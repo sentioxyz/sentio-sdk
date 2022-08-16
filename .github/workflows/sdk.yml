@@ -30,4 +30,4 @@ jobs:
         run: ./scripts/build-examples.sh
       - name: Test SDK
         run: yarn test
-        working-directory: processor/sdk
+        working-directory: sdk
