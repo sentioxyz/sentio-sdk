@@ -1,0 +1,6 @@
+{
+  "scripts": {
+    "configure": "git config --local include.path ../../../.github/.gitconfig",
+    "hooks": "git config core.hooksPath ../.github/.githooks"
+  }
+}

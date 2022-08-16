@@ -1,0 +1,65 @@
+{
+  "1": {
+    "ChainID": "1",
+    "Https": [
+      "https://eth-mainnet.alchemyapi.io/v2/Gk024pFA-64RaEPIawL40n__1esXJFb2",
+      "https://eth-mainnet.alchemyapi.io/v2/BJQpOPPKYT7mr3X6iRL3IawOJPnyiG-P"
+    ],
+    "WebSockets": [
+      "wss://eth-mainnet.alchemyapi.io/v2/Gk024pFA-64RaEPIawL40n__1esXJFb2",
+      "wss://eth-mainnet.alchemyapi.io/v2/BJQpOPPKYT7mr3X6iRL3IawOJPnyiG-P"
+    ],
+    "ChainServer": "",
+    "BatchSize": 2000,
+    "ReorgThresholdBlocks": 30,
+    "TimestampSampleInterval": 10000,
+    "ProcessingDelayBlocks": 0
+  },
+  "3": {
+    "ChainID": "3",
+    "Https": [
+      "https://ropsten.infura.io/v3/1e2099a68b354e6db3649b9e75fe17b9",
+      "https://ropsten.infura.io/v3/ec4bc1d370134f06a05dc7ffc735d8f5"
+    ],
+    "WebSockets": [
+      "wss://ropsten.infura.io/ws/v3/1e2099a68b354e6db3649b9e75fe17b9",
+      "wss://ropsten.infura.io/ws/v3/ec4bc1d370134f06a05dc7ffc735d8f5"
+    ],
+    "ChainServer": "",
+    "BatchSize": 2000,
+    "ReorgThresholdBlocks": 300,
+    "TimestampSampleInterval": 10000,
+    "ProcessingDelayBlocks": 0
+  },
+  "56": {
+    "ChainID": "56",
+    "Https": [
+      "https://winter-withered-feather.bsc.discover.quiknode.pro/09cdc3b22506509b3fc49cb52448419d5e302ea1/",
+      "https://red-wandering-tree.bsc.discover.quiknode.pro/88d316a3d174489011af3c9cb3dd940fdff7880b/",
+      "https://morning-fragrant-silence.bsc.discover.quiknode.pro/7c6d4b06289c2dbaadce00f3b0a465d48c3f0753/"
+    ],
+    "WebSockets": [
+      "wss://winter-withered-feather.bsc.discover.quiknode.pro/09cdc3b22506509b3fc49cb52448419d5e302ea1/",
+      "wss://red-wandering-tree.bsc.discover.quiknode.pro/88d316a3d174489011af3c9cb3dd940fdff7880b/",
+      "wss://morning-fragrant-silence.bsc.discover.quiknode.pro/7c6d4b06289c2dbaadce00f3b0a465d48c3f0753/"
+    ],
+    "ChainServer": "",
+    "BatchSize": 2000,
+    "ReorgThresholdBlocks": 30,
+    "TimestampSampleInterval": 50000,
+    "ProcessingDelayBlocks": 5
+  },
+  "SOL:mainnet": {
+    "ChainID": "SOL:mainnet",
+    "Https": [
+      "https://solana-mainnet.g.alchemy.com/v2/AIM3Qp8rkxBoAjRCNeazPaNKdjYgLdzc",
+      "https://try-rpc.mainnet.solana.blockdaemon.tech"
+    ],
+    "WebSockets": [],
+    "ChainServer": "",
+    "BatchSize": 10000,
+    "ReorgThresholdBlocks": 0,
+    "TimestampSampleInterval": 0,
+    "ProcessingDelayBlocks": 0
+  }
+}

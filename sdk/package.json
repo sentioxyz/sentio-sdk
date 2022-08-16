@@ -1,0 +1,73 @@
+{
+  "name": "@sentio/sdk",
+  "license": "Apache-2.0",
+  "scripts": {
+    "compile": "tsc --build tsconfig.json && cp src/cli/webpack.config.js dist/cli",
+    "build": "yarn compile && yarn gen_test_abi",
+    "pub": "yarn publish --no-git-tag-version --access public",
+    "start_ts": "ts-node --files src/processor.ts ../examples/x2y2/src/processor.ts",
+    "start_ts_solana": "ts-node --files src/processor.ts ../examples/mirrorworld/src/processor.ts",
+    "start": "ts-node --files src/processor.ts ../examples/x2y2/dist/lib.js",
+    "start_js": "node dist/processor.js ../examples/x2y2/dist/lib.js",
+    "ts-start": "ts-node --files src/processor.ts src/test-case/erc20.ts",
+    "cli": "yarn build && node dist/cli/cli.js",
+    "test": "ts-mocha --paths src/**/*.test.ts src/*.test.ts",
+    "gen_test_abi": "yarn gen_evm_abi && yarn gen_solana_abi",
+    "gen_evm_abi": "typechain --target dist/target-ethers-sentio --out-dir src/test-case/types 'src/test-case/abis/*.json'",
+    "gen_solana_abi": "ts-node src/cli/solana-code-gen.ts src/test-case types"
+  },
+  "bin": {
+    "processor": "./dist/processor.js",
+    "sentio": "./dist/cli/cli.js"
+  },
+  "version": "0.2.14",
+  "dependencies": {
+    "@ethersproject/providers": "^5.6.7",
+    "@project-serum/anchor": "^0.25.0",
+    "@solana/web3.js": "^1.47.3",
+    "@typechain/ethers-v5": "^10.0.0",
+    "@types/node-fetch": "^2.6.2",
+    "bn.js": "^5.2.1",
+    "bs58": "^5.0.0",
+    "command-line-args": "^5.2.1",
+    "command-line-usage": "^6.1.3",
+    "ethers": "^5.6.7",
+    "form-data": "^4.0.0",
+    "fs-extra": "^10.1.0",
+    "google-protobuf": "^3.15.8",
+    "js-yaml": "^4.1.0",
+    "log-timestamp": "^0.3.0",
+    "nice-grpc": "^2.0.0",
+    "node-fetch": "2",
+    "ts-loader": "^9.3.0",
+    "typechain": "^8.0.0",
+    "webpack": "^5.72.1",
+    "webpack-cli": "^4.9.2"
+  },
+  "devDependencies": {
+    "@bazel/typescript": "^5.4.2",
+    "@types/bn.js": "^5.1.0",
+    "@types/chai": "^4.3.1",
+    "@types/command-line-args": "^5.2.0",
+    "@types/command-line-usage": "^5.0.2",
+    "@types/expect": "^24.3.0",
+    "@types/fs-extra": "^9.0.13",
+    "@types/google-protobuf": "^3.15.6",
+    "@types/js-yaml": "^4.0.5",
+    "@types/mkdirp": "^1.0.2",
+    "@types/mocha": "^9.1.1",
+    "@types/node": "^18.0.4",
+    "chai": "^4.3.6",
+    "mocha": "^10.0.0",
+    "ts-mocha": "^10.0.0",
+    "ts-node": "^10.8.0",
+    "tsconfig-paths": "^4.0.0",
+    "typescript": "^4.7.2"
+  },
+  "files": [
+    "dist/**/*"
+  ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "module": "./dist/index.js"
+}

@@ -1,0 +1,29 @@
+# https://ls-lint.org/1.x/configuration/the-rules.html
+ls:
+  .dir: kebab-case | snake_case | regex:.[a-z0-9]+ | regex:[[a-z0-9]+] # TODO clean this up
+  .go: snake_case
+  .deepcopy.go: snake_case
+  .proto: snake_case
+  .bazel: SCREAMING_SNAKE_CASE
+  .html: kebab-case
+  .css: kebab-case
+  .png: kebab-case
+  .jpg: kebab-case
+  .json: kebab-case | regex:.[a-z0-9]+
+  .js: kebab-case
+  .config.js: kebab-case
+  .ts: kebab-case | regex:_[a-z0-9]+
+  .tsx: kebab-case | regex:_[a-z0-9]+ | regex:[[a-z0-9]+]
+  .test.ts: kebab-case
+  .test.tsx: kebab-case
+  .d.ts: kebab-case
+
+ignore:
+  - .git
+  - .idea
+  - .github
+  - node_modules
+  - sdk/src/test-case/types
+  - sdk/dist
+  - sdk/node_modules
+  - examples

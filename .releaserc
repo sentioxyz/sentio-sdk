@@ -1,0 +1,18 @@
+{
+    "branches": [ "release", {"name": "main", "prerelease": "rc"}],
+    "plugins": [
+      ["@semantic-release/commit-analyzer", {
+        "preset": "angular",
+        "releaseRules": [
+          {"type": "chore", "scope": "deps", "release": "patch"},
+        ]
+      }],
+      "@semantic-release/release-notes-generator",
+      ["@semantic-release/github", {
+        "successComment": false,
+        "labels": false,
+      }],
+    ]
+
+    # https://github.com/semantic-release/commit-analyzer#release-rules
+}

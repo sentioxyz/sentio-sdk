@@ -1,0 +1,4 @@
+project: test
+# project: user_org_name/name
+host: test # local/test/staging/prod
+definition: src/

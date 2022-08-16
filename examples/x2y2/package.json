@@ -1,0 +1,19 @@
+{
+  "name": "@sentio/x2y2",
+  "license": "Apache-2.0",
+  "version": "1.0.0",
+  "scripts": {
+    "compile": "tsc -p .",
+    "start": "processor_server ./dist/lib",
+    "build": "sentio build",
+    "postinstall": "sentio gen",
+    "tsnode": "yarn ts-node"
+  },
+  "dependencies": {
+    "@sentio/sdk": "file:../../sdk"
+  },
+  "devDependencies": {
+    "ts-node": "^10.8.0",
+    "typescript": "^4.7.2"
+  }
+}

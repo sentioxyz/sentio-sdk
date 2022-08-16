@@ -1,0 +1,37 @@
+{
+  "extends": [
+    "config:base",
+    ":preserveSemverRanges"
+  ],
+  "labels": ["dependencies"],
+  "groupName": "all",
+  "separateMajorMinor": false,
+  "packageRules": [
+    {
+      "matchPackageNames": [
+        "node"
+      ],
+      "enabled": false
+    },
+    {
+      "matchPackageNames": [  // TODO update this to 3.0.0
+        "node-fetch"
+      ],
+      "allowedVersions": "< 3.0.0"
+    },
+    {
+      "matchPackageNames": [  // > 1 package is actually bad release
+        "github.com/prometheus/prometheus"
+      ],
+      "allowedVersions": "< 1.0.0"
+    },
+    {
+      "matchPackageNames": [ // https://pkg.go.dev/k8s.io/client-go#section-readme
+        "k8s.io/client-go"
+      ],
+      "allowedVersions": "< 1.0.0"
+    }
+  ],
+  "timezone": "America/Los_Angeles",
+  "schedule": ["after 9pm on sunday"]
+}

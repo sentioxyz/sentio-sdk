@@ -1,0 +1,171 @@
+import { Context, ContractWrapper } from './context'
+import { Block, Log } from '@ethersproject/abstract-provider'
+import { BaseContract, EventFilter } from 'ethers'
+import { Event } from '@ethersproject/contracts'
+import { BytesLike } from '@ethersproject/bytes'
+import { O11yResult } from './gen/processor/protos/processor'
+import Long from 'long'
+import { ServerError, Status } from 'nice-grpc'
+import { BindInternalOptions, BindOptions } from './bind-options'
+
+// type IndexConfigure = {
+//   startBlock: Long
+//   endBlock?: Long
+//   chunkSize?: number
+// }
+
+class EventsHandler {
+  filters: EventFilter[]
+  handler: (event: Log) => Promise<O11yResult>
+}
+
+export class BaseProcessor<TContract extends BaseContract, TContractWrapper extends ContractWrapper<TContract>> {
+  blockHandlers: ((block: Block) => Promise<O11yResult>)[] = []
+  eventHandlers: EventsHandler[] = []
+
+  contract: TContractWrapper
+  // network: Network
+  name: string
+
+  config: BindInternalOptions
+
+  constructor(config: BindOptions, contract: TContractWrapper) {
+    // this.name = name
+    // this.network = getNetwork(network)
+
+    this.config = {
+      address: config.address,
+      name: config.name || '',
+      network: config.network ? config.network : 1,
+      startBlock: new Long(0),
+    }
+    if (config.startBlock) {
+      if (typeof config.startBlock === 'number') {
+        this.config.startBlock = Long.fromNumber(config.startBlock)
+      } else {
+        this.config.startBlock = config.startBlock
+      }
+    }
+    if (config.endBlock) {
+      if (typeof config.endBlock === 'number') {
+        this.config.endBlock = Long.fromNumber(config.endBlock)
+      } else {
+        this.config.endBlock = config.endBlock
+      }
+    }
+
+    this.contract = contract
+    if (!globalThis.Processors) {
+      globalThis.Processors = []
+    }
+    globalThis.Processors.push(this)
+  }
+
+  // constructor(address: string, name: string, network: Networkish = 1) {
+  //   this.name = name
+  //   // this.network = getNetwork(network)
+  //   this.contract = this.bindInternal(address, network)
+  //   if (!globalThis.Processors) {
+  //     globalThis.Processors = []
+  //   }
+  //   globalThis.Processors.push(this)
+  // }
+  //
+  // protected abstract bindInternal(address: string, network: Networkish): TContractWrapper
+
+  // public startBlock(startBlock: Long | number) {
+  //   if (typeof startBlock === 'number') {
+  //     startBlock = Long.fromNumber(startBlock)
+  //   }
+  //   this.config.startBlock = startBlock
+  //   return this
+  // }
+
+  // public endBlock(endBlock: Long | number) {
+  //   if (typeof endBlock === 'number') {
+  //     endBlock = Long.fromNumber(endBlock)
+  //   }
+  //   this.config.endBlock = endBlock
+  //   return this
+  // }
+
+  // public configure(option: IndexConfigure) {
+  //   this.config = option
+  // }
+
+  public isBind() {
+    return this.contract._underlineContract.address !== ''
+  }
+
+  public async getChainId() {
+    return (await this.contract._underlineContract.provider.getNetwork()).chainId.toString()
+  }
+
+  public async onEvent(
+    handler: (event: Event, ctx: Context<TContract, TContractWrapper>) => void,
+    filter: EventFilter | EventFilter[]
+  ) {
+    if (!this.isBind()) {
+      throw new ServerError(Status.INTERNAL, 'processor not bind')
+    }
+    const contract = this.contract
+    const chainId = await this.getChainId()
+
+    let _filters: EventFilter[] = []
+
+    if (Array.isArray(filter)) {
+      _filters = filter
+    } else {
+      _filters.push(filter)
+    }
+
+    this.eventHandlers.push({
+      filters: _filters,
+      handler: async function (log) {
+        const ctx = new Context<TContract, TContractWrapper>(contract, chainId, undefined, log)
+        // let event: Event = <Event>deepCopy(log);
+        const event: Event = <Event>log
+
+        const parsed = contract._underlineContract.interface.parseLog(log)
+        if (parsed) {
+          event.args = parsed.args
+          event.decode = (data: BytesLike, topics?: Array<any>) => {
+            return contract._underlineContract.interface.decodeEventLog(parsed.eventFragment, data, topics)
+          }
+          event.event = parsed.name
+          event.eventSignature = parsed.signature
+
+          // TODO fix this bug
+          await handler(event, ctx)
+          return {
+            histograms: ctx.histograms,
+            counters: ctx.counters,
+          }
+        }
+        return {
+          histograms: [],
+          counters: [],
+        }
+      },
+    })
+  }
+
+  public async onBlock(handler: (block: Block, ctx: Context<TContract, TContractWrapper>) => void) {
+    if (!this.isBind()) {
+      throw new ServerError(Status.INTERNAL, 'Registry not bind')
+    }
+    const contract = this.contract
+    const chainId = await this.getChainId()
+
+    this.blockHandlers.push(async function (block: Block) {
+      contract.block = block
+      const ctx = new Context<TContract, TContractWrapper>(contract, chainId, block, undefined)
+      await handler(block, ctx)
+      return {
+        histograms: ctx.histograms,
+        counters: ctx.counters,
+      }
+    })
+    return this
+  }
+}

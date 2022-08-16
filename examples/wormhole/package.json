@@ -1,0 +1,17 @@
+{
+  "name": "@sentio/wormhole",
+  "license": "Apache-2.0",
+  "version": "1.0.0",
+  "scripts": {
+    "compile": "tsc -p .",
+    "start": "processor_server ./dist/lib",
+    "build": "sentio build",
+    "postinstall": "sentio gen"
+  },
+  "dependencies": {
+    "@sentio/sdk": "file:../../sdk"
+  },
+  "devDependencies": {
+    "typescript": "^4.7.2"
+  }
+}

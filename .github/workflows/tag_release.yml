@@ -1,0 +1,26 @@
+name: Tag Release
+on:
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: 'Commit to be tagged'
+        required: false
+        default: ""
+  push:
+    branches:
+      - release # TODO add better formal release workflow
+jobs:
+  release:
+    name: release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          persist-credentials: false # https://github.com/semantic-release/semantic-release/discussions/1906#discussioncomment-1991497
+          ref: ${{ github.event.inputs.commit }}
+      - uses: actions/setup-node@v3
+      - run: yarn install && yarn release
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+    # TODO Delete all pre release if it's release

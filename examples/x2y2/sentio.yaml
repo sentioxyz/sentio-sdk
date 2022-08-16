@@ -1,0 +1,5 @@
+project: x2y2
+host: http://localhost:10000
+targets:
+  - chain: evm
+    abisDir: abis

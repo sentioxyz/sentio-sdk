@@ -1,0 +1,21 @@
+{
+  "name": "@sentio/mirrorworld",
+  "license": "Apache-2.0",
+  "version": "1.0.0",
+  "scripts": {
+    "compile": "tsc -p .",
+    "start": "processor_server ./dist/lib",
+    "build": "sentio build",
+    "tsnode": "yarn ts-node"
+  },
+  "dependencies": {
+    "@sentio/sdk": "file:../../sdk"
+  },
+  "devDependencies": {
+    "ts-node": "^10.8.0",
+    "typescript": "^4.7.2",
+    "@types/bn.js": "^5.1.0",
+    "@types/bs58": "4.0.1",
+    "@types/node-fetch": "^2.6.2"
+  }
+}
