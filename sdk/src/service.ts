@@ -17,8 +17,7 @@ import {
   ProcessTransactionResponse,
   ProcessInstructionResponse,
   ProcessInstructionRequest,
-  InstantiateTemplateRequest,
-  TemplateInstance,
+  TemplateInstance, StartRequest
 } from './gen/processor/protos/processor'
 
 import { DeepPartial } from './gen/builtin'
@@ -162,9 +161,22 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     }
   }
 
-  async start(request: Empty, context: CallContext): Promise<DeepPartial<Empty>> {
+  async start(request: StartRequest, context: CallContext): Promise<DeepPartial<Empty>> {
     if (this.started) {
       return {}
+    }
+    for (const instance of request.templateInstances) {
+      const template = globalThis.Templates[instance.templateId]
+      if (!instance.contract) {
+        throw new ServerError(Status.INVALID_ARGUMENT, 'Invalid template contract' + instance.contract)
+      }
+      template.bind({
+        name: instance.contract.name,
+        address: instance.contract.address,
+        network: Number(instance.contract.chainId),
+        startBlock: instance.startBlock,
+        endBlock: instance.endBlock,
+      })
     }
     await this.configure()
     this.started = true
@@ -324,29 +336,6 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     return {
       result: resp,
     }
-  }
-
-  async instantiateTemplate(request: InstantiateTemplateRequest, context: CallContext): Promise<DeepPartial<Empty>> {
-    if (!this.started) {
-      throw new ServerError(Status.UNAVAILABLE, 'Service Not started.')
-    }
-
-    for (const instance of request.instances) {
-      const template = globalThis.Templates[instance.templateId]
-      if (!instance.contract) {
-        throw new ServerError(Status.INVALID_ARGUMENT, 'Invalid template contract' + instance.contract)
-      }
-      template.bind({
-        name: instance.contract.name,
-        address: instance.contract.address,
-        network: Number(instance.contract.chainId),
-        startBlock: instance.startBlock,
-        endBlock: instance.endBlock,
-      })
-    }
-    await this.configure()
-    this.started = true
-    return {}
   }
 }
 

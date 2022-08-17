@@ -20,7 +20,7 @@
     "processor": "./dist/processor.js",
     "sentio": "./dist/cli/cli.js"
   },
-  "version": "0.2.14",
+  "version": "0.2.15",
   "dependencies": {
     "@ethersproject/providers": "^5.6.7",
     "@project-serum/anchor": "^0.25.0",

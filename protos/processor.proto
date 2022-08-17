@@ -8,9 +8,8 @@ option go_package = "sentioxyz/sentio/processor";
 
 service Processor {
   rpc GetConfig(ProcessConfigRequest) returns (ProcessConfigResponse);
-  rpc Start(google.protobuf.Empty) returns (google.protobuf.Empty);
+  rpc Start(StartRequest) returns (google.protobuf.Empty);
   rpc Stop(google.protobuf.Empty) returns (google.protobuf.Empty);
-  rpc InstantiateTemplate(InstantiateTemplateRequest) returns (google.protobuf.Empty);
 
   // This only applies to EVM-compatible chain
   rpc ProcessLog(ProcessLogRequest) returns (ProcessLogResponse);
@@ -59,8 +58,8 @@ message TemplateInstance {
   int32 template_id = 4;
 }
 
-message InstantiateTemplateRequest {
-    repeated TemplateInstance instances = 1;
+message StartRequest {
+    repeated TemplateInstance template_instances = 1;
 }
 
 message BlockHandlerConfig {

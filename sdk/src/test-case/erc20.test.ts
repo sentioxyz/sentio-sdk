@@ -3,8 +3,6 @@
 import { expect } from 'chai'
 
 import {
-  ContractInfo,
-  InstantiateTemplateRequest,
   LogBinding,
   ProcessBlockRequest,
   ProcessLogRequest,
@@ -30,7 +28,7 @@ describe('Test Server with Example', () => {
     setProvider(chainsConfig)
 
     require('./erc20')
-    await service.start({}, testContext)
+    await service.start({ templateInstances: [] }, testContext)
   })
 
   it('check configuration', async () => {
@@ -111,36 +109,6 @@ describe('Test Server with Example', () => {
     const config = await service.getConfig({}, testContext)
     expect(config.contractConfigs).length(5) //config increased
     expect(config.contractConfigs?.[4].contract?.name).equals('dynamic')
-  })
-
-  it('Check template instantiate', async () => {
-    let originLen = (await service.getConfig({}, testContext)).contractConfigs?.length
-    if (originLen === undefined) {
-      originLen = 0
-    }
-
-    const request: InstantiateTemplateRequest = {
-      instances: [
-        {
-          contract: {
-            address: 'dynamic2',
-            name: 'dynamic2',
-            chainId: '1',
-            abi: '',
-          },
-          startBlock: Long.ZERO,
-          endBlock: Long.ZERO,
-          templateId: 0,
-        },
-      ],
-    }
-
-    await service.instantiateTemplate(request, testContext)
-
-    const config = await service.getConfig({}, testContext)
-    expect(config.contractConfigs).length(originLen + 1)
-    expect(config.contractConfigs?.[originLen].contract?.name).equals('dynamic2')
-    expect(config.templateInstances).length(2)
   })
 
   const blockData = {

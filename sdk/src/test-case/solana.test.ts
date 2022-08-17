@@ -17,7 +17,7 @@ describe('Test Server with Solana Example', () => {
 
     require('./mirrorworld')
     require('./wormhole-token-bridge')
-    await service.start({}, testContext)
+    await service.start({ templateInstances: [] }, testContext)
   })
 
   it('check configuration ', async () => {

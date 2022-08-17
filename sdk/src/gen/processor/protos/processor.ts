@@ -41,8 +41,8 @@ export interface TemplateInstance {
   templateId: number;
 }
 
-export interface InstantiateTemplateRequest {
-  instances: TemplateInstance[];
+export interface StartRequest {
+  templateInstances: TemplateInstance[];
 }
 
 export interface BlockHandlerConfig {
@@ -752,33 +752,30 @@ export const TemplateInstance = {
   },
 };
 
-function createBaseInstantiateTemplateRequest(): InstantiateTemplateRequest {
-  return { instances: [] };
+function createBaseStartRequest(): StartRequest {
+  return { templateInstances: [] };
 }
 
-export const InstantiateTemplateRequest = {
+export const StartRequest = {
   encode(
-    message: InstantiateTemplateRequest,
+    message: StartRequest,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    for (const v of message.instances) {
+    for (const v of message.templateInstances) {
       TemplateInstance.encode(v!, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): InstantiateTemplateRequest {
+  decode(input: _m0.Reader | Uint8Array, length?: number): StartRequest {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseInstantiateTemplateRequest();
+    const message = createBaseStartRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.instances.push(
+          message.templateInstances.push(
             TemplateInstance.decode(reader, reader.uint32())
           );
           break;
@@ -790,32 +787,31 @@ export const InstantiateTemplateRequest = {
     return message;
   },
 
-  fromJSON(object: any): InstantiateTemplateRequest {
+  fromJSON(object: any): StartRequest {
     return {
-      instances: Array.isArray(object?.instances)
-        ? object.instances.map((e: any) => TemplateInstance.fromJSON(e))
+      templateInstances: Array.isArray(object?.templateInstances)
+        ? object.templateInstances.map((e: any) => TemplateInstance.fromJSON(e))
         : [],
     };
   },
 
-  toJSON(message: InstantiateTemplateRequest): unknown {
+  toJSON(message: StartRequest): unknown {
     const obj: any = {};
-    if (message.instances) {
-      obj.instances = message.instances.map((e) =>
+    if (message.templateInstances) {
+      obj.templateInstances = message.templateInstances.map((e) =>
         e ? TemplateInstance.toJSON(e) : undefined
       );
     } else {
-      obj.instances = [];
+      obj.templateInstances = [];
     }
     return obj;
   },
 
-  fromPartial(
-    object: DeepPartial<InstantiateTemplateRequest>
-  ): InstantiateTemplateRequest {
-    const message = createBaseInstantiateTemplateRequest();
-    message.instances =
-      object.instances?.map((e) => TemplateInstance.fromPartial(e)) || [];
+  fromPartial(object: DeepPartial<StartRequest>): StartRequest {
+    const message = createBaseStartRequest();
+    message.templateInstances =
+      object.templateInstances?.map((e) => TemplateInstance.fromPartial(e)) ||
+      [];
     return message;
   },
 };
@@ -2602,7 +2598,7 @@ export const ProcessorDefinition = {
     },
     start: {
       name: "Start",
-      requestType: Empty,
+      requestType: StartRequest,
       requestStream: false,
       responseType: Empty,
       responseStream: false,
@@ -2611,14 +2607,6 @@ export const ProcessorDefinition = {
     stop: {
       name: "Stop",
       requestType: Empty,
-      requestStream: false,
-      responseType: Empty,
-      responseStream: false,
-      options: {},
-    },
-    instantiateTemplate: {
-      name: "InstantiateTemplate",
-      requestType: InstantiateTemplateRequest,
       requestStream: false,
       responseType: Empty,
       responseStream: false,
@@ -2665,15 +2653,11 @@ export interface ProcessorServiceImplementation<CallContextExt = {}> {
     context: CallContext & CallContextExt
   ): Promise<DeepPartial<ProcessConfigResponse>>;
   start(
-    request: Empty,
+    request: StartRequest,
     context: CallContext & CallContextExt
   ): Promise<DeepPartial<Empty>>;
   stop(
     request: Empty,
-    context: CallContext & CallContextExt
-  ): Promise<DeepPartial<Empty>>;
-  instantiateTemplate(
-    request: InstantiateTemplateRequest,
     context: CallContext & CallContextExt
   ): Promise<DeepPartial<Empty>>;
   processLog(
@@ -2700,15 +2684,11 @@ export interface ProcessorClient<CallOptionsExt = {}> {
     options?: CallOptions & CallOptionsExt
   ): Promise<ProcessConfigResponse>;
   start(
-    request: DeepPartial<Empty>,
+    request: DeepPartial<StartRequest>,
     options?: CallOptions & CallOptionsExt
   ): Promise<Empty>;
   stop(
     request: DeepPartial<Empty>,
-    options?: CallOptions & CallOptionsExt
-  ): Promise<Empty>;
-  instantiateTemplate(
-    request: DeepPartial<InstantiateTemplateRequest>,
     options?: CallOptions & CallOptionsExt
   ): Promise<Empty>;
   processLog(
