@@ -5,10 +5,16 @@ import { exec } from 'child_process'
 import { EVM, SOLANA, Target } from './config'
 
 export async function buildProcessor(onlyGen: boolean, targets: Target[]) {
-  targets.forEach(async (target) => await buildProcessorForTarget(onlyGen, target))
-  const WEBPACK_CONFIG = path.join(__dirname, 'webpack.config.js')
-  await execStep('yarn tsc -p .', 'Compile')
-  await execStep('yarn webpack --config=' + WEBPACK_CONFIG, 'Packaging')
+  // targets.forEach(async (target) => await buildProcessorForTarget(onlyGen, target))
+  for (const target of targets) {
+    await buildProcessorForTarget(onlyGen, target)
+  }
+
+  if (!onlyGen) {
+    const WEBPACK_CONFIG = path.join(__dirname, 'webpack.config.js')
+    await execStep('yarn tsc -p .', 'Compile')
+    await execStep('yarn webpack --config=' + WEBPACK_CONFIG, 'Packaging')
+  }
 }
 
 async function buildProcessorForTarget(onlyGen: boolean, target: Target) {
@@ -150,13 +156,9 @@ async function execStep(cmd: string, stepName: string) {
     child.on('close', resolve)
   })
 
-  if (child.exitCode !== 0) {
+  if (child.exitCode) {
     console.error(chalk.red(stepName + ' failed'))
-    let exitCode = 1
-    if (child.exitCode !== null) {
-      exitCode = child.exitCode
-    }
-    process.exit(exitCode)
+    process.exit(child.exitCode)
   }
   console.log(chalk.blue(stepName + ' success'))
   console.log()

@@ -7,6 +7,7 @@ import { O11yResult } from './gen/processor/protos/processor'
 import Long from 'long'
 import { ServerError, Status } from 'nice-grpc'
 import { BindInternalOptions, BindOptions } from './bind-options'
+import { getNetwork } from '@ethersproject/providers'
 
 // type IndexConfigure = {
 //   startBlock: Long
@@ -97,11 +98,11 @@ export class BaseProcessor<TContract extends BaseContract, TContractWrapper exte
     return this.contract._underlineContract.address !== ''
   }
 
-  public async getChainId() {
-    return (await this.contract._underlineContract.provider.getNetwork()).chainId.toString()
+  public getChainId() {
+    return getNetwork(this.config.network).chainId.toString()
   }
 
-  public async onEvent(
+  public onEvent(
     handler: (event: Event, ctx: Context<TContract, TContractWrapper>) => void,
     filter: EventFilter | EventFilter[]
   ) {
@@ -109,7 +110,7 @@ export class BaseProcessor<TContract extends BaseContract, TContractWrapper exte
       throw new ServerError(Status.INTERNAL, 'processor not bind')
     }
     const contract = this.contract
-    const chainId = await this.getChainId()
+    const chainId = this.getChainId()
 
     let _filters: EventFilter[] = []
 
@@ -148,14 +149,15 @@ export class BaseProcessor<TContract extends BaseContract, TContractWrapper exte
         }
       },
     })
+    return this
   }
 
-  public async onBlock(handler: (block: Block, ctx: Context<TContract, TContractWrapper>) => void) {
+  public onBlock(handler: (block: Block, ctx: Context<TContract, TContractWrapper>) => void) {
     if (!this.isBind()) {
       throw new ServerError(Status.INTERNAL, 'Registry not bind')
     }
     const contract = this.contract
-    const chainId = await this.getChainId()
+    const chainId = this.getChainId()
 
     this.blockHandlers.push(async function (block: Block) {
       contract.block = block

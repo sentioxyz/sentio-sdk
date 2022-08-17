@@ -27,7 +27,7 @@ jobs:
           restore-keys: |
             yarn-sdk-v1
       - name: Build SDK & Examples
-        run: ./scripts/build-examples.sh
+        run: ./scripts/build-all.sh
       - name: Test SDK
         run: yarn test
         working-directory: sdk

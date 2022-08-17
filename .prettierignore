@@ -1,10 +1,7 @@
-bazel-*
 node_modules
 .*
 dist
 gen
 types
-deploy
 out
-k8s/config/**/*.yaml
 /private/var*
