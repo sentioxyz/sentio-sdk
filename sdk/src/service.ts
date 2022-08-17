@@ -167,8 +167,11 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     }
     for (const instance of request.templateInstances) {
       const template = globalThis.Templates[instance.templateId]
+      if (!template) {
+        throw new ServerError(Status.INVALID_ARGUMENT, 'Invalid template contract:' + instance)
+      }
       if (!instance.contract) {
-        throw new ServerError(Status.INVALID_ARGUMENT, 'Invalid template contract' + instance.contract)
+        throw new ServerError(Status.INVALID_ARGUMENT, 'Contract Empty from:' + instance)
       }
       template.bind({
         name: instance.contract.name,
