@@ -109,6 +109,11 @@ describe('Test Server with Example', () => {
     const config = await service.getConfig({}, testContext)
     expect(config.contractConfigs).length(5) //config increased
     expect(config.contractConfigs?.[4].contract?.name).equals('dynamic')
+
+    // repeat trigger won't bind again
+    await service.processLog(request, testContext)
+    const config2 = await service.getConfig({}, testContext)
+    expect(config).deep.equals(config2)
   })
 
   const blockData = {

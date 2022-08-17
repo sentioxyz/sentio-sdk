@@ -61,8 +61,6 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     if (globalThis.TemplatesInstances) {
       this.templateInstances = [...globalThis.TemplatesInstances]
     }
-    // console.log(globalThis.TemplatesInstances)
-    // console.log(this.templateInstances)
 
     if (globalThis.Processors) {
       for (const processor of globalThis.Processors) {
@@ -82,16 +80,12 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
           logConfigs: [],
           startBlock: processor.config.startBlock,
           endBlock: MAX_BLOCK,
-          // chunkSize: 1,
           instructionConfig: [],
           transactionConfig: [],
         }
         if (processor.config.endBlock) {
           contractConfig.endBlock = processor.config.endBlock
         }
-        // if (processor.config.chunkSize) {
-        //   contractConfig.chunkSize = processor.config.chunkSize
-        // }
 
         // Prepare all the event handlers
         for (const eventsHandler of processor.eventHandlers) {
@@ -152,7 +146,6 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
           logConfigs: [],
           startBlock: solanaProcessor.config.startSlot,
           endBlock: MAX_BLOCK,
-          // chunkSize: 1,
           instructionConfig: [],
           transactionConfig: [],
         }

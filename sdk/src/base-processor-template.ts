@@ -3,7 +3,7 @@ import { Block } from '@ethersproject/abstract-provider'
 import { BaseContract, EventFilter } from 'ethers'
 import { Event } from '@ethersproject/contracts'
 import { BaseProcessor } from './base-processor'
-import { BindOptions } from './bind-options'
+import { BindOptions, getOptionsSignature } from './bind-options'
 import { TemplateInstance } from './gen/processor/protos/processor'
 import Long from 'long'
 import { getNetwork } from '@ethersproject/providers'
@@ -13,6 +13,7 @@ export abstract class BaseProcessorTemplate<
   TContractWrapper extends ContractWrapper<TContract>
 > {
   id: number
+  bound = new Set<string>()
 
   constructor() {
     if (!globalThis.Templates) {
@@ -22,13 +23,13 @@ export abstract class BaseProcessorTemplate<
     globalThis.Templates.push(this)
   }
 
-  // static bind(address: string, network: Networkish = 1, name: string = ""): Erc20Processor {
-  //   if (name === "") {
-  //     name = Erc20Processor.namer.nextName()
-  //   }
-  //   return new Erc20Processor(address, name, network)
-  // }
   public bind(options: BindOptions) {
+    const sig = getOptionsSignature(options)
+    if (this.bound.has(sig)) {
+      return
+    }
+    this.bound.add(sig)
+
     const processor = this.bindInternal(options)
 
     for (const eh of this.eventHandlers) {
