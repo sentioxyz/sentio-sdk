@@ -2,13 +2,7 @@
 
 import { expect } from 'chai'
 
-import {
-  LogBinding,
-  ProcessBlockRequest,
-  ProcessLogRequest,
-  ProcessorServiceImpl,
-  setProvider,
-} from '..'
+import { LogBinding, ProcessBlockRequest, ProcessLogRequest, ProcessorServiceImpl, setProvider } from '..'
 
 import { CallContext } from 'nice-grpc-common/src/server/CallContext'
 import * as path from 'path'

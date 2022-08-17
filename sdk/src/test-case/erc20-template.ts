@@ -5,11 +5,9 @@ export const filter = Erc20Processor.filters.Transfer(
   '0xb329e39ebefd16f40d38f07643652ce17ca5bac1'
 )
 
-const processorTemplate = new Erc20ProcessorTemplate().onTransfer(
-  async function (event, ctx) {
-    console.log('')
-  }
-)
+const processorTemplate = new Erc20ProcessorTemplate().onTransfer(async function (event, ctx) {
+  console.log('')
+})
 
 Erc20Processor.bind({
   address: '0x1e4ede388cbc9f4b5c79681b7f94d36a11abebc9',

@@ -31,8 +31,8 @@
     }
   },
   "exclude": [
-    "dist",
+    "dist"
     //    "**/*.test.ts"
-//                "src/test-case/**/*.ts"
+    //                "src/test-case/**/*.ts"
   ]
 }

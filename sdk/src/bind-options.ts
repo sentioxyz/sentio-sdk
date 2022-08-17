@@ -11,7 +11,7 @@ export class BindOptions {
 }
 
 export function getOptionsSignature(opts: BindOptions): string {
-  const sig = [ opts.address ]
+  const sig = [opts.address]
   if (opts.network) {
     sig.push(getNetwork(opts.network).chainId.toString())
   }
@@ -24,7 +24,7 @@ export function getOptionsSignature(opts: BindOptions): string {
   if (opts.endBlock) {
     sig.push(opts.endBlock.toString())
   }
-  return sig.join("_")
+  return sig.join('_')
 }
 
 export class BindInternalOptions {

@@ -1,0 +1,4 @@
+set -e
+
+echo "Running pre-push other linters"
+yarn lint

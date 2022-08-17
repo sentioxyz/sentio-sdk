@@ -17,7 +17,8 @@ import {
   ProcessTransactionResponse,
   ProcessInstructionResponse,
   ProcessInstructionRequest,
-  TemplateInstance, StartRequest
+  TemplateInstance,
+  StartRequest,
 } from './gen/processor/protos/processor'
 
 import { DeepPartial } from './gen/builtin'

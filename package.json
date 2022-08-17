@@ -1,6 +1,20 @@
 {
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@ls-lint/ls-lint": "^1.11.2",
+    "semantic-release": "^19.0.3",
+    "@typescript-eslint/eslint-plugin": "^5.26.0",
+    "@typescript-eslint/parser": "^5.26.0",
+    "eslint": "^8.17.0",
+    "eslint-config-prettier": "^8.5.0",
+    "lint-staged": "^13.0.3",
+    "prettier": "^2.7.1",
+    "prettier-plugin-sh": "^0.12.8",
+    "typescript": "^4.7.2"
+  },
   "scripts": {
-    "configure": "git config --local include.path ../../../.github/.gitconfig",
-    "hooks": "git config core.hooksPath ../.github/.githooks"
+    "format": "prettier --write .",
+    "lint": "ls-lint && eslint .",
+    "release": "semantic-release"
   }
 }

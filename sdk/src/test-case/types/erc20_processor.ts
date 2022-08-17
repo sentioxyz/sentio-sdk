@@ -76,8 +76,7 @@ export class Erc20ProcessorTemplate extends BaseProcessorTemplate<
         null
       );
     }
-    super.onEvent(handler, filter);
-    return this;
+    return super.onEvent(handler, filter);
   }
 
   onTransfer(
@@ -91,8 +90,7 @@ export class Erc20ProcessorTemplate extends BaseProcessorTemplate<
         null
       );
     }
-    super.onEvent(handler, filter);
-    return this;
+    return super.onEvent(handler, filter);
   }
 }
 
@@ -108,8 +106,7 @@ export class Erc20Processor extends BaseProcessor<Erc20, Erc20ContractWrapper> {
         null
       );
     }
-    super.onEvent(handler, filter);
-    return this;
+    return super.onEvent(handler, filter);
   }
 
   onTransfer(
@@ -123,8 +120,7 @@ export class Erc20Processor extends BaseProcessor<Erc20, Erc20ContractWrapper> {
         null
       );
     }
-    super.onEvent(handler, filter);
-    return this;
+    return super.onEvent(handler, filter);
   }
 
   public static filters = templateContract.filters;
