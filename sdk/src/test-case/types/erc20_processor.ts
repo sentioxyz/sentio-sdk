@@ -70,7 +70,11 @@ export class Erc20ProcessorTemplate extends BaseProcessorTemplate<
     filter?: ApprovalEventFilter | ApprovalEventFilter[]
   ) {
     if (!filter) {
-      filter = Erc20Processor.filters.Approval(null, null, null);
+      filter = Erc20Processor.filters["Approval(address,address,uint256)"](
+        null,
+        null,
+        null
+      );
     }
     super.onEvent(handler, filter);
     return this;
@@ -81,7 +85,11 @@ export class Erc20ProcessorTemplate extends BaseProcessorTemplate<
     filter?: TransferEventFilter | TransferEventFilter[]
   ) {
     if (!filter) {
-      filter = Erc20Processor.filters.Transfer(null, null, null);
+      filter = Erc20Processor.filters["Transfer(address,address,uint256)"](
+        null,
+        null,
+        null
+      );
     }
     super.onEvent(handler, filter);
     return this;
@@ -94,7 +102,11 @@ export class Erc20Processor extends BaseProcessor<Erc20, Erc20ContractWrapper> {
     filter?: ApprovalEventFilter | ApprovalEventFilter[]
   ) {
     if (!filter) {
-      filter = Erc20Processor.filters.Approval(null, null, null);
+      filter = Erc20Processor.filters["Approval(address,address,uint256)"](
+        null,
+        null,
+        null
+      );
     }
     super.onEvent(handler, filter);
     return this;
@@ -105,7 +117,11 @@ export class Erc20Processor extends BaseProcessor<Erc20, Erc20ContractWrapper> {
     filter?: TransferEventFilter | TransferEventFilter[]
   ) {
     if (!filter) {
-      filter = Erc20Processor.filters.Transfer(null, null, null);
+      filter = Erc20Processor.filters["Transfer(address,address,uint256)"](
+        null,
+        null,
+        null
+      );
     }
     super.onEvent(handler, filter);
     return this;

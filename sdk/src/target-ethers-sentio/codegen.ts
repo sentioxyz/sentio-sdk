@@ -8,6 +8,7 @@ import {
 
 import { reservedKeywords } from '@typechain/ethers-v5/dist/codegen/reserved-keywords'
 import { generateInputTypes } from '@typechain/ethers-v5/dist/codegen/types'
+import { getFullSignatureForEvent } from 'typechain/dist/utils/signatures'
 
 export function codeGenSentioFile(contract: Contract): string {
   const source = `
@@ -118,13 +119,24 @@ function generateOnEventFunction(event: EventDeclaration, contractName: string, 
   if (includeArgTypes) {
     eventName = getFullSignatureAsSymbolForEvent(event) + '_'
   }
+  // let argTypes: string[] = []
+  // for (const d of event.inputs) {
+  //   if (d) {
+  //     argTypes.push(d.type.toString())
+  //   }
+  // }
+  let filterName = getFullSignatureForEvent(event)
+  // if (argTypes.length) {
+  //   filterName = event.name + '(' + argTypes.join(',') + ')'
+  // }
+
   return `
   on${eventName}(
     handler: (event: ${eventName}Event, ctx: ${contractName}Context) => void,
     filter?: ${eventName}EventFilter | ${eventName}EventFilter[]
   ) {
     if (!filter) {
-      filter = ${contractName}Processor.filters.${eventName}(${event.inputs.map(() => 'null').join(',')})
+      filter = ${contractName}Processor.filters['${filterName}'](${event.inputs.map(() => 'null').join(',')})
     }
     super.onEvent(handler, filter)
     return this

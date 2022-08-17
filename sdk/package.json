@@ -20,12 +20,13 @@
     "processor": "./dist/processor.js",
     "sentio": "./dist/cli/cli.js"
   },
-  "version": "0.2.16",
+  "version": "0.2.18",
   "dependencies": {
     "@ethersproject/providers": "^5.6.7",
     "@project-serum/anchor": "^0.25.0",
     "@solana/web3.js": "^1.47.3",
     "@typechain/ethers-v5": "^10.0.0",
+    "@types/bn.js": "^5.1.0",
     "@types/node-fetch": "^2.6.2",
     "bn.js": "^5.2.1",
     "bs58": "^5.0.0",
@@ -46,7 +47,6 @@
   },
   "devDependencies": {
     "@bazel/typescript": "^5.4.2",
-    "@types/bn.js": "^5.1.0",
     "@types/chai": "^4.3.1",
     "@types/command-line-args": "^5.2.0",
     "@types/command-line-usage": "^5.0.2",
