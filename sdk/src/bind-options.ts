@@ -11,7 +11,7 @@ export class BindOptions {
 }
 
 export function getOptionsSignature(opts: BindOptions): string {
-  let sig = [ opts.address ]
+  const sig = [ opts.address ]
   if (opts.network) {
     sig.push(getNetwork(opts.network).chainId.toString())
   }

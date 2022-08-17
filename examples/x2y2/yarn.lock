@@ -512,12 +512,13 @@
   integrity sha512-Vvn3zZrhQZkkBE8LSuW3em98c0FwgO4nxzv6OdSxPKJIEKY2bGbHn+mhGIPerzI4twdxaP8/0+06HBpwf345Lw==
 
 "@sentio/sdk@file:../../sdk":
-  version "0.1.14"
+  version "0.2.19"
   dependencies:
     "@ethersproject/providers" "^5.6.7"
     "@project-serum/anchor" "^0.25.0"
     "@solana/web3.js" "^1.47.3"
     "@typechain/ethers-v5" "^10.0.0"
+    "@types/bn.js" "^5.1.0"
     "@types/node-fetch" "^2.6.2"
     bn.js "^5.2.1"
     bs58 "^5.0.0"
@@ -593,6 +594,13 @@
   dependencies:
     lodash "^4.17.15"
     ts-essentials "^7.0.1"
+
+"@types/bn.js@^5.1.0":
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/@types/bn.js/-/bn.js-5.1.0.tgz#32c5d271503a12653c62cf4d2b45e6eab8cebc68"
+  integrity sha512-QSSVYj7pYFN49kW77o2s9xTCwZ8F2xLbjLLSEVh8D2F4JUhZtPAGOFLTD+ffqksBx/u4cE/KImFjyhqCjn/LIA==
+  dependencies:
+    "@types/node" "*"
 
 "@types/connect@^3.4.33":
   version "3.4.35"

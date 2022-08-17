@@ -213,7 +213,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     }
 
     let updated = false
-    if (this.templateInstances.length != global.TemplatesInstances.length) {
+    if (global.TemplatesInstances && this.templateInstances.length != global.TemplatesInstances.length) {
       await this.configure()
       updated = true
     }

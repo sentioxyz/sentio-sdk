@@ -119,16 +119,8 @@ function generateOnEventFunction(event: EventDeclaration, contractName: string, 
   if (includeArgTypes) {
     eventName = getFullSignatureAsSymbolForEvent(event) + '_'
   }
-  // let argTypes: string[] = []
-  // for (const d of event.inputs) {
-  //   if (d) {
-  //     argTypes.push(d.type.toString())
-  //   }
-  // }
-  let filterName = getFullSignatureForEvent(event)
-  // if (argTypes.length) {
-  //   filterName = event.name + '(' + argTypes.join(',') + ')'
-  // }
+
+  const filterName = getFullSignatureForEvent(event)
 
   return `
   on${eventName}(
