@@ -2,12 +2,14 @@ import { CounterResult, HistogramResult } from './gen/processor/protos/processor
 import { BaseContract, EventFilter } from 'ethers'
 import { Block, Log } from '@ethersproject/abstract-provider'
 import { Meter } from './meter'
+import Long from 'long'
 
 export class Context<TContract extends BaseContract, TContractWrapper extends ContractWrapper<TContract>> {
   contract: TContractWrapper
   chainId: string
   log?: Log
   block?: Block
+  blockNumber: Long
   histograms: HistogramResult[] = []
   counters: CounterResult[] = []
   meter: Meter
@@ -17,6 +19,11 @@ export class Context<TContract extends BaseContract, TContractWrapper extends Co
     this.chainId = chainId
     this.log = log
     this.block = block
+    if (log) {
+      this.blockNumber = Long.fromNumber(log.blockNumber)
+    } else if (block) {
+      this.blockNumber = Long.fromNumber(block.number)
+    }
     this.meter = new Meter(this)
   }
 }
