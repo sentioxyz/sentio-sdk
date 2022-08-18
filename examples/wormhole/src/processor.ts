@@ -29,9 +29,18 @@ Weth9Processor.bind({ address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', sta
     }
   }, transferFilters)
 
-Weth9Processor.bind({ address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', startBlock: 13217349 }).onBlock(
+Weth9Processor.bind({ address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+  startBlock: 13217349}).onBlock(
   async function (_, ctx: Weth9Context) {
     const balance = (await ctx.contract.balanceOf(TOKEN_BRIDGE_ADDRESS)).toBigInt()
     ctx.meter.Histogram('balance').record(balance)
+  }
+)
+
+Weth9Processor.bind({ address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+  startBlock: 13217349, endBlock: 14500000}).onBlock(
+  async function (_, ctx: Weth9Context) {
+    const balance = (await ctx.contract.balanceOf(TOKEN_BRIDGE_ADDRESS)).toBigInt()
+    ctx.meter.Histogram('balance_end').record(balance)
   }
 )
