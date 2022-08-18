@@ -1,6 +1,6 @@
 import { O11yResult } from './gen/processor/protos/processor'
 import { SolanaContext } from './context'
-import { Connection } from '@solana/web3.js'
+import { Connection, ParsedInstruction } from '@solana/web3.js'
 import Long from 'long'
 import { Instruction } from '@project-serum/anchor'
 
@@ -15,9 +15,10 @@ export class SolanaBaseProcessor {
   endpoint: string
   connection: Connection
   contractName: string
+  processInnerInstruction: boolean
   config: IndexConfigure = { startSlot: new Long(0) }
 
-  constructor(contractName: string, address: string, endpoint: string) {
+  constructor(contractName: string, address: string, endpoint: string, processInnerInstruction: boolean = false) {
     this.endpoint = endpoint
     this.address = address
     if (!globalThis.SolanaProcessors) {
@@ -26,6 +27,7 @@ export class SolanaBaseProcessor {
     globalThis.SolanaProcessors.push(this)
     this.connection = new Connection(endpoint, 'confirmed')
     this.contractName = contractName
+    this.processInnerInstruction = processInnerInstruction
   }
 
   bind(address: string) {
@@ -34,6 +36,10 @@ export class SolanaBaseProcessor {
 
   public decodeInstruction(rawInstruction: string): Instruction | null {
     throw new Error('decodeInstruction is not implemented.')
+  }
+
+  public fromParsedInstruction(instruction: ParsedInstruction): Instruction | null {
+    throw new Error('fromParsedInstruction is not implemented.')
   }
 
   public onInstruction(instructionName: string, handler: (instruction: Instruction, ctx: SolanaContext) => void) {

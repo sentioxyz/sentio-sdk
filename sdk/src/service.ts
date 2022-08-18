@@ -24,6 +24,7 @@ import {
 import { DeepPartial } from './gen/builtin'
 import { Empty } from './gen/google/protobuf/empty'
 import Long from 'long'
+import { Instruction } from '@project-serum/anchor'
 
 const MAX_BLOCK = new Long(0)
 
@@ -81,8 +82,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
           logConfigs: [],
           startBlock: processor.config.startBlock,
           endBlock: MAX_BLOCK,
-          instructionConfig: [],
-          transactionConfig: [],
+          instructionConfig: undefined,
         }
         if (processor.config.endBlock) {
           contractConfig.endBlock = processor.config.endBlock
@@ -147,8 +147,9 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
           logConfigs: [],
           startBlock: solanaProcessor.config.startSlot,
           endBlock: MAX_BLOCK,
-          instructionConfig: [],
-          transactionConfig: [],
+          instructionConfig: {
+            processInnerInstruction: solanaProcessor.processInnerInstruction,
+          }
         }
         this.contractConfigs.push(contractConfig)
       }
@@ -257,7 +258,12 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
 
         for (const processor of globalThis.SolanaProcessors) {
           if (processor.address === instruction.programAccountId) {
-            const decodedIns = processor.decodeInstruction(instruction.instructionData)
+            let decodedIns: Instruction | null
+            if (instruction.parsed) {
+              decodedIns = processor.fromParsedInstruction(JSON.parse(instruction.parsed.toString()))
+            } else {
+              decodedIns = processor.decodeInstruction(instruction.instructionData)
+            }
             if (decodedIns) {
               const handler = processor.instructionHanlderMap.get(decodedIns.name)
               if (handler !== undefined) {

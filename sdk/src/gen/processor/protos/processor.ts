@@ -23,8 +23,7 @@ export interface ContractConfig {
   logConfigs: LogHandlerConfig[];
   startBlock: Long;
   endBlock: Long;
-  transactionConfig: TransactionHandlerConfig[];
-  instructionConfig: InstructionHandlerConfig[];
+  instructionConfig: InstructionHandlerConfig | undefined;
 }
 
 export interface ContractInfo {
@@ -58,14 +57,8 @@ export interface HandlerCondition {
   topics: Topic[];
 }
 
-export interface TransactionHandlerConfig {
-  handlerName: string;
-  address: string;
-}
-
 export interface InstructionHandlerConfig {
-  handlerName: string;
-  address: string;
+  processInnerInstruction: boolean;
 }
 
 export interface Topic {
@@ -125,6 +118,7 @@ export interface Instruction {
   instructionData: string;
   slot: Long;
   programAccountId: string;
+  parsed?: Uint8Array | undefined;
 }
 
 export interface Block {
@@ -386,8 +380,7 @@ function createBaseContractConfig(): ContractConfig {
     logConfigs: [],
     startBlock: Long.UZERO,
     endBlock: Long.UZERO,
-    transactionConfig: [],
-    instructionConfig: [],
+    instructionConfig: undefined,
   };
 }
 
@@ -414,11 +407,11 @@ export const ContractConfig = {
     if (!message.endBlock.isZero()) {
       writer.uint32(40).uint64(message.endBlock);
     }
-    for (const v of message.transactionConfig) {
-      TransactionHandlerConfig.encode(v!, writer.uint32(58).fork()).ldelim();
-    }
-    for (const v of message.instructionConfig) {
-      InstructionHandlerConfig.encode(v!, writer.uint32(66).fork()).ldelim();
+    if (message.instructionConfig !== undefined) {
+      InstructionHandlerConfig.encode(
+        message.instructionConfig,
+        writer.uint32(50).fork()
+      ).ldelim();
     }
     return writer;
   },
@@ -450,14 +443,10 @@ export const ContractConfig = {
         case 5:
           message.endBlock = reader.uint64() as Long;
           break;
-        case 7:
-          message.transactionConfig.push(
-            TransactionHandlerConfig.decode(reader, reader.uint32())
-          );
-          break;
-        case 8:
-          message.instructionConfig.push(
-            InstructionHandlerConfig.decode(reader, reader.uint32())
+        case 6:
+          message.instructionConfig = InstructionHandlerConfig.decode(
+            reader,
+            reader.uint32()
           );
           break;
         default:
@@ -485,16 +474,9 @@ export const ContractConfig = {
       endBlock: isSet(object.endBlock)
         ? Long.fromValue(object.endBlock)
         : Long.UZERO,
-      transactionConfig: Array.isArray(object?.transactionConfig)
-        ? object.transactionConfig.map((e: any) =>
-            TransactionHandlerConfig.fromJSON(e)
-          )
-        : [],
-      instructionConfig: Array.isArray(object?.instructionConfig)
-        ? object.instructionConfig.map((e: any) =>
-            InstructionHandlerConfig.fromJSON(e)
-          )
-        : [],
+      instructionConfig: isSet(object.instructionConfig)
+        ? InstructionHandlerConfig.fromJSON(object.instructionConfig)
+        : undefined,
     };
   },
 
@@ -519,20 +501,10 @@ export const ContractConfig = {
       (obj.startBlock = (message.startBlock || Long.UZERO).toString());
     message.endBlock !== undefined &&
       (obj.endBlock = (message.endBlock || Long.UZERO).toString());
-    if (message.transactionConfig) {
-      obj.transactionConfig = message.transactionConfig.map((e) =>
-        e ? TransactionHandlerConfig.toJSON(e) : undefined
-      );
-    } else {
-      obj.transactionConfig = [];
-    }
-    if (message.instructionConfig) {
-      obj.instructionConfig = message.instructionConfig.map((e) =>
-        e ? InstructionHandlerConfig.toJSON(e) : undefined
-      );
-    } else {
-      obj.instructionConfig = [];
-    }
+    message.instructionConfig !== undefined &&
+      (obj.instructionConfig = message.instructionConfig
+        ? InstructionHandlerConfig.toJSON(message.instructionConfig)
+        : undefined);
     return obj;
   },
 
@@ -556,14 +528,11 @@ export const ContractConfig = {
       object.endBlock !== undefined && object.endBlock !== null
         ? Long.fromValue(object.endBlock)
         : Long.UZERO;
-    message.transactionConfig =
-      object.transactionConfig?.map((e) =>
-        TransactionHandlerConfig.fromPartial(e)
-      ) || [];
     message.instructionConfig =
-      object.instructionConfig?.map((e) =>
-        InstructionHandlerConfig.fromPartial(e)
-      ) || [];
+      object.instructionConfig !== undefined &&
+      object.instructionConfig !== null
+        ? InstructionHandlerConfig.fromPartial(object.instructionConfig)
+        : undefined;
     return message;
   },
 };
@@ -1000,75 +969,8 @@ export const HandlerCondition = {
   },
 };
 
-function createBaseTransactionHandlerConfig(): TransactionHandlerConfig {
-  return { handlerName: "", address: "" };
-}
-
-export const TransactionHandlerConfig = {
-  encode(
-    message: TransactionHandlerConfig,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
-    if (message.handlerName !== "") {
-      writer.uint32(10).string(message.handlerName);
-    }
-    if (message.address !== "") {
-      writer.uint32(18).string(message.address);
-    }
-    return writer;
-  },
-
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): TransactionHandlerConfig {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseTransactionHandlerConfig();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.handlerName = reader.string();
-          break;
-        case 2:
-          message.address = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): TransactionHandlerConfig {
-    return {
-      handlerName: isSet(object.handlerName) ? String(object.handlerName) : "",
-      address: isSet(object.address) ? String(object.address) : "",
-    };
-  },
-
-  toJSON(message: TransactionHandlerConfig): unknown {
-    const obj: any = {};
-    message.handlerName !== undefined &&
-      (obj.handlerName = message.handlerName);
-    message.address !== undefined && (obj.address = message.address);
-    return obj;
-  },
-
-  fromPartial(
-    object: DeepPartial<TransactionHandlerConfig>
-  ): TransactionHandlerConfig {
-    const message = createBaseTransactionHandlerConfig();
-    message.handlerName = object.handlerName ?? "";
-    message.address = object.address ?? "";
-    return message;
-  },
-};
-
 function createBaseInstructionHandlerConfig(): InstructionHandlerConfig {
-  return { handlerName: "", address: "" };
+  return { processInnerInstruction: false };
 }
 
 export const InstructionHandlerConfig = {
@@ -1076,11 +978,8 @@ export const InstructionHandlerConfig = {
     message: InstructionHandlerConfig,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (message.handlerName !== "") {
-      writer.uint32(10).string(message.handlerName);
-    }
-    if (message.address !== "") {
-      writer.uint32(18).string(message.address);
+    if (message.processInnerInstruction === true) {
+      writer.uint32(8).bool(message.processInnerInstruction);
     }
     return writer;
   },
@@ -1096,10 +995,7 @@ export const InstructionHandlerConfig = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.handlerName = reader.string();
-          break;
-        case 2:
-          message.address = reader.string();
+          message.processInnerInstruction = reader.bool();
           break;
         default:
           reader.skipType(tag & 7);
@@ -1111,16 +1007,16 @@ export const InstructionHandlerConfig = {
 
   fromJSON(object: any): InstructionHandlerConfig {
     return {
-      handlerName: isSet(object.handlerName) ? String(object.handlerName) : "",
-      address: isSet(object.address) ? String(object.address) : "",
+      processInnerInstruction: isSet(object.processInnerInstruction)
+        ? Boolean(object.processInnerInstruction)
+        : false,
     };
   },
 
   toJSON(message: InstructionHandlerConfig): unknown {
     const obj: any = {};
-    message.handlerName !== undefined &&
-      (obj.handlerName = message.handlerName);
-    message.address !== undefined && (obj.address = message.address);
+    message.processInnerInstruction !== undefined &&
+      (obj.processInnerInstruction = message.processInnerInstruction);
     return obj;
   },
 
@@ -1128,8 +1024,7 @@ export const InstructionHandlerConfig = {
     object: DeepPartial<InstructionHandlerConfig>
   ): InstructionHandlerConfig {
     const message = createBaseInstructionHandlerConfig();
-    message.handlerName = object.handlerName ?? "";
-    message.address = object.address ?? "";
+    message.processInnerInstruction = object.processInnerInstruction ?? false;
     return message;
   },
 };
@@ -1910,7 +1805,12 @@ export const Transaction = {
 };
 
 function createBaseInstruction(): Instruction {
-  return { instructionData: "", slot: Long.UZERO, programAccountId: "" };
+  return {
+    instructionData: "",
+    slot: Long.UZERO,
+    programAccountId: "",
+    parsed: undefined,
+  };
 }
 
 export const Instruction = {
@@ -1926,6 +1826,9 @@ export const Instruction = {
     }
     if (message.programAccountId !== "") {
       writer.uint32(26).string(message.programAccountId);
+    }
+    if (message.parsed !== undefined) {
+      writer.uint32(34).bytes(message.parsed);
     }
     return writer;
   },
@@ -1946,6 +1849,9 @@ export const Instruction = {
         case 3:
           message.programAccountId = reader.string();
           break;
+        case 4:
+          message.parsed = reader.bytes();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1963,6 +1869,7 @@ export const Instruction = {
       programAccountId: isSet(object.programAccountId)
         ? String(object.programAccountId)
         : "",
+      parsed: isSet(object.parsed) ? bytesFromBase64(object.parsed) : undefined,
     };
   },
 
@@ -1974,6 +1881,11 @@ export const Instruction = {
       (obj.slot = (message.slot || Long.UZERO).toString());
     message.programAccountId !== undefined &&
       (obj.programAccountId = message.programAccountId);
+    message.parsed !== undefined &&
+      (obj.parsed =
+        message.parsed !== undefined
+          ? base64FromBytes(message.parsed)
+          : undefined);
     return obj;
   },
 
@@ -1985,6 +1897,7 @@ export const Instruction = {
         ? Long.fromValue(object.slot)
         : Long.UZERO;
     message.programAccountId = object.programAccountId ?? "";
+    message.parsed = object.parsed ?? undefined;
     return message;
   },
 };
