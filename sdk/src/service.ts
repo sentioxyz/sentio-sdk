@@ -310,6 +310,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       counters: [],
     }
 
+    const promises: Promise<O11yResult[]>[] = []
     for (const processor of globalThis.Processors) {
       if (Long.fromNumber(block.number) < processor.config.startBlock) {
         continue
@@ -324,20 +325,27 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       }
 
       // TODO maybe do a map and construct in start
-      const chainId = await processor.getChainId()
+      const chainId = processor.getChainId()
       if (chainId !== request.chainId) {
         continue
       }
-      for (const handler of processor.blockHandlers) {
-        try {
-          const res = await handler(block)
-          resp.counters = resp.counters.concat(res.counters)
-          resp.histograms = resp.histograms.concat(res.histograms)
-        } catch (e) {
-          throw new ServerError(Status.INTERNAL, e.stack.toString())
-        }
-      }
+      const blockPromises: Promise<O11yResult[]> = Promise.all(
+        processor.blockHandlers.map(function (handler) {
+          return handler(block)
+        })
+      )
+      promises.push(blockPromises)
     }
+    try {
+      const allRes = (await Promise.all(promises)).flat()
+      for (const res of allRes) {
+        resp.counters = resp.counters.concat(res.counters)
+        resp.histograms = resp.histograms.concat(res.histograms)
+      }
+    } catch (e) {
+      throw new ServerError(Status.INTERNAL, e.stack.toString())
+    }
+
     return {
       result: resp,
     }
