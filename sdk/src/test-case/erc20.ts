@@ -21,7 +21,7 @@ Erc20Processor.bind({
     ctx.meter.Counter('c1').add(1)
   }, filter)
   .onBlock(async function (block, ctx) {
-    ctx.meter.Histogram('h1').record(10, { k: 'v' })
+    ctx.meter.Gauge('h1').record(10, { k: 'v' })
   })
 
 Erc20Processor.bind({ address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', network: 56, name: 'usdc' })
@@ -29,7 +29,7 @@ Erc20Processor.bind({ address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', net
     ctx.meter.Counter('c2').add(2)
   }, filter)
   .onBlock(async function (block, ctx) {
-    ctx.meter.Histogram('h1').record(20, { k: 'v' })
+    ctx.meter.Gauge('h1').record(20, { k: 'v' })
   })
 // .startBlock(14201940)
 
@@ -41,5 +41,5 @@ Erc20Processor.bind({ address: 'yyyy', network: 1 })
 //     ctx.meter.Counter('c2').add(2)
 //   }, filter)
 //   .onBlock(async function (block, ctx) {
-//     ctx.meter.Histogram('h1').record(20, { k: 'v' })
+//     ctx.meter.Gauge('h1').record(20, { k: 'v' })
 //   })

@@ -44,12 +44,12 @@ describe('Test Server with Example', () => {
     }
     const res = await service.processBlock(request, testContext)
     expect(res.result?.counters).length(0)
-    expect(res.result?.histograms).length(1)
-    expect(res.result?.histograms?.[0].metricValue?.bigInt).equals('10')
+    expect(res.result?.gauges).length(1)
+    expect(res.result?.gauges?.[0].metricValue?.bigInt).equals('10')
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const histogram = res.result!.histograms![0]
-    expect(histogram.metadata?.blockNumber?.toString()).equals('14373295')
+    const gauge = res.result!.gauges![0]
+    expect(gauge.metadata?.blockNumber?.toString()).equals('14373295')
 
     // Different chainId should be dispatch to other
     const request2: ProcessBlockRequest = {
@@ -60,8 +60,8 @@ describe('Test Server with Example', () => {
     }
     const res2 = await service.processBlock(request2, testContext)
     expect(res2.result?.counters).length(0)
-    expect(res2.result?.histograms).length(1)
-    expect(res2.result?.histograms?.[0].metricValue?.bigInt).equals('20')
+    expect(res2.result?.gauges).length(1)
+    expect(res2.result?.gauges?.[0].metricValue?.bigInt).equals('20')
   })
 
   it('Check log dispatch', async () => {
@@ -96,7 +96,7 @@ describe('Test Server with Example', () => {
     expect(res.result?.counters?.[1].metricValue?.bigInt).equals('2')
     expect(res.result?.counters?.[1].metadata?.chainId).equals('56')
 
-    expect(res.result?.histograms).length(0)
+    expect(res.result?.gauges).length(0)
     expect(res.configUpdated).equals(true)
 
     const config = await service.getConfig({}, testContext)

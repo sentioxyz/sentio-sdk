@@ -37,7 +37,7 @@ describe('Test Server with Solana Example', () => {
     }
     const res = await service.processInstruction(request, testContext)
     expect(res.result?.counters).length(3)
-    expect(res.result?.histograms).length(0)
+    expect(res.result?.gauges).length(0)
     expect(res.result?.counters[0].metricValue?.bigInt).equal('5000000000')
   })
 
@@ -53,7 +53,7 @@ describe('Test Server with Solana Example', () => {
     }
     const res = await service.processInstruction(request, testContext)
     expect(res.result?.counters).length(1)
-    expect(res.result?.histograms).length(0)
+    expect(res.result?.gauges).length(0)
     expect(res.result?.counters[0].metadata?.blockNumber.toInt()).equal(0)
     expect(res.result?.counters[0].metricValue?.doubleValue).equal(1000000)
   })

@@ -1,4 +1,4 @@
-import { CounterResult, HistogramResult } from './gen/processor/protos/processor'
+import { CounterResult, GaugeResult } from './gen/processor/protos/processor'
 import { BaseContract, EventFilter } from 'ethers'
 import { Block, Log } from '@ethersproject/abstract-provider'
 import { Meter } from './meter'
@@ -10,7 +10,7 @@ export class Context<TContract extends BaseContract, TContractWrapper extends Co
   log?: Log
   block?: Block
   blockNumber: Long
-  histograms: HistogramResult[] = []
+  gauges: GaugeResult[] = []
   counters: CounterResult[] = []
   meter: Meter
 
@@ -45,7 +45,7 @@ export class ContractWrapper<TContract extends BaseContract> {
 }
 
 export class SolanaContext {
-  histograms: HistogramResult[] = []
+  gauges: GaugeResult[] = []
   counters: CounterResult[] = []
   meter: Meter
 

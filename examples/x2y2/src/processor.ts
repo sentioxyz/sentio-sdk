@@ -7,7 +7,7 @@ X2y2Processor.bind({ address: '0xB329e39Ebefd16f40d38f07643652cE17Ca5Bac1', star
   async function (_, ctx: X2y2Context) {
     const phase = (await ctx.contract.currentPhase()).toString()
     const reward = Number((await ctx.contract.rewardPerBlockForStaking()).toBigInt() / 10n ** 18n)
-    ctx.meter.Histogram('reward_per_block').record(reward, { phase })
+    ctx.meter.Gauge('reward_per_block').record(reward, { phase })
   }
 )
 

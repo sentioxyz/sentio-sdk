@@ -139,12 +139,12 @@ export class BaseProcessor<TContract extends BaseContract, TContractWrapper exte
           // TODO fix this bug
           await handler(event, ctx)
           return {
-            histograms: ctx.histograms,
+            gauges: ctx.gauges,
             counters: ctx.counters,
           }
         }
         return {
-          histograms: [],
+          gauges: [],
           counters: [],
         }
       },
@@ -164,7 +164,7 @@ export class BaseProcessor<TContract extends BaseContract, TContractWrapper exte
       const ctx = new Context<TContract, TContractWrapper>(contract, chainId, block, undefined)
       await handler(block, ctx)
       return {
-        histograms: ctx.histograms,
+        gauges: ctx.gauges,
         counters: ctx.counters,
       }
     })

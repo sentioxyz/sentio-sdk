@@ -18,7 +18,7 @@ export class SolanaBaseProcessor {
   processInnerInstruction: boolean
   config: IndexConfigure = { startSlot: new Long(0) }
 
-  constructor(contractName: string, address: string, endpoint: string, processInnerInstruction: boolean = false) {
+  constructor(contractName: string, address: string, endpoint: string, processInnerInstruction = false) {
     this.endpoint = endpoint
     this.address = address
     if (!globalThis.SolanaProcessors) {
@@ -55,7 +55,7 @@ export class SolanaBaseProcessor {
         await handler(ins, ctx)
       }
       return {
-        histograms: ctx.histograms,
+        gauges: ctx.gauges,
         counters: ctx.counters,
       }
     })

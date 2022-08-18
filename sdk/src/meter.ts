@@ -73,7 +73,7 @@ export class Counter {
   }
 }
 
-export class Histogram {
+export class Gauge {
   private readonly name: string
   private readonly ctx: Context<any, any> | SolanaContext
 
@@ -84,7 +84,7 @@ export class Histogram {
 
   record(value: Numberish, labels: Labels = {}) {
     const [v, type] = convertNumber(value)
-    this.ctx.histograms.push({
+    this.ctx.gauges.push({
       metadata: GetRecordMetaData(this.ctx, this.name, labels),
       metricValue: {
         bigInt: type == 0 ? <string>v : undefined,
@@ -99,7 +99,7 @@ export class Meter {
 
   // TODO is map necessary since we are sending request remotely?
   // counterMap = new Map<string, Counter>()
-  // histogramMap = new Map<string, Histogram>()
+  // gaugeMap = new Map<string, Gauge>()
 
   constructor(ctx: Context<any, any> | SolanaContext) {
     this.ctx = ctx
@@ -116,13 +116,13 @@ export class Meter {
     return new Counter(name, this.ctx)
   }
 
-  Histogram(name: string): Histogram {
-    // let histogram = this.histogramMap.get(name)
+  Gauge(name: string): Gauge {
+    // let gauge = this.gaugeMap.get(name)
     //
-    // if (!histogram) {
-    //     histogram = new Histogram(name, this.ctx)
+    // if (!gauge) {
+    //     gauge = new Gauge(name, this.ctx)
     // }
-    // return histogram
-    return new Histogram(name, this.ctx)
+    // return gauge
+    return new Gauge(name, this.ctx)
   }
 }

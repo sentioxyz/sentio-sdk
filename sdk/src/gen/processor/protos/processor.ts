@@ -126,7 +126,7 @@ export interface Block {
 }
 
 export interface O11yResult {
-  histograms: HistogramResult[];
+  gauges: GaugeResult[];
   counters: CounterResult[];
 }
 
@@ -150,7 +150,7 @@ export interface MetricValue {
   doubleValue: number | undefined;
 }
 
-export interface HistogramResult {
+export interface GaugeResult {
   metadata: RecordMetaData | undefined;
   metricValue: MetricValue | undefined;
 }
@@ -1955,7 +1955,7 @@ export const Block = {
 };
 
 function createBaseO11yResult(): O11yResult {
-  return { histograms: [], counters: [] };
+  return { gauges: [], counters: [] };
 }
 
 export const O11yResult = {
@@ -1963,8 +1963,8 @@ export const O11yResult = {
     message: O11yResult,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    for (const v of message.histograms) {
-      HistogramResult.encode(v!, writer.uint32(10).fork()).ldelim();
+    for (const v of message.gauges) {
+      GaugeResult.encode(v!, writer.uint32(10).fork()).ldelim();
     }
     for (const v of message.counters) {
       CounterResult.encode(v!, writer.uint32(18).fork()).ldelim();
@@ -1980,9 +1980,7 @@ export const O11yResult = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.histograms.push(
-            HistogramResult.decode(reader, reader.uint32())
-          );
+          message.gauges.push(GaugeResult.decode(reader, reader.uint32()));
           break;
         case 2:
           message.counters.push(CounterResult.decode(reader, reader.uint32()));
@@ -1997,8 +1995,8 @@ export const O11yResult = {
 
   fromJSON(object: any): O11yResult {
     return {
-      histograms: Array.isArray(object?.histograms)
-        ? object.histograms.map((e: any) => HistogramResult.fromJSON(e))
+      gauges: Array.isArray(object?.gauges)
+        ? object.gauges.map((e: any) => GaugeResult.fromJSON(e))
         : [],
       counters: Array.isArray(object?.counters)
         ? object.counters.map((e: any) => CounterResult.fromJSON(e))
@@ -2008,12 +2006,12 @@ export const O11yResult = {
 
   toJSON(message: O11yResult): unknown {
     const obj: any = {};
-    if (message.histograms) {
-      obj.histograms = message.histograms.map((e) =>
-        e ? HistogramResult.toJSON(e) : undefined
+    if (message.gauges) {
+      obj.gauges = message.gauges.map((e) =>
+        e ? GaugeResult.toJSON(e) : undefined
       );
     } else {
-      obj.histograms = [];
+      obj.gauges = [];
     }
     if (message.counters) {
       obj.counters = message.counters.map((e) =>
@@ -2027,8 +2025,8 @@ export const O11yResult = {
 
   fromPartial(object: DeepPartial<O11yResult>): O11yResult {
     const message = createBaseO11yResult();
-    message.histograms =
-      object.histograms?.map((e) => HistogramResult.fromPartial(e)) || [];
+    message.gauges =
+      object.gauges?.map((e) => GaugeResult.fromPartial(e)) || [];
     message.counters =
       object.counters?.map((e) => CounterResult.fromPartial(e)) || [];
     return message;
@@ -2321,13 +2319,13 @@ export const MetricValue = {
   },
 };
 
-function createBaseHistogramResult(): HistogramResult {
+function createBaseGaugeResult(): GaugeResult {
   return { metadata: undefined, metricValue: undefined };
 }
 
-export const HistogramResult = {
+export const GaugeResult = {
   encode(
-    message: HistogramResult,
+    message: GaugeResult,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.metadata !== undefined) {
@@ -2345,10 +2343,10 @@ export const HistogramResult = {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): HistogramResult {
+  decode(input: _m0.Reader | Uint8Array, length?: number): GaugeResult {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseHistogramResult();
+    const message = createBaseGaugeResult();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -2366,7 +2364,7 @@ export const HistogramResult = {
     return message;
   },
 
-  fromJSON(object: any): HistogramResult {
+  fromJSON(object: any): GaugeResult {
     return {
       metadata: isSet(object.metadata)
         ? RecordMetaData.fromJSON(object.metadata)
@@ -2377,7 +2375,7 @@ export const HistogramResult = {
     };
   },
 
-  toJSON(message: HistogramResult): unknown {
+  toJSON(message: GaugeResult): unknown {
     const obj: any = {};
     message.metadata !== undefined &&
       (obj.metadata = message.metadata
@@ -2390,8 +2388,8 @@ export const HistogramResult = {
     return obj;
   },
 
-  fromPartial(object: DeepPartial<HistogramResult>): HistogramResult {
-    const message = createBaseHistogramResult();
+  fromPartial(object: DeepPartial<GaugeResult>): GaugeResult {
+    const message = createBaseGaugeResult();
     message.metadata =
       object.metadata !== undefined && object.metadata !== null
         ? RecordMetaData.fromPartial(object.metadata)

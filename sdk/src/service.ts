@@ -149,7 +149,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
           endBlock: MAX_BLOCK,
           instructionConfig: {
             processInnerInstruction: solanaProcessor.processInnerInstruction,
-          }
+          },
         }
         this.contractConfigs.push(contractConfig)
       }
@@ -193,7 +193,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     }
 
     const resp: O11yResult = {
-      histograms: [],
+      gauges: [],
       counters: [],
     }
 
@@ -208,7 +208,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       try {
         const res = await this.eventHandlers[l.handlerId](log)
         resp.counters = resp.counters.concat(res.counters)
-        resp.histograms = resp.histograms.concat(res.histograms)
+        resp.gauges = resp.gauges.concat(res.gauges)
       } catch (e) {
         throw new ServerError(Status.INTERNAL, e)
       }
@@ -245,7 +245,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     }
 
     const result: O11yResult = {
-      histograms: [],
+      gauges: [],
       counters: [],
     }
 
@@ -269,11 +269,11 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
               if (handler !== undefined) {
                 try {
                   const res = await handler(decodedIns)
-                  res.histograms.forEach((h) => {
+                  res.gauges.forEach((h) => {
                     if (h.metadata) {
                       h.metadata.blockNumber = instruction.slot
                     }
-                    result.histograms.push(h)
+                    result.gauges.push(h)
                   })
                   res.counters.forEach((c) => {
                     if (c.metadata) {
@@ -312,7 +312,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     const block: Block = JSON.parse(jsonString)
 
     const resp: O11yResult = {
-      histograms: [],
+      gauges: [],
       counters: [],
     }
 
@@ -346,7 +346,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       const allRes = (await Promise.all(promises)).flat()
       for (const res of allRes) {
         resp.counters = resp.counters.concat(res.counters)
-        resp.histograms = resp.histograms.concat(res.histograms)
+        resp.gauges = resp.gauges.concat(res.gauges)
       }
     } catch (e) {
       throw new ServerError(Status.INTERNAL, e.stack.toString())
