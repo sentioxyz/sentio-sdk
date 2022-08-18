@@ -315,6 +315,14 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         continue
       }
 
+      if (
+        processor.config.endBlock &&
+        processor.config.endBlock > Long.fromNumber(0) &&
+        Long.fromNumber(block.number) > processor.config.endBlock
+      ) {
+        continue
+      }
+
       // TODO maybe do a map and construct in start
       const chainId = await processor.getChainId()
       if (chainId !== request.chainId) {
