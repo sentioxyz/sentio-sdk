@@ -1,33 +1,33 @@
-name: SDK
-
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.10.0
-        with:
-          access_token: ${{ secrets.ACCESS_TOKEN }}
-      - uses: actions/checkout@v3
-      - name: Get Yarn cache directory
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - name: Mount Yarn cache
-        uses: actions/cache@v3
-        id: yarn-cache
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: yarn-sdk-v1-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            yarn-sdk-v1
-      - name: Build SDK & Examples
-        run: ./scripts/build-all.sh
-      - name: Test SDK
-        run: yarn test
-        working-directory: sdk
+#name: SDK
+#
+#on:
+#  push:
+#    branches: [ main ]
+#  pull_request:
+#    branches: [ main ]
+#
+#jobs:
+#  build:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Cancel Previous Runs
+#        uses: styfle/cancel-workflow-action@0.10.0
+#        with:
+#          access_token: ${{ secrets.ACCESS_TOKEN }}
+#      - uses: actions/checkout@v3
+#      - name: Get Yarn cache directory
+#        id: yarn-cache-dir-path
+#        run: echo "::set-output name=dir::$(yarn cache dir)"
+#      - name: Mount Yarn cache
+#        uses: actions/cache@v3
+#        id: yarn-cache
+#        with:
+#          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+#          key: yarn-sdk-v1-${{ hashFiles('**/yarn.lock') }}
+#          restore-keys: |
+#            yarn-sdk-v1
+#      - name: Build SDK & Examples
+#        run: ./scripts/build-all.sh
+#      - name: Test SDK
+#        run: yarn test
+#        working-directory: sdk

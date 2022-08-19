@@ -1,0 +1,4 @@
+[include]
+	path = ../../.github/.gitconfig
+[alias]
+	dev = "!../scripts/git/dev.sh $@"
