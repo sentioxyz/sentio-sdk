@@ -30,7 +30,7 @@ function GetRecordMetaData(ctx: Context<any, any> | SolanaContext, name: string,
   } else if (ctx instanceof SolanaContext) {
     return {
       contractAddress: ctx.address,
-      blockNumber: Long.fromNumber(0), // TODO need number type to be long
+      blockNumber: Long.ZERO, // TODO need number type to be long
       transactionIndex: 0,
       logIndex: 0,
       chainId: 'SOL:mainnet', // TODO set in context

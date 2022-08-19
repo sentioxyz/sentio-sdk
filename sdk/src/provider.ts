@@ -30,14 +30,17 @@ export function setProvider(config: any) {
     const chainConfig = config[chainIdStr]
     const chainId = Number(chainIdStr)
 
-    let providers: StaticJsonRpcProvider[] = []
-    for (const http of chainConfig.Https) {
-      providers.push(new StaticJsonRpcProvider(http, chainId))
-    }
+    // let providers: StaticJsonRpcProvider[] = []
+    // for (const http of chainConfig.Https) {
+    //   providers.push(new StaticJsonRpcProvider(http, chainId))
+    // }
     // random shuffle
-    providers = providers.sort(() => Math.random() - 0.5)
+    // providers = providers.sort(() => Math.random() - 0.5)
 
-    const provider = new FallbackProvider(providers)
+    // const provider = new FallbackProvider(providers)
+    const idx = Math.floor(Math.random() * chainConfig.Https.length)
+    const provider = new StaticJsonRpcProvider(chainConfig.Https[idx], chainId)
+
     globalThis.SentioProvider.set(chainId, provider)
   }
 }

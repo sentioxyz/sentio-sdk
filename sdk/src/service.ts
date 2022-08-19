@@ -340,7 +340,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
 
       if (
         processor.config.endBlock &&
-        processor.config.endBlock > Long.fromNumber(0) &&
+        processor.config.endBlock > Long.ZERO &&
         Long.fromNumber(block.number) > processor.config.endBlock
       ) {
         continue
