@@ -1,9 +1,9 @@
-import { BaseProvider, getNetwork, StaticJsonRpcProvider } from '@ethersproject/providers'
+import { BaseProvider, FallbackProvider, getNetwork, Provider, StaticJsonRpcProvider } from '@ethersproject/providers'
 import { Networkish } from '@ethersproject/networks'
 
 export const DummyProvider = new StaticJsonRpcProvider(undefined, 1)
 
-export function getProvider(networkish?: Networkish): BaseProvider {
+export function getProvider(networkish?: Networkish): Provider {
   if (!networkish) {
     networkish = 1
   }
@@ -20,12 +20,24 @@ export function getProvider(networkish?: Networkish): BaseProvider {
 }
 
 export function setProvider(config: any) {
-  globalThis.SentioProvider = new Map<number, StaticJsonRpcProvider>()
+  globalThis.SentioProvider = new Map<number, Provider>()
 
   for (const chainIdStr in config) {
+    if (isNaN(Number.parseInt(chainIdStr))) {
+      continue
+    }
+
     const chainConfig = config[chainIdStr]
     const chainId = Number(chainIdStr)
 
-    globalThis.SentioProvider.set(chainId, new StaticJsonRpcProvider(chainConfig.Https[0], chainId))
+    let providers: StaticJsonRpcProvider[] = []
+    for (const http of chainConfig.Https) {
+      providers.push(new StaticJsonRpcProvider(http, chainId))
+    }
+    // random shuffle
+    providers = providers.sort(() => Math.random() - 0.5)
+
+    const provider = new FallbackProvider(providers)
+    globalThis.SentioProvider.set(chainId, provider)
   }
 }
