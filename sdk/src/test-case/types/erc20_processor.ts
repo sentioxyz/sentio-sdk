@@ -3,11 +3,12 @@
 /* eslint-disable */
 
 import {
-  Context,
   getProvider,
+  transformEtherError,
   BindOptions,
   BaseProcessor,
   BaseProcessorTemplate,
+  Context,
   ContractWrapper,
   ContractNamer,
   DummyProvider,
@@ -28,22 +29,47 @@ class Erc20ContractWrapper extends ContractWrapper<Erc20> {
     super(contract);
   }
 
-  allowance(owner: PromiseOrValue<string>, spender: PromiseOrValue<string>) {
-    return this.contract.allowance(owner, spender, {
-      blockTag: this.block.number,
-    });
+  async allowance(
+    owner: PromiseOrValue<string>,
+    spender: PromiseOrValue<string>
+  ) {
+    try {
+      return await this.contract.allowance(owner, spender, {
+        blockTag: this.context.blockNumber.toNumber(),
+      });
+    } catch (e) {
+      throw transformEtherError(e, this.context);
+    }
   }
 
-  balanceOf(account: PromiseOrValue<string>) {
-    return this.contract.balanceOf(account, { blockTag: this.block.number });
+  async balanceOf(account: PromiseOrValue<string>) {
+    try {
+      return await this.contract.balanceOf(account, {
+        blockTag: this.context.blockNumber.toNumber(),
+      });
+    } catch (e) {
+      throw transformEtherError(e, this.context);
+    }
   }
 
-  decimals() {
-    return this.contract.decimals({ blockTag: this.block.number });
+  async decimals() {
+    try {
+      return await this.contract.decimals({
+        blockTag: this.context.blockNumber.toNumber(),
+      });
+    } catch (e) {
+      throw transformEtherError(e, this.context);
+    }
   }
 
-  totalSupply() {
-    return this.contract.totalSupply({ blockTag: this.block.number });
+  async totalSupply() {
+    try {
+      return await this.contract.totalSupply({
+        blockTag: this.context.blockNumber.toNumber(),
+      });
+    } catch (e) {
+      throw transformEtherError(e, this.context);
+    }
   }
 }
 

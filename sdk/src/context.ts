@@ -32,7 +32,7 @@ export class ContractWrapper<TContract extends BaseContract> {
   protected contract: TContract
 
   filters: { [name: string]: (...args: Array<any>) => EventFilter }
-  block: Block
+  context: Context<any, any>
 
   constructor(contract: TContract) {
     this.contract = contract

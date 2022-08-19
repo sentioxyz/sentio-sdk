@@ -84,11 +84,12 @@ export function codeGenSentioFile(contract: Contract): string {
       ethers: ['BigNumber', 'BigNumberish', 'BytesLike'],
       '@ethersproject/providers': ['Networkish'],
       '@sentio/sdk': [
-        'Context',
         'getProvider',
+        'transformEtherError',
         'BindOptions',
         'BaseProcessor',
         'BaseProcessorTemplate',
+        'Context',
         'ContractWrapper',
         'ContractNamer',
         'DummyProvider',
@@ -137,10 +138,14 @@ function generateOnEventFunction(event: EventDeclaration, contractName: string, 
 
 function generateViewFunction(func: FunctionDeclaration): string {
   return `
-  ${func.name}(${generateInputTypes(func.inputs, { useStructs: true })}) {
-    return this.contract.${func.name}(${
+  async ${func.name}(${generateInputTypes(func.inputs, { useStructs: true })}) {
+    try {
+      return await this.contract.${func.name}(${
     func.inputs.length > 0 ? func.inputs.map((input, index) => input.name || `arg${index}`).join(',') + ',' : ''
-  } { blockTag: this.block.number })
+  } { blockTag: this.context.blockNumber.toNumber() })
+    } catch (e) {
+      throw transformEtherError(e, this.context)
+    }
   }
   `
 }

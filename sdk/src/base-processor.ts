@@ -160,8 +160,8 @@ export class BaseProcessor<TContract extends BaseContract, TContractWrapper exte
     const chainId = this.getChainId()
 
     this.blockHandlers.push(async function (block: Block) {
-      contract.block = block
       const ctx = new Context<TContract, TContractWrapper>(contract, chainId, block, undefined)
+      contract.context = ctx
       await handler(block, ctx)
       return {
         gauges: ctx.gauges,
