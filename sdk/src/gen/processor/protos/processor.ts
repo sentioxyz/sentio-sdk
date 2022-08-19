@@ -99,6 +99,14 @@ export interface ProcessBlockResponse {
   result: O11yResult | undefined;
 }
 
+export interface ProcessBlocksRequest {
+  requests: ProcessBlockRequest[];
+}
+
+export interface ProcessBlocksResponse {
+  response: ProcessBlockResponse[];
+}
+
 export interface LogBinding {
   log: Log | undefined;
   handlerId: number;
@@ -1610,6 +1618,140 @@ export const ProcessBlockResponse = {
   },
 };
 
+function createBaseProcessBlocksRequest(): ProcessBlocksRequest {
+  return { requests: [] };
+}
+
+export const ProcessBlocksRequest = {
+  encode(
+    message: ProcessBlocksRequest,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    for (const v of message.requests) {
+      ProcessBlockRequest.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): ProcessBlocksRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseProcessBlocksRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.requests.push(
+            ProcessBlockRequest.decode(reader, reader.uint32())
+          );
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ProcessBlocksRequest {
+    return {
+      requests: Array.isArray(object?.requests)
+        ? object.requests.map((e: any) => ProcessBlockRequest.fromJSON(e))
+        : [],
+    };
+  },
+
+  toJSON(message: ProcessBlocksRequest): unknown {
+    const obj: any = {};
+    if (message.requests) {
+      obj.requests = message.requests.map((e) =>
+        e ? ProcessBlockRequest.toJSON(e) : undefined
+      );
+    } else {
+      obj.requests = [];
+    }
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<ProcessBlocksRequest>): ProcessBlocksRequest {
+    const message = createBaseProcessBlocksRequest();
+    message.requests =
+      object.requests?.map((e) => ProcessBlockRequest.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseProcessBlocksResponse(): ProcessBlocksResponse {
+  return { response: [] };
+}
+
+export const ProcessBlocksResponse = {
+  encode(
+    message: ProcessBlocksResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    for (const v of message.response) {
+      ProcessBlockResponse.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): ProcessBlocksResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseProcessBlocksResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.response.push(
+            ProcessBlockResponse.decode(reader, reader.uint32())
+          );
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ProcessBlocksResponse {
+    return {
+      response: Array.isArray(object?.response)
+        ? object.response.map((e: any) => ProcessBlockResponse.fromJSON(e))
+        : [],
+    };
+  },
+
+  toJSON(message: ProcessBlocksResponse): unknown {
+    const obj: any = {};
+    if (message.response) {
+      obj.response = message.response.map((e) =>
+        e ? ProcessBlockResponse.toJSON(e) : undefined
+      );
+    } else {
+      obj.response = [];
+    }
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<ProcessBlocksResponse>
+  ): ProcessBlocksResponse {
+    const message = createBaseProcessBlocksResponse();
+    message.response =
+      object.response?.map((e) => ProcessBlockResponse.fromPartial(e)) || [];
+    return message;
+  },
+};
+
 function createBaseLogBinding(): LogBinding {
   return { log: undefined, handlerId: 0 };
 }
@@ -2547,6 +2689,14 @@ export const ProcessorDefinition = {
       responseStream: false,
       options: {},
     },
+    processBlocks: {
+      name: "ProcessBlocks",
+      requestType: ProcessBlocksRequest,
+      requestStream: false,
+      responseType: ProcessBlocksResponse,
+      responseStream: false,
+      options: {},
+    },
     processInstruction: {
       name: "ProcessInstruction",
       requestType: ProcessInstructionRequest,
@@ -2583,6 +2733,10 @@ export interface ProcessorServiceImplementation<CallContextExt = {}> {
     request: ProcessBlockRequest,
     context: CallContext & CallContextExt
   ): Promise<DeepPartial<ProcessBlockResponse>>;
+  processBlocks(
+    request: ProcessBlocksRequest,
+    context: CallContext & CallContextExt
+  ): Promise<DeepPartial<ProcessBlocksResponse>>;
   processInstruction(
     request: ProcessInstructionRequest,
     context: CallContext & CallContextExt
@@ -2614,6 +2768,10 @@ export interface ProcessorClient<CallOptionsExt = {}> {
     request: DeepPartial<ProcessBlockRequest>,
     options?: CallOptions & CallOptionsExt
   ): Promise<ProcessBlockResponse>;
+  processBlocks(
+    request: DeepPartial<ProcessBlocksRequest>,
+    options?: CallOptions & CallOptionsExt
+  ): Promise<ProcessBlocksResponse>;
   processInstruction(
     request: DeepPartial<ProcessInstructionRequest>,
     options?: CallOptions & CallOptionsExt

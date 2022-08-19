@@ -15,6 +15,8 @@ service Processor {
   rpc ProcessLog(ProcessLogRequest) returns (ProcessLogResponse);
   rpc ProcessTransaction(ProcessTransactionRequest) returns (ProcessTransactionResponse);
   rpc ProcessBlock(ProcessBlockRequest) returns (ProcessBlockResponse);
+  rpc ProcessBlocks(ProcessBlocksRequest) returns (ProcessBlocksResponse);
+
   rpc ProcessInstruction(ProcessInstructionRequest) returns (ProcessInstructionResponse);
 }
 
@@ -115,6 +117,14 @@ message ProcessBlockRequest {
 
 message ProcessBlockResponse {
   O11yResult result = 1;
+}
+
+message ProcessBlocksRequest {
+  repeated ProcessBlockRequest requests = 1;
+}
+
+message ProcessBlocksResponse {
+  repeated ProcessBlockResponse response = 1;
 }
 
 message LogBinding {

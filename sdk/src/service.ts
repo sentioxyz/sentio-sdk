@@ -19,6 +19,8 @@ import {
   ProcessInstructionRequest,
   TemplateInstance,
   StartRequest,
+  ProcessBlocksResponse,
+  ProcessBlocksRequest,
 } from './gen/processor/protos/processor'
 
 import { DeepPartial } from './gen/builtin'
@@ -299,6 +301,20 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       result,
     }
   }
+
+  async processBlocks(
+    request: ProcessBlocksRequest,
+    context: CallContext
+  ): Promise<DeepPartial<ProcessBlocksResponse>> {
+    const resp = []
+    for (const req of request.requests) {
+      resp.push(await this.processBlock(req, context))
+    }
+    return {
+      response: resp,
+    }
+  }
+
   async processBlock(request: ProcessBlockRequest, context: CallContext): Promise<DeepPartial<ProcessBlockResponse>> {
     if (!this.started) {
       throw new ServerError(Status.UNAVAILABLE, 'Service Not started.')
