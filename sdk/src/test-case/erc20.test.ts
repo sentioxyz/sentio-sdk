@@ -42,14 +42,14 @@ describe('Test Server with Example', () => {
       },
       chainId: '1',
     }
-    const res = await service.processBlock(request, testContext)
-    expect(res.result?.counters).length(0)
-    expect(res.result?.gauges).length(1)
-    expect(res.result?.gauges?.[0].metricValue?.bigInt).equals('10')
+    const res = await service.processBlocks({ requests: [request] }, testContext)
+    const o11yRes = res.response?.[0].result
+    expect(o11yRes?.counters).length(0)
+    expect(o11yRes?.gauges).length(1)
+    expect(o11yRes?.gauges?.[0].metricValue?.bigInt).equals('10')
 
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const gauge = res.result!.gauges![0]
-    expect(gauge.metadata?.blockNumber?.toString()).equals('14373295')
+    const gauge = o11yRes?.gauges?.[0]
+    expect(gauge?.metadata?.blockNumber?.toString()).equals('14373295')
 
     // Different chainId should be dispatch to other
     const request2: ProcessBlockRequest = {
@@ -58,10 +58,11 @@ describe('Test Server with Example', () => {
       },
       chainId: '56',
     }
-    const res2 = await service.processBlock(request2, testContext)
-    expect(res2.result?.counters).length(0)
-    expect(res2.result?.gauges).length(1)
-    expect(res2.result?.gauges?.[0].metricValue?.bigInt).equals('20')
+    const res2 = await service.processBlocks({ requests: [request2] }, testContext)
+    const o11yRes2 = res2.response?.[0].result
+    expect(o11yRes2?.counters).length(0)
+    expect(o11yRes2?.gauges).length(1)
+    expect(o11yRes2?.gauges?.[0].metricValue?.bigInt).equals('20')
   })
 
   it('Check log dispatch', async () => {
@@ -90,11 +91,12 @@ describe('Test Server with Example', () => {
 
     const res = await service.processLog(request, testContext)
 
-    expect(res.result?.counters).length(2)
-    expect(res.result?.counters?.[0].metricValue?.bigInt).equals('1')
-    expect(res.result?.counters?.[0].metadata?.chainId).equals('1')
-    expect(res.result?.counters?.[1].metricValue?.bigInt).equals('2')
-    expect(res.result?.counters?.[1].metadata?.chainId).equals('56')
+    const counters = res.result?.counters
+    expect(counters).length(2)
+    expect(counters?.[0].metricValue?.bigInt).equals('1')
+    expect(counters?.[0].metadata?.chainId).equals('1')
+    expect(counters?.[1].metricValue?.bigInt).equals('2')
+    expect(counters?.[1].metadata?.chainId).equals('56')
 
     expect(res.result?.gauges).length(0)
     expect(res.configUpdated).equals(true)
