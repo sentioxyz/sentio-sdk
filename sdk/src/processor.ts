@@ -40,7 +40,8 @@ function tryRequire(name: string): { module: any; name: string; path: string } |
 
 const optionDefinitions = [
   { name: 'target', type: String, defaultOption: true },
-  { name: 'port', alias: 'p', type: Number, defaultValue: '4000' },
+  { name: 'port', alias: 'p', type: String, defaultValue: '4000' },
+  { name: 'concurrency', type: Number, defaultValue: 4 },
   {
     name: 'chains-config',
     alias: 'c',
@@ -56,7 +57,7 @@ console.log('loading', options.target)
 const fullPath = path.resolve(options['chains-config'])
 const chainsConfig = fs.readJsonSync(fullPath)
 
-setProvider(chainsConfig)
+setProvider(chainsConfig, options.concurrency)
 
 tryRequire(options.target)
 

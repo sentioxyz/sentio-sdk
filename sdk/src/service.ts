@@ -1,5 +1,6 @@
 import { Block, Log } from '@ethersproject/abstract-provider'
 import { CallContext, ServerError, Status } from 'nice-grpc'
+import PQueue from 'p-queue'
 
 import {
   HandlerCondition,
@@ -306,10 +307,9 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     request: ProcessBlocksRequest,
     context: CallContext
   ): Promise<DeepPartial<ProcessBlocksResponse>> {
-    const resp = []
-    for (const req of request.requests) {
-      resp.push(await this.processBlock(req, context))
-    }
+    const promises = request.requests.map((req) => this.processBlock(req, context))
+    const resp = await Promise.all(promises)
+
     return {
       response: resp,
     }

@@ -20,16 +20,10 @@
       "allowedVersions": "< 3.0.0"
     },
     {
-      "matchPackageNames": [  // > 1 package is actually bad release
-        "github.com/prometheus/prometheus"
+      "matchPackageNames": [  // TODO update this to 7
+        "p-queue"
       ],
-      "allowedVersions": "< 1.0.0"
-    },
-    {
-      "matchPackageNames": [ // https://pkg.go.dev/k8s.io/client-go#section-readme
-        "k8s.io/client-go"
-      ],
-      "allowedVersions": "< 1.0.0"
+      "allowedVersions": "< 7.0.0"
     }
   ],
   "timezone": "America/Los_Angeles",

@@ -1572,7 +1572,7 @@ ethers@^5.6.7:
     "@ethersproject/web" "5.6.1"
     "@ethersproject/wordlists" "5.6.1"
 
-eventemitter3@^4.0.7:
+eventemitter3@^4.0.4, eventemitter3@^4.0.7:
   version "4.0.7"
   resolved "https://registry.npmjs.org/eventemitter3/-/eventemitter3-4.0.7.tgz"
   integrity sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw==
@@ -2246,6 +2246,11 @@ once@^1.3.0:
   dependencies:
     wrappy "1"
 
+p-finally@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/p-finally/-/p-finally-1.0.0.tgz#3fbcfb15b899a44123b34b6dcc18b724336a2cae"
+  integrity sha512-LICb2p9CB7FS+0eR1oqWnHhp0FljGLZCWBE9aix0Uye9W8LTQPwMTYVGWQWIw9RdQiDg4+epXQODwIYJtSJaow==
+
 p-limit@^2.2.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/p-limit/-/p-limit-2.3.0.tgz#3dd33c647a214fdfffd835933eb086da0dc21db1"
@@ -2271,6 +2276,21 @@ p-locate@^5.0.0:
   resolved "https://registry.npmjs.org/p-locate/-/p-locate-5.0.0.tgz"
   dependencies:
     p-limit "^3.0.2"
+
+p-queue@^6.6.2:
+  version "6.6.2"
+  resolved "https://registry.yarnpkg.com/p-queue/-/p-queue-6.6.2.tgz#2068a9dcf8e67dd0ec3e7a2bcb76810faa85e426"
+  integrity sha512-RwFpb72c/BhQLEXIZ5K2e+AhgNVmIejGlTgiB9MzZ0e93GRvqZ7uSi0dvRF7/XIXDeNkra2fNHBxTyPDGySpjQ==
+  dependencies:
+    eventemitter3 "^4.0.4"
+    p-timeout "^3.2.0"
+
+p-timeout@^3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/p-timeout/-/p-timeout-3.2.0.tgz#c7e17abc971d2a7962ef83626b35d635acf23dfe"
+  integrity sha512-rhIwUycgwwKcP9yTOOFK/AKsAopjjCakVqLHePO3CC6Mir1Z99xT+R63jZxAT5lFZLa2inS5h+ZS2GvR99/FBg==
+  dependencies:
+    p-finally "^1.0.0"
 
 p-try@^2.0.0:
   version "2.2.0"
