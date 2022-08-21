@@ -4,7 +4,7 @@
   "scripts": {
     "compile": "tsc --build tsconfig.json && cp src/cli/webpack.config.js dist/cli",
     "build": "yarn compile && yarn gen_test_abi",
-    "pub": "yarn publish --no-git-tag-version --access public",
+    "pub": "yarn compile && yarn publish --no-git-tag-version --access public",
     "start_ts": "ts-node --files src/processor.ts ../examples/x2y2/src/processor.ts",
     "start_ts_solana": "ts-node --files src/processor.ts ../examples/mirrorworld/src/processor.ts",
     "start": "ts-node --files src/processor.ts ../examples/x2y2/dist/lib.js",
@@ -20,7 +20,7 @@
     "processor": "./dist/processor.js",
     "sentio": "./dist/cli/cli.js"
   },
-  "version": "0.3.6",
+  "version": "0.3.11",
   "dependencies": {
     "@ethersproject/providers": "^5.6.7",
     "@project-serum/anchor": "^0.25.0",
@@ -29,6 +29,7 @@
     "@typechain/ethers-v5": "^10.0.0",
     "@types/bn.js": "^5.1.0",
     "@types/node-fetch": "^2.6.2",
+    "bigint-buffer": "^1.1.5",
     "bn.js": "^5.2.1",
     "bs58": "^5.0.0",
     "command-line-args": "^5.2.1",

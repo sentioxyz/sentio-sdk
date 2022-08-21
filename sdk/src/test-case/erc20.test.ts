@@ -1,13 +1,24 @@
 // TODO move out of this package
 
-import { expect } from 'chai'
+import { assert, expect } from 'chai'
 
-import { LogBinding, ProcessBlockRequest, ProcessLogRequest, ProcessorServiceImpl, setProvider } from '..'
+import {
+  BigInteger,
+  LogBinding,
+  MetricValue,
+  ProcessBlockRequest,
+  ProcessLogRequest,
+  ProcessorServiceImpl,
+  setProvider,
+} from '..'
 
 import { CallContext } from 'nice-grpc-common/src/server/CallContext'
 import * as path from 'path'
 import * as fs from 'fs-extra'
 import { cleanTest } from './clean-test'
+import { BigNumber } from 'ethers'
+import { MetricValueToNumber, Numberish } from '../numberish'
+import { DeepPartial } from '../gen/builtin'
 
 describe('Test Server with Example', () => {
   const service = new ProcessorServiceImpl(undefined)
@@ -46,7 +57,7 @@ describe('Test Server with Example', () => {
     const o11yRes = res.response?.[0].result
     expect(o11yRes?.counters).length(0)
     expect(o11yRes?.gauges).length(1)
-    expect(o11yRes?.gauges?.[0].metricValue?.bigInt).equals('10')
+    expect(MetricValueToNumber(o11yRes?.gauges?.[0].metricValue)).equals(10n)
 
     const gauge = o11yRes?.gauges?.[0]
     expect(gauge?.metadata?.blockNumber?.toString()).equals('14373295')
@@ -62,7 +73,7 @@ describe('Test Server with Example', () => {
     const o11yRes2 = res2.response?.[0].result
     expect(o11yRes2?.counters).length(0)
     expect(o11yRes2?.gauges).length(1)
-    expect(o11yRes2?.gauges?.[0].metricValue?.bigInt).equals('20')
+    expect(MetricValueToNumber(o11yRes2?.gauges?.[0].metricValue)).equals(20n)
   })
 
   it('Check log dispatch', async () => {
@@ -93,9 +104,9 @@ describe('Test Server with Example', () => {
 
     const counters = res.result?.counters
     expect(counters).length(2)
-    expect(counters?.[0].metricValue?.bigInt).equals('1')
+    expect(MetricValueToNumber(counters?.[0].metricValue)).equals(1n)
     expect(counters?.[0].metadata?.chainId).equals('1')
-    expect(counters?.[1].metricValue?.bigInt).equals('2')
+    expect(MetricValueToNumber(counters?.[1].metricValue)).equals(2n)
     expect(counters?.[1].metadata?.chainId).equals('56')
 
     expect(res.result?.gauges).length(0)

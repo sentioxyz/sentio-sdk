@@ -7,6 +7,7 @@ import { ProcessInstructionRequest, ProcessorServiceImpl } from '..'
 import { CallContext } from 'nice-grpc-common/src/server/CallContext'
 import Long from 'long'
 import { cleanTest } from './clean-test'
+import { MetricValueToNumber } from '../numberish'
 
 describe('Test Server with Solana Example', () => {
   const service = new ProcessorServiceImpl(undefined)
@@ -38,7 +39,7 @@ describe('Test Server with Solana Example', () => {
     const res = await service.processInstruction(request, testContext)
     expect(res.result?.counters).length(3)
     expect(res.result?.gauges).length(0)
-    expect(res.result?.counters[0].metricValue?.bigInt).equal('5000000000')
+    expect(MetricValueToNumber(res.result?.counters[0].metricValue)).equal(5000000000n)
   })
 
   it('Check wormhole token bridge instruction dispatch', async () => {
@@ -55,6 +56,6 @@ describe('Test Server with Solana Example', () => {
     expect(res.result?.counters).length(1)
     expect(res.result?.gauges).length(0)
     expect(res.result?.counters[0].metadata?.blockNumber.toInt()).equal(0)
-    expect(res.result?.counters[0].metricValue?.doubleValue).equal(1000000)
+    expect(MetricValueToNumber(res.result?.counters[0].metricValue)).equal(1000000)
   })
 })

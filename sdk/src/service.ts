@@ -1,6 +1,5 @@
 import { Block, Log } from '@ethersproject/abstract-provider'
 import { CallContext, ServerError, Status } from 'nice-grpc'
-import PQueue from 'p-queue'
 
 import {
   HandlerCondition,

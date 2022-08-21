@@ -53,13 +53,9 @@ export class Counter {
   }
 
   private record(value: Numberish, labels: Labels, add: boolean) {
-    const [v, type] = convertNumber(value)
     this.ctx.counters.push({
       metadata: GetRecordMetaData(this.ctx, this.name, labels),
-      metricValue: {
-        bigInt: type == 0 ? <string>v : undefined,
-        doubleValue: type == 1 ? Number(v) : undefined,
-      },
+      metricValue: convertNumber(value),
       add: add,
     })
   }
@@ -83,13 +79,9 @@ export class Gauge {
   }
 
   record(value: Numberish, labels: Labels = {}) {
-    const [v, type] = convertNumber(value)
     this.ctx.gauges.push({
       metadata: GetRecordMetaData(this.ctx, this.name, labels),
-      metricValue: {
-        bigInt: type == 0 ? <string>v : undefined,
-        doubleValue: type == 1 ? Number(v) : undefined,
-      },
+      metricValue: convertNumber(value),
     })
   }
 }

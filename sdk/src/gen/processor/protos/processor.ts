@@ -156,6 +156,12 @@ export interface RecordMetaData_LabelsEntry {
 export interface MetricValue {
   bigInt: string | undefined;
   doubleValue: number | undefined;
+  bigInteger: BigInteger | undefined;
+}
+
+export interface BigInteger {
+  negative: boolean;
+  data: Uint8Array;
 }
 
 export interface GaugeResult {
@@ -2398,7 +2404,7 @@ export const RecordMetaData_LabelsEntry = {
 };
 
 function createBaseMetricValue(): MetricValue {
-  return { bigInt: undefined, doubleValue: undefined };
+  return { bigInt: undefined, doubleValue: undefined, bigInteger: undefined };
 }
 
 export const MetricValue = {
@@ -2411,6 +2417,9 @@ export const MetricValue = {
     }
     if (message.doubleValue !== undefined) {
       writer.uint32(17).double(message.doubleValue);
+    }
+    if (message.bigInteger !== undefined) {
+      BigInteger.encode(message.bigInteger, writer.uint32(26).fork()).ldelim();
     }
     return writer;
   },
@@ -2428,6 +2437,9 @@ export const MetricValue = {
         case 2:
           message.doubleValue = reader.double();
           break;
+        case 3:
+          message.bigInteger = BigInteger.decode(reader, reader.uint32());
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -2442,6 +2454,9 @@ export const MetricValue = {
       doubleValue: isSet(object.doubleValue)
         ? Number(object.doubleValue)
         : undefined,
+      bigInteger: isSet(object.bigInteger)
+        ? BigInteger.fromJSON(object.bigInteger)
+        : undefined,
     };
   },
 
@@ -2450,6 +2465,10 @@ export const MetricValue = {
     message.bigInt !== undefined && (obj.bigInt = message.bigInt);
     message.doubleValue !== undefined &&
       (obj.doubleValue = message.doubleValue);
+    message.bigInteger !== undefined &&
+      (obj.bigInteger = message.bigInteger
+        ? BigInteger.toJSON(message.bigInteger)
+        : undefined);
     return obj;
   },
 
@@ -2457,6 +2476,76 @@ export const MetricValue = {
     const message = createBaseMetricValue();
     message.bigInt = object.bigInt ?? undefined;
     message.doubleValue = object.doubleValue ?? undefined;
+    message.bigInteger =
+      object.bigInteger !== undefined && object.bigInteger !== null
+        ? BigInteger.fromPartial(object.bigInteger)
+        : undefined;
+    return message;
+  },
+};
+
+function createBaseBigInteger(): BigInteger {
+  return { negative: false, data: new Uint8Array() };
+}
+
+export const BigInteger = {
+  encode(
+    message: BigInteger,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.negative === true) {
+      writer.uint32(8).bool(message.negative);
+    }
+    if (message.data.length !== 0) {
+      writer.uint32(18).bytes(message.data);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): BigInteger {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseBigInteger();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.negative = reader.bool();
+          break;
+        case 2:
+          message.data = reader.bytes();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): BigInteger {
+    return {
+      negative: isSet(object.negative) ? Boolean(object.negative) : false,
+      data: isSet(object.data)
+        ? bytesFromBase64(object.data)
+        : new Uint8Array(),
+    };
+  },
+
+  toJSON(message: BigInteger): unknown {
+    const obj: any = {};
+    message.negative !== undefined && (obj.negative = message.negative);
+    message.data !== undefined &&
+      (obj.data = base64FromBytes(
+        message.data !== undefined ? message.data : new Uint8Array()
+      ));
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<BigInteger>): BigInteger {
+    const message = createBaseBigInteger();
+    message.negative = object.negative ?? false;
+    message.data = object.data ?? new Uint8Array();
     return message;
   },
 };
