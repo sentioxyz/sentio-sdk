@@ -8,7 +8,7 @@ import http from 'http'
 import path from 'path'
 
 import yaml from 'js-yaml'
-import { EVM, FinalizeHost, SentioProjectConfig, Target } from './config'
+import { EVM, FinalizeHost, SentioProjectConfig } from './config'
 import { WriteKey } from './key'
 import { uploadFile } from './upload'
 import chalk from 'chalk'

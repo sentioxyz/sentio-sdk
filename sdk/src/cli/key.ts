@@ -1,7 +1,6 @@
 import path from 'path'
 import fs from 'fs'
 import os from 'os'
-import exp from 'constants'
 
 const homeDir = os.homedir()
 const sentioDir = path.join(homeDir, '.sentio')

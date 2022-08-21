@@ -1,4 +1,4 @@
-import Long from "long";
+import Long from 'long'
 
 type Builtin =
   | Date
@@ -10,13 +10,13 @@ type Builtin =
   | undefined;
 
 export type DeepPartial<T> = T extends Builtin
-    ? T
-    : T extends Long
-        ? string | number | Long
-        : T extends Array<infer U>
-            ? Array<DeepPartial<U>>
-            : T extends ReadonlyArray<infer U>
-                ? ReadonlyArray<DeepPartial<U>>
-                : T extends {}
-                    ? { [K in keyof T]?: DeepPartial<T[K]> }
-                    : Partial<T>;
+  ? T
+  : T extends Long
+    ? string | number | Long
+    : T extends Array<infer U>
+      ? Array<DeepPartial<U>>
+      : T extends ReadonlyArray<infer U>
+        ? ReadonlyArray<DeepPartial<U>>
+        : T extends {}
+          ? { [K in keyof T]?: DeepPartial<T[K]> }
+          : Partial<T>;

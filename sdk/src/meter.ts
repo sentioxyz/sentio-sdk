@@ -52,20 +52,20 @@ export class Counter {
     this.ctx = ctx
   }
 
-  private record(value: Numberish, labels: Labels, add: boolean) {
-    this.ctx.counters.push({
-      metadata: GetRecordMetaData(this.ctx, this.name, labels),
-      metricValue: convertNumber(value),
-      add: add,
-    })
-  }
-
   add(value: Numberish, labels: Labels = {}) {
     this.record(value, labels, true)
   }
 
   sub(value: Numberish, labels: Labels = {}) {
     this.record(value, labels, false)
+  }
+
+  private record(value: Numberish, labels: Labels, add: boolean) {
+    this.ctx.counters.push({
+      metadata: GetRecordMetaData(this.ctx, this.name, labels),
+      metricValue: convertNumber(value),
+      add: add,
+    })
   }
 }
 

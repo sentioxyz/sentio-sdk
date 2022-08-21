@@ -1,4 +1,4 @@
-import { BaseProvider, FallbackProvider, getNetwork, Provider, StaticJsonRpcProvider } from '@ethersproject/providers'
+import { getNetwork, Provider, StaticJsonRpcProvider } from '@ethersproject/providers'
 import { Networkish } from '@ethersproject/networks'
 import PQueue from 'p-queue'
 import { ConnectionInfo } from '@ethersproject/web'

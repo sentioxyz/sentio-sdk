@@ -29,10 +29,9 @@ export class Context<TContract extends BaseContract, TContractWrapper extends Co
 }
 
 export class ContractWrapper<TContract extends BaseContract> {
-  protected contract: TContract
-
   filters: { [name: string]: (...args: Array<any>) => EventFilter }
   context: Context<any, any>
+  protected contract: TContract
 
   constructor(contract: TContract) {
     this.contract = contract

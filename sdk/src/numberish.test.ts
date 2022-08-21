@@ -1,8 +1,7 @@
 import { expect } from 'chai'
 import { toBigInteger } from './numberish'
-import * as crypto from 'crypto'
-import { BigNumber } from 'ethers'
 import { webcrypto } from 'crypto'
+import { BigNumber } from 'ethers'
 import { performance } from 'perf_hooks'
 import { BigInteger } from './gen/processor/protos/processor'
 

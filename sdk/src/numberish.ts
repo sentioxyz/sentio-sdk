@@ -1,7 +1,6 @@
 import { BigNumber } from 'ethers'
 import { BigInteger, MetricValue } from './gen/processor/protos/processor'
 import { DeepPartial } from './gen/builtin'
-import { BN } from '@project-serum/anchor'
 
 export type Numberish = number | BigNumber | bigint //BigNumberish
 

@@ -1,24 +1,14 @@
 // TODO move out of this package
 
-import { assert, expect } from 'chai'
+import { expect } from 'chai'
 
-import {
-  BigInteger,
-  LogBinding,
-  MetricValue,
-  ProcessBlockRequest,
-  ProcessLogRequest,
-  ProcessorServiceImpl,
-  setProvider,
-} from '..'
+import { LogBinding, ProcessBlockRequest, ProcessLogRequest, ProcessorServiceImpl, setProvider } from '..'
 
 import { CallContext } from 'nice-grpc-common/src/server/CallContext'
 import * as path from 'path'
 import * as fs from 'fs-extra'
 import { cleanTest } from './clean-test'
-import { BigNumber } from 'ethers'
-import { MetricValueToNumber, Numberish } from '../numberish'
-import { DeepPartial } from '../gen/builtin'
+import { MetricValueToNumber } from '../numberish'
 
 describe('Test Server with Example', () => {
   const service = new ProcessorServiceImpl(undefined)

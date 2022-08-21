@@ -2,25 +2,25 @@ import { Block, Log } from '@ethersproject/abstract-provider'
 import { CallContext, ServerError, Status } from 'nice-grpc'
 
 import {
-  HandlerCondition,
   ContractConfig,
+  HandlerCondition,
   LogHandlerConfig,
   O11yResult,
   ProcessBlockRequest,
   ProcessBlockResponse,
+  ProcessBlocksRequest,
+  ProcessBlocksResponse,
   ProcessConfigRequest,
   ProcessConfigResponse,
+  ProcessInstructionRequest,
+  ProcessInstructionResponse,
   ProcessLogRequest,
   ProcessLogResponse,
   ProcessorServiceImplementation,
   ProcessTransactionRequest,
   ProcessTransactionResponse,
-  ProcessInstructionResponse,
-  ProcessInstructionRequest,
-  TemplateInstance,
   StartRequest,
-  ProcessBlocksResponse,
-  ProcessBlocksRequest,
+  TemplateInstance,
 } from './gen/processor/protos/processor'
 
 import { DeepPartial } from './gen/builtin'
@@ -182,6 +182,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     this.started = true
     return {}
   }
+
   async stop(request: Empty, context: CallContext): Promise<DeepPartial<Empty>> {
     console.log('Server Shutting down in 5 seconds')
     if (this.shutdownHandler) {
@@ -189,6 +190,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     }
     return {}
   }
+
   async processLog(request: ProcessLogRequest, context: CallContext): Promise<DeepPartial<ProcessLogResponse>> {
     if (!this.started) {
       throw new ServerError(Status.UNAVAILABLE, 'Service Not started.')

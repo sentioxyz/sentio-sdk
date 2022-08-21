@@ -14,6 +14,11 @@ export abstract class BaseProcessorTemplate<
 > {
   id: number
   bound = new Set<string>()
+  blockHandlers: ((block: Block, ctx: Context<TContract, TContractWrapper>) => void)[] = []
+  eventHandlers: {
+    handler: (event: Event, ctx: Context<TContract, TContractWrapper>) => void
+    filter: EventFilter | EventFilter[]
+  }[] = []
 
   constructor() {
     if (!globalThis.Templates) {
@@ -73,14 +78,6 @@ export abstract class BaseProcessorTemplate<
     return processor
   }
 
-  protected abstract bindInternal(options: BindOptions): BaseProcessor<TContract, TContractWrapper>
-
-  blockHandlers: ((block: Block, ctx: Context<TContract, TContractWrapper>) => void)[] = []
-  eventHandlers: {
-    handler: (event: Event, ctx: Context<TContract, TContractWrapper>) => void
-    filter: EventFilter | EventFilter[]
-  }[] = []
-
   public onEvent(
     handler: (event: Event, ctx: Context<TContract, TContractWrapper>) => void,
     filter: EventFilter | EventFilter[]
@@ -96,4 +93,6 @@ export abstract class BaseProcessorTemplate<
     this.blockHandlers.push(handler)
     return this
   }
+
+  protected abstract bindInternal(options: BindOptions): BaseProcessor<TContract, TContractWrapper>
 }

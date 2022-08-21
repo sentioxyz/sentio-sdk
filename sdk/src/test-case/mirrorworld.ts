@@ -1,4 +1,3 @@
-import { SolanaContext } from '@sentio/sdk'
 import { GameWalletProcessor } from './types/game_wallet_processor'
 
 GameWalletProcessor.bind('F78NhTC9XmP1DKsCBRz5LGdQc4n4yFbj2dURiv7T9gGZ', 'https://api.mainnet-beta.solana.com')

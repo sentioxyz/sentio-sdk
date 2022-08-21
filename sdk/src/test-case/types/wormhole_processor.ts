@@ -1,6 +1,6 @@
-import { Instruction, BN } from '@project-serum/anchor'
-import * as borsh from "@project-serum/borsh";
-import { SolanaBaseProcessor, SolanaContext } from "@sentio/sdk"
+import { Instruction } from '@project-serum/anchor'
+import * as borsh from '@project-serum/borsh'
+import { SolanaBaseProcessor, SolanaContext } from '@sentio/sdk'
 import bs58 from 'bs58'
 
 // https://github.com/certusone/wormhole/blob/8818d4b8f0471095dd48fa6f5da9c315cbfc9b52/solana/modules/token_bridge/program/src/lib.rs#L100
@@ -22,18 +22,13 @@ enum TokenBrigeInstruction {
 
 export class TokenBridgeProcessor extends SolanaBaseProcessor {
 
-  static bind(address: string, endpoint: string, name = 'Wormhole'): TokenBridgeProcessor {
-    return new TokenBridgeProcessor(name, address, endpoint)
-  }
-
   private readonly transferDataValues = [
     borsh.u32('nonce'),
     borsh.u64('amount'),
     borsh.u64('fee'),
     borsh.array(borsh.u8(undefined), 32, 'target_address'),
-    borsh.u16('target_chain'),
+    borsh.u16('target_chain')
   ]
-
   // https://github.com/certusone/wormhole/blob/8818d4b8f0471095dd48fa6f5da9c315cbfc9b52/solana/modules/token_bridge/program/src/api/transfer_payload.rs#L170
   private readonly transferDataWithPayloadValues = [
     borsh.u32('nonce'),
@@ -43,14 +38,16 @@ export class TokenBridgeProcessor extends SolanaBaseProcessor {
     borsh.vecU8('payload'),
     borsh.option(borsh.publicKey(undefined), 'cpi_program_id')
   ]
-
   private readonly attestTokenValues = [
-    borsh.u32('nonce'),
+    borsh.u32('nonce')
+  ]
+  private readonly initializeDataValues = [
+    borsh.publicKey('bridge')
   ]
 
-  private readonly initializeDataValues = [
-    borsh.publicKey('bridge'),
-  ]
+  static bind(address: string, endpoint: string, name = 'Wormhole'): TokenBridgeProcessor {
+    return new TokenBridgeProcessor(name, address, endpoint)
+  }
 
   public decodeInstruction(ins: string): Instruction | null {
     const u8Arr = bs58.decode(ins)
@@ -115,13 +112,13 @@ export class TokenBridgeProcessor extends SolanaBaseProcessor {
           data: '',
           name: TokenBrigeInstruction[u8Arr[0]]
         }
-              
+
       default:
         return null
     }
   }
 
-  
+
   onInitialize(handler: (args: any, ctx: SolanaContext) => void): TokenBridgeProcessor {
     this.onInstruction('Initialize', (ins: Instruction, ctx) => {
       if (ins) {
@@ -139,8 +136,8 @@ export class TokenBridgeProcessor extends SolanaBaseProcessor {
     })
     return this
   }
-  
-  
+
+
   onTransferWrapped(handler: (args: any, ctx: SolanaContext) => void): TokenBridgeProcessor {
     this.onInstruction('TransferWrapped', (ins: Instruction, ctx) => {
       if (ins) {
