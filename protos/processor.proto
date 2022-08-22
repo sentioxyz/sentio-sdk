@@ -77,7 +77,9 @@ message HandlerCondition {
 }
 
 message InstructionHandlerConfig {
-  bool processInnerInstruction = 1;
+  bool inner_instruction = 1;
+  bool parsed_instruction = 2;
+  bool raw_data_instruction = 3;
 }
 
 message Topic {

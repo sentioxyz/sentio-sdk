@@ -49,7 +49,7 @@ export class TokenBridgeProcessor extends SolanaBaseProcessor {
     return new TokenBridgeProcessor(name, address, endpoint)
   }
 
-  public decodeInstruction(ins: string): Instruction | null {
+  decodeInstruction: (rawInstruction: string) => Instruction | null = (ins) => {
     const u8Arr = bs58.decode(ins)
     if (u8Arr.length === 0) {
       return null
@@ -117,7 +117,6 @@ export class TokenBridgeProcessor extends SolanaBaseProcessor {
         return null
     }
   }
-
 
   onInitialize(handler: (args: any, ctx: SolanaContext) => void): TokenBridgeProcessor {
     this.onInstruction('Initialize', (ins: Instruction, ctx) => {

@@ -11,67 +11,67 @@ import type {
   Overrides,
   PopulatedTransaction,
   Signer,
-  utils
-} from 'ethers'
-import type { EventFragment, FunctionFragment, Result } from '@ethersproject/abi'
-import type { Listener, Provider } from '@ethersproject/providers'
-import type { OnEvent, PromiseOrValue, TypedEvent, TypedEventFilter, TypedListener } from './common'
+  utils,
+} from "ethers";
+import type {
+  FunctionFragment,
+  Result,
+  EventFragment,
+} from "@ethersproject/abi";
+import type { Listener, Provider } from "@ethersproject/providers";
+import type {
+  TypedEventFilter,
+  TypedEvent,
+  TypedListener,
+  OnEvent,
+  PromiseOrValue,
+} from "./common";
 
 export interface Erc20Interface extends utils.Interface {
   functions: {
-    'allowance(address,address)': FunctionFragment;
-    'approve(address,uint256)': FunctionFragment;
-    'balanceOf(address)': FunctionFragment;
-    'decimals()': FunctionFragment;
-    'totalSupply()': FunctionFragment;
-    'transfer(address,uint256)': FunctionFragment;
-    'transferFrom(address,address,uint256)': FunctionFragment;
-  };
-  events: {
-    'Approval(address,address,uint256)': EventFragment;
-    'Transfer(address,address,uint256)': EventFragment;
+    "allowance(address,address)": FunctionFragment;
+    "approve(address,uint256)": FunctionFragment;
+    "balanceOf(address)": FunctionFragment;
+    "decimals()": FunctionFragment;
+    "totalSupply()": FunctionFragment;
+    "transfer(address,uint256)": FunctionFragment;
+    "transferFrom(address,address,uint256)": FunctionFragment;
   };
 
   getFunction(
     nameOrSignatureOrTopic:
-      | 'allowance'
-      | 'approve'
-      | 'balanceOf'
-      | 'decimals'
-      | 'totalSupply'
-      | 'transfer'
-      | 'transferFrom'
+      | "allowance"
+      | "approve"
+      | "balanceOf"
+      | "decimals"
+      | "totalSupply"
+      | "transfer"
+      | "transferFrom"
   ): FunctionFragment;
 
   encodeFunctionData(
-    functionFragment: 'allowance',
+    functionFragment: "allowance",
     values: [PromiseOrValue<string>, PromiseOrValue<string>]
   ): string;
-
   encodeFunctionData(
-    functionFragment: 'approve',
+    functionFragment: "approve",
     values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]
   ): string;
-
   encodeFunctionData(
-    functionFragment: 'balanceOf',
+    functionFragment: "balanceOf",
     values: [PromiseOrValue<string>]
   ): string;
-
-  encodeFunctionData(functionFragment: 'decimals', values?: undefined): string;
-
+  encodeFunctionData(functionFragment: "decimals", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: 'totalSupply',
+    functionFragment: "totalSupply",
     values?: undefined
   ): string;
-
   encodeFunctionData(
-    functionFragment: 'transfer',
+    functionFragment: "transfer",
     values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]
   ): string;
-
   encodeFunctionData(
-    functionFragment: 'transferFrom',
+    functionFragment: "transferFrom",
     values: [
       PromiseOrValue<string>,
       PromiseOrValue<string>,
@@ -79,29 +79,27 @@ export interface Erc20Interface extends utils.Interface {
     ]
   ): string;
 
-  decodeFunctionResult(functionFragment: 'allowance', data: BytesLike): Result;
-
-  decodeFunctionResult(functionFragment: 'approve', data: BytesLike): Result;
-
-  decodeFunctionResult(functionFragment: 'balanceOf', data: BytesLike): Result;
-
-  decodeFunctionResult(functionFragment: 'decimals', data: BytesLike): Result;
-
+  decodeFunctionResult(functionFragment: "allowance", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "decimals", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: 'totalSupply',
+    functionFragment: "totalSupply",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "transfer", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "transferFrom",
     data: BytesLike
   ): Result;
 
-  decodeFunctionResult(functionFragment: 'transfer', data: BytesLike): Result;
+  events: {
+    "Approval(address,address,uint256)": EventFragment;
+    "Transfer(address,address,uint256)": EventFragment;
+  };
 
-  decodeFunctionResult(
-    functionFragment: 'transferFrom',
-    data: BytesLike
-  ): Result;
-
-  getEvent(nameOrSignatureOrTopic: 'Approval'): EventFragment;
-
-  getEvent(nameOrSignatureOrTopic: 'Transfer'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
 }
 
 export interface ApprovalEventObject {
@@ -109,9 +107,10 @@ export interface ApprovalEventObject {
   spender: string;
   value: BigNumber;
 }
-
-export type ApprovalEvent = TypedEvent<[string, string, BigNumber],
-  ApprovalEventObject>;
+export type ApprovalEvent = TypedEvent<
+  [string, string, BigNumber],
+  ApprovalEventObject
+>;
 
 export type ApprovalEventFilter = TypedEventFilter<ApprovalEvent>;
 
@@ -120,18 +119,39 @@ export interface TransferEventObject {
   to: string;
   value: BigNumber;
 }
-
-export type TransferEvent = TypedEvent<[string, string, BigNumber],
-  TransferEventObject>;
+export type TransferEvent = TypedEvent<
+  [string, string, BigNumber],
+  TransferEventObject
+>;
 
 export type TransferEventFilter = TypedEventFilter<TransferEvent>;
 
 export interface Erc20 extends BaseContract {
+  connect(signerOrProvider: Signer | Provider | string): this;
+  attach(addressOrName: string): this;
+  deployed(): Promise<this>;
+
   interface: Erc20Interface;
+
+  queryFilter<TEvent extends TypedEvent>(
+    event: TypedEventFilter<TEvent>,
+    fromBlockOrBlockhash?: string | number | undefined,
+    toBlock?: string | number | undefined
+  ): Promise<Array<TEvent>>;
+
+  listeners<TEvent extends TypedEvent>(
+    eventFilter?: TypedEventFilter<TEvent>
+  ): Array<TypedListener<TEvent>>;
+  listeners(eventName?: string): Array<Listener>;
+  removeAllListeners<TEvent extends TypedEvent>(
+    eventFilter: TypedEventFilter<TEvent>
+  ): this;
+  removeAllListeners(eventName?: string): this;
   off: OnEvent<this>;
   on: OnEvent<this>;
   once: OnEvent<this>;
   removeListener: OnEvent<this>;
+
   functions: {
     allowance(
       owner: PromiseOrValue<string>,
@@ -167,6 +187,41 @@ export interface Erc20 extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
   };
+
+  allowance(
+    owner: PromiseOrValue<string>,
+    spender: PromiseOrValue<string>,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  approve(
+    spender: PromiseOrValue<string>,
+    amount: PromiseOrValue<BigNumberish>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  balanceOf(
+    account: PromiseOrValue<string>,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  decimals(overrides?: CallOverrides): Promise<number>;
+
+  totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
+
+  transfer(
+    to: PromiseOrValue<string>,
+    amount: PromiseOrValue<BigNumberish>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  transferFrom(
+    from: PromiseOrValue<string>,
+    to: PromiseOrValue<string>,
+    amount: PromiseOrValue<BigNumberish>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
   callStatic: {
     allowance(
       owner: PromiseOrValue<string>,
@@ -202,8 +257,9 @@ export interface Erc20 extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
   };
+
   filters: {
-    'Approval(address,address,uint256)'(
+    "Approval(address,address,uint256)"(
       owner?: PromiseOrValue<string> | null,
       spender?: PromiseOrValue<string> | null,
       value?: null
@@ -214,7 +270,7 @@ export interface Erc20 extends BaseContract {
       value?: null
     ): ApprovalEventFilter;
 
-    'Transfer(address,address,uint256)'(
+    "Transfer(address,address,uint256)"(
       from?: PromiseOrValue<string> | null,
       to?: PromiseOrValue<string> | null,
       value?: null
@@ -225,6 +281,7 @@ export interface Erc20 extends BaseContract {
       value?: null
     ): TransferEventFilter;
   };
+
   estimateGas: {
     allowance(
       owner: PromiseOrValue<string>,
@@ -260,6 +317,7 @@ export interface Erc20 extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
   };
+
   populateTransaction: {
     allowance(
       owner: PromiseOrValue<string>,
@@ -295,62 +353,4 @@ export interface Erc20 extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
   };
-
-  connect(signerOrProvider: Signer | Provider | string): this;
-
-  attach(addressOrName: string): this;
-
-  deployed(): Promise<this>;
-
-  queryFilter<TEvent extends TypedEvent>(
-    event: TypedEventFilter<TEvent>,
-    fromBlockOrBlockhash?: string | number | undefined,
-    toBlock?: string | number | undefined
-  ): Promise<Array<TEvent>>;
-
-  listeners<TEvent extends TypedEvent>(
-    eventFilter?: TypedEventFilter<TEvent>
-  ): Array<TypedListener<TEvent>>;
-
-  listeners(eventName?: string): Array<Listener>;
-
-  removeAllListeners<TEvent extends TypedEvent>(
-    eventFilter: TypedEventFilter<TEvent>
-  ): this;
-
-  removeAllListeners(eventName?: string): this;
-
-  allowance(
-    owner: PromiseOrValue<string>,
-    spender: PromiseOrValue<string>,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
-  approve(
-    spender: PromiseOrValue<string>,
-    amount: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  balanceOf(
-    account: PromiseOrValue<string>,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
-  decimals(overrides?: CallOverrides): Promise<number>;
-
-  totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
-
-  transfer(
-    to: PromiseOrValue<string>,
-    amount: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  transferFrom(
-    from: PromiseOrValue<string>,
-    to: PromiseOrValue<string>,
-    amount: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
 }

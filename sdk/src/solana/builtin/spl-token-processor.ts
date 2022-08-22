@@ -26,7 +26,7 @@ export class SPLTokenProcessor extends SolanaBaseProcessor {
     return new SPLTokenProcessor(name, address, endpoint)
   }
 
-  public fromParsedInstruction(instruction: ParsedInstruction): Instruction | null {
+  fromParsedInstruction: (instruction: ParsedInstruction) => Instruction | null = (instruction: ParsedInstruction) => {
     const instructionType = instruction.parsed.type as string
     if (!instructionType || !this.instructionTypeToTokenInstruction(instructionType)) {
       return null

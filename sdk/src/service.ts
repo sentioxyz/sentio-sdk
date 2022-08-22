@@ -26,7 +26,6 @@ import {
 import { DeepPartial } from './gen/builtin'
 import { Empty } from './gen/google/protobuf/empty'
 import Long from 'long'
-import { Instruction } from '@project-serum/anchor'
 
 const MAX_BLOCK = new Long(0)
 
@@ -150,7 +149,9 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
           startBlock: solanaProcessor.config.startSlot,
           endBlock: MAX_BLOCK,
           instructionConfig: {
-            processInnerInstruction: solanaProcessor.processInnerInstruction,
+            innerInstruction: solanaProcessor.processInnerInstruction,
+            parsedInstruction: solanaProcessor.fromParsedInstruction != null ? true : false,
+            rawDataInstruction: solanaProcessor.decodeInstruction != null ? true : false,
           },
         }
         this.contractConfigs.push(contractConfig)
@@ -262,32 +263,28 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
 
         for (const processor of globalThis.SolanaProcessors) {
           if (processor.address === instruction.programAccountId) {
-            let decodedIns: Instruction | null
+            let res: O11yResult | null
             if (instruction.parsed) {
-              decodedIns = processor.fromParsedInstruction(JSON.parse(instruction.parsed.toString()))
+              res = processor.handleInstruction(JSON.parse(instruction.parsed.toString()))
             } else {
-              decodedIns = processor.decodeInstruction(instruction.instructionData)
+              res = processor.handleInstruction(instruction.instructionData)
             }
-            if (decodedIns) {
-              const handler = processor.instructionHanlderMap.get(decodedIns.name)
-              if (handler !== undefined) {
-                try {
-                  const res = await handler(decodedIns)
-                  res.gauges.forEach((h) => {
-                    if (h.metadata) {
-                      h.metadata.blockNumber = instruction.slot
-                    }
-                    result.gauges.push(h)
-                  })
-                  res.counters.forEach((c) => {
-                    if (c.metadata) {
-                      c.metadata.blockNumber = instruction.slot
-                    }
-                    result.counters.push(c)
-                  })
-                } catch (e) {
-                  throw new ServerError(Status.INTERNAL, e)
-                }
+            if (res) {
+              try {
+                res.gauges.forEach((h) => {
+                  if (h.metadata) {
+                    h.metadata.blockNumber = instruction.slot
+                  }
+                  result.gauges.push(h)
+                })
+                res.counters.forEach((c) => {
+                  if (c.metadata) {
+                    c.metadata.blockNumber = instruction.slot
+                  }
+                  result.counters.push(c)
+                })
+              } catch (e) {
+                throw new ServerError(Status.INTERNAL, e)
               }
             } else {
               console.error(

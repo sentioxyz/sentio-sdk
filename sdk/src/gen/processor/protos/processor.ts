@@ -58,7 +58,9 @@ export interface HandlerCondition {
 }
 
 export interface InstructionHandlerConfig {
-  processInnerInstruction: boolean;
+  innerInstruction: boolean;
+  parsedInstruction: boolean;
+  rawDataInstruction: boolean;
 }
 
 export interface Topic {
@@ -984,7 +986,11 @@ export const HandlerCondition = {
 };
 
 function createBaseInstructionHandlerConfig(): InstructionHandlerConfig {
-  return { processInnerInstruction: false };
+  return {
+    innerInstruction: false,
+    parsedInstruction: false,
+    rawDataInstruction: false,
+  };
 }
 
 export const InstructionHandlerConfig = {
@@ -992,8 +998,14 @@ export const InstructionHandlerConfig = {
     message: InstructionHandlerConfig,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (message.processInnerInstruction === true) {
-      writer.uint32(8).bool(message.processInnerInstruction);
+    if (message.innerInstruction === true) {
+      writer.uint32(8).bool(message.innerInstruction);
+    }
+    if (message.parsedInstruction === true) {
+      writer.uint32(16).bool(message.parsedInstruction);
+    }
+    if (message.rawDataInstruction === true) {
+      writer.uint32(24).bool(message.rawDataInstruction);
     }
     return writer;
   },
@@ -1009,7 +1021,13 @@ export const InstructionHandlerConfig = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.processInnerInstruction = reader.bool();
+          message.innerInstruction = reader.bool();
+          break;
+        case 2:
+          message.parsedInstruction = reader.bool();
+          break;
+        case 3:
+          message.rawDataInstruction = reader.bool();
           break;
         default:
           reader.skipType(tag & 7);
@@ -1021,16 +1039,26 @@ export const InstructionHandlerConfig = {
 
   fromJSON(object: any): InstructionHandlerConfig {
     return {
-      processInnerInstruction: isSet(object.processInnerInstruction)
-        ? Boolean(object.processInnerInstruction)
+      innerInstruction: isSet(object.innerInstruction)
+        ? Boolean(object.innerInstruction)
+        : false,
+      parsedInstruction: isSet(object.parsedInstruction)
+        ? Boolean(object.parsedInstruction)
+        : false,
+      rawDataInstruction: isSet(object.rawDataInstruction)
+        ? Boolean(object.rawDataInstruction)
         : false,
     };
   },
 
   toJSON(message: InstructionHandlerConfig): unknown {
     const obj: any = {};
-    message.processInnerInstruction !== undefined &&
-      (obj.processInnerInstruction = message.processInnerInstruction);
+    message.innerInstruction !== undefined &&
+      (obj.innerInstruction = message.innerInstruction);
+    message.parsedInstruction !== undefined &&
+      (obj.parsedInstruction = message.parsedInstruction);
+    message.rawDataInstruction !== undefined &&
+      (obj.rawDataInstruction = message.rawDataInstruction);
     return obj;
   },
 
@@ -1038,7 +1066,9 @@ export const InstructionHandlerConfig = {
     object: DeepPartial<InstructionHandlerConfig>
   ): InstructionHandlerConfig {
     const message = createBaseInstructionHandlerConfig();
-    message.processInnerInstruction = object.processInnerInstruction ?? false;
+    message.innerInstruction = object.innerInstruction ?? false;
+    message.parsedInstruction = object.parsedInstruction ?? false;
+    message.rawDataInstruction = object.rawDataInstruction ?? false;
     return message;
   },
 };

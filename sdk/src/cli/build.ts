@@ -71,9 +71,9 @@ export class ${idlNamePascalCase}Processor extends SolanaBaseProcessor {
     return new ${idlNamePascalCase}Processor(name, address, endpoint)
   }
 
-  public decodeInstruction(ins: string): Instruction | null {
+  decodeInstruction: (rawInstruction: string) => Instruction | null = (rawInstruction) => {
     const instructionCoder = new BorshInstructionCoder(${idlName}_idl as Idl)
-    const decodedIns = instructionCoder.decode(Buffer.from(bs58.decode(ins)))
+    const decodedIns = instructionCoder.decode(Buffer.from(bs58.decode(rawInstruction)))
     return decodedIns
   }
 

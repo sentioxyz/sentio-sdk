@@ -10,13 +10,15 @@ type IndexConfigure = {
 }
 
 export class SolanaBaseProcessor {
-  public instructionHanlderMap: Map<string, (instruction: Instruction) => Promise<O11yResult>> = new Map()
+  public instructionHanlderMap: Map<string, (instruction: Instruction, ctx: SolanaContext) => void> = new Map()
   address: string
   endpoint: string
   connection: Connection
   contractName: string
   processInnerInstruction: boolean
   config: IndexConfigure = { startSlot: new Long(0) }
+  decodeInstruction: (rawInstruction: string) => Instruction | null
+  fromParsedInstruction: (instruction: ParsedInstruction) => Instruction | null
 
   constructor(contractName: string, address: string, endpoint: string, processInnerInstruction = false) {
     this.endpoint = endpoint
@@ -34,33 +36,37 @@ export class SolanaBaseProcessor {
     this.address = address
   }
 
-  public decodeInstruction(rawInstruction: string): Instruction | null {
-    throw new Error('decodeInstruction is not implemented.')
-  }
-
-  public fromParsedInstruction(instruction: ParsedInstruction): Instruction | null {
-    throw new Error('fromParsedInstruction is not implemented.')
-  }
-
   public onInstruction(instructionName: string, handler: (instruction: Instruction, ctx: SolanaContext) => void) {
     if (!this.isBind()) {
       throw new Error("Processor doesn't bind to an address")
     }
 
-    this.instructionHanlderMap.set(instructionName, async (ins: Instruction) => {
-      const ctx = new SolanaContext(this.address)
-      // const parsedTransaction = await this.connection.getParsedTransaction(ins)
-
-      if (ins) {
-        await handler(ins, ctx)
-      }
-      return {
-        gauges: ctx.gauges,
-        counters: ctx.counters,
-      }
-    })
+    this.instructionHanlderMap.set(instructionName, handler)
 
     return this
+  }
+  
+  public handleInstruction(ins: string | ParsedInstruction): O11yResult {
+    const ctx = new SolanaContext(this.address)
+    let parsedInstruction: Instruction | null = null
+
+    if (ins) {
+      if ((ins as ParsedInstruction).parsed) {
+        parsedInstruction = this.fromParsedInstruction(ins as ParsedInstruction)
+      } else {
+        parsedInstruction = this.decodeInstruction(ins as string)
+      }
+      if (parsedInstruction) {
+        const handler = this.instructionHanlderMap.get(parsedInstruction.name)
+        if (handler) {
+          handler(parsedInstruction, ctx)
+        }
+      }
+    }
+    return {
+      gauges: ctx.gauges,
+      counters: ctx.counters,
+    }
   }
 
   public isBind() {

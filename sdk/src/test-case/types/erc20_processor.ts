@@ -3,26 +3,30 @@
 /* eslint-disable */
 
 import {
+  getProvider,
+  transformEtherError,
+  BindOptions,
   BaseProcessor,
   BaseProcessorTemplate,
-  BindOptions,
   Context,
-  ContractNamer,
   ContractWrapper,
+  ContractNamer,
   DummyProvider,
-  getProvider,
-  transformEtherError
-} from '@sentio/sdk'
-import { PromiseOrValue } from './common'
-import { Erc20, Erc20__factory } from './index'
-import { ApprovalEvent, ApprovalEventFilter, TransferEvent, TransferEventFilter } from './Erc20'
-
-const namer = new ContractNamer('Erc20')
-const templateContract = Erc20__factory.connect('', DummyProvider)
+} from "@sentio/sdk";
+import { PromiseOrValue } from "./common";
+import { Erc20, Erc20__factory } from "./index";
+import {
+  ApprovalEvent,
+  ApprovalEventFilter,
+  TransferEvent,
+  TransferEventFilter,
+} from "./Erc20";
+const namer = new ContractNamer("Erc20");
+const templateContract = Erc20__factory.connect("", DummyProvider);
 
 class Erc20ContractWrapper extends ContractWrapper<Erc20> {
   constructor(contract: Erc20) {
-    super(contract)
+    super(contract);
   }
 
   async allowance(
@@ -31,58 +35,60 @@ class Erc20ContractWrapper extends ContractWrapper<Erc20> {
   ) {
     try {
       return await this.contract.allowance(owner, spender, {
-        blockTag: this.context.blockNumber.toNumber()
-      })
+        blockTag: this.context.blockNumber.toNumber(),
+      });
     } catch (e) {
-      throw transformEtherError(e, this.context)
+      throw transformEtherError(e, this.context);
     }
   }
 
   async balanceOf(account: PromiseOrValue<string>) {
     try {
       return await this.contract.balanceOf(account, {
-        blockTag: this.context.blockNumber.toNumber()
-      })
+        blockTag: this.context.blockNumber.toNumber(),
+      });
     } catch (e) {
-      throw transformEtherError(e, this.context)
+      throw transformEtherError(e, this.context);
     }
   }
 
   async decimals() {
     try {
       return await this.contract.decimals({
-        blockTag: this.context.blockNumber.toNumber()
-      })
+        blockTag: this.context.blockNumber.toNumber(),
+      });
     } catch (e) {
-      throw transformEtherError(e, this.context)
+      throw transformEtherError(e, this.context);
     }
   }
 
   async totalSupply() {
     try {
       return await this.contract.totalSupply({
-        blockTag: this.context.blockNumber.toNumber()
-      })
+        blockTag: this.context.blockNumber.toNumber(),
+      });
     } catch (e) {
-      throw transformEtherError(e, this.context)
+      throw transformEtherError(e, this.context);
     }
   }
 }
 
 export type Erc20Context = Context<Erc20, Erc20ContractWrapper>;
 
-export class Erc20ProcessorTemplate extends BaseProcessorTemplate<Erc20,
-  Erc20ContractWrapper> {
+export class Erc20ProcessorTemplate extends BaseProcessorTemplate<
+  Erc20,
+  Erc20ContractWrapper
+> {
   bindInternal(options: BindOptions) {
     const contract = Erc20__factory.connect(
       options.address,
       getProvider(options.network)
-    )
-    const wrapper = new Erc20ContractWrapper(contract)
+    );
+    const wrapper = new Erc20ContractWrapper(contract);
     if (!options.name) {
-      options.name = namer.nextName()
+      options.name = namer.nextName();
     }
-    return new Erc20Processor(options, wrapper)
+    return new Erc20Processor(options, wrapper);
   }
 
   onApproval(
@@ -90,13 +96,13 @@ export class Erc20ProcessorTemplate extends BaseProcessorTemplate<Erc20,
     filter?: ApprovalEventFilter | ApprovalEventFilter[]
   ) {
     if (!filter) {
-      filter = Erc20Processor.filters['Approval(address,address,uint256)'](
+      filter = Erc20Processor.filters["Approval(address,address,uint256)"](
         null,
         null,
         null
-      )
+      );
     }
-    return super.onEvent(handler, filter)
+    return super.onEvent(handler, filter);
   }
 
   onTransfer(
@@ -104,58 +110,58 @@ export class Erc20ProcessorTemplate extends BaseProcessorTemplate<Erc20,
     filter?: TransferEventFilter | TransferEventFilter[]
   ) {
     if (!filter) {
-      filter = Erc20Processor.filters['Transfer(address,address,uint256)'](
+      filter = Erc20Processor.filters["Transfer(address,address,uint256)"](
         null,
         null,
         null
-      )
+      );
     }
-    return super.onEvent(handler, filter)
+    return super.onEvent(handler, filter);
   }
 }
 
 export class Erc20Processor extends BaseProcessor<Erc20, Erc20ContractWrapper> {
-  public static filters = templateContract.filters
+  onApproval(
+    handler: (event: ApprovalEvent, ctx: Erc20Context) => void,
+    filter?: ApprovalEventFilter | ApprovalEventFilter[]
+  ) {
+    if (!filter) {
+      filter = Erc20Processor.filters["Approval(address,address,uint256)"](
+        null,
+        null,
+        null
+      );
+    }
+    return super.onEvent(handler, filter);
+  }
+
+  onTransfer(
+    handler: (event: TransferEvent, ctx: Erc20Context) => void,
+    filter?: TransferEventFilter | TransferEventFilter[]
+  ) {
+    if (!filter) {
+      filter = Erc20Processor.filters["Transfer(address,address,uint256)"](
+        null,
+        null,
+        null
+      );
+    }
+    return super.onEvent(handler, filter);
+  }
+
+  public static filters = templateContract.filters;
 
   public static bind(options: BindOptions): Erc20Processor {
     const contract = Erc20__factory.connect(
       options.address,
       getProvider(options.network)
-    )
-    const wrapper = new Erc20ContractWrapper(contract)
+    );
+    const wrapper = new Erc20ContractWrapper(contract);
 
     if (!options.name) {
-      options.name = namer.nextName()
+      options.name = namer.nextName();
     }
-    return new Erc20Processor(options, wrapper)
-  }
-
-  onApproval(
-    handler: (event: ApprovalEvent, ctx: Erc20Context) => void,
-    filter?: ApprovalEventFilter | ApprovalEventFilter[]
-  ) {
-    if (!filter) {
-      filter = Erc20Processor.filters['Approval(address,address,uint256)'](
-        null,
-        null,
-        null
-      )
-    }
-    return super.onEvent(handler, filter)
-  }
-
-  onTransfer(
-    handler: (event: TransferEvent, ctx: Erc20Context) => void,
-    filter?: TransferEventFilter | TransferEventFilter[]
-  ) {
-    if (!filter) {
-      filter = Erc20Processor.filters['Transfer(address,address,uint256)'](
-        null,
-        null,
-        null
-      )
-    }
-    return super.onEvent(handler, filter)
+    return new Erc20Processor(options, wrapper);
   }
 }
 
