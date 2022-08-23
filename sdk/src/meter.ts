@@ -1,4 +1,4 @@
-import { HandlerType, RecordMetaData } from './gen/processor/protos/processor'
+import { RecordMetaData } from './gen/processor/protos/processor'
 import { Context, SolanaContext } from './context'
 import { convertNumber, Numberish } from './numberish'
 import Long from 'long'
@@ -65,7 +65,7 @@ export class Counter {
       metadata: GetRecordMetaData(this.ctx, this.name, labels),
       metricValue: convertNumber(value),
       add: add,
-      from: HandlerType.UNKNOWN,
+      runtimeInfo: undefined,
     })
   }
 }
@@ -83,7 +83,7 @@ export class Gauge {
     this.ctx.gauges.push({
       metadata: GetRecordMetaData(this.ctx, this.name, labels),
       metricValue: convertNumber(value),
-      from: HandlerType.UNKNOWN,
+      runtimeInfo: undefined,
     })
   }
 }

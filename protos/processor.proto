@@ -198,10 +198,14 @@ enum HandlerType {
   INSTRUCTION = 4;
 }
 
+message RuntimeInfo {
+  HandlerType from = 1;
+}
+
 message GaugeResult {
   RecordMetaData metadata = 1;
   MetricValue metric_value = 2;
-  HandlerType from = 3;
+  RuntimeInfo runtime_info = 3;
 }
 
 message CounterResult {
@@ -209,5 +213,5 @@ message CounterResult {
   MetricValue metric_value = 2;
   // True to increase or False to decrease
   bool add = 3;
-  HandlerType from = 4;
+  RuntimeInfo runtime_info = 4;
 }

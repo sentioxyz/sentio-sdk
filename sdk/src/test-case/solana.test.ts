@@ -2,7 +2,7 @@
 
 import { expect } from 'chai'
 
-import { ProcessInstructionRequest, ProcessorServiceImpl } from '..'
+import { HandlerType, ProcessInstructionRequest, ProcessorServiceImpl } from '..'
 
 import { CallContext } from 'nice-grpc-common/src/server/CallContext'
 import Long from 'long'
@@ -57,5 +57,6 @@ describe('Test Server with Solana Example', () => {
     expect(res.result?.gauges).length(0)
     expect(res.result?.counters[0].metadata?.blockNumber.toInt()).equal(0)
     expect(MetricValueToNumber(res.result?.counters[0].metricValue)).equal(1000000)
+    expect(res.result?.counters[0].runtimeInfo?.from).equals(HandlerType.INSTRUCTION)
   })
 })

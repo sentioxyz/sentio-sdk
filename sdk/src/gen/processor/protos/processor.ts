@@ -217,17 +217,21 @@ export interface BigInteger {
   data: Uint8Array;
 }
 
+export interface RuntimeInfo {
+  from: HandlerType;
+}
+
 export interface GaugeResult {
   metadata: RecordMetaData | undefined;
   metricValue: MetricValue | undefined;
-  from: HandlerType;
+  runtimeInfo: RuntimeInfo | undefined;
 }
 
 export interface CounterResult {
   metadata: RecordMetaData | undefined;
   metricValue: MetricValue | undefined;
   add: boolean;
-  from: HandlerType;
+  runtimeInfo: RuntimeInfo | undefined;
 }
 
 function createBaseProjectConfig(): ProjectConfig {
@@ -2633,8 +2637,64 @@ export const BigInteger = {
   },
 };
 
+function createBaseRuntimeInfo(): RuntimeInfo {
+  return { from: 0 };
+}
+
+export const RuntimeInfo = {
+  encode(
+    message: RuntimeInfo,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.from !== 0) {
+      writer.uint32(8).int32(message.from);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): RuntimeInfo {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRuntimeInfo();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.from = reader.int32() as any;
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): RuntimeInfo {
+    return {
+      from: isSet(object.from) ? handlerTypeFromJSON(object.from) : 0,
+    };
+  },
+
+  toJSON(message: RuntimeInfo): unknown {
+    const obj: any = {};
+    message.from !== undefined && (obj.from = handlerTypeToJSON(message.from));
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<RuntimeInfo>): RuntimeInfo {
+    const message = createBaseRuntimeInfo();
+    message.from = object.from ?? 0;
+    return message;
+  },
+};
+
 function createBaseGaugeResult(): GaugeResult {
-  return { metadata: undefined, metricValue: undefined, from: 0 };
+  return {
+    metadata: undefined,
+    metricValue: undefined,
+    runtimeInfo: undefined,
+  };
 }
 
 export const GaugeResult = {
@@ -2654,8 +2714,11 @@ export const GaugeResult = {
         writer.uint32(18).fork()
       ).ldelim();
     }
-    if (message.from !== 0) {
-      writer.uint32(24).int32(message.from);
+    if (message.runtimeInfo !== undefined) {
+      RuntimeInfo.encode(
+        message.runtimeInfo,
+        writer.uint32(26).fork()
+      ).ldelim();
     }
     return writer;
   },
@@ -2674,7 +2737,7 @@ export const GaugeResult = {
           message.metricValue = MetricValue.decode(reader, reader.uint32());
           break;
         case 3:
-          message.from = reader.int32() as any;
+          message.runtimeInfo = RuntimeInfo.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -2692,7 +2755,9 @@ export const GaugeResult = {
       metricValue: isSet(object.metricValue)
         ? MetricValue.fromJSON(object.metricValue)
         : undefined,
-      from: isSet(object.from) ? handlerTypeFromJSON(object.from) : 0,
+      runtimeInfo: isSet(object.runtimeInfo)
+        ? RuntimeInfo.fromJSON(object.runtimeInfo)
+        : undefined,
     };
   },
 
@@ -2706,7 +2771,10 @@ export const GaugeResult = {
       (obj.metricValue = message.metricValue
         ? MetricValue.toJSON(message.metricValue)
         : undefined);
-    message.from !== undefined && (obj.from = handlerTypeToJSON(message.from));
+    message.runtimeInfo !== undefined &&
+      (obj.runtimeInfo = message.runtimeInfo
+        ? RuntimeInfo.toJSON(message.runtimeInfo)
+        : undefined);
     return obj;
   },
 
@@ -2720,13 +2788,21 @@ export const GaugeResult = {
       object.metricValue !== undefined && object.metricValue !== null
         ? MetricValue.fromPartial(object.metricValue)
         : undefined;
-    message.from = object.from ?? 0;
+    message.runtimeInfo =
+      object.runtimeInfo !== undefined && object.runtimeInfo !== null
+        ? RuntimeInfo.fromPartial(object.runtimeInfo)
+        : undefined;
     return message;
   },
 };
 
 function createBaseCounterResult(): CounterResult {
-  return { metadata: undefined, metricValue: undefined, add: false, from: 0 };
+  return {
+    metadata: undefined,
+    metricValue: undefined,
+    add: false,
+    runtimeInfo: undefined,
+  };
 }
 
 export const CounterResult = {
@@ -2749,8 +2825,11 @@ export const CounterResult = {
     if (message.add === true) {
       writer.uint32(24).bool(message.add);
     }
-    if (message.from !== 0) {
-      writer.uint32(32).int32(message.from);
+    if (message.runtimeInfo !== undefined) {
+      RuntimeInfo.encode(
+        message.runtimeInfo,
+        writer.uint32(34).fork()
+      ).ldelim();
     }
     return writer;
   },
@@ -2772,7 +2851,7 @@ export const CounterResult = {
           message.add = reader.bool();
           break;
         case 4:
-          message.from = reader.int32() as any;
+          message.runtimeInfo = RuntimeInfo.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -2791,7 +2870,9 @@ export const CounterResult = {
         ? MetricValue.fromJSON(object.metricValue)
         : undefined,
       add: isSet(object.add) ? Boolean(object.add) : false,
-      from: isSet(object.from) ? handlerTypeFromJSON(object.from) : 0,
+      runtimeInfo: isSet(object.runtimeInfo)
+        ? RuntimeInfo.fromJSON(object.runtimeInfo)
+        : undefined,
     };
   },
 
@@ -2806,7 +2887,10 @@ export const CounterResult = {
         ? MetricValue.toJSON(message.metricValue)
         : undefined);
     message.add !== undefined && (obj.add = message.add);
-    message.from !== undefined && (obj.from = handlerTypeToJSON(message.from));
+    message.runtimeInfo !== undefined &&
+      (obj.runtimeInfo = message.runtimeInfo
+        ? RuntimeInfo.toJSON(message.runtimeInfo)
+        : undefined);
     return obj;
   },
 
@@ -2821,7 +2905,10 @@ export const CounterResult = {
         ? MetricValue.fromPartial(object.metricValue)
         : undefined;
     message.add = object.add ?? false;
-    message.from = object.from ?? 0;
+    message.runtimeInfo =
+      object.runtimeInfo !== undefined && object.runtimeInfo !== null
+        ? RuntimeInfo.fromPartial(object.runtimeInfo)
+        : undefined;
     return message;
   },
 };

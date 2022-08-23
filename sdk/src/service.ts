@@ -225,8 +225,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       updated = true
     }
 
-    resp.gauges?.forEach((e) => (e.from = HandlerType.LOG))
-    resp.counters?.forEach((e) => (e.from = HandlerType.LOG))
+    recordRuntimeInfo(resp, HandlerType.LOG)
     return {
       result: resp,
       configUpdated: updated,
@@ -299,8 +298,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       }
     }
 
-    result.gauges?.forEach((e) => (e.from = HandlerType.INSTRUCTION))
-    result.counters?.forEach((e) => (e.from = HandlerType.INSTRUCTION))
+    recordRuntimeInfo(result, HandlerType.INSTRUCTION)
     return {
       result,
     }
@@ -371,8 +369,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       throw new ServerError(Status.INTERNAL, e.stack.toString())
     }
 
-    resp.gauges?.forEach((e) => (e.from = HandlerType.BLOCK))
-    resp.counters?.forEach((e) => (e.from = HandlerType.BLOCK))
+    recordRuntimeInfo(resp, HandlerType.BLOCK)
     return {
       result: resp,
     }
@@ -418,4 +415,18 @@ function Utf8ArrayToStr(array: Uint8Array) {
   }
 
   return out
+}
+
+function recordRuntimeInfo(results: O11yResult, handlerType: HandlerType) {
+  results.gauges.forEach((e) => {
+    e.runtimeInfo = {
+      from: handlerType,
+    }
+  })
+
+  results.counters.forEach((e) => {
+    e.runtimeInfo = {
+      from: handlerType,
+    }
+  })
 }
