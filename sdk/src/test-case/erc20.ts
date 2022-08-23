@@ -11,7 +11,7 @@ const processorTemplate = new Erc20ProcessorTemplate().onTransfer(async function
 
 Erc20Processor.bind({
   address: '0x1e4ede388cbc9f4b5c79681b7f94d36a11abebc9',
-  network: 1,
+  // network: 1,
   name: 'x2y2',
   startBlock: 14201940,
 })
@@ -34,7 +34,10 @@ Erc20Processor.bind({ address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', net
 // .startBlock(14201940)
 
 Erc20Processor.bind({ address: 'xxxx', network: 56 })
+
 Erc20Processor.bind({ address: 'yyyy', network: 1 })
+Erc20Processor.bind({ address: 'yyyy', network: 1 })
+Erc20Processor.bind({ address: 'yyyy', network: 1, startBlock: 21 })
 
 // const template = Erc20Processor.template
 //   .onTransfer(async function (event, ctx) {

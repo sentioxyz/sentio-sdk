@@ -6,8 +6,10 @@ export { Counter, Meter, Gauge } from './meter'
 export { getProvider, setProvider, DummyProvider } from './provider'
 export { SolanaBaseProcessor } from './solana-processor'
 export { ContractNamer } from './contract-namer'
-export { getChainName } from './chainmap'
 export { BindOptions } from './bind-options'
 export { transformEtherError } from './error'
+export { ProcessorState } from './processor-state'
+
+export { getProcessor, addProcessor, getContractByABI, addContractByABI, getContractName } from './binds'
 
 export * from './gen/processor/protos/processor'

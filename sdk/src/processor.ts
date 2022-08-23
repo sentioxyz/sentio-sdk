@@ -8,10 +8,12 @@ import { setProvider } from './provider'
 
 import path from 'path'
 import fs from 'fs-extra'
+import { ProcessorState } from './processor-state'
 
 // import 'log-timestamp'
 
 global.sentio_sdk = require('.')
+global.PROCESSOR_STATE = new ProcessorState()
 
 function tryRequire(name: string): { module: any; name: string; path: string } | undefined {
   const req = eval('require')
@@ -63,8 +65,9 @@ tryRequire(options.target)
 
 console.log('Start Server', options)
 
-if (globalThis.Processors) console.log(globalThis.Processors.length, ' processors loaded')
-if (globalThis.SolanaProcessors) console.log(globalThis.SolanaProcessors.length, ' solana processors loaded')
+console.log(global.PROCESSOR_STATE.processors.length, ' processors loaded')
+console.log(global.PROCESSOR_STATE.solanaProcessors.length, ' solana processors loaded')
+
 const processor = createServer()
 
 const service = new ProcessorServiceImpl(processor.shutdown)

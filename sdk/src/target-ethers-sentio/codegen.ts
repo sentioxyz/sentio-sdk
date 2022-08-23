@@ -12,7 +12,6 @@ import { getFullSignatureForEvent } from 'typechain/dist/utils/signatures'
 
 export function codeGenSentioFile(contract: Contract): string {
   const source = `
-  const namer = new ContractNamer("${contract.name}")
   const templateContract = ${contract.name}__factory.connect("", DummyProvider)
 
   class ${contract.name}ContractWrapper extends ContractWrapper<${contract.name}> {
@@ -33,12 +32,15 @@ export function codeGenSentioFile(contract: Contract): string {
     contract.name
   }ContractWrapper> {
     bindInternal(options: BindOptions) {
-      const contract = ${contract.name}__factory.connect(options.address, getProvider(options.network))
-      const wrapper = new ${contract.name}ContractWrapper(contract)
-      if (!options.name) {
-        options.name = namer.nextName()
+      let processor = getProcessor("${contract.name}", options) as ${contract.name}Processor
+      if (!processor) {
+        const wrapper = get${contract.name}Contract(options.address, options.network)
+        const finalOptions = Object.assign({}, options)
+        finalOptions.name = getContractName("${contract.name}", options.name, options.address, options.network)
+        processor = new ${contract.name}Processor(finalOptions, wrapper)
+        addProcessor("${contract.name}", options, processor)
       }
-      return new ${contract.name}Processor(options, wrapper)
+      return processor
     }
 
     ${Object.values(contract.events)
@@ -66,14 +68,29 @@ export function codeGenSentioFile(contract: Contract): string {
     public static filters = templateContract.filters
     
     public static bind(options: BindOptions): ${contract.name}Processor {
-      const contract = ${contract.name}__factory.connect(options.address, getProvider(options.network))
-      const wrapper = new ${contract.name}ContractWrapper(contract)
-
-      if (!options.name) {
-        options.name = namer.nextName()
+      let processor = getProcessor("${contract.name}", options) as ${contract.name}Processor
+      if (!processor) {
+        const wrapper = get${contract.name}Contract(options.address, options.network)
+  
+        const finalOptions = Object.assign({}, options)
+        finalOptions.name = getContractName("${contract.name}", options.name, options.address, options.network)
+        processor = new ${contract.name}Processor(finalOptions, wrapper)
+        addProcessor("${contract.name}", options, processor)
       }
-      return new ${contract.name}Processor(options, wrapper)
+      return processor
     }
+  }
+  
+  export function get${contract.name}Contract(address: string, network: Networkish = 1): ${
+    contract.name
+  }ContractWrapper {
+    let contract = getContractByABI("${contract.name}", address, network) as ${contract.name}ContractWrapper
+    if (!contract) {
+      const rawContract = ${contract.name}__factory.connect(address, getProvider(network))
+      contract = new ${contract.name}ContractWrapper(rawContract)
+      addContractByABI("${contract.name}", address, network, contract)
+    }
+    return contract
   }
   
   // export const ${contract.name}Processor = new ${contract.name}ProcessorTemplate("${contract.name}")
@@ -81,9 +98,13 @@ export function codeGenSentioFile(contract: Contract): string {
 
   const imports = createImportsForUsedIdentifiers(
     {
-      ethers: ['BigNumber', 'BigNumberish', 'BytesLike'],
+      ethers: ['BigNumber', 'BigNumberish', 'CallOverrides', 'BytesLike'],
       '@ethersproject/providers': ['Networkish'],
       '@sentio/sdk': [
+        'addContractByABI',
+        'getContractByABI',
+        'addProcessor',
+        'getProcessor',
         'getProvider',
         'transformEtherError',
         'BindOptions',
@@ -91,8 +112,8 @@ export function codeGenSentioFile(contract: Contract): string {
         'BaseProcessorTemplate',
         'Context',
         'ContractWrapper',
-        'ContractNamer',
         'DummyProvider',
+        'getContractName',
       ],
       './common': ['PromiseOrValue'],
       './index': [`${contract.name}`, `${contract.name}__factory`],
@@ -138,11 +159,16 @@ function generateOnEventFunction(event: EventDeclaration, contractName: string, 
 
 function generateViewFunction(func: FunctionDeclaration): string {
   return `
-  async ${func.name}(${generateInputTypes(func.inputs, { useStructs: true })}) {
+  async ${func.name}(${generateInputTypes(func.inputs, { useStructs: true })}overrides?: CallOverrides) {
     try {
+      if (!overrides) {
+        overrides = {
+          blockTag: this.context.blockNumber.toNumber(),
+        }
+      }
       return await this.contract.${func.name}(${
     func.inputs.length > 0 ? func.inputs.map((input, index) => input.name || `arg${index}`).join(',') + ',' : ''
-  } { blockTag: this.context.blockNumber.toNumber() })
+  } overrides)
     } catch (e) {
       throw transformEtherError(e, this.context)
     }

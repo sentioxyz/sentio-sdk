@@ -27,11 +27,13 @@ describe('Test Server with Example', () => {
 
   it('check configuration', async () => {
     const config = await service.getConfig({}, testContext)
-    expect(config.contractConfigs).length(4)
+    expect(config.contractConfigs).length(5)
 
     // check auto rename
     expect(config.contractConfigs?.[2].contract?.name).equals('Erc20')
     expect(config.contractConfigs?.[3].contract?.name).equals('Erc20_1')
+    // same as above because only differ in parameters
+    expect(config.contractConfigs?.[4].contract?.name).equals('Erc20_1')
   })
 
   it('Check block dispatch', async () => {
@@ -103,8 +105,8 @@ describe('Test Server with Example', () => {
     expect(res.configUpdated).equals(true)
 
     const config = await service.getConfig({}, testContext)
-    expect(config.contractConfigs).length(5) //config increased
-    expect(config.contractConfigs?.[4].contract?.name).equals('dynamic')
+    expect(config.contractConfigs).length(6) //config increased
+    expect(config.contractConfigs?.[5].contract?.name).equals('dynamic')
 
     // repeat trigger won't bind again
     await service.processLog(request, testContext)

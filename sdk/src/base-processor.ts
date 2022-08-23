@@ -9,12 +9,6 @@ import { ServerError, Status } from 'nice-grpc'
 import { BindInternalOptions, BindOptions } from './bind-options'
 import { getNetwork } from '@ethersproject/providers'
 
-// type IndexConfigure = {
-//   startBlock: Long
-//   endBlock?: Long
-//   chunkSize?: number
-// }
-
 class EventsHandler {
   filters: EventFilter[]
   handler: (event: Log) => Promise<O11yResult>
@@ -31,9 +25,6 @@ export class BaseProcessor<TContract extends BaseContract, TContractWrapper exte
   config: BindInternalOptions
 
   constructor(config: BindOptions, contract: TContractWrapper) {
-    // this.name = name
-    // this.network = getNetwork(network)
-
     this.config = {
       address: config.address,
       name: config.name || '',
@@ -56,43 +47,9 @@ export class BaseProcessor<TContract extends BaseContract, TContractWrapper exte
     }
 
     this.contract = contract
-    if (!globalThis.Processors) {
-      globalThis.Processors = []
-    }
-    globalThis.Processors.push(this)
+    // TODO next break change move this to binds
+    global.PROCESSOR_STATE.processors.push(this)
   }
-
-  // constructor(address: string, name: string, network: Networkish = 1) {
-  //   this.name = name
-  //   // this.network = getNetwork(network)
-  //   this.contract = this.bindInternal(address, network)
-  //   if (!globalThis.Processors) {
-  //     globalThis.Processors = []
-  //   }
-  //   globalThis.Processors.push(this)
-  // }
-  //
-  // protected abstract bindInternal(address: string, network: Networkish): TContractWrapper
-
-  // public startBlock(startBlock: Long | number) {
-  //   if (typeof startBlock === 'number') {
-  //     startBlock = Long.fromNumber(startBlock)
-  //   }
-  //   this.config.startBlock = startBlock
-  //   return this
-  // }
-
-  // public endBlock(endBlock: Long | number) {
-  //   if (typeof endBlock === 'number') {
-  //     endBlock = Long.fromNumber(endBlock)
-  //   }
-  //   this.config.endBlock = endBlock
-  //   return this
-  // }
-
-  // public configure(option: IndexConfigure) {
-  //   this.config = option
-  // }
 
   public isBind() {
     return this.contract._underlineContract.address !== ''

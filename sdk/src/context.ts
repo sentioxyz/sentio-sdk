@@ -3,6 +3,7 @@ import { BaseContract, EventFilter } from 'ethers'
 import { Block, Log } from '@ethersproject/abstract-provider'
 import { Meter } from './meter'
 import Long from 'long'
+import { Provider } from '@ethersproject/providers'
 
 export class Context<TContract extends BaseContract, TContractWrapper extends ContractWrapper<TContract>> {
   contract: TContractWrapper
@@ -31,10 +32,12 @@ export class Context<TContract extends BaseContract, TContractWrapper extends Co
 export class ContractWrapper<TContract extends BaseContract> {
   filters: { [name: string]: (...args: Array<any>) => EventFilter }
   context: Context<any, any>
+  provider: Provider
   protected contract: TContract
 
   constructor(contract: TContract) {
     this.contract = contract
+    this.provider = contract.provider
     this.filters = contract.filters
   }
 

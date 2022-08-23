@@ -23,10 +23,7 @@ export class SolanaBaseProcessor {
   constructor(contractName: string, address: string, endpoint: string, processInnerInstruction = false) {
     this.endpoint = endpoint
     this.address = address
-    if (!globalThis.SolanaProcessors) {
-      globalThis.SolanaProcessors = []
-    }
-    globalThis.SolanaProcessors.push(this)
+    global.PROCESSOR_STATE.solanaProcessors.push(this)
     this.connection = new Connection(endpoint, 'confirmed')
     this.contractName = contractName
     this.processInnerInstruction = processInnerInstruction
@@ -45,7 +42,7 @@ export class SolanaBaseProcessor {
 
     return this
   }
-  
+
   public handleInstruction(ins: string | ParsedInstruction): O11yResult {
     const ctx = new SolanaContext(this.address)
     let parsedInstruction: Instruction | null = null

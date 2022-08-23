@@ -13,7 +13,7 @@ export abstract class BaseProcessorTemplate<
   TContractWrapper extends ContractWrapper<TContract>
 > {
   id: number
-  bound = new Set<string>()
+  binds = new Set<string>()
   blockHandlers: ((block: Block, ctx: Context<TContract, TContractWrapper>) => void)[] = []
   eventHandlers: {
     handler: (event: Event, ctx: Context<TContract, TContractWrapper>) => void
@@ -21,19 +21,16 @@ export abstract class BaseProcessorTemplate<
   }[] = []
 
   constructor() {
-    if (!globalThis.Templates) {
-      globalThis.Templates = []
-    }
-    this.id = globalThis.Templates.length
-    globalThis.Templates.push(this)
+    this.id = global.PROCESSOR_STATE.templates.length
+    global.PROCESSOR_STATE.templates.push(this)
   }
 
   public bind(options: BindOptions) {
     const sig = getOptionsSignature(options)
-    if (this.bound.has(sig)) {
+    if (this.binds.has(sig)) {
       return
     }
-    this.bound.add(sig)
+    this.binds.add(sig)
 
     const processor = this.bindInternal(options)
 
@@ -44,10 +41,6 @@ export abstract class BaseProcessorTemplate<
       processor.onBlock(bh)
     }
 
-    if (!globalThis.TemplatesInstances) {
-      globalThis.TemplatesInstances = []
-    }
-
     const instance: TemplateInstance = {
       templateId: this.id,
       contract: {
@@ -56,8 +49,8 @@ export abstract class BaseProcessorTemplate<
         chainId: options.network ? getNetwork(options.network).chainId.toString() : '1',
         abi: '',
       },
-      startBlock: new Long(0),
-      endBlock: new Long(0),
+      startBlock: Long.ZERO,
+      endBlock: Long.ZERO,
     }
     if (options.startBlock) {
       if (typeof options.startBlock === 'number') {
@@ -73,7 +66,7 @@ export abstract class BaseProcessorTemplate<
         instance.endBlock = options.endBlock
       }
     }
-    globalThis.TemplatesInstances.push(instance)
+    global.PROCESSOR_STATE.templatesInstances.push(instance)
 
     return processor
   }

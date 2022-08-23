@@ -9,7 +9,7 @@
     "start_ts_solana": "ts-node --files src/processor.ts ../examples/mirrorworld/src/processor.ts",
     "start": "ts-node --files src/processor.ts ../examples/x2y2/dist/lib.js",
     "start_js": "node dist/processor.js ../examples/x2y2/dist/lib.js",
-    "ts-start": "ts-node --files src/processor.ts ~/src/sentio-processor/goldfinch/src/processor.ts",
+    "ts-start": "ts-node --files src/processor.ts ../examples/wormhole/src/processor.ts",
     "cli": "yarn build && node dist/cli/cli.js",
     "test": "ts-mocha --paths src/**/*.test.ts src/*.test.ts",
     "gen_test_abi": "yarn gen_evm_abi && yarn gen_solana_abi",
@@ -20,7 +20,7 @@
     "processor": "./dist/processor.js",
     "sentio": "./dist/cli/cli.js"
   },
-  "version": "0.3.11",
+  "version": "0.3.12",
   "dependencies": {
     "@ethersproject/providers": "^5.6.7",
     "@project-serum/anchor": "^0.25.0",

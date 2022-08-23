@@ -190,9 +190,18 @@ message BigInteger {
   bytes data = 2;
 }
 
+enum HandlerType {
+  UNKNOWN = 0;
+  LOG = 1;
+  BLOCK = 2;
+  TRANSACTION = 3;
+  INSTRUCTION = 4;
+}
+
 message GaugeResult {
   RecordMetaData metadata = 1;
   MetricValue metric_value = 2;
+  HandlerType from = 3;
 }
 
 message CounterResult {
@@ -200,4 +209,5 @@ message CounterResult {
   MetricValue metric_value = 2;
   // True to increase or False to decrease
   bool add = 3;
+  HandlerType from = 4;
 }

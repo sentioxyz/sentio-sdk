@@ -1,6 +1,5 @@
+import { ProcessorState } from '@sentio/sdk'
+
 export function cleanTest() {
-  globalThis.Processors = []
-  globalThis.TemplatesInstances = []
-  globalThis.Templates = []
-  globalThis.SolanaProcessors = []
+  global.PROCESSOR_STATE = new ProcessorState()
 }

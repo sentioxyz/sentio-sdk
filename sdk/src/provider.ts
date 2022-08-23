@@ -11,10 +11,10 @@ export function getProvider(networkish?: Networkish): Provider {
   }
   const network = getNetwork(networkish)
 
-  if (!globalThis.SentioProvider) {
+  if (!global.PROCESSOR_STATE.providers) {
     throw Error('Provider not found')
   }
-  const value = globalThis.SentioProvider.get(network.chainId)
+  const value = global.PROCESSOR_STATE.providers.get(network.chainId)
   if (value === undefined) {
     throw Error('Provider not found')
   }
@@ -22,7 +22,7 @@ export function getProvider(networkish?: Networkish): Provider {
 }
 
 export function setProvider(config: any, concurrency = 4) {
-  globalThis.SentioProvider = new Map<number, Provider>()
+  global.PROCESSOR_STATE.providers = new Map<number, Provider>()
 
   for (const chainIdStr in config) {
     if (isNaN(Number.parseInt(chainIdStr))) {
@@ -43,7 +43,7 @@ export function setProvider(config: any, concurrency = 4) {
     const idx = Math.floor(Math.random() * chainConfig.Https.length)
     const provider = new QueuedStaticJsonRpcProvider(chainConfig.Https[idx], chainId, concurrency)
 
-    globalThis.SentioProvider.set(chainId, provider)
+    global.PROCESSOR_STATE.providers.set(chainId, provider)
   }
 }
 
