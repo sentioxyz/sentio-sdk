@@ -29,7 +29,7 @@ import { Empty } from './gen/google/protobuf/empty'
 import Long from 'long'
 import { BaseProcessor } from './base-processor'
 import { BaseContract } from 'ethers'
-import { ContractWrapper } from './context'
+import { ContractView } from './context'
 
 const DEFAULT_MAX_BLOCK = Long.ZERO
 
@@ -37,7 +37,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
   private eventHandlers: ((event: Log) => Promise<O11yResult>)[] = []
   // map from chain id to list of processors
   // private blockHandlers = new Map<string, ((block: Block) => Promise<O11yResult>)[]>()
-  private processorsByChainId = new Map<string, BaseProcessor<BaseContract, ContractWrapper<BaseContract>>>()
+  private processorsByChainId = new Map<string, BaseProcessor<BaseContract, ContractView<BaseContract>>>()
 
   private started = false
   private contractConfigs: ContractConfig[]
@@ -212,7 +212,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         resp.counters = resp.counters.concat(res.counters)
         resp.gauges = resp.gauges.concat(res.gauges)
       } catch (e) {
-        throw new ServerError(Status.INTERNAL, e)
+        throw new ServerError(Status.INTERNAL, e.toString())
       }
     }
 
@@ -286,7 +286,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
                   result.counters.push(c)
                 })
               } catch (e) {
-                throw new ServerError(Status.INTERNAL, e)
+                throw new ServerError(Status.INTERNAL, e.toString())
               }
             } else {
               console.error(
@@ -366,7 +366,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         resp.gauges = resp.gauges.concat(res.gauges)
       }
     } catch (e) {
-      throw new ServerError(Status.INTERNAL, e.stack.toString())
+      throw new ServerError(Status.INTERNAL, e.toString())
     }
 
     recordRuntimeInfo(resp, HandlerType.BLOCK)

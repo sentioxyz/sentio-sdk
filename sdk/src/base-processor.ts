@@ -1,4 +1,4 @@
-import { Context, ContractWrapper } from './context'
+import { Context, ContractView } from './context'
 import { Block, Log } from '@ethersproject/abstract-provider'
 import { BaseContract, EventFilter } from 'ethers'
 import { Event } from '@ethersproject/contracts'
@@ -14,17 +14,17 @@ class EventsHandler {
   handler: (event: Log) => Promise<O11yResult>
 }
 
-export class BaseProcessor<TContract extends BaseContract, TContractWrapper extends ContractWrapper<TContract>> {
+export class BaseProcessor<TContract extends BaseContract, TContractView extends ContractView<TContract>> {
   blockHandlers: ((block: Block) => Promise<O11yResult>)[] = []
   eventHandlers: EventsHandler[] = []
 
-  contract: TContractWrapper
+  contract: TContractView
   // network: Network
   name: string
 
   config: BindInternalOptions
 
-  constructor(config: BindOptions, contract: TContractWrapper) {
+  constructor(config: BindOptions, contract: TContractView) {
     this.config = {
       address: config.address,
       name: config.name || '',
@@ -60,7 +60,7 @@ export class BaseProcessor<TContract extends BaseContract, TContractWrapper exte
   }
 
   public onEvent(
-    handler: (event: Event, ctx: Context<TContract, TContractWrapper>) => void,
+    handler: (event: Event, ctx: Context<TContract, TContractView>) => void,
     filter: EventFilter | EventFilter[]
   ) {
     if (!this.isBind()) {
@@ -80,7 +80,7 @@ export class BaseProcessor<TContract extends BaseContract, TContractWrapper exte
     this.eventHandlers.push({
       filters: _filters,
       handler: async function (log) {
-        const ctx = new Context<TContract, TContractWrapper>(contract, chainId, undefined, log)
+        const ctx = new Context<TContract, TContractView>(contract, chainId, undefined, log)
         // let event: Event = <Event>deepCopy(log);
         const event: Event = <Event>log
 
@@ -109,7 +109,7 @@ export class BaseProcessor<TContract extends BaseContract, TContractWrapper exte
     return this
   }
 
-  public onBlock(handler: (block: Block, ctx: Context<TContract, TContractWrapper>) => void) {
+  public onBlock(handler: (block: Block, ctx: Context<TContract, TContractView>) => void) {
     if (!this.isBind()) {
       throw new ServerError(Status.INTERNAL, 'Registry not bind')
     }
@@ -117,7 +117,7 @@ export class BaseProcessor<TContract extends BaseContract, TContractWrapper exte
     const chainId = this.getChainId()
 
     this.blockHandlers.push(async function (block: Block) {
-      const ctx = new Context<TContract, TContractWrapper>(contract, chainId, block, undefined)
+      const ctx = new Context<TContract, TContractView>(contract, chainId, block, undefined)
       contract.context = ctx
       await handler(block, ctx)
       return {

@@ -5,8 +5,8 @@ import { Meter } from './meter'
 import Long from 'long'
 import { Provider } from '@ethersproject/providers'
 
-export class Context<TContract extends BaseContract, TContractWrapper extends ContractWrapper<TContract>> {
-  contract: TContractWrapper
+export class Context<TContract extends BaseContract, TContractView extends ContractView<TContract>> {
+  contract: TContractView
   chainId: string
   log?: Log
   block?: Block
@@ -15,7 +15,7 @@ export class Context<TContract extends BaseContract, TContractWrapper extends Co
   counters: CounterResult[] = []
   meter: Meter
 
-  constructor(contract: TContractWrapper, chainId: string, block?: Block, log?: Log) {
+  constructor(contract: TContractView, chainId: string, block?: Block, log?: Log) {
     this.contract = contract
     this.chainId = chainId
     this.log = log
@@ -29,7 +29,7 @@ export class Context<TContract extends BaseContract, TContractWrapper extends Co
   }
 }
 
-export class ContractWrapper<TContract extends BaseContract> {
+export class ContractView<TContract extends BaseContract> {
   filters: { [name: string]: (...args: Array<any>) => EventFilter }
   context: Context<any, any>
   provider: Provider

@@ -2,7 +2,7 @@ import { BindOptions, getOptionsSignature } from './bind-options'
 import { BaseProcessor } from './base-processor'
 import { Networkish } from '@ethersproject/networks'
 import { getNetwork } from '@ethersproject/providers'
-import { ContractWrapper } from './context'
+import { ContractView } from './context'
 import { BaseContract } from 'ethers'
 import { ContractNamer } from './contract-namer'
 
@@ -60,7 +60,7 @@ export function addContractByABI(
   abiName: string,
   address: string,
   network: Networkish,
-  contract: ContractWrapper<BaseContract>
+  contract: ContractView<BaseContract>
 ) {
   const key = getKey(abiName, address, network)
   return global.PROCESSOR_STATE.contracts.set(key, contract)

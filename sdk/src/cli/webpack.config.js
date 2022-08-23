@@ -5,7 +5,7 @@ module.exports = {
   entry: {
     lib: './src/processor.ts',
   },
-  // devtool: 'inline-source-map',
+  devtool: 'inline-source-map',
   module: {
     rules: [
       {

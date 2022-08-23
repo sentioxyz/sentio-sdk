@@ -1,4 +1,4 @@
-import { Context, ContractWrapper } from './context'
+import { Context, ContractView } from './context'
 import { Block } from '@ethersproject/abstract-provider'
 import { BaseContract, EventFilter } from 'ethers'
 import { Event } from '@ethersproject/contracts'
@@ -10,13 +10,13 @@ import { getNetwork } from '@ethersproject/providers'
 
 export abstract class BaseProcessorTemplate<
   TContract extends BaseContract,
-  TContractWrapper extends ContractWrapper<TContract>
+  TContractView extends ContractView<TContract>
 > {
   id: number
   binds = new Set<string>()
-  blockHandlers: ((block: Block, ctx: Context<TContract, TContractWrapper>) => void)[] = []
+  blockHandlers: ((block: Block, ctx: Context<TContract, TContractView>) => void)[] = []
   eventHandlers: {
-    handler: (event: Event, ctx: Context<TContract, TContractWrapper>) => void
+    handler: (event: Event, ctx: Context<TContract, TContractView>) => void
     filter: EventFilter | EventFilter[]
   }[] = []
 
@@ -72,7 +72,7 @@ export abstract class BaseProcessorTemplate<
   }
 
   public onEvent(
-    handler: (event: Event, ctx: Context<TContract, TContractWrapper>) => void,
+    handler: (event: Event, ctx: Context<TContract, TContractView>) => void,
     filter: EventFilter | EventFilter[]
   ) {
     this.eventHandlers.push({
@@ -82,10 +82,10 @@ export abstract class BaseProcessorTemplate<
     return this
   }
 
-  public onBlock(handler: (block: Block, ctx: Context<TContract, TContractWrapper>) => void) {
+  public onBlock(handler: (block: Block, ctx: Context<TContract, TContractView>) => void) {
     this.blockHandlers.push(handler)
     return this
   }
 
-  protected abstract bindInternal(options: BindOptions): BaseProcessor<TContract, TContractWrapper>
+  protected abstract bindInternal(options: BindOptions): BaseProcessor<TContract, TContractView>
 }

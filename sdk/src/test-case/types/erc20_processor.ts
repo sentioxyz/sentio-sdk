@@ -14,7 +14,7 @@ import {
   BaseProcessor,
   BaseProcessorTemplate,
   Context,
-  ContractWrapper,
+  ContractView,
   DummyProvider,
   getContractName,
 } from "@sentio/sdk";
@@ -28,7 +28,7 @@ import {
 } from "./Erc20";
 const templateContract = Erc20__factory.connect("", DummyProvider);
 
-class Erc20ContractWrapper extends ContractWrapper<Erc20> {
+class Erc20ContractView extends ContractView<Erc20> {
   constructor(contract: Erc20) {
     super(contract);
   }
@@ -39,12 +39,16 @@ class Erc20ContractWrapper extends ContractWrapper<Erc20> {
     overrides?: CallOverrides
   ) {
     try {
-      if (!overrides) {
+      if (!overrides && this.context) {
         overrides = {
           blockTag: this.context.blockNumber.toNumber(),
         };
       }
-      return await this.contract.allowance(owner, spender, overrides);
+      if (overrides) {
+        return await this.contract.allowance(owner, spender, overrides);
+      } else {
+        return await this.contract.allowance(owner, spender);
+      }
     } catch (e) {
       throw transformEtherError(e, this.context);
     }
@@ -52,12 +56,16 @@ class Erc20ContractWrapper extends ContractWrapper<Erc20> {
 
   async balanceOf(account: PromiseOrValue<string>, overrides?: CallOverrides) {
     try {
-      if (!overrides) {
+      if (!overrides && this.context) {
         overrides = {
           blockTag: this.context.blockNumber.toNumber(),
         };
       }
-      return await this.contract.balanceOf(account, overrides);
+      if (overrides) {
+        return await this.contract.balanceOf(account, overrides);
+      } else {
+        return await this.contract.balanceOf(account);
+      }
     } catch (e) {
       throw transformEtherError(e, this.context);
     }
@@ -65,12 +73,16 @@ class Erc20ContractWrapper extends ContractWrapper<Erc20> {
 
   async decimals(overrides?: CallOverrides) {
     try {
-      if (!overrides) {
+      if (!overrides && this.context) {
         overrides = {
           blockTag: this.context.blockNumber.toNumber(),
         };
       }
-      return await this.contract.decimals(overrides);
+      if (overrides) {
+        return await this.contract.decimals(overrides);
+      } else {
+        return await this.contract.decimals();
+      }
     } catch (e) {
       throw transformEtherError(e, this.context);
     }
@@ -78,23 +90,27 @@ class Erc20ContractWrapper extends ContractWrapper<Erc20> {
 
   async totalSupply(overrides?: CallOverrides) {
     try {
-      if (!overrides) {
+      if (!overrides && this.context) {
         overrides = {
           blockTag: this.context.blockNumber.toNumber(),
         };
       }
-      return await this.contract.totalSupply(overrides);
+      if (overrides) {
+        return await this.contract.totalSupply(overrides);
+      } else {
+        return await this.contract.totalSupply();
+      }
     } catch (e) {
       throw transformEtherError(e, this.context);
     }
   }
 }
 
-export type Erc20Context = Context<Erc20, Erc20ContractWrapper>;
+export type Erc20Context = Context<Erc20, Erc20ContractView>;
 
 export class Erc20ProcessorTemplate extends BaseProcessorTemplate<
   Erc20,
-  Erc20ContractWrapper
+  Erc20ContractView
 > {
   bindInternal(options: BindOptions) {
     let processor = getProcessor("Erc20", options) as Erc20Processor;
@@ -142,7 +158,7 @@ export class Erc20ProcessorTemplate extends BaseProcessorTemplate<
   }
 }
 
-export class Erc20Processor extends BaseProcessor<Erc20, Erc20ContractWrapper> {
+export class Erc20Processor extends BaseProcessor<Erc20, Erc20ContractView> {
   onApproval(
     handler: (event: ApprovalEvent, ctx: Erc20Context) => void,
     filter?: ApprovalEventFilter | ApprovalEventFilter[]
@@ -195,15 +211,15 @@ export class Erc20Processor extends BaseProcessor<Erc20, Erc20ContractWrapper> {
 export function getErc20Contract(
   address: string,
   network: Networkish = 1
-): Erc20ContractWrapper {
+): Erc20ContractView {
   let contract = getContractByABI(
     "Erc20",
     address,
     network
-  ) as Erc20ContractWrapper;
+  ) as Erc20ContractView;
   if (!contract) {
     const rawContract = Erc20__factory.connect(address, getProvider(network));
-    contract = new Erc20ContractWrapper(rawContract);
+    contract = new Erc20ContractView(rawContract);
     addContractByABI("Erc20", address, network, contract);
   }
   return contract;

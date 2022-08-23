@@ -14,7 +14,7 @@ export function codeGenSentioFile(contract: Contract): string {
   const source = `
   const templateContract = ${contract.name}__factory.connect("", DummyProvider)
 
-  class ${contract.name}ContractWrapper extends ContractWrapper<${contract.name}> {
+  class ${contract.name}ContractView extends ContractView<${contract.name}> {
 
     constructor (contract: ${contract.name}) {
       super(contract);
@@ -26,11 +26,11 @@ export function codeGenSentioFile(contract: Contract): string {
       .join('\n')}
   }
 
-  export type ${contract.name}Context = Context<${contract.name}, ${contract.name}ContractWrapper>
+  export type ${contract.name}Context = Context<${contract.name}, ${contract.name}ContractView>
 
   export class ${contract.name}ProcessorTemplate extends BaseProcessorTemplate<${contract.name}, ${
     contract.name
-  }ContractWrapper> {
+  }ContractView> {
     bindInternal(options: BindOptions) {
       let processor = getProcessor("${contract.name}", options) as ${contract.name}Processor
       if (!processor) {
@@ -53,8 +53,8 @@ export function codeGenSentioFile(contract: Contract): string {
       })
       .join('\n')}
     }
-  
-    export class ${contract.name}Processor extends BaseProcessor<${contract.name}, ${contract.name}ContractWrapper> {
+
+    export class ${contract.name}Processor extends BaseProcessor<${contract.name}, ${contract.name}ContractView> {
       ${Object.values(contract.events)
         .map((events) => {
           if (events.length === 1) {
@@ -64,14 +64,14 @@ export function codeGenSentioFile(contract: Contract): string {
           }
         })
         .join('\n')}
-    
+
     public static filters = templateContract.filters
-    
+
     public static bind(options: BindOptions): ${contract.name}Processor {
       let processor = getProcessor("${contract.name}", options) as ${contract.name}Processor
       if (!processor) {
         const wrapper = get${contract.name}Contract(options.address, options.network)
-  
+
         const finalOptions = Object.assign({}, options)
         finalOptions.name = getContractName("${contract.name}", options.name, options.address, options.network)
         processor = new ${contract.name}Processor(finalOptions, wrapper)
@@ -80,19 +80,17 @@ export function codeGenSentioFile(contract: Contract): string {
       return processor
     }
   }
-  
-  export function get${contract.name}Contract(address: string, network: Networkish = 1): ${
-    contract.name
-  }ContractWrapper {
-    let contract = getContractByABI("${contract.name}", address, network) as ${contract.name}ContractWrapper
+
+  export function get${contract.name}Contract(address: string, network: Networkish = 1): ${contract.name}ContractView {
+    let contract = getContractByABI("${contract.name}", address, network) as ${contract.name}ContractView
     if (!contract) {
       const rawContract = ${contract.name}__factory.connect(address, getProvider(network))
-      contract = new ${contract.name}ContractWrapper(rawContract)
+      contract = new ${contract.name}ContractView(rawContract)
       addContractByABI("${contract.name}", address, network, contract)
     }
     return contract
   }
-  
+
   // export const ${contract.name}Processor = new ${contract.name}ProcessorTemplate("${contract.name}")
   `
 
@@ -111,7 +109,7 @@ export function codeGenSentioFile(contract: Contract): string {
         'BaseProcessor',
         'BaseProcessorTemplate',
         'Context',
-        'ContractWrapper',
+        'ContractView',
         'DummyProvider',
         'getContractName',
       ],
@@ -161,14 +159,20 @@ function generateViewFunction(func: FunctionDeclaration): string {
   return `
   async ${func.name}(${generateInputTypes(func.inputs, { useStructs: true })}overrides?: CallOverrides) {
     try {
-      if (!overrides) {
+      if (!overrides && this.context) {
         overrides = {
           blockTag: this.context.blockNumber.toNumber(),
         }
       }
-      return await this.contract.${func.name}(${
+      if (overrides) {
+        return await this.contract.${func.name}(${
     func.inputs.length > 0 ? func.inputs.map((input, index) => input.name || `arg${index}`).join(',') + ',' : ''
   } overrides)
+      } else {
+        return await this.contract.${func.name}(${func.inputs
+    .map((input, index) => input.name || `arg${index}`)
+    .join(',')})
+      }
     } catch (e) {
       throw transformEtherError(e, this.context)
     }
