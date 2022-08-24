@@ -5,6 +5,8 @@ import { exec } from 'child_process'
 import { EVM, SOLANA, Target } from './config'
 
 export async function buildProcessor(onlyGen: boolean, targets: Target[]) {
+  await installDeps()
+
   // targets.forEach(async (target) => await buildProcessorForTarget(onlyGen, target))
   for (const target of targets) {
     await buildProcessorForTarget(onlyGen, target)
@@ -27,6 +29,10 @@ async function buildProcessorForTarget(onlyGen: boolean, target: Target) {
   if (onlyGen) {
     return
   }
+}
+
+async function installDeps() {
+  await execStep('yarn install --ignore-scripts', 'Yarn Install')
 }
 
 async function codeGenEthersProcessor(abisDir: string) {
