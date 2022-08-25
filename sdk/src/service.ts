@@ -199,21 +199,32 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       counters: [],
     }
 
+    const promises: Promise<O11yResult>[] = []
     for (const l of request.logs) {
       if (!l.log) {
         throw new ServerError(Status.INVALID_ARGUMENT, "Log can't be null")
       }
       // const jsonString = Buffer.from(l.log.raw.buffer).toString("utf-8")
       // const jsonString = String.fromCharCode.apply(null, l.log.raw)
-      const jsonString = Utf8ArrayToStr(l.log.raw)
-      const log: Log = JSON.parse(jsonString)
+
       try {
-        const res = await this.eventHandlers[l.handlerId](log)
-        resp.counters = resp.counters.concat(res.counters)
-        resp.gauges = resp.gauges.concat(res.gauges)
+        const jsonString = Utf8ArrayToStr(l.log.raw)
+        const log: Log = JSON.parse(jsonString)
+        const handler = this.eventHandlers[l.handlerId]
+        const promise = handler(log).catch((e) => {
+          throw new ServerError(Status.INTERNAL, 'error processing log: ' + jsonString + '\n' + e.toString())
+        })
+
+        promises.push(promise)
       } catch (e) {
-        throw new ServerError(Status.INTERNAL, 'error process log ' + l.toString() + ': ' + e.toString())
+        throw new ServerError(Status.INTERNAL, 'error parse log: ' + l)
       }
+    }
+
+    const results = await Promise.all(promises)
+    for (const res of results) {
+      resp.counters = resp.counters.concat(res.counters)
+      resp.gauges = resp.gauges.concat(res.gauges)
     }
 
     let updated = false
@@ -286,7 +297,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
                   result.counters.push(c)
                 })
               } catch (e) {
-                throw new ServerError(Status.INTERNAL, 'error process instruction ' + e.toString())
+                throw new ServerError(Status.INTERNAL, 'error processing instruction ' + e.toString())
               }
             } else {
               console.error(
@@ -354,20 +365,17 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       }
       const blockPromises: Promise<O11yResult[]> = Promise.all(
         processor.blockHandlers.map(function (handler) {
-          return handler(block)
+          return handler(block).catch((e) => {
+            throw new ServerError(Status.INTERNAL, 'error processing block: ' + jsonString + +'\n' + e.toString())
+          })
         })
       )
       promises.push(blockPromises)
     }
-    try {
-      const allRes = (await Promise.all(promises)).flat()
-      for (const res of allRes) {
-        resp.counters = resp.counters.concat(res.counters)
-        resp.gauges = resp.gauges.concat(res.gauges)
-      }
-    } catch (e) {
-      // TODO move error wrapping earlier
-      throw new ServerError(Status.INTERNAL, 'error processing blocks: ' + e.toString())
+    const allRes = (await Promise.all(promises)).flat()
+    for (const res of allRes) {
+      resp.counters = resp.counters.concat(res.counters)
+      resp.gauges = resp.gauges.concat(res.gauges)
     }
 
     recordRuntimeInfo(resp, HandlerType.BLOCK)
