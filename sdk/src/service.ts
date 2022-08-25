@@ -212,7 +212,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         resp.counters = resp.counters.concat(res.counters)
         resp.gauges = resp.gauges.concat(res.gauges)
       } catch (e) {
-        throw new ServerError(Status.INTERNAL, e.toString())
+        throw new ServerError(Status.INTERNAL, 'error process log ' + l.toString() + ': ' + e.toString())
       }
     }
 
@@ -286,7 +286,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
                   result.counters.push(c)
                 })
               } catch (e) {
-                throw new ServerError(Status.INTERNAL, e.toString())
+                throw new ServerError(Status.INTERNAL, 'error process instruction ' + e.toString())
               }
             } else {
               console.error(
@@ -366,7 +366,8 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         resp.gauges = resp.gauges.concat(res.gauges)
       }
     } catch (e) {
-      throw new ServerError(Status.INTERNAL, e.toString())
+      // TODO move error wrapping earlier
+      throw new ServerError(Status.INTERNAL, 'error processing blocks: ' + e.toString())
     }
 
     recordRuntimeInfo(resp, HandlerType.BLOCK)
