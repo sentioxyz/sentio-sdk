@@ -1,6 +1,6 @@
 export { BaseProcessor } from './base-processor'
 export { BaseProcessorTemplate } from './base-processor-template'
-export { Context, ContractView, SolanaContext } from './context'
+export { Context, ContractView, BoundContractView, SolanaContext } from './context'
 export { ProcessorServiceImpl } from './service'
 export { Counter, Meter, Gauge } from './meter'
 export { getProvider, setProvider, DummyProvider } from './provider'

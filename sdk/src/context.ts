@@ -3,10 +3,12 @@ import { BaseContract, EventFilter } from 'ethers'
 import { Block, Log } from '@ethersproject/abstract-provider'
 import { Meter } from './meter'
 import Long from 'long'
-import { Provider } from '@ethersproject/providers'
 
-export class Context<TContract extends BaseContract, TContractView extends ContractView<TContract>> {
-  contract: TContractView
+export class Context<
+  TContract extends BaseContract,
+  TContractBoundView extends BoundContractView<TContract, ContractView<TContract>>
+> {
+  contract: TContractBoundView
   chainId: string
   log?: Log
   block?: Block
@@ -15,8 +17,10 @@ export class Context<TContract extends BaseContract, TContractView extends Contr
   counters: CounterResult[] = []
   meter: Meter
 
-  constructor(contract: TContractView, chainId: string, block?: Block, log?: Log) {
-    this.contract = contract
+  constructor(view: TContractBoundView, chainId: string, block?: Block, log?: Log) {
+    view.context = this
+    this.contract = view
+
     this.chainId = chainId
     this.log = log
     this.block = block
@@ -31,18 +35,37 @@ export class Context<TContract extends BaseContract, TContractView extends Contr
 
 export class ContractView<TContract extends BaseContract> {
   filters: { [name: string]: (...args: Array<any>) => EventFilter }
-  context: Context<any, any>
-  provider: Provider
   protected contract: TContract
 
   constructor(contract: TContract) {
     this.contract = contract
-    this.provider = contract.provider
     this.filters = contract.filters
   }
 
-  get _underlineContract() {
+  get rawContract() {
     return this.contract
+  }
+
+  get provider() {
+    return this.contract.provider
+  }
+}
+
+export class BoundContractView<TContract extends BaseContract, TContractView extends ContractView<TContract>> {
+  protected view: TContractView
+  // context will be set right after context creation (in context's constructor)
+  context: Context<TContract, BoundContractView<TContract, TContractView>>
+
+  constructor(view: TContractView) {
+    this.view = view
+  }
+
+  get rawContract() {
+    return this.view.rawContract
+  }
+
+  get provider() {
+    return this.view.provider
   }
 }
 

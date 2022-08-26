@@ -15,7 +15,6 @@ export function codeGenSentioFile(contract: Contract): string {
   const templateContract = ${contract.name}__factory.connect("", DummyProvider)
 
   class ${contract.name}ContractView extends ContractView<${contract.name}> {
-
     constructor (contract: ${contract.name}) {
       super(contract);
     }
@@ -25,19 +24,29 @@ export function codeGenSentioFile(contract: Contract): string {
       .flatMap((v) => v.filter((f) => f.stateMutability == 'view').map(generateViewFunction))
       .join('\n')}
   }
+  
+  class ${contract.name}BoundContractView extends BoundContractView<${contract.name}, ${contract.name}ContractView> {
+    // constructor (contract: ${contract.name}) {
+    //   super(contract);
+    // }
 
-  export type ${contract.name}Context = Context<${contract.name}, ${contract.name}ContractView>
+    ${Object.values(contract.functions)
+      .filter((f) => !reservedKeywords.has(f[0].name))
+      .flatMap((v) => v.filter((f) => f.stateMutability == 'view').map(generateBoundViewFunction))
+      .join('\n')}
+  }
+
+  export type ${contract.name}Context = Context<${contract.name}, ${contract.name}BoundContractView>
 
   export class ${contract.name}ProcessorTemplate extends BaseProcessorTemplate<${contract.name}, ${
     contract.name
-  }ContractView> {
+  }BoundContractView> {
     bindInternal(options: BindOptions) {
       let processor = getProcessor("${contract.name}", options) as ${contract.name}Processor
       if (!processor) {
-        const wrapper = get${contract.name}Contract(options.address, options.network)
         const finalOptions = Object.assign({}, options)
         finalOptions.name = getContractName("${contract.name}", options.name, options.address, options.network)
-        processor = new ${contract.name}Processor(finalOptions, wrapper)
+        processor = new ${contract.name}Processor(finalOptions)
         addProcessor("${contract.name}", options, processor)
       }
       return processor
@@ -54,7 +63,7 @@ export function codeGenSentioFile(contract: Contract): string {
       .join('\n')}
     }
 
-    export class ${contract.name}Processor extends BaseProcessor<${contract.name}, ${contract.name}ContractView> {
+    export class ${contract.name}Processor extends BaseProcessor<${contract.name}, ${contract.name}BoundContractView> {
       ${Object.values(contract.events)
         .map((events) => {
           if (events.length === 1) {
@@ -66,15 +75,20 @@ export function codeGenSentioFile(contract: Contract): string {
         .join('\n')}
 
     public static filters = templateContract.filters
+    
+    protected CreateBoundContractView(): ${contract.name}BoundContractView {
+      const view = get${contract.name}Contract(this.config.address, this.config.network)
+      return new ${contract.name}BoundContractView(view)
+    }
 
     public static bind(options: BindOptions): ${contract.name}Processor {
       let processor = getProcessor("${contract.name}", options) as ${contract.name}Processor
       if (!processor) {
-        const wrapper = get${contract.name}Contract(options.address, options.network)
+        // const wrapper = get${contract.name}Contract(options.address, options.network)
 
         const finalOptions = Object.assign({}, options)
         finalOptions.name = getContractName("${contract.name}", options.name, options.address, options.network)
-        processor = new ${contract.name}Processor(finalOptions, wrapper)
+        processor = new ${contract.name}Processor(finalOptions)
         addProcessor("${contract.name}", options, processor)
       }
       return processor
@@ -108,6 +122,7 @@ export function codeGenSentioFile(contract: Contract): string {
         'BindOptions',
         'BaseProcessor',
         'BaseProcessorTemplate',
+        'BoundContractView',
         'Context',
         'ContractView',
         'DummyProvider',
@@ -159,11 +174,6 @@ function generateViewFunction(func: FunctionDeclaration): string {
   return `
   async ${func.name}(${generateInputTypes(func.inputs, { useStructs: true })}overrides?: CallOverrides) {
     try {
-      if (!overrides && this.context) {
-        overrides = {
-          blockTag: this.context.blockNumber.toNumber(),
-        }
-      }
       if (overrides) {
         return await this.contract.${func.name}(${
     func.inputs.length > 0 ? func.inputs.map((input, index) => input.name || `arg${index}`).join(',') + ',' : ''
@@ -172,6 +182,29 @@ function generateViewFunction(func: FunctionDeclaration): string {
         return await this.contract.${func.name}(${func.inputs
     .map((input, index) => input.name || `arg${index}`)
     .join(',')})
+      }
+    } catch (e) {
+      throw transformEtherError(e, undefined)
+    }
+  }
+  `
+}
+
+function generateBoundViewFunction(func: FunctionDeclaration): string {
+  return `
+  async ${func.name}(${generateInputTypes(func.inputs, { useStructs: true })}overrides?: CallOverrides) {
+    try {
+      if (!overrides && this.context) {
+        overrides = {
+          blockTag: this.context.blockNumber.toNumber(),
+        }
+      }
+      if (overrides) {
+        return await this.view.${func.name}(${
+    func.inputs.length > 0 ? func.inputs.map((input, index) => input.name || `arg${index}`).join(',') + ',' : ''
+  } overrides)
+      } else {
+        return await this.view.${func.name}(${func.inputs.map((input, index) => input.name || `arg${index}`).join(',')})
       }
     } catch (e) {
       throw transformEtherError(e, this.context)

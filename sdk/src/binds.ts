@@ -13,6 +13,11 @@ function getKey(abiName: string, address: string, network: Networkish) {
 
 const addressToName = new Map<string, string>()
 const namerMap = new Map<string, ContractNamer>()
+
+// Get contract name by ABI, and other options
+// If there is contract using same ABI and different (address, network) pair
+// It will be renamed as ABI, ABI_1, ABI_2
+// Otherwise just use same contract name
 export function getContractName(
   abiName: string,
   contractName: string | undefined,
@@ -46,8 +51,8 @@ export function getProcessor(abiName: string, opts: BindOptions) {
 
 export function addProcessor(abiName: string, opts: BindOptions, processor: BaseProcessor<any, any>) {
   const sig = abiName + '_' + getOptionsSignature(opts)
-  // TODO next break change move this to binds
-  // global.PROCESSOR_STATE.processors.push(processor)
+
+  global.PROCESSOR_STATE.processors.push(processor)
   global.PROCESSOR_STATE.processorMap.set(sig, processor)
 }
 

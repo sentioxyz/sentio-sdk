@@ -1,11 +1,10 @@
-import { Context, ContractView } from './context'
+import { BoundContractView, Context, ContractView } from './context'
 import { Block, Log } from '@ethersproject/abstract-provider'
 import { BaseContract, EventFilter } from 'ethers'
 import { Event } from '@ethersproject/contracts'
 import { BytesLike } from '@ethersproject/bytes'
 import { O11yResult } from './gen/processor/protos/processor'
 import Long from 'long'
-import { ServerError, Status } from 'nice-grpc'
 import { BindInternalOptions, BindOptions } from './bind-options'
 import { getNetwork } from '@ethersproject/providers'
 
@@ -14,17 +13,17 @@ class EventsHandler {
   handler: (event: Log) => Promise<O11yResult>
 }
 
-export class BaseProcessor<TContract extends BaseContract, TContractView extends ContractView<TContract>> {
+export abstract class BaseProcessor<
+  TContract extends BaseContract,
+  TBoundContractView extends BoundContractView<TContract, ContractView<TContract>>
+> {
   blockHandlers: ((block: Block) => Promise<O11yResult>)[] = []
   eventHandlers: EventsHandler[] = []
 
-  contract: TContractView
-  // network: Network
   name: string
-
   config: BindInternalOptions
 
-  constructor(config: BindOptions, contract: TContractView) {
+  constructor(config: BindOptions) {
     this.config = {
       address: config.address,
       name: config.name || '',
@@ -45,28 +44,22 @@ export class BaseProcessor<TContract extends BaseContract, TContractView extends
         this.config.endBlock = config.endBlock
       }
     }
-
-    this.contract = contract
-    // TODO next break change move this to binds
-    global.PROCESSOR_STATE.processors.push(this)
   }
 
-  public isBind() {
-    return this.contract._underlineContract.address !== ''
-  }
+  protected abstract CreateBoundContractView(): TBoundContractView
+
+  // public isBind() {
+  //   return this.contract.rawContract.address !== ''
+  // }
 
   public getChainId() {
     return getNetwork(this.config.network).chainId.toString()
   }
 
   public onEvent(
-    handler: (event: Event, ctx: Context<TContract, TContractView>) => void,
+    handler: (event: Event, ctx: Context<TContract, TBoundContractView>) => void,
     filter: EventFilter | EventFilter[]
   ) {
-    if (!this.isBind()) {
-      throw new ServerError(Status.INTERNAL, 'processor not bind')
-    }
-    const contract = this.contract
     const chainId = this.getChainId()
 
     let _filters: EventFilter[] = []
@@ -77,18 +70,19 @@ export class BaseProcessor<TContract extends BaseContract, TContractView extends
       _filters.push(filter)
     }
 
+    const contractView = this.CreateBoundContractView()
     this.eventHandlers.push({
       filters: _filters,
       handler: async function (log) {
-        const ctx = new Context<TContract, TContractView>(contract, chainId, undefined, log)
+        const ctx = new Context<TContract, TBoundContractView>(contractView, chainId, undefined, log)
         // let event: Event = <Event>deepCopy(log);
         const event: Event = <Event>log
 
-        const parsed = contract._underlineContract.interface.parseLog(log)
+        const parsed = contractView.rawContract.interface.parseLog(log)
         if (parsed) {
           event.args = parsed.args
           event.decode = (data: BytesLike, topics?: Array<any>) => {
-            return contract._underlineContract.interface.decodeEventLog(parsed.eventFragment, data, topics)
+            return contractView.rawContract.interface.decodeEventLog(parsed.eventFragment, data, topics)
           }
           event.event = parsed.name
           event.eventSignature = parsed.signature
@@ -109,16 +103,12 @@ export class BaseProcessor<TContract extends BaseContract, TContractView extends
     return this
   }
 
-  public onBlock(handler: (block: Block, ctx: Context<TContract, TContractView>) => void) {
-    if (!this.isBind()) {
-      throw new ServerError(Status.INTERNAL, 'Registry not bind')
-    }
-    const contract = this.contract
+  public onBlock(handler: (block: Block, ctx: Context<TContract, TBoundContractView>) => void) {
     const chainId = this.getChainId()
+    const contractView = this.CreateBoundContractView()
 
     this.blockHandlers.push(async function (block: Block) {
-      const ctx = new Context<TContract, TContractView>(contract, chainId, block, undefined)
-      contract.context = ctx
+      const ctx = new Context<TContract, TBoundContractView>(contractView, chainId, block, undefined)
       await handler(block, ctx)
       return {
         gauges: ctx.gauges,

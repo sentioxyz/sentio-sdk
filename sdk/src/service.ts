@@ -29,7 +29,7 @@ import { Empty } from './gen/google/protobuf/empty'
 import Long from 'long'
 import { BaseProcessor } from './base-processor'
 import { BaseContract } from 'ethers'
-import { ContractView } from './context'
+import { BoundContractView } from './context'
 
 const DEFAULT_MAX_BLOCK = Long.ZERO
 
@@ -37,7 +37,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
   private eventHandlers: ((event: Log) => Promise<O11yResult>)[] = []
   // map from chain id to list of processors
   // private blockHandlers = new Map<string, ((block: Block) => Promise<O11yResult>)[]>()
-  private processorsByChainId = new Map<string, BaseProcessor<BaseContract, ContractView<BaseContract>>>()
+  private processorsByChainId = new Map<string, BaseProcessor<BaseContract, BoundContractView<BaseContract, any>>>()
 
   private started = false
   private contractConfigs: ContractConfig[]
@@ -81,7 +81,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
           contract: {
             name: processor.config.name,
             chainId: chainId,
-            address: processor.contract._underlineContract.address,
+            address: processor.config.address,
             abi: '',
           },
           blockConfig: {

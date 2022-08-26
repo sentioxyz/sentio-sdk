@@ -7,7 +7,7 @@ function GetRecordMetaData(ctx: Context<any, any> | SolanaContext, name: string,
   if (ctx instanceof Context) {
     if (ctx.log) {
       return {
-        contractAddress: ctx.contract._underlineContract.address,
+        contractAddress: ctx.contract.rawContract.address,
         blockNumber: Long.fromNumber(ctx.log.blockNumber, true), // TODO need number type to be long
         transactionIndex: ctx.log.transactionIndex,
         logIndex: ctx.log.logIndex,
@@ -18,7 +18,7 @@ function GetRecordMetaData(ctx: Context<any, any> | SolanaContext, name: string,
     }
     if (ctx.block) {
       return {
-        contractAddress: ctx.contract._underlineContract.address,
+        contractAddress: ctx.contract.rawContract.address,
         blockNumber: Long.fromNumber(ctx.block.number, true),
         transactionIndex: -1,
         logIndex: -1,

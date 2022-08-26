@@ -13,6 +13,7 @@ import {
   BindOptions,
   BaseProcessor,
   BaseProcessorTemplate,
+  BoundContractView,
   Context,
   ContractView,
   DummyProvider,
@@ -39,15 +40,76 @@ class Erc20ContractView extends ContractView<Erc20> {
     overrides?: CallOverrides
   ) {
     try {
+      if (overrides) {
+        return await this.contract.allowance(owner, spender, overrides);
+      } else {
+        return await this.contract.allowance(owner, spender);
+      }
+    } catch (e) {
+      throw transformEtherError(e, undefined);
+    }
+  }
+
+  async balanceOf(account: PromiseOrValue<string>, overrides?: CallOverrides) {
+    try {
+      if (overrides) {
+        return await this.contract.balanceOf(account, overrides);
+      } else {
+        return await this.contract.balanceOf(account);
+      }
+    } catch (e) {
+      throw transformEtherError(e, undefined);
+    }
+  }
+
+  async decimals(overrides?: CallOverrides) {
+    try {
+      if (overrides) {
+        return await this.contract.decimals(overrides);
+      } else {
+        return await this.contract.decimals();
+      }
+    } catch (e) {
+      throw transformEtherError(e, undefined);
+    }
+  }
+
+  async totalSupply(overrides?: CallOverrides) {
+    try {
+      if (overrides) {
+        return await this.contract.totalSupply(overrides);
+      } else {
+        return await this.contract.totalSupply();
+      }
+    } catch (e) {
+      throw transformEtherError(e, undefined);
+    }
+  }
+}
+
+class Erc20BoundContractView extends BoundContractView<
+  Erc20,
+  Erc20ContractView
+> {
+  // constructor (contract: Erc20) {
+  //   super(contract);
+  // }
+
+  async allowance(
+    owner: PromiseOrValue<string>,
+    spender: PromiseOrValue<string>,
+    overrides?: CallOverrides
+  ) {
+    try {
       if (!overrides && this.context) {
         overrides = {
           blockTag: this.context.blockNumber.toNumber(),
         };
       }
       if (overrides) {
-        return await this.contract.allowance(owner, spender, overrides);
+        return await this.view.allowance(owner, spender, overrides);
       } else {
-        return await this.contract.allowance(owner, spender);
+        return await this.view.allowance(owner, spender);
       }
     } catch (e) {
       throw transformEtherError(e, this.context);
@@ -62,9 +124,9 @@ class Erc20ContractView extends ContractView<Erc20> {
         };
       }
       if (overrides) {
-        return await this.contract.balanceOf(account, overrides);
+        return await this.view.balanceOf(account, overrides);
       } else {
-        return await this.contract.balanceOf(account);
+        return await this.view.balanceOf(account);
       }
     } catch (e) {
       throw transformEtherError(e, this.context);
@@ -79,9 +141,9 @@ class Erc20ContractView extends ContractView<Erc20> {
         };
       }
       if (overrides) {
-        return await this.contract.decimals(overrides);
+        return await this.view.decimals(overrides);
       } else {
-        return await this.contract.decimals();
+        return await this.view.decimals();
       }
     } catch (e) {
       throw transformEtherError(e, this.context);
@@ -96,9 +158,9 @@ class Erc20ContractView extends ContractView<Erc20> {
         };
       }
       if (overrides) {
-        return await this.contract.totalSupply(overrides);
+        return await this.view.totalSupply(overrides);
       } else {
-        return await this.contract.totalSupply();
+        return await this.view.totalSupply();
       }
     } catch (e) {
       throw transformEtherError(e, this.context);
@@ -106,16 +168,15 @@ class Erc20ContractView extends ContractView<Erc20> {
   }
 }
 
-export type Erc20Context = Context<Erc20, Erc20ContractView>;
+export type Erc20Context = Context<Erc20, Erc20BoundContractView>;
 
 export class Erc20ProcessorTemplate extends BaseProcessorTemplate<
   Erc20,
-  Erc20ContractView
+  Erc20BoundContractView
 > {
   bindInternal(options: BindOptions) {
     let processor = getProcessor("Erc20", options) as Erc20Processor;
     if (!processor) {
-      const wrapper = getErc20Contract(options.address, options.network);
       const finalOptions = Object.assign({}, options);
       finalOptions.name = getContractName(
         "Erc20",
@@ -123,7 +184,7 @@ export class Erc20ProcessorTemplate extends BaseProcessorTemplate<
         options.address,
         options.network
       );
-      processor = new Erc20Processor(finalOptions, wrapper);
+      processor = new Erc20Processor(finalOptions);
       addProcessor("Erc20", options, processor);
     }
     return processor;
@@ -158,7 +219,10 @@ export class Erc20ProcessorTemplate extends BaseProcessorTemplate<
   }
 }
 
-export class Erc20Processor extends BaseProcessor<Erc20, Erc20ContractView> {
+export class Erc20Processor extends BaseProcessor<
+  Erc20,
+  Erc20BoundContractView
+> {
   onApproval(
     handler: (event: ApprovalEvent, ctx: Erc20Context) => void,
     filter?: ApprovalEventFilter | ApprovalEventFilter[]
@@ -189,10 +253,15 @@ export class Erc20Processor extends BaseProcessor<Erc20, Erc20ContractView> {
 
   public static filters = templateContract.filters;
 
+  protected CreateBoundContractView(): Erc20BoundContractView {
+    const view = getErc20Contract(this.config.address, this.config.network);
+    return new Erc20BoundContractView(view);
+  }
+
   public static bind(options: BindOptions): Erc20Processor {
     let processor = getProcessor("Erc20", options) as Erc20Processor;
     if (!processor) {
-      const wrapper = getErc20Contract(options.address, options.network);
+      // const wrapper = getErc20Contract(options.address, options.network)
 
       const finalOptions = Object.assign({}, options);
       finalOptions.name = getContractName(
@@ -201,7 +270,7 @@ export class Erc20Processor extends BaseProcessor<Erc20, Erc20ContractView> {
         options.address,
         options.network
       );
-      processor = new Erc20Processor(finalOptions, wrapper);
+      processor = new Erc20Processor(finalOptions);
       addProcessor("Erc20", options, processor);
     }
     return processor;
