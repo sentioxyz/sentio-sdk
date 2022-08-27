@@ -1,4 +1,5 @@
 .*
+*.config.js
 dist
 gen
 types

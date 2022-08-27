@@ -15,7 +15,7 @@ yarn build
 
 cd ..
 
-if [ -d node_modules/.bin/sentio ]; then
+if [ -f ./node_modules/.bin/sentio ]; then
   echo "sentio bin already existed"
 else
   chmod +x $PWD/sdk/dist/cli/cli.js
