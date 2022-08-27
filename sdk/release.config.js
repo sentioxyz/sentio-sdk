@@ -24,5 +24,4 @@ module.exports = {
     ],
     // ['@semantic-release/exec', { publishCmd: 'echo "::set-output name=release_version::${nextRelease.version}"' }],
   ],
-  // https://github.com/semantic-release/commit-analyzer#release-rules
 }

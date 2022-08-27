@@ -10,8 +10,6 @@ import path from 'path'
 import fs from 'fs-extra'
 import { ProcessorState } from './processor-state'
 
-// import 'log-timestamp'
-
 global.sentio_sdk = require('.')
 global.PROCESSOR_STATE = new ProcessorState()
 
