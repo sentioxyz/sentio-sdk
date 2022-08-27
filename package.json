@@ -15,10 +15,7 @@
   "scripts": {
     "format": "prettier --write .",
     "lint": "ls-lint && eslint .",
-    "release": "semantic-release"
-  },
-  "dependencies": {
-    "install": "^0.13.0",
-    "p-queue": "^7.3.0"
+    "release": "semantic-release",
+    "postinstall": "git config --local include.path ../.github/.gitconfig && git config core.hooksPath .github/.githooks"
   }
 }

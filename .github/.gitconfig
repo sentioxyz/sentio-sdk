@@ -1,4 +1,21 @@
-[include]
-	path = ../../.github/.gitconfig
 [alias]
-	dev = "!../scripts/git/dev.sh $@"
+	# amend previous commit
+	amend = commit -a --amend -C HEAD
+    # reset to remote
+	sync-force = !git fetch && git reset --hard origin/main
+    # reset to remote and push
+	sync-force-push = !git fetch && git reset --hard origin/main && git push --no-verify
+    # rebase to remote
+	sync = !git fetch && git rebase origin/main
+	# create new dev/$git_user/$name branch and push to remote
+	dev = "!./scripts/git/dev.sh $@"
+	# clean dev/$git_user/* branches except the current one
+	dev-clean = "!f() { BRANCH=dev/$(git config  --get user.email | cut -d @ -f1)/*;  git branch --list $BRANCH | egrep -v \"(^\\*|master|main|develop)\" | xargs git branch -D; }; f"
+	# Pull pr to local pr/$number
+	pr  = "!f() { git fetch -fu ${2:-$(git remote |grep ^upstream || echo origin)} refs/pull/$1/head:pr/$1 && git checkout pr/$1; }; f"
+	# clean all pr/*
+	pr-clean = "!git for-each-ref refs/heads/pr/* --format='%(refname)' | while read ref ; do branch=${ref#refs/heads/} ; git branch -D $branch ; done"
+
+[push]
+  autoSetupRemote = true
+
