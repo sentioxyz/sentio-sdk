@@ -5,7 +5,9 @@ import { exec } from 'child_process'
 import { EVM, SOLANA, Target } from './config'
 
 export async function buildProcessor(onlyGen: boolean, targets: Target[]) {
-  await installDeps()
+  if (!onlyGen) {
+    await installDeps()
+  }
 
   // targets.forEach(async (target) => await buildProcessorForTarget(onlyGen, target))
   for (const target of targets) {
@@ -37,6 +39,7 @@ async function installDeps() {
 
 async function codeGenEthersProcessor(abisDir: string) {
   const ETHERS_TARGET = path.join(__dirname, '../target-ethers-sentio')
+  // TODO this will fail during postinstall, need to locate real typechain path
   await execStep(
     'yarn typechain --target ' + ETHERS_TARGET + ` --out-dir src/types/internal ${path.join(abisDir, '*.json')}`,
     'Type definitions gen'
