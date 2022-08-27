@@ -38,7 +38,7 @@ async function installDeps() {
 async function codeGenEthersProcessor(abisDir: string) {
   const ETHERS_TARGET = path.join(__dirname, '../target-ethers-sentio')
   await execStep(
-    'yarn typechain --target ' + ETHERS_TARGET + ` --out-dir src/types ${path.join(abisDir, '*.json')}`,
+    'yarn typechain --target ' + ETHERS_TARGET + ` --out-dir src/types/internal ${path.join(abisDir, '*.json')}`,
     'Type definitions gen'
   )
 }

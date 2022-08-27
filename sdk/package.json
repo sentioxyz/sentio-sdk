@@ -2,9 +2,10 @@
   "name": "@sentio/sdk",
   "license": "Apache-2.0",
   "scripts": {
-    "compile": "tsc --build tsconfig.json && cp src/cli/webpack.config.js dist/cli",
-    "build": "yarn compile && yarn gen_test_abi",
-    "pub": "yarn build && yarn publish --no-git-tag-version --access public",
+    "compile_target": "yarn tsc -b src/target-ethers-sentio/tsconfig.json",
+    "compile": "tsc -p . && cp src/cli/webpack.config.js dist/cli",
+    "build": "yarn compile_target && yarn gen_bultin_evm && yarn gen_test_abi && yarn compile",
+    "pub": "rm -rf dist && yarn build && yarn publish --no-git-tag-version --access public",
     "start_ts": "ts-node --files src/processor-runner.ts ../examples/x2y2/src/processor.ts",
     "start_ts_solana": "ts-node --files src/processor-runner.ts ../examples/mirrorworld/src/processor.ts",
     "start": "ts-node --files src/processor-runner.ts ../examples/x2y2/dist/lib.js",
@@ -12,15 +13,15 @@
     "ts-start": "ts-node --files src/processor-runner.ts ../examples/wormhole/src/processor.ts",
     "cli": "yarn build && node dist/cli/cli.js",
     "test": "ts-mocha --paths src/**/*.test.ts src/*.test.ts",
-    "gen_test_abi": "yarn gen_evm_abi && yarn gen_solana_abi",
-    "gen_evm_abi": "typechain --target dist/target-ethers-sentio --out-dir src/test-case/types 'src/test-case/abis/*.json'",
+    "gen_test_abi": "yarn gen_solana_abi",
+    "gen_bultin_evm": "typechain --target dist/target-ethers-sentio --out-dir src/builtin/internal 'src/abis/*.json'",
     "gen_solana_abi": "ts-node src/cli/solana-code-gen.ts src/test-case types"
   },
   "bin": {
     "processor-runner": "./dist/processor-runner.js",
     "sentio": "./dist/cli/cli.js"
   },
-  "version": "0.6.2",
+  "version": "0.6.4",
   "dependencies": {
     "@ethersproject/providers": "~5.7.0",
     "@project-serum/anchor": "^0.25.0",
@@ -39,7 +40,6 @@
     "fs-extra": "^10.1.0",
     "google-protobuf": "^3.15.8",
     "js-yaml": "^4.1.0",
-    "log-timestamp": "^0.3.0",
     "nice-grpc": "^2.0.0",
     "node-fetch": "2",
     "p-queue": "^6.6.2",
@@ -64,7 +64,7 @@
     "ts-mocha": "^10.0.0",
     "ts-node": "^10.8.0",
     "tsconfig-paths": "^4.0.0",
-    "typescript": "~4.7.4"
+    "typescript": "^4.8.0"
   },
   "files": [
     "dist/**/*"

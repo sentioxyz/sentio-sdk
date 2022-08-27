@@ -1,38 +1,13 @@
 {
+  "extends": "../tsconfig.json",
   "compilerOptions": {
-    "declaration": true,
-    "alwaysStrict": true,
-    "sourceMap": true,
-    "target": "esnext",
-    "lib": ["es7"],
-    "esModuleInterop": true,
-    //    "removeComments": true,
-    "noImplicitReturns": true,
-    "noImplicitAny": true,
-    //    "noUnusedLocals": true,
-    //    "noUnusedParameters": true,
-    //    "module": "ES6",
-    "resolveJsonModule": true,
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "strictNullChecks": true,
-    "stripInternal": true,
-    "noFallthroughCasesInSwitch": true,
-    "noEmitOnError": true,
-    "outDir": "dist",
     "rootDir": "./src",
     "baseUrl": "./src",
-    // by pass issue: Could not find a declaration file for module 'buffer-layout' for now.
-    "skipLibCheck": true,
-    // check if we need?
     //https://levelup.gitconnected.com/path-aliases-with-typescript-in-node-js-230803e3f200
     "paths": {
       "@sentio/sdk": ["."]
-    }
+    },
+    "outDir": "dist"
   },
-  "exclude": [
-    "dist"
-    //    "**/*.test.ts"
-    //                        "src/test-case/**/*.ts"
-  ]
+  "exclude": ["dist", "src/target-ethers-sentio"]
 }

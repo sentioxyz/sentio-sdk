@@ -1,4 +1,4 @@
-import { Weth9Processor, Weth9Context } from './types/weth9_processor'
+import { Weth9Processor, Weth9Context } from './types/weth9'
 
 const TOKEN_BRIDGE_ADDRESS = '0x3ee18B2214AFF97000D974cf647E7C347E8fa585'
 

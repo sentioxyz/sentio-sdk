@@ -1,16 +1,21 @@
 {
-  "license": "Apache-2.0",
+  "private": true,
+  "workspaces": [
+    "sdk",
+    "cli2",
+    "examples/*"
+  ],
   "devDependencies": {
     "@ls-lint/ls-lint": "^1.11.2",
-    "@typescript-eslint/eslint-plugin": "^5.26.0",
-    "@typescript-eslint/parser": "^5.26.0",
-    "eslint": "^8.17.0",
+    "@typescript-eslint/eslint-plugin": "^5.35.0",
+    "@typescript-eslint/parser": "^5.35.0",
+    "eslint": "^8.23.0",
     "eslint-config-prettier": "^8.5.0",
     "lint-staged": "^13.0.3",
     "prettier": "^2.7.1",
     "prettier-plugin-sh": "^0.12.8",
     "semantic-release": "^19.0.3",
-    "typescript": "^4.7.2"
+    "typescript": "^4.8.0"
   },
   "scripts": {
     "format": "prettier --write .",

@@ -10,11 +10,18 @@ import { reservedKeywords } from '@typechain/ethers-v5/dist/codegen/reserved-key
 import { generateInputTypes } from '@typechain/ethers-v5/dist/codegen/types'
 import { getFullSignatureForEvent } from 'typechain/dist/utils/signatures'
 
+export function codeGenIndex(contract: Contract): string {
+  return ` 
+  export * from '../internal/${contract.name.toLowerCase()}_processor'
+  export * from '../internal/${contract.name}'
+  `
+}
+
 export function codeGenSentioFile(contract: Contract): string {
   const source = `
   const templateContract = ${contract.name}__factory.connect("", DummyProvider)
 
-  class ${contract.name}ContractView extends ContractView<${contract.name}> {
+  export class ${contract.name}ContractView extends ContractView<${contract.name}> {
     constructor (contract: ${contract.name}) {
       super(contract);
     }
@@ -25,7 +32,9 @@ export function codeGenSentioFile(contract: Contract): string {
       .join('\n')}
   }
   
-  class ${contract.name}BoundContractView extends BoundContractView<${contract.name}, ${contract.name}ContractView> {
+  export class ${contract.name}BoundContractView extends BoundContractView<${contract.name}, ${
+    contract.name
+  }ContractView> {
     // constructor (contract: ${contract.name}) {
     //   super(contract);
     // }
@@ -104,8 +113,6 @@ export function codeGenSentioFile(contract: Contract): string {
     }
     return contract
   }
-
-  // export const ${contract.name}Processor = new ${contract.name}ProcessorTemplate("${contract.name}")
   `
 
   const imports = createImportsForUsedIdentifiers(

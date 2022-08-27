@@ -1,9 +1,16 @@
 import Ethers from '@typechain/ethers-v5'
-import { extractAbi, extractDocumentation, FileDescription, parse, shortenFullJsonFilePath } from 'typechain'
+import { Config, extractAbi, extractDocumentation, FileDescription, parse, shortenFullJsonFilePath } from 'typechain'
 import { dirname, join, relative } from 'path'
-import { codeGenSentioFile } from './codegen'
+import { codeGenIndex, codeGenSentioFile } from './codegen'
 
 export default class EthersSentio extends Ethers {
+  constructor(config: Config) {
+    if (!config.outDir) {
+      throw new Error('Out put path not specificed')
+    }
+    super(config)
+  }
+
   // TODO(pc): also have to override transformBinFile, transformFile
   override transformAbiOrFullJsonFile(file: FileDescription): FileDescription[] | void {
     const abi = extractAbi(file.contents)
@@ -13,18 +20,25 @@ export default class EthersSentio extends Ethers {
 
     const documentation = extractDocumentation(file.contents)
 
-    const path = relative(this.cfg.inputDir, shortenFullJsonFilePath(file.path, this.cfg.allFiles))
-
-    const contract = parse(abi, path, documentation)
-
+    const jsonPath = relative(this.cfg.inputDir, shortenFullJsonFilePath(file.path, this.cfg.allFiles))
+    const contract = parse(abi, jsonPath, documentation)
     const files = super.transformAbiOrFullJsonFile(file)
 
     if (files !== undefined) {
+      // files.forEach(this.transformFilePath)
+      // for (const file of files) {
+      //   this.transformFilePath(file)
+      // }
+
       return [
         ...files,
         {
           path: join(dirname(files[0].path), `${contract.name.toLowerCase()}_processor.ts`),
           contents: codeGenSentioFile(contract),
+        },
+        {
+          path: join(dirname(files[0].path), '..', contract.name.toLowerCase(), 'index.ts'),
+          contents: codeGenIndex(contract),
         },
       ]
     }

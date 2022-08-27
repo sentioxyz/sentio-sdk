@@ -5,13 +5,10 @@
   "scripts": {
     "compile": "tsc -p .",
     "start": "processor_server ./dist/lib",
-    "build": "sentio build",
-    "postinstall": "sentio gen"
+    "build": "sentio build"
   },
   "dependencies": {
-    "@sentio/sdk": "file:../../sdk"
+    "@sentio/sdk": "*.x.x"
   },
-  "devDependencies": {
-    "typescript": "^4.7.2"
-  }
+  "devDependencies": {}
 }

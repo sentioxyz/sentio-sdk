@@ -1,4 +1,4 @@
-import { Erc20Processor, Erc20ProcessorTemplate } from './types/erc20_processor'
+import { Erc20Processor, Erc20ProcessorTemplate } from 'builtin/erc20'
 
 export const filter = Erc20Processor.filters.Transfer(
   '0x0000000000000000000000000000000000000000',

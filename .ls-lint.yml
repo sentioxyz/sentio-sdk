@@ -23,6 +23,7 @@ ignore:
   - .idea
   - .github
   - node_modules
+  - sdk/src/builtin/internal
   - sdk/src/test-case/types
   - sdk/dist
   - sdk/node_modules

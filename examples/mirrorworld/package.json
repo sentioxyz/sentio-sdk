@@ -9,11 +9,10 @@
     "tsnode": "yarn ts-node"
   },
   "dependencies": {
-    "@sentio/sdk": "file:../../sdk"
+    "@sentio/sdk": "*.x.x"
   },
   "devDependencies": {
     "ts-node": "^10.8.0",
-    "typescript": "^4.7.2",
     "@types/bn.js": "^5.1.0",
     "@types/bs58": "4.0.1",
     "@types/node-fetch": "^2.6.2"

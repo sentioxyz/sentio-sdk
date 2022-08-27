@@ -13,9 +13,11 @@ jobs:
       - checkout
       - node/install-packages:
           pkg-manager: yarn
-          app-dir: sdk
+#      - run:
+#          command: yarn install
+#          name: Yarn Install
       - run:
-          command: yarn test
+          command: yarn build && yarn test
           name: Test SDK
           working_directory: sdk
       - run:
