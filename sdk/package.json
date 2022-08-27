@@ -5,11 +5,11 @@
     "compile": "tsc --build tsconfig.json && cp src/cli/webpack.config.js dist/cli",
     "build": "yarn compile && yarn gen_test_abi",
     "pub": "yarn build && yarn publish --no-git-tag-version --access public",
-    "start_ts": "ts-node --files src/processor.ts ../examples/x2y2/src/processor.ts",
-    "start_ts_solana": "ts-node --files src/processor.ts ../examples/mirrorworld/src/processor.ts",
-    "start": "ts-node --files src/processor.ts ../examples/x2y2/dist/lib.js",
+    "start_ts": "ts-node --files src/processor-runner.ts ../examples/x2y2/src/processor.ts",
+    "start_ts_solana": "ts-node --files src/processor-runner.ts ../examples/mirrorworld/src/processor.ts",
+    "start": "ts-node --files src/processor-runner.ts ../examples/x2y2/dist/lib.js",
     "start_js": "node dist/processor.js ../examples/x2y2/dist/lib.js",
-    "ts-start": "ts-node --files src/processor.ts /Users/fuyaoz/src/sentio-processor/balancer/src/processor.ts",
+    "ts-start": "ts-node --files src/processor-runner.ts ../examples/wormhole/src/processor.ts",
     "cli": "yarn build && node dist/cli/cli.js",
     "test": "ts-mocha --paths src/**/*.test.ts src/*.test.ts",
     "gen_test_abi": "yarn gen_evm_abi && yarn gen_solana_abi",
@@ -17,10 +17,10 @@
     "gen_solana_abi": "ts-node src/cli/solana-code-gen.ts src/test-case types"
   },
   "bin": {
-    "processor": "./dist/processor.js",
+    "processor-runner": "./dist/processor-runner.js",
     "sentio": "./dist/cli/cli.js"
   },
-  "version": "0.5.1",
+  "version": "0.6.2",
   "dependencies": {
     "@ethersproject/providers": "~5.7.0",
     "@project-serum/anchor": "^0.25.0",
@@ -49,7 +49,6 @@
     "webpack-cli": "^4.9.2"
   },
   "devDependencies": {
-    "@bazel/typescript": "^5.4.2",
     "@types/chai": "^4.3.1",
     "@types/command-line-args": "^5.2.0",
     "@types/command-line-usage": "^5.0.2",
@@ -65,7 +64,7 @@
     "ts-mocha": "^10.0.0",
     "ts-node": "^10.8.0",
     "tsconfig-paths": "^4.0.0",
-    "typescript": "^4.7.2"
+    "typescript": "~4.7.4"
   },
   "files": [
     "dist/**/*"

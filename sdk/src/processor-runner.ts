@@ -68,9 +68,9 @@ console.log('Start Server', options)
 console.log(global.PROCESSOR_STATE.processors.length, ' processors loaded')
 console.log(global.PROCESSOR_STATE.solanaProcessors.length, ' solana processors loaded')
 
-const processor = createServer()
+const server = createServer()
 
-const service = new ProcessorServiceImpl(processor.shutdown)
-processor.add(ProcessorDefinition, service)
+const service = new ProcessorServiceImpl(server.shutdown)
+server.add(ProcessorDefinition, service)
 
-processor.listen('0.0.0.0:' + options.port)
+server.listen('0.0.0.0:' + options.port)
