@@ -30,6 +30,7 @@ import Long from 'long'
 import { BaseProcessor } from './base-processor'
 import { BaseContract } from 'ethers'
 import { BoundContractView } from './context'
+import { TextDecoder } from 'util'
 
 const DEFAULT_MAX_BLOCK = Long.ZERO
 
@@ -278,7 +279,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
           if (processor.address === instruction.programAccountId) {
             let res: O11yResult | null
             if (instruction.parsed) {
-              res = processor.handleInstruction(JSON.parse(instruction.parsed.toString()))
+              res = processor.handleInstruction(JSON.parse(new TextDecoder().decode(instruction.parsed)))
             } else {
               res = processor.handleInstruction(instruction.instructionData)
             }

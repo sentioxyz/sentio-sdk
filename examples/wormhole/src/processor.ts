@@ -1,4 +1,5 @@
 import { Weth9Processor, Weth9Context } from './types/weth9'
+import { SPLTokenProcessor } from '@sentio/sdk'
 
 const TOKEN_BRIDGE_ADDRESS = '0x3ee18B2214AFF97000D974cf647E7C347E8fa585'
 
@@ -44,3 +45,16 @@ Weth9Processor.bind({
   const balance = (await ctx.contract.balanceOf(TOKEN_BRIDGE_ADDRESS)).toBigInt()
   ctx.meter.Gauge('balance_end').record(balance)
 })
+
+SPLTokenProcessor.bind(
+  'wormDTUJ6AWPNvk59vGQbDvGJmqbDTdgWgAqcLBCgUb',
+  'https://api.mainnet-beta.solana.com'
+).onMintTo((data, ctx) => {
+  if (data.mint === '7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs') {
+    ctx.meter.Counter('totalWeth_supply').add(data.amount as number)
+  }
+}).onBurn((data, ctx) => {
+  if (data.mint === '7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs') {
+    ctx.meter.Counter('totalWeth_supply').sub(data.amount as number)
+  }
+}).innerInstruction(true)

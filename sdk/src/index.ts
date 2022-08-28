@@ -13,3 +13,5 @@ export { ProcessorState } from './processor-state'
 export { getProcessor, addProcessor, getContractByABI, addContractByABI, getContractName } from './binds'
 
 export * from './gen/processor/protos/processor'
+
+export { SPLTokenProcessor } from './solana/builtin'

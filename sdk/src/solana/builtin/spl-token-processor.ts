@@ -1,122 +1,107 @@
 import { SolanaBaseProcessor } from 'solana-processor'
-import { ParsedInstruction } from '@solana/web3.js'
-import {
-  ApproveInstructionData,
-  BurnInstructionData,
-  CloseAccountInstructionData,
-  FreezeAccountInstructionData,
-  InitializeAccount2InstructionData,
-  InitializeAccount3InstructionData,
-  InitializeAccountInstructionData,
-  InitializeMintInstructionData,
-  InitializeMultisigInstructionData,
-  MintToInstructionData,
-  RevokeInstructionData,
-  ThawAccountInstructionData,
-  TokenInstruction,
-  TransferInstructionData,
-} from '@solana/spl-token'
 import { SolanaContext } from 'context'
 import { Instruction } from '@project-serum/anchor'
+import { Approve, Burn, CloseAccount, FreezeAccount, InitializeAccount, InitializeAccount2, InitializeAccount3, InitializeMint, InitializeMultisig, MintTo, Revoke, ThawAccount, Transfer } from './types';
 
 export class SPLTokenProcessor extends SolanaBaseProcessor {
-  private TokenInstructionMapCache: Map<string, TokenInstruction | undefined> = new Map()
-
-  static bind(address: string, endpoint: string, name = 'Token Program'): SPLTokenProcessor {
+  static bind(address: string, endpoint: string, name = 'SPL Token Program'): SPLTokenProcessor {
     return new SPLTokenProcessor(name, address, endpoint)
   }
 
-  fromParsedInstruction: (instruction: ParsedInstruction) => Instruction | null = (instruction: ParsedInstruction) => {
-    const instructionType = instruction.parsed.type as string
-    if (!instructionType || !this.instructionTypeToTokenInstruction(instructionType)) {
+  innerInstruction(flag: boolean) {
+    return super.innerInstruction(flag)
+  }
+
+  fromParsedInstruction: (instruction: { type: string, info: any }) => Instruction | null = (instruction: { type: string, info: any }) => {
+    const instructionType = instruction.type
+    if (!instructionType) {
       return null
     }
     return {
-      name: instruction.parsed.type,
+      name: instruction.type,
       data: {
-        instruction: this.instructionTypeToTokenInstruction(instructionType),
-        ...instruction.parsed.info,
+        ...instruction.info,
       },
     }
   }
 
   public onInitializeMint(
-    handler: (data: InitializeMintInstructionData, ctx: SolanaContext) => void
+    handler: (data: InitializeMint, ctx: SolanaContext) => void
   ): SPLTokenProcessor {
     this.onInstruction('initializeMint', (ins: Instruction, ctx) => {
       if (ins) {
-        handler(ins.data as InitializeMintInstructionData, ctx)
+        handler(ins.data as InitializeMint, ctx)
       }
     })
     return this
   }
 
   public onInitializeAccount(
-    hanlder: (data: InitializeAccountInstructionData, ctx: SolanaContext) => void
+    hanlder: (data: InitializeAccount, ctx: SolanaContext) => void
   ): SPLTokenProcessor {
     this.onInstruction('initializeAccount', (ins: Instruction, ctx) => {
       if (ins) {
-        hanlder(ins.data as InitializeAccountInstructionData, ctx)
+        hanlder(ins.data as InitializeAccount, ctx)
       }
     })
     return this
   }
 
   public onInitializeAccount2(
-    hanlder: (data: InitializeAccount2InstructionData, ctx: SolanaContext) => void
+    hanlder: (data: InitializeAccount2, ctx: SolanaContext) => void
   ): SPLTokenProcessor {
     this.onInstruction('initializeAccount2', (ins: Instruction, ctx) => {
       if (ins) {
-        hanlder(ins.data as InitializeAccount2InstructionData, ctx)
+        hanlder(ins.data as InitializeAccount2, ctx)
       }
     })
     return this
   }
 
   public onInitializeAccount3(
-    hanlder: (data: InitializeAccount3InstructionData, ctx: SolanaContext) => void
+    hanlder: (data: InitializeAccount3, ctx: SolanaContext) => void
   ): SPLTokenProcessor {
     this.onInstruction('initializeAccount3', (ins: Instruction, ctx) => {
       if (ins) {
-        hanlder(ins.data as InitializeAccount3InstructionData, ctx)
+        hanlder(ins.data as InitializeAccount3, ctx)
       }
     })
     return this
   }
 
   public onInitializeMultisig(
-    handler: (data: InitializeMultisigInstructionData, ctx: SolanaContext) => void
+    handler: (data: InitializeMultisig, ctx: SolanaContext) => void
   ): SPLTokenProcessor {
     this.onInstruction('initializeMultisig', (ins: Instruction, ctx) => {
       if (ins) {
-        handler(ins.data as InitializeMultisigInstructionData, ctx)
+        handler(ins.data as InitializeMultisig, ctx)
       }
     })
     return this
   }
 
-  public onTransfer(handler: (data: TransferInstructionData, ctx: SolanaContext) => void): SPLTokenProcessor {
+  public onTransfer(handler: (data: Transfer, ctx: SolanaContext) => void): SPLTokenProcessor {
     this.onInstruction('transfer', (ins: Instruction, ctx) => {
       if (ins) {
-        handler(ins.data as TransferInstructionData, ctx)
+        handler(ins.data as Transfer, ctx)
       }
     })
     return this
   }
 
-  public onApprovend(handler: (data: ApproveInstructionData, ctx: SolanaContext) => void): SPLTokenProcessor {
+  public onApprovend(handler: (data: Approve, ctx: SolanaContext) => void): SPLTokenProcessor {
     this.onInstruction('approve', (ins: Instruction, ctx) => {
       if (ins) {
-        handler(ins.data as ApproveInstructionData, ctx)
+        handler(ins.data as Approve, ctx)
       }
     })
     return this
   }
 
-  public onRevoke(handler: (data: RevokeInstructionData, ctx: SolanaContext) => void): SPLTokenProcessor {
+  public onRevoke(handler: (data: Revoke, ctx: SolanaContext) => void): SPLTokenProcessor {
     this.onInstruction('revoke', (ins: Instruction, ctx) => {
       if (ins) {
-        handler(ins.data as RevokeInstructionData, ctx)
+        handler(ins.data as Revoke, ctx)
       }
     })
     return this
@@ -131,67 +116,49 @@ export class SPLTokenProcessor extends SolanaBaseProcessor {
     return this
   }
 
-  public onMintTo(handler: (data: MintToInstructionData, ctx: SolanaContext) => void): SPLTokenProcessor {
+  public onMintTo(handler: (data: MintTo, ctx: SolanaContext) => void): SPLTokenProcessor {
     this.onInstruction('mintTo', (ins: Instruction, ctx) => {
       if (ins) {
-        handler(ins.data as MintToInstructionData, ctx)
+        handler(ins.data as MintTo, ctx)
       }
     })
     return this
   }
 
-  public onBurn(handler: (data: BurnInstructionData, ctx: SolanaContext) => void): SPLTokenProcessor {
+  public onBurn(handler: (data: Burn, ctx: SolanaContext) => void): SPLTokenProcessor {
     this.onInstruction('burn', (ins: Instruction, ctx) => {
       if (ins) {
-        handler(ins.data as BurnInstructionData, ctx)
+        handler(ins.data as Burn, ctx)
       }
     })
     return this
   }
 
-  public onCloseAccount(handler: (data: CloseAccountInstructionData, ctx: SolanaContext) => void): SPLTokenProcessor {
+  public onCloseAccount(handler: (data: CloseAccount, ctx: SolanaContext) => void): SPLTokenProcessor {
     this.onInstruction('closeAccount', (ins: Instruction, ctx) => {
       if (ins) {
-        handler(ins.data as CloseAccountInstructionData, ctx)
+        handler(ins.data as CloseAccount, ctx)
       }
     })
     return this
   }
 
-  public onFreezeAccount(handler: (data: FreezeAccountInstructionData, ctx: SolanaContext) => void): SPLTokenProcessor {
+  public onFreezeAccount(handler: (data: FreezeAccount, ctx: SolanaContext) => void): SPLTokenProcessor {
     this.onInstruction('freezeAccount', (ins: Instruction, ctx) => {
       if (ins) {
-        handler(ins.data as FreezeAccountInstructionData, ctx)
+        handler(ins.data as FreezeAccount, ctx)
       }
     })
     return this
   }
 
-  public onThawAccount(handler: (data: ThawAccountInstructionData, ctx: SolanaContext) => void): SPLTokenProcessor {
+  public onThawAccount(handler: (data: ThawAccount, ctx: SolanaContext) => void): SPLTokenProcessor {
     this.onInstruction('thawAccount', (ins: Instruction, ctx) => {
       if (ins) {
-        handler(ins.data as ThawAccountInstructionData, ctx)
+        handler(ins.data as ThawAccount, ctx)
       }
     })
     return this
   }
-
-  private instructionTypeToTokenInstruction(type: string): TokenInstruction | undefined {
-    const findTokenInstruction: () => TokenInstruction | undefined = () => {
-      const camelCaseType = type[0].toLowerCase() + type.substring(1)
-      const index = Object.keys(TokenInstruction).indexOf(camelCaseType)
-      if (index !== -1) {
-        return Object.values(TokenInstruction)[index] as TokenInstruction
-      }
-      return undefined
-    }
-
-    if (!this.TokenInstructionMapCache.has(type)) {
-      this.TokenInstructionMapCache.set(type, findTokenInstruction())
-    }
-
-    return this.TokenInstructionMapCache.get(type)
-  }
-
   // Todo(pcxu): auto gen this file
 }

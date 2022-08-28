@@ -9,6 +9,10 @@ export class GameWalletProcessor extends SolanaBaseProcessor {
     return new GameWalletProcessor(name, address, endpoint)
   }
 
+  innerInstruction(flag: boolean) {
+    return super.innerInstruction(flag)
+  }
+
   decodeInstruction: (rawInstruction: string) => Instruction | null = (rawInstruction) => {
     const instructionCoder = new BorshInstructionCoder(game_wallet_idl as Idl)
     const decodedIns = instructionCoder.decode(Buffer.from(bs58.decode(rawInstruction)))
