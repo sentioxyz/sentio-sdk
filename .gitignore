@@ -1,4 +1,4 @@
-builtin
+sdk/src/builtin
 node_modules
 dist
 **/src/types
