@@ -21,7 +21,7 @@
     "processor-runner": "./dist/processor-runner.js",
     "sentio": "./dist/cli/cli.js"
   },
-  "version": "0.0.0-development",
+  "version": "1.0.0-development",
   "dependencies": {
     "@ethersproject/providers": "~5.7.0",
     "@project-serum/anchor": "^0.25.0",

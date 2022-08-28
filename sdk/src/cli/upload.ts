@@ -67,10 +67,10 @@ export async function uploadFile(options: SentioProjectConfig, apiKeyOverride: s
   })
 
   if (res.ok) {
-    console.log(chalk.green('Upload success'))
-    console.log(chalk.blue('sha256:'), digest)
+    console.log(chalk.green('Upload success: '))
+    console.log('\t', chalk.blue('sha256:'), digest)
     if (commitSha) {
-      console.log(chalk.blue('Git commit SHA:'), commitSha)
+      console.log('\t', chalk.blue('Git commit SHA:'), commitSha)
     }
   } else {
     console.error(chalk.red('Upload Failed'))
