@@ -24,7 +24,6 @@
   "dependencies": {
     "@ethersproject/providers": "~5.7.0",
     "@project-serum/anchor": "^0.25.0",
-    "@solana/spl-token": "0.3.4",
     "@solana/web3.js": "^1.47.3",
     "@typechain/ethers-v5": "^10.0.0",
     "@types/bn.js": "^5.1.0",
