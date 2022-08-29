@@ -51,7 +51,7 @@ const optionDefinitions = [
   },
 ]
 
-const options = commandLineArgs(optionDefinitions)
+const options = commandLineArgs(optionDefinitions, { partial: true })
 
 console.log('loading', options.target)
 
