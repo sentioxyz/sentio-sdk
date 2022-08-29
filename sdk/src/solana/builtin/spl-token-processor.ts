@@ -1,5 +1,5 @@
-import { SolanaBaseProcessor } from 'solana-processor'
-import { SolanaContext } from 'context'
+import { SolanaBaseProcessor } from '../../solana-processor'
+import { SolanaContext } from '../../context'
 import { Instruction } from '@project-serum/anchor'
 import { Approve, Burn, CloseAccount, FreezeAccount, InitializeAccount, InitializeAccount2, InitializeAccount3, InitializeMint, InitializeMultisig, MintTo, Revoke, ThawAccount, Transfer } from './types';
 
@@ -7,11 +7,7 @@ export class SPLTokenProcessor extends SolanaBaseProcessor {
   static bind(address: string, endpoint: string, name = 'SPL Token Program'): SPLTokenProcessor {
     return new SPLTokenProcessor(name, address, endpoint)
   }
-
-  innerInstruction(flag: boolean) {
-    return super.innerInstruction(flag)
-  }
-
+  
   fromParsedInstruction: (instruction: { type: string, info: any }) => Instruction | null = (instruction: { type: string, info: any }) => {
     const instructionType = instruction.type
     if (!instructionType) {
