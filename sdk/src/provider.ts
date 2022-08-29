@@ -21,7 +21,7 @@ export function getProvider(networkish?: Networkish): Provider {
   return value
 }
 
-export function setProvider(config: any, concurrency = 4) {
+export function setProvider(config: any, concurrency = 4, useChainServer = false) {
   global.PROCESSOR_STATE.providers = new Map<number, Provider>()
 
   for (const chainIdStr in config) {
@@ -40,9 +40,16 @@ export function setProvider(config: any, concurrency = 4) {
     // providers = providers.sort(() => Math.random() - 0.5)
 
     // const provider = new FallbackProvider(providers)
-    const idx = Math.floor(Math.random() * chainConfig.Https.length)
-    const provider = new QueuedStaticJsonRpcProvider(chainConfig.Https[idx], chainId, concurrency)
 
+    let rpcAddress = ''
+    if (useChainServer && chainConfig.ChainServer) {
+      rpcAddress = chainConfig.ChainServer
+    } else {
+      const idx = Math.floor(Math.random() * chainConfig.Https.length)
+      rpcAddress = chainConfig.Https[idx]
+    }
+
+    const provider = new QueuedStaticJsonRpcProvider(rpcAddress, chainId, concurrency)
     global.PROCESSOR_STATE.providers.set(chainId, provider)
   }
 }

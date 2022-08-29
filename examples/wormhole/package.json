@@ -8,7 +8,7 @@
     "build": "sentio build"
   },
   "dependencies": {
-    "@sentio/sdk": "*.x.x"
+    "@sentio/sdk": "1.0.0-development"
   },
   "devDependencies": {}
 }

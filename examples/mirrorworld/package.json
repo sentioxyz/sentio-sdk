@@ -9,7 +9,7 @@
     "tsnode": "yarn ts-node"
   },
   "dependencies": {
-    "@sentio/sdk": "*.x.x"
+    "@sentio/sdk": "1.0.0-development"
   },
   "devDependencies": {
     "ts-node": "^10.8.0",

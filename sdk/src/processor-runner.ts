@@ -42,6 +42,7 @@ const optionDefinitions = [
   { name: 'target', type: String, defaultOption: true },
   { name: 'port', alias: 'p', type: String, defaultValue: '4000' },
   { name: 'concurrency', type: Number, defaultValue: 4 },
+  { name: 'use-chainserver', type: Boolean, defaultValue: false },
   {
     name: 'chains-config',
     alias: 'c',
@@ -57,7 +58,7 @@ console.log('loading', options.target)
 const fullPath = path.resolve(options['chains-config'])
 const chainsConfig = fs.readJsonSync(fullPath)
 
-setProvider(chainsConfig, options.concurrency)
+setProvider(chainsConfig, options.concurrency, options['use-chainserver'])
 
 tryRequire(options.target)
 
