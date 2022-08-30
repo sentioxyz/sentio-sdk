@@ -67,93 +67,87 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     this.processorsByChainId.clear()
     this.contractConfigs = []
 
-    if (global.PROCESSOR_STATE.templatesInstances) {
-      this.templateInstances = [...global.PROCESSOR_STATE.templatesInstances]
-    }
+    this.templateInstances = [...global.PROCESSOR_STATE.templatesInstances]
 
-    if (global.PROCESSOR_STATE.processors) {
-      for (const processor of global.PROCESSOR_STATE.processors) {
-        // If server favor incremental update this need to change
-        // Start basic config for contract
-        const chainId = processor.getChainId()
-        this.processorsByChainId.set(chainId, processor)
+    for (const processor of global.PROCESSOR_STATE.processors) {
+      // If server favor incremental update this need to change
+      // Start basic config for contract
+      const chainId = processor.getChainId()
+      this.processorsByChainId.set(chainId, processor)
 
-        const contractConfig: ContractConfig = {
-          contract: {
-            name: processor.config.name,
-            chainId: chainId,
-            address: processor.config.address,
-            abi: '',
-          },
-          blockConfig: {
-            numHandlers: processor.blockHandlers.length,
-          },
-          logConfigs: [],
-          startBlock: processor.config.startBlock,
-          endBlock: DEFAULT_MAX_BLOCK,
-          instructionConfig: undefined,
+      const contractConfig: ContractConfig = {
+        contract: {
+          name: processor.config.name,
+          chainId: chainId,
+          address: processor.config.address,
+          abi: '',
+        },
+        blockConfig: {
+          numHandlers: processor.blockHandlers.length,
+        },
+        logConfigs: [],
+        startBlock: processor.config.startBlock,
+        endBlock: DEFAULT_MAX_BLOCK,
+        instructionConfig: undefined,
+      }
+      if (processor.config.endBlock) {
+        contractConfig.endBlock = processor.config.endBlock
+      }
+
+      // Prepare all the event handlers
+      for (const eventsHandler of processor.eventHandlers) {
+        // associate id with filter
+        const handlerId = this.eventHandlers.push(eventsHandler.handler) - 1
+        const logConfig: LogHandlerConfig = {
+          handlerId: handlerId,
+          conditions: [],
         }
-        if (processor.config.endBlock) {
-          contractConfig.endBlock = processor.config.endBlock
-        }
 
-        // Prepare all the event handlers
-        for (const eventsHandler of processor.eventHandlers) {
-          // associate id with filter
-          const handlerId = this.eventHandlers.push(eventsHandler.handler) - 1
-          const logConfig: LogHandlerConfig = {
-            handlerId: handlerId,
-            conditions: [],
+        for (const filter of eventsHandler.filters) {
+          if (!filter.topics) {
+            throw new ServerError(Status.INVALID_ARGUMENT, 'Topic should not be null')
+          }
+          const condition: HandlerCondition = {
+            topics: [],
           }
 
-          for (const filter of eventsHandler.filters) {
-            if (!filter.topics) {
-              throw new ServerError(Status.INVALID_ARGUMENT, 'Topic should not be null')
+          for (const ts of filter.topics) {
+            let hashes: string[] = []
+            if (Array.isArray(ts)) {
+              hashes = hashes.concat(ts)
+            } else if (ts) {
+              hashes.push(ts)
             }
-            const condition: HandlerCondition = {
-              topics: [],
-            }
-
-            for (const ts of filter.topics) {
-              let hashes: string[] = []
-              if (Array.isArray(ts)) {
-                hashes = hashes.concat(ts)
-              } else if (ts) {
-                hashes.push(ts)
-              }
-              condition.topics.push({ hashes: hashes })
-            }
-            logConfig.conditions.push(condition)
+            condition.topics.push({ hashes: hashes })
           }
-          contractConfig.logConfigs.push(logConfig)
+          logConfig.conditions.push(condition)
         }
-
-        // Finish up a contract
-        this.contractConfigs.push(contractConfig)
+        contractConfig.logConfigs.push(logConfig)
       }
+
+      // Finish up a contract
+      this.contractConfigs.push(contractConfig)
     }
 
-    if (global.PROCESSOR_STATE.solanaProcessors) {
-      for (const solanaProcessor of global.PROCESSOR_STATE.solanaProcessors) {
-        const contractConfig: ContractConfig = {
-          contract: {
-            name: solanaProcessor.contractName,
-            chainId: 'SOL:mainnet', // TODO set in processor
-            address: solanaProcessor.address,
-            abi: '',
-          },
-          blockConfig: undefined,
-          logConfigs: [],
-          startBlock: solanaProcessor.config.startSlot,
-          endBlock: DEFAULT_MAX_BLOCK,
-          instructionConfig: {
-            innerInstruction: solanaProcessor.processInnerInstruction,
-            parsedInstruction: solanaProcessor.fromParsedInstruction != null ? true : false,
-            rawDataInstruction: solanaProcessor.decodeInstruction != null ? true : false,
-          },
-        }
-        this.contractConfigs.push(contractConfig)
+    for (const solanaProcessor of global.PROCESSOR_STATE.solanaProcessors) {
+      const contractConfig: ContractConfig = {
+        contract: {
+          name: solanaProcessor.contractName,
+          chainId: 'SOL:mainnet', // TODO set in processor
+          address: solanaProcessor.address,
+          abi: '',
+        },
+        blockConfig: undefined,
+        logConfigs: [],
+        startBlock: solanaProcessor.config.startSlot,
+        endBlock: DEFAULT_MAX_BLOCK,
+        instructionConfig: {
+          innerInstruction: solanaProcessor.processInnerInstruction,
+          parsedInstruction: solanaProcessor.fromParsedInstruction != null ? true : false,
+          rawDataInstruction: solanaProcessor.decodeInstruction != null ? true : false,
+        },
       }
+      this.contractConfigs.push(contractConfig)
     }
   }
 

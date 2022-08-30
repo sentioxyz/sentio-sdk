@@ -10,7 +10,7 @@ import { cleanTest } from './clean-test'
 import { MetricValueToNumber } from '../numberish'
 import { TextEncoder } from 'util'
 
-describe('Test Server with Solana Example', () => {
+describe('Test Solana Example', () => {
   const service = new ProcessorServiceImpl(undefined)
   const testContext: CallContext = <CallContext>{}
 
@@ -63,13 +63,13 @@ describe('Test Server with Solana Example', () => {
 
   it('Check SPLToken parsed instruction dispatch', async () => {
     const parsedIns = {
-      "info": {
-          "account": "2SDN4vEJdCdW3pGyhx2km9gB3LeHzMGLrG2j4uVNZfrx",
-          "amount": "12000000000000",
-          "mint": "7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs",
-          "mintAuthority": "BCD75RNBHrJJpW4dXVagL5mPjzRLnVZq4YirJdjEYMV7"
+      info: {
+        account: '2SDN4vEJdCdW3pGyhx2km9gB3LeHzMGLrG2j4uVNZfrx',
+        amount: '12000000000000',
+        mint: '7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs',
+        mintAuthority: 'BCD75RNBHrJJpW4dXVagL5mPjzRLnVZq4YirJdjEYMV7',
       },
-      "type": "mintTo"
+      type: 'mintTo',
     }
     const request: ProcessInstructionRequest = {
       instructions: [
@@ -77,7 +77,7 @@ describe('Test Server with Solana Example', () => {
           instructionData: '',
           slot: Long.fromNumber(0),
           programAccountId: 'wormDTUJ6AWPNvk59vGQbDvGJmqbDTdgWgAqcLBCgUb',
-          parsed: new TextEncoder().encode(JSON.stringify(parsedIns))
+          parsed: new TextEncoder().encode(JSON.stringify(parsedIns)),
         },
       ],
     }

@@ -10,7 +10,7 @@ import * as fs from 'fs-extra'
 import { cleanTest } from './clean-test'
 import { MetricValueToNumber } from '../numberish'
 
-describe('Test Server with Example', () => {
+describe('Test Basic Examples', () => {
   const service = new ProcessorServiceImpl(undefined)
   const testContext: CallContext = <CallContext>{}
 

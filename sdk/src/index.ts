@@ -1,4 +1,5 @@
 export { BaseProcessor } from './base-processor'
+export { GenericProcessor } from './generic-processor'
 export { BaseProcessorTemplate } from './base-processor-template'
 export { Context, ContractView, BoundContractView, SolanaContext } from './context'
 export { ProcessorServiceImpl } from './service'

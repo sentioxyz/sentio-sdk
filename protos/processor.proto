@@ -68,6 +68,7 @@ message BlockHandlerConfig {
 }
 
 message LogHandlerConfig {
+  // todo rename this
   repeated HandlerCondition conditions = 1;
   int32 handler_id = 2;
 }

@@ -10,7 +10,7 @@ import * as fs from 'fs-extra'
 import Long from 'long'
 import { cleanTest } from './clean-test'
 
-describe('Test Server with Example', () => {
+describe('Test Template', () => {
   const service = new ProcessorServiceImpl(undefined)
   const testContext: CallContext = <CallContext>{}
 

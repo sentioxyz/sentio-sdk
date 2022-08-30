@@ -11,6 +11,7 @@ function getKey(abiName: string, address: string, network: Networkish) {
   return [abiName, address.toLowerCase(), chainId].join('_')
 }
 
+// TODO move to processor state
 const addressToName = new Map<string, string>()
 const namerMap = new Map<string, ContractNamer>()
 

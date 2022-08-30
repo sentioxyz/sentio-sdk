@@ -1,9 +1,9 @@
 import { RecordMetaData } from './gen/processor/protos/processor'
-import { Context, SolanaContext } from './context'
+import { Context, EthContext, SolanaContext } from './context'
 import { convertNumber, Numberish } from './numberish'
 import Long from 'long'
 
-function GetRecordMetaData(ctx: Context<any, any> | SolanaContext, name: string, labels: Labels): RecordMetaData {
+function GetRecordMetaData(ctx: EthContext | SolanaContext, name: string, labels: Labels): RecordMetaData {
   if (ctx instanceof Context) {
     if (ctx.log) {
       return {
@@ -44,10 +44,10 @@ function GetRecordMetaData(ctx: Context<any, any> | SolanaContext, name: string,
 export type Labels = { [key: string]: string }
 
 export class Counter {
-  private readonly ctx: Context<any, any> | SolanaContext
+  private readonly ctx: EthContext | SolanaContext
   private readonly name: string
 
-  constructor(name: string, ctx: Context<any, any> | SolanaContext) {
+  constructor(name: string, ctx: EthContext | SolanaContext) {
     this.name = name
     this.ctx = ctx
   }
@@ -72,9 +72,9 @@ export class Counter {
 
 export class Gauge {
   private readonly name: string
-  private readonly ctx: Context<any, any> | SolanaContext
+  private readonly ctx: EthContext | SolanaContext
 
-  constructor(name: string, ctx: Context<any, any> | SolanaContext) {
+  constructor(name: string, ctx: EthContext | SolanaContext) {
     this.name = name
     this.ctx = ctx
   }
@@ -89,13 +89,13 @@ export class Gauge {
 }
 
 export class Meter {
-  private readonly ctx: Context<any, any> | SolanaContext
+  private readonly ctx: EthContext | SolanaContext
 
   // TODO is map necessary since we are sending request remotely?
   // counterMap = new Map<string, Counter>()
   // gaugeMap = new Map<string, Gauge>()
 
-  constructor(ctx: Context<any, any> | SolanaContext) {
+  constructor(ctx: EthContext | SolanaContext) {
     this.ctx = ctx
   }
 

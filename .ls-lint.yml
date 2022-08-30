@@ -24,7 +24,7 @@ ignore:
   - .github
   - node_modules
   - sdk/src/builtin/internal
-  - sdk/src/test-case/types
+  - sdk/src/test/types
   - sdk/dist
   - sdk/node_modules
   - examples

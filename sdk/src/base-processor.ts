@@ -1,14 +1,14 @@
-import { BoundContractView, Context, ContractView } from './context'
-import { Block, Log } from '@ethersproject/abstract-provider'
-import { BaseContract, EventFilter } from 'ethers'
 import { Event } from '@ethersproject/contracts'
 import { BytesLike } from '@ethersproject/bytes'
-import { O11yResult } from './gen/processor/protos/processor'
+import { Block, Log, getNetwork } from '@ethersproject/providers'
+import { BaseContract, EventFilter } from '@ethersproject/contracts'
 import Long from 'long'
-import { BindInternalOptions, BindOptions } from './bind-options'
-import { getNetwork } from '@ethersproject/providers'
 
-class EventsHandler {
+import { BoundContractView, Context, ContractView } from './context'
+import { O11yResult } from './gen/processor/protos/processor'
+import { BindInternalOptions, BindOptions } from './bind-options'
+
+export class EventsHandler {
   filters: EventFilter[]
   handler: (event: Log) => Promise<O11yResult>
 }
@@ -47,10 +47,6 @@ export abstract class BaseProcessor<
   }
 
   protected abstract CreateBoundContractView(): TBoundContractView
-
-  // public isBind() {
-  //   return this.contract.rawContract.address !== ''
-  // }
 
   public getChainId() {
     return getNetwork(this.config.network).chainId.toString()
@@ -116,5 +112,17 @@ export abstract class BaseProcessor<
       }
     })
     return this
+  }
+
+  public onAllEvents(handler: (event: Log, ctx: Context<TContract, TBoundContractView>) => void) {
+    const _filters: EventFilter[] = []
+    const tmpContract = this.CreateBoundContractView()
+
+    for (const key in tmpContract.filters) {
+      _filters.push(tmpContract.filters[key]())
+    }
+    this.onEvent(function (log, ctx) {
+      return handler(log, ctx)
+    }, _filters)
   }
 }

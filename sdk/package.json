@@ -14,7 +14,7 @@
     "test": "ts-mocha --paths src/**/*.test.ts src/*.test.ts",
     "gen_test_abi": "yarn gen_solana_abi",
     "gen_bultin_evm": "typechain --target dist/target-ethers-sentio --out-dir src/builtin/internal 'src/abis/*.json'",
-    "gen_solana_abi": "ts-node src/cli/solana-code-gen.ts src/test-case types"
+    "gen_solana_abi": "ts-node src/cli/solana-code-gen.ts src/test types"
   },
   "bin": {
     "processor-runner": "./dist/processor-runner.js",

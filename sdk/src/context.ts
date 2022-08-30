@@ -4,11 +4,7 @@ import { Block, Log } from '@ethersproject/abstract-provider'
 import { Meter } from './meter'
 import Long from 'long'
 
-export class Context<
-  TContract extends BaseContract,
-  TContractBoundView extends BoundContractView<TContract, ContractView<TContract>>
-> {
-  contract: TContractBoundView
+export class EthContext {
   chainId: string
   log?: Log
   block?: Block
@@ -17,10 +13,7 @@ export class Context<
   counters: CounterResult[] = []
   meter: Meter
 
-  constructor(view: TContractBoundView, chainId: string, block?: Block, log?: Log) {
-    view.context = this
-    this.contract = view
-
+  constructor(chainId: string, block?: Block, log?: Log) {
     this.chainId = chainId
     this.log = log
     this.block = block
@@ -30,6 +23,19 @@ export class Context<
       this.blockNumber = Long.fromNumber(block.number)
     }
     this.meter = new Meter(this)
+  }
+}
+
+export class Context<
+  TContract extends BaseContract,
+  TContractBoundView extends BoundContractView<TContract, ContractView<TContract>>
+> extends EthContext {
+  contract: TContractBoundView
+
+  constructor(view: TContractBoundView, chainId: string, block?: Block, log?: Log) {
+    super(chainId, block, log)
+    view.context = this
+    this.contract = view
   }
 }
 
@@ -66,6 +72,10 @@ export class BoundContractView<TContract extends BaseContract, TContractView ext
 
   get provider() {
     return this.view.provider
+  }
+
+  get filters() {
+    return this.view.filters
   }
 }
 
