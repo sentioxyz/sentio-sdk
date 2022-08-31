@@ -361,7 +361,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       const blockPromises: Promise<O11yResult[]> = Promise.all(
         processor.blockHandlers.map(function (handler) {
           return handler(block).catch((e) => {
-            throw new ServerError(Status.INTERNAL, 'error processing block: ' + jsonString + +'\n' + e.toString())
+            throw new ServerError(Status.INTERNAL, 'error processing block: ' + block.number + '\n' + e.toString())
           })
         })
       )

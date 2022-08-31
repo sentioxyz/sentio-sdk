@@ -32,6 +32,6 @@ export function transformEtherError(e: Error, ctx: Context<any, any> | undefined
   }
   // TODO gracefully handle more errors
 
-  msg = 'ethers call error\n' + e.stack?.toString()
+  msg = 'ethers call error\n' + e.toString()
   return new Error(msg)
 }
