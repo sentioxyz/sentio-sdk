@@ -2,24 +2,23 @@ import { Block, Log } from '@ethersproject/abstract-provider'
 import { CallContext, ServerError, Status } from 'nice-grpc'
 
 import {
+  BlockBinding,
   ContractConfig,
-  HandlerCondition,
   HandlerType,
+  LogFilter,
   LogHandlerConfig,
   O11yResult,
-  ProcessBlockRequest,
-  ProcessBlockResponse,
   ProcessBlocksRequest,
   ProcessBlocksResponse,
   ProcessConfigRequest,
   ProcessConfigResponse,
-  ProcessInstructionRequest,
-  ProcessInstructionResponse,
-  ProcessLogRequest,
-  ProcessLogResponse,
+  ProcessInstructionsRequest,
+  ProcessInstructionsResponse,
+  ProcessLogsRequest,
+  ProcessLogsResponse,
   ProcessorServiceImplementation,
-  ProcessTransactionRequest,
-  ProcessTransactionResponse,
+  ProcessTransactionsRequest,
+  ProcessTransactionsResponse,
   StartRequest,
   TemplateInstance,
 } from './gen/processor/protos/processor'
@@ -36,6 +35,8 @@ const DEFAULT_MAX_BLOCK = Long.ZERO
 
 export class ProcessorServiceImpl implements ProcessorServiceImplementation {
   private eventHandlers: ((event: Log) => Promise<O11yResult>)[] = []
+  private blockHandlers: ((block: Block) => Promise<O11yResult>)[] = []
+
   // map from chain id to list of processors
   // private blockHandlers = new Map<string, ((block: Block) => Promise<O11yResult>)[]>()
   private processorsByChainId = new Map<string, BaseProcessor<BaseContract, BoundContractView<BaseContract, any>>>()
@@ -69,6 +70,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
 
     this.templateInstances = [...global.PROCESSOR_STATE.templatesInstances]
 
+    // Part 1, prepare EVM processors
     for (const processor of global.PROCESSOR_STATE.processors) {
       // If server favor incremental update this need to change
       // Start basic config for contract
@@ -83,8 +85,10 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
           abi: '',
         },
         blockConfig: {
+          // TODO remove this field
           numHandlers: processor.blockHandlers.length,
         },
+        blockConfigs: [],
         logConfigs: [],
         startBlock: processor.config.startBlock,
         endBlock: DEFAULT_MAX_BLOCK,
@@ -94,20 +98,28 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         contractConfig.endBlock = processor.config.endBlock
       }
 
-      // Prepare all the event handlers
+      // Step 1. Prepare all the block handlers
+      for (const blockHandler of processor.blockHandlers) {
+        const handlerId = this.blockHandlers.push(blockHandler) - 1
+        contractConfig.blockConfigs.push({
+          handlerId: handlerId,
+        })
+      }
+
+      // Step 2. Prepare all the event handlers
       for (const eventsHandler of processor.eventHandlers) {
         // associate id with filter
         const handlerId = this.eventHandlers.push(eventsHandler.handler) - 1
         const logConfig: LogHandlerConfig = {
           handlerId: handlerId,
-          conditions: [],
+          filters: [],
         }
 
         for (const filter of eventsHandler.filters) {
           if (!filter.topics) {
             throw new ServerError(Status.INVALID_ARGUMENT, 'Topic should not be null')
           }
-          const condition: HandlerCondition = {
+          const logFilter: LogFilter = {
             topics: [],
           }
 
@@ -118,9 +130,9 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
             } else if (ts) {
               hashes.push(ts)
             }
-            condition.topics.push({ hashes: hashes })
+            logFilter.topics.push({ hashes: hashes })
           }
-          logConfig.conditions.push(condition)
+          logConfig.filters.push(logFilter)
         }
         contractConfig.logConfigs.push(logConfig)
       }
@@ -129,6 +141,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       this.contractConfigs.push(contractConfig)
     }
 
+    // Part 2, prepare solana constractors
     for (const solanaProcessor of global.PROCESSOR_STATE.solanaProcessors) {
       const contractConfig: ContractConfig = {
         contract: {
@@ -138,6 +151,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
           abi: '',
         },
         blockConfig: undefined,
+        blockConfigs: [],
         logConfigs: [],
         startBlock: solanaProcessor.config.startSlot,
         endBlock: DEFAULT_MAX_BLOCK,
@@ -184,7 +198,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     return {}
   }
 
-  async processLog(request: ProcessLogRequest, context: CallContext): Promise<DeepPartial<ProcessLogResponse>> {
+  async processLogs(request: ProcessLogsRequest, context: CallContext): Promise<DeepPartial<ProcessLogsResponse>> {
     if (!this.started) {
       throw new ServerError(Status.UNAVAILABLE, 'Service Not started.')
     }
@@ -195,7 +209,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     }
 
     const promises: Promise<O11yResult>[] = []
-    for (const l of request.logs) {
+    for (const l of request.logBindings) {
       if (!l.log) {
         throw new ServerError(Status.INVALID_ARGUMENT, "Log can't be null")
       }
@@ -238,10 +252,10 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     }
   }
 
-  async processTransaction(
-    request: ProcessTransactionRequest,
+  async processTransactions(
+    request: ProcessTransactionsRequest,
     context: CallContext
-  ): Promise<DeepPartial<ProcessTransactionResponse>> {
+  ): Promise<DeepPartial<ProcessTransactionsResponse>> {
     if (!this.started) {
       throw new ServerError(Status.UNAVAILABLE, 'Service not started.')
     }
@@ -249,10 +263,10 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     throw new ServerError(Status.UNIMPLEMENTED, 'Processing transaction is not suppored.')
   }
 
-  async processInstruction(
-    request: ProcessInstructionRequest,
+  async processInstructions(
+    request: ProcessInstructionsRequest,
     context: CallContext
-  ): Promise<ProcessInstructionResponse> {
+  ): Promise<ProcessInstructionsResponse> {
     if (!this.started) {
       throw new ServerError(Status.UNAVAILABLE, 'Service not started.')
     }
@@ -322,23 +336,31 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     request: ProcessBlocksRequest,
     context: CallContext
   ): Promise<DeepPartial<ProcessBlocksResponse>> {
-    const promises = request.requests.map((req) => this.processBlock(req, context))
-    const resp = await Promise.all(promises)
-
-    return {
-      response: resp,
-    }
-  }
-
-  async processBlock(request: ProcessBlockRequest, context: CallContext): Promise<DeepPartial<ProcessBlockResponse>> {
     if (!this.started) {
       throw new ServerError(Status.UNAVAILABLE, 'Service Not started.')
     }
 
-    if (!request.block) {
+    const promises = request.blockBindings.map((binding) => this.processBlock(binding))
+    const results = await Promise.all(promises)
+
+    const res = O11yResult.fromPartial({})
+
+    for (const r of results) {
+      res.counters = res.counters.concat(r.counters)
+      res.gauges = res.gauges.concat(r.gauges)
+    }
+
+    recordRuntimeInfo(res, HandlerType.BLOCK)
+    return {
+      result: res,
+    }
+  }
+
+  async processBlock(binding: BlockBinding): Promise<O11yResult> {
+    if (!binding.block) {
       throw new ServerError(Status.INVALID_ARGUMENT, "Block can't be empty")
     }
-    const jsonString = Utf8ArrayToStr(request.block.raw)
+    const jsonString = Utf8ArrayToStr(binding.block.raw)
 
     const block: Block = JSON.parse(jsonString)
 
@@ -347,44 +369,19 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       counters: [],
     }
 
-    const promises: Promise<O11yResult[]>[] = []
-    for (const processor of global.PROCESSOR_STATE.processors) {
-      if (Long.fromNumber(block.number) < processor.config.startBlock) {
-        continue
-      }
-
-      if (
-        processor.config.endBlock &&
-        processor.config.endBlock > Long.ZERO &&
-        Long.fromNumber(block.number) > processor.config.endBlock
-      ) {
-        continue
-      }
-
-      // TODO maybe do a map and construct in start
-      const chainId = processor.getChainId()
-      if (chainId !== request.chainId) {
-        continue
-      }
-      const blockPromises: Promise<O11yResult[]> = Promise.all(
-        processor.blockHandlers.map(function (handler) {
-          return handler(block).catch((e) => {
-            throw new ServerError(Status.INTERNAL, 'error processing block: ' + block.number + '\n' + e.toString())
-          })
-        })
-      )
-      promises.push(blockPromises)
+    const promises: Promise<O11yResult>[] = []
+    for (const handlerId of binding.handlerIds) {
+      const promise = this.blockHandlers[handlerId](block).catch((e) => {
+        throw new ServerError(Status.INTERNAL, 'error processing block: ' + block.number + '\n' + e.toString())
+      })
+      promises.push(promise)
     }
-    const allRes = (await Promise.all(promises)).flat()
+    const allRes = await Promise.all(promises)
     for (const res of allRes) {
       resp.counters = resp.counters.concat(res.counters)
       resp.gauges = resp.gauges.concat(res.gauges)
     }
-
-    recordRuntimeInfo(resp, HandlerType.BLOCK)
-    return {
-      result: resp,
-    }
+    return resp
   }
 }
 

@@ -2,7 +2,7 @@
 
 import { expect } from 'chai'
 
-import { HandlerType, LogBinding, ProcessLogRequest, ProcessorServiceImpl, setProvider } from '..'
+import { HandlerType, LogBinding, ProcessLogsRequest, ProcessorServiceImpl, setProvider } from '..'
 
 import { CallContext } from 'nice-grpc-common/src/server/CallContext'
 import * as path from 'path'
@@ -43,8 +43,8 @@ describe('Test Generic Processor', () => {
 
   it('Check log dispatch', async () => {
     const raw = toRaw(logData)
-    const request: ProcessLogRequest = {
-      logs: [],
+    const request: ProcessLogsRequest = {
+      logBindings: [],
     }
 
     const binding = LogBinding.fromPartial({
@@ -54,10 +54,10 @@ describe('Test Generic Processor', () => {
       },
     })
 
-    request.logs.push(binding)
-    request.logs.push(binding)
+    request.logBindings.push(binding)
+    request.logBindings.push(binding)
 
-    const res = await service.processLog(request, testContext)
+    const res = await service.processLogs(request, testContext)
 
     const counters = res.result?.counters
     expect(counters).length(2)

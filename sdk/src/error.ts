@@ -18,20 +18,23 @@ export function transformEtherError(e: Error, ctx: Context<any, any> | undefined
           'data: ' + e.transaction.data,
         ].join('\n')
       } else {
-        if (ctx) {
-          msg += [
-            // @ts-ignore expected error fields
-            "jsonrpc eth_call return '0x' (likely contract not existed): " + e.method + '(' + e.args.join(',') + ')',
-            // @ts-ignore expected error fields
-            'data: ' + e.transaction.data,
-          ].join('\n')
-        }
+        msg += [
+          // @ts-ignore expected error fields
+          "jsonrpc eth_call return '0x' (likely contract not existed): " + e.method + '(' + e.args.join(',') + ')',
+          // @ts-ignore expected error fields
+          'data: ' + e.transaction.data,
+        ].join('\n')
       }
     }
-    return new Error(msg)
+    return { name: 'ETHERS_ERROR', message: msg }
   }
+
+  if (e.name === 'ETHERS_ERROR') {
+    return e
+  }
+
   // TODO gracefully handle more errors
 
-  msg = 'ethers call error\n' + e.toString()
+  msg = 'ethers call error\n' + e.message + '\n' + e.stack?.toString()
   return new Error(msg)
 }

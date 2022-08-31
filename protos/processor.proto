@@ -7,17 +7,28 @@ import "google/protobuf/empty.proto";
 option go_package = "sentioxyz/sentio/processor";
 
 service Processor {
-  rpc GetConfig(ProcessConfigRequest) returns (ProcessConfigResponse);
+  // Start the processor, need to be called before any other RPC calls
   rpc Start(StartRequest) returns (google.protobuf.Empty);
+  // Stop the processor
   rpc Stop(google.protobuf.Empty) returns (google.protobuf.Empty);
+  // Get configs of processor, it will be updated automatically if new contracts is added
+  // during log processing
+  rpc GetConfig(ProcessConfigRequest) returns (ProcessConfigResponse);
 
   // This only applies to EVM-compatible chain
-  rpc ProcessLog(ProcessLogRequest) returns (ProcessLogResponse);
-  rpc ProcessTransaction(ProcessTransactionRequest) returns (ProcessTransactionResponse);
-  rpc ProcessBlock(ProcessBlockRequest) returns (ProcessBlockResponse);
+  // Process a list of logs associate with their handler id
+  // Logs will be ordered by their creation time, the caller should also guarantee
+  // It will also return a flag indicate if new contract config is added during the process
+  rpc ProcessLogs(ProcessLogsRequest) returns (ProcessLogsResponse);
+
+  // Not implemented yet
+  rpc ProcessTransactions(ProcessTransactionsRequest) returns (ProcessTransactionsResponse);
+
+  // Process a list of blocks associate with their handler id
+  // No particular order is assumed for the list of blocks
   rpc ProcessBlocks(ProcessBlocksRequest) returns (ProcessBlocksResponse);
 
-  rpc ProcessInstruction(ProcessInstructionRequest) returns (ProcessInstructionResponse);
+  rpc ProcessInstructions(ProcessInstructionsRequest) returns (ProcessInstructionsResponse);
 }
 
 message ProjectConfig {
@@ -36,7 +47,8 @@ message ProcessConfigResponse {
 
 message ContractConfig {
   ContractInfo contract = 1;
-  BlockHandlerConfig block_config = 2; // may not needed
+  OldBlockHandlerConfig block_config = 2; // deprecate, TODO to be deleted
+  repeated BlockHandlerConfig block_configs = 7;
   repeated LogHandlerConfig log_configs = 3;
   uint64 start_block = 4;
   uint64 end_block = 5;
@@ -60,20 +72,24 @@ message TemplateInstance {
 }
 
 message StartRequest {
-    repeated TemplateInstance template_instances = 1;
+  repeated TemplateInstance template_instances = 1;
 }
 
-message BlockHandlerConfig {
+// deprecate, TODO to be deteled
+message OldBlockHandlerConfig {
   int32 num_handlers = 1;
 }
 
+message BlockHandlerConfig {
+  int32 handler_id = 1;
+}
+
 message LogHandlerConfig {
-  // todo rename this
-  repeated HandlerCondition conditions = 1;
+  repeated LogFilter filters = 1;
   int32 handler_id = 2;
 }
 
-message HandlerCondition {
+message LogFilter {
   repeated Topic topics = 1;
 }
 
@@ -87,53 +103,43 @@ message Topic {
   repeated string hashes = 1;
 }
 
-message ProcessLogRequest {
-  repeated LogBinding logs = 1;
+message ProcessLogsRequest {
+  repeated LogBinding log_bindings = 1;
 }
 
-message ProcessLogResponse {
+message ProcessLogsResponse {
   O11yResult result = 1;
   // Whether config update because of dynamic contract processor creation
   bool config_updated = 4;
 }
 
-message ProcessTransactionRequest {
+message ProcessTransactionsRequest {
   Transaction transaction = 1;
 }
 
-message ProcessInstructionRequest {
+message ProcessInstructionsRequest {
   repeated Instruction instructions = 1;
 }
 
-message ProcessTransactionResponse {
+message ProcessTransactionsResponse {
   O11yResult result = 1;
 }
 
-message ProcessInstructionResponse {
-  O11yResult result = 1;
-}
-
-message ProcessBlockRequest {
-  Block block = 1;
-  string chain_id = 2;
-}
-
-message ProcessBlockResponse {
+message ProcessInstructionsResponse {
   O11yResult result = 1;
 }
 
 message ProcessBlocksRequest {
-  repeated ProcessBlockRequest requests = 1;
+  repeated BlockBinding block_bindings = 2;
 }
 
 message ProcessBlocksResponse {
-  repeated ProcessBlockResponse response = 1;
+  O11yResult result = 2;
 }
 
 message LogBinding {
   Log log = 1;
   int32 handler_id = 2;
-  //  int32 chain_id = 3; // not sure if we need in the future
 }
 
 message Log {
@@ -151,6 +157,12 @@ message Instruction {
   uint64 slot = 2;
   string program_account_id = 3;
   optional bytes parsed = 4;
+}
+
+message BlockBinding {
+  Block block = 1;
+  repeated int32 handler_ids = 2; // TODO consider make log binds contain list of handler id as well
+  string chain_id = 3; // TODO remove this
 }
 
 message Block {
@@ -186,7 +198,6 @@ message MetricValue {
 }
 
 message BigInteger {
-//  bool negative = 1;
   bool negative = 1;
   bytes data = 2;
 }

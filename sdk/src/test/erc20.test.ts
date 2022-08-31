@@ -2,7 +2,14 @@
 
 import { expect } from 'chai'
 
-import { HandlerType, LogBinding, ProcessBlockRequest, ProcessLogRequest, ProcessorServiceImpl, setProvider } from '..'
+import {
+  HandlerType,
+  LogBinding,
+  ProcessBlocksRequest,
+  ProcessLogsRequest,
+  ProcessorServiceImpl,
+  setProvider,
+} from '..'
 
 import { CallContext } from 'nice-grpc-common/src/server/CallContext'
 import * as path from 'path'
@@ -39,14 +46,19 @@ describe('Test Basic Examples', () => {
   it('Check block dispatch', async () => {
     const raw = toRaw(blockData)
 
-    const request: ProcessBlockRequest = {
-      block: {
-        raw: raw,
-      },
-      chainId: '1',
+    const request: ProcessBlocksRequest = {
+      blockBindings: [
+        {
+          block: {
+            raw: raw,
+          },
+          handlerIds: [0],
+          chainId: '', // TODO remove
+        },
+      ],
     }
-    const res = await service.processBlocks({ requests: [request] }, testContext)
-    const o11yRes = res.response?.[0].result
+    const res = await service.processBlocks(request, testContext)
+    const o11yRes = res.result
     expect(o11yRes?.counters).length(0)
     expect(o11yRes?.gauges).length(1)
     expect(MetricValueToNumber(o11yRes?.gauges?.[0].metricValue)).equals(10n)
@@ -55,15 +67,20 @@ describe('Test Basic Examples', () => {
     expect(gauge?.metadata?.blockNumber?.toString()).equals('14373295')
     expect(gauge?.runtimeInfo?.from).equals(HandlerType.BLOCK)
 
-    // Different chainId should be dispatch to other
-    const request2: ProcessBlockRequest = {
-      block: {
-        raw: raw,
-      },
-      chainId: '56',
+    // Different handler id should be dispatch to other
+    const request2: ProcessBlocksRequest = {
+      blockBindings: [
+        {
+          block: {
+            raw: raw,
+          },
+          handlerIds: [1],
+          chainId: '', // TODO remove
+        },
+      ],
     }
-    const res2 = await service.processBlocks({ requests: [request2] }, testContext)
-    const o11yRes2 = res2.response?.[0].result
+    const res2 = await service.processBlocks(request2, testContext)
+    const o11yRes2 = res2.result
     expect(o11yRes2?.counters).length(0)
     expect(o11yRes2?.gauges).length(1)
     expect(MetricValueToNumber(o11yRes2?.gauges?.[0].metricValue)).equals(20n)
@@ -71,8 +88,8 @@ describe('Test Basic Examples', () => {
 
   it('Check log dispatch', async () => {
     const raw = toRaw(logData)
-    const request: ProcessLogRequest = {
-      logs: [],
+    const request: ProcessLogsRequest = {
+      logBindings: [],
     }
 
     const binding = LogBinding.fromPartial({
@@ -82,7 +99,7 @@ describe('Test Basic Examples', () => {
       },
     })
 
-    request.logs.push(binding)
+    request.logBindings.push(binding)
 
     // just faked some logs here
     const binding2 = LogBinding.fromPartial({
@@ -91,9 +108,9 @@ describe('Test Basic Examples', () => {
         raw: raw,
       },
     })
-    request.logs.push(binding2)
+    request.logBindings.push(binding2)
 
-    const res = await service.processLog(request, testContext)
+    const res = await service.processLogs(request, testContext)
 
     const counters = res.result?.counters
     expect(counters).length(2)
@@ -112,7 +129,7 @@ describe('Test Basic Examples', () => {
     expect(config.contractConfigs?.[5].contract?.name).equals('dynamic')
 
     // repeat trigger won't bind again
-    await service.processLog(request, testContext)
+    await service.processLogs(request, testContext)
     const config2 = await service.getConfig({}, testContext)
     expect(config).deep.equals(config2)
   })

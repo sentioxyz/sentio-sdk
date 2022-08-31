@@ -7,7 +7,7 @@ import Long from 'long'
 import { BoundContractView, Context, ContractView } from './context'
 import { O11yResult } from './gen/processor/protos/processor'
 import { BindInternalOptions, BindOptions } from './bind-options'
-import { PromiseOrValue } from './promise-or-value'
+import { PromiseOrVoid } from './promise-or-void'
 
 export class EventsHandler {
   filters: EventFilter[]
@@ -54,7 +54,7 @@ export abstract class BaseProcessor<
   }
 
   public onEvent(
-    handler: (event: Event, ctx: Context<TContract, TBoundContractView>) => PromiseOrValue<void>,
+    handler: (event: Event, ctx: Context<TContract, TBoundContractView>) => PromiseOrVoid,
     filter: EventFilter | EventFilter[]
   ) {
     const chainId = this.getChainId()
@@ -100,7 +100,7 @@ export abstract class BaseProcessor<
     return this
   }
 
-  public onBlock(handler: (block: Block, ctx: Context<TContract, TBoundContractView>) => PromiseOrValue<void>) {
+  public onBlock(handler: (block: Block, ctx: Context<TContract, TBoundContractView>) => PromiseOrVoid) {
     const chainId = this.getChainId()
     const contractView = this.CreateBoundContractView()
 
@@ -115,7 +115,7 @@ export abstract class BaseProcessor<
     return this
   }
 
-  public onAllEvents(handler: (event: Log, ctx: Context<TContract, TBoundContractView>) => PromiseOrValue<void>) {
+  public onAllEvents(handler: (event: Log, ctx: Context<TContract, TBoundContractView>) => PromiseOrVoid) {
     const _filters: EventFilter[] = []
     const tmpContract = this.CreateBoundContractView()
 

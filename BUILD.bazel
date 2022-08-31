@@ -7,4 +7,5 @@ write_source_files(
         "sdk/src/gen/processor/protos/processor.ts": "//processor/protos:processor_ts_proto",
         "sdk/src/gen/google/protobuf/empty.ts": "//processor/protos:empty_ts_proto",
     },
+    tags = ["manual"],
 )

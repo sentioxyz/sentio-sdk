@@ -9,7 +9,7 @@
     "start_ts_solana": "ts-node --files src/processor-runner.ts ../examples/mirrorworld/src/processor.ts",
     "start": "ts-node --files src/processor-runner.ts ../examples/x2y2/dist/lib.js",
     "start_js": "node dist/processor.js ../examples/x2y2/dist/lib.js",
-    "ts-start": "ts-node --files src/processor-runner.ts ../examples/wormhole/src/processor.ts",
+    "ts-start": "ts-node --files src/processor-runner.ts ./src/anyswap/src/processor.ts",
     "cli": "yarn build && node dist/cli/cli.js",
     "test": "ts-mocha --paths src/**/*.test.ts src/*.test.ts",
     "gen_test_abi": "yarn gen_solana_abi",

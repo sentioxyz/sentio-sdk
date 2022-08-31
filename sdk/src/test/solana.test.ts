@@ -2,7 +2,7 @@
 
 import { expect } from 'chai'
 
-import { HandlerType, ProcessInstructionRequest, ProcessorServiceImpl } from '..'
+import { HandlerType, ProcessInstructionsRequest, ProcessorServiceImpl } from '..'
 
 import { CallContext } from 'nice-grpc-common/src/server/CallContext'
 import Long from 'long'
@@ -28,7 +28,7 @@ describe('Test Solana Example', () => {
   })
 
   it('Check mirrorworld instruction dispatch', async () => {
-    const request: ProcessInstructionRequest = {
+    const request: ProcessInstructionsRequest = {
       instructions: [
         {
           instructionData: 'CACadoFwjNvan4GP8gh3Jtm1qdeoKX5j2SbSNEiB',
@@ -37,14 +37,14 @@ describe('Test Solana Example', () => {
         },
       ],
     }
-    const res = await service.processInstruction(request, testContext)
+    const res = await service.processInstructions(request, testContext)
     expect(res.result?.counters).length(3)
     expect(res.result?.gauges).length(0)
     expect(MetricValueToNumber(res.result?.counters[0].metricValue)).equal(5000000000n)
   })
 
   it('Check wormhole token bridge instruction dispatch', async () => {
-    const request: ProcessInstructionRequest = {
+    const request: ProcessInstructionsRequest = {
       instructions: [
         {
           instructionData: '33G5T8yXAQWdH8FX7fTy1mBJ6e4dUKfQWbViSrT7qJjpS8UAA3ftEQx9sNzrkaJm56xtENhDsWf',
@@ -58,7 +58,7 @@ describe('Test Solana Example', () => {
         },
       ],
     }
-    const res = await service.processInstruction(request, testContext)
+    const res = await service.processInstructions(request, testContext)
     expect(res.result?.counters).length(2)
     expect(res.result?.gauges).length(0)
     expect(res.result?.counters[0].metadata?.blockNumber.toInt()).equal(0)
@@ -76,7 +76,7 @@ describe('Test Solana Example', () => {
       },
       type: 'mintTo',
     }
-    const request: ProcessInstructionRequest = {
+    const request: ProcessInstructionsRequest = {
       instructions: [
         {
           instructionData: '',
@@ -86,7 +86,7 @@ describe('Test Solana Example', () => {
         },
       ],
     }
-    const res = await service.processInstruction(request, testContext)
+    const res = await service.processInstructions(request, testContext)
     expect(res.result?.counters).length(1)
     expect(res.result?.gauges).length(0)
     expect(res.result?.counters[0].metadata?.blockNumber.toInt()).equal(0)

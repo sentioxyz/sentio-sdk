@@ -7,7 +7,7 @@ import { BindOptions, getOptionsSignature } from './bind-options'
 import { TemplateInstance } from './gen/processor/protos/processor'
 import Long from 'long'
 import { getNetwork } from '@ethersproject/providers'
-import { PromiseOrValue } from './promise-or-value'
+import { PromiseOrVoid } from './promise-or-void'
 
 export abstract class BaseProcessorTemplate<
   TContract extends BaseContract,
@@ -15,9 +15,9 @@ export abstract class BaseProcessorTemplate<
 > {
   id: number
   binds = new Set<string>()
-  blockHandlers: ((block: Block, ctx: Context<TContract, TBoundContractView>) => PromiseOrValue<void>)[] = []
+  blockHandlers: ((block: Block, ctx: Context<TContract, TBoundContractView>) => PromiseOrVoid)[] = []
   eventHandlers: {
-    handler: (event: Event, ctx: Context<TContract, TBoundContractView>) => PromiseOrValue<void>
+    handler: (event: Event, ctx: Context<TContract, TBoundContractView>) => PromiseOrVoid
     filter: EventFilter | EventFilter[]
   }[] = []
 
@@ -73,7 +73,7 @@ export abstract class BaseProcessorTemplate<
   }
 
   public onEvent(
-    handler: (event: Event, ctx: Context<TContract, TBoundContractView>) => PromiseOrValue<void>,
+    handler: (event: Event, ctx: Context<TContract, TBoundContractView>) => PromiseOrVoid,
     filter: EventFilter | EventFilter[]
   ) {
     this.eventHandlers.push({
@@ -83,7 +83,7 @@ export abstract class BaseProcessorTemplate<
     return this
   }
 
-  public onBlock(handler: (block: Block, ctx: Context<TContract, TBoundContractView>) => PromiseOrValue<void>) {
+  public onBlock(handler: (block: Block, ctx: Context<TContract, TBoundContractView>) => PromiseOrVoid) {
     this.blockHandlers.push(handler)
     return this
   }

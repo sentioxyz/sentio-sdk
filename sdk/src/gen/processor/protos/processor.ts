@@ -70,7 +70,8 @@ export interface ProcessConfigResponse {
 
 export interface ContractConfig {
   contract: ContractInfo | undefined;
-  blockConfig: BlockHandlerConfig | undefined;
+  blockConfig: OldBlockHandlerConfig | undefined;
+  blockConfigs: BlockHandlerConfig[];
   logConfigs: LogHandlerConfig[];
   startBlock: Long;
   endBlock: Long;
@@ -95,16 +96,20 @@ export interface StartRequest {
   templateInstances: TemplateInstance[];
 }
 
-export interface BlockHandlerConfig {
+export interface OldBlockHandlerConfig {
   numHandlers: number;
 }
 
-export interface LogHandlerConfig {
-  conditions: HandlerCondition[];
+export interface BlockHandlerConfig {
   handlerId: number;
 }
 
-export interface HandlerCondition {
+export interface LogHandlerConfig {
+  filters: LogFilter[];
+  handlerId: number;
+}
+
+export interface LogFilter {
   topics: Topic[];
 }
 
@@ -118,46 +123,37 @@ export interface Topic {
   hashes: string[];
 }
 
-export interface ProcessLogRequest {
-  logs: LogBinding[];
+export interface ProcessLogsRequest {
+  logBindings: LogBinding[];
 }
 
-export interface ProcessLogResponse {
+export interface ProcessLogsResponse {
   result: O11yResult | undefined;
   configUpdated: boolean;
 }
 
-export interface ProcessTransactionRequest {
+export interface ProcessTransactionsRequest {
   transaction: Transaction | undefined;
 }
 
-export interface ProcessInstructionRequest {
+export interface ProcessInstructionsRequest {
   instructions: Instruction[];
 }
 
-export interface ProcessTransactionResponse {
+export interface ProcessTransactionsResponse {
   result: O11yResult | undefined;
 }
 
-export interface ProcessInstructionResponse {
-  result: O11yResult | undefined;
-}
-
-export interface ProcessBlockRequest {
-  block: Block | undefined;
-  chainId: string;
-}
-
-export interface ProcessBlockResponse {
+export interface ProcessInstructionsResponse {
   result: O11yResult | undefined;
 }
 
 export interface ProcessBlocksRequest {
-  requests: ProcessBlockRequest[];
+  blockBindings: BlockBinding[];
 }
 
 export interface ProcessBlocksResponse {
-  response: ProcessBlockResponse[];
+  result: O11yResult | undefined;
 }
 
 export interface LogBinding {
@@ -180,6 +176,12 @@ export interface Instruction {
   slot: Long;
   programAccountId: string;
   parsed?: Uint8Array | undefined;
+}
+
+export interface BlockBinding {
+  block: Block | undefined;
+  handlerIds: number[];
+  chainId: string;
 }
 
 export interface Block {
@@ -450,6 +452,7 @@ function createBaseContractConfig(): ContractConfig {
   return {
     contract: undefined,
     blockConfig: undefined,
+    blockConfigs: [],
     logConfigs: [],
     startBlock: Long.UZERO,
     endBlock: Long.UZERO,
@@ -466,10 +469,13 @@ export const ContractConfig = {
       ContractInfo.encode(message.contract, writer.uint32(10).fork()).ldelim();
     }
     if (message.blockConfig !== undefined) {
-      BlockHandlerConfig.encode(
+      OldBlockHandlerConfig.encode(
         message.blockConfig,
         writer.uint32(18).fork()
       ).ldelim();
+    }
+    for (const v of message.blockConfigs) {
+      BlockHandlerConfig.encode(v!, writer.uint32(58).fork()).ldelim();
     }
     for (const v of message.logConfigs) {
       LogHandlerConfig.encode(v!, writer.uint32(26).fork()).ldelim();
@@ -500,9 +506,14 @@ export const ContractConfig = {
           message.contract = ContractInfo.decode(reader, reader.uint32());
           break;
         case 2:
-          message.blockConfig = BlockHandlerConfig.decode(
+          message.blockConfig = OldBlockHandlerConfig.decode(
             reader,
             reader.uint32()
+          );
+          break;
+        case 7:
+          message.blockConfigs.push(
+            BlockHandlerConfig.decode(reader, reader.uint32())
           );
           break;
         case 3:
@@ -536,8 +547,11 @@ export const ContractConfig = {
         ? ContractInfo.fromJSON(object.contract)
         : undefined,
       blockConfig: isSet(object.blockConfig)
-        ? BlockHandlerConfig.fromJSON(object.blockConfig)
+        ? OldBlockHandlerConfig.fromJSON(object.blockConfig)
         : undefined,
+      blockConfigs: Array.isArray(object?.blockConfigs)
+        ? object.blockConfigs.map((e: any) => BlockHandlerConfig.fromJSON(e))
+        : [],
       logConfigs: Array.isArray(object?.logConfigs)
         ? object.logConfigs.map((e: any) => LogHandlerConfig.fromJSON(e))
         : [],
@@ -561,8 +575,15 @@ export const ContractConfig = {
         : undefined);
     message.blockConfig !== undefined &&
       (obj.blockConfig = message.blockConfig
-        ? BlockHandlerConfig.toJSON(message.blockConfig)
+        ? OldBlockHandlerConfig.toJSON(message.blockConfig)
         : undefined);
+    if (message.blockConfigs) {
+      obj.blockConfigs = message.blockConfigs.map((e) =>
+        e ? BlockHandlerConfig.toJSON(e) : undefined
+      );
+    } else {
+      obj.blockConfigs = [];
+    }
     if (message.logConfigs) {
       obj.logConfigs = message.logConfigs.map((e) =>
         e ? LogHandlerConfig.toJSON(e) : undefined
@@ -589,8 +610,10 @@ export const ContractConfig = {
         : undefined;
     message.blockConfig =
       object.blockConfig !== undefined && object.blockConfig !== null
-        ? BlockHandlerConfig.fromPartial(object.blockConfig)
+        ? OldBlockHandlerConfig.fromPartial(object.blockConfig)
         : undefined;
+    message.blockConfigs =
+      object.blockConfigs?.map((e) => BlockHandlerConfig.fromPartial(e)) || [];
     message.logConfigs =
       object.logConfigs?.map((e) => LogHandlerConfig.fromPartial(e)) || [];
     message.startBlock =
@@ -858,13 +881,13 @@ export const StartRequest = {
   },
 };
 
-function createBaseBlockHandlerConfig(): BlockHandlerConfig {
+function createBaseOldBlockHandlerConfig(): OldBlockHandlerConfig {
   return { numHandlers: 0 };
 }
 
-export const BlockHandlerConfig = {
+export const OldBlockHandlerConfig = {
   encode(
-    message: BlockHandlerConfig,
+    message: OldBlockHandlerConfig,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.numHandlers !== 0) {
@@ -873,10 +896,13 @@ export const BlockHandlerConfig = {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): BlockHandlerConfig {
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): OldBlockHandlerConfig {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseBlockHandlerConfig();
+    const message = createBaseOldBlockHandlerConfig();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -891,28 +917,83 @@ export const BlockHandlerConfig = {
     return message;
   },
 
-  fromJSON(object: any): BlockHandlerConfig {
+  fromJSON(object: any): OldBlockHandlerConfig {
     return {
       numHandlers: isSet(object.numHandlers) ? Number(object.numHandlers) : 0,
     };
   },
 
-  toJSON(message: BlockHandlerConfig): unknown {
+  toJSON(message: OldBlockHandlerConfig): unknown {
     const obj: any = {};
     message.numHandlers !== undefined &&
       (obj.numHandlers = Math.round(message.numHandlers));
     return obj;
   },
 
-  fromPartial(object: DeepPartial<BlockHandlerConfig>): BlockHandlerConfig {
-    const message = createBaseBlockHandlerConfig();
+  fromPartial(
+    object: DeepPartial<OldBlockHandlerConfig>
+  ): OldBlockHandlerConfig {
+    const message = createBaseOldBlockHandlerConfig();
     message.numHandlers = object.numHandlers ?? 0;
     return message;
   },
 };
 
+function createBaseBlockHandlerConfig(): BlockHandlerConfig {
+  return { handlerId: 0 };
+}
+
+export const BlockHandlerConfig = {
+  encode(
+    message: BlockHandlerConfig,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.handlerId !== 0) {
+      writer.uint32(8).int32(message.handlerId);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): BlockHandlerConfig {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseBlockHandlerConfig();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.handlerId = reader.int32();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): BlockHandlerConfig {
+    return {
+      handlerId: isSet(object.handlerId) ? Number(object.handlerId) : 0,
+    };
+  },
+
+  toJSON(message: BlockHandlerConfig): unknown {
+    const obj: any = {};
+    message.handlerId !== undefined &&
+      (obj.handlerId = Math.round(message.handlerId));
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<BlockHandlerConfig>): BlockHandlerConfig {
+    const message = createBaseBlockHandlerConfig();
+    message.handlerId = object.handlerId ?? 0;
+    return message;
+  },
+};
+
 function createBaseLogHandlerConfig(): LogHandlerConfig {
-  return { conditions: [], handlerId: 0 };
+  return { filters: [], handlerId: 0 };
 }
 
 export const LogHandlerConfig = {
@@ -920,8 +1001,8 @@ export const LogHandlerConfig = {
     message: LogHandlerConfig,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    for (const v of message.conditions) {
-      HandlerCondition.encode(v!, writer.uint32(10).fork()).ldelim();
+    for (const v of message.filters) {
+      LogFilter.encode(v!, writer.uint32(10).fork()).ldelim();
     }
     if (message.handlerId !== 0) {
       writer.uint32(16).int32(message.handlerId);
@@ -937,9 +1018,7 @@ export const LogHandlerConfig = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.conditions.push(
-            HandlerCondition.decode(reader, reader.uint32())
-          );
+          message.filters.push(LogFilter.decode(reader, reader.uint32()));
           break;
         case 2:
           message.handlerId = reader.int32();
@@ -954,8 +1033,8 @@ export const LogHandlerConfig = {
 
   fromJSON(object: any): LogHandlerConfig {
     return {
-      conditions: Array.isArray(object?.conditions)
-        ? object.conditions.map((e: any) => HandlerCondition.fromJSON(e))
+      filters: Array.isArray(object?.filters)
+        ? object.filters.map((e: any) => LogFilter.fromJSON(e))
         : [],
       handlerId: isSet(object.handlerId) ? Number(object.handlerId) : 0,
     };
@@ -963,12 +1042,12 @@ export const LogHandlerConfig = {
 
   toJSON(message: LogHandlerConfig): unknown {
     const obj: any = {};
-    if (message.conditions) {
-      obj.conditions = message.conditions.map((e) =>
-        e ? HandlerCondition.toJSON(e) : undefined
+    if (message.filters) {
+      obj.filters = message.filters.map((e) =>
+        e ? LogFilter.toJSON(e) : undefined
       );
     } else {
-      obj.conditions = [];
+      obj.filters = [];
     }
     message.handlerId !== undefined &&
       (obj.handlerId = Math.round(message.handlerId));
@@ -977,20 +1056,20 @@ export const LogHandlerConfig = {
 
   fromPartial(object: DeepPartial<LogHandlerConfig>): LogHandlerConfig {
     const message = createBaseLogHandlerConfig();
-    message.conditions =
-      object.conditions?.map((e) => HandlerCondition.fromPartial(e)) || [];
+    message.filters =
+      object.filters?.map((e) => LogFilter.fromPartial(e)) || [];
     message.handlerId = object.handlerId ?? 0;
     return message;
   },
 };
 
-function createBaseHandlerCondition(): HandlerCondition {
+function createBaseLogFilter(): LogFilter {
   return { topics: [] };
 }
 
-export const HandlerCondition = {
+export const LogFilter = {
   encode(
-    message: HandlerCondition,
+    message: LogFilter,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     for (const v of message.topics) {
@@ -999,10 +1078,10 @@ export const HandlerCondition = {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): HandlerCondition {
+  decode(input: _m0.Reader | Uint8Array, length?: number): LogFilter {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseHandlerCondition();
+    const message = createBaseLogFilter();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1017,7 +1096,7 @@ export const HandlerCondition = {
     return message;
   },
 
-  fromJSON(object: any): HandlerCondition {
+  fromJSON(object: any): LogFilter {
     return {
       topics: Array.isArray(object?.topics)
         ? object.topics.map((e: any) => Topic.fromJSON(e))
@@ -1025,7 +1104,7 @@ export const HandlerCondition = {
     };
   },
 
-  toJSON(message: HandlerCondition): unknown {
+  toJSON(message: LogFilter): unknown {
     const obj: any = {};
     if (message.topics) {
       obj.topics = message.topics.map((e) => (e ? Topic.toJSON(e) : undefined));
@@ -1035,8 +1114,8 @@ export const HandlerCondition = {
     return obj;
   },
 
-  fromPartial(object: DeepPartial<HandlerCondition>): HandlerCondition {
-    const message = createBaseHandlerCondition();
+  fromPartial(object: DeepPartial<LogFilter>): LogFilter {
+    const message = createBaseLogFilter();
     message.topics = object.topics?.map((e) => Topic.fromPartial(e)) || [];
     return message;
   },
@@ -1185,30 +1264,30 @@ export const Topic = {
   },
 };
 
-function createBaseProcessLogRequest(): ProcessLogRequest {
-  return { logs: [] };
+function createBaseProcessLogsRequest(): ProcessLogsRequest {
+  return { logBindings: [] };
 }
 
-export const ProcessLogRequest = {
+export const ProcessLogsRequest = {
   encode(
-    message: ProcessLogRequest,
+    message: ProcessLogsRequest,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    for (const v of message.logs) {
+    for (const v of message.logBindings) {
       LogBinding.encode(v!, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): ProcessLogRequest {
+  decode(input: _m0.Reader | Uint8Array, length?: number): ProcessLogsRequest {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseProcessLogRequest();
+    const message = createBaseProcessLogsRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.logs.push(LogBinding.decode(reader, reader.uint32()));
+          message.logBindings.push(LogBinding.decode(reader, reader.uint32()));
           break;
         default:
           reader.skipType(tag & 7);
@@ -1218,40 +1297,41 @@ export const ProcessLogRequest = {
     return message;
   },
 
-  fromJSON(object: any): ProcessLogRequest {
+  fromJSON(object: any): ProcessLogsRequest {
     return {
-      logs: Array.isArray(object?.logs)
-        ? object.logs.map((e: any) => LogBinding.fromJSON(e))
+      logBindings: Array.isArray(object?.logBindings)
+        ? object.logBindings.map((e: any) => LogBinding.fromJSON(e))
         : [],
     };
   },
 
-  toJSON(message: ProcessLogRequest): unknown {
+  toJSON(message: ProcessLogsRequest): unknown {
     const obj: any = {};
-    if (message.logs) {
-      obj.logs = message.logs.map((e) =>
+    if (message.logBindings) {
+      obj.logBindings = message.logBindings.map((e) =>
         e ? LogBinding.toJSON(e) : undefined
       );
     } else {
-      obj.logs = [];
+      obj.logBindings = [];
     }
     return obj;
   },
 
-  fromPartial(object: DeepPartial<ProcessLogRequest>): ProcessLogRequest {
-    const message = createBaseProcessLogRequest();
-    message.logs = object.logs?.map((e) => LogBinding.fromPartial(e)) || [];
+  fromPartial(object: DeepPartial<ProcessLogsRequest>): ProcessLogsRequest {
+    const message = createBaseProcessLogsRequest();
+    message.logBindings =
+      object.logBindings?.map((e) => LogBinding.fromPartial(e)) || [];
     return message;
   },
 };
 
-function createBaseProcessLogResponse(): ProcessLogResponse {
+function createBaseProcessLogsResponse(): ProcessLogsResponse {
   return { result: undefined, configUpdated: false };
 }
 
-export const ProcessLogResponse = {
+export const ProcessLogsResponse = {
   encode(
-    message: ProcessLogResponse,
+    message: ProcessLogsResponse,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.result !== undefined) {
@@ -1263,10 +1343,10 @@ export const ProcessLogResponse = {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): ProcessLogResponse {
+  decode(input: _m0.Reader | Uint8Array, length?: number): ProcessLogsResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseProcessLogResponse();
+    const message = createBaseProcessLogsResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1284,7 +1364,7 @@ export const ProcessLogResponse = {
     return message;
   },
 
-  fromJSON(object: any): ProcessLogResponse {
+  fromJSON(object: any): ProcessLogsResponse {
     return {
       result: isSet(object.result)
         ? O11yResult.fromJSON(object.result)
@@ -1295,7 +1375,7 @@ export const ProcessLogResponse = {
     };
   },
 
-  toJSON(message: ProcessLogResponse): unknown {
+  toJSON(message: ProcessLogsResponse): unknown {
     const obj: any = {};
     message.result !== undefined &&
       (obj.result = message.result
@@ -1306,8 +1386,8 @@ export const ProcessLogResponse = {
     return obj;
   },
 
-  fromPartial(object: DeepPartial<ProcessLogResponse>): ProcessLogResponse {
-    const message = createBaseProcessLogResponse();
+  fromPartial(object: DeepPartial<ProcessLogsResponse>): ProcessLogsResponse {
+    const message = createBaseProcessLogsResponse();
     message.result =
       object.result !== undefined && object.result !== null
         ? O11yResult.fromPartial(object.result)
@@ -1317,13 +1397,13 @@ export const ProcessLogResponse = {
   },
 };
 
-function createBaseProcessTransactionRequest(): ProcessTransactionRequest {
+function createBaseProcessTransactionsRequest(): ProcessTransactionsRequest {
   return { transaction: undefined };
 }
 
-export const ProcessTransactionRequest = {
+export const ProcessTransactionsRequest = {
   encode(
-    message: ProcessTransactionRequest,
+    message: ProcessTransactionsRequest,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.transaction !== undefined) {
@@ -1338,10 +1418,10 @@ export const ProcessTransactionRequest = {
   decode(
     input: _m0.Reader | Uint8Array,
     length?: number
-  ): ProcessTransactionRequest {
+  ): ProcessTransactionsRequest {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseProcessTransactionRequest();
+    const message = createBaseProcessTransactionsRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1356,7 +1436,7 @@ export const ProcessTransactionRequest = {
     return message;
   },
 
-  fromJSON(object: any): ProcessTransactionRequest {
+  fromJSON(object: any): ProcessTransactionsRequest {
     return {
       transaction: isSet(object.transaction)
         ? Transaction.fromJSON(object.transaction)
@@ -1364,7 +1444,7 @@ export const ProcessTransactionRequest = {
     };
   },
 
-  toJSON(message: ProcessTransactionRequest): unknown {
+  toJSON(message: ProcessTransactionsRequest): unknown {
     const obj: any = {};
     message.transaction !== undefined &&
       (obj.transaction = message.transaction
@@ -1374,9 +1454,9 @@ export const ProcessTransactionRequest = {
   },
 
   fromPartial(
-    object: DeepPartial<ProcessTransactionRequest>
-  ): ProcessTransactionRequest {
-    const message = createBaseProcessTransactionRequest();
+    object: DeepPartial<ProcessTransactionsRequest>
+  ): ProcessTransactionsRequest {
+    const message = createBaseProcessTransactionsRequest();
     message.transaction =
       object.transaction !== undefined && object.transaction !== null
         ? Transaction.fromPartial(object.transaction)
@@ -1385,13 +1465,13 @@ export const ProcessTransactionRequest = {
   },
 };
 
-function createBaseProcessInstructionRequest(): ProcessInstructionRequest {
+function createBaseProcessInstructionsRequest(): ProcessInstructionsRequest {
   return { instructions: [] };
 }
 
-export const ProcessInstructionRequest = {
+export const ProcessInstructionsRequest = {
   encode(
-    message: ProcessInstructionRequest,
+    message: ProcessInstructionsRequest,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     for (const v of message.instructions) {
@@ -1403,10 +1483,10 @@ export const ProcessInstructionRequest = {
   decode(
     input: _m0.Reader | Uint8Array,
     length?: number
-  ): ProcessInstructionRequest {
+  ): ProcessInstructionsRequest {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseProcessInstructionRequest();
+    const message = createBaseProcessInstructionsRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1423,7 +1503,7 @@ export const ProcessInstructionRequest = {
     return message;
   },
 
-  fromJSON(object: any): ProcessInstructionRequest {
+  fromJSON(object: any): ProcessInstructionsRequest {
     return {
       instructions: Array.isArray(object?.instructions)
         ? object.instructions.map((e: any) => Instruction.fromJSON(e))
@@ -1431,7 +1511,7 @@ export const ProcessInstructionRequest = {
     };
   },
 
-  toJSON(message: ProcessInstructionRequest): unknown {
+  toJSON(message: ProcessInstructionsRequest): unknown {
     const obj: any = {};
     if (message.instructions) {
       obj.instructions = message.instructions.map((e) =>
@@ -1444,22 +1524,22 @@ export const ProcessInstructionRequest = {
   },
 
   fromPartial(
-    object: DeepPartial<ProcessInstructionRequest>
-  ): ProcessInstructionRequest {
-    const message = createBaseProcessInstructionRequest();
+    object: DeepPartial<ProcessInstructionsRequest>
+  ): ProcessInstructionsRequest {
+    const message = createBaseProcessInstructionsRequest();
     message.instructions =
       object.instructions?.map((e) => Instruction.fromPartial(e)) || [];
     return message;
   },
 };
 
-function createBaseProcessTransactionResponse(): ProcessTransactionResponse {
+function createBaseProcessTransactionsResponse(): ProcessTransactionsResponse {
   return { result: undefined };
 }
 
-export const ProcessTransactionResponse = {
+export const ProcessTransactionsResponse = {
   encode(
-    message: ProcessTransactionResponse,
+    message: ProcessTransactionsResponse,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.result !== undefined) {
@@ -1471,10 +1551,10 @@ export const ProcessTransactionResponse = {
   decode(
     input: _m0.Reader | Uint8Array,
     length?: number
-  ): ProcessTransactionResponse {
+  ): ProcessTransactionsResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseProcessTransactionResponse();
+    const message = createBaseProcessTransactionsResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1489,7 +1569,7 @@ export const ProcessTransactionResponse = {
     return message;
   },
 
-  fromJSON(object: any): ProcessTransactionResponse {
+  fromJSON(object: any): ProcessTransactionsResponse {
     return {
       result: isSet(object.result)
         ? O11yResult.fromJSON(object.result)
@@ -1497,7 +1577,7 @@ export const ProcessTransactionResponse = {
     };
   },
 
-  toJSON(message: ProcessTransactionResponse): unknown {
+  toJSON(message: ProcessTransactionsResponse): unknown {
     const obj: any = {};
     message.result !== undefined &&
       (obj.result = message.result
@@ -1507,9 +1587,9 @@ export const ProcessTransactionResponse = {
   },
 
   fromPartial(
-    object: DeepPartial<ProcessTransactionResponse>
-  ): ProcessTransactionResponse {
-    const message = createBaseProcessTransactionResponse();
+    object: DeepPartial<ProcessTransactionsResponse>
+  ): ProcessTransactionsResponse {
+    const message = createBaseProcessTransactionsResponse();
     message.result =
       object.result !== undefined && object.result !== null
         ? O11yResult.fromPartial(object.result)
@@ -1518,13 +1598,13 @@ export const ProcessTransactionResponse = {
   },
 };
 
-function createBaseProcessInstructionResponse(): ProcessInstructionResponse {
+function createBaseProcessInstructionsResponse(): ProcessInstructionsResponse {
   return { result: undefined };
 }
 
-export const ProcessInstructionResponse = {
+export const ProcessInstructionsResponse = {
   encode(
-    message: ProcessInstructionResponse,
+    message: ProcessInstructionsResponse,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.result !== undefined) {
@@ -1536,10 +1616,10 @@ export const ProcessInstructionResponse = {
   decode(
     input: _m0.Reader | Uint8Array,
     length?: number
-  ): ProcessInstructionResponse {
+  ): ProcessInstructionsResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseProcessInstructionResponse();
+    const message = createBaseProcessInstructionsResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1554,7 +1634,7 @@ export const ProcessInstructionResponse = {
     return message;
   },
 
-  fromJSON(object: any): ProcessInstructionResponse {
+  fromJSON(object: any): ProcessInstructionsResponse {
     return {
       result: isSet(object.result)
         ? O11yResult.fromJSON(object.result)
@@ -1562,7 +1642,7 @@ export const ProcessInstructionResponse = {
     };
   },
 
-  toJSON(message: ProcessInstructionResponse): unknown {
+  toJSON(message: ProcessInstructionsResponse): unknown {
     const obj: any = {};
     message.result !== undefined &&
       (obj.result = message.result
@@ -1572,137 +1652,9 @@ export const ProcessInstructionResponse = {
   },
 
   fromPartial(
-    object: DeepPartial<ProcessInstructionResponse>
-  ): ProcessInstructionResponse {
-    const message = createBaseProcessInstructionResponse();
-    message.result =
-      object.result !== undefined && object.result !== null
-        ? O11yResult.fromPartial(object.result)
-        : undefined;
-    return message;
-  },
-};
-
-function createBaseProcessBlockRequest(): ProcessBlockRequest {
-  return { block: undefined, chainId: "" };
-}
-
-export const ProcessBlockRequest = {
-  encode(
-    message: ProcessBlockRequest,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
-    if (message.block !== undefined) {
-      Block.encode(message.block, writer.uint32(10).fork()).ldelim();
-    }
-    if (message.chainId !== "") {
-      writer.uint32(18).string(message.chainId);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): ProcessBlockRequest {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseProcessBlockRequest();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.block = Block.decode(reader, reader.uint32());
-          break;
-        case 2:
-          message.chainId = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): ProcessBlockRequest {
-    return {
-      block: isSet(object.block) ? Block.fromJSON(object.block) : undefined,
-      chainId: isSet(object.chainId) ? String(object.chainId) : "",
-    };
-  },
-
-  toJSON(message: ProcessBlockRequest): unknown {
-    const obj: any = {};
-    message.block !== undefined &&
-      (obj.block = message.block ? Block.toJSON(message.block) : undefined);
-    message.chainId !== undefined && (obj.chainId = message.chainId);
-    return obj;
-  },
-
-  fromPartial(object: DeepPartial<ProcessBlockRequest>): ProcessBlockRequest {
-    const message = createBaseProcessBlockRequest();
-    message.block =
-      object.block !== undefined && object.block !== null
-        ? Block.fromPartial(object.block)
-        : undefined;
-    message.chainId = object.chainId ?? "";
-    return message;
-  },
-};
-
-function createBaseProcessBlockResponse(): ProcessBlockResponse {
-  return { result: undefined };
-}
-
-export const ProcessBlockResponse = {
-  encode(
-    message: ProcessBlockResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
-    if (message.result !== undefined) {
-      O11yResult.encode(message.result, writer.uint32(10).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): ProcessBlockResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseProcessBlockResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.result = O11yResult.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): ProcessBlockResponse {
-    return {
-      result: isSet(object.result)
-        ? O11yResult.fromJSON(object.result)
-        : undefined,
-    };
-  },
-
-  toJSON(message: ProcessBlockResponse): unknown {
-    const obj: any = {};
-    message.result !== undefined &&
-      (obj.result = message.result
-        ? O11yResult.toJSON(message.result)
-        : undefined);
-    return obj;
-  },
-
-  fromPartial(object: DeepPartial<ProcessBlockResponse>): ProcessBlockResponse {
-    const message = createBaseProcessBlockResponse();
+    object: DeepPartial<ProcessInstructionsResponse>
+  ): ProcessInstructionsResponse {
+    const message = createBaseProcessInstructionsResponse();
     message.result =
       object.result !== undefined && object.result !== null
         ? O11yResult.fromPartial(object.result)
@@ -1712,7 +1664,7 @@ export const ProcessBlockResponse = {
 };
 
 function createBaseProcessBlocksRequest(): ProcessBlocksRequest {
-  return { requests: [] };
+  return { blockBindings: [] };
 }
 
 export const ProcessBlocksRequest = {
@@ -1720,8 +1672,8 @@ export const ProcessBlocksRequest = {
     message: ProcessBlocksRequest,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    for (const v of message.requests) {
-      ProcessBlockRequest.encode(v!, writer.uint32(10).fork()).ldelim();
+    for (const v of message.blockBindings) {
+      BlockBinding.encode(v!, writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
@@ -1736,9 +1688,9 @@ export const ProcessBlocksRequest = {
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        case 1:
-          message.requests.push(
-            ProcessBlockRequest.decode(reader, reader.uint32())
+        case 2:
+          message.blockBindings.push(
+            BlockBinding.decode(reader, reader.uint32())
           );
           break;
         default:
@@ -1751,34 +1703,34 @@ export const ProcessBlocksRequest = {
 
   fromJSON(object: any): ProcessBlocksRequest {
     return {
-      requests: Array.isArray(object?.requests)
-        ? object.requests.map((e: any) => ProcessBlockRequest.fromJSON(e))
+      blockBindings: Array.isArray(object?.blockBindings)
+        ? object.blockBindings.map((e: any) => BlockBinding.fromJSON(e))
         : [],
     };
   },
 
   toJSON(message: ProcessBlocksRequest): unknown {
     const obj: any = {};
-    if (message.requests) {
-      obj.requests = message.requests.map((e) =>
-        e ? ProcessBlockRequest.toJSON(e) : undefined
+    if (message.blockBindings) {
+      obj.blockBindings = message.blockBindings.map((e) =>
+        e ? BlockBinding.toJSON(e) : undefined
       );
     } else {
-      obj.requests = [];
+      obj.blockBindings = [];
     }
     return obj;
   },
 
   fromPartial(object: DeepPartial<ProcessBlocksRequest>): ProcessBlocksRequest {
     const message = createBaseProcessBlocksRequest();
-    message.requests =
-      object.requests?.map((e) => ProcessBlockRequest.fromPartial(e)) || [];
+    message.blockBindings =
+      object.blockBindings?.map((e) => BlockBinding.fromPartial(e)) || [];
     return message;
   },
 };
 
 function createBaseProcessBlocksResponse(): ProcessBlocksResponse {
-  return { response: [] };
+  return { result: undefined };
 }
 
 export const ProcessBlocksResponse = {
@@ -1786,8 +1738,8 @@ export const ProcessBlocksResponse = {
     message: ProcessBlocksResponse,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    for (const v of message.response) {
-      ProcessBlockResponse.encode(v!, writer.uint32(10).fork()).ldelim();
+    if (message.result !== undefined) {
+      O11yResult.encode(message.result, writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
@@ -1802,10 +1754,8 @@ export const ProcessBlocksResponse = {
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        case 1:
-          message.response.push(
-            ProcessBlockResponse.decode(reader, reader.uint32())
-          );
+        case 2:
+          message.result = O11yResult.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -1817,21 +1767,18 @@ export const ProcessBlocksResponse = {
 
   fromJSON(object: any): ProcessBlocksResponse {
     return {
-      response: Array.isArray(object?.response)
-        ? object.response.map((e: any) => ProcessBlockResponse.fromJSON(e))
-        : [],
+      result: isSet(object.result)
+        ? O11yResult.fromJSON(object.result)
+        : undefined,
     };
   },
 
   toJSON(message: ProcessBlocksResponse): unknown {
     const obj: any = {};
-    if (message.response) {
-      obj.response = message.response.map((e) =>
-        e ? ProcessBlockResponse.toJSON(e) : undefined
-      );
-    } else {
-      obj.response = [];
-    }
+    message.result !== undefined &&
+      (obj.result = message.result
+        ? O11yResult.toJSON(message.result)
+        : undefined);
     return obj;
   },
 
@@ -1839,8 +1786,10 @@ export const ProcessBlocksResponse = {
     object: DeepPartial<ProcessBlocksResponse>
   ): ProcessBlocksResponse {
     const message = createBaseProcessBlocksResponse();
-    message.response =
-      object.response?.map((e) => ProcessBlockResponse.fromPartial(e)) || [];
+    message.result =
+      object.result !== undefined && object.result !== null
+        ? O11yResult.fromPartial(object.result)
+        : undefined;
     return message;
   },
 };
@@ -2133,6 +2082,95 @@ export const Instruction = {
         : Long.UZERO;
     message.programAccountId = object.programAccountId ?? "";
     message.parsed = object.parsed ?? undefined;
+    return message;
+  },
+};
+
+function createBaseBlockBinding(): BlockBinding {
+  return { block: undefined, handlerIds: [], chainId: "" };
+}
+
+export const BlockBinding = {
+  encode(
+    message: BlockBinding,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.block !== undefined) {
+      Block.encode(message.block, writer.uint32(10).fork()).ldelim();
+    }
+    writer.uint32(18).fork();
+    for (const v of message.handlerIds) {
+      writer.int32(v);
+    }
+    writer.ldelim();
+    if (message.chainId !== "") {
+      writer.uint32(26).string(message.chainId);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): BlockBinding {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseBlockBinding();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.block = Block.decode(reader, reader.uint32());
+          break;
+        case 2:
+          if ((tag & 7) === 2) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.handlerIds.push(reader.int32());
+            }
+          } else {
+            message.handlerIds.push(reader.int32());
+          }
+          break;
+        case 3:
+          message.chainId = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): BlockBinding {
+    return {
+      block: isSet(object.block) ? Block.fromJSON(object.block) : undefined,
+      handlerIds: Array.isArray(object?.handlerIds)
+        ? object.handlerIds.map((e: any) => Number(e))
+        : [],
+      chainId: isSet(object.chainId) ? String(object.chainId) : "",
+    };
+  },
+
+  toJSON(message: BlockBinding): unknown {
+    const obj: any = {};
+    message.block !== undefined &&
+      (obj.block = message.block ? Block.toJSON(message.block) : undefined);
+    if (message.handlerIds) {
+      obj.handlerIds = message.handlerIds.map((e) => Math.round(e));
+    } else {
+      obj.handlerIds = [];
+    }
+    message.chainId !== undefined && (obj.chainId = message.chainId);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<BlockBinding>): BlockBinding {
+    const message = createBaseBlockBinding();
+    message.block =
+      object.block !== undefined && object.block !== null
+        ? Block.fromPartial(object.block)
+        : undefined;
+    message.handlerIds = object.handlerIds?.map((e) => e) || [];
+    message.chainId = object.chainId ?? "";
     return message;
   },
 };
@@ -2918,14 +2956,6 @@ export const ProcessorDefinition = {
   name: "Processor",
   fullName: "processor.Processor",
   methods: {
-    getConfig: {
-      name: "GetConfig",
-      requestType: ProcessConfigRequest,
-      requestStream: false,
-      responseType: ProcessConfigResponse,
-      responseStream: false,
-      options: {},
-    },
     start: {
       name: "Start",
       requestType: StartRequest,
@@ -2942,27 +2972,27 @@ export const ProcessorDefinition = {
       responseStream: false,
       options: {},
     },
-    processLog: {
-      name: "ProcessLog",
-      requestType: ProcessLogRequest,
+    getConfig: {
+      name: "GetConfig",
+      requestType: ProcessConfigRequest,
       requestStream: false,
-      responseType: ProcessLogResponse,
+      responseType: ProcessConfigResponse,
       responseStream: false,
       options: {},
     },
-    processTransaction: {
-      name: "ProcessTransaction",
-      requestType: ProcessTransactionRequest,
+    processLogs: {
+      name: "ProcessLogs",
+      requestType: ProcessLogsRequest,
       requestStream: false,
-      responseType: ProcessTransactionResponse,
+      responseType: ProcessLogsResponse,
       responseStream: false,
       options: {},
     },
-    processBlock: {
-      name: "ProcessBlock",
-      requestType: ProcessBlockRequest,
+    processTransactions: {
+      name: "ProcessTransactions",
+      requestType: ProcessTransactionsRequest,
       requestStream: false,
-      responseType: ProcessBlockResponse,
+      responseType: ProcessTransactionsResponse,
       responseStream: false,
       options: {},
     },
@@ -2974,11 +3004,11 @@ export const ProcessorDefinition = {
       responseStream: false,
       options: {},
     },
-    processInstruction: {
-      name: "ProcessInstruction",
-      requestType: ProcessInstructionRequest,
+    processInstructions: {
+      name: "ProcessInstructions",
+      requestType: ProcessInstructionsRequest,
       requestStream: false,
-      responseType: ProcessInstructionResponse,
+      responseType: ProcessInstructionsResponse,
       responseStream: false,
       options: {},
     },
@@ -2986,10 +3016,6 @@ export const ProcessorDefinition = {
 } as const;
 
 export interface ProcessorServiceImplementation<CallContextExt = {}> {
-  getConfig(
-    request: ProcessConfigRequest,
-    context: CallContext & CallContextExt
-  ): Promise<DeepPartial<ProcessConfigResponse>>;
   start(
     request: StartRequest,
     context: CallContext & CallContextExt
@@ -2998,33 +3024,29 @@ export interface ProcessorServiceImplementation<CallContextExt = {}> {
     request: Empty,
     context: CallContext & CallContextExt
   ): Promise<DeepPartial<Empty>>;
-  processLog(
-    request: ProcessLogRequest,
+  getConfig(
+    request: ProcessConfigRequest,
     context: CallContext & CallContextExt
-  ): Promise<DeepPartial<ProcessLogResponse>>;
-  processTransaction(
-    request: ProcessTransactionRequest,
+  ): Promise<DeepPartial<ProcessConfigResponse>>;
+  processLogs(
+    request: ProcessLogsRequest,
     context: CallContext & CallContextExt
-  ): Promise<DeepPartial<ProcessTransactionResponse>>;
-  processBlock(
-    request: ProcessBlockRequest,
+  ): Promise<DeepPartial<ProcessLogsResponse>>;
+  processTransactions(
+    request: ProcessTransactionsRequest,
     context: CallContext & CallContextExt
-  ): Promise<DeepPartial<ProcessBlockResponse>>;
+  ): Promise<DeepPartial<ProcessTransactionsResponse>>;
   processBlocks(
     request: ProcessBlocksRequest,
     context: CallContext & CallContextExt
   ): Promise<DeepPartial<ProcessBlocksResponse>>;
-  processInstruction(
-    request: ProcessInstructionRequest,
+  processInstructions(
+    request: ProcessInstructionsRequest,
     context: CallContext & CallContextExt
-  ): Promise<DeepPartial<ProcessInstructionResponse>>;
+  ): Promise<DeepPartial<ProcessInstructionsResponse>>;
 }
 
 export interface ProcessorClient<CallOptionsExt = {}> {
-  getConfig(
-    request: DeepPartial<ProcessConfigRequest>,
-    options?: CallOptions & CallOptionsExt
-  ): Promise<ProcessConfigResponse>;
   start(
     request: DeepPartial<StartRequest>,
     options?: CallOptions & CallOptionsExt
@@ -3033,26 +3055,26 @@ export interface ProcessorClient<CallOptionsExt = {}> {
     request: DeepPartial<Empty>,
     options?: CallOptions & CallOptionsExt
   ): Promise<Empty>;
-  processLog(
-    request: DeepPartial<ProcessLogRequest>,
+  getConfig(
+    request: DeepPartial<ProcessConfigRequest>,
     options?: CallOptions & CallOptionsExt
-  ): Promise<ProcessLogResponse>;
-  processTransaction(
-    request: DeepPartial<ProcessTransactionRequest>,
+  ): Promise<ProcessConfigResponse>;
+  processLogs(
+    request: DeepPartial<ProcessLogsRequest>,
     options?: CallOptions & CallOptionsExt
-  ): Promise<ProcessTransactionResponse>;
-  processBlock(
-    request: DeepPartial<ProcessBlockRequest>,
+  ): Promise<ProcessLogsResponse>;
+  processTransactions(
+    request: DeepPartial<ProcessTransactionsRequest>,
     options?: CallOptions & CallOptionsExt
-  ): Promise<ProcessBlockResponse>;
+  ): Promise<ProcessTransactionsResponse>;
   processBlocks(
     request: DeepPartial<ProcessBlocksRequest>,
     options?: CallOptions & CallOptionsExt
   ): Promise<ProcessBlocksResponse>;
-  processInstruction(
-    request: DeepPartial<ProcessInstructionRequest>,
+  processInstructions(
+    request: DeepPartial<ProcessInstructionsRequest>,
     options?: CallOptions & CallOptionsExt
-  ): Promise<ProcessInstructionResponse>;
+  ): Promise<ProcessInstructionsResponse>;
 }
 
 declare var self: any | undefined;
