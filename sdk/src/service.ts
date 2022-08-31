@@ -264,44 +264,52 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
 
     // Only have instruction handlers for solana processors
     if (global.PROCESSOR_STATE.solanaProcessors) {
+      const processorPromises: Promise<void>[] = []
       for (const instruction of request.instructions) {
         if (!instruction) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'instruction cannot be null')
         }
 
-        for (const processor of global.PROCESSOR_STATE.solanaProcessors) {
-          if (processor.address === instruction.programAccountId) {
-            let res: O11yResult | null
-            if (instruction.parsed) {
-              res = processor.handleInstruction(JSON.parse(new TextDecoder().decode(instruction.parsed)))
-            } else {
-              res = processor.handleInstruction(instruction.instructionData)
-            }
-            if (res) {
-              try {
-                res.gauges.forEach((g) => {
-                  if (g.metadata) {
-                    g.metadata.blockNumber = instruction.slot
+        processorPromises.push(
+          new Promise((resolve, _) => {
+            for (const processor of global.PROCESSOR_STATE.solanaProcessors) {
+              if (processor.address === instruction.programAccountId) {
+                let res: O11yResult | null
+                if (instruction.parsed) {
+                  res = processor.handleInstruction(JSON.parse(new TextDecoder().decode(instruction.parsed)))
+                } else {
+                  res = processor.handleInstruction(instruction.instructionData)
+                }
+                if (res) {
+                  try {
+                    res.gauges.forEach((g) => {
+                      if (g.metadata) {
+                        g.metadata.blockNumber = instruction.slot
+                      }
+                      result.gauges.push(g)
+                    })
+                    res.counters.forEach((c) => {
+                      if (c.metadata) {
+                        c.metadata.blockNumber = instruction.slot
+                      }
+                      result.counters.push(c)
+                    })
+                  } catch (e) {
+                    console.error('error processing instruction ' + e.toString())
                   }
-                  result.gauges.push(g)
-                })
-                res.counters.forEach((c) => {
-                  if (c.metadata) {
-                    c.metadata.blockNumber = instruction.slot
-                  }
-                  result.counters.push(c)
-                })
-              } catch (e) {
-                throw new ServerError(Status.INTERNAL, 'error processing instruction ' + e.toString())
+                } else {
+                  console.error(
+                    `Failed to decode the instruction: ${instruction.instructionData} with slot: ${instruction.slot}`
+                  )
+                }
               }
-            } else {
-              console.error(
-                `Failed to decode the instruction: ${instruction.instructionData} with slot: ${instruction.slot}`
-              )
             }
-          }
-        }
+            resolve()
+          })
+        )
       }
+
+      await Promise.all(processorPromises)
     }
 
     recordRuntimeInfo(result, HandlerType.INSTRUCTION)

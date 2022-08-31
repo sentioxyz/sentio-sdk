@@ -51,10 +51,15 @@ describe('Test Solana Example', () => {
           slot: Long.fromNumber(0),
           programAccountId: 'wormDTUJ6AWPNvk59vGQbDvGJmqbDTdgWgAqcLBCgUb',
         },
+        {
+          instructionData: '33G5T8yXAQWdH8FX7fTy1mBJ6e4dUKfQWbViSrT7qJjpS8UAA3ftEQx9sNzrkaJm56xtENhDsWf',
+          slot: Long.fromNumber(1),
+          programAccountId: 'wormDTUJ6AWPNvk59vGQbDvGJmqbDTdgWgAqcLBCgUb',
+        },
       ],
     }
     const res = await service.processInstruction(request, testContext)
-    expect(res.result?.counters).length(1)
+    expect(res.result?.counters).length(2)
     expect(res.result?.gauges).length(0)
     expect(res.result?.counters[0].metadata?.blockNumber.toInt()).equal(0)
     expect(MetricValueToNumber(res.result?.counters[0].metricValue)).equal(1000000)
