@@ -57,18 +57,12 @@ export async function uploadFile(options: SentioProjectConfig, apiKeyOverride: s
 
   url.pathname = '/api/v1/processors'
 
-  let sdkVersion = packageJson.version
-  if (sdkVersion.endsWith('development')) {
-    // TODO remove this and make change in server
-    sdkVersion = '1.2.2'
-  }
-
   const res = await fetch(url, {
     method: 'POST',
     headers: {
       'api-key': apiKey,
       project: options.project,
-      version: sdkVersion,
+      version: packageJson.version,
     },
     body: data,
   })
