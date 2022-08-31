@@ -7,6 +7,7 @@ import Long from 'long'
 import { BoundContractView, Context, ContractView } from './context'
 import { O11yResult } from './gen/processor/protos/processor'
 import { BindInternalOptions, BindOptions } from './bind-options'
+import { PromiseOrValue } from './promise-or-value'
 
 export class EventsHandler {
   filters: EventFilter[]
@@ -53,7 +54,7 @@ export abstract class BaseProcessor<
   }
 
   public onEvent(
-    handler: (event: Event, ctx: Context<TContract, TBoundContractView>) => void,
+    handler: (event: Event, ctx: Context<TContract, TBoundContractView>) => PromiseOrValue<void>,
     filter: EventFilter | EventFilter[]
   ) {
     const chainId = this.getChainId()
@@ -99,7 +100,7 @@ export abstract class BaseProcessor<
     return this
   }
 
-  public onBlock(handler: (block: Block, ctx: Context<TContract, TBoundContractView>) => void) {
+  public onBlock(handler: (block: Block, ctx: Context<TContract, TBoundContractView>) => PromiseOrValue<void>) {
     const chainId = this.getChainId()
     const contractView = this.CreateBoundContractView()
 
@@ -114,14 +115,14 @@ export abstract class BaseProcessor<
     return this
   }
 
-  public onAllEvents(handler: (event: Log, ctx: Context<TContract, TBoundContractView>) => void) {
+  public onAllEvents(handler: (event: Log, ctx: Context<TContract, TBoundContractView>) => PromiseOrValue<void>) {
     const _filters: EventFilter[] = []
     const tmpContract = this.CreateBoundContractView()
 
     for (const key in tmpContract.filters) {
       _filters.push(tmpContract.filters[key]())
     }
-    this.onEvent(function (log, ctx) {
+    return this.onEvent(function (log, ctx) {
       return handler(log, ctx)
     }, _filters)
   }
