@@ -28,6 +28,7 @@
     "@typechain/ethers-v5": "^10.0.0",
     "@types/bn.js": "^5.1.0",
     "@types/node-fetch": "^2.6.2",
+    "bignumber.js": "^9.1.0",
     "bn.js": "^5.2.1",
     "bs58": "^5.0.0",
     "command-line-args": "^5.2.1",

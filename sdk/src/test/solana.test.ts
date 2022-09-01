@@ -62,7 +62,7 @@ describe('Test Solana Example', () => {
     expect(res.result?.counters).length(2)
     expect(res.result?.gauges).length(0)
     expect(res.result?.counters[0].metadata?.blockNumber.toInt()).equal(0)
-    expect(MetricValueToNumber(res.result?.counters[0].metricValue)).equal(1000000)
+    expect(MetricValueToNumber(res.result?.counters[0].metricValue)).equal(1000000n)
     expect(res.result?.counters[0].runtimeInfo?.from).equals(HandlerType.INSTRUCTION)
   })
 

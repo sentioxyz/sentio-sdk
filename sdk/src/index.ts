@@ -10,6 +10,7 @@ export { ContractNamer } from './contract-namer'
 export { BindOptions } from './bind-options'
 export { transformEtherError } from './error'
 export { ProcessorState } from './processor-state'
+export { BigNumber as BigDecimal } from 'bignumber.js'
 
 export { getProcessor, addProcessor, getContractByABI, addContractByABI, getContractName } from './binds'
 

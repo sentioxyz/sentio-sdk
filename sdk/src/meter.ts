@@ -1,6 +1,6 @@
 import { RecordMetaData } from './gen/processor/protos/processor'
 import { Context, EthContext, SolanaContext } from './context'
-import { convertNumber, Numberish } from './numberish'
+import { toMetricValue, Numberish } from './numberish'
 import Long from 'long'
 
 function GetRecordMetaData(ctx: EthContext | SolanaContext, name: string, labels: Labels): RecordMetaData {
@@ -63,7 +63,7 @@ export class Counter {
   private record(value: Numberish, labels: Labels, add: boolean) {
     this.ctx.counters.push({
       metadata: GetRecordMetaData(this.ctx, this.name, labels),
-      metricValue: convertNumber(value),
+      metricValue: toMetricValue(value),
       add: add,
       runtimeInfo: undefined,
     })
@@ -82,7 +82,7 @@ export class Gauge {
   record(value: Numberish, labels: Labels = {}) {
     this.ctx.gauges.push({
       metadata: GetRecordMetaData(this.ctx, this.name, labels),
-      metricValue: convertNumber(value),
+      metricValue: toMetricValue(value),
       runtimeInfo: undefined,
     })
   }

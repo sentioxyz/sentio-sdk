@@ -1,13 +1,32 @@
 import { BigNumber } from 'ethers'
 import { BigInteger, MetricValue } from './gen/processor/protos/processor'
 import { DeepPartial } from './gen/builtin'
+import { BigDecimal } from '.'
+import { BN } from '@project-serum/anchor'
 
-export type Numberish = number | BigNumber | bigint //BigNumberish
+export type Numberish = number | BigNumber | bigint | BigDecimal //BigNumberish
 
-export function convertNumber(value: Numberish): MetricValue {
+export function toMetricValue(value: Numberish): MetricValue {
   if (value instanceof BigNumber) {
     return MetricValue.fromPartial({
       bigInteger: toBigInteger(value.toBigInt()),
+    })
+  }
+  if (value instanceof BigDecimal) {
+    // Carefully consider the use case here
+    if (value.isInteger()) {
+      return MetricValue.fromPartial({
+        bigInteger: bigDecimalToBigInteger(value),
+      })
+    } else {
+      return MetricValue.fromPartial({
+        bigDecimal: value.toString(), // e.g. -7.350918e-428
+      })
+    }
+  }
+  if (BN.isBN(value)) {
+    return MetricValue.fromPartial({
+      bigInteger: bnToBigInteger(value),
     })
   }
   if (typeof value === 'bigint' || Number.isInteger(value)) {
@@ -15,24 +34,46 @@ export function convertNumber(value: Numberish): MetricValue {
       bigInteger: toBigInteger(value),
     })
   }
-  // TODO handle BN type better
-  // if (BN.isBN(value)) {
-  //   return MetricValue.fromPartial({
-  //     bigInt: value.toString()
-  //   })
-  // }
 
   return MetricValue.fromPartial({
     doubleValue: Number(value),
   })
 }
+function bigDecimalToBigInteger(a: BigDecimal): BigInteger {
+  const negative = a.isNegative()
+  if (negative) {
+    a = a.abs()
+  }
+  return hexToBigInteger(a.toString(16), negative)
+}
 
-export function toBigInteger(a: bigint | number): BigInteger {
+function bnToBigInteger(a: BN): BigInteger {
+  const negative = a.isNeg()
+  if (negative) {
+    a = a.abs()
+  }
+  return hexToBigInteger(a.toString(16), negative)
+}
+
+function intToBigInteger(a: bigint | number): BigInteger {
   const negative = a < 0
-
   if (negative) {
     a = -a
   }
+  return hexToBigInteger(a.toString(16), negative)
+}
+
+export function toBigInteger(a: Numberish): BigInteger {
+  if (a instanceof BigDecimal) {
+    return bigDecimalToBigInteger(a)
+  }
+  if (a instanceof BN) {
+    return bnToBigInteger(a)
+  }
+  if (a instanceof BigNumber) {
+    return intToBigInteger(a.toBigInt())
+  }
+  return intToBigInteger(a)
 
   // Following code is actually very slow
   // while (a > 0) {
@@ -44,7 +85,9 @@ export function toBigInteger(a: bigint | number): BigInteger {
   // return {
   //   negative, value: new Uint8Array(value.reverse()),
   // }
-  let hex = a.toString(16)
+}
+
+function hexToBigInteger(hex: string, negative: boolean): BigInteger {
   if (hex.length % 2 === 1) {
     hex = '0' + hex
   }
@@ -71,8 +114,8 @@ export function MetricValueToNumber(v: DeepPartial<MetricValue> | undefined): Nu
     }
     return intValue
   }
-  if (v.bigInt !== undefined) {
-    return BigNumber.from(v.bigInt)
+  if (v.bigDecimal !== undefined) {
+    return new BigDecimal(v.bigDecimal)
   }
   return undefined
 }

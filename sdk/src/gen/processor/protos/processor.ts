@@ -209,7 +209,7 @@ export interface RecordMetaData_LabelsEntry {
 }
 
 export interface MetricValue {
-  bigInt: string | undefined;
+  bigDecimal: string | undefined;
   doubleValue: number | undefined;
   bigInteger: BigInteger | undefined;
 }
@@ -2518,7 +2518,11 @@ export const RecordMetaData_LabelsEntry = {
 };
 
 function createBaseMetricValue(): MetricValue {
-  return { bigInt: undefined, doubleValue: undefined, bigInteger: undefined };
+  return {
+    bigDecimal: undefined,
+    doubleValue: undefined,
+    bigInteger: undefined,
+  };
 }
 
 export const MetricValue = {
@@ -2526,8 +2530,8 @@ export const MetricValue = {
     message: MetricValue,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (message.bigInt !== undefined) {
-      writer.uint32(10).string(message.bigInt);
+    if (message.bigDecimal !== undefined) {
+      writer.uint32(10).string(message.bigDecimal);
     }
     if (message.doubleValue !== undefined) {
       writer.uint32(17).double(message.doubleValue);
@@ -2546,7 +2550,7 @@ export const MetricValue = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.bigInt = reader.string();
+          message.bigDecimal = reader.string();
           break;
         case 2:
           message.doubleValue = reader.double();
@@ -2564,7 +2568,9 @@ export const MetricValue = {
 
   fromJSON(object: any): MetricValue {
     return {
-      bigInt: isSet(object.bigInt) ? String(object.bigInt) : undefined,
+      bigDecimal: isSet(object.bigDecimal)
+        ? String(object.bigDecimal)
+        : undefined,
       doubleValue: isSet(object.doubleValue)
         ? Number(object.doubleValue)
         : undefined,
@@ -2576,7 +2582,7 @@ export const MetricValue = {
 
   toJSON(message: MetricValue): unknown {
     const obj: any = {};
-    message.bigInt !== undefined && (obj.bigInt = message.bigInt);
+    message.bigDecimal !== undefined && (obj.bigDecimal = message.bigDecimal);
     message.doubleValue !== undefined &&
       (obj.doubleValue = message.doubleValue);
     message.bigInteger !== undefined &&
@@ -2588,7 +2594,7 @@ export const MetricValue = {
 
   fromPartial(object: DeepPartial<MetricValue>): MetricValue {
     const message = createBaseMetricValue();
-    message.bigInt = object.bigInt ?? undefined;
+    message.bigDecimal = object.bigDecimal ?? undefined;
     message.doubleValue = object.doubleValue ?? undefined;
     message.bigInteger =
       object.bigInteger !== undefined && object.bigInteger !== null

@@ -191,7 +191,7 @@ message RecordMetaData {
 
 message MetricValue {
   oneof value {
-    string big_int = 1;
+    string big_decimal = 1;
     double double_value = 2;
     BigInteger big_integer = 3;
   }
