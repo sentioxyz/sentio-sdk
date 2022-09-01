@@ -23,6 +23,16 @@ export function FinalizeHost(config: SentioProjectConfig) {
   }
 }
 
+export function FinalizeProjectName(config: SentioProjectConfig, owner: string | undefined) {
+  if (owner) {
+    let name = config.project
+    if (name.includes('/')) {
+      name = config.project.split('/')[1]
+    }
+    config.project = [owner, name].join('/')
+  }
+}
+
 export interface Target {
   chain: string
   abisDir?: string

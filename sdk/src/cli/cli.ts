@@ -8,7 +8,7 @@ import http from 'http'
 import path from 'path'
 
 import yaml from 'js-yaml'
-import { EVM, FinalizeHost, SentioProjectConfig } from './config'
+import { EVM, FinalizeHost, FinalizeProjectName, SentioProjectConfig } from './config'
 import { WriteKey } from './key'
 import { uploadFile } from './upload'
 import chalk from 'chalk'
@@ -86,6 +86,11 @@ if (mainOptions.command === 'upload') {
       type: String,
     },
     {
+      name: 'owner',
+      description: '(Optional) Override Project owner',
+      type: String,
+    },
+    {
       name: 'nobuild',
       description: '(Optional) Skip build & pack file before uploading, default false',
       type: Boolean,
@@ -112,6 +117,7 @@ if (mainOptions.command === 'upload') {
       processorConfig.build = false
     }
     FinalizeHost(processorConfig)
+    FinalizeProjectName(processorConfig, options.owner)
     console.log(processorConfig)
 
     let apiOverride = undefined
