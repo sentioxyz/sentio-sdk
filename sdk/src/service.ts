@@ -78,15 +78,12 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       this.processorsByChainId.set(chainId, processor)
 
       const contractConfig: ContractConfig = {
+        processorType: 'user_processor',
         contract: {
           name: processor.config.name,
           chainId: chainId,
           address: processor.config.address,
           abi: '',
-        },
-        blockConfig: {
-          // TODO remove this field
-          numHandlers: processor.blockHandlers.length,
         },
         blockConfigs: [],
         logConfigs: [],
@@ -144,13 +141,13 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     // Part 2, prepare solana constractors
     for (const solanaProcessor of global.PROCESSOR_STATE.solanaProcessors) {
       const contractConfig: ContractConfig = {
+        processorType: 'user_processor',
         contract: {
           name: solanaProcessor.contractName,
           chainId: 'SOL:mainnet', // TODO set in processor
           address: solanaProcessor.address,
           abi: '',
         },
-        blockConfig: undefined,
         blockConfigs: [],
         logConfigs: [],
         startBlock: solanaProcessor.config.startSlot,

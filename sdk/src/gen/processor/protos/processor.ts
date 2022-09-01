@@ -70,12 +70,12 @@ export interface ProcessConfigResponse {
 
 export interface ContractConfig {
   contract: ContractInfo | undefined;
-  blockConfig: OldBlockHandlerConfig | undefined;
   blockConfigs: BlockHandlerConfig[];
   logConfigs: LogHandlerConfig[];
   startBlock: Long;
   endBlock: Long;
   instructionConfig: InstructionHandlerConfig | undefined;
+  processorType: string;
 }
 
 export interface ContractInfo {
@@ -451,12 +451,12 @@ export const ProcessConfigResponse = {
 function createBaseContractConfig(): ContractConfig {
   return {
     contract: undefined,
-    blockConfig: undefined,
     blockConfigs: [],
     logConfigs: [],
     startBlock: Long.UZERO,
     endBlock: Long.UZERO,
     instructionConfig: undefined,
+    processorType: "",
   };
 }
 
@@ -467,12 +467,6 @@ export const ContractConfig = {
   ): _m0.Writer {
     if (message.contract !== undefined) {
       ContractInfo.encode(message.contract, writer.uint32(10).fork()).ldelim();
-    }
-    if (message.blockConfig !== undefined) {
-      OldBlockHandlerConfig.encode(
-        message.blockConfig,
-        writer.uint32(18).fork()
-      ).ldelim();
     }
     for (const v of message.blockConfigs) {
       BlockHandlerConfig.encode(v!, writer.uint32(58).fork()).ldelim();
@@ -492,6 +486,9 @@ export const ContractConfig = {
         writer.uint32(50).fork()
       ).ldelim();
     }
+    if (message.processorType !== "") {
+      writer.uint32(66).string(message.processorType);
+    }
     return writer;
   },
 
@@ -504,12 +501,6 @@ export const ContractConfig = {
       switch (tag >>> 3) {
         case 1:
           message.contract = ContractInfo.decode(reader, reader.uint32());
-          break;
-        case 2:
-          message.blockConfig = OldBlockHandlerConfig.decode(
-            reader,
-            reader.uint32()
-          );
           break;
         case 7:
           message.blockConfigs.push(
@@ -533,6 +524,9 @@ export const ContractConfig = {
             reader.uint32()
           );
           break;
+        case 8:
+          message.processorType = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -545,9 +539,6 @@ export const ContractConfig = {
     return {
       contract: isSet(object.contract)
         ? ContractInfo.fromJSON(object.contract)
-        : undefined,
-      blockConfig: isSet(object.blockConfig)
-        ? OldBlockHandlerConfig.fromJSON(object.blockConfig)
         : undefined,
       blockConfigs: Array.isArray(object?.blockConfigs)
         ? object.blockConfigs.map((e: any) => BlockHandlerConfig.fromJSON(e))
@@ -564,6 +555,9 @@ export const ContractConfig = {
       instructionConfig: isSet(object.instructionConfig)
         ? InstructionHandlerConfig.fromJSON(object.instructionConfig)
         : undefined,
+      processorType: isSet(object.processorType)
+        ? String(object.processorType)
+        : "",
     };
   },
 
@@ -572,10 +566,6 @@ export const ContractConfig = {
     message.contract !== undefined &&
       (obj.contract = message.contract
         ? ContractInfo.toJSON(message.contract)
-        : undefined);
-    message.blockConfig !== undefined &&
-      (obj.blockConfig = message.blockConfig
-        ? OldBlockHandlerConfig.toJSON(message.blockConfig)
         : undefined);
     if (message.blockConfigs) {
       obj.blockConfigs = message.blockConfigs.map((e) =>
@@ -599,6 +589,8 @@ export const ContractConfig = {
       (obj.instructionConfig = message.instructionConfig
         ? InstructionHandlerConfig.toJSON(message.instructionConfig)
         : undefined);
+    message.processorType !== undefined &&
+      (obj.processorType = message.processorType);
     return obj;
   },
 
@@ -607,10 +599,6 @@ export const ContractConfig = {
     message.contract =
       object.contract !== undefined && object.contract !== null
         ? ContractInfo.fromPartial(object.contract)
-        : undefined;
-    message.blockConfig =
-      object.blockConfig !== undefined && object.blockConfig !== null
-        ? OldBlockHandlerConfig.fromPartial(object.blockConfig)
         : undefined;
     message.blockConfigs =
       object.blockConfigs?.map((e) => BlockHandlerConfig.fromPartial(e)) || [];
@@ -629,6 +617,7 @@ export const ContractConfig = {
       object.instructionConfig !== null
         ? InstructionHandlerConfig.fromPartial(object.instructionConfig)
         : undefined;
+    message.processorType = object.processorType ?? "";
     return message;
   },
 };

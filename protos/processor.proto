@@ -4,7 +4,7 @@ package processor;
 
 import "google/protobuf/empty.proto";
 
-option go_package = "sentioxyz/sentio/processor";
+option go_package = "sentioxyz/sentio/processor/protos";
 
 service Processor {
   // Start the processor, need to be called before any other RPC calls
@@ -47,13 +47,13 @@ message ProcessConfigResponse {
 
 message ContractConfig {
   ContractInfo contract = 1;
-  OldBlockHandlerConfig block_config = 2; // deprecate, TODO to be deleted
   repeated BlockHandlerConfig block_configs = 7;
   repeated LogHandlerConfig log_configs = 3;
   uint64 start_block = 4;
   uint64 end_block = 5;
-//  int32 chunk_size = 6;
   InstructionHandlerConfig instruction_config = 6;
+
+  string processor_type = 8;
 }
 
 message ContractInfo {
