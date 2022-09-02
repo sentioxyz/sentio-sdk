@@ -21,7 +21,7 @@ describe('Test Basic Examples', () => {
   const service = new ProcessorServiceImpl(undefined)
   const testContext: CallContext = <CallContext>{}
 
-  before(async () => {
+  beforeAll(async () => {
     cleanTest()
 
     const fullPath = path.resolve('chains-config.json')
@@ -32,7 +32,7 @@ describe('Test Basic Examples', () => {
     await service.start({ templateInstances: [] }, testContext)
   })
 
-  it('check configuration', async () => {
+  test('check configuration', async () => {
     const config = await service.getConfig({}, testContext)
     expect(config.contractConfigs).length(5)
 

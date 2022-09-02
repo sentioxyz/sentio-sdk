@@ -7,7 +7,7 @@ import { BigInteger } from './gen/processor/protos/processor'
 import { BigDecimal } from './index'
 
 // TODO add test for type conversion
-describe('Basic Testing', () => {
+describe('Numberish tests', () => {
   const values: bigint[] = [0n, -0n, 3815372408723498172304781320847103784n, 2132n, -18708707n, 123n << 100n]
 
   it('big integer conversion correctness ', async () => {
@@ -30,6 +30,9 @@ describe('Basic Testing', () => {
   })
 
   it.skip('random big integer performance', async () => {
+    jest.setTimeout(100000)
+    jest.retryTimes(3)
+
     let timer1 = 0
     let timer2 = 0
     for (let i = 0; i < 1000; i++) {
@@ -48,8 +51,7 @@ describe('Basic Testing', () => {
 
     console.log(timer1, timer2)
     expect(timer1).to.lessThan(timer2 * 3)
-  }).timeout(100000)
-  // .retries(3)
+  })
 
   it('metric value test', async () => {
     const longDec = '12.00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002'

@@ -29,7 +29,8 @@ module.exports = {
       ethers: 'commonjs2 ethers',
       '@sentio/sdk': 'root sentio_sdk',
       bs58: 'commonjs2 bs58',
-      'bn.js': 'commonjs2 bnjs',
+      "bignumber.js": 'commonjs2 bignumber.js',
+      'bn.js': 'commonjs2 bn.js',
     },
     function ({ context, request }, callback) {
       if (/^@(ethersproject|solana|project-serum).*$/.test(request)) {

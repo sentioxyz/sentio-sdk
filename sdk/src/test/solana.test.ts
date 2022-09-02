@@ -14,7 +14,7 @@ describe('Test Solana Example', () => {
   const service = new ProcessorServiceImpl(undefined)
   const testContext: CallContext = <CallContext>{}
 
-  before(async () => {
+  beforeAll(async () => {
     cleanTest()
 
     require('./mirrorworld')

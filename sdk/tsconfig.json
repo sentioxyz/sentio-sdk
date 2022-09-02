@@ -3,7 +3,6 @@
   "compilerOptions": {
     "rootDir": "./src",
     "baseUrl": "./src",
-    //https://levelup.gitconnected.com/path-aliases-with-typescript-in-node-js-230803e3f200
     "paths": {
       "@sentio/sdk": ["."]
     },

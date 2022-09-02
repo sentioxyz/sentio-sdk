@@ -14,7 +14,7 @@ describe('Test Template', () => {
   const service = new ProcessorServiceImpl(undefined)
   const testContext: CallContext = <CallContext>{}
 
-  before(async () => {
+  beforeAll(async () => {
     cleanTest()
 
     const fullPath = path.resolve('chains-config.json')
