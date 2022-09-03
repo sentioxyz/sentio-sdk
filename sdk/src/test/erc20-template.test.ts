@@ -2,26 +2,15 @@
 
 import { expect } from 'chai'
 
-import { ProcessorServiceImpl, setProvider, StartRequest } from '..'
-
-import { CallContext } from 'nice-grpc-common/src/server/CallContext'
-import * as path from 'path'
-import * as fs from 'fs-extra'
+import { StartRequest } from '..'
 import Long from 'long'
-import { cleanTest } from './clean-test'
+import { TestProcessorServer } from './test-processor-server'
 
 describe('Test Template', () => {
-  const service = new ProcessorServiceImpl(undefined)
-  const testContext: CallContext = <CallContext>{}
+  const service = new TestProcessorServer()
 
   beforeAll(async () => {
-    cleanTest()
-
-    const fullPath = path.resolve('chains-config.json')
-    const chainsConfig = fs.readJsonSync(fullPath)
-    setProvider(chainsConfig)
-
-    require('./erc20-template')
+    service.setup('./erc20-template')
     const request: StartRequest = {
       templateInstances: [
         {
@@ -37,11 +26,11 @@ describe('Test Template', () => {
         },
       ],
     }
-    await service.start(request, testContext)
+    await service.start(request)
   })
 
-  it('Check template instantiate', async () => {
-    const config = await service.getConfig({}, testContext)
+  test('Check template instantiate', async () => {
+    const config = await service.getConfig({})
     expect(config.contractConfigs).length(2)
     expect(config.contractConfigs?.[1].contract?.name).equals('dynamic2')
     expect(config.templateInstances).length(1)

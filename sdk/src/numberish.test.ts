@@ -10,7 +10,7 @@ import { BigDecimal } from './index'
 describe('Numberish tests', () => {
   const values: bigint[] = [0n, -0n, 3815372408723498172304781320847103784n, 2132n, -18708707n, 123n << 100n]
 
-  it('big integer conversion correctness ', async () => {
+  test('big integer conversion correctness ', async () => {
     for (const v of values) {
       const b = toBigInteger(v)
       const hex1 = BigIntegerToHex(b)
@@ -19,7 +19,7 @@ describe('Numberish tests', () => {
     }
   })
 
-  it('random big integer conversion correctness ', async () => {
+  test('random big integer conversion correctness ', async () => {
     for (let i = 0; i < 1000; i++) {
       const random = webcrypto.getRandomValues(new Uint8Array(256))
       const v = BigNumber.from(random).toBigInt()
@@ -29,7 +29,7 @@ describe('Numberish tests', () => {
     }
   })
 
-  it.skip('random big integer performance', async () => {
+  test.skip('random big integer performance', async () => {
     jest.setTimeout(100000)
     jest.retryTimes(3)
 
@@ -53,7 +53,7 @@ describe('Numberish tests', () => {
     expect(timer1).to.lessThan(timer2 * 3)
   })
 
-  it('metric value test', async () => {
+  test('metric values', async () => {
     const longDec = '12.00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002'
     expect(toMetricValue(new BigDecimal(longDec)).bigDecimal == longDec)
 

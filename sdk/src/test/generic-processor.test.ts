@@ -4,23 +4,15 @@ import { expect } from 'chai'
 
 import { HandlerType, LogBinding, ProcessLogsRequest, ProcessorServiceImpl, setProvider } from '..'
 
-import { CallContext } from 'nice-grpc-common/src/server/CallContext'
-import * as path from 'path'
-import * as fs from 'fs-extra'
-import { cleanTest } from './clean-test'
 import { MetricValueToNumber } from '../numberish'
 import { GenericProcessor } from '../generic-processor'
+import { TestProcessorServer } from './test-processor-server'
 
 describe('Test Generic Processor', () => {
-  const service = new ProcessorServiceImpl(undefined)
-  const testContext: CallContext = <CallContext>{}
+  const service = new TestProcessorServer()
 
   beforeAll(async () => {
-    cleanTest()
-
-    const fullPath = path.resolve('chains-config.json')
-    const chainsConfig = fs.readJsonSync(fullPath)
-    setProvider(chainsConfig)
+    service.setup()
 
     GenericProcessor.bind(
       [
@@ -32,16 +24,16 @@ describe('Test Generic Processor', () => {
       ctx.meter.Counter('event_num').add(1)
     })
 
-    await service.start({ templateInstances: [] }, testContext)
+    await service.start()
   })
 
-  it('check configuration', async () => {
-    const config = await service.getConfig({}, testContext)
+  test('check configuration', async () => {
+    const config = await service.getConfig({})
     expect(config.contractConfigs).length(1)
     expect(config.contractConfigs?.[0].contract?.name).equals('Generic')
   })
 
-  it('Check log dispatch', async () => {
+  test('Check log dispatch', async () => {
     const raw = toRaw(logData)
     const request: ProcessLogsRequest = {
       logBindings: [],
@@ -57,7 +49,7 @@ describe('Test Generic Processor', () => {
     request.logBindings.push(binding)
     request.logBindings.push(binding)
 
-    const res = await service.processLogs(request, testContext)
+    const res = await service.processLogs(request)
 
     const counters = res.result?.counters
     expect(counters).length(2)

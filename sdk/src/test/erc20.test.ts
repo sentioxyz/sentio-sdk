@@ -16,24 +16,18 @@ import * as path from 'path'
 import * as fs from 'fs-extra'
 import { cleanTest } from './clean-test'
 import { MetricValueToNumber } from '../numberish'
+import { TestProcessorServer } from './test-processor-server'
 
 describe('Test Basic Examples', () => {
-  const service = new ProcessorServiceImpl(undefined)
-  const testContext: CallContext = <CallContext>{}
+  const service = new TestProcessorServer()
 
   beforeAll(async () => {
-    cleanTest()
-
-    const fullPath = path.resolve('chains-config.json')
-    const chainsConfig = fs.readJsonSync(fullPath)
-    setProvider(chainsConfig)
-
-    require('./erc20')
-    await service.start({ templateInstances: [] }, testContext)
+    service.setup('./erc20')
+    await service.start()
   })
 
   test('check configuration', async () => {
-    const config = await service.getConfig({}, testContext)
+    const config = await service.getConfig({})
     expect(config.contractConfigs).length(5)
 
     // check auto rename
@@ -43,7 +37,7 @@ describe('Test Basic Examples', () => {
     expect(config.contractConfigs?.[4].contract?.name).equals('Erc20_1')
   })
 
-  it('Check block dispatch', async () => {
+  test('Check block dispatch', async () => {
     const raw = toRaw(blockData)
 
     const request: ProcessBlocksRequest = {
@@ -57,7 +51,7 @@ describe('Test Basic Examples', () => {
         },
       ],
     }
-    const res = await service.processBlocks(request, testContext)
+    const res = await service.processBlocks(request)
     const o11yRes = res.result
     expect(o11yRes?.counters).length(0)
     expect(o11yRes?.gauges).length(1)
@@ -79,14 +73,14 @@ describe('Test Basic Examples', () => {
         },
       ],
     }
-    const res2 = await service.processBlocks(request2, testContext)
+    const res2 = await service.processBlocks(request2)
     const o11yRes2 = res2.result
     expect(o11yRes2?.counters).length(0)
     expect(o11yRes2?.gauges).length(1)
     expect(MetricValueToNumber(o11yRes2?.gauges?.[0].metricValue)).equals(20n)
   })
 
-  it('Check log dispatch', async () => {
+  test('Check log dispatch', async () => {
     const raw = toRaw(logData)
     const request: ProcessLogsRequest = {
       logBindings: [],
@@ -110,7 +104,7 @@ describe('Test Basic Examples', () => {
     })
     request.logBindings.push(binding2)
 
-    const res = await service.processLogs(request, testContext)
+    const res = await service.processLogs(request)
 
     const counters = res.result?.counters
     expect(counters).length(2)
@@ -124,13 +118,13 @@ describe('Test Basic Examples', () => {
     expect(res.result?.gauges).length(0)
     expect(res.configUpdated).equals(true)
 
-    const config = await service.getConfig({}, testContext)
+    const config = await service.getConfig({})
     expect(config.contractConfigs).length(6) //config increased
     expect(config.contractConfigs?.[5].contract?.name).equals('dynamic')
 
     // repeat trigger won't bind again
-    await service.processLogs(request, testContext)
-    const config2 = await service.getConfig({}, testContext)
+    await service.processLogs(request)
+    const config2 = await service.getConfig({})
     expect(config).deep.equals(config2)
   })
 

@@ -23,7 +23,6 @@ import {
   TemplateInstance,
 } from './gen/processor/protos/processor'
 
-import { DeepPartial } from './gen/builtin'
 import { Empty } from './gen/google/protobuf/empty'
 import Long from 'long'
 import { BaseProcessor } from './base-processor'
@@ -51,12 +50,13 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     this.shutdownHandler = shutdownHandler
   }
 
-  async getConfig(request: ProcessConfigRequest, context: CallContext): Promise<DeepPartial<ProcessConfigResponse>> {
+  async getConfig(request: ProcessConfigRequest, context: CallContext): Promise<ProcessConfigResponse> {
     if (!this.started) {
       throw new ServerError(Status.UNAVAILABLE, 'Service Not started.')
     }
     return {
       // TODO project setting
+      config: undefined,
       contractConfigs: this.contractConfigs,
       templateInstances: this.templateInstances,
     }
@@ -162,7 +162,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     }
   }
 
-  async start(request: StartRequest, context: CallContext): Promise<DeepPartial<Empty>> {
+  async start(request: StartRequest, context: CallContext): Promise<Empty> {
     if (this.started) {
       return {}
     }
@@ -187,7 +187,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     return {}
   }
 
-  async stop(request: Empty, context: CallContext): Promise<DeepPartial<Empty>> {
+  async stop(request: Empty, context: CallContext): Promise<Empty> {
     console.log('Server Shutting down in 5 seconds')
     if (this.shutdownHandler) {
       setTimeout(this.shutdownHandler, 5000)
@@ -195,7 +195,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     return {}
   }
 
-  async processLogs(request: ProcessLogsRequest, context: CallContext): Promise<DeepPartial<ProcessLogsResponse>> {
+  async processLogs(request: ProcessLogsRequest, context: CallContext): Promise<ProcessLogsResponse> {
     if (!this.started) {
       throw new ServerError(Status.UNAVAILABLE, 'Service Not started.')
     }
@@ -252,7 +252,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
   async processTransactions(
     request: ProcessTransactionsRequest,
     context: CallContext
-  ): Promise<DeepPartial<ProcessTransactionsResponse>> {
+  ): Promise<ProcessTransactionsResponse> {
     if (!this.started) {
       throw new ServerError(Status.UNAVAILABLE, 'Service not started.')
     }
@@ -329,10 +329,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     }
   }
 
-  async processBlocks(
-    request: ProcessBlocksRequest,
-    context: CallContext
-  ): Promise<DeepPartial<ProcessBlocksResponse>> {
+  async processBlocks(request: ProcessBlocksRequest, context: CallContext): Promise<ProcessBlocksResponse> {
     if (!this.started) {
       throw new ServerError(Status.UNAVAILABLE, 'Service Not started.')
     }
