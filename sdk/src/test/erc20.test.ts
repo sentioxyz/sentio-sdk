@@ -2,21 +2,10 @@
 
 import { expect } from 'chai'
 
-import {
-  HandlerType,
-  LogBinding,
-  ProcessBlocksRequest,
-  ProcessLogsRequest,
-  ProcessorServiceImpl,
-  setProvider,
-} from '..'
+import { HandlerType, LogBinding, ProcessBlocksRequest, ProcessLogsRequest } from '..'
 
-import { CallContext } from 'nice-grpc-common/src/server/CallContext'
-import * as path from 'path'
-import * as fs from 'fs-extra'
-import { cleanTest } from './clean-test'
 import { MetricValueToNumber } from '../numberish'
-import { TestProcessorServer } from './test-processor-server'
+import { firstCounterValue, TestProcessorServer } from './test-processor-server'
 
 describe('Test Basic Examples', () => {
   const service = new TestProcessorServer()
@@ -108,11 +97,12 @@ describe('Test Basic Examples', () => {
 
     const counters = res.result?.counters
     expect(counters).length(2)
-    expect(MetricValueToNumber(counters?.[0].metricValue)).equals(1n)
+    expect(firstCounterValue(res.result, 'c1')).equals(1n)
+
     expect(counters?.[0].metadata?.chainId).equals('1')
     expect(counters?.[0].runtimeInfo?.from).equals(HandlerType.LOG)
 
-    expect(MetricValueToNumber(counters?.[1].metricValue)).equals(2n)
+    expect(firstCounterValue(res.result, 'c2')).equals(2n)
     expect(counters?.[1].metadata?.chainId).equals('56')
 
     expect(res.result?.gauges).length(0)

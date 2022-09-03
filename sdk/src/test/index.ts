@@ -1,1 +1,1 @@
-export { cleanTest } from './clean-test'
+export { TestProcessorServer } from './test-processor-server'

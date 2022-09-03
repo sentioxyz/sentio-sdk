@@ -1,7 +1,7 @@
 // copy from https://github.com/DefiLlama/chainlist/blob/main/constants/chainIds.js
 // and https://besu.hyperledger.org/en/stable/Concepts/NetworkID-And-ChainID/
 
-export const CHAIN_MAP: { [key: string]: string } = {
+export const CHAIN_MAP: Record<string, string> = {
   'SOL:mainnet': 'solana',
   'SOL:devnet': 'solana-dev',
   'SOL:testnet': 'solana-test',

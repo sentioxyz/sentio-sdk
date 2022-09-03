@@ -2,6 +2,7 @@ import { getNetwork, Provider, StaticJsonRpcProvider } from '@ethersproject/prov
 import { Networkish } from '@ethersproject/networks'
 import PQueue from 'p-queue'
 import { ConnectionInfo } from '@ethersproject/web'
+import { ChainConfig } from './chain-config'
 
 export const DummyProvider = new StaticJsonRpcProvider(undefined, 1)
 
@@ -21,7 +22,7 @@ export function getProvider(networkish?: Networkish): Provider {
   return value
 }
 
-export function setProvider(config: any, concurrency = 4, useChainServer = false) {
+export function setProvider(config: Record<string, ChainConfig>, concurrency = 4, useChainServer = false) {
   global.PROCESSOR_STATE.providers = new Map<number, Provider>()
 
   for (const chainIdStr in config) {

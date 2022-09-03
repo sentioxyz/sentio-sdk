@@ -1,4 +1,5 @@
 import {
+  O11yResult,
   ProcessBlocksRequest,
   ProcessBlocksResponse,
   ProcessConfigRequest,
@@ -9,28 +10,39 @@ import {
   ProcessLogsResponse,
   ProcessorServiceImpl,
   ProcessorServiceImplementation,
+  ProcessorState,
   ProcessTransactionsRequest,
   ProcessTransactionsResponse,
   setProvider,
   StartRequest,
 } from '@sentio/sdk'
-import { cleanTest } from './clean-test'
-import path from 'path'
-import * as fs from 'fs-extra'
 import { CallContext } from 'nice-grpc-common'
-import { DeepPartial } from '../gen/builtin'
 import { Empty } from '../gen/google/protobuf/empty'
+import { ChainConfig } from '../chain-config'
+import { CHAIN_MAP } from '../utils/chainmap'
+import { MetricValueToNumber, Numberish } from '../numberish'
 
 const TEST_CONTEXT: CallContext = <CallContext>{}
 
+function cleanTest() {
+  global.PROCESSOR_STATE = new ProcessorState()
+}
 export class TestProcessorServer implements ProcessorServiceImplementation {
   service = new ProcessorServiceImpl()
 
-  setup(processorPath: string | string[] = []) {
+  setup(processorPath: string | string[] = [], httpEndpoints: Record<string, string> = {}) {
     cleanTest()
-    const fullPath = path.resolve('chains-config.json')
-    const chainsConfig = fs.readJsonSync(fullPath)
-    setProvider(chainsConfig)
+    const dummyConfig: Record<string, ChainConfig> = {}
+
+    for (const k in CHAIN_MAP) {
+      const http = httpEndpoints[k] || ''
+      dummyConfig[k] = {
+        ChainID: k,
+        Https: [http],
+      }
+    }
+
+    setProvider(dummyConfig)
     if (!Array.isArray(processorPath)) {
       processorPath = [processorPath]
     }
@@ -72,4 +84,28 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
   ): Promise<ProcessTransactionsResponse> {
     return this.service.processTransactions(request, context)
   }
+}
+
+export function firstCounterValue(result: O11yResult | undefined, name: string): Numberish | undefined {
+  if (!result) {
+    return undefined
+  }
+  for (const counter of result.counters) {
+    if (counter.metadata?.name === name) {
+      return MetricValueToNumber(counter.metricValue)
+    }
+  }
+  return undefined
+}
+
+export function firstGaugeValue(result: O11yResult | undefined, name: string): Numberish | undefined {
+  if (!result) {
+    return undefined
+  }
+  for (const gauge of result.gauges) {
+    if (gauge.metadata?.name === name) {
+      return MetricValueToNumber(gauge.metricValue)
+    }
+  }
+  return undefined
 }

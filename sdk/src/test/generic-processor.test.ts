@@ -2,11 +2,10 @@
 
 import { expect } from 'chai'
 
-import { HandlerType, LogBinding, ProcessLogsRequest, ProcessorServiceImpl, setProvider } from '..'
+import { HandlerType, LogBinding, ProcessLogsRequest } from '..'
 
-import { MetricValueToNumber } from '../numberish'
 import { GenericProcessor } from '../generic-processor'
-import { TestProcessorServer } from './test-processor-server'
+import { firstCounterValue, TestProcessorServer } from './test-processor-server'
 
 describe('Test Generic Processor', () => {
   const service = new TestProcessorServer()
@@ -53,7 +52,7 @@ describe('Test Generic Processor', () => {
 
     const counters = res.result?.counters
     expect(counters).length(2)
-    expect(MetricValueToNumber(counters?.[0].metricValue)).equals(1n)
+    expect(firstCounterValue(res.result, 'event_num')).equals(1n)
     expect(counters?.[0].runtimeInfo?.from).equals(HandlerType.LOG)
   })
 
