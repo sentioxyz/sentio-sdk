@@ -96,10 +96,6 @@ export interface StartRequest {
   templateInstances: TemplateInstance[];
 }
 
-export interface OldBlockHandlerConfig {
-  numHandlers: number;
-}
-
 export interface BlockHandlerConfig {
   handlerId: number;
 }
@@ -181,7 +177,6 @@ export interface Instruction {
 export interface BlockBinding {
   block: Block | undefined;
   handlerIds: number[];
-  chainId: string;
 }
 
 export interface Block {
@@ -866,64 +861,6 @@ export const StartRequest = {
     message.templateInstances =
       object.templateInstances?.map((e) => TemplateInstance.fromPartial(e)) ||
       [];
-    return message;
-  },
-};
-
-function createBaseOldBlockHandlerConfig(): OldBlockHandlerConfig {
-  return { numHandlers: 0 };
-}
-
-export const OldBlockHandlerConfig = {
-  encode(
-    message: OldBlockHandlerConfig,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
-    if (message.numHandlers !== 0) {
-      writer.uint32(8).int32(message.numHandlers);
-    }
-    return writer;
-  },
-
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): OldBlockHandlerConfig {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseOldBlockHandlerConfig();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.numHandlers = reader.int32();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): OldBlockHandlerConfig {
-    return {
-      numHandlers: isSet(object.numHandlers) ? Number(object.numHandlers) : 0,
-    };
-  },
-
-  toJSON(message: OldBlockHandlerConfig): unknown {
-    const obj: any = {};
-    message.numHandlers !== undefined &&
-      (obj.numHandlers = Math.round(message.numHandlers));
-    return obj;
-  },
-
-  fromPartial(
-    object: DeepPartial<OldBlockHandlerConfig>
-  ): OldBlockHandlerConfig {
-    const message = createBaseOldBlockHandlerConfig();
-    message.numHandlers = object.numHandlers ?? 0;
     return message;
   },
 };
@@ -2076,7 +2013,7 @@ export const Instruction = {
 };
 
 function createBaseBlockBinding(): BlockBinding {
-  return { block: undefined, handlerIds: [], chainId: "" };
+  return { block: undefined, handlerIds: [] };
 }
 
 export const BlockBinding = {
@@ -2092,9 +2029,6 @@ export const BlockBinding = {
       writer.int32(v);
     }
     writer.ldelim();
-    if (message.chainId !== "") {
-      writer.uint32(26).string(message.chainId);
-    }
     return writer;
   },
 
@@ -2118,9 +2052,6 @@ export const BlockBinding = {
             message.handlerIds.push(reader.int32());
           }
           break;
-        case 3:
-          message.chainId = reader.string();
-          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -2135,7 +2066,6 @@ export const BlockBinding = {
       handlerIds: Array.isArray(object?.handlerIds)
         ? object.handlerIds.map((e: any) => Number(e))
         : [],
-      chainId: isSet(object.chainId) ? String(object.chainId) : "",
     };
   },
 
@@ -2148,7 +2078,6 @@ export const BlockBinding = {
     } else {
       obj.handlerIds = [];
     }
-    message.chainId !== undefined && (obj.chainId = message.chainId);
     return obj;
   },
 
@@ -2159,7 +2088,6 @@ export const BlockBinding = {
         ? Block.fromPartial(object.block)
         : undefined;
     message.handlerIds = object.handlerIds?.map((e) => e) || [];
-    message.chainId = object.chainId ?? "";
     return message;
   },
 };

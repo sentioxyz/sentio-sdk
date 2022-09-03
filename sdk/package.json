@@ -4,14 +4,15 @@
   "scripts": {
     "compile_target": "yarn tsc -b src/target-ethers-sentio/tsconfig.json",
     "compile": "tsc -p . && cp src/cli/webpack.config.js dist/cli",
-    "build": "yarn compile_target && yarn gen_bultin_evm && yarn gen_test_abi && yarn compile",
+    "build": "yarn gen && yarn compile",
     "start_ts": "ts-node --files src/processor-runner.ts ../examples/x2y2/src/processor.ts",
     "start_ts_solana": "ts-node --files src/processor-runner.ts ../examples/mirrorworld/src/processor.ts",
     "start": "ts-node --files src/processor-runner.ts ../examples/x2y2/dist/lib.js",
     "start_js": "node dist/processor.js ../examples/x2y2/dist/lib.js",
     "ts-start": "ts-node --files src/processor-runner.ts ./src/anyswap/src/processor.ts",
     "cli": "yarn build && node dist/cli/cli.js",
-    "test": "jest src/**/*.test.ts",
+    "test": "jest",
+    "gen": "yarn compile_target && yarn gen_bultin_evm && yarn gen_test_abi",
     "gen_test_abi": "yarn gen_solana_abi",
     "gen_bultin_evm": "typechain --target dist/target-ethers-sentio --out-dir src/builtin/internal 'src/abis/*.json'",
     "gen_solana_abi": "ts-node src/cli/solana-code-gen.ts src/test types"

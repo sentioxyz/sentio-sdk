@@ -98,24 +98,3 @@ function hexToBigInteger(hex: string, negative: boolean): BigInteger {
     data: new Uint8Array(buffer),
   }
 }
-
-export function MetricValueToNumber(v: DeepPartial<MetricValue> | undefined): Numberish | undefined {
-  if (v === undefined) {
-    return undefined
-  }
-
-  if (v.doubleValue !== undefined) {
-    return v.doubleValue
-  }
-  if (v.bigInteger !== undefined) {
-    let intValue = BigNumber.from(v.bigInteger.data).toBigInt()
-    if (v.bigInteger.negative) {
-      intValue = -intValue
-    }
-    return intValue
-  }
-  if (v.bigDecimal !== undefined) {
-    return new BigDecimal(v.bigDecimal)
-  }
-  return undefined
-}

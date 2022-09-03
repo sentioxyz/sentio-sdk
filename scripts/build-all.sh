@@ -27,5 +27,6 @@ for dir in $PROCESSOR_DIR/examples/*/; do # list directories in the form "/tmp/d
   echo
   echo "### Build ${dir##*/}" # print everything after the final "/"
   cd $dir
+  yarn sentio gen && yarn test
   yarn sentio build
 done

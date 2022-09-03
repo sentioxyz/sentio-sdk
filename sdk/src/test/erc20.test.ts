@@ -2,16 +2,16 @@
 
 import { expect } from 'chai'
 
-import { HandlerType, LogBinding, ProcessBlocksRequest, ProcessLogsRequest } from '..'
+import { HandlerType } from '..'
 
-import { MetricValueToNumber } from '../numberish'
-import { firstCounterValue, TestProcessorServer } from './test-processor-server'
+import { firstCounterValue, firstGaugeValue, TestProcessorServer } from './test-processor-server'
 
 describe('Test Basic Examples', () => {
   const service = new TestProcessorServer()
 
   beforeAll(async () => {
-    service.setup('./erc20')
+    service.setup()
+    require('./erc20')
     await service.start()
   })
 
@@ -27,105 +27,57 @@ describe('Test Basic Examples', () => {
   })
 
   test('Check block dispatch', async () => {
-    const raw = toRaw(blockData)
-
-    const request: ProcessBlocksRequest = {
-      blockBindings: [
-        {
-          block: {
-            raw: raw,
-          },
-          handlerIds: [0],
-          chainId: '', // TODO remove
-        },
-      ],
-    }
-    const res = await service.processBlocks(request)
+    const res = await service.testBlock(blockData)
     const o11yRes = res.result
     expect(o11yRes?.counters).length(0)
     expect(o11yRes?.gauges).length(1)
-    expect(MetricValueToNumber(o11yRes?.gauges?.[0].metricValue)).equals(10n)
+    expect(firstGaugeValue(o11yRes, 'g1')).equals(10n)
 
     const gauge = o11yRes?.gauges?.[0]
     expect(gauge?.metadata?.blockNumber?.toString()).equals('14373295')
     expect(gauge?.runtimeInfo?.from).equals(HandlerType.BLOCK)
 
-    // Different handler id should be dispatch to other
-    const request2: ProcessBlocksRequest = {
-      blockBindings: [
-        {
-          block: {
-            raw: raw,
-          },
-          handlerIds: [1],
-          chainId: '', // TODO remove
-        },
-      ],
-    }
-    const res2 = await service.processBlocks(request2)
+    const res2 = await service.testBlock(blockData, 56)
     const o11yRes2 = res2.result
     expect(o11yRes2?.counters).length(0)
     expect(o11yRes2?.gauges).length(1)
-    expect(MetricValueToNumber(o11yRes2?.gauges?.[0].metricValue)).equals(20n)
+    expect(firstGaugeValue(o11yRes2, 'g2')).equals(20n)
   })
 
   test('Check log dispatch', async () => {
-    const raw = toRaw(logData)
-    const request: ProcessLogsRequest = {
-      logBindings: [],
-    }
-
-    const binding = LogBinding.fromPartial({
-      handlerId: 0,
-      log: {
-        raw: raw,
-      },
-    })
-
-    request.logBindings.push(binding)
-
-    // just faked some logs here
-    const binding2 = LogBinding.fromPartial({
-      handlerId: 1,
-      log: {
-        raw: raw,
-      },
-    })
-    request.logBindings.push(binding2)
-
-    const res = await service.processLogs(request)
+    let res = await service.testLog(logData)
 
     const counters = res.result?.counters
-    expect(counters).length(2)
+    expect(counters).length(1)
     expect(firstCounterValue(res.result, 'c1')).equals(1n)
 
     expect(counters?.[0].metadata?.chainId).equals('1')
     expect(counters?.[0].runtimeInfo?.from).equals(HandlerType.LOG)
+    expect(res.configUpdated).equals(true)
+
+    const logData2 = Object.assign({}, logData)
+    logData2.address = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
+    res = await service.testLog(logData2, 56)
 
     expect(firstCounterValue(res.result, 'c2')).equals(2n)
-    expect(counters?.[1].metadata?.chainId).equals('56')
+    expect(res.result?.counters[0].metadata?.chainId).equals('56')
 
     expect(res.result?.gauges).length(0)
-    expect(res.configUpdated).equals(true)
 
     const config = await service.getConfig({})
     expect(config.contractConfigs).length(6) //config increased
     expect(config.contractConfigs?.[5].contract?.name).equals('dynamic')
 
     // repeat trigger won't bind again
-    await service.processLogs(request)
+    await service.testLogs([logData])
     const config2 = await service.getConfig({})
     expect(config).deep.equals(config2)
   })
 
   const blockData = {
     hash: '0x2b9b7cce1f17f3b7e1f3c2472cc806a07bee3f0baca07d021350950d81d73a42',
-    parentHash: '0xd538332875124ce30a6674926ae6befa2358ac0a03c70d60c24e74ad7bdf2505',
     number: 14373295,
     timestamp: 1647106437,
-    nonce: '0x73bcaf422fe98f49',
-    difficulty: null,
-    miner: '0x829BD824B016326A401d083B33D092293333A830',
     extraData: '0xe4b883e5bda9e7a59ee4bb99e9b1bc493421',
   }
 
@@ -143,14 +95,5 @@ describe('Test Basic Examples', () => {
     ],
     transactionHash: '0x93355e0cb2c3490cb8a747029ff2dc8cdbde2407025b8391398436955afae303',
     logIndex: 428,
-  }
-
-  function toRaw(obj: any): Uint8Array {
-    const logJsonStr = JSON.stringify(obj)
-    const raw = new Uint8Array(logJsonStr.length)
-    for (let i = 0; i < logJsonStr.length; i++) {
-      raw[i] = logJsonStr.charCodeAt(i)
-    }
-    return raw
   }
 })

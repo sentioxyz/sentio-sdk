@@ -2,7 +2,7 @@
 
 import { expect } from 'chai'
 
-import { HandlerType, LogBinding, ProcessLogsRequest } from '..'
+import { HandlerType } from '..'
 
 import { GenericProcessor } from '../generic-processor'
 import { firstCounterValue, TestProcessorServer } from './test-processor-server'
@@ -16,7 +16,7 @@ describe('Test Generic Processor', () => {
     GenericProcessor.bind(
       [
         'event Transfer(address indexed from, address indexed to, uint256 value)',
-        'event Approval(address indexed from, address indexed to,uint256 value)',
+        'event Approval(address indexed from, address indexed to, uint256 value)',
       ],
       { address: '0x1E4EDE388cbc9F4b5c79681B7f94d36a11ABEBC9' }
     ).onAllEvents(function (log, ctx) {
@@ -33,23 +33,7 @@ describe('Test Generic Processor', () => {
   })
 
   test('Check log dispatch', async () => {
-    const raw = toRaw(logData)
-    const request: ProcessLogsRequest = {
-      logBindings: [],
-    }
-
-    const binding = LogBinding.fromPartial({
-      handlerId: 0,
-      log: {
-        raw: raw,
-      },
-    })
-
-    request.logBindings.push(binding)
-    request.logBindings.push(binding)
-
-    const res = await service.processLogs(request)
-
+    const res = await service.testLogs([logData, logData])
     const counters = res.result?.counters
     expect(counters).length(2)
     expect(firstCounterValue(res.result, 'event_num')).equals(1n)
@@ -70,14 +54,5 @@ describe('Test Generic Processor', () => {
     ],
     transactionHash: '0x93355e0cb2c3490cb8a747029ff2dc8cdbde2407025b8391398436955afae303',
     logIndex: 428,
-  }
-
-  function toRaw(obj: any): Uint8Array {
-    const logJsonStr = JSON.stringify(obj)
-    const raw = new Uint8Array(logJsonStr.length)
-    for (let i = 0; i < logJsonStr.length; i++) {
-      raw[i] = logJsonStr.charCodeAt(i)
-    }
-    return raw
   }
 })

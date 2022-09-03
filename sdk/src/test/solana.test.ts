@@ -5,15 +5,16 @@ import { expect } from 'chai'
 import { HandlerType, ProcessInstructionsRequest } from '..'
 
 import Long from 'long'
-import { MetricValueToNumber } from '../numberish'
 import { TextEncoder } from 'util'
-import { TestProcessorServer } from './test-processor-server'
+import { MetricValueToNumber, TestProcessorServer } from './test-processor-server'
 
 describe('Test Solana Example', () => {
   const service = new TestProcessorServer()
 
   beforeAll(async () => {
-    service.setup(['./mirrorworld', './wormhole-token-bridge'])
+    await service.setup()
+    require('./mirrorworld')
+    require('./wormhole-token-bridge')
     await service.start({ templateInstances: [] })
   })
 

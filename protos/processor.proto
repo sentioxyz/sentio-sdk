@@ -75,11 +75,6 @@ message StartRequest {
   repeated TemplateInstance template_instances = 1;
 }
 
-// deprecate, TODO to be deteled
-message OldBlockHandlerConfig {
-  int32 num_handlers = 1;
-}
-
 message BlockHandlerConfig {
   int32 handler_id = 1;
 }
@@ -162,7 +157,6 @@ message Instruction {
 message BlockBinding {
   Block block = 1;
   repeated int32 handler_ids = 2; // TODO consider make log binds contain list of handler id as well
-  string chain_id = 3; // TODO remove this
 }
 
 message Block {

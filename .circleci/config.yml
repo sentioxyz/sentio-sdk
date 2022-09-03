@@ -17,7 +17,7 @@ jobs:
 #          command: yarn install
 #          name: Yarn Install
       - run:
-          command: yarn build && yarn test
+          command: yarn gen && yarn test
           name: Test SDK
           working_directory: sdk
       - run:

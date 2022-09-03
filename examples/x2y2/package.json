@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "scripts": {
     "compile": "tsc -p .",
-    "start": "processor_server ./dist/lib",
+    "test": "jest",
     "build": "sentio build",
     "tsnode": "yarn ts-node"
   },

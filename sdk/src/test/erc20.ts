@@ -16,12 +16,12 @@ Erc20Processor.bind({
   startBlock: 14201940,
 })
   .onTransfer(async function (event, ctx) {
-    processorTemplate.bind({ address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', network: 3, name: 'dynamic' })
+    processorTemplate.bind({ address: '0x1E4EDE388cbc9F4b5c79681B7f94d36a11ABEBC9', network: 3, name: 'dynamic' })
     // template.bind('0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', 3, 'dynamic')
     ctx.meter.Counter('c1').add(1)
   }, filter)
   .onBlock(async function (block, ctx) {
-    ctx.meter.Gauge('h1').record(10, { k: 'v' })
+    ctx.meter.Gauge('g1').record(10, { k: 'v' })
   })
 
 Erc20Processor.bind({ address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', network: 56, name: 'usdc' })
@@ -29,7 +29,7 @@ Erc20Processor.bind({ address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', net
     ctx.meter.Counter('c2').add(2)
   }, filter)
   .onBlock(async function (block, ctx) {
-    ctx.meter.Gauge('h1').record(20, { k: 'v' })
+    ctx.meter.Gauge('g2').record(20, { k: 'v' })
   })
 // .startBlock(14201940)
 

@@ -10,7 +10,8 @@ describe('Test Template', () => {
   const service = new TestProcessorServer()
 
   beforeAll(async () => {
-    service.setup('./erc20-template')
+    service.setup()
+    require('./erc20-template')
     const request: StartRequest = {
       templateInstances: [
         {
