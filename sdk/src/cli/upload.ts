@@ -54,7 +54,7 @@ export async function uploadFile(options: SentioProjectConfig, apiKeyOverride: s
 
   url.pathname = '/api/v1/processors'
 
-  let packageJson = { version: 'error' }
+  let packageJson: { version: string }
   try {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     packageJson = require('../package.json')
