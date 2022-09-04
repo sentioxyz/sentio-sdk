@@ -1,6 +1,5 @@
 import { BigNumber } from 'ethers'
 import { BigInteger, MetricValue } from './gen/processor/protos/processor'
-import { DeepPartial } from './gen/builtin'
 import { BigDecimal } from '.'
 import { BN } from '@project-serum/anchor'
 

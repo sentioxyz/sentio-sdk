@@ -1,10 +1,7 @@
 import {
-  BigDecimal,
   BlockBinding,
   ContractConfig,
   LogBinding,
-  MetricValue,
-  O11yResult,
   ProcessBlocksRequest,
   ProcessBlocksResponse,
   ProcessConfigRequest,
@@ -25,12 +22,9 @@ import { CallContext } from 'nice-grpc-common'
 import { Empty } from '../gen/google/protobuf/empty'
 import { ChainConfig } from '../chain-config'
 import { CHAIN_MAP } from '../utils/chainmap'
-import { Numberish } from '../numberish'
 import { Block, Log } from '@ethersproject/abstract-provider'
 import Long from 'long'
 import { getNetwork, Networkish } from '@ethersproject/providers'
-import { DeepPartial } from '../gen/builtin'
-import { BigNumber } from 'ethers'
 
 const TEST_CONTEXT: CallContext = <CallContext>{}
 
@@ -206,30 +200,6 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
   }
 }
 
-export function firstCounterValue(result: O11yResult | undefined, name: string): Numberish | undefined {
-  if (!result) {
-    return undefined
-  }
-  for (const counter of result.counters) {
-    if (counter.metadata?.name === name) {
-      return MetricValueToNumber(counter.metricValue)
-    }
-  }
-  return undefined
-}
-
-export function firstGaugeValue(result: O11yResult | undefined, name: string): Numberish | undefined {
-  if (!result) {
-    return undefined
-  }
-  for (const gauge of result.gauges) {
-    if (gauge.metadata?.name === name) {
-      return MetricValueToNumber(gauge.metricValue)
-    }
-  }
-  return undefined
-}
-
 function toBytes(obj: any): Uint8Array {
   const logJsonStr = JSON.stringify(obj)
   const raw = new Uint8Array(logJsonStr.length)
@@ -237,25 +207,4 @@ function toBytes(obj: any): Uint8Array {
     raw[i] = logJsonStr.charCodeAt(i)
   }
   return raw
-}
-
-export function MetricValueToNumber(v: DeepPartial<MetricValue> | undefined): Numberish | undefined {
-  if (v === undefined) {
-    return undefined
-  }
-
-  if (v.doubleValue !== undefined) {
-    return v.doubleValue
-  }
-  if (v.bigInteger !== undefined) {
-    let intValue = BigNumber.from(v.bigInteger.data).toBigInt()
-    if (v.bigInteger.negative) {
-      intValue = -intValue
-    }
-    return intValue
-  }
-  if (v.bigDecimal !== undefined) {
-    return new BigDecimal(v.bigDecimal)
-  }
-  return undefined
 }

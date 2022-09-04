@@ -5,7 +5,8 @@ import { expect } from 'chai'
 import { HandlerType } from '..'
 
 import { GenericProcessor } from '../generic-processor'
-import { firstCounterValue, TestProcessorServer } from './test-processor-server'
+import { TestProcessorServer } from './test-processor-server'
+import { firstCounterValue } from './metric-utils'
 
 describe('Test Generic Processor', () => {
   const service = new TestProcessorServer()

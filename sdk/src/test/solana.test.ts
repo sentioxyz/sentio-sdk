@@ -6,7 +6,8 @@ import { HandlerType, ProcessInstructionsRequest } from '..'
 
 import Long from 'long'
 import { TextEncoder } from 'util'
-import { MetricValueToNumber, TestProcessorServer } from './test-processor-server'
+import { TestProcessorServer } from './test-processor-server'
+import { MetricValueToNumber } from './metric-utils'
 
 describe('Test Solana Example', () => {
   const service = new TestProcessorServer()
