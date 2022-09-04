@@ -83,7 +83,10 @@ export const CHAIN_MAP: Record<string, string> = {
   836542336838601: 'curio',
 }
 
-export function getChainName(chainId: string): string {
+export function getChainName(chainId: string | number): string {
+  if (typeof chainId === 'number') {
+    chainId = chainId.toString()
+  }
   const name = CHAIN_MAP[chainId]
   if (name) {
     return name
