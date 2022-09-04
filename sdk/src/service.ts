@@ -288,8 +288,10 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
                 let res: O11yResult | null
                 if (instruction.parsed) {
                   res = processor.handleInstruction(JSON.parse(new TextDecoder().decode(instruction.parsed)))
-                } else {
+                } else if (instruction.instructionData) {
                   res = processor.handleInstruction(instruction.instructionData)
+                } else {
+                  continue
                 }
                 if (res) {
                   try {
@@ -309,7 +311,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
                     console.error('error processing instruction ' + e.toString())
                   }
                 } else {
-                  console.error(
+                  console.warn(
                     `Failed to decode the instruction: ${instruction.instructionData} with slot: ${instruction.slot}`
                   )
                 }

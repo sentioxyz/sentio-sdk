@@ -7,7 +7,7 @@ import { HandlerType, ProcessInstructionsRequest } from '..'
 import Long from 'long'
 import { TextEncoder } from 'util'
 import { TestProcessorServer } from './test-processor-server'
-import { MetricValueToNumber } from './metric-utils'
+import { firstCounterValue } from './metric-utils'
 
 describe('Test Solana Example', () => {
   const service = new TestProcessorServer()
@@ -37,7 +37,7 @@ describe('Test Solana Example', () => {
     const res = await service.processInstructions(request)
     expect(res.result?.counters).length(3)
     expect(res.result?.gauges).length(0)
-    expect(MetricValueToNumber(res.result?.counters[0].metricValue)).equal(5000000000n)
+    expect(firstCounterValue(res.result, 'deposit_pool_total_value')).equal(5000000000n)
   })
 
   test('Check wormhole token bridge instruction dispatch', async () => {
@@ -59,7 +59,7 @@ describe('Test Solana Example', () => {
     expect(res.result?.counters).length(2)
     expect(res.result?.gauges).length(0)
     expect(res.result?.counters[0].metadata?.blockNumber.toInt()).equal(0)
-    expect(MetricValueToNumber(res.result?.counters[0].metricValue)).equal(1000000n)
+    expect(firstCounterValue(res.result, 'total_transfer_amount')).equal(1000000n)
     expect(res.result?.counters[0].runtimeInfo?.from).equals(HandlerType.INSTRUCTION)
   })
 
@@ -87,7 +87,7 @@ describe('Test Solana Example', () => {
     expect(res.result?.counters).length(1)
     expect(res.result?.gauges).length(0)
     expect(res.result?.counters[0].metadata?.blockNumber.toInt()).equal(0)
-    expect(MetricValueToNumber(res.result?.counters[0].metricValue)).equal(12000000000000)
+    expect(firstCounterValue(res.result, 'totalWeth_supply')).equal(12000000000000)
     expect(res.result?.counters[0].runtimeInfo?.from).equals(HandlerType.INSTRUCTION)
   })
 })
