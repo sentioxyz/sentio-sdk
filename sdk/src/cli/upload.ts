@@ -9,9 +9,6 @@ import chalk from 'chalk'
 import { buildProcessor } from './build'
 import fetch from 'node-fetch'
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const packageJson = require('../../package.json')
-
 export async function uploadFile(options: SentioProjectConfig, apiKeyOverride: string) {
   if (options.build) {
     await buildProcessor(false, options.targets)
@@ -56,6 +53,15 @@ export async function uploadFile(options: SentioProjectConfig, apiKeyOverride: s
   }
 
   url.pathname = '/api/v1/processors'
+
+  let packageJson = { version: 'error' }
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    packageJson = require('../package.json')
+  } catch (e) {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    packageJson = require('../../package.json')
+  }
 
   const res = await fetch(url, {
     method: 'POST',
