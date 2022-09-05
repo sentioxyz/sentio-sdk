@@ -6,6 +6,41 @@ import { HandlerType } from '..'
 
 import { TestProcessorServer } from './test-processor-server'
 import { firstCounterValue, firstGaugeValue } from './metric-utils'
+import { ApprovalEventObject, getErc20Contract, TransferEventObject } from '../builtin/erc20'
+import { Log } from '@ethersproject/providers'
+import { BigNumber } from 'ethers'
+
+const contractAddress = '0x1E4EDE388cbc9F4b5c79681B7f94d36a11ABEBC9'
+
+function getEventLog(event: TransferEventObject | ApprovalEventObject): Log {
+  let encodedLog: {
+    data: string
+    topics: string[]
+  }
+  const erc20Contract = getErc20Contract(contractAddress)
+  if ('from' in event) {
+    encodedLog = erc20Contract.rawContract.interface.encodeEventLog(
+      erc20Contract.rawContract.interface.getEvent('Transfer'),
+      [event.from, event.to, event.value]
+    )
+  } else {
+    encodedLog = erc20Contract.rawContract.interface.encodeEventLog(
+      erc20Contract.rawContract.interface.getEvent('Approval'),
+      [event.owner, event.spender, event.value]
+    )
+  }
+  return {
+    address: contractAddress,
+    blockHash: '0x0000000000000000000000000000000000000000000000000000000000000000',
+    blockNumber: 0,
+    logIndex: 0,
+    removed: false,
+    transactionHash: '0x0000000000000000000000000000000000000000000000000000000000000000',
+    transactionIndex: 0,
+    data: encodedLog.data,
+    topics: encodedLog.topics,
+  }
+}
 
 describe('Test Basic Examples', () => {
   const service = new TestProcessorServer()
@@ -46,6 +81,12 @@ describe('Test Basic Examples', () => {
   })
 
   test('Check log dispatch', async () => {
+    const logData = getEventLog({
+      from: '0x0000000000000000000000000000000000000000',
+      to: '0xB329e39Ebefd16f40d38f07643652cE17Ca5Bac1',
+      value: BigNumber.from('0x9a71db64810aaa0000'),
+    })
+
     let res = await service.testLog(logData)
 
     const counters = res.result?.counters
@@ -80,21 +121,5 @@ describe('Test Basic Examples', () => {
     number: 14373295,
     timestamp: 1647106437,
     extraData: '0xe4b883e5bda9e7a59ee4bb99e9b1bc493421',
-  }
-
-  const logData = {
-    blockNumber: 14213252,
-    blockHash: '0x83d646fac9350b281def8c4c37626f9d8efc95df801287b848c719edf35cdbaf',
-    transactionIndex: 347,
-    removed: false,
-    address: '0x1E4EDE388cbc9F4b5c79681B7f94d36a11ABEBC9',
-    data: '0x00000000000000000000000000000000000000000000009a71db64810aaa0000',
-    topics: [
-      '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
-      '0x0000000000000000000000000000000000000000000000000000000000000000',
-      '0x000000000000000000000000b329e39ebefd16f40d38f07643652ce17ca5bac1',
-    ],
-    transactionHash: '0x93355e0cb2c3490cb8a747029ff2dc8cdbde2407025b8391398436955afae303',
-    logIndex: 428,
   }
 })

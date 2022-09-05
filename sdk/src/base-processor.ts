@@ -74,7 +74,6 @@ export abstract class BaseProcessor<
         const ctx = new Context<TContract, TBoundContractView>(contractView, chainId, undefined, log)
         // let event: Event = <Event>deepCopy(log);
         const event: Event = <Event>log
-
         const parsed = contractView.rawContract.interface.parseLog(log)
         if (parsed) {
           event.args = parsed.args
