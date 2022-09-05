@@ -2,7 +2,7 @@ import { SolanaBaseProcessor } from '../../solana-processor'
 import { SolanaContext } from '../../context'
 import { Instruction } from '@project-serum/anchor'
 import { Approve, Burn, CloseAccount, FreezeAccount, InitializeAccount, InitializeAccount2, InitializeAccount3, InitializeMint, InitializeMultisig, MintTo, Revoke, ThawAccount, Transfer } from './types';
-import { SolanaBindOptions } from 'bind-options';
+import { SolanaBindOptions } from '../../bind-options';
 
 export class SPLTokenProcessor extends SolanaBaseProcessor {
   static bind(options: SolanaBindOptions): SPLTokenProcessor {
