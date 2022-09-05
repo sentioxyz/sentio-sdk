@@ -25,9 +25,6 @@ import {
 
 import { Empty } from './gen/google/protobuf/empty'
 import Long from 'long'
-import { BaseProcessor } from './base-processor'
-import { BaseContract } from 'ethers'
-import { BoundContractView } from './context'
 import { TextDecoder } from 'util'
 
 const DEFAULT_MAX_BLOCK = Long.ZERO
@@ -38,7 +35,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
 
   // map from chain id to list of processors
   // private blockHandlers = new Map<string, ((block: Block) => Promise<O11yResult>)[]>()
-  private processorsByChainId = new Map<string, BaseProcessor<BaseContract, BoundContractView<BaseContract, any>>>()
+  // private processorsByChainId = new Map<string, BaseProcessor<BaseContract, BoundContractView<BaseContract, any>>>()
 
   private started = false
   private contractConfigs: ContractConfig[]
@@ -65,7 +62,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
   async configure() {
     this.eventHandlers = []
     this.templateInstances = []
-    this.processorsByChainId.clear()
+    // this.processorsByChainId.clear()
     this.contractConfigs = []
 
     this.templateInstances = [...global.PROCESSOR_STATE.templatesInstances]
@@ -75,13 +72,13 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       // If server favor incremental update this need to change
       // Start basic config for contract
       const chainId = processor.getChainId()
-      this.processorsByChainId.set(chainId, processor)
+      // this.processorsByChainId.set(chainId, processor)
 
       const contractConfig: ContractConfig = {
         processorType: 'user_processor',
         contract: {
           name: processor.config.name,
-          chainId: chainId,
+          chainId: chainId.toString(),
           address: processor.config.address,
           abi: '',
         },

@@ -49,8 +49,8 @@ export abstract class BaseProcessor<
 
   protected abstract CreateBoundContractView(): TBoundContractView
 
-  public getChainId() {
-    return getNetwork(this.config.network).chainId.toString()
+  public getChainId(): number {
+    return getNetwork(this.config.network).chainId
   }
 
   public onEvent(

@@ -5,7 +5,7 @@ import { Meter } from './meter'
 import Long from 'long'
 
 export class EthContext {
-  chainId: string
+  chainId: number
   log?: Log
   block?: Block
   blockNumber: Long
@@ -13,7 +13,7 @@ export class EthContext {
   counters: CounterResult[] = []
   meter: Meter
 
-  constructor(chainId: string, block?: Block, log?: Log) {
+  constructor(chainId: number, block?: Block, log?: Log) {
     this.chainId = chainId
     this.log = log
     this.block = block
@@ -32,7 +32,7 @@ export class Context<
 > extends EthContext {
   contract: TContractBoundView
 
-  constructor(view: TContractBoundView, chainId: string, block?: Block, log?: Log) {
+  constructor(view: TContractBoundView, chainId: number, block?: Block, log?: Log) {
     super(chainId, block, log)
     view.context = this
     this.contract = view

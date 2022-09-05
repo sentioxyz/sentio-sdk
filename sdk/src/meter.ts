@@ -11,7 +11,7 @@ function GetRecordMetaData(ctx: EthContext | SolanaContext, name: string, labels
         blockNumber: Long.fromNumber(ctx.log.blockNumber, true), // TODO need number type to be long
         transactionIndex: ctx.log.transactionIndex,
         logIndex: ctx.log.logIndex,
-        chainId: ctx.chainId,
+        chainId: ctx.chainId.toString(),
         name: name,
         labels: labels,
       }
@@ -22,7 +22,7 @@ function GetRecordMetaData(ctx: EthContext | SolanaContext, name: string, labels
         blockNumber: Long.fromNumber(ctx.block.number, true),
         transactionIndex: -1,
         logIndex: -1,
-        chainId: ctx.chainId,
+        chainId: ctx.chainId.toString(),
         name: name,
         labels: labels,
       }

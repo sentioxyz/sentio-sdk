@@ -2,6 +2,17 @@
 import { Context } from './context'
 import { errors } from 'ethers'
 
+class EthersError extends Error {
+  constructor(message: string, stack?: string) {
+    super(message)
+    this.stack = stack
+  }
+
+  toString() {
+    return this.message + '\n' + this.stack?.toString()
+  }
+}
+
 export function transformEtherError(e: Error, ctx: Context<any, any> | undefined): Error {
   let msg = ''
   // @ts-ignore expected error fields
@@ -9,27 +20,19 @@ export function transformEtherError(e: Error, ctx: Context<any, any> | undefined
     // @ts-ignore expected error fields
     if (e.data === '0x') {
       if (ctx) {
-        msg += [
-          // @ts-ignore expected error fields
-          "jsonrpc eth_call return '0x' (likely contract not existed): " + e.method + '(' + e.args.join(',') + ')',
-          'address: ' + ctx.contract.rawContract.address + ' at chain: ' + ctx.chainId,
-          'block: ' + ctx.blockNumber,
-          // @ts-ignore expected error fields
-          'data: ' + e.transaction.data,
-        ].join('\n')
+        msg =
+          "jsonrpc eth_call return '0x' (likely contract not existed) at chain " +
+          ctx.chainId +
+          ': ' +
+          JSON.stringify(e)
       } else {
-        msg += [
-          // @ts-ignore expected error fields
-          "jsonrpc eth_call return '0x' (likely contract not existed): " + e.method + '(' + e.args.join(',') + ')',
-          // @ts-ignore expected error fields
-          'data: ' + e.transaction.data,
-        ].join('\n')
+        msg = "jsonrpc eth_call return '0x' (likely contract not existed): " + JSON.stringify(e)
       }
     }
-    return { name: 'ETHERS_ERROR', message: msg }
+    return new EthersError(msg, e.stack)
   }
 
-  if (e.name === 'ETHERS_ERROR') {
+  if (e instanceof EthersError) {
     return e
   }
 
