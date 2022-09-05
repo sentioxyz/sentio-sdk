@@ -2,7 +2,7 @@ import { O11yResult } from './gen/processor/protos/processor'
 import { SolanaContext } from './context'
 import Long from 'long'
 import { Instruction } from '@project-serum/anchor'
-import { SolanaBindOptions } from 'bind-options'
+import { SolanaBindOptions } from './bind-options'
 
 type IndexConfigure = {
   startSlot: Long
