@@ -1,12 +1,15 @@
 import { BorshInstructionCoder, Instruction, Idl, BN } from '@project-serum/anchor'
-import { SolanaBaseProcessor, SolanaContext } from "@sentio/sdk"
+import { SolanaBaseProcessor, SolanaContext, SolanaBindOptions } from "@sentio/sdk"
 import { game_wallet_idl } from "./game_wallet"
 import bs58 from 'bs58'
 import { PublicKey } from '@solana/web3.js'
 
 export class GameWalletProcessor extends SolanaBaseProcessor {
-  static bind(address: string, endpoint: string, name = 'GameWallet'): GameWalletProcessor {
-    return new GameWalletProcessor(name, address, endpoint)
+  static bind(options: SolanaBindOptions): GameWalletProcessor {
+    if (options && !options.name) {
+      options.name = 'GameWallet'
+    }
+    return new GameWalletProcessor(options)
   }
 
   decodeInstruction: (rawInstruction: string) => Instruction | null = (rawInstruction) => {

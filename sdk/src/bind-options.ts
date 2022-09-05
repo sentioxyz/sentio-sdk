@@ -34,3 +34,8 @@ export class BindInternalOptions {
   startBlock: Long
   endBlock?: Long
 }
+
+export class SolanaBindOptions extends BindOptions {
+  declare network?: string
+  processInnerInstruction?: boolean
+}

@@ -1,8 +1,8 @@
 import { O11yResult } from './gen/processor/protos/processor'
 import { SolanaContext } from './context'
-import { Connection } from '@solana/web3.js'
 import Long from 'long'
 import { Instruction } from '@project-serum/anchor'
+import { SolanaBindOptions } from 'bind-options'
 
 type IndexConfigure = {
   startSlot: Long
@@ -13,30 +13,36 @@ export class SolanaBaseProcessor {
   public instructionHanlderMap: Map<string, (instruction: Instruction, ctx: SolanaContext) => void> = new Map()
   address: string
   endpoint: string
-  connection: Connection
   contractName: string
   processInnerInstruction: boolean
   config: IndexConfigure = { startSlot: new Long(0) }
   decodeInstruction: (rawInstruction: string) => Instruction | null
-  fromParsedInstruction: (instruction: { type: string, info: any }) => Instruction | null
+  fromParsedInstruction: (instruction: { type: string; info: any }) => Instruction | null
 
-  constructor(contractName: string, address: string, endpoint: string, processInnerInstruction = false) {
-    this.endpoint = endpoint
-    this.address = address
+  constructor(options: SolanaBindOptions) {
+    if (options) {
+      this.bind(options)
+    }
     global.PROCESSOR_STATE.solanaProcessors.push(this)
-    this.connection = new Connection(endpoint, 'confirmed')
-    this.contractName = contractName
-    this.processInnerInstruction = processInnerInstruction
   }
 
-  bind(address: string) {
-    this.address = address
+  bind(options: SolanaBindOptions) {
+    this.address = options.address
+    this.contractName = options.name || ''
+    this.processInnerInstruction = options.processInnerInstruction || false
+    if (options.startBlock) {
+      this.startSlot(options.startBlock)
+    }
+    if (options.endBlock) {
+      this.endBlock(options.endBlock)
+    }
+    this.endpoint = options.network || 'https://api.mainnet-beta.solana.com'
   }
 
   innerInstruction(flag: boolean) {
     this.processInnerInstruction = flag
     return this
-  } 
+  }
 
   public onInstruction(instructionName: string, handler: (instruction: Instruction, ctx: SolanaContext) => void) {
     if (!this.isBind()) {
@@ -48,16 +54,16 @@ export class SolanaBaseProcessor {
     return this
   }
 
-  public handleInstruction(ins: string | { type: string, info: any }): O11yResult | null {
+  public handleInstruction(ins: string | { type: string; info: any }): O11yResult | null {
     const ctx = new SolanaContext(this.address)
     let parsedInstruction: Instruction | null = null
 
     if (ins) {
-      if ((ins as { type: string, info: any }).info) {
+      if ((ins as { type: string; info: any }).info) {
         if (this.fromParsedInstruction == null) {
           return null
         }
-        parsedInstruction = this.fromParsedInstruction(ins as { type: string, info: any })
+        parsedInstruction = this.fromParsedInstruction(ins as { type: string; info: any })
       } else {
         if (this.decodeInstruction == null) {
           return null

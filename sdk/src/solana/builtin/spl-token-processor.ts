@@ -2,10 +2,14 @@ import { SolanaBaseProcessor } from '../../solana-processor'
 import { SolanaContext } from '../../context'
 import { Instruction } from '@project-serum/anchor'
 import { Approve, Burn, CloseAccount, FreezeAccount, InitializeAccount, InitializeAccount2, InitializeAccount3, InitializeMint, InitializeMultisig, MintTo, Revoke, ThawAccount, Transfer } from './types';
+import { SolanaBindOptions } from 'bind-options';
 
 export class SPLTokenProcessor extends SolanaBaseProcessor {
-  static bind(address: string, endpoint: string, name = 'SPL Token Program'): SPLTokenProcessor {
-    return new SPLTokenProcessor(name, address, endpoint)
+  static bind(options: SolanaBindOptions): SPLTokenProcessor {
+    if (options && !options.name) {
+      options.name = 'SPL Token Program'
+    }
+    return new SPLTokenProcessor(options)
   }
   
   fromParsedInstruction: (instruction: { type: string, info: any }) => Instruction | null = (instruction: { type: string, info: any }) => {

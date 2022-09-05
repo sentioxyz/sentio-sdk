@@ -70,14 +70,17 @@ function codeGenSolanaIdlProcessor(idlObj: any): string {
   const idlNamePascalCase = toPascalCase(idlName)
   const instructions: any[] = idlObj.instructions
   return `import { BorshInstructionCoder, Instruction, Idl, BN } from '@project-serum/anchor'
-import { SolanaBaseProcessor, SolanaContext } from "@sentio/sdk"
+import { SolanaBaseProcessor, SolanaContext, SolanaBindOptions } from "@sentio/sdk"
 import { ${idlName}_idl } from "./${idlName}"
 import bs58 from 'bs58'
 import { PublicKey } from '@solana/web3.js'
 
 export class ${idlNamePascalCase}Processor extends SolanaBaseProcessor {
-  static bind(address: string, endpoint: string, name = '${idlNamePascalCase}'): ${idlNamePascalCase}Processor {
-    return new ${idlNamePascalCase}Processor(name, address, endpoint)
+  static bind(options: SolanaBindOptions): ${idlNamePascalCase}Processor {
+    if (options && !options.name) {
+      options.name = '${idlNamePascalCase}'
+    }
+    return new ${idlNamePascalCase}Processor(options)
   }
 
   decodeInstruction: (rawInstruction: string) => Instruction | null = (rawInstruction) => {
