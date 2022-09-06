@@ -6,46 +6,14 @@ import { HandlerType } from '..'
 
 import { TestProcessorServer } from './test-processor-server'
 import { firstCounterValue, firstGaugeValue } from './metric-utils'
-import { ApprovalEventObject, getErc20Contract, TransferEventObject } from '../builtin/erc20'
-import { Log } from '@ethersproject/providers'
 import { BigNumber } from 'ethers'
-
-const contractAddress = '0x1E4EDE388cbc9F4b5c79681B7f94d36a11ABEBC9'
-
-function getEventLog(event: TransferEventObject | ApprovalEventObject): Log {
-  let encodedLog: {
-    data: string
-    topics: string[]
-  }
-  const erc20Contract = getErc20Contract(contractAddress)
-  if ('from' in event) {
-    encodedLog = erc20Contract.rawContract.interface.encodeEventLog(
-      erc20Contract.rawContract.interface.getEvent('Transfer'),
-      [event.from, event.to, event.value]
-    )
-  } else {
-    encodedLog = erc20Contract.rawContract.interface.encodeEventLog(
-      erc20Contract.rawContract.interface.getEvent('Approval'),
-      [event.owner, event.spender, event.value]
-    )
-  }
-  return {
-    address: contractAddress,
-    blockHash: '0x0000000000000000000000000000000000000000000000000000000000000000',
-    blockNumber: 0,
-    logIndex: 0,
-    removed: false,
-    transactionHash: '0x0000000000000000000000000000000000000000000000000000000000000000',
-    transactionIndex: 0,
-    data: encodedLog.data,
-    topics: encodedLog.topics,
-  }
-}
+import { mockTransferLog } from '../builtin/erc20/test-utils'
 
 describe('Test Basic Examples', () => {
   const service = new TestProcessorServer()
 
   beforeAll(async () => {
+    globalThis.contractAddress = '0x1E4EDE388cbc9F4b5c79681B7f94d36a11ABEBC9'
     service.setup()
     require('./erc20')
     await service.start()
@@ -81,7 +49,7 @@ describe('Test Basic Examples', () => {
   })
 
   test('Check log dispatch', async () => {
-    const logData = getEventLog({
+    const logData = mockTransferLog({
       from: '0x0000000000000000000000000000000000000000',
       to: '0xB329e39Ebefd16f40d38f07643652cE17Ca5Bac1',
       value: BigNumber.from('0x9a71db64810aaa0000'),

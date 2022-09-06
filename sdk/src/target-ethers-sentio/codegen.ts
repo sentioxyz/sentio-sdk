@@ -156,6 +156,56 @@ export function codeGenSentioFile(contract: Contract): string {
   return imports + source
 }
 
+export function codeGenTestUtilsFile(contract: Contract): string {
+  const source = `
+  declare global {
+    var contractAddress: string
+  }
+  
+  function mockField() {
+    return {
+      address: globalThis.contractAddress,
+      blockHash:
+        "0x0000000000000000000000000000000000000000000000000000000000000000",
+      blockNumber: 0,
+      logIndex: 0,
+      removed: false,
+      transactionHash:
+        "0x0000000000000000000000000000000000000000000000000000000000000000",
+      transactionIndex: 0,
+    }
+  }
+  ${Object.values(contract.events)
+    .map((events) => {
+      if (events.length === 1) {
+        return generateMockEventLogFunction(events[0], contract.name, false)
+      } else {
+        return events.map((e) => generateMockEventLogFunction(e, contract.name, true)).join('\n')
+      }
+    })
+    .join('\n')}
+  `
+
+  const imports = createImportsForUsedIdentifiers(
+    {
+      '@ethersproject/providers': ['Log'],
+      '.': [
+        `get${contract.name}Contract`,
+        ...Object.values(contract.events).flatMap((events) => {
+          if (events.length === 1) {
+            return `${events[0].name}EventObject`
+          } else {
+            return events.flatMap((e) => `${getFullSignatureAsSymbolForEvent(e)}_EventObject`)
+          }
+        }),
+      ],
+    },
+    source
+  )
+
+  return imports + source
+}
+
 function generateOnEventFunction(event: EventDeclaration, contractName: string, includeArgTypes: boolean): string {
   let eventName = event.name
   if (includeArgTypes) {
@@ -217,5 +267,27 @@ function generateBoundViewFunction(func: FunctionDeclaration): string {
       throw transformEtherError(e, this.context)
     }
   }
+  `
+}
+
+function generateMockEventLogFunction(event: EventDeclaration, contractName: string, includeArgTypes: boolean): string {
+  let eventName = event.name
+  if (includeArgTypes) {
+    eventName = getFullSignatureAsSymbolForEvent(event) + '_'
+  }
+
+  return `
+    export function mock${eventName}Log(event: ${eventName}EventObject): Log {
+      const contract = get${contractName}Contract(globalThis.contractAddress)
+      const encodedLog = contract.rawContract.interface.encodeEventLog(
+        contract.rawContract.interface.getEvent('${eventName}'),
+        Object.values(event)
+      )
+      return {
+        ...mockField(),
+        data: encodedLog.data,
+        topics: encodedLog.topics,
+      }
+    }
   `
 }
