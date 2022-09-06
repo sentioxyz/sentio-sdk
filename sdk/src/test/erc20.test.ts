@@ -13,7 +13,6 @@ describe('Test Basic Examples', () => {
   const service = new TestProcessorServer()
 
   beforeAll(async () => {
-    globalThis.contractAddress = '0x1E4EDE388cbc9F4b5c79681B7f94d36a11ABEBC9'
     service.setup()
     require('./erc20')
     await service.start()
@@ -49,7 +48,7 @@ describe('Test Basic Examples', () => {
   })
 
   test('Check log dispatch', async () => {
-    const logData = mockTransferLog({
+    const logData = mockTransferLog('0x1E4EDE388cbc9F4b5c79681B7f94d36a11ABEBC9', {
       from: '0x0000000000000000000000000000000000000000',
       to: '0xB329e39Ebefd16f40d38f07643652cE17Ca5Bac1',
       value: BigNumber.from('0x9a71db64810aaa0000'),

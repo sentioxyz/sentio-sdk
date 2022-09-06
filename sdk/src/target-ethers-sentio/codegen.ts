@@ -158,22 +158,15 @@ export function codeGenSentioFile(contract: Contract): string {
 
 export function codeGenTestUtilsFile(contract: Contract): string {
   const source = `
-  declare global {
-    var contractAddress: string
-  }
-  
-  function mockField() {
-    return {
-      address: globalThis.contractAddress,
-      blockHash:
-        "0x0000000000000000000000000000000000000000000000000000000000000000",
-      blockNumber: 0,
-      logIndex: 0,
-      removed: false,
-      transactionHash:
-        "0x0000000000000000000000000000000000000000000000000000000000000000",
-      transactionIndex: 0,
-    }
+  const mockField = {
+    blockHash:
+      "0x0000000000000000000000000000000000000000000000000000000000000000",
+    blockNumber: 0,
+    logIndex: 0,
+    removed: false,
+    transactionHash:
+      "0x0000000000000000000000000000000000000000000000000000000000000000",
+    transactionIndex: 0,
   }
   ${Object.values(contract.events)
     .map((events) => {
@@ -277,14 +270,15 @@ function generateMockEventLogFunction(event: EventDeclaration, contractName: str
   }
 
   return `
-    export function mock${eventName}Log(event: ${eventName}EventObject): Log {
-      const contract = get${contractName}Contract(globalThis.contractAddress)
+    export function mock${eventName}Log(contractAddress: string, event: ${eventName}EventObject): Log {
+      const contract = get${contractName}Contract(contractAddress)
       const encodedLog = contract.rawContract.interface.encodeEventLog(
         contract.rawContract.interface.getEvent('${eventName}'),
         Object.values(event)
       )
       return {
-        ...mockField(),
+        ...mockField,
+        address: contractAddress,
         data: encodedLog.data,
         topics: encodedLog.topics,
       }
