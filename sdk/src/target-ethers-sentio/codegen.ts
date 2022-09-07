@@ -265,15 +265,17 @@ function generateBoundViewFunction(func: FunctionDeclaration): string {
 
 function generateMockEventLogFunction(event: EventDeclaration, contractName: string, includeArgTypes: boolean): string {
   let eventName = event.name
+  let eventNameWithSignature = event.name
   if (includeArgTypes) {
     eventName = getFullSignatureAsSymbolForEvent(event) + '_'
+    eventNameWithSignature = getFullSignatureForEvent(event)
   }
 
   return `
     export function mock${eventName}Log(contractAddress: string, event: ${eventName}EventObject): Log {
       const contract = get${contractName}Contract(contractAddress)
       const encodedLog = contract.rawContract.interface.encodeEventLog(
-        contract.rawContract.interface.getEvent('${eventName}'),
+        contract.rawContract.interface.getEvent('${eventNameWithSignature}'),
         Object.values(event)
       )
       return {
