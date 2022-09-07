@@ -28,3 +28,4 @@ ignore:
   - sdk/node_modules
   - examples
   - sdk/src/test/abis
+  - sdk/src/test/types
