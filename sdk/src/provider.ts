@@ -20,7 +20,7 @@ export function getProvider(networkish?: Networkish): Provider {
     throw Error(
       'Provider not found for chain ' +
         network.chainId +
-        'current: ' +
+        ', configured chains: ' +
         [...global.PROCESSOR_STATE.providers.keys()].join(' ')
     )
   }

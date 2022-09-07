@@ -1,15 +1,12 @@
 import { codeGenEthersProcessor } from '../cli/build'
 import path from 'path'
 import * as fs from 'fs'
+import os from 'os'
 
 describe('Test EVM codegen', () => {
-  const codeGenFolder = path.join(__dirname, 'types/evm')
-  beforeAll(() => {
-    if (fs.existsSync(codeGenFolder)) {
-      fs.rmSync(codeGenFolder, { recursive: true, force: true })
-    }
-    fs.mkdirSync(codeGenFolder, { recursive: true })
-  })
+  const codeGenFolder = fs.mkdtempSync(path.join(os.tmpdir(), 'codegen_test'))
+
+  jest.setTimeout(20000)
 
   test('code gen for anyswapRouter', async () => {
     await codeGenEthersProcessor(
