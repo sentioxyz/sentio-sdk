@@ -28,3 +28,4 @@ ignore:
   - sdk/dist
   - sdk/node_modules
   - examples
+  - sdk/src/abis
