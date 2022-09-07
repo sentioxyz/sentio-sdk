@@ -112,3 +112,6 @@ dist
 package-lock.json
 
 .DS_Store
+
+# codegen files in the test folder
+sdk/src/test/types/

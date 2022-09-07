@@ -1,4 +1,4 @@
-import { TokenBridgeProcessor } from './types/wormhole_processor'
+import { TokenBridgeProcessor } from '../solana/builtin/wormhole-processor'
 import { SPLTokenProcessor } from '../solana/builtin'
 
 TokenBridgeProcessor.bind({

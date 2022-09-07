@@ -1,6 +1,8 @@
+import { SolanaBaseProcessor } from '../../solana-processor'
+import { SolanaContext } from '../../context'
+import { SolanaBindOptions } from '../../bind-options'
 import { Instruction } from '@project-serum/anchor'
 import * as borsh from '@project-serum/borsh'
-import { SolanaBaseProcessor, SolanaContext, SolanaBindOptions } from '@sentio/sdk'
 import bs58 from 'bs58'
 
 // https://github.com/certusone/wormhole/blob/8818d4b8f0471095dd48fa6f5da9c315cbfc9b52/solana/modules/token_bridge/program/src/lib.rs#L100

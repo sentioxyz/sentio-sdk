@@ -37,11 +37,14 @@ async function installDeps() {
   await execStep('yarn install --ignore-scripts', 'Yarn Install')
 }
 
-async function codeGenEthersProcessor(abisDir: string) {
-  const ETHERS_TARGET = path.join(__dirname, '../target-ethers-sentio')
+export async function codeGenEthersProcessor(
+  abisDir: string,
+  ETHERS_TARGET = path.join(__dirname, '../target-ethers-sentio'),
+  outDir = 'src/types/internal'
+) {
   // TODO this will fail during postinstall, need to locate real typechain path
   await execStep(
-    'yarn typechain --target ' + ETHERS_TARGET + ` --out-dir src/types/internal ${path.join(abisDir, '*.json')}`,
+    'yarn typechain --target ' + ETHERS_TARGET + ` --out-dir ${outDir} ${path.join(abisDir, '*.json')}`,
     'Type definitions gen'
   )
 }
