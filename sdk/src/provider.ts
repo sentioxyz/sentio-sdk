@@ -13,11 +13,16 @@ export function getProvider(networkish?: Networkish): Provider {
   const network = getNetwork(networkish)
 
   if (!global.PROCESSOR_STATE.providers) {
-    throw Error('Provider not found')
+    throw Error('Provider not set')
   }
   const value = global.PROCESSOR_STATE.providers.get(network.chainId)
   if (value === undefined) {
-    throw Error('Provider not found')
+    throw Error(
+      'Provider not found for chain ' +
+        network.chainId +
+        'current: ' +
+        [...global.PROCESSOR_STATE.providers.keys()].join(' ')
+    )
   }
   return value
 }
