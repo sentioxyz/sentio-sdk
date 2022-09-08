@@ -1,6 +1,7 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
+    "inlineSources": true,
     "rootDir": "./src",
     "baseUrl": "./src",
     "paths": {
