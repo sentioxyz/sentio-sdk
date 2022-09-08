@@ -1,4 +1,4 @@
-import { TestProcessorServer } from '@sentio/sdk/dist/test'
+import { TestProcessorServer } from '@sentio/sdk/lib/test'
 
 describe('Test Processor', () => {
   const service = new TestProcessorServer()

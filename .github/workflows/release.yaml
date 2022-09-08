@@ -23,8 +23,8 @@ jobs:
         working-directory: sdk
       - name: Release
         id: release
-        run: ../node_modules/.bin/semantic-release
-        working-directory: sdk/dist
+        run: yarn semantic-release
+        working-directory: sdk
         env:
           GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -7,7 +7,7 @@
     "paths": {
       "@sentio/sdk": ["."]
     },
-    "outDir": "dist"
+    "outDir": "lib"
   },
-  "exclude": ["dist", "src/target-ethers-sentio"]
+  "exclude": ["lib", "src/target-ethers-sentio"]
 }

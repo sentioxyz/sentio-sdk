@@ -11,7 +11,7 @@ describe('Test EVM codegen', () => {
   test('code gen for anyswapRouter', async () => {
     await codeGenEthersProcessor(
       path.join(__dirname, 'abis/evm'),
-      'dist/target-ethers-sentio',
+      'lib/target-ethers-sentio',
       `${codeGenFolder}/internal`
     )
     expect(fs.existsSync(codeGenFolder)).toEqual(true)

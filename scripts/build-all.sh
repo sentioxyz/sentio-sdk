@@ -18,8 +18,8 @@ cd ..
 if [ -f ./node_modules/.bin/sentio ]; then
   echo "sentio bin already existed"
 else
-  chmod +x $PWD/sdk/dist/cli/cli.js
-  ln -s $PWD/sdk/dist/cli/cli.js node_modules/.bin/sentio
+  chmod +x $PWD/sdk/lib/cli/cli.js
+  ln -s $PWD/sdk/lib/cli/cli.js node_modules/.bin/sentio
 fi
 
 for dir in $PROCESSOR_DIR/examples/*/; do # list directories in the form "/tmp/dirname/"

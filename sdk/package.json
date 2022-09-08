@@ -4,20 +4,20 @@
   "version": "1.0.0-development",
   "scripts": {
     "compile_target": "yarn tsc -b src/target-ethers-sentio/tsconfig.json",
-    "compile": "tsc -p . && cp src/cli/webpack.config.js dist/cli",
+    "compile": "tsc -p . && cp src/cli/webpack.config.js lib/cli",
     "build": "yarn gen && yarn compile",
     "start_ts": "ts-node --files src/processor-runner.ts ../examples/x2y2/src/processor.ts",
     "start_ts_solana": "ts-node --files src/processor-runner.ts ../examples/mirrorworld/src/processor.ts",
     "start": "ts-node --files src/processor-runner.ts ../examples/x2y2/dist/lib.js",
-    "start_js": "node dist/processor.js ../examples/x2y2/dist/lib.js",
+    "start_js": "node lib/processor.js ../examples/x2y2/dist/lib.js",
     "ts-start": "ts-node --files src/processor-runner.ts ./src/anyswap/src/processor.ts",
-    "cli": "yarn build && node dist/cli/cli.js",
+    "cli": "yarn build && node lib/cli/cli.js",
     "test": "jest",
     "gen": "yarn compile_target && yarn gen_bultin_evm && yarn gen_test_abi",
     "gen_test_abi": "yarn gen_solana_abi",
-    "gen_bultin_evm": "typechain --target dist/target-ethers-sentio --out-dir src/builtin/internal 'src/abis/*.json'",
+    "gen_bultin_evm": "typechain --target lib/target-ethers-sentio --out-dir src/builtin/internal 'src/abis/*.json'",
     "gen_solana_abi": "ts-node src/cli/solana-code-gen.ts src/test types",
-    "postbuild": "clear-package-json package.json -o ./dist/package.json && cp release.config.js ./dist"
+    "postbuild": "echo || clear-package-json package.json -o ./lib/package.json && cp release.config.js ./lib"
   },
   "dependencies": {
     "@ethersproject/providers": "~5.7.0",
@@ -65,19 +65,14 @@
     "typescript": "^4.8.0"
   },
   "bin": {
-    "processor-runner": "./dist/processor-runner.js",
-    "sentio": "./dist/cli/cli.js"
+    "processor-runner": "./lib/processor-runner.js",
+    "sentio": "./lib/cli/cli.js"
   },
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "module": "./dist/index.js",
-  "publishConfig": {
-    "bin": {
-      "processor-runner": "./processor-runner.js",
-      "sentio": "./cli/cli.js"
-    },
-    "main": "./index.js",
-    "types": "./index.d.js",
-    "module": "./index.js"
-  }
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "module": "./lib/index.js",
+  "files": [
+    "lib/**/*",
+    "src/**/*"
+  ]
 }

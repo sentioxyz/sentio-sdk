@@ -1,6 +1,7 @@
 .*
 *.config.js
 dist
+lib
 gen
 types
 builtin

@@ -1,6 +1,7 @@
 sdk/src/builtin
 node_modules
 dist
+lib
 **/src/types
 
 .idea

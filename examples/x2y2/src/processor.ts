@@ -1,4 +1,4 @@
-import { Erc20Context, Erc20Processor, TransferEvent } from '@sentio/sdk/dist/builtin/erc20'
+import { Erc20Context, Erc20Processor, TransferEvent } from '@sentio/sdk/lib/builtin/erc20'
 import { X2y2Context, X2y2Processor } from './types/x2y2'
 
 X2y2Processor.bind({ address: '0xB329e39Ebefd16f40d38f07643652cE17Ca5Bac1', startBlock: 14211735 }).onBlock(

@@ -25,6 +25,7 @@ ignore:
   - node_modules
   - sdk/src/builtin/internal
   - sdk/dist
+  - sdk/lib
   - sdk/node_modules
   - examples
   - sdk/src/test/abis
