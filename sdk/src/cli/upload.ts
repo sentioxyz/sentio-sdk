@@ -79,6 +79,8 @@ export async function uploadFile(options: SentioProjectConfig, apiKeyOverride: s
     if (commitSha) {
       console.log('\t', chalk.blue('Git commit SHA:'), commitSha)
     }
+    const { ProjectSlug } = await res.json()
+    console.log('\t', chalk.blue('Check status:'), `${options.host}/${ProjectSlug}/datasource`)
   } else {
     console.error(chalk.red('Upload Failed'))
     console.error(chalk.red(await res.text()))
