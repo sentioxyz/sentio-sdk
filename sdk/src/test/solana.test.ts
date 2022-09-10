@@ -10,12 +10,12 @@ import { TestProcessorServer } from './test-processor-server'
 import { firstCounterValue } from './metric-utils'
 
 describe('Test Solana Example', () => {
-  const service = new TestProcessorServer()
-
-  beforeAll(async () => {
-    await service.setup()
+  const service = new TestProcessorServer(() => {
     require('./mirrorworld')
     require('./wormhole-token-bridge')
+  })
+
+  beforeAll(async () => {
     await service.start({ templateInstances: [] })
   })
 

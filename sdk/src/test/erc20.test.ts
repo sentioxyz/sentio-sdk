@@ -10,11 +10,9 @@ import { BigNumber } from 'ethers'
 import { mockTransferLog } from '../builtin/erc20/test-utils'
 
 describe('Test Basic Examples', () => {
-  const service = new TestProcessorServer()
+  const service = new TestProcessorServer(() => require('./erc20'))
 
   beforeAll(async () => {
-    service.setup()
-    require('./erc20')
     await service.start()
   })
 

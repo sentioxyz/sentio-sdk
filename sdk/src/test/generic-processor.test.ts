@@ -9,11 +9,7 @@ import { TestProcessorServer } from './test-processor-server'
 import { firstCounterValue } from './metric-utils'
 
 describe('Test Generic Processor', () => {
-  const service = new TestProcessorServer()
-
-  beforeAll(async () => {
-    service.setup()
-
+  const service = new TestProcessorServer(() => {
     GenericProcessor.bind(
       [
         'event Transfer(address indexed from, address indexed to, uint256 value)',
@@ -29,7 +25,9 @@ describe('Test Generic Processor', () => {
     }).onAllEvents(function (log, ctx) {
       ctx.meter.Counter('wallet').add(1)
     })
+  })
 
+  beforeAll(async () => {
     await service.start()
   })
 

@@ -40,10 +40,12 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
   private started = false
   private contractConfigs: ContractConfig[]
   private templateInstances: TemplateInstance[]
+  private readonly loader: () => void
 
   private readonly shutdownHandler?: () => void
 
-  constructor(shutdownHandler?: () => void) {
+  constructor(loader: () => void, shutdownHandler?: () => void) {
+    this.loader = loader
     this.shutdownHandler = shutdownHandler
   }
 
@@ -151,8 +153,8 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         endBlock: DEFAULT_MAX_BLOCK,
         instructionConfig: {
           innerInstruction: solanaProcessor.processInnerInstruction,
-          parsedInstruction: solanaProcessor.fromParsedInstruction != null ? true : false,
-          rawDataInstruction: solanaProcessor.decodeInstruction != null ? true : false,
+          parsedInstruction: solanaProcessor.fromParsedInstruction !== null,
+          rawDataInstruction: solanaProcessor.decodeInstruction !== null,
         },
       }
       this.contractConfigs.push(contractConfig)
@@ -163,6 +165,9 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     if (this.started) {
       return {}
     }
+
+    this.loader()
+
     for (const instance of request.templateInstances) {
       const template = global.PROCESSOR_STATE.templates[instance.templateId]
       if (!template) {

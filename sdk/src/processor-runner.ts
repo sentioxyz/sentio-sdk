@@ -9,34 +9,10 @@ import { setProvider } from './provider'
 import path from 'path'
 import fs from 'fs-extra'
 import { ProcessorState } from './processor-state'
+import { load } from './loader'
 
 global.sentio_sdk = require('.')
 global.PROCESSOR_STATE = new ProcessorState()
-
-function tryRequire(name: string): { module: any; name: string; path: string } | undefined {
-  const req = eval('require')
-
-  try {
-    let path: string
-    try {
-      path = req.resolve(name, { paths: [process.cwd()] })
-    } catch {
-      path = req.resolve(name)
-    }
-
-    const module = { module: req(path), name, path }
-    console.log('Load successfully: ', name)
-    return module
-  } catch (err) {
-    if (err instanceof Error && err.message.startsWith(`Cannot find module '${name}'`)) {
-      // this error is expected
-      console.log("Couldn't load (expected): ", name)
-      return undefined
-    } else {
-      throw err
-    }
-  }
-}
 
 const optionDefinitions = [
   { name: 'target', type: String, defaultOption: true },
@@ -60,8 +36,6 @@ const chainsConfig = fs.readJsonSync(fullPath)
 
 setProvider(chainsConfig, options.concurrency, options['use-chainserver'])
 
-tryRequire(options.target)
-
 console.log('Start Server', options)
 
 console.log(global.PROCESSOR_STATE.processors.length, ' processors loaded')
@@ -69,7 +43,7 @@ console.log(global.PROCESSOR_STATE.solanaProcessors.length, ' solana processors 
 
 const server = createServer()
 
-const service = new ProcessorServiceImpl(server.shutdown)
+const service = new ProcessorServiceImpl(() => load(options.target), server.shutdown)
 server.add(ProcessorDefinition, service)
 
 server.listen('0.0.0.0:' + options.port)

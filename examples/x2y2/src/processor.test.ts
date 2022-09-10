@@ -1,11 +1,9 @@
 import { TestProcessorServer } from '@sentio/sdk/lib/test'
 
 describe('Test Processor', () => {
-  const service = new TestProcessorServer()
+  const service = new TestProcessorServer(() => require('./processor'))
 
   beforeAll(async () => {
-    service.setup()
-    require('./processor')
     await service.start()
   })
 

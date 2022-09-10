@@ -7,11 +7,9 @@ import Long from 'long'
 import { TestProcessorServer } from './test-processor-server'
 
 describe('Test Template', () => {
-  const service = new TestProcessorServer()
+  const service = new TestProcessorServer(() => require('./erc20-template'))
 
   beforeAll(async () => {
-    service.setup()
-    require('./erc20-template')
     const request: StartRequest = {
       templateInstances: [
         {

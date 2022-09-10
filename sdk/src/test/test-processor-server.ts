@@ -33,11 +33,13 @@ function cleanTest() {
 }
 
 export class TestProcessorServer implements ProcessorServiceImplementation {
-  service = new ProcessorServiceImpl()
+  service: ProcessorServiceImpl
   contractConfig: ContractConfig[]
 
-  setup(httpEndpoints: Record<string, string> = {}) {
+  constructor(loader: () => void, httpEndpoints: Record<string, string> = {}) {
     cleanTest()
+
+    this.service = new ProcessorServiceImpl(loader)
     const dummyConfig: Record<string, ChainConfig> = {}
 
     for (const k in CHAIN_MAP) {
@@ -49,13 +51,6 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
     }
 
     setProvider(dummyConfig)
-
-    // if (!Array.isArray(processorPath)) {
-    //   processorPath = [processorPath]
-    // }
-    // for (const path of processorPath) {
-    //   require(path)
-    // }
   }
 
   async start(request: StartRequest = { templateInstances: [] }, context = TEST_CONTEXT): Promise<Empty> {
