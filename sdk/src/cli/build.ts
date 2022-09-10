@@ -42,6 +42,22 @@ export async function codeGenEthersProcessor(
   ETHERS_TARGET = path.join(__dirname, '../target-ethers-sentio'),
   outDir = 'src/types/internal'
 ) {
+  if (!fs.existsSync(abisDir)) {
+    return
+  }
+
+  let haveJson = false
+  const files = fs.readdirSync(abisDir)
+  for (const file of files) {
+    if (file.toLowerCase().endsWith('.json')) {
+      haveJson = true
+      break
+    }
+  }
+  if (!haveJson) {
+    return
+  }
+
   // TODO this will fail during postinstall, need to locate real typechain path
   await execStep(
     'yarn typechain --target ' + ETHERS_TARGET + ` --out-dir ${outDir} ${path.join(abisDir, '*.json')}`,
