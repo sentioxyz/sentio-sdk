@@ -11,6 +11,7 @@ export { BindOptions, SolanaBindOptions } from './bind-options'
 export { transformEtherError } from './error'
 export { ProcessorState } from './processor-state'
 export { BigNumber as BigDecimal } from 'bignumber.js'
+export { EthersError } from './error'
 
 export { getProcessor, addProcessor, getContractByABI, addContractByABI, getContractName } from './binds'
 

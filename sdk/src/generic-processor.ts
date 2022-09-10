@@ -9,30 +9,27 @@ export class GenericProcessor extends BaseProcessor<
   BaseContract,
   BoundContractView<BaseContract, ContractView<BaseContract>>
 > {
-  eventAbi: string[]
-  constructor(eventAbi: string[], options: BindOptions) {
+  eventABI: string[]
+  constructor(eventABI: string[], options: BindOptions) {
     super(options)
-    this.eventAbi = eventAbi
+    this.eventABI = eventABI
   }
 
   protected CreateBoundContractView(): BoundContractView<BaseContract, ContractView<BaseContract>> {
-    const contract = new BaseContract(this.config.address, this.eventAbi, getProvider(this.config.network))
+    const contract = new BaseContract(this.config.address, this.eventABI, getProvider(this.config.network))
     return new BoundContractView(new ContractView<BaseContract>(contract))
   }
 
-  public static bind(eventAbi: string[] | string, options: BindOptions): GenericProcessor {
+  public static bind(eventABI: string[] | string, options: BindOptions): GenericProcessor {
     const AbiName = 'Generic'
-    if (!Array.isArray(eventAbi)) {
-      eventAbi = [eventAbi]
+    if (!Array.isArray(eventABI)) {
+      eventABI = [eventABI]
     }
 
-    // let processor = getProcessor(AbiName, options) as GenericProcessor;
-    // if (!processor) {
     const finalOptions = Object.assign({}, options)
     finalOptions.name = getContractName(AbiName, options.name, options.address, options.network)
-    const processor = new GenericProcessor(eventAbi, finalOptions)
+    const processor = new GenericProcessor(eventABI, finalOptions)
     addProcessor(AbiName, options, processor)
-    // }
     return processor
   }
 }

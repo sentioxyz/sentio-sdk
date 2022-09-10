@@ -2,10 +2,12 @@
 import { Context } from './context'
 import { errors } from 'ethers'
 
-class EthersError extends Error {
-  constructor(message: string, stack?: string) {
+export class EthersError extends Error {
+  e: Error
+
+  constructor(message: string, e: Error) {
     super(message)
-    this.stack = stack
+    this.stack = e.stack
   }
 
   toString() {
@@ -29,7 +31,7 @@ export function transformEtherError(e: Error, ctx: Context<any, any> | undefined
         msg = "jsonrpc eth_call return '0x' (likely contract not existed): " + JSON.stringify(e)
       }
     }
-    return new EthersError(msg, e.stack)
+    return new EthersError(msg, e)
   }
 
   if (e instanceof EthersError) {

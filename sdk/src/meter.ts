@@ -3,7 +3,14 @@ import { Context, EthContext, SolanaContext } from './context'
 import { toMetricValue, Numberish } from './numberish'
 import Long from 'long'
 
+export function normalizeName(name: string) {
+  const regex = new RegExp('![_.a-zA-Z0-9]')
+  return name.slice(0, 100).replace(regex, '_')
+}
+
 function GetRecordMetaData(ctx: EthContext | SolanaContext, name: string, labels: Labels): RecordMetaData {
+  name = normalizeName(name)
+
   if (ctx instanceof Context) {
     if (ctx.log) {
       return {

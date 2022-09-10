@@ -3,7 +3,7 @@ import { BigInteger, MetricValue } from './gen/processor/protos/processor'
 import { BigDecimal } from '.'
 import { BN } from '@project-serum/anchor'
 
-export type Numberish = number | BigNumber | bigint | BigDecimal //BigNumberish
+export type Numberish = number | BigNumber | bigint | BigDecimal
 
 export function toMetricValue(value: Numberish): MetricValue {
   if (value instanceof BigNumber) {
@@ -38,6 +38,7 @@ export function toMetricValue(value: Numberish): MetricValue {
     doubleValue: Number(value),
   })
 }
+
 function bigDecimalToBigInteger(a: BigDecimal): BigInteger {
   const negative = a.isNegative()
   if (negative) {
