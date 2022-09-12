@@ -21,10 +21,10 @@ describe('Test Basic Examples', () => {
     expect(config.contractConfigs).length(5)
 
     // check auto rename
-    expect(config.contractConfigs?.[2].contract?.name).equals('Erc20')
-    expect(config.contractConfigs?.[3].contract?.name).equals('Erc20_1')
+    expect(config.contractConfigs?.[2].contract?.name).equals('ERC20')
+    expect(config.contractConfigs?.[3].contract?.name).equals('ERC20_1')
     // same as above because only differ in parameters
-    expect(config.contractConfigs?.[4].contract?.name).equals('Erc20_1')
+    expect(config.contractConfigs?.[4].contract?.name).equals('ERC20_1')
   })
 
   test('Check block dispatch', async () => {

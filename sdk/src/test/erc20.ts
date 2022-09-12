@@ -1,15 +1,15 @@
-import { Erc20Processor, Erc20ProcessorTemplate } from '../builtin/erc20'
+import { ERC20Processor, ERC20ProcessorTemplate } from '../builtin/erc20'
 
-export const filter = Erc20Processor.filters.Transfer(
+export const filter = ERC20Processor.filters.Transfer(
   '0x0000000000000000000000000000000000000000',
   '0xb329e39ebefd16f40d38f07643652ce17ca5bac1'
 )
 
-const processorTemplate = new Erc20ProcessorTemplate().onTransfer(async function (event, ctx) {
+const processorTemplate = new ERC20ProcessorTemplate().onTransfer(async function (event, ctx) {
   console.log('')
 })
 
-Erc20Processor.bind({
+ERC20Processor.bind({
   address: '0x1e4ede388cbc9f4b5c79681b7f94d36a11abebc9',
   // network: 1,
   name: 'x2y2',
@@ -24,7 +24,7 @@ Erc20Processor.bind({
     ctx.meter.Gauge('g1').record(10, { k: 'v' })
   })
 
-Erc20Processor.bind({ address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', network: 56, name: 'usdc' })
+ERC20Processor.bind({ address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', network: 56, name: 'usdc' })
   .onTransfer(async function (event, ctx) {
     ctx.meter.Counter('c2').add(2)
   }, filter)
@@ -33,11 +33,11 @@ Erc20Processor.bind({ address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', net
   })
 // .startBlock(14201940)
 
-Erc20Processor.bind({ address: 'xxxx', network: 56 })
+ERC20Processor.bind({ address: 'xxxx', network: 56 })
 
-Erc20Processor.bind({ address: 'yyyy', network: 1 })
-Erc20Processor.bind({ address: 'yyyy', network: 1 })
-Erc20Processor.bind({ address: 'yyyy', network: 1, startBlock: 21 })
+ERC20Processor.bind({ address: 'yyyy', network: 1 })
+ERC20Processor.bind({ address: 'yyyy', network: 1 })
+ERC20Processor.bind({ address: 'yyyy', network: 1, startBlock: 21 })
 
 // const template = Erc20Processor.template
 //   .onTransfer(async function (event, ctx) {

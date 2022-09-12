@@ -1,15 +1,15 @@
-import { Erc20Processor, Erc20ProcessorTemplate } from '../builtin/erc20'
+import { ERC20Processor, ERC20ProcessorTemplate } from '../builtin/erc20'
 
-export const filter = Erc20Processor.filters.Transfer(
+export const filter = ERC20Processor.filters.Transfer(
   '0x0000000000000000000000000000000000000000',
   '0xb329e39ebefd16f40d38f07643652ce17ca5bac1'
 )
 
-const processorTemplate = new Erc20ProcessorTemplate().onTransfer(async function (event, ctx) {
+const processorTemplate = new ERC20ProcessorTemplate().onTransfer(async function (event, ctx) {
   console.log('')
 })
 
-Erc20Processor.bind({
+ERC20Processor.bind({
   address: '0x1e4ede388cbc9f4b5c79681b7f94d36a11abebc9',
   network: 1,
   name: 'x2y2',
