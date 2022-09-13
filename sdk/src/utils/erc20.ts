@@ -7,10 +7,16 @@ import { BigDecimal } from '@sentio/sdk'
 import { toBigDecimal } from './convert'
 import { utils } from 'ethers'
 
-export interface TokenInfo {
+export class TokenInfo {
   symbol: string
   name: string
   decimal: number
+}
+
+export const NATIVE_ETH = {
+  symbol: 'ETH',
+  decimal: 18,
+  name: 'Native ETH',
 }
 
 const TOKEN_INFOS = new Map<string, TokenInfo>()
@@ -41,7 +47,7 @@ export async function getERC20TokenInfo(tokenAddress: string, chainId = 1): Prom
     }
 
     const decimal = await contract.decimals()
-    const info = { name, symbol, decimal }
+    const info: TokenInfo = { name, symbol, decimal }
     TOKEN_INFOS.set(key, info)
     return info
   } catch (e) {

@@ -38,9 +38,6 @@ setProvider(chainsConfig, options.concurrency, options['use-chainserver'])
 
 console.log('Start Server', options)
 
-console.log(global.PROCESSOR_STATE.processors.length, ' processors loaded')
-console.log(global.PROCESSOR_STATE.solanaProcessors.length, ' solana processors loaded')
-
 const server = createServer()
 
 const service = new ProcessorServiceImpl(() => load(options.target), server.shutdown)
