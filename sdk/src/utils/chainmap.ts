@@ -2,9 +2,9 @@
 // and https://besu.hyperledger.org/en/stable/Concepts/NetworkID-And-ChainID/
 
 export const CHAIN_MAP: Record<string, string> = {
-  'SOL:mainnet': 'solana',
-  'SOL:devnet': 'solana-dev',
-  'SOL:testnet': 'solana-test',
+  SOL_mainnet: 'solana',
+  SOL_devnet: 'solana-dev',
+  SOL_testnet: 'solana-test',
   0: 'kardia',
   1: 'ethereum',
   2: 'expanse',

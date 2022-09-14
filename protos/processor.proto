@@ -21,6 +21,8 @@ service Processor {
   // It will also return a flag indicate if new contract config is added during the process
   rpc ProcessLogs(ProcessLogsRequest) returns (ProcessLogsResponse);
 
+  rpc ProcessTraces(ProcessTracesRequest) returns (ProcessTracesResponse);
+
   // Not implemented yet
   rpc ProcessTransactions(ProcessTransactionsRequest) returns (ProcessTransactionsResponse);
 
@@ -108,6 +110,14 @@ message ProcessLogsResponse {
   bool config_updated = 4;
 }
 
+message ProcessTracesRequest {
+  repeated LogBinding log_bindings = 1;
+}
+
+message ProcessTracesResponse {
+  O11yResult result = 1;
+}
+
 message ProcessTransactionsRequest {
   Transaction transaction = 1;
 }
@@ -133,11 +143,20 @@ message ProcessBlocksResponse {
 }
 
 message LogBinding {
-  Log log = 1;
+  RawLog log = 1;
   int32 handler_id = 2;
 }
 
-message Log {
+message RawLog {
+  bytes raw = 1;
+}
+
+message TraceBinding {
+  RawTrace trace = 1;
+  int32 handler_id = 2;
+}
+
+message RawTrace {
   bytes raw = 1;
 }
 
@@ -155,11 +174,11 @@ message Instruction {
 }
 
 message BlockBinding {
-  Block block = 1;
+  RawBlock block = 1;
   repeated int32 handler_ids = 2; // TODO consider make log binds contain list of handler id as well
 }
 
-message Block {
+message RawBlock {
   bytes raw = 1;
 }
 
@@ -202,6 +221,7 @@ enum HandlerType {
   BLOCK = 2;
   TRANSACTION = 3;
   INSTRUCTION = 4;
+  TRACE = 5;
 }
 
 message RuntimeInfo {

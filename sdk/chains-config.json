@@ -1,14 +1,8 @@
 {
   "1": {
     "ChainID": "1",
-    "Https": [
-      "https://eth-mainnet.alchemyapi.io/v2/Gk024pFA-64RaEPIawL40n__1esXJFb2",
-      "https://eth-mainnet.alchemyapi.io/v2/BJQpOPPKYT7mr3X6iRL3IawOJPnyiG-P"
-    ],
-    "WebSockets": [
-      "wss://eth-mainnet.alchemyapi.io/v2/Gk024pFA-64RaEPIawL40n__1esXJFb2",
-      "wss://eth-mainnet.alchemyapi.io/v2/BJQpOPPKYT7mr3X6iRL3IawOJPnyiG-P"
-    ],
+    "Https": ["https://eth-mainnet.alchemyapi.io/v2/Gk024pFA-64RaEPIawL40n__1esXJFb2"],
+    "WebSockets": ["wss://eth-mainnet.alchemyapi.io/v2/Gk024pFA-64RaEPIawL40n__1esXJFb2"],
     "ChainServer": "",
     "BatchSize": 2000,
     "ReorgThresholdBlocks": 30,
@@ -49,8 +43,8 @@
     "TimestampSampleInterval": 50000,
     "ProcessingDelayBlocks": 5
   },
-  "SOL:mainnet": {
-    "ChainID": "SOL:mainnet",
+  "SOL_mainnet": {
+    "ChainID": "SOL_mainnet",
     "Https": [
       "https://solana-mainnet.g.alchemy.com/v2/AIM3Qp8rkxBoAjRCNeazPaNKdjYgLdzc",
       "https://try-rpc.mainnet.solana.blockdaemon.tech"

@@ -13,6 +13,8 @@ import {
   ProcessorServiceImpl,
   ProcessorServiceImplementation,
   ProcessorState,
+  ProcessTracesRequest,
+  ProcessTracesResponse,
   ProcessTransactionsRequest,
   ProcessTransactionsResponse,
   setProvider,
@@ -80,6 +82,10 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
 
   processLogs(request: ProcessLogsRequest, context = TEST_CONTEXT): Promise<ProcessLogsResponse> {
     return this.service.processLogs(request, context)
+  }
+
+  processTraces(request: ProcessTracesRequest, context: CallContext = TEST_CONTEXT): Promise<ProcessTracesResponse> {
+    return this.service.processTraces(request, context)
   }
 
   processTransactions(

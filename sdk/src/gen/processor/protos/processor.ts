@@ -10,6 +10,7 @@ export enum HandlerType {
   BLOCK = 2,
   TRANSACTION = 3,
   INSTRUCTION = 4,
+  TRACE = 5,
   UNRECOGNIZED = -1,
 }
 
@@ -30,6 +31,9 @@ export function handlerTypeFromJSON(object: any): HandlerType {
     case 4:
     case "INSTRUCTION":
       return HandlerType.INSTRUCTION;
+    case 5:
+    case "TRACE":
+      return HandlerType.TRACE;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -49,6 +53,8 @@ export function handlerTypeToJSON(object: HandlerType): string {
       return "TRANSACTION";
     case HandlerType.INSTRUCTION:
       return "INSTRUCTION";
+    case HandlerType.TRACE:
+      return "TRACE";
     case HandlerType.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
@@ -128,6 +134,14 @@ export interface ProcessLogsResponse {
   configUpdated: boolean;
 }
 
+export interface ProcessTracesRequest {
+  logBindings: LogBinding[];
+}
+
+export interface ProcessTracesResponse {
+  result: O11yResult | undefined;
+}
+
 export interface ProcessTransactionsRequest {
   transaction: Transaction | undefined;
 }
@@ -153,11 +167,20 @@ export interface ProcessBlocksResponse {
 }
 
 export interface LogBinding {
-  log: Log | undefined;
+  log: RawLog | undefined;
   handlerId: number;
 }
 
-export interface Log {
+export interface RawLog {
+  raw: Uint8Array;
+}
+
+export interface TraceBinding {
+  trace: RawTrace | undefined;
+  handlerId: number;
+}
+
+export interface RawTrace {
   raw: Uint8Array;
 }
 
@@ -175,11 +198,11 @@ export interface Instruction {
 }
 
 export interface BlockBinding {
-  block: Block | undefined;
+  block: RawBlock | undefined;
   handlerIds: number[];
 }
 
-export interface Block {
+export interface RawBlock {
   raw: Uint8Array;
 }
 
@@ -1323,6 +1346,135 @@ export const ProcessLogsResponse = {
   },
 };
 
+function createBaseProcessTracesRequest(): ProcessTracesRequest {
+  return { logBindings: [] };
+}
+
+export const ProcessTracesRequest = {
+  encode(
+    message: ProcessTracesRequest,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    for (const v of message.logBindings) {
+      LogBinding.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): ProcessTracesRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseProcessTracesRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.logBindings.push(LogBinding.decode(reader, reader.uint32()));
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ProcessTracesRequest {
+    return {
+      logBindings: Array.isArray(object?.logBindings)
+        ? object.logBindings.map((e: any) => LogBinding.fromJSON(e))
+        : [],
+    };
+  },
+
+  toJSON(message: ProcessTracesRequest): unknown {
+    const obj: any = {};
+    if (message.logBindings) {
+      obj.logBindings = message.logBindings.map((e) =>
+        e ? LogBinding.toJSON(e) : undefined
+      );
+    } else {
+      obj.logBindings = [];
+    }
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<ProcessTracesRequest>): ProcessTracesRequest {
+    const message = createBaseProcessTracesRequest();
+    message.logBindings =
+      object.logBindings?.map((e) => LogBinding.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseProcessTracesResponse(): ProcessTracesResponse {
+  return { result: undefined };
+}
+
+export const ProcessTracesResponse = {
+  encode(
+    message: ProcessTracesResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.result !== undefined) {
+      O11yResult.encode(message.result, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): ProcessTracesResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseProcessTracesResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.result = O11yResult.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ProcessTracesResponse {
+    return {
+      result: isSet(object.result)
+        ? O11yResult.fromJSON(object.result)
+        : undefined,
+    };
+  },
+
+  toJSON(message: ProcessTracesResponse): unknown {
+    const obj: any = {};
+    message.result !== undefined &&
+      (obj.result = message.result
+        ? O11yResult.toJSON(message.result)
+        : undefined);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<ProcessTracesResponse>
+  ): ProcessTracesResponse {
+    const message = createBaseProcessTracesResponse();
+    message.result =
+      object.result !== undefined && object.result !== null
+        ? O11yResult.fromPartial(object.result)
+        : undefined;
+    return message;
+  },
+};
+
 function createBaseProcessTransactionsRequest(): ProcessTransactionsRequest {
   return { transaction: undefined };
 }
@@ -1730,7 +1882,7 @@ export const LogBinding = {
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.log !== undefined) {
-      Log.encode(message.log, writer.uint32(10).fork()).ldelim();
+      RawLog.encode(message.log, writer.uint32(10).fork()).ldelim();
     }
     if (message.handlerId !== 0) {
       writer.uint32(16).int32(message.handlerId);
@@ -1746,7 +1898,7 @@ export const LogBinding = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.log = Log.decode(reader, reader.uint32());
+          message.log = RawLog.decode(reader, reader.uint32());
           break;
         case 2:
           message.handlerId = reader.int32();
@@ -1761,7 +1913,7 @@ export const LogBinding = {
 
   fromJSON(object: any): LogBinding {
     return {
-      log: isSet(object.log) ? Log.fromJSON(object.log) : undefined,
+      log: isSet(object.log) ? RawLog.fromJSON(object.log) : undefined,
       handlerId: isSet(object.handlerId) ? Number(object.handlerId) : 0,
     };
   },
@@ -1769,7 +1921,7 @@ export const LogBinding = {
   toJSON(message: LogBinding): unknown {
     const obj: any = {};
     message.log !== undefined &&
-      (obj.log = message.log ? Log.toJSON(message.log) : undefined);
+      (obj.log = message.log ? RawLog.toJSON(message.log) : undefined);
     message.handlerId !== undefined &&
       (obj.handlerId = Math.round(message.handlerId));
     return obj;
@@ -1779,29 +1931,32 @@ export const LogBinding = {
     const message = createBaseLogBinding();
     message.log =
       object.log !== undefined && object.log !== null
-        ? Log.fromPartial(object.log)
+        ? RawLog.fromPartial(object.log)
         : undefined;
     message.handlerId = object.handlerId ?? 0;
     return message;
   },
 };
 
-function createBaseLog(): Log {
+function createBaseRawLog(): RawLog {
   return { raw: new Uint8Array() };
 }
 
-export const Log = {
-  encode(message: Log, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const RawLog = {
+  encode(
+    message: RawLog,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     if (message.raw.length !== 0) {
       writer.uint32(10).bytes(message.raw);
     }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): Log {
+  decode(input: _m0.Reader | Uint8Array, length?: number): RawLog {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseLog();
+    const message = createBaseRawLog();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1816,13 +1971,13 @@ export const Log = {
     return message;
   },
 
-  fromJSON(object: any): Log {
+  fromJSON(object: any): RawLog {
     return {
       raw: isSet(object.raw) ? bytesFromBase64(object.raw) : new Uint8Array(),
     };
   },
 
-  toJSON(message: Log): unknown {
+  toJSON(message: RawLog): unknown {
     const obj: any = {};
     message.raw !== undefined &&
       (obj.raw = base64FromBytes(
@@ -1831,8 +1986,129 @@ export const Log = {
     return obj;
   },
 
-  fromPartial(object: DeepPartial<Log>): Log {
-    const message = createBaseLog();
+  fromPartial(object: DeepPartial<RawLog>): RawLog {
+    const message = createBaseRawLog();
+    message.raw = object.raw ?? new Uint8Array();
+    return message;
+  },
+};
+
+function createBaseTraceBinding(): TraceBinding {
+  return { trace: undefined, handlerId: 0 };
+}
+
+export const TraceBinding = {
+  encode(
+    message: TraceBinding,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.trace !== undefined) {
+      RawTrace.encode(message.trace, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.handlerId !== 0) {
+      writer.uint32(16).int32(message.handlerId);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): TraceBinding {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseTraceBinding();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.trace = RawTrace.decode(reader, reader.uint32());
+          break;
+        case 2:
+          message.handlerId = reader.int32();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): TraceBinding {
+    return {
+      trace: isSet(object.trace) ? RawTrace.fromJSON(object.trace) : undefined,
+      handlerId: isSet(object.handlerId) ? Number(object.handlerId) : 0,
+    };
+  },
+
+  toJSON(message: TraceBinding): unknown {
+    const obj: any = {};
+    message.trace !== undefined &&
+      (obj.trace = message.trace ? RawTrace.toJSON(message.trace) : undefined);
+    message.handlerId !== undefined &&
+      (obj.handlerId = Math.round(message.handlerId));
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<TraceBinding>): TraceBinding {
+    const message = createBaseTraceBinding();
+    message.trace =
+      object.trace !== undefined && object.trace !== null
+        ? RawTrace.fromPartial(object.trace)
+        : undefined;
+    message.handlerId = object.handlerId ?? 0;
+    return message;
+  },
+};
+
+function createBaseRawTrace(): RawTrace {
+  return { raw: new Uint8Array() };
+}
+
+export const RawTrace = {
+  encode(
+    message: RawTrace,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.raw.length !== 0) {
+      writer.uint32(10).bytes(message.raw);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): RawTrace {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRawTrace();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.raw = reader.bytes();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): RawTrace {
+    return {
+      raw: isSet(object.raw) ? bytesFromBase64(object.raw) : new Uint8Array(),
+    };
+  },
+
+  toJSON(message: RawTrace): unknown {
+    const obj: any = {};
+    message.raw !== undefined &&
+      (obj.raw = base64FromBytes(
+        message.raw !== undefined ? message.raw : new Uint8Array()
+      ));
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<RawTrace>): RawTrace {
+    const message = createBaseRawTrace();
     message.raw = object.raw ?? new Uint8Array();
     return message;
   },
@@ -2022,7 +2298,7 @@ export const BlockBinding = {
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.block !== undefined) {
-      Block.encode(message.block, writer.uint32(10).fork()).ldelim();
+      RawBlock.encode(message.block, writer.uint32(10).fork()).ldelim();
     }
     writer.uint32(18).fork();
     for (const v of message.handlerIds) {
@@ -2040,7 +2316,7 @@ export const BlockBinding = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.block = Block.decode(reader, reader.uint32());
+          message.block = RawBlock.decode(reader, reader.uint32());
           break;
         case 2:
           if ((tag & 7) === 2) {
@@ -2062,7 +2338,7 @@ export const BlockBinding = {
 
   fromJSON(object: any): BlockBinding {
     return {
-      block: isSet(object.block) ? Block.fromJSON(object.block) : undefined,
+      block: isSet(object.block) ? RawBlock.fromJSON(object.block) : undefined,
       handlerIds: Array.isArray(object?.handlerIds)
         ? object.handlerIds.map((e: any) => Number(e))
         : [],
@@ -2072,7 +2348,7 @@ export const BlockBinding = {
   toJSON(message: BlockBinding): unknown {
     const obj: any = {};
     message.block !== undefined &&
-      (obj.block = message.block ? Block.toJSON(message.block) : undefined);
+      (obj.block = message.block ? RawBlock.toJSON(message.block) : undefined);
     if (message.handlerIds) {
       obj.handlerIds = message.handlerIds.map((e) => Math.round(e));
     } else {
@@ -2085,29 +2361,32 @@ export const BlockBinding = {
     const message = createBaseBlockBinding();
     message.block =
       object.block !== undefined && object.block !== null
-        ? Block.fromPartial(object.block)
+        ? RawBlock.fromPartial(object.block)
         : undefined;
     message.handlerIds = object.handlerIds?.map((e) => e) || [];
     return message;
   },
 };
 
-function createBaseBlock(): Block {
+function createBaseRawBlock(): RawBlock {
   return { raw: new Uint8Array() };
 }
 
-export const Block = {
-  encode(message: Block, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const RawBlock = {
+  encode(
+    message: RawBlock,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     if (message.raw.length !== 0) {
       writer.uint32(10).bytes(message.raw);
     }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): Block {
+  decode(input: _m0.Reader | Uint8Array, length?: number): RawBlock {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseBlock();
+    const message = createBaseRawBlock();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -2122,13 +2401,13 @@ export const Block = {
     return message;
   },
 
-  fromJSON(object: any): Block {
+  fromJSON(object: any): RawBlock {
     return {
       raw: isSet(object.raw) ? bytesFromBase64(object.raw) : new Uint8Array(),
     };
   },
 
-  toJSON(message: Block): unknown {
+  toJSON(message: RawBlock): unknown {
     const obj: any = {};
     message.raw !== undefined &&
       (obj.raw = base64FromBytes(
@@ -2137,8 +2416,8 @@ export const Block = {
     return obj;
   },
 
-  fromPartial(object: DeepPartial<Block>): Block {
-    const message = createBaseBlock();
+  fromPartial(object: DeepPartial<RawBlock>): RawBlock {
+    const message = createBaseRawBlock();
     message.raw = object.raw ?? new Uint8Array();
     return message;
   },
@@ -2911,6 +3190,14 @@ export const ProcessorDefinition = {
       responseStream: false,
       options: {},
     },
+    processTraces: {
+      name: "ProcessTraces",
+      requestType: ProcessTracesRequest,
+      requestStream: false,
+      responseType: ProcessTracesResponse,
+      responseStream: false,
+      options: {},
+    },
     processTransactions: {
       name: "ProcessTransactions",
       requestType: ProcessTransactionsRequest,
@@ -2955,6 +3242,10 @@ export interface ProcessorServiceImplementation<CallContextExt = {}> {
     request: ProcessLogsRequest,
     context: CallContext & CallContextExt
   ): Promise<DeepPartial<ProcessLogsResponse>>;
+  processTraces(
+    request: ProcessTracesRequest,
+    context: CallContext & CallContextExt
+  ): Promise<DeepPartial<ProcessTracesResponse>>;
   processTransactions(
     request: ProcessTransactionsRequest,
     context: CallContext & CallContextExt
@@ -2986,6 +3277,10 @@ export interface ProcessorClient<CallOptionsExt = {}> {
     request: DeepPartial<ProcessLogsRequest>,
     options?: CallOptions & CallOptionsExt
   ): Promise<ProcessLogsResponse>;
+  processTraces(
+    request: DeepPartial<ProcessTracesRequest>,
+    options?: CallOptions & CallOptionsExt
+  ): Promise<ProcessTracesResponse>;
   processTransactions(
     request: DeepPartial<ProcessTransactionsRequest>,
     options?: CallOptions & CallOptionsExt

@@ -40,7 +40,7 @@ function GetRecordMetaData(ctx: EthContext | SolanaContext, name: string, labels
       blockNumber: Long.ZERO, // TODO need number type to be long
       transactionIndex: 0,
       logIndex: 0,
-      chainId: 'SOL:mainnet', // TODO set in context
+      chainId: 'SOL_mainnet', // TODO set in context
       name: name,
       labels: labels,
     }

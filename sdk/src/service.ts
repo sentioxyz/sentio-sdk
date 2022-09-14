@@ -17,6 +17,8 @@ import {
   ProcessLogsRequest,
   ProcessLogsResponse,
   ProcessorServiceImplementation,
+  ProcessTracesRequest,
+  ProcessTracesResponse,
   ProcessTransactionsRequest,
   ProcessTransactionsResponse,
   StartRequest,
@@ -143,7 +145,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         processorType: 'user_processor',
         contract: {
           name: solanaProcessor.contractName,
-          chainId: 'SOL:mainnet', // TODO set in processor
+          chainId: 'SOL_mainnet', // TODO set in processor
           address: solanaProcessor.address,
           abi: '',
         },
@@ -380,6 +382,12 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       resp.gauges = resp.gauges.concat(res.gauges)
     }
     return resp
+  }
+
+  async processTraces(request: ProcessTracesRequest, context: CallContext): Promise<ProcessTracesResponse> {
+    return {
+      result: undefined,
+    }
   }
 }
 
