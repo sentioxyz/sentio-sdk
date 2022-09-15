@@ -28,21 +28,19 @@ describe('Test Basic Examples', () => {
   })
 
   test('Check block dispatch', async () => {
-    const res = await service.testBlock(blockData)
-    const o11yRes = res.result
-    expect(o11yRes?.counters).length(0)
-    expect(o11yRes?.gauges).length(1)
-    expect(firstGaugeValue(o11yRes, 'g1')).equals(10n)
+    const res = (await service.testBlock(blockData)).result
+    expect(res?.counters).length(0)
+    expect(res?.gauges).length(1)
+    expect(firstGaugeValue(res, 'g1')).equals(10n)
 
-    const gauge = o11yRes?.gauges?.[0]
+    const gauge = res?.gauges?.[0]
     expect(gauge?.metadata?.blockNumber?.toString()).equals('14373295')
     expect(gauge?.runtimeInfo?.from).equals(HandlerType.BLOCK)
 
-    const res2 = await service.testBlock(blockData, 56)
-    const o11yRes2 = res2.result
-    expect(o11yRes2?.counters).length(0)
-    expect(o11yRes2?.gauges).length(1)
-    expect(firstGaugeValue(o11yRes2, 'g2')).equals(20n)
+    const res2 = (await service.testBlock(blockData, 56)).result
+    expect(res2?.counters).length(0)
+    expect(res2?.gauges).length(1)
+    expect(firstGaugeValue(res2, 'g2')).equals(20n)
   })
 
   test('Check log dispatch', async () => {

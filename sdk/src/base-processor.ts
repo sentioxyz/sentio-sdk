@@ -5,20 +5,20 @@ import { BaseContract, EventFilter } from '@ethersproject/contracts'
 import Long from 'long'
 
 import { BoundContractView, Context, ContractView } from './context'
-import { O11yResult } from './gen/processor/protos/processor'
+import { ProcessResult } from './gen/processor/protos/processor'
 import { BindInternalOptions, BindOptions } from './bind-options'
 import { PromiseOrVoid } from './promise-or-void'
 
 export class EventsHandler {
   filters: EventFilter[]
-  handler: (event: Log) => Promise<O11yResult>
+  handler: (event: Log) => Promise<ProcessResult>
 }
 
 export abstract class BaseProcessor<
   TContract extends BaseContract,
   TBoundContractView extends BoundContractView<TContract, ContractView<TContract>>
 > {
-  blockHandlers: ((block: Block) => Promise<O11yResult>)[] = []
+  blockHandlers: ((block: Block) => Promise<ProcessResult>)[] = []
   eventHandlers: EventsHandler[] = []
 
   name: string
@@ -88,11 +88,13 @@ export abstract class BaseProcessor<
           return {
             gauges: ctx.gauges,
             counters: ctx.counters,
+            logs: [],
           }
         }
         return {
           gauges: [],
           counters: [],
+          logs: [],
         }
       },
     })
@@ -109,6 +111,7 @@ export abstract class BaseProcessor<
       return {
         gauges: ctx.gauges,
         counters: ctx.counters,
+        logs: [],
       }
     })
     return this

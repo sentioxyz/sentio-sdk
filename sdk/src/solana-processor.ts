@@ -1,4 +1,4 @@
-import { O11yResult } from './gen/processor/protos/processor'
+import { ProcessResult } from './gen/processor/protos/processor'
 import { SolanaContext } from './context'
 import Long from 'long'
 import { Instruction } from '@project-serum/anchor'
@@ -54,7 +54,7 @@ export class SolanaBaseProcessor {
     return this
   }
 
-  public handleInstruction(ins: string | { type: string; info: any }): O11yResult | null {
+  public handleInstruction(ins: string | { type: string; info: any }): ProcessResult | null {
     const ctx = new SolanaContext(this.address)
     let parsedInstruction: Instruction | null = null
 
@@ -80,6 +80,7 @@ export class SolanaBaseProcessor {
     return {
       gauges: ctx.gauges,
       counters: ctx.counters,
+      logs: [],
     }
   }
 

@@ -61,6 +61,51 @@ export function handlerTypeToJSON(object: HandlerType): string {
   }
 }
 
+export enum LogLevel {
+  DEBUG = 0,
+  INFO = 1,
+  WARNING = 2,
+  ERROR = 3,
+  UNRECOGNIZED = -1,
+}
+
+export function logLevelFromJSON(object: any): LogLevel {
+  switch (object) {
+    case 0:
+    case "DEBUG":
+      return LogLevel.DEBUG;
+    case 1:
+    case "INFO":
+      return LogLevel.INFO;
+    case 2:
+    case "WARNING":
+      return LogLevel.WARNING;
+    case 3:
+    case "ERROR":
+      return LogLevel.ERROR;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return LogLevel.UNRECOGNIZED;
+  }
+}
+
+export function logLevelToJSON(object: LogLevel): string {
+  switch (object) {
+    case LogLevel.DEBUG:
+      return "DEBUG";
+    case LogLevel.INFO:
+      return "INFO";
+    case LogLevel.WARNING:
+      return "WARNING";
+    case LogLevel.ERROR:
+      return "ERROR";
+    case LogLevel.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
 export interface ProjectConfig {
   name: string;
   version: string;
@@ -130,7 +175,7 @@ export interface ProcessLogsRequest {
 }
 
 export interface ProcessLogsResponse {
-  result: O11yResult | undefined;
+  result: ProcessResult | undefined;
   configUpdated: boolean;
 }
 
@@ -139,11 +184,11 @@ export interface ProcessTracesRequest {
 }
 
 export interface ProcessTracesResponse {
-  result: O11yResult | undefined;
+  result: ProcessResult | undefined;
 }
 
 export interface ProcessTransactionsRequest {
-  transaction: Transaction | undefined;
+  transaction: RawTransaction | undefined;
 }
 
 export interface ProcessInstructionsRequest {
@@ -151,11 +196,11 @@ export interface ProcessInstructionsRequest {
 }
 
 export interface ProcessTransactionsResponse {
-  result: O11yResult | undefined;
+  result: ProcessResult | undefined;
 }
 
 export interface ProcessInstructionsResponse {
-  result: O11yResult | undefined;
+  result: ProcessResult | undefined;
 }
 
 export interface ProcessBlocksRequest {
@@ -163,7 +208,7 @@ export interface ProcessBlocksRequest {
 }
 
 export interface ProcessBlocksResponse {
-  result: O11yResult | undefined;
+  result: ProcessResult | undefined;
 }
 
 export interface LogBinding {
@@ -184,7 +229,7 @@ export interface RawTrace {
   raw: Uint8Array;
 }
 
-export interface Transaction {
+export interface RawTransaction {
   txHash: string;
   raw: Uint8Array;
   programAccountId: string;
@@ -206,9 +251,10 @@ export interface RawBlock {
   raw: Uint8Array;
 }
 
-export interface O11yResult {
+export interface ProcessResult {
   gauges: GaugeResult[];
   counters: CounterResult[];
+  logs: LogResult[];
 }
 
 export interface RecordMetaData {
@@ -251,6 +297,13 @@ export interface CounterResult {
   metadata: RecordMetaData | undefined;
   metricValue: MetricValue | undefined;
   add: boolean;
+  runtimeInfo: RuntimeInfo | undefined;
+}
+
+export interface LogResult {
+  metadata: RecordMetaData | undefined;
+  level: LogLevel;
+  message: string;
   runtimeInfo: RuntimeInfo | undefined;
 }
 
@@ -1284,7 +1337,7 @@ export const ProcessLogsResponse = {
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.result !== undefined) {
-      O11yResult.encode(message.result, writer.uint32(10).fork()).ldelim();
+      ProcessResult.encode(message.result, writer.uint32(10).fork()).ldelim();
     }
     if (message.configUpdated === true) {
       writer.uint32(32).bool(message.configUpdated);
@@ -1300,7 +1353,7 @@ export const ProcessLogsResponse = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.result = O11yResult.decode(reader, reader.uint32());
+          message.result = ProcessResult.decode(reader, reader.uint32());
           break;
         case 4:
           message.configUpdated = reader.bool();
@@ -1316,7 +1369,7 @@ export const ProcessLogsResponse = {
   fromJSON(object: any): ProcessLogsResponse {
     return {
       result: isSet(object.result)
-        ? O11yResult.fromJSON(object.result)
+        ? ProcessResult.fromJSON(object.result)
         : undefined,
       configUpdated: isSet(object.configUpdated)
         ? Boolean(object.configUpdated)
@@ -1328,7 +1381,7 @@ export const ProcessLogsResponse = {
     const obj: any = {};
     message.result !== undefined &&
       (obj.result = message.result
-        ? O11yResult.toJSON(message.result)
+        ? ProcessResult.toJSON(message.result)
         : undefined);
     message.configUpdated !== undefined &&
       (obj.configUpdated = message.configUpdated);
@@ -1339,7 +1392,7 @@ export const ProcessLogsResponse = {
     const message = createBaseProcessLogsResponse();
     message.result =
       object.result !== undefined && object.result !== null
-        ? O11yResult.fromPartial(object.result)
+        ? ProcessResult.fromPartial(object.result)
         : undefined;
     message.configUpdated = object.configUpdated ?? false;
     return message;
@@ -1420,7 +1473,7 @@ export const ProcessTracesResponse = {
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.result !== undefined) {
-      O11yResult.encode(message.result, writer.uint32(10).fork()).ldelim();
+      ProcessResult.encode(message.result, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
@@ -1436,7 +1489,7 @@ export const ProcessTracesResponse = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.result = O11yResult.decode(reader, reader.uint32());
+          message.result = ProcessResult.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -1449,7 +1502,7 @@ export const ProcessTracesResponse = {
   fromJSON(object: any): ProcessTracesResponse {
     return {
       result: isSet(object.result)
-        ? O11yResult.fromJSON(object.result)
+        ? ProcessResult.fromJSON(object.result)
         : undefined,
     };
   },
@@ -1458,7 +1511,7 @@ export const ProcessTracesResponse = {
     const obj: any = {};
     message.result !== undefined &&
       (obj.result = message.result
-        ? O11yResult.toJSON(message.result)
+        ? ProcessResult.toJSON(message.result)
         : undefined);
     return obj;
   },
@@ -1469,7 +1522,7 @@ export const ProcessTracesResponse = {
     const message = createBaseProcessTracesResponse();
     message.result =
       object.result !== undefined && object.result !== null
-        ? O11yResult.fromPartial(object.result)
+        ? ProcessResult.fromPartial(object.result)
         : undefined;
     return message;
   },
@@ -1485,7 +1538,7 @@ export const ProcessTransactionsRequest = {
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.transaction !== undefined) {
-      Transaction.encode(
+      RawTransaction.encode(
         message.transaction,
         writer.uint32(10).fork()
       ).ldelim();
@@ -1504,7 +1557,7 @@ export const ProcessTransactionsRequest = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.transaction = Transaction.decode(reader, reader.uint32());
+          message.transaction = RawTransaction.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -1517,7 +1570,7 @@ export const ProcessTransactionsRequest = {
   fromJSON(object: any): ProcessTransactionsRequest {
     return {
       transaction: isSet(object.transaction)
-        ? Transaction.fromJSON(object.transaction)
+        ? RawTransaction.fromJSON(object.transaction)
         : undefined,
     };
   },
@@ -1526,7 +1579,7 @@ export const ProcessTransactionsRequest = {
     const obj: any = {};
     message.transaction !== undefined &&
       (obj.transaction = message.transaction
-        ? Transaction.toJSON(message.transaction)
+        ? RawTransaction.toJSON(message.transaction)
         : undefined);
     return obj;
   },
@@ -1537,7 +1590,7 @@ export const ProcessTransactionsRequest = {
     const message = createBaseProcessTransactionsRequest();
     message.transaction =
       object.transaction !== undefined && object.transaction !== null
-        ? Transaction.fromPartial(object.transaction)
+        ? RawTransaction.fromPartial(object.transaction)
         : undefined;
     return message;
   },
@@ -1621,7 +1674,7 @@ export const ProcessTransactionsResponse = {
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.result !== undefined) {
-      O11yResult.encode(message.result, writer.uint32(10).fork()).ldelim();
+      ProcessResult.encode(message.result, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
@@ -1637,7 +1690,7 @@ export const ProcessTransactionsResponse = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.result = O11yResult.decode(reader, reader.uint32());
+          message.result = ProcessResult.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -1650,7 +1703,7 @@ export const ProcessTransactionsResponse = {
   fromJSON(object: any): ProcessTransactionsResponse {
     return {
       result: isSet(object.result)
-        ? O11yResult.fromJSON(object.result)
+        ? ProcessResult.fromJSON(object.result)
         : undefined,
     };
   },
@@ -1659,7 +1712,7 @@ export const ProcessTransactionsResponse = {
     const obj: any = {};
     message.result !== undefined &&
       (obj.result = message.result
-        ? O11yResult.toJSON(message.result)
+        ? ProcessResult.toJSON(message.result)
         : undefined);
     return obj;
   },
@@ -1670,7 +1723,7 @@ export const ProcessTransactionsResponse = {
     const message = createBaseProcessTransactionsResponse();
     message.result =
       object.result !== undefined && object.result !== null
-        ? O11yResult.fromPartial(object.result)
+        ? ProcessResult.fromPartial(object.result)
         : undefined;
     return message;
   },
@@ -1686,7 +1739,7 @@ export const ProcessInstructionsResponse = {
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.result !== undefined) {
-      O11yResult.encode(message.result, writer.uint32(10).fork()).ldelim();
+      ProcessResult.encode(message.result, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
@@ -1702,7 +1755,7 @@ export const ProcessInstructionsResponse = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.result = O11yResult.decode(reader, reader.uint32());
+          message.result = ProcessResult.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -1715,7 +1768,7 @@ export const ProcessInstructionsResponse = {
   fromJSON(object: any): ProcessInstructionsResponse {
     return {
       result: isSet(object.result)
-        ? O11yResult.fromJSON(object.result)
+        ? ProcessResult.fromJSON(object.result)
         : undefined,
     };
   },
@@ -1724,7 +1777,7 @@ export const ProcessInstructionsResponse = {
     const obj: any = {};
     message.result !== undefined &&
       (obj.result = message.result
-        ? O11yResult.toJSON(message.result)
+        ? ProcessResult.toJSON(message.result)
         : undefined);
     return obj;
   },
@@ -1735,7 +1788,7 @@ export const ProcessInstructionsResponse = {
     const message = createBaseProcessInstructionsResponse();
     message.result =
       object.result !== undefined && object.result !== null
-        ? O11yResult.fromPartial(object.result)
+        ? ProcessResult.fromPartial(object.result)
         : undefined;
     return message;
   },
@@ -1817,7 +1870,7 @@ export const ProcessBlocksResponse = {
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.result !== undefined) {
-      O11yResult.encode(message.result, writer.uint32(18).fork()).ldelim();
+      ProcessResult.encode(message.result, writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
@@ -1833,7 +1886,7 @@ export const ProcessBlocksResponse = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 2:
-          message.result = O11yResult.decode(reader, reader.uint32());
+          message.result = ProcessResult.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -1846,7 +1899,7 @@ export const ProcessBlocksResponse = {
   fromJSON(object: any): ProcessBlocksResponse {
     return {
       result: isSet(object.result)
-        ? O11yResult.fromJSON(object.result)
+        ? ProcessResult.fromJSON(object.result)
         : undefined,
     };
   },
@@ -1855,7 +1908,7 @@ export const ProcessBlocksResponse = {
     const obj: any = {};
     message.result !== undefined &&
       (obj.result = message.result
-        ? O11yResult.toJSON(message.result)
+        ? ProcessResult.toJSON(message.result)
         : undefined);
     return obj;
   },
@@ -1866,7 +1919,7 @@ export const ProcessBlocksResponse = {
     const message = createBaseProcessBlocksResponse();
     message.result =
       object.result !== undefined && object.result !== null
-        ? O11yResult.fromPartial(object.result)
+        ? ProcessResult.fromPartial(object.result)
         : undefined;
     return message;
   },
@@ -2114,13 +2167,13 @@ export const RawTrace = {
   },
 };
 
-function createBaseTransaction(): Transaction {
+function createBaseRawTransaction(): RawTransaction {
   return { txHash: "", raw: new Uint8Array(), programAccountId: "" };
 }
 
-export const Transaction = {
+export const RawTransaction = {
   encode(
-    message: Transaction,
+    message: RawTransaction,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.txHash !== "") {
@@ -2135,10 +2188,10 @@ export const Transaction = {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): Transaction {
+  decode(input: _m0.Reader | Uint8Array, length?: number): RawTransaction {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseTransaction();
+    const message = createBaseRawTransaction();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -2159,7 +2212,7 @@ export const Transaction = {
     return message;
   },
 
-  fromJSON(object: any): Transaction {
+  fromJSON(object: any): RawTransaction {
     return {
       txHash: isSet(object.txHash) ? String(object.txHash) : "",
       raw: isSet(object.raw) ? bytesFromBase64(object.raw) : new Uint8Array(),
@@ -2169,7 +2222,7 @@ export const Transaction = {
     };
   },
 
-  toJSON(message: Transaction): unknown {
+  toJSON(message: RawTransaction): unknown {
     const obj: any = {};
     message.txHash !== undefined && (obj.txHash = message.txHash);
     message.raw !== undefined &&
@@ -2181,8 +2234,8 @@ export const Transaction = {
     return obj;
   },
 
-  fromPartial(object: DeepPartial<Transaction>): Transaction {
-    const message = createBaseTransaction();
+  fromPartial(object: DeepPartial<RawTransaction>): RawTransaction {
+    const message = createBaseRawTransaction();
     message.txHash = object.txHash ?? "";
     message.raw = object.raw ?? new Uint8Array();
     message.programAccountId = object.programAccountId ?? "";
@@ -2423,13 +2476,13 @@ export const RawBlock = {
   },
 };
 
-function createBaseO11yResult(): O11yResult {
-  return { gauges: [], counters: [] };
+function createBaseProcessResult(): ProcessResult {
+  return { gauges: [], counters: [], logs: [] };
 }
 
-export const O11yResult = {
+export const ProcessResult = {
   encode(
-    message: O11yResult,
+    message: ProcessResult,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     for (const v of message.gauges) {
@@ -2438,13 +2491,16 @@ export const O11yResult = {
     for (const v of message.counters) {
       CounterResult.encode(v!, writer.uint32(18).fork()).ldelim();
     }
+    for (const v of message.logs) {
+      LogResult.encode(v!, writer.uint32(26).fork()).ldelim();
+    }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): O11yResult {
+  decode(input: _m0.Reader | Uint8Array, length?: number): ProcessResult {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseO11yResult();
+    const message = createBaseProcessResult();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -2454,6 +2510,9 @@ export const O11yResult = {
         case 2:
           message.counters.push(CounterResult.decode(reader, reader.uint32()));
           break;
+        case 3:
+          message.logs.push(LogResult.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -2462,7 +2521,7 @@ export const O11yResult = {
     return message;
   },
 
-  fromJSON(object: any): O11yResult {
+  fromJSON(object: any): ProcessResult {
     return {
       gauges: Array.isArray(object?.gauges)
         ? object.gauges.map((e: any) => GaugeResult.fromJSON(e))
@@ -2470,10 +2529,13 @@ export const O11yResult = {
       counters: Array.isArray(object?.counters)
         ? object.counters.map((e: any) => CounterResult.fromJSON(e))
         : [],
+      logs: Array.isArray(object?.logs)
+        ? object.logs.map((e: any) => LogResult.fromJSON(e))
+        : [],
     };
   },
 
-  toJSON(message: O11yResult): unknown {
+  toJSON(message: ProcessResult): unknown {
     const obj: any = {};
     if (message.gauges) {
       obj.gauges = message.gauges.map((e) =>
@@ -2489,15 +2551,21 @@ export const O11yResult = {
     } else {
       obj.counters = [];
     }
+    if (message.logs) {
+      obj.logs = message.logs.map((e) => (e ? LogResult.toJSON(e) : undefined));
+    } else {
+      obj.logs = [];
+    }
     return obj;
   },
 
-  fromPartial(object: DeepPartial<O11yResult>): O11yResult {
-    const message = createBaseO11yResult();
+  fromPartial(object: DeepPartial<ProcessResult>): ProcessResult {
+    const message = createBaseProcessResult();
     message.gauges =
       object.gauges?.map((e) => GaugeResult.fromPartial(e)) || [];
     message.counters =
       object.counters?.map((e) => CounterResult.fromPartial(e)) || [];
+    message.logs = object.logs?.map((e) => LogResult.fromPartial(e)) || [];
     return message;
   },
 };
@@ -3145,6 +3213,107 @@ export const CounterResult = {
         ? MetricValue.fromPartial(object.metricValue)
         : undefined;
     message.add = object.add ?? false;
+    message.runtimeInfo =
+      object.runtimeInfo !== undefined && object.runtimeInfo !== null
+        ? RuntimeInfo.fromPartial(object.runtimeInfo)
+        : undefined;
+    return message;
+  },
+};
+
+function createBaseLogResult(): LogResult {
+  return { metadata: undefined, level: 0, message: "", runtimeInfo: undefined };
+}
+
+export const LogResult = {
+  encode(
+    message: LogResult,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.metadata !== undefined) {
+      RecordMetaData.encode(
+        message.metadata,
+        writer.uint32(10).fork()
+      ).ldelim();
+    }
+    if (message.level !== 0) {
+      writer.uint32(16).int32(message.level);
+    }
+    if (message.message !== "") {
+      writer.uint32(26).string(message.message);
+    }
+    if (message.runtimeInfo !== undefined) {
+      RuntimeInfo.encode(
+        message.runtimeInfo,
+        writer.uint32(34).fork()
+      ).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): LogResult {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseLogResult();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.metadata = RecordMetaData.decode(reader, reader.uint32());
+          break;
+        case 2:
+          message.level = reader.int32() as any;
+          break;
+        case 3:
+          message.message = reader.string();
+          break;
+        case 4:
+          message.runtimeInfo = RuntimeInfo.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): LogResult {
+    return {
+      metadata: isSet(object.metadata)
+        ? RecordMetaData.fromJSON(object.metadata)
+        : undefined,
+      level: isSet(object.level) ? logLevelFromJSON(object.level) : 0,
+      message: isSet(object.message) ? String(object.message) : "",
+      runtimeInfo: isSet(object.runtimeInfo)
+        ? RuntimeInfo.fromJSON(object.runtimeInfo)
+        : undefined,
+    };
+  },
+
+  toJSON(message: LogResult): unknown {
+    const obj: any = {};
+    message.metadata !== undefined &&
+      (obj.metadata = message.metadata
+        ? RecordMetaData.toJSON(message.metadata)
+        : undefined);
+    message.level !== undefined && (obj.level = logLevelToJSON(message.level));
+    message.message !== undefined && (obj.message = message.message);
+    message.runtimeInfo !== undefined &&
+      (obj.runtimeInfo = message.runtimeInfo
+        ? RuntimeInfo.toJSON(message.runtimeInfo)
+        : undefined);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<LogResult>): LogResult {
+    const message = createBaseLogResult();
+    message.metadata =
+      object.metadata !== undefined && object.metadata !== null
+        ? RecordMetaData.fromPartial(object.metadata)
+        : undefined;
+    message.level = object.level ?? 0;
+    message.message = object.message ?? "";
     message.runtimeInfo =
       object.runtimeInfo !== undefined && object.runtimeInfo !== null
         ? RuntimeInfo.fromPartial(object.runtimeInfo)

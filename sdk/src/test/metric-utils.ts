@@ -1,5 +1,5 @@
 import { DeepPartial } from '../gen/builtin'
-import { BigDecimal, MetricValue, O11yResult } from '@sentio/sdk'
+import { BigDecimal, MetricValue, ProcessResult } from '@sentio/sdk'
 import { Numberish } from '../numberish'
 import { BigNumber } from 'ethers'
 
@@ -24,7 +24,7 @@ export function MetricValueToNumber(v: DeepPartial<MetricValue> | undefined): Nu
   return undefined
 }
 
-export function firstCounterValue(result: O11yResult | undefined, name: string): Numberish | undefined {
+export function firstCounterValue(result: ProcessResult | undefined, name: string): Numberish | undefined {
   if (!result) {
     return undefined
   }
@@ -36,7 +36,7 @@ export function firstCounterValue(result: O11yResult | undefined, name: string):
   return undefined
 }
 
-export function firstGaugeValue(result: O11yResult | undefined, name: string): Numberish | undefined {
+export function firstGaugeValue(result: ProcessResult | undefined, name: string): Numberish | undefined {
   if (!result) {
     return undefined
   }

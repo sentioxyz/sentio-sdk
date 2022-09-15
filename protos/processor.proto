@@ -105,7 +105,7 @@ message ProcessLogsRequest {
 }
 
 message ProcessLogsResponse {
-  O11yResult result = 1;
+  ProcessResult result = 1;
   // Whether config update because of dynamic contract processor creation
   bool config_updated = 4;
 }
@@ -115,11 +115,11 @@ message ProcessTracesRequest {
 }
 
 message ProcessTracesResponse {
-  O11yResult result = 1;
+  ProcessResult result = 1;
 }
 
 message ProcessTransactionsRequest {
-  Transaction transaction = 1;
+  RawTransaction transaction = 1;
 }
 
 message ProcessInstructionsRequest {
@@ -127,11 +127,11 @@ message ProcessInstructionsRequest {
 }
 
 message ProcessTransactionsResponse {
-  O11yResult result = 1;
+  ProcessResult result = 1;
 }
 
 message ProcessInstructionsResponse {
-  O11yResult result = 1;
+  ProcessResult result = 1;
 }
 
 message ProcessBlocksRequest {
@@ -139,7 +139,7 @@ message ProcessBlocksRequest {
 }
 
 message ProcessBlocksResponse {
-  O11yResult result = 2;
+  ProcessResult result = 2;
 }
 
 message LogBinding {
@@ -160,10 +160,10 @@ message RawTrace {
   bytes raw = 1;
 }
 
-message Transaction {
+message RawTransaction {
   string tx_hash = 1;
   bytes raw = 2;
-  string program_account_id = 3;
+  string program_account_id = 3; // only for solana
 }
 
 message Instruction {
@@ -182,9 +182,10 @@ message RawBlock {
   bytes raw = 1;
 }
 
-message O11yResult {
+message ProcessResult {
   repeated GaugeResult gauges = 1;
   repeated CounterResult counters = 2;
+  repeated LogResult logs = 3;
 }
 
 message RecordMetaData {
@@ -239,5 +240,19 @@ message CounterResult {
   MetricValue metric_value = 2;
   // True to increase or False to decrease
   bool add = 3;
+  RuntimeInfo runtime_info = 4;
+}
+
+enum LogLevel {
+  DEBUG = 0;
+  INFO = 1;
+  WARNING = 2;
+  ERROR = 3;
+}
+
+message LogResult {
+  RecordMetaData metadata = 1;
+  LogLevel level = 2;
+  string message = 3;
   RuntimeInfo runtime_info = 4;
 }

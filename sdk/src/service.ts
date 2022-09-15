@@ -7,7 +7,7 @@ import {
   HandlerType,
   LogFilter,
   LogHandlerConfig,
-  O11yResult,
+  ProcessResult,
   ProcessBlocksRequest,
   ProcessBlocksResponse,
   ProcessConfigRequest,
@@ -32,11 +32,11 @@ import { TextDecoder } from 'util'
 const DEFAULT_MAX_BLOCK = Long.ZERO
 
 export class ProcessorServiceImpl implements ProcessorServiceImplementation {
-  private eventHandlers: ((event: Log) => Promise<O11yResult>)[] = []
-  private blockHandlers: ((block: Block) => Promise<O11yResult>)[] = []
+  private eventHandlers: ((event: Log) => Promise<ProcessResult>)[] = []
+  private blockHandlers: ((block: Block) => Promise<ProcessResult>)[] = []
 
   // map from chain id to list of processors
-  // private blockHandlers = new Map<string, ((block: Block) => Promise<O11yResult>)[]>()
+  // private blockHandlers = new Map<string, ((block: Block) => Promise<ProcessResult>)[]>()
   // private processorsByChainId = new Map<string, BaseProcessor<BaseContract, BoundContractView<BaseContract, any>>>()
 
   private started = false
@@ -204,12 +204,13 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       throw new ServerError(Status.UNAVAILABLE, 'Service Not started.')
     }
 
-    const resp: O11yResult = {
+    const resp: ProcessResult = {
       gauges: [],
       counters: [],
+      logs: [],
     }
 
-    const promises: Promise<O11yResult>[] = []
+    const promises: Promise<ProcessResult>[] = []
     for (const l of request.logBindings) {
       if (!l.log) {
         throw new ServerError(Status.INVALID_ARGUMENT, "Log can't be null")
@@ -272,9 +273,10 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       throw new ServerError(Status.UNAVAILABLE, 'Service not started.')
     }
 
-    const result: O11yResult = {
+    const result: ProcessResult = {
       gauges: [],
       counters: [],
+      logs: [],
     }
 
     // Only have instruction handlers for solana processors
@@ -289,7 +291,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
           new Promise((resolve, _) => {
             for (const processor of global.PROCESSOR_STATE.solanaProcessors) {
               if (processor.address === instruction.programAccountId) {
-                let res: O11yResult | null
+                let res: ProcessResult | null
                 if (instruction.parsed) {
                   res = processor.handleInstruction(JSON.parse(new TextDecoder().decode(instruction.parsed)))
                 } else if (instruction.instructionData) {
@@ -343,7 +345,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     const promises = request.blockBindings.map((binding) => this.processBlock(binding))
     const results = await Promise.all(promises)
 
-    const res = O11yResult.fromPartial({})
+    const res = ProcessResult.fromPartial({})
 
     for (const r of results) {
       res.counters = res.counters.concat(r.counters)
@@ -356,7 +358,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     }
   }
 
-  async processBlock(binding: BlockBinding): Promise<O11yResult> {
+  async processBlock(binding: BlockBinding): Promise<ProcessResult> {
     if (!binding.block) {
       throw new ServerError(Status.INVALID_ARGUMENT, "Block can't be empty")
     }
@@ -364,12 +366,13 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
 
     const block: Block = JSON.parse(jsonString)
 
-    const resp: O11yResult = {
+    const resp: ProcessResult = {
       gauges: [],
       counters: [],
+      logs: [],
     }
 
-    const promises: Promise<O11yResult>[] = []
+    const promises: Promise<ProcessResult>[] = []
     for (const handlerId of binding.handlerIds) {
       const promise = this.blockHandlers[handlerId](block).catch((e) => {
         throw new ServerError(Status.INTERNAL, 'error processing block: ' + block.number + '\n' + e.toString())
@@ -432,7 +435,7 @@ function Utf8ArrayToStr(array: Uint8Array) {
   return out
 }
 
-function recordRuntimeInfo(results: O11yResult, handlerType: HandlerType) {
+function recordRuntimeInfo(results: ProcessResult, handlerType: HandlerType) {
   results.gauges.forEach((e) => {
     e.runtimeInfo = {
       from: handlerType,
