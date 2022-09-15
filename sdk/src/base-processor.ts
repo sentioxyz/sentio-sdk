@@ -8,10 +8,17 @@ import { BoundContractView, Context, ContractView } from './context'
 import { ProcessResult } from './gen/processor/protos/processor'
 import { BindInternalOptions, BindOptions } from './bind-options'
 import { PromiseOrVoid } from './promise-or-void'
+import { Trace } from './trace'
+import { utils } from 'ethers'
 
 export class EventsHandler {
   filters: EventFilter[]
   handler: (event: Log) => Promise<ProcessResult>
+}
+
+export class TraceHandler {
+  signature: string
+  handler: (trace: Trace) => Promise<ProcessResult>
 }
 
 export abstract class BaseProcessor<
@@ -20,6 +27,7 @@ export abstract class BaseProcessor<
 > {
   blockHandlers: ((block: Block) => Promise<ProcessResult>)[] = []
   eventHandlers: EventsHandler[] = []
+  traceHandlers: TraceHandler[] = []
 
   name: string
   config: BindInternalOptions
@@ -127,5 +135,31 @@ export abstract class BaseProcessor<
     return this.onEvent(function (log, ctx) {
       return handler(log, ctx)
     }, _filters)
+  }
+
+  public onTrace(
+    signature: string,
+    handler: (trace: Trace, ctx: Context<TContract, TBoundContractView>) => PromiseOrVoid
+  ) {
+    const chainId = this.getChainId()
+    const contractView = this.CreateBoundContractView()
+
+    this.traceHandlers.push({
+      signature,
+      handler: async function (trace: Trace) {
+        const contractInterface = contractView.rawContract.interface
+        const fragment = contractInterface.getFunction(signature)
+        trace.args = contractInterface._abiCoder.decode(fragment.inputs, utils.hexDataSlice(trace.action.input, 4))
+
+        const ctx = new Context<TContract, TBoundContractView>(contractView, chainId, undefined, undefined, trace)
+        await handler(trace, ctx)
+        return {
+          gauges: ctx.gauges,
+          counters: ctx.counters,
+          logs: [],
+        }
+      },
+    })
+    return this
   }
 }

@@ -1,5 +1,5 @@
 import { RecordMetaData } from './gen/processor/protos/processor'
-import { Context, EthContext, SolanaContext } from './context'
+import { BaseContext, Context, SolanaContext } from './context'
 import { toMetricValue, Numberish } from './numberish'
 import Long from 'long'
 
@@ -8,7 +8,7 @@ export function normalizeName(name: string) {
   return name.slice(0, 100).replace(regex, '_')
 }
 
-function GetRecordMetaData(ctx: EthContext | SolanaContext, name: string, labels: Labels): RecordMetaData {
+function GetRecordMetaData(ctx: BaseContext, name: string, labels: Labels): RecordMetaData {
   name = normalizeName(name)
 
   if (ctx instanceof Context) {
@@ -34,6 +34,17 @@ function GetRecordMetaData(ctx: EthContext | SolanaContext, name: string, labels
         labels: labels,
       }
     }
+    if (ctx.trace) {
+      return {
+        contractAddress: ctx.contract.rawContract.address,
+        blockNumber: Long.fromNumber(ctx.trace.blockNumber, true),
+        transactionIndex: ctx.trace.transactionPosition, // TODO make sure if this is the right value to set
+        logIndex: -1,
+        chainId: ctx.chainId.toString(),
+        name: name,
+        labels: labels,
+      }
+    }
   } else if (ctx instanceof SolanaContext) {
     return {
       contractAddress: ctx.address,
@@ -51,10 +62,10 @@ function GetRecordMetaData(ctx: EthContext | SolanaContext, name: string, labels
 export type Labels = { [key: string]: string }
 
 export class Counter {
-  private readonly ctx: EthContext | SolanaContext
+  private readonly ctx: BaseContext
   private readonly name: string
 
-  constructor(name: string, ctx: EthContext | SolanaContext) {
+  constructor(name: string, ctx: BaseContext) {
     this.name = name
     this.ctx = ctx
   }
@@ -79,9 +90,9 @@ export class Counter {
 
 export class Gauge {
   private readonly name: string
-  private readonly ctx: EthContext | SolanaContext
+  private readonly ctx: BaseContext
 
-  constructor(name: string, ctx: EthContext | SolanaContext) {
+  constructor(name: string, ctx: BaseContext) {
     this.name = name
     this.ctx = ctx
   }
@@ -96,13 +107,13 @@ export class Gauge {
 }
 
 export class Meter {
-  private readonly ctx: EthContext | SolanaContext
+  private readonly ctx: BaseContext
 
   // TODO is map necessary since we are sending request remotely?
   // counterMap = new Map<string, Counter>()
   // gaugeMap = new Map<string, Gauge>()
 
-  constructor(ctx: EthContext | SolanaContext) {
+  constructor(ctx: BaseContext) {
     this.ctx = ctx
   }
 

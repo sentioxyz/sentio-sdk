@@ -23,16 +23,19 @@ import {
   ProcessTransactionsResponse,
   StartRequest,
   TemplateInstance,
+  TraceBinding,
 } from './gen/processor/protos/processor'
 
 import { Empty } from './gen/google/protobuf/empty'
 import Long from 'long'
 import { TextDecoder } from 'util'
+import { Trace } from './trace'
 
 const DEFAULT_MAX_BLOCK = Long.ZERO
 
 export class ProcessorServiceImpl implements ProcessorServiceImplementation {
   private eventHandlers: ((event: Log) => Promise<ProcessResult>)[] = []
+  private traceHandlers: ((trace: Trace) => Promise<ProcessResult>)[] = []
   private blockHandlers: ((block: Block) => Promise<ProcessResult>)[] = []
 
   // map from chain id to list of processors
@@ -88,6 +91,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         },
         blockConfigs: [],
         logConfigs: [],
+        traceConfigs: [],
         startBlock: processor.config.startBlock,
         endBlock: DEFAULT_MAX_BLOCK,
         instructionConfig: undefined,
@@ -104,7 +108,16 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         })
       }
 
-      // Step 2. Prepare all the event handlers
+      // Step 2. Prepare all trace handlers
+      for (const traceHandler of processor.traceHandlers) {
+        const handlerId = this.traceHandlers.push(traceHandler.handler) - 1
+        contractConfig.traceConfigs.push({
+          signature: traceHandler.signature,
+          handlerId: handlerId,
+        })
+      }
+
+      // Step 3. Prepare all the event handlers
       for (const eventsHandler of processor.eventHandlers) {
         // associate id with filter
         const handlerId = this.eventHandlers.push(eventsHandler.handler) - 1
@@ -151,6 +164,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         },
         blockConfigs: [],
         logConfigs: [],
+        traceConfigs: [],
         startBlock: solanaProcessor.config.startSlot,
         endBlock: DEFAULT_MAX_BLOCK,
         instructionConfig: {
@@ -388,9 +402,36 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
   }
 
   async processTraces(request: ProcessTracesRequest, context: CallContext): Promise<ProcessTracesResponse> {
-    return {
-      result: undefined,
+    if (!this.started) {
+      throw new ServerError(Status.UNAVAILABLE, 'Service Not started.')
     }
+
+    const promises = request.traceBindings.map((binding) => this.processTrace(binding))
+    const results = await Promise.all(promises)
+
+    const res = ProcessResult.fromPartial({})
+
+    for (const r of results) {
+      res.counters = res.counters.concat(r.counters)
+      res.gauges = res.gauges.concat(r.gauges)
+    }
+
+    recordRuntimeInfo(res, HandlerType.TRACE)
+    return {
+      result: res,
+    }
+  }
+
+  async processTrace(binding: TraceBinding): Promise<ProcessResult> {
+    if (!binding.trace) {
+      throw new ServerError(Status.INVALID_ARGUMENT, "Trace can't be empty")
+    }
+    const jsonString = Utf8ArrayToStr(binding.trace.raw)
+    const trace: Trace = JSON.parse(jsonString)
+
+    return this.traceHandlers[binding.handlerId](trace).catch((e) => {
+      throw new ServerError(Status.INTERNAL, 'error processing trace: ' + jsonString + '\n' + e.toString())
+    })
   }
 }
 

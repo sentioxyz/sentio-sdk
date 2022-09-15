@@ -51,6 +51,7 @@ message ContractConfig {
   ContractInfo contract = 1;
   repeated BlockHandlerConfig block_configs = 7;
   repeated LogHandlerConfig log_configs = 3;
+  repeated TraceHandlerConfig trace_configs = 2;
   uint64 start_block = 4;
   uint64 end_block = 5;
   InstructionHandlerConfig instruction_config = 6;
@@ -79,6 +80,11 @@ message StartRequest {
 
 message BlockHandlerConfig {
   int32 handler_id = 1;
+}
+
+message TraceHandlerConfig {
+  string signature = 1;
+  int32 handler_id = 2;
 }
 
 message LogHandlerConfig {
@@ -111,7 +117,7 @@ message ProcessLogsResponse {
 }
 
 message ProcessTracesRequest {
-  repeated LogBinding log_bindings = 1;
+  repeated TraceBinding trace_bindings = 1;
 }
 
 message ProcessTracesResponse {

@@ -1,19 +1,30 @@
-import { CounterResult, GaugeResult } from './gen/processor/protos/processor'
+import { CounterResult, GaugeResult, LogResult } from './gen/processor/protos/processor'
 import { BaseContract, EventFilter } from 'ethers'
 import { Block, Log } from '@ethersproject/abstract-provider'
 import { Meter } from './meter'
 import Long from 'long'
+import { Trace } from './trace'
 
-export class EthContext {
+export class BaseContext {
+  gauges: GaugeResult[] = []
+  counters: CounterResult[] = []
+  logs: LogResult[] = []
+  meter: Meter
+
+  constructor() {
+    this.meter = new Meter(this)
+  }
+}
+
+export class EthContext extends BaseContext {
   chainId: number
   log?: Log
   block?: Block
+  trace?: Trace
   blockNumber: Long
-  gauges: GaugeResult[] = []
-  counters: CounterResult[] = []
-  meter: Meter
 
-  constructor(chainId: number, block?: Block, log?: Log) {
+  constructor(chainId: number, block?: Block, log?: Log, trace?: Trace) {
+    super()
     this.chainId = chainId
     this.log = log
     this.block = block
@@ -22,7 +33,6 @@ export class EthContext {
     } else if (block) {
       this.blockNumber = Long.fromNumber(block.number)
     }
-    this.meter = new Meter(this)
   }
 }
 
@@ -31,11 +41,13 @@ export class Context<
   TContractBoundView extends BoundContractView<TContract, ContractView<TContract>>
 > extends EthContext {
   contract: TContractBoundView
+  address: string
 
-  constructor(view: TContractBoundView, chainId: number, block?: Block, log?: Log) {
-    super(chainId, block, log)
+  constructor(view: TContractBoundView, chainId: number, block?: Block, log?: Log, trace?: Trace) {
+    super(chainId, block, log, trace)
     view.context = this
     this.contract = view
+    this.address = view.rawContract.address
   }
 }
 
@@ -79,14 +91,11 @@ export class BoundContractView<TContract extends BaseContract, TContractView ext
   }
 }
 
-export class SolanaContext {
-  gauges: GaugeResult[] = []
-  counters: CounterResult[] = []
-  meter: Meter
-
+export class SolanaContext extends BaseContext {
   address: string
 
   constructor(address: string) {
+    super()
     this.meter = new Meter(this)
     this.address = address
   }

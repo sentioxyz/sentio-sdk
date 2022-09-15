@@ -123,6 +123,7 @@ export interface ContractConfig {
   contract: ContractInfo | undefined;
   blockConfigs: BlockHandlerConfig[];
   logConfigs: LogHandlerConfig[];
+  traceConfigs: TraceHandlerConfig[];
   startBlock: Long;
   endBlock: Long;
   instructionConfig: InstructionHandlerConfig | undefined;
@@ -148,6 +149,11 @@ export interface StartRequest {
 }
 
 export interface BlockHandlerConfig {
+  handlerId: number;
+}
+
+export interface TraceHandlerConfig {
+  signature: string;
   handlerId: number;
 }
 
@@ -180,7 +186,7 @@ export interface ProcessLogsResponse {
 }
 
 export interface ProcessTracesRequest {
-  logBindings: LogBinding[];
+  traceBindings: TraceBinding[];
 }
 
 export interface ProcessTracesResponse {
@@ -524,6 +530,7 @@ function createBaseContractConfig(): ContractConfig {
     contract: undefined,
     blockConfigs: [],
     logConfigs: [],
+    traceConfigs: [],
     startBlock: Long.UZERO,
     endBlock: Long.UZERO,
     instructionConfig: undefined,
@@ -544,6 +551,9 @@ export const ContractConfig = {
     }
     for (const v of message.logConfigs) {
       LogHandlerConfig.encode(v!, writer.uint32(26).fork()).ldelim();
+    }
+    for (const v of message.traceConfigs) {
+      TraceHandlerConfig.encode(v!, writer.uint32(18).fork()).ldelim();
     }
     if (!message.startBlock.isZero()) {
       writer.uint32(32).uint64(message.startBlock);
@@ -583,6 +593,11 @@ export const ContractConfig = {
             LogHandlerConfig.decode(reader, reader.uint32())
           );
           break;
+        case 2:
+          message.traceConfigs.push(
+            TraceHandlerConfig.decode(reader, reader.uint32())
+          );
+          break;
         case 4:
           message.startBlock = reader.uint64() as Long;
           break;
@@ -616,6 +631,9 @@ export const ContractConfig = {
         : [],
       logConfigs: Array.isArray(object?.logConfigs)
         ? object.logConfigs.map((e: any) => LogHandlerConfig.fromJSON(e))
+        : [],
+      traceConfigs: Array.isArray(object?.traceConfigs)
+        ? object.traceConfigs.map((e: any) => TraceHandlerConfig.fromJSON(e))
         : [],
       startBlock: isSet(object.startBlock)
         ? Long.fromValue(object.startBlock)
@@ -652,6 +670,13 @@ export const ContractConfig = {
     } else {
       obj.logConfigs = [];
     }
+    if (message.traceConfigs) {
+      obj.traceConfigs = message.traceConfigs.map((e) =>
+        e ? TraceHandlerConfig.toJSON(e) : undefined
+      );
+    } else {
+      obj.traceConfigs = [];
+    }
     message.startBlock !== undefined &&
       (obj.startBlock = (message.startBlock || Long.UZERO).toString());
     message.endBlock !== undefined &&
@@ -675,6 +700,8 @@ export const ContractConfig = {
       object.blockConfigs?.map((e) => BlockHandlerConfig.fromPartial(e)) || [];
     message.logConfigs =
       object.logConfigs?.map((e) => LogHandlerConfig.fromPartial(e)) || [];
+    message.traceConfigs =
+      object.traceConfigs?.map((e) => TraceHandlerConfig.fromPartial(e)) || [];
     message.startBlock =
       object.startBlock !== undefined && object.startBlock !== null
         ? Long.fromValue(object.startBlock)
@@ -989,6 +1016,68 @@ export const BlockHandlerConfig = {
 
   fromPartial(object: DeepPartial<BlockHandlerConfig>): BlockHandlerConfig {
     const message = createBaseBlockHandlerConfig();
+    message.handlerId = object.handlerId ?? 0;
+    return message;
+  },
+};
+
+function createBaseTraceHandlerConfig(): TraceHandlerConfig {
+  return { signature: "", handlerId: 0 };
+}
+
+export const TraceHandlerConfig = {
+  encode(
+    message: TraceHandlerConfig,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.signature !== "") {
+      writer.uint32(10).string(message.signature);
+    }
+    if (message.handlerId !== 0) {
+      writer.uint32(16).int32(message.handlerId);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): TraceHandlerConfig {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseTraceHandlerConfig();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.signature = reader.string();
+          break;
+        case 2:
+          message.handlerId = reader.int32();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): TraceHandlerConfig {
+    return {
+      signature: isSet(object.signature) ? String(object.signature) : "",
+      handlerId: isSet(object.handlerId) ? Number(object.handlerId) : 0,
+    };
+  },
+
+  toJSON(message: TraceHandlerConfig): unknown {
+    const obj: any = {};
+    message.signature !== undefined && (obj.signature = message.signature);
+    message.handlerId !== undefined &&
+      (obj.handlerId = Math.round(message.handlerId));
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<TraceHandlerConfig>): TraceHandlerConfig {
+    const message = createBaseTraceHandlerConfig();
+    message.signature = object.signature ?? "";
     message.handlerId = object.handlerId ?? 0;
     return message;
   },
@@ -1400,7 +1489,7 @@ export const ProcessLogsResponse = {
 };
 
 function createBaseProcessTracesRequest(): ProcessTracesRequest {
-  return { logBindings: [] };
+  return { traceBindings: [] };
 }
 
 export const ProcessTracesRequest = {
@@ -1408,8 +1497,8 @@ export const ProcessTracesRequest = {
     message: ProcessTracesRequest,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    for (const v of message.logBindings) {
-      LogBinding.encode(v!, writer.uint32(10).fork()).ldelim();
+    for (const v of message.traceBindings) {
+      TraceBinding.encode(v!, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
@@ -1425,7 +1514,9 @@ export const ProcessTracesRequest = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.logBindings.push(LogBinding.decode(reader, reader.uint32()));
+          message.traceBindings.push(
+            TraceBinding.decode(reader, reader.uint32())
+          );
           break;
         default:
           reader.skipType(tag & 7);
@@ -1437,28 +1528,28 @@ export const ProcessTracesRequest = {
 
   fromJSON(object: any): ProcessTracesRequest {
     return {
-      logBindings: Array.isArray(object?.logBindings)
-        ? object.logBindings.map((e: any) => LogBinding.fromJSON(e))
+      traceBindings: Array.isArray(object?.traceBindings)
+        ? object.traceBindings.map((e: any) => TraceBinding.fromJSON(e))
         : [],
     };
   },
 
   toJSON(message: ProcessTracesRequest): unknown {
     const obj: any = {};
-    if (message.logBindings) {
-      obj.logBindings = message.logBindings.map((e) =>
-        e ? LogBinding.toJSON(e) : undefined
+    if (message.traceBindings) {
+      obj.traceBindings = message.traceBindings.map((e) =>
+        e ? TraceBinding.toJSON(e) : undefined
       );
     } else {
-      obj.logBindings = [];
+      obj.traceBindings = [];
     }
     return obj;
   },
 
   fromPartial(object: DeepPartial<ProcessTracesRequest>): ProcessTracesRequest {
     const message = createBaseProcessTracesRequest();
-    message.logBindings =
-      object.logBindings?.map((e) => LogBinding.fromPartial(e)) || [];
+    message.traceBindings =
+      object.traceBindings?.map((e) => TraceBinding.fromPartial(e)) || [];
     return message;
   },
 };
