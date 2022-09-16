@@ -9,6 +9,7 @@ import {
 import { reservedKeywords } from '@typechain/ethers-v5/dist/codegen/reserved-keywords'
 import { generateInputTypes } from '@typechain/ethers-v5/dist/codegen/types'
 import { getFullSignatureForEvent } from 'typechain/dist/utils/signatures'
+import { codegenCallTraceTypes, codegenFunctions } from './functions'
 
 export function codeGenIndex(contract: Contract): string {
   return ` 
@@ -72,6 +73,8 @@ export function codeGenSentioFile(contract: Contract): string {
       .join('\n')}
     }
 
+    ${Object.values(contract.functions).map(codegenCallTraceTypes).join('\n')}
+
     export class ${contract.name}Processor extends BaseProcessor<${contract.name}, ${contract.name}BoundContractView> {
       ${Object.values(contract.events)
         .map((events) => {
@@ -81,6 +84,10 @@ export function codeGenSentioFile(contract: Contract): string {
             return events.map((e) => generateOnEventFunction(e, contract.name, true)).join('\n')
           }
         })
+        .join('\n')}
+
+      ${Object.values(contract.functions)
+        .map((f) => codegenFunctions(f, contract.name))
         .join('\n')}
 
     public static filters = templateContract.filters
@@ -134,6 +141,7 @@ export function codeGenSentioFile(contract: Contract): string {
         'ContractView',
         'DummyProvider',
         'getContractName',
+        'TypedTrace',
       ],
       './common': ['PromiseOrValue'],
       './index': [`${contract.name}`, `${contract.name}__factory`],

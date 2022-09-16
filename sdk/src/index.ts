@@ -12,6 +12,7 @@ export { transformEtherError } from './error'
 export { ProcessorState } from './processor-state'
 export { BigNumber as BigDecimal } from 'bignumber.js'
 export { EthersError } from './error'
+export type { TypedTrace } from './trace'
 
 export { getProcessor, addProcessor, getContractByABI, addContractByABI, getContractName } from './binds'
 
