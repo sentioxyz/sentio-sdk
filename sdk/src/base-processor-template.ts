@@ -8,6 +8,7 @@ import { TemplateInstance } from './gen/processor/protos/processor'
 import Long from 'long'
 import { getNetwork } from '@ethersproject/providers'
 import { PromiseOrVoid } from './promise-or-void'
+import { Trace } from './trace'
 
 export abstract class BaseProcessorTemplate<
   TContract extends BaseContract,
@@ -16,6 +17,10 @@ export abstract class BaseProcessorTemplate<
   id: number
   binds = new Set<string>()
   blockHandlers: ((block: Block, ctx: Context<TContract, TBoundContractView>) => PromiseOrVoid)[] = []
+  traceHandlers: {
+    signature: string
+    handler: (trace: Trace, ctx: Context<TContract, TBoundContractView>) => PromiseOrVoid
+  }[] = []
   eventHandlers: {
     handler: (event: Event, ctx: Context<TContract, TBoundContractView>) => PromiseOrVoid
     filter: EventFilter | EventFilter[]
@@ -85,6 +90,14 @@ export abstract class BaseProcessorTemplate<
 
   public onBlock(handler: (block: Block, ctx: Context<TContract, TBoundContractView>) => PromiseOrVoid) {
     this.blockHandlers.push(handler)
+    return this
+  }
+
+  public onTrace(
+    signature: string,
+    handler: (trace: Trace, ctx: Context<TContract, TBoundContractView>) => PromiseOrVoid
+  ) {
+    this.traceHandlers.push({ signature, handler })
     return this
   }
 

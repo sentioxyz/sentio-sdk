@@ -14,7 +14,7 @@ export const filter = ERC20Processor.filters.Transfer(
   '0xb329e39ebefd16f40d38f07643652ce17ca5bac1'
 )
 
-ERC20Processor.bind({ address: '0x1e4ede388cbc9f4b5c79681b7f94d36a11abebc9', startBlock: 14201940 }).onTransfer(
+ERC20Processor.bind({ address: '0x1e4ede388cbc9f4b5c79681b7f94d36a11abebc9', startBlock: 14201940 }).onEventTransfer(
   handleTransfer,
   filter // filter is an optional parameter
 )

@@ -8,6 +8,7 @@ import { TestProcessorServer } from './test-processor-server'
 import { firstCounterValue, firstGaugeValue } from './metric-utils'
 import { BigNumber } from 'ethers'
 import { mockTransferLog } from '../builtin/erc20/test-utils'
+import { Trace } from '../trace'
 
 describe('Test Basic Examples', () => {
   const service = new TestProcessorServer(() => require('./erc20'))
@@ -84,5 +85,33 @@ describe('Test Basic Examples', () => {
     number: 14373295,
     timestamp: 1647106437,
     extraData: '0xe4b883e5bda9e7a59ee4bb99e9b1bc493421',
+  }
+
+  test('Check trace dispatch', async () => {
+    const res = (await service.testTrace(traceData)).result
+    expect(res?.counters).length(1)
+  })
+
+  const traceData: Trace = {
+    action: {
+      from: '0x80009ff8154bd5653c6dda2fa5f5053e5a5c1a91',
+      callType: 'call',
+      gas: 0xbb0a,
+      input:
+        '0x095ea7b30000000000000000000000003eabf546fff0a41edaaf5b667333a846285713180000000000000000000000000000000000000000000000000000002a03956d85',
+      to: '0x1E4EDE388cbc9F4b5c79681B7f94d36a11ABEBC9',
+      value: 0x0,
+    },
+    blockHash: '0xb1fe1fefca4063ab9cc06a10356a6dd397b8c3dd38e21470e107a711ad559c13',
+    blockNumber: 15548801,
+    result: {
+      gasUsed: 0x95df,
+      output: '0x0000000000000000000000000000000000000000000000000000000000000001',
+    },
+    subtraces: 1,
+    traceAddress: [],
+    transactionHash: '0xc05c37b34e13380d0b7e0475b27a0c77fda826f82c603f9c45922e952d63b7a5',
+    transactionPosition: 69,
+    type: 'call',
   }
 })

@@ -20,6 +20,8 @@ export function codeGenIndex(contract: Contract): string {
 
 export function codeGenSentioFile(contract: Contract): string {
   const source = `
+  ${Object.values(contract.functions).map(codegenCallTraceTypes).join('\n')}
+
   const templateContract = ${contract.name}__factory.connect("", DummyProvider)
 
   export class ${contract.name}ContractView extends ContractView<${contract.name}> {
@@ -71,9 +73,11 @@ export function codeGenSentioFile(contract: Contract): string {
         }
       })
       .join('\n')}
+    
+    ${Object.values(contract.functions)
+      .map((f) => codegenFunctions(f, contract.name))
+      .join('\n')}
     }
-
-    ${Object.values(contract.functions).map(codegenCallTraceTypes).join('\n')}
 
     export class ${contract.name}Processor extends BaseProcessor<${contract.name}, ${contract.name}BoundContractView> {
       ${Object.values(contract.events)
@@ -141,7 +145,7 @@ export function codeGenSentioFile(contract: Contract): string {
         'ContractView',
         'DummyProvider',
         'getContractName',
-        'TypedTrace',
+        'TypedCallTrace',
       ],
       './common': ['PromiseOrValue'],
       './index': [`${contract.name}`, `${contract.name}__factory`],
@@ -216,7 +220,7 @@ function generateOnEventFunction(event: EventDeclaration, contractName: string, 
   const filterName = getFullSignatureForEvent(event)
 
   return `
-  on${eventName}(
+  onEvent${eventName}(
     handler: (event: ${eventName}Event, ctx: ${contractName}Context) => void,
     filter?: ${eventName}EventFilter | ${eventName}EventFilter[]
   ) {

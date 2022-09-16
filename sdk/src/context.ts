@@ -28,6 +28,7 @@ export class EthContext extends BaseContext {
     this.chainId = chainId
     this.log = log
     this.block = block
+    this.trace = trace
     if (log) {
       this.blockNumber = Long.fromNumber(log.blockNumber)
     } else if (block) {

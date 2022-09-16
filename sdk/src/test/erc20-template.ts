@@ -5,7 +5,7 @@ export const filter = ERC20Processor.filters.Transfer(
   '0xb329e39ebefd16f40d38f07643652ce17ca5bac1'
 )
 
-const processorTemplate = new ERC20ProcessorTemplate().onTransfer(async function (event, ctx) {
+const processorTemplate = new ERC20ProcessorTemplate().onEventTransfer(async function (event, ctx) {
   console.log('')
 })
 
@@ -14,7 +14,7 @@ ERC20Processor.bind({
   network: 1,
   name: 'x2y2',
   startBlock: 14201940,
-}).onTransfer(async function (event, ctx) {
+}).onEventTransfer(async function (event, ctx) {
   processorTemplate.bind({
     address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
     network: 3,

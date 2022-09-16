@@ -11,15 +11,15 @@ const transferFilters = [
 ]
 
 WETH9Processor.bind({ address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', startBlock: 13217349 })
-  .onDeposit(async function (event, ctx) {
+  .onEventDeposit(async function (event, ctx) {
     const amount = Number(event.args.wad.toBigInt()) / Math.pow(10, 18)
     ctx.meter.Counter('token_bridge_weth').add(amount)
   }, depositFilter)
-  .onWithdrawal(async function (event, ctx) {
+  .onEventWithdrawal(async function (event, ctx) {
     const amount = Number(event.args.wad.toBigInt()) / Math.pow(10, 18)
     ctx.meter.Counter('token_bridge_weth').sub(amount)
   }, withdrawalFilter)
-  .onTransfer(async function (event, ctx) {
+  .onEventTransfer(async function (event, ctx) {
     const amount = Number(event.args.wad.toBigInt()) / Math.pow(10, 18)
 
     if (event.args.src == TOKEN_BRIDGE_ADDRESS) {

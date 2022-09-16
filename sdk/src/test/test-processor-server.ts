@@ -19,6 +19,7 @@ import {
   ProcessTransactionsResponse,
   setProvider,
   StartRequest,
+  TraceBinding,
 } from '@sentio/sdk'
 import { CallContext } from 'nice-grpc-common'
 import { Empty } from '../gen/google/protobuf/empty'
@@ -27,6 +28,7 @@ import { CHAIN_MAP } from '../utils/chainmap'
 import { Block, Log } from '@ethersproject/abstract-provider'
 import Long from 'long'
 import { getNetwork, Networkish } from '@ethersproject/providers'
+import { Trace } from '../trace'
 
 const TEST_CONTEXT: CallContext = <CallContext>{}
 
@@ -93,6 +95,51 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
     context = TEST_CONTEXT
   ): Promise<ProcessTransactionsResponse> {
     return this.service.processTransactions(request, context)
+  }
+
+  testTrace(trace: Trace, network: Networkish = 1): Promise<ProcessTracesResponse> {
+    return this.testTraces([trace], network)
+  }
+
+  testTraces(traces: Trace[], network: Networkish = 1): Promise<ProcessTracesResponse> {
+    const bindings = []
+    for (const trace of traces) {
+      const binding = this.buildTraceBinding(trace, network)
+      if (!binding) {
+        throw Error('Invalid test trace: ' + JSON.stringify(trace))
+      }
+      bindings.push(binding)
+    }
+    return this.processTraces({
+      traceBindings: bindings,
+    })
+  }
+
+  buildTraceBinding(trace: Trace, network: Networkish = 1): TraceBinding | undefined {
+    if (trace.type !== 'call' || !trace.action.input) {
+      throw Error('Invalid test trace: ' + JSON.stringify(trace))
+    }
+    const signature = trace.action.input.slice(0, 10)
+
+    for (const contract of this.contractConfig) {
+      if (contract.contract?.chainId !== getNetwork(network).chainId.toString()) {
+        continue
+      }
+      if (trace.action.to?.toLowerCase() !== contract.contract?.address.toLowerCase()) {
+        continue
+      }
+      for (const config of contract.traceConfigs) {
+        if (config.signature == signature) {
+          return {
+            trace: {
+              raw: toBytes(trace),
+            },
+            handlerId: config.handlerId,
+          }
+        }
+      }
+    }
+    return undefined
   }
 
   testLog(log: Log, network: Networkish = 1): Promise<ProcessLogsResponse> {
