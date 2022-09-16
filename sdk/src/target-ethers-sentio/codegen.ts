@@ -125,6 +125,31 @@ export function codeGenSentioFile(contract: Contract): string {
     return contract
   }
   `
+  const eventsImports = Object.values(contract.events).flatMap((events) => {
+    if (events.length === 1) {
+      return [`${events[0].name}Event`, `${events[0].name}EventFilter`]
+    } else {
+      return events.flatMap((e) => [
+        `${getFullSignatureAsSymbolForEvent(e)}_Event`,
+        `${getFullSignatureAsSymbolForEvent(e)}_EventFilter`,
+      ])
+    }
+  })
+
+  const structImports = Object.values(contract.structs).flatMap((structs) => {
+    return structs.flatMap((s) => {
+      if (!s.structName) {
+        return []
+      }
+      if (s.structName.namespace) {
+        return [s.structName.namespace]
+      } else {
+        return [s.structName.identifier]
+      }
+    })
+  })
+  // dedup namespace
+  const uniqueStructImports = [...new Set(structImports)]
 
   const imports = createImportsForUsedIdentifiers(
     {
@@ -149,18 +174,7 @@ export function codeGenSentioFile(contract: Contract): string {
       ],
       './common': ['PromiseOrValue'],
       './index': [`${contract.name}`, `${contract.name}__factory`],
-      [`./${contract.name}`]: (<string[]>[]).concat(
-        ...Object.values(contract.events).map((events) => {
-          if (events.length === 1) {
-            return [`${events[0].name}Event`, `${events[0].name}EventFilter`]
-          } else {
-            return events.flatMap((e) => [
-              `${getFullSignatureAsSymbolForEvent(e)}_Event`,
-              `${getFullSignatureAsSymbolForEvent(e)}_EventFilter`,
-            ])
-          }
-        })
-      ),
+      [`./${contract.name}`]: eventsImports.concat(uniqueStructImports),
     },
     source
   )

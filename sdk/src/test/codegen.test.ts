@@ -8,19 +8,22 @@ describe('Test EVM codegen', () => {
 
   jest.setTimeout(20000)
 
-  test('code gen for anyswapRouter', async () => {
+  // TODO make sure code could be compile
+  test('code gen for evm', async () => {
+    console.log('source code generated to ' + codeGenFolder)
+
     await codeGenEthersProcessor(
       path.join(__dirname, 'abis/evm'),
       'lib/target-ethers-sentio',
       `${codeGenFolder}/internal`
     )
     expect(fs.existsSync(codeGenFolder)).toEqual(true)
-    expect(fs.readdirSync(codeGenFolder).length).toEqual(2)
+    expect(fs.readdirSync(codeGenFolder).length).toEqual(3)
   })
 
-  afterAll(() => {
-    if (fs.existsSync(codeGenFolder)) {
-      fs.rmSync(codeGenFolder, { recursive: true, force: true })
-    }
-  })
+  // afterAll(() => {
+  //   if (fs.existsSync(codeGenFolder)) {
+  //     fs.rmSync(codeGenFolder, { recursive: true, force: true })
+  //   }
+  // })
 })
