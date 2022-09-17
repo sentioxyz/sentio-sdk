@@ -1483,9 +1483,9 @@
     read-pkg-up "^7.0.0"
 
 "@sentio/sdk@^1.0.0":
-  version "1.10.1"
-  resolved "https://registry.yarnpkg.com/@sentio/sdk/-/sdk-1.10.1.tgz#f32c91bdad315837a41369f10c16dfc962d36dbb"
-  integrity sha512-3s4bt3kmgD/s8YVfBw3Z2q6gjjVXLIbrFWAjFIJy4BzCiluImaXey4iBjKvfXn7o/bXydyuQVVO5RxFHQlfU7w==
+  version "1.10.2"
+  resolved "https://registry.yarnpkg.com/@sentio/sdk/-/sdk-1.10.2.tgz#2fc4944524d1711f3086261dad1ba8b9ba0607bd"
+  integrity sha512-XrXWJMj3vILbvFtzm+WDtuZOeYRn52b36iazjTTY6/ijTxpLW6QVzH/fJtMroEWGFo5Ob7yvEzrEvDtqvjNDEg==
   dependencies:
     "@ethersproject/providers" "~5.7.0"
     "@project-serum/anchor" "^0.25.0"

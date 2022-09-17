@@ -8,6 +8,7 @@ import path from 'path'
 import chalk from 'chalk'
 import { buildProcessor } from './build'
 import fetch from 'node-fetch'
+import { getCliVersion } from './utils'
 
 export async function uploadFile(options: SentioProjectConfig, apiKeyOverride: string) {
   if (options.build) {
@@ -54,21 +55,12 @@ export async function uploadFile(options: SentioProjectConfig, apiKeyOverride: s
 
   url.pathname = '/api/v1/processors'
 
-  let packageJson: { version: string }
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    packageJson = require('../package.json')
-  } catch (e) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    packageJson = require('../../package.json')
-  }
-
   const res = await fetch(url, {
     method: 'POST',
     headers: {
       'api-key': apiKey,
       project: options.project,
-      version: packageJson.version,
+      version: getCliVersion(),
     },
     body: data,
   })

@@ -11,7 +11,7 @@
     "start": "ts-node --files src/processor-runner.ts ../examples/x2y2/dist/lib.js",
     "start_js": "node lib/processor.js ../examples/x2y2/dist/lib.js",
     "ts-start": "ts-node --files src/processor-runner.ts ./src/anyswap/src/processor.ts",
-    "cli": "yarn build && node lib/cli/cli.js",
+    "cli": "ts-node src/cli/cli.ts",
     "test": "jest",
     "gen": "yarn compile_target && yarn gen_bultin_evm && yarn gen_test_abi",
     "gen_test_abi": "yarn gen_solana_abi",
@@ -73,6 +73,7 @@
   "module": "./lib/index.js",
   "files": [
     "lib/**/*",
-    "src/**/*"
+    "src/**/*",
+    "template/**/*"
   ]
 }

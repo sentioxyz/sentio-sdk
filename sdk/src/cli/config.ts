@@ -8,6 +8,7 @@ export interface SentioProjectConfig {
 
 export function getFinalizedHost(host: string): string {
   switch (host) {
+    case undefined:
     case '':
     case 'prod':
       return 'https://app.sentio.xyz'

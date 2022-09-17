@@ -19,6 +19,10 @@ const mainOptions = commandLineArgs(mainDefinitions, {
 })
 const argv = mainOptions._unknown || []
 
+if (!mainOptions.command) {
+  usage()
+}
+
 if (mainOptions.command === 'login') {
   runLogin(argv)
 } else if (mainOptions.command === 'create') {
@@ -138,23 +142,28 @@ if (mainOptions.command === 'login') {
   } else if (mainOptions.command === 'gen') {
     buildProcessor(true, processorConfig.targets)
   } else {
-    const usage = commandLineUsage([
-      {
-        header: 'Sentio',
-        content: 'Login & Manage your project files to Sentio.',
-      },
-      {
-        header: 'Usage',
-        content: [
-          'sentio $command --help\t\tshow detail usage of specific command',
-          'sentio login --api-key=xx\t\tsave credential to local',
-          'sentio create\t\t\t\tcreate a template project',
-          'sentio upload\t\t\t\tbuild and upload processor to sentio',
-          'sentio gen\t\t\t\tgenerate abi',
-          'sentio build\t\t\t\tgenerate abi and build',
-        ],
-      },
-    ])
-    console.log(usage)
+    usage()
   }
+}
+
+function usage() {
+  const usage = commandLineUsage([
+    {
+      header: 'Sentio',
+      content: 'Login & Manage your project files to Sentio.',
+    },
+    {
+      header: 'Usage',
+      content: [
+        'sentio $command --help\t\tshow detail usage of specific command',
+        'sentio login --api-key=xx\t\tsave credential to local',
+        'sentio create\t\t\t\tcreate a template project',
+        'sentio upload\t\t\t\tbuild and upload processor to sentio',
+        'sentio gen\t\t\t\tgenerate abi',
+        'sentio build\t\t\t\tgenerate abi and build',
+      ],
+    },
+  ])
+  console.log(usage)
+  process.exit(1)
 }
