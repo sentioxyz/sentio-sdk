@@ -2,6 +2,7 @@
   "private": true,
   "workspaces": [
     "sdk",
+    "sdk/template",
     "examples/*"
   ],
   "devDependencies": {

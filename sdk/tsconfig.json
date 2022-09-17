@@ -9,5 +9,5 @@
     },
     "outDir": "lib"
   },
-  "exclude": ["lib", "src/target-ethers-sentio"]
+  "exclude": ["lib", "src/target-ethers-sentio", "template"]
 }

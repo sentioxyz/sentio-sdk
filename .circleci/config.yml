@@ -21,6 +21,10 @@ jobs:
           name: Test SDK
           working_directory: sdk
       - run:
+          command: yarn gen && yarn test
+          name: Test Template
+          working_directory: sdk/template
+      - run:
           command: ./scripts/build-all.sh
           name: Build All
 #      - persist_to_workspace:

@@ -6,21 +6,23 @@ export interface SentioProjectConfig {
   targets: Target[]
 }
 
-export function FinalizeHost(config: SentioProjectConfig) {
-  switch (config.host) {
+export function getFinalizedHost(host: string): string {
+  switch (host) {
     case '':
     case 'prod':
-      config.host = 'https://app.sentio.xyz'
-      break
+      return 'https://app.sentio.xyz'
     case 'test':
-      config.host = 'https://test.sentio.xyz'
-      break
+      return 'https://test.sentio.xyz'
     case 'staging':
-      config.host = 'https://staging.sentio.xyz'
-      break
+      return 'https://staging.sentio.xyz'
     case 'local':
-      config.host = 'http://localhost:10000'
+      return 'http://localhost:10000'
   }
+  return host
+}
+
+export function finalizeHost(config: SentioProjectConfig) {
+  config.host = getFinalizedHost(config.host)
 }
 
 export function FinalizeProjectName(config: SentioProjectConfig, owner: string | undefined) {
