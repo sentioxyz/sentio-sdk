@@ -30,8 +30,8 @@ export function runLogin(argv: string[]) {
   if (options.help || !options['api-key']) {
     const usage = commandLineUsage([
       {
-        header: 'Sentio Login',
-        content: 'Try login to Sentio with your apikey.',
+        header: 'Login to Sentio',
+        content: 'sentio login --api-key=$key',
       },
       {
         header: 'Options',

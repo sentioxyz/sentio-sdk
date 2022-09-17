@@ -112,7 +112,7 @@ if (mainOptions.command === 'login') {
       const usage = commandLineUsage([
         {
           header: 'Sentio upload',
-          content: 'Upload your project files to Sentio.',
+          content: 'sentio upload',
         },
         {
           header: 'Options',

@@ -16,6 +16,7 @@ export function runCreate(argv: string[]) {
     {
       name: 'name',
       alias: 'n',
+      defaultOption: true,
       type: String,
       description: '(Optional) Project name, If not provided they "Default" name will be used',
     },
@@ -25,8 +26,8 @@ export function runCreate(argv: string[]) {
   if (options.help) {
     const usage = commandLineUsage([
       {
-        header: 'Sentio Create',
-        content: 'Create a template project',
+        header: 'Create a template project',
+        content: 'sentio create [$name]',
       },
       {
         header: 'Options',
@@ -77,5 +78,6 @@ export function runCreate(argv: string[]) {
 
       fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson))
     }
+    console.log(chalk.green("successfully create project '" + projectName + "'"))
   }
 }
