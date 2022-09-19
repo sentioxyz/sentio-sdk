@@ -125,7 +125,7 @@ message ProcessTracesResponse {
 }
 
 message ProcessTransactionsRequest {
-  RawTransaction transaction = 1;
+  repeated RawTransaction transactions = 1;
 }
 
 message ProcessInstructionsRequest {

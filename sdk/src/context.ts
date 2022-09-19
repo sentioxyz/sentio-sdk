@@ -101,3 +101,5 @@ export class SolanaContext extends BaseContext {
     this.address = address
   }
 }
+
+export class SuiContext extends SolanaContext {}

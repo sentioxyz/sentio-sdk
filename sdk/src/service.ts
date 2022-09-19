@@ -175,6 +175,26 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       }
       this.contractConfigs.push(contractConfig)
     }
+
+    // Part 3, prepare sui constractors
+    for (const suiProcessor of global.PROCESSOR_STATE.suiProcessors) {
+      const contractConfig: ContractConfig = {
+        processorType: 'user_processor',
+        contract: {
+          name: 'sui processor',
+          chainId: 'SUI_devnet',
+          address: suiProcessor.address,
+          abi: '',
+        },
+        blockConfigs: [],
+        logConfigs: [],
+        traceConfigs: [],
+        startBlock: suiProcessor.config.startSeqNumber,
+        endBlock: DEFAULT_MAX_BLOCK,
+        instructionConfig: undefined,
+      }
+      this.contractConfigs.push(contractConfig)
+    }
   }
 
   async start(request: StartRequest, context: CallContext): Promise<Empty> {
@@ -276,7 +296,40 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       throw new ServerError(Status.UNAVAILABLE, 'Service not started.')
     }
 
-    throw new ServerError(Status.UNIMPLEMENTED, 'Processing transaction is not suppored.')
+    const result: ProcessResult = {
+      gauges: [],
+      counters: [],
+      logs: [],
+    }
+
+    if (global.PROCESSOR_STATE.suiProcessors) {
+      const processorPromises: Promise<void>[] = []
+      for (const txn of request.transactions) {
+        processorPromises.push(
+          new Promise((resolve, _) => {
+            for (const processor of global.PROCESSOR_STATE.suiProcessors) {
+              const res: ProcessResult | null
+              res = processor.handleTransaction(JSON.parse(new TextDecoder().decode(txn.raw)))
+              if (res) {
+                res.gauges.forEach((g) => {
+                  result.gauges.push(g)
+                })
+                res.counters.forEach((c) => {
+                  result.counters.push(c)
+                })
+              }
+            }
+            resolve()
+          })
+        )
+      }
+      await Promise.all(processorPromises)
+    }
+
+    recordRuntimeInfo(result, HandlerType.TRANSACTION)
+    return {
+      result,
+    }
   }
 
   async processInstructions(

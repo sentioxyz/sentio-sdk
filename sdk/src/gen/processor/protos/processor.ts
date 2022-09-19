@@ -194,7 +194,7 @@ export interface ProcessTracesResponse {
 }
 
 export interface ProcessTransactionsRequest {
-  transaction: RawTransaction | undefined;
+  transactions: RawTransaction[];
 }
 
 export interface ProcessInstructionsRequest {
@@ -1620,7 +1620,7 @@ export const ProcessTracesResponse = {
 };
 
 function createBaseProcessTransactionsRequest(): ProcessTransactionsRequest {
-  return { transaction: undefined };
+  return { transactions: [] };
 }
 
 export const ProcessTransactionsRequest = {
@@ -1628,11 +1628,8 @@ export const ProcessTransactionsRequest = {
     message: ProcessTransactionsRequest,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (message.transaction !== undefined) {
-      RawTransaction.encode(
-        message.transaction,
-        writer.uint32(10).fork()
-      ).ldelim();
+    for (const v of message.transactions) {
+      RawTransaction.encode(v!, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
@@ -1648,7 +1645,9 @@ export const ProcessTransactionsRequest = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.transaction = RawTransaction.decode(reader, reader.uint32());
+          message.transactions.push(
+            RawTransaction.decode(reader, reader.uint32())
+          );
           break;
         default:
           reader.skipType(tag & 7);
@@ -1660,18 +1659,21 @@ export const ProcessTransactionsRequest = {
 
   fromJSON(object: any): ProcessTransactionsRequest {
     return {
-      transaction: isSet(object.transaction)
-        ? RawTransaction.fromJSON(object.transaction)
-        : undefined,
+      transactions: Array.isArray(object?.transactions)
+        ? object.transactions.map((e: any) => RawTransaction.fromJSON(e))
+        : [],
     };
   },
 
   toJSON(message: ProcessTransactionsRequest): unknown {
     const obj: any = {};
-    message.transaction !== undefined &&
-      (obj.transaction = message.transaction
-        ? RawTransaction.toJSON(message.transaction)
-        : undefined);
+    if (message.transactions) {
+      obj.transactions = message.transactions.map((e) =>
+        e ? RawTransaction.toJSON(e) : undefined
+      );
+    } else {
+      obj.transactions = [];
+    }
     return obj;
   },
 
@@ -1679,10 +1681,8 @@ export const ProcessTransactionsRequest = {
     object: DeepPartial<ProcessTransactionsRequest>
   ): ProcessTransactionsRequest {
     const message = createBaseProcessTransactionsRequest();
-    message.transaction =
-      object.transaction !== undefined && object.transaction !== null
-        ? RawTransaction.fromPartial(object.transaction)
-        : undefined;
+    message.transactions =
+      object.transactions?.map((e) => RawTransaction.fromPartial(e)) || [];
     return message;
   },
 };

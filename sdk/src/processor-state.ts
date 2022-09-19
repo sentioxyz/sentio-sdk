@@ -5,6 +5,7 @@ import { BaseProcessorTemplate } from './base-processor-template'
 import { TemplateInstance } from './gen/processor/protos/processor'
 import { Provider } from '@ethersproject/providers'
 import { SolanaBaseProcessor } from './solana-processor'
+import { SuiBaseProcessor } from './sui-processor'
 
 export class ProcessorState {
   // from abiName_address_chainId => contract wrapper
@@ -21,4 +22,6 @@ export class ProcessorState {
   templatesInstances: TemplateInstance[] = []
 
   solanaProcessors: SolanaBaseProcessor[] = []
+
+  suiProcessors: SuiBaseProcessor[] = []
 }
