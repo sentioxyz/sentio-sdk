@@ -308,8 +308,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         processorPromises.push(
           new Promise((resolve, _) => {
             for (const processor of global.PROCESSOR_STATE.suiProcessors) {
-              const res: ProcessResult | null
-              res = processor.handleTransaction(JSON.parse(new TextDecoder().decode(txn.raw)))
+              const res = processor.handleTransaction(JSON.parse(new TextDecoder().decode(txn.raw)))
               if (res) {
                 res.gauges.forEach((g) => {
                   result.gauges.push(g)

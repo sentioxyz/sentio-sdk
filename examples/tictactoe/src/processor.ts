@@ -24,7 +24,7 @@ TicTacToeProcessor.bind({
         txn.effects.events.forEach((event: { newObject: { recipient: { AddressOwner: any } } }) => {
           if (event.newObject) {
             const owner = event.newObject.recipient.AddressOwner
-            if ((owner.toString() as string).includes('0x1c27')) {
+            if (owner && (owner.toString() as string).includes('0x1c27')) {
               ctx.meter.Counter('win_count').add(1)
             }
           }

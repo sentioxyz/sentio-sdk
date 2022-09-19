@@ -40,4 +40,4 @@ export class SolanaBindOptions extends BindOptions {
   processInnerInstruction?: boolean
 }
 
-export class SuiBindOptions extends BindInternalOptions {}
+export class SuiBindOptions extends BindOptions {}
