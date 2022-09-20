@@ -6,6 +6,7 @@
     "compile": "tsc -p .",
     "test": "jest",
     "build": "sentio build",
+    "upload": "sentio upload",
     "tsnode": "yarn ts-node"
   },
   "dependencies": {
