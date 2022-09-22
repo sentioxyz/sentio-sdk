@@ -102,4 +102,12 @@ export class SolanaContext extends BaseContext {
   }
 }
 
-export class SuiContext extends SolanaContext {}
+export class SuiContext extends BaseContext {
+  address: string
+
+  constructor(address: string) {
+    super()
+    this.meter = new Meter(this)
+    this.address = address
+  }
+}

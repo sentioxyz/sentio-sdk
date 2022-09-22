@@ -1,4 +1,4 @@
-project: tictactoe
+project: sui
 host: local
 targets:
   - chain: sui

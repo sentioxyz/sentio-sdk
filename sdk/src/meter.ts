@@ -1,5 +1,5 @@
 import { RecordMetaData } from './gen/processor/protos/processor'
-import { BaseContext, Context, SolanaContext } from './context'
+import { BaseContext, Context, SolanaContext, SuiContext } from './context'
 import { toMetricValue, Numberish } from './numberish'
 import Long from 'long'
 
@@ -52,6 +52,16 @@ function GetRecordMetaData(ctx: BaseContext, name: string, labels: Labels): Reco
       transactionIndex: 0,
       logIndex: 0,
       chainId: 'SOL_mainnet', // TODO set in context
+      name: name,
+      labels: labels,
+    }
+  } else if (ctx instanceof SuiContext) {
+    return {
+      contractAddress: ctx.address,
+      blockNumber: Long.ZERO, // TODO need number type to be long
+      transactionIndex: 0,
+      logIndex: 0,
+      chainId: 'SUI_devnet', // TODO set in context
       name: name,
       labels: labels,
     }

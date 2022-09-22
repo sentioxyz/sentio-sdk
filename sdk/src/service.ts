@@ -311,9 +311,15 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
               const res = processor.handleTransaction(JSON.parse(new TextDecoder().decode(txn.raw)))
               if (res) {
                 res.gauges.forEach((g) => {
+                  if (g.metadata) {
+                    g.metadata.blockNumber = Long.fromString(txn.programAccountId)
+                  }
                   result.gauges.push(g)
                 })
                 res.counters.forEach((c) => {
+                  if (c.metadata) {
+                    c.metadata.blockNumber = Long.fromString(txn.programAccountId)
+                  }
                   result.counters.push(c)
                 })
               }
