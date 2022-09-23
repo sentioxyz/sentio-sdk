@@ -3,9 +3,28 @@ import { BaseContext, Context, SolanaContext, SuiContext } from './context'
 import { toMetricValue, Numberish } from './numberish'
 import Long from 'long'
 
-export function normalizeName(name: string) {
+export function normalizeName(name: string): string {
   const regex = new RegExp('![_.a-zA-Z0-9]')
   return name.slice(0, 100).replace(regex, '_')
+}
+
+export function normalizeKey(name: string): string {
+  if (name === 'labels') {
+    return 'labels_'
+  }
+  return normalizeName(name)
+}
+
+export function normalizeValue(name: string): string {
+  return name.slice(0, 100)
+}
+
+export function normalizeLabels(labels: Labels): Labels {
+  const normLabels: Labels = {}
+  for (const key in labels) {
+    normLabels[normalizeKey(key)] = normalizeValue(labels[key])
+  }
+  return normLabels
 }
 
 function GetRecordMetaData(ctx: BaseContext, name: string, labels: Labels): RecordMetaData {
@@ -20,7 +39,7 @@ function GetRecordMetaData(ctx: BaseContext, name: string, labels: Labels): Reco
         logIndex: ctx.log.logIndex,
         chainId: ctx.chainId.toString(),
         name: name,
-        labels: labels,
+        labels: normalizeLabels(labels),
       }
     }
     if (ctx.block) {
@@ -31,7 +50,7 @@ function GetRecordMetaData(ctx: BaseContext, name: string, labels: Labels): Reco
         logIndex: -1,
         chainId: ctx.chainId.toString(),
         name: name,
-        labels: labels,
+        labels: normalizeLabels(labels),
       }
     }
     if (ctx.trace) {
@@ -42,7 +61,7 @@ function GetRecordMetaData(ctx: BaseContext, name: string, labels: Labels): Reco
         logIndex: -1,
         chainId: ctx.chainId.toString(),
         name: name,
-        labels: labels,
+        labels: normalizeLabels(labels),
       }
     }
   } else if (ctx instanceof SolanaContext) {
@@ -53,7 +72,7 @@ function GetRecordMetaData(ctx: BaseContext, name: string, labels: Labels): Reco
       logIndex: 0,
       chainId: 'SOL_mainnet', // TODO set in context
       name: name,
-      labels: labels,
+      labels: normalizeLabels(labels),
     }
   } else if (ctx instanceof SuiContext) {
     return {
@@ -63,7 +82,7 @@ function GetRecordMetaData(ctx: BaseContext, name: string, labels: Labels): Reco
       logIndex: 0,
       chainId: 'SUI_devnet', // TODO set in context
       name: name,
-      labels: labels,
+      labels: normalizeLabels(labels),
     }
   }
   throw new Error("This can't happen")

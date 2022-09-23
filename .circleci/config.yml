@@ -8,6 +8,10 @@ orbs:
 
 jobs:
   build_and_test:
+#    filters: # only run on PR
+#      branches:
+#        ignore:
+#          - main
     executor: node/default # use the default executor defined within the orb
     steps:
       - checkout

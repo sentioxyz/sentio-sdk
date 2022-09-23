@@ -1,14 +1,14 @@
 import { SuiBindOptions } from '@sentio/sdk'
 import { SuiBaseProcessor } from '@sentio/sdk'
 
-class TicTacToeProcessor extends SuiBaseProcessor {
-  static bind(options: SuiBindOptions): TicTacToeProcessor {
-    if (options && !options.name) {
-      options.name = 'TicTacToe'
-    }
-    return new TicTacToeProcessor(options)
-  }
-}
+// class TicTacToeProcessor extends SuiBaseProcessor {
+//   static bind(options: SuiBindOptions): TicTacToeProcessor {
+//     if (options && !options.name) {
+//       options.name = 'TicTacToe'
+//     }
+//     return new TicTacToeProcessor(options)
+//   }
+// }
 
 class SuiTransferProcessor extends SuiBaseProcessor {
   static bind(options: SuiBindOptions): SuiTransferProcessor {

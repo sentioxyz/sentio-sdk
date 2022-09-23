@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { normalizeName } from './meter'
+import { normalizeLabels, normalizeName } from './meter'
 
 describe('meter tests', () => {
   test('test normalization ', async () => {
@@ -12,5 +12,12 @@ describe('meter tests', () => {
     expect(normalizeName('*&~') === '___')
 
     expect(normalizeName('x'.repeat(200)).length === 100)
+  })
+
+  test('test  labels', async () => {
+    const labels = { labels: '0' }
+    const updated = normalizeLabels(labels)
+
+    expect(updated['labels_']).to.eq('0')
   })
 })
