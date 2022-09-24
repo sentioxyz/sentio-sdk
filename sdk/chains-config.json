@@ -1,8 +1,22 @@
 {
   "1": {
     "ChainID": "1",
-    "Https": ["https://eth-mainnet.alchemyapi.io/v2/Gk024pFA-64RaEPIawL40n__1esXJFb2"],
-    "WebSockets": ["wss://eth-mainnet.alchemyapi.io/v2/Gk024pFA-64RaEPIawL40n__1esXJFb2"],
+    "Https": [
+      "https://mainnet.infura.io/v3/6d3fecb13dea4c6086e1984b4a520fd0",
+      "https://mainnet.infura.io/v3/226c57463e9247bdaf7c402aa42fd259",
+      "https://mainnet.infura.io/v3/b27d64c4cb6343389f5a01a52dce19ab",
+      "https://mainnet.infura.io/v3/e55d25edf30f44e1ab6c09111d44bc49",
+      "https://mainnet.infura.io/v3/86922264d8de4635bbcc0c286cc18e76",
+      "https://mainnet.infura.io/v3/7b62d78dcf314d758318af8efc2046b1"
+    ],
+    "WebSockets": [
+      "wss://mainnet.infura.io/ws/v3/6d3fecb13dea4c6086e1984b4a520fd0",
+      "wss://mainnet.infura.io/ws/v3/226c57463e9247bdaf7c402aa42fd259",
+      "wss://mainnet.infura.io/ws/v3/b27d64c4cb6343389f5a01a52dce19ab",
+      "wss://mainnet.infura.io/ws/v3/e55d25edf30f44e1ab6c09111d44bc49",
+      "wss://mainnet.infura.io/ws/v3/86922264d8de4635bbcc0c286cc18e76",
+      "wss://mainnet.infura.io/ws/v3/7b62d78dcf314d758318af8efc2046b1"
+    ],
     "ChainServer": "",
     "BatchSize": 2000,
     "ReorgThresholdBlocks": 30,
