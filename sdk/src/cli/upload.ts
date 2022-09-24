@@ -56,7 +56,7 @@ export async function uploadFile(options: SentioProjectConfig, apiKeyOverride: s
     const gitUrl = execSync('git remote get-url origin').toString().trim()
     data.append('gitUrl', gitUrl)
   } catch (e) {
-    chalk.yellow(e)
+    // skip errors
   }
 
   url.pathname = '/api/v1/processors'

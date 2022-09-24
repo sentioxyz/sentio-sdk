@@ -194,6 +194,13 @@ message ProcessResult {
   repeated LogResult logs = 3;
 }
 
+message MetricDescriptor {
+  string name = 1;
+  string unit = 2;
+  string description = 3;
+  bool sparse = 4;
+}
+
 message RecordMetaData {
   // These are populated by systems.
   string contract_address = 1;
@@ -204,7 +211,9 @@ message RecordMetaData {
 
   // These are populated by users in meter.
   // The metric name.
-  string name = 6;
+  string name = 6; // TODO deprecate
+  MetricDescriptor descriptor = 8;
+
   // The metric labels provided by users.
   map<string, string> labels = 7;
 }

@@ -263,6 +263,13 @@ export interface ProcessResult {
   logs: LogResult[];
 }
 
+export interface MetricDescriptor {
+  name: string;
+  unit: string;
+  description: string;
+  sparse: boolean;
+}
+
 export interface RecordMetaData {
   contractAddress: string;
   blockNumber: Long;
@@ -270,6 +277,7 @@ export interface RecordMetaData {
   logIndex: number;
   chainId: string;
   name: string;
+  descriptor: MetricDescriptor | undefined;
   labels: { [key: string]: string };
 }
 
@@ -2661,6 +2669,86 @@ export const ProcessResult = {
   },
 };
 
+function createBaseMetricDescriptor(): MetricDescriptor {
+  return { name: "", unit: "", description: "", sparse: false };
+}
+
+export const MetricDescriptor = {
+  encode(
+    message: MetricDescriptor,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.name !== "") {
+      writer.uint32(10).string(message.name);
+    }
+    if (message.unit !== "") {
+      writer.uint32(18).string(message.unit);
+    }
+    if (message.description !== "") {
+      writer.uint32(26).string(message.description);
+    }
+    if (message.sparse === true) {
+      writer.uint32(32).bool(message.sparse);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MetricDescriptor {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMetricDescriptor();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.name = reader.string();
+          break;
+        case 2:
+          message.unit = reader.string();
+          break;
+        case 3:
+          message.description = reader.string();
+          break;
+        case 4:
+          message.sparse = reader.bool();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MetricDescriptor {
+    return {
+      name: isSet(object.name) ? String(object.name) : "",
+      unit: isSet(object.unit) ? String(object.unit) : "",
+      description: isSet(object.description) ? String(object.description) : "",
+      sparse: isSet(object.sparse) ? Boolean(object.sparse) : false,
+    };
+  },
+
+  toJSON(message: MetricDescriptor): unknown {
+    const obj: any = {};
+    message.name !== undefined && (obj.name = message.name);
+    message.unit !== undefined && (obj.unit = message.unit);
+    message.description !== undefined &&
+      (obj.description = message.description);
+    message.sparse !== undefined && (obj.sparse = message.sparse);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<MetricDescriptor>): MetricDescriptor {
+    const message = createBaseMetricDescriptor();
+    message.name = object.name ?? "";
+    message.unit = object.unit ?? "";
+    message.description = object.description ?? "";
+    message.sparse = object.sparse ?? false;
+    return message;
+  },
+};
+
 function createBaseRecordMetaData(): RecordMetaData {
   return {
     contractAddress: "",
@@ -2669,6 +2757,7 @@ function createBaseRecordMetaData(): RecordMetaData {
     logIndex: 0,
     chainId: "",
     name: "",
+    descriptor: undefined,
     labels: {},
   };
 }
@@ -2695,6 +2784,12 @@ export const RecordMetaData = {
     }
     if (message.name !== "") {
       writer.uint32(50).string(message.name);
+    }
+    if (message.descriptor !== undefined) {
+      MetricDescriptor.encode(
+        message.descriptor,
+        writer.uint32(66).fork()
+      ).ldelim();
     }
     Object.entries(message.labels).forEach(([key, value]) => {
       RecordMetaData_LabelsEntry.encode(
@@ -2730,6 +2825,9 @@ export const RecordMetaData = {
         case 6:
           message.name = reader.string();
           break;
+        case 8:
+          message.descriptor = MetricDescriptor.decode(reader, reader.uint32());
+          break;
         case 7:
           const entry7 = RecordMetaData_LabelsEntry.decode(
             reader,
@@ -2761,6 +2859,9 @@ export const RecordMetaData = {
       logIndex: isSet(object.logIndex) ? Number(object.logIndex) : 0,
       chainId: isSet(object.chainId) ? String(object.chainId) : "",
       name: isSet(object.name) ? String(object.name) : "",
+      descriptor: isSet(object.descriptor)
+        ? MetricDescriptor.fromJSON(object.descriptor)
+        : undefined,
       labels: isObject(object.labels)
         ? Object.entries(object.labels).reduce<{ [key: string]: string }>(
             (acc, [key, value]) => {
@@ -2785,6 +2886,10 @@ export const RecordMetaData = {
       (obj.logIndex = Math.round(message.logIndex));
     message.chainId !== undefined && (obj.chainId = message.chainId);
     message.name !== undefined && (obj.name = message.name);
+    message.descriptor !== undefined &&
+      (obj.descriptor = message.descriptor
+        ? MetricDescriptor.toJSON(message.descriptor)
+        : undefined);
     obj.labels = {};
     if (message.labels) {
       Object.entries(message.labels).forEach(([k, v]) => {
@@ -2805,6 +2910,10 @@ export const RecordMetaData = {
     message.logIndex = object.logIndex ?? 0;
     message.chainId = object.chainId ?? "";
     message.name = object.name ?? "";
+    message.descriptor =
+      object.descriptor !== undefined && object.descriptor !== null
+        ? MetricDescriptor.fromPartial(object.descriptor)
+        : undefined;
     message.labels = Object.entries(object.labels ?? {}).reduce<{
       [key: string]: string;
     }>((acc, [key, value]) => {
