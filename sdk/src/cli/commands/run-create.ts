@@ -76,6 +76,9 @@ export function runCreate(argv: string[]) {
       packageJson.version = cliVersion
       packageJson.name = projectName
 
+      // Don't add directly to avoid deps issue
+      packageJson.scripts.postinstall = 'sentio gen'
+
       fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2))
     }
     console.log(chalk.green("successfully create project '" + projectName + "'"))
