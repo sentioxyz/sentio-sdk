@@ -1,17 +1,22 @@
 name: Release
 
 on:
-  push:
-    branches:
-      - main
-      - release
-
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: 'Commit to be released, default to head'
+        required: false
+        default: ""
 jobs:
   release:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          ref: ${{ github.event.inputs.commit }}
       - uses: actions/setup-node@v3
         with:
           cache: yarn
