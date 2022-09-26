@@ -21,12 +21,23 @@ jobs:
       - name: Build
         run: yarn build
         working-directory: sdk
-      - name: Release
-        id: release
-        run: yarn semantic-release
-        working-directory: sdk
+      - name: Semantic Release
+        id: semantic
+        uses: cycjimmy/semantic-release-action@v3
+        with:
+          working_directory: sdk
         env:
           GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: mark prerelease and summary
+        if: steps.semantic.outputs.new_release_published == 'true'
+        run: |
+          gh release edit v${{ steps.semantic.outputs.new_release_version }} --prerelease
+          echo "### New version v${{ steps.semantic.outputs.new_release_version }} cut" >> $GITHUB_STEP_SUMMARY
+          echo "commit: ${GITHUB_SHA}, branch/tag: ${GITHUB_REF}" >> $GITHUB_STEP_SUMMARY
+          echo "automatic release will be marked as prerelease, please manually confirm in the release page" >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.semantic.outputs.new_release_notes }}" >> $GITHUB_STEP_SUMMARY
+        env:
+          GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
     outputs:
       release_version: ${{ steps.release.outputs.release_version }}
