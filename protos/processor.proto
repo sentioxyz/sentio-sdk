@@ -210,8 +210,7 @@ message RecordMetaData {
   string chain_id = 5;
 
   // These are populated by users in meter.
-  // The metric name.
-  string name = 6; // TODO deprecate
+  // The metric name and properties
   MetricDescriptor descriptor = 8;
 
   // The metric labels provided by users.

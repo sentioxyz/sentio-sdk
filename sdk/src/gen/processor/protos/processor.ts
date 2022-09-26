@@ -276,7 +276,6 @@ export interface RecordMetaData {
   transactionIndex: number;
   logIndex: number;
   chainId: string;
-  name: string;
   descriptor: MetricDescriptor | undefined;
   labels: { [key: string]: string };
 }
@@ -2756,7 +2755,6 @@ function createBaseRecordMetaData(): RecordMetaData {
     transactionIndex: 0,
     logIndex: 0,
     chainId: "",
-    name: "",
     descriptor: undefined,
     labels: {},
   };
@@ -2781,9 +2779,6 @@ export const RecordMetaData = {
     }
     if (message.chainId !== "") {
       writer.uint32(42).string(message.chainId);
-    }
-    if (message.name !== "") {
-      writer.uint32(50).string(message.name);
     }
     if (message.descriptor !== undefined) {
       MetricDescriptor.encode(
@@ -2822,9 +2817,6 @@ export const RecordMetaData = {
         case 5:
           message.chainId = reader.string();
           break;
-        case 6:
-          message.name = reader.string();
-          break;
         case 8:
           message.descriptor = MetricDescriptor.decode(reader, reader.uint32());
           break;
@@ -2858,7 +2850,6 @@ export const RecordMetaData = {
         : 0,
       logIndex: isSet(object.logIndex) ? Number(object.logIndex) : 0,
       chainId: isSet(object.chainId) ? String(object.chainId) : "",
-      name: isSet(object.name) ? String(object.name) : "",
       descriptor: isSet(object.descriptor)
         ? MetricDescriptor.fromJSON(object.descriptor)
         : undefined,
@@ -2885,7 +2876,6 @@ export const RecordMetaData = {
     message.logIndex !== undefined &&
       (obj.logIndex = Math.round(message.logIndex));
     message.chainId !== undefined && (obj.chainId = message.chainId);
-    message.name !== undefined && (obj.name = message.name);
     message.descriptor !== undefined &&
       (obj.descriptor = message.descriptor
         ? MetricDescriptor.toJSON(message.descriptor)
@@ -2909,7 +2899,6 @@ export const RecordMetaData = {
     message.transactionIndex = object.transactionIndex ?? 0;
     message.logIndex = object.logIndex ?? 0;
     message.chainId = object.chainId ?? "";
-    message.name = object.name ?? "";
     message.descriptor =
       object.descriptor !== undefined && object.descriptor !== null
         ? MetricDescriptor.fromPartial(object.descriptor)

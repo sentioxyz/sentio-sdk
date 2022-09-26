@@ -44,7 +44,6 @@ function GetRecordMetaData(ctx: BaseContext, metric: Metric, labels: Labels): Re
         transactionIndex: ctx.log.transactionIndex,
         logIndex: ctx.log.logIndex,
         chainId: ctx.chainId.toString(),
-        name: descriptor.name,
         descriptor: descriptor,
         labels: normalizeLabels(labels),
       }
@@ -56,7 +55,6 @@ function GetRecordMetaData(ctx: BaseContext, metric: Metric, labels: Labels): Re
         transactionIndex: -1,
         logIndex: -1,
         chainId: ctx.chainId.toString(),
-        name: descriptor.name,
         descriptor: descriptor,
         labels: normalizeLabels(labels),
       }
@@ -68,7 +66,6 @@ function GetRecordMetaData(ctx: BaseContext, metric: Metric, labels: Labels): Re
         transactionIndex: ctx.trace.transactionPosition, // TODO make sure if this is the right value to set
         logIndex: -1,
         chainId: ctx.chainId.toString(),
-        name: descriptor.name,
         descriptor: descriptor,
         labels: normalizeLabels(labels),
       }
@@ -80,7 +77,6 @@ function GetRecordMetaData(ctx: BaseContext, metric: Metric, labels: Labels): Re
       transactionIndex: 0,
       logIndex: 0,
       chainId: 'SOL_mainnet', // TODO set in context
-      name: descriptor.name,
       descriptor: descriptor,
       labels: normalizeLabels(labels),
     }
@@ -91,7 +87,6 @@ function GetRecordMetaData(ctx: BaseContext, metric: Metric, labels: Labels): Re
       transactionIndex: 0,
       logIndex: 0,
       chainId: 'SUI_devnet', // TODO set in context
-      name: descriptor.name,
       descriptor: descriptor,
       labels: normalizeLabels(labels),
     }
