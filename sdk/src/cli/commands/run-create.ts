@@ -20,6 +20,12 @@ export function runCreate(argv: string[]) {
       type: String,
       description: 'Project name',
     },
+    {
+      name: 'directory',
+      alias: 'd',
+      description: '(Optional) The root direct new project will be created, default current working dir',
+      type: String,
+    },
   ]
 
   const options = commandLineArgs(optionDefinitions, { argv })
@@ -39,7 +45,8 @@ export function runCreate(argv: string[]) {
     const templateFolder = path.resolve(__dirname, '../../../template')
     const projectName = options.name || 'default'
 
-    const dstFolder = path.resolve(projectName)
+    const rootDir = options.directory || process.cwd()
+    const dstFolder = path.resolve(rootDir, projectName)
     if (fs.existsSync(dstFolder)) {
       console.error(chalk.red("can't create project '" + projectName + "', directory already existed"))
       process.exit(1)
@@ -73,7 +80,7 @@ export function runCreate(argv: string[]) {
         cliVersion = '^' + cliVersion
       }
 
-      packageJson.version = cliVersion
+      packageJson.dependencies['@sentio/sdk'] = cliVersion
       packageJson.name = projectName
 
       // Don't add directly to avoid deps issue

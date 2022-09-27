@@ -18,7 +18,16 @@ module.exports = {
     ["@semantic-release/npm", {
       // "pkgRoot": "dist"
     }],
-    '@semantic-release/release-notes-generator',
+    ['@semantic-release/release-notes-generator', {
+      preset: 'conventionalcommits',
+      presetConfig: {
+        types: [
+          { type: 'feat', section: 'Features' },
+          { type: 'fix', section: 'Bug Fixes' },
+          { type: 'chore', section: 'Internal', hidden: false },
+          { type: 'refactor', section: 'Internal', hidden: false },
+        ]},
+    }],
     [
       '@semantic-release/github',
       {

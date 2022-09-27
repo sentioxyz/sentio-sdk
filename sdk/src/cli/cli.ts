@@ -12,6 +12,7 @@ import chalk from 'chalk'
 import { buildProcessor } from './build'
 import { runLogin } from './commands/run-login'
 import { runCreate } from './commands/run-create'
+import { runVersion } from './commands/run-version'
 
 const mainDefinitions = [{ name: 'command', defaultOption: true }]
 const mainOptions = commandLineArgs(mainDefinitions, {
@@ -27,6 +28,8 @@ if (mainOptions.command === 'login') {
   runLogin(argv)
 } else if (mainOptions.command === 'create') {
   runCreate(argv)
+} else if (mainOptions.command === 'version') {
+  runVersion(argv)
 } else {
   // For all the commands that need read project configs
   // TODO move them to their own modules
@@ -161,6 +164,7 @@ function usage() {
         'sentio upload\t\t\t\tbuild and upload processor to sentio',
         'sentio gen\t\t\t\tgenerate abi',
         'sentio build\t\t\t\tgenerate abi and build',
+        'sentio version\t\t\t\tcurrent cli version',
       ],
     },
   ])
