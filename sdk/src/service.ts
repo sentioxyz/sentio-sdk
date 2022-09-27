@@ -202,7 +202,11 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       return {}
     }
 
-    this.loader()
+    try {
+      this.loader()
+    } catch (e) {
+      throw new ServerError(Status.INVALID_ARGUMENT, 'Failed to load processor : ' + e.toString())
+    }
 
     for (const instance of request.templateInstances) {
       const template = global.PROCESSOR_STATE.templates[instance.templateId]
@@ -220,7 +224,11 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         endBlock: instance.endBlock,
       })
     }
-    await this.configure()
+    try {
+      await this.configure()
+    } catch (e) {
+      throw new ServerError(Status.INTERNAL, 'Failed to start processor : ' + e.toString())
+    }
     this.started = true
     return {}
   }
