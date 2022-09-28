@@ -20,9 +20,10 @@ describe('Test Sui Example', () => {
 
   test('Check tictactoe transaction dispatch', async () => {
     const request: ProcessTransactionsRequest = {
+      chainId: 'SUI_devnet',
       transactions: [
         {
-          txHash: 'z3HjnnFFKAaszOi0pMSImtGMpRd2r7ljLjAjUoqs3Kw=',
+          // txHash: 'z3HjnnFFKAaszOi0pMSImtGMpRd2r7ljLjAjUoqs3Kw=',
           raw: new TextEncoder().encode(JSON.stringify(testData)),
           programAccountId: '0xb8252513f0b9efaa3e260842c4b84d8ff933522d',
         },

@@ -310,7 +310,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       logs: [],
     }
 
-    if (global.PROCESSOR_STATE.suiProcessors) {
+    if (request.chainId.toLowerCase().startsWith('sui') && global.PROCESSOR_STATE.suiProcessors) {
       const processorPromises: Promise<void>[] = []
       for (const txn of request.transactions) {
         processorPromises.push(
@@ -319,14 +319,14 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
               const res = processor.handleTransaction(JSON.parse(new TextDecoder().decode(txn.raw)))
               if (res) {
                 res.gauges.forEach((g) => {
-                  if (g.metadata) {
-                    g.metadata.blockNumber = Long.fromString(txn.programAccountId)
+                  if (g.metadata && txn.slot) {
+                    g.metadata.blockNumber = txn.slot
                   }
                   result.gauges.push(g)
                 })
                 res.counters.forEach((c) => {
-                  if (c.metadata) {
-                    c.metadata.blockNumber = Long.fromString(txn.programAccountId)
+                  if (c.metadata && txn.slot) {
+                    c.metadata.blockNumber = txn.slot
                   }
                   result.counters.push(c)
                 })

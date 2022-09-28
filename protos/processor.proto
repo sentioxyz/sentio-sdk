@@ -125,7 +125,8 @@ message ProcessTracesResponse {
 }
 
 message ProcessTransactionsRequest {
-  repeated RawTransaction transactions = 1;
+  string chain_id = 1;
+  repeated RawTransaction transactions = 2;
 }
 
 message ProcessInstructionsRequest {
@@ -167,9 +168,9 @@ message RawTrace {
 }
 
 message RawTransaction {
-  string tx_hash = 1;
-  bytes raw = 2;
-  string program_account_id = 3; // only for solana
+  bytes raw = 1;
+  optional string program_account_id = 2;
+  optional uint64 slot = 3;
 }
 
 message Instruction {

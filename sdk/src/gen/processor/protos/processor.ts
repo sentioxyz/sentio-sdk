@@ -194,6 +194,7 @@ export interface ProcessTracesResponse {
 }
 
 export interface ProcessTransactionsRequest {
+  chainId: string;
   transactions: RawTransaction[];
 }
 
@@ -236,9 +237,9 @@ export interface RawTrace {
 }
 
 export interface RawTransaction {
-  txHash: string;
   raw: Uint8Array;
-  programAccountId: string;
+  programAccountId?: string | undefined;
+  slot?: Long | undefined;
 }
 
 export interface Instruction {
@@ -1627,7 +1628,7 @@ export const ProcessTracesResponse = {
 };
 
 function createBaseProcessTransactionsRequest(): ProcessTransactionsRequest {
-  return { transactions: [] };
+  return { chainId: "", transactions: [] };
 }
 
 export const ProcessTransactionsRequest = {
@@ -1635,8 +1636,11 @@ export const ProcessTransactionsRequest = {
     message: ProcessTransactionsRequest,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
+    if (message.chainId !== "") {
+      writer.uint32(10).string(message.chainId);
+    }
     for (const v of message.transactions) {
-      RawTransaction.encode(v!, writer.uint32(10).fork()).ldelim();
+      RawTransaction.encode(v!, writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
@@ -1652,6 +1656,9 @@ export const ProcessTransactionsRequest = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          message.chainId = reader.string();
+          break;
+        case 2:
           message.transactions.push(
             RawTransaction.decode(reader, reader.uint32())
           );
@@ -1666,6 +1673,7 @@ export const ProcessTransactionsRequest = {
 
   fromJSON(object: any): ProcessTransactionsRequest {
     return {
+      chainId: isSet(object.chainId) ? String(object.chainId) : "",
       transactions: Array.isArray(object?.transactions)
         ? object.transactions.map((e: any) => RawTransaction.fromJSON(e))
         : [],
@@ -1674,6 +1682,7 @@ export const ProcessTransactionsRequest = {
 
   toJSON(message: ProcessTransactionsRequest): unknown {
     const obj: any = {};
+    message.chainId !== undefined && (obj.chainId = message.chainId);
     if (message.transactions) {
       obj.transactions = message.transactions.map((e) =>
         e ? RawTransaction.toJSON(e) : undefined
@@ -1688,6 +1697,7 @@ export const ProcessTransactionsRequest = {
     object: DeepPartial<ProcessTransactionsRequest>
   ): ProcessTransactionsRequest {
     const message = createBaseProcessTransactionsRequest();
+    message.chainId = object.chainId ?? "";
     message.transactions =
       object.transactions?.map((e) => RawTransaction.fromPartial(e)) || [];
     return message;
@@ -2266,7 +2276,11 @@ export const RawTrace = {
 };
 
 function createBaseRawTransaction(): RawTransaction {
-  return { txHash: "", raw: new Uint8Array(), programAccountId: "" };
+  return {
+    raw: new Uint8Array(),
+    programAccountId: undefined,
+    slot: undefined,
+  };
 }
 
 export const RawTransaction = {
@@ -2274,14 +2288,14 @@ export const RawTransaction = {
     message: RawTransaction,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (message.txHash !== "") {
-      writer.uint32(10).string(message.txHash);
-    }
     if (message.raw.length !== 0) {
-      writer.uint32(18).bytes(message.raw);
+      writer.uint32(10).bytes(message.raw);
     }
-    if (message.programAccountId !== "") {
-      writer.uint32(26).string(message.programAccountId);
+    if (message.programAccountId !== undefined) {
+      writer.uint32(18).string(message.programAccountId);
+    }
+    if (message.slot !== undefined) {
+      writer.uint32(24).uint64(message.slot);
     }
     return writer;
   },
@@ -2294,13 +2308,13 @@ export const RawTransaction = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.txHash = reader.string();
-          break;
-        case 2:
           message.raw = reader.bytes();
           break;
-        case 3:
+        case 2:
           message.programAccountId = reader.string();
+          break;
+        case 3:
+          message.slot = reader.uint64() as Long;
           break;
         default:
           reader.skipType(tag & 7);
@@ -2312,31 +2326,35 @@ export const RawTransaction = {
 
   fromJSON(object: any): RawTransaction {
     return {
-      txHash: isSet(object.txHash) ? String(object.txHash) : "",
       raw: isSet(object.raw) ? bytesFromBase64(object.raw) : new Uint8Array(),
       programAccountId: isSet(object.programAccountId)
         ? String(object.programAccountId)
-        : "",
+        : undefined,
+      slot: isSet(object.slot) ? Long.fromValue(object.slot) : undefined,
     };
   },
 
   toJSON(message: RawTransaction): unknown {
     const obj: any = {};
-    message.txHash !== undefined && (obj.txHash = message.txHash);
     message.raw !== undefined &&
       (obj.raw = base64FromBytes(
         message.raw !== undefined ? message.raw : new Uint8Array()
       ));
     message.programAccountId !== undefined &&
       (obj.programAccountId = message.programAccountId);
+    message.slot !== undefined &&
+      (obj.slot = (message.slot || undefined).toString());
     return obj;
   },
 
   fromPartial(object: DeepPartial<RawTransaction>): RawTransaction {
     const message = createBaseRawTransaction();
-    message.txHash = object.txHash ?? "";
     message.raw = object.raw ?? new Uint8Array();
-    message.programAccountId = object.programAccountId ?? "";
+    message.programAccountId = object.programAccountId ?? undefined;
+    message.slot =
+      object.slot !== undefined && object.slot !== null
+        ? Long.fromValue(object.slot)
+        : undefined;
     return message;
   },
 };
