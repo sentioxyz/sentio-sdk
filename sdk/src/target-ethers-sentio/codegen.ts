@@ -7,7 +7,7 @@ import {
 } from 'typechain'
 
 import { reservedKeywords } from '@typechain/ethers-v5/dist/codegen/reserved-keywords'
-import { generateInputTypes } from '@typechain/ethers-v5/dist/codegen/types'
+import { generateInputTypes, generateOutputTypes } from '@typechain/ethers-v5/dist/codegen/types'
 import { getFullSignatureForEvent } from 'typechain/dist/utils/signatures'
 import { codegenCallTraceTypes, codegenFunctions } from './functions'
 
@@ -246,9 +246,17 @@ function generateOnEventFunction(event: EventDeclaration, contractName: string, 
   `
 }
 
+// https://github.com/dethcrypto/TypeChain/blob/015abb28bd22826611051f27e0ec96a00f9a0b61/packages/target-ethers-v5/src/codegen/functions.ts#L54
+function generateReturnTypes(fn: FunctionDeclaration) {
+  // sounds like returnResultObject should be true but we need to set false to make it work
+  return `Promise<${generateOutputTypes({ returnResultObject: false, useStructs: true }, fn.outputs)}>`
+}
+
 function generateViewFunction(func: FunctionDeclaration): string {
   return `
-  async ${func.name}(${generateInputTypes(func.inputs, { useStructs: true })}overrides?: CallOverrides) {
+  async ${func.name}(${generateInputTypes(func.inputs, {
+    useStructs: true,
+  })}overrides?: CallOverrides): ${generateReturnTypes(func)} {
     try {
       if (overrides) {
         return await this.contract.${func.name}(${
@@ -268,7 +276,9 @@ function generateViewFunction(func: FunctionDeclaration): string {
 
 function generateBoundViewFunction(func: FunctionDeclaration): string {
   return `
-  async ${func.name}(${generateInputTypes(func.inputs, { useStructs: true })}overrides?: CallOverrides) {
+  async ${func.name}(${generateInputTypes(func.inputs, {
+    useStructs: true,
+  })}overrides?: CallOverrides): ${generateReturnTypes(func)} {
     try {
       if (!overrides && this.context) {
         overrides = {
