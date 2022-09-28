@@ -1,4 +1,5 @@
 import { ERC20Processor, ERC20ProcessorTemplate } from '../builtin/erc20'
+import { BigNumber } from '@ethersproject/bignumber'
 
 export const filter = ERC20Processor.filters.Transfer(
   '0x0000000000000000000000000000000000000000',
@@ -34,7 +35,10 @@ ERC20Processor.bind({ address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', net
   .onBlock(async function (block, ctx) {
     ctx.meter.Gauge('g2').record(20, { k: 'v' })
   })
-
+  .onEventApproval(async function (event, ctx) {
+    BigNumber.from(10 ** 18)
+    // console.log(n)
+  })
 ERC20Processor.bind({ address: 'xxxx', network: 56 })
 
 ERC20Processor.bind({ address: 'yyyy', network: 1 })

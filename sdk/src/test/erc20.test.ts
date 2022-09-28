@@ -7,7 +7,7 @@ import { HandlerType } from '..'
 import { TestProcessorServer } from './test-processor-server'
 import { firstCounterValue, firstGaugeValue } from './metric-utils'
 import { BigNumber } from 'ethers'
-import { mockTransferLog } from '../builtin/erc20/test-utils'
+import { mockApprovalLog, mockTransferLog } from '../builtin/erc20/test-utils'
 import { Trace } from '../trace'
 
 describe('Test Basic Examples', () => {
@@ -78,6 +78,20 @@ describe('Test Basic Examples', () => {
     await service.testLogs([logData])
     const config2 = await service.getConfig({})
     expect(config).deep.equals(config2)
+  })
+
+  test('Check log exception', async () => {
+    const logData = mockApprovalLog('0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', {
+      owner: '0x0000000000000000000000000000000000000000',
+      spender: '0xB329e39Ebefd16f40d38f07643652cE17Ca5Bac1',
+      value: BigNumber.from('1111'),
+    })
+
+    try {
+      await service.testLog(logData, 56)
+    } catch (e) {
+      expect(e.message.indexOf('sdk/src/test/erc20.ts') != -1).eq(true)
+    }
   })
 
   const blockData = {

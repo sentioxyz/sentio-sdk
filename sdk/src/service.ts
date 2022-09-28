@@ -205,7 +205,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     try {
       this.loader()
     } catch (e) {
-      throw new ServerError(Status.INVALID_ARGUMENT, 'Failed to load processor : ' + e.toString())
+      throw new ServerError(Status.INVALID_ARGUMENT, 'Failed to load processor: ' + errorString(e))
     }
 
     for (const instance of request.templateInstances) {
@@ -227,7 +227,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     try {
       await this.configure()
     } catch (e) {
-      throw new ServerError(Status.INTERNAL, 'Failed to start processor : ' + e.toString())
+      throw new ServerError(Status.INTERNAL, 'Failed to start processor : ' + errorString(e))
     }
     this.started = true
     return {}
@@ -265,7 +265,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         const log: Log = JSON.parse(jsonString)
         const handler = this.eventHandlers[l.handlerId]
         const promise = handler(log).catch((e) => {
-          throw new ServerError(Status.INTERNAL, 'error processing log: ' + jsonString + '\n' + e.toString())
+          throw new ServerError(Status.INTERNAL, 'error processing log: ' + jsonString + '\n' + errorString(e))
         })
 
         promises.push(promise)
@@ -394,7 +394,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
                       result.counters.push(c)
                     })
                   } catch (e) {
-                    console.error('error processing instruction ' + e.toString())
+                    console.error('error processing instruction ' + errorString(e))
                   }
                 } else {
                   console.warn(
@@ -455,7 +455,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     const promises: Promise<ProcessResult>[] = []
     for (const handlerId of binding.handlerIds) {
       const promise = this.blockHandlers[handlerId](block).catch((e) => {
-        throw new ServerError(Status.INTERNAL, 'error processing block: ' + block.number + '\n' + e.toString())
+        throw new ServerError(Status.INTERNAL, 'error processing block: ' + block.number + '\n' + errorString(e))
       })
       promises.push(promise)
     }
@@ -496,7 +496,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     const trace: Trace = JSON.parse(jsonString)
 
     return this.traceHandlers[binding.handlerId](trace).catch((e) => {
-      throw new ServerError(Status.INTERNAL, 'error processing trace: ' + jsonString + '\n' + e.toString())
+      throw new ServerError(Status.INTERNAL, 'error processing trace: ' + jsonString + '\n' + errorString(e))
     })
   }
 }
@@ -554,4 +554,8 @@ function recordRuntimeInfo(results: ProcessResult, handlerType: HandlerType) {
       from: handlerType,
     }
   })
+}
+
+function errorString(e: Error): string {
+  return e.stack || e.message
 }
