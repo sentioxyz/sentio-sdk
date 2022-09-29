@@ -15,12 +15,28 @@ git clone https://github.com/sentioxyz/sentio-sdk
 cd examples/mirrorworld
 ```
 
-5. open (profile)[https://test.sentio.xyz/profile] page, generate a api key
-copy paste the prompt command line  `yarn sentio login ...`
+5. open [profile](https://test.sentio.xyz/profile) page, generate a api key at [Account](https://test.sentio.xyz/profile#tab=apikey) page, follow guides from the Account page to copy
+
+```
+npx -p @sentio/sdk sentio login --api-key ${api_key} --host https://test.sentio.xyz
+
+```
+then paste it in the prompt command line for `yarn sentio login --host=https://test.sentio.xyz`
 
 6.  try upload the project
 ```
 yarn sentio upload --host=test
+```
+
+you should see the uploading runs and down 
+
+```
+Upload success:
+	 sha256: xxxx
+	 Git commit SHA: xxx
+	 Check status: https://test.sentio.xyz/regulus/mirrorworld/datasource
+✨  Done in 7.66s.
+
 ```
 
 7. if it tells xxx project is not found,  create the project in web page.
