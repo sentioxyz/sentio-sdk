@@ -144,7 +144,7 @@ export function codeGenSentioFile(contract: Contract): string {
       if (s.structName.namespace) {
         return [s.structName.namespace]
       } else {
-        return [s.structName.identifier + 'StructOutput']
+        return [s.structName.identifier + 'StructOutput', s.structName.identifier + 'Struct']
       }
     })
   })
