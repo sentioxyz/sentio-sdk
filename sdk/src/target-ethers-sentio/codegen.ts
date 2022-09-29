@@ -10,6 +10,7 @@ import { reservedKeywords } from '@typechain/ethers-v5/dist/codegen/reserved-key
 import { generateInputTypes, generateOutputTypes } from '@typechain/ethers-v5/dist/codegen/types'
 import { getFullSignatureForEvent } from 'typechain/dist/utils/signatures'
 import { codegenCallTraceTypes, codegenFunctions } from './functions'
+import { EvmType } from 'typechain/dist/parser/parseEvmType'
 
 export function codeGenIndex(contract: Contract): string {
   return ` 
@@ -225,23 +226,42 @@ export function codeGenTestUtilsFile(contract: Contract): string {
   return imports + source
 }
 
+function formatType(type: EvmType): string {
+  if (type.type === 'array') {
+    return formatType(type.itemType) + '[]'
+  } else if (type.type === 'tuple') {
+    return '(' + type.components.map((s) => formatType(s.type)).join(',') + ')'
+  } else {
+    return type.originalType
+  }
+}
+
+// TODO contribute upstream
+function getFullSignatureForEventPatched(event: EventDeclaration): string {
+  return `${event.name}(${event.inputs
+    .map((e) => {
+      return formatType(e.type)
+    })
+    .join(',')})`
+}
+
 function generateOnEventFunction(event: EventDeclaration, contractName: string, includeArgTypes: boolean): string {
   let eventName = event.name
   if (includeArgTypes) {
     eventName = getFullSignatureAsSymbolForEvent(event) + '_'
   }
 
-  const filterName = getFullSignatureForEvent(event)
-
+  const filterName = getFullSignatureForEventPatched(event)
   return `
   onEvent${eventName}(
     handler: (event: ${eventName}Event, ctx: ${contractName}Context) => void,
     filter?: ${eventName}EventFilter | ${eventName}EventFilter[]
   ) {
     if (!filter) {
+      // @ts-ignore
       filter = ${contractName}Processor.filters['${filterName}'](${event.inputs.map(() => 'null').join(',')})
     }
-    return super.onEvent(handler, filter)
+    return super.onEvent(handler, filter!)
   }
   `
 }
