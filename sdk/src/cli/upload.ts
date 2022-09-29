@@ -106,7 +106,12 @@ export async function uploadFile(options: SentioProjectConfig, apiKeyOverride: s
           )
           if (['y', 'yes'].includes(answer.toLowerCase())) {
             rl.close()
-            await createProject(options, apiKey)
+            const res = await createProject(options, apiKey)
+            if (!res.ok) {
+              console.error(chalk.red('Create Project Failed'))
+              console.error(chalk.red((await res.json()).message))
+              return
+            }
             console.log(chalk.green('Project created'))
             await upload()
           } else if (['n', 'no'].includes(answer.toLowerCase())) {
