@@ -18,7 +18,7 @@ describe('Test EVM codegen', () => {
       `${codeGenFolder}/internal`
     )
     expect(fs.existsSync(codeGenFolder)).toEqual(true)
-    expect(fs.readdirSync(codeGenFolder).length).toEqual(3)
+    expect(fs.readdirSync(codeGenFolder).length).toEqual(4)
   })
 
   // afterAll(() => {
