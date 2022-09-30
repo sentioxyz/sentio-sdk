@@ -38,7 +38,10 @@ setProvider(chainsConfig, options.concurrency, options['use-chainserver'])
 
 console.log('Start Server', options)
 
-const server = createServer()
+const server = createServer({
+  'grpc.max_send_message_length': 64 * 1024 * 1024,
+  'grpc.max_receive_message_length': 64 * 1024 * 1024,
+})
 
 const service = new ProcessorServiceImpl(() => load(options.target), server.shutdown)
 server.add(ProcessorDefinition, service)
