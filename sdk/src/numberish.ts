@@ -18,6 +18,13 @@ export function toMetricValue(value: Numberish): MetricValue {
         bigInteger: bigDecimalToBigInteger(value),
       })
     } else {
+      if (value.isNaN()) {
+        throw new Error('Record NaN value')
+      }
+      if (!value.isFinite()) {
+        // NaN also not finite
+        throw new Error('Record infinite value')
+      }
       return MetricValue.fromPartial({
         bigDecimal: value.toString(), // e.g. -7.350918e-428
       })

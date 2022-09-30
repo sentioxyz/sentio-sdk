@@ -80,20 +80,6 @@ describe('Test Basic Examples', () => {
     expect(config).deep.equals(config2)
   })
 
-  test('Check log exception', async () => {
-    const logData = mockApprovalLog('0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', {
-      owner: '0x0000000000000000000000000000000000000000',
-      spender: '0xB329e39Ebefd16f40d38f07643652cE17Ca5Bac1',
-      value: BigNumber.from('1111'),
-    })
-
-    try {
-      await service.testLog(logData, 56)
-    } catch (e) {
-      expect(e.message.indexOf('sdk/src/test/erc20.ts') != -1).eq(true)
-    }
-  })
-
   const blockData = {
     hash: '0x2b9b7cce1f17f3b7e1f3c2472cc806a07bee3f0baca07d021350950d81d73a42',
     number: 14373295,
