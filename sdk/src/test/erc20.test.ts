@@ -7,7 +7,7 @@ import { HandlerType } from '..'
 import { TestProcessorServer } from './test-processor-server'
 import { firstCounterValue, firstGaugeValue } from './metric-utils'
 import { BigNumber } from 'ethers'
-import { mockApprovalLog, mockTransferLog } from '../builtin/erc20/test-utils'
+import { mockTransferLog } from '../builtin/erc20/test-utils'
 import { Trace } from '../trace'
 
 describe('Test Basic Examples', () => {

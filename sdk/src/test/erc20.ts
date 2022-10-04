@@ -1,5 +1,4 @@
 import { ERC20Processor, ERC20ProcessorTemplate } from '../builtin/erc20'
-import { BigNumber } from '@ethersproject/bignumber'
 
 export const filter = ERC20Processor.filters.Transfer(
   '0x0000000000000000000000000000000000000000',

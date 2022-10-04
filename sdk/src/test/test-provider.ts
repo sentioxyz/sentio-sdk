@@ -1,18 +1,19 @@
 import { ChainConfig } from '../chain-config'
 import { setProvider } from '@sentio/sdk'
+import { CHAIN_MAP } from '../utils/chainmap'
 
-export function loadTestProvidersFromEnv(ids: string[] | string): boolean {
+export function loadTestProvidersFromEnv(requiredChainIds: string[] | string): boolean {
   const dummyConfig: Record<string, ChainConfig> = {}
 
-  if (!Array.isArray(ids)) {
-    ids = [ids]
+  if (!Array.isArray(requiredChainIds)) {
+    requiredChainIds = [requiredChainIds]
   }
 
-  for (const k of ids) {
+  for (const k of Object.keys(CHAIN_MAP)) {
     const envKey = 'TEST_ENDPOINT_' + k
     const http = process.env[envKey]
     if (!http) {
-      return false
+      continue
     }
     dummyConfig[k] = {
       ChainID: k,
@@ -21,5 +22,10 @@ export function loadTestProvidersFromEnv(ids: string[] | string): boolean {
   }
 
   setProvider(dummyConfig)
+  for (const id of requiredChainIds) {
+    if (!requiredChainIds.includes(id)) {
+      return false
+    }
+  }
   return true
 }

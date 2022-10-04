@@ -42,6 +42,7 @@ function GetRecordMetaData(ctx: BaseContext, metric: Metric, labels: Labels): Re
         contractAddress: ctx.contract.rawContract.address,
         blockNumber: Long.fromNumber(ctx.log.blockNumber, true), // TODO need number type to be long
         transactionIndex: ctx.log.transactionIndex,
+        transactionHash: ctx.transactionHash || '',
         logIndex: ctx.log.logIndex,
         chainId: ctx.chainId.toString(),
         descriptor: descriptor,
@@ -53,6 +54,7 @@ function GetRecordMetaData(ctx: BaseContext, metric: Metric, labels: Labels): Re
         contractAddress: ctx.contract.rawContract.address,
         blockNumber: Long.fromNumber(ctx.block.number, true),
         transactionIndex: -1,
+        transactionHash: '',
         logIndex: -1,
         chainId: ctx.chainId.toString(),
         descriptor: descriptor,
@@ -63,7 +65,8 @@ function GetRecordMetaData(ctx: BaseContext, metric: Metric, labels: Labels): Re
       return {
         contractAddress: ctx.contract.rawContract.address,
         blockNumber: Long.fromNumber(ctx.trace.blockNumber, true),
-        transactionIndex: ctx.trace.transactionPosition, // TODO make sure if this is the right value to set
+        transactionIndex: ctx.trace.transactionPosition,
+        transactionHash: ctx.transactionHash || '',
         logIndex: -1,
         chainId: ctx.chainId.toString(),
         descriptor: descriptor,
@@ -75,6 +78,7 @@ function GetRecordMetaData(ctx: BaseContext, metric: Metric, labels: Labels): Re
       contractAddress: ctx.address,
       blockNumber: Long.ZERO, // TODO need number type to be long
       transactionIndex: 0,
+      transactionHash: '', // TODO add
       logIndex: 0,
       chainId: 'SOL_mainnet', // TODO set in context
       descriptor: descriptor,
@@ -85,6 +89,7 @@ function GetRecordMetaData(ctx: BaseContext, metric: Metric, labels: Labels): Re
       contractAddress: ctx.address,
       blockNumber: Long.ZERO, // TODO need number type to be long
       transactionIndex: 0,
+      transactionHash: '', // TODO
       logIndex: 0,
       chainId: 'SUI_devnet', // TODO set in context
       descriptor: descriptor,
@@ -95,6 +100,7 @@ function GetRecordMetaData(ctx: BaseContext, metric: Metric, labels: Labels): Re
       contractAddress: ctx.address,
       blockNumber: Long.ZERO, // TODO need number type to be long
       transactionIndex: 0,
+      transactionHash: '', // TODO
       logIndex: 0,
       chainId: 'aptos_devnet', // TODO set in context
       descriptor: descriptor,

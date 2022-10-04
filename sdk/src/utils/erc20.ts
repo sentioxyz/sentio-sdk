@@ -61,6 +61,10 @@ export async function getER20NormalizedAmount(
   chainId: number
 ): Promise<BigDecimal> {
   const tokenInfo = await getERC20TokenInfo(tokenAddress, chainId)
-  const divider = new BigDecimal(10).pow(tokenInfo.decimal)
+  return scaleDown(amount, tokenInfo.decimal)
+}
+
+export function scaleDown(amount: BigNumber, decimal: number) {
+  const divider = new BigDecimal(10).pow(decimal)
   return toBigDecimal(amount).dividedBy(divider)
 }

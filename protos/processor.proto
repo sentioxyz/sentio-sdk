@@ -206,12 +206,14 @@ message RecordMetaData {
   // These are populated by systems.
   string contract_address = 1;
   uint64 block_number = 2; // TODO discuss if we need this if we send request per block
+  string transaction_hash = 6;
   int32 transaction_index = 3;
   int32 log_index = 4;
   string chain_id = 5;
 
   // These are populated by users in meter.
   // The metric name and properties
+  // none for for log
   MetricDescriptor descriptor = 8;
 
   // The metric labels provided by users.
@@ -263,6 +265,7 @@ enum LogLevel {
   INFO = 1;
   WARNING = 2;
   ERROR = 3;
+  CRITICAL = 4;
 }
 
 message LogResult {

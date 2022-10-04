@@ -66,6 +66,7 @@ export enum LogLevel {
   INFO = 1,
   WARNING = 2,
   ERROR = 3,
+  CRITICAL = 4,
   UNRECOGNIZED = -1,
 }
 
@@ -83,6 +84,9 @@ export function logLevelFromJSON(object: any): LogLevel {
     case 3:
     case "ERROR":
       return LogLevel.ERROR;
+    case 4:
+    case "CRITICAL":
+      return LogLevel.CRITICAL;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -100,6 +104,8 @@ export function logLevelToJSON(object: LogLevel): string {
       return "WARNING";
     case LogLevel.ERROR:
       return "ERROR";
+    case LogLevel.CRITICAL:
+      return "CRITICAL";
     case LogLevel.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
@@ -274,6 +280,7 @@ export interface MetricDescriptor {
 export interface RecordMetaData {
   contractAddress: string;
   blockNumber: Long;
+  transactionHash: string;
   transactionIndex: number;
   logIndex: number;
   chainId: string;
@@ -2770,6 +2777,7 @@ function createBaseRecordMetaData(): RecordMetaData {
   return {
     contractAddress: "",
     blockNumber: Long.UZERO,
+    transactionHash: "",
     transactionIndex: 0,
     logIndex: 0,
     chainId: "",
@@ -2788,6 +2796,9 @@ export const RecordMetaData = {
     }
     if (!message.blockNumber.isZero()) {
       writer.uint32(16).uint64(message.blockNumber);
+    }
+    if (message.transactionHash !== "") {
+      writer.uint32(50).string(message.transactionHash);
     }
     if (message.transactionIndex !== 0) {
       writer.uint32(24).int32(message.transactionIndex);
@@ -2826,6 +2837,9 @@ export const RecordMetaData = {
         case 2:
           message.blockNumber = reader.uint64() as Long;
           break;
+        case 6:
+          message.transactionHash = reader.string();
+          break;
         case 3:
           message.transactionIndex = reader.int32();
           break;
@@ -2863,6 +2877,9 @@ export const RecordMetaData = {
       blockNumber: isSet(object.blockNumber)
         ? Long.fromValue(object.blockNumber)
         : Long.UZERO,
+      transactionHash: isSet(object.transactionHash)
+        ? String(object.transactionHash)
+        : "",
       transactionIndex: isSet(object.transactionIndex)
         ? Number(object.transactionIndex)
         : 0,
@@ -2889,6 +2906,8 @@ export const RecordMetaData = {
       (obj.contractAddress = message.contractAddress);
     message.blockNumber !== undefined &&
       (obj.blockNumber = (message.blockNumber || Long.UZERO).toString());
+    message.transactionHash !== undefined &&
+      (obj.transactionHash = message.transactionHash);
     message.transactionIndex !== undefined &&
       (obj.transactionIndex = Math.round(message.transactionIndex));
     message.logIndex !== undefined &&
@@ -2914,6 +2933,7 @@ export const RecordMetaData = {
       object.blockNumber !== undefined && object.blockNumber !== null
         ? Long.fromValue(object.blockNumber)
         : Long.UZERO;
+    message.transactionHash = object.transactionHash ?? "";
     message.transactionIndex = object.transactionIndex ?? 0;
     message.logIndex = object.logIndex ?? 0;
     message.chainId = object.chainId ?? "";

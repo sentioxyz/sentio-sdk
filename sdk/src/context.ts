@@ -22,6 +22,7 @@ export class EthContext extends BaseContext {
   block?: Block
   trace?: Trace
   blockNumber: Long
+  transactionHash?: string
 
   constructor(chainId: number, block?: Block, log?: Log, trace?: Trace) {
     super()
@@ -31,8 +32,13 @@ export class EthContext extends BaseContext {
     this.trace = trace
     if (log) {
       this.blockNumber = Long.fromNumber(log.blockNumber)
+      this.transactionHash = log.transactionHash
     } else if (block) {
       this.blockNumber = Long.fromNumber(block.number)
+    }
+    if (trace) {
+      this.blockNumber = Long.fromNumber(trace.blockNumber)
+      this.transactionHash = trace.transactionHash
     }
   }
 }
