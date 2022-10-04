@@ -12,7 +12,7 @@ git clone https://github.com/sentioxyz/sentio-sdk
 ```
 4. Choose an example to run
 ```
-cd examples/mirrorworld
+cd examples/x2y2
 ```
 
 5. open [profile](https://test.sentio.xyz/profile) page, generate a api key at [Account](https://test.sentio.xyz/profile#tab=apikey) page, follow guides from the Account page to copy
@@ -34,7 +34,7 @@ you should see the uploading runs and down
 Upload success:
 	 sha256: xxxx
 	 Git commit SHA: xxx
-	 Check status: https://test.sentio.xyz/regulus/mirrorworld/datasource
+	 Check status: https://test.sentio.xyz/regulus/x2y2/datasource
 ✨  Done in 7.66s.
 
 ```

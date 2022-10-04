@@ -1,5 +1,0 @@
-project: mirrorworld
-host: local
-targets:
-  - chain: solana
-    abisDir: abis/solana

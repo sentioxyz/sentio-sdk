@@ -7,7 +7,6 @@
     "compile": "tsc -p . && cp src/cli/webpack.config.js lib/cli",
     "build": "yarn gen && yarn compile",
     "start_ts": "ts-node --files src/processor-runner.ts ../examples/x2y2/src/processor.ts",
-    "start_ts_solana": "ts-node --files src/processor-runner.ts ../examples/mirrorworld/src/processor.ts",
     "start": "ts-node --files src/processor-runner.ts ../examples/x2y2/dist/lib.js",
     "start_js": "node lib/processor.js ../examples/x2y2/dist/lib.js",
     "ts-start": "ts-node --files src/processor-runner.ts ./src/anyswap/src/processor.ts",

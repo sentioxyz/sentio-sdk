@@ -11,7 +11,6 @@ import { firstCounterValue } from './metric-utils'
 
 describe('Test Solana Example', () => {
   const service = new TestProcessorServer(() => {
-    require('./mirrorworld')
     require('./wormhole-token-bridge')
   })
 
@@ -21,23 +20,7 @@ describe('Test Solana Example', () => {
 
   test('check configuration ', async () => {
     const config = await service.getConfig({})
-    expect(config.contractConfigs).length(3)
-  })
-
-  test('Check mirrorworld instruction dispatch', async () => {
-    const request: ProcessInstructionsRequest = {
-      instructions: [
-        {
-          instructionData: 'CACadoFwjNvan4GP8gh3Jtm1qdeoKX5j2SbSNEiB',
-          slot: Long.fromNumber(0),
-          programAccountId: 'F78NhTC9XmP1DKsCBRz5LGdQc4n4yFbj2dURiv7T9gGZ',
-        },
-      ],
-    }
-    const res = await service.processInstructions(request)
-    expect(res.result?.counters).length(3)
-    expect(res.result?.gauges).length(0)
-    expect(firstCounterValue(res.result, 'deposit_pool_total_value')).equal(5000000000n)
+    expect(config.contractConfigs).length(2)
   })
 
   test('Check wormhole token bridge instruction dispatch', async () => {
