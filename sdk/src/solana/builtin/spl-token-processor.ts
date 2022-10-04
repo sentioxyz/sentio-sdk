@@ -1,7 +1,7 @@
 import { SolanaBaseProcessor } from '../../solana-processor'
 import { SolanaContext } from '../../context'
 import { Instruction } from '@project-serum/anchor'
-import { Approve, Burn, CloseAccount, FreezeAccount, InitializeAccount, InitializeAccount2, InitializeAccount3, InitializeMint, InitializeMultisig, MintTo, Revoke, ThawAccount, Transfer } from './types';
+import { AmountToUiAmount, Approve, ApproveChecked, Burn, BurnChecked, CloseAccount, CreateNativeMint, DefaultAccountStateExtension, FreezeAccount, GetAccountDataSize, InitializeAccount, InitializeAccount2, InitializeAccount3, InitializeImmutableOwner, InitializeMint, InitializeMintCloseAuthority, InitializeMultisig, MemoTransferExtension, MintTo, MintToChecked, Reallocate, Revoke, SyncNative, ThawAccount, Transfer, TransferChecked, TransferFeeExtension, UiAmountToAmount } from './types';
 import { SolanaBindOptions } from '../../bind-options';
 
 export class SPLTokenProcessor extends SolanaBaseProcessor {
@@ -160,5 +160,141 @@ export class SPLTokenProcessor extends SolanaBaseProcessor {
     })
     return this
   }
+
+  public onTransferChecked(handler: (data: TransferChecked, ctx: SolanaContext) => void): SPLTokenProcessor {
+    this.onInstruction('transferChecked', (ins: Instruction, ctx) => {
+      if (ins) {
+        handler(ins.data as TransferChecked, ctx)
+      }
+    })
+    return this
+  }
+
+  public onApproveChecked(handler: (data: ApproveChecked, ctx: SolanaContext) => void): SPLTokenProcessor {
+    this.onInstruction('approveChecked', (ins: Instruction, ctx) => {
+      if (ins) {
+        handler(ins.data as ApproveChecked, ctx)
+      }
+    })
+    return this
+  }
+
+  public onMintToChecked(handler: (data: MintToChecked, ctx: SolanaContext) => void): SPLTokenProcessor {
+    this.onInstruction('mintToChecked', (ins: Instruction, ctx) => {
+      if (ins) {
+        handler(ins.data as MintToChecked, ctx)
+      }
+    })
+    return this
+  }
+
+  public onBurnChecked(handler: (data: BurnChecked, ctx: SolanaContext) => void): SPLTokenProcessor {
+    this.onInstruction('burnChecked', (ins: Instruction, ctx) => {
+      if (ins) {
+        handler(ins.data as BurnChecked, ctx)
+      }
+    })
+    return this
+  }
+
+  public onSyncNative(handler: (data: SyncNative, ctx: SolanaContext) => void): SPLTokenProcessor {
+    this.onInstruction('syncNative', (ins: Instruction, ctx) => {
+      if (ins) {
+        handler(ins.data as SyncNative, ctx)
+      }
+    })
+    return this
+  }
+
+  public onGetAccountDataSize(handler: (data: GetAccountDataSize, ctx: SolanaContext) => void): SPLTokenProcessor {
+    this.onInstruction('getAccountDataSize', (ins: Instruction, ctx) => {
+      if (ins) {
+        handler(ins.data as GetAccountDataSize, ctx)
+      }
+    })
+    return this
+  }
+
+  public onInitializeImmutableOwner(handler: (data: InitializeImmutableOwner, ctx: SolanaContext) => void): SPLTokenProcessor {
+    this.onInstruction('initializeImmutableOwner', (ins: Instruction, ctx) => {
+      if (ins) {
+        handler(ins.data as InitializeImmutableOwner, ctx)
+      }
+    })
+    return this
+  }
+
+  public onAmountToUiAmount(handler: (data: AmountToUiAmount, ctx: SolanaContext) => void): SPLTokenProcessor {
+    this.onInstruction('amountToUiAmount', (ins: Instruction, ctx) => {
+      if (ins) {
+        handler(ins.data as AmountToUiAmount, ctx)
+      }
+    })
+    return this
+  }
+
+  public onUiAmountToAmount(handler: (data: UiAmountToAmount, ctx: SolanaContext) => void): SPLTokenProcessor {
+    this.onInstruction('uiAmountToAmount', (ins: Instruction, ctx) => {
+      if (ins) {
+        handler(ins.data as UiAmountToAmount, ctx)
+      }
+    })
+    return this
+  }
+
+  public onInitializeMintCloseAuthority(handler: (data: InitializeMintCloseAuthority, ctx: SolanaContext) => void): SPLTokenProcessor {
+    this.onInstruction('initializeMintCloseAuthority', (ins: Instruction, ctx) => {
+      if (ins) {
+        handler(ins.data as InitializeMintCloseAuthority, ctx)
+      }
+    })
+    return this
+  }
+
+  public onTransferFeeExtension(handler: (data: TransferFeeExtension, ctx: SolanaContext) => void): SPLTokenProcessor {
+    this.onInstruction('transferFeeExtension', (ins: Instruction, ctx) => {
+      if (ins) {
+        handler(ins.data as TransferFeeExtension, ctx)
+      }
+    })
+    return this
+  }
+
+  public onDefaultAccountStateExtension(handler: (data: DefaultAccountStateExtension, ctx: SolanaContext) => void): SPLTokenProcessor {
+    this.onInstruction('defaultAccountStateExtension', (ins: Instruction, ctx) => {
+      if (ins) {
+        handler(ins.data as DefaultAccountStateExtension, ctx)
+      }
+    })
+    return this
+  }
+
+  public onReallocate(handler: (data: Reallocate, ctx: SolanaContext) => void): SPLTokenProcessor {
+    this.onInstruction('reallocate', (ins: Instruction, ctx) => {
+      if (ins) {
+        handler(ins.data as Reallocate, ctx)
+      }
+    })
+    return this
+  }
+
+  public onMemoTransferExtension(handler: (data: MemoTransferExtension, ctx: SolanaContext) => void): SPLTokenProcessor {
+    this.onInstruction('memoTransferExtension', (ins: Instruction, ctx) => {
+      if (ins) {
+        handler(ins.data as MemoTransferExtension, ctx)
+      }
+    })
+    return this
+  }
+
+  public onCreateNativeMint(handler: (data: CreateNativeMint, ctx: SolanaContext) => void): SPLTokenProcessor {
+    this.onInstruction('createNativeMint', (ins: Instruction, ctx) => {
+      if (ins) {
+        handler(ins.data as CreateNativeMint, ctx)
+      }
+    })
+    return this
+  }
+  
   // Todo(pcxu): auto gen this file
 }

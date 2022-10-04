@@ -205,34 +205,41 @@ const BurnChecked = type({
   tokenAmount: TokenAmountUi,
 });
 
+export type SyncNative = Infer<typeof BurnChecked>;
 const SyncNative = type({
   account: PublicKeyFromString,
 });
 
+export type GetAccountDataSize = Infer<typeof GetAccountDataSize>;
 const GetAccountDataSize = type({
   mint: PublicKeyFromString,
   extensionTypes: optional(array(string())),
 });
 
+export type InitializeImmutableOwner = Infer<typeof InitializeImmutableOwner>;
 const InitializeImmutableOwner = type({
   account: PublicKeyFromString,
 });
 
+export type AmountToUiAmount = Infer<typeof AmountToUiAmount>;
 const AmountToUiAmount = type({
   mint: PublicKeyFromString,
   amount: union([string(), number()]),
 });
 
+export type UiAmountToAmount = Infer<typeof UiAmountToAmount>;
 const UiAmountToAmount = type({
   mint: PublicKeyFromString,
   uiAmount: string(),
 });
 
+export type InitializeMintCloseAuthority = Infer<typeof InitializeMintCloseAuthority>;
 const InitializeMintCloseAuthority = type({
   mint: PublicKeyFromString,
   newAuthority: PublicKeyFromString,
 });
 
+export type TransferFeeExtension = Infer<typeof TransferFeeExtension>;
 const TransferFeeExtension = type({
   mint: PublicKeyFromString,
   transferFeeConfigAuthority: PublicKeyFromString,
@@ -241,12 +248,14 @@ const TransferFeeExtension = type({
   maximumFee: number(),
 });
 
+export type DefaultAccountStateExtension = Infer<typeof DefaultAccountStateExtension>;
 const DefaultAccountStateExtension = type({
   mint: PublicKeyFromString,
   accountState: string(),
   freezeAuthority: optional(PublicKeyFromString),
 });
 
+export type Reallocate = Infer<typeof Reallocate>;
 const Reallocate = type({
   account: PublicKeyFromString,
   payer: PublicKeyFromString,
@@ -254,6 +263,7 @@ const Reallocate = type({
   extensionTypes: array(string()),
 });
 
+export type MemoTransferExtension = Infer<typeof MemoTransferExtension>;
 const MemoTransferExtension = type({
   account: PublicKeyFromString,
   owner: optional(PublicKeyFromString),
@@ -261,6 +271,7 @@ const MemoTransferExtension = type({
   signers: optional(array(PublicKeyFromString)),
 });
 
+export type CreateNativeMint = Infer<typeof CreateNativeMint>;
 const CreateNativeMint = type({
   payer: PublicKeyFromString,
   nativeMint: PublicKeyFromString,
