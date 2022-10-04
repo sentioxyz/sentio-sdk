@@ -6,7 +6,7 @@ import { TemplateInstance } from './gen/processor/protos/processor'
 import { Provider } from '@ethersproject/providers'
 import { SolanaBaseProcessor } from './solana-processor'
 import { SuiBaseProcessor } from './sui-processor'
-import { AptosBaseProcessor } from 'aptos-processor'
+import { AptosBaseProcessor } from './aptos-processor'
 
 export class ProcessorState {
   // from abiName_address_chainId => contract wrapper
