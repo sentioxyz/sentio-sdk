@@ -1,5 +1,5 @@
 import { MetricDescriptor, RecordMetaData } from './gen/processor/protos/processor'
-import { BaseContext, Context, SolanaContext, SuiContext } from './context'
+import { AptosContext, BaseContext, Context, SolanaContext, SuiContext } from './context'
 import { toMetricValue, Numberish } from './numberish'
 import Long from 'long'
 
@@ -87,6 +87,16 @@ function GetRecordMetaData(ctx: BaseContext, metric: Metric, labels: Labels): Re
       transactionIndex: 0,
       logIndex: 0,
       chainId: 'SUI_devnet', // TODO set in context
+      descriptor: descriptor,
+      labels: normalizeLabels(labels),
+    }
+  } else if (ctx instanceof AptosContext) {
+    return {
+      contractAddress: ctx.address,
+      blockNumber: Long.ZERO, // TODO need number type to be long
+      transactionIndex: 0,
+      logIndex: 0,
+      chainId: 'aptos_devnet', // TODO set in context
       descriptor: descriptor,
       labels: normalizeLabels(labels),
     }

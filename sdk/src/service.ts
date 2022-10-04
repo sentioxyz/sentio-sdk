@@ -195,6 +195,26 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       }
       this.contractConfigs.push(contractConfig)
     }
+
+    // Part 3, prepare aptos constractors
+    for (const aptosProcessor of global.PROCESSOR_STATE.aptosProcessors) {
+      const contractConfig: ContractConfig = {
+        processorType: 'user_processor',
+        contract: {
+          name: 'aptos processor',
+          chainId: 'aptos_testnet',
+          address: aptosProcessor.address,
+          abi: '',
+        },
+        blockConfigs: [],
+        logConfigs: [],
+        traceConfigs: [],
+        startBlock: aptosProcessor.config.startSeqNumber,
+        endBlock: DEFAULT_MAX_BLOCK,
+        instructionConfig: undefined,
+      }
+      this.contractConfigs.push(contractConfig)
+    }
   }
 
   async start(request: StartRequest, context: CallContext): Promise<Empty> {
@@ -330,6 +350,37 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
                   }
                   result.counters.push(c)
                 })
+              }
+            }
+            resolve()
+          })
+        )
+      }
+      await Promise.all(processorPromises)
+    }
+
+    if (request.chainId.toLowerCase().startsWith('apt') && global.PROCESSOR_STATE.aptosProcessors) {
+      const processorPromises: Promise<void>[] = []
+      for (const txn of request.transactions) {
+        processorPromises.push(
+          new Promise((resolve, _) => {
+            for (const processor of global.PROCESSOR_STATE.aptosProcessors) {
+              if (processor.address === txn.programAccountId!) {
+                const res = processor.handleTransaction(JSON.parse(new TextDecoder().decode(txn.raw)))
+                if (res) {
+                  res.gauges.forEach((g) => {
+                    if (g.metadata && txn.slot) {
+                      g.metadata.blockNumber = txn.slot
+                    }
+                    result.gauges.push(g)
+                  })
+                  res.counters.forEach((c) => {
+                    if (c.metadata && txn.slot) {
+                      c.metadata.blockNumber = txn.slot
+                    }
+                    result.counters.push(c)
+                  })
+                }
               }
             }
             resolve()

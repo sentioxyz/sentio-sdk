@@ -97,7 +97,6 @@ export class SolanaContext extends BaseContext {
 
   constructor(address: string) {
     super()
-    this.meter = new Meter(this)
     this.address = address
   }
 }
@@ -107,7 +106,15 @@ export class SuiContext extends BaseContext {
 
   constructor(address: string) {
     super()
-    this.meter = new Meter(this)
+    this.address = address
+  }
+}
+
+export class AptosContext extends BaseContext {
+  address: string
+
+  constructor(address: string) {
+    super()
     this.address = address
   }
 }
