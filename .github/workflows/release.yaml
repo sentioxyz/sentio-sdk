@@ -26,6 +26,9 @@ jobs:
       - name: Build
         run: yarn build
         working-directory: sdk
+      - name: Clean template
+        run: rm -rf node_modules
+        working-directory: sdk/template
       - name: Semantic Release
         id: semantic
         uses: cycjimmy/semantic-release-action@v3
