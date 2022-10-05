@@ -1,8 +1,13 @@
-sdk/src/builtin
+sdk/src/builtin/*
+!sdk/src/builtin/solana
+!sdk/src/builtin/index.ts
 node_modules
 dist
 lib
 **/src/types
+!sdk/src/types
+
+docs
 
 .idea
 
@@ -115,4 +120,4 @@ package-lock.json
 .DS_Store
 
 # codegen files in the test folder
-sdk/src/test/types/
+sdk/src/tests/types/

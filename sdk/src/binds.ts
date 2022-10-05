@@ -1,8 +1,7 @@
-import { BindOptions, getOptionsSignature } from './bind-options'
-import { BaseProcessor } from './base-processor'
+import { BindOptions, getOptionsSignature } from './core/bind-options'
+import { BaseProcessor, ContractView } from './core'
 import { Networkish } from '@ethersproject/networks'
 import { getNetwork } from '@ethersproject/providers'
-import { ContractView } from './context'
 import { BaseContract } from 'ethers'
 import { ContractNamer } from './contract-namer'
 

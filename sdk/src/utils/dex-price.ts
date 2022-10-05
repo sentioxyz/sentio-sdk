@@ -4,7 +4,7 @@ import fs from 'fs'
 
 import { parse } from 'csv-parse/sync'
 import { BlockTag } from '@ethersproject/providers'
-import { scaleDown } from './erc20'
+import { scaleDown } from './token'
 
 type OralceRecord = {
   Pair: string
@@ -27,12 +27,12 @@ export interface DexPriceResult {
 // Load price feed from https://docs.chain.link/docs/data-feeds/price-feeds/addresses/?network=ethereum
 // and then use EACAggregatorProxy contract to get price
 class DexPrice {
-  private USD_ORACLE_MAP = new Map<string, string>()
-  private ETH_ORACLE_MAP = new Map<string, string>()
-  private BTC_ORACLE_MAP = new Map<string, string>()
-  private ASSETS_INFOS = new Map<string, number>()
+  USD_ORACLE_MAP = new Map<string, string>()
+  ETH_ORACLE_MAP = new Map<string, string>()
+  BTC_ORACLE_MAP = new Map<string, string>()
+  ASSETS_INFOS = new Map<string, number>()
 
-  private readonly chainId: number
+  readonly chainId: number
 
   constructor(csvFileName: string, chainId: number) {
     this.chainId = chainId

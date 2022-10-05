@@ -26,9 +26,9 @@ ignore:
   - sdk/template
   - sdk/src/abis
   - sdk/src/builtin/internal
-  - sdk/dist
+  - sdk/docs
   - sdk/lib
   - sdk/node_modules
   - examples
-  - sdk/src/test/abis
-  - sdk/src/test/types
+  - sdk/src/tests/abis
+  - sdk/src/tests/types

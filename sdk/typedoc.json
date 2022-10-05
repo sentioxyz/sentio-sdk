@@ -1,0 +1,4 @@
+{
+  "entryPoints": ["./src/core", "./src/utils", "./src/testing", "./src/builtin"],
+  "out": "docs"
+}

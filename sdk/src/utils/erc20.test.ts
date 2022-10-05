@@ -1,6 +1,6 @@
 import { ProcessorState } from '@sentio/sdk'
-import { getERC20TokenInfo } from './erc20'
-import { loadTestProvidersFromEnv } from '../test'
+import { getERC20TokenInfo } from './token'
+import { loadTestProvidersFromEnv } from '../testing/test-provider'
 
 describe('erc20 tests', () => {
   global.PROCESSOR_STATE = new ProcessorState()

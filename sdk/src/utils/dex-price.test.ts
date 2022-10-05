@@ -1,6 +1,7 @@
 import { EthereumDexPrice, GoerliDexPrice } from './dex-price'
 import { ProcessorState } from '@sentio/sdk'
-import { loadTestProvidersFromEnv } from '../test'
+import { loadTestProvidersFromEnv } from '../testing/test-provider'
+
 import { expect } from 'chai'
 
 describe('dex price tests', () => {

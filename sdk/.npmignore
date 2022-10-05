@@ -1,0 +1,5 @@
+lib/tests
+src/tests
+
+*.test.ts
+*.test.js

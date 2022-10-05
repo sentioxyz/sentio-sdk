@@ -2,6 +2,7 @@
 *.config.js
 dist
 lib
+docs
 gen
 types
 builtin

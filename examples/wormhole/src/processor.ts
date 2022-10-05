@@ -1,5 +1,5 @@
 import { WETH9Processor, WETH9Context } from '@sentio/sdk/lib/builtin/weth9'
-import { SPLTokenProcessor } from '@sentio/sdk'
+import { SPLTokenProcessor } from '@sentio/sdk/lib/builtin/solana'
 
 const TOKEN_BRIDGE_ADDRESS = '0x3ee18B2214AFF97000D974cf647E7C347E8fa585'
 

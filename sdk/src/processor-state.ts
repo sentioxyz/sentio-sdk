@@ -1,12 +1,15 @@
-import { BaseProcessor } from './base-processor'
+import {
+  BaseProcessor,
+  BoundContractView,
+  ContractView,
+  BaseProcessorTemplate,
+  SolanaBaseProcessor,
+  SuiBaseProcessor,
+  AptosBaseProcessor,
+} from './core'
 import { BaseContract } from 'ethers'
-import { BoundContractView, ContractView } from './context'
-import { BaseProcessorTemplate } from './base-processor-template'
 import { TemplateInstance } from './gen/processor/protos/processor'
 import { Provider } from '@ethersproject/providers'
-import { SolanaBaseProcessor } from './solana-processor'
-import { SuiBaseProcessor } from './sui-processor'
-import { AptosBaseProcessor } from './aptos-processor'
 
 export class ProcessorState {
   // from abiName_address_chainId => contract wrapper

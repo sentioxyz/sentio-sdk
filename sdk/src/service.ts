@@ -24,12 +24,14 @@ import {
   StartRequest,
   TemplateInstance,
   TraceBinding,
+  CounterResult,
+  GaugeResult,
 } from './gen/processor/protos/processor'
 
 import { Empty } from './gen/google/protobuf/empty'
 import Long from 'long'
 import { TextDecoder } from 'util'
-import { Trace } from './trace'
+import { Trace } from './core'
 
 const DEFAULT_MAX_BLOCK = Long.ZERO
 
@@ -368,13 +370,13 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
               if (processor.address === txn.programAccountId!) {
                 const res = processor.handleTransaction(JSON.parse(new TextDecoder().decode(txn.raw)))
                 if (res) {
-                  res.gauges.forEach((g) => {
+                  res.gauges.forEach((g: GaugeResult) => {
                     if (g.metadata && txn.slot) {
                       g.metadata.blockNumber = txn.slot
                     }
                     result.gauges.push(g)
                   })
-                  res.counters.forEach((c) => {
+                  res.counters.forEach((c: CounterResult) => {
                     if (c.metadata && txn.slot) {
                       c.metadata.blockNumber = txn.slot
                     }

@@ -1,5 +1,5 @@
 // Transform error in more readable format
-import { Context } from './context'
+import { Context } from './core/context'
 import { errors } from 'ethers'
 
 export class EthersError extends Error {
