@@ -327,12 +327,14 @@ function generateMockEventLogFunction(event: EventDeclaration, contractName: str
     eventNameWithSignature = getFullSignatureForEvent(event)
   }
 
+  const eventArgs = event.inputs.map((input, i) => `event.${input.name ?? `arg${i.toString()}`}`)
+
   return `
     export function mock${eventName}Log(contractAddress: string, event: ${eventName}EventObject): Log {
       const contract = get${contractName}Contract(contractAddress)
       const encodedLog = contract.rawContract.interface.encodeEventLog(
         contract.rawContract.interface.getEvent('${eventNameWithSignature}'),
-        Object.values(event)
+        [${eventArgs.join(', ')}]
       )
       return {
         ...mockField,
