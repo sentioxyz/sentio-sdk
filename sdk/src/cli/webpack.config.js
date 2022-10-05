@@ -27,14 +27,17 @@ module.exports = {
   externals: [
     {
       ethers: 'commonjs2 ethers',
-      '@sentio/sdk': 'root sentio_sdk',
       bs58: 'commonjs2 bs58',
       "bignumber.js": 'commonjs2 bignumber.js',
       'bn.js': 'commonjs2 bn.js',
+      'csv-parse': 'commonjs2 csv-parse'
     },
     function ({ context, request }, callback) {
       if (/^@(ethersproject|solana|project-serum).*$/.test(request)) {
         return callback(null, 'commonjs ' + request)
+      }
+      if (request.startsWith("@sentio/sdk")) {
+        return callback(null, 'commonjs2 ' + request)
       }
       callback()
     },

@@ -11,7 +11,6 @@ import fs from 'fs-extra'
 import { ProcessorState } from './processor-state'
 import { load } from './loader'
 
-global.sentio_sdk = require('.')
 global.PROCESSOR_STATE = new ProcessorState()
 
 const optionDefinitions = [
