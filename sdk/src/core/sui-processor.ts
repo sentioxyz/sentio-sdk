@@ -40,8 +40,8 @@ export class SuiBaseProcessor {
     return this
   }
 
-  public handleTransaction(txn: any): ProcessResult | null {
-    const ctx = new SuiContext(this.address)
+  public handleTransaction(txn: any, slot: Long): ProcessResult | null {
+    const ctx = new SuiContext(this.address, slot)
 
     if (txn) {
       this.transactionHanlder(txn, ctx)

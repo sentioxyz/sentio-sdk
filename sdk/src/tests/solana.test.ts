@@ -27,7 +27,7 @@ describe('Test Solana Example', () => {
       instructions: [
         {
           instructionData: '33G5T8yXAQWdH8FX7fTy1mBJ6e4dUKfQWbViSrT7qJjpS8UAA3ftEQx9sNzrkaJm56xtENhDsWf',
-          slot: Long.fromNumber(0),
+          slot: Long.fromNumber(12345),
           programAccountId: 'wormDTUJ6AWPNvk59vGQbDvGJmqbDTdgWgAqcLBCgUb',
         },
         {
@@ -40,7 +40,7 @@ describe('Test Solana Example', () => {
     const res = await service.processInstructions(request)
     expect(res.result?.counters).length(2)
     expect(res.result?.gauges).length(0)
-    expect(res.result?.counters[0].metadata?.blockNumber.toInt()).equal(0)
+    expect(res.result?.counters[0].metadata?.blockNumber.toInt()).equal(12345)
     expect(firstCounterValue(res.result, 'total_transfer_amount')).equal(1000000n)
     expect(res.result?.counters[0].runtimeInfo?.from).equals(HandlerType.INSTRUCTION)
   })

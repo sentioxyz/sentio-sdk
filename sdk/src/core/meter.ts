@@ -40,7 +40,7 @@ function GetRecordMetaData(ctx: BaseContext, metric: Metric, labels: Labels): Re
     if (ctx.log) {
       return {
         contractAddress: ctx.contract.rawContract.address,
-        blockNumber: Long.fromNumber(ctx.log.blockNumber, true), // TODO need number type to be long
+        blockNumber: ctx.blockNumber,
         transactionIndex: ctx.log.transactionIndex,
         transactionHash: ctx.transactionHash || '',
         logIndex: ctx.log.logIndex,
@@ -52,7 +52,7 @@ function GetRecordMetaData(ctx: BaseContext, metric: Metric, labels: Labels): Re
     if (ctx.block) {
       return {
         contractAddress: ctx.contract.rawContract.address,
-        blockNumber: Long.fromNumber(ctx.block.number, true),
+        blockNumber: ctx.blockNumber,
         transactionIndex: -1,
         transactionHash: '',
         logIndex: -1,
@@ -64,7 +64,7 @@ function GetRecordMetaData(ctx: BaseContext, metric: Metric, labels: Labels): Re
     if (ctx.trace) {
       return {
         contractAddress: ctx.contract.rawContract.address,
-        blockNumber: Long.fromNumber(ctx.trace.blockNumber, true),
+        blockNumber: ctx.blockNumber,
         transactionIndex: ctx.trace.transactionPosition,
         transactionHash: ctx.transactionHash || '',
         logIndex: -1,
@@ -76,7 +76,7 @@ function GetRecordMetaData(ctx: BaseContext, metric: Metric, labels: Labels): Re
   } else if (ctx instanceof SolanaContext) {
     return {
       contractAddress: ctx.address,
-      blockNumber: Long.ZERO, // TODO need number type to be long
+      blockNumber: ctx.blockNumber,
       transactionIndex: 0,
       transactionHash: '', // TODO add
       logIndex: 0,
@@ -87,7 +87,7 @@ function GetRecordMetaData(ctx: BaseContext, metric: Metric, labels: Labels): Re
   } else if (ctx instanceof SuiContext) {
     return {
       contractAddress: ctx.address,
-      blockNumber: Long.ZERO, // TODO need number type to be long
+      blockNumber: ctx.blockNumber,
       transactionIndex: 0,
       transactionHash: '', // TODO
       logIndex: 0,
@@ -98,7 +98,7 @@ function GetRecordMetaData(ctx: BaseContext, metric: Metric, labels: Labels): Re
   } else if (ctx instanceof AptosContext) {
     return {
       contractAddress: ctx.address,
-      blockNumber: Long.ZERO, // TODO need number type to be long
+      blockNumber: ctx.blockNumber,
       transactionIndex: 0,
       transactionHash: '', // TODO
       logIndex: 0,

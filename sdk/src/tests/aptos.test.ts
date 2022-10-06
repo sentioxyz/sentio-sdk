@@ -1,4 +1,5 @@
 import { expect } from 'chai'
+import Long from 'long'
 import { TextEncoder } from 'util'
 import { ProcessTransactionsRequest } from '..'
 
@@ -25,12 +26,14 @@ describe('Test Aptos Example', () => {
         {
           raw: new TextEncoder().encode(JSON.stringify(testData)),
           programAccountId: '4188c8694687e844677c2aa87171019e23d61cac60de5082a278a8aa47e9d807',
+          slot: Long.fromNumber(12345),
         },
       ],
     }
     const res = await service.processTransactions(request)
     expect(res.result?.counters).length(1)
     expect(res.result?.gauges).length(0)
+    expect(res.result?.counters[0].metadata?.blockNumber.toInt()).equal(12345)
   })
 })
 

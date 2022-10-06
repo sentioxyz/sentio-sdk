@@ -40,8 +40,8 @@ export class AptosBaseProcessor {
     return this
   }
 
-  public handleTransaction(txn: any): ProcessResult | null {
-    const ctx = new AptosContext(this.address)
+  public handleTransaction(txn: any, slot: Long): ProcessResult | null {
+    const ctx = new AptosContext(this.address, slot)
 
     if (txn) {
       this.transactionHanlder(txn, ctx)

@@ -338,20 +338,13 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         processorPromises.push(
           new Promise((resolve, _) => {
             for (const processor of global.PROCESSOR_STATE.suiProcessors) {
-              const res = processor.handleTransaction(JSON.parse(new TextDecoder().decode(txn.raw)))
+              const res = processor.handleTransaction(
+                JSON.parse(new TextDecoder().decode(txn.raw)),
+                txn.slot ?? Long.fromNumber(0)
+              )
               if (res) {
-                res.gauges.forEach((g) => {
-                  if (g.metadata && txn.slot) {
-                    g.metadata.blockNumber = txn.slot
-                  }
-                  result.gauges.push(g)
-                })
-                res.counters.forEach((c) => {
-                  if (c.metadata && txn.slot) {
-                    c.metadata.blockNumber = txn.slot
-                  }
-                  result.counters.push(c)
-                })
+                res.gauges.forEach((g) => result.gauges.push(g))
+                res.counters.forEach((c) => result.counters.push(c))
               }
             }
             resolve()
@@ -368,20 +361,13 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
           new Promise((resolve, _) => {
             for (const processor of global.PROCESSOR_STATE.aptosProcessors) {
               if (processor.address === txn.programAccountId!) {
-                const res = processor.handleTransaction(JSON.parse(new TextDecoder().decode(txn.raw)))
+                const res = processor.handleTransaction(
+                  JSON.parse(new TextDecoder().decode(txn.raw)),
+                  txn.slot ?? Long.fromNumber(0)
+                )
                 if (res) {
-                  res.gauges.forEach((g: GaugeResult) => {
-                    if (g.metadata && txn.slot) {
-                      g.metadata.blockNumber = txn.slot
-                    }
-                    result.gauges.push(g)
-                  })
-                  res.counters.forEach((c: CounterResult) => {
-                    if (c.metadata && txn.slot) {
-                      c.metadata.blockNumber = txn.slot
-                    }
-                    result.counters.push(c)
-                  })
+                  res.gauges.forEach((g) => result.gauges.push(g))
+                  res.counters.forEach((c) => result.counters.push(c))
                 }
               }
             }
@@ -426,29 +412,18 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
               if (processor.address === instruction.programAccountId) {
                 let res: ProcessResult | null
                 if (instruction.parsed) {
-                  res = processor.handleInstruction(JSON.parse(new TextDecoder().decode(instruction.parsed)))
+                  res = processor.handleInstruction(
+                    JSON.parse(new TextDecoder().decode(instruction.parsed)),
+                    instruction.slot
+                  )
                 } else if (instruction.instructionData) {
-                  res = processor.handleInstruction(instruction.instructionData)
+                  res = processor.handleInstruction(instruction.instructionData, instruction.slot)
                 } else {
                   continue
                 }
                 if (res) {
-                  try {
-                    res.gauges.forEach((g) => {
-                      if (g.metadata) {
-                        g.metadata.blockNumber = instruction.slot
-                      }
-                      result.gauges.push(g)
-                    })
-                    res.counters.forEach((c) => {
-                      if (c.metadata) {
-                        c.metadata.blockNumber = instruction.slot
-                      }
-                      result.counters.push(c)
-                    })
-                  } catch (e) {
-                    console.error('error processing instruction ' + errorString(e))
-                  }
+                  res.gauges.forEach((g) => result.gauges.push(g))
+                  res.counters.forEach((c) => result.counters.push(c))
                 } else {
                   console.warn(
                     `Failed to decode the instruction: ${instruction.instructionData} with slot: ${instruction.slot}`

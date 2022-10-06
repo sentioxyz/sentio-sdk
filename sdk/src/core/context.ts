@@ -31,13 +31,13 @@ export class EthContext extends BaseContext {
     this.block = block
     this.trace = trace
     if (log) {
-      this.blockNumber = Long.fromNumber(log.blockNumber)
+      this.blockNumber = Long.fromNumber(log.blockNumber, true)
       this.transactionHash = log.transactionHash
     } else if (block) {
-      this.blockNumber = Long.fromNumber(block.number)
+      this.blockNumber = Long.fromNumber(block.number, true)
     }
     if (trace) {
-      this.blockNumber = Long.fromNumber(trace.blockNumber)
+      this.blockNumber = Long.fromNumber(trace.blockNumber, true)
       this.transactionHash = trace.transactionHash
     }
   }
@@ -100,27 +100,33 @@ export class BoundContractView<TContract extends BaseContract, TContractView ext
 
 export class SolanaContext extends BaseContext {
   address: string
+  blockNumber: Long
 
-  constructor(address: string) {
+  constructor(address: string, slot: Long) {
     super()
     this.address = address
+    this.blockNumber = slot
   }
 }
 
 export class SuiContext extends BaseContext {
   address: string
+  blockNumber: Long
 
-  constructor(address: string) {
+  constructor(address: string, slot: Long) {
     super()
     this.address = address
+    this.blockNumber = slot
   }
 }
 
 export class AptosContext extends BaseContext {
   address: string
+  blockNumber: Long
 
-  constructor(address: string) {
+  constructor(address: string, slot: Long) {
     super()
     this.address = address
+    this.blockNumber = slot
   }
 }

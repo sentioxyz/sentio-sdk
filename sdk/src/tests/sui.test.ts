@@ -1,4 +1,5 @@
 import { expect } from 'chai'
+import Long from 'long'
 import { TextEncoder } from 'util'
 import { ProcessTransactionsRequest, SuiBaseProcessor, SuiBindOptions } from '..'
 
@@ -52,7 +53,7 @@ describe('Test Sui Example', () => {
       chainId: 'SUI_devnet',
       transactions: [
         {
-          // txHash: 'z3HjnnFFKAaszOi0pMSImtGMpRd2r7ljLjAjUoqs3Kw=',
+          slot: Long.fromNumber(12345),
           raw: new TextEncoder().encode(JSON.stringify(testData)),
           programAccountId: '0xb8252513f0b9efaa3e260842c4b84d8ff933522d',
         },
@@ -61,6 +62,7 @@ describe('Test Sui Example', () => {
     const res = await service.processTransactions(request)
     expect(res.result?.counters).length(1)
     expect(res.result?.gauges).length(0)
+    expect(res.result?.counters[0].metadata?.blockNumber.toInt()).equal(12345)
   })
 })
 
