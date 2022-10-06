@@ -102,7 +102,7 @@ function GetRecordMetaData(ctx: BaseContext, metric: Metric, labels: Labels): Re
       transactionIndex: 0,
       transactionHash: '', // TODO
       logIndex: 0,
-      chainId: 'aptos_devnet', // TODO set in context
+      chainId: 'aptos_testnet', // TODO set in context
       descriptor: descriptor,
       labels: normalizeLabels(labels),
     }
