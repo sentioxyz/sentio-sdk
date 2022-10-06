@@ -1,0 +1,32 @@
+name: docs
+
+on:
+  push:
+    branches:
+      - main
+permissions:
+  contents: write
+
+jobs:
+  build_and_lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v3
+        with:
+          cache: yarn
+          node-version: 16
+      - name: Install
+        run: yarn install
+
+      - name: Create the docs directory locally in CI
+        run: yarn gen && yarn docs
+        working-directory: sdk
+
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@4.1.4
+        with:
+          branch: gh-pages
+          folder: sdk/docs
