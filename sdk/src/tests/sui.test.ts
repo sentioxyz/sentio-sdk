@@ -2,6 +2,7 @@ import { expect } from 'chai'
 import Long from 'long'
 import { TextEncoder } from 'util'
 import { ProcessTransactionsRequest, SuiBaseProcessor, SuiBindOptions } from '..'
+import { chain } from '../utils'
 
 import { TestProcessorServer } from '../testing'
 
@@ -50,7 +51,7 @@ describe('Test Sui Example', () => {
 
   test('Check tictactoe transaction dispatch', async () => {
     const request: ProcessTransactionsRequest = {
-      chainId: 'SUI_devnet',
+      chainId: chain.SUI_DEVNET_ID,
       transactions: [
         {
           slot: Long.fromNumber(12345),

@@ -2,6 +2,7 @@ import { expect } from 'chai'
 import Long from 'long'
 import { TextEncoder } from 'util'
 import { ProcessTransactionsRequest } from '..'
+import { chain } from '../utils'
 
 import { TestProcessorServer } from '../testing'
 
@@ -21,7 +22,7 @@ describe('Test Aptos Example', () => {
 
   test('Check souffl3 transaction dispatch', async () => {
     const request: ProcessTransactionsRequest = {
-      chainId: 'aptos_testnet',
+      chainId: chain.APTOS_TESTNET_ID,
       transactions: [
         {
           raw: new TextEncoder().encode(JSON.stringify(testData)),

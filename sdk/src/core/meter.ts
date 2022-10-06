@@ -1,7 +1,7 @@
 import { MetricDescriptor, RecordMetaData } from '../gen/processor/protos/processor'
 import { AptosContext, BaseContext, Context, SolanaContext, SuiContext } from './context'
 import { toMetricValue, Numberish } from './numberish'
-import Long from 'long'
+import { APTOS_TESTNET_ID, SOL_MAINMET_ID, SUI_DEVNET_ID } from '../utils/chain'
 
 export function normalizeName(name: string): string {
   const regex = new RegExp('![_.a-zA-Z0-9]')
@@ -80,7 +80,7 @@ function GetRecordMetaData(ctx: BaseContext, metric: Metric, labels: Labels): Re
       transactionIndex: 0,
       transactionHash: '', // TODO add
       logIndex: 0,
-      chainId: 'SOL_mainnet', // TODO set in context
+      chainId: SOL_MAINMET_ID, // TODO set in context
       descriptor: descriptor,
       labels: normalizeLabels(labels),
     }
@@ -91,7 +91,7 @@ function GetRecordMetaData(ctx: BaseContext, metric: Metric, labels: Labels): Re
       transactionIndex: 0,
       transactionHash: '', // TODO
       logIndex: 0,
-      chainId: 'SUI_devnet', // TODO set in context
+      chainId: SUI_DEVNET_ID, // TODO set in context
       descriptor: descriptor,
       labels: normalizeLabels(labels),
     }
@@ -102,7 +102,7 @@ function GetRecordMetaData(ctx: BaseContext, metric: Metric, labels: Labels): Re
       transactionIndex: 0,
       transactionHash: '', // TODO
       logIndex: 0,
-      chainId: 'aptos_testnet', // TODO set in context
+      chainId: APTOS_TESTNET_ID, // TODO set in context
       descriptor: descriptor,
       labels: normalizeLabels(labels),
     }

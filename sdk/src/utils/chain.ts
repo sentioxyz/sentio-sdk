@@ -2,9 +2,6 @@
 // and https://besu.hyperledger.org/en/stable/Concepts/NetworkID-And-ChainID/
 
 export const CHAIN_MAP: Record<string, string> = {
-  SOL_mainnet: 'solana',
-  SOL_devnet: 'solana-dev',
-  SOL_testnet: 'solana-test',
   0: 'kardia',
   1: 'ethereum',
   2: 'expanse',
@@ -82,6 +79,19 @@ export const CHAIN_MAP: Record<string, string> = {
   11297108109: 'palm',
   836542336838601: 'curio',
 }
+
+export const SOL_MAINMET_ID = 'sol_mainnet'
+export const SOL_DEVNET_ID = 'sol_devnet'
+export const SOL_TESTNENT_ID = 'sol_testnet'
+CHAIN_MAP[SOL_MAINMET_ID] = 'solana'
+CHAIN_MAP[SOL_DEVNET_ID] = 'solana-dev'
+CHAIN_MAP[SOL_TESTNENT_ID] = 'solana-test'
+
+export const SUI_DEVNET_ID = 'sui_devnet'
+CHAIN_MAP[SUI_DEVNET_ID] = 'sui-dev'
+
+export const APTOS_TESTNET_ID = 'aptos_testnet'
+CHAIN_MAP[APTOS_TESTNET_ID] = 'aptos-test'
 
 export function getChainName(chainId: string | number): string {
   if (typeof chainId === 'number') {

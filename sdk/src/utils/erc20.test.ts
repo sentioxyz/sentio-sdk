@@ -1,4 +1,7 @@
-import { ProcessorState } from '@sentio/sdk'
+import { ProcessorState, DummyProvider } from '@sentio/sdk'
+
+console.log(DummyProvider)
+
 import { getERC20TokenInfo } from './token'
 import { loadTestProvidersFromEnv } from '../testing/test-provider'
 

@@ -1,5 +1,6 @@
 import { Block, Log } from '@ethersproject/abstract-provider'
 import { CallContext, ServerError, Status } from 'nice-grpc'
+import { APTOS_TESTNET_ID, SOL_MAINMET_ID, SUI_DEVNET_ID } from './utils/chain'
 
 import {
   BlockBinding,
@@ -24,8 +25,6 @@ import {
   StartRequest,
   TemplateInstance,
   TraceBinding,
-  CounterResult,
-  GaugeResult,
 } from './gen/processor/protos/processor'
 
 import { Empty } from './gen/google/protobuf/empty'
@@ -34,6 +33,8 @@ import { TextDecoder } from 'util'
 import { Trace } from './core'
 
 const DEFAULT_MAX_BLOCK = Long.ZERO
+
+const USER_PROCESSOR = 'user_processor'
 
 export class ProcessorServiceImpl implements ProcessorServiceImplementation {
   private eventHandlers: ((event: Log) => Promise<ProcessResult>)[] = []
@@ -84,7 +85,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       // this.processorsByChainId.set(chainId, processor)
 
       const contractConfig: ContractConfig = {
-        processorType: 'user_processor',
+        processorType: USER_PROCESSOR,
         contract: {
           name: processor.config.name,
           chainId: chainId.toString(),
@@ -157,10 +158,10 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     // Part 2, prepare solana constractors
     for (const solanaProcessor of global.PROCESSOR_STATE.solanaProcessors) {
       const contractConfig: ContractConfig = {
-        processorType: 'user_processor',
+        processorType: USER_PROCESSOR,
         contract: {
           name: solanaProcessor.contractName,
-          chainId: 'SOL_mainnet', // TODO set in processor
+          chainId: SOL_MAINMET_ID, // TODO set in processor
           address: solanaProcessor.address,
           abi: '',
         },
@@ -181,10 +182,10 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     // Part 3, prepare sui constractors
     for (const suiProcessor of global.PROCESSOR_STATE.suiProcessors) {
       const contractConfig: ContractConfig = {
-        processorType: 'user_processor',
+        processorType: USER_PROCESSOR,
         contract: {
-          name: 'sui processor',
-          chainId: 'SUI_devnet',
+          name: 'sui contract',
+          chainId: SUI_DEVNET_ID,
           address: suiProcessor.address,
           abi: '',
         },
@@ -201,10 +202,10 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     // Part 3, prepare aptos constractors
     for (const aptosProcessor of global.PROCESSOR_STATE.aptosProcessors) {
       const contractConfig: ContractConfig = {
-        processorType: 'user_processor',
+        processorType: USER_PROCESSOR,
         contract: {
-          name: 'aptos processor',
-          chainId: 'aptos_testnet',
+          name: aptosProcessor.name,
+          chainId: APTOS_TESTNET_ID,
           address: aptosProcessor.address,
           abi: '',
         },

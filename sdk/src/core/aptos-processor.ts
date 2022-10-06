@@ -11,6 +11,7 @@ type IndexConfigure = {
 export class AptosBaseProcessor {
   public transactionHanlder: (transaction: any, ctx: AptosContext) => void
   address: string
+  name: string
   config: IndexConfigure = { startSeqNumber: new Long(0) }
 
   constructor(options: AptosBindOptions) {
@@ -22,6 +23,7 @@ export class AptosBaseProcessor {
 
   bind(options: AptosBindOptions) {
     this.address = options.address
+    this.name = options.name || this.address
     if (options.startBlock) {
       this.startSlot(options.startBlock)
     }
