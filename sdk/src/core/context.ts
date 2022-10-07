@@ -4,15 +4,18 @@ import { Block, Log } from '@ethersproject/abstract-provider'
 import { Meter } from './meter'
 import Long from 'long'
 import { Trace } from './trace'
+import { Logger } from './logger'
 
 export class BaseContext {
   gauges: GaugeResult[] = []
   counters: CounterResult[] = []
   logs: LogResult[] = []
   meter: Meter
+  logger: Logger
 
   constructor() {
     this.meter = new Meter(this)
+    this.logger = new Logger(this)
   }
 }
 
@@ -35,8 +38,7 @@ export class EthContext extends BaseContext {
       this.transactionHash = log.transactionHash
     } else if (block) {
       this.blockNumber = Long.fromNumber(block.number, true)
-    }
-    if (trace) {
+    } else if (trace) {
       this.blockNumber = Long.fromNumber(trace.blockNumber, true)
       this.transactionHash = trace.transactionHash
     }

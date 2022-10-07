@@ -269,12 +269,6 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       throw new ServerError(Status.UNAVAILABLE, 'Service Not started.')
     }
 
-    const resp: ProcessResult = {
-      gauges: [],
-      counters: [],
-      logs: [],
-    }
-
     const promises: Promise<ProcessResult>[] = []
     for (const l of request.logBindings) {
       if (!l.log) {
@@ -297,11 +291,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       }
     }
 
-    const results = await Promise.all(promises)
-    for (const res of results) {
-      resp.counters = resp.counters.concat(res.counters)
-      resp.gauges = resp.gauges.concat(res.gauges)
-    }
+    const result = mergeProcessResults(await Promise.all(promises))
 
     let updated = false
     if (
@@ -312,9 +302,9 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       updated = true
     }
 
-    recordRuntimeInfo(resp, HandlerType.LOG)
+    recordRuntimeInfo(result, HandlerType.LOG)
     return {
-      result: resp,
+      result,
       configUpdated: updated,
     }
   }
@@ -346,6 +336,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
               if (res) {
                 res.gauges.forEach((g) => result.gauges.push(g))
                 res.counters.forEach((c) => result.counters.push(c))
+                res.logs.forEach((l) => result.logs.push(l))
               }
             }
             resolve()
@@ -369,6 +360,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
                 if (res) {
                   res.gauges.forEach((g) => result.gauges.push(g))
                   res.counters.forEach((c) => result.counters.push(c))
+                  res.logs.forEach((l) => result.logs.push(l))
                 }
               }
             }
@@ -425,6 +417,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
                 if (res) {
                   res.gauges.forEach((g) => result.gauges.push(g))
                   res.counters.forEach((c) => result.counters.push(c))
+                  res.logs.forEach((l) => result.logs.push(l))
                 } else {
                   console.warn(
                     `Failed to decode the instruction: ${instruction.instructionData} with slot: ${instruction.slot}`
@@ -452,18 +445,11 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     }
 
     const promises = request.blockBindings.map((binding) => this.processBlock(binding))
-    const results = await Promise.all(promises)
+    const result = mergeProcessResults(await Promise.all(promises))
 
-    const res = ProcessResult.fromPartial({})
-
-    for (const r of results) {
-      res.counters = res.counters.concat(r.counters)
-      res.gauges = res.gauges.concat(r.gauges)
-    }
-
-    recordRuntimeInfo(res, HandlerType.BLOCK)
+    recordRuntimeInfo(result, HandlerType.BLOCK)
     return {
-      result: res,
+      result,
     }
   }
 
@@ -475,12 +461,6 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
 
     const block: Block = JSON.parse(jsonString)
 
-    const resp: ProcessResult = {
-      gauges: [],
-      counters: [],
-      logs: [],
-    }
-
     const promises: Promise<ProcessResult>[] = []
     for (const handlerId of binding.handlerIds) {
       const promise = this.blockHandlers[handlerId](block).catch((e) => {
@@ -488,12 +468,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       })
       promises.push(promise)
     }
-    const allRes = await Promise.all(promises)
-    for (const res of allRes) {
-      resp.counters = resp.counters.concat(res.counters)
-      resp.gauges = resp.gauges.concat(res.gauges)
-    }
-    return resp
+    return mergeProcessResults(await Promise.all(promises))
   }
 
   async processTraces(request: ProcessTracesRequest, context: CallContext): Promise<ProcessTracesResponse> {
@@ -502,18 +477,11 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     }
 
     const promises = request.traceBindings.map((binding) => this.processTrace(binding))
-    const results = await Promise.all(promises)
+    const result = mergeProcessResults(await Promise.all(promises))
 
-    const res = ProcessResult.fromPartial({})
-
-    for (const r of results) {
-      res.counters = res.counters.concat(r.counters)
-      res.gauges = res.gauges.concat(r.gauges)
-    }
-
-    recordRuntimeInfo(res, HandlerType.TRACE)
+    recordRuntimeInfo(result, HandlerType.TRACE)
     return {
-      result: res,
+      result,
     }
   }
 
@@ -571,6 +539,17 @@ function Utf8ArrayToStr(array: Uint8Array) {
   return out
 }
 
+function mergeProcessResults(results: ProcessResult[]): ProcessResult {
+  const res = ProcessResult.fromPartial({})
+
+  for (const r of results) {
+    res.counters = res.counters.concat(r.counters)
+    res.gauges = res.gauges.concat(r.gauges)
+    res.logs = res.logs.concat(r.logs)
+  }
+  return res
+}
+
 function recordRuntimeInfo(results: ProcessResult, handlerType: HandlerType) {
   results.gauges.forEach((e) => {
     e.runtimeInfo = {
@@ -579,6 +558,12 @@ function recordRuntimeInfo(results: ProcessResult, handlerType: HandlerType) {
   })
 
   results.counters.forEach((e) => {
+    e.runtimeInfo = {
+      from: handlerType,
+    }
+  })
+
+  results.logs.forEach((e) => {
     e.runtimeInfo = {
       from: handlerType,
     }

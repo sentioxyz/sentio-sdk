@@ -95,7 +95,7 @@ export abstract class BaseProcessor<
           return {
             gauges: ctx.gauges,
             counters: ctx.counters,
-            logs: [],
+            logs: ctx.logs,
           }
         }
         return {
@@ -118,7 +118,7 @@ export abstract class BaseProcessor<
       return {
         gauges: ctx.gauges,
         counters: ctx.counters,
-        logs: [],
+        logs: ctx.logs,
       }
     })
     return this
@@ -163,7 +163,7 @@ export abstract class BaseProcessor<
         return {
           gauges: ctx.gauges,
           counters: ctx.counters,
-          logs: [],
+          logs: ctx.logs,
         }
       },
     })

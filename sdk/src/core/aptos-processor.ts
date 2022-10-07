@@ -51,7 +51,7 @@ export class AptosBaseProcessor {
     return {
       gauges: ctx.gauges,
       counters: ctx.counters,
-      logs: [],
+      logs: ctx.logs,
     }
   }
 
