@@ -36,7 +36,7 @@ module.exports = {
       if (/^@(ethersproject|solana|project-serum).*$/.test(request)) {
         return callback(null, 'commonjs ' + request)
       }
-      if (request.startsWith("@sentio")) {
+      if (request.startsWith("@sentio-sdk")) {
         return callback(null, 'commonjs2 ' + request)
       }
       callback()
