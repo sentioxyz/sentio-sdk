@@ -10,6 +10,7 @@ import path from 'path'
 import fs from 'fs-extra'
 import { ProcessorState } from './processor-state'
 import { load } from './loader'
+import { CompressionAlgorithms } from '@grpc/grpc-js/src/compression-algorithms'
 
 global.PROCESSOR_STATE = new ProcessorState()
 
@@ -40,6 +41,7 @@ console.log('Start Server', options)
 const server = createServer({
   'grpc.max_send_message_length': 64 * 1024 * 1024,
   'grpc.max_receive_message_length': 64 * 1024 * 1024,
+  'grpc.default_compression_algorithm': CompressionAlgorithms.gzip,
 })
 
 const service = new ProcessorServiceImpl(() => load(options.target), server.shutdown)
