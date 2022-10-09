@@ -10,7 +10,7 @@ import path from 'path'
 import fs from 'fs-extra'
 import { ProcessorState } from './processor-state'
 import { load } from './loader'
-import { CompressionAlgorithms } from '@grpc/grpc-js/src/compression-algorithms'
+import { CompressionAlgorithms } from '@grpc/grpc-js/build/src/compression-algorithms'
 
 global.PROCESSOR_STATE = new ProcessorState()
 
