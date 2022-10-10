@@ -11,6 +11,8 @@ export enum HandlerType {
   TRANSACTION = 3,
   INSTRUCTION = 4,
   TRACE = 5,
+  EVENT = 6,
+  CALL = 7,
   UNRECOGNIZED = -1,
 }
 
@@ -34,6 +36,12 @@ export function handlerTypeFromJSON(object: any): HandlerType {
     case 5:
     case "TRACE":
       return HandlerType.TRACE;
+    case 6:
+    case "EVENT":
+      return HandlerType.EVENT;
+    case 7:
+    case "CALL":
+      return HandlerType.CALL;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -55,6 +63,10 @@ export function handlerTypeToJSON(object: HandlerType): string {
       return "INSTRUCTION";
     case HandlerType.TRACE:
       return "TRACE";
+    case HandlerType.EVENT:
+      return "EVENT";
+    case HandlerType.CALL:
+      return "CALL";
     case HandlerType.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
@@ -130,9 +142,11 @@ export interface ContractConfig {
   blockConfigs: BlockHandlerConfig[];
   logConfigs: LogHandlerConfig[];
   traceConfigs: TraceHandlerConfig[];
+  aptosEventConfigs: AptosEventHandlerConfig[];
+  aptosCallConfigs: AptosCallHandlerConfig[];
+  instructionConfig: InstructionHandlerConfig | undefined;
   startBlock: Long;
   endBlock: Long;
-  instructionConfig: InstructionHandlerConfig | undefined;
   processorType: string;
 }
 
@@ -176,6 +190,25 @@ export interface InstructionHandlerConfig {
   innerInstruction: boolean;
   parsedInstruction: boolean;
   rawDataInstruction: boolean;
+}
+
+export interface AptosEventHandlerConfig {
+  filters: AptosEventFilter[];
+  handlerId: number;
+}
+
+export interface AptosEventFilter {
+  type: string;
+}
+
+export interface AptosCallHandlerConfig {
+  filters: AptosCallFilter[];
+  handlerId: number;
+}
+
+export interface AptosCallFilter {
+  function: string;
+  typeArguments: string[];
 }
 
 export interface Topic {
@@ -224,6 +257,22 @@ export interface ProcessBlocksResponse {
   result: ProcessResult | undefined;
 }
 
+export interface ProcessEventsRequest {
+  eventBindings: EventBinding[];
+}
+
+export interface ProcessEventsResponse {
+  result: ProcessResult | undefined;
+}
+
+export interface ProcessCallsRequest {
+  callBindings: CallBinding[];
+}
+
+export interface ProcessCallsResponse {
+  result: ProcessResult | undefined;
+}
+
 export interface LogBinding {
   log: RawLog | undefined;
   handlerId: number;
@@ -261,6 +310,24 @@ export interface BlockBinding {
 }
 
 export interface RawBlock {
+  raw: Uint8Array;
+}
+
+export interface EventBinding {
+  event: RawEvent | undefined;
+  handlerId: number;
+}
+
+export interface RawEvent {
+  raw: Uint8Array;
+}
+
+export interface CallBinding {
+  call: RawCall | undefined;
+  handlerId: number;
+}
+
+export interface RawCall {
   raw: Uint8Array;
 }
 
@@ -546,9 +613,11 @@ function createBaseContractConfig(): ContractConfig {
     blockConfigs: [],
     logConfigs: [],
     traceConfigs: [],
+    aptosEventConfigs: [],
+    aptosCallConfigs: [],
+    instructionConfig: undefined,
     startBlock: Long.UZERO,
     endBlock: Long.UZERO,
-    instructionConfig: undefined,
     processorType: "",
   };
 }
@@ -570,17 +639,23 @@ export const ContractConfig = {
     for (const v of message.traceConfigs) {
       TraceHandlerConfig.encode(v!, writer.uint32(18).fork()).ldelim();
     }
-    if (!message.startBlock.isZero()) {
-      writer.uint32(32).uint64(message.startBlock);
+    for (const v of message.aptosEventConfigs) {
+      AptosEventHandlerConfig.encode(v!, writer.uint32(74).fork()).ldelim();
     }
-    if (!message.endBlock.isZero()) {
-      writer.uint32(40).uint64(message.endBlock);
+    for (const v of message.aptosCallConfigs) {
+      AptosCallHandlerConfig.encode(v!, writer.uint32(82).fork()).ldelim();
     }
     if (message.instructionConfig !== undefined) {
       InstructionHandlerConfig.encode(
         message.instructionConfig,
         writer.uint32(50).fork()
       ).ldelim();
+    }
+    if (!message.startBlock.isZero()) {
+      writer.uint32(32).uint64(message.startBlock);
+    }
+    if (!message.endBlock.isZero()) {
+      writer.uint32(40).uint64(message.endBlock);
     }
     if (message.processorType !== "") {
       writer.uint32(66).string(message.processorType);
@@ -613,17 +688,27 @@ export const ContractConfig = {
             TraceHandlerConfig.decode(reader, reader.uint32())
           );
           break;
-        case 4:
-          message.startBlock = reader.uint64() as Long;
+        case 9:
+          message.aptosEventConfigs.push(
+            AptosEventHandlerConfig.decode(reader, reader.uint32())
+          );
           break;
-        case 5:
-          message.endBlock = reader.uint64() as Long;
+        case 10:
+          message.aptosCallConfigs.push(
+            AptosCallHandlerConfig.decode(reader, reader.uint32())
+          );
           break;
         case 6:
           message.instructionConfig = InstructionHandlerConfig.decode(
             reader,
             reader.uint32()
           );
+          break;
+        case 4:
+          message.startBlock = reader.uint64() as Long;
+          break;
+        case 5:
+          message.endBlock = reader.uint64() as Long;
           break;
         case 8:
           message.processorType = reader.string();
@@ -650,15 +735,25 @@ export const ContractConfig = {
       traceConfigs: Array.isArray(object?.traceConfigs)
         ? object.traceConfigs.map((e: any) => TraceHandlerConfig.fromJSON(e))
         : [],
+      aptosEventConfigs: Array.isArray(object?.aptosEventConfigs)
+        ? object.aptosEventConfigs.map((e: any) =>
+            AptosEventHandlerConfig.fromJSON(e)
+          )
+        : [],
+      aptosCallConfigs: Array.isArray(object?.aptosCallConfigs)
+        ? object.aptosCallConfigs.map((e: any) =>
+            AptosCallHandlerConfig.fromJSON(e)
+          )
+        : [],
+      instructionConfig: isSet(object.instructionConfig)
+        ? InstructionHandlerConfig.fromJSON(object.instructionConfig)
+        : undefined,
       startBlock: isSet(object.startBlock)
         ? Long.fromValue(object.startBlock)
         : Long.UZERO,
       endBlock: isSet(object.endBlock)
         ? Long.fromValue(object.endBlock)
         : Long.UZERO,
-      instructionConfig: isSet(object.instructionConfig)
-        ? InstructionHandlerConfig.fromJSON(object.instructionConfig)
-        : undefined,
       processorType: isSet(object.processorType)
         ? String(object.processorType)
         : "",
@@ -692,14 +787,28 @@ export const ContractConfig = {
     } else {
       obj.traceConfigs = [];
     }
-    message.startBlock !== undefined &&
-      (obj.startBlock = (message.startBlock || Long.UZERO).toString());
-    message.endBlock !== undefined &&
-      (obj.endBlock = (message.endBlock || Long.UZERO).toString());
+    if (message.aptosEventConfigs) {
+      obj.aptosEventConfigs = message.aptosEventConfigs.map((e) =>
+        e ? AptosEventHandlerConfig.toJSON(e) : undefined
+      );
+    } else {
+      obj.aptosEventConfigs = [];
+    }
+    if (message.aptosCallConfigs) {
+      obj.aptosCallConfigs = message.aptosCallConfigs.map((e) =>
+        e ? AptosCallHandlerConfig.toJSON(e) : undefined
+      );
+    } else {
+      obj.aptosCallConfigs = [];
+    }
     message.instructionConfig !== undefined &&
       (obj.instructionConfig = message.instructionConfig
         ? InstructionHandlerConfig.toJSON(message.instructionConfig)
         : undefined);
+    message.startBlock !== undefined &&
+      (obj.startBlock = (message.startBlock || Long.UZERO).toString());
+    message.endBlock !== undefined &&
+      (obj.endBlock = (message.endBlock || Long.UZERO).toString());
     message.processorType !== undefined &&
       (obj.processorType = message.processorType);
     return obj;
@@ -717,6 +826,19 @@ export const ContractConfig = {
       object.logConfigs?.map((e) => LogHandlerConfig.fromPartial(e)) || [];
     message.traceConfigs =
       object.traceConfigs?.map((e) => TraceHandlerConfig.fromPartial(e)) || [];
+    message.aptosEventConfigs =
+      object.aptosEventConfigs?.map((e) =>
+        AptosEventHandlerConfig.fromPartial(e)
+      ) || [];
+    message.aptosCallConfigs =
+      object.aptosCallConfigs?.map((e) =>
+        AptosCallHandlerConfig.fromPartial(e)
+      ) || [];
+    message.instructionConfig =
+      object.instructionConfig !== undefined &&
+      object.instructionConfig !== null
+        ? InstructionHandlerConfig.fromPartial(object.instructionConfig)
+        : undefined;
     message.startBlock =
       object.startBlock !== undefined && object.startBlock !== null
         ? Long.fromValue(object.startBlock)
@@ -725,11 +847,6 @@ export const ContractConfig = {
       object.endBlock !== undefined && object.endBlock !== null
         ? Long.fromValue(object.endBlock)
         : Long.UZERO;
-    message.instructionConfig =
-      object.instructionConfig !== undefined &&
-      object.instructionConfig !== null
-        ? InstructionHandlerConfig.fromPartial(object.instructionConfig)
-        : undefined;
     message.processorType = object.processorType ?? "";
     return message;
   },
@@ -1311,6 +1428,279 @@ export const InstructionHandlerConfig = {
     message.innerInstruction = object.innerInstruction ?? false;
     message.parsedInstruction = object.parsedInstruction ?? false;
     message.rawDataInstruction = object.rawDataInstruction ?? false;
+    return message;
+  },
+};
+
+function createBaseAptosEventHandlerConfig(): AptosEventHandlerConfig {
+  return { filters: [], handlerId: 0 };
+}
+
+export const AptosEventHandlerConfig = {
+  encode(
+    message: AptosEventHandlerConfig,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    for (const v of message.filters) {
+      AptosEventFilter.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.handlerId !== 0) {
+      writer.uint32(16).int32(message.handlerId);
+    }
+    return writer;
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): AptosEventHandlerConfig {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAptosEventHandlerConfig();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.filters.push(
+            AptosEventFilter.decode(reader, reader.uint32())
+          );
+          break;
+        case 2:
+          message.handlerId = reader.int32();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): AptosEventHandlerConfig {
+    return {
+      filters: Array.isArray(object?.filters)
+        ? object.filters.map((e: any) => AptosEventFilter.fromJSON(e))
+        : [],
+      handlerId: isSet(object.handlerId) ? Number(object.handlerId) : 0,
+    };
+  },
+
+  toJSON(message: AptosEventHandlerConfig): unknown {
+    const obj: any = {};
+    if (message.filters) {
+      obj.filters = message.filters.map((e) =>
+        e ? AptosEventFilter.toJSON(e) : undefined
+      );
+    } else {
+      obj.filters = [];
+    }
+    message.handlerId !== undefined &&
+      (obj.handlerId = Math.round(message.handlerId));
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<AptosEventHandlerConfig>
+  ): AptosEventHandlerConfig {
+    const message = createBaseAptosEventHandlerConfig();
+    message.filters =
+      object.filters?.map((e) => AptosEventFilter.fromPartial(e)) || [];
+    message.handlerId = object.handlerId ?? 0;
+    return message;
+  },
+};
+
+function createBaseAptosEventFilter(): AptosEventFilter {
+  return { type: "" };
+}
+
+export const AptosEventFilter = {
+  encode(
+    message: AptosEventFilter,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.type !== "") {
+      writer.uint32(10).string(message.type);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): AptosEventFilter {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAptosEventFilter();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.type = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): AptosEventFilter {
+    return {
+      type: isSet(object.type) ? String(object.type) : "",
+    };
+  },
+
+  toJSON(message: AptosEventFilter): unknown {
+    const obj: any = {};
+    message.type !== undefined && (obj.type = message.type);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<AptosEventFilter>): AptosEventFilter {
+    const message = createBaseAptosEventFilter();
+    message.type = object.type ?? "";
+    return message;
+  },
+};
+
+function createBaseAptosCallHandlerConfig(): AptosCallHandlerConfig {
+  return { filters: [], handlerId: 0 };
+}
+
+export const AptosCallHandlerConfig = {
+  encode(
+    message: AptosCallHandlerConfig,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    for (const v of message.filters) {
+      AptosCallFilter.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.handlerId !== 0) {
+      writer.uint32(16).int32(message.handlerId);
+    }
+    return writer;
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): AptosCallHandlerConfig {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAptosCallHandlerConfig();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.filters.push(AptosCallFilter.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.handlerId = reader.int32();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): AptosCallHandlerConfig {
+    return {
+      filters: Array.isArray(object?.filters)
+        ? object.filters.map((e: any) => AptosCallFilter.fromJSON(e))
+        : [],
+      handlerId: isSet(object.handlerId) ? Number(object.handlerId) : 0,
+    };
+  },
+
+  toJSON(message: AptosCallHandlerConfig): unknown {
+    const obj: any = {};
+    if (message.filters) {
+      obj.filters = message.filters.map((e) =>
+        e ? AptosCallFilter.toJSON(e) : undefined
+      );
+    } else {
+      obj.filters = [];
+    }
+    message.handlerId !== undefined &&
+      (obj.handlerId = Math.round(message.handlerId));
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<AptosCallHandlerConfig>
+  ): AptosCallHandlerConfig {
+    const message = createBaseAptosCallHandlerConfig();
+    message.filters =
+      object.filters?.map((e) => AptosCallFilter.fromPartial(e)) || [];
+    message.handlerId = object.handlerId ?? 0;
+    return message;
+  },
+};
+
+function createBaseAptosCallFilter(): AptosCallFilter {
+  return { function: "", typeArguments: [] };
+}
+
+export const AptosCallFilter = {
+  encode(
+    message: AptosCallFilter,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.function !== "") {
+      writer.uint32(10).string(message.function);
+    }
+    for (const v of message.typeArguments) {
+      writer.uint32(18).string(v!);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): AptosCallFilter {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAptosCallFilter();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.function = reader.string();
+          break;
+        case 2:
+          message.typeArguments.push(reader.string());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): AptosCallFilter {
+    return {
+      function: isSet(object.function) ? String(object.function) : "",
+      typeArguments: Array.isArray(object?.typeArguments)
+        ? object.typeArguments.map((e: any) => String(e))
+        : [],
+    };
+  },
+
+  toJSON(message: AptosCallFilter): unknown {
+    const obj: any = {};
+    message.function !== undefined && (obj.function = message.function);
+    if (message.typeArguments) {
+      obj.typeArguments = message.typeArguments.map((e) => e);
+    } else {
+      obj.typeArguments = [];
+    }
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<AptosCallFilter>): AptosCallFilter {
+    const message = createBaseAptosCallFilter();
+    message.function = object.function ?? "";
+    message.typeArguments = object.typeArguments?.map((e) => e) || [];
     return message;
   },
 };
@@ -2040,6 +2430,263 @@ export const ProcessBlocksResponse = {
   },
 };
 
+function createBaseProcessEventsRequest(): ProcessEventsRequest {
+  return { eventBindings: [] };
+}
+
+export const ProcessEventsRequest = {
+  encode(
+    message: ProcessEventsRequest,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    for (const v of message.eventBindings) {
+      EventBinding.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): ProcessEventsRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseProcessEventsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.eventBindings.push(
+            EventBinding.decode(reader, reader.uint32())
+          );
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ProcessEventsRequest {
+    return {
+      eventBindings: Array.isArray(object?.eventBindings)
+        ? object.eventBindings.map((e: any) => EventBinding.fromJSON(e))
+        : [],
+    };
+  },
+
+  toJSON(message: ProcessEventsRequest): unknown {
+    const obj: any = {};
+    if (message.eventBindings) {
+      obj.eventBindings = message.eventBindings.map((e) =>
+        e ? EventBinding.toJSON(e) : undefined
+      );
+    } else {
+      obj.eventBindings = [];
+    }
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<ProcessEventsRequest>): ProcessEventsRequest {
+    const message = createBaseProcessEventsRequest();
+    message.eventBindings =
+      object.eventBindings?.map((e) => EventBinding.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseProcessEventsResponse(): ProcessEventsResponse {
+  return { result: undefined };
+}
+
+export const ProcessEventsResponse = {
+  encode(
+    message: ProcessEventsResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.result !== undefined) {
+      ProcessResult.encode(message.result, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): ProcessEventsResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseProcessEventsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.result = ProcessResult.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ProcessEventsResponse {
+    return {
+      result: isSet(object.result)
+        ? ProcessResult.fromJSON(object.result)
+        : undefined,
+    };
+  },
+
+  toJSON(message: ProcessEventsResponse): unknown {
+    const obj: any = {};
+    message.result !== undefined &&
+      (obj.result = message.result
+        ? ProcessResult.toJSON(message.result)
+        : undefined);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<ProcessEventsResponse>
+  ): ProcessEventsResponse {
+    const message = createBaseProcessEventsResponse();
+    message.result =
+      object.result !== undefined && object.result !== null
+        ? ProcessResult.fromPartial(object.result)
+        : undefined;
+    return message;
+  },
+};
+
+function createBaseProcessCallsRequest(): ProcessCallsRequest {
+  return { callBindings: [] };
+}
+
+export const ProcessCallsRequest = {
+  encode(
+    message: ProcessCallsRequest,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    for (const v of message.callBindings) {
+      CallBinding.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ProcessCallsRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseProcessCallsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.callBindings.push(
+            CallBinding.decode(reader, reader.uint32())
+          );
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ProcessCallsRequest {
+    return {
+      callBindings: Array.isArray(object?.callBindings)
+        ? object.callBindings.map((e: any) => CallBinding.fromJSON(e))
+        : [],
+    };
+  },
+
+  toJSON(message: ProcessCallsRequest): unknown {
+    const obj: any = {};
+    if (message.callBindings) {
+      obj.callBindings = message.callBindings.map((e) =>
+        e ? CallBinding.toJSON(e) : undefined
+      );
+    } else {
+      obj.callBindings = [];
+    }
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<ProcessCallsRequest>): ProcessCallsRequest {
+    const message = createBaseProcessCallsRequest();
+    message.callBindings =
+      object.callBindings?.map((e) => CallBinding.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseProcessCallsResponse(): ProcessCallsResponse {
+  return { result: undefined };
+}
+
+export const ProcessCallsResponse = {
+  encode(
+    message: ProcessCallsResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.result !== undefined) {
+      ProcessResult.encode(message.result, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): ProcessCallsResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseProcessCallsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.result = ProcessResult.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ProcessCallsResponse {
+    return {
+      result: isSet(object.result)
+        ? ProcessResult.fromJSON(object.result)
+        : undefined,
+    };
+  },
+
+  toJSON(message: ProcessCallsResponse): unknown {
+    const obj: any = {};
+    message.result !== undefined &&
+      (obj.result = message.result
+        ? ProcessResult.toJSON(message.result)
+        : undefined);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<ProcessCallsResponse>): ProcessCallsResponse {
+    const message = createBaseProcessCallsResponse();
+    message.result =
+      object.result !== undefined && object.result !== null
+        ? ProcessResult.fromPartial(object.result)
+        : undefined;
+    return message;
+  },
+};
+
 function createBaseLogBinding(): LogBinding {
   return { log: undefined, handlerId: 0 };
 }
@@ -2594,6 +3241,248 @@ export const RawBlock = {
 
   fromPartial(object: DeepPartial<RawBlock>): RawBlock {
     const message = createBaseRawBlock();
+    message.raw = object.raw ?? new Uint8Array();
+    return message;
+  },
+};
+
+function createBaseEventBinding(): EventBinding {
+  return { event: undefined, handlerId: 0 };
+}
+
+export const EventBinding = {
+  encode(
+    message: EventBinding,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.event !== undefined) {
+      RawEvent.encode(message.event, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.handlerId !== 0) {
+      writer.uint32(16).int32(message.handlerId);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): EventBinding {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseEventBinding();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.event = RawEvent.decode(reader, reader.uint32());
+          break;
+        case 2:
+          message.handlerId = reader.int32();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): EventBinding {
+    return {
+      event: isSet(object.event) ? RawEvent.fromJSON(object.event) : undefined,
+      handlerId: isSet(object.handlerId) ? Number(object.handlerId) : 0,
+    };
+  },
+
+  toJSON(message: EventBinding): unknown {
+    const obj: any = {};
+    message.event !== undefined &&
+      (obj.event = message.event ? RawEvent.toJSON(message.event) : undefined);
+    message.handlerId !== undefined &&
+      (obj.handlerId = Math.round(message.handlerId));
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<EventBinding>): EventBinding {
+    const message = createBaseEventBinding();
+    message.event =
+      object.event !== undefined && object.event !== null
+        ? RawEvent.fromPartial(object.event)
+        : undefined;
+    message.handlerId = object.handlerId ?? 0;
+    return message;
+  },
+};
+
+function createBaseRawEvent(): RawEvent {
+  return { raw: new Uint8Array() };
+}
+
+export const RawEvent = {
+  encode(
+    message: RawEvent,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.raw.length !== 0) {
+      writer.uint32(10).bytes(message.raw);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): RawEvent {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRawEvent();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.raw = reader.bytes();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): RawEvent {
+    return {
+      raw: isSet(object.raw) ? bytesFromBase64(object.raw) : new Uint8Array(),
+    };
+  },
+
+  toJSON(message: RawEvent): unknown {
+    const obj: any = {};
+    message.raw !== undefined &&
+      (obj.raw = base64FromBytes(
+        message.raw !== undefined ? message.raw : new Uint8Array()
+      ));
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<RawEvent>): RawEvent {
+    const message = createBaseRawEvent();
+    message.raw = object.raw ?? new Uint8Array();
+    return message;
+  },
+};
+
+function createBaseCallBinding(): CallBinding {
+  return { call: undefined, handlerId: 0 };
+}
+
+export const CallBinding = {
+  encode(
+    message: CallBinding,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.call !== undefined) {
+      RawCall.encode(message.call, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.handlerId !== 0) {
+      writer.uint32(16).int32(message.handlerId);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): CallBinding {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCallBinding();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.call = RawCall.decode(reader, reader.uint32());
+          break;
+        case 2:
+          message.handlerId = reader.int32();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): CallBinding {
+    return {
+      call: isSet(object.call) ? RawCall.fromJSON(object.call) : undefined,
+      handlerId: isSet(object.handlerId) ? Number(object.handlerId) : 0,
+    };
+  },
+
+  toJSON(message: CallBinding): unknown {
+    const obj: any = {};
+    message.call !== undefined &&
+      (obj.call = message.call ? RawCall.toJSON(message.call) : undefined);
+    message.handlerId !== undefined &&
+      (obj.handlerId = Math.round(message.handlerId));
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<CallBinding>): CallBinding {
+    const message = createBaseCallBinding();
+    message.call =
+      object.call !== undefined && object.call !== null
+        ? RawCall.fromPartial(object.call)
+        : undefined;
+    message.handlerId = object.handlerId ?? 0;
+    return message;
+  },
+};
+
+function createBaseRawCall(): RawCall {
+  return { raw: new Uint8Array() };
+}
+
+export const RawCall = {
+  encode(
+    message: RawCall,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.raw.length !== 0) {
+      writer.uint32(10).bytes(message.raw);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): RawCall {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRawCall();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.raw = reader.bytes();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): RawCall {
+    return {
+      raw: isSet(object.raw) ? bytesFromBase64(object.raw) : new Uint8Array(),
+    };
+  },
+
+  toJSON(message: RawCall): unknown {
+    const obj: any = {};
+    message.raw !== undefined &&
+      (obj.raw = base64FromBytes(
+        message.raw !== undefined ? message.raw : new Uint8Array()
+      ));
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<RawCall>): RawCall {
+    const message = createBaseRawCall();
     message.raw = object.raw ?? new Uint8Array();
     return message;
   },
