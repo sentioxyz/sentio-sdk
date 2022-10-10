@@ -209,6 +209,7 @@ export interface AptosCallHandlerConfig {
 export interface AptosCallFilter {
   function: string;
   typeArguments: string[];
+  withTypeArguments: boolean;
 }
 
 export interface Topic {
@@ -1639,7 +1640,7 @@ export const AptosCallHandlerConfig = {
 };
 
 function createBaseAptosCallFilter(): AptosCallFilter {
-  return { function: "", typeArguments: [] };
+  return { function: "", typeArguments: [], withTypeArguments: false };
 }
 
 export const AptosCallFilter = {
@@ -1652,6 +1653,9 @@ export const AptosCallFilter = {
     }
     for (const v of message.typeArguments) {
       writer.uint32(18).string(v!);
+    }
+    if (message.withTypeArguments === true) {
+      writer.uint32(24).bool(message.withTypeArguments);
     }
     return writer;
   },
@@ -1669,6 +1673,9 @@ export const AptosCallFilter = {
         case 2:
           message.typeArguments.push(reader.string());
           break;
+        case 3:
+          message.withTypeArguments = reader.bool();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1683,6 +1690,9 @@ export const AptosCallFilter = {
       typeArguments: Array.isArray(object?.typeArguments)
         ? object.typeArguments.map((e: any) => String(e))
         : [],
+      withTypeArguments: isSet(object.withTypeArguments)
+        ? Boolean(object.withTypeArguments)
+        : false,
     };
   },
 
@@ -1694,6 +1704,8 @@ export const AptosCallFilter = {
     } else {
       obj.typeArguments = [];
     }
+    message.withTypeArguments !== undefined &&
+      (obj.withTypeArguments = message.withTypeArguments);
     return obj;
   },
 
@@ -1701,6 +1713,7 @@ export const AptosCallFilter = {
     const message = createBaseAptosCallFilter();
     message.function = object.function ?? "";
     message.typeArguments = object.typeArguments?.map((e) => e) || [];
+    message.withTypeArguments = object.withTypeArguments ?? false;
     return message;
   },
 };

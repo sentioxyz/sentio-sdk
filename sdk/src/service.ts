@@ -248,7 +248,13 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       for (const handler of aptosProcessor.callHandlers) {
         const handlerId = this.aptosCallHandlers.push(handler.handler) - 1
         const functionHandlerConfig: AptosCallHandlerConfig = {
-          filters: handler.filters,
+          filters: handler.filters.map((filter) => {
+            return {
+              function: filter.function,
+              typeArguments: filter.typeArguments ?? [],
+              withTypeArguments: filter.typeArguments ? true : false,
+            }
+          }),
           handlerId,
         }
         contractConfig.aptosCallConfigs.push(functionHandlerConfig)

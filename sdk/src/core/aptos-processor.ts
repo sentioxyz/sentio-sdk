@@ -13,7 +13,7 @@ export interface AptosEventFilter {
 }
 export interface AptosCallFilter {
   function: string
-  typeArguments: string[]
+  typeArguments: string[] | undefined
 }
 
 export class AptosEventHandler {
