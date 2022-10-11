@@ -2,6 +2,8 @@ import { BaseContext } from './context'
 import { Labels, GetRecordMetaData } from './metadata'
 import { LogLevel } from '@sentio/sdk'
 
+export type Attributes = Record<string, any>
+
 export class Logger {
   private readonly ctx: BaseContext
   private readonly name: string
@@ -15,16 +17,17 @@ export class Logger {
     return new Logger(this.ctx, name)
   }
 
-  log(level: LogLevel, message: any, labels: Labels = {}) {
+  log(level: LogLevel, message: any, attributes: Attributes = {}) {
     if (typeof message !== 'string' && !(message instanceof String)) {
       message = message.toString()
     }
 
     this.ctx.logs.push({
       name: this.name,
-      metadata: GetRecordMetaData(this.ctx, undefined, labels),
+      metadata: GetRecordMetaData(this.ctx, undefined, {}),
       level,
       message,
+      attributes: JSON.stringify(attributes),
       runtimeInfo: undefined,
     })
   }

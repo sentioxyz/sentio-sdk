@@ -332,6 +332,7 @@ export interface LogResult {
   metadata: RecordMetaData | undefined;
   level: LogLevel;
   message: string;
+  attributes: string;
   runtimeInfo: RuntimeInfo | undefined;
 }
 
@@ -3368,6 +3369,7 @@ function createBaseLogResult(): LogResult {
     metadata: undefined,
     level: 0,
     message: "",
+    attributes: "",
     runtimeInfo: undefined,
   };
 }
@@ -3391,6 +3393,9 @@ export const LogResult = {
     }
     if (message.message !== "") {
       writer.uint32(26).string(message.message);
+    }
+    if (message.attributes !== "") {
+      writer.uint32(50).string(message.attributes);
     }
     if (message.runtimeInfo !== undefined) {
       RuntimeInfo.encode(
@@ -3420,6 +3425,9 @@ export const LogResult = {
         case 3:
           message.message = reader.string();
           break;
+        case 6:
+          message.attributes = reader.string();
+          break;
         case 4:
           message.runtimeInfo = RuntimeInfo.decode(reader, reader.uint32());
           break;
@@ -3439,6 +3447,7 @@ export const LogResult = {
         : undefined,
       level: isSet(object.level) ? logLevelFromJSON(object.level) : 0,
       message: isSet(object.message) ? String(object.message) : "",
+      attributes: isSet(object.attributes) ? String(object.attributes) : "",
       runtimeInfo: isSet(object.runtimeInfo)
         ? RuntimeInfo.fromJSON(object.runtimeInfo)
         : undefined,
@@ -3454,6 +3463,7 @@ export const LogResult = {
         : undefined);
     message.level !== undefined && (obj.level = logLevelToJSON(message.level));
     message.message !== undefined && (obj.message = message.message);
+    message.attributes !== undefined && (obj.attributes = message.attributes);
     message.runtimeInfo !== undefined &&
       (obj.runtimeInfo = message.runtimeInfo
         ? RuntimeInfo.toJSON(message.runtimeInfo)
@@ -3470,6 +3480,7 @@ export const LogResult = {
         : undefined;
     message.level = object.level ?? 0;
     message.message = object.message ?? "";
+    message.attributes = object.attributes ?? "";
     message.runtimeInfo =
       object.runtimeInfo !== undefined && object.runtimeInfo !== null
         ? RuntimeInfo.fromPartial(object.runtimeInfo)
