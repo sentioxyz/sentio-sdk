@@ -25,7 +25,7 @@ import { Block, Log } from '@ethersproject/abstract-provider'
 import Long from 'long'
 import { getNetwork, Networkish } from '@ethersproject/providers'
 
-const TEST_CONTEXT: CallContext = <CallContext>{}
+export const TEST_CONTEXT: CallContext = <CallContext>{}
 
 function cleanTest() {
   global.PROCESSOR_STATE = new ProcessorState()
@@ -238,7 +238,10 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
     return binding
   }
 
-  processBindings(request: ProcessBindingsRequest, context: CallContext): Promise<ProcessBindingResponse> {
+  processBindings(
+    request: ProcessBindingsRequest,
+    context: CallContext = TEST_CONTEXT
+  ): Promise<ProcessBindingResponse> {
     return this.service.processBindings(request, context)
   }
 }

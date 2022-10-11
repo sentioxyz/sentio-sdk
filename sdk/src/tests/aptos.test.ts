@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import Long from 'long'
 import { TextEncoder } from 'util'
-import { ProcessTransactionsRequest } from '..'
+import { HandlerType, ProcessBindingsRequest, ProcessTransactionsRequest } from '..'
 import { chain } from '../utils'
 
 import { TestProcessorServer } from '../testing'
@@ -26,7 +26,7 @@ describe('Test Aptos Example', () => {
       transactions: [
         {
           raw: new TextEncoder().encode(JSON.stringify(testData)),
-          programAccountId: '4188c8694687e844677c2aa87171019e23d61cac60de5082a278a8aa47e9d807',
+          programAccountId: '0x4188c8694687e844677c2aa87171019e23d61cac60de5082a278a8aa47e9d807',
           slot: Long.fromNumber(12345),
         },
       ],
@@ -35,6 +35,42 @@ describe('Test Aptos Example', () => {
     expect(res.result?.counters).length(1)
     expect(res.result?.gauges).length(0)
     expect(res.result?.counters[0].metadata?.blockNumber.toInt()).equal(12345)
+  })
+
+  test('Check souffl3 function call dispatch', async () => {
+    const request: ProcessBindingsRequest = {
+      bindings: [
+        {
+          data: {
+            raw: new TextEncoder().encode(JSON.stringify(testData)),
+          },
+          handlerId: 0,
+          handlerType: HandlerType.APT_CALL,
+        },
+      ],
+    }
+    const res = await service.processBindings(request)
+    expect(res.result?.counters).length(1)
+    expect(res.result?.gauges).length(0)
+    expect(res.result?.counters[0].metadata?.blockNumber.toInt()).equal(18483034)
+  })
+
+  test('Check souffl3 event dispatch', async () => {
+    const request: ProcessBindingsRequest = {
+      bindings: [
+        {
+          data: {
+            raw: new TextEncoder().encode(JSON.stringify(testData.events[1])),
+          },
+          handlerId: 0,
+          handlerType: HandlerType.APT_EVENT,
+        },
+      ],
+    }
+    const res = await service.processBindings(request)
+    expect(res.result?.counters).length(1)
+    expect(res.result?.gauges).length(0)
+    expect(res.result?.counters[0].metadata?.blockNumber.toInt()).equal(18483034)
   })
 })
 
@@ -84,6 +120,7 @@ const testData = {
       },
     },
     {
+      version: '18483034',
       guid: {
         creation_number: '2',
         account_address: '0x4188c8694687e844677c2aa87171019e23d61cac60de5082a278a8aa47e9d807',

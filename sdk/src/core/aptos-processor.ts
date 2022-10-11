@@ -3,6 +3,13 @@ import { AptosContext } from './context'
 import { ProcessResult } from '..'
 import Long from 'long'
 
+import { Transaction_UserTransaction } from 'aptos/src/generated/models/Transaction_UserTransaction'
+import { Event } from 'aptos/src/generated/models/Event'
+import { TransactionPayload_EntryFunctionPayload } from 'aptos/src/generated/models/TransactionPayload_EntryFunctionPayload'
+
+export type ExtEvent = Event & { version: string }
+export type FunctionPayload = TransactionPayload_EntryFunctionPayload
+
 type IndexConfigure = {
   startSeqNumber: Long
   endSeqNumber?: Long
@@ -11,6 +18,7 @@ type IndexConfigure = {
 export interface AptosEventFilter {
   type: string
 }
+
 export interface AptosCallFilter {
   function: string
   typeArguments: string[] | undefined
@@ -18,12 +26,12 @@ export interface AptosCallFilter {
 
 export class AptosEventHandler {
   filters: AptosEventFilter[]
-  handler: (event: any) => Promise<ProcessResult>
+  handler: (event: ExtEvent) => Promise<ProcessResult>
 }
 
 export class AptosCallHandler {
   filters: AptosCallFilter[]
-  handler: (func: any) => Promise<ProcessResult>
+  handler: (call: Transaction_UserTransaction) => Promise<ProcessResult>
 }
 
 export class AptosBaseProcessor {
@@ -35,13 +43,6 @@ export class AptosBaseProcessor {
   callHandlers: AptosCallHandler[] = []
 
   constructor(options: AptosBindOptions) {
-    if (options) {
-      this.bind(options)
-    }
-    global.PROCESSOR_STATE.aptosProcessors.push(this)
-  }
-
-  bind(options: AptosBindOptions) {
     this.address = options.address
     this.name = options.name || this.address
     if (options.startBlock) {
@@ -50,6 +51,7 @@ export class AptosBaseProcessor {
     if (options.endBlock) {
       this.endBlock(options.endBlock)
     }
+    global.PROCESSOR_STATE.aptosProcessors.push(this)
   }
 
   public onTransaction(handler: (transaction: any, ctx: AptosContext) => void) {
@@ -62,7 +64,7 @@ export class AptosBaseProcessor {
     return this
   }
 
-  public onEvent(handler: (event: any, ctx: AptosContext) => void, filter: AptosEventFilter | AptosEventFilter[]) {
+  public onEvent(handler: (event: Event, ctx: AptosContext) => void, filter: AptosEventFilter | AptosEventFilter[]) {
     let _filters: AptosEventFilter[] = []
 
     if (Array.isArray(filter)) {
@@ -71,9 +73,11 @@ export class AptosBaseProcessor {
       _filters.push(filter)
     }
 
+    const address = this.address
+
     this.eventHandlers.push({
       handler: async function (event) {
-        const ctx = new AptosContext(this.address, event.slot)
+        const ctx = new AptosContext(address, Long.fromString(event.version))
         if (event) {
           handler(event, ctx)
         }
@@ -87,7 +91,10 @@ export class AptosBaseProcessor {
     })
   }
 
-  public onCall(handler: (func: any, ctx: AptosContext) => void, filter: AptosCallFilter | AptosCallFilter[]) {
+  public onCall(
+    handler: (call: TransactionPayload_EntryFunctionPayload, ctx: AptosContext) => void,
+    filter: AptosCallFilter | AptosCallFilter[]
+  ) {
     let _filters: AptosCallFilter[] = []
 
     if (Array.isArray(filter)) {
@@ -96,11 +103,14 @@ export class AptosBaseProcessor {
       _filters.push(filter)
     }
 
+    const address = this.address
+
     this.callHandlers.push({
       handler: async function (call) {
-        const ctx = new AptosContext(this.address, call.slot)
+        const ctx = new AptosContext(address, Long.fromString(call.version))
         if (call) {
-          handler(call, ctx)
+          const payload = call.payload as TransactionPayload_EntryFunctionPayload
+          handler(payload, ctx)
         }
         return {
           gauges: ctx.gauges,
@@ -110,6 +120,7 @@ export class AptosBaseProcessor {
       },
       filters: _filters,
     })
+    return this
   }
 
   public handleTransaction(txn: any, slot: Long): ProcessResult | null {
