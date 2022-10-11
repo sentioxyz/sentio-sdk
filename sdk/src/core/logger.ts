@@ -4,19 +4,24 @@ import { LogLevel } from '@sentio/sdk'
 
 export class Logger {
   private readonly ctx: BaseContext
+  private readonly name: string
 
-  constructor(ctx: BaseContext) {
+  constructor(ctx: BaseContext, name = '') {
     this.ctx = ctx
+    this.name = name
+  }
+
+  withName(name: string) {
+    return new Logger(this.ctx, name)
   }
 
   log(level: LogLevel, message: any, labels: Labels = {}) {
-    // TODO
-
     if (typeof message !== 'string' && !(message instanceof String)) {
       message = message.toString()
     }
 
     this.ctx.logs.push({
+      name: this.name,
       metadata: GetRecordMetaData(this.ctx, undefined, labels),
       level,
       message,

@@ -57,7 +57,7 @@ describe('Test Basic Examples', () => {
     expect(firstCounterValue(res.result, 'c1')).equals(1n)
 
     expect(counters?.[0].metadata?.chainId).equals('1')
-    expect(counters?.[0].runtimeInfo?.from).equals(HandlerType.LOG)
+    expect(counters?.[0].runtimeInfo?.from).equals(HandlerType.ETH_LOG)
     expect(res.configUpdated).equals(true)
 
     const logData2 = Object.assign({}, logData)

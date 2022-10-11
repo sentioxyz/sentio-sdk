@@ -19,18 +19,22 @@ service Processor {
   // Process a list of logs associate with their handler id
   // Logs will be ordered by their creation time, the caller should also guarantee
   // It will also return a flag indicate if new contract config is added during the process
-  rpc ProcessLogs(ProcessLogsRequest) returns (ProcessLogsResponse);
+  rpc ProcessLogs(ProcessBindingsRequest) returns (ProcessBindingResponse);
 
-  rpc ProcessTraces(ProcessTracesRequest) returns (ProcessTracesResponse);
+  rpc ProcessTraces(ProcessBindingsRequest) returns (ProcessBindingResponse);
 
   // Not implemented yet
-  rpc ProcessTransactions(ProcessTransactionsRequest) returns (ProcessTransactionsResponse);
+  rpc ProcessTransactions(ProcessTransactionsRequest) returns (ProcessBindingResponse);
+
+  rpc ProcessInstructions(ProcessInstructionsRequest) returns (ProcessBindingResponse);
 
   // Process a list of blocks associate with their handler id
   // No particular order is assumed for the list of blocks
-  rpc ProcessBlocks(ProcessBlocksRequest) returns (ProcessBlocksResponse);
+  rpc ProcessBlocks(ProcessBlocksRequest) returns (ProcessBindingResponse);
 
-  rpc ProcessInstructions(ProcessInstructionsRequest) returns (ProcessInstructionsResponse);
+  // TODO migrate to this API, which could make sure different processing logic could be handled
+  // in a serializable way
+  rpc ProcessBindings(ProcessBindingsRequest) returns (ProcessBindingResponse);
 }
 
 message ProjectConfig {
@@ -127,24 +131,6 @@ message Topic {
   repeated string hashes = 1;
 }
 
-message ProcessLogsRequest {
-  repeated LogBinding log_bindings = 1;
-}
-
-message ProcessLogsResponse {
-  ProcessResult result = 1;
-  // Whether config update because of dynamic contract processor creation
-  bool config_updated = 4;
-}
-
-message ProcessTracesRequest {
-  repeated TraceBinding trace_bindings = 1;
-}
-
-message ProcessTracesResponse {
-  ProcessResult result = 1;
-}
-
 message ProcessTransactionsRequest {
   string chain_id = 1;
   repeated RawTransaction transactions = 2;
@@ -154,54 +140,20 @@ message ProcessInstructionsRequest {
   repeated Instruction instructions = 1;
 }
 
-message ProcessTransactionsResponse {
-  ProcessResult result = 1;
-}
-
-message ProcessInstructionsResponse {
-  ProcessResult result = 1;
-}
-
 message ProcessBlocksRequest {
   repeated BlockBinding block_bindings = 2;
 }
 
-message ProcessBlocksResponse {
-  ProcessResult result = 2;
+message ProcessBindingsRequest {
+  repeated DataBinding bindings = 1;
 }
 
-message ProcessEventsRequest {
-  repeated EventBinding event_bindings = 1;
-}
-
-message ProcessEventsResponse {
+message ProcessBindingResponse {
   ProcessResult result = 1;
-}
 
-message ProcessCallsRequest {
-  repeated CallBinding call_bindings = 1;
-}
-
-message ProcessCallsResponse {
-  ProcessResult result = 1;
-}
-
-message LogBinding {
-  RawLog log = 1;
-  int32 handler_id = 2;
-}
-
-message RawLog {
-  bytes raw = 1;
-}
-
-message TraceBinding {
-  RawTrace trace = 1;
-  int32 handler_id = 2;
-}
-
-message RawTrace {
-  bytes raw = 1;
+  // Whether config update because of dynamic contract processor creation
+  // Currently only support log handler in ethereum
+  bool config_updated = 4;
 }
 
 message RawTransaction {
@@ -217,30 +169,23 @@ message Instruction {
   optional bytes parsed = 4;
 }
 
+message Data {
+  bytes raw = 1;
+}
+
+message DataBinding {
+  Data data = 1;
+  int32 handler_id = 2;
+  HandlerType handler_type = 3;
+}
+
+// TODO migrate this to just use one handler_id?
 message BlockBinding {
   RawBlock block = 1;
   repeated int32 handler_ids = 2; // TODO consider make log binds contain list of handler id as well
 }
 
 message RawBlock {
-  bytes raw = 1;
-}
-
-message EventBinding {
-  RawEvent event = 1;
-  int32 handler_id = 2;
-}
-
-message RawEvent {
-  bytes raw = 1;
-}
-
-message CallBinding {
-  RawCall call = 1;
-  int32 handler_id = 2;
-}
-
-message RawCall {
   bytes raw = 1;
 }
 
@@ -290,13 +235,13 @@ message BigInteger {
 
 enum HandlerType {
   UNKNOWN = 0;
-  LOG = 1;
+  ETH_LOG = 1;
   BLOCK = 2;
   TRANSACTION = 3;
   INSTRUCTION = 4;
-  TRACE = 5;
-  EVENT = 6;
-  CALL = 7;
+  ETH_TRACE = 5;
+  APT_EVENT = 6;
+  APT_CALL = 7;
 }
 
 message RuntimeInfo {
@@ -326,6 +271,7 @@ enum LogLevel {
 }
 
 message LogResult {
+  string name = 5;
   RecordMetaData metadata = 1;
   LogLevel level = 2;
   string message = 3;

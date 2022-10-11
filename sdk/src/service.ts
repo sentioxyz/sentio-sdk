@@ -3,36 +3,25 @@ import { CallContext, ServerError, Status } from 'nice-grpc'
 import { APTOS_TESTNET_ID, SOL_MAINMET_ID, SUI_DEVNET_ID } from './utils/chain'
 
 import {
+  AptosCallHandlerConfig,
+  AptosEventHandlerConfig,
   BlockBinding,
   ContractConfig,
+  DataBinding,
   HandlerType,
   LogFilter,
   LogHandlerConfig,
-  ProcessResult,
+  ProcessBindingResponse,
+  ProcessBindingsRequest,
   ProcessBlocksRequest,
-  ProcessBlocksResponse,
   ProcessConfigRequest,
   ProcessConfigResponse,
   ProcessInstructionsRequest,
-  ProcessInstructionsResponse,
-  ProcessLogsRequest,
-  ProcessLogsResponse,
   ProcessorServiceImplementation,
-  ProcessTracesRequest,
-  ProcessTracesResponse,
+  ProcessResult,
   ProcessTransactionsRequest,
-  ProcessTransactionsResponse,
   StartRequest,
   TemplateInstance,
-  TraceBinding,
-  AptosEventHandlerConfig,
-  EventBinding,
-  ProcessEventsRequest,
-  ProcessEventsResponse,
-  CallBinding,
-  ProcessCallsRequest,
-  ProcessCallsResponse,
-  AptosCallHandlerConfig,
 } from './gen/processor/protos/processor'
 
 import { Empty } from './gen/google/protobuf/empty'
@@ -118,6 +107,8 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       // Step 1. Prepare all the block handlers
       for (const blockHandler of processor.blockHandlers) {
         const handlerId = this.blockHandlers.push(blockHandler) - 1
+        // TODO wrap the block handler into one
+
         contractConfig.blockConfigs.push({
           handlerId: handlerId,
         })
@@ -307,21 +298,55 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     return {}
   }
 
-  async processLogs(request: ProcessLogsRequest, context: CallContext): Promise<ProcessLogsResponse> {
+  async processBindings(request: ProcessBindingsRequest, options?: CallContext): Promise<ProcessBindingResponse> {
+    if (!this.started) {
+      throw new ServerError(Status.UNAVAILABLE, 'Service Not started.')
+    }
+
+    const promises = request.bindings.map((binding) => this.processBinding(binding))
+    const result = mergeProcessResults(await Promise.all(promises))
+
+    let updated = false
+    if (
+      global.PROCESSOR_STATE.templatesInstances &&
+      this.templateInstances.length != global.PROCESSOR_STATE.templatesInstances.length
+    ) {
+      await this.configure()
+      updated = true
+    }
+
+    return {
+      result,
+      configUpdated: updated,
+    }
+  }
+
+  async processBinding(request: DataBinding, options?: CallContext): Promise<ProcessResult> {
+    switch (request.handlerType) {
+      case HandlerType.APT_CALL:
+        return this.processAptosCall(request)
+      case HandlerType.APT_EVENT:
+        return this.processAptosEvent(request)
+      default:
+        throw new ServerError(Status.INVALID_ARGUMENT, 'No handle type registered ' + request.handlerType)
+    }
+  }
+
+  async processLogs(request: ProcessBindingsRequest, context: CallContext): Promise<ProcessBindingResponse> {
     if (!this.started) {
       throw new ServerError(Status.UNAVAILABLE, 'Service Not started.')
     }
 
     const promises: Promise<ProcessResult>[] = []
-    for (const l of request.logBindings) {
-      if (!l.log) {
+    for (const l of request.bindings) {
+      if (!l.data) {
         throw new ServerError(Status.INVALID_ARGUMENT, "Log can't be null")
       }
       // const jsonString = Buffer.from(l.log.raw.buffer).toString("utf-8")
       // const jsonString = String.fromCharCode.apply(null, l.log.raw)
 
       try {
-        const jsonString = Utf8ArrayToStr(l.log.raw)
+        const jsonString = Utf8ArrayToStr(l.data.raw)
         const log: Log = JSON.parse(jsonString)
         const handler = this.eventHandlers[l.handlerId]
         const promise = handler(log).catch((e) => {
@@ -345,7 +370,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       updated = true
     }
 
-    recordRuntimeInfo(result, HandlerType.LOG)
+    recordRuntimeInfo(result, HandlerType.ETH_LOG)
     return {
       result,
       configUpdated: updated,
@@ -355,16 +380,12 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
   async processTransactions(
     request: ProcessTransactionsRequest,
     context: CallContext
-  ): Promise<ProcessTransactionsResponse> {
+  ): Promise<ProcessBindingResponse> {
     if (!this.started) {
       throw new ServerError(Status.UNAVAILABLE, 'Service not started.')
     }
 
-    const result: ProcessResult = {
-      gauges: [],
-      counters: [],
-      logs: [],
-    }
+    const result = ProcessResult.fromPartial({})
 
     if (request.chainId.toLowerCase().startsWith('sui') && global.PROCESSOR_STATE.suiProcessors) {
       const processorPromises: Promise<void>[] = []
@@ -417,22 +438,19 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     recordRuntimeInfo(result, HandlerType.TRANSACTION)
     return {
       result,
+      configUpdated: false,
     }
   }
 
   async processInstructions(
     request: ProcessInstructionsRequest,
     context: CallContext
-  ): Promise<ProcessInstructionsResponse> {
+  ): Promise<ProcessBindingResponse> {
     if (!this.started) {
       throw new ServerError(Status.UNAVAILABLE, 'Service not started.')
     }
 
-    const result: ProcessResult = {
-      gauges: [],
-      counters: [],
-      logs: [],
-    }
+    const result = ProcessResult.fromPartial({})
 
     // Only have instruction handlers for solana processors
     if (global.PROCESSOR_STATE.solanaProcessors) {
@@ -479,10 +497,11 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     recordRuntimeInfo(result, HandlerType.INSTRUCTION)
     return {
       result,
+      configUpdated: false,
     }
   }
 
-  async processBlocks(request: ProcessBlocksRequest, context: CallContext): Promise<ProcessBlocksResponse> {
+  async processBlocks(request: ProcessBlocksRequest, context: CallContext): Promise<ProcessBindingResponse> {
     if (!this.started) {
       throw new ServerError(Status.UNAVAILABLE, 'Service Not started.')
     }
@@ -493,6 +512,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     recordRuntimeInfo(result, HandlerType.BLOCK)
     return {
       result,
+      configUpdated: false,
     }
   }
 
@@ -514,25 +534,26 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     return mergeProcessResults(await Promise.all(promises))
   }
 
-  async processTraces(request: ProcessTracesRequest, context: CallContext): Promise<ProcessTracesResponse> {
+  async processTraces(request: ProcessBindingsRequest, context: CallContext): Promise<ProcessBindingResponse> {
     if (!this.started) {
       throw new ServerError(Status.UNAVAILABLE, 'Service Not started.')
     }
 
-    const promises = request.traceBindings.map((binding) => this.processTrace(binding))
+    const promises = request.bindings.map((binding) => this.processTrace(binding))
     const result = mergeProcessResults(await Promise.all(promises))
 
-    recordRuntimeInfo(result, HandlerType.TRACE)
+    recordRuntimeInfo(result, HandlerType.ETH_TRACE)
     return {
       result,
+      configUpdated: false,
     }
   }
 
-  async processTrace(binding: TraceBinding): Promise<ProcessResult> {
-    if (!binding.trace) {
+  async processTrace(binding: DataBinding): Promise<ProcessResult> {
+    if (!binding.data) {
       throw new ServerError(Status.INVALID_ARGUMENT, "Trace can't be empty")
     }
-    const jsonString = Utf8ArrayToStr(binding.trace.raw)
+    const jsonString = Utf8ArrayToStr(binding.data.raw)
     const trace: Trace = JSON.parse(jsonString)
 
     return this.traceHandlers[binding.handlerId](trace).catch((e) => {
@@ -540,56 +561,32 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     })
   }
 
-  async processEvents(request: ProcessEventsRequest, context: CallContext): Promise<ProcessEventsResponse> {
-    if (!this.started) {
-      throw new ServerError(Status.UNAVAILABLE, 'Service Not started.')
-    }
-
-    const promises = request.eventBindings.map((binding) => this.processEvent(binding))
-    const result = mergeProcessResults(await Promise.all(promises))
-
-    recordRuntimeInfo(result, HandlerType.EVENT)
-    return {
-      result,
-    }
-  }
-
-  async processCalls(request: ProcessCallsRequest, context: CallContext): Promise<ProcessCallsResponse> {
-    if (!this.started) {
-      throw new ServerError(Status.UNAVAILABLE, 'Service Not started.')
-    }
-
-    const promises = request.callBindings.map((binding) => this.processCall(binding))
-    const result = mergeProcessResults(await Promise.all(promises))
-
-    recordRuntimeInfo(result, HandlerType.CALL)
-    return {
-      result,
-    }
-  }
-
-  async processEvent(binding: EventBinding): Promise<ProcessResult> {
-    if (!binding.event) {
+  async processAptosEvent(binding: DataBinding): Promise<ProcessResult> {
+    if (!binding.data) {
       throw new ServerError(Status.INVALID_ARGUMENT, "Event can't be empty")
     }
-    const jsonString = Utf8ArrayToStr(binding.event.raw)
+    const jsonString = Utf8ArrayToStr(binding.data.raw)
     const event = JSON.parse(jsonString)
     // only support aptos event for now
-    return this.aptosEventHandlers[binding.handlerId](event).catch((e) => {
+    const result = await this.aptosEventHandlers[binding.handlerId](event).catch((e) => {
       throw new ServerError(Status.INTERNAL, 'error processing event: ' + jsonString + '\n' + errorString(e))
     })
+    recordRuntimeInfo(result, HandlerType.APT_EVENT)
+    return result
   }
 
-  async processCall(binding: CallBinding): Promise<ProcessResult> {
-    if (!binding.call) {
+  async processAptosCall(binding: DataBinding): Promise<ProcessResult> {
+    if (!binding.data) {
       throw new ServerError(Status.INVALID_ARGUMENT, "Event can't be empty")
     }
-    const jsonString = Utf8ArrayToStr(binding.call.raw)
+    const jsonString = Utf8ArrayToStr(binding.data.raw)
     const call = JSON.parse(jsonString)
     // only support aptos call for now
-    return this.aptosCallHandlers[binding.handlerId](call).catch((e) => {
+    const result = await this.aptosCallHandlers[binding.handlerId](call).catch((e) => {
       throw new ServerError(Status.INTERNAL, 'error processing call: ' + jsonString + '\n' + errorString(e))
     })
+    recordRuntimeInfo(result, HandlerType.APT_CALL)
+    return result
   }
 }
 

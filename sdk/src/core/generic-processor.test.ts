@@ -41,7 +41,7 @@ describe('Test Generic Processor', () => {
     const counters = res.result?.counters
     expect(counters).length(2)
     expect(firstCounterValue(res.result, 'event_num')).equals(1n)
-    expect(counters?.[0].runtimeInfo?.from).equals(HandlerType.LOG)
+    expect(counters?.[0].runtimeInfo?.from).equals(HandlerType.ETH_LOG)
   })
 
   test('Check log dispatch no buffer over rune', async () => {

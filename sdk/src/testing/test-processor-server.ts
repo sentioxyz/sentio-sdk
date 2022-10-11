@@ -1,25 +1,21 @@
 import {
   BlockBinding,
   ContractConfig,
-  LogBinding,
+  DataBinding,
+  HandlerType,
+  ProcessBindingResponse,
+  ProcessBindingsRequest,
   ProcessBlocksRequest,
-  ProcessBlocksResponse,
   ProcessConfigRequest,
   ProcessConfigResponse,
   ProcessInstructionsRequest,
-  ProcessInstructionsResponse,
-  ProcessLogsRequest,
-  ProcessLogsResponse,
   ProcessorServiceImpl,
   ProcessorServiceImplementation,
   ProcessorState,
-  ProcessTracesRequest,
-  ProcessTracesResponse,
   ProcessTransactionsRequest,
-  ProcessTransactionsResponse,
   setProvider,
   StartRequest,
-  TraceBinding,
+  Trace,
 } from '@sentio/sdk'
 import { CallContext } from 'nice-grpc-common'
 import { Empty } from '../gen/google/protobuf/empty'
@@ -28,7 +24,6 @@ import { CHAIN_MAP } from '../utils/chain'
 import { Block, Log } from '@ethersproject/abstract-provider'
 import Long from 'long'
 import { getNetwork, Networkish } from '@ethersproject/providers'
-import { Trace } from '@sentio/sdk'
 
 const TEST_CONTEXT: CallContext = <CallContext>{}
 
@@ -71,37 +66,31 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
     return this.service.getConfig(request, context)
   }
 
-  processBlocks(request: ProcessBlocksRequest, context = TEST_CONTEXT): Promise<ProcessBlocksResponse> {
+  processBlocks(request: ProcessBlocksRequest, context = TEST_CONTEXT): Promise<ProcessBindingResponse> {
     return this.service.processBlocks(request, context)
   }
 
-  processInstructions(
-    request: ProcessInstructionsRequest,
-    context = TEST_CONTEXT
-  ): Promise<ProcessInstructionsResponse> {
+  processInstructions(request: ProcessInstructionsRequest, context = TEST_CONTEXT): Promise<ProcessBindingResponse> {
     return this.service.processInstructions(request, context)
   }
 
-  processLogs(request: ProcessLogsRequest, context = TEST_CONTEXT): Promise<ProcessLogsResponse> {
+  processLogs(request: ProcessBindingsRequest, context = TEST_CONTEXT): Promise<ProcessBindingResponse> {
     return this.service.processLogs(request, context)
   }
 
-  processTraces(request: ProcessTracesRequest, context: CallContext = TEST_CONTEXT): Promise<ProcessTracesResponse> {
+  processTraces(request: ProcessBindingsRequest, context: CallContext = TEST_CONTEXT): Promise<ProcessBindingResponse> {
     return this.service.processTraces(request, context)
   }
 
-  processTransactions(
-    request: ProcessTransactionsRequest,
-    context = TEST_CONTEXT
-  ): Promise<ProcessTransactionsResponse> {
+  processTransactions(request: ProcessTransactionsRequest, context = TEST_CONTEXT): Promise<ProcessBindingResponse> {
     return this.service.processTransactions(request, context)
   }
 
-  testTrace(trace: Trace, network: Networkish = 1): Promise<ProcessTracesResponse> {
+  testTrace(trace: Trace, network: Networkish = 1): Promise<ProcessBindingResponse> {
     return this.testTraces([trace], network)
   }
 
-  testTraces(traces: Trace[], network: Networkish = 1): Promise<ProcessTracesResponse> {
+  testTraces(traces: Trace[], network: Networkish = 1): Promise<ProcessBindingResponse> {
     const bindings = []
     for (const trace of traces) {
       const binding = this.buildTraceBinding(trace, network)
@@ -111,11 +100,11 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
       bindings.push(binding)
     }
     return this.processTraces({
-      traceBindings: bindings,
+      bindings: bindings,
     })
   }
 
-  buildTraceBinding(trace: Trace, network: Networkish = 1): TraceBinding | undefined {
+  buildTraceBinding(trace: Trace, network: Networkish = 1): DataBinding | undefined {
     if (trace.type !== 'call' || !trace.action.input) {
       throw Error('Invalid test trace: ' + JSON.stringify(trace))
     }
@@ -131,10 +120,11 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
       for (const config of contract.traceConfigs) {
         if (config.signature == signature) {
           return {
-            trace: {
+            data: {
               raw: toBytes(trace),
             },
             handlerId: config.handlerId,
+            handlerType: HandlerType.ETH_TRACE,
           }
         }
       }
@@ -142,11 +132,11 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
     return undefined
   }
 
-  testLog(log: Log, network: Networkish = 1): Promise<ProcessLogsResponse> {
+  testLog(log: Log, network: Networkish = 1): Promise<ProcessBindingResponse> {
     return this.testLogs([log], network)
   }
 
-  testLogs(logs: Log[], network: Networkish = 1): Promise<ProcessLogsResponse> {
+  testLogs(logs: Log[], network: Networkish = 1): Promise<ProcessBindingResponse> {
     const bindings = []
     for (const log of logs) {
       const binding = this.buildLogBinding(log, network)
@@ -156,11 +146,11 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
       bindings.push(binding)
     }
     return this.processLogs({
-      logBindings: bindings,
+      bindings: bindings,
     })
   }
 
-  buildLogBinding(log: Log, network: Networkish = 1): LogBinding | undefined {
+  buildLogBinding(log: Log, network: Networkish = 1): DataBinding | undefined {
     for (const contract of this.contractConfig) {
       if (contract.contract?.chainId !== getNetwork(network).chainId.toString()) {
         continue
@@ -191,10 +181,11 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
           }
           if (match) {
             return {
-              log: {
+              data: {
                 raw: toBytes(log),
               },
               handlerId: config.handlerId,
+              handlerType: HandlerType.ETH_LOG,
             }
           }
         }
@@ -203,7 +194,7 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
     return undefined
   }
 
-  testBlock(block: Partial<Block> & { number: number }, network: Networkish = 1): Promise<ProcessBlocksResponse> {
+  testBlock(block: Partial<Block> & { number: number }, network: Networkish = 1): Promise<ProcessBindingResponse> {
     return this.testBlocks([block], network)
   }
 
@@ -245,6 +236,10 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
       }
     }
     return binding
+  }
+
+  processBindings(request: ProcessBindingsRequest, context: CallContext): Promise<ProcessBindingResponse> {
+    return this.service.processBindings(request, context)
   }
 }
 
