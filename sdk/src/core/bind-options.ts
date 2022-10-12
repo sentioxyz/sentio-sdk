@@ -41,4 +41,3 @@ export class SolanaBindOptions extends BindOptions {
 }
 
 export class SuiBindOptions extends BindOptions {}
-export class AptosBindOptions extends BindOptions {}

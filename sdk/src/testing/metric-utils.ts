@@ -1,6 +1,6 @@
 import { DeepPartial } from '../gen/builtin'
-import { BigDecimal, MetricValue, ProcessResult } from '@sentio/sdk'
-import { Numberish } from '../core'
+import { MetricValue, ProcessResult } from '../gen'
+import { Numberish, BigDecimal } from '../core'
 import { BigNumber } from 'ethers'
 
 export function MetricValueToNumber(v: DeepPartial<MetricValue> | undefined): Numberish | undefined {

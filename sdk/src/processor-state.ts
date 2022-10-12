@@ -5,8 +5,10 @@ import {
   BaseProcessorTemplate,
   SolanaBaseProcessor,
   SuiBaseProcessor,
-  AptosBaseProcessor,
 } from './core'
+
+import { AptosBaseProcessor } from './aptos'
+
 import { BaseContract } from 'ethers'
 import { TemplateInstance } from './gen/processor/protos/processor'
 import { Provider } from '@ethersproject/providers'

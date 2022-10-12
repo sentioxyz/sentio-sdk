@@ -1,6 +1,6 @@
 import { BaseContext } from './context'
 import { Labels, GetRecordMetaData } from './metadata'
-import { LogLevel } from '@sentio/sdk'
+import { LogLevel } from '../gen'
 
 export type Attributes = Record<string, any>
 

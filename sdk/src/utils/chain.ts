@@ -91,7 +91,9 @@ export const SUI_DEVNET_ID = 'sui_devnet'
 CHAIN_MAP[SUI_DEVNET_ID] = 'sui-dev'
 
 export const APTOS_TESTNET_ID = 'aptos_testnet'
+export const APTOS_MAINNET_ID = 'aptos_mainnet'
 CHAIN_MAP[APTOS_TESTNET_ID] = 'aptos-test'
+CHAIN_MAP[APTOS_MAINNET_ID] = 'aptos-mainnet'
 
 export function getChainName(chainId: string | number): string {
   if (typeof chainId === 'number') {

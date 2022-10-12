@@ -5,7 +5,7 @@ import { BaseContract, EventFilter } from '@ethersproject/contracts'
 import Long from 'long'
 
 import { BoundContractView, Context, ContractView } from './context'
-import { ProcessResult } from '../gen/processor/protos/processor'
+import { ProcessResult } from '../gen'
 import { BindInternalOptions, BindOptions } from './bind-options'
 import { PromiseOrVoid } from '../promise-or-void'
 import { Trace } from './trace'

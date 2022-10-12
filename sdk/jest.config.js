@@ -2,6 +2,7 @@
 const { pathsToModuleNameMapper } = require('ts-jest');
 const { compilerOptions } = require('./tsconfig');
 
+// TODO seems not fully ignored
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',

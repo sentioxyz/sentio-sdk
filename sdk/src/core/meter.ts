@@ -1,4 +1,4 @@
-import { MetricDescriptor } from '../gen/processor/protos/processor'
+import { MetricDescriptor } from '../gen'
 import { BaseContext } from './context'
 import { toMetricValue, Numberish } from './numberish'
 import { GetRecordMetaData, Labels } from './metadata'

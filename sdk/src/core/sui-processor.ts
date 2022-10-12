@@ -1,6 +1,6 @@
 import { SuiBindOptions } from './bind-options'
 import { SuiContext } from './context'
-import { ProcessResult } from '..'
+import { ProcessResult } from '../gen'
 import Long from 'long'
 
 type IndexConfigure = {

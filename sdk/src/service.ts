@@ -22,7 +22,7 @@ import {
   ProcessTransactionsRequest,
   StartRequest,
   TemplateInstance,
-} from './gen/processor/protos/processor'
+} from './gen'
 
 import { Empty } from './gen/google/protobuf/empty'
 import Long from 'long'
@@ -213,13 +213,13 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         contract: {
           name: aptosProcessor.name,
           chainId: APTOS_TESTNET_ID,
-          address: aptosProcessor.address,
+          address: aptosProcessor.config.address,
           abi: '',
         },
         blockConfigs: [],
         logConfigs: [],
         traceConfigs: [],
-        startBlock: aptosProcessor.config.startSeqNumber,
+        startBlock: aptosProcessor.config.startVersion,
         endBlock: DEFAULT_MAX_BLOCK,
         instructionConfig: undefined,
         aptosEventConfigs: [],
@@ -324,7 +324,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
   async processBinding(request: DataBinding, options?: CallContext): Promise<ProcessResult> {
     switch (request.handlerType) {
       case HandlerType.APT_CALL:
-        return this.processAptosCall(request)
+        return this.processAptosFunctionCall(request)
       case HandlerType.APT_EVENT:
         return this.processAptosEvent(request)
       default:
@@ -410,30 +410,30 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       await Promise.all(processorPromises)
     }
 
-    if (request.chainId.toLowerCase().startsWith('apt') && global.PROCESSOR_STATE.aptosProcessors) {
-      const processorPromises: Promise<void>[] = []
-      for (const txn of request.transactions) {
-        processorPromises.push(
-          new Promise((resolve, _) => {
-            for (const processor of global.PROCESSOR_STATE.aptosProcessors) {
-              if (processor.address === txn.programAccountId!) {
-                const res = processor.handleTransaction(
-                  JSON.parse(new TextDecoder().decode(txn.raw)),
-                  txn.slot ?? Long.fromNumber(0)
-                )
-                if (res) {
-                  res.gauges.forEach((g) => result.gauges.push(g))
-                  res.counters.forEach((c) => result.counters.push(c))
-                  res.logs.forEach((l) => result.logs.push(l))
-                }
-              }
-            }
-            resolve()
-          })
-        )
-      }
-      await Promise.all(processorPromises)
-    }
+    // if (request.chainId.toLowerCase().startsWith('apt') && global.PROCESSOR_STATE.aptosProcessors) {
+    //   const processorPromises: Promise<void>[] = []
+    //   for (const txn of request.transactions) {
+    //     processorPromises.push(
+    //       new Promise((resolve, _) => {
+    //         for (const processor of global.PROCESSOR_STATE.aptosProcessors) {
+    //           if (processor.address === txn.programAccountId!) {
+    //             const res = processor.handleTransaction(
+    //               JSON.parse(new TextDecoder().decode(txn.raw)),
+    //               txn.slot ?? Long.fromNumber(0)
+    //             )
+    //             if (res) {
+    //               res.gauges.forEach((g) => result.gauges.push(g))
+    //               res.counters.forEach((c) => result.counters.push(c))
+    //               res.logs.forEach((l) => result.logs.push(l))
+    //             }
+    //           }
+    //         }
+    //         resolve()
+    //       })
+    //     )
+    //   }
+    //   await Promise.all(processorPromises)
+    // }
 
     recordRuntimeInfo(result, HandlerType.TRANSACTION)
     return {
@@ -575,7 +575,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     return result
   }
 
-  async processAptosCall(binding: DataBinding): Promise<ProcessResult> {
+  async processAptosFunctionCall(binding: DataBinding): Promise<ProcessResult> {
     if (!binding.data) {
       throw new ServerError(Status.INVALID_ARGUMENT, "Event can't be empty")
     }

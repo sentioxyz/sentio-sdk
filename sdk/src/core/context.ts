@@ -1,25 +1,29 @@
-import { CounterResult, GaugeResult, LogResult } from '../gen/processor/protos/processor'
+import { CounterResult, GaugeResult, LogResult, MetricDescriptor, RecordMetaData } from '../gen'
 import { BaseContract, EventFilter } from 'ethers'
 import { Block, Log } from '@ethersproject/abstract-provider'
-import { Meter } from './meter'
+import { Meter, normalizeLabels } from './meter'
 import Long from 'long'
 import { Trace } from './trace'
 import { Logger } from './logger'
+import { Labels } from './metadata'
+import { SOL_MAINMET_ID, SUI_DEVNET_ID } from '../utils/chain'
 
-export class BaseContext {
+export abstract class BaseContext {
   gauges: GaugeResult[] = []
   counters: CounterResult[] = []
   logs: LogResult[] = []
   meter: Meter
   logger: Logger
 
-  constructor() {
+  protected constructor() {
     this.meter = new Meter(this)
     this.logger = new Logger(this)
   }
+
+  abstract getMetaData(descriptor: MetricDescriptor | undefined, labels: Labels): RecordMetaData
 }
 
-export class EthContext extends BaseContext {
+export abstract class EthContext extends BaseContext {
   chainId: number
   log?: Log
   block?: Block
@@ -27,7 +31,7 @@ export class EthContext extends BaseContext {
   blockNumber: Long
   transactionHash?: string
 
-  constructor(chainId: number, block?: Block, log?: Log, trace?: Trace) {
+  protected constructor(chainId: number, block?: Block, log?: Log, trace?: Trace) {
     super()
     this.chainId = chainId
     this.log = log
@@ -57,6 +61,46 @@ export class Context<
     view.context = this
     this.contract = view
     this.address = view.rawContract.address
+  }
+
+  getMetaData(descriptor: MetricDescriptor | undefined, labels: Labels): RecordMetaData {
+    if (this.log) {
+      return {
+        contractAddress: this.contract.rawContract.address,
+        blockNumber: this.blockNumber,
+        transactionIndex: this.log.transactionIndex,
+        transactionHash: this.transactionHash || '',
+        logIndex: this.log.logIndex,
+        chainId: this.chainId.toString(),
+        descriptor: descriptor,
+        labels: normalizeLabels(labels),
+      }
+    }
+    if (this.block) {
+      return {
+        contractAddress: this.contract.rawContract.address,
+        blockNumber: this.blockNumber,
+        transactionIndex: -1,
+        transactionHash: '',
+        logIndex: -1,
+        chainId: this.chainId.toString(),
+        descriptor: descriptor,
+        labels: normalizeLabels(labels),
+      }
+    }
+    if (this.trace) {
+      return {
+        contractAddress: this.contract.rawContract.address,
+        blockNumber: this.blockNumber,
+        transactionIndex: this.trace.transactionPosition,
+        transactionHash: this.transactionHash || '',
+        logIndex: -1,
+        chainId: this.chainId.toString(),
+        descriptor: descriptor,
+        labels: normalizeLabels(labels),
+      }
+    }
+    throw new Error("Invaid ctx argument can't happen")
   }
 }
 
@@ -109,6 +153,19 @@ export class SolanaContext extends BaseContext {
     this.address = address
     this.blockNumber = slot
   }
+
+  getMetaData(descriptor: MetricDescriptor | undefined, labels: Labels): RecordMetaData {
+    return {
+      contractAddress: this.address,
+      blockNumber: this.blockNumber,
+      transactionIndex: 0,
+      transactionHash: '', // TODO add
+      logIndex: 0,
+      chainId: SOL_MAINMET_ID, // TODO set in context
+      descriptor: descriptor,
+      labels: normalizeLabels(labels),
+    }
+  }
 }
 
 export class SuiContext extends BaseContext {
@@ -120,15 +177,17 @@ export class SuiContext extends BaseContext {
     this.address = address
     this.blockNumber = slot
   }
-}
 
-export class AptosContext extends BaseContext {
-  address: string
-  blockNumber: Long
-
-  constructor(address: string, slot: Long) {
-    super()
-    this.address = address
-    this.blockNumber = slot
+  getMetaData(descriptor: MetricDescriptor | undefined, labels: Labels): RecordMetaData {
+    return {
+      contractAddress: this.address,
+      blockNumber: this.blockNumber,
+      transactionIndex: 0,
+      transactionHash: '', // TODO
+      logIndex: 0,
+      chainId: SUI_DEVNET_ID, // TODO set in context
+      descriptor: descriptor,
+      labels: normalizeLabels(labels),
+    }
   }
 }

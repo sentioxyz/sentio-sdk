@@ -3,7 +3,7 @@ import { toBigInteger, toMetricValue } from './numberish'
 import { webcrypto } from 'crypto'
 import { BigNumber } from 'ethers'
 import { performance } from 'perf_hooks'
-import { BigInteger } from '../gen/processor/protos/processor'
+import { BigInteger } from '../gen'
 import { BigDecimal } from '.'
 
 // TODO add test for type conversion

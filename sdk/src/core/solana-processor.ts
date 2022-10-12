@@ -1,4 +1,4 @@
-import { ProcessResult } from '../gen/processor/protos/processor'
+import { ProcessResult } from '../gen'
 import { SolanaContext } from './context'
 import Long from 'long'
 import { Instruction } from '@project-serum/anchor'
