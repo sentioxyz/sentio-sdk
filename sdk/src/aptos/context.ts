@@ -4,14 +4,14 @@ import { Labels } from '../core/metadata'
 import { APTOS_TESTNET_ID } from '../utils/chain'
 import { normalizeLabels } from '../core/meter'
 import { BaseContext } from '../core/context'
-import { UserTransaction } from './'
+import { Transaction_UserTransaction } from './'
 
 export class AptosContext extends BaseContext {
   address: string
   blockNumber: Long
-  transaction: UserTransaction
+  transaction: Transaction_UserTransaction
 
-  constructor(address: string, slot: Long, transaction?: UserTransaction) {
+  constructor(address: string, slot: Long, transaction?: Transaction_UserTransaction) {
     super()
     this.address = address
     this.blockNumber = slot

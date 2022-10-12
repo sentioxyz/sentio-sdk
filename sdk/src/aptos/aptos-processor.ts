@@ -1,5 +1,11 @@
 import { ProcessResult } from '../gen'
-import { AptosBindOptions, AptosContext, AptosNetwork, FunctionPayload, UserTransaction } from '.'
+import {
+  AptosBindOptions,
+  AptosContext,
+  AptosNetwork,
+  Transaction_UserTransaction,
+  TransactionPayload_EntryFunctionPayload,
+} from '.'
 import type { Event as OldEvent } from 'aptos/src/generated'
 
 import Long from 'long'
@@ -30,7 +36,7 @@ class EventHandler {
 
 class CallHandler {
   filters: CallFilter[]
-  handler: (call: UserTransaction) => Promise<ProcessResult>
+  handler: (call: Transaction_UserTransaction) => Promise<ProcessResult>
 }
 
 export class AptosBaseProcessor {
@@ -45,7 +51,11 @@ export class AptosBaseProcessor {
     global.PROCESSOR_STATE.aptosProcessors.push(this)
   }
 
-  public onTransaction(handler: (transaction: UserTransaction, ctx: AptosContext) => void) {
+  static bind(options: AptosBindOptions) {
+    return new AptosBaseProcessor(options)
+  }
+
+  public onTransaction(handler: (transaction: Transaction_UserTransaction, ctx: AptosContext) => void) {
     const address = this.config.address
     this.callHandlers.push({
       handler: async function (tx) {
@@ -91,8 +101,8 @@ export class AptosBaseProcessor {
     })
   }
 
-  public onFunctionCall(
-    handler: (call: FunctionPayload, ctx: AptosContext) => void,
+  public onEntryFunctionCall(
+    handler: (call: TransactionPayload_EntryFunctionPayload, ctx: AptosContext) => void,
     filter: CallFilter | CallFilter[]
   ) {
     let _filters: CallFilter[] = []
@@ -109,7 +119,7 @@ export class AptosBaseProcessor {
       handler: async function (tx) {
         const ctx = new AptosContext(address, Long.fromString(tx.version), tx)
         if (tx) {
-          const payload = tx.payload as FunctionPayload
+          const payload = tx.payload as TransactionPayload_EntryFunctionPayload
           handler(payload, ctx)
         }
         return {

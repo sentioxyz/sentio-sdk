@@ -1,15 +1,7 @@
 import { aptos } from '@sentio/sdk'
 
-class Souffl3 extends aptos.AptosBaseProcessor {
-  static bind(options: aptos.AptosBindOptions): Souffl3 {
-    if (options && !options.name) {
-      options.name = 'souffl3'
-    }
-    return new Souffl3(options)
-  }
-}
-
-Souffl3.bind({
+aptos.AptosBaseProcessor.bind({
+  name: 'souffl3',
   startVersion: 6604913,
   address: '0x4188c8694687e844677c2aa87171019e23d61cac60de5082a278a8aa47e9d807',
 })
@@ -22,11 +14,11 @@ Souffl3.bind({
       }
     }
   })
-  .onFunctionCall(
+  .onEntryFunctionCall(
     (call, ctx) => {
       ctx.meter.Counter('call_num').add(1)
-      if (call.arguments.length > 0 && call.type_arguments.length > 0) {
-        ctx.meter.Counter('arg').add(call.arguments[0], { type: call.type_arguments[0] })
+      if (call.arguments.length > 3 && call.type_arguments.length > 0) {
+        ctx.meter.Counter('arg').add(parseInt(call.arguments[3]), { type: call.type_arguments[0] })
       }
     },
     {
