@@ -51,11 +51,13 @@ export class AptosBaseProcessor {
     global.PROCESSOR_STATE.aptosProcessors.push(this)
   }
 
-  static bind(options: AptosBindOptions) {
+  static bind(options: AptosBindOptions): AptosBaseProcessor {
     return new AptosBaseProcessor(options)
   }
 
-  public onTransaction(handler: (transaction: Transaction_UserTransaction, ctx: AptosContext) => void) {
+  public onTransaction(
+    handler: (transaction: Transaction_UserTransaction, ctx: AptosContext) => void
+  ): AptosBaseProcessor {
     const address = this.config.address
     this.callHandlers.push({
       handler: async function (tx) {
@@ -74,7 +76,10 @@ export class AptosBaseProcessor {
     return this
   }
 
-  public onEvent(handler: (event: Event, ctx: AptosContext) => void, filter: EventFilter | EventFilter[]) {
+  public onEvent(
+    handler: (event: Event, ctx: AptosContext) => void,
+    filter: EventFilter | EventFilter[]
+  ): AptosBaseProcessor {
     let _filters: EventFilter[] = []
 
     if (Array.isArray(filter)) {
@@ -99,12 +104,13 @@ export class AptosBaseProcessor {
       },
       filters: _filters,
     })
+    return this
   }
 
   public onEntryFunctionCall(
     handler: (call: TransactionPayload_EntryFunctionPayload, ctx: AptosContext) => void,
     filter: CallFilter | CallFilter[]
-  ) {
+  ): AptosBaseProcessor {
     let _filters: CallFilter[] = []
 
     if (Array.isArray(filter)) {
@@ -144,7 +150,6 @@ export class AptosBaseProcessor {
       address: options.address,
       network: options.network || AptosNetwork.TEST_NET,
     }
-    return this
   }
   //
   // public endBlock(endBlock: Long | number) {

@@ -26,6 +26,7 @@ module.exports = {
   mode: 'production',
   externals: [
     {
+      aptos: 'commonjs2 aptos',
       ethers: 'commonjs2 ethers',
       bs58: 'commonjs2 bs58',
       "bignumber.js": 'commonjs2 bignumber.js',

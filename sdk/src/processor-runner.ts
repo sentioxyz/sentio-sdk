@@ -2,7 +2,7 @@
 
 import commandLineArgs from 'command-line-args'
 import { createServer } from 'nice-grpc'
-import { ProcessorDefinition } from './gen/processor/protos/processor'
+import { ProcessorDefinition } from './gen'
 import { ProcessorServiceImpl } from './service'
 import { setProvider } from './provider'
 

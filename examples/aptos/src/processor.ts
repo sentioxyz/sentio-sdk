@@ -1,5 +1,13 @@
 import { aptos } from '@sentio/sdk'
 
+// class Souffl3 extends aptos.AptosBaseProcessor {
+//   static bind(options: aptos.AptosBindOptions): Souffl3 {
+//     if (options && !options.name) {
+//       options.name = 'souffl3'
+//     }
+//     return new Souffl3(options)
+//   }
+// }
 aptos.AptosBaseProcessor.bind({
   name: 'souffl3',
   startVersion: 6604913,
