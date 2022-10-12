@@ -20,7 +20,7 @@ export interface EventFilter {
 
 export interface CallFilter {
   function: string
-  typeArguments: string[] | undefined
+  typeArguments?: string[]
 }
 
 class EventHandler {

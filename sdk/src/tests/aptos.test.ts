@@ -49,7 +49,7 @@ describe('Test Aptos Example', () => {
       ],
     }
     const res = await service.processBindings(request)
-    expect(res.result?.counters).length(1)
+    expect(res.result?.counters).length(2)
     expect(res.result?.gauges).length(0)
     expect(res.result?.counters[0].metadata?.blockNumber.toInt()).equal(18483034)
   })

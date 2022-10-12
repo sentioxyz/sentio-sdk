@@ -23,12 +23,14 @@ Souffl3.bind({
     }
   })
   .onFunctionCall(
-    (call: aptos.FunctionPayload, ctx: aptos.AptosContext) => {
+    (call, ctx) => {
       ctx.meter.Counter('call_num').add(1)
+      if (call.arguments.length > 0 && call.type_arguments.length > 0) {
+        ctx.meter.Counter('arg').add(call.arguments[0], { type: call.type_arguments[0] })
+      }
     },
     {
       function: 'SouffleChefCampaign::pull_token_v2',
-      typeArguments: undefined,
     }
   )
   .onEvent(
