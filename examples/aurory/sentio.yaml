@@ -1,0 +1,5 @@
+project: aurory
+host: local
+targets:
+  - chain: solana
+    abisDir: abis/solana
