@@ -65,6 +65,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       config: undefined,
       contractConfigs: this.contractConfigs,
       templateInstances: this.templateInstances,
+      accountConfigs: [],
     }
   }
 
@@ -211,7 +212,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       const contractConfig: ContractConfig = {
         processorType: USER_PROCESSOR,
         contract: {
-          name: aptosProcessor.name,
+          name: aptosProcessor.moduleName,
           chainId: aptosProcessor.getChainId(),
           address: aptosProcessor.config.address,
           abi: '',

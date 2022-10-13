@@ -42,7 +42,7 @@ ERC20Processor.bind({ address: 'xxxx', network: 56 })
 
 ERC20Processor.bind({ address: 'yyyy', network: 1 })
 ERC20Processor.bind({ address: 'yyyy', network: 1 })
-ERC20Processor.bind({ address: 'yyyy', network: 1, startBlock: 21 })
+ERC20Processor.bind({ address: 'yyyy', network: 1, startBlock: 21, name: 'ytoken' })
 
 // const template = Erc20Processor.template
 //   .onTransfer(async function (event, ctx) {

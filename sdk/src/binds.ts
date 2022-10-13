@@ -44,13 +44,14 @@ export function getContractName(
   return name
 }
 
-export function getProcessor(abiName: string, opts: BindOptions) {
-  const sig = abiName + '_' + getOptionsSignature(opts)
+// Dedup processor that bind multiple times
+export function getProcessor(opts: BindOptions) {
+  const sig = getOptionsSignature(opts)
   return global.PROCESSOR_STATE.processorMap.get(sig)
 }
 
-export function addProcessor(abiName: string, opts: BindOptions, processor: BaseProcessor<any, any>) {
-  const sig = abiName + '_' + getOptionsSignature(opts)
+export function addProcessor(opts: BindOptions, processor: BaseProcessor<any, any>) {
+  const sig = getOptionsSignature(opts)
 
   global.PROCESSOR_STATE.processors.push(processor)
   global.PROCESSOR_STATE.processorMap.set(sig, processor)

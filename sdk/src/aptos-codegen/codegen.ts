@@ -65,12 +65,16 @@ function generateModule(moduleByteCode: MoveModuleBytecode) {
 
   return `
   export class ${module.name} extends aptos.AptosBaseProcessor {
-    static DEFAULT_OPTIONS: aptos.NamedAptosBindOptions = {
+    constructor(options: aptos.AptosBindOptions) {
+      super("${module.name}", options)
+    }
+    static DEFAULT_OPTIONS: aptos.AptosBindOptions = {
       address: "${module.address}",
       network: aptos.AptosNetwork.TEST_NET       
     }
-    static bind(options = ${module.name}.DEFAULT_OPTIONS): ${module.name} {
-      return new ${module.name}({ ...options, name: "${module.name}" })
+
+    static bind(options: Partial<aptos.AptosBindOptions> = {}): ${module.name} {
+      return new ${module.name}({ ...${module.name}.DEFAULT_OPTIONS, ...options })
     }
     
     ${functions.join('\n')}

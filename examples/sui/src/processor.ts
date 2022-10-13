@@ -12,10 +12,7 @@ import { SuiBaseProcessor } from '@sentio/sdk'
 
 class SuiTransferProcessor extends SuiBaseProcessor {
   static bind(options: SuiBindOptions): SuiTransferProcessor {
-    if (options && !options.name) {
-      options.name = 'SuiNameNFT'
-    }
-    return new SuiTransferProcessor(options)
+    return new SuiTransferProcessor('SuiNameNFT', options)
   }
 }
 

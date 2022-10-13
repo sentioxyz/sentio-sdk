@@ -10,10 +10,7 @@ describe('Test Sui Example', () => {
   const service = new TestProcessorServer(() => {
     class TicTacToeProcessor extends SuiBaseProcessor {
       static bind(options: SuiBindOptions): TicTacToeProcessor {
-        if (options && !options.name) {
-          options.name = 'TicTacToe'
-        }
-        return new TicTacToeProcessor(options)
+        return new TicTacToeProcessor('TicTacToe', options)
       }
     }
 

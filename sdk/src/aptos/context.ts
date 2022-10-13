@@ -1,5 +1,5 @@
 import Long from 'long'
-import { MetricDescriptor, RecordMetaData } from '../gen'
+import { DataDescriptor, RecordMetaData } from '../gen'
 import { Labels } from '../core/metadata'
 import { APTOS_TESTNET_ID } from '../utils/chain'
 import { normalizeLabels } from '../core/meter'
@@ -8,27 +8,30 @@ import { Transaction_UserTransaction } from './'
 
 export class AptosContext extends BaseContext {
   address: string
-  blockNumber: Long
+  moduleName: string
+  version: Long
   transaction: Transaction_UserTransaction
 
-  constructor(address: string, slot: Long, transaction?: Transaction_UserTransaction) {
+  constructor(moduleName: string, address: string, version: Long, transaction?: Transaction_UserTransaction) {
     super()
     this.address = address
-    this.blockNumber = slot
+    this.moduleName = moduleName
+    this.version = version
     if (transaction) {
       this.transaction = transaction
     }
   }
 
-  getMetaData(descriptor: MetricDescriptor | undefined, labels: Labels): RecordMetaData {
+  getMetaData(descriptor: DataDescriptor | undefined, labels: Labels): RecordMetaData {
     return {
-      contractAddress: this.address,
-      blockNumber: this.blockNumber,
+      address: this.address,
+      contractName: this.moduleName,
+      blockNumber: this.version,
       transactionIndex: 0,
       transactionHash: this.transaction?.hash || '', // TODO
       logIndex: 0,
       chainId: APTOS_TESTNET_ID, // TODO set in context
-      descriptor: descriptor,
+      dataDescriptor: descriptor,
       labels: normalizeLabels(labels),
     }
   }

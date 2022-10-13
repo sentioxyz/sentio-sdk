@@ -9,13 +9,6 @@ export enum AptosNetwork {
 export class AptosBindOptions {
   address: string
   network?: AptosNetwork = AptosNetwork.TEST_NET
-  name?: string
   startVersion?: Long | number
   // endBlock?: Long | number
-}
-
-export class NamedAptosBindOptions {
-  address: string
-  network?: AptosNetwork = AptosNetwork.TEST_NET
-  startVersion?: Long | number
 }

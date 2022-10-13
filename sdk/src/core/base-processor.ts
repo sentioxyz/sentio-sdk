@@ -4,7 +4,7 @@ import { Block, Log, getNetwork } from '@ethersproject/providers'
 import { BaseContract, EventFilter } from '@ethersproject/contracts'
 import Long from 'long'
 
-import { BoundContractView, Context, ContractView } from './context'
+import { BoundContractView, ContractContext, ContractView } from './context'
 import { ProcessResult } from '../gen'
 import { BindInternalOptions, BindOptions } from './bind-options'
 import { PromiseOrVoid } from '../promise-or-void'
@@ -28,7 +28,6 @@ export abstract class BaseProcessor<
   eventHandlers: EventsHandler[] = []
   traceHandlers: TraceHandler[] = []
 
-  name: string
   config: BindInternalOptions
 
   constructor(config: BindOptions) {
@@ -61,7 +60,7 @@ export abstract class BaseProcessor<
   }
 
   public onEvent(
-    handler: (event: Event, ctx: Context<TContract, TBoundContractView>) => PromiseOrVoid,
+    handler: (event: Event, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     filter: EventFilter | EventFilter[]
   ) {
     const chainId = this.getChainId()
@@ -75,10 +74,17 @@ export abstract class BaseProcessor<
     }
 
     const contractView = this.CreateBoundContractView()
+    const contractName = this.config.name
     this.eventHandlers.push({
       filters: _filters,
       handler: async function (log) {
-        const ctx = new Context<TContract, TBoundContractView>(contractView, chainId, undefined, log)
+        const ctx = new ContractContext<TContract, TBoundContractView>(
+          contractName,
+          contractView,
+          chainId,
+          undefined,
+          log
+        )
         // let event: Event = <Event>deepCopy(log);
         const event: Event = <Event>log
         const parsed = contractView.rawContract.interface.parseLog(log)
@@ -108,12 +114,19 @@ export abstract class BaseProcessor<
     return this
   }
 
-  public onBlock(handler: (block: Block, ctx: Context<TContract, TBoundContractView>) => PromiseOrVoid) {
+  public onBlock(handler: (block: Block, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid) {
     const chainId = this.getChainId()
     const contractView = this.CreateBoundContractView()
+    const contractName = this.config.name
 
     this.blockHandlers.push(async function (block: Block) {
-      const ctx = new Context<TContract, TBoundContractView>(contractView, chainId, block, undefined)
+      const ctx = new ContractContext<TContract, TBoundContractView>(
+        contractName,
+        contractView,
+        chainId,
+        block,
+        undefined
+      )
       await handler(block, ctx)
       return {
         gauges: ctx.gauges,
@@ -124,7 +137,7 @@ export abstract class BaseProcessor<
     return this
   }
 
-  public onAllEvents(handler: (event: Log, ctx: Context<TContract, TBoundContractView>) => PromiseOrVoid) {
+  public onAllEvents(handler: (event: Log, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid) {
     const _filters: EventFilter[] = []
     const tmpContract = this.CreateBoundContractView()
 
@@ -138,10 +151,11 @@ export abstract class BaseProcessor<
 
   protected onTrace(
     signature: string,
-    handler: (trace: Trace, ctx: Context<TContract, TBoundContractView>) => PromiseOrVoid
+    handler: (trace: Trace, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid
   ) {
     const chainId = this.getChainId()
     const contractView = this.CreateBoundContractView()
+    const contractName = this.config.name
 
     this.traceHandlers.push({
       signature,
@@ -158,7 +172,14 @@ export abstract class BaseProcessor<
         const traceData = '0x' + trace.action.input.slice(10)
         trace.args = contractInterface._abiCoder.decode(fragment.inputs, traceData)
 
-        const ctx = new Context<TContract, TBoundContractView>(contractView, chainId, undefined, undefined, trace)
+        const ctx = new ContractContext<TContract, TBoundContractView>(
+          contractName,
+          contractView,
+          chainId,
+          undefined,
+          undefined,
+          trace
+        )
         await handler(trace, ctx)
         return {
           gauges: ctx.gauges,

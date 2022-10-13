@@ -1,6 +1,6 @@
 import { SouffleChefCampaign, CandyMachine } from './types/aptos/souffle'
 
-SouffleChefCampaign.bind()
+SouffleChefCampaign.bind({ startVersion: 3212312 })
   .onEntryPullTokenV2((call, ctx) => {
     ctx.meter.Counter('call_num').add(1)
     ctx.meter.Counter('pulled').add(parseInt(call.arguments[3]))

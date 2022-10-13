@@ -49,18 +49,19 @@ export function codeGenSentioFile(contract: Contract): string {
       .join('\n')}
   }
 
-  export type ${contract.name}Context = Context<${contract.name}, ${contract.name}BoundContractView>
+  export type ${contract.name}Context = ContractContext<${contract.name}, ${contract.name}BoundContractView>
 
   export class ${contract.name}ProcessorTemplate extends BaseProcessorTemplate<${contract.name}, ${
     contract.name
   }BoundContractView> {
     bindInternal(options: BindOptions) {
-      let processor = getProcessor("${contract.name}", options) as ${contract.name}Processor
+      if (!options.name) {
+        options.name = "${contract.name}"
+      }
+      let processor = getProcessor(options) as ${contract.name}Processor
       if (!processor) {
-        const finalOptions = Object.assign({}, options)
-        finalOptions.name = getContractName("${contract.name}", options.name, options.address, options.network)
-        processor = new ${contract.name}Processor(finalOptions)
-        addProcessor("${contract.name}", options, processor)
+        processor = new ${contract.name}Processor(options)
+        addProcessor(options, processor)
       }
       return processor
     }
@@ -103,14 +104,13 @@ export function codeGenSentioFile(contract: Contract): string {
     }
 
     public static bind(options: BindOptions): ${contract.name}Processor {
-      let processor = getProcessor("${contract.name}", options) as ${contract.name}Processor
+       if (!options.name) {
+        options.name = "${contract.name}"
+      }
+      let processor = getProcessor(options) as ${contract.name}Processor
       if (!processor) {
-        // const wrapper = get${contract.name}Contract(options.address, options.network)
-
-        const finalOptions = Object.assign({}, options)
-        finalOptions.name = getContractName("${contract.name}", options.name, options.address, options.network)
-        processor = new ${contract.name}Processor(finalOptions)
-        addProcessor("${contract.name}", options, processor)
+        processor = new ${contract.name}Processor(options)
+        addProcessor(options, processor)
       }
       return processor
     }
@@ -167,7 +167,7 @@ export function codeGenSentioFile(contract: Contract): string {
         'BaseProcessor',
         'BaseProcessorTemplate',
         'BoundContractView',
-        'Context',
+        'ContractContext',
         'ContractView',
         'DummyProvider',
         'getContractName',

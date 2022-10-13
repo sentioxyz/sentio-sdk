@@ -1,20 +1,22 @@
-import { BaseContext } from './context'
-import { MetricDescriptor, RecordMetaData } from '../gen'
-import { Metric, normalizeName } from './meter'
+import { DataDescriptor } from '../gen'
+import { normalizeName } from './meter'
 
 export type Labels = { [key: string]: string }
 
-export function GetRecordMetaData(ctx: BaseContext, metric: Metric | undefined, labels: Labels): RecordMetaData {
-  let descriptor = undefined
-  if (metric) {
-    descriptor = metric.descriptor
-    if (metric.usage > 0) {
-      // Other setting don't need to be write multiple times
-      descriptor = MetricDescriptor.fromPartial({ name: descriptor.name })
-    }
-
-    descriptor.name = normalizeName(descriptor.name)
+export class DescriptorWithUsage {
+  descriptor: DataDescriptor
+  usage = 0
+  constructor(descriptor: DataDescriptor) {
+    this.descriptor = descriptor
+    this.descriptor.name = normalizeName(descriptor.name)
   }
 
-  return ctx.getMetaData(descriptor, labels)
+  getShortDescriptor(): DataDescriptor {
+    if (this.usage > 0) {
+      // Other setting don't need to be write multiple times
+      return DataDescriptor.fromPartial({ name: this.descriptor.name })
+    }
+
+    return this.descriptor
+  }
 }

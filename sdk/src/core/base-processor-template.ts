@@ -1,4 +1,4 @@
-import { BoundContractView, Context, ContractView } from './context'
+import { BoundContractView, ContractContext, ContractView } from './context'
 import { Block } from '@ethersproject/abstract-provider'
 import { BaseContract, EventFilter } from 'ethers'
 import { Event } from '@ethersproject/contracts'
@@ -16,13 +16,13 @@ export abstract class BaseProcessorTemplate<
 > {
   id: number
   binds = new Set<string>()
-  blockHandlers: ((block: Block, ctx: Context<TContract, TBoundContractView>) => PromiseOrVoid)[] = []
+  blockHandlers: ((block: Block, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid)[] = []
   traceHandlers: {
     signature: string
-    handler: (trace: Trace, ctx: Context<TContract, TBoundContractView>) => PromiseOrVoid
+    handler: (trace: Trace, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid
   }[] = []
   eventHandlers: {
-    handler: (event: Event, ctx: Context<TContract, TBoundContractView>) => PromiseOrVoid
+    handler: (event: Event, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid
     filter: EventFilter | EventFilter[]
   }[] = []
 
@@ -78,7 +78,7 @@ export abstract class BaseProcessorTemplate<
   }
 
   public onEvent(
-    handler: (event: Event, ctx: Context<TContract, TBoundContractView>) => PromiseOrVoid,
+    handler: (event: Event, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     filter: EventFilter | EventFilter[]
   ) {
     this.eventHandlers.push({
@@ -88,14 +88,14 @@ export abstract class BaseProcessorTemplate<
     return this
   }
 
-  public onBlock(handler: (block: Block, ctx: Context<TContract, TBoundContractView>) => PromiseOrVoid) {
+  public onBlock(handler: (block: Block, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid) {
     this.blockHandlers.push(handler)
     return this
   }
 
   public onTrace(
     signature: string,
-    handler: (trace: Trace, ctx: Context<TContract, TBoundContractView>) => PromiseOrVoid
+    handler: (trace: Trace, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid
   ) {
     this.traceHandlers.push({ signature, handler })
     return this

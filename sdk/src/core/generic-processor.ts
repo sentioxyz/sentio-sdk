@@ -21,15 +21,14 @@ export class GenericProcessor extends BaseProcessor<
   }
 
   public static bind(eventABI: string[] | string, options: BindOptions): GenericProcessor {
-    const AbiName = 'Generic'
     if (!Array.isArray(eventABI)) {
       eventABI = [eventABI]
     }
-
-    const finalOptions = Object.assign({}, options)
-    finalOptions.name = getContractName(AbiName, options.name, options.address, options.network)
-    const processor = new GenericProcessor(eventABI, finalOptions)
-    addProcessor(AbiName, options, processor)
+    if (!options.name) {
+      options.name = 'Generic'
+    }
+    const processor = new GenericProcessor(eventABI, options)
+    addProcessor(options, processor)
     return processor
   }
 }

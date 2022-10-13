@@ -1,7 +1,7 @@
-import { MetricDescriptor } from '../gen'
 import { BaseContext } from './context'
 import { toMetricValue, Numberish } from './numberish'
-import { GetRecordMetaData, Labels } from './metadata'
+import { DescriptorWithUsage, Labels } from './metadata'
+import { DataDescriptor } from '../gen'
 
 export function normalizeName(name: string): string {
   const regex = new RegExp('![_.a-zA-Z0-9]')
@@ -27,29 +27,27 @@ export function normalizeLabels(labels: Labels): Labels {
   return normLabels
 }
 
-export class MetricDescriptorOption {
+export class MetricDescriptorOptions {
   unit?: string
   description?: string
   sparse?: boolean
 }
 
-export class Metric {
-  descriptor: MetricDescriptor = MetricDescriptor.fromPartial({})
-  usage = 0
-
-  constructor(name: string, option?: MetricDescriptorOption) {
-    this.descriptor.name = name
+export class Metric extends DescriptorWithUsage {
+  constructor(name: string, option?: MetricDescriptorOptions) {
+    const descriptor = DataDescriptor.fromPartial({ name })
     if (option) {
       if (option.unit) {
-        this.descriptor.unit = option.unit
+        descriptor.unit = option.unit
       }
       if (option.description) {
-        this.descriptor.description = option.description
+        descriptor.description = option.description
       }
       if (option.sparse) {
-        this.descriptor.sparse = option.sparse
+        descriptor.sparse = option.sparse
       }
     }
+    super(descriptor)
   }
 }
 
@@ -64,7 +62,7 @@ export class Counter extends Metric {
 
   private record(ctx: BaseContext, value: Numberish, labels: Labels, add: boolean) {
     ctx.counters.push({
-      metadata: GetRecordMetaData(ctx, this, labels),
+      metadata: ctx.getMetaData(this.getShortDescriptor(), labels),
       metricValue: toMetricValue(value),
       add: add,
       runtimeInfo: undefined,
@@ -94,7 +92,7 @@ export class CounterBinding {
 export class Gauge extends Metric {
   record(ctx: BaseContext, value: Numberish, labels: Labels = {}) {
     ctx.gauges.push({
-      metadata: GetRecordMetaData(ctx, this, labels),
+      metadata: ctx.getMetaData(this.getShortDescriptor(), labels),
       metricValue: toMetricValue(value),
       runtimeInfo: undefined,
     })

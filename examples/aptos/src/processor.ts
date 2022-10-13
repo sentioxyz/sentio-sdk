@@ -1,6 +1,6 @@
 import { SouffleChefCampaign, CandyMachine } from './types/aptos/souffle'
 
-SouffleChefCampaign.bind({ ...SouffleChefCampaign.DEFAULT_OPTIONS, startVersion: 6604913 })
+SouffleChefCampaign.bind({ startVersion: 6604913 })
   .onEntryPullTokenV2((call, ctx) => {
     ctx.meter.Counter('call_num').add(1)
     ctx.meter.Counter('pulled').add(parseInt(call.arguments[3]))
@@ -18,6 +18,6 @@ SouffleChefCampaign.bind({ ...SouffleChefCampaign.DEFAULT_OPTIONS, startVersion:
     }
   })
 
-// CandyMachine.bind().onEntryPullToken((call, ctx) => {
-//   ctx.meter.Counter('pulled').add(parseInt(call.arguments[3]))
-// })
+CandyMachine.bind().onEntryPullToken((call, ctx) => {
+  ctx.meter.Counter('pulled').add(parseInt(call.arguments[3]))
+})

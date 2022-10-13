@@ -49,6 +49,8 @@ message ProcessConfigResponse {
   ProjectConfig config = 1;
   repeated ContractConfig contract_configs = 2;
   repeated TemplateInstance template_instances = 3;
+
+  repeated AccountConfig account_configs = 4;
 }
 
 message ContractConfig {
@@ -62,6 +64,10 @@ message ContractConfig {
   uint64 start_block = 4;
   uint64 end_block = 5;
   string processor_type = 8;
+}
+
+message AccountConfig {
+  // TODO implement account configs
 }
 
 message ContractInfo {
@@ -195,26 +201,37 @@ message ProcessResult {
   repeated LogResult logs = 3;
 }
 
-message MetricDescriptor {
+message DataDescriptor {
   string name = 1;
-  string unit = 2;
   string description = 3;
+  // Only for metrics
+  string unit = 2;
+  // Only for metrics
   bool sparse = 4;
 }
 
 message RecordMetaData {
   // These are populated by systems.
-  string contract_address = 1;
-  uint64 block_number = 2; // TODO discuss if we need this if we send request per block
+
+  // Contract or Wallet or Account address
+  string address = 1;
+  // Contract (solidity) or module (move) or programId (solana)
+  // it could be empty if this is not record for a contract
+  // In some chain (e.g. aptos)
+  // one address could have multiple contract/module name
+  string contract_name = 9;
+  // Block or slot (solana) or version (aptos) number
+  uint64 block_number = 2;
   string transaction_hash = 6;
+  string chain_id = 5;
+
+  // optional for ether
   int32 transaction_index = 3;
   int32 log_index = 4;
-  string chain_id = 5;
 
   // These are populated by users in meter.
   // The metric name and properties
-  // none for for log
-  MetricDescriptor descriptor = 8;
+  DataDescriptor dataDescriptor = 8;
 
   // The metric labels provided by users.
   map<string, string> labels = 7;
@@ -271,7 +288,6 @@ enum LogLevel {
 }
 
 message LogResult {
-  string name = 5;
   RecordMetaData metadata = 1;
   LogLevel level = 2;
   string message = 3;

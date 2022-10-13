@@ -1,4 +1,3 @@
-import { SuiBindOptions } from './bind-options'
 import { SuiContext } from './context'
 import { ProcessResult } from '../gen'
 import Long from 'long'
@@ -8,35 +7,29 @@ type IndexConfigure = {
   endSeqNumber?: Long
 }
 
+export class SuiBindOptions {
+  address: string
+  // network?: Networkish = 1
+  // name?: string
+  startBlock?: Long | number
+  // endBlock?: Long | number
+}
+
 export class SuiBaseProcessor {
   public transactionHanlder: (transaction: any, ctx: SuiContext) => void
   address: string
   config: IndexConfigure = { startSeqNumber: new Long(0) }
 
-  constructor(options: SuiBindOptions) {
-    if (options) {
-      this.bind(options)
-    }
-    global.PROCESSOR_STATE.suiProcessors.push(this)
-  }
-
-  bind(options: SuiBindOptions) {
+  constructor(name: string, options: SuiBindOptions) {
     this.address = options.address
     if (options.startBlock) {
       this.startSlot(options.startBlock)
     }
-    if (options.endBlock) {
-      this.endBlock(options.endBlock)
-    }
+    global.PROCESSOR_STATE.suiProcessors.push(this)
   }
 
   public onTransaction(handler: (transaction: any, ctx: SuiContext) => void) {
-    if (!this.isBind()) {
-      throw new Error("Processor doesn't bind to an address")
-    }
-
     this.transactionHanlder = handler
-
     return this
   }
 
@@ -51,10 +44,6 @@ export class SuiBaseProcessor {
       counters: ctx.counters,
       logs: ctx.logs,
     }
-  }
-
-  public isBind() {
-    return this.address !== null
   }
 
   public startSlot(startSlot: Long | number) {

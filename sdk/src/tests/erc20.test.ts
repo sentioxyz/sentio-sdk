@@ -20,11 +20,9 @@ describe('Test Basic Examples', () => {
     const config = await service.getConfig({})
     expect(config.contractConfigs).length(5)
 
-    // check auto rename
     expect(config.contractConfigs?.[2].contract?.name).equals('ERC20')
-    expect(config.contractConfigs?.[3].contract?.name).equals('ERC20_1')
-    // same as above because only differ in parameters
-    expect(config.contractConfigs?.[4].contract?.name).equals('ERC20_1')
+    expect(config.contractConfigs?.[3].contract?.name).equals('ERC20')
+    expect(config.contractConfigs?.[4].contract?.name).equals('ytoken')
   })
 
   test('Check block dispatch', async () => {
@@ -32,6 +30,7 @@ describe('Test Basic Examples', () => {
     expect(res?.counters).length(0)
     expect(res?.gauges).length(1)
     expect(firstGaugeValue(res, 'g1')).equals(10n)
+    expect(res?.gauges[0].metadata?.contractName).equals('x2y2')
 
     const gauge = res?.gauges?.[0]
     expect(gauge?.metadata?.blockNumber?.toString()).equals('14373295')

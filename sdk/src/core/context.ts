@@ -1,4 +1,4 @@
-import { CounterResult, GaugeResult, LogResult, MetricDescriptor, RecordMetaData } from '../gen'
+import { CounterResult, GaugeResult, LogResult, DataDescriptor, RecordMetaData } from '../gen'
 import { BaseContract, EventFilter } from 'ethers'
 import { Block, Log } from '@ethersproject/abstract-provider'
 import { Meter, normalizeLabels } from './meter'
@@ -20,18 +20,19 @@ export abstract class BaseContext {
     this.logger = new Logger(this)
   }
 
-  abstract getMetaData(descriptor: MetricDescriptor | undefined, labels: Labels): RecordMetaData
+  abstract getMetaData(descriptor: DataDescriptor | undefined, labels: Labels): RecordMetaData
 }
 
 export abstract class EthContext extends BaseContext {
   chainId: number
+  address: string
   log?: Log
   block?: Block
   trace?: Trace
   blockNumber: Long
   transactionHash?: string
 
-  protected constructor(chainId: number, block?: Block, log?: Log, trace?: Trace) {
+  protected constructor(chainId: number, address: string, block?: Block, log?: Log, trace?: Trace) {
     super()
     this.chainId = chainId
     this.log = log
@@ -49,54 +50,64 @@ export abstract class EthContext extends BaseContext {
   }
 }
 
-export class Context<
+export class ContractContext<
   TContract extends BaseContract,
   TContractBoundView extends BoundContractView<TContract, ContractView<TContract>>
 > extends EthContext {
   contract: TContractBoundView
-  address: string
+  contractName: string
 
-  constructor(view: TContractBoundView, chainId: number, block?: Block, log?: Log, trace?: Trace) {
-    super(chainId, block, log, trace)
+  constructor(
+    contractName: string,
+    view: TContractBoundView,
+    chainId: number,
+    block?: Block,
+    log?: Log,
+    trace?: Trace
+  ) {
+    super(chainId, view.rawContract.address, block, log, trace)
     view.context = this
+    this.contractName = contractName
     this.contract = view
-    this.address = view.rawContract.address
   }
 
-  getMetaData(descriptor: MetricDescriptor | undefined, labels: Labels): RecordMetaData {
+  getMetaData(descriptor: DataDescriptor | undefined, labels: Labels): RecordMetaData {
     if (this.log) {
       return {
-        contractAddress: this.contract.rawContract.address,
+        address: this.contract.rawContract.address,
+        contractName: this.contractName,
         blockNumber: this.blockNumber,
         transactionIndex: this.log.transactionIndex,
         transactionHash: this.transactionHash || '',
         logIndex: this.log.logIndex,
         chainId: this.chainId.toString(),
-        descriptor: descriptor,
+        dataDescriptor: descriptor,
         labels: normalizeLabels(labels),
       }
     }
     if (this.block) {
       return {
-        contractAddress: this.contract.rawContract.address,
+        address: this.contract.rawContract.address,
+        contractName: this.contractName,
         blockNumber: this.blockNumber,
         transactionIndex: -1,
         transactionHash: '',
         logIndex: -1,
         chainId: this.chainId.toString(),
-        descriptor: descriptor,
+        dataDescriptor: descriptor,
         labels: normalizeLabels(labels),
       }
     }
     if (this.trace) {
       return {
-        contractAddress: this.contract.rawContract.address,
+        address: this.contract.rawContract.address,
+        contractName: this.contractName,
         blockNumber: this.blockNumber,
         transactionIndex: this.trace.transactionPosition,
         transactionHash: this.transactionHash || '',
         logIndex: -1,
         chainId: this.chainId.toString(),
-        descriptor: descriptor,
+        dataDescriptor: descriptor,
         labels: normalizeLabels(labels),
       }
     }
@@ -125,7 +136,7 @@ export class ContractView<TContract extends BaseContract> {
 export class BoundContractView<TContract extends BaseContract, TContractView extends ContractView<TContract>> {
   protected view: TContractView
   // context will be set right after context creation (in context's constructor)
-  context: Context<TContract, BoundContractView<TContract, TContractView>>
+  context: ContractContext<TContract, BoundContractView<TContract, TContractView>>
 
   constructor(view: TContractView) {
     this.view = view
@@ -146,23 +157,26 @@ export class BoundContractView<TContract extends BaseContract, TContractView ext
 
 export class SolanaContext extends BaseContext {
   address: string
+  programName: string
   blockNumber: Long
 
-  constructor(address: string, slot: Long) {
+  constructor(programName: string, address: string, slot: Long) {
     super()
+    this.programName = programName
     this.address = address
     this.blockNumber = slot
   }
 
-  getMetaData(descriptor: MetricDescriptor | undefined, labels: Labels): RecordMetaData {
+  getMetaData(descriptor: DataDescriptor | undefined, labels: Labels): RecordMetaData {
     return {
-      contractAddress: this.address,
+      address: this.address,
+      contractName: this.programName,
       blockNumber: this.blockNumber,
       transactionIndex: 0,
       transactionHash: '', // TODO add
       logIndex: 0,
       chainId: SOL_MAINMET_ID, // TODO set in context
-      descriptor: descriptor,
+      dataDescriptor: descriptor,
       labels: normalizeLabels(labels),
     }
   }
@@ -170,6 +184,7 @@ export class SolanaContext extends BaseContext {
 
 export class SuiContext extends BaseContext {
   address: string
+  moduleName: string
   blockNumber: Long
 
   constructor(address: string, slot: Long) {
@@ -178,15 +193,16 @@ export class SuiContext extends BaseContext {
     this.blockNumber = slot
   }
 
-  getMetaData(descriptor: MetricDescriptor | undefined, labels: Labels): RecordMetaData {
+  getMetaData(descriptor: DataDescriptor | undefined, labels: Labels): RecordMetaData {
     return {
-      contractAddress: this.address,
+      address: this.address,
+      contractName: this.moduleName,
       blockNumber: this.blockNumber,
       transactionIndex: 0,
       transactionHash: '', // TODO
       logIndex: 0,
       chainId: SUI_DEVNET_ID, // TODO set in context
-      descriptor: descriptor,
+      dataDescriptor: descriptor,
       labels: normalizeLabels(labels),
     }
   }

@@ -1,5 +1,5 @@
 // Transform error in more readable format
-import { Context } from './core/context'
+import { ContractContext } from './core/context'
 import { errors } from 'ethers'
 
 export class EthersError extends Error {
@@ -15,7 +15,7 @@ export class EthersError extends Error {
   }
 }
 
-export function transformEtherError(e: Error, ctx: Context<any, any> | undefined): Error {
+export function transformEtherError(e: Error, ctx: ContractContext<any, any> | undefined): Error {
   let msg = ''
   // @ts-ignore expected error fields
   if (e.code === errors.CALL_EXCEPTION) {

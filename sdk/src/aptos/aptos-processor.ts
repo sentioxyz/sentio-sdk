@@ -47,28 +47,25 @@ class CallHandler {
 }
 
 export class AptosBaseProcessor {
-  name: string
+  readonly moduleName: string
   config: IndexConfigure
   eventHandlers: EventHandler[] = []
   callHandlers: CallHandler[] = []
 
-  constructor(options: AptosBindOptions) {
-    this.name = options.name || options.address
+  constructor(moduleName: string, options: AptosBindOptions) {
+    this.moduleName = moduleName
     this.configure(options)
     global.PROCESSOR_STATE.aptosProcessors.push(this)
-  }
-
-  static bind(options: AptosBindOptions): AptosBaseProcessor {
-    return new AptosBaseProcessor(options)
   }
 
   public onTransaction(
     handler: (transaction: Transaction_UserTransaction, ctx: AptosContext) => void
   ): AptosBaseProcessor {
     const address = this.config.address
+    const moduleName = this.moduleName
     this.callHandlers.push({
       handler: async function (tx) {
-        const ctx = new AptosContext(address, Long.fromString(tx.version), tx)
+        const ctx = new AptosContext(moduleName, address, Long.fromString(tx.version), tx)
         if (tx) {
           handler(tx, ctx)
         }
@@ -96,10 +93,11 @@ export class AptosBaseProcessor {
     }
 
     const address = this.config.address
+    const moduleName = this.moduleName
 
     this.eventHandlers.push({
       handler: async function (event) {
-        const ctx = new AptosContext(address, Long.fromString(event.version))
+        const ctx = new AptosContext(moduleName, address, Long.fromString(event.version))
         if (event) {
           handler(event, ctx)
         }
@@ -127,10 +125,11 @@ export class AptosBaseProcessor {
     }
 
     const address = this.config.address
+    const moduleName = this.moduleName
 
     this.callHandlers.push({
       handler: async function (tx) {
-        const ctx = new AptosContext(address, Long.fromString(tx.version), tx)
+        const ctx = new AptosContext(moduleName, address, Long.fromString(tx.version), tx)
         if (tx) {
           const payload = tx.payload as TransactionPayload_EntryFunctionPayload
           handler(payload, ctx)

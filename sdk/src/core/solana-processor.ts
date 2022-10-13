@@ -55,7 +55,7 @@ export class SolanaBaseProcessor {
   }
 
   public handleInstruction(ins: string | { type: string; info: any }, slot: Long): ProcessResult | null {
-    const ctx = new SolanaContext(this.address, slot)
+    const ctx = new SolanaContext(this.contractName, this.address, slot)
     let parsedInstruction: Instruction | null = null
 
     if (ins) {
