@@ -8,14 +8,6 @@ SouffleChefCampaign.bind({ ...SouffleChefCampaign.DEFAULT_OPTIONS, startVersion:
   .onEventBurnEnjoyEvent((evt, ctx) => {
     ctx.meter.Counter('burned').add(1)
   })
-  .onEvent(
-    (event, ctx) => {
-      ctx.meter.Counter('evt_num').add(1)
-    },
-    {
-      type: '0x1::coin::DepositEvent',
-    }
-  )
   .onTransaction((txn, ctx) => {
     if (txn.events) {
       for (const event of txn.events) {

@@ -104,7 +104,7 @@ function generateOnEvents(module: MoveModule, struct: MoveStruct): string {
   const source = `
   onEvent${struct.name}(func: (event: aptos.Event, ctx: aptos.AptosContext) => void): ${module.name} {
     this.onEvent(func, {
-      type: '${module.address}::${module.name}::${struct.name}'
+      type: '${module.name}::${struct.name}'
     })
     return this
   }

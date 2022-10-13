@@ -20,13 +20,20 @@ type IndexConfigure = {
   // endSeqNumber?: Long
 }
 
-export interface EventFilter {
+export interface EventFilter extends ArgumentsFilter {
   type: string
 }
 
-export interface CallFilter {
+export interface CallFilter extends CallArgumentsFilter {
   function: string
+}
+
+export interface CallArgumentsFilter extends ArgumentsFilter {
   typeArguments?: string[]
+}
+
+export interface ArgumentsFilter {
+  arguments?: string[]
 }
 
 class EventHandler {
