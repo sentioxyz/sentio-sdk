@@ -6,6 +6,7 @@ import { MoveStruct } from 'aptos/src/generated/models/MoveStruct'
 import prettier from 'prettier'
 
 interface Config {
+  srcFile: string
   outputDir: string
 }
 
@@ -13,8 +14,8 @@ export class AptosCodegen {
   modules: MoveModuleBytecode[]
   config: Config
 
-  constructor(srcFile: string, config: Config) {
-    const json = fs.readFileSync(srcFile, 'utf-8')
+  constructor(config: Config) {
+    const json = fs.readFileSync(config.srcFile, 'utf-8')
     this.modules = JSON.parse(json)
     this.config = config
   }
@@ -47,8 +48,9 @@ export class AptosCodegen {
     ${this.modules.map(generateModule).join('\n')}
     ` // source
 
+    const baseName = path.basename(this.config.srcFile, '.json')
     source = prettier.format(source, { parser: 'typescript' })
-    fs.writeFileSync(path.join(this.config.outputDir, 'account-' + address.slice(2, 8) + '.ts'), source)
+    fs.writeFileSync(path.join(this.config.outputDir, baseName + '.ts'), source)
   }
 }
 

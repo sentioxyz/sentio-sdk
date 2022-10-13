@@ -50,7 +50,8 @@ export function codeGenAptosProcessor(abisDir: string, outDir = 'src/types/aptos
         fs.mkdirSync(outDir, { recursive: true })
       }
     }
-    const codegen = new AptosCodegen(path.join(abisDir, file), {
+    const codegen = new AptosCodegen({
+      srcFile: path.join(abisDir, file),
       outputDir: outDir,
     })
     codegen.generate()

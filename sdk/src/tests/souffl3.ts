@@ -1,9 +1,9 @@
-import { SouffleChefCampaign, CandyMachine } from './types/aptos/account-4188c8'
+import { SouffleChefCampaign, CandyMachine } from './types/aptos/souffle'
 
 SouffleChefCampaign.bind()
   .onEntryPullTokenV2((call, ctx) => {
     ctx.meter.Counter('call_num').add(1)
-    ctx.meter.Counter('pulled').add(parseInt(call.arguments[4]))
+    ctx.meter.Counter('pulled').add(parseInt(call.arguments[3]))
   })
   .onEventBurnEnjoyEvent((evt, ctx) => {
     ctx.meter.Counter('burned').add(1)
