@@ -151,14 +151,6 @@ export class AptosBaseProcessor {
       network: options.network || AptosNetwork.TEST_NET,
     }
   }
-  //
-  // public endBlock(endBlock: Long | number) {
-  //   if (typeof endBlock === 'number') {
-  //     endBlock = Long.fromNumber(endBlock)
-  //   }
-  //   this.config.endSeqNumber = endBlock
-  //   return this
-  // }
 
   getChainId(): string {
     switch (this.config.network) {

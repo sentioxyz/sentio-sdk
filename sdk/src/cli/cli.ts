@@ -6,7 +6,7 @@ import fs from 'fs'
 import path from 'path'
 
 import yaml from 'js-yaml'
-import { EVM, finalizeHost, FinalizeProjectName, SentioProjectConfig } from './config'
+import { finalizeHost, FinalizeProjectName, SentioProjectConfig } from './config'
 import { uploadFile } from './upload'
 import chalk from 'chalk'
 import { buildProcessor } from './build'
@@ -35,7 +35,7 @@ if (mainOptions.command === 'login') {
   // TODO move them to their own modules
 
   // Process configs
-  let processorConfig: SentioProjectConfig = { host: '', project: '', source: '', build: true, targets: [] }
+  let processorConfig: SentioProjectConfig = { host: '', project: '', source: '', build: true }
   // Fist step, read from project yaml file
   try {
     console.log(chalk.blue('Loading Process config'))
@@ -68,14 +68,14 @@ if (mainOptions.command === 'login') {
     if (!processorConfig.source) {
       processorConfig.source = 'src/processor.ts'
     }
-    if (!processorConfig.targets) {
-      console.warn('targets is not defined, use EVM as the default target')
-      processorConfig.targets = []
-    }
-    if (processorConfig.targets.length === 0) {
-      // By default evm
-      processorConfig.targets.push({ chain: EVM })
-    }
+    // if (!processorConfig.targets) {
+    //   console.warn('targets is not defined, use EVM as the default target')
+    //   processorConfig.targets = []
+    // }
+    // if (processorConfig.targets.length === 0) {
+    //   // By default evm
+    //   processorConfig.targets.push({ chain: EVM })
+    // }
   } catch (e) {
     console.error(e)
     process.exit(1)
@@ -141,9 +141,9 @@ if (mainOptions.command === 'login') {
       uploadFile(processorConfig, apiOverride)
     }
   } else if (mainOptions.command === 'build') {
-    buildProcessor(false, processorConfig.targets)
+    buildProcessor(false)
   } else if (mainOptions.command === 'gen') {
-    buildProcessor(true, processorConfig.targets)
+    buildProcessor(true)
   } else {
     usage()
   }

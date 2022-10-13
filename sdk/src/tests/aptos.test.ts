@@ -15,7 +15,7 @@ describe('Test Aptos Example', () => {
 
   test('check configuration ', async () => {
     const config = await service.getConfig({})
-    expect(config.contractConfigs).length(1)
+    expect(config.contractConfigs).length(2)
   })
 
   test('Check souffl3 transaction dispatch', async () => {
@@ -25,7 +25,7 @@ describe('Test Aptos Example', () => {
           data: {
             raw: new TextEncoder().encode(JSON.stringify(testData)),
           },
-          handlerId: 0,
+          handlerId: 1,
           handlerType: HandlerType.APT_CALL,
         },
       ],
@@ -43,7 +43,7 @@ describe('Test Aptos Example', () => {
           data: {
             raw: new TextEncoder().encode(JSON.stringify(testData)),
           },
-          handlerId: 1,
+          handlerId: 0,
           handlerType: HandlerType.APT_CALL,
         },
       ],

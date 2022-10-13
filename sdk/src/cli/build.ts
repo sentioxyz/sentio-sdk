@@ -2,17 +2,18 @@ import chalk from 'chalk'
 import path from 'path'
 import fs from 'fs'
 import { exec } from 'child_process'
-import { EVM, SOLANA, Target } from './config'
+import { AptosCodegen } from '../aptos-codegen/codegen'
+// import { EVM, SOLANA, Target } from './config'
 
-export async function buildProcessor(onlyGen: boolean, targets: Target[]) {
+export async function buildProcessor(onlyGen: boolean) {
   if (!onlyGen) {
     await installDeps()
   }
 
   // targets.forEach(async (target) => await buildProcessorForTarget(onlyGen, target))
-  for (const target of targets) {
-    await buildProcessorForTarget(onlyGen, target)
-  }
+  // for (const target) {
+  await buildProcessorForTarget(onlyGen)
+  // }
 
   if (!onlyGen) {
     const WEBPACK_CONFIG = path.join(__dirname, 'webpack.config.js')
@@ -21,12 +22,10 @@ export async function buildProcessor(onlyGen: boolean, targets: Target[]) {
   }
 }
 
-async function buildProcessorForTarget(onlyGen: boolean, target: Target) {
-  if (target.chain === EVM) {
-    await codeGenEthersProcessor(target.abisDir ?? path.join('abis', 'evm'))
-  } else if (target.chain === SOLANA) {
-    codeGenSolanaProcessor(target.abisDir ?? path.join('abis', 'solana'))
-  }
+async function buildProcessorForTarget(onlyGen: boolean) {
+  await codeGenEthersProcessor(path.join('abis', 'evm'))
+  codeGenSolanaProcessor(path.join('abis', 'solana'))
+  codeGenAptosProcessor(path.join('abis', 'aptos'))
 
   if (onlyGen) {
     return
@@ -35,6 +34,27 @@ async function buildProcessorForTarget(onlyGen: boolean, target: Target) {
 
 async function installDeps() {
   await execStep('yarn install --ignore-scripts', 'Yarn Install')
+}
+
+export function codeGenAptosProcessor(abisDir: string, outDir = 'src/types/aptos') {
+  if (!fs.existsSync(abisDir)) {
+    return
+  }
+
+  const files = fs.readdirSync(abisDir)
+
+  console.log(chalk.green('Generated Types for Aptos'))
+  for (const file of files) {
+    if (path.extname(file) === '.json') {
+      if (!fs.existsSync(outDir)) {
+        fs.mkdirSync(outDir, { recursive: true })
+      }
+    }
+    const codegen = new AptosCodegen(path.join(abisDir, file), {
+      outputDir: outDir,
+    })
+    codegen.generate()
+  }
 }
 
 export async function codeGenEthersProcessor(
@@ -58,6 +78,8 @@ export async function codeGenEthersProcessor(
     return
   }
 
+  console.log(chalk.green('Generated Types for EVM'))
+
   // TODO this will fail during postinstall, need to locate real typechain path
   await execStep(
     'yarn typechain --target ' + ETHERS_TARGET + ` --out-dir ${outDir} ${path.join(abisDir, '*.json')}`,
@@ -65,21 +87,28 @@ export async function codeGenEthersProcessor(
   )
 }
 
-export function codeGenSolanaProcessor(abisDir: string, root = '', targetPath = path.join('src', 'types')) {
-  const abisFolder = path.join(root, abisDir)
-  const abisFiles = fs.readdirSync(abisFolder)
-  const typeFolder = path.join(root, targetPath)
+export function codeGenSolanaProcessor(abisDir: string, targetPath = path.join('src', 'types', 'solana')) {
+  if (!fs.existsSync(abisDir)) {
+    return
+  }
+
+  const abisFiles = fs.readdirSync(abisDir)
+
+  if (abisFiles.length > 0) {
+    console.log(chalk.green('Generated Types for Solana'))
+  }
+
   for (const file of abisFiles) {
     if (path.extname(file) === '.json') {
-      if (!fs.existsSync(typeFolder)) {
-        fs.mkdirSync(typeFolder)
+      if (!fs.existsSync(targetPath)) {
+        fs.mkdirSync(targetPath, { recursive: true })
       }
-      const idlContent = fs.readFileSync(path.join(abisFolder, file), 'utf-8')
+      const idlContent = fs.readFileSync(path.join(abisDir, file), 'utf-8')
       const idlObj = JSON.parse(idlContent)
       const idlName = idlObj.name
-      const idlFile = path.join(typeFolder, idlName + '.ts')
+      const idlFile = path.join(targetPath, idlName + '.ts')
       fs.writeFileSync(idlFile, `export const ${idlName}_idl = ${idlContent}`)
-      fs.writeFileSync(path.join(typeFolder, `${idlName}_processor.ts`), codeGenSolanaIdlProcessor(idlObj))
+      fs.writeFileSync(path.join(targetPath, `${idlName}_processor.ts`), codeGenSolanaIdlProcessor(idlObj))
     }
   }
 }

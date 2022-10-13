@@ -24,7 +24,7 @@ async function createProject(options: SentioProjectConfig, apiKey: string) {
 
 export async function uploadFile(options: SentioProjectConfig, apiKeyOverride: string) {
   if (options.build) {
-    await buildProcessor(false, options.targets)
+    await buildProcessor(false)
   }
 
   console.log(chalk.blue('Prepare to upload'))

@@ -3,7 +3,7 @@ export interface SentioProjectConfig {
   host: string
   source: string
   build: boolean
-  targets: Target[]
+  // targets: Target[]
 }
 
 export function getFinalizedHost(host: string): string {
@@ -36,11 +36,11 @@ export function FinalizeProjectName(config: SentioProjectConfig, owner: string |
   }
 }
 
-export interface Target {
-  chain: string
-  abisDir?: string
-}
-
-// Supported target chain, lower case
-export const EVM = 'evm'
-export const SOLANA = 'solana'
+// export interface Target {
+//   chain: string
+//   abisDir?: string
+// }
+//
+// // Supported target chain, lower case
+// export const EVM = 'evm'
+// export const SOLANA = 'solana'

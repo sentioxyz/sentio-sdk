@@ -13,3 +13,9 @@ export class AptosBindOptions {
   startVersion?: Long | number
   // endBlock?: Long | number
 }
+
+export class NamedAptosBindOptions {
+  address: string
+  network?: AptosNetwork = AptosNetwork.TEST_NET
+  startVersion?: Long | number
+}

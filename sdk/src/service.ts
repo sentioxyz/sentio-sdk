@@ -1,6 +1,6 @@
 import { Block, Log } from '@ethersproject/abstract-provider'
 import { CallContext, ServerError, Status } from 'nice-grpc'
-import { APTOS_TESTNET_ID, SOL_MAINMET_ID, SUI_DEVNET_ID } from './utils/chain'
+import { SOL_MAINMET_ID, SUI_DEVNET_ID } from './utils/chain'
 
 import {
   AptosCallHandlerConfig,
@@ -212,7 +212,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         processorType: USER_PROCESSOR,
         contract: {
           name: aptosProcessor.name,
-          chainId: APTOS_TESTNET_ID,
+          chainId: aptosProcessor.getChainId(),
           address: aptosProcessor.config.address,
           abi: '',
         },
