@@ -1,13 +1,11 @@
 {
   "name": "aurory",
-  "private": true,
   "version": "1.0.0",
   "scripts": {
     "test": "jest",
     "gen": "sentio gen",
     "build": "sentio build",
-    "upload": "sentio upload",
-    "postinstall": "sentio gen"
+    "upload": "sentio upload"
   },
   "dependencies": {
     "@sentio/sdk": "^1.0.0-development"

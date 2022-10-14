@@ -170,7 +170,6 @@ export function codeGenSentioFile(contract: Contract): string {
         'ContractContext',
         'ContractView',
         'DummyProvider',
-        'getContractName',
         'TypedCallTrace',
       ],
       './common': ['PromiseOrValue'],
