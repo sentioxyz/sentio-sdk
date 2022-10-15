@@ -9,8 +9,10 @@ type IndexConfigure = {
   endSlot?: Long
 }
 
+export type SolanaInstructionHandler = (instruction: Instruction, ctx: SolanaContext) => void
+
 export class SolanaBaseProcessor {
-  public instructionHanlderMap: Map<string, (instruction: Instruction, ctx: SolanaContext) => void> = new Map()
+  public instructionHandlerMap: Map<string, SolanaInstructionHandler> = new Map()
   address: string
   endpoint: string
   contractName: string
@@ -49,34 +51,34 @@ export class SolanaBaseProcessor {
       throw new Error("Processor doesn't bind to an address")
     }
 
-    this.instructionHanlderMap.set(instructionName, handler)
+    this.instructionHandlerMap.set(`${this.address}:${instructionName}`, handler)
 
     return this
   }
 
-  public handleInstruction(ins: string | { type: string; info: any }, slot: Long): ProcessResult | null {
-    const ctx = new SolanaContext(this.contractName, this.address, slot)
-    let parsedInstruction: Instruction | null = null
-
+  public getParsedInstruction(ins: string | { type: string; info: any }): Instruction | null {
     if (ins) {
       if ((ins as { type: string; info: any }).info) {
-        if (this.fromParsedInstruction == null) {
-          return null
-        }
-        parsedInstruction = this.fromParsedInstruction(ins as { type: string; info: any })
-      } else {
-        if (this.decodeInstruction == null) {
-          return null
-        }
-        parsedInstruction = this.decodeInstruction(ins as string)
+        return this.fromParsedInstruction ? this.fromParsedInstruction(ins as { type: string; info: any }) : null
       }
-      if (parsedInstruction) {
-        const handler = this.instructionHanlderMap.get(parsedInstruction.name)
-        if (handler) {
-          handler(parsedInstruction, ctx)
-        }
+      if (this.decodeInstruction != null) {
+        return this.decodeInstruction(ins as string)
       }
     }
+    return null
+  }
+
+  public getInstructionHandler(parsedInstruction: Instruction): SolanaInstructionHandler | undefined {
+    return this.instructionHandlerMap.get(`${this.address}:${parsedInstruction.name}`)
+  }
+
+  public handleInstruction(
+    parsedInstruction: Instruction,
+    handler: SolanaInstructionHandler,
+    slot: Long
+  ): ProcessResult {
+    const ctx = new SolanaContext(this.contractName, this.address, slot)
+    handler(parsedInstruction, ctx)
     return {
       gauges: ctx.gauges,
       counters: ctx.counters,

@@ -28,6 +28,8 @@ import { Empty } from './gen/google/protobuf/empty'
 import Long from 'long'
 import { TextDecoder } from 'util'
 import { Trace } from './core'
+import { SolanaInstructionHandler } from 'core/solana-processor'
+import { Instruction } from '@project-serum/anchor'
 
 const DEFAULT_MAX_BLOCK = Long.ZERO
 
@@ -465,26 +467,25 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
           new Promise((resolve, _) => {
             for (const processor of global.PROCESSOR_STATE.solanaProcessors) {
               if (processor.address === instruction.programAccountId) {
-                let res: ProcessResult | null
+                let parsedInstruction: Instruction | null = null
                 if (instruction.parsed) {
-                  res = processor.handleInstruction(
-                    JSON.parse(new TextDecoder().decode(instruction.parsed)),
-                    instruction.slot
+                  parsedInstruction = processor.getParsedInstruction(
+                    JSON.parse(new TextDecoder().decode(instruction.parsed))
                   )
                 } else if (instruction.instructionData) {
-                  res = processor.handleInstruction(instruction.instructionData, instruction.slot)
-                } else {
+                  parsedInstruction = processor.getParsedInstruction(instruction.instructionData)
+                }
+                if (parsedInstruction == null) {
                   continue
                 }
-                if (res) {
-                  res.gauges.forEach((g) => result.gauges.push(g))
-                  res.counters.forEach((c) => result.counters.push(c))
-                  res.logs.forEach((l) => result.logs.push(l))
-                } else {
-                  console.warn(
-                    `Failed to decode the instruction: ${instruction.instructionData} with slot: ${instruction.slot}`
-                  )
+                const insHandler = processor.getInstructionHandler(parsedInstruction)
+                if (insHandler == null) {
+                  continue
                 }
+                const res = processor.handleInstruction(parsedInstruction, insHandler, instruction.slot)
+                res.gauges.forEach((g) => result.gauges.push(g))
+                res.counters.forEach((c) => result.counters.push(c))
+                res.logs.forEach((l) => result.logs.push(l))
               }
             }
             resolve()
