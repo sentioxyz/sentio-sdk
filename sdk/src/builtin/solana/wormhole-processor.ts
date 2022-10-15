@@ -46,6 +46,9 @@ export class TokenBridgeProcessor extends SolanaBaseProcessor {
   ]
 
   static bind(options: SolanaBindOptions): TokenBridgeProcessor {
+    if (options && !options.name) {
+      options.name = 'WormholeTokenBridge'
+    }
     return new TokenBridgeProcessor(options)
   }
 
@@ -118,56 +121,56 @@ export class TokenBridgeProcessor extends SolanaBaseProcessor {
     }
   }
 
-  onInitialize(handler: (args: any, ctx: SolanaContext) => void): TokenBridgeProcessor {
-    this.onInstruction('Initialize', (ins: Instruction, ctx) => {
+  onInitialize(handler: (args: any, accounts: string[], ctx: SolanaContext) => void): TokenBridgeProcessor {
+    this.onInstruction('Initialize', (ins: Instruction, ctx, accounts: string[]) => {
       if (ins) {
-        handler(ins.data, ctx)
+        handler(ins.data, accounts, ctx)
       }
     })
     return this
   }
 
-  onAttestToken(handler: (args: any, ctx: SolanaContext) => void): TokenBridgeProcessor {
-    this.onInstruction('AttestToken', (ins: Instruction, ctx) => {
+  onAttestToken(handler: (args: any, accounts: string[], ctx: SolanaContext) => void): TokenBridgeProcessor {
+    this.onInstruction('AttestToken', (ins: Instruction, ctx, accounts: string[]) => {
       if (ins) {
-        handler(ins.data, ctx)
+        handler(ins.data, accounts, ctx)
       }
     })
     return this
   }
 
 
-  onTransferWrapped(handler: (args: any, ctx: SolanaContext) => void): TokenBridgeProcessor {
-    this.onInstruction('TransferWrapped', (ins: Instruction, ctx) => {
+  onTransferWrapped(handler: (args: any, accounts: string[], ctx: SolanaContext) => void): TokenBridgeProcessor {
+    this.onInstruction('TransferWrapped', (ins: Instruction, ctx, accounts: string[]) => {
       if (ins) {
-        handler(ins.data, ctx)
+        handler(ins.data, accounts, ctx)
       }
     })
     return this
   }
 
-  onTransferNativeWithPayload(handler: (args: any, ctx: SolanaContext) => void): TokenBridgeProcessor {
-    this.onInstruction('TransferNativeWithPayload', (ins: Instruction, ctx) => {
+  onTransferNativeWithPayload(handler: (args: any, accounts: string[], ctx: SolanaContext) => void): TokenBridgeProcessor {
+    this.onInstruction('TransferNativeWithPayload', (ins: Instruction, ctx, accounts: string[]) => {
       if (ins) {
-        handler(ins.data, ctx)
+        handler(ins.data,  accounts, ctx)
       }
     })
     return this
   }
 
-  onTransferWrappedWithPaylod(handler: (args: any, ctx: SolanaContext) => void): TokenBridgeProcessor {
-    this.onInstruction('TransferWrappedWithPaylod', (ins: Instruction, ctx) => {
+  onTransferWrappedWithPaylod(handler: (args: any, accounts: string[], ctx: SolanaContext) => void): TokenBridgeProcessor {
+    this.onInstruction('TransferWrappedWithPaylod', (ins: Instruction, ctx, accounts: string[]) => {
       if (ins) {
-        handler(ins.data, ctx)
+        handler(ins.data, accounts, ctx)
       }
     })
     return this
   }
 
-  onTransferNative(handler: (args: any, ctx: SolanaContext) => void): TokenBridgeProcessor {
-    this.onInstruction('TransferNative', (ins: Instruction, ctx) => {
+  onTransferNative(handler: (args: any, accounts: string[], ctx: SolanaContext) => void): TokenBridgeProcessor {
+    this.onInstruction('TransferNative', (ins: Instruction, ctx, accounts: string[]) => {
       if (ins) {
-        handler(ins.data, ctx)
+        handler(ins.data, accounts, ctx)
       }
     })
     return this

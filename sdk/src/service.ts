@@ -482,7 +482,12 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
                 if (insHandler == null) {
                   continue
                 }
-                const res = processor.handleInstruction(parsedInstruction, insHandler, instruction.slot)
+                const res = processor.handleInstruction(
+                  parsedInstruction,
+                  instruction.accounts,
+                  insHandler,
+                  instruction.slot
+                )
                 res.gauges.forEach((g) => result.gauges.push(g))
                 res.counters.forEach((c) => result.counters.push(c))
                 res.logs.forEach((l) => result.logs.push(l))

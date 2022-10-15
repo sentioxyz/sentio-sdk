@@ -172,6 +172,7 @@ message Instruction {
   string instruction_data = 1;
   uint64 slot = 2;
   string program_account_id = 3;
+  repeated string accounts = 5;
   optional bytes parsed = 4;
 }
 

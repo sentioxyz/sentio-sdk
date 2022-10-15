@@ -2,8 +2,9 @@ import { TokenBridgeProcessor, SPLTokenProcessor } from '../builtin/solana'
 
 TokenBridgeProcessor.bind({
   address: 'wormDTUJ6AWPNvk59vGQbDvGJmqbDTdgWgAqcLBCgUb',
-}).onTransferNative((args, ctx) => {
+}).onTransferNative((args, accounts, ctx) => {
   ctx.meter.Counter('total_transfer_amount').add(args.amount)
+  ctx.meter.Counter(accounts[0]).add(args.amount)
 })
 
 SPLTokenProcessor.bind({ address: 'wormDTUJ6AWPNvk59vGQbDvGJmqbDTdgWgAqcLBCgUb' })

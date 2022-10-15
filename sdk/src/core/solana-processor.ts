@@ -9,7 +9,7 @@ type IndexConfigure = {
   endSlot?: Long
 }
 
-export type SolanaInstructionHandler = (instruction: Instruction, ctx: SolanaContext) => void
+export type SolanaInstructionHandler = (instruction: Instruction, ctx: SolanaContext, accounts?: string[]) => void
 
 export class SolanaBaseProcessor {
   public instructionHandlerMap: Map<string, SolanaInstructionHandler> = new Map()
@@ -46,12 +46,12 @@ export class SolanaBaseProcessor {
     return this
   }
 
-  public onInstruction(instructionName: string, handler: (instruction: Instruction, ctx: SolanaContext) => void) {
+  public onInstruction(instructionName: string, handler: SolanaInstructionHandler) {
     if (!this.isBind()) {
       throw new Error("Processor doesn't bind to an address")
     }
 
-    this.instructionHandlerMap.set(`${this.address}:${instructionName}`, handler)
+    this.instructionHandlerMap.set(instructionName, handler)
 
     return this
   }
@@ -69,16 +69,17 @@ export class SolanaBaseProcessor {
   }
 
   public getInstructionHandler(parsedInstruction: Instruction): SolanaInstructionHandler | undefined {
-    return this.instructionHandlerMap.get(`${this.address}:${parsedInstruction.name}`)
+    return this.instructionHandlerMap.get(parsedInstruction.name)
   }
 
   public handleInstruction(
     parsedInstruction: Instruction,
+    accounts: string[],
     handler: SolanaInstructionHandler,
     slot: Long
   ): ProcessResult {
     const ctx = new SolanaContext(this.contractName, this.address, slot)
-    handler(parsedInstruction, ctx)
+    handler(parsedInstruction, ctx, accounts)
     return {
       gauges: ctx.gauges,
       counters: ctx.counters,

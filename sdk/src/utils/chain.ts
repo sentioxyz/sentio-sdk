@@ -105,3 +105,17 @@ export function getChainName(chainId: string | number): string {
   }
   return chainId
 }
+
+export function getChainType(chainId: string | number): string {
+  const id = String(chainId).toLowerCase()
+  if (id.startsWith('sol')) {
+    return 'solana'
+  }
+  if (id.startsWith('sui')) {
+    return 'sui'
+  }
+  if (id.startsWith('apt')) {
+    return 'aptos'
+  }
+  return 'ethereum'
+}

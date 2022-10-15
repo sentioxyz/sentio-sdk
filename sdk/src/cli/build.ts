@@ -149,10 +149,10 @@ function codeGenSolanaInstruction(idlName: string, ins: any): string {
   return `
   on${
     instructionName.charAt(0).toUpperCase() + instructionName.slice(1)
-  }(handler: (args: ${argsTypeString}, ctx: SolanaContext) => void): ${idlName}Processor {
-    this.onInstruction('${instructionName}', (ins: Instruction, ctx) => {
+  }(handler: (args: ${argsTypeString}, accounts: string[], ctx: SolanaContext) => void): ${idlName}Processor {
+    this.onInstruction('${instructionName}', (ins: Instruction, ctx, accounts: string[]) => {
       if (ins) {
-        handler(ins.data as ${argsTypeString}, ctx)
+        handler(ins.data as ${argsTypeString}, accounts, ctx)
       }
     })
     return this

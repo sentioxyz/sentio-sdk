@@ -251,6 +251,7 @@ export interface Instruction {
   instructionData: string;
   slot: Long;
   programAccountId: string;
+  accounts: string[];
   parsed?: Uint8Array | undefined;
 }
 
@@ -2226,6 +2227,7 @@ function createBaseInstruction(): Instruction {
     instructionData: "",
     slot: Long.UZERO,
     programAccountId: "",
+    accounts: [],
     parsed: undefined,
   };
 }
@@ -2243,6 +2245,9 @@ export const Instruction = {
     }
     if (message.programAccountId !== "") {
       writer.uint32(26).string(message.programAccountId);
+    }
+    for (const v of message.accounts) {
+      writer.uint32(42).string(v!);
     }
     if (message.parsed !== undefined) {
       writer.uint32(34).bytes(message.parsed);
@@ -2266,6 +2271,9 @@ export const Instruction = {
         case 3:
           message.programAccountId = reader.string();
           break;
+        case 5:
+          message.accounts.push(reader.string());
+          break;
         case 4:
           message.parsed = reader.bytes();
           break;
@@ -2286,6 +2294,9 @@ export const Instruction = {
       programAccountId: isSet(object.programAccountId)
         ? String(object.programAccountId)
         : "",
+      accounts: Array.isArray(object?.accounts)
+        ? object.accounts.map((e: any) => String(e))
+        : [],
       parsed: isSet(object.parsed) ? bytesFromBase64(object.parsed) : undefined,
     };
   },
@@ -2298,6 +2309,11 @@ export const Instruction = {
       (obj.slot = (message.slot || Long.UZERO).toString());
     message.programAccountId !== undefined &&
       (obj.programAccountId = message.programAccountId);
+    if (message.accounts) {
+      obj.accounts = message.accounts.map((e) => e);
+    } else {
+      obj.accounts = [];
+    }
     message.parsed !== undefined &&
       (obj.parsed =
         message.parsed !== undefined
@@ -2314,6 +2330,7 @@ export const Instruction = {
         ? Long.fromValue(object.slot)
         : Long.UZERO;
     message.programAccountId = object.programAccountId ?? "";
+    message.accounts = object.accounts?.map((e) => e) || [];
     message.parsed = object.parsed ?? undefined;
     return message;
   },
