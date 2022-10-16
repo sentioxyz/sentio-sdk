@@ -2,7 +2,7 @@ import { expect } from 'chai'
 import { TextEncoder } from 'util'
 import { HandlerType, ProcessBindingsRequest } from '..'
 
-import { TestProcessorServer } from '../testing'
+import { firstCounterValue, firstGaugeValue, TestProcessorServer } from '../testing'
 
 describe('Test Aptos Example', () => {
   const service = new TestProcessorServer(() => {
@@ -15,7 +15,7 @@ describe('Test Aptos Example', () => {
 
   test('check configuration ', async () => {
     const config = await service.getConfig({})
-    expect(config.contractConfigs).length(2)
+    expect(config.contractConfigs).length(4)
   })
 
   test('Check souffl3 transaction dispatch', async () => {
@@ -59,7 +59,7 @@ describe('Test Aptos Example', () => {
       bindings: [
         {
           data: {
-            raw: new TextEncoder().encode(JSON.stringify(testData.events[1])),
+            raw: new TextEncoder().encode(JSON.stringify(testData.events[testData.events.length - 1])),
           },
           handlerId: 0,
           handlerType: HandlerType.APT_EVENT,
@@ -70,6 +70,39 @@ describe('Test Aptos Example', () => {
     expect(res.result?.counters).length(1)
     expect(res.result?.gauges).length(0)
     expect(res.result?.counters[0].metadata?.blockNumber.toInt()).equal(18483034)
+  })
+
+  test('Check token deposit event dispatch', async () => {
+    const request: ProcessBindingsRequest = {
+      bindings: [
+        {
+          data: {
+            raw: new TextEncoder().encode(JSON.stringify(tokenTestData)),
+          },
+          handlerId: 2,
+          handlerType: HandlerType.APT_EVENT,
+        },
+      ],
+    }
+    const res = await service.processBindings(request)
+    expect(firstCounterValue(res.result, 'deposit')).equal(1n)
+    expect(firstGaugeValue(res.result, 'version')).equal(0n)
+  })
+
+  test('Check create poposal event dispatch', async () => {
+    const request: ProcessBindingsRequest = {
+      bindings: [
+        {
+          data: {
+            raw: new TextEncoder().encode(JSON.stringify(createProposalData)),
+          },
+          handlerId: 3,
+          handlerType: HandlerType.APT_EVENT,
+        },
+      ],
+    }
+    const res = await service.processBindings(request)
+    expect(firstGaugeValue(res.result, 'size')).equal(2n)
   })
 })
 
@@ -182,7 +215,73 @@ const testData = {
         },
       },
     },
+    {
+      version: '18483034',
+      guid: {
+        creation_number: '7',
+        account_address: '0x21d5fe032affa1c8b10d343e9ad5a5618bc13baf5ed4a674fafaa12c54f416cc',
+      },
+      sequence_number: '980533',
+      type: '0x4188c8694687e844677c2aa87171019e23d61cac60de5082a278a8aa47e9d807::SouffleChefCampaign::PullTokenEvent',
+      data: {
+        receiver: '0x3a80be5daa84f2da7e07b3ec9234da48a5647f757187879c97a1fa03f31f1195',
+      },
+    },
   ],
   timestamp: '1663143945131218',
   type: 'user_transaction',
+}
+
+const tokenTestData = {
+  version: '18483034',
+  guid: {
+    creation_number: '4',
+    account_address: '0x89bc80de59187f707a59ae7a4121718dafe3e6068e0509104ef7e41a56bc97db',
+  },
+  sequence_number: '10',
+  type: '0x3::token::DepositEvent',
+  data: {
+    amount: '1',
+    id: {
+      property_version: '0',
+      token_data_id: {
+        collection: 'Topaz Troopers',
+        creator: '0x9125e4054d884fdc7296b66e12c0d63a7baa0d88c77e8e784987c0a967c670ac',
+        name: 'Topaz Trooper #11293',
+      },
+    },
+  },
+}
+
+const createProposalData = {
+  version: '1',
+  guid: {
+    creation_number: '5',
+    account_address: '0x1',
+  },
+  sequence_number: '3',
+  type: '0x1::voting::CreateProposalEvent',
+  data: {
+    early_resolution_vote_threshold: {
+      vec: ['9272156337856446330'],
+    },
+    execution_hash: '0x31549239ce8abdc1e9c259178614c3d44d015bd6d48635ddcfbfa4a77e7222b0',
+    expiration_secs: '1665463839',
+    metadata: {
+      data: [
+        {
+          key: 'metadata_hash',
+          value:
+            '0x61633230656566373063616466363939663530353564323463356363353931396463306330656562643463303662653332346336323030313561633361653066',
+        },
+        {
+          key: 'metadata_location',
+          value:
+            '0x68747470733a2f2f676973742e67697468756275736572636f6e74656e742e636f6d2f6d6f76656b6576696e2f30353766623134356234303836366566663863323263393166623964613931392f7261772f626162383566306637343334663030386138373831656563376663616464316163356135353438312f6769737466696c65312e747874',
+        },
+      ],
+    },
+    min_vote_threshold: '100000000000000',
+    proposal_id: '3',
+  },
 }

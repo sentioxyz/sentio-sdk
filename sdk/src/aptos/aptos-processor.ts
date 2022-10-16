@@ -5,13 +5,15 @@ import {
   AptosNetwork,
   Transaction_UserTransaction,
   TransactionPayload_EntryFunctionPayload,
+  TypedEntryFunctionPayload,
+  TypedEventInstance,
+  TypeRegistry,
 } from '.'
-import type { Event as OldEvent } from 'aptos/src/generated'
 
 import Long from 'long'
 import { APTOS_MAINNET_ID, APTOS_TESTNET_ID } from '../utils/chain'
-
-export type Event = OldEvent & { version: string }
+import { EventInstance, GLOBAL_TYPE_REGISTRY } from './types'
+import { parseMoveType } from '../aptos-codegen/typegen'
 
 type IndexConfigure = {
   address: string
@@ -38,7 +40,7 @@ export interface ArgumentsFilter {
 
 class EventHandler {
   filters: EventFilter[]
-  handler: (event: Event) => Promise<ProcessResult>
+  handler: (event: EventInstance) => Promise<ProcessResult>
 }
 
 class CallHandler {
@@ -57,6 +59,10 @@ export class AptosBaseProcessor {
     this.configure(options)
     global.PROCESSOR_STATE.aptosProcessors.push(this)
   }
+
+  // getABI(): MoveModule | undefined {
+  //   return undefined
+  // }
 
   public onTransaction(
     handler: (transaction: Transaction_UserTransaction, ctx: AptosContext) => void
@@ -81,7 +87,7 @@ export class AptosBaseProcessor {
   }
 
   public onEvent(
-    handler: (event: Event, ctx: AptosContext) => void,
+    handler: (event: EventInstance, ctx: AptosContext) => void,
     filter: EventFilter | EventFilter[]
   ): AptosBaseProcessor {
     let _filters: EventFilter[] = []
@@ -92,14 +98,18 @@ export class AptosBaseProcessor {
       _filters.push(filter)
     }
 
-    const address = this.config.address
-    const moduleName = this.moduleName
+    // const address = this.config.address
+    // const moduleName = this.moduleName
+
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const processor = this
 
     this.eventHandlers.push({
       handler: async function (event) {
-        const ctx = new AptosContext(moduleName, address, Long.fromString(event.version))
+        const ctx = new AptosContext(processor.moduleName, processor.config.address, Long.fromString(event.version))
         if (event) {
-          handler(event, ctx)
+          const decoded = processor.decodeEvent(event)
+          handler(decoded, ctx)
         }
         return {
           gauges: ctx.gauges,
@@ -124,15 +134,18 @@ export class AptosBaseProcessor {
       _filters.push(filter)
     }
 
-    const address = this.config.address
-    const moduleName = this.moduleName
+    // const address = this.config.address
+    // const moduleName = this.moduleName
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const processor = this
 
     this.callHandlers.push({
       handler: async function (tx) {
-        const ctx = new AptosContext(moduleName, address, Long.fromString(tx.version), tx)
+        const ctx = new AptosContext(processor.moduleName, processor.config.address, Long.fromString(tx.version), tx)
         if (tx) {
           const payload = tx.payload as TransactionPayload_EntryFunctionPayload
-          handler(payload, ctx)
+          const decoded = processor.decodeFunctionPayload(payload)
+          handler(decoded, ctx)
         }
         return {
           gauges: ctx.gauges,
@@ -165,5 +178,54 @@ export class AptosBaseProcessor {
       case AptosNetwork.MAIN_NET:
         return APTOS_MAINNET_ID
     }
+  }
+
+  loadTypes(registry: TypeRegistry) {
+    if (registry.contains(this.config.address, this.moduleName)) {
+      return
+    }
+    this.loadTypesInternal(registry)
+  }
+
+  protected loadTypesInternal(registry: TypeRegistry) {
+    // should be override by subclass
+  }
+
+  private decodeEvent(event: EventInstance): EventInstance {
+    const registry = GLOBAL_TYPE_REGISTRY
+    this.loadTypes(registry)
+    // TODO check if module is not loaded
+
+    let dataTyped = undefined
+    try {
+      dataTyped = registry.decode(event.data, parseMoveType(event.type))
+    } catch (e) {
+      console.warn('Decoding error for ', event.type)
+      return event
+    }
+
+    return { ...event, data_typed: dataTyped } as TypedEventInstance<any>
+  }
+
+  private decodeFunctionPayload(
+    payload: TransactionPayload_EntryFunctionPayload
+  ): TransactionPayload_EntryFunctionPayload {
+    const registry = GLOBAL_TYPE_REGISTRY
+    this.loadTypes(registry)
+    const argumentsTyped: any[] = []
+
+    try {
+      const func = registry.getMoveFunction(payload.function)
+      for (const [idx, arg] of payload.arguments.entries()) {
+        // TODO consider apply payload.type_arguments, but this might be hard since we don't code gen for them
+        const argType = parseMoveType(func.params[idx + 1])
+        argumentsTyped.push(registry.decode(arg, argType))
+      }
+    } catch (e) {
+      console.warn('Decoding error for ', payload.function)
+      return payload
+    }
+
+    return { ...payload, arguments_typed: argumentsTyped } as TypedEntryFunctionPayload<any>
   }
 }

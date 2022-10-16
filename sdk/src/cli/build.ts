@@ -2,7 +2,7 @@ import chalk from 'chalk'
 import path from 'path'
 import fs from 'fs'
 import { exec } from 'child_process'
-import { AptosCodegen } from '../aptos-codegen/codegen'
+import { generate } from '../aptos-codegen/codegen'
 // import { EVM, SOLANA, Target } from './config'
 
 export async function buildProcessor(onlyGen: boolean) {
@@ -41,21 +41,23 @@ export function codeGenAptosProcessor(abisDir: string, outDir = 'src/types/aptos
     return
   }
 
-  const files = fs.readdirSync(abisDir)
+  // const files = fs.readdirSync(abisDir)
 
   console.log(chalk.green('Generated Types for Aptos'))
-  for (const file of files) {
-    if (path.extname(file) === '.json') {
-      if (!fs.existsSync(outDir)) {
-        fs.mkdirSync(outDir, { recursive: true })
-      }
-    }
-    const codegen = new AptosCodegen({
-      srcFile: path.join(abisDir, file),
-      outputDir: outDir,
-    })
-    codegen.generate()
-  }
+
+  generate(abisDir, outDir)
+  // for (const file of files) {
+  //   if (path.extname(file) === '.json') {
+  //     if (!fs.existsSync(outDir)) {
+  //       fs.mkdirSync(outDir, { recursive: true })
+  //     }
+  //   }
+  //   const codegen = new AptosAccountCodegen({
+  //     srcFile: path.join(abisDir, file),
+  //     outputDir: outDir,
+  //   })
+  //   codegen.generate()
+  // }
 }
 
 export async function codeGenEthersProcessor(

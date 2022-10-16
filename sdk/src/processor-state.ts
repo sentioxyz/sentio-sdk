@@ -10,7 +10,7 @@ import {
 import { AptosBaseProcessor } from './aptos'
 
 import { BaseContract } from 'ethers'
-import { TemplateInstance } from './gen/processor/protos/processor'
+import { TemplateInstance } from './gen'
 import { Provider } from '@ethersproject/providers'
 
 export class ProcessorState {

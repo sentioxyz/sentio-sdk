@@ -1,4 +1,4 @@
-export { BigNumber as BigDecimal } from 'bignumber.js'
+export { BigDecimal } from './big-decimal'
 export { ContractContext, ContractView, BoundContractView, SolanaContext } from './context'
 export { CounterBinding, Meter, GaugeBinding, Counter, Gauge, MetricDescriptorOptions } from './meter'
 export { type Numberish, toBigInteger, toMetricValue } from './numberish'
