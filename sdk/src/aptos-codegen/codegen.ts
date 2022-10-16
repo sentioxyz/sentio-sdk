@@ -285,8 +285,9 @@ function generateOnEntryFunctions(module: MoveModule, func: MoveFunction) {
 
   const camelFuncName = capitalizeFirstChar(camelize(func.name))
   const source = `
-  onEntry${camelFuncName}${genericString}(func: (call: ${module.name}.${camelFuncName}Payload${genericString}, ctx: aptos.AptosContext) => void): ${module.name} {
+  onEntry${camelFuncName}${genericString}(func: (call: ${module.name}.${camelFuncName}Payload${genericString}, ctx: aptos.AptosContext) => void, filter?: aptos.CallFilter): ${module.name} {
     this.onEntryFunctionCall(func, {
+      ...filter,
       function: '${module.name}::${func.name}'
     })
     return this

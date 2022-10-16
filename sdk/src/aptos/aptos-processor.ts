@@ -1,4 +1,4 @@
-import { ProcessResult } from '../gen'
+import { ProcessResult, RecordMetaData } from '../gen'
 import {
   AptosBindOptions,
   AptosContext,
@@ -22,15 +22,18 @@ type IndexConfigure = {
   // endSeqNumber?: Long
 }
 
-export interface EventFilter extends ArgumentsFilter {
+// TODO extends ArgumentsFilter
+export interface EventFilter {
   type: string
 }
 
-export interface CallFilter extends CallArgumentsFilter {
+export interface FunctionNameAndCallFilter extends CallFilter {
   function: string
 }
 
-export interface CallArgumentsFilter extends ArgumentsFilter {
+// TODO extends ArgumentsFilter
+export interface CallFilter {
+  includeFailed?: boolean
   typeArguments?: string[]
 }
 
@@ -44,7 +47,7 @@ class EventHandler {
 }
 
 class CallHandler {
-  filters: CallFilter[]
+  filters: FunctionNameAndCallFilter[]
   handler: (call: Transaction_UserTransaction) => Promise<ProcessResult>
 }
 
@@ -124,9 +127,9 @@ export class AptosBaseProcessor {
 
   public onEntryFunctionCall(
     handler: (call: TransactionPayload_EntryFunctionPayload, ctx: AptosContext) => void,
-    filter: CallFilter | CallFilter[]
+    filter: FunctionNameAndCallFilter | FunctionNameAndCallFilter[]
   ): AptosBaseProcessor {
-    let _filters: CallFilter[] = []
+    let _filters: FunctionNameAndCallFilter[] = []
 
     if (Array.isArray(filter)) {
       _filters = filter

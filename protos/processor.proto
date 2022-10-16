@@ -131,6 +131,7 @@ message AptosCallFilter {
   string function = 1;
   repeated string type_arguments = 2;
   bool with_type_arguments = 3;
+  bool include_failed = 4;
 }
 
 message Topic {

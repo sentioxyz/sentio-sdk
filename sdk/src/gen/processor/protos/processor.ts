@@ -213,6 +213,7 @@ export interface AptosCallFilter {
   function: string;
   typeArguments: string[];
   withTypeArguments: boolean;
+  includeFailed: boolean;
 }
 
 export interface Topic {
@@ -1651,7 +1652,12 @@ export const AptosCallHandlerConfig = {
 };
 
 function createBaseAptosCallFilter(): AptosCallFilter {
-  return { function: "", typeArguments: [], withTypeArguments: false };
+  return {
+    function: "",
+    typeArguments: [],
+    withTypeArguments: false,
+    includeFailed: false,
+  };
 }
 
 export const AptosCallFilter = {
@@ -1667,6 +1673,9 @@ export const AptosCallFilter = {
     }
     if (message.withTypeArguments === true) {
       writer.uint32(24).bool(message.withTypeArguments);
+    }
+    if (message.includeFailed === true) {
+      writer.uint32(32).bool(message.includeFailed);
     }
     return writer;
   },
@@ -1687,6 +1696,9 @@ export const AptosCallFilter = {
         case 3:
           message.withTypeArguments = reader.bool();
           break;
+        case 4:
+          message.includeFailed = reader.bool();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1704,6 +1716,9 @@ export const AptosCallFilter = {
       withTypeArguments: isSet(object.withTypeArguments)
         ? Boolean(object.withTypeArguments)
         : false,
+      includeFailed: isSet(object.includeFailed)
+        ? Boolean(object.includeFailed)
+        : false,
     };
   },
 
@@ -1717,6 +1732,8 @@ export const AptosCallFilter = {
     }
     message.withTypeArguments !== undefined &&
       (obj.withTypeArguments = message.withTypeArguments);
+    message.includeFailed !== undefined &&
+      (obj.includeFailed = message.includeFailed);
     return obj;
   },
 
@@ -1725,6 +1742,7 @@ export const AptosCallFilter = {
     message.function = object.function ?? "";
     message.typeArguments = object.typeArguments?.map((e) => e) || [];
     message.withTypeArguments = object.withTypeArguments ?? false;
+    message.includeFailed = object.includeFailed ?? false;
     return message;
   },
 };

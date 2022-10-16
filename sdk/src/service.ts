@@ -244,8 +244,9 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
           filters: handler.filters.map((filter) => {
             return {
               function: filter.function,
-              typeArguments: filter.typeArguments ?? [],
+              typeArguments: filter.typeArguments || [],
               withTypeArguments: filter.typeArguments ? true : false,
+              includeFailed: filter.includeFailed || false,
             }
           }),
           handlerId,
