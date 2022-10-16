@@ -28,7 +28,6 @@ import { Empty } from './gen/google/protobuf/empty'
 import Long from 'long'
 import { TextDecoder } from 'util'
 import { Trace } from './core'
-import { SolanaInstructionHandler } from 'core/solana-processor'
 import { Instruction } from '@project-serum/anchor'
 
 const DEFAULT_MAX_BLOCK = Long.ZERO
