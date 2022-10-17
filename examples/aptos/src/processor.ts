@@ -1,6 +1,5 @@
 import { SouffleChefCampaign, CandyMachine } from './types/aptos/souffle'
-
-// import { token } from '@sentio/sdk/lib/builtin/aptos/0x3'
+import { token } from '@sentio/sdk/lib/builtin/aptos/0x3'
 
 SouffleChefCampaign.bind({ startVersion: 6604913 })
   .onEntryPullTokenV2((call, ctx) => {
@@ -36,10 +35,8 @@ CandyMachine.bind({ startVersion: 6604913 }).onEntryPullToken((call, ctx) => {
   ctx.meter.Counter('pulled').add(call.arguments_typed[2])
 })
 
-// token.bind({ startVersion: 182159141 }).onEventWithdrawEvent((evt: token.WithdrawEventInstance, ctx) => {
-//   if (!evt.data_typed) {
-//     console.log(JSON.stringify(evt))
-//     throw Error("adsfadf")
-//   }
-//   ctx.meter.Counter('with_draw').add(evt.data_typed.amount, { token: evt.data_typed.id.token_data_id.name })
-// })
+token.bind({ startVersion: 282159141 }).onEventWithdrawEvent((evt: token.WithdrawEventInstance, ctx) => {
+  ctx.meter.Counter('with_draw').add(evt.data_typed.amount, { token: evt.data_typed.id.token_data_id.name })
+})
+
+// vault.bind().onEventBorrowEvent()

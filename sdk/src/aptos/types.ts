@@ -17,6 +17,8 @@ export type TypedEventInstance<T> = EventInstance & {
   // undefined if there is converting error, usually because the ABI/data
   // mismatch
   data_typed: T
+
+  type_arguments: string[]
 }
 
 // Don't use intermedidate type to make IDE happier
@@ -39,8 +41,15 @@ export class TypeDescriptor {
     this.typeArgs = typeParams || []
   }
 
+  getSignature(): string {
+    if (this.typeArgs.length > 0) {
+      return this.qname + '<' + this.typeArgs.map((t) => t.getSignature()).join(', ') + '>'
+    }
+    return this.qname
+  }
+
   // Replace T0, T1 with more concrete type
-  applyArgs(ctx: Map<string, TypeDescriptor>): TypeDescriptor {
+  applyTypeArgs(ctx: Map<string, TypeDescriptor>): TypeDescriptor {
     const replace = ctx.get(this.qname)
     if (replace) {
       return replace
@@ -55,7 +64,7 @@ export class TypeDescriptor {
       if (replace) {
         typeArgs.push(replace)
       } else {
-        typeArgs.push(arg.applyArgs(ctx))
+        typeArgs.push(arg.applyTypeArgs(ctx))
       }
     }
     return new TypeDescriptor(this.qname, typeArgs)
@@ -190,7 +199,7 @@ export class TypeRegistry {
 
     for (const field of struct.fields) {
       let filedType = parseMoveType(field.type)
-      filedType = filedType.applyArgs(typeCtx)
+      filedType = filedType.applyTypeArgs(typeCtx)
       const value = this.decode(data[field.name], filedType)
       typedData[field.name] = value
     }

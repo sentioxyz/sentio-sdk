@@ -199,15 +199,20 @@ export class AptosBaseProcessor {
     this.loadTypes(registry)
     // TODO check if module is not loaded
 
+    const typeDescriptor = parseMoveType(event.type)
+    const typeArguments = typeDescriptor.typeArgs.map((t) => t.getSignature())
+    // TODO check move structure's type param match type args, also maybe
+    // use type arguments for decoding
+
     let dataTyped = undefined
     try {
-      dataTyped = registry.decode(event.data, parseMoveType(event.type))
+      dataTyped = registry.decode(event.data, typeDescriptor)
     } catch (e) {
       console.warn('Decoding error for ', event.type)
       return event
     }
 
-    return { ...event, data_typed: dataTyped } as TypedEventInstance<any>
+    return { ...event, data_typed: dataTyped, type_arguments: typeArguments } as TypedEventInstance<any>
   }
 
   private decodeFunctionPayload(

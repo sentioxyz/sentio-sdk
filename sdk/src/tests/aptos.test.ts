@@ -222,7 +222,7 @@ const testData = {
         account_address: '0x21d5fe032affa1c8b10d343e9ad5a5618bc13baf5ed4a674fafaa12c54f416cc',
       },
       sequence_number: '980533',
-      type: '0x4188c8694687e844677c2aa87171019e23d61cac60de5082a278a8aa47e9d807::SouffleChefCampaign::PullTokenEvent',
+      type: '0x4188c8694687e844677c2aa87171019e23d61cac60de5082a278a8aa47e9d807::SouffleChefCampaign::PullTokenEvent<0x1::aptos_coin::AptosCoin>',
       data: {
         receiver: '0x3a80be5daa84f2da7e07b3ec9234da48a5647f757187879c97a1fa03f31f1195',
       },

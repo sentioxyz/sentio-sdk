@@ -38,6 +38,7 @@ export abstract class EthContext extends BaseContext {
     this.log = log
     this.block = block
     this.trace = trace
+    this.address = address
     if (log) {
       this.blockNumber = Long.fromNumber(log.blockNumber, true)
       this.transactionHash = log.transactionHash

@@ -60,7 +60,7 @@ function generateSimpleType(type: string): string {
   return parts.slice(1).join('.')
 }
 
-export function parseMoveType(type: string) {
+export function parseMoveType(type: string): TypeDescriptor {
   // type = type.replace('&', '')
 
   type = type.replaceAll('&mut ', '&')

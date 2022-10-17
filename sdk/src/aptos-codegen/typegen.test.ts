@@ -18,9 +18,9 @@ describe('type gen', () => {
   })
 
   test('test depended types', async () => {
-    const res = parseMoveType(
+    const typeString =
       '0x1::table_with_length::TableWithLength<T0, 0xd5f9f2b1c24faee8f07b790e570c75dfa1b7d8c1e9a60162fbd92ade03ea29e4::iterable_table::IterableValue<T0, T1>>'
-    )
+    const res = parseMoveType(typeString)
 
     const deps = res.dependedTypes()
     assert(deps.length === 2)
@@ -28,6 +28,9 @@ describe('type gen', () => {
       deps[0] === '0xd5f9f2b1c24faee8f07b790e570c75dfa1b7d8c1e9a60162fbd92ade03ea29e4::iterable_table::IterableValue'
     )
     assert(deps[1] === '0x1::table_with_length::TableWithLength')
+
+    const computedTypeString = res.getSignature()
+    assert(computedTypeString === typeString)
   })
   // test('type type gen', async () => {
   //
