@@ -1,4 +1,4 @@
-import { ProcessResult, RecordMetaData } from '../gen'
+import { ProcessResult } from '../gen'
 import {
   AptosBindOptions,
   AptosContext,

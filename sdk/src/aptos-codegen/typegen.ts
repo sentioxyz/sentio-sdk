@@ -63,10 +63,11 @@ function generateSimpleType(type: string): string {
 export function parseMoveType(type: string) {
   // type = type.replace('&', '')
 
-  type = type.replace('&mut ', '&')
+  type = type.replaceAll('&mut ', '&')
+  type = type.replaceAll('mut ', '')
 
   // TODO replace ' ' is not exactly safe, need to double check this
-  type = type.replace(' ', '')
+  type = type.replaceAll(' ', '')
 
   const stack: TypeDescriptor[] = [new TypeDescriptor('')]
   let buffer = []

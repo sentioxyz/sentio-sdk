@@ -305,8 +305,11 @@ function generateOnEvents(module: MoveModule, struct: MoveStruct): string {
   if (!isEvent(struct)) {
     return ''
   }
+
+  const genericString = generateStructTypeParameters(struct)
+
   const source = `
-  onEvent${struct.name}(func: (event: ${module.name}.${struct.name}Instance, ctx: aptos.AptosContext) => void): ${module.name} {
+  onEvent${struct.name}${genericString}(func: (event: ${module.name}.${struct.name}Instance${genericString}, ctx: aptos.AptosContext) => void): ${module.name} {
     this.onEvent(func, {
       type: '${module.name}::${struct.name}'
     })
