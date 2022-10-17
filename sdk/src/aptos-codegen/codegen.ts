@@ -203,6 +203,7 @@ function generateModule(moduleByteCode: MoveModuleBytecode, dependedModules: str
 
 function generateStructs(module: MoveModule, struct: MoveStruct) {
   const genericString = generateStructTypeParameters(struct)
+  const genericStringAny = generateStructTypeParameters(struct, true)
 
   const fields = struct.fields.map((field) => {
     return `${field.name}: ${generateType(field.type)}`
@@ -211,9 +212,10 @@ function generateStructs(module: MoveModule, struct: MoveStruct) {
   let eventPayload = ''
   if (isEvent(struct)) {
     eventPayload = `
-    export interface ${struct.name}Instance${genericString} extends 
-        aptos.TypedEventInstance<${struct.name}${genericString}> {
-      data_typed: ${struct.name}${genericString}
+    export interface ${struct.name}Instance extends 
+        aptos.TypedEventInstance<${struct.name}${genericStringAny}> {
+      data_typed: ${struct.name}${genericStringAny}
+      type_arguments: [${struct.generic_type_params.map((_) => 'string').join(', ')}]
     }
     `
   }
@@ -227,26 +229,26 @@ function generateStructs(module: MoveModule, struct: MoveStruct) {
   `
 }
 
-function generateFunctionTypeParameters(func: MoveFunction) {
-  let genericString = ''
-  if (func.generic_type_params && func.generic_type_params.length > 0) {
-    const params = func.generic_type_params
-      .map((v, idx) => {
-        return 'T' + idx
-      })
-      .join(',')
-    genericString = `<${params}>`
-  }
-  return genericString
-}
+// function generateFunctionTypeParameters(func: MoveFunction) {
+//   let genericString = ''
+//   if (func.generic_type_params && func.generic_type_params.length > 0) {
+//     const params = func.generic_type_params
+//       .map((v, idx) => {
+//         return 'T' + idx
+//       })
+//       .join(',')
+//     genericString = `<${params}>`
+//   }
+//   return genericString
+// }
 
-function generateStructTypeParameters(struct: MoveStruct) {
+function generateStructTypeParameters(struct: MoveStruct, useAny = false) {
   let genericString = ''
 
   if (struct.generic_type_params && struct.generic_type_params.length > 0) {
     const params = struct.generic_type_params
       .map((v, idx) => {
-        return 'T' + idx
+        return useAny ? 'any' : 'T' + idx
       })
       .join(',')
     genericString = `<${params}>`
@@ -267,11 +269,12 @@ function generateCallArgsStructs(module: MoveModule, func: MoveFunction) {
 
   const camelFuncName = capitalizeFirstChar(camelize(func.name))
 
-  const genericString = generateFunctionTypeParameters(func)
+  // const genericString = generateFunctionTypeParameters(func)
   return `
-  export interface ${camelFuncName}Payload${genericString} 
+  export interface ${camelFuncName}Payload
       extends aptos.TypedEntryFunctionPayload<[${fields.join(',')}]> {
-    arguments_typed: [${fields.join(',')}]
+    arguments_typed: [${fields.join(',')}],
+    type_arguments: [${func.generic_type_params.map((_) => 'string').join(', ')}]
   }
   `
 }
@@ -281,11 +284,11 @@ function generateOnEntryFunctions(module: MoveModule, func: MoveFunction) {
     return ''
   }
 
-  const genericString = generateFunctionTypeParameters(func)
+  // const genericString = generateFunctionTypeParameters(func)
 
   const camelFuncName = capitalizeFirstChar(camelize(func.name))
   const source = `
-  onEntry${camelFuncName}${genericString}(func: (call: ${module.name}.${camelFuncName}Payload${genericString}, ctx: aptos.AptosContext) => void, filter?: aptos.CallFilter): ${module.name} {
+  onEntry${camelFuncName}(func: (call: ${module.name}.${camelFuncName}Payload, ctx: aptos.AptosContext) => void, filter?: aptos.CallFilter): ${module.name} {
     this.onEntryFunctionCall(func, {
       ...filter,
       function: '${module.name}::${func.name}'
@@ -306,10 +309,10 @@ function generateOnEvents(module: MoveModule, struct: MoveStruct): string {
     return ''
   }
 
-  const genericString = generateStructTypeParameters(struct)
+  // const genericString = generateStructTypeParameters(struct)
 
   const source = `
-  onEvent${struct.name}${genericString}(func: (event: ${module.name}.${struct.name}Instance${genericString}, ctx: aptos.AptosContext) => void): ${module.name} {
+  onEvent${struct.name}(func: (event: ${module.name}.${struct.name}Instance, ctx: aptos.AptosContext) => void): ${module.name} {
     this.onEvent(func, {
       type: '${module.name}::${struct.name}'
     })

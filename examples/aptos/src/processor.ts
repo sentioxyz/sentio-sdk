@@ -32,11 +32,9 @@ CandyMachine.bind({ startVersion: 6604913 }).onEntryPullToken((call, ctx) => {
     console.log(JSON.stringify(ctx.transaction))
     throw Error('processor decode error')
   }
-  ctx.meter.Counter('pulled').add(call.arguments_typed[2])
+  ctx.meter.Counter('pulled').add(call.arguments_typed[2], { coin: call.type_arguments[0] })
 })
 
 token.bind({ startVersion: 282159141 }).onEventWithdrawEvent((evt: token.WithdrawEventInstance, ctx) => {
   ctx.meter.Counter('with_draw').add(evt.data_typed.amount, { token: evt.data_typed.id.token_data_id.name })
 })
-
-// vault.bind().onEventBorrowEvent()

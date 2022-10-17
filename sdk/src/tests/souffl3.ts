@@ -3,7 +3,7 @@ import { token } from '../builtin/aptos/0x3'
 import { voting } from '../builtin/aptos/0x1'
 
 SouffleChefCampaign.bind({ startVersion: 3212312 })
-  .onEntryPullTokenV2((call: SouffleChefCampaign.PullTokenV2Payload<any>, ctx) => {
+  .onEntryPullTokenV2((call: SouffleChefCampaign.PullTokenV2Payload, ctx) => {
     ctx.meter.Counter('call_num').add(1)
     ctx.meter.Counter('pulled').add(call.arguments_typed[3])
   })
@@ -30,7 +30,7 @@ SouffleChefCampaign.bind({ startVersion: 3212312 })
     }
   })
 
-CandyMachine.bind().onEntryPullToken((call: CandyMachine.PullTokenPayload<any>, ctx) => {
+CandyMachine.bind().onEntryPullToken((call: CandyMachine.PullTokenPayload, ctx) => {
   ctx.meter.Counter('pulled').add(call.arguments[2])
 })
 
