@@ -59,7 +59,12 @@ describe('Test Aptos Example', () => {
       bindings: [
         {
           data: {
-            raw: new TextEncoder().encode(JSON.stringify(testData.events[testData.events.length - 1])),
+            raw: new TextEncoder().encode(
+              JSON.stringify({
+                ...testData,
+                events: [testData.events[testData.events.length - 1]],
+              })
+            ),
           },
           handlerId: 0,
           handlerType: HandlerType.APT_EVENT,
@@ -77,7 +82,12 @@ describe('Test Aptos Example', () => {
       bindings: [
         {
           data: {
-            raw: new TextEncoder().encode(JSON.stringify(tokenTestData)),
+            raw: new TextEncoder().encode(
+              JSON.stringify({
+                ...testData,
+                events: [tokenTestData],
+              })
+            ),
           },
           handlerId: 2,
           handlerType: HandlerType.APT_EVENT,
@@ -94,7 +104,7 @@ describe('Test Aptos Example', () => {
       bindings: [
         {
           data: {
-            raw: new TextEncoder().encode(JSON.stringify(createProposalData)),
+            raw: new TextEncoder().encode(JSON.stringify({ ...testData, events: [createProposalData] })),
           },
           handlerId: 3,
           handlerType: HandlerType.APT_EVENT,
@@ -233,7 +243,6 @@ const testData = {
 }
 
 const tokenTestData = {
-  version: '18483034',
   guid: {
     creation_number: '4',
     account_address: '0x89bc80de59187f707a59ae7a4121718dafe3e6068e0509104ef7e41a56bc97db',
@@ -254,7 +263,6 @@ const tokenTestData = {
 }
 
 const createProposalData = {
-  version: '1',
   guid: {
     creation_number: '5',
     account_address: '0x1',

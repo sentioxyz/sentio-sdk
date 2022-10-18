@@ -43,7 +43,7 @@ export interface ArgumentsFilter {
 
 class EventHandler {
   filters: EventFilter[]
-  handler: (event: EventInstance) => Promise<ProcessResult>
+  handler: (event: Transaction_UserTransaction) => Promise<ProcessResult>
 }
 
 class CallHandler {
@@ -108,11 +108,15 @@ export class AptosBaseProcessor {
     const processor = this
 
     this.eventHandlers.push({
-      handler: async function (event) {
-        const ctx = new AptosContext(processor.moduleName, processor.config.address, Long.fromString(event.version))
-        if (event) {
-          const decoded = processor.decodeEvent(event)
-          handler(decoded, ctx)
+      handler: async function (txn) {
+        const ctx = new AptosContext(processor.moduleName, processor.config.address, Long.fromString(txn.version), txn)
+        if (txn && txn.events) {
+          const events = txn.events
+          txn.events = []
+          for (const evt of events) {
+            const decoded = processor.decodeEvent(evt as EventInstance)
+            handler(decoded, ctx)
+          }
         }
         return {
           gauges: ctx.gauges,
