@@ -3,18 +3,10 @@ import { token } from '@sentio/sdk/lib/builtin/aptos/0x3'
 
 SouffleChefCampaign.bind({ startVersion: 6604913 })
   .onEntryPullTokenV2((call, ctx) => {
-    if (!call.arguments_typed) {
-      console.log(JSON.stringify(ctx.transaction))
-      throw Error('processor decode error')
-    }
     ctx.meter.Counter('call_num').add(1)
     ctx.meter.Counter('pulled').add(call.arguments_typed[3])
   })
   .onEventBurnEnjoyEvent((evt, ctx) => {
-    if (!evt.data_typed) {
-      console.log(JSON.stringify(evt))
-      throw Error('processor decode error')
-    }
     ctx.meter.Counter('burned').add(1)
   })
   .onTransaction((txn, ctx) => {
@@ -28,10 +20,6 @@ SouffleChefCampaign.bind({ startVersion: 6604913 })
   })
 
 CandyMachine.bind({ startVersion: 6604913 }).onEntryPullToken((call, ctx) => {
-  if (!call.arguments_typed) {
-    console.log(JSON.stringify(ctx.transaction))
-    throw Error('processor decode error')
-  }
   ctx.meter.Counter('pulled').add(call.arguments_typed[2], { coin: call.type_arguments[0] })
 })
 

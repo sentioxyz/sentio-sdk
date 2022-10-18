@@ -212,7 +212,7 @@ export class AptosBaseProcessor {
     try {
       dataTyped = registry.decode(event.data, typeDescriptor)
     } catch (e) {
-      console.warn('Decoding error for ', event.type)
+      console.error('Decoding error for ', JSON.stringify(event))
       return event
     }
 
@@ -234,7 +234,7 @@ export class AptosBaseProcessor {
         argumentsTyped.push(registry.decode(arg, argType))
       }
     } catch (e) {
-      console.warn('Decoding error for ', payload.function)
+      console.error('Decoding error for ', JSON.stringify(payload))
       return payload
     }
 
