@@ -1,5 +1,6 @@
 sdk/src/builtin/*
 !sdk/src/builtin/solana
+!sdk/src/builtin/aptos/index.ts
 !sdk/src/builtin/index.ts
 node_modules
 dist

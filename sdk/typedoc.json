@@ -1,4 +1,4 @@
 {
-  "entryPoints": ["./src/core", "./src/utils", "./src/testing", "./src/builtin"],
+  "entryPoints": ["./src/core", "./src/utils", "./src/testing", "./src/builtin", "./src/aptos"],
   "out": "docs"
 }
