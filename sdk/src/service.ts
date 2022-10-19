@@ -29,7 +29,6 @@ import Long from 'long'
 import { TextDecoder } from 'util'
 import { Trace } from './core'
 import { Instruction } from '@project-serum/anchor'
-import { account } from './builtin/aptos/0x1'
 
 const DEFAULT_MAX_BLOCK = Long.ZERO
 

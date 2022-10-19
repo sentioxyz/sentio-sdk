@@ -7,6 +7,7 @@ coin.bind({ network: aptos.AptosNetwork.MAIN_NET }).onEventWithdrawEvent((evt, c
   if (evt.guid.account_address === '0x9c5382a5aa6cd92f38ffa50bd8ec2879833997116499cc5bcd6d4688a962e330') {
     ctx.meter.Counter('air_dropped').add(evt.data_typed.amount)
   }
+  ctx.meter.Counter('evt_cnt').add(1)
 })
 
 SouffleChefCampaign.bind({ network: aptos.AptosNetwork.TEST_NET, startVersion: 6604913 })

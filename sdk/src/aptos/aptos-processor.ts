@@ -11,9 +11,9 @@ import {
 } from '.'
 
 import Long from 'long'
-import { APTOS_MAINNET_ID, APTOS_TESTNET_ID } from '../utils/chain'
 import { EventInstance, GLOBAL_TYPE_REGISTRY } from './types'
 import { parseMoveType } from '../aptos-codegen/typegen'
+import { getChainId } from './bind-options'
 
 type IndexConfigure = {
   address: string
@@ -71,11 +71,19 @@ export class AptosBaseProcessor {
   public onTransaction(
     handler: (transaction: Transaction_UserTransaction, ctx: AptosContext) => void
   ): AptosBaseProcessor {
-    const address = this.config.address
-    const moduleName = this.moduleName
+    // const address = this.config.address
+    // const moduleName = this.moduleName
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const processor = this
     this.callHandlers.push({
       handler: async function (tx) {
-        const ctx = new AptosContext(moduleName, address, Long.fromString(tx.version), tx)
+        const ctx = new AptosContext(
+          processor.moduleName,
+          processor.config.network,
+          processor.config.address,
+          Long.fromString(tx.version),
+          tx
+        )
         if (tx) {
           handler(tx, ctx)
         }
@@ -110,7 +118,13 @@ export class AptosBaseProcessor {
 
     this.eventHandlers.push({
       handler: async function (txn) {
-        const ctx = new AptosContext(processor.moduleName, processor.config.address, Long.fromString(txn.version), txn)
+        const ctx = new AptosContext(
+          processor.moduleName,
+          processor.config.network,
+          processor.config.address,
+          Long.fromString(txn.version),
+          txn
+        )
         if (txn && txn.events) {
           const events = txn.events
           txn.events = []
@@ -149,7 +163,13 @@ export class AptosBaseProcessor {
 
     this.callHandlers.push({
       handler: async function (tx) {
-        const ctx = new AptosContext(processor.moduleName, processor.config.address, Long.fromString(tx.version), tx)
+        const ctx = new AptosContext(
+          processor.moduleName,
+          processor.config.network,
+          processor.config.address,
+          Long.fromString(tx.version),
+          tx
+        )
         if (tx) {
           const payload = tx.payload as TransactionPayload_EntryFunctionPayload
           const decoded = processor.decodeFunctionPayload(payload)
@@ -180,12 +200,7 @@ export class AptosBaseProcessor {
   }
 
   getChainId(): string {
-    switch (this.config.network) {
-      case AptosNetwork.TEST_NET:
-        return APTOS_TESTNET_ID
-      case AptosNetwork.MAIN_NET:
-        return APTOS_MAINNET_ID
-    }
+    return getChainId(this.config.network)
   }
 
   loadTypes(registry: TypeRegistry) {
