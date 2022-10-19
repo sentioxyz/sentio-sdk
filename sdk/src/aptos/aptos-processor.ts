@@ -25,6 +25,7 @@ type IndexConfigure = {
 // TODO extends ArgumentsFilter
 export interface EventFilter {
   type: string
+  account?: string
 }
 
 export interface FunctionNameAndCallFilter extends CallFilter {

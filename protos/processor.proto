@@ -120,6 +120,7 @@ message AptosEventHandlerConfig {
 
 message AptosEventFilter {
   string type = 1;
+  string account = 2;
 }
 
 message AptosCallHandlerConfig {

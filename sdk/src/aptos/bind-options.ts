@@ -1,8 +1,8 @@
 import Long from 'long'
 
 export enum AptosNetwork {
-  MAIN_NET = 0,
-  TEST_NET = 1,
+  MAIN_NET = 1,
+  TEST_NET = 2,
   // DEV_NET,
 }
 

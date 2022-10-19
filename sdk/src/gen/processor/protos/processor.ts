@@ -202,6 +202,7 @@ export interface AptosEventHandlerConfig {
 
 export interface AptosEventFilter {
   type: string;
+  account: string;
 }
 
 export interface AptosCallHandlerConfig {
@@ -1524,7 +1525,7 @@ export const AptosEventHandlerConfig = {
 };
 
 function createBaseAptosEventFilter(): AptosEventFilter {
-  return { type: "" };
+  return { type: "", account: "" };
 }
 
 export const AptosEventFilter = {
@@ -1534,6 +1535,9 @@ export const AptosEventFilter = {
   ): _m0.Writer {
     if (message.type !== "") {
       writer.uint32(10).string(message.type);
+    }
+    if (message.account !== "") {
+      writer.uint32(18).string(message.account);
     }
     return writer;
   },
@@ -1548,6 +1552,9 @@ export const AptosEventFilter = {
         case 1:
           message.type = reader.string();
           break;
+        case 2:
+          message.account = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1559,18 +1566,21 @@ export const AptosEventFilter = {
   fromJSON(object: any): AptosEventFilter {
     return {
       type: isSet(object.type) ? String(object.type) : "",
+      account: isSet(object.account) ? String(object.account) : "",
     };
   },
 
   toJSON(message: AptosEventFilter): unknown {
     const obj: any = {};
     message.type !== undefined && (obj.type = message.type);
+    message.account !== undefined && (obj.account = message.account);
     return obj;
   },
 
   fromPartial(object: DeepPartial<AptosEventFilter>): AptosEventFilter {
     const message = createBaseAptosEventFilter();
     message.type = object.type ?? "";
+    message.account = object.account ?? "";
     return message;
   },
 };

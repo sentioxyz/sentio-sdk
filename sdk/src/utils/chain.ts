@@ -117,5 +117,5 @@ export function getChainType(chainId: string | number): string {
   if (id.startsWith('apt')) {
     return 'aptos'
   }
-  return 'ethereum'
+  return 'EVM'
 }

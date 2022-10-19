@@ -29,6 +29,7 @@ import Long from 'long'
 import { TextDecoder } from 'util'
 import { Trace } from './core'
 import { Instruction } from '@project-serum/anchor'
+import { account } from './builtin/aptos/0x1'
 
 const DEFAULT_MAX_BLOCK = Long.ZERO
 
@@ -231,7 +232,12 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       for (const handler of aptosProcessor.eventHandlers) {
         const handlerId = this.aptosEventHandlers.push(handler.handler) - 1
         const eventHandlerConfig: AptosEventHandlerConfig = {
-          filters: handler.filters,
+          filters: handler.filters.map((f) => {
+            return {
+              type: f.type,
+              account: f.account || '',
+            }
+          }),
           handlerId,
         }
         contractConfig.aptosEventConfigs.push(eventHandlerConfig)
