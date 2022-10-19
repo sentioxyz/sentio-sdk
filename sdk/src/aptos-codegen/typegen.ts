@@ -1,4 +1,4 @@
-import { MoveModule } from 'aptos/src/generated'
+import { MoveModule } from '@aptos/src/generated'
 import { TypeDescriptor } from '../aptos/types'
 import { moduleQname, moduleQnameForType, SPLITTER, VECTOR_STR } from '../aptos/utils'
 

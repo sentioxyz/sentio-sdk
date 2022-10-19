@@ -1,4 +1,4 @@
-import { MoveStruct } from 'aptos/src/generated/models/MoveStruct'
+import { MoveStruct } from '@aptos/src/generated'
 
 export function decode<T>(struct: MoveStruct, args: any[]): T | undefined {
   if (args.length != struct.fields.length) {

@@ -4,7 +4,7 @@ import { Labels } from '../core/metadata'
 import { normalizeLabels } from '../core/meter'
 import { BaseContext } from '../core/context'
 import { AptosNetwork, Transaction_UserTransaction } from './'
-import { getChainId } from './bind-options'
+import { getChainId } from './network'
 
 export class AptosContext extends BaseContext {
   address: string

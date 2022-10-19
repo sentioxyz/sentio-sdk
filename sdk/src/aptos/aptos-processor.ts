@@ -13,7 +13,7 @@ import {
 import Long from 'long'
 import { EventInstance, GLOBAL_TYPE_REGISTRY } from './types'
 import { parseMoveType } from '../aptos-codegen/typegen'
-import { getChainId } from './bind-options'
+import { getChainId } from './network'
 
 type IndexConfigure = {
   address: string
@@ -195,7 +195,7 @@ export class AptosBaseProcessor {
     this.config = {
       startVersion: startVersion,
       address: options.address,
-      network: options.network || AptosNetwork.TEST_NET,
+      network: options.network || AptosNetwork.MAIN_NET,
     }
   }
 

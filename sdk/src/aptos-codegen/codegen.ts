@@ -1,61 +1,107 @@
 import fs from 'fs'
 import path from 'path'
 import prettier from 'prettier'
-import { MoveFunction, MoveModule, MoveStruct, MoveModuleBytecode } from 'aptos/src/generated'
-import { generateType, AccountRegister } from './typegen'
+import { MoveFunction, MoveModule, MoveModuleBytecode, MoveStruct } from '@aptos/src/generated'
+import { AccountModulesImportInfo, AccountRegister, generateType } from './typegen'
 import { isFrameworkAccount } from '../aptos/utils'
+import chalk from 'chalk'
+import { AptosNetwork, getChainName, getChainRpcEndpoint } from '../aptos/network'
+import { AptosClient } from '@aptos'
 
-export function generate(srcDir: string, outputDir: string) {
+export async function generate(srcDir: string, outputDir: string) {
+  await generateForNetwork(srcDir, outputDir, AptosNetwork.MAIN_NET)
+  await generateForNetwork(path.join(srcDir, 'testnet'), path.join(outputDir, 'testnet'), AptosNetwork.TEST_NET)
+}
+
+export async function generateForNetwork(srcDir: string, outputDir: string, network: AptosNetwork) {
+  if (!fs.existsSync(srcDir)) {
+    return
+  }
+  if (network === AptosNetwork.TEST_NET) {
+    console.log('Found testnet directory, generate code for testnet modules')
+  }
   const files = fs.readdirSync(srcDir)
   outputDir = path.resolve(outputDir)
+  const outputs: OutputFile[] = []
 
   fs.mkdirSync(outputDir, { recursive: true })
 
   const loader = new AccountRegister()
 
-  // The first path, identify import relation and module name (filename) of those imports
+  // when generating user code, don't need to generate framework account
+  loader.accountImports.set('0x1', new AccountModulesImportInfo('0x1', '0x1'))
+  loader.accountImports.set('0x2', new AccountModulesImportInfo('0x2', '0x2'))
+  loader.accountImports.set('0x3', new AccountModulesImportInfo('0x3', '0x3'))
+  const client = new AptosClient(getChainRpcEndpoint(network))
+
   for (const file of files) {
     if (!file.endsWith('.json')) {
       continue
     }
-    // Reading file is duplicated, but since they are small files probably file
-    // TODO add file manager class
-    const json = fs.readFileSync(path.join(srcDir, file), 'utf-8')
-    const modules = JSON.parse(json)
+    const fullPath = path.resolve(srcDir, file)
+    const modules = JSON.parse(fs.readFileSync(fullPath, 'utf-8'))
 
     for (const module of modules) {
       if (module.abi) {
         loader.register(module.abi, path.basename(file, '.json'))
       }
     }
-  }
-
-  for (const file of files) {
-    if (!file.endsWith('.json')) {
-      continue
-    }
-    const codeGen = new AccountCodegen(loader, {
-      srcFile: path.join(srcDir, file),
+    const codeGen = new AccountCodegen(loader, modules, {
+      fileName: path.basename(file, '.json'),
       outputDir: outputDir,
+      network,
     })
 
-    codeGen.generate()
+    outputs.push(...codeGen.generate())
   }
 
-  // when generating user code, don't need to generate framework account
-  loader.pendingAccounts.delete('0x1')
-  loader.pendingAccounts.delete('0x2')
-  loader.pendingAccounts.delete('0x3')
+  while (loader.pendingAccounts.size > 0) {
+    for (const account of loader.pendingAccounts) {
+      console.log(`download depended module for account ${account} at ${getChainName(network)}`)
 
-  if (loader.pendingAccounts.size > 0) {
-    // TODO automatic download dependencies
-    console.error('Missing ABIs from the following accounts', loader.pendingAccounts)
+      try {
+        const modules = await client.getAccountModules(account)
+        fs.writeFileSync(path.resolve(srcDir, account + '.json'), JSON.stringify(modules, null, '\t'))
+
+        for (const module of modules) {
+          if (module.abi) {
+            loader.register(module.abi, account)
+          }
+        }
+        const codeGen = new AccountCodegen(loader, modules, {
+          fileName: account,
+          outputDir: outputDir,
+          network,
+        })
+
+        outputs.push(...codeGen.generate())
+      } catch (e) {
+        console.error(
+          chalk.red(
+            'Error downloading account module, check if you choose the right network，or download account modules manually into your director'
+          )
+        )
+        console.error(e)
+        process.exit(1)
+      }
+    }
+  }
+
+  for (const output of outputs) {
+    const content = prettier.format(output.fileContent, { parser: 'typescript' })
+    fs.writeFileSync(path.join(outputDir, output.fileName), content)
   }
 }
 
+interface OutputFile {
+  fileName: string
+  fileContent: string
+}
+
 interface Config {
-  srcFile: string
+  fileName: string
   outputDir: string
+  network: AptosNetwork
 }
 
 export class AccountCodegen {
@@ -63,18 +109,18 @@ export class AccountCodegen {
   config: Config
   loader: AccountRegister
 
-  constructor(loader: AccountRegister, config: Config) {
-    const json = fs.readFileSync(config.srcFile, 'utf-8')
-    this.modules = JSON.parse(json)
+  constructor(loader: AccountRegister, modules: MoveModuleBytecode[], config: Config) {
+    // const json = fs.readFileSync(config.srcFile, 'utf-8')
+    this.modules = modules
     this.config = config
     this.loader = loader
   }
 
-  generate() {
+  generate(): OutputFile[] {
     if (!this.modules) {
-      return
+      return []
     }
-    const baseName = path.basename(this.config.srcFile, '.json')
+    // const baseName = path.basename(this.config.fileName, '.json')
 
     let address: string | undefined
     for (const module of this.modules) {
@@ -83,12 +129,12 @@ export class AccountCodegen {
       }
     }
     if (!address) {
-      return
+      return []
     }
 
     const imports = `
     import { aptos } from "@sentio/sdk"
-    import { Address, MoveModule } from "aptos/src/generated"
+    import { Address, MoveModule } from "@aptos/src/generated"
     `
 
     const dependedAccounts: string[] = []
@@ -118,7 +164,7 @@ export class AccountCodegen {
       }
     }
 
-    let source = `
+    const source = `
     /* Autogenerated file. Do not edit manually. */
     /* tslint:disable */
     /* eslint-disable */
@@ -129,7 +175,7 @@ export class AccountCodegen {
     
     ${moduleImports.join('\n')}
     
-    ${this.modules.map((m) => generateModule(m, dependedAccounts)).join('\n')}
+    ${this.modules.map((m) => generateModule(m, this.config.network)).join('\n')}
     
     function loadAllTypes(registry: aptos.TypeRegistry) {
       ${dependedAccounts.map((m) => `${m}.loadTypes(registry)`).join('\n')}
@@ -142,12 +188,24 @@ export class AccountCodegen {
     }
     ` // source
 
-    source = prettier.format(source, { parser: 'typescript' })
-    fs.writeFileSync(path.join(this.config.outputDir, baseName + '.ts'), source)
+    return [
+      {
+        fileName: this.config.fileName + '.ts',
+        fileContent: source,
+      },
+    ]
   }
 }
 
-function generateModule(moduleByteCode: MoveModuleBytecode, dependedModules: string[]) {
+function generateNetworkOption(network: AptosNetwork) {
+  switch (network) {
+    case AptosNetwork.TEST_NET:
+      return 'TEST_NET'
+  }
+  return 'MAIN_NET'
+}
+
+function generateModule(moduleByteCode: MoveModuleBytecode, network: AptosNetwork) {
   if (!moduleByteCode.abi) {
     return ''
   }
@@ -167,7 +225,7 @@ function generateModule(moduleByteCode: MoveModuleBytecode, dependedModules: str
     }
     static DEFAULT_OPTIONS: aptos.AptosBindOptions = {
       address: "${module.address}",
-      network: aptos.AptosNetwork.TEST_NET       
+      network: aptos.AptosNetwork.${generateNetworkOption(network)}       
     }
 
     static bind(options: Partial<aptos.AptosBindOptions> = {}): ${module.name} {
