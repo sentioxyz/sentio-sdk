@@ -85,7 +85,7 @@ export class AptosBaseProcessor {
           tx
         )
         if (tx) {
-          handler(tx, ctx)
+          await handler(tx, ctx)
         }
         return {
           gauges: ctx.gauges,
@@ -130,7 +130,7 @@ export class AptosBaseProcessor {
           txn.events = []
           for (const evt of events) {
             const decoded = processor.decodeEvent(evt as EventInstance)
-            handler(decoded, ctx)
+            await handler(decoded, ctx)
           }
         }
         return {
@@ -173,7 +173,7 @@ export class AptosBaseProcessor {
         if (tx) {
           const payload = tx.payload as TransactionPayload_EntryFunctionPayload
           const decoded = processor.decodeFunctionPayload(payload)
-          handler(decoded, ctx)
+          await handler(decoded, ctx)
         }
         return {
           gauges: ctx.gauges,
