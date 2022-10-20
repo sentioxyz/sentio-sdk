@@ -1,4 +1,4 @@
-import { MoveModule } from '@aptos/src/generated'
+import { MoveModule } from 'aptos-sdk/src/generated'
 
 export const SPLITTER = '::'
 

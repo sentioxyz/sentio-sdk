@@ -1,12 +1,12 @@
 import fs from 'fs'
 import path from 'path'
 import prettier from 'prettier'
-import { MoveFunction, MoveModule, MoveModuleBytecode, MoveStruct } from '@aptos/src/generated'
+import { MoveFunction, MoveModule, MoveModuleBytecode, MoveStruct } from 'aptos-sdk/src/generated'
 import { AccountModulesImportInfo, AccountRegister, generateType } from './typegen'
 import { isFrameworkAccount } from '../aptos/utils'
 import chalk from 'chalk'
 import { AptosNetwork, getChainName, getChainRpcEndpoint } from '../aptos/network'
-import { AptosClient } from '@aptos'
+import { AptosClient } from 'aptos-sdk'
 
 export async function generate(srcDir: string, outputDir: string) {
   await generateForNetwork(srcDir, outputDir, AptosNetwork.MAIN_NET)
@@ -134,7 +134,7 @@ export class AccountCodegen {
 
     const imports = `
     import { aptos } from "@sentio/sdk"
-    import { Address, MoveModule } from "@aptos/src/generated"
+    import { Address, MoveModule } from "aptos-sdk/src/generated"
     `
 
     const dependedAccounts: string[] = []

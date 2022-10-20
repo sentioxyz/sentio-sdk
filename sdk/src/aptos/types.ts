@@ -4,7 +4,7 @@ import {
   MoveModule,
   MoveStruct,
   TransactionPayload_EntryFunctionPayload,
-} from '@aptos/src/generated'
+} from 'aptos-sdk/src/generated'
 import { moduleQname, SPLITTER, VECTOR_STR } from './utils'
 import { parseMoveType } from '../aptos-codegen/typegen'
 
