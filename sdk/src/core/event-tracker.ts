@@ -10,7 +10,7 @@ export interface Event {
 }
 
 export interface TrackerOptions {
-  total?: boolean
+  totalByDay?: boolean
   unique?: boolean
   distinctByDays?: number[]
 }
@@ -18,7 +18,7 @@ export interface TrackerOptions {
 // Track Event with an identity associate with it
 export class EventTracker {
   static DEFAULT_OPTIONS: TrackerOptions = {
-    total: true,
+    totalByDay: true,
     unique: true,
   }
 
@@ -48,7 +48,7 @@ export class EventTracker {
 
 export class AccountEventTracker extends EventTracker {
   static DEFAULT_OPTIONS: TrackerOptions = {
-    total: true,
+    totalByDay: true,
     unique: true,
     distinctByDays: [1, 7, 30],
   }

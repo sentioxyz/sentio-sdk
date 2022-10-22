@@ -84,7 +84,7 @@ message RetentionConfig {
 
 message EventTrackingConfig {
   string event_name = 1;
-  bool total = 2;
+  bool total_by_day = 2;
   bool unique = 3;
   TotalPerEntityAggregation total_per_entity = 4;
   repeated int32 distinct_aggregation_by_days = 5;

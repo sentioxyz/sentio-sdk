@@ -199,7 +199,7 @@ export interface RetentionConfig {
 
 export interface EventTrackingConfig {
   eventName: string;
-  total: boolean;
+  totalByDay: boolean;
   unique: boolean;
   totalPerEntity: TotalPerEntityAggregation | undefined;
   distinctAggregationByDays: number[];
@@ -1055,7 +1055,7 @@ export const RetentionConfig = {
 function createBaseEventTrackingConfig(): EventTrackingConfig {
   return {
     eventName: "",
-    total: false,
+    totalByDay: false,
     unique: false,
     totalPerEntity: undefined,
     distinctAggregationByDays: [],
@@ -1071,8 +1071,8 @@ export const EventTrackingConfig = {
     if (message.eventName !== "") {
       writer.uint32(10).string(message.eventName);
     }
-    if (message.total === true) {
-      writer.uint32(16).bool(message.total);
+    if (message.totalByDay === true) {
+      writer.uint32(16).bool(message.totalByDay);
     }
     if (message.unique === true) {
       writer.uint32(24).bool(message.unique);
@@ -1108,7 +1108,7 @@ export const EventTrackingConfig = {
           message.eventName = reader.string();
           break;
         case 2:
-          message.total = reader.bool();
+          message.totalByDay = reader.bool();
           break;
         case 3:
           message.unique = reader.bool();
@@ -1146,7 +1146,7 @@ export const EventTrackingConfig = {
   fromJSON(object: any): EventTrackingConfig {
     return {
       eventName: isSet(object.eventName) ? String(object.eventName) : "",
-      total: isSet(object.total) ? Boolean(object.total) : false,
+      totalByDay: isSet(object.totalByDay) ? Boolean(object.totalByDay) : false,
       unique: isSet(object.unique) ? Boolean(object.unique) : false,
       totalPerEntity: isSet(object.totalPerEntity)
         ? TotalPerEntityAggregation.fromJSON(object.totalPerEntity)
@@ -1165,7 +1165,7 @@ export const EventTrackingConfig = {
   toJSON(message: EventTrackingConfig): unknown {
     const obj: any = {};
     message.eventName !== undefined && (obj.eventName = message.eventName);
-    message.total !== undefined && (obj.total = message.total);
+    message.totalByDay !== undefined && (obj.totalByDay = message.totalByDay);
     message.unique !== undefined && (obj.unique = message.unique);
     message.totalPerEntity !== undefined &&
       (obj.totalPerEntity = message.totalPerEntity
@@ -1188,7 +1188,7 @@ export const EventTrackingConfig = {
   fromPartial(object: DeepPartial<EventTrackingConfig>): EventTrackingConfig {
     const message = createBaseEventTrackingConfig();
     message.eventName = object.eventName ?? "";
-    message.total = object.total ?? false;
+    message.totalByDay = object.totalByDay ?? false;
     message.unique = object.unique ?? false;
     message.totalPerEntity =
       object.totalPerEntity !== undefined && object.totalPerEntity !== null

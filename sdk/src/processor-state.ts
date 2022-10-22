@@ -5,7 +5,6 @@ import {
   BaseProcessorTemplate,
   SolanaBaseProcessor,
   SuiBaseProcessor,
-  Meter,
 } from './core'
 
 import { AptosBaseProcessor } from './aptos'
@@ -13,7 +12,7 @@ import { AptosBaseProcessor } from './aptos'
 import { BaseContract } from 'ethers'
 import { TemplateInstance } from './gen'
 import { Provider } from '@ethersproject/providers'
-import { EventTracker } from './core/event-tracker'
+import { EventTracker } from './core'
 import { Metric } from './core/meter'
 
 export class ProcessorState {

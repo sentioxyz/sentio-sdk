@@ -31,7 +31,6 @@ import Long from 'long'
 import { TextDecoder } from 'util'
 import { Trace } from './core'
 import { Instruction } from '@project-serum/anchor'
-import { EventTracker } from './core/event-tracker'
 
 const DEFAULT_MAX_BLOCK = Long.ZERO
 
@@ -99,7 +98,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         distinctAggregationByDays: eventTracker.options.distinctByDays || [],
         eventName: eventTracker.eventName,
         retentionConfig: undefined,
-        total: eventTracker.options.total || false,
+        totalByDay: eventTracker.options.totalByDay || false,
         totalPerEntity: undefined,
         unique: eventTracker.options.unique || false,
       })
