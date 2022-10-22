@@ -98,17 +98,9 @@ export abstract class BaseProcessor<
 
           // TODO fix this bug
           await handler(event, ctx)
-          return {
-            gauges: ctx.gauges,
-            counters: ctx.counters,
-            logs: ctx.logs,
-          }
+          return ctx.getProcessResult()
         }
-        return {
-          gauges: [],
-          counters: [],
-          logs: [],
-        }
+        return ProcessResult.fromPartial({})
       },
     })
     return this
@@ -128,11 +120,7 @@ export abstract class BaseProcessor<
         undefined
       )
       await handler(block, ctx)
-      return {
-        gauges: ctx.gauges,
-        counters: ctx.counters,
-        logs: ctx.logs,
-      }
+      return ctx.getProcessResult()
     })
     return this
   }
@@ -163,11 +151,7 @@ export abstract class BaseProcessor<
         const contractInterface = contractView.rawContract.interface
         const fragment = contractInterface.getFunction(signature)
         if (!trace.action.input) {
-          return {
-            gauges: [],
-            counters: [],
-            logs: [],
-          }
+          return ProcessResult.fromPartial({})
         }
         const traceData = '0x' + trace.action.input.slice(10)
         trace.args = contractInterface._abiCoder.decode(fragment.inputs, traceData)
@@ -181,11 +165,7 @@ export abstract class BaseProcessor<
           trace
         )
         await handler(trace, ctx)
-        return {
-          gauges: ctx.gauges,
-          counters: ctx.counters,
-          logs: ctx.logs,
-        }
+        return ctx.getProcessResult()
       },
     })
     return this

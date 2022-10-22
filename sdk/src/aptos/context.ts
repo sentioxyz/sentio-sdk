@@ -30,7 +30,7 @@ export class AptosContext extends BaseContext {
     }
   }
 
-  getMetaData(descriptor: DataDescriptor | undefined, labels: Labels): RecordMetaData {
+  getMetaData(descriptor: DataDescriptor, labels: Labels): RecordMetaData {
     return {
       address: this.address,
       contractName: this.moduleName,
@@ -40,6 +40,7 @@ export class AptosContext extends BaseContext {
       logIndex: 0,
       chainId: getChainId(this.network),
       dataDescriptor: descriptor,
+      name: descriptor.name,
       labels: normalizeLabels(labels),
     }
   }

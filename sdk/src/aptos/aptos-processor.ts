@@ -87,11 +87,7 @@ export class AptosBaseProcessor {
         if (tx) {
           await handler(tx, ctx)
         }
-        return {
-          gauges: ctx.gauges,
-          counters: ctx.counters,
-          logs: ctx.logs,
-        }
+        return ctx.getProcessResult()
       },
       filters: [],
     })
@@ -133,11 +129,7 @@ export class AptosBaseProcessor {
             await handler(decoded, ctx)
           }
         }
-        return {
-          gauges: ctx.gauges,
-          counters: ctx.counters,
-          logs: ctx.logs,
-        }
+        return ctx.getProcessResult()
       },
       filters: _filters,
     })
@@ -175,11 +167,7 @@ export class AptosBaseProcessor {
           const decoded = processor.decodeFunctionPayload(payload)
           await handler(decoded, ctx)
         }
-        return {
-          gauges: ctx.gauges,
-          counters: ctx.counters,
-          logs: ctx.logs,
-        }
+        return ctx.getProcessResult()
       },
       filters: _filters,
     })

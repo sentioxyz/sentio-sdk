@@ -1,4 +1,12 @@
-import { CounterResult, GaugeResult, LogResult, DataDescriptor, RecordMetaData } from '../gen'
+import {
+  CounterResult,
+  GaugeResult,
+  LogResult,
+  DataDescriptor,
+  RecordMetaData,
+  EventTrackingResult,
+  ProcessResult,
+} from '../gen'
 import { BaseContract, EventFilter } from 'ethers'
 import { Block, Log } from '@ethersproject/abstract-provider'
 import { Meter, normalizeLabels } from './meter'
@@ -12,6 +20,7 @@ export abstract class BaseContext {
   gauges: GaugeResult[] = []
   counters: CounterResult[] = []
   logs: LogResult[] = []
+  events: EventTrackingResult[] = []
   meter: Meter
   logger: Logger
 
@@ -20,7 +29,17 @@ export abstract class BaseContext {
     this.logger = new Logger(this)
   }
 
-  abstract getMetaData(descriptor: DataDescriptor | undefined, labels: Labels): RecordMetaData
+  getProcessResult(): ProcessResult {
+    const res: ProcessResult = {
+      gauges: this.gauges,
+      counters: this.counters,
+      logs: this.logs,
+      events: this.events,
+    }
+    return res
+  }
+
+  abstract getMetaData(descriptor: DataDescriptor, labels: Labels): RecordMetaData
 }
 
 export abstract class EthContext extends BaseContext {
@@ -72,7 +91,7 @@ export class ContractContext<
     this.contract = view
   }
 
-  getMetaData(descriptor: DataDescriptor | undefined, labels: Labels): RecordMetaData {
+  getMetaData(descriptor: DataDescriptor, labels: Labels): RecordMetaData {
     if (this.log) {
       return {
         address: this.contract.rawContract.address,
@@ -83,6 +102,7 @@ export class ContractContext<
         logIndex: this.log.logIndex,
         chainId: this.chainId.toString(),
         dataDescriptor: descriptor,
+        name: descriptor.name,
         labels: normalizeLabels(labels),
       }
     }
@@ -96,6 +116,7 @@ export class ContractContext<
         logIndex: -1,
         chainId: this.chainId.toString(),
         dataDescriptor: descriptor,
+        name: descriptor.name,
         labels: normalizeLabels(labels),
       }
     }
@@ -109,6 +130,7 @@ export class ContractContext<
         logIndex: -1,
         chainId: this.chainId.toString(),
         dataDescriptor: descriptor,
+        name: descriptor.name,
         labels: normalizeLabels(labels),
       }
     }
@@ -168,7 +190,7 @@ export class SolanaContext extends BaseContext {
     this.blockNumber = slot
   }
 
-  getMetaData(descriptor: DataDescriptor | undefined, labels: Labels): RecordMetaData {
+  getMetaData(descriptor: DataDescriptor, labels: Labels): RecordMetaData {
     return {
       address: this.address,
       contractName: this.programName,
@@ -178,6 +200,7 @@ export class SolanaContext extends BaseContext {
       logIndex: 0,
       chainId: SOL_MAINMET_ID, // TODO set in context
       dataDescriptor: descriptor,
+      name: descriptor.name,
       labels: normalizeLabels(labels),
     }
   }
@@ -194,7 +217,7 @@ export class SuiContext extends BaseContext {
     this.blockNumber = slot
   }
 
-  getMetaData(descriptor: DataDescriptor | undefined, labels: Labels): RecordMetaData {
+  getMetaData(descriptor: DataDescriptor, labels: Labels): RecordMetaData {
     return {
       address: this.address,
       contractName: this.moduleName,
@@ -204,6 +227,7 @@ export class SuiContext extends BaseContext {
       logIndex: 0,
       chainId: SUI_DEVNET_ID, // TODO set in context
       dataDescriptor: descriptor,
+      name: descriptor.name,
       labels: normalizeLabels(labels),
     }
   }

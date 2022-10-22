@@ -80,11 +80,7 @@ export class SolanaBaseProcessor {
   ): ProcessResult {
     const ctx = new SolanaContext(this.contractName, this.address, slot)
     handler(parsedInstruction, ctx, accounts)
-    return {
-      gauges: ctx.gauges,
-      counters: ctx.counters,
-      logs: ctx.logs,
-    }
+    return ctx.getProcessResult()
   }
 
   public isBind() {

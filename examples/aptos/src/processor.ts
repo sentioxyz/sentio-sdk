@@ -1,7 +1,9 @@
 import { SouffleChefCampaign, CandyMachine } from './types/aptos/souffle'
 import { token } from '@sentio/sdk/lib/builtin/aptos/0x3'
 import { coin } from '@sentio/sdk/lib/builtin/aptos/0x1'
-import { aptos } from '@sentio/sdk'
+import { AccountEventTracker, aptos } from '@sentio/sdk'
+
+const accountTracker = AccountEventTracker.register('pull')
 
 coin.bind({ network: aptos.AptosNetwork.MAIN_NET }).onEventWithdrawEvent((evt, ctx) => {
   if (evt.guid.account_address === '0x9c5382a5aa6cd92f38ffa50bd8ec2879833997116499cc5bcd6d4688a962e330') {
@@ -14,6 +16,8 @@ SouffleChefCampaign.bind({ network: aptos.AptosNetwork.TEST_NET, startVersion: 6
   .onEntryPullTokenV2((call, ctx) => {
     ctx.meter.Counter('call_num').add(1)
     ctx.meter.Counter('pulled').add(call.arguments_typed[3])
+
+    accountTracker.trackEvent(ctx, { distinctId: ctx.transaction.sender })
   })
   .onEventBurnEnjoyEvent((evt, ctx) => {
     ctx.meter.Counter('burned').add(1)

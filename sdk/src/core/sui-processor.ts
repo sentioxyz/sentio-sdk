@@ -39,11 +39,7 @@ export class SuiBaseProcessor {
     if (txn) {
       this.transactionHanlder(txn, ctx)
     }
-    return {
-      gauges: ctx.gauges,
-      counters: ctx.counters,
-      logs: ctx.logs,
-    }
+    return ctx.getProcessResult()
   }
 
   public startSlot(startSlot: Long | number) {

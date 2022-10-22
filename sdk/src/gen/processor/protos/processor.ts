@@ -136,6 +136,8 @@ export interface ProcessConfigResponse {
   contractConfigs: ContractConfig[];
   templateInstances: TemplateInstance[];
   accountConfigs: AccountConfig[];
+  metricConfigs: MetricConfig[];
+  eventTrackingConfigs: EventTrackingConfig[];
 }
 
 export interface ContractConfig {
@@ -149,6 +151,66 @@ export interface ContractConfig {
   startBlock: Long;
   endBlock: Long;
   processorType: string;
+}
+
+export interface TotalPerEntityAggregation {}
+
+export enum TotalPerEntityAggregation_Type {
+  AVG = 0,
+  MEDIAN = 1,
+  UNRECOGNIZED = -1,
+}
+
+export function totalPerEntityAggregation_TypeFromJSON(
+  object: any
+): TotalPerEntityAggregation_Type {
+  switch (object) {
+    case 0:
+    case "AVG":
+      return TotalPerEntityAggregation_Type.AVG;
+    case 1:
+    case "MEDIAN":
+      return TotalPerEntityAggregation_Type.MEDIAN;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return TotalPerEntityAggregation_Type.UNRECOGNIZED;
+  }
+}
+
+export function totalPerEntityAggregation_TypeToJSON(
+  object: TotalPerEntityAggregation_Type
+): string {
+  switch (object) {
+    case TotalPerEntityAggregation_Type.AVG:
+      return "AVG";
+    case TotalPerEntityAggregation_Type.MEDIAN:
+      return "MEDIAN";
+    case TotalPerEntityAggregation_Type.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
+export interface RetentionConfig {
+  retentionEventName: string;
+  days: number;
+}
+
+export interface EventTrackingConfig {
+  eventName: string;
+  total: boolean;
+  unique: boolean;
+  totalPerEntity: TotalPerEntityAggregation | undefined;
+  distinctAggregationByDays: number[];
+  retentionConfig: RetentionConfig | undefined;
+}
+
+export interface MetricConfig {
+  name: string;
+  description: string;
+  unit: string;
+  sparse: boolean;
 }
 
 export interface AccountConfig {}
@@ -280,6 +342,7 @@ export interface ProcessResult {
   gauges: GaugeResult[];
   counters: CounterResult[];
   logs: LogResult[];
+  events: EventTrackingResult[];
 }
 
 export interface DataDescriptor {
@@ -298,6 +361,7 @@ export interface RecordMetaData {
   transactionIndex: number;
   logIndex: number;
   dataDescriptor: DataDescriptor | undefined;
+  name: string;
   labels: { [key: string]: string };
 }
 
@@ -338,6 +402,13 @@ export interface LogResult {
   metadata: RecordMetaData | undefined;
   level: LogLevel;
   message: string;
+  attributes: string;
+  runtimeInfo: RuntimeInfo | undefined;
+}
+
+export interface EventTrackingResult {
+  metadata: RecordMetaData | undefined;
+  distinctEntityId: string;
   attributes: string;
   runtimeInfo: RuntimeInfo | undefined;
 }
@@ -454,6 +525,8 @@ function createBaseProcessConfigResponse(): ProcessConfigResponse {
     contractConfigs: [],
     templateInstances: [],
     accountConfigs: [],
+    metricConfigs: [],
+    eventTrackingConfigs: [],
   };
 }
 
@@ -473,6 +546,12 @@ export const ProcessConfigResponse = {
     }
     for (const v of message.accountConfigs) {
       AccountConfig.encode(v!, writer.uint32(34).fork()).ldelim();
+    }
+    for (const v of message.metricConfigs) {
+      MetricConfig.encode(v!, writer.uint32(42).fork()).ldelim();
+    }
+    for (const v of message.eventTrackingConfigs) {
+      EventTrackingConfig.encode(v!, writer.uint32(50).fork()).ldelim();
     }
     return writer;
   },
@@ -505,6 +584,16 @@ export const ProcessConfigResponse = {
             AccountConfig.decode(reader, reader.uint32())
           );
           break;
+        case 5:
+          message.metricConfigs.push(
+            MetricConfig.decode(reader, reader.uint32())
+          );
+          break;
+        case 6:
+          message.eventTrackingConfigs.push(
+            EventTrackingConfig.decode(reader, reader.uint32())
+          );
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -526,6 +615,14 @@ export const ProcessConfigResponse = {
         : [],
       accountConfigs: Array.isArray(object?.accountConfigs)
         ? object.accountConfigs.map((e: any) => AccountConfig.fromJSON(e))
+        : [],
+      metricConfigs: Array.isArray(object?.metricConfigs)
+        ? object.metricConfigs.map((e: any) => MetricConfig.fromJSON(e))
+        : [],
+      eventTrackingConfigs: Array.isArray(object?.eventTrackingConfigs)
+        ? object.eventTrackingConfigs.map((e: any) =>
+            EventTrackingConfig.fromJSON(e)
+          )
         : [],
     };
   },
@@ -557,6 +654,20 @@ export const ProcessConfigResponse = {
     } else {
       obj.accountConfigs = [];
     }
+    if (message.metricConfigs) {
+      obj.metricConfigs = message.metricConfigs.map((e) =>
+        e ? MetricConfig.toJSON(e) : undefined
+      );
+    } else {
+      obj.metricConfigs = [];
+    }
+    if (message.eventTrackingConfigs) {
+      obj.eventTrackingConfigs = message.eventTrackingConfigs.map((e) =>
+        e ? EventTrackingConfig.toJSON(e) : undefined
+      );
+    } else {
+      obj.eventTrackingConfigs = [];
+    }
     return obj;
   },
 
@@ -575,6 +686,12 @@ export const ProcessConfigResponse = {
       [];
     message.accountConfigs =
       object.accountConfigs?.map((e) => AccountConfig.fromPartial(e)) || [];
+    message.metricConfigs =
+      object.metricConfigs?.map((e) => MetricConfig.fromPartial(e)) || [];
+    message.eventTrackingConfigs =
+      object.eventTrackingConfigs?.map((e) =>
+        EventTrackingConfig.fromPartial(e)
+      ) || [];
     return message;
   },
 };
@@ -820,6 +937,349 @@ export const ContractConfig = {
         ? Long.fromValue(object.endBlock)
         : Long.UZERO;
     message.processorType = object.processorType ?? "";
+    return message;
+  },
+};
+
+function createBaseTotalPerEntityAggregation(): TotalPerEntityAggregation {
+  return {};
+}
+
+export const TotalPerEntityAggregation = {
+  encode(
+    _: TotalPerEntityAggregation,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    return writer;
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): TotalPerEntityAggregation {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseTotalPerEntityAggregation();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(_: any): TotalPerEntityAggregation {
+    return {};
+  },
+
+  toJSON(_: TotalPerEntityAggregation): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  fromPartial(
+    _: DeepPartial<TotalPerEntityAggregation>
+  ): TotalPerEntityAggregation {
+    const message = createBaseTotalPerEntityAggregation();
+    return message;
+  },
+};
+
+function createBaseRetentionConfig(): RetentionConfig {
+  return { retentionEventName: "", days: 0 };
+}
+
+export const RetentionConfig = {
+  encode(
+    message: RetentionConfig,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.retentionEventName !== "") {
+      writer.uint32(18).string(message.retentionEventName);
+    }
+    if (message.days !== 0) {
+      writer.uint32(24).int32(message.days);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): RetentionConfig {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRetentionConfig();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 2:
+          message.retentionEventName = reader.string();
+          break;
+        case 3:
+          message.days = reader.int32();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): RetentionConfig {
+    return {
+      retentionEventName: isSet(object.retentionEventName)
+        ? String(object.retentionEventName)
+        : "",
+      days: isSet(object.days) ? Number(object.days) : 0,
+    };
+  },
+
+  toJSON(message: RetentionConfig): unknown {
+    const obj: any = {};
+    message.retentionEventName !== undefined &&
+      (obj.retentionEventName = message.retentionEventName);
+    message.days !== undefined && (obj.days = Math.round(message.days));
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<RetentionConfig>): RetentionConfig {
+    const message = createBaseRetentionConfig();
+    message.retentionEventName = object.retentionEventName ?? "";
+    message.days = object.days ?? 0;
+    return message;
+  },
+};
+
+function createBaseEventTrackingConfig(): EventTrackingConfig {
+  return {
+    eventName: "",
+    total: false,
+    unique: false,
+    totalPerEntity: undefined,
+    distinctAggregationByDays: [],
+    retentionConfig: undefined,
+  };
+}
+
+export const EventTrackingConfig = {
+  encode(
+    message: EventTrackingConfig,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.eventName !== "") {
+      writer.uint32(10).string(message.eventName);
+    }
+    if (message.total === true) {
+      writer.uint32(16).bool(message.total);
+    }
+    if (message.unique === true) {
+      writer.uint32(24).bool(message.unique);
+    }
+    if (message.totalPerEntity !== undefined) {
+      TotalPerEntityAggregation.encode(
+        message.totalPerEntity,
+        writer.uint32(34).fork()
+      ).ldelim();
+    }
+    writer.uint32(42).fork();
+    for (const v of message.distinctAggregationByDays) {
+      writer.int32(v);
+    }
+    writer.ldelim();
+    if (message.retentionConfig !== undefined) {
+      RetentionConfig.encode(
+        message.retentionConfig,
+        writer.uint32(50).fork()
+      ).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): EventTrackingConfig {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseEventTrackingConfig();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.eventName = reader.string();
+          break;
+        case 2:
+          message.total = reader.bool();
+          break;
+        case 3:
+          message.unique = reader.bool();
+          break;
+        case 4:
+          message.totalPerEntity = TotalPerEntityAggregation.decode(
+            reader,
+            reader.uint32()
+          );
+          break;
+        case 5:
+          if ((tag & 7) === 2) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.distinctAggregationByDays.push(reader.int32());
+            }
+          } else {
+            message.distinctAggregationByDays.push(reader.int32());
+          }
+          break;
+        case 6:
+          message.retentionConfig = RetentionConfig.decode(
+            reader,
+            reader.uint32()
+          );
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): EventTrackingConfig {
+    return {
+      eventName: isSet(object.eventName) ? String(object.eventName) : "",
+      total: isSet(object.total) ? Boolean(object.total) : false,
+      unique: isSet(object.unique) ? Boolean(object.unique) : false,
+      totalPerEntity: isSet(object.totalPerEntity)
+        ? TotalPerEntityAggregation.fromJSON(object.totalPerEntity)
+        : undefined,
+      distinctAggregationByDays: Array.isArray(
+        object?.distinctAggregationByDays
+      )
+        ? object.distinctAggregationByDays.map((e: any) => Number(e))
+        : [],
+      retentionConfig: isSet(object.retentionConfig)
+        ? RetentionConfig.fromJSON(object.retentionConfig)
+        : undefined,
+    };
+  },
+
+  toJSON(message: EventTrackingConfig): unknown {
+    const obj: any = {};
+    message.eventName !== undefined && (obj.eventName = message.eventName);
+    message.total !== undefined && (obj.total = message.total);
+    message.unique !== undefined && (obj.unique = message.unique);
+    message.totalPerEntity !== undefined &&
+      (obj.totalPerEntity = message.totalPerEntity
+        ? TotalPerEntityAggregation.toJSON(message.totalPerEntity)
+        : undefined);
+    if (message.distinctAggregationByDays) {
+      obj.distinctAggregationByDays = message.distinctAggregationByDays.map(
+        (e) => Math.round(e)
+      );
+    } else {
+      obj.distinctAggregationByDays = [];
+    }
+    message.retentionConfig !== undefined &&
+      (obj.retentionConfig = message.retentionConfig
+        ? RetentionConfig.toJSON(message.retentionConfig)
+        : undefined);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<EventTrackingConfig>): EventTrackingConfig {
+    const message = createBaseEventTrackingConfig();
+    message.eventName = object.eventName ?? "";
+    message.total = object.total ?? false;
+    message.unique = object.unique ?? false;
+    message.totalPerEntity =
+      object.totalPerEntity !== undefined && object.totalPerEntity !== null
+        ? TotalPerEntityAggregation.fromPartial(object.totalPerEntity)
+        : undefined;
+    message.distinctAggregationByDays =
+      object.distinctAggregationByDays?.map((e) => e) || [];
+    message.retentionConfig =
+      object.retentionConfig !== undefined && object.retentionConfig !== null
+        ? RetentionConfig.fromPartial(object.retentionConfig)
+        : undefined;
+    return message;
+  },
+};
+
+function createBaseMetricConfig(): MetricConfig {
+  return { name: "", description: "", unit: "", sparse: false };
+}
+
+export const MetricConfig = {
+  encode(
+    message: MetricConfig,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.name !== "") {
+      writer.uint32(10).string(message.name);
+    }
+    if (message.description !== "") {
+      writer.uint32(26).string(message.description);
+    }
+    if (message.unit !== "") {
+      writer.uint32(18).string(message.unit);
+    }
+    if (message.sparse === true) {
+      writer.uint32(32).bool(message.sparse);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MetricConfig {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMetricConfig();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.name = reader.string();
+          break;
+        case 3:
+          message.description = reader.string();
+          break;
+        case 2:
+          message.unit = reader.string();
+          break;
+        case 4:
+          message.sparse = reader.bool();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MetricConfig {
+    return {
+      name: isSet(object.name) ? String(object.name) : "",
+      description: isSet(object.description) ? String(object.description) : "",
+      unit: isSet(object.unit) ? String(object.unit) : "",
+      sparse: isSet(object.sparse) ? Boolean(object.sparse) : false,
+    };
+  },
+
+  toJSON(message: MetricConfig): unknown {
+    const obj: any = {};
+    message.name !== undefined && (obj.name = message.name);
+    message.description !== undefined &&
+      (obj.description = message.description);
+    message.unit !== undefined && (obj.unit = message.unit);
+    message.sparse !== undefined && (obj.sparse = message.sparse);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<MetricConfig>): MetricConfig {
+    const message = createBaseMetricConfig();
+    message.name = object.name ?? "";
+    message.description = object.description ?? "";
+    message.unit = object.unit ?? "";
+    message.sparse = object.sparse ?? false;
     return message;
   },
 };
@@ -2630,7 +3090,7 @@ export const RawBlock = {
 };
 
 function createBaseProcessResult(): ProcessResult {
-  return { gauges: [], counters: [], logs: [] };
+  return { gauges: [], counters: [], logs: [], events: [] };
 }
 
 export const ProcessResult = {
@@ -2646,6 +3106,9 @@ export const ProcessResult = {
     }
     for (const v of message.logs) {
       LogResult.encode(v!, writer.uint32(26).fork()).ldelim();
+    }
+    for (const v of message.events) {
+      EventTrackingResult.encode(v!, writer.uint32(34).fork()).ldelim();
     }
     return writer;
   },
@@ -2666,6 +3129,11 @@ export const ProcessResult = {
         case 3:
           message.logs.push(LogResult.decode(reader, reader.uint32()));
           break;
+        case 4:
+          message.events.push(
+            EventTrackingResult.decode(reader, reader.uint32())
+          );
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -2684,6 +3152,9 @@ export const ProcessResult = {
         : [],
       logs: Array.isArray(object?.logs)
         ? object.logs.map((e: any) => LogResult.fromJSON(e))
+        : [],
+      events: Array.isArray(object?.events)
+        ? object.events.map((e: any) => EventTrackingResult.fromJSON(e))
         : [],
     };
   },
@@ -2709,6 +3180,13 @@ export const ProcessResult = {
     } else {
       obj.logs = [];
     }
+    if (message.events) {
+      obj.events = message.events.map((e) =>
+        e ? EventTrackingResult.toJSON(e) : undefined
+      );
+    } else {
+      obj.events = [];
+    }
     return obj;
   },
 
@@ -2719,6 +3197,8 @@ export const ProcessResult = {
     message.counters =
       object.counters?.map((e) => CounterResult.fromPartial(e)) || [];
     message.logs = object.logs?.map((e) => LogResult.fromPartial(e)) || [];
+    message.events =
+      object.events?.map((e) => EventTrackingResult.fromPartial(e)) || [];
     return message;
   },
 };
@@ -2813,6 +3293,7 @@ function createBaseRecordMetaData(): RecordMetaData {
     transactionIndex: 0,
     logIndex: 0,
     dataDescriptor: undefined,
+    name: "",
     labels: {},
   };
 }
@@ -2848,6 +3329,9 @@ export const RecordMetaData = {
         message.dataDescriptor,
         writer.uint32(66).fork()
       ).ldelim();
+    }
+    if (message.name !== "") {
+      writer.uint32(82).string(message.name);
     }
     Object.entries(message.labels).forEach(([key, value]) => {
       RecordMetaData_LabelsEntry.encode(
@@ -2892,6 +3376,9 @@ export const RecordMetaData = {
             reader.uint32()
           );
           break;
+        case 10:
+          message.name = reader.string();
+          break;
         case 7:
           const entry7 = RecordMetaData_LabelsEntry.decode(
             reader,
@@ -2929,6 +3416,7 @@ export const RecordMetaData = {
       dataDescriptor: isSet(object.dataDescriptor)
         ? DataDescriptor.fromJSON(object.dataDescriptor)
         : undefined,
+      name: isSet(object.name) ? String(object.name) : "",
       labels: isObject(object.labels)
         ? Object.entries(object.labels).reduce<{ [key: string]: string }>(
             (acc, [key, value]) => {
@@ -2959,6 +3447,7 @@ export const RecordMetaData = {
       (obj.dataDescriptor = message.dataDescriptor
         ? DataDescriptor.toJSON(message.dataDescriptor)
         : undefined);
+    message.name !== undefined && (obj.name = message.name);
     obj.labels = {};
     if (message.labels) {
       Object.entries(message.labels).forEach(([k, v]) => {
@@ -2984,6 +3473,7 @@ export const RecordMetaData = {
       object.dataDescriptor !== undefined && object.dataDescriptor !== null
         ? DataDescriptor.fromPartial(object.dataDescriptor)
         : undefined;
+    message.name = object.name ?? "";
     message.labels = Object.entries(object.labels ?? {}).reduce<{
       [key: string]: string;
     }>((acc, [key, value]) => {
@@ -3598,6 +4088,115 @@ export const LogResult = {
         : undefined;
     message.level = object.level ?? 0;
     message.message = object.message ?? "";
+    message.attributes = object.attributes ?? "";
+    message.runtimeInfo =
+      object.runtimeInfo !== undefined && object.runtimeInfo !== null
+        ? RuntimeInfo.fromPartial(object.runtimeInfo)
+        : undefined;
+    return message;
+  },
+};
+
+function createBaseEventTrackingResult(): EventTrackingResult {
+  return {
+    metadata: undefined,
+    distinctEntityId: "",
+    attributes: "",
+    runtimeInfo: undefined,
+  };
+}
+
+export const EventTrackingResult = {
+  encode(
+    message: EventTrackingResult,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.metadata !== undefined) {
+      RecordMetaData.encode(
+        message.metadata,
+        writer.uint32(10).fork()
+      ).ldelim();
+    }
+    if (message.distinctEntityId !== "") {
+      writer.uint32(18).string(message.distinctEntityId);
+    }
+    if (message.attributes !== "") {
+      writer.uint32(34).string(message.attributes);
+    }
+    if (message.runtimeInfo !== undefined) {
+      RuntimeInfo.encode(
+        message.runtimeInfo,
+        writer.uint32(42).fork()
+      ).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): EventTrackingResult {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseEventTrackingResult();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.metadata = RecordMetaData.decode(reader, reader.uint32());
+          break;
+        case 2:
+          message.distinctEntityId = reader.string();
+          break;
+        case 4:
+          message.attributes = reader.string();
+          break;
+        case 5:
+          message.runtimeInfo = RuntimeInfo.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): EventTrackingResult {
+    return {
+      metadata: isSet(object.metadata)
+        ? RecordMetaData.fromJSON(object.metadata)
+        : undefined,
+      distinctEntityId: isSet(object.distinctEntityId)
+        ? String(object.distinctEntityId)
+        : "",
+      attributes: isSet(object.attributes) ? String(object.attributes) : "",
+      runtimeInfo: isSet(object.runtimeInfo)
+        ? RuntimeInfo.fromJSON(object.runtimeInfo)
+        : undefined,
+    };
+  },
+
+  toJSON(message: EventTrackingResult): unknown {
+    const obj: any = {};
+    message.metadata !== undefined &&
+      (obj.metadata = message.metadata
+        ? RecordMetaData.toJSON(message.metadata)
+        : undefined);
+    message.distinctEntityId !== undefined &&
+      (obj.distinctEntityId = message.distinctEntityId);
+    message.attributes !== undefined && (obj.attributes = message.attributes);
+    message.runtimeInfo !== undefined &&
+      (obj.runtimeInfo = message.runtimeInfo
+        ? RuntimeInfo.toJSON(message.runtimeInfo)
+        : undefined);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<EventTrackingResult>): EventTrackingResult {
+    const message = createBaseEventTrackingResult();
+    message.metadata =
+      object.metadata !== undefined && object.metadata !== null
+        ? RecordMetaData.fromPartial(object.metadata)
+        : undefined;
+    message.distinctEntityId = object.distinctEntityId ?? "";
     message.attributes = object.attributes ?? "";
     message.runtimeInfo =
       object.runtimeInfo !== undefined && object.runtimeInfo !== null

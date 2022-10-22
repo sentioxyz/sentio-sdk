@@ -1,9 +1,12 @@
 import { ERC20Processor, ERC20ProcessorTemplate } from '../builtin/erc20'
+import { EventTracker } from '../core/event-tracker'
 
 export const filter = ERC20Processor.filters.Transfer(
   '0x0000000000000000000000000000000000000000',
   '0xb329e39ebefd16f40d38f07643652ce17ca5bac1'
 )
+
+const tracker = EventTracker.register('sdf')
 
 const processorTemplate = new ERC20ProcessorTemplate().onEventTransfer(async function (event, ctx) {
   console.log('')
@@ -30,6 +33,7 @@ ERC20Processor.bind({
 ERC20Processor.bind({ address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', network: 56, name: 'usdc' })
   .onEventTransfer(async function (event, ctx) {
     ctx.meter.Counter('c2').add(2)
+    tracker.trackEvent(ctx, { distinctId: event.args.from })
   }, filter)
   .onBlock(async function (block, ctx) {
     ctx.meter.Gauge('g2').record(20, { k: 'v' })

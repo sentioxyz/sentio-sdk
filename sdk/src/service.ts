@@ -8,9 +8,11 @@ import {
   BlockBinding,
   ContractConfig,
   DataBinding,
+  EventTrackingConfig,
   HandlerType,
   LogFilter,
   LogHandlerConfig,
+  MetricConfig,
   ProcessBindingResponse,
   ProcessBindingsRequest,
   ProcessBlocksRequest,
@@ -29,6 +31,7 @@ import Long from 'long'
 import { TextDecoder } from 'util'
 import { Trace } from './core'
 import { Instruction } from '@project-serum/anchor'
+import { EventTracker } from './core/event-tracker'
 
 const DEFAULT_MAX_BLOCK = Long.ZERO
 
@@ -48,6 +51,8 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
   private started = false
   private contractConfigs: ContractConfig[]
   private templateInstances: TemplateInstance[]
+  private metricConfigs: MetricConfig[]
+  private eventTrackingConfigs: EventTrackingConfig[]
   private readonly loader: () => void
 
   private readonly shutdownHandler?: () => void
@@ -66,6 +71,8 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       config: undefined,
       contractConfigs: this.contractConfigs,
       templateInstances: this.templateInstances,
+      eventTrackingConfigs: this.eventTrackingConfigs,
+      metricConfigs: this.metricConfigs,
       accountConfigs: [],
     }
   }
@@ -77,6 +84,26 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     this.contractConfigs = []
 
     this.templateInstances = [...global.PROCESSOR_STATE.templatesInstances]
+    this.eventTrackingConfigs = []
+    this.metricConfigs = []
+
+    // part 0, prepare metrics and event tracking configs
+    for (const metric of global.PROCESSOR_STATE.metrics) {
+      this.metricConfigs.push({
+        ...metric.descriptor,
+      })
+    }
+
+    for (const eventTracker of global.PROCESSOR_STATE.eventTrackers) {
+      this.eventTrackingConfigs.push({
+        distinctAggregationByDays: eventTracker.options.distinctByDays || [],
+        eventName: eventTracker.eventName,
+        retentionConfig: undefined,
+        total: eventTracker.options.total || false,
+        totalPerEntity: undefined,
+        unique: eventTracker.options.unique || false,
+      })
+    }
 
     // Part 1, prepare EVM processors
     for (const processor of global.PROCESSOR_STATE.processors) {
@@ -208,7 +235,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       this.contractConfigs.push(contractConfig)
     }
 
-    // Part 3, prepare aptos constractors
+    // Part 4, prepare aptos constractors
     for (const aptosProcessor of global.PROCESSOR_STATE.aptosProcessors) {
       const contractConfig: ContractConfig = {
         processorType: USER_PROCESSOR,
@@ -650,6 +677,7 @@ function mergeProcessResults(results: ProcessResult[]): ProcessResult {
     res.counters = res.counters.concat(r.counters)
     res.gauges = res.gauges.concat(r.gauges)
     res.logs = res.logs.concat(r.logs)
+    res.events = res.events.concat(res.events)
   }
   return res
 }
