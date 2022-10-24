@@ -5,14 +5,11 @@ import {
   AptosNetwork,
   Transaction_UserTransaction,
   TransactionPayload_EntryFunctionPayload,
-  TypedEntryFunctionPayload,
-  TypedEventInstance,
   TypeRegistry,
 } from '.'
 
 import Long from 'long'
-import { EventInstance, GLOBAL_TYPE_REGISTRY } from './types'
-import { parseMoveType } from '../aptos-codegen/typegen'
+import { EventInstance, DEFAULT_TYPE_REGISTRY } from './types'
 import { getChainId } from './network'
 
 type IndexConfigure = {
@@ -62,6 +59,7 @@ export class AptosBaseProcessor {
     this.moduleName = moduleName
     this.configure(options)
     global.PROCESSOR_STATE.aptosProcessors.push(this)
+    this.loadTypes(DEFAULT_TYPE_REGISTRY)
   }
 
   // getABI(): MoveModule | undefined {
@@ -125,8 +123,9 @@ export class AptosBaseProcessor {
           const events = txn.events
           txn.events = []
           for (const evt of events) {
-            const decoded = processor.decodeEvent(evt as EventInstance)
-            await handler(decoded, ctx)
+            const eventInstance = evt as EventInstance
+            const decoded = DEFAULT_TYPE_REGISTRY.decodeEvent<any>(eventInstance)
+            await handler(decoded || eventInstance, ctx)
           }
         }
         return ctx.getProcessResult()
@@ -164,7 +163,7 @@ export class AptosBaseProcessor {
         )
         if (tx) {
           const payload = tx.payload as TransactionPayload_EntryFunctionPayload
-          const decoded = processor.decodeFunctionPayload(payload)
+          const decoded = DEFAULT_TYPE_REGISTRY.decodeFunctionPayload(payload)
           await handler(decoded, ctx)
         }
         return ctx.getProcessResult()
@@ -200,48 +199,6 @@ export class AptosBaseProcessor {
 
   protected loadTypesInternal(registry: TypeRegistry) {
     // should be override by subclass
-  }
-
-  private decodeEvent(event: EventInstance): EventInstance {
-    const registry = GLOBAL_TYPE_REGISTRY
-    this.loadTypes(registry)
-    // TODO check if module is not loaded
-
-    const typeDescriptor = parseMoveType(event.type)
-    const typeArguments = typeDescriptor.typeArgs.map((t) => t.getSignature())
-    // TODO check move structure's type param match type args, also maybe
-    // use type arguments for decoding
-
-    let dataTyped = undefined
-    try {
-      dataTyped = registry.decode(event.data, typeDescriptor)
-    } catch (e) {
-      console.error('Decoding error for ', JSON.stringify(event))
-      return event
-    }
-
-    return { ...event, data_typed: dataTyped, type_arguments: typeArguments } as TypedEventInstance<any>
-  }
-
-  private decodeFunctionPayload(
-    payload: TransactionPayload_EntryFunctionPayload
-  ): TransactionPayload_EntryFunctionPayload {
-    const registry = GLOBAL_TYPE_REGISTRY
-    this.loadTypes(registry)
-    const argumentsTyped: any[] = []
-
-    try {
-      const func = registry.getMoveFunction(payload.function)
-      for (const [idx, arg] of payload.arguments.entries()) {
-        // TODO consider apply payload.type_arguments, but this might be hard since we don't code gen for them
-        const argType = parseMoveType(func.params[idx + 1])
-        argumentsTyped.push(registry.decode(arg, argType))
-      }
-    } catch (e) {
-      console.error('Decoding error for ', JSON.stringify(payload))
-      return payload
-    }
-
-    return { ...payload, arguments_typed: argumentsTyped } as TypedEntryFunctionPayload<any>
+    console.log('')
   }
 }

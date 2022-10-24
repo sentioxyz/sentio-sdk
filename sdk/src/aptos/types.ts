@@ -4,6 +4,7 @@ import {
   MoveModule,
   MoveStruct,
   TransactionPayload_EntryFunctionPayload,
+  MoveResource,
 } from 'aptos-sdk/src/generated'
 import { moduleQname, SPLITTER, VECTOR_STR } from './utils'
 import { parseMoveType } from '../aptos-codegen/typegen'
@@ -24,6 +25,21 @@ export type TypedEventInstance<T> = EventInstance & {
 // Don't use intermedidate type to make IDE happier
 export type TypedEntryFunctionPayload<T extends Array<any>> = TransactionPayload_EntryFunctionPayload & {
   arguments_typed: T
+}
+
+export type TypedMoveResource<T> = MoveResource & {
+  data_typed: T
+  type_arguments: string[]
+}
+
+interface StructWithTag {
+  type: string
+  data: any
+}
+
+interface StructWithType<T> extends StructWithTag {
+  data_typed: T
+  type_arguments: string[]
 }
 
 export class TypeDescriptor {
@@ -206,7 +222,51 @@ export class TypeRegistry {
     return typedData
   }
 
-  // private decodeInternal(data: any, type: TypeDescriptor, typeArgs: )
+  decodeEvent<T>(event: Event): TypedEventInstance<T> | undefined {
+    return this.decodedInternal<T>(event) as TypedEventInstance<T>
+  }
+
+  decodeResource<T>(event: MoveResource): TypedMoveResource<T> | undefined {
+    return this.decodedInternal<T>(event)
+  }
+
+  private decodedInternal<T>(typeStruct: StructWithTag): StructWithType<T> | undefined {
+    const registry = DEFAULT_TYPE_REGISTRY
+    // this.loadTypes(registry)
+    // TODO check if module is not loaded
+
+    const typeDescriptor = parseMoveType(typeStruct.type)
+    const typeArguments = typeDescriptor.typeArgs.map((t) => t.getSignature())
+
+    let dataTyped = undefined
+    try {
+      dataTyped = registry.decode(typeStruct.data, typeDescriptor)
+    } catch (e) {
+      console.error('Decoding error for ', JSON.stringify(typeStruct))
+      return undefined
+    }
+    return { ...typeStruct, data_typed: dataTyped, type_arguments: typeArguments } as StructWithType<T>
+  }
+
+  decodeFunctionPayload(payload: TransactionPayload_EntryFunctionPayload): TransactionPayload_EntryFunctionPayload {
+    const registry = DEFAULT_TYPE_REGISTRY
+    // this.loadTypes(registry)
+    const argumentsTyped: any[] = []
+
+    try {
+      const func = registry.getMoveFunction(payload.function)
+      for (const [idx, arg] of payload.arguments.entries()) {
+        // TODO consider apply payload.type_arguments, but this might be hard since we don't code gen for them
+        const argType = parseMoveType(func.params[idx + 1])
+        argumentsTyped.push(registry.decode(arg, argType))
+      }
+    } catch (e) {
+      console.error('Decoding error for ', JSON.stringify(payload))
+      return payload
+    }
+
+    return { ...payload, arguments_typed: argumentsTyped } as TypedEntryFunctionPayload<any>
+  }
 }
 
-export const GLOBAL_TYPE_REGISTRY = new TypeRegistry()
+export const DEFAULT_TYPE_REGISTRY = new TypeRegistry()

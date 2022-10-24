@@ -1,5 +1,6 @@
 import Long from 'long'
 import { APTOS_MAINNET_ID, APTOS_TESTNET_ID, CHAIN_MAP } from '../utils/chain'
+import { AptosClient } from 'aptos-sdk'
 
 export enum AptosNetwork {
   MAIN_NET = 1,
@@ -23,12 +24,16 @@ export function getChainName(network: AptosNetwork): string {
   return CHAIN_MAP[APTOS_MAINNET_ID]
 }
 
-export function getChainRpcEndpoint(network: AptosNetwork): string {
+export function getRpcEndpoint(network: AptosNetwork): string {
   switch (network) {
     case AptosNetwork.TEST_NET:
       return 'https://testnet.aptoslabs.com/'
   }
   return 'https://mainnet.aptoslabs.com/v1/'
+}
+
+export function getRpcClient(network: AptosNetwork): AptosClient {
+  return new AptosClient(getRpcEndpoint(network))
 }
 
 export class AptosBindOptions {

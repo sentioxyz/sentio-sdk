@@ -5,8 +5,7 @@ import { MoveFunction, MoveModule, MoveModuleBytecode, MoveStruct } from 'aptos-
 import { AccountModulesImportInfo, AccountRegister, generateType } from './typegen'
 import { isFrameworkAccount } from '../aptos/utils'
 import chalk from 'chalk'
-import { AptosNetwork, getChainName, getChainRpcEndpoint } from '../aptos/network'
-import { AptosClient } from 'aptos-sdk'
+import { AptosNetwork, getChainName, getRpcClient } from '../aptos/network'
 
 export async function generate(srcDir: string, outputDir: string) {
   await generateForNetwork(srcDir, outputDir, AptosNetwork.MAIN_NET)
@@ -32,7 +31,7 @@ export async function generateForNetwork(srcDir: string, outputDir: string, netw
   loader.accountImports.set('0x1', new AccountModulesImportInfo('0x1', '0x1'))
   loader.accountImports.set('0x2', new AccountModulesImportInfo('0x2', '0x2'))
   loader.accountImports.set('0x3', new AccountModulesImportInfo('0x3', '0x3'))
-  const client = new AptosClient(getChainRpcEndpoint(network))
+  const client = getRpcClient(network)
 
   for (const file of files) {
     if (!file.endsWith('.json')) {
