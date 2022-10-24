@@ -28,9 +28,17 @@ jobs:
           command: ./scripts/build-all.sh
           name: Build All
       - run:
-          command: yarn gen && yarn test
-          name: Test Template
-          working_directory: sdk/template
+          command: yarn install && yarn gen && yarn test
+          name: Test Template - Aptos
+          working_directory: sdk/templates/aptos
+      - run:
+          command: yarn install && yarn gen && yarn test
+          name: Test Template - EVM
+          working_directory: sdk/templates/evm
+      - run:
+          command: yarn install && yarn test
+          name: Test Template - RAW
+          working_directory: sdk/templates/raw
 #      - persist_to_workspace:
 #          root: ~/project
 #          paths:

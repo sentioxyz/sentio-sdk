@@ -23,12 +23,10 @@ SouffleChefCampaign.bind({ network: aptos.AptosNetwork.TEST_NET, startVersion: 6
     ctx.meter.Counter('burned').add(1)
   })
   .onTransaction((txn, ctx) => {
-    if (txn.events) {
-      for (const event of txn.events) {
-        if (event && event.type === '0x3::token::DepositEvent') {
-          ctx.meter.Counter('deposit_token_count').add(Number(event.data.amount))
-        }
-      }
+    const events = aptos.TYPE_REGISTRY.filterAndDecodeEvents<token.DepositEvent>('0x3::token::DepositEvent', txn.events)
+    for (const event of events) {
+      // const depositEventInstance = DEFAULT_TYPE_REGISTRY.decodeEvent(event) as DepositEventInstance
+      ctx.meter.Counter('deposit_token_count').add(event.data_typed.amount)
     }
   })
 

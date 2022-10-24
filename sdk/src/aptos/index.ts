@@ -1,5 +1,6 @@
 export type { Transaction_UserTransaction, TransactionPayload_EntryFunctionPayload } from 'aptos-sdk/src/generated'
-export type { EventInstance, TypedEventInstance, TypeRegistry, TypedEntryFunctionPayload } from './types'
+export type { EventInstance, TypedEventInstance, TypedEntryFunctionPayload } from './types'
+export { TYPE_REGISTRY, TypeRegistry } from './types'
 export type { FunctionNameAndCallFilter, EventFilter, CallFilter, ArgumentsFilter } from './aptos-processor'
 export { AptosBaseProcessor } from './aptos-processor'
 export { AptosContext } from './context'

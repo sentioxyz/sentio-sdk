@@ -225,13 +225,35 @@ export class TypeRegistry {
   decodeEvent<T>(event: Event): TypedEventInstance<T> | undefined {
     return this.decodedInternal<T>(event) as TypedEventInstance<T>
   }
+  filterAndDecodeEvents<T>(typePrefix: string, resources: Event[]): TypedEventInstance<T>[] {
+    return this.filterAndDecodeInternal(typePrefix, resources) as TypedEventInstance<T>[]
+  }
+  decodeResource<T>(res: MoveResource): TypedMoveResource<T> | undefined {
+    return this.decodedInternal<T>(res)
+  }
+  filterAndDecodeResources<T>(typePrefix: string, resources: MoveResource[]): TypedMoveResource<T>[] {
+    return this.filterAndDecodeInternal(typePrefix, resources)
+  }
 
-  decodeResource<T>(event: MoveResource): TypedMoveResource<T> | undefined {
-    return this.decodedInternal<T>(event)
+  private filterAndDecodeInternal<T>(typePrefix: string, structs: StructWithTag[]): StructWithType<T>[] {
+    if (!structs) {
+      return []
+    }
+    const results: StructWithType<T>[] = []
+    for (const resource of structs) {
+      if (!resource.type.startsWith(typePrefix)) {
+        continue
+      }
+      const result = this.decodedInternal(resource)
+      if (result) {
+        results.push(result as StructWithType<T>)
+      }
+    }
+    return results
   }
 
   private decodedInternal<T>(typeStruct: StructWithTag): StructWithType<T> | undefined {
-    const registry = DEFAULT_TYPE_REGISTRY
+    const registry = TYPE_REGISTRY
     // this.loadTypes(registry)
     // TODO check if module is not loaded
 
@@ -249,7 +271,7 @@ export class TypeRegistry {
   }
 
   decodeFunctionPayload(payload: TransactionPayload_EntryFunctionPayload): TransactionPayload_EntryFunctionPayload {
-    const registry = DEFAULT_TYPE_REGISTRY
+    const registry = TYPE_REGISTRY
     // this.loadTypes(registry)
     const argumentsTyped: any[] = []
 
@@ -269,4 +291,4 @@ export class TypeRegistry {
   }
 }
 
-export const DEFAULT_TYPE_REGISTRY = new TypeRegistry()
+export const TYPE_REGISTRY = new TypeRegistry()

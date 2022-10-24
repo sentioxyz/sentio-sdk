@@ -9,7 +9,7 @@ import {
 } from '.'
 
 import Long from 'long'
-import { EventInstance, DEFAULT_TYPE_REGISTRY } from './types'
+import { EventInstance, TYPE_REGISTRY } from './types'
 import { getChainId } from './network'
 
 type IndexConfigure = {
@@ -59,7 +59,7 @@ export class AptosBaseProcessor {
     this.moduleName = moduleName
     this.configure(options)
     global.PROCESSOR_STATE.aptosProcessors.push(this)
-    this.loadTypes(DEFAULT_TYPE_REGISTRY)
+    this.loadTypes(TYPE_REGISTRY)
   }
 
   // getABI(): MoveModule | undefined {
@@ -124,7 +124,7 @@ export class AptosBaseProcessor {
           txn.events = []
           for (const evt of events) {
             const eventInstance = evt as EventInstance
-            const decoded = DEFAULT_TYPE_REGISTRY.decodeEvent<any>(eventInstance)
+            const decoded = TYPE_REGISTRY.decodeEvent<any>(eventInstance)
             await handler(decoded || eventInstance, ctx)
           }
         }
@@ -163,7 +163,7 @@ export class AptosBaseProcessor {
         )
         if (tx) {
           const payload = tx.payload as TransactionPayload_EntryFunctionPayload
-          const decoded = DEFAULT_TYPE_REGISTRY.decodeFunctionPayload(payload)
+          const decoded = TYPE_REGISTRY.decodeFunctionPayload(payload)
           await handler(decoded, ctx)
         }
         return ctx.getProcessResult()
