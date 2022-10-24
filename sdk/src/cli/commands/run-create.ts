@@ -26,23 +26,45 @@ export function runCreate(argv: string[]) {
       description: '(Optional) The root direct new project will be created, default current working dir',
       type: String,
     },
+    {
+      name: 'chain-type',
+      alias: 'c',
+      description:
+        'The type of project you want to create, can be evm, aptos, raw (if you want to start from scratch and support multiple types of chains)',
+      type: String,
+      defaultValue: 'evm',
+    },
   ]
 
   const options = commandLineArgs(optionDefinitions, { argv })
+  const usage = commandLineUsage([
+    {
+      header: 'Create a template project',
+      content: 'sentio create <name>',
+    },
+    {
+      header: 'Options',
+      optionList: optionDefinitions,
+    },
+  ])
+
   if (options.help || !options.name) {
-    const usage = commandLineUsage([
-      {
-        header: 'Create a template project',
-        content: 'sentio create $NAME',
-      },
-      {
-        header: 'Options',
-        optionList: optionDefinitions,
-      },
-    ])
     console.log(usage)
   } else {
-    const templateFolder = path.resolve(__dirname, '../../../template')
+    const chainType: string = options['chain-type'].toLowerCase()
+    switch (chainType) {
+      case 'evm':
+        break
+      case 'aptos':
+        break
+      case 'raw':
+        break
+      default:
+        console.error(chalk.red('non supported chain-type for template creation, use --help for more information.'))
+        console.log(usage)
+        process.exit(1)
+    }
+    const templateFolder = path.resolve(__dirname, '../../../templates', chainType)
     const projectName = options.name || 'default'
 
     const rootDir = options.directory || process.cwd()

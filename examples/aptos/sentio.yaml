@@ -1,5 +1,2 @@
 project: aptos
-host: local
-targets:
-  - chain: aptos
-    abisDir: abis/aptos
+host: test

@@ -1,7 +1,7 @@
 export interface SentioProjectConfig {
   project: string
   host: string
-  source: string
+  // source: string
   build: boolean
   // targets: Target[]
 }

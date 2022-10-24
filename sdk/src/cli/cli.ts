@@ -35,7 +35,7 @@ if (mainOptions.command === 'login') {
   // TODO move them to their own modules
 
   // Process configs
-  let processorConfig: SentioProjectConfig = { host: '', project: '', source: '', build: true }
+  let processorConfig: SentioProjectConfig = { host: '', project: '', build: true }
   // Fist step, read from project yaml file
   try {
     console.log(chalk.blue('Loading Process config'))
@@ -65,9 +65,9 @@ if (mainOptions.command === 'login') {
       processorConfig.host = 'prod'
     }
 
-    if (!processorConfig.source) {
-      processorConfig.source = 'src/processor.ts'
-    }
+    // if (!processorConfig.source) {
+    //   processorConfig.source = 'src/processor.ts'
+    // }
     // if (!processorConfig.targets) {
     //   console.warn('targets is not defined, use EVM as the default target')
     //   processorConfig.targets = []
@@ -158,7 +158,7 @@ function usage() {
     {
       header: 'Usage',
       content: [
-        'sentio $command --help\t\tshow detail usage of specific command',
+        'sentio <command> --help\t\tshow detail usage of specific command',
         'sentio login --api-key=xx\t\tsave credential to local',
         'sentio create\t\t\t\tcreate a template project',
         'sentio upload\t\t\t\tbuild and upload processor to sentio',
