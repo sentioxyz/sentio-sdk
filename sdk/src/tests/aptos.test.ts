@@ -75,6 +75,7 @@ describe('Test Aptos Example', () => {
     expect(res.result?.counters).length(1)
     expect(res.result?.gauges).length(0)
     expect(res.result?.counters[0].metadata?.blockNumber.toInt()).equal(18483034)
+    expect(res.result?.events).length(1)
   })
 
   test('Check token deposit event dispatch', async () => {

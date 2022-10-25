@@ -2,6 +2,9 @@ import { SouffleChefCampaign, CandyMachine } from './types/aptos/souffle'
 import { token } from '../builtin/aptos/0x3'
 import { voting } from '../builtin/aptos/0x1'
 import { TYPE_REGISTRY } from '../aptos/types'
+import { AccountEventTracker } from '@sentio/sdk'
+
+const accountTracker = AccountEventTracker.register('pull')
 
 SouffleChefCampaign.bind({ startVersion: 3212312 })
   .onEntryPullTokenV2((call: SouffleChefCampaign.PullTokenV2Payload, ctx) => {
@@ -9,8 +12,8 @@ SouffleChefCampaign.bind({ startVersion: 3212312 })
     ctx.meter.Counter('pulled').add(call.arguments_typed[3])
   })
   .onEventPullTokenEvent((evt, ctx) => {
-    console.log(evt.data_typed.receiver)
     ctx.meter.Counter('burned').add(1)
+    accountTracker.trackEvent(ctx, { distinctId: ctx.transaction.sender })
   })
   .onEvent(
     (event, ctx) => {

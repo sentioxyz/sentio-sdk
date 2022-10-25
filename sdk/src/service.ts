@@ -676,7 +676,7 @@ function mergeProcessResults(results: ProcessResult[]): ProcessResult {
     res.counters = res.counters.concat(r.counters)
     res.gauges = res.gauges.concat(r.gauges)
     res.logs = res.logs.concat(r.logs)
-    res.events = res.events.concat(res.events)
+    res.events = res.events.concat(r.events)
   }
   return res
 }

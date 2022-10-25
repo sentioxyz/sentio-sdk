@@ -29,7 +29,7 @@ export function getRpcEndpoint(network: AptosNetwork): string {
     case AptosNetwork.TEST_NET:
       return 'https://testnet.aptoslabs.com/'
   }
-  return 'https://mainnet.aptoslabs.com/v1/'
+  return 'https://mainnet.aptoslabs.com/'
 }
 
 export function getRpcClient(network: AptosNetwork): AptosClient {
