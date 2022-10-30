@@ -55,7 +55,7 @@ export class AccountEventTracker extends EventTracker {
 
   static register(eventName?: string, options?: TrackerOptions) {
     if (eventName) {
-      ;['user', eventName].join(':')
+      eventName = ['user', eventName].join('_')
     } else {
       eventName = 'user'
     }

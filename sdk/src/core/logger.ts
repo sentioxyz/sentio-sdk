@@ -1,6 +1,6 @@
 import { BaseContext } from './context'
 import { DataDescriptor, LogLevel } from '../gen'
-import { DescriptorWithUsage, Labels } from './metadata'
+import { DescriptorWithUsage } from './metadata'
 
 export type Attributes = Record<string, any>
 
@@ -32,19 +32,19 @@ export class Logger extends DescriptorWithUsage {
     })
   }
 
-  info(msg: any, labels: Labels = {}) {
-    this.log(LogLevel.INFO, msg, labels)
+  info(msg: any, attributes: Attributes = {}) {
+    this.log(LogLevel.INFO, msg, attributes)
   }
 
-  warn(msg: any, labels: Labels = {}) {
-    this.log(LogLevel.WARNING, msg, labels)
+  warn(msg: any, attributes: Attributes = {}) {
+    this.log(LogLevel.WARNING, msg, attributes)
   }
 
-  error(msg: any, labels: Labels = {}) {
-    this.log(LogLevel.ERROR, msg, labels)
+  error(msg: any, attributes: Attributes = {}) {
+    this.log(LogLevel.ERROR, msg, attributes)
   }
 
-  critical(msg: any, labels: Labels = {}) {
-    this.log(LogLevel.CRITICAL, msg, labels)
+  critical(msg: any, attributes: Attributes = {}) {
+    this.log(LogLevel.CRITICAL, msg, attributes)
   }
 }
