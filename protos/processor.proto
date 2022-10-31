@@ -98,10 +98,23 @@ message MetricConfig {
   string unit = 2;
   // Only for metrics
   bool sparse = 4;
+  // how to reduce the metrics, in seconds, 0 means no reduction
+  int32 resolution_in_seconds = 5;
 }
 
 message AccountConfig {
   // TODO implement account configs
+  string chain_id = 1;
+  string address = 2;
+  uint64 start_block = 3;
+
+  repeated AptosOnVersionConfig aptos_on_version_configs = 4;
+  // TODO add tx handler config related to the account
+}
+
+message AptosOnVersionConfig {
+  int32 handler_id = 1;
+  int32 step = 2;
 }
 
 message ContractInfo {
@@ -247,6 +260,8 @@ message DataDescriptor {
   string unit = 2;
   // Only for metrics
   bool sparse = 4;
+  // how to reduce the metrics, in seconds, 0 means no reduction
+  int32 resolution_in_seconds = 5;
 }
 
 message RecordMetaData {
@@ -300,6 +315,7 @@ enum HandlerType {
   ETH_TRACE = 5;
   APT_EVENT = 6;
   APT_CALL = 7;
+  APT_RESOURCE = 8;
 }
 
 message RuntimeInfo {

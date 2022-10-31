@@ -13,6 +13,7 @@ export enum HandlerType {
   ETH_TRACE = 5,
   APT_EVENT = 6,
   APT_CALL = 7,
+  APT_RESOURCE = 8,
   UNRECOGNIZED = -1,
 }
 
@@ -42,6 +43,9 @@ export function handlerTypeFromJSON(object: any): HandlerType {
     case 7:
     case "APT_CALL":
       return HandlerType.APT_CALL;
+    case 8:
+    case "APT_RESOURCE":
+      return HandlerType.APT_RESOURCE;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -67,6 +71,8 @@ export function handlerTypeToJSON(object: HandlerType): string {
       return "APT_EVENT";
     case HandlerType.APT_CALL:
       return "APT_CALL";
+    case HandlerType.APT_RESOURCE:
+      return "APT_RESOURCE";
     case HandlerType.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
@@ -211,9 +217,20 @@ export interface MetricConfig {
   description: string;
   unit: string;
   sparse: boolean;
+  resolutionInSeconds: number;
 }
 
-export interface AccountConfig {}
+export interface AccountConfig {
+  chainId: string;
+  address: string;
+  startBlock: Long;
+  aptosOnVersionConfigs: AptosOnVersionConfig[];
+}
+
+export interface AptosOnVersionConfig {
+  handlerId: number;
+  step: number;
+}
 
 export interface ContractInfo {
   name: string;
@@ -350,6 +367,7 @@ export interface DataDescriptor {
   description: string;
   unit: string;
   sparse: boolean;
+  resolutionInSeconds: number;
 }
 
 export interface RecordMetaData {
@@ -1205,7 +1223,13 @@ export const EventTrackingConfig = {
 };
 
 function createBaseMetricConfig(): MetricConfig {
-  return { name: "", description: "", unit: "", sparse: false };
+  return {
+    name: "",
+    description: "",
+    unit: "",
+    sparse: false,
+    resolutionInSeconds: 0,
+  };
 }
 
 export const MetricConfig = {
@@ -1224,6 +1248,9 @@ export const MetricConfig = {
     }
     if (message.sparse === true) {
       writer.uint32(32).bool(message.sparse);
+    }
+    if (message.resolutionInSeconds !== 0) {
+      writer.uint32(40).int32(message.resolutionInSeconds);
     }
     return writer;
   },
@@ -1247,6 +1274,9 @@ export const MetricConfig = {
         case 4:
           message.sparse = reader.bool();
           break;
+        case 5:
+          message.resolutionInSeconds = reader.int32();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1261,6 +1291,9 @@ export const MetricConfig = {
       description: isSet(object.description) ? String(object.description) : "",
       unit: isSet(object.unit) ? String(object.unit) : "",
       sparse: isSet(object.sparse) ? Boolean(object.sparse) : false,
+      resolutionInSeconds: isSet(object.resolutionInSeconds)
+        ? Number(object.resolutionInSeconds)
+        : 0,
     };
   },
 
@@ -1271,6 +1304,8 @@ export const MetricConfig = {
       (obj.description = message.description);
     message.unit !== undefined && (obj.unit = message.unit);
     message.sparse !== undefined && (obj.sparse = message.sparse);
+    message.resolutionInSeconds !== undefined &&
+      (obj.resolutionInSeconds = Math.round(message.resolutionInSeconds));
     return obj;
   },
 
@@ -1280,19 +1315,37 @@ export const MetricConfig = {
     message.description = object.description ?? "";
     message.unit = object.unit ?? "";
     message.sparse = object.sparse ?? false;
+    message.resolutionInSeconds = object.resolutionInSeconds ?? 0;
     return message;
   },
 };
 
 function createBaseAccountConfig(): AccountConfig {
-  return {};
+  return {
+    chainId: "",
+    address: "",
+    startBlock: Long.UZERO,
+    aptosOnVersionConfigs: [],
+  };
 }
 
 export const AccountConfig = {
   encode(
-    _: AccountConfig,
+    message: AccountConfig,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
+    if (message.chainId !== "") {
+      writer.uint32(10).string(message.chainId);
+    }
+    if (message.address !== "") {
+      writer.uint32(18).string(message.address);
+    }
+    if (!message.startBlock.isZero()) {
+      writer.uint32(24).uint64(message.startBlock);
+    }
+    for (const v of message.aptosOnVersionConfigs) {
+      AptosOnVersionConfig.encode(v!, writer.uint32(34).fork()).ldelim();
+    }
     return writer;
   },
 
@@ -1303,6 +1356,20 @@ export const AccountConfig = {
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
+        case 1:
+          message.chainId = reader.string();
+          break;
+        case 2:
+          message.address = reader.string();
+          break;
+        case 3:
+          message.startBlock = reader.uint64() as Long;
+          break;
+        case 4:
+          message.aptosOnVersionConfigs.push(
+            AptosOnVersionConfig.decode(reader, reader.uint32())
+          );
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1311,17 +1378,114 @@ export const AccountConfig = {
     return message;
   },
 
-  fromJSON(_: any): AccountConfig {
-    return {};
+  fromJSON(object: any): AccountConfig {
+    return {
+      chainId: isSet(object.chainId) ? String(object.chainId) : "",
+      address: isSet(object.address) ? String(object.address) : "",
+      startBlock: isSet(object.startBlock)
+        ? Long.fromValue(object.startBlock)
+        : Long.UZERO,
+      aptosOnVersionConfigs: Array.isArray(object?.aptosOnVersionConfigs)
+        ? object.aptosOnVersionConfigs.map((e: any) =>
+            AptosOnVersionConfig.fromJSON(e)
+          )
+        : [],
+    };
   },
 
-  toJSON(_: AccountConfig): unknown {
+  toJSON(message: AccountConfig): unknown {
     const obj: any = {};
+    message.chainId !== undefined && (obj.chainId = message.chainId);
+    message.address !== undefined && (obj.address = message.address);
+    message.startBlock !== undefined &&
+      (obj.startBlock = (message.startBlock || Long.UZERO).toString());
+    if (message.aptosOnVersionConfigs) {
+      obj.aptosOnVersionConfigs = message.aptosOnVersionConfigs.map((e) =>
+        e ? AptosOnVersionConfig.toJSON(e) : undefined
+      );
+    } else {
+      obj.aptosOnVersionConfigs = [];
+    }
     return obj;
   },
 
-  fromPartial(_: DeepPartial<AccountConfig>): AccountConfig {
+  fromPartial(object: DeepPartial<AccountConfig>): AccountConfig {
     const message = createBaseAccountConfig();
+    message.chainId = object.chainId ?? "";
+    message.address = object.address ?? "";
+    message.startBlock =
+      object.startBlock !== undefined && object.startBlock !== null
+        ? Long.fromValue(object.startBlock)
+        : Long.UZERO;
+    message.aptosOnVersionConfigs =
+      object.aptosOnVersionConfigs?.map((e) =>
+        AptosOnVersionConfig.fromPartial(e)
+      ) || [];
+    return message;
+  },
+};
+
+function createBaseAptosOnVersionConfig(): AptosOnVersionConfig {
+  return { handlerId: 0, step: 0 };
+}
+
+export const AptosOnVersionConfig = {
+  encode(
+    message: AptosOnVersionConfig,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.handlerId !== 0) {
+      writer.uint32(8).int32(message.handlerId);
+    }
+    if (message.step !== 0) {
+      writer.uint32(16).int32(message.step);
+    }
+    return writer;
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): AptosOnVersionConfig {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAptosOnVersionConfig();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.handlerId = reader.int32();
+          break;
+        case 2:
+          message.step = reader.int32();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): AptosOnVersionConfig {
+    return {
+      handlerId: isSet(object.handlerId) ? Number(object.handlerId) : 0,
+      step: isSet(object.step) ? Number(object.step) : 0,
+    };
+  },
+
+  toJSON(message: AptosOnVersionConfig): unknown {
+    const obj: any = {};
+    message.handlerId !== undefined &&
+      (obj.handlerId = Math.round(message.handlerId));
+    message.step !== undefined && (obj.step = Math.round(message.step));
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<AptosOnVersionConfig>): AptosOnVersionConfig {
+    const message = createBaseAptosOnVersionConfig();
+    message.handlerId = object.handlerId ?? 0;
+    message.step = object.step ?? 0;
     return message;
   },
 };
@@ -3204,7 +3368,13 @@ export const ProcessResult = {
 };
 
 function createBaseDataDescriptor(): DataDescriptor {
-  return { name: "", description: "", unit: "", sparse: false };
+  return {
+    name: "",
+    description: "",
+    unit: "",
+    sparse: false,
+    resolutionInSeconds: 0,
+  };
 }
 
 export const DataDescriptor = {
@@ -3223,6 +3393,9 @@ export const DataDescriptor = {
     }
     if (message.sparse === true) {
       writer.uint32(32).bool(message.sparse);
+    }
+    if (message.resolutionInSeconds !== 0) {
+      writer.uint32(40).int32(message.resolutionInSeconds);
     }
     return writer;
   },
@@ -3246,6 +3419,9 @@ export const DataDescriptor = {
         case 4:
           message.sparse = reader.bool();
           break;
+        case 5:
+          message.resolutionInSeconds = reader.int32();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -3260,6 +3436,9 @@ export const DataDescriptor = {
       description: isSet(object.description) ? String(object.description) : "",
       unit: isSet(object.unit) ? String(object.unit) : "",
       sparse: isSet(object.sparse) ? Boolean(object.sparse) : false,
+      resolutionInSeconds: isSet(object.resolutionInSeconds)
+        ? Number(object.resolutionInSeconds)
+        : 0,
     };
   },
 
@@ -3270,6 +3449,8 @@ export const DataDescriptor = {
       (obj.description = message.description);
     message.unit !== undefined && (obj.unit = message.unit);
     message.sparse !== undefined && (obj.sparse = message.sparse);
+    message.resolutionInSeconds !== undefined &&
+      (obj.resolutionInSeconds = Math.round(message.resolutionInSeconds));
     return obj;
   },
 
@@ -3279,6 +3460,7 @@ export const DataDescriptor = {
     message.description = object.description ?? "";
     message.unit = object.unit ?? "";
     message.sparse = object.sparse ?? false;
+    message.resolutionInSeconds = object.resolutionInSeconds ?? 0;
     return message;
   },
 };

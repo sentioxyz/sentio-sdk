@@ -31,6 +31,7 @@ export class MetricDescriptorOptions {
   unit?: string
   description?: string
   sparse?: boolean
+  resolutionInSeconds?: number
 }
 
 export class Metric extends DescriptorWithUsage {
@@ -45,6 +46,9 @@ export class Metric extends DescriptorWithUsage {
       }
       if (option.sparse) {
         descriptor.sparse = option.sparse
+      }
+      if (option.resolutionInSeconds) {
+        descriptor.resolutionInSeconds = option.resolutionInSeconds
       }
     }
     super(descriptor)
