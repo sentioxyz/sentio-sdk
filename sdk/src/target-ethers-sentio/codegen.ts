@@ -258,7 +258,9 @@ function generateOnEventFunction(event: EventDeclaration, contractName: string, 
   ) {
     if (!filter) {
       // @ts-ignore
-      filter = ${contractName}Processor.filters['${filterName}'](${event.inputs.map(() => 'null').join(',')})
+      filter = ${contractName}Processor.filters[
+        // @ts-ignore
+        '${filterName}'](${event.inputs.map(() => 'null').join(',')})
     }
     return super.onEvent(handler, filter!)
   }
