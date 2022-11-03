@@ -115,6 +115,34 @@ describe('Test Aptos Example', () => {
     const res = await service.processBindings(request)
     expect(firstGaugeValue(res.result, 'size')).equal(2n)
   })
+
+  test('check on timer', async () => {
+    const request: ProcessBindingsRequest = {
+      bindings: [
+        {
+          data: {
+            raw: new TextEncoder().encode(
+              JSON.stringify({
+                version: '12345',
+                resources: [
+                  {
+                    type: '0x1::coin::SupplyConfig',
+                    data: {
+                      allow_upgrades: false,
+                    },
+                  },
+                ],
+              })
+            ),
+          },
+          handlerId: 0,
+          handlerType: HandlerType.APT_RESOURCE,
+        },
+      ],
+    }
+    const res = await service.processBindings(request)
+    expect(firstCounterValue(res.result, 'onTimer')).equal(1n)
+  })
 })
 
 const testData = {

@@ -224,12 +224,19 @@ export interface AccountConfig {
   chainId: string;
   address: string;
   startBlock: Long;
-  aptosOnVersionConfigs: AptosOnVersionConfig[];
+  onIntervalConfigs: OnIntervalConfig[];
+  onAptosIntervalConfigs: AptosOnIntervalConfig[];
 }
 
-export interface AptosOnVersionConfig {
+export interface OnIntervalConfig {
   handlerId: number;
-  step: number;
+  minutes: number;
+  slot: number;
+}
+
+export interface AptosOnIntervalConfig {
+  intervalConfig: OnIntervalConfig | undefined;
+  type: string;
 }
 
 export interface ContractInfo {
@@ -1325,7 +1332,8 @@ function createBaseAccountConfig(): AccountConfig {
     chainId: "",
     address: "",
     startBlock: Long.UZERO,
-    aptosOnVersionConfigs: [],
+    onIntervalConfigs: [],
+    onAptosIntervalConfigs: [],
   };
 }
 
@@ -1343,8 +1351,11 @@ export const AccountConfig = {
     if (!message.startBlock.isZero()) {
       writer.uint32(24).uint64(message.startBlock);
     }
-    for (const v of message.aptosOnVersionConfigs) {
-      AptosOnVersionConfig.encode(v!, writer.uint32(34).fork()).ldelim();
+    for (const v of message.onIntervalConfigs) {
+      OnIntervalConfig.encode(v!, writer.uint32(34).fork()).ldelim();
+    }
+    for (const v of message.onAptosIntervalConfigs) {
+      AptosOnIntervalConfig.encode(v!, writer.uint32(42).fork()).ldelim();
     }
     return writer;
   },
@@ -1366,8 +1377,13 @@ export const AccountConfig = {
           message.startBlock = reader.uint64() as Long;
           break;
         case 4:
-          message.aptosOnVersionConfigs.push(
-            AptosOnVersionConfig.decode(reader, reader.uint32())
+          message.onIntervalConfigs.push(
+            OnIntervalConfig.decode(reader, reader.uint32())
+          );
+          break;
+        case 5:
+          message.onAptosIntervalConfigs.push(
+            AptosOnIntervalConfig.decode(reader, reader.uint32())
           );
           break;
         default:
@@ -1385,9 +1401,12 @@ export const AccountConfig = {
       startBlock: isSet(object.startBlock)
         ? Long.fromValue(object.startBlock)
         : Long.UZERO,
-      aptosOnVersionConfigs: Array.isArray(object?.aptosOnVersionConfigs)
-        ? object.aptosOnVersionConfigs.map((e: any) =>
-            AptosOnVersionConfig.fromJSON(e)
+      onIntervalConfigs: Array.isArray(object?.onIntervalConfigs)
+        ? object.onIntervalConfigs.map((e: any) => OnIntervalConfig.fromJSON(e))
+        : [],
+      onAptosIntervalConfigs: Array.isArray(object?.onAptosIntervalConfigs)
+        ? object.onAptosIntervalConfigs.map((e: any) =>
+            AptosOnIntervalConfig.fromJSON(e)
           )
         : [],
     };
@@ -1399,12 +1418,19 @@ export const AccountConfig = {
     message.address !== undefined && (obj.address = message.address);
     message.startBlock !== undefined &&
       (obj.startBlock = (message.startBlock || Long.UZERO).toString());
-    if (message.aptosOnVersionConfigs) {
-      obj.aptosOnVersionConfigs = message.aptosOnVersionConfigs.map((e) =>
-        e ? AptosOnVersionConfig.toJSON(e) : undefined
+    if (message.onIntervalConfigs) {
+      obj.onIntervalConfigs = message.onIntervalConfigs.map((e) =>
+        e ? OnIntervalConfig.toJSON(e) : undefined
       );
     } else {
-      obj.aptosOnVersionConfigs = [];
+      obj.onIntervalConfigs = [];
+    }
+    if (message.onAptosIntervalConfigs) {
+      obj.onAptosIntervalConfigs = message.onAptosIntervalConfigs.map((e) =>
+        e ? AptosOnIntervalConfig.toJSON(e) : undefined
+      );
+    } else {
+      obj.onAptosIntervalConfigs = [];
     }
     return obj;
   },
@@ -1417,39 +1443,42 @@ export const AccountConfig = {
       object.startBlock !== undefined && object.startBlock !== null
         ? Long.fromValue(object.startBlock)
         : Long.UZERO;
-    message.aptosOnVersionConfigs =
-      object.aptosOnVersionConfigs?.map((e) =>
-        AptosOnVersionConfig.fromPartial(e)
+    message.onIntervalConfigs =
+      object.onIntervalConfigs?.map((e) => OnIntervalConfig.fromPartial(e)) ||
+      [];
+    message.onAptosIntervalConfigs =
+      object.onAptosIntervalConfigs?.map((e) =>
+        AptosOnIntervalConfig.fromPartial(e)
       ) || [];
     return message;
   },
 };
 
-function createBaseAptosOnVersionConfig(): AptosOnVersionConfig {
-  return { handlerId: 0, step: 0 };
+function createBaseOnIntervalConfig(): OnIntervalConfig {
+  return { handlerId: 0, minutes: 0, slot: 0 };
 }
 
-export const AptosOnVersionConfig = {
+export const OnIntervalConfig = {
   encode(
-    message: AptosOnVersionConfig,
+    message: OnIntervalConfig,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.handlerId !== 0) {
       writer.uint32(8).int32(message.handlerId);
     }
-    if (message.step !== 0) {
-      writer.uint32(16).int32(message.step);
+    if (message.minutes !== 0) {
+      writer.uint32(16).int32(message.minutes);
+    }
+    if (message.slot !== 0) {
+      writer.uint32(24).int32(message.slot);
     }
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): AptosOnVersionConfig {
+  decode(input: _m0.Reader | Uint8Array, length?: number): OnIntervalConfig {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseAptosOnVersionConfig();
+    const message = createBaseOnIntervalConfig();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1457,7 +1486,10 @@ export const AptosOnVersionConfig = {
           message.handlerId = reader.int32();
           break;
         case 2:
-          message.step = reader.int32();
+          message.minutes = reader.int32();
+          break;
+        case 3:
+          message.slot = reader.int32();
           break;
         default:
           reader.skipType(tag & 7);
@@ -1467,25 +1499,109 @@ export const AptosOnVersionConfig = {
     return message;
   },
 
-  fromJSON(object: any): AptosOnVersionConfig {
+  fromJSON(object: any): OnIntervalConfig {
     return {
       handlerId: isSet(object.handlerId) ? Number(object.handlerId) : 0,
-      step: isSet(object.step) ? Number(object.step) : 0,
+      minutes: isSet(object.minutes) ? Number(object.minutes) : 0,
+      slot: isSet(object.slot) ? Number(object.slot) : 0,
     };
   },
 
-  toJSON(message: AptosOnVersionConfig): unknown {
+  toJSON(message: OnIntervalConfig): unknown {
     const obj: any = {};
     message.handlerId !== undefined &&
       (obj.handlerId = Math.round(message.handlerId));
-    message.step !== undefined && (obj.step = Math.round(message.step));
+    message.minutes !== undefined &&
+      (obj.minutes = Math.round(message.minutes));
+    message.slot !== undefined && (obj.slot = Math.round(message.slot));
     return obj;
   },
 
-  fromPartial(object: DeepPartial<AptosOnVersionConfig>): AptosOnVersionConfig {
-    const message = createBaseAptosOnVersionConfig();
+  fromPartial(object: DeepPartial<OnIntervalConfig>): OnIntervalConfig {
+    const message = createBaseOnIntervalConfig();
     message.handlerId = object.handlerId ?? 0;
-    message.step = object.step ?? 0;
+    message.minutes = object.minutes ?? 0;
+    message.slot = object.slot ?? 0;
+    return message;
+  },
+};
+
+function createBaseAptosOnIntervalConfig(): AptosOnIntervalConfig {
+  return { intervalConfig: undefined, type: "" };
+}
+
+export const AptosOnIntervalConfig = {
+  encode(
+    message: AptosOnIntervalConfig,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.intervalConfig !== undefined) {
+      OnIntervalConfig.encode(
+        message.intervalConfig,
+        writer.uint32(10).fork()
+      ).ldelim();
+    }
+    if (message.type !== "") {
+      writer.uint32(18).string(message.type);
+    }
+    return writer;
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): AptosOnIntervalConfig {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAptosOnIntervalConfig();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.intervalConfig = OnIntervalConfig.decode(
+            reader,
+            reader.uint32()
+          );
+          break;
+        case 2:
+          message.type = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): AptosOnIntervalConfig {
+    return {
+      intervalConfig: isSet(object.intervalConfig)
+        ? OnIntervalConfig.fromJSON(object.intervalConfig)
+        : undefined,
+      type: isSet(object.type) ? String(object.type) : "",
+    };
+  },
+
+  toJSON(message: AptosOnIntervalConfig): unknown {
+    const obj: any = {};
+    message.intervalConfig !== undefined &&
+      (obj.intervalConfig = message.intervalConfig
+        ? OnIntervalConfig.toJSON(message.intervalConfig)
+        : undefined);
+    message.type !== undefined && (obj.type = message.type);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<AptosOnIntervalConfig>
+  ): AptosOnIntervalConfig {
+    const message = createBaseAptosOnIntervalConfig();
+    message.intervalConfig =
+      object.intervalConfig !== undefined && object.intervalConfig !== null
+        ? OnIntervalConfig.fromPartial(object.intervalConfig)
+        : undefined;
+    message.type = object.type ?? "";
     return message;
   },
 };

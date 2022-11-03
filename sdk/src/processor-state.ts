@@ -14,6 +14,7 @@ import { TemplateInstance } from './gen'
 import { Provider } from '@ethersproject/providers'
 import { EventTracker } from './core'
 import { Metric } from './core/meter'
+import { AptosAccountProcessor } from './aptos/aptos-processor'
 
 export class ProcessorState {
   // from abiName_address_chainId => contract wrapper
@@ -34,6 +35,7 @@ export class ProcessorState {
   suiProcessors: SuiBaseProcessor[] = []
 
   aptosProcessors: AptosBaseProcessor[] = []
+  aptosAccountProcessors: AptosAccountProcessor[] = []
 
   eventTrackers: EventTracker[] = []
 

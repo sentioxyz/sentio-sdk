@@ -108,13 +108,22 @@ message AccountConfig {
   string address = 2;
   uint64 start_block = 3;
 
-  repeated AptosOnVersionConfig aptos_on_version_configs = 4;
+  repeated OnIntervalConfig on_interval_configs = 4;
+  repeated AptosOnIntervalConfig on_aptos_interval_configs = 5;
   // TODO add tx handler config related to the account
 }
 
-message AptosOnVersionConfig {
+message OnIntervalConfig {
   int32 handler_id = 1;
-  int32 step = 2;
+  // num of minutes, there can be either minutes or slot
+  int32 minutes = 2;
+  // block or version
+  int32 slot = 3;
+}
+
+message AptosOnIntervalConfig {
+  OnIntervalConfig interval_config = 1;
+  string type = 2;
 }
 
 message ContractInfo {

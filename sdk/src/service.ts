@@ -3,6 +3,7 @@ import { CallContext, ServerError, Status } from 'nice-grpc'
 import { SOL_MAINMET_ID, SUI_DEVNET_ID } from './utils/chain'
 
 import {
+  AccountConfig,
   AptosCallHandlerConfig,
   AptosEventHandlerConfig,
   BlockBinding,
@@ -31,6 +32,7 @@ import Long from 'long'
 import { TextDecoder } from 'util'
 import { Trace } from './core'
 import { Instruction } from '@project-serum/anchor'
+import { MoveResourcesWithVersionPayload } from './aptos/aptos-processor'
 
 const DEFAULT_MAX_BLOCK = Long.ZERO
 
@@ -42,6 +44,8 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
   private blockHandlers: ((block: Block) => Promise<ProcessResult>)[] = []
   private aptosEventHandlers: ((event: any) => Promise<ProcessResult>)[] = []
   private aptosCallHandlers: ((func: any) => Promise<ProcessResult>)[] = []
+  private aptosResourceHandlers: ((resourceWithVersion: MoveResourcesWithVersionPayload) => Promise<ProcessResult>)[] =
+    []
 
   // map from chain id to list of processors
   // private blockHandlers = new Map<string, ((block: Block) => Promise<ProcessResult>)[]>()
@@ -49,6 +53,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
 
   private started = false
   private contractConfigs: ContractConfig[]
+  private accountConfigs: AccountConfig[]
   private templateInstances: TemplateInstance[]
   private metricConfigs: MetricConfig[]
   private eventTrackingConfigs: EventTrackingConfig[]
@@ -72,7 +77,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       templateInstances: this.templateInstances,
       eventTrackingConfigs: this.eventTrackingConfigs,
       metricConfigs: this.metricConfigs,
-      accountConfigs: [],
+      accountConfigs: this.accountConfigs,
     }
   }
 
@@ -81,6 +86,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     this.templateInstances = []
     // this.processorsByChainId.clear()
     this.contractConfigs = []
+    this.accountConfigs = []
 
     this.templateInstances = [...global.PROCESSOR_STATE.templatesInstances]
     this.eventTrackingConfigs = []
@@ -247,7 +253,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         blockConfigs: [],
         logConfigs: [],
         traceConfigs: [],
-        startBlock: aptosProcessor.config.startVersion,
+        startBlock: Long.fromString(aptosProcessor.config.startVersion.toString()),
         endBlock: DEFAULT_MAX_BLOCK,
         instructionConfig: undefined,
         aptosEventConfigs: [],
@@ -285,6 +291,28 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         contractConfig.aptosCallConfigs.push(functionHandlerConfig)
       }
       this.contractConfigs.push(contractConfig)
+    }
+
+    for (const aptosProcessor of global.PROCESSOR_STATE.aptosAccountProcessors) {
+      const accountConfig: AccountConfig = {
+        address: aptosProcessor.config.address,
+        chainId: aptosProcessor.getChainId(),
+        startBlock: Long.fromValue(aptosProcessor.config.startVersion.toString()),
+        onAptosIntervalConfigs: [],
+        onIntervalConfigs: [],
+      }
+      for (const handler of aptosProcessor.resourcesHandlers) {
+        const handlerId = this.aptosResourceHandlers.push(handler.handler) - 1
+        accountConfig.onAptosIntervalConfigs.push({
+          intervalConfig: {
+            handlerId: handlerId,
+            minutes: handler.timeIntervalInMinutes || 0,
+            slot: handler.versionInterval || 0,
+          },
+          type: handler.type || '',
+        })
+      }
+      this.accountConfigs.push(accountConfig)
     }
   }
 
@@ -361,6 +389,8 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         return this.processAptosFunctionCall(request)
       case HandlerType.APT_EVENT:
         return this.processAptosEvent(request)
+      case HandlerType.APT_RESOURCE:
+        return this.processAptosResource(request)
       default:
         throw new ServerError(Status.INVALID_ARGUMENT, 'No handle type registered ' + request.handlerType)
     }
@@ -610,6 +640,19 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       throw new ServerError(Status.INTERNAL, 'error processing event: ' + jsonString + '\n' + errorString(e))
     })
     recordRuntimeInfo(result, HandlerType.APT_EVENT)
+    return result
+  }
+
+  async processAptosResource(binding: DataBinding): Promise<ProcessResult> {
+    if (!binding.data) {
+      throw new ServerError(Status.INVALID_ARGUMENT, "Event can't be empty")
+    }
+    const jsonString = Utf8ArrayToStr(binding.data.raw)
+    const json = JSON.parse(jsonString) as MoveResourcesWithVersionPayload
+    const result = await this.aptosResourceHandlers[binding.handlerId](json).catch((e) => {
+      throw new ServerError(Status.INTERNAL, 'error processing event: ' + jsonString + '\n' + errorString(e))
+    })
+    recordRuntimeInfo(result, HandlerType.APT_RESOURCE)
     return result
   }
 

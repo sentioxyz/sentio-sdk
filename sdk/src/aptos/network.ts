@@ -1,4 +1,3 @@
-import Long from 'long'
 import { APTOS_MAINNET_ID, APTOS_TESTNET_ID, CHAIN_MAP } from '../utils/chain'
 import { AptosClient } from 'aptos-sdk'
 
@@ -38,7 +37,6 @@ export function getRpcClient(network: AptosNetwork): AptosClient {
 
 export class AptosBindOptions {
   address: string
-  network?: AptosNetwork = AptosNetwork.TEST_NET
-  startVersion?: Long | number
-  // endBlock?: Long | number
+  network?: AptosNetwork = AptosNetwork.MAIN_NET
+  startVersion?: bigint | number
 }

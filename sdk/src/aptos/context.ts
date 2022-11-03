@@ -10,14 +10,14 @@ export class AptosContext extends BaseContext {
   address: string
   network: AptosNetwork
   moduleName: string
-  version: Long
+  version: bigint
   transaction: Transaction_UserTransaction
 
   constructor(
     moduleName: string,
     network: AptosNetwork,
     address: string,
-    version: Long,
+    version: bigint,
     transaction?: Transaction_UserTransaction
   ) {
     super()
@@ -34,9 +34,37 @@ export class AptosContext extends BaseContext {
     return {
       address: this.address,
       contractName: this.moduleName,
-      blockNumber: this.version,
+      blockNumber: Long.fromString(this.version.toString()),
       transactionIndex: 0,
       transactionHash: this.transaction?.hash || '', // TODO
+      logIndex: 0,
+      chainId: getChainId(this.network),
+      dataDescriptor: descriptor,
+      name: descriptor.name,
+      labels: normalizeLabels(labels),
+    }
+  }
+}
+
+export class AptosResourceContext extends BaseContext {
+  address: string
+  network: AptosNetwork
+  version: bigint
+
+  constructor(network: AptosNetwork, address: string, version: bigint) {
+    super()
+    this.address = address
+    this.network = network
+    this.version = version
+  }
+
+  getMetaData(descriptor: DataDescriptor, labels: Labels): RecordMetaData {
+    return {
+      address: this.address,
+      contractName: 'resources',
+      blockNumber: Long.fromString(this.version.toString()),
+      transactionIndex: 0,
+      transactionHash: '',
       logIndex: 0,
       chainId: getChainId(this.network),
       dataDescriptor: descriptor,

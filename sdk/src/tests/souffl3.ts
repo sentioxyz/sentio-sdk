@@ -3,10 +3,11 @@ import { token } from '../builtin/aptos/0x3'
 import { voting } from '../builtin/aptos/0x1'
 import { TYPE_REGISTRY } from '../aptos/types'
 import { AccountEventTracker } from '@sentio/sdk'
+import { AptosAccountProcessor } from '../aptos/aptos-processor'
 
 const accountTracker = AccountEventTracker.register('pull')
 
-SouffleChefCampaign.bind({ startVersion: 3212312 })
+SouffleChefCampaign.bind({ startVersion: 3212312n })
   .onEntryPullTokenV2((call: SouffleChefCampaign.PullTokenV2Payload, ctx) => {
     ctx.meter.Counter('call_num').add(1)
     ctx.meter.Counter('pulled').add(call.arguments_typed[3])
@@ -45,3 +46,7 @@ voting.bind().onEventCreateProposalEvent((evt, ctx) => {
   evt.data_typed.expiration_secs + evt.data_typed.expiration_secs
   ctx.meter.Gauge('size').record(evt.data_typed.metadata.data.length)
 })
+
+AptosAccountProcessor.bind({ address: '0x1' }).onTimeInterval((resources, ctx) => {
+  ctx.meter.Counter('onTimer').add(1)
+}, 10000)
