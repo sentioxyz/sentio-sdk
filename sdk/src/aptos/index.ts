@@ -2,6 +2,6 @@ export type { Transaction_UserTransaction, TransactionPayload_EntryFunctionPaylo
 export type { EventInstance, TypedEventInstance, TypedEntryFunctionPayload } from './types'
 export { TYPE_REGISTRY, TypeRegistry } from './types'
 export type { FunctionNameAndCallFilter, EventFilter, CallFilter, ArgumentsFilter } from './aptos-processor'
-export { AptosBaseProcessor } from './aptos-processor'
+export { AptosBaseProcessor, AptosAccountProcessor } from './aptos-processor'
 export { AptosContext } from './context'
 export { AptosBindOptions, AptosNetwork, getRpcClient } from './network'

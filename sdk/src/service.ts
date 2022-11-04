@@ -10,6 +10,7 @@ import {
   ContractConfig,
   DataBinding,
   EventTrackingConfig,
+  ExportConfig,
   HandlerType,
   LogFilter,
   LogHandlerConfig,
@@ -57,6 +58,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
   private templateInstances: TemplateInstance[]
   private metricConfigs: MetricConfig[]
   private eventTrackingConfigs: EventTrackingConfig[]
+  private exportConfigs: ExportConfig[]
   private readonly loader: () => void
 
   private readonly shutdownHandler?: () => void
@@ -74,10 +76,11 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       // TODO project setting
       config: undefined,
       contractConfigs: this.contractConfigs,
+      accountConfigs: this.accountConfigs,
       templateInstances: this.templateInstances,
       eventTrackingConfigs: this.eventTrackingConfigs,
       metricConfigs: this.metricConfigs,
-      accountConfigs: this.accountConfigs,
+      exportConfigs: this.exportConfigs,
     }
   }
 
@@ -91,6 +94,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     this.templateInstances = [...global.PROCESSOR_STATE.templatesInstances]
     this.eventTrackingConfigs = []
     this.metricConfigs = []
+    this.exportConfigs = []
 
     // part 0, prepare metrics and event tracking configs
     for (const metric of global.PROCESSOR_STATE.metrics) {
@@ -107,6 +111,14 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         totalByDay: eventTracker.options.totalByDay || false,
         totalPerEntity: undefined,
         unique: eventTracker.options.unique || false,
+      })
+    }
+
+    for (const exporter of global.PROCESSOR_STATE.exporters) {
+      this.exportConfigs.push({
+        exportName: exporter.exportName,
+        exportType: exporter.options.exportType,
+        exportUrl: exporter.options.exportUrl,
       })
     }
 
@@ -720,28 +732,19 @@ function mergeProcessResults(results: ProcessResult[]): ProcessResult {
     res.gauges = res.gauges.concat(r.gauges)
     res.logs = res.logs.concat(r.logs)
     res.events = res.events.concat(r.events)
+    res.exports = res.exports.concat(r.exports)
   }
   return res
 }
 
 function recordRuntimeInfo(results: ProcessResult, handlerType: HandlerType) {
-  results.gauges.forEach((e) => {
-    e.runtimeInfo = {
-      from: handlerType,
-    }
-  })
-
-  results.counters.forEach((e) => {
-    e.runtimeInfo = {
-      from: handlerType,
-    }
-  })
-
-  results.logs.forEach((e) => {
-    e.runtimeInfo = {
-      from: handlerType,
-    }
-  })
+  for (const list of [results.gauges, results.counters, results.logs, results.events, results.exports]) {
+    list.forEach((e) => {
+      e.runtimeInfo = {
+        from: handlerType,
+      }
+    })
+  }
 }
 
 function errorString(e: Error): string {

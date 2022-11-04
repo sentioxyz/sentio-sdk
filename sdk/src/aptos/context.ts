@@ -50,12 +50,14 @@ export class AptosResourceContext extends BaseContext {
   address: string
   network: AptosNetwork
   version: bigint
+  timestampInMicros: number
 
-  constructor(network: AptosNetwork, address: string, version: bigint) {
+  constructor(network: AptosNetwork, address: string, version: bigint, timestampInMicros: number) {
     super()
     this.address = address
     this.network = network
     this.version = version
+    this.timestampInMicros = timestampInMicros
   }
 
   getMetaData(descriptor: DataDescriptor, labels: Labels): RecordMetaData {

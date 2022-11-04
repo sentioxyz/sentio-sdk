@@ -144,6 +144,7 @@ export interface ProcessConfigResponse {
   accountConfigs: AccountConfig[];
   metricConfigs: MetricConfig[];
   eventTrackingConfigs: EventTrackingConfig[];
+  exportConfigs: ExportConfig[];
 }
 
 export interface ContractConfig {
@@ -210,6 +211,43 @@ export interface EventTrackingConfig {
   totalPerEntity: TotalPerEntityAggregation | undefined;
   distinctAggregationByDays: number[];
   retentionConfig: RetentionConfig | undefined;
+}
+
+export interface ExportConfig {
+  exportName: string;
+  exportType: ExportConfig_ExportType;
+  exportUrl: string;
+}
+
+export enum ExportConfig_ExportType {
+  WEBHOOK = 0,
+  UNRECOGNIZED = -1,
+}
+
+export function exportConfig_ExportTypeFromJSON(
+  object: any
+): ExportConfig_ExportType {
+  switch (object) {
+    case 0:
+    case "WEBHOOK":
+      return ExportConfig_ExportType.WEBHOOK;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return ExportConfig_ExportType.UNRECOGNIZED;
+  }
+}
+
+export function exportConfig_ExportTypeToJSON(
+  object: ExportConfig_ExportType
+): string {
+  switch (object) {
+    case ExportConfig_ExportType.WEBHOOK:
+      return "WEBHOOK";
+    case ExportConfig_ExportType.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
 }
 
 export interface MetricConfig {
@@ -367,6 +405,7 @@ export interface ProcessResult {
   counters: CounterResult[];
   logs: LogResult[];
   events: EventTrackingResult[];
+  exports: ExportResult[];
 }
 
 export interface DataDescriptor {
@@ -435,6 +474,12 @@ export interface EventTrackingResult {
   metadata: RecordMetaData | undefined;
   distinctEntityId: string;
   attributes: string;
+  runtimeInfo: RuntimeInfo | undefined;
+}
+
+export interface ExportResult {
+  metadata: RecordMetaData | undefined;
+  payload: string;
   runtimeInfo: RuntimeInfo | undefined;
 }
 
@@ -552,6 +597,7 @@ function createBaseProcessConfigResponse(): ProcessConfigResponse {
     accountConfigs: [],
     metricConfigs: [],
     eventTrackingConfigs: [],
+    exportConfigs: [],
   };
 }
 
@@ -577,6 +623,9 @@ export const ProcessConfigResponse = {
     }
     for (const v of message.eventTrackingConfigs) {
       EventTrackingConfig.encode(v!, writer.uint32(50).fork()).ldelim();
+    }
+    for (const v of message.exportConfigs) {
+      ExportConfig.encode(v!, writer.uint32(58).fork()).ldelim();
     }
     return writer;
   },
@@ -619,6 +668,11 @@ export const ProcessConfigResponse = {
             EventTrackingConfig.decode(reader, reader.uint32())
           );
           break;
+        case 7:
+          message.exportConfigs.push(
+            ExportConfig.decode(reader, reader.uint32())
+          );
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -648,6 +702,9 @@ export const ProcessConfigResponse = {
         ? object.eventTrackingConfigs.map((e: any) =>
             EventTrackingConfig.fromJSON(e)
           )
+        : [],
+      exportConfigs: Array.isArray(object?.exportConfigs)
+        ? object.exportConfigs.map((e: any) => ExportConfig.fromJSON(e))
         : [],
     };
   },
@@ -693,6 +750,13 @@ export const ProcessConfigResponse = {
     } else {
       obj.eventTrackingConfigs = [];
     }
+    if (message.exportConfigs) {
+      obj.exportConfigs = message.exportConfigs.map((e) =>
+        e ? ExportConfig.toJSON(e) : undefined
+      );
+    } else {
+      obj.exportConfigs = [];
+    }
     return obj;
   },
 
@@ -717,6 +781,8 @@ export const ProcessConfigResponse = {
       object.eventTrackingConfigs?.map((e) =>
         EventTrackingConfig.fromPartial(e)
       ) || [];
+    message.exportConfigs =
+      object.exportConfigs?.map((e) => ExportConfig.fromPartial(e)) || [];
     return message;
   },
 };
@@ -1225,6 +1291,79 @@ export const EventTrackingConfig = {
       object.retentionConfig !== undefined && object.retentionConfig !== null
         ? RetentionConfig.fromPartial(object.retentionConfig)
         : undefined;
+    return message;
+  },
+};
+
+function createBaseExportConfig(): ExportConfig {
+  return { exportName: "", exportType: 0, exportUrl: "" };
+}
+
+export const ExportConfig = {
+  encode(
+    message: ExportConfig,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.exportName !== "") {
+      writer.uint32(10).string(message.exportName);
+    }
+    if (message.exportType !== 0) {
+      writer.uint32(16).int32(message.exportType);
+    }
+    if (message.exportUrl !== "") {
+      writer.uint32(26).string(message.exportUrl);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ExportConfig {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseExportConfig();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.exportName = reader.string();
+          break;
+        case 2:
+          message.exportType = reader.int32() as any;
+          break;
+        case 3:
+          message.exportUrl = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ExportConfig {
+    return {
+      exportName: isSet(object.exportName) ? String(object.exportName) : "",
+      exportType: isSet(object.exportType)
+        ? exportConfig_ExportTypeFromJSON(object.exportType)
+        : 0,
+      exportUrl: isSet(object.exportUrl) ? String(object.exportUrl) : "",
+    };
+  },
+
+  toJSON(message: ExportConfig): unknown {
+    const obj: any = {};
+    message.exportName !== undefined && (obj.exportName = message.exportName);
+    message.exportType !== undefined &&
+      (obj.exportType = exportConfig_ExportTypeToJSON(message.exportType));
+    message.exportUrl !== undefined && (obj.exportUrl = message.exportUrl);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<ExportConfig>): ExportConfig {
+    const message = createBaseExportConfig();
+    message.exportName = object.exportName ?? "";
+    message.exportType = object.exportType ?? 0;
+    message.exportUrl = object.exportUrl ?? "";
     return message;
   },
 };
@@ -3370,7 +3509,7 @@ export const RawBlock = {
 };
 
 function createBaseProcessResult(): ProcessResult {
-  return { gauges: [], counters: [], logs: [], events: [] };
+  return { gauges: [], counters: [], logs: [], events: [], exports: [] };
 }
 
 export const ProcessResult = {
@@ -3389,6 +3528,9 @@ export const ProcessResult = {
     }
     for (const v of message.events) {
       EventTrackingResult.encode(v!, writer.uint32(34).fork()).ldelim();
+    }
+    for (const v of message.exports) {
+      ExportResult.encode(v!, writer.uint32(42).fork()).ldelim();
     }
     return writer;
   },
@@ -3414,6 +3556,9 @@ export const ProcessResult = {
             EventTrackingResult.decode(reader, reader.uint32())
           );
           break;
+        case 5:
+          message.exports.push(ExportResult.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -3435,6 +3580,9 @@ export const ProcessResult = {
         : [],
       events: Array.isArray(object?.events)
         ? object.events.map((e: any) => EventTrackingResult.fromJSON(e))
+        : [],
+      exports: Array.isArray(object?.exports)
+        ? object.exports.map((e: any) => ExportResult.fromJSON(e))
         : [],
     };
   },
@@ -3467,6 +3615,13 @@ export const ProcessResult = {
     } else {
       obj.events = [];
     }
+    if (message.exports) {
+      obj.exports = message.exports.map((e) =>
+        e ? ExportResult.toJSON(e) : undefined
+      );
+    } else {
+      obj.exports = [];
+    }
     return obj;
   },
 
@@ -3479,6 +3634,8 @@ export const ProcessResult = {
     message.logs = object.logs?.map((e) => LogResult.fromPartial(e)) || [];
     message.events =
       object.events?.map((e) => EventTrackingResult.fromPartial(e)) || [];
+    message.exports =
+      object.exports?.map((e) => ExportResult.fromPartial(e)) || [];
     return message;
   },
 };
@@ -4496,6 +4653,98 @@ export const EventTrackingResult = {
         : undefined;
     message.distinctEntityId = object.distinctEntityId ?? "";
     message.attributes = object.attributes ?? "";
+    message.runtimeInfo =
+      object.runtimeInfo !== undefined && object.runtimeInfo !== null
+        ? RuntimeInfo.fromPartial(object.runtimeInfo)
+        : undefined;
+    return message;
+  },
+};
+
+function createBaseExportResult(): ExportResult {
+  return { metadata: undefined, payload: "", runtimeInfo: undefined };
+}
+
+export const ExportResult = {
+  encode(
+    message: ExportResult,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.metadata !== undefined) {
+      RecordMetaData.encode(
+        message.metadata,
+        writer.uint32(10).fork()
+      ).ldelim();
+    }
+    if (message.payload !== "") {
+      writer.uint32(18).string(message.payload);
+    }
+    if (message.runtimeInfo !== undefined) {
+      RuntimeInfo.encode(
+        message.runtimeInfo,
+        writer.uint32(26).fork()
+      ).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ExportResult {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseExportResult();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.metadata = RecordMetaData.decode(reader, reader.uint32());
+          break;
+        case 2:
+          message.payload = reader.string();
+          break;
+        case 3:
+          message.runtimeInfo = RuntimeInfo.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ExportResult {
+    return {
+      metadata: isSet(object.metadata)
+        ? RecordMetaData.fromJSON(object.metadata)
+        : undefined,
+      payload: isSet(object.payload) ? String(object.payload) : "",
+      runtimeInfo: isSet(object.runtimeInfo)
+        ? RuntimeInfo.fromJSON(object.runtimeInfo)
+        : undefined,
+    };
+  },
+
+  toJSON(message: ExportResult): unknown {
+    const obj: any = {};
+    message.metadata !== undefined &&
+      (obj.metadata = message.metadata
+        ? RecordMetaData.toJSON(message.metadata)
+        : undefined);
+    message.payload !== undefined && (obj.payload = message.payload);
+    message.runtimeInfo !== undefined &&
+      (obj.runtimeInfo = message.runtimeInfo
+        ? RuntimeInfo.toJSON(message.runtimeInfo)
+        : undefined);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<ExportResult>): ExportResult {
+    const message = createBaseExportResult();
+    message.metadata =
+      object.metadata !== undefined && object.metadata !== null
+        ? RecordMetaData.fromPartial(object.metadata)
+        : undefined;
+    message.payload = object.payload ?? "";
     message.runtimeInfo =
       object.runtimeInfo !== undefined && object.runtimeInfo !== null
         ? RuntimeInfo.fromPartial(object.runtimeInfo)

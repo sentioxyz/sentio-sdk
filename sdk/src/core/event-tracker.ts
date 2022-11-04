@@ -42,7 +42,7 @@ export class EventTracker {
       attributes: JSON.stringify({}),
       runtimeInfo: undefined,
     }
-    ctx.events.push(res)
+    ctx.res.events.push(res)
   }
 }
 

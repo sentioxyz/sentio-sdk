@@ -54,6 +54,7 @@ message ProcessConfigResponse {
 
   repeated MetricConfig metric_configs = 5;
   repeated EventTrackingConfig event_tracking_configs = 6;
+  repeated ExportConfig export_configs = 7;
 }
 
 message ContractConfig {
@@ -89,6 +90,15 @@ message EventTrackingConfig {
   TotalPerEntityAggregation total_per_entity = 4;
   repeated int32 distinct_aggregation_by_days = 5;
   RetentionConfig retention_config = 6;
+}
+
+message ExportConfig {
+  enum ExportType {
+    WEBHOOK = 0;
+  }
+  string export_name = 1;
+  ExportType export_type = 2;
+  string export_url = 3;  // TODO config should be moved into UI
 }
 
 message MetricConfig {
@@ -259,6 +269,7 @@ message ProcessResult {
   repeated CounterResult counters = 2;
   repeated LogResult logs = 3;
   repeated EventTrackingResult events = 4;
+  repeated ExportResult exports = 5;
 }
 
 // TODO deprecate this
@@ -368,4 +379,10 @@ message EventTrackingResult {
   // JSON payload
   string attributes = 4;
   RuntimeInfo runtime_info = 5;
+}
+
+message ExportResult {
+  RecordMetaData metadata = 1;
+  string payload = 2;
+  RuntimeInfo runtime_info = 3;
 }

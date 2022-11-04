@@ -65,7 +65,7 @@ export class Counter extends Metric {
   }
 
   private record(ctx: BaseContext, value: Numberish, labels: Labels, add: boolean) {
-    ctx.counters.push({
+    ctx.res.counters.push({
       metadata: ctx.getMetaData(this.getShortDescriptor(), labels),
       metricValue: toMetricValue(value),
       add: add,
@@ -95,7 +95,7 @@ export class CounterBinding {
 
 export class Gauge extends Metric {
   record(ctx: BaseContext, value: Numberish, labels: Labels = {}) {
-    ctx.gauges.push({
+    ctx.res.gauges.push({
       metadata: ctx.getMetaData(this.getShortDescriptor(), labels),
       metricValue: toMetricValue(value),
       runtimeInfo: undefined,

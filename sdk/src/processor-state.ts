@@ -15,6 +15,7 @@ import { Provider } from '@ethersproject/providers'
 import { EventTracker } from './core'
 import { Metric } from './core/meter'
 import { AptosAccountProcessor } from './aptos/aptos-processor'
+import { Exporter } from './core/exporter'
 
 export class ProcessorState {
   // from abiName_address_chainId => contract wrapper
@@ -38,6 +39,8 @@ export class ProcessorState {
   aptosAccountProcessors: AptosAccountProcessor[] = []
 
   eventTrackers: EventTracker[] = []
+
+  exporters: Exporter[] = []
 
   metrics: Metric[] = []
 }

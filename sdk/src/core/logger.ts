@@ -22,7 +22,7 @@ export class Logger extends DescriptorWithUsage {
     }
 
     this.usage++
-    this.ctx.logs.push({
+    this.ctx.res.logs.push({
       // name: this.name,
       metadata: this.ctx.getMetaData(this.getShortDescriptor(), {}), // GetRecordMetaData(this.ctx, this, {}),
       level,

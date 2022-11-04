@@ -1,12 +1,4 @@
-import {
-  CounterResult,
-  GaugeResult,
-  LogResult,
-  DataDescriptor,
-  RecordMetaData,
-  EventTrackingResult,
-  ProcessResult,
-} from '../gen'
+import { DataDescriptor, RecordMetaData, ProcessResult } from '../gen'
 import { BaseContract, EventFilter } from 'ethers'
 import { Block, Log } from '@ethersproject/abstract-provider'
 import { Meter, normalizeLabels } from './meter'
@@ -17,12 +9,16 @@ import { Labels } from './metadata'
 import { SOL_MAINMET_ID, SUI_DEVNET_ID } from '../utils/chain'
 
 export abstract class BaseContext {
-  gauges: GaugeResult[] = []
-  counters: CounterResult[] = []
-  logs: LogResult[] = []
-  events: EventTrackingResult[] = []
   meter: Meter
   logger: Logger
+
+  res: ProcessResult = {
+    counters: [],
+    events: [],
+    exports: [],
+    gauges: [],
+    logs: [],
+  }
 
   protected constructor() {
     this.meter = new Meter(this)
@@ -30,13 +26,7 @@ export abstract class BaseContext {
   }
 
   getProcessResult(): ProcessResult {
-    const res: ProcessResult = {
-      gauges: this.gauges,
-      counters: this.counters,
-      logs: this.logs,
-      events: this.events,
-    }
-    return res
+    return this.res
   }
 
   abstract getMetaData(descriptor: DataDescriptor, labels: Labels): RecordMetaData

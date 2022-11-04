@@ -53,6 +53,7 @@ class CallHandler {
 export class MoveResourcesWithVersionPayload {
   resources: MoveResource[]
   version: string
+  timestamp: string
 }
 
 class ResourceHandlder {
@@ -231,7 +232,12 @@ export class AptosAccountProcessor {
     const processor = this
     this.resourcesHandlers.push({
       handler: async function (arg) {
-        const ctx = new AptosResourceContext(processor.config.network, processor.config.address, BigInt(arg.version))
+        const ctx = new AptosResourceContext(
+          processor.config.network,
+          processor.config.address,
+          BigInt(arg.version),
+          parseInt(arg.timestamp)
+        )
         await handler(arg.resources, ctx)
         return ctx.getProcessResult()
       },
