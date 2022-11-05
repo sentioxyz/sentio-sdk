@@ -116,9 +116,8 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
 
     for (const exporter of global.PROCESSOR_STATE.exporters) {
       this.exportConfigs.push({
-        exportName: exporter.exportName,
-        exportType: exporter.options.exportType,
-        exportUrl: exporter.options.exportUrl,
+        name: exporter.name,
+        channel: exporter.channel,
       })
     }
 

@@ -214,40 +214,8 @@ export interface EventTrackingConfig {
 }
 
 export interface ExportConfig {
-  exportName: string;
-  exportType: ExportConfig_ExportType;
-  exportUrl: string;
-}
-
-export enum ExportConfig_ExportType {
-  WEBHOOK = 0,
-  UNRECOGNIZED = -1,
-}
-
-export function exportConfig_ExportTypeFromJSON(
-  object: any
-): ExportConfig_ExportType {
-  switch (object) {
-    case 0:
-    case "WEBHOOK":
-      return ExportConfig_ExportType.WEBHOOK;
-    case -1:
-    case "UNRECOGNIZED":
-    default:
-      return ExportConfig_ExportType.UNRECOGNIZED;
-  }
-}
-
-export function exportConfig_ExportTypeToJSON(
-  object: ExportConfig_ExportType
-): string {
-  switch (object) {
-    case ExportConfig_ExportType.WEBHOOK:
-      return "WEBHOOK";
-    case ExportConfig_ExportType.UNRECOGNIZED:
-    default:
-      return "UNRECOGNIZED";
-  }
+  name: string;
+  channel: string;
 }
 
 export interface MetricConfig {
@@ -1296,7 +1264,7 @@ export const EventTrackingConfig = {
 };
 
 function createBaseExportConfig(): ExportConfig {
-  return { exportName: "", exportType: 0, exportUrl: "" };
+  return { name: "", channel: "" };
 }
 
 export const ExportConfig = {
@@ -1304,14 +1272,11 @@ export const ExportConfig = {
     message: ExportConfig,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (message.exportName !== "") {
-      writer.uint32(10).string(message.exportName);
+    if (message.name !== "") {
+      writer.uint32(10).string(message.name);
     }
-    if (message.exportType !== 0) {
-      writer.uint32(16).int32(message.exportType);
-    }
-    if (message.exportUrl !== "") {
-      writer.uint32(26).string(message.exportUrl);
+    if (message.channel !== "") {
+      writer.uint32(18).string(message.channel);
     }
     return writer;
   },
@@ -1324,13 +1289,10 @@ export const ExportConfig = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.exportName = reader.string();
+          message.name = reader.string();
           break;
         case 2:
-          message.exportType = reader.int32() as any;
-          break;
-        case 3:
-          message.exportUrl = reader.string();
+          message.channel = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -1342,28 +1304,22 @@ export const ExportConfig = {
 
   fromJSON(object: any): ExportConfig {
     return {
-      exportName: isSet(object.exportName) ? String(object.exportName) : "",
-      exportType: isSet(object.exportType)
-        ? exportConfig_ExportTypeFromJSON(object.exportType)
-        : 0,
-      exportUrl: isSet(object.exportUrl) ? String(object.exportUrl) : "",
+      name: isSet(object.name) ? String(object.name) : "",
+      channel: isSet(object.channel) ? String(object.channel) : "",
     };
   },
 
   toJSON(message: ExportConfig): unknown {
     const obj: any = {};
-    message.exportName !== undefined && (obj.exportName = message.exportName);
-    message.exportType !== undefined &&
-      (obj.exportType = exportConfig_ExportTypeToJSON(message.exportType));
-    message.exportUrl !== undefined && (obj.exportUrl = message.exportUrl);
+    message.name !== undefined && (obj.name = message.name);
+    message.channel !== undefined && (obj.channel = message.channel);
     return obj;
   },
 
   fromPartial(object: DeepPartial<ExportConfig>): ExportConfig {
     const message = createBaseExportConfig();
-    message.exportName = object.exportName ?? "";
-    message.exportType = object.exportType ?? 0;
-    message.exportUrl = object.exportUrl ?? "";
+    message.name = object.name ?? "";
+    message.channel = object.channel ?? "";
     return message;
   },
 };

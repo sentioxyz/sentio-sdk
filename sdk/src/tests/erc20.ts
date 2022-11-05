@@ -1,7 +1,6 @@
 import { ERC20Processor, ERC20ProcessorTemplate } from '../builtin/erc20'
 import { EventTracker } from '../core/event-tracker'
 import { Exporter } from '../core/exporter'
-import { ExportConfig_ExportType } from '@sentio/sdk'
 
 export const filter = ERC20Processor.filters.Transfer(
   '0x0000000000000000000000000000000000000000',
@@ -9,10 +8,7 @@ export const filter = ERC20Processor.filters.Transfer(
 )
 
 const tracker = EventTracker.register('sdf')
-const exporter = Exporter.register('transfer', {
-  exportType: ExportConfig_ExportType.WEBHOOK,
-  exportUrl: 'http://localhost',
-})
+const exporter = Exporter.register('transfer', 'xxx')
 
 const processorTemplate = new ERC20ProcessorTemplate().onEventTransfer(async function (event, ctx) {
   console.log('')
