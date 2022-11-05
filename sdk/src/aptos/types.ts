@@ -225,23 +225,23 @@ export class TypeRegistry {
   decodeEvent<T>(event: Event): TypedEventInstance<T> | undefined {
     return this.decodedInternal<T>(event) as TypedEventInstance<T>
   }
-  filterAndDecodeEvents<T>(typePrefix: string, resources: Event[]): TypedEventInstance<T>[] {
-    return this.filterAndDecodeInternal(typePrefix, resources) as TypedEventInstance<T>[]
+  filterAndDecodeEvents<T>(typeQname: string, resources: Event[]): TypedEventInstance<T>[] {
+    return this.filterAndDecodeInternal(typeQname, resources) as TypedEventInstance<T>[]
   }
   decodeResource<T>(res: MoveResource): TypedMoveResource<T> | undefined {
     return this.decodedInternal<T>(res)
   }
-  filterAndDecodeResources<T>(typePrefix: string, resources: MoveResource[]): TypedMoveResource<T>[] {
-    return this.filterAndDecodeInternal(typePrefix, resources)
+  filterAndDecodeResources<T>(typeQname: string, resources: MoveResource[]): TypedMoveResource<T>[] {
+    return this.filterAndDecodeInternal(typeQname, resources)
   }
 
-  private filterAndDecodeInternal<T>(typePrefix: string, structs: StructWithTag[]): StructWithType<T>[] {
+  private filterAndDecodeInternal<T>(typeQname: string, structs: StructWithTag[]): StructWithType<T>[] {
     if (!structs) {
       return []
     }
     const results: StructWithType<T>[] = []
     for (const resource of structs) {
-      if (!resource.type.startsWith(typePrefix)) {
+      if (resource.type.split('<')[0] !== typeQname) {
         continue
       }
       const result = this.decodedInternal(resource)
