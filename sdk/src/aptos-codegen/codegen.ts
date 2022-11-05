@@ -279,6 +279,7 @@ function generateStructs(module: MoveModule, struct: MoveStruct) {
 
   return `
   export class ${struct.name}${genericString} {
+    static TYPE_NAME = '${module.address}::${module.name}::${struct.name}'
     ${fields.join('\n')} 
   }
   
