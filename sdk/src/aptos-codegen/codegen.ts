@@ -2,8 +2,8 @@ import fs from 'fs'
 import path from 'path'
 import prettier from 'prettier'
 import { MoveFunction, MoveModule, MoveModuleBytecode, MoveStruct } from 'aptos-sdk/src/generated'
-import { AccountModulesImportInfo, AccountRegister, generateType } from './typegen'
-import { isFrameworkAccount } from '../aptos/utils'
+import { AccountModulesImportInfo, AccountRegister, generateType, parseMoveType } from './typegen'
+import { isFrameworkAccount, moduleQname, SPLITTER } from '../aptos/utils'
 import chalk from 'chalk'
 import { AptosNetwork, getChainName, getRpcClient } from '../aptos/network'
 
@@ -211,8 +211,13 @@ function generateModule(moduleByteCode: MoveModuleBytecode, network: AptosNetwor
   const module = moduleByteCode.abi
 
   const functions = module.exposed_functions.map((f) => generateOnEntryFunctions(module, f)).filter((s) => s !== '')
-  const events = module.structs.map((e) => generateOnEvents(module, e)).filter((s) => s !== '')
-  const structs = module.structs.map((s) => generateStructs(module, s))
+
+  const eventStructs = getEventStructs(module)
+  const eventTypes = new Set(eventStructs.keys())
+  const events = Array.from(eventStructs.values())
+    .map((e) => generateOnEvents(module, e))
+    .filter((s) => s !== '')
+  const structs = module.structs.map((s) => generateStructs(module, s, eventTypes))
   const callArgs = module.exposed_functions.map((f) => generateCallArgsStructs(module, f))
 
   let processor = ''
@@ -258,7 +263,7 @@ function generateModule(moduleByteCode: MoveModuleBytecode, network: AptosNetwor
   `
 }
 
-function generateStructs(module: MoveModule, struct: MoveStruct) {
+function generateStructs(module: MoveModule, struct: MoveStruct, events: Set<string>) {
   const genericString = generateStructTypeParameters(struct)
   const genericStringAny = generateStructTypeParameters(struct, true)
 
@@ -267,7 +272,7 @@ function generateStructs(module: MoveModule, struct: MoveStruct) {
   })
 
   let eventPayload = ''
-  if (isEvent(struct)) {
+  if (events.has(moduleQname(module) + SPLITTER + struct.name)) {
     eventPayload = `
     export interface ${struct.name}Instance extends 
         aptos.TypedEventInstance<${struct.name}${genericStringAny}> {
@@ -357,15 +362,57 @@ function generateOnEntryFunctions(module: MoveModule, func: MoveFunction) {
   return source
 }
 
-function isEvent(struct: MoveStruct) {
-  return struct.abilities.includes('drop') && struct.abilities.includes('store') && struct.name.endsWith('Event')
+function getEventStructs(module: MoveModule) {
+  const qname = moduleQname(module)
+  const structMap = new Map<string, MoveStruct>()
+  const eventMap = new Map<string, MoveStruct>()
+
+  for (const struct of module.structs) {
+    structMap.set(qname + SPLITTER + struct.name, struct)
+  }
+
+  for (const struct of module.structs) {
+    for (const field of struct.fields) {
+      const t = parseMoveType(field.type)
+      if (t.qname === '0x1::event::EventHandle') {
+        const event = t.typeArgs[0].qname
+        const eventStruct = structMap.get(event)
+        if (eventStruct) {
+          eventMap.set(event, eventStruct)
+        }
+      }
+    }
+  }
+
+  return eventMap
+}
+
+function isEvent(struct: MoveStruct, module: MoveModule) {
+  const hasAbility = struct.abilities.includes('drop') && struct.abilities.includes('store')
+
+  if (!hasAbility) {
+    return false
+  }
+  if (struct.name.endsWith('Event')) {
+    return true
+  }
+
+  // for (const struct of module.structs) {
+  //   for (const field of struct.fields) {
+  //     if (field.type.startsWith('0x1::event::EventHandle')
+  //   }
+  // }
+
+  return false
+
+  //&&
 }
 
 function generateOnEvents(module: MoveModule, struct: MoveStruct): string {
   // for struct that has drop + store
-  if (!isEvent(struct)) {
-    return ''
-  }
+  // if (!isEvent(struct, module)) {
+  //   return ''
+  // }
 
   // const genericString = generateStructTypeParameters(struct)
 
