@@ -176,12 +176,12 @@ export class AccountCodegen {
     
     ${this.modules.map((m) => generateModule(m, this.config.network)).join('\n')}
     
-    function loadAllTypes(registry: aptos.TypeRegistry) {
-      ${dependedAccounts.map((m) => `${m}.loadTypes(registry)`).join('\n')}
+    function loadAllTypes(_r: aptos.TypeRegistry) {
+      ${dependedAccounts.map((m) => `${m}.loadTypes(_r)`).join('\n')}
 
       ${this.modules
         .map((m) => {
-          return `registry.load(${m.abi?.name}.ABI)`
+          return `_r.load(${m.abi?.name}.ABI)`
         })
         .join('\n')}
     }
@@ -250,8 +250,8 @@ function generateModule(moduleByteCode: MoveModuleBytecode, network: AptosNetwor
     
     ${callArgs.join('\n')}
        
-    export function loadTypes(registry: aptos.TypeRegistry) {
-      loadAllTypes(registry)
+    export function loadTypes(_r: aptos.TypeRegistry) {
+      loadAllTypes(_r)
     }
     export const ABI: MoveModule = JSON.parse('${JSON.stringify(module)}')
  }
