@@ -22,6 +22,35 @@ export function getFinalizedHost(host: string): string {
   return host
 }
 
+export function getAuthConfig(host: string): { domain: string; clientId: string; audience: string } {
+  let domain = '',
+    clientId = '',
+    audience = ''
+  switch (host) {
+    case 'local':
+      domain = 'https://sentio-dev.us.auth0.com'
+      clientId = 'qGDisObqQbcPeRA8k02POPZ2Df4KVCna'
+      audience = 'http://localhost:8080/v1'
+      break
+    case '':
+    case undefined:
+    case 'prod':
+      domain = 'https://auth.sentio.xyz'
+      clientId = 'xd80PeuvuZVHpBFh7yEdlSZdtE5mTpGe'
+      audience = 'https://app.sentio.xyz/api/v1'
+      break
+    case 'test':
+    case 'staging':
+      domain = 'https://auth.test.sentio.xyz'
+      clientId = 'qXVvovHaOE37SndxTZJxCKgZjw1axPax'
+      audience = 'https://test.sentio.xyz/api/v1'
+      break
+    default:
+      break
+  }
+  return { domain, clientId, audience }
+}
+
 export function finalizeHost(config: SentioProjectConfig) {
   config.host = getFinalizedHost(config.host)
 }

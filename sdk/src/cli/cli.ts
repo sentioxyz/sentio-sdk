@@ -10,9 +10,9 @@ import { finalizeHost, FinalizeProjectName, SentioProjectConfig } from './config
 import { uploadFile } from './upload'
 import chalk from 'chalk'
 import { buildProcessor } from './build'
-import { runLogin } from './commands/run-login'
 import { runCreate } from './commands/run-create'
 import { runVersion } from './commands/run-version'
+import { runLogin } from './commands/run-login'
 
 const mainDefinitions = [{ name: 'command', defaultOption: true }]
 const mainOptions = commandLineArgs(mainDefinitions, {
@@ -159,12 +159,12 @@ function usage() {
       header: 'Usage',
       content: [
         'sentio <command> --help\t\tshow detail usage of specific command',
-        'sentio login --api-key=xx\t\tsave credential to local',
+        'sentio login\t\t\t\tlogin to sentio',
         'sentio create\t\t\t\tcreate a template project',
         'sentio upload\t\t\t\tbuild and upload processor to sentio',
         'sentio gen\t\t\t\tgenerate abi',
         'sentio build\t\t\t\tgenerate abi and build',
-        'sentio version\t\t\t\tcurrent cli version',
+        'sentio version\t\t\tcurrent cli version',
       ],
     },
   ])

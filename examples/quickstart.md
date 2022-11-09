@@ -15,13 +15,12 @@ git clone https://github.com/sentioxyz/sentio-sdk
 cd examples/x2y2
 ```
 
-5. open [profile](https://test.sentio.xyz/profile) page, generate a api key at [Account](https://test.sentio.xyz/profile#tab=apikey) page, follow guides from the Account page to copy
-
+5. Login to sentio
 ```
-npx -p @sentio/sdk sentio login --api-key ${api_key} --host https://test.sentio.xyz
-
+yarn sentio login --host=test
 ```
-then paste it in the prompt command line for `yarn sentio login --host=https://test.sentio.xyz`
+then finish the login in browser and go back to command line to create an API key
+
 
 6.  try upload the project
 ```
