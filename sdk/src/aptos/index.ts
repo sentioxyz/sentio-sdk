@@ -3,5 +3,5 @@ export type { EventInstance, TypedEventInstance, TypedEntryFunctionPayload } fro
 export { TYPE_REGISTRY, TypeRegistry } from './types'
 export type { FunctionNameAndCallFilter, EventFilter, CallFilter, ArgumentsFilter } from './aptos-processor'
 export { AptosBaseProcessor, AptosAccountProcessor } from './aptos-processor'
-export { AptosContext } from './context'
+export { AptosContext, AptosResourceContext } from './context'
 export { AptosBindOptions, AptosNetwork, getRpcClient } from './network'
