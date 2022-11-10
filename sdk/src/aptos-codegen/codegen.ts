@@ -326,7 +326,12 @@ function generateCallArgsStructs(module: MoveModule, func: MoveFunction) {
 
   // the first param is always signer so ignore
   // TODO check if there is any edge case
-  const fields = func.params.slice(1).map((param) => {
+  let params = func.params
+  if (func.params[0] === '&signer') {
+    params = params.slice(1)
+  }
+
+  const fields = params.map((param) => {
     return `${generateType(param)}`
   })
 
