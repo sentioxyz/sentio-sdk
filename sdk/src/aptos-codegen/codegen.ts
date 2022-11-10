@@ -56,7 +56,7 @@ export async function generateForNetwork(srcDir: string, outputDir: string, netw
 
   while (loader.pendingAccounts.size > 0) {
     for (const account of loader.pendingAccounts) {
-      console.log(`download depended module for account ${account} at ${getChainName(network)}`)
+      console.log(`download dependent module for account ${account} at ${getChainName(network)}`)
 
       try {
         const modules = await client.getAccountModules(account)
@@ -385,27 +385,6 @@ function getEventStructs(module: MoveModule) {
   }
 
   return eventMap
-}
-
-function isEvent(struct: MoveStruct, module: MoveModule) {
-  const hasAbility = struct.abilities.includes('drop') && struct.abilities.includes('store')
-
-  if (!hasAbility) {
-    return false
-  }
-  if (struct.name.endsWith('Event')) {
-    return true
-  }
-
-  // for (const struct of module.structs) {
-  //   for (const field of struct.fields) {
-  //     if (field.type.startsWith('0x1::event::EventHandle')
-  //   }
-  // }
-
-  return false
-
-  //&&
 }
 
 function generateOnEvents(module: MoveModule, struct: MoveStruct): string {

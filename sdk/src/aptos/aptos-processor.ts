@@ -251,9 +251,9 @@ export class AptosAccountProcessor {
   public onTimeInterval(
     handler: (resources: MoveResource[], ctx: AptosResourceContext) => void,
     timeIntervalInMinutes = 60,
-    typpe?: string
+    type?: string
   ) {
-    return this.onInterval(handler, timeIntervalInMinutes, undefined, typpe)
+    return this.onInterval(handler, timeIntervalInMinutes, undefined, type)
   }
 
   public onVersionInterval(
