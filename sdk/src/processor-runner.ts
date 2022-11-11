@@ -39,8 +39,8 @@ setProvider(chainsConfig, options.concurrency, options['use-chainserver'])
 console.log('Start Server', options)
 
 const server = createServer({
-  'grpc.max_send_message_length': 64 * 1024 * 1024,
-  'grpc.max_receive_message_length': 64 * 1024 * 1024,
+  'grpc.max_send_message_length': 128 * 1024 * 1024,
+  'grpc.max_receive_message_length': 128 * 1024 * 1024,
   'grpc.default_compression_algorithm': CompressionAlgorithms.gzip,
 })
 
