@@ -102,7 +102,7 @@ export class AptosBaseProcessor {
         }
         return ctx.getProcessResult()
       },
-      filters: [{ function: '', includeFailed: includedFailed, typeArguments: [] }],
+      filters: [{ function: '', includeFailed: includedFailed }],
     })
     return this
   }
