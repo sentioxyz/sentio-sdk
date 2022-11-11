@@ -292,18 +292,18 @@ function generateStructs(module: MoveModule, struct: MoveStruct, events: Set<str
   `
 }
 
-// function generateFunctionTypeParameters(func: MoveFunction) {
-//   let genericString = ''
-//   if (func.generic_type_params && func.generic_type_params.length > 0) {
-//     const params = func.generic_type_params
-//       .map((v, idx) => {
-//         return 'T' + idx
-//       })
-//       .join(',')
-//     genericString = `<${params}>`
-//   }
-//   return genericString
-// }
+function generateFunctionTypeParameters(func: MoveFunction) {
+  let genericString = ''
+  if (func.generic_type_params && func.generic_type_params.length > 0) {
+    const params = func.generic_type_params
+      .map((v, idx) => {
+        return `T${idx}=any`
+      })
+      .join(',')
+    genericString = `<${params}>`
+  }
+  return genericString
+}
 
 function generateStructTypeParameters(struct: MoveStruct, useAny = false) {
   let genericString = ''
@@ -337,9 +337,9 @@ function generateCallArgsStructs(module: MoveModule, func: MoveFunction) {
 
   const camelFuncName = capitalizeFirstChar(camelize(func.name))
 
-  // const genericString = generateFunctionTypeParameters(func)
+  const genericString = generateFunctionTypeParameters(func)
   return `
-  export interface ${camelFuncName}Payload
+  export interface ${camelFuncName}Payload${genericString}
       extends aptos.TypedEntryFunctionPayload<[${fields.join(',')}]> {
     arguments_typed: [${fields.join(',')}],
     type_arguments: [${func.generic_type_params.map((_) => 'string').join(', ')}]

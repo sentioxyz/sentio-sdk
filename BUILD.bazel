@@ -4,6 +4,7 @@ write_source_files(
     name = "write_gen",
     files = {
         "protos/processor.proto": "//processor/protos:proto_file",
+        "sdk/src/gen/chainquery/protos/chainquery.ts": "//chainquery/protos:chainquery_ts_proto",
         "sdk/src/gen/processor/protos/processor.ts": "//processor/protos:processor_ts_proto",
         "sdk/src/gen/google/protobuf/empty.ts": "//processor/protos:empty_ts_proto",
     },
