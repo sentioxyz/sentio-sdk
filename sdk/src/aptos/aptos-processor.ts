@@ -81,7 +81,8 @@ export class AptosBaseProcessor {
   // }
 
   public onTransaction(
-    handler: (transaction: Transaction_UserTransaction, ctx: AptosContext) => void
+    handler: (transaction: Transaction_UserTransaction, ctx: AptosContext) => void,
+    includedFailed = false
   ): AptosBaseProcessor {
     // const address = this.config.address
     // const moduleName = this.moduleName
@@ -101,7 +102,7 @@ export class AptosBaseProcessor {
         }
         return ctx.getProcessResult()
       },
-      filters: [],
+      filters: [{ function: '', includeFailed: includedFailed, typeArguments: [] }],
     })
     return this
   }
