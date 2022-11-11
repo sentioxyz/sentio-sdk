@@ -1,4 +1,4 @@
-import { MoveModule } from 'aptos-sdk/src/generated'
+import { MoveFunction, MoveModule } from 'aptos-sdk/src/generated'
 
 import { createChannel, createClient } from 'nice-grpc'
 import { AptosQueryClient, AptosQueryDefinition } from '../gen/chainquery/protos/chainquery'
@@ -24,4 +24,12 @@ export function getChainQueryClient(address = 'chainquery-server.chain-sync:6809
   const channel = createChannel(address)
 
   return createClient(AptosQueryDefinition, channel)
+}
+
+export function getMeaningfulFunctionParams(func: MoveFunction): string[] {
+  let params = func.params
+  if (func.params[0] === '&signer') {
+    params = params.slice(1)
+  }
+  return params
 }

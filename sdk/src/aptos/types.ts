@@ -6,7 +6,7 @@ import {
   TransactionPayload_EntryFunctionPayload,
   MoveResource,
 } from 'aptos-sdk/src/generated'
-import { moduleQname, SPLITTER, VECTOR_STR } from './utils'
+import { getMeaningfulFunctionParams, moduleQname, SPLITTER, VECTOR_STR } from './utils'
 import { parseMoveType } from '../aptos-codegen/typegen'
 
 export type EventInstance = Event & {
@@ -264,7 +264,7 @@ export class TypeRegistry {
     try {
       dataTyped = registry.decode(typeStruct.data, typeDescriptor)
     } catch (e) {
-      console.error('Decoding error for ', JSON.stringify(typeStruct))
+      console.error('Decoding error for ', JSON.stringify(typeStruct), e)
       return undefined
     }
     return { ...typeStruct, data_typed: dataTyped, type_arguments: typeArguments } as StructWithType<T>
@@ -277,13 +277,14 @@ export class TypeRegistry {
 
     try {
       const func = registry.getMoveFunction(payload.function)
+      const params = getMeaningfulFunctionParams(func)
       for (const [idx, arg] of payload.arguments.entries()) {
         // TODO consider apply payload.type_arguments, but this might be hard since we don't code gen for them
-        const argType = parseMoveType(func.params[idx + 1])
+        const argType = parseMoveType(params[idx])
         argumentsTyped.push(registry.decode(arg, argType))
       }
     } catch (e) {
-      console.error('Decoding error for ', JSON.stringify(payload))
+      console.error('Decoding error for ', JSON.stringify(payload), e)
       return payload
     }
 

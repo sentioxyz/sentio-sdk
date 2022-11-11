@@ -3,7 +3,7 @@ import path from 'path'
 import prettier from 'prettier'
 import { MoveFunction, MoveModule, MoveModuleBytecode, MoveStruct } from 'aptos-sdk/src/generated'
 import { AccountModulesImportInfo, AccountRegister, generateType, parseMoveType } from './typegen'
-import { isFrameworkAccount, moduleQname, SPLITTER } from '../aptos/utils'
+import { getMeaningfulFunctionParams, isFrameworkAccount, moduleQname, SPLITTER } from '../aptos/utils'
 import chalk from 'chalk'
 import { AptosNetwork, getChainName, getRpcClient } from '../aptos/network'
 
@@ -324,14 +324,7 @@ function generateCallArgsStructs(module: MoveModule, func: MoveFunction) {
     return
   }
 
-  // the first param is always signer so ignore
-  // TODO check if there is any edge case
-  let params = func.params
-  if (func.params[0] === '&signer') {
-    params = params.slice(1)
-  }
-
-  const fields = params.map((param) => {
+  const fields = getMeaningfulFunctionParams(func).map((param) => {
     return `${generateType(param)}`
   })
 

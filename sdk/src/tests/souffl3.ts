@@ -1,6 +1,6 @@
 import { SouffleChefCampaign, CandyMachine } from './types/aptos/souffle'
 import { token } from '../builtin/aptos/0x3'
-import { voting } from '../builtin/aptos/0x1'
+import { aptos_account, voting } from '../builtin/aptos/0x1'
 import { TYPE_REGISTRY } from '../aptos/types'
 import { AccountEventTracker } from '@sentio/sdk'
 import { AptosAccountProcessor } from '../aptos/aptos-processor'
@@ -50,3 +50,7 @@ voting.bind().onEventCreateProposalEvent((evt, ctx) => {
 AptosAccountProcessor.bind({ address: '0x1' }).onTimeInterval((resources, ctx) => {
   ctx.meter.Counter('onTimer').add(1)
 }, 10000)
+
+aptos_account.bind().onEntryCreateAccount((call, ctx) => {
+  ctx.meter.Counter('xx').add(1)
+})

@@ -15,7 +15,7 @@ describe('Test Aptos Example', () => {
 
   test('check configuration ', async () => {
     const config = await service.getConfig({})
-    expect(config.contractConfigs).length(4)
+    expect(config.contractConfigs).length(5)
   })
 
   test('Check souffl3 transaction dispatch', async () => {
@@ -142,6 +142,22 @@ describe('Test Aptos Example', () => {
     }
     const res = await service.processBindings(request)
     expect(firstCounterValue(res.result, 'onTimer')).equal(1n)
+  })
+
+  test('Check aptos account transaction dispatch', async () => {
+    const request: ProcessBindingsRequest = {
+      bindings: [
+        {
+          data: {
+            raw: new TextEncoder().encode(JSON.stringify(dataCreate)),
+          },
+          handlerId: 3,
+          handlerType: HandlerType.APT_CALL,
+        },
+      ],
+    }
+    const res = await service.processBindings(request)
+    expect(res.result?.counters).length(1)
   })
 })
 
@@ -321,4 +337,66 @@ const createProposalData = {
     min_vote_threshold: '100000000000000',
     proposal_id: '3',
   },
+}
+
+const dataCreate = {
+  id: '',
+  round: '',
+  previous_block_votes: null,
+  proposer: '',
+  sender: '0x88252db4dc2484cd9cedb23cd67b7b91f88940142f3eea35df7a9168d9c30896',
+  sequence_number: '1510',
+  payload: {
+    type: 'entry_function_payload',
+    type_arguments: [],
+    arguments: ['0xd582e092190feda35a2f737123f86e33a1b592596804f40b1d539ab603a82a24'],
+    code: { bytecode: '' },
+    function: '0x1::aptos_account::create_account',
+  },
+  max_gas_amount: '2000',
+  gas_unit_price: '100',
+  expiration_timestamp_secs: '1666174748',
+  secondary_signers: null,
+  signature: {
+    type: 'ed25519_signature',
+    public_key: '0xfe1e11c6cb912ae998c9512d21e5781abb64fd4b8d6cfa15aeba3ee481406b64',
+    signature:
+      '0x98a49f348a3015702e3be33c1d2a92ea7b2726d31b27c857980493fe68cadc83fbef0839e312d6a82a9e6ca69481245fa49b6f25c0ec51660615d03e05738c03',
+    public_keys: null,
+    signatures: null,
+    threshold: 0,
+    bitmap: '',
+    sender: { type: '', public_key: '', signature: '', public_keys: null, signatures: null, threshold: 0, bitmap: '' },
+    secondary_signer_addresses: null,
+    secondary_signers: null,
+  },
+  type: 'user_transaction',
+  timestamp: '1666174688494614',
+  events: [
+    {
+      version: '3121410',
+      guid: {
+        creation_number: '0',
+        account_address: '0xd582e092190feda35a2f737123f86e33a1b592596804f40b1d539ab603a82a24',
+      },
+      sequence_number: '0',
+      type: '0x1::account::CoinRegisterEvent',
+      data: {
+        type_info: {
+          account_address: '0x1',
+          module_name: '0x6170746f735f636f696e',
+          struct_name: '0x4170746f73436f696e',
+        },
+      },
+    },
+  ],
+  version: '3121410',
+  hash: '0xcae7d97c9f43d90e247a366688905bc8e83ee0ad4baddbf3cc2fdda56e4d6926',
+  state_root_hash: '',
+  event_root_hash: '0xfa557e3bb8dff8fd3321f9a4eaa779311c9c795728355686b487b5b0adf7ce3c',
+  gas_used: '1538',
+  success: true,
+  vm_status: 'Executed successfully',
+  accumulator_root_hash: '0x7563d6ed58b011e512d53cce2bc1a70716fc6362e12fb6af8fe6d459ae71dffc',
+  changes: null,
 }
