@@ -77,9 +77,9 @@
   "types": "./lib/index.d.ts",
   "module": "./lib/index.js",
   "files": [
-    "lib/**/*",
-    "src/**/*",
-    "templates/**/*"
+    "{lib,src,templates}",
+    "!{lib,src}/tests",
+    "!**/*.test.{js,ts}"
   ],
   "engines": {
     "node": ">=16"
