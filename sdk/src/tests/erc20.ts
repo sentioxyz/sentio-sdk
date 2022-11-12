@@ -36,7 +36,7 @@ ERC20Processor.bind({ address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', net
   .onEventTransfer(async function (event, ctx) {
     ctx.meter.Counter('c2').add(2)
     tracker.trackEvent(ctx, { distinctId: event.args.from })
-    exporter.emit(ctx, event)
+    exporter.emit(ctx, { ...event, x: 100n })
   }, filter)
   .onBlock(async function (block, ctx) {
     ctx.meter.Gauge('g2').record(20, { k: 'v' })

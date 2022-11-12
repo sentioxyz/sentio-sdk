@@ -35,6 +35,10 @@ import { Trace } from './core'
 import { Instruction } from '@project-serum/anchor'
 import { MoveResourcesWithVersionPayload } from './aptos/aptos-processor'
 
+;(BigInt.prototype as any).toJSON = function () {
+  return this.toString()
+}
+
 const DEFAULT_MAX_BLOCK = Long.ZERO
 
 const USER_PROCESSOR = 'user_processor'
