@@ -126,16 +126,21 @@ export async function uploadFile(options: SentioProjectConfig, apiKeyOverride: s
     }
   }
 
+  let error: Error
   const tryUploading = async () => {
     if (triedCount++ >= 5) {
+      console.error(error)
       return
     }
     try {
       await upload()
     } catch (e) {
-      console.log(e)
       if (e.constructor.name === 'FetchError' && e.type === 'system' && e.code === 'EPIPE') {
+        error = e
+        await new Promise((resolve) => setTimeout(resolve, 1000))
         await tryUploading()
+      } else {
+        console.error(e)
       }
     }
   }
