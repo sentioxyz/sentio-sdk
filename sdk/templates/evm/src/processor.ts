@@ -9,7 +9,7 @@ const rewardPerBlock = new Gauge('reward_per_block', {
 })
 const tokenCounter = new Counter('token')
 
-X2y2Processor.bind({ address: '0xB329e39Ebefd16f40d38f07643652cE17Ca5Bac1' }).onBlock(async (_, ctx) => {
+X2y2Processor.bind({ address: '0xB329e39Ebefd16f40d38f07643652cE17Ca5Bac1' }).onBlockInterval(async (_, ctx) => {
   const phase = (await ctx.contract.currentPhase()).toString()
   const reward = token.scaleDown(await ctx.contract.rewardPerBlockForStaking(), 18)
   rewardPerBlock.record(ctx, reward, { phase })

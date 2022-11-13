@@ -9,9 +9,6 @@ import { ProcessResult } from '../gen'
 import { BindInternalOptions, BindOptions } from './bind-options'
 import { PromiseOrVoid } from '../promise-or-void'
 import { Trace } from './trace'
-import { MoveResource } from 'aptos-sdk/src/generated'
-import { AptosResourceContext } from '../aptos'
-import { MoveResourcesWithVersionPayload } from '../aptos/aptos-processor'
 
 export class EventsHandler {
   filters: EventFilter[]
@@ -23,7 +20,7 @@ export class TraceHandler {
   handler: (trace: Trace) => Promise<ProcessResult>
 }
 
-class BlockHandlder {
+export class BlockHandlder {
   blockInterval?: number
   timeIntervalInMinutes?: number
   handler: (block: Block) => Promise<ProcessResult>
@@ -116,19 +113,19 @@ export abstract class BaseProcessor<
   }
 
   public onBlock(handler: (block: Block, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid) {
-    return this.onBlockInterval(handler, 1)
+    return this.onBlockInterval(handler)
   }
 
   public onBlockInterval(
     handler: (block: Block, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
-    blockInterval = 240
+    blockInterval = 1000
   ) {
     return this.onInterval(handler, undefined, blockInterval)
   }
 
   public onTimeInterval(
     handler: (block: Block, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
-    timeIntervalInMinutes = 60
+    timeIntervalInMinutes = 60 * 4
   ) {
     return this.onInterval(handler, timeIntervalInMinutes, undefined)
   }

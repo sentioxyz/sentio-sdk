@@ -16,7 +16,11 @@ export abstract class BaseProcessorTemplate<
 > {
   id: number
   binds = new Set<string>()
-  blockHandlers: ((block: Block, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid)[] = []
+  blockHandlers: {
+    handler: (block: Block, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid
+    blockInterval?: number
+    timeIntervalInMinutes?: number
+  }[] = []
   traceHandlers: {
     signature: string
     handler: (trace: Trace, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid
@@ -44,7 +48,7 @@ export abstract class BaseProcessorTemplate<
       processor.onEvent(eh.handler, eh.filter)
     }
     for (const bh of this.blockHandlers) {
-      processor.onBlock(bh)
+      processor.onInterval(bh.handler, bh.timeIntervalInMinutes, bh.blockInterval)
     }
 
     const instance: TemplateInstance = {
@@ -89,7 +93,29 @@ export abstract class BaseProcessorTemplate<
   }
 
   public onBlock(handler: (block: Block, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid) {
-    this.blockHandlers.push(handler)
+    return this.onBlockInterval(handler)
+  }
+
+  public onBlockInterval(
+    handler: (block: Block, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
+    blockInterval = 1000
+  ) {
+    return this.onInterval(handler, undefined, blockInterval)
+  }
+
+  public onTimeInterval(
+    handler: (block: Block, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
+    timeIntervalInMinutes = 240
+  ) {
+    return this.onInterval(handler, timeIntervalInMinutes, undefined)
+  }
+
+  public onInterval(
+    handler: (block: Block, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
+    timeInterval: number | undefined,
+    blockInterval: number | undefined
+  ) {
+    this.blockHandlers.push({ handler, timeIntervalInMinutes: timeInterval, blockInterval: blockInterval })
     return this
   }
 
