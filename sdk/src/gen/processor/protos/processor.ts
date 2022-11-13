@@ -150,6 +150,7 @@ export interface ProcessConfigResponse {
 export interface ContractConfig {
   contract: ContractInfo | undefined;
   blockConfigs: BlockHandlerConfig[];
+  intervalConfigs: OnIntervalConfig[];
   logConfigs: LogHandlerConfig[];
   traceConfigs: TraceHandlerConfig[];
   aptosEventConfigs: AptosEventHandlerConfig[];
@@ -230,8 +231,8 @@ export interface AccountConfig {
   chainId: string;
   address: string;
   startBlock: Long;
-  onIntervalConfigs: OnIntervalConfig[];
-  onAptosIntervalConfigs: AptosOnIntervalConfig[];
+  intervalConfigs: OnIntervalConfig[];
+  aptosIntervalConfigs: AptosOnIntervalConfig[];
 }
 
 export interface OnIntervalConfig {
@@ -759,6 +760,7 @@ function createBaseContractConfig(): ContractConfig {
   return {
     contract: undefined,
     blockConfigs: [],
+    intervalConfigs: [],
     logConfigs: [],
     traceConfigs: [],
     aptosEventConfigs: [],
@@ -780,6 +782,9 @@ export const ContractConfig = {
     }
     for (const v of message.blockConfigs) {
       BlockHandlerConfig.encode(v!, writer.uint32(58).fork()).ldelim();
+    }
+    for (const v of message.intervalConfigs) {
+      OnIntervalConfig.encode(v!, writer.uint32(90).fork()).ldelim();
     }
     for (const v of message.logConfigs) {
       LogHandlerConfig.encode(v!, writer.uint32(26).fork()).ldelim();
@@ -824,6 +829,11 @@ export const ContractConfig = {
         case 7:
           message.blockConfigs.push(
             BlockHandlerConfig.decode(reader, reader.uint32())
+          );
+          break;
+        case 11:
+          message.intervalConfigs.push(
+            OnIntervalConfig.decode(reader, reader.uint32())
           );
           break;
         case 3:
@@ -877,6 +887,9 @@ export const ContractConfig = {
       blockConfigs: Array.isArray(object?.blockConfigs)
         ? object.blockConfigs.map((e: any) => BlockHandlerConfig.fromJSON(e))
         : [],
+      intervalConfigs: Array.isArray(object?.intervalConfigs)
+        ? object.intervalConfigs.map((e: any) => OnIntervalConfig.fromJSON(e))
+        : [],
       logConfigs: Array.isArray(object?.logConfigs)
         ? object.logConfigs.map((e: any) => LogHandlerConfig.fromJSON(e))
         : [],
@@ -920,6 +933,13 @@ export const ContractConfig = {
       );
     } else {
       obj.blockConfigs = [];
+    }
+    if (message.intervalConfigs) {
+      obj.intervalConfigs = message.intervalConfigs.map((e) =>
+        e ? OnIntervalConfig.toJSON(e) : undefined
+      );
+    } else {
+      obj.intervalConfigs = [];
     }
     if (message.logConfigs) {
       obj.logConfigs = message.logConfigs.map((e) =>
@@ -970,6 +990,8 @@ export const ContractConfig = {
         : undefined;
     message.blockConfigs =
       object.blockConfigs?.map((e) => BlockHandlerConfig.fromPartial(e)) || [];
+    message.intervalConfigs =
+      object.intervalConfigs?.map((e) => OnIntervalConfig.fromPartial(e)) || [];
     message.logConfigs =
       object.logConfigs?.map((e) => LogHandlerConfig.fromPartial(e)) || [];
     message.traceConfigs =
@@ -1427,8 +1449,8 @@ function createBaseAccountConfig(): AccountConfig {
     chainId: "",
     address: "",
     startBlock: Long.UZERO,
-    onIntervalConfigs: [],
-    onAptosIntervalConfigs: [],
+    intervalConfigs: [],
+    aptosIntervalConfigs: [],
   };
 }
 
@@ -1446,10 +1468,10 @@ export const AccountConfig = {
     if (!message.startBlock.isZero()) {
       writer.uint32(24).uint64(message.startBlock);
     }
-    for (const v of message.onIntervalConfigs) {
+    for (const v of message.intervalConfigs) {
       OnIntervalConfig.encode(v!, writer.uint32(34).fork()).ldelim();
     }
-    for (const v of message.onAptosIntervalConfigs) {
+    for (const v of message.aptosIntervalConfigs) {
       AptosOnIntervalConfig.encode(v!, writer.uint32(42).fork()).ldelim();
     }
     return writer;
@@ -1472,12 +1494,12 @@ export const AccountConfig = {
           message.startBlock = reader.uint64() as Long;
           break;
         case 4:
-          message.onIntervalConfigs.push(
+          message.intervalConfigs.push(
             OnIntervalConfig.decode(reader, reader.uint32())
           );
           break;
         case 5:
-          message.onAptosIntervalConfigs.push(
+          message.aptosIntervalConfigs.push(
             AptosOnIntervalConfig.decode(reader, reader.uint32())
           );
           break;
@@ -1496,11 +1518,11 @@ export const AccountConfig = {
       startBlock: isSet(object.startBlock)
         ? Long.fromValue(object.startBlock)
         : Long.UZERO,
-      onIntervalConfigs: Array.isArray(object?.onIntervalConfigs)
-        ? object.onIntervalConfigs.map((e: any) => OnIntervalConfig.fromJSON(e))
+      intervalConfigs: Array.isArray(object?.intervalConfigs)
+        ? object.intervalConfigs.map((e: any) => OnIntervalConfig.fromJSON(e))
         : [],
-      onAptosIntervalConfigs: Array.isArray(object?.onAptosIntervalConfigs)
-        ? object.onAptosIntervalConfigs.map((e: any) =>
+      aptosIntervalConfigs: Array.isArray(object?.aptosIntervalConfigs)
+        ? object.aptosIntervalConfigs.map((e: any) =>
             AptosOnIntervalConfig.fromJSON(e)
           )
         : [],
@@ -1513,19 +1535,19 @@ export const AccountConfig = {
     message.address !== undefined && (obj.address = message.address);
     message.startBlock !== undefined &&
       (obj.startBlock = (message.startBlock || Long.UZERO).toString());
-    if (message.onIntervalConfigs) {
-      obj.onIntervalConfigs = message.onIntervalConfigs.map((e) =>
+    if (message.intervalConfigs) {
+      obj.intervalConfigs = message.intervalConfigs.map((e) =>
         e ? OnIntervalConfig.toJSON(e) : undefined
       );
     } else {
-      obj.onIntervalConfigs = [];
+      obj.intervalConfigs = [];
     }
-    if (message.onAptosIntervalConfigs) {
-      obj.onAptosIntervalConfigs = message.onAptosIntervalConfigs.map((e) =>
+    if (message.aptosIntervalConfigs) {
+      obj.aptosIntervalConfigs = message.aptosIntervalConfigs.map((e) =>
         e ? AptosOnIntervalConfig.toJSON(e) : undefined
       );
     } else {
-      obj.onAptosIntervalConfigs = [];
+      obj.aptosIntervalConfigs = [];
     }
     return obj;
   },
@@ -1538,11 +1560,10 @@ export const AccountConfig = {
       object.startBlock !== undefined && object.startBlock !== null
         ? Long.fromValue(object.startBlock)
         : Long.UZERO;
-    message.onIntervalConfigs =
-      object.onIntervalConfigs?.map((e) => OnIntervalConfig.fromPartial(e)) ||
-      [];
-    message.onAptosIntervalConfigs =
-      object.onAptosIntervalConfigs?.map((e) =>
+    message.intervalConfigs =
+      object.intervalConfigs?.map((e) => OnIntervalConfig.fromPartial(e)) || [];
+    message.aptosIntervalConfigs =
+      object.aptosIntervalConfigs?.map((e) =>
         AptosOnIntervalConfig.fromPartial(e)
       ) || [];
     return message;

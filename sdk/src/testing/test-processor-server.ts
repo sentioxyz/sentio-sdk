@@ -231,7 +231,7 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
         continue
       }
 
-      for (const config of contract.blockConfigs) {
+      for (const config of contract.intervalConfigs) {
         binding.handlerIds.push(config.handlerId)
       }
     }

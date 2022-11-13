@@ -141,6 +141,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
           abi: '',
         },
         blockConfigs: [],
+        intervalConfigs: [],
         logConfigs: [],
         traceConfigs: [],
         startBlock: processor.config.startBlock,
@@ -155,10 +156,12 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
 
       // Step 1. Prepare all the block handlers
       for (const blockHandler of processor.blockHandlers) {
-        const handlerId = this.blockHandlers.push(blockHandler) - 1
+        const handlerId = this.blockHandlers.push(blockHandler.handler) - 1
         // TODO wrap the block handler into one
 
-        contractConfig.blockConfigs.push({
+        contractConfig.intervalConfigs.push({
+          slot: blockHandler.blockInterval || 1,
+          minutes: blockHandler.timeIntervalInMinutes || 0,
           handlerId: handlerId,
         })
       }
@@ -220,6 +223,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         blockConfigs: [],
         logConfigs: [],
         traceConfigs: [],
+        intervalConfigs: [],
         startBlock: solanaProcessor.config.startSlot,
         endBlock: DEFAULT_MAX_BLOCK,
         instructionConfig: {
@@ -245,6 +249,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         },
         blockConfigs: [],
         logConfigs: [],
+        intervalConfigs: [],
         traceConfigs: [],
         startBlock: suiProcessor.config.startSeqNumber,
         endBlock: DEFAULT_MAX_BLOCK,
@@ -266,6 +271,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
           abi: '',
         },
         blockConfigs: [],
+        intervalConfigs: [],
         logConfigs: [],
         traceConfigs: [],
         startBlock: Long.fromString(aptosProcessor.config.startVersion.toString()),
@@ -313,12 +319,12 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         address: aptosProcessor.config.address,
         chainId: aptosProcessor.getChainId(),
         startBlock: Long.fromValue(aptosProcessor.config.startVersion.toString()),
-        onAptosIntervalConfigs: [],
-        onIntervalConfigs: [],
+        aptosIntervalConfigs: [],
+        intervalConfigs: [],
       }
       for (const handler of aptosProcessor.resourcesHandlers) {
         const handlerId = this.aptosResourceHandlers.push(handler.handler) - 1
-        accountConfig.onAptosIntervalConfigs.push({
+        accountConfig.aptosIntervalConfigs.push({
           intervalConfig: {
             handlerId: handlerId,
             minutes: handler.timeIntervalInMinutes || 0,

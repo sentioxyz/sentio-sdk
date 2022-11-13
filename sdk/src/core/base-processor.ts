@@ -9,6 +9,9 @@ import { ProcessResult } from '../gen'
 import { BindInternalOptions, BindOptions } from './bind-options'
 import { PromiseOrVoid } from '../promise-or-void'
 import { Trace } from './trace'
+import { MoveResource } from 'aptos-sdk/src/generated'
+import { AptosResourceContext } from '../aptos'
+import { MoveResourcesWithVersionPayload } from '../aptos/aptos-processor'
 
 export class EventsHandler {
   filters: EventFilter[]
@@ -20,11 +23,17 @@ export class TraceHandler {
   handler: (trace: Trace) => Promise<ProcessResult>
 }
 
+class BlockHandlder {
+  blockInterval?: number
+  timeIntervalInMinutes?: number
+  handler: (block: Block) => Promise<ProcessResult>
+}
+
 export abstract class BaseProcessor<
   TContract extends BaseContract,
   TBoundContractView extends BoundContractView<TContract, ContractView<TContract>>
 > {
-  blockHandlers: ((block: Block) => Promise<ProcessResult>)[] = []
+  blockHandlers: BlockHandlder[] = []
   eventHandlers: EventsHandler[] = []
   traceHandlers: TraceHandler[] = []
 
@@ -107,20 +116,46 @@ export abstract class BaseProcessor<
   }
 
   public onBlock(handler: (block: Block, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid) {
+    return this.onBlockInterval(handler, 1)
+  }
+
+  public onBlockInterval(
+    handler: (block: Block, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
+    blockInterval = 240
+  ) {
+    return this.onInterval(handler, undefined, blockInterval)
+  }
+
+  public onTimeInterval(
+    handler: (block: Block, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
+    timeIntervalInMinutes = 60
+  ) {
+    return this.onInterval(handler, timeIntervalInMinutes, undefined)
+  }
+
+  public onInterval(
+    handler: (block: Block, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
+    timeInterval: number | undefined,
+    blockInterval: number | undefined
+  ) {
     const chainId = this.getChainId()
     const contractView = this.CreateBoundContractView()
     const contractName = this.config.name
 
-    this.blockHandlers.push(async function (block: Block) {
-      const ctx = new ContractContext<TContract, TBoundContractView>(
-        contractName,
-        contractView,
-        chainId,
-        block,
-        undefined
-      )
-      await handler(block, ctx)
-      return ctx.getProcessResult()
+    this.blockHandlers.push({
+      handler: async function (block: Block) {
+        const ctx = new ContractContext<TContract, TBoundContractView>(
+          contractName,
+          contractView,
+          chainId,
+          block,
+          undefined
+        )
+        await handler(block, ctx)
+        return ctx.getProcessResult()
+      },
+      timeIntervalInMinutes: timeInterval,
+      blockInterval: blockInterval,
     })
     return this
   }

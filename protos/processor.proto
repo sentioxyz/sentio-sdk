@@ -59,7 +59,8 @@ message ProcessConfigResponse {
 
 message ContractConfig {
   ContractInfo contract = 1;
-  repeated BlockHandlerConfig block_configs = 7;
+  repeated BlockHandlerConfig block_configs = 7; // TODO deprecate this
+  repeated OnIntervalConfig interval_configs = 11;
   repeated LogHandlerConfig log_configs = 3;
   repeated TraceHandlerConfig trace_configs = 2;
   repeated AptosEventHandlerConfig aptos_event_configs = 9;
@@ -114,8 +115,8 @@ message AccountConfig {
   string address = 2;
   uint64 start_block = 3;
 
-  repeated OnIntervalConfig on_interval_configs = 4;
-  repeated AptosOnIntervalConfig on_aptos_interval_configs = 5;
+  repeated OnIntervalConfig interval_configs = 4;
+  repeated AptosOnIntervalConfig aptos_interval_configs = 5;
   // TODO add tx handler config related to the account
 }
 
