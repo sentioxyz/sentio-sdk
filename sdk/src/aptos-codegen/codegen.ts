@@ -143,7 +143,7 @@ export class AccountCodegen {
     const info = this.loader.accountImports.get(address)
 
     if (info) {
-      for (const [account, moduleImported] of info.imports.entries()) {
+      for (const [account] of info.imports.entries()) {
         // Remap to user's filename if possible, TODO codepath not well tested
         let tsAccountModule = './' + (this.loader.accountImports.get(account)?.moduleName || account)
         if (isFrameworkAccount(account) && !isFrameworkAccount(address)) {
@@ -154,12 +154,9 @@ export class AccountCodegen {
           }
           tsAccountModule = `@sentio/sdk/${srcRoot}/builtin/aptos/${account}`
         }
-        const items = Array.from(moduleImported)
-        moduleImports.push(`import { ${items.join(',')} } from "${tsAccountModule}"`)
+        moduleImports.push(`import * as _${account} from "${tsAccountModule}"`)
 
-        // Ideally we should use per module's load types, but it doesn't matter since we are loading the entire
-        // account modules anyway
-        items.forEach((m) => dependedAccounts.push(m))
+        dependedAccounts.push(account)
       }
     }
 
@@ -176,8 +173,8 @@ export class AccountCodegen {
     
     ${this.modules.map((m) => generateModule(m, this.config.network)).join('\n')}
     
-    function loadAllTypes(_r: aptos.TypeRegistry) {
-      ${dependedAccounts.map((m) => `${m}.loadTypes(_r)`).join('\n')}
+    export function loadAllTypes(_r: aptos.TypeRegistry) {
+      ${dependedAccounts.map((a) => `_${a}.loadAllTypes(_r)`).join('\n')}
 
       ${this.modules
         .map((m) => {
@@ -268,7 +265,7 @@ function generateStructs(module: MoveModule, struct: MoveStruct, events: Set<str
   const genericStringAny = generateStructTypeParameters(struct, true)
 
   const fields = struct.fields.map((field) => {
-    return `${field.name}: ${generateType(field.type)}`
+    return `${field.name}: ${generateType(field.type, module.address)}`
   })
 
   let eventPayload = ''
@@ -325,7 +322,7 @@ function generateCallArgsStructs(module: MoveModule, func: MoveFunction) {
   }
 
   const fields = getMeaningfulFunctionParams(func).map((param) => {
-    return `${generateType(param)}`
+    return `${generateType(param, module.address)}`
   })
 
   const camelFuncName = capitalizeFirstChar(camelize(func.name))

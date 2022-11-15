@@ -2,7 +2,7 @@ import { MoveModule } from 'aptos-sdk/src/generated'
 import { TypeDescriptor } from '../aptos/types'
 import { moduleQname, moduleQnameForType, SPLITTER, VECTOR_STR } from '../aptos/utils'
 
-function generateTypeForDescriptor(type: TypeDescriptor): string {
+function generateTypeForDescriptor(type: TypeDescriptor, currentAddress: string): string {
   // TODO &signer is defintely an address, but what if &OTHER_TYPE?
   if (type.qname.startsWith('&')) {
     return 'Address'
@@ -34,10 +34,10 @@ function generateTypeForDescriptor(type: TypeDescriptor): string {
     if (elementTypeQname.startsWith('T') && !elementTypeQname.includes(SPLITTER)) {
       return `${elementTypeQname}[] | string`
     }
-    return generateTypeForDescriptor(type.typeArgs[0]) + '[]'
+    return generateTypeForDescriptor(type.typeArgs[0], currentAddress) + '[]'
   }
 
-  const simpleName = generateSimpleType(type.qname)
+  const simpleName = generateSimpleType(type.qname, currentAddress)
   if (simpleName.length === 0) {
     console.error('unexpected error')
   }
@@ -46,18 +46,20 @@ function generateTypeForDescriptor(type: TypeDescriptor): string {
   }
   if (type.typeArgs.length > 0) {
     // return simpleName
-    return simpleName + '<' + type.typeArgs.map((t) => generateTypeForDescriptor(t)).join(',') + '>'
+    return simpleName + '<' + type.typeArgs.map((t) => generateTypeForDescriptor(t, currentAddress)).join(',') + '>'
   }
   return simpleName
 }
 
-function generateSimpleType(type: string): string {
+function generateSimpleType(type: string, currentAddress: string): string {
   const parts = type.split(SPLITTER)
   if (parts.length < 2) {
     return parts[0]
   }
-
-  return parts.slice(1).join('.')
+  if (parts[0] === currentAddress) {
+    return parts.slice(1).join('.')
+  }
+  return '_' + parts.join('.')
 }
 
 export function parseMoveType(type: string): TypeDescriptor {
@@ -127,8 +129,8 @@ export function parseMoveType(type: string): TypeDescriptor {
 }
 
 // TODO ctx need to have type parameters
-export function generateType(type: string, ctx?: any): string {
-  return generateTypeForDescriptor(parseMoveType(type))
+export function generateType(type: string, currentAddress: string): string {
+  return generateTypeForDescriptor(parseMoveType(type), currentAddress)
 }
 
 export class AccountModulesImportInfo {
