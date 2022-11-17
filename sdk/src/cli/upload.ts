@@ -13,12 +13,13 @@ import { getCliVersion } from './utils'
 
 async function createProject(options: SentioProjectConfig, apiKey: string) {
   const url = new URL('/api/v1/projects', options.host)
+  const [ownerName, slug] = options.project.includes('/') ? options.project.split('/') : [undefined, options.project]
   return fetch(url, {
     method: 'POST',
     headers: {
       'api-key': apiKey,
     },
-    body: JSON.stringify({ slug: options.project, visibility: 'PRIVATE' }),
+    body: JSON.stringify({ slug, ownerName, visibility: 'PRIVATE' }),
   })
 }
 
