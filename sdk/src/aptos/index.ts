@@ -5,3 +5,4 @@ export type { FunctionNameAndCallFilter, EventFilter, CallFilter, ArgumentsFilte
 export { AptosBaseProcessor, AptosAccountProcessor } from './aptos-processor'
 export { AptosContext, AptosResourceContext } from './context'
 export { AptosBindOptions, AptosNetwork, getRpcClient } from './network'
+export * from './api'

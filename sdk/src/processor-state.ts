@@ -11,7 +11,6 @@ import { AptosBaseProcessor } from './aptos'
 
 import { BaseContract } from 'ethers'
 import { TemplateInstance } from './gen'
-import { Provider } from '@ethersproject/providers'
 import { EventTracker } from './core'
 import { Metric } from './core/meter'
 import { AptosAccountProcessor } from './aptos/aptos-processor'
@@ -24,8 +23,6 @@ export class ProcessorState {
   processors: BaseProcessor<BaseContract, BoundContractView<BaseContract, any>>[] = []
   // from abiName_options to contracts
   processorMap = new Map<string, BaseProcessor<any, any>>()
-  // evm providers
-  providers = new Map<number, Provider>()
   // evm processor templates
   templates: BaseProcessorTemplate<BaseContract, BoundContractView<BaseContract, any>>[] = []
   // evm processor template instances spec

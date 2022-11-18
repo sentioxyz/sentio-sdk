@@ -11,8 +11,10 @@ import fs from 'fs-extra'
 import { ProcessorState } from './processor-state'
 import { load } from './loader'
 import { CompressionAlgorithms } from '@grpc/grpc-js/build/src/compression-algorithms'
+import { Endpoints } from './endpoints'
 
 global.PROCESSOR_STATE = new ProcessorState()
+global.ENDPOINTS = new Endpoints()
 
 const optionDefinitions = [
   { name: 'target', type: String, defaultOption: true },
@@ -25,6 +27,8 @@ const optionDefinitions = [
     type: String,
     defaultValue: 'chains-config.json',
   },
+  { name: 'chainquery-api', type: String, defaultValue: '' },
+  { name: 'pricefeed-api', type: String, defaultValue: '' },
 ]
 
 const options = commandLineArgs(optionDefinitions, { partial: true })
@@ -35,6 +39,8 @@ const fullPath = path.resolve(options['chains-config'])
 const chainsConfig = fs.readJsonSync(fullPath)
 
 setProvider(chainsConfig, options.concurrency, options['use-chainserver'])
+globalThis.ENDPOINTS.priceFeedAPI = options['pricefeed-api']
+globalThis.ENDPOINTS.chainQueryAPI = options['chainquery-api']
 
 console.log('Start Server', options)
 

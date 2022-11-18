@@ -24,11 +24,15 @@ import { CHAIN_MAP } from '../utils/chain'
 import { Block, Log } from '@ethersproject/abstract-provider'
 import Long from 'long'
 import { getNetwork, Networkish } from '@ethersproject/providers'
+import { Endpoints } from '../endpoints'
 
 export const TEST_CONTEXT: CallContext = <CallContext>{}
 
-function cleanTest() {
+export function cleanTest() {
   global.PROCESSOR_STATE = new ProcessorState()
+  if (!global.ENDPOINTS) {
+    global.ENDPOINTS = new Endpoints()
+  }
 }
 
 export class TestProcessorServer implements ProcessorServiceImplementation {

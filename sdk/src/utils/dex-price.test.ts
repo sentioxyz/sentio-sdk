@@ -3,9 +3,12 @@ import { ProcessorState } from '@sentio/sdk'
 import { loadTestProvidersFromEnv } from '../testing/test-provider'
 
 import { expect } from 'chai'
+import { Endpoints } from '../endpoints'
 
 describe('dex price tests', () => {
   global.PROCESSOR_STATE = new ProcessorState()
+  global.ENDPOINTS = new Endpoints()
+
   const haveProviders = loadTestProvidersFromEnv(['1', '5'])
 
   const testIf = haveProviders ? test : test.skip

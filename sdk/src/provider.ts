@@ -12,23 +12,23 @@ export function getProvider(networkish?: Networkish): Provider {
   }
   const network = getNetwork(networkish)
 
-  if (!global.PROCESSOR_STATE.providers) {
+  if (!global.ENDPOINTS.providers) {
     throw Error('Provider not set')
   }
-  const value = global.PROCESSOR_STATE.providers.get(network.chainId)
+  const value = global.ENDPOINTS.providers.get(network.chainId)
   if (value === undefined) {
     throw Error(
       'Provider not found for chain ' +
         network.chainId +
         ', configured chains: ' +
-        [...global.PROCESSOR_STATE.providers.keys()].join(' ')
+        [...global.ENDPOINTS.providers.keys()].join(' ')
     )
   }
   return value
 }
 
 export function setProvider(config: Record<string, ChainConfig>, concurrency = 4, useChainServer = false) {
-  global.PROCESSOR_STATE.providers = new Map<number, Provider>()
+  globalThis.ENDPOINTS.providers = new Map<number, Provider>()
 
   for (const chainIdStr in config) {
     if (isNaN(Number.parseInt(chainIdStr))) {
@@ -56,7 +56,7 @@ export function setProvider(config: Record<string, ChainConfig>, concurrency = 4
     }
 
     const provider = new QueuedStaticJsonRpcProvider(rpcAddress, chainId, concurrency)
-    global.PROCESSOR_STATE.providers.set(chainId, provider)
+    global.ENDPOINTS.providers.set(chainId, provider)
   }
 }
 
