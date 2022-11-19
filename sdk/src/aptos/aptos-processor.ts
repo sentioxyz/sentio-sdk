@@ -1,17 +1,14 @@
 import { ProcessResult } from '../gen'
+
+import { TYPE_REGISTRY, TypeRegistry } from './type-registry'
+import { AptosBindOptions, AptosNetwork, getChainId } from './network'
 import {
-  AptosBindOptions,
-  AptosContext,
-  AptosNetwork,
+  MoveResource,
   Transaction_UserTransaction,
   TransactionPayload_EntryFunctionPayload,
-  TypeRegistry,
-} from '.'
-
-import { EventInstance, TYPE_REGISTRY } from './types'
-import { getChainId } from './network'
-import { MoveResource } from 'aptos-sdk/src/generated'
-import { AptosResourceContext } from './context'
+} from 'aptos-sdk/src/generated'
+import { AptosContext, AptosResourceContext } from './context'
+import { EventInstance } from './models'
 
 type IndexConfigure = {
   address: string

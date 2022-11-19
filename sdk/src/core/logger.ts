@@ -1,4 +1,4 @@
-import { BaseContext } from './context'
+import { BaseContext } from './base-context'
 import { DataDescriptor, LogLevel } from '../gen'
 import { DescriptorWithUsage } from './metadata'
 

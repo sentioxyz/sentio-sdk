@@ -1,6 +1,7 @@
 import { BigNumber } from 'ethers'
-import { BigDecimal, MetricValue } from '@sentio/sdk'
+import { BigDecimal } from '../core/big-decimal'
 import { Numberish } from '../core'
+import { MetricValue } from '../gen'
 
 export function toBigDecimal(n: BigNumber | bigint) {
   return new BigDecimal(n.toString())

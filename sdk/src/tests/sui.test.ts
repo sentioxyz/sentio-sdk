@@ -1,8 +1,9 @@
 import { expect } from 'chai'
 import Long from 'long'
 import { TextEncoder } from 'util'
-import { ProcessTransactionsRequest, SuiBaseProcessor, SuiBindOptions } from '..'
+import { SuiBaseProcessor, SuiBindOptions } from '../core'
 import { chain } from '../utils'
+import { ProcessTransactionsRequest } from '../gen'
 
 import { TestProcessorServer } from '../testing'
 

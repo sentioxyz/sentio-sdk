@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import { TextEncoder } from 'util'
-import { HandlerType, ProcessBindingsRequest } from '..'
+import { HandlerType, ProcessBindingsRequest } from '../gen'
 
 import { firstCounterValue, firstGaugeValue, TestProcessorServer } from '../testing'
 

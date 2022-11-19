@@ -2,9 +2,9 @@ import Long from 'long'
 import { DataDescriptor, RecordMetaData } from '../gen'
 import { Labels } from '../core/metadata'
 import { normalizeLabels } from '../core/meter'
-import { BaseContext } from '../core/context'
-import { AptosNetwork, Transaction_UserTransaction } from './'
-import { getChainId } from './network'
+import { BaseContext } from '../core/base-context'
+import { Transaction_UserTransaction } from 'aptos-sdk/src/generated'
+import { AptosNetwork, getChainId } from './network'
 
 export class AptosContext extends BaseContext {
   address: string

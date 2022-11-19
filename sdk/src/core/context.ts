@@ -1,36 +1,12 @@
 import { DataDescriptor, RecordMetaData, ProcessResult } from '../gen'
 import { BaseContract, EventFilter } from 'ethers'
 import { Block, Log } from '@ethersproject/abstract-provider'
-import { Meter, normalizeLabels } from './meter'
+import { normalizeLabels } from './meter'
 import Long from 'long'
 import { Trace } from './trace'
-import { Logger } from './logger'
 import { Labels } from './metadata'
 import { SOL_MAINMET_ID, SUI_DEVNET_ID } from '../utils/chain'
-
-export abstract class BaseContext {
-  meter: Meter
-  logger: Logger
-
-  res: ProcessResult = {
-    counters: [],
-    events: [],
-    exports: [],
-    gauges: [],
-    logs: [],
-  }
-
-  protected constructor() {
-    this.meter = new Meter(this)
-    this.logger = new Logger(this)
-  }
-
-  getProcessResult(): ProcessResult {
-    return this.res
-  }
-
-  abstract getMetaData(descriptor: DataDescriptor, labels: Labels): RecordMetaData
-}
+import { BaseContext } from './base-context'
 
 export abstract class EthContext extends BaseContext {
   chainId: number

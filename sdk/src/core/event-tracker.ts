@@ -1,5 +1,5 @@
-import { BaseContext } from './context'
-import { DataDescriptor, EventTrackingResult } from '@sentio/sdk'
+import { BaseContext } from './base-context'
+import { DataDescriptor, EventTrackingResult } from '../gen'
 
 export interface Event {
   // The unique identifier of main identity associate with an event

@@ -1,5 +1,5 @@
 import { MoveModule } from 'aptos-sdk/src/generated'
-import { TypeDescriptor } from '../aptos/types'
+import { parseMoveType, TypeDescriptor } from '../aptos/types'
 import { moduleQname, moduleQnameForType, SPLITTER, VECTOR_STR } from '../aptos/utils'
 
 function generateTypeForDescriptor(type: TypeDescriptor, currentAddress: string): string {
@@ -60,72 +60,6 @@ function generateSimpleType(type: string, currentAddress: string): string {
     return parts.slice(1).join('.')
   }
   return '_' + parts.join('.')
-}
-
-export function parseMoveType(type: string): TypeDescriptor {
-  // type = type.replace('&', '')
-
-  type = type.replaceAll('&mut ', '&')
-  type = type.replaceAll('mut ', '')
-
-  // TODO replace ' ' is not exactly safe, need to double check this
-  type = type.replaceAll(' ', '')
-
-  const stack: TypeDescriptor[] = [new TypeDescriptor('')]
-  let buffer = []
-
-  // xxx:asdf<g1<a,<c,d>>, b, g2<a,b>, e>
-  for (let i = 0; i < type.length; i++) {
-    const ch = type[i]
-    if (ch === '<') {
-      // const symbol = type.slice(symbolStart, i)
-      // symbolStart =
-      const symbol = buffer.join('')
-      buffer = []
-      stack[stack.length - 1].qname = symbol
-      stack.push(new TypeDescriptor(''))
-      continue
-    }
-    if (ch === '>') {
-      const typeParam = stack.pop()
-      if (!typeParam) {
-        throw Error('Uxpectecd stack size')
-      }
-      if (buffer.length > 0) {
-        typeParam.qname = buffer.join('')
-        buffer = []
-      }
-      stack[stack.length - 1].typeArgs.push(typeParam)
-      continue
-    }
-    if (ch === ',') {
-      const typeParam = stack.pop()
-      if (!typeParam) {
-        throw Error('Uxpectecd stack size')
-      }
-      if (buffer.length > 0) {
-        typeParam.qname = buffer.join('')
-        buffer = []
-      }
-
-      stack[stack.length - 1].typeArgs.push(typeParam)
-      // continue parse next param
-      stack.push(new TypeDescriptor(''))
-      continue
-    }
-
-    buffer.push(ch)
-  }
-
-  if (buffer.length > 0) {
-    stack[stack.length - 1].qname = buffer.join('')
-  }
-
-  const res = stack.pop()
-  if (!res || stack.length > 0) {
-    throw Error('Uxpectecd stack size')
-  }
-  return res
 }
 
 // TODO ctx need to have type parameters

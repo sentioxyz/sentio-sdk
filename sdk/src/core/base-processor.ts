@@ -1,7 +1,6 @@
-import { Event } from '@ethersproject/contracts'
 import { BytesLike } from '@ethersproject/bytes'
 import { Block, Log, getNetwork } from '@ethersproject/providers'
-import { BaseContract, EventFilter } from '@ethersproject/contracts'
+import { BaseContract, Event, EventFilter } from '@ethersproject/contracts'
 import Long from 'long'
 
 import { BoundContractView, ContractContext, ContractView } from './context'

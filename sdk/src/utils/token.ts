@@ -3,7 +3,7 @@ import { BigNumber } from '@ethersproject/bignumber'
 import { transformEtherError } from '../error'
 import { getERC20Contract } from '../builtin/erc20'
 import { getERC20BytesContract } from '../builtin/internal/erc20bytes_processor'
-import { BigDecimal } from '@sentio/sdk'
+import { BigDecimal } from '../core/big-decimal'
 import { toBigDecimal } from './conversion'
 import { utils } from 'ethers'
 

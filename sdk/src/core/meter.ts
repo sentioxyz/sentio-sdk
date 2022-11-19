@@ -1,4 +1,4 @@
-import { BaseContext } from './context'
+import { BaseContext } from './base-context'
 import { toMetricValue, Numberish } from './numberish'
 import { DescriptorWithUsage, Labels } from './metadata'
 import { DataDescriptor } from '../gen'

@@ -1,4 +1,4 @@
-import { TYPE_REGISTRY } from './types'
+import { TYPE_REGISTRY } from './type-registry'
 import { aptos_account } from '../builtin/aptos/0x1'
 
 describe('type decode', () => {

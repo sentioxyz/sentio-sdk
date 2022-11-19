@@ -1,46 +1,4 @@
-import {
-  Event,
-  MoveFunction,
-  MoveModule,
-  MoveStruct,
-  TransactionPayload_EntryFunctionPayload,
-  MoveResource,
-} from 'aptos-sdk/src/generated'
-import { getMeaningfulFunctionParams, moduleQname, SPLITTER, VECTOR_STR } from './utils'
-import { parseMoveType } from '../aptos-codegen/typegen'
-
-export type EventInstance = Event & {
-  version: string
-}
-
-export type TypedEventInstance<T> = EventInstance & {
-  // Typed data converted from ABI
-  // undefined if there is converting error, usually because the ABI/data
-  // mismatch
-  data_typed: T
-
-  type_arguments: string[]
-}
-
-// Don't use intermedidate type to make IDE happier
-export type TypedEntryFunctionPayload<T extends Array<any>> = TransactionPayload_EntryFunctionPayload & {
-  arguments_typed: T
-}
-
-export type TypedMoveResource<T> = MoveResource & {
-  data_typed: T
-  type_arguments: string[]
-}
-
-interface StructWithTag {
-  type: string
-  data: any
-}
-
-interface StructWithType<T> extends StructWithTag {
-  data_typed: T
-  type_arguments: string[]
-}
+import { SPLITTER, VECTOR_STR } from './utils'
 
 export class TypeDescriptor {
   // type: string
@@ -124,172 +82,68 @@ export class TypeDescriptor {
   }
 }
 
-export class TypeRegistry {
-  moduleMapping = new Map<string, MoveModule>()
-  typeMapping = new Map<string, MoveStruct>()
-  funcMapping = new Map<string, MoveFunction>()
+export function parseMoveType(type: string): TypeDescriptor {
+  // type = type.replace('&', '')
 
-  contains(account: string, name: string) {
-    return this.moduleMapping.has(account + '::' + name)
-  }
+  type = type.replaceAll('&mut ', '&')
+  type = type.replaceAll('mut ', '')
 
-  load(module: MoveModule) {
-    if (this.contains(module.address, module.name)) {
-      return
+  // TODO replace ' ' is not exactly safe, need to double check this
+  type = type.replaceAll(' ', '')
+
+  const stack: TypeDescriptor[] = [new TypeDescriptor('')]
+  let buffer = []
+
+  // xxx:asdf<g1<a,<c,d>>, b, g2<a,b>, e>
+  for (let i = 0; i < type.length; i++) {
+    const ch = type[i]
+    if (ch === '<') {
+      // const symbol = type.slice(symbolStart, i)
+      // symbolStart =
+      const symbol = buffer.join('')
+      buffer = []
+      stack[stack.length - 1].qname = symbol
+      stack.push(new TypeDescriptor(''))
+      continue
     }
-    this.moduleMapping.set(moduleQname(module), module)
-
-    for (const struct of module.structs) {
-      // TODO move to util
-      const key = [module.address, module.name, struct.name].join(SPLITTER)
-      this.typeMapping.set(key, struct)
-    }
-
-    for (const func of module.exposed_functions) {
-      if (!func.is_entry) {
-        continue
+    if (ch === '>') {
+      const typeParam = stack.pop()
+      if (!typeParam) {
+        throw Error('Uxpectecd stack size')
       }
-      const key = [module.address, module.name, func.name].join(SPLITTER)
-      this.funcMapping.set(key, func)
+      if (buffer.length > 0) {
+        typeParam.qname = buffer.join('')
+        buffer = []
+      }
+      stack[stack.length - 1].typeArgs.push(typeParam)
+      continue
     }
-  }
-
-  getMoveStruct(type: string): MoveStruct {
-    const struct = this.typeMapping.get(type)
-    if (!struct) {
-      throw new Error('Failed to load type' + type)
-    }
-    return struct
-  }
-
-  getMoveFunction(type: string): MoveFunction {
-    const func = this.funcMapping.get(type)
-    if (!func) {
-      throw new Error('Failed to load function' + type)
-    }
-    return func
-  }
-
-  decode(data: any, type: TypeDescriptor): any {
-    // process simple type
-    if (type.qname.startsWith('&')) {
-      return data
-    }
-    switch (type.qname) {
-      case 'signer': // TODO check this
-      case 'address':
-      case '0x1::string::String':
-      case 'bool':
-      case 'u8':
-      case 'u16':
-      case 'u32':
-        return data
-      case 'u64':
-      case 'u128':
-        return BigInt(data)
-    }
-
-    // process vector
-    if (type.qname === VECTOR_STR) {
-      // vector<u8> as hex string
-      if (type.typeArgs[0].qname === 'u8') {
-        return data
+    if (ch === ',') {
+      const typeParam = stack.pop()
+      if (!typeParam) {
+        throw Error('Uxpectecd stack size')
+      }
+      if (buffer.length > 0) {
+        typeParam.qname = buffer.join('')
+        buffer = []
       }
 
-      const res = []
-      for (const entry of data) {
-        res.push(this.decode(entry, type.typeArgs[0]))
-      }
-      return res
+      stack[stack.length - 1].typeArgs.push(typeParam)
+      // continue parse next param
+      stack.push(new TypeDescriptor(''))
+      continue
     }
 
-    // Process complex type
-    const struct = this.getMoveStruct(type.qname)
-
-    const typeCtx = new Map<string, TypeDescriptor>()
-    for (const [idx, typeArg] of type.typeArgs.entries()) {
-      typeCtx.set('T' + idx, typeArg)
-    }
-
-    const typedData: any = {}
-
-    for (const field of struct.fields) {
-      let filedType = parseMoveType(field.type)
-      filedType = filedType.applyTypeArgs(typeCtx)
-      const value = this.decode(data[field.name], filedType)
-      typedData[field.name] = value
-    }
-    return typedData
+    buffer.push(ch)
   }
 
-  decodeEvent<T>(event: Event): TypedEventInstance<T> | undefined {
-    return this.decodedInternal<T>(event) as TypedEventInstance<T>
-  }
-  filterAndDecodeEvents<T>(typeQname: string, resources: Event[]): TypedEventInstance<T>[] {
-    return this.filterAndDecodeInternal(typeQname, resources) as TypedEventInstance<T>[]
-  }
-  decodeResource<T>(res: MoveResource): TypedMoveResource<T> | undefined {
-    return this.decodedInternal<T>(res)
-  }
-  filterAndDecodeResources<T>(typeQname: string, resources: MoveResource[]): TypedMoveResource<T>[] {
-    return this.filterAndDecodeInternal(typeQname, resources)
+  if (buffer.length > 0) {
+    stack[stack.length - 1].qname = buffer.join('')
   }
 
-  private filterAndDecodeInternal<T>(typeQname: string, structs: StructWithTag[]): StructWithType<T>[] {
-    if (!structs) {
-      return []
-    }
-    const results: StructWithType<T>[] = []
-    for (const resource of structs) {
-      if (resource.type.split('<')[0] !== typeQname) {
-        continue
-      }
-      const result = this.decodedInternal(resource)
-      if (result) {
-        results.push(result as StructWithType<T>)
-      }
-    }
-    return results
+  const res = stack.pop()
+  if (!res || stack.length > 0) {
+    throw Error('Uxpectecd stack size')
   }
-
-  private decodedInternal<T>(typeStruct: StructWithTag): StructWithType<T> | undefined {
-    const registry = TYPE_REGISTRY
-    // this.loadTypes(registry)
-    // TODO check if module is not loaded
-
-    const typeDescriptor = parseMoveType(typeStruct.type)
-    const typeArguments = typeDescriptor.typeArgs.map((t) => t.getSignature())
-
-    let dataTyped = undefined
-    try {
-      dataTyped = registry.decode(typeStruct.data, typeDescriptor)
-    } catch (e) {
-      console.error('Decoding error for ', JSON.stringify(typeStruct), e)
-      return undefined
-    }
-    return { ...typeStruct, data_typed: dataTyped, type_arguments: typeArguments } as StructWithType<T>
-  }
-
-  decodeFunctionPayload(payload: TransactionPayload_EntryFunctionPayload): TransactionPayload_EntryFunctionPayload {
-    const registry = TYPE_REGISTRY
-    // this.loadTypes(registry)
-    const argumentsTyped: any[] = []
-
-    try {
-      const func = registry.getMoveFunction(payload.function)
-      const params = getMeaningfulFunctionParams(func)
-      for (const [idx, arg] of payload.arguments.entries()) {
-        // TODO consider apply payload.type_arguments, but this might be hard since we don't code gen for them
-        const argType = parseMoveType(params[idx])
-        argumentsTyped.push(registry.decode(arg, argType))
-      }
-    } catch (e) {
-      console.error('Decoding error for ', JSON.stringify(payload), e)
-      return payload
-    }
-
-    return { ...payload, arguments_typed: argumentsTyped } as TypedEntryFunctionPayload<any>
-  }
+  return res
 }
-
-export const TYPE_REGISTRY = new TypeRegistry()

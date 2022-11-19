@@ -2,12 +2,10 @@
 
 import { expect } from 'chai'
 
-import { HandlerType } from '..'
-
 import { TestProcessorServer, firstCounterValue, firstGaugeValue } from '../testing'
 import { BigNumber } from 'ethers'
 import { mockTransferLog } from '../builtin/erc20/test-utils'
-import { Trace } from '@sentio/sdk'
+import { HandlerType } from '../gen'
 
 describe('Test Basic Examples', () => {
   const service = new TestProcessorServer(() => require('./erc20'))
@@ -90,7 +88,7 @@ describe('Test Basic Examples', () => {
     expect(res?.counters).length(1)
   })
 
-  const traceData: Trace = {
+  const traceData = {
     action: {
       from: '0x80009ff8154bd5653c6dda2fa5f5053e5a5c1a91',
       callType: 'call',

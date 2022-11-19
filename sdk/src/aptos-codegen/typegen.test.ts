@@ -1,5 +1,5 @@
-import { parseMoveType } from './typegen'
 import { assert } from 'chai'
+import { parseMoveType } from '../aptos/types'
 
 describe('type gen', () => {
   test('type gen for generic', async () => {

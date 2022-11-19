@@ -2,10 +2,11 @@ import fs from 'fs'
 import path from 'path'
 import prettier from 'prettier'
 import { MoveFunction, MoveModule, MoveModuleBytecode, MoveStruct } from 'aptos-sdk/src/generated'
-import { AccountModulesImportInfo, AccountRegister, generateType, parseMoveType } from './typegen'
+import { AccountModulesImportInfo, AccountRegister, generateType } from './typegen'
 import { getMeaningfulFunctionParams, isFrameworkAccount, moduleQname, SPLITTER } from '../aptos/utils'
 import chalk from 'chalk'
 import { AptosNetwork, getChainName, getRpcClient } from '../aptos/network'
+import { parseMoveType } from '../aptos/types'
 
 export async function generate(srcDir: string, outputDir: string) {
   await generateForNetwork(srcDir, outputDir, AptosNetwork.MAIN_NET)

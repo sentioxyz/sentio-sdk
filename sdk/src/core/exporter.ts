@@ -1,4 +1,4 @@
-import { BaseContext } from './context'
+import { BaseContext } from './base-context'
 import { DataDescriptor, ExportResult } from '@sentio/sdk'
 
 export type Export = Record<string, any>

@@ -9,14 +9,10 @@ import {
   ProcessConfigRequest,
   ProcessConfigResponse,
   ProcessInstructionsRequest,
-  ProcessorServiceImpl,
   ProcessorServiceImplementation,
-  ProcessorState,
   ProcessTransactionsRequest,
-  setProvider,
   StartRequest,
-  Trace,
-} from '@sentio/sdk'
+} from '../gen'
 import { CallContext } from 'nice-grpc-common'
 import { Empty } from '../gen/google/protobuf/empty'
 import { ChainConfig } from '../chain-config'
@@ -25,6 +21,10 @@ import { Block, Log } from '@ethersproject/abstract-provider'
 import Long from 'long'
 import { getNetwork, Networkish } from '@ethersproject/providers'
 import { Endpoints } from '../endpoints'
+import { ProcessorState } from '../processor-state'
+import { ProcessorServiceImpl } from '../service'
+import { Trace } from '../core/trace'
+import { setProvider } from '../provider'
 
 export const TEST_CONTEXT: CallContext = <CallContext>{}
 

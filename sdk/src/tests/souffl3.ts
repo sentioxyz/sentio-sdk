@@ -1,9 +1,9 @@
 import { SouffleChefCampaign, CandyMachine } from './types/aptos/souffle'
 import { token } from '../builtin/aptos/0x3'
 import { aptos_account, voting } from '../builtin/aptos/0x1'
-import { TYPE_REGISTRY } from '../aptos/types'
 import { AccountEventTracker } from '@sentio/sdk'
 import { AptosAccountProcessor } from '../aptos/aptos-processor'
+import { TYPE_REGISTRY } from '../aptos'
 
 const accountTracker = AccountEventTracker.register('pull')
 

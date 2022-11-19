@@ -27,8 +27,8 @@ const optionDefinitions = [
     type: String,
     defaultValue: 'chains-config.json',
   },
-  { name: 'chainquery-api', type: String, defaultValue: '' },
-  { name: 'pricefeed-api', type: String, defaultValue: '' },
+  { name: 'chainquery-server', type: String, defaultValue: '' },
+  { name: 'pricefeed-server', type: String, defaultValue: '' },
 ]
 
 const options = commandLineArgs(optionDefinitions, { partial: true })
@@ -39,8 +39,8 @@ const fullPath = path.resolve(options['chains-config'])
 const chainsConfig = fs.readJsonSync(fullPath)
 
 setProvider(chainsConfig, options.concurrency, options['use-chainserver'])
-globalThis.ENDPOINTS.priceFeedAPI = options['pricefeed-api']
-globalThis.ENDPOINTS.chainQueryAPI = options['chainquery-api']
+globalThis.ENDPOINTS.chainQueryAPI = options['chainquery-server']
+globalThis.ENDPOINTS.priceFeedAPI = options['pricefeed-server']
 
 console.log('Start Server', options)
 

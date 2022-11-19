@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 
-import { StartRequest } from '..'
+import { StartRequest } from '../gen'
 import Long from 'long'
 import { TestProcessorServer } from '../testing'
 import { ERC20Processor, ERC20ProcessorTemplate } from '../builtin/internal/erc20_processor'
