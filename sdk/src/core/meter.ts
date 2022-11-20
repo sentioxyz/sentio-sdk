@@ -56,6 +56,13 @@ export class Metric extends DescriptorWithUsage {
 }
 
 export class Counter extends Metric {
+  static register(name: string, option?: MetricDescriptorOptions): Counter {
+    // TODO also dedup
+    const metric = new Counter(name, option)
+    global.PROCESSOR_STATE.metrics.push(metric)
+    return metric
+  }
+
   add(ctx: BaseContext, value: Numberish, labels: Labels = {}) {
     this.record(ctx, value, labels, true)
   }
@@ -94,6 +101,13 @@ export class CounterBinding {
 }
 
 export class Gauge extends Metric {
+  static register(name: string, option?: MetricDescriptorOptions): Gauge {
+    // TODO also dedup
+    const metric = new Gauge(name, option)
+    global.PROCESSOR_STATE.metrics.push(metric)
+    return metric
+  }
+
   record(ctx: BaseContext, value: Numberish, labels: Labels = {}) {
     ctx.res.gauges.push({
       metadata: ctx.getMetaData(this.getShortDescriptor(), labels),
