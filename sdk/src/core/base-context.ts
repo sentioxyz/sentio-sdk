@@ -1,4 +1,4 @@
-import { DataDescriptor, ProcessResult, RecordMetaData } from '../gen'
+import { ProcessResult, RecordMetaData } from '../gen'
 import { Logger } from './logger'
 import { Labels } from './metadata'
 import { Meter } from './meter'
@@ -24,5 +24,5 @@ export abstract class BaseContext {
     return this.res
   }
 
-  abstract getMetaData(descriptor: DataDescriptor, labels: Labels): RecordMetaData
+  abstract getMetaData(name: string, labels: Labels): RecordMetaData
 }

@@ -57,7 +57,7 @@ export class ContractContext<
     this.contract = view
   }
 
-  getMetaData(descriptor: DataDescriptor, labels: Labels): RecordMetaData {
+  getMetaData(name: string, labels: Labels): RecordMetaData {
     if (this.log) {
       return {
         address: this.contract.rawContract.address,
@@ -67,8 +67,8 @@ export class ContractContext<
         transactionHash: this.transactionHash || '',
         logIndex: this.log.logIndex,
         chainId: this.chainId.toString(),
-        dataDescriptor: descriptor,
-        name: descriptor.name,
+        dataDescriptor: DataDescriptor.fromPartial({ name }),
+        name: name,
         labels: normalizeLabels(labels),
       }
     }
@@ -81,8 +81,8 @@ export class ContractContext<
         transactionHash: '',
         logIndex: -1,
         chainId: this.chainId.toString(),
-        dataDescriptor: descriptor,
-        name: descriptor.name,
+        dataDescriptor: DataDescriptor.fromPartial({ name }),
+        name: name,
         labels: normalizeLabels(labels),
       }
     }
@@ -95,8 +95,8 @@ export class ContractContext<
         transactionHash: this.transactionHash || '',
         logIndex: -1,
         chainId: this.chainId.toString(),
-        dataDescriptor: descriptor,
-        name: descriptor.name,
+        dataDescriptor: DataDescriptor.fromPartial({ name }),
+        name: name,
         labels: normalizeLabels(labels),
       }
     }
@@ -156,7 +156,7 @@ export class SolanaContext extends BaseContext {
     this.blockNumber = slot
   }
 
-  getMetaData(descriptor: DataDescriptor, labels: Labels): RecordMetaData {
+  getMetaData(name: string, labels: Labels): RecordMetaData {
     return {
       address: this.address,
       contractName: this.programName,
@@ -165,8 +165,8 @@ export class SolanaContext extends BaseContext {
       transactionHash: '', // TODO add
       logIndex: 0,
       chainId: SOL_MAINMET_ID, // TODO set in context
-      dataDescriptor: descriptor,
-      name: descriptor.name,
+      dataDescriptor: DataDescriptor.fromPartial({ name }),
+      name: name,
       labels: normalizeLabels(labels),
     }
   }
@@ -183,7 +183,7 @@ export class SuiContext extends BaseContext {
     this.blockNumber = slot
   }
 
-  getMetaData(descriptor: DataDescriptor, labels: Labels): RecordMetaData {
+  getMetaData(name: string, labels: Labels): RecordMetaData {
     return {
       address: this.address,
       contractName: this.moduleName,
@@ -192,8 +192,8 @@ export class SuiContext extends BaseContext {
       transactionHash: '', // TODO
       logIndex: 0,
       chainId: SUI_DEVNET_ID, // TODO set in context
-      dataDescriptor: descriptor,
-      name: descriptor.name,
+      dataDescriptor: DataDescriptor.fromPartial({ name }),
+      name: name,
       labels: normalizeLabels(labels),
     }
   }

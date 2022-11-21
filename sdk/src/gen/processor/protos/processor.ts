@@ -4,6 +4,39 @@ import Long from "long";
 import { Empty } from "../../google/protobuf/empty";
 import _m0 from "protobufjs/minimal";
 
+export enum AggregationType {
+  COUNT = 0,
+  SUM = 1,
+  UNRECOGNIZED = -1,
+}
+
+export function aggregationTypeFromJSON(object: any): AggregationType {
+  switch (object) {
+    case 0:
+    case "COUNT":
+      return AggregationType.COUNT;
+    case 1:
+    case "SUM":
+      return AggregationType.SUM;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return AggregationType.UNRECOGNIZED;
+  }
+}
+
+export function aggregationTypeToJSON(object: AggregationType): string {
+  switch (object) {
+    case AggregationType.COUNT:
+      return "COUNT";
+    case AggregationType.SUM:
+      return "SUM";
+    case AggregationType.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
 export enum HandlerType {
   UNKNOWN = 0,
   ETH_LOG = 1,
@@ -225,6 +258,13 @@ export interface MetricConfig {
   unit: string;
   sparse: boolean;
   resolutionInSeconds: number;
+  aggregationConfig: AggregationConfig | undefined;
+}
+
+export interface AggregationConfig {
+  intervalInMinutes: number;
+  types: AggregationType[];
+  discardOrigin: boolean;
 }
 
 export interface AccountConfig {
@@ -1353,6 +1393,7 @@ function createBaseMetricConfig(): MetricConfig {
     unit: "",
     sparse: false,
     resolutionInSeconds: 0,
+    aggregationConfig: undefined,
   };
 }
 
@@ -1375,6 +1416,12 @@ export const MetricConfig = {
     }
     if (message.resolutionInSeconds !== 0) {
       writer.uint32(40).int32(message.resolutionInSeconds);
+    }
+    if (message.aggregationConfig !== undefined) {
+      AggregationConfig.encode(
+        message.aggregationConfig,
+        writer.uint32(50).fork()
+      ).ldelim();
     }
     return writer;
   },
@@ -1401,6 +1448,12 @@ export const MetricConfig = {
         case 5:
           message.resolutionInSeconds = reader.int32();
           break;
+        case 6:
+          message.aggregationConfig = AggregationConfig.decode(
+            reader,
+            reader.uint32()
+          );
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1418,6 +1471,9 @@ export const MetricConfig = {
       resolutionInSeconds: isSet(object.resolutionInSeconds)
         ? Number(object.resolutionInSeconds)
         : 0,
+      aggregationConfig: isSet(object.aggregationConfig)
+        ? AggregationConfig.fromJSON(object.aggregationConfig)
+        : undefined,
     };
   },
 
@@ -1430,6 +1486,10 @@ export const MetricConfig = {
     message.sparse !== undefined && (obj.sparse = message.sparse);
     message.resolutionInSeconds !== undefined &&
       (obj.resolutionInSeconds = Math.round(message.resolutionInSeconds));
+    message.aggregationConfig !== undefined &&
+      (obj.aggregationConfig = message.aggregationConfig
+        ? AggregationConfig.toJSON(message.aggregationConfig)
+        : undefined);
     return obj;
   },
 
@@ -1440,6 +1500,102 @@ export const MetricConfig = {
     message.unit = object.unit ?? "";
     message.sparse = object.sparse ?? false;
     message.resolutionInSeconds = object.resolutionInSeconds ?? 0;
+    message.aggregationConfig =
+      object.aggregationConfig !== undefined &&
+      object.aggregationConfig !== null
+        ? AggregationConfig.fromPartial(object.aggregationConfig)
+        : undefined;
+    return message;
+  },
+};
+
+function createBaseAggregationConfig(): AggregationConfig {
+  return { intervalInMinutes: 0, types: [], discardOrigin: false };
+}
+
+export const AggregationConfig = {
+  encode(
+    message: AggregationConfig,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.intervalInMinutes !== 0) {
+      writer.uint32(8).int32(message.intervalInMinutes);
+    }
+    writer.uint32(18).fork();
+    for (const v of message.types) {
+      writer.int32(v);
+    }
+    writer.ldelim();
+    if (message.discardOrigin === true) {
+      writer.uint32(24).bool(message.discardOrigin);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): AggregationConfig {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAggregationConfig();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.intervalInMinutes = reader.int32();
+          break;
+        case 2:
+          if ((tag & 7) === 2) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.types.push(reader.int32() as any);
+            }
+          } else {
+            message.types.push(reader.int32() as any);
+          }
+          break;
+        case 3:
+          message.discardOrigin = reader.bool();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): AggregationConfig {
+    return {
+      intervalInMinutes: isSet(object.intervalInMinutes)
+        ? Number(object.intervalInMinutes)
+        : 0,
+      types: Array.isArray(object?.types)
+        ? object.types.map((e: any) => aggregationTypeFromJSON(e))
+        : [],
+      discardOrigin: isSet(object.discardOrigin)
+        ? Boolean(object.discardOrigin)
+        : false,
+    };
+  },
+
+  toJSON(message: AggregationConfig): unknown {
+    const obj: any = {};
+    message.intervalInMinutes !== undefined &&
+      (obj.intervalInMinutes = Math.round(message.intervalInMinutes));
+    if (message.types) {
+      obj.types = message.types.map((e) => aggregationTypeToJSON(e));
+    } else {
+      obj.types = [];
+    }
+    message.discardOrigin !== undefined &&
+      (obj.discardOrigin = message.discardOrigin);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<AggregationConfig>): AggregationConfig {
+    const message = createBaseAggregationConfig();
+    message.intervalInMinutes = object.intervalInMinutes ?? 0;
+    message.types = object.types?.map((e) => e) || [];
+    message.discardOrigin = object.discardOrigin ?? false;
     return message;
   },
 };

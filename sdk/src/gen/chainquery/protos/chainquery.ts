@@ -40,7 +40,7 @@ export interface QueryExecutionSummary {
 
 export interface AptosGetTxnsResponse {
   documents: string[];
-  executionSummary: QueryExecutionSummary | undefined;
+  executionSummary?: QueryExecutionSummary | undefined;
 }
 
 export interface AptosRefreshRequest {}
@@ -728,6 +728,14 @@ export const AptosQueryDefinition = {
       responseStream: false,
       options: {},
     },
+    aptosGetTxnsByFunctionStream: {
+      name: "AptosGetTxnsByFunctionStream",
+      requestType: AptosGetTxnsByFunctionRequest,
+      requestStream: false,
+      responseType: AptosGetTxnsResponse,
+      responseStream: true,
+      options: {},
+    },
     aptosGetTxnsByVersion: {
       name: "AptosGetTxnsByVersion",
       requestType: AptosGetTxnsByVersionRequest,
@@ -742,6 +750,14 @@ export const AptosQueryDefinition = {
       requestStream: false,
       responseType: AptosGetTxnsResponse,
       responseStream: false,
+      options: {},
+    },
+    aptosGetTxnsByEventStream: {
+      name: "AptosGetTxnsByEventStream",
+      requestType: AptosGetTxnsByEventRequest,
+      requestStream: false,
+      responseType: AptosGetTxnsResponse,
+      responseStream: true,
       options: {},
     },
     aptosRefresh: {
@@ -768,6 +784,10 @@ export interface AptosQueryServiceImplementation<CallContextExt = {}> {
     request: AptosGetTxnsByFunctionRequest,
     context: CallContext & CallContextExt
   ): Promise<DeepPartial<AptosGetTxnsResponse>>;
+  aptosGetTxnsByFunctionStream(
+    request: AptosGetTxnsByFunctionRequest,
+    context: CallContext & CallContextExt
+  ): ServerStreamingMethodResult<DeepPartial<AptosGetTxnsResponse>>;
   aptosGetTxnsByVersion(
     request: AptosGetTxnsByVersionRequest,
     context: CallContext & CallContextExt
@@ -776,6 +796,10 @@ export interface AptosQueryServiceImplementation<CallContextExt = {}> {
     request: AptosGetTxnsByEventRequest,
     context: CallContext & CallContextExt
   ): Promise<DeepPartial<AptosGetTxnsResponse>>;
+  aptosGetTxnsByEventStream(
+    request: AptosGetTxnsByEventRequest,
+    context: CallContext & CallContextExt
+  ): ServerStreamingMethodResult<DeepPartial<AptosGetTxnsResponse>>;
   aptosRefresh(
     request: AptosRefreshRequest,
     context: CallContext & CallContextExt
@@ -791,6 +815,10 @@ export interface AptosQueryClient<CallOptionsExt = {}> {
     request: DeepPartial<AptosGetTxnsByFunctionRequest>,
     options?: CallOptions & CallOptionsExt
   ): Promise<AptosGetTxnsResponse>;
+  aptosGetTxnsByFunctionStream(
+    request: DeepPartial<AptosGetTxnsByFunctionRequest>,
+    options?: CallOptions & CallOptionsExt
+  ): AsyncIterable<AptosGetTxnsResponse>;
   aptosGetTxnsByVersion(
     request: DeepPartial<AptosGetTxnsByVersionRequest>,
     options?: CallOptions & CallOptionsExt
@@ -799,6 +827,10 @@ export interface AptosQueryClient<CallOptionsExt = {}> {
     request: DeepPartial<AptosGetTxnsByEventRequest>,
     options?: CallOptions & CallOptionsExt
   ): Promise<AptosGetTxnsResponse>;
+  aptosGetTxnsByEventStream(
+    request: DeepPartial<AptosGetTxnsByEventRequest>,
+    options?: CallOptions & CallOptionsExt
+  ): AsyncIterable<AptosGetTxnsResponse>;
   aptosRefresh(
     request: DeepPartial<AptosRefreshRequest>,
     options?: CallOptions & CallOptionsExt
@@ -838,3 +870,7 @@ if (_m0.util.Long !== Long) {
 function isSet(value: any): boolean {
   return value !== null && value !== undefined;
 }
+
+export type ServerStreamingMethodResult<Response> = {
+  [Symbol.asyncIterator](): AsyncIterator<Response, void>;
+};

@@ -1,9 +1,8 @@
-import { DeepPartial } from '../gen/builtin'
 import { MetricValue, ProcessResult } from '../gen'
 import { Numberish, BigDecimal } from '../core'
 import { BigNumber } from 'ethers'
 
-export function MetricValueToNumber(v: DeepPartial<MetricValue> | undefined): Numberish | undefined {
+export function MetricValueToNumber(v: Partial<MetricValue> | undefined): Numberish | undefined {
   if (v === undefined) {
     return undefined
   }
@@ -29,7 +28,7 @@ export function firstCounterValue(result: ProcessResult | undefined, name: strin
     return undefined
   }
   for (const counter of result.counters) {
-    if (counter.metadata?.dataDescriptor?.name === name) {
+    if (counter.metadata?.name === name) {
       return MetricValueToNumber(counter.metricValue)
     }
   }
@@ -41,7 +40,7 @@ export function firstGaugeValue(result: ProcessResult | undefined, name: string)
     return undefined
   }
   for (const gauge of result.gauges) {
-    if (gauge.metadata?.dataDescriptor?.name === name) {
+    if (gauge.metadata?.name === name) {
       return MetricValueToNumber(gauge.metricValue)
     }
   }

@@ -34,7 +34,6 @@ import { TextDecoder } from 'util'
 import { Trace } from './core'
 import { Instruction } from '@project-serum/anchor'
 import { MoveResourcesWithVersionPayload } from './aptos/aptos-processor'
-
 ;(BigInt.prototype as any).toJSON = function () {
   return this.toString()
 }
@@ -110,7 +109,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     for (const eventTracker of global.PROCESSOR_STATE.eventTrackers) {
       this.eventTrackingConfigs.push({
         distinctAggregationByDays: eventTracker.options.distinctByDays || [],
-        eventName: eventTracker.eventName,
+        eventName: eventTracker.name,
         retentionConfig: undefined,
         totalByDay: eventTracker.options.totalByDay || false,
         totalPerEntity: undefined,

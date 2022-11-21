@@ -1,7 +1,7 @@
 import { BaseContext } from './base-context'
 import { toMetricValue, Numberish } from './numberish'
-import { DescriptorWithUsage, Labels } from './metadata'
-import { DataDescriptor } from '../gen'
+import { Labels, NamedResultDescriptor } from './metadata'
+import { AggregationConfig, MetricConfig } from '../gen'
 
 export function normalizeName(name: string): string {
   const regex = new RegExp('![_.a-zA-Z0-9]')
@@ -27,36 +27,29 @@ export function normalizeLabels(labels: Labels): Labels {
   return normLabels
 }
 
-export class MetricDescriptorOptions {
+export class MetricOptions {
   unit?: string
   description?: string
   sparse?: boolean
-  resolutionInSeconds?: number
+  aggregationConfig?: Partial<AggregationConfig>
 }
 
-export class Metric extends DescriptorWithUsage {
-  constructor(name: string, option?: MetricDescriptorOptions) {
-    const descriptor = DataDescriptor.fromPartial({ name })
-    if (option) {
-      if (option.unit) {
-        descriptor.unit = option.unit
-      }
-      if (option.description) {
-        descriptor.description = option.description
-      }
-      if (option.sparse) {
-        descriptor.sparse = option.sparse
-      }
-      if (option.resolutionInSeconds) {
-        descriptor.resolutionInSeconds = option.resolutionInSeconds
-      }
-    }
-    super(descriptor)
+export class CounterOptions {
+  unit?: string
+  description?: string
+  sparse?: boolean
+}
+
+export class Metric extends NamedResultDescriptor {
+  descriptor: MetricConfig
+  constructor(name: string, option?: MetricOptions) {
+    super(name)
+    this.descriptor = MetricConfig.fromPartial({ name: this.name, ...option })
   }
 }
 
 export class Counter extends Metric {
-  static register(name: string, option?: MetricDescriptorOptions): Counter {
+  static register(name: string, option?: CounterOptions): Counter {
     // TODO also dedup
     const metric = new Counter(name, option)
     global.PROCESSOR_STATE.metrics.push(metric)
@@ -73,12 +66,11 @@ export class Counter extends Metric {
 
   private record(ctx: BaseContext, value: Numberish, labels: Labels, add: boolean) {
     ctx.res.counters.push({
-      metadata: ctx.getMetaData(this.getShortDescriptor(), labels),
+      metadata: ctx.getMetaData(this.name, labels),
       metricValue: toMetricValue(value),
       add: add,
       runtimeInfo: undefined,
     })
-    this.usage++
   }
 }
 
@@ -101,7 +93,7 @@ export class CounterBinding {
 }
 
 export class Gauge extends Metric {
-  static register(name: string, option?: MetricDescriptorOptions): Gauge {
+  static register(name: string, option?: MetricOptions): Gauge {
     // TODO also dedup
     const metric = new Gauge(name, option)
     global.PROCESSOR_STATE.metrics.push(metric)
@@ -110,11 +102,10 @@ export class Gauge extends Metric {
 
   record(ctx: BaseContext, value: Numberish, labels: Labels = {}) {
     ctx.res.gauges.push({
-      metadata: ctx.getMetaData(this.getShortDescriptor(), labels),
+      metadata: ctx.getMetaData(this.descriptor.name, labels),
       metricValue: toMetricValue(value),
       runtimeInfo: undefined,
     })
-    this.usage++
   }
 }
 

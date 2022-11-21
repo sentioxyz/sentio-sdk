@@ -1,14 +1,14 @@
 import { BaseContext } from './base-context'
 import { DataDescriptor, LogLevel } from '../gen'
-import { DescriptorWithUsage } from './metadata'
+import { NamedResultDescriptor } from './metadata'
 
 export type Attributes = Record<string, any>
 
-export class Logger extends DescriptorWithUsage {
+export class Logger extends NamedResultDescriptor {
   private readonly ctx: BaseContext
 
   constructor(ctx: BaseContext, name = '') {
-    super(DataDescriptor.fromPartial({ name }))
+    super(name)
     this.ctx = ctx
   }
 
@@ -21,10 +21,9 @@ export class Logger extends DescriptorWithUsage {
       message = message.toString()
     }
 
-    this.usage++
     this.ctx.res.logs.push({
       // name: this.name,
-      metadata: this.ctx.getMetaData(this.getShortDescriptor(), {}), // GetRecordMetaData(this.ctx, this, {}),
+      metadata: this.ctx.getMetaData(this.name, {}), // GetRecordMetaData(this.ctx, this, {}),
       level,
       message,
       attributes: JSON.stringify(attributes),

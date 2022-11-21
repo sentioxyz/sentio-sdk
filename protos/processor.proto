@@ -101,12 +101,46 @@ message ExportConfig {
 message MetricConfig {
   string name = 1;
   string description = 3;
-  // Only for metrics
   string unit = 2;
-  // Only for metrics
   bool sparse = 4;
-  // how to reduce the metrics, in seconds, 0 means no reduction
+  // Depracated
   int32 resolution_in_seconds = 5;
+
+  AggregationConfig aggregation_config = 6;
+}
+
+/*
+  Config to aggregate multiple data points into new data points in a constant time interval.
+  e.g. if you have a metric called 'vol', use 1 minutes interval and [SUM, AVG] aggregation type,
+  then every minutes there will be a 'vol_sum' and 'vol_avg' metric.
+
+  Currently this apply to gauge only.
+ */
+message AggregationConfig {
+  /*
+    The interval for data point to be resolved.
+    The minimal value is 1, and the max value allowed is 24*60 (1 day)
+   */
+  int32 interval_in_minutes = 1;
+  /*
+    What aggregations to be done for the data points.
+   */
+  repeated AggregationType types = 2;
+  /*
+    Whether to discard original data points, default to be false.r
+   */
+  bool discard_origin = 3;
+}
+
+enum AggregationType {
+  COUNT = 0;
+  SUM = 1;
+//  AVG = 2;
+//  MIN = 3;
+//  MAX = 4;
+//  P50 = 5;
+//  P99 = 6;
+//  P99_9 = 7;
 }
 
 message AccountConfig {

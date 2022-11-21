@@ -3,7 +3,7 @@ import { token } from '@sentio/sdk/lib/utils'
 import { ERC20Processor } from '@sentio/sdk/lib/builtin/erc20'
 import { X2y2Processor } from './types/x2y2'
 
-const rewardPerBlock = new Gauge('reward_per_block', {
+const rewardPerBlock = Gauge.register('reward_per_block', {
   description: 'rewards for each block grouped by phase',
   unit: 'x2y2',
 })

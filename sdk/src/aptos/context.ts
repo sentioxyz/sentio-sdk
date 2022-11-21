@@ -30,7 +30,7 @@ export class AptosContext extends BaseContext {
     }
   }
 
-  getMetaData(descriptor: DataDescriptor, labels: Labels): RecordMetaData {
+  getMetaData(name: string, labels: Labels): RecordMetaData {
     return {
       address: this.address,
       contractName: this.moduleName,
@@ -39,8 +39,8 @@ export class AptosContext extends BaseContext {
       transactionHash: this.transaction?.hash || '', // TODO
       logIndex: 0,
       chainId: getChainId(this.network),
-      dataDescriptor: descriptor,
-      name: descriptor.name,
+      dataDescriptor: DataDescriptor.fromPartial({ name }),
+      name: name,
       labels: normalizeLabels(labels),
     }
   }
@@ -60,7 +60,7 @@ export class AptosResourceContext extends BaseContext {
     this.timestampInMicros = timestampInMicros
   }
 
-  getMetaData(descriptor: DataDescriptor, labels: Labels): RecordMetaData {
+  getMetaData(name: string, labels: Labels): RecordMetaData {
     return {
       address: this.address,
       contractName: 'resources',
@@ -69,8 +69,8 @@ export class AptosResourceContext extends BaseContext {
       transactionHash: '',
       logIndex: 0,
       chainId: getChainId(this.network),
-      dataDescriptor: descriptor,
-      name: descriptor.name,
+      dataDescriptor: DataDescriptor.fromPartial({ name }),
+      name: name,
       labels: normalizeLabels(labels),
     }
   }

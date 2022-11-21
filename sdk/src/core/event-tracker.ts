@@ -1,5 +1,6 @@
 import { BaseContext } from './base-context'
 import { DataDescriptor, EventTrackingResult } from '../gen'
+import { NamedResultDescriptor } from './metadata'
 
 export interface Event {
   // The unique identifier of main identity associate with an event
@@ -16,7 +17,7 @@ export interface TrackerOptions {
 }
 
 // Track Event with an identity associate with it
-export class EventTracker {
+export class EventTracker extends NamedResultDescriptor {
   static DEFAULT_OPTIONS: TrackerOptions = {
     totalByDay: true,
     unique: true,
@@ -28,16 +29,15 @@ export class EventTracker {
     return tracker
   }
 
-  eventName: string
   options: TrackerOptions
   protected constructor(eventName: string, options: TrackerOptions) {
-    this.eventName = eventName
+    super(eventName)
     this.options = options
   }
 
   trackEvent(ctx: BaseContext, event: Event) {
     const res: EventTrackingResult = {
-      metadata: ctx.getMetaData(DataDescriptor.fromPartial({ name: this.eventName }), {}),
+      metadata: ctx.getMetaData(this.name, {}),
       distinctEntityId: event.distinctId,
       attributes: JSON.stringify({}),
       runtimeInfo: undefined,
