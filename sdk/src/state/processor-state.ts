@@ -6,13 +6,11 @@ import {
   SolanaBaseProcessor,
   SuiBaseProcessor,
   EventTracker,
-} from './core'
+} from '../core'
 
 import { BaseContract } from 'ethers'
-import { TemplateInstance } from './gen'
-import { Metric } from './core/meter'
-import { Exporter } from './core/exporter'
-import { AptosBaseProcessor, AptosAccountProcessor } from './aptos/aptos-processor'
+import { TemplateInstance } from '../gen'
+import { AptosBaseProcessor, AptosAccountProcessor } from '../aptos/aptos-processor'
 
 export class ProcessorState {
   // from abiName_address_chainId => contract wrapper
@@ -35,7 +33,5 @@ export class ProcessorState {
 
   eventTrackers: EventTracker[] = []
 
-  exporters: Exporter[] = []
-
-  metrics: Metric[] = []
+  stateMap = new Map<string, any>()
 }

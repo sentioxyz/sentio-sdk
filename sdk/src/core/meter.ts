@@ -2,6 +2,7 @@ import { BaseContext } from './base-context'
 import { toMetricValue, Numberish } from './numberish'
 import { Labels, NamedResultDescriptor } from './metadata'
 import { AggregationConfig, MetricConfig } from '../gen'
+import { MapStateStorage, StateStorage } from '../state/state-storage'
 
 export function normalizeName(name: string): string {
   const regex = new RegExp('![_.a-zA-Z0-9]')
@@ -40,20 +41,50 @@ export class CounterOptions {
   sparse?: boolean
 }
 
+enum MetricType {
+  Counter = 0,
+  Gauge = 1,
+}
+
 export class Metric extends NamedResultDescriptor {
+  type: MetricType
   descriptor: MetricConfig
-  constructor(name: string, option?: MetricOptions) {
+  constructor(type: MetricType, name: string, option?: MetricOptions) {
     super(name)
+    this.type = type
     this.descriptor = MetricConfig.fromPartial({ name: this.name, ...option })
+  }
+}
+
+export class MetricState extends MapStateStorage<Metric> {
+  static INSTANCE = new MetricState()
+
+  getOrRegisterMetric(type: MetricType, name: string, option?: CounterOptions | MetricOptions): Metric {
+    const metricMap = this.getOrRegister()
+    let metric = metricMap.get(name)
+    if (metric && metric.type !== type) {
+      throw Error(`redefine ${name} of metric type ${type} that is previously ${metric.type}`)
+    }
+
+    if (!metric) {
+      if (type === MetricType.Counter) {
+        metric = new Counter(name, option)
+      } else {
+        metric = new Gauge(name, option)
+      }
+    }
+    metricMap.set(name, metric)
+    return metric
   }
 }
 
 export class Counter extends Metric {
   static register(name: string, option?: CounterOptions): Counter {
-    // TODO also dedup
-    const metric = new Counter(name, option)
-    global.PROCESSOR_STATE.metrics.push(metric)
-    return metric
+    return MetricState.INSTANCE.getOrRegisterMetric(MetricType.Counter, name, option) as Counter
+  }
+
+  constructor(name: string, option?: MetricOptions) {
+    super(MetricType.Counter, name, option)
   }
 
   add(ctx: BaseContext, value: Numberish, labels: Labels = {}) {
@@ -94,10 +125,11 @@ export class CounterBinding {
 
 export class Gauge extends Metric {
   static register(name: string, option?: MetricOptions): Gauge {
-    // TODO also dedup
-    const metric = new Gauge(name, option)
-    global.PROCESSOR_STATE.metrics.push(metric)
-    return metric
+    return MetricState.INSTANCE.getOrRegisterMetric(MetricType.Gauge, name, option) as Gauge
+  }
+
+  constructor(name: string, option?: MetricOptions) {
+    super(MetricType.Counter, name, option)
   }
 
   record(ctx: BaseContext, value: Numberish, labels: Labels = {}) {

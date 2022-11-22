@@ -1,14 +1,18 @@
 import { BaseContext } from './base-context'
 import { ExportResult } from '@sentio/sdk'
 import { NamedResultDescriptor } from './metadata'
+import { MapStateStorage } from '../state/state-storage'
 
 export type Export = Record<string, any>
+
+export class ExporterState extends MapStateStorage<Exporter> {
+  static INSTANCE = new ExporterState()
+}
 
 export class Exporter extends NamedResultDescriptor {
   static register(name: string, channel: string) {
     const exporter = new Exporter(name, channel)
-    global.PROCESSOR_STATE.exporters.push(exporter)
-    return exporter
+    return ExporterState.INSTANCE.getOrSetValue(name, exporter)
   }
 
   channel: string

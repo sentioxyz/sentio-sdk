@@ -1,4 +1,4 @@
-import { ProcessorState } from '../processor-state'
+import { ProcessorState } from '../state/processor-state'
 import { Endpoints } from "../endpoints";
 
 declare global {

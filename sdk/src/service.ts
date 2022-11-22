@@ -34,6 +34,9 @@ import { TextDecoder } from 'util'
 import { Trace } from './core'
 import { Instruction } from '@project-serum/anchor'
 import { MoveResourcesWithVersionPayload } from './aptos/aptos-processor'
+import { MetricState } from './core/meter'
+import { ExporterState } from './core/exporter'
+
 ;(BigInt.prototype as any).toJSON = function () {
   return this.toString()
 }
@@ -100,7 +103,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     this.exportConfigs = []
 
     // part 0, prepare metrics and event tracking configs
-    for (const metric of global.PROCESSOR_STATE.metrics) {
+    for (const metric of MetricState.INSTANCE.getValues()) {
       this.metricConfigs.push({
         ...metric.descriptor,
       })
@@ -117,7 +120,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       })
     }
 
-    for (const exporter of global.PROCESSOR_STATE.exporters) {
+    for (const exporter of ExporterState.INSTANCE.getValues()) {
       this.exportConfigs.push({
         name: exporter.name,
         channel: exporter.channel,

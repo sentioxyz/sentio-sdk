@@ -8,7 +8,7 @@ import { setProvider } from './provider'
 
 import path from 'path'
 import fs from 'fs-extra'
-import { ProcessorState } from './processor-state'
+import { ProcessorState } from './state/processor-state'
 import { load } from './loader'
 import { CompressionAlgorithms } from '@grpc/grpc-js/build/src/compression-algorithms'
 import { Endpoints } from './endpoints'
