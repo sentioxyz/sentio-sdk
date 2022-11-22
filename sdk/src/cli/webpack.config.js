@@ -26,15 +26,16 @@ module.exports = {
   mode: 'production',
   externals: [
     {
+      protobufjs: 'commonjs2 protobufjs',
       aptos: 'commonjs2 aptos-sdk',
       ethers: 'commonjs2 ethers',
       bs58: 'commonjs2 bs58',
       "bignumber.js": 'commonjs2 bignumber.js',
       'bn.js': 'commonjs2 bn.js',
-      'csv-parse': 'commonjs2 csv-parse'
+      'csv-parse': 'commonjs2 csv-parse',
     },
     function ({ context, request }, callback) {
-      if (/^@(ethersproject|solana|project-serum).*$/.test(request)) {
+      if (/^@(ethersproject|solana|project-serum|nice-grpc).*$/.test(request)) {
         return callback(null, 'commonjs ' + request)
       }
       if (request.startsWith("@sentio/sdk")) {

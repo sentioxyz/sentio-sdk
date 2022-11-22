@@ -1,17 +1,18 @@
 import { PriceServiceClient, PriceServiceDefinition } from '../gen/service/price/protos/price'
-import { createChannel, createClient } from 'nice-grpc'
+import { createChannel, createClientFactory } from 'nice-grpc'
+import { retryMiddleware, RetryOptions } from 'nice-grpc-client-middleware-retry'
 
-export function getPriceClient(address?: string): PriceServiceClient {
+export function getPriceClient(address?: string) {
   if (!address) {
     address = global.ENDPOINTS.priceFeedAPI
   }
   const channel = createChannel(address)
 
-  return createClient(PriceServiceDefinition, channel)
+  return createClientFactory().use(retryMiddleware).create(PriceServiceDefinition, channel)
 }
 
 const priceMap = new Map<string, number>()
-let priceClient: PriceServiceClient
+let priceClient: PriceServiceClient<RetryOptions>
 
 /**
  *
@@ -26,33 +27,61 @@ export async function getPriceByType(chainId: string, coinType: string, date: Da
 
   const dateStr = [date.getUTCDate(), date.getUTCMonth() + 1, date.getUTCFullYear()].join('-')
   const key = `${coinType}-${dateStr}`
-  const price = priceMap.get(key)
+  let price = priceMap.get(key)
   if (price) {
     return price
   }
 
-  /*eslint no-constant-condition: ["error", { "checkLoops": false }]*/
-  while (true) {
-    try {
-      const response = await priceClient.getPrice({
-        timestamp: date,
-        coinId: {
-          address: {
-            chain: chainId,
-            address: coinType,
-          },
+  const response = await priceClient.getPrice(
+    {
+      timestamp: date,
+      coinId: {
+        address: {
+          chain: chainId,
+          address: coinType,
         },
-      })
-      const price = response.price
-      priceMap.set(key, price)
-      return price
-    } catch (e) {
-      console.log('error getting price', e, dateStr, coinType)
-      await delay(1000)
+      },
+    },
+    {
+      retry: true,
+      retryMaxAttempts: 8,
     }
-  }
+  )
+  price = response.price
+  priceMap.set(key, price)
+  return price
 }
 
-export function delay(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
+/**
+ *
+ * @param symbol token symbol like BTC, etc
+ * @param date
+ */
+export async function getPriceBySymbol(symbol: string, date: Date): Promise<number> {
+  if (!priceClient) {
+    priceClient = getPriceClient()
+  }
+
+  const dateStr = [date.getUTCDate(), date.getUTCMonth() + 1, date.getUTCFullYear()].join('-')
+  const key = `${symbol}-${dateStr}`
+  let price = priceMap.get(key)
+  if (price) {
+    return price
+  }
+
+  const response = await priceClient.getPrice(
+    {
+      timestamp: date,
+      coinId: {
+        symbol,
+      },
+    },
+    {
+      retry: true,
+      retryMaxAttempts: 8,
+    }
+  )
+  price = response.price
+  priceMap.set(key, price)
+  return price
 }

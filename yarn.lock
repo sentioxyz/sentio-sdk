@@ -6234,12 +6234,28 @@ nerf-dart@^1.0.0:
   resolved "https://registry.npmjs.org/nerf-dart/-/nerf-dart-1.0.0.tgz"
   integrity sha512-EZSPZB70jiVsivaBLYDCyntd5eH8NTSMOn3rB+HxwdmKThGELLdYv8qVIMWvZEFy9w8ZZpW9h9OB32l1rGtj7g==
 
+nice-grpc-client-middleware-retry@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/nice-grpc-client-middleware-retry/-/nice-grpc-client-middleware-retry-2.0.1.tgz#2b70d606baa6360acf8e216348ee761be20b34b2"
+  integrity sha512-U3oWOkSXw2VnBRUOduMYq6pwJ358HjbbhEzupOypIY9UhCHfyT7CxFs49Fd7v0zdV+EsxxowlkheM1v30vmTxw==
+  dependencies:
+    abort-controller-x "^0.4.0"
+    nice-grpc-common "^2.0.0"
+
 nice-grpc-common@^2.0.0:
   version "2.0.0"
   resolved "https://registry.npmjs.org/nice-grpc-common/-/nice-grpc-common-2.0.0.tgz"
   integrity sha512-8h/QraeDmScnbKLd5ImS+e7uUDxumvByBo6ILj1jLHjKlIa74WKHNSn54u7RmnJ5tFAYE70iTm8VWyvbTv82yg==
   dependencies:
     ts-error "^1.0.6"
+
+nice-grpc-error-details@^0.1.4:
+  version "0.1.4"
+  resolved "https://registry.yarnpkg.com/nice-grpc-error-details/-/nice-grpc-error-details-0.1.4.tgz#1f57c7be8a6f2ea2867492eeb578b84ee11154b3"
+  integrity sha512-zgP/pAwabqF1bZePgU4VJRZ2CTa3RmNH67bNFfHBT0bhfMO28C1RSOApf/8xrib7bhINf7YCm8ntTjmYnP83rQ==
+  dependencies:
+    nice-grpc-common "^2.0.0"
+    protobufjs "^7.1.2"
 
 nice-grpc@^2.0.0:
   version "2.0.0"
@@ -6998,6 +7014,24 @@ protobufjs@^7.0.0:
   version "7.1.0"
   resolved "https://registry.npmjs.org/protobufjs/-/protobufjs-7.1.0.tgz"
   integrity sha512-rCuxKlh0UQKSMjrpIcTLbR5TtGQ52cgs1a5nUoPBAKOccdPblN67BJtjrbtudUJK6HmBvUdsmymyYOzO7lxZEA==
+  dependencies:
+    "@protobufjs/aspromise" "^1.1.2"
+    "@protobufjs/base64" "^1.1.2"
+    "@protobufjs/codegen" "^2.0.4"
+    "@protobufjs/eventemitter" "^1.1.0"
+    "@protobufjs/fetch" "^1.1.0"
+    "@protobufjs/float" "^1.0.2"
+    "@protobufjs/inquire" "^1.1.0"
+    "@protobufjs/path" "^1.1.2"
+    "@protobufjs/pool" "^1.1.0"
+    "@protobufjs/utf8" "^1.1.0"
+    "@types/node" ">=13.7.0"
+    long "^5.0.0"
+
+protobufjs@^7.1.2:
+  version "7.1.2"
+  resolved "https://registry.yarnpkg.com/protobufjs/-/protobufjs-7.1.2.tgz#a0cf6aeaf82f5625bffcf5a38b7cd2a7de05890c"
+  integrity sha512-4ZPTPkXCdel3+L81yw3dG6+Kq3umdWKh7Dc7GW/CpNk4SX3hK58iPCWeCyhVTDrbkNeKrYNZ7EojM5WDaEWTLQ==
   dependencies:
     "@protobufjs/aspromise" "^1.1.2"
     "@protobufjs/base64" "^1.1.2"
