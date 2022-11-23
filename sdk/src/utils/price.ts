@@ -25,7 +25,7 @@ export async function getPriceByType(chainId: string, coinType: string, date: Da
     priceClient = getPriceClient()
   }
 
-  const dateStr = [date.getUTCDate(), date.getUTCMonth() + 1, date.getUTCFullYear()].join('-')
+  const dateStr = dateString(date)
   const key = `${coinType}-${dateStr}`
   let price = priceMap.get(key)
   if (price) {
@@ -48,7 +48,9 @@ export async function getPriceByType(chainId: string, coinType: string, date: Da
     }
   )
   price = response.price
-  priceMap.set(key, price)
+  if (response.timestamp && dateString(response.timestamp) === dateStr) {
+    priceMap.set(key, price)
+  }
   return price
 }
 
@@ -62,7 +64,7 @@ export async function getPriceBySymbol(symbol: string, date: Date): Promise<numb
     priceClient = getPriceClient()
   }
 
-  const dateStr = [date.getUTCDate(), date.getUTCMonth() + 1, date.getUTCFullYear()].join('-')
+  const dateStr = dateString(date)
   const key = `${symbol}-${dateStr}`
   let price = priceMap.get(key)
   if (price) {
@@ -82,6 +84,12 @@ export async function getPriceBySymbol(symbol: string, date: Date): Promise<numb
     }
   )
   price = response.price
-  priceMap.set(key, price)
+  if (response.timestamp && dateString(response.timestamp) === dateStr) {
+    priceMap.set(key, price)
+  }
   return price
+}
+
+function dateString(date: Date) {
+  return [date.getUTCDate(), date.getUTCMonth() + 1, date.getUTCFullYear()].join('-')
 }

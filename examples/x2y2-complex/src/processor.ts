@@ -3,7 +3,7 @@ import { token } from '@sentio/sdk/lib/utils'
 import { ERC20Processor } from '@sentio/sdk/lib/builtin/erc20'
 import { X2y2Processor } from './types/x2y2'
 
-import { AggregationType } from '@sentio/sdk/lib/gen/processor/protos/processor'
+// import { AggregationType } from '@sentio/sdk/lib/gen/processor/protos/processor'
 import { Exporter } from '@sentio/sdk/lib/core/exporter'
 
 const rewardPerBlock = Gauge.register('reward_per_block', {
@@ -16,10 +16,10 @@ const tokenCounter = Counter.register('token')
 const vol = Gauge.register('x2y2_vol', {
   description: 'transfer activities',
   unit: 'x2y2',
-  aggregationConfig: {
-    intervalInMinutes: 60,
-    types: [AggregationType.COUNT, AggregationType.SUM],
-  },
+  // aggregationConfig: {
+  //   intervalInMinutes: 60,
+  //   types: [AggregationType.COUNT, AggregationType.SUM],
+  // },
 })
 
 const exporter = Exporter.register('x2y2', 'x2y2_mint')
