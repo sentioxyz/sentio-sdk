@@ -1,0 +1,18 @@
+{
+  "name": "@sentio/x2y2-complex",
+  "license": "Apache-2.0",
+  "version": "1.0.0",
+  "scripts": {
+    "compile": "tsc -p .",
+    "test": "jest",
+    "build": "sentio build",
+    "upload": "sentio upload",
+    "tsnode": "yarn ts-node"
+  },
+  "dependencies": {
+    "@sentio/sdk": "1.0.0-development"
+  },
+  "devDependencies": {
+    "ts-node": "^10.8.0"
+  }
+}

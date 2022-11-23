@@ -1,5 +1,2 @@
 project: wormhole
 host: local # local/test/staging/prod
-targets:
-  - chain: evm
-    abisDir: abis

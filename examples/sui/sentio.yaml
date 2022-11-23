@@ -1,5 +1,2 @@
 project: sui
 host: local
-targets:
-  - chain: sui
-    abisDir: abis/sui
