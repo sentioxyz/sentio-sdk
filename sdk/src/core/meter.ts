@@ -2,7 +2,7 @@ import { BaseContext } from './base-context'
 import { toMetricValue, Numberish } from './numberish'
 import { Labels, NamedResultDescriptor } from './metadata'
 import { AggregationConfig, MetricConfig } from '../gen'
-import { MapStateStorage, StateStorage } from '../state/state-storage'
+import { MapStateStorage } from '../state/state-storage'
 
 export function normalizeName(name: string): string {
   const regex = new RegExp('![_.a-zA-Z0-9]')

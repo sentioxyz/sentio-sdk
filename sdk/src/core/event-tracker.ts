@@ -1,6 +1,7 @@
 import { BaseContext } from './base-context'
-import { DataDescriptor, EventTrackingResult } from '../gen'
+import { EventTrackingResult } from '../gen'
 import { NamedResultDescriptor } from './metadata'
+import { MapStateStorage } from '../state/state-storage'
 
 export interface Event {
   // The unique identifier of main identity associate with an event
@@ -16,6 +17,10 @@ export interface TrackerOptions {
   distinctByDays?: number[]
 }
 
+export class EventTrackerState extends MapStateStorage<EventTracker> {
+  static INSTANCE = new EventTrackerState()
+}
+
 // Track Event with an identity associate with it
 export class EventTracker extends NamedResultDescriptor {
   static DEFAULT_OPTIONS: TrackerOptions = {
@@ -25,8 +30,7 @@ export class EventTracker extends NamedResultDescriptor {
 
   static register(eventName: string, options?: TrackerOptions) {
     const tracker = new EventTracker(eventName, { ...EventTracker.DEFAULT_OPTIONS, ...options })
-    global.PROCESSOR_STATE.eventTrackers.push(tracker)
-    return tracker
+    return EventTrackerState.INSTANCE.getOrSetValue(eventName, tracker)
   }
 
   options: TrackerOptions
@@ -60,7 +64,6 @@ export class AccountEventTracker extends EventTracker {
       eventName = 'user'
     }
     const tracker = new AccountEventTracker(eventName, { ...AccountEventTracker.DEFAULT_OPTIONS, ...options })
-    global.PROCESSOR_STATE.eventTrackers.push(tracker)
-    return tracker
+    return EventTrackerState.INSTANCE.getOrSetValue(eventName, tracker)
   }
 }

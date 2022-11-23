@@ -47,3 +47,19 @@ export abstract class MapStateStorage<T> extends StateStorage<Map<string, T>> {
     return value
   }
 }
+
+export abstract class ListStateStorage<T> extends StateStorage<T[]> {
+  initValue() {
+    return []
+  }
+
+  getValues(): T[] {
+    return this.getOrRegister()
+  }
+
+  addValue(value: T): T {
+    const m = this.getOrRegister()
+    m.push(value)
+    return value
+  }
+}

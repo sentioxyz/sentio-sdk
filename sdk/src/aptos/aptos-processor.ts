@@ -1,14 +1,15 @@
-import { ProcessResult } from '../gen'
-
-import { TYPE_REGISTRY, TypeRegistry } from './type-registry'
-import { AptosBindOptions, AptosNetwork, getChainId } from './network'
 import {
   MoveResource,
   Transaction_UserTransaction,
   TransactionPayload_EntryFunctionPayload,
 } from 'aptos-sdk/src/generated'
+
+import { TYPE_REGISTRY, TypeRegistry } from './type-registry'
+import { AptosBindOptions, AptosNetwork, getChainId } from './network'
 import { AptosContext, AptosResourceContext } from './context'
 import { EventInstance } from './models'
+import { ListStateStorage } from '../state/state-storage'
+import { ProcessResult } from '../gen'
 
 type IndexConfigure = {
   address: string
@@ -60,6 +61,10 @@ class ResourceHandlder {
   handler: (resource: MoveResourcesWithVersionPayload) => Promise<ProcessResult>
 }
 
+export class AptosProcessorState extends ListStateStorage<AptosBaseProcessor> {
+  static INSTANCE = new AptosProcessorState()
+}
+
 export class AptosBaseProcessor {
   readonly moduleName: string
   config: IndexConfigure
@@ -69,7 +74,7 @@ export class AptosBaseProcessor {
   constructor(moduleName: string, options: AptosBindOptions) {
     this.moduleName = moduleName
     this.config = configure(options)
-    global.PROCESSOR_STATE.aptosProcessors.push(this)
+    AptosProcessorState.INSTANCE.addValue(this)
     this.loadTypes(TYPE_REGISTRY)
   }
 
@@ -202,6 +207,10 @@ export class AptosBaseProcessor {
   }
 }
 
+export class AptosAccountProcessorState extends ListStateStorage<AptosAccountProcessor> {
+  static INSTANCE = new AptosAccountProcessorState()
+}
+
 export class AptosAccountProcessor {
   config: IndexConfigure
 
@@ -213,7 +222,7 @@ export class AptosAccountProcessor {
 
   protected constructor(options: AptosBindOptions) {
     this.config = configure(options)
-    global.PROCESSOR_STATE.aptosAccountProcessors.push(this)
+    AptosAccountProcessorState.INSTANCE.addValue(this)
   }
 
   getChainId(): string {

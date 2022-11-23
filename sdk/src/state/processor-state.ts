@@ -5,12 +5,10 @@ import {
   BaseProcessorTemplate,
   SolanaBaseProcessor,
   SuiBaseProcessor,
-  EventTracker,
 } from '../core'
 
 import { BaseContract } from 'ethers'
 import { TemplateInstance } from '../gen'
-import { AptosBaseProcessor, AptosAccountProcessor } from '../aptos/aptos-processor'
 
 export class ProcessorState {
   // from abiName_address_chainId => contract wrapper
@@ -28,10 +26,7 @@ export class ProcessorState {
 
   suiProcessors: SuiBaseProcessor[] = []
 
-  aptosProcessors: AptosBaseProcessor[] = []
-  aptosAccountProcessors: AptosAccountProcessor[] = []
-
-  eventTrackers: EventTracker[] = []
+  // TODO move above to state map
 
   stateMap = new Map<string, any>()
 }

@@ -33,10 +33,14 @@ import Long from 'long'
 import { TextDecoder } from 'util'
 import { Trace } from './core'
 import { Instruction } from '@project-serum/anchor'
-import { MoveResourcesWithVersionPayload } from './aptos/aptos-processor'
 import { MetricState } from './core/meter'
 import { ExporterState } from './core/exporter'
-
+import { EventTrackerState } from './core/event-tracker'
+import {
+  AptosAccountProcessorState,
+  AptosProcessorState,
+  MoveResourcesWithVersionPayload,
+} from './aptos/aptos-processor'
 ;(BigInt.prototype as any).toJSON = function () {
   return this.toString()
 }
@@ -109,7 +113,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       })
     }
 
-    for (const eventTracker of global.PROCESSOR_STATE.eventTrackers) {
+    for (const eventTracker of EventTrackerState.INSTANCE.getValues()) {
       this.eventTrackingConfigs.push({
         distinctAggregationByDays: eventTracker.options.distinctByDays || [],
         eventName: eventTracker.name,
@@ -263,7 +267,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     }
 
     // Part 4, prepare aptos constractors
-    for (const aptosProcessor of global.PROCESSOR_STATE.aptosProcessors) {
+    for (const aptosProcessor of AptosProcessorState.INSTANCE.getValues()) {
       const contractConfig: ContractConfig = {
         processorType: USER_PROCESSOR,
         contract: {
@@ -316,7 +320,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       this.contractConfigs.push(contractConfig)
     }
 
-    for (const aptosProcessor of global.PROCESSOR_STATE.aptosAccountProcessors) {
+    for (const aptosProcessor of AptosAccountProcessorState.INSTANCE.getValues()) {
       const accountConfig: AccountConfig = {
         address: aptosProcessor.config.address,
         chainId: aptosProcessor.getChainId(),
