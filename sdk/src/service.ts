@@ -41,6 +41,7 @@ import {
   AptosProcessorState,
   MoveResourcesWithVersionPayload,
 } from './aptos/aptos-processor'
+import { AccountProcessorState } from './core/account-processor'
 ;(BigInt.prototype as any).toJSON = function () {
   return this.toString()
 }
@@ -131,7 +132,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       })
     }
 
-    // Part 1, prepare EVM processors
+    // Part 1.a, prepare EVM processors
     for (const processor of global.PROCESSOR_STATE.processors) {
       // If server favor incremental update this need to change
       // Start basic config for contract
@@ -195,6 +196,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
             throw new ServerError(Status.INVALID_ARGUMENT, 'Topic should not be null')
           }
           const logFilter: LogFilter = {
+            address: '',
             topics: [],
           }
 
@@ -214,6 +216,51 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
 
       // Finish up a contract
       this.contractConfigs.push(contractConfig)
+    }
+
+    // part 1.b prepare EVM account processors
+    for (const processor of AccountProcessorState.INSTANCE.getValues()) {
+      const accountConfig: AccountConfig = {
+        address: processor.config.address,
+        chainId: processor.getChainId().toString(),
+        startBlock: processor.config.startBlock ? Long.fromValue(processor.config.startBlock) : Long.ZERO,
+        aptosIntervalConfigs: [],
+        intervalConfigs: [],
+        logConfigs: [],
+      }
+      // TODO add interval
+      for (const eventsHandler of processor.eventHandlers) {
+        // associate id with filter
+        const handlerId = this.eventHandlers.push(eventsHandler.handler) - 1
+        const logConfig: LogHandlerConfig = {
+          handlerId: handlerId,
+          filters: [],
+        }
+
+        for (const filter of eventsHandler.filters) {
+          if (!filter.topics) {
+            throw new ServerError(Status.INVALID_ARGUMENT, 'Topic should not be null')
+          }
+          const logFilter: LogFilter = {
+            address: filter.address || '',
+            topics: [],
+          }
+
+          for (const ts of filter.topics) {
+            let hashes: string[] = []
+            if (Array.isArray(ts)) {
+              hashes = hashes.concat(ts)
+            } else if (ts) {
+              hashes.push(ts)
+            }
+            logFilter.topics.push({ hashes: hashes })
+          }
+          logConfig.filters.push(logFilter)
+        }
+        accountConfig.logConfigs.push(logConfig)
+      }
+
+      this.accountConfigs.push(accountConfig)
     }
 
     // Part 2, prepare solana constractors
@@ -327,6 +374,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         startBlock: Long.fromValue(aptosProcessor.config.startVersion.toString()),
         aptosIntervalConfigs: [],
         intervalConfigs: [],
+        logConfigs: [],
       }
       for (const handler of aptosProcessor.resourcesHandlers) {
         const handlerId = this.aptosResourceHandlers.push(handler.handler) - 1
@@ -418,6 +466,8 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         return this.processAptosEvent(request)
       case HandlerType.APT_RESOURCE:
         return this.processAptosResource(request)
+      case HandlerType.ETH_LOG:
+        return this.processLog(request)
       default:
         throw new ServerError(Status.INVALID_ARGUMENT, 'No handle type registered ' + request.handlerType)
     }
@@ -430,24 +480,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
 
     const promises: Promise<ProcessResult>[] = []
     for (const l of request.bindings) {
-      if (!l.data) {
-        throw new ServerError(Status.INVALID_ARGUMENT, "Log can't be null")
-      }
-      // const jsonString = Buffer.from(l.log.raw.buffer).toString("utf-8")
-      // const jsonString = String.fromCharCode.apply(null, l.log.raw)
-
-      try {
-        const jsonString = Utf8ArrayToStr(l.data.raw)
-        const log: Log = JSON.parse(jsonString)
-        const handler = this.eventHandlers[l.handlerId]
-        const promise = handler(log).catch((e) => {
-          throw new ServerError(Status.INTERNAL, 'error processing log: ' + jsonString + '\n' + errorString(e))
-        })
-
-        promises.push(promise)
-      } catch (e) {
-        throw new ServerError(Status.INTERNAL, 'error parse log: ' + l)
-      }
+      promises.push(this.processLog(l))
     }
 
     const result = mergeProcessResults(await Promise.all(promises))
@@ -465,6 +498,23 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     return {
       result,
       configUpdated: updated,
+    }
+  }
+
+  async processLog(l: DataBinding): Promise<ProcessResult> {
+    if (!l.data) {
+      throw new ServerError(Status.INVALID_ARGUMENT, "Log can't be null")
+    }
+
+    try {
+      const jsonString = Utf8ArrayToStr(l.data.raw)
+      const log: Log = JSON.parse(jsonString)
+      const handler = this.eventHandlers[l.handlerId]
+      return handler(log).catch((e) => {
+        throw new ServerError(Status.INTERNAL, 'error processing log: ' + jsonString + '\n' + errorString(e))
+      })
+    } catch (e) {
+      throw new ServerError(Status.INTERNAL, 'error parse log: ' + l)
     }
   }
 
@@ -500,31 +550,6 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       }
       await Promise.all(processorPromises)
     }
-
-    // if (request.chainId.toLowerCase().startsWith('apt') && global.PROCESSOR_STATE.aptosProcessors) {
-    //   const processorPromises: Promise<void>[] = []
-    //   for (const txn of request.transactions) {
-    //     processorPromises.push(
-    //       new Promise((resolve, _) => {
-    //         for (const processor of global.PROCESSOR_STATE.aptosProcessors) {
-    //           if (processor.address === txn.programAccountId!) {
-    //             const res = processor.handleTransaction(
-    //               JSON.parse(new TextDecoder().decode(txn.raw)),
-    //               txn.slot ?? Long.fromNumber(0)
-    //             )
-    //             if (res) {
-    //               res.gauges.forEach((g) => result.gauges.push(g))
-    //               res.counters.forEach((c) => result.counters.push(c))
-    //               res.logs.forEach((l) => result.logs.push(l))
-    //             }
-    //           }
-    //         }
-    //         resolve()
-    //       })
-    //     )
-    //   }
-    //   await Promise.all(processorPromises)
-    // }
 
     recordRuntimeInfo(result, HandlerType.TRANSACTION)
     return {

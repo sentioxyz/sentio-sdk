@@ -34,6 +34,63 @@ export abstract class EthContext extends BaseContext {
       this.transactionHash = trace.transactionHash
     }
   }
+
+  protected abstract getContractName(): string
+
+  getMetaData(name: string, labels: Labels): RecordMetaData {
+    if (this.log) {
+      return {
+        address: this.address,
+        contractName: this.getContractName(),
+        blockNumber: this.blockNumber,
+        transactionIndex: this.log.transactionIndex,
+        transactionHash: this.transactionHash || '',
+        logIndex: this.log.logIndex,
+        chainId: this.chainId.toString(),
+        dataDescriptor: DataDescriptor.fromPartial({ name }),
+        name: name,
+        labels: normalizeLabels(labels),
+      }
+    }
+    if (this.block) {
+      return {
+        address: this.address,
+        contractName: this.getContractName(),
+        blockNumber: this.blockNumber,
+        transactionIndex: -1,
+        transactionHash: '',
+        logIndex: -1,
+        chainId: this.chainId.toString(),
+        dataDescriptor: DataDescriptor.fromPartial({ name }),
+        name: name,
+        labels: normalizeLabels(labels),
+      }
+    }
+    if (this.trace) {
+      return {
+        address: this.address,
+        contractName: this.getContractName(),
+        blockNumber: this.blockNumber,
+        transactionIndex: this.trace.transactionPosition,
+        transactionHash: this.transactionHash || '',
+        logIndex: -1,
+        chainId: this.chainId.toString(),
+        dataDescriptor: DataDescriptor.fromPartial({ name }),
+        name: name,
+        labels: normalizeLabels(labels),
+      }
+    }
+    throw new Error("Invaid ctx argument can't happen")
+  }
+}
+
+export class AccountContext extends EthContext {
+  constructor(chainId: number, address: string, block?: Block, log?: Log, trace?: Trace) {
+    super(chainId, address, block, log, trace)
+  }
+  protected getContractName(): string {
+    return 'account'
+  }
 }
 
 export class ContractContext<
@@ -57,50 +114,8 @@ export class ContractContext<
     this.contract = view
   }
 
-  getMetaData(name: string, labels: Labels): RecordMetaData {
-    if (this.log) {
-      return {
-        address: this.contract.rawContract.address,
-        contractName: this.contractName,
-        blockNumber: this.blockNumber,
-        transactionIndex: this.log.transactionIndex,
-        transactionHash: this.transactionHash || '',
-        logIndex: this.log.logIndex,
-        chainId: this.chainId.toString(),
-        dataDescriptor: DataDescriptor.fromPartial({ name }),
-        name: name,
-        labels: normalizeLabels(labels),
-      }
-    }
-    if (this.block) {
-      return {
-        address: this.contract.rawContract.address,
-        contractName: this.contractName,
-        blockNumber: this.blockNumber,
-        transactionIndex: -1,
-        transactionHash: '',
-        logIndex: -1,
-        chainId: this.chainId.toString(),
-        dataDescriptor: DataDescriptor.fromPartial({ name }),
-        name: name,
-        labels: normalizeLabels(labels),
-      }
-    }
-    if (this.trace) {
-      return {
-        address: this.contract.rawContract.address,
-        contractName: this.contractName,
-        blockNumber: this.blockNumber,
-        transactionIndex: this.trace.transactionPosition,
-        transactionHash: this.transactionHash || '',
-        logIndex: -1,
-        chainId: this.chainId.toString(),
-        dataDescriptor: DataDescriptor.fromPartial({ name }),
-        name: name,
-        labels: normalizeLabels(labels),
-      }
-    }
-    throw new Error("Invaid ctx argument can't happen")
+  protected getContractName(): string {
+    return this.contractName
   }
 }
 

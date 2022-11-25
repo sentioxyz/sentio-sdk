@@ -152,6 +152,8 @@ message AccountConfig {
   repeated OnIntervalConfig interval_configs = 4;
   repeated AptosOnIntervalConfig aptos_interval_configs = 5;
   // TODO add tx handler config related to the account
+
+  repeated LogHandlerConfig log_configs = 6;
 }
 
 message OnIntervalConfig {
@@ -202,6 +204,8 @@ message LogHandlerConfig {
 
 message LogFilter {
   repeated Topic topics = 1;
+  // only used for when in account config
+  string address = 2;
 }
 
 message InstructionHandlerConfig {

@@ -1,4 +1,5 @@
 import {
+  AccountConfig,
   BlockBinding,
   ContractConfig,
   DataBinding,
@@ -25,6 +26,7 @@ import { ProcessorState } from '../state/processor-state'
 import { ProcessorServiceImpl } from '../service'
 import { Trace } from '../core/trace'
 import { setProvider } from '../provider'
+import { account } from '../builtin/aptos/0x1'
 
 export const TEST_CONTEXT: CallContext = <CallContext>{}
 
@@ -37,7 +39,8 @@ export function cleanTest() {
 
 export class TestProcessorServer implements ProcessorServiceImplementation {
   service: ProcessorServiceImpl
-  contractConfig: ContractConfig[]
+  contractConfigs: ContractConfig[]
+  accountConfigs: AccountConfig[]
 
   constructor(loader: () => void, httpEndpoints: Record<string, string> = {}) {
     cleanTest()
@@ -58,7 +61,9 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
 
   async start(request: StartRequest = { templateInstances: [] }, context = TEST_CONTEXT): Promise<Empty> {
     const res = await this.service.start(request, context)
-    this.contractConfig = (await this.getConfig({})).contractConfigs
+    const config = await this.getConfig({})
+    this.contractConfigs = config.contractConfigs
+    this.accountConfigs = config.accountConfigs
     return res
   }
 
@@ -114,7 +119,7 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
     }
     const signature = trace.action.input.slice(0, 10)
 
-    for (const contract of this.contractConfig) {
+    for (const contract of this.contractConfigs) {
       if (contract.contract?.chainId !== getNetwork(network).chainId.toString()) {
         continue
       }
@@ -155,7 +160,7 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
   }
 
   buildLogBinding(log: Log, network: Networkish = 1): DataBinding | undefined {
-    for (const contract of this.contractConfig) {
+    for (const contract of this.contractConfigs) {
       if (contract.contract?.chainId !== getNetwork(network).chainId.toString()) {
         continue
       }
@@ -163,6 +168,67 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
         continue
       }
       for (const config of contract.logConfigs) {
+        for (const filter of config.filters) {
+          // if (filter.topics.length != log.topics.length) {
+          //   continue
+          // }
+
+          let match = true
+          for (const topicIdx in filter.topics) {
+            const logTopic = log.topics[topicIdx]
+            const possibleTopic = filter.topics[topicIdx].hashes
+            if (possibleTopic.length === 0) {
+              // match all
+              continue
+            }
+            if (possibleTopic.find((e) => e.toLowerCase() === logTopic.toLowerCase())) {
+              // find one
+              continue
+            }
+            match = false
+            break
+          }
+          if (match) {
+            return {
+              data: {
+                raw: toBytes(log),
+              },
+              handlerId: config.handlerId,
+              handlerType: HandlerType.ETH_LOG,
+            }
+          }
+        }
+      }
+    }
+    return undefined
+  }
+  testAccountLog(address: string, log: Log, network: Networkish = 1): Promise<ProcessBindingResponse> {
+    return this.testAccountLogs(address, [log], network)
+  }
+
+  testAccountLogs(address: string, logs: Log[], network: Networkish = 1): Promise<ProcessBindingResponse> {
+    const bindings = []
+    for (const log of logs) {
+      const binding = this.buildAccountLogBinding(address, log, network)
+      if (!binding) {
+        throw Error('Invalid test log: ' + JSON.stringify(log))
+      }
+      bindings.push(binding)
+    }
+    return this.processLogs({
+      bindings: bindings,
+    })
+  }
+
+  buildAccountLogBinding(address: string, log: Log, network: Networkish = 1): DataBinding | undefined {
+    for (const account of this.accountConfigs) {
+      if (account.chainId !== getNetwork(network).chainId.toString()) {
+        continue
+      }
+      if (address.toLowerCase() !== account.address.toLowerCase()) {
+        continue
+      }
+      for (const config of account.logConfigs) {
         for (const filter of config.filters) {
           // if (filter.topics.length != log.topics.length) {
           //   continue
@@ -223,7 +289,7 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
       },
       handlerIds: [],
     }
-    for (const contract of this.contractConfig) {
+    for (const contract of this.contractConfigs) {
       if (contract.contract?.chainId !== getNetwork(network).chainId.toString()) {
         continue
       }

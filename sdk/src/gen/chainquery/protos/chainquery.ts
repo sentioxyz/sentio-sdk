@@ -16,6 +16,7 @@ export interface AptosGetTxnsByVersionRequest {
   network: string;
   fromVersion: Long;
   toVersion: Long;
+  headerOnly?: boolean | undefined;
 }
 
 export interface AptosGetTxnsByEventRequest {
@@ -175,7 +176,12 @@ export const AptosGetTxnsByFunctionRequest = {
 };
 
 function createBaseAptosGetTxnsByVersionRequest(): AptosGetTxnsByVersionRequest {
-  return { network: "", fromVersion: Long.UZERO, toVersion: Long.UZERO };
+  return {
+    network: "",
+    fromVersion: Long.UZERO,
+    toVersion: Long.UZERO,
+    headerOnly: undefined,
+  };
 }
 
 export const AptosGetTxnsByVersionRequest = {
@@ -191,6 +197,9 @@ export const AptosGetTxnsByVersionRequest = {
     }
     if (!message.toVersion.isZero()) {
       writer.uint32(24).uint64(message.toVersion);
+    }
+    if (message.headerOnly !== undefined) {
+      writer.uint32(32).bool(message.headerOnly);
     }
     return writer;
   },
@@ -214,6 +223,9 @@ export const AptosGetTxnsByVersionRequest = {
         case 3:
           message.toVersion = reader.uint64() as Long;
           break;
+        case 4:
+          message.headerOnly = reader.bool();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -231,6 +243,9 @@ export const AptosGetTxnsByVersionRequest = {
       toVersion: isSet(object.toVersion)
         ? Long.fromValue(object.toVersion)
         : Long.UZERO,
+      headerOnly: isSet(object.headerOnly)
+        ? Boolean(object.headerOnly)
+        : undefined,
     };
   },
 
@@ -241,6 +256,7 @@ export const AptosGetTxnsByVersionRequest = {
       (obj.fromVersion = (message.fromVersion || Long.UZERO).toString());
     message.toVersion !== undefined &&
       (obj.toVersion = (message.toVersion || Long.UZERO).toString());
+    message.headerOnly !== undefined && (obj.headerOnly = message.headerOnly);
     return obj;
   },
 
@@ -257,6 +273,7 @@ export const AptosGetTxnsByVersionRequest = {
       object.toVersion !== undefined && object.toVersion !== null
         ? Long.fromValue(object.toVersion)
         : Long.UZERO;
+    message.headerOnly = object.headerOnly ?? undefined;
     return message;
   },
 };

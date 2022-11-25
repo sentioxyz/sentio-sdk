@@ -273,6 +273,7 @@ export interface AccountConfig {
   startBlock: Long;
   intervalConfigs: OnIntervalConfig[];
   aptosIntervalConfigs: AptosOnIntervalConfig[];
+  logConfigs: LogHandlerConfig[];
 }
 
 export interface OnIntervalConfig {
@@ -320,6 +321,7 @@ export interface LogHandlerConfig {
 
 export interface LogFilter {
   topics: Topic[];
+  address: string;
 }
 
 export interface InstructionHandlerConfig {
@@ -1607,6 +1609,7 @@ function createBaseAccountConfig(): AccountConfig {
     startBlock: Long.UZERO,
     intervalConfigs: [],
     aptosIntervalConfigs: [],
+    logConfigs: [],
   };
 }
 
@@ -1629,6 +1632,9 @@ export const AccountConfig = {
     }
     for (const v of message.aptosIntervalConfigs) {
       AptosOnIntervalConfig.encode(v!, writer.uint32(42).fork()).ldelim();
+    }
+    for (const v of message.logConfigs) {
+      LogHandlerConfig.encode(v!, writer.uint32(50).fork()).ldelim();
     }
     return writer;
   },
@@ -1659,6 +1665,11 @@ export const AccountConfig = {
             AptosOnIntervalConfig.decode(reader, reader.uint32())
           );
           break;
+        case 6:
+          message.logConfigs.push(
+            LogHandlerConfig.decode(reader, reader.uint32())
+          );
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1681,6 +1692,9 @@ export const AccountConfig = {
         ? object.aptosIntervalConfigs.map((e: any) =>
             AptosOnIntervalConfig.fromJSON(e)
           )
+        : [],
+      logConfigs: Array.isArray(object?.logConfigs)
+        ? object.logConfigs.map((e: any) => LogHandlerConfig.fromJSON(e))
         : [],
     };
   },
@@ -1705,6 +1719,13 @@ export const AccountConfig = {
     } else {
       obj.aptosIntervalConfigs = [];
     }
+    if (message.logConfigs) {
+      obj.logConfigs = message.logConfigs.map((e) =>
+        e ? LogHandlerConfig.toJSON(e) : undefined
+      );
+    } else {
+      obj.logConfigs = [];
+    }
     return obj;
   },
 
@@ -1722,6 +1743,8 @@ export const AccountConfig = {
       object.aptosIntervalConfigs?.map((e) =>
         AptosOnIntervalConfig.fromPartial(e)
       ) || [];
+    message.logConfigs =
+      object.logConfigs?.map((e) => LogHandlerConfig.fromPartial(e)) || [];
     return message;
   },
 };
@@ -2313,7 +2336,7 @@ export const LogHandlerConfig = {
 };
 
 function createBaseLogFilter(): LogFilter {
-  return { topics: [] };
+  return { topics: [], address: "" };
 }
 
 export const LogFilter = {
@@ -2323,6 +2346,9 @@ export const LogFilter = {
   ): _m0.Writer {
     for (const v of message.topics) {
       Topic.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.address !== "") {
+      writer.uint32(18).string(message.address);
     }
     return writer;
   },
@@ -2337,6 +2363,9 @@ export const LogFilter = {
         case 1:
           message.topics.push(Topic.decode(reader, reader.uint32()));
           break;
+        case 2:
+          message.address = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -2350,6 +2379,7 @@ export const LogFilter = {
       topics: Array.isArray(object?.topics)
         ? object.topics.map((e: any) => Topic.fromJSON(e))
         : [],
+      address: isSet(object.address) ? String(object.address) : "",
     };
   },
 
@@ -2360,12 +2390,14 @@ export const LogFilter = {
     } else {
       obj.topics = [];
     }
+    message.address !== undefined && (obj.address = message.address);
     return obj;
   },
 
   fromPartial(object: DeepPartial<LogFilter>): LogFilter {
     const message = createBaseLogFilter();
     message.topics = object.topics?.map((e) => Topic.fromPartial(e)) || [];
+    message.address = object.address ?? "";
     return message;
   },
 };
