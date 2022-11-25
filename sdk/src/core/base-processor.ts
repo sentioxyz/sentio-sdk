@@ -4,13 +4,17 @@ import { BaseContract, Event, EventFilter } from '@ethersproject/contracts'
 import Long from 'long'
 
 import { BoundContractView, ContractContext, ContractView } from './context'
-import { ProcessResult } from '../gen'
+import { AddressType, ProcessResult } from '../gen'
 import { BindInternalOptions, BindOptions } from './bind-options'
 import { PromiseOrVoid } from '../promise-or-void'
 import { Trace } from './trace'
 
+export interface AddressOrTypeEventFilter extends EventFilter {
+  addressType?: AddressType
+}
+
 export class EventsHandler {
-  filters: EventFilter[]
+  filters: AddressOrTypeEventFilter[]
   handler: (event: Log) => Promise<ProcessResult>
 }
 

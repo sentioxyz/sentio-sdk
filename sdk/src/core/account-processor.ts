@@ -1,20 +1,22 @@
 import { ListStateStorage } from '../state/state-storage'
-import { ERC20__factory } from '../builtin/internal'
-import { DummyProvider, ProcessResult } from '@sentio/sdk'
+import { ERC20__factory, ERC721__factory } from '../builtin/internal'
+import { AddressType, DummyProvider, ProcessResult } from '@sentio/sdk'
 import { AccountBindOptions } from './bind-options'
 import { getNetwork } from '@ethersproject/providers'
-import { TransferEvent } from '../builtin/internal/ERC20'
+import { TransferEvent as ERC20TransferEvent } from '../builtin/internal/ERC20'
+import { TransferEvent as ERC721TransferEvent } from '../builtin/internal/ERC721'
 import { AccountContext } from './context'
 import { PromiseOrVoid } from '../promise-or-void'
 import { Event, EventFilter } from '@ethersproject/contracts'
 import { BytesLike } from '@ethersproject/bytes'
-import { EventsHandler } from './base-processor'
+import { AddressOrTypeEventFilter, EventsHandler } from './base-processor'
 
 export class AccountProcessorState extends ListStateStorage<AccountProcessor> {
   static INSTANCE = new AccountProcessorState()
 }
 
 const ERC20_CONTRACT = ERC20__factory.connect('', DummyProvider)
+const ERC721_CONTRACT = ERC721__factory.connect('', DummyProvider)
 
 export class AccountProcessor {
   config: AccountBindOptions
@@ -37,10 +39,10 @@ export class AccountProcessor {
   /**
    * Register custom handler function to process erc20 transfer event to this account
    * @param handler custom handler function
-   * @param tokensAddresses all the erc20 token address to watch, if not provided then watch all erc20
+   * @param tokensAddresses all the erc20 token address to watch
    */
   onERC20TransferIn(
-    handler: (event: TransferEvent, ctx: AccountContext) => PromiseOrVoid,
+    handler: (event: ERC20TransferEvent, ctx: AccountContext) => PromiseOrVoid,
     tokensAddresses: string[] = []
   ) {
     return this.onERC20(handler, tokensAddresses, (address: string) =>
@@ -51,10 +53,10 @@ export class AccountProcessor {
   /**
    * Register custom handler function to process erc20 transfer event from this account
    * @param handler custom handler function
-   * @param tokensAddresses all the erc20 token address to watch, if not provided then watch all erc20
+   * @param tokensAddresses all the erc20 token address to watch
    */
   onERC20TransferOut(
-    handler: (event: TransferEvent, ctx: AccountContext) => PromiseOrVoid,
+    handler: (event: ERC20TransferEvent, ctx: AccountContext) => PromiseOrVoid,
     tokensAddresses: string[] = []
   ) {
     return this.onERC20(handler, tokensAddresses, (address: string) =>
@@ -65,21 +67,83 @@ export class AccountProcessor {
   /**
    * Register custom handler function to process erc20 mint for this account
    * @param handler custom handler function
-   * @param tokensAddresses all the erc20 token address to watch, if not provided then watch all erc20
+   * @param tokensAddresses all the erc20 token address to watch
    */
-  onERC20Minted(handler: (event: TransferEvent, ctx: AccountContext) => PromiseOrVoid, tokensAddresses: string[] = []) {
+  onERC20Minted(
+    handler: (event: ERC20TransferEvent, ctx: AccountContext) => PromiseOrVoid,
+    tokensAddresses: string[] = []
+  ) {
     return this.onERC20(handler, tokensAddresses, (address: string) =>
       ERC20_CONTRACT.filters.Transfer('0x0000000000000000000000000000000000000000', this.config.address)
     )
   }
 
   private onERC20(
-    handler: (event: TransferEvent, ctx: AccountContext) => PromiseOrVoid,
+    handler: (event: ERC20TransferEvent, ctx: AccountContext) => PromiseOrVoid,
     tokensAddresses: string[] = [],
-    defaultFilter: (address: string) => EventFilter
+    defaultFilter: (address: string) => AddressOrTypeEventFilter
+  ) {
+    return this.onERC(handler, tokensAddresses, defaultFilter, AddressType.ERC20)
+  }
+
+  /**
+   * Register custom handler function to process ERC721 transfer event to this account
+   * @param handler custom handler function
+   * @param collections all the ERC721 token address to watch, if not provided then watch all ERC721
+   */
+  onERC721TransferIn(
+    handler: (event: ERC721TransferEvent, ctx: AccountContext) => PromiseOrVoid,
+    collections: string[]
+  ) {
+    return this.onERC721(handler, collections, (address: string) =>
+      ERC721_CONTRACT.filters.Transfer(null, this.config.address)
+    )
+  }
+
+  /**
+   * Register custom handler function to process ERC721 transfer event from this account
+   * @param handler custom handler function
+   * @param collections all the ERC721 token address to watch, if not provided then watch all ERC721
+   */
+  onERC721TransferOut(
+    handler: (event: ERC721TransferEvent, ctx: AccountContext) => PromiseOrVoid,
+    collections: string[]
+  ) {
+    return this.onERC721(handler, collections, (address: string) =>
+      ERC721_CONTRACT.filters.Transfer(this.config.address)
+    )
+  }
+
+  /**
+   * Register custom handler function to process ERC721 mint for this account
+   * @param handler custom handler function
+   * @param collections all the ERC721 token address to watch, if not provided then watch all ERC721
+   */
+  onERC721Minted(
+    handler: (event: ERC721TransferEvent, ctx: AccountContext) => PromiseOrVoid,
+    collections: string[] = []
+  ) {
+    return this.onERC721(handler, collections, (address: string) =>
+      ERC721_CONTRACT.filters.Transfer('0x0000000000000000000000000000000000000000', this.config.address)
+    )
+  }
+
+  private onERC721(
+    handler: (event: ERC721TransferEvent, ctx: AccountContext) => PromiseOrVoid,
+    collections: string[],
+    defaultFilter: (address: string) => AddressOrTypeEventFilter
+  ) {
+    return this.onERC(handler, collections, defaultFilter, AddressType.ERC721)
+  }
+
+  private onERC(
+    handler: (event: any, ctx: AccountContext) => PromiseOrVoid,
+    contractAddresses: string[],
+    defaultFilter: (address: string) => AddressOrTypeEventFilter,
+    addressType: AddressType
   ) {
     const filters = []
-    for (const token of tokensAddresses) {
+    for (const token of contractAddresses) {
       const filter = defaultFilter(this.config.address)
       filter.address = token
       filters.push(filter)
@@ -87,6 +151,7 @@ export class AccountProcessor {
     if (!filters.length) {
       const filter = defaultFilter(this.config.address)
       filter.address = undefined
+      filter.addressType = addressType
       filters.push(filter)
     }
     return this.onEvent(handler, filters)
@@ -94,11 +159,11 @@ export class AccountProcessor {
 
   protected onEvent(
     handler: (event: Event, ctx: AccountContext) => PromiseOrVoid,
-    filter: EventFilter | EventFilter[]
+    filter: AddressOrTypeEventFilter | AddressOrTypeEventFilter[]
   ) {
     const chainId = this.getChainId()
 
-    let _filters: EventFilter[] = []
+    let _filters: AddressOrTypeEventFilter[] = []
 
     if (Array.isArray(filter)) {
       _filters = filter

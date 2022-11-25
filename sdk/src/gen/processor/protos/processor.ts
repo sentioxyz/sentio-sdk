@@ -37,6 +37,45 @@ export function aggregationTypeToJSON(object: AggregationType): string {
   }
 }
 
+export enum AddressType {
+  ERC20 = 0,
+  ERC721 = 1,
+  ERC1155 = 2,
+  UNRECOGNIZED = -1,
+}
+
+export function addressTypeFromJSON(object: any): AddressType {
+  switch (object) {
+    case 0:
+    case "ERC20":
+      return AddressType.ERC20;
+    case 1:
+    case "ERC721":
+      return AddressType.ERC721;
+    case 2:
+    case "ERC1155":
+      return AddressType.ERC1155;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return AddressType.UNRECOGNIZED;
+  }
+}
+
+export function addressTypeToJSON(object: AddressType): string {
+  switch (object) {
+    case AddressType.ERC20:
+      return "ERC20";
+    case AddressType.ERC721:
+      return "ERC721";
+    case AddressType.ERC1155:
+      return "ERC1155";
+    case AddressType.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
 export enum HandlerType {
   UNKNOWN = 0,
   ETH_LOG = 1,
@@ -321,7 +360,8 @@ export interface LogHandlerConfig {
 
 export interface LogFilter {
   topics: Topic[];
-  address: string;
+  address: string | undefined;
+  addressType: AddressType | undefined;
 }
 
 export interface InstructionHandlerConfig {
@@ -2336,7 +2376,7 @@ export const LogHandlerConfig = {
 };
 
 function createBaseLogFilter(): LogFilter {
-  return { topics: [], address: "" };
+  return { topics: [], address: undefined, addressType: undefined };
 }
 
 export const LogFilter = {
@@ -2347,8 +2387,11 @@ export const LogFilter = {
     for (const v of message.topics) {
       Topic.encode(v!, writer.uint32(10).fork()).ldelim();
     }
-    if (message.address !== "") {
+    if (message.address !== undefined) {
       writer.uint32(18).string(message.address);
+    }
+    if (message.addressType !== undefined) {
+      writer.uint32(24).int32(message.addressType);
     }
     return writer;
   },
@@ -2366,6 +2409,9 @@ export const LogFilter = {
         case 2:
           message.address = reader.string();
           break;
+        case 3:
+          message.addressType = reader.int32() as any;
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -2379,7 +2425,10 @@ export const LogFilter = {
       topics: Array.isArray(object?.topics)
         ? object.topics.map((e: any) => Topic.fromJSON(e))
         : [],
-      address: isSet(object.address) ? String(object.address) : "",
+      address: isSet(object.address) ? String(object.address) : undefined,
+      addressType: isSet(object.addressType)
+        ? addressTypeFromJSON(object.addressType)
+        : undefined,
     };
   },
 
@@ -2391,13 +2440,19 @@ export const LogFilter = {
       obj.topics = [];
     }
     message.address !== undefined && (obj.address = message.address);
+    message.addressType !== undefined &&
+      (obj.addressType =
+        message.addressType !== undefined
+          ? addressTypeToJSON(message.addressType)
+          : undefined);
     return obj;
   },
 
   fromPartial(object: DeepPartial<LogFilter>): LogFilter {
     const message = createBaseLogFilter();
     message.topics = object.topics?.map((e) => Topic.fromPartial(e)) || [];
-    message.address = object.address ?? "";
+    message.address = object.address ?? undefined;
+    message.addressType = object.addressType ?? undefined;
     return message;
   },
 };

@@ -205,7 +205,16 @@ message LogHandlerConfig {
 message LogFilter {
   repeated Topic topics = 1;
   // only used for when in account config
-  string address = 2;
+  oneof address_or_type {
+    string address = 2;
+    AddressType address_type = 3;
+  }
+}
+
+enum AddressType {
+  ERC20 = 0;
+  ERC721 = 1;
+  ERC1155 = 2;
 }
 
 message InstructionHandlerConfig {

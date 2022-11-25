@@ -196,7 +196,8 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
             throw new ServerError(Status.INVALID_ARGUMENT, 'Topic should not be null')
           }
           const logFilter: LogFilter = {
-            address: '',
+            addressType: undefined,
+            address: contractConfig.contract?.address,
             topics: [],
           }
 
@@ -242,7 +243,8 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
             throw new ServerError(Status.INVALID_ARGUMENT, 'Topic should not be null')
           }
           const logFilter: LogFilter = {
-            address: filter.address || '',
+            addressType: filter.addressType,
+            address: filter.address,
             topics: [],
           }
 
