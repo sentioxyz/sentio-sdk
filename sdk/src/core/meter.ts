@@ -1,7 +1,7 @@
 import { BaseContext } from './base-context'
-import { toMetricValue, Numberish } from './numberish'
+import { Numberish, toMetricValue } from './numberish'
 import { Labels, NamedResultDescriptor } from './metadata'
-import { AggregationConfig, MetricConfig } from '../gen'
+import { AggregationConfig, AggregationType, MetricConfig } from '../gen'
 import { MapStateStorage } from '../state/state-storage'
 
 export function normalizeName(name: string): string {
@@ -53,6 +53,12 @@ export class Metric extends NamedResultDescriptor {
     super(name)
     this.type = type
     this.descriptor = MetricConfig.fromPartial({ name: this.name, ...option })
+    const aggregationConfig = this.descriptor.aggregationConfig
+    if (aggregationConfig) {
+      if (aggregationConfig.intervalInMinutes > 0 && !aggregationConfig.types) {
+        aggregationConfig.types = [AggregationType.SUM, AggregationType.COUNT]
+      }
+    }
   }
 }
 
