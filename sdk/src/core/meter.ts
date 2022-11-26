@@ -54,8 +54,11 @@ export class Metric extends NamedResultDescriptor {
     this.type = type
     this.descriptor = MetricConfig.fromPartial({ name: this.name, ...option })
     const aggregationConfig = this.descriptor.aggregationConfig
-    if (aggregationConfig) {
-      if (aggregationConfig.intervalInMinutes > 0 && !aggregationConfig.types) {
+    if (aggregationConfig && aggregationConfig.intervalInMinutes && aggregationConfig.intervalInMinutes.length) {
+      if (aggregationConfig.intervalInMinutes.length > 1) {
+        console.error('current only support one intervalInMinutes, only first interval will be used for', name)
+      }
+      if (aggregationConfig.intervalInMinutes[0] > 0 && !aggregationConfig.types) {
         aggregationConfig.types = [AggregationType.SUM, AggregationType.COUNT]
       }
     }

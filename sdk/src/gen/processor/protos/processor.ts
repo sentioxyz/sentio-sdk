@@ -301,7 +301,7 @@ export interface MetricConfig {
 }
 
 export interface AggregationConfig {
-  intervalInMinutes: number;
+  intervalInMinutes: number[];
   types: AggregationType[];
   discardOrigin: boolean;
 }
@@ -1552,7 +1552,7 @@ export const MetricConfig = {
 };
 
 function createBaseAggregationConfig(): AggregationConfig {
-  return { intervalInMinutes: 0, types: [], discardOrigin: false };
+  return { intervalInMinutes: [], types: [], discardOrigin: false };
 }
 
 export const AggregationConfig = {
@@ -1560,9 +1560,11 @@ export const AggregationConfig = {
     message: AggregationConfig,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (message.intervalInMinutes !== 0) {
-      writer.uint32(8).int32(message.intervalInMinutes);
+    writer.uint32(10).fork();
+    for (const v of message.intervalInMinutes) {
+      writer.int32(v);
     }
+    writer.ldelim();
     writer.uint32(18).fork();
     for (const v of message.types) {
       writer.int32(v);
@@ -1582,7 +1584,14 @@ export const AggregationConfig = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.intervalInMinutes = reader.int32();
+          if ((tag & 7) === 2) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.intervalInMinutes.push(reader.int32());
+            }
+          } else {
+            message.intervalInMinutes.push(reader.int32());
+          }
           break;
         case 2:
           if ((tag & 7) === 2) {
@@ -1607,9 +1616,9 @@ export const AggregationConfig = {
 
   fromJSON(object: any): AggregationConfig {
     return {
-      intervalInMinutes: isSet(object.intervalInMinutes)
-        ? Number(object.intervalInMinutes)
-        : 0,
+      intervalInMinutes: Array.isArray(object?.intervalInMinutes)
+        ? object.intervalInMinutes.map((e: any) => Number(e))
+        : [],
       types: Array.isArray(object?.types)
         ? object.types.map((e: any) => aggregationTypeFromJSON(e))
         : [],
@@ -1621,8 +1630,13 @@ export const AggregationConfig = {
 
   toJSON(message: AggregationConfig): unknown {
     const obj: any = {};
-    message.intervalInMinutes !== undefined &&
-      (obj.intervalInMinutes = Math.round(message.intervalInMinutes));
+    if (message.intervalInMinutes) {
+      obj.intervalInMinutes = message.intervalInMinutes.map((e) =>
+        Math.round(e)
+      );
+    } else {
+      obj.intervalInMinutes = [];
+    }
     if (message.types) {
       obj.types = message.types.map((e) => aggregationTypeToJSON(e));
     } else {
@@ -1635,7 +1649,7 @@ export const AggregationConfig = {
 
   fromPartial(object: DeepPartial<AggregationConfig>): AggregationConfig {
     const message = createBaseAggregationConfig();
-    message.intervalInMinutes = object.intervalInMinutes ?? 0;
+    message.intervalInMinutes = object.intervalInMinutes?.map((e) => e) || [];
     message.types = object.types?.map((e) => e) || [];
     message.discardOrigin = object.discardOrigin ?? false;
     return message;

@@ -121,7 +121,7 @@ message AggregationConfig {
     The interval for data point to be resolved.
     The minimal value is 1, and the max value allowed is 24*60 (1 day)
    */
-  int32 interval_in_minutes = 1;
+  repeated int32 interval_in_minutes = 1;
   /*
     What aggregations to be done for the data points.
    */
