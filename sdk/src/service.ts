@@ -42,6 +42,10 @@ import {
   MoveResourcesWithVersionPayload,
 } from './aptos/aptos-processor'
 import { AccountProcessorState } from './core/account-processor'
+import { SuiProcessorState } from './core/sui-processor'
+import { SolanaProcessorState } from './core/solana-processor'
+import { ProcessorState } from './binds'
+
 ;(BigInt.prototype as any).toJSON = function () {
   return this.toString()
 }
@@ -133,7 +137,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     }
 
     // Part 1.a, prepare EVM processors
-    for (const processor of global.PROCESSOR_STATE.processors) {
+    for (const processor of ProcessorState.INSTANCE.getValues()) {
       // If server favor incremental update this need to change
       // Start basic config for contract
       const chainId = processor.getChainId()
@@ -266,7 +270,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     }
 
     // Part 2, prepare solana constractors
-    for (const solanaProcessor of global.PROCESSOR_STATE.solanaProcessors) {
+    for (const solanaProcessor of SolanaProcessorState.INSTANCE.getValues()) {
       const contractConfig: ContractConfig = {
         processorType: USER_PROCESSOR,
         contract: {
@@ -293,7 +297,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     }
 
     // Part 3, prepare sui constractors
-    for (const suiProcessor of global.PROCESSOR_STATE.suiProcessors) {
+    for (const suiProcessor of SuiProcessorState.INSTANCE.getValues()) {
       const contractConfig: ContractConfig = {
         processorType: USER_PROCESSOR,
         contract: {
@@ -530,12 +534,12 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
 
     const result = ProcessResult.fromPartial({})
 
-    if (request.chainId.toLowerCase().startsWith('sui') && global.PROCESSOR_STATE.suiProcessors) {
+    if (request.chainId.toLowerCase().startsWith('sui') && SuiProcessorState.INSTANCE.getValues()) {
       const processorPromises: Promise<void>[] = []
       for (const txn of request.transactions) {
         processorPromises.push(
           new Promise((resolve, _) => {
-            for (const processor of global.PROCESSOR_STATE.suiProcessors) {
+            for (const processor of SuiProcessorState.INSTANCE.getValues()) {
               const res = processor.handleTransaction(
                 JSON.parse(new TextDecoder().decode(txn.raw)),
                 txn.slot ?? Long.fromNumber(0)
@@ -571,7 +575,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     const result = ProcessResult.fromPartial({})
 
     // Only have instruction handlers for solana processors
-    if (global.PROCESSOR_STATE.solanaProcessors) {
+    if (SolanaProcessorState.INSTANCE.getValues()) {
       const processorPromises: Promise<void>[] = []
       for (const instruction of request.instructions) {
         if (!instruction) {
@@ -580,7 +584,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
 
         processorPromises.push(
           new Promise((resolve, _) => {
-            for (const processor of global.PROCESSOR_STATE.solanaProcessors) {
+            for (const processor of SolanaProcessorState.INSTANCE.getValues()) {
               if (processor.address === instruction.programAccountId) {
                 let parsedInstruction: Instruction | null = null
                 if (instruction.parsed) {

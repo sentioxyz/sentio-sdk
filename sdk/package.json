@@ -12,6 +12,7 @@
     "ts-start": "ts-node --files src/processor-runner.ts ./src/anyswap/src/processor.ts",
     "cli": "ts-node src/cli/cli.ts",
     "test": "jest",
+    "test-nocache": "yarn jest --clearCache && yarn jest",
     "gen": "yarn compile_target && yarn gen_bultin_evm && yarn gen_bultin_others && yarn gen_test_abi",
     "gen_test_abi": "ts-node src/test-abi-code-gen.ts src/tests/abis src/tests/types",
     "gen_bultin_evm": "typechain --target lib/target-ethers-sentio --out-dir src/builtin/internal 'src/abis/*.json'",

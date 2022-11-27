@@ -3,6 +3,7 @@ import { SolanaContext } from './context'
 import Long from 'long'
 import { Instruction } from '@project-serum/anchor'
 import { SolanaBindOptions } from './bind-options'
+import { ListStateStorage } from '../state/state-storage'
 
 type IndexConfigure = {
   startSlot: Long
@@ -10,6 +11,10 @@ type IndexConfigure = {
 }
 
 export type SolanaInstructionHandler = (instruction: Instruction, ctx: SolanaContext, accounts?: string[]) => void
+
+export class SolanaProcessorState extends ListStateStorage<SolanaBaseProcessor> {
+  static INSTANCE: SolanaProcessorState = new SolanaProcessorState()
+}
 
 export class SolanaBaseProcessor {
   public instructionHandlerMap: Map<string, SolanaInstructionHandler> = new Map()
@@ -25,7 +30,7 @@ export class SolanaBaseProcessor {
     if (options) {
       this.bind(options)
     }
-    global.PROCESSOR_STATE.solanaProcessors.push(this)
+    SolanaProcessorState.INSTANCE.addValue(this)
   }
 
   bind(options: SolanaBindOptions) {

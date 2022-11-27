@@ -1,6 +1,7 @@
 import { SuiContext } from './context'
 import { ProcessResult } from '../gen'
 import Long from 'long'
+import { ListStateStorage } from '../state/state-storage'
 
 type IndexConfigure = {
   startSeqNumber: Long
@@ -15,6 +16,10 @@ export class SuiBindOptions {
   // endBlock?: Long | number
 }
 
+export class SuiProcessorState extends ListStateStorage<SuiBaseProcessor> {
+  static INSTANCE = new SuiProcessorState()
+}
+
 export class SuiBaseProcessor {
   public transactionHanlder: (transaction: any, ctx: SuiContext) => void
   address: string
@@ -25,7 +30,7 @@ export class SuiBaseProcessor {
     if (options.startBlock) {
       this.startSlot(options.startBlock)
     }
-    global.PROCESSOR_STATE.suiProcessors.push(this)
+    SuiProcessorState.INSTANCE.addValue(this)
   }
 
   public onTransaction(handler: (transaction: any, ctx: SuiContext) => void) {

@@ -3,6 +3,14 @@ import { BaseProcessor, ContractView } from './core'
 import { Networkish } from '@ethersproject/networks'
 import { getNetwork } from '@ethersproject/providers'
 import { BaseContract } from 'ethers'
+import { MapStateStorage } from './state/state-storage'
+
+export class ProcessorState extends MapStateStorage<BaseProcessor<any, any>> {
+  static INSTANCE = new ProcessorState()
+}
+
+// from abiName_address_chainId => contract wrapper
+const contracts = new Map<string, ContractView<BaseContract>>()
 
 function getKey(abiName: string, address: string, network: Networkish) {
   const chainId = getNetwork(network).chainId.toString()
@@ -12,19 +20,18 @@ function getKey(abiName: string, address: string, network: Networkish) {
 // Dedup processor that bind multiple times
 export function getProcessor(opts: BindOptions) {
   const sig = getOptionsSignature(opts)
-  return global.PROCESSOR_STATE.processorMap.get(sig)
+  return ProcessorState.INSTANCE.getValue(sig)
 }
 
 export function addProcessor(opts: BindOptions, processor: BaseProcessor<any, any>) {
   const sig = getOptionsSignature(opts)
 
-  global.PROCESSOR_STATE.processors.push(processor)
-  global.PROCESSOR_STATE.processorMap.set(sig, processor)
+  ProcessorState.INSTANCE.getOrSetValue(sig, processor)
 }
 
 export function getContractByABI(abiName: string, address: string, network: Networkish) {
   const key = getKey(abiName, address, network)
-  return global.PROCESSOR_STATE.contracts.get(key)
+  return contracts.get(key)
 }
 
 export function addContractByABI(
@@ -34,5 +41,5 @@ export function addContractByABI(
   contract: ContractView<BaseContract>
 ) {
   const key = getKey(abiName, address, network)
-  return global.PROCESSOR_STATE.contracts.set(key, contract)
+  return contracts.set(key, contract)
 }
