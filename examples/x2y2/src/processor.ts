@@ -13,7 +13,7 @@ const tokenCounter = Counter.register('token')
 X2y2Processor.bind({ address: '0xB329e39Ebefd16f40d38f07643652cE17Ca5Bac1' }).onBlockInterval(async (_, ctx) => {
   const phase = (await ctx.contract.currentPhase()).toString()
   const reward = token.scaleDown(await ctx.contract.rewardPerBlockForStaking(), 18)
-  ctx.logger.info(`reward ${reward.toFormat(6)} for block ${ctx.blockNumber}`, { phase })
+  // ctx.logger.info(`reward ${reward.toFormat(6)} for block ${ctx.blockNumber}`, { phase })
   rewardPerBlock.record(ctx, reward, { phase })
   // exporter.emit(ctx, { reward, phase })
 })
