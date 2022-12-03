@@ -93,7 +93,7 @@ function sha256(str: string) {
 async function checkKey(host: string, apiKey: string) {
   const checkApiKeyUrl = new URL('/api/v1/processors/check_key', host)
   return fetch(checkApiKeyUrl, {
-    method: 'HEAD',
+    method: 'GET',
     headers: {
       'api-key': apiKey,
     },

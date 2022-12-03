@@ -1,6 +1,5 @@
 import { execSync } from 'child_process'
 import { createHash } from 'crypto'
-import FormData from 'form-data'
 import fs from 'fs'
 import readline from 'readline'
 import { SentioProjectConfig } from './config'
@@ -10,6 +9,7 @@ import chalk from 'chalk'
 import { buildProcessor } from './build'
 import fetch from 'node-fetch'
 import { getCliVersion } from './utils'
+import { URL } from 'url'
 
 async function createProject(options: SentioProjectConfig, apiKey: string) {
   const url = new URL('/api/v1/projects', options.host)
@@ -32,7 +32,6 @@ export async function uploadFile(options: SentioProjectConfig, apiKeyOverride: s
 
   const PROCESSOR_FILE = path.join(process.cwd(), 'dist/lib.js')
 
-  const url = new URL('/api/v1/processors', options.host)
   const apiKey = apiKeyOverride || ReadKey(options.host)
 
   const isProd = options.host === 'https://app.sentio.xyz'
@@ -56,52 +55,33 @@ export async function uploadFile(options: SentioProjectConfig, apiKeyOverride: s
 
   let triedCount = 0
   const upload = async () => {
-    const data = new FormData()
-    data.append('attachment', fs.createReadStream(PROCESSOR_FILE))
-    data.append('sha256', digest)
-
     let commitSha = ''
+    let gitUrl = ''
+    const sha256 = digest
     try {
       commitSha = execSync('git rev-parse HEAD').toString().trim()
-      data.append('commitSha', commitSha)
     } catch (e) {
       chalk.yellow(e)
     }
     try {
-      const gitUrl = execSync('git remote get-url origin').toString().trim()
-      data.append('gitUrl', gitUrl)
+      gitUrl = execSync('git remote get-url origin').toString().trim()
     } catch (e) {
       // skip errors
     }
     console.log(chalk.blue(triedCount > 1 ? 'Retry uploading' : 'Uploading'))
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'api-key': apiKey,
-        project: options.project,
-        version: getCliVersion(),
-      },
-      body: data,
-    })
 
-    if (res.ok) {
-      console.log(chalk.green('Upload success: '))
-      console.log('\t', chalk.blue('sha256:'), digest)
-      if (commitSha) {
-        console.log('\t', chalk.blue('Git commit SHA:'), commitSha)
-      }
-      const { ProjectSlug } = await res.json()
-      console.log('\t', chalk.blue('Check status:'), `${options.host}/${ProjectSlug}/datasource`)
-    } else {
-      console.error(chalk.red('Upload Failed'))
-      console.error(chalk.red(await res.text()))
+    // get gcs upload url
+    const initUploadResRaw = await initUpload(options.host, apiKey, options.project, getCliVersion())
+    if (!initUploadResRaw.ok) {
+      console.error(chalk.red('Failed to get upload url'))
+      console.error(chalk.red(await initUploadResRaw.text()))
 
-      if (res.status === 404) {
+      if (initUploadResRaw.status === 404) {
+        // create project if not exist
         const rl = readline.createInterface({
           input: process.stdin,
           output: process.stdout,
         })
-
         const prompt = async () => {
           const answer: string = await new Promise((resolve) =>
             rl.question(`Do you want to create it and continue the uploading process? (yes/no) `, resolve)
@@ -124,7 +104,49 @@ export async function uploadFile(options: SentioProjectConfig, apiKeyOverride: s
         }
         await prompt()
       }
+      return
     }
+    const initUploadRes = await initUploadResRaw.json()
+    const uploadUrl = initUploadRes['url'] as string
+
+    // do actual uploading
+    const file = fs.createReadStream(PROCESSOR_FILE)
+    const uploadResRaw = await fetch(uploadUrl, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/octet-stream',
+      },
+      body: file,
+    })
+    if (!uploadResRaw.ok) {
+      console.error(chalk.red('Failed to upload'))
+      console.error(chalk.red(await uploadResRaw.text()))
+      return
+    }
+
+    // finish uploading
+    const finishUploadResRaw = await finishUpload(
+      options.host,
+      apiKey,
+      options.project,
+      getCliVersion(),
+      sha256,
+      commitSha,
+      gitUrl
+    )
+    if (!finishUploadResRaw.ok) {
+      console.error(chalk.red('Failed to finish uploading'))
+      console.error(chalk.red(await finishUploadResRaw.text()))
+      return
+    }
+
+    console.log(chalk.green('Upload success: '))
+    console.log('\t', chalk.blue('sha256:'), digest)
+    if (commitSha) {
+      console.log('\t', chalk.blue('Git commit SHA:'), commitSha)
+    }
+    const { ProjectFullSlug } = await finishUploadResRaw.json()
+    console.log('\t', chalk.blue('Check status:'), `${options.host}/${ProjectFullSlug}/datasource`)
   }
 
   let error: Error
@@ -147,4 +169,41 @@ export async function uploadFile(options: SentioProjectConfig, apiKeyOverride: s
   }
 
   await tryUploading()
+}
+
+async function initUpload(host: string, apiKey: string, projectSlug: string, sdkVersion: string) {
+  const initUploadUrl = new URL(`/api/v1/processors/${projectSlug}/init_upload`, host)
+  return fetch(initUploadUrl, {
+    method: 'POST',
+    headers: {
+      'api-key': apiKey,
+    },
+    body: JSON.stringify({
+      sdk_version: sdkVersion,
+    }),
+  })
+}
+
+async function finishUpload(
+  host: string,
+  apiKey: string,
+  projectSlug: string,
+  sdkVersion: string,
+  sha256: string,
+  commitSha: string,
+  gitUrl: string
+) {
+  const finishUploadUrl = new URL(`/api/v1/processors/${projectSlug}/finish_upload`, host)
+  return fetch(finishUploadUrl, {
+    method: 'POST',
+    headers: {
+      'api-key': apiKey,
+    },
+    body: JSON.stringify({
+      sdk_version: sdkVersion,
+      sha256: sha256,
+      commit_sha: commitSha,
+      git_url: gitUrl,
+    }),
+  })
 }
