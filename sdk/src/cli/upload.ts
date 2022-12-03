@@ -74,7 +74,7 @@ export async function uploadFile(options: SentioProjectConfig, apiKeyOverride: s
     const initUploadResRaw = await initUpload(options.host, apiKey, options.project, getCliVersion())
     if (!initUploadResRaw.ok) {
       console.error(chalk.red('Failed to get upload url'))
-      console.error(chalk.red(await initUploadResRaw.text()))
+      console.error(chalk.red((await initUploadResRaw.json()).message))
 
       if (initUploadResRaw.status === 404) {
         // create project if not exist
@@ -172,13 +172,14 @@ export async function uploadFile(options: SentioProjectConfig, apiKeyOverride: s
 }
 
 async function initUpload(host: string, apiKey: string, projectSlug: string, sdkVersion: string) {
-  const initUploadUrl = new URL(`/api/v1/processors/${projectSlug}/init_upload`, host)
+  const initUploadUrl = new URL(`/api/v1/processors/init_upload`, host)
   return fetch(initUploadUrl, {
     method: 'POST',
     headers: {
       'api-key': apiKey,
     },
     body: JSON.stringify({
+      project_slug: projectSlug,
       sdk_version: sdkVersion,
     }),
   })
@@ -193,13 +194,14 @@ async function finishUpload(
   commitSha: string,
   gitUrl: string
 ) {
-  const finishUploadUrl = new URL(`/api/v1/processors/${projectSlug}/finish_upload`, host)
+  const finishUploadUrl = new URL(`/api/v1/processors/finish_upload`, host)
   return fetch(finishUploadUrl, {
     method: 'POST',
     headers: {
       'api-key': apiKey,
     },
     body: JSON.stringify({
+      project_slug: projectSlug,
       sdk_version: sdkVersion,
       sha256: sha256,
       commit_sha: commitSha,
