@@ -9,7 +9,7 @@ import { AptosBindOptions, AptosNetwork, getChainId } from './network'
 import { AptosContext, AptosResourceContext } from './context'
 import { EventInstance } from './models'
 import { ListStateStorage } from '../state/state-storage'
-import { ProcessResult } from '../gen'
+import { HandleInterval, ProcessResult } from '../gen'
 
 type IndexConfigure = {
   address: string
@@ -56,8 +56,8 @@ export class MoveResourcesWithVersionPayload {
 
 class ResourceHandlder {
   type?: string
-  versionInterval?: number
-  timeIntervalInMinutes?: number
+  versionInterval?: HandleInterval
+  timeIntervalInMinutes?: HandleInterval
   handler: (resource: MoveResourcesWithVersionPayload) => Promise<ProcessResult>
 }
 
@@ -231,8 +231,8 @@ export class AptosAccountProcessor {
 
   private onInterval(
     handler: (resources: MoveResource[], ctx: AptosResourceContext) => void,
-    timeInterval: number | undefined,
-    versionInterval: number | undefined,
+    timeInterval: HandleInterval | undefined,
+    versionInterval: HandleInterval | undefined,
     type: string | undefined
   ) {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
@@ -258,17 +258,32 @@ export class AptosAccountProcessor {
   public onTimeInterval(
     handler: (resources: MoveResource[], ctx: AptosResourceContext) => void,
     timeIntervalInMinutes = 60,
+    backfillTimeIntervalInMinutes = 240,
     type?: string
   ) {
-    return this.onInterval(handler, timeIntervalInMinutes, undefined, type)
+    return this.onInterval(
+      handler,
+      {
+        recentInterval: timeIntervalInMinutes,
+        backfillInterval: backfillTimeIntervalInMinutes,
+      },
+      undefined,
+      type
+    )
   }
 
   public onVersionInterval(
     handler: (resources: MoveResource[], ctx: AptosResourceContext) => void,
     versionInterval = 100000,
+    backfillVersionInterval = 400000,
     typePrefix?: string
   ) {
-    return this.onInterval(handler, undefined, versionInterval, typePrefix)
+    return this.onInterval(
+      handler,
+      undefined,
+      { recentInterval: versionInterval, backfillInterval: backfillVersionInterval },
+      typePrefix
+    )
   }
 }
 

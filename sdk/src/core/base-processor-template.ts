@@ -4,7 +4,7 @@ import { BaseContract, EventFilter } from 'ethers'
 import { Event } from '@ethersproject/contracts'
 import { BaseProcessor } from './base-processor'
 import { BindOptions, getOptionsSignature } from './bind-options'
-import { TemplateInstance } from '../gen'
+import { HandleInterval, TemplateInstance } from '../gen'
 import Long from 'long'
 import { getNetwork } from '@ethersproject/providers'
 import { PromiseOrVoid } from '../promise-or-void'
@@ -18,8 +18,8 @@ export abstract class BaseProcessorTemplate<
   binds = new Set<string>()
   blockHandlers: {
     handler: (block: Block, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid
-    blockInterval?: number
-    timeIntervalInMinutes?: number
+    blockInterval?: HandleInterval
+    timeIntervalInMinutes?: HandleInterval
   }[] = []
   traceHandlers: {
     signature: string
@@ -98,22 +98,31 @@ export abstract class BaseProcessorTemplate<
 
   public onBlockInterval(
     handler: (block: Block, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
-    blockInterval = 1000
+    blockInterval = 1000,
+    backfillBlockInterval = 4000
   ) {
-    return this.onInterval(handler, undefined, blockInterval)
+    return this.onInterval(handler, undefined, {
+      recentInterval: blockInterval,
+      backfillInterval: backfillBlockInterval,
+    })
   }
 
   public onTimeInterval(
     handler: (block: Block, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
-    timeIntervalInMinutes = 240
+    timeIntervalInMinutes = 60,
+    backfillBlockInterval = 240
   ) {
-    return this.onInterval(handler, timeIntervalInMinutes, undefined)
+    return this.onInterval(
+      handler,
+      { recentInterval: timeIntervalInMinutes, backfillInterval: backfillBlockInterval },
+      undefined
+    )
   }
 
   public onInterval(
     handler: (block: Block, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
-    timeInterval: number | undefined,
-    blockInterval: number | undefined
+    timeInterval: HandleInterval | undefined,
+    blockInterval: HandleInterval | undefined
   ) {
     this.blockHandlers.push({ handler, timeIntervalInMinutes: timeInterval, blockInterval: blockInterval })
     return this

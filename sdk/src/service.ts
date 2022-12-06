@@ -45,7 +45,6 @@ import { AccountProcessorState } from './core/account-processor'
 import { SuiProcessorState } from './core/sui-processor'
 import { SolanaProcessorState } from './core/solana-processor'
 import { ProcessorState } from './binds'
-
 ;(BigInt.prototype as any).toJSON = function () {
   return this.toString()
 }
@@ -171,8 +170,10 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         // TODO wrap the block handler into one
 
         contractConfig.intervalConfigs.push({
-          slot: blockHandler.blockInterval || 1,
-          minutes: blockHandler.timeIntervalInMinutes || 0,
+          slot: 0,
+          slotInterval: blockHandler.blockInterval,
+          minutes: 0,
+          minutesInterval: blockHandler.timeIntervalInMinutes,
           handlerId: handlerId,
         })
       }
@@ -387,8 +388,10 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         accountConfig.aptosIntervalConfigs.push({
           intervalConfig: {
             handlerId: handlerId,
-            minutes: handler.timeIntervalInMinutes || 0,
-            slot: handler.versionInterval || 0,
+            minutes: 0,
+            minutesInterval: handler.timeIntervalInMinutes,
+            slot: 0,
+            slotInterval: handler.versionInterval,
           },
           type: handler.type || '',
         })

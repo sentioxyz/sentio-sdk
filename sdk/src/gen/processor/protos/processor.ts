@@ -315,10 +315,17 @@ export interface AccountConfig {
   logConfigs: LogHandlerConfig[];
 }
 
+export interface HandleInterval {
+  recentInterval: number;
+  backfillInterval: number;
+}
+
 export interface OnIntervalConfig {
   handlerId: number;
   minutes: number;
+  minutesInterval?: HandleInterval | undefined;
   slot: number;
+  slotInterval?: HandleInterval | undefined;
 }
 
 export interface AptosOnIntervalConfig {
@@ -1803,8 +1810,81 @@ export const AccountConfig = {
   },
 };
 
+function createBaseHandleInterval(): HandleInterval {
+  return { recentInterval: 0, backfillInterval: 0 };
+}
+
+export const HandleInterval = {
+  encode(
+    message: HandleInterval,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.recentInterval !== 0) {
+      writer.uint32(8).int32(message.recentInterval);
+    }
+    if (message.backfillInterval !== 0) {
+      writer.uint32(16).int32(message.backfillInterval);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): HandleInterval {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseHandleInterval();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.recentInterval = reader.int32();
+          break;
+        case 2:
+          message.backfillInterval = reader.int32();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): HandleInterval {
+    return {
+      recentInterval: isSet(object.recentInterval)
+        ? Number(object.recentInterval)
+        : 0,
+      backfillInterval: isSet(object.backfillInterval)
+        ? Number(object.backfillInterval)
+        : 0,
+    };
+  },
+
+  toJSON(message: HandleInterval): unknown {
+    const obj: any = {};
+    message.recentInterval !== undefined &&
+      (obj.recentInterval = Math.round(message.recentInterval));
+    message.backfillInterval !== undefined &&
+      (obj.backfillInterval = Math.round(message.backfillInterval));
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<HandleInterval>): HandleInterval {
+    const message = createBaseHandleInterval();
+    message.recentInterval = object.recentInterval ?? 0;
+    message.backfillInterval = object.backfillInterval ?? 0;
+    return message;
+  },
+};
+
 function createBaseOnIntervalConfig(): OnIntervalConfig {
-  return { handlerId: 0, minutes: 0, slot: 0 };
+  return {
+    handlerId: 0,
+    minutes: 0,
+    minutesInterval: undefined,
+    slot: 0,
+    slotInterval: undefined,
+  };
 }
 
 export const OnIntervalConfig = {
@@ -1818,8 +1898,20 @@ export const OnIntervalConfig = {
     if (message.minutes !== 0) {
       writer.uint32(16).int32(message.minutes);
     }
+    if (message.minutesInterval !== undefined) {
+      HandleInterval.encode(
+        message.minutesInterval,
+        writer.uint32(34).fork()
+      ).ldelim();
+    }
     if (message.slot !== 0) {
       writer.uint32(24).int32(message.slot);
+    }
+    if (message.slotInterval !== undefined) {
+      HandleInterval.encode(
+        message.slotInterval,
+        writer.uint32(42).fork()
+      ).ldelim();
     }
     return writer;
   },
@@ -1837,8 +1929,17 @@ export const OnIntervalConfig = {
         case 2:
           message.minutes = reader.int32();
           break;
+        case 4:
+          message.minutesInterval = HandleInterval.decode(
+            reader,
+            reader.uint32()
+          );
+          break;
         case 3:
           message.slot = reader.int32();
+          break;
+        case 5:
+          message.slotInterval = HandleInterval.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -1852,7 +1953,13 @@ export const OnIntervalConfig = {
     return {
       handlerId: isSet(object.handlerId) ? Number(object.handlerId) : 0,
       minutes: isSet(object.minutes) ? Number(object.minutes) : 0,
+      minutesInterval: isSet(object.minutesInterval)
+        ? HandleInterval.fromJSON(object.minutesInterval)
+        : undefined,
       slot: isSet(object.slot) ? Number(object.slot) : 0,
+      slotInterval: isSet(object.slotInterval)
+        ? HandleInterval.fromJSON(object.slotInterval)
+        : undefined,
     };
   },
 
@@ -1862,7 +1969,15 @@ export const OnIntervalConfig = {
       (obj.handlerId = Math.round(message.handlerId));
     message.minutes !== undefined &&
       (obj.minutes = Math.round(message.minutes));
+    message.minutesInterval !== undefined &&
+      (obj.minutesInterval = message.minutesInterval
+        ? HandleInterval.toJSON(message.minutesInterval)
+        : undefined);
     message.slot !== undefined && (obj.slot = Math.round(message.slot));
+    message.slotInterval !== undefined &&
+      (obj.slotInterval = message.slotInterval
+        ? HandleInterval.toJSON(message.slotInterval)
+        : undefined);
     return obj;
   },
 
@@ -1870,7 +1985,15 @@ export const OnIntervalConfig = {
     const message = createBaseOnIntervalConfig();
     message.handlerId = object.handlerId ?? 0;
     message.minutes = object.minutes ?? 0;
+    message.minutesInterval =
+      object.minutesInterval !== undefined && object.minutesInterval !== null
+        ? HandleInterval.fromPartial(object.minutesInterval)
+        : undefined;
     message.slot = object.slot ?? 0;
+    message.slotInterval =
+      object.slotInterval !== undefined && object.slotInterval !== null
+        ? HandleInterval.fromPartial(object.slotInterval)
+        : undefined;
     return message;
   },
 };

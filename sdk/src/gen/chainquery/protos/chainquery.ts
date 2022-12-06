@@ -35,8 +35,19 @@ export interface AptosSQLQueryRequest {
   arbitraryRange: boolean;
 }
 
+export interface QueryPhaseSummary {
+  name: string;
+  timeTookMs: Long;
+}
+
 export interface QueryExecutionSummary {
   timeTookMs: Long;
+  resultNumRows?: Long | undefined;
+  resultNumBytes?: Long | undefined;
+  numPartitionsWithMaterializedView?: Long | undefined;
+  numPartitionsWithoutMaterializedView?: Long | undefined;
+  numPartitions?: Long | undefined;
+  phases: QueryPhaseSummary[];
 }
 
 export interface AptosGetTxnsResponse {
@@ -47,6 +58,22 @@ export interface AptosGetTxnsResponse {
 export interface AptosRefreshRequest {}
 
 export interface VoidResponse {}
+
+export interface EvmSQLQueryRequest {
+  network: string;
+  sql: string;
+}
+
+export interface EvmGetHeaderRequest {
+  network: string;
+  fromBlock: Long;
+  toBlock: Long;
+}
+
+export interface EvmQueryResponse {
+  rows: string[];
+  executionSummary?: QueryExecutionSummary | undefined;
+}
 
 function createBaseAptosGetTxnsByFunctionRequest(): AptosGetTxnsByFunctionRequest {
   return {
@@ -501,8 +528,83 @@ export const AptosSQLQueryRequest = {
   },
 };
 
+function createBaseQueryPhaseSummary(): QueryPhaseSummary {
+  return { name: "", timeTookMs: Long.UZERO };
+}
+
+export const QueryPhaseSummary = {
+  encode(
+    message: QueryPhaseSummary,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.name !== "") {
+      writer.uint32(10).string(message.name);
+    }
+    if (!message.timeTookMs.isZero()) {
+      writer.uint32(16).uint64(message.timeTookMs);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryPhaseSummary {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryPhaseSummary();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.name = reader.string();
+          break;
+        case 2:
+          message.timeTookMs = reader.uint64() as Long;
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryPhaseSummary {
+    return {
+      name: isSet(object.name) ? String(object.name) : "",
+      timeTookMs: isSet(object.timeTookMs)
+        ? Long.fromValue(object.timeTookMs)
+        : Long.UZERO,
+    };
+  },
+
+  toJSON(message: QueryPhaseSummary): unknown {
+    const obj: any = {};
+    message.name !== undefined && (obj.name = message.name);
+    message.timeTookMs !== undefined &&
+      (obj.timeTookMs = (message.timeTookMs || Long.UZERO).toString());
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<QueryPhaseSummary>): QueryPhaseSummary {
+    const message = createBaseQueryPhaseSummary();
+    message.name = object.name ?? "";
+    message.timeTookMs =
+      object.timeTookMs !== undefined && object.timeTookMs !== null
+        ? Long.fromValue(object.timeTookMs)
+        : Long.UZERO;
+    return message;
+  },
+};
+
 function createBaseQueryExecutionSummary(): QueryExecutionSummary {
-  return { timeTookMs: Long.UZERO };
+  return {
+    timeTookMs: Long.UZERO,
+    resultNumRows: undefined,
+    resultNumBytes: undefined,
+    numPartitionsWithMaterializedView: undefined,
+    numPartitionsWithoutMaterializedView: undefined,
+    numPartitions: undefined,
+    phases: [],
+  };
 }
 
 export const QueryExecutionSummary = {
@@ -512,6 +614,24 @@ export const QueryExecutionSummary = {
   ): _m0.Writer {
     if (!message.timeTookMs.isZero()) {
       writer.uint32(8).uint64(message.timeTookMs);
+    }
+    if (message.resultNumRows !== undefined) {
+      writer.uint32(16).uint64(message.resultNumRows);
+    }
+    if (message.resultNumBytes !== undefined) {
+      writer.uint32(24).uint64(message.resultNumBytes);
+    }
+    if (message.numPartitionsWithMaterializedView !== undefined) {
+      writer.uint32(32).uint64(message.numPartitionsWithMaterializedView);
+    }
+    if (message.numPartitionsWithoutMaterializedView !== undefined) {
+      writer.uint32(40).uint64(message.numPartitionsWithoutMaterializedView);
+    }
+    if (message.numPartitions !== undefined) {
+      writer.uint32(48).uint64(message.numPartitions);
+    }
+    for (const v of message.phases) {
+      QueryPhaseSummary.encode(v!, writer.uint32(58).fork()).ldelim();
     }
     return writer;
   },
@@ -529,6 +649,27 @@ export const QueryExecutionSummary = {
         case 1:
           message.timeTookMs = reader.uint64() as Long;
           break;
+        case 2:
+          message.resultNumRows = reader.uint64() as Long;
+          break;
+        case 3:
+          message.resultNumBytes = reader.uint64() as Long;
+          break;
+        case 4:
+          message.numPartitionsWithMaterializedView = reader.uint64() as Long;
+          break;
+        case 5:
+          message.numPartitionsWithoutMaterializedView =
+            reader.uint64() as Long;
+          break;
+        case 6:
+          message.numPartitions = reader.uint64() as Long;
+          break;
+        case 7:
+          message.phases.push(
+            QueryPhaseSummary.decode(reader, reader.uint32())
+          );
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -542,6 +683,28 @@ export const QueryExecutionSummary = {
       timeTookMs: isSet(object.timeTookMs)
         ? Long.fromValue(object.timeTookMs)
         : Long.UZERO,
+      resultNumRows: isSet(object.resultNumRows)
+        ? Long.fromValue(object.resultNumRows)
+        : undefined,
+      resultNumBytes: isSet(object.resultNumBytes)
+        ? Long.fromValue(object.resultNumBytes)
+        : undefined,
+      numPartitionsWithMaterializedView: isSet(
+        object.numPartitionsWithMaterializedView
+      )
+        ? Long.fromValue(object.numPartitionsWithMaterializedView)
+        : undefined,
+      numPartitionsWithoutMaterializedView: isSet(
+        object.numPartitionsWithoutMaterializedView
+      )
+        ? Long.fromValue(object.numPartitionsWithoutMaterializedView)
+        : undefined,
+      numPartitions: isSet(object.numPartitions)
+        ? Long.fromValue(object.numPartitions)
+        : undefined,
+      phases: Array.isArray(object?.phases)
+        ? object.phases.map((e: any) => QueryPhaseSummary.fromJSON(e))
+        : [],
     };
   },
 
@@ -549,6 +712,27 @@ export const QueryExecutionSummary = {
     const obj: any = {};
     message.timeTookMs !== undefined &&
       (obj.timeTookMs = (message.timeTookMs || Long.UZERO).toString());
+    message.resultNumRows !== undefined &&
+      (obj.resultNumRows = (message.resultNumRows || undefined).toString());
+    message.resultNumBytes !== undefined &&
+      (obj.resultNumBytes = (message.resultNumBytes || undefined).toString());
+    message.numPartitionsWithMaterializedView !== undefined &&
+      (obj.numPartitionsWithMaterializedView = (
+        message.numPartitionsWithMaterializedView || undefined
+      ).toString());
+    message.numPartitionsWithoutMaterializedView !== undefined &&
+      (obj.numPartitionsWithoutMaterializedView = (
+        message.numPartitionsWithoutMaterializedView || undefined
+      ).toString());
+    message.numPartitions !== undefined &&
+      (obj.numPartitions = (message.numPartitions || undefined).toString());
+    if (message.phases) {
+      obj.phases = message.phases.map((e) =>
+        e ? QueryPhaseSummary.toJSON(e) : undefined
+      );
+    } else {
+      obj.phases = [];
+    }
     return obj;
   },
 
@@ -560,6 +744,30 @@ export const QueryExecutionSummary = {
       object.timeTookMs !== undefined && object.timeTookMs !== null
         ? Long.fromValue(object.timeTookMs)
         : Long.UZERO;
+    message.resultNumRows =
+      object.resultNumRows !== undefined && object.resultNumRows !== null
+        ? Long.fromValue(object.resultNumRows)
+        : undefined;
+    message.resultNumBytes =
+      object.resultNumBytes !== undefined && object.resultNumBytes !== null
+        ? Long.fromValue(object.resultNumBytes)
+        : undefined;
+    message.numPartitionsWithMaterializedView =
+      object.numPartitionsWithMaterializedView !== undefined &&
+      object.numPartitionsWithMaterializedView !== null
+        ? Long.fromValue(object.numPartitionsWithMaterializedView)
+        : undefined;
+    message.numPartitionsWithoutMaterializedView =
+      object.numPartitionsWithoutMaterializedView !== undefined &&
+      object.numPartitionsWithoutMaterializedView !== null
+        ? Long.fromValue(object.numPartitionsWithoutMaterializedView)
+        : undefined;
+    message.numPartitions =
+      object.numPartitions !== undefined && object.numPartitions !== null
+        ? Long.fromValue(object.numPartitions)
+        : undefined;
+    message.phases =
+      object.phases?.map((e) => QueryPhaseSummary.fromPartial(e)) || [];
     return message;
   },
 };
@@ -732,6 +940,230 @@ export const VoidResponse = {
   },
 };
 
+function createBaseEvmSQLQueryRequest(): EvmSQLQueryRequest {
+  return { network: "", sql: "" };
+}
+
+export const EvmSQLQueryRequest = {
+  encode(
+    message: EvmSQLQueryRequest,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.network !== "") {
+      writer.uint32(10).string(message.network);
+    }
+    if (message.sql !== "") {
+      writer.uint32(18).string(message.sql);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): EvmSQLQueryRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseEvmSQLQueryRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.network = reader.string();
+          break;
+        case 2:
+          message.sql = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): EvmSQLQueryRequest {
+    return {
+      network: isSet(object.network) ? String(object.network) : "",
+      sql: isSet(object.sql) ? String(object.sql) : "",
+    };
+  },
+
+  toJSON(message: EvmSQLQueryRequest): unknown {
+    const obj: any = {};
+    message.network !== undefined && (obj.network = message.network);
+    message.sql !== undefined && (obj.sql = message.sql);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<EvmSQLQueryRequest>): EvmSQLQueryRequest {
+    const message = createBaseEvmSQLQueryRequest();
+    message.network = object.network ?? "";
+    message.sql = object.sql ?? "";
+    return message;
+  },
+};
+
+function createBaseEvmGetHeaderRequest(): EvmGetHeaderRequest {
+  return { network: "", fromBlock: Long.UZERO, toBlock: Long.UZERO };
+}
+
+export const EvmGetHeaderRequest = {
+  encode(
+    message: EvmGetHeaderRequest,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.network !== "") {
+      writer.uint32(10).string(message.network);
+    }
+    if (!message.fromBlock.isZero()) {
+      writer.uint32(16).uint64(message.fromBlock);
+    }
+    if (!message.toBlock.isZero()) {
+      writer.uint32(24).uint64(message.toBlock);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): EvmGetHeaderRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseEvmGetHeaderRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.network = reader.string();
+          break;
+        case 2:
+          message.fromBlock = reader.uint64() as Long;
+          break;
+        case 3:
+          message.toBlock = reader.uint64() as Long;
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): EvmGetHeaderRequest {
+    return {
+      network: isSet(object.network) ? String(object.network) : "",
+      fromBlock: isSet(object.fromBlock)
+        ? Long.fromValue(object.fromBlock)
+        : Long.UZERO,
+      toBlock: isSet(object.toBlock)
+        ? Long.fromValue(object.toBlock)
+        : Long.UZERO,
+    };
+  },
+
+  toJSON(message: EvmGetHeaderRequest): unknown {
+    const obj: any = {};
+    message.network !== undefined && (obj.network = message.network);
+    message.fromBlock !== undefined &&
+      (obj.fromBlock = (message.fromBlock || Long.UZERO).toString());
+    message.toBlock !== undefined &&
+      (obj.toBlock = (message.toBlock || Long.UZERO).toString());
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<EvmGetHeaderRequest>): EvmGetHeaderRequest {
+    const message = createBaseEvmGetHeaderRequest();
+    message.network = object.network ?? "";
+    message.fromBlock =
+      object.fromBlock !== undefined && object.fromBlock !== null
+        ? Long.fromValue(object.fromBlock)
+        : Long.UZERO;
+    message.toBlock =
+      object.toBlock !== undefined && object.toBlock !== null
+        ? Long.fromValue(object.toBlock)
+        : Long.UZERO;
+    return message;
+  },
+};
+
+function createBaseEvmQueryResponse(): EvmQueryResponse {
+  return { rows: [], executionSummary: undefined };
+}
+
+export const EvmQueryResponse = {
+  encode(
+    message: EvmQueryResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    for (const v of message.rows) {
+      writer.uint32(10).string(v!);
+    }
+    if (message.executionSummary !== undefined) {
+      QueryExecutionSummary.encode(
+        message.executionSummary,
+        writer.uint32(18).fork()
+      ).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): EvmQueryResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseEvmQueryResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.rows.push(reader.string());
+          break;
+        case 2:
+          message.executionSummary = QueryExecutionSummary.decode(
+            reader,
+            reader.uint32()
+          );
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): EvmQueryResponse {
+    return {
+      rows: Array.isArray(object?.rows)
+        ? object.rows.map((e: any) => String(e))
+        : [],
+      executionSummary: isSet(object.executionSummary)
+        ? QueryExecutionSummary.fromJSON(object.executionSummary)
+        : undefined,
+    };
+  },
+
+  toJSON(message: EvmQueryResponse): unknown {
+    const obj: any = {};
+    if (message.rows) {
+      obj.rows = message.rows.map((e) => e);
+    } else {
+      obj.rows = [];
+    }
+    message.executionSummary !== undefined &&
+      (obj.executionSummary = message.executionSummary
+        ? QueryExecutionSummary.toJSON(message.executionSummary)
+        : undefined);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<EvmQueryResponse>): EvmQueryResponse {
+    const message = createBaseEvmQueryResponse();
+    message.rows = object.rows?.map((e) => e) || [];
+    message.executionSummary =
+      object.executionSummary !== undefined && object.executionSummary !== null
+        ? QueryExecutionSummary.fromPartial(object.executionSummary)
+        : undefined;
+    return message;
+  },
+};
+
 export type AptosQueryDefinition = typeof AptosQueryDefinition;
 export const AptosQueryDefinition = {
   name: "AptosQuery",
@@ -856,6 +1288,52 @@ export interface AptosQueryClient<CallOptionsExt = {}> {
     request: DeepPartial<AptosSQLQueryRequest>,
     options?: CallOptions & CallOptionsExt
   ): Promise<AptosGetTxnsResponse>;
+}
+
+export type EvmQueryDefinition = typeof EvmQueryDefinition;
+export const EvmQueryDefinition = {
+  name: "EvmQuery",
+  fullName: "chainquery.EvmQuery",
+  methods: {
+    evmSQLQuery: {
+      name: "EvmSQLQuery",
+      requestType: EvmSQLQueryRequest,
+      requestStream: false,
+      responseType: EvmQueryResponse,
+      responseStream: true,
+      options: {},
+    },
+    evmGetHeader: {
+      name: "EvmGetHeader",
+      requestType: EvmGetHeaderRequest,
+      requestStream: false,
+      responseType: EvmQueryResponse,
+      responseStream: false,
+      options: {},
+    },
+  },
+} as const;
+
+export interface EvmQueryServiceImplementation<CallContextExt = {}> {
+  evmSQLQuery(
+    request: EvmSQLQueryRequest,
+    context: CallContext & CallContextExt
+  ): ServerStreamingMethodResult<DeepPartial<EvmQueryResponse>>;
+  evmGetHeader(
+    request: EvmGetHeaderRequest,
+    context: CallContext & CallContextExt
+  ): Promise<DeepPartial<EvmQueryResponse>>;
+}
+
+export interface EvmQueryClient<CallOptionsExt = {}> {
+  evmSQLQuery(
+    request: DeepPartial<EvmSQLQueryRequest>,
+    options?: CallOptions & CallOptionsExt
+  ): AsyncIterable<EvmQueryResponse>;
+  evmGetHeader(
+    request: DeepPartial<EvmGetHeaderRequest>,
+    options?: CallOptions & CallOptionsExt
+  ): Promise<EvmQueryResponse>;
 }
 
 type Builtin =

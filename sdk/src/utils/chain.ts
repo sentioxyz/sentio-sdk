@@ -95,18 +95,20 @@ export const APTOS_MAINNET_ID = 'aptos_mainnet'
 CHAIN_MAP[APTOS_TESTNET_ID] = 'aptos-test'
 CHAIN_MAP[APTOS_MAINNET_ID] = 'aptos-mainnet'
 
-export function getChainName(chainId: string | number): string {
+export function getChainName(chainId: string | number | null | undefined): string {
   if (typeof chainId === 'number') {
     chainId = chainId.toString()
   }
-  const name = CHAIN_MAP[chainId]
-  if (name) {
-    return name
+  if (chainId) {
+    const name = CHAIN_MAP[chainId]
+    if (name) {
+      return name
+    }
   }
-  return chainId
+  return chainId || ''
 }
 
-export function getChainType(chainId: string | number): string {
+export function getChainType(chainId?: string | number): string {
   const id = String(chainId).toLowerCase()
   if (id.startsWith('sol')) {
     return 'solana'

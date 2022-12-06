@@ -156,12 +156,20 @@ message AccountConfig {
   repeated LogHandlerConfig log_configs = 6;
 }
 
+message HandleInterval {
+  int32 recent_interval = 1;
+  int32 backfill_interval = 2;
+}
+
 message OnIntervalConfig {
   int32 handler_id = 1;
   // num of minutes, there can be either minutes or slot
   int32 minutes = 2;
+  optional HandleInterval minutes_interval = 4;
+
   // block or version
   int32 slot = 3;
+  optional HandleInterval slot_interval = 5;
 }
 
 message AptosOnIntervalConfig {

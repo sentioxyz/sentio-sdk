@@ -18,7 +18,7 @@ export class Logger extends NamedResultDescriptor {
 
   log(level: LogLevel, message: any, attributes: Attributes = {}) {
     if (typeof message !== 'string' && !(message instanceof String)) {
-      message = message.toString()
+      message = JSON.stringify(message)
     }
 
     this.ctx.res.logs.push({

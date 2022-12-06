@@ -4,7 +4,7 @@ import { BaseContract, Event, EventFilter } from '@ethersproject/contracts'
 import Long from 'long'
 
 import { BoundContractView, ContractContext, ContractView } from './context'
-import { AddressType, ProcessResult } from '../gen'
+import { AddressType, HandleInterval, ProcessResult } from '../gen'
 import { BindInternalOptions, BindOptions } from './bind-options'
 import { PromiseOrVoid } from '../promise-or-void'
 import { Trace } from './trace'
@@ -24,8 +24,8 @@ export class TraceHandler {
 }
 
 export class BlockHandlder {
-  blockInterval?: number
-  timeIntervalInMinutes?: number
+  blockInterval?: HandleInterval
+  timeIntervalInMinutes?: HandleInterval
   handler: (block: Block) => Promise<ProcessResult>
 }
 
@@ -121,22 +121,31 @@ export abstract class BaseProcessor<
 
   public onBlockInterval(
     handler: (block: Block, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
-    blockInterval = 1000
+    blockInterval = 1000,
+    backfillBlockInterval = 4000
   ) {
-    return this.onInterval(handler, undefined, blockInterval)
+    return this.onInterval(handler, undefined, {
+      recentInterval: blockInterval,
+      backfillInterval: backfillBlockInterval,
+    })
   }
 
   public onTimeInterval(
     handler: (block: Block, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
-    timeIntervalInMinutes = 60 * 4
+    timeIntervalInMinutes = 60,
+    backfillTimeIntervalInMinutes = 240
   ) {
-    return this.onInterval(handler, timeIntervalInMinutes, undefined)
+    return this.onInterval(
+      handler,
+      { recentInterval: timeIntervalInMinutes, backfillInterval: backfillTimeIntervalInMinutes },
+      undefined
+    )
   }
 
   public onInterval(
     handler: (block: Block, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
-    timeInterval: number | undefined,
-    blockInterval: number | undefined
+    timeInterval: HandleInterval | undefined,
+    blockInterval: HandleInterval | undefined
   ) {
     const chainId = this.getChainId()
     const contractView = this.CreateBoundContractView()
