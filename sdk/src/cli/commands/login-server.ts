@@ -27,7 +27,7 @@ export function startServer(params: AuthParams) {
 
 app.get('/callback', async (req, res) => {
   res.end('login success, please go back to CLI to continue')
-  const host = authParams.sentioHost
+  const host = getFinalizedHost(authParams.sentioHost)
   const code = req.query.code
   if (!code || (code as string).length == 0) {
     return
@@ -43,8 +43,7 @@ app.get('/callback', async (req, res) => {
   const accessToken = tokenRes['access_token']
 
   // check if the account is ready
-  const realHost = getFinalizedHost(host)
-  const userResRaw = await getUser(realHost, accessToken)
+  const userResRaw = await getUser(host, accessToken)
   if (!userResRaw.ok) {
     if (userResRaw.status == 401) {
       console.error(chalk.red('please sign up on sentio first'))
@@ -61,14 +60,14 @@ app.get('/callback', async (req, res) => {
 
   // create API key
   const apiKeyName = `${os.hostname()}-${crypto.randomBytes(4).toString('hex')}`
-  const createApiKeyResRaw = await createApiKey(realHost, apiKeyName, 'sdk_generated', accessToken)
+  const createApiKeyResRaw = await createApiKey(host, apiKeyName, 'sdk_generated', accessToken)
   if (!createApiKeyResRaw.ok) {
     console.error(chalk.red('create api key error, code:', createApiKeyResRaw.status, createApiKeyResRaw.statusText))
     return
   }
   const createApiKeyRes = await createApiKeyResRaw.json()
   const apiKey = createApiKeyRes['key']
-  WriteKey(realHost, apiKey)
+  WriteKey(host, apiKey)
   console.log(chalk.green('login success, new API key: ' + apiKey))
 
   server.close()

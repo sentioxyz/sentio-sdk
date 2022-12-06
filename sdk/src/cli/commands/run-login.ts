@@ -32,6 +32,7 @@ export function runLogin(argv: string[]) {
   ]
   const options = commandLineArgs(optionDefinitions, { argv })
 
+  const host = getFinalizedHost(options.host)
   if (options.help) {
     const usage = commandLineUsage([
       {
@@ -45,7 +46,6 @@ export function runLogin(argv: string[]) {
     ])
     console.log(usage)
   } else if (options['api-key']) {
-    const host = getFinalizedHost(options.host)
     console.log(chalk.blue('login to ' + host))
     const apiKey = options['api-key']
     checkKey(host, apiKey).then((res) => {
@@ -61,7 +61,11 @@ export function runLogin(argv: string[]) {
     const verifier = base64URLEncode(crypto.randomBytes(32))
     const challenge = base64URLEncode(sha256(verifier))
 
-    const conf = getAuthConfig(options.host)
+    const conf = getAuthConfig(host)
+    if (conf.domain === '') {
+      console.error(chalk.red('invalid host, try login with an API key if it is a dev env'))
+      return
+    }
     const authURL = new URL(conf.domain + `/authorize?`)
     const params = new url.URLSearchParams({
       response_type: 'code',
