@@ -45,6 +45,7 @@
     "nice-grpc-client-middleware-retry": "^2.0.1",
     "nice-grpc-error-details": "^0.1.4",
     "node-fetch": "2",
+    "open": "^8.4.0",
     "p-queue": "^6.6.2",
     "ts-loader": "^9.3.0",
     "typechain": "^8.0.0",

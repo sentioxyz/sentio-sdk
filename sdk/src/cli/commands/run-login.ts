@@ -7,6 +7,7 @@ import * as crypto from 'crypto'
 import chalk from 'chalk'
 import { WriteKey } from '../key'
 import fetch from 'node-fetch'
+import open from 'open'
 
 const port = 20000
 
@@ -72,7 +73,12 @@ export function runLogin(argv: string[]) {
       prompt: 'login',
     })
     authURL.search = params.toString()
-    console.log('Continue your authorization here: ' + authURL.toString())
+
+    console.log('Continue your authorization in the browser')
+    open(authURL.toString()).catch((reason) => {
+      console.error(chalk.red('Unable to open browser: ' + reason))
+      console.error(chalk.red('Open this url in your browser: ' + authURL.toString()))
+    })
 
     startServer({
       serverPort: port,
