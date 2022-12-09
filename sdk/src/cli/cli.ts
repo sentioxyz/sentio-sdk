@@ -35,7 +35,7 @@ if (mainOptions.command === 'login') {
   // TODO move them to their own modules
 
   // Process configs
-  let processorConfig: SentioProjectConfig = { host: '', project: '', build: true }
+  let processorConfig: SentioProjectConfig = { host: '', project: '', build: true, debug: false }
   // Fist step, read from project yaml file
   try {
     console.log(chalk.blue('Loading Process config'))
@@ -63,6 +63,9 @@ if (mainOptions.command === 'login') {
     }
     if (!processorConfig.host) {
       processorConfig.host = 'prod'
+    }
+    if (processorConfig.debug === undefined) {
+      processorConfig.debug = false
     }
 
     // if (!processorConfig.source) {
@@ -109,6 +112,11 @@ if (mainOptions.command === 'login') {
         description: '(Optional) Skip build & pack file before uploading, default false',
         type: Boolean,
       },
+      {
+        name: 'debug',
+        description: '(Optional) Set driver logging level to debug',
+        type: Boolean,
+      },
     ]
     const options = commandLineArgs(optionDefinitions, { argv })
     if (options.help) {
@@ -129,6 +137,9 @@ if (mainOptions.command === 'login') {
       }
       if (options.nobuild) {
         processorConfig.build = false
+      }
+      if (options.debug) {
+        processorConfig.debug = true
       }
       finalizeHost(processorConfig)
       FinalizeProjectName(processorConfig, options.owner)

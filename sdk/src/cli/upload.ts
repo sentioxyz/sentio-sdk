@@ -132,7 +132,8 @@ export async function uploadFile(options: SentioProjectConfig, apiKeyOverride: s
       getCliVersion(),
       sha256,
       commitSha,
-      gitUrl
+      gitUrl,
+      options.debug
     )
     if (!finishUploadResRaw.ok) {
       console.error(chalk.red('Failed to finish uploading'))
@@ -192,7 +193,8 @@ async function finishUpload(
   sdkVersion: string,
   sha256: string,
   commitSha: string,
-  gitUrl: string
+  gitUrl: string,
+  debug: boolean
 ) {
   const finishUploadUrl = new URL(`/api/v1/processors/finish_upload`, host)
   return fetch(finishUploadUrl, {
@@ -206,6 +208,7 @@ async function finishUpload(
       sha256: sha256,
       commit_sha: commitSha,
       git_url: gitUrl,
+      debug: debug,
     }),
   })
 }

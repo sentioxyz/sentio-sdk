@@ -11,6 +11,7 @@ export interface SentioProjectConfig {
   // source: string
   build: boolean
   // targets: Target[]
+  debug: boolean
 }
 
 export function getFinalizedHost(host: string): string {
