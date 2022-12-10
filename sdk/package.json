@@ -6,7 +6,7 @@
     "compile_target": "yarn tsc -b src/target-ethers-sentio/tsconfig.json",
     "compile": "tsc -p . && cp src/cli/webpack.config.js lib/cli && cp src/utils/*.csv lib/utils",
     "build": "yarn gen && yarn compile",
-    "start_ts": "ts-node --files src/processor-runner.ts ../examples/x2y2/src/processor.ts",
+    "start_ts": "ts-node --files src/processor-runner.ts  --log-format=json ../examples/x2y2/src/processor.ts",
     "start": "ts-node --files src/processor-runner.ts ../examples/aptos/dist/lib.js",
     "start_js": "node lib/processor-runner.js ../examples/aptos/dist/lib.js",
     "ts-start": "ts-node --files src/processor-runner.ts ./src/anyswap/src/processor.ts",
@@ -50,7 +50,8 @@
     "ts-loader": "^9.3.0",
     "typechain": "^8.0.0",
     "webpack": "^5.72.1",
-    "webpack-cli": "^4.9.2"
+    "webpack-cli": "^4.9.2",
+    "winston": "^3.8.2"
   },
   "resolutions": {
     "@grpc/grpc-js": "1.7.3"

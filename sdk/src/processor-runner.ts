@@ -1,16 +1,19 @@
 #!/usr/bin/env node
 
+import path from 'path'
+import fs from 'fs-extra'
+import * as util from 'util'
+
 import commandLineArgs from 'command-line-args'
 import { createServer } from 'nice-grpc'
+import { createLogger, transports, format } from 'winston'
+import { CompressionAlgorithms } from '@grpc/grpc-js/build/src/compression-algorithms'
+
 import { ProcessorDefinition } from './gen'
 import { ProcessorServiceImpl } from './service'
 import { setProvider } from './provider'
-
-import path from 'path'
-import fs from 'fs-extra'
 import { ProcessorState } from './state/processor-state'
 import { load } from './loader'
-import { CompressionAlgorithms } from '@grpc/grpc-js/build/src/compression-algorithms'
 import { Endpoints } from './endpoints'
 
 global.PROCESSOR_STATE = new ProcessorState()
@@ -29,10 +32,37 @@ const optionDefinitions = [
   },
   { name: 'chainquery-server', type: String, defaultValue: '' },
   { name: 'pricefeed-server', type: String, defaultValue: '' },
+  { name: 'log-format', type: String, defaultValue: 'console' },
 ]
 
 const options = commandLineArgs(optionDefinitions, { partial: true })
 
+if (options['log-format'] === 'json') {
+  const utilFormatter = {
+    transform: (info: any) => {
+      const args = info[Symbol.for('splat')]
+      if (args) {
+        info.message = util.format(info.message, ...args)
+      }
+      return info
+    },
+  }
+  const logger = createLogger({
+    format: format.combine(
+      format.timestamp({ format: 'YYYY-MM-DDTHH:mm:ssZ' }),
+      utilFormatter,
+      format.errors({ stack: true }),
+      format.json()
+    ),
+    transports: [new transports.Console()],
+  })
+
+  console.log = (...args) => logger.info.call(logger, ...args)
+  console.info = (...args) => logger.info.call(logger, ...args)
+  console.warn = (...args) => logger.warn.call(logger, ...args)
+  console.error = (...args) => logger.error.call(logger, ...args)
+  console.debug = (...args) => logger.debug.call(logger, ...args)
+}
 console.log('loading', options.target)
 
 const fullPath = path.resolve(options['chains-config'])
