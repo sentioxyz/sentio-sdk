@@ -77,6 +77,7 @@ export class SolanaBaseProcessor {
     return this.instructionHandlerMap.get(parsedInstruction.name)
   }
 
+  // TODO this should be a async function
   public handleInstruction(
     parsedInstruction: Instruction,
     accounts: string[],

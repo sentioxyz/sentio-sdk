@@ -304,6 +304,7 @@ message DataBinding {
   Data data = 1;
   int32 handler_id = 2;
   HandlerType handler_type = 3;
+  repeated int32 handler_ids = 4;
 }
 
 // TODO migrate this to just use one handler_id?
@@ -381,13 +382,13 @@ message BigInteger {
 enum HandlerType {
   UNKNOWN = 0;
   ETH_LOG = 1;
-  BLOCK = 2;
-  TRANSACTION = 3;
-  INSTRUCTION = 4;
+  ETH_BLOCK = 2;
   ETH_TRACE = 5;
+  SOL_INSTRUCTIONS = 4;
   APT_EVENT = 6;
   APT_CALL = 7;
   APT_RESOURCE = 8;
+  SUI_TRANSACTION = 3;
 }
 
 message RuntimeInfo {

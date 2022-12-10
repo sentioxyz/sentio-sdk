@@ -32,7 +32,7 @@ describe('Test Basic Examples', () => {
 
     const gauge = res?.gauges?.[0]
     expect(gauge?.metadata?.blockNumber?.toString()).equals('14373295')
-    expect(gauge?.runtimeInfo?.from).equals(HandlerType.BLOCK)
+    expect(gauge?.runtimeInfo?.from).equals(HandlerType.ETH_BLOCK)
 
     const res2 = (await service.testBlock(blockData, 56)).result
     expect(res2?.counters).length(0)

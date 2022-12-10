@@ -25,7 +25,8 @@ describe('Test Aptos Example', () => {
           data: {
             raw: new TextEncoder().encode(JSON.stringify(testData)),
           },
-          handlerId: 1,
+          handlerId: 0,
+          handlerIds: [1],
           handlerType: HandlerType.APT_CALL,
         },
       ],
@@ -43,6 +44,7 @@ describe('Test Aptos Example', () => {
           data: {
             raw: new TextEncoder().encode(JSON.stringify(testData)),
           },
+          handlerIds: [0],
           handlerId: 0,
           handlerType: HandlerType.APT_CALL,
         },
@@ -67,6 +69,7 @@ describe('Test Aptos Example', () => {
             ),
           },
           handlerId: 0,
+          handlerIds: [0],
           handlerType: HandlerType.APT_EVENT,
         },
       ],
@@ -90,7 +93,8 @@ describe('Test Aptos Example', () => {
               })
             ),
           },
-          handlerId: 2,
+          handlerId: 0,
+          handlerIds: [2],
           handlerType: HandlerType.APT_EVENT,
         },
       ],
@@ -107,7 +111,8 @@ describe('Test Aptos Example', () => {
           data: {
             raw: new TextEncoder().encode(JSON.stringify({ ...testData, events: [createProposalData] })),
           },
-          handlerId: 3,
+          handlerIds: [3],
+          handlerId: 0,
           handlerType: HandlerType.APT_EVENT,
         },
       ],
@@ -136,6 +141,7 @@ describe('Test Aptos Example', () => {
             ),
           },
           handlerId: 0,
+          handlerIds: [0],
           handlerType: HandlerType.APT_RESOURCE,
         },
       ],
@@ -151,7 +157,8 @@ describe('Test Aptos Example', () => {
           data: {
             raw: new TextEncoder().encode(JSON.stringify(dataCreate)),
           },
-          handlerId: 3,
+          handlerId: 0,
+          handlerIds: [3],
           handlerType: HandlerType.APT_CALL,
         },
       ],

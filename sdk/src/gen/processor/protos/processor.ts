@@ -79,13 +79,13 @@ export function addressTypeToJSON(object: AddressType): string {
 export enum HandlerType {
   UNKNOWN = 0,
   ETH_LOG = 1,
-  BLOCK = 2,
-  TRANSACTION = 3,
-  INSTRUCTION = 4,
+  ETH_BLOCK = 2,
   ETH_TRACE = 5,
+  SOL_INSTRUCTIONS = 4,
   APT_EVENT = 6,
   APT_CALL = 7,
   APT_RESOURCE = 8,
+  SUI_TRANSACTION = 3,
   UNRECOGNIZED = -1,
 }
 
@@ -98,17 +98,14 @@ export function handlerTypeFromJSON(object: any): HandlerType {
     case "ETH_LOG":
       return HandlerType.ETH_LOG;
     case 2:
-    case "BLOCK":
-      return HandlerType.BLOCK;
-    case 3:
-    case "TRANSACTION":
-      return HandlerType.TRANSACTION;
-    case 4:
-    case "INSTRUCTION":
-      return HandlerType.INSTRUCTION;
+    case "ETH_BLOCK":
+      return HandlerType.ETH_BLOCK;
     case 5:
     case "ETH_TRACE":
       return HandlerType.ETH_TRACE;
+    case 4:
+    case "SOL_INSTRUCTIONS":
+      return HandlerType.SOL_INSTRUCTIONS;
     case 6:
     case "APT_EVENT":
       return HandlerType.APT_EVENT;
@@ -118,6 +115,9 @@ export function handlerTypeFromJSON(object: any): HandlerType {
     case 8:
     case "APT_RESOURCE":
       return HandlerType.APT_RESOURCE;
+    case 3:
+    case "SUI_TRANSACTION":
+      return HandlerType.SUI_TRANSACTION;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -131,20 +131,20 @@ export function handlerTypeToJSON(object: HandlerType): string {
       return "UNKNOWN";
     case HandlerType.ETH_LOG:
       return "ETH_LOG";
-    case HandlerType.BLOCK:
-      return "BLOCK";
-    case HandlerType.TRANSACTION:
-      return "TRANSACTION";
-    case HandlerType.INSTRUCTION:
-      return "INSTRUCTION";
+    case HandlerType.ETH_BLOCK:
+      return "ETH_BLOCK";
     case HandlerType.ETH_TRACE:
       return "ETH_TRACE";
+    case HandlerType.SOL_INSTRUCTIONS:
+      return "SOL_INSTRUCTIONS";
     case HandlerType.APT_EVENT:
       return "APT_EVENT";
     case HandlerType.APT_CALL:
       return "APT_CALL";
     case HandlerType.APT_RESOURCE:
       return "APT_RESOURCE";
+    case HandlerType.SUI_TRANSACTION:
+      return "SUI_TRANSACTION";
     case HandlerType.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
@@ -447,6 +447,7 @@ export interface DataBinding {
   data: Data | undefined;
   handlerId: number;
   handlerType: HandlerType;
+  handlerIds: number[];
 }
 
 export interface BlockBinding {
@@ -3653,7 +3654,7 @@ export const Data = {
 };
 
 function createBaseDataBinding(): DataBinding {
-  return { data: undefined, handlerId: 0, handlerType: 0 };
+  return { data: undefined, handlerId: 0, handlerType: 0, handlerIds: [] };
 }
 
 export const DataBinding = {
@@ -3670,6 +3671,11 @@ export const DataBinding = {
     if (message.handlerType !== 0) {
       writer.uint32(24).int32(message.handlerType);
     }
+    writer.uint32(34).fork();
+    for (const v of message.handlerIds) {
+      writer.int32(v);
+    }
+    writer.ldelim();
     return writer;
   },
 
@@ -3689,6 +3695,16 @@ export const DataBinding = {
         case 3:
           message.handlerType = reader.int32() as any;
           break;
+        case 4:
+          if ((tag & 7) === 2) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.handlerIds.push(reader.int32());
+            }
+          } else {
+            message.handlerIds.push(reader.int32());
+          }
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -3704,6 +3720,9 @@ export const DataBinding = {
       handlerType: isSet(object.handlerType)
         ? handlerTypeFromJSON(object.handlerType)
         : 0,
+      handlerIds: Array.isArray(object?.handlerIds)
+        ? object.handlerIds.map((e: any) => Number(e))
+        : [],
     };
   },
 
@@ -3715,6 +3734,11 @@ export const DataBinding = {
       (obj.handlerId = Math.round(message.handlerId));
     message.handlerType !== undefined &&
       (obj.handlerType = handlerTypeToJSON(message.handlerType));
+    if (message.handlerIds) {
+      obj.handlerIds = message.handlerIds.map((e) => Math.round(e));
+    } else {
+      obj.handlerIds = [];
+    }
     return obj;
   },
 
@@ -3726,6 +3750,7 @@ export const DataBinding = {
         : undefined;
     message.handlerId = object.handlerId ?? 0;
     message.handlerType = object.handlerType ?? 0;
+    message.handlerIds = object.handlerIds?.map((e) => e) || [];
     return message;
   },
 };

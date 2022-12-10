@@ -132,7 +132,8 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
             data: {
               raw: toBytes(trace),
             },
-            handlerId: config.handlerId,
+            handlerId: 0,
+            handlerIds: [config.handlerId],
             handlerType: HandlerType.ETH_TRACE,
           }
         }
@@ -193,7 +194,8 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
               data: {
                 raw: toBytes(log),
               },
-              handlerId: config.handlerId,
+              handlerId: 0,
+              handlerIds: [config.handlerId],
               handlerType: HandlerType.ETH_LOG,
             }
           }
@@ -254,7 +256,8 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
               data: {
                 raw: toBytes(log),
               },
-              handlerId: config.handlerId,
+              handlerIds: [config.handlerId],
+              handlerId: 0,
               handlerType: HandlerType.ETH_LOG,
             }
           }

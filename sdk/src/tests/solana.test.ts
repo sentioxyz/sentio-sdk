@@ -45,7 +45,7 @@ describe('Test Solana Example', () => {
     expect(res.result?.counters[0].metadata?.blockNumber.toInt()).equal(12345)
     expect(firstCounterValue(res.result, 'total_transfer_amount')).equal(1000000n)
     expect(firstCounterValue(res.result, 'worm')).equal(1000000n)
-    expect(res.result?.counters[0].runtimeInfo?.from).equals(HandlerType.INSTRUCTION)
+    expect(res.result?.counters[0].runtimeInfo?.from).equals(HandlerType.SOL_INSTRUCTIONS)
   })
 
   test('Check SPLToken parsed instruction dispatch', async () => {
@@ -74,6 +74,6 @@ describe('Test Solana Example', () => {
     expect(res.result?.gauges).length(0)
     expect(res.result?.counters[0].metadata?.blockNumber.toInt()).equal(0)
     expect(firstCounterValue(res.result, 'totalWeth_supply')).equal(12000000000000)
-    expect(res.result?.counters[0].runtimeInfo?.from).equals(HandlerType.INSTRUCTION)
+    expect(res.result?.counters[0].runtimeInfo?.from).equals(HandlerType.SOL_INSTRUCTIONS)
   })
 })
