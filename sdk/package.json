@@ -52,6 +52,9 @@
     "webpack": "^5.72.1",
     "webpack-cli": "^4.9.2"
   },
+  "resolutions": {
+    "@grpc/grpc-js": "1.7.3"
+  },
   "devDependencies": {
     "@types/chai": "^4.3.1",
     "@types/command-line-args": "^5.2.0",
