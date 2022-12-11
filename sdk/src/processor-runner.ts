@@ -33,6 +33,7 @@ const optionDefinitions = [
   { name: 'chainquery-server', type: String, defaultValue: '' },
   { name: 'pricefeed-server', type: String, defaultValue: '' },
   { name: 'log-format', type: String, defaultValue: 'console' },
+  { name: 'debug', type: Boolean, defaultValue: false },
 ]
 
 const options = commandLineArgs(optionDefinitions, { partial: true })
@@ -63,7 +64,9 @@ if (options['log-format'] === 'json') {
   console.error = (...args) => logger.error.call(logger, ...args)
   console.debug = (...args) => logger.debug.call(logger, ...args)
 }
-console.log('loading', options.target)
+if (options.debug) {
+  console.log('Starting with', options.target)
+}
 
 const fullPath = path.resolve(options['chains-config'])
 const chainsConfig = fs.readJsonSync(fullPath)
@@ -72,7 +75,9 @@ setProvider(chainsConfig, options.concurrency, options['use-chainserver'])
 globalThis.ENDPOINTS.chainQueryAPI = options['chainquery-server']
 globalThis.ENDPOINTS.priceFeedAPI = options['pricefeed-server']
 
-console.log('Start Server', options)
+if (options.debug) {
+  console.log('Starting Server', options)
+}
 
 const server = createServer({
   'grpc.max_send_message_length': 128 * 1024 * 1024,
@@ -84,3 +89,5 @@ const service = new ProcessorServiceImpl(() => load(options.target), server.shut
 server.add(ProcessorDefinition, service)
 
 server.listen('0.0.0.0:' + options.port)
+
+console.log('Processor Server Started')

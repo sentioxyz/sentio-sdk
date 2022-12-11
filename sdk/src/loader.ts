@@ -10,7 +10,7 @@ export function load(name: string): { module: any; name: string; path: string } 
     }
 
     const module = { module: req(path), name, path }
-    console.log('Load successfully: ', name)
+    console.log('Processor Load successfully')
     return module
   } catch (err) {
     if (err instanceof Error && err.message.startsWith(`Cannot find module '${name}'`)) {
