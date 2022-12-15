@@ -47,4 +47,14 @@ export default class EthersSentio extends Ethers {
       ]
     }
   }
+
+  override afterRun() {
+    const files = super.afterRun()
+    for (const [idx, file] of files.entries()) {
+      if (file.path.endsWith('__factory.ts')) {
+        file.contents = '// @ts-nocheck\n' + file.contents
+      }
+    }
+    return files
+  }
 }
