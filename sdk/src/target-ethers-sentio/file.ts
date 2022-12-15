@@ -2,15 +2,14 @@ import {
   Contract,
   createImportsForUsedIdentifiers,
   EventDeclaration,
-  FunctionDeclaration,
   getFullSignatureAsSymbolForEvent,
 } from 'typechain'
 
 import { reservedKeywords } from '@typechain/ethers-v5/dist/codegen/reserved-keywords'
-import { generateInputTypes, generateOutputTypes } from '@typechain/ethers-v5/dist/codegen/types'
 import { getFullSignatureForEvent } from 'typechain/dist/utils/signatures'
-import { codegenCallTraceTypes, codegenFunctions } from './functions'
-import { EvmType } from 'typechain/dist/parser/parseEvmType'
+import { codegenCallTraceTypes, generateCallHandlers } from './functions-handler'
+import { generateEventHandlers } from './event-handler'
+import { generateBoundViewFunctions, generateViewFunctions } from './view-function'
 
 export function codeGenIndex(contract: Contract): string {
   return ` 
@@ -32,7 +31,7 @@ export function codeGenSentioFile(contract: Contract): string {
 
     ${Object.values(contract.functions)
       .filter((f) => !reservedKeywords.has(f[0].name))
-      .flatMap((v) => v.filter((f) => f.stateMutability == 'view').map(generateViewFunction))
+      .map((fs) => generateViewFunctions(fs))
       .join('\n')}
   }
   
@@ -45,7 +44,7 @@ export function codeGenSentioFile(contract: Contract): string {
 
     ${Object.values(contract.functions)
       .filter((f) => !reservedKeywords.has(f[0].name))
-      .flatMap((v) => v.filter((f) => f.stateMutability == 'view').map(generateBoundViewFunction))
+      .map((fs) => generateBoundViewFunctions(fs))
       .join('\n')}
   }
 
@@ -67,33 +66,23 @@ export function codeGenSentioFile(contract: Contract): string {
     }
 
     ${Object.values(contract.events)
-      .map((events) => {
-        if (events.length === 1) {
-          return generateOnEventFunction(events[0], contract.name, false)
-        } else {
-          return events.map((e) => generateOnEventFunction(e, contract.name, true)).join('\n')
-        }
-      })
+      .map((events) => generateEventHandlers(events, contract.name))
       .join('\n')}
     
     ${Object.values(contract.functions)
-      .map((f) => codegenFunctions(f, contract.name))
+      .map((functions) => {
+        generateCallHandlers(functions, contract.name)
+      })
       .join('\n')}
     }
 
     export class ${contract.name}Processor extends BaseProcessor<${contract.name}, ${contract.name}BoundContractView> {
       ${Object.values(contract.events)
-        .map((events) => {
-          if (events.length === 1) {
-            return generateOnEventFunction(events[0], contract.name, false)
-          } else {
-            return events.map((e) => generateOnEventFunction(e, contract.name, true)).join('\n')
-          }
-        })
+        .map((events) => generateEventHandlers(events, contract.name))
         .join('\n')}
 
       ${Object.values(contract.functions)
-        .map((f) => codegenFunctions(f, contract.name))
+        .map((f) => generateCallHandlers(f, contract.name))
         .join('\n')}
 
     public static filters = templateContract.filters
@@ -223,101 +212,6 @@ export function codeGenTestUtilsFile(contract: Contract): string {
   )
 
   return imports + source
-}
-
-function formatType(type: EvmType): string {
-  if (type.type === 'array') {
-    return formatType(type.itemType) + '[]'
-  } else if (type.type === 'tuple') {
-    return '(' + type.components.map((s) => formatType(s.type)).join(',') + ')'
-  } else {
-    return type.originalType
-  }
-}
-
-// TODO contribute upstream
-function getFullSignatureForEventPatched(event: EventDeclaration): string {
-  return `${event.name}(${event.inputs
-    .map((e) => {
-      return formatType(e.type)
-    })
-    .join(',')})`
-}
-
-function generateOnEventFunction(event: EventDeclaration, contractName: string, includeArgTypes: boolean): string {
-  let eventName = event.name
-  if (includeArgTypes) {
-    eventName = getFullSignatureAsSymbolForEvent(event) + '_'
-  }
-
-  const filterName = getFullSignatureForEventPatched(event)
-  return `
-  onEvent${eventName}(
-    handler: (event: ${eventName}Event, ctx: ${contractName}Context) => void,
-    filter?: ${eventName}EventFilter | ${eventName}EventFilter[]
-  ) {
-    if (!filter) {
-      // @ts-ignore
-      filter = ${contractName}Processor.filters[
-        // @ts-ignore
-        '${filterName}'](${event.inputs.map(() => 'null').join(',')})
-    }
-    return super.onEvent(handler, filter!)
-  }
-  `
-}
-
-// https://github.com/dethcrypto/TypeChain/blob/015abb28bd22826611051f27e0ec96a00f9a0b61/packages/target-ethers-v5/src/codegen/functions.ts#L54
-function generateReturnTypes(fn: FunctionDeclaration) {
-  // sounds like returnResultObject should be true but we need to set false to make it work
-  return `Promise<${generateOutputTypes({ returnResultObject: false, useStructs: true }, fn.outputs)}>`
-}
-
-function generateViewFunction(func: FunctionDeclaration): string {
-  return `
-  async ${func.name}(${generateInputTypes(func.inputs, {
-    useStructs: true,
-  })}overrides?: CallOverrides): ${generateReturnTypes(func)} {
-    try {
-      if (overrides) {
-        return await this.contract.${func.name}(${
-    func.inputs.length > 0 ? func.inputs.map((input, index) => input.name || `arg${index}`).join(',') + ',' : ''
-  } overrides)
-      } else {
-        return await this.contract.${func.name}(${func.inputs
-    .map((input, index) => input.name || `arg${index}`)
-    .join(',')})
-      }
-    } catch (e) {
-      throw transformEtherError(e, undefined)
-    }
-  }
-  `
-}
-
-function generateBoundViewFunction(func: FunctionDeclaration): string {
-  return `
-  async ${func.name}(${generateInputTypes(func.inputs, {
-    useStructs: true,
-  })}overrides?: CallOverrides): ${generateReturnTypes(func)} {
-    try {
-      if (!overrides && this.context) {
-        overrides = {
-          blockTag: this.context.blockNumber.toNumber(),
-        }
-      }
-      if (overrides) {
-        return await this.view.${func.name}(${
-    func.inputs.length > 0 ? func.inputs.map((input, index) => input.name || `arg${index}`).join(',') + ',' : ''
-  } overrides)
-      } else {
-        return await this.view.${func.name}(${func.inputs.map((input, index) => input.name || `arg${index}`).join(',')})
-      }
-    } catch (e) {
-      throw transformEtherError(e, this.context)
-    }
-  }
-  `
 }
 
 function generateMockEventLogFunction(event: EventDeclaration, contractName: string, includeArgTypes: boolean): string {

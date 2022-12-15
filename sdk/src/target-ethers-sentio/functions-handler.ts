@@ -4,13 +4,14 @@ import {
 } from '@typechain/ethers-v5/dist/codegen/types'
 import { FunctionDeclaration, getSignatureForFn } from 'typechain'
 import { utils } from 'ethers'
+import { getFullSignatureAsSymbolForFunction } from './types'
 
-export function codegenFunctions(fns: FunctionDeclaration[], contractName: string): string {
+export function generateCallHandlers(fns: FunctionDeclaration[], contractName: string): string {
   if (fns.length === 1) {
-    return generateFunction(fns[0], contractName)
+    return generateCallHandler(fns[0], contractName)
   }
 
-  return fns.map((fn) => generateFunction(fn, contractName, getFullSignatureAsSymbolForFunction(fn))).join('\n')
+  return fns.map((fn) => generateCallHandler(fn, contractName, getFullSignatureAsSymbolForFunction(fn))).join('\n')
 }
 
 export function codegenCallTraceTypes(fns: FunctionDeclaration[]): string {
@@ -35,7 +36,7 @@ function codegenCallTraceType(fn: FunctionDeclaration, overloadedName?: string):
   `
 }
 
-function generateFunction(fn: FunctionDeclaration, contractName: string, overloadedName?: string): string {
+function generateCallHandler(fn: FunctionDeclaration, contractName: string, overloadedName?: string): string {
   const signature = getSignatureForFn(fn)
   const sighash = utils.keccak256(utils.toUtf8Bytes(signature)).substring(0, 10)
 
@@ -46,18 +47,6 @@ function generateFunction(fn: FunctionDeclaration, contractName: string, overloa
     return super.onTrace("${sighash}", handler);
   }
 `
-}
-
-function getFullSignatureAsSymbolForFunction(fn: FunctionDeclaration): string {
-  return `${fn.name}_${fn.inputs
-    .map((e) => {
-      if (e.type.type === 'array') {
-        return e.type.itemType.originalType + '_array'
-      } else {
-        return e.type.originalType
-      }
-    })
-    .join('_')}`
 }
 
 function capitalizeFirstChar(input: string): string {

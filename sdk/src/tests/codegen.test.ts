@@ -5,10 +5,10 @@ import os from 'os'
 
 describe('Test EVM codegen', () => {
   // TODO make sure code could be compile
-  jest.setTimeout(20000)
+  jest.setTimeout(200000)
   test('code gen for evm', async () => {
-    const codeGenFolder = fs.mkdtempSync(path.join(os.tmpdir(), 'codegen_test'))
-    // const codeGenFolder = path.join(__dirname, 'types/evm/test')
+    // const codeGenFolder = fs.mkdtempSync(path.join(os.tmpdir(), 'codegen_test'))
+    const codeGenFolder = path.join(__dirname, 'types/evm/test')
 
     console.log('source code generated to ' + codeGenFolder)
 
@@ -18,7 +18,7 @@ describe('Test EVM codegen', () => {
       path.join(codeGenFolder, '/internal')
     )
     expect(fs.existsSync(codeGenFolder)).toEqual(true)
-    expect(fs.readdirSync(codeGenFolder).length).toEqual(5)
+    expect(fs.readdirSync(codeGenFolder).length).toEqual(6)
   })
 
   // afterAll(() => {

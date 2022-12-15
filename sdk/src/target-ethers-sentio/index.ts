@@ -1,7 +1,7 @@
 import Ethers from '@typechain/ethers-v5'
 import { Config, extractAbi, extractDocumentation, FileDescription, parse, shortenFullJsonFilePath } from 'typechain'
 import { dirname, join, relative } from 'path'
-import { codeGenIndex, codeGenSentioFile, codeGenTestUtilsFile } from './codegen'
+import { codeGenIndex, codeGenSentioFile, codeGenTestUtilsFile } from './file'
 
 export default class EthersSentio extends Ethers {
   constructor(config: Config) {
