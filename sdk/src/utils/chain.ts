@@ -73,6 +73,7 @@ export const CHAIN_MAP: Record<string, string> = {
   71402: 'godwoken',
   200625: 'akroma',
   333999: 'polis',
+  421613: 'arbitrum test',
   11155111: 'sepolia',
   1313161554: 'aurora',
   1666600000: 'harmony',

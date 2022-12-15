@@ -46,7 +46,7 @@ describe('Test Error Capture', () => {
     } catch (e) {
       err = e
     }
-    assert(err?.message.includes('Record infinite value'))
+    assert(err?.message.includes('Cannot record infinite value'))
   })
 
   test('Check NaN', async () => {

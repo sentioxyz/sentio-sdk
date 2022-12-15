@@ -66,8 +66,9 @@ export interface EvmSQLQueryRequest {
 
 export interface EvmGetHeaderRequest {
   network: string;
-  fromBlock: Long;
-  toBlock: Long;
+  fromBlock?: Long | undefined;
+  toBlock?: Long | undefined;
+  blockNumbers: Long[];
 }
 
 export interface EvmQueryResponse {
@@ -1002,7 +1003,12 @@ export const EvmSQLQueryRequest = {
 };
 
 function createBaseEvmGetHeaderRequest(): EvmGetHeaderRequest {
-  return { network: "", fromBlock: Long.UZERO, toBlock: Long.UZERO };
+  return {
+    network: "",
+    fromBlock: undefined,
+    toBlock: undefined,
+    blockNumbers: [],
+  };
 }
 
 export const EvmGetHeaderRequest = {
@@ -1013,12 +1019,17 @@ export const EvmGetHeaderRequest = {
     if (message.network !== "") {
       writer.uint32(10).string(message.network);
     }
-    if (!message.fromBlock.isZero()) {
+    if (message.fromBlock !== undefined) {
       writer.uint32(16).uint64(message.fromBlock);
     }
-    if (!message.toBlock.isZero()) {
+    if (message.toBlock !== undefined) {
       writer.uint32(24).uint64(message.toBlock);
     }
+    writer.uint32(34).fork();
+    for (const v of message.blockNumbers) {
+      writer.uint64(v);
+    }
+    writer.ldelim();
     return writer;
   },
 
@@ -1038,6 +1049,16 @@ export const EvmGetHeaderRequest = {
         case 3:
           message.toBlock = reader.uint64() as Long;
           break;
+        case 4:
+          if ((tag & 7) === 2) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.blockNumbers.push(reader.uint64() as Long);
+            }
+          } else {
+            message.blockNumbers.push(reader.uint64() as Long);
+          }
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1051,10 +1072,13 @@ export const EvmGetHeaderRequest = {
       network: isSet(object.network) ? String(object.network) : "",
       fromBlock: isSet(object.fromBlock)
         ? Long.fromValue(object.fromBlock)
-        : Long.UZERO,
+        : undefined,
       toBlock: isSet(object.toBlock)
         ? Long.fromValue(object.toBlock)
-        : Long.UZERO,
+        : undefined,
+      blockNumbers: Array.isArray(object?.blockNumbers)
+        ? object.blockNumbers.map((e: any) => Long.fromValue(e))
+        : [],
     };
   },
 
@@ -1062,9 +1086,16 @@ export const EvmGetHeaderRequest = {
     const obj: any = {};
     message.network !== undefined && (obj.network = message.network);
     message.fromBlock !== undefined &&
-      (obj.fromBlock = (message.fromBlock || Long.UZERO).toString());
+      (obj.fromBlock = (message.fromBlock || undefined).toString());
     message.toBlock !== undefined &&
-      (obj.toBlock = (message.toBlock || Long.UZERO).toString());
+      (obj.toBlock = (message.toBlock || undefined).toString());
+    if (message.blockNumbers) {
+      obj.blockNumbers = message.blockNumbers.map((e) =>
+        (e || Long.UZERO).toString()
+      );
+    } else {
+      obj.blockNumbers = [];
+    }
     return obj;
   },
 
@@ -1074,11 +1105,13 @@ export const EvmGetHeaderRequest = {
     message.fromBlock =
       object.fromBlock !== undefined && object.fromBlock !== null
         ? Long.fromValue(object.fromBlock)
-        : Long.UZERO;
+        : undefined;
     message.toBlock =
       object.toBlock !== undefined && object.toBlock !== null
         ? Long.fromValue(object.toBlock)
-        : Long.UZERO;
+        : undefined;
+    message.blockNumbers =
+      object.blockNumbers?.map((e) => Long.fromValue(e)) || [];
     return message;
   },
 };
@@ -1311,6 +1344,14 @@ export const EvmQueryDefinition = {
       responseStream: false,
       options: {},
     },
+    evmHintHeaderCache: {
+      name: "EvmHintHeaderCache",
+      requestType: EvmGetHeaderRequest,
+      requestStream: false,
+      responseType: VoidResponse,
+      responseStream: false,
+      options: {},
+    },
   },
 } as const;
 
@@ -1323,6 +1364,10 @@ export interface EvmQueryServiceImplementation<CallContextExt = {}> {
     request: EvmGetHeaderRequest,
     context: CallContext & CallContextExt
   ): Promise<DeepPartial<EvmQueryResponse>>;
+  evmHintHeaderCache(
+    request: EvmGetHeaderRequest,
+    context: CallContext & CallContextExt
+  ): Promise<DeepPartial<VoidResponse>>;
 }
 
 export interface EvmQueryClient<CallOptionsExt = {}> {
@@ -1334,6 +1379,10 @@ export interface EvmQueryClient<CallOptionsExt = {}> {
     request: DeepPartial<EvmGetHeaderRequest>,
     options?: CallOptions & CallOptionsExt
   ): Promise<EvmQueryResponse>;
+  evmHintHeaderCache(
+    request: DeepPartial<EvmGetHeaderRequest>,
+    options?: CallOptions & CallOptionsExt
+  ): Promise<VoidResponse>;
 }
 
 type Builtin =
