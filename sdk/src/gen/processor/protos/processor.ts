@@ -4,6 +4,51 @@ import Long from "long";
 import { Empty } from "../../google/protobuf/empty";
 import _m0 from "protobufjs/minimal";
 
+export enum MetricType {
+  UNKNOWN_TYPE = 0,
+  COUNTER = 1,
+  GAUGE = 2,
+  HISTOGRAM = 3,
+  UNRECOGNIZED = -1,
+}
+
+export function metricTypeFromJSON(object: any): MetricType {
+  switch (object) {
+    case 0:
+    case "UNKNOWN_TYPE":
+      return MetricType.UNKNOWN_TYPE;
+    case 1:
+    case "COUNTER":
+      return MetricType.COUNTER;
+    case 2:
+    case "GAUGE":
+      return MetricType.GAUGE;
+    case 3:
+    case "HISTOGRAM":
+      return MetricType.HISTOGRAM;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return MetricType.UNRECOGNIZED;
+  }
+}
+
+export function metricTypeToJSON(object: MetricType): string {
+  switch (object) {
+    case MetricType.UNKNOWN_TYPE:
+      return "UNKNOWN_TYPE";
+    case MetricType.COUNTER:
+      return "COUNTER";
+    case MetricType.GAUGE:
+      return "GAUGE";
+    case MetricType.HISTOGRAM:
+      return "HISTOGRAM";
+    case MetricType.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
 export enum AggregationType {
   COUNT = 0,
   SUM = 1,
@@ -297,6 +342,7 @@ export interface MetricConfig {
   unit: string;
   sparse: boolean;
   resolutionInSeconds: number;
+  type: MetricType;
   aggregationConfig: AggregationConfig | undefined;
 }
 
@@ -1443,6 +1489,7 @@ function createBaseMetricConfig(): MetricConfig {
     unit: "",
     sparse: false,
     resolutionInSeconds: 0,
+    type: 0,
     aggregationConfig: undefined,
   };
 }
@@ -1466,6 +1513,9 @@ export const MetricConfig = {
     }
     if (message.resolutionInSeconds !== 0) {
       writer.uint32(40).int32(message.resolutionInSeconds);
+    }
+    if (message.type !== 0) {
+      writer.uint32(56).int32(message.type);
     }
     if (message.aggregationConfig !== undefined) {
       AggregationConfig.encode(
@@ -1498,6 +1548,9 @@ export const MetricConfig = {
         case 5:
           message.resolutionInSeconds = reader.int32();
           break;
+        case 7:
+          message.type = reader.int32() as any;
+          break;
         case 6:
           message.aggregationConfig = AggregationConfig.decode(
             reader,
@@ -1521,6 +1574,7 @@ export const MetricConfig = {
       resolutionInSeconds: isSet(object.resolutionInSeconds)
         ? Number(object.resolutionInSeconds)
         : 0,
+      type: isSet(object.type) ? metricTypeFromJSON(object.type) : 0,
       aggregationConfig: isSet(object.aggregationConfig)
         ? AggregationConfig.fromJSON(object.aggregationConfig)
         : undefined,
@@ -1536,6 +1590,7 @@ export const MetricConfig = {
     message.sparse !== undefined && (obj.sparse = message.sparse);
     message.resolutionInSeconds !== undefined &&
       (obj.resolutionInSeconds = Math.round(message.resolutionInSeconds));
+    message.type !== undefined && (obj.type = metricTypeToJSON(message.type));
     message.aggregationConfig !== undefined &&
       (obj.aggregationConfig = message.aggregationConfig
         ? AggregationConfig.toJSON(message.aggregationConfig)
@@ -1550,6 +1605,7 @@ export const MetricConfig = {
     message.unit = object.unit ?? "";
     message.sparse = object.sparse ?? false;
     message.resolutionInSeconds = object.resolutionInSeconds ?? 0;
+    message.type = object.type ?? 0;
     message.aggregationConfig =
       object.aggregationConfig !== undefined &&
       object.aggregationConfig !== null

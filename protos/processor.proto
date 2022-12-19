@@ -98,6 +98,13 @@ message ExportConfig {
   string channel = 2;
 }
 
+enum MetricType {
+  UNKNOWN_TYPE = 0;
+  COUNTER = 1;
+  GAUGE = 2;
+  HISTOGRAM = 3;
+}
+
 message MetricConfig {
   string name = 1;
   string description = 3;
@@ -106,6 +113,7 @@ message MetricConfig {
   // Depracated
   int32 resolution_in_seconds = 5;
 
+  MetricType type = 7;
   AggregationConfig aggregation_config = 6;
 }
 

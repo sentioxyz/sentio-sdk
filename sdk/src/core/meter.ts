@@ -1,7 +1,7 @@
 import { BaseContext } from './base-context'
 import { Numberish, toMetricValue } from './numberish'
 import { Labels, NamedResultDescriptor } from './metadata'
-import { AggregationConfig, AggregationType, MetricConfig } from '../gen'
+import { AggregationConfig, AggregationType, MetricConfig, MetricType } from '../gen'
 import { MapStateStorage } from '../state/state-storage'
 
 export function normalizeName(name: string): string {
@@ -41,19 +41,17 @@ export class CounterOptions {
   sparse?: boolean
 }
 
-enum MetricType {
-  Counter = 0,
-  Gauge = 1,
-}
+// enum MetricType {
+//   Counter = 0,
+//   Gauge = 1,
+// }
 
 export class Metric extends NamedResultDescriptor {
-  type: MetricType
-  descriptor: MetricConfig
+  config: MetricConfig
   constructor(type: MetricType, name: string, option?: MetricOptions) {
     super(name)
-    this.type = type
-    this.descriptor = MetricConfig.fromPartial({ name: this.name, ...option })
-    const aggregationConfig = this.descriptor.aggregationConfig
+    this.config = MetricConfig.fromPartial({ name: this.name, type: type, ...option })
+    const aggregationConfig = this.config.aggregationConfig
     if (aggregationConfig && aggregationConfig.intervalInMinutes.length) {
       if (aggregationConfig.intervalInMinutes.length > 1) {
         console.error('current only support one intervalInMinutes, only first interval will be used for', name)
@@ -71,12 +69,12 @@ export class MetricState extends MapStateStorage<Metric> {
   getOrRegisterMetric(type: MetricType, name: string, option?: CounterOptions | MetricOptions): Metric {
     const metricMap = this.getOrRegister()
     let metric = metricMap.get(name)
-    if (metric && metric.type !== type) {
-      throw Error(`redefine ${name} of metric type ${type} that is previously ${metric.type}`)
+    if (metric && metric.config.type !== type) {
+      throw Error(`redefine ${name} of metric type ${type} that is previously ${metric.config.type}`)
     }
 
     if (!metric) {
-      if (type === MetricType.Counter) {
+      if (type === MetricType.COUNTER) {
         metric = new Counter(name, option)
       } else {
         metric = new Gauge(name, option)
@@ -89,11 +87,11 @@ export class MetricState extends MapStateStorage<Metric> {
 
 export class Counter extends Metric {
   static register(name: string, option?: CounterOptions): Counter {
-    return MetricState.INSTANCE.getOrRegisterMetric(MetricType.Counter, name, option) as Counter
+    return MetricState.INSTANCE.getOrRegisterMetric(MetricType.COUNTER, name, option) as Counter
   }
 
   constructor(name: string, option?: MetricOptions) {
-    super(MetricType.Counter, name, option)
+    super(MetricType.COUNTER, name, option)
   }
 
   add(ctx: BaseContext, value: Numberish, labels: Labels = {}) {
@@ -134,16 +132,16 @@ export class CounterBinding {
 
 export class Gauge extends Metric {
   static register(name: string, option?: MetricOptions): Gauge {
-    return MetricState.INSTANCE.getOrRegisterMetric(MetricType.Gauge, name, option) as Gauge
+    return MetricState.INSTANCE.getOrRegisterMetric(MetricType.GAUGE, name, option) as Gauge
   }
 
   constructor(name: string, option?: MetricOptions) {
-    super(MetricType.Counter, name, option)
+    super(MetricType.GAUGE, name, option)
   }
 
   record(ctx: BaseContext, value: Numberish, labels: Labels = {}) {
     ctx.res.gauges.push({
-      metadata: ctx.getMetaData(this.descriptor.name, labels),
+      metadata: ctx.getMetaData(this.config.name, labels),
       metricValue: toMetricValue(value),
       runtimeInfo: undefined,
     })

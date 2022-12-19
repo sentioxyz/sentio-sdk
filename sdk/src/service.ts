@@ -46,7 +46,6 @@ import { AccountProcessorState } from './core/account-processor'
 import { SuiProcessorState } from './core/sui-processor'
 import { SolanaProcessorState } from './core/solana-processor'
 import { ProcessorState } from './binds'
-
 ;(BigInt.prototype as any).toJSON = function () {
   return this.toString()
 }
@@ -118,7 +117,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     // part 0, prepare metrics and event tracking configs
     for (const metric of MetricState.INSTANCE.getValues()) {
       this.metricConfigs.push({
-        ...metric.descriptor,
+        ...metric.config,
       })
     }
 
