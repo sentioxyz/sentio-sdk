@@ -2,7 +2,7 @@
 
 import { expect } from 'chai'
 
-import { HandlerType, ProcessInstructionsRequest } from '..'
+import { HandlerType } from '..'
 
 import Long from 'long'
 import { TextEncoder } from 'util'
@@ -23,29 +23,28 @@ describe('Test Solana Example', () => {
   })
 
   test('Check wormhole token bridge instruction dispatch', async () => {
-    const request: ProcessInstructionsRequest = {
-      instructions: [
-        {
-          instructionData: '33G5T8yXAQWdH8FX7fTy1mBJ6e4dUKfQWbViSrT7qJjpS8UAA3ftEQx9sNzrkaJm56xtENhDsWf',
-          slot: Long.fromNumber(12345),
-          programAccountId: 'wormDTUJ6AWPNvk59vGQbDvGJmqbDTdgWgAqcLBCgUb',
-          accounts: ['worm'],
-        },
-        {
-          instructionData: '33G5T8yXAQWdH8FX7fTy1mBJ6e4dUKfQWbViSrT7qJjpS8UAA3ftEQx9sNzrkaJm56xtENhDsWf',
-          slot: Long.fromNumber(1),
-          programAccountId: 'wormDTUJ6AWPNvk59vGQbDvGJmqbDTdgWgAqcLBCgUb',
-          accounts: ['worm'],
-        },
-      ],
-    }
-    const res = await service.processInstructions(request)
+    const instructions = [
+      {
+        instructionData: '33G5T8yXAQWdH8FX7fTy1mBJ6e4dUKfQWbViSrT7qJjpS8UAA3ftEQx9sNzrkaJm56xtENhDsWf',
+        slot: Long.fromNumber(12345),
+        programAccountId: 'wormDTUJ6AWPNvk59vGQbDvGJmqbDTdgWgAqcLBCgUb',
+        accounts: ['worm'],
+      },
+      {
+        instructionData: '33G5T8yXAQWdH8FX7fTy1mBJ6e4dUKfQWbViSrT7qJjpS8UAA3ftEQx9sNzrkaJm56xtENhDsWf',
+        slot: Long.fromNumber(1),
+        programAccountId: 'wormDTUJ6AWPNvk59vGQbDvGJmqbDTdgWgAqcLBCgUb',
+        accounts: ['worm'],
+      },
+    ]
+
+    const res = await service.testInstructions(instructions)
     expect(res.result?.counters).length(4)
     expect(res.result?.gauges).length(0)
     expect(res.result?.counters[0].metadata?.blockNumber.toInt()).equal(12345)
     expect(firstCounterValue(res.result, 'total_transfer_amount')).equal(1000000n)
     expect(firstCounterValue(res.result, 'worm')).equal(1000000n)
-    expect(res.result?.counters[0].runtimeInfo?.from).equals(HandlerType.SOL_INSTRUCTIONS)
+    expect(res.result?.counters[0].runtimeInfo?.from).equals(HandlerType.SOL_INSTRUCTION)
   })
 
   test('Check SPLToken parsed instruction dispatch', async () => {
@@ -58,22 +57,20 @@ describe('Test Solana Example', () => {
       },
       type: 'mintTo',
     }
-    const request: ProcessInstructionsRequest = {
-      instructions: [
-        {
-          instructionData: '',
-          slot: Long.fromNumber(0),
-          programAccountId: 'wormDTUJ6AWPNvk59vGQbDvGJmqbDTdgWgAqcLBCgUb',
-          parsed: new TextEncoder().encode(JSON.stringify(parsedIns)),
-          accounts: [],
-        },
-      ],
-    }
-    const res = await service.processInstructions(request)
+    const instructions = [
+      {
+        instructionData: '',
+        slot: Long.fromNumber(0),
+        programAccountId: 'wormDTUJ6AWPNvk59vGQbDvGJmqbDTdgWgAqcLBCgUb',
+        parsed: new TextEncoder().encode(JSON.stringify(parsedIns)),
+        accounts: [],
+      },
+    ]
+    const res = await service.testInstructions(instructions)
     expect(res.result?.counters).length(1)
     expect(res.result?.gauges).length(0)
     expect(res.result?.counters[0].metadata?.blockNumber.toInt()).equal(0)
     expect(firstCounterValue(res.result, 'totalWeth_supply')).equal(12000000000000)
-    expect(res.result?.counters[0].runtimeInfo?.from).equals(HandlerType.SOL_INSTRUCTIONS)
+    expect(res.result?.counters[0].runtimeInfo?.from).equals(HandlerType.SOL_INSTRUCTION)
   })
 })

@@ -1,5 +1,5 @@
 import { BaseContext } from './base-context'
-import { DataDescriptor, LogLevel } from '../gen'
+import { LogLevel } from '../gen'
 import { NamedResultDescriptor } from './metadata'
 
 export type Attributes = Record<string, any>

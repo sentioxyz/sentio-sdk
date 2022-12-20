@@ -15,25 +15,7 @@ service Processor {
   // during log processing
   rpc GetConfig(ProcessConfigRequest) returns (ProcessConfigResponse);
 
-  // This only applies to EVM-compatible chain
-  // Process a list of logs associate with their handler id
-  // Logs will be ordered by their creation time, the caller should also guarantee
-  // It will also return a flag indicate if new contract config is added during the process
-  rpc ProcessLogs(ProcessBindingsRequest) returns (ProcessBindingResponse);
-
-  rpc ProcessTraces(ProcessBindingsRequest) returns (ProcessBindingResponse);
-
-  // Not implemented yet
-  rpc ProcessTransactions(ProcessTransactionsRequest) returns (ProcessBindingResponse);
-
-  rpc ProcessInstructions(ProcessInstructionsRequest) returns (ProcessBindingResponse);
-
-  // Process a list of blocks associate with their handler id
-  // No particular order is assumed for the list of blocks
-  rpc ProcessBlocks(ProcessBlocksRequest) returns (ProcessBindingResponse);
-
-  // TODO migrate to this API, which could make sure different processing logic could be handled
-  // in a serializable way
+  // Process data binding
   rpc ProcessBindings(ProcessBindingsRequest) returns (ProcessBindingResponse);
 }
 
@@ -59,7 +41,6 @@ message ProcessConfigResponse {
 
 message ContractConfig {
   ContractInfo contract = 1;
-  repeated BlockHandlerConfig block_configs = 7; // TODO deprecate this
   repeated OnIntervalConfig interval_configs = 11;
   repeated LogHandlerConfig log_configs = 3;
   repeated TraceHandlerConfig trace_configs = 2;
@@ -110,8 +91,6 @@ message MetricConfig {
   string description = 3;
   string unit = 2;
   bool sparse = 4;
-  // Depracated
-  int32 resolution_in_seconds = 5;
 
   MetricType type = 7;
   AggregationConfig aggregation_config = 6;
@@ -265,19 +244,6 @@ message Topic {
   repeated string hashes = 1;
 }
 
-message ProcessTransactionsRequest {
-  string chain_id = 1;
-  repeated RawTransaction transactions = 2;
-}
-
-message ProcessInstructionsRequest {
-  repeated Instruction instructions = 1;
-}
-
-message ProcessBlocksRequest {
-  repeated BlockBinding block_bindings = 2;
-}
-
 message ProcessBindingsRequest {
   repeated DataBinding bindings = 1;
 }
@@ -310,15 +276,8 @@ message Data {
 
 message DataBinding {
   Data data = 1;
-  int32 handler_id = 2;
   HandlerType handler_type = 3;
   repeated int32 handler_ids = 4;
-}
-
-// TODO migrate this to just use one handler_id?
-message BlockBinding {
-  RawBlock block = 1;
-  repeated int32 handler_ids = 2; // TODO consider make log binds contain list of handler id as well
 }
 
 message RawBlock {
@@ -331,18 +290,6 @@ message ProcessResult {
   repeated LogResult logs = 3;
   repeated EventTrackingResult events = 4;
   repeated ExportResult exports = 5;
-}
-
-// TODO deprecate this
-message DataDescriptor {
-  string name = 1;
-  string description = 3;
-  // Only for metrics
-  string unit = 2;
-  // Only for metrics
-  bool sparse = 4;
-  // how to reduce the metrics, in seconds, 0 means no reduction
-  int32 resolution_in_seconds = 5;
 }
 
 message RecordMetaData {
@@ -366,8 +313,6 @@ message RecordMetaData {
 
   // These are populated by users in meter.
   // The metric name and properties
-  // TODO move descriptor to init and deprecate this
-  DataDescriptor dataDescriptor = 8;
   string name = 10;
 
   // The metric labels provided by users.
@@ -392,7 +337,7 @@ enum HandlerType {
   ETH_LOG = 1;
   ETH_BLOCK = 2;
   ETH_TRACE = 5;
-  SOL_INSTRUCTIONS = 4;
+  SOL_INSTRUCTION = 4;
   APT_EVENT = 6;
   APT_CALL = 7;
   APT_RESOURCE = 8;

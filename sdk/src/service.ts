@@ -6,7 +6,6 @@ import {
   AccountConfig,
   AptosCallHandlerConfig,
   AptosEventHandlerConfig,
-  BlockBinding,
   ContractConfig,
   DataBinding,
   EventTrackingConfig,
@@ -18,13 +17,10 @@ import {
   MetricConfig,
   ProcessBindingResponse,
   ProcessBindingsRequest,
-  ProcessBlocksRequest,
   ProcessConfigRequest,
   ProcessConfigResponse,
-  ProcessInstructionsRequest,
   ProcessorServiceImplementation,
   ProcessResult,
-  ProcessTransactionsRequest,
   StartRequest,
   TemplateInstance,
 } from './gen'
@@ -154,7 +150,6 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
           address: processor.config.address,
           abi: '',
         },
-        blockConfigs: [],
         intervalConfigs: [],
         logConfigs: [],
         traceConfigs: [],
@@ -284,7 +279,6 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
           address: solanaProcessor.address,
           abi: '',
         },
-        blockConfigs: [],
         logConfigs: [],
         traceConfigs: [],
         intervalConfigs: [],
@@ -311,7 +305,6 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
           address: suiProcessor.address,
           abi: '',
         },
-        blockConfigs: [],
         logConfigs: [],
         intervalConfigs: [],
         traceConfigs: [],
@@ -334,7 +327,6 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
           address: aptosProcessor.config.address,
           abi: '',
         },
-        blockConfigs: [],
         intervalConfigs: [],
         logConfigs: [],
         traceConfigs: [],
@@ -472,10 +464,6 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
   }
 
   async processBinding(request: DataBinding, options?: CallContext): Promise<ProcessResult> {
-    if (request.handlerIds.length == 0) {
-      request.handlerIds = [request.handlerId]
-    }
-
     const processBindingInternal = (request: DataBinding) => {
       switch (request.handlerType) {
         case HandlerType.APT_CALL:
@@ -489,10 +477,10 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         case HandlerType.ETH_TRACE:
           return this.processTrace(request)
         case HandlerType.ETH_BLOCK:
-          return this.processBlockNew(request)
-        case HandlerType.SOL_INSTRUCTIONS:
-          return this.processInstructionsNew(request)
-        // TODO migrate SOLANA SUI cases
+          return this.processBlock(request)
+        case HandlerType.SOL_INSTRUCTION:
+          return this.procecessSolInstruSolctions(request)
+        // TODO migrate SUI cases
         // case HandlerType.INSTRUCTION:
         //   return this.processInstruction(request)
         default:
@@ -537,9 +525,6 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     if (!l.data) {
       throw new ServerError(Status.INVALID_ARGUMENT, "Log can't be null")
     }
-    if (l.handlerIds.length == 0) {
-      l.handlerIds = [l.handlerId]
-    }
 
     const promises: Promise<ProcessResult>[] = []
     const jsonString = Utf8ArrayToStr(l.data.raw)
@@ -556,200 +541,56 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     return mergeProcessResults(await Promise.all(promises))
   }
 
-  async processTransactions(
-    request: ProcessTransactionsRequest,
-    context: CallContext
-  ): Promise<ProcessBindingResponse> {
-    if (!this.started) {
-      throw new ServerError(Status.UNAVAILABLE, 'Service not started.')
-    }
-
-    const result = ProcessResult.fromPartial({})
-
-    if (request.chainId.toLowerCase().startsWith('sui') && SuiProcessorState.INSTANCE.getValues()) {
-      const processorPromises: Promise<void>[] = []
-      for (const txn of request.transactions) {
-        processorPromises.push(
-          new Promise((resolve, _) => {
-            for (const processor of SuiProcessorState.INSTANCE.getValues()) {
-              const res = processor.handleTransaction(
-                JSON.parse(new TextDecoder().decode(txn.raw)),
-                txn.slot ?? Long.fromNumber(0)
-              )
-              if (res) {
-                res.gauges.forEach((g) => result.gauges.push(g))
-                res.counters.forEach((c) => result.counters.push(c))
-                res.logs.forEach((l) => result.logs.push(l))
-              }
-            }
-            resolve()
-          })
-        )
-      }
-      await Promise.all(processorPromises)
-    }
-
-    recordRuntimeInfo(result, HandlerType.SUI_TRANSACTION)
-    return {
-      result,
-      configUpdated: false,
-    }
-  }
-
-  async processInstructions(
-    request: ProcessInstructionsRequest,
-    context: CallContext
-  ): Promise<ProcessBindingResponse> {
-    if (!this.started) {
-      throw new ServerError(Status.UNAVAILABLE, 'Service not started.')
-    }
-
-    const result = ProcessResult.fromPartial({})
-
-    // Only have instruction handlers for solana processors
-    if (SolanaProcessorState.INSTANCE.getValues()) {
-      const processorPromises: Promise<void>[] = []
-      for (const instruction of request.instructions) {
-        if (!instruction) {
-          throw new ServerError(Status.INVALID_ARGUMENT, 'instruction cannot be null')
-        }
-
-        processorPromises.push(
-          new Promise((resolve, _) => {
-            for (const processor of SolanaProcessorState.INSTANCE.getValues()) {
-              if (processor.address === instruction.programAccountId) {
-                let parsedInstruction: SolInstruction | null = null
-                if (instruction.parsed) {
-                  parsedInstruction = processor.getParsedInstruction(
-                    JSON.parse(new TextDecoder().decode(instruction.parsed))
-                  )
-                } else if (instruction.instructionData) {
-                  parsedInstruction = processor.getParsedInstruction(instruction.instructionData)
-                }
-                if (parsedInstruction == null) {
-                  continue
-                }
-                const insHandler = processor.getInstructionHandler(parsedInstruction)
-                if (insHandler == null) {
-                  continue
-                }
-                const res = processor.handleInstruction(
-                  parsedInstruction,
-                  instruction.accounts,
-                  insHandler,
-                  instruction.slot
-                )
-                res.gauges.forEach((g) => result.gauges.push(g))
-                res.counters.forEach((c) => result.counters.push(c))
-                res.logs.forEach((l) => result.logs.push(l))
-              }
-            }
-            resolve()
-          })
-        )
-      }
-
-      await Promise.all(processorPromises)
-    }
-
-    recordRuntimeInfo(result, HandlerType.SOL_INSTRUCTIONS)
-    return {
-      result,
-      configUpdated: false,
-    }
-  }
-
-  async processInstructionsNew(request: DataBinding): Promise<ProcessResult> {
-    if (!this.started) {
-      throw new ServerError(Status.UNAVAILABLE, 'Service not started.')
-    }
+  async procecessSolInstruSolctions(request: DataBinding): Promise<ProcessResult> {
     if (!request.data) {
       throw new ServerError(Status.INVALID_ARGUMENT, 'instruction data cannot be empty')
     }
 
-    const jsonString = Utf8ArrayToStr(request.data.raw)
-    const instructions: Instruction[] = JSON.parse(jsonString)
+    // const jsonString =  new TextDecoder().decode(request.data.raw)  // Utf8ArrayToStr(request.data.raw)
+
+    const instruction: Instruction = Instruction.decode(request.data.raw) // JSON.parse(jsonString)
     const promises: Promise<ProcessResult>[] = []
 
     // Only have instruction handlers for solana processors
-    if (SolanaProcessorState.INSTANCE.getValues()) {
-      for (const instruction of instructions) {
-        if (!instruction) {
-          throw new ServerError(Status.INVALID_ARGUMENT, 'instruction cannot be null')
-        }
-
-        for (const processor of SolanaProcessorState.INSTANCE.getValues()) {
-          if (processor.address === instruction.programAccountId) {
-            let parsedInstruction: SolInstruction | null = null
-            if (instruction.parsed) {
-              parsedInstruction = processor.getParsedInstruction(
-                JSON.parse(new TextDecoder().decode(instruction.parsed))
-              )
-            } else if (instruction.instructionData) {
-              parsedInstruction = processor.getParsedInstruction(instruction.instructionData)
-            }
-            if (parsedInstruction == null) {
-              continue
-            }
-            const insHandler = processor.getInstructionHandler(parsedInstruction)
-            if (insHandler == null) {
-              continue
-            }
-            const res = await processor.handleInstruction(
-              parsedInstruction,
-              instruction.accounts,
-              insHandler,
-              instruction.slot
-            )
-
-            promises.push(Promise.resolve(res))
+    for (const processor of SolanaProcessorState.INSTANCE.getValues()) {
+      if (processor.address === instruction.programAccountId) {
+        let parsedInstruction: SolInstruction | null = null
+        if (instruction.parsed) {
+          // const decoded = new TextDecoder().decode(instruction.parsed)
+          if (!(instruction.parsed instanceof Uint8Array)) {
+            // const parsed = instruction.parsed as Uint8Array
+            const values = Object.entries(instruction.parsed).map(([key, value]) => value) as number[]
+            instruction.parsed = Uint8Array.from(values)
           }
+
+          const a1 = JSON.parse(new TextDecoder().decode(instruction.parsed))
+          parsedInstruction = processor.getParsedInstruction(a1)
+        } else if (instruction.instructionData) {
+          parsedInstruction = processor.getParsedInstruction(instruction.instructionData)
         }
+        if (parsedInstruction == null) {
+          continue
+        }
+        const insHandler = processor.getInstructionHandler(parsedInstruction)
+        if (insHandler == null) {
+          continue
+        }
+        const res = await processor.handleInstruction(
+          parsedInstruction,
+          instruction.accounts,
+          insHandler,
+          instruction.slot
+        )
+
+        promises.push(Promise.resolve(res))
       }
     }
     return mergeProcessResults(await Promise.all(promises))
   }
 
-  async processBlocks(request: ProcessBlocksRequest, context: CallContext): Promise<ProcessBindingResponse> {
-    if (!this.started) {
-      throw new ServerError(Status.UNAVAILABLE, 'Service Not started.')
-    }
-
-    const promises = request.blockBindings.map((binding) => this.processBlock(binding))
-    const result = mergeProcessResults(await Promise.all(promises))
-
-    recordRuntimeInfo(result, HandlerType.ETH_BLOCK)
-    return {
-      result,
-      configUpdated: false,
-    }
-  }
-
-  async processBlock(binding: BlockBinding): Promise<ProcessResult> {
-    if (!binding.block) {
-      throw new ServerError(Status.INVALID_ARGUMENT, "Block can't be empty")
-    }
-    const jsonString = Utf8ArrayToStr(binding.block.raw)
-
-    const block: Block = JSON.parse(jsonString)
-
-    const promises: Promise<ProcessResult>[] = []
-    for (const handlerId of binding.handlerIds) {
-      const promise = this.blockHandlers[handlerId](block).catch((e) => {
-        throw new ServerError(Status.INTERNAL, 'error processing block: ' + block.number + '\n' + errorString(e))
-      })
-      promises.push(promise)
-    }
-    return mergeProcessResults(await Promise.all(promises))
-  }
-
-  // TODO remove above old processBlock logic
-  async processBlockNew(binding: DataBinding): Promise<ProcessResult> {
+  async processBlock(binding: DataBinding): Promise<ProcessResult> {
     if (!binding.data) {
       throw new ServerError(Status.INVALID_ARGUMENT, "Block can't be empty")
-    }
-    if (binding.handlerIds.length == 0) {
-      binding.handlerIds = [binding.handlerId]
     }
 
     const jsonString = Utf8ArrayToStr(binding.data.raw)
@@ -785,9 +626,6 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
   async processTrace(binding: DataBinding): Promise<ProcessResult> {
     if (!binding.data) {
       throw new ServerError(Status.INVALID_ARGUMENT, "Trace can't be empty")
-    }
-    if (binding.handlerIds.length == 0) {
-      binding.handlerIds = [binding.handlerId]
     }
     const jsonString = Utf8ArrayToStr(binding.data.raw)
     const trace: Trace = JSON.parse(jsonString)

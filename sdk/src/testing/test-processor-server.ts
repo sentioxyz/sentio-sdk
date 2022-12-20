@@ -1,17 +1,14 @@
 import {
   AccountConfig,
-  BlockBinding,
   ContractConfig,
   DataBinding,
   HandlerType,
+  Instruction,
   ProcessBindingResponse,
   ProcessBindingsRequest,
-  ProcessBlocksRequest,
   ProcessConfigRequest,
   ProcessConfigResponse,
-  ProcessInstructionsRequest,
   ProcessorServiceImplementation,
-  ProcessTransactionsRequest,
   StartRequest,
 } from '../gen'
 import { CallContext } from 'nice-grpc-common'
@@ -27,6 +24,7 @@ import { ProcessorServiceImpl } from '../service'
 import { Trace } from '../core/trace'
 import { setProvider } from '../provider'
 import { account } from '../builtin/aptos/0x1'
+import { TextEncoder } from 'util'
 
 export const TEST_CONTEXT: CallContext = <CallContext>{}
 
@@ -75,13 +73,13 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
     return this.service.getConfig(request, context)
   }
 
-  processBlocks(request: ProcessBlocksRequest, context = TEST_CONTEXT): Promise<ProcessBindingResponse> {
-    return this.service.processBlocks(request, context)
-  }
-
-  processInstructions(request: ProcessInstructionsRequest, context = TEST_CONTEXT): Promise<ProcessBindingResponse> {
-    return this.service.processInstructions(request, context)
-  }
+  // processBlocks(request: ProcessBlocksRequest, context = TEST_CONTEXT): Promise<ProcessBindingResponse> {
+  //   return this.service.processBlocks(request, context)
+  // }
+  //
+  // processInstructions(request: ProcessInstructionsRequest, context = TEST_CONTEXT): Promise<ProcessBindingResponse> {
+  //   return this.service.processInstructions(request, context)
+  // }
 
   processLogs(request: ProcessBindingsRequest, context = TEST_CONTEXT): Promise<ProcessBindingResponse> {
     return this.service.processLogs(request, context)
@@ -90,10 +88,10 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
   processTraces(request: ProcessBindingsRequest, context: CallContext = TEST_CONTEXT): Promise<ProcessBindingResponse> {
     return this.service.processTraces(request, context)
   }
-
-  processTransactions(request: ProcessTransactionsRequest, context = TEST_CONTEXT): Promise<ProcessBindingResponse> {
-    return this.service.processTransactions(request, context)
-  }
+  //
+  // processTransactions(request: ProcessTransactionsRequest, context = TEST_CONTEXT): Promise<ProcessBindingResponse> {
+  //   return this.service.processTransactions(request, context)
+  // }
 
   testTrace(trace: Trace, network: Networkish = 1): Promise<ProcessBindingResponse> {
     return this.testTraces([trace], network)
@@ -132,7 +130,6 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
             data: {
               raw: toBytes(trace),
             },
-            handlerId: 0,
             handlerIds: [config.handlerId],
             handlerType: HandlerType.ETH_TRACE,
           }
@@ -194,7 +191,6 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
               data: {
                 raw: toBytes(log),
               },
-              handlerId: 0,
               handlerIds: [config.handlerId],
               handlerType: HandlerType.ETH_LOG,
             }
@@ -257,7 +253,6 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
                 raw: toBytes(log),
               },
               handlerIds: [config.handlerId],
-              handlerId: 0,
               handlerType: HandlerType.ETH_LOG,
             }
           }
@@ -280,16 +275,17 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
       }
       bindings.push(binding)
     }
-    return this.processBlocks({
-      blockBindings: bindings,
+    return this.processBindings({
+      bindings: bindings,
     })
   }
 
-  buildBlockBinding(block: Partial<Block> & { number: number }, network: Networkish = 1): BlockBinding {
-    const binding: BlockBinding = {
-      block: {
+  buildBlockBinding(block: Partial<Block> & { number: number }, network: Networkish = 1): DataBinding {
+    const binding: DataBinding = {
+      data: {
         raw: toBytes(block),
       },
+      handlerType: HandlerType.ETH_BLOCK,
       handlerIds: [],
     }
     for (const contract of this.contractConfigs) {
@@ -309,6 +305,20 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
       }
     }
     return binding
+  }
+
+  testInstructions(instructions: Instruction[]): Promise<ProcessBindingResponse> {
+    return this.processBindings({
+      bindings: instructions.map((instruction) => {
+        return {
+          data: {
+            raw: Instruction.encode(instruction).finish(),
+          },
+          handlerIds: [],
+          handlerType: HandlerType.SOL_INSTRUCTION,
+        }
+      }),
+    })
   }
 
   processBindings(

@@ -1,5 +1,5 @@
 import Long from 'long'
-import { DataDescriptor, RecordMetaData } from '../gen'
+import { RecordMetaData } from '../gen'
 import { Labels } from '../core/metadata'
 import { normalizeLabels } from '../core/meter'
 import { BaseContext } from '../core/base-context'
@@ -39,7 +39,6 @@ export class AptosContext extends BaseContext {
       transactionHash: this.transaction?.hash || '', // TODO
       logIndex: 0,
       chainId: getChainId(this.network),
-      dataDescriptor: DataDescriptor.fromPartial({ name }),
       name: name,
       labels: normalizeLabels(labels),
     }
@@ -69,7 +68,6 @@ export class AptosResourceContext extends BaseContext {
       transactionHash: '',
       logIndex: 0,
       chainId: getChainId(this.network),
-      dataDescriptor: DataDescriptor.fromPartial({ name }),
       name: name,
       labels: normalizeLabels(labels),
     }

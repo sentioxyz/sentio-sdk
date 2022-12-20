@@ -1,4 +1,4 @@
-import { DataDescriptor, RecordMetaData, ProcessResult } from '../gen'
+import { RecordMetaData, ProcessResult } from '../gen'
 import { BaseContract, EventFilter } from 'ethers'
 import { Block, Log } from '@ethersproject/abstract-provider'
 import { normalizeLabels } from './meter'
@@ -47,7 +47,6 @@ export abstract class EthContext extends BaseContext {
         transactionHash: this.transactionHash || '',
         logIndex: this.log.logIndex,
         chainId: this.chainId.toString(),
-        dataDescriptor: DataDescriptor.fromPartial({ name }),
         name: name,
         labels: normalizeLabels(labels),
       }
@@ -61,7 +60,6 @@ export abstract class EthContext extends BaseContext {
         transactionHash: '',
         logIndex: -1,
         chainId: this.chainId.toString(),
-        dataDescriptor: DataDescriptor.fromPartial({ name }),
         name: name,
         labels: normalizeLabels(labels),
       }
@@ -75,7 +73,6 @@ export abstract class EthContext extends BaseContext {
         transactionHash: this.transactionHash || '',
         logIndex: -1,
         chainId: this.chainId.toString(),
-        dataDescriptor: DataDescriptor.fromPartial({ name }),
         name: name,
         labels: normalizeLabels(labels),
       }
@@ -180,7 +177,6 @@ export class SolanaContext extends BaseContext {
       transactionHash: '', // TODO add
       logIndex: 0,
       chainId: SOL_MAINMET_ID, // TODO set in context
-      dataDescriptor: DataDescriptor.fromPartial({ name }),
       name: name,
       labels: normalizeLabels(labels),
     }
@@ -207,7 +203,6 @@ export class SuiContext extends BaseContext {
       transactionHash: '', // TODO
       logIndex: 0,
       chainId: SUI_DEVNET_ID, // TODO set in context
-      dataDescriptor: DataDescriptor.fromPartial({ name }),
       name: name,
       labels: normalizeLabels(labels),
     }

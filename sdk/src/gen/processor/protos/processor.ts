@@ -126,7 +126,7 @@ export enum HandlerType {
   ETH_LOG = 1,
   ETH_BLOCK = 2,
   ETH_TRACE = 5,
-  SOL_INSTRUCTIONS = 4,
+  SOL_INSTRUCTION = 4,
   APT_EVENT = 6,
   APT_CALL = 7,
   APT_RESOURCE = 8,
@@ -149,8 +149,8 @@ export function handlerTypeFromJSON(object: any): HandlerType {
     case "ETH_TRACE":
       return HandlerType.ETH_TRACE;
     case 4:
-    case "SOL_INSTRUCTIONS":
-      return HandlerType.SOL_INSTRUCTIONS;
+    case "SOL_INSTRUCTION":
+      return HandlerType.SOL_INSTRUCTION;
     case 6:
     case "APT_EVENT":
       return HandlerType.APT_EVENT;
@@ -180,8 +180,8 @@ export function handlerTypeToJSON(object: HandlerType): string {
       return "ETH_BLOCK";
     case HandlerType.ETH_TRACE:
       return "ETH_TRACE";
-    case HandlerType.SOL_INSTRUCTIONS:
-      return "SOL_INSTRUCTIONS";
+    case HandlerType.SOL_INSTRUCTION:
+      return "SOL_INSTRUCTION";
     case HandlerType.APT_EVENT:
       return "APT_EVENT";
     case HandlerType.APT_CALL:
@@ -266,7 +266,6 @@ export interface ProcessConfigResponse {
 
 export interface ContractConfig {
   contract: ContractInfo | undefined;
-  blockConfigs: BlockHandlerConfig[];
   intervalConfigs: OnIntervalConfig[];
   logConfigs: LogHandlerConfig[];
   traceConfigs: TraceHandlerConfig[];
@@ -341,7 +340,6 @@ export interface MetricConfig {
   description: string;
   unit: string;
   sparse: boolean;
-  resolutionInSeconds: number;
   type: MetricType;
   aggregationConfig: AggregationConfig | undefined;
 }
@@ -449,19 +447,6 @@ export interface Topic {
   hashes: string[];
 }
 
-export interface ProcessTransactionsRequest {
-  chainId: string;
-  transactions: RawTransaction[];
-}
-
-export interface ProcessInstructionsRequest {
-  instructions: Instruction[];
-}
-
-export interface ProcessBlocksRequest {
-  blockBindings: BlockBinding[];
-}
-
 export interface ProcessBindingsRequest {
   bindings: DataBinding[];
 }
@@ -491,13 +476,7 @@ export interface Data {
 
 export interface DataBinding {
   data: Data | undefined;
-  handlerId: number;
   handlerType: HandlerType;
-  handlerIds: number[];
-}
-
-export interface BlockBinding {
-  block: RawBlock | undefined;
   handlerIds: number[];
 }
 
@@ -513,14 +492,6 @@ export interface ProcessResult {
   exports: ExportResult[];
 }
 
-export interface DataDescriptor {
-  name: string;
-  description: string;
-  unit: string;
-  sparse: boolean;
-  resolutionInSeconds: number;
-}
-
 export interface RecordMetaData {
   address: string;
   contractName: string;
@@ -529,7 +500,6 @@ export interface RecordMetaData {
   chainId: string;
   transactionIndex: number;
   logIndex: number;
-  dataDescriptor: DataDescriptor | undefined;
   name: string;
   labels: { [key: string]: string };
 }
@@ -895,7 +865,6 @@ export const ProcessConfigResponse = {
 function createBaseContractConfig(): ContractConfig {
   return {
     contract: undefined,
-    blockConfigs: [],
     intervalConfigs: [],
     logConfigs: [],
     traceConfigs: [],
@@ -915,9 +884,6 @@ export const ContractConfig = {
   ): _m0.Writer {
     if (message.contract !== undefined) {
       ContractInfo.encode(message.contract, writer.uint32(10).fork()).ldelim();
-    }
-    for (const v of message.blockConfigs) {
-      BlockHandlerConfig.encode(v!, writer.uint32(58).fork()).ldelim();
     }
     for (const v of message.intervalConfigs) {
       OnIntervalConfig.encode(v!, writer.uint32(90).fork()).ldelim();
@@ -961,11 +927,6 @@ export const ContractConfig = {
       switch (tag >>> 3) {
         case 1:
           message.contract = ContractInfo.decode(reader, reader.uint32());
-          break;
-        case 7:
-          message.blockConfigs.push(
-            BlockHandlerConfig.decode(reader, reader.uint32())
-          );
           break;
         case 11:
           message.intervalConfigs.push(
@@ -1020,9 +981,6 @@ export const ContractConfig = {
       contract: isSet(object.contract)
         ? ContractInfo.fromJSON(object.contract)
         : undefined,
-      blockConfigs: Array.isArray(object?.blockConfigs)
-        ? object.blockConfigs.map((e: any) => BlockHandlerConfig.fromJSON(e))
-        : [],
       intervalConfigs: Array.isArray(object?.intervalConfigs)
         ? object.intervalConfigs.map((e: any) => OnIntervalConfig.fromJSON(e))
         : [],
@@ -1063,13 +1021,6 @@ export const ContractConfig = {
       (obj.contract = message.contract
         ? ContractInfo.toJSON(message.contract)
         : undefined);
-    if (message.blockConfigs) {
-      obj.blockConfigs = message.blockConfigs.map((e) =>
-        e ? BlockHandlerConfig.toJSON(e) : undefined
-      );
-    } else {
-      obj.blockConfigs = [];
-    }
     if (message.intervalConfigs) {
       obj.intervalConfigs = message.intervalConfigs.map((e) =>
         e ? OnIntervalConfig.toJSON(e) : undefined
@@ -1124,8 +1075,6 @@ export const ContractConfig = {
       object.contract !== undefined && object.contract !== null
         ? ContractInfo.fromPartial(object.contract)
         : undefined;
-    message.blockConfigs =
-      object.blockConfigs?.map((e) => BlockHandlerConfig.fromPartial(e)) || [];
     message.intervalConfigs =
       object.intervalConfigs?.map((e) => OnIntervalConfig.fromPartial(e)) || [];
     message.logConfigs =
@@ -1488,7 +1437,6 @@ function createBaseMetricConfig(): MetricConfig {
     description: "",
     unit: "",
     sparse: false,
-    resolutionInSeconds: 0,
     type: 0,
     aggregationConfig: undefined,
   };
@@ -1510,9 +1458,6 @@ export const MetricConfig = {
     }
     if (message.sparse === true) {
       writer.uint32(32).bool(message.sparse);
-    }
-    if (message.resolutionInSeconds !== 0) {
-      writer.uint32(40).int32(message.resolutionInSeconds);
     }
     if (message.type !== 0) {
       writer.uint32(56).int32(message.type);
@@ -1545,9 +1490,6 @@ export const MetricConfig = {
         case 4:
           message.sparse = reader.bool();
           break;
-        case 5:
-          message.resolutionInSeconds = reader.int32();
-          break;
         case 7:
           message.type = reader.int32() as any;
           break;
@@ -1571,9 +1513,6 @@ export const MetricConfig = {
       description: isSet(object.description) ? String(object.description) : "",
       unit: isSet(object.unit) ? String(object.unit) : "",
       sparse: isSet(object.sparse) ? Boolean(object.sparse) : false,
-      resolutionInSeconds: isSet(object.resolutionInSeconds)
-        ? Number(object.resolutionInSeconds)
-        : 0,
       type: isSet(object.type) ? metricTypeFromJSON(object.type) : 0,
       aggregationConfig: isSet(object.aggregationConfig)
         ? AggregationConfig.fromJSON(object.aggregationConfig)
@@ -1588,8 +1527,6 @@ export const MetricConfig = {
       (obj.description = message.description);
     message.unit !== undefined && (obj.unit = message.unit);
     message.sparse !== undefined && (obj.sparse = message.sparse);
-    message.resolutionInSeconds !== undefined &&
-      (obj.resolutionInSeconds = Math.round(message.resolutionInSeconds));
     message.type !== undefined && (obj.type = metricTypeToJSON(message.type));
     message.aggregationConfig !== undefined &&
       (obj.aggregationConfig = message.aggregationConfig
@@ -1604,7 +1541,6 @@ export const MetricConfig = {
     message.description = object.description ?? "";
     message.unit = object.unit ?? "";
     message.sparse = object.sparse ?? false;
-    message.resolutionInSeconds = object.resolutionInSeconds ?? 0;
     message.type = object.type ?? 0;
     message.aggregationConfig =
       object.aggregationConfig !== undefined &&
@@ -3105,217 +3041,6 @@ export const Topic = {
   },
 };
 
-function createBaseProcessTransactionsRequest(): ProcessTransactionsRequest {
-  return { chainId: "", transactions: [] };
-}
-
-export const ProcessTransactionsRequest = {
-  encode(
-    message: ProcessTransactionsRequest,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
-    if (message.chainId !== "") {
-      writer.uint32(10).string(message.chainId);
-    }
-    for (const v of message.transactions) {
-      RawTransaction.encode(v!, writer.uint32(18).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): ProcessTransactionsRequest {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseProcessTransactionsRequest();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.chainId = reader.string();
-          break;
-        case 2:
-          message.transactions.push(
-            RawTransaction.decode(reader, reader.uint32())
-          );
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): ProcessTransactionsRequest {
-    return {
-      chainId: isSet(object.chainId) ? String(object.chainId) : "",
-      transactions: Array.isArray(object?.transactions)
-        ? object.transactions.map((e: any) => RawTransaction.fromJSON(e))
-        : [],
-    };
-  },
-
-  toJSON(message: ProcessTransactionsRequest): unknown {
-    const obj: any = {};
-    message.chainId !== undefined && (obj.chainId = message.chainId);
-    if (message.transactions) {
-      obj.transactions = message.transactions.map((e) =>
-        e ? RawTransaction.toJSON(e) : undefined
-      );
-    } else {
-      obj.transactions = [];
-    }
-    return obj;
-  },
-
-  fromPartial(
-    object: DeepPartial<ProcessTransactionsRequest>
-  ): ProcessTransactionsRequest {
-    const message = createBaseProcessTransactionsRequest();
-    message.chainId = object.chainId ?? "";
-    message.transactions =
-      object.transactions?.map((e) => RawTransaction.fromPartial(e)) || [];
-    return message;
-  },
-};
-
-function createBaseProcessInstructionsRequest(): ProcessInstructionsRequest {
-  return { instructions: [] };
-}
-
-export const ProcessInstructionsRequest = {
-  encode(
-    message: ProcessInstructionsRequest,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
-    for (const v of message.instructions) {
-      Instruction.encode(v!, writer.uint32(10).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): ProcessInstructionsRequest {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseProcessInstructionsRequest();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.instructions.push(
-            Instruction.decode(reader, reader.uint32())
-          );
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): ProcessInstructionsRequest {
-    return {
-      instructions: Array.isArray(object?.instructions)
-        ? object.instructions.map((e: any) => Instruction.fromJSON(e))
-        : [],
-    };
-  },
-
-  toJSON(message: ProcessInstructionsRequest): unknown {
-    const obj: any = {};
-    if (message.instructions) {
-      obj.instructions = message.instructions.map((e) =>
-        e ? Instruction.toJSON(e) : undefined
-      );
-    } else {
-      obj.instructions = [];
-    }
-    return obj;
-  },
-
-  fromPartial(
-    object: DeepPartial<ProcessInstructionsRequest>
-  ): ProcessInstructionsRequest {
-    const message = createBaseProcessInstructionsRequest();
-    message.instructions =
-      object.instructions?.map((e) => Instruction.fromPartial(e)) || [];
-    return message;
-  },
-};
-
-function createBaseProcessBlocksRequest(): ProcessBlocksRequest {
-  return { blockBindings: [] };
-}
-
-export const ProcessBlocksRequest = {
-  encode(
-    message: ProcessBlocksRequest,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
-    for (const v of message.blockBindings) {
-      BlockBinding.encode(v!, writer.uint32(18).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): ProcessBlocksRequest {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseProcessBlocksRequest();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 2:
-          message.blockBindings.push(
-            BlockBinding.decode(reader, reader.uint32())
-          );
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): ProcessBlocksRequest {
-    return {
-      blockBindings: Array.isArray(object?.blockBindings)
-        ? object.blockBindings.map((e: any) => BlockBinding.fromJSON(e))
-        : [],
-    };
-  },
-
-  toJSON(message: ProcessBlocksRequest): unknown {
-    const obj: any = {};
-    if (message.blockBindings) {
-      obj.blockBindings = message.blockBindings.map((e) =>
-        e ? BlockBinding.toJSON(e) : undefined
-      );
-    } else {
-      obj.blockBindings = [];
-    }
-    return obj;
-  },
-
-  fromPartial(object: DeepPartial<ProcessBlocksRequest>): ProcessBlocksRequest {
-    const message = createBaseProcessBlocksRequest();
-    message.blockBindings =
-      object.blockBindings?.map((e) => BlockBinding.fromPartial(e)) || [];
-    return message;
-  },
-};
-
 function createBaseProcessBindingsRequest(): ProcessBindingsRequest {
   return { bindings: [] };
 }
@@ -3710,7 +3435,7 @@ export const Data = {
 };
 
 function createBaseDataBinding(): DataBinding {
-  return { data: undefined, handlerId: 0, handlerType: 0, handlerIds: [] };
+  return { data: undefined, handlerType: 0, handlerIds: [] };
 }
 
 export const DataBinding = {
@@ -3720,9 +3445,6 @@ export const DataBinding = {
   ): _m0.Writer {
     if (message.data !== undefined) {
       Data.encode(message.data, writer.uint32(10).fork()).ldelim();
-    }
-    if (message.handlerId !== 0) {
-      writer.uint32(16).int32(message.handlerId);
     }
     if (message.handlerType !== 0) {
       writer.uint32(24).int32(message.handlerType);
@@ -3744,9 +3466,6 @@ export const DataBinding = {
       switch (tag >>> 3) {
         case 1:
           message.data = Data.decode(reader, reader.uint32());
-          break;
-        case 2:
-          message.handlerId = reader.int32();
           break;
         case 3:
           message.handlerType = reader.int32() as any;
@@ -3772,7 +3491,6 @@ export const DataBinding = {
   fromJSON(object: any): DataBinding {
     return {
       data: isSet(object.data) ? Data.fromJSON(object.data) : undefined,
-      handlerId: isSet(object.handlerId) ? Number(object.handlerId) : 0,
       handlerType: isSet(object.handlerType)
         ? handlerTypeFromJSON(object.handlerType)
         : 0,
@@ -3786,8 +3504,6 @@ export const DataBinding = {
     const obj: any = {};
     message.data !== undefined &&
       (obj.data = message.data ? Data.toJSON(message.data) : undefined);
-    message.handlerId !== undefined &&
-      (obj.handlerId = Math.round(message.handlerId));
     message.handlerType !== undefined &&
       (obj.handlerType = handlerTypeToJSON(message.handlerType));
     if (message.handlerIds) {
@@ -3804,88 +3520,7 @@ export const DataBinding = {
       object.data !== undefined && object.data !== null
         ? Data.fromPartial(object.data)
         : undefined;
-    message.handlerId = object.handlerId ?? 0;
     message.handlerType = object.handlerType ?? 0;
-    message.handlerIds = object.handlerIds?.map((e) => e) || [];
-    return message;
-  },
-};
-
-function createBaseBlockBinding(): BlockBinding {
-  return { block: undefined, handlerIds: [] };
-}
-
-export const BlockBinding = {
-  encode(
-    message: BlockBinding,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
-    if (message.block !== undefined) {
-      RawBlock.encode(message.block, writer.uint32(10).fork()).ldelim();
-    }
-    writer.uint32(18).fork();
-    for (const v of message.handlerIds) {
-      writer.int32(v);
-    }
-    writer.ldelim();
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): BlockBinding {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseBlockBinding();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.block = RawBlock.decode(reader, reader.uint32());
-          break;
-        case 2:
-          if ((tag & 7) === 2) {
-            const end2 = reader.uint32() + reader.pos;
-            while (reader.pos < end2) {
-              message.handlerIds.push(reader.int32());
-            }
-          } else {
-            message.handlerIds.push(reader.int32());
-          }
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): BlockBinding {
-    return {
-      block: isSet(object.block) ? RawBlock.fromJSON(object.block) : undefined,
-      handlerIds: Array.isArray(object?.handlerIds)
-        ? object.handlerIds.map((e: any) => Number(e))
-        : [],
-    };
-  },
-
-  toJSON(message: BlockBinding): unknown {
-    const obj: any = {};
-    message.block !== undefined &&
-      (obj.block = message.block ? RawBlock.toJSON(message.block) : undefined);
-    if (message.handlerIds) {
-      obj.handlerIds = message.handlerIds.map((e) => Math.round(e));
-    } else {
-      obj.handlerIds = [];
-    }
-    return obj;
-  },
-
-  fromPartial(object: DeepPartial<BlockBinding>): BlockBinding {
-    const message = createBaseBlockBinding();
-    message.block =
-      object.block !== undefined && object.block !== null
-        ? RawBlock.fromPartial(object.block)
-        : undefined;
     message.handlerIds = object.handlerIds?.map((e) => e) || [];
     return message;
   },
@@ -4078,104 +3713,6 @@ export const ProcessResult = {
   },
 };
 
-function createBaseDataDescriptor(): DataDescriptor {
-  return {
-    name: "",
-    description: "",
-    unit: "",
-    sparse: false,
-    resolutionInSeconds: 0,
-  };
-}
-
-export const DataDescriptor = {
-  encode(
-    message: DataDescriptor,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
-    if (message.name !== "") {
-      writer.uint32(10).string(message.name);
-    }
-    if (message.description !== "") {
-      writer.uint32(26).string(message.description);
-    }
-    if (message.unit !== "") {
-      writer.uint32(18).string(message.unit);
-    }
-    if (message.sparse === true) {
-      writer.uint32(32).bool(message.sparse);
-    }
-    if (message.resolutionInSeconds !== 0) {
-      writer.uint32(40).int32(message.resolutionInSeconds);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): DataDescriptor {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseDataDescriptor();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.name = reader.string();
-          break;
-        case 3:
-          message.description = reader.string();
-          break;
-        case 2:
-          message.unit = reader.string();
-          break;
-        case 4:
-          message.sparse = reader.bool();
-          break;
-        case 5:
-          message.resolutionInSeconds = reader.int32();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): DataDescriptor {
-    return {
-      name: isSet(object.name) ? String(object.name) : "",
-      description: isSet(object.description) ? String(object.description) : "",
-      unit: isSet(object.unit) ? String(object.unit) : "",
-      sparse: isSet(object.sparse) ? Boolean(object.sparse) : false,
-      resolutionInSeconds: isSet(object.resolutionInSeconds)
-        ? Number(object.resolutionInSeconds)
-        : 0,
-    };
-  },
-
-  toJSON(message: DataDescriptor): unknown {
-    const obj: any = {};
-    message.name !== undefined && (obj.name = message.name);
-    message.description !== undefined &&
-      (obj.description = message.description);
-    message.unit !== undefined && (obj.unit = message.unit);
-    message.sparse !== undefined && (obj.sparse = message.sparse);
-    message.resolutionInSeconds !== undefined &&
-      (obj.resolutionInSeconds = Math.round(message.resolutionInSeconds));
-    return obj;
-  },
-
-  fromPartial(object: DeepPartial<DataDescriptor>): DataDescriptor {
-    const message = createBaseDataDescriptor();
-    message.name = object.name ?? "";
-    message.description = object.description ?? "";
-    message.unit = object.unit ?? "";
-    message.sparse = object.sparse ?? false;
-    message.resolutionInSeconds = object.resolutionInSeconds ?? 0;
-    return message;
-  },
-};
-
 function createBaseRecordMetaData(): RecordMetaData {
   return {
     address: "",
@@ -4185,7 +3722,6 @@ function createBaseRecordMetaData(): RecordMetaData {
     chainId: "",
     transactionIndex: 0,
     logIndex: 0,
-    dataDescriptor: undefined,
     name: "",
     labels: {},
   };
@@ -4216,12 +3752,6 @@ export const RecordMetaData = {
     }
     if (message.logIndex !== 0) {
       writer.uint32(32).int32(message.logIndex);
-    }
-    if (message.dataDescriptor !== undefined) {
-      DataDescriptor.encode(
-        message.dataDescriptor,
-        writer.uint32(66).fork()
-      ).ldelim();
     }
     if (message.name !== "") {
       writer.uint32(82).string(message.name);
@@ -4263,12 +3793,6 @@ export const RecordMetaData = {
         case 4:
           message.logIndex = reader.int32();
           break;
-        case 8:
-          message.dataDescriptor = DataDescriptor.decode(
-            reader,
-            reader.uint32()
-          );
-          break;
         case 10:
           message.name = reader.string();
           break;
@@ -4306,9 +3830,6 @@ export const RecordMetaData = {
         ? Number(object.transactionIndex)
         : 0,
       logIndex: isSet(object.logIndex) ? Number(object.logIndex) : 0,
-      dataDescriptor: isSet(object.dataDescriptor)
-        ? DataDescriptor.fromJSON(object.dataDescriptor)
-        : undefined,
       name: isSet(object.name) ? String(object.name) : "",
       labels: isObject(object.labels)
         ? Object.entries(object.labels).reduce<{ [key: string]: string }>(
@@ -4336,10 +3857,6 @@ export const RecordMetaData = {
       (obj.transactionIndex = Math.round(message.transactionIndex));
     message.logIndex !== undefined &&
       (obj.logIndex = Math.round(message.logIndex));
-    message.dataDescriptor !== undefined &&
-      (obj.dataDescriptor = message.dataDescriptor
-        ? DataDescriptor.toJSON(message.dataDescriptor)
-        : undefined);
     message.name !== undefined && (obj.name = message.name);
     obj.labels = {};
     if (message.labels) {
@@ -4362,10 +3879,6 @@ export const RecordMetaData = {
     message.chainId = object.chainId ?? "";
     message.transactionIndex = object.transactionIndex ?? 0;
     message.logIndex = object.logIndex ?? 0;
-    message.dataDescriptor =
-      object.dataDescriptor !== undefined && object.dataDescriptor !== null
-        ? DataDescriptor.fromPartial(object.dataDescriptor)
-        : undefined;
     message.name = object.name ?? "";
     message.labels = Object.entries(object.labels ?? {}).reduce<{
       [key: string]: string;
@@ -5220,46 +4733,6 @@ export const ProcessorDefinition = {
       responseStream: false,
       options: {},
     },
-    processLogs: {
-      name: "ProcessLogs",
-      requestType: ProcessBindingsRequest,
-      requestStream: false,
-      responseType: ProcessBindingResponse,
-      responseStream: false,
-      options: {},
-    },
-    processTraces: {
-      name: "ProcessTraces",
-      requestType: ProcessBindingsRequest,
-      requestStream: false,
-      responseType: ProcessBindingResponse,
-      responseStream: false,
-      options: {},
-    },
-    processTransactions: {
-      name: "ProcessTransactions",
-      requestType: ProcessTransactionsRequest,
-      requestStream: false,
-      responseType: ProcessBindingResponse,
-      responseStream: false,
-      options: {},
-    },
-    processInstructions: {
-      name: "ProcessInstructions",
-      requestType: ProcessInstructionsRequest,
-      requestStream: false,
-      responseType: ProcessBindingResponse,
-      responseStream: false,
-      options: {},
-    },
-    processBlocks: {
-      name: "ProcessBlocks",
-      requestType: ProcessBlocksRequest,
-      requestStream: false,
-      responseType: ProcessBindingResponse,
-      responseStream: false,
-      options: {},
-    },
     processBindings: {
       name: "ProcessBindings",
       requestType: ProcessBindingsRequest,
@@ -5284,26 +4757,6 @@ export interface ProcessorServiceImplementation<CallContextExt = {}> {
     request: ProcessConfigRequest,
     context: CallContext & CallContextExt
   ): Promise<DeepPartial<ProcessConfigResponse>>;
-  processLogs(
-    request: ProcessBindingsRequest,
-    context: CallContext & CallContextExt
-  ): Promise<DeepPartial<ProcessBindingResponse>>;
-  processTraces(
-    request: ProcessBindingsRequest,
-    context: CallContext & CallContextExt
-  ): Promise<DeepPartial<ProcessBindingResponse>>;
-  processTransactions(
-    request: ProcessTransactionsRequest,
-    context: CallContext & CallContextExt
-  ): Promise<DeepPartial<ProcessBindingResponse>>;
-  processInstructions(
-    request: ProcessInstructionsRequest,
-    context: CallContext & CallContextExt
-  ): Promise<DeepPartial<ProcessBindingResponse>>;
-  processBlocks(
-    request: ProcessBlocksRequest,
-    context: CallContext & CallContextExt
-  ): Promise<DeepPartial<ProcessBindingResponse>>;
   processBindings(
     request: ProcessBindingsRequest,
     context: CallContext & CallContextExt
@@ -5323,26 +4776,6 @@ export interface ProcessorClient<CallOptionsExt = {}> {
     request: DeepPartial<ProcessConfigRequest>,
     options?: CallOptions & CallOptionsExt
   ): Promise<ProcessConfigResponse>;
-  processLogs(
-    request: DeepPartial<ProcessBindingsRequest>,
-    options?: CallOptions & CallOptionsExt
-  ): Promise<ProcessBindingResponse>;
-  processTraces(
-    request: DeepPartial<ProcessBindingsRequest>,
-    options?: CallOptions & CallOptionsExt
-  ): Promise<ProcessBindingResponse>;
-  processTransactions(
-    request: DeepPartial<ProcessTransactionsRequest>,
-    options?: CallOptions & CallOptionsExt
-  ): Promise<ProcessBindingResponse>;
-  processInstructions(
-    request: DeepPartial<ProcessInstructionsRequest>,
-    options?: CallOptions & CallOptionsExt
-  ): Promise<ProcessBindingResponse>;
-  processBlocks(
-    request: DeepPartial<ProcessBlocksRequest>,
-    options?: CallOptions & CallOptionsExt
-  ): Promise<ProcessBindingResponse>;
   processBindings(
     request: DeepPartial<ProcessBindingsRequest>,
     options?: CallOptions & CallOptionsExt
