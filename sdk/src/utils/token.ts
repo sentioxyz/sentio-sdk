@@ -64,7 +64,7 @@ export async function getER20NormalizedAmount(
   return scaleDown(amount, tokenInfo.decimal)
 }
 
-export function scaleDown(amount: BigNumber, decimal: number) {
+export function scaleDown(amount: BigNumber | bigint, decimal: number) {
   const divider = new BigDecimal(10).pow(decimal)
   return toBigDecimal(amount).dividedBy(divider)
 }

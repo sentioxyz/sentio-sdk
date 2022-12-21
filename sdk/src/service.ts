@@ -479,7 +479,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         case HandlerType.ETH_BLOCK:
           return this.processBlock(request)
         case HandlerType.SOL_INSTRUCTION:
-          return this.procecessSolInstruSolctions(request)
+          return this.procecessSolInstructions(request)
         // TODO migrate SUI cases
         // case HandlerType.INSTRUCTION:
         //   return this.processInstruction(request)
@@ -541,12 +541,10 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     return mergeProcessResults(await Promise.all(promises))
   }
 
-  async procecessSolInstruSolctions(request: DataBinding): Promise<ProcessResult> {
+  async procecessSolInstructions(request: DataBinding): Promise<ProcessResult> {
     if (!request.data) {
       throw new ServerError(Status.INVALID_ARGUMENT, 'instruction data cannot be empty')
     }
-
-    // const jsonString =  new TextDecoder().decode(request.data.raw)  // Utf8ArrayToStr(request.data.raw)
 
     const instruction: Instruction = Instruction.decode(request.data.raw) // JSON.parse(jsonString)
     const promises: Promise<ProcessResult>[] = []
@@ -556,13 +554,6 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       if (processor.address === instruction.programAccountId) {
         let parsedInstruction: SolInstruction | null = null
         if (instruction.parsed) {
-          // const decoded = new TextDecoder().decode(instruction.parsed)
-          if (!(instruction.parsed instanceof Uint8Array)) {
-            // const parsed = instruction.parsed as Uint8Array
-            const values = Object.entries(instruction.parsed).map(([key, value]) => value) as number[]
-            instruction.parsed = Uint8Array.from(values)
-          }
-
           const a1 = JSON.parse(new TextDecoder().decode(instruction.parsed))
           parsedInstruction = processor.getParsedInstruction(a1)
         } else if (instruction.instructionData) {
