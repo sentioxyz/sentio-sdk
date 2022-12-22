@@ -1,8 +1,8 @@
 /* eslint-disable */
-import { CallContext, CallOptions } from "nice-grpc-common";
 import Long from "long";
-import { Empty } from "../../google/protobuf/empty";
+import type { CallContext, CallOptions } from "nice-grpc-common";
 import _m0 from "protobufjs/minimal";
+import { Empty } from "../../google/protobuf/empty";
 
 export enum MetricType {
   UNKNOWN_TYPE = 0,
@@ -252,7 +252,8 @@ export interface ProjectConfig {
   version: string;
 }
 
-export interface ProcessConfigRequest {}
+export interface ProcessConfigRequest {
+}
 
 export interface ProcessConfigResponse {
   config: ProjectConfig | undefined;
@@ -277,7 +278,8 @@ export interface ContractConfig {
   processorType: string;
 }
 
-export interface TotalPerEntityAggregation {}
+export interface TotalPerEntityAggregation {
+}
 
 export enum TotalPerEntityAggregation_Type {
   AVG = 0,
@@ -285,9 +287,7 @@ export enum TotalPerEntityAggregation_Type {
   UNRECOGNIZED = -1,
 }
 
-export function totalPerEntityAggregation_TypeFromJSON(
-  object: any
-): TotalPerEntityAggregation_Type {
+export function totalPerEntityAggregation_TypeFromJSON(object: any): TotalPerEntityAggregation_Type {
   switch (object) {
     case 0:
     case "AVG":
@@ -302,9 +302,7 @@ export function totalPerEntityAggregation_TypeFromJSON(
   }
 }
 
-export function totalPerEntityAggregation_TypeToJSON(
-  object: TotalPerEntityAggregation_Type
-): string {
+export function totalPerEntityAggregation_TypeToJSON(object: TotalPerEntityAggregation_Type): string {
   switch (object) {
     case TotalPerEntityAggregation_Type.AVG:
       return "AVG";
@@ -411,8 +409,8 @@ export interface LogHandlerConfig {
 
 export interface LogFilter {
   topics: Topic[];
-  address: string | undefined;
-  addressType: AddressType | undefined;
+  address?: string | undefined;
+  addressType?: AddressType | undefined;
 }
 
 export interface InstructionHandlerConfig {
@@ -462,7 +460,40 @@ export interface RawTransaction {
   slot?: Long | undefined;
 }
 
-export interface Instruction {
+export interface Data {
+  raw: Uint8Array;
+  ethLog?: Data_EthLog | undefined;
+  ethBlock?: Data_EthBlock | undefined;
+  ethTransaction?: Data_EthTransaction | undefined;
+  ethTrace?: Data_EthTrace | undefined;
+  solInstruction?: Data_SolInstruction | undefined;
+  aptEvent?: Data_AptEvent | undefined;
+  aptCall?: Data_AptCall | undefined;
+  aptResource?: Data_AptResource | undefined;
+}
+
+export interface Data_EthLog {
+  data: Uint8Array;
+  transaction?: Uint8Array | undefined;
+}
+
+export interface Data_EthBlock {
+  data: Uint8Array;
+}
+
+export interface Data_EthTransaction {
+  data: Uint8Array;
+  transaction?: Uint8Array | undefined;
+  transactionReceipt?: Uint8Array | undefined;
+}
+
+export interface Data_EthTrace {
+  data: Uint8Array;
+  transaction?: Uint8Array | undefined;
+  transactionReceipt?: Uint8Array | undefined;
+}
+
+export interface Data_SolInstruction {
   instructionData: string;
   slot: Long;
   programAccountId: string;
@@ -470,18 +501,24 @@ export interface Instruction {
   parsed?: Uint8Array | undefined;
 }
 
-export interface Data {
-  raw: Uint8Array;
+export interface Data_AptEvent {
+  data: Uint8Array;
+}
+
+export interface Data_AptCall {
+  data: Uint8Array;
+}
+
+export interface Data_AptResource {
+  data: Uint8Array;
+  version: Long;
+  timestamp: string;
 }
 
 export interface DataBinding {
   data: Data | undefined;
   handlerType: HandlerType;
   handlerIds: number[];
-}
-
-export interface RawBlock {
-  raw: Uint8Array;
 }
 
 export interface ProcessResult {
@@ -510,9 +547,9 @@ export interface RecordMetaData_LabelsEntry {
 }
 
 export interface MetricValue {
-  bigDecimal: string | undefined;
-  doubleValue: number | undefined;
-  bigInteger: BigInteger | undefined;
+  bigDecimal?: string | undefined;
+  doubleValue?: number | undefined;
+  bigInteger?: BigInteger | undefined;
 }
 
 export interface BigInteger {
@@ -563,10 +600,7 @@ function createBaseProjectConfig(): ProjectConfig {
 }
 
 export const ProjectConfig = {
-  encode(
-    message: ProjectConfig,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: ProjectConfig, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.name !== "") {
       writer.uint32(10).string(message.name);
     }
@@ -624,17 +658,11 @@ function createBaseProcessConfigRequest(): ProcessConfigRequest {
 }
 
 export const ProcessConfigRequest = {
-  encode(
-    _: ProcessConfigRequest,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(_: ProcessConfigRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): ProcessConfigRequest {
+  decode(input: _m0.Reader | Uint8Array, length?: number): ProcessConfigRequest {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseProcessConfigRequest();
@@ -677,10 +705,7 @@ function createBaseProcessConfigResponse(): ProcessConfigResponse {
 }
 
 export const ProcessConfigResponse = {
-  encode(
-    message: ProcessConfigResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: ProcessConfigResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.config !== undefined) {
       ProjectConfig.encode(message.config, writer.uint32(10).fork()).ldelim();
     }
@@ -705,10 +730,7 @@ export const ProcessConfigResponse = {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): ProcessConfigResponse {
+  decode(input: _m0.Reader | Uint8Array, length?: number): ProcessConfigResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseProcessConfigResponse();
@@ -719,34 +741,22 @@ export const ProcessConfigResponse = {
           message.config = ProjectConfig.decode(reader, reader.uint32());
           break;
         case 2:
-          message.contractConfigs.push(
-            ContractConfig.decode(reader, reader.uint32())
-          );
+          message.contractConfigs.push(ContractConfig.decode(reader, reader.uint32()));
           break;
         case 3:
-          message.templateInstances.push(
-            TemplateInstance.decode(reader, reader.uint32())
-          );
+          message.templateInstances.push(TemplateInstance.decode(reader, reader.uint32()));
           break;
         case 4:
-          message.accountConfigs.push(
-            AccountConfig.decode(reader, reader.uint32())
-          );
+          message.accountConfigs.push(AccountConfig.decode(reader, reader.uint32()));
           break;
         case 5:
-          message.metricConfigs.push(
-            MetricConfig.decode(reader, reader.uint32())
-          );
+          message.metricConfigs.push(MetricConfig.decode(reader, reader.uint32()));
           break;
         case 6:
-          message.eventTrackingConfigs.push(
-            EventTrackingConfig.decode(reader, reader.uint32())
-          );
+          message.eventTrackingConfigs.push(EventTrackingConfig.decode(reader, reader.uint32()));
           break;
         case 7:
-          message.exportConfigs.push(
-            ExportConfig.decode(reader, reader.uint32())
-          );
+          message.exportConfigs.push(ExportConfig.decode(reader, reader.uint32()));
           break;
         default:
           reader.skipType(tag & 7);
@@ -758,9 +768,7 @@ export const ProcessConfigResponse = {
 
   fromJSON(object: any): ProcessConfigResponse {
     return {
-      config: isSet(object.config)
-        ? ProjectConfig.fromJSON(object.config)
-        : undefined,
+      config: isSet(object.config) ? ProjectConfig.fromJSON(object.config) : undefined,
       contractConfigs: Array.isArray(object?.contractConfigs)
         ? object.contractConfigs.map((e: any) => ContractConfig.fromJSON(e))
         : [],
@@ -774,9 +782,7 @@ export const ProcessConfigResponse = {
         ? object.metricConfigs.map((e: any) => MetricConfig.fromJSON(e))
         : [],
       eventTrackingConfigs: Array.isArray(object?.eventTrackingConfigs)
-        ? object.eventTrackingConfigs.map((e: any) =>
-            EventTrackingConfig.fromJSON(e)
-          )
+        ? object.eventTrackingConfigs.map((e: any) => EventTrackingConfig.fromJSON(e))
         : [],
       exportConfigs: Array.isArray(object?.exportConfigs)
         ? object.exportConfigs.map((e: any) => ExportConfig.fromJSON(e))
@@ -786,78 +792,51 @@ export const ProcessConfigResponse = {
 
   toJSON(message: ProcessConfigResponse): unknown {
     const obj: any = {};
-    message.config !== undefined &&
-      (obj.config = message.config
-        ? ProjectConfig.toJSON(message.config)
-        : undefined);
+    message.config !== undefined && (obj.config = message.config ? ProjectConfig.toJSON(message.config) : undefined);
     if (message.contractConfigs) {
-      obj.contractConfigs = message.contractConfigs.map((e) =>
-        e ? ContractConfig.toJSON(e) : undefined
-      );
+      obj.contractConfigs = message.contractConfigs.map((e) => e ? ContractConfig.toJSON(e) : undefined);
     } else {
       obj.contractConfigs = [];
     }
     if (message.templateInstances) {
-      obj.templateInstances = message.templateInstances.map((e) =>
-        e ? TemplateInstance.toJSON(e) : undefined
-      );
+      obj.templateInstances = message.templateInstances.map((e) => e ? TemplateInstance.toJSON(e) : undefined);
     } else {
       obj.templateInstances = [];
     }
     if (message.accountConfigs) {
-      obj.accountConfigs = message.accountConfigs.map((e) =>
-        e ? AccountConfig.toJSON(e) : undefined
-      );
+      obj.accountConfigs = message.accountConfigs.map((e) => e ? AccountConfig.toJSON(e) : undefined);
     } else {
       obj.accountConfigs = [];
     }
     if (message.metricConfigs) {
-      obj.metricConfigs = message.metricConfigs.map((e) =>
-        e ? MetricConfig.toJSON(e) : undefined
-      );
+      obj.metricConfigs = message.metricConfigs.map((e) => e ? MetricConfig.toJSON(e) : undefined);
     } else {
       obj.metricConfigs = [];
     }
     if (message.eventTrackingConfigs) {
-      obj.eventTrackingConfigs = message.eventTrackingConfigs.map((e) =>
-        e ? EventTrackingConfig.toJSON(e) : undefined
-      );
+      obj.eventTrackingConfigs = message.eventTrackingConfigs.map((e) => e ? EventTrackingConfig.toJSON(e) : undefined);
     } else {
       obj.eventTrackingConfigs = [];
     }
     if (message.exportConfigs) {
-      obj.exportConfigs = message.exportConfigs.map((e) =>
-        e ? ExportConfig.toJSON(e) : undefined
-      );
+      obj.exportConfigs = message.exportConfigs.map((e) => e ? ExportConfig.toJSON(e) : undefined);
     } else {
       obj.exportConfigs = [];
     }
     return obj;
   },
 
-  fromPartial(
-    object: DeepPartial<ProcessConfigResponse>
-  ): ProcessConfigResponse {
+  fromPartial(object: DeepPartial<ProcessConfigResponse>): ProcessConfigResponse {
     const message = createBaseProcessConfigResponse();
-    message.config =
-      object.config !== undefined && object.config !== null
-        ? ProjectConfig.fromPartial(object.config)
-        : undefined;
-    message.contractConfigs =
-      object.contractConfigs?.map((e) => ContractConfig.fromPartial(e)) || [];
-    message.templateInstances =
-      object.templateInstances?.map((e) => TemplateInstance.fromPartial(e)) ||
-      [];
-    message.accountConfigs =
-      object.accountConfigs?.map((e) => AccountConfig.fromPartial(e)) || [];
-    message.metricConfigs =
-      object.metricConfigs?.map((e) => MetricConfig.fromPartial(e)) || [];
-    message.eventTrackingConfigs =
-      object.eventTrackingConfigs?.map((e) =>
-        EventTrackingConfig.fromPartial(e)
-      ) || [];
-    message.exportConfigs =
-      object.exportConfigs?.map((e) => ExportConfig.fromPartial(e)) || [];
+    message.config = (object.config !== undefined && object.config !== null)
+      ? ProjectConfig.fromPartial(object.config)
+      : undefined;
+    message.contractConfigs = object.contractConfigs?.map((e) => ContractConfig.fromPartial(e)) || [];
+    message.templateInstances = object.templateInstances?.map((e) => TemplateInstance.fromPartial(e)) || [];
+    message.accountConfigs = object.accountConfigs?.map((e) => AccountConfig.fromPartial(e)) || [];
+    message.metricConfigs = object.metricConfigs?.map((e) => MetricConfig.fromPartial(e)) || [];
+    message.eventTrackingConfigs = object.eventTrackingConfigs?.map((e) => EventTrackingConfig.fromPartial(e)) || [];
+    message.exportConfigs = object.exportConfigs?.map((e) => ExportConfig.fromPartial(e)) || [];
     return message;
   },
 };
@@ -878,10 +857,7 @@ function createBaseContractConfig(): ContractConfig {
 }
 
 export const ContractConfig = {
-  encode(
-    message: ContractConfig,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: ContractConfig, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.contract !== undefined) {
       ContractInfo.encode(message.contract, writer.uint32(10).fork()).ldelim();
     }
@@ -901,10 +877,7 @@ export const ContractConfig = {
       AptosCallHandlerConfig.encode(v!, writer.uint32(82).fork()).ldelim();
     }
     if (message.instructionConfig !== undefined) {
-      InstructionHandlerConfig.encode(
-        message.instructionConfig,
-        writer.uint32(50).fork()
-      ).ldelim();
+      InstructionHandlerConfig.encode(message.instructionConfig, writer.uint32(50).fork()).ldelim();
     }
     if (!message.startBlock.isZero()) {
       writer.uint32(32).uint64(message.startBlock);
@@ -929,35 +902,22 @@ export const ContractConfig = {
           message.contract = ContractInfo.decode(reader, reader.uint32());
           break;
         case 11:
-          message.intervalConfigs.push(
-            OnIntervalConfig.decode(reader, reader.uint32())
-          );
+          message.intervalConfigs.push(OnIntervalConfig.decode(reader, reader.uint32()));
           break;
         case 3:
-          message.logConfigs.push(
-            LogHandlerConfig.decode(reader, reader.uint32())
-          );
+          message.logConfigs.push(LogHandlerConfig.decode(reader, reader.uint32()));
           break;
         case 2:
-          message.traceConfigs.push(
-            TraceHandlerConfig.decode(reader, reader.uint32())
-          );
+          message.traceConfigs.push(TraceHandlerConfig.decode(reader, reader.uint32()));
           break;
         case 9:
-          message.aptosEventConfigs.push(
-            AptosEventHandlerConfig.decode(reader, reader.uint32())
-          );
+          message.aptosEventConfigs.push(AptosEventHandlerConfig.decode(reader, reader.uint32()));
           break;
         case 10:
-          message.aptosCallConfigs.push(
-            AptosCallHandlerConfig.decode(reader, reader.uint32())
-          );
+          message.aptosCallConfigs.push(AptosCallHandlerConfig.decode(reader, reader.uint32()));
           break;
         case 6:
-          message.instructionConfig = InstructionHandlerConfig.decode(
-            reader,
-            reader.uint32()
-          );
+          message.instructionConfig = InstructionHandlerConfig.decode(reader, reader.uint32());
           break;
         case 4:
           message.startBlock = reader.uint64() as Long;
@@ -978,9 +938,7 @@ export const ContractConfig = {
 
   fromJSON(object: any): ContractConfig {
     return {
-      contract: isSet(object.contract)
-        ? ContractInfo.fromJSON(object.contract)
-        : undefined,
+      contract: isSet(object.contract) ? ContractInfo.fromJSON(object.contract) : undefined,
       intervalConfigs: Array.isArray(object?.intervalConfigs)
         ? object.intervalConfigs.map((e: any) => OnIntervalConfig.fromJSON(e))
         : [],
@@ -991,117 +949,77 @@ export const ContractConfig = {
         ? object.traceConfigs.map((e: any) => TraceHandlerConfig.fromJSON(e))
         : [],
       aptosEventConfigs: Array.isArray(object?.aptosEventConfigs)
-        ? object.aptosEventConfigs.map((e: any) =>
-            AptosEventHandlerConfig.fromJSON(e)
-          )
+        ? object.aptosEventConfigs.map((e: any) => AptosEventHandlerConfig.fromJSON(e))
         : [],
       aptosCallConfigs: Array.isArray(object?.aptosCallConfigs)
-        ? object.aptosCallConfigs.map((e: any) =>
-            AptosCallHandlerConfig.fromJSON(e)
-          )
+        ? object.aptosCallConfigs.map((e: any) => AptosCallHandlerConfig.fromJSON(e))
         : [],
       instructionConfig: isSet(object.instructionConfig)
         ? InstructionHandlerConfig.fromJSON(object.instructionConfig)
         : undefined,
-      startBlock: isSet(object.startBlock)
-        ? Long.fromValue(object.startBlock)
-        : Long.UZERO,
-      endBlock: isSet(object.endBlock)
-        ? Long.fromValue(object.endBlock)
-        : Long.UZERO,
-      processorType: isSet(object.processorType)
-        ? String(object.processorType)
-        : "",
+      startBlock: isSet(object.startBlock) ? Long.fromValue(object.startBlock) : Long.UZERO,
+      endBlock: isSet(object.endBlock) ? Long.fromValue(object.endBlock) : Long.UZERO,
+      processorType: isSet(object.processorType) ? String(object.processorType) : "",
     };
   },
 
   toJSON(message: ContractConfig): unknown {
     const obj: any = {};
     message.contract !== undefined &&
-      (obj.contract = message.contract
-        ? ContractInfo.toJSON(message.contract)
-        : undefined);
+      (obj.contract = message.contract ? ContractInfo.toJSON(message.contract) : undefined);
     if (message.intervalConfigs) {
-      obj.intervalConfigs = message.intervalConfigs.map((e) =>
-        e ? OnIntervalConfig.toJSON(e) : undefined
-      );
+      obj.intervalConfigs = message.intervalConfigs.map((e) => e ? OnIntervalConfig.toJSON(e) : undefined);
     } else {
       obj.intervalConfigs = [];
     }
     if (message.logConfigs) {
-      obj.logConfigs = message.logConfigs.map((e) =>
-        e ? LogHandlerConfig.toJSON(e) : undefined
-      );
+      obj.logConfigs = message.logConfigs.map((e) => e ? LogHandlerConfig.toJSON(e) : undefined);
     } else {
       obj.logConfigs = [];
     }
     if (message.traceConfigs) {
-      obj.traceConfigs = message.traceConfigs.map((e) =>
-        e ? TraceHandlerConfig.toJSON(e) : undefined
-      );
+      obj.traceConfigs = message.traceConfigs.map((e) => e ? TraceHandlerConfig.toJSON(e) : undefined);
     } else {
       obj.traceConfigs = [];
     }
     if (message.aptosEventConfigs) {
-      obj.aptosEventConfigs = message.aptosEventConfigs.map((e) =>
-        e ? AptosEventHandlerConfig.toJSON(e) : undefined
-      );
+      obj.aptosEventConfigs = message.aptosEventConfigs.map((e) => e ? AptosEventHandlerConfig.toJSON(e) : undefined);
     } else {
       obj.aptosEventConfigs = [];
     }
     if (message.aptosCallConfigs) {
-      obj.aptosCallConfigs = message.aptosCallConfigs.map((e) =>
-        e ? AptosCallHandlerConfig.toJSON(e) : undefined
-      );
+      obj.aptosCallConfigs = message.aptosCallConfigs.map((e) => e ? AptosCallHandlerConfig.toJSON(e) : undefined);
     } else {
       obj.aptosCallConfigs = [];
     }
-    message.instructionConfig !== undefined &&
-      (obj.instructionConfig = message.instructionConfig
-        ? InstructionHandlerConfig.toJSON(message.instructionConfig)
-        : undefined);
-    message.startBlock !== undefined &&
-      (obj.startBlock = (message.startBlock || Long.UZERO).toString());
-    message.endBlock !== undefined &&
-      (obj.endBlock = (message.endBlock || Long.UZERO).toString());
-    message.processorType !== undefined &&
-      (obj.processorType = message.processorType);
+    message.instructionConfig !== undefined && (obj.instructionConfig = message.instructionConfig
+      ? InstructionHandlerConfig.toJSON(message.instructionConfig)
+      : undefined);
+    message.startBlock !== undefined && (obj.startBlock = (message.startBlock || Long.UZERO).toString());
+    message.endBlock !== undefined && (obj.endBlock = (message.endBlock || Long.UZERO).toString());
+    message.processorType !== undefined && (obj.processorType = message.processorType);
     return obj;
   },
 
   fromPartial(object: DeepPartial<ContractConfig>): ContractConfig {
     const message = createBaseContractConfig();
-    message.contract =
-      object.contract !== undefined && object.contract !== null
-        ? ContractInfo.fromPartial(object.contract)
-        : undefined;
-    message.intervalConfigs =
-      object.intervalConfigs?.map((e) => OnIntervalConfig.fromPartial(e)) || [];
-    message.logConfigs =
-      object.logConfigs?.map((e) => LogHandlerConfig.fromPartial(e)) || [];
-    message.traceConfigs =
-      object.traceConfigs?.map((e) => TraceHandlerConfig.fromPartial(e)) || [];
-    message.aptosEventConfigs =
-      object.aptosEventConfigs?.map((e) =>
-        AptosEventHandlerConfig.fromPartial(e)
-      ) || [];
-    message.aptosCallConfigs =
-      object.aptosCallConfigs?.map((e) =>
-        AptosCallHandlerConfig.fromPartial(e)
-      ) || [];
-    message.instructionConfig =
-      object.instructionConfig !== undefined &&
-      object.instructionConfig !== null
-        ? InstructionHandlerConfig.fromPartial(object.instructionConfig)
-        : undefined;
-    message.startBlock =
-      object.startBlock !== undefined && object.startBlock !== null
-        ? Long.fromValue(object.startBlock)
-        : Long.UZERO;
-    message.endBlock =
-      object.endBlock !== undefined && object.endBlock !== null
-        ? Long.fromValue(object.endBlock)
-        : Long.UZERO;
+    message.contract = (object.contract !== undefined && object.contract !== null)
+      ? ContractInfo.fromPartial(object.contract)
+      : undefined;
+    message.intervalConfigs = object.intervalConfigs?.map((e) => OnIntervalConfig.fromPartial(e)) || [];
+    message.logConfigs = object.logConfigs?.map((e) => LogHandlerConfig.fromPartial(e)) || [];
+    message.traceConfigs = object.traceConfigs?.map((e) => TraceHandlerConfig.fromPartial(e)) || [];
+    message.aptosEventConfigs = object.aptosEventConfigs?.map((e) => AptosEventHandlerConfig.fromPartial(e)) || [];
+    message.aptosCallConfigs = object.aptosCallConfigs?.map((e) => AptosCallHandlerConfig.fromPartial(e)) || [];
+    message.instructionConfig = (object.instructionConfig !== undefined && object.instructionConfig !== null)
+      ? InstructionHandlerConfig.fromPartial(object.instructionConfig)
+      : undefined;
+    message.startBlock = (object.startBlock !== undefined && object.startBlock !== null)
+      ? Long.fromValue(object.startBlock)
+      : Long.UZERO;
+    message.endBlock = (object.endBlock !== undefined && object.endBlock !== null)
+      ? Long.fromValue(object.endBlock)
+      : Long.UZERO;
     message.processorType = object.processorType ?? "";
     return message;
   },
@@ -1112,17 +1030,11 @@ function createBaseTotalPerEntityAggregation(): TotalPerEntityAggregation {
 }
 
 export const TotalPerEntityAggregation = {
-  encode(
-    _: TotalPerEntityAggregation,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(_: TotalPerEntityAggregation, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): TotalPerEntityAggregation {
+  decode(input: _m0.Reader | Uint8Array, length?: number): TotalPerEntityAggregation {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseTotalPerEntityAggregation();
@@ -1146,9 +1058,7 @@ export const TotalPerEntityAggregation = {
     return obj;
   },
 
-  fromPartial(
-    _: DeepPartial<TotalPerEntityAggregation>
-  ): TotalPerEntityAggregation {
+  fromPartial(_: DeepPartial<TotalPerEntityAggregation>): TotalPerEntityAggregation {
     const message = createBaseTotalPerEntityAggregation();
     return message;
   },
@@ -1159,10 +1069,7 @@ function createBaseRetentionConfig(): RetentionConfig {
 }
 
 export const RetentionConfig = {
-  encode(
-    message: RetentionConfig,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: RetentionConfig, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.retentionEventName !== "") {
       writer.uint32(18).string(message.retentionEventName);
     }
@@ -1195,17 +1102,14 @@ export const RetentionConfig = {
 
   fromJSON(object: any): RetentionConfig {
     return {
-      retentionEventName: isSet(object.retentionEventName)
-        ? String(object.retentionEventName)
-        : "",
+      retentionEventName: isSet(object.retentionEventName) ? String(object.retentionEventName) : "",
       days: isSet(object.days) ? Number(object.days) : 0,
     };
   },
 
   toJSON(message: RetentionConfig): unknown {
     const obj: any = {};
-    message.retentionEventName !== undefined &&
-      (obj.retentionEventName = message.retentionEventName);
+    message.retentionEventName !== undefined && (obj.retentionEventName = message.retentionEventName);
     message.days !== undefined && (obj.days = Math.round(message.days));
     return obj;
   },
@@ -1230,10 +1134,7 @@ function createBaseEventTrackingConfig(): EventTrackingConfig {
 }
 
 export const EventTrackingConfig = {
-  encode(
-    message: EventTrackingConfig,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: EventTrackingConfig, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.eventName !== "") {
       writer.uint32(10).string(message.eventName);
     }
@@ -1244,10 +1145,7 @@ export const EventTrackingConfig = {
       writer.uint32(24).bool(message.unique);
     }
     if (message.totalPerEntity !== undefined) {
-      TotalPerEntityAggregation.encode(
-        message.totalPerEntity,
-        writer.uint32(34).fork()
-      ).ldelim();
+      TotalPerEntityAggregation.encode(message.totalPerEntity, writer.uint32(34).fork()).ldelim();
     }
     writer.uint32(42).fork();
     for (const v of message.distinctAggregationByDays) {
@@ -1255,10 +1153,7 @@ export const EventTrackingConfig = {
     }
     writer.ldelim();
     if (message.retentionConfig !== undefined) {
-      RetentionConfig.encode(
-        message.retentionConfig,
-        writer.uint32(50).fork()
-      ).ldelim();
+      RetentionConfig.encode(message.retentionConfig, writer.uint32(50).fork()).ldelim();
     }
     return writer;
   },
@@ -1280,10 +1175,7 @@ export const EventTrackingConfig = {
           message.unique = reader.bool();
           break;
         case 4:
-          message.totalPerEntity = TotalPerEntityAggregation.decode(
-            reader,
-            reader.uint32()
-          );
+          message.totalPerEntity = TotalPerEntityAggregation.decode(reader, reader.uint32());
           break;
         case 5:
           if ((tag & 7) === 2) {
@@ -1296,10 +1188,7 @@ export const EventTrackingConfig = {
           }
           break;
         case 6:
-          message.retentionConfig = RetentionConfig.decode(
-            reader,
-            reader.uint32()
-          );
+          message.retentionConfig = RetentionConfig.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -1317,14 +1206,10 @@ export const EventTrackingConfig = {
       totalPerEntity: isSet(object.totalPerEntity)
         ? TotalPerEntityAggregation.fromJSON(object.totalPerEntity)
         : undefined,
-      distinctAggregationByDays: Array.isArray(
-        object?.distinctAggregationByDays
-      )
+      distinctAggregationByDays: Array.isArray(object?.distinctAggregationByDays)
         ? object.distinctAggregationByDays.map((e: any) => Number(e))
         : [],
-      retentionConfig: isSet(object.retentionConfig)
-        ? RetentionConfig.fromJSON(object.retentionConfig)
-        : undefined,
+      retentionConfig: isSet(object.retentionConfig) ? RetentionConfig.fromJSON(object.retentionConfig) : undefined,
     };
   },
 
@@ -1333,21 +1218,16 @@ export const EventTrackingConfig = {
     message.eventName !== undefined && (obj.eventName = message.eventName);
     message.totalByDay !== undefined && (obj.totalByDay = message.totalByDay);
     message.unique !== undefined && (obj.unique = message.unique);
-    message.totalPerEntity !== undefined &&
-      (obj.totalPerEntity = message.totalPerEntity
-        ? TotalPerEntityAggregation.toJSON(message.totalPerEntity)
-        : undefined);
+    message.totalPerEntity !== undefined && (obj.totalPerEntity = message.totalPerEntity
+      ? TotalPerEntityAggregation.toJSON(message.totalPerEntity)
+      : undefined);
     if (message.distinctAggregationByDays) {
-      obj.distinctAggregationByDays = message.distinctAggregationByDays.map(
-        (e) => Math.round(e)
-      );
+      obj.distinctAggregationByDays = message.distinctAggregationByDays.map((e) => Math.round(e));
     } else {
       obj.distinctAggregationByDays = [];
     }
     message.retentionConfig !== undefined &&
-      (obj.retentionConfig = message.retentionConfig
-        ? RetentionConfig.toJSON(message.retentionConfig)
-        : undefined);
+      (obj.retentionConfig = message.retentionConfig ? RetentionConfig.toJSON(message.retentionConfig) : undefined);
     return obj;
   },
 
@@ -1356,16 +1236,13 @@ export const EventTrackingConfig = {
     message.eventName = object.eventName ?? "";
     message.totalByDay = object.totalByDay ?? false;
     message.unique = object.unique ?? false;
-    message.totalPerEntity =
-      object.totalPerEntity !== undefined && object.totalPerEntity !== null
-        ? TotalPerEntityAggregation.fromPartial(object.totalPerEntity)
-        : undefined;
-    message.distinctAggregationByDays =
-      object.distinctAggregationByDays?.map((e) => e) || [];
-    message.retentionConfig =
-      object.retentionConfig !== undefined && object.retentionConfig !== null
-        ? RetentionConfig.fromPartial(object.retentionConfig)
-        : undefined;
+    message.totalPerEntity = (object.totalPerEntity !== undefined && object.totalPerEntity !== null)
+      ? TotalPerEntityAggregation.fromPartial(object.totalPerEntity)
+      : undefined;
+    message.distinctAggregationByDays = object.distinctAggregationByDays?.map((e) => e) || [];
+    message.retentionConfig = (object.retentionConfig !== undefined && object.retentionConfig !== null)
+      ? RetentionConfig.fromPartial(object.retentionConfig)
+      : undefined;
     return message;
   },
 };
@@ -1375,10 +1252,7 @@ function createBaseExportConfig(): ExportConfig {
 }
 
 export const ExportConfig = {
-  encode(
-    message: ExportConfig,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: ExportConfig, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.name !== "") {
       writer.uint32(10).string(message.name);
     }
@@ -1432,21 +1306,11 @@ export const ExportConfig = {
 };
 
 function createBaseMetricConfig(): MetricConfig {
-  return {
-    name: "",
-    description: "",
-    unit: "",
-    sparse: false,
-    type: 0,
-    aggregationConfig: undefined,
-  };
+  return { name: "", description: "", unit: "", sparse: false, type: 0, aggregationConfig: undefined };
 }
 
 export const MetricConfig = {
-  encode(
-    message: MetricConfig,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: MetricConfig, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.name !== "") {
       writer.uint32(10).string(message.name);
     }
@@ -1463,10 +1327,7 @@ export const MetricConfig = {
       writer.uint32(56).int32(message.type);
     }
     if (message.aggregationConfig !== undefined) {
-      AggregationConfig.encode(
-        message.aggregationConfig,
-        writer.uint32(50).fork()
-      ).ldelim();
+      AggregationConfig.encode(message.aggregationConfig, writer.uint32(50).fork()).ldelim();
     }
     return writer;
   },
@@ -1494,10 +1355,7 @@ export const MetricConfig = {
           message.type = reader.int32() as any;
           break;
         case 6:
-          message.aggregationConfig = AggregationConfig.decode(
-            reader,
-            reader.uint32()
-          );
+          message.aggregationConfig = AggregationConfig.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -1523,15 +1381,13 @@ export const MetricConfig = {
   toJSON(message: MetricConfig): unknown {
     const obj: any = {};
     message.name !== undefined && (obj.name = message.name);
-    message.description !== undefined &&
-      (obj.description = message.description);
+    message.description !== undefined && (obj.description = message.description);
     message.unit !== undefined && (obj.unit = message.unit);
     message.sparse !== undefined && (obj.sparse = message.sparse);
     message.type !== undefined && (obj.type = metricTypeToJSON(message.type));
-    message.aggregationConfig !== undefined &&
-      (obj.aggregationConfig = message.aggregationConfig
-        ? AggregationConfig.toJSON(message.aggregationConfig)
-        : undefined);
+    message.aggregationConfig !== undefined && (obj.aggregationConfig = message.aggregationConfig
+      ? AggregationConfig.toJSON(message.aggregationConfig)
+      : undefined);
     return obj;
   },
 
@@ -1542,11 +1398,9 @@ export const MetricConfig = {
     message.unit = object.unit ?? "";
     message.sparse = object.sparse ?? false;
     message.type = object.type ?? 0;
-    message.aggregationConfig =
-      object.aggregationConfig !== undefined &&
-      object.aggregationConfig !== null
-        ? AggregationConfig.fromPartial(object.aggregationConfig)
-        : undefined;
+    message.aggregationConfig = (object.aggregationConfig !== undefined && object.aggregationConfig !== null)
+      ? AggregationConfig.fromPartial(object.aggregationConfig)
+      : undefined;
     return message;
   },
 };
@@ -1556,10 +1410,7 @@ function createBaseAggregationConfig(): AggregationConfig {
 }
 
 export const AggregationConfig = {
-  encode(
-    message: AggregationConfig,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: AggregationConfig, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     writer.uint32(10).fork();
     for (const v of message.intervalInMinutes) {
       writer.int32(v);
@@ -1619,21 +1470,15 @@ export const AggregationConfig = {
       intervalInMinutes: Array.isArray(object?.intervalInMinutes)
         ? object.intervalInMinutes.map((e: any) => Number(e))
         : [],
-      types: Array.isArray(object?.types)
-        ? object.types.map((e: any) => aggregationTypeFromJSON(e))
-        : [],
-      discardOrigin: isSet(object.discardOrigin)
-        ? Boolean(object.discardOrigin)
-        : false,
+      types: Array.isArray(object?.types) ? object.types.map((e: any) => aggregationTypeFromJSON(e)) : [],
+      discardOrigin: isSet(object.discardOrigin) ? Boolean(object.discardOrigin) : false,
     };
   },
 
   toJSON(message: AggregationConfig): unknown {
     const obj: any = {};
     if (message.intervalInMinutes) {
-      obj.intervalInMinutes = message.intervalInMinutes.map((e) =>
-        Math.round(e)
-      );
+      obj.intervalInMinutes = message.intervalInMinutes.map((e) => Math.round(e));
     } else {
       obj.intervalInMinutes = [];
     }
@@ -1642,8 +1487,7 @@ export const AggregationConfig = {
     } else {
       obj.types = [];
     }
-    message.discardOrigin !== undefined &&
-      (obj.discardOrigin = message.discardOrigin);
+    message.discardOrigin !== undefined && (obj.discardOrigin = message.discardOrigin);
     return obj;
   },
 
@@ -1668,10 +1512,7 @@ function createBaseAccountConfig(): AccountConfig {
 }
 
 export const AccountConfig = {
-  encode(
-    message: AccountConfig,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: AccountConfig, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.chainId !== "") {
       writer.uint32(10).string(message.chainId);
     }
@@ -1710,19 +1551,13 @@ export const AccountConfig = {
           message.startBlock = reader.uint64() as Long;
           break;
         case 4:
-          message.intervalConfigs.push(
-            OnIntervalConfig.decode(reader, reader.uint32())
-          );
+          message.intervalConfigs.push(OnIntervalConfig.decode(reader, reader.uint32()));
           break;
         case 5:
-          message.aptosIntervalConfigs.push(
-            AptosOnIntervalConfig.decode(reader, reader.uint32())
-          );
+          message.aptosIntervalConfigs.push(AptosOnIntervalConfig.decode(reader, reader.uint32()));
           break;
         case 6:
-          message.logConfigs.push(
-            LogHandlerConfig.decode(reader, reader.uint32())
-          );
+          message.logConfigs.push(LogHandlerConfig.decode(reader, reader.uint32()));
           break;
         default:
           reader.skipType(tag & 7);
@@ -1736,16 +1571,12 @@ export const AccountConfig = {
     return {
       chainId: isSet(object.chainId) ? String(object.chainId) : "",
       address: isSet(object.address) ? String(object.address) : "",
-      startBlock: isSet(object.startBlock)
-        ? Long.fromValue(object.startBlock)
-        : Long.UZERO,
+      startBlock: isSet(object.startBlock) ? Long.fromValue(object.startBlock) : Long.UZERO,
       intervalConfigs: Array.isArray(object?.intervalConfigs)
         ? object.intervalConfigs.map((e: any) => OnIntervalConfig.fromJSON(e))
         : [],
       aptosIntervalConfigs: Array.isArray(object?.aptosIntervalConfigs)
-        ? object.aptosIntervalConfigs.map((e: any) =>
-            AptosOnIntervalConfig.fromJSON(e)
-          )
+        ? object.aptosIntervalConfigs.map((e: any) => AptosOnIntervalConfig.fromJSON(e))
         : [],
       logConfigs: Array.isArray(object?.logConfigs)
         ? object.logConfigs.map((e: any) => LogHandlerConfig.fromJSON(e))
@@ -1757,12 +1588,9 @@ export const AccountConfig = {
     const obj: any = {};
     message.chainId !== undefined && (obj.chainId = message.chainId);
     message.address !== undefined && (obj.address = message.address);
-    message.startBlock !== undefined &&
-      (obj.startBlock = (message.startBlock || Long.UZERO).toString());
+    message.startBlock !== undefined && (obj.startBlock = (message.startBlock || Long.UZERO).toString());
     if (message.intervalConfigs) {
-      obj.intervalConfigs = message.intervalConfigs.map((e) =>
-        e ? OnIntervalConfig.toJSON(e) : undefined
-      );
+      obj.intervalConfigs = message.intervalConfigs.map((e) => e ? OnIntervalConfig.toJSON(e) : undefined);
     } else {
       obj.intervalConfigs = [];
     }
@@ -1774,9 +1602,7 @@ export const AccountConfig = {
       obj.aptosIntervalConfigs = [];
     }
     if (message.logConfigs) {
-      obj.logConfigs = message.logConfigs.map((e) =>
-        e ? LogHandlerConfig.toJSON(e) : undefined
-      );
+      obj.logConfigs = message.logConfigs.map((e) => e ? LogHandlerConfig.toJSON(e) : undefined);
     } else {
       obj.logConfigs = [];
     }
@@ -1787,18 +1613,12 @@ export const AccountConfig = {
     const message = createBaseAccountConfig();
     message.chainId = object.chainId ?? "";
     message.address = object.address ?? "";
-    message.startBlock =
-      object.startBlock !== undefined && object.startBlock !== null
-        ? Long.fromValue(object.startBlock)
-        : Long.UZERO;
-    message.intervalConfigs =
-      object.intervalConfigs?.map((e) => OnIntervalConfig.fromPartial(e)) || [];
-    message.aptosIntervalConfigs =
-      object.aptosIntervalConfigs?.map((e) =>
-        AptosOnIntervalConfig.fromPartial(e)
-      ) || [];
-    message.logConfigs =
-      object.logConfigs?.map((e) => LogHandlerConfig.fromPartial(e)) || [];
+    message.startBlock = (object.startBlock !== undefined && object.startBlock !== null)
+      ? Long.fromValue(object.startBlock)
+      : Long.UZERO;
+    message.intervalConfigs = object.intervalConfigs?.map((e) => OnIntervalConfig.fromPartial(e)) || [];
+    message.aptosIntervalConfigs = object.aptosIntervalConfigs?.map((e) => AptosOnIntervalConfig.fromPartial(e)) || [];
+    message.logConfigs = object.logConfigs?.map((e) => LogHandlerConfig.fromPartial(e)) || [];
     return message;
   },
 };
@@ -1808,10 +1628,7 @@ function createBaseHandleInterval(): HandleInterval {
 }
 
 export const HandleInterval = {
-  encode(
-    message: HandleInterval,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: HandleInterval, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.recentInterval !== 0) {
       writer.uint32(8).int32(message.recentInterval);
     }
@@ -1844,21 +1661,15 @@ export const HandleInterval = {
 
   fromJSON(object: any): HandleInterval {
     return {
-      recentInterval: isSet(object.recentInterval)
-        ? Number(object.recentInterval)
-        : 0,
-      backfillInterval: isSet(object.backfillInterval)
-        ? Number(object.backfillInterval)
-        : 0,
+      recentInterval: isSet(object.recentInterval) ? Number(object.recentInterval) : 0,
+      backfillInterval: isSet(object.backfillInterval) ? Number(object.backfillInterval) : 0,
     };
   },
 
   toJSON(message: HandleInterval): unknown {
     const obj: any = {};
-    message.recentInterval !== undefined &&
-      (obj.recentInterval = Math.round(message.recentInterval));
-    message.backfillInterval !== undefined &&
-      (obj.backfillInterval = Math.round(message.backfillInterval));
+    message.recentInterval !== undefined && (obj.recentInterval = Math.round(message.recentInterval));
+    message.backfillInterval !== undefined && (obj.backfillInterval = Math.round(message.backfillInterval));
     return obj;
   },
 
@@ -1871,20 +1682,11 @@ export const HandleInterval = {
 };
 
 function createBaseOnIntervalConfig(): OnIntervalConfig {
-  return {
-    handlerId: 0,
-    minutes: 0,
-    minutesInterval: undefined,
-    slot: 0,
-    slotInterval: undefined,
-  };
+  return { handlerId: 0, minutes: 0, minutesInterval: undefined, slot: 0, slotInterval: undefined };
 }
 
 export const OnIntervalConfig = {
-  encode(
-    message: OnIntervalConfig,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: OnIntervalConfig, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.handlerId !== 0) {
       writer.uint32(8).int32(message.handlerId);
     }
@@ -1892,19 +1694,13 @@ export const OnIntervalConfig = {
       writer.uint32(16).int32(message.minutes);
     }
     if (message.minutesInterval !== undefined) {
-      HandleInterval.encode(
-        message.minutesInterval,
-        writer.uint32(34).fork()
-      ).ldelim();
+      HandleInterval.encode(message.minutesInterval, writer.uint32(34).fork()).ldelim();
     }
     if (message.slot !== 0) {
       writer.uint32(24).int32(message.slot);
     }
     if (message.slotInterval !== undefined) {
-      HandleInterval.encode(
-        message.slotInterval,
-        writer.uint32(42).fork()
-      ).ldelim();
+      HandleInterval.encode(message.slotInterval, writer.uint32(42).fork()).ldelim();
     }
     return writer;
   },
@@ -1923,10 +1719,7 @@ export const OnIntervalConfig = {
           message.minutes = reader.int32();
           break;
         case 4:
-          message.minutesInterval = HandleInterval.decode(
-            reader,
-            reader.uint32()
-          );
+          message.minutesInterval = HandleInterval.decode(reader, reader.uint32());
           break;
         case 3:
           message.slot = reader.int32();
@@ -1946,31 +1739,21 @@ export const OnIntervalConfig = {
     return {
       handlerId: isSet(object.handlerId) ? Number(object.handlerId) : 0,
       minutes: isSet(object.minutes) ? Number(object.minutes) : 0,
-      minutesInterval: isSet(object.minutesInterval)
-        ? HandleInterval.fromJSON(object.minutesInterval)
-        : undefined,
+      minutesInterval: isSet(object.minutesInterval) ? HandleInterval.fromJSON(object.minutesInterval) : undefined,
       slot: isSet(object.slot) ? Number(object.slot) : 0,
-      slotInterval: isSet(object.slotInterval)
-        ? HandleInterval.fromJSON(object.slotInterval)
-        : undefined,
+      slotInterval: isSet(object.slotInterval) ? HandleInterval.fromJSON(object.slotInterval) : undefined,
     };
   },
 
   toJSON(message: OnIntervalConfig): unknown {
     const obj: any = {};
-    message.handlerId !== undefined &&
-      (obj.handlerId = Math.round(message.handlerId));
-    message.minutes !== undefined &&
-      (obj.minutes = Math.round(message.minutes));
+    message.handlerId !== undefined && (obj.handlerId = Math.round(message.handlerId));
+    message.minutes !== undefined && (obj.minutes = Math.round(message.minutes));
     message.minutesInterval !== undefined &&
-      (obj.minutesInterval = message.minutesInterval
-        ? HandleInterval.toJSON(message.minutesInterval)
-        : undefined);
+      (obj.minutesInterval = message.minutesInterval ? HandleInterval.toJSON(message.minutesInterval) : undefined);
     message.slot !== undefined && (obj.slot = Math.round(message.slot));
     message.slotInterval !== undefined &&
-      (obj.slotInterval = message.slotInterval
-        ? HandleInterval.toJSON(message.slotInterval)
-        : undefined);
+      (obj.slotInterval = message.slotInterval ? HandleInterval.toJSON(message.slotInterval) : undefined);
     return obj;
   },
 
@@ -1978,15 +1761,13 @@ export const OnIntervalConfig = {
     const message = createBaseOnIntervalConfig();
     message.handlerId = object.handlerId ?? 0;
     message.minutes = object.minutes ?? 0;
-    message.minutesInterval =
-      object.minutesInterval !== undefined && object.minutesInterval !== null
-        ? HandleInterval.fromPartial(object.minutesInterval)
-        : undefined;
+    message.minutesInterval = (object.minutesInterval !== undefined && object.minutesInterval !== null)
+      ? HandleInterval.fromPartial(object.minutesInterval)
+      : undefined;
     message.slot = object.slot ?? 0;
-    message.slotInterval =
-      object.slotInterval !== undefined && object.slotInterval !== null
-        ? HandleInterval.fromPartial(object.slotInterval)
-        : undefined;
+    message.slotInterval = (object.slotInterval !== undefined && object.slotInterval !== null)
+      ? HandleInterval.fromPartial(object.slotInterval)
+      : undefined;
     return message;
   },
 };
@@ -1996,15 +1777,9 @@ function createBaseAptosOnIntervalConfig(): AptosOnIntervalConfig {
 }
 
 export const AptosOnIntervalConfig = {
-  encode(
-    message: AptosOnIntervalConfig,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: AptosOnIntervalConfig, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.intervalConfig !== undefined) {
-      OnIntervalConfig.encode(
-        message.intervalConfig,
-        writer.uint32(10).fork()
-      ).ldelim();
+      OnIntervalConfig.encode(message.intervalConfig, writer.uint32(10).fork()).ldelim();
     }
     if (message.type !== "") {
       writer.uint32(18).string(message.type);
@@ -2012,10 +1787,7 @@ export const AptosOnIntervalConfig = {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): AptosOnIntervalConfig {
+  decode(input: _m0.Reader | Uint8Array, length?: number): AptosOnIntervalConfig {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseAptosOnIntervalConfig();
@@ -2023,10 +1795,7 @@ export const AptosOnIntervalConfig = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.intervalConfig = OnIntervalConfig.decode(
-            reader,
-            reader.uint32()
-          );
+          message.intervalConfig = OnIntervalConfig.decode(reader, reader.uint32());
           break;
         case 2:
           message.type = reader.string();
@@ -2041,9 +1810,7 @@ export const AptosOnIntervalConfig = {
 
   fromJSON(object: any): AptosOnIntervalConfig {
     return {
-      intervalConfig: isSet(object.intervalConfig)
-        ? OnIntervalConfig.fromJSON(object.intervalConfig)
-        : undefined,
+      intervalConfig: isSet(object.intervalConfig) ? OnIntervalConfig.fromJSON(object.intervalConfig) : undefined,
       type: isSet(object.type) ? String(object.type) : "",
     };
   },
@@ -2051,21 +1818,16 @@ export const AptosOnIntervalConfig = {
   toJSON(message: AptosOnIntervalConfig): unknown {
     const obj: any = {};
     message.intervalConfig !== undefined &&
-      (obj.intervalConfig = message.intervalConfig
-        ? OnIntervalConfig.toJSON(message.intervalConfig)
-        : undefined);
+      (obj.intervalConfig = message.intervalConfig ? OnIntervalConfig.toJSON(message.intervalConfig) : undefined);
     message.type !== undefined && (obj.type = message.type);
     return obj;
   },
 
-  fromPartial(
-    object: DeepPartial<AptosOnIntervalConfig>
-  ): AptosOnIntervalConfig {
+  fromPartial(object: DeepPartial<AptosOnIntervalConfig>): AptosOnIntervalConfig {
     const message = createBaseAptosOnIntervalConfig();
-    message.intervalConfig =
-      object.intervalConfig !== undefined && object.intervalConfig !== null
-        ? OnIntervalConfig.fromPartial(object.intervalConfig)
-        : undefined;
+    message.intervalConfig = (object.intervalConfig !== undefined && object.intervalConfig !== null)
+      ? OnIntervalConfig.fromPartial(object.intervalConfig)
+      : undefined;
     message.type = object.type ?? "";
     return message;
   },
@@ -2076,10 +1838,7 @@ function createBaseContractInfo(): ContractInfo {
 }
 
 export const ContractInfo = {
-  encode(
-    message: ContractInfo,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: ContractInfo, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.name !== "") {
       writer.uint32(10).string(message.name);
     }
@@ -2151,19 +1910,11 @@ export const ContractInfo = {
 };
 
 function createBaseTemplateInstance(): TemplateInstance {
-  return {
-    contract: undefined,
-    startBlock: Long.UZERO,
-    endBlock: Long.UZERO,
-    templateId: 0,
-  };
+  return { contract: undefined, startBlock: Long.UZERO, endBlock: Long.UZERO, templateId: 0 };
 }
 
 export const TemplateInstance = {
-  encode(
-    message: TemplateInstance,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: TemplateInstance, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.contract !== undefined) {
       ContractInfo.encode(message.contract, writer.uint32(10).fork()).ldelim();
     }
@@ -2208,15 +1959,9 @@ export const TemplateInstance = {
 
   fromJSON(object: any): TemplateInstance {
     return {
-      contract: isSet(object.contract)
-        ? ContractInfo.fromJSON(object.contract)
-        : undefined,
-      startBlock: isSet(object.startBlock)
-        ? Long.fromValue(object.startBlock)
-        : Long.UZERO,
-      endBlock: isSet(object.endBlock)
-        ? Long.fromValue(object.endBlock)
-        : Long.UZERO,
+      contract: isSet(object.contract) ? ContractInfo.fromJSON(object.contract) : undefined,
+      startBlock: isSet(object.startBlock) ? Long.fromValue(object.startBlock) : Long.UZERO,
+      endBlock: isSet(object.endBlock) ? Long.fromValue(object.endBlock) : Long.UZERO,
       templateId: isSet(object.templateId) ? Number(object.templateId) : 0,
     };
   },
@@ -2224,32 +1969,24 @@ export const TemplateInstance = {
   toJSON(message: TemplateInstance): unknown {
     const obj: any = {};
     message.contract !== undefined &&
-      (obj.contract = message.contract
-        ? ContractInfo.toJSON(message.contract)
-        : undefined);
-    message.startBlock !== undefined &&
-      (obj.startBlock = (message.startBlock || Long.UZERO).toString());
-    message.endBlock !== undefined &&
-      (obj.endBlock = (message.endBlock || Long.UZERO).toString());
-    message.templateId !== undefined &&
-      (obj.templateId = Math.round(message.templateId));
+      (obj.contract = message.contract ? ContractInfo.toJSON(message.contract) : undefined);
+    message.startBlock !== undefined && (obj.startBlock = (message.startBlock || Long.UZERO).toString());
+    message.endBlock !== undefined && (obj.endBlock = (message.endBlock || Long.UZERO).toString());
+    message.templateId !== undefined && (obj.templateId = Math.round(message.templateId));
     return obj;
   },
 
   fromPartial(object: DeepPartial<TemplateInstance>): TemplateInstance {
     const message = createBaseTemplateInstance();
-    message.contract =
-      object.contract !== undefined && object.contract !== null
-        ? ContractInfo.fromPartial(object.contract)
-        : undefined;
-    message.startBlock =
-      object.startBlock !== undefined && object.startBlock !== null
-        ? Long.fromValue(object.startBlock)
-        : Long.UZERO;
-    message.endBlock =
-      object.endBlock !== undefined && object.endBlock !== null
-        ? Long.fromValue(object.endBlock)
-        : Long.UZERO;
+    message.contract = (object.contract !== undefined && object.contract !== null)
+      ? ContractInfo.fromPartial(object.contract)
+      : undefined;
+    message.startBlock = (object.startBlock !== undefined && object.startBlock !== null)
+      ? Long.fromValue(object.startBlock)
+      : Long.UZERO;
+    message.endBlock = (object.endBlock !== undefined && object.endBlock !== null)
+      ? Long.fromValue(object.endBlock)
+      : Long.UZERO;
     message.templateId = object.templateId ?? 0;
     return message;
   },
@@ -2260,10 +1997,7 @@ function createBaseStartRequest(): StartRequest {
 }
 
 export const StartRequest = {
-  encode(
-    message: StartRequest,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: StartRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     for (const v of message.templateInstances) {
       TemplateInstance.encode(v!, writer.uint32(10).fork()).ldelim();
     }
@@ -2278,9 +2012,7 @@ export const StartRequest = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.templateInstances.push(
-            TemplateInstance.decode(reader, reader.uint32())
-          );
+          message.templateInstances.push(TemplateInstance.decode(reader, reader.uint32()));
           break;
         default:
           reader.skipType(tag & 7);
@@ -2301,9 +2033,7 @@ export const StartRequest = {
   toJSON(message: StartRequest): unknown {
     const obj: any = {};
     if (message.templateInstances) {
-      obj.templateInstances = message.templateInstances.map((e) =>
-        e ? TemplateInstance.toJSON(e) : undefined
-      );
+      obj.templateInstances = message.templateInstances.map((e) => e ? TemplateInstance.toJSON(e) : undefined);
     } else {
       obj.templateInstances = [];
     }
@@ -2312,9 +2042,7 @@ export const StartRequest = {
 
   fromPartial(object: DeepPartial<StartRequest>): StartRequest {
     const message = createBaseStartRequest();
-    message.templateInstances =
-      object.templateInstances?.map((e) => TemplateInstance.fromPartial(e)) ||
-      [];
+    message.templateInstances = object.templateInstances?.map((e) => TemplateInstance.fromPartial(e)) || [];
     return message;
   },
 };
@@ -2324,10 +2052,7 @@ function createBaseBlockHandlerConfig(): BlockHandlerConfig {
 }
 
 export const BlockHandlerConfig = {
-  encode(
-    message: BlockHandlerConfig,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: BlockHandlerConfig, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.handlerId !== 0) {
       writer.uint32(8).int32(message.handlerId);
     }
@@ -2353,15 +2078,12 @@ export const BlockHandlerConfig = {
   },
 
   fromJSON(object: any): BlockHandlerConfig {
-    return {
-      handlerId: isSet(object.handlerId) ? Number(object.handlerId) : 0,
-    };
+    return { handlerId: isSet(object.handlerId) ? Number(object.handlerId) : 0 };
   },
 
   toJSON(message: BlockHandlerConfig): unknown {
     const obj: any = {};
-    message.handlerId !== undefined &&
-      (obj.handlerId = Math.round(message.handlerId));
+    message.handlerId !== undefined && (obj.handlerId = Math.round(message.handlerId));
     return obj;
   },
 
@@ -2377,10 +2099,7 @@ function createBaseTraceHandlerConfig(): TraceHandlerConfig {
 }
 
 export const TraceHandlerConfig = {
-  encode(
-    message: TraceHandlerConfig,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: TraceHandlerConfig, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.signature !== "") {
       writer.uint32(10).string(message.signature);
     }
@@ -2421,8 +2140,7 @@ export const TraceHandlerConfig = {
   toJSON(message: TraceHandlerConfig): unknown {
     const obj: any = {};
     message.signature !== undefined && (obj.signature = message.signature);
-    message.handlerId !== undefined &&
-      (obj.handlerId = Math.round(message.handlerId));
+    message.handlerId !== undefined && (obj.handlerId = Math.round(message.handlerId));
     return obj;
   },
 
@@ -2439,10 +2157,7 @@ function createBaseLogHandlerConfig(): LogHandlerConfig {
 }
 
 export const LogHandlerConfig = {
-  encode(
-    message: LogHandlerConfig,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: LogHandlerConfig, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     for (const v of message.filters) {
       LogFilter.encode(v!, writer.uint32(10).fork()).ldelim();
     }
@@ -2475,9 +2190,7 @@ export const LogHandlerConfig = {
 
   fromJSON(object: any): LogHandlerConfig {
     return {
-      filters: Array.isArray(object?.filters)
-        ? object.filters.map((e: any) => LogFilter.fromJSON(e))
-        : [],
+      filters: Array.isArray(object?.filters) ? object.filters.map((e: any) => LogFilter.fromJSON(e)) : [],
       handlerId: isSet(object.handlerId) ? Number(object.handlerId) : 0,
     };
   },
@@ -2485,21 +2198,17 @@ export const LogHandlerConfig = {
   toJSON(message: LogHandlerConfig): unknown {
     const obj: any = {};
     if (message.filters) {
-      obj.filters = message.filters.map((e) =>
-        e ? LogFilter.toJSON(e) : undefined
-      );
+      obj.filters = message.filters.map((e) => e ? LogFilter.toJSON(e) : undefined);
     } else {
       obj.filters = [];
     }
-    message.handlerId !== undefined &&
-      (obj.handlerId = Math.round(message.handlerId));
+    message.handlerId !== undefined && (obj.handlerId = Math.round(message.handlerId));
     return obj;
   },
 
   fromPartial(object: DeepPartial<LogHandlerConfig>): LogHandlerConfig {
     const message = createBaseLogHandlerConfig();
-    message.filters =
-      object.filters?.map((e) => LogFilter.fromPartial(e)) || [];
+    message.filters = object.filters?.map((e) => LogFilter.fromPartial(e)) || [];
     message.handlerId = object.handlerId ?? 0;
     return message;
   },
@@ -2510,10 +2219,7 @@ function createBaseLogFilter(): LogFilter {
 }
 
 export const LogFilter = {
-  encode(
-    message: LogFilter,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: LogFilter, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     for (const v of message.topics) {
       Topic.encode(v!, writer.uint32(10).fork()).ldelim();
     }
@@ -2552,29 +2258,22 @@ export const LogFilter = {
 
   fromJSON(object: any): LogFilter {
     return {
-      topics: Array.isArray(object?.topics)
-        ? object.topics.map((e: any) => Topic.fromJSON(e))
-        : [],
+      topics: Array.isArray(object?.topics) ? object.topics.map((e: any) => Topic.fromJSON(e)) : [],
       address: isSet(object.address) ? String(object.address) : undefined,
-      addressType: isSet(object.addressType)
-        ? addressTypeFromJSON(object.addressType)
-        : undefined,
+      addressType: isSet(object.addressType) ? addressTypeFromJSON(object.addressType) : undefined,
     };
   },
 
   toJSON(message: LogFilter): unknown {
     const obj: any = {};
     if (message.topics) {
-      obj.topics = message.topics.map((e) => (e ? Topic.toJSON(e) : undefined));
+      obj.topics = message.topics.map((e) => e ? Topic.toJSON(e) : undefined);
     } else {
       obj.topics = [];
     }
     message.address !== undefined && (obj.address = message.address);
     message.addressType !== undefined &&
-      (obj.addressType =
-        message.addressType !== undefined
-          ? addressTypeToJSON(message.addressType)
-          : undefined);
+      (obj.addressType = message.addressType !== undefined ? addressTypeToJSON(message.addressType) : undefined);
     return obj;
   },
 
@@ -2588,18 +2287,11 @@ export const LogFilter = {
 };
 
 function createBaseInstructionHandlerConfig(): InstructionHandlerConfig {
-  return {
-    innerInstruction: false,
-    parsedInstruction: false,
-    rawDataInstruction: false,
-  };
+  return { innerInstruction: false, parsedInstruction: false, rawDataInstruction: false };
 }
 
 export const InstructionHandlerConfig = {
-  encode(
-    message: InstructionHandlerConfig,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: InstructionHandlerConfig, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.innerInstruction === true) {
       writer.uint32(8).bool(message.innerInstruction);
     }
@@ -2612,10 +2304,7 @@ export const InstructionHandlerConfig = {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): InstructionHandlerConfig {
+  decode(input: _m0.Reader | Uint8Array, length?: number): InstructionHandlerConfig {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseInstructionHandlerConfig();
@@ -2641,32 +2330,21 @@ export const InstructionHandlerConfig = {
 
   fromJSON(object: any): InstructionHandlerConfig {
     return {
-      innerInstruction: isSet(object.innerInstruction)
-        ? Boolean(object.innerInstruction)
-        : false,
-      parsedInstruction: isSet(object.parsedInstruction)
-        ? Boolean(object.parsedInstruction)
-        : false,
-      rawDataInstruction: isSet(object.rawDataInstruction)
-        ? Boolean(object.rawDataInstruction)
-        : false,
+      innerInstruction: isSet(object.innerInstruction) ? Boolean(object.innerInstruction) : false,
+      parsedInstruction: isSet(object.parsedInstruction) ? Boolean(object.parsedInstruction) : false,
+      rawDataInstruction: isSet(object.rawDataInstruction) ? Boolean(object.rawDataInstruction) : false,
     };
   },
 
   toJSON(message: InstructionHandlerConfig): unknown {
     const obj: any = {};
-    message.innerInstruction !== undefined &&
-      (obj.innerInstruction = message.innerInstruction);
-    message.parsedInstruction !== undefined &&
-      (obj.parsedInstruction = message.parsedInstruction);
-    message.rawDataInstruction !== undefined &&
-      (obj.rawDataInstruction = message.rawDataInstruction);
+    message.innerInstruction !== undefined && (obj.innerInstruction = message.innerInstruction);
+    message.parsedInstruction !== undefined && (obj.parsedInstruction = message.parsedInstruction);
+    message.rawDataInstruction !== undefined && (obj.rawDataInstruction = message.rawDataInstruction);
     return obj;
   },
 
-  fromPartial(
-    object: DeepPartial<InstructionHandlerConfig>
-  ): InstructionHandlerConfig {
+  fromPartial(object: DeepPartial<InstructionHandlerConfig>): InstructionHandlerConfig {
     const message = createBaseInstructionHandlerConfig();
     message.innerInstruction = object.innerInstruction ?? false;
     message.parsedInstruction = object.parsedInstruction ?? false;
@@ -2680,10 +2358,7 @@ function createBaseAptosEventHandlerConfig(): AptosEventHandlerConfig {
 }
 
 export const AptosEventHandlerConfig = {
-  encode(
-    message: AptosEventHandlerConfig,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: AptosEventHandlerConfig, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     for (const v of message.filters) {
       AptosEventFilter.encode(v!, writer.uint32(10).fork()).ldelim();
     }
@@ -2693,10 +2368,7 @@ export const AptosEventHandlerConfig = {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): AptosEventHandlerConfig {
+  decode(input: _m0.Reader | Uint8Array, length?: number): AptosEventHandlerConfig {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseAptosEventHandlerConfig();
@@ -2704,9 +2376,7 @@ export const AptosEventHandlerConfig = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.filters.push(
-            AptosEventFilter.decode(reader, reader.uint32())
-          );
+          message.filters.push(AptosEventFilter.decode(reader, reader.uint32()));
           break;
         case 2:
           message.handlerId = reader.int32();
@@ -2721,9 +2391,7 @@ export const AptosEventHandlerConfig = {
 
   fromJSON(object: any): AptosEventHandlerConfig {
     return {
-      filters: Array.isArray(object?.filters)
-        ? object.filters.map((e: any) => AptosEventFilter.fromJSON(e))
-        : [],
+      filters: Array.isArray(object?.filters) ? object.filters.map((e: any) => AptosEventFilter.fromJSON(e)) : [],
       handlerId: isSet(object.handlerId) ? Number(object.handlerId) : 0,
     };
   },
@@ -2731,23 +2399,17 @@ export const AptosEventHandlerConfig = {
   toJSON(message: AptosEventHandlerConfig): unknown {
     const obj: any = {};
     if (message.filters) {
-      obj.filters = message.filters.map((e) =>
-        e ? AptosEventFilter.toJSON(e) : undefined
-      );
+      obj.filters = message.filters.map((e) => e ? AptosEventFilter.toJSON(e) : undefined);
     } else {
       obj.filters = [];
     }
-    message.handlerId !== undefined &&
-      (obj.handlerId = Math.round(message.handlerId));
+    message.handlerId !== undefined && (obj.handlerId = Math.round(message.handlerId));
     return obj;
   },
 
-  fromPartial(
-    object: DeepPartial<AptosEventHandlerConfig>
-  ): AptosEventHandlerConfig {
+  fromPartial(object: DeepPartial<AptosEventHandlerConfig>): AptosEventHandlerConfig {
     const message = createBaseAptosEventHandlerConfig();
-    message.filters =
-      object.filters?.map((e) => AptosEventFilter.fromPartial(e)) || [];
+    message.filters = object.filters?.map((e) => AptosEventFilter.fromPartial(e)) || [];
     message.handlerId = object.handlerId ?? 0;
     return message;
   },
@@ -2758,10 +2420,7 @@ function createBaseAptosEventFilter(): AptosEventFilter {
 }
 
 export const AptosEventFilter = {
-  encode(
-    message: AptosEventFilter,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: AptosEventFilter, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.type !== "") {
       writer.uint32(10).string(message.type);
     }
@@ -2819,10 +2478,7 @@ function createBaseAptosCallHandlerConfig(): AptosCallHandlerConfig {
 }
 
 export const AptosCallHandlerConfig = {
-  encode(
-    message: AptosCallHandlerConfig,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: AptosCallHandlerConfig, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     for (const v of message.filters) {
       AptosCallFilter.encode(v!, writer.uint32(10).fork()).ldelim();
     }
@@ -2832,10 +2488,7 @@ export const AptosCallHandlerConfig = {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): AptosCallHandlerConfig {
+  decode(input: _m0.Reader | Uint8Array, length?: number): AptosCallHandlerConfig {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseAptosCallHandlerConfig();
@@ -2858,9 +2511,7 @@ export const AptosCallHandlerConfig = {
 
   fromJSON(object: any): AptosCallHandlerConfig {
     return {
-      filters: Array.isArray(object?.filters)
-        ? object.filters.map((e: any) => AptosCallFilter.fromJSON(e))
-        : [],
+      filters: Array.isArray(object?.filters) ? object.filters.map((e: any) => AptosCallFilter.fromJSON(e)) : [],
       handlerId: isSet(object.handlerId) ? Number(object.handlerId) : 0,
     };
   },
@@ -2868,42 +2519,28 @@ export const AptosCallHandlerConfig = {
   toJSON(message: AptosCallHandlerConfig): unknown {
     const obj: any = {};
     if (message.filters) {
-      obj.filters = message.filters.map((e) =>
-        e ? AptosCallFilter.toJSON(e) : undefined
-      );
+      obj.filters = message.filters.map((e) => e ? AptosCallFilter.toJSON(e) : undefined);
     } else {
       obj.filters = [];
     }
-    message.handlerId !== undefined &&
-      (obj.handlerId = Math.round(message.handlerId));
+    message.handlerId !== undefined && (obj.handlerId = Math.round(message.handlerId));
     return obj;
   },
 
-  fromPartial(
-    object: DeepPartial<AptosCallHandlerConfig>
-  ): AptosCallHandlerConfig {
+  fromPartial(object: DeepPartial<AptosCallHandlerConfig>): AptosCallHandlerConfig {
     const message = createBaseAptosCallHandlerConfig();
-    message.filters =
-      object.filters?.map((e) => AptosCallFilter.fromPartial(e)) || [];
+    message.filters = object.filters?.map((e) => AptosCallFilter.fromPartial(e)) || [];
     message.handlerId = object.handlerId ?? 0;
     return message;
   },
 };
 
 function createBaseAptosCallFilter(): AptosCallFilter {
-  return {
-    function: "",
-    typeArguments: [],
-    withTypeArguments: false,
-    includeFailed: false,
-  };
+  return { function: "", typeArguments: [], withTypeArguments: false, includeFailed: false };
 }
 
 export const AptosCallFilter = {
-  encode(
-    message: AptosCallFilter,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: AptosCallFilter, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.function !== "") {
       writer.uint32(10).string(message.function);
     }
@@ -2949,15 +2586,9 @@ export const AptosCallFilter = {
   fromJSON(object: any): AptosCallFilter {
     return {
       function: isSet(object.function) ? String(object.function) : "",
-      typeArguments: Array.isArray(object?.typeArguments)
-        ? object.typeArguments.map((e: any) => String(e))
-        : [],
-      withTypeArguments: isSet(object.withTypeArguments)
-        ? Boolean(object.withTypeArguments)
-        : false,
-      includeFailed: isSet(object.includeFailed)
-        ? Boolean(object.includeFailed)
-        : false,
+      typeArguments: Array.isArray(object?.typeArguments) ? object.typeArguments.map((e: any) => String(e)) : [],
+      withTypeArguments: isSet(object.withTypeArguments) ? Boolean(object.withTypeArguments) : false,
+      includeFailed: isSet(object.includeFailed) ? Boolean(object.includeFailed) : false,
     };
   },
 
@@ -2969,10 +2600,8 @@ export const AptosCallFilter = {
     } else {
       obj.typeArguments = [];
     }
-    message.withTypeArguments !== undefined &&
-      (obj.withTypeArguments = message.withTypeArguments);
-    message.includeFailed !== undefined &&
-      (obj.includeFailed = message.includeFailed);
+    message.withTypeArguments !== undefined && (obj.withTypeArguments = message.withTypeArguments);
+    message.includeFailed !== undefined && (obj.includeFailed = message.includeFailed);
     return obj;
   },
 
@@ -3017,11 +2646,7 @@ export const Topic = {
   },
 
   fromJSON(object: any): Topic {
-    return {
-      hashes: Array.isArray(object?.hashes)
-        ? object.hashes.map((e: any) => String(e))
-        : [],
-    };
+    return { hashes: Array.isArray(object?.hashes) ? object.hashes.map((e: any) => String(e)) : [] };
   },
 
   toJSON(message: Topic): unknown {
@@ -3046,20 +2671,14 @@ function createBaseProcessBindingsRequest(): ProcessBindingsRequest {
 }
 
 export const ProcessBindingsRequest = {
-  encode(
-    message: ProcessBindingsRequest,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: ProcessBindingsRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     for (const v of message.bindings) {
       DataBinding.encode(v!, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): ProcessBindingsRequest {
+  decode(input: _m0.Reader | Uint8Array, length?: number): ProcessBindingsRequest {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseProcessBindingsRequest();
@@ -3079,30 +2698,23 @@ export const ProcessBindingsRequest = {
 
   fromJSON(object: any): ProcessBindingsRequest {
     return {
-      bindings: Array.isArray(object?.bindings)
-        ? object.bindings.map((e: any) => DataBinding.fromJSON(e))
-        : [],
+      bindings: Array.isArray(object?.bindings) ? object.bindings.map((e: any) => DataBinding.fromJSON(e)) : [],
     };
   },
 
   toJSON(message: ProcessBindingsRequest): unknown {
     const obj: any = {};
     if (message.bindings) {
-      obj.bindings = message.bindings.map((e) =>
-        e ? DataBinding.toJSON(e) : undefined
-      );
+      obj.bindings = message.bindings.map((e) => e ? DataBinding.toJSON(e) : undefined);
     } else {
       obj.bindings = [];
     }
     return obj;
   },
 
-  fromPartial(
-    object: DeepPartial<ProcessBindingsRequest>
-  ): ProcessBindingsRequest {
+  fromPartial(object: DeepPartial<ProcessBindingsRequest>): ProcessBindingsRequest {
     const message = createBaseProcessBindingsRequest();
-    message.bindings =
-      object.bindings?.map((e) => DataBinding.fromPartial(e)) || [];
+    message.bindings = object.bindings?.map((e) => DataBinding.fromPartial(e)) || [];
     return message;
   },
 };
@@ -3112,10 +2724,7 @@ function createBaseProcessBindingResponse(): ProcessBindingResponse {
 }
 
 export const ProcessBindingResponse = {
-  encode(
-    message: ProcessBindingResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: ProcessBindingResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.result !== undefined) {
       ProcessResult.encode(message.result, writer.uint32(10).fork()).ldelim();
     }
@@ -3125,10 +2734,7 @@ export const ProcessBindingResponse = {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): ProcessBindingResponse {
+  decode(input: _m0.Reader | Uint8Array, length?: number): ProcessBindingResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseProcessBindingResponse();
@@ -3151,52 +2757,34 @@ export const ProcessBindingResponse = {
 
   fromJSON(object: any): ProcessBindingResponse {
     return {
-      result: isSet(object.result)
-        ? ProcessResult.fromJSON(object.result)
-        : undefined,
-      configUpdated: isSet(object.configUpdated)
-        ? Boolean(object.configUpdated)
-        : false,
+      result: isSet(object.result) ? ProcessResult.fromJSON(object.result) : undefined,
+      configUpdated: isSet(object.configUpdated) ? Boolean(object.configUpdated) : false,
     };
   },
 
   toJSON(message: ProcessBindingResponse): unknown {
     const obj: any = {};
-    message.result !== undefined &&
-      (obj.result = message.result
-        ? ProcessResult.toJSON(message.result)
-        : undefined);
-    message.configUpdated !== undefined &&
-      (obj.configUpdated = message.configUpdated);
+    message.result !== undefined && (obj.result = message.result ? ProcessResult.toJSON(message.result) : undefined);
+    message.configUpdated !== undefined && (obj.configUpdated = message.configUpdated);
     return obj;
   },
 
-  fromPartial(
-    object: DeepPartial<ProcessBindingResponse>
-  ): ProcessBindingResponse {
+  fromPartial(object: DeepPartial<ProcessBindingResponse>): ProcessBindingResponse {
     const message = createBaseProcessBindingResponse();
-    message.result =
-      object.result !== undefined && object.result !== null
-        ? ProcessResult.fromPartial(object.result)
-        : undefined;
+    message.result = (object.result !== undefined && object.result !== null)
+      ? ProcessResult.fromPartial(object.result)
+      : undefined;
     message.configUpdated = object.configUpdated ?? false;
     return message;
   },
 };
 
 function createBaseRawTransaction(): RawTransaction {
-  return {
-    raw: new Uint8Array(),
-    programAccountId: undefined,
-    slot: undefined,
-  };
+  return { raw: new Uint8Array(), programAccountId: undefined, slot: undefined };
 }
 
 export const RawTransaction = {
-  encode(
-    message: RawTransaction,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: RawTransaction, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.raw.length !== 0) {
       writer.uint32(10).bytes(message.raw);
     }
@@ -3236,9 +2824,7 @@ export const RawTransaction = {
   fromJSON(object: any): RawTransaction {
     return {
       raw: isSet(object.raw) ? bytesFromBase64(object.raw) : new Uint8Array(),
-      programAccountId: isSet(object.programAccountId)
-        ? String(object.programAccountId)
-        : undefined,
+      programAccountId: isSet(object.programAccountId) ? String(object.programAccountId) : undefined,
       slot: isSet(object.slot) ? Long.fromValue(object.slot) : undefined,
     };
   },
@@ -3246,13 +2832,9 @@ export const RawTransaction = {
   toJSON(message: RawTransaction): unknown {
     const obj: any = {};
     message.raw !== undefined &&
-      (obj.raw = base64FromBytes(
-        message.raw !== undefined ? message.raw : new Uint8Array()
-      ));
-    message.programAccountId !== undefined &&
-      (obj.programAccountId = message.programAccountId);
-    message.slot !== undefined &&
-      (obj.slot = (message.slot || undefined).toString());
+      (obj.raw = base64FromBytes(message.raw !== undefined ? message.raw : new Uint8Array()));
+    message.programAccountId !== undefined && (obj.programAccountId = message.programAccountId);
+    message.slot !== undefined && (obj.slot = (message.slot || undefined).toString());
     return obj;
   },
 
@@ -3260,29 +2842,421 @@ export const RawTransaction = {
     const message = createBaseRawTransaction();
     message.raw = object.raw ?? new Uint8Array();
     message.programAccountId = object.programAccountId ?? undefined;
-    message.slot =
-      object.slot !== undefined && object.slot !== null
-        ? Long.fromValue(object.slot)
-        : undefined;
+    message.slot = (object.slot !== undefined && object.slot !== null) ? Long.fromValue(object.slot) : undefined;
     return message;
   },
 };
 
-function createBaseInstruction(): Instruction {
+function createBaseData(): Data {
   return {
-    instructionData: "",
-    slot: Long.UZERO,
-    programAccountId: "",
-    accounts: [],
-    parsed: undefined,
+    raw: new Uint8Array(),
+    ethLog: undefined,
+    ethBlock: undefined,
+    ethTransaction: undefined,
+    ethTrace: undefined,
+    solInstruction: undefined,
+    aptEvent: undefined,
+    aptCall: undefined,
+    aptResource: undefined,
   };
 }
 
-export const Instruction = {
-  encode(
-    message: Instruction,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+export const Data = {
+  encode(message: Data, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.raw.length !== 0) {
+      writer.uint32(10).bytes(message.raw);
+    }
+    if (message.ethLog !== undefined) {
+      Data_EthLog.encode(message.ethLog, writer.uint32(18).fork()).ldelim();
+    }
+    if (message.ethBlock !== undefined) {
+      Data_EthBlock.encode(message.ethBlock, writer.uint32(26).fork()).ldelim();
+    }
+    if (message.ethTransaction !== undefined) {
+      Data_EthTransaction.encode(message.ethTransaction, writer.uint32(34).fork()).ldelim();
+    }
+    if (message.ethTrace !== undefined) {
+      Data_EthTrace.encode(message.ethTrace, writer.uint32(42).fork()).ldelim();
+    }
+    if (message.solInstruction !== undefined) {
+      Data_SolInstruction.encode(message.solInstruction, writer.uint32(50).fork()).ldelim();
+    }
+    if (message.aptEvent !== undefined) {
+      Data_AptEvent.encode(message.aptEvent, writer.uint32(58).fork()).ldelim();
+    }
+    if (message.aptCall !== undefined) {
+      Data_AptCall.encode(message.aptCall, writer.uint32(66).fork()).ldelim();
+    }
+    if (message.aptResource !== undefined) {
+      Data_AptResource.encode(message.aptResource, writer.uint32(74).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Data {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseData();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.raw = reader.bytes();
+          break;
+        case 2:
+          message.ethLog = Data_EthLog.decode(reader, reader.uint32());
+          break;
+        case 3:
+          message.ethBlock = Data_EthBlock.decode(reader, reader.uint32());
+          break;
+        case 4:
+          message.ethTransaction = Data_EthTransaction.decode(reader, reader.uint32());
+          break;
+        case 5:
+          message.ethTrace = Data_EthTrace.decode(reader, reader.uint32());
+          break;
+        case 6:
+          message.solInstruction = Data_SolInstruction.decode(reader, reader.uint32());
+          break;
+        case 7:
+          message.aptEvent = Data_AptEvent.decode(reader, reader.uint32());
+          break;
+        case 8:
+          message.aptCall = Data_AptCall.decode(reader, reader.uint32());
+          break;
+        case 9:
+          message.aptResource = Data_AptResource.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Data {
+    return {
+      raw: isSet(object.raw) ? bytesFromBase64(object.raw) : new Uint8Array(),
+      ethLog: isSet(object.ethLog) ? Data_EthLog.fromJSON(object.ethLog) : undefined,
+      ethBlock: isSet(object.ethBlock) ? Data_EthBlock.fromJSON(object.ethBlock) : undefined,
+      ethTransaction: isSet(object.ethTransaction) ? Data_EthTransaction.fromJSON(object.ethTransaction) : undefined,
+      ethTrace: isSet(object.ethTrace) ? Data_EthTrace.fromJSON(object.ethTrace) : undefined,
+      solInstruction: isSet(object.solInstruction) ? Data_SolInstruction.fromJSON(object.solInstruction) : undefined,
+      aptEvent: isSet(object.aptEvent) ? Data_AptEvent.fromJSON(object.aptEvent) : undefined,
+      aptCall: isSet(object.aptCall) ? Data_AptCall.fromJSON(object.aptCall) : undefined,
+      aptResource: isSet(object.aptResource) ? Data_AptResource.fromJSON(object.aptResource) : undefined,
+    };
+  },
+
+  toJSON(message: Data): unknown {
+    const obj: any = {};
+    message.raw !== undefined &&
+      (obj.raw = base64FromBytes(message.raw !== undefined ? message.raw : new Uint8Array()));
+    message.ethLog !== undefined && (obj.ethLog = message.ethLog ? Data_EthLog.toJSON(message.ethLog) : undefined);
+    message.ethBlock !== undefined &&
+      (obj.ethBlock = message.ethBlock ? Data_EthBlock.toJSON(message.ethBlock) : undefined);
+    message.ethTransaction !== undefined &&
+      (obj.ethTransaction = message.ethTransaction ? Data_EthTransaction.toJSON(message.ethTransaction) : undefined);
+    message.ethTrace !== undefined &&
+      (obj.ethTrace = message.ethTrace ? Data_EthTrace.toJSON(message.ethTrace) : undefined);
+    message.solInstruction !== undefined &&
+      (obj.solInstruction = message.solInstruction ? Data_SolInstruction.toJSON(message.solInstruction) : undefined);
+    message.aptEvent !== undefined &&
+      (obj.aptEvent = message.aptEvent ? Data_AptEvent.toJSON(message.aptEvent) : undefined);
+    message.aptCall !== undefined && (obj.aptCall = message.aptCall ? Data_AptCall.toJSON(message.aptCall) : undefined);
+    message.aptResource !== undefined &&
+      (obj.aptResource = message.aptResource ? Data_AptResource.toJSON(message.aptResource) : undefined);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<Data>): Data {
+    const message = createBaseData();
+    message.raw = object.raw ?? new Uint8Array();
+    message.ethLog = (object.ethLog !== undefined && object.ethLog !== null)
+      ? Data_EthLog.fromPartial(object.ethLog)
+      : undefined;
+    message.ethBlock = (object.ethBlock !== undefined && object.ethBlock !== null)
+      ? Data_EthBlock.fromPartial(object.ethBlock)
+      : undefined;
+    message.ethTransaction = (object.ethTransaction !== undefined && object.ethTransaction !== null)
+      ? Data_EthTransaction.fromPartial(object.ethTransaction)
+      : undefined;
+    message.ethTrace = (object.ethTrace !== undefined && object.ethTrace !== null)
+      ? Data_EthTrace.fromPartial(object.ethTrace)
+      : undefined;
+    message.solInstruction = (object.solInstruction !== undefined && object.solInstruction !== null)
+      ? Data_SolInstruction.fromPartial(object.solInstruction)
+      : undefined;
+    message.aptEvent = (object.aptEvent !== undefined && object.aptEvent !== null)
+      ? Data_AptEvent.fromPartial(object.aptEvent)
+      : undefined;
+    message.aptCall = (object.aptCall !== undefined && object.aptCall !== null)
+      ? Data_AptCall.fromPartial(object.aptCall)
+      : undefined;
+    message.aptResource = (object.aptResource !== undefined && object.aptResource !== null)
+      ? Data_AptResource.fromPartial(object.aptResource)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseData_EthLog(): Data_EthLog {
+  return { data: new Uint8Array(), transaction: undefined };
+}
+
+export const Data_EthLog = {
+  encode(message: Data_EthLog, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.data.length !== 0) {
+      writer.uint32(10).bytes(message.data);
+    }
+    if (message.transaction !== undefined) {
+      writer.uint32(18).bytes(message.transaction);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Data_EthLog {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseData_EthLog();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.data = reader.bytes();
+          break;
+        case 2:
+          message.transaction = reader.bytes();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Data_EthLog {
+    return {
+      data: isSet(object.data) ? bytesFromBase64(object.data) : new Uint8Array(),
+      transaction: isSet(object.transaction) ? bytesFromBase64(object.transaction) : undefined,
+    };
+  },
+
+  toJSON(message: Data_EthLog): unknown {
+    const obj: any = {};
+    message.data !== undefined &&
+      (obj.data = base64FromBytes(message.data !== undefined ? message.data : new Uint8Array()));
+    message.transaction !== undefined &&
+      (obj.transaction = message.transaction !== undefined ? base64FromBytes(message.transaction) : undefined);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<Data_EthLog>): Data_EthLog {
+    const message = createBaseData_EthLog();
+    message.data = object.data ?? new Uint8Array();
+    message.transaction = object.transaction ?? undefined;
+    return message;
+  },
+};
+
+function createBaseData_EthBlock(): Data_EthBlock {
+  return { data: new Uint8Array() };
+}
+
+export const Data_EthBlock = {
+  encode(message: Data_EthBlock, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.data.length !== 0) {
+      writer.uint32(10).bytes(message.data);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Data_EthBlock {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseData_EthBlock();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.data = reader.bytes();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Data_EthBlock {
+    return { data: isSet(object.data) ? bytesFromBase64(object.data) : new Uint8Array() };
+  },
+
+  toJSON(message: Data_EthBlock): unknown {
+    const obj: any = {};
+    message.data !== undefined &&
+      (obj.data = base64FromBytes(message.data !== undefined ? message.data : new Uint8Array()));
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<Data_EthBlock>): Data_EthBlock {
+    const message = createBaseData_EthBlock();
+    message.data = object.data ?? new Uint8Array();
+    return message;
+  },
+};
+
+function createBaseData_EthTransaction(): Data_EthTransaction {
+  return { data: new Uint8Array(), transaction: undefined, transactionReceipt: undefined };
+}
+
+export const Data_EthTransaction = {
+  encode(message: Data_EthTransaction, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.data.length !== 0) {
+      writer.uint32(10).bytes(message.data);
+    }
+    if (message.transaction !== undefined) {
+      writer.uint32(18).bytes(message.transaction);
+    }
+    if (message.transactionReceipt !== undefined) {
+      writer.uint32(26).bytes(message.transactionReceipt);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Data_EthTransaction {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseData_EthTransaction();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.data = reader.bytes();
+          break;
+        case 2:
+          message.transaction = reader.bytes();
+          break;
+        case 3:
+          message.transactionReceipt = reader.bytes();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Data_EthTransaction {
+    return {
+      data: isSet(object.data) ? bytesFromBase64(object.data) : new Uint8Array(),
+      transaction: isSet(object.transaction) ? bytesFromBase64(object.transaction) : undefined,
+      transactionReceipt: isSet(object.transactionReceipt) ? bytesFromBase64(object.transactionReceipt) : undefined,
+    };
+  },
+
+  toJSON(message: Data_EthTransaction): unknown {
+    const obj: any = {};
+    message.data !== undefined &&
+      (obj.data = base64FromBytes(message.data !== undefined ? message.data : new Uint8Array()));
+    message.transaction !== undefined &&
+      (obj.transaction = message.transaction !== undefined ? base64FromBytes(message.transaction) : undefined);
+    message.transactionReceipt !== undefined && (obj.transactionReceipt = message.transactionReceipt !== undefined
+      ? base64FromBytes(message.transactionReceipt)
+      : undefined);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<Data_EthTransaction>): Data_EthTransaction {
+    const message = createBaseData_EthTransaction();
+    message.data = object.data ?? new Uint8Array();
+    message.transaction = object.transaction ?? undefined;
+    message.transactionReceipt = object.transactionReceipt ?? undefined;
+    return message;
+  },
+};
+
+function createBaseData_EthTrace(): Data_EthTrace {
+  return { data: new Uint8Array(), transaction: undefined, transactionReceipt: undefined };
+}
+
+export const Data_EthTrace = {
+  encode(message: Data_EthTrace, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.data.length !== 0) {
+      writer.uint32(10).bytes(message.data);
+    }
+    if (message.transaction !== undefined) {
+      writer.uint32(18).bytes(message.transaction);
+    }
+    if (message.transactionReceipt !== undefined) {
+      writer.uint32(26).bytes(message.transactionReceipt);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Data_EthTrace {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseData_EthTrace();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.data = reader.bytes();
+          break;
+        case 2:
+          message.transaction = reader.bytes();
+          break;
+        case 3:
+          message.transactionReceipt = reader.bytes();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Data_EthTrace {
+    return {
+      data: isSet(object.data) ? bytesFromBase64(object.data) : new Uint8Array(),
+      transaction: isSet(object.transaction) ? bytesFromBase64(object.transaction) : undefined,
+      transactionReceipt: isSet(object.transactionReceipt) ? bytesFromBase64(object.transactionReceipt) : undefined,
+    };
+  },
+
+  toJSON(message: Data_EthTrace): unknown {
+    const obj: any = {};
+    message.data !== undefined &&
+      (obj.data = base64FromBytes(message.data !== undefined ? message.data : new Uint8Array()));
+    message.transaction !== undefined &&
+      (obj.transaction = message.transaction !== undefined ? base64FromBytes(message.transaction) : undefined);
+    message.transactionReceipt !== undefined && (obj.transactionReceipt = message.transactionReceipt !== undefined
+      ? base64FromBytes(message.transactionReceipt)
+      : undefined);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<Data_EthTrace>): Data_EthTrace {
+    const message = createBaseData_EthTrace();
+    message.data = object.data ?? new Uint8Array();
+    message.transaction = object.transaction ?? undefined;
+    message.transactionReceipt = object.transactionReceipt ?? undefined;
+    return message;
+  },
+};
+
+function createBaseData_SolInstruction(): Data_SolInstruction {
+  return { instructionData: "", slot: Long.UZERO, programAccountId: "", accounts: [], parsed: undefined };
+}
+
+export const Data_SolInstruction = {
+  encode(message: Data_SolInstruction, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.instructionData !== "") {
       writer.uint32(10).string(message.instructionData);
     }
@@ -3301,10 +3275,10 @@ export const Instruction = {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): Instruction {
+  decode(input: _m0.Reader | Uint8Array, length?: number): Data_SolInstruction {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseInstruction();
+    const message = createBaseData_SolInstruction();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -3331,50 +3305,35 @@ export const Instruction = {
     return message;
   },
 
-  fromJSON(object: any): Instruction {
+  fromJSON(object: any): Data_SolInstruction {
     return {
-      instructionData: isSet(object.instructionData)
-        ? String(object.instructionData)
-        : "",
+      instructionData: isSet(object.instructionData) ? String(object.instructionData) : "",
       slot: isSet(object.slot) ? Long.fromValue(object.slot) : Long.UZERO,
-      programAccountId: isSet(object.programAccountId)
-        ? String(object.programAccountId)
-        : "",
-      accounts: Array.isArray(object?.accounts)
-        ? object.accounts.map((e: any) => String(e))
-        : [],
+      programAccountId: isSet(object.programAccountId) ? String(object.programAccountId) : "",
+      accounts: Array.isArray(object?.accounts) ? object.accounts.map((e: any) => String(e)) : [],
       parsed: isSet(object.parsed) ? bytesFromBase64(object.parsed) : undefined,
     };
   },
 
-  toJSON(message: Instruction): unknown {
+  toJSON(message: Data_SolInstruction): unknown {
     const obj: any = {};
-    message.instructionData !== undefined &&
-      (obj.instructionData = message.instructionData);
-    message.slot !== undefined &&
-      (obj.slot = (message.slot || Long.UZERO).toString());
-    message.programAccountId !== undefined &&
-      (obj.programAccountId = message.programAccountId);
+    message.instructionData !== undefined && (obj.instructionData = message.instructionData);
+    message.slot !== undefined && (obj.slot = (message.slot || Long.UZERO).toString());
+    message.programAccountId !== undefined && (obj.programAccountId = message.programAccountId);
     if (message.accounts) {
       obj.accounts = message.accounts.map((e) => e);
     } else {
       obj.accounts = [];
     }
     message.parsed !== undefined &&
-      (obj.parsed =
-        message.parsed !== undefined
-          ? base64FromBytes(message.parsed)
-          : undefined);
+      (obj.parsed = message.parsed !== undefined ? base64FromBytes(message.parsed) : undefined);
     return obj;
   },
 
-  fromPartial(object: DeepPartial<Instruction>): Instruction {
-    const message = createBaseInstruction();
+  fromPartial(object: DeepPartial<Data_SolInstruction>): Data_SolInstruction {
+    const message = createBaseData_SolInstruction();
     message.instructionData = object.instructionData ?? "";
-    message.slot =
-      object.slot !== undefined && object.slot !== null
-        ? Long.fromValue(object.slot)
-        : Long.UZERO;
+    message.slot = (object.slot !== undefined && object.slot !== null) ? Long.fromValue(object.slot) : Long.UZERO;
     message.programAccountId = object.programAccountId ?? "";
     message.accounts = object.accounts?.map((e) => e) || [];
     message.parsed = object.parsed ?? undefined;
@@ -3382,27 +3341,27 @@ export const Instruction = {
   },
 };
 
-function createBaseData(): Data {
-  return { raw: new Uint8Array() };
+function createBaseData_AptEvent(): Data_AptEvent {
+  return { data: new Uint8Array() };
 }
 
-export const Data = {
-  encode(message: Data, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.raw.length !== 0) {
-      writer.uint32(10).bytes(message.raw);
+export const Data_AptEvent = {
+  encode(message: Data_AptEvent, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.data.length !== 0) {
+      writer.uint32(10).bytes(message.data);
     }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): Data {
+  decode(input: _m0.Reader | Uint8Array, length?: number): Data_AptEvent {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseData();
+    const message = createBaseData_AptEvent();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.raw = reader.bytes();
+          message.data = reader.bytes();
           break;
         default:
           reader.skipType(tag & 7);
@@ -3412,24 +3371,138 @@ export const Data = {
     return message;
   },
 
-  fromJSON(object: any): Data {
-    return {
-      raw: isSet(object.raw) ? bytesFromBase64(object.raw) : new Uint8Array(),
-    };
+  fromJSON(object: any): Data_AptEvent {
+    return { data: isSet(object.data) ? bytesFromBase64(object.data) : new Uint8Array() };
   },
 
-  toJSON(message: Data): unknown {
+  toJSON(message: Data_AptEvent): unknown {
     const obj: any = {};
-    message.raw !== undefined &&
-      (obj.raw = base64FromBytes(
-        message.raw !== undefined ? message.raw : new Uint8Array()
-      ));
+    message.data !== undefined &&
+      (obj.data = base64FromBytes(message.data !== undefined ? message.data : new Uint8Array()));
     return obj;
   },
 
-  fromPartial(object: DeepPartial<Data>): Data {
-    const message = createBaseData();
-    message.raw = object.raw ?? new Uint8Array();
+  fromPartial(object: DeepPartial<Data_AptEvent>): Data_AptEvent {
+    const message = createBaseData_AptEvent();
+    message.data = object.data ?? new Uint8Array();
+    return message;
+  },
+};
+
+function createBaseData_AptCall(): Data_AptCall {
+  return { data: new Uint8Array() };
+}
+
+export const Data_AptCall = {
+  encode(message: Data_AptCall, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.data.length !== 0) {
+      writer.uint32(10).bytes(message.data);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Data_AptCall {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseData_AptCall();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.data = reader.bytes();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Data_AptCall {
+    return { data: isSet(object.data) ? bytesFromBase64(object.data) : new Uint8Array() };
+  },
+
+  toJSON(message: Data_AptCall): unknown {
+    const obj: any = {};
+    message.data !== undefined &&
+      (obj.data = base64FromBytes(message.data !== undefined ? message.data : new Uint8Array()));
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<Data_AptCall>): Data_AptCall {
+    const message = createBaseData_AptCall();
+    message.data = object.data ?? new Uint8Array();
+    return message;
+  },
+};
+
+function createBaseData_AptResource(): Data_AptResource {
+  return { data: new Uint8Array(), version: Long.ZERO, timestamp: "" };
+}
+
+export const Data_AptResource = {
+  encode(message: Data_AptResource, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.data.length !== 0) {
+      writer.uint32(10).bytes(message.data);
+    }
+    if (!message.version.isZero()) {
+      writer.uint32(16).int64(message.version);
+    }
+    if (message.timestamp !== "") {
+      writer.uint32(26).string(message.timestamp);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Data_AptResource {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseData_AptResource();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.data = reader.bytes();
+          break;
+        case 2:
+          message.version = reader.int64() as Long;
+          break;
+        case 3:
+          message.timestamp = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Data_AptResource {
+    return {
+      data: isSet(object.data) ? bytesFromBase64(object.data) : new Uint8Array(),
+      version: isSet(object.version) ? Long.fromValue(object.version) : Long.ZERO,
+      timestamp: isSet(object.timestamp) ? String(object.timestamp) : "",
+    };
+  },
+
+  toJSON(message: Data_AptResource): unknown {
+    const obj: any = {};
+    message.data !== undefined &&
+      (obj.data = base64FromBytes(message.data !== undefined ? message.data : new Uint8Array()));
+    message.version !== undefined && (obj.version = (message.version || Long.ZERO).toString());
+    message.timestamp !== undefined && (obj.timestamp = message.timestamp);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<Data_AptResource>): Data_AptResource {
+    const message = createBaseData_AptResource();
+    message.data = object.data ?? new Uint8Array();
+    message.version = (object.version !== undefined && object.version !== null)
+      ? Long.fromValue(object.version)
+      : Long.ZERO;
+    message.timestamp = object.timestamp ?? "";
     return message;
   },
 };
@@ -3439,10 +3512,7 @@ function createBaseDataBinding(): DataBinding {
 }
 
 export const DataBinding = {
-  encode(
-    message: DataBinding,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: DataBinding, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.data !== undefined) {
       Data.encode(message.data, writer.uint32(10).fork()).ldelim();
     }
@@ -3491,21 +3561,15 @@ export const DataBinding = {
   fromJSON(object: any): DataBinding {
     return {
       data: isSet(object.data) ? Data.fromJSON(object.data) : undefined,
-      handlerType: isSet(object.handlerType)
-        ? handlerTypeFromJSON(object.handlerType)
-        : 0,
-      handlerIds: Array.isArray(object?.handlerIds)
-        ? object.handlerIds.map((e: any) => Number(e))
-        : [],
+      handlerType: isSet(object.handlerType) ? handlerTypeFromJSON(object.handlerType) : 0,
+      handlerIds: Array.isArray(object?.handlerIds) ? object.handlerIds.map((e: any) => Number(e)) : [],
     };
   },
 
   toJSON(message: DataBinding): unknown {
     const obj: any = {};
-    message.data !== undefined &&
-      (obj.data = message.data ? Data.toJSON(message.data) : undefined);
-    message.handlerType !== undefined &&
-      (obj.handlerType = handlerTypeToJSON(message.handlerType));
+    message.data !== undefined && (obj.data = message.data ? Data.toJSON(message.data) : undefined);
+    message.handlerType !== undefined && (obj.handlerType = handlerTypeToJSON(message.handlerType));
     if (message.handlerIds) {
       obj.handlerIds = message.handlerIds.map((e) => Math.round(e));
     } else {
@@ -3516,67 +3580,9 @@ export const DataBinding = {
 
   fromPartial(object: DeepPartial<DataBinding>): DataBinding {
     const message = createBaseDataBinding();
-    message.data =
-      object.data !== undefined && object.data !== null
-        ? Data.fromPartial(object.data)
-        : undefined;
+    message.data = (object.data !== undefined && object.data !== null) ? Data.fromPartial(object.data) : undefined;
     message.handlerType = object.handlerType ?? 0;
     message.handlerIds = object.handlerIds?.map((e) => e) || [];
-    return message;
-  },
-};
-
-function createBaseRawBlock(): RawBlock {
-  return { raw: new Uint8Array() };
-}
-
-export const RawBlock = {
-  encode(
-    message: RawBlock,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
-    if (message.raw.length !== 0) {
-      writer.uint32(10).bytes(message.raw);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): RawBlock {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseRawBlock();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.raw = reader.bytes();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): RawBlock {
-    return {
-      raw: isSet(object.raw) ? bytesFromBase64(object.raw) : new Uint8Array(),
-    };
-  },
-
-  toJSON(message: RawBlock): unknown {
-    const obj: any = {};
-    message.raw !== undefined &&
-      (obj.raw = base64FromBytes(
-        message.raw !== undefined ? message.raw : new Uint8Array()
-      ));
-    return obj;
-  },
-
-  fromPartial(object: DeepPartial<RawBlock>): RawBlock {
-    const message = createBaseRawBlock();
-    message.raw = object.raw ?? new Uint8Array();
     return message;
   },
 };
@@ -3586,10 +3592,7 @@ function createBaseProcessResult(): ProcessResult {
 }
 
 export const ProcessResult = {
-  encode(
-    message: ProcessResult,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: ProcessResult, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     for (const v of message.gauges) {
       GaugeResult.encode(v!, writer.uint32(10).fork()).ldelim();
     }
@@ -3625,9 +3628,7 @@ export const ProcessResult = {
           message.logs.push(LogResult.decode(reader, reader.uint32()));
           break;
         case 4:
-          message.events.push(
-            EventTrackingResult.decode(reader, reader.uint32())
-          );
+          message.events.push(EventTrackingResult.decode(reader, reader.uint32()));
           break;
         case 5:
           message.exports.push(ExportResult.decode(reader, reader.uint32()));
@@ -3642,56 +3643,38 @@ export const ProcessResult = {
 
   fromJSON(object: any): ProcessResult {
     return {
-      gauges: Array.isArray(object?.gauges)
-        ? object.gauges.map((e: any) => GaugeResult.fromJSON(e))
-        : [],
-      counters: Array.isArray(object?.counters)
-        ? object.counters.map((e: any) => CounterResult.fromJSON(e))
-        : [],
-      logs: Array.isArray(object?.logs)
-        ? object.logs.map((e: any) => LogResult.fromJSON(e))
-        : [],
-      events: Array.isArray(object?.events)
-        ? object.events.map((e: any) => EventTrackingResult.fromJSON(e))
-        : [],
-      exports: Array.isArray(object?.exports)
-        ? object.exports.map((e: any) => ExportResult.fromJSON(e))
-        : [],
+      gauges: Array.isArray(object?.gauges) ? object.gauges.map((e: any) => GaugeResult.fromJSON(e)) : [],
+      counters: Array.isArray(object?.counters) ? object.counters.map((e: any) => CounterResult.fromJSON(e)) : [],
+      logs: Array.isArray(object?.logs) ? object.logs.map((e: any) => LogResult.fromJSON(e)) : [],
+      events: Array.isArray(object?.events) ? object.events.map((e: any) => EventTrackingResult.fromJSON(e)) : [],
+      exports: Array.isArray(object?.exports) ? object.exports.map((e: any) => ExportResult.fromJSON(e)) : [],
     };
   },
 
   toJSON(message: ProcessResult): unknown {
     const obj: any = {};
     if (message.gauges) {
-      obj.gauges = message.gauges.map((e) =>
-        e ? GaugeResult.toJSON(e) : undefined
-      );
+      obj.gauges = message.gauges.map((e) => e ? GaugeResult.toJSON(e) : undefined);
     } else {
       obj.gauges = [];
     }
     if (message.counters) {
-      obj.counters = message.counters.map((e) =>
-        e ? CounterResult.toJSON(e) : undefined
-      );
+      obj.counters = message.counters.map((e) => e ? CounterResult.toJSON(e) : undefined);
     } else {
       obj.counters = [];
     }
     if (message.logs) {
-      obj.logs = message.logs.map((e) => (e ? LogResult.toJSON(e) : undefined));
+      obj.logs = message.logs.map((e) => e ? LogResult.toJSON(e) : undefined);
     } else {
       obj.logs = [];
     }
     if (message.events) {
-      obj.events = message.events.map((e) =>
-        e ? EventTrackingResult.toJSON(e) : undefined
-      );
+      obj.events = message.events.map((e) => e ? EventTrackingResult.toJSON(e) : undefined);
     } else {
       obj.events = [];
     }
     if (message.exports) {
-      obj.exports = message.exports.map((e) =>
-        e ? ExportResult.toJSON(e) : undefined
-      );
+      obj.exports = message.exports.map((e) => e ? ExportResult.toJSON(e) : undefined);
     } else {
       obj.exports = [];
     }
@@ -3700,15 +3683,11 @@ export const ProcessResult = {
 
   fromPartial(object: DeepPartial<ProcessResult>): ProcessResult {
     const message = createBaseProcessResult();
-    message.gauges =
-      object.gauges?.map((e) => GaugeResult.fromPartial(e)) || [];
-    message.counters =
-      object.counters?.map((e) => CounterResult.fromPartial(e)) || [];
+    message.gauges = object.gauges?.map((e) => GaugeResult.fromPartial(e)) || [];
+    message.counters = object.counters?.map((e) => CounterResult.fromPartial(e)) || [];
     message.logs = object.logs?.map((e) => LogResult.fromPartial(e)) || [];
-    message.events =
-      object.events?.map((e) => EventTrackingResult.fromPartial(e)) || [];
-    message.exports =
-      object.exports?.map((e) => ExportResult.fromPartial(e)) || [];
+    message.events = object.events?.map((e) => EventTrackingResult.fromPartial(e)) || [];
+    message.exports = object.exports?.map((e) => ExportResult.fromPartial(e)) || [];
     return message;
   },
 };
@@ -3728,10 +3707,7 @@ function createBaseRecordMetaData(): RecordMetaData {
 }
 
 export const RecordMetaData = {
-  encode(
-    message: RecordMetaData,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: RecordMetaData, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.address !== "") {
       writer.uint32(10).string(message.address);
     }
@@ -3757,10 +3733,7 @@ export const RecordMetaData = {
       writer.uint32(82).string(message.name);
     }
     Object.entries(message.labels).forEach(([key, value]) => {
-      RecordMetaData_LabelsEntry.encode(
-        { key: key as any, value },
-        writer.uint32(58).fork()
-      ).ldelim();
+      RecordMetaData_LabelsEntry.encode({ key: key as any, value }, writer.uint32(58).fork()).ldelim();
     });
     return writer;
   },
@@ -3797,10 +3770,7 @@ export const RecordMetaData = {
           message.name = reader.string();
           break;
         case 7:
-          const entry7 = RecordMetaData_LabelsEntry.decode(
-            reader,
-            reader.uint32()
-          );
+          const entry7 = RecordMetaData_LabelsEntry.decode(reader, reader.uint32());
           if (entry7.value !== undefined) {
             message.labels[entry7.key] = entry7.value;
           }
@@ -3816,29 +3786,18 @@ export const RecordMetaData = {
   fromJSON(object: any): RecordMetaData {
     return {
       address: isSet(object.address) ? String(object.address) : "",
-      contractName: isSet(object.contractName)
-        ? String(object.contractName)
-        : "",
-      blockNumber: isSet(object.blockNumber)
-        ? Long.fromValue(object.blockNumber)
-        : Long.UZERO,
-      transactionHash: isSet(object.transactionHash)
-        ? String(object.transactionHash)
-        : "",
+      contractName: isSet(object.contractName) ? String(object.contractName) : "",
+      blockNumber: isSet(object.blockNumber) ? Long.fromValue(object.blockNumber) : Long.UZERO,
+      transactionHash: isSet(object.transactionHash) ? String(object.transactionHash) : "",
       chainId: isSet(object.chainId) ? String(object.chainId) : "",
-      transactionIndex: isSet(object.transactionIndex)
-        ? Number(object.transactionIndex)
-        : 0,
+      transactionIndex: isSet(object.transactionIndex) ? Number(object.transactionIndex) : 0,
       logIndex: isSet(object.logIndex) ? Number(object.logIndex) : 0,
       name: isSet(object.name) ? String(object.name) : "",
       labels: isObject(object.labels)
-        ? Object.entries(object.labels).reduce<{ [key: string]: string }>(
-            (acc, [key, value]) => {
-              acc[key] = String(value);
-              return acc;
-            },
-            {}
-          )
+        ? Object.entries(object.labels).reduce<{ [key: string]: string }>((acc, [key, value]) => {
+          acc[key] = String(value);
+          return acc;
+        }, {})
         : {},
     };
   },
@@ -3846,17 +3805,12 @@ export const RecordMetaData = {
   toJSON(message: RecordMetaData): unknown {
     const obj: any = {};
     message.address !== undefined && (obj.address = message.address);
-    message.contractName !== undefined &&
-      (obj.contractName = message.contractName);
-    message.blockNumber !== undefined &&
-      (obj.blockNumber = (message.blockNumber || Long.UZERO).toString());
-    message.transactionHash !== undefined &&
-      (obj.transactionHash = message.transactionHash);
+    message.contractName !== undefined && (obj.contractName = message.contractName);
+    message.blockNumber !== undefined && (obj.blockNumber = (message.blockNumber || Long.UZERO).toString());
+    message.transactionHash !== undefined && (obj.transactionHash = message.transactionHash);
     message.chainId !== undefined && (obj.chainId = message.chainId);
-    message.transactionIndex !== undefined &&
-      (obj.transactionIndex = Math.round(message.transactionIndex));
-    message.logIndex !== undefined &&
-      (obj.logIndex = Math.round(message.logIndex));
+    message.transactionIndex !== undefined && (obj.transactionIndex = Math.round(message.transactionIndex));
+    message.logIndex !== undefined && (obj.logIndex = Math.round(message.logIndex));
     message.name !== undefined && (obj.name = message.name);
     obj.labels = {};
     if (message.labels) {
@@ -3871,18 +3825,15 @@ export const RecordMetaData = {
     const message = createBaseRecordMetaData();
     message.address = object.address ?? "";
     message.contractName = object.contractName ?? "";
-    message.blockNumber =
-      object.blockNumber !== undefined && object.blockNumber !== null
-        ? Long.fromValue(object.blockNumber)
-        : Long.UZERO;
+    message.blockNumber = (object.blockNumber !== undefined && object.blockNumber !== null)
+      ? Long.fromValue(object.blockNumber)
+      : Long.UZERO;
     message.transactionHash = object.transactionHash ?? "";
     message.chainId = object.chainId ?? "";
     message.transactionIndex = object.transactionIndex ?? 0;
     message.logIndex = object.logIndex ?? 0;
     message.name = object.name ?? "";
-    message.labels = Object.entries(object.labels ?? {}).reduce<{
-      [key: string]: string;
-    }>((acc, [key, value]) => {
+    message.labels = Object.entries(object.labels ?? {}).reduce<{ [key: string]: string }>((acc, [key, value]) => {
       if (value !== undefined) {
         acc[key] = String(value);
       }
@@ -3897,10 +3848,7 @@ function createBaseRecordMetaData_LabelsEntry(): RecordMetaData_LabelsEntry {
 }
 
 export const RecordMetaData_LabelsEntry = {
-  encode(
-    message: RecordMetaData_LabelsEntry,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: RecordMetaData_LabelsEntry, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.key !== "") {
       writer.uint32(10).string(message.key);
     }
@@ -3910,10 +3858,7 @@ export const RecordMetaData_LabelsEntry = {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): RecordMetaData_LabelsEntry {
+  decode(input: _m0.Reader | Uint8Array, length?: number): RecordMetaData_LabelsEntry {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseRecordMetaData_LabelsEntry();
@@ -3935,10 +3880,7 @@ export const RecordMetaData_LabelsEntry = {
   },
 
   fromJSON(object: any): RecordMetaData_LabelsEntry {
-    return {
-      key: isSet(object.key) ? String(object.key) : "",
-      value: isSet(object.value) ? String(object.value) : "",
-    };
+    return { key: isSet(object.key) ? String(object.key) : "", value: isSet(object.value) ? String(object.value) : "" };
   },
 
   toJSON(message: RecordMetaData_LabelsEntry): unknown {
@@ -3948,9 +3890,7 @@ export const RecordMetaData_LabelsEntry = {
     return obj;
   },
 
-  fromPartial(
-    object: DeepPartial<RecordMetaData_LabelsEntry>
-  ): RecordMetaData_LabelsEntry {
+  fromPartial(object: DeepPartial<RecordMetaData_LabelsEntry>): RecordMetaData_LabelsEntry {
     const message = createBaseRecordMetaData_LabelsEntry();
     message.key = object.key ?? "";
     message.value = object.value ?? "";
@@ -3959,18 +3899,11 @@ export const RecordMetaData_LabelsEntry = {
 };
 
 function createBaseMetricValue(): MetricValue {
-  return {
-    bigDecimal: undefined,
-    doubleValue: undefined,
-    bigInteger: undefined,
-  };
+  return { bigDecimal: undefined, doubleValue: undefined, bigInteger: undefined };
 }
 
 export const MetricValue = {
-  encode(
-    message: MetricValue,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: MetricValue, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.bigDecimal !== undefined) {
       writer.uint32(10).string(message.bigDecimal);
     }
@@ -4009,27 +3942,18 @@ export const MetricValue = {
 
   fromJSON(object: any): MetricValue {
     return {
-      bigDecimal: isSet(object.bigDecimal)
-        ? String(object.bigDecimal)
-        : undefined,
-      doubleValue: isSet(object.doubleValue)
-        ? Number(object.doubleValue)
-        : undefined,
-      bigInteger: isSet(object.bigInteger)
-        ? BigInteger.fromJSON(object.bigInteger)
-        : undefined,
+      bigDecimal: isSet(object.bigDecimal) ? String(object.bigDecimal) : undefined,
+      doubleValue: isSet(object.doubleValue) ? Number(object.doubleValue) : undefined,
+      bigInteger: isSet(object.bigInteger) ? BigInteger.fromJSON(object.bigInteger) : undefined,
     };
   },
 
   toJSON(message: MetricValue): unknown {
     const obj: any = {};
     message.bigDecimal !== undefined && (obj.bigDecimal = message.bigDecimal);
-    message.doubleValue !== undefined &&
-      (obj.doubleValue = message.doubleValue);
+    message.doubleValue !== undefined && (obj.doubleValue = message.doubleValue);
     message.bigInteger !== undefined &&
-      (obj.bigInteger = message.bigInteger
-        ? BigInteger.toJSON(message.bigInteger)
-        : undefined);
+      (obj.bigInteger = message.bigInteger ? BigInteger.toJSON(message.bigInteger) : undefined);
     return obj;
   },
 
@@ -4037,10 +3961,9 @@ export const MetricValue = {
     const message = createBaseMetricValue();
     message.bigDecimal = object.bigDecimal ?? undefined;
     message.doubleValue = object.doubleValue ?? undefined;
-    message.bigInteger =
-      object.bigInteger !== undefined && object.bigInteger !== null
-        ? BigInteger.fromPartial(object.bigInteger)
-        : undefined;
+    message.bigInteger = (object.bigInteger !== undefined && object.bigInteger !== null)
+      ? BigInteger.fromPartial(object.bigInteger)
+      : undefined;
     return message;
   },
 };
@@ -4050,10 +3973,7 @@ function createBaseBigInteger(): BigInteger {
 }
 
 export const BigInteger = {
-  encode(
-    message: BigInteger,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: BigInteger, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.negative === true) {
       writer.uint32(8).bool(message.negative);
     }
@@ -4087,9 +4007,7 @@ export const BigInteger = {
   fromJSON(object: any): BigInteger {
     return {
       negative: isSet(object.negative) ? Boolean(object.negative) : false,
-      data: isSet(object.data)
-        ? bytesFromBase64(object.data)
-        : new Uint8Array(),
+      data: isSet(object.data) ? bytesFromBase64(object.data) : new Uint8Array(),
     };
   },
 
@@ -4097,9 +4015,7 @@ export const BigInteger = {
     const obj: any = {};
     message.negative !== undefined && (obj.negative = message.negative);
     message.data !== undefined &&
-      (obj.data = base64FromBytes(
-        message.data !== undefined ? message.data : new Uint8Array()
-      ));
+      (obj.data = base64FromBytes(message.data !== undefined ? message.data : new Uint8Array()));
     return obj;
   },
 
@@ -4116,10 +4032,7 @@ function createBaseRuntimeInfo(): RuntimeInfo {
 }
 
 export const RuntimeInfo = {
-  encode(
-    message: RuntimeInfo,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: RuntimeInfo, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.from !== 0) {
       writer.uint32(8).int32(message.from);
     }
@@ -4145,9 +4058,7 @@ export const RuntimeInfo = {
   },
 
   fromJSON(object: any): RuntimeInfo {
-    return {
-      from: isSet(object.from) ? handlerTypeFromJSON(object.from) : 0,
-    };
+    return { from: isSet(object.from) ? handlerTypeFromJSON(object.from) : 0 };
   },
 
   toJSON(message: RuntimeInfo): unknown {
@@ -4164,35 +4075,19 @@ export const RuntimeInfo = {
 };
 
 function createBaseGaugeResult(): GaugeResult {
-  return {
-    metadata: undefined,
-    metricValue: undefined,
-    runtimeInfo: undefined,
-  };
+  return { metadata: undefined, metricValue: undefined, runtimeInfo: undefined };
 }
 
 export const GaugeResult = {
-  encode(
-    message: GaugeResult,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: GaugeResult, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.metadata !== undefined) {
-      RecordMetaData.encode(
-        message.metadata,
-        writer.uint32(10).fork()
-      ).ldelim();
+      RecordMetaData.encode(message.metadata, writer.uint32(10).fork()).ldelim();
     }
     if (message.metricValue !== undefined) {
-      MetricValue.encode(
-        message.metricValue,
-        writer.uint32(18).fork()
-      ).ldelim();
+      MetricValue.encode(message.metricValue, writer.uint32(18).fork()).ldelim();
     }
     if (message.runtimeInfo !== undefined) {
-      RuntimeInfo.encode(
-        message.runtimeInfo,
-        writer.uint32(26).fork()
-      ).ldelim();
+      RuntimeInfo.encode(message.runtimeInfo, writer.uint32(26).fork()).ldelim();
     }
     return writer;
   },
@@ -4223,87 +4118,55 @@ export const GaugeResult = {
 
   fromJSON(object: any): GaugeResult {
     return {
-      metadata: isSet(object.metadata)
-        ? RecordMetaData.fromJSON(object.metadata)
-        : undefined,
-      metricValue: isSet(object.metricValue)
-        ? MetricValue.fromJSON(object.metricValue)
-        : undefined,
-      runtimeInfo: isSet(object.runtimeInfo)
-        ? RuntimeInfo.fromJSON(object.runtimeInfo)
-        : undefined,
+      metadata: isSet(object.metadata) ? RecordMetaData.fromJSON(object.metadata) : undefined,
+      metricValue: isSet(object.metricValue) ? MetricValue.fromJSON(object.metricValue) : undefined,
+      runtimeInfo: isSet(object.runtimeInfo) ? RuntimeInfo.fromJSON(object.runtimeInfo) : undefined,
     };
   },
 
   toJSON(message: GaugeResult): unknown {
     const obj: any = {};
     message.metadata !== undefined &&
-      (obj.metadata = message.metadata
-        ? RecordMetaData.toJSON(message.metadata)
-        : undefined);
+      (obj.metadata = message.metadata ? RecordMetaData.toJSON(message.metadata) : undefined);
     message.metricValue !== undefined &&
-      (obj.metricValue = message.metricValue
-        ? MetricValue.toJSON(message.metricValue)
-        : undefined);
+      (obj.metricValue = message.metricValue ? MetricValue.toJSON(message.metricValue) : undefined);
     message.runtimeInfo !== undefined &&
-      (obj.runtimeInfo = message.runtimeInfo
-        ? RuntimeInfo.toJSON(message.runtimeInfo)
-        : undefined);
+      (obj.runtimeInfo = message.runtimeInfo ? RuntimeInfo.toJSON(message.runtimeInfo) : undefined);
     return obj;
   },
 
   fromPartial(object: DeepPartial<GaugeResult>): GaugeResult {
     const message = createBaseGaugeResult();
-    message.metadata =
-      object.metadata !== undefined && object.metadata !== null
-        ? RecordMetaData.fromPartial(object.metadata)
-        : undefined;
-    message.metricValue =
-      object.metricValue !== undefined && object.metricValue !== null
-        ? MetricValue.fromPartial(object.metricValue)
-        : undefined;
-    message.runtimeInfo =
-      object.runtimeInfo !== undefined && object.runtimeInfo !== null
-        ? RuntimeInfo.fromPartial(object.runtimeInfo)
-        : undefined;
+    message.metadata = (object.metadata !== undefined && object.metadata !== null)
+      ? RecordMetaData.fromPartial(object.metadata)
+      : undefined;
+    message.metricValue = (object.metricValue !== undefined && object.metricValue !== null)
+      ? MetricValue.fromPartial(object.metricValue)
+      : undefined;
+    message.runtimeInfo = (object.runtimeInfo !== undefined && object.runtimeInfo !== null)
+      ? RuntimeInfo.fromPartial(object.runtimeInfo)
+      : undefined;
     return message;
   },
 };
 
 function createBaseCounterResult(): CounterResult {
-  return {
-    metadata: undefined,
-    metricValue: undefined,
-    add: false,
-    runtimeInfo: undefined,
-  };
+  return { metadata: undefined, metricValue: undefined, add: false, runtimeInfo: undefined };
 }
 
 export const CounterResult = {
-  encode(
-    message: CounterResult,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: CounterResult, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.metadata !== undefined) {
-      RecordMetaData.encode(
-        message.metadata,
-        writer.uint32(10).fork()
-      ).ldelim();
+      RecordMetaData.encode(message.metadata, writer.uint32(10).fork()).ldelim();
     }
     if (message.metricValue !== undefined) {
-      MetricValue.encode(
-        message.metricValue,
-        writer.uint32(18).fork()
-      ).ldelim();
+      MetricValue.encode(message.metricValue, writer.uint32(18).fork()).ldelim();
     }
     if (message.add === true) {
       writer.uint32(24).bool(message.add);
     }
     if (message.runtimeInfo !== undefined) {
-      RuntimeInfo.encode(
-        message.runtimeInfo,
-        writer.uint32(34).fork()
-      ).ldelim();
+      RuntimeInfo.encode(message.runtimeInfo, writer.uint32(34).fork()).ldelim();
     }
     return writer;
   },
@@ -4337,76 +4200,49 @@ export const CounterResult = {
 
   fromJSON(object: any): CounterResult {
     return {
-      metadata: isSet(object.metadata)
-        ? RecordMetaData.fromJSON(object.metadata)
-        : undefined,
-      metricValue: isSet(object.metricValue)
-        ? MetricValue.fromJSON(object.metricValue)
-        : undefined,
+      metadata: isSet(object.metadata) ? RecordMetaData.fromJSON(object.metadata) : undefined,
+      metricValue: isSet(object.metricValue) ? MetricValue.fromJSON(object.metricValue) : undefined,
       add: isSet(object.add) ? Boolean(object.add) : false,
-      runtimeInfo: isSet(object.runtimeInfo)
-        ? RuntimeInfo.fromJSON(object.runtimeInfo)
-        : undefined,
+      runtimeInfo: isSet(object.runtimeInfo) ? RuntimeInfo.fromJSON(object.runtimeInfo) : undefined,
     };
   },
 
   toJSON(message: CounterResult): unknown {
     const obj: any = {};
     message.metadata !== undefined &&
-      (obj.metadata = message.metadata
-        ? RecordMetaData.toJSON(message.metadata)
-        : undefined);
+      (obj.metadata = message.metadata ? RecordMetaData.toJSON(message.metadata) : undefined);
     message.metricValue !== undefined &&
-      (obj.metricValue = message.metricValue
-        ? MetricValue.toJSON(message.metricValue)
-        : undefined);
+      (obj.metricValue = message.metricValue ? MetricValue.toJSON(message.metricValue) : undefined);
     message.add !== undefined && (obj.add = message.add);
     message.runtimeInfo !== undefined &&
-      (obj.runtimeInfo = message.runtimeInfo
-        ? RuntimeInfo.toJSON(message.runtimeInfo)
-        : undefined);
+      (obj.runtimeInfo = message.runtimeInfo ? RuntimeInfo.toJSON(message.runtimeInfo) : undefined);
     return obj;
   },
 
   fromPartial(object: DeepPartial<CounterResult>): CounterResult {
     const message = createBaseCounterResult();
-    message.metadata =
-      object.metadata !== undefined && object.metadata !== null
-        ? RecordMetaData.fromPartial(object.metadata)
-        : undefined;
-    message.metricValue =
-      object.metricValue !== undefined && object.metricValue !== null
-        ? MetricValue.fromPartial(object.metricValue)
-        : undefined;
+    message.metadata = (object.metadata !== undefined && object.metadata !== null)
+      ? RecordMetaData.fromPartial(object.metadata)
+      : undefined;
+    message.metricValue = (object.metricValue !== undefined && object.metricValue !== null)
+      ? MetricValue.fromPartial(object.metricValue)
+      : undefined;
     message.add = object.add ?? false;
-    message.runtimeInfo =
-      object.runtimeInfo !== undefined && object.runtimeInfo !== null
-        ? RuntimeInfo.fromPartial(object.runtimeInfo)
-        : undefined;
+    message.runtimeInfo = (object.runtimeInfo !== undefined && object.runtimeInfo !== null)
+      ? RuntimeInfo.fromPartial(object.runtimeInfo)
+      : undefined;
     return message;
   },
 };
 
 function createBaseLogResult(): LogResult {
-  return {
-    metadata: undefined,
-    level: 0,
-    message: "",
-    attributes: "",
-    runtimeInfo: undefined,
-  };
+  return { metadata: undefined, level: 0, message: "", attributes: "", runtimeInfo: undefined };
 }
 
 export const LogResult = {
-  encode(
-    message: LogResult,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: LogResult, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.metadata !== undefined) {
-      RecordMetaData.encode(
-        message.metadata,
-        writer.uint32(10).fork()
-      ).ldelim();
+      RecordMetaData.encode(message.metadata, writer.uint32(10).fork()).ldelim();
     }
     if (message.level !== 0) {
       writer.uint32(16).int32(message.level);
@@ -4418,10 +4254,7 @@ export const LogResult = {
       writer.uint32(50).string(message.attributes);
     }
     if (message.runtimeInfo !== undefined) {
-      RuntimeInfo.encode(
-        message.runtimeInfo,
-        writer.uint32(34).fork()
-      ).ldelim();
+      RuntimeInfo.encode(message.runtimeInfo, writer.uint32(34).fork()).ldelim();
     }
     return writer;
   },
@@ -4458,70 +4291,49 @@ export const LogResult = {
 
   fromJSON(object: any): LogResult {
     return {
-      metadata: isSet(object.metadata)
-        ? RecordMetaData.fromJSON(object.metadata)
-        : undefined,
+      metadata: isSet(object.metadata) ? RecordMetaData.fromJSON(object.metadata) : undefined,
       level: isSet(object.level) ? logLevelFromJSON(object.level) : 0,
       message: isSet(object.message) ? String(object.message) : "",
       attributes: isSet(object.attributes) ? String(object.attributes) : "",
-      runtimeInfo: isSet(object.runtimeInfo)
-        ? RuntimeInfo.fromJSON(object.runtimeInfo)
-        : undefined,
+      runtimeInfo: isSet(object.runtimeInfo) ? RuntimeInfo.fromJSON(object.runtimeInfo) : undefined,
     };
   },
 
   toJSON(message: LogResult): unknown {
     const obj: any = {};
     message.metadata !== undefined &&
-      (obj.metadata = message.metadata
-        ? RecordMetaData.toJSON(message.metadata)
-        : undefined);
+      (obj.metadata = message.metadata ? RecordMetaData.toJSON(message.metadata) : undefined);
     message.level !== undefined && (obj.level = logLevelToJSON(message.level));
     message.message !== undefined && (obj.message = message.message);
     message.attributes !== undefined && (obj.attributes = message.attributes);
     message.runtimeInfo !== undefined &&
-      (obj.runtimeInfo = message.runtimeInfo
-        ? RuntimeInfo.toJSON(message.runtimeInfo)
-        : undefined);
+      (obj.runtimeInfo = message.runtimeInfo ? RuntimeInfo.toJSON(message.runtimeInfo) : undefined);
     return obj;
   },
 
   fromPartial(object: DeepPartial<LogResult>): LogResult {
     const message = createBaseLogResult();
-    message.metadata =
-      object.metadata !== undefined && object.metadata !== null
-        ? RecordMetaData.fromPartial(object.metadata)
-        : undefined;
+    message.metadata = (object.metadata !== undefined && object.metadata !== null)
+      ? RecordMetaData.fromPartial(object.metadata)
+      : undefined;
     message.level = object.level ?? 0;
     message.message = object.message ?? "";
     message.attributes = object.attributes ?? "";
-    message.runtimeInfo =
-      object.runtimeInfo !== undefined && object.runtimeInfo !== null
-        ? RuntimeInfo.fromPartial(object.runtimeInfo)
-        : undefined;
+    message.runtimeInfo = (object.runtimeInfo !== undefined && object.runtimeInfo !== null)
+      ? RuntimeInfo.fromPartial(object.runtimeInfo)
+      : undefined;
     return message;
   },
 };
 
 function createBaseEventTrackingResult(): EventTrackingResult {
-  return {
-    metadata: undefined,
-    distinctEntityId: "",
-    attributes: "",
-    runtimeInfo: undefined,
-  };
+  return { metadata: undefined, distinctEntityId: "", attributes: "", runtimeInfo: undefined };
 }
 
 export const EventTrackingResult = {
-  encode(
-    message: EventTrackingResult,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: EventTrackingResult, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.metadata !== undefined) {
-      RecordMetaData.encode(
-        message.metadata,
-        writer.uint32(10).fork()
-      ).ldelim();
+      RecordMetaData.encode(message.metadata, writer.uint32(10).fork()).ldelim();
     }
     if (message.distinctEntityId !== "") {
       writer.uint32(18).string(message.distinctEntityId);
@@ -4530,10 +4342,7 @@ export const EventTrackingResult = {
       writer.uint32(34).string(message.attributes);
     }
     if (message.runtimeInfo !== undefined) {
-      RuntimeInfo.encode(
-        message.runtimeInfo,
-        writer.uint32(42).fork()
-      ).ldelim();
+      RuntimeInfo.encode(message.runtimeInfo, writer.uint32(42).fork()).ldelim();
     }
     return writer;
   },
@@ -4567,47 +4376,34 @@ export const EventTrackingResult = {
 
   fromJSON(object: any): EventTrackingResult {
     return {
-      metadata: isSet(object.metadata)
-        ? RecordMetaData.fromJSON(object.metadata)
-        : undefined,
-      distinctEntityId: isSet(object.distinctEntityId)
-        ? String(object.distinctEntityId)
-        : "",
+      metadata: isSet(object.metadata) ? RecordMetaData.fromJSON(object.metadata) : undefined,
+      distinctEntityId: isSet(object.distinctEntityId) ? String(object.distinctEntityId) : "",
       attributes: isSet(object.attributes) ? String(object.attributes) : "",
-      runtimeInfo: isSet(object.runtimeInfo)
-        ? RuntimeInfo.fromJSON(object.runtimeInfo)
-        : undefined,
+      runtimeInfo: isSet(object.runtimeInfo) ? RuntimeInfo.fromJSON(object.runtimeInfo) : undefined,
     };
   },
 
   toJSON(message: EventTrackingResult): unknown {
     const obj: any = {};
     message.metadata !== undefined &&
-      (obj.metadata = message.metadata
-        ? RecordMetaData.toJSON(message.metadata)
-        : undefined);
-    message.distinctEntityId !== undefined &&
-      (obj.distinctEntityId = message.distinctEntityId);
+      (obj.metadata = message.metadata ? RecordMetaData.toJSON(message.metadata) : undefined);
+    message.distinctEntityId !== undefined && (obj.distinctEntityId = message.distinctEntityId);
     message.attributes !== undefined && (obj.attributes = message.attributes);
     message.runtimeInfo !== undefined &&
-      (obj.runtimeInfo = message.runtimeInfo
-        ? RuntimeInfo.toJSON(message.runtimeInfo)
-        : undefined);
+      (obj.runtimeInfo = message.runtimeInfo ? RuntimeInfo.toJSON(message.runtimeInfo) : undefined);
     return obj;
   },
 
   fromPartial(object: DeepPartial<EventTrackingResult>): EventTrackingResult {
     const message = createBaseEventTrackingResult();
-    message.metadata =
-      object.metadata !== undefined && object.metadata !== null
-        ? RecordMetaData.fromPartial(object.metadata)
-        : undefined;
+    message.metadata = (object.metadata !== undefined && object.metadata !== null)
+      ? RecordMetaData.fromPartial(object.metadata)
+      : undefined;
     message.distinctEntityId = object.distinctEntityId ?? "";
     message.attributes = object.attributes ?? "";
-    message.runtimeInfo =
-      object.runtimeInfo !== undefined && object.runtimeInfo !== null
-        ? RuntimeInfo.fromPartial(object.runtimeInfo)
-        : undefined;
+    message.runtimeInfo = (object.runtimeInfo !== undefined && object.runtimeInfo !== null)
+      ? RuntimeInfo.fromPartial(object.runtimeInfo)
+      : undefined;
     return message;
   },
 };
@@ -4617,24 +4413,15 @@ function createBaseExportResult(): ExportResult {
 }
 
 export const ExportResult = {
-  encode(
-    message: ExportResult,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: ExportResult, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.metadata !== undefined) {
-      RecordMetaData.encode(
-        message.metadata,
-        writer.uint32(10).fork()
-      ).ldelim();
+      RecordMetaData.encode(message.metadata, writer.uint32(10).fork()).ldelim();
     }
     if (message.payload !== "") {
       writer.uint32(18).string(message.payload);
     }
     if (message.runtimeInfo !== undefined) {
-      RuntimeInfo.encode(
-        message.runtimeInfo,
-        writer.uint32(26).fork()
-      ).ldelim();
+      RuntimeInfo.encode(message.runtimeInfo, writer.uint32(26).fork()).ldelim();
     }
     return writer;
   },
@@ -4665,41 +4452,31 @@ export const ExportResult = {
 
   fromJSON(object: any): ExportResult {
     return {
-      metadata: isSet(object.metadata)
-        ? RecordMetaData.fromJSON(object.metadata)
-        : undefined,
+      metadata: isSet(object.metadata) ? RecordMetaData.fromJSON(object.metadata) : undefined,
       payload: isSet(object.payload) ? String(object.payload) : "",
-      runtimeInfo: isSet(object.runtimeInfo)
-        ? RuntimeInfo.fromJSON(object.runtimeInfo)
-        : undefined,
+      runtimeInfo: isSet(object.runtimeInfo) ? RuntimeInfo.fromJSON(object.runtimeInfo) : undefined,
     };
   },
 
   toJSON(message: ExportResult): unknown {
     const obj: any = {};
     message.metadata !== undefined &&
-      (obj.metadata = message.metadata
-        ? RecordMetaData.toJSON(message.metadata)
-        : undefined);
+      (obj.metadata = message.metadata ? RecordMetaData.toJSON(message.metadata) : undefined);
     message.payload !== undefined && (obj.payload = message.payload);
     message.runtimeInfo !== undefined &&
-      (obj.runtimeInfo = message.runtimeInfo
-        ? RuntimeInfo.toJSON(message.runtimeInfo)
-        : undefined);
+      (obj.runtimeInfo = message.runtimeInfo ? RuntimeInfo.toJSON(message.runtimeInfo) : undefined);
     return obj;
   },
 
   fromPartial(object: DeepPartial<ExportResult>): ExportResult {
     const message = createBaseExportResult();
-    message.metadata =
-      object.metadata !== undefined && object.metadata !== null
-        ? RecordMetaData.fromPartial(object.metadata)
-        : undefined;
+    message.metadata = (object.metadata !== undefined && object.metadata !== null)
+      ? RecordMetaData.fromPartial(object.metadata)
+      : undefined;
     message.payload = object.payload ?? "";
-    message.runtimeInfo =
-      object.runtimeInfo !== undefined && object.runtimeInfo !== null
-        ? RuntimeInfo.fromPartial(object.runtimeInfo)
-        : undefined;
+    message.runtimeInfo = (object.runtimeInfo !== undefined && object.runtimeInfo !== null)
+      ? RuntimeInfo.fromPartial(object.runtimeInfo)
+      : undefined;
     return message;
   },
 };
@@ -4741,63 +4518,75 @@ export const ProcessorDefinition = {
       responseStream: false,
       options: {},
     },
+    processBindingsStream: {
+      name: "ProcessBindingsStream",
+      requestType: DataBinding,
+      requestStream: true,
+      responseType: ProcessBindingResponse,
+      responseStream: true,
+      options: {},
+    },
   },
 } as const;
 
 export interface ProcessorServiceImplementation<CallContextExt = {}> {
-  start(
-    request: StartRequest,
-    context: CallContext & CallContextExt
-  ): Promise<DeepPartial<Empty>>;
-  stop(
-    request: Empty,
-    context: CallContext & CallContextExt
-  ): Promise<DeepPartial<Empty>>;
+  start(request: StartRequest, context: CallContext & CallContextExt): Promise<DeepPartial<Empty>>;
+  stop(request: Empty, context: CallContext & CallContextExt): Promise<DeepPartial<Empty>>;
   getConfig(
     request: ProcessConfigRequest,
-    context: CallContext & CallContextExt
+    context: CallContext & CallContextExt,
   ): Promise<DeepPartial<ProcessConfigResponse>>;
   processBindings(
     request: ProcessBindingsRequest,
-    context: CallContext & CallContextExt
+    context: CallContext & CallContextExt,
   ): Promise<DeepPartial<ProcessBindingResponse>>;
+  processBindingsStream(
+    request: AsyncIterable<DataBinding>,
+    context: CallContext & CallContextExt,
+  ): ServerStreamingMethodResult<DeepPartial<ProcessBindingResponse>>;
 }
 
 export interface ProcessorClient<CallOptionsExt = {}> {
-  start(
-    request: DeepPartial<StartRequest>,
-    options?: CallOptions & CallOptionsExt
-  ): Promise<Empty>;
-  stop(
-    request: DeepPartial<Empty>,
-    options?: CallOptions & CallOptionsExt
-  ): Promise<Empty>;
+  start(request: DeepPartial<StartRequest>, options?: CallOptions & CallOptionsExt): Promise<Empty>;
+  stop(request: DeepPartial<Empty>, options?: CallOptions & CallOptionsExt): Promise<Empty>;
   getConfig(
     request: DeepPartial<ProcessConfigRequest>,
-    options?: CallOptions & CallOptionsExt
+    options?: CallOptions & CallOptionsExt,
   ): Promise<ProcessConfigResponse>;
   processBindings(
     request: DeepPartial<ProcessBindingsRequest>,
-    options?: CallOptions & CallOptionsExt
+    options?: CallOptions & CallOptionsExt,
   ): Promise<ProcessBindingResponse>;
+  processBindingsStream(
+    request: AsyncIterable<DeepPartial<DataBinding>>,
+    options?: CallOptions & CallOptionsExt,
+  ): AsyncIterable<ProcessBindingResponse>;
 }
 
 declare var self: any | undefined;
 declare var window: any | undefined;
 declare var global: any | undefined;
-var globalThis: any = (() => {
-  if (typeof globalThis !== "undefined") return globalThis;
-  if (typeof self !== "undefined") return self;
-  if (typeof window !== "undefined") return window;
-  if (typeof global !== "undefined") return global;
+var tsProtoGlobalThis: any = (() => {
+  if (typeof globalThis !== "undefined") {
+    return globalThis;
+  }
+  if (typeof self !== "undefined") {
+    return self;
+  }
+  if (typeof window !== "undefined") {
+    return window;
+  }
+  if (typeof global !== "undefined") {
+    return global;
+  }
   throw "Unable to locate global object";
 })();
 
 function bytesFromBase64(b64: string): Uint8Array {
-  if (globalThis.Buffer) {
-    return Uint8Array.from(globalThis.Buffer.from(b64, "base64"));
+  if (tsProtoGlobalThis.Buffer) {
+    return Uint8Array.from(tsProtoGlobalThis.Buffer.from(b64, "base64"));
   } else {
-    const bin = globalThis.atob(b64);
+    const bin = tsProtoGlobalThis.atob(b64);
     const arr = new Uint8Array(bin.length);
     for (let i = 0; i < bin.length; ++i) {
       arr[i] = bin.charCodeAt(i);
@@ -4807,36 +4596,23 @@ function bytesFromBase64(b64: string): Uint8Array {
 }
 
 function base64FromBytes(arr: Uint8Array): string {
-  if (globalThis.Buffer) {
-    return globalThis.Buffer.from(arr).toString("base64");
+  if (tsProtoGlobalThis.Buffer) {
+    return tsProtoGlobalThis.Buffer.from(arr).toString("base64");
   } else {
     const bin: string[] = [];
     arr.forEach((byte) => {
       bin.push(String.fromCharCode(byte));
     });
-    return globalThis.btoa(bin.join(""));
+    return tsProtoGlobalThis.btoa(bin.join(""));
   }
 }
 
-type Builtin =
-  | Date
-  | Function
-  | Uint8Array
-  | string
-  | number
-  | boolean
-  | undefined;
+type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
-type DeepPartial<T> = T extends Builtin
-  ? T
-  : T extends Long
-  ? string | number | Long
-  : T extends Array<infer U>
-  ? Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
+type DeepPartial<T> = T extends Builtin ? T
+  : T extends Long ? string | number | Long : T extends Array<infer U> ? Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 
 if (_m0.util.Long !== Long) {
@@ -4851,3 +4627,5 @@ function isObject(value: any): boolean {
 function isSet(value: any): boolean {
   return value !== null && value !== undefined;
 }
+
+export type ServerStreamingMethodResult<Response> = { [Symbol.asyncIterator](): AsyncIterator<Response, void> };

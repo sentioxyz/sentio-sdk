@@ -3,7 +3,7 @@ import {
   ContractConfig,
   DataBinding,
   HandlerType,
-  Instruction,
+  Data_SolInstruction,
   ProcessBindingResponse,
   ProcessBindingsRequest,
   ProcessConfigRequest,
@@ -23,8 +23,6 @@ import { ProcessorState } from '../state/processor-state'
 import { ProcessorServiceImpl } from '../service'
 import { Trace } from '../core/trace'
 import { setProvider } from '../provider'
-import { account } from '../builtin/aptos/0x1'
-import { TextEncoder } from 'util'
 
 export const TEST_CONTEXT: CallContext = <CallContext>{}
 
@@ -128,7 +126,8 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
         if (config.signature == signature) {
           return {
             data: {
-              raw: toBytes(trace),
+              raw: new Uint8Array(),
+              ethTrace: { data: toBytes(trace) },
             },
             handlerIds: [config.handlerId],
             handlerType: HandlerType.ETH_TRACE,
@@ -189,7 +188,8 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
           if (match) {
             return {
               data: {
-                raw: toBytes(log),
+                raw: new Uint8Array(),
+                ethLog: { data: toBytes(log) },
               },
               handlerIds: [config.handlerId],
               handlerType: HandlerType.ETH_LOG,
@@ -250,7 +250,8 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
           if (match) {
             return {
               data: {
-                raw: toBytes(log),
+                raw: new Uint8Array(),
+                ethLog: { data: toBytes(log) },
               },
               handlerIds: [config.handlerId],
               handlerType: HandlerType.ETH_LOG,
@@ -283,7 +284,10 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
   buildBlockBinding(block: Partial<Block> & { number: number }, network: Networkish = 1): DataBinding {
     const binding: DataBinding = {
       data: {
-        raw: toBytes(block),
+        raw: new Uint8Array(),
+        ethBlock: {
+          data: toBytes(block),
+        },
       },
       handlerType: HandlerType.ETH_BLOCK,
       handlerIds: [],
@@ -307,12 +311,13 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
     return binding
   }
 
-  testInstructions(instructions: Instruction[]): Promise<ProcessBindingResponse> {
+  testInstructions(instructions: Data_SolInstruction[]): Promise<ProcessBindingResponse> {
     return this.processBindings({
       bindings: instructions.map((instruction) => {
         return {
           data: {
-            raw: Instruction.encode(instruction).finish(),
+            raw: new Uint8Array(),
+            solInstruction: instruction,
           },
           handlerIds: [],
           handlerType: HandlerType.SOL_INSTRUCTION,
@@ -326,6 +331,10 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
     context: CallContext = TEST_CONTEXT
   ): Promise<ProcessBindingResponse> {
     return this.service.processBindings(request, context)
+  }
+
+  processBindingsStream(request: AsyncIterable<DataBinding>, context: CallContext) {
+    return this.service.processBindingsStream(request, context)
   }
 }
 

@@ -7,11 +7,12 @@ import {
   AptosCallHandlerConfig,
   AptosEventHandlerConfig,
   ContractConfig,
+  Data,
+  Data_SolInstruction,
   DataBinding,
   EventTrackingConfig,
   ExportConfig,
   HandlerType,
-  Instruction,
   LogFilter,
   LogHandlerConfig,
   MetricConfig,
@@ -21,6 +22,7 @@ import {
   ProcessConfigResponse,
   ProcessorServiceImplementation,
   ProcessResult,
+  ServerStreamingMethodResult,
   StartRequest,
   TemplateInstance,
 } from './gen'
@@ -493,6 +495,24 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     return result
   }
 
+  async *processBindingsStream(requests: AsyncIterable<DataBinding>, context: CallContext) {
+    for await (const request of requests) {
+      const result = await this.processBinding(request)
+      let updated = false
+      if (
+        global.PROCESSOR_STATE.templatesInstances &&
+        this.templateInstances.length != global.PROCESSOR_STATE.templatesInstances.length
+      ) {
+        await this.configure()
+        updated = true
+      }
+      yield {
+        result,
+        configUpdated: updated,
+      }
+    }
+  }
+
   async processLogs(request: ProcessBindingsRequest, context: CallContext): Promise<ProcessBindingResponse> {
     if (!this.started) {
       throw new ServerError(Status.UNAVAILABLE, 'Service Not started.')
@@ -521,16 +541,16 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     }
   }
 
-  async processLog(l: DataBinding): Promise<ProcessResult> {
-    if (!l.data) {
+  async processLog(request: DataBinding): Promise<ProcessResult> {
+    if (!request.data) {
       throw new ServerError(Status.INVALID_ARGUMENT, "Log can't be null")
     }
 
     const promises: Promise<ProcessResult>[] = []
-    const jsonString = Utf8ArrayToStr(l.data.raw)
+    const jsonString = Utf8ArrayToStr(request.data.ethLog?.data || request.data.raw)
     const log: Log = JSON.parse(jsonString)
 
-    for (const handlerId of l.handlerIds) {
+    for (const handlerId of request.handlerIds) {
       const handler = this.eventHandlers[handlerId]
       promises.push(
         handler(log).catch((e) => {
@@ -546,7 +566,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       throw new ServerError(Status.INVALID_ARGUMENT, 'instruction data cannot be empty')
     }
 
-    const instruction: Instruction = Instruction.decode(request.data.raw) // JSON.parse(jsonString)
+    const instruction = request.data.solInstruction || Data_SolInstruction.decode(request.data.raw) // JSON.parse(jsonString)
     const promises: Promise<ProcessResult>[] = []
 
     // Only have instruction handlers for solana processors
@@ -584,7 +604,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       throw new ServerError(Status.INVALID_ARGUMENT, "Block can't be empty")
     }
 
-    const jsonString = Utf8ArrayToStr(binding.data.raw)
+    const jsonString = Utf8ArrayToStr(binding.data.ethBlock?.data || binding.data.raw)
 
     const block: Block = JSON.parse(jsonString)
 
@@ -618,7 +638,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     if (!binding.data) {
       throw new ServerError(Status.INVALID_ARGUMENT, "Trace can't be empty")
     }
-    const jsonString = Utf8ArrayToStr(binding.data.raw)
+    const jsonString = Utf8ArrayToStr(binding.data.ethTrace?.data || binding.data.raw)
     const trace: Trace = JSON.parse(jsonString)
 
     const promises: Promise<ProcessResult>[] = []
@@ -638,7 +658,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       throw new ServerError(Status.INVALID_ARGUMENT, "Event can't be empty")
     }
     const promises: Promise<ProcessResult>[] = []
-    const jsonString = Utf8ArrayToStr(binding.data.raw)
+    const jsonString = Utf8ArrayToStr(binding.data.aptEvent?.data || binding.data.raw)
     const event = JSON.parse(jsonString)
 
     for (const handlerId of binding.handlerIds) {
@@ -656,7 +676,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     if (!binding.data) {
       throw new ServerError(Status.INVALID_ARGUMENT, "Event can't be empty")
     }
-    const jsonString = Utf8ArrayToStr(binding.data.raw)
+    const jsonString = Utf8ArrayToStr(binding.data.aptResource?.data || binding.data.raw)
     const json = JSON.parse(jsonString) as MoveResourcesWithVersionPayload
     const promises: Promise<ProcessResult>[] = []
     for (const handlerId of binding.handlerIds) {
@@ -673,7 +693,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     if (!binding.data) {
       throw new ServerError(Status.INVALID_ARGUMENT, "Event can't be empty")
     }
-    const jsonString = Utf8ArrayToStr(binding.data.raw)
+    const jsonString = Utf8ArrayToStr(binding.data.aptCall?.data || binding.data.raw)
     const call = JSON.parse(jsonString)
 
     const promises: Promise<ProcessResult>[] = []

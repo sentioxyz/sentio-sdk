@@ -17,6 +17,8 @@ service Processor {
 
   // Process data binding
   rpc ProcessBindings(ProcessBindingsRequest) returns (ProcessBindingResponse);
+
+  rpc ProcessBindingsStream(stream DataBinding) returns (stream ProcessBindingResponse);
 }
 
 message ProjectConfig {
@@ -262,26 +264,61 @@ message RawTransaction {
   optional uint64 slot = 3;
 }
 
-message Instruction {
-  string instruction_data = 1;
-  uint64 slot = 2;
-  string program_account_id = 3;
-  repeated string accounts = 5;
-  optional bytes parsed = 4;
-}
-
 message Data {
+  // Every Handler type should have a data type
+  message EthLog {
+    bytes data = 1;
+    optional bytes transaction = 2;
+  }
+  message EthBlock {
+    bytes data = 1;
+  }
+  message EthTransaction {
+    bytes data = 1;
+    optional bytes transaction = 2;
+    optional bytes transaction_receipt = 3;
+  }
+  message EthTrace {
+    bytes data = 1;
+    optional bytes transaction = 2;
+    optional bytes transaction_receipt = 3;
+  }
+  message SolInstruction {
+    string instruction_data = 1;
+    uint64 slot = 2;
+    string program_account_id = 3;
+    repeated string accounts = 5;
+    optional bytes parsed = 4;
+  }
+  message AptEvent {
+    bytes data = 1;
+  }
+  message AptCall {
+    bytes data = 1;
+  }
+  message AptResource {
+    bytes data = 1;
+    int64 version = 2;
+    string timestamp = 3;
+  }
+
   bytes raw = 1;
+  oneof value {
+    EthLog eth_log = 2;
+    EthBlock eth_block = 3;
+    EthTransaction eth_transaction = 4;
+    EthTrace eth_trace = 5;
+    SolInstruction sol_instruction = 6;
+    AptEvent apt_event = 7;
+    AptCall apt_call = 8;
+    AptResource apt_resource = 9;
+  }
 }
 
 message DataBinding {
   Data data = 1;
   HandlerType handler_type = 3;
   repeated int32 handler_ids = 4;
-}
-
-message RawBlock {
-  bytes raw = 1;
 }
 
 message ProcessResult {

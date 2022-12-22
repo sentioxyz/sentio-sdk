@@ -1,12 +1,12 @@
 /* eslint-disable */
-import { CallContext, CallOptions } from "nice-grpc-common";
-import { Timestamp } from "../../../google/protobuf/timestamp";
 import Long from "long";
+import type { CallContext, CallOptions } from "nice-grpc-common";
 import _m0 from "protobufjs/minimal";
+import { Timestamp } from "../../../google/protobuf/timestamp";
 
 export interface CoinID {
-  symbol: string | undefined;
-  address: CoinID_AddressIdentifier | undefined;
+  symbol?: string | undefined;
+  address?: CoinID_AddressIdentifier | undefined;
 }
 
 export interface CoinID_AddressIdentifier {
@@ -29,18 +29,12 @@ function createBaseCoinID(): CoinID {
 }
 
 export const CoinID = {
-  encode(
-    message: CoinID,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: CoinID, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.symbol !== undefined) {
       writer.uint32(18).string(message.symbol);
     }
     if (message.address !== undefined) {
-      CoinID_AddressIdentifier.encode(
-        message.address,
-        writer.uint32(26).fork()
-      ).ldelim();
+      CoinID_AddressIdentifier.encode(message.address, writer.uint32(26).fork()).ldelim();
     }
     return writer;
   },
@@ -56,10 +50,7 @@ export const CoinID = {
           message.symbol = reader.string();
           break;
         case 3:
-          message.address = CoinID_AddressIdentifier.decode(
-            reader,
-            reader.uint32()
-          );
+          message.address = CoinID_AddressIdentifier.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -72,9 +63,7 @@ export const CoinID = {
   fromJSON(object: any): CoinID {
     return {
       symbol: isSet(object.symbol) ? String(object.symbol) : undefined,
-      address: isSet(object.address)
-        ? CoinID_AddressIdentifier.fromJSON(object.address)
-        : undefined,
+      address: isSet(object.address) ? CoinID_AddressIdentifier.fromJSON(object.address) : undefined,
     };
   },
 
@@ -82,19 +71,16 @@ export const CoinID = {
     const obj: any = {};
     message.symbol !== undefined && (obj.symbol = message.symbol);
     message.address !== undefined &&
-      (obj.address = message.address
-        ? CoinID_AddressIdentifier.toJSON(message.address)
-        : undefined);
+      (obj.address = message.address ? CoinID_AddressIdentifier.toJSON(message.address) : undefined);
     return obj;
   },
 
   fromPartial(object: DeepPartial<CoinID>): CoinID {
     const message = createBaseCoinID();
     message.symbol = object.symbol ?? undefined;
-    message.address =
-      object.address !== undefined && object.address !== null
-        ? CoinID_AddressIdentifier.fromPartial(object.address)
-        : undefined;
+    message.address = (object.address !== undefined && object.address !== null)
+      ? CoinID_AddressIdentifier.fromPartial(object.address)
+      : undefined;
     return message;
   },
 };
@@ -104,10 +90,7 @@ function createBaseCoinID_AddressIdentifier(): CoinID_AddressIdentifier {
 }
 
 export const CoinID_AddressIdentifier = {
-  encode(
-    message: CoinID_AddressIdentifier,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: CoinID_AddressIdentifier, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.address !== "") {
       writer.uint32(10).string(message.address);
     }
@@ -117,10 +100,7 @@ export const CoinID_AddressIdentifier = {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): CoinID_AddressIdentifier {
+  decode(input: _m0.Reader | Uint8Array, length?: number): CoinID_AddressIdentifier {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseCoinID_AddressIdentifier();
@@ -155,9 +135,7 @@ export const CoinID_AddressIdentifier = {
     return obj;
   },
 
-  fromPartial(
-    object: DeepPartial<CoinID_AddressIdentifier>
-  ): CoinID_AddressIdentifier {
+  fromPartial(object: DeepPartial<CoinID_AddressIdentifier>): CoinID_AddressIdentifier {
     const message = createBaseCoinID_AddressIdentifier();
     message.address = object.address ?? "";
     message.chain = object.chain ?? "";
@@ -170,15 +148,9 @@ function createBaseGetPriceRequest(): GetPriceRequest {
 }
 
 export const GetPriceRequest = {
-  encode(
-    message: GetPriceRequest,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: GetPriceRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.timestamp !== undefined) {
-      Timestamp.encode(
-        toTimestamp(message.timestamp),
-        writer.uint32(10).fork()
-      ).ldelim();
+      Timestamp.encode(toTimestamp(message.timestamp), writer.uint32(10).fork()).ldelim();
     }
     if (message.coinId !== undefined) {
       CoinID.encode(message.coinId, writer.uint32(18).fork()).ldelim();
@@ -194,9 +166,7 @@ export const GetPriceRequest = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.timestamp = fromTimestamp(
-            Timestamp.decode(reader, reader.uint32())
-          );
+          message.timestamp = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
           break;
         case 2:
           message.coinId = CoinID.decode(reader, reader.uint32());
@@ -211,29 +181,24 @@ export const GetPriceRequest = {
 
   fromJSON(object: any): GetPriceRequest {
     return {
-      timestamp: isSet(object.timestamp)
-        ? fromJsonTimestamp(object.timestamp)
-        : undefined,
+      timestamp: isSet(object.timestamp) ? fromJsonTimestamp(object.timestamp) : undefined,
       coinId: isSet(object.coinId) ? CoinID.fromJSON(object.coinId) : undefined,
     };
   },
 
   toJSON(message: GetPriceRequest): unknown {
     const obj: any = {};
-    message.timestamp !== undefined &&
-      (obj.timestamp = message.timestamp.toISOString());
-    message.coinId !== undefined &&
-      (obj.coinId = message.coinId ? CoinID.toJSON(message.coinId) : undefined);
+    message.timestamp !== undefined && (obj.timestamp = message.timestamp.toISOString());
+    message.coinId !== undefined && (obj.coinId = message.coinId ? CoinID.toJSON(message.coinId) : undefined);
     return obj;
   },
 
   fromPartial(object: DeepPartial<GetPriceRequest>): GetPriceRequest {
     const message = createBaseGetPriceRequest();
     message.timestamp = object.timestamp ?? undefined;
-    message.coinId =
-      object.coinId !== undefined && object.coinId !== null
-        ? CoinID.fromPartial(object.coinId)
-        : undefined;
+    message.coinId = (object.coinId !== undefined && object.coinId !== null)
+      ? CoinID.fromPartial(object.coinId)
+      : undefined;
     return message;
   },
 };
@@ -243,18 +208,12 @@ function createBaseGetPriceResponse(): GetPriceResponse {
 }
 
 export const GetPriceResponse = {
-  encode(
-    message: GetPriceResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: GetPriceResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.price !== 0) {
       writer.uint32(9).double(message.price);
     }
     if (message.timestamp !== undefined) {
-      Timestamp.encode(
-        toTimestamp(message.timestamp),
-        writer.uint32(18).fork()
-      ).ldelim();
+      Timestamp.encode(toTimestamp(message.timestamp), writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
@@ -270,9 +229,7 @@ export const GetPriceResponse = {
           message.price = reader.double();
           break;
         case 2:
-          message.timestamp = fromTimestamp(
-            Timestamp.decode(reader, reader.uint32())
-          );
+          message.timestamp = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
           break;
         default:
           reader.skipType(tag & 7);
@@ -285,17 +242,14 @@ export const GetPriceResponse = {
   fromJSON(object: any): GetPriceResponse {
     return {
       price: isSet(object.price) ? Number(object.price) : 0,
-      timestamp: isSet(object.timestamp)
-        ? fromJsonTimestamp(object.timestamp)
-        : undefined,
+      timestamp: isSet(object.timestamp) ? fromJsonTimestamp(object.timestamp) : undefined,
     };
   },
 
   toJSON(message: GetPriceResponse): unknown {
     const obj: any = {};
     message.price !== undefined && (obj.price = message.price);
-    message.timestamp !== undefined &&
-      (obj.timestamp = message.timestamp.toISOString());
+    message.timestamp !== undefined && (obj.timestamp = message.timestamp.toISOString());
     return obj;
   },
 
@@ -323,39 +277,20 @@ export const PriceServiceDefinition = {
   },
 } as const;
 
-export interface PriceServiceServiceImplementation<CallContextExt = {}> {
-  getPrice(
-    request: GetPriceRequest,
-    context: CallContext & CallContextExt
-  ): Promise<DeepPartial<GetPriceResponse>>;
+export interface PriceServiceImplementation<CallContextExt = {}> {
+  getPrice(request: GetPriceRequest, context: CallContext & CallContextExt): Promise<DeepPartial<GetPriceResponse>>;
 }
 
 export interface PriceServiceClient<CallOptionsExt = {}> {
-  getPrice(
-    request: DeepPartial<GetPriceRequest>,
-    options?: CallOptions & CallOptionsExt
-  ): Promise<GetPriceResponse>;
+  getPrice(request: DeepPartial<GetPriceRequest>, options?: CallOptions & CallOptionsExt): Promise<GetPriceResponse>;
 }
 
-type Builtin =
-  | Date
-  | Function
-  | Uint8Array
-  | string
-  | number
-  | boolean
-  | undefined;
+type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
-type DeepPartial<T> = T extends Builtin
-  ? T
-  : T extends Long
-  ? string | number | Long
-  : T extends Array<infer U>
-  ? Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
+type DeepPartial<T> = T extends Builtin ? T
+  : T extends Long ? string | number | Long : T extends Array<infer U> ? Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 
 function toTimestamp(date: Date): Timestamp {
