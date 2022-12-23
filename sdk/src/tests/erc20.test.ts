@@ -6,6 +6,7 @@ import { TestProcessorServer, firstCounterValue, firstGaugeValue } from '../test
 import { BigNumber } from 'ethers'
 import { mockTransferLog } from '../builtin/erc20/test-utils'
 import { HandlerType } from '../gen'
+import { TemplateInstanceState } from '../core/base-processor-template'
 
 describe('Test Basic Examples', () => {
   const service = new TestProcessorServer(() => require('./erc20'))
@@ -47,6 +48,7 @@ describe('Test Basic Examples', () => {
       value: BigNumber.from('0x9a71db64810aaa0000'),
     })
 
+    const x = TemplateInstanceState.INSTANCE.getValues()
     let res = await service.testLog(logData)
 
     const counters = res.result?.counters

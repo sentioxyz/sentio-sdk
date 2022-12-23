@@ -71,24 +71,12 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
     return this.service.getConfig(request, context)
   }
 
-  // processBlocks(request: ProcessBlocksRequest, context = TEST_CONTEXT): Promise<ProcessBindingResponse> {
-  //   return this.service.processBlocks(request, context)
+  // processLogs(request: ProcessBindingsRequest, context = TEST_CONTEXT): Promise<ProcessBindingResponse> {
+  //   return this.service.processLogs(request, context)
   // }
   //
-  // processInstructions(request: ProcessInstructionsRequest, context = TEST_CONTEXT): Promise<ProcessBindingResponse> {
-  //   return this.service.processInstructions(request, context)
-  // }
-
-  processLogs(request: ProcessBindingsRequest, context = TEST_CONTEXT): Promise<ProcessBindingResponse> {
-    return this.service.processLogs(request, context)
-  }
-
-  processTraces(request: ProcessBindingsRequest, context: CallContext = TEST_CONTEXT): Promise<ProcessBindingResponse> {
-    return this.service.processTraces(request, context)
-  }
-  //
-  // processTransactions(request: ProcessTransactionsRequest, context = TEST_CONTEXT): Promise<ProcessBindingResponse> {
-  //   return this.service.processTransactions(request, context)
+  // processTraces(request: ProcessBindingsRequest, context: CallContext = TEST_CONTEXT): Promise<ProcessBindingResponse> {
+  //   return this.service.processTraces(request, context)
   // }
 
   testTrace(trace: Trace, network: Networkish = 1): Promise<ProcessBindingResponse> {
@@ -104,7 +92,7 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
       }
       bindings.push(binding)
     }
-    return this.processTraces({
+    return this.processBindings({
       bindings: bindings,
     })
   }
@@ -151,7 +139,7 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
       }
       bindings.push(binding)
     }
-    return this.processLogs({
+    return this.processBindings({
       bindings: bindings,
     })
   }
@@ -213,7 +201,7 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
       }
       bindings.push(binding)
     }
-    return this.processLogs({
+    return this.processBindings({
       bindings: bindings,
     })
   }

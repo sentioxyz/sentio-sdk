@@ -7,7 +7,6 @@ import {
   AptosCallHandlerConfig,
   AptosEventHandlerConfig,
   ContractConfig,
-  Data,
   Data_SolInstruction,
   DataBinding,
   EventTrackingConfig,
@@ -22,7 +21,6 @@ import {
   ProcessConfigResponse,
   ProcessorServiceImplementation,
   ProcessResult,
-  ServerStreamingMethodResult,
   StartRequest,
   TemplateInstance,
 } from './gen'
@@ -44,6 +42,7 @@ import { AccountProcessorState } from './core/account-processor'
 import { SuiProcessorState } from './core/sui-processor'
 import { SolanaProcessorState } from './core/solana-processor'
 import { ProcessorState } from './binds'
+import { ProcessorTemplateProcessorState, TemplateInstanceState } from './core/base-processor-template'
 ;(BigInt.prototype as any).toJSON = function () {
   return this.toString()
 }
@@ -107,7 +106,8 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     this.contractConfigs = []
     this.accountConfigs = []
 
-    this.templateInstances = [...global.PROCESSOR_STATE.templatesInstances]
+    // This syntax is to copy values instead of using references
+    this.templateInstances = [...TemplateInstanceState.INSTANCE.getValues()]
     this.eventTrackingConfigs = []
     this.metricConfigs = []
     this.exportConfigs = []
@@ -410,7 +410,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     }
 
     for (const instance of request.templateInstances) {
-      const template = global.PROCESSOR_STATE.templates[instance.templateId]
+      const template = ProcessorTemplateProcessorState.INSTANCE.getValues()[instance.templateId]
       if (!template) {
         throw new ServerError(Status.INVALID_ARGUMENT, 'Invalid template contract:' + instance)
       }
@@ -451,10 +451,8 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     const result = mergeProcessResults(await Promise.all(promises))
 
     let updated = false
-    if (
-      global.PROCESSOR_STATE.templatesInstances &&
-      this.templateInstances.length != global.PROCESSOR_STATE.templatesInstances.length
-    ) {
+    const t = TemplateInstanceState.INSTANCE.getValues()
+    if (TemplateInstanceState.INSTANCE.getValues().length !== this.templateInstances.length) {
       await this.configure()
       updated = true
     }
@@ -481,7 +479,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         case HandlerType.ETH_BLOCK:
           return this.processBlock(request)
         case HandlerType.SOL_INSTRUCTION:
-          return this.procecessSolInstructions(request)
+          return this.processSolInstruction(request)
         // TODO migrate SUI cases
         // case HandlerType.INSTRUCTION:
         //   return this.processInstruction(request)
@@ -499,10 +497,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     for await (const request of requests) {
       const result = await this.processBinding(request)
       let updated = false
-      if (
-        global.PROCESSOR_STATE.templatesInstances &&
-        this.templateInstances.length != global.PROCESSOR_STATE.templatesInstances.length
-      ) {
+      if (TemplateInstanceState.INSTANCE.getValues().length !== this.templateInstances.length) {
         await this.configure()
         updated = true
       }
@@ -510,34 +505,6 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         result,
         configUpdated: updated,
       }
-    }
-  }
-
-  async processLogs(request: ProcessBindingsRequest, context: CallContext): Promise<ProcessBindingResponse> {
-    if (!this.started) {
-      throw new ServerError(Status.UNAVAILABLE, 'Service Not started.')
-    }
-
-    const promises: Promise<ProcessResult>[] = []
-    for (const l of request.bindings) {
-      promises.push(this.processLog(l))
-    }
-
-    const result = mergeProcessResults(await Promise.all(promises))
-
-    let updated = false
-    if (
-      global.PROCESSOR_STATE.templatesInstances &&
-      this.templateInstances.length != global.PROCESSOR_STATE.templatesInstances.length
-    ) {
-      await this.configure()
-      updated = true
-    }
-
-    recordRuntimeInfo(result, HandlerType.ETH_LOG)
-    return {
-      result,
-      configUpdated: updated,
     }
   }
 
@@ -561,7 +528,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     return mergeProcessResults(await Promise.all(promises))
   }
 
-  async procecessSolInstructions(request: DataBinding): Promise<ProcessResult> {
+  async processSolInstruction(request: DataBinding): Promise<ProcessResult> {
     if (!request.data) {
       throw new ServerError(Status.INVALID_ARGUMENT, 'instruction data cannot be empty')
     }
@@ -617,21 +584,6 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       )
     }
     return mergeProcessResults(await Promise.all(promises))
-  }
-
-  async processTraces(request: ProcessBindingsRequest, context: CallContext): Promise<ProcessBindingResponse> {
-    if (!this.started) {
-      throw new ServerError(Status.UNAVAILABLE, 'Service Not started.')
-    }
-
-    const promises = request.bindings.map((binding) => this.processTrace(binding))
-    const result = mergeProcessResults(await Promise.all(promises))
-
-    recordRuntimeInfo(result, HandlerType.ETH_TRACE)
-    return {
-      result,
-      configUpdated: false,
-    }
   }
 
   async processTrace(binding: DataBinding): Promise<ProcessResult> {

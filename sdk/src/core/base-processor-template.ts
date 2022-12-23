@@ -9,6 +9,17 @@ import Long from 'long'
 import { getNetwork } from '@ethersproject/providers'
 import { PromiseOrVoid } from '../promise-or-void'
 import { Trace } from './trace'
+import { ListStateStorage } from '../state/state-storage'
+
+export class ProcessorTemplateProcessorState extends ListStateStorage<
+  BaseProcessorTemplate<BaseContract, BoundContractView<BaseContract, any>>
+> {
+  static INSTANCE = new ProcessorTemplateProcessorState()
+}
+
+export class TemplateInstanceState extends ListStateStorage<TemplateInstance> {
+  static INSTANCE = new TemplateInstanceState()
+}
 
 export abstract class BaseProcessorTemplate<
   TContract extends BaseContract,
@@ -31,8 +42,8 @@ export abstract class BaseProcessorTemplate<
   }[] = []
 
   constructor() {
-    this.id = global.PROCESSOR_STATE.templates.length
-    global.PROCESSOR_STATE.templates.push(this)
+    this.id = ProcessorTemplateProcessorState.INSTANCE.getValues().length
+    ProcessorTemplateProcessorState.INSTANCE.addValue(this)
   }
 
   public bind(options: BindOptions) {
@@ -76,8 +87,7 @@ export abstract class BaseProcessorTemplate<
         instance.endBlock = options.endBlock
       }
     }
-    global.PROCESSOR_STATE.templatesInstances.push(instance)
-
+    TemplateInstanceState.INSTANCE.addValue(instance)
     return processor
   }
 
