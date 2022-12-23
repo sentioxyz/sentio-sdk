@@ -1,0 +1,26 @@
+name: Cut Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: 'Commit to be cut to final released, default to head'
+        required: false
+        default: ""
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          ref: ${{ github.event.inputs.commit }}
+          token: ${{ secrets.ACCESS_TOKEN }}
+      - name: Sync Release Branch
+        run: |
+          git remote set-url origin https://${{ secrets.ACCESS_TOKEN }}@github.com/sentioxyz/sentio-sdk
+          git checkout -b release
+          git log -1
+          git push -f --set-upstream origin release
