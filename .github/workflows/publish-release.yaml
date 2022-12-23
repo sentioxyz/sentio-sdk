@@ -1,12 +1,11 @@
-name: Release
+name: Publish Package
 
 on:
-  workflow_dispatch:
-    inputs:
-      commit:
-        description: 'Commit to be released, default to head'
-        required: false
-        default: ""
+  workflow_dispatch: {}
+  push:
+    braches:
+#      - main
+      - release
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -47,5 +46,11 @@ jobs:
           echo "${{ steps.semantic.outputs.new_release_notes }}" >> $GITHUB_STEP_SUMMARY
         env:
           GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+      - name: report error
+        if: steps.semantic.outputs.new_release_published == 'false'
+        run: |
+          echo "### No version cut" >> $GITHUB_STEP_SUMMARY
+          echo "Check Semantic Release output for details"
+          exit(1)
     outputs:
       release_version: ${{ steps.release.outputs.release_version }}

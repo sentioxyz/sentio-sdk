@@ -1,9 +1,10 @@
-name: docs
+name: Publish Docs
 
 on:
   push:
     tags:
       - v**
+      - "!v**-rc**"
 permissions:
   contents: write
 

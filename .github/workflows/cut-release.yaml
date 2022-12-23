@@ -1,0 +1,23 @@
+name: Cut Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: 'Commit to be cut to final released, default to head'
+        required: false
+        default: ""
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          ref: ${{ github.event.inputs.commit }}
+      - name: Sync Release Branch
+        run: |
+          git checkout -b release origin/release
+          git push
