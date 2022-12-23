@@ -4,7 +4,7 @@ import * as borsh from "@coral-xyz/borsh";
 import bs58 from 'bs58'
 
 // https://github.com/certusone/wormhole/blob/8818d4b8f0471095dd48fa6f5da9c315cbfc9b52/solana/modules/token_bridge/program/src/lib.rs#L100
-enum TokenBrigeInstruction {
+enum TokenBridgeInstruction {
   Initialize = 0,
   AttestToken,
   CompleteNative, // no args
@@ -61,59 +61,59 @@ export class TokenBridgeProcessor extends SolanaBaseProcessor {
     let data: any
     // wormhole pass intruction's enum value as its first instrcution data
     switch (u8Arr[0]) {
-      case TokenBrigeInstruction.Initialize:
+      case TokenBridgeInstruction.Initialize:
         return {
           data: '',
-          name: TokenBrigeInstruction[TokenBrigeInstruction.Initialize]
+          name: TokenBridgeInstruction[TokenBridgeInstruction.Initialize]
         }
-      case TokenBrigeInstruction.TransferNative:
+      case TokenBridgeInstruction.TransferNative:
         // struct is defined at: https://github.com/certusone/wormhole/blob/8818d4b8f0471095dd48fa6f5da9c315cbfc9b52/solana/modules/token_bridge/program/src/api/transfer.rs#L295
         data = borsh.struct(this.transferDataValues, 'TransferNativeData').decode(Buffer.from(u8Arr.slice(1)))
         return {
           data,
-          name: TokenBrigeInstruction[TokenBrigeInstruction.TransferNative]
+          name: TokenBridgeInstruction[TokenBridgeInstruction.TransferNative]
         }
-      case TokenBrigeInstruction.TransferWrapped:
+      case TokenBridgeInstruction.TransferWrapped:
         // stuct is defined at: https://github.com/certusone/wormhole/blob/8818d4b8f0471095dd48fa6f5da9c315cbfc9b52/solana/modules/token_bridge/program/src/api/transfer.rs#L295
         data = borsh.struct(this.transferDataValues, 'TransferWrappedData').decode(Buffer.from(u8Arr.slice(1)))
         return {
           data,
-          name: TokenBrigeInstruction[TokenBrigeInstruction.TransferWrapped]
+          name: TokenBridgeInstruction[TokenBridgeInstruction.TransferWrapped]
         }
-      case TokenBrigeInstruction.TransferNativeWithPayload:
+      case TokenBridgeInstruction.TransferNativeWithPayload:
         data = borsh.struct(this.transferDataWithPayloadValues, 'TransferNativeWithPayloadData').decode(Buffer.from(u8Arr.slice(1)))
         return {
           data,
-          name: TokenBrigeInstruction[TokenBrigeInstruction.TransferNativeWithPayload]
+          name: TokenBridgeInstruction[TokenBridgeInstruction.TransferNativeWithPayload]
         }
-      case TokenBrigeInstruction.TransferWrappedWithPayload:
+      case TokenBridgeInstruction.TransferWrappedWithPayload:
         data = borsh.struct(this.transferDataWithPayloadValues, 'TransferWrappedWithPayloadData').decode(Buffer.from(u8Arr.slice(1)))
         return {
           data,
-          name: TokenBrigeInstruction[TokenBrigeInstruction.TransferWrappedWithPayload]
+          name: TokenBridgeInstruction[TokenBridgeInstruction.TransferWrappedWithPayload]
         }
-      case TokenBrigeInstruction.Initialize:
+      case TokenBridgeInstruction.Initialize:
         data = borsh.struct(this.initializeDataValues, 'InitializeData').decode(Buffer.from(u8Arr.slice(1)))
         return {
           data,
-          name: TokenBrigeInstruction[TokenBrigeInstruction.Initialize]
+          name: TokenBridgeInstruction[TokenBridgeInstruction.Initialize]
         }
-      case TokenBrigeInstruction.AttestToken:
+      case TokenBridgeInstruction.AttestToken:
         data = borsh.struct(this.attestTokenValues, 'AttestTokenData').decode(Buffer.from(u8Arr.slice(1)))
         return {
           data,
-          name: TokenBrigeInstruction[TokenBrigeInstruction.AttestToken]
+          name: TokenBridgeInstruction[TokenBridgeInstruction.AttestToken]
         }
-      case TokenBrigeInstruction.CompleteNative:
-      case TokenBrigeInstruction.CompleteNativeWithPayload:
-      case TokenBrigeInstruction.CompleteWrapped:
-      case TokenBrigeInstruction.CompleteWrappedWithPayload:
-      case TokenBrigeInstruction.CreateWrapped:
-      case TokenBrigeInstruction.UpgradeContract:
-      case TokenBrigeInstruction.RegisterChain:
+      case TokenBridgeInstruction.CompleteNative:
+      case TokenBridgeInstruction.CompleteNativeWithPayload:
+      case TokenBridgeInstruction.CompleteWrapped:
+      case TokenBridgeInstruction.CompleteWrappedWithPayload:
+      case TokenBridgeInstruction.CreateWrapped:
+      case TokenBridgeInstruction.UpgradeContract:
+      case TokenBridgeInstruction.RegisterChain:
         return {
           data: '',
-          name: TokenBrigeInstruction[u8Arr[0]]
+          name: TokenBridgeInstruction[u8Arr[0]]
         }
 
       default:

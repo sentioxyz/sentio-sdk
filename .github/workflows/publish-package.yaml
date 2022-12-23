@@ -39,7 +39,7 @@ jobs:
       - name: mark prerelease and summary
         if: steps.semantic.outputs.new_release_published == 'true'
         run: |
-          gh release edit v${{ steps.semantic.outputs.new_release_version }} --prerelease
+          # gh release edit v${{ steps.semantic.outputs.new_release_version }} --prerelease
           echo "### New version v${{ steps.semantic.outputs.new_release_version }} cut" >> $GITHUB_STEP_SUMMARY
           echo "commit: ${GITHUB_SHA}, branch/tag: ${GITHUB_REF}" >> $GITHUB_STEP_SUMMARY
           echo "automatic release will be marked as prerelease, please manually confirm in the release page" >> $GITHUB_STEP_SUMMARY
