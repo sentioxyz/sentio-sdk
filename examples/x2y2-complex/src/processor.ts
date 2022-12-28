@@ -47,7 +47,6 @@ ERC20Processor.bind({ address: '0x1e4ede388cbc9f4b5c79681b7f94d36a11abebc9' }).o
   async (event, ctx) => {
     const val = token.scaleDown(event.args.value, 18)
     tokenCounter.add(ctx, val)
-    exporter.emit(ctx, event)
     ctx.logger.info(event)
   },
   filter // filter is an optional parameter

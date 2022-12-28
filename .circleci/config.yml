@@ -25,20 +25,28 @@ jobs:
           name: Test SDK
           working_directory: sdk
       - run:
+          command: yarn build
+          name: Build CLI
+          working_directory: cli
+      - run:
           command: ./scripts/build-all.sh
           name: Build All
       - run:
+          command: sudo npm link
+          name: Link CLI globally for template testing
+          working_directory: cli
+      - run:
           command: yarn install && yarn gen && yarn test
           name: Test Template - Aptos
-          working_directory: sdk/templates/aptos
+          working_directory: cli/templates/aptos
       - run:
           command: yarn install && yarn gen && yarn test
           name: Test Template - EVM
-          working_directory: sdk/templates/evm
+          working_directory: cli/templates/evm
       - run:
           command: yarn install && yarn test
           name: Test Template - RAW
-          working_directory: sdk/templates/raw
+          working_directory: cli/templates/raw
 #      - persist_to_workspace:
 #          root: ~/project
 #          paths:

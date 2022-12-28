@@ -8,6 +8,14 @@ import chalk from 'chalk'
 import { AptosNetwork, getChainName, getRpcClient } from '../aptos/network'
 import { parseMoveType } from '../aptos/types'
 
+export function codeGenAptosProcessor(abisDir: string, outDir = 'src/types/aptos') {
+  if (!fs.existsSync(abisDir)) {
+    return
+  }
+  console.log(chalk.green('Generated Types for Aptos'))
+  generate(abisDir, outDir)
+}
+
 export async function generate(srcDir: string, outputDir: string) {
   await generateForNetwork(srcDir, outputDir, AptosNetwork.MAIN_NET)
   await generateForNetwork(path.join(srcDir, 'testnet'), path.join(outputDir, 'testnet'), AptosNetwork.TEST_NET)

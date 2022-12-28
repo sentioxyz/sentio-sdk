@@ -1,7 +1,35 @@
-import { codeGenEthersProcessor } from '../cli/build'
 import path from 'path'
 import * as fs from 'fs'
 import os from 'os'
+import chalk from 'chalk'
+import { execSync } from 'child_process'
+
+export async function codeGenEthersProcessor(
+  abisDir: string,
+  ETHERS_TARGET = path.join(__dirname, '../target-ethers-sentio'),
+  outDir = 'src/types/internal'
+) {
+  if (!fs.existsSync(abisDir)) {
+    return
+  }
+
+  // TODO merge code with CLI
+  let haveJson = false
+  const files = fs.readdirSync(abisDir)
+  for (const file of files) {
+    if (file.toLowerCase().endsWith('.json')) {
+      haveJson = true
+      break
+    }
+  }
+  if (!haveJson) {
+    return
+  }
+
+  console.log(chalk.green('Generated Types for EVM'))
+
+  execSync('yarn typechain --target ' + ETHERS_TARGET + ` --out-dir ${outDir} ${path.join(abisDir, '*.json')}`)
+}
 
 describe('Test EVM codegen', () => {
   // TODO make sure code could be compile

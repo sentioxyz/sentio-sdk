@@ -2,6 +2,7 @@
   "private": true,
   "workspaces": [
     "sdk",
+    "cli",
     "sdk/templates",
     "examples/*"
   ],

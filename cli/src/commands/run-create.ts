@@ -64,7 +64,7 @@ export function runCreate(argv: string[]) {
         console.log(usage)
         process.exit(1)
     }
-    const templateFolder = path.resolve(__dirname, '../../../templates', chainType)
+    const templateFolder = path.resolve(__dirname, '../../templates', chainType)
     const projectName = options.name || 'default'
 
     const rootDir = options.directory || process.cwd()
@@ -103,6 +103,7 @@ export function runCreate(argv: string[]) {
       }
 
       packageJson.dependencies['@sentio/sdk'] = cliVersion
+      packageJson.dependencies['@sentio/cli'] = cliVersion
       packageJson.name = projectName
 
       // Don't add directly to avoid deps issue

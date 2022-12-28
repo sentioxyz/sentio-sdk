@@ -9,5 +9,5 @@
     },
     "outDir": "lib"
   },
-  "exclude": ["lib", "src/target-ethers-sentio", "src/aptos-codegen"]
+  "exclude": ["lib", "templates"]
 }

@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
-import { codeGenAptosProcessor, codeGenSolanaProcessor } from './cli/build'
 import path from 'path'
+import { codeGenSolanaProcessor } from './solana-codegen/codegen'
+import { codeGenAptosProcessor } from './aptos-codegen/codegen'
 
 if (process.argv.length > 3) {
   const abisDir = process.argv[2]

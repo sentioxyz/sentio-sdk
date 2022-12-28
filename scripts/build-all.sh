@@ -15,12 +15,22 @@ yarn build
 
 cd ..
 
+echo
+echo "### Build cli"
+cd $PROCESSOR_DIR/cli
+echo $PWD
+yarn build
+
+cd ..
+
 if [ -f ./node_modules/.bin/sentio ]; then
   echo "sentio bin already existed"
 else
-  chmod +x $PWD/sdk/lib/cli/cli.js
-  ln -s $PWD/sdk/lib/cli/cli.js node_modules/.bin/sentio
+  chmod +x $PWD/cli/lib/cli.js
+  ln -s $PWD/cli/lib/cli.js node_modules/.bin/sentio
 fi
+
+yarn install
 
 for dir in $PROCESSOR_DIR/examples/*/; do # list directories in the form "/tmp/dirname/"
   dir=${dir%*/}                           # remove the trailing "/"

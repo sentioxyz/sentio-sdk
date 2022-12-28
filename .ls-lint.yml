@@ -23,7 +23,8 @@ ignore:
   - .idea
   - .github
   - node_modules
-  - sdk/templates
+  - cli/node_modules
+  - cli/templates
   - sdk/src/abis
   - sdk/src/builtin/internal
   - sdk/docs

@@ -5,7 +5,8 @@
   "scripts": {
     "compile": "tsc -p .",
     "test": "jest",
-    "build": "sentio build"
+    "build": "yarn sentio build",
+    "build_sdk": "cd ../../sdk && yarn build"
   },
   "dependencies": {
     "@sentio/sdk": "1.0.0-development"
