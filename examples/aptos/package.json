@@ -1,14 +1,17 @@
 {
-  "name": "@sentio/aptos",
+  "name": "@sentio/example-aptos",
   "license": "Apache-2.0",
   "version": "1.0.0",
   "scripts": {
     "compile": "tsc -p .",
     "test": "jest",
-    "build": "sentio build"
+    "build": "sentio build",
+    "build_all": "yarn lerna run --scope=@sentio/example-aptos build --include-dependencies"
   },
   "dependencies": {
-    "@sentio/sdk": "1.0.0-development"
+    "@sentio/sdk": "^1.0.0-development"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@sentio/cli": "^1.0.0-development"
+  }
 }

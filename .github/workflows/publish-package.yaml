@@ -22,11 +22,10 @@ jobs:
       - name: Install
         run: yarn install
       - name: Build
-        run: yarn build
-        working-directory: sdk
+        run: yarn lerna run --scope=@sentio/sdk build
       - name: Clean templates node mdules
         run: "rm -rf */node_modules"
-        working-directory: sdk/templates
+        working-directory: cli/templates
       - name: Semantic Release
         id: semantic
         uses: cycjimmy/semantic-release-action@v3

@@ -5,6 +5,7 @@
   "scripts": {
     "compile": "tsc -p . && cp src/webpack.config.js lib/",
     "build": "yarn compile",
+    "postbuild": "../scripts/link-bin.sh",
     "cli": "ts-node src/cli.ts",
     "test": "jest"
   },

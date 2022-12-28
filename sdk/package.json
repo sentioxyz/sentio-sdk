@@ -5,7 +5,7 @@
   "scripts": {
     "compile_target": "yarn tsc -b src/target-ethers-sentio/tsconfig.json",
     "compile": "tsc -p . && cp src/utils/*.csv lib/utils",
-    "build": "yarn install && yarn gen && yarn compile",
+    "build": "yarn gen && yarn compile",
     "start_ts": "ts-node --files src/processor-runner.ts  --log-format=json ../examples/x2y2/src/processor.ts",
     "start": "ts-node --files src/processor-runner.ts ../examples/aptos/dist/lib.js",
     "start_js": "node lib/processor-runner.js ../examples/aptos/dist/lib.js",

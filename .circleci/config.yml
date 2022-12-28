@@ -24,10 +24,10 @@ jobs:
           command: rm -rf lib && yarn gen && yarn test || yarn test # TODO remove this hack, understand why test will fail in first run
           name: Test SDK
           working_directory: sdk
-      - run:
-          command: yarn build
-          name: Build CLI
-          working_directory: cli
+#      - run:
+#          command: yarn build
+#          name: Build CLI
+#          working_directory: cli
       - run:
           command: ./scripts/build-all.sh
           name: Build All
