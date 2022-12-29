@@ -1,6 +1,7 @@
 import commandLineArgs from 'command-line-args'
 import commandLineUsage from 'command-line-usage'
-import { getCliVersion } from '../utils'
+import { getCliVersion, getSdkVersion } from '../utils'
+import * as console from 'console'
 
 export function runVersion(argv: string[]) {
   const optionDefinitions = [
@@ -27,6 +28,11 @@ export function runVersion(argv: string[]) {
     console.log(usage)
   } else {
     console.log('CLI Version: ', getCliVersion())
-    // TODO show SDK version for current package
+    const sdkVersion = getSdkVersion()
+    if (sdkVersion) {
+      console.log('SDK Version: ', sdkVersion)
+    } else {
+      console.log('SDK Not installed for this project')
+    }
   }
 }

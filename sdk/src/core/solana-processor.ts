@@ -1,9 +1,10 @@
 import { ProcessResult } from '../gen'
-import { SolanaContext } from './context'
+import { SolanaContext } from './solana-context'
 import Long from 'long'
 import { Instruction } from '@project-serum/anchor'
-import { SolanaBindOptions } from './bind-options'
+import { SolanaBindOptions } from './solana-options'
 import { ListStateStorage } from '../state/state-storage'
+import { CHAIN_IDS } from '../utils/chain'
 
 type IndexConfigure = {
   startSlot: Long
@@ -21,6 +22,7 @@ export class SolanaBaseProcessor {
   address: string
   endpoint: string
   contractName: string
+  network: string
   processInnerInstruction: boolean
   config: IndexConfigure = { startSlot: new Long(0) }
   decodeInstruction: (rawInstruction: string) => Instruction | null
@@ -37,6 +39,7 @@ export class SolanaBaseProcessor {
     this.address = options.address
     this.contractName = options.name || ''
     this.processInnerInstruction = options.processInnerInstruction || false
+    this.network = options.network || CHAIN_IDS.SOLANA_MAINNET
     if (options.startBlock) {
       this.startSlot(options.startBlock)
     }
@@ -84,7 +87,7 @@ export class SolanaBaseProcessor {
     handler: SolanaInstructionHandler,
     slot: Long
   ): ProcessResult {
-    const ctx = new SolanaContext(this.contractName, this.address, slot)
+    const ctx = new SolanaContext(this.contractName, this.network, this.address, slot)
     handler(parsedInstruction, ctx, accounts)
     return ctx.getProcessResult()
   }

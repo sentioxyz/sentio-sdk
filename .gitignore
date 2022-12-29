@@ -11,6 +11,7 @@ lib
 docs
 
 .idea
+.run
 
 # Logs
 logs

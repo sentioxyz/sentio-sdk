@@ -8,7 +8,7 @@ import path from 'path'
 import chalk from 'chalk'
 import { buildProcessor } from './build'
 import fetch from 'node-fetch'
-import { getCliVersion } from './utils'
+import { getSdkVersion } from './utils'
 import { URL } from 'url'
 
 async function createProject(options: SentioProjectConfig, apiKey: string) {
@@ -71,7 +71,7 @@ export async function uploadFile(options: SentioProjectConfig, apiKeyOverride: s
     console.log(chalk.blue(triedCount > 1 ? 'Retry uploading' : 'Uploading'))
 
     // get gcs upload url
-    const initUploadResRaw = await initUpload(options.host, apiKey, options.project, getCliVersion())
+    const initUploadResRaw = await initUpload(options.host, apiKey, options.project, getSdkVersion())
     if (!initUploadResRaw.ok) {
       console.error(chalk.red('Failed to get upload url'))
       console.error(chalk.red((await initUploadResRaw.json()).message))
@@ -129,7 +129,7 @@ export async function uploadFile(options: SentioProjectConfig, apiKeyOverride: s
       options.host,
       apiKey,
       options.project,
-      getCliVersion(),
+      getSdkVersion(),
       sha256,
       commitSha,
       gitUrl,

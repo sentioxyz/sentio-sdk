@@ -42,7 +42,6 @@ async function installDeps() {
 
 export async function codeGenEthersProcessor(
   abisDir: string,
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   ETHERS_TARGET = path.dirname(require.resolve('@sentio/sdk/lib/target-ethers-sentio')),
   outDir = 'src/types/internal'
 ) {

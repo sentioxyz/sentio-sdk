@@ -156,33 +156,6 @@ export class BoundContractView<TContract extends BaseContract, TContractView ext
   }
 }
 
-export class SolanaContext extends BaseContext {
-  address: string
-  programName: string
-  blockNumber: Long
-
-  constructor(programName: string, address: string, slot: Long) {
-    super()
-    this.programName = programName
-    this.address = address
-    this.blockNumber = slot
-  }
-
-  getMetaData(name: string, labels: Labels): RecordMetaData {
-    return {
-      address: this.address,
-      contractName: this.programName,
-      blockNumber: this.blockNumber,
-      transactionIndex: 0,
-      transactionHash: '', // TODO add
-      logIndex: 0,
-      chainId: CHAIN_IDS.SOLANA_MAINNET, // TODO set in context
-      name: name,
-      labels: normalizeLabels(labels),
-    }
-  }
-}
-
 export class SuiContext extends BaseContext {
   address: string
   moduleName: string

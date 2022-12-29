@@ -38,11 +38,6 @@ export class BindInternalOptions {
   endBlock?: Long
 }
 
-export class SolanaBindOptions extends BindOptions {
-  declare network?: string
-  processInnerInstruction?: boolean
-}
-
 export class AccountBindOptions {
   address: string
   network?: Networkish
