@@ -5,7 +5,7 @@ import { normalizeLabels } from './meter'
 import Long from 'long'
 import { Trace } from './trace'
 import { Labels } from './metadata'
-import { SOL_MAINMET_ID, SUI_DEVNET_ID } from '../utils/chain'
+import { CHAIN_IDS } from '../utils/chain'
 import { BaseContext } from './base-context'
 
 export abstract class EthContext extends BaseContext {
@@ -176,7 +176,7 @@ export class SolanaContext extends BaseContext {
       transactionIndex: 0,
       transactionHash: '', // TODO add
       logIndex: 0,
-      chainId: SOL_MAINMET_ID, // TODO set in context
+      chainId: CHAIN_IDS.SOLANA_MAINNET, // TODO set in context
       name: name,
       labels: normalizeLabels(labels),
     }
@@ -202,7 +202,7 @@ export class SuiContext extends BaseContext {
       transactionIndex: 0,
       transactionHash: '', // TODO
       logIndex: 0,
-      chainId: SUI_DEVNET_ID, // TODO set in context
+      chainId: CHAIN_IDS.SUI_DEVNET, // TODO set in context
       name: name,
       labels: normalizeLabels(labels),
     }

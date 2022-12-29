@@ -1,6 +1,6 @@
 import { Block, Log } from '@ethersproject/abstract-provider'
 import { CallContext, ServerError, Status } from 'nice-grpc'
-import { SOL_MAINMET_ID, SUI_DEVNET_ID } from './utils/chain'
+import { CHAIN_IDS } from './utils/chain'
 
 import {
   AccountConfig,
@@ -277,7 +277,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         processorType: USER_PROCESSOR,
         contract: {
           name: solanaProcessor.contractName,
-          chainId: SOL_MAINMET_ID,
+          chainId: CHAIN_IDS.SOLANA_MAINNET,
           address: solanaProcessor.address,
           abi: '',
         },
@@ -303,7 +303,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         processorType: USER_PROCESSOR,
         contract: {
           name: 'sui contract',
-          chainId: SUI_DEVNET_ID,
+          chainId: CHAIN_IDS.SUI_DEVNET,
           address: suiProcessor.address,
           abi: '',
         },

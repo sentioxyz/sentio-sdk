@@ -5,7 +5,7 @@ import { MoveFunction, MoveModule, MoveModuleBytecode, MoveStruct } from 'aptos-
 import { AccountModulesImportInfo, AccountRegister, generateType } from './typegen'
 import { getMeaningfulFunctionParams, isFrameworkAccount, moduleQname, SPLITTER } from '../aptos/utils'
 import chalk from 'chalk'
-import { AptosNetwork, getChainName, getRpcClient } from '../aptos/network'
+import { AptosNetwork, getAptosChainName, getRpcClient } from '../aptos/network'
 import { parseMoveType } from '../aptos/types'
 
 export function codeGenAptosProcessor(abisDir: string, outDir = 'src/types/aptos') {
@@ -65,7 +65,7 @@ export async function generateForNetwork(srcDir: string, outputDir: string, netw
 
   while (loader.pendingAccounts.size > 0) {
     for (const account of loader.pendingAccounts) {
-      console.log(`download dependent module for account ${account} at ${getChainName(network)}`)
+      console.log(`download dependent module for account ${account} at ${getAptosChainName(network)}`)
 
       try {
         const modules = await client.getAccountModules(account)

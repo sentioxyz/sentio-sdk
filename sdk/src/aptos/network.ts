@@ -1,4 +1,4 @@
-import { APTOS_MAINNET_ID, APTOS_TESTNET_ID, CHAIN_MAP } from '../utils/chain'
+import { CHAIN_IDS, CHAIN_MAP, getChainName } from '../utils/chain'
 import { AptosClient } from 'aptos-sdk'
 
 export enum AptosNetwork {
@@ -10,17 +10,17 @@ export enum AptosNetwork {
 export function getChainId(network: AptosNetwork): string {
   switch (network) {
     case AptosNetwork.TEST_NET:
-      return APTOS_TESTNET_ID
+      return CHAIN_IDS.APTOS_TESTNET
   }
-  return APTOS_MAINNET_ID
+  return CHAIN_IDS.APTOS_MAINNET
 }
 
-export function getChainName(network: AptosNetwork): string {
+export function getAptosChainName(network: AptosNetwork): string {
   switch (network) {
     case AptosNetwork.TEST_NET:
-      return CHAIN_MAP[APTOS_TESTNET_ID]
+      return getChainName(CHAIN_IDS.APTOS_TESTNET)
   }
-  return CHAIN_MAP[APTOS_MAINNET_ID]
+  return getChainName(CHAIN_IDS.APTOS_MAINNET)
 }
 
 export function getRpcEndpoint(network: AptosNetwork): string {
