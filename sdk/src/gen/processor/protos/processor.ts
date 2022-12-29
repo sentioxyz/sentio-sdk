@@ -3,6 +3,7 @@ import Long from "long";
 import type { CallContext, CallOptions } from "nice-grpc-common";
 import _m0 from "protobufjs/minimal";
 import { Empty } from "../../google/protobuf/empty";
+import { Struct } from "../../google/protobuf/struct";
 
 export enum MetricType {
   UNKNOWN_TYPE = 0,
@@ -498,21 +499,21 @@ export interface Data_SolInstruction {
   slot: Long;
   programAccountId: string;
   accounts: string[];
-  parsed?: Uint8Array | undefined;
+  parsed?: { [key: string]: any } | undefined;
 }
 
 export interface Data_AptEvent {
-  data: Uint8Array;
+  event: { [key: string]: any } | undefined;
 }
 
 export interface Data_AptCall {
-  data: Uint8Array;
+  call: { [key: string]: any } | undefined;
 }
 
 export interface Data_AptResource {
-  data: Uint8Array;
+  resources: { [key: string]: any }[];
   version: Long;
-  timestamp: string;
+  timestampMicros: Long;
 }
 
 export interface DataBinding {
@@ -3270,7 +3271,7 @@ export const Data_SolInstruction = {
       writer.uint32(42).string(v!);
     }
     if (message.parsed !== undefined) {
-      writer.uint32(34).bytes(message.parsed);
+      Struct.encode(Struct.wrap(message.parsed), writer.uint32(34).fork()).ldelim();
     }
     return writer;
   },
@@ -3295,7 +3296,7 @@ export const Data_SolInstruction = {
           message.accounts.push(reader.string());
           break;
         case 4:
-          message.parsed = reader.bytes();
+          message.parsed = Struct.unwrap(Struct.decode(reader, reader.uint32()));
           break;
         default:
           reader.skipType(tag & 7);
@@ -3311,7 +3312,7 @@ export const Data_SolInstruction = {
       slot: isSet(object.slot) ? Long.fromValue(object.slot) : Long.UZERO,
       programAccountId: isSet(object.programAccountId) ? String(object.programAccountId) : "",
       accounts: Array.isArray(object?.accounts) ? object.accounts.map((e: any) => String(e)) : [],
-      parsed: isSet(object.parsed) ? bytesFromBase64(object.parsed) : undefined,
+      parsed: isObject(object.parsed) ? object.parsed : undefined,
     };
   },
 
@@ -3325,8 +3326,7 @@ export const Data_SolInstruction = {
     } else {
       obj.accounts = [];
     }
-    message.parsed !== undefined &&
-      (obj.parsed = message.parsed !== undefined ? base64FromBytes(message.parsed) : undefined);
+    message.parsed !== undefined && (obj.parsed = message.parsed);
     return obj;
   },
 
@@ -3342,13 +3342,13 @@ export const Data_SolInstruction = {
 };
 
 function createBaseData_AptEvent(): Data_AptEvent {
-  return { data: new Uint8Array() };
+  return { event: undefined };
 }
 
 export const Data_AptEvent = {
   encode(message: Data_AptEvent, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.data.length !== 0) {
-      writer.uint32(10).bytes(message.data);
+    if (message.event !== undefined) {
+      Struct.encode(Struct.wrap(message.event), writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
@@ -3360,8 +3360,8 @@ export const Data_AptEvent = {
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        case 1:
-          message.data = reader.bytes();
+        case 2:
+          message.event = Struct.unwrap(Struct.decode(reader, reader.uint32()));
           break;
         default:
           reader.skipType(tag & 7);
@@ -3372,31 +3372,30 @@ export const Data_AptEvent = {
   },
 
   fromJSON(object: any): Data_AptEvent {
-    return { data: isSet(object.data) ? bytesFromBase64(object.data) : new Uint8Array() };
+    return { event: isObject(object.event) ? object.event : undefined };
   },
 
   toJSON(message: Data_AptEvent): unknown {
     const obj: any = {};
-    message.data !== undefined &&
-      (obj.data = base64FromBytes(message.data !== undefined ? message.data : new Uint8Array()));
+    message.event !== undefined && (obj.event = message.event);
     return obj;
   },
 
   fromPartial(object: DeepPartial<Data_AptEvent>): Data_AptEvent {
     const message = createBaseData_AptEvent();
-    message.data = object.data ?? new Uint8Array();
+    message.event = object.event ?? undefined;
     return message;
   },
 };
 
 function createBaseData_AptCall(): Data_AptCall {
-  return { data: new Uint8Array() };
+  return { call: undefined };
 }
 
 export const Data_AptCall = {
   encode(message: Data_AptCall, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.data.length !== 0) {
-      writer.uint32(10).bytes(message.data);
+    if (message.call !== undefined) {
+      Struct.encode(Struct.wrap(message.call), writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
@@ -3408,8 +3407,8 @@ export const Data_AptCall = {
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        case 1:
-          message.data = reader.bytes();
+        case 2:
+          message.call = Struct.unwrap(Struct.decode(reader, reader.uint32()));
           break;
         default:
           reader.skipType(tag & 7);
@@ -3420,37 +3419,36 @@ export const Data_AptCall = {
   },
 
   fromJSON(object: any): Data_AptCall {
-    return { data: isSet(object.data) ? bytesFromBase64(object.data) : new Uint8Array() };
+    return { call: isObject(object.call) ? object.call : undefined };
   },
 
   toJSON(message: Data_AptCall): unknown {
     const obj: any = {};
-    message.data !== undefined &&
-      (obj.data = base64FromBytes(message.data !== undefined ? message.data : new Uint8Array()));
+    message.call !== undefined && (obj.call = message.call);
     return obj;
   },
 
   fromPartial(object: DeepPartial<Data_AptCall>): Data_AptCall {
     const message = createBaseData_AptCall();
-    message.data = object.data ?? new Uint8Array();
+    message.call = object.call ?? undefined;
     return message;
   },
 };
 
 function createBaseData_AptResource(): Data_AptResource {
-  return { data: new Uint8Array(), version: Long.ZERO, timestamp: "" };
+  return { resources: [], version: Long.ZERO, timestampMicros: Long.ZERO };
 }
 
 export const Data_AptResource = {
   encode(message: Data_AptResource, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.data.length !== 0) {
-      writer.uint32(10).bytes(message.data);
+    for (const v of message.resources) {
+      Struct.encode(Struct.wrap(v!), writer.uint32(34).fork()).ldelim();
     }
     if (!message.version.isZero()) {
       writer.uint32(16).int64(message.version);
     }
-    if (message.timestamp !== "") {
-      writer.uint32(26).string(message.timestamp);
+    if (!message.timestampMicros.isZero()) {
+      writer.uint32(40).int64(message.timestampMicros);
     }
     return writer;
   },
@@ -3462,14 +3460,14 @@ export const Data_AptResource = {
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        case 1:
-          message.data = reader.bytes();
+        case 4:
+          message.resources.push(Struct.unwrap(Struct.decode(reader, reader.uint32())));
           break;
         case 2:
           message.version = reader.int64() as Long;
           break;
-        case 3:
-          message.timestamp = reader.string();
+        case 5:
+          message.timestampMicros = reader.int64() as Long;
           break;
         default:
           reader.skipType(tag & 7);
@@ -3481,28 +3479,33 @@ export const Data_AptResource = {
 
   fromJSON(object: any): Data_AptResource {
     return {
-      data: isSet(object.data) ? bytesFromBase64(object.data) : new Uint8Array(),
+      resources: Array.isArray(object?.resources) ? [...object.resources] : [],
       version: isSet(object.version) ? Long.fromValue(object.version) : Long.ZERO,
-      timestamp: isSet(object.timestamp) ? String(object.timestamp) : "",
+      timestampMicros: isSet(object.timestampMicros) ? Long.fromValue(object.timestampMicros) : Long.ZERO,
     };
   },
 
   toJSON(message: Data_AptResource): unknown {
     const obj: any = {};
-    message.data !== undefined &&
-      (obj.data = base64FromBytes(message.data !== undefined ? message.data : new Uint8Array()));
+    if (message.resources) {
+      obj.resources = message.resources.map((e) => e);
+    } else {
+      obj.resources = [];
+    }
     message.version !== undefined && (obj.version = (message.version || Long.ZERO).toString());
-    message.timestamp !== undefined && (obj.timestamp = message.timestamp);
+    message.timestampMicros !== undefined && (obj.timestampMicros = (message.timestampMicros || Long.ZERO).toString());
     return obj;
   },
 
   fromPartial(object: DeepPartial<Data_AptResource>): Data_AptResource {
     const message = createBaseData_AptResource();
-    message.data = object.data ?? new Uint8Array();
+    message.resources = object.resources?.map((e) => e) || [];
     message.version = (object.version !== undefined && object.version !== null)
       ? Long.fromValue(object.version)
       : Long.ZERO;
-    message.timestamp = object.timestamp ?? "";
+    message.timestampMicros = (object.timestampMicros !== undefined && object.timestampMicros !== null)
+      ? Long.fromValue(object.timestampMicros)
+      : Long.ZERO;
     return message;
   },
 };

@@ -2,6 +2,7 @@ import { BigNumber } from 'ethers'
 import { BigInteger, MetricValue } from '../gen'
 import { BigDecimal } from '.'
 import { BN } from '@project-serum/anchor'
+import Long from 'long'
 
 export type Numberish = number | BigNumber | bigint | BigDecimal
 
@@ -113,4 +114,8 @@ function hexToBigInteger(hex: string, negative: boolean): BigInteger {
     negative: negative,
     data: new Uint8Array(buffer),
   }
+}
+
+export function toBigInt(v: Long): bigint {
+  return BigInt(v.toString())
 }

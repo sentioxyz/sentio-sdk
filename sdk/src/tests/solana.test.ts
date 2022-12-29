@@ -62,7 +62,7 @@ describe('Test Solana Example', () => {
         instructionData: '',
         slot: Long.fromNumber(0),
         programAccountId: 'wormDTUJ6AWPNvk59vGQbDvGJmqbDTdgWgAqcLBCgUb',
-        parsed: new TextEncoder().encode(JSON.stringify(parsedIns)),
+        parsed: parsedIns,
         accounts: [],
       },
     ]

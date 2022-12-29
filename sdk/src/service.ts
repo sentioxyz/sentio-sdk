@@ -43,6 +43,12 @@ import { SuiProcessorState } from './core/sui-processor'
 import { SolanaProcessorState } from './core/solana-processor'
 import { ProcessorState } from './binds'
 import { ProcessorTemplateProcessorState, TemplateInstanceState } from './core/base-processor-template'
+import { toBigInt } from './core/numberish'
+import { MoveResource, Transaction_UserTransaction } from 'aptos-sdk/src/generated'
+
+// (Long.prototype as any).toBigInt = function() {
+//   return BigInt(this.toString())
+// };
 ;(BigInt.prototype as any).toJSON = function () {
   return this.toString()
 }
@@ -541,8 +547,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       if (processor.address === instruction.programAccountId) {
         let parsedInstruction: SolInstruction | null = null
         if (instruction.parsed) {
-          const a1 = JSON.parse(new TextDecoder().decode(instruction.parsed))
-          parsedInstruction = processor.getParsedInstruction(a1)
+          parsedInstruction = processor.getParsedInstruction(instruction.parsed as { type: string; info: any })
         } else if (instruction.instructionData) {
           parsedInstruction = processor.getParsedInstruction(instruction.instructionData)
         }
@@ -610,14 +615,22 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       throw new ServerError(Status.INVALID_ARGUMENT, "Event can't be empty")
     }
     const promises: Promise<ProcessResult>[] = []
-    const jsonString = Utf8ArrayToStr(binding.data.aptEvent?.data || binding.data.raw)
-    const event = JSON.parse(jsonString)
+    let event: Transaction_UserTransaction
+    if (binding.data.aptEvent) {
+      event = binding.data.aptEvent?.event as Transaction_UserTransaction
+    } else {
+      const jsonString = Utf8ArrayToStr(binding.data.raw)
+      event = JSON.parse(jsonString)
+    }
 
     for (const handlerId of binding.handlerIds) {
       // only support aptos event for now
       promises.push(
         this.aptosEventHandlers[handlerId](event).catch((e) => {
-          throw new ServerError(Status.INTERNAL, 'error processing event: ' + jsonString + '\n' + errorString(e))
+          throw new ServerError(
+            Status.INTERNAL,
+            'error processing event: ' + JSON.stringify(event) + '\n' + errorString(e)
+          )
         })
       )
     }
@@ -628,13 +641,31 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     if (!binding.data) {
       throw new ServerError(Status.INVALID_ARGUMENT, "Event can't be empty")
     }
-    const jsonString = Utf8ArrayToStr(binding.data.aptResource?.data || binding.data.raw)
-    const json = JSON.parse(jsonString) as MoveResourcesWithVersionPayload
+
+    const resource: MoveResourcesWithVersionPayload = {
+      resources: [],
+      version: 0n,
+      timestamp: 0n,
+    }
+    if (binding.data.aptResource?.resources) {
+      resource.timestamp = toBigInt(binding.data.aptResource.timestampMicros)
+      resource.version = toBigInt(binding.data.aptResource.version)
+      resource.resources = binding.data.aptResource.resources as MoveResource[]
+    } else {
+      const jsonString = Utf8ArrayToStr(binding.data.raw)
+      const json = JSON.parse(jsonString)
+      resource.timestamp = toBigInt(json.timestamp)
+      resource.version = toBigInt(json.version)
+    }
+
     const promises: Promise<ProcessResult>[] = []
     for (const handlerId of binding.handlerIds) {
       promises.push(
-        this.aptosResourceHandlers[handlerId](json).catch((e) => {
-          throw new ServerError(Status.INTERNAL, 'error processing event: ' + jsonString + '\n' + errorString(e))
+        this.aptosResourceHandlers[handlerId](resource).catch((e) => {
+          throw new ServerError(
+            Status.INTERNAL,
+            'error processing event: ' + JSON.stringify(resource) + '\n' + errorString(e)
+          )
         })
       )
     }
@@ -645,14 +676,19 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     if (!binding.data) {
       throw new ServerError(Status.INVALID_ARGUMENT, "Event can't be empty")
     }
-    const jsonString = Utf8ArrayToStr(binding.data.aptCall?.data || binding.data.raw)
-    const call = JSON.parse(jsonString)
+    let call: Transaction_UserTransaction
+    if (binding.data.aptCall?.call) {
+      call = binding.data.aptCall?.call as Transaction_UserTransaction
+    } else {
+      const jsonString = Utf8ArrayToStr(binding.data.raw)
+      call = JSON.parse(jsonString)
+    }
 
     const promises: Promise<ProcessResult>[] = []
     for (const handlerId of binding.handlerIds) {
       // only support aptos call for now
       const promise = this.aptosCallHandlers[handlerId](call).catch((e) => {
-        throw new ServerError(Status.INTERNAL, 'error processing call: ' + jsonString + '\n' + errorString(e))
+        throw new ServerError(Status.INTERNAL, 'error processing call: ' + JSON.stringify(call) + '\n' + errorString(e))
       })
       promises.push(promise)
     }

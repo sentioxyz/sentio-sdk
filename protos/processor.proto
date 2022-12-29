@@ -3,6 +3,7 @@ syntax = "proto3";
 package processor;
 
 import "google/protobuf/empty.proto";
+import "google/protobuf/struct.proto";
 
 option go_package = "sentioxyz/sentio/processor/protos";
 
@@ -288,18 +289,18 @@ message Data {
     uint64 slot = 2;
     string program_account_id = 3;
     repeated string accounts = 5;
-    optional bytes parsed = 4;
+    optional google.protobuf.Struct parsed = 4;
   }
   message AptEvent {
-    bytes data = 1;
+    google.protobuf.Struct event = 2;
   }
   message AptCall {
-    bytes data = 1;
+    google.protobuf.Struct call = 2;
   }
   message AptResource {
-    bytes data = 1;
+    repeated google.protobuf.Struct resources = 4;
     int64 version = 2;
-    string timestamp = 3;
+    int64 timestampMicros = 5;
   }
 
   bytes raw = 1;

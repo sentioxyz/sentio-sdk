@@ -49,9 +49,9 @@ export class AptosResourceContext extends BaseContext {
   address: string
   network: AptosNetwork
   version: bigint
-  timestampInMicros: number
+  timestampInMicros: bigint
 
-  constructor(network: AptosNetwork, address: string, version: bigint, timestampInMicros: number) {
+  constructor(network: AptosNetwork, address: string, version: bigint, timestampInMicros: bigint) {
     super()
     this.address = address
     this.network = network

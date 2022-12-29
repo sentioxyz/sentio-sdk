@@ -1,8 +1,8 @@
 import { expect } from 'chai'
-import { TextEncoder } from 'util'
 import { HandlerType, ProcessBindingsRequest } from '../gen'
 
 import { firstCounterValue, firstGaugeValue, TestProcessorServer } from '../testing'
+import Long from 'long'
 
 describe('Test Aptos Example', () => {
   const service = new TestProcessorServer(() => {
@@ -23,7 +23,10 @@ describe('Test Aptos Example', () => {
       bindings: [
         {
           data: {
-            raw: new TextEncoder().encode(JSON.stringify(testData)),
+            raw: new Uint8Array(),
+            aptCall: {
+              call: testData,
+            },
           },
           handlerIds: [1],
           handlerType: HandlerType.APT_CALL,
@@ -41,8 +44,12 @@ describe('Test Aptos Example', () => {
       bindings: [
         {
           data: {
-            raw: new TextEncoder().encode(JSON.stringify(testData)),
+            raw: new Uint8Array(),
+            aptCall: {
+              call: testData,
+            },
           },
+
           handlerIds: [0],
           handlerType: HandlerType.APT_CALL,
         },
@@ -59,13 +66,15 @@ describe('Test Aptos Example', () => {
       bindings: [
         {
           data: {
-            raw: new TextEncoder().encode(
-              JSON.stringify({
+            raw: new Uint8Array(),
+            aptEvent: {
+              event: {
                 ...testData,
                 events: [testData.events[testData.events.length - 1]],
-              })
-            ),
+              },
+            },
           },
+
           handlerIds: [0],
           handlerType: HandlerType.APT_EVENT,
         },
@@ -83,12 +92,13 @@ describe('Test Aptos Example', () => {
       bindings: [
         {
           data: {
-            raw: new TextEncoder().encode(
-              JSON.stringify({
+            raw: new Uint8Array(),
+            aptEvent: {
+              event: {
                 ...testData,
                 events: [tokenTestData],
-              })
-            ),
+              },
+            },
           },
           handlerIds: [2],
           handlerType: HandlerType.APT_EVENT,
@@ -105,7 +115,10 @@ describe('Test Aptos Example', () => {
       bindings: [
         {
           data: {
-            raw: new TextEncoder().encode(JSON.stringify({ ...testData, events: [createProposalData] })),
+            raw: new Uint8Array(),
+            aptEvent: {
+              event: { ...testData, events: [createProposalData] },
+            },
           },
           handlerIds: [3],
           handlerType: HandlerType.APT_EVENT,
@@ -121,19 +134,19 @@ describe('Test Aptos Example', () => {
       bindings: [
         {
           data: {
-            raw: new TextEncoder().encode(
-              JSON.stringify({
-                version: '12345',
-                resources: [
-                  {
-                    type: '0x1::coin::SupplyConfig',
-                    data: {
-                      allow_upgrades: false,
-                    },
+            raw: new Uint8Array(),
+            aptResource: {
+              version: Long.fromNumber(12345),
+              resources: [
+                {
+                  type: '0x1::coin::SupplyConfig',
+                  data: {
+                    allow_upgrades: false,
                   },
-                ],
-              })
-            ),
+                },
+              ],
+              timestampMicros: Long.fromNumber(1),
+            },
           },
           handlerIds: [0],
           handlerType: HandlerType.APT_RESOURCE,
@@ -149,7 +162,10 @@ describe('Test Aptos Example', () => {
       bindings: [
         {
           data: {
-            raw: new TextEncoder().encode(JSON.stringify(dataCreate)),
+            raw: new Uint8Array(),
+            aptCall: {
+              call: dataCreate,
+            },
           },
           handlerIds: [3],
           handlerType: HandlerType.APT_CALL,
