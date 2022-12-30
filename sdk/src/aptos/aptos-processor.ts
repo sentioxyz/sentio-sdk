@@ -51,7 +51,7 @@ class CallHandler {
 export class MoveResourcesWithVersionPayload {
   resources: MoveResource[]
   version: bigint
-  timestamp: bigint
+  timestamp: number
 }
 
 class ResourceHandlder {

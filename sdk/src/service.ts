@@ -660,16 +660,22 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     const resource: MoveResourcesWithVersionPayload = {
       resources: [],
       version: 0n,
-      timestamp: 0n,
+      timestamp: 0,
     }
     if (binding.data.aptResource?.resources) {
-      resource.timestamp = toBigInt(binding.data.aptResource.timestampMicros)
+      if (binding.data.aptResource.timestampMicros.greaterThan(Number.MAX_SAFE_INTEGER)) {
+        throw new ServerError(Status.INVALID_ARGUMENT, 'timestamp is too large')
+      }
+      resource.timestamp = binding.data.aptResource.timestampMicros.toNumber()
       resource.version = toBigInt(binding.data.aptResource.version)
       resource.resources = binding.data.aptResource.resources as MoveResource[]
     } else {
       const jsonString = Utf8ArrayToStr(binding.data.raw)
       const json = JSON.parse(jsonString)
-      resource.timestamp = toBigInt(json.timestamp)
+      if (Long.fromString(json.timestamp).greaterThan(Number.MAX_SAFE_INTEGER)) {
+        throw new ServerError(Status.INVALID_ARGUMENT, 'timestamp is too large')
+      }
+      resource.timestamp = parseInt(json.timestamp)
       resource.version = toBigInt(json.version)
     }
 
