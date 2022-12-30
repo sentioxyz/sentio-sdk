@@ -282,7 +282,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         processorType: USER_PROCESSOR,
         contract: {
           name: solanaProcessor.contractName,
-          chainId: CHAIN_IDS.SOLANA_MAINNET,
+          chainId: solanaProcessor.network,
           address: solanaProcessor.address,
           abi: '',
         },
