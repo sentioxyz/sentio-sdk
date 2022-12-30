@@ -580,7 +580,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       throw new ServerError(Status.INVALID_ARGUMENT, "Block can't be empty")
     }
     let block: Block
-    if (binding.data.ethBlock) {
+    if (binding.data.ethBlock?.block) {
       block = binding.data.ethBlock.block as Block
     } else {
       const jsonString = Utf8ArrayToStr(binding.data.raw)
@@ -603,7 +603,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       throw new ServerError(Status.INVALID_ARGUMENT, "Trace can't be empty")
     }
     let trace: Trace
-    if (binding.data.ethTrace) {
+    if (binding.data.ethTrace?.trace) {
       trace = binding.data.ethTrace.trace as Trace
     } else {
       const jsonString = Utf8ArrayToStr(binding.data.raw)
@@ -631,7 +631,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     }
     const promises: Promise<ProcessResult>[] = []
     let event: Transaction_UserTransaction
-    if (binding.data.aptEvent) {
+    if (binding.data.aptEvent?.event) {
       event = binding.data.aptEvent?.event as Transaction_UserTransaction
     } else {
       const jsonString = Utf8ArrayToStr(binding.data.raw)
