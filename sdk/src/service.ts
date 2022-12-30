@@ -519,14 +519,19 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     }
 
     const promises: Promise<ProcessResult>[] = []
-    const jsonString = Utf8ArrayToStr(request.data.ethLog?.data || request.data.raw)
-    const log: Log = JSON.parse(jsonString)
+    let log: Log
+    if (request.data.ethLog) {
+      log = request.data.ethLog.log as Log
+    } else {
+      const jsonString = Utf8ArrayToStr(request.data.raw)
+      log = JSON.parse(jsonString)
+    }
 
     for (const handlerId of request.handlerIds) {
       const handler = this.eventHandlers[handlerId]
       promises.push(
         handler(log).catch((e) => {
-          throw new ServerError(Status.INTERNAL, 'error processing log: ' + jsonString + '\n' + errorString(e))
+          throw new ServerError(Status.INTERNAL, 'error processing log: ' + JSON.stringify(log) + '\n' + errorString(e))
         })
       )
     }
@@ -574,10 +579,13 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     if (!binding.data) {
       throw new ServerError(Status.INVALID_ARGUMENT, "Block can't be empty")
     }
-
-    const jsonString = Utf8ArrayToStr(binding.data.ethBlock?.data || binding.data.raw)
-
-    const block: Block = JSON.parse(jsonString)
+    let block: Block
+    if (binding.data.ethBlock) {
+      block = binding.data.ethBlock.block as Block
+    } else {
+      const jsonString = Utf8ArrayToStr(binding.data.raw)
+      block = JSON.parse(jsonString)
+    }
 
     const promises: Promise<ProcessResult>[] = []
     for (const handlerId of binding.handlerIds) {
@@ -594,15 +602,23 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     if (!binding.data) {
       throw new ServerError(Status.INVALID_ARGUMENT, "Trace can't be empty")
     }
-    const jsonString = Utf8ArrayToStr(binding.data.ethTrace?.data || binding.data.raw)
-    const trace: Trace = JSON.parse(jsonString)
+    let trace: Trace
+    if (binding.data.ethTrace) {
+      trace = binding.data.ethTrace.trace as Trace
+    } else {
+      const jsonString = Utf8ArrayToStr(binding.data.raw)
+      trace = JSON.parse(jsonString)
+    }
 
     const promises: Promise<ProcessResult>[] = []
 
     for (const handlerId of binding.handlerIds) {
       promises.push(
         this.traceHandlers[handlerId](trace).catch((e) => {
-          throw new ServerError(Status.INTERNAL, 'error processing trace: ' + jsonString + '\n' + errorString(e))
+          throw new ServerError(
+            Status.INTERNAL,
+            'error processing trace: ' + JSON.stringify(trace) + '\n' + errorString(e)
+          )
         })
       )
     }

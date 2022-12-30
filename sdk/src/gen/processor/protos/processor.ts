@@ -474,22 +474,21 @@ export interface Data {
 }
 
 export interface Data_EthLog {
-  data: Uint8Array;
+  log: { [key: string]: any } | undefined;
   transaction?: Uint8Array | undefined;
 }
 
 export interface Data_EthBlock {
-  data: Uint8Array;
+  block: { [key: string]: any } | undefined;
 }
 
 export interface Data_EthTransaction {
-  data: Uint8Array;
-  transaction?: Uint8Array | undefined;
+  transaction: { [key: string]: any } | undefined;
   transactionReceipt?: Uint8Array | undefined;
 }
 
 export interface Data_EthTrace {
-  data: Uint8Array;
+  trace: { [key: string]: any } | undefined;
   transaction?: Uint8Array | undefined;
   transactionReceipt?: Uint8Array | undefined;
 }
@@ -3003,13 +3002,13 @@ export const Data = {
 };
 
 function createBaseData_EthLog(): Data_EthLog {
-  return { data: new Uint8Array(), transaction: undefined };
+  return { log: undefined, transaction: undefined };
 }
 
 export const Data_EthLog = {
   encode(message: Data_EthLog, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.data.length !== 0) {
-      writer.uint32(10).bytes(message.data);
+    if (message.log !== undefined) {
+      Struct.encode(Struct.wrap(message.log), writer.uint32(26).fork()).ldelim();
     }
     if (message.transaction !== undefined) {
       writer.uint32(18).bytes(message.transaction);
@@ -3024,8 +3023,8 @@ export const Data_EthLog = {
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        case 1:
-          message.data = reader.bytes();
+        case 3:
+          message.log = Struct.unwrap(Struct.decode(reader, reader.uint32()));
           break;
         case 2:
           message.transaction = reader.bytes();
@@ -3040,15 +3039,14 @@ export const Data_EthLog = {
 
   fromJSON(object: any): Data_EthLog {
     return {
-      data: isSet(object.data) ? bytesFromBase64(object.data) : new Uint8Array(),
+      log: isObject(object.log) ? object.log : undefined,
       transaction: isSet(object.transaction) ? bytesFromBase64(object.transaction) : undefined,
     };
   },
 
   toJSON(message: Data_EthLog): unknown {
     const obj: any = {};
-    message.data !== undefined &&
-      (obj.data = base64FromBytes(message.data !== undefined ? message.data : new Uint8Array()));
+    message.log !== undefined && (obj.log = message.log);
     message.transaction !== undefined &&
       (obj.transaction = message.transaction !== undefined ? base64FromBytes(message.transaction) : undefined);
     return obj;
@@ -3056,20 +3054,20 @@ export const Data_EthLog = {
 
   fromPartial(object: DeepPartial<Data_EthLog>): Data_EthLog {
     const message = createBaseData_EthLog();
-    message.data = object.data ?? new Uint8Array();
+    message.log = object.log ?? undefined;
     message.transaction = object.transaction ?? undefined;
     return message;
   },
 };
 
 function createBaseData_EthBlock(): Data_EthBlock {
-  return { data: new Uint8Array() };
+  return { block: undefined };
 }
 
 export const Data_EthBlock = {
   encode(message: Data_EthBlock, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.data.length !== 0) {
-      writer.uint32(10).bytes(message.data);
+    if (message.block !== undefined) {
+      Struct.encode(Struct.wrap(message.block), writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
@@ -3081,8 +3079,8 @@ export const Data_EthBlock = {
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        case 1:
-          message.data = reader.bytes();
+        case 2:
+          message.block = Struct.unwrap(Struct.decode(reader, reader.uint32()));
           break;
         default:
           reader.skipType(tag & 7);
@@ -3093,34 +3091,30 @@ export const Data_EthBlock = {
   },
 
   fromJSON(object: any): Data_EthBlock {
-    return { data: isSet(object.data) ? bytesFromBase64(object.data) : new Uint8Array() };
+    return { block: isObject(object.block) ? object.block : undefined };
   },
 
   toJSON(message: Data_EthBlock): unknown {
     const obj: any = {};
-    message.data !== undefined &&
-      (obj.data = base64FromBytes(message.data !== undefined ? message.data : new Uint8Array()));
+    message.block !== undefined && (obj.block = message.block);
     return obj;
   },
 
   fromPartial(object: DeepPartial<Data_EthBlock>): Data_EthBlock {
     const message = createBaseData_EthBlock();
-    message.data = object.data ?? new Uint8Array();
+    message.block = object.block ?? undefined;
     return message;
   },
 };
 
 function createBaseData_EthTransaction(): Data_EthTransaction {
-  return { data: new Uint8Array(), transaction: undefined, transactionReceipt: undefined };
+  return { transaction: undefined, transactionReceipt: undefined };
 }
 
 export const Data_EthTransaction = {
   encode(message: Data_EthTransaction, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.data.length !== 0) {
-      writer.uint32(10).bytes(message.data);
-    }
     if (message.transaction !== undefined) {
-      writer.uint32(18).bytes(message.transaction);
+      Struct.encode(Struct.wrap(message.transaction), writer.uint32(34).fork()).ldelim();
     }
     if (message.transactionReceipt !== undefined) {
       writer.uint32(26).bytes(message.transactionReceipt);
@@ -3135,11 +3129,8 @@ export const Data_EthTransaction = {
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        case 1:
-          message.data = reader.bytes();
-          break;
-        case 2:
-          message.transaction = reader.bytes();
+        case 4:
+          message.transaction = Struct.unwrap(Struct.decode(reader, reader.uint32()));
           break;
         case 3:
           message.transactionReceipt = reader.bytes();
@@ -3154,18 +3145,14 @@ export const Data_EthTransaction = {
 
   fromJSON(object: any): Data_EthTransaction {
     return {
-      data: isSet(object.data) ? bytesFromBase64(object.data) : new Uint8Array(),
-      transaction: isSet(object.transaction) ? bytesFromBase64(object.transaction) : undefined,
+      transaction: isObject(object.transaction) ? object.transaction : undefined,
       transactionReceipt: isSet(object.transactionReceipt) ? bytesFromBase64(object.transactionReceipt) : undefined,
     };
   },
 
   toJSON(message: Data_EthTransaction): unknown {
     const obj: any = {};
-    message.data !== undefined &&
-      (obj.data = base64FromBytes(message.data !== undefined ? message.data : new Uint8Array()));
-    message.transaction !== undefined &&
-      (obj.transaction = message.transaction !== undefined ? base64FromBytes(message.transaction) : undefined);
+    message.transaction !== undefined && (obj.transaction = message.transaction);
     message.transactionReceipt !== undefined && (obj.transactionReceipt = message.transactionReceipt !== undefined
       ? base64FromBytes(message.transactionReceipt)
       : undefined);
@@ -3174,7 +3161,6 @@ export const Data_EthTransaction = {
 
   fromPartial(object: DeepPartial<Data_EthTransaction>): Data_EthTransaction {
     const message = createBaseData_EthTransaction();
-    message.data = object.data ?? new Uint8Array();
     message.transaction = object.transaction ?? undefined;
     message.transactionReceipt = object.transactionReceipt ?? undefined;
     return message;
@@ -3182,13 +3168,13 @@ export const Data_EthTransaction = {
 };
 
 function createBaseData_EthTrace(): Data_EthTrace {
-  return { data: new Uint8Array(), transaction: undefined, transactionReceipt: undefined };
+  return { trace: undefined, transaction: undefined, transactionReceipt: undefined };
 }
 
 export const Data_EthTrace = {
   encode(message: Data_EthTrace, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.data.length !== 0) {
-      writer.uint32(10).bytes(message.data);
+    if (message.trace !== undefined) {
+      Struct.encode(Struct.wrap(message.trace), writer.uint32(34).fork()).ldelim();
     }
     if (message.transaction !== undefined) {
       writer.uint32(18).bytes(message.transaction);
@@ -3206,8 +3192,8 @@ export const Data_EthTrace = {
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        case 1:
-          message.data = reader.bytes();
+        case 4:
+          message.trace = Struct.unwrap(Struct.decode(reader, reader.uint32()));
           break;
         case 2:
           message.transaction = reader.bytes();
@@ -3225,7 +3211,7 @@ export const Data_EthTrace = {
 
   fromJSON(object: any): Data_EthTrace {
     return {
-      data: isSet(object.data) ? bytesFromBase64(object.data) : new Uint8Array(),
+      trace: isObject(object.trace) ? object.trace : undefined,
       transaction: isSet(object.transaction) ? bytesFromBase64(object.transaction) : undefined,
       transactionReceipt: isSet(object.transactionReceipt) ? bytesFromBase64(object.transactionReceipt) : undefined,
     };
@@ -3233,8 +3219,7 @@ export const Data_EthTrace = {
 
   toJSON(message: Data_EthTrace): unknown {
     const obj: any = {};
-    message.data !== undefined &&
-      (obj.data = base64FromBytes(message.data !== undefined ? message.data : new Uint8Array()));
+    message.trace !== undefined && (obj.trace = message.trace);
     message.transaction !== undefined &&
       (obj.transaction = message.transaction !== undefined ? base64FromBytes(message.transaction) : undefined);
     message.transactionReceipt !== undefined && (obj.transactionReceipt = message.transactionReceipt !== undefined
@@ -3245,7 +3230,7 @@ export const Data_EthTrace = {
 
   fromPartial(object: DeepPartial<Data_EthTrace>): Data_EthTrace {
     const message = createBaseData_EthTrace();
-    message.data = object.data ?? new Uint8Array();
+    message.trace = object.trace ?? undefined;
     message.transaction = object.transaction ?? undefined;
     message.transactionReceipt = object.transactionReceipt ?? undefined;
     return message;

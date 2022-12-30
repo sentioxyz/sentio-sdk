@@ -268,19 +268,18 @@ message RawTransaction {
 message Data {
   // Every Handler type should have a data type
   message EthLog {
-    bytes data = 1;
+    google.protobuf.Struct log = 3;
     optional bytes transaction = 2;
   }
   message EthBlock {
-    bytes data = 1;
+    google.protobuf.Struct block = 2;
   }
   message EthTransaction {
-    bytes data = 1;
-    optional bytes transaction = 2;
+    google.protobuf.Struct transaction = 4;
     optional bytes transaction_receipt = 3;
   }
   message EthTrace {
-    bytes data = 1;
+    google.protobuf.Struct trace = 4;
     optional bytes transaction = 2;
     optional bytes transaction_receipt = 3;
   }

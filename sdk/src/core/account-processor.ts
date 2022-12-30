@@ -7,7 +7,7 @@ import { TransferEvent as ERC20TransferEvent } from '../builtin/internal/ERC20'
 import { TransferEvent as ERC721TransferEvent } from '../builtin/internal/ERC721'
 import { AccountContext } from './context'
 import { PromiseOrVoid } from '../promise-or-void'
-import { Event, EventFilter } from '@ethersproject/contracts'
+import { Event } from '@ethersproject/contracts'
 import { BytesLike } from '@ethersproject/bytes'
 import { AddressOrTypeEventFilter, EventsHandler } from './base-processor'
 

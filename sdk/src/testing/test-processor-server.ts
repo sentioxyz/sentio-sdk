@@ -115,7 +115,7 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
           return {
             data: {
               raw: new Uint8Array(),
-              ethTrace: { data: toBytes(trace) },
+              ethTrace: { trace },
             },
             handlerIds: [config.handlerId],
             handlerType: HandlerType.ETH_TRACE,
@@ -177,7 +177,7 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
             return {
               data: {
                 raw: new Uint8Array(),
-                ethLog: { data: toBytes(log) },
+                ethLog: { log },
               },
               handlerIds: [config.handlerId],
               handlerType: HandlerType.ETH_LOG,
@@ -239,7 +239,7 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
             return {
               data: {
                 raw: new Uint8Array(),
-                ethLog: { data: toBytes(log) },
+                ethLog: { log },
               },
               handlerIds: [config.handlerId],
               handlerType: HandlerType.ETH_LOG,
@@ -273,9 +273,7 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
     const binding: DataBinding = {
       data: {
         raw: new Uint8Array(),
-        ethBlock: {
-          data: toBytes(block),
-        },
+        ethBlock: { block },
       },
       handlerType: HandlerType.ETH_BLOCK,
       handlerIds: [],
