@@ -59,4 +59,3 @@ SPLTokenProcessor.bind({
       ctx.meter.Counter('totalWeth_supply').sub(data.amount as number)
     }
   })
-  .innerInstruction(true)

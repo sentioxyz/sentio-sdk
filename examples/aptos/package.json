@@ -6,7 +6,8 @@
     "compile": "tsc -p .",
     "test": "jest",
     "build": "sentio build",
-    "build_all": "yarn lerna run --scope=@sentio/example-aptos build --include-dependencies"
+    "build_all": "yarn lerna run --scope=@sentio/example-aptos build --include-dependencies",
+    "cli": "ts-node --files src/cli.ts"
   },
   "dependencies": {
     "@sentio/sdk": "^1.0.0-development"

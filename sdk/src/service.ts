@@ -27,7 +27,6 @@ import {
 
 import { Empty } from './gen/google/protobuf/empty'
 import Long from 'long'
-import { TextDecoder } from 'util'
 import { Trace } from './core'
 import { Instruction as SolInstruction } from '@project-serum/anchor'
 import { MetricState } from './core/meter'

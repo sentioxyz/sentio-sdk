@@ -4,8 +4,9 @@ import path from 'path'
 import fs from 'fs-extra'
 import chalk from 'chalk'
 import { getCliVersion } from '../utils'
+import latestVersion from 'latest-version'
 
-export function runCreate(argv: string[]) {
+export async function runCreate(argv: string[]) {
   const optionDefinitions = [
     {
       name: 'help',
@@ -30,7 +31,7 @@ export function runCreate(argv: string[]) {
       name: 'chain-type',
       alias: 'c',
       description:
-        'The type of project you want to create, can be evm, aptos, raw (if you want to start from scratch and support multiple types of chains)',
+        'The type of project you want to create, can be evm, aptos, solana, raw (if you want to start from scratch and support multiple types of chains)',
       type: String,
       defaultValue: 'evm',
     },
@@ -58,6 +59,8 @@ export function runCreate(argv: string[]) {
       case 'aptos':
         break
       case 'raw':
+        break
+      case 'solana':
         break
       default:
         console.error(chalk.red('non supported chain-type for template creation, use --help for more information.'))
@@ -102,7 +105,7 @@ export function runCreate(argv: string[]) {
         cliVersion = '^' + cliVersion
       }
 
-      packageJson.dependencies['@sentio/sdk'] = cliVersion
+      packageJson.dependencies['@sentio/sdk'] = '^' + (await latestVersion('@sentio/sdk'))
       packageJson.dependencies['@sentio/cli'] = cliVersion
       packageJson.name = projectName
 

@@ -49,11 +49,6 @@ export class SolanaBaseProcessor {
     this.endpoint = options.network || 'https://api.mainnet-beta.solana.com'
   }
 
-  innerInstruction(flag: boolean) {
-    this.processInnerInstruction = flag
-    return this
-  }
-
   public onInstruction(instructionName: string, handler: SolanaInstructionHandler) {
     if (!this.isBind()) {
       throw new Error("Processor doesn't bind to an address")

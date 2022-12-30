@@ -45,6 +45,10 @@ jobs:
           working_directory: cli/templates/evm
       - run:
           command: yarn install && yarn test
+          name: Test Template - Solana
+          working_directory: cli/templates/solana
+      - run:
+          command: yarn install && yarn test
           name: Test Template - RAW
           working_directory: cli/templates/raw
 #      - persist_to_workspace:
