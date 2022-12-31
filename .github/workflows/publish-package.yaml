@@ -30,7 +30,7 @@ jobs:
         id: semantic
         uses: cycjimmy/semantic-release-action@v3
         with:
-          working_directory: sdk
+          working_directory: packages/sdk
         env:
           GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

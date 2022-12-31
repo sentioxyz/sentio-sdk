@@ -1,12 +1,13 @@
-sdk/src/builtin/*
-!sdk/src/builtin/solana
-!sdk/src/builtin/aptos/index.ts
-!sdk/src/builtin/index.ts
+packages/sdk/src/builtin/*
+!packages/sdk/src/builtin/solana
+!packages/sdk/src/builtin/aptos/index.ts
+!packages/sdk/src/builtin/index.ts
 node_modules
 dist
 lib
 **/src/types
-!sdk/src/types
+**/tests/types
+!packages/sdk/src/types
 
 docs
 

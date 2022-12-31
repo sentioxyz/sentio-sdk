@@ -1,0 +1,433 @@
+syntax = "proto3";
+
+package processor;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/struct.proto";
+
+option go_package = "sentioxyz/sentio/processor/protos";
+
+service Processor {
+  // Start the processor, need to be called before any other RPC calls
+  rpc Start(StartRequest) returns (google.protobuf.Empty);
+  // Stop the processor
+  rpc Stop(google.protobuf.Empty) returns (google.protobuf.Empty);
+  // Get configs of processor, it will be updated automatically if new contracts is added
+  // during log processing
+  rpc GetConfig(ProcessConfigRequest) returns (ProcessConfigResponse);
+
+  // Process data binding
+  rpc ProcessBindings(ProcessBindingsRequest) returns (ProcessBindingResponse);
+
+  rpc ProcessBindingsStream(stream DataBinding) returns (stream ProcessBindingResponse);
+}
+
+message ProjectConfig {
+  string name = 1;
+  string version = 3;
+}
+
+message ProcessConfigRequest {
+}
+
+message ProcessConfigResponse {
+  ProjectConfig config = 1;
+  repeated ContractConfig contract_configs = 2;
+  repeated TemplateInstance template_instances = 3;
+
+  repeated AccountConfig account_configs = 4;
+
+  repeated MetricConfig metric_configs = 5;
+  repeated EventTrackingConfig event_tracking_configs = 6;
+  repeated ExportConfig export_configs = 7;
+}
+
+message ContractConfig {
+  ContractInfo contract = 1;
+  repeated OnIntervalConfig interval_configs = 11;
+  repeated LogHandlerConfig log_configs = 3;
+  repeated TraceHandlerConfig trace_configs = 2;
+  repeated AptosEventHandlerConfig aptos_event_configs = 9;
+  repeated AptosCallHandlerConfig aptos_call_configs = 10;
+  InstructionHandlerConfig instruction_config = 6;
+  uint64 start_block = 4;
+  uint64 end_block = 5;
+  string processor_type = 8;
+}
+
+message TotalPerEntityAggregation {
+  enum Type {
+    AVG = 0;
+    MEDIAN = 1;
+    // add more
+  }
+}
+
+message RetentionConfig {
+  string retention_event_name = 2;
+  int32 days = 3;
+}
+
+message EventTrackingConfig {
+  string event_name = 1;
+  bool total_by_day = 2;
+  bool unique = 3;
+  TotalPerEntityAggregation total_per_entity = 4;
+  repeated int32 distinct_aggregation_by_days = 5;
+  RetentionConfig retention_config = 6;
+}
+
+message ExportConfig {
+  string name = 1;
+  string channel = 2;
+}
+
+enum MetricType {
+  UNKNOWN_TYPE = 0;
+  COUNTER = 1;
+  GAUGE = 2;
+  HISTOGRAM = 3;
+}
+
+message MetricConfig {
+  string name = 1;
+  string description = 3;
+  string unit = 2;
+  bool sparse = 4;
+
+  MetricType type = 7;
+  AggregationConfig aggregation_config = 6;
+}
+
+/*
+  Config to aggregate multiple data points into new data points in a constant time interval.
+  e.g. if you have a metric called 'vol', use 1 minutes interval and [SUM, AVG] aggregation type,
+  then every minutes there will be a 'vol_sum' and 'vol_avg' metric.
+
+  Currently this apply to gauge only.
+ */
+message AggregationConfig {
+  /*
+    The interval for data point to be resolved.
+    The minimal value is 1, and the max value allowed is 24*60 (1 day)
+   */
+  repeated int32 interval_in_minutes = 1;
+  /*
+    What aggregations to be done for the data points.
+   */
+  repeated AggregationType types = 2;
+  /*
+    Whether to discard original data points, default to be false.r
+   */
+  bool discard_origin = 3;
+}
+
+enum AggregationType {
+  COUNT = 0;
+  SUM = 1;
+//  AVG = 2;
+//  MIN = 3;
+//  MAX = 4;
+//  P50 = 5;
+//  P99 = 6;
+//  P99_9 = 7;
+}
+
+message AccountConfig {
+  // TODO implement account configs
+  string chain_id = 1;
+  string address = 2;
+  uint64 start_block = 3;
+
+  repeated OnIntervalConfig interval_configs = 4;
+  repeated AptosOnIntervalConfig aptos_interval_configs = 5;
+  // TODO add tx handler config related to the account
+
+  repeated LogHandlerConfig log_configs = 6;
+}
+
+message HandleInterval {
+  int32 recent_interval = 1;
+  int32 backfill_interval = 2;
+}
+
+message OnIntervalConfig {
+  int32 handler_id = 1;
+  // num of minutes, there can be either minutes or slot
+  int32 minutes = 2;
+  optional HandleInterval minutes_interval = 4;
+
+  // block or version
+  int32 slot = 3;
+  optional HandleInterval slot_interval = 5;
+}
+
+message AptosOnIntervalConfig {
+  OnIntervalConfig interval_config = 1;
+  string type = 2;
+}
+
+message ContractInfo {
+  string name = 1;
+  // should this be more flexible?
+  string chain_id = 2;
+  string address = 3;
+  string abi = 4;
+}
+
+message TemplateInstance {
+  ContractInfo contract = 1;
+  uint64 start_block = 2;
+  uint64 end_block = 3;
+  int32 template_id = 4;
+}
+
+message StartRequest {
+  repeated TemplateInstance template_instances = 1;
+}
+
+message BlockHandlerConfig {
+  int32 handler_id = 1;
+}
+
+message TraceHandlerConfig {
+  string signature = 1;
+  int32 handler_id = 2;
+}
+
+message LogHandlerConfig {
+  repeated LogFilter filters = 1;
+  int32 handler_id = 2;
+}
+
+message LogFilter {
+  repeated Topic topics = 1;
+  // only used for when in account config
+  oneof address_or_type {
+    string address = 2;
+    AddressType address_type = 3;
+  }
+}
+
+enum AddressType {
+  ERC20 = 0;
+  ERC721 = 1;
+  ERC1155 = 2;
+}
+
+message InstructionHandlerConfig {
+  bool inner_instruction = 1;
+  bool parsed_instruction = 2;
+  bool raw_data_instruction = 3;
+}
+
+message AptosEventHandlerConfig {
+  repeated AptosEventFilter filters = 1;
+  int32 handler_id = 2;
+}
+
+message AptosEventFilter {
+  string type = 1;
+  string account = 2;
+}
+
+message AptosCallHandlerConfig {
+  repeated AptosCallFilter filters = 1;
+  int32 handler_id = 2;
+}
+
+message AptosCallFilter {
+  string function = 1;
+  repeated string type_arguments = 2;
+  bool with_type_arguments = 3;
+  bool include_failed = 4;
+}
+
+message Topic {
+  repeated string hashes = 1;
+}
+
+message ProcessBindingsRequest {
+  repeated DataBinding bindings = 1;
+}
+
+message ProcessBindingResponse {
+  ProcessResult result = 1;
+
+  // Whether config update because of dynamic contract processor creation
+  // Currently only support log handler in ethereum
+  bool config_updated = 4;
+}
+
+message RawTransaction {
+  bytes raw = 1;
+  optional string program_account_id = 2;
+  optional uint64 slot = 3;
+}
+
+message Data {
+  // Every Handler type should have a data type
+  message EthLog {
+//    bytes data = 1;
+    google.protobuf.Struct log = 3;
+    optional bytes transaction = 2;
+  }
+  message EthBlock {
+//    bytes data = 1;
+    google.protobuf.Struct block = 2;
+  }
+  message EthTransaction {
+    google.protobuf.Struct transaction = 4;
+    optional bytes transaction_receipt = 3;
+  }
+  message EthTrace {
+    google.protobuf.Struct trace = 4;
+    optional bytes transaction = 2;
+    optional bytes transaction_receipt = 3;
+  }
+  message SolInstruction {
+    string instruction_data = 1;
+    uint64 slot = 2;
+    string program_account_id = 3;
+    repeated string accounts = 5;
+    optional google.protobuf.Struct parsed = 4;
+  }
+  message AptEvent {
+    google.protobuf.Struct event = 2;
+  }
+  message AptCall {
+    google.protobuf.Struct call = 2;
+  }
+  message AptResource {
+    repeated google.protobuf.Struct resources = 4;
+    int64 version = 2;
+    int64 timestampMicros = 5;
+  }
+
+  bytes raw = 1;
+  oneof value {
+    EthLog eth_log = 2;
+    EthBlock eth_block = 3;
+    EthTransaction eth_transaction = 4;
+    EthTrace eth_trace = 5;
+    SolInstruction sol_instruction = 6;
+    AptEvent apt_event = 7;
+    AptCall apt_call = 8;
+    AptResource apt_resource = 9;
+  }
+}
+
+message DataBinding {
+  Data data = 1;
+  HandlerType handler_type = 3;
+  repeated int32 handler_ids = 4;
+}
+
+message ProcessResult {
+  repeated GaugeResult gauges = 1;
+  repeated CounterResult counters = 2;
+  repeated LogResult logs = 3;
+  repeated EventTrackingResult events = 4;
+  repeated ExportResult exports = 5;
+}
+
+message RecordMetaData {
+  // These are populated by systems.
+
+  // Contract or Wallet or Account address
+  string address = 1;
+  // Contract (solidity) or module (move) or programId (solana)
+  // it could be empty if this is not record for a contract
+  // In some chain (e.g. aptos)
+  // one address could have multiple contract/module name
+  string contract_name = 9;
+  // Block or slot (solana) or version (aptos) number
+  uint64 block_number = 2;
+  string transaction_hash = 6;
+  string chain_id = 5;
+
+  // optional for ether
+  int32 transaction_index = 3;
+  int32 log_index = 4;
+
+  // These are populated by users in meter.
+  // The metric name and properties
+  string name = 10;
+
+  // The metric labels provided by users.
+  map<string, string> labels = 7;
+}
+
+message MetricValue {
+  oneof value {
+    string big_decimal = 1;
+    double double_value = 2;
+    BigInteger big_integer = 3;
+  }
+}
+
+message BigInteger {
+  bool negative = 1;
+  bytes data = 2;
+}
+
+enum HandlerType {
+  UNKNOWN = 0;
+  ETH_LOG = 1;
+  ETH_BLOCK = 2;
+  ETH_TRACE = 5;
+  SOL_INSTRUCTION = 4;
+  APT_EVENT = 6;
+  APT_CALL = 7;
+  APT_RESOURCE = 8;
+  SUI_TRANSACTION = 3;
+}
+
+message RuntimeInfo {
+  HandlerType from = 1;
+}
+
+message GaugeResult {
+  RecordMetaData metadata = 1;
+  MetricValue metric_value = 2;
+  RuntimeInfo runtime_info = 3;
+}
+
+message CounterResult {
+  RecordMetaData metadata = 1;
+  MetricValue metric_value = 2;
+  // True to increase or False to decrease
+  bool add = 3;
+  RuntimeInfo runtime_info = 4;
+}
+
+enum LogLevel {
+  DEBUG = 0;
+  INFO = 1;
+  WARNING = 2;
+  ERROR = 3;
+  CRITICAL = 4;
+}
+
+message LogResult {
+  RecordMetaData metadata = 1;
+  LogLevel level = 2;
+  string message = 3;
+  // JSON payload
+  string attributes = 6;
+  RuntimeInfo runtime_info = 4;
+}
+
+message EventTrackingResult {
+  RecordMetaData metadata = 1;
+  string distinct_entity_id = 2;
+  // JSON payload
+  string attributes = 4;
+  RuntimeInfo runtime_info = 5;
+}
+
+message ExportResult {
+  RecordMetaData metadata = 1;
+  string payload = 2;
+  RuntimeInfo runtime_info = 3;
+}

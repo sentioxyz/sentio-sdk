@@ -1,7 +1,9 @@
 {
   "extends": [
     "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
+//    "plugin:@typescript-eslint/recommended",
+    "plugin:import/recommended",
+    "plugin:import/typescript",
     "prettier"
   ],
   "parser": "@typescript-eslint/parser",
@@ -11,7 +13,8 @@
   },
   "plugins": ["@typescript-eslint"],
   "rules": {
-    "@typescript-eslint/no-unused-vars": ["warn", { "args": "none" }],
+    "@typescript-eslint/no-unused-vars": ["off"],
+//    "@typescript-eslint/no-unused-vars": ["warn", { "args": "none" }],
     "@typescript-eslint/no-explicit-any": ["off"],
     "@typescript-eslint/ban-ts-comment": [
       "error",
@@ -19,6 +22,9 @@
         "ts-ignore": "allow-with-description",
         "ts-expect-error": "allow-with-description"
       }
-    ]
+    ],
+    "import/no-unresolved": ["off"]
+    //    "import/no-cycle": 2,
+    //    "import/no-self-import": 2
   }
 }

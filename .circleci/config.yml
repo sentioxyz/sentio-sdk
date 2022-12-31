@@ -23,7 +23,7 @@ jobs:
       - run:
           command: rm -rf lib && yarn gen && yarn test || yarn test # TODO remove this hack, understand why test will fail in first run
           name: Test SDK
-          working_directory: sdk
+          working_directory: packages/sdk
 #      - run:
 #          command: yarn build
 #          name: Build CLI
@@ -34,23 +34,23 @@ jobs:
       - run:
           command: sudo npm link
           name: Link CLI globally for template testing
-          working_directory: cli
+          working_directory: packages/cli
       - run:
           command: yarn install && yarn gen && yarn test
           name: Test Template - Aptos
-          working_directory: cli/templates/aptos
+          working_directory: packages/cli/templates/aptos
       - run:
           command: yarn install && yarn gen && yarn test
           name: Test Template - EVM
-          working_directory: cli/templates/evm
+          working_directory: packages/cli/templates/evm
       - run:
           command: yarn install && yarn test
           name: Test Template - Solana
-          working_directory: cli/templates/solana
+          working_directory: packages/cli/templates/solana
       - run:
           command: yarn install && yarn test
           name: Test Template - RAW
-          working_directory: cli/templates/raw
+          working_directory: packages/cli/templates/raw
 #      - persist_to_workspace:
 #          root: ~/project
 #          paths:

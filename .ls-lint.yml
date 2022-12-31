@@ -23,13 +23,13 @@ ignore:
   - .idea
   - .github
   - node_modules
-  - cli/node_modules
-  - cli/templates
-  - sdk/src/abis
-  - sdk/src/builtin/internal
-  - sdk/docs
-  - sdk/lib
-  - sdk/node_modules
+  - packages/cli/node_modules
+  - packages/cli/templates
+  - packages/sdk/src/abis
+  - packages/sdk/src/builtin/internal
+  - packages/sdk/docs
+  - packages/sdk/lib
+  - packages/sdk/node_modules
   - examples
-  - sdk/src/tests/abis
-  - sdk/src/tests/types
+  - packages/sdk/src/tests/abis
+  - packages/sdk/src/tests/types

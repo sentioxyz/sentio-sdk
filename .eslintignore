@@ -1,9 +1,10 @@
 .*
-*.config.js
+jest.config.js
+release.config.js
 dist
 lib
 docs
 gen
 types
 builtin
-sdk/templates
+templates

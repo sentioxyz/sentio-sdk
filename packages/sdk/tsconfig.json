@@ -1,5 +1,5 @@
 {
-  "extends": "../tsconfig.json",
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
     "inlineSources": true,
     "rootDir": "./src",
@@ -9,5 +9,5 @@
     },
     "outDir": "lib"
   },
-  "exclude": ["lib", "templates"]
+  "exclude": ["lib", "src/target-ethers-sentio", "src/aptos-codegen"]
 }
