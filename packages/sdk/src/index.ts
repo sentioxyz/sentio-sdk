@@ -1,6 +1,5 @@
 export { getProvider, setProvider, DummyProvider } from './provider'
-export { transformEtherError } from './error'
-export { EthersError } from './error'
+export { transformEtherError, EthersError } from './error'
 
 export { getProcessor, addProcessor, getContractByABI, addContractByABI } from './binds'
 

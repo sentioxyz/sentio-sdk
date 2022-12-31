@@ -1,7 +1,6 @@
 import { BytesLike } from '@ethersproject/bytes'
 import { Block, Log, getNetwork } from '@ethersproject/providers'
 import { BaseContract, Event, EventFilter } from '@ethersproject/contracts'
-import Long from 'long'
 
 import { BoundContractView, ContractContext, ContractView } from './context'
 import { AddressType, HandleInterval, ProcessResult } from '@sentio/protos'
@@ -44,21 +43,13 @@ export abstract class BaseProcessor<
       address: config.address,
       name: config.name || '',
       network: config.network ? config.network : 1,
-      startBlock: new Long(0),
+      startBlock: 0n,
     }
     if (config.startBlock) {
-      if (typeof config.startBlock === 'number') {
-        this.config.startBlock = Long.fromNumber(config.startBlock)
-      } else {
-        this.config.startBlock = config.startBlock
-      }
+      this.config.startBlock = BigInt(config.startBlock)
     }
     if (config.endBlock) {
-      if (typeof config.endBlock === 'number') {
-        this.config.endBlock = Long.fromNumber(config.endBlock)
-      } else {
-        this.config.endBlock = config.endBlock
-      }
+      this.config.endBlock = BigInt(config.endBlock)
     }
   }
 

@@ -1,14 +1,13 @@
 import { ProcessResult } from '@sentio/protos'
 import { SolanaContext } from './solana-context'
-import Long from 'long'
 import { Instruction } from '@project-serum/anchor'
 import { SolanaBindOptions } from './solana-options'
 import { ListStateStorage } from '@sentio/base'
 import { CHAIN_IDS } from '../utils/chain'
 
 type IndexConfigure = {
-  startSlot: Long
-  endSlot?: Long
+  startSlot: bigint
+  endSlot?: bigint
 }
 
 export type SolanaInstructionHandler = (instruction: Instruction, ctx: SolanaContext, accounts?: string[]) => void
@@ -24,7 +23,7 @@ export class SolanaBaseProcessor {
   contractName: string
   network: string
   processInnerInstruction: boolean
-  config: IndexConfigure = { startSlot: new Long(0) }
+  config: IndexConfigure = { startSlot: 0n }
   decodeInstruction: (rawInstruction: string) => Instruction | null
   fromParsedInstruction: (instruction: { type: string; info: any }) => Instruction | null
 
@@ -80,7 +79,7 @@ export class SolanaBaseProcessor {
     parsedInstruction: Instruction,
     accounts: string[],
     handler: SolanaInstructionHandler,
-    slot: Long
+    slot: bigint
   ): ProcessResult {
     const ctx = new SolanaContext(this.contractName, this.network, this.address, slot)
     handler(parsedInstruction, ctx, accounts)
@@ -91,19 +90,13 @@ export class SolanaBaseProcessor {
     return this.address !== null
   }
 
-  public startSlot(startSlot: Long | number) {
-    if (typeof startSlot === 'number') {
-      startSlot = Long.fromNumber(startSlot)
-    }
-    this.config.startSlot = startSlot
+  public startSlot(startSlot: bigint | number) {
+    this.config.startSlot = BigInt(startSlot)
     return this
   }
 
-  public endBlock(endBlock: Long | number) {
-    if (typeof endBlock === 'number') {
-      endBlock = Long.fromNumber(endBlock)
-    }
-    this.config.endSlot = endBlock
+  public endBlock(endBlock: bigint | number) {
+    this.config.endSlot = BigInt(endBlock)
     return this
   }
 }

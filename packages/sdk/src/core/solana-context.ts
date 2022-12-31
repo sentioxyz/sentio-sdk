@@ -1,5 +1,4 @@
 import { BaseContext } from './base-context'
-import Long from 'long'
 import { Labels } from './metadata'
 import { RecordMetaData } from '@sentio/sdk'
 import { CHAIN_IDS } from '../utils/chain'
@@ -9,9 +8,9 @@ export class SolanaContext extends BaseContext {
   network: string
   address: string
   programName: string
-  blockNumber: Long
+  blockNumber: bigint
 
-  constructor(programName: string, network: string, address: string, slot: Long) {
+  constructor(programName: string, network: string, address: string, slot: bigint) {
     super()
     this.network = network || CHAIN_IDS.SOLANA_MAINNET
     this.programName = programName

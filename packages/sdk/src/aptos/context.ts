@@ -1,4 +1,3 @@
-import Long from 'long'
 import { RecordMetaData } from '@sentio/protos'
 import { Labels } from '../core/metadata'
 import { normalizeLabels } from '../core/meter'
@@ -34,7 +33,7 @@ export class AptosContext extends BaseContext {
     return {
       address: this.address,
       contractName: this.moduleName,
-      blockNumber: Long.fromString(this.version.toString()),
+      blockNumber: this.version,
       transactionIndex: 0,
       transactionHash: this.transaction?.hash || '', // TODO
       logIndex: 0,
@@ -63,7 +62,7 @@ export class AptosResourceContext extends BaseContext {
     return {
       address: this.address,
       contractName: 'resources',
-      blockNumber: Long.fromString(this.version.toString()),
+      blockNumber: this.version,
       transactionIndex: 0,
       transactionHash: '',
       logIndex: 0,

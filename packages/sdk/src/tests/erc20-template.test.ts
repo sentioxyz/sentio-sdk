@@ -1,7 +1,6 @@
 import { expect } from 'chai'
 
 import { StartRequest } from '@sentio/protos'
-import Long from 'long'
 import { TestProcessorServer } from '../testing'
 import { ERC20Processor, ERC20ProcessorTemplate } from '../builtin/internal/erc20_processor'
 
@@ -42,8 +41,8 @@ describe('Test Template', () => {
             chainId: '1',
             abi: '',
           },
-          startBlock: Long.ZERO,
-          endBlock: Long.ZERO,
+          startBlock: 0n,
+          endBlock: 0n,
           templateId: 0,
         },
       ],

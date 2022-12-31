@@ -4,8 +4,6 @@ import { expect } from 'chai'
 
 import { HandlerType } from '..'
 
-import Long from 'long'
-import { TextEncoder } from 'util'
 import { TestProcessorServer, firstCounterValue } from '../testing'
 
 describe('Test Solana Example', () => {
@@ -26,13 +24,13 @@ describe('Test Solana Example', () => {
     const instructions = [
       {
         instructionData: '33G5T8yXAQWdH8FX7fTy1mBJ6e4dUKfQWbViSrT7qJjpS8UAA3ftEQx9sNzrkaJm56xtENhDsWf',
-        slot: Long.fromNumber(12345),
+        slot: 12345n,
         programAccountId: 'wormDTUJ6AWPNvk59vGQbDvGJmqbDTdgWgAqcLBCgUb',
         accounts: ['worm'],
       },
       {
         instructionData: '33G5T8yXAQWdH8FX7fTy1mBJ6e4dUKfQWbViSrT7qJjpS8UAA3ftEQx9sNzrkaJm56xtENhDsWf',
-        slot: Long.fromNumber(1),
+        slot: 1n,
         programAccountId: 'wormDTUJ6AWPNvk59vGQbDvGJmqbDTdgWgAqcLBCgUb',
         accounts: ['worm'],
       },
@@ -41,7 +39,7 @@ describe('Test Solana Example', () => {
     const res = await service.testInstructions(instructions)
     expect(res.result?.counters).length(4)
     expect(res.result?.gauges).length(0)
-    expect(res.result?.counters[0].metadata?.blockNumber.toInt()).equal(12345)
+    expect(res.result?.counters[0].metadata?.blockNumber).equal(12345n)
     expect(firstCounterValue(res.result, 'total_transfer_amount')).equal(1000000n)
     expect(firstCounterValue(res.result, 'worm')).equal(1000000n)
     expect(res.result?.counters[0].runtimeInfo?.from).equals(HandlerType.SOL_INSTRUCTION)
@@ -60,7 +58,7 @@ describe('Test Solana Example', () => {
     const instructions = [
       {
         instructionData: '',
-        slot: Long.fromNumber(0),
+        slot: 0n,
         programAccountId: 'wormDTUJ6AWPNvk59vGQbDvGJmqbDTdgWgAqcLBCgUb',
         parsed: parsedIns,
         accounts: [],
@@ -69,7 +67,7 @@ describe('Test Solana Example', () => {
     const res = await service.testInstructions(instructions)
     expect(res.result?.counters).length(1)
     expect(res.result?.gauges).length(0)
-    expect(res.result?.counters[0].metadata?.blockNumber.toInt()).equal(0)
+    expect(res.result?.counters[0].metadata?.blockNumber).equal(0n)
     expect(firstCounterValue(res.result, 'totalWeth_supply')).equal(12000000000000)
     expect(res.result?.counters[0].runtimeInfo?.from).equals(HandlerType.SOL_INSTRUCTION)
   })

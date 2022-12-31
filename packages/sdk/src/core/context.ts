@@ -1,8 +1,7 @@
-import { RecordMetaData, ProcessResult } from '@sentio/protos'
+import { RecordMetaData } from '@sentio/protos'
 import { BaseContract, EventFilter } from 'ethers'
 import { Block, Log } from '@ethersproject/abstract-provider'
 import { normalizeLabels } from './meter'
-import Long from 'long'
 import { Trace } from './trace'
 import { Labels } from './metadata'
 import { CHAIN_IDS } from '../utils/chain'
@@ -14,7 +13,7 @@ export abstract class EthContext extends BaseContext {
   log?: Log
   block?: Block
   trace?: Trace
-  blockNumber: Long
+  blockNumber: bigint | number
   transactionHash?: string
 
   protected constructor(chainId: number, address: string, block?: Block, log?: Log, trace?: Trace) {
@@ -25,12 +24,12 @@ export abstract class EthContext extends BaseContext {
     this.trace = trace
     this.address = address
     if (log) {
-      this.blockNumber = Long.fromNumber(log.blockNumber, true)
+      this.blockNumber = log.blockNumber
       this.transactionHash = log.transactionHash
     } else if (block) {
-      this.blockNumber = Long.fromNumber(block.number, true)
+      this.blockNumber = block.number
     } else if (trace) {
-      this.blockNumber = Long.fromNumber(trace.blockNumber, true)
+      this.blockNumber = trace.blockNumber
       this.transactionHash = trace.transactionHash
     }
   }
@@ -42,7 +41,7 @@ export abstract class EthContext extends BaseContext {
       return {
         address: this.address,
         contractName: this.getContractName(),
-        blockNumber: this.blockNumber,
+        blockNumber: BigInt(this.blockNumber),
         transactionIndex: this.log.transactionIndex,
         transactionHash: this.transactionHash || '',
         logIndex: this.log.logIndex,
@@ -55,7 +54,7 @@ export abstract class EthContext extends BaseContext {
       return {
         address: this.address,
         contractName: this.getContractName(),
-        blockNumber: this.blockNumber,
+        blockNumber: BigInt(this.blockNumber),
         transactionIndex: -1,
         transactionHash: '',
         logIndex: -1,
@@ -68,7 +67,7 @@ export abstract class EthContext extends BaseContext {
       return {
         address: this.address,
         contractName: this.getContractName(),
-        blockNumber: this.blockNumber,
+        blockNumber: BigInt(this.blockNumber),
         transactionIndex: this.trace.transactionPosition,
         transactionHash: this.transactionHash || '',
         logIndex: -1,
@@ -159,9 +158,9 @@ export class BoundContractView<TContract extends BaseContract, TContractView ext
 export class SuiContext extends BaseContext {
   address: string
   moduleName: string
-  blockNumber: Long
+  blockNumber: bigint
 
-  constructor(address: string, slot: Long) {
+  constructor(address: string, slot: bigint) {
     super()
     this.address = address
     this.blockNumber = slot

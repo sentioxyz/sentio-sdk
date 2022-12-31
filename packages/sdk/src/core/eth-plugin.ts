@@ -16,7 +16,6 @@ import { Block, Log } from '@ethersproject/abstract-provider'
 import { Trace } from '@sentio/sdk'
 import { ProcessorState } from '../binds'
 import { AccountProcessorState } from './account-processor'
-import Long from 'long'
 
 export class EthPlugin implements Plugin {
   name: string = 'EthPlugin'
@@ -118,7 +117,7 @@ export class EthPlugin implements Plugin {
       const accountConfig: AccountConfig = {
         address: processor.config.address,
         chainId: processor.getChainId().toString(),
-        startBlock: processor.config.startBlock ? Long.fromValue(processor.config.startBlock) : Long.ZERO,
+        startBlock: processor.config.startBlock ? BigInt(processor.config.startBlock) : 0n,
         aptosIntervalConfigs: [],
         intervalConfigs: [],
         logConfigs: [],

@@ -1,18 +1,17 @@
 import { SuiContext } from './context'
 import { ProcessResult } from '@sentio/protos'
-import Long from 'long'
 import { ListStateStorage } from '@sentio/base'
 
 type IndexConfigure = {
-  startSeqNumber: Long
-  endSeqNumber?: Long
+  startSeqNumber: bigint
+  endSeqNumber?: bigint
 }
 
 export class SuiBindOptions {
   address: string
   // network?: Networkish = 1
   // name?: string
-  startBlock?: Long | number
+  startBlock?: bigint | number
   // endBlock?: Long | number
 }
 
@@ -23,7 +22,7 @@ export class SuiProcessorState extends ListStateStorage<SuiBaseProcessor> {
 export class SuiBaseProcessor {
   public transactionHanlder: (transaction: any, ctx: SuiContext) => void
   address: string
-  config: IndexConfigure = { startSeqNumber: new Long(0) }
+  config: IndexConfigure = { startSeqNumber: 0n }
 
   constructor(name: string, options: SuiBindOptions) {
     this.address = options.address
@@ -38,7 +37,7 @@ export class SuiBaseProcessor {
     return this
   }
 
-  public handleTransaction(txn: any, slot: Long): ProcessResult | null {
+  public handleTransaction(txn: any, slot: bigint): ProcessResult | null {
     const ctx = new SuiContext(this.address, slot)
 
     if (txn) {
@@ -47,19 +46,13 @@ export class SuiBaseProcessor {
     return ctx.getProcessResult()
   }
 
-  public startSlot(startSlot: Long | number) {
-    if (typeof startSlot === 'number') {
-      startSlot = Long.fromNumber(startSlot)
-    }
-    this.config.startSeqNumber = startSlot
+  public startSlot(startSlot: bigint | number) {
+    this.config.startSeqNumber = BigInt(startSlot)
     return this
   }
 
-  public endBlock(endBlock: Long | number) {
-    if (typeof endBlock === 'number') {
-      endBlock = Long.fromNumber(endBlock)
-    }
-    this.config.endSeqNumber = endBlock
+  public endBlock(endBlock: bigint | number) {
+    this.config.endSeqNumber = BigInt(endBlock)
     return this
   }
 }

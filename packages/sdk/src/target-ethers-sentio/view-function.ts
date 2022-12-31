@@ -61,7 +61,7 @@ export function generateBoundViewFunction(fn: FunctionDeclaration, includeArgTyp
     try {
       if (!overrides && this.context) {
         overrides = {
-          blockTag: this.context.blockNumber.toNumber(),
+          blockTag: toBlockTag(this.context.blockNumber),
         }
       }
       if (overrides) {

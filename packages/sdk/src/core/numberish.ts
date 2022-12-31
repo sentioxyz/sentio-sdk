@@ -2,9 +2,19 @@ import { BigNumber } from 'ethers'
 import { BigInteger, MetricValue } from '@sentio/protos'
 import { BigDecimal } from '.'
 import { BN } from '@project-serum/anchor'
-import Long from 'long'
+import { BlockTag } from '@ethersproject/providers'
 
 export type Numberish = number | BigNumber | bigint | BigDecimal
+
+export function toBlockTag(a: number | bigint): BlockTag {
+  if (typeof a === 'number') {
+    return a
+  }
+  if (a > Number.MAX_SAFE_INTEGER) {
+    return '0x' + a.toString(16)
+  }
+  return Number(a)
+}
 
 export function toMetricValue(value: Numberish): MetricValue {
   if (value instanceof BigNumber) {
@@ -114,8 +124,4 @@ function hexToBigInteger(hex: string, negative: boolean): BigInteger {
     negative: negative,
     data: new Uint8Array(buffer),
   }
-}
-
-export function toBigInt(v: Long): bigint {
-  return BigInt(v.toString())
 }

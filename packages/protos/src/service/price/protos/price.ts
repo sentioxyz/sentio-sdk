@@ -1,5 +1,4 @@
 /* eslint-disable */
-import Long from 'long'
 import type { CallContext, CallOptions } from 'nice-grpc-common'
 import _m0 from 'protobufjs/minimal'
 import { Timestamp } from '../../../google/protobuf/timestamp'
@@ -289,8 +288,6 @@ type Builtin = Date | Function | Uint8Array | string | number | boolean | undefi
 
 type DeepPartial<T> = T extends Builtin
   ? T
-  : T extends Long
-  ? string | number | Long
   : T extends Array<infer U>
   ? Array<DeepPartial<U>>
   : T extends ReadonlyArray<infer U>
@@ -300,13 +297,13 @@ type DeepPartial<T> = T extends Builtin
   : Partial<T>
 
 function toTimestamp(date: Date): Timestamp {
-  const seconds = numberToLong(date.getTime() / 1_000)
+  const seconds = BigInt(Math.trunc(date.getTime() / 1_000))
   const nanos = (date.getTime() % 1_000) * 1_000_000
   return { seconds, nanos }
 }
 
 function fromTimestamp(t: Timestamp): Date {
-  let millis = t.seconds.toNumber() * 1_000
+  let millis = Number(t.seconds.toString()) * 1_000
   millis += t.nanos / 1_000_000
   return new Date(millis)
 }
@@ -319,15 +316,6 @@ function fromJsonTimestamp(o: any): Date {
   } else {
     return fromTimestamp(Timestamp.fromJSON(o))
   }
-}
-
-function numberToLong(number: number) {
-  return Long.fromNumber(number)
-}
-
-if (_m0.util.Long !== Long) {
-  _m0.util.Long = Long as any
-  _m0.configure()
 }
 
 function isSet(value: any): boolean {

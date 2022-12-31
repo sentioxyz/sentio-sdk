@@ -16,7 +16,6 @@ import { Empty } from '@sentio/protos/lib/google/protobuf/empty'
 import { ChainConfig } from '../chain-config'
 import { CHAIN_MAP } from '../utils/chain'
 import { Block, Log } from '@ethersproject/abstract-provider'
-import Long from 'long'
 import { getNetwork, Networkish } from '@ethersproject/providers'
 import { Endpoints } from '../endpoints'
 import { State } from '@sentio/base'
@@ -282,11 +281,11 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
       if (contract.contract?.chainId !== getNetwork(network).chainId.toString()) {
         continue
       }
-      const longBlockNumber = Long.fromNumber(block.number)
+      const longBlockNumber = block.number
       if (longBlockNumber < contract.startBlock) {
         continue
       }
-      if (contract.endBlock !== Long.ZERO && longBlockNumber >= contract.endBlock) {
+      if (contract.endBlock !== 0n && longBlockNumber >= contract.endBlock) {
         continue
       }
 

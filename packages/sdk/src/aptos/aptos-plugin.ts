@@ -16,8 +16,6 @@ import { ServerError, Status } from 'nice-grpc'
 
 import { MoveResource, Transaction_UserTransaction } from 'aptos-sdk/src/generated'
 import { AptosAccountProcessorState, AptosProcessorState, MoveResourcesWithVersionPayload } from './aptos-processor'
-import { toBigInt } from '../core/numberish'
-import Long from 'long'
 
 export class AptosPlugin implements Plugin {
   name: string = 'AptosPlugin'
@@ -40,7 +38,7 @@ export class AptosPlugin implements Plugin {
         intervalConfigs: [],
         logConfigs: [],
         traceConfigs: [],
-        startBlock: Long.fromString(aptosProcessor.config.startVersion.toString()),
+        startBlock: aptosProcessor.config.startVersion,
         endBlock: DEFAULT_MAX_BLOCK,
         instructionConfig: undefined,
         aptosEventConfigs: [],
@@ -84,7 +82,7 @@ export class AptosPlugin implements Plugin {
       const accountConfig: AccountConfig = {
         address: aptosProcessor.config.address,
         chainId: aptosProcessor.getChainId(),
-        startBlock: Long.fromValue(aptosProcessor.config.startVersion.toString()),
+        startBlock: aptosProcessor.config.startVersion,
         aptosIntervalConfigs: [],
         intervalConfigs: [],
         logConfigs: [],
@@ -161,20 +159,20 @@ export class AptosPlugin implements Plugin {
       timestamp: 0,
     }
     if (binding.data.aptResource?.resources) {
-      if (binding.data.aptResource.timestampMicros.greaterThan(Number.MAX_SAFE_INTEGER)) {
+      if (binding.data.aptResource.timestampMicros > Number.MAX_SAFE_INTEGER) {
         throw new ServerError(Status.INVALID_ARGUMENT, 'timestamp is too large')
       }
-      resource.timestamp = binding.data.aptResource.timestampMicros.toNumber()
-      resource.version = toBigInt(binding.data.aptResource.version)
+      resource.timestamp = Number(binding.data.aptResource.timestampMicros)
+      resource.version = binding.data.aptResource.version
       resource.resources = binding.data.aptResource.resources as MoveResource[]
     } else {
       const jsonString = Utf8ArrayToStr(binding.data.raw)
       const json = JSON.parse(jsonString)
-      if (Long.fromString(json.timestamp).greaterThan(Number.MAX_SAFE_INTEGER)) {
+      if (BigInt(json.timestamp) > Number.MAX_SAFE_INTEGER) {
         throw new ServerError(Status.INVALID_ARGUMENT, 'timestamp is too large')
       }
       resource.timestamp = parseInt(json.timestamp)
-      resource.version = toBigInt(json.version)
+      resource.version = BigInt(json.version)
     }
 
     const promises: Promise<ProcessResult>[] = []

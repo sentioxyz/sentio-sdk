@@ -274,8 +274,8 @@ export interface ContractConfig {
   aptosEventConfigs: AptosEventHandlerConfig[];
   aptosCallConfigs: AptosCallHandlerConfig[];
   instructionConfig: InstructionHandlerConfig | undefined;
-  startBlock: Long;
-  endBlock: Long;
+  startBlock: bigint;
+  endBlock: bigint;
   processorType: string;
 }
 
@@ -352,7 +352,7 @@ export interface AggregationConfig {
 export interface AccountConfig {
   chainId: string;
   address: string;
-  startBlock: Long;
+  startBlock: bigint;
   intervalConfigs: OnIntervalConfig[];
   aptosIntervalConfigs: AptosOnIntervalConfig[];
   logConfigs: LogHandlerConfig[];
@@ -385,8 +385,8 @@ export interface ContractInfo {
 
 export interface TemplateInstance {
   contract: ContractInfo | undefined;
-  startBlock: Long;
-  endBlock: Long;
+  startBlock: bigint;
+  endBlock: bigint;
   templateId: number;
 }
 
@@ -458,7 +458,7 @@ export interface ProcessBindingResponse {
 export interface RawTransaction {
   raw: Uint8Array;
   programAccountId?: string | undefined;
-  slot?: Long | undefined;
+  slot?: bigint | undefined;
 }
 
 export interface Data {
@@ -495,7 +495,7 @@ export interface Data_EthTrace {
 
 export interface Data_SolInstruction {
   instructionData: string;
-  slot: Long;
+  slot: bigint;
   programAccountId: string;
   accounts: string[];
   parsed?: { [key: string]: any } | undefined;
@@ -511,8 +511,8 @@ export interface Data_AptCall {
 
 export interface Data_AptResource {
   resources: { [key: string]: any }[];
-  version: Long;
-  timestampMicros: Long;
+  version: bigint;
+  timestampMicros: bigint;
 }
 
 export interface DataBinding {
@@ -532,7 +532,7 @@ export interface ProcessResult {
 export interface RecordMetaData {
   address: string;
   contractName: string;
-  blockNumber: Long;
+  blockNumber: bigint;
   transactionHash: string;
   chainId: string;
   transactionIndex: number;
@@ -850,8 +850,8 @@ function createBaseContractConfig(): ContractConfig {
     aptosEventConfigs: [],
     aptosCallConfigs: [],
     instructionConfig: undefined,
-    startBlock: Long.UZERO,
-    endBlock: Long.UZERO,
+    startBlock: BigInt("0"),
+    endBlock: BigInt("0"),
     processorType: "",
   };
 }
@@ -879,11 +879,11 @@ export const ContractConfig = {
     if (message.instructionConfig !== undefined) {
       InstructionHandlerConfig.encode(message.instructionConfig, writer.uint32(50).fork()).ldelim();
     }
-    if (!message.startBlock.isZero()) {
-      writer.uint32(32).uint64(message.startBlock);
+    if (message.startBlock !== BigInt("0")) {
+      writer.uint32(32).uint64(message.startBlock.toString());
     }
-    if (!message.endBlock.isZero()) {
-      writer.uint32(40).uint64(message.endBlock);
+    if (message.endBlock !== BigInt("0")) {
+      writer.uint32(40).uint64(message.endBlock.toString());
     }
     if (message.processorType !== "") {
       writer.uint32(66).string(message.processorType);
@@ -920,10 +920,10 @@ export const ContractConfig = {
           message.instructionConfig = InstructionHandlerConfig.decode(reader, reader.uint32());
           break;
         case 4:
-          message.startBlock = reader.uint64() as Long;
+          message.startBlock = longToBigint(reader.uint64() as Long);
           break;
         case 5:
-          message.endBlock = reader.uint64() as Long;
+          message.endBlock = longToBigint(reader.uint64() as Long);
           break;
         case 8:
           message.processorType = reader.string();
@@ -957,8 +957,8 @@ export const ContractConfig = {
       instructionConfig: isSet(object.instructionConfig)
         ? InstructionHandlerConfig.fromJSON(object.instructionConfig)
         : undefined,
-      startBlock: isSet(object.startBlock) ? Long.fromValue(object.startBlock) : Long.UZERO,
-      endBlock: isSet(object.endBlock) ? Long.fromValue(object.endBlock) : Long.UZERO,
+      startBlock: isSet(object.startBlock) ? BigInt(object.startBlock) : BigInt("0"),
+      endBlock: isSet(object.endBlock) ? BigInt(object.endBlock) : BigInt("0"),
       processorType: isSet(object.processorType) ? String(object.processorType) : "",
     };
   },
@@ -995,8 +995,8 @@ export const ContractConfig = {
     message.instructionConfig !== undefined && (obj.instructionConfig = message.instructionConfig
       ? InstructionHandlerConfig.toJSON(message.instructionConfig)
       : undefined);
-    message.startBlock !== undefined && (obj.startBlock = (message.startBlock || Long.UZERO).toString());
-    message.endBlock !== undefined && (obj.endBlock = (message.endBlock || Long.UZERO).toString());
+    message.startBlock !== undefined && (obj.startBlock = message.startBlock.toString());
+    message.endBlock !== undefined && (obj.endBlock = message.endBlock.toString());
     message.processorType !== undefined && (obj.processorType = message.processorType);
     return obj;
   },
@@ -1014,12 +1014,8 @@ export const ContractConfig = {
     message.instructionConfig = (object.instructionConfig !== undefined && object.instructionConfig !== null)
       ? InstructionHandlerConfig.fromPartial(object.instructionConfig)
       : undefined;
-    message.startBlock = (object.startBlock !== undefined && object.startBlock !== null)
-      ? Long.fromValue(object.startBlock)
-      : Long.UZERO;
-    message.endBlock = (object.endBlock !== undefined && object.endBlock !== null)
-      ? Long.fromValue(object.endBlock)
-      : Long.UZERO;
+    message.startBlock = object.startBlock ?? BigInt("0");
+    message.endBlock = object.endBlock ?? BigInt("0");
     message.processorType = object.processorType ?? "";
     return message;
   },
@@ -1504,7 +1500,7 @@ function createBaseAccountConfig(): AccountConfig {
   return {
     chainId: "",
     address: "",
-    startBlock: Long.UZERO,
+    startBlock: BigInt("0"),
     intervalConfigs: [],
     aptosIntervalConfigs: [],
     logConfigs: [],
@@ -1519,8 +1515,8 @@ export const AccountConfig = {
     if (message.address !== "") {
       writer.uint32(18).string(message.address);
     }
-    if (!message.startBlock.isZero()) {
-      writer.uint32(24).uint64(message.startBlock);
+    if (message.startBlock !== BigInt("0")) {
+      writer.uint32(24).uint64(message.startBlock.toString());
     }
     for (const v of message.intervalConfigs) {
       OnIntervalConfig.encode(v!, writer.uint32(34).fork()).ldelim();
@@ -1548,7 +1544,7 @@ export const AccountConfig = {
           message.address = reader.string();
           break;
         case 3:
-          message.startBlock = reader.uint64() as Long;
+          message.startBlock = longToBigint(reader.uint64() as Long);
           break;
         case 4:
           message.intervalConfigs.push(OnIntervalConfig.decode(reader, reader.uint32()));
@@ -1571,7 +1567,7 @@ export const AccountConfig = {
     return {
       chainId: isSet(object.chainId) ? String(object.chainId) : "",
       address: isSet(object.address) ? String(object.address) : "",
-      startBlock: isSet(object.startBlock) ? Long.fromValue(object.startBlock) : Long.UZERO,
+      startBlock: isSet(object.startBlock) ? BigInt(object.startBlock) : BigInt("0"),
       intervalConfigs: Array.isArray(object?.intervalConfigs)
         ? object.intervalConfigs.map((e: any) => OnIntervalConfig.fromJSON(e))
         : [],
@@ -1588,7 +1584,7 @@ export const AccountConfig = {
     const obj: any = {};
     message.chainId !== undefined && (obj.chainId = message.chainId);
     message.address !== undefined && (obj.address = message.address);
-    message.startBlock !== undefined && (obj.startBlock = (message.startBlock || Long.UZERO).toString());
+    message.startBlock !== undefined && (obj.startBlock = message.startBlock.toString());
     if (message.intervalConfigs) {
       obj.intervalConfigs = message.intervalConfigs.map((e) => e ? OnIntervalConfig.toJSON(e) : undefined);
     } else {
@@ -1613,9 +1609,7 @@ export const AccountConfig = {
     const message = createBaseAccountConfig();
     message.chainId = object.chainId ?? "";
     message.address = object.address ?? "";
-    message.startBlock = (object.startBlock !== undefined && object.startBlock !== null)
-      ? Long.fromValue(object.startBlock)
-      : Long.UZERO;
+    message.startBlock = object.startBlock ?? BigInt("0");
     message.intervalConfigs = object.intervalConfigs?.map((e) => OnIntervalConfig.fromPartial(e)) || [];
     message.aptosIntervalConfigs = object.aptosIntervalConfigs?.map((e) => AptosOnIntervalConfig.fromPartial(e)) || [];
     message.logConfigs = object.logConfigs?.map((e) => LogHandlerConfig.fromPartial(e)) || [];
@@ -1910,7 +1904,7 @@ export const ContractInfo = {
 };
 
 function createBaseTemplateInstance(): TemplateInstance {
-  return { contract: undefined, startBlock: Long.UZERO, endBlock: Long.UZERO, templateId: 0 };
+  return { contract: undefined, startBlock: BigInt("0"), endBlock: BigInt("0"), templateId: 0 };
 }
 
 export const TemplateInstance = {
@@ -1918,11 +1912,11 @@ export const TemplateInstance = {
     if (message.contract !== undefined) {
       ContractInfo.encode(message.contract, writer.uint32(10).fork()).ldelim();
     }
-    if (!message.startBlock.isZero()) {
-      writer.uint32(16).uint64(message.startBlock);
+    if (message.startBlock !== BigInt("0")) {
+      writer.uint32(16).uint64(message.startBlock.toString());
     }
-    if (!message.endBlock.isZero()) {
-      writer.uint32(24).uint64(message.endBlock);
+    if (message.endBlock !== BigInt("0")) {
+      writer.uint32(24).uint64(message.endBlock.toString());
     }
     if (message.templateId !== 0) {
       writer.uint32(32).int32(message.templateId);
@@ -1941,10 +1935,10 @@ export const TemplateInstance = {
           message.contract = ContractInfo.decode(reader, reader.uint32());
           break;
         case 2:
-          message.startBlock = reader.uint64() as Long;
+          message.startBlock = longToBigint(reader.uint64() as Long);
           break;
         case 3:
-          message.endBlock = reader.uint64() as Long;
+          message.endBlock = longToBigint(reader.uint64() as Long);
           break;
         case 4:
           message.templateId = reader.int32();
@@ -1960,8 +1954,8 @@ export const TemplateInstance = {
   fromJSON(object: any): TemplateInstance {
     return {
       contract: isSet(object.contract) ? ContractInfo.fromJSON(object.contract) : undefined,
-      startBlock: isSet(object.startBlock) ? Long.fromValue(object.startBlock) : Long.UZERO,
-      endBlock: isSet(object.endBlock) ? Long.fromValue(object.endBlock) : Long.UZERO,
+      startBlock: isSet(object.startBlock) ? BigInt(object.startBlock) : BigInt("0"),
+      endBlock: isSet(object.endBlock) ? BigInt(object.endBlock) : BigInt("0"),
       templateId: isSet(object.templateId) ? Number(object.templateId) : 0,
     };
   },
@@ -1970,8 +1964,8 @@ export const TemplateInstance = {
     const obj: any = {};
     message.contract !== undefined &&
       (obj.contract = message.contract ? ContractInfo.toJSON(message.contract) : undefined);
-    message.startBlock !== undefined && (obj.startBlock = (message.startBlock || Long.UZERO).toString());
-    message.endBlock !== undefined && (obj.endBlock = (message.endBlock || Long.UZERO).toString());
+    message.startBlock !== undefined && (obj.startBlock = message.startBlock.toString());
+    message.endBlock !== undefined && (obj.endBlock = message.endBlock.toString());
     message.templateId !== undefined && (obj.templateId = Math.round(message.templateId));
     return obj;
   },
@@ -1981,12 +1975,8 @@ export const TemplateInstance = {
     message.contract = (object.contract !== undefined && object.contract !== null)
       ? ContractInfo.fromPartial(object.contract)
       : undefined;
-    message.startBlock = (object.startBlock !== undefined && object.startBlock !== null)
-      ? Long.fromValue(object.startBlock)
-      : Long.UZERO;
-    message.endBlock = (object.endBlock !== undefined && object.endBlock !== null)
-      ? Long.fromValue(object.endBlock)
-      : Long.UZERO;
+    message.startBlock = object.startBlock ?? BigInt("0");
+    message.endBlock = object.endBlock ?? BigInt("0");
     message.templateId = object.templateId ?? 0;
     return message;
   },
@@ -2792,7 +2782,7 @@ export const RawTransaction = {
       writer.uint32(18).string(message.programAccountId);
     }
     if (message.slot !== undefined) {
-      writer.uint32(24).uint64(message.slot);
+      writer.uint32(24).uint64(message.slot.toString());
     }
     return writer;
   },
@@ -2811,7 +2801,7 @@ export const RawTransaction = {
           message.programAccountId = reader.string();
           break;
         case 3:
-          message.slot = reader.uint64() as Long;
+          message.slot = longToBigint(reader.uint64() as Long);
           break;
         default:
           reader.skipType(tag & 7);
@@ -2825,7 +2815,7 @@ export const RawTransaction = {
     return {
       raw: isSet(object.raw) ? bytesFromBase64(object.raw) : new Uint8Array(),
       programAccountId: isSet(object.programAccountId) ? String(object.programAccountId) : undefined,
-      slot: isSet(object.slot) ? Long.fromValue(object.slot) : undefined,
+      slot: isSet(object.slot) ? BigInt(object.slot) : undefined,
     };
   },
 
@@ -2834,7 +2824,7 @@ export const RawTransaction = {
     message.raw !== undefined &&
       (obj.raw = base64FromBytes(message.raw !== undefined ? message.raw : new Uint8Array()));
     message.programAccountId !== undefined && (obj.programAccountId = message.programAccountId);
-    message.slot !== undefined && (obj.slot = (message.slot || undefined).toString());
+    message.slot !== undefined && (obj.slot = message.slot.toString());
     return obj;
   },
 
@@ -2842,7 +2832,7 @@ export const RawTransaction = {
     const message = createBaseRawTransaction();
     message.raw = object.raw ?? new Uint8Array();
     message.programAccountId = object.programAccountId ?? undefined;
-    message.slot = (object.slot !== undefined && object.slot !== null) ? Long.fromValue(object.slot) : undefined;
+    message.slot = object.slot ?? undefined;
     return message;
   },
 };
@@ -3238,7 +3228,7 @@ export const Data_EthTrace = {
 };
 
 function createBaseData_SolInstruction(): Data_SolInstruction {
-  return { instructionData: "", slot: Long.UZERO, programAccountId: "", accounts: [], parsed: undefined };
+  return { instructionData: "", slot: BigInt("0"), programAccountId: "", accounts: [], parsed: undefined };
 }
 
 export const Data_SolInstruction = {
@@ -3246,8 +3236,8 @@ export const Data_SolInstruction = {
     if (message.instructionData !== "") {
       writer.uint32(10).string(message.instructionData);
     }
-    if (!message.slot.isZero()) {
-      writer.uint32(16).uint64(message.slot);
+    if (message.slot !== BigInt("0")) {
+      writer.uint32(16).uint64(message.slot.toString());
     }
     if (message.programAccountId !== "") {
       writer.uint32(26).string(message.programAccountId);
@@ -3272,7 +3262,7 @@ export const Data_SolInstruction = {
           message.instructionData = reader.string();
           break;
         case 2:
-          message.slot = reader.uint64() as Long;
+          message.slot = longToBigint(reader.uint64() as Long);
           break;
         case 3:
           message.programAccountId = reader.string();
@@ -3294,7 +3284,7 @@ export const Data_SolInstruction = {
   fromJSON(object: any): Data_SolInstruction {
     return {
       instructionData: isSet(object.instructionData) ? String(object.instructionData) : "",
-      slot: isSet(object.slot) ? Long.fromValue(object.slot) : Long.UZERO,
+      slot: isSet(object.slot) ? BigInt(object.slot) : BigInt("0"),
       programAccountId: isSet(object.programAccountId) ? String(object.programAccountId) : "",
       accounts: Array.isArray(object?.accounts) ? object.accounts.map((e: any) => String(e)) : [],
       parsed: isObject(object.parsed) ? object.parsed : undefined,
@@ -3304,7 +3294,7 @@ export const Data_SolInstruction = {
   toJSON(message: Data_SolInstruction): unknown {
     const obj: any = {};
     message.instructionData !== undefined && (obj.instructionData = message.instructionData);
-    message.slot !== undefined && (obj.slot = (message.slot || Long.UZERO).toString());
+    message.slot !== undefined && (obj.slot = message.slot.toString());
     message.programAccountId !== undefined && (obj.programAccountId = message.programAccountId);
     if (message.accounts) {
       obj.accounts = message.accounts.map((e) => e);
@@ -3318,7 +3308,7 @@ export const Data_SolInstruction = {
   fromPartial(object: DeepPartial<Data_SolInstruction>): Data_SolInstruction {
     const message = createBaseData_SolInstruction();
     message.instructionData = object.instructionData ?? "";
-    message.slot = (object.slot !== undefined && object.slot !== null) ? Long.fromValue(object.slot) : Long.UZERO;
+    message.slot = object.slot ?? BigInt("0");
     message.programAccountId = object.programAccountId ?? "";
     message.accounts = object.accounts?.map((e) => e) || [];
     message.parsed = object.parsed ?? undefined;
@@ -3421,7 +3411,7 @@ export const Data_AptCall = {
 };
 
 function createBaseData_AptResource(): Data_AptResource {
-  return { resources: [], version: Long.ZERO, timestampMicros: Long.ZERO };
+  return { resources: [], version: BigInt("0"), timestampMicros: BigInt("0") };
 }
 
 export const Data_AptResource = {
@@ -3429,11 +3419,11 @@ export const Data_AptResource = {
     for (const v of message.resources) {
       Struct.encode(Struct.wrap(v!), writer.uint32(34).fork()).ldelim();
     }
-    if (!message.version.isZero()) {
-      writer.uint32(16).int64(message.version);
+    if (message.version !== BigInt("0")) {
+      writer.uint32(16).int64(message.version.toString());
     }
-    if (!message.timestampMicros.isZero()) {
-      writer.uint32(40).int64(message.timestampMicros);
+    if (message.timestampMicros !== BigInt("0")) {
+      writer.uint32(40).int64(message.timestampMicros.toString());
     }
     return writer;
   },
@@ -3449,10 +3439,10 @@ export const Data_AptResource = {
           message.resources.push(Struct.unwrap(Struct.decode(reader, reader.uint32())));
           break;
         case 2:
-          message.version = reader.int64() as Long;
+          message.version = longToBigint(reader.int64() as Long);
           break;
         case 5:
-          message.timestampMicros = reader.int64() as Long;
+          message.timestampMicros = longToBigint(reader.int64() as Long);
           break;
         default:
           reader.skipType(tag & 7);
@@ -3465,8 +3455,8 @@ export const Data_AptResource = {
   fromJSON(object: any): Data_AptResource {
     return {
       resources: Array.isArray(object?.resources) ? [...object.resources] : [],
-      version: isSet(object.version) ? Long.fromValue(object.version) : Long.ZERO,
-      timestampMicros: isSet(object.timestampMicros) ? Long.fromValue(object.timestampMicros) : Long.ZERO,
+      version: isSet(object.version) ? BigInt(object.version) : BigInt("0"),
+      timestampMicros: isSet(object.timestampMicros) ? BigInt(object.timestampMicros) : BigInt("0"),
     };
   },
 
@@ -3477,20 +3467,16 @@ export const Data_AptResource = {
     } else {
       obj.resources = [];
     }
-    message.version !== undefined && (obj.version = (message.version || Long.ZERO).toString());
-    message.timestampMicros !== undefined && (obj.timestampMicros = (message.timestampMicros || Long.ZERO).toString());
+    message.version !== undefined && (obj.version = message.version.toString());
+    message.timestampMicros !== undefined && (obj.timestampMicros = message.timestampMicros.toString());
     return obj;
   },
 
   fromPartial(object: DeepPartial<Data_AptResource>): Data_AptResource {
     const message = createBaseData_AptResource();
     message.resources = object.resources?.map((e) => e) || [];
-    message.version = (object.version !== undefined && object.version !== null)
-      ? Long.fromValue(object.version)
-      : Long.ZERO;
-    message.timestampMicros = (object.timestampMicros !== undefined && object.timestampMicros !== null)
-      ? Long.fromValue(object.timestampMicros)
-      : Long.ZERO;
+    message.version = object.version ?? BigInt("0");
+    message.timestampMicros = object.timestampMicros ?? BigInt("0");
     return message;
   },
 };
@@ -3684,7 +3670,7 @@ function createBaseRecordMetaData(): RecordMetaData {
   return {
     address: "",
     contractName: "",
-    blockNumber: Long.UZERO,
+    blockNumber: BigInt("0"),
     transactionHash: "",
     chainId: "",
     transactionIndex: 0,
@@ -3702,8 +3688,8 @@ export const RecordMetaData = {
     if (message.contractName !== "") {
       writer.uint32(74).string(message.contractName);
     }
-    if (!message.blockNumber.isZero()) {
-      writer.uint32(16).uint64(message.blockNumber);
+    if (message.blockNumber !== BigInt("0")) {
+      writer.uint32(16).uint64(message.blockNumber.toString());
     }
     if (message.transactionHash !== "") {
       writer.uint32(50).string(message.transactionHash);
@@ -3740,7 +3726,7 @@ export const RecordMetaData = {
           message.contractName = reader.string();
           break;
         case 2:
-          message.blockNumber = reader.uint64() as Long;
+          message.blockNumber = longToBigint(reader.uint64() as Long);
           break;
         case 6:
           message.transactionHash = reader.string();
@@ -3775,7 +3761,7 @@ export const RecordMetaData = {
     return {
       address: isSet(object.address) ? String(object.address) : "",
       contractName: isSet(object.contractName) ? String(object.contractName) : "",
-      blockNumber: isSet(object.blockNumber) ? Long.fromValue(object.blockNumber) : Long.UZERO,
+      blockNumber: isSet(object.blockNumber) ? BigInt(object.blockNumber) : BigInt("0"),
       transactionHash: isSet(object.transactionHash) ? String(object.transactionHash) : "",
       chainId: isSet(object.chainId) ? String(object.chainId) : "",
       transactionIndex: isSet(object.transactionIndex) ? Number(object.transactionIndex) : 0,
@@ -3794,7 +3780,7 @@ export const RecordMetaData = {
     const obj: any = {};
     message.address !== undefined && (obj.address = message.address);
     message.contractName !== undefined && (obj.contractName = message.contractName);
-    message.blockNumber !== undefined && (obj.blockNumber = (message.blockNumber || Long.UZERO).toString());
+    message.blockNumber !== undefined && (obj.blockNumber = message.blockNumber.toString());
     message.transactionHash !== undefined && (obj.transactionHash = message.transactionHash);
     message.chainId !== undefined && (obj.chainId = message.chainId);
     message.transactionIndex !== undefined && (obj.transactionIndex = Math.round(message.transactionIndex));
@@ -3813,9 +3799,7 @@ export const RecordMetaData = {
     const message = createBaseRecordMetaData();
     message.address = object.address ?? "";
     message.contractName = object.contractName ?? "";
-    message.blockNumber = (object.blockNumber !== undefined && object.blockNumber !== null)
-      ? Long.fromValue(object.blockNumber)
-      : Long.UZERO;
+    message.blockNumber = object.blockNumber ?? BigInt("0");
     message.transactionHash = object.transactionHash ?? "";
     message.chainId = object.chainId ?? "";
     message.transactionIndex = object.transactionIndex ?? 0;
@@ -4598,10 +4582,13 @@ function base64FromBytes(arr: Uint8Array): string {
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
 type DeepPartial<T> = T extends Builtin ? T
-  : T extends Long ? string | number | Long : T extends Array<infer U> ? Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends Array<infer U> ? Array<DeepPartial<U>> : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
   : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
+
+function longToBigint(long: Long) {
+  return BigInt(long.toString());
+}
 
 if (_m0.util.Long !== Long) {
   _m0.util.Long = Long as any;

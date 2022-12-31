@@ -4,12 +4,12 @@ write_source_files(
     name = "write_gen",
     files = {
         "packages/protos/processor.proto": "//processor/protos:proto_file",
-        "packages/protos/src/gen/chainquery/protos/chainquery.ts": "//chainquery/protos:chainquery_ts_proto",
-        "packages/protos/src/gen/processor/protos/processor.ts": "//processor/protos:processor_ts_proto",
-        "packages/protos/src/gen/service/price/protos/price.ts": "//service/price/protos:protos_ts_proto",
-        "packages/protos/src/gen/google/protobuf/empty.ts": "//processor/protos:empty_ts_proto",
-        "packages/protos/src/gen/google/protobuf/struct.ts": "//processor/protos:struct_ts_proto",
-        "packages/protos/src/gen/google/protobuf/timestamp.ts": "//processor/protos:timestamp_ts_proto",
+        "packages/protos/src/chainquery/protos/chainquery.ts": "//chainquery/protos:chainquery_ts_proto",
+        "packages/protos/src/processor/protos/processor.ts": "//processor/protos:processor_ts_proto",
+        "packages/protos/src/service/price/protos/price.ts": "//service/price/protos:protos_ts_proto",
+        "packages/protos/src/google/protobuf/empty.ts": "//processor/protos:empty_ts_proto",
+        "packages/protos/src/google/protobuf/struct.ts": "//processor/protos:struct_ts_proto",
+        "packages/protos/src/google/protobuf/timestamp.ts": "//processor/protos:timestamp_ts_proto",
 
         "packages/runtime/processor_full.proto": "//processor/protos:proto_full_file",
         "packages/runtime/src/gen/processor/protos/processor.ts": "//processor/protos:processor_ts_proto",

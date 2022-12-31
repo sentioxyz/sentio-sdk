@@ -1,5 +1,4 @@
 import { Networkish } from '@ethersproject/networks'
-import Long from 'long'
 import { getNetwork } from '@ethersproject/providers'
 
 export class BindOptions {
@@ -9,8 +8,8 @@ export class BindOptions {
   network?: Networkish = 1
   // Optional, override default contract name
   name?: string
-  startBlock?: Long | number
-  endBlock?: Long | number
+  startBlock?: bigint | number
+  endBlock?: bigint | number
 }
 
 export function getOptionsSignature(opts: BindOptions): string {
@@ -34,12 +33,12 @@ export class BindInternalOptions {
   address: string
   network: Networkish
   name: string
-  startBlock: Long
-  endBlock?: Long
+  startBlock: bigint
+  endBlock?: bigint
 }
 
 export class AccountBindOptions {
   address: string
   network?: Networkish
-  startBlock?: Long | number
+  startBlock?: bigint | number
 }

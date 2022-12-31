@@ -2,7 +2,6 @@ import { expect } from 'chai'
 import { HandlerType, ProcessBindingsRequest } from '@sentio/protos'
 
 import { firstCounterValue, firstGaugeValue, TestProcessorServer } from '../testing'
-import Long from 'long'
 
 describe('Test Aptos Example', () => {
   const service = new TestProcessorServer(() => {
@@ -36,7 +35,7 @@ describe('Test Aptos Example', () => {
     const res = await service.processBindings(request)
     expect(res.result?.counters).length(1)
     expect(res.result?.gauges).length(0)
-    expect(res.result?.counters[0].metadata?.blockNumber.toInt()).equal(18483034)
+    expect(res.result?.counters[0].metadata?.blockNumber).equal(18483034n)
   })
 
   test('Check souffl3 function call dispatch', async () => {
@@ -58,7 +57,7 @@ describe('Test Aptos Example', () => {
     const res = await service.processBindings(request)
     expect(res.result?.counters).length(2)
     expect(res.result?.gauges).length(0)
-    expect(res.result?.counters[0].metadata?.blockNumber.toInt()).equal(18483034)
+    expect(res.result?.counters[0].metadata?.blockNumber).equal(18483034n)
   })
 
   test('Check souffl3 event dispatch', async () => {
@@ -83,7 +82,7 @@ describe('Test Aptos Example', () => {
     const res = await service.processBindings(request)
     expect(res.result?.counters).length(1)
     expect(res.result?.gauges).length(0)
-    expect(res.result?.counters[0].metadata?.blockNumber.toInt()).equal(18483034)
+    expect(res.result?.counters[0].metadata?.blockNumber).equal(18483034n)
     expect(res.result?.events).length(1)
   })
 
@@ -136,7 +135,7 @@ describe('Test Aptos Example', () => {
           data: {
             raw: new Uint8Array(),
             aptResource: {
-              version: Long.fromNumber(12345),
+              version: 12345n,
               resources: [
                 {
                   type: '0x1::coin::SupplyConfig',
@@ -145,7 +144,7 @@ describe('Test Aptos Example', () => {
                   },
                 },
               ],
-              timestampMicros: Long.fromNumber(1),
+              timestampMicros: 1n,
             },
           },
           handlerIds: [0],

@@ -14,7 +14,6 @@ import {
 
 import { Empty } from '@sentio/protos/lib/google/protobuf/empty'
 
-import Long from 'long'
 import { MetricState } from './core/meter'
 import { ExporterState } from './core/exporter'
 import { EventTrackerState } from './core/event-tracker'
@@ -28,7 +27,7 @@ import { PluginManager } from '@sentio/base'
   return this.toString()
 }
 
-export const DEFAULT_MAX_BLOCK = Long.ZERO
+export const DEFAULT_MAX_BLOCK = 0n
 
 export const USER_PROCESSOR = 'user_processor'
 

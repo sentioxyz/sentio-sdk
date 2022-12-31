@@ -5,8 +5,8 @@ import _m0 from 'protobufjs/minimal'
 
 export interface AptosGetTxnsByFunctionRequest {
   network: string
-  fromVersion: Long
-  toVersion: Long
+  fromVersion: bigint
+  toVersion: bigint
   function: string
   matchAll: boolean
   typedArguments: string[]
@@ -14,39 +14,39 @@ export interface AptosGetTxnsByFunctionRequest {
 
 export interface AptosGetTxnsByVersionRequest {
   network: string
-  fromVersion: Long
-  toVersion: Long
+  fromVersion: bigint
+  toVersion: bigint
   headerOnly?: boolean | undefined
 }
 
 export interface AptosGetTxnsByEventRequest {
   network: string
-  fromVersion: Long
-  toVersion: Long
+  fromVersion: bigint
+  toVersion: bigint
   address: string
   type: string
 }
 
 export interface AptosSQLQueryRequest {
   network: string
-  fromVersion: Long
-  toVersion: Long
+  fromVersion: bigint
+  toVersion: bigint
   sql: string
   arbitraryRange: boolean
 }
 
 export interface QueryPhaseSummary {
   name: string
-  timeTookMs: Long
+  timeTookMs: bigint
 }
 
 export interface QueryExecutionSummary {
-  timeTookMs: Long
-  resultNumRows?: Long | undefined
-  resultNumBytes?: Long | undefined
-  numPartitionsWithMaterializedView?: Long | undefined
-  numPartitionsWithoutMaterializedView?: Long | undefined
-  numPartitions?: Long | undefined
+  timeTookMs: bigint
+  resultNumRows?: bigint | undefined
+  resultNumBytes?: bigint | undefined
+  numPartitionsWithMaterializedView?: bigint | undefined
+  numPartitionsWithoutMaterializedView?: bigint | undefined
+  numPartitions?: bigint | undefined
   phases: QueryPhaseSummary[]
 }
 
@@ -66,9 +66,9 @@ export interface EvmSQLQueryRequest {
 
 export interface EvmGetHeaderRequest {
   network: string
-  fromBlock?: Long | undefined
-  toBlock?: Long | undefined
-  blockNumbers: Long[]
+  fromBlock?: bigint | undefined
+  toBlock?: bigint | undefined
+  blockNumbers: bigint[]
 }
 
 export interface EvmQueryResponse {
@@ -79,8 +79,8 @@ export interface EvmQueryResponse {
 function createBaseAptosGetTxnsByFunctionRequest(): AptosGetTxnsByFunctionRequest {
   return {
     network: '',
-    fromVersion: Long.UZERO,
-    toVersion: Long.UZERO,
+    fromVersion: BigInt('0'),
+    toVersion: BigInt('0'),
     function: '',
     matchAll: false,
     typedArguments: [],
@@ -92,11 +92,11 @@ export const AptosGetTxnsByFunctionRequest = {
     if (message.network !== '') {
       writer.uint32(10).string(message.network)
     }
-    if (!message.fromVersion.isZero()) {
-      writer.uint32(16).uint64(message.fromVersion)
+    if (message.fromVersion !== BigInt('0')) {
+      writer.uint32(16).uint64(message.fromVersion.toString())
     }
-    if (!message.toVersion.isZero()) {
-      writer.uint32(24).uint64(message.toVersion)
+    if (message.toVersion !== BigInt('0')) {
+      writer.uint32(24).uint64(message.toVersion.toString())
     }
     if (message.function !== '') {
       writer.uint32(34).string(message.function)
@@ -121,10 +121,10 @@ export const AptosGetTxnsByFunctionRequest = {
           message.network = reader.string()
           break
         case 2:
-          message.fromVersion = reader.uint64() as Long
+          message.fromVersion = longToBigint(reader.uint64() as Long)
           break
         case 3:
-          message.toVersion = reader.uint64() as Long
+          message.toVersion = longToBigint(reader.uint64() as Long)
           break
         case 4:
           message.function = reader.string()
@@ -146,8 +146,8 @@ export const AptosGetTxnsByFunctionRequest = {
   fromJSON(object: any): AptosGetTxnsByFunctionRequest {
     return {
       network: isSet(object.network) ? String(object.network) : '',
-      fromVersion: isSet(object.fromVersion) ? Long.fromValue(object.fromVersion) : Long.UZERO,
-      toVersion: isSet(object.toVersion) ? Long.fromValue(object.toVersion) : Long.UZERO,
+      fromVersion: isSet(object.fromVersion) ? BigInt(object.fromVersion) : BigInt('0'),
+      toVersion: isSet(object.toVersion) ? BigInt(object.toVersion) : BigInt('0'),
       function: isSet(object.function) ? String(object.function) : '',
       matchAll: isSet(object.matchAll) ? Boolean(object.matchAll) : false,
       typedArguments: Array.isArray(object?.typedArguments) ? object.typedArguments.map((e: any) => String(e)) : [],
@@ -157,8 +157,8 @@ export const AptosGetTxnsByFunctionRequest = {
   toJSON(message: AptosGetTxnsByFunctionRequest): unknown {
     const obj: any = {}
     message.network !== undefined && (obj.network = message.network)
-    message.fromVersion !== undefined && (obj.fromVersion = (message.fromVersion || Long.UZERO).toString())
-    message.toVersion !== undefined && (obj.toVersion = (message.toVersion || Long.UZERO).toString())
+    message.fromVersion !== undefined && (obj.fromVersion = message.fromVersion.toString())
+    message.toVersion !== undefined && (obj.toVersion = message.toVersion.toString())
     message.function !== undefined && (obj.function = message.function)
     message.matchAll !== undefined && (obj.matchAll = message.matchAll)
     if (message.typedArguments) {
@@ -172,10 +172,8 @@ export const AptosGetTxnsByFunctionRequest = {
   fromPartial(object: DeepPartial<AptosGetTxnsByFunctionRequest>): AptosGetTxnsByFunctionRequest {
     const message = createBaseAptosGetTxnsByFunctionRequest()
     message.network = object.network ?? ''
-    message.fromVersion =
-      object.fromVersion !== undefined && object.fromVersion !== null ? Long.fromValue(object.fromVersion) : Long.UZERO
-    message.toVersion =
-      object.toVersion !== undefined && object.toVersion !== null ? Long.fromValue(object.toVersion) : Long.UZERO
+    message.fromVersion = object.fromVersion ?? BigInt('0')
+    message.toVersion = object.toVersion ?? BigInt('0')
     message.function = object.function ?? ''
     message.matchAll = object.matchAll ?? false
     message.typedArguments = object.typedArguments?.map((e) => e) || []
@@ -184,7 +182,7 @@ export const AptosGetTxnsByFunctionRequest = {
 }
 
 function createBaseAptosGetTxnsByVersionRequest(): AptosGetTxnsByVersionRequest {
-  return { network: '', fromVersion: Long.UZERO, toVersion: Long.UZERO, headerOnly: undefined }
+  return { network: '', fromVersion: BigInt('0'), toVersion: BigInt('0'), headerOnly: undefined }
 }
 
 export const AptosGetTxnsByVersionRequest = {
@@ -192,11 +190,11 @@ export const AptosGetTxnsByVersionRequest = {
     if (message.network !== '') {
       writer.uint32(10).string(message.network)
     }
-    if (!message.fromVersion.isZero()) {
-      writer.uint32(16).uint64(message.fromVersion)
+    if (message.fromVersion !== BigInt('0')) {
+      writer.uint32(16).uint64(message.fromVersion.toString())
     }
-    if (!message.toVersion.isZero()) {
-      writer.uint32(24).uint64(message.toVersion)
+    if (message.toVersion !== BigInt('0')) {
+      writer.uint32(24).uint64(message.toVersion.toString())
     }
     if (message.headerOnly !== undefined) {
       writer.uint32(32).bool(message.headerOnly)
@@ -215,10 +213,10 @@ export const AptosGetTxnsByVersionRequest = {
           message.network = reader.string()
           break
         case 2:
-          message.fromVersion = reader.uint64() as Long
+          message.fromVersion = longToBigint(reader.uint64() as Long)
           break
         case 3:
-          message.toVersion = reader.uint64() as Long
+          message.toVersion = longToBigint(reader.uint64() as Long)
           break
         case 4:
           message.headerOnly = reader.bool()
@@ -234,8 +232,8 @@ export const AptosGetTxnsByVersionRequest = {
   fromJSON(object: any): AptosGetTxnsByVersionRequest {
     return {
       network: isSet(object.network) ? String(object.network) : '',
-      fromVersion: isSet(object.fromVersion) ? Long.fromValue(object.fromVersion) : Long.UZERO,
-      toVersion: isSet(object.toVersion) ? Long.fromValue(object.toVersion) : Long.UZERO,
+      fromVersion: isSet(object.fromVersion) ? BigInt(object.fromVersion) : BigInt('0'),
+      toVersion: isSet(object.toVersion) ? BigInt(object.toVersion) : BigInt('0'),
       headerOnly: isSet(object.headerOnly) ? Boolean(object.headerOnly) : undefined,
     }
   },
@@ -243,8 +241,8 @@ export const AptosGetTxnsByVersionRequest = {
   toJSON(message: AptosGetTxnsByVersionRequest): unknown {
     const obj: any = {}
     message.network !== undefined && (obj.network = message.network)
-    message.fromVersion !== undefined && (obj.fromVersion = (message.fromVersion || Long.UZERO).toString())
-    message.toVersion !== undefined && (obj.toVersion = (message.toVersion || Long.UZERO).toString())
+    message.fromVersion !== undefined && (obj.fromVersion = message.fromVersion.toString())
+    message.toVersion !== undefined && (obj.toVersion = message.toVersion.toString())
     message.headerOnly !== undefined && (obj.headerOnly = message.headerOnly)
     return obj
   },
@@ -252,17 +250,15 @@ export const AptosGetTxnsByVersionRequest = {
   fromPartial(object: DeepPartial<AptosGetTxnsByVersionRequest>): AptosGetTxnsByVersionRequest {
     const message = createBaseAptosGetTxnsByVersionRequest()
     message.network = object.network ?? ''
-    message.fromVersion =
-      object.fromVersion !== undefined && object.fromVersion !== null ? Long.fromValue(object.fromVersion) : Long.UZERO
-    message.toVersion =
-      object.toVersion !== undefined && object.toVersion !== null ? Long.fromValue(object.toVersion) : Long.UZERO
+    message.fromVersion = object.fromVersion ?? BigInt('0')
+    message.toVersion = object.toVersion ?? BigInt('0')
     message.headerOnly = object.headerOnly ?? undefined
     return message
   },
 }
 
 function createBaseAptosGetTxnsByEventRequest(): AptosGetTxnsByEventRequest {
-  return { network: '', fromVersion: Long.UZERO, toVersion: Long.UZERO, address: '', type: '' }
+  return { network: '', fromVersion: BigInt('0'), toVersion: BigInt('0'), address: '', type: '' }
 }
 
 export const AptosGetTxnsByEventRequest = {
@@ -270,11 +266,11 @@ export const AptosGetTxnsByEventRequest = {
     if (message.network !== '') {
       writer.uint32(10).string(message.network)
     }
-    if (!message.fromVersion.isZero()) {
-      writer.uint32(16).uint64(message.fromVersion)
+    if (message.fromVersion !== BigInt('0')) {
+      writer.uint32(16).uint64(message.fromVersion.toString())
     }
-    if (!message.toVersion.isZero()) {
-      writer.uint32(24).uint64(message.toVersion)
+    if (message.toVersion !== BigInt('0')) {
+      writer.uint32(24).uint64(message.toVersion.toString())
     }
     if (message.address !== '') {
       writer.uint32(34).string(message.address)
@@ -296,10 +292,10 @@ export const AptosGetTxnsByEventRequest = {
           message.network = reader.string()
           break
         case 2:
-          message.fromVersion = reader.uint64() as Long
+          message.fromVersion = longToBigint(reader.uint64() as Long)
           break
         case 3:
-          message.toVersion = reader.uint64() as Long
+          message.toVersion = longToBigint(reader.uint64() as Long)
           break
         case 4:
           message.address = reader.string()
@@ -318,8 +314,8 @@ export const AptosGetTxnsByEventRequest = {
   fromJSON(object: any): AptosGetTxnsByEventRequest {
     return {
       network: isSet(object.network) ? String(object.network) : '',
-      fromVersion: isSet(object.fromVersion) ? Long.fromValue(object.fromVersion) : Long.UZERO,
-      toVersion: isSet(object.toVersion) ? Long.fromValue(object.toVersion) : Long.UZERO,
+      fromVersion: isSet(object.fromVersion) ? BigInt(object.fromVersion) : BigInt('0'),
+      toVersion: isSet(object.toVersion) ? BigInt(object.toVersion) : BigInt('0'),
       address: isSet(object.address) ? String(object.address) : '',
       type: isSet(object.type) ? String(object.type) : '',
     }
@@ -328,8 +324,8 @@ export const AptosGetTxnsByEventRequest = {
   toJSON(message: AptosGetTxnsByEventRequest): unknown {
     const obj: any = {}
     message.network !== undefined && (obj.network = message.network)
-    message.fromVersion !== undefined && (obj.fromVersion = (message.fromVersion || Long.UZERO).toString())
-    message.toVersion !== undefined && (obj.toVersion = (message.toVersion || Long.UZERO).toString())
+    message.fromVersion !== undefined && (obj.fromVersion = message.fromVersion.toString())
+    message.toVersion !== undefined && (obj.toVersion = message.toVersion.toString())
     message.address !== undefined && (obj.address = message.address)
     message.type !== undefined && (obj.type = message.type)
     return obj
@@ -338,10 +334,8 @@ export const AptosGetTxnsByEventRequest = {
   fromPartial(object: DeepPartial<AptosGetTxnsByEventRequest>): AptosGetTxnsByEventRequest {
     const message = createBaseAptosGetTxnsByEventRequest()
     message.network = object.network ?? ''
-    message.fromVersion =
-      object.fromVersion !== undefined && object.fromVersion !== null ? Long.fromValue(object.fromVersion) : Long.UZERO
-    message.toVersion =
-      object.toVersion !== undefined && object.toVersion !== null ? Long.fromValue(object.toVersion) : Long.UZERO
+    message.fromVersion = object.fromVersion ?? BigInt('0')
+    message.toVersion = object.toVersion ?? BigInt('0')
     message.address = object.address ?? ''
     message.type = object.type ?? ''
     return message
@@ -349,7 +343,7 @@ export const AptosGetTxnsByEventRequest = {
 }
 
 function createBaseAptosSQLQueryRequest(): AptosSQLQueryRequest {
-  return { network: '', fromVersion: Long.UZERO, toVersion: Long.UZERO, sql: '', arbitraryRange: false }
+  return { network: '', fromVersion: BigInt('0'), toVersion: BigInt('0'), sql: '', arbitraryRange: false }
 }
 
 export const AptosSQLQueryRequest = {
@@ -357,11 +351,11 @@ export const AptosSQLQueryRequest = {
     if (message.network !== '') {
       writer.uint32(10).string(message.network)
     }
-    if (!message.fromVersion.isZero()) {
-      writer.uint32(16).uint64(message.fromVersion)
+    if (message.fromVersion !== BigInt('0')) {
+      writer.uint32(16).uint64(message.fromVersion.toString())
     }
-    if (!message.toVersion.isZero()) {
-      writer.uint32(24).uint64(message.toVersion)
+    if (message.toVersion !== BigInt('0')) {
+      writer.uint32(24).uint64(message.toVersion.toString())
     }
     if (message.sql !== '') {
       writer.uint32(34).string(message.sql)
@@ -383,10 +377,10 @@ export const AptosSQLQueryRequest = {
           message.network = reader.string()
           break
         case 2:
-          message.fromVersion = reader.uint64() as Long
+          message.fromVersion = longToBigint(reader.uint64() as Long)
           break
         case 3:
-          message.toVersion = reader.uint64() as Long
+          message.toVersion = longToBigint(reader.uint64() as Long)
           break
         case 4:
           message.sql = reader.string()
@@ -405,8 +399,8 @@ export const AptosSQLQueryRequest = {
   fromJSON(object: any): AptosSQLQueryRequest {
     return {
       network: isSet(object.network) ? String(object.network) : '',
-      fromVersion: isSet(object.fromVersion) ? Long.fromValue(object.fromVersion) : Long.UZERO,
-      toVersion: isSet(object.toVersion) ? Long.fromValue(object.toVersion) : Long.UZERO,
+      fromVersion: isSet(object.fromVersion) ? BigInt(object.fromVersion) : BigInt('0'),
+      toVersion: isSet(object.toVersion) ? BigInt(object.toVersion) : BigInt('0'),
       sql: isSet(object.sql) ? String(object.sql) : '',
       arbitraryRange: isSet(object.arbitraryRange) ? Boolean(object.arbitraryRange) : false,
     }
@@ -415,8 +409,8 @@ export const AptosSQLQueryRequest = {
   toJSON(message: AptosSQLQueryRequest): unknown {
     const obj: any = {}
     message.network !== undefined && (obj.network = message.network)
-    message.fromVersion !== undefined && (obj.fromVersion = (message.fromVersion || Long.UZERO).toString())
-    message.toVersion !== undefined && (obj.toVersion = (message.toVersion || Long.UZERO).toString())
+    message.fromVersion !== undefined && (obj.fromVersion = message.fromVersion.toString())
+    message.toVersion !== undefined && (obj.toVersion = message.toVersion.toString())
     message.sql !== undefined && (obj.sql = message.sql)
     message.arbitraryRange !== undefined && (obj.arbitraryRange = message.arbitraryRange)
     return obj
@@ -425,10 +419,8 @@ export const AptosSQLQueryRequest = {
   fromPartial(object: DeepPartial<AptosSQLQueryRequest>): AptosSQLQueryRequest {
     const message = createBaseAptosSQLQueryRequest()
     message.network = object.network ?? ''
-    message.fromVersion =
-      object.fromVersion !== undefined && object.fromVersion !== null ? Long.fromValue(object.fromVersion) : Long.UZERO
-    message.toVersion =
-      object.toVersion !== undefined && object.toVersion !== null ? Long.fromValue(object.toVersion) : Long.UZERO
+    message.fromVersion = object.fromVersion ?? BigInt('0')
+    message.toVersion = object.toVersion ?? BigInt('0')
     message.sql = object.sql ?? ''
     message.arbitraryRange = object.arbitraryRange ?? false
     return message
@@ -436,7 +428,7 @@ export const AptosSQLQueryRequest = {
 }
 
 function createBaseQueryPhaseSummary(): QueryPhaseSummary {
-  return { name: '', timeTookMs: Long.UZERO }
+  return { name: '', timeTookMs: BigInt('0') }
 }
 
 export const QueryPhaseSummary = {
@@ -444,8 +436,8 @@ export const QueryPhaseSummary = {
     if (message.name !== '') {
       writer.uint32(10).string(message.name)
     }
-    if (!message.timeTookMs.isZero()) {
-      writer.uint32(16).uint64(message.timeTookMs)
+    if (message.timeTookMs !== BigInt('0')) {
+      writer.uint32(16).uint64(message.timeTookMs.toString())
     }
     return writer
   },
@@ -461,7 +453,7 @@ export const QueryPhaseSummary = {
           message.name = reader.string()
           break
         case 2:
-          message.timeTookMs = reader.uint64() as Long
+          message.timeTookMs = longToBigint(reader.uint64() as Long)
           break
         default:
           reader.skipType(tag & 7)
@@ -474,29 +466,28 @@ export const QueryPhaseSummary = {
   fromJSON(object: any): QueryPhaseSummary {
     return {
       name: isSet(object.name) ? String(object.name) : '',
-      timeTookMs: isSet(object.timeTookMs) ? Long.fromValue(object.timeTookMs) : Long.UZERO,
+      timeTookMs: isSet(object.timeTookMs) ? BigInt(object.timeTookMs) : BigInt('0'),
     }
   },
 
   toJSON(message: QueryPhaseSummary): unknown {
     const obj: any = {}
     message.name !== undefined && (obj.name = message.name)
-    message.timeTookMs !== undefined && (obj.timeTookMs = (message.timeTookMs || Long.UZERO).toString())
+    message.timeTookMs !== undefined && (obj.timeTookMs = message.timeTookMs.toString())
     return obj
   },
 
   fromPartial(object: DeepPartial<QueryPhaseSummary>): QueryPhaseSummary {
     const message = createBaseQueryPhaseSummary()
     message.name = object.name ?? ''
-    message.timeTookMs =
-      object.timeTookMs !== undefined && object.timeTookMs !== null ? Long.fromValue(object.timeTookMs) : Long.UZERO
+    message.timeTookMs = object.timeTookMs ?? BigInt('0')
     return message
   },
 }
 
 function createBaseQueryExecutionSummary(): QueryExecutionSummary {
   return {
-    timeTookMs: Long.UZERO,
+    timeTookMs: BigInt('0'),
     resultNumRows: undefined,
     resultNumBytes: undefined,
     numPartitionsWithMaterializedView: undefined,
@@ -508,23 +499,23 @@ function createBaseQueryExecutionSummary(): QueryExecutionSummary {
 
 export const QueryExecutionSummary = {
   encode(message: QueryExecutionSummary, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (!message.timeTookMs.isZero()) {
-      writer.uint32(8).uint64(message.timeTookMs)
+    if (message.timeTookMs !== BigInt('0')) {
+      writer.uint32(8).uint64(message.timeTookMs.toString())
     }
     if (message.resultNumRows !== undefined) {
-      writer.uint32(16).uint64(message.resultNumRows)
+      writer.uint32(16).uint64(message.resultNumRows.toString())
     }
     if (message.resultNumBytes !== undefined) {
-      writer.uint32(24).uint64(message.resultNumBytes)
+      writer.uint32(24).uint64(message.resultNumBytes.toString())
     }
     if (message.numPartitionsWithMaterializedView !== undefined) {
-      writer.uint32(32).uint64(message.numPartitionsWithMaterializedView)
+      writer.uint32(32).uint64(message.numPartitionsWithMaterializedView.toString())
     }
     if (message.numPartitionsWithoutMaterializedView !== undefined) {
-      writer.uint32(40).uint64(message.numPartitionsWithoutMaterializedView)
+      writer.uint32(40).uint64(message.numPartitionsWithoutMaterializedView.toString())
     }
     if (message.numPartitions !== undefined) {
-      writer.uint32(48).uint64(message.numPartitions)
+      writer.uint32(48).uint64(message.numPartitions.toString())
     }
     for (const v of message.phases) {
       QueryPhaseSummary.encode(v!, writer.uint32(58).fork()).ldelim()
@@ -540,22 +531,22 @@ export const QueryExecutionSummary = {
       const tag = reader.uint32()
       switch (tag >>> 3) {
         case 1:
-          message.timeTookMs = reader.uint64() as Long
+          message.timeTookMs = longToBigint(reader.uint64() as Long)
           break
         case 2:
-          message.resultNumRows = reader.uint64() as Long
+          message.resultNumRows = longToBigint(reader.uint64() as Long)
           break
         case 3:
-          message.resultNumBytes = reader.uint64() as Long
+          message.resultNumBytes = longToBigint(reader.uint64() as Long)
           break
         case 4:
-          message.numPartitionsWithMaterializedView = reader.uint64() as Long
+          message.numPartitionsWithMaterializedView = longToBigint(reader.uint64() as Long)
           break
         case 5:
-          message.numPartitionsWithoutMaterializedView = reader.uint64() as Long
+          message.numPartitionsWithoutMaterializedView = longToBigint(reader.uint64() as Long)
           break
         case 6:
-          message.numPartitions = reader.uint64() as Long
+          message.numPartitions = longToBigint(reader.uint64() as Long)
           break
         case 7:
           message.phases.push(QueryPhaseSummary.decode(reader, reader.uint32()))
@@ -570,32 +561,30 @@ export const QueryExecutionSummary = {
 
   fromJSON(object: any): QueryExecutionSummary {
     return {
-      timeTookMs: isSet(object.timeTookMs) ? Long.fromValue(object.timeTookMs) : Long.UZERO,
-      resultNumRows: isSet(object.resultNumRows) ? Long.fromValue(object.resultNumRows) : undefined,
-      resultNumBytes: isSet(object.resultNumBytes) ? Long.fromValue(object.resultNumBytes) : undefined,
+      timeTookMs: isSet(object.timeTookMs) ? BigInt(object.timeTookMs) : BigInt('0'),
+      resultNumRows: isSet(object.resultNumRows) ? BigInt(object.resultNumRows) : undefined,
+      resultNumBytes: isSet(object.resultNumBytes) ? BigInt(object.resultNumBytes) : undefined,
       numPartitionsWithMaterializedView: isSet(object.numPartitionsWithMaterializedView)
-        ? Long.fromValue(object.numPartitionsWithMaterializedView)
+        ? BigInt(object.numPartitionsWithMaterializedView)
         : undefined,
       numPartitionsWithoutMaterializedView: isSet(object.numPartitionsWithoutMaterializedView)
-        ? Long.fromValue(object.numPartitionsWithoutMaterializedView)
+        ? BigInt(object.numPartitionsWithoutMaterializedView)
         : undefined,
-      numPartitions: isSet(object.numPartitions) ? Long.fromValue(object.numPartitions) : undefined,
+      numPartitions: isSet(object.numPartitions) ? BigInt(object.numPartitions) : undefined,
       phases: Array.isArray(object?.phases) ? object.phases.map((e: any) => QueryPhaseSummary.fromJSON(e)) : [],
     }
   },
 
   toJSON(message: QueryExecutionSummary): unknown {
     const obj: any = {}
-    message.timeTookMs !== undefined && (obj.timeTookMs = (message.timeTookMs || Long.UZERO).toString())
-    message.resultNumRows !== undefined && (obj.resultNumRows = (message.resultNumRows || undefined).toString())
-    message.resultNumBytes !== undefined && (obj.resultNumBytes = (message.resultNumBytes || undefined).toString())
+    message.timeTookMs !== undefined && (obj.timeTookMs = message.timeTookMs.toString())
+    message.resultNumRows !== undefined && (obj.resultNumRows = message.resultNumRows.toString())
+    message.resultNumBytes !== undefined && (obj.resultNumBytes = message.resultNumBytes.toString())
     message.numPartitionsWithMaterializedView !== undefined &&
-      (obj.numPartitionsWithMaterializedView = (message.numPartitionsWithMaterializedView || undefined).toString())
+      (obj.numPartitionsWithMaterializedView = message.numPartitionsWithMaterializedView.toString())
     message.numPartitionsWithoutMaterializedView !== undefined &&
-      (obj.numPartitionsWithoutMaterializedView = (
-        message.numPartitionsWithoutMaterializedView || undefined
-      ).toString())
-    message.numPartitions !== undefined && (obj.numPartitions = (message.numPartitions || undefined).toString())
+      (obj.numPartitionsWithoutMaterializedView = message.numPartitionsWithoutMaterializedView.toString())
+    message.numPartitions !== undefined && (obj.numPartitions = message.numPartitions.toString())
     if (message.phases) {
       obj.phases = message.phases.map((e) => (e ? QueryPhaseSummary.toJSON(e) : undefined))
     } else {
@@ -606,28 +595,12 @@ export const QueryExecutionSummary = {
 
   fromPartial(object: DeepPartial<QueryExecutionSummary>): QueryExecutionSummary {
     const message = createBaseQueryExecutionSummary()
-    message.timeTookMs =
-      object.timeTookMs !== undefined && object.timeTookMs !== null ? Long.fromValue(object.timeTookMs) : Long.UZERO
-    message.resultNumRows =
-      object.resultNumRows !== undefined && object.resultNumRows !== null
-        ? Long.fromValue(object.resultNumRows)
-        : undefined
-    message.resultNumBytes =
-      object.resultNumBytes !== undefined && object.resultNumBytes !== null
-        ? Long.fromValue(object.resultNumBytes)
-        : undefined
-    message.numPartitionsWithMaterializedView =
-      object.numPartitionsWithMaterializedView !== undefined && object.numPartitionsWithMaterializedView !== null
-        ? Long.fromValue(object.numPartitionsWithMaterializedView)
-        : undefined
-    message.numPartitionsWithoutMaterializedView =
-      object.numPartitionsWithoutMaterializedView !== undefined && object.numPartitionsWithoutMaterializedView !== null
-        ? Long.fromValue(object.numPartitionsWithoutMaterializedView)
-        : undefined
-    message.numPartitions =
-      object.numPartitions !== undefined && object.numPartitions !== null
-        ? Long.fromValue(object.numPartitions)
-        : undefined
+    message.timeTookMs = object.timeTookMs ?? BigInt('0')
+    message.resultNumRows = object.resultNumRows ?? undefined
+    message.resultNumBytes = object.resultNumBytes ?? undefined
+    message.numPartitionsWithMaterializedView = object.numPartitionsWithMaterializedView ?? undefined
+    message.numPartitionsWithoutMaterializedView = object.numPartitionsWithoutMaterializedView ?? undefined
+    message.numPartitions = object.numPartitions ?? undefined
     message.phases = object.phases?.map((e) => QueryPhaseSummary.fromPartial(e)) || []
     return message
   },
@@ -849,14 +822,14 @@ export const EvmGetHeaderRequest = {
       writer.uint32(10).string(message.network)
     }
     if (message.fromBlock !== undefined) {
-      writer.uint32(16).uint64(message.fromBlock)
+      writer.uint32(16).uint64(message.fromBlock.toString())
     }
     if (message.toBlock !== undefined) {
-      writer.uint32(24).uint64(message.toBlock)
+      writer.uint32(24).uint64(message.toBlock.toString())
     }
     writer.uint32(34).fork()
     for (const v of message.blockNumbers) {
-      writer.uint64(v)
+      writer.uint64(v.toString())
     }
     writer.ldelim()
     return writer
@@ -873,19 +846,19 @@ export const EvmGetHeaderRequest = {
           message.network = reader.string()
           break
         case 2:
-          message.fromBlock = reader.uint64() as Long
+          message.fromBlock = longToBigint(reader.uint64() as Long)
           break
         case 3:
-          message.toBlock = reader.uint64() as Long
+          message.toBlock = longToBigint(reader.uint64() as Long)
           break
         case 4:
           if ((tag & 7) === 2) {
             const end2 = reader.uint32() + reader.pos
             while (reader.pos < end2) {
-              message.blockNumbers.push(reader.uint64() as Long)
+              message.blockNumbers.push(longToBigint(reader.uint64() as Long))
             }
           } else {
-            message.blockNumbers.push(reader.uint64() as Long)
+            message.blockNumbers.push(longToBigint(reader.uint64() as Long))
           }
           break
         default:
@@ -899,19 +872,19 @@ export const EvmGetHeaderRequest = {
   fromJSON(object: any): EvmGetHeaderRequest {
     return {
       network: isSet(object.network) ? String(object.network) : '',
-      fromBlock: isSet(object.fromBlock) ? Long.fromValue(object.fromBlock) : undefined,
-      toBlock: isSet(object.toBlock) ? Long.fromValue(object.toBlock) : undefined,
-      blockNumbers: Array.isArray(object?.blockNumbers) ? object.blockNumbers.map((e: any) => Long.fromValue(e)) : [],
+      fromBlock: isSet(object.fromBlock) ? BigInt(object.fromBlock) : undefined,
+      toBlock: isSet(object.toBlock) ? BigInt(object.toBlock) : undefined,
+      blockNumbers: Array.isArray(object?.blockNumbers) ? object.blockNumbers.map((e: any) => BigInt(e)) : [],
     }
   },
 
   toJSON(message: EvmGetHeaderRequest): unknown {
     const obj: any = {}
     message.network !== undefined && (obj.network = message.network)
-    message.fromBlock !== undefined && (obj.fromBlock = (message.fromBlock || undefined).toString())
-    message.toBlock !== undefined && (obj.toBlock = (message.toBlock || undefined).toString())
+    message.fromBlock !== undefined && (obj.fromBlock = message.fromBlock.toString())
+    message.toBlock !== undefined && (obj.toBlock = message.toBlock.toString())
     if (message.blockNumbers) {
-      obj.blockNumbers = message.blockNumbers.map((e) => (e || Long.UZERO).toString())
+      obj.blockNumbers = message.blockNumbers.map((e) => e.toString())
     } else {
       obj.blockNumbers = []
     }
@@ -921,11 +894,9 @@ export const EvmGetHeaderRequest = {
   fromPartial(object: DeepPartial<EvmGetHeaderRequest>): EvmGetHeaderRequest {
     const message = createBaseEvmGetHeaderRequest()
     message.network = object.network ?? ''
-    message.fromBlock =
-      object.fromBlock !== undefined && object.fromBlock !== null ? Long.fromValue(object.fromBlock) : undefined
-    message.toBlock =
-      object.toBlock !== undefined && object.toBlock !== null ? Long.fromValue(object.toBlock) : undefined
-    message.blockNumbers = object.blockNumbers?.map((e) => Long.fromValue(e)) || []
+    message.fromBlock = object.fromBlock ?? undefined
+    message.toBlock = object.toBlock ?? undefined
+    message.blockNumbers = object.blockNumbers?.map((e) => e) || []
     return message
   },
 }
@@ -1186,8 +1157,6 @@ type Builtin = Date | Function | Uint8Array | string | number | boolean | undefi
 
 type DeepPartial<T> = T extends Builtin
   ? T
-  : T extends Long
-  ? string | number | Long
   : T extends Array<infer U>
   ? Array<DeepPartial<U>>
   : T extends ReadonlyArray<infer U>
@@ -1195,6 +1164,10 @@ type DeepPartial<T> = T extends Builtin
   : T extends {}
   ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>
+
+function longToBigint(long: Long) {
+  return BigInt(long.toString())
+}
 
 if (_m0.util.Long !== Long) {
   _m0.util.Long = Long as any

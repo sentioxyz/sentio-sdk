@@ -5,7 +5,6 @@ import { Event } from '@ethersproject/contracts'
 import { BaseProcessor } from './base-processor'
 import { BindOptions, getOptionsSignature } from './bind-options'
 import { HandleInterval, TemplateInstance } from '@sentio/protos'
-import Long from 'long'
 import { getNetwork } from '@ethersproject/providers'
 import { PromiseOrVoid } from '../promise-or-void'
 import { Trace } from './trace'
@@ -70,22 +69,14 @@ export abstract class BaseProcessorTemplate<
         chainId: options.network ? getNetwork(options.network).chainId.toString() : '1',
         abi: '',
       },
-      startBlock: Long.ZERO,
-      endBlock: Long.ZERO,
+      startBlock: 0n,
+      endBlock: 0n,
     }
     if (options.startBlock) {
-      if (typeof options.startBlock === 'number') {
-        instance.startBlock = Long.fromNumber(options.startBlock)
-      } else {
-        instance.startBlock = options.startBlock
-      }
+      instance.startBlock = BigInt(options.startBlock)
     }
     if (options.endBlock) {
-      if (typeof options.endBlock === 'number') {
-        instance.endBlock = Long.fromNumber(options.endBlock)
-      } else {
-        instance.endBlock = options.endBlock
-      }
+      instance.endBlock = BigInt(options.endBlock)
     }
     TemplateInstanceState.INSTANCE.addValue(instance)
     return processor
