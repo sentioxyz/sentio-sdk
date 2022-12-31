@@ -1,6 +1,7 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "experimentalDecorators": true,
     "inlineSources": true,
     "rootDir": "./src",
     "baseUrl": "./src",

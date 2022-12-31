@@ -68,7 +68,7 @@ describe('Test Solana Example', () => {
     expect(res.result?.counters).length(1)
     expect(res.result?.gauges).length(0)
     expect(res.result?.counters[0].metadata?.blockNumber).equal(0n)
-    expect(firstCounterValue(res.result, 'totalWeth_supply')).equal(12000000000000)
+    expect(firstCounterValue(res.result, 'totalWeth_supply')?.toString()).equal('12000000000000')
     expect(res.result?.counters[0].runtimeInfo?.from).equals(HandlerType.SOL_INSTRUCTION)
   })
 })

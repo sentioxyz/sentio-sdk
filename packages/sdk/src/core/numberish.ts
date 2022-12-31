@@ -1,10 +1,9 @@
 import { BigNumber } from 'ethers'
 import { BigInteger, MetricValue } from '@sentio/protos'
 import { BigDecimal } from '.'
-import { BN } from '@project-serum/anchor'
 import { BlockTag } from '@ethersproject/providers'
 
-export type Numberish = number | BigNumber | bigint | BigDecimal
+export type Numberish = number | BigNumber | bigint | BigDecimal | string
 
 export function toBlockTag(a: number | bigint): BlockTag {
   if (typeof a === 'number') {
@@ -41,9 +40,9 @@ export function toMetricValue(value: Numberish): MetricValue {
       })
     }
   }
-  if (BN.isBN(value)) {
+  if (typeof value === 'string') {
     return MetricValue.fromPartial({
-      bigInteger: bnToBigInteger(value),
+      bigDecimal: value,
     })
   }
   if (typeof value === 'bigint' || Number.isInteger(value)) {
@@ -74,14 +73,6 @@ function bigDecimalToBigInteger(a: BigDecimal): BigInteger {
   return hexToBigInteger(a.toString(16), negative)
 }
 
-function bnToBigInteger(a: BN): BigInteger {
-  const negative = a.isNeg()
-  if (negative) {
-    a = a.abs()
-  }
-  return hexToBigInteger(a.toString(16), negative)
-}
-
 function intToBigInteger(a: bigint | number): BigInteger {
   const negative = a < 0
   if (negative) {
@@ -94,12 +85,14 @@ export function toBigInteger(a: Numberish): BigInteger {
   if (a instanceof BigDecimal) {
     return bigDecimalToBigInteger(a)
   }
-  if (a instanceof BN) {
-    return bnToBigInteger(a)
-  }
+
   if (a instanceof BigNumber) {
     return intToBigInteger(a.toBigInt())
   }
+  if (typeof a === 'string') {
+    return intToBigInteger(BigInt(a))
+  }
+
   return intToBigInteger(a)
 
   // Following code is actually very slow

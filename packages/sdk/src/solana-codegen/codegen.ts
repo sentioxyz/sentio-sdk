@@ -32,7 +32,7 @@ function codeGenSolanaIdlProcessor(idlObj: any): string {
   const idlName = idlObj.name
   const idlNamePascalCase = toPascalCase(idlName)
   const instructions: any[] = idlObj.instructions
-  return `import { BorshInstructionCoder, Instruction, Idl, BN } from '@project-serum/anchor'
+  return `import { BorshInstructionCoder, Instruction, Idl } from '@project-serum/anchor'
 import { SolanaBaseProcessor, SolanaContext, SolanaBindOptions } from "@sentio/sdk"
 import { ${idlName}_idl } from "./${idlName}"
 import bs58 from 'bs58'
@@ -59,14 +59,15 @@ export class ${idlNamePascalCase}Processor extends SolanaBaseProcessor {
 
 function codeGenSolanaInstruction(idlName: string, ins: any): string {
   const instructionName = ins.name
-  const argsTypeString = codeGenInstructionArgs(ins.args)
   return `
-  on${
-    instructionName.charAt(0).toUpperCase() + instructionName.slice(1)
-  }(handler: (args: ${argsTypeString}, accounts: string[], ctx: SolanaContext) => void): ${idlName}Processor {
+  on${instructionName.charAt(0).toUpperCase() + instructionName.slice(1)}(handler: (args: ${codeGenInstructionArgsType(
+    ins.args
+  )}, accounts: string[], ctx: SolanaContext) => void): ${idlName}Processor {
     this.onInstruction('${instructionName}', (ins: Instruction, ctx, accounts: string[]) => {
+      const origin = ins.data as any
+      const data = ${codeGenInstructionArgs(ins.args)}
       if (ins) {
-        handler(ins.data as ${argsTypeString}, accounts, ctx)
+        handler(data, accounts, ctx)
       }
     })
     return this
@@ -75,6 +76,18 @@ function codeGenSolanaInstruction(idlName: string, ins: any): string {
 }
 
 function codeGenInstructionArgs(args: { name: string; type: string }[]): string {
+  return `{ ${args.map((arg) => codeGenInstructionArg(arg.name, arg.type)).join(', ')} }`
+}
+
+function codeGenInstructionArg(name: string, type: string): string {
+  const mType = mapType(type)
+  if (mType === 'bigint') {
+    return `${name}: BigInt(origin.${name}.toString())`
+  }
+  return `${name}: origin.${name} as ${mType}`
+}
+
+function codeGenInstructionArgsType(args: { name: string; type: string }[]): string {
   return `{ ${args.map((arg) => arg.name + ': ' + mapType(arg.type)).join(', ')} }`
 }
 
@@ -100,7 +113,7 @@ function mapType(tpe: string): string {
     case 'i64':
     case 'u128':
     case 'i128':
-      return 'BN'
+      return 'bigint'
     default:
       return 'any'
   }
