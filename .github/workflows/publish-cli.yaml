@@ -51,6 +51,6 @@ jobs:
         run: |
           echo "### No version cut" >> $GITHUB_STEP_SUMMARY
           echo "Check Semantic Release output for details"
-          exit(1)
+          exit 1
     outputs:
       release_version: ${{ steps.release.outputs.release_version }}
