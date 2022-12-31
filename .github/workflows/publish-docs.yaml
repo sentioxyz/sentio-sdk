@@ -21,13 +21,12 @@ jobs:
           node-version: 16
       - name: Install
         run: yarn install
-
+      - name: Build
+        run: yarn lerna run build --no-private --ignore @sentio/runtime --ignore @sentio/sdk-all
       - name: Create the docs directory locally in CI
-        run: yarn gen && yarn docs
-        working-directory: packages/sdk
-
+        run: yarn docs
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4.4.1
         with:
           branch: gh-pages
-          folder: packages/sdk/docs
+          folder: dockss

@@ -22,6 +22,7 @@ ignore:
   - .git
   - .idea
   - .github
+  - docs
   - node_modules
   - packages/cli/node_modules
   - packages/cli/templates

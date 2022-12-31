@@ -25,7 +25,8 @@ jobs:
       - name: Install
         run: yarn install
       - name: Build
-        run: yarn lerna run build
+        run: yarn build_all
+        working-directory: packages/sdk-all
       - name: Clean templates node mdules
         run: "rm -rf */node_modules"
         working-directory: packages/cli/templates
