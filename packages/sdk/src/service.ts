@@ -95,7 +95,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       for (const plugin of [
         '@sentio/sdk/lib/core/eth-plugin',
         '@sentio/sdk/lib/core/sui-plugin',
-        '@sentio/sdk/lib/aptos/aptos-plugin',
+        '@sentio/sdk-aptos/lib/aptos-plugin',
         '@sentio/sdk-solana/lib/solana-plugin',
       ]) {
         try {
