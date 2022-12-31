@@ -1,10 +1,10 @@
 import { AptosQueryClient, AptosQueryDefinition } from '@sentio/protos/lib/chainquery/protos/chainquery'
 import { createChannel, createClient } from 'nice-grpc'
+import { Endpoints } from '@sentio/runtime'
 
 export function getChainQueryClient(address?: string): AptosQueryClient {
   if (!address) {
-    // @ts-ignore
-    address = global.ENDPOINTS.chainQueryAPI
+    address = Endpoints.INSTANCE.chainQueryAPI
   }
   const channel = createChannel(address!)
 
