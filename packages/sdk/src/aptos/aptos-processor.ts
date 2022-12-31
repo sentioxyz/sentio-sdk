@@ -8,8 +8,8 @@ import { TYPE_REGISTRY, TypeRegistry } from './type-registry'
 import { AptosBindOptions, AptosNetwork, getChainId } from './network'
 import { AptosContext, AptosResourceContext } from './context'
 import { EventInstance } from './models'
-import { ListStateStorage } from '../state/state-storage'
-import { HandleInterval, ProcessResult } from '../gen'
+import { ListStateStorage } from '@sentio/base'
+import { HandleInterval, ProcessResult } from '@sentio/protos'
 
 type IndexConfigure = {
   address: string

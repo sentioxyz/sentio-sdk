@@ -1,5 +1,5 @@
 import { BaseContext } from './base-context'
-import { LogLevel } from '../gen'
+import { LogLevel } from '@sentio/protos'
 import { NamedResultDescriptor } from './metadata'
 
 export type Attributes = Record<string, any>

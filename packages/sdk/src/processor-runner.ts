@@ -9,14 +9,14 @@ import { createServer } from 'nice-grpc'
 import { createLogger, transports, format } from 'winston'
 import { CompressionAlgorithms } from '@grpc/grpc-js/build/src/compression-algorithms'
 
-import { ProcessorDefinition } from './gen'
+import { ProcessorDefinition } from '@sentio/protos'
 import { ProcessorServiceImpl } from './service'
 import { setProvider } from './provider'
-import { ProcessorState } from './state/processor-state'
+import { State } from '@sentio/base'
 import { load } from './loader'
 import { Endpoints } from './endpoints'
 
-global.PROCESSOR_STATE = new ProcessorState()
+State.reset()
 global.ENDPOINTS = new Endpoints()
 
 const optionDefinitions = [

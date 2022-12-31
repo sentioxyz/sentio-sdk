@@ -1,11 +1,6 @@
-import { Plugin, PluginManager } from '../plugin'
-import {
-  ContractConfig,
-  DataBinding,
-  HandlerType,
-  ProcessConfigResponse,
-  ProcessResult,
-} from '../gen/processor/protos/processor'
+import { Plugin, PluginManager } from '@sentio/base'
+import { ContractConfig, DataBinding, HandlerType, ProcessConfigResponse, ProcessResult } from '@sentio/protos'
+
 import { DEFAULT_MAX_BLOCK, USER_PROCESSOR } from '../service'
 
 import { ServerError, Status } from 'nice-grpc'

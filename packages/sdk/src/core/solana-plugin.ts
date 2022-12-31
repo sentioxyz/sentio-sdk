@@ -1,4 +1,4 @@
-import { Plugin, PluginManager } from '../plugin'
+import { Plugin, PluginManager } from '@sentio/base'
 import {
   ContractConfig,
   Data_SolInstruction,
@@ -6,8 +6,8 @@ import {
   HandlerType,
   ProcessConfigResponse,
   ProcessResult,
-} from '../gen/processor/protos/processor'
-import { DEFAULT_MAX_BLOCK, errorString, mergeProcessResults, USER_PROCESSOR, Utf8ArrayToStr } from '../service'
+} from '@sentio/protos'
+import { DEFAULT_MAX_BLOCK, mergeProcessResults, USER_PROCESSOR } from '../service'
 
 import { ServerError, Status } from 'nice-grpc'
 

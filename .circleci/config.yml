@@ -21,7 +21,7 @@ jobs:
 #          command: yarn install
 #          name: Yarn Install
       - run:
-          command: rm -rf lib && yarn gen && yarn test || yarn test # TODO remove this hack, understand why test will fail in first run
+          command: yarn build_all && yarn gen && yarn test || yarn test # TODO remove this hack, understand why test will fail in first run
           name: Test SDK
           working_directory: packages/sdk
 #      - run:

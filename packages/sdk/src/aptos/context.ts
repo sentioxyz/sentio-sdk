@@ -1,5 +1,5 @@
 import Long from 'long'
-import { RecordMetaData } from '../gen'
+import { RecordMetaData } from '@sentio/protos'
 import { Labels } from '../core/metadata'
 import { normalizeLabels } from '../core/meter'
 import { BaseContext } from '../core/base-context'

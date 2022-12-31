@@ -1,4 +1,4 @@
-import { Plugin, PluginManager } from '../plugin'
+import { Plugin, PluginManager } from '@sentio/base'
 import {
   AccountConfig,
   AptosCallHandlerConfig,
@@ -8,7 +8,8 @@ import {
   HandlerType,
   ProcessConfigResponse,
   ProcessResult,
-} from '../gen/processor/protos/processor'
+} from '@sentio/protos'
+
 import { DEFAULT_MAX_BLOCK, errorString, mergeProcessResults, USER_PROCESSOR, Utf8ArrayToStr } from '../service'
 
 import { ServerError, Status } from 'nice-grpc'

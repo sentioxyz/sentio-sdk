@@ -5,7 +5,7 @@ import { expect } from 'chai'
 import { TestProcessorServer, firstCounterValue, firstGaugeValue } from '../testing'
 import { BigNumber } from 'ethers'
 import { mockTransferLog } from '../builtin/erc20/test-utils'
-import { HandlerType } from '../gen'
+import { HandlerType } from '@sentio/protos'
 import { TemplateInstanceState } from '../core/base-processor-template'
 
 describe('Test Basic Examples', () => {

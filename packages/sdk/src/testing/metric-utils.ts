@@ -1,4 +1,4 @@
-import { MetricValue, ProcessResult } from '../gen'
+import { MetricValue, ProcessResult } from '@sentio/protos'
 import { Numberish, BigDecimal } from '../core'
 import { BigNumber } from 'ethers'
 

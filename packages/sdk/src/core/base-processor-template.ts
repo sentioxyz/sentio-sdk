@@ -4,12 +4,12 @@ import { BaseContract, EventFilter } from 'ethers'
 import { Event } from '@ethersproject/contracts'
 import { BaseProcessor } from './base-processor'
 import { BindOptions, getOptionsSignature } from './bind-options'
-import { HandleInterval, TemplateInstance } from '../gen'
+import { HandleInterval, TemplateInstance } from '@sentio/protos'
 import Long from 'long'
 import { getNetwork } from '@ethersproject/providers'
 import { PromiseOrVoid } from '../promise-or-void'
 import { Trace } from './trace'
-import { ListStateStorage } from '../state/state-storage'
+import { ListStateStorage } from '@sentio/base'
 
 export class ProcessorTemplateProcessorState extends ListStateStorage<
   BaseProcessorTemplate<BaseContract, BoundContractView<BaseContract, any>>

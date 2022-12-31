@@ -1,10 +1,10 @@
-import { ProcessorState } from '../state/processor-state'
+import { State } from '@sentio/base'
 import { getERC20TokenInfo } from './token'
 import { loadTestProvidersFromEnv } from '../testing/test-provider'
 import { Endpoints } from '../endpoints'
 
 describe('erc20 tests', () => {
-  global.PROCESSOR_STATE = new ProcessorState()
+  State.reset()
   global.ENDPOINTS = new Endpoints()
 
   const haveProviders = loadTestProvidersFromEnv('1')

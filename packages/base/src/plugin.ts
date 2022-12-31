@@ -1,4 +1,4 @@
-import { DataBinding, HandlerType, ProcessConfigResponse, ProcessResult } from './gen'
+import { DataBinding, HandlerType, ProcessConfigResponse, ProcessResult } from '@sentio/protos'
 
 export interface Plugin {
   name: string

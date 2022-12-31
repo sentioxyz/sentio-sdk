@@ -3,7 +3,7 @@ import { BaseProcessor, ContractView } from './core'
 import { Networkish } from '@ethersproject/networks'
 import { getNetwork } from '@ethersproject/providers'
 import { BaseContract } from 'ethers'
-import { MapStateStorage } from './state/state-storage'
+import { MapStateStorage } from '@sentio/base'
 
 export class ProcessorState extends MapStateStorage<BaseProcessor<any, any>> {
   static INSTANCE = new ProcessorState()

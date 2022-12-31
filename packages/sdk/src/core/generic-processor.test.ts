@@ -2,7 +2,7 @@
 
 import { expect } from 'chai'
 
-import { HandlerType } from '../gen'
+import { HandlerType } from '@sentio/protos'
 
 import { GenericProcessor } from './generic-processor'
 import { TestProcessorServer, firstCounterValue } from '../testing'

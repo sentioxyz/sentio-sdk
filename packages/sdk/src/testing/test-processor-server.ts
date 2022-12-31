@@ -10,16 +10,16 @@ import {
   ProcessConfigResponse,
   ProcessorServiceImplementation,
   StartRequest,
-} from '../gen'
+} from '@sentio/protos'
 import { CallContext } from 'nice-grpc-common'
-import { Empty } from '../gen/google/protobuf/empty'
+import { Empty } from '@sentio/protos/lib/google/protobuf/empty'
 import { ChainConfig } from '../chain-config'
 import { CHAIN_MAP } from '../utils/chain'
 import { Block, Log } from '@ethersproject/abstract-provider'
 import Long from 'long'
 import { getNetwork, Networkish } from '@ethersproject/providers'
 import { Endpoints } from '../endpoints'
-import { ProcessorState } from '../state/processor-state'
+import { State } from '@sentio/base'
 import { ProcessorServiceImpl } from '../service'
 import { Trace } from '../core/trace'
 import { setProvider } from '../provider'
@@ -27,7 +27,7 @@ import { setProvider } from '../provider'
 export const TEST_CONTEXT: CallContext = <CallContext>{}
 
 export function cleanTest() {
-  global.PROCESSOR_STATE = new ProcessorState()
+  State.reset()
   if (!global.ENDPOINTS) {
     global.ENDPOINTS = new Endpoints()
   }
@@ -322,13 +322,4 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
   processBindingsStream(request: AsyncIterable<DataBinding>, context: CallContext) {
     return this.service.processBindingsStream(request, context)
   }
-}
-
-function toBytes(obj: any): Uint8Array {
-  const logJsonStr = JSON.stringify(obj)
-  const raw = new Uint8Array(logJsonStr.length)
-  for (let i = 0; i < logJsonStr.length; i++) {
-    raw[i] = logJsonStr.charCodeAt(i)
-  }
-  return raw
 }

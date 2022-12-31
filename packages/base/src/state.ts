@@ -1,3 +1,13 @@
+export class State {
+  stateMap = new Map<string, any>()
+
+  static INSTANCE = new State()
+
+  static reset() {
+    State.INSTANCE = new State()
+  }
+}
+
 export abstract class StateStorage<T> {
   // TODO learn how to define single instance for all subclasses
 
@@ -12,10 +22,10 @@ export abstract class StateStorage<T> {
   }
 
   getOrRegister(): T {
-    let metricState: T = global.PROCESSOR_STATE.stateMap.get(this.key())
+    let metricState: T = State.INSTANCE.stateMap.get(this.key())
     if (!metricState) {
       metricState = this.initValue()
-      global.PROCESSOR_STATE.stateMap.set(this.key(), metricState)
+      State.INSTANCE.stateMap.set(this.key(), metricState)
     }
     return metricState
   }

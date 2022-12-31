@@ -24,10 +24,10 @@ jobs:
 
       - name: Create the docs directory locally in CI
         run: yarn gen && yarn docs
-        working-directory: sdk
+        working-directory: packages/sdk
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4.4.1
         with:
           branch: gh-pages
-          folder: sdk/docs
+          folder: packages/sdk/docs

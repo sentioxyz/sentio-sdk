@@ -1,15 +1,15 @@
 {
-  "name": "@sentio/base",
+  "name": "@sentio/protos",
   "license": "Apache-2.0",
   "version": "1.0.0",
   "scripts": {
     "compile": "tsc -p .",
-    "build": "yarn compile",
-    "build_all": "yarn lerna run --scope=@sentio/base build --include-dependencies",
-    "test": "jest"
+    "clean": "tsc --build --clean",
+    "build": "yarn compile"
   },
   "dependencies": {
-    "@sentio/protos": "^1.0.0"
+    "google-protobuf": "^3.15.8",
+    "nice-grpc": "^2.0.0"
   },
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",

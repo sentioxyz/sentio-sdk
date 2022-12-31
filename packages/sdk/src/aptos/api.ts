@@ -1,4 +1,4 @@
-import { AptosQueryClient, AptosQueryDefinition } from '../gen/chainquery/protos/chainquery'
+import { AptosQueryClient, AptosQueryDefinition } from '@sentio/protos/lib/chainquery/protos/chainquery'
 import { createChannel, createClient } from 'nice-grpc'
 
 export function getChainQueryClient(address?: string): AptosQueryClient {

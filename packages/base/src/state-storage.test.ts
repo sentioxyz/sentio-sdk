@@ -1,9 +1,8 @@
 import { assert } from 'chai'
-import { MapStateStorage } from './state-storage'
-import { ProcessorState } from './processor-state'
+import { State, MapStateStorage } from './state'
 
 describe('state storage tests', () => {
-  global.PROCESSOR_STATE = new ProcessorState()
+  State.reset()
 
   test('test labels', async () => {
     class TestState extends MapStateStorage<any> {
@@ -18,7 +17,7 @@ describe('state storage tests', () => {
     TestState.INSTANCE.getOrSetValue('k2', 'v2')
 
     assert(TestState.INSTANCE.getValues().length === 2)
-    assert(global.PROCESSOR_STATE.stateMap.size === 1)
-    assert(global.PROCESSOR_STATE.stateMap.keys().next().value === 'TestState')
+    assert(State.INSTANCE.stateMap.size === 1)
+    assert(State.INSTANCE.stateMap.keys().next().value === 'TestState')
   })
 })

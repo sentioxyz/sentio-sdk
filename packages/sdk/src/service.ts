@@ -10,9 +10,10 @@ import {
   ProcessorServiceImplementation,
   ProcessResult,
   StartRequest,
-} from './gen'
+} from '@sentio/protos'
 
-import { Empty } from './gen/google/protobuf/empty'
+import { Empty } from '@sentio/protos/lib/google/protobuf/empty'
+
 import Long from 'long'
 import { MetricState } from './core/meter'
 import { ExporterState } from './core/exporter'
@@ -22,7 +23,7 @@ import { ProcessorTemplateProcessorState, TemplateInstanceState } from './core/b
 // (Long.prototype as any).toBigInt = function() {
 //   return BigInt(this.toString())
 // };
-import { PluginManager } from './plugin'
+import { PluginManager } from '@sentio/base'
 ;(BigInt.prototype as any).toJSON = function () {
   return this.toString()
 }

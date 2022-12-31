@@ -1,4 +1,4 @@
-import { ProcessResult, RecordMetaData } from '../gen'
+import { ProcessResult, RecordMetaData } from '@sentio/protos'
 import { Logger } from './logger'
 import { Labels } from './metadata'
 import { Meter } from './meter'

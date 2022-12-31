@@ -1,7 +1,7 @@
 import { BaseContext } from './base-context'
 import { ExportResult } from '@sentio/sdk'
 import { NamedResultDescriptor } from './metadata'
-import { MapStateStorage } from '../state/state-storage'
+import { MapStateStorage } from '@sentio/base'
 
 export type Export = Record<string, any>
 

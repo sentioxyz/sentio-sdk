@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { HandlerType, ProcessBindingsRequest } from '../gen'
+import { HandlerType, ProcessBindingsRequest } from '@sentio/protos'
 
 import { firstCounterValue, firstGaugeValue, TestProcessorServer } from '../testing'
 import Long from 'long'

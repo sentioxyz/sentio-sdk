@@ -33,3 +33,9 @@ ignore:
   - examples
   - packages/sdk/src/tests/abis
   - packages/sdk/src/tests/types
+  - packages/base/lib
+  - packages/base/node_modules
+  - packages/protos/lib
+  - packages/protos/node_modules
+  - packages/runtime/lib
+  - packages/runtime/node_modules

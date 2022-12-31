@@ -4,7 +4,7 @@ import { BaseContract, Event, EventFilter } from '@ethersproject/contracts'
 import Long from 'long'
 
 import { BoundContractView, ContractContext, ContractView } from './context'
-import { AddressType, HandleInterval, ProcessResult } from '../gen'
+import { AddressType, HandleInterval, ProcessResult } from '@sentio/protos'
 import { BindInternalOptions, BindOptions } from './bind-options'
 import { PromiseOrVoid } from '../promise-or-void'
 import { Trace } from './trace'

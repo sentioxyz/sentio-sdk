@@ -1,9 +1,9 @@
-import { ProcessResult } from '../gen'
+import { ProcessResult } from '@sentio/protos'
 import { SolanaContext } from './solana-context'
 import Long from 'long'
 import { Instruction } from '@project-serum/anchor'
 import { SolanaBindOptions } from './solana-options'
-import { ListStateStorage } from '../state/state-storage'
+import { ListStateStorage } from '@sentio/base'
 import { CHAIN_IDS } from '../utils/chain'
 
 type IndexConfigure = {

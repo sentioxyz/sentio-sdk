@@ -1,4 +1,4 @@
-import { RecordMetaData, ProcessResult } from '../gen'
+import { RecordMetaData, ProcessResult } from '@sentio/protos'
 import { BaseContract, EventFilter } from 'ethers'
 import { Block, Log } from '@ethersproject/abstract-provider'
 import { normalizeLabels } from './meter'

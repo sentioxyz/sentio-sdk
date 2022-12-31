@@ -1,7 +1,7 @@
 import { SuiContext } from './context'
-import { ProcessResult } from '../gen'
+import { ProcessResult } from '@sentio/protos'
 import Long from 'long'
-import { ListStateStorage } from '../state/state-storage'
+import { ListStateStorage } from '@sentio/base'
 
 type IndexConfigure = {
   startSeqNumber: Long

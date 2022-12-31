@@ -1,10 +1,11 @@
 {
   "name": "@sentio/runtime",
   "license": "Apache-2.0",
-  "version": "1.0.0-rc.5",
+  "version": "1.0.0",
   "scripts": {
     "compile": "tsc -p .",
     "build": "yarn compile",
+    "build_all": "yarn lerna run --scope=@sentio/runtime build --include-dependencies",
     "test": "jest"
   },
   "dependencies": {
@@ -45,9 +46,5 @@
     "{lib,src,templates}",
     "!{lib,src}/tests",
     "!**/*.test.{js,ts}"
-  ],
-  "engines": {
-    "node": ">=16"
-  },
-  "gitHead": "8bec43cdc9e778d66a4154bc1be1f9276b680408"
+  ]
 }

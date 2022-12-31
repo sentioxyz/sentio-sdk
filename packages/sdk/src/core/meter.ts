@@ -1,8 +1,8 @@
 import { BaseContext } from './base-context'
 import { Numberish, toMetricValue } from './numberish'
 import { Labels, NamedResultDescriptor } from './metadata'
-import { AggregationConfig, AggregationType, MetricConfig, MetricType } from '../gen'
-import { MapStateStorage } from '../state/state-storage'
+import { AggregationConfig, AggregationType, MetricConfig, MetricType } from '@sentio/protos'
+import { MapStateStorage } from '@sentio/base'
 
 export function normalizeName(name: string): string {
   const regex = new RegExp('![_.a-zA-Z0-9]')
