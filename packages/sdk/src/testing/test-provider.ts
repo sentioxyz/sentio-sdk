@@ -1,6 +1,5 @@
-import { ChainConfig } from '../chain-config'
+import { ChainConfig, setProvider } from '@sentio/runtime'
 import { CHAIN_MAP } from '../utils/chain'
-import { setProvider } from '../provider'
 
 export function loadTestProvidersFromEnv(requiredChainIds: string[] | string): boolean {
   const dummyConfig: Record<string, ChainConfig> = {}

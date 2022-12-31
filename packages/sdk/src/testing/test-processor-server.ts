@@ -13,23 +13,17 @@ import {
 } from '@sentio/protos'
 import { CallContext } from 'nice-grpc-common'
 import { Empty } from '@sentio/protos/lib/google/protobuf/empty'
-import { ChainConfig } from '../chain-config'
+import { ChainConfig, ProcessorServiceImpl, setProvider, Endpoints, State } from '@sentio/runtime'
 import { CHAIN_MAP } from '../utils/chain'
 import { Block, Log } from '@ethersproject/abstract-provider'
 import { getNetwork, Networkish } from '@ethersproject/providers'
-import { Endpoints } from '../endpoints'
-import { State } from '@sentio/base'
-import { ProcessorServiceImpl } from '../service'
 import { Trace } from '../core/trace'
-import { setProvider } from '../provider'
 
 export const TEST_CONTEXT: CallContext = <CallContext>{}
 
 export function cleanTest() {
   State.reset()
-  if (!global.ENDPOINTS) {
-    global.ENDPOINTS = new Endpoints()
-  }
+  Endpoints.reset()
 }
 
 export class TestProcessorServer implements ProcessorServiceImplementation {

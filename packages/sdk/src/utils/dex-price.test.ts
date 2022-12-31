@@ -1,13 +1,13 @@
 import { EthereumDexPrice, GoerliDexPrice } from './dex-price'
-import { State } from '@sentio/base'
+import { State } from '@sentio/runtime'
 import { loadTestProvidersFromEnv } from '../testing/test-provider'
 
 import { expect } from 'chai'
-import { Endpoints } from '../endpoints'
+import { Endpoints } from '@sentio/runtime'
 
 describe('dex price tests', () => {
   State.reset()
-  global.ENDPOINTS = new Endpoints()
+  Endpoints.reset()
 
   const haveProviders = loadTestProvidersFromEnv(['1', '5'])
 

@@ -4,7 +4,10 @@
     "inlineSources": true,
     "rootDir": "./src",
     "baseUrl": "./src",
-    "outDir": "lib"
+    "outDir": "lib",
+    "paths": {
+      "@sentio/runtime": ["."]
+    }
   },
   "exclude": ["lib"]
 }

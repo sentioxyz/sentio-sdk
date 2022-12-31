@@ -2,7 +2,7 @@ import { BaseContract } from '@ethersproject/contracts'
 import { BoundContractView, ContractView } from './context'
 import { BindOptions } from './bind-options'
 import { BaseProcessor } from './base-processor'
-import { getProvider } from '../provider'
+import { getProvider } from '@sentio/runtime'
 import { addProcessor } from '../binds'
 
 export class GenericProcessor extends BaseProcessor<

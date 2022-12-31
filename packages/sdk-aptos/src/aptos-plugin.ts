@@ -1,4 +1,4 @@
-import { Plugin, PluginManager } from '@sentio/base'
+import { Plugin, PluginManager } from '@sentio/runtime'
 import {
   AccountConfig,
   AptosCallHandlerConfig,
@@ -10,14 +10,14 @@ import {
   ProcessResult,
 } from '@sentio/protos'
 
-import { errorString, mergeProcessResults, USER_PROCESSOR } from '@sentio/base'
+import { errorString, mergeProcessResults, USER_PROCESSOR } from '@sentio/runtime'
 
 import { ServerError, Status } from 'nice-grpc'
 
 import { MoveResource, Transaction_UserTransaction } from 'aptos-sdk/src/generated'
 import { AptosAccountProcessorState, AptosProcessorState, MoveResourcesWithVersionPayload } from './aptos-processor'
 
-export class AptosPlugin implements Plugin {
+export class AptosPlugin extends Plugin {
   name: string = 'AptosPlugin'
 
   private aptosEventHandlers: ((event: any) => Promise<ProcessResult>)[] = []
@@ -106,7 +106,7 @@ export class AptosPlugin implements Plugin {
 
   supportedHandlers = [HandlerType.APT_CALL, HandlerType.APT_RESOURCE, HandlerType.APT_EVENT]
 
-  processBinding(request: DataBinding): Promise<ProcessResult> {
+  async processBinding(request: DataBinding): Promise<ProcessResult> {
     switch (request.handlerType) {
       case HandlerType.APT_CALL:
         return this.processAptosFunctionCall(request)
@@ -114,8 +114,6 @@ export class AptosPlugin implements Plugin {
         return this.processAptosEvent(request)
       case HandlerType.APT_RESOURCE:
         return this.processAptosResource(request)
-      // case HandlerType.INSTRUCTION:
-      //   return this.processInstruction(request)
       default:
         throw new ServerError(Status.INVALID_ARGUMENT, 'No handle type registered ' + request.handlerType)
     }

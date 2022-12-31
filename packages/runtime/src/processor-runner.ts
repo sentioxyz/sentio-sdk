@@ -12,12 +12,14 @@ import { CompressionAlgorithms } from '@grpc/grpc-js/build/src/compression-algor
 import { ProcessorDefinition } from '@sentio/protos'
 import { ProcessorServiceImpl } from './service'
 import { setProvider } from './provider'
-import { State } from '@sentio/base'
-import { load } from './loader'
+import { State } from './state'
 import { Endpoints } from './endpoints'
 
+import { load } from './loader'
+import { FullProcessorServiceImpl } from './full-service'
+
 State.reset()
-global.ENDPOINTS = new Endpoints()
+Endpoints.reset()
 
 const optionDefinitions = [
   { name: 'target', type: String, defaultOption: true },
@@ -72,8 +74,8 @@ const fullPath = path.resolve(options['chains-config'])
 const chainsConfig = fs.readJsonSync(fullPath)
 
 setProvider(chainsConfig, options.concurrency, options['use-chainserver'])
-globalThis.ENDPOINTS.chainQueryAPI = options['chainquery-server']
-globalThis.ENDPOINTS.priceFeedAPI = options['pricefeed-server']
+Endpoints.INSTANCE.chainQueryAPI = options['chainquery-server']
+Endpoints.INSTANCE.priceFeedAPI = options['pricefeed-server']
 
 if (options.debug) {
   console.log('Starting Server', options)
@@ -85,7 +87,9 @@ const server = createServer({
   'grpc.default_compression_algorithm': CompressionAlgorithms.gzip,
 })
 
-const service = new ProcessorServiceImpl(() => load(options.target), server.shutdown)
+const baseService = new ProcessorServiceImpl(() => load(options.target), server.shutdown)
+const service = new FullProcessorServiceImpl(baseService)
+
 server.add(ProcessorDefinition, service)
 
 server.listen('0.0.0.0:' + options.port)

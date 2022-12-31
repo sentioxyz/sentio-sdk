@@ -8,7 +8,7 @@ import { HandleInterval, TemplateInstance } from '@sentio/protos'
 import { getNetwork } from '@ethersproject/providers'
 import { PromiseOrVoid } from '../promise-or-void'
 import { Trace } from './trace'
-import { ListStateStorage } from '@sentio/base'
+import { ListStateStorage } from '@sentio/runtime'
 
 export class ProcessorTemplateProcessorState extends ListStateStorage<
   BaseProcessorTemplate<BaseContract, BoundContractView<BaseContract, any>>

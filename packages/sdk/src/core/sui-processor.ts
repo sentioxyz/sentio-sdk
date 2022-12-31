@@ -1,6 +1,6 @@
 import { SuiContext } from './context'
 import { ProcessResult } from '@sentio/protos'
-import { ListStateStorage } from '@sentio/base'
+import { ListStateStorage } from '@sentio/runtime'
 
 type IndexConfigure = {
   startSeqNumber: bigint

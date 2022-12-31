@@ -1,4 +1,4 @@
-import { Plugin, PluginManager } from '@sentio/base'
+import { Plugin, PluginManager } from '@sentio/runtime'
 import {
   ContractConfig,
   Data_SolInstruction,
@@ -7,14 +7,14 @@ import {
   ProcessConfigResponse,
   ProcessResult,
 } from '@sentio/protos'
-import { mergeProcessResults, USER_PROCESSOR } from '@sentio/base'
+import { mergeProcessResults, USER_PROCESSOR } from '@sentio/runtime'
 
 import { ServerError, Status } from 'nice-grpc'
 
 import { SolanaProcessorState } from './solana-processor'
 import { Instruction as SolInstruction } from '@project-serum/anchor/dist/cjs/coder/borsh/instruction'
 
-export class SolanaPlugin implements Plugin {
+export class SolanaPlugin extends Plugin {
   name: string = 'SolanaPlugin'
 
   configure(config: ProcessConfigResponse): void {

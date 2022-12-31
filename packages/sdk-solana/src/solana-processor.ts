@@ -2,7 +2,7 @@ import { ProcessResult } from '@sentio/protos'
 import { SolanaContext } from './solana-context'
 import { Instruction } from '@project-serum/anchor'
 import { SolanaBindOptions } from './solana-options'
-import { ListStateStorage } from '@sentio/base'
+import { ListStateStorage } from '@sentio/runtime'
 import { CHAIN_IDS } from '@sentio/sdk/lib/utils/chain'
 
 type IndexConfigure = {

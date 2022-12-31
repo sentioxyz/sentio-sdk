@@ -1,11 +1,17 @@
-import { DataBinding, HandlerType, ProcessConfigResponse, ProcessResult } from '@sentio/protos'
+import { DataBinding, HandlerType, ProcessConfigResponse, ProcessResult, StartRequest } from '@sentio/protos'
 
-export interface Plugin {
+export abstract class Plugin {
   name: string
-  supportedHandlers: HandlerType[]
+  supportedHandlers: HandlerType[] = []
 
-  configure(config: ProcessConfigResponse): void
-  processBinding(request: DataBinding): Promise<ProcessResult>
+  configure(config: ProcessConfigResponse) {}
+  start(start: StartRequest) {}
+  stateDiff(config: ProcessConfigResponse): boolean {
+    return false
+  }
+  async processBinding(request: DataBinding): Promise<ProcessResult> {
+    return ProcessResult.fromPartial({})
+  }
 }
 
 export class PluginManager {
@@ -16,7 +22,6 @@ export class PluginManager {
 
   register(plugin: Plugin) {
     this.plugins.push(plugin)
-    // for (const plugin of this.plugins) {
     for (const handlerType of plugin.supportedHandlers) {
       const exsited = this.typesToPlugin.get(handlerType)
       if (exsited) {
@@ -24,11 +29,18 @@ export class PluginManager {
       }
       this.typesToPlugin.set(handlerType, plugin)
     }
-    // }
   }
 
   configure(config: ProcessConfigResponse) {
     this.plugins.forEach((plugin) => plugin.configure(config))
+  }
+
+  start(start: StartRequest) {
+    this.plugins.forEach((plugin) => plugin.start(start))
+  }
+
+  stateDiff(config: ProcessConfigResponse): boolean {
+    return this.plugins.some((plugin) => plugin.stateDiff(config))
   }
 
   processBinding(request: DataBinding): Promise<ProcessResult> {

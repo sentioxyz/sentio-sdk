@@ -1,4 +1,4 @@
-export { getProvider, setProvider, DummyProvider } from './provider'
+export { getProvider, setProvider, DummyProvider } from '@sentio/runtime'
 export { transformEtherError, EthersError } from './error'
 
 export { getProcessor, addProcessor, getContractByABI, addContractByABI } from './binds'

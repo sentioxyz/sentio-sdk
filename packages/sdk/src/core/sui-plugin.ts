@@ -1,15 +1,13 @@
-import { Plugin, PluginManager } from '@sentio/base'
+import { Plugin, PluginManager, USER_PROCESSOR } from '@sentio/runtime'
 import { ContractConfig, DataBinding, HandlerType, ProcessConfigResponse, ProcessResult } from '@sentio/protos'
-
-import { USER_PROCESSOR } from '../service'
 
 import { ServerError, Status } from 'nice-grpc'
 
 import { CHAIN_IDS } from '../utils/chain'
 import { SuiProcessorState } from './sui-processor'
 
-export class SuiPlugin implements Plugin {
-  name: string = 'SolanaPlugin'
+export class SuiPlugin extends Plugin {
+  name: string = 'SuiPlugin'
 
   configure(config: ProcessConfigResponse): void {
     for (const suiProcessor of SuiProcessorState.INSTANCE.getValues()) {
@@ -34,7 +32,7 @@ export class SuiPlugin implements Plugin {
     }
   }
 
-  supportedHandlers = [HandlerType.SUI_TRANSACTION]
+  supportedHandlers = []
 
   processBinding(request: DataBinding): Promise<ProcessResult> {
     switch (request.handlerType) {

@@ -9,6 +9,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@sentio/protos": "^1.0.0",
     "@ethersproject/providers": "~5.7.0",
     "bignumber.js": "^9.1.0",
     "command-line-args": "^5.2.1",
@@ -16,7 +17,6 @@
     "ethers": "~5.7.1",
     "fs-extra": "^11.0.0",
     "google-protobuf": "^3.15.8",
-    "js-yaml": "^4.1.0",
     "nice-grpc": "^2.0.0",
     "nice-grpc-client-middleware-retry": "^2.0.1",
     "nice-grpc-error-details": "^0.1.4",
@@ -33,7 +33,6 @@
     "@types/expect": "^24.3.0",
     "@types/fs-extra": "^9.0.13",
     "@types/google-protobuf": "^3.15.6",
-    "@types/js-yaml": "^4.0.5",
     "@types/node": "^18.0.4"
   },
   "bin": {
@@ -43,7 +42,7 @@
   "types": "./lib/index.d.ts",
   "module": "./lib/index.js",
   "files": [
-    "{lib,src,templates}",
+    "{lib,src}",
     "!{lib,src}/tests",
     "!**/*.test.{js,ts}"
   ]

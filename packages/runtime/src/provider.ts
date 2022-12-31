@@ -3,6 +3,7 @@ import { Networkish } from '@ethersproject/networks'
 import PQueue from 'p-queue'
 import { ConnectionInfo } from '@ethersproject/web'
 import { ChainConfig } from './chain-config'
+import { Endpoints } from './endpoints'
 
 export const DummyProvider = new StaticJsonRpcProvider(undefined, 1)
 
@@ -12,23 +13,23 @@ export function getProvider(networkish?: Networkish): Provider {
   }
   const network = getNetwork(networkish)
 
-  if (!global.ENDPOINTS.providers) {
+  if (!Endpoints.INSTANCE.providers) {
     throw Error('Provider not set')
   }
-  const value = global.ENDPOINTS.providers.get(network.chainId)
+  const value = Endpoints.INSTANCE.providers.get(network.chainId)
   if (value === undefined) {
     throw Error(
       'Provider not found for chain ' +
         network.chainId +
         ', configured chains: ' +
-        [...global.ENDPOINTS.providers.keys()].join(' ')
+        [...Endpoints.INSTANCE.providers.keys()].join(' ')
     )
   }
   return value
 }
 
 export function setProvider(config: Record<string, ChainConfig>, concurrency = 4, useChainServer = false) {
-  globalThis.ENDPOINTS.providers = new Map<number, Provider>()
+  Endpoints.INSTANCE.providers = new Map<number, Provider>()
 
   for (const chainIdStr in config) {
     if (isNaN(Number.parseInt(chainIdStr))) {
@@ -56,7 +57,7 @@ export function setProvider(config: Record<string, ChainConfig>, concurrency = 4
     }
 
     const provider = new QueuedStaticJsonRpcProvider(rpcAddress, chainId, concurrency)
-    global.ENDPOINTS.providers.set(chainId, provider)
+    Endpoints.INSTANCE.providers.set(chainId, provider)
   }
 }
 

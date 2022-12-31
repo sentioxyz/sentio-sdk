@@ -1,7 +1,7 @@
 import { BaseContext } from './base-context'
 import { EventTrackingResult } from '@sentio/protos'
 import { NamedResultDescriptor } from './metadata'
-import { MapStateStorage } from '@sentio/base'
+import { MapStateStorage } from '@sentio/runtime'
 
 export interface Event {
   // The unique identifier of main identity associate with an event

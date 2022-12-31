@@ -14,21 +14,11 @@ import {
 
 import { Empty } from '@sentio/protos/lib/google/protobuf/empty'
 
-import { MetricState } from './core/meter'
-import { ExporterState } from './core/exporter'
-import { EventTrackerState } from './core/event-tracker'
-import { ProcessorTemplateProcessorState, TemplateInstanceState } from './core/base-processor-template'
-
-// (Long.prototype as any).toBigInt = function() {
-//   return BigInt(this.toString())
-// };
-import { errorString, mergeProcessResults, PluginManager } from '@sentio/base'
-import * as console from 'console'
+import { PluginManager } from './plugin'
+import { errorString, mergeProcessResults } from './utils'
 ;(BigInt.prototype as any).toJSON = function () {
   return this.toString()
 }
-
-export const USER_PROCESSOR = 'user_processor'
 
 export class ProcessorServiceImpl implements ProcessorServiceImplementation {
   private started = false
@@ -55,34 +45,6 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
 
   async configure() {
     this.processorConfig = ProcessConfigResponse.fromPartial({})
-    // This syntax is to copy values instead of using references
-    this.processorConfig.templateInstances = [...TemplateInstanceState.INSTANCE.getValues()]
-
-    // part 0, prepare metrics and event tracking configs
-    for (const metric of MetricState.INSTANCE.getValues()) {
-      this.processorConfig.metricConfigs.push({
-        ...metric.config,
-      })
-    }
-
-    for (const eventTracker of EventTrackerState.INSTANCE.getValues()) {
-      this.processorConfig.eventTrackingConfigs.push({
-        distinctAggregationByDays: eventTracker.options.distinctByDays || [],
-        eventName: eventTracker.name,
-        retentionConfig: undefined,
-        totalByDay: eventTracker.options.totalByDay || false,
-        totalPerEntity: undefined,
-        unique: eventTracker.options.unique || false,
-      })
-    }
-
-    for (const exporter of ExporterState.INSTANCE.getValues()) {
-      this.processorConfig.exportConfigs.push({
-        name: exporter.name,
-        channel: exporter.channel,
-      })
-    }
-
     PluginManager.INSTANCE.configure(this.processorConfig)
   }
 
@@ -93,6 +55,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
 
     try {
       for (const plugin of [
+        '@sentio/sdk/lib/core/core-plugin',
         '@sentio/sdk/lib/core/eth-plugin',
         '@sentio/sdk/lib/core/sui-plugin',
         '@sentio/sdk-aptos/lib/aptos-plugin',
@@ -110,22 +73,8 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       throw new ServerError(Status.INVALID_ARGUMENT, 'Failed to load processor: ' + errorString(e))
     }
 
-    for (const instance of request.templateInstances) {
-      const template = ProcessorTemplateProcessorState.INSTANCE.getValues()[instance.templateId]
-      if (!template) {
-        throw new ServerError(Status.INVALID_ARGUMENT, 'Invalid template contract:' + instance)
-      }
-      if (!instance.contract) {
-        throw new ServerError(Status.INVALID_ARGUMENT, 'Contract Empty from:' + instance)
-      }
-      template.bind({
-        name: instance.contract.name,
-        address: instance.contract.address,
-        network: Number(instance.contract.chainId),
-        startBlock: instance.startBlock,
-        endBlock: instance.endBlock,
-      })
-    }
+    PluginManager.INSTANCE.start(request)
+
     try {
       await this.configure()
     } catch (e) {
@@ -152,8 +101,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     const result = mergeProcessResults(await Promise.all(promises))
 
     let updated = false
-    const t = TemplateInstanceState.INSTANCE.getValues()
-    if (TemplateInstanceState.INSTANCE.getValues().length !== this.processorConfig.templateInstances.length) {
+    if (PluginManager.INSTANCE.stateDiff(this.processorConfig)) {
       await this.configure()
       updated = true
     }
@@ -174,7 +122,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     for await (const request of requests) {
       const result = await this.processBinding(request)
       let updated = false
-      if (TemplateInstanceState.INSTANCE.getValues().length !== this.processorConfig.templateInstances.length) {
+      if (PluginManager.INSTANCE.stateDiff(this.processorConfig)) {
         await this.configure()
         updated = true
       }

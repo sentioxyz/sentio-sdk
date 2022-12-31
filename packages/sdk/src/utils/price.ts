@@ -1,10 +1,11 @@
 import { PriceServiceClient, PriceServiceDefinition } from '@sentio/protos/lib/service/price/protos/price'
 import { createChannel, createClientFactory } from 'nice-grpc'
 import { retryMiddleware, RetryOptions } from 'nice-grpc-client-middleware-retry'
+import { Endpoints } from '@sentio/runtime'
 
 export function getPriceClient(address?: string) {
   if (!address) {
-    address = global.ENDPOINTS.priceFeedAPI
+    address = Endpoints.INSTANCE.priceFeedAPI
   }
   const channel = createChannel(address)
 

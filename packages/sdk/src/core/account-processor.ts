@@ -1,4 +1,4 @@
-import { ListStateStorage } from '@sentio/base'
+import { ListStateStorage } from '@sentio/runtime'
 import { ERC20__factory, ERC721__factory } from '../builtin/internal'
 import { AddressType, DummyProvider, ProcessResult } from '@sentio/sdk'
 import { AccountBindOptions } from './bind-options'

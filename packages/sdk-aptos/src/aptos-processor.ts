@@ -8,7 +8,7 @@ import { TYPE_REGISTRY, TypeRegistry } from './type-registry'
 import { AptosBindOptions, AptosNetwork, getChainId } from './network'
 import { AptosContext, AptosResourceContext } from './context'
 import { EventInstance } from './models'
-import { ListStateStorage } from '@sentio/base'
+import { ListStateStorage } from '@sentio/runtime'
 import { HandleInterval, ProcessResult } from '@sentio/protos'
 
 type IndexConfigure = {

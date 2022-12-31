@@ -1,4 +1,4 @@
-import { Plugin, PluginManager } from '@sentio/base'
+import { Plugin, PluginManager, errorString, mergeProcessResults, USER_PROCESSOR } from '@sentio/runtime'
 import {
   AccountConfig,
   ContractConfig,
@@ -8,16 +8,17 @@ import {
   LogHandlerConfig,
   ProcessConfigResponse,
   ProcessResult,
+  StartRequest,
 } from '@sentio/protos'
-import { errorString, mergeProcessResults, USER_PROCESSOR } from '@sentio/base'
 
 import { ServerError, Status } from 'nice-grpc'
 import { Block, Log } from '@ethersproject/abstract-provider'
 import { Trace } from '@sentio/sdk'
 import { ProcessorState } from '../binds'
 import { AccountProcessorState } from './account-processor'
+import { ProcessorTemplateProcessorState, TemplateInstanceState } from './base-processor-template'
 
-export class EthPlugin implements Plugin {
+export class EthPlugin extends Plugin {
   name: string = 'EthPlugin'
 
   private eventHandlers: ((event: Log) => Promise<ProcessResult>)[] = []
@@ -25,6 +26,9 @@ export class EthPlugin implements Plugin {
   private blockHandlers: ((block: Block) => Promise<ProcessResult>)[] = []
 
   configure(config: ProcessConfigResponse): void {
+    // This syntax is to copy values instead of using references
+    config.templateInstances = [...TemplateInstanceState.INSTANCE.getValues()]
+
     for (const processor of ProcessorState.INSTANCE.getValues()) {
       // If server favor incremental update this need to change
       // Start basic config for contract
@@ -173,6 +177,29 @@ export class EthPlugin implements Plugin {
       default:
         throw new ServerError(Status.INVALID_ARGUMENT, 'No handle type registered ' + request.handlerType)
     }
+  }
+
+  start(request: StartRequest) {
+    for (const instance of request.templateInstances) {
+      const template = ProcessorTemplateProcessorState.INSTANCE.getValues()[instance.templateId]
+      if (!template) {
+        throw new ServerError(Status.INVALID_ARGUMENT, 'Invalid template contract:' + instance)
+      }
+      if (!instance.contract) {
+        throw new ServerError(Status.INVALID_ARGUMENT, 'Contract Empty from:' + instance)
+      }
+      template.bind({
+        name: instance.contract.name,
+        address: instance.contract.address,
+        network: Number(instance.contract.chainId),
+        startBlock: instance.startBlock,
+        endBlock: instance.endBlock,
+      })
+    }
+  }
+
+  stateDiff(config: ProcessConfigResponse): boolean {
+    return TemplateInstanceState.INSTANCE.getValues().length !== config.templateInstances.length
   }
 
   async processLog(request: DataBinding): Promise<ProcessResult> {

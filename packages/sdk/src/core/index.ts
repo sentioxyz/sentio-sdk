@@ -15,3 +15,4 @@ export type { TypedCallTrace, Trace } from './trace'
 
 export { EthPlugin } from './eth-plugin'
 export { SuiPlugin } from './sui-plugin'
+export { CorePlugin } from './core-plugin'
