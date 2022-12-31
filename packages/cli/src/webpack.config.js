@@ -38,8 +38,11 @@ module.exports = {
       if (/^@(ethersproject|solana|project-serum|nice-grpc).*$/.test(request)) {
         return callback(null, 'commonjs ' + request)
       }
-      if (request.startsWith("@sentio/sdk")) {
-        return callback(null, 'commonjs2 ' + request)
+      if (/^nice-grpc.*$/.test(request)) {
+        return callback(null, 'commonjs ' + request)
+      }
+      if (/^@sentio\/(sdk|runtime|base|protos).*$/.test(request)) {
+        return callback(null, 'commonjs ' + request)
       }
       callback()
     },

@@ -31,11 +31,15 @@ ignore:
   - packages/sdk/lib
   - packages/sdk/node_modules
   - examples
-  - packages/sdk/src/tests/abis
-  - packages/sdk/src/tests/types
+  - packages/sdk/src/tests
   - packages/base/lib
   - packages/base/node_modules
   - packages/protos/lib
   - packages/protos/node_modules
   - packages/runtime/lib
   - packages/runtime/node_modules
+  - packages/sdk-aptos/lib
+  - packages/sdk-aptos/node_modules
+  - packages/sdk-solana/lib
+  - packages/sdk-solana/node_modules
+  - packages/sdk-solana/src/tests

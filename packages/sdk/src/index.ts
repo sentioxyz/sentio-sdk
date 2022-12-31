@@ -8,4 +8,6 @@ export * from '@sentio/protos'
 
 export * from './core'
 
-export * as aptos from './aptos'
+export * from './utils/chain'
+
+// export * from  './api'

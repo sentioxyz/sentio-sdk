@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "inlineSources": true,
+    "rootDir": "./src",
+    "baseUrl": "./src",
+    "outDir": "lib",
+    "paths": {
+      "@sentio/sdk-aptos": ["."]
+    }
+  },
+  "exclude": ["lib"]
+}

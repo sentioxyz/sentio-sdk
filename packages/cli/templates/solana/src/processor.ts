@@ -1,4 +1,4 @@
-import { SPLTokenProcessor } from '@sentio/sdk/lib/builtin/solana'
+import { SPLTokenProcessor } from '@sentio/sdk-solana/lib/builtin'
 
 SPLTokenProcessor.bind({
   address: 'wormDTUJ6AWPNvk59vGQbDvGJmqbDTdgWgAqcLBCgUb',

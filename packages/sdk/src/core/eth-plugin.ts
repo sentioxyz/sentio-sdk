@@ -9,7 +9,7 @@ import {
   ProcessConfigResponse,
   ProcessResult,
 } from '@sentio/protos'
-import { DEFAULT_MAX_BLOCK, errorString, mergeProcessResults, USER_PROCESSOR, Utf8ArrayToStr } from '../service'
+import { errorString, mergeProcessResults, USER_PROCESSOR } from '@sentio/base'
 
 import { ServerError, Status } from 'nice-grpc'
 import { Block, Log } from '@ethersproject/abstract-provider'
@@ -43,7 +43,7 @@ export class EthPlugin implements Plugin {
         logConfigs: [],
         traceConfigs: [],
         startBlock: processor.config.startBlock,
-        endBlock: DEFAULT_MAX_BLOCK,
+        endBlock: 0n,
         instructionConfig: undefined,
         aptosEventConfigs: [],
         aptosCallConfigs: [],
@@ -185,8 +185,7 @@ export class EthPlugin implements Plugin {
     if (request.data.ethLog) {
       log = request.data.ethLog.log as Log
     } else {
-      const jsonString = Utf8ArrayToStr(request.data.raw)
-      log = JSON.parse(jsonString)
+      throw new ServerError(Status.INVALID_ARGUMENT, "Log can't be null")
     }
 
     for (const handlerId of request.handlerIds) {
@@ -208,8 +207,7 @@ export class EthPlugin implements Plugin {
     if (binding.data.ethTrace?.trace) {
       trace = binding.data.ethTrace.trace as Trace
     } else {
-      const jsonString = Utf8ArrayToStr(binding.data.raw)
-      trace = JSON.parse(jsonString)
+      throw new ServerError(Status.INVALID_ARGUMENT, "Trace can't be null")
     }
 
     const promises: Promise<ProcessResult>[] = []
@@ -235,8 +233,7 @@ export class EthPlugin implements Plugin {
     if (binding.data.ethBlock?.block) {
       block = binding.data.ethBlock.block as Block
     } else {
-      const jsonString = Utf8ArrayToStr(binding.data.raw)
-      block = JSON.parse(jsonString)
+      throw new ServerError(Status.INVALID_ARGUMENT, "Block can't be empty")
     }
 
     const promises: Promise<ProcessResult>[] = []

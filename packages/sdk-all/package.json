@@ -1,0 +1,25 @@
+{
+  "name": "@sentio/sdk-all",
+  "license": "Apache-2.0",
+  "version": "1.0.0",
+  "scripts": {
+    "compile": "tsc -p .",
+    "build": "yarn compile",
+    "build_all": "yarn lerna run --scope=@sentio/sdk-all build --include-dependencies",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@sentio/sdk": "^1.0.0",
+    "@sentio/runtime": "^1.0.0",
+    "@sentio/sdk-aptos": "^1.0.0",
+    "@sentio/sdk-solana": "^1.0.0"
+  },
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "module": "./lib/index.js",
+  "files": [
+    "{lib,src}",
+    "!{lib,src}/tests",
+    "!**/*.test.{js,ts}"
+  ]
+}

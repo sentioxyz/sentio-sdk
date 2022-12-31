@@ -1,7 +1,9 @@
 packages/sdk/src/builtin/*
-!packages/sdk/src/builtin/solana
-!packages/sdk/src/builtin/aptos/index.ts
 !packages/sdk/src/builtin/index.ts
+
+packages/sdk-aptos/src/builtin/
+!packages/sdk-aptos/src/builtin/index.ts
+
 node_modules
 dist
 lib

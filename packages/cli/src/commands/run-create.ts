@@ -105,7 +105,19 @@ export async function runCreate(argv: string[]) {
         cliVersion = '^' + cliVersion
       }
 
-      packageJson.dependencies['@sentio/sdk'] = '^' + (await latestVersion('@sentio/sdk'))
+      const sdkVersion = '^' + (await latestVersion('@sentio/sdk'))
+      packageJson.dependencies['@sentio/sdk'] = sdkVersion
+
+      switch (chainType) {
+        case 'aptos':
+          packageJson.dependencies['@sentio/sdk-aptos'] = sdkVersion
+          break
+        case 'solana':
+          packageJson.dependencies['@sentio/sdk-solana'] = sdkVersion
+          break
+        default:
+      }
+
       packageJson.dependencies['@sentio/cli'] = cliVersion
       packageJson.name = projectName
 

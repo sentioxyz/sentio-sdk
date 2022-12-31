@@ -1,0 +1,28 @@
+{
+  "name": "@sentio/sdk-solana",
+  "license": "Apache-2.0",
+  "version": "1.0.0",
+  "scripts": {
+    "compile": "tsc -p .",
+    "build": "yarn compile",
+    "build_all": "yarn lerna run --scope=@sentio/sdk-solana build --include-dependencies",
+    "test": "yarn gen_test && yarn jest",
+    "gen_test": "ts-node src/run-codegen.ts src/tests/abis src/tests/types"
+  },
+  "dependencies": {
+    "@sentio/sdk": "^1.0.0",
+    "@project-serum/anchor": "^0.26.0",
+    "@dao-xyz/borsh": "^4.0.7",
+    "@solana/web3.js": "^1.47.3",
+    "@types/bs58": "^4.0.1",
+    "bs58": "^5.0.0"
+  },
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "module": "./lib/index.js",
+  "files": [
+    "{lib,src}",
+    "!{lib,src}/tests",
+    "!**/*.test.{js,ts}"
+  ]
+}

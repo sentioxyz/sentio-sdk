@@ -22,12 +22,11 @@ import { ProcessorTemplateProcessorState, TemplateInstanceState } from './core/b
 // (Long.prototype as any).toBigInt = function() {
 //   return BigInt(this.toString())
 // };
-import { PluginManager } from '@sentio/base'
+import { errorString, mergeProcessResults, PluginManager } from '@sentio/base'
+import * as console from 'console'
 ;(BigInt.prototype as any).toJSON = function () {
   return this.toString()
 }
-
-export const DEFAULT_MAX_BLOCK = 0n
 
 export const USER_PROCESSOR = 'user_processor'
 
@@ -93,16 +92,17 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     }
 
     try {
-      try {
-        require('./core/eth-plugin')
-        require('./core/sui-plugin')
-        require('./aptos/aptos-plugin')
-        require('./core/solana-plugin')
-      } catch (e) {
-        require('@sentio/sdk/lib/core/eth-plugin')
-        require('@sentio/sdk/lib/core/sui-plugin')
-        require('@sentio/sdk/lib/aptos/aptos-plugin')
-        require('@sentio/sdk/lib/core/solana-plugin')
+      for (const plugin of [
+        '@sentio/sdk/lib/core/eth-plugin',
+        '@sentio/sdk/lib/core/sui-plugin',
+        '@sentio/sdk/lib/aptos/aptos-plugin',
+        '@sentio/sdk-solana/lib/solana-plugin',
+      ]) {
+        try {
+          require(plugin)
+        } catch (e) {
+          console.error('Failed to load plugin: ', plugin)
+        }
       }
 
       this.loader()
@@ -186,60 +186,6 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
   }
 }
 
-// https://ourcodeworld.com/articles/read/164/how-to-convert-an-uint8array-to-string-in-javascript
-/* eslint-disable */
-export function Utf8ArrayToStr(array: Uint8Array) {
-  let out, i, len, c
-  let char2, char3
-
-  out = ''
-  len = array.length
-  i = 0
-  while (i < len) {
-    c = array[i++]
-    switch (c >> 4) {
-      case 0:
-      case 1:
-      case 2:
-      case 3:
-      case 4:
-      case 5:
-      case 6:
-      case 7:
-        // 0xxxxxxx
-        out += String.fromCharCode(c)
-        break
-      case 12:
-      case 13:
-        // 110x xxxx   10xx xxxx
-        char2 = array[i++]
-        out += String.fromCharCode(((c & 0x1f) << 6) | (char2 & 0x3f))
-        break
-      case 14:
-        // 1110 xxxx  10xx xxxx  10xx xxxx
-        char2 = array[i++]
-        char3 = array[i++]
-        out += String.fromCharCode(((c & 0x0f) << 12) | ((char2 & 0x3f) << 6) | ((char3 & 0x3f) << 0))
-        break
-    }
-  }
-
-  return out
-}
-
-export function mergeProcessResults(results: ProcessResult[]): ProcessResult {
-  const res = ProcessResult.fromPartial({})
-
-  for (const r of results) {
-    res.counters = res.counters.concat(r.counters)
-    res.gauges = res.gauges.concat(r.gauges)
-    res.logs = res.logs.concat(r.logs)
-    res.events = res.events.concat(r.events)
-    res.exports = res.exports.concat(r.exports)
-  }
-  return res
-}
-
 function recordRuntimeInfo(results: ProcessResult, handlerType: HandlerType) {
   for (const list of [results.gauges, results.counters, results.logs, results.events, results.exports]) {
     list.forEach((e) => {
@@ -248,8 +194,4 @@ function recordRuntimeInfo(results: ProcessResult, handlerType: HandlerType) {
       }
     })
   }
-}
-
-export function errorString(e: Error): string {
-  return e.stack || e.message
 }

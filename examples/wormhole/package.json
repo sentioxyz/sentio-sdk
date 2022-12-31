@@ -1,5 +1,5 @@
 {
-  "name": "@sentio/example-wormhole",
+  "name": "@sentio-example/wormhole",
   "license": "Apache-2.0",
   "version": "1.0.0",
   "private": "true",
@@ -10,7 +10,8 @@
     "build_all": "yarn lerna run --scope=@sentio/example-wormhole build --include-dependencies"
   },
   "dependencies": {
-    "@sentio/sdk": "^1.0.0-development"
+    "@sentio/sdk": "^1.0.0-development",
+    "@sentio/sdk-solana": "^1.0.0-development"
   },
   "devDependencies": {
     "@sentio/cli": "^1.0.0"

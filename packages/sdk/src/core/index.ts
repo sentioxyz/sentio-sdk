@@ -11,12 +11,7 @@ export { GenericProcessor } from './generic-processor'
 export { BaseProcessorTemplate } from './base-processor-template'
 export { SuiBaseProcessor, SuiBindOptions } from './sui-processor'
 
-export { SolanaContext } from './solana-context'
-export { SolanaBindOptions } from './solana-options'
-export { SolanaBaseProcessor } from './solana-processor'
-
 export type { TypedCallTrace, Trace } from './trace'
 
 export { EthPlugin } from './eth-plugin'
-export { SolanaPlugin } from './solana-plugin'
 export { SuiPlugin } from './sui-plugin'

@@ -1,7 +1,7 @@
 import { Plugin, PluginManager } from '@sentio/base'
 import { ContractConfig, DataBinding, HandlerType, ProcessConfigResponse, ProcessResult } from '@sentio/protos'
 
-import { DEFAULT_MAX_BLOCK, USER_PROCESSOR } from '../service'
+import { USER_PROCESSOR } from '../service'
 
 import { ServerError, Status } from 'nice-grpc'
 
@@ -25,7 +25,7 @@ export class SuiPlugin implements Plugin {
         intervalConfigs: [],
         traceConfigs: [],
         startBlock: suiProcessor.config.startSeqNumber,
-        endBlock: DEFAULT_MAX_BLOCK,
+        endBlock: 0n,
         instructionConfig: undefined,
         aptosEventConfigs: [],
         aptosCallConfigs: [],

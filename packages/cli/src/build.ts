@@ -24,11 +24,11 @@ async function buildProcessorForTarget(onlyGen: boolean) {
   await codeGenEthersProcessor(path.join('abis', 'evm'))
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const solanaModule = require('@sentio/sdk/lib/solana-codegen/codegen')
+  const solanaModule = require('@sentio/sdk-solana/lib/codegen/codegen')
   solanaModule.codeGenSolanaProcessor(path.join('abis', 'solana'))
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const aptosModuole = require('@sentio/sdk/lib/aptos-codegen/codegen')
+  const aptosModuole = require('@sentio/sdk-aptos/lib/codegen/codegen')
   aptosModuole.codeGenAptosProcessor(path.join('abis', 'aptos'))
 
   if (onlyGen) {
