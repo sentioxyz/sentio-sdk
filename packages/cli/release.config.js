@@ -16,6 +16,7 @@ module.exports = {
       },
     ],
     ["@semantic-release/npm", {
+      npmPublish: true,
     }],
     ['@semantic-release/release-notes-generator', {
       preset: 'conventionalcommits',
