@@ -1,7 +1,7 @@
 {
   "name": "@sentio/runtime",
   "license": "Apache-2.0",
-  "version": "1.0.0-development",
+  "version": "1.0.0-rc.5",
   "scripts": {
     "compile": "tsc -p .",
     "build": "yarn compile",
@@ -48,5 +48,6 @@
   ],
   "engines": {
     "node": ">=16"
-  }
+  },
+  "gitHead": "8bec43cdc9e778d66a4154bc1be1f9276b680408"
 }
