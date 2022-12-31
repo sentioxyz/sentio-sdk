@@ -1,0 +1,56 @@
+name: Publish CLI
+
+on:
+  push:
+    branches:
+      - main
+      - release
+    paths:
+      - 'packages/cli/**'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          ref: ${{ github.event.inputs.commit }}
+      - uses: actions/setup-node@v3
+        with:
+          cache: yarn
+          node-version: 16
+      - name: Install
+        run: yarn install
+      - name: Build
+        run: yarn lerna run build
+      - name: Clean templates node mdules
+        run: "rm -rf */node_modules"
+        working-directory: packages/cli/templates
+      - name: Semantic Release
+        id: semantic
+        uses: cycjimmy/semantic-release-action@v3
+        with:
+          working_directory: packages/cli
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: mark prerelease and summary
+        if: steps.semantic.outputs.new_release_published == 'true'
+        run: |
+          echo "### New version v${{ steps.semantic.outputs.new_release_version }} cut" >> $GITHUB_STEP_SUMMARY
+          echo "commit: ${GITHUB_SHA}, branch/tag: ${GITHUB_REF}" >> $GITHUB_STEP_SUMMARY
+          echo "automatic release will be marked as prerelease, please manually confirm in the release page" >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.semantic.outputs.new_release_notes }}" >> $GITHUB_STEP_SUMMARY
+        env:
+          GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+      - name: report error
+        if: steps.semantic.outputs.new_release_published == 'false'
+        run: |
+          echo "### No version cut" >> $GITHUB_STEP_SUMMARY
+          echo "Check Semantic Release output for details"
+          exit(1)
+    outputs:
+      release_version: ${{ steps.release.outputs.release_version }}
