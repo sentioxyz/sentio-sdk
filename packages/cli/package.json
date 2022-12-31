@@ -1,7 +1,7 @@
 {
   "name": "@sentio/cli",
   "license": "Apache-2.0",
-  "version": "1.0.5",
+  "version": "1.0.0-rc.1",
   "scripts": {
     "compile": "tsc -p . && cp src/webpack.config.js lib/",
     "build": "yarn compile",

@@ -17,7 +17,6 @@
     "gen_test_abi": "ts-node src/test-abi-code-gen.ts src/tests/abis src/tests/types",
     "gen_bultin_evm": "typechain --target lib/target-ethers-sentio --out-dir src/builtin/internal 'src/abis/*.json'",
     "gen_bultin_others": "ts-node src/test-abi-code-gen.ts src/abis src/builtin",
-    "postbuild": "echo || clear-package-json package.json -o ./lib/package.json && cp release.config.js ./lib",
     "docs": "typedoc --options typedoc.json"
   },
   "dependencies": {

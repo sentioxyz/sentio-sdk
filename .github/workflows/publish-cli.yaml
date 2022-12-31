@@ -1,10 +1,13 @@
-name: Publish Package
+name: Publish CLI
 
 on:
   push:
     branches:
       - main
       - release
+    paths:
+      - 'packages/cli/**'
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -22,19 +25,21 @@ jobs:
       - name: Install
         run: yarn install
       - name: Build
-        run: yarn lerna run --scope=@sentio/sdk build
+        run: yarn lerna run --scope=@sentio/cli build
+      - name: Clean templates node mdules
+        run: "rm -rf */node_modules"
+        working-directory: packages/cli/templates
       - name: Semantic Release
         id: semantic
         uses: cycjimmy/semantic-release-action@v3
-#        with:
-#          working_directory: packages/sdk
+        with:
+          working_directory: packages/cli
         env:
           GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-#          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: mark prerelease and summary
         if: steps.semantic.outputs.new_release_published == 'true'
         run: |
-          # gh release edit v${{ steps.semantic.outputs.new_release_version }} --prerelease
           echo "### New version v${{ steps.semantic.outputs.new_release_version }} cut" >> $GITHUB_STEP_SUMMARY
           echo "commit: ${GITHUB_SHA}, branch/tag: ${GITHUB_REF}" >> $GITHUB_STEP_SUMMARY
           echo "automatic release will be marked as prerelease, please manually confirm in the release page" >> $GITHUB_STEP_SUMMARY
@@ -47,10 +52,5 @@ jobs:
           echo "### No version cut" >> $GITHUB_STEP_SUMMARY
           echo "Check Semantic Release output for details"
           exit(1)
-      - name: Lerna Version Update
-        run: |
-          yarn lerna publish ${{ steps.semantic.outputs.new_release_version }} --no-private --yes --no-push --no-git-tag-version
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     outputs:
       release_version: ${{ steps.release.outputs.release_version }}

@@ -1,4 +1,5 @@
 module.exports = {
+  extends: ["semantic-release-monorepo"],
   branches: ['release', { name: 'main', prerelease: 'rc' }],
   plugins: [
     [
@@ -14,9 +15,9 @@ module.exports = {
         ],
       },
     ],
-    ["@semantic-release/npm", {
-      // "pkgRoot": "dist"
-    }],
+    // ["@semantic-release/npm", {
+    //   // "pkgRoot": "dist"
+    // }],
     ['@semantic-release/release-notes-generator', {
       preset: 'conventionalcommits',
       presetConfig: {
