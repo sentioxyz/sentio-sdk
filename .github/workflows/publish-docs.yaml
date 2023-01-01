@@ -22,7 +22,7 @@ jobs:
       - name: Install
         run: yarn install
       - name: Build
-        run: yarn lerna run build --no-private --ignore @sentio/runtime --ignore @sentio/sdk-all
+        run: yarn lerna run build --no-private --ignore @sentio/sdk-all
       - name: Create the docs directory locally in CI
         run: yarn docs
       - name: Deploy 🚀

@@ -8,7 +8,7 @@ describe('Test Processor', () => {
   })
 
   test('has valid config', async () => {
-    // const config = await service.getConfig({})
-    // expect(config.contractConfigs.length > 0).toBeTruthy()
+    const config = await service.getConfig({})
+    expect(config.contractConfigs.length > 0).toBeTruthy()
   })
 })
