@@ -100,11 +100,6 @@ export async function runCreate(argv: string[]) {
       const packageJsonPath = path.resolve(dstFolder, 'package.json')
       const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'))
 
-      let cliVersion = getCliVersion()
-      if (!cliVersion.startsWith('^')) {
-        cliVersion = '^' + cliVersion
-      }
-
       const sdkVersion = '^' + (await latestVersion('@sentio/sdk'))
       packageJson.dependencies['@sentio/sdk'] = sdkVersion
 
@@ -118,7 +113,8 @@ export async function runCreate(argv: string[]) {
         default:
       }
 
-      packageJson.dependencies['@sentio/cli'] = cliVersion
+      const cliVersion = '^' + (await latestVersion('@sentio/cli'))
+      packageJson.devDependencies['@sentio/cli'] = cliVersion
       packageJson.name = projectName
 
       // Don't add directly to avoid deps issue

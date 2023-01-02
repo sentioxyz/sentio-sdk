@@ -1,7 +1,7 @@
 {
   "name": "@sentio/protos",
   "license": "Apache-2.0",
-  "version": "1.0.0",
+  "version": "1.0.0-development",
   "scripts": {
     "compile": "tsc -p .",
     "clean": "tsc --build --clean",

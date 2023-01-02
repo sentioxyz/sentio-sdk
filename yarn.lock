@@ -2389,6 +2389,24 @@
     lodash "^4.17.4"
     read-pkg-up "^7.0.0"
 
+"@sentio/cli@^1.0.0":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@sentio/cli/-/cli-1.1.1.tgz#84819e001b59e134d967e05d39622b05a4bb08d1"
+  integrity sha512-Z3WlVRdiY0V2z2pf7JxDj2e986x+0PK50ZJZjnwys2fHjRjWba63K9NulB71P9GsZCHDVXIgmHHBrdvWXpn89w==
+  dependencies:
+    command-line-args "^5.2.1"
+    command-line-usage "^6.1.3"
+    express "^4.18.2"
+    form-data "^4.0.0"
+    fs-extra "^11.0.0"
+    js-yaml "^4.1.0"
+    latest-version "^5.1.0"
+    node-fetch "2"
+    open "^8.4.0"
+    ts-loader "^9.3.0"
+    webpack "^5.72.1"
+    webpack-cli "^5.0.0"
+
 "@sinclair/typebox@^0.24.1":
   version "0.24.35"
   resolved "https://registry.npmjs.org/@sinclair/typebox/-/typebox-0.24.35.tgz"

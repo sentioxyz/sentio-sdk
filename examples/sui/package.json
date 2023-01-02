@@ -13,6 +13,6 @@
     "@sentio/sdk": "^1.0.0-development"
   },
   "devDependencies": {
-    "@sentio/cli": "^1.0.0"
+    "@sentio/cli": "^1.0.0-development"
   }
 }

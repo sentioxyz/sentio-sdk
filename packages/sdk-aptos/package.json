@@ -1,7 +1,7 @@
 {
   "name": "@sentio/sdk-aptos",
   "license": "Apache-2.0",
-  "version": "1.0.0",
+  "version": "1.0.0-development",
   "scripts": {
     "compile": "tsc -p .",
     "build": "yarn gen && yarn gen_test &&  yarn compile",
@@ -11,7 +11,7 @@
     "gen_test": "ts-node src/run-codegen.ts src/tests/abis src/tests/types"
   },
   "dependencies": {
-    "@sentio/sdk": "^1.0.0",
+    "@sentio/sdk": "^1.0.0-development",
     "aptos-sdk": "npm:aptos@^1.3.17",
     "prettier": "^2.8.1"
   },

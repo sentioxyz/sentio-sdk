@@ -1,7 +1,7 @@
 {
   "name": "@sentio/sdk-all",
   "license": "Apache-2.0",
-  "version": "1.0.0",
+  "version": "1.0.0-development",
   "scripts": {
     "compile": "tsc -p .",
     "build": "yarn compile",
@@ -9,10 +9,10 @@
     "test": "jest"
   },
   "dependencies": {
-    "@sentio/sdk": "^1.0.0",
-    "@sentio/runtime": "^1.0.0",
-    "@sentio/sdk-aptos": "^1.0.0",
-    "@sentio/sdk-solana": "^1.0.0"
+    "@sentio/sdk": "^1.0.0-development",
+    "@sentio/runtime": "^1.0.0-development",
+    "@sentio/sdk-aptos": "^1.0.0-development",
+    "@sentio/sdk-solana": "^1.0.0-development"
   },
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",

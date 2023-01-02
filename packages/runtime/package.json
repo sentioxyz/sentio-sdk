@@ -9,7 +9,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@sentio/protos": "^1.0.0",
+    "@sentio/protos": "^1.0.0-development",
     "@ethersproject/providers": "~5.7.0",
     "bignumber.js": "^9.1.0",
     "command-line-args": "^5.2.1",

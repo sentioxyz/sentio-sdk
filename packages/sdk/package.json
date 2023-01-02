@@ -1,7 +1,7 @@
 {
   "name": "@sentio/sdk",
   "license": "Apache-2.0",
-  "version": "1.0.0",
+  "version": "1.0.0-development",
   "scripts": {
     "compile_target": "yarn tsc -b src/target-ethers-sentio/tsconfig.json",
     "compile": "tsc -p . && cp src/utils/*.csv lib/utils",
@@ -19,8 +19,8 @@
   "dependencies": {
     "@ethersproject/providers": "~5.7.0",
     "@sentio/cli": "^1.0.0",
-    "@sentio/runtime": "^1.0.0",
-    "@sentio/protos": "^1.0.0",
+    "@sentio/runtime": "^1.0.0-development",
+    "@sentio/protos": "^1.0.0-development",
     "@typechain/ethers-v5": "^10.0.0",
     "bignumber.js": "^9.1.0",
     "command-line-args": "^5.2.1",

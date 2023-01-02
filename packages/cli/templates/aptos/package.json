@@ -9,8 +9,8 @@
     "upload": "sentio upload"
   },
   "dependencies": {
-    "@sentio/sdk": "^1.0.0",
-    "@sentio/sdk-aptos": "^1.0.0"
+    "@sentio/sdk": "^1.0.0-development",
+    "@sentio/sdk-aptos": "^1.0.0-development"
   },
   "devDependencies": {
     "@types/jest": "^29.0.0",
