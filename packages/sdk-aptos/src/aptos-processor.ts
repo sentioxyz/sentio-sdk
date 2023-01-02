@@ -88,7 +88,6 @@ export class AptosBaseProcessor {
   ): AptosBaseProcessor {
     // const address = this.config.address
     // const moduleName = this.moduleName
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const processor = this
     this.callHandlers.push({
       handler: async function (tx) {
@@ -124,7 +123,6 @@ export class AptosBaseProcessor {
     // const address = this.config.address
     // const moduleName = this.moduleName
 
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const processor = this
 
     this.eventHandlers.push({
@@ -166,7 +164,6 @@ export class AptosBaseProcessor {
 
     // const address = this.config.address
     // const moduleName = this.moduleName
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const processor = this
 
     this.callHandlers.push({
@@ -235,7 +232,6 @@ export class AptosAccountProcessor {
     versionInterval: HandleInterval | undefined,
     type: string | undefined
   ) {
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const processor = this
     this.resourcesHandlers.push({
       handler: async function (arg) {

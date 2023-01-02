@@ -73,11 +73,13 @@ export abstract class BaseProcessor<
       _filters.push(filter)
     }
 
-    const contractView = this.CreateBoundContractView()
     const contractName = this.config.name
+    const processor = this
     this.eventHandlers.push({
       filters: _filters,
       handler: async function (log) {
+        const contractView = processor.CreateBoundContractView()
+
         const ctx = new ContractContext<TContract, TBoundContractView>(
           contractName,
           contractView,
@@ -139,11 +141,13 @@ export abstract class BaseProcessor<
     blockInterval: HandleInterval | undefined
   ) {
     const chainId = this.getChainId()
-    const contractView = this.CreateBoundContractView()
+    const processor = this
     const contractName = this.config.name
 
     this.blockHandlers.push({
       handler: async function (block: Block) {
+        const contractView = processor.CreateBoundContractView()
+
         const ctx = new ContractContext<TContract, TBoundContractView>(
           contractName,
           contractView,
@@ -177,12 +181,13 @@ export abstract class BaseProcessor<
     handler: (trace: Trace, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid
   ) {
     const chainId = this.getChainId()
-    const contractView = this.CreateBoundContractView()
     const contractName = this.config.name
+    const processor = this
 
     this.traceHandlers.push({
       signature,
       handler: async function (trace: Trace) {
+        const contractView = processor.CreateBoundContractView()
         const contractInterface = contractView.rawContract.interface
         const fragment = contractInterface.getFunction(signature)
         if (!trace.action.input) {

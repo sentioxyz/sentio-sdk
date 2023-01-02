@@ -54,18 +54,22 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     }
 
     try {
+      for (const plugin of ['@sentio/sdk/lib/core/core-plugin', '@sentio/sdk/lib/core/eth-plugin']) {
+        try {
+          require(plugin)
+        } catch (e) {
+          console.error('Failed to load plugin: ', plugin)
+        }
+      }
+
       for (const plugin of [
-        '@sentio/sdk/lib/core/core-plugin',
-        '@sentio/sdk/lib/core/eth-plugin',
         '@sentio/sdk/lib/core/sui-plugin',
         '@sentio/sdk-aptos/lib/aptos-plugin',
         '@sentio/sdk-solana/lib/solana-plugin',
       ]) {
         try {
           require(plugin)
-        } catch (e) {
-          console.error('Failed to load plugin: ', plugin)
-        }
+        } catch (e) {}
       }
 
       this.loader()
