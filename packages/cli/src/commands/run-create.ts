@@ -3,7 +3,6 @@ import commandLineUsage from 'command-line-usage'
 import path from 'path'
 import fs from 'fs-extra'
 import chalk from 'chalk'
-import { getCliVersion } from '../utils'
 import latestVersion from 'latest-version'
 
 export async function runCreate(argv: string[]) {

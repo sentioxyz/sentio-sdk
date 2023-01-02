@@ -22,7 +22,7 @@ jobs:
       - name: Install
         run: yarn install
       - name: Build
-        run: yarn build_all
+        run: yarn lerna run build --no-private
         working-directory: packages/sdk-all
       - name: Semantic Release
         id: semantic
