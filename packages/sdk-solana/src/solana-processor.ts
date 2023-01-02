@@ -74,15 +74,14 @@ export class SolanaBaseProcessor {
     return this.instructionHandlerMap.get(parsedInstruction.name)
   }
 
-  // TODO this should be a async function
-  public handleInstruction(
+  public async handleInstruction(
     parsedInstruction: Instruction,
     accounts: string[],
     handler: SolanaInstructionHandler,
     slot: bigint
-  ): ProcessResult {
+  ): Promise<ProcessResult> {
     const ctx = new SolanaContext(this.contractName, this.network, this.address, slot)
-    handler(parsedInstruction, ctx, accounts)
+    await handler(parsedInstruction, ctx, accounts)
     return ctx.getProcessResult()
   }
 

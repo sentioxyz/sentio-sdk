@@ -1,4 +1,4 @@
-import { Plugin, PluginManager } from '@sentio/runtime'
+import { errorString, mergeProcessResults, Plugin, PluginManager, USER_PROCESSOR } from '@sentio/runtime'
 import {
   ContractConfig,
   Data_SolInstruction,
@@ -7,7 +7,6 @@ import {
   ProcessConfigResponse,
   ProcessResult,
 } from '@sentio/protos'
-import { mergeProcessResults, USER_PROCESSOR } from '@sentio/runtime'
 
 import { ServerError, Status } from 'nice-grpc'
 
@@ -68,10 +67,18 @@ export class SolanaPlugin extends Plugin {
     for (const processor of SolanaProcessorState.INSTANCE.getValues()) {
       if (processor.address === instruction.programAccountId) {
         let parsedInstruction: SolInstruction | null = null
-        if (instruction.parsed) {
-          parsedInstruction = processor.getParsedInstruction(instruction.parsed as { type: string; info: any })
-        } else if (instruction.instructionData) {
-          parsedInstruction = processor.getParsedInstruction(instruction.instructionData)
+
+        try {
+          if (instruction.parsed) {
+            parsedInstruction = processor.getParsedInstruction(instruction.parsed as { type: string; info: any })
+          } else if (instruction.instructionData) {
+            parsedInstruction = processor.getParsedInstruction(instruction.instructionData)
+          }
+        } catch (e) {
+          throw new ServerError(
+            Status.INTERNAL,
+            'Failed to decode instruction: ' + JSON.stringify(instruction) + errorString(e)
+          )
         }
         if (parsedInstruction == null) {
           continue
@@ -80,14 +87,16 @@ export class SolanaPlugin extends Plugin {
         if (insHandler == null) {
           continue
         }
-        const res = await processor.handleInstruction(
-          parsedInstruction,
-          instruction.accounts,
-          insHandler,
-          instruction.slot
-        )
+        const res = processor
+          .handleInstruction(parsedInstruction, instruction.accounts, insHandler, instruction.slot)
+          .catch((e) => {
+            throw new ServerError(
+              Status.INTERNAL,
+              'Error processing instruction: ' + JSON.stringify(instruction) + '\n' + errorString(e)
+            )
+          })
 
-        promises.push(Promise.resolve(res))
+        promises.push(res)
       }
     }
     return mergeProcessResults(await Promise.all(promises))
