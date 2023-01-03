@@ -15,14 +15,16 @@ export abstract class EthContext extends BaseContext {
   trace?: Trace
   blockNumber: bigint | number
   transactionHash?: string
+  timestamp: Date
 
-  protected constructor(chainId: number, address: string, block?: Block, log?: Log, trace?: Trace) {
+  protected constructor(chainId: number, address: string, block?: Block, log?: Log, trace?: Trace, timestamp?: Date) {
     super()
     this.chainId = chainId
     this.log = log
     this.block = block
     this.trace = trace
     this.address = address
+    this.timestamp = timestamp || new Date(0)
     if (log) {
       this.blockNumber = log.blockNumber
       this.transactionHash = log.transactionHash
@@ -102,9 +104,10 @@ export class ContractContext<
     chainId: number,
     block?: Block,
     log?: Log,
-    trace?: Trace
+    trace?: Trace,
+    timestamp?: Date
   ) {
-    super(chainId, view.rawContract.address, block, log, trace)
+    super(chainId, view.rawContract.address, block, log, trace, timestamp)
     view.context = this
     this.contractName = contractName
     this.contract = view

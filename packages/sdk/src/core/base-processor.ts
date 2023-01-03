@@ -3,10 +3,11 @@ import { Block, Log, getNetwork } from '@ethersproject/providers'
 import { BaseContract, Event, EventFilter } from '@ethersproject/contracts'
 
 import { BoundContractView, ContractContext, ContractView } from './context'
-import { AddressType, HandleInterval, ProcessResult } from '@sentio/protos'
+import { AddressType, Data_EthBlock, Data_EthLog, Data_EthTrace, HandleInterval, ProcessResult } from '@sentio/protos'
 import { BindInternalOptions, BindOptions } from './bind-options'
 import { PromiseOrVoid } from '../promise-or-void'
 import { Trace } from './trace'
+import { ServerError, Status } from 'nice-grpc'
 
 export interface AddressOrTypeEventFilter extends EventFilter {
   addressType?: AddressType
@@ -14,18 +15,18 @@ export interface AddressOrTypeEventFilter extends EventFilter {
 
 export class EventsHandler {
   filters: AddressOrTypeEventFilter[]
-  handler: (event: Log) => Promise<ProcessResult>
+  handler: (event: Data_EthLog) => Promise<ProcessResult>
 }
 
 export class TraceHandler {
   signature: string
-  handler: (trace: Trace) => Promise<ProcessResult>
+  handler: (trace: Data_EthTrace) => Promise<ProcessResult>
 }
 
 export class BlockHandlder {
   blockInterval?: HandleInterval
   timeIntervalInMinutes?: HandleInterval
-  handler: (block: Block) => Promise<ProcessResult>
+  handler: (block: Data_EthBlock) => Promise<ProcessResult>
 }
 
 export abstract class BaseProcessor<
@@ -77,7 +78,12 @@ export abstract class BaseProcessor<
     const processor = this
     this.eventHandlers.push({
       filters: _filters,
-      handler: async function (log) {
+      handler: async function (data: Data_EthLog) {
+        if (!data.log) {
+          throw new ServerError(Status.INVALID_ARGUMENT, 'Log is empty')
+        }
+        const log = data.log as Log
+
         const contractView = processor.CreateBoundContractView()
 
         const ctx = new ContractContext<TContract, TBoundContractView>(
@@ -85,7 +91,9 @@ export abstract class BaseProcessor<
           contractView,
           chainId,
           undefined,
-          log
+          log,
+          undefined,
+          data.timestamp
         )
         // let event: Event = <Event>deepCopy(log);
         const event: Event = <Event>log
@@ -145,7 +153,12 @@ export abstract class BaseProcessor<
     const contractName = this.config.name
 
     this.blockHandlers.push({
-      handler: async function (block: Block) {
+      handler: async function (data: Data_EthBlock) {
+        if (!data.block) {
+          throw new ServerError(Status.INVALID_ARGUMENT, 'Block is empty')
+        }
+        const block = data.block as Block
+
         const contractView = processor.CreateBoundContractView()
 
         const ctx = new ContractContext<TContract, TBoundContractView>(
@@ -153,7 +166,9 @@ export abstract class BaseProcessor<
           contractView,
           chainId,
           block,
-          undefined
+          undefined,
+          undefined,
+          new Date(block.timestamp * 1000)
         )
         await handler(block, ctx)
         return ctx.getProcessResult()
@@ -186,10 +201,14 @@ export abstract class BaseProcessor<
 
     this.traceHandlers.push({
       signature,
-      handler: async function (trace: Trace) {
+      handler: async function (data: Data_EthTrace) {
         const contractView = processor.CreateBoundContractView()
         const contractInterface = contractView.rawContract.interface
         const fragment = contractInterface.getFunction(signature)
+        if (!data.trace) {
+          throw new ServerError(Status.INVALID_ARGUMENT, 'trace is null')
+        }
+        const trace = data.trace as Trace
         if (!trace.action.input) {
           return ProcessResult.fromPartial({})
         }
@@ -202,7 +221,8 @@ export abstract class BaseProcessor<
           chainId,
           undefined,
           undefined,
-          trace
+          trace,
+          data.timestamp
         )
         await handler(trace, ctx)
         return ctx.getProcessResult()

@@ -107,7 +107,10 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
         if (config.signature == signature) {
           return {
             data: {
-              ethTrace: { trace },
+              ethTrace: {
+                trace,
+                timestamp: new Date(),
+              },
             },
             handlerIds: [config.handlerId],
             handlerType: HandlerType.ETH_TRACE,
@@ -168,7 +171,7 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
           if (match) {
             return {
               data: {
-                ethLog: { log },
+                ethLog: { log, timestamp: new Date() },
               },
               handlerIds: [config.handlerId],
               handlerType: HandlerType.ETH_LOG,
@@ -229,7 +232,7 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
           if (match) {
             return {
               data: {
-                ethLog: { log },
+                ethLog: { log, timestamp: new Date() },
               },
               handlerIds: [config.handlerId],
               handlerType: HandlerType.ETH_LOG,

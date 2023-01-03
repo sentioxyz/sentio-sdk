@@ -23,7 +23,7 @@ describe('Test Aptos Example', () => {
         {
           data: {
             aptCall: {
-              call: testData,
+              transaction: testData,
             },
           },
           handlerIds: [1],
@@ -43,7 +43,7 @@ describe('Test Aptos Example', () => {
         {
           data: {
             aptCall: {
-              call: testData,
+              transaction: testData,
             },
           },
 
@@ -64,7 +64,7 @@ describe('Test Aptos Example', () => {
         {
           data: {
             aptEvent: {
-              event: {
+              transaction: {
                 ...testData,
                 events: [testData.events[testData.events.length - 1]],
               },
@@ -89,7 +89,7 @@ describe('Test Aptos Example', () => {
         {
           data: {
             aptEvent: {
-              event: {
+              transaction: {
                 ...testData,
                 events: [tokenTestData],
               },
@@ -111,7 +111,7 @@ describe('Test Aptos Example', () => {
         {
           data: {
             aptEvent: {
-              event: { ...testData, events: [createProposalData] },
+              transaction: { ...testData, events: [createProposalData] },
             },
           },
           handlerIds: [3],
@@ -156,7 +156,7 @@ describe('Test Aptos Example', () => {
         {
           data: {
             aptCall: {
-              call: dataCreate,
+              transaction: dataCreate,
             },
           },
           handlerIds: [3],

@@ -9,7 +9,8 @@ import { AptosBindOptions, AptosNetwork, getChainId } from './network'
 import { AptosContext, AptosResourceContext } from './context'
 import { EventInstance } from './models'
 import { ListStateStorage } from '@sentio/runtime'
-import { HandleInterval, ProcessResult } from '@sentio/protos'
+import { Data_AptCall, Data_AptEvent, Data_AptResource, HandleInterval, ProcessResult } from '@sentio/protos'
+import { ServerError, Status } from 'nice-grpc'
 
 type IndexConfigure = {
   address: string
@@ -40,25 +41,19 @@ export interface ArgumentsFilter {
 
 class EventHandler {
   filters: EventFilter[]
-  handler: (event: Transaction_UserTransaction) => Promise<ProcessResult>
+  handler: (event: Data_AptEvent) => Promise<ProcessResult>
 }
 
 class CallHandler {
   filters: FunctionNameAndCallFilter[]
-  handler: (call: Transaction_UserTransaction) => Promise<ProcessResult>
-}
-
-export class MoveResourcesWithVersionPayload {
-  resources: MoveResource[]
-  version: bigint
-  timestamp: number
+  handler: (call: Data_AptCall) => Promise<ProcessResult>
 }
 
 class ResourceHandlder {
   type?: string
   versionInterval?: HandleInterval
   timeIntervalInMinutes?: HandleInterval
-  handler: (resource: MoveResourcesWithVersionPayload) => Promise<ProcessResult>
+  handler: (resource: Data_AptResource) => Promise<ProcessResult>
 }
 
 export class AptosProcessorState extends ListStateStorage<AptosBaseProcessor> {
@@ -90,17 +85,19 @@ export class AptosBaseProcessor {
     // const moduleName = this.moduleName
     const processor = this
     this.callHandlers.push({
-      handler: async function (tx) {
+      handler: async function (data) {
+        if (!data.transaction) {
+          throw new ServerError(Status.INVALID_ARGUMENT, 'call is null')
+        }
+        const call = data.transaction as Transaction_UserTransaction
         const ctx = new AptosContext(
           processor.moduleName,
           processor.config.network,
           processor.config.address,
-          BigInt(tx.version),
-          tx
+          BigInt(data.transaction.version),
+          call
         )
-        if (tx) {
-          await handler(tx, ctx)
-        }
+        await handler(call, ctx)
         return ctx.getProcessResult()
       },
       filters: [{ function: '', includeFailed: includedFailed }],
@@ -126,13 +123,17 @@ export class AptosBaseProcessor {
     const processor = this
 
     this.eventHandlers.push({
-      handler: async function (txn) {
+      handler: async function (data) {
+        if (!data.transaction) {
+          throw new ServerError(Status.INVALID_ARGUMENT, 'event is null')
+        }
+        const txn = data.transaction as Transaction_UserTransaction
+
         const ctx = new AptosContext(
           processor.moduleName,
           processor.config.network,
           processor.config.address,
-          BigInt(txn.version),
-          txn
+          BigInt(txn.version)
         )
         if (txn && txn.events) {
           const events = txn.events
@@ -167,7 +168,12 @@ export class AptosBaseProcessor {
     const processor = this
 
     this.callHandlers.push({
-      handler: async function (tx) {
+      handler: async function (data) {
+        if (!data.transaction) {
+          throw new ServerError(Status.INVALID_ARGUMENT, 'call is null')
+        }
+        const tx = data.transaction as Transaction_UserTransaction
+
         const ctx = new AptosContext(
           processor.moduleName,
           processor.config.network,
@@ -234,14 +240,19 @@ export class AptosAccountProcessor {
   ) {
     const processor = this
     this.resourcesHandlers.push({
-      handler: async function (arg) {
+      handler: async function (data) {
+        if (data.timestampMicros > Number.MAX_SAFE_INTEGER) {
+          throw new ServerError(Status.INVALID_ARGUMENT, 'timestamp is too large')
+        }
+        const timestamp = Number(data.timestampMicros)
+
         const ctx = new AptosResourceContext(
           processor.config.network,
           processor.config.address,
-          arg.version,
-          arg.timestamp
+          data.version,
+          timestamp
         )
-        await handler(arg.resources, ctx)
+        await handler(data.resources as MoveResource[], ctx)
         return ctx.getProcessResult()
       },
       timeIntervalInMinutes: timeInterval,

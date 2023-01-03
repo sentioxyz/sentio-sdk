@@ -2,6 +2,9 @@ import { Plugin, PluginManager, errorString, mergeProcessResults, USER_PROCESSOR
 import {
   AccountConfig,
   ContractConfig,
+  Data_EthBlock,
+  Data_EthLog,
+  Data_EthTrace,
   DataBinding,
   HandlerType,
   LogFilter,
@@ -13,7 +16,6 @@ import {
 
 import { ServerError, Status } from 'nice-grpc'
 import { Block, Log } from '@ethersproject/abstract-provider'
-import { Trace } from '@sentio/sdk'
 import { ProcessorState } from '../binds'
 import { AccountProcessorState } from './account-processor'
 import { ProcessorTemplateProcessorState, TemplateInstanceState } from './base-processor-template'
@@ -21,9 +23,9 @@ import { ProcessorTemplateProcessorState, TemplateInstanceState } from './base-p
 export class EthPlugin extends Plugin {
   name: string = 'EthPlugin'
 
-  private eventHandlers: ((event: Log) => Promise<ProcessResult>)[] = []
-  private traceHandlers: ((trace: Trace) => Promise<ProcessResult>)[] = []
-  private blockHandlers: ((block: Block) => Promise<ProcessResult>)[] = []
+  private eventHandlers: ((event: Data_EthLog) => Promise<ProcessResult>)[] = []
+  private traceHandlers: ((trace: Data_EthTrace) => Promise<ProcessResult>)[] = []
+  private blockHandlers: ((block: Data_EthBlock) => Promise<ProcessResult>)[] = []
 
   configure(config: ProcessConfigResponse): void {
     // This syntax is to copy values instead of using references
@@ -203,23 +205,20 @@ export class EthPlugin extends Plugin {
   }
 
   async processLog(request: DataBinding): Promise<ProcessResult> {
-    if (!request.data) {
+    if (!request.data?.ethLog?.log) {
       throw new ServerError(Status.INVALID_ARGUMENT, "Log can't be null")
     }
+    const ethLog = request.data.ethLog
 
     const promises: Promise<ProcessResult>[] = []
-    let log: Log
-    if (request.data.ethLog) {
-      log = request.data.ethLog.log as Log
-    } else {
-      throw new ServerError(Status.INVALID_ARGUMENT, "Log can't be null")
-    }
-
     for (const handlerId of request.handlerIds) {
       const handler = this.eventHandlers[handlerId]
       promises.push(
-        handler(log).catch((e) => {
-          throw new ServerError(Status.INTERNAL, 'error processing log: ' + JSON.stringify(log) + '\n' + errorString(e))
+        handler(ethLog).catch((e) => {
+          throw new ServerError(
+            Status.INTERNAL,
+            'error processing log: ' + JSON.stringify(ethLog.log) + '\n' + errorString(e)
+          )
         })
       )
     }
@@ -227,24 +226,19 @@ export class EthPlugin extends Plugin {
   }
 
   async processTrace(binding: DataBinding): Promise<ProcessResult> {
-    if (!binding.data) {
-      throw new ServerError(Status.INVALID_ARGUMENT, "Trace can't be empty")
-    }
-    let trace: Trace
-    if (binding.data.ethTrace?.trace) {
-      trace = binding.data.ethTrace.trace as Trace
-    } else {
+    if (!binding.data?.ethTrace?.trace) {
       throw new ServerError(Status.INVALID_ARGUMENT, "Trace can't be null")
     }
+    const ethTrace = binding.data.ethTrace
 
     const promises: Promise<ProcessResult>[] = []
 
     for (const handlerId of binding.handlerIds) {
       promises.push(
-        this.traceHandlers[handlerId](trace).catch((e) => {
+        this.traceHandlers[handlerId](ethTrace).catch((e) => {
           throw new ServerError(
             Status.INTERNAL,
-            'error processing trace: ' + JSON.stringify(trace) + '\n' + errorString(e)
+            'error processing trace: ' + JSON.stringify(ethTrace.trace) + '\n' + errorString(e)
           )
         })
       )
@@ -253,21 +247,19 @@ export class EthPlugin extends Plugin {
   }
 
   async processBlock(binding: DataBinding): Promise<ProcessResult> {
-    if (!binding.data) {
+    if (!binding.data?.ethBlock?.block) {
       throw new ServerError(Status.INVALID_ARGUMENT, "Block can't be empty")
     }
-    let block: Block
-    if (binding.data.ethBlock?.block) {
-      block = binding.data.ethBlock.block as Block
-    } else {
-      throw new ServerError(Status.INVALID_ARGUMENT, "Block can't be empty")
-    }
+    const ethBlock = binding.data.ethBlock
 
     const promises: Promise<ProcessResult>[] = []
     for (const handlerId of binding.handlerIds) {
       promises.push(
-        this.blockHandlers[handlerId](block).catch((e) => {
-          throw new ServerError(Status.INTERNAL, 'error processing block: ' + block.number + '\n' + errorString(e))
+        this.blockHandlers[handlerId](ethBlock).catch((e) => {
+          throw new ServerError(
+            Status.INTERNAL,
+            'error processing block: ' + ethBlock.block?.number + '\n' + errorString(e)
+          )
         })
       )
     }

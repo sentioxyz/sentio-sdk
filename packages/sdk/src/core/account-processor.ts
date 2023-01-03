@@ -191,10 +191,10 @@ export class AccountProcessor {
 
     this.eventHandlers.push({
       filters: _filters,
-      handler: async function (log) {
+      handler: async function (data) {
+        const log = data.log as Event
         const ctx = new AccountContext(chainId, config.address, undefined, log)
-        // let event: Event = <Event>deepCopy(log);
-        const event: Event = <Event>log
+        const event: Event = log
         const parsed = ERC20_CONTRACT.interface.parseLog(log)
         if (parsed) {
           event.args = parsed.args

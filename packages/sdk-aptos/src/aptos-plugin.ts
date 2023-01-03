@@ -4,6 +4,9 @@ import {
   AptosCallHandlerConfig,
   AptosEventHandlerConfig,
   ContractConfig,
+  Data_AptCall,
+  Data_AptEvent,
+  Data_AptResource,
   DataBinding,
   HandlerType,
   ProcessConfigResponse,
@@ -14,16 +17,14 @@ import { errorString, mergeProcessResults, USER_PROCESSOR } from '@sentio/runtim
 
 import { ServerError, Status } from 'nice-grpc'
 
-import { MoveResource, Transaction_UserTransaction } from 'aptos-sdk/src/generated'
-import { AptosAccountProcessorState, AptosProcessorState, MoveResourcesWithVersionPayload } from './aptos-processor'
+import { AptosAccountProcessorState, AptosProcessorState } from './aptos-processor'
 
 export class AptosPlugin extends Plugin {
   name: string = 'AptosPlugin'
 
-  private aptosEventHandlers: ((event: any) => Promise<ProcessResult>)[] = []
-  private aptosCallHandlers: ((func: any) => Promise<ProcessResult>)[] = []
-  private aptosResourceHandlers: ((resourceWithVersion: MoveResourcesWithVersionPayload) => Promise<ProcessResult>)[] =
-    []
+  private aptosEventHandlers: ((event: Data_AptEvent) => Promise<ProcessResult>)[] = []
+  private aptosCallHandlers: ((func: Data_AptCall) => Promise<ProcessResult>)[] = []
+  private aptosResourceHandlers: ((resourceWithVersion: Data_AptResource) => Promise<ProcessResult>)[] = []
 
   configure(config: ProcessConfigResponse): void {
     for (const aptosProcessor of AptosProcessorState.INSTANCE.getValues()) {
@@ -67,7 +68,7 @@ export class AptosPlugin extends Plugin {
             return {
               function: filter.function,
               typeArguments: filter.typeArguments || [],
-              withTypeArguments: filter.typeArguments ? true : false,
+              withTypeArguments: !!filter.typeArguments,
               includeFailed: filter.includeFailed || false,
             }
           }),
@@ -120,16 +121,11 @@ export class AptosPlugin extends Plugin {
   }
 
   async processAptosEvent(binding: DataBinding): Promise<ProcessResult> {
-    if (!binding.data) {
+    if (!binding.data?.aptEvent) {
       throw new ServerError(Status.INVALID_ARGUMENT, "Event can't be empty")
     }
     const promises: Promise<ProcessResult>[] = []
-    let event: Transaction_UserTransaction
-    if (binding.data.aptEvent?.event) {
-      event = binding.data.aptEvent?.event as Transaction_UserTransaction
-    } else {
-      throw new ServerError(Status.INVALID_ARGUMENT, "Event can't be empty")
-    }
+    const event = binding.data.aptEvent
 
     for (const handlerId of binding.handlerIds) {
       // only support aptos event for now
@@ -146,25 +142,10 @@ export class AptosPlugin extends Plugin {
   }
 
   async processAptosResource(binding: DataBinding): Promise<ProcessResult> {
-    if (!binding.data) {
+    if (!binding.data?.aptResource) {
       throw new ServerError(Status.INVALID_ARGUMENT, "Resource can't be empty")
     }
-
-    const resource: MoveResourcesWithVersionPayload = {
-      resources: [],
-      version: 0n,
-      timestamp: 0,
-    }
-    if (binding.data.aptResource?.resources) {
-      if (binding.data.aptResource.timestampMicros > Number.MAX_SAFE_INTEGER) {
-        throw new ServerError(Status.INVALID_ARGUMENT, 'timestamp is too large')
-      }
-      resource.timestamp = Number(binding.data.aptResource.timestampMicros)
-      resource.version = binding.data.aptResource.version
-      resource.resources = binding.data.aptResource.resources as MoveResource[]
-    } else {
-      throw new ServerError(Status.INVALID_ARGUMENT, "Resource can't be empty")
-    }
+    const resource = binding.data.aptResource
 
     const promises: Promise<ProcessResult>[] = []
     for (const handlerId of binding.handlerIds) {
@@ -181,15 +162,10 @@ export class AptosPlugin extends Plugin {
   }
 
   async processAptosFunctionCall(binding: DataBinding): Promise<ProcessResult> {
-    if (!binding.data) {
+    if (!binding.data?.aptCall) {
       throw new ServerError(Status.INVALID_ARGUMENT, "Call can't be empty")
     }
-    let call: Transaction_UserTransaction
-    if (binding.data.aptCall?.call) {
-      call = binding.data.aptCall?.call as Transaction_UserTransaction
-    } else {
-      throw new ServerError(Status.INVALID_ARGUMENT, "Call can't be empty")
-    }
+    const call = binding.data.aptCall
 
     const promises: Promise<ProcessResult>[] = []
     for (const handlerId of binding.handlerIds) {

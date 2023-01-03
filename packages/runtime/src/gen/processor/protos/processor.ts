@@ -4,6 +4,7 @@ import type { CallContext, CallOptions } from "nice-grpc-common";
 import _m0 from "protobufjs/minimal";
 import { Empty } from "../../google/protobuf/empty";
 import { Struct } from "../../google/protobuf/struct";
+import { Timestamp } from "../../google/protobuf/timestamp";
 
 export enum MetricType {
   UNKNOWN_TYPE = 0,
@@ -476,6 +477,7 @@ export interface Data {
 
 export interface Data_EthLog {
   log: { [key: string]: any } | undefined;
+  timestamp: Date | undefined;
   transaction?: { [key: string]: any } | undefined;
 }
 
@@ -485,11 +487,13 @@ export interface Data_EthBlock {
 
 export interface Data_EthTransaction {
   transaction: { [key: string]: any } | undefined;
+  timestamp: Date | undefined;
   transactionReceipt?: { [key: string]: any } | undefined;
 }
 
 export interface Data_EthTrace {
   trace: { [key: string]: any } | undefined;
+  timestamp: Date | undefined;
   transaction?: { [key: string]: any } | undefined;
   transactionReceipt?: { [key: string]: any } | undefined;
 }
@@ -503,11 +507,11 @@ export interface Data_SolInstruction {
 }
 
 export interface Data_AptEvent {
-  event: { [key: string]: any } | undefined;
+  transaction: { [key: string]: any } | undefined;
 }
 
 export interface Data_AptCall {
-  call: { [key: string]: any } | undefined;
+  transaction: { [key: string]: any } | undefined;
 }
 
 export interface Data_AptResource {
@@ -2993,13 +2997,16 @@ export const Data = {
 };
 
 function createBaseData_EthLog(): Data_EthLog {
-  return { log: undefined, transaction: undefined };
+  return { log: undefined, timestamp: undefined, transaction: undefined };
 }
 
 export const Data_EthLog = {
   encode(message: Data_EthLog, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.log !== undefined) {
       Struct.encode(Struct.wrap(message.log), writer.uint32(26).fork()).ldelim();
+    }
+    if (message.timestamp !== undefined) {
+      Timestamp.encode(toTimestamp(message.timestamp), writer.uint32(34).fork()).ldelim();
     }
     if (message.transaction !== undefined) {
       Struct.encode(Struct.wrap(message.transaction), writer.uint32(18).fork()).ldelim();
@@ -3017,6 +3024,9 @@ export const Data_EthLog = {
         case 3:
           message.log = Struct.unwrap(Struct.decode(reader, reader.uint32()));
           break;
+        case 4:
+          message.timestamp = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+          break;
         case 2:
           message.transaction = Struct.unwrap(Struct.decode(reader, reader.uint32()));
           break;
@@ -3031,6 +3041,7 @@ export const Data_EthLog = {
   fromJSON(object: any): Data_EthLog {
     return {
       log: isObject(object.log) ? object.log : undefined,
+      timestamp: isSet(object.timestamp) ? fromJsonTimestamp(object.timestamp) : undefined,
       transaction: isObject(object.transaction) ? object.transaction : undefined,
     };
   },
@@ -3038,6 +3049,7 @@ export const Data_EthLog = {
   toJSON(message: Data_EthLog): unknown {
     const obj: any = {};
     message.log !== undefined && (obj.log = message.log);
+    message.timestamp !== undefined && (obj.timestamp = message.timestamp.toISOString());
     message.transaction !== undefined && (obj.transaction = message.transaction);
     return obj;
   },
@@ -3045,6 +3057,7 @@ export const Data_EthLog = {
   fromPartial(object: DeepPartial<Data_EthLog>): Data_EthLog {
     const message = createBaseData_EthLog();
     message.log = object.log ?? undefined;
+    message.timestamp = object.timestamp ?? undefined;
     message.transaction = object.transaction ?? undefined;
     return message;
   },
@@ -3098,13 +3111,16 @@ export const Data_EthBlock = {
 };
 
 function createBaseData_EthTransaction(): Data_EthTransaction {
-  return { transaction: undefined, transactionReceipt: undefined };
+  return { transaction: undefined, timestamp: undefined, transactionReceipt: undefined };
 }
 
 export const Data_EthTransaction = {
   encode(message: Data_EthTransaction, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.transaction !== undefined) {
       Struct.encode(Struct.wrap(message.transaction), writer.uint32(34).fork()).ldelim();
+    }
+    if (message.timestamp !== undefined) {
+      Timestamp.encode(toTimestamp(message.timestamp), writer.uint32(42).fork()).ldelim();
     }
     if (message.transactionReceipt !== undefined) {
       Struct.encode(Struct.wrap(message.transactionReceipt), writer.uint32(26).fork()).ldelim();
@@ -3122,6 +3138,9 @@ export const Data_EthTransaction = {
         case 4:
           message.transaction = Struct.unwrap(Struct.decode(reader, reader.uint32()));
           break;
+        case 5:
+          message.timestamp = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+          break;
         case 3:
           message.transactionReceipt = Struct.unwrap(Struct.decode(reader, reader.uint32()));
           break;
@@ -3136,6 +3155,7 @@ export const Data_EthTransaction = {
   fromJSON(object: any): Data_EthTransaction {
     return {
       transaction: isObject(object.transaction) ? object.transaction : undefined,
+      timestamp: isSet(object.timestamp) ? fromJsonTimestamp(object.timestamp) : undefined,
       transactionReceipt: isObject(object.transactionReceipt) ? object.transactionReceipt : undefined,
     };
   },
@@ -3143,6 +3163,7 @@ export const Data_EthTransaction = {
   toJSON(message: Data_EthTransaction): unknown {
     const obj: any = {};
     message.transaction !== undefined && (obj.transaction = message.transaction);
+    message.timestamp !== undefined && (obj.timestamp = message.timestamp.toISOString());
     message.transactionReceipt !== undefined && (obj.transactionReceipt = message.transactionReceipt);
     return obj;
   },
@@ -3150,19 +3171,23 @@ export const Data_EthTransaction = {
   fromPartial(object: DeepPartial<Data_EthTransaction>): Data_EthTransaction {
     const message = createBaseData_EthTransaction();
     message.transaction = object.transaction ?? undefined;
+    message.timestamp = object.timestamp ?? undefined;
     message.transactionReceipt = object.transactionReceipt ?? undefined;
     return message;
   },
 };
 
 function createBaseData_EthTrace(): Data_EthTrace {
-  return { trace: undefined, transaction: undefined, transactionReceipt: undefined };
+  return { trace: undefined, timestamp: undefined, transaction: undefined, transactionReceipt: undefined };
 }
 
 export const Data_EthTrace = {
   encode(message: Data_EthTrace, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.trace !== undefined) {
       Struct.encode(Struct.wrap(message.trace), writer.uint32(34).fork()).ldelim();
+    }
+    if (message.timestamp !== undefined) {
+      Timestamp.encode(toTimestamp(message.timestamp), writer.uint32(42).fork()).ldelim();
     }
     if (message.transaction !== undefined) {
       Struct.encode(Struct.wrap(message.transaction), writer.uint32(18).fork()).ldelim();
@@ -3183,6 +3208,9 @@ export const Data_EthTrace = {
         case 4:
           message.trace = Struct.unwrap(Struct.decode(reader, reader.uint32()));
           break;
+        case 5:
+          message.timestamp = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+          break;
         case 2:
           message.transaction = Struct.unwrap(Struct.decode(reader, reader.uint32()));
           break;
@@ -3200,6 +3228,7 @@ export const Data_EthTrace = {
   fromJSON(object: any): Data_EthTrace {
     return {
       trace: isObject(object.trace) ? object.trace : undefined,
+      timestamp: isSet(object.timestamp) ? fromJsonTimestamp(object.timestamp) : undefined,
       transaction: isObject(object.transaction) ? object.transaction : undefined,
       transactionReceipt: isObject(object.transactionReceipt) ? object.transactionReceipt : undefined,
     };
@@ -3208,6 +3237,7 @@ export const Data_EthTrace = {
   toJSON(message: Data_EthTrace): unknown {
     const obj: any = {};
     message.trace !== undefined && (obj.trace = message.trace);
+    message.timestamp !== undefined && (obj.timestamp = message.timestamp.toISOString());
     message.transaction !== undefined && (obj.transaction = message.transaction);
     message.transactionReceipt !== undefined && (obj.transactionReceipt = message.transactionReceipt);
     return obj;
@@ -3216,6 +3246,7 @@ export const Data_EthTrace = {
   fromPartial(object: DeepPartial<Data_EthTrace>): Data_EthTrace {
     const message = createBaseData_EthTrace();
     message.trace = object.trace ?? undefined;
+    message.timestamp = object.timestamp ?? undefined;
     message.transaction = object.transaction ?? undefined;
     message.transactionReceipt = object.transactionReceipt ?? undefined;
     return message;
@@ -3312,13 +3343,13 @@ export const Data_SolInstruction = {
 };
 
 function createBaseData_AptEvent(): Data_AptEvent {
-  return { event: undefined };
+  return { transaction: undefined };
 }
 
 export const Data_AptEvent = {
   encode(message: Data_AptEvent, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.event !== undefined) {
-      Struct.encode(Struct.wrap(message.event), writer.uint32(18).fork()).ldelim();
+    if (message.transaction !== undefined) {
+      Struct.encode(Struct.wrap(message.transaction), writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
@@ -3331,7 +3362,7 @@ export const Data_AptEvent = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 2:
-          message.event = Struct.unwrap(Struct.decode(reader, reader.uint32()));
+          message.transaction = Struct.unwrap(Struct.decode(reader, reader.uint32()));
           break;
         default:
           reader.skipType(tag & 7);
@@ -3342,30 +3373,30 @@ export const Data_AptEvent = {
   },
 
   fromJSON(object: any): Data_AptEvent {
-    return { event: isObject(object.event) ? object.event : undefined };
+    return { transaction: isObject(object.transaction) ? object.transaction : undefined };
   },
 
   toJSON(message: Data_AptEvent): unknown {
     const obj: any = {};
-    message.event !== undefined && (obj.event = message.event);
+    message.transaction !== undefined && (obj.transaction = message.transaction);
     return obj;
   },
 
   fromPartial(object: DeepPartial<Data_AptEvent>): Data_AptEvent {
     const message = createBaseData_AptEvent();
-    message.event = object.event ?? undefined;
+    message.transaction = object.transaction ?? undefined;
     return message;
   },
 };
 
 function createBaseData_AptCall(): Data_AptCall {
-  return { call: undefined };
+  return { transaction: undefined };
 }
 
 export const Data_AptCall = {
   encode(message: Data_AptCall, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.call !== undefined) {
-      Struct.encode(Struct.wrap(message.call), writer.uint32(18).fork()).ldelim();
+    if (message.transaction !== undefined) {
+      Struct.encode(Struct.wrap(message.transaction), writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
@@ -3378,7 +3409,7 @@ export const Data_AptCall = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 2:
-          message.call = Struct.unwrap(Struct.decode(reader, reader.uint32()));
+          message.transaction = Struct.unwrap(Struct.decode(reader, reader.uint32()));
           break;
         default:
           reader.skipType(tag & 7);
@@ -3389,18 +3420,18 @@ export const Data_AptCall = {
   },
 
   fromJSON(object: any): Data_AptCall {
-    return { call: isObject(object.call) ? object.call : undefined };
+    return { transaction: isObject(object.transaction) ? object.transaction : undefined };
   },
 
   toJSON(message: Data_AptCall): unknown {
     const obj: any = {};
-    message.call !== undefined && (obj.call = message.call);
+    message.transaction !== undefined && (obj.transaction = message.transaction);
     return obj;
   },
 
   fromPartial(object: DeepPartial<Data_AptCall>): Data_AptCall {
     const message = createBaseData_AptCall();
-    message.call = object.call ?? undefined;
+    message.transaction = object.transaction ?? undefined;
     return message;
   },
 };
@@ -4580,6 +4611,28 @@ type DeepPartial<T> = T extends Builtin ? T
   : T extends Array<infer U> ? Array<DeepPartial<U>> : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
   : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
+
+function toTimestamp(date: Date): Timestamp {
+  const seconds = BigInt(Math.trunc(date.getTime() / 1_000));
+  const nanos = (date.getTime() % 1_000) * 1_000_000;
+  return { seconds, nanos };
+}
+
+function fromTimestamp(t: Timestamp): Date {
+  let millis = Number(t.seconds.toString()) * 1_000;
+  millis += t.nanos / 1_000_000;
+  return new Date(millis);
+}
+
+function fromJsonTimestamp(o: any): Date {
+  if (o instanceof Date) {
+    return o;
+  } else if (typeof o === "string") {
+    return new Date(o);
+  } else {
+    return fromTimestamp(Timestamp.fromJSON(o));
+  }
+}
 
 function longToBigint(long: Long) {
   return BigInt(long.toString());

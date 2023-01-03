@@ -4,6 +4,7 @@ package processor;
 
 import "google/protobuf/empty.proto";
 import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
 
 option go_package = "sentioxyz/sentio/processor/protos";
 
@@ -270,6 +271,7 @@ message Data {
   // Every Handler type should have a data type
   message EthLog {
     google.protobuf.Struct log = 3;
+    google.protobuf.Timestamp timestamp = 4;
     optional google.protobuf.Struct transaction = 2;
   }
   message EthBlock {
@@ -277,10 +279,12 @@ message Data {
   }
   message EthTransaction {
     google.protobuf.Struct transaction = 4;
+    google.protobuf.Timestamp timestamp = 5;
     optional google.protobuf.Struct transaction_receipt = 3;
   }
   message EthTrace {
     google.protobuf.Struct trace = 4;
+    google.protobuf.Timestamp timestamp = 5;
     optional google.protobuf.Struct transaction = 2;
     optional google.protobuf.Struct transaction_receipt = 3;
   }
@@ -292,10 +296,10 @@ message Data {
     optional google.protobuf.Struct parsed = 4;
   }
   message AptEvent {
-    google.protobuf.Struct event = 2;
+    google.protobuf.Struct transaction = 2;
   }
   message AptCall {
-    google.protobuf.Struct call = 2;
+    google.protobuf.Struct transaction = 2;
   }
   message AptResource {
     repeated google.protobuf.Struct resources = 4;
