@@ -125,12 +125,12 @@ message AggregationConfig {
 enum AggregationType {
   COUNT = 0;
   SUM = 1;
-//  AVG = 2;
-//  MIN = 3;
-//  MAX = 4;
-//  P50 = 5;
-//  P99 = 6;
-//  P99_9 = 7;
+  //  AVG = 2;
+  //  MIN = 3;
+  //  MAX = 4;
+  //  P50 = 5;
+  //  P99 = 6;
+  //  P99_9 = 7;
 }
 
 message AccountConfig {
@@ -259,6 +259,7 @@ message ProcessBindingResponse {
   bool config_updated = 4;
 }
 
+// TODO remove this (SUI)
 message RawTransaction {
   bytes raw = 1;
   optional string program_account_id = 2;
@@ -268,22 +269,20 @@ message RawTransaction {
 message Data {
   // Every Handler type should have a data type
   message EthLog {
-//    bytes data = 1;
     google.protobuf.Struct log = 3;
-    optional bytes transaction = 2;
+    optional google.protobuf.Struct transaction = 2;
   }
   message EthBlock {
-//    bytes data = 1;
     google.protobuf.Struct block = 2;
   }
   message EthTransaction {
     google.protobuf.Struct transaction = 4;
-    optional bytes transaction_receipt = 3;
+    optional google.protobuf.Struct transaction_receipt = 3;
   }
   message EthTrace {
     google.protobuf.Struct trace = 4;
-    optional bytes transaction = 2;
-    optional bytes transaction_receipt = 3;
+    optional google.protobuf.Struct transaction = 2;
+    optional google.protobuf.Struct transaction_receipt = 3;
   }
   message SolInstruction {
     string instruction_data = 1;
@@ -304,7 +303,6 @@ message Data {
     int64 timestampMicros = 5;
   }
 
-  bytes raw = 1;
   oneof value {
     EthLog eth_log = 2;
     EthBlock eth_block = 3;

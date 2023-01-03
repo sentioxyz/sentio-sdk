@@ -22,7 +22,6 @@ describe('Test Aptos Example', () => {
       bindings: [
         {
           data: {
-            raw: new Uint8Array(),
             aptCall: {
               call: testData,
             },
@@ -43,7 +42,6 @@ describe('Test Aptos Example', () => {
       bindings: [
         {
           data: {
-            raw: new Uint8Array(),
             aptCall: {
               call: testData,
             },
@@ -65,7 +63,6 @@ describe('Test Aptos Example', () => {
       bindings: [
         {
           data: {
-            raw: new Uint8Array(),
             aptEvent: {
               event: {
                 ...testData,
@@ -91,7 +88,6 @@ describe('Test Aptos Example', () => {
       bindings: [
         {
           data: {
-            raw: new Uint8Array(),
             aptEvent: {
               event: {
                 ...testData,
@@ -114,7 +110,6 @@ describe('Test Aptos Example', () => {
       bindings: [
         {
           data: {
-            raw: new Uint8Array(),
             aptEvent: {
               event: { ...testData, events: [createProposalData] },
             },
@@ -133,7 +128,6 @@ describe('Test Aptos Example', () => {
       bindings: [
         {
           data: {
-            raw: new Uint8Array(),
             aptResource: {
               version: 12345n,
               resources: [
@@ -161,7 +155,6 @@ describe('Test Aptos Example', () => {
       bindings: [
         {
           data: {
-            raw: new Uint8Array(),
             aptCall: {
               call: dataCreate,
             },

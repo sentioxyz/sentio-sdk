@@ -11,11 +11,11 @@ write_source_files(
         "packages/protos/src/google/protobuf/struct.ts": "//processor/protos:struct_ts_proto",
         "packages/protos/src/google/protobuf/timestamp.ts": "//processor/protos:timestamp_ts_proto",
 
-        "packages/runtime/processor_full.proto": "//processor/protos:proto_full_file",
-        "packages/runtime/src/gen/processor/protos/processor.ts": "//processor/protos:processor_ts_proto",
+        "packages/runtime/processor_full.proto": "//processor/protos-full:protos_proto",
+        "packages/runtime/src/gen/processor/protos/processor.ts": "//processor/protos-full:processor_ts_proto",
         "packages/runtime/src/gen/google/protobuf/empty.ts": "//processor/protos:empty_ts_proto",
         "packages/runtime/src/gen/google/protobuf/struct.ts": "//processor/protos:struct_ts_proto",
-        "packages/runtime/src/gen/src/google/protobuf/timestamp.ts": "//processor/protos:timestamp_ts_proto",
+        "packages/runtime/src/gen/google/protobuf/timestamp.ts": "//processor/protos:timestamp_ts_proto",
     },
     tags = ["manual"],
 )

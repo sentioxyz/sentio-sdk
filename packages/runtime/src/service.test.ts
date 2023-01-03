@@ -1,7 +1,7 @@
 import { ProcessorServiceImpl } from './service'
 import { FullProcessorServiceImpl } from './full-service'
 import { CallContext } from 'nice-grpc-common'
-import { DataBinding, HandlerType, ProcessResult } from '@sentio/protos'
+import { DataBinding, HandlerType, ProcessResult } from './gen/processor/protos/processor'
 import { Plugin, PluginManager } from './plugin'
 import { assert } from 'chai'
 

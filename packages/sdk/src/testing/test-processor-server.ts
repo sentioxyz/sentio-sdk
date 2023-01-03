@@ -107,7 +107,6 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
         if (config.signature == signature) {
           return {
             data: {
-              raw: new Uint8Array(),
               ethTrace: { trace },
             },
             handlerIds: [config.handlerId],
@@ -169,7 +168,6 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
           if (match) {
             return {
               data: {
-                raw: new Uint8Array(),
                 ethLog: { log },
               },
               handlerIds: [config.handlerId],
@@ -231,7 +229,6 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
           if (match) {
             return {
               data: {
-                raw: new Uint8Array(),
                 ethLog: { log },
               },
               handlerIds: [config.handlerId],
@@ -265,7 +262,6 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
   buildBlockBinding(block: Partial<Block> & { number: number }, network: Networkish = 1): DataBinding {
     const binding: DataBinding = {
       data: {
-        raw: new Uint8Array(),
         ethBlock: { block },
       },
       handlerType: HandlerType.ETH_BLOCK,

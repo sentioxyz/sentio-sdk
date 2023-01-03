@@ -1,12 +1,5 @@
 import { errorString, mergeProcessResults, Plugin, PluginManager, USER_PROCESSOR } from '@sentio/runtime'
-import {
-  ContractConfig,
-  Data_SolInstruction,
-  DataBinding,
-  HandlerType,
-  ProcessConfigResponse,
-  ProcessResult,
-} from '@sentio/protos'
+import { ContractConfig, DataBinding, HandlerType, ProcessConfigResponse, ProcessResult } from '@sentio/protos'
 
 import { ServerError, Status } from 'nice-grpc'
 
@@ -59,8 +52,11 @@ export class SolanaPlugin extends Plugin {
     if (!request.data) {
       throw new ServerError(Status.INVALID_ARGUMENT, 'instruction data cannot be empty')
     }
+    if (!request.data.solInstruction) {
+      throw new ServerError(Status.INVALID_ARGUMENT, 'instruction data cannot be empty')
+    }
 
-    const instruction = request.data.solInstruction || Data_SolInstruction.decode(request.data.raw) // JSON.parse(jsonString)
+    const instruction = request.data.solInstruction
     const promises: Promise<ProcessResult>[] = []
 
     // Only have instruction handlers for solana processors
