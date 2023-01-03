@@ -133,7 +133,8 @@ export class AptosBaseProcessor {
           processor.moduleName,
           processor.config.network,
           processor.config.address,
-          BigInt(txn.version)
+          BigInt(txn.version),
+          txn
         )
         if (txn && txn.events) {
           const events = txn.events
