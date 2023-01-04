@@ -4337,7 +4337,7 @@ export const EventTrackingResult = {
       writer.uint32(18).string(message.distinctEntityId);
     }
     if (message.attributes !== undefined) {
-      Struct.encode(Struct.wrap(message.attributes), writer.uint32(34).fork()).ldelim();
+      Struct.encode(Struct.wrap(message.attributes), writer.uint32(50).fork()).ldelim();
     }
     if (message.runtimeInfo !== undefined) {
       RuntimeInfo.encode(message.runtimeInfo, writer.uint32(42).fork()).ldelim();
@@ -4358,7 +4358,7 @@ export const EventTrackingResult = {
         case 2:
           message.distinctEntityId = reader.string();
           break;
-        case 4:
+        case 6:
           message.attributes = Struct.unwrap(Struct.decode(reader, reader.uint32()));
           break;
         case 5:
