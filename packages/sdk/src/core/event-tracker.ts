@@ -8,7 +8,7 @@ export interface Event {
   // .e.g user id / toekn address / account address / contract address id
   //
   distinctId: string
-  payload?: Record<string, string>
+  [key: string]: any
 }
 
 export interface TrackerOptions {
@@ -40,10 +40,12 @@ export class EventTracker extends NamedResultDescriptor {
   }
 
   trackEvent(ctx: BaseContext, event: Event) {
+    const { distinctId, ...payload } = event
+
     const res: EventTrackingResult = {
       metadata: ctx.getMetaData(this.name, {}),
-      distinctEntityId: event.distinctId,
-      attributes: JSON.stringify({}),
+      distinctEntityId: distinctId,
+      attributes: payload,
       runtimeInfo: undefined,
     }
     ctx.res.events.push(res)

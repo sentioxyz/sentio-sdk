@@ -586,7 +586,7 @@ export interface LogResult {
 export interface EventTrackingResult {
   metadata: RecordMetaData | undefined
   distinctEntityId: string
-  attributes: string
+  attributes: { [key: string]: any } | undefined
   runtimeInfo: RuntimeInfo | undefined
 }
 
@@ -4324,7 +4324,7 @@ export const LogResult = {
 }
 
 function createBaseEventTrackingResult(): EventTrackingResult {
-  return { metadata: undefined, distinctEntityId: '', attributes: '', runtimeInfo: undefined }
+  return { metadata: undefined, distinctEntityId: '', attributes: undefined, runtimeInfo: undefined }
 }
 
 export const EventTrackingResult = {
@@ -4335,8 +4335,8 @@ export const EventTrackingResult = {
     if (message.distinctEntityId !== '') {
       writer.uint32(18).string(message.distinctEntityId)
     }
-    if (message.attributes !== '') {
-      writer.uint32(34).string(message.attributes)
+    if (message.attributes !== undefined) {
+      Struct.encode(Struct.wrap(message.attributes), writer.uint32(34).fork()).ldelim()
     }
     if (message.runtimeInfo !== undefined) {
       RuntimeInfo.encode(message.runtimeInfo, writer.uint32(42).fork()).ldelim()
@@ -4358,7 +4358,7 @@ export const EventTrackingResult = {
           message.distinctEntityId = reader.string()
           break
         case 4:
-          message.attributes = reader.string()
+          message.attributes = Struct.unwrap(Struct.decode(reader, reader.uint32()))
           break
         case 5:
           message.runtimeInfo = RuntimeInfo.decode(reader, reader.uint32())
@@ -4375,7 +4375,7 @@ export const EventTrackingResult = {
     return {
       metadata: isSet(object.metadata) ? RecordMetaData.fromJSON(object.metadata) : undefined,
       distinctEntityId: isSet(object.distinctEntityId) ? String(object.distinctEntityId) : '',
-      attributes: isSet(object.attributes) ? String(object.attributes) : '',
+      attributes: isObject(object.attributes) ? object.attributes : undefined,
       runtimeInfo: isSet(object.runtimeInfo) ? RuntimeInfo.fromJSON(object.runtimeInfo) : undefined,
     }
   },
@@ -4398,7 +4398,7 @@ export const EventTrackingResult = {
         ? RecordMetaData.fromPartial(object.metadata)
         : undefined
     message.distinctEntityId = object.distinctEntityId ?? ''
-    message.attributes = object.attributes ?? ''
+    message.attributes = object.attributes ?? undefined
     message.runtimeInfo =
       object.runtimeInfo !== undefined && object.runtimeInfo !== null
         ? RuntimeInfo.fromPartial(object.runtimeInfo)

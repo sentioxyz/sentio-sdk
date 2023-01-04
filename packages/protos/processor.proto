@@ -423,8 +423,7 @@ message LogResult {
 message EventTrackingResult {
   RecordMetaData metadata = 1;
   string distinct_entity_id = 2;
-  // JSON payload
-  string attributes = 4;
+  google.protobuf.Struct attributes = 4;
   RuntimeInfo runtime_info = 5;
 }
 
