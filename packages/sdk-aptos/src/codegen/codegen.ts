@@ -1,6 +1,6 @@
-import fs from 'fs'
-import path from 'path'
-import prettier from 'prettier'
+import * as fs from 'fs'
+import * as path from 'path'
+import { format } from 'prettier'
 import { MoveFunction, MoveModule, MoveModuleBytecode, MoveStruct } from 'aptos-sdk/src/generated'
 import { AccountModulesImportInfo, AccountRegister, generateType } from './typegen'
 import { getMeaningfulFunctionParams, isFrameworkAccount, moduleQname, SPLITTER } from '../utils'
@@ -96,7 +96,7 @@ export async function generateForNetwork(srcDir: string, outputDir: string, netw
   }
 
   for (const output of outputs) {
-    const content = prettier.format(output.fileContent, { parser: 'typescript' })
+    const content = format(output.fileContent, { parser: 'typescript' })
     fs.writeFileSync(path.join(outputDir, output.fileName), content)
   }
 }
@@ -419,7 +419,7 @@ function camelize(input: string): string {
     .split('_')
     .reduce(
       (res, word, i) =>
-        i === 0 ? word.toLowerCase() : `${res}${word.charAt(0).toUpperCase()}${word.substr(1).toLowerCase()}`,
+        i === 0 ? word.toLowerCase() : `${res}${word.charAt(0).toUpperCase()}${word.slice(1).toLowerCase()}`,
       ''
     )
 }

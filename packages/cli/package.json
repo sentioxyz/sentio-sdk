@@ -23,7 +23,8 @@
     "open": "^8.4.0",
     "ts-loader": "^9.3.0",
     "webpack": "^5.72.1",
-    "webpack-cli": "^5.0.0"
+    "webpack-cli": "^5.0.0",
+    "chalk": "^4.1.0"
   },
   "devDependencies": {
     "@types/chai": "^4.3.1",

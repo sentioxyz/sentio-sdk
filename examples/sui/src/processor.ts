@@ -1,5 +1,4 @@
-import { SuiBindOptions } from '@sentio/sdk'
-import { SuiBaseProcessor } from '@sentio/sdk'
+import { SuiBindOptions, SuiBaseProcessor } from '@sentio/sdk'
 
 // class TicTacToeProcessor extends SuiBaseProcessor {
 //   static bind(options: SuiBindOptions): TicTacToeProcessor {

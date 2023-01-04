@@ -6,7 +6,7 @@ export function getChainQueryClient(address?: string): AptosQueryClient {
   if (!address) {
     address = Endpoints.INSTANCE.chainQueryAPI
   }
-  const channel = createChannel(address!)
+  const channel = createChannel(address)
 
   return createClient(AptosQueryDefinition, channel)
 }

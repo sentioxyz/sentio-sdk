@@ -1,4 +1,4 @@
-import { Plugin, PluginManager } from '@sentio/runtime'
+import { Plugin, PluginManager, errorString, mergeProcessResults, USER_PROCESSOR } from '@sentio/runtime'
 import {
   AccountConfig,
   AptosCallHandlerConfig,
@@ -12,8 +12,6 @@ import {
   ProcessConfigResponse,
   ProcessResult,
 } from '@sentio/protos'
-
-import { errorString, mergeProcessResults, USER_PROCESSOR } from '@sentio/runtime'
 
 import { ServerError, Status } from 'nice-grpc'
 

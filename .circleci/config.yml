@@ -21,6 +21,9 @@ jobs:
           command: ./scripts/test-all.sh
           name: Build & Test All
       - run:
+          command: yarn lint
+          name: Lint
+      - run:
           command: sudo npm link
           name: Link CLI globally for template testing
           working_directory: packages/cli

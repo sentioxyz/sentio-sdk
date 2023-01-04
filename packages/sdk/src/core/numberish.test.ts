@@ -60,7 +60,9 @@ describe('Numberish tests', () => {
     const complexDec = '-7.350918e-428'
     expect(toMetricValue(new BigDecimal(complexDec)).bigDecimal == complexDec)
 
-    expect(BigIntegerToBigInt(toMetricValue(new BigDecimal('100000')).bigInteger!) === 100000n)
+    expect(
+      BigIntegerToBigInt(toMetricValue(new BigDecimal('100000')).bigInteger || BigInteger.fromPartial({})) === 100000n
+    )
   })
 })
 

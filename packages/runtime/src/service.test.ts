@@ -11,7 +11,7 @@ export const TEST_CONTEXT: CallContext = <CallContext>{}
 class TestPlugin extends Plugin {
   async processBinding(request: DataBinding): Promise<ProcessResult> {
     if (request.handlerType === HandlerType.UNKNOWN) {
-      assert(request.data!.raw.length > 0)
+      assert((request.data?.raw.length || 0) > 0)
     }
     return ProcessResult.fromPartial({})
   }

@@ -12,8 +12,10 @@
   },
   "dependencies": {
     "@sentio/sdk": "^1.0.0-development",
+    "chalk": "^4.1.0",
     "aptos-sdk": "npm:aptos@^1.3.17",
-    "prettier": "^2.8.1"
+    "prettier": "^2.8.1",
+    "@types/prettier": "^2.7.2"
   },
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",

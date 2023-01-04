@@ -1,0 +1,14 @@
+{
+  "extends": [
+    "../../.eslintrc.json"
+  ],
+  "plugins": [
+    "deprecation"
+  ],
+  "parserOptions": {
+    "project": "./tsconfig.json"
+  },
+  "rules": {
+    "deprecation/deprecation": "error"
+  }
+}
