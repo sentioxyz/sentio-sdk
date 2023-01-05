@@ -3,6 +3,7 @@ node_modules
 *.config.js
 dist
 gen
+protos/src
 docs
 types
 builtin

@@ -307,6 +307,7 @@ message Data {
     int64 timestampMicros = 5;
   }
 
+  bytes raw = 1 [deprecated = true]; // can be removed anytime
   oneof value {
     EthLog eth_log = 2;
     EthBlock eth_block = 3;

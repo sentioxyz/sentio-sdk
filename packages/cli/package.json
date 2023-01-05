@@ -1,7 +1,7 @@
 {
   "name": "@sentio/cli",
   "license": "Apache-2.0",
-  "private": false,
+  "private": true,
   "version": "1.0.0-development",
   "scripts": {
     "compile": "tsc -p . && cp src/webpack.config.js lib/",

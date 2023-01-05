@@ -4482,7 +4482,7 @@ export const ExportResult = {
 export type ProcessorDefinition = typeof ProcessorDefinition;
 export const ProcessorDefinition = {
   name: "Processor",
-  fullName: "processor_full.Processor",
+  fullName: "processor.Processor",
   methods: {
     start: {
       name: "Start",
