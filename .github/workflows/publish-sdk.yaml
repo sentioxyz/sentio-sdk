@@ -55,6 +55,9 @@ jobs:
       - name: Clean templates node mdules
         run: "rm -rf */node_modules"
         working-directory: packages/cli/templates
+      - name: CLI Prepare
+        run: npx -y json -I -f package.json -e "this.private=false"
+        working-directory: packages/cli
       - name: Semantic Release CLI
         id: semantic_cli
         uses: cycjimmy/semantic-release-action@v3
