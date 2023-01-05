@@ -9,7 +9,7 @@ import yaml from 'js-yaml'
 import { finalizeHost, FinalizeProjectName, SentioProjectConfig } from './config'
 import { uploadFile } from './upload'
 import chalk from 'chalk'
-import { buildProcessor } from './build'
+import { runBuild } from './commands/run-build'
 import { runCreate } from './commands/run-create'
 import { runVersion } from './commands/run-version'
 import { runLogin } from './commands/run-login'
@@ -152,9 +152,9 @@ if (mainOptions.command === 'login') {
       uploadFile(processorConfig, apiOverride)
     }
   } else if (mainOptions.command === 'build') {
-    buildProcessor(false)
+    runBuild(false)
   } else if (mainOptions.command === 'gen') {
-    buildProcessor(true)
+    runBuild(true)
   } else {
     usage()
   }

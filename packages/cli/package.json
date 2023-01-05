@@ -9,7 +9,7 @@
     "postbuild": "../../scripts/link-bin.sh",
     "cli": "ts-node src/cli.ts",
     "test": "jest",
-    "pub": "yarn build && yarn publish --no-git-tag-version"
+    "pub_deprecated": "yarn build && yarn publish --no-git-tag-version"
   },
   "dependencies": {
     "command-line-args": "^5.2.1",

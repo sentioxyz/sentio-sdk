@@ -6,7 +6,7 @@ import { SentioProjectConfig } from './config'
 import { ReadKey } from './key'
 import path from 'path'
 import chalk from 'chalk'
-import { buildProcessor } from './build'
+import { runBuild } from './commands/run-build'
 import fetch from 'node-fetch'
 import { getSdkVersion } from './utils'
 import { URL } from 'url'
@@ -25,7 +25,7 @@ async function createProject(options: SentioProjectConfig, apiKey: string) {
 
 export async function uploadFile(options: SentioProjectConfig, apiKeyOverride: string) {
   if (options.build) {
-    await buildProcessor(false)
+    await runBuild(false)
   }
 
   console.log(chalk.blue('Prepare to upload'))

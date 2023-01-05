@@ -3,7 +3,7 @@ import path from 'path'
 import fs from 'fs'
 import { exec } from 'child_process'
 
-export async function buildProcessor(onlyGen: boolean) {
+export async function runBuild(onlyGen: boolean) {
   if (!onlyGen) {
     await installDeps()
   }
@@ -31,7 +31,7 @@ async function buildProcessorForTarget(onlyGen: boolean) {
 
   try {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const aptosModuole = require('@sentio/sdk-aptos/lib/codegen/codegen')
+    const aptosModuole = require('packages/sdk-aptos/src/codegen/codegen')
     aptosModuole.codeGenAptosProcessor(path.join('abis', 'aptos'))
   } catch (e) {}
 
@@ -44,7 +44,7 @@ async function installDeps() {
   await execStep('yarn install --ignore-scripts', 'Yarn Install')
 }
 
-export async function codeGenEthersProcessor(
+async function codeGenEthersProcessor(
   abisDir: string,
   ETHERS_TARGET = path.dirname(require.resolve('@sentio/sdk/lib/target-ethers-sentio')),
   outDir = 'src/types/internal'
