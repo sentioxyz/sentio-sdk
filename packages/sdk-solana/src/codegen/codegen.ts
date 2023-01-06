@@ -1,6 +1,8 @@
 import path from 'path'
 import fs from 'fs'
 import chalk from 'chalk'
+import { Idl } from '@project-serum/anchor'
+import { IdlAccountItem, IdlField, IdlInstruction, IdlType } from '@project-serum/anchor/dist/cjs/idl'
 
 export function codeGenSolanaProcessor(abisDir: string, targetPath = path.join('src', 'types', 'solana')) {
   if (!fs.existsSync(abisDir)) {
@@ -28,7 +30,7 @@ export function codeGenSolanaProcessor(abisDir: string, targetPath = path.join('
   }
 }
 
-function codeGenSolanaIdlProcessor(idlObj: any): string {
+function codeGenSolanaIdlProcessor(idlObj: Idl): string {
   const idlName = idlObj.name
   const idlNamePascalCase = toPascalCase(idlName)
   const instructions: any[] = idlObj.instructions
@@ -57,17 +59,22 @@ export class ${idlNamePascalCase}Processor extends SolanaBaseProcessor {
   `
 }
 
-function codeGenSolanaInstruction(idlName: string, ins: any): string {
+function codeGenSolanaInstruction(idlName: string, ins: IdlInstruction): string {
   const instructionName = ins.name
+
+  const argsType = codeGenInstructionArgsType(ins.args)
+  const accountType = codeGenAccountType(ins.accounts)
+
   return `
-  on${instructionName.charAt(0).toUpperCase() + instructionName.slice(1)}(handler: (args: ${codeGenInstructionArgsType(
-    ins.args
-  )}, accounts: string[], ctx: SolanaContext) => void): ${idlName}Processor {
+  on${
+    instructionName.charAt(0).toUpperCase() + instructionName.slice(1)
+  }(handler: (args: ${argsType}, accounts: ${accountType}, ctx: SolanaContext) => void): ${idlName}Processor {
     this.onInstruction('${instructionName}', (ins: Instruction, ctx, accounts: string[]) => {
       const origin = ins.data as any
-      const data = ${codeGenInstructionArgs(ins.args)}
-      if (ins) {
-        handler(data, accounts, ctx)
+      if (origin) {
+        const data = ${codeGenInstructionArgs(ins.args)}
+        const accountData = ${codeGenAccountTypeArgs(ins.accounts)}
+        handler(data, accountData, ctx)
       }
     })
     return this
@@ -75,11 +82,11 @@ function codeGenSolanaInstruction(idlName: string, ins: any): string {
   `
 }
 
-function codeGenInstructionArgs(args: { name: string; type: string }[]): string {
+function codeGenInstructionArgs(args: IdlField[]): string {
   return `{ ${args.map((arg) => codeGenInstructionArg(arg.name, arg.type)).join(', ')} }`
 }
 
-function codeGenInstructionArg(name: string, type: string): string {
+function codeGenInstructionArg(name: string, type: IdlType): string {
   const mType = mapType(type)
   if (mType === 'bigint') {
     return `${name}: BigInt(origin.${name}.toString())`
@@ -87,12 +94,21 @@ function codeGenInstructionArg(name: string, type: string): string {
   return `${name}: origin.${name} as ${mType}`
 }
 
-function codeGenInstructionArgsType(args: { name: string; type: string }[]): string {
+function codeGenInstructionArgsType(args: IdlField[]): string {
   return `{ ${args.map((arg) => arg.name + ': ' + mapType(arg.type)).join(', ')} }`
 }
 
+function codeGenAccountType(args: IdlAccountItem[]): string {
+  return `{ ${args.map((arg) => arg.name + ': string').join(', ')} }`
+}
+
+function codeGenAccountTypeArgs(args: IdlAccountItem[]): string {
+  return `{ ${args.map((arg, idx) => `${arg.name}: accounts[${idx}]`).join(', ')} }`
+}
+
 // Reference: https://github.com/coral-xyz/anchor/blob/93332766f13e86efbe77c9986722731742317ede/ts/src/program/namespace/types.ts#L104
-function mapType(tpe: string): string {
+function mapType(tpe: IdlType): string {
+  // TODO handle complex type
   switch (tpe) {
     case 'publicKey':
       return 'PublicKey'
