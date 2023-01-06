@@ -1,3 +1,5 @@
+import { InstructionCoder } from './solana-processor'
+
 export class SolanaBindOptions {
   address: string
   network?: string
@@ -5,4 +7,5 @@ export class SolanaBindOptions {
   startBlock?: bigint | number
   endBlock?: bigint | number
   processInnerInstruction?: boolean
+  instructionCoder?: InstructionCoder
 }

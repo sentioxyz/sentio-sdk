@@ -10,6 +10,10 @@ type IndexConfigure = {
   endSlot?: bigint
 }
 
+export interface InstructionCoder {
+  decode(ix: Buffer | string, encoding?: 'hex' | 'base58'): Instruction | null
+}
+
 export type SolanaInstructionHandler = (instruction: Instruction, ctx: SolanaContext, accounts?: string[]) => void
 
 export class SolanaProcessorState extends ListStateStorage<SolanaBaseProcessor> {
@@ -24,21 +28,25 @@ export class SolanaBaseProcessor {
   network: string
   processInnerInstruction: boolean
   config: IndexConfigure = { startSlot: 0n }
-  decodeInstruction: (rawInstruction: string) => Instruction | null
+  instructionCoder: InstructionCoder
+
+  decodeInstruction(rawInstruction: string): Instruction | null {
+    if (this.instructionCoder) {
+      return this.instructionCoder.decode(rawInstruction, 'base58')
+    }
+    return null
+  }
+
   fromParsedInstruction: (instruction: { type: string; info: any }) => Instruction | null
 
   constructor(options: SolanaBindOptions) {
-    if (options) {
-      this.bind(options)
-    }
-    SolanaProcessorState.INSTANCE.addValue(this)
-  }
-
-  bind(options: SolanaBindOptions) {
     this.address = options.address
     this.contractName = options.name || ''
     this.processInnerInstruction = options.processInnerInstruction || false
     this.network = options.network || CHAIN_IDS.SOLANA_MAINNET
+    if (options.instructionCoder) {
+      this.instructionCoder = options.instructionCoder
+    }
     if (options.startBlock) {
       this.startSlot(options.startBlock)
     }
@@ -46,15 +54,12 @@ export class SolanaBaseProcessor {
       this.endBlock(options.endBlock)
     }
     this.endpoint = options.network || 'https://api.mainnet-beta.solana.com'
+
+    SolanaProcessorState.INSTANCE.addValue(this)
   }
 
   public onInstruction(instructionName: string, handler: SolanaInstructionHandler) {
-    if (!this.isBind()) {
-      throw new Error("Processor doesn't bind to an address")
-    }
-
     this.instructionHandlerMap.set(instructionName, handler)
-
     return this
   }
 
@@ -83,10 +88,6 @@ export class SolanaBaseProcessor {
     const ctx = new SolanaContext(this.contractName, this.network, this.address, slot)
     await handler(parsedInstruction, ctx, accounts)
     return ctx.getProcessResult()
-  }
-
-  public isBind() {
-    return this.address !== null
   }
 
   public startSlot(startSlot: bigint | number) {

@@ -7,7 +7,7 @@
     "compile": "tsc -p .",
     "test": "jest",
     "build": "yarn sentio build",
-    "build_all": "yarn lerna run --scope=@sentio/example-wormhole build --include-dependencies"
+    "build_all": "yarn lerna run --scope=@sentio-example/wormhole build --include-dependencies"
   },
   "dependencies": {
     "@sentio/sdk": "^1.0.0-development",

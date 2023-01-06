@@ -21,7 +21,11 @@ export class PluginManager {
   typesToPlugin = new Map<HandlerType, Plugin>()
 
   register(plugin: Plugin) {
+    if (this.plugins.find((p) => p.name === plugin.name)) {
+      return
+    }
     this.plugins.push(plugin)
+
     for (const handlerType of plugin.supportedHandlers) {
       const exsited = this.typesToPlugin.get(handlerType)
       if (exsited) {

@@ -37,21 +37,16 @@ function codeGenSolanaIdlProcessor(idlObj: Idl): string {
   return `import { BorshInstructionCoder, Instruction, Idl } from '@project-serum/anchor'
 import { SolanaBaseProcessor, SolanaContext, SolanaBindOptions } from "@sentio/sdk-solana"
 import { ${idlName}_idl } from "./${idlName}"
-import bs58 from 'bs58'
 import { PublicKey } from '@solana/web3.js'
 
 export class ${idlNamePascalCase}Processor extends SolanaBaseProcessor {
-  static bind(options: SolanaBindOptions): ${idlNamePascalCase}Processor {
-    if (options && !options.name) {
-      options.name = '${idlNamePascalCase}'
-    }
-    return new ${idlNamePascalCase}Processor(options)
+  static DEFAULT_OPTIONS = {
+    name: '${idlNamePascalCase}',
+    instructionCoder: new BorshInstructionCoder(${idlName}_idl as Idl)
   }
 
-  decodeInstruction: (rawInstruction: string) => Instruction | null = (rawInstruction) => {
-    const instructionCoder = new BorshInstructionCoder(${idlName}_idl as Idl)
-    const decodedIns = instructionCoder.decode(Buffer.from(bs58.decode(rawInstruction)))
-    return decodedIns
+  static bind(options: SolanaBindOptions): ${idlNamePascalCase}Processor {
+    return new ${idlNamePascalCase}Processor( { ...${idlNamePascalCase}Processor.DEFAULT_OPTIONS, ...options })
   }
 
   ${instructions.map((ins) => codeGenSolanaInstruction(idlNamePascalCase, ins)).join('')}
