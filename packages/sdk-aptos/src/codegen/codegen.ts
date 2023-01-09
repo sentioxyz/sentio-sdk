@@ -146,6 +146,7 @@ export class AccountCodegen {
       TypedEventInstance, AptosNetwork, TypedEntryFunctionPayload,
       AptosContext, CallFilter
     } from "@sentio/sdk-aptos"
+    import { AptosFetchConfig } from "@sentio/protos"
     import { Address, MoveModule } from "aptos-sdk/src/generated"
     `
 
@@ -359,11 +360,12 @@ function generateOnEntryFunctions(module: MoveModule, func: MoveFunction) {
 
   const camelFuncName = capitalizeFirstChar(camelize(func.name))
   const source = `
-  onEntry${camelFuncName}(func: (call: ${module.name}.${camelFuncName}Payload, ctx: AptosContext) => void, filter?: CallFilter): ${module.name} {
+  onEntry${camelFuncName}(func: (call: ${module.name}.${camelFuncName}Payload, ctx: AptosContext) => void, filter?: CallFilter, fetchConfig?: AptosFetchConfig): ${module.name} {
     this.onEntryFunctionCall(func, {
       ...filter,
       function: '${module.name}::${func.name}'
-    })
+    },
+    fetchConfig)
     return this
   }`
 
@@ -404,10 +406,11 @@ function generateOnEvents(module: MoveModule, struct: MoveStruct): string {
   // const genericString = generateStructTypeParameters(struct)
 
   const source = `
-  onEvent${struct.name}(func: (event: ${module.name}.${struct.name}Instance, ctx: AptosContext) => void): ${module.name} {
+  onEvent${struct.name}(func: (event: ${module.name}.${struct.name}Instance, ctx: AptosContext) => void, fetchConfig?: AptosFetchConfig): ${module.name} {
     this.onEvent(func, {
       type: '${module.name}::${struct.name}'
-    })
+    },
+    fetchConfig)
     return this
   }
   `

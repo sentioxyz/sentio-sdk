@@ -23,26 +23,6 @@ jobs:
       - run:
           command: yarn lint
           name: Lint
-      - run:
-          command: sudo npm link
-          name: Link CLI globally for template testing
-          working_directory: packages/cli
-      - run:
-          command: yarn install && yarn gen && yarn test
-          name: Test Template - Aptos
-          working_directory: packages/cli/templates/aptos
-      - run:
-          command: yarn install && yarn gen && yarn test
-          name: Test Template - EVM
-          working_directory: packages/cli/templates/evm
-      - run:
-          command: yarn install && yarn test
-          name: Test Template - Solana
-          working_directory: packages/cli/templates/solana
-      - run:
-          command: yarn install && yarn test
-          name: Test Template - RAW
-          working_directory: packages/cli/templates/raw
 #      - persist_to_workspace:
 #          root: ~/project
 #          paths:

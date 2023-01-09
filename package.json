@@ -2,7 +2,7 @@
   "private": true,
   "workspaces": [
     "packages/*",
-    "packages/cli/templates",
+    "packages/cli/templates/*",
     "examples/*"
   ],
   "devDependencies": {

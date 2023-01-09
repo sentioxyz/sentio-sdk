@@ -191,6 +191,12 @@ message BlockHandlerConfig {
   int32 handler_id = 1;
 }
 
+message EthFetchConfig {
+  bool transaction = 1;
+  bool transaction_receipt = 2;
+//  bool block = 3;
+}
+
 message TraceHandlerConfig {
   string signature = 1;
   int32 handler_id = 2;
@@ -222,9 +228,14 @@ message InstructionHandlerConfig {
   bool raw_data_instruction = 3;
 }
 
+message AptosFetchConfig {
+  bool resource_changes = 1;
+}
+
 message AptosEventHandlerConfig {
   repeated AptosEventFilter filters = 1;
   int32 handler_id = 2;
+  AptosFetchConfig fetch_config = 3;
 }
 
 message AptosEventFilter {
@@ -235,6 +246,7 @@ message AptosEventFilter {
 message AptosCallHandlerConfig {
   repeated AptosCallFilter filters = 1;
   int32 handler_id = 2;
+  AptosFetchConfig fetch_config = 3;
 }
 
 message AptosCallFilter {
@@ -262,6 +274,7 @@ message ProcessBindingResponse {
 
 // TODO remove this (SUI)
 message RawTransaction {
+  option deprecated = true;
   bytes raw = 1;
   optional string program_account_id = 2;
   optional uint64 slot = 3;

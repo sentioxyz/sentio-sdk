@@ -53,6 +53,7 @@ export class AptosPlugin extends Plugin {
               account: f.account || '',
             }
           }),
+          fetchConfig: handler.fetchConfig,
           handlerId,
         }
         contractConfig.aptosEventConfigs.push(eventHandlerConfig)
@@ -70,6 +71,7 @@ export class AptosPlugin extends Plugin {
               includeFailed: filter.includeFailed || false,
             }
           }),
+          fetchConfig: handler.fetchConfig,
           handlerId,
         }
         contractConfig.aptosCallConfigs.push(functionHandlerConfig)

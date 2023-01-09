@@ -51,6 +51,10 @@ AptosAccountProcessor.bind({ address: '0x1' }).onTimeInterval((resources, ctx) =
   ctx.meter.Counter('onTimer').add(1)
 }, 10000)
 
-aptos_account.bind().onEntryCreateAccount((call, ctx) => {
-  ctx.meter.Counter('xx').add(1)
-})
+aptos_account.bind().onEntryCreateAccount(
+  (call, ctx) => {
+    ctx.meter.Counter('xx').add(1)
+  },
+  undefined,
+  { resourceChanges: true }
+)
