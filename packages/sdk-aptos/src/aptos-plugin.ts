@@ -153,7 +153,7 @@ export class AptosPlugin extends Plugin {
         this.aptosResourceHandlers[handlerId](resource).catch((e) => {
           throw new ServerError(
             Status.INTERNAL,
-            'error processing event: ' + JSON.stringify(resource) + '\n' + errorString(e)
+            'error processing resource: ' + JSON.stringify(resource) + '\n' + errorString(e)
           )
         })
       )

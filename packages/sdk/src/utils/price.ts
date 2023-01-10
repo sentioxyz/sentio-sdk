@@ -1,6 +1,7 @@
 import { PriceServiceClient, PriceServiceDefinition } from '@sentio/protos/lib/service/price/protos/price'
 import { createChannel, createClientFactory } from 'nice-grpc'
 import { retryMiddleware, RetryOptions } from 'nice-grpc-client-middleware-retry'
+import { errorDetailsClientMiddleware } from 'nice-grpc-error-details'
 import { Endpoints } from '@sentio/runtime'
 
 export function getPriceClient(address?: string) {
@@ -9,7 +10,10 @@ export function getPriceClient(address?: string) {
   }
   const channel = createChannel(address)
 
-  return createClientFactory().use(retryMiddleware).create(PriceServiceDefinition, channel)
+  return createClientFactory()
+    .use(errorDetailsClientMiddleware)
+    .use(retryMiddleware)
+    .create(PriceServiceDefinition, channel)
 }
 
 const priceMap = new Map<string, number>()
