@@ -14,6 +14,7 @@ export async function buildProcessor(onlyGen: boolean) {
   // }
 
   if (!onlyGen) {
+    // TODO move this to SDK
     const WEBPACK_CONFIG = path.join(__dirname, 'webpack.config.js')
     await execStep('yarn tsc -p .', 'Compile')
     await execStep('yarn webpack --config=' + WEBPACK_CONFIG, 'Packaging')
