@@ -62,15 +62,15 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         }
       }
 
-      for (const plugin of [
-        '@sentio/sdk/lib/core/sui-plugin',
-        '@sentio/sdk-aptos/lib/aptos-plugin',
-        '@sentio/sdk-solana/lib/solana-plugin',
-      ]) {
-        try {
-          require(plugin)
-        } catch (e) {}
-      }
+      // for (const plugin of [
+      //   '@sentio/sdk/lib/core/sui-plugin',
+      //   '@sentio/sdk-aptos/lib/aptos-plugin',
+      //   '@sentio/sdk-solana/lib/solana-plugin',
+      // ]) {
+      //   try {
+      //     require(plugin)
+      //   } catch (e) {}
+      // }
 
       this.loader()
     } catch (e) {

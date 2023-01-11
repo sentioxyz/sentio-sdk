@@ -4,7 +4,7 @@ import { BaseContract, EventFilter } from 'ethers'
 import { Event } from '@ethersproject/contracts'
 import { BaseProcessor } from './base-processor'
 import { BindOptions, getOptionsSignature } from './bind-options'
-import { HandleInterval, TemplateInstance } from '@sentio/protos'
+import { EthFetchConfig, HandleInterval, TemplateInstance } from '@sentio/protos'
 import { getNetwork } from '@ethersproject/providers'
 import { PromiseOrVoid } from '../promise-or-void'
 import { Trace } from './trace'
@@ -34,10 +34,12 @@ export abstract class BaseProcessorTemplate<
   traceHandlers: {
     signature: string
     handler: (trace: Trace, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid
+    fetchConfig?: EthFetchConfig
   }[] = []
   eventHandlers: {
     handler: (event: Event, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid
     filter: EventFilter | EventFilter[]
+    fetchConfig?: EthFetchConfig
   }[] = []
 
   constructor() {
@@ -55,7 +57,10 @@ export abstract class BaseProcessorTemplate<
     const processor = this.bindInternal(options)
 
     for (const eh of this.eventHandlers) {
-      processor.onEvent(eh.handler, eh.filter)
+      processor.onEvent(eh.handler, eh.filter, eh.fetchConfig)
+    }
+    for (const th of this.traceHandlers) {
+      processor.onTrace(th.signature, th.handler, th.fetchConfig)
     }
     for (const bh of this.blockHandlers) {
       processor.onInterval(bh.handler, bh.timeIntervalInMinutes, bh.blockInterval)
@@ -84,11 +89,13 @@ export abstract class BaseProcessorTemplate<
 
   public onEvent(
     handler: (event: Event, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
-    filter: EventFilter | EventFilter[]
+    filter: EventFilter | EventFilter[],
+    fetchConfig?: EthFetchConfig
   ) {
     this.eventHandlers.push({
       handler: handler,
       filter: filter,
+      fetchConfig: fetchConfig,
     })
     return this
   }

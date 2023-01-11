@@ -9,7 +9,8 @@ export function generateEventHandler(event: EventDeclaration, contractName: stri
   return `
   onEvent${eventName}(
     handler: (event: ${eventNamePrefix}Event, ctx: ${contractName}Context) => void,
-    filter?: ${eventNamePrefix}EventFilter | ${eventNamePrefix}EventFilter[]
+    filter?: ${eventNamePrefix}EventFilter | ${eventNamePrefix}EventFilter[],
+    fetchConfig?: EthFetchConfig
   ) {
     if (!filter) {
       // @ts-ignore
@@ -17,7 +18,7 @@ export function generateEventHandler(event: EventDeclaration, contractName: stri
         // @ts-ignore
         '${filterName}'](${event.inputs.map(() => 'null').join(',')})
     }
-    return super.onEvent(handler, filter!)
+    return super.onEvent(handler, filter!, fetchConfig)
   }
   `
 }

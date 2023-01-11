@@ -1,29 +1,43 @@
 import { RecordMetaData } from '@sentio/protos'
-import { BaseContract, EventFilter } from 'ethers'
+import { BaseContract, EventFilter, Transaction } from 'ethers'
 import { Block, Log } from '@ethersproject/abstract-provider'
 import { normalizeLabels } from './meter'
 import { Trace } from './trace'
 import { Labels } from './metadata'
 import { CHAIN_IDS } from '../utils/chain'
 import { BaseContext } from './base-context'
+import { TransactionReceipt } from '@ethersproject/providers'
 
 export abstract class EthContext extends BaseContext {
   chainId: number
   address: string
-  log?: Log
+  private readonly log?: Log
   block?: Block
-  trace?: Trace
+  private readonly trace?: Trace
   blockNumber: bigint | number
   transactionHash?: string
+  transaction?: Transaction
+  transactionReceipt?: TransactionReceipt
   timestamp: Date
 
-  protected constructor(chainId: number, address: string, block?: Block, log?: Log, trace?: Trace, timestamp?: Date) {
+  constructor(
+    chainId: number,
+    address: string,
+    timestamp?: Date,
+    block?: Block,
+    log?: Log,
+    trace?: Trace,
+    transaction?: Transaction,
+    transactionReceipt?: TransactionReceipt
+  ) {
     super()
     this.chainId = chainId
     this.log = log
     this.block = block
     this.trace = trace
     this.address = address
+    this.transaction = transaction
+    this.transactionReceipt = transactionReceipt
     this.timestamp = timestamp || new Date(0)
     if (log) {
       this.blockNumber = log.blockNumber
@@ -83,9 +97,9 @@ export abstract class EthContext extends BaseContext {
 }
 
 export class AccountContext extends EthContext {
-  constructor(chainId: number, address: string, block?: Block, log?: Log, trace?: Trace) {
-    super(chainId, address, block, log, trace)
-  }
+  // constructor(chainId: number, address: string, block?: Block, log?: Log, trace?: Trace) {
+  //   super(chainId, address, new Date(0), block, log, trace)
+  // }
   protected getContractName(): string {
     return 'account'
   }
@@ -102,12 +116,14 @@ export class ContractContext<
     contractName: string,
     view: TContractBoundView,
     chainId: number,
+    timestamp?: Date,
     block?: Block,
     log?: Log,
     trace?: Trace,
-    timestamp?: Date
+    transaction?: Transaction,
+    transactionReceipt?: TransactionReceipt
   ) {
-    super(chainId, view.rawContract.address, block, log, trace, timestamp)
+    super(chainId, view.rawContract.address, timestamp, block, log, trace, transaction, transactionReceipt)
     view.context = this
     this.contractName = contractName
     this.contract = view

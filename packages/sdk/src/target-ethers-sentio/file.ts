@@ -162,6 +162,7 @@ export function codeGenSentioFile(contract: Contract): string {
         'TypedCallTrace',
         'toBlockTag',
       ],
+      '@sentio/protos': ['EthFetchConfig'],
       './common': ['PromiseOrValue'],
       './index': [`${contract.name}`, `${contract.name}__factory`],
       [`./${contract.name}`]: eventsImports.concat(uniqueStructImports),

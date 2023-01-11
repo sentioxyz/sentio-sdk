@@ -1,13 +1,22 @@
 import { BytesLike } from '@ethersproject/bytes'
-import { Block, Log, getNetwork } from '@ethersproject/providers'
+import { Block, Log, getNetwork, TransactionReceipt } from '@ethersproject/providers'
 import { BaseContract, Event, EventFilter } from '@ethersproject/contracts'
 
 import { BoundContractView, ContractContext, ContractView } from './context'
-import { AddressType, Data_EthBlock, Data_EthLog, Data_EthTrace, HandleInterval, ProcessResult } from '@sentio/protos'
+import {
+  AddressType,
+  Data_EthBlock,
+  Data_EthLog,
+  Data_EthTrace,
+  EthFetchConfig,
+  HandleInterval,
+  ProcessResult,
+} from '@sentio/protos'
 import { BindInternalOptions, BindOptions } from './bind-options'
 import { PromiseOrVoid } from '../promise-or-void'
 import { Trace } from './trace'
 import { ServerError, Status } from 'nice-grpc'
+import { Transaction } from 'ethers'
 
 export interface AddressOrTypeEventFilter extends EventFilter {
   addressType?: AddressType
@@ -16,11 +25,13 @@ export interface AddressOrTypeEventFilter extends EventFilter {
 export class EventsHandler {
   filters: AddressOrTypeEventFilter[]
   handler: (event: Data_EthLog) => Promise<ProcessResult>
+  fetchConfig: EthFetchConfig
 }
 
 export class TraceHandler {
   signature: string
   handler: (trace: Data_EthTrace) => Promise<ProcessResult>
+  fetchConfig: EthFetchConfig
 }
 
 export class BlockHandlder {
@@ -62,7 +73,8 @@ export abstract class BaseProcessor<
 
   public onEvent(
     handler: (event: Event, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
-    filter: EventFilter | EventFilter[]
+    filter: EventFilter | EventFilter[],
+    fetchConfig?: EthFetchConfig
   ) {
     const chainId = this.getChainId()
 
@@ -78,6 +90,7 @@ export abstract class BaseProcessor<
     const processor = this
     this.eventHandlers.push({
       filters: _filters,
+      fetchConfig: fetchConfig || EthFetchConfig.fromPartial({}),
       handler: async function (data: Data_EthLog) {
         if (!data.log) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'Log is empty')
@@ -90,10 +103,12 @@ export abstract class BaseProcessor<
           contractName,
           contractView,
           chainId,
-          undefined,
+          data.timestamp,
+          data.block as Block,
           log,
           undefined,
-          data.timestamp
+          data.transaction as Transaction,
+          data.transactionReceipt as TransactionReceipt
         )
         // let event: Event = <Event>deepCopy(log);
         const event: Event = <Event>log
@@ -165,10 +180,10 @@ export abstract class BaseProcessor<
           contractName,
           contractView,
           chainId,
+          new Date(block.timestamp * 1000),
           block,
           undefined,
-          undefined,
-          new Date(block.timestamp * 1000)
+          undefined
         )
         await handler(block, ctx)
         return ctx.getProcessResult()
@@ -191,9 +206,10 @@ export abstract class BaseProcessor<
     }, _filters)
   }
 
-  protected onTrace(
+  public onTrace(
     signature: string,
-    handler: (trace: Trace, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid
+    handler: (trace: Trace, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
+    fetchConfig?: EthFetchConfig
   ) {
     const chainId = this.getChainId()
     const contractName = this.config.name
@@ -201,6 +217,7 @@ export abstract class BaseProcessor<
 
     this.traceHandlers.push({
       signature,
+      fetchConfig: fetchConfig || EthFetchConfig.fromPartial({}),
       handler: async function (data: Data_EthTrace) {
         const contractView = processor.CreateBoundContractView()
         const contractInterface = contractView.rawContract.interface
@@ -219,10 +236,12 @@ export abstract class BaseProcessor<
           contractName,
           contractView,
           chainId,
-          undefined,
+          data.timestamp,
+          data.block as Block,
           undefined,
           trace,
-          data.timestamp
+          data.transaction as Transaction,
+          data.transactionReceipt as TransactionReceipt
         )
         await handler(trace, ctx)
         return ctx.getProcessResult()

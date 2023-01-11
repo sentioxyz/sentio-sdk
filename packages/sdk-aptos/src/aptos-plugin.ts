@@ -27,6 +27,7 @@ export class AptosPlugin extends Plugin {
   configure(config: ProcessConfigResponse): void {
     for (const aptosProcessor of AptosProcessorState.INSTANCE.getValues()) {
       const contractConfig: ContractConfig = {
+        transactionConfig: [],
         processorType: USER_PROCESSOR,
         contract: {
           name: aptosProcessor.moduleName,

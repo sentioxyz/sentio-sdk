@@ -151,13 +151,20 @@ export class AptosBaseProcessor {
           BigInt(txn.version),
           txn
         )
-        if (txn && txn.events) {
-          const events = txn.events
-          txn.events = []
-          for (const evt of events) {
-            const eventInstance = evt as EventInstance
-            const decoded = TYPE_REGISTRY.decodeEvent<any>(eventInstance)
-            await handler(decoded || eventInstance, ctx)
+        if (data.event) {
+          const eventInstance = data.event as EventInstance
+          const decoded = TYPE_REGISTRY.decodeEvent<any>(eventInstance)
+          await handler(decoded || eventInstance, ctx)
+        } else {
+          // TODO, this branch is deprecated, remove after full release
+          if (txn && txn.events) {
+            const events = txn.events
+            txn.events = []
+            for (const evt of events) {
+              const eventInstance = evt as EventInstance
+              const decoded = TYPE_REGISTRY.decodeEvent<any>(eventInstance)
+              await handler(decoded || eventInstance, ctx)
+            }
           }
         }
         return ctx.getProcessResult()

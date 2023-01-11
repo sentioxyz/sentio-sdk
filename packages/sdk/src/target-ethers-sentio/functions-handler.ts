@@ -42,9 +42,10 @@ function generateCallHandler(fn: FunctionDeclaration, contractName: string, over
 
   return `
   onCall${capitalizeFirstChar(overloadedName ?? fn.name)}(
-    handler: (call: ${capitalizeFirstChar(overloadedName ?? fn.name)}CallTrace, ctx: ${contractName}Context) => void
+    handler: (call: ${capitalizeFirstChar(overloadedName ?? fn.name)}CallTrace, ctx: ${contractName}Context) => void,
+    fetchConfig?: EthFetchConfig
   ) {
-    return super.onTrace("${sighash}", handler);
+    return super.onTrace("${sighash}", handler, fetchConfig);
   }
 `
 }

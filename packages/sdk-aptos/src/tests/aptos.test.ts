@@ -64,6 +64,7 @@ describe('Test Aptos Example', () => {
         {
           data: {
             aptEvent: {
+              event: testData.events[testData.events.length - 1],
               transaction: {
                 ...testData,
                 events: [testData.events[testData.events.length - 1]],
@@ -89,6 +90,7 @@ describe('Test Aptos Example', () => {
         {
           data: {
             aptEvent: {
+              event: tokenTestData,
               transaction: {
                 ...testData,
                 events: [tokenTestData],
@@ -111,6 +113,7 @@ describe('Test Aptos Example', () => {
         {
           data: {
             aptEvent: {
+              event: createProposalData,
               transaction: { ...testData, events: [createProposalData] },
             },
           },

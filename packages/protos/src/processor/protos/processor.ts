@@ -272,6 +272,7 @@ export interface ContractConfig {
   intervalConfigs: OnIntervalConfig[];
   logConfigs: LogHandlerConfig[];
   traceConfigs: TraceHandlerConfig[];
+  transactionConfig: TransactionHandlerConfig[];
   aptosEventConfigs: AptosEventHandlerConfig[];
   aptosCallConfigs: AptosCallHandlerConfig[];
   instructionConfig: InstructionHandlerConfig | undefined;
@@ -402,16 +403,24 @@ export interface BlockHandlerConfig {
 export interface EthFetchConfig {
   transaction: boolean;
   transactionReceipt: boolean;
+  block: boolean;
 }
 
 export interface TraceHandlerConfig {
   signature: string;
   handlerId: number;
+  fetchConfig: EthFetchConfig | undefined;
+}
+
+export interface TransactionHandlerConfig {
+  handlerId: number;
+  fetchConfig: EthFetchConfig | undefined;
 }
 
 export interface LogHandlerConfig {
   filters: LogFilter[];
   handlerId: number;
+  fetchConfig: EthFetchConfig | undefined;
 }
 
 export interface LogFilter {
@@ -482,6 +491,8 @@ export interface Data_EthLog {
   log: { [key: string]: any } | undefined;
   timestamp: Date | undefined;
   transaction?: { [key: string]: any } | undefined;
+  transactionReceipt?: { [key: string]: any } | undefined;
+  block?: { [key: string]: any } | undefined;
 }
 
 export interface Data_EthBlock {
@@ -492,6 +503,7 @@ export interface Data_EthTransaction {
   transaction: { [key: string]: any } | undefined;
   timestamp: Date | undefined;
   transactionReceipt?: { [key: string]: any } | undefined;
+  block?: { [key: string]: any } | undefined;
 }
 
 export interface Data_EthTrace {
@@ -499,6 +511,7 @@ export interface Data_EthTrace {
   timestamp: Date | undefined;
   transaction?: { [key: string]: any } | undefined;
   transactionReceipt?: { [key: string]: any } | undefined;
+  block?: { [key: string]: any } | undefined;
 }
 
 export interface Data_SolInstruction {
@@ -510,6 +523,7 @@ export interface Data_SolInstruction {
 }
 
 export interface Data_AptEvent {
+  event: { [key: string]: any } | undefined;
   transaction: { [key: string]: any } | undefined;
 }
 
@@ -855,6 +869,7 @@ function createBaseContractConfig(): ContractConfig {
     intervalConfigs: [],
     logConfigs: [],
     traceConfigs: [],
+    transactionConfig: [],
     aptosEventConfigs: [],
     aptosCallConfigs: [],
     instructionConfig: undefined,
@@ -877,6 +892,9 @@ export const ContractConfig = {
     }
     for (const v of message.traceConfigs) {
       TraceHandlerConfig.encode(v!, writer.uint32(18).fork()).ldelim();
+    }
+    for (const v of message.transactionConfig) {
+      TransactionHandlerConfig.encode(v!, writer.uint32(58).fork()).ldelim();
     }
     for (const v of message.aptosEventConfigs) {
       AptosEventHandlerConfig.encode(v!, writer.uint32(74).fork()).ldelim();
@@ -918,6 +936,9 @@ export const ContractConfig = {
         case 2:
           message.traceConfigs.push(TraceHandlerConfig.decode(reader, reader.uint32()));
           break;
+        case 7:
+          message.transactionConfig.push(TransactionHandlerConfig.decode(reader, reader.uint32()));
+          break;
         case 9:
           message.aptosEventConfigs.push(AptosEventHandlerConfig.decode(reader, reader.uint32()));
           break;
@@ -956,6 +977,9 @@ export const ContractConfig = {
       traceConfigs: Array.isArray(object?.traceConfigs)
         ? object.traceConfigs.map((e: any) => TraceHandlerConfig.fromJSON(e))
         : [],
+      transactionConfig: Array.isArray(object?.transactionConfig)
+        ? object.transactionConfig.map((e: any) => TransactionHandlerConfig.fromJSON(e))
+        : [],
       aptosEventConfigs: Array.isArray(object?.aptosEventConfigs)
         ? object.aptosEventConfigs.map((e: any) => AptosEventHandlerConfig.fromJSON(e))
         : [],
@@ -990,6 +1014,11 @@ export const ContractConfig = {
     } else {
       obj.traceConfigs = [];
     }
+    if (message.transactionConfig) {
+      obj.transactionConfig = message.transactionConfig.map((e) => e ? TransactionHandlerConfig.toJSON(e) : undefined);
+    } else {
+      obj.transactionConfig = [];
+    }
     if (message.aptosEventConfigs) {
       obj.aptosEventConfigs = message.aptosEventConfigs.map((e) => e ? AptosEventHandlerConfig.toJSON(e) : undefined);
     } else {
@@ -1017,6 +1046,7 @@ export const ContractConfig = {
     message.intervalConfigs = object.intervalConfigs?.map((e) => OnIntervalConfig.fromPartial(e)) || [];
     message.logConfigs = object.logConfigs?.map((e) => LogHandlerConfig.fromPartial(e)) || [];
     message.traceConfigs = object.traceConfigs?.map((e) => TraceHandlerConfig.fromPartial(e)) || [];
+    message.transactionConfig = object.transactionConfig?.map((e) => TransactionHandlerConfig.fromPartial(e)) || [];
     message.aptosEventConfigs = object.aptosEventConfigs?.map((e) => AptosEventHandlerConfig.fromPartial(e)) || [];
     message.aptosCallConfigs = object.aptosCallConfigs?.map((e) => AptosCallHandlerConfig.fromPartial(e)) || [];
     message.instructionConfig = (object.instructionConfig !== undefined && object.instructionConfig !== null)
@@ -2093,7 +2123,7 @@ export const BlockHandlerConfig = {
 };
 
 function createBaseEthFetchConfig(): EthFetchConfig {
-  return { transaction: false, transactionReceipt: false };
+  return { transaction: false, transactionReceipt: false, block: false };
 }
 
 export const EthFetchConfig = {
@@ -2103,6 +2133,9 @@ export const EthFetchConfig = {
     }
     if (message.transactionReceipt === true) {
       writer.uint32(16).bool(message.transactionReceipt);
+    }
+    if (message.block === true) {
+      writer.uint32(24).bool(message.block);
     }
     return writer;
   },
@@ -2120,6 +2153,9 @@ export const EthFetchConfig = {
         case 2:
           message.transactionReceipt = reader.bool();
           break;
+        case 3:
+          message.block = reader.bool();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -2132,6 +2168,7 @@ export const EthFetchConfig = {
     return {
       transaction: isSet(object.transaction) ? Boolean(object.transaction) : false,
       transactionReceipt: isSet(object.transactionReceipt) ? Boolean(object.transactionReceipt) : false,
+      block: isSet(object.block) ? Boolean(object.block) : false,
     };
   },
 
@@ -2139,6 +2176,7 @@ export const EthFetchConfig = {
     const obj: any = {};
     message.transaction !== undefined && (obj.transaction = message.transaction);
     message.transactionReceipt !== undefined && (obj.transactionReceipt = message.transactionReceipt);
+    message.block !== undefined && (obj.block = message.block);
     return obj;
   },
 
@@ -2146,12 +2184,13 @@ export const EthFetchConfig = {
     const message = createBaseEthFetchConfig();
     message.transaction = object.transaction ?? false;
     message.transactionReceipt = object.transactionReceipt ?? false;
+    message.block = object.block ?? false;
     return message;
   },
 };
 
 function createBaseTraceHandlerConfig(): TraceHandlerConfig {
-  return { signature: "", handlerId: 0 };
+  return { signature: "", handlerId: 0, fetchConfig: undefined };
 }
 
 export const TraceHandlerConfig = {
@@ -2161,6 +2200,9 @@ export const TraceHandlerConfig = {
     }
     if (message.handlerId !== 0) {
       writer.uint32(16).int32(message.handlerId);
+    }
+    if (message.fetchConfig !== undefined) {
+      EthFetchConfig.encode(message.fetchConfig, writer.uint32(26).fork()).ldelim();
     }
     return writer;
   },
@@ -2178,6 +2220,9 @@ export const TraceHandlerConfig = {
         case 2:
           message.handlerId = reader.int32();
           break;
+        case 3:
+          message.fetchConfig = EthFetchConfig.decode(reader, reader.uint32());
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -2190,6 +2235,7 @@ export const TraceHandlerConfig = {
     return {
       signature: isSet(object.signature) ? String(object.signature) : "",
       handlerId: isSet(object.handlerId) ? Number(object.handlerId) : 0,
+      fetchConfig: isSet(object.fetchConfig) ? EthFetchConfig.fromJSON(object.fetchConfig) : undefined,
     };
   },
 
@@ -2197,6 +2243,8 @@ export const TraceHandlerConfig = {
     const obj: any = {};
     message.signature !== undefined && (obj.signature = message.signature);
     message.handlerId !== undefined && (obj.handlerId = Math.round(message.handlerId));
+    message.fetchConfig !== undefined &&
+      (obj.fetchConfig = message.fetchConfig ? EthFetchConfig.toJSON(message.fetchConfig) : undefined);
     return obj;
   },
 
@@ -2204,12 +2252,76 @@ export const TraceHandlerConfig = {
     const message = createBaseTraceHandlerConfig();
     message.signature = object.signature ?? "";
     message.handlerId = object.handlerId ?? 0;
+    message.fetchConfig = (object.fetchConfig !== undefined && object.fetchConfig !== null)
+      ? EthFetchConfig.fromPartial(object.fetchConfig)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseTransactionHandlerConfig(): TransactionHandlerConfig {
+  return { handlerId: 0, fetchConfig: undefined };
+}
+
+export const TransactionHandlerConfig = {
+  encode(message: TransactionHandlerConfig, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.handlerId !== 0) {
+      writer.uint32(8).int32(message.handlerId);
+    }
+    if (message.fetchConfig !== undefined) {
+      EthFetchConfig.encode(message.fetchConfig, writer.uint32(26).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): TransactionHandlerConfig {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseTransactionHandlerConfig();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.handlerId = reader.int32();
+          break;
+        case 3:
+          message.fetchConfig = EthFetchConfig.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): TransactionHandlerConfig {
+    return {
+      handlerId: isSet(object.handlerId) ? Number(object.handlerId) : 0,
+      fetchConfig: isSet(object.fetchConfig) ? EthFetchConfig.fromJSON(object.fetchConfig) : undefined,
+    };
+  },
+
+  toJSON(message: TransactionHandlerConfig): unknown {
+    const obj: any = {};
+    message.handlerId !== undefined && (obj.handlerId = Math.round(message.handlerId));
+    message.fetchConfig !== undefined &&
+      (obj.fetchConfig = message.fetchConfig ? EthFetchConfig.toJSON(message.fetchConfig) : undefined);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<TransactionHandlerConfig>): TransactionHandlerConfig {
+    const message = createBaseTransactionHandlerConfig();
+    message.handlerId = object.handlerId ?? 0;
+    message.fetchConfig = (object.fetchConfig !== undefined && object.fetchConfig !== null)
+      ? EthFetchConfig.fromPartial(object.fetchConfig)
+      : undefined;
     return message;
   },
 };
 
 function createBaseLogHandlerConfig(): LogHandlerConfig {
-  return { filters: [], handlerId: 0 };
+  return { filters: [], handlerId: 0, fetchConfig: undefined };
 }
 
 export const LogHandlerConfig = {
@@ -2219,6 +2331,9 @@ export const LogHandlerConfig = {
     }
     if (message.handlerId !== 0) {
       writer.uint32(16).int32(message.handlerId);
+    }
+    if (message.fetchConfig !== undefined) {
+      EthFetchConfig.encode(message.fetchConfig, writer.uint32(26).fork()).ldelim();
     }
     return writer;
   },
@@ -2236,6 +2351,9 @@ export const LogHandlerConfig = {
         case 2:
           message.handlerId = reader.int32();
           break;
+        case 3:
+          message.fetchConfig = EthFetchConfig.decode(reader, reader.uint32());
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -2248,6 +2366,7 @@ export const LogHandlerConfig = {
     return {
       filters: Array.isArray(object?.filters) ? object.filters.map((e: any) => LogFilter.fromJSON(e)) : [],
       handlerId: isSet(object.handlerId) ? Number(object.handlerId) : 0,
+      fetchConfig: isSet(object.fetchConfig) ? EthFetchConfig.fromJSON(object.fetchConfig) : undefined,
     };
   },
 
@@ -2259,6 +2378,8 @@ export const LogHandlerConfig = {
       obj.filters = [];
     }
     message.handlerId !== undefined && (obj.handlerId = Math.round(message.handlerId));
+    message.fetchConfig !== undefined &&
+      (obj.fetchConfig = message.fetchConfig ? EthFetchConfig.toJSON(message.fetchConfig) : undefined);
     return obj;
   },
 
@@ -2266,6 +2387,9 @@ export const LogHandlerConfig = {
     const message = createBaseLogHandlerConfig();
     message.filters = object.filters?.map((e) => LogFilter.fromPartial(e)) || [];
     message.handlerId = object.handlerId ?? 0;
+    message.fetchConfig = (object.fetchConfig !== undefined && object.fetchConfig !== null)
+      ? EthFetchConfig.fromPartial(object.fetchConfig)
+      : undefined;
     return message;
   },
 };
@@ -3050,7 +3174,13 @@ export const Data = {
 };
 
 function createBaseData_EthLog(): Data_EthLog {
-  return { log: undefined, timestamp: undefined, transaction: undefined };
+  return {
+    log: undefined,
+    timestamp: undefined,
+    transaction: undefined,
+    transactionReceipt: undefined,
+    block: undefined,
+  };
 }
 
 export const Data_EthLog = {
@@ -3063,6 +3193,12 @@ export const Data_EthLog = {
     }
     if (message.transaction !== undefined) {
       Struct.encode(Struct.wrap(message.transaction), writer.uint32(18).fork()).ldelim();
+    }
+    if (message.transactionReceipt !== undefined) {
+      Struct.encode(Struct.wrap(message.transactionReceipt), writer.uint32(42).fork()).ldelim();
+    }
+    if (message.block !== undefined) {
+      Struct.encode(Struct.wrap(message.block), writer.uint32(50).fork()).ldelim();
     }
     return writer;
   },
@@ -3083,6 +3219,12 @@ export const Data_EthLog = {
         case 2:
           message.transaction = Struct.unwrap(Struct.decode(reader, reader.uint32()));
           break;
+        case 5:
+          message.transactionReceipt = Struct.unwrap(Struct.decode(reader, reader.uint32()));
+          break;
+        case 6:
+          message.block = Struct.unwrap(Struct.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -3096,6 +3238,8 @@ export const Data_EthLog = {
       log: isObject(object.log) ? object.log : undefined,
       timestamp: isSet(object.timestamp) ? fromJsonTimestamp(object.timestamp) : undefined,
       transaction: isObject(object.transaction) ? object.transaction : undefined,
+      transactionReceipt: isObject(object.transactionReceipt) ? object.transactionReceipt : undefined,
+      block: isObject(object.block) ? object.block : undefined,
     };
   },
 
@@ -3104,6 +3248,8 @@ export const Data_EthLog = {
     message.log !== undefined && (obj.log = message.log);
     message.timestamp !== undefined && (obj.timestamp = message.timestamp.toISOString());
     message.transaction !== undefined && (obj.transaction = message.transaction);
+    message.transactionReceipt !== undefined && (obj.transactionReceipt = message.transactionReceipt);
+    message.block !== undefined && (obj.block = message.block);
     return obj;
   },
 
@@ -3112,6 +3258,8 @@ export const Data_EthLog = {
     message.log = object.log ?? undefined;
     message.timestamp = object.timestamp ?? undefined;
     message.transaction = object.transaction ?? undefined;
+    message.transactionReceipt = object.transactionReceipt ?? undefined;
+    message.block = object.block ?? undefined;
     return message;
   },
 };
@@ -3164,7 +3312,7 @@ export const Data_EthBlock = {
 };
 
 function createBaseData_EthTransaction(): Data_EthTransaction {
-  return { transaction: undefined, timestamp: undefined, transactionReceipt: undefined };
+  return { transaction: undefined, timestamp: undefined, transactionReceipt: undefined, block: undefined };
 }
 
 export const Data_EthTransaction = {
@@ -3177,6 +3325,9 @@ export const Data_EthTransaction = {
     }
     if (message.transactionReceipt !== undefined) {
       Struct.encode(Struct.wrap(message.transactionReceipt), writer.uint32(26).fork()).ldelim();
+    }
+    if (message.block !== undefined) {
+      Struct.encode(Struct.wrap(message.block), writer.uint32(50).fork()).ldelim();
     }
     return writer;
   },
@@ -3197,6 +3348,9 @@ export const Data_EthTransaction = {
         case 3:
           message.transactionReceipt = Struct.unwrap(Struct.decode(reader, reader.uint32()));
           break;
+        case 6:
+          message.block = Struct.unwrap(Struct.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -3210,6 +3364,7 @@ export const Data_EthTransaction = {
       transaction: isObject(object.transaction) ? object.transaction : undefined,
       timestamp: isSet(object.timestamp) ? fromJsonTimestamp(object.timestamp) : undefined,
       transactionReceipt: isObject(object.transactionReceipt) ? object.transactionReceipt : undefined,
+      block: isObject(object.block) ? object.block : undefined,
     };
   },
 
@@ -3218,6 +3373,7 @@ export const Data_EthTransaction = {
     message.transaction !== undefined && (obj.transaction = message.transaction);
     message.timestamp !== undefined && (obj.timestamp = message.timestamp.toISOString());
     message.transactionReceipt !== undefined && (obj.transactionReceipt = message.transactionReceipt);
+    message.block !== undefined && (obj.block = message.block);
     return obj;
   },
 
@@ -3226,12 +3382,19 @@ export const Data_EthTransaction = {
     message.transaction = object.transaction ?? undefined;
     message.timestamp = object.timestamp ?? undefined;
     message.transactionReceipt = object.transactionReceipt ?? undefined;
+    message.block = object.block ?? undefined;
     return message;
   },
 };
 
 function createBaseData_EthTrace(): Data_EthTrace {
-  return { trace: undefined, timestamp: undefined, transaction: undefined, transactionReceipt: undefined };
+  return {
+    trace: undefined,
+    timestamp: undefined,
+    transaction: undefined,
+    transactionReceipt: undefined,
+    block: undefined,
+  };
 }
 
 export const Data_EthTrace = {
@@ -3247,6 +3410,9 @@ export const Data_EthTrace = {
     }
     if (message.transactionReceipt !== undefined) {
       Struct.encode(Struct.wrap(message.transactionReceipt), writer.uint32(26).fork()).ldelim();
+    }
+    if (message.block !== undefined) {
+      Struct.encode(Struct.wrap(message.block), writer.uint32(50).fork()).ldelim();
     }
     return writer;
   },
@@ -3270,6 +3436,9 @@ export const Data_EthTrace = {
         case 3:
           message.transactionReceipt = Struct.unwrap(Struct.decode(reader, reader.uint32()));
           break;
+        case 6:
+          message.block = Struct.unwrap(Struct.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -3284,6 +3453,7 @@ export const Data_EthTrace = {
       timestamp: isSet(object.timestamp) ? fromJsonTimestamp(object.timestamp) : undefined,
       transaction: isObject(object.transaction) ? object.transaction : undefined,
       transactionReceipt: isObject(object.transactionReceipt) ? object.transactionReceipt : undefined,
+      block: isObject(object.block) ? object.block : undefined,
     };
   },
 
@@ -3293,6 +3463,7 @@ export const Data_EthTrace = {
     message.timestamp !== undefined && (obj.timestamp = message.timestamp.toISOString());
     message.transaction !== undefined && (obj.transaction = message.transaction);
     message.transactionReceipt !== undefined && (obj.transactionReceipt = message.transactionReceipt);
+    message.block !== undefined && (obj.block = message.block);
     return obj;
   },
 
@@ -3302,6 +3473,7 @@ export const Data_EthTrace = {
     message.timestamp = object.timestamp ?? undefined;
     message.transaction = object.transaction ?? undefined;
     message.transactionReceipt = object.transactionReceipt ?? undefined;
+    message.block = object.block ?? undefined;
     return message;
   },
 };
@@ -3396,11 +3568,14 @@ export const Data_SolInstruction = {
 };
 
 function createBaseData_AptEvent(): Data_AptEvent {
-  return { transaction: undefined };
+  return { event: undefined, transaction: undefined };
 }
 
 export const Data_AptEvent = {
   encode(message: Data_AptEvent, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.event !== undefined) {
+      Struct.encode(Struct.wrap(message.event), writer.uint32(10).fork()).ldelim();
+    }
     if (message.transaction !== undefined) {
       Struct.encode(Struct.wrap(message.transaction), writer.uint32(18).fork()).ldelim();
     }
@@ -3414,6 +3589,9 @@ export const Data_AptEvent = {
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
+        case 1:
+          message.event = Struct.unwrap(Struct.decode(reader, reader.uint32()));
+          break;
         case 2:
           message.transaction = Struct.unwrap(Struct.decode(reader, reader.uint32()));
           break;
@@ -3426,17 +3604,22 @@ export const Data_AptEvent = {
   },
 
   fromJSON(object: any): Data_AptEvent {
-    return { transaction: isObject(object.transaction) ? object.transaction : undefined };
+    return {
+      event: isObject(object.event) ? object.event : undefined,
+      transaction: isObject(object.transaction) ? object.transaction : undefined,
+    };
   },
 
   toJSON(message: Data_AptEvent): unknown {
     const obj: any = {};
+    message.event !== undefined && (obj.event = message.event);
     message.transaction !== undefined && (obj.transaction = message.transaction);
     return obj;
   },
 
   fromPartial(object: DeepPartial<Data_AptEvent>): Data_AptEvent {
     const message = createBaseData_AptEvent();
+    message.event = object.event ?? undefined;
     message.transaction = object.transaction ?? undefined;
     return message;
   },

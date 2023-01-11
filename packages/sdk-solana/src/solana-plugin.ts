@@ -13,6 +13,7 @@ export class SolanaPlugin extends Plugin {
     // Part 2, prepare solana constractors
     for (const solanaProcessor of SolanaProcessorState.INSTANCE.getValues()) {
       const contractConfig: ContractConfig = {
+        transactionConfig: [],
         processorType: USER_PROCESSOR,
         contract: {
           name: solanaProcessor.contractName,

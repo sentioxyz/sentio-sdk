@@ -15,7 +15,6 @@ import {
 } from '@sentio/protos'
 
 import { ServerError, Status } from 'nice-grpc'
-import { Block, Log } from '@ethersproject/abstract-provider'
 import { ProcessorState } from '../binds'
 import { AccountProcessorState } from './account-processor'
 import { ProcessorTemplateProcessorState, TemplateInstanceState } from './base-processor-template'
@@ -48,6 +47,7 @@ export class EthPlugin extends Plugin {
         intervalConfigs: [],
         logConfigs: [],
         traceConfigs: [],
+        transactionConfig: [],
         startBlock: processor.config.startBlock,
         endBlock: 0n,
         instructionConfig: undefined,
@@ -78,6 +78,7 @@ export class EthPlugin extends Plugin {
         contractConfig.traceConfigs.push({
           signature: traceHandler.signature,
           handlerId: handlerId,
+          fetchConfig: traceHandler.fetchConfig,
         })
       }
 
@@ -88,6 +89,7 @@ export class EthPlugin extends Plugin {
         const logConfig: LogHandlerConfig = {
           handlerId: handlerId,
           filters: [],
+          fetchConfig: eventsHandler.fetchConfig,
         }
 
         for (const filter of eventsHandler.filters) {
@@ -135,6 +137,7 @@ export class EthPlugin extends Plugin {
         const logConfig: LogHandlerConfig = {
           handlerId: handlerId,
           filters: [],
+          fetchConfig: eventsHandler.fetchConfig,
         }
 
         for (const filter of eventsHandler.filters) {

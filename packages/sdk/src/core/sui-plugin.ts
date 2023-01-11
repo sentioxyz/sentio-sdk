@@ -12,6 +12,7 @@ export class SuiPlugin extends Plugin {
   configure(config: ProcessConfigResponse): void {
     for (const suiProcessor of SuiProcessorState.INSTANCE.getValues()) {
       const contractConfig: ContractConfig = {
+        transactionConfig: [],
         processorType: USER_PROCESSOR,
         contract: {
           name: 'sui contract',

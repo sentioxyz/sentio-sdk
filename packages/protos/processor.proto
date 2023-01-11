@@ -48,6 +48,7 @@ message ContractConfig {
   repeated OnIntervalConfig interval_configs = 11;
   repeated LogHandlerConfig log_configs = 3;
   repeated TraceHandlerConfig trace_configs = 2;
+  repeated TransactionHandlerConfig transaction_config = 7;
   repeated AptosEventHandlerConfig aptos_event_configs = 9;
   repeated AptosCallHandlerConfig aptos_call_configs = 10;
   InstructionHandlerConfig instruction_config = 6;
@@ -194,17 +195,24 @@ message BlockHandlerConfig {
 message EthFetchConfig {
   bool transaction = 1;
   bool transaction_receipt = 2;
-//  bool block = 3;
+  bool block = 3;
 }
 
 message TraceHandlerConfig {
   string signature = 1;
   int32 handler_id = 2;
+  EthFetchConfig fetch_config = 3;
+}
+
+message TransactionHandlerConfig {
+  int32 handler_id = 1;
+  EthFetchConfig fetch_config = 3;
 }
 
 message LogHandlerConfig {
   repeated LogFilter filters = 1;
   int32 handler_id = 2;
+  EthFetchConfig fetch_config = 3;
 }
 
 message LogFilter {
@@ -286,6 +294,8 @@ message Data {
     google.protobuf.Struct log = 3;
     google.protobuf.Timestamp timestamp = 4;
     optional google.protobuf.Struct transaction = 2;
+    optional google.protobuf.Struct transaction_receipt = 5;
+    optional google.protobuf.Struct block = 6;
   }
   message EthBlock {
     google.protobuf.Struct block = 2;
@@ -294,12 +304,14 @@ message Data {
     google.protobuf.Struct transaction = 4;
     google.protobuf.Timestamp timestamp = 5;
     optional google.protobuf.Struct transaction_receipt = 3;
+    optional google.protobuf.Struct block = 6;
   }
   message EthTrace {
     google.protobuf.Struct trace = 4;
     google.protobuf.Timestamp timestamp = 5;
     optional google.protobuf.Struct transaction = 2;
     optional google.protobuf.Struct transaction_receipt = 3;
+    optional google.protobuf.Struct block = 6;
   }
   message SolInstruction {
     string instruction_data = 1;
@@ -309,6 +321,7 @@ message Data {
     optional google.protobuf.Struct parsed = 4;
   }
   message AptEvent {
+    google.protobuf.Struct event = 1;
     google.protobuf.Struct transaction = 2;
   }
   message AptCall {
