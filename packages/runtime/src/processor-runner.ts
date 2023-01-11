@@ -52,7 +52,7 @@ if (options['log-format'] === 'json') {
   }
   const logger = createLogger({
     format: format.combine(
-      format.timestamp({ format: 'YYYY-MM-DDTHH:mm:ssZ' }),
+      format.timestamp({ format: 'YYYY-MM-DDTHH:mm:ss.SSSZ' }),
       utilFormatter,
       format.errors({ stack: true }),
       format.json()
