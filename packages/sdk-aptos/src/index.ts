@@ -4,7 +4,7 @@ export { TYPE_REGISTRY, TypeRegistry } from './type-registry'
 export type { FunctionNameAndCallFilter, EventFilter, CallFilter, ArgumentsFilter } from './aptos-processor'
 export { AptosBaseProcessor, AptosAccountProcessor } from './aptos-processor'
 export { AptosContext, AptosResourceContext } from './context'
-export { AptosBindOptions, AptosNetwork, getRpcClient } from './network'
+export { AptosBindOptions, AptosNetwork } from './network'
 export * from './api'
 
 export { AptosPlugin } from './aptos-plugin'

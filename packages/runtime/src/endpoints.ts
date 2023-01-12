@@ -11,4 +11,6 @@ export class Endpoints {
 
   chainQueryAPI = ''
   priceFeedAPI = ''
+
+  chainServer = new Map<string, string>()
 }

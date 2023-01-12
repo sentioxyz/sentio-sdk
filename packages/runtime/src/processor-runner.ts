@@ -17,6 +17,7 @@ import { Endpoints } from './endpoints'
 
 import { load } from './loader'
 import { FullProcessorServiceImpl } from './full-service'
+import { ChainConfig } from './chain-config'
 
 State.reset()
 Endpoints.reset()
@@ -76,6 +77,13 @@ const chainsConfig = fs.readJsonSync(fullPath)
 setProvider(chainsConfig, options.concurrency, options['use-chainserver'])
 Endpoints.INSTANCE.chainQueryAPI = options['chainquery-server']
 Endpoints.INSTANCE.priceFeedAPI = options['pricefeed-server']
+
+for (const [id, config] of Object.entries(chainsConfig)) {
+  const chainConfig = config as ChainConfig
+  if (chainConfig.ChainServer) {
+    Endpoints.INSTANCE.chainServer.set(id, chainConfig.ChainServer)
+  }
+}
 
 if (options.debug) {
   console.log('Starting Server', options)
