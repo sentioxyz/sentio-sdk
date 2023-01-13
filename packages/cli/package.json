@@ -18,20 +18,20 @@
     "form-data": "^4.0.0",
     "fs-extra": "^11.0.0",
     "js-yaml": "^4.1.0",
-    "latest-version": "^5.1.0",
+    "latest-version": "^7.0.0",
     "node-fetch": "2",
     "open": "^8.4.0",
     "ts-loader": "^9.3.0",
     "webpack": "^5.72.1",
     "webpack-cli": "^5.0.0",
-    "chalk": "^4.1.0"
+    "chalk": "^5.0.0"
   },
   "devDependencies": {
     "@types/command-line-args": "^5.2.0",
     "@types/command-line-usage": "^5.0.2",
     "@types/expect": "^24.3.0",
     "@types/express": "^4.17.14",
-    "@types/fs-extra": "^9.0.13",
+    "@types/fs-extra": "^11.0.0",
     "@types/js-yaml": "^4.0.5",
     "@types/node": "^18.0.4",
     "@types/node-fetch": "^2.6.2"
