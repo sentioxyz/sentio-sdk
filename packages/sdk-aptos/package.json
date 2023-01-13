@@ -13,7 +13,7 @@
   "dependencies": {
     "@sentio/sdk": "^1.0.0-development",
     "chalk": "^4.1.0",
-    "aptos-sdk": "npm:aptos@^1.3.17",
+    "aptos-sdk": "npm:aptos@^1.5.0",
     "prettier": "^2.8.1",
     "@types/prettier": "^2.7.2"
   },

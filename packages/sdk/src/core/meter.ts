@@ -5,7 +5,7 @@ import { AggregationConfig, AggregationType, MetricConfig, MetricType } from '@s
 import { MapStateStorage } from '@sentio/runtime'
 
 export function normalizeName(name: string): string {
-  const regex = new RegExp('![_.a-zA-Z0-9]')
+  const regex = new RegExp('![_a-zA-Z0-9]')
   return name.slice(0, 100).replace(regex, '_')
 }
 

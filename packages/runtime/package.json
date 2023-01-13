@@ -7,7 +7,8 @@
     "build": "yarn compile",
     "build_all": "yarn lerna run --scope=@sentio/runtime build --include-dependencies",
     "test": "jest",
-    "run": "ts-node --files src/processor-runner.ts --log-format=json"
+    "run": "ts-node --files src/processor-runner.ts --log-format=json",
+    "run-benchmark": "ts-node --files src/decode-benchmark.ts"
   },
   "dependencies": {
     "@sentio/protos": "^1.0.0-development",
