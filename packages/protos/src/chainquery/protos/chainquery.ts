@@ -53,7 +53,7 @@ export interface QueryExecutionSummary {
 }
 
 export interface AptosGetTxnsResponse {
-  documents: string[];
+  documents: Uint8Array[];
   executionSummary?: QueryExecutionSummary | undefined;
 }
 
@@ -76,7 +76,7 @@ export interface EvmGetHeaderRequest {
 }
 
 export interface EvmQueryResponse {
-  rows: string[];
+  rows: Uint8Array[];
   executionSummary?: QueryExecutionSummary | undefined;
 }
 
@@ -637,7 +637,7 @@ function createBaseAptosGetTxnsResponse(): AptosGetTxnsResponse {
 export const AptosGetTxnsResponse = {
   encode(message: AptosGetTxnsResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     for (const v of message.documents) {
-      writer.uint32(10).string(v!);
+      writer.uint32(10).bytes(v!);
     }
     if (message.executionSummary !== undefined) {
       QueryExecutionSummary.encode(message.executionSummary, writer.uint32(18).fork()).ldelim();
@@ -653,7 +653,7 @@ export const AptosGetTxnsResponse = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.documents.push(reader.string());
+          message.documents.push(reader.bytes());
           break;
         case 2:
           message.executionSummary = QueryExecutionSummary.decode(reader, reader.uint32());
@@ -668,7 +668,7 @@ export const AptosGetTxnsResponse = {
 
   fromJSON(object: any): AptosGetTxnsResponse {
     return {
-      documents: Array.isArray(object?.documents) ? object.documents.map((e: any) => String(e)) : [],
+      documents: Array.isArray(object?.documents) ? object.documents.map((e: any) => bytesFromBase64(e)) : [],
       executionSummary: isSet(object.executionSummary)
         ? QueryExecutionSummary.fromJSON(object.executionSummary)
         : undefined,
@@ -678,7 +678,7 @@ export const AptosGetTxnsResponse = {
   toJSON(message: AptosGetTxnsResponse): unknown {
     const obj: any = {};
     if (message.documents) {
-      obj.documents = message.documents.map((e) => e);
+      obj.documents = message.documents.map((e) => base64FromBytes(e !== undefined ? e : new Uint8Array()));
     } else {
       obj.documents = [];
     }
@@ -930,7 +930,7 @@ function createBaseEvmQueryResponse(): EvmQueryResponse {
 export const EvmQueryResponse = {
   encode(message: EvmQueryResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     for (const v of message.rows) {
-      writer.uint32(10).string(v!);
+      writer.uint32(10).bytes(v!);
     }
     if (message.executionSummary !== undefined) {
       QueryExecutionSummary.encode(message.executionSummary, writer.uint32(18).fork()).ldelim();
@@ -946,7 +946,7 @@ export const EvmQueryResponse = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.rows.push(reader.string());
+          message.rows.push(reader.bytes());
           break;
         case 2:
           message.executionSummary = QueryExecutionSummary.decode(reader, reader.uint32());
@@ -961,7 +961,7 @@ export const EvmQueryResponse = {
 
   fromJSON(object: any): EvmQueryResponse {
     return {
-      rows: Array.isArray(object?.rows) ? object.rows.map((e: any) => String(e)) : [],
+      rows: Array.isArray(object?.rows) ? object.rows.map((e: any) => bytesFromBase64(e)) : [],
       executionSummary: isSet(object.executionSummary)
         ? QueryExecutionSummary.fromJSON(object.executionSummary)
         : undefined,
@@ -971,7 +971,7 @@ export const EvmQueryResponse = {
   toJSON(message: EvmQueryResponse): unknown {
     const obj: any = {};
     if (message.rows) {
-      obj.rows = message.rows.map((e) => e);
+      obj.rows = message.rows.map((e) => base64FromBytes(e !== undefined ? e : new Uint8Array()));
     } else {
       obj.rows = [];
     }
@@ -1174,6 +1174,50 @@ export interface EvmQueryClient<CallOptionsExt = {}> {
     request: DeepPartial<EvmGetHeaderRequest>,
     options?: CallOptions & CallOptionsExt,
   ): Promise<VoidResponse>;
+}
+
+declare var self: any | undefined;
+declare var window: any | undefined;
+declare var global: any | undefined;
+var tsProtoGlobalThis: any = (() => {
+  if (typeof globalThis !== "undefined") {
+    return globalThis;
+  }
+  if (typeof self !== "undefined") {
+    return self;
+  }
+  if (typeof window !== "undefined") {
+    return window;
+  }
+  if (typeof global !== "undefined") {
+    return global;
+  }
+  throw "Unable to locate global object";
+})();
+
+function bytesFromBase64(b64: string): Uint8Array {
+  if (tsProtoGlobalThis.Buffer) {
+    return Uint8Array.from(tsProtoGlobalThis.Buffer.from(b64, "base64"));
+  } else {
+    const bin = tsProtoGlobalThis.atob(b64);
+    const arr = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; ++i) {
+      arr[i] = bin.charCodeAt(i);
+    }
+    return arr;
+  }
+}
+
+function base64FromBytes(arr: Uint8Array): string {
+  if (tsProtoGlobalThis.Buffer) {
+    return tsProtoGlobalThis.Buffer.from(arr).toString("base64");
+  } else {
+    const bin: string[] = [];
+    arr.forEach((byte) => {
+      bin.push(String.fromCharCode(byte));
+    });
+    return tsProtoGlobalThis.btoa(bin.join(""));
+  }
 }
 
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;

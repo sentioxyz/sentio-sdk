@@ -96,6 +96,9 @@ message MetricConfig {
   string description = 3;
   string unit = 2;
   bool sparse = 4;
+  // by default metric value get recalculated for each run, but in same cases we want to just continue the metric
+  // from the previous version, e.g. the blockchain is heavily pruned so it can't be recalculated from the beginning
+  bool persistent_between_version = 5;
 
   MetricType type = 7;
   AggregationConfig aggregation_config = 6;

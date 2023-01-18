@@ -341,6 +341,7 @@ export interface MetricConfig {
   description: string;
   unit: string;
   sparse: boolean;
+  persistentBetweenVersion: boolean;
   type: MetricType;
   aggregationConfig: AggregationConfig | undefined;
 }
@@ -1340,7 +1341,15 @@ export const ExportConfig = {
 };
 
 function createBaseMetricConfig(): MetricConfig {
-  return { name: "", description: "", unit: "", sparse: false, type: 0, aggregationConfig: undefined };
+  return {
+    name: "",
+    description: "",
+    unit: "",
+    sparse: false,
+    persistentBetweenVersion: false,
+    type: 0,
+    aggregationConfig: undefined,
+  };
 }
 
 export const MetricConfig = {
@@ -1356,6 +1365,9 @@ export const MetricConfig = {
     }
     if (message.sparse === true) {
       writer.uint32(32).bool(message.sparse);
+    }
+    if (message.persistentBetweenVersion === true) {
+      writer.uint32(40).bool(message.persistentBetweenVersion);
     }
     if (message.type !== 0) {
       writer.uint32(56).int32(message.type);
@@ -1385,6 +1397,9 @@ export const MetricConfig = {
         case 4:
           message.sparse = reader.bool();
           break;
+        case 5:
+          message.persistentBetweenVersion = reader.bool();
+          break;
         case 7:
           message.type = reader.int32() as any;
           break;
@@ -1405,6 +1420,9 @@ export const MetricConfig = {
       description: isSet(object.description) ? String(object.description) : "",
       unit: isSet(object.unit) ? String(object.unit) : "",
       sparse: isSet(object.sparse) ? Boolean(object.sparse) : false,
+      persistentBetweenVersion: isSet(object.persistentBetweenVersion)
+        ? Boolean(object.persistentBetweenVersion)
+        : false,
       type: isSet(object.type) ? metricTypeFromJSON(object.type) : 0,
       aggregationConfig: isSet(object.aggregationConfig)
         ? AggregationConfig.fromJSON(object.aggregationConfig)
@@ -1418,6 +1436,7 @@ export const MetricConfig = {
     message.description !== undefined && (obj.description = message.description);
     message.unit !== undefined && (obj.unit = message.unit);
     message.sparse !== undefined && (obj.sparse = message.sparse);
+    message.persistentBetweenVersion !== undefined && (obj.persistentBetweenVersion = message.persistentBetweenVersion);
     message.type !== undefined && (obj.type = metricTypeToJSON(message.type));
     message.aggregationConfig !== undefined && (obj.aggregationConfig = message.aggregationConfig
       ? AggregationConfig.toJSON(message.aggregationConfig)
@@ -1431,6 +1450,7 @@ export const MetricConfig = {
     message.description = object.description ?? "";
     message.unit = object.unit ?? "";
     message.sparse = object.sparse ?? false;
+    message.persistentBetweenVersion = object.persistentBetweenVersion ?? false;
     message.type = object.type ?? 0;
     message.aggregationConfig = (object.aggregationConfig !== undefined && object.aggregationConfig !== null)
       ? AggregationConfig.fromPartial(object.aggregationConfig)

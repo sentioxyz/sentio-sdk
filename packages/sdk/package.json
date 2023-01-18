@@ -31,9 +31,6 @@
     "typechain": "^8.0.0",
     "winston": "^3.8.2"
   },
-  "resolutions": {
-    "@grpc/grpc-js": "1.7.3"
-  },
   "devDependencies": {
     "@types/command-line-args": "^5.2.0",
     "@types/command-line-usage": "^5.0.2",

@@ -32,6 +32,7 @@ export class MetricOptions {
   unit?: string
   description?: string
   sparse?: boolean
+  persistentBetweenVersion?: boolean
   aggregationConfig?: Partial<AggregationConfig>
 }
 
