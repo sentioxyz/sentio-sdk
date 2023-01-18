@@ -57,6 +57,12 @@ export abstract class BaseProcessor<
       network: config.network ? config.network : 1,
       startBlock: 0n,
     }
+    if (typeof this.config.network === 'string') {
+      const asInt = parseInt(this.config.network)
+      if (Number.isFinite(asInt)) {
+        this.config.network = asInt
+      }
+    }
     if (config.startBlock) {
       this.config.startBlock = BigInt(config.startBlock)
     }

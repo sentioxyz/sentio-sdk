@@ -32,6 +32,12 @@ export class AccountProcessor {
 
   protected constructor(config: AccountBindOptions) {
     this.config = config
+    if (typeof this.config.network === 'string') {
+      const asInt = parseInt(this.config.network)
+      if (Number.isFinite(asInt)) {
+        this.config.network = asInt
+      }
+    }
   }
 
   public getChainId(): number {
