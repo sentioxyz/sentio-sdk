@@ -12,7 +12,7 @@
   "dependencies": {
     "@dao-xyz/borsh": "^4.0.7",
     "@project-serum/anchor": "^0.26.0",
-    "@sentio/sdk": "^1.0.0-development",
+    "@sentio/sdk": "1.0.0-development",
     "@solana/web3.js": "^1.47.3",
     "bs58": "^5.0.0"
   },

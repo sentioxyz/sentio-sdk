@@ -11,7 +11,7 @@
     "gen_test": "ts-node src/run-codegen.ts src/tests/abis src/tests/types"
   },
   "dependencies": {
-    "@sentio/sdk": "^1.0.0-development",
+    "@sentio/sdk": "1.0.0-development",
     "chalk": "^4.1.0",
     "aptos-sdk": "npm:aptos@^1.5.0",
     "prettier": "^2.8.1",
