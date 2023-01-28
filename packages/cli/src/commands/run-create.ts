@@ -21,6 +21,13 @@ export async function runCreate(argv: string[]) {
       description: 'Project name',
     },
     {
+      name: 'subproject',
+      alias: 'p',
+      type: Boolean,
+      description:
+        'If this is a subproject in mono-repo setup, in this case sdk version is controlled in parent package.json.',
+    },
+    {
       name: 'directory',
       alias: 'd',
       description: '(Optional) The root direct new project will be created, default current working dir',
@@ -115,6 +122,13 @@ export async function runCreate(argv: string[]) {
       const cliVersion = '^' + (await latestVersion('@sentio/cli'))
       packageJson.devDependencies['@sentio/cli'] = cliVersion
       packageJson.name = projectName
+
+      if (options.subproject) {
+        delete packageJson.dependencies['@sentio/sdk']
+        delete packageJson.devDependencies['@sentio/cli']
+        delete packageJson.dependencies['@sentio/sdk-aptos']
+        delete packageJson.dependencies['@sentio/sdk-solana']
+      }
 
       // Don't add directly to avoid deps issue
       packageJson.scripts.postinstall = 'sentio gen'
