@@ -15,7 +15,7 @@ export function getPriceClient(address?: string) {
 const priceMap = new Map<string, Promise<number>>()
 let priceClient: PriceServiceClient<RetryOptions>
 
-export async function getPriceByTypeOrSymbol(date: Date, coinId: CoinID): Promise<number> {
+async function getPriceByTypeOrSymbol(date: Date, coinId: CoinID): Promise<number> {
   if (!priceClient) {
     priceClient = getPriceClient()
   }
@@ -65,7 +65,7 @@ export async function getPriceByTypeOrSymbol(date: Date, coinId: CoinID): Promis
  * @param coinType
  * @param date
  */
-async function getPriceByType(chainId: string, coinType: string, date: Date): Promise<number> {
+export async function getPriceByType(chainId: string, coinType: string, date: Date): Promise<number> {
   return getPriceByTypeOrSymbol(date, {
     address: {
       chain: chainId,
