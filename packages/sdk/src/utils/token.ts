@@ -6,6 +6,7 @@ import { getERC20BytesContract } from '../builtin/internal/erc20bytes_processor'
 import { BigDecimal } from '../core/big-decimal'
 import { toBigDecimal } from './conversion'
 import { utils } from 'ethers'
+import { PromiseOrValue } from '../builtin/internal/common'
 
 export interface TokenInfo {
   symbol: string
@@ -19,7 +20,19 @@ export const NATIVE_ETH = {
   name: 'Native ETH',
 }
 
-const TOKEN_INFOS = new Map<string, TokenInfo>()
+const TOKEN_INFOS = new Map<string, Promise<TokenInfo>>()
+
+async function getTokenInfoPromise(
+  symbol: PromiseOrValue<string> | string,
+  name: PromiseOrValue<string> | string,
+  decimal: PromiseOrValue<number>
+): Promise<TokenInfo> {
+  return {
+    symbol: await symbol,
+    name: await name,
+    decimal: await decimal,
+  }
+}
 
 export async function getERC20TokenInfo(tokenAddress: string, chainId = 1): Promise<TokenInfo> {
   const key = chainId + tokenAddress
@@ -47,7 +60,8 @@ export async function getERC20TokenInfo(tokenAddress: string, chainId = 1): Prom
     }
 
     const decimal = await contract.decimals()
-    const info: TokenInfo = { name, symbol, decimal }
+    const info = getTokenInfoPromise(symbol, name, decimal)
+
     TOKEN_INFOS.set(key, info)
     return info
   } catch (e) {
