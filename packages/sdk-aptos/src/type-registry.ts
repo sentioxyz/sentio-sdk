@@ -159,7 +159,12 @@ export class TypeRegistry {
       console.error('Decoding error for ', JSON.stringify(typeStruct), e)
       return undefined
     }
-    return { ...typeStruct, data_typed: dataTyped, type_arguments: typeArguments } as StructWithType<T>
+    return {
+      ...typeStruct,
+      data_typed: dataTyped,
+      data_decoded: dataTyped,
+      type_arguments: typeArguments,
+    } as StructWithType<T>
   }
 
   decodeFunctionPayload(payload: TransactionPayload_EntryFunctionPayload): TransactionPayload_EntryFunctionPayload {
@@ -180,7 +185,11 @@ export class TypeRegistry {
       return payload
     }
 
-    return { ...payload, arguments_typed: argumentsTyped } as TypedEntryFunctionPayload<any>
+    return {
+      ...payload,
+      arguments_typed: argumentsTyped,
+      arguments_decoded: argumentsTyped,
+    } as TypedEntryFunctionPayload<any>
   }
 }
 

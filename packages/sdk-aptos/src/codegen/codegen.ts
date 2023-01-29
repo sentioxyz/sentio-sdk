@@ -287,7 +287,9 @@ function generateStructs(module: MoveModule, struct: MoveStruct, events: Set<str
     eventPayload = `
     export interface ${struct.name}Instance extends 
         TypedEventInstance<${struct.name}${genericStringAny}> {
+      /** @deprecated use {@link data_decoded} instead */
       data_typed: ${struct.name}${genericStringAny}
+      data_decoded: ${struct.name}${genericStringAny}
       type_arguments: [${struct.generic_type_params.map((_) => 'string').join(', ')}]
     }
     `
@@ -345,7 +347,9 @@ function generateCallArgsStructs(module: MoveModule, func: MoveFunction) {
   return `
   export interface ${camelFuncName}Payload${genericString}
       extends TypedEntryFunctionPayload<[${fields.join(',')}]> {
+    /** @deprecated use {@link arguments_decoded} instead */
     arguments_typed: [${fields.join(',')}],
+    arguments_decoded: [${fields.join(',')}],
     type_arguments: [${func.generic_type_params.map((_) => 'string').join(', ')}]
   }
   `

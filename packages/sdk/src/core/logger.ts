@@ -16,7 +16,7 @@ export class Logger extends NamedResultDescriptor {
     return new Logger(this.ctx, name)
   }
 
-  log(level: LogLevel, message: any, attributes: Attributes = {}) {
+  protected log(level: LogLevel, message: any, attributes: Attributes = {}) {
     if (typeof message !== 'string' && !(message instanceof String)) {
       message = JSON.stringify(message)
     }
