@@ -4,7 +4,7 @@
   "version": "1.0.0-development",
   "scripts": {
     "compile_target": "yarn tsc -b src/target-ethers-sentio/tsconfig.json",
-    "compile": "tsc -p . && cp src/utils/*.csv lib/utils",
+    "compile": "tsc -p . && cp src/utils/*.csv lib/utils && cp src/webpack.config.js lib",
     "build": "yarn gen && yarn compile",
     "build_all": "yarn lerna run --scope=@sentio/sdk build --include-dependencies",
     "start_ts": "ts-node --files ../runtime/src/processor-runner.ts  --log-format=json ../../examples/x2y2/src/processor.ts",
@@ -21,7 +21,7 @@
     "@sentio/runtime": "^1.0.0-development",
     "@sentio/protos": "^1.0.0-development",
     "@typechain/ethers-v5": "^10.0.0",
-    "bignumber.js": "^9.1.0",
+    "@sentio/bigdecimal": "9.1.1-patch.1",
     "command-line-args": "^5.2.1",
     "command-line-usage": "^6.1.3",
     "csv-parse": "^5.3.0",

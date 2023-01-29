@@ -1,1 +1,1 @@
-export { BigNumber as BigDecimal } from 'bignumber.js'
+export { BigDecimal } from '@sentio/bigdecimal'

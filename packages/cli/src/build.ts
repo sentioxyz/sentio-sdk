@@ -14,8 +14,13 @@ export async function buildProcessor(onlyGen: boolean) {
   // }
 
   if (!onlyGen) {
-    // TODO move this to SDK
-    const WEBPACK_CONFIG = path.join(__dirname, 'webpack.config.js')
+    let WEBPACK_CONFIG: string
+    try {
+      WEBPACK_CONFIG = require.resolve('@sentio/sdk/lib/webpack.config.js')
+    } catch (e) {
+      // In the future this should not need unless using very old sdk
+      WEBPACK_CONFIG = path.join(__dirname, 'webpack.config.js')
+    }
     await execStep('yarn tsc -p .', 'Compile')
     await execStep('yarn webpack --config=' + WEBPACK_CONFIG, 'Packaging')
   }
