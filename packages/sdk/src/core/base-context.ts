@@ -2,12 +2,14 @@ import { ProcessResult, RecordMetaData } from '@sentio/protos'
 import { Logger } from './logger'
 import { Labels } from './metadata'
 import { Meter } from './meter'
+import { BoundedEventTracker } from './event-tracker'
 
 export abstract class BaseContext {
   meter: Meter
   logger: Logger
+  eventTracker: BoundedEventTracker
 
-  res: ProcessResult = {
+  _res: ProcessResult = {
     counters: [],
     events: [],
     exports: [],
@@ -18,10 +20,11 @@ export abstract class BaseContext {
   protected constructor() {
     this.meter = new Meter(this)
     this.logger = new Logger(this)
+    this.eventTracker = new BoundedEventTracker(this)
   }
 
   getProcessResult(): ProcessResult {
-    return this.res
+    return this._res
   }
 
   abstract getMetaData(name: string, labels: Labels): RecordMetaData

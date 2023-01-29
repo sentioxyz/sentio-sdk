@@ -610,6 +610,7 @@ export interface EventTrackingResult {
   distinctEntityId: string;
   attributes: { [key: string]: any } | undefined;
   runtimeInfo: RuntimeInfo | undefined;
+  noMetric: boolean;
 }
 
 export interface ExportResult {
@@ -4581,7 +4582,7 @@ export const LogResult = {
 };
 
 function createBaseEventTrackingResult(): EventTrackingResult {
-  return { metadata: undefined, distinctEntityId: "", attributes: undefined, runtimeInfo: undefined };
+  return { metadata: undefined, distinctEntityId: "", attributes: undefined, runtimeInfo: undefined, noMetric: false };
 }
 
 export const EventTrackingResult = {
@@ -4597,6 +4598,9 @@ export const EventTrackingResult = {
     }
     if (message.runtimeInfo !== undefined) {
       RuntimeInfo.encode(message.runtimeInfo, writer.uint32(42).fork()).ldelim();
+    }
+    if (message.noMetric === true) {
+      writer.uint32(24).bool(message.noMetric);
     }
     return writer;
   },
@@ -4620,6 +4624,9 @@ export const EventTrackingResult = {
         case 5:
           message.runtimeInfo = RuntimeInfo.decode(reader, reader.uint32());
           break;
+        case 3:
+          message.noMetric = reader.bool();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -4634,6 +4641,7 @@ export const EventTrackingResult = {
       distinctEntityId: isSet(object.distinctEntityId) ? String(object.distinctEntityId) : "",
       attributes: isObject(object.attributes) ? object.attributes : undefined,
       runtimeInfo: isSet(object.runtimeInfo) ? RuntimeInfo.fromJSON(object.runtimeInfo) : undefined,
+      noMetric: isSet(object.noMetric) ? Boolean(object.noMetric) : false,
     };
   },
 
@@ -4645,6 +4653,7 @@ export const EventTrackingResult = {
     message.attributes !== undefined && (obj.attributes = message.attributes);
     message.runtimeInfo !== undefined &&
       (obj.runtimeInfo = message.runtimeInfo ? RuntimeInfo.toJSON(message.runtimeInfo) : undefined);
+    message.noMetric !== undefined && (obj.noMetric = message.noMetric);
     return obj;
   },
 
@@ -4658,6 +4667,7 @@ export const EventTrackingResult = {
     message.runtimeInfo = (object.runtimeInfo !== undefined && object.runtimeInfo !== null)
       ? RuntimeInfo.fromPartial(object.runtimeInfo)
       : undefined;
+    message.noMetric = object.noMetric ?? false;
     return message;
   },
 };

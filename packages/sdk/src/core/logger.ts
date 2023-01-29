@@ -21,7 +21,7 @@ export class Logger extends NamedResultDescriptor {
       message = JSON.stringify(message)
     }
 
-    this.ctx.res.logs.push({
+    this.ctx._res.logs.push({
       // name: this.name,
       metadata: this.ctx.getMetaData(this.name, {}), // GetRecordMetaData(this.ctx, this, {}),
       level,

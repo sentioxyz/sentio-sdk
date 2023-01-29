@@ -52,6 +52,7 @@ export const CHAIN_IDS = {
   OMCHAIN: '1246',
   MOONBEAM: '1284',
   MOONRIVER: '1285',
+  MOONBASE: '1287',
   DEV: '2018',
   RONIN: '2020',
   KAVA: '2222',

@@ -55,6 +55,7 @@ ERC20Processor.bind({ address: '0x1e4ede388cbc9f4b5c79681b7f94d36a11abebc9' }).o
 ERC20Processor.bind({ address: '0x1e4ede388cbc9f4b5c79681b7f94d36a11abebc9' }).onEventTransfer(async (event, ctx) => {
   const val = token.scaleDown(event.args.value, 18)
   vol.record(ctx, val)
+  ctx.eventTracker.track('Transfer', { distinctId: event.args.from })
   tracker.trackEvent(ctx, { distinctId: event.args.from })
   // tracker.trackEvent(ctx, { distinctId: event.args.to })
 })

@@ -47,8 +47,9 @@ export class EventTracker extends NamedResultDescriptor {
       distinctEntityId: distinctId,
       attributes: payload,
       runtimeInfo: undefined,
+      noMetric: false,
     }
-    ctx.res.events.push(res)
+    ctx._res.events.push(res)
   }
 }
 
@@ -67,5 +68,26 @@ export class AccountEventTracker extends EventTracker {
     }
     const tracker = new AccountEventTracker(eventName, { ...AccountEventTracker.DEFAULT_OPTIONS, ...options })
     return EventTrackerState.INSTANCE.getOrSetValue(eventName, tracker)
+  }
+}
+
+export class BoundedEventTracker {
+  private readonly ctx: BaseContext
+
+  constructor(ctx: BaseContext) {
+    this.ctx = ctx
+  }
+
+  track(eventName: string, event: Event) {
+    const { distinctId, ...payload } = event
+
+    const res: EventTrackingResult = {
+      metadata: this.ctx.getMetaData(eventName, {}),
+      distinctEntityId: distinctId,
+      attributes: payload,
+      runtimeInfo: undefined,
+      noMetric: true,
+    }
+    this.ctx._res.events.push(res)
   }
 }
