@@ -6,13 +6,13 @@ import fs from 'fs'
 import path from 'path'
 
 import yaml from 'js-yaml'
-import { finalizeHost, FinalizeProjectName, SentioProjectConfig } from './config'
-import { uploadFile } from './upload'
+import { SentioProjectConfig } from './config'
 import chalk from 'chalk'
 import { buildProcessor } from './build'
 import { runCreate } from './commands/run-create'
 import { runVersion } from './commands/run-version'
 import { runLogin } from './commands/run-login'
+import { runUpload } from './commands/run-upload'
 
 const mainDefinitions = [{ name: 'command', defaultOption: true }]
 const mainOptions = commandLineArgs(mainDefinitions, {
@@ -85,72 +85,7 @@ if (mainOptions.command === 'login') {
   }
 
   if (mainOptions.command === 'upload') {
-    const optionDefinitions = [
-      {
-        name: 'help',
-        alias: 'h',
-        type: Boolean,
-        description: 'Display this usage guide.',
-      },
-      {
-        name: 'api-key',
-        type: String,
-        description: '(Optional) Manually provide API key rather than use saved credential',
-      },
-      {
-        name: 'host',
-        description: '(Optional) Override Sentio Host name',
-        type: String,
-      },
-      {
-        name: 'owner',
-        description: '(Optional) Override Project owner',
-        type: String,
-      },
-      {
-        name: 'nobuild',
-        description: '(Optional) Skip build & pack file before uploading, default false',
-        type: Boolean,
-      },
-      {
-        name: 'debug',
-        description: '(Optional) Set driver logging level to debug',
-        type: Boolean,
-      },
-    ]
-    const options = commandLineArgs(optionDefinitions, { argv })
-    if (options.help) {
-      const usage = commandLineUsage([
-        {
-          header: 'Sentio upload',
-          content: 'sentio upload',
-        },
-        {
-          header: 'Options',
-          optionList: optionDefinitions,
-        },
-      ])
-      console.log(usage)
-    } else {
-      if (options.host) {
-        processorConfig.host = options.host
-      }
-      if (options.nobuild) {
-        processorConfig.build = false
-      }
-      if (options.debug) {
-        processorConfig.debug = true
-      }
-      finalizeHost(processorConfig)
-      FinalizeProjectName(processorConfig, options.owner)
-      console.log(processorConfig)
-
-      let apiOverride = undefined
-      if (options['api-key']) {
-        apiOverride = options['api-key']
-      }
-      uploadFile(processorConfig, apiOverride)
-    }
+    runUpload(processorConfig, argv)
   } else if (mainOptions.command === 'build') {
     buildProcessor(false)
   } else if (mainOptions.command === 'gen') {
