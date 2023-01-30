@@ -5,8 +5,7 @@ import { AggregationConfig, AggregationType, MetricConfig, MetricType } from '@s
 import { MapStateStorage } from '@sentio/runtime'
 
 export function normalizeName(name: string): string {
-  const regex = new RegExp('![_a-zA-Z0-9]')
-  return name.slice(0, 100).replace(regex, '_')
+  return name.slice(0, 100).replace(/[^_\-a-zA-Z0-9]/g, '_')
 }
 
 export function normalizeKey(name: string): string {
@@ -50,7 +49,7 @@ export class CounterOptions {
 export class Metric extends NamedResultDescriptor {
   config: MetricConfig
   constructor(type: MetricType, name: string, option?: MetricOptions) {
-    super(name)
+    super(normalizeKey(name))
     this.config = MetricConfig.fromPartial({ name: this.name, type: type, ...option })
     const aggregationConfig = this.config.aggregationConfig
     if (aggregationConfig && aggregationConfig.intervalInMinutes.length) {
@@ -76,9 +75,9 @@ export class MetricState extends MapStateStorage<Metric> {
 
     if (!metric) {
       if (type === MetricType.COUNTER) {
-        metric = new Counter(name, option)
+        metric = Counter._create(name, option)
       } else {
-        metric = new Gauge(name, option)
+        metric = Gauge._create(name, option)
       }
     }
     metricMap.set(name, metric)
@@ -91,7 +90,14 @@ export class Counter extends Metric {
     return MetricState.INSTANCE.getOrRegisterMetric(MetricType.COUNTER, name, option) as Counter
   }
 
-  constructor(name: string, option?: MetricOptions) {
+  /**
+   * internal use only, to create a metric use {@link register} instead
+   */
+  static _create(name: string, option?: MetricOptions): Counter {
+    return new Counter(name, option)
+  }
+
+  private constructor(name: string, option?: MetricOptions) {
     super(MetricType.COUNTER, name, option)
   }
 
@@ -118,7 +124,7 @@ export class CounterBinding {
   private readonly counter: Counter
 
   constructor(name: string, ctx: BaseContext) {
-    this.counter = new Counter(name)
+    this.counter = Counter._create(name)
     this.ctx = ctx
   }
 
@@ -136,7 +142,14 @@ export class Gauge extends Metric {
     return MetricState.INSTANCE.getOrRegisterMetric(MetricType.GAUGE, name, option) as Gauge
   }
 
-  constructor(name: string, option?: MetricOptions) {
+  /**
+   * internal use only, to create a metric use {@link register} instead
+   */
+  static _create(name: string, option?: MetricOptions): Gauge {
+    return new Gauge(name, option)
+  }
+
+  private constructor(name: string, option?: MetricOptions) {
     super(MetricType.GAUGE, name, option)
   }
 
@@ -154,7 +167,7 @@ export class GaugeBinding {
   private readonly ctx: BaseContext
 
   constructor(name: string, ctx: BaseContext) {
-    this.gauge = new Gauge(name)
+    this.gauge = Gauge._create(name)
     this.ctx = ctx
   }
 
