@@ -16,10 +16,10 @@ import {
   TypedEntryFunctionPayload,
 } from './models'
 
-export class TypeRegistry {
-  moduleMapping = new Map<string, MoveModule>()
-  typeMapping = new Map<string, MoveStruct>()
-  funcMapping = new Map<string, MoveFunction>()
+export class MoveCoder {
+  private moduleMapping = new Map<string, MoveModule>()
+  private typeMapping = new Map<string, MoveStruct>()
+  private funcMapping = new Map<string, MoveFunction>()
 
   contains(account: string, name: string) {
     return this.moduleMapping.has(account + '::' + name)
@@ -145,7 +145,7 @@ export class TypeRegistry {
   }
 
   private decodedInternal<T>(typeStruct: StructWithTag): StructWithType<T> | undefined {
-    const registry = TYPE_REGISTRY
+    const registry = MOVE_CODER
     // this.loadTypes(registry)
     // TODO check if module is not loaded
 
@@ -168,7 +168,7 @@ export class TypeRegistry {
   }
 
   decodeFunctionPayload(payload: TransactionPayload_EntryFunctionPayload): TransactionPayload_EntryFunctionPayload {
-    const registry = TYPE_REGISTRY
+    const registry = MOVE_CODER
     // this.loadTypes(registry)
     const argumentsTyped: any[] = []
 
@@ -193,4 +193,8 @@ export class TypeRegistry {
   }
 }
 
-export const TYPE_REGISTRY = new TypeRegistry()
+export const MOVE_CODER = new MoveCoder()
+
+export function defaultMoveCoder(): MoveCoder {
+  return MOVE_CODER
+}

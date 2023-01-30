@@ -2,7 +2,7 @@ import { SouffleChefCampaign, CandyMachine } from './types/aptos/souffle'
 import { token } from '@sentio/sdk-aptos/lib/builtin/0x3'
 import { coin } from '@sentio/sdk-aptos/lib/builtin/0x1'
 import { AccountEventTracker } from '@sentio/sdk'
-import { AptosNetwork, TYPE_REGISTRY } from '@sentio/sdk-aptos'
+import { AptosNetwork, defaultMoveCoder } from '@sentio/sdk-aptos'
 
 const accountTracker = AccountEventTracker.register('pull')
 
@@ -24,7 +24,7 @@ SouffleChefCampaign.bind({ network: AptosNetwork.TEST_NET, startVersion: 6604913
     ctx.meter.Counter('burned').add(1)
   })
   .onTransaction((txn, ctx) => {
-    const events = TYPE_REGISTRY.filterAndDecodeEvents<token.DepositEvent>('0x3::token::DepositEvent', txn.events)
+    const events = defaultMoveCoder().filterAndDecodeEvents<token.DepositEvent>('0x3::token::DepositEvent', txn.events)
     for (const event of events) {
       // const depositEventInstance = DEFAULT_TYPE_REGISTRY.decodeEvent(event) as DepositEventInstance
       ctx.meter.Counter('deposit_token_count').add(event.data_decoded.amount)

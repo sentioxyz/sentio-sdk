@@ -2701,10 +2701,10 @@
     lodash "^4.17.4"
     read-pkg-up "^7.0.0"
 
-"@sentio/bigdecimal@9.1.1-patch.1":
-  version "9.1.1-patch.1"
-  resolved "https://registry.yarnpkg.com/@sentio/bigdecimal/-/bigdecimal-9.1.1-patch.1.tgz#0dfab1fcd85fc3b6e8c81c7d628455d6c113d9a9"
-  integrity sha512-jdqGsnxy+BwCGH1g1Qw5RAnSBsYAyNzOr2HQAc7q9MW2oluegQsMC8GTz4YahL8OdYQT2B42gQA3lloDdaOxZw==
+"@sentio/bigdecimal@^9.1.1-patch.2":
+  version "9.1.1-patch.2"
+  resolved "https://registry.yarnpkg.com/@sentio/bigdecimal/-/bigdecimal-9.1.1-patch.2.tgz#b8f692156ac48b6b39b257a5ed4fd5632777e4c6"
+  integrity sha512-+zI6oByskIxWM9Ko+m3KKGEQT2yPFgPCYIWQu4ZTegseq9bDq7pisvPb3BukNRb6QPUfPJ8vpZ4YiaqRUsEzzg==
 
 "@sinclair/typebox@^0.24.1":
   version "0.24.51"

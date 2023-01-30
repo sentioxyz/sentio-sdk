@@ -1,10 +1,10 @@
-import { TYPE_REGISTRY } from './type-registry'
+import { MOVE_CODER } from './move-coder'
 import { aptos_account } from './builtin/0x1'
 
 describe('type decode', () => {
-  aptos_account.loadTypes(TYPE_REGISTRY)
+  aptos_account.loadTypes(MOVE_CODER)
   test('decode function payload', async () => {
-    const decoded = TYPE_REGISTRY.decodeFunctionPayload(data)
+    const decoded = MOVE_CODER.decodeFunctionPayload(data)
     console.log(decoded)
   })
 })

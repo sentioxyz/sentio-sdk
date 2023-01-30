@@ -4,7 +4,7 @@ import {
   TransactionPayload_EntryFunctionPayload,
 } from 'aptos-sdk/src/generated'
 
-import { TYPE_REGISTRY, TypeRegistry } from './type-registry'
+import { MOVE_CODER, MoveCoder } from './move-coder'
 import { AptosBindOptions, AptosNetwork, getChainId } from './network'
 import { AptosContext, AptosResourceContext } from './context'
 import { EventInstance } from './models'
@@ -79,7 +79,7 @@ export class AptosBaseProcessor {
     this.moduleName = moduleName
     this.config = configure(options)
     AptosProcessorState.INSTANCE.addValue(this)
-    this.loadTypes(TYPE_REGISTRY)
+    this.loadTypes(MOVE_CODER)
   }
 
   // getABI(): MoveModule | undefined {
@@ -153,7 +153,7 @@ export class AptosBaseProcessor {
         )
         if (data.event) {
           const eventInstance = data.event as EventInstance
-          const decoded = TYPE_REGISTRY.decodeEvent<any>(eventInstance)
+          const decoded = MOVE_CODER.decodeEvent<any>(eventInstance)
           await handler(decoded || eventInstance, ctx)
         } else {
           // TODO, this branch is deprecated, remove after full release
@@ -162,7 +162,7 @@ export class AptosBaseProcessor {
             txn.events = []
             for (const evt of events) {
               const eventInstance = evt as EventInstance
-              const decoded = TYPE_REGISTRY.decodeEvent<any>(eventInstance)
+              const decoded = MOVE_CODER.decodeEvent<any>(eventInstance)
               await handler(decoded || eventInstance, ctx)
             }
           }
@@ -209,7 +209,7 @@ export class AptosBaseProcessor {
         )
         if (tx) {
           const payload = tx.payload as TransactionPayload_EntryFunctionPayload
-          const decoded = TYPE_REGISTRY.decodeFunctionPayload(payload)
+          const decoded = MOVE_CODER.decodeFunctionPayload(payload)
           await handler(decoded, ctx)
         }
         return ctx.getProcessResult()
@@ -224,14 +224,14 @@ export class AptosBaseProcessor {
     return getChainId(this.config.network)
   }
 
-  loadTypes(registry: TypeRegistry) {
+  loadTypes(registry: MoveCoder) {
     if (registry.contains(this.config.address, this.moduleName)) {
       return
     }
     this.loadTypesInternal(registry)
   }
 
-  protected loadTypesInternal(registry: TypeRegistry) {
+  protected loadTypesInternal(registry: MoveCoder) {
     // should be override by subclass
     console.log('')
   }

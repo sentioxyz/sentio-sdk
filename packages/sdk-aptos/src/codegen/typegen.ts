@@ -97,15 +97,15 @@ export class AccountRegister {
   pendingAccounts = new Set<string>()
 
   // loadedAccount = new Set<string>()
-  typeRegistry = new Map<string, TypeDescriptor>()
+  typeDescriptors = new Map<string, TypeDescriptor>()
 
   private loadTypeDescriptor(type: string) {
-    let descriptor = this.typeRegistry.get(type)
+    let descriptor = this.typeDescriptors.get(type)
 
     // const descriptparseMoveType(type)
     if (!descriptor) {
       descriptor = parseMoveType(type)
-      this.typeRegistry.set(type, descriptor)
+      this.typeDescriptors.set(type, descriptor)
     }
     return descriptor
   }

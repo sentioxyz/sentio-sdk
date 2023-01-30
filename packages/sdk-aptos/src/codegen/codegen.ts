@@ -142,7 +142,7 @@ export class AccountCodegen {
 
     const imports = `
     import { 
-      TypeRegistry, AptosBindOptions, AptosBaseProcessor, 
+      MoveCoder, AptosBindOptions, AptosBaseProcessor, 
       TypedEventInstance, AptosNetwork, TypedEntryFunctionPayload,
       AptosContext, CallFilter
     } from "@sentio/sdk-aptos"
@@ -187,7 +187,7 @@ export class AccountCodegen {
     
     ${this.modules.map((m) => generateModule(m, this.config.network)).join('\n')}
     
-    export function loadAllTypes(_r: TypeRegistry) {
+    export function loadAllTypes(_r: MoveCoder) {
       ${dependedAccounts.map((a) => `_${a}.loadAllTypes(_r)`).join('\n')}
 
       ${this.modules
@@ -251,7 +251,7 @@ function generateModule(moduleByteCode: MoveModuleBytecode, network: AptosNetwor
     
     ${events.join('\n')}
     
-    loadTypesInternal(registry: TypeRegistry) {
+    loadTypesInternal(registry: MoveCoder) {
       loadAllTypes(registry)
     }
   }
@@ -266,7 +266,7 @@ function generateModule(moduleByteCode: MoveModuleBytecode, network: AptosNetwor
     
     ${callArgs.join('\n')}
        
-    export function loadTypes(_r: TypeRegistry) {
+    export function loadTypes(_r: MoveCoder) {
       loadAllTypes(_r)
     }
     export const ABI: MoveModule = JSON.parse('${JSON.stringify(module)}')
