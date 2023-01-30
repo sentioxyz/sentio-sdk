@@ -26,17 +26,23 @@ export function startServer(params: AuthParams) {
 }
 
 app.get('/callback', async (req, res) => {
-  res.end('login success, please go back to CLI to continue')
+  const fail = function(...args: any[]) {
+    console.error(chalk.red(args))
+    res.end(args.toString())
+    server.close()
+  }
+
   const host = getFinalizedHost(authParams.sentioHost)
   const code = req.query.code
   if (!code || (code as string).length == 0) {
+    fail('Failed to get authorization code')
     return
   }
 
   // exchange token
   const tokenResRaw = await getToken(host, code as string)
   if (!tokenResRaw.ok) {
-    console.error(chalk.red('request token error, code:', tokenResRaw.status, tokenResRaw.statusText))
+    fail(`Failed to get access token: ${tokenResRaw.status} ${tokenResRaw.statusText}`)
     return
   }
   const tokenRes = await tokenResRaw.json()
@@ -46,15 +52,15 @@ app.get('/callback', async (req, res) => {
   const userResRaw = await getUser(host, accessToken)
   if (!userResRaw.ok) {
     if (userResRaw.status == 401) {
-      console.error(chalk.red('please sign up on sentio first'))
+      fail('The account does not exist, please sign up on sentio first')
     } else {
-      console.error(chalk.red('get user error, code:', userResRaw.status, userResRaw.statusText))
+      fail(`Failed to get user info: ${userResRaw.status} ${userResRaw.statusText}`)
     }
     return
   }
   const userRes = await userResRaw.json()
   if (!userRes.emailVerified) {
-    console.error(chalk.red('please verify your email first'))
+    fail('Your account is not verified, please verify your email first')
     return
   }
 
@@ -62,13 +68,15 @@ app.get('/callback', async (req, res) => {
   const apiKeyName = `${os.hostname()}-${crypto.randomBytes(4).toString('hex')}`
   const createApiKeyResRaw = await createApiKey(host, apiKeyName, 'sdk_generated', accessToken)
   if (!createApiKeyResRaw.ok) {
-    console.error(chalk.red('create api key error, code:', createApiKeyResRaw.status, createApiKeyResRaw.statusText))
+    fail(`Failed to create API key: ${createApiKeyResRaw.status} ${createApiKeyResRaw.statusText}`)
     return
   }
   const createApiKeyRes = await createApiKeyResRaw.json()
   const apiKey = createApiKeyRes['key']
   WriteKey(host, apiKey)
-  console.log(chalk.green('login success, new API key: ' + apiKey))
+
+  res.end("Login success, please go back to CLI to continue")
+  console.log(chalk.green('Login success, new API key: ' + apiKey))
 
   server.close()
 })
