@@ -138,14 +138,10 @@ export abstract class BaseProcessor<
     return this
   }
 
-  public onBlock(handler: (block: Block, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid) {
-    return this.onBlockInterval(handler)
-  }
-
   public onBlockInterval(
     handler: (block: Block, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
-    blockInterval = 1000,
-    backfillBlockInterval = 4000
+    blockInterval = 250,
+    backfillBlockInterval = 1000
   ) {
     return this.onInterval(handler, undefined, {
       recentInterval: blockInterval,

@@ -99,10 +99,6 @@ export abstract class BaseProcessorTemplate<
     return this
   }
 
-  public onBlock(handler: (block: Block, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid) {
-    return this.onBlockInterval(handler)
-  }
-
   public onBlockInterval(
     handler: (block: Block, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     blockInterval = 1000,
