@@ -1,12 +1,11 @@
-import { BigNumber } from '@ethersproject/bignumber'
-
 import { transformEtherError } from '../error'
 import { getERC20Contract } from '../builtin/erc20'
 import { getERC20BytesContract } from '../builtin/internal/erc20bytes_processor'
 import { BigDecimal } from '../core/big-decimal'
 import { toBigDecimal } from './conversion'
-import { utils } from 'ethers'
+// import { utils } from 'ethers'
 import { PromiseOrValue } from '../builtin/internal/common'
+import { decodeBytes32String } from 'ethers'
 
 export interface TokenInfo {
   symbol: string
@@ -25,12 +24,12 @@ const TOKEN_INFOS = new Map<string, Promise<TokenInfo>>()
 async function getTokenInfoPromise(
   symbol: PromiseOrValue<string> | string,
   name: PromiseOrValue<string> | string,
-  decimal: PromiseOrValue<number>
+  decimal: PromiseOrValue<bigint>
 ): Promise<TokenInfo> {
   return {
     symbol: await symbol,
     name: await name,
-    decimal: await decimal,
+    decimal: Number(await decimal),
   }
 }
 
@@ -49,14 +48,14 @@ export async function getERC20TokenInfo(tokenAddress: string, chainId = 1): Prom
     try {
       name = await contract.name()
     } catch (e) {
-      name = utils.parseBytes32String(await bytesContract.name())
+      name = decodeBytes32String(await bytesContract.name())
     }
 
     let symbol = ''
     try {
       symbol = await contract.symbol()
     } catch (e) {
-      symbol = utils.parseBytes32String(await bytesContract.symbol())
+      symbol = decodeBytes32String(await bytesContract.symbol())
     }
 
     const decimal = await contract.decimals()
@@ -71,14 +70,14 @@ export async function getERC20TokenInfo(tokenAddress: string, chainId = 1): Prom
 
 export async function getER20NormalizedAmount(
   tokenAddress: string,
-  amount: BigNumber,
+  amount: bigint,
   chainId: number
 ): Promise<BigDecimal> {
   const tokenInfo = await getERC20TokenInfo(tokenAddress, chainId)
   return scaleDown(amount, tokenInfo.decimal)
 }
 
-export function scaleDown(amount: BigNumber | bigint, decimal: number) {
-  const divider = new BigDecimal(10).pow(decimal)
-  return toBigDecimal(amount).dividedBy(divider)
+export function scaleDown(amount: bigint, decimal: number | bigint) {
+  const divider = new BigDecimal(10).pow(Number(decimal))
+  return amount.asBigDecimal().dividedBy(divider)
 }

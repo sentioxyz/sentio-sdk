@@ -1,7 +1,6 @@
 import { assert, expect } from 'chai'
 
 import { TestProcessorServer } from '../testing'
-import { BigNumber } from 'ethers'
 import { mockApprovalLog, mockTransferLog } from '../builtin/erc20/test-utils'
 import { ERC20Processor } from '../builtin/internal/erc20_processor'
 
@@ -25,7 +24,7 @@ describe('Test Error Capture', () => {
       mockApprovalLog('0x80009ff8154bd5653c6dda2fa5f5053e5a5c1a91', {
         owner: '0x80009ff8154bd5653c6dda2fa5f5053e5a5c1a91',
         spender: '0x0000000000000000000000000000000000000000',
-        value: BigNumber.from(0),
+        value: 0n,
       })
     )
     assert(res.result?.logs?.[0].message.includes('approve '))
@@ -36,7 +35,7 @@ describe('Test Error Capture', () => {
       mockTransferLog('0x80009ff8154bd5653c6dda2fa5f5053e5a5c1a91', {
         from: '0x80009ff8154bd5653c6dda2fa5f5053e5a5c1a91',
         to: '0x0000000000000000000000000000000000000000',
-        value: BigNumber.from(0),
+        value: 0n,
       })
     )
     const log = res.result?.logs?.[0]

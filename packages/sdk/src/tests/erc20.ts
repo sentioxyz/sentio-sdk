@@ -33,11 +33,13 @@ ERC20Processor.bind({
   })
 
 ERC20Processor.bind({ address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', network: 56, name: 'usdc' })
-  .onEventTransfer(async function (event, ctx) {
-    ctx.meter.Counter('c2').add(2)
-    tracker.trackEvent(ctx, { distinctId: event.args.from })
-    exporter.emit(ctx, { ...event, x: 100n })
-  }, filter)
+  .onEventTransfer(
+    async function (event, ctx) {
+      ctx.meter.Counter('c2').add(2)
+      tracker.trackEvent(ctx, { distinctId: event.args.from })
+      exporter.emit(ctx, { ...event, x: 100n })
+    } /*filter*/
+  )
   .onBlockInterval(async function (block, ctx) {
     ctx.meter.Gauge('g2').record(20, { k: 'v' })
   })

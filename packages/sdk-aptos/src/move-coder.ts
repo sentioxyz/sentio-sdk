@@ -5,7 +5,8 @@ import {
   MoveResource,
   MoveStruct,
   TransactionPayload_EntryFunctionPayload,
-} from 'aptos-sdk/src/generated'
+} from './move-types'
+
 import { getMeaningfulFunctionParams, moduleQname, SPLITTER, VECTOR_STR } from './utils'
 import { parseMoveType, TypeDescriptor } from './types'
 import {

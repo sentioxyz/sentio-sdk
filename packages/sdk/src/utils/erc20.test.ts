@@ -4,7 +4,7 @@ import { loadTestProvidersFromEnv } from '../testing/test-provider'
 
 describe('erc20 tests', () => {
   State.reset()
-  Endpoints.reset()
+  // Endpoints.reset()
 
   const haveProviders = loadTestProvidersFromEnv('1')
 

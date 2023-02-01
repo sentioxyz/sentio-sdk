@@ -8,7 +8,7 @@ import { ExporterState } from './exporter'
 export class CorePlugin extends Plugin {
   name: string = 'CorePlugin'
 
-  configure(config: ProcessConfigResponse): void {
+  async configure(config: ProcessConfigResponse): Promise<void> {
     // part 0, prepare metrics and event tracking configs
     for (const metric of MetricState.INSTANCE.getValues()) {
       config.metricConfigs.push({

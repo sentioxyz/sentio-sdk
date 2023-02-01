@@ -1,22 +1,6 @@
 {
   "1": {
     "ChainID": "1",
-    "Https": [
-      "https://mainnet.infura.io/v3/6d3fecb13dea4c6086e1984b4a520fd0",
-      "https://mainnet.infura.io/v3/226c57463e9247bdaf7c402aa42fd259",
-      "https://mainnet.infura.io/v3/b27d64c4cb6343389f5a01a52dce19ab",
-      "https://mainnet.infura.io/v3/e55d25edf30f44e1ab6c09111d44bc49",
-      "https://mainnet.infura.io/v3/86922264d8de4635bbcc0c286cc18e76",
-      "https://mainnet.infura.io/v3/7b62d78dcf314d758318af8efc2046b1"
-    ],
-    "WebSockets": [
-      "wss://mainnet.infura.io/ws/v3/6d3fecb13dea4c6086e1984b4a520fd0",
-      "wss://mainnet.infura.io/ws/v3/226c57463e9247bdaf7c402aa42fd259",
-      "wss://mainnet.infura.io/ws/v3/b27d64c4cb6343389f5a01a52dce19ab",
-      "wss://mainnet.infura.io/ws/v3/e55d25edf30f44e1ab6c09111d44bc49",
-      "wss://mainnet.infura.io/ws/v3/86922264d8de4635bbcc0c286cc18e76",
-      "wss://mainnet.infura.io/ws/v3/7b62d78dcf314d758318af8efc2046b1"
-    ],
     "ChainServer": "",
     "BatchSize": 2000,
     "ReorgThresholdBlocks": 30,
@@ -25,14 +9,6 @@
   },
   "3": {
     "ChainID": "3",
-    "Https": [
-      "https://ropsten.infura.io/v3/1e2099a68b354e6db3649b9e75fe17b9",
-      "https://ropsten.infura.io/v3/ec4bc1d370134f06a05dc7ffc735d8f5"
-    ],
-    "WebSockets": [
-      "wss://ropsten.infura.io/ws/v3/1e2099a68b354e6db3649b9e75fe17b9",
-      "wss://ropsten.infura.io/ws/v3/ec4bc1d370134f06a05dc7ffc735d8f5"
-    ],
     "ChainServer": "",
     "BatchSize": 2000,
     "ReorgThresholdBlocks": 300,
@@ -41,16 +17,6 @@
   },
   "56": {
     "ChainID": "56",
-    "Https": [
-      "https://winter-withered-feather.bsc.discover.quiknode.pro/09cdc3b22506509b3fc49cb52448419d5e302ea1/",
-      "https://red-wandering-tree.bsc.discover.quiknode.pro/88d316a3d174489011af3c9cb3dd940fdff7880b/",
-      "https://morning-fragrant-silence.bsc.discover.quiknode.pro/7c6d4b06289c2dbaadce00f3b0a465d48c3f0753/"
-    ],
-    "WebSockets": [
-      "wss://winter-withered-feather.bsc.discover.quiknode.pro/09cdc3b22506509b3fc49cb52448419d5e302ea1/",
-      "wss://red-wandering-tree.bsc.discover.quiknode.pro/88d316a3d174489011af3c9cb3dd940fdff7880b/",
-      "wss://morning-fragrant-silence.bsc.discover.quiknode.pro/7c6d4b06289c2dbaadce00f3b0a465d48c3f0753/"
-    ],
     "ChainServer": "",
     "BatchSize": 2000,
     "ReorgThresholdBlocks": 30,
@@ -59,10 +25,6 @@
   },
   "SOL_mainnet": {
     "ChainID": "SOL_mainnet",
-    "Https": [
-      "https://solana-mainnet.g.alchemy.com/v2/AIM3Qp8rkxBoAjRCNeazPaNKdjYgLdzc",
-      "https://try-rpc.mainnet.solana.blockdaemon.tech"
-    ],
     "WebSockets": [],
     "ChainServer": "",
     "BatchSize": 10000,

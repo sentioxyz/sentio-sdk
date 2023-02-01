@@ -1,24 +1,23 @@
-import { ListStateStorage } from '@sentio/runtime'
 import { ERC20__factory, ERC721__factory } from '../builtin/internal'
 import { AddressType, DummyProvider, EthFetchConfig, ProcessResult } from '@sentio/sdk'
-import { AccountBindOptions } from './bind-options'
-import { getNetwork, TransactionReceipt } from '@ethersproject/providers'
+import { AccountBindOptions } from '../core/bind-options'
+
+import { Network, LogParams } from 'ethers/providers'
+
 import { TransferEvent as ERC20TransferEvent } from '../builtin/internal/ERC20'
 import { TransferEvent as ERC721TransferEvent } from '../builtin/internal/ERC721'
-import { AccountContext } from './context'
+
+import { ERC20Processor } from '../builtin/internal/erc20_processor'
+import { ERC721Processor } from '../builtin/internal/erc721_processor'
+
+import { AccountContext } from '../core/context'
 import { PromiseOrVoid } from '../promise-or-void'
-import { Event } from '@ethersproject/contracts'
-import { BytesLike } from '@ethersproject/bytes'
 import { AddressOrTypeEventFilter, EventsHandler } from './base-processor'
-import { Block } from '@ethersproject/abstract-provider'
-import { Transaction } from 'ethers'
+import { Transaction, Block, TransactionReceipt, LogDescription } from 'ethers'
+import { AccountProcessorState } from './account-processor-state'
 
-export class AccountProcessorState extends ListStateStorage<AccountProcessor> {
-  static INSTANCE = new AccountProcessorState()
-}
-
-const ERC20_CONTRACT = ERC20__factory.connect('', DummyProvider)
-const ERC721_CONTRACT = ERC721__factory.connect('', DummyProvider)
+const ERC20_INTERFACE = ERC20__factory.createInterface()
+const ERC721_INTERFACE = ERC721__factory.createInterface()
 
 export class AccountProcessor {
   config: AccountBindOptions
@@ -41,7 +40,7 @@ export class AccountProcessor {
   }
 
   public getChainId(): number {
-    return getNetwork(this.config.network || 1).chainId
+    return Number(Network.from(this.config.network || 1).chainId)
   }
 
   /**
@@ -58,7 +57,7 @@ export class AccountProcessor {
     return this.onERC20(
       handler,
       tokensAddresses,
-      (address: string) => ERC20_CONTRACT.filters.Transfer(null, this.config.address),
+      (address: string) => ERC721Processor.filters.Transfer(null, this.config.address),
       fetchConfig
     )
   }
@@ -77,7 +76,7 @@ export class AccountProcessor {
     return this.onERC20(
       handler,
       tokensAddresses,
-      (address: string) => ERC20_CONTRACT.filters.Transfer(this.config.address),
+      (address: string) => ERC20Processor.filters.Transfer(this.config.address),
       fetchConfig
     )
   }
@@ -97,7 +96,7 @@ export class AccountProcessor {
       handler,
       tokensAddresses,
       (address: string) =>
-        ERC20_CONTRACT.filters.Transfer('0x0000000000000000000000000000000000000000', this.config.address),
+        ERC20Processor.filters.Transfer('0x0000000000000000000000000000000000000000', this.config.address),
       fetchConfig
     )
   }
@@ -125,7 +124,7 @@ export class AccountProcessor {
     return this.onERC721(
       handler,
       collections,
-      (address: string) => ERC721_CONTRACT.filters.Transfer(null, this.config.address),
+      (address: string) => ERC721Processor.filters.Transfer(null, this.config.address),
       fetchConfig
     )
   }
@@ -144,7 +143,7 @@ export class AccountProcessor {
     return this.onERC721(
       handler,
       collections,
-      (address: string) => ERC721_CONTRACT.filters.Transfer(this.config.address),
+      (address: string) => ERC721Processor.filters.Transfer(this.config.address),
       fetchConfig
     )
   }
@@ -164,7 +163,7 @@ export class AccountProcessor {
       handler,
       collections,
       (address: string) =>
-        ERC721_CONTRACT.filters.Transfer('0x0000000000000000000000000000000000000000', this.config.address),
+        ERC721Processor.filters.Transfer('0x0000000000000000000000000000000000000000', this.config.address),
       fetchConfig
     )
   }
@@ -201,7 +200,7 @@ export class AccountProcessor {
   }
 
   protected onEvent(
-    handler: (event: Event, ctx: AccountContext) => PromiseOrVoid,
+    handler: (event: LogDescription, ctx: AccountContext) => PromiseOrVoid,
     filter: AddressOrTypeEventFilter | AddressOrTypeEventFilter[],
     fetchConfig?: EthFetchConfig
   ) {
@@ -215,21 +214,21 @@ export class AccountProcessor {
       _filters.push(filter)
     }
 
-    let hasVaildConfig = false
-    for (const filter of _filters) {
-      if (filter.address) {
-        hasVaildConfig = true
-        break
-      }
-      if (filter.topics && filter.topics.length) {
-        hasVaildConfig = true
-        break
-      }
-    }
-
-    if (!hasVaildConfig) {
-      throw Error('no valid config has been found for this account')
-    }
+    // let hasVaildConfig = false
+    // for (const filter of _filters) {
+    //   if (filter.address) {
+    //     hasVaildConfig = true
+    //     break
+    //   }
+    //   if (filter.topics && filter.topics.length) {
+    //     hasVaildConfig = true
+    //     break
+    //   }
+    // }
+    //
+    // if (!hasVaildConfig) {
+    //   throw Error('no valid config has been found for this account')
+    // }
 
     const config = this.config
 
@@ -237,29 +236,20 @@ export class AccountProcessor {
       filters: _filters,
       fetchConfig: fetchConfig || EthFetchConfig.fromPartial({}),
       handler: async function (data) {
-        const log = data.log as Event
+        const log = data.log as { topics: Array<string>; data: string }
         const ctx = new AccountContext(
           chainId,
           config.address,
           data.timestamp,
           data.block as Block,
-          log,
+          log as any as LogParams,
           undefined,
           data.transaction as Transaction,
           data.transactionReceipt as TransactionReceipt
         )
-        const event: Event = log
-        const parsed = ERC20_CONTRACT.interface.parseLog(log)
+        const parsed = ERC20_INTERFACE.parseLog(log)
         if (parsed) {
-          event.args = parsed.args
-          event.decode = (data: BytesLike, topics?: Array<any>) => {
-            return ERC20_CONTRACT.interface.decodeEventLog(parsed.eventFragment, data, topics)
-          }
-          event.event = parsed.name
-          event.eventSignature = parsed.signature
-
-          // TODO fix this bug
-          await handler(event, ctx)
+          await handler(parsed, ctx)
           return ctx.getProcessResult()
         }
         return ProcessResult.fromPartial({})

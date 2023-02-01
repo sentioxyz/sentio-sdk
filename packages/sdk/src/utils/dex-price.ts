@@ -1,9 +1,9 @@
 import { getEACAggregatorProxyContract } from '../builtin/internal/eacaggregatorproxy_processor'
 import path from 'path'
 import fs from 'fs'
-
+// @ts-ignore type def not provided
 import { parse } from 'csv-parse/sync'
-import { BlockTag } from '@ethersproject/providers'
+import { BlockTag } from 'ethers/providers'
 import { scaleDown } from './token'
 
 type OralceRecord = {
@@ -109,7 +109,7 @@ class DexPrice {
 
       let decimal = this.ASSETS_INFOS.get(asset)
       if (!decimal) {
-        decimal = await contract.decimals()
+        decimal = Number(await contract.decimals())
         this.ASSETS_INFOS.set(asset, decimal)
       }
 

@@ -1,5 +1,4 @@
-import { Networkish } from '@ethersproject/networks'
-import { getNetwork } from '@ethersproject/providers'
+import { Networkish, Network } from 'ethers/providers'
 
 export class BindOptions {
   // Contract address
@@ -15,7 +14,7 @@ export class BindOptions {
 export function getOptionsSignature(opts: BindOptions): string {
   const sig = [opts.address]
   if (opts.network) {
-    sig.push(getNetwork(opts.network).chainId.toString())
+    sig.push(Network.from(opts.network).chainId.toString())
   }
   if (opts.name) {
     sig.push(opts.name)

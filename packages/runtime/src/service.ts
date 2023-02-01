@@ -16,6 +16,7 @@ import { Empty } from '@sentio/protos/lib/google/protobuf/empty'
 
 import { PluginManager } from './plugin'
 import { errorString, mergeProcessResults } from './utils'
+
 ;(BigInt.prototype as any).toJSON = function () {
   return this.toString()
 }
@@ -45,7 +46,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
 
   async configure() {
     this.processorConfig = ProcessConfigResponse.fromPartial({})
-    PluginManager.INSTANCE.configure(this.processorConfig)
+    await PluginManager.INSTANCE.configure(this.processorConfig)
   }
 
   async start(request: StartRequest, context: CallContext): Promise<Empty> {
@@ -54,13 +55,13 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     }
 
     try {
-      for (const plugin of ['@sentio/sdk/lib/core/core-plugin', '@sentio/sdk/lib/core/eth-plugin']) {
-        try {
-          require(plugin)
-        } catch (e) {
-          console.error('Failed to load plugin: ', plugin)
-        }
-      }
+      // for (const plugin of ['@sentio/sdk/lib/core/core-plugin', '@sentio/sdk/lib/core/eth-plugin']) {
+      //   try {
+      //     require(plugin)
+      //   } catch (e) {
+      //     console.error('Failed to load plugin: ', plugin)
+      //   }
+      // }
 
       // for (const plugin of [
       //   '@sentio/sdk/lib/core/sui-plugin',
@@ -77,7 +78,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       throw new ServerError(Status.INVALID_ARGUMENT, 'Failed to load processor: ' + errorString(e))
     }
 
-    PluginManager.INSTANCE.start(request)
+    await PluginManager.INSTANCE.start(request)
 
     try {
       await this.configure()

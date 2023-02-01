@@ -1,7 +1,6 @@
 import { assert } from 'chai'
 
 import { TestProcessorServer } from '../testing'
-import { BigNumber } from 'ethers'
 import { mockApprovalLog, mockOwnershipTransferredLog, mockTransferLog } from '../builtin/erc20/test-utils'
 import { ERC20Processor } from '../builtin/internal/erc20_processor'
 import { conversion } from '../utils'
@@ -11,15 +10,15 @@ describe('Test Error Capture', () => {
   const service = new TestProcessorServer(() => {
     ERC20Processor.bind({ address: '0x80009ff8154bd5653c6dda2fa5f5053e5a5c1a91' })
       .onEventApproval((evt, ctx) => {
-        const v = new BigDecimal(1).div(conversion.toBigDecimal(evt.args.value))
+        const v = BigDecimal(1).div(conversion.toBigDecimal(evt.args.value))
         ctx.meter.Gauge('xx').record(v)
       })
       .onEventTransfer((evt, ctx) => {
-        const v = new BigDecimal(0).div(conversion.toBigDecimal(evt.args.value))
+        const v = BigDecimal(0).div(conversion.toBigDecimal(evt.args.value))
         ctx.meter.Gauge('xx').record(v)
       })
       .onEventOwnershipTransferred((evt, ctx) => {
-        ctx.meter.Gauge('xx').record(BigNumber.from(10 ** 18))
+        ctx.meter.Gauge('xx').record(10 ** 18)
       })
   })
 
@@ -40,7 +39,7 @@ describe('Test Error Capture', () => {
         mockApprovalLog('0x80009ff8154bd5653c6dda2fa5f5053e5a5c1a91', {
           owner: '0x80009ff8154bd5653c6dda2fa5f5053e5a5c1a91',
           spender: '0x0000000000000000000000000000000000000000',
-          value: BigNumber.from(0),
+          value: 0n,
         })
       )
     } catch (e) {
@@ -56,7 +55,7 @@ describe('Test Error Capture', () => {
         mockTransferLog('0x80009ff8154bd5653c6dda2fa5f5053e5a5c1a91', {
           from: '0x80009ff8154bd5653c6dda2fa5f5053e5a5c1a91',
           to: '0x0000000000000000000000000000000000000000',
-          value: BigNumber.from(0),
+          value: 0n,
         })
       )
     } catch (e) {
@@ -77,6 +76,7 @@ describe('Test Error Capture', () => {
     } catch (e) {
       err = e
     }
-    assert(err?.message.includes('overflow'))
+    // should be convert to bigint if it's unsafe int
+    assert(!err)
   })
 })

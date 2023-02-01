@@ -41,7 +41,7 @@ module.exports = {
       if (/^nice-grpc.*$/.test(request)) {
         return callback(null, 'commonjs ' + request)
       }
-      if (/^@sentio\/(sdk|runtime|base|protos|bigdecimal).*$/.test(request)) {
+      if (/^@sentio\/(sdk|runtime|base|protos|bigdecimal|ethers).*$/.test(request)) {
         return callback(null, 'commonjs ' + request)
       }
       callback()

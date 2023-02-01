@@ -1,6 +1,6 @@
 // https://github.com/dethcrypto/TypeChain/blob/015abb28bd22826611051f27e0ec96a00f9a0b61/packages/target-ethers-v5/src/codegen/functions.ts#L54
 import { FunctionDeclaration } from 'typechain'
-import { generateInputTypes, generateOutputTypes } from '@typechain/ethers-v5/dist/codegen/types'
+import { generateInputTypes, generateOutputTypes } from '@sentio/ethers-v6/dist/codegen/types'
 import { getFullSignatureAsSymbolForFunction, getFullSignatureForFunction } from './types'
 
 function generateReturnTypes(fn: FunctionDeclaration) {
@@ -20,20 +20,22 @@ export function generateViewFunction(fn: FunctionDeclaration, includeArgTypes: b
     return ''
   }
   const declName = includeArgTypes ? getFullSignatureAsSymbolForFunction(fn) : fn.name
-  const call = includeArgTypes ? 'this.contract["' + getFullSignatureForFunction(fn) + '"]' : 'this.contract.' + fn.name
-
+  const call = 'this.contract.getFunction("' + getFullSignatureForFunction(fn) + '")'
+  // if (overrides) {
+  //   return await ${call}(${
+  //   fn.inputs.length > 0 ? fn.inputs.map((input, index) => input.name || `arg${index}`).join(',') + ',' : ''
+  // } overrides)
+  //     } else {
+  //       return await ${call}(${fn.inputs.map((input, index) => input.name || `arg${index}`).join(',')})
+  //     }
   return `
   async ${declName}(${generateInputTypes(fn.inputs, {
     useStructs: true,
-  })}overrides?: CallOverrides): ${generateReturnTypes(fn)} {
-    try {
-      if (overrides) {
-        return await ${call}(${
+  })}overrides?: Overrides): ${generateReturnTypes(fn)} {
+    try {    
+       return await ${call}(${
     fn.inputs.length > 0 ? fn.inputs.map((input, index) => input.name || `arg${index}`).join(',') + ',' : ''
-  } overrides)
-      } else {
-        return await ${call}(${fn.inputs.map((input, index) => input.name || `arg${index}`).join(',')})
-      }
+  } overrides || {})
     } catch (e) {
       throw transformEtherError(e, undefined)
     }
@@ -57,20 +59,17 @@ export function generateBoundViewFunction(fn: FunctionDeclaration, includeArgTyp
   return `
   async ${declName ?? fn.name}(${generateInputTypes(fn.inputs, {
     useStructs: true,
-  })}overrides?: CallOverrides): ${generateReturnTypes(fn)} {
+  })}overrides?: Overrides): ${generateReturnTypes(fn)} {
     try {
       if (!overrides && this.context) {
         overrides = {
           blockTag: toBlockTag(this.context.blockNumber),
         }
       }
-      if (overrides) {
-        return await this.view.${declName}(${
+      return await this.view.${declName}(${
     fn.inputs.length > 0 ? fn.inputs.map((input, index) => input.name || `arg${index}`).join(',') + ',' : ''
-  } overrides)
-      } else {
-        return await this.view.${declName}(${fn.inputs.map((input, index) => input.name || `arg${index}`).join(',')})
-      }
+  } overrides || {})
+
     } catch (e) {
       throw transformEtherError(e, this.context)
     }

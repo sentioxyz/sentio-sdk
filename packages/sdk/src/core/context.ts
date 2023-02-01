@@ -1,17 +1,17 @@
+import { BaseContract, Transaction, TransactionReceipt, Block, ContractEvent } from 'ethers'
+import { LogParams } from 'ethers/providers'
+
 import { RecordMetaData } from '@sentio/protos'
-import { BaseContract, EventFilter, Transaction } from 'ethers'
-import { Block, Log } from '@ethersproject/abstract-provider'
 import { normalizeLabels } from './meter'
-import { Trace } from './trace'
+import { Trace } from '../eth/trace'
 import { Labels } from './metadata'
 import { CHAIN_IDS } from '../utils/chain'
 import { BaseContext } from './base-context'
-import { TransactionReceipt } from '@ethersproject/providers'
 
 export abstract class EthContext extends BaseContext {
   chainId: number
   address: string
-  private readonly log?: Log
+  private readonly log?: LogParams
   block?: Block
   private readonly trace?: Trace
   blockNumber: bigint | number
@@ -25,7 +25,7 @@ export abstract class EthContext extends BaseContext {
     address: string,
     timestamp?: Date,
     block?: Block,
-    log?: Log,
+    log?: LogParams,
     trace?: Trace,
     transaction?: Transaction,
     transactionReceipt?: TransactionReceipt
@@ -60,7 +60,7 @@ export abstract class EthContext extends BaseContext {
         blockNumber: BigInt(this.blockNumber),
         transactionIndex: this.log.transactionIndex,
         transactionHash: this.transactionHash || '',
-        logIndex: this.log.logIndex,
+        logIndex: this.log.index,
         chainId: this.chainId.toString(),
         name: name,
         labels: normalizeLabels(labels),
@@ -118,12 +118,15 @@ export class ContractContext<
     chainId: number,
     timestamp?: Date,
     block?: Block,
-    log?: Log,
+    log?: LogParams,
     trace?: Trace,
     transaction?: Transaction,
     transactionReceipt?: TransactionReceipt
   ) {
-    super(chainId, view.rawContract.address, timestamp, block, log, trace, transaction, transactionReceipt)
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const address = view.rawContract.getAddress() as string
+    super(chainId, address, timestamp, block, log, trace, transaction, transactionReceipt)
     view.context = this
     this.contractName = contractName
     this.contract = view
@@ -135,12 +138,10 @@ export class ContractContext<
 }
 
 export class ContractView<TContract extends BaseContract> {
-  filters: { [name: string]: (...args: Array<any>) => EventFilter }
   protected contract: TContract
 
   constructor(contract: TContract) {
     this.contract = contract
-    this.filters = contract.filters
   }
 
   get rawContract() {
@@ -148,7 +149,7 @@ export class ContractView<TContract extends BaseContract> {
   }
 
   get provider() {
-    return this.contract.provider
+    return this.contract.runner?.provider
   }
 }
 
@@ -170,7 +171,7 @@ export class BoundContractView<TContract extends BaseContract, TContractView ext
   }
 
   get filters() {
-    return this.view.filters
+    return this.view.rawContract.filters
   }
 }
 

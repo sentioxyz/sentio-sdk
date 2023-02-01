@@ -1,7 +1,7 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import { format } from 'prettier'
-import { MoveFunction, MoveModule, MoveModuleBytecode, MoveStruct } from 'aptos-sdk/src/generated'
+import { MoveFunction, MoveModule, MoveModuleBytecode, MoveStruct } from '../move-types'
 import { AccountModulesImportInfo, AccountRegister, generateType } from './typegen'
 import { getMeaningfulFunctionParams, isFrameworkAccount, moduleQname, SPLITTER } from '../utils'
 import chalk from 'chalk'
@@ -147,7 +147,7 @@ export class AccountCodegen {
       AptosContext, CallFilter
     } from "@sentio/sdk-aptos"
     import { AptosFetchConfig } from "@sentio/protos"
-    import { Address, MoveModule } from "aptos-sdk/src/generated"
+    import { Address, MoveModule } from "@sentio/sdk-aptos"
     `
 
     const dependedAccounts: string[] = []

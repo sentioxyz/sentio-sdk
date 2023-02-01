@@ -12,15 +12,15 @@ const transferFilters = [
 
 WETH9Processor.bind({ address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', startBlock: 13217349 })
   .onEventDeposit(async function (event, ctx) {
-    const amount = Number(event.args.wad.toBigInt()) / Math.pow(10, 18)
+    const amount = Number(event.args.wad) / Math.pow(10, 18)
     ctx.meter.Counter('token_bridge_weth').add(amount)
   }, depositFilter)
   .onEventWithdrawal(async function (event, ctx) {
-    const amount = Number(event.args.wad.toBigInt()) / Math.pow(10, 18)
+    const amount = Number(event.args.wad) / Math.pow(10, 18)
     ctx.meter.Counter('token_bridge_weth').sub(amount)
   }, withdrawalFilter)
   .onEventTransfer(async function (event, ctx) {
-    const amount = Number(event.args.wad.toBigInt()) / Math.pow(10, 18)
+    const amount = Number(event.args.wad) / Math.pow(10, 18)
 
     if (event.args.src == TOKEN_BRIDGE_ADDRESS) {
       ctx.meter.Counter('token_bridge_weth').sub(amount)
@@ -32,7 +32,7 @@ WETH9Processor.bind({ address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', sta
 
 WETH9Processor.bind({ address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', startBlock: 13217349 }).onBlock(
   async function (_, ctx: WETH9Context) {
-    const balance = (await ctx.contract.balanceOf(TOKEN_BRIDGE_ADDRESS)).toBigInt()
+    const balance = await ctx.contract.balanceOf(TOKEN_BRIDGE_ADDRESS)
     ctx.meter.Gauge('balance').record(balance)
   }
 )
@@ -42,7 +42,7 @@ WETH9Processor.bind({
   startBlock: 13217349,
   endBlock: 14500000,
 }).onBlock(async function (_, ctx: WETH9Context) {
-  const balance = (await ctx.contract.balanceOf(TOKEN_BRIDGE_ADDRESS)).toBigInt()
+  const balance = await ctx.contract.balanceOf(TOKEN_BRIDGE_ADDRESS)
   ctx.meter.Gauge('balance_end').record(balance)
 })
 

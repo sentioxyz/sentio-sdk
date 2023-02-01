@@ -9,7 +9,7 @@ import { SuiProcessorState } from './sui-processor'
 export class SuiPlugin extends Plugin {
   name: string = 'SuiPlugin'
 
-  configure(config: ProcessConfigResponse): void {
+  async configure(config: ProcessConfigResponse) {
     for (const suiProcessor of SuiProcessorState.INSTANCE.getValues()) {
       const contractConfig: ContractConfig = {
         transactionConfig: [],

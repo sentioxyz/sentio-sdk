@@ -11,7 +11,6 @@ import { CompressionAlgorithms } from '@grpc/grpc-js/build/src/compression-algor
 
 import { ProcessorDefinition } from '@sentio/protos'
 import { ProcessorServiceImpl } from './service'
-import { setProvider } from './provider'
 import { State } from './state'
 import { Endpoints } from './endpoints'
 
@@ -20,13 +19,13 @@ import { FullProcessorServiceImpl } from './full-service'
 import { ChainConfig } from './chain-config'
 
 State.reset()
-Endpoints.reset()
+// Endpoints.reset()
 
 const optionDefinitions = [
   { name: 'target', type: String, defaultOption: true },
   { name: 'port', alias: 'p', type: String, defaultValue: '4000' },
   { name: 'concurrency', type: Number, defaultValue: 4 },
-  { name: 'use-chainserver', type: Boolean, defaultValue: false },
+  // { name: 'use-chainserver', type: Boolean, defaultValue: false },
   {
     name: 'chains-config',
     alias: 'c',
@@ -74,7 +73,8 @@ if (options.debug) {
 const fullPath = path.resolve(options['chains-config'])
 const chainsConfig = fs.readJsonSync(fullPath)
 
-setProvider(chainsConfig, options.concurrency, options['use-chainserver'])
+// setProvider(chainsConfig, options.concurrency, options['use-chainserver'])
+Endpoints.INSTANCE.concurrency = options.concurrency
 Endpoints.INSTANCE.chainQueryAPI = options['chainquery-server']
 Endpoints.INSTANCE.priceFeedAPI = options['pricefeed-server']
 

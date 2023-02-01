@@ -1,10 +1,10 @@
 import { expect } from 'chai'
 import { toBigInteger, toMetricValue } from './numberish'
 import { webcrypto } from 'crypto'
-import { BigNumber } from 'ethers'
 import { performance } from 'perf_hooks'
 import { BigInteger } from '@sentio/protos'
 import { BigDecimal } from '.'
+import { bytesToBigInt } from '../utils/conversion'
 
 // TODO add test for type conversion
 describe('Numberish tests', () => {
@@ -22,10 +22,10 @@ describe('Numberish tests', () => {
   test('random big integer conversion correctness ', async () => {
     for (let i = 0; i < 1000; i++) {
       const random = webcrypto.getRandomValues(new Uint8Array(256))
-      const v = BigNumber.from(random).toBigInt()
+      const v = bytesToBigInt(random)
       const b = toBigInteger(v)
 
-      expect(BigNumber.from(b.data).eq(v)).to.equals(true)
+      expect(bytesToBigInt(b.data)).equals(v)
     }
   })
 
@@ -38,7 +38,7 @@ describe('Numberish tests', () => {
     for (let i = 0; i < 1000; i++) {
       // Use higher value for local debugging
       const random = webcrypto.getRandomValues(new Uint8Array(256))
-      const v = BigNumber.from(random).toBigInt()
+      const v = bytesToBigInt(random)
 
       let start = performance.now()
       toBigInteger(v)
@@ -68,7 +68,7 @@ describe('Numberish tests', () => {
 
 // Performance very bad
 function BigIntegerToHex(b: BigInteger): string {
-  let res = BigNumber.from(b.data).toBigInt().toString(16)
+  let res = bytesToBigInt(b.data).toString(16)
   if (b.negative) {
     res = '-' + res
   }
@@ -76,7 +76,7 @@ function BigIntegerToHex(b: BigInteger): string {
 }
 
 function BigIntegerToBigInt(b: BigInteger): bigint {
-  let res = BigNumber.from(b.data).toBigInt()
+  let res = bytesToBigInt(b.data)
   if (b.negative) {
     res = -res
   }

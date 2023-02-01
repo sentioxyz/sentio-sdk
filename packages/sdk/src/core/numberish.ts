@@ -1,9 +1,8 @@
-import { BigNumber } from 'ethers'
 import { BigInteger, MetricValue } from '@sentio/protos'
 import { BigDecimal } from '.'
-import { BlockTag } from '@ethersproject/providers'
+import { BlockTag } from 'ethers/providers'
 
-export type Numberish = number | BigNumber | bigint | BigDecimal | string
+export type Numberish = number | bigint | BigDecimal | string
 
 export function toBlockTag(a: number | bigint): BlockTag {
   if (typeof a === 'number') {
@@ -16,41 +15,6 @@ export function toBlockTag(a: number | bigint): BlockTag {
 }
 
 export function toMetricValue(value: Numberish): MetricValue {
-  if (value instanceof BigNumber) {
-    return MetricValue.fromPartial({
-      bigInteger: toBigInteger(value.toBigInt()),
-    })
-  }
-  if (value instanceof BigDecimal) {
-    // Carefully consider the use case here
-    if (value.isInteger()) {
-      return MetricValue.fromPartial({
-        bigInteger: bigDecimalToBigInteger(value),
-      })
-    } else {
-      if (value.isNaN()) {
-        throw new Error('Cannot record NaN value')
-      }
-      if (!value.isFinite()) {
-        // NaN also not finite
-        throw new Error('Cannot record infinite value')
-      }
-      return MetricValue.fromPartial({
-        bigDecimal: value.toString(), // e.g. -7.350918e-428
-      })
-    }
-  }
-  if (typeof value === 'string') {
-    return MetricValue.fromPartial({
-      bigDecimal: value,
-    })
-  }
-  if (typeof value === 'bigint' || Number.isInteger(value)) {
-    return MetricValue.fromPartial({
-      bigInteger: toBigInteger(value),
-    })
-  }
-
   if (typeof value === 'number') {
     if (Number.isNaN(value)) {
       throw new Error('Cannot record NaN value')
@@ -58,11 +22,45 @@ export function toMetricValue(value: Numberish): MetricValue {
     if (!Number.isFinite(value)) {
       throw new Error('Cannot record infinite value')
     }
-  }
+    if (Number.isInteger(value) && !Number.isSafeInteger(value)) {
+      return MetricValue.fromPartial({
+        bigInteger: toBigInteger(value),
+      })
+    }
 
-  return MetricValue.fromPartial({
-    doubleValue: Number(value),
-  })
+    return MetricValue.fromPartial({
+      doubleValue: Number(value),
+    })
+  }
+  if (typeof value === 'bigint') {
+    return MetricValue.fromPartial({
+      bigInteger: toBigInteger(value),
+    })
+  }
+  if (typeof value === 'string') {
+    return MetricValue.fromPartial({
+      bigDecimal: value,
+    })
+  }
+  // if (value instanceof BigDecimal) {
+  // Carefully consider the use case here
+  if (value.isInteger()) {
+    return MetricValue.fromPartial({
+      bigInteger: bigDecimalToBigInteger(value),
+    })
+  } else {
+    if (value.isNaN()) {
+      throw new Error('Cannot record NaN value')
+    }
+    if (!value.isFinite()) {
+      // NaN also not finite
+      throw new Error('Cannot record infinite value')
+    }
+    return MetricValue.fromPartial({
+      bigDecimal: value.toString(), // e.g. -7.350918e-428
+    })
+  }
+  // }
 }
 
 function bigDecimalToBigInteger(a: BigDecimal): BigInteger {
@@ -82,17 +80,18 @@ function intToBigInteger(a: bigint | number): BigInteger {
 }
 
 export function toBigInteger(a: Numberish): BigInteger {
-  if (a instanceof BigDecimal) {
-    return bigDecimalToBigInteger(a)
+  if (typeof a === 'number') {
+    return intToBigInteger(a)
   }
-
-  if (a instanceof BigNumber) {
-    return intToBigInteger(a.toBigInt())
+  if (typeof a === 'bigint') {
+    return intToBigInteger(a)
   }
   if (typeof a === 'string') {
     return intToBigInteger(BigInt(a))
   }
-
+  if (a instanceof BigDecimal) {
+    return bigDecimalToBigInteger(a)
+  }
   return intToBigInteger(a)
 
   // Following code is actually very slow

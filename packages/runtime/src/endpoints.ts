@@ -1,14 +1,13 @@
-import { Provider } from '@ethersproject/providers'
-
 export class Endpoints {
   static INSTANCE: Endpoints = new Endpoints()
 
-  static reset() {
-    Endpoints.INSTANCE = new Endpoints()
-  }
+  // static reset() {
+  //   Endpoints.INSTANCE = new Endpoints()
+  // }
   // evm providers
-  providers = new Map<number, Provider>()
+  // providers = new Map<bigint, Provider>()
 
+  concurrency = 4
   chainQueryAPI = ''
   priceFeedAPI = ''
 

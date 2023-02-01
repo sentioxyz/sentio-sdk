@@ -1,9 +1,10 @@
 import {
   generateOutputComplexTypeAsArray,
   generateOutputComplexTypesAsObject,
-} from '@typechain/ethers-v5/dist/codegen/types'
+} from '@sentio/ethers-v6/dist/codegen/types'
+import { keccak256 } from 'ethers'
 import { FunctionDeclaration, getSignatureForFn } from 'typechain'
-import { utils } from 'ethers'
+// import { utils } from 'ethers'
 import { getFullSignatureAsSymbolForFunction } from './types'
 
 export function generateCallHandlers(fns: FunctionDeclaration[], contractName: string): string {
@@ -32,13 +33,16 @@ function codegenCallTraceType(fn: FunctionDeclaration, overloadedName?: string):
   return `
   export interface ${identifier}CallObject ${objectOutput}
     
-  export type ${identifier}CallTrace = TypedCallTrace<${arrayOutput}, ${identifier}CallObject>
+  export type ${identifier}CallTrace = TypedCallTrace<${arrayOutput}, ${identifier}CallObject> & Trace
   `
 }
 
 function generateCallHandler(fn: FunctionDeclaration, contractName: string, overloadedName?: string): string {
   const signature = getSignatureForFn(fn)
-  const sighash = utils.keccak256(utils.toUtf8Bytes(signature)).substring(0, 10)
+  // utils.toUtf8Bytes(signature))
+
+  const test = new TextEncoder().encode(signature)
+  const sighash = keccak256(test).substring(0, 10)
 
   return `
   onCall${capitalizeFirstChar(overloadedName ?? fn.name)}(

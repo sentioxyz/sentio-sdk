@@ -1,4 +1,4 @@
-export type { Transaction_UserTransaction, TransactionPayload_EntryFunctionPayload } from 'aptos-sdk/src/generated'
+export * from './move-types'
 export type { EventInstance, TypedEventInstance, TypedEntryFunctionPayload, TypedMoveResource } from './models'
 export { defaultMoveCoder, MoveCoder } from './move-coder'
 export type { FunctionNameAndCallFilter, EventFilter, CallFilter, ArgumentsFilter } from './aptos-processor'
