@@ -2,7 +2,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import { format } from 'prettier'
 import { MoveFunction, MoveModule, MoveModuleBytecode, MoveStruct } from 'aptos-sdk/src/generated'
-import { AccountModulesImportInfo, AccountRegister, generateType } from './typegen'
+import { AccountModulesImportInfo, AccountRegister, generateType, normalizeToJSName } from './typegen'
 import { getMeaningfulFunctionParams, isFrameworkAccount, moduleQname, SPLITTER } from '../utils'
 import chalk from 'chalk'
 import { AptosNetwork, getAptosChainName, getRpcClient } from '../network'
@@ -192,7 +192,7 @@ export class AccountCodegen {
 
       ${this.modules
         .map((m) => {
-          return `_r.load(${m.abi?.name}.ABI)`
+          return `_r.load(${normalizeToJSName(m.abi!.name)}.ABI)`
         })
         .join('\n')}
     }
@@ -231,9 +231,10 @@ function generateModule(moduleByteCode: MoveModuleBytecode, network: AptosNetwor
   const structs = module.structs.map((s) => generateStructs(module, s, eventTypes))
   const callArgs = module.exposed_functions.map((f) => generateCallArgsStructs(module, f))
 
+  const moduleName = normalizeToJSName(module.name)
   let processor = ''
   if (functions.length > 0 || events.length > 0) {
-    processor = `export class ${module.name} extends AptosBaseProcessor {
+    processor = `export class ${moduleName} extends AptosBaseProcessor {
 
     constructor(options: AptosBindOptions) {
       super("${module.name}", options)
@@ -243,8 +244,8 @@ function generateModule(moduleByteCode: MoveModuleBytecode, network: AptosNetwor
       network: AptosNetwork.${generateNetworkOption(network)}       
     }
 
-    static bind(options: Partial<AptosBindOptions> = {}): ${module.name} {
-      return new ${module.name}({ ...${module.name}.DEFAULT_OPTIONS, ...options })
+    static bind(options: Partial<AptosBindOptions> = {}): ${moduleName} {
+      return new ${moduleName}({ ...${moduleName}.DEFAULT_OPTIONS, ...options })
     }
     
     ${functions.join('\n')}
@@ -261,7 +262,7 @@ function generateModule(moduleByteCode: MoveModuleBytecode, network: AptosNetwor
   return `
   ${processor}
 
-  export namespace ${module.name} {
+  export namespace ${moduleName} {
     ${structs.join('\n')}
     
     ${callArgs.join('\n')}
@@ -278,6 +279,8 @@ function generateStructs(module: MoveModule, struct: MoveStruct, events: Set<str
   const genericString = generateStructTypeParameters(struct)
   const genericStringAny = generateStructTypeParameters(struct, true)
 
+  const structName = normalizeToJSName(struct.name)
+
   const fields = struct.fields.map((field) => {
     return `${field.name}: ${generateType(field.type, module.address)}`
   })
@@ -285,18 +288,18 @@ function generateStructs(module: MoveModule, struct: MoveStruct, events: Set<str
   let eventPayload = ''
   if (events.has(moduleQname(module) + SPLITTER + struct.name)) {
     eventPayload = `
-    export interface ${struct.name}Instance extends 
-        TypedEventInstance<${struct.name}${genericStringAny}> {
+    export interface ${structName}Instance extends 
+        TypedEventInstance<${structName}${genericStringAny}> {
       /** @deprecated use {@link data_decoded} instead */
-      data_typed: ${struct.name}${genericStringAny}
-      data_decoded: ${struct.name}${genericStringAny}
+      data_typed: ${structName}${genericStringAny}
+      data_decoded: ${structName}${genericStringAny}
       type_arguments: [${struct.generic_type_params.map((_) => 'string').join(', ')}]
     }
     `
   }
 
   return `
-  export class ${struct.name}${genericString} {
+  export class ${structName}${genericString} {
     static TYPE_QNAME = '${module.address}::${module.name}::${struct.name}'
     ${fields.join('\n')} 
   }
@@ -361,10 +364,11 @@ function generateOnEntryFunctions(module: MoveModule, func: MoveFunction) {
   }
 
   // const genericString = generateFunctionTypeParameters(func)
+  const moduleName = normalizeToJSName(module.name)
 
   const camelFuncName = capitalizeFirstChar(camelize(func.name))
   const source = `
-  onEntry${camelFuncName}(func: (call: ${module.name}.${camelFuncName}Payload, ctx: AptosContext) => void, filter?: CallFilter, fetchConfig?: AptosFetchConfig): ${module.name} {
+  onEntry${camelFuncName}(func: (call: ${moduleName}.${camelFuncName}Payload, ctx: AptosContext) => void, filter?: CallFilter, fetchConfig?: AptosFetchConfig): ${moduleName} {
     this.onEntryFunctionCall(func, {
       ...filter,
       function: '${module.name}::${func.name}'
@@ -409,8 +413,11 @@ function generateOnEvents(module: MoveModule, struct: MoveStruct): string {
 
   // const genericString = generateStructTypeParameters(struct)
 
+  const moduleName = normalizeToJSName(module.name)
   const source = `
-  onEvent${struct.name}(func: (event: ${module.name}.${struct.name}Instance, ctx: AptosContext) => void, fetchConfig?: AptosFetchConfig): ${module.name} {
+  onEvent${struct.name}(func: (event: ${moduleName}.${normalizeToJSName(
+    struct.name
+  )}Instance, ctx: AptosContext) => void, fetchConfig?: AptosFetchConfig): ${moduleName} {
     this.onEvent(func, {
       type: '${module.name}::${struct.name}'
     },

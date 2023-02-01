@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - release
+      - v1
 jobs:
   release:
     runs-on: ubuntu-latest

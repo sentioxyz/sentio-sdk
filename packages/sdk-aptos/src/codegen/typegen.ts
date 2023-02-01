@@ -53,6 +53,11 @@ function generateTypeForDescriptor(type: TypeDescriptor, currentAddress: string)
 
 function generateSimpleType(type: string, currentAddress: string): string {
   const parts = type.split(SPLITTER)
+
+  for (let i = 0; i < parts.length; i++) {
+    parts[i] = normalizeToJSName(parts[i])
+  }
+
   if (parts.length < 2) {
     return parts[0]
   }
@@ -150,4 +155,11 @@ export class AccountRegister {
     this.accountImports.set(currentModuleFqn, accountModuleImports)
     return accountModuleImports
   }
+}
+
+export function normalizeToJSName(name: string) {
+  if (name === 'package' || name === 'volatile') {
+    return name + '_'
+  }
+  return name
 }
