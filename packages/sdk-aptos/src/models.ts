@@ -1,4 +1,4 @@
-import { Event, MoveResource, TransactionPayload_EntryFunctionPayload } from 'aptos-sdk/src/generated'
+import { Event, MoveResource, TransactionPayload_EntryFunctionPayload } from './move-types'
 
 export type EventInstance = Event & {
   version: string

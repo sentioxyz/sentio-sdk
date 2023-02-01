@@ -1,19 +1,19 @@
 {
   "name": "@sentio/sdk-aptos",
   "license": "Apache-2.0",
-  "version": "1.0.0-development",
+  "version": "2.0.0-development",
   "scripts": {
     "compile": "tsc -p .",
     "build": "yarn gen && yarn gen_test &&  yarn compile",
     "build_all": "yarn lerna run --scope=@sentio/sdk-aptos build --include-dependencies",
     "test": "yarn gen_test && yarn jest",
-    "gen": "ts-node src/run-codegen.ts src/abis src/builtin",
-    "gen_test": "ts-node src/run-codegen.ts src/tests/abis src/tests/types"
+    "gen": "ts-node  src/run-codegen.ts src/abis src/builtin",
+    "gen_test": "ts-node   src/run-codegen.ts src/tests/abis src/tests/types"
   },
   "dependencies": {
-    "@sentio/sdk": "1.0.0-development",
+    "@sentio/sdk": "2.0.0-development",
     "chalk": "^4.1.0",
-    "aptos-sdk": "npm:aptos@^1.5.0",
+    "aptos-sdk": "npm:aptos@^1.6.0",
     "prettier": "^2.8.1",
     "@types/prettier": "^2.7.2"
   },

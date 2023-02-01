@@ -13,17 +13,19 @@ import {
 } from '@sentio/protos'
 import { CallContext } from 'nice-grpc-common'
 import { Empty } from '@sentio/protos/lib/google/protobuf/empty'
-import { ChainConfig, ProcessorServiceImpl, setProvider, Endpoints, State } from '@sentio/runtime'
+import { ChainConfig, ProcessorServiceImpl, Endpoints, State } from '@sentio/runtime'
 import { CHAIN_MAP } from '../utils/chain'
-import { Block, Log } from '@ethersproject/abstract-provider'
-import { getNetwork, Networkish } from '@ethersproject/providers'
-import { Trace } from '../core/trace'
+
+import { Trace } from '../eth/trace'
+import { LogParams, Networkish, BlockParams, Network } from 'ethers/providers'
+
+import { Block, Log } from 'ethers'
 
 export const TEST_CONTEXT: CallContext = <CallContext>{}
 
 export function cleanTest() {
   State.reset()
-  Endpoints.reset()
+  // Endpoints.reset()
 }
 
 export class TestProcessorServer implements ProcessorServiceImplementation {
@@ -35,17 +37,11 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
     cleanTest()
 
     this.service = new ProcessorServiceImpl(loader)
-    const dummyConfig: Record<string, ChainConfig> = {}
 
     for (const k in CHAIN_MAP) {
       const http = httpEndpoints[k] || ''
-      dummyConfig[k] = {
-        ChainID: k,
-        Https: [http],
-      }
+      Endpoints.INSTANCE.chainServer.set(k, http)
     }
-
-    setProvider(dummyConfig)
   }
 
   async start(request: StartRequest = { templateInstances: [] }, context = TEST_CONTEXT): Promise<Empty> {
@@ -97,7 +93,7 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
     const signature = trace.action.input.slice(0, 10)
 
     for (const contract of this.contractConfigs) {
-      if (contract.contract?.chainId !== getNetwork(network).chainId.toString()) {
+      if (contract.contract?.chainId !== Network.from(network).chainId.toString()) {
         continue
       }
       if (trace.action.to?.toLowerCase() !== contract.contract?.address.toLowerCase()) {
@@ -121,11 +117,11 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
     return undefined
   }
 
-  testLog(log: Log, network: Networkish = 1): Promise<ProcessBindingResponse> {
+  testLog(log: LogParams, network: Networkish = 1): Promise<ProcessBindingResponse> {
     return this.testLogs([log], network)
   }
 
-  testLogs(logs: Log[], network: Networkish = 1): Promise<ProcessBindingResponse> {
+  testLogs(logs: LogParams[], network: Networkish = 1): Promise<ProcessBindingResponse> {
     const bindings = []
     for (const log of logs) {
       const binding = this.buildLogBinding(log, network)
@@ -139,9 +135,9 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
     })
   }
 
-  buildLogBinding(log: Log, network: Networkish = 1): DataBinding | undefined {
+  buildLogBinding(log: LogParams, network: Networkish = 1): DataBinding | undefined {
     for (const contract of this.contractConfigs) {
-      if (contract.contract?.chainId !== getNetwork(network).chainId.toString()) {
+      if (contract.contract?.chainId !== Network.from(network).chainId.toString()) {
         continue
       }
       if (log.address.toLowerCase() !== contract.contract?.address.toLowerCase()) {
@@ -182,11 +178,11 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
     }
     return undefined
   }
-  testAccountLog(address: string, log: Log, network: Networkish = 1): Promise<ProcessBindingResponse> {
+  testAccountLog(address: string, log: LogParams, network: Networkish = 1): Promise<ProcessBindingResponse> {
     return this.testAccountLogs(address, [log], network)
   }
 
-  testAccountLogs(address: string, logs: Log[], network: Networkish = 1): Promise<ProcessBindingResponse> {
+  testAccountLogs(address: string, logs: LogParams[], network: Networkish = 1): Promise<ProcessBindingResponse> {
     const bindings = []
     for (const log of logs) {
       const binding = this.buildAccountLogBinding(address, log, network)
@@ -200,9 +196,9 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
     })
   }
 
-  buildAccountLogBinding(address: string, log: Log, network: Networkish = 1): DataBinding | undefined {
+  buildAccountLogBinding(address: string, log: LogParams, network: Networkish = 1): DataBinding | undefined {
     for (const account of this.accountConfigs) {
-      if (account.chainId !== getNetwork(network).chainId.toString()) {
+      if (account.chainId !== Network.from(network).chainId.toString()) {
         continue
       }
       if (address.toLowerCase() !== account.address.toLowerCase()) {
@@ -244,11 +240,14 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
     return undefined
   }
 
-  testBlock(block: Partial<Block> & { number: number }, network: Networkish = 1): Promise<ProcessBindingResponse> {
+  testBlock(
+    block: Partial<BlockParams> & { number: number },
+    network: Networkish = 1
+  ): Promise<ProcessBindingResponse> {
     return this.testBlocks([block], network)
   }
 
-  testBlocks(blocks: Partial<Block> & { number: number }[], network: Networkish = 1) {
+  testBlocks(blocks: Partial<BlockParams> & { number: number }[], network: Networkish = 1) {
     const bindings = []
     for (const block of blocks) {
       const binding = this.buildBlockBinding(block, network)
@@ -271,7 +270,7 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
       handlerIds: [],
     }
     for (const contract of this.contractConfigs) {
-      if (contract.contract?.chainId !== getNetwork(network).chainId.toString()) {
+      if (contract.contract?.chainId !== Network.from(network).chainId.toString()) {
         continue
       }
       const longBlockNumber = block.number

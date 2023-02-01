@@ -1,8 +1,18 @@
-import { BytesLike } from '@ethersproject/bytes'
-import { Block, Log, getNetwork, TransactionReceipt } from '@ethersproject/providers'
-import { BaseContract, Event, EventFilter } from '@ethersproject/contracts'
+import {
+  Block,
+  ContractEvent,
+  Log,
+  TransactionReceipt,
+  BytesLike,
+  BaseContract,
+  Transaction,
+  DeferredTopicFilter,
+  LogDescription,
+  EventFragment,
+} from 'ethers'
+import { EventFilter, LogParams, Network } from 'ethers/providers'
 
-import { BoundContractView, ContractContext, ContractView } from './context'
+import { BoundContractView, ContractContext, ContractView } from '../core/context'
 import {
   AddressType,
   Data_EthBlock,
@@ -12,14 +22,14 @@ import {
   HandleInterval,
   ProcessResult,
 } from '@sentio/protos'
-import { BindInternalOptions, BindOptions } from './bind-options'
+import { BindInternalOptions, BindOptions } from '../core/bind-options'
 import { PromiseOrVoid } from '../promise-or-void'
 import { Trace } from './trace'
 import { ServerError, Status } from 'nice-grpc'
-import { Transaction } from 'ethers'
 
-export interface AddressOrTypeEventFilter extends EventFilter {
+export interface AddressOrTypeEventFilter extends DeferredTopicFilter {
   addressType?: AddressType
+  address?: string
 }
 
 export class EventsHandler {
@@ -74,17 +84,16 @@ export abstract class BaseProcessor<
   protected abstract CreateBoundContractView(): TBoundContractView
 
   public getChainId(): number {
-    return getNetwork(this.config.network).chainId
+    return Number(Network.from(this.config.network).chainId)
   }
 
   public onEvent(
-    handler: (event: Event, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
-    filter: EventFilter | EventFilter[],
+    handler: (event: LogDescription, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
+    filter: DeferredTopicFilter | DeferredTopicFilter[],
     fetchConfig?: EthFetchConfig
   ) {
     const chainId = this.getChainId()
-
-    let _filters: EventFilter[] = []
+    let _filters: DeferredTopicFilter[] = []
 
     if (Array.isArray(filter)) {
       _filters = filter
@@ -101,7 +110,7 @@ export abstract class BaseProcessor<
         if (!data.log) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'Log is empty')
         }
-        const log = data.log as Log
+        const log = data.log as LogParams
 
         const contractView = processor.CreateBoundContractView()
 
@@ -116,19 +125,11 @@ export abstract class BaseProcessor<
           data.transaction as Transaction,
           data.transactionReceipt as TransactionReceipt
         )
-        // let event: Event = <Event>deepCopy(log);
-        const event: Event = <Event>log
-        const parsed = contractView.rawContract.interface.parseLog(log)
-        if (parsed) {
-          event.args = parsed.args
-          event.decode = (data: BytesLike, topics?: Array<any>) => {
-            return contractView.rawContract.interface.decodeEventLog(parsed.eventFragment, data, topics)
-          }
-          event.event = parsed.name
-          event.eventSignature = parsed.signature
+        const logParam = log as any as { topics: Array<string>; data: string }
 
-          // TODO fix this bug
-          await handler(event, ctx)
+        const parsed = contractView.rawContract.interface.parseLog(logParam)
+        if (parsed) {
+          await handler(parsed, ctx)
           return ctx.getProcessResult()
         }
         return ProcessResult.fromPartial({})
@@ -200,12 +201,17 @@ export abstract class BaseProcessor<
     return this
   }
 
-  public onAllEvents(handler: (event: Log, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid) {
-    const _filters: EventFilter[] = []
+  public onAllEvents(
+    handler: (event: LogDescription, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid
+  ) {
+    const _filters: DeferredTopicFilter[] = []
     const tmpContract = this.CreateBoundContractView()
 
-    for (const key in tmpContract.filters) {
-      _filters.push(tmpContract.filters[key]())
+    for (const fragment of tmpContract.rawContract.interface.fragments) {
+      if (fragment.type === 'event') {
+        const filter = tmpContract.rawContract.filters[fragment.format()]
+        _filters.push(filter())
+      }
     }
     return this.onEvent(function (log, ctx) {
       return handler(log, ctx)
@@ -228,7 +234,7 @@ export abstract class BaseProcessor<
         const contractView = processor.CreateBoundContractView()
         const contractInterface = contractView.rawContract.interface
         const fragment = contractInterface.getFunction(signature)
-        if (!data.trace) {
+        if (!data.trace || !fragment) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'trace is null')
         }
         const trace = data.trace as Trace
@@ -236,7 +242,7 @@ export abstract class BaseProcessor<
           return ProcessResult.fromPartial({})
         }
         const traceData = '0x' + trace.action.input.slice(10)
-        trace.args = contractInterface._abiCoder.decode(fragment.inputs, traceData)
+        trace.args = contractInterface.getAbiCoder().decode(fragment.inputs, traceData)
 
         const ctx = new ContractContext<TContract, TBoundContractView>(
           contractName,

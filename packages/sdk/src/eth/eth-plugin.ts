@@ -15,8 +15,8 @@ import {
 } from '@sentio/protos'
 
 import { ServerError, Status } from 'nice-grpc'
-import { ProcessorState } from '../binds'
-import { AccountProcessorState } from './account-processor'
+import { ProcessorState } from './binds'
+import { AccountProcessorState } from './account-processor-state'
 import { ProcessorTemplateProcessorState, TemplateInstanceState } from './base-processor-template'
 
 export class EthPlugin extends Plugin {
@@ -26,7 +26,7 @@ export class EthPlugin extends Plugin {
   private traceHandlers: ((trace: Data_EthTrace) => Promise<ProcessResult>)[] = []
   private blockHandlers: ((block: Data_EthBlock) => Promise<ProcessResult>)[] = []
 
-  configure(config: ProcessConfigResponse): void {
+  async configure(config: ProcessConfigResponse) {
     // This syntax is to copy values instead of using references
     config.templateInstances = [...TemplateInstanceState.INSTANCE.getValues()]
 
@@ -93,16 +93,18 @@ export class EthPlugin extends Plugin {
         }
 
         for (const filter of eventsHandler.filters) {
-          if (!filter.topics) {
-            throw new ServerError(Status.INVALID_ARGUMENT, 'Topic should not be null')
-          }
+          const topics = await filter.getTopicFilter()
+
+          // if (!filter.topics) {
+          //   throw new ServerError(Status.INVALID_ARGUMENT, 'Topic should not be null')
+          // }
           const logFilter: LogFilter = {
             addressType: undefined,
             address: contractConfig.contract?.address,
             topics: [],
           }
 
-          for (const ts of filter.topics) {
+          for (const ts of topics) {
             let hashes: string[] = []
             if (Array.isArray(ts)) {
               hashes = hashes.concat(ts)
@@ -141,16 +143,21 @@ export class EthPlugin extends Plugin {
         }
 
         for (const filter of eventsHandler.filters) {
-          if (!filter.topics) {
-            throw new ServerError(Status.INVALID_ARGUMENT, 'Topic should not be null')
+          const topics = await filter.getTopicFilter()
+          // if (!filter.topics) {
+          //   throw new ServerError(Status.INVALID_ARGUMENT, 'Topic should not be null')
+          // }
+          let address = undefined
+          if (filter.address) {
+            address = filter.address.toString()
           }
           const logFilter: LogFilter = {
             addressType: filter.addressType,
-            address: filter.address,
+            address,
             topics: [],
           }
 
-          for (const ts of filter.topics) {
+          for (const ts of topics) {
             let hashes: string[] = []
             if (Array.isArray(ts)) {
               hashes = hashes.concat(ts)
@@ -184,7 +191,7 @@ export class EthPlugin extends Plugin {
     }
   }
 
-  start(request: StartRequest) {
+  async start(request: StartRequest) {
     for (const instance of request.templateInstances) {
       const template = ProcessorTemplateProcessorState.INSTANCE.getValues()[instance.templateId]
       if (!template) {

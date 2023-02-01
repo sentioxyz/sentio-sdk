@@ -1,6 +1,6 @@
 import { MetricValue, ProcessResult } from '@sentio/protos'
 import { Numberish, BigDecimal } from '../core'
-import { BigNumber } from 'ethers'
+import { bytesToBigInt } from '../utils/conversion'
 
 export function MetricValueToNumber(v: Partial<MetricValue> | undefined): Numberish | undefined {
   if (v === undefined) {
@@ -11,7 +11,7 @@ export function MetricValueToNumber(v: Partial<MetricValue> | undefined): Number
     return v.doubleValue
   }
   if (v.bigInteger !== undefined) {
-    let intValue = BigNumber.from(v.bigInteger.data).toBigInt()
+    let intValue = bytesToBigInt(v.bigInteger.data)
     if (v.bigInteger.negative) {
       intValue = -intValue
     }

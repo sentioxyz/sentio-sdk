@@ -2,11 +2,12 @@
 
 import { expect } from 'chai'
 
+// import { Provider, Network } from 'ethers/providers'
+
 import { TestProcessorServer, firstCounterValue, firstGaugeValue } from '../testing'
-import { BigNumber } from 'ethers'
 import { mockTransferLog } from '../builtin/erc20/test-utils'
 import { HandlerType } from '@sentio/protos'
-import { TemplateInstanceState } from '../core/base-processor-template'
+import { TemplateInstanceState } from '../eth/base-processor-template'
 
 describe('Test Basic Examples', () => {
   const service = new TestProcessorServer(() => require('./erc20'))
@@ -28,7 +29,7 @@ describe('Test Basic Examples', () => {
     const res = (await service.testBlock(blockData)).result
     expect(res?.counters).length(0)
     expect(res?.gauges).length(1)
-    expect(firstGaugeValue(res, 'g1')).equals(10n)
+    expect(firstGaugeValue(res, 'g1')).equals(10)
     expect(res?.gauges[0].metadata?.contractName).equals('x2y2')
 
     const gauge = res?.gauges?.[0]
@@ -38,22 +39,21 @@ describe('Test Basic Examples', () => {
     const res2 = (await service.testBlock(blockData, 56)).result
     expect(res2?.counters).length(0)
     expect(res2?.gauges).length(1)
-    expect(firstGaugeValue(res2, 'g2')).equals(20n)
+    expect(firstGaugeValue(res2, 'g2')).equals(20)
   })
 
   test('Check log dispatch', async () => {
     const logData = mockTransferLog('0x1E4EDE388cbc9F4b5c79681B7f94d36a11ABEBC9', {
       from: '0x0000000000000000000000000000000000000000',
       to: '0xB329e39Ebefd16f40d38f07643652cE17Ca5Bac1',
-      value: BigNumber.from('0x9a71db64810aaa0000'),
+      value: BigInt('0x9a71db64810aaa0000'),
     })
 
-    const x = TemplateInstanceState.INSTANCE.getValues()
     let res = await service.testLog(logData)
 
     const counters = res.result?.counters
     expect(counters).length(1)
-    expect(firstCounterValue(res.result, 'c1')).equals(1n)
+    expect(firstCounterValue(res.result, 'c1')).equals(1)
 
     expect(counters?.[0].metadata?.chainId).equals('1')
     expect(counters?.[0].runtimeInfo?.from).equals(HandlerType.ETH_LOG)
@@ -63,7 +63,7 @@ describe('Test Basic Examples', () => {
     logData2.address = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
     res = await service.testLog(logData2, 56)
 
-    expect(firstCounterValue(res.result, 'c2')).equals(2n)
+    expect(firstCounterValue(res.result, 'c2')).equals(2)
     expect(res.result?.counters[0].metadata?.chainId).equals('56')
 
     expect(res.result?.gauges).length(0)

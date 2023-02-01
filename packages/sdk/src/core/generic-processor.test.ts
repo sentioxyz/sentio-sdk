@@ -4,7 +4,7 @@ import { expect } from 'chai'
 
 import { HandlerType } from '@sentio/protos'
 
-import { GenericProcessor } from './generic-processor'
+import { GenericProcessor } from '../eth/generic-processor'
 import { TestProcessorServer, firstCounterValue } from '../testing'
 
 describe('Test Generic Processor', () => {
@@ -40,7 +40,7 @@ describe('Test Generic Processor', () => {
     const res = await service.testLogs([logData, logData])
     const counters = res.result?.counters
     expect(counters).length(2)
-    expect(firstCounterValue(res.result, 'event_num')).equals(1n)
+    expect(firstCounterValue(res.result, 'event_num')).equals(1)
     expect(counters?.[0].runtimeInfo?.from).equals(HandlerType.ETH_LOG)
   })
 
@@ -52,6 +52,7 @@ describe('Test Generic Processor', () => {
   })
 
   const logData = {
+    index: 0,
     blockNumber: 14213252,
     blockHash: '0x83d646fac9350b281def8c4c37626f9d8efc95df801287b848c719edf35cdbaf',
     transactionIndex: 347,

@@ -1,10 +1,17 @@
-import { BigNumber } from 'ethers'
 import { BigDecimal } from '../core/big-decimal'
 import { Numberish } from '../core'
 import { MetricValue } from '@sentio/protos'
 
-export function toBigDecimal(n: BigNumber | bigint) {
+export function toBigDecimal(n: bigint) {
   return new BigDecimal(n.toString())
+}
+
+export function bytesToBigInt(bytes: Uint8Array) {
+  let intValue = BigInt(0)
+  for (let i = 0; i < bytes.length; i++) {
+    intValue = intValue * BigInt(256) + BigInt(bytes[i])
+  }
+  return intValue
 }
 
 export function metricValueToNumberish(v: MetricValue): Numberish {
@@ -12,11 +19,11 @@ export function metricValueToNumberish(v: MetricValue): Numberish {
     return v.doubleValue
   }
   if (v.bigInteger) {
-    const bn = BigNumber.from(v.bigInteger.data)
+    let intValue = bytesToBigInt(v.bigInteger.data)
     if (v.bigInteger.negative) {
-      return BigNumber.from(0).sub(bn)
+      intValue = -intValue
     }
-    return bn
+    return intValue
   }
 
   if (v.bigDecimal) {

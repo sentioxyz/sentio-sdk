@@ -1,14 +1,13 @@
-import { BoundContractView, ContractContext, ContractView } from './context'
-import { Block } from '@ethersproject/abstract-provider'
-import { BaseContract, EventFilter } from 'ethers'
-import { Event } from '@ethersproject/contracts'
-import { BaseProcessor } from './base-processor'
-import { BindOptions, getOptionsSignature } from './bind-options'
+import { BoundContractView, ContractContext, ContractView } from '../core/context'
+import { BaseContract, ContractEvent, Block, LogDescription } from 'ethers'
+import { AddressOrTypeEventFilter, BaseProcessor } from './base-processor'
+import { BindOptions, getOptionsSignature } from '../core/bind-options'
 import { EthFetchConfig, HandleInterval, TemplateInstance } from '@sentio/protos'
-import { getNetwork } from '@ethersproject/providers'
 import { PromiseOrVoid } from '../promise-or-void'
 import { Trace } from './trace'
 import { ListStateStorage } from '@sentio/runtime'
+import { EventFilter, LogParams, Network } from 'ethers/providers'
+import { DeferredTopicFilter } from 'ethers/contract'
 
 export class ProcessorTemplateProcessorState extends ListStateStorage<
   BaseProcessorTemplate<BaseContract, BoundContractView<BaseContract, any>>
@@ -37,8 +36,8 @@ export abstract class BaseProcessorTemplate<
     fetchConfig?: EthFetchConfig
   }[] = []
   eventHandlers: {
-    handler: (event: Event, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid
-    filter: EventFilter | EventFilter[]
+    handler: (event: LogDescription, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid
+    filter: DeferredTopicFilter | DeferredTopicFilter[]
     fetchConfig?: EthFetchConfig
   }[] = []
 
@@ -71,7 +70,7 @@ export abstract class BaseProcessorTemplate<
       contract: {
         address: options.address,
         name: options.name || '',
-        chainId: options.network ? getNetwork(options.network).chainId.toString() : '1',
+        chainId: options.network ? Network.from(options.network).chainId.toString() : '1',
         abi: '',
       },
       startBlock: 0n,
@@ -88,8 +87,8 @@ export abstract class BaseProcessorTemplate<
   }
 
   public onEvent(
-    handler: (event: Event, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
-    filter: EventFilter | EventFilter[],
+    handler: (event: LogDescription, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
+    filter: DeferredTopicFilter | DeferredTopicFilter[],
     fetchConfig?: EthFetchConfig
   ) {
     this.eventHandlers.push({

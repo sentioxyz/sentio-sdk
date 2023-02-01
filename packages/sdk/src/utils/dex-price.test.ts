@@ -6,7 +6,7 @@ import { expect } from 'chai'
 
 describe('dex price tests', () => {
   State.reset()
-  Endpoints.reset()
+  // Endpoints.reset()
 
   const haveProviders = loadTestProvidersFromEnv(['1', '5'])
 

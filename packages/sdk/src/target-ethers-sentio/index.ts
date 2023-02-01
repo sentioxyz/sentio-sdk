@@ -1,4 +1,4 @@
-import Ethers from '@typechain/ethers-v5'
+import Ethers from '@sentio/ethers-v6'
 import { Config, extractAbi, extractDocumentation, FileDescription, parse, shortenFullJsonFilePath } from 'typechain'
 import { dirname, join, relative } from 'path'
 import { codeGenIndex, codeGenSentioFile, codeGenTestUtilsFile } from './file'

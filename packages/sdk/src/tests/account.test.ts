@@ -3,9 +3,8 @@
 import { assert, expect } from 'chai'
 
 import { firstCounterValue, TestProcessorServer } from '../testing'
-import { BigNumber } from 'ethers'
 import { mockTransferLog } from '../builtin/erc20/test-utils'
-import { AccountProcessor } from '../core/account-processor'
+import { AccountProcessor } from '../eth/account-processor'
 
 describe(' erc20 account transfer Examples', () => {
   const ADDRESS = '0x1000000000000000000000000000000000000000'
@@ -44,12 +43,12 @@ describe(' erc20 account transfer Examples', () => {
       mockTransferLog('0x1E4EDE388cbc9F4b5c79681B7f94d36a11ABEBC9', {
         from: ADDRESS,
         to: '0xB329e39Ebefd16f40d38f07643652cE17Ca5Bac1',
-        value: BigNumber.from(100),
+        value: BigInt(100),
       }),
       mockTransferLog('0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', {
         from: '0xB329e39Ebefd16f40d38f07643652cE17Ca5Bac1',
         to: ADDRESS,
-        value: BigNumber.from(200),
+        value: BigInt(200),
       }),
     ])
 

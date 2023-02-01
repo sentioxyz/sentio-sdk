@@ -9,7 +9,7 @@ import { Instruction as SolInstruction } from '@project-serum/anchor/dist/cjs/co
 export class SolanaPlugin extends Plugin {
   name: string = 'SolanaPlugin'
 
-  configure(config: ProcessConfigResponse): void {
+  async configure(config: ProcessConfigResponse) {
     // Part 2, prepare solana constractors
     for (const solanaProcessor of SolanaProcessorState.INSTANCE.getValues()) {
       const contractConfig: ContractConfig = {

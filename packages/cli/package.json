@@ -2,7 +2,7 @@
   "name": "@sentio/cli",
   "license": "Apache-2.0",
   "private": true,
-  "version": "1.0.0-development",
+  "version": "2.0.0-development",
   "scripts": {
     "compile": "tsc -p . && cp src/webpack.config.js lib/",
     "build": "yarn compile",
@@ -31,7 +31,7 @@
     "@types/command-line-usage": "^5.0.2",
     "@types/expect": "^24.3.0",
     "@types/express": "^4.17.14",
-    "@types/fs-extra": "^9.0.13",
+    "@types/fs-extra": "^11.0.1",
     "@types/js-yaml": "^4.0.5",
     "@types/node": "^18.0.4",
     "@types/node-fetch": "^2.6.2"

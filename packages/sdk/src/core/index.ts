@@ -6,13 +6,7 @@ export { type Numberish, toBigInteger, toMetricValue, toBlockTag } from './numbe
 
 export { BindOptions } from './bind-options'
 
-export { BaseProcessor } from './base-processor'
-export { GenericProcessor } from './generic-processor'
-export { BaseProcessorTemplate } from './base-processor-template'
 export { SuiBaseProcessor, SuiBindOptions } from './sui-processor'
 
-export type { TypedCallTrace, Trace } from './trace'
-
-export { EthPlugin } from './eth-plugin'
 export { SuiPlugin } from './sui-plugin'
 export { CorePlugin } from './core-plugin'

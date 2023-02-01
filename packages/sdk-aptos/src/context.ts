@@ -2,7 +2,7 @@ import { RecordMetaData } from '@sentio/protos'
 import { Labels } from '@sentio/sdk/lib/core/metadata'
 import { normalizeLabels } from '@sentio/sdk/lib/core/meter'
 import { BaseContext } from '@sentio/sdk/lib/core/base-context'
-import { Transaction_UserTransaction } from 'aptos-sdk/src/generated'
+import { Transaction_UserTransaction } from './move-types'
 import { AptosNetwork, getChainId } from './network'
 
 export class AptosContext extends BaseContext {

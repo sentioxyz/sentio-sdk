@@ -22,6 +22,7 @@ ignore:
   - .git
   - .idea
   - .github
+  - tsconfig.mjs.json
   - docs
   - node_modules
   - packages/cli/node_modules

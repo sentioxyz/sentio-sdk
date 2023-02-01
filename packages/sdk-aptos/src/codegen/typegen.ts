@@ -1,4 +1,4 @@
-import { MoveModule } from 'aptos-sdk/src/generated'
+import { MoveModule } from '../move-types'
 import { parseMoveType, TypeDescriptor } from '../types'
 import { moduleQname, moduleQnameForType, SPLITTER, VECTOR_STR } from '../utils'
 

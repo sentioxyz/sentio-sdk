@@ -4,8 +4,8 @@ export abstract class Plugin {
   name: string
   supportedHandlers: HandlerType[] = []
 
-  configure(config: ProcessConfigResponse) {}
-  start(start: StartRequest) {}
+  async configure(config: ProcessConfigResponse): Promise<void> {}
+  async start(start: StartRequest): Promise<void> {}
   stateDiff(config: ProcessConfigResponse): boolean {
     return false
   }
@@ -36,11 +36,11 @@ export class PluginManager {
   }
 
   configure(config: ProcessConfigResponse) {
-    this.plugins.forEach((plugin) => plugin.configure(config))
+    return Promise.all(this.plugins.map((plugin) => plugin.configure(config)))
   }
 
   start(start: StartRequest) {
-    this.plugins.forEach((plugin) => plugin.start(start))
+    return Promise.all(this.plugins.map((plugin) => plugin.start(start)))
   }
 
   stateDiff(config: ProcessConfigResponse): boolean {

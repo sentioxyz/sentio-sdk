@@ -1,8 +1,4 @@
-import {
-  MoveResource,
-  Transaction_UserTransaction,
-  TransactionPayload_EntryFunctionPayload,
-} from 'aptos-sdk/src/generated'
+import { MoveResource, Transaction_UserTransaction, TransactionPayload_EntryFunctionPayload } from './move-types'
 
 import { MOVE_CODER, MoveCoder } from './move-coder'
 import { AptosBindOptions, AptosNetwork, getChainId } from './network'

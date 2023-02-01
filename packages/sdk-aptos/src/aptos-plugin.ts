@@ -24,7 +24,7 @@ export class AptosPlugin extends Plugin {
   private aptosCallHandlers: ((func: Data_AptCall) => Promise<ProcessResult>)[] = []
   private aptosResourceHandlers: ((resourceWithVersion: Data_AptResource) => Promise<ProcessResult>)[] = []
 
-  configure(config: ProcessConfigResponse): void {
+  async configure(config: ProcessConfigResponse) {
     for (const aptosProcessor of AptosProcessorState.INSTANCE.getValues()) {
       const contractConfig: ContractConfig = {
         transactionConfig: [],
