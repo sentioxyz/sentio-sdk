@@ -1,4 +1,4 @@
-import { SPLITTER, VECTOR_STR } from './utils'
+import { SPLITTER, VECTOR_STR } from './utils.js'
 
 export class TypeDescriptor {
   // type: string

@@ -1,9 +1,9 @@
-import { MoveResource, Transaction_UserTransaction, TransactionPayload_EntryFunctionPayload } from './move-types'
+import { MoveResource, Transaction_UserTransaction, TransactionPayload_EntryFunctionPayload } from './move-types.js'
 
-import { MOVE_CODER, MoveCoder } from './move-coder'
-import { AptosBindOptions, AptosNetwork, getChainId } from './network'
-import { AptosContext, AptosResourceContext } from './context'
-import { EventInstance } from './models'
+import { MOVE_CODER, MoveCoder } from './move-coder.js'
+import { AptosBindOptions, AptosNetwork, getChainId } from './network.js'
+import { AptosContext, AptosResourceContext } from './context.js'
+import { EventInstance } from './models.js'
 import { ListStateStorage } from '@sentio/runtime'
 import {
   AptosFetchConfig,

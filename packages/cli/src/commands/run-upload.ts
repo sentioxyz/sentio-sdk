@@ -1,16 +1,16 @@
 import commandLineArgs from 'command-line-args'
 import commandLineUsage from 'command-line-usage'
-import { finalizeHost, FinalizeProjectName, SentioProjectConfig } from '../config'
+import { finalizeHost, FinalizeProjectName, SentioProjectConfig } from '../config.js'
 import { URL } from 'url'
 import fetch from 'node-fetch'
-import { buildProcessor } from '../build'
+import { buildProcessor } from '../build.js'
 import chalk from 'chalk'
 import path from 'path'
-import { ReadKey } from '../key'
+import { ReadKey } from '../key.js'
 import fs from 'fs'
 import { createHash } from 'crypto'
 import { execSync } from 'child_process'
-import { getSdkVersion } from '../utils'
+import { getSdkVersion } from '../utils.js'
 import readline from 'readline'
 
 export async function runUpload(processorConfig: SentioProjectConfig, argv: string[]) {
@@ -85,7 +85,7 @@ export async function runUpload(processorConfig: SentioProjectConfig, argv: stri
 async function createProject(options: SentioProjectConfig, apiKey: string) {
   const url = new URL('/api/v1/projects', options.host)
   const [ownerName, slug] = options.project.includes('/') ? options.project.split('/') : [undefined, options.project]
-  return fetch(url, {
+  return fetch(url.href, {
     method: 'POST',
     headers: {
       'api-key': apiKey,
@@ -144,8 +144,8 @@ export async function uploadFile(options: SentioProjectConfig, apiKeyOverride: s
     // get gcs upload url
     const initUploadResRaw = await initUpload(options.host, apiKey, options.project, getSdkVersion())
     if (!initUploadResRaw.ok) {
-      console.error(chalk.red('Failed to get upload url'))
-      console.error(chalk.red((await initUploadResRaw.json()).message))
+      // console.error(chalk.red('Failed to get upload url'))
+      console.error(chalk.red(((await initUploadResRaw.json()) as { message: string }).message))
 
       if (initUploadResRaw.status === 404) {
         // create project if not exist
@@ -162,7 +162,7 @@ export async function uploadFile(options: SentioProjectConfig, apiKeyOverride: s
             const res = await createProject(options, apiKey)
             if (!res.ok) {
               console.error(chalk.red('Create Project Failed'))
-              console.error(chalk.red((await res.json()).message))
+              console.error(chalk.red(((await res.json()) as { message: string }).message))
               return
             }
             console.log(chalk.green('Project created'))
@@ -177,8 +177,8 @@ export async function uploadFile(options: SentioProjectConfig, apiKeyOverride: s
       }
       return
     }
-    const initUploadRes = await initUploadResRaw.json()
-    const uploadUrl = initUploadRes['url'] as string
+    const initUploadRes = (await initUploadResRaw.json()) as { url: string }
+    const uploadUrl = initUploadRes.url
 
     // do actual uploading
     const file = fs.createReadStream(PROCESSOR_FILE)
@@ -217,7 +217,10 @@ export async function uploadFile(options: SentioProjectConfig, apiKeyOverride: s
     if (commitSha) {
       console.log('\t', chalk.blue('Git commit SHA:'), commitSha)
     }
-    const { projectFullSlug, version } = await finishUploadResRaw.json()
+    const { projectFullSlug, version } = (await finishUploadResRaw.json()) as {
+      projectFullSlug: string
+      version: string
+    }
     console.log('\t', chalk.blue('Check status:'), `${options.host}/${projectFullSlug}/datasource`)
     console.log('\t', chalk.blue('Version:'), version)
   }
@@ -246,7 +249,7 @@ export async function uploadFile(options: SentioProjectConfig, apiKeyOverride: s
 
 async function initUpload(host: string, apiKey: string, projectSlug: string, sdkVersion: string) {
   const initUploadUrl = new URL(`/api/v1/processors/init_upload`, host)
-  return fetch(initUploadUrl, {
+  return fetch(initUploadUrl.href, {
     method: 'POST',
     headers: {
       'api-key': apiKey,
@@ -269,7 +272,7 @@ async function finishUpload(
   debug: boolean
 ) {
   const finishUploadUrl = new URL(`/api/v1/processors/finish_upload`, host)
-  return fetch(finishUploadUrl, {
+  return fetch(finishUploadUrl.href, {
     method: 'POST',
     headers: {
       'api-key': apiKey,

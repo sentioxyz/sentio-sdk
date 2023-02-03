@@ -1,9 +1,9 @@
 import express from 'express'
-import { getAuthConfig, getFinalizedHost } from '../config'
+import { getAuthConfig, getFinalizedHost } from '../config.js'
 import url, { URL } from 'url'
 import fetch from 'node-fetch'
-import { getCliVersion } from '../utils'
-import { WriteKey } from '../key'
+import { getCliVersion } from '../utils.js'
+import { WriteKey } from '../key.js'
 import chalk from 'chalk'
 import http from 'http'
 import os from 'os'
@@ -26,7 +26,7 @@ export function startServer(params: AuthParams) {
 }
 
 app.get('/callback', async (req, res) => {
-  const fail = function(...args: any[]) {
+  const fail = function (...args: any[]) {
     console.error(chalk.red(args))
     res.end(args.toString())
     server.close()
@@ -45,8 +45,8 @@ app.get('/callback', async (req, res) => {
     fail(`Failed to get access token: ${tokenResRaw.status} ${tokenResRaw.statusText}`)
     return
   }
-  const tokenRes = await tokenResRaw.json()
-  const accessToken = tokenRes['access_token']
+  const tokenRes = (await tokenResRaw.json()) as { access_token: string }
+  const accessToken = tokenRes.access_token
 
   // check if the account is ready
   const userResRaw = await getUser(host, accessToken)
@@ -58,7 +58,7 @@ app.get('/callback', async (req, res) => {
     }
     return
   }
-  const userRes = await userResRaw.json()
+  const userRes = (await userResRaw.json()) as { emailVerified: boolean }
   if (!userRes.emailVerified) {
     fail('Your account is not verified, please verify your email first')
     return
@@ -71,11 +71,11 @@ app.get('/callback', async (req, res) => {
     fail(`Failed to create API key: ${createApiKeyResRaw.status} ${createApiKeyResRaw.statusText}`)
     return
   }
-  const createApiKeyRes = await createApiKeyResRaw.json()
-  const apiKey = createApiKeyRes['key']
+  const createApiKeyRes = (await createApiKeyResRaw.json()) as { key: string }
+  const apiKey = createApiKeyRes.key
   WriteKey(host, apiKey)
 
-  res.end("Login success, please go back to CLI to continue")
+  res.end('Login success, please go back to CLI to continue')
   console.log(chalk.green('Login success, new API key: ' + apiKey))
 
   server.close()
@@ -101,7 +101,7 @@ async function getToken(host: string, code: string) {
 
 async function createApiKey(host: string, name: string, source: string, accessToken: string) {
   const createApiKeyUrl = new URL('/api/v1/keys', host)
-  return fetch(createApiKeyUrl, {
+  return fetch(createApiKeyUrl.href, {
     method: 'POST',
     headers: {
       Authorization: 'Bearer ' + accessToken,
@@ -117,7 +117,7 @@ async function createApiKey(host: string, name: string, source: string, accessTo
 
 async function getUser(host: string, accessToken: string) {
   const getUserUrl = new URL('/api/v1/users', host)
-  return fetch(getUserUrl, {
+  return fetch(getUserUrl.href, {
     method: 'GET',
     headers: {
       Authorization: 'Bearer ' + accessToken,

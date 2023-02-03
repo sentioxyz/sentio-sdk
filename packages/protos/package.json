@@ -2,6 +2,7 @@
   "name": "@sentio/protos",
   "license": "Apache-2.0",
   "version": "2.0.0-development",
+  "type": "module",
   "scripts": {
     "compile": "tsc -p .",
     "clean": "tsc --build --clean",
@@ -11,9 +12,11 @@
     "google-protobuf": "^3.15.8",
     "nice-grpc": "^2.0.0"
   },
-  "main": "./lib/index.js",
-  "types": "./lib/index.d.ts",
-  "module": "./lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./price": "./lib/service/price/protos/price.js",
+    "./chainquery": "./lib/chainquery/protos/chainquery.js"
+  },
   "files": [
     "{lib,src}",
     "!{lib,src}/tests",

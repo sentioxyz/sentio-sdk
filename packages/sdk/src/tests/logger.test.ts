@@ -1,11 +1,10 @@
 import { assert, expect } from 'chai'
 
-import { TestProcessorServer } from '../testing'
-import { mockApprovalLog, mockTransferLog } from '../builtin/erc20/test-utils'
-import { ERC20Processor } from '../builtin/internal/erc20_processor'
+import { TestProcessorServer } from '@sentio/sdk/testing'
+import { ERC20Processor, mockApprovalLog, mockTransferLog } from '../builtin/erc20/index.js'
 
 describe('Test Error Capture', () => {
-  const service = new TestProcessorServer(() => {
+  const service = new TestProcessorServer(async () => {
     ERC20Processor.bind({ address: '0x80009ff8154bd5653c6dda2fa5f5053e5a5c1a91' })
       .onEventApproval((evt, ctx) => {
         ctx.logger.info(`approve ${evt.args}`)

@@ -1,7 +1,7 @@
 import Ethers from '@sentio/ethers-v6'
 import { Config, extractAbi, extractDocumentation, FileDescription, parse, shortenFullJsonFilePath } from 'typechain'
 import { dirname, join, relative } from 'path'
-import { codeGenIndex, codeGenSentioFile, codeGenTestUtilsFile } from './file'
+import { codeGenIndex, codeGenSentioFile, codeGenTestUtilsFile } from './file.cjs'
 
 export default class EthersSentio extends Ethers {
   constructor(config: Config) {
@@ -53,6 +53,9 @@ export default class EthersSentio extends Ethers {
     for (const [idx, file] of files.entries()) {
       if (file.path.endsWith('__factory.ts')) {
         file.contents = '// @ts-nocheck\n' + file.contents
+      }
+      if (file.path.endsWith('factories/index.ts')) {
+        file.contents = file.contents.replaceAll("__factory'", "__factory.js'")
       }
     }
     return files

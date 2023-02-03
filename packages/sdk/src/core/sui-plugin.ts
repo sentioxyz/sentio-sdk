@@ -3,8 +3,8 @@ import { ContractConfig, DataBinding, HandlerType, ProcessConfigResponse, Proces
 
 import { ServerError, Status } from 'nice-grpc'
 
-import { CHAIN_IDS } from '../utils/chain'
-import { SuiProcessorState } from './sui-processor'
+import { CHAIN_IDS } from '../utils/chain.js'
+import { SuiProcessorState } from './sui-processor.js'
 
 export class SuiPlugin extends Plugin {
   name: string = 'SuiPlugin'

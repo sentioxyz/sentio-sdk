@@ -1,6 +1,6 @@
 import { State, Endpoints } from '@sentio/runtime'
-import { getERC20TokenInfo } from './token'
-import { loadTestProvidersFromEnv } from '../testing/test-provider'
+import { getERC20TokenInfo } from './token.js'
+import { loadTestProvidersFromEnv } from '../testing/test-provider.js'
 
 describe('erc20 tests', () => {
   State.reset()

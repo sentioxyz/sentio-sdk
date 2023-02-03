@@ -1,4 +1,4 @@
-export { TestProcessorServer } from './test-processor-server'
-export { MetricValueToNumber, firstCounterValue, firstGaugeValue } from './metric-utils'
+export { TestProcessorServer } from './test-processor-server.js'
+export { MetricValueToNumber, firstCounterValue, firstGaugeValue } from './metric-utils.js'
 
-// export { loadTestProvidersFromEnv } from './test-provider' // TODO make the interface more standard and then export
+export { loadTestProvidersFromEnv } from './test-provider.js' // TODO make the interface more standard and then export

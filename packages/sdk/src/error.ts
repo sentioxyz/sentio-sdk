@@ -1,5 +1,5 @@
 // Transform error in more readable format
-import { ContractContext } from './core/context'
+import { ContractContext } from './core/context.js'
 // import { errors } from 'ethers/providers'
 
 export class EthersError extends Error {

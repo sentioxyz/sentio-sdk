@@ -1,7 +1,7 @@
 /* eslint-disable */
 import Long from "long";
 import type { CallContext, CallOptions } from "nice-grpc-common";
-import _m0 from "protobufjs/minimal";
+import _m0 from "protobufjs/minimal.js";
 
 export interface AptosGetTxnsByFunctionRequest {
   network: string;
@@ -1174,6 +1174,36 @@ export interface EvmQueryClient<CallOptionsExt = {}> {
     request: DeepPartial<EvmGetHeaderRequest>,
     options?: CallOptions & CallOptionsExt,
   ): Promise<VoidResponse>;
+}
+
+export type SuiQueryDefinition = typeof SuiQueryDefinition;
+export const SuiQueryDefinition = {
+  name: "SuiQuery",
+  fullName: "chainquery.SuiQuery",
+  methods: {
+    suiSQLQuery: {
+      name: "SuiSQLQuery",
+      requestType: EvmSQLQueryRequest,
+      requestStream: false,
+      responseType: EvmQueryResponse,
+      responseStream: true,
+      options: {},
+    },
+  },
+} as const;
+
+export interface SuiQueryServiceImplementation<CallContextExt = {}> {
+  suiSQLQuery(
+    request: EvmSQLQueryRequest,
+    context: CallContext & CallContextExt,
+  ): ServerStreamingMethodResult<DeepPartial<EvmQueryResponse>>;
+}
+
+export interface SuiQueryClient<CallOptionsExt = {}> {
+  suiSQLQuery(
+    request: DeepPartial<EvmSQLQueryRequest>,
+    options?: CallOptions & CallOptionsExt,
+  ): AsyncIterable<EvmQueryResponse>;
 }
 
 declare var self: any | undefined;

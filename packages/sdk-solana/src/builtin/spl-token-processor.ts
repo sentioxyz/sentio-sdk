@@ -1,6 +1,6 @@
 import { SolanaBaseProcessor, SolanaContext, SolanaBindOptions } from '@sentio/sdk-solana'
 import { Instruction } from '@project-serum/anchor'
-import { AmountToUiAmount, Approve, ApproveChecked, Burn, BurnChecked, CloseAccount, CreateNativeMint, DefaultAccountStateExtension, FreezeAccount, GetAccountDataSize, InitializeAccount, InitializeAccount2, InitializeAccount3, InitializeImmutableOwner, InitializeMint, InitializeMintCloseAuthority, InitializeMultisig, MemoTransferExtension, MintTo, MintToChecked, Reallocate, Revoke, SyncNative, ThawAccount, Transfer, TransferChecked, TransferFeeExtension, UiAmountToAmount } from './types';
+import { AmountToUiAmount, Approve, ApproveChecked, Burn, BurnChecked, CloseAccount, CreateNativeMint, DefaultAccountStateExtension, FreezeAccount, GetAccountDataSize, InitializeAccount, InitializeAccount2, InitializeAccount3, InitializeImmutableOwner, InitializeMint, InitializeMintCloseAuthority, InitializeMultisig, MemoTransferExtension, MintTo, MintToChecked, Reallocate, Revoke, SyncNative, ThawAccount, Transfer, TransferChecked, TransferFeeExtension, UiAmountToAmount } from './types.js';
 
 export class SPLTokenProcessor extends SolanaBaseProcessor {
   static bind(options: SolanaBindOptions): SPLTokenProcessor {

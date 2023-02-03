@@ -4,10 +4,7 @@
     "inlineSources": true,
     "rootDir": "./src",
     "baseUrl": "./src",
-    "paths": {
-      "@sentio/sdk": ["."]
-    },
     "outDir": "lib"
   },
-  "exclude": ["lib", "src/target-ethers-sentio", "../sdk-aptos/src/codegen"]
+  "exclude": ["lib", "jest.config.ts", "src/tsup.config.ts", "src/target-ethers-sentio"]
 }

@@ -1,10 +1,10 @@
 /* eslint-disable */
 import Long from "long";
 import type { CallContext, CallOptions } from "nice-grpc-common";
-import _m0 from "protobufjs/minimal";
-import { Empty } from "../../google/protobuf/empty";
-import { Struct } from "../../google/protobuf/struct";
-import { Timestamp } from "../../google/protobuf/timestamp";
+import _m0 from "protobufjs/minimal.js";
+import { Empty } from "../../google/protobuf/empty.js";
+import { Struct } from "../../google/protobuf/struct.js";
+import { Timestamp } from "../../google/protobuf/timestamp.js";
 
 export enum MetricType {
   UNKNOWN_TYPE = 0,

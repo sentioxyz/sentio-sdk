@@ -15,9 +15,9 @@ import {
 } from '@sentio/protos'
 
 import { ServerError, Status } from 'nice-grpc'
-import { ProcessorState } from './binds'
-import { AccountProcessorState } from './account-processor-state'
-import { ProcessorTemplateProcessorState, TemplateInstanceState } from './base-processor-template'
+import { ProcessorState } from './binds.js'
+import { AccountProcessorState } from './account-processor-state.js'
+import { ProcessorTemplateProcessorState, TemplateInstanceState } from './base-processor-template.js'
 
 export class EthPlugin extends Plugin {
   name: string = 'EthPlugin'

@@ -1,4 +1,4 @@
-import { MoveFunction, MoveModule } from './move-types'
+import { MoveFunction, MoveModule } from './move-types.js'
 
 export const SPLITTER = '::'
 

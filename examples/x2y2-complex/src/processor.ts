@@ -1,10 +1,9 @@
-import { AccountEventTracker, Counter, Gauge } from '@sentio/sdk'
-import { token } from '@sentio/sdk/lib/utils'
-import { ERC20Processor } from '@sentio/sdk/lib/builtin/erc20'
-import { X2y2Processor } from './types/x2y2'
+import { AccountEventTracker, Counter, Gauge, Exporter } from '@sentio/sdk'
+import { token } from '@sentio/sdk/utils'
+import { ERC20Processor } from '@sentio/sdk/builtin'
+import { X2y2Processor } from './types/x2y2/index.js'
 
 // import { AggregationType } from '@sentio/sdk/lib/gen/processor/protos/processor'
-import { Exporter } from '@sentio/sdk/lib/core/exporter'
 
 const rewardPerBlock = Gauge.register('reward_per_block', {
   description: 'rewards for each block grouped by phase',

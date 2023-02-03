@@ -1,5 +1,5 @@
 import { EventDeclaration, Contract, getFullSignatureAsSymbolForEvent } from 'typechain'
-import { getFullSignatureForEventPatched } from './types'
+import { getFullSignatureForEventPatched } from './types.cjs'
 import { generateEventInputs } from '@sentio/ethers-v6/dist/codegen/events'
 
 export function generateEventHandler(event: EventDeclaration, contractName: string, includeArgTypes: boolean): string {

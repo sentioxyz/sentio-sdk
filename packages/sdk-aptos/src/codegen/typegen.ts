@@ -1,6 +1,6 @@
-import { MoveModule } from '../move-types'
-import { parseMoveType, TypeDescriptor } from '../types'
-import { moduleQname, moduleQnameForType, SPLITTER, VECTOR_STR } from '../utils'
+import { MoveModule } from '../move-types.js'
+import { parseMoveType, TypeDescriptor } from '../types.js'
+import { moduleQname, moduleQnameForType, SPLITTER, VECTOR_STR } from '../utils.js'
 
 function generateTypeForDescriptor(type: TypeDescriptor, currentAddress: string): string {
   // TODO &signer is defintely an address, but what if &OTHER_TYPE?

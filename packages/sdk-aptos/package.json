@@ -6,23 +6,31 @@
     "compile": "tsc -p .",
     "build": "yarn gen && yarn gen_test &&  yarn compile",
     "build_all": "yarn lerna run --scope=@sentio/sdk-aptos build --include-dependencies",
-    "test": "yarn gen_test && yarn jest",
-    "gen": "ts-node  src/run-codegen.ts src/abis src/builtin",
-    "gen_test": "ts-node   src/run-codegen.ts src/tests/abis src/tests/types"
+    "test": "NODE_OPTIONS=--experimental-vm-modules yarn jest",
+    "gen": "ts-node-esm  src/run-codegen.ts src/abis src/builtin",
+    "gen_test": "ts-node-esm  src/run-codegen.ts src/tests/abis src/tests/types"
   },
   "dependencies": {
     "@sentio/sdk": "2.0.0-development",
-    "chalk": "^4.1.0",
-    "aptos-sdk": "npm:aptos@^1.6.0",
+    "chalk": "^5.2.0",
+    "aptos-sdk": "npm:@sentio/aptos@^1.6.0",
     "prettier": "^2.8.1",
     "@types/prettier": "^2.7.2"
   },
-  "main": "./lib/index.js",
-  "types": "./lib/index.d.ts",
-  "module": "./lib/index.js",
+  "type": "module",
+  "exports": {
+    ".": "./lib/index.js",
+    "./builtin": "./lib/builtin/index.js",
+    "./builtin/0x1": "./lib/builtin/0x1.js",
+    "./builtin/0x3": "./lib/builtin/0x3.js",
+    "./codegen": "./lib/codegen/index.js"
+  },
   "files": [
     "{lib,src}",
     "!{lib,src}/tests",
     "!**/*.test.{js,ts}"
-  ]
+  ],
+  "typedoc": {
+    "entryPoint": "./src/index.ts"
+  }
 }

@@ -2,6 +2,20 @@ import chalk from 'chalk'
 import path from 'path'
 import fs from 'fs'
 import { exec } from 'child_process'
+import * as process from 'process'
+import { createRequire } from 'module'
+const require = createRequire(import.meta.url)
+
+function getPackageRoot(pkgId: string): string {
+  const m = require.resolve(pkgId)
+
+  let dir = path.dirname(m)
+  while (!fs.existsSync(path.join(dir, 'package.json'))) {
+    dir = path.dirname(dir)
+  }
+
+  return dir
+}
 
 export async function buildProcessor(onlyGen: boolean) {
   if (!onlyGen) {
@@ -16,13 +30,13 @@ export async function buildProcessor(onlyGen: boolean) {
   if (!onlyGen) {
     let WEBPACK_CONFIG: string
     try {
-      WEBPACK_CONFIG = require.resolve('@sentio/sdk/lib/webpack.config.js')
+      WEBPACK_CONFIG = path.resolve(getPackageRoot('@sentio/sdk'), 'lib/tsup.config.ts')
     } catch (e) {
-      // In the future this should not need unless using very old sdk
-      WEBPACK_CONFIG = path.join(__dirname, 'webpack.config.js')
+      console.error(chalk.red("Wrong CLI version for sdk, can't find tsup.config.ts"))
+      process.exit(1)
     }
     await execStep('yarn tsc -p .', 'Compile')
-    await execStep('yarn webpack --config=' + WEBPACK_CONFIG, 'Packaging')
+    await execStep('yarn tsup --config=' + WEBPACK_CONFIG, 'Packaging')
   }
 }
 
@@ -30,15 +44,15 @@ async function buildProcessorForTarget(onlyGen: boolean) {
   await codeGenEthersProcessor(path.join('abis', 'evm'))
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const solanaModule = require('@sentio/sdk-solana/lib/codegen/codegen')
-    solanaModule.codeGenSolanaProcessor(path.join('abis', 'solana'))
+    // @ts-ignore dynamic import
+    const codegen = await import('@sentio/sdk-solana/codegen')
+    codegen.codeGenSolanaProcessor(path.join('abis', 'solana'))
   } catch (e) {}
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const aptosModuole = require('@sentio/sdk-aptos/lib/codegen/codegen')
-    aptosModuole.codeGenAptosProcessor(path.join('abis', 'aptos'))
+    // @ts-ignore dynamic import
+    const codegen = await import('@sentio/sdk-aptos/codegen')
+    codegen.codeGenAptosProcessor(path.join('abis', 'aptos'))
   } catch (e) {}
 
   if (onlyGen) {
@@ -52,7 +66,7 @@ async function installDeps() {
 
 export async function codeGenEthersProcessor(
   abisDir: string,
-  ETHERS_TARGET = path.dirname(require.resolve('@sentio/sdk/lib/target-ethers-sentio')),
+  ETHERS_TARGET = path.resolve(getPackageRoot('@sentio/sdk'), 'lib/target-ethers-sentio/index.cjs'),
   outDir = 'src/types/internal'
 ) {
   if (!fs.existsSync(abisDir)) {

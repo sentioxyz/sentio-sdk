@@ -9,10 +9,10 @@ ls:
   .css: kebab-case
   .png: kebab-case
   .jpg: kebab-case
-  .json: kebab-case | regex:.[a-z0-9]+
+  .json: kebab-case | regex:.[a-z0-9]+ | regex:tsconfig[a-z0-9.]*
   .js: kebab-case
   .config.js: kebab-case
-  .ts: kebab-case | regex:_[a-z0-9]+
+  .ts: kebab-case | regex:_[a-z0-9]+ | regex:[a-z0-9]+.config
   .tsx: kebab-case | regex:_[a-z0-9]+ | regex:[[a-z0-9]+]
   .test.ts: kebab-case
   .test.tsx: kebab-case
@@ -22,7 +22,6 @@ ignore:
   - .git
   - .idea
   - .github
-  - tsconfig.mjs.json
   - docs
   - node_modules
   - packages/cli/node_modules

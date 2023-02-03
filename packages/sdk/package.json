@@ -2,38 +2,42 @@
   "name": "@sentio/sdk",
   "license": "Apache-2.0",
   "version": "2.0.0-development",
+  "type": "module",
   "scripts": {
     "compile_target": "yarn tsc -b src/target-ethers-sentio/tsconfig.json",
-    "compile": "tsc -p . && cp src/utils/*.csv lib/utils && cp src/webpack.config.js lib",
+    "compile": "tsc -p . && cp src/utils/*.csv lib/utils && cp src/tsup.config.ts lib",
     "build": "yarn gen && yarn compile",
     "build_all": "yarn lerna run --scope=@sentio/sdk build --include-dependencies",
-    "start_ts": "ts-node --files ../runtime/src/processor-runner.ts  --log-format=json ../../examples/x2y2/src/processor.ts",
-    "start": "ts-node --files ../runtime/src/processor-runner.ts ../../examples/aptos/dist/lib.js",
-    "start_js": "node lib/processor-runner.js ../examples/aptos/dist/lib.js",
-    "ts-start": "ts-node --files ../runtime/src/processor-runner.ts ./src/anyswap/src/processor.ts",
-    "test": "jest",
-    "test-nocache": "yarn jest --clearCache && yarn jest",
+    "test": "NODE_OPTIONS=--experimental-vm-modules yarn jest",
     "gen": "yarn compile_target && yarn gen_bultin_evm",
-    "gen_bultin_evm": "typechain --target lib/target-ethers-sentio --out-dir src/builtin/internal 'src/abis/*.json'"
+    "gen_bultin_evm": "typechain --target lib/target-ethers-sentio/index.cjs --out-dir src/builtin/internal 'src/abis/*.json'"
   },
   "dependencies": {
     "@sentio/runtime": "^2.0.0-development",
     "@sentio/protos": "^2.0.0-development",
-    "@sentio/ethers-v6": "^1.0.15",
+    "@sentio/ethers-v6": "^1.0.19",
     "@sentio/bigdecimal": "^9.1.1-patch.3",
     "csv-parse": "^5.3.0",
-    "ethers": "npm:@sentio/ethers@6.0.0-beta-exports.14",
+    "ethers": "6.0.0-beta-exports.16",
     "google-protobuf": "^3.15.8",
     "nice-grpc": "^2.0.0",
     "typechain": "^8.0.0",
-    "winston": "^3.8.2"
+    "p-queue": "^7.3.0"
   },
   "devDependencies": {
     "@types/google-protobuf": "^3.15.6"
   },
-  "main": "./lib/index.js",
-  "types": "./lib/index.d.ts",
-  "module": "./lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./testing": "./lib/testing/index.js",
+    "./builtin": "./lib/builtin/index.js",
+    "./builtin/erc20": "./lib/builtin/erc20/index.js",
+    "./builtin/erc721": "./lib/builtin/erc721/index.js",
+    "./builtin/erc1155": "./lib/builtin/erc1155/index.js",
+    "./builtin/eacaggregatorproxy": "./lib/builtin/eacaggregatorproxy/index.js",
+    "./builtin/weth9": "./lib/builtin/weth9/index.js",
+    "./utils": "./lib/utils/index.js"
+  },
   "files": [
     "{lib,src}",
     "!{lib,src}/tests",

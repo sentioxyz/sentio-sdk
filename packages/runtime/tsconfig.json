@@ -4,10 +4,7 @@
     "inlineSources": true,
     "rootDir": "./src",
     "baseUrl": "./src",
-    "outDir": "lib",
-    "paths": {
-      "@sentio/runtime": ["."]
-    }
+    "outDir": "lib"
   },
-  "exclude": ["lib"]
+  "exclude": ["lib", "jest.config.ts"]
 }

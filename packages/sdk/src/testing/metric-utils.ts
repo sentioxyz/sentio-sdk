@@ -1,6 +1,6 @@
 import { MetricValue, ProcessResult } from '@sentio/protos'
-import { Numberish, BigDecimal } from '../core'
-import { bytesToBigInt } from '../utils/conversion'
+import { Numberish, BigDecimal } from '../core/index.js'
+import { bytesToBigInt } from '../utils/conversion.js'
 
 export function MetricValueToNumber(v: Partial<MetricValue> | undefined): Numberish | undefined {
   if (v === undefined) {

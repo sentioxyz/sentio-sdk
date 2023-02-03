@@ -2,8 +2,9 @@
   "name": "@sentio-example/aurory",
   "version": "1.0.0",
   "private": "true",
+  "type": "module",
   "scripts": {
-    "test": "jest",
+    "test": "NODE_OPTIONS=--experimental-vm-modules yarn jest",
     "gen": "sentio gen",
     "build": "sentio build",
     "upload": "sentio upload",

@@ -6,5 +6,5 @@
     "baseUrl": "./src",
     "outDir": "lib"
   },
-  "exclude": ["lib"]
+  "exclude": ["lib", "jest.config.ts"]
 }

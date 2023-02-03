@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "importHelpers": true,
     "alwaysStrict": true,
     "sourceMap": true,
     "target": "esnext",
@@ -7,7 +8,7 @@
     "noImplicitReturns": true,
     "noImplicitAny": true,
     "module": "esnext",
-    "moduleResolution": "node16",
+    "moduleResolution": "nodenext",
     "strictNullChecks": true,
     "stripInternal": true,
     "noFallthroughCasesInSwitch": true,
@@ -16,5 +17,5 @@
     "rootDir": "./src",
     "skipLibCheck": true
   },
-  "exclude": ["dist"]
+  "exclude": ["dist", "jest.config.ts"]
 }

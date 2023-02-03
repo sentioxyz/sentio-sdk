@@ -1,5 +1,5 @@
-import { MOVE_CODER } from './move-coder'
-import { aptos_account } from './builtin/0x1'
+import { MOVE_CODER } from './move-coder.js'
+import { aptos_account } from './builtin/0x1.js'
 
 describe('type decode', () => {
   aptos_account.loadTypes(MOVE_CODER)

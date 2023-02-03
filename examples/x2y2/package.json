@@ -2,13 +2,14 @@
   "name": "@sentio-example/x2y2",
   "license": "Apache-2.0",
   "version": "1.0.0",
+  "type": "module",
   "private": "true",
   "scripts": {
     "compile": "tsc -p .",
-    "test": "jest",
+    "test": "NODE_OPTIONS=--experimental-vm-modules yarn jest",
     "build": "sentio build",
     "upload": "sentio upload",
-    "tsnode": "yarn ts-node",
+    "tsnode": "yarn ts-node-esm",
     "build_all": "yarn lerna run --scope=@sentio-example/x2y2 build --include-dependencies"
   },
   "dependencies": {

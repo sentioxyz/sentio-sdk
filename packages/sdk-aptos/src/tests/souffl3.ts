@@ -1,9 +1,8 @@
-import { SouffleChefCampaign, CandyMachine } from './types/souffle'
-import { token } from '../builtin/0x3'
-import { aptos_account, voting } from '../builtin/0x1'
+import { AptosAccountProcessor, defaultMoveCoder } from '@sentio/sdk-aptos'
 import { AccountEventTracker } from '@sentio/sdk'
-import { AptosAccountProcessor } from '../aptos-processor'
-import { MOVE_CODER } from '../move-coder'
+import { SouffleChefCampaign, CandyMachine } from './types/souffle.js'
+import { token } from '../builtin/0x3.js'
+import { aptos_account, voting } from '../builtin/0x1.js'
 
 const accountTracker = AccountEventTracker.register('pull')
 
@@ -25,7 +24,7 @@ SouffleChefCampaign.bind({ startVersion: 3212312n })
     }
   )
   .onTransaction((txn, ctx) => {
-    const events = MOVE_CODER.filterAndDecodeEvents<token.DepositEvent>('0x3::token::DepositEvent', txn.events)
+    const events = defaultMoveCoder().filterAndDecodeEvents<token.DepositEvent>('0x3::token::DepositEvent', txn.events)
     for (const event of events) {
       // const depositEventInstance = DEFAULT_TYPE_REGISTRY.decodeEvent(event) as DepositEventInstance
       ctx.meter.Counter('deposit_token_count').add(event.data_decoded.amount)

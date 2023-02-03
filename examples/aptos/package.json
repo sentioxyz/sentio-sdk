@@ -3,9 +3,10 @@
   "license": "Apache-2.0",
   "version": "1.0.0",
   "private": "true",
+  "type": "module",
   "scripts": {
     "compile": "tsc -p .",
-    "test": "jest",
+    "test": "NODE_OPTIONS=--experimental-vm-modules yarn jest",
     "build": "sentio build",
     "build_all": "yarn lerna run --scope=@sentio-example/aptos build --include-dependencies",
     "cli": "ts-node --files src/cli.ts"

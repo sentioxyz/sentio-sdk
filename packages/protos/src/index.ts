@@ -1,5 +1,9 @@
-export * from './builtin'
+export * from './builtin.js'
 
-export * from './processor/protos/processor'
+export * from './processor/protos/processor.js'
 
-// export * from './src/chainquery/protos/chainquery'
+export * from './google/protobuf/empty.js'
+
+export * from './google/protobuf/timestamp.js'
+
+export * from './google/protobuf/struct.js'

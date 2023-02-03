@@ -3,8 +3,8 @@ import { ContractConfig, DataBinding, HandlerType, ProcessConfigResponse, Proces
 
 import { ServerError, Status } from 'nice-grpc'
 
-import { SolanaProcessorState } from './solana-processor'
-import { Instruction as SolInstruction } from '@project-serum/anchor/dist/cjs/coder/borsh/instruction'
+import { SolanaProcessorState } from './solana-processor.js'
+import { Instruction as SolInstruction } from '@project-serum/anchor'
 
 export class SolanaPlugin extends Plugin {
   name: string = 'SolanaPlugin'

@@ -2,10 +2,9 @@ import {
   generateOutputComplexTypeAsArray,
   generateOutputComplexTypesAsObject,
 } from '@sentio/ethers-v6/dist/codegen/types'
-import { keccak256 } from 'ethers'
+import { keccak_256 } from 'js-sha3'
 import { FunctionDeclaration, getSignatureForFn } from 'typechain'
-// import { utils } from 'ethers'
-import { getFullSignatureAsSymbolForFunction } from './types'
+import { getFullSignatureAsSymbolForFunction } from './types.cjs'
 
 export function generateCallHandlers(fns: FunctionDeclaration[], contractName: string): string {
   if (fns.length === 1) {
@@ -42,7 +41,7 @@ function generateCallHandler(fn: FunctionDeclaration, contractName: string, over
   // utils.toUtf8Bytes(signature))
 
   const test = new TextEncoder().encode(signature)
-  const sighash = keccak256(test).substring(0, 10)
+  const sighash = "0x" + keccak_256(test).substring(0, 8)
 
   return `
   onCall${capitalizeFirstChar(overloadedName ?? fn.name)}(

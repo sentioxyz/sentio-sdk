@@ -1,9 +1,9 @@
 import { BaseContract } from 'ethers'
-import { BoundContractView, ContractView } from '../core/context'
-import { BindOptions } from '../core/bind-options'
-import { BaseProcessor } from './base-processor'
-import { getProvider } from './provider'
-import { addProcessor } from './binds'
+import { BoundContractView, ContractView } from '../core/context.js'
+import { BindOptions } from '../core/bind-options.js'
+import { BaseProcessor } from './base-processor.js'
+import { getProvider } from './provider.js'
+import { addProcessor } from './binds.js'
 
 export class GenericProcessor extends BaseProcessor<
   BaseContract,

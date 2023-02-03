@@ -1,4 +1,4 @@
-import { CoinID, PriceServiceClient, PriceServiceDefinition } from '@sentio/protos/lib/service/price/protos/price'
+import { CoinID, PriceServiceClient, PriceServiceDefinition } from '@sentio/protos/price'
 import { createChannel, createClientFactory } from 'nice-grpc'
 import { retryMiddleware, RetryOptions } from 'nice-grpc-client-middleware-retry'
 import { Endpoints } from '@sentio/runtime'

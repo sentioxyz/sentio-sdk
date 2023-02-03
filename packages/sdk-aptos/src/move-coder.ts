@@ -5,17 +5,17 @@ import {
   MoveResource,
   MoveStruct,
   TransactionPayload_EntryFunctionPayload,
-} from './move-types'
+} from './move-types.js'
 
-import { getMeaningfulFunctionParams, moduleQname, SPLITTER, VECTOR_STR } from './utils'
-import { parseMoveType, TypeDescriptor } from './types'
+import { getMeaningfulFunctionParams, moduleQname, SPLITTER, VECTOR_STR } from './utils.js'
+import { parseMoveType, TypeDescriptor } from './types.js'
 import {
   TypedEventInstance,
   TypedMoveResource,
   StructWithTag,
   StructWithType,
   TypedEntryFunctionPayload,
-} from './models'
+} from './models.js'
 
 export class MoveCoder {
   private moduleMapping = new Map<string, MoveModule>()

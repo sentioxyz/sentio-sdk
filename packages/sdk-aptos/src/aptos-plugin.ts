@@ -15,7 +15,7 @@ import {
 
 import { ServerError, Status } from 'nice-grpc'
 
-import { AptosAccountProcessorState, AptosProcessorState } from './aptos-processor'
+import { AptosAccountProcessorState, AptosProcessorState } from './aptos-processor.js'
 
 export class AptosPlugin extends Plugin {
   name: string = 'AptosPlugin'

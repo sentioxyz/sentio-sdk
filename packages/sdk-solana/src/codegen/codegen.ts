@@ -2,7 +2,7 @@ import path from 'path'
 import fs from 'fs'
 import chalk from 'chalk'
 import { Idl } from '@project-serum/anchor'
-import { IdlAccountItem, IdlField, IdlInstruction, IdlType } from '@project-serum/anchor/dist/cjs/idl'
+import { IdlAccountItem, IdlField, IdlInstruction, IdlType } from '@project-serum/anchor/dist/cjs/idl.js'
 
 export function codeGenSolanaProcessor(abisDir: string, targetPath = path.join('src', 'types', 'solana')) {
   if (!fs.existsSync(abisDir)) {
@@ -36,7 +36,7 @@ function codeGenSolanaIdlProcessor(idlObj: Idl): string {
   const instructions: any[] = idlObj.instructions
   return `import { BorshInstructionCoder, Instruction, Idl } from '@project-serum/anchor'
 import { SolanaBaseProcessor, SolanaContext, SolanaBindOptions } from "@sentio/sdk-solana"
-import { ${idlName}_idl } from "./${idlName}"
+import { ${idlName}_idl } from "./${idlName}.js"
 import { PublicKey } from '@solana/web3.js'
 
 export class ${idlNamePascalCase}Processor extends SolanaBaseProcessor {

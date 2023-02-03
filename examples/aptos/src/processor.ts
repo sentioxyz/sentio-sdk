@@ -1,6 +1,6 @@
-import { SouffleChefCampaign, CandyMachine } from './types/aptos/souffle'
-import { token } from '@sentio/sdk-aptos/lib/builtin/0x3'
-import { coin } from '@sentio/sdk-aptos/lib/builtin/0x1'
+import { SouffleChefCampaign, CandyMachine } from './types/aptos/souffle.js'
+import { token } from '@sentio/sdk-aptos/builtin/0x3'
+import { coin } from '@sentio/sdk-aptos/builtin/0x1'
 import { AccountEventTracker } from '@sentio/sdk'
 import { AptosNetwork, defaultMoveCoder } from '@sentio/sdk-aptos'
 

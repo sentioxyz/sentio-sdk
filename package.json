@@ -29,15 +29,16 @@
     "prettier-plugin-sh": "^0.12.8",
     "semantic-release": "^19.0.5",
     "semantic-release-monorepo": "^7.0.5",
-    "ts-jest": "^29.0.3",
+    "ts-jest": "^29.0.5",
     "ts-node": "^10.9.1",
     "typedoc": "^0.23.23",
     "typescript": "^4.9.0"
   },
   "resolutions": {
-    "ethers": "npm:@sentio/ethers@6.0.0-beta-exports.14"
+    "ethers": "^6.0.0-beta-exports"
   },
   "scripts": {
+    "cleanjest": "yarn jest --clearCache",
     "format": "prettier --write .",
     "lint": "ls-lint && eslint .",
     "docs": "rm -rf packages/sdk-all/lib && typedoc --options ./typedoc.json",

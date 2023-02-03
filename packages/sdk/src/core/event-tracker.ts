@@ -1,6 +1,6 @@
-import { BaseContext } from './base-context'
+import { BaseContext } from './base-context.js'
 import { EventTrackingResult } from '@sentio/protos'
-import { NamedResultDescriptor } from './metadata'
+import { NamedResultDescriptor } from './metadata.js'
 import { MapStateStorage } from '@sentio/runtime'
 
 export interface Event {

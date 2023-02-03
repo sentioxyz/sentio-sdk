@@ -1,8 +1,8 @@
-import { ProcessorServiceImpl } from './service'
-import { FullProcessorServiceImpl } from './full-service'
+import { ProcessorServiceImpl } from './service.js'
+import { FullProcessorServiceImpl } from './full-service.js'
 import { CallContext } from 'nice-grpc-common'
-import { DataBinding, HandlerType, ProcessResult } from './gen/processor/protos/processor'
-import { Plugin, PluginManager } from './plugin'
+import { DataBinding, HandlerType, ProcessResult } from './gen/processor/protos/processor.js'
+import { Plugin, PluginManager } from './plugin.js'
 import { assert } from 'chai'
 
 export const TEST_CONTEXT: CallContext = <CallContext>{}
@@ -19,7 +19,7 @@ class TestPlugin extends Plugin {
 }
 
 describe('Test Service Compatibility', () => {
-  const baseService = new ProcessorServiceImpl(() => {
+  const baseService = new ProcessorServiceImpl(async () => {
     PluginManager.INSTANCE.plugins = []
     PluginManager.INSTANCE.register(new TestPlugin())
   })

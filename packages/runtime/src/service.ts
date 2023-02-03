@@ -10,13 +10,11 @@ import {
   ProcessorServiceImplementation,
   ProcessResult,
   StartRequest,
+  Empty,
 } from '@sentio/protos'
 
-import { Empty } from '@sentio/protos/lib/google/protobuf/empty'
-
-import { PluginManager } from './plugin'
-import { errorString, mergeProcessResults } from './utils'
-
+import { PluginManager } from './plugin.js'
+import { errorString, mergeProcessResults } from './utils.js'
 ;(BigInt.prototype as any).toJSON = function () {
   return this.toString()
 }
@@ -25,11 +23,11 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
   private started = false
   private processorConfig: ProcessConfigResponse
 
-  private readonly loader: () => void
+  private readonly loader: () => Promise<any>
 
   private readonly shutdownHandler?: () => void
 
-  constructor(loader: () => void, shutdownHandler?: () => void) {
+  constructor(loader: () => Promise<any>, shutdownHandler?: () => void) {
     this.loader = loader
     this.shutdownHandler = shutdownHandler
   }
@@ -55,25 +53,21 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     }
 
     try {
-      // for (const plugin of ['@sentio/sdk/lib/core/core-plugin', '@sentio/sdk/lib/core/eth-plugin']) {
-      //   try {
-      //     require(plugin)
-      //   } catch (e) {
-      //     console.error('Failed to load plugin: ', plugin)
-      //   }
-      // }
+      for (const plugin of ['@sentio/sdk']) {
+        try {
+          await import(plugin)
+        } catch (e) {
+          console.error('Failed to load plugin: ', plugin)
+        }
+      }
 
-      // for (const plugin of [
-      //   '@sentio/sdk/lib/core/sui-plugin',
-      //   '@sentio/sdk-aptos/lib/aptos-plugin',
-      //   '@sentio/sdk-solana/lib/solana-plugin',
-      // ]) {
-      //   try {
-      //     require(plugin)
-      //   } catch (e) {}
-      // }
+      for (const plugin of ['@sentio/sdk-aptos', '@sentio/sdk-solana']) {
+        try {
+          await import(plugin)
+        } catch (e) {}
+      }
 
-      this.loader()
+      await this.loader()
     } catch (e) {
       throw new ServerError(Status.INVALID_ARGUMENT, 'Failed to load processor: ' + errorString(e))
     }

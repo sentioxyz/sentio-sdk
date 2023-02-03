@@ -1,12 +1,10 @@
-export { transformEtherError, EthersError } from './error'
-
-export { getProcessor, addProcessor, getContractByABI, addContractByABI } from './eth/binds'
+export { transformEtherError, EthersError } from './error.js'
 
 // TODO maybe remove this
 export * from '@sentio/protos'
 
-export * from './core'
-export * from './eth'
+export * from './core/index.js'
+export * from './eth/index.js'
 
-export * from './utils/chain'
+export * from './utils/chain.js'
 // export * from  './api'

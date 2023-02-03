@@ -3,6 +3,10 @@ import * as fs from 'fs'
 import os from 'os'
 import chalk from 'chalk'
 import { execSync } from 'child_process'
+import { jest } from '@jest/globals'
+import * as url from 'url'
+
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
 
 export async function codeGenEthersProcessor(
   abisDir: string,
@@ -42,7 +46,7 @@ describe('Test EVM codegen', () => {
 
     await codeGenEthersProcessor(
       path.join(__dirname, 'abis/evm'),
-      'lib/target-ethers-sentio',
+      'lib/target-ethers-sentio/index.cjs',
       path.join(codeGenFolder, '/internal')
     )
     expect(fs.existsSync(codeGenFolder)).toEqual(true)

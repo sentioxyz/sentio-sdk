@@ -1,4 +1,4 @@
-import { SuiContext } from './context'
+import { SuiContext } from './context.js'
 import { ProcessResult } from '@sentio/protos'
 import { ListStateStorage } from '@sentio/runtime'
 

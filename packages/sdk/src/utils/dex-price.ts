@@ -1,10 +1,10 @@
-import { getEACAggregatorProxyContract } from '../builtin/internal/eacaggregatorproxy_processor'
+import { getEACAggregatorProxyContract } from '../builtin/internal/eacaggregatorproxy_processor.js'
 import path from 'path'
 import fs from 'fs'
-// @ts-ignore type def not provided
 import { parse } from 'csv-parse/sync'
 import { BlockTag } from 'ethers/providers'
-import { scaleDown } from './token'
+import { scaleDown } from './token.js'
+import url from 'url'
 
 type OralceRecord = {
   Pair: string
@@ -36,7 +36,7 @@ class DexPrice {
 
   constructor(csvFileName: string, chainId: number) {
     this.chainId = chainId
-    const csvFilePath = path.resolve(__dirname, csvFileName)
+    const csvFilePath = url.fileURLToPath(new URL('./' + csvFileName, import.meta.url))
     const fileContent = fs.readFileSync(csvFilePath, { encoding: 'utf-8' })
     const headers = ['Pair', 'Asset', 'Type', 'Address']
 

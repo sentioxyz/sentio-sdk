@@ -4,11 +4,11 @@ import { expect } from 'chai'
 
 import { HandlerType } from '@sentio/protos'
 
-import { GenericProcessor } from '../eth/generic-processor'
-import { TestProcessorServer, firstCounterValue } from '../testing'
+import { GenericProcessor } from '@sentio/sdk'
+import { TestProcessorServer, firstCounterValue } from '../testing/index.js'
 
 describe('Test Generic Processor', () => {
-  const service = new TestProcessorServer(() => {
+  const service = new TestProcessorServer(async () => {
     GenericProcessor.bind(
       [
         'event Transfer(address indexed from, address indexed to, uint256 value)',

@@ -1,10 +1,11 @@
 import { assert } from 'chai'
-import { State, MapStateStorage } from './state'
+import { State, MapStateStorage } from './state.js'
 
 describe('state storage tests', () => {
   State.reset()
 
   test('test labels', async () => {
+    // assert(false)
     class TestState extends MapStateStorage<any> {
       static INSTANCE = new TestState()
     }

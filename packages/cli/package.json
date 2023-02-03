@@ -2,12 +2,13 @@
   "name": "@sentio/cli",
   "license": "Apache-2.0",
   "private": true,
+  "type": "module",
   "version": "2.0.0-development",
   "scripts": {
-    "compile": "tsc -p . && cp src/webpack.config.js lib/",
+    "compile": "tsc -p .",
     "build": "yarn compile",
     "postbuild": "../../scripts/link-bin.sh",
-    "cli": "ts-node src/cli.ts",
+    "cli": "ts-node-esm src/cli.ts",
     "test": "jest",
     "pub": "yarn build && yarn publish --no-git-tag-version"
   },
@@ -18,13 +19,11 @@
     "form-data": "^4.0.0",
     "fs-extra": "^11.0.0",
     "js-yaml": "^4.1.0",
-    "latest-version": "^5.1.0",
-    "node-fetch": "2",
+    "latest-version": "^7.0.0",
+    "node-fetch": "^3.3.0",
     "open": "^8.4.0",
-    "ts-loader": "^9.3.0",
-    "webpack": "^5.72.1",
-    "webpack-cli": "^5.0.0",
-    "chalk": "^4.1.0"
+    "tsup": "^6.5.0",
+    "chalk": "^5.2.0"
   },
   "devDependencies": {
     "@types/command-line-args": "^5.2.0",

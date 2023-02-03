@@ -4,11 +4,11 @@ import { expect } from 'chai'
 
 import { HandlerType } from '@sentio/sdk'
 
-import { TestProcessorServer, firstCounterValue } from '@sentio/sdk/lib/testing'
+import { TestProcessorServer, firstCounterValue } from '@sentio/sdk/testing'
 
 describe('Test Solana Example', () => {
-  const service = new TestProcessorServer(() => {
-    require('./wormhole-token-bridge')
+  const service = new TestProcessorServer(async () => {
+    await import('./wormhole-token-bridge.js')
   })
 
   beforeAll(async () => {

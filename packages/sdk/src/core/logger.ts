@@ -1,6 +1,6 @@
-import { BaseContext } from './base-context'
+import { BaseContext } from './base-context.js'
 import { LogLevel } from '@sentio/protos'
-import { NamedResultDescriptor } from './metadata'
+import { NamedResultDescriptor } from './metadata.js'
 
 export type Attributes = Record<string, any>
 

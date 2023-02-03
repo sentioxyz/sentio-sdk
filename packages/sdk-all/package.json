@@ -14,12 +14,13 @@
     "@sentio/sdk-aptos": "2.0.0-development",
     "@sentio/sdk-solana": "2.0.0-development"
   },
-  "main": "./lib/index.js",
-  "types": "./lib/index.d.ts",
-  "module": "./lib/index.js",
+  "type": "module",
   "files": [
     "{lib,src}",
     "!{lib,src}/tests",
     "!**/*.test.{js,ts}"
-  ]
+  ],
+  "typedoc": {
+    "entryPoint": "./src/index.ts"
+  }
 }

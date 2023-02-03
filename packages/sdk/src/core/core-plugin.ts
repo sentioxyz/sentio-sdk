@@ -1,9 +1,9 @@
 import { Plugin, PluginManager } from '@sentio/runtime'
 import { ProcessConfigResponse } from '@sentio/protos'
 
-import { MetricState } from './meter'
-import { EventTrackerState } from './event-tracker'
-import { ExporterState } from './exporter'
+import { MetricState } from './meter.js'
+import { EventTrackerState } from './event-tracker.js'
+import { ExporterState } from './exporter.js'
 
 export class CorePlugin extends Plugin {
   name: string = 'CorePlugin'

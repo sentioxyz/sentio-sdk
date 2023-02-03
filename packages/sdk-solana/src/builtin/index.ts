@@ -1,1 +1,1 @@
-export * from './spl-token-processor'
+export * from './spl-token-processor.js'

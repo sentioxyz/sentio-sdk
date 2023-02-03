@@ -2,14 +2,14 @@
 
 import { assert, expect } from 'chai'
 
-import { firstCounterValue, TestProcessorServer } from '../testing'
-import { mockTransferLog } from '../builtin/erc20/test-utils'
-import { AccountProcessor } from '../eth/account-processor'
+import { firstCounterValue, TestProcessorServer } from '../testing/index.js'
+import { mockTransferLog } from '../builtin/erc20/test-utils.js'
+import { AccountProcessor } from '../eth/account-processor.js'
 
 describe(' erc20 account transfer Examples', () => {
   const ADDRESS = '0x1000000000000000000000000000000000000000'
 
-  const service = new TestProcessorServer(() => {
+  const service = new TestProcessorServer(async () => {
     AccountProcessor.bind({ address: ADDRESS })
       .onERC20TransferOut((evt, ctx) => {
         assert(evt.args.from === ADDRESS)

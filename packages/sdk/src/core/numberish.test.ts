@@ -1,10 +1,10 @@
 import { expect } from 'chai'
-import { toBigInteger, toMetricValue } from './numberish'
+import { toBigInteger, toMetricValue } from './numberish.js'
 import { webcrypto } from 'crypto'
 import { performance } from 'perf_hooks'
 import { BigInteger } from '@sentio/protos'
-import { BigDecimal } from '.'
-import { bytesToBigInt } from '../utils/conversion'
+import { BigDecimal } from './big-decimal.js'
+import { bytesToBigInt } from '../utils/conversion.js'
 
 // TODO add test for type conversion
 describe('Numberish tests', () => {

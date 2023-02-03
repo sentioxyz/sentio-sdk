@@ -1,6 +1,6 @@
-import { ERC20Processor, ERC20ProcessorTemplate } from '../builtin/erc20'
-import { EventTracker } from '../core/event-tracker'
-import { Exporter } from '../core/exporter'
+import { ERC20Processor, ERC20ProcessorTemplate } from '../builtin/erc20/index.js'
+import { EventTracker } from '@sentio/sdk'
+import { Exporter } from '../core/exporter.js'
 
 export const filter = ERC20Processor.filters.Transfer(
   '0x0000000000000000000000000000000000000000',

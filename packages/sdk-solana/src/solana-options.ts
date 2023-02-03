@@ -1,4 +1,4 @@
-import { InstructionCoder } from './solana-processor'
+import { InstructionCoder } from './solana-processor.js'
 
 export class SolanaBindOptions {
   address: string

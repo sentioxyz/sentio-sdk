@@ -12,7 +12,7 @@ import {
 } from 'ethers'
 import { EventFilter, LogParams, Network } from 'ethers/providers'
 
-import { BoundContractView, ContractContext, ContractView } from '../core/context'
+import { BoundContractView, ContractContext, ContractView } from '../core/context.js'
 import {
   AddressType,
   Data_EthBlock,
@@ -22,9 +22,9 @@ import {
   HandleInterval,
   ProcessResult,
 } from '@sentio/protos'
-import { BindInternalOptions, BindOptions } from '../core/bind-options'
-import { PromiseOrVoid } from '../promise-or-void'
-import { Trace } from './trace'
+import { BindInternalOptions, BindOptions } from '../core/bind-options.js'
+import { PromiseOrVoid } from '../promise-or-void.js'
+import { Trace } from './trace.js'
 import { ServerError, Status } from 'nice-grpc'
 
 export interface AddressOrTypeEventFilter extends DeferredTopicFilter {

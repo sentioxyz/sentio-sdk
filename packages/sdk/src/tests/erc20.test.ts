@@ -2,15 +2,14 @@
 
 import { expect } from 'chai'
 
-// import { Provider, Network } from 'ethers/providers'
-
-import { TestProcessorServer, firstCounterValue, firstGaugeValue } from '../testing'
-import { mockTransferLog } from '../builtin/erc20/test-utils'
+import { TestProcessorServer, firstCounterValue, firstGaugeValue } from '@sentio/sdk/testing'
+import { mockTransferLog } from '../builtin/erc20/test-utils.js'
 import { HandlerType } from '@sentio/protos'
-import { TemplateInstanceState } from '../eth/base-processor-template'
 
 describe('Test Basic Examples', () => {
-  const service = new TestProcessorServer(() => require('./erc20'))
+  const service = new TestProcessorServer(async () => {
+    await import('./erc20.js')
+  })
 
   beforeAll(async () => {
     await service.start()

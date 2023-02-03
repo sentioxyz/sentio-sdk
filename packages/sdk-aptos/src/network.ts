@@ -1,5 +1,4 @@
 import { CHAIN_IDS, getChainName } from '@sentio/sdk'
-import { AptosClient } from 'aptos-sdk'
 
 export enum AptosNetwork {
   MAIN_NET = 1,
@@ -21,18 +20,6 @@ export function getAptosChainName(network: AptosNetwork): string {
       return getChainName(CHAIN_IDS.APTOS_TESTNET)
   }
   return getChainName(CHAIN_IDS.APTOS_MAINNET)
-}
-
-export function getRpcEndpoint(network: AptosNetwork): string {
-  switch (network) {
-    case AptosNetwork.TEST_NET:
-      return 'https://testnet.aptoslabs.com/'
-  }
-  return 'https://mainnet.aptoslabs.com/'
-}
-
-export function getRpcClient(network: AptosNetwork): AptosClient {
-  return new AptosClient(getRpcEndpoint(network))
 }
 
 export class AptosBindOptions {

@@ -12,18 +12,6 @@
         "node"
       ],
       "enabled": false
-    },
-    {
-      "matchPackageNames": [  // TODO update this to 3.0.0
-        "node-fetch"
-      ],
-      "allowedVersions": "< 3.0.0"
-    },
-    {
-      "matchPackageNames": [  // TODO update this to 7
-        "p-queue"
-      ],
-      "allowedVersions": "< 7.0.0"
     }
   ],
   "timezone": "America/Los_Angeles",

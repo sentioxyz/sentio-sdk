@@ -7,16 +7,15 @@ import * as util from 'util'
 import commandLineArgs from 'command-line-args'
 import { createServer } from 'nice-grpc'
 import { createLogger, transports, format } from 'winston'
-import { CompressionAlgorithms } from '@grpc/grpc-js/build/src/compression-algorithms'
+import { compressionAlgorithms } from '@grpc/grpc-js'
 
 import { ProcessorDefinition } from '@sentio/protos'
-import { ProcessorServiceImpl } from './service'
-import { State } from './state'
-import { Endpoints } from './endpoints'
+import { ProcessorServiceImpl } from './service.js'
+import { State } from './state.js'
+import { Endpoints } from './endpoints.js'
 
-import { load } from './loader'
-import { FullProcessorServiceImpl } from './full-service'
-import { ChainConfig } from './chain-config'
+import { FullProcessorServiceImpl } from './full-service.js'
+import { ChainConfig } from './chain-config.js'
 
 State.reset()
 // Endpoints.reset()
@@ -92,10 +91,17 @@ if (options.debug) {
 const server = createServer({
   'grpc.max_send_message_length': 128 * 1024 * 1024,
   'grpc.max_receive_message_length': 128 * 1024 * 1024,
-  'grpc.default_compression_algorithm': CompressionAlgorithms.gzip,
+  'grpc.default_compression_algorithm': compressionAlgorithms.gzip,
 })
 
-const baseService = new ProcessorServiceImpl(() => load(options.target), server.shutdown)
+// const m = await import(options.target)
+// console.log(m)
+
+const baseService = new ProcessorServiceImpl(async () => {
+  const m = await import(options.target)
+  console.log('module loaded')
+  return m
+}, server.shutdown)
 const service = new FullProcessorServiceImpl(baseService)
 
 server.add(ProcessorDefinition, service)

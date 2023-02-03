@@ -1,11 +1,12 @@
 import { expect } from 'chai'
 
 import { StartRequest } from '@sentio/protos'
-import { TestProcessorServer } from '../testing'
-import { ERC20Processor, ERC20ProcessorTemplate } from '../builtin/internal/erc20_processor'
+import { TestProcessorServer } from '../testing/index.js'
+import { ERC20Processor, ERC20ProcessorTemplate } from '../builtin/internal/erc20_processor.js'
+// import { TestProcessorServer } from '../testing/index.js'
 
 describe('Test Template', () => {
-  const service = new TestProcessorServer(() => {
+  const service = new TestProcessorServer(async () => {
     const filter = ERC20Processor.filters.Transfer(
       '0x0000000000000000000000000000000000000000',
       '0xb329e39ebefd16f40d38f07643652ce17ca5bac1'

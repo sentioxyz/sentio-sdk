@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { normalizeLabels, normalizeName } from './meter'
+import { normalizeLabels, normalizeName } from './metadata.js'
 
 describe('meter tests', () => {
   test('test normalization ', async () => {

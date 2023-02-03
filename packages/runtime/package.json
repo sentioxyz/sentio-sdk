@@ -6,9 +6,11 @@
     "compile": "tsc -p .",
     "build": "yarn compile",
     "build_all": "yarn lerna run --scope=@sentio/runtime build --include-dependencies",
-    "test": "jest",
-    "run": "ts-node --files src/processor-runner.ts --log-format=json",
-    "run-benchmark": "ts-node --files src/decode-benchmark.ts"
+    "test": "NODE_OPTIONS=--experimental-vm-modules yarn jest",
+    "run": "ts-node-esm --files src/processor-runner.ts --log-format=json",
+    "run-benchmark": "ts-node-esm --files src/decode-benchmark.ts",
+    "start_ts": "ts-node-esm --files ./src/processor-runner.ts  --log-format=json ../../../examples/x2y2/src/processor.ts",
+    "start_js": "ts-node-esm --files ./src/processor-runner.ts ../../../examples/x2y2/dist/lib.js"
   },
   "dependencies": {
     "@sentio/protos": "^2.0.0-development",
@@ -19,7 +21,6 @@
     "nice-grpc": "^2.0.0",
     "nice-grpc-client-middleware-retry": "^2.0.1",
     "nice-grpc-error-details": "^0.1.4",
-    "p-queue": "^6.6.2",
     "winston": "^3.8.2"
   },
   "devDependencies": {
@@ -34,9 +35,10 @@
   "bin": {
     "processor-runner": "./lib/processor-runner.js"
   },
-  "main": "./lib/index.js",
-  "types": "./lib/index.d.ts",
-  "module": "./lib/index.js",
+  "type": "module",
+  "exports": {
+    ".": "./lib/index.js"
+  },
   "files": [
     "{lib,src}",
     "!{lib,src}/tests",

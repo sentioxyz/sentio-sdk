@@ -1,4 +1,4 @@
-import { Event, MoveResource, TransactionPayload_EntryFunctionPayload } from './move-types'
+import { Event, MoveResource, TransactionPayload_EntryFunctionPayload } from './move-types.js'
 
 export type EventInstance = Event & {
   version: string

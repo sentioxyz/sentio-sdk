@@ -1,11 +1,11 @@
 import { expect } from 'chai'
 import { HandlerType, ProcessBindingsRequest } from '@sentio/protos'
 
-import { firstCounterValue, firstGaugeValue, TestProcessorServer } from '@sentio/sdk/lib/testing'
+import { firstCounterValue, firstGaugeValue, TestProcessorServer } from '@sentio/sdk/testing'
 
 describe('Test Aptos Example', () => {
-  const service = new TestProcessorServer(() => {
-    require('./souffl3')
+  const service = new TestProcessorServer(async () => {
+    await import('./souffl3.js')
   })
 
   beforeAll(async () => {
@@ -123,7 +123,7 @@ describe('Test Aptos Example', () => {
       ],
     }
     const res = await service.processBindings(request)
-    expect(firstGaugeValue(res.result, 'size')).equal(2n)
+    expect(firstGaugeValue(res.result, 'size')).equal(2)
   })
 
   test('check on timer', async () => {
@@ -150,7 +150,7 @@ describe('Test Aptos Example', () => {
       ],
     }
     const res = await service.processBindings(request)
-    expect(firstCounterValue(res.result, 'onTimer')).equal(1n)
+    expect(firstCounterValue(res.result, 'onTimer')).equal(1)
   })
 
   test('Check aptos account transaction dispatch', async () => {

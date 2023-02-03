@@ -2,7 +2,6 @@ packages/sdk/src/builtin/*
 !packages/sdk/src/builtin/index.ts
 
 packages/sdk-aptos/src/builtin/
-!packages/sdk-aptos/src/builtin/index.ts
 
 node_modules
 dist

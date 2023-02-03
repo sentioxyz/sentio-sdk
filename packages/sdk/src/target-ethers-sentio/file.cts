@@ -7,14 +7,15 @@ import {
 
 import { reservedKeywords } from '@sentio/ethers-v6/dist/codegen/reserved-keywords'
 import { getFullSignatureForEvent } from 'typechain/dist/utils/signatures'
-import { codegenCallTraceTypes, generateCallHandlers } from './functions-handler'
-import { generateEventFilters, generateEventHandlers } from './event-handler'
-import { generateBoundViewFunctions, generateViewFunctions } from './view-function'
+import { codegenCallTraceTypes, generateCallHandlers } from './functions-handler.cjs'
+import { generateEventFilters, generateEventHandlers } from './event-handler.cjs'
+import { generateBoundViewFunctions, generateViewFunctions } from './view-function.cjs'
 
 export function codeGenIndex(contract: Contract): string {
   return ` 
-  export * from '../internal/${contract.name.toLowerCase()}_processor'
-  export * from '../internal/${contract.name}'
+  export * from '../internal/${contract.name.toLowerCase()}_processor.js'
+  export * from '../internal/${contract.name}.js'
+  export * from './test-utils.js'
   `
 }
 
@@ -164,9 +165,9 @@ export class ${contract.name}ProcessorTemplate extends BaseProcessorTemplate<${c
         'toBlockTag',
       ],
       '@sentio/protos': ['EthFetchConfig'],
-      './common': ['PromiseOrValue'],
-      './index': [`${contract.name}`, `${contract.name}__factory`],
-      [`./${contract.name}`]: eventsImports.concat(uniqueStructImports),
+      './common.js': ['PromiseOrValue'],
+      './index.js': [`${contract.name}`, `${contract.name}__factory`],
+      [`./${contract.name}.js`]: eventsImports.concat(uniqueStructImports),
     },
     source
   )
@@ -200,7 +201,7 @@ export function codeGenTestUtilsFile(contract: Contract): string {
   const imports = createImportsForUsedIdentifiers(
     {
       'ethers/providers': ['LogParams'],
-      '.': [
+      './index.js': [
         `get${contract.name}Contract`,
         ...Object.values(contract.events).flatMap((events) => {
           if (events.length === 1) {

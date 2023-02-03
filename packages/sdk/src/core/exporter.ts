@@ -1,6 +1,6 @@
-import { BaseContext } from './base-context'
-import { ExportResult } from '@sentio/sdk'
-import { NamedResultDescriptor } from './metadata'
+import { BaseContext } from './base-context.js'
+import { ExportResult } from '@sentio/protos'
+import { NamedResultDescriptor } from './metadata.js'
 import { MapStateStorage } from '@sentio/runtime'
 
 export type Export = Record<string, any>

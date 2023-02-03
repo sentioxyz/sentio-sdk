@@ -1,11 +1,11 @@
 import commandLineArgs from 'command-line-args'
 import commandLineUsage from 'command-line-usage'
-import { getAuthConfig, getFinalizedHost } from '../config'
-import { startServer } from './login-server'
+import { getAuthConfig, getFinalizedHost } from '../config.js'
+import { startServer } from './login-server.js'
 import url, { URL } from 'url'
 import * as crypto from 'crypto'
 import chalk from 'chalk'
-import { WriteKey } from '../key'
+import { WriteKey } from '../key.js'
 import fetch from 'node-fetch'
 import open from 'open'
 
@@ -102,7 +102,7 @@ function sha256(str: string) {
 
 async function checkKey(host: string, apiKey: string) {
   const checkApiKeyUrl = new URL('/api/v1/processors/check_key', host)
-  return fetch(checkApiKeyUrl, {
+  return fetch(checkApiKeyUrl.href, {
     method: 'GET',
     headers: {
       'api-key': apiKey,

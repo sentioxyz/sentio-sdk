@@ -1,31 +1,8 @@
-import { BaseContext } from './base-context'
-import { Numberish, toMetricValue } from './numberish'
-import { Labels, NamedResultDescriptor } from './metadata'
+import { BaseContext } from './base-context.js'
+import { Numberish, toMetricValue } from './numberish.js'
+import { Labels, NamedResultDescriptor, normalizeKey } from './metadata.js'
 import { AggregationConfig, AggregationType, MetricConfig, MetricType } from '@sentio/protos'
 import { MapStateStorage } from '@sentio/runtime'
-
-export function normalizeName(name: string): string {
-  return name.slice(0, 100).replace(/[^_\-a-zA-Z0-9]/g, '_')
-}
-
-export function normalizeKey(name: string): string {
-  if (name === 'labels') {
-    return 'labels_'
-  }
-  return normalizeName(name)
-}
-
-export function normalizeValue(name: string): string {
-  return name.slice(0, 100)
-}
-
-export function normalizeLabels(labels: Labels): Labels {
-  const normLabels: Labels = {}
-  for (const key in labels) {
-    normLabels[normalizeKey(key)] = normalizeValue(labels[key])
-  }
-  return normLabels
-}
 
 export class MetricOptions {
   unit?: string

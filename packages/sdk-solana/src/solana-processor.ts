@@ -1,9 +1,9 @@
 import { ProcessResult } from '@sentio/protos'
-import { SolanaContext } from './solana-context'
+import { SolanaContext } from './solana-context.js'
 import { Instruction } from '@project-serum/anchor'
-import { SolanaBindOptions } from './solana-options'
+import { SolanaBindOptions } from './solana-options.js'
 import { ListStateStorage } from '@sentio/runtime'
-import { CHAIN_IDS } from '@sentio/sdk/lib/utils/chain'
+import { CHAIN_IDS } from '@sentio/sdk'
 
 type IndexConfigure = {
   startSlot: bigint

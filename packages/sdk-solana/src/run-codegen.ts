@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import path from 'path'
-import { codeGenSolanaProcessor } from './codegen/codegen'
+import { codeGenSolanaProcessor } from './codegen/codegen.js'
 
 if (process.argv.length > 3) {
   const abisDir = process.argv[2]

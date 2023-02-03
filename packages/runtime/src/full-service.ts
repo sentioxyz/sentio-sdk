@@ -1,4 +1,6 @@
 import { CallContext } from 'nice-grpc'
+import { createRequire } from 'module'
+const require = createRequire(import.meta.url)
 
 // Different than the simple one which
 import {
@@ -8,22 +10,29 @@ import {
   ProcessConfigRequest,
   ProcessorServiceImplementation,
   StartRequest,
-} from './gen/processor/protos/processor'
+} from './gen/processor/protos/processor.js'
 
-import { Empty } from '@sentio/protos/lib/google/protobuf/empty'
+import { Empty } from '@sentio/protos'
 import fs from 'fs-extra'
 import * as assert from 'assert'
+import path from 'path'
+
+function locatePackageJson(pkgId: string) {
+  const m = require.resolve(pkgId)
+
+  let dir = path.dirname(m)
+  while (!fs.existsSync(path.join(dir, 'package.json'))) {
+    dir = path.dirname(dir)
+  }
+  const content = fs.readFileSync(path.join(dir, 'package.json'), 'utf-8')
+  return JSON.parse(content)
+}
 
 export class FullProcessorServiceImpl implements ProcessorServiceImplementation {
   constructor(instance: ProcessorServiceImplementation) {
     this.instance = instance
-    const sdkPackageJsonPath = require.resolve('@sentio/sdk/package.json')
-    const sdkPackageJsonContent = fs.readFileSync(sdkPackageJsonPath, 'utf-8')
-    const sdkPackageJson = JSON.parse(sdkPackageJsonContent)
-
-    const runtimePackageJsonPath = require.resolve('@sentio/runtime/package.json')
-    const runtimePackageJsonContent = fs.readFileSync(runtimePackageJsonPath, 'utf-8')
-    const runtimePackageJson = JSON.parse(runtimePackageJsonContent)
+    const sdkPackageJson = locatePackageJson('@sentio/sdk')
+    const runtimePackageJson = locatePackageJson('@sentio/runtime')
 
     console.log('Runtime version:', runtimePackageJson.version, 'SDK version:', sdkPackageJson.version)
 

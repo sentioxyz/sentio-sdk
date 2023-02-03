@@ -1,7 +1,7 @@
 // https://github.com/dethcrypto/TypeChain/blob/015abb28bd22826611051f27e0ec96a00f9a0b61/packages/target-ethers-v5/src/codegen/functions.ts#L54
 import { FunctionDeclaration } from 'typechain'
 import { generateInputTypes, generateOutputTypes } from '@sentio/ethers-v6/dist/codegen/types'
-import { getFullSignatureAsSymbolForFunction, getFullSignatureForFunction } from './types'
+import { getFullSignatureAsSymbolForFunction, getFullSignatureForFunction } from './types.cjs'
 
 function generateReturnTypes(fn: FunctionDeclaration) {
   // sounds like returnResultObject should be true but we need to set false to make it work
