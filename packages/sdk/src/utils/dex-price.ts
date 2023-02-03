@@ -1,5 +1,4 @@
 import { getEACAggregatorProxyContract } from '../builtin/internal/eacaggregatorproxy_processor.js'
-import path from 'path'
 import fs from 'fs'
 import { parse } from 'csv-parse/sync'
 import { BlockTag } from 'ethers/providers'

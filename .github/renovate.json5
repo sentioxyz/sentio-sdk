@@ -9,7 +9,8 @@
   "packageRules": [
     {
       "matchPackageNames": [
-        "node"
+        "node",
+        "semantic-release"
       ],
       "enabled": false
     }

@@ -7,18 +7,17 @@ import {
   mockOwnershipTransferredLog,
   mockTransferLog,
 } from '../builtin/erc20/index.js'
-import { toBigDecimal } from '../utils/conversion.js'
 import { BigDecimal } from '../core/big-decimal.js'
 
 describe('Test Error Capture', () => {
   const service = new TestProcessorServer(async () => {
     ERC20Processor.bind({ address: '0x80009ff8154bd5653c6dda2fa5f5053e5a5c1a91' })
       .onEventApproval((evt, ctx) => {
-        const v = BigDecimal(1).div(toBigDecimal(evt.args.value))
+        const v = BigDecimal(1).div(evt.args.value.asBigDecimal())
         ctx.meter.Gauge('xx').record(v)
       })
       .onEventTransfer((evt, ctx) => {
-        const v = BigDecimal(0).div(toBigDecimal(evt.args.value))
+        const v = BigDecimal(0).div(evt.args.value.asBigDecimal())
         ctx.meter.Gauge('xx').record(v)
       })
       .onEventOwnershipTransferred((evt, ctx) => {

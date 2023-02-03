@@ -1,16 +1,5 @@
-import {
-  Block,
-  ContractEvent,
-  Log,
-  TransactionReceipt,
-  BytesLike,
-  BaseContract,
-  Transaction,
-  DeferredTopicFilter,
-  LogDescription,
-  EventFragment,
-} from 'ethers'
-import { EventFilter, LogParams, Network } from 'ethers/providers'
+import { Block, TransactionReceipt, BaseContract, Transaction, DeferredTopicFilter } from 'ethers'
+import { LogParams, Network } from 'ethers/providers'
 
 import { BoundContractView, ContractContext, ContractView } from '../core/context.js'
 import {
@@ -26,6 +15,7 @@ import { BindInternalOptions, BindOptions } from '../core/bind-options.js'
 import { PromiseOrVoid } from '../promise-or-void.js'
 import { Trace } from './trace.js'
 import { ServerError, Status } from 'nice-grpc'
+import { EthEvent } from './eth-event.js'
 
 export interface AddressOrTypeEventFilter extends DeferredTopicFilter {
   addressType?: AddressType
@@ -88,7 +78,7 @@ export abstract class BaseProcessor<
   }
 
   public onEvent(
-    handler: (event: LogDescription, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
+    handler: (event: EthEvent, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     filter: DeferredTopicFilter | DeferredTopicFilter[],
     fetchConfig?: EthFetchConfig
   ) {
@@ -128,8 +118,10 @@ export abstract class BaseProcessor<
         const logParam = log as any as { topics: Array<string>; data: string }
 
         const parsed = contractView.rawContract.interface.parseLog(logParam)
+
         if (parsed) {
-          await handler(parsed, ctx)
+          const event: EthEvent = { ...log, args: parsed.args }
+          await handler(event, ctx)
           return ctx.getProcessResult()
         }
         return ProcessResult.fromPartial({})
@@ -197,9 +189,7 @@ export abstract class BaseProcessor<
     return this
   }
 
-  public onAllEvents(
-    handler: (event: LogDescription, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid
-  ) {
+  public onAllEvents(handler: (event: EthEvent, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid) {
     const _filters: DeferredTopicFilter[] = []
     const tmpContract = this.CreateBoundContractView()
 
