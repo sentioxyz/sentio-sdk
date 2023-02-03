@@ -23,7 +23,7 @@ export async function buildProcessor(onlyGen: boolean) {
       console.error(chalk.red("Wrong CLI version for sdk, can't find tsup.config.ts"))
       process.exit(1)
     }
-    await execStep('yarn tsc -p .', 'Compile')
+    // await execStep('yarn tsc -p .', 'Compile')
     await execStep('yarn tsup --config=' + WEBPACK_CONFIG, 'Packaging')
   }
 }
