@@ -1,6 +1,11 @@
 import { defineConfig } from 'tsup'
 
 export default defineConfig({
+  esbuildOptions: (options) => {
+    options.banner = {
+      js: `import { createRequire } from 'module'; const require = createRequire(import.meta.url);`,
+    }
+  },
   entry: {
     lib: 'src/processor.ts',
   },
@@ -11,6 +16,7 @@ export default defineConfig({
   external: [
     'protobufjs',
     'aptos',
+    'aptos-sdk',
     'ethers',
     'bs58',
     'bn.js',
