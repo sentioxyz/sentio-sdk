@@ -18,7 +18,7 @@
     "@sentio/ethers-v6": "^1.0.19",
     "@sentio/bigdecimal": "^9.1.1-patch.3",
     "csv-parse": "^5.3.0",
-    "ethers": "6.0.0-beta-exports.16",
+    "ethers": "6.0.0",
     "google-protobuf": "^3.15.8",
     "nice-grpc": "^2.0.0",
     "typechain": "^8.0.0",

@@ -5679,10 +5679,10 @@ ethereumjs-util@^6.0.0, ethereumjs-util@^6.2.1:
     ethjs-util "0.1.6"
     rlp "^2.2.3"
 
-ethers@5.7.2, ethers@6.0.0-beta-exports.16, ethers@^5.6.4, ethers@^6.0.0-beta-exports:
-  version "6.0.0-beta-exports.16"
-  resolved "https://registry.yarnpkg.com/ethers/-/ethers-6.0.0-beta-exports.16.tgz#ae70354971f8337b9908a7871ab62ee38c98e069"
-  integrity sha512-k/rI/UyJOEs0qDWzcUYhQWD5n5NQ7GHCqHGZ1DQCC4yoHfq+BCNJ58vVfTGYugO8ni8xhMM1VW22tngBcMMcEQ==
+ethers@5.7.2, ethers@6.0.0, ethers@^5.6.4, ethers@^6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/ethers/-/ethers-6.0.0.tgz#c2a0622bdd5d1597f6d67d7a57327f5f7b365d99"
+  integrity sha512-3zI3VqRS6ERFoRMDIaOPTlR2CFeRYLh21OgoIEL4P5thF2xleWCM6R4ks3qdPp0qYUNzkTV4F+NbczbxxD8ybQ==
   dependencies:
     "@adraffy/ens-normalize" "1.8.9"
     "@noble/hashes" "1.1.2"
