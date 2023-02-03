@@ -7435,7 +7435,7 @@ jest-worker@^29.4.1:
     merge-stream "^2.0.0"
     supports-color "^8.0.0"
 
-jest@^29.0.0, jest@^29.4.1:
+jest@^29.4.1:
   version "29.4.1"
   resolved "https://registry.yarnpkg.com/jest/-/jest-29.4.1.tgz#bb34baca8e05901b49c02c62f1183a6182ea1785"
   integrity sha512-cknimw7gAXPDOmj0QqztlxVtBVCw2lYY9CeIE5N6kD+kET1H4H79HSNISJmijb1HF+qk+G+ploJgiDi5k/fRlg==
@@ -9464,6 +9464,13 @@ prettier-plugin-sh@^0.12.8:
     sh-syntax "^0.3.6"
     synckit "^0.8.1"
 
+prettier-plugin-sort-json@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/prettier-plugin-sort-json/-/prettier-plugin-sort-json-1.0.0.tgz#fe677d5537b6d79d12ffaf1604046a3d3ee2427c"
+  integrity sha512-XgcaF/Sojax1vD6j53wNIByx0rp7ecang+A8W0eM+Ks3yBFu/qXjJNvUtC1lEWeYbNfmRs/d8FyYJCYozAVENw==
+  dependencies:
+    "@types/prettier" "^2.7.2"
+
 prettier@^2.3.1:
   version "2.8.3"
   resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.8.3.tgz#ab697b1d3dd46fb4626fbe2f543afe0cc98d8632"
@@ -11031,7 +11038,7 @@ ts-invariant@^0.10.3:
   dependencies:
     tslib "^2.1.0"
 
-ts-jest@^29.0.0, ts-jest@^29.0.5:
+ts-jest@^29.0.5:
   version "29.0.5"
   resolved "https://registry.yarnpkg.com/ts-jest/-/ts-jest-29.0.5.tgz#c5557dcec8fe434fcb8b70c3e21c6b143bfce066"
   integrity sha512-PL3UciSgIpQ7f6XjVOmbi96vmDHUqAyqDr8YxzopDqX3kfgYtX1cuNeBjP+L9sFXi6nzsGGA6R3fP3DDDJyrxA==
@@ -11045,7 +11052,7 @@ ts-jest@^29.0.0, ts-jest@^29.0.5:
     semver "7.x"
     yargs-parser "^21.0.1"
 
-ts-node@^10.8.0, ts-node@^10.9.1:
+ts-node@^10.9.1:
   version "10.9.1"
   resolved "https://registry.yarnpkg.com/ts-node/-/ts-node-10.9.1.tgz#e73de9102958af9e1f0b168a6ff320e25adcff4b"
   integrity sha512-NtVysVPkxxrwFGUUxGYhfux8k78pQB3JqYBXlLRZgdGUqTO5wU/UyHop5p70iEbGhB7q5KmiZiU0Y3KlJrScEw==

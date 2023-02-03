@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "test": "NODE_OPTIONS=--experimental-vm-modules yarn jest",
+    "test": "sentio test",
     "gen": "sentio gen",
     "build": "sentio build",
     "upload": "sentio upload"

@@ -4,9 +4,9 @@
   "private": "true",
   "type": "module",
   "scripts": {
-    "test": "NODE_OPTIONS=--experimental-vm-modules yarn jest",
     "gen": "sentio gen",
     "build": "sentio build",
+    "test": "sentio test",
     "upload": "sentio upload",
     "build_all": "yarn lerna run --scope=@sentio-example/aurory build --include-dependencies"
   },

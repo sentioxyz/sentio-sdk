@@ -6,7 +6,7 @@
   "private": "true",
   "scripts": {
     "compile": "tsc -p .",
-    "test": "NODE_OPTIONS=--experimental-vm-modules yarn jest",
+    "test": "sentio test",
     "build": "sentio build",
     "upload": "sentio upload",
     "tsnode": "yarn ts-node-esm",
@@ -16,7 +16,6 @@
     "@sentio/sdk": "^2.0.0-development"
   },
   "devDependencies": {
-    "@sentio/cli": "^2.0.0-development",
-    "ts-node": "^10.8.0"
+    "@sentio/cli": "^2.0.0-development"
   }
 }

@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "compile": "tsc -p .",
-    "test": "NODE_OPTIONS=--experimental-vm-modules yarn jest",
+    "test": "sentio test",
     "build": "sentio build",
     "build_all": "yarn lerna run --scope=@sentio-example/sui build --include-dependencies"
   },

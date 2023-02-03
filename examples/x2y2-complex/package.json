@@ -6,8 +6,8 @@
   "type": "module",
   "scripts": {
     "compile": "tsc -p .",
-    "test": "NODE_OPTIONS=--experimental-vm-modules yarn jest",
-    "build": "yarn install && sentio build",
+    "test": "sentio test",
+    "build": "sentio build",
     "upload": "sentio upload",
     "tsnode": "yarn ts-node",
     "build_all": "yarn lerna run --scope=@sentio-example/x2y2-complex build --include-dependencies"
@@ -16,7 +16,6 @@
     "@sentio/sdk": "^2.0.0-development"
   },
   "devDependencies": {
-    "@sentio/cli": "^2.0.0-development",
-    "ts-node": "^10.8.0"
+    "@sentio/cli": "^2.0.0-development"
   }
 }
