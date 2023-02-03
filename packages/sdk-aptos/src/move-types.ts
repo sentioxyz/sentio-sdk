@@ -1,4 +1,4 @@
-import { Types } from 'aptos'
+import { Types } from 'aptos-sdk'
 
 export type Address = Types.Address
 export type Event = Types.Event

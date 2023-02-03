@@ -3453,7 +3453,7 @@ anymatch@^3.0.3, anymatch@~3.1.2:
   resolved "https://registry.yarnpkg.com/aproba/-/aproba-2.0.0.tgz#52520b8ae5b569215b354efc0caa3fe1e45a8adc"
   integrity sha512-lYe4Gx7QT+MKGbDsA+Z+he/Wtef0BiwDOlK/XkBrdfsh9J/jPPXbX0tE9x9cl27Tmu5gg3QUbUrQYa/y+KOHPQ==
 
-aptos@^1.3.16, "aptos@npm:@sentio/aptos@^1.6.0":
+"aptos-sdk@npm:@sentio/aptos@^1.6.0", aptos@^1.3.16:
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/@sentio/aptos/-/aptos-1.6.0.tgz#5482faa15b92b645760fe121b006466162c7f1e4"
   integrity sha512-z1TfTB76bcps+BH2gES6Y5RiPSGzzhQP8lC8rNJ1HU3WwVy56m+sJvlDTI5Y5AlsrH9/EPILiuakUIA81C42ww==

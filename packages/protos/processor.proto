@@ -324,7 +324,7 @@ message Data {
     optional google.protobuf.Struct parsed = 4;
   }
   message AptEvent {
-    google.protobuf.Struct event = 1;
+//    google.protobuf.Struct event = 1;
     google.protobuf.Struct transaction = 2;
   }
   message AptCall {

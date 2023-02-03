@@ -47,43 +47,4 @@ describe('Test Service Compatibility', () => {
     assert(testRequest.handlerType === HandlerType.UNKNOWN)
     assert((testRequest.data?.raw.length || 0) > 0)
   })
-
-  test('Check < 1.40 aptos event dispatch', async () => {
-    const binding1: DataBinding = {
-      data: {
-        raw: new Uint8Array(),
-        aptEvent: {
-          event: { key: 'value' },
-          transaction: {
-            events: [{ a: 'b' }, { c: 'd' }, { key: 'value' }],
-          },
-        },
-      },
-      handlerType: HandlerType.APT_EVENT,
-      handlerIds: [0],
-    }
-
-    await service.processBindings({ bindings: [binding1] }, TEST_CONTEXT)
-    assert((testRequest.data?.aptEvent?.transaction?.events.length || 0) === 1)
-  })
-
-  test('Check >= 1.40 aptos event dispatch', async () => {
-    const binding1: DataBinding = {
-      data: {
-        raw: new Uint8Array(),
-        aptEvent: {
-          event: { key: 'value' },
-          transaction: {
-            events: [{ a: 'b' }, { c: 'd' }, { key: 'value' }],
-          },
-        },
-      },
-      handlerType: HandlerType.APT_EVENT,
-      handlerIds: [0],
-    }
-
-    service.sdkMinorVersion = 40
-    await service.processBindings({ bindings: [binding1] }, TEST_CONTEXT)
-    assert((testRequest.data?.aptEvent?.transaction?.events.length || 0) === 3)
-  })
 })

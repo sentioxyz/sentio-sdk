@@ -533,7 +533,6 @@ export interface Data_SolInstruction {
 }
 
 export interface Data_AptEvent {
-  event: { [key: string]: any } | undefined;
   transaction: { [key: string]: any } | undefined;
 }
 
@@ -3677,14 +3676,11 @@ export const Data_SolInstruction = {
 };
 
 function createBaseData_AptEvent(): Data_AptEvent {
-  return { event: undefined, transaction: undefined };
+  return { transaction: undefined };
 }
 
 export const Data_AptEvent = {
   encode(message: Data_AptEvent, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.event !== undefined) {
-      Struct.encode(Struct.wrap(message.event), writer.uint32(10).fork()).ldelim();
-    }
     if (message.transaction !== undefined) {
       Struct.encode(Struct.wrap(message.transaction), writer.uint32(18).fork()).ldelim();
     }
@@ -3698,9 +3694,6 @@ export const Data_AptEvent = {
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        case 1:
-          message.event = Struct.unwrap(Struct.decode(reader, reader.uint32()));
-          break;
         case 2:
           message.transaction = Struct.unwrap(Struct.decode(reader, reader.uint32()));
           break;
@@ -3713,22 +3706,17 @@ export const Data_AptEvent = {
   },
 
   fromJSON(object: any): Data_AptEvent {
-    return {
-      event: isObject(object.event) ? object.event : undefined,
-      transaction: isObject(object.transaction) ? object.transaction : undefined,
-    };
+    return { transaction: isObject(object.transaction) ? object.transaction : undefined };
   },
 
   toJSON(message: Data_AptEvent): unknown {
     const obj: any = {};
-    message.event !== undefined && (obj.event = message.event);
     message.transaction !== undefined && (obj.transaction = message.transaction);
     return obj;
   },
 
   fromPartial(object: DeepPartial<Data_AptEvent>): Data_AptEvent {
     const message = createBaseData_AptEvent();
-    message.event = object.event ?? undefined;
     message.transaction = object.transaction ?? undefined;
     return message;
   },

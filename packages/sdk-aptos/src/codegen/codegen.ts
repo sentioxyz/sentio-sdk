@@ -7,7 +7,7 @@ import { getMeaningfulFunctionParams, isFrameworkAccount, moduleQname, SPLITTER 
 import chalk from 'chalk'
 import { AptosNetwork, getAptosChainName } from '../network.js'
 import { parseMoveType } from '../types.js'
-import { AptosClient } from 'aptos'
+import { AptosClient } from 'aptos-sdk'
 
 function getRpcEndpoint(network: AptosNetwork): string {
   switch (network) {

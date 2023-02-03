@@ -139,6 +139,9 @@ export class AptosBaseProcessor {
           throw new ServerError(Status.INVALID_ARGUMENT, 'event is null')
         }
         const txn = data.transaction as Transaction_UserTransaction
+        if (!txn.events.length) {
+          throw new ServerError(Status.INVALID_ARGUMENT, 'no event in the transactions')
+        }
 
         const ctx = new AptosContext(
           processor.moduleName,
@@ -147,22 +150,15 @@ export class AptosBaseProcessor {
           BigInt(txn.version),
           txn
         )
-        if (data.event) {
-          const eventInstance = data.event as EventInstance
+
+        const events = txn.events
+        txn.events = []
+        for (const evt of events) {
+          const eventInstance = evt as EventInstance
           const decoded = MOVE_CODER.decodeEvent<any>(eventInstance)
           await handler(decoded || eventInstance, ctx)
-        } else {
-          // TODO, this branch is deprecated, remove after full release
-          if (txn && txn.events) {
-            const events = txn.events
-            txn.events = []
-            for (const evt of events) {
-              const eventInstance = evt as EventInstance
-              const decoded = MOVE_CODER.decodeEvent<any>(eventInstance)
-              await handler(decoded || eventInstance, ctx)
-            }
-          }
         }
+
         return ctx.getProcessResult()
       },
       filters: _filters,

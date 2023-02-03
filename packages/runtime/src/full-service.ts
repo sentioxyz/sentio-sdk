@@ -71,11 +71,11 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
     switch (dataBinding.handlerType) {
       case HandlerType.APT_EVENT:
         if (dataBinding.data?.aptEvent) {
-          const aptEvent = dataBinding.data.aptEvent
-          if (aptEvent.event && this.sdkMinorVersion < 40) {
-            assert.ok(aptEvent.transaction, 'No Transaction')
-            aptEvent.transaction.events = [aptEvent.event]
-          }
+          // const aptEvent = dataBinding.data.aptEvent
+          // if (aptEvent.event && this.sdkMinorVersion < 40) {
+          //   assert.ok(aptEvent.transaction, 'No Transaction')
+          //   aptEvent.transaction.events = [aptEvent.event]
+          // }
         }
         break
       case HandlerType.UNKNOWN:
