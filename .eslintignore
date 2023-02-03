@@ -1,6 +1,6 @@
 .*
 packages/sdk-solana/jest.config.ts
-release.config.js
+release.config.cjs
 dist
 lib
 docs

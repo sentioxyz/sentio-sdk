@@ -2,7 +2,7 @@ import { AptosQueryClient, AptosQueryDefinition } from '@sentio/protos/chainquer
 import { createChannel, createClientFactory } from 'nice-grpc'
 import { Endpoints } from '@sentio/runtime'
 import { retryMiddleware } from 'nice-grpc-client-middleware-retry'
-import { AptosClient } from 'aptos-sdk'
+import { AptosClient } from 'aptos'
 import { AptosNetwork, getChainId } from './network.js'
 
 export function getChainQueryClient(address?: string): AptosQueryClient {

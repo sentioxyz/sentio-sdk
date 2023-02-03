@@ -10,7 +10,6 @@ export default defineConfig({
   format: 'esm',
   external: [
     'protobufjs',
-    'aptos-sdk',
     'aptos',
     'ethers',
     'bs58',
