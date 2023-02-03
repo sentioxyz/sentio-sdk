@@ -38,9 +38,10 @@
   "bin": {
     "sentio": "./lib/cli.js"
   },
-  "main": "./lib/index.js",
-  "types": "./lib/index.d.ts",
-  "module": "./lib/index.js",
+  "types": "module",
+  "exports": {
+    ".": "./lib/index.js"
+  },
   "files": [
     "{lib,src,templates}",
     "!{lib,src}/tests",

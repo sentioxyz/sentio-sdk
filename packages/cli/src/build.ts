@@ -3,19 +3,7 @@ import path from 'path'
 import fs from 'fs'
 import { exec } from 'child_process'
 import * as process from 'process'
-import { createRequire } from 'module'
-const require = createRequire(import.meta.url)
-
-function getPackageRoot(pkgId: string): string {
-  const m = require.resolve(pkgId)
-
-  let dir = path.dirname(m)
-  while (!fs.existsSync(path.join(dir, 'package.json'))) {
-    dir = path.dirname(dir)
-  }
-
-  return dir
-}
+import { getPackageRoot } from './utils.js'
 
 export async function buildProcessor(onlyGen: boolean) {
   if (!onlyGen) {
