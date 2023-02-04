@@ -44,22 +44,22 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
   sdkMinorVersion: number
 
   async getConfig(request: ProcessConfigRequest, context: CallContext) {
-    return this.instance.getConfig(request, context)
+    return await this.instance.getConfig(request, context)
   }
 
   async start(request: StartRequest, context: CallContext) {
-    return this.instance.start(request, context)
+    return await this.instance.start(request, context)
   }
 
   async stop(request: Empty, context: CallContext) {
-    return this.instance.stop(request, context)
+    return await this.instance.stop(request, context)
   }
 
   async processBindings(request: ProcessBindingsRequest, options: CallContext) {
     for (const binding of request.bindings) {
       this.adjustDataBinding(binding)
     }
-    return this.instance.processBindings(request, options)
+    return await this.instance.processBindings(request, options)
   }
 
   async *processBindingsStream(requests: AsyncIterable<DataBinding>, context: CallContext) {

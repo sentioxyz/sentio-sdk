@@ -122,10 +122,7 @@ export class ContractContext<
     transaction?: Transaction,
     transactionReceipt?: TransactionReceipt
   ) {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    const address = view.rawContract.getAddress() as string
-    super(chainId, address, timestamp, block, log, trace, transaction, transactionReceipt)
+    super(chainId, view.address, timestamp, block, log, trace, transaction, transactionReceipt)
     view.context = this
     this.contractName = contractName
     this.contract = view
@@ -154,10 +151,12 @@ export class ContractView<TContract extends BaseContract> {
 
 export class BoundContractView<TContract extends BaseContract, TContractView extends ContractView<TContract>> {
   protected view: TContractView
+  readonly address: string
   // context will be set right after context creation (in context's constructor)
   context: ContractContext<TContract, BoundContractView<TContract, TContractView>>
 
-  constructor(view: TContractView) {
+  constructor(address: string, view: TContractView) {
+    this.address = address
     this.view = view
   }
 

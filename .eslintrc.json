@@ -26,6 +26,7 @@
         "ts-expect-error": "allow-with-description"
       }
     ],
+    "import/no-named-as-default": ["off"],
     "import/no-unresolved": ["off"]
     //    "import/no-cycle": 2,
     //    "import/no-self-import": 2

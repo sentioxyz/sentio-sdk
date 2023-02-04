@@ -63,7 +63,7 @@ export function codeGenSentioFile(contract: Contract): string {
   
   protected CreateBoundContractView(): ${contract.name}BoundContractView {
     const view = get${contract.name}Contract(this.config.address, this.config.network)
-    return new ${contract.name}BoundContractView(view)
+    return new ${contract.name}BoundContractView(this.config.address, view)
   }
 
   public static bind(options: BindOptions): ${contract.name}Processor {

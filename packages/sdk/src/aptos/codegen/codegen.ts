@@ -217,7 +217,11 @@ export class AccountCodegen {
 
       ${this.modules
         .map((m) => {
-          return `_r.load(${normalizeToJSName(m.abi!.name)}.ABI)`
+          if (m.abi) {
+            return `_r.load(${normalizeToJSName(m.abi.name)}.ABI)`
+          }
+          console.error('Find Module with empty ABI')
+          return ''
         })
         .join('\n')}
     }

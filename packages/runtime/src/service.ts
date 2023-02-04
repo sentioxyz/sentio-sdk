@@ -53,19 +53,19 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     }
 
     try {
-      for (const plugin of ['@sentio/sdk']) {
-        try {
-          await import(plugin)
-        } catch (e) {
-          console.error('Failed to load plugin: ', plugin)
-        }
-      }
-
-      for (const plugin of ['@sentio/sdk/aptos', '@sentio/sdk/solana']) {
-        try {
-          await import(plugin)
-        } catch (e) {}
-      }
+      // for (const plugin of ['@sentio/sdk', '@sentio/sdk/eth']) {
+      //   try {
+      //     await import(plugin)
+      //   } catch (e) {
+      //     console.error('Failed to load plugin: ', plugin)
+      //   }
+      // }
+      //
+      // for (const plugin of ['@sentio/sdk/aptos', '@sentio/sdk/solana']) {
+      //   try {
+      //     await import(plugin)
+      //   } catch (e) {}
+      // }
 
       await this.loader()
     } catch (e) {
@@ -97,7 +97,13 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     }
 
     const promises = request.bindings.map((binding) => this.processBinding(binding))
-    const result = mergeProcessResults(await Promise.all(promises))
+    let promise
+    try {
+      promise = await Promise.all(promises)
+    } catch (e) {
+      throw e
+    }
+    const result = mergeProcessResults(promise)
 
     let updated = false
     if (PluginManager.INSTANCE.stateDiff(this.processorConfig)) {

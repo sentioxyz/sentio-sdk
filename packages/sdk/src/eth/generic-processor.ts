@@ -17,7 +17,7 @@ export class GenericProcessor extends BaseProcessor<
 
   protected CreateBoundContractView(): BoundContractView<BaseContract, ContractView<BaseContract>> {
     const contract = new BaseContract(this.config.address, this.eventABI, getProvider(this.config.network))
-    return new BoundContractView(new ContractView<BaseContract>(contract))
+    return new BoundContractView(this.config.address, new ContractView<BaseContract>(contract))
   }
 
   public static bind(eventABI: string[] | string, options: BindOptions): GenericProcessor {
