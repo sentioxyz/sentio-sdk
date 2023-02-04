@@ -1,9 +1,9 @@
-import { getEACAggregatorProxyContract } from '../builtin/internal/eacaggregatorproxy_processor.js'
+import { getEACAggregatorProxyContract } from '../eth/builtin/internal/eacaggregatorproxy_processor.js'
 import fs from 'fs'
 import { parse } from 'csv-parse/sync'
 import { BlockTag } from 'ethers/providers'
-import { scaleDown } from './token.js'
 import url from 'url'
+import { scaleDown } from '../core/big-decimal.js'
 
 type OralceRecord = {
   Pair: string

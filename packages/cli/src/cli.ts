@@ -88,11 +88,11 @@ if (mainOptions.command === 'login') {
   }
 
   if (mainOptions.command === 'upload') {
-    runUpload(processorConfig, argv)
+    await runUpload(processorConfig, argv)
   } else if (mainOptions.command === 'build') {
-    buildProcessor(false)
+    await buildProcessor(false)
   } else if (mainOptions.command === 'gen') {
-    buildProcessor(true)
+    await buildProcessor(true)
   } else {
     usage()
   }

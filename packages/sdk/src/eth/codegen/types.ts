@@ -1,5 +1,5 @@
 import { EventDeclaration, FunctionDeclaration } from 'typechain'
-import { EvmType } from 'typechain/dist/parser/parseEvmType'
+import { EvmType } from 'typechain/dist/parser/parseEvmType.js'
 
 export function getFullSignatureAsSymbolForFunction(fn: FunctionDeclaration): string {
   return `${fn.name}_${fn.inputs

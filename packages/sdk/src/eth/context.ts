@@ -2,10 +2,10 @@ import { BaseContract, Transaction, TransactionReceipt, Block } from 'ethers'
 import { LogParams } from 'ethers/providers'
 
 import { RecordMetaData } from '@sentio/protos'
-import { Trace } from '../eth/trace.js'
-import { Labels, normalizeLabels } from './metadata.js'
-import { CHAIN_IDS } from '../chain.js'
-import { BaseContext } from './base-context.js'
+import { Trace } from './trace.js'
+import { Labels, normalizeLabels } from '../core/metadata.js'
+import { CHAIN_IDS } from '../core/chain.js'
+import { BaseContext } from '../core/base-context.js'
 
 export abstract class EthContext extends BaseContext {
   chainId: number

@@ -16,16 +16,17 @@ export async function buildProcessor(onlyGen: boolean) {
   // }
 
   if (!onlyGen) {
-    let WEBPACK_CONFIG: string
+    let tsupConfig: string
     try {
-      WEBPACK_CONFIG = path.resolve(getPackageRoot('@sentio/sdk'), 'lib/tsup.config.ts')
+      tsupConfig = path.resolve(getPackageRoot('@sentio/sdk'), 'lib/tsup.config.ts')
     } catch (e) {
       console.error(chalk.red("Wrong CLI version for sdk, can't find tsup.config.ts"))
       process.exit(1)
     }
 
+    const tsup = path.resolve(getPackageRoot('tsup'), 'dist', 'cli-default.js')
     // await execStep('yarn tsc -p .', 'Compile')
-    await execStep('yarn tsup --config=' + WEBPACK_CONFIG, 'Packaging')
+    await execStep(`node ${tsup} --config=${tsupConfig}`, 'Packaging')
 
     const dir = fs.readdirSync(path.join(process.cwd(), 'dist'))
     const generated = dir.filter((d) => d.endsWith('.js')).length
@@ -47,19 +48,39 @@ import 'mine.js'
 }
 
 async function buildProcessorForTarget(onlyGen: boolean) {
-  await codeGenEthersProcessor(path.join('abis', 'evm'))
+  const outputBase = path.resolve('src', 'types')
+  try {
+    // @ts-ignore dynamic import
+    const codegen = await import('@sentio/sdk/eth/codegen')
+    let input = path.resolve('abis', 'eth')
+    let output = path.resolve(outputBase)
+    if (!fs.existsSync(input)) {
+      input = path.resolve('abis', 'evm')
+      output = path.resolve(outputBase)
+    }
+    // @ts-ignore dynamic import
+    await codegen.codegen(input, output)
+  } catch (e) {
+    console.error('code gen error', e)
+  }
 
   try {
     // @ts-ignore dynamic import
     const codegen = await import('@sentio/sdk/solana/codegen')
-    codegen.codeGenSolanaProcessor(path.join('abis', 'solana'))
-  } catch (e) {}
+    // @ts-ignore dynamic import
+    await codegen.codegen(path.resolve('abis', 'solana'), path.resolve(outputBase, 'solana'))
+  } catch (e) {
+    console.error('code gen error', e)
+  }
 
   try {
     // @ts-ignore dynamic import
     const codegen = await import('@sentio/sdk/aptos/codegen')
-    codegen.codeGenAptosProcessor(path.join('abis', 'aptos'))
-  } catch (e) {}
+    // @ts-ignore dynamic import
+    await codegen.codegen(path.resolve('abis', 'aptos'), path.resolve(outputBase, 'aptos'))
+  } catch (e) {
+    console.error('code gen error', e)
+  }
 
   if (onlyGen) {
     return
@@ -68,36 +89,6 @@ async function buildProcessorForTarget(onlyGen: boolean) {
 
 async function installDeps() {
   await execStep('yarn install --ignore-scripts', 'Yarn Install')
-}
-
-export async function codeGenEthersProcessor(
-  abisDir: string,
-  ETHERS_TARGET = path.resolve(getPackageRoot('@sentio/sdk'), 'lib/target-ethers-sentio/index.cjs'),
-  outDir = 'src/types/internal'
-) {
-  if (!fs.existsSync(abisDir)) {
-    return
-  }
-
-  let haveJson = false
-  const files = fs.readdirSync(abisDir)
-  for (const file of files) {
-    if (file.toLowerCase().endsWith('.json')) {
-      haveJson = true
-      break
-    }
-  }
-  if (!haveJson) {
-    return
-  }
-
-  console.log(chalk.green('Generated Types for EVM'))
-
-  // TODO this will fail during postinstall, need to locate real typechain path
-  await execStep(
-    'yarn typechain --target ' + ETHERS_TARGET + ` --out-dir ${outDir} ${path.join(abisDir, '*.json')}`,
-    'Type definitions gen'
-  )
 }
 
 async function execStep(cmd: string, stepName: string) {

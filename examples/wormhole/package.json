@@ -5,7 +5,7 @@
   "private": "true",
   "type": "module",
   "scripts": {
-    "compile": "tsc -p .",
+    "compile": "tsc",
     "test": "sentio test",
     "build": "yarn sentio build",
     "build_all": "yarn lerna run --scope=@sentio-example/wormhole build --include-dependencies"

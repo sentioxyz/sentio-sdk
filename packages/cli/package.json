@@ -5,7 +5,7 @@
   "type": "module",
   "version": "2.0.0-development",
   "scripts": {
-    "compile": "tsc -p .",
+    "compile": "tsc",
     "build": "yarn compile",
     "postbuild": "../../scripts/link-bin.sh",
     "cli": "ts-node-esm src/cli.ts",

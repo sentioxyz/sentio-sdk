@@ -1,10 +1,9 @@
-import { transformEtherError } from '../error.js'
-import { getERC20Contract } from '../builtin/erc20/index.js'
-import { getERC20BytesContract } from '../builtin/internal/erc20bytes_processor.js'
-import { BigDecimal } from '../core/big-decimal.js'
+import { getERC20Contract } from '../eth/builtin/erc20/index.js'
+import { getERC20BytesContract } from '../eth/builtin/internal/erc20bytes_processor.js'
+import { BigDecimal, scaleDown } from '../core/big-decimal.js'
 // import { toBigDecimal } from './conversion'
 // import { utils } from 'ethers'
-import { PromiseOrValue } from '../builtin/internal/common.js'
+import { PromiseOrValue } from '../eth/builtin/internal/common.js'
 import { decodeBytes32String } from 'ethers'
 
 export interface TokenInfo {
@@ -42,30 +41,25 @@ export async function getERC20TokenInfo(tokenAddress: string, chainId = 1): Prom
   const contract = getERC20Contract(tokenAddress, chainId)
   const bytesContract = getERC20BytesContract(tokenAddress, chainId)
 
+  let name = ''
   try {
-    // TODO maybe not do try catch, just do raw call the parse results
-    let name = ''
-    try {
-      name = await contract.name()
-    } catch (e) {
-      name = decodeBytes32String(await bytesContract.name())
-    }
-
-    let symbol = ''
-    try {
-      symbol = await contract.symbol()
-    } catch (e) {
-      symbol = decodeBytes32String(await bytesContract.symbol())
-    }
-
-    const decimal = await contract.decimals()
-    const info = getTokenInfoPromise(symbol, name, decimal)
-
-    TOKEN_INFOS.set(key, info)
-    return info
+    name = await contract.name()
   } catch (e) {
-    throw transformEtherError(e, undefined)
+    name = decodeBytes32String(await bytesContract.name())
   }
+
+  let symbol = ''
+  try {
+    symbol = await contract.symbol()
+  } catch (e) {
+    symbol = decodeBytes32String(await bytesContract.symbol())
+  }
+
+  const decimal = await contract.decimals()
+  const info = getTokenInfoPromise(symbol, name, decimal)
+
+  TOKEN_INFOS.set(key, info)
+  return info
 }
 
 export async function getER20NormalizedAmount(
@@ -75,9 +69,4 @@ export async function getER20NormalizedAmount(
 ): Promise<BigDecimal> {
   const tokenInfo = await getERC20TokenInfo(tokenAddress, chainId)
   return scaleDown(amount, tokenInfo.decimal)
-}
-
-export function scaleDown(amount: bigint, decimal: number | bigint) {
-  const divider = new BigDecimal(10).pow(Number(decimal))
-  return amount.asBigDecimal().dividedBy(divider)
 }

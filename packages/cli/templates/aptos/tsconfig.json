@@ -13,8 +13,8 @@
     "stripInternal": true,
     "noFallthroughCasesInSwitch": true,
     "noEmitOnError": true,
-    "outDir": "dist",
     "rootDir": "./src",
+    "outDir": "./dist",
     "skipLibCheck": true
   },
   "exclude": ["dist", "jest.config.ts"]

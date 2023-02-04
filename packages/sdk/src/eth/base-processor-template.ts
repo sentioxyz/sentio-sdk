@@ -1,14 +1,14 @@
-import { BoundContractView, ContractContext, ContractView } from '../core/context.js'
+import { BoundContractView, ContractContext, ContractView } from './context.js'
 import { BaseContract, ContractEvent, Block, LogDescription } from 'ethers'
 import { AddressOrTypeEventFilter, BaseProcessor } from './base-processor.js'
-import { BindOptions, getOptionsSignature } from '../core/bind-options.js'
+import { BindOptions, getOptionsSignature } from './bind-options.js'
 import { EthFetchConfig, HandleInterval, TemplateInstance } from '@sentio/protos'
 import { PromiseOrVoid } from '../promise-or-void.js'
 import { Trace } from './trace.js'
 import { ListStateStorage } from '@sentio/runtime'
 import { EventFilter, LogParams, Network } from 'ethers/providers'
 import { DeferredTopicFilter } from 'ethers/contract'
-import { Eth } from './eth.js'
+import { EthLog } from './eth.js'
 
 export class ProcessorTemplateProcessorState extends ListStateStorage<
   BaseProcessorTemplate<BaseContract, BoundContractView<BaseContract, any>>
@@ -37,7 +37,7 @@ export abstract class BaseProcessorTemplate<
     fetchConfig?: EthFetchConfig
   }[] = []
   eventHandlers: {
-    handler: (event: Eth, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid
+    handler: (event: EthLog, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid
     filter: DeferredTopicFilter | DeferredTopicFilter[]
     fetchConfig?: EthFetchConfig
   }[] = []
@@ -88,7 +88,7 @@ export abstract class BaseProcessorTemplate<
   }
 
   public onEvent(
-    handler: (event: Eth, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
+    handler: (event: EthLog, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     filter: DeferredTopicFilter | DeferredTopicFilter[],
     fetchConfig?: EthFetchConfig
   ) {

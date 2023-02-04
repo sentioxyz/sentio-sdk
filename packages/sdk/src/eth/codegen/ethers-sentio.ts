@@ -1,9 +1,9 @@
 import Ethers from '@sentio/ethers-v6'
 import { Config, extractAbi, extractDocumentation, FileDescription, parse, shortenFullJsonFilePath } from 'typechain'
 import { dirname, join, relative } from 'path'
-import { codeGenIndex, codeGenSentioFile, codeGenTestUtilsFile } from './file.cjs'
+import { codeGenIndex, codeGenSentioFile, codeGenTestUtilsFile } from './file.js'
 
-export default class EthersSentio extends Ethers {
+export default class EthersSentio extends Ethers.default {
   constructor(config: Config) {
     if (!config.outDir) {
       throw new Error('Out put path not specificed')

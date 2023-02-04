@@ -3,6 +3,6 @@
     "rootDir": "..",
     "outDir": "../../../lib/aptos"
   },
-  "extends": "../../../tsconfig.json",
+  "extends": "@sentio/sdk/tsconfig.json",
   "include": ["./"]
 }

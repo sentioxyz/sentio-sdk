@@ -8,6 +8,15 @@ import chalk from 'chalk'
 import { AptosNetwork, getAptosChainName } from '../network.js'
 import { parseMoveType } from '../types.js'
 import { AptosClient } from 'aptos-sdk'
+import { camelCase } from 'lodash-es'
+
+export async function codegen(abisDir: string, outDir = 'src/types/aptos') {
+  if (!fs.existsSync(abisDir)) {
+    return
+  }
+  console.log(chalk.green('Generated Types for Aptos'))
+  await generate(abisDir, outDir)
+}
 
 function getRpcEndpoint(network: AptosNetwork): string {
   switch (network) {
@@ -21,20 +30,12 @@ function getRpcClient(network: AptosNetwork): AptosClient {
   return new AptosClient(getRpcEndpoint(network))
 }
 
-export async function codeGenAptosProcessor(abisDir: string, outDir = 'src/types/aptos') {
-  if (!fs.existsSync(abisDir)) {
-    return
-  }
-  console.log(chalk.green('Generated Types for Aptos'))
-  await generate(abisDir, outDir)
-}
-
-export async function generate(srcDir: string, outputDir: string) {
+async function generate(srcDir: string, outputDir: string) {
   await generateForNetwork(srcDir, outputDir, AptosNetwork.MAIN_NET)
   await generateForNetwork(path.join(srcDir, 'testnet'), path.join(outputDir, 'testnet'), AptosNetwork.TEST_NET)
 }
 
-export async function generateForNetwork(srcDir: string, outputDir: string, network: AptosNetwork) {
+async function generateForNetwork(srcDir: string, outputDir: string, network: AptosNetwork) {
   if (!fs.existsSync(srcDir)) {
     return
   }
@@ -366,7 +367,7 @@ function generateCallArgsStructs(module: MoveModule, func: MoveFunction) {
     return `${generateType(param, module.address)}`
   })
 
-  const camelFuncName = capitalizeFirstChar(camelize(func.name))
+  const camelFuncName = capitalizeFirstChar(camelCase(func.name))
 
   const genericString = generateFunctionTypeParameters(func)
   return `
@@ -386,7 +387,7 @@ function generateOnEntryFunctions(module: MoveModule, func: MoveFunction) {
   // const genericString = generateFunctionTypeParameters(func)
   const moduleName = normalizeToJSName(module.name)
 
-  const camelFuncName = capitalizeFirstChar(camelize(func.name))
+  const camelFuncName = capitalizeFirstChar(camelCase(func.name))
   const source = `
   onEntry${camelFuncName}(func: (call: ${moduleName}.${camelFuncName}Payload, ctx: AptosContext) => void, filter?: CallFilter, fetchConfig?: AptosFetchConfig): ${moduleName} {
     this.onEntryFunctionCall(func, {
@@ -446,16 +447,6 @@ function generateOnEvents(module: MoveModule, struct: MoveStruct): string {
   }
   `
   return source
-}
-
-function camelize(input: string): string {
-  return input
-    .split('_')
-    .reduce(
-      (res, word, i) =>
-        i === 0 ? word.toLowerCase() : `${res}${word.charAt(0).toUpperCase()}${word.slice(1).toLowerCase()}`,
-      ''
-    )
 }
 
 function capitalizeFirstChar(input: string): string {

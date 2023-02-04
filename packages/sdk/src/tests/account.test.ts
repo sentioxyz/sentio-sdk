@@ -3,7 +3,7 @@
 import { assert, expect } from 'chai'
 
 import { firstCounterValue, TestProcessorServer } from '../testing/index.js'
-import { mockTransferLog } from '../builtin/erc20/test-utils.js'
+import { mockTransferLog } from '../eth/builtin/erc20/test-utils.js'
 import { AccountProcessor } from '../eth/account-processor.js'
 
 describe(' erc20 account transfer Examples', () => {

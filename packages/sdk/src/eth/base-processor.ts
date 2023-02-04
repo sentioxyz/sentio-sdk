@@ -1,7 +1,7 @@
 import { Block, TransactionReceipt, BaseContract, Transaction, DeferredTopicFilter } from 'ethers'
 import { LogParams, Network } from 'ethers/providers'
 
-import { BoundContractView, ContractContext, ContractView } from '../core/context.js'
+import { BoundContractView, ContractContext, ContractView } from './context.js'
 import {
   AddressType,
   Data_EthBlock,
@@ -11,11 +11,11 @@ import {
   HandleInterval,
   ProcessResult,
 } from '@sentio/protos'
-import { BindInternalOptions, BindOptions } from '../core/bind-options.js'
+import { BindInternalOptions, BindOptions } from './bind-options.js'
 import { PromiseOrVoid } from '../promise-or-void.js'
 import { Trace } from './trace.js'
 import { ServerError, Status } from 'nice-grpc'
-import { Eth } from './eth.js'
+import { EthLog } from './eth.js'
 
 export interface AddressOrTypeEventFilter extends DeferredTopicFilter {
   addressType?: AddressType
@@ -78,7 +78,7 @@ export abstract class BaseProcessor<
   }
 
   public onEvent(
-    handler: (event: Eth, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
+    handler: (event: EthLog, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     filter: DeferredTopicFilter | DeferredTopicFilter[],
     fetchConfig?: EthFetchConfig
   ) {
@@ -120,7 +120,7 @@ export abstract class BaseProcessor<
         const parsed = contractView.rawContract.interface.parseLog(logParam)
 
         if (parsed) {
-          const event: Eth = { ...log, args: parsed.args }
+          const event: EthLog = { ...log, args: parsed.args }
           await handler(event, ctx)
           return ctx.getProcessResult()
         }
@@ -189,7 +189,7 @@ export abstract class BaseProcessor<
     return this
   }
 
-  public onAllEvents(handler: (event: Eth, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid) {
+  public onAllEvents(handler: (event: EthLog, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid) {
     const _filters: DeferredTopicFilter[] = []
     const tmpContract = this.CreateBoundContractView()
 

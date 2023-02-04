@@ -6,7 +6,7 @@ import {
   mockApprovalLog,
   mockOwnershipTransferredLog,
   mockTransferLog,
-} from '../builtin/erc20/index.js'
+} from '../eth/builtin/erc20/index.js'
 import { BigDecimal } from '../core/big-decimal.js'
 
 describe('Test Error Capture', () => {

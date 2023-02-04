@@ -1,7 +1,5 @@
 {
   "_format": "hh-sol-artifact-1",
-  "contractName": "CommitmentPool",
-  "sourceName": "contracts/core/commitment/CommitmentPool.sol",
   "abi": [
     {
       "inputs": [],
@@ -1028,7 +1026,9 @@
     }
   ],
   "bytecode": "0x",
+  "contractName": "CommitmentPool",
   "deployedBytecode": "0x",
+  "deployedLinkReferences": {},
   "linkReferences": {},
-  "deployedLinkReferences": {}
+  "sourceName": "contracts/core/commitment/CommitmentPool.sol"
 }

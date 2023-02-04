@@ -1,6 +1,5 @@
 import { AccountEventTracker, Counter, Gauge, Exporter } from '@sentio/sdk'
-import { scaleDown } from '@sentio/sdk/utils'
-import { ERC20Processor } from '@sentio/sdk/builtin'
+import { ERC20Processor } from '@sentio/sdk/eth/builtin'
 import { X2y2Processor } from './types/x2y2/index.js'
 
 // import { AggregationType } from '@sentio/sdk/lib/gen/processor/protos/processor'
@@ -28,7 +27,7 @@ const tracker = AccountEventTracker.register()
 X2y2Processor.bind({ address: '0xB329e39Ebefd16f40d38f07643652cE17Ca5Bac1' }).onTimeInterval(
   async (_, ctx) => {
     const phase = (await ctx.contract.currentPhase()).toString()
-    const reward = scaleDown(await ctx.contract.rewardPerBlockForStaking(), 18)
+    const reward = (await ctx.contract.rewardPerBlockForStaking()).scaleDown(18)
     ctx.logger.info(`reward ${reward.toFormat(6)} for block ${ctx.blockNumber}`, { phase })
     rewardPerBlock.record(ctx, reward, { phase })
     // exporter.emit(ctx, { reward, phase })
@@ -44,7 +43,7 @@ const filter = ERC20Processor.filters.Transfer(
 
 ERC20Processor.bind({ address: '0x1e4ede388cbc9f4b5c79681b7f94d36a11abebc9' }).onEventTransfer(
   async (event, ctx) => {
-    const val = scaleDown(event.args.value, 18)
+    const val = event.args.value.scaleDown(18)
     tokenCounter.add(ctx, val)
     ctx.logger.info(event)
   },
@@ -52,7 +51,7 @@ ERC20Processor.bind({ address: '0x1e4ede388cbc9f4b5c79681b7f94d36a11abebc9' }).o
 )
 
 ERC20Processor.bind({ address: '0x1e4ede388cbc9f4b5c79681b7f94d36a11abebc9' }).onEventTransfer(async (event, ctx) => {
-  const val = scaleDown(event.args.value, 18)
+  const val = event.args.value.scaleDown(18)
   vol.record(ctx, val)
   ctx.eventTracker.track('Transfer', { distinctId: event.args.from })
   tracker.trackEvent(ctx, { distinctId: event.args.from })

@@ -1,4 +1,4 @@
-import { CHAIN_IDS, getChainName } from '../chain.js'
+import { CHAIN_IDS, getChainName } from '../core/chain.js'
 
 export enum AptosNetwork {
   MAIN_NET = 1,

@@ -4,7 +4,7 @@
   "version": "2.0.0-development",
   "type": "module",
   "scripts": {
-    "compile": "tsc -p .",
+    "compile": "tsc",
     "clean": "tsc --build --clean",
     "build": "yarn compile"
   },

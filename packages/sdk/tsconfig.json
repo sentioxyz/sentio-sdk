@@ -1,10 +1,10 @@
 {
-  "extends": "../../tsconfig.json",
   "compilerOptions": {
     "inlineSources": true,
     "rootDir": "./src",
     "baseUrl": "./src",
     "outDir": "lib"
   },
-  "exclude": ["lib", "jest.config.ts", "src/tsup.config.ts", "src/target-ethers-sentio"]
+  "exclude": ["lib", "jest.config.ts", "src/tsup.config.ts"],
+  "extends": "../../tsconfig.json"
 }

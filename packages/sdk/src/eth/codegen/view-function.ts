@@ -1,7 +1,7 @@
 // https://github.com/dethcrypto/TypeChain/blob/015abb28bd22826611051f27e0ec96a00f9a0b61/packages/target-ethers-v5/src/codegen/functions.ts#L54
 import { FunctionDeclaration } from 'typechain'
-import { generateInputTypes, generateOutputTypes } from '@sentio/ethers-v6/dist/codegen/types'
-import { getFullSignatureAsSymbolForFunction, getFullSignatureForFunction } from './types.cjs'
+import { generateInputTypes, generateOutputTypes } from '@sentio/ethers-v6/dist/codegen/types.js'
+import { getFullSignatureAsSymbolForFunction, getFullSignatureForFunction } from './types.js'
 
 function generateReturnTypes(fn: FunctionDeclaration) {
   // sounds like returnResultObject should be true but we need to set false to make it work
@@ -65,7 +65,9 @@ export function generateBoundViewFunction(fn: FunctionDeclaration, includeArgTyp
         blockTag: toBlockTag(this.context.blockNumber),
       }
     }
-    return await this.view.${declName}(${fn.inputs.length > 0 ? fn.inputs.map((input, index) => input.name || `arg${index}`).join(',') + ',' : ''} overrides || {})
+    return await this.view.${declName}(${
+    fn.inputs.length > 0 ? fn.inputs.map((input, index) => input.name || `arg${index}`).join(',') + ',' : ''
+  } overrides || {})
   }
   `
 }

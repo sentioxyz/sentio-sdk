@@ -26,8 +26,8 @@ ignore:
   - node_modules
   - packages/cli/node_modules
   - packages/cli/templates
-  - packages/sdk/src/abis
-  - packages/sdk/src/builtin/internal
+  - packages/sdk/src/eth/abis
+  - packages/sdk/src/eth/builtin/internal
   - packages/sdk/docs
   - packages/sdk/lib
   - packages/sdk/node_modules

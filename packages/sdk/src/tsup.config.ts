@@ -13,6 +13,9 @@ export default defineConfig({
   sourcemap: 'inline',
   clean: true,
   format: 'esm',
+  dts: {
+    resolve: true,
+  },
   external: [
     'protobufjs',
     'aptos',

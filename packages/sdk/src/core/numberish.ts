@@ -1,18 +1,7 @@
 import { BigInteger, MetricValue } from '@sentio/protos'
 import { BigDecimal } from './big-decimal.js'
-import { BlockTag } from 'ethers/providers'
 
 export type Numberish = number | bigint | BigDecimal | string
-
-export function toBlockTag(a: number | bigint): BlockTag {
-  if (typeof a === 'number') {
-    return a
-  }
-  if (a > Number.MAX_SAFE_INTEGER) {
-    return '0x' + a.toString(16)
-  }
-  return Number(a)
-}
 
 export function toMetricValue(value: Numberish): MetricValue {
   if (typeof value === 'number') {

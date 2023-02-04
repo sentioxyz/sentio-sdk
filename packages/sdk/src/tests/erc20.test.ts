@@ -3,7 +3,7 @@
 import { expect } from 'chai'
 
 import { TestProcessorServer, firstCounterValue, firstGaugeValue } from '@sentio/sdk/testing'
-import { mockTransferLog } from '../builtin/erc20/test-utils.js'
+import { mockTransferLog } from '../eth/builtin/erc20/test-utils.js'
 import { HandlerType } from '@sentio/protos'
 
 describe('Test Basic Examples', () => {

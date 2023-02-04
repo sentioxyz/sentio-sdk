@@ -3,13 +3,13 @@ import {
   createImportsForUsedIdentifiers,
   EventDeclaration,
   getFullSignatureAsSymbolForEvent,
+  getFullSignatureForEvent,
 } from 'typechain'
 
-import { reservedKeywords } from '@sentio/ethers-v6/dist/codegen/reserved-keywords'
-import { getFullSignatureForEvent } from 'typechain/dist/utils/signatures'
-import { codegenCallTraceTypes, generateCallHandlers } from './functions-handler.cjs'
-import { generateEventFilters, generateEventHandlers } from './event-handler.cjs'
-import { generateBoundViewFunctions, generateViewFunctions } from './view-function.cjs'
+import { reservedKeywords } from '@sentio/ethers-v6/dist/codegen/reserved-keywords.js'
+import { codegenCallTraceTypes, generateCallHandlers } from './functions-handler.js'
+import { generateEventFilters, generateEventHandlers } from './event-handler.js'
+import { generateBoundViewFunctions, generateViewFunctions } from './view-function.js'
 
 export function codeGenIndex(contract: Contract): string {
   return ` 
@@ -146,7 +146,7 @@ export class ${contract.name}ProcessorTemplate extends BaseProcessorTemplate<${c
     {
       ethers: ['BigNumberish', 'Overrides', 'BytesLike'],
       'ethers/providers': ['Networkish'],
-      '@sentio/sdk': [
+      '@sentio/sdk/eth': [
         'addContractByABI',
         'getContractByABI',
         'addProcessor',

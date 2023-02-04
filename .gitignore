@@ -1,5 +1,6 @@
-packages/sdk/src/builtin/*
-!packages/sdk/src/builtin/index.ts
+packages/sdk/src/eth/builtin/*
+# TODO auto gen index.ts
+!packages/sdk/src/eth/builtin/index.ts
 
 packages/sdk/src/aptos/builtin/
 
@@ -8,7 +9,6 @@ dist
 lib
 **/src/types
 **/tests/types
-!packages/sdk/src/types
 
 docs
 

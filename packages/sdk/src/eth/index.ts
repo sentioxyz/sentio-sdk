@@ -3,8 +3,10 @@ export { GenericProcessor } from './generic-processor.js'
 export { BaseProcessorTemplate } from './base-processor-template.js'
 export { getProvider, DummyProvider } from './provider.js'
 export type { TypedCallTrace, Trace } from './trace.js'
-export { EthPlugin } from './eth-plugin.js'
-
 export * from './eth.js'
-
+export * from './error.js'
+export { BindOptions, AccountBindOptions } from './bind-options.js'
 export { getProcessor, addProcessor, getContractByABI, addContractByABI } from './binds.js'
+export { ContractContext, ContractView, BoundContractView } from './context.js'
+
+export { EthPlugin } from './eth-plugin.js'
