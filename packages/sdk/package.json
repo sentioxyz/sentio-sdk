@@ -29,6 +29,7 @@
   },
   "exports": {
     ".": "./lib/index.js",
+    "./eth": "./lib/eth/index.js",
     "./testing": "./lib/testing/index.js",
     "./builtin": "./lib/builtin/index.js",
     "./builtin/erc20": "./lib/builtin/erc20/index.js",

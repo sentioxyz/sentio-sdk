@@ -1,8 +1,9 @@
 // Transform error in more readable format
 import { ContractContext } from './core/context.js'
+import { CallExceptionError } from 'ethers'
 // import { errors } from 'ethers/providers'
 
-export class EthersError extends Error {
+export class SimpleEthersError extends Error {
   e: Error
 
   constructor(message: string, e: Error) {
@@ -16,11 +17,14 @@ export class EthersError extends Error {
 }
 
 export function transformEtherError(e: Error, ctx: ContractContext<any, any> | undefined): Error {
+  if (e instanceof SimpleEthersError) {
+    return e
+  }
+
   let msg = ''
-  // @ts-ignore expected error fields
-  if (e.code === errors.CALL_EXCEPTION) {
-    // @ts-ignore expected error fields
-    if (e.data === '0x') {
+  const err = e as CallExceptionError
+  if (err.code === 'CALL_EXCEPTION') {
+    if (err.data === '0x') {
       if (ctx) {
         msg =
           "jsonrpc eth_call return '0x' (likely contract not existed) at chain " +
@@ -28,18 +32,12 @@ export function transformEtherError(e: Error, ctx: ContractContext<any, any> | u
           ': ' +
           JSON.stringify(e)
       } else {
-        msg = "jsonrpc eth_call return '0x' (likely contract not existed): " + JSON.stringify(e)
+        msg = "jsonrpc eth_call return '0x' (likely contract not existed): " + JSON.stringify(err)
       }
+      return new SimpleEthersError(msg, err)
     }
-    return new EthersError(msg, e)
   }
 
-  if (e instanceof EthersError) {
-    return e
-  }
-
-  // TODO gracefully handle more errors
-
-  msg = 'ethers call error\n' + e.message + '\n' + e.stack?.toString()
+  msg = 'ethers call error\n' + JSON.stringify(e) + '\n' + e.stack?.toString()
   return new Error(msg)
 }

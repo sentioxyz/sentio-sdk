@@ -23,8 +23,26 @@ export async function buildProcessor(onlyGen: boolean) {
       console.error(chalk.red("Wrong CLI version for sdk, can't find tsup.config.ts"))
       process.exit(1)
     }
+
     // await execStep('yarn tsc -p .', 'Compile')
     await execStep('yarn tsup --config=' + WEBPACK_CONFIG, 'Packaging')
+
+    const dir = fs.readdirSync(path.join(process.cwd(), 'dist'))
+    const generated = dir.filter((d) => d.endsWith('.js')).length
+    if (generated < 0) {
+      console.error(chalk.red('No filed generated, please check if your processor.ts file'))
+      process.exit(1)
+    }
+    if (generated > 1) {
+      console.error(
+        chalk.red('Packing failed: '),
+        `Multiple entry point is not allowed. If your processor.ts have multiple file imported, please change:
+import('mine.js')
+to
+import 'mine.js'
+`
+      )
+    }
   }
 }
 

@@ -60,19 +60,12 @@ export function generateBoundViewFunction(fn: FunctionDeclaration, includeArgTyp
   async ${declName ?? fn.name}(${generateInputTypes(fn.inputs, {
     useStructs: true,
   })}overrides?: Overrides): ${generateReturnTypes(fn)} {
-    try {
-      if (!overrides && this.context) {
-        overrides = {
-          blockTag: toBlockTag(this.context.blockNumber),
-        }
+    if (!overrides && this.context) {
+      overrides = {
+        blockTag: toBlockTag(this.context.blockNumber),
       }
-      return await this.view.${declName}(${
-    fn.inputs.length > 0 ? fn.inputs.map((input, index) => input.name || `arg${index}`).join(',') + ',' : ''
-  } overrides || {})
-
-    } catch (e) {
-      throw transformEtherError(e, this.context)
     }
+    return await this.view.${declName}(${fn.inputs.length > 0 ? fn.inputs.map((input, index) => input.name || `arg${index}`).join(',') + ',' : ''} overrides || {})
   }
   `
 }

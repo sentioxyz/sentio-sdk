@@ -15,7 +15,7 @@ import { BindInternalOptions, BindOptions } from '../core/bind-options.js'
 import { PromiseOrVoid } from '../promise-or-void.js'
 import { Trace } from './trace.js'
 import { ServerError, Status } from 'nice-grpc'
-import { EthEvent } from './eth-event.js'
+import { Eth } from './eth.js'
 
 export interface AddressOrTypeEventFilter extends DeferredTopicFilter {
   addressType?: AddressType
@@ -78,7 +78,7 @@ export abstract class BaseProcessor<
   }
 
   public onEvent(
-    handler: (event: EthEvent, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
+    handler: (event: Eth, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     filter: DeferredTopicFilter | DeferredTopicFilter[],
     fetchConfig?: EthFetchConfig
   ) {
@@ -120,7 +120,7 @@ export abstract class BaseProcessor<
         const parsed = contractView.rawContract.interface.parseLog(logParam)
 
         if (parsed) {
-          const event: EthEvent = { ...log, args: parsed.args }
+          const event: Eth = { ...log, args: parsed.args }
           await handler(event, ctx)
           return ctx.getProcessResult()
         }
@@ -189,7 +189,7 @@ export abstract class BaseProcessor<
     return this
   }
 
-  public onAllEvents(handler: (event: EthEvent, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid) {
+  public onAllEvents(handler: (event: Eth, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid) {
     const _filters: DeferredTopicFilter[] = []
     const tmpContract = this.CreateBoundContractView()
 

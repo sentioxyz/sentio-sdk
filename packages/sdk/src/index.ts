@@ -1,4 +1,4 @@
-export { transformEtherError, EthersError } from './error.js'
+export { transformEtherError, SimpleEthersError } from './error.js'
 
 // TODO maybe remove this
 export * from '@sentio/protos'
