@@ -79,4 +79,10 @@ class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
   send(method: string, params: Array<any>): Promise<any> {
     return this.executor.add(() => super.send(method, params))
   }
+
+  async _detectNetwork(): Promise<Network> {
+    return this._network
+  }
+  // disable batch eth call
+  _start(): void {}
 }

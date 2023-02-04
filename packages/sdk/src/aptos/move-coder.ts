@@ -162,7 +162,6 @@ export class MoveCoder {
     }
     return {
       ...typeStruct,
-      data_typed: dataTyped,
       data_decoded: dataTyped,
       type_arguments: typeArguments,
     } as StructWithType<T>
@@ -188,7 +187,6 @@ export class MoveCoder {
 
     return {
       ...payload,
-      arguments_typed: argumentsTyped,
       arguments_decoded: argumentsTyped,
     } as TypedEntryFunctionPayload<any>
   }
