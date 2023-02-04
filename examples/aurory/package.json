@@ -11,8 +11,7 @@
     "build_all": "yarn lerna run --scope=@sentio-example/aurory build --include-dependencies"
   },
   "dependencies": {
-    "@sentio/sdk": "^2.0.0-development",
-    "@sentio/sdk-solana": "^2.0.0-development"
+    "@sentio/sdk": "^2.0.0-development"
   },
   "devDependencies": {
     "@sentio/cli": "^2.0.0-development"

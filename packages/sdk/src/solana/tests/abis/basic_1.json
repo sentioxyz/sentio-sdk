@@ -1,6 +1,18 @@
 {
-  "version": "0.1.0",
-  "name": "basic_1",
+  "accounts": [
+    {
+      "name": "MyAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "data",
+            "type": "u64"
+          }
+        ]
+      }
+    }
+  ],
   "instructions": [
     {
       "name": "initialize",
@@ -45,18 +57,6 @@
       ]
     }
   ],
-  "accounts": [
-    {
-      "name": "MyAccount",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "data",
-            "type": "u64"
-          }
-        ]
-      }
-    }
-  ]
+  "name": "basic_1",
+  "version": "0.1.0"
 }

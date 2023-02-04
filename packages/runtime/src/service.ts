@@ -61,7 +61,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         }
       }
 
-      for (const plugin of ['@sentio/sdk-aptos', '@sentio/sdk-solana']) {
+      for (const plugin of ['@sentio/sdk/aptos', '@sentio/sdk/solana']) {
         try {
           await import(plugin)
         } catch (e) {}

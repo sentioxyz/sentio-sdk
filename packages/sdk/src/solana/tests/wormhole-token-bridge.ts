@@ -1,4 +1,4 @@
-import { SPLTokenProcessor } from '@sentio/sdk-solana/builtin'
+import { SPLTokenProcessor } from '@sentio/sdk/solana/builtin'
 import { TokenBridgeProcessor } from './types/token_bridge_processor.js'
 
 import { token_bridge_idl } from './types/token_bridge.js'

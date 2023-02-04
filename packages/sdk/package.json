@@ -4,28 +4,42 @@
   "version": "2.0.0-development",
   "type": "module",
   "scripts": {
-    "compile_target": "yarn tsc -b src/target-ethers-sentio/tsconfig.json",
+    "compile_typechain_target": "yarn tsc -b src/target-ethers-sentio/tsconfig.json",
     "compile": "tsc -p . && cp src/utils/*.csv lib/utils && cp src/tsup.config.ts lib",
-    "build": "yarn gen && yarn compile",
+    "build": "yarn gen && yarn aptos:gen && yarn solana:gen && yarn compile",
     "build_all": "yarn lerna run --scope=@sentio/sdk build --include-dependencies",
     "test": "NODE_OPTIONS=--experimental-vm-modules yarn jest",
-    "gen": "yarn compile_target && yarn gen_bultin_evm",
-    "gen_bultin_evm": "typechain --target lib/target-ethers-sentio/index.cjs --out-dir src/builtin/internal 'src/abis/*.json'"
+    "gen": "yarn compile_typechain_target && yarn gen_bultin_evm",
+    "gen_bultin_evm": "typechain --target lib/target-ethers-sentio/index.cjs --out-dir src/builtin/internal 'src/abis/*.json'",
+    "aptos:gen": "ts-node-esm  ./src/aptos/run-codegen.ts src/aptos/abis src/aptos/builtin && yarn aptos:gen_test",
+    "aptos:gen_test": "ts-node-esm  ./src/aptos/run-codegen.ts src/aptos/tests/abis src/aptos/tests/types",
+    "solana:gen": "ts-node-esm ./src/solana/run-codegen.ts src/solana/tests/abis src/solana/tests/types"
   },
   "dependencies": {
     "@sentio/runtime": "^2.0.0-development",
     "@sentio/protos": "^2.0.0-development",
     "@sentio/ethers-v6": "^1.0.24",
     "@sentio/bigdecimal": "^9.1.1-patch.3",
+    "@types/prettier": "^2.7.2",
     "csv-parse": "^5.3.0",
-    "ethers": "6.0.0",
+    "ethers": "npm:@sentio/ethers@^6.0.0",
     "google-protobuf": "^3.15.8",
     "nice-grpc": "^2.0.0",
     "typechain": "^8.0.0",
-    "p-queue": "^7.3.0"
+    "p-queue": "^7.3.0",
+    "chalk": "^5.2.0",
+    "aptos-sdk": "npm:@sentio/aptos@^1.6.0",
+    "prettier": "^2.8.1",
+    "@project-serum/anchor": "^0.26.0",
+    "@sentio/sdk": "2.0.0-development",
+    "@solana/web3.js": "^1.47.3",
+    "bs58": "^5.0.0"
   },
   "devDependencies": {
-    "@types/google-protobuf": "^3.15.6"
+    "@types/google-protobuf": "^3.15.6",
+    "@certusone/wormhole-sdk": "^0.9.8",
+    "@types/lodash-es": "^4.17.6",
+    "lodash-es": "^4.17.21"
   },
   "exports": {
     ".": "./lib/index.js",
@@ -37,7 +51,15 @@
     "./builtin/erc1155": "./lib/builtin/erc1155/index.js",
     "./builtin/eacaggregatorproxy": "./lib/builtin/eacaggregatorproxy/index.js",
     "./builtin/weth9": "./lib/builtin/weth9/index.js",
-    "./utils": "./lib/utils/index.js"
+    "./utils": "./lib/utils/index.js",
+    "./aptos": "./lib/aptos/index.js",
+    "./aptos/builtin": "./lib/aptos/builtin/index.js",
+    "./aptos/builtin/0x1": "./lib/aptos/builtin/0x1.js",
+    "./aptos/builtin/0x3": "./lib/aptos/builtin/0x3.js",
+    "./aptos/codegen": "./lib/aptos/codegen/index.js",
+    "./solana": "./lib/solana/index.js",
+    "./solana/builtin": "./lib/solana/builtin/index.js",
+    "./solana/codegen": "./lib/solana/codegen/index.js"
   },
   "files": [
     "{lib,src}",

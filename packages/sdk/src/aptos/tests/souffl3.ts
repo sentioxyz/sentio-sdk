@@ -1,4 +1,4 @@
-import { AptosAccountProcessor, defaultMoveCoder } from '@sentio/sdk-aptos'
+import { AptosAccountProcessor, defaultMoveCoder } from '@sentio/sdk/aptos'
 import { AccountEventTracker } from '@sentio/sdk'
 import { SouffleChefCampaign, CandyMachine } from './types/souffle.js'
 import { token } from '../builtin/0x3.js'

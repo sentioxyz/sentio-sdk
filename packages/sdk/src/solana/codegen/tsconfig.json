@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "rootDir": "..",
+    "outDir": "../../../lib"
+  },
+  "extends": "@sentio/sdk-solana/tsconfig.json",
+  "include": ["./"]
+}

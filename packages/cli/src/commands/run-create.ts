@@ -109,16 +109,6 @@ export async function runCreate(argv: string[]) {
       const sdkVersion = '^' + (await latestVersion('@sentio/sdk'))
       packageJson.dependencies['@sentio/sdk'] = sdkVersion
 
-      switch (chainType) {
-        case 'aptos':
-          packageJson.dependencies['@sentio/sdk-aptos'] = sdkVersion
-          break
-        case 'solana':
-          packageJson.dependencies['@sentio/sdk-solana'] = sdkVersion
-          break
-        default:
-      }
-
       const cliVersion = '^' + (await latestVersion('@sentio/cli'))
       packageJson.devDependencies['@sentio/cli'] = cliVersion
       packageJson.name = projectName
@@ -126,8 +116,6 @@ export async function runCreate(argv: string[]) {
       if (options.subproject) {
         delete packageJson.dependencies['@sentio/sdk']
         delete packageJson.devDependencies['@sentio/cli']
-        delete packageJson.dependencies['@sentio/sdk-aptos']
-        delete packageJson.dependencies['@sentio/sdk-solana']
       }
 
       // Don't add directly to avoid deps issue

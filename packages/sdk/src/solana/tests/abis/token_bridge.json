@@ -1,6 +1,5 @@
 {
-  "version": "0.1.0",
-  "name": "token_bridge",
+  "accounts": [],
   "instructions": [
     {
       "name": "initialize",
@@ -933,5 +932,6 @@
       ]
     }
   ],
-  "accounts": []
+  "name": "token_bridge",
+  "version": "0.1.0"
 }

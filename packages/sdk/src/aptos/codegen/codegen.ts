@@ -172,9 +172,9 @@ export class AccountCodegen {
       MoveCoder, AptosBindOptions, AptosBaseProcessor, 
       TypedEventInstance, AptosNetwork, TypedEntryFunctionPayload,
       AptosContext, CallFilter
-    } from "@sentio/sdk-aptos"
+    } from "@sentio/sdk/aptos"
     import { AptosFetchConfig } from "@sentio/protos"
-    import { Address, MoveModule } from "@sentio/sdk-aptos"
+    import { Address, MoveModule } from "@sentio/sdk/aptos"
     `
 
     const dependedAccounts: string[] = []
@@ -189,7 +189,7 @@ export class AccountCodegen {
         const tsAccountModule = './' + (this.loader.accountImports.get(account)?.moduleName || account)
         if (isFrameworkAccount(account) && !isFrameworkAccount(address)) {
           // Decide where to find runtime library
-          moduleImports.push(`import { _${account} } from "@sentio/sdk-aptos/builtin"`)
+          moduleImports.push(`import { _${account} } from "@sentio/sdk/aptos/builtin"`)
         } else {
           moduleImports.push(`import * as _${account} from "${tsAccountModule}.js"`)
         }

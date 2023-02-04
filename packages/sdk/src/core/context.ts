@@ -4,7 +4,7 @@ import { LogParams } from 'ethers/providers'
 import { RecordMetaData } from '@sentio/protos'
 import { Trace } from '../eth/trace.js'
 import { Labels, normalizeLabels } from './metadata.js'
-import { CHAIN_IDS } from '../utils/chain.js'
+import { CHAIN_IDS } from '../chain.js'
 import { BaseContext } from './base-context.js'
 
 export abstract class EthContext extends BaseContext {

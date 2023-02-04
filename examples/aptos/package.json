@@ -12,8 +12,7 @@
     "cli": "ts-node --files src/cli.ts"
   },
   "dependencies": {
-    "@sentio/sdk": "^2.0.0-development",
-    "@sentio/sdk-aptos": "^2.0.0-development"
+    "@sentio/sdk": "^2.0.0-development"
   },
   "devDependencies": {
     "@sentio/cli": "^2.0.0-development"

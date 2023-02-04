@@ -14,7 +14,7 @@ import {
 } from '@sentio/protos'
 import { CallContext } from 'nice-grpc-common'
 import { ProcessorServiceImpl, Endpoints, State } from '@sentio/runtime'
-import { CHAIN_MAP } from '../utils/chain.js'
+import { CHAIN_MAP } from '../chain.js'
 
 import { Trace } from '../eth/trace.js'
 import { LogParams, Networkish, BlockParams, Network } from 'ethers/providers'

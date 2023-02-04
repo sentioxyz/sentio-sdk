@@ -1,8 +1,8 @@
 import { SouffleChefCampaign, CandyMachine } from './types/aptos/souffle.js'
-import { token } from '@sentio/sdk-aptos/builtin/0x3'
-import { coin } from '@sentio/sdk-aptos/builtin/0x1'
+import { token } from '@sentio/sdk/aptos/builtin/0x3'
+import { coin } from '@sentio/sdk/aptos/builtin/0x1'
 import { AccountEventTracker } from '@sentio/sdk'
-import { AptosNetwork, defaultMoveCoder } from '@sentio/sdk-aptos'
+import { AptosNetwork, defaultMoveCoder } from '@sentio/sdk/aptos'
 
 const accountTracker = AccountEventTracker.register('pull')
 

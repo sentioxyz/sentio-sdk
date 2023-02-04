@@ -6,5 +6,5 @@ export * from '@sentio/protos'
 export * from './core/index.js'
 export * from './eth/index.js'
 
-export * from './utils/chain.js'
+export * from './chain.js'
 // export * from  './api'

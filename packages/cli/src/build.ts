@@ -51,13 +51,13 @@ async function buildProcessorForTarget(onlyGen: boolean) {
 
   try {
     // @ts-ignore dynamic import
-    const codegen = await import('@sentio/sdk-solana/codegen')
+    const codegen = await import('@sentio/sdk/solana/codegen')
     codegen.codeGenSolanaProcessor(path.join('abis', 'solana'))
   } catch (e) {}
 
   try {
     // @ts-ignore dynamic import
-    const codegen = await import('@sentio/sdk-aptos/codegen')
+    const codegen = await import('@sentio/sdk/aptos/codegen')
     codegen.codeGenAptosProcessor(path.join('abis', 'aptos'))
   } catch (e) {}
 

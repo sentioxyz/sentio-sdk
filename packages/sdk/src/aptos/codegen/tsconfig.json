@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "rootDir": "..",
+    "outDir": "../../../lib/aptos"
+  },
+  "extends": "../../../tsconfig.json",
+  "include": ["./"]
+}
