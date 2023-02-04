@@ -3,17 +3,54 @@ import path from 'path'
 import fs from 'fs'
 import { exec } from 'child_process'
 import * as process from 'process'
-import { getPackageRoot } from './utils.js'
+import { getPackageRoot } from '../utils.js'
+import commandLineArgs from 'command-line-args'
+import commandLineUsage from 'command-line-usage'
 
-export async function buildProcessor(onlyGen: boolean) {
-  if (!onlyGen) {
+export async function buildProcessor(onlyGen: boolean, argv: string[]) {
+  const optionDefinitions = [
+    {
+      name: 'help',
+      alias: 'h',
+      type: Boolean,
+      description: 'Display this usage guide.',
+    },
+    {
+      name: 'skip-gen',
+      type: Boolean,
+      description: 'Skip code generation.',
+    },
+    {
+      name: 'skip-deps',
+      type: Boolean,
+      description: 'Skip dependency enforce.',
+    },
+  ]
+
+  const options = commandLineArgs(optionDefinitions, { argv })
+  const usage = commandLineUsage([
+    {
+      header: 'Create a template project',
+      content: 'sentio create <name>',
+    },
+    {
+      header: 'Options',
+      optionList: optionDefinitions,
+    },
+  ])
+
+  if (options.help) {
+    console.log(usage)
+    process.exit(0)
+  }
+
+  if (!options['skip-deps'] && !onlyGen) {
     await installDeps()
   }
 
-  // targets.forEach(async (target) => await buildProcessorForTarget(onlyGen, target))
-  // for (const target) {
-  await buildProcessorForTarget(onlyGen)
-  // }
+  if (!options['skip-gen']) {
+    await codegen()
+  }
 
   if (!onlyGen) {
     let tsupConfig: string
@@ -47,7 +84,7 @@ import 'mine.js'
   }
 }
 
-async function buildProcessorForTarget(onlyGen: boolean) {
+async function codegen() {
   const outputBase = path.resolve('src', 'types')
   try {
     // @ts-ignore dynamic import
@@ -80,10 +117,6 @@ async function buildProcessorForTarget(onlyGen: boolean) {
     await codegen.codegen(path.resolve('abis', 'aptos'), path.resolve(outputBase, 'aptos'))
   } catch (e) {
     console.error('code gen error', e)
-  }
-
-  if (onlyGen) {
-    return
   }
 }
 

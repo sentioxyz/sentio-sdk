@@ -42,7 +42,7 @@
     "cleanjest": "yarn jest --clearCache",
     "format": "prettier --write .",
     "lint": "ls-lint && eslint .",
-    "docs": "rm -rf packages/sdk-all/lib && typedoc --options ./typedoc.json",
+    "docs": "rm -rf packages/sdk/lib && typedoc --options ./typedoc.json",
     "postinstall": "git config --local include.path ../.github/.gitconfig && git config core.hooksPath .github/.githooks"
   },
   "engines": {

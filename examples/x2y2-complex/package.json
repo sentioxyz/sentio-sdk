@@ -7,7 +7,7 @@
   "scripts": {
     "compile": "tsc -p .",
     "test": "sentio test",
-    "build": "sentio build",
+    "build": "sentio build --skip-deps",
     "upload": "sentio upload",
     "tsnode": "yarn ts-node",
     "build_all": "yarn lerna run --scope=@sentio-example/x2y2-complex build --include-dependencies"

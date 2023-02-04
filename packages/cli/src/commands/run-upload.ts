@@ -3,7 +3,7 @@ import commandLineUsage from 'command-line-usage'
 import { finalizeHost, FinalizeProjectName, SentioProjectConfig } from '../config.js'
 import { URL } from 'url'
 import fetch from 'node-fetch'
-import { buildProcessor } from '../build.js'
+import { buildProcessor } from './build.js'
 import chalk from 'chalk'
 import path from 'path'
 import { ReadKey } from '../key.js'
@@ -12,6 +12,7 @@ import { createHash } from 'crypto'
 import { execSync } from 'child_process'
 import { getSdkVersion } from '../utils.js'
 import readline from 'readline'
+import * as process from 'process'
 
 export async function runUpload(processorConfig: SentioProjectConfig, argv: string[]) {
   const optionDefinitions = [
@@ -60,26 +61,27 @@ export async function runUpload(processorConfig: SentioProjectConfig, argv: stri
       },
     ])
     console.log(usage)
-  } else {
-    if (options.host) {
-      processorConfig.host = options.host
-    }
-    if (options.nobuild) {
-      processorConfig.build = false
-    }
-    if (options.debug) {
-      processorConfig.debug = true
-    }
-    finalizeHost(processorConfig)
-    FinalizeProjectName(processorConfig, options.owner)
-    console.log(processorConfig)
-
-    let apiOverride = undefined
-    if (options['api-key']) {
-      apiOverride = options['api-key']
-    }
-    return uploadFile(processorConfig, apiOverride)
+    process.exit(0)
   }
+
+  if (options.host) {
+    processorConfig.host = options.host
+  }
+  if (options.nobuild) {
+    processorConfig.build = false
+  }
+  if (options.debug) {
+    processorConfig.debug = true
+  }
+  finalizeHost(processorConfig)
+  FinalizeProjectName(processorConfig, options.owner)
+  console.log(processorConfig)
+
+  let apiOverride = undefined
+  if (options['api-key']) {
+    apiOverride = options['api-key']
+  }
+  return uploadFile(processorConfig, apiOverride, argv)
 }
 
 async function createProject(options: SentioProjectConfig, apiKey: string) {
@@ -94,9 +96,9 @@ async function createProject(options: SentioProjectConfig, apiKey: string) {
   })
 }
 
-export async function uploadFile(options: SentioProjectConfig, apiKeyOverride: string) {
+export async function uploadFile(options: SentioProjectConfig, apiKeyOverride: string, argv: string[]) {
   if (options.build) {
-    await buildProcessor(false)
+    await buildProcessor(false, argv)
   }
 
   console.log(chalk.blue('Prepare to upload'))

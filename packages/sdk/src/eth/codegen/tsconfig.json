@@ -3,6 +3,6 @@
     "rootDir": "..",
     "outDir": "../../../lib"
   },
-  "extends": "@sentio/sdk/tsconfig.json",
+  "extends": "../../../tsconfig.json",
   "include": ["./"]
 }

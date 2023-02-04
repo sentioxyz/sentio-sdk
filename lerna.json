@@ -1,9 +1,9 @@
 {
-  "packages_no_need": ["sdk", "cli", "cli/templates", "examples/*"],
-  "version": "1.0.0-rc.5",
+  "command": {},
+  "concurrency": 4,
   "npmClient": "yarn",
-  "useWorkspaces": true,
+  "packages_no_need": ["sdk", "cli", "cli/templates", "examples/*"],
   "stream": true,
-  "concurrency": 1,
-  "command": {}
+  "useWorkspaces": true,
+  "version": "1.0.0-rc.5"
 }

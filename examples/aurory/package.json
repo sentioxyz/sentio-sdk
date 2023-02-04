@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "gen": "sentio gen",
-    "build": "sentio build",
+    "build": "sentio build --skip-deps",
     "test": "sentio test",
     "upload": "sentio upload",
     "build_all": "yarn lerna run --scope=@sentio-example/aurory build --include-dependencies"

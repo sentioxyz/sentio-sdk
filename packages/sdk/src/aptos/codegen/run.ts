@@ -1,6 +1,6 @@
 // #!/usr/bin/env node
 
-import { codegen } from './codegen/codegen.js'
+import { codegen } from './codegen.js'
 
 if (process.argv.length > 3) {
   const abisDir = process.argv[2]

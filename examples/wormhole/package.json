@@ -7,7 +7,7 @@
   "scripts": {
     "compile": "tsc",
     "test": "sentio test",
-    "build": "yarn sentio build",
+    "build": "yarn sentio build --skip-deps",
     "build_all": "yarn lerna run --scope=@sentio-example/wormhole build --include-dependencies"
   },
   "dependencies": {
