@@ -1,7 +1,7 @@
 {
   "1": {
     "ChainID": "1",
-    "ChainServer": "",
+    "ChainServer": "http://localhost:8645",
     "BatchSize": 2000,
     "ReorgThresholdBlocks": 30,
     "TimestampSampleInterval": 10000,

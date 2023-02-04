@@ -106,6 +106,7 @@ const service = new FullProcessorServiceImpl(baseService)
 
 server.add(ProcessorDefinition, service)
 
+console.log('Listen on', options.port)
 server.listen('0.0.0.0:' + options.port)
 
 console.log('Processor Server Started')

@@ -9,8 +9,8 @@
     "build": "yarn compile"
   },
   "dependencies": {
-    "google-protobuf": "^3.15.8",
-    "nice-grpc": "^2.0.0"
+    "google-protobuf": "^3.21.2",
+    "nice-grpc": "^2.1.0"
   },
   "exports": {
     ".": "./lib/index.js",
