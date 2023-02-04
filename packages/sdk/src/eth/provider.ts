@@ -31,7 +31,7 @@ export function getProvider(networkish?: Networkish): Provider {
         [...Endpoints.INSTANCE.chainServer.keys()].join(' ')
     )
   }
-  provider = new QueuedStaticJsonRpcProvider(address, network, Endpoints.INSTANCE.concurrency)
+  provider = new QueuedStaticJsonRpcProvider(address, Network.from(network), Endpoints.INSTANCE.concurrency)
   providers.set(network.chainId.toString(), provider)
   return provider
 }
@@ -70,18 +70,22 @@ export function getProvider(networkish?: Networkish): Provider {
 
 class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
   executor: PQueue
+  network: Network
 
-  constructor(url: string, network: Networkish, concurrency: number) {
-    super(url, Network.from(network))
+  constructor(url: string, network: Network, concurrency: number) {
+    super(url, network)
+    this.network = network
     this.executor = new PQueue({ concurrency: concurrency })
   }
 
   send(method: string, params: Array<any>): Promise<any> {
     return this.executor.add(() => super.send(method, params))
   }
-
   async _detectNetwork(): Promise<Network> {
-    return this._network
+    return this.network
+  }
+  get _network(): Network {
+    return this.network
   }
   // disable batch eth call
   _start(): void {}
