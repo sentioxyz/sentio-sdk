@@ -7,27 +7,27 @@ import { getPackageRoot } from '../utils.js'
 import commandLineArgs from 'command-line-args'
 import commandLineUsage from 'command-line-usage'
 
-export async function buildProcessor(onlyGen: boolean, argv: string[]) {
-  const optionDefinitions = [
-    {
-      name: 'help',
-      alias: 'h',
-      type: Boolean,
-      description: 'Display this usage guide.',
-    },
-    {
-      name: 'skip-gen',
-      type: Boolean,
-      description: 'Skip code generation.',
-    },
-    {
-      name: 'skip-deps',
-      type: Boolean,
-      description: 'Skip dependency enforce.',
-    },
-  ]
+export const buildOptionDefinitions = [
+  {
+    name: 'help',
+    alias: 'h',
+    type: Boolean,
+    description: 'Display this usage guide.',
+  },
+  {
+    name: 'skip-gen',
+    type: Boolean,
+    description: 'Skip code generation.',
+  },
+  {
+    name: 'skip-deps',
+    type: Boolean,
+    description: 'Skip dependency enforce.',
+  },
+]
 
-  const options = commandLineArgs(optionDefinitions, { argv })
+export async function buildProcessorWithArgs(argv: string[]) {
+  const options = commandLineArgs(buildOptionDefinitions, { argv })
   const usage = commandLineUsage([
     {
       header: 'Create a template project',
@@ -35,7 +35,7 @@ export async function buildProcessor(onlyGen: boolean, argv: string[]) {
     },
     {
       header: 'Options',
-      optionList: optionDefinitions,
+      optionList: buildOptionDefinitions,
     },
   ])
 
@@ -43,7 +43,10 @@ export async function buildProcessor(onlyGen: boolean, argv: string[]) {
     console.log(usage)
     process.exit(0)
   }
+  await buildProcessor(false, options)
+}
 
+export async function buildProcessor(onlyGen: boolean, options: commandLineArgs.CommandLineOptions) {
   if (!options['skip-deps'] && !onlyGen) {
     await installDeps()
   }

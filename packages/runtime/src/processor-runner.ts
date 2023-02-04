@@ -94,19 +94,17 @@ const server = createServer({
   'grpc.default_compression_algorithm': compressionAlgorithms.gzip,
 })
 
-// const m = await import(options.target)
-// console.log(m)
-
 const baseService = new ProcessorServiceImpl(async () => {
   const m = await import(options.target)
-  console.log('module loaded')
+  if (options.debug) {
+    console.log('Module loaded', m)
+  }
   return m
 }, server.shutdown)
 const service = new FullProcessorServiceImpl(baseService)
 
 server.add(ProcessorDefinition, service)
 
-console.log('Listen on', options.port)
 server.listen('0.0.0.0:' + options.port)
 
-console.log('Processor Server Started')
+console.log('Processor Server Started at:', options.port)

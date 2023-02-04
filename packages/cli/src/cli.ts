@@ -8,7 +8,7 @@ import path from 'path'
 import yaml from 'js-yaml'
 import { SentioProjectConfig } from './config.js'
 import chalk from 'chalk'
-import { buildProcessor } from './commands/build.js'
+import { buildProcessor, buildProcessorWithArgs } from './commands/build.js'
 import { runCreate } from './commands/run-create.js'
 import { runVersion } from './commands/run-version.js'
 import { runLogin } from './commands/run-login.js'
@@ -90,9 +90,9 @@ if (mainOptions.command === 'login') {
   if (mainOptions.command === 'upload') {
     await runUpload(processorConfig, argv)
   } else if (mainOptions.command === 'build') {
-    await buildProcessor(false, argv)
+    await buildProcessorWithArgs(argv)
   } else if (mainOptions.command === 'gen') {
-    await buildProcessor(true, argv)
+    await buildProcessor(true, [])
   } else {
     usage()
   }

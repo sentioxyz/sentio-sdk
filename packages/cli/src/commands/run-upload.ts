@@ -3,7 +3,7 @@ import commandLineUsage from 'command-line-usage'
 import { finalizeHost, FinalizeProjectName, SentioProjectConfig } from '../config.js'
 import { URL } from 'url'
 import fetch from 'node-fetch'
-import { buildProcessor } from './build.js'
+import { buildOptionDefinitions, buildProcessor } from './build.js'
 import chalk from 'chalk'
 import path from 'path'
 import { ReadKey } from '../key.js'
@@ -14,40 +14,57 @@ import { getSdkVersion } from '../utils.js'
 import readline from 'readline'
 import * as process from 'process'
 
+const uploadOptionDefinitions = [
+  {
+    name: 'help',
+    alias: 'h',
+    type: Boolean,
+    description: 'Display this usage guide.',
+  },
+  {
+    name: 'api-key',
+    type: String,
+    description: '(Optional) Manually provide API key rather than use saved credential',
+  },
+  {
+    name: 'host',
+    description: '(Optional) Override Sentio Host name',
+    type: String,
+  },
+  {
+    name: 'owner',
+    description: '(Optional) Override Project owner',
+    type: String,
+  },
+  {
+    name: 'nobuild',
+    description: '(Optional) Skip build & pack file before uploading, default false',
+    type: Boolean,
+  },
+  {
+    name: 'debug',
+    description: '(Optional) Run driver in debug mode, default false',
+    type: Boolean,
+  },
+]
+
+function mergeOptions(options1: commandLineArgs.OptionDefinition[], options2: commandLineArgs.OptionDefinition[]) {
+  const res = Object.assign([], options1)
+  const added = new Set<string>()
+  for (const opt of options1) {
+    added.add(opt.name)
+  }
+  for (const opt of options2) {
+    if (!added.has(opt.name)) {
+      res.push(opt)
+    }
+  }
+  return res
+}
+
 export async function runUpload(processorConfig: SentioProjectConfig, argv: string[]) {
-  const optionDefinitions = [
-    {
-      name: 'help',
-      alias: 'h',
-      type: Boolean,
-      description: 'Display this usage guide.',
-    },
-    {
-      name: 'api-key',
-      type: String,
-      description: '(Optional) Manually provide API key rather than use saved credential',
-    },
-    {
-      name: 'host',
-      description: '(Optional) Override Sentio Host name',
-      type: String,
-    },
-    {
-      name: 'owner',
-      description: '(Optional) Override Project owner',
-      type: String,
-    },
-    {
-      name: 'nobuild',
-      description: '(Optional) Skip build & pack file before uploading, default false',
-      type: Boolean,
-    },
-    {
-      name: 'debug',
-      description: '(Optional) Run driver in debug mode, default false',
-      type: Boolean,
-    },
-  ]
+  const optionDefinitions = mergeOptions(uploadOptionDefinitions, buildOptionDefinitions)
+
   const options = commandLineArgs(optionDefinitions, { argv })
   if (options.help) {
     const usage = commandLineUsage([
@@ -81,7 +98,10 @@ export async function runUpload(processorConfig: SentioProjectConfig, argv: stri
   if (options['api-key']) {
     apiOverride = options['api-key']
   }
-  return uploadFile(processorConfig, apiOverride, argv)
+  if (processorConfig.build) {
+    await buildProcessor(false, options)
+  }
+  return uploadFile(processorConfig, apiOverride)
 }
 
 async function createProject(options: SentioProjectConfig, apiKey: string) {
@@ -96,11 +116,7 @@ async function createProject(options: SentioProjectConfig, apiKey: string) {
   })
 }
 
-export async function uploadFile(options: SentioProjectConfig, apiKeyOverride: string, argv: string[]) {
-  if (options.build) {
-    await buildProcessor(false, argv)
-  }
-
+export async function uploadFile(options: SentioProjectConfig, apiKeyOverride: string) {
   console.log(chalk.blue('Prepare to upload'))
 
   const PROCESSOR_FILE = path.join(process.cwd(), 'dist/lib.js')
