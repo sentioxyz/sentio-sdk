@@ -99,6 +99,10 @@ export async function runCreate(argv: string[]) {
       },
       overwrite: false,
     })
+    const gitignoreFile = path.join(dstFolder, 'gitignore')
+    if (fs.existsSync(gitignoreFile)) {
+      fs.renameSync(gitignoreFile, path.join(dstFolder, '.gitignore'))
+    }
     if (options.name) {
       const sentioYamlPath = path.resolve(dstFolder, 'sentio.yaml')
       fs.writeFileSync(sentioYamlPath, 'project: ' + projectName + '\n', { flag: 'w+' })
