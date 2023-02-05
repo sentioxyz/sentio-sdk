@@ -41,6 +41,8 @@ async function codegenInternal(abisDir: string, outDir: string): Promise<number>
   }
   const services: Services = {
     fs,
+    // @ts-ignore for test
+    // prettier: { format: (s) => s },
     prettier,
     mkdirp: mkdirp.sync,
   }

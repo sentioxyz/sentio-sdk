@@ -35,7 +35,7 @@ function generateEventFilter(event: EventDeclaration, includeArgTypes: boolean):
   const filterName = getFullSignatureForEventPatched(event)
   return `
     ${eventName}(${generateEventInputs(event.inputs)}) { return templateContract.filters['${filterName}'](${event.inputs
-    .map((i) => i.name)
+    .map((i, idx) => i.name || `arg${idx}`)
     .join(',')}) }
   `
 }
