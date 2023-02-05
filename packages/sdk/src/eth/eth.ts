@@ -2,8 +2,9 @@ import { BlockTag, LogParams } from 'ethers/providers'
 import { CallExceptionError, Result, LogDescription } from 'ethers'
 import { ContractContext } from './context.js'
 
-export interface EthLog<TArgsArray extends Array<any> = any, TArgsObject = any> extends LogParams {
+export interface EthEvent<TArgsArray extends Array<any> = any, TArgsObject = any> extends LogParams {
   args: TArgsArray & TArgsObject & Result
+  name: string
 }
 
 export function toBlockTag(a: number | bigint): BlockTag {
