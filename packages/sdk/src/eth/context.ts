@@ -145,7 +145,10 @@ export class ContractView<TContract extends BaseContract> {
   }
 
   get provider() {
-    return this.contract.runner?.provider
+    if (this.contract.runner?.provider) {
+      return this.contract.runner.provider
+    }
+    throw Error("Can't find provider for contract" + this.contract.toString())
   }
 }
 

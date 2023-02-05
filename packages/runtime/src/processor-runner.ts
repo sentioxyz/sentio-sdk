@@ -11,14 +11,10 @@ import { compressionAlgorithms } from '@grpc/grpc-js'
 
 import { ProcessorDefinition } from '@sentio/protos'
 import { ProcessorServiceImpl } from './service.js'
-import { State } from './state.js'
 import { Endpoints } from './endpoints.js'
 
 import { FullProcessorServiceImpl } from './full-service.js'
 import { ChainConfig } from './chain-config.js'
-
-State.reset()
-// Endpoints.reset()
 
 const optionDefinitions = [
   { name: 'target', type: String, defaultOption: true },
@@ -72,7 +68,6 @@ if (options.debug) {
 const fullPath = path.resolve(options['chains-config'])
 const chainsConfig = fs.readJsonSync(fullPath)
 
-// setProvider(chainsConfig, options.concurrency, options['use-chainserver'])
 Endpoints.INSTANCE.concurrency = options.concurrency
 Endpoints.INSTANCE.chainQueryAPI = options['chainquery-server']
 Endpoints.INSTANCE.priceFeedAPI = options['pricefeed-server']
@@ -81,6 +76,13 @@ for (const [id, config] of Object.entries(chainsConfig)) {
   const chainConfig = config as ChainConfig
   if (chainConfig.ChainServer) {
     Endpoints.INSTANCE.chainServer.set(id, chainConfig.ChainServer)
+  } else {
+    const http = chainConfig.Https?.[0]
+    if (http) {
+      Endpoints.INSTANCE.chainServer.set(id, http)
+    } else {
+      console.error('not valid config for chain', id)
+    }
   }
 }
 
