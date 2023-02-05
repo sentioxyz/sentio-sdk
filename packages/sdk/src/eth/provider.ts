@@ -12,6 +12,12 @@ export function getProvider(networkish?: Networkish): Provider {
   if (!networkish) {
     networkish = 1
   }
+  if (typeof networkish === 'string') {
+    const id = parseInt(networkish)
+    if (!isNaN(id)) {
+      networkish = 1
+    }
+  }
   const network = Network.from(networkish)
   // TODO check if other key needed
 

@@ -1,5 +1,5 @@
 import { BlockTag, LogParams } from 'ethers/providers'
-import { CallExceptionError, Result } from 'ethers'
+import { CallExceptionError, Result, LogDescription } from 'ethers'
 import { ContractContext } from './context.js'
 
 export interface EthLog<TArgsArray extends Array<any> = any, TArgsObject = any> extends LogParams {
@@ -53,4 +53,17 @@ export function transformEtherError(e: Error, ctx: ContractContext<any, any> | u
 
   msg = 'ethers call error\n' + JSON.stringify(e) + '\n' + e.stack?.toString()
   return new Error(msg)
+}
+
+export function decodeResult(result: LogDescription): any {
+  const decoded = [] as any
+  for (const [i, arg] of result.fragment.inputs.entries()) {
+    if (arg.name === '') {
+      decoded['arg' + i] = result.args[i]
+    } else {
+      decoded[arg.name] = result.args[i]
+    }
+    decoded.push(result.args[i])
+  }
+  return decoded
 }

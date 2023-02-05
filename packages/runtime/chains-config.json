@@ -1,35 +1,9 @@
 {
   "1": {
-    "ChainID": "1",
-    "ChainServer": "http://localhost:8645",
-    "BatchSize": 2000,
-    "ReorgThresholdBlocks": 30,
-    "TimestampSampleInterval": 10000,
-    "ProcessingDelayBlocks": 0
+    "ChainServer": "http://localhost:8645"
   },
-  "3": {
-    "ChainID": "3",
-    "ChainServer": "",
-    "BatchSize": 2000,
-    "ReorgThresholdBlocks": 300,
-    "TimestampSampleInterval": 10000,
-    "ProcessingDelayBlocks": 0
-  },
-  "56": {
-    "ChainID": "56",
-    "ChainServer": "",
-    "BatchSize": 2000,
-    "ReorgThresholdBlocks": 30,
-    "TimestampSampleInterval": 50000,
-    "ProcessingDelayBlocks": 5
-  },
-  "SOL_mainnet": {
-    "ChainID": "SOL_mainnet",
-    "WebSockets": [],
-    "ChainServer": "",
-    "BatchSize": 10000,
-    "ReorgThresholdBlocks": 0,
-    "TimestampSampleInterval": 0,
-    "ProcessingDelayBlocks": 0
+  "25": {
+    "ChainID": 25,
+    "ChainServer": "http://localhost:8660"
   }
 }

@@ -80,7 +80,6 @@ export class BoundedEventTracker {
 
   track(eventName: string, event: Event) {
     const { distinctId, ...payload } = event
-
     const res: EventTrackingResult = {
       metadata: this.ctx.getMetaData(eventName, {}),
       distinctEntityId: distinctId,

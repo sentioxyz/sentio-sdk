@@ -15,7 +15,7 @@ import { BindInternalOptions, BindOptions } from './bind-options.js'
 import { PromiseOrVoid } from '../promise-or-void.js'
 import { Trace } from './trace.js'
 import { ServerError, Status } from 'nice-grpc'
-import { EthLog } from './eth.js'
+import { decodeResult, EthLog } from './eth.js'
 
 export interface AddressOrTypeEventFilter extends DeferredTopicFilter {
   addressType?: AddressType
@@ -120,7 +120,7 @@ export abstract class BaseProcessor<
         const parsed = contractView.rawContract.interface.parseLog(logParam)
 
         if (parsed) {
-          const event: EthLog = { ...log, args: parsed.args }
+          const event: EthLog = { ...log, args: decodeResult(parsed) }
           await handler(event, ctx)
           return ctx.getProcessResult()
         }
