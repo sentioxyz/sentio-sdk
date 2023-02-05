@@ -47,7 +47,7 @@ async function getPriceByTypeOrSymbol(date: Date, coinId: CoinID): Promise<numbe
   price = response.then((res) => {
     if (res.timestamp) {
       const responseDateString = dateString(res.timestamp)
-      if (responseDateString !== dateStr || responseDateString !== todayDateString) {
+      if (responseDateString !== dateStr || responseDateString === todayDateString) {
         priceMap.delete(key)
       }
     } else {
