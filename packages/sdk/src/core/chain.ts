@@ -28,6 +28,7 @@ export const CHAIN_IDS = {
   HOO: '70',
   METER: '82',
   TOMOCHAIN: '88',
+  BINANCE_TEST: '97',
   XDAI: '100',
   VELAS: '106',
   THUNDERCORE: '108',
