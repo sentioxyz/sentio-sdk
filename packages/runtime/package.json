@@ -9,7 +9,7 @@
     "test": "NODE_OPTIONS=--experimental-vm-modules yarn jest",
     "run": "ts-node-esm --files src/processor-runner.ts --log-format=json",
     "run-benchmark": "ts-node-esm --files src/decode-benchmark.ts",
-    "start_ts": "ts-node-esm --files ./src/processor-runner.ts  --log-format=json $PWD/../../debug/src/processor.ts",
+    "start_ts": "ts-node-esm --files ./lib/processor-runner.js --log-format=json $PWD/../../debug/src/processor.ts",
     "start_js": "ts-node-esm --files ./lib/processor-runner.js $PWD/../../debug/dist/lib.js"
   },
   "dependencies": {
