@@ -2,9 +2,11 @@ import { expect } from 'chai'
 import { toBigInteger, toMetricValue } from './numberish.js'
 import { webcrypto } from 'crypto'
 import { performance } from 'perf_hooks'
-import { BigInteger } from '@sentio/protos'
+import { BigInteger, Timestamp } from '@sentio/protos'
 import { BigDecimal } from './big-decimal.js'
 import { bytesToBigInt } from '../utils/conversion.js'
+import { normalizeAttribute } from './normalization.js'
+import { Struct } from '@sentio/protos'
 
 // TODO add test for type conversion
 describe('Numberish tests', () => {
@@ -63,6 +65,20 @@ describe('Numberish tests', () => {
     expect(
       BigIntegerToBigInt(toMetricValue(new BigDecimal('100000')).bigInteger || BigInteger.fromPartial({})) === 100000n
     )
+  })
+
+  test('normalize attributes basic', async () => {
+    const t1 = { a: 'a', n: 123, n2: 1233333333300000000000n, nested: { date: new Date() } }
+    const r1 = normalizeAttribute(t1)
+    expect(typeof r1.n2).equals('number')
+    expect(typeof r1.nested.date).equals('string')
+
+    const w1 = Struct.encode(Struct.wrap(r1))
+    const s2 = Struct.decode(w1.finish())
+
+    const t2 = { f: () => {} }
+    const r2 = normalizeAttribute(t2)
+    expect(r2.f).equals(undefined)
   })
 })
 

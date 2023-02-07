@@ -1,8 +1,10 @@
 import { BaseContext } from './base-context.js'
 import { Numberish, toMetricValue } from './numberish.js'
-import { Labels, NamedResultDescriptor, normalizeKey } from './metadata.js'
+import { NamedResultDescriptor } from './metadata.js'
 import { AggregationConfig, AggregationType, MetricConfig, MetricType } from '@sentio/protos'
 import { MapStateStorage } from '@sentio/runtime'
+
+export type Labels = { [key: string]: string }
 
 export class MetricOptions {
   unit?: string
@@ -26,7 +28,7 @@ export class CounterOptions {
 export class Metric extends NamedResultDescriptor {
   config: MetricConfig
   constructor(type: MetricType, name: string, option?: MetricOptions) {
-    super(normalizeKey(name))
+    super(name)
     this.config = MetricConfig.fromPartial({ name: this.name, type: type, ...option })
     const aggregationConfig = this.config.aggregationConfig
     if (aggregationConfig && aggregationConfig.intervalInMinutes.length) {

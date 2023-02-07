@@ -39,6 +39,6 @@ describe('Test Error Capture', () => {
     )
     const log = res.result?.logs?.[0]
     expect(log?.message).eq('transferred 0')
-    expect(JSON.parse(log?.attributes || '')['from'].toLowerCase()).eq('0x80009ff8154bd5653c6dda2fa5f5053e5a5c1a91')
+    expect(log?.attributes2?.from.toLowerCase()).eq('0x80009ff8154bd5653c6dda2fa5f5053e5a5c1a91')
   })
 })

@@ -446,7 +446,8 @@ message LogResult {
   LogLevel level = 2;
   string message = 3;
   // JSON payload
-  string attributes = 6;
+  string attributes = 6 [ deprecated = true ];
+  google.protobuf.Struct attributes2 = 7;
   RuntimeInfo runtime_info = 4;
 }
 

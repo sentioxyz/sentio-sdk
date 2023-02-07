@@ -600,7 +600,7 @@ export interface LogResult {
   metadata: RecordMetaData | undefined;
   level: LogLevel;
   message: string;
-  attributes: string;
+  attributes2: { [key: string]: any } | undefined;
   runtimeInfo: RuntimeInfo | undefined;
 }
 
@@ -4479,7 +4479,7 @@ export const CounterResult = {
 };
 
 function createBaseLogResult(): LogResult {
-  return { metadata: undefined, level: 0, message: "", attributes: "", runtimeInfo: undefined };
+  return { metadata: undefined, level: 0, message: "", attributes2: undefined, runtimeInfo: undefined };
 }
 
 export const LogResult = {
@@ -4493,8 +4493,8 @@ export const LogResult = {
     if (message.message !== "") {
       writer.uint32(26).string(message.message);
     }
-    if (message.attributes !== "") {
-      writer.uint32(50).string(message.attributes);
+    if (message.attributes2 !== undefined) {
+      Struct.encode(Struct.wrap(message.attributes2), writer.uint32(58).fork()).ldelim();
     }
     if (message.runtimeInfo !== undefined) {
       RuntimeInfo.encode(message.runtimeInfo, writer.uint32(34).fork()).ldelim();
@@ -4518,8 +4518,8 @@ export const LogResult = {
         case 3:
           message.message = reader.string();
           break;
-        case 6:
-          message.attributes = reader.string();
+        case 7:
+          message.attributes2 = Struct.unwrap(Struct.decode(reader, reader.uint32()));
           break;
         case 4:
           message.runtimeInfo = RuntimeInfo.decode(reader, reader.uint32());
@@ -4537,7 +4537,7 @@ export const LogResult = {
       metadata: isSet(object.metadata) ? RecordMetaData.fromJSON(object.metadata) : undefined,
       level: isSet(object.level) ? logLevelFromJSON(object.level) : 0,
       message: isSet(object.message) ? String(object.message) : "",
-      attributes: isSet(object.attributes) ? String(object.attributes) : "",
+      attributes2: isObject(object.attributes2) ? object.attributes2 : undefined,
       runtimeInfo: isSet(object.runtimeInfo) ? RuntimeInfo.fromJSON(object.runtimeInfo) : undefined,
     };
   },
@@ -4548,7 +4548,7 @@ export const LogResult = {
       (obj.metadata = message.metadata ? RecordMetaData.toJSON(message.metadata) : undefined);
     message.level !== undefined && (obj.level = logLevelToJSON(message.level));
     message.message !== undefined && (obj.message = message.message);
-    message.attributes !== undefined && (obj.attributes = message.attributes);
+    message.attributes2 !== undefined && (obj.attributes2 = message.attributes2);
     message.runtimeInfo !== undefined &&
       (obj.runtimeInfo = message.runtimeInfo ? RuntimeInfo.toJSON(message.runtimeInfo) : undefined);
     return obj;
@@ -4561,7 +4561,7 @@ export const LogResult = {
       : undefined;
     message.level = object.level ?? 0;
     message.message = object.message ?? "";
-    message.attributes = object.attributes ?? "";
+    message.attributes2 = object.attributes2 ?? undefined;
     message.runtimeInfo = (object.runtimeInfo !== undefined && object.runtimeInfo !== null)
       ? RuntimeInfo.fromPartial(object.runtimeInfo)
       : undefined;

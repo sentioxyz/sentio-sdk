@@ -10,11 +10,11 @@ import {
   ProcessConfigRequest,
   ProcessorServiceImplementation,
   StartRequest,
+  ProcessResult,
 } from './gen/processor/protos/processor.js'
 
 import { Empty } from '@sentio/protos'
 import fs from 'fs-extra'
-import * as assert from 'assert'
 import path from 'path'
 
 function locatePackageJson(pkgId: string) {
@@ -59,7 +59,9 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
     for (const binding of request.bindings) {
       this.adjustDataBinding(binding)
     }
-    return await this.instance.processBindings(request, options)
+    const result = await this.instance.processBindings(request, options)
+    this.adjustResult(result.result as ProcessResult)
+    return result
   }
 
   async *processBindingsStream(requests: AsyncIterable<DataBinding>, context: CallContext) {
@@ -67,7 +69,15 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
     // y this.instance.processBindingsStream(requests, context)
   }
 
-  protected adjustDataBinding(dataBinding: DataBinding): void {
+  private adjustResult(res: ProcessResult): void {
+    for (const log of res.logs) {
+      if (log.attributes && !log.attributes2) {
+        log.attributes2 = JSON.parse(log.attributes)
+      }
+    }
+  }
+
+  private adjustDataBinding(dataBinding: DataBinding): void {
     switch (dataBinding.handlerType) {
       case HandlerType.APT_EVENT:
         if (dataBinding.data?.aptEvent) {

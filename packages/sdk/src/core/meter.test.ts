@@ -1,19 +1,19 @@
 import { expect } from 'chai'
-import { normalizeLabels, normalizeName } from './metadata.js'
+import { normalizeLabels, normalizeKey } from './normalization.js'
 
 describe('meter tests', () => {
   test('test normalization ', async () => {
-    expect(normalizeName('abc')).eq('abc')
-    expect(normalizeName('a-b-c')).eq('a-b-c')
-    expect(normalizeName('_a-B-1.')).eq('_a-B-1_')
+    expect(normalizeKey('abc')).eq('abc')
+    expect(normalizeKey('a-b-c')).eq('a-b-c')
+    expect(normalizeKey('_a-B-1.')).eq('_a-B-1_')
 
-    expect(normalizeName('a/b\\c\n')).eq('a_b_c_')
-    expect(normalizeName('abc abc')).eq('abc_abc')
-    expect(normalizeName('*&~')).eq('___')
+    expect(normalizeKey('a/b\\c\n')).eq('a_b_c_')
+    expect(normalizeKey('abc abc')).eq('abc_abc')
+    expect(normalizeKey('*&~')).eq('___')
 
-    expect(normalizeName('vo total')).eq('vo_total')
+    expect(normalizeKey('vo total')).eq('vo_total')
 
-    expect(normalizeName('x'.repeat(200)).length).eq(100)
+    expect(normalizeKey('x'.repeat(200)).length).eq(100)
   })
 
   test('test  labels', async () => {

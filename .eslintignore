@@ -2,6 +2,7 @@
 jest.config.ts
 release.config.cjs
 dist
+debug
 lib
 docs
 gen

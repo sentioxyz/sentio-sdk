@@ -2,6 +2,7 @@ import { BaseContext } from './base-context.js'
 import { EventTrackingResult } from '@sentio/protos'
 import { NamedResultDescriptor } from './metadata.js'
 import { MapStateStorage } from '@sentio/runtime'
+import { normalizeAttribute } from './normalization.js'
 
 export interface Event {
   // The unique identifier of main identity associate with an event
@@ -45,7 +46,7 @@ export class EventTracker extends NamedResultDescriptor {
     const res: EventTrackingResult = {
       metadata: ctx.getMetaData(this.name, {}),
       distinctEntityId: distinctId,
-      attributes: payload,
+      attributes: normalizeAttribute(payload),
       runtimeInfo: undefined,
       noMetric: false,
     }

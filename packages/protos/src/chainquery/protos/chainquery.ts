@@ -80,6 +80,16 @@ export interface EvmQueryResponse {
   executionSummary?: QueryExecutionSummary | undefined;
 }
 
+export interface RemoteResultRequest {
+  token: string;
+  position: number;
+  keepAlive: boolean;
+}
+
+export interface RemoteResultResponse {
+  rows: Uint8Array[];
+}
+
 function createBaseAptosGetTxnsByFunctionRequest(): AptosGetTxnsByFunctionRequest {
   return {
     network: "",
@@ -991,6 +1001,124 @@ export const EvmQueryResponse = {
   },
 };
 
+function createBaseRemoteResultRequest(): RemoteResultRequest {
+  return { token: "", position: 0, keepAlive: false };
+}
+
+export const RemoteResultRequest = {
+  encode(message: RemoteResultRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.token !== "") {
+      writer.uint32(10).string(message.token);
+    }
+    if (message.position !== 0) {
+      writer.uint32(16).int32(message.position);
+    }
+    if (message.keepAlive === true) {
+      writer.uint32(24).bool(message.keepAlive);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): RemoteResultRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRemoteResultRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.token = reader.string();
+          break;
+        case 2:
+          message.position = reader.int32();
+          break;
+        case 3:
+          message.keepAlive = reader.bool();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): RemoteResultRequest {
+    return {
+      token: isSet(object.token) ? String(object.token) : "",
+      position: isSet(object.position) ? Number(object.position) : 0,
+      keepAlive: isSet(object.keepAlive) ? Boolean(object.keepAlive) : false,
+    };
+  },
+
+  toJSON(message: RemoteResultRequest): unknown {
+    const obj: any = {};
+    message.token !== undefined && (obj.token = message.token);
+    message.position !== undefined && (obj.position = Math.round(message.position));
+    message.keepAlive !== undefined && (obj.keepAlive = message.keepAlive);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<RemoteResultRequest>): RemoteResultRequest {
+    const message = createBaseRemoteResultRequest();
+    message.token = object.token ?? "";
+    message.position = object.position ?? 0;
+    message.keepAlive = object.keepAlive ?? false;
+    return message;
+  },
+};
+
+function createBaseRemoteResultResponse(): RemoteResultResponse {
+  return { rows: [] };
+}
+
+export const RemoteResultResponse = {
+  encode(message: RemoteResultResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.rows) {
+      writer.uint32(10).bytes(v!);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): RemoteResultResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRemoteResultResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.rows.push(reader.bytes());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): RemoteResultResponse {
+    return { rows: Array.isArray(object?.rows) ? object.rows.map((e: any) => bytesFromBase64(e)) : [] };
+  },
+
+  toJSON(message: RemoteResultResponse): unknown {
+    const obj: any = {};
+    if (message.rows) {
+      obj.rows = message.rows.map((e) => base64FromBytes(e !== undefined ? e : new Uint8Array()));
+    } else {
+      obj.rows = [];
+    }
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<RemoteResultResponse>): RemoteResultResponse {
+    const message = createBaseRemoteResultResponse();
+    message.rows = object.rows?.map((e) => e) || [];
+    return message;
+  },
+};
+
 export type AptosQueryDefinition = typeof AptosQueryDefinition;
 export const AptosQueryDefinition = {
   name: "AptosQuery",
@@ -1204,6 +1332,36 @@ export interface SuiQueryClient<CallOptionsExt = {}> {
     request: DeepPartial<EvmSQLQueryRequest>,
     options?: CallOptions & CallOptionsExt,
   ): AsyncIterable<EvmQueryResponse>;
+}
+
+export type RemoteResultTransferServiceDefinition = typeof RemoteResultTransferServiceDefinition;
+export const RemoteResultTransferServiceDefinition = {
+  name: "RemoteResultTransferService",
+  fullName: "chainquery.RemoteResultTransferService",
+  methods: {
+    getResult: {
+      name: "GetResult",
+      requestType: RemoteResultRequest,
+      requestStream: false,
+      responseType: RemoteResultResponse,
+      responseStream: false,
+      options: {},
+    },
+  },
+} as const;
+
+export interface RemoteResultTransferServiceImplementation<CallContextExt = {}> {
+  getResult(
+    request: RemoteResultRequest,
+    context: CallContext & CallContextExt,
+  ): Promise<DeepPartial<RemoteResultResponse>>;
+}
+
+export interface RemoteResultTransferServiceClient<CallOptionsExt = {}> {
+  getResult(
+    request: DeepPartial<RemoteResultRequest>,
+    options?: CallOptions & CallOptionsExt,
+  ): Promise<RemoteResultResponse>;
 }
 
 declare var self: any | undefined;

@@ -42,38 +42,6 @@ export function getProvider(networkish?: Networkish): Provider {
   return provider
 }
 
-// export function setProvider(config: Record<string, ChainConfig>, concurrency = 4, useChainServer = false) {
-//   Endpoints.INSTANCE.providers = new Map<bigint, Provider>()
-//
-//   for (const chainIdStr in config) {
-//     if (isNaN(Number.parseInt(chainIdStr))) {
-//       continue
-//     }
-//
-//     const chainConfig = config[chainIdStr]
-//     const chainId = BigInt(chainIdStr)
-//
-//     // let providers: StaticJsonRpcProvider[] = []
-//     // for (const http of chainConfig.Https) {
-//     //   providers.push(new StaticJsonRpcProvider(http, chainId))
-//     // }
-//     // random shuffle
-//     // providers = providers.sort(() => Math.random() - 0.5)
-//
-//     // const provider = new FallbackProvider(providers)
-//
-//     let rpcAddress = ''
-//     if (useChainServer && chainConfig.ChainServer) {
-//       rpcAddress = chainConfig.ChainServer
-//     } else {
-//       const idx = Math.floor(Math.random() * chainConfig.Https.length)
-//       rpcAddress = chainConfig.Https[idx]
-//     }
-//
-//     Endpoints.INSTANCE.providers.set(chainId, provider)
-//   }
-// }
-
 class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
   executor: PQueue
 
@@ -83,7 +51,10 @@ class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
     this.executor = new PQueue({ concurrency: concurrency })
   }
 
-  send(method: string, params: Array<any>): Promise<any> {
-    return this.executor.add(() => super.send(method, params))
+  async send(method: string, params: Array<any>): Promise<any> {
+    const res = await this.executor.add(() => super.send(method, params))
+    if (!res) {
+      throw Error('Unexpected null response')
+    }
   }
 }

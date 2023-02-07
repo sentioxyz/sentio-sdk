@@ -1,6 +1,7 @@
 import { BaseContext } from './base-context.js'
 import { LogLevel } from '@sentio/protos'
 import { NamedResultDescriptor } from './metadata.js'
+import { normalizeAttribute } from './normalization.js'
 
 export type Attributes = Record<string, any>
 
@@ -21,12 +22,14 @@ export class Logger extends NamedResultDescriptor {
       message = JSON.stringify(message)
     }
 
+    const norm = normalizeAttribute(attributes)
+
     this.ctx._res.logs.push({
       // name: this.name,
       metadata: this.ctx.getMetaData(this.name, {}), // GetRecordMetaData(this.ctx, this, {}),
       level,
       message,
-      attributes: JSON.stringify(attributes),
+      attributes2: norm,
       runtimeInfo: undefined,
     })
   }
