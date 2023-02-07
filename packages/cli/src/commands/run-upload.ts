@@ -37,6 +37,11 @@ const uploadOptionDefinitions = [
     type: String,
   },
   {
+    name: 'name',
+    description: '(Optional) Override Project name',
+    type: String,
+  },
+  {
     name: 'nobuild',
     description: '(Optional) Skip build & pack file before uploading, default false',
     type: Boolean,
@@ -91,7 +96,7 @@ export async function runUpload(processorConfig: SentioProjectConfig, argv: stri
     processorConfig.debug = true
   }
   finalizeHost(processorConfig)
-  FinalizeProjectName(processorConfig, options.owner)
+  FinalizeProjectName(processorConfig, options.owner, options.name)
   console.log(processorConfig)
 
   let apiOverride = undefined
