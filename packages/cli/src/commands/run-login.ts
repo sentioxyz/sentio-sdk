@@ -72,7 +72,7 @@ export function runLogin(argv: string[]) {
       code_challenge: challenge,
       code_challenge_method: 'S256',
       client_id: conf.clientId,
-      redirect_uri: `http://localhost:${port}/callback`,
+      redirect_uri: conf.redirectUri,
       audience: conf.audience,
       prompt: 'login',
     })

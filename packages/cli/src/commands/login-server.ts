@@ -30,6 +30,7 @@ app.get('/callback', async (req, res) => {
     console.error(chalk.red(args))
     res.end(args.toString())
     server.close()
+    setTimeout(() => process.exit(), 1000)
   }
 
   const host = getFinalizedHost(authParams.sentioHost)
@@ -42,7 +43,7 @@ app.get('/callback', async (req, res) => {
   // exchange token
   const tokenResRaw = await getToken(host, code as string)
   if (!tokenResRaw.ok) {
-    fail(`Failed to get access token: ${tokenResRaw.status} ${tokenResRaw.statusText}`)
+    fail(`Failed to get access token: ${tokenResRaw.status} ${tokenResRaw.statusText}, ${await tokenResRaw.text()}`)
     return
   }
   const tokenRes = (await tokenResRaw.json()) as { access_token: string }
@@ -78,7 +79,8 @@ app.get('/callback', async (req, res) => {
   res.end('Login success, please go back to CLI to continue')
   console.log(chalk.green('Login success, new API key: ' + apiKey))
 
-  server.close()
+  server.close();
+  setTimeout(() => process.exit(), 1000)
 })
 
 async function getToken(host: string, code: string) {
@@ -88,7 +90,7 @@ async function getToken(host: string, code: string) {
     client_id: authConf.clientId,
     code_verifier: authParams.codeVerifier,
     code: code,
-    redirect_uri: `http://localhost:${authParams.serverPort}/callback`,
+    redirect_uri: authConf.redirectUri,
   })
   return fetch(`${authConf.domain}/oauth/token`, {
     method: 'POST',

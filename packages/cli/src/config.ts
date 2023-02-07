@@ -21,31 +21,35 @@ export function getFinalizedHost(host: string): string {
   return HostMap[host] ?? host
 }
 
-export function getAuthConfig(host: string): { domain: string; clientId: string; audience: string } {
+export function getAuthConfig(host: string): { domain: string; clientId: string; audience: string, redirectUri: string } {
   let domain = '',
     clientId = '',
-    audience = ''
+    audience = '',
+    redirectUri = ''
   switch (host) {
     case HostMap['local']:
       domain = 'https://sentio-dev.us.auth0.com'
-      clientId = 'qGDisObqQbcPeRA8k02POPZ2Df4KVCna'
+      clientId = 'JREam3EysMTM49eFbAjNK02OCykpmda3'
       audience = 'http://localhost:8080/v1'
+      redirectUri = 'http://localhost:10000/redirect/sdk'
       break
     case HostMap['prod']:
       domain = 'https://auth.sentio.xyz'
-      clientId = 'xd80PeuvuZVHpBFh7yEdlSZdtE5mTpGe'
+      clientId = '66oqMrep54LVI9ckH97cw8C4GBA1cpKW'
       audience = 'https://app.sentio.xyz/api/v1'
+      redirectUri = 'https://app.sentio.xyz/redirect/sdk'
       break
     case HostMap['test']:
     case HostMap['staging']:
       domain = 'https://auth.test.sentio.xyz'
-      clientId = 'qXVvovHaOE37SndxTZJxCKgZjw1axPax'
+      clientId = '6SH2S1qJ2yYqyYGCQOcEnGsYgoyONTxM'
       audience = 'https://test.sentio.xyz/api/v1'
+      redirectUri = 'https://test.sentio.xyz/redirect/sdk'
       break
     default:
       break
   }
-  return { domain, clientId, audience }
+  return { domain, clientId, audience, redirectUri }
 }
 
 export function finalizeHost(config: SentioProjectConfig) {
