@@ -56,5 +56,6 @@ class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
     if (!res) {
       throw Error('Unexpected null response')
     }
+    return res
   }
 }

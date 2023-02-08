@@ -79,6 +79,15 @@ describe('Numberish tests', () => {
     const t2 = { f: () => {} }
     const r2 = normalizeAttribute(t2)
     expect(r2.f).equals(undefined)
+
+    const t3 = {
+      token0Symbol: null,
+      token1Symbol: 't2',
+    }
+    const r3 = normalizeAttribute(t3)
+    const w3 = Struct.encode(Struct.wrap(r3))
+    const s3 = Struct.decode(w3.finish())
+    console.log(r3)
   })
 })
 

@@ -1,4 +1,5 @@
 import { Labels } from './meter.js'
+import { BigDecimal } from './big-decimal.js'
 
 function normalizeName(name: string): string {
   return name.slice(0, 100).replace(/[^_\-a-zA-Z0-9]/g, '_')
@@ -47,6 +48,9 @@ function normalizeObject(obj: any, length: number): any {
   } else if (obj === Object(obj)) {
     if (obj instanceof Date) {
       return obj.toISOString()
+    }
+    if (obj instanceof BigDecimal) {
+      return obj.toNumber()
     }
     ret = {}
     for (const [key, value] of Object.entries(obj)) {
