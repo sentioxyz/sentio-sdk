@@ -66,5 +66,5 @@ function normalizeObject(obj: any, length: number): any {
 }
 
 export function normalizeAttribute(record: Record<string, any>): any {
-  return normalizeObject(record, 256)
+  return normalizeObject(record, 1000)
 }

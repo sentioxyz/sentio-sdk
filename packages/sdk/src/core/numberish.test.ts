@@ -2,11 +2,10 @@ import { expect } from 'chai'
 import { toBigInteger, toMetricValue } from './numberish.js'
 import { webcrypto } from 'crypto'
 import { performance } from 'perf_hooks'
-import { BigInteger, Timestamp } from '@sentio/protos'
+import { BigInteger, Struct } from '@sentio/protos'
 import { BigDecimal } from './big-decimal.js'
 import { bytesToBigInt } from '../utils/conversion.js'
 import { normalizeAttribute } from './normalization.js'
-import { Struct } from '@sentio/protos'
 
 // TODO add test for type conversion
 describe('Numberish tests', () => {
