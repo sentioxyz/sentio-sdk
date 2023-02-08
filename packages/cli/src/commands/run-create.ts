@@ -4,6 +4,7 @@ import path from 'path'
 import fs from 'fs-extra'
 import chalk from 'chalk'
 import latestVersion from 'latest-version'
+import url from 'url'
 
 export async function runCreate(argv: string[]) {
   const optionDefinitions = [
@@ -73,7 +74,8 @@ export async function runCreate(argv: string[]) {
         console.log(usage)
         process.exit(1)
     }
-    const templateFolder = path.resolve(__dirname, '../../templates', chainType)
+
+    const templateFolder = url.fileURLToPath(new URL('../../templates/' + chainType, import.meta.url))
     const projectName = options.name || 'default'
 
     const rootDir = options.directory || process.cwd()
