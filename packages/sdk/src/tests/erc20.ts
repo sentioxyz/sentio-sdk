@@ -1,5 +1,4 @@
 import { ERC20Processor, ERC20ProcessorTemplate } from '../eth/builtin/erc20/index.js'
-import { EventTracker } from '@sentio/sdk'
 import { Exporter } from '../core/exporter.js'
 
 export const filter = ERC20Processor.filters.Transfer(
@@ -7,7 +6,6 @@ export const filter = ERC20Processor.filters.Transfer(
   '0xb329e39ebefd16f40d38f07643652ce17ca5bac1'
 )
 
-const tracker = EventTracker.register('sdf')
 const exporter = Exporter.register('transfer', 'xxx')
 
 const processorTemplate = new ERC20ProcessorTemplate().onEventTransfer(async function (event, ctx) {
@@ -35,8 +33,8 @@ ERC20Processor.bind({
 ERC20Processor.bind({ address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', network: 56, name: 'usdc' })
   .onEventTransfer(
     async function (event, ctx) {
-      ctx.meter.Counter('c2').add(2)
-      tracker.trackEvent(ctx, { distinctId: event.args.from })
+      // ctx.meter.Counter('c2').add(2)
+      ctx.eventLogger.emit('transfer', { distinctId: event.args.from })
       exporter.emit(ctx, { ...event, x: 100n })
     } /*filter*/
   )

@@ -38,9 +38,9 @@ export async function runCreate(argv: string[]) {
       name: 'chain-type',
       alias: 'c',
       description:
-        'The type of project you want to create, can be evm, aptos, solana, raw (if you want to start from scratch and support multiple types of chains)',
+        'The type of project you want to create, can be eth, aptos, solana, raw (if you want to start from scratch and support multiple types of chains)',
       type: String,
-      defaultValue: 'evm',
+      defaultValue: 'eth',
     },
   ]
 
@@ -61,7 +61,7 @@ export async function runCreate(argv: string[]) {
   } else {
     const chainType: string = options['chain-type'].toLowerCase()
     switch (chainType) {
-      case 'evm':
+      case 'eth':
         break
       case 'aptos':
         break

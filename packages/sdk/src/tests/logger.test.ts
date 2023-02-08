@@ -1,16 +1,28 @@
 import { assert, expect } from 'chai'
 
 import { TestProcessorServer } from '@sentio/sdk/testing'
-import { ERC20Processor, mockApprovalLog, mockTransferLog } from '../eth/builtin/erc20/index.js'
+import { ERC20Processor, mockApprovalLog, mockTransferLog, TransferEvent } from '../eth/builtin/erc20/index.js'
+import { LogLevel } from '@sentio/protos'
 
 describe('Test Error Capture', () => {
   const service = new TestProcessorServer(async () => {
     ERC20Processor.bind({ address: '0x80009ff8154bd5653c6dda2fa5f5053e5a5c1a91' })
       .onEventApproval((evt, ctx) => {
-        ctx.logger.info(`approve ${evt.args}`)
+        ctx.eventLogger.emit('Approve', {
+          severity: LogLevel.INFO,
+          message: `approve ${evt.args}`,
+          owner: evt.args.owner,
+          spender: evt.args.spender,
+          value: evt.args.value,
+        })
       })
-      .onEventTransfer((evt, ctx) => {
-        ctx.logger.warn('transferred ' + evt.args.value, { from: evt.args.from })
+      .onEventTransfer((evt: TransferEvent, ctx) => {
+        ctx.eventLogger.emit('Transfer', {
+          severity: LogLevel.WARNING,
+          owner: evt.args.from,
+          to: evt.args.to,
+          value: evt.args.value,
+        })
       })
   })
 

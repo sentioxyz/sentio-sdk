@@ -1,4 +1,4 @@
-import { AccountEventTracker, Counter, Gauge, Exporter } from '@sentio/sdk'
+import { Counter, Gauge, Exporter } from '@sentio/sdk'
 import { ERC20Processor } from '@sentio/sdk/eth/builtin'
 import { X2y2Processor } from './types/x2y2/index.js'
 
@@ -21,8 +21,6 @@ const vol = Gauge.register('x2y2_vol', {
 })
 
 const exporter = Exporter.register('x2y2', 'x2y2_mint')
-
-const tracker = AccountEventTracker.register()
 
 X2y2Processor.bind({ address: '0xB329e39Ebefd16f40d38f07643652cE17Ca5Bac1' }).onTimeInterval(
   async (_, ctx) => {
@@ -53,7 +51,5 @@ ERC20Processor.bind({ address: '0x1e4ede388cbc9f4b5c79681b7f94d36a11abebc9' }).o
 ERC20Processor.bind({ address: '0x1e4ede388cbc9f4b5c79681b7f94d36a11abebc9' }).onEventTransfer(async (event, ctx) => {
   const val = event.args.value.scaleDown(18)
   vol.record(ctx, val)
-  ctx.eventTracker.track('Transfer', { distinctId: event.args.from })
-  tracker.trackEvent(ctx, { distinctId: event.args.from })
-  // tracker.trackEvent(ctx, { distinctId: event.args.to })
+  ctx.eventLogger.emit('Transfer', { distinctId: event.args.from })
 })

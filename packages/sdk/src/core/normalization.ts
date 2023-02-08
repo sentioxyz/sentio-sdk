@@ -55,7 +55,7 @@ function normalizeObject(obj: any, length: number): any {
     ret = {}
     for (const [key, value] of Object.entries(obj)) {
       const normValue = normalizeObject(value, length)
-      if (normValue) {
+      if (normValue != null) {
         ret[key] = normValue
       }
     }

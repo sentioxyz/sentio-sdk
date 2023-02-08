@@ -619,6 +619,8 @@ export interface EventTrackingResult {
   metadata: RecordMetaData | undefined;
   distinctEntityId: string;
   attributes: { [key: string]: any } | undefined;
+  severity: LogLevel;
+  message: string;
   runtimeInfo: RuntimeInfo | undefined;
   noMetric: boolean;
 }
@@ -4669,7 +4671,15 @@ export const LogResult = {
 };
 
 function createBaseEventTrackingResult(): EventTrackingResult {
-  return { metadata: undefined, distinctEntityId: "", attributes: undefined, runtimeInfo: undefined, noMetric: false };
+  return {
+    metadata: undefined,
+    distinctEntityId: "",
+    attributes: undefined,
+    severity: 0,
+    message: "",
+    runtimeInfo: undefined,
+    noMetric: false,
+  };
 }
 
 export const EventTrackingResult = {
@@ -4682,6 +4692,12 @@ export const EventTrackingResult = {
     }
     if (message.attributes !== undefined) {
       Struct.encode(Struct.wrap(message.attributes), writer.uint32(50).fork()).ldelim();
+    }
+    if (message.severity !== 0) {
+      writer.uint32(56).int32(message.severity);
+    }
+    if (message.message !== "") {
+      writer.uint32(66).string(message.message);
     }
     if (message.runtimeInfo !== undefined) {
       RuntimeInfo.encode(message.runtimeInfo, writer.uint32(42).fork()).ldelim();
@@ -4708,6 +4724,12 @@ export const EventTrackingResult = {
         case 6:
           message.attributes = Struct.unwrap(Struct.decode(reader, reader.uint32()));
           break;
+        case 7:
+          message.severity = reader.int32() as any;
+          break;
+        case 8:
+          message.message = reader.string();
+          break;
         case 5:
           message.runtimeInfo = RuntimeInfo.decode(reader, reader.uint32());
           break;
@@ -4727,6 +4749,8 @@ export const EventTrackingResult = {
       metadata: isSet(object.metadata) ? RecordMetaData.fromJSON(object.metadata) : undefined,
       distinctEntityId: isSet(object.distinctEntityId) ? String(object.distinctEntityId) : "",
       attributes: isObject(object.attributes) ? object.attributes : undefined,
+      severity: isSet(object.severity) ? logLevelFromJSON(object.severity) : 0,
+      message: isSet(object.message) ? String(object.message) : "",
       runtimeInfo: isSet(object.runtimeInfo) ? RuntimeInfo.fromJSON(object.runtimeInfo) : undefined,
       noMetric: isSet(object.noMetric) ? Boolean(object.noMetric) : false,
     };
@@ -4738,6 +4762,8 @@ export const EventTrackingResult = {
       (obj.metadata = message.metadata ? RecordMetaData.toJSON(message.metadata) : undefined);
     message.distinctEntityId !== undefined && (obj.distinctEntityId = message.distinctEntityId);
     message.attributes !== undefined && (obj.attributes = message.attributes);
+    message.severity !== undefined && (obj.severity = logLevelToJSON(message.severity));
+    message.message !== undefined && (obj.message = message.message);
     message.runtimeInfo !== undefined &&
       (obj.runtimeInfo = message.runtimeInfo ? RuntimeInfo.toJSON(message.runtimeInfo) : undefined);
     message.noMetric !== undefined && (obj.noMetric = message.noMetric);
@@ -4751,6 +4777,8 @@ export const EventTrackingResult = {
       : undefined;
     message.distinctEntityId = object.distinctEntityId ?? "";
     message.attributes = object.attributes ?? undefined;
+    message.severity = object.severity ?? 0;
+    message.message = object.message ?? "";
     message.runtimeInfo = (object.runtimeInfo !== undefined && object.runtimeInfo !== null)
       ? RuntimeInfo.fromPartial(object.runtimeInfo)
       : undefined;

@@ -1,11 +1,12 @@
 import { BaseContext } from './base-context.js'
-import { LogLevel } from '@sentio/protos'
+import { EventTrackingResult, LogLevel } from '@sentio/protos'
 import { NamedResultDescriptor } from './metadata.js'
 import { normalizeAttribute } from './normalization.js'
+import { Event } from './event-tracker.js'
 
 export type Attributes = Record<string, any>
 
-export class Logger extends NamedResultDescriptor {
+export class EventLogger extends NamedResultDescriptor {
   private readonly ctx: BaseContext
 
   constructor(ctx: BaseContext, name = '') {
@@ -14,7 +15,7 @@ export class Logger extends NamedResultDescriptor {
   }
 
   withName(name: string) {
-    return new Logger(this.ctx, name)
+    return new EventLogger(this.ctx, name)
   }
 
   protected log(level: LogLevel, message: any, attributes: Attributes = {}) {
@@ -48,5 +49,20 @@ export class Logger extends NamedResultDescriptor {
 
   critical(msg: any, attributes: Attributes = {}) {
     this.log(LogLevel.CRITICAL, msg, attributes)
+  }
+
+  emit(eventName: string, event: Event) {
+    const { distinctId, severity, message, ...payload } = event
+
+    const res: EventTrackingResult = {
+      metadata: this.ctx.getMetaData(eventName, {}),
+      severity: severity || LogLevel.INFO,
+      message: message || '',
+      distinctEntityId: distinctId || '',
+      attributes: payload,
+      runtimeInfo: undefined,
+      noMetric: true,
+    }
+    this.ctx._res.events.push(res)
   }
 }

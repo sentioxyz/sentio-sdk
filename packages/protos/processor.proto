@@ -455,6 +455,8 @@ message EventTrackingResult {
   RecordMetaData metadata = 1;
   string distinct_entity_id = 2;
   google.protobuf.Struct attributes = 6;
+  LogLevel severity = 7;
+  string message = 8;
   RuntimeInfo runtime_info = 5;
 
   // TODO remove this after driver don't use old event tracker

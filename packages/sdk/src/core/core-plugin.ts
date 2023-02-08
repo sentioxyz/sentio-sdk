@@ -2,7 +2,6 @@ import { Plugin, PluginManager } from '@sentio/runtime'
 import { ProcessConfigResponse } from '@sentio/protos'
 
 import { MetricState } from './meter.js'
-import { EventTrackerState } from './event-tracker.js'
 import { ExporterState } from './exporter.js'
 
 export class CorePlugin extends Plugin {
@@ -13,17 +12,6 @@ export class CorePlugin extends Plugin {
     for (const metric of MetricState.INSTANCE.getValues()) {
       config.metricConfigs.push({
         ...metric.config,
-      })
-    }
-
-    for (const eventTracker of EventTrackerState.INSTANCE.getValues()) {
-      config.eventTrackingConfigs.push({
-        distinctAggregationByDays: eventTracker.options.distinctByDays || [],
-        eventName: eventTracker.name,
-        retentionConfig: undefined,
-        totalByDay: eventTracker.options.totalByDay || false,
-        totalPerEntity: undefined,
-        unique: eventTracker.options.unique || false,
       })
     }
 

@@ -1,11 +1,14 @@
 import { ProcessResult, RecordMetaData } from '@sentio/protos'
-import { Logger } from './logger.js'
+import { EventLogger } from './event-logger.js'
 import { Meter, Labels } from './meter.js'
 import { BoundedEventTracker } from './event-tracker.js'
 
 export abstract class BaseContext {
   meter: Meter
-  logger: Logger
+  eventLogger: EventLogger
+
+  logger: EventLogger
+  /** @deprecated use {@link this.eventLogger} instead */
   eventTracker: BoundedEventTracker
 
   _res: ProcessResult = {
@@ -18,7 +21,10 @@ export abstract class BaseContext {
 
   protected constructor() {
     this.meter = new Meter(this)
-    this.logger = new Logger(this)
+    this.eventLogger = new EventLogger(this)
+    // eslint-disable-next-line deprecation/deprecation
+    this.logger = this.eventLogger
+    // eslint-disable-next-line deprecation/deprecation
     this.eventTracker = new BoundedEventTracker(this)
   }
 
