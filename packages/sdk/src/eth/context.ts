@@ -1,5 +1,5 @@
-import { BaseContract, Transaction, TransactionReceipt, Block } from 'ethers'
-import { LogParams } from 'ethers/providers'
+import { BaseContract, Transaction, TransactionReceipt } from 'ethers'
+import { LogParams, BlockParams } from 'ethers/providers'
 
 import { RecordMetaData } from '@sentio/protos'
 import { Trace } from './trace.js'
@@ -11,7 +11,7 @@ export abstract class EthContext extends BaseContext {
   chainId: number
   address: string
   private readonly log?: LogParams
-  block?: Block
+  block?: BlockParams
   private readonly trace?: Trace
   blockNumber: bigint | number
   transactionHash?: string
@@ -23,7 +23,7 @@ export abstract class EthContext extends BaseContext {
     chainId: number,
     address: string,
     timestamp?: Date,
-    block?: Block,
+    block?: BlockParams,
     log?: LogParams,
     trace?: Trace,
     transaction?: Transaction,
@@ -116,7 +116,7 @@ export class ContractContext<
     view: TContractBoundView,
     chainId: number,
     timestamp?: Date,
-    block?: Block,
+    block?: BlockParams,
     log?: LogParams,
     trace?: Trace,
     transaction?: Transaction,

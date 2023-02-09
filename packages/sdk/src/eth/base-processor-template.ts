@@ -1,12 +1,12 @@
 import { BoundContractView, ContractContext, ContractView } from './context.js'
-import { BaseContract, ContractEvent, Block, LogDescription } from 'ethers'
-import { AddressOrTypeEventFilter, BaseProcessor } from './base-processor.js'
+import { BaseContract } from 'ethers'
+import { BaseProcessor } from './base-processor.js'
 import { BindOptions, getOptionsSignature } from './bind-options.js'
 import { EthFetchConfig, HandleInterval, TemplateInstance } from '@sentio/protos'
 import { PromiseOrVoid } from '../promise-or-void.js'
 import { Trace } from './trace.js'
 import { ListStateStorage } from '@sentio/runtime'
-import { EventFilter, LogParams, Network } from 'ethers/providers'
+import { BlockParams, Network } from 'ethers/providers'
 import { DeferredTopicFilter } from 'ethers/contract'
 import { EthEvent } from './eth.js'
 
@@ -27,7 +27,7 @@ export abstract class BaseProcessorTemplate<
   id: number
   binds = new Set<string>()
   blockHandlers: {
-    handler: (block: Block, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid
+    handler: (block: BlockParams, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid
     blockInterval?: HandleInterval
     timeIntervalInMinutes?: HandleInterval
   }[] = []
@@ -101,7 +101,7 @@ export abstract class BaseProcessorTemplate<
   }
 
   public onBlockInterval(
-    handler: (block: Block, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
+    handler: (block: BlockParams, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     blockInterval = 1000,
     backfillBlockInterval = 4000
   ) {
@@ -112,7 +112,7 @@ export abstract class BaseProcessorTemplate<
   }
 
   public onTimeInterval(
-    handler: (block: Block, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
+    handler: (block: BlockParams, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     timeIntervalInMinutes = 60,
     backfillBlockInterval = 240
   ) {
@@ -124,7 +124,7 @@ export abstract class BaseProcessorTemplate<
   }
 
   public onInterval(
-    handler: (block: Block, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
+    handler: (block: BlockParams, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     timeInterval: HandleInterval | undefined,
     blockInterval: HandleInterval | undefined
   ) {

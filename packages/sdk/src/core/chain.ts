@@ -101,8 +101,8 @@ for (const [key, value] of Object.entries(CHAIN_IDS)) {
     .join(' ')
 }
 
-export function getChainName(chainId: string | number | null | undefined): string {
-  if (typeof chainId === 'number') {
+export function getChainName(chainId: string | number | bigint | null | undefined): string {
+  if (typeof chainId === 'number' || typeof chainId === 'bigint') {
     chainId = chainId.toString()
   }
   if (chainId) {

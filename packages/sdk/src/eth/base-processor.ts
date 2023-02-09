@@ -1,5 +1,5 @@
-import { Block, TransactionReceipt, BaseContract, Transaction, DeferredTopicFilter } from 'ethers'
-import { LogParams, Network } from 'ethers/providers'
+import { TransactionReceipt, BaseContract, Transaction, DeferredTopicFilter } from 'ethers'
+import { LogParams, BlockParams, Network } from 'ethers/providers'
 
 import { BoundContractView, ContractContext, ContractView } from './context.js'
 import {
@@ -109,7 +109,7 @@ export abstract class BaseProcessor<
           contractView,
           chainId,
           data.timestamp,
-          data.block as Block,
+          data.block as BlockParams,
           log,
           undefined,
           data.transaction as Transaction,
@@ -131,7 +131,7 @@ export abstract class BaseProcessor<
   }
 
   public onBlockInterval(
-    handler: (block: Block, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
+    handler: (block: BlockParams, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     blockInterval = 250,
     backfillBlockInterval = 1000
   ) {
@@ -142,7 +142,7 @@ export abstract class BaseProcessor<
   }
 
   public onTimeInterval(
-    handler: (block: Block, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
+    handler: (block: BlockParams, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     timeIntervalInMinutes = 60,
     backfillTimeIntervalInMinutes = 240
   ) {
@@ -154,7 +154,7 @@ export abstract class BaseProcessor<
   }
 
   public onInterval(
-    handler: (block: Block, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
+    handler: (block: BlockParams, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     timeInterval: HandleInterval | undefined,
     blockInterval: HandleInterval | undefined
   ) {
@@ -167,7 +167,7 @@ export abstract class BaseProcessor<
         if (!data.block) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'Block is empty')
         }
-        const block = data.block as Block
+        const block = data.block as BlockParams
 
         const contractView = processor.CreateBoundContractView()
 
@@ -235,7 +235,7 @@ export abstract class BaseProcessor<
           contractView,
           chainId,
           data.timestamp,
-          data.block as Block,
+          data.block as BlockParams,
           undefined,
           trace,
           data.transaction as Transaction,
