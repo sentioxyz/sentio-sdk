@@ -42,8 +42,39 @@ export function getProvider(networkish?: Networkish): Provider {
   return provider
 }
 
+function getTag(prefix: string, value: any): string {
+  return (
+    prefix +
+    ':' +
+    JSON.stringify(value, (k, v) => {
+      if (v == null) {
+        return 'null'
+      }
+      if (typeof v === 'bigint') {
+        return `bigint:${v.toString()}`
+      }
+      if (typeof v === 'string') {
+        return v.toLowerCase()
+      }
+
+      // Sort object keys
+      if (typeof v === 'object' && !Array.isArray(v)) {
+        const keys = Object.keys(v)
+        keys.sort()
+        return keys.reduce((accum, key) => {
+          accum[key] = v[key]
+          return accum
+        }, <any>{})
+      }
+
+      return v
+    })
+  )
+}
+
 class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
   executor: PQueue
+  #performCache = new Map<string, Promise<any>>()
 
   constructor(url: string, network: Network, concurrency: number) {
     // TODO re-enable match when possible
@@ -52,10 +83,23 @@ class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
   }
 
   async send(method: string, params: Array<any>): Promise<any> {
-    const res = await this.executor.add(() => super.send(method, params))
-    if (!res) {
+    const tag = getTag(method, params)
+    let perform = this.#performCache.get(tag)
+    if (!perform) {
+      perform = this.executor.add(() => super.send(method, params))
+      this.#performCache.set(tag, perform)
+
+      setTimeout(() => {
+        if (this.#performCache.get(tag) === perform) {
+          this.#performCache.delete(tag)
+        }
+      }, 500)
+    }
+
+    const result = await perform
+    if (!result) {
       throw Error('Unexpected null response')
     }
-    return res
+    return result
   }
 }
