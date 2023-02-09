@@ -1,5 +1,13 @@
 import Ethers from '@sentio/ethers-v6'
-import { Config, extractAbi, extractDocumentation, FileDescription, parse, shortenFullJsonFilePath } from 'typechain'
+import {
+  Config,
+  extractAbi,
+  extractDocumentation,
+  FileDescription,
+  parse,
+  shortenFullJsonFilePath,
+  Contract,
+} from 'typechain'
 import { dirname, join, relative } from 'path'
 import { codeGenIndex, codeGenSentioFile, codeGenTestUtilsFile } from './file.js'
 
@@ -10,6 +18,8 @@ export default class EthersSentio extends Ethers.default {
     }
     super(config)
   }
+
+  private processedContracts: Contract[] = []
 
   // TODO(pc): also have to override transformBinFile, transformFile
   override transformAbiOrFullJsonFile(file: FileDescription): FileDescription[] | void {
@@ -23,6 +33,7 @@ export default class EthersSentio extends Ethers.default {
     const jsonPath = relative(this.cfg.inputDir, shortenFullJsonFilePath(file.path, this.cfg.allFiles))
     const contract = parse(abi, jsonPath, documentation)
     const files = super.transformAbiOrFullJsonFile(file)
+    this.processedContracts.push(contract)
 
     if (files !== undefined) {
       // files.forEach(this.transformFilePath)
@@ -37,11 +48,11 @@ export default class EthersSentio extends Ethers.default {
           contents: codeGenSentioFile(contract),
         },
         {
-          path: join(dirname(files[0].path), '..', contract.name.toLowerCase(), 'index.ts'),
+          path: join(dirname(files[0].path), '..', `${contract.name.toLowerCase()}.ts`),
           contents: codeGenIndex(contract),
         },
         {
-          path: join(dirname(files[0].path), '..', contract.name.toLowerCase(), 'test-utils.ts'),
+          path: join(dirname(files[0].path), `${contract.name.toLowerCase()}_test-utils.ts`),
           contents: codeGenTestUtilsFile(contract),
         },
       ]
@@ -53,11 +64,26 @@ export default class EthersSentio extends Ethers.default {
     for (const [idx, file] of files.entries()) {
       if (file.path.endsWith('__factory.ts')) {
         file.contents = '// @ts-nocheck\n' + file.contents
-      }
-      if (file.path.endsWith('factories/index.ts')) {
+      } else if (file.path.endsWith('factories/index.ts')) {
         file.contents = file.contents.replaceAll("__factory'", "__factory.js'")
+      } else if (file.path.endsWith('_processor.ts')) {
       }
     }
+    let indexContent = ''
+    for (const contract of this.processedContracts) {
+      indexContent =
+        indexContent +
+        `
+            export * as ${contract.name.toLowerCase()} from './${contract.name.toLowerCase()}.js'
+            export { ${contract.name}Processor, ${
+          contract.name
+        }ProcessorTemplate } from './${contract.name.toLowerCase()}.js'
+            `
+    }
+    files.push({
+      path: join(dirname(files[0].path), '../index.ts'),
+      contents: indexContent,
+    })
     return files
   }
 }

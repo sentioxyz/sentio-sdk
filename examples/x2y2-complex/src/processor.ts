@@ -1,6 +1,6 @@
 import { Counter, Gauge, Exporter } from '@sentio/sdk'
 import { ERC20Processor } from '@sentio/sdk/eth/builtin'
-import { X2y2Processor } from './types/x2y2/index.js'
+import { X2y2Processor } from './types/eth/x2y2.js'
 
 // import { AggregationType } from '@sentio/sdk/lib/gen/processor/protos/processor'
 

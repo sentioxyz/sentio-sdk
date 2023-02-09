@@ -1,10 +1,5 @@
-packages/sdk/src/eth/builtin/*
-# TODO auto gen index.ts
-!packages/sdk/src/eth/builtin/index.ts
-
+builtin
 debug
-
-packages/sdk/src/aptos/builtin/
 
 node_modules
 dist

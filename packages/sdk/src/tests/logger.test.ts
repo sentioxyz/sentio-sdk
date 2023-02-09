@@ -1,7 +1,7 @@
 import { assert, expect } from 'chai'
 
 import { TestProcessorServer } from '@sentio/sdk/testing'
-import { ERC20Processor, mockApprovalLog, mockTransferLog, TransferEvent } from '../eth/builtin/erc20/index.js'
+import { ERC20Processor, mockApprovalLog, mockTransferLog, TransferEvent } from '../eth/builtin/erc20.js'
 import { LogLevel } from '@sentio/protos'
 
 describe('Test Error Capture', () => {

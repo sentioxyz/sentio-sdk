@@ -1,12 +1,7 @@
 import { assert } from 'chai'
 
 import { TestProcessorServer } from '../testing/index.js'
-import {
-  ERC20Processor,
-  mockApprovalLog,
-  mockOwnershipTransferredLog,
-  mockTransferLog,
-} from '../eth/builtin/erc20/index.js'
+import { ERC20Processor, mockApprovalLog, mockOwnershipTransferredLog, mockTransferLog } from '../eth/builtin/erc20.js'
 import { BigDecimal } from '../core/big-decimal.js'
 
 describe('Test Error Capture', () => {

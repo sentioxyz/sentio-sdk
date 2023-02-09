@@ -93,10 +93,10 @@ async function codegen() {
     // @ts-ignore dynamic import
     const codegen = await import('@sentio/sdk/eth/codegen')
     let input = path.resolve('abis', 'eth')
-    let output = path.resolve(outputBase)
+    let output = path.resolve(outputBase, 'eth')
     if (!fs.existsSync(input)) {
       input = path.resolve('abis', 'evm')
-      output = path.resolve(outputBase)
+      output = path.resolve(outputBase, 'eth')
     }
     // @ts-ignore dynamic import
     await codegen.codegen(input, output)

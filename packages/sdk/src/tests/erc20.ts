@@ -1,4 +1,4 @@
-import { ERC20Processor, ERC20ProcessorTemplate } from '../eth/builtin/erc20/index.js'
+import { ERC20Processor, ERC20ProcessorTemplate } from '../eth/builtin/erc20.js'
 import { Exporter } from '../core/exporter.js'
 
 export const filter = ERC20Processor.filters.Transfer(

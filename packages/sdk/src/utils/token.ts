@@ -1,4 +1,4 @@
-import { getERC20Contract } from '../eth/builtin/erc20/index.js'
+import { getERC20Contract } from '../eth/builtin/erc20.js'
 import { getERC20BytesContract } from '../eth/builtin/internal/erc20bytes_processor.js'
 import { BigDecimal, scaleDown } from '../core/big-decimal.js'
 // import { toBigDecimal } from './conversion'

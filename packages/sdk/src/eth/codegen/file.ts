@@ -13,9 +13,9 @@ import { generateBoundViewFunctions, generateViewFunctions } from './view-functi
 
 export function codeGenIndex(contract: Contract): string {
   return ` 
-  export * from '../internal/${contract.name.toLowerCase()}_processor.js'
-  export * from '../internal/${contract.name}.js'
-  export * from './test-utils.js'
+  export * from './internal/${contract.name.toLowerCase()}_processor.js'
+  export * from './internal/${contract.name}.js'
+  export * from './internal/${contract.name.toLowerCase()}_test-utils.js'
   `
 }
 
@@ -198,22 +198,20 @@ export function codeGenTestUtilsFile(contract: Contract): string {
     .join('\n')}
   `
 
-  const imports = createImportsForUsedIdentifiers(
-    {
-      'ethers/providers': ['LogParams'],
-      './index.js': [
-        `get${contract.name}Contract`,
-        ...Object.values(contract.events).flatMap((events) => {
-          if (events.length === 1) {
-            return `${events[0].name}EventObject`
-          } else {
-            return events.flatMap((e) => `${getFullSignatureAsSymbolForEvent(e)}_EventObject`)
-          }
-        }),
-      ],
-    },
-    source
-  )
+  const possibleImports = {
+    'ethers/providers': ['LogParams'],
+  } as any
+  possibleImports[`./${contract.name}.js`] = Object.values(contract.events).flatMap((events) => {
+    if (events.length === 1) {
+      return `${events[0].name}EventObject`
+    } else {
+      return events.flatMap((e) => `${getFullSignatureAsSymbolForEvent(e)}_EventObject`)
+    }
+  })
+
+  possibleImports[`./${contract.name.toLowerCase()}_processor.js`] = [`get${contract.name}Contract`]
+
+  const imports = createImportsForUsedIdentifiers(possibleImports, source)
 
   return imports + source
 }

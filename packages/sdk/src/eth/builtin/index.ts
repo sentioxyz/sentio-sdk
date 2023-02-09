@@ -1,8 +1,0 @@
-export * as eacaggregatorproxy from './eacaggregatorproxy/index.js'
-export { EACAggregatorProxyProcessor, EACAggregatorProxyProcessorTemplate } from './eacaggregatorproxy/index.js'
-export * as erc20 from './erc20/index.js'
-export { ERC20Processor, ERC20ProcessorTemplate } from './erc20/index.js'
-export * as erc20bytes from './erc20bytes/index.js'
-export { ERC20BytesProcessor, ERC20BytesProcessorTemplate } from './erc20bytes/index.js'
-export * as weth9 from './weth9/index.js'
-export { WETH9Processor, WETH9ProcessorTemplate } from './weth9/index.js'

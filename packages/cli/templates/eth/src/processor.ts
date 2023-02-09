@@ -1,6 +1,6 @@
 import { Counter, Gauge } from '@sentio/sdk'
 import { ERC20Processor } from '@sentio/sdk/eth/builtin'
-import { X2y2Processor } from './types/x2y2/index.js'
+import { X2y2Processor } from './types/eth/x2y2.js'
 
 const rewardPerBlock = Gauge.register('reward_per_block', {
   description: 'rewards for each block grouped by phase',
