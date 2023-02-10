@@ -44,7 +44,22 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
   sdkMinorVersion: number
 
   async getConfig(request: ProcessConfigRequest, context: CallContext) {
-    return await this.instance.getConfig(request, context)
+    const config = await this.instance.getConfig(request, context)
+    if (config.contractConfigs) {
+      for (const contract of config.contractConfigs) {
+        // @ts-ignore old fields
+        if (contract.aptosCallConfigs) {
+          // @ts-ignore old fields
+          contract.moveCallConfigs = contract.aptosCallConfigs
+        }
+        // @ts-ignore old fields
+        if (contract.aptosEventConfigs) {
+          // @ts-ignore old fields
+          contract.moveEventConfigs = contract.aptosEventConfigs
+        }
+      }
+    }
+    return config
   }
 
   async start(request: StartRequest, context: CallContext) {
