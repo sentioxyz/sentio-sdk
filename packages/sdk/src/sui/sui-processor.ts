@@ -6,7 +6,7 @@ import { SuiContext } from './context.js'
 import { MoveEvent, SuiTransactionResponse, getMoveCallTransaction, MoveCall } from '@mysten/sui.js'
 import { CallHandler, EventFilter, EventHandler, FunctionNameAndCallFilter } from '../move/index.js'
 
-export class IndexConfigure {
+class IndexConfigure {
   address: string
   network: SuiNetwork
   startTimestamp: number

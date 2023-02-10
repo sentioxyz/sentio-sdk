@@ -59,7 +59,7 @@ export class EventLogger extends NamedResultDescriptor {
       severity: severity || LogLevel.INFO,
       message: message || '',
       distinctEntityId: distinctId || '',
-      attributes: payload,
+      attributes: normalizeAttribute(payload),
       runtimeInfo: undefined,
       noMetric: true,
     }

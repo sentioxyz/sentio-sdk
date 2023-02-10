@@ -67,9 +67,10 @@ describe('Numberish tests', () => {
   })
 
   test('normalize attributes basic', async () => {
-    const t1 = { a: 'a', n: 123, n2: 1233333333300000000000n, nested: { date: new Date() } }
+    const t1 = { a: 'a', n: 123, n2: 1233333333300000000000n, n3: BigDecimal(0.0), nested: { date: new Date() } }
     const r1 = normalizeAttribute(t1)
     expect(typeof r1.n2).equals('number')
+    expect(typeof r1.n3).equals('number')
     expect(typeof r1.nested.date).equals('string')
 
     const w1 = Struct.encode(Struct.wrap(r1))
