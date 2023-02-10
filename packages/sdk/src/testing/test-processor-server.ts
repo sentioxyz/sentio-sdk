@@ -310,6 +310,10 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
     return this.service.processBindings(request, context)
   }
 
+  processBinding(request: DataBinding, context: CallContext = TEST_CONTEXT): Promise<ProcessBindingResponse> {
+    return this.service.processBindings({ bindings: [request] }, context)
+  }
+
   processBindingsStream(request: AsyncIterable<DataBinding>, context: CallContext) {
     return this.service.processBindingsStream(request, context)
   }

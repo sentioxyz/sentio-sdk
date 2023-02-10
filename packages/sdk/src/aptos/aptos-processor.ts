@@ -5,53 +5,15 @@ import { AptosBindOptions, AptosNetwork, getChainId } from './network.js'
 import { AptosContext, AptosResourceContext } from './context.js'
 import { EventInstance } from './models.js'
 import { ListStateStorage } from '@sentio/runtime'
-import {
-  AptosFetchConfig,
-  Data_AptCall,
-  Data_AptEvent,
-  Data_AptResource,
-  HandleInterval,
-  ProcessResult,
-} from '@sentio/protos'
+import { MoveFetchConfig, Data_AptResource, HandleInterval, ProcessResult } from '@sentio/protos'
 import { ServerError, Status } from 'nice-grpc'
+import { CallHandler, EventFilter, EventHandler, FunctionNameAndCallFilter } from '../move/index.js'
 
 type IndexConfigure = {
   address: string
   network: AptosNetwork
   startVersion: bigint
   // endSeqNumber?: Long
-}
-
-// TODO extends ArgumentsFilter
-export interface EventFilter {
-  type: string
-  account?: string
-}
-
-export interface FunctionNameAndCallFilter extends CallFilter {
-  function: string
-}
-
-// TODO extends ArgumentsFilter
-export interface CallFilter {
-  includeFailed?: boolean
-  typeArguments?: string[]
-}
-
-export interface ArgumentsFilter {
-  arguments?: string[]
-}
-
-class EventHandler {
-  filters: EventFilter[]
-  handler: (event: Data_AptEvent) => Promise<ProcessResult>
-  fetchConfig: AptosFetchConfig
-}
-
-class CallHandler {
-  filters: FunctionNameAndCallFilter[]
-  handler: (call: Data_AptCall) => Promise<ProcessResult>
-  fetchConfig: AptosFetchConfig
 }
 
 class ResourceHandlder {
@@ -85,9 +47,9 @@ export class AptosBaseProcessor {
   public onTransaction(
     handler: (transaction: Transaction_UserTransaction, ctx: AptosContext) => void,
     includedFailed = false,
-    fetchConfig?: AptosFetchConfig
+    fetchConfig?: MoveFetchConfig
   ): AptosBaseProcessor {
-    const _fetchConfig = fetchConfig || AptosFetchConfig.fromPartial({})
+    const _fetchConfig = fetchConfig || MoveFetchConfig.fromPartial({})
 
     // const address = this.config.address
     // const moduleName = this.moduleName
@@ -117,10 +79,10 @@ export class AptosBaseProcessor {
   public onEvent(
     handler: (event: EventInstance, ctx: AptosContext) => void,
     filter: EventFilter | EventFilter[],
-    fetchConfig?: AptosFetchConfig
+    fetchConfig?: MoveFetchConfig
   ): AptosBaseProcessor {
     let _filters: EventFilter[] = []
-    const _fetchConfig = fetchConfig || AptosFetchConfig.fromPartial({})
+    const _fetchConfig = fetchConfig || MoveFetchConfig.fromPartial({})
 
     if (Array.isArray(filter)) {
       _filters = filter
@@ -170,10 +132,10 @@ export class AptosBaseProcessor {
   public onEntryFunctionCall(
     handler: (call: TransactionPayload_EntryFunctionPayload, ctx: AptosContext) => void,
     filter: FunctionNameAndCallFilter | FunctionNameAndCallFilter[],
-    fetchConfig?: AptosFetchConfig
+    fetchConfig?: MoveFetchConfig
   ): AptosBaseProcessor {
     let _filters: FunctionNameAndCallFilter[] = []
-    const _fetchConfig = fetchConfig || AptosFetchConfig.fromPartial({})
+    const _fetchConfig = fetchConfig || MoveFetchConfig.fromPartial({})
 
     if (Array.isArray(filter)) {
       _filters = filter

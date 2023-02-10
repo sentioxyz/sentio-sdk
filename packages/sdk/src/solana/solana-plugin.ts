@@ -12,8 +12,7 @@ export class SolanaPlugin extends Plugin {
   async configure(config: ProcessConfigResponse) {
     // Part 2, prepare solana constractors
     for (const solanaProcessor of SolanaProcessorState.INSTANCE.getValues()) {
-      const contractConfig: ContractConfig = {
-        transactionConfig: [],
+      const contractConfig = ContractConfig.fromPartial({
         processorType: USER_PROCESSOR,
         contract: {
           name: solanaProcessor.contractName,
@@ -21,19 +20,13 @@ export class SolanaPlugin extends Plugin {
           address: solanaProcessor.address,
           abi: '',
         },
-        logConfigs: [],
-        traceConfigs: [],
-        intervalConfigs: [],
         startBlock: solanaProcessor.config.startSlot,
-        endBlock: 0n,
         instructionConfig: {
           innerInstruction: solanaProcessor.processInnerInstruction,
           parsedInstruction: solanaProcessor.fromParsedInstruction !== null,
           rawDataInstruction: solanaProcessor.decodeInstruction !== null,
         },
-        aptosEventConfigs: [],
-        aptosCallConfigs: [],
-      }
+      })
       config.contractConfigs.push(contractConfig)
     }
   }

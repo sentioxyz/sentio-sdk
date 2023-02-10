@@ -132,7 +132,8 @@ export enum HandlerType {
   APT_EVENT = 6,
   APT_CALL = 7,
   APT_RESOURCE = 8,
-  SUI_TRANSACTION = 3,
+  SUI_EVENT = 3,
+  SUI_CALL = 9,
   UNRECOGNIZED = -1,
 }
 
@@ -163,8 +164,11 @@ export function handlerTypeFromJSON(object: any): HandlerType {
     case "APT_RESOURCE":
       return HandlerType.APT_RESOURCE;
     case 3:
-    case "SUI_TRANSACTION":
-      return HandlerType.SUI_TRANSACTION;
+    case "SUI_EVENT":
+      return HandlerType.SUI_EVENT;
+    case 9:
+    case "SUI_CALL":
+      return HandlerType.SUI_CALL;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -190,8 +194,10 @@ export function handlerTypeToJSON(object: HandlerType): string {
       return "APT_CALL";
     case HandlerType.APT_RESOURCE:
       return "APT_RESOURCE";
-    case HandlerType.SUI_TRANSACTION:
-      return "SUI_TRANSACTION";
+    case HandlerType.SUI_EVENT:
+      return "SUI_EVENT";
+    case HandlerType.SUI_CALL:
+      return "SUI_CALL";
     case HandlerType.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
@@ -273,8 +279,8 @@ export interface ContractConfig {
   logConfigs: LogHandlerConfig[];
   traceConfigs: TraceHandlerConfig[];
   transactionConfig: TransactionHandlerConfig[];
-  aptosEventConfigs: AptosEventHandlerConfig[];
-  aptosCallConfigs: AptosCallHandlerConfig[];
+  moveEventConfigs: MoveEventHandlerConfig[];
+  moveCallConfigs: MoveCallHandlerConfig[];
   instructionConfig: InstructionHandlerConfig | undefined;
   startBlock: bigint;
   endBlock: bigint;
@@ -436,28 +442,28 @@ export interface InstructionHandlerConfig {
   rawDataInstruction: boolean;
 }
 
-export interface AptosFetchConfig {
+export interface MoveFetchConfig {
   resourceChanges: boolean;
 }
 
-export interface AptosEventHandlerConfig {
-  filters: AptosEventFilter[];
+export interface MoveEventHandlerConfig {
+  filters: MoveEventFilter[];
   handlerId: number;
-  fetchConfig: AptosFetchConfig | undefined;
+  fetchConfig: MoveFetchConfig | undefined;
 }
 
-export interface AptosEventFilter {
+export interface MoveEventFilter {
   type: string;
   account: string;
 }
 
-export interface AptosCallHandlerConfig {
-  filters: AptosCallFilter[];
+export interface MoveCallHandlerConfig {
+  filters: MoveCallFilter[];
   handlerId: number;
-  fetchConfig: AptosFetchConfig | undefined;
+  fetchConfig: MoveFetchConfig | undefined;
 }
 
-export interface AptosCallFilter {
+export interface MoveCallFilter {
   function: string;
   typeArguments: string[];
   withTypeArguments: boolean;
@@ -486,6 +492,8 @@ export interface Data {
   aptEvent?: Data_AptEvent | undefined;
   aptCall?: Data_AptCall | undefined;
   aptResource?: Data_AptResource | undefined;
+  suiEvent?: Data_SuiEvent | undefined;
+  suiCall?: Data_SuiCall | undefined;
 }
 
 export interface Data_EthLog {
@@ -535,6 +543,14 @@ export interface Data_AptResource {
   resources: { [key: string]: any }[];
   version: bigint;
   timestampMicros: bigint;
+}
+
+export interface Data_SuiEvent {
+  transaction: { [key: string]: any } | undefined;
+}
+
+export interface Data_SuiCall {
+  transaction: { [key: string]: any } | undefined;
 }
 
 export interface DataBinding {
@@ -873,8 +889,8 @@ function createBaseContractConfig(): ContractConfig {
     logConfigs: [],
     traceConfigs: [],
     transactionConfig: [],
-    aptosEventConfigs: [],
-    aptosCallConfigs: [],
+    moveEventConfigs: [],
+    moveCallConfigs: [],
     instructionConfig: undefined,
     startBlock: BigInt("0"),
     endBlock: BigInt("0"),
@@ -899,11 +915,11 @@ export const ContractConfig = {
     for (const v of message.transactionConfig) {
       TransactionHandlerConfig.encode(v!, writer.uint32(58).fork()).ldelim();
     }
-    for (const v of message.aptosEventConfigs) {
-      AptosEventHandlerConfig.encode(v!, writer.uint32(74).fork()).ldelim();
+    for (const v of message.moveEventConfigs) {
+      MoveEventHandlerConfig.encode(v!, writer.uint32(74).fork()).ldelim();
     }
-    for (const v of message.aptosCallConfigs) {
-      AptosCallHandlerConfig.encode(v!, writer.uint32(82).fork()).ldelim();
+    for (const v of message.moveCallConfigs) {
+      MoveCallHandlerConfig.encode(v!, writer.uint32(82).fork()).ldelim();
     }
     if (message.instructionConfig !== undefined) {
       InstructionHandlerConfig.encode(message.instructionConfig, writer.uint32(50).fork()).ldelim();
@@ -943,10 +959,10 @@ export const ContractConfig = {
           message.transactionConfig.push(TransactionHandlerConfig.decode(reader, reader.uint32()));
           break;
         case 9:
-          message.aptosEventConfigs.push(AptosEventHandlerConfig.decode(reader, reader.uint32()));
+          message.moveEventConfigs.push(MoveEventHandlerConfig.decode(reader, reader.uint32()));
           break;
         case 10:
-          message.aptosCallConfigs.push(AptosCallHandlerConfig.decode(reader, reader.uint32()));
+          message.moveCallConfigs.push(MoveCallHandlerConfig.decode(reader, reader.uint32()));
           break;
         case 6:
           message.instructionConfig = InstructionHandlerConfig.decode(reader, reader.uint32());
@@ -983,11 +999,11 @@ export const ContractConfig = {
       transactionConfig: Array.isArray(object?.transactionConfig)
         ? object.transactionConfig.map((e: any) => TransactionHandlerConfig.fromJSON(e))
         : [],
-      aptosEventConfigs: Array.isArray(object?.aptosEventConfigs)
-        ? object.aptosEventConfigs.map((e: any) => AptosEventHandlerConfig.fromJSON(e))
+      moveEventConfigs: Array.isArray(object?.moveEventConfigs)
+        ? object.moveEventConfigs.map((e: any) => MoveEventHandlerConfig.fromJSON(e))
         : [],
-      aptosCallConfigs: Array.isArray(object?.aptosCallConfigs)
-        ? object.aptosCallConfigs.map((e: any) => AptosCallHandlerConfig.fromJSON(e))
+      moveCallConfigs: Array.isArray(object?.moveCallConfigs)
+        ? object.moveCallConfigs.map((e: any) => MoveCallHandlerConfig.fromJSON(e))
         : [],
       instructionConfig: isSet(object.instructionConfig)
         ? InstructionHandlerConfig.fromJSON(object.instructionConfig)
@@ -1022,15 +1038,15 @@ export const ContractConfig = {
     } else {
       obj.transactionConfig = [];
     }
-    if (message.aptosEventConfigs) {
-      obj.aptosEventConfigs = message.aptosEventConfigs.map((e) => e ? AptosEventHandlerConfig.toJSON(e) : undefined);
+    if (message.moveEventConfigs) {
+      obj.moveEventConfigs = message.moveEventConfigs.map((e) => e ? MoveEventHandlerConfig.toJSON(e) : undefined);
     } else {
-      obj.aptosEventConfigs = [];
+      obj.moveEventConfigs = [];
     }
-    if (message.aptosCallConfigs) {
-      obj.aptosCallConfigs = message.aptosCallConfigs.map((e) => e ? AptosCallHandlerConfig.toJSON(e) : undefined);
+    if (message.moveCallConfigs) {
+      obj.moveCallConfigs = message.moveCallConfigs.map((e) => e ? MoveCallHandlerConfig.toJSON(e) : undefined);
     } else {
-      obj.aptosCallConfigs = [];
+      obj.moveCallConfigs = [];
     }
     message.instructionConfig !== undefined && (obj.instructionConfig = message.instructionConfig
       ? InstructionHandlerConfig.toJSON(message.instructionConfig)
@@ -1050,8 +1066,8 @@ export const ContractConfig = {
     message.logConfigs = object.logConfigs?.map((e) => LogHandlerConfig.fromPartial(e)) || [];
     message.traceConfigs = object.traceConfigs?.map((e) => TraceHandlerConfig.fromPartial(e)) || [];
     message.transactionConfig = object.transactionConfig?.map((e) => TransactionHandlerConfig.fromPartial(e)) || [];
-    message.aptosEventConfigs = object.aptosEventConfigs?.map((e) => AptosEventHandlerConfig.fromPartial(e)) || [];
-    message.aptosCallConfigs = object.aptosCallConfigs?.map((e) => AptosCallHandlerConfig.fromPartial(e)) || [];
+    message.moveEventConfigs = object.moveEventConfigs?.map((e) => MoveEventHandlerConfig.fromPartial(e)) || [];
+    message.moveCallConfigs = object.moveCallConfigs?.map((e) => MoveCallHandlerConfig.fromPartial(e)) || [];
     message.instructionConfig = (object.instructionConfig !== undefined && object.instructionConfig !== null)
       ? InstructionHandlerConfig.fromPartial(object.instructionConfig)
       : undefined;
@@ -2555,22 +2571,22 @@ export const InstructionHandlerConfig = {
   },
 };
 
-function createBaseAptosFetchConfig(): AptosFetchConfig {
+function createBaseMoveFetchConfig(): MoveFetchConfig {
   return { resourceChanges: false };
 }
 
-export const AptosFetchConfig = {
-  encode(message: AptosFetchConfig, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const MoveFetchConfig = {
+  encode(message: MoveFetchConfig, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.resourceChanges === true) {
       writer.uint32(8).bool(message.resourceChanges);
     }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): AptosFetchConfig {
+  decode(input: _m0.Reader | Uint8Array, length?: number): MoveFetchConfig {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseAptosFetchConfig();
+    const message = createBaseMoveFetchConfig();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -2585,56 +2601,56 @@ export const AptosFetchConfig = {
     return message;
   },
 
-  fromJSON(object: any): AptosFetchConfig {
+  fromJSON(object: any): MoveFetchConfig {
     return { resourceChanges: isSet(object.resourceChanges) ? Boolean(object.resourceChanges) : false };
   },
 
-  toJSON(message: AptosFetchConfig): unknown {
+  toJSON(message: MoveFetchConfig): unknown {
     const obj: any = {};
     message.resourceChanges !== undefined && (obj.resourceChanges = message.resourceChanges);
     return obj;
   },
 
-  fromPartial(object: DeepPartial<AptosFetchConfig>): AptosFetchConfig {
-    const message = createBaseAptosFetchConfig();
+  fromPartial(object: DeepPartial<MoveFetchConfig>): MoveFetchConfig {
+    const message = createBaseMoveFetchConfig();
     message.resourceChanges = object.resourceChanges ?? false;
     return message;
   },
 };
 
-function createBaseAptosEventHandlerConfig(): AptosEventHandlerConfig {
+function createBaseMoveEventHandlerConfig(): MoveEventHandlerConfig {
   return { filters: [], handlerId: 0, fetchConfig: undefined };
 }
 
-export const AptosEventHandlerConfig = {
-  encode(message: AptosEventHandlerConfig, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const MoveEventHandlerConfig = {
+  encode(message: MoveEventHandlerConfig, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     for (const v of message.filters) {
-      AptosEventFilter.encode(v!, writer.uint32(10).fork()).ldelim();
+      MoveEventFilter.encode(v!, writer.uint32(10).fork()).ldelim();
     }
     if (message.handlerId !== 0) {
       writer.uint32(16).int32(message.handlerId);
     }
     if (message.fetchConfig !== undefined) {
-      AptosFetchConfig.encode(message.fetchConfig, writer.uint32(26).fork()).ldelim();
+      MoveFetchConfig.encode(message.fetchConfig, writer.uint32(26).fork()).ldelim();
     }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): AptosEventHandlerConfig {
+  decode(input: _m0.Reader | Uint8Array, length?: number): MoveEventHandlerConfig {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseAptosEventHandlerConfig();
+    const message = createBaseMoveEventHandlerConfig();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.filters.push(AptosEventFilter.decode(reader, reader.uint32()));
+          message.filters.push(MoveEventFilter.decode(reader, reader.uint32()));
           break;
         case 2:
           message.handlerId = reader.int32();
           break;
         case 3:
-          message.fetchConfig = AptosFetchConfig.decode(reader, reader.uint32());
+          message.fetchConfig = MoveFetchConfig.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -2644,44 +2660,44 @@ export const AptosEventHandlerConfig = {
     return message;
   },
 
-  fromJSON(object: any): AptosEventHandlerConfig {
+  fromJSON(object: any): MoveEventHandlerConfig {
     return {
-      filters: Array.isArray(object?.filters) ? object.filters.map((e: any) => AptosEventFilter.fromJSON(e)) : [],
+      filters: Array.isArray(object?.filters) ? object.filters.map((e: any) => MoveEventFilter.fromJSON(e)) : [],
       handlerId: isSet(object.handlerId) ? Number(object.handlerId) : 0,
-      fetchConfig: isSet(object.fetchConfig) ? AptosFetchConfig.fromJSON(object.fetchConfig) : undefined,
+      fetchConfig: isSet(object.fetchConfig) ? MoveFetchConfig.fromJSON(object.fetchConfig) : undefined,
     };
   },
 
-  toJSON(message: AptosEventHandlerConfig): unknown {
+  toJSON(message: MoveEventHandlerConfig): unknown {
     const obj: any = {};
     if (message.filters) {
-      obj.filters = message.filters.map((e) => e ? AptosEventFilter.toJSON(e) : undefined);
+      obj.filters = message.filters.map((e) => e ? MoveEventFilter.toJSON(e) : undefined);
     } else {
       obj.filters = [];
     }
     message.handlerId !== undefined && (obj.handlerId = Math.round(message.handlerId));
     message.fetchConfig !== undefined &&
-      (obj.fetchConfig = message.fetchConfig ? AptosFetchConfig.toJSON(message.fetchConfig) : undefined);
+      (obj.fetchConfig = message.fetchConfig ? MoveFetchConfig.toJSON(message.fetchConfig) : undefined);
     return obj;
   },
 
-  fromPartial(object: DeepPartial<AptosEventHandlerConfig>): AptosEventHandlerConfig {
-    const message = createBaseAptosEventHandlerConfig();
-    message.filters = object.filters?.map((e) => AptosEventFilter.fromPartial(e)) || [];
+  fromPartial(object: DeepPartial<MoveEventHandlerConfig>): MoveEventHandlerConfig {
+    const message = createBaseMoveEventHandlerConfig();
+    message.filters = object.filters?.map((e) => MoveEventFilter.fromPartial(e)) || [];
     message.handlerId = object.handlerId ?? 0;
     message.fetchConfig = (object.fetchConfig !== undefined && object.fetchConfig !== null)
-      ? AptosFetchConfig.fromPartial(object.fetchConfig)
+      ? MoveFetchConfig.fromPartial(object.fetchConfig)
       : undefined;
     return message;
   },
 };
 
-function createBaseAptosEventFilter(): AptosEventFilter {
+function createBaseMoveEventFilter(): MoveEventFilter {
   return { type: "", account: "" };
 }
 
-export const AptosEventFilter = {
-  encode(message: AptosEventFilter, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const MoveEventFilter = {
+  encode(message: MoveEventFilter, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.type !== "") {
       writer.uint32(10).string(message.type);
     }
@@ -2691,10 +2707,10 @@ export const AptosEventFilter = {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): AptosEventFilter {
+  decode(input: _m0.Reader | Uint8Array, length?: number): MoveEventFilter {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseAptosEventFilter();
+    const message = createBaseMoveEventFilter();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -2712,61 +2728,61 @@ export const AptosEventFilter = {
     return message;
   },
 
-  fromJSON(object: any): AptosEventFilter {
+  fromJSON(object: any): MoveEventFilter {
     return {
       type: isSet(object.type) ? String(object.type) : "",
       account: isSet(object.account) ? String(object.account) : "",
     };
   },
 
-  toJSON(message: AptosEventFilter): unknown {
+  toJSON(message: MoveEventFilter): unknown {
     const obj: any = {};
     message.type !== undefined && (obj.type = message.type);
     message.account !== undefined && (obj.account = message.account);
     return obj;
   },
 
-  fromPartial(object: DeepPartial<AptosEventFilter>): AptosEventFilter {
-    const message = createBaseAptosEventFilter();
+  fromPartial(object: DeepPartial<MoveEventFilter>): MoveEventFilter {
+    const message = createBaseMoveEventFilter();
     message.type = object.type ?? "";
     message.account = object.account ?? "";
     return message;
   },
 };
 
-function createBaseAptosCallHandlerConfig(): AptosCallHandlerConfig {
+function createBaseMoveCallHandlerConfig(): MoveCallHandlerConfig {
   return { filters: [], handlerId: 0, fetchConfig: undefined };
 }
 
-export const AptosCallHandlerConfig = {
-  encode(message: AptosCallHandlerConfig, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const MoveCallHandlerConfig = {
+  encode(message: MoveCallHandlerConfig, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     for (const v of message.filters) {
-      AptosCallFilter.encode(v!, writer.uint32(10).fork()).ldelim();
+      MoveCallFilter.encode(v!, writer.uint32(10).fork()).ldelim();
     }
     if (message.handlerId !== 0) {
       writer.uint32(16).int32(message.handlerId);
     }
     if (message.fetchConfig !== undefined) {
-      AptosFetchConfig.encode(message.fetchConfig, writer.uint32(26).fork()).ldelim();
+      MoveFetchConfig.encode(message.fetchConfig, writer.uint32(26).fork()).ldelim();
     }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): AptosCallHandlerConfig {
+  decode(input: _m0.Reader | Uint8Array, length?: number): MoveCallHandlerConfig {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseAptosCallHandlerConfig();
+    const message = createBaseMoveCallHandlerConfig();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.filters.push(AptosCallFilter.decode(reader, reader.uint32()));
+          message.filters.push(MoveCallFilter.decode(reader, reader.uint32()));
           break;
         case 2:
           message.handlerId = reader.int32();
           break;
         case 3:
-          message.fetchConfig = AptosFetchConfig.decode(reader, reader.uint32());
+          message.fetchConfig = MoveFetchConfig.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -2776,44 +2792,44 @@ export const AptosCallHandlerConfig = {
     return message;
   },
 
-  fromJSON(object: any): AptosCallHandlerConfig {
+  fromJSON(object: any): MoveCallHandlerConfig {
     return {
-      filters: Array.isArray(object?.filters) ? object.filters.map((e: any) => AptosCallFilter.fromJSON(e)) : [],
+      filters: Array.isArray(object?.filters) ? object.filters.map((e: any) => MoveCallFilter.fromJSON(e)) : [],
       handlerId: isSet(object.handlerId) ? Number(object.handlerId) : 0,
-      fetchConfig: isSet(object.fetchConfig) ? AptosFetchConfig.fromJSON(object.fetchConfig) : undefined,
+      fetchConfig: isSet(object.fetchConfig) ? MoveFetchConfig.fromJSON(object.fetchConfig) : undefined,
     };
   },
 
-  toJSON(message: AptosCallHandlerConfig): unknown {
+  toJSON(message: MoveCallHandlerConfig): unknown {
     const obj: any = {};
     if (message.filters) {
-      obj.filters = message.filters.map((e) => e ? AptosCallFilter.toJSON(e) : undefined);
+      obj.filters = message.filters.map((e) => e ? MoveCallFilter.toJSON(e) : undefined);
     } else {
       obj.filters = [];
     }
     message.handlerId !== undefined && (obj.handlerId = Math.round(message.handlerId));
     message.fetchConfig !== undefined &&
-      (obj.fetchConfig = message.fetchConfig ? AptosFetchConfig.toJSON(message.fetchConfig) : undefined);
+      (obj.fetchConfig = message.fetchConfig ? MoveFetchConfig.toJSON(message.fetchConfig) : undefined);
     return obj;
   },
 
-  fromPartial(object: DeepPartial<AptosCallHandlerConfig>): AptosCallHandlerConfig {
-    const message = createBaseAptosCallHandlerConfig();
-    message.filters = object.filters?.map((e) => AptosCallFilter.fromPartial(e)) || [];
+  fromPartial(object: DeepPartial<MoveCallHandlerConfig>): MoveCallHandlerConfig {
+    const message = createBaseMoveCallHandlerConfig();
+    message.filters = object.filters?.map((e) => MoveCallFilter.fromPartial(e)) || [];
     message.handlerId = object.handlerId ?? 0;
     message.fetchConfig = (object.fetchConfig !== undefined && object.fetchConfig !== null)
-      ? AptosFetchConfig.fromPartial(object.fetchConfig)
+      ? MoveFetchConfig.fromPartial(object.fetchConfig)
       : undefined;
     return message;
   },
 };
 
-function createBaseAptosCallFilter(): AptosCallFilter {
+function createBaseMoveCallFilter(): MoveCallFilter {
   return { function: "", typeArguments: [], withTypeArguments: false, includeFailed: false };
 }
 
-export const AptosCallFilter = {
-  encode(message: AptosCallFilter, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const MoveCallFilter = {
+  encode(message: MoveCallFilter, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.function !== "") {
       writer.uint32(10).string(message.function);
     }
@@ -2829,10 +2845,10 @@ export const AptosCallFilter = {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): AptosCallFilter {
+  decode(input: _m0.Reader | Uint8Array, length?: number): MoveCallFilter {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseAptosCallFilter();
+    const message = createBaseMoveCallFilter();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -2856,7 +2872,7 @@ export const AptosCallFilter = {
     return message;
   },
 
-  fromJSON(object: any): AptosCallFilter {
+  fromJSON(object: any): MoveCallFilter {
     return {
       function: isSet(object.function) ? String(object.function) : "",
       typeArguments: Array.isArray(object?.typeArguments) ? object.typeArguments.map((e: any) => String(e)) : [],
@@ -2865,7 +2881,7 @@ export const AptosCallFilter = {
     };
   },
 
-  toJSON(message: AptosCallFilter): unknown {
+  toJSON(message: MoveCallFilter): unknown {
     const obj: any = {};
     message.function !== undefined && (obj.function = message.function);
     if (message.typeArguments) {
@@ -2878,8 +2894,8 @@ export const AptosCallFilter = {
     return obj;
   },
 
-  fromPartial(object: DeepPartial<AptosCallFilter>): AptosCallFilter {
-    const message = createBaseAptosCallFilter();
+  fromPartial(object: DeepPartial<MoveCallFilter>): MoveCallFilter {
+    const message = createBaseMoveCallFilter();
     message.function = object.function ?? "";
     message.typeArguments = object.typeArguments?.map((e) => e) || [];
     message.withTypeArguments = object.withTypeArguments ?? false;
@@ -3062,6 +3078,8 @@ function createBaseData(): Data {
     aptEvent: undefined,
     aptCall: undefined,
     aptResource: undefined,
+    suiEvent: undefined,
+    suiCall: undefined,
   };
 }
 
@@ -3090,6 +3108,12 @@ export const Data = {
     }
     if (message.aptResource !== undefined) {
       Data_AptResource.encode(message.aptResource, writer.uint32(74).fork()).ldelim();
+    }
+    if (message.suiEvent !== undefined) {
+      Data_SuiEvent.encode(message.suiEvent, writer.uint32(82).fork()).ldelim();
+    }
+    if (message.suiCall !== undefined) {
+      Data_SuiCall.encode(message.suiCall, writer.uint32(90).fork()).ldelim();
     }
     return writer;
   },
@@ -3125,6 +3149,12 @@ export const Data = {
         case 9:
           message.aptResource = Data_AptResource.decode(reader, reader.uint32());
           break;
+        case 10:
+          message.suiEvent = Data_SuiEvent.decode(reader, reader.uint32());
+          break;
+        case 11:
+          message.suiCall = Data_SuiCall.decode(reader, reader.uint32());
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -3143,6 +3173,8 @@ export const Data = {
       aptEvent: isSet(object.aptEvent) ? Data_AptEvent.fromJSON(object.aptEvent) : undefined,
       aptCall: isSet(object.aptCall) ? Data_AptCall.fromJSON(object.aptCall) : undefined,
       aptResource: isSet(object.aptResource) ? Data_AptResource.fromJSON(object.aptResource) : undefined,
+      suiEvent: isSet(object.suiEvent) ? Data_SuiEvent.fromJSON(object.suiEvent) : undefined,
+      suiCall: isSet(object.suiCall) ? Data_SuiCall.fromJSON(object.suiCall) : undefined,
     };
   },
 
@@ -3162,6 +3194,9 @@ export const Data = {
     message.aptCall !== undefined && (obj.aptCall = message.aptCall ? Data_AptCall.toJSON(message.aptCall) : undefined);
     message.aptResource !== undefined &&
       (obj.aptResource = message.aptResource ? Data_AptResource.toJSON(message.aptResource) : undefined);
+    message.suiEvent !== undefined &&
+      (obj.suiEvent = message.suiEvent ? Data_SuiEvent.toJSON(message.suiEvent) : undefined);
+    message.suiCall !== undefined && (obj.suiCall = message.suiCall ? Data_SuiCall.toJSON(message.suiCall) : undefined);
     return obj;
   },
 
@@ -3190,6 +3225,12 @@ export const Data = {
       : undefined;
     message.aptResource = (object.aptResource !== undefined && object.aptResource !== null)
       ? Data_AptResource.fromPartial(object.aptResource)
+      : undefined;
+    message.suiEvent = (object.suiEvent !== undefined && object.suiEvent !== null)
+      ? Data_SuiEvent.fromPartial(object.suiEvent)
+      : undefined;
+    message.suiCall = (object.suiCall !== undefined && object.suiCall !== null)
+      ? Data_SuiCall.fromPartial(object.suiCall)
       : undefined;
     return message;
   },
@@ -3750,6 +3791,100 @@ export const Data_AptResource = {
     message.resources = object.resources?.map((e) => e) || [];
     message.version = object.version ?? BigInt("0");
     message.timestampMicros = object.timestampMicros ?? BigInt("0");
+    return message;
+  },
+};
+
+function createBaseData_SuiEvent(): Data_SuiEvent {
+  return { transaction: undefined };
+}
+
+export const Data_SuiEvent = {
+  encode(message: Data_SuiEvent, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.transaction !== undefined) {
+      Struct.encode(Struct.wrap(message.transaction), writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Data_SuiEvent {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseData_SuiEvent();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.transaction = Struct.unwrap(Struct.decode(reader, reader.uint32()));
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Data_SuiEvent {
+    return { transaction: isObject(object.transaction) ? object.transaction : undefined };
+  },
+
+  toJSON(message: Data_SuiEvent): unknown {
+    const obj: any = {};
+    message.transaction !== undefined && (obj.transaction = message.transaction);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<Data_SuiEvent>): Data_SuiEvent {
+    const message = createBaseData_SuiEvent();
+    message.transaction = object.transaction ?? undefined;
+    return message;
+  },
+};
+
+function createBaseData_SuiCall(): Data_SuiCall {
+  return { transaction: undefined };
+}
+
+export const Data_SuiCall = {
+  encode(message: Data_SuiCall, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.transaction !== undefined) {
+      Struct.encode(Struct.wrap(message.transaction), writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Data_SuiCall {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseData_SuiCall();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.transaction = Struct.unwrap(Struct.decode(reader, reader.uint32()));
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Data_SuiCall {
+    return { transaction: isObject(object.transaction) ? object.transaction : undefined };
+  },
+
+  toJSON(message: Data_SuiCall): unknown {
+    const obj: any = {};
+    message.transaction !== undefined && (obj.transaction = message.transaction);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<Data_SuiCall>): Data_SuiCall {
+    const message = createBaseData_SuiCall();
+    message.transaction = object.transaction ?? undefined;
     return message;
   },
 };

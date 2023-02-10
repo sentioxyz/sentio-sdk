@@ -4,7 +4,7 @@
   "version": "2.0.0-development",
   "type": "module",
   "scripts": {
-    "compile": "tsc -p . && cp src/utils/*.csv lib/utils && cp src/tsup.config.ts lib",
+    "compile": "tsc && cp src/utils/*.csv lib/utils && cp src/tsup.config.ts lib",
     "build": "yarn gen:eth && yarn gen:aptos && yarn gen:solana && yarn compile",
     "build_all": "yarn lerna run --scope=@sentio/sdk build --include-dependencies",
     "test": "NODE_OPTIONS=--experimental-vm-modules yarn jest",
@@ -15,6 +15,7 @@
     "gen:solana": "ts-node-esm src/solana/codegen/run.ts src/solana/tests/abis src/solana/tests/types"
   },
   "dependencies": {
+    "@mysten/sui.js": "npm:@sentio/sui.js@0.17.0",
     "@project-serum/anchor": "^0.26.0",
     "@sentio/bigdecimal": "^9.1.1-patch.3",
     "@sentio/ethers-v6": "^1.0.25",
@@ -51,6 +52,7 @@
     "./eth/builtin/erc1155": "./lib/eth/builtin/erc1155.js",
     "./eth/builtin/eacaggregatorproxy": "./lib/eth/builtin/eacaggregatorproxy.js",
     "./eth/builtin/weth9": "./lib/eth/builtin/weth9.js",
+    "./move": "./lib/move/index.js",
     "./aptos": "./lib/aptos/index.js",
     "./aptos/codegen": "./lib/aptos/codegen/index.js",
     "./aptos/builtin": "./lib/aptos/builtin/index.js",
@@ -58,7 +60,12 @@
     "./aptos/builtin/0x3": "./lib/aptos/builtin/0x3.js",
     "./solana": "./lib/solana/index.js",
     "./solana/builtin": "./lib/solana/builtin/index.js",
-    "./solana/codegen": "./lib/solana/codegen/index.js"
+    "./solana/codegen": "./lib/solana/codegen/index.js",
+    "./sui": "./lib/sui/index.js",
+    "./sui/codegen": "./lib/sui/codegen/index.js",
+    "./sui/builtin": "./lib/sui/builtin/index.js",
+    "./sui/builtin/0x1": "./lib/sui/builtin/0x1.js",
+    "./sui/builtin/0x2": "./lib/sui/builtin/0x2.js"
   },
   "files": [
     "{lib,src}",

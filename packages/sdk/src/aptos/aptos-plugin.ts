@@ -1,8 +1,8 @@
 import { Plugin, PluginManager, errorString, mergeProcessResults, USER_PROCESSOR } from '@sentio/runtime'
 import {
   AccountConfig,
-  AptosCallHandlerConfig,
-  AptosEventHandlerConfig,
+  MoveCallHandlerConfig,
+  MoveEventHandlerConfig,
   ContractConfig,
   Data_AptCall,
   Data_AptEvent,
@@ -26,8 +26,7 @@ export class AptosPlugin extends Plugin {
 
   async configure(config: ProcessConfigResponse) {
     for (const aptosProcessor of AptosProcessorState.INSTANCE.getValues()) {
-      const contractConfig: ContractConfig = {
-        transactionConfig: [],
+      const contractConfig = ContractConfig.fromPartial({
         processorType: USER_PROCESSOR,
         contract: {
           name: aptosProcessor.moduleName,
@@ -35,19 +34,12 @@ export class AptosPlugin extends Plugin {
           address: aptosProcessor.config.address,
           abi: '',
         },
-        intervalConfigs: [],
-        logConfigs: [],
-        traceConfigs: [],
         startBlock: aptosProcessor.config.startVersion,
-        endBlock: 0n,
-        instructionConfig: undefined,
-        aptosEventConfigs: [],
-        aptosCallConfigs: [],
-      }
+      })
       // 1. Prepare event handlers
       for (const handler of aptosProcessor.eventHandlers) {
         const handlerId = this.aptosEventHandlers.push(handler.handler) - 1
-        const eventHandlerConfig: AptosEventHandlerConfig = {
+        const eventHandlerConfig: MoveEventHandlerConfig = {
           filters: handler.filters.map((f) => {
             return {
               type: f.type,
@@ -57,13 +49,13 @@ export class AptosPlugin extends Plugin {
           fetchConfig: handler.fetchConfig,
           handlerId,
         }
-        contractConfig.aptosEventConfigs.push(eventHandlerConfig)
+        contractConfig.moveEventConfigs.push(eventHandlerConfig)
       }
 
       // 2. Prepare function handlers
       for (const handler of aptosProcessor.callHandlers) {
         const handlerId = this.aptosCallHandlers.push(handler.handler) - 1
-        const functionHandlerConfig: AptosCallHandlerConfig = {
+        const functionHandlerConfig: MoveCallHandlerConfig = {
           filters: handler.filters.map((filter) => {
             return {
               function: filter.function,
@@ -75,7 +67,7 @@ export class AptosPlugin extends Plugin {
           fetchConfig: handler.fetchConfig,
           handlerId,
         }
-        contractConfig.aptosCallConfigs.push(functionHandlerConfig)
+        contractConfig.moveCallConfigs.push(functionHandlerConfig)
       }
       config.contractConfigs.push(contractConfig)
     }

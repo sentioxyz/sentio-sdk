@@ -49,8 +49,8 @@ message ContractConfig {
   repeated LogHandlerConfig log_configs = 3;
   repeated TraceHandlerConfig trace_configs = 2;
   repeated TransactionHandlerConfig transaction_config = 7;
-  repeated AptosEventHandlerConfig aptos_event_configs = 9;
-  repeated AptosCallHandlerConfig aptos_call_configs = 10;
+  repeated MoveEventHandlerConfig move_event_configs = 9;
+  repeated MoveCallHandlerConfig move_call_configs = 10;
   InstructionHandlerConfig instruction_config = 6;
   uint64 start_block = 4;
   uint64 end_block = 5;
@@ -239,28 +239,28 @@ message InstructionHandlerConfig {
   bool raw_data_instruction = 3;
 }
 
-message AptosFetchConfig {
+message MoveFetchConfig {
   bool resource_changes = 1;
 }
 
-message AptosEventHandlerConfig {
-  repeated AptosEventFilter filters = 1;
+message MoveEventHandlerConfig {
+  repeated MoveEventFilter filters = 1;
   int32 handler_id = 2;
-  AptosFetchConfig fetch_config = 3;
+  MoveFetchConfig fetch_config = 3;
 }
 
-message AptosEventFilter {
+message MoveEventFilter {
   string type = 1;
   string account = 2;
 }
 
-message AptosCallHandlerConfig {
-  repeated AptosCallFilter filters = 1;
+message MoveCallHandlerConfig {
+  repeated MoveCallFilter filters = 1;
   int32 handler_id = 2;
-  AptosFetchConfig fetch_config = 3;
+  MoveFetchConfig fetch_config = 3;
 }
 
-message AptosCallFilter {
+message MoveCallFilter {
   string function = 1;
   repeated string type_arguments = 2;
   bool with_type_arguments = 3;
@@ -335,6 +335,12 @@ message Data {
     int64 version = 2;
     int64 timestampMicros = 5;
   }
+  message SuiEvent {
+    google.protobuf.Struct transaction = 1;
+  }
+  message SuiCall {
+    google.protobuf.Struct transaction = 1;
+  }
 
   bytes raw = 1 [deprecated = true]; // can be removed anytime
   oneof value {
@@ -346,6 +352,8 @@ message Data {
     AptEvent apt_event = 7;
     AptCall apt_call = 8;
     AptResource apt_resource = 9;
+    SuiEvent sui_event = 10;
+    SuiCall sui_call = 11;
   }
 }
 
@@ -412,7 +420,8 @@ enum HandlerType {
   APT_EVENT = 6;
   APT_CALL = 7;
   APT_RESOURCE = 8;
-  SUI_TRANSACTION = 3;
+  SUI_EVENT = 3;
+  SUI_CALL = 9;
 }
 
 message RuntimeInfo {

@@ -1,7 +1,6 @@
 export * from './move-types.js'
 export type { EventInstance, TypedEventInstance, TypedEntryFunctionPayload, TypedMoveResource } from './models.js'
 export { defaultMoveCoder, MoveCoder } from './move-coder.js'
-export type { FunctionNameAndCallFilter, EventFilter, CallFilter, ArgumentsFilter } from './aptos-processor.js'
 export { AptosBaseProcessor, AptosAccountProcessor } from './aptos-processor.js'
 export { AptosContext, AptosResourceContext } from './context.js'
 export { AptosBindOptions, AptosNetwork } from './network.js'

@@ -175,29 +175,3 @@ export class BoundContractView<TContract extends BaseContract, TContractView ext
     return this.view.rawContract.filters
   }
 }
-
-export class SuiContext extends BaseContext {
-  address: string
-  moduleName: string
-  blockNumber: bigint
-
-  constructor(address: string, slot: bigint) {
-    super()
-    this.address = address
-    this.blockNumber = slot
-  }
-
-  getMetaData(name: string, labels: Labels): RecordMetaData {
-    return {
-      address: this.address,
-      contractName: this.moduleName,
-      blockNumber: this.blockNumber,
-      transactionIndex: 0,
-      transactionHash: '', // TODO
-      logIndex: 0,
-      chainId: CHAIN_IDS.SUI_DEVNET, // TODO set in context
-      name: name,
-      labels: normalizeLabels(labels),
-    }
-  }
-}

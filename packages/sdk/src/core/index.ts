@@ -5,7 +5,4 @@ export { CounterBinding, Meter, type Labels, GaugeBinding, Counter, Gauge, Metri
 export { Exporter } from './exporter.js'
 export { type Numberish, toBigInteger, toMetricValue } from './numberish.js'
 
-export { SuiBaseProcessor, SuiBindOptions } from './sui-processor.js'
-
-export { SuiPlugin } from './sui-plugin.js'
 export { CorePlugin } from './core-plugin.js'

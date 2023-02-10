@@ -36,7 +36,7 @@ export class EthPlugin extends Plugin {
       const chainId = processor.getChainId()
       // this.processorsByChainId.set(chainId, processor)
 
-      const contractConfig: ContractConfig = {
+      const contractConfig = ContractConfig.fromPartial({
         processorType: USER_PROCESSOR,
         contract: {
           name: processor.config.name,
@@ -44,19 +44,9 @@ export class EthPlugin extends Plugin {
           address: processor.config.address,
           abi: '',
         },
-        intervalConfigs: [],
-        logConfigs: [],
-        traceConfigs: [],
-        transactionConfig: [],
         startBlock: processor.config.startBlock,
-        endBlock: 0n,
-        instructionConfig: undefined,
-        aptosEventConfigs: [],
-        aptosCallConfigs: [],
-      }
-      if (processor.config.endBlock) {
-        contractConfig.endBlock = processor.config.endBlock
-      }
+        endBlock: processor.config.endBlock,
+      })
 
       // Step 1. Prepare all the block handlers
       for (const blockHandler of processor.blockHandlers) {

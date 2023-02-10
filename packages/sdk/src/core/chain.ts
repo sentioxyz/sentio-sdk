@@ -85,7 +85,8 @@ export const CHAIN_IDS = {
   SOLANA_DEVNET: 'sol_devnet',
   SOLANA_TESTNET: 'sol_testnet',
   SOLANA_PYTH: 'sol_pyth',
-  SUI_DEVNET: 'sui_devnet',
+  SUI_MAINNET: 'sui_mainnet',
+  SUI_TESTNET: 'sui_testnet',
   APTOS_MAINNET: 'aptos_mainnet',
   APTOS_TESTNET: 'aptos_testnet',
 }
@@ -101,8 +102,8 @@ for (const [key, value] of Object.entries(CHAIN_IDS)) {
     .join(' ')
 }
 
-export function getChainName(chainId: string | number | bigint | null | undefined): string {
-  if (typeof chainId === 'number' || typeof chainId === 'bigint') {
+export function getChainName(chainId: string | number | null | undefined): string {
+  if (typeof chainId === 'number') {
     chainId = chainId.toString()
   }
   if (chainId) {
