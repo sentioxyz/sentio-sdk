@@ -87,7 +87,7 @@ import 'mine.js'
   }
 }
 
-async function codegen() {
+export async function codegen() {
   const outputBase = path.resolve('src', 'types')
   try {
     // @ts-ignore dynamic import

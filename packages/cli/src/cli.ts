@@ -14,6 +14,7 @@ import { runVersion } from './commands/run-version.js'
 import { runLogin } from './commands/run-login.js'
 import { runUpload } from './commands/run-upload.js'
 import { runTest } from './commands/run-test.js'
+import { runAdd } from './commands/run-add.js'
 
 const mainDefinitions = [{ name: 'command', defaultOption: true }]
 const mainOptions = commandLineArgs(mainDefinitions, {
@@ -33,6 +34,8 @@ if (mainOptions.command === 'login') {
   runVersion(argv)
 } else if (mainOptions.command === 'test') {
   runTest(argv)
+} else if (mainOptions.command === 'add') {
+  await runAdd(argv)
 } else {
   // For all the commands that need read project configs
   // TODO move them to their own modules
@@ -110,6 +113,7 @@ function usage() {
         'sentio <command> --help\t\tshow detail usage of specific command',
         'sentio login\t\t\t\tlogin to sentio',
         'sentio create\t\t\t\tcreate a template project',
+        'sentio add\t\t\t\tadd contract ABI to the project',
         'sentio upload\t\t\t\tbuild and upload processor to sentio',
         'sentio gen\t\t\t\tgenerate abi',
         'sentio build\t\t\t\tgenerate abi and build',

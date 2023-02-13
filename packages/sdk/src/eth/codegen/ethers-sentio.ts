@@ -74,7 +74,7 @@ export default class EthersSentio extends Ethers.default {
       indexContent =
         indexContent +
         `
-            export * as ${contract.name.toLowerCase()} from './${contract.name.toLowerCase()}.js'
+            export * as ${contract.name.toLowerCase().replaceAll('-', '_')} from './${contract.name.toLowerCase()}.js'
             export { ${contract.name}Processor, ${
           contract.name
         }ProcessorTemplate } from './${contract.name.toLowerCase()}.js'
