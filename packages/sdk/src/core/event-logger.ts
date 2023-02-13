@@ -1,21 +1,23 @@
 import { BaseContext } from './base-context.js'
 import { EventTrackingResult, LogLevel } from '@sentio/protos'
-import { NamedResultDescriptor } from './metadata.js'
 import { normalizeAttribute } from './normalization.js'
-import { Event } from './event-tracker.js'
 
-export type Attributes = Record<string, any>
+export interface Event {
+  // The unique identifier of main identity associate with an event
+  // .e.g user id / token address / account address / contract address id
+  //
+  distinctId?: string
+  severity?: LogLevel
+  message?: string
 
-export class EventLogger extends NamedResultDescriptor {
+  [key: string]: any
+}
+
+export class EventLogger {
   private readonly ctx: BaseContext
 
-  constructor(ctx: BaseContext, name = '') {
-    super(name)
+  constructor(ctx: BaseContext) {
     this.ctx = ctx
-  }
-
-  withName(name: string) {
-    return new EventLogger(this.ctx, name)
   }
 
   emit(eventName: string, event: Event) {
