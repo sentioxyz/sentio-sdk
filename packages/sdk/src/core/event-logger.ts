@@ -18,39 +18,6 @@ export class EventLogger extends NamedResultDescriptor {
     return new EventLogger(this.ctx, name)
   }
 
-  protected log(level: LogLevel, message: any, attributes: Attributes = {}) {
-    if (typeof message !== 'string' && !(message instanceof String)) {
-      message = JSON.stringify(message)
-    }
-
-    const norm = normalizeAttribute(attributes)
-
-    this.ctx._res.logs.push({
-      // name: this.name,
-      metadata: this.ctx.getMetaData(this.name, {}), // GetRecordMetaData(this.ctx, this, {}),
-      level,
-      message,
-      attributes2: norm,
-      runtimeInfo: undefined,
-    })
-  }
-
-  info(msg: any, attributes: Attributes = {}) {
-    this.log(LogLevel.INFO, msg, attributes)
-  }
-
-  warn(msg: any, attributes: Attributes = {}) {
-    this.log(LogLevel.WARNING, msg, attributes)
-  }
-
-  error(msg: any, attributes: Attributes = {}) {
-    this.log(LogLevel.ERROR, msg, attributes)
-  }
-
-  critical(msg: any, attributes: Attributes = {}) {
-    this.log(LogLevel.CRITICAL, msg, attributes)
-  }
-
   emit(eventName: string, event: Event) {
     const { distinctId, severity, message, ...payload } = event
 

@@ -26,7 +26,7 @@ X2y2Processor.bind({ address: '0xB329e39Ebefd16f40d38f07643652cE17Ca5Bac1' }).on
   async (_, ctx) => {
     const phase = (await ctx.contract.currentPhase()).toString()
     const reward = (await ctx.contract.rewardPerBlockForStaking()).scaleDown(18)
-    ctx.logger.info(`reward ${reward.toFormat(6)} for block ${ctx.blockNumber}`, { phase })
+    ctx.eventLogger.emit('reward', { message: `reward ${reward.toFormat(6)} for block ${ctx.blockNumber}`, phase })
     rewardPerBlock.record(ctx, reward, { phase })
     // exporter.emit(ctx, { reward, phase })
   },
@@ -43,7 +43,7 @@ ERC20Processor.bind({ address: '0x1e4ede388cbc9f4b5c79681b7f94d36a11abebc9' }).o
   async (event, ctx) => {
     const val = event.args.value.scaleDown(18)
     tokenCounter.add(ctx, val)
-    ctx.logger.info(event)
+    ctx.eventLogger.emit('transfer', event)
   },
   filter // filter is an optional parameter
 )

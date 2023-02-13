@@ -6,7 +6,6 @@ export function mergeProcessResults(results: ProcessResult[]): ProcessResult {
   for (const r of results) {
     res.counters = res.counters.concat(r.counters)
     res.gauges = res.gauges.concat(r.gauges)
-    res.logs = res.logs.concat(r.logs)
     res.events = res.events.concat(r.events)
     res.exports = res.exports.concat(r.exports)
   }

@@ -283,14 +283,6 @@ message ProcessBindingResponse {
   bool config_updated = 4;
 }
 
-// TODO remove this (SUI)
-message RawTransaction {
-  option deprecated = true;
-  bytes raw = 1;
-  optional string program_account_id = 2;
-  optional uint64 slot = 3;
-}
-
 message Data {
   // Every Handler type should have a data type
   message EthLog {
@@ -366,7 +358,7 @@ message DataBinding {
 message ProcessResult {
   repeated GaugeResult gauges = 1;
   repeated CounterResult counters = 2;
-  repeated LogResult logs = 3;
+  repeated LogResult logs = 3 [deprecated = true];
   repeated EventTrackingResult events = 4;
   repeated ExportResult exports = 5;
 }
@@ -451,6 +443,7 @@ enum LogLevel {
 }
 
 message LogResult {
+  option deprecated = true;
   RecordMetaData metadata = 1;
   LogLevel level = 2;
   string message = 3;

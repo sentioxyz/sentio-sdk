@@ -74,6 +74,10 @@ export const CoinID = {
     return obj;
   },
 
+  create(base?: DeepPartial<CoinID>): CoinID {
+    return CoinID.fromPartial(base ?? {});
+  },
+
   fromPartial(object: DeepPartial<CoinID>): CoinID {
     const message = createBaseCoinID();
     message.symbol = object.symbol ?? undefined;
@@ -134,6 +138,10 @@ export const CoinID_AddressIdentifier = {
     return obj;
   },
 
+  create(base?: DeepPartial<CoinID_AddressIdentifier>): CoinID_AddressIdentifier {
+    return CoinID_AddressIdentifier.fromPartial(base ?? {});
+  },
+
   fromPartial(object: DeepPartial<CoinID_AddressIdentifier>): CoinID_AddressIdentifier {
     const message = createBaseCoinID_AddressIdentifier();
     message.address = object.address ?? "";
@@ -190,6 +198,10 @@ export const GetPriceRequest = {
     message.timestamp !== undefined && (obj.timestamp = message.timestamp.toISOString());
     message.coinId !== undefined && (obj.coinId = message.coinId ? CoinID.toJSON(message.coinId) : undefined);
     return obj;
+  },
+
+  create(base?: DeepPartial<GetPriceRequest>): GetPriceRequest {
+    return GetPriceRequest.fromPartial(base ?? {});
   },
 
   fromPartial(object: DeepPartial<GetPriceRequest>): GetPriceRequest {
@@ -250,6 +262,10 @@ export const GetPriceResponse = {
     message.price !== undefined && (obj.price = message.price);
     message.timestamp !== undefined && (obj.timestamp = message.timestamp.toISOString());
     return obj;
+  },
+
+  create(base?: DeepPartial<GetPriceResponse>): GetPriceResponse {
+    return GetPriceResponse.fromPartial(base ?? {});
   },
 
   fromPartial(object: DeepPartial<GetPriceResponse>): GetPriceResponse {

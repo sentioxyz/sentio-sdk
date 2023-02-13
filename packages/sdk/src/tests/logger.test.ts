@@ -38,7 +38,7 @@ describe('Test Error Capture', () => {
         value: 0n,
       })
     )
-    assert(res.result?.logs?.[0].message.includes('approve '))
+    assert(res.result?.events?.[0].message.includes('approve '))
   })
 
   test('Check transfer', async () => {
@@ -49,8 +49,8 @@ describe('Test Error Capture', () => {
         value: 0n,
       })
     )
-    const log = res.result?.logs?.[0]
-    expect(log?.message).eq('transferred 0')
-    expect(log?.attributes2?.from.toLowerCase()).eq('0x80009ff8154bd5653c6dda2fa5f5053e5a5c1a91')
+    const events = res.result?.events?.[0]
+    expect(events?.message).eq('transferred 0')
+    expect(events?.attributes?.from.toLowerCase()).eq('0x80009ff8154bd5653c6dda2fa5f5053e5a5c1a91')
   })
 })

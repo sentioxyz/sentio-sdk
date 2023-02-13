@@ -562,7 +562,6 @@ export interface DataBinding {
 export interface ProcessResult {
   gauges: GaugeResult[];
   counters: CounterResult[];
-  logs: LogResult[];
   events: EventTrackingResult[];
   exports: ExportResult[];
 }
@@ -609,14 +608,6 @@ export interface CounterResult {
   metadata: RecordMetaData | undefined;
   metricValue: MetricValue | undefined;
   add: boolean;
-  runtimeInfo: RuntimeInfo | undefined;
-}
-
-export interface LogResult {
-  metadata: RecordMetaData | undefined;
-  level: LogLevel;
-  message: string;
-  attributes2: { [key: string]: any } | undefined;
   runtimeInfo: RuntimeInfo | undefined;
 }
 
@@ -686,6 +677,10 @@ export const ProjectConfig = {
     return obj;
   },
 
+  create(base?: DeepPartial<ProjectConfig>): ProjectConfig {
+    return ProjectConfig.fromPartial(base ?? {});
+  },
+
   fromPartial(object: DeepPartial<ProjectConfig>): ProjectConfig {
     const message = createBaseProjectConfig();
     message.name = object.name ?? "";
@@ -725,6 +720,10 @@ export const ProcessConfigRequest = {
   toJSON(_: ProcessConfigRequest): unknown {
     const obj: any = {};
     return obj;
+  },
+
+  create(base?: DeepPartial<ProcessConfigRequest>): ProcessConfigRequest {
+    return ProcessConfigRequest.fromPartial(base ?? {});
   },
 
   fromPartial(_: DeepPartial<ProcessConfigRequest>): ProcessConfigRequest {
@@ -865,6 +864,10 @@ export const ProcessConfigResponse = {
       obj.exportConfigs = [];
     }
     return obj;
+  },
+
+  create(base?: DeepPartial<ProcessConfigResponse>): ProcessConfigResponse {
+    return ProcessConfigResponse.fromPartial(base ?? {});
   },
 
   fromPartial(object: DeepPartial<ProcessConfigResponse>): ProcessConfigResponse {
@@ -1057,6 +1060,10 @@ export const ContractConfig = {
     return obj;
   },
 
+  create(base?: DeepPartial<ContractConfig>): ContractConfig {
+    return ContractConfig.fromPartial(base ?? {});
+  },
+
   fromPartial(object: DeepPartial<ContractConfig>): ContractConfig {
     const message = createBaseContractConfig();
     message.contract = (object.contract !== undefined && object.contract !== null)
@@ -1109,6 +1116,10 @@ export const TotalPerEntityAggregation = {
   toJSON(_: TotalPerEntityAggregation): unknown {
     const obj: any = {};
     return obj;
+  },
+
+  create(base?: DeepPartial<TotalPerEntityAggregation>): TotalPerEntityAggregation {
+    return TotalPerEntityAggregation.fromPartial(base ?? {});
   },
 
   fromPartial(_: DeepPartial<TotalPerEntityAggregation>): TotalPerEntityAggregation {
@@ -1165,6 +1176,10 @@ export const RetentionConfig = {
     message.retentionEventName !== undefined && (obj.retentionEventName = message.retentionEventName);
     message.days !== undefined && (obj.days = Math.round(message.days));
     return obj;
+  },
+
+  create(base?: DeepPartial<RetentionConfig>): RetentionConfig {
+    return RetentionConfig.fromPartial(base ?? {});
   },
 
   fromPartial(object: DeepPartial<RetentionConfig>): RetentionConfig {
@@ -1284,6 +1299,10 @@ export const EventTrackingConfig = {
     return obj;
   },
 
+  create(base?: DeepPartial<EventTrackingConfig>): EventTrackingConfig {
+    return EventTrackingConfig.fromPartial(base ?? {});
+  },
+
   fromPartial(object: DeepPartial<EventTrackingConfig>): EventTrackingConfig {
     const message = createBaseEventTrackingConfig();
     message.eventName = object.eventName ?? "";
@@ -1348,6 +1367,10 @@ export const ExportConfig = {
     message.name !== undefined && (obj.name = message.name);
     message.channel !== undefined && (obj.channel = message.channel);
     return obj;
+  },
+
+  create(base?: DeepPartial<ExportConfig>): ExportConfig {
+    return ExportConfig.fromPartial(base ?? {});
   },
 
   fromPartial(object: DeepPartial<ExportConfig>): ExportConfig {
@@ -1462,6 +1485,10 @@ export const MetricConfig = {
     return obj;
   },
 
+  create(base?: DeepPartial<MetricConfig>): MetricConfig {
+    return MetricConfig.fromPartial(base ?? {});
+  },
+
   fromPartial(object: DeepPartial<MetricConfig>): MetricConfig {
     const message = createBaseMetricConfig();
     message.name = object.name ?? "";
@@ -1561,6 +1588,10 @@ export const AggregationConfig = {
     }
     message.discardOrigin !== undefined && (obj.discardOrigin = message.discardOrigin);
     return obj;
+  },
+
+  create(base?: DeepPartial<AggregationConfig>): AggregationConfig {
+    return AggregationConfig.fromPartial(base ?? {});
   },
 
   fromPartial(object: DeepPartial<AggregationConfig>): AggregationConfig {
@@ -1681,6 +1712,10 @@ export const AccountConfig = {
     return obj;
   },
 
+  create(base?: DeepPartial<AccountConfig>): AccountConfig {
+    return AccountConfig.fromPartial(base ?? {});
+  },
+
   fromPartial(object: DeepPartial<AccountConfig>): AccountConfig {
     const message = createBaseAccountConfig();
     message.chainId = object.chainId ?? "";
@@ -1741,6 +1776,10 @@ export const HandleInterval = {
     message.recentInterval !== undefined && (obj.recentInterval = Math.round(message.recentInterval));
     message.backfillInterval !== undefined && (obj.backfillInterval = Math.round(message.backfillInterval));
     return obj;
+  },
+
+  create(base?: DeepPartial<HandleInterval>): HandleInterval {
+    return HandleInterval.fromPartial(base ?? {});
   },
 
   fromPartial(object: DeepPartial<HandleInterval>): HandleInterval {
@@ -1827,6 +1866,10 @@ export const OnIntervalConfig = {
     return obj;
   },
 
+  create(base?: DeepPartial<OnIntervalConfig>): OnIntervalConfig {
+    return OnIntervalConfig.fromPartial(base ?? {});
+  },
+
   fromPartial(object: DeepPartial<OnIntervalConfig>): OnIntervalConfig {
     const message = createBaseOnIntervalConfig();
     message.handlerId = object.handlerId ?? 0;
@@ -1891,6 +1934,10 @@ export const AptosOnIntervalConfig = {
       (obj.intervalConfig = message.intervalConfig ? OnIntervalConfig.toJSON(message.intervalConfig) : undefined);
     message.type !== undefined && (obj.type = message.type);
     return obj;
+  },
+
+  create(base?: DeepPartial<AptosOnIntervalConfig>): AptosOnIntervalConfig {
+    return AptosOnIntervalConfig.fromPartial(base ?? {});
   },
 
   fromPartial(object: DeepPartial<AptosOnIntervalConfig>): AptosOnIntervalConfig {
@@ -1967,6 +2014,10 @@ export const ContractInfo = {
     message.address !== undefined && (obj.address = message.address);
     message.abi !== undefined && (obj.abi = message.abi);
     return obj;
+  },
+
+  create(base?: DeepPartial<ContractInfo>): ContractInfo {
+    return ContractInfo.fromPartial(base ?? {});
   },
 
   fromPartial(object: DeepPartial<ContractInfo>): ContractInfo {
@@ -2046,6 +2097,10 @@ export const TemplateInstance = {
     return obj;
   },
 
+  create(base?: DeepPartial<TemplateInstance>): TemplateInstance {
+    return TemplateInstance.fromPartial(base ?? {});
+  },
+
   fromPartial(object: DeepPartial<TemplateInstance>): TemplateInstance {
     const message = createBaseTemplateInstance();
     message.contract = (object.contract !== undefined && object.contract !== null)
@@ -2106,6 +2161,10 @@ export const StartRequest = {
     return obj;
   },
 
+  create(base?: DeepPartial<StartRequest>): StartRequest {
+    return StartRequest.fromPartial(base ?? {});
+  },
+
   fromPartial(object: DeepPartial<StartRequest>): StartRequest {
     const message = createBaseStartRequest();
     message.templateInstances = object.templateInstances?.map((e) => TemplateInstance.fromPartial(e)) || [];
@@ -2151,6 +2210,10 @@ export const BlockHandlerConfig = {
     const obj: any = {};
     message.handlerId !== undefined && (obj.handlerId = Math.round(message.handlerId));
     return obj;
+  },
+
+  create(base?: DeepPartial<BlockHandlerConfig>): BlockHandlerConfig {
+    return BlockHandlerConfig.fromPartial(base ?? {});
   },
 
   fromPartial(object: DeepPartial<BlockHandlerConfig>): BlockHandlerConfig {
@@ -2216,6 +2279,10 @@ export const EthFetchConfig = {
     message.transactionReceipt !== undefined && (obj.transactionReceipt = message.transactionReceipt);
     message.block !== undefined && (obj.block = message.block);
     return obj;
+  },
+
+  create(base?: DeepPartial<EthFetchConfig>): EthFetchConfig {
+    return EthFetchConfig.fromPartial(base ?? {});
   },
 
   fromPartial(object: DeepPartial<EthFetchConfig>): EthFetchConfig {
@@ -2286,6 +2353,10 @@ export const TraceHandlerConfig = {
     return obj;
   },
 
+  create(base?: DeepPartial<TraceHandlerConfig>): TraceHandlerConfig {
+    return TraceHandlerConfig.fromPartial(base ?? {});
+  },
+
   fromPartial(object: DeepPartial<TraceHandlerConfig>): TraceHandlerConfig {
     const message = createBaseTraceHandlerConfig();
     message.signature = object.signature ?? "";
@@ -2346,6 +2417,10 @@ export const TransactionHandlerConfig = {
     message.fetchConfig !== undefined &&
       (obj.fetchConfig = message.fetchConfig ? EthFetchConfig.toJSON(message.fetchConfig) : undefined);
     return obj;
+  },
+
+  create(base?: DeepPartial<TransactionHandlerConfig>): TransactionHandlerConfig {
+    return TransactionHandlerConfig.fromPartial(base ?? {});
   },
 
   fromPartial(object: DeepPartial<TransactionHandlerConfig>): TransactionHandlerConfig {
@@ -2419,6 +2494,10 @@ export const LogHandlerConfig = {
     message.fetchConfig !== undefined &&
       (obj.fetchConfig = message.fetchConfig ? EthFetchConfig.toJSON(message.fetchConfig) : undefined);
     return obj;
+  },
+
+  create(base?: DeepPartial<LogHandlerConfig>): LogHandlerConfig {
+    return LogHandlerConfig.fromPartial(base ?? {});
   },
 
   fromPartial(object: DeepPartial<LogHandlerConfig>): LogHandlerConfig {
@@ -2495,6 +2574,10 @@ export const LogFilter = {
     return obj;
   },
 
+  create(base?: DeepPartial<LogFilter>): LogFilter {
+    return LogFilter.fromPartial(base ?? {});
+  },
+
   fromPartial(object: DeepPartial<LogFilter>): LogFilter {
     const message = createBaseLogFilter();
     message.topics = object.topics?.map((e) => Topic.fromPartial(e)) || [];
@@ -2562,6 +2645,10 @@ export const InstructionHandlerConfig = {
     return obj;
   },
 
+  create(base?: DeepPartial<InstructionHandlerConfig>): InstructionHandlerConfig {
+    return InstructionHandlerConfig.fromPartial(base ?? {});
+  },
+
   fromPartial(object: DeepPartial<InstructionHandlerConfig>): InstructionHandlerConfig {
     const message = createBaseInstructionHandlerConfig();
     message.innerInstruction = object.innerInstruction ?? false;
@@ -2609,6 +2696,10 @@ export const MoveFetchConfig = {
     const obj: any = {};
     message.resourceChanges !== undefined && (obj.resourceChanges = message.resourceChanges);
     return obj;
+  },
+
+  create(base?: DeepPartial<MoveFetchConfig>): MoveFetchConfig {
+    return MoveFetchConfig.fromPartial(base ?? {});
   },
 
   fromPartial(object: DeepPartial<MoveFetchConfig>): MoveFetchConfig {
@@ -2681,6 +2772,10 @@ export const MoveEventHandlerConfig = {
     return obj;
   },
 
+  create(base?: DeepPartial<MoveEventHandlerConfig>): MoveEventHandlerConfig {
+    return MoveEventHandlerConfig.fromPartial(base ?? {});
+  },
+
   fromPartial(object: DeepPartial<MoveEventHandlerConfig>): MoveEventHandlerConfig {
     const message = createBaseMoveEventHandlerConfig();
     message.filters = object.filters?.map((e) => MoveEventFilter.fromPartial(e)) || [];
@@ -2740,6 +2835,10 @@ export const MoveEventFilter = {
     message.type !== undefined && (obj.type = message.type);
     message.account !== undefined && (obj.account = message.account);
     return obj;
+  },
+
+  create(base?: DeepPartial<MoveEventFilter>): MoveEventFilter {
+    return MoveEventFilter.fromPartial(base ?? {});
   },
 
   fromPartial(object: DeepPartial<MoveEventFilter>): MoveEventFilter {
@@ -2811,6 +2910,10 @@ export const MoveCallHandlerConfig = {
     message.fetchConfig !== undefined &&
       (obj.fetchConfig = message.fetchConfig ? MoveFetchConfig.toJSON(message.fetchConfig) : undefined);
     return obj;
+  },
+
+  create(base?: DeepPartial<MoveCallHandlerConfig>): MoveCallHandlerConfig {
+    return MoveCallHandlerConfig.fromPartial(base ?? {});
   },
 
   fromPartial(object: DeepPartial<MoveCallHandlerConfig>): MoveCallHandlerConfig {
@@ -2894,6 +2997,10 @@ export const MoveCallFilter = {
     return obj;
   },
 
+  create(base?: DeepPartial<MoveCallFilter>): MoveCallFilter {
+    return MoveCallFilter.fromPartial(base ?? {});
+  },
+
   fromPartial(object: DeepPartial<MoveCallFilter>): MoveCallFilter {
     const message = createBaseMoveCallFilter();
     message.function = object.function ?? "";
@@ -2948,6 +3055,10 @@ export const Topic = {
     return obj;
   },
 
+  create(base?: DeepPartial<Topic>): Topic {
+    return Topic.fromPartial(base ?? {});
+  },
+
   fromPartial(object: DeepPartial<Topic>): Topic {
     const message = createBaseTopic();
     message.hashes = object.hashes?.map((e) => e) || [];
@@ -2999,6 +3110,10 @@ export const ProcessBindingsRequest = {
       obj.bindings = [];
     }
     return obj;
+  },
+
+  create(base?: DeepPartial<ProcessBindingsRequest>): ProcessBindingsRequest {
+    return ProcessBindingsRequest.fromPartial(base ?? {});
   },
 
   fromPartial(object: DeepPartial<ProcessBindingsRequest>): ProcessBindingsRequest {
@@ -3056,6 +3171,10 @@ export const ProcessBindingResponse = {
     message.result !== undefined && (obj.result = message.result ? ProcessResult.toJSON(message.result) : undefined);
     message.configUpdated !== undefined && (obj.configUpdated = message.configUpdated);
     return obj;
+  },
+
+  create(base?: DeepPartial<ProcessBindingResponse>): ProcessBindingResponse {
+    return ProcessBindingResponse.fromPartial(base ?? {});
   },
 
   fromPartial(object: DeepPartial<ProcessBindingResponse>): ProcessBindingResponse {
@@ -3200,6 +3319,10 @@ export const Data = {
     return obj;
   },
 
+  create(base?: DeepPartial<Data>): Data {
+    return Data.fromPartial(base ?? {});
+  },
+
   fromPartial(object: DeepPartial<Data>): Data {
     const message = createBaseData();
     message.ethLog = (object.ethLog !== undefined && object.ethLog !== null)
@@ -3316,6 +3439,10 @@ export const Data_EthLog = {
     return obj;
   },
 
+  create(base?: DeepPartial<Data_EthLog>): Data_EthLog {
+    return Data_EthLog.fromPartial(base ?? {});
+  },
+
   fromPartial(object: DeepPartial<Data_EthLog>): Data_EthLog {
     const message = createBaseData_EthLog();
     message.log = object.log ?? undefined;
@@ -3365,6 +3492,10 @@ export const Data_EthBlock = {
     const obj: any = {};
     message.block !== undefined && (obj.block = message.block);
     return obj;
+  },
+
+  create(base?: DeepPartial<Data_EthBlock>): Data_EthBlock {
+    return Data_EthBlock.fromPartial(base ?? {});
   },
 
   fromPartial(object: DeepPartial<Data_EthBlock>): Data_EthBlock {
@@ -3438,6 +3569,10 @@ export const Data_EthTransaction = {
     message.transactionReceipt !== undefined && (obj.transactionReceipt = message.transactionReceipt);
     message.block !== undefined && (obj.block = message.block);
     return obj;
+  },
+
+  create(base?: DeepPartial<Data_EthTransaction>): Data_EthTransaction {
+    return Data_EthTransaction.fromPartial(base ?? {});
   },
 
   fromPartial(object: DeepPartial<Data_EthTransaction>): Data_EthTransaction {
@@ -3530,6 +3665,10 @@ export const Data_EthTrace = {
     return obj;
   },
 
+  create(base?: DeepPartial<Data_EthTrace>): Data_EthTrace {
+    return Data_EthTrace.fromPartial(base ?? {});
+  },
+
   fromPartial(object: DeepPartial<Data_EthTrace>): Data_EthTrace {
     const message = createBaseData_EthTrace();
     message.trace = object.trace ?? undefined;
@@ -3619,6 +3758,10 @@ export const Data_SolInstruction = {
     return obj;
   },
 
+  create(base?: DeepPartial<Data_SolInstruction>): Data_SolInstruction {
+    return Data_SolInstruction.fromPartial(base ?? {});
+  },
+
   fromPartial(object: DeepPartial<Data_SolInstruction>): Data_SolInstruction {
     const message = createBaseData_SolInstruction();
     message.instructionData = object.instructionData ?? "";
@@ -3670,6 +3813,10 @@ export const Data_AptEvent = {
     return obj;
   },
 
+  create(base?: DeepPartial<Data_AptEvent>): Data_AptEvent {
+    return Data_AptEvent.fromPartial(base ?? {});
+  },
+
   fromPartial(object: DeepPartial<Data_AptEvent>): Data_AptEvent {
     const message = createBaseData_AptEvent();
     message.transaction = object.transaction ?? undefined;
@@ -3715,6 +3862,10 @@ export const Data_AptCall = {
     const obj: any = {};
     message.transaction !== undefined && (obj.transaction = message.transaction);
     return obj;
+  },
+
+  create(base?: DeepPartial<Data_AptCall>): Data_AptCall {
+    return Data_AptCall.fromPartial(base ?? {});
   },
 
   fromPartial(object: DeepPartial<Data_AptCall>): Data_AptCall {
@@ -3786,6 +3937,10 @@ export const Data_AptResource = {
     return obj;
   },
 
+  create(base?: DeepPartial<Data_AptResource>): Data_AptResource {
+    return Data_AptResource.fromPartial(base ?? {});
+  },
+
   fromPartial(object: DeepPartial<Data_AptResource>): Data_AptResource {
     const message = createBaseData_AptResource();
     message.resources = object.resources?.map((e) => e) || [];
@@ -3835,6 +3990,10 @@ export const Data_SuiEvent = {
     return obj;
   },
 
+  create(base?: DeepPartial<Data_SuiEvent>): Data_SuiEvent {
+    return Data_SuiEvent.fromPartial(base ?? {});
+  },
+
   fromPartial(object: DeepPartial<Data_SuiEvent>): Data_SuiEvent {
     const message = createBaseData_SuiEvent();
     message.transaction = object.transaction ?? undefined;
@@ -3880,6 +4039,10 @@ export const Data_SuiCall = {
     const obj: any = {};
     message.transaction !== undefined && (obj.transaction = message.transaction);
     return obj;
+  },
+
+  create(base?: DeepPartial<Data_SuiCall>): Data_SuiCall {
+    return Data_SuiCall.fromPartial(base ?? {});
   },
 
   fromPartial(object: DeepPartial<Data_SuiCall>): Data_SuiCall {
@@ -3960,6 +4123,10 @@ export const DataBinding = {
     return obj;
   },
 
+  create(base?: DeepPartial<DataBinding>): DataBinding {
+    return DataBinding.fromPartial(base ?? {});
+  },
+
   fromPartial(object: DeepPartial<DataBinding>): DataBinding {
     const message = createBaseDataBinding();
     message.data = (object.data !== undefined && object.data !== null) ? Data.fromPartial(object.data) : undefined;
@@ -3970,7 +4137,7 @@ export const DataBinding = {
 };
 
 function createBaseProcessResult(): ProcessResult {
-  return { gauges: [], counters: [], logs: [], events: [], exports: [] };
+  return { gauges: [], counters: [], events: [], exports: [] };
 }
 
 export const ProcessResult = {
@@ -3980,9 +4147,6 @@ export const ProcessResult = {
     }
     for (const v of message.counters) {
       CounterResult.encode(v!, writer.uint32(18).fork()).ldelim();
-    }
-    for (const v of message.logs) {
-      LogResult.encode(v!, writer.uint32(26).fork()).ldelim();
     }
     for (const v of message.events) {
       EventTrackingResult.encode(v!, writer.uint32(34).fork()).ldelim();
@@ -4006,9 +4170,6 @@ export const ProcessResult = {
         case 2:
           message.counters.push(CounterResult.decode(reader, reader.uint32()));
           break;
-        case 3:
-          message.logs.push(LogResult.decode(reader, reader.uint32()));
-          break;
         case 4:
           message.events.push(EventTrackingResult.decode(reader, reader.uint32()));
           break;
@@ -4027,7 +4188,6 @@ export const ProcessResult = {
     return {
       gauges: Array.isArray(object?.gauges) ? object.gauges.map((e: any) => GaugeResult.fromJSON(e)) : [],
       counters: Array.isArray(object?.counters) ? object.counters.map((e: any) => CounterResult.fromJSON(e)) : [],
-      logs: Array.isArray(object?.logs) ? object.logs.map((e: any) => LogResult.fromJSON(e)) : [],
       events: Array.isArray(object?.events) ? object.events.map((e: any) => EventTrackingResult.fromJSON(e)) : [],
       exports: Array.isArray(object?.exports) ? object.exports.map((e: any) => ExportResult.fromJSON(e)) : [],
     };
@@ -4045,11 +4205,6 @@ export const ProcessResult = {
     } else {
       obj.counters = [];
     }
-    if (message.logs) {
-      obj.logs = message.logs.map((e) => e ? LogResult.toJSON(e) : undefined);
-    } else {
-      obj.logs = [];
-    }
     if (message.events) {
       obj.events = message.events.map((e) => e ? EventTrackingResult.toJSON(e) : undefined);
     } else {
@@ -4063,11 +4218,14 @@ export const ProcessResult = {
     return obj;
   },
 
+  create(base?: DeepPartial<ProcessResult>): ProcessResult {
+    return ProcessResult.fromPartial(base ?? {});
+  },
+
   fromPartial(object: DeepPartial<ProcessResult>): ProcessResult {
     const message = createBaseProcessResult();
     message.gauges = object.gauges?.map((e) => GaugeResult.fromPartial(e)) || [];
     message.counters = object.counters?.map((e) => CounterResult.fromPartial(e)) || [];
-    message.logs = object.logs?.map((e) => LogResult.fromPartial(e)) || [];
     message.events = object.events?.map((e) => EventTrackingResult.fromPartial(e)) || [];
     message.exports = object.exports?.map((e) => ExportResult.fromPartial(e)) || [];
     return message;
@@ -4203,6 +4361,10 @@ export const RecordMetaData = {
     return obj;
   },
 
+  create(base?: DeepPartial<RecordMetaData>): RecordMetaData {
+    return RecordMetaData.fromPartial(base ?? {});
+  },
+
   fromPartial(object: DeepPartial<RecordMetaData>): RecordMetaData {
     const message = createBaseRecordMetaData();
     message.address = object.address ?? "";
@@ -4268,6 +4430,10 @@ export const RecordMetaData_LabelsEntry = {
     message.key !== undefined && (obj.key = message.key);
     message.value !== undefined && (obj.value = message.value);
     return obj;
+  },
+
+  create(base?: DeepPartial<RecordMetaData_LabelsEntry>): RecordMetaData_LabelsEntry {
+    return RecordMetaData_LabelsEntry.fromPartial(base ?? {});
   },
 
   fromPartial(object: DeepPartial<RecordMetaData_LabelsEntry>): RecordMetaData_LabelsEntry {
@@ -4337,6 +4503,10 @@ export const MetricValue = {
     return obj;
   },
 
+  create(base?: DeepPartial<MetricValue>): MetricValue {
+    return MetricValue.fromPartial(base ?? {});
+  },
+
   fromPartial(object: DeepPartial<MetricValue>): MetricValue {
     const message = createBaseMetricValue();
     message.bigDecimal = object.bigDecimal ?? undefined;
@@ -4399,6 +4569,10 @@ export const BigInteger = {
     return obj;
   },
 
+  create(base?: DeepPartial<BigInteger>): BigInteger {
+    return BigInteger.fromPartial(base ?? {});
+  },
+
   fromPartial(object: DeepPartial<BigInteger>): BigInteger {
     const message = createBaseBigInteger();
     message.negative = object.negative ?? false;
@@ -4445,6 +4619,10 @@ export const RuntimeInfo = {
     const obj: any = {};
     message.from !== undefined && (obj.from = handlerTypeToJSON(message.from));
     return obj;
+  },
+
+  create(base?: DeepPartial<RuntimeInfo>): RuntimeInfo {
+    return RuntimeInfo.fromPartial(base ?? {});
   },
 
   fromPartial(object: DeepPartial<RuntimeInfo>): RuntimeInfo {
@@ -4513,6 +4691,10 @@ export const GaugeResult = {
     message.runtimeInfo !== undefined &&
       (obj.runtimeInfo = message.runtimeInfo ? RuntimeInfo.toJSON(message.runtimeInfo) : undefined);
     return obj;
+  },
+
+  create(base?: DeepPartial<GaugeResult>): GaugeResult {
+    return GaugeResult.fromPartial(base ?? {});
   },
 
   fromPartial(object: DeepPartial<GaugeResult>): GaugeResult {
@@ -4599,6 +4781,10 @@ export const CounterResult = {
     return obj;
   },
 
+  create(base?: DeepPartial<CounterResult>): CounterResult {
+    return CounterResult.fromPartial(base ?? {});
+  },
+
   fromPartial(object: DeepPartial<CounterResult>): CounterResult {
     const message = createBaseCounterResult();
     message.metadata = (object.metadata !== undefined && object.metadata !== null)
@@ -4608,97 +4794,6 @@ export const CounterResult = {
       ? MetricValue.fromPartial(object.metricValue)
       : undefined;
     message.add = object.add ?? false;
-    message.runtimeInfo = (object.runtimeInfo !== undefined && object.runtimeInfo !== null)
-      ? RuntimeInfo.fromPartial(object.runtimeInfo)
-      : undefined;
-    return message;
-  },
-};
-
-function createBaseLogResult(): LogResult {
-  return { metadata: undefined, level: 0, message: "", attributes2: undefined, runtimeInfo: undefined };
-}
-
-export const LogResult = {
-  encode(message: LogResult, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.metadata !== undefined) {
-      RecordMetaData.encode(message.metadata, writer.uint32(10).fork()).ldelim();
-    }
-    if (message.level !== 0) {
-      writer.uint32(16).int32(message.level);
-    }
-    if (message.message !== "") {
-      writer.uint32(26).string(message.message);
-    }
-    if (message.attributes2 !== undefined) {
-      Struct.encode(Struct.wrap(message.attributes2), writer.uint32(58).fork()).ldelim();
-    }
-    if (message.runtimeInfo !== undefined) {
-      RuntimeInfo.encode(message.runtimeInfo, writer.uint32(34).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): LogResult {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseLogResult();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.metadata = RecordMetaData.decode(reader, reader.uint32());
-          break;
-        case 2:
-          message.level = reader.int32() as any;
-          break;
-        case 3:
-          message.message = reader.string();
-          break;
-        case 7:
-          message.attributes2 = Struct.unwrap(Struct.decode(reader, reader.uint32()));
-          break;
-        case 4:
-          message.runtimeInfo = RuntimeInfo.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): LogResult {
-    return {
-      metadata: isSet(object.metadata) ? RecordMetaData.fromJSON(object.metadata) : undefined,
-      level: isSet(object.level) ? logLevelFromJSON(object.level) : 0,
-      message: isSet(object.message) ? String(object.message) : "",
-      attributes2: isObject(object.attributes2) ? object.attributes2 : undefined,
-      runtimeInfo: isSet(object.runtimeInfo) ? RuntimeInfo.fromJSON(object.runtimeInfo) : undefined,
-    };
-  },
-
-  toJSON(message: LogResult): unknown {
-    const obj: any = {};
-    message.metadata !== undefined &&
-      (obj.metadata = message.metadata ? RecordMetaData.toJSON(message.metadata) : undefined);
-    message.level !== undefined && (obj.level = logLevelToJSON(message.level));
-    message.message !== undefined && (obj.message = message.message);
-    message.attributes2 !== undefined && (obj.attributes2 = message.attributes2);
-    message.runtimeInfo !== undefined &&
-      (obj.runtimeInfo = message.runtimeInfo ? RuntimeInfo.toJSON(message.runtimeInfo) : undefined);
-    return obj;
-  },
-
-  fromPartial(object: DeepPartial<LogResult>): LogResult {
-    const message = createBaseLogResult();
-    message.metadata = (object.metadata !== undefined && object.metadata !== null)
-      ? RecordMetaData.fromPartial(object.metadata)
-      : undefined;
-    message.level = object.level ?? 0;
-    message.message = object.message ?? "";
-    message.attributes2 = object.attributes2 ?? undefined;
     message.runtimeInfo = (object.runtimeInfo !== undefined && object.runtimeInfo !== null)
       ? RuntimeInfo.fromPartial(object.runtimeInfo)
       : undefined;
@@ -4806,6 +4901,10 @@ export const EventTrackingResult = {
     return obj;
   },
 
+  create(base?: DeepPartial<EventTrackingResult>): EventTrackingResult {
+    return EventTrackingResult.fromPartial(base ?? {});
+  },
+
   fromPartial(object: DeepPartial<EventTrackingResult>): EventTrackingResult {
     const message = createBaseEventTrackingResult();
     message.metadata = (object.metadata !== undefined && object.metadata !== null)
@@ -4881,6 +4980,10 @@ export const ExportResult = {
     message.runtimeInfo !== undefined &&
       (obj.runtimeInfo = message.runtimeInfo ? RuntimeInfo.toJSON(message.runtimeInfo) : undefined);
     return obj;
+  },
+
+  create(base?: DeepPartial<ExportResult>): ExportResult {
+    return ExportResult.fromPartial(base ?? {});
   },
 
   fromPartial(object: DeepPartial<ExportResult>): ExportResult {

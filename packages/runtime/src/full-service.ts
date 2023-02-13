@@ -84,13 +84,7 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
     // y this.instance.processBindingsStream(requests, context)
   }
 
-  private adjustResult(res: ProcessResult): void {
-    for (const log of res.logs) {
-      if (log.attributes && !log.attributes2) {
-        log.attributes2 = JSON.parse(log.attributes)
-      }
-    }
-  }
+  private adjustResult(res: ProcessResult): void {}
 
   private adjustDataBinding(dataBinding: DataBinding): void {
     switch (dataBinding.handlerType) {

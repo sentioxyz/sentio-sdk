@@ -140,7 +140,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
 }
 
 function recordRuntimeInfo(results: ProcessResult, handlerType: HandlerType) {
-  for (const list of [results.gauges, results.counters, results.logs, results.events, results.exports]) {
+  for (const list of [results.gauges, results.counters, results.events, results.exports]) {
     list.forEach((e) => {
       e.runtimeInfo = {
         from: handlerType,

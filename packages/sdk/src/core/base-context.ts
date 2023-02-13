@@ -7,7 +7,6 @@ export abstract class BaseContext {
   meter: Meter
   eventLogger: EventLogger
 
-  logger: EventLogger
   /** @deprecated use {@link this.eventLogger} instead */
   eventTracker: BoundedEventTracker
 
@@ -16,14 +15,11 @@ export abstract class BaseContext {
     events: [],
     exports: [],
     gauges: [],
-    logs: [],
   }
 
   protected constructor() {
     this.meter = new Meter(this)
     this.eventLogger = new EventLogger(this)
-    // eslint-disable-next-line deprecation/deprecation
-    this.logger = this.eventLogger
     // eslint-disable-next-line deprecation/deprecation
     this.eventTracker = new BoundedEventTracker(this)
   }

@@ -183,6 +183,10 @@ export const AptosGetTxnsByFunctionRequest = {
     return obj;
   },
 
+  create(base?: DeepPartial<AptosGetTxnsByFunctionRequest>): AptosGetTxnsByFunctionRequest {
+    return AptosGetTxnsByFunctionRequest.fromPartial(base ?? {});
+  },
+
   fromPartial(object: DeepPartial<AptosGetTxnsByFunctionRequest>): AptosGetTxnsByFunctionRequest {
     const message = createBaseAptosGetTxnsByFunctionRequest();
     message.network = object.network ?? "";
@@ -259,6 +263,10 @@ export const AptosGetTxnsByVersionRequest = {
     message.toVersion !== undefined && (obj.toVersion = message.toVersion.toString());
     message.headerOnly !== undefined && (obj.headerOnly = message.headerOnly);
     return obj;
+  },
+
+  create(base?: DeepPartial<AptosGetTxnsByVersionRequest>): AptosGetTxnsByVersionRequest {
+    return AptosGetTxnsByVersionRequest.fromPartial(base ?? {});
   },
 
   fromPartial(object: DeepPartial<AptosGetTxnsByVersionRequest>): AptosGetTxnsByVersionRequest {
@@ -343,6 +351,10 @@ export const AptosGetTxnsByEventRequest = {
     message.address !== undefined && (obj.address = message.address);
     message.type !== undefined && (obj.type = message.type);
     return obj;
+  },
+
+  create(base?: DeepPartial<AptosGetTxnsByEventRequest>): AptosGetTxnsByEventRequest {
+    return AptosGetTxnsByEventRequest.fromPartial(base ?? {});
   },
 
   fromPartial(object: DeepPartial<AptosGetTxnsByEventRequest>): AptosGetTxnsByEventRequest {
@@ -430,6 +442,10 @@ export const AptosSQLQueryRequest = {
     return obj;
   },
 
+  create(base?: DeepPartial<AptosSQLQueryRequest>): AptosSQLQueryRequest {
+    return AptosSQLQueryRequest.fromPartial(base ?? {});
+  },
+
   fromPartial(object: DeepPartial<AptosSQLQueryRequest>): AptosSQLQueryRequest {
     const message = createBaseAptosSQLQueryRequest();
     message.network = object.network ?? "";
@@ -489,6 +505,10 @@ export const QueryPhaseSummary = {
     message.name !== undefined && (obj.name = message.name);
     message.timeTookMs !== undefined && (obj.timeTookMs = message.timeTookMs.toString());
     return obj;
+  },
+
+  create(base?: DeepPartial<QueryPhaseSummary>): QueryPhaseSummary {
+    return QueryPhaseSummary.fromPartial(base ?? {});
   },
 
   fromPartial(object: DeepPartial<QueryPhaseSummary>): QueryPhaseSummary {
@@ -625,6 +645,10 @@ export const QueryExecutionSummary = {
     return obj;
   },
 
+  create(base?: DeepPartial<QueryExecutionSummary>): QueryExecutionSummary {
+    return QueryExecutionSummary.fromPartial(base ?? {});
+  },
+
   fromPartial(object: DeepPartial<QueryExecutionSummary>): QueryExecutionSummary {
     const message = createBaseQueryExecutionSummary();
     message.timeTookMs = object.timeTookMs ?? BigInt("0");
@@ -698,6 +722,10 @@ export const AptosGetTxnsResponse = {
     return obj;
   },
 
+  create(base?: DeepPartial<AptosGetTxnsResponse>): AptosGetTxnsResponse {
+    return AptosGetTxnsResponse.fromPartial(base ?? {});
+  },
+
   fromPartial(object: DeepPartial<AptosGetTxnsResponse>): AptosGetTxnsResponse {
     const message = createBaseAptosGetTxnsResponse();
     message.documents = object.documents?.map((e) => e) || [];
@@ -741,6 +769,10 @@ export const AptosRefreshRequest = {
     return obj;
   },
 
+  create(base?: DeepPartial<AptosRefreshRequest>): AptosRefreshRequest {
+    return AptosRefreshRequest.fromPartial(base ?? {});
+  },
+
   fromPartial(_: DeepPartial<AptosRefreshRequest>): AptosRefreshRequest {
     const message = createBaseAptosRefreshRequest();
     return message;
@@ -778,6 +810,10 @@ export const VoidResponse = {
   toJSON(_: VoidResponse): unknown {
     const obj: any = {};
     return obj;
+  },
+
+  create(base?: DeepPartial<VoidResponse>): VoidResponse {
+    return VoidResponse.fromPartial(base ?? {});
   },
 
   fromPartial(_: DeepPartial<VoidResponse>): VoidResponse {
@@ -834,6 +870,10 @@ export const EvmSQLQueryRequest = {
     message.network !== undefined && (obj.network = message.network);
     message.sql !== undefined && (obj.sql = message.sql);
     return obj;
+  },
+
+  create(base?: DeepPartial<EvmSQLQueryRequest>): EvmSQLQueryRequest {
+    return EvmSQLQueryRequest.fromPartial(base ?? {});
   },
 
   fromPartial(object: DeepPartial<EvmSQLQueryRequest>): EvmSQLQueryRequest {
@@ -923,6 +963,10 @@ export const EvmGetHeaderRequest = {
     return obj;
   },
 
+  create(base?: DeepPartial<EvmGetHeaderRequest>): EvmGetHeaderRequest {
+    return EvmGetHeaderRequest.fromPartial(base ?? {});
+  },
+
   fromPartial(object: DeepPartial<EvmGetHeaderRequest>): EvmGetHeaderRequest {
     const message = createBaseEvmGetHeaderRequest();
     message.network = object.network ?? "";
@@ -989,6 +1033,10 @@ export const EvmQueryResponse = {
       ? QueryExecutionSummary.toJSON(message.executionSummary)
       : undefined);
     return obj;
+  },
+
+  create(base?: DeepPartial<EvmQueryResponse>): EvmQueryResponse {
+    return EvmQueryResponse.fromPartial(base ?? {});
   },
 
   fromPartial(object: DeepPartial<EvmQueryResponse>): EvmQueryResponse {
@@ -1059,6 +1107,10 @@ export const RemoteResultRequest = {
     return obj;
   },
 
+  create(base?: DeepPartial<RemoteResultRequest>): RemoteResultRequest {
+    return RemoteResultRequest.fromPartial(base ?? {});
+  },
+
   fromPartial(object: DeepPartial<RemoteResultRequest>): RemoteResultRequest {
     const message = createBaseRemoteResultRequest();
     message.token = object.token ?? "";
@@ -1110,6 +1162,10 @@ export const RemoteResultResponse = {
       obj.rows = [];
     }
     return obj;
+  },
+
+  create(base?: DeepPartial<RemoteResultResponse>): RemoteResultResponse {
+    return RemoteResultResponse.fromPartial(base ?? {});
   },
 
   fromPartial(object: DeepPartial<RemoteResultResponse>): RemoteResultResponse {
