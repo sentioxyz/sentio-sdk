@@ -10,7 +10,6 @@ export class SuiContext extends BaseContext {
   timestamp: Date
   slot: bigint
   transaction: SuiTransactionResponse
-  sequence: bigint
 
   constructor(
     moduleName: string,

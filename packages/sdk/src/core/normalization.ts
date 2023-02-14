@@ -13,7 +13,7 @@ export function normalizeKey(name: string): string {
 }
 
 function normalizeValue(name: string): string {
-  return name.slice(0, 100)
+  return name.slice(0, 500)
 }
 
 export function normalizeLabels(labels: Labels): Labels {
@@ -41,10 +41,12 @@ function normalizeObject(obj: any, length: number): any {
       return null
   }
   if (Array.isArray(obj)) {
-    ret = []
-    for (const val of obj) {
-      ret.push(normalizeObject(val, length))
-    }
+    console.warn('Array type inside log/event payload is not currently supported and will be ignored.')
+    return null
+    // ret = []
+    // for (const val of obj) {
+    //   ret.push(normalizeObject(val, length))
+    // }
   } else if (obj === Object(obj)) {
     if (obj instanceof Date) {
       return obj.toISOString()
