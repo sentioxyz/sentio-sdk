@@ -1,4 +1,4 @@
-import { MoveFetchConfig } from '@sentio/protos'
+import { Data_SuiCall, Data_SuiEvent, MoveFetchConfig } from '@sentio/protos'
 import { ListStateStorage } from '@sentio/runtime'
 import { SuiNetwork, getChainId } from './network.js'
 import { ServerError, Status } from 'nice-grpc'
@@ -26,8 +26,8 @@ export class SuiBaseProcessor {
   readonly moduleName: string
   config: IndexConfigure
 
-  eventHandlers: EventHandler[] = []
-  callHandlers: CallHandler[] = []
+  eventHandlers: EventHandler<Data_SuiEvent>[] = []
+  callHandlers: CallHandler<Data_SuiCall>[] = []
 
   constructor(name: string, options: SuiBindOptions) {
     this.config = configure(options)
@@ -71,7 +71,8 @@ export class SuiBaseProcessor {
           processor.moduleName,
           processor.config.network,
           processor.config.address,
-          txn.timestamp_ms || 0,
+          data.timestamp || new Date(0),
+          data.slot,
           txn
         )
 
@@ -123,7 +124,8 @@ export class SuiBaseProcessor {
           processor.moduleName,
           processor.config.network,
           processor.config.address,
-          tx.timestamp_ms || 0,
+          data.timestamp || new Date(0),
+          data.slot,
           tx
         )
         if (tx) {

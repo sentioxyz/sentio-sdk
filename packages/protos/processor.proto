@@ -329,9 +329,13 @@ message Data {
   }
   message SuiEvent {
     google.protobuf.Struct transaction = 1;
+    google.protobuf.Timestamp timestamp = 2;
+    uint64 slot = 3;
   }
   message SuiCall {
     google.protobuf.Struct transaction = 1;
+    google.protobuf.Timestamp timestamp = 2;
+    uint64 slot = 3;
   }
 
   bytes raw = 1 [deprecated = true]; // can be removed anytime

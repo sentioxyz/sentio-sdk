@@ -20,14 +20,14 @@ export interface ArgumentsFilter {
   arguments?: string[]
 }
 
-export class EventHandler {
+export class EventHandler<T> {
   filters: EventFilter[]
-  handler: (event: Data_AptEvent) => Promise<ProcessResult>
+  handler: (event: T) => Promise<ProcessResult>
   fetchConfig: MoveFetchConfig
 }
 
-export class CallHandler {
+export class CallHandler<T> {
   filters: FunctionNameAndCallFilter[]
-  handler: (call: Data_AptCall) => Promise<ProcessResult>
+  handler: (call: T) => Promise<ProcessResult>
   fetchConfig: MoveFetchConfig
 }

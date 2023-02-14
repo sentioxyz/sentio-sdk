@@ -80,6 +80,17 @@ export interface EvmQueryResponse {
   executionSummary?: QueryExecutionSummary | undefined;
 }
 
+export interface SuiGetCheckpointTimeRequest {
+  network: string;
+  checkpointSequenceNumber: bigint;
+}
+
+export interface SuiGetCheckpointTimeResponse {
+  checkpointTimestampMs?: bigint | undefined;
+  transactionMinTimestampMs?: bigint | undefined;
+  transactionMaxTimestampMs?: bigint | undefined;
+}
+
 export interface RemoteResultRequest {
   token: string;
   position: number;
@@ -1049,6 +1060,153 @@ export const EvmQueryResponse = {
   },
 };
 
+function createBaseSuiGetCheckpointTimeRequest(): SuiGetCheckpointTimeRequest {
+  return { network: "", checkpointSequenceNumber: BigInt("0") };
+}
+
+export const SuiGetCheckpointTimeRequest = {
+  encode(message: SuiGetCheckpointTimeRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.network !== "") {
+      writer.uint32(10).string(message.network);
+    }
+    if (message.checkpointSequenceNumber !== BigInt("0")) {
+      writer.uint32(16).uint64(message.checkpointSequenceNumber.toString());
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): SuiGetCheckpointTimeRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseSuiGetCheckpointTimeRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.network = reader.string();
+          break;
+        case 2:
+          message.checkpointSequenceNumber = longToBigint(reader.uint64() as Long);
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): SuiGetCheckpointTimeRequest {
+    return {
+      network: isSet(object.network) ? String(object.network) : "",
+      checkpointSequenceNumber: isSet(object.checkpointSequenceNumber)
+        ? BigInt(object.checkpointSequenceNumber)
+        : BigInt("0"),
+    };
+  },
+
+  toJSON(message: SuiGetCheckpointTimeRequest): unknown {
+    const obj: any = {};
+    message.network !== undefined && (obj.network = message.network);
+    message.checkpointSequenceNumber !== undefined &&
+      (obj.checkpointSequenceNumber = message.checkpointSequenceNumber.toString());
+    return obj;
+  },
+
+  create(base?: DeepPartial<SuiGetCheckpointTimeRequest>): SuiGetCheckpointTimeRequest {
+    return SuiGetCheckpointTimeRequest.fromPartial(base ?? {});
+  },
+
+  fromPartial(object: DeepPartial<SuiGetCheckpointTimeRequest>): SuiGetCheckpointTimeRequest {
+    const message = createBaseSuiGetCheckpointTimeRequest();
+    message.network = object.network ?? "";
+    message.checkpointSequenceNumber = object.checkpointSequenceNumber ?? BigInt("0");
+    return message;
+  },
+};
+
+function createBaseSuiGetCheckpointTimeResponse(): SuiGetCheckpointTimeResponse {
+  return {
+    checkpointTimestampMs: undefined,
+    transactionMinTimestampMs: undefined,
+    transactionMaxTimestampMs: undefined,
+  };
+}
+
+export const SuiGetCheckpointTimeResponse = {
+  encode(message: SuiGetCheckpointTimeResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.checkpointTimestampMs !== undefined) {
+      writer.uint32(8).uint64(message.checkpointTimestampMs.toString());
+    }
+    if (message.transactionMinTimestampMs !== undefined) {
+      writer.uint32(16).uint64(message.transactionMinTimestampMs.toString());
+    }
+    if (message.transactionMaxTimestampMs !== undefined) {
+      writer.uint32(24).uint64(message.transactionMaxTimestampMs.toString());
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): SuiGetCheckpointTimeResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseSuiGetCheckpointTimeResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.checkpointTimestampMs = longToBigint(reader.uint64() as Long);
+          break;
+        case 2:
+          message.transactionMinTimestampMs = longToBigint(reader.uint64() as Long);
+          break;
+        case 3:
+          message.transactionMaxTimestampMs = longToBigint(reader.uint64() as Long);
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): SuiGetCheckpointTimeResponse {
+    return {
+      checkpointTimestampMs: isSet(object.checkpointTimestampMs) ? BigInt(object.checkpointTimestampMs) : undefined,
+      transactionMinTimestampMs: isSet(object.transactionMinTimestampMs)
+        ? BigInt(object.transactionMinTimestampMs)
+        : undefined,
+      transactionMaxTimestampMs: isSet(object.transactionMaxTimestampMs)
+        ? BigInt(object.transactionMaxTimestampMs)
+        : undefined,
+    };
+  },
+
+  toJSON(message: SuiGetCheckpointTimeResponse): unknown {
+    const obj: any = {};
+    message.checkpointTimestampMs !== undefined &&
+      (obj.checkpointTimestampMs = message.checkpointTimestampMs.toString());
+    message.transactionMinTimestampMs !== undefined &&
+      (obj.transactionMinTimestampMs = message.transactionMinTimestampMs.toString());
+    message.transactionMaxTimestampMs !== undefined &&
+      (obj.transactionMaxTimestampMs = message.transactionMaxTimestampMs.toString());
+    return obj;
+  },
+
+  create(base?: DeepPartial<SuiGetCheckpointTimeResponse>): SuiGetCheckpointTimeResponse {
+    return SuiGetCheckpointTimeResponse.fromPartial(base ?? {});
+  },
+
+  fromPartial(object: DeepPartial<SuiGetCheckpointTimeResponse>): SuiGetCheckpointTimeResponse {
+    const message = createBaseSuiGetCheckpointTimeResponse();
+    message.checkpointTimestampMs = object.checkpointTimestampMs ?? undefined;
+    message.transactionMinTimestampMs = object.transactionMinTimestampMs ?? undefined;
+    message.transactionMaxTimestampMs = object.transactionMaxTimestampMs ?? undefined;
+    return message;
+  },
+};
+
 function createBaseRemoteResultRequest(): RemoteResultRequest {
   return { token: "", position: 0, keepAlive: false };
 }
@@ -1373,6 +1531,14 @@ export const SuiQueryDefinition = {
       responseStream: true,
       options: {},
     },
+    getCheckpointTime: {
+      name: "GetCheckpointTime",
+      requestType: SuiGetCheckpointTimeRequest,
+      requestStream: false,
+      responseType: SuiGetCheckpointTimeResponse,
+      responseStream: false,
+      options: {},
+    },
   },
 } as const;
 
@@ -1381,6 +1547,10 @@ export interface SuiQueryServiceImplementation<CallContextExt = {}> {
     request: EvmSQLQueryRequest,
     context: CallContext & CallContextExt,
   ): ServerStreamingMethodResult<DeepPartial<EvmQueryResponse>>;
+  getCheckpointTime(
+    request: SuiGetCheckpointTimeRequest,
+    context: CallContext & CallContextExt,
+  ): Promise<DeepPartial<SuiGetCheckpointTimeResponse>>;
 }
 
 export interface SuiQueryClient<CallOptionsExt = {}> {
@@ -1388,6 +1558,10 @@ export interface SuiQueryClient<CallOptionsExt = {}> {
     request: DeepPartial<EvmSQLQueryRequest>,
     options?: CallOptions & CallOptionsExt,
   ): AsyncIterable<EvmQueryResponse>;
+  getCheckpointTime(
+    request: DeepPartial<SuiGetCheckpointTimeRequest>,
+    options?: CallOptions & CallOptionsExt,
+  ): Promise<SuiGetCheckpointTimeResponse>;
 }
 
 export type RemoteResultTransferServiceDefinition = typeof RemoteResultTransferServiceDefinition;

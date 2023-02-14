@@ -42,6 +42,8 @@ describe('Test Sui Example', () => {
       data: {
         suiEvent: {
           transaction: data,
+          timestamp: new Date(),
+          slot: 10000n,
         },
       },
       handlerIds: [0],

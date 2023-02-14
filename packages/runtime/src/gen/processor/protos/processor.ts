@@ -549,10 +549,14 @@ export interface Data_AptResource {
 
 export interface Data_SuiEvent {
   transaction: { [key: string]: any } | undefined;
+  timestamp: Date | undefined;
+  slot: bigint;
 }
 
 export interface Data_SuiCall {
   transaction: { [key: string]: any } | undefined;
+  timestamp: Date | undefined;
+  slot: bigint;
 }
 
 export interface DataBinding {
@@ -3977,13 +3981,19 @@ export const Data_AptResource = {
 };
 
 function createBaseData_SuiEvent(): Data_SuiEvent {
-  return { transaction: undefined };
+  return { transaction: undefined, timestamp: undefined, slot: BigInt("0") };
 }
 
 export const Data_SuiEvent = {
   encode(message: Data_SuiEvent, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.transaction !== undefined) {
       Struct.encode(Struct.wrap(message.transaction), writer.uint32(10).fork()).ldelim();
+    }
+    if (message.timestamp !== undefined) {
+      Timestamp.encode(toTimestamp(message.timestamp), writer.uint32(18).fork()).ldelim();
+    }
+    if (message.slot !== BigInt("0")) {
+      writer.uint32(24).uint64(message.slot.toString());
     }
     return writer;
   },
@@ -3998,6 +4008,12 @@ export const Data_SuiEvent = {
         case 1:
           message.transaction = Struct.unwrap(Struct.decode(reader, reader.uint32()));
           break;
+        case 2:
+          message.timestamp = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+          break;
+        case 3:
+          message.slot = longToBigint(reader.uint64() as Long);
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -4007,12 +4023,18 @@ export const Data_SuiEvent = {
   },
 
   fromJSON(object: any): Data_SuiEvent {
-    return { transaction: isObject(object.transaction) ? object.transaction : undefined };
+    return {
+      transaction: isObject(object.transaction) ? object.transaction : undefined,
+      timestamp: isSet(object.timestamp) ? fromJsonTimestamp(object.timestamp) : undefined,
+      slot: isSet(object.slot) ? BigInt(object.slot) : BigInt("0"),
+    };
   },
 
   toJSON(message: Data_SuiEvent): unknown {
     const obj: any = {};
     message.transaction !== undefined && (obj.transaction = message.transaction);
+    message.timestamp !== undefined && (obj.timestamp = message.timestamp.toISOString());
+    message.slot !== undefined && (obj.slot = message.slot.toString());
     return obj;
   },
 
@@ -4023,18 +4045,26 @@ export const Data_SuiEvent = {
   fromPartial(object: DeepPartial<Data_SuiEvent>): Data_SuiEvent {
     const message = createBaseData_SuiEvent();
     message.transaction = object.transaction ?? undefined;
+    message.timestamp = object.timestamp ?? undefined;
+    message.slot = object.slot ?? BigInt("0");
     return message;
   },
 };
 
 function createBaseData_SuiCall(): Data_SuiCall {
-  return { transaction: undefined };
+  return { transaction: undefined, timestamp: undefined, slot: BigInt("0") };
 }
 
 export const Data_SuiCall = {
   encode(message: Data_SuiCall, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.transaction !== undefined) {
       Struct.encode(Struct.wrap(message.transaction), writer.uint32(10).fork()).ldelim();
+    }
+    if (message.timestamp !== undefined) {
+      Timestamp.encode(toTimestamp(message.timestamp), writer.uint32(18).fork()).ldelim();
+    }
+    if (message.slot !== BigInt("0")) {
+      writer.uint32(24).uint64(message.slot.toString());
     }
     return writer;
   },
@@ -4049,6 +4079,12 @@ export const Data_SuiCall = {
         case 1:
           message.transaction = Struct.unwrap(Struct.decode(reader, reader.uint32()));
           break;
+        case 2:
+          message.timestamp = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+          break;
+        case 3:
+          message.slot = longToBigint(reader.uint64() as Long);
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -4058,12 +4094,18 @@ export const Data_SuiCall = {
   },
 
   fromJSON(object: any): Data_SuiCall {
-    return { transaction: isObject(object.transaction) ? object.transaction : undefined };
+    return {
+      transaction: isObject(object.transaction) ? object.transaction : undefined,
+      timestamp: isSet(object.timestamp) ? fromJsonTimestamp(object.timestamp) : undefined,
+      slot: isSet(object.slot) ? BigInt(object.slot) : BigInt("0"),
+    };
   },
 
   toJSON(message: Data_SuiCall): unknown {
     const obj: any = {};
     message.transaction !== undefined && (obj.transaction = message.transaction);
+    message.timestamp !== undefined && (obj.timestamp = message.timestamp.toISOString());
+    message.slot !== undefined && (obj.slot = message.slot.toString());
     return obj;
   },
 
@@ -4074,6 +4116,8 @@ export const Data_SuiCall = {
   fromPartial(object: DeepPartial<Data_SuiCall>): Data_SuiCall {
     const message = createBaseData_SuiCall();
     message.transaction = object.transaction ?? undefined;
+    message.timestamp = object.timestamp ?? undefined;
+    message.slot = object.slot ?? BigInt("0");
     return message;
   },
 };

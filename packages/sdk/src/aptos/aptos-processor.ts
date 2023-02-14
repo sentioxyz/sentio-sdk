@@ -5,7 +5,14 @@ import { AptosBindOptions, AptosNetwork, getChainId } from './network.js'
 import { AptosContext, AptosResourceContext } from './context.js'
 import { EventInstance } from './models.js'
 import { ListStateStorage } from '@sentio/runtime'
-import { MoveFetchConfig, Data_AptResource, HandleInterval, ProcessResult } from '@sentio/protos'
+import {
+  MoveFetchConfig,
+  Data_AptResource,
+  HandleInterval,
+  ProcessResult,
+  Data_AptEvent,
+  Data_AptCall,
+} from '@sentio/protos'
 import { ServerError, Status } from 'nice-grpc'
 import { CallHandler, EventFilter, EventHandler, FunctionNameAndCallFilter } from '../move/index.js'
 
@@ -30,8 +37,8 @@ export class AptosProcessorState extends ListStateStorage<AptosBaseProcessor> {
 export class AptosBaseProcessor {
   readonly moduleName: string
   config: IndexConfigure
-  eventHandlers: EventHandler[] = []
-  callHandlers: CallHandler[] = []
+  eventHandlers: EventHandler<Data_AptEvent>[] = []
+  callHandlers: CallHandler<Data_AptCall>[] = []
 
   constructor(moduleName: string, options: AptosBindOptions) {
     this.moduleName = moduleName

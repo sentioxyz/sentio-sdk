@@ -7,21 +7,25 @@ export class SuiContext extends BaseContext {
   address: string
   network: SuiNetwork
   moduleName: string
-  timestamp: number
+  timestamp: Date
+  slot: bigint
   transaction: SuiTransactionResponse
+  sequence: bigint
 
   constructor(
     moduleName: string,
     network: SuiNetwork,
     address: string,
-    version: number,
+    timestamp: Date,
+    slot: bigint,
     transaction?: SuiTransactionResponse
   ) {
     super()
     this.address = address
     this.network = network
     this.moduleName = moduleName
-    this.timestamp = version
+    this.timestamp = timestamp
+    this.slot = slot
     if (transaction) {
       this.transaction = transaction
     }
@@ -31,7 +35,7 @@ export class SuiContext extends BaseContext {
     return {
       address: this.address,
       contractName: this.moduleName,
-      blockNumber: BigInt(this.timestamp),
+      blockNumber: this.slot,
       transactionIndex: 0,
       transactionHash: this.transaction?.certificate.transactionDigest || '', // TODO
       logIndex: 0,
