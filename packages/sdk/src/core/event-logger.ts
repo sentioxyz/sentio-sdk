@@ -2,15 +2,17 @@ import { BaseContext } from './base-context.js'
 import { EventTrackingResult, LogLevel } from '@sentio/protos'
 import { normalizeAttribute } from './normalization.js'
 
-export interface Event {
+export interface Attribute<T> {
+  [key: string]: Exclude<T | number | bigint | string | LogLevel | Attribute<T> | undefined, Promise<any>>
+}
+
+export interface Event<T> extends Attribute<T> {
   // The unique identifier of main identity associate with an event
   // .e.g user id / token address / account address / contract address id
   //
   distinctId?: string
   severity?: LogLevel
   message?: string
-
-  [key: string]: any
 }
 
 export class EventLogger {
@@ -20,7 +22,7 @@ export class EventLogger {
     this.ctx = ctx
   }
 
-  emit(eventName: string, event: Event) {
+  emit<T>(eventName: string, event: Event<T>) {
     const { distinctId, severity, message, ...payload } = event
 
     const res: EventTrackingResult = {

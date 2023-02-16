@@ -39,7 +39,7 @@ export class EventTracker extends NamedResultDescriptor {
     this.options = options
   }
 
-  trackEvent(ctx: BaseContext, event: Event) {
+  trackEvent<T>(ctx: BaseContext, event: Event<T>) {
     const { distinctId, message, severity, ...payload } = event
 
     const res: EventTrackingResult = {

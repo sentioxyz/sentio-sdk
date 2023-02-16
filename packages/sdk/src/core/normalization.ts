@@ -54,6 +54,10 @@ function normalizeObject(obj: any, length: number): any {
     if (obj instanceof BigDecimal) {
       return obj.toNumber()
     }
+    if (obj instanceof Promise) {
+      console.error('Cannot submit promise')
+      return null
+    }
     ret = {}
     for (const [key, value] of Object.entries(obj)) {
       const normValue = normalizeObject(value, length)
