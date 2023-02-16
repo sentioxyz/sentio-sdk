@@ -228,7 +228,7 @@ export abstract class BaseProcessor<
           return ProcessResult.fromPartial({})
         }
         const traceData = '0x' + trace.action.input.slice(10)
-        trace.args = contractInterface.getAbiCoder().decode(fragment.inputs, traceData)
+        trace.args = contractInterface.getAbiCoder().decode(fragment.inputs, traceData, true)
 
         const ctx = new ContractContext<TContract, TBoundContractView>(
           contractName,
