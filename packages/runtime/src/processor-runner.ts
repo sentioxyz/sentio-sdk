@@ -9,6 +9,12 @@ import { createServer } from 'nice-grpc'
 import { createLogger, transports, format } from 'winston'
 import { compressionAlgorithms } from '@grpc/grpc-js'
 
+import { register as globalRegistry, Registry } from 'prom-client'
+import { registry as niceGrpcRegistry, prometheusServerMiddleware } from 'nice-grpc-prometheus'
+import http from 'http'
+
+const mergedRegistry = Registry.merge([globalRegistry, niceGrpcRegistry])
+
 import { ProcessorDefinition } from '@sentio/protos'
 import { ProcessorServiceImpl } from './service.js'
 import { Endpoints } from './endpoints.js'
@@ -94,7 +100,7 @@ const server = createServer({
   'grpc.max_send_message_length': 128 * 1024 * 1024,
   'grpc.max_receive_message_length': 128 * 1024 * 1024,
   'grpc.default_compression_algorithm': compressionAlgorithms.gzip,
-})
+}).use(prometheusServerMiddleware())
 
 const baseService = new ProcessorServiceImpl(async () => {
   const m = await import(options.target)
@@ -110,3 +116,18 @@ server.add(ProcessorDefinition, service)
 server.listen('0.0.0.0:' + options.port)
 
 console.log('Processor Server Started at:', options.port)
+
+const metricsPort = 4040
+http
+  .createServer(async function (req, res) {
+    if (req.url && new URL(req.url, `http://${req.headers.host}`).pathname === '/metrics') {
+      const metrics = await mergedRegistry.metrics()
+      res.write(metrics)
+    } else {
+      res.writeHead(404)
+    }
+    res.end()
+  })
+  .listen(metricsPort)
+
+console.log('Metric Server Started at:', metricsPort)

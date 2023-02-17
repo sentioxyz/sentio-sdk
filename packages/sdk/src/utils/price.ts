@@ -1,5 +1,6 @@
 import { CoinID, PriceServiceClient, PriceServiceDefinition } from '@sentio/protos/price'
 import { createChannel, createClientFactory, Status } from 'nice-grpc'
+import { prometheusClientMiddleware } from 'nice-grpc-prometheus'
 import { retryMiddleware, RetryOptions } from 'nice-grpc-client-middleware-retry'
 import { Endpoints } from '@sentio/runtime'
 
@@ -9,7 +10,10 @@ export function getPriceClient(address?: string) {
   }
   const channel = createChannel(address)
 
-  return createClientFactory().use(retryMiddleware).create(PriceServiceDefinition, channel)
+  return createClientFactory()
+    .use(prometheusClientMiddleware())
+    .use(retryMiddleware)
+    .create(PriceServiceDefinition, channel)
 }
 
 const priceMap = new Map<string, Promise<number | undefined>>()
