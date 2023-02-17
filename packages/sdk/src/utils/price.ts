@@ -1,5 +1,5 @@
 import { CoinID, PriceServiceClient, PriceServiceDefinition } from '@sentio/protos/price'
-import { createChannel, createClientFactory } from 'nice-grpc'
+import { createChannel, createClientFactory, Status } from 'nice-grpc'
 import { retryMiddleware, RetryOptions } from 'nice-grpc-client-middleware-retry'
 import { Endpoints } from '@sentio/runtime'
 
@@ -12,14 +12,14 @@ export function getPriceClient(address?: string) {
   return createClientFactory().use(retryMiddleware).create(PriceServiceDefinition, channel)
 }
 
-const priceMap = new Map<string, Promise<number>>()
+const priceMap = new Map<string, Promise<number | undefined>>()
 let priceClient: PriceServiceClient<RetryOptions>
 
 interface PriceOptions {
   toleranceInDays?: number
 }
 
-async function getPriceByTypeOrSymbol(date: Date, coinId: CoinID, options?: PriceOptions): Promise<number> {
+async function getPriceByTypeOrSymbol(date: Date, coinId: CoinID, options?: PriceOptions): Promise<number | undefined> {
   if (!priceClient) {
     priceClient = getPriceClient()
   }
@@ -45,28 +45,36 @@ async function getPriceByTypeOrSymbol(date: Date, coinId: CoinID, options?: Pric
     },
     {
       retry: true,
-      retryMaxAttempts: 8,
+      retryMaxAttempts: 5,
     }
   )
-  price = response.then((res) => {
-    if (res.timestamp) {
-      const responseDateString = dateString(res.timestamp)
-      if (responseDateString === todayDateString) {
-        priceMap.delete(key)
-      } else {
-        // https://www.javatpoint.com/javascript-date-difference
-        const diff = Math.abs(res.timestamp.getTime() - date.getTime())
-        const daysDiff = diff / (1000 * 60 * 60 * 24)
-        const tolerance = options?.toleranceInDays || 1
-        if (daysDiff > tolerance) {
+  price = response
+    .then((res) => {
+      if (res.timestamp) {
+        const responseDateString = dateString(res.timestamp)
+        if (responseDateString === todayDateString) {
           priceMap.delete(key)
+        } else {
+          // https://www.javatpoint.com/javascript-date-difference
+          const diff = Math.abs(res.timestamp.getTime() - date.getTime())
+          const daysDiff = diff / (1000 * 60 * 60 * 24)
+          const tolerance = options?.toleranceInDays || 1
+          if (daysDiff > tolerance) {
+            priceMap.delete(key)
+            return undefined
+          }
         }
+      } else {
+        priceMap.delete(key)
       }
-    } else {
-      priceMap.delete(key)
-    }
-    return res.price
-  })
+      return res.price
+    })
+    .catch((e) => {
+      if (e.code === Status.NOT_FOUND) {
+        return undefined
+      }
+      throw e
+    })
   priceMap.set(key, price)
   return price
 }
@@ -76,13 +84,14 @@ async function getPriceByTypeOrSymbol(date: Date, coinId: CoinID, options?: Pric
  * @param chainId chain id refers to CHAIN_MAP
  * @param coinType
  * @param date
+ * @param options other behavior options
  */
 export async function getPriceByType(
   chainId: string,
   coinType: string,
   date: Date,
   options?: PriceOptions
-): Promise<number> {
+): Promise<number | undefined> {
   return getPriceByTypeOrSymbol(
     date,
     {
@@ -96,11 +105,15 @@ export async function getPriceByType(
 }
 
 /**
- *
  * @param symbol token symbol like BTC, etc
  * @param date
+ * @param options other behavior options
  */
-export async function getPriceBySymbol(symbol: string, date: Date, options?: PriceOptions): Promise<number> {
+export async function getPriceBySymbol(
+  symbol: string,
+  date: Date,
+  options?: PriceOptions
+): Promise<number | undefined> {
   return getPriceByTypeOrSymbol(date, { symbol }, options)
 }
 

@@ -1,0 +1,19 @@
+{
+  "customCss": "./doc.css",
+  "entryPoints": [
+    "./src/index.ts",
+    "./src/aptos/index.ts",
+    "./src/aptos/builtin/index.ts",
+    "./src/core/index.ts",
+    "./src/eth/index.ts",
+    "./src/eth/builtin/index.ts",
+    "./src/solana/index.ts",
+    "./src/solana/builtin/index.ts",
+    "./src/sui/index.ts",
+    "./src/sui/builtin/index.ts",
+    "./src/testing/index.ts",
+    "./src/utils/index.ts"
+  ],
+  "excludeNotDocumented": true,
+  "excludeNotDocumentedKinds": ["Namespace"]
+}

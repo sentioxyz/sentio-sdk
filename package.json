@@ -32,7 +32,7 @@
     "semantic-release-monorepo": "^7.0.5",
     "ts-jest": "^29.0.5",
     "ts-node": "^10.9.1",
-    "typedoc": "^0.23.23",
+    "typedoc": "^0.23.25",
     "typescript": "^4.9.0"
   },
   "resolutions": {
@@ -42,7 +42,6 @@
     "cleanjest": "yarn jest --clearCache",
     "format": "prettier --write .",
     "lint": "ls-lint && eslint .",
-    "docs": "rm -rf packages/sdk/lib && typedoc --options ./typedoc.json",
     "postinstall": "git config --local include.path ../.github/.gitconfig && git config core.hooksPath .github/.githooks"
   },
   "engines": {

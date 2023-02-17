@@ -12,7 +12,8 @@
     "gen:eth_test": "ts-node-esm src/eth/codegen/run.ts src/tests/abis/eth ./src/tests/types/eth",
     "gen:aptos": "ts-node-esm  src/aptos/codegen/run.ts src/aptos/abis src/aptos/builtin && yarn gen:aptos_test",
     "gen:aptos_test": "ts-node-esm  src/aptos/codegen/run.ts src/aptos/tests/abis src/aptos/tests/types",
-    "gen:solana": "ts-node-esm src/solana/codegen/run.ts src/solana/tests/abis src/solana/tests/types"
+    "gen:solana": "ts-node-esm src/solana/codegen/run.ts src/solana/tests/abis src/solana/tests/types",
+    "docs": "typedoc --options typedoc.json"
   },
   "dependencies": {
     "@mysten/sui.js": "npm:@sentio/sui.js@0.17.0",
