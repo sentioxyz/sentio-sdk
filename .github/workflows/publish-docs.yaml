@@ -22,11 +22,13 @@ jobs:
       - name: Install
         run: yarn install
       - name: Build
-        run: yarn lerna run build --no-private
+        run: yarn build_all
+        working-directory: packages/sdk
       - name: Create the docs directory locally in CI
         run: yarn docs
+        working-directory: packages/sdk
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4.4.1
         with:
           branch: gh-pages
-          folder: docs
+          folder: packages/sdk/docs
