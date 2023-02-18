@@ -4,8 +4,7 @@ debug
 node_modules
 dist
 lib
-**/src/types
-**/tests/types
+types
 
 docs
 

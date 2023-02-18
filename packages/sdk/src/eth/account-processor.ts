@@ -4,11 +4,8 @@ import { AccountBindOptions } from './bind-options.js'
 
 import { Network, LogParams } from 'ethers/providers'
 
-import { TransferEvent as ERC20TransferEvent } from './builtin/internal/ERC20.js'
-import { TransferEvent as ERC721TransferEvent } from './builtin/internal/ERC721.js'
-
-import { ERC20Processor } from './builtin/internal/erc20_processor.js'
-import { ERC721Processor } from './builtin/internal/erc721_processor.js'
+import { TransferEvent as ERC20TransferEvent, ERC20Processor } from './builtin/erc20.js'
+import { TransferEvent as ERC721TransferEvent, ERC721Processor } from './builtin/erc721.js'
 
 import { AccountContext } from './context.js'
 import { PromiseOrVoid } from '../promise-or-void.js'

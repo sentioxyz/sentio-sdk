@@ -9,7 +9,7 @@
     "build_all": "yarn lerna run --scope=@sentio/sdk build --include-dependencies",
     "test": "NODE_OPTIONS=--experimental-vm-modules yarn jest",
     "gen:eth": "ts-node-esm src/eth/codegen/run.ts src/eth/abis src/eth/builtin && yarn gen:eth_test",
-    "gen:eth_test": "ts-node-esm src/eth/codegen/run.ts src/tests/abis/eth ./src/tests/types/eth",
+    "gen:eth_test": "ts-node-esm src/eth/codegen/run.ts src/eth/tests/abis/eth ./src/eth/tests/types",
     "gen:aptos": "ts-node-esm  src/aptos/codegen/run.ts src/aptos/abis src/aptos/builtin && yarn gen:aptos_test",
     "gen:aptos_test": "ts-node-esm  src/aptos/codegen/run.ts src/aptos/tests/abis src/aptos/tests/types",
     "gen:solana": "ts-node-esm src/solana/codegen/run.ts src/solana/tests/abis src/solana/tests/types",

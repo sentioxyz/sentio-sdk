@@ -36,7 +36,7 @@ describe('Test Solana Example', () => {
       },
     ]
 
-    const res = await service.testInstructions(instructions)
+    const res = await service.solana.testInstructions(instructions)
     expect(res.result?.counters).length(4)
     expect(res.result?.gauges).length(0)
     expect(res.result?.counters[0].metadata?.blockNumber).equal(12345n)
@@ -64,7 +64,7 @@ describe('Test Solana Example', () => {
         accounts: [],
       },
     ]
-    const res = await service.testInstructions(instructions)
+    const res = await service.solana.testInstructions(instructions)
     expect(res.result?.counters).length(1)
     expect(res.result?.gauges).length(0)
     expect(res.result?.counters[0].metadata?.blockNumber).equal(0n)

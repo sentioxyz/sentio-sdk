@@ -1,6 +1,6 @@
 import chalk from 'chalk'
 import path from 'path'
-import fs from 'fs'
+import fs from 'fs-extra'
 import { exec } from 'child_process'
 import * as process from 'process'
 import { getPackageRoot } from '../utils.js'
@@ -98,6 +98,7 @@ export async function codegen() {
       input = path.resolve('abis', 'evm')
       output = path.resolve(outputBase, 'eth')
     }
+    fs.emptyDirSync(output)
     // @ts-ignore dynamic import
     await codegen.codegen(input, output)
   } catch (e) {
@@ -107,8 +108,12 @@ export async function codegen() {
   try {
     // @ts-ignore dynamic import
     const codegen = await import('@sentio/sdk/solana/codegen')
+
+    const output = path.resolve(outputBase, 'solana')
+    fs.emptyDirSync(output)
+
     // @ts-ignore dynamic import
-    await codegen.codegen(path.resolve('abis', 'solana'), path.resolve(outputBase, 'solana'))
+    await codegen.codegen(path.resolve('abis', 'solana'), output)
   } catch (e) {
     console.error('code gen error', e)
   }
@@ -116,8 +121,12 @@ export async function codegen() {
   try {
     // @ts-ignore dynamic import
     const codegen = await import('@sentio/sdk/aptos/codegen')
+
+    const output = path.resolve(outputBase, 'aptos')
+    fs.emptyDirSync(output)
+
     // @ts-ignore dynamic import
-    await codegen.codegen(path.resolve('abis', 'aptos'), path.resolve(outputBase, 'aptos'))
+    await codegen.codegen(path.resolve('abis', 'aptos'), output)
   } catch (e) {
     console.error('code gen error', e)
   }

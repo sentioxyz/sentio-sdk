@@ -13,9 +13,9 @@ import { generateBoundViewFunctions, generateViewFunctions } from './view-functi
 
 export function codeGenIndex(contract: Contract): string {
   return ` 
-  export * from './internal/${contract.name.toLowerCase()}_processor.js'
+  export * from './internal/${contract.name.toLowerCase()}-processor.js'
   export * from './internal/${contract.name}.js'
-  export * from './internal/${contract.name.toLowerCase()}_test-utils.js'
+  export * from './internal/${contract.name.toLowerCase()}-test-utils.js'
   `
 }
 
@@ -209,7 +209,7 @@ export function codeGenTestUtilsFile(contract: Contract): string {
     }
   })
 
-  possibleImports[`./${contract.name.toLowerCase()}_processor.js`] = [`get${contract.name}Contract`]
+  possibleImports[`./${contract.name.toLowerCase()}-processor.js`] = [`get${contract.name}Contract`]
 
   const imports = createImportsForUsedIdentifiers(possibleImports, source)
 

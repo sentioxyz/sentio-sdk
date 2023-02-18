@@ -1,8 +1,8 @@
 import { expect } from 'chai'
 
 import { StartRequest } from '@sentio/protos'
-import { TestProcessorServer } from '../testing/index.js'
-import { ERC20Processor, ERC20ProcessorTemplate } from '../eth/builtin/internal/erc20_processor.js'
+import { TestProcessorServer } from '../../testing/index.js'
+import { ERC20Processor, ERC20ProcessorTemplate } from '../builtin/erc20.js'
 // import { TestProcessorServer } from '../testing/index.js'
 
 describe('Test Template', () => {

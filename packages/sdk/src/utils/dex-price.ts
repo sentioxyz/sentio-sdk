@@ -1,4 +1,4 @@
-import { getEACAggregatorProxyContract } from '../eth/builtin/internal/eacaggregatorproxy_processor.js'
+import { getEACAggregatorProxyContract } from '../eth/builtin/eacaggregatorproxy.js'
 import fs from 'fs'
 import { parse } from 'csv-parse/sync'
 import { BlockTag } from 'ethers/providers'

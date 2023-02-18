@@ -1,8 +1,8 @@
 import { assert } from 'chai'
 
-import { TestProcessorServer } from '../testing/index.js'
-import { ERC20Processor, mockApprovalLog, mockOwnershipTransferredLog, mockTransferLog } from '../eth/builtin/erc20.js'
-import { BigDecimal } from '../core/big-decimal.js'
+import { TestProcessorServer } from '../../testing/index.js'
+import { ERC20Processor, mockApprovalLog, mockOwnershipTransferredLog, mockTransferLog } from '../builtin/erc20.js'
+import { BigDecimal } from '../../core/big-decimal.js'
 
 describe('Test Error Capture', () => {
   const service = new TestProcessorServer(async () => {
@@ -33,7 +33,7 @@ describe('Test Error Capture', () => {
       //       spender: "0x0000000000000000000000000000000000000000",
       //       owner: "0x80009ff8154bd5653c6dda2fa5f5053e5a5c1a91"
       //     }))
-      await service.testLog(
+      await service.eth.testLog(
         mockApprovalLog('0x80009ff8154bd5653c6dda2fa5f5053e5a5c1a91', {
           owner: '0x80009ff8154bd5653c6dda2fa5f5053e5a5c1a91',
           spender: '0x0000000000000000000000000000000000000000',
@@ -49,7 +49,7 @@ describe('Test Error Capture', () => {
   test('Check NaN', async () => {
     let err: Error | undefined
     try {
-      await service.testLog(
+      await service.eth.testLog(
         mockTransferLog('0x80009ff8154bd5653c6dda2fa5f5053e5a5c1a91', {
           from: '0x80009ff8154bd5653c6dda2fa5f5053e5a5c1a91',
           to: '0x0000000000000000000000000000000000000000',
@@ -65,7 +65,7 @@ describe('Test Error Capture', () => {
   test('Check overflow', async () => {
     let err: Error | undefined
     try {
-      await service.testLog(
+      await service.eth.testLog(
         mockOwnershipTransferredLog('0x80009ff8154bd5653c6dda2fa5f5053e5a5c1a91', {
           previousOwner: '0x80009ff8154bd5653c6dda2fa5f5053e5a5c1a91',
           newOwner: '0x0000000000000000000000000000000000000000',

@@ -3,7 +3,7 @@
 import { expect } from 'chai'
 
 import { TestProcessorServer, firstCounterValue, firstGaugeValue } from '@sentio/sdk/testing'
-import { mockTransferLog } from '../eth/builtin/erc20.js'
+import { mockTransferLog } from '../builtin/erc20.js'
 import { HandlerType } from '@sentio/protos'
 
 describe('Test Basic Examples', () => {
@@ -25,7 +25,7 @@ describe('Test Basic Examples', () => {
   })
 
   test('Check block dispatch', async () => {
-    const res = (await service.testBlock(blockData)).result
+    const res = (await service.eth.testBlock(blockData)).result
     expect(res?.counters).length(0)
     expect(res?.gauges).length(1)
     expect(firstGaugeValue(res, 'g1')).equals(10)
@@ -35,7 +35,7 @@ describe('Test Basic Examples', () => {
     expect(gauge?.metadata?.blockNumber?.toString()).equals('14373295')
     expect(gauge?.runtimeInfo?.from).equals(HandlerType.ETH_BLOCK)
 
-    const res2 = (await service.testBlock(blockData, 56)).result
+    const res2 = (await service.eth.testBlock(blockData, 56)).result
     expect(res2?.counters).length(0)
     expect(res2?.gauges).length(1)
     expect(firstGaugeValue(res2, 'g2')).equals(20)
@@ -48,7 +48,7 @@ describe('Test Basic Examples', () => {
       value: BigInt('0x9a71db64810aaa0000'),
     })
 
-    let res = await service.testLog(logData)
+    let res = await service.eth.testLog(logData)
 
     const counters = res.result?.counters
     expect(counters).length(1)
@@ -60,7 +60,7 @@ describe('Test Basic Examples', () => {
 
     const logData2 = Object.assign({}, logData)
     logData2.address = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
-    res = await service.testLog(logData2, 56)
+    res = await service.eth.testLog(logData2, 56)
 
     expect(firstCounterValue(res.result, 'c2')).equals(2)
     expect(res.result?.counters[0].metadata?.chainId).equals('56')
@@ -72,7 +72,7 @@ describe('Test Basic Examples', () => {
     expect(config.contractConfigs?.[5].contract?.name).equals('dynamic')
 
     // repeat trigger won't bind again
-    await service.testLogs([logData])
+    await service.eth.testLogs([logData])
     const config2 = await service.getConfig({})
     expect(config).deep.equals(config2)
   })
@@ -85,7 +85,7 @@ describe('Test Basic Examples', () => {
   }
 
   test('Check trace dispatch', async () => {
-    const res = (await service.testTrace(traceData)).result
+    const res = (await service.eth.testTrace(traceData)).result
     expect(res?.counters).length(1)
   })
 

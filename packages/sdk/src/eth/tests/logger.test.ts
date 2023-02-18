@@ -1,7 +1,7 @@
 import { assert, expect } from 'chai'
 
-import { TestProcessorServer } from '@sentio/sdk/testing'
-import { ERC20Processor, mockApprovalLog, mockTransferLog, TransferEvent } from '../eth/builtin/erc20.js'
+import { TestProcessorServer } from '../../testing/index.js'
+import { ERC20Processor, mockApprovalLog, mockTransferLog, TransferEvent } from '../builtin/erc20.js'
 import { LogLevel } from '@sentio/protos'
 
 describe('Test Error Capture', () => {
@@ -31,7 +31,7 @@ describe('Test Error Capture', () => {
   })
 
   test('Check approve', async () => {
-    const res = await service.testLog(
+    const res = await service.eth.testLog(
       mockApprovalLog('0x80009ff8154bd5653c6dda2fa5f5053e5a5c1a91', {
         owner: '0x80009ff8154bd5653c6dda2fa5f5053e5a5c1a91',
         spender: '0x0000000000000000000000000000000000000000',
@@ -42,7 +42,7 @@ describe('Test Error Capture', () => {
   })
 
   test('Check transfer', async () => {
-    const res = await service.testLog(
+    const res = await service.eth.testLog(
       mockTransferLog('0x80009ff8154bd5653c6dda2fa5f5053e5a5c1a91', {
         from: '0x80009ff8154bd5653c6dda2fa5f5053e5a5c1a91',
         to: '0x0000000000000000000000000000000000000000',

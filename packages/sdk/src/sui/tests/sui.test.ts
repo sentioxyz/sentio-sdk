@@ -1,8 +1,7 @@
 import { expect } from 'chai'
 import { SuiBaseProcessor, SuiBindOptions } from '../index.js'
 
-import { TestProcessorServer } from '@sentio/sdk/testing'
-import { DataBinding, HandlerType } from '@sentio/protos'
+import { TestProcessorServer } from '../../testing/index.js'
 
 describe('Test Sui Example', () => {
   const service = new TestProcessorServer(async () => {
@@ -35,24 +34,10 @@ describe('Test Sui Example', () => {
     expect(config.contractConfigs).length(1)
   })
 
-  test('Check transaction dispatch', async () => {
-    const data = testData
-    data.effects.events = [data.effects.events[data.effects.events.length - 1]]
-    const request: DataBinding = {
-      data: {
-        suiEvent: {
-          transaction: data,
-          timestamp: new Date(),
-          slot: 10000n,
-        },
-      },
-      handlerIds: [0],
-      handlerType: HandlerType.SUI_EVENT,
-    }
-    const res = await service.processBinding(request)
+  test('Check event dispatch', async () => {
+    const res = await service.sui.testEvent(testData as any, testData.effects.events.length - 1)
     expect(res.result?.counters).length(1)
     expect(res.result?.gauges).length(0)
-    // expect(res.result?.counters[0].metadata?.toInt()).equal(12345)
   })
 })
 

@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import { HandlerType, ProcessBindingsRequest } from '@sentio/protos'
 
-import { firstCounterValue, firstGaugeValue, TestProcessorServer } from '@sentio/sdk/testing'
+import { firstCounterValue, firstGaugeValue, TestProcessorServer } from '../../testing/index.js'
 
 describe('Test Aptos Example', () => {
   const service = new TestProcessorServer(async () => {
@@ -38,45 +38,14 @@ describe('Test Aptos Example', () => {
   })
 
   test('Check souffl3 function call dispatch', async () => {
-    const request: ProcessBindingsRequest = {
-      bindings: [
-        {
-          data: {
-            aptCall: {
-              transaction: testData,
-            },
-          },
-
-          handlerIds: [0],
-          handlerType: HandlerType.APT_CALL,
-        },
-      ],
-    }
-    const res = await service.processBindings(request)
+    const res = await service.aptos.testEntryFunctionCall(testData as any)
     expect(res.result?.counters).length(2)
     expect(res.result?.gauges).length(0)
     expect(res.result?.counters[0].metadata?.blockNumber).equal(18483034n)
   })
 
   test('Check souffl3 event dispatch', async () => {
-    const request: ProcessBindingsRequest = {
-      bindings: [
-        {
-          data: {
-            aptEvent: {
-              transaction: {
-                ...testData,
-                events: [testData.events[testData.events.length - 1]],
-              },
-            },
-          },
-
-          handlerIds: [0],
-          handlerType: HandlerType.APT_EVENT,
-        },
-      ],
-    }
-    const res = await service.processBindings(request)
+    const res = await service.aptos.testEvent(testData as any, testData.events.length - 1)
     expect(res.result?.counters).length(1)
     expect(res.result?.gauges).length(0)
     expect(res.result?.counters[0].metadata?.blockNumber).equal(18483034n)
@@ -84,42 +53,13 @@ describe('Test Aptos Example', () => {
   })
 
   test('Check token deposit event dispatch', async () => {
-    const request: ProcessBindingsRequest = {
-      bindings: [
-        {
-          data: {
-            aptEvent: {
-              transaction: {
-                ...testData,
-                events: [tokenTestData],
-              },
-            },
-          },
-          handlerIds: [2],
-          handlerType: HandlerType.APT_EVENT,
-        },
-      ],
-    }
-    const res = await service.processBindings(request)
+    const res = await service.aptos.testEvent(testData as any, tokenTestData)
     expect(firstCounterValue(res.result, 'deposit')).equal(1n)
     expect(firstGaugeValue(res.result, 'version')).equal(0n)
   })
 
   test('Check create poposal event dispatch', async () => {
-    const request: ProcessBindingsRequest = {
-      bindings: [
-        {
-          data: {
-            aptEvent: {
-              transaction: { ...testData, events: [createProposalData] },
-            },
-          },
-          handlerIds: [3],
-          handlerType: HandlerType.APT_EVENT,
-        },
-      ],
-    }
-    const res = await service.processBindings(request)
+    const res = await service.aptos.testEvent(testData as any, createProposalData)
     expect(firstGaugeValue(res.result, 'size')).equal(2)
   })
 
@@ -350,7 +290,7 @@ const createProposalData = {
 const dataCreate = {
   id: '',
   round: '',
-  previous_block_votes: null,
+  previous_block_votes: undefined,
   proposer: '',
   sender: '0x88252db4dc2484cd9cedb23cd67b7b91f88940142f3eea35df7a9168d9c30896',
   sequence_number: '1510',
@@ -406,5 +346,5 @@ const dataCreate = {
   success: true,
   vm_status: 'Executed successfully',
   accumulator_root_hash: '0x7563d6ed58b011e512d53cce2bc1a70716fc6362e12fb6af8fe6d459ae71dffc',
-  changes: null,
+  changes: undefined,
 }

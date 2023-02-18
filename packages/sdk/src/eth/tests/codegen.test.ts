@@ -5,7 +5,7 @@ import chalk from 'chalk'
 import { execSync } from 'child_process'
 import { jest } from '@jest/globals'
 import * as url from 'url'
-import { codegen } from '../eth/codegen/index.js'
+import { codegen } from '../codegen/index.js'
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
 

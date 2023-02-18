@@ -44,7 +44,7 @@ export default class EthersSentio extends Ethers.default {
       return [
         ...files,
         {
-          path: join(dirname(files[0].path), `${contract.name.toLowerCase()}_processor.ts`),
+          path: join(dirname(files[0].path), `${contract.name.toLowerCase()}-processor.ts`),
           contents: codeGenSentioFile(contract),
         },
         {
@@ -52,7 +52,7 @@ export default class EthersSentio extends Ethers.default {
           contents: codeGenIndex(contract),
         },
         {
-          path: join(dirname(files[0].path), `${contract.name.toLowerCase()}_test-utils.ts`),
+          path: join(dirname(files[0].path), `${contract.name.toLowerCase()}-test-utils.ts`),
           contents: codeGenTestUtilsFile(contract),
         },
       ]

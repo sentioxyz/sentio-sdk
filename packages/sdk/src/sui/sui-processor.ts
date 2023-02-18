@@ -5,6 +5,7 @@ import { ServerError, Status } from 'nice-grpc'
 import { SuiContext } from './context.js'
 import { MoveEvent, SuiTransactionResponse, getMoveCallTransaction, MoveCall } from '@mysten/sui.js'
 import { CallHandler, EventFilter, EventHandler, FunctionNameAndCallFilter } from '../move/index.js'
+import { getMoveCalls } from './utils.js'
 
 class IndexConfigure {
   address: string
@@ -129,13 +130,7 @@ export class SuiBaseProcessor {
           tx
         )
         if (tx) {
-          const calls: MoveCall[] = tx.certificate.data.transactions.flatMap((tx) => {
-            const call = getMoveCallTransaction(tx)
-            if (call) {
-              return [call]
-            }
-            return []
-          })
+          const calls: MoveCall[] = getMoveCalls(tx)
           if (calls.length !== 1) {
             throw new ServerError(Status.INVALID_ARGUMENT, 'Unexpected number of call transactions ' + calls.length)
           }

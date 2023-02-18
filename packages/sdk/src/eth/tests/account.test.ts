@@ -1,10 +1,8 @@
-// TODO move out of this package
-
 import { assert, expect } from 'chai'
 
-import { firstCounterValue, TestProcessorServer } from '../testing/index.js'
-import { mockTransferLog } from '../eth/builtin/erc20.js'
-import { AccountProcessor } from '../eth/account-processor.js'
+import { firstCounterValue, TestProcessorServer } from '../../testing/index.js'
+import { mockTransferLog } from '../builtin/erc20.js'
+import { AccountProcessor } from '../account-processor.js'
 
 describe(' erc20 account transfer Examples', () => {
   const ADDRESS = '0x1000000000000000000000000000000000000000'
@@ -39,7 +37,7 @@ describe(' erc20 account transfer Examples', () => {
   })
 
   test('Check log dispatch', async () => {
-    const res = await service.testAccountLogs(ADDRESS, [
+    const res = await service.eth.testAccountLogs(ADDRESS, [
       mockTransferLog('0x1E4EDE388cbc9F4b5c79681B7f94d36a11ABEBC9', {
         from: ADDRESS,
         to: '0xB329e39Ebefd16f40d38f07643652cE17Ca5Bac1',

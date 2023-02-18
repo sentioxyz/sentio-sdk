@@ -33,7 +33,7 @@ ignore:
   - packages/sdk/lib
   - packages/sdk/node_modules
   - examples
-  - packages/sdk/src/tests
+  - packages/sdk/src/eth/tests
   - packages/protos/lib
   - packages/protos/node_modules
   - packages/runtime/lib
