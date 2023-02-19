@@ -4,7 +4,7 @@ import { TokenBridgeProcessor } from './types/token_bridge_processor.js'
 import { token_bridge_idl } from './types/token_bridge.js'
 import { Idl, Instruction } from '@project-serum/anchor'
 import bs58 from 'bs58'
-import { camelCase, upperFirst } from 'lodash-es'
+import { camelCase } from 'lodash-es'
 // @ts-ignore no type definition
 import { Layout } from 'buffer-layout'
 import { IdlField, IdlStateMethod } from '@project-serum/anchor/dist/cjs/idl.js'

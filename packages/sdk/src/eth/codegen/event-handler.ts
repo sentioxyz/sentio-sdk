@@ -1,4 +1,4 @@
-import { EventDeclaration, Contract, getFullSignatureAsSymbolForEvent } from 'typechain'
+import { EventDeclaration, getFullSignatureAsSymbolForEvent } from 'typechain'
 import { getFullSignatureForEventPatched } from './types.js'
 import { generateEventInputs } from '@sentio/ethers-v6/dist/codegen/events.js'
 

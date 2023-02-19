@@ -1,5 +1,5 @@
 import { EthereumDexPrice, GoerliDexPrice } from './dex-price.js'
-import { State, Endpoints } from '@sentio/runtime'
+import { State } from '@sentio/runtime'
 import { loadTestProvidersFromEnv } from '@sentio/sdk/testing'
 
 import { expect } from 'chai'

@@ -6,7 +6,7 @@ import chalk from 'chalk'
 import { format } from 'prettier'
 import { isFrameworkAccount, moduleQname, normalizeToJSName, SPLITTER } from './utils.js'
 import { generateTypeForDescriptor } from './ts-type.js'
-import { camelCase } from 'lodash-es'
+import { camelCase, upperFirst } from 'lodash-es'
 import { TypeDescriptor } from './types.js'
 
 interface OutputFile {
@@ -261,7 +261,7 @@ export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
       return generateTypeForDescriptor(param, module.address, this.ADDRESS_TYPE)
     })
 
-    const camelFuncName = capitalizeFirstChar(camelCase(func.name))
+    const camelFuncName = upperFirst(camelCase(func.name))
 
     const genericString = this.generateFunctionTypeParameters(func)
     return `
@@ -281,7 +281,7 @@ export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
     // const genericString = generateFunctionTypeParameters(func)
     const moduleName = normalizeToJSName(module.name)
 
-    const camelFuncName = capitalizeFirstChar(camelCase(func.name))
+    const camelFuncName = upperFirst(camelCase(func.name))
     const source = `
   onEntry${camelFuncName}(func: (call: ${moduleName}.${camelFuncName}Payload, ctx: ${this.PREFIX}Context) => void, filter?: CallFilter, fetchConfig?: MoveFetchConfig): ${moduleName} {
     this.onEntryFunctionCall(func, {
@@ -418,11 +418,4 @@ export class AccountCodegen<ModuleType, NetworkType> {
       },
     ]
   }
-}
-
-function capitalizeFirstChar(input: string): string {
-  if (!input) {
-    return input
-  }
-  return input[0].toUpperCase() + (input.length > 1 ? input.substring(1) : '')
 }

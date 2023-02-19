@@ -1,8 +1,5 @@
 import path from 'path'
 import * as fs from 'fs'
-import os from 'os'
-import chalk from 'chalk'
-import { execSync } from 'child_process'
 import { jest } from '@jest/globals'
 import * as url from 'url'
 import { codegen } from '../codegen/index.js'

@@ -11,7 +11,7 @@
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
-  "plugins": ["@typescript-eslint"],
+  "plugins": ["@typescript-eslint", "unused-imports"],
   "rules": {
     "@typescript-eslint/no-inferrable-types": ["off"],
     "@typescript-eslint/no-empty-function": ["off"],
@@ -27,8 +27,9 @@
       }
     ],
     "import/no-named-as-default": ["off"],
-    "import/no-unresolved": ["off"]
-    //    "import/no-cycle": 2,
-    //    "import/no-self-import": 2
+    "import/no-unresolved": ["off"],
+//        "import/no-cycle": 2,
+//        "import/no-self-import": 2,
+    "unused-imports/no-unused-imports": "error"
   }
 }

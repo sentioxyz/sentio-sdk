@@ -72,13 +72,10 @@
   },
   "files": [
     "{lib,src}",
-    "!{lib,src}/tests",
+    "!{lib,src}/*/tests",
     "!**/*.test.{js,ts}"
   ],
   "engines": {
     "node": ">=16"
-  },
-  "typedoc": {
-    "entryPoint": "./src/index.ts"
   }
 }
