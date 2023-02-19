@@ -1,20 +1,15 @@
 import { SPLITTER, VECTOR_STR } from './utils.js'
 
 export class TypeDescriptor {
-  // type: string
-
-  // TODO add reference flag
-
-  // qualified name without type parameters
   qname: string
   reference: boolean
-  // account?: string
-  // module?: string
-
+  mutable: boolean
   typeArgs: TypeDescriptor[]
 
   constructor(symbol: string, typeParams?: TypeDescriptor[]) {
     this.qname = symbol
+    this.reference = false
+    this.mutable = false
     this.typeArgs = typeParams || []
   }
 
@@ -97,20 +92,15 @@ export class TypeDescriptor {
 }
 
 export function parseMoveType(type: string): TypeDescriptor {
-  // type = type.replace('&', '')
-
-  type = type.replaceAll('&mut ', '&')
-  type = type.replaceAll('mut ', '')
-
-  // TODO replace ' ' is not exactly safe, need to double check this
-  type = type.replaceAll(' ', '')
-
   const stack: TypeDescriptor[] = [new TypeDescriptor('')]
   let buffer = []
 
   // xxx:asdf<g1<a,<c,d>>, b, g2<a,b>, e>
   for (let i = 0; i < type.length; i++) {
     const ch = type[i]
+    if (ch === ' ') {
+      continue
+    }
     if (ch === '<') {
       // const symbol = type.slice(symbolStart, i)
       // symbolStart =
@@ -121,7 +111,7 @@ export function parseMoveType(type: string): TypeDescriptor {
       stack.push(new TypeDescriptor(''))
       continue
     }
-    if (ch === '>') {
+    if (ch === '>' || ch === ',') {
       const typeParam = stack.pop()
       if (!typeParam) {
         throw Error('Unexpected stack size')
@@ -132,25 +122,11 @@ export function parseMoveType(type: string): TypeDescriptor {
       }
       adjustType(typeParam)
       stack[stack.length - 1].typeArgs.push(typeParam)
+      if (ch === ',') {
+        stack.push(new TypeDescriptor(''))
+      }
       continue
     }
-    if (ch === ',') {
-      const typeParam = stack.pop()
-      if (!typeParam) {
-        throw Error('Unexpected stack size')
-      }
-      if (buffer.length > 0) {
-        typeParam.qname = buffer.join('')
-        buffer = []
-      }
-      adjustType(typeParam)
-
-      stack[stack.length - 1].typeArgs.push(typeParam)
-      // continue parse next param
-      stack.push(new TypeDescriptor(''))
-      continue
-    }
-
     buffer.push(ch)
   }
 
@@ -170,5 +146,9 @@ function adjustType(type: TypeDescriptor) {
   if (type.qname.startsWith('&')) {
     type.reference = true
     type.qname = type.qname.slice(1)
+  }
+  if (type.qname.startsWith('mut')) {
+    type.mutable = true
+    type.qname = type.qname.slice(3)
   }
 }

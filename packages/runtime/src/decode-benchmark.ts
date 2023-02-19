@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 import fs from 'fs'
-import * as console from 'console'
 
 const fileContent = fs.readFileSync('../../../chain/aptos/testdata/block-0-9999.json', { encoding: 'utf-8' })
 // console.log(fileContent)

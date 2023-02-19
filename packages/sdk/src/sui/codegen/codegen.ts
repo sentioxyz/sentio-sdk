@@ -1,10 +1,10 @@
 import { SuiNetwork } from '../network.js'
 import * as fs from 'fs'
 import chalk from 'chalk'
-import { NeutralMoveModule, NeutralMoveStruct } from '../../move/neutral-models.js'
+import { InternalMoveModule, InternalMoveStruct } from '../../move/internal-models.js'
 import { AbstractCodegen } from '../../move/abstract-codegen.js'
 import { JsonRpcProvider, SuiMoveNormalizedModules } from '@mysten/sui.js'
-import { toNeutralModule } from '../move-types.js'
+import { toInternalModule } from '../move-types.js'
 import { moduleQname, SPLITTER, TypeDescriptor } from '../../move/index.js'
 
 export async function codegen(abisDir: string, outDir = 'src/types/sui') {
@@ -12,7 +12,7 @@ export async function codegen(abisDir: string, outDir = 'src/types/sui') {
     return
   }
   console.log(chalk.green('Generated Types for Sui'))
-  const gen = new SuiCodeGen()
+  const gen = new SuiCodegen()
   await gen.generate(abisDir, outDir)
 }
 
@@ -28,7 +28,7 @@ function getRpcClient(network: SuiNetwork): JsonRpcProvider {
   return new JsonRpcProvider(getRpcEndpoint(network))
 }
 
-class SuiCodeGen extends AbstractCodegen<SuiMoveNormalizedModules, SuiNetwork> {
+class SuiCodegen extends AbstractCodegen<SuiMoveNormalizedModules, SuiNetwork> {
   ADDRESS_TYPE = 'SuiAddress'
   MAIN_NET = SuiNetwork.MAIN_NET
   TEST_NET = SuiNetwork.TEST_NET
@@ -44,13 +44,13 @@ class SuiCodeGen extends AbstractCodegen<SuiMoveNormalizedModules, SuiNetwork> {
     return params.slice(0, params.length - 1)
   }
 
-  toNeutral(modules: SuiMoveNormalizedModules): NeutralMoveModule[] {
-    return Object.values(modules).map(toNeutralModule)
+  toInternalModules(modules: SuiMoveNormalizedModules): InternalMoveModule[] {
+    return Object.values(modules).map(toInternalModule)
   }
 
-  getEventStructs(module: NeutralMoveModule) {
+  getEventStructs(module: InternalMoveModule) {
     const qname = moduleQname(module)
-    const eventMap = new Map<string, NeutralMoveStruct>()
+    const eventMap = new Map<string, InternalMoveStruct>()
 
     for (const struct of module.structs) {
       const abilities = new Set(struct.abilities)

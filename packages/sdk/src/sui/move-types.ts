@@ -1,4 +1,4 @@
-import {
+import type {
   SuiMoveNormalizedField,
   SuiMoveNormalizedFunction,
   SuiMoveNormalizedModule,
@@ -6,102 +6,103 @@ import {
   SuiMoveNormalizedType,
 } from '@mysten/sui.js'
 import {
-  NeutralMoveFunction,
-  NeutralMoveFunctionVisibility,
-  NeutralMoveModule,
-  NeutralMoveStruct,
-  NeutralMoveStructField,
-} from '../move/neutral-models.js'
+  InternalMoveFunction,
+  InternalMoveFunctionVisibility,
+  InternalMoveModule,
+  InternalMoveStruct,
+  InternalMoveStructField,
+} from '../move/internal-models.js'
 import { SPLITTER, TypeDescriptor } from '../move/index.js'
 
 export type { SuiAddress } from '@mysten/sui.js'
 
-export function toNeutralModule(module: SuiMoveNormalizedModule): NeutralMoveModule {
+export function toInternalModule(module: SuiMoveNormalizedModule): InternalMoveModule {
   return {
     address: module.address,
-    exposed_functions: Object.entries(module.exposed_functions).map(([n, f]) => toNeutralFunction(n, f)),
+    exposedFunctions: Object.entries(module.exposed_functions).map(([n, f]) => toInternalFunction(n, f)),
     name: module.name,
-    structs: Object.entries(module.structs).map(([n, s]) => toNeutralStruct(n, s)),
+    structs: Object.entries(module.structs).map(([n, s]) => toInternalStruct(n, s)),
   }
 }
 
-export function toNeutralFunction(name: string, func: SuiMoveNormalizedFunction): NeutralMoveFunction {
+export function toInternalFunction(name: string, func: SuiMoveNormalizedFunction): InternalMoveFunction {
   let visibility
   switch (func.visibility) {
     case 'Private':
-      visibility = NeutralMoveFunctionVisibility.PRIVATE
+      visibility = InternalMoveFunctionVisibility.PRIVATE
       break
     case 'Public':
-      visibility = NeutralMoveFunctionVisibility.PUBLIC
+      visibility = InternalMoveFunctionVisibility.PUBLIC
       break
     case 'Friend':
-      visibility = NeutralMoveFunctionVisibility.FRIEND
+      visibility = InternalMoveFunctionVisibility.FRIEND
       break
+    default:
+      throw Error('No visibility for function' + name)
   }
   return {
-    generic_type_params: func.type_parameters.map((p) => {
+    typeParams: func.type_parameters.map((p: any) => {
       return { constraints: p.abilities }
     }),
-    is_entry: func.is_entry,
+    isEntry: func.is_entry,
     name: name,
-    params: func.parameters.map(convertToTypeDescriptor),
-    return: func.return_.map(convertToTypeDescriptor),
+    params: func.parameters.map(toTypeDescriptor),
+    return: func.return_.map(toTypeDescriptor),
     visibility: visibility,
   }
 }
 
-export function toNeutralStruct(name: string, struct: SuiMoveNormalizedStruct): NeutralMoveStruct {
+export function toInternalStruct(name: string, struct: SuiMoveNormalizedStruct): InternalMoveStruct {
   return {
     abilities: struct.abilities.abilities,
-    fields: struct.fields.map(toNeutralField),
-    generic_type_params: struct.type_parameters.map((p) => {
+    fields: struct.fields.map(toInternalField),
+    typeParams: struct.type_parameters.map((p: any) => {
       return { constraints: p.constraints.abilities }
     }),
-    is_native: false,
+    isNative: false,
     name: name,
   }
 }
 
-export function toNeutralField(module: SuiMoveNormalizedField): NeutralMoveStructField {
+export function toInternalField(module: SuiMoveNormalizedField): InternalMoveStructField {
   return {
     name: module.name,
-    type: convertToTypeDescriptor(module.type_),
+    type: toTypeDescriptor(module.type_),
   }
 }
 
-export function convertToTypeDescriptor(normalizedType: SuiMoveNormalizedType): TypeDescriptor {
+export function toTypeDescriptor(normalizedType: SuiMoveNormalizedType): TypeDescriptor {
   if (typeof normalizedType === 'string') {
     return new TypeDescriptor(normalizedType)
   }
 
   if ('Struct' in normalizedType) {
-    // normalizedType.Struct.
-    // return normalizedType;
     const qname = [normalizedType.Struct.address, normalizedType.Struct.module, normalizedType.Struct.name].join(
       SPLITTER
     )
 
-    const args = normalizedType.Struct.type_arguments.map(convertToTypeDescriptor)
+    const args = normalizedType.Struct.type_arguments.map(toTypeDescriptor)
 
     return new TypeDescriptor(qname, args)
   }
 
   if ('Vector' in normalizedType) {
-    return new TypeDescriptor('vector', [convertToTypeDescriptor(normalizedType.Vector)])
+    return new TypeDescriptor('vector', [toTypeDescriptor(normalizedType.Vector)])
   }
   if ('TypeParameter' in normalizedType) {
     return new TypeDescriptor('T' + normalizedType.TypeParameter)
   }
 
   if ('Reference' in normalizedType) {
-    const res = convertToTypeDescriptor(normalizedType.Reference)
+    const res = toTypeDescriptor(normalizedType.Reference)
     res.reference = true
     return res
   }
 
   if ('MutableReference' in normalizedType) {
-    const res = convertToTypeDescriptor(normalizedType.MutableReference)
+    const res = toTypeDescriptor(normalizedType.MutableReference)
     res.reference = true
+    res.mutable = true
     return res
   }
 

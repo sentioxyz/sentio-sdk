@@ -1,6 +1,6 @@
 import { moduleQname, SPLITTER, VECTOR_STR } from './utils.js'
 import { parseMoveType, TypeDescriptor } from './types.js'
-import { NeutralMoveFunction, NeutralMoveModule, NeutralMoveStruct } from './neutral-models.js'
+import { InternalMoveFunction, InternalMoveModule, InternalMoveStruct } from './internal-models.js'
 import { bytesToBigInt } from '../utils/index.js'
 
 type StructWithTag<Base> = Base & {
@@ -14,15 +14,15 @@ type DecodedStructWithTag<B, T> = StructWithTag<B> & {
 }
 
 export abstract class AbstractMoveCoder<StructType> {
-  private moduleMapping = new Map<string, NeutralMoveModule>()
-  private typeMapping = new Map<string, NeutralMoveStruct>()
-  private funcMapping = new Map<string, NeutralMoveFunction>()
+  private moduleMapping = new Map<string, InternalMoveModule>()
+  private typeMapping = new Map<string, InternalMoveStruct>()
+  private funcMapping = new Map<string, InternalMoveFunction>()
 
   contains(account: string, name: string) {
     return this.moduleMapping.has(account + '::' + name)
   }
 
-  loadNeutral(module: NeutralMoveModule) {
+  loadInternal(module: InternalMoveModule) {
     if (this.contains(module.address, module.name)) {
       return
     }
@@ -34,8 +34,8 @@ export abstract class AbstractMoveCoder<StructType> {
       this.typeMapping.set(key, struct)
     }
 
-    for (const func of module.exposed_functions) {
-      if (!func.is_entry) {
+    for (const func of module.exposedFunctions) {
+      if (!func.isEntry) {
         continue
       }
       const key = [module.address, module.name, func.name].join(SPLITTER)
@@ -53,7 +53,7 @@ export abstract class AbstractMoveCoder<StructType> {
     }
   }
 
-  protected getMoveStruct(type: string): NeutralMoveStruct {
+  protected getMoveStruct(type: string): InternalMoveStruct {
     const struct = this.typeMapping.get(type)
     if (!struct) {
       throw new Error('Failed to load type' + type + ' type are not imported anywhere')
@@ -61,7 +61,7 @@ export abstract class AbstractMoveCoder<StructType> {
     return struct
   }
 
-  protected getMoveFunction(type: string): NeutralMoveFunction {
+  protected getMoveFunction(type: string): InternalMoveFunction {
     const func = this.funcMapping.get(type)
     if (!func) {
       throw new Error('Failed to load function' + type + ' type are not imported anywhere')

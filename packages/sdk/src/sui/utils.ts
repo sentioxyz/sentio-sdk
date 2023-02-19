@@ -1,7 +1,7 @@
-import { SuiTransactionResponse, getMoveCallTransaction, MoveCall } from '@mysten/sui.js'
+import { SuiTransactionResponse, getMoveCallTransaction, SuiTransactionKind } from '@mysten/sui.js'
 
 export function getMoveCalls(tx: SuiTransactionResponse) {
-  return tx.certificate.data.transactions.flatMap((tx) => {
+  return tx.certificate.data.transactions.flatMap((tx: SuiTransactionKind) => {
     const call = getMoveCallTransaction(tx)
     if (call) {
       return [call]

@@ -1,7 +1,7 @@
 import { TypedEventInstance, TypedEntryFunctionPayload } from './models.js'
 import { AbstractMoveCoder } from '../move/abstract-move-coder.js'
 import { MoveCall, MoveEvent, SuiMoveNormalizedModule } from '@mysten/sui.js'
-import { toNeutralModule } from './move-types.js'
+import { toInternalModule } from './move-types.js'
 import { SPLITTER } from '../move/index.js'
 
 export class MoveCoder extends AbstractMoveCoder<MoveEvent> {
@@ -9,7 +9,7 @@ export class MoveCoder extends AbstractMoveCoder<MoveEvent> {
     if (this.contains(module.address, module.name)) {
       return
     }
-    this.loadNeutral(toNeutralModule(module))
+    this.loadInternal(toInternalModule(module))
   }
 
   decodeEvent<T>(event: MoveEvent): TypedEventInstance<T> | undefined {

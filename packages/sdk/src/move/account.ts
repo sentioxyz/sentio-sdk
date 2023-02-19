@@ -1,6 +1,5 @@
-import { parseMoveType, TypeDescriptor } from './types.js'
 import { moduleQname, moduleQnameForType } from './utils.js'
-import { NeutralMoveModule } from './neutral-models.js'
+import { InternalMoveModule } from './internal-models.js'
 
 export class AccountModulesImportInfo {
   // account to module
@@ -31,21 +30,7 @@ export class AccountRegister {
   accountImports = new Map<string, AccountModulesImportInfo>()
   pendingAccounts = new Set<string>()
 
-  // loadedAccount = new Set<string>()
-  typeDescriptors = new Map<string, TypeDescriptor>()
-
-  protected loadTypeDescriptor(type: string) {
-    let descriptor = this.typeDescriptors.get(type)
-
-    // const descriptparseMoveType(type)
-    if (!descriptor) {
-      descriptor = parseMoveType(type)
-      this.typeDescriptors.set(type, descriptor)
-    }
-    return descriptor
-  }
-
-  register(module: NeutralMoveModule, tsModuleName: string): AccountModulesImportInfo {
+  register(module: InternalMoveModule, tsModuleName: string): AccountModulesImportInfo {
     const currentModuleFqn = moduleQname(module)
 
     let accountModuleImports = this.accountImports.get(module.address)
@@ -63,9 +48,9 @@ export class AccountRegister {
     return accountModuleImports
   }
 
-  registerFunctions(module: NeutralMoveModule, accountModuleImports: AccountModulesImportInfo): void {
-    for (const func of module.exposed_functions) {
-      if (!func.is_entry) {
+  private registerFunctions(module: InternalMoveModule, accountModuleImports: AccountModulesImportInfo): void {
+    for (const func of module.exposedFunctions) {
+      if (!func.isEntry) {
         continue
       }
       for (const param of func.params) {
@@ -80,7 +65,7 @@ export class AccountRegister {
     }
   }
 
-  registerStruct(module: NeutralMoveModule, accountModuleImports: AccountModulesImportInfo): void {
+  private registerStruct(module: InternalMoveModule, accountModuleImports: AccountModulesImportInfo): void {
     for (const struct of module.structs) {
       for (const field of struct.fields) {
         for (const type of field.type.dependedTypes()) {

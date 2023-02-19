@@ -1,9 +1,8 @@
 import {
   Event,
-  MoveModule,
   MoveModuleBytecode,
   MoveResource,
-  toNeutralModule,
+  toInternalModule,
   TransactionPayload_EntryFunctionPayload,
 } from './move-types.js'
 
@@ -19,7 +18,7 @@ export class MoveCoder extends AbstractMoveCoder<Event | MoveResource> {
     if (this.contains(module.abi.address, module.abi.name)) {
       return
     }
-    this.loadNeutral(toNeutralModule(module))
+    this.loadInternal(toInternalModule(module))
   }
 
   decodeEvent<T>(event: Event): TypedEventInstance<T> | undefined {

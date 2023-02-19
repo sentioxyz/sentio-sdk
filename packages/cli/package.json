@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@jest/types": "^29.4.1",
-    "@mysten/sui.js": "npm:@sentio/sui.js@0.17.0",
+    "@mysten/sui.js": "npm:@sentio/sui.js@0.27.0",
     "@types/jest": "^29.0.0",
     "@types/node": "^18.11.18",
     "aptos-sdk": "npm:@sentio/aptos@^1.6.0",
@@ -32,7 +32,7 @@
     "open": "^8.4.0",
     "ts-jest": "^29.0.5",
     "ts-node": "^10.9.1",
-    "tsup": "npm:@sentio/tsup@^6.5.0"
+    "tsup": "npm:@sentio/tsup@^6.6.3"
   },
   "devDependencies": {
     "@types/command-line-args": "^5.2.0",

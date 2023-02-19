@@ -2,10 +2,8 @@ import { TypeDescriptor } from './types.js'
 import { normalizeToJSName, SPLITTER, VECTOR_STR } from './utils.js'
 
 export function generateTypeForDescriptor(type: TypeDescriptor, currentAddress: string, addressType: string): string {
-  // TODO &signer is defintely an address, but what if &OTHER_TYPE?
   if (type.qname.startsWith('&')) {
-    console.error('Unexpected &')
-    return addressType
+    throw Error('Unexpected &')
   }
   if (type.reference) {
     return addressType

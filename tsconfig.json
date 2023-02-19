@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    //    "forceConsistentCasingInFileNames": true,
     "importHelpers": true,
     "declaration": true,
     "alwaysStrict": true,
@@ -20,6 +19,7 @@
     "noFallthroughCasesInSwitch": true,
     "noEmitOnError": true,
     // by pass issue: Could not find a declaration file for module 'buffer-layout' for now.
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
   }
 }

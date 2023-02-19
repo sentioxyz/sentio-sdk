@@ -1,4 +1,4 @@
-import { NeutralMoveFunction, NeutralMoveModule, NeutralMoveStruct } from './neutral-models.js'
+import { InternalMoveFunction, InternalMoveModule, InternalMoveStruct } from './internal-models.js'
 import path from 'path'
 import fs from 'fs'
 import { AccountModulesImportInfo, AccountRegister } from './account.js'
@@ -28,9 +28,11 @@ export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
   STRUCT_FIELD_NAME: string = 'data'
 
   abstract fetchModules(account: string, network: NetworkType): Promise<ModuleTypes>
-  abstract toNeutral(modules: ModuleTypes): NeutralMoveModule[]
-  abstract getEventStructs(module: NeutralMoveModule): Map<string, NeutralMoveStruct>
-
+  abstract toInternalModules(modules: ModuleTypes): InternalMoveModule[]
+  // Get the structs that represent Events
+  abstract getEventStructs(module: InternalMoveModule): Map<string, InternalMoveStruct>
+  // Get the parameters that actually have arguments in runtime
+  // Aptos first signer and Sui's last TxContext are no use
   abstract getMeaningfulFunctionParams(params: TypeDescriptor[]): TypeDescriptor[]
 
   readModulesFile(fullPath: string) {
@@ -69,7 +71,7 @@ export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
       }
       const fullPath = path.resolve(srcDir, file)
       const abi = this.readModulesFile(fullPath)
-      const modules = this.toNeutral(abi)
+      const modules = this.toInternalModules(abi)
 
       for (const module of modules) {
         loader.register(module, path.basename(file, '.json'))
@@ -89,7 +91,7 @@ export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
 
         try {
           const rawModules = await this.fetchModules(account, network)
-          const modules = this.toNeutral(rawModules)
+          const modules = this.toInternalModules(rawModules)
 
           fs.writeFileSync(path.resolve(srcDir, account + '.json'), JSON.stringify(rawModules, null, '\t'))
 
@@ -143,8 +145,8 @@ export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
     return 'MAIN_NET'
   }
 
-  generateModule(module: NeutralMoveModule, network: NetworkType) {
-    const functions = module.exposed_functions
+  generateModule(module: InternalMoveModule, network: NetworkType) {
+    const functions = module.exposedFunctions
       .map((f) => this.generateOnEntryFunctions(module, f))
       .filter((s) => s !== '')
 
@@ -154,7 +156,7 @@ export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
       .map((e) => this.generateOnEvents(module, e))
       .filter((s) => s !== '')
     const structs = module.structs.map((s) => this.generateStructs(module, s, eventTypes))
-    const callArgs = module.exposed_functions.map((f) => this.generateCallArgsStructs(module, f))
+    const callArgs = module.exposedFunctions.map((f) => this.generateCallArgsStructs(module, f))
 
     const moduleName = normalizeToJSName(module.name)
     let processor = ''
@@ -166,15 +168,15 @@ export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
     }
     static DEFAULT_OPTIONS: ${this.PREFIX}BindOptions = {
       address: "${module.address}",
-      network: ${this.PREFIX}Network.${this.generateNetworkOption(network)}       
+      network: ${this.PREFIX}Network.${this.generateNetworkOption(network)}
     }
 
     static bind(options: Partial<${this.PREFIX}BindOptions> = {}): ${moduleName} {
       return new ${moduleName}({ ...${moduleName}.DEFAULT_OPTIONS, ...options })
     }
-    
+
     ${functions.join('\n')}
-    
+
     ${events.join('\n')}
   }
   `
@@ -185,13 +187,13 @@ export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
 
   export namespace ${moduleName} {
     ${structs.join('\n')}
-    
+
     ${callArgs.join('\n')}
  }
   `
   }
 
-  generateStructs(module: NeutralMoveModule, struct: NeutralMoveStruct, events: Set<string>) {
+  generateStructs(module: InternalMoveModule, struct: InternalMoveStruct, events: Set<string>) {
     const genericString = this.generateStructTypeParameters(struct)
     const genericStringAny = this.generateStructTypeParameters(struct, true)
 
@@ -205,10 +207,10 @@ export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
     let eventPayload = ''
     if (events.has(moduleQname(module) + SPLITTER + struct.name)) {
       eventPayload = `
-    export interface ${structName}Instance extends 
+    export interface ${structName}Instance extends
         TypedEventInstance<${structName}${genericStringAny}> {
       ${this.STRUCT_FIELD_NAME}_decoded: ${structName}${genericStringAny}
-      type_arguments: [${struct.generic_type_params.map((_) => 'string').join(', ')}]
+      type_arguments: [${struct.typeParams.map((_) => 'string').join(', ')}]
     }
     `
     }
@@ -216,17 +218,17 @@ export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
     return `
   export class ${structName}${genericString} {
     static TYPE_QNAME = '${module.address}::${module.name}::${struct.name}'
-    ${fields.join('\n')} 
+    ${fields.join('\n')}
   }
-  
+
   ${eventPayload}
   `
   }
 
-  generateFunctionTypeParameters(func: NeutralMoveFunction) {
+  generateFunctionTypeParameters(func: InternalMoveFunction) {
     let genericString = ''
-    if (func.generic_type_params && func.generic_type_params.length > 0) {
-      const params = func.generic_type_params
+    if (func.typeParams && func.typeParams.length > 0) {
+      const params = func.typeParams
         .map((v, idx) => {
           return `T${idx}=any`
         })
@@ -236,11 +238,11 @@ export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
     return genericString
   }
 
-  generateStructTypeParameters(struct: NeutralMoveStruct, useAny = false) {
+  generateStructTypeParameters(struct: InternalMoveStruct, useAny = false) {
     let genericString = ''
 
-    if (struct.generic_type_params && struct.generic_type_params.length > 0) {
-      const params = struct.generic_type_params
+    if (struct.typeParams && struct.typeParams.length > 0) {
+      const params = struct.typeParams
         .map((v, idx) => {
           return useAny ? 'any' : 'T' + idx
         })
@@ -250,8 +252,8 @@ export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
     return genericString
   }
 
-  generateCallArgsStructs(module: NeutralMoveModule, func: NeutralMoveFunction) {
-    if (!func.is_entry) {
+  generateCallArgsStructs(module: InternalMoveModule, func: InternalMoveFunction) {
+    if (!func.isEntry) {
       return
     }
 
@@ -266,13 +268,13 @@ export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
   export interface ${camelFuncName}Payload${genericString}
       extends TypedEntryFunctionPayload<[${fields.join(',')}]> {
     arguments_decoded: [${fields.join(',')}],
-    type_arguments: [${func.generic_type_params.map((_) => 'string').join(', ')}]
+    type_arguments: [${func.typeParams.map((_) => 'string').join(', ')}]
   }
   `
   }
 
-  generateOnEntryFunctions(module: NeutralMoveModule, func: NeutralMoveFunction) {
-    if (!func.is_entry) {
+  generateOnEntryFunctions(module: InternalMoveModule, func: InternalMoveFunction) {
+    if (!func.isEntry) {
       return ''
     }
 
@@ -293,7 +295,7 @@ export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
     return source
   }
 
-  generateOnEvents(module: NeutralMoveModule, struct: NeutralMoveStruct): string {
+  generateOnEvents(module: InternalMoveModule, struct: InternalMoveStruct): string {
     // for struct that has drop + store
     // if (!isEvent(struct, module)) {
     //   return ''
@@ -318,7 +320,7 @@ export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
 }
 
 export class AccountCodegen<ModuleType, NetworkType> {
-  modules: NeutralMoveModule[]
+  modules: InternalMoveModule[]
   config: Config<NetworkType>
   abi: ModuleType
   loader: AccountRegister
@@ -328,7 +330,7 @@ export class AccountCodegen<ModuleType, NetworkType> {
     moduleGen: AbstractCodegen<ModuleType, NetworkType>,
     loader: AccountRegister,
     abi: ModuleType,
-    modules: NeutralMoveModule[],
+    modules: InternalMoveModule[],
     config: Config<NetworkType>
   ) {
     // const json = fs.readFileSync(config.srcFile, 'utf-8')
@@ -355,8 +357,8 @@ export class AccountCodegen<ModuleType, NetworkType> {
 
     const imports = `
     import { CallFilter } from "@sentio/sdk/move"
-    import { 
-      MoveCoder, defaultMoveCoder, ${this.moduleGen.PREFIX}BindOptions, ${this.moduleGen.PREFIX}BaseProcessor, 
+    import {
+      MoveCoder, defaultMoveCoder, ${this.moduleGen.PREFIX}BindOptions, ${this.moduleGen.PREFIX}BaseProcessor,
       TypedEventInstance, ${this.moduleGen.PREFIX}Network, TypedEntryFunctionPayload,
       ${this.moduleGen.PREFIX}Context } from "@sentio/sdk/${this.moduleGen.PREFIX.toLowerCase()}"
     import { MoveFetchConfig } from "@sentio/protos"
@@ -388,15 +390,15 @@ export class AccountCodegen<ModuleType, NetworkType> {
     /* Autogenerated file. Do not edit manually. */
     /* tslint:disable */
     /* eslint-disable */
-  
+
     /* Generated modules for account ${address} */
-  
+
     ${imports}
-    
+
     ${moduleImports.join('\n')}
-    
+
     ${this.modules.map((m) => this.moduleGen.generateModule(m, this.config.network)).join('\n')}
-    
+
     const MODULES = JSON.parse('${JSON.stringify(this.abi)}')
 
     export function loadAllTypes(coder: MoveCoder) {
@@ -405,7 +407,7 @@ export class AccountCodegen<ModuleType, NetworkType> {
         coder.load(m as any)
       }
     }
-    
+
     loadAllTypes(defaultMoveCoder())
     ` // source
 
