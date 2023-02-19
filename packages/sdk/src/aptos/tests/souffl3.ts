@@ -14,7 +14,7 @@ SouffleChefCampaign.bind({ startVersion: 3212312n })
     ctx.meter.Counter('burned').add(1)
     ctx.eventLogger.emit('pull', { distinctId: ctx.transaction.sender })
   })
-  .onEvent(
+  .onMoveEvent(
     (event, ctx) => {
       ctx.meter.Counter('evt_num').add(1)
     },

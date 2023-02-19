@@ -1,8 +1,8 @@
-import { MOVE_CODER } from './move-coder.js'
-import { aptos_account } from './builtin/0x1.js'
+import { MOVE_CODER } from '../move-coder.js'
+import { loadAllTypes } from '../builtin/0x1.js'
 
 describe('type decode', () => {
-  aptos_account.loadTypes(MOVE_CODER)
+  loadAllTypes(MOVE_CODER)
   test('decode function payload', async () => {
     const decoded = MOVE_CODER.decodeFunctionPayload(data)
     console.log(decoded)

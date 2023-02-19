@@ -1,28 +1,26 @@
 import { expect } from 'chai'
-import { SuiBaseProcessor, SuiBindOptions } from '../index.js'
-
 import { TestProcessorServer } from '../../testing/index.js'
+
+import { pool } from './types/testnet/swap.js'
+import { SuiNetwork } from '../network.js'
 
 describe('Test Sui Example', () => {
   const service = new TestProcessorServer(async () => {
-    class SwapProcessor extends SuiBaseProcessor {
-      static bind(options: SuiBindOptions): SwapProcessor {
-        return new SwapProcessor('TicTacToe', options)
-      }
-    }
-
-    SwapProcessor.bind({
-      startTimestamp: 0,
-      address: '0x8235459df815e77668b4a49bb36e229f3321f432',
-    }).onMoveEvent(
-      (evt, ctx) => {
-        const amount = parseInt(evt.fields?.x_amount)
-        ctx.meter.Counter('amount').add(amount)
-      },
-      {
-        type: 'pool::LiquidityEvent',
-      }
-    )
+    pool
+      .bind({
+        startTimestamp: 0,
+        address: '0x8235459df815e77668b4a49bb36e229f3321f432',
+      })
+      .onEventLiquidityEvent((evt, ctx) => {
+        const amount_original = BigInt(evt.fields?.x_amount)
+        const amount = evt.fields_decoded.x_amount
+        expect(amount_original).eq(amount)
+        ctx.meter.Counter('amount').add(amount, { pool: evt.fields_decoded.pool_id })
+      })
+      .onEntryAddLiquidity((call, ctx) => {
+        const amount = call.arguments_decoded[3]
+        ctx.meter.Gauge('amount2').record(amount)
+      })
   })
 
   beforeAll(async () => {
@@ -35,9 +33,15 @@ describe('Test Sui Example', () => {
   })
 
   test('Check event dispatch', async () => {
-    const res = await service.sui.testEvent(testData as any, testData.effects.events.length - 1)
+    const res = await service.sui.testEvent(testData as any, testData.effects.events.length - 1, SuiNetwork.TEST_NET)
     expect(res.result?.counters).length(1)
     expect(res.result?.gauges).length(0)
+  })
+
+  test('Check call dispatch', async () => {
+    const res = await service.sui.testEntryFunctionCall(testData as any, SuiNetwork.TEST_NET)
+    expect(res.result?.counters).length(0)
+    expect(res.result?.gauges).length(1)
   })
 })
 

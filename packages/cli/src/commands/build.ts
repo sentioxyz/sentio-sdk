@@ -130,6 +130,19 @@ export async function codegen() {
   } catch (e) {
     console.error('code gen error', e)
   }
+
+  try {
+    // @ts-ignore dynamic import
+    const codegen = await import('@sentio/sdk/sui/codegen')
+
+    const output = path.resolve(outputBase, 'sui')
+    fs.emptyDirSync(output)
+
+    // @ts-ignore dynamic import
+    await codegen.codegen(path.resolve('abis', 'sui'), output)
+  } catch (e) {
+    console.error('code gen error', e)
+  }
 }
 
 async function installDeps() {

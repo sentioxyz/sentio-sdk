@@ -6,6 +6,7 @@ import { SuiContext } from './context.js'
 import { MoveEvent, SuiTransactionResponse, getMoveCallTransaction, MoveCall } from '@mysten/sui.js'
 import { CallHandler, EventFilter, EventHandler, FunctionNameAndCallFilter } from '../move/index.js'
 import { getMoveCalls } from './utils.js'
+import { defaultMoveCoder } from './move-coder.js'
 
 class IndexConfigure {
   address: string
@@ -82,8 +83,7 @@ export class SuiBaseProcessor {
         for (const evt of events) {
           if ('moveEvent' in evt) {
             const eventInstance = evt.moveEvent as MoveEvent
-            const decoded = eventInstance // TODO
-            // const decoded = MOVE_CODER.decodeEvent<any>(eventInstance)
+            const decoded = defaultMoveCoder().decodeEvent<any>(eventInstance)
             await handler(decoded || eventInstance, ctx)
           }
         }
@@ -135,7 +135,7 @@ export class SuiBaseProcessor {
             throw new ServerError(Status.INVALID_ARGUMENT, 'Unexpected number of call transactions ' + calls.length)
           }
           const payload = calls[0]
-          const decoded = payload // MOVE_CODER.decodeFunctionPayload(payload)
+          const decoded = defaultMoveCoder().decodeFunctionPayload(payload)
           await handler(decoded, ctx)
         }
         return ctx.getProcessResult()

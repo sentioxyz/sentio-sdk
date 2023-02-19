@@ -18,9 +18,11 @@ describe('Test Error Capture', () => {
       })
       .onEventTransfer((evt: TransferEvent, ctx) => {
         ctx.eventLogger.emit('Transfer', {
+          message: `transferred ${evt.args.value}`,
           severity: LogLevel.WARNING,
           owner: evt.args.from,
           to: evt.args.to,
+          from: evt.args.from,
           value: evt.args.value,
         })
       })

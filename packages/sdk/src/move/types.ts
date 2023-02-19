@@ -3,8 +3,11 @@ import { SPLITTER, VECTOR_STR } from './utils.js'
 export class TypeDescriptor {
   // type: string
 
+  // TODO add reference flag
+
   // qualified name without type parameters
   qname: string
+  reference: boolean
   // account?: string
   // module?: string
 
@@ -47,18 +50,29 @@ export class TypeDescriptor {
   // all depended types including itself, not include system type
   dependedTypes(): string[] {
     if (this.qname.startsWith('&')) {
+      console.error('Not expected &')
+      return []
+    }
+    if (this.reference) {
       return []
     }
     switch (this.qname) {
       case 'signer':
       case 'address':
+      case 'Address':
       case '0x1::string::String':
       case 'bool':
+      case 'Bool':
       case 'u8':
+      case 'U8':
       case 'u16':
+      case 'U16':
       case 'u32':
+      case 'U32':
       case 'u64':
+      case 'U64':
       case 'u128':
+      case 'U128':
         return []
     }
 
@@ -103,30 +117,33 @@ export function parseMoveType(type: string): TypeDescriptor {
       const symbol = buffer.join('')
       buffer = []
       stack[stack.length - 1].qname = symbol
+      adjustType(stack[stack.length - 1])
       stack.push(new TypeDescriptor(''))
       continue
     }
     if (ch === '>') {
       const typeParam = stack.pop()
       if (!typeParam) {
-        throw Error('Uxpectecd stack size')
+        throw Error('Unexpected stack size')
       }
       if (buffer.length > 0) {
         typeParam.qname = buffer.join('')
         buffer = []
       }
+      adjustType(typeParam)
       stack[stack.length - 1].typeArgs.push(typeParam)
       continue
     }
     if (ch === ',') {
       const typeParam = stack.pop()
       if (!typeParam) {
-        throw Error('Uxpectecd stack size')
+        throw Error('Unexpected stack size')
       }
       if (buffer.length > 0) {
         typeParam.qname = buffer.join('')
         buffer = []
       }
+      adjustType(typeParam)
 
       stack[stack.length - 1].typeArgs.push(typeParam)
       // continue parse next param
@@ -140,10 +157,18 @@ export function parseMoveType(type: string): TypeDescriptor {
   if (buffer.length > 0) {
     stack[stack.length - 1].qname = buffer.join('')
   }
+  adjustType(stack[stack.length - 1])
 
   const res = stack.pop()
   if (!res || stack.length > 0) {
-    throw Error('Uxpectecd stack size')
+    throw Error('Unexpected stack size')
   }
   return res
+}
+
+function adjustType(type: TypeDescriptor) {
+  if (type.qname.startsWith('&')) {
+    type.reference = true
+    type.qname = type.qname.slice(1)
+  }
 }

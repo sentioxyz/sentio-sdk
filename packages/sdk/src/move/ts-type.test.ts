@@ -1,5 +1,5 @@
 import { assert } from 'chai'
-import { parseMoveType } from '../types.js'
+import { parseMoveType } from './types.js'
 
 describe('type gen', () => {
   test('type gen for generic', async () => {

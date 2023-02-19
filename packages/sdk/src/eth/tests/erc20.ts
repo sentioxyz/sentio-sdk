@@ -33,7 +33,7 @@ ERC20Processor.bind({
 ERC20Processor.bind({ address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', network: 56, name: 'usdc' })
   .onEventTransfer(
     async function (event, ctx) {
-      // ctx.meter.Counter('c2').add(2)
+      ctx.meter.Counter('c2').add(2)
       // const t: Promise<string> =
       // ctx.eventLogger.emit('transfer', { distinctId: event.args.from, xx: 33,  y: Promise.resolve("s")})
       // ctx.eventLogger.emit('transfer', { distinctId: event.args.from, x: { y: Promise.resolve("s")} })

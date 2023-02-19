@@ -1,10 +1,11 @@
 import { DataBinding, HandlerType } from '@sentio/protos'
 import { getChainId } from '../sui/network.js'
 import { TestProcessorServer } from './test-processor-server.js'
-import { parseMoveType } from '../aptos/types.js'
+import { parseMoveType } from '../move/types.js'
 import { SuiNetwork } from '../sui/index.js'
 import { MoveEvent, SuiTransactionResponse, MoveCall } from '@mysten/sui.js'
 import { getMoveCalls } from '../sui/utils.js'
+import { SPLITTER } from '../move/index.js'
 
 export class SuiFacet {
   server: TestProcessorServer
@@ -38,7 +39,7 @@ export class SuiFacet {
     if (calls.length !== 1) {
       throw Error('Transaction has more than one calls')
     }
-    const functionType = calls[0].package.objectId + calls[0].module + calls[0].function
+    const functionType = [calls[0].package.objectId, calls[0].module, calls[0].function].join(SPLITTER)
 
     for (const config of this.server.contractConfigs) {
       if (config.contract?.chainId !== getChainId(network)) {

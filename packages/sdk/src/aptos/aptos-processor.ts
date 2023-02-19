@@ -83,7 +83,7 @@ export class AptosBaseProcessor {
     return this
   }
 
-  public onEvent(
+  public onMoveEvent(
     handler: (event: EventInstance, ctx: AptosContext) => void,
     filter: EventFilter | EventFilter[],
     fetchConfig?: MoveFetchConfig

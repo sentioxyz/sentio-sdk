@@ -1,21 +1,20 @@
 import * as fs from 'fs'
-import * as path from 'path'
-import { format } from 'prettier'
-import { MoveFunction, MoveModule, MoveModuleBytecode, MoveStruct } from '../move-types.js'
-import { AccountModulesImportInfo, AccountRegister, generateType, normalizeToJSName } from './typegen.js'
-import { getMeaningfulFunctionParams, isFrameworkAccount, moduleQname, SPLITTER } from '../utils.js'
+import { MoveModuleBytecode, toNeutralModule } from '../move-types.js'
+import { moduleQname, SPLITTER, TypeDescriptor } from '../../move/index.js'
 import chalk from 'chalk'
-import { AptosNetwork, getAptosChainName } from '../network.js'
-import { parseMoveType } from '../types.js'
+import { AptosNetwork } from '../network.js'
 import { AptosClient } from 'aptos-sdk'
-import { camelCase } from 'lodash-es'
+import { getMeaningfulFunctionParams } from '../utils.js'
+import { NeutralMoveModule, NeutralMoveStruct } from '../../move/neutral-models.js'
+import { AbstractCodegen } from '../../move/abstract-codegen.js'
 
 export async function codegen(abisDir: string, outDir = 'src/types/aptos') {
   if (!fs.existsSync(abisDir)) {
     return
   }
   console.log(chalk.green('Generated Types for Aptos'))
-  await generate(abisDir, outDir)
+  const gen = new AptosCodegen()
+  await gen.generate(abisDir, outDir)
 }
 
 function getRpcEndpoint(network: AptosNetwork): string {
@@ -30,432 +29,47 @@ function getRpcClient(network: AptosNetwork): AptosClient {
   return new AptosClient(getRpcEndpoint(network))
 }
 
-async function generate(srcDir: string, outputDir: string) {
-  await generateForNetwork(srcDir, outputDir, AptosNetwork.MAIN_NET)
-  await generateForNetwork(path.join(srcDir, 'testnet'), path.join(outputDir, 'testnet'), AptosNetwork.TEST_NET)
-}
+class AptosCodegen extends AbstractCodegen<MoveModuleBytecode[], AptosNetwork> {
+  ADDRESS_TYPE = 'Address'
+  MAIN_NET = AptosNetwork.MAIN_NET
+  TEST_NET = AptosNetwork.TEST_NET
+  PREFIX = 'Aptos'
 
-async function generateForNetwork(srcDir: string, outputDir: string, network: AptosNetwork) {
-  if (!fs.existsSync(srcDir)) {
-    return
+  async fetchModules(account: string, network: AptosNetwork): Promise<MoveModuleBytecode[]> {
+    const client = getRpcClient(network)
+    return await client.getAccountModules(account)
   }
-  if (network === AptosNetwork.TEST_NET) {
-    console.log('Found testnet directory, generate code for testnet modules')
+
+  toNeutral(modules: MoveModuleBytecode[]): NeutralMoveModule[] {
+    return modules.flatMap((m) => (m.abi ? [toNeutralModule(m)] : []))
   }
-  const files = fs.readdirSync(srcDir)
-  outputDir = path.resolve(outputDir)
-  const outputs: OutputFile[] = []
 
-  fs.mkdirSync(outputDir, { recursive: true })
+  getMeaningfulFunctionParams(params: TypeDescriptor[]): TypeDescriptor[] {
+    return getMeaningfulFunctionParams(params)
+  }
 
-  const loader = new AccountRegister()
+  getEventStructs(module: NeutralMoveModule) {
+    const qname = moduleQname(module)
+    const structMap = new Map<string, NeutralMoveStruct>()
+    const eventMap = new Map<string, NeutralMoveStruct>()
 
-  // when generating user code, don't need to generate framework account
-  loader.accountImports.set('0x1', new AccountModulesImportInfo('0x1', '0x1'))
-  loader.accountImports.set('0x2', new AccountModulesImportInfo('0x2', '0x2'))
-  loader.accountImports.set('0x3', new AccountModulesImportInfo('0x3', '0x3'))
-  const client = getRpcClient(network)
-
-  for (const file of files) {
-    if (!file.endsWith('.json')) {
-      continue
+    for (const struct of module.structs) {
+      structMap.set(qname + SPLITTER + struct.name, struct)
     }
-    const fullPath = path.resolve(srcDir, file)
-    const modules = JSON.parse(fs.readFileSync(fullPath, 'utf-8'))
 
-    for (const module of modules) {
-      if (module.abi) {
-        loader.register(module.abi, path.basename(file, '.json'))
-      }
-    }
-    const codeGen = new AccountCodegen(loader, modules, {
-      fileName: path.basename(file, '.json'),
-      outputDir: outputDir,
-      network,
-    })
-
-    outputs.push(...codeGen.generate())
-  }
-
-  while (loader.pendingAccounts.size > 0) {
-    for (const account of loader.pendingAccounts) {
-      console.log(`download dependent module for account ${account} at ${getAptosChainName(network)}`)
-
-      try {
-        const modules = await client.getAccountModules(account)
-        fs.writeFileSync(path.resolve(srcDir, account + '.json'), JSON.stringify(modules, null, '\t'))
-
-        for (const module of modules) {
-          if (module.abi) {
-            loader.register(module.abi, account)
+    for (const struct of module.structs) {
+      for (const field of struct.fields) {
+        const t = field.type
+        if (t.qname === '0x1::event::EventHandle') {
+          const event = t.typeArgs[0].qname
+          const eventStruct = structMap.get(event)
+          if (eventStruct) {
+            eventMap.set(event, eventStruct)
           }
         }
-        const codeGen = new AccountCodegen(loader, modules, {
-          fileName: account,
-          outputDir: outputDir,
-          network,
-        })
-
-        outputs.push(...codeGen.generate())
-      } catch (e) {
-        console.error(
-          chalk.red(
-            'Error downloading account module, check if you choose the right network，or download account modules manually into your director'
-          )
-        )
-        console.error(e)
-        process.exit(1)
-      }
-    }
-  }
-
-  for (const output of outputs) {
-    const content = format(output.fileContent, { parser: 'typescript' })
-    fs.writeFileSync(path.join(outputDir, output.fileName), content)
-  }
-
-  const rootFile = path.join(outputDir, 'index.ts')
-  fs.writeFileSync(
-    rootFile,
-    `/* Autogenerated file. Do not edit manually. */
-/* tslint:disable */
-/* eslint-disable */
-`
-  )
-  for (const output of outputs) {
-    const parsed = path.parse(output.fileName)
-    const content = `export * as _${parsed.name} from './${parsed.name}.js'\n`
-    fs.appendFileSync(rootFile, content)
-  }
-}
-
-interface OutputFile {
-  fileName: string
-  fileContent: string
-}
-
-interface Config {
-  fileName: string
-  outputDir: string
-  network: AptosNetwork
-}
-
-export class AccountCodegen {
-  modules: MoveModuleBytecode[]
-  config: Config
-  loader: AccountRegister
-
-  constructor(loader: AccountRegister, modules: MoveModuleBytecode[], config: Config) {
-    // const json = fs.readFileSync(config.srcFile, 'utf-8')
-    this.modules = modules
-    this.config = config
-    this.loader = loader
-  }
-
-  generate(): OutputFile[] {
-    if (!this.modules) {
-      return []
-    }
-    // const baseName = path.basename(this.config.fileName, '.json')
-
-    let address: string | undefined
-    for (const module of this.modules) {
-      if (module.abi && module.abi.address) {
-        address = module.abi.address
-      }
-    }
-    if (!address) {
-      return []
-    }
-
-    const imports = `
-    import { CallFilter } from "@sentio/sdk/move"
-    import { 
-      MoveCoder, AptosBindOptions, AptosBaseProcessor, 
-      TypedEventInstance, AptosNetwork, TypedEntryFunctionPayload,
-      AptosContext } from "@sentio/sdk/aptos"
-    import { MoveFetchConfig } from "@sentio/protos"
-    import { Address, MoveModule } from "@sentio/sdk/aptos"
-    `
-
-    const dependedAccounts: string[] = []
-
-    const moduleImports: string[] = []
-
-    const info = this.loader.accountImports.get(address)
-
-    if (info) {
-      for (const [account] of info.imports.entries()) {
-        // Remap to user's filename if possible, TODO codepath not well tested
-        const tsAccountModule = './' + (this.loader.accountImports.get(account)?.moduleName || account)
-        if (isFrameworkAccount(account) && !isFrameworkAccount(address)) {
-          // Decide where to find runtime library
-          moduleImports.push(`import { _${account} } from "@sentio/sdk/aptos/builtin"`)
-        } else {
-          moduleImports.push(`import * as _${account} from "${tsAccountModule}.js"`)
-        }
-
-        dependedAccounts.push(account)
       }
     }
 
-    const source = `
-    /* Autogenerated file. Do not edit manually. */
-    /* tslint:disable */
-    /* eslint-disable */
-  
-    /* Generated modules for account ${address} */
-  
-    ${imports}
-    
-    ${moduleImports.join('\n')}
-    
-    ${this.modules.map((m) => generateModule(m, this.config.network)).join('\n')}
-    
-    export function loadAllTypes(_r: MoveCoder) {
-      ${dependedAccounts.map((a) => `_${a}.loadAllTypes(_r)`).join('\n')}
-
-      ${this.modules
-        .map((m) => {
-          if (m.abi) {
-            return `_r.load(${normalizeToJSName(m.abi.name)}.ABI)`
-          }
-          console.error('Find Module with empty ABI')
-          return ''
-        })
-        .join('\n')}
-    }
-    ` // source
-
-    return [
-      {
-        fileName: this.config.fileName + '.ts',
-        fileContent: source,
-      },
-    ]
+    return eventMap
   }
-}
-
-function generateNetworkOption(network: AptosNetwork) {
-  switch (network) {
-    case AptosNetwork.TEST_NET:
-      return 'TEST_NET'
-  }
-  return 'MAIN_NET'
-}
-
-function generateModule(moduleByteCode: MoveModuleBytecode, network: AptosNetwork) {
-  if (!moduleByteCode.abi) {
-    return ''
-  }
-  const module = moduleByteCode.abi
-
-  const functions = module.exposed_functions.map((f) => generateOnEntryFunctions(module, f)).filter((s) => s !== '')
-
-  const eventStructs = getEventStructs(module)
-  const eventTypes = new Set(eventStructs.keys())
-  const events = Array.from(eventStructs.values())
-    .map((e) => generateOnEvents(module, e))
-    .filter((s) => s !== '')
-  const structs = module.structs.map((s) => generateStructs(module, s, eventTypes))
-  const callArgs = module.exposed_functions.map((f) => generateCallArgsStructs(module, f))
-
-  const moduleName = normalizeToJSName(module.name)
-  let processor = ''
-  if (functions.length > 0 || events.length > 0) {
-    processor = `export class ${moduleName} extends AptosBaseProcessor {
-
-    constructor(options: AptosBindOptions) {
-      super("${module.name}", options)
-    }
-    static DEFAULT_OPTIONS: AptosBindOptions = {
-      address: "${module.address}",
-      network: AptosNetwork.${generateNetworkOption(network)}       
-    }
-
-    static bind(options: Partial<AptosBindOptions> = {}): ${moduleName} {
-      return new ${moduleName}({ ...${moduleName}.DEFAULT_OPTIONS, ...options })
-    }
-    
-    ${functions.join('\n')}
-    
-    ${events.join('\n')}
-    
-    loadTypesInternal(registry: MoveCoder) {
-      loadAllTypes(registry)
-    }
-  }
-  `
-  }
-
-  return `
-  ${processor}
-
-  export namespace ${moduleName} {
-    ${structs.join('\n')}
-    
-    ${callArgs.join('\n')}
-       
-    export function loadTypes(_r: MoveCoder) {
-      loadAllTypes(_r)
-    }
-    export const ABI: MoveModule = JSON.parse('${JSON.stringify(module)}')
- }
-  `
-}
-
-function generateStructs(module: MoveModule, struct: MoveStruct, events: Set<string>) {
-  const genericString = generateStructTypeParameters(struct)
-  const genericStringAny = generateStructTypeParameters(struct, true)
-
-  const structName = normalizeToJSName(struct.name)
-
-  const fields = struct.fields.map((field) => {
-    return `${field.name}: ${generateType(field.type, module.address)}`
-  })
-
-  let eventPayload = ''
-  if (events.has(moduleQname(module) + SPLITTER + struct.name)) {
-    eventPayload = `
-    export interface ${structName}Instance extends 
-        TypedEventInstance<${structName}${genericStringAny}> {
-      data_decoded: ${structName}${genericStringAny}
-      type_arguments: [${struct.generic_type_params.map((_) => 'string').join(', ')}]
-    }
-    `
-  }
-
-  return `
-  export class ${structName}${genericString} {
-    static TYPE_QNAME = '${module.address}::${module.name}::${struct.name}'
-    ${fields.join('\n')} 
-  }
-  
-  ${eventPayload}
-  `
-}
-
-function generateFunctionTypeParameters(func: MoveFunction) {
-  let genericString = ''
-  if (func.generic_type_params && func.generic_type_params.length > 0) {
-    const params = func.generic_type_params
-      .map((v, idx) => {
-        return `T${idx}=any`
-      })
-      .join(',')
-    genericString = `<${params}>`
-  }
-  return genericString
-}
-
-function generateStructTypeParameters(struct: MoveStruct, useAny = false) {
-  let genericString = ''
-
-  if (struct.generic_type_params && struct.generic_type_params.length > 0) {
-    const params = struct.generic_type_params
-      .map((v, idx) => {
-        return useAny ? 'any' : 'T' + idx
-      })
-      .join(',')
-    genericString = `<${params}>`
-  }
-  return genericString
-}
-
-function generateCallArgsStructs(module: MoveModule, func: MoveFunction) {
-  if (!func.is_entry) {
-    return
-  }
-
-  const fields = getMeaningfulFunctionParams(func).map((param) => {
-    return `${generateType(param, module.address)}`
-  })
-
-  const camelFuncName = capitalizeFirstChar(camelCase(func.name))
-
-  const genericString = generateFunctionTypeParameters(func)
-  return `
-  export interface ${camelFuncName}Payload${genericString}
-      extends TypedEntryFunctionPayload<[${fields.join(',')}]> {
-    arguments_decoded: [${fields.join(',')}],
-    type_arguments: [${func.generic_type_params.map((_) => 'string').join(', ')}]
-  }
-  `
-}
-
-function generateOnEntryFunctions(module: MoveModule, func: MoveFunction) {
-  if (!func.is_entry) {
-    return ''
-  }
-
-  // const genericString = generateFunctionTypeParameters(func)
-  const moduleName = normalizeToJSName(module.name)
-
-  const camelFuncName = capitalizeFirstChar(camelCase(func.name))
-  const source = `
-  onEntry${camelFuncName}(func: (call: ${moduleName}.${camelFuncName}Payload, ctx: AptosContext) => void, filter?: CallFilter, fetchConfig?: MoveFetchConfig): ${moduleName} {
-    this.onEntryFunctionCall(func, {
-      ...filter,
-      function: '${module.name}::${func.name}'
-    },
-    fetchConfig)
-    return this
-  }`
-
-  return source
-}
-
-function getEventStructs(module: MoveModule) {
-  const qname = moduleQname(module)
-  const structMap = new Map<string, MoveStruct>()
-  const eventMap = new Map<string, MoveStruct>()
-
-  for (const struct of module.structs) {
-    structMap.set(qname + SPLITTER + struct.name, struct)
-  }
-
-  for (const struct of module.structs) {
-    for (const field of struct.fields) {
-      const t = parseMoveType(field.type)
-      if (t.qname === '0x1::event::EventHandle') {
-        const event = t.typeArgs[0].qname
-        const eventStruct = structMap.get(event)
-        if (eventStruct) {
-          eventMap.set(event, eventStruct)
-        }
-      }
-    }
-  }
-
-  return eventMap
-}
-
-function generateOnEvents(module: MoveModule, struct: MoveStruct): string {
-  // for struct that has drop + store
-  // if (!isEvent(struct, module)) {
-  //   return ''
-  // }
-
-  // const genericString = generateStructTypeParameters(struct)
-
-  const moduleName = normalizeToJSName(module.name)
-  const source = `
-  onEvent${struct.name}(func: (event: ${moduleName}.${normalizeToJSName(
-    struct.name
-  )}Instance, ctx: AptosContext) => void, fetchConfig?: MoveFetchConfig): ${moduleName} {
-    this.onEvent(func, {
-      type: '${module.name}::${struct.name}'
-    },
-    fetchConfig)
-    return this
-  }
-  `
-  return source
-}
-
-function capitalizeFirstChar(input: string): string {
-  if (!input) {
-    return input
-  }
-  return input[0].toUpperCase() + (input.length > 1 ? input.substring(1) : '')
 }

@@ -25,13 +25,3 @@ export type TypedMoveResource<T> = MoveResource & {
   data_decoded: T
   type_arguments: string[]
 }
-
-export interface StructWithTag {
-  type: string
-  data: any
-}
-
-export interface StructWithType<T> extends StructWithTag {
-  data_decoded: T
-  type_arguments: string[]
-}

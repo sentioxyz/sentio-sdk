@@ -14,13 +14,13 @@ describe('Test EVM codegen', () => {
   jest.setTimeout(200000)
   test('code gen for evm', async () => {
     // const codeGenFolder = fs.mkdtempSync(path.join(os.tmpdir(), 'codegen_test'))
-    const codeGenFolder = path.resolve(__dirname, 'types/eth/test')
+    const codeGenFolder = path.resolve(__dirname, 'types/eth')
 
     console.log('source code generated to ' + codeGenFolder)
 
     await codegen(path.resolve(__dirname, 'abis/eth'), codeGenFolder)
     expect(fs.existsSync(codeGenFolder)).toEqual(true)
-    expect(fs.readdirSync(codeGenFolder).length).toEqual(6)
+    expect(fs.readdirSync(codeGenFolder).length).toEqual(8)
   })
 
   // afterAll(() => {

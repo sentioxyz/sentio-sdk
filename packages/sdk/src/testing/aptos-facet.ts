@@ -3,7 +3,7 @@ import { DataBinding, HandlerType } from '@sentio/protos'
 import { getChainId } from '../aptos/network.js'
 import { TestProcessorServer } from './test-processor-server.js'
 import { AptosNetwork, Event } from '@sentio/sdk/aptos'
-import { parseMoveType } from '../aptos/types.js'
+import { parseMoveType } from '../move/types.js'
 
 export class AptosFacet {
   server: TestProcessorServer
