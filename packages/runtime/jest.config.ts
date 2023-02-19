@@ -4,5 +4,6 @@ export default {
   modulePathIgnorePatterns: ['<rootDir>/lib/'],
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1',
+    '^@sentio/runtime(.*)$': '<rootDir>/src/$1',
   },
 }

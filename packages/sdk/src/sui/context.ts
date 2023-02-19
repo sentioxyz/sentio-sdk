@@ -1,5 +1,5 @@
 import { RecordMetaData } from '@sentio/protos'
-import { type Labels, BaseContext, normalizeLabels } from '@sentio/sdk'
+import { type Labels, BaseContext, normalizeLabels } from '../index.js'
 import { SuiNetwork, getChainId } from './network.js'
 import { SuiTransactionResponse } from '@mysten/sui.js'
 
