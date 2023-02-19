@@ -14,6 +14,12 @@ export class BindOptions {
 export function getOptionsSignature(opts: BindOptions): string {
   const sig = [opts.address]
   if (opts.network) {
+    if (typeof opts.network === 'string') {
+      const asInt = parseInt(opts.network)
+      if (Number.isFinite(asInt)) {
+        opts.network = asInt
+      }
+    }
     sig.push(Network.from(opts.network).chainId.toString())
   }
   if (opts.name) {
