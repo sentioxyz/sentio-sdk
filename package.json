@@ -35,7 +35,7 @@
     "typescript": "^4.9.5"
   },
   "resolutions": {
-    "ethers": "npm:@sentio/ethers@6.0.2-patch.1"
+    "ethers": "npm:@sentio/ethers@6.0.5-patch.1"
   },
   "scripts": {
     "cleanjest": "yarn jest --clearCache",

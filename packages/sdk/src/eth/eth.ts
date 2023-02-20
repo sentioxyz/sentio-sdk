@@ -1,6 +1,22 @@
-import { BlockTag, LogParams } from 'ethers/providers'
+import {
+  BlockTag,
+  LogParams,
+  formatBlock,
+  formatLog,
+  TransactionReceiptParams,
+  formatTransactionResponse,
+  allowNull,
+  arrayOf,
+  formatHash,
+  formatReceiptLog,
+  object,
+  formatData,
+} from 'ethers/providers'
 import { CallExceptionError, Result, LogDescription } from 'ethers'
 import { ContractContext } from './context.js'
+import { Trace } from './trace.js'
+import { getAddress } from 'ethers/address'
+import { getBigInt, getNumber, hexlify } from 'ethers/utils'
 
 export interface EthEvent<TArgsArray extends Array<any> = any, TArgsObject = any> extends LogParams {
   args: TArgsArray & TArgsObject & Result
@@ -67,4 +83,59 @@ export function decodeResult(result: LogDescription): any {
     decoded.push(result.args[i])
   }
   return decoded
+}
+
+const _formatTransactionReceipt = object(
+  {
+    to: allowNull(getAddress, null),
+    from: allowNull(getAddress, null),
+    contractAddress: allowNull(getAddress, null),
+    // should be allowNull(hash), but broken-EIP-658 support is handled in receipt
+    index: getNumber,
+    root: allowNull(hexlify),
+    gasUsed: getBigInt,
+    logsBloom: allowNull(formatData),
+    blockHash: formatHash,
+    hash: formatHash,
+    logs: allowNull(arrayOf(formatReceiptLog)), // Only thing that different
+    blockNumber: getNumber,
+    //confirmations: allowNull(getNumber, null),
+    cumulativeGasUsed: getBigInt,
+    effectiveGasPrice: allowNull(getBigInt),
+    status: allowNull(getNumber),
+    type: allowNull(getNumber, 0),
+  },
+  {
+    effectiveGasPrice: ['gasPrice'],
+    hash: ['transactionHash'],
+    index: ['transactionIndex'],
+  }
+)
+
+function formatTransactionReceipt(value: any): TransactionReceiptParams {
+  return _formatTransactionReceipt(value)
+}
+
+export function formatEthData(data: {
+  log?: any
+  block?: any
+  trace?: any
+  transaction?: any
+  transactionReceipt?: any
+}) {
+  const log = data.log ? formatLog(data.log) : undefined
+  if (data.block && !data.block.transactions) {
+    data.block.transactions = []
+  }
+  const block = data.block ? formatBlock(data.block) : undefined
+  const trace = data.trace ? (data.trace as Trace) : undefined
+  const transaction = data.transaction ? formatTransactionResponse(data.transaction) : undefined
+  const transactionReceipt = data.transactionReceipt ? formatTransactionReceipt(data.transactionReceipt) : undefined
+  return {
+    log,
+    block,
+    trace,
+    transaction,
+    transactionReceipt,
+  }
 }

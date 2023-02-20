@@ -5,6 +5,7 @@ import { expect } from 'chai'
 import { firstCounterValue, firstGaugeValue, TestProcessorServer } from '@sentio/sdk/testing'
 import { mockTransferLog } from '../builtin/erc20.js'
 import { HandlerType } from '@sentio/protos'
+import { BlockParams } from 'ethers/providers'
 
 describe('Test Basic Examples', () => {
   const service = new TestProcessorServer(async () => {
@@ -76,11 +77,19 @@ describe('Test Basic Examples', () => {
     expect(config).deep.equals(config2)
   })
 
-  const blockData = {
+  const blockData: BlockParams = {
     hash: '0x2b9b7cce1f17f3b7e1f3c2472cc806a07bee3f0baca07d021350950d81d73a42',
+    parentHash: '0x2b9b7cce1f17f3b7e1f3c2472cc806a07bee3f0baca07d021350950d81d73a41',
+    difficulty: 1n,
     number: 14373295,
     timestamp: 1647106437,
     extraData: '0xe4b883e5bda9e7a59ee4bb99e9b1bc493421',
+    nonce: '0x689056015818adbe',
+    gasLimit: 0n,
+    gasUsed: 0n,
+    miner: '0xbb7b8287f3f0a933474a79eae42cbca977791171',
+    baseFeePerGas: null,
+    transactions: [],
   }
 
   test('Check trace dispatch', async () => {

@@ -5046,10 +5046,10 @@ ethereumjs-util@^6.0.0, ethereumjs-util@^6.2.1:
     ethjs-util "0.1.6"
     rlp "^2.2.3"
 
-ethers@5.7.2, ethers@^5.6.4, "ethers@npm:@sentio/ethers@6.0.2-patch.1", "ethers@npm:@sentio/ethers@^6.0.2":
-  version "6.0.2-patch.1"
-  resolved "https://registry.yarnpkg.com/@sentio/ethers/-/ethers-6.0.2-patch.1.tgz#c1460aa3047f4bad5f50d47166f8736d1a47db96"
-  integrity sha512-D4aPByC1P3nN1ERd6MT9u2H4zWEPNN8rUxnU+cF1fx2tFYiTafK4Ht5vW4M1DWGnYAMzky9rDI8O5gwtRfRvIA==
+ethers@5.7.2, ethers@^5.6.4, "ethers@npm:@sentio/ethers@6.0.5-patch.1", "ethers@npm:@sentio/ethers@^6.0.5-patch.1":
+  version "6.0.5-patch.1"
+  resolved "https://registry.yarnpkg.com/@sentio/ethers/-/ethers-6.0.5-patch.1.tgz#473f7f4f103d3b1f2a4c916653321f2219627e6e"
+  integrity sha512-SnOgGjaNn/GzlQhkcPJR8sgslB3AxFTCjFT7klMWByPhAnbHhjGSgOsBZkmVcE1toT9iDXI/2IWUlKKV7vmbxA==
   dependencies:
     "@adraffy/ens-normalize" "1.8.9"
     "@noble/hashes" "1.1.2"

@@ -1,5 +1,5 @@
-import { TransactionReceipt, BaseContract, Transaction, DeferredTopicFilter } from 'ethers'
-import { LogParams, BlockParams, Network } from 'ethers/providers'
+import { BaseContract, DeferredTopicFilter } from 'ethers'
+import { BlockParams, Network } from 'ethers/providers'
 
 import { BoundContractView, ContractContext, ContractView } from './context.js'
 import {
@@ -15,7 +15,7 @@ import { BindInternalOptions, BindOptions } from './bind-options.js'
 import { PromiseOrVoid } from '../promise-or-void.js'
 import { Trace } from './trace.js'
 import { ServerError, Status } from 'nice-grpc'
-import { decodeResult, EthEvent } from './eth.js'
+import { decodeResult, EthEvent, formatEthData } from './eth.js'
 
 export interface AddressOrTypeEventFilter extends DeferredTopicFilter {
   addressType?: AddressType
@@ -97,11 +97,10 @@ export abstract class BaseProcessor<
       filters: _filters,
       fetchConfig: fetchConfig || EthFetchConfig.fromPartial({}),
       handler: async function (data: Data_EthLog) {
-        if (!data.log) {
+        const { log, block, transaction, transactionReceipt } = formatEthData(data)
+        if (!log) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'Log is empty')
         }
-        const log = data.log as LogParams
-
         const contractView = processor.CreateBoundContractView()
 
         const ctx = new ContractContext<TContract, TBoundContractView>(
@@ -109,11 +108,11 @@ export abstract class BaseProcessor<
           contractView,
           chainId,
           data.timestamp,
-          data.block as BlockParams,
+          block,
           log,
           undefined,
-          data.transaction as Transaction,
-          data.transactionReceipt as TransactionReceipt
+          transaction,
+          transactionReceipt
         )
         const logParam = log as any as { topics: Array<string>; data: string }
 
@@ -164,10 +163,11 @@ export abstract class BaseProcessor<
 
     this.blockHandlers.push({
       handler: async function (data: Data_EthBlock) {
-        if (!data.block) {
+        const { block } = formatEthData(data)
+
+        if (!block) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'Block is empty')
         }
-        const block = data.block as BlockParams
 
         const contractView = processor.CreateBoundContractView()
 
@@ -220,11 +220,12 @@ export abstract class BaseProcessor<
         const contractView = processor.CreateBoundContractView()
         const contractInterface = contractView.rawContract.interface
         const fragment = contractInterface.getFunction(signature)
-        if (!data.trace || !fragment) {
+        const { trace, block, transaction, transactionReceipt } = formatEthData(data)
+        if (!trace || !fragment) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'trace is null')
         }
-        const trace = data.trace as Trace
-        if (!trace.action.input) {
+        // const trace = data.trace as Trace
+        if (!trace?.action.input) {
           return ProcessResult.fromPartial({})
         }
         const traceData = '0x' + trace.action.input.slice(10)
@@ -235,11 +236,11 @@ export abstract class BaseProcessor<
           contractView,
           chainId,
           data.timestamp,
-          data.block as BlockParams,
+          block,
           undefined,
           trace,
-          data.transaction as Transaction,
-          data.transactionReceipt as TransactionReceipt
+          transaction,
+          transactionReceipt
         )
         await handler(trace, ctx)
         return ctx.getProcessResult()

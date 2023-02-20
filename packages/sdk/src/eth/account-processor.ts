@@ -2,7 +2,7 @@ import { ERC20__factory, ERC721__factory } from './builtin/internal/index.js'
 import { AddressType, EthFetchConfig, ProcessResult } from '@sentio/protos'
 import { AccountBindOptions } from './bind-options.js'
 
-import { Network, LogParams } from 'ethers/providers'
+import { Network } from 'ethers/providers'
 
 import { TransferEvent as ERC20TransferEvent, ERC20Processor } from './builtin/erc20.js'
 import { TransferEvent as ERC721TransferEvent, ERC721Processor } from './builtin/erc721.js'
@@ -10,8 +10,9 @@ import { TransferEvent as ERC721TransferEvent, ERC721Processor } from './builtin
 import { AccountContext } from './context.js'
 import { PromiseOrVoid } from '../promise-or-void.js'
 import { AddressOrTypeEventFilter, EventsHandler } from './base-processor.js'
-import { Transaction, Block, TransactionReceipt, LogDescription } from 'ethers'
+import { Block, LogDescription } from 'ethers'
 import { AccountProcessorState } from './account-processor-state.js'
+import { formatEthData } from './eth.js'
 
 const ERC20_INTERFACE = ERC20__factory.createInterface()
 const ERC721_INTERFACE = ERC721__factory.createInterface()
@@ -233,18 +234,21 @@ export class AccountProcessor {
       filters: _filters,
       fetchConfig: fetchConfig || EthFetchConfig.fromPartial({}),
       handler: async function (data) {
-        const log = data.log as { topics: Array<string>; data: string }
+        const { log, block, transaction, transactionReceipt } = formatEthData(data)
+
+        // const log = data.log as { topics: Array<string>; data: string }
         const ctx = new AccountContext(
           chainId,
           config.address,
           data.timestamp,
           data.block as Block,
-          log as any as LogParams,
+          log,
           undefined,
-          data.transaction as Transaction,
-          data.transactionReceipt as TransactionReceipt
+          transaction,
+          transactionReceipt
         )
-        const parsed = ERC20_INTERFACE.parseLog(log)
+        const logParam = log as any as { topics: Array<string>; data: string }
+        const parsed = ERC20_INTERFACE.parseLog(logParam)
         if (parsed) {
           await handler(parsed, ctx)
           return ctx.getProcessResult()
