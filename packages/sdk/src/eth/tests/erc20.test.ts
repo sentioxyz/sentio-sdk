@@ -2,7 +2,7 @@
 
 import { expect } from 'chai'
 
-import { TestProcessorServer, firstCounterValue, firstGaugeValue } from '@sentio/sdk/testing'
+import { firstCounterValue, firstGaugeValue, TestProcessorServer } from '@sentio/sdk/testing'
 import { mockTransferLog } from '../builtin/erc20.js'
 import { HandlerType } from '@sentio/protos'
 
@@ -47,7 +47,6 @@ describe('Test Basic Examples', () => {
       to: '0xB329e39Ebefd16f40d38f07643652cE17Ca5Bac1',
       value: BigInt('0x9a71db64810aaa0000'),
     })
-
     let res = await service.eth.testLog(logData)
 
     const counters = res.result?.counters
@@ -85,7 +84,35 @@ describe('Test Basic Examples', () => {
   }
 
   test('Check trace dispatch', async () => {
-    const res = (await service.eth.testTrace(traceData)).result
+    // const res = (await service.eth.testTrace(traceData)).result
+
+    const res = (
+      await service.processBinding({
+        data: {
+          ethTrace: {
+            trace: traceData,
+            transaction: undefined,
+            transactionReceipt: {
+              transactionHash: '0xcb8810a23315b5c2cb836883959bbf982f2158b7d9f7f8f4c5c0a8cf9d90f720',
+              gasUsed: '0x4cf12',
+              blockHash: '0x74f3c24a0f27a3a6afa8878a2072d62f661b03d04ead2b99c7f6c33acff2e7c2',
+              status: '0x1',
+              logsBloom:
+                '0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
+              transactionIndex: '0x50',
+              contractAddress: '0x0000000000000000000000000000000000000000',
+              blockNumber: '0xb8ba23',
+              type: '0x0',
+              cumulativeGasUsed: '0x8b56b3',
+            },
+            timestamp: new Date(),
+          },
+        },
+        handlerIds: [0],
+        handlerType: HandlerType.ETH_TRACE,
+      })
+    ).result
+
     expect(res?.counters).length(1)
   })
 

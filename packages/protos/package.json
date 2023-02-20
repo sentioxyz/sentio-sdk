@@ -18,8 +18,6 @@
     "./chainquery": "./lib/chainquery/protos/chainquery.js"
   },
   "files": [
-    "{lib,src}",
-    "!{lib,src}/tests",
-    "!**/*.test.{js,ts}"
+    "{lib,src}"
   ]
 }

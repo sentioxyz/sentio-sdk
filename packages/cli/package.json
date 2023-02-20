@@ -9,12 +9,11 @@
     "build": "yarn compile",
     "postbuild": "../../scripts/link-bin.sh",
     "cli": "ts-node-esm src/cli.ts",
-    "test": "jest",
     "pub": "yarn build && yarn publish --no-git-tag-version"
   },
   "dependencies": {
     "@jest/types": "^29.4.1",
-    "@mysten/sui.js": "npm:@sentio/sui.js@0.27.0",
+    "@mysten/sui.js": "npm:@sentio/sui.js@0.17.0",
     "@types/jest": "^29.0.0",
     "@types/node": "^18.11.18",
     "aptos-sdk": "npm:@sentio/aptos@^1.6.0",
@@ -51,7 +50,6 @@
   },
   "files": [
     "{lib,src,templates}",
-    "!{lib,src}/tests",
     "!**/*.test.{js,ts}"
   ],
   "engines": {
