@@ -41,6 +41,9 @@ class SuiCodegen extends AbstractCodegen<SuiMoveNormalizedModules, SuiNetwork> {
   }
 
   getMeaningfulFunctionParams(params: TypeDescriptor[]): TypeDescriptor[] {
+    if (params.length === 0) {
+      return params
+    }
     return params.slice(0, params.length - 1)
   }
 
