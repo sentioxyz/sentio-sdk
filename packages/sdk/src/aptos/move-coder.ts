@@ -6,9 +6,10 @@ import {
   TransactionPayload_EntryFunctionPayload,
 } from './move-types.js'
 
-import { TypedEventInstance, TypedMoveResource, TypedEntryFunctionPayload } from './models.js'
+import { TypedEventInstance, TypedMoveResource, TypedFunctionPayload } from './models.js'
 import { getMeaningfulFunctionParams } from './utils.js'
 import { AbstractMoveCoder } from '../move/abstract-move-coder.js'
+import { TypeDescriptor } from '../move/index.js'
 
 export class MoveCoder extends AbstractMoveCoder<Event | MoveResource> {
   load(module: MoveModuleBytecode) {
@@ -34,26 +35,19 @@ export class MoveCoder extends AbstractMoveCoder<Event | MoveResource> {
     return this.filterAndDecodeInternal(typeQname, resources)
   }
 
-  decodeFunctionPayload(payload: TransactionPayload_EntryFunctionPayload): TransactionPayload_EntryFunctionPayload {
-    const argumentsTyped: any[] = []
+  getMeaningfulFunctionParams(params: TypeDescriptor[]): TypeDescriptor[] {
+    return getMeaningfulFunctionParams(params)
+  }
 
-    try {
-      const func = this.getMoveFunction(payload.function)
-      const params = getMeaningfulFunctionParams(func.params)
-      for (const [idx, arg] of payload.arguments.entries()) {
-        // TODO consider apply payload.type_arguments, but this might be hard since we don't code gen for them
-        const argType = params[idx]
-        argumentsTyped.push(this.decode(arg, argType))
-      }
-    } catch (e) {
-      console.error('Decoding error for ', JSON.stringify(payload), e)
-      return payload
-    }
+  decodeFunctionPayload(payload: TransactionPayload_EntryFunctionPayload): TransactionPayload_EntryFunctionPayload {
+    const func = this.getMoveFunction(payload.function)
+    const params = getMeaningfulFunctionParams(func.params)
+    const argumentsDecoded = this.decodeArray(payload.arguments, params)
 
     return {
       ...payload,
-      arguments_decoded: argumentsTyped,
-    } as TypedEntryFunctionPayload<any>
+      arguments_decoded: argumentsDecoded,
+    } as TypedFunctionPayload<any>
   }
 }
 

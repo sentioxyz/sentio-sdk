@@ -34,6 +34,7 @@ class AptosCodegen extends AbstractCodegen<MoveModuleBytecode[], AptosNetwork> {
   MAIN_NET = AptosNetwork.MAIN_NET
   TEST_NET = AptosNetwork.TEST_NET
   PREFIX = 'Aptos'
+  // GENERATED_CLIENT = true
 
   async fetchModules(account: string, network: AptosNetwork): Promise<MoveModuleBytecode[]> {
     const client = getRpcClient(network)

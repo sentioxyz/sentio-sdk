@@ -52,7 +52,7 @@ export function generateTypeForDescriptor(type: TypeDescriptor, currentAddress: 
   if (simpleName.length === 0) {
     console.error('unexpected error')
   }
-  if (simpleName.toLowerCase().includes(VECTOR_STR)) {
+  if (simpleName.toLowerCase() === VECTOR_STR || simpleName.toLowerCase().startsWith(VECTOR_STR + SPLITTER)) {
     console.error('unexpected vector type error')
   }
   if (type.typeArgs.length > 0) {

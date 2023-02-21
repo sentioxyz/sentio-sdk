@@ -1,4 +1,5 @@
 import { CHAIN_IDS, getChainName } from '../core/chain.js'
+import { AptosClient } from 'aptos-sdk'
 
 export enum AptosNetwork {
   MAIN_NET = 1,
@@ -25,5 +26,6 @@ export function getAptosChainName(network: AptosNetwork): string {
 export class AptosBindOptions {
   address: string
   network?: AptosNetwork = AptosNetwork.MAIN_NET
+  client?: AptosClient
   startVersion?: bigint | number
 }

@@ -6,6 +6,7 @@ import { AbstractCodegen } from '../../move/abstract-codegen.js'
 import { JsonRpcProvider, SuiMoveNormalizedModules } from '@mysten/sui.js'
 import { toInternalModule } from '../move-types.js'
 import { moduleQname, SPLITTER, TypeDescriptor } from '../../move/index.js'
+import { getMeaningfulFunctionParams } from '../utils.js'
 
 export async function codegen(abisDir: string, outDir = 'src/types/sui') {
   if (!fs.existsSync(abisDir)) {
@@ -41,10 +42,7 @@ class SuiCodegen extends AbstractCodegen<SuiMoveNormalizedModules, SuiNetwork> {
   }
 
   getMeaningfulFunctionParams(params: TypeDescriptor[]): TypeDescriptor[] {
-    if (params.length === 0) {
-      return params
-    }
-    return params.slice(0, params.length - 1)
+    return getMeaningfulFunctionParams(params)
   }
 
   toInternalModules(modules: SuiMoveNormalizedModules): InternalMoveModule[] {

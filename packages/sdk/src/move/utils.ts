@@ -6,7 +6,7 @@ export function isFrameworkAccount(account: string) {
   return account === '0x1' || account === '0x2' || account === '0x3'
 }
 
-const KEYWORDS = new Set(['package', 'namespace', 'volatile', 'object', 'string', 'number', 'bigint'])
+const KEYWORDS = new Set(['package', 'namespace', 'volatile', 'object', 'string', 'number', 'bigint', 'any'])
 
 export function normalizeToJSName(name: string) {
   if (KEYWORDS.has(name)) {

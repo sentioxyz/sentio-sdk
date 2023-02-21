@@ -9,7 +9,7 @@ export type TypedEventInstance<T> = MoveEvent & {
   type_arguments: string[]
 }
 
-export type TypedEntryFunctionPayload<T extends Array<any>> = MoveCall & {
+export type TypedFunctionPayload<T extends Array<any>> = MoveCall & {
   /**
    * decoded argument data using ABI, undefined if there is decoding error, usually because the ABI/data mismatch
    */

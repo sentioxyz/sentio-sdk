@@ -14,7 +14,7 @@ export type TypedEventInstance<T> = EventInstance & {
 }
 
 // Don't use intermediate type to make IDE happier
-export type TypedEntryFunctionPayload<T extends Array<any>> = TransactionPayload_EntryFunctionPayload & {
+export type TypedFunctionPayload<T extends Array<any>> = TransactionPayload_EntryFunctionPayload & {
   /**
    * decoded argument data using ABI, undefined if there is decoding error, usually because the ABI/data mismatch
    */

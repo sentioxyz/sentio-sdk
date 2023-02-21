@@ -9,3 +9,5 @@ export type { SuiAddress } from './move-types.js'
 export * from './move-coder.js'
 
 export { SuiPlugin } from './sui-plugin.js'
+
+export { ModuleClient } from './module-client.js'

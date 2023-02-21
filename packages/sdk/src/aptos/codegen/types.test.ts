@@ -1,10 +1,10 @@
-import { MOVE_CODER } from '../move-coder.js'
+import { defaultMoveCoder } from '../index.js'
 import { loadAllTypes } from '../builtin/0x1.js'
 
 describe('type decode', () => {
-  loadAllTypes(MOVE_CODER)
+  loadAllTypes(defaultMoveCoder())
   test('decode function payload', async () => {
-    const decoded = MOVE_CODER.decodeFunctionPayload(data)
+    const decoded = defaultMoveCoder().decodeFunctionPayload(data)
     console.log(decoded)
   })
 })

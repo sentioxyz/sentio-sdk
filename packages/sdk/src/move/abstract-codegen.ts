@@ -1,4 +1,9 @@
-import { InternalMoveFunction, InternalMoveModule, InternalMoveStruct } from './internal-models.js'
+import {
+  InternalMoveFunction,
+  InternalMoveFunctionVisibility,
+  InternalMoveModule,
+  InternalMoveStruct,
+} from './internal-models.js'
 import path from 'path'
 import fs from 'fs'
 import { AccountModulesImportInfo, AccountRegister } from './account.js'
@@ -26,6 +31,7 @@ export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
   ADDRESS_TYPE: string
   PREFIX: string
   STRUCT_FIELD_NAME: string = 'data'
+  GENERATED_CLIENT = false
 
   abstract fetchModules(account: string, network: NetworkType): Promise<ModuleTypes>
   abstract toInternalModules(modules: ModuleTypes): InternalMoveModule[]
@@ -48,9 +54,7 @@ export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
     if (!fs.existsSync(srcDir)) {
       return
     }
-    if (network === this.TEST_NET) {
-      console.log('Found testnet directory, generate code for testnet modules')
-    }
+
     const files = fs.readdirSync(srcDir)
     outputDir = path.resolve(outputDir)
     const outputs: OutputFile[] = []
@@ -118,6 +122,7 @@ export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
     }
 
     for (const output of outputs) {
+      // const content = output.fileContent
       const content = format(output.fileContent, { parser: 'typescript' })
       fs.writeFileSync(path.join(outputDir, output.fileName), content)
     }
@@ -132,7 +137,7 @@ export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
     )
     for (const output of outputs) {
       const parsed = path.parse(output.fileName)
-      const content = `export * as _${parsed.name} from './${parsed.name}.js'\n`
+      const content = `export * as _${parsed.name.replaceAll('-', '_')} from './${parsed.name}.js'\n`
       fs.appendFileSync(rootFile, content)
     }
   }
@@ -149,7 +154,9 @@ export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
     const functions = module.exposedFunctions
       .map((f) => this.generateOnEntryFunctions(module, f))
       .filter((s) => s !== '')
-
+    const clientFunctions = module.exposedFunctions
+      .map((f) => this.generateClientFunctions(module, f))
+      .filter((s) => s !== '')
     const eventStructs = this.getEventStructs(module)
     const eventTypes = new Set(eventStructs.keys())
     const events = Array.from(eventStructs.values())
@@ -160,6 +167,16 @@ export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
 
     const moduleName = normalizeToJSName(module.name)
     let processor = ''
+    let client = ''
+
+    if (this.GENERATED_CLIENT && clientFunctions.length > 0) {
+      client = `
+      export class ${moduleName}_client extends ModuleClient {
+        ${clientFunctions.join('\n')}
+      }
+      `
+    }
+
     if (functions.length > 0 || events.length > 0) {
       processor = `export class ${moduleName} extends ${this.PREFIX}BaseProcessor {
 
@@ -183,6 +200,8 @@ export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
     }
 
     return `
+  ${client}
+
   ${processor}
 
   export namespace ${moduleName} {
@@ -266,11 +285,38 @@ export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
     const genericString = this.generateFunctionTypeParameters(func)
     return `
   export interface ${camelFuncName}Payload${genericString}
-      extends TypedEntryFunctionPayload<[${fields.join(',')}]> {
+      extends TypedFunctionPayload<[${fields.join(',')}]> {
     arguments_decoded: [${fields.join(',')}],
     type_arguments: [${func.typeParams.map((_) => 'string').join(', ')}]
   }
   `
+  }
+
+  generateClientFunctions(module: InternalMoveModule, func: InternalMoveFunction) {
+    if (func.visibility === InternalMoveFunctionVisibility.PRIVATE) {
+      return ''
+    }
+    if (func.isEntry) {
+      return ''
+    }
+    // const moduleName = normalizeToJSName(module.name)
+    const funcName = camelCase(func.name)
+    const fields = this.getMeaningfulFunctionParams(func.params).map((param) => {
+      return generateTypeForDescriptor(param, module.address, this.ADDRESS_TYPE)
+    })
+    const genericString = this.generateFunctionTypeParameters(func)
+
+    const returns = func.return.map((param) => {
+      return generateTypeForDescriptor(param, module.address, this.ADDRESS_TYPE)
+    })
+
+    const source = `
+  ${funcName}${genericString}(type_arguments: [${func.typeParams
+      .map((_) => 'string')
+      .join(', ')}], args: [${fields.join(',')}], version?: bigint): Promise<[${returns.join(',')}]> {
+    return this.viewDecoded('${module.address}::${module.name}::${func.name}', type_arguments, args, version) as any
+  }`
+    return source
   }
 
   generateOnEntryFunctions(module: InternalMoveModule, func: InternalMoveFunction) {
@@ -359,10 +405,10 @@ export class AccountCodegen<ModuleType, NetworkType> {
     import { CallFilter } from "@sentio/sdk/move"
     import {
       MoveCoder, defaultMoveCoder, ${this.moduleGen.PREFIX}BindOptions, ${this.moduleGen.PREFIX}BaseProcessor,
-      TypedEventInstance, ${this.moduleGen.PREFIX}Network, TypedEntryFunctionPayload,
+      TypedEventInstance, ${this.moduleGen.PREFIX}Network, TypedFunctionPayload,
       ${this.moduleGen.PREFIX}Context } from "@sentio/sdk/${this.moduleGen.PREFIX.toLowerCase()}"
     import { MoveFetchConfig } from "@sentio/protos"
-    import { ${this.moduleGen.ADDRESS_TYPE} } from "@sentio/sdk/${this.moduleGen.PREFIX.toLowerCase()}"
+    import { ${this.moduleGen.ADDRESS_TYPE}, ModuleClient } from "@sentio/sdk/${this.moduleGen.PREFIX.toLowerCase()}"
     `
 
     const dependedAccounts: string[] = []
