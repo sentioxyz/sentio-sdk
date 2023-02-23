@@ -68,6 +68,8 @@ export class TypeDescriptor {
       case 'U64':
       case 'u128':
       case 'U128':
+      case 'u256':
+      case 'U256':
         return []
     }
 

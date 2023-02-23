@@ -11,4 +11,4 @@ types:
   - ci
   - chore
   - revert
-  - release # add one
+  - release
