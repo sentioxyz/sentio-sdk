@@ -51,6 +51,9 @@ export function transformEtherError(e: Error, ctx: ContractContext<any, any> | u
     return e
   }
 
+  const checkPage =
+    'Check here for possible cause and fix: https://docs.sentio.xyz/best-practices/handling-errors#ethers-error'
+
   let msg = ''
   const err = e as CallExceptionError
   if (err.code === 'CALL_EXCEPTION') {
@@ -64,11 +67,12 @@ export function transformEtherError(e: Error, ctx: ContractContext<any, any> | u
       } else {
         msg = "jsonrpc eth_call return '0x' (likely contract not existed): " + JSON.stringify(err)
       }
+      msg += '\n' + checkPage
       return new SimpleEthersError(msg, err)
     }
   }
 
-  msg = 'ethers call error\n' + JSON.stringify(e) + '\n' + e.stack?.toString()
+  msg = 'ethers call error\n' + JSON.stringify(e) + '\n' + e.stack?.toString() + '\n' + checkPage
   return new Error(msg)
 }
 

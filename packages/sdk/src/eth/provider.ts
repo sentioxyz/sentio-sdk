@@ -84,16 +84,19 @@ class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
 
   async send(method: string, params: Array<any>): Promise<any> {
     const tag = getTag(method, params)
+    const block = params[params.length - 1]
     let perform = this.#performCache.get(tag)
     if (!perform) {
       perform = this.executor.add(() => super.send(method, params))
       this.#performCache.set(tag, perform)
-
-      setTimeout(() => {
-        if (this.#performCache.get(tag) === perform) {
-          this.#performCache.delete(tag)
-        }
-      }, 500)
+      // For non latest block call, we cache permanently, otherwise we cache for one minute
+      if (block === 'latest') {
+        setTimeout(() => {
+          if (this.#performCache.get(tag) === perform) {
+            this.#performCache.delete(tag)
+          }
+        }, 60 * 1000)
+      }
     }
 
     const result = await perform
