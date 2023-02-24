@@ -1,5 +1,4 @@
 export * from './filter.js'
 export * from './types.js'
-export * from './ts-type.js'
 export * from './utils.js'
 export * from './account.js'

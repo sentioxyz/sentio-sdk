@@ -84,8 +84,6 @@ export abstract class AbstractMoveCoder<StructType> {
       case 'signer': // TODO check this, aptos only
       case 'address':
       case 'Address':
-      case '0x2::object::ID':
-      case '0x2::coin::Coin':
       case '0x1::string::String':
       case 'bool':
       case 'Bool':

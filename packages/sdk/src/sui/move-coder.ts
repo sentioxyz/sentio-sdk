@@ -13,6 +13,18 @@ export class MoveCoder extends AbstractMoveCoder<MoveEvent> {
     this.loadInternal(toInternalModule(module))
   }
 
+  decode(data: any, type: TypeDescriptor): any {
+    switch (type.qname) {
+      case '0x2::object::ID':
+      case '0x2::coin::Coin':
+        return data
+      case '0x1::option::Option':
+        return this.decode(data, type.typeArgs[0])
+      default:
+        return super.decode(data, type)
+    }
+  }
+
   decodeEvent<T>(event: MoveEvent): TypedEventInstance<T> | undefined {
     const res = this.decodedInternal<T>({ ...event, data: event.fields })
     return { ...event, fields_decoded: res?.data_decoded as T, type_arguments: res?.type_arguments || [] }

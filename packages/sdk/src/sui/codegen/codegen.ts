@@ -5,7 +5,7 @@ import { InternalMoveModule, InternalMoveStruct } from '../../move/internal-mode
 import { AbstractCodegen } from '../../move/abstract-codegen.js'
 import { JsonRpcProvider, SuiMoveNormalizedModules } from '@mysten/sui.js'
 import { toInternalModule } from '../move-types.js'
-import { moduleQname, SPLITTER, TypeDescriptor } from '../../move/index.js'
+import { moduleQname, SPLITTER, structQname, TypeDescriptor } from '../../move/index.js'
 import { getMeaningfulFunctionParams } from '../utils.js'
 
 export async function codegen(abisDir: string, outDir = 'src/types/sui') {
@@ -68,5 +68,27 @@ class SuiCodegen extends AbstractCodegen<SuiMoveNormalizedModules, SuiNetwork> {
       return res.result
     }
     return res
+  }
+
+  generateStructs(module: InternalMoveModule, struct: InternalMoveStruct, events: Set<string>): string {
+    switch (structQname(module, struct)) {
+      case '0x2::object::ID':
+        return `export type ${struct.name} = string`
+      case '0x2::coin::Coin':
+        return `export type ${struct.name}<T> = string`
+      case '0x1::option::Option':
+        return `export type Option<T> = T | undefined`
+    }
+    return super.generateStructs(module, struct, events)
+  }
+
+  generateOnEvents(module: InternalMoveModule, struct: InternalMoveStruct): string {
+    switch (structQname(module, struct)) {
+      case '0x2::object::ID':
+      case '0x2::coin::Coin':
+      case '0x1::option::Option':
+        return ''
+    }
+    return super.generateOnEvents(module, struct)
   }
 }

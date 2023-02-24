@@ -1,3 +1,5 @@
+import { InternalMoveModule, InternalMoveStruct } from './internal-models.js'
+
 export const SPLITTER = '::'
 
 export const VECTOR_STR = 'vector'
@@ -22,4 +24,8 @@ export function moduleQnameForType(type: string): [string, string] {
 
 export function moduleQname(module: { address: string; name: string }): string {
   return module.address.toLowerCase() + SPLITTER + module.name
+}
+
+export function structQname(module: InternalMoveModule, struct: InternalMoveStruct): string {
+  return [module.address, module.name, struct.name].join(SPLITTER)
 }

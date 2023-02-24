@@ -9,8 +9,7 @@ import fs from 'fs'
 import { AccountModulesImportInfo, AccountRegister } from './account.js'
 import chalk from 'chalk'
 import { format } from 'prettier'
-import { isFrameworkAccount, moduleQname, normalizeToJSName, SPLITTER } from './utils.js'
-import { generateTypeForDescriptor } from './ts-type.js'
+import { isFrameworkAccount, moduleQname, normalizeToJSName, SPLITTER, VECTOR_STR } from './utils.js'
 import { camelCase, upperFirst } from 'lodash-es'
 import { TypeDescriptor } from './types.js'
 
@@ -219,7 +218,7 @@ export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
     const structName = normalizeToJSName(struct.name)
 
     const fields = struct.fields.map((field) => {
-      const type = generateTypeForDescriptor(field.type, module.address, this.ADDRESS_TYPE)
+      const type = this.generateTypeForDescriptor(field.type, module.address)
       return `${field.name}: ${type}`
     })
 
@@ -277,7 +276,7 @@ export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
     }
 
     const fields = this.getMeaningfulFunctionParams(func.params).map((param) => {
-      return generateTypeForDescriptor(param, module.address, this.ADDRESS_TYPE)
+      return this.generateTypeForDescriptor(param, module.address)
     })
 
     const camelFuncName = upperFirst(camelCase(func.name))
@@ -302,12 +301,12 @@ export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
     // const moduleName = normalizeToJSName(module.name)
     const funcName = camelCase(func.name)
     const fields = this.getMeaningfulFunctionParams(func.params).map((param) => {
-      return generateTypeForDescriptor(param, module.address, this.ADDRESS_TYPE)
+      return this.generateTypeForDescriptor(param, module.address)
     })
     const genericString = this.generateFunctionTypeParameters(func)
 
     const returns = func.return.map((param) => {
-      return generateTypeForDescriptor(param, module.address, this.ADDRESS_TYPE)
+      return this.generateTypeForDescriptor(param, module.address)
     })
 
     const source = `
@@ -362,6 +361,81 @@ export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
   }
   `
     return source
+  }
+
+  generateTypeForDescriptor(type: TypeDescriptor, currentAddress: string): string {
+    if (type.reference) {
+      return this.ADDRESS_TYPE
+    }
+
+    switch (type.qname) {
+      case 'signer': // TODO check this
+      case 'address':
+      case 'Address':
+        return this.ADDRESS_TYPE
+      case '0x1::string::String':
+        return 'string'
+      case 'bool':
+      case 'Bool':
+        return 'Boolean'
+      case 'u8':
+      case 'U8':
+      case 'u16':
+      case 'U16':
+      case 'u32':
+      case 'U32':
+        return 'number'
+      case 'u64':
+      case 'U64':
+      case 'u128':
+      case 'U128':
+      case 'u256':
+      case 'U256':
+        return 'bigint'
+    }
+
+    if (type.qname.toLowerCase() === VECTOR_STR) {
+      // vector<u8> as hex string
+      const elementTypeQname = type.typeArgs[0].qname
+      if (elementTypeQname === 'u8' || elementTypeQname === 'U8') {
+        return 'string'
+      }
+      if (elementTypeQname.startsWith('T') && !elementTypeQname.includes(SPLITTER)) {
+        return `${elementTypeQname}[] | string`
+      }
+      return this.generateTypeForDescriptor(type.typeArgs[0], currentAddress) + '[]'
+    }
+
+    const simpleName = this.generateSimpleType(type.qname, currentAddress)
+    if (simpleName.length === 0) {
+      console.error('unexpected error')
+    }
+    if (simpleName.toLowerCase() === VECTOR_STR || simpleName.toLowerCase().startsWith(VECTOR_STR + SPLITTER)) {
+      console.error('unexpected vector type error')
+    }
+    if (type.typeArgs.length > 0) {
+      // return simpleName
+      return (
+        simpleName + '<' + type.typeArgs.map((t) => this.generateTypeForDescriptor(t, currentAddress)).join(',') + '>'
+      )
+    }
+    return simpleName
+  }
+
+  generateSimpleType(type: string, currentAddress: string): string {
+    const parts = type.split(SPLITTER)
+
+    for (let i = 0; i < parts.length; i++) {
+      parts[i] = normalizeToJSName(parts[i])
+    }
+
+    if (parts.length < 2) {
+      return parts[0]
+    }
+    if (parts[0] === currentAddress) {
+      return parts.slice(1).join('.')
+    }
+    return '_' + parts.join('.')
   }
 }
 
