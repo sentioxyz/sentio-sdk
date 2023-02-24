@@ -32,6 +32,7 @@ export class SuiBaseProcessor {
   callHandlers: CallHandler<Data_SuiCall>[] = []
 
   constructor(name: string, options: SuiBindOptions) {
+    this.moduleName = name
     this.config = configure(options)
     SuiProcessorState.INSTANCE.addValue(this)
   }

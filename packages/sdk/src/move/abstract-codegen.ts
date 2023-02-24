@@ -397,7 +397,8 @@ export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
     if (type.qname.toLowerCase() === VECTOR_STR) {
       // vector<u8> as hex string
       const elementTypeQname = type.typeArgs[0].qname
-      if (elementTypeQname === 'u8' || elementTypeQname === 'U8') {
+      if (elementTypeQname === 'u8') {
+        // only for aptos
         return 'string'
       }
       if (elementTypeQname.startsWith('T') && !elementTypeQname.includes(SPLITTER)) {

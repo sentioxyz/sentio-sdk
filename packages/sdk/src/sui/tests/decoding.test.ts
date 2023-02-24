@@ -7,12 +7,11 @@ describe('Test Sui Example', () => {
 
   test('decode 1', async () => {
     const x = coder.decodeEvent(data1) as capy.CapyBornInstance
-    // console.log(JSON.stringify(x))
   })
 
   test('decode 2', async () => {
     const x = coder.decodeEvent(data2)
-    console.log(JSON.stringify(x))
+    // console.log(JSON.stringify(x))
   })
 })
 
