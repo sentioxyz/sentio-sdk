@@ -13,7 +13,7 @@ describe('meter tests', () => {
 
     expect(normalizeKey('vo total')).eq('vo_total')
 
-    expect(normalizeKey('x'.repeat(200)).length).eq(100)
+    expect(normalizeKey('x'.repeat(200)).length).eq(128)
   })
 
   test('test  labels', async () => {

@@ -2,7 +2,7 @@ import { Labels } from './meter.js'
 import { BigDecimal } from './big-decimal.js'
 
 function normalizeName(name: string): string {
-  return name.slice(0, 100).replace(/[^_\-a-zA-Z0-9]/g, '_')
+  return name.slice(0, 128).replace(/[^_\-a-zA-Z0-9]/g, '_')
 }
 
 export function normalizeKey(name: string): string {
@@ -13,7 +13,7 @@ export function normalizeKey(name: string): string {
 }
 
 function normalizeValue(name: string): string {
-  return name.slice(0, 500)
+  return name.slice(0, 1024)
 }
 
 export function normalizeLabels(labels: Labels): Labels {
