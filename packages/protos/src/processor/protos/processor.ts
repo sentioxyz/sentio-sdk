@@ -622,7 +622,6 @@ export interface EventTrackingResult {
   severity: LogLevel;
   message: string;
   runtimeInfo: RuntimeInfo | undefined;
-  noMetric: boolean;
 }
 
 export interface ExportResult {
@@ -4853,7 +4852,6 @@ function createBaseEventTrackingResult(): EventTrackingResult {
     severity: 0,
     message: "",
     runtimeInfo: undefined,
-    noMetric: false,
   };
 }
 
@@ -4876,9 +4874,6 @@ export const EventTrackingResult = {
     }
     if (message.runtimeInfo !== undefined) {
       RuntimeInfo.encode(message.runtimeInfo, writer.uint32(42).fork()).ldelim();
-    }
-    if (message.noMetric === true) {
-      writer.uint32(24).bool(message.noMetric);
     }
     return writer;
   },
@@ -4908,9 +4903,6 @@ export const EventTrackingResult = {
         case 5:
           message.runtimeInfo = RuntimeInfo.decode(reader, reader.uint32());
           break;
-        case 3:
-          message.noMetric = reader.bool();
-          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -4927,7 +4919,6 @@ export const EventTrackingResult = {
       severity: isSet(object.severity) ? logLevelFromJSON(object.severity) : 0,
       message: isSet(object.message) ? String(object.message) : "",
       runtimeInfo: isSet(object.runtimeInfo) ? RuntimeInfo.fromJSON(object.runtimeInfo) : undefined,
-      noMetric: isSet(object.noMetric) ? Boolean(object.noMetric) : false,
     };
   },
 
@@ -4941,7 +4932,6 @@ export const EventTrackingResult = {
     message.message !== undefined && (obj.message = message.message);
     message.runtimeInfo !== undefined &&
       (obj.runtimeInfo = message.runtimeInfo ? RuntimeInfo.toJSON(message.runtimeInfo) : undefined);
-    message.noMetric !== undefined && (obj.noMetric = message.noMetric);
     return obj;
   },
 
@@ -4961,7 +4951,6 @@ export const EventTrackingResult = {
     message.runtimeInfo = (object.runtimeInfo !== undefined && object.runtimeInfo !== null)
       ? RuntimeInfo.fromPartial(object.runtimeInfo)
       : undefined;
-    message.noMetric = object.noMetric ?? false;
     return message;
   },
 };

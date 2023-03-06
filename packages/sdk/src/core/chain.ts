@@ -65,6 +65,7 @@ export const CHAIN_IDS = {
   NMACTEST: '7777',
   KLAYTN: '8217',
   EVMOS: '9001',
+  BASE_GOERLI: '84531',
   SMARTBCH: '10000',
   CRYSTALEUM: '103090',
   FUSION: '32659',
@@ -87,8 +88,10 @@ export const CHAIN_IDS = {
   SOLANA_PYTH: 'sol_pyth',
   SUI_MAINNET: 'sui_mainnet',
   SUI_TESTNET: 'sui_testnet',
+  SUI_DEVNET: 'sui_devnet',
   APTOS_MAINNET: 'aptos_mainnet',
   APTOS_TESTNET: 'aptos_testnet',
+  APTOS_DEVNET: 'aptos_devnet',
 }
 
 export const CHAIN_MAP: Record<string, string> = {}

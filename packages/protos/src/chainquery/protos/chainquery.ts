@@ -66,6 +66,7 @@ export interface VoidResponse {
 export interface EvmSQLQueryRequest {
   network: string;
   sql: string;
+  nocache?: boolean | undefined;
 }
 
 export interface EvmGetHeaderRequest {
@@ -834,7 +835,7 @@ export const VoidResponse = {
 };
 
 function createBaseEvmSQLQueryRequest(): EvmSQLQueryRequest {
-  return { network: "", sql: "" };
+  return { network: "", sql: "", nocache: undefined };
 }
 
 export const EvmSQLQueryRequest = {
@@ -844,6 +845,9 @@ export const EvmSQLQueryRequest = {
     }
     if (message.sql !== "") {
       writer.uint32(18).string(message.sql);
+    }
+    if (message.nocache !== undefined) {
+      writer.uint32(24).bool(message.nocache);
     }
     return writer;
   },
@@ -861,6 +865,9 @@ export const EvmSQLQueryRequest = {
         case 2:
           message.sql = reader.string();
           break;
+        case 3:
+          message.nocache = reader.bool();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -873,6 +880,7 @@ export const EvmSQLQueryRequest = {
     return {
       network: isSet(object.network) ? String(object.network) : "",
       sql: isSet(object.sql) ? String(object.sql) : "",
+      nocache: isSet(object.nocache) ? Boolean(object.nocache) : undefined,
     };
   },
 
@@ -880,6 +888,7 @@ export const EvmSQLQueryRequest = {
     const obj: any = {};
     message.network !== undefined && (obj.network = message.network);
     message.sql !== undefined && (obj.sql = message.sql);
+    message.nocache !== undefined && (obj.nocache = message.nocache);
     return obj;
   },
 
@@ -891,6 +900,7 @@ export const EvmSQLQueryRequest = {
     const message = createBaseEvmSQLQueryRequest();
     message.network = object.network ?? "";
     message.sql = object.sql ?? "";
+    message.nocache = object.nocache ?? undefined;
     return message;
   },
 };

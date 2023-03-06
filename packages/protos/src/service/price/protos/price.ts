@@ -23,6 +23,25 @@ export interface GetPriceResponse {
   timestamp: Date | undefined;
 }
 
+export interface BatchGetPricesRequest {
+  timestamps: Date[];
+  coinIds: CoinID[];
+}
+
+export interface BatchGetPricesResponse {
+  prices: BatchGetPricesResponse_CoinPrice[];
+}
+
+export interface BatchGetPricesResponse_CoinPrice {
+  coinId: CoinID | undefined;
+  price?: BatchGetPricesResponse_CoinPrice_Price | undefined;
+  error?: string | undefined;
+}
+
+export interface BatchGetPricesResponse_CoinPrice_Price {
+  results: GetPriceResponse[];
+}
+
 function createBaseCoinID(): CoinID {
   return { symbol: undefined, address: undefined };
 }
@@ -276,6 +295,268 @@ export const GetPriceResponse = {
   },
 };
 
+function createBaseBatchGetPricesRequest(): BatchGetPricesRequest {
+  return { timestamps: [], coinIds: [] };
+}
+
+export const BatchGetPricesRequest = {
+  encode(message: BatchGetPricesRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.timestamps) {
+      Timestamp.encode(toTimestamp(v!), writer.uint32(10).fork()).ldelim();
+    }
+    for (const v of message.coinIds) {
+      CoinID.encode(v!, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): BatchGetPricesRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseBatchGetPricesRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.timestamps.push(fromTimestamp(Timestamp.decode(reader, reader.uint32())));
+          break;
+        case 2:
+          message.coinIds.push(CoinID.decode(reader, reader.uint32()));
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): BatchGetPricesRequest {
+    return {
+      timestamps: Array.isArray(object?.timestamps) ? object.timestamps.map((e: any) => fromJsonTimestamp(e)) : [],
+      coinIds: Array.isArray(object?.coinIds) ? object.coinIds.map((e: any) => CoinID.fromJSON(e)) : [],
+    };
+  },
+
+  toJSON(message: BatchGetPricesRequest): unknown {
+    const obj: any = {};
+    if (message.timestamps) {
+      obj.timestamps = message.timestamps.map((e) => e.toISOString());
+    } else {
+      obj.timestamps = [];
+    }
+    if (message.coinIds) {
+      obj.coinIds = message.coinIds.map((e) => e ? CoinID.toJSON(e) : undefined);
+    } else {
+      obj.coinIds = [];
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<BatchGetPricesRequest>): BatchGetPricesRequest {
+    return BatchGetPricesRequest.fromPartial(base ?? {});
+  },
+
+  fromPartial(object: DeepPartial<BatchGetPricesRequest>): BatchGetPricesRequest {
+    const message = createBaseBatchGetPricesRequest();
+    message.timestamps = object.timestamps?.map((e) => e) || [];
+    message.coinIds = object.coinIds?.map((e) => CoinID.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseBatchGetPricesResponse(): BatchGetPricesResponse {
+  return { prices: [] };
+}
+
+export const BatchGetPricesResponse = {
+  encode(message: BatchGetPricesResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.prices) {
+      BatchGetPricesResponse_CoinPrice.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): BatchGetPricesResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseBatchGetPricesResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.prices.push(BatchGetPricesResponse_CoinPrice.decode(reader, reader.uint32()));
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): BatchGetPricesResponse {
+    return {
+      prices: Array.isArray(object?.prices)
+        ? object.prices.map((e: any) => BatchGetPricesResponse_CoinPrice.fromJSON(e))
+        : [],
+    };
+  },
+
+  toJSON(message: BatchGetPricesResponse): unknown {
+    const obj: any = {};
+    if (message.prices) {
+      obj.prices = message.prices.map((e) => e ? BatchGetPricesResponse_CoinPrice.toJSON(e) : undefined);
+    } else {
+      obj.prices = [];
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<BatchGetPricesResponse>): BatchGetPricesResponse {
+    return BatchGetPricesResponse.fromPartial(base ?? {});
+  },
+
+  fromPartial(object: DeepPartial<BatchGetPricesResponse>): BatchGetPricesResponse {
+    const message = createBaseBatchGetPricesResponse();
+    message.prices = object.prices?.map((e) => BatchGetPricesResponse_CoinPrice.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseBatchGetPricesResponse_CoinPrice(): BatchGetPricesResponse_CoinPrice {
+  return { coinId: undefined, price: undefined, error: undefined };
+}
+
+export const BatchGetPricesResponse_CoinPrice = {
+  encode(message: BatchGetPricesResponse_CoinPrice, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.coinId !== undefined) {
+      CoinID.encode(message.coinId, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.price !== undefined) {
+      BatchGetPricesResponse_CoinPrice_Price.encode(message.price, writer.uint32(18).fork()).ldelim();
+    }
+    if (message.error !== undefined) {
+      writer.uint32(26).string(message.error);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): BatchGetPricesResponse_CoinPrice {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseBatchGetPricesResponse_CoinPrice();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.coinId = CoinID.decode(reader, reader.uint32());
+          break;
+        case 2:
+          message.price = BatchGetPricesResponse_CoinPrice_Price.decode(reader, reader.uint32());
+          break;
+        case 3:
+          message.error = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): BatchGetPricesResponse_CoinPrice {
+    return {
+      coinId: isSet(object.coinId) ? CoinID.fromJSON(object.coinId) : undefined,
+      price: isSet(object.price) ? BatchGetPricesResponse_CoinPrice_Price.fromJSON(object.price) : undefined,
+      error: isSet(object.error) ? String(object.error) : undefined,
+    };
+  },
+
+  toJSON(message: BatchGetPricesResponse_CoinPrice): unknown {
+    const obj: any = {};
+    message.coinId !== undefined && (obj.coinId = message.coinId ? CoinID.toJSON(message.coinId) : undefined);
+    message.price !== undefined &&
+      (obj.price = message.price ? BatchGetPricesResponse_CoinPrice_Price.toJSON(message.price) : undefined);
+    message.error !== undefined && (obj.error = message.error);
+    return obj;
+  },
+
+  create(base?: DeepPartial<BatchGetPricesResponse_CoinPrice>): BatchGetPricesResponse_CoinPrice {
+    return BatchGetPricesResponse_CoinPrice.fromPartial(base ?? {});
+  },
+
+  fromPartial(object: DeepPartial<BatchGetPricesResponse_CoinPrice>): BatchGetPricesResponse_CoinPrice {
+    const message = createBaseBatchGetPricesResponse_CoinPrice();
+    message.coinId = (object.coinId !== undefined && object.coinId !== null)
+      ? CoinID.fromPartial(object.coinId)
+      : undefined;
+    message.price = (object.price !== undefined && object.price !== null)
+      ? BatchGetPricesResponse_CoinPrice_Price.fromPartial(object.price)
+      : undefined;
+    message.error = object.error ?? undefined;
+    return message;
+  },
+};
+
+function createBaseBatchGetPricesResponse_CoinPrice_Price(): BatchGetPricesResponse_CoinPrice_Price {
+  return { results: [] };
+}
+
+export const BatchGetPricesResponse_CoinPrice_Price = {
+  encode(message: BatchGetPricesResponse_CoinPrice_Price, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.results) {
+      GetPriceResponse.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): BatchGetPricesResponse_CoinPrice_Price {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseBatchGetPricesResponse_CoinPrice_Price();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.results.push(GetPriceResponse.decode(reader, reader.uint32()));
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): BatchGetPricesResponse_CoinPrice_Price {
+    return {
+      results: Array.isArray(object?.results) ? object.results.map((e: any) => GetPriceResponse.fromJSON(e)) : [],
+    };
+  },
+
+  toJSON(message: BatchGetPricesResponse_CoinPrice_Price): unknown {
+    const obj: any = {};
+    if (message.results) {
+      obj.results = message.results.map((e) => e ? GetPriceResponse.toJSON(e) : undefined);
+    } else {
+      obj.results = [];
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<BatchGetPricesResponse_CoinPrice_Price>): BatchGetPricesResponse_CoinPrice_Price {
+    return BatchGetPricesResponse_CoinPrice_Price.fromPartial(base ?? {});
+  },
+
+  fromPartial(object: DeepPartial<BatchGetPricesResponse_CoinPrice_Price>): BatchGetPricesResponse_CoinPrice_Price {
+    const message = createBaseBatchGetPricesResponse_CoinPrice_Price();
+    message.results = object.results?.map((e) => GetPriceResponse.fromPartial(e)) || [];
+    return message;
+  },
+};
+
 export type PriceServiceDefinition = typeof PriceServiceDefinition;
 export const PriceServiceDefinition = {
   name: "PriceService",
@@ -289,15 +570,31 @@ export const PriceServiceDefinition = {
       responseStream: false,
       options: {},
     },
+    batchGetPrices: {
+      name: "BatchGetPrices",
+      requestType: BatchGetPricesRequest,
+      requestStream: false,
+      responseType: BatchGetPricesResponse,
+      responseStream: false,
+      options: {},
+    },
   },
 } as const;
 
 export interface PriceServiceImplementation<CallContextExt = {}> {
   getPrice(request: GetPriceRequest, context: CallContext & CallContextExt): Promise<DeepPartial<GetPriceResponse>>;
+  batchGetPrices(
+    request: BatchGetPricesRequest,
+    context: CallContext & CallContextExt,
+  ): Promise<DeepPartial<BatchGetPricesResponse>>;
 }
 
 export interface PriceServiceClient<CallOptionsExt = {}> {
   getPrice(request: DeepPartial<GetPriceRequest>, options?: CallOptions & CallOptionsExt): Promise<GetPriceResponse>;
+  batchGetPrices(
+    request: DeepPartial<BatchGetPricesRequest>,
+    options?: CallOptions & CallOptionsExt,
+  ): Promise<BatchGetPricesResponse>;
 }
 
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;

@@ -4,23 +4,21 @@ import { AptosClient } from 'aptos-sdk'
 export enum AptosNetwork {
   MAIN_NET = 1,
   TEST_NET = 2,
-  // DEV_NET,
+  DEV_NET = 3,
 }
 
 export function getChainId(network: AptosNetwork): string {
   switch (network) {
     case AptosNetwork.TEST_NET:
       return CHAIN_IDS.APTOS_TESTNET
+    case AptosNetwork.DEV_NET:
+      return CHAIN_IDS.APTOS_DEVNET
   }
   return CHAIN_IDS.APTOS_MAINNET
 }
 
 export function getAptosChainName(network: AptosNetwork): string {
-  switch (network) {
-    case AptosNetwork.TEST_NET:
-      return getChainName(CHAIN_IDS.APTOS_TESTNET)
-  }
-  return getChainName(CHAIN_IDS.APTOS_MAINNET)
+  return getChainName(getChainId(network))
 }
 
 export class AptosBindOptions {
