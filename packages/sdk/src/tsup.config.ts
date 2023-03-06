@@ -16,6 +16,7 @@ export default defineConfig({
   dts: {
     resolve: true,
   },
+  splitting: false,
   external: [
     'protobufjs',
     'aptos',
