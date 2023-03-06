@@ -90,12 +90,12 @@ export abstract class BaseProcessorTemplate<
   public onEvent(
     handler: (event: EthEvent, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     filter: DeferredTopicFilter | DeferredTopicFilter[],
-    fetchConfig?: EthFetchConfig
+    fetchConfig?: Partial<EthFetchConfig>
   ) {
     this.eventHandlers.push({
       handler: handler,
       filter: filter,
-      fetchConfig: fetchConfig,
+      fetchConfig: EthFetchConfig.fromPartial(fetchConfig || {}),
     })
     return this
   }
@@ -134,9 +134,10 @@ export abstract class BaseProcessorTemplate<
 
   public onTrace(
     signature: string,
-    handler: (trace: Trace, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid
+    handler: (trace: Trace, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
+    fetchConfig?: Partial<EthFetchConfig>
   ) {
-    this.traceHandlers.push({ signature, handler })
+    this.traceHandlers.push({ signature, handler, fetchConfig: EthFetchConfig.fromPartial(fetchConfig || {}) })
     return this
   }
 

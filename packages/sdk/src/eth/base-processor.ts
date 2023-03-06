@@ -80,7 +80,7 @@ export abstract class BaseProcessor<
   public onEvent(
     handler: (event: EthEvent, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     filter: DeferredTopicFilter | DeferredTopicFilter[],
-    fetchConfig?: EthFetchConfig
+    fetchConfig?: Partial<EthFetchConfig>
   ) {
     const chainId = this.getChainId()
     let _filters: DeferredTopicFilter[] = []
@@ -95,7 +95,7 @@ export abstract class BaseProcessor<
     const processor = this
     this.eventHandlers.push({
       filters: _filters,
-      fetchConfig: fetchConfig || EthFetchConfig.fromPartial({}),
+      fetchConfig: EthFetchConfig.fromPartial(fetchConfig || {}),
       handler: async function (data: Data_EthLog) {
         const { log, block, transaction, transactionReceipt } = formatEthData(data)
         if (!log) {
@@ -207,7 +207,7 @@ export abstract class BaseProcessor<
   public onTrace(
     signature: string,
     handler: (trace: Trace, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
-    fetchConfig?: EthFetchConfig
+    fetchConfig?: Partial<EthFetchConfig>
   ) {
     const chainId = this.getChainId()
     const contractName = this.config.name
@@ -215,7 +215,7 @@ export abstract class BaseProcessor<
 
     this.traceHandlers.push({
       signature,
-      fetchConfig: fetchConfig || EthFetchConfig.fromPartial({}),
+      fetchConfig: EthFetchConfig.fromPartial(fetchConfig || {}),
       handler: async function (data: Data_EthTrace) {
         const contractView = processor.CreateBoundContractView()
         const contractInterface = contractView.rawContract.interface

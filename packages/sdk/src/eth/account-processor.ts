@@ -50,7 +50,7 @@ export class AccountProcessor {
   onERC20TransferIn(
     handler: (event: ERC20TransferEvent, ctx: AccountContext) => PromiseOrVoid,
     tokensAddresses: string[] = [],
-    fetchConfig?: EthFetchConfig
+    fetchConfig?: Partial<EthFetchConfig>
   ) {
     return this.onERC20(
       handler,
@@ -69,7 +69,7 @@ export class AccountProcessor {
   onERC20TransferOut(
     handler: (event: ERC20TransferEvent, ctx: AccountContext) => PromiseOrVoid,
     tokensAddresses: string[] = [],
-    fetchConfig?: EthFetchConfig
+    fetchConfig?: Partial<EthFetchConfig>
   ) {
     return this.onERC20(
       handler,
@@ -88,7 +88,7 @@ export class AccountProcessor {
   onERC20Minted(
     handler: (event: ERC20TransferEvent, ctx: AccountContext) => PromiseOrVoid,
     tokensAddresses: string[] = [],
-    fetchConfig?: EthFetchConfig
+    fetchConfig?: Partial<EthFetchConfig>
   ) {
     return this.onERC20(
       handler,
@@ -103,7 +103,7 @@ export class AccountProcessor {
     handler: (event: ERC20TransferEvent, ctx: AccountContext) => PromiseOrVoid,
     tokensAddresses: string[] = [],
     defaultFilter: (address: string) => AddressOrTypeEventFilter,
-    fetchConfig?: EthFetchConfig
+    fetchConfig?: Partial<EthFetchConfig>
   ) {
     return this.onERC(handler, tokensAddresses, defaultFilter, AddressType.ERC20, fetchConfig)
   }
@@ -117,7 +117,7 @@ export class AccountProcessor {
   onERC721TransferIn(
     handler: (event: ERC721TransferEvent, ctx: AccountContext) => PromiseOrVoid,
     collections: string[],
-    fetchConfig?: EthFetchConfig
+    fetchConfig?: Partial<EthFetchConfig>
   ) {
     return this.onERC721(
       handler,
@@ -136,7 +136,7 @@ export class AccountProcessor {
   onERC721TransferOut(
     handler: (event: ERC721TransferEvent, ctx: AccountContext) => PromiseOrVoid,
     collections: string[],
-    fetchConfig?: EthFetchConfig
+    fetchConfig?: Partial<EthFetchConfig>
   ) {
     return this.onERC721(
       handler,
@@ -155,7 +155,7 @@ export class AccountProcessor {
   onERC721Minted(
     handler: (event: ERC721TransferEvent, ctx: AccountContext) => PromiseOrVoid,
     collections: string[] = [],
-    fetchConfig?: EthFetchConfig
+    fetchConfig?: Partial<EthFetchConfig>
   ) {
     return this.onERC721(
       handler,
@@ -170,7 +170,7 @@ export class AccountProcessor {
     handler: (event: ERC721TransferEvent, ctx: AccountContext) => PromiseOrVoid,
     collections: string[],
     defaultFilter: (address: string) => AddressOrTypeEventFilter,
-    fetchConfig?: EthFetchConfig
+    fetchConfig?: Partial<EthFetchConfig>
   ) {
     return this.onERC(handler, collections, defaultFilter, AddressType.ERC721, fetchConfig)
   }
@@ -180,7 +180,7 @@ export class AccountProcessor {
     contractAddresses: string[],
     defaultFilter: (address: string) => AddressOrTypeEventFilter,
     addressType: AddressType,
-    fetchConfig?: EthFetchConfig
+    fetchConfig?: Partial<EthFetchConfig>
   ) {
     const filters = []
     for (const token of contractAddresses) {
@@ -200,7 +200,7 @@ export class AccountProcessor {
   protected onEvent(
     handler: (event: LogDescription, ctx: AccountContext) => PromiseOrVoid,
     filter: AddressOrTypeEventFilter | AddressOrTypeEventFilter[],
-    fetchConfig?: EthFetchConfig
+    fetchConfig?: Partial<EthFetchConfig>
   ) {
     const chainId = this.getChainId()
 
@@ -232,7 +232,7 @@ export class AccountProcessor {
 
     this.eventHandlers.push({
       filters: _filters,
-      fetchConfig: fetchConfig || EthFetchConfig.fromPartial({}),
+      fetchConfig: EthFetchConfig.fromPartial(fetchConfig || {}),
       handler: async function (data) {
         const { log, block, transaction, transactionReceipt } = formatEthData(data)
 
