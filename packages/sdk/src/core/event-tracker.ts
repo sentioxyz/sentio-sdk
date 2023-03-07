@@ -49,6 +49,7 @@ export class EventTracker extends NamedResultDescriptor {
       distinctEntityId: distinctId || '',
       attributes: normalizeAttribute(payload),
       runtimeInfo: undefined,
+      noMetric: false,
     }
     ctx._res.events.push(res)
   }

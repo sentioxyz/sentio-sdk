@@ -32,6 +32,7 @@ export class EventLogger {
       distinctEntityId: distinctId || '',
       attributes: normalizeAttribute(payload),
       runtimeInfo: undefined,
+      noMetric: true,
     }
     this.ctx._res.events.push(res)
   }
