@@ -42,6 +42,16 @@ export interface BatchGetPricesResponse_CoinPrice_Price {
   results: GetPriceResponse[];
 }
 
+export interface ListCoinsRequest {
+  limit: number;
+  offset: number;
+  queryString: string;
+}
+
+export interface ListCoinsResponse {
+  coins: CoinID[];
+}
+
 function createBaseCoinID(): CoinID {
   return { symbol: undefined, address: undefined };
 }
@@ -557,6 +567,132 @@ export const BatchGetPricesResponse_CoinPrice_Price = {
   },
 };
 
+function createBaseListCoinsRequest(): ListCoinsRequest {
+  return { limit: 0, offset: 0, queryString: "" };
+}
+
+export const ListCoinsRequest = {
+  encode(message: ListCoinsRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.limit !== 0) {
+      writer.uint32(8).int32(message.limit);
+    }
+    if (message.offset !== 0) {
+      writer.uint32(16).int32(message.offset);
+    }
+    if (message.queryString !== "") {
+      writer.uint32(26).string(message.queryString);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ListCoinsRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseListCoinsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.limit = reader.int32();
+          break;
+        case 2:
+          message.offset = reader.int32();
+          break;
+        case 3:
+          message.queryString = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ListCoinsRequest {
+    return {
+      limit: isSet(object.limit) ? Number(object.limit) : 0,
+      offset: isSet(object.offset) ? Number(object.offset) : 0,
+      queryString: isSet(object.queryString) ? String(object.queryString) : "",
+    };
+  },
+
+  toJSON(message: ListCoinsRequest): unknown {
+    const obj: any = {};
+    message.limit !== undefined && (obj.limit = Math.round(message.limit));
+    message.offset !== undefined && (obj.offset = Math.round(message.offset));
+    message.queryString !== undefined && (obj.queryString = message.queryString);
+    return obj;
+  },
+
+  create(base?: DeepPartial<ListCoinsRequest>): ListCoinsRequest {
+    return ListCoinsRequest.fromPartial(base ?? {});
+  },
+
+  fromPartial(object: DeepPartial<ListCoinsRequest>): ListCoinsRequest {
+    const message = createBaseListCoinsRequest();
+    message.limit = object.limit ?? 0;
+    message.offset = object.offset ?? 0;
+    message.queryString = object.queryString ?? "";
+    return message;
+  },
+};
+
+function createBaseListCoinsResponse(): ListCoinsResponse {
+  return { coins: [] };
+}
+
+export const ListCoinsResponse = {
+  encode(message: ListCoinsResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.coins) {
+      CoinID.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ListCoinsResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseListCoinsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.coins.push(CoinID.decode(reader, reader.uint32()));
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ListCoinsResponse {
+    return { coins: Array.isArray(object?.coins) ? object.coins.map((e: any) => CoinID.fromJSON(e)) : [] };
+  },
+
+  toJSON(message: ListCoinsResponse): unknown {
+    const obj: any = {};
+    if (message.coins) {
+      obj.coins = message.coins.map((e) => e ? CoinID.toJSON(e) : undefined);
+    } else {
+      obj.coins = [];
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<ListCoinsResponse>): ListCoinsResponse {
+    return ListCoinsResponse.fromPartial(base ?? {});
+  },
+
+  fromPartial(object: DeepPartial<ListCoinsResponse>): ListCoinsResponse {
+    const message = createBaseListCoinsResponse();
+    message.coins = object.coins?.map((e) => CoinID.fromPartial(e)) || [];
+    return message;
+  },
+};
+
 export type PriceServiceDefinition = typeof PriceServiceDefinition;
 export const PriceServiceDefinition = {
   name: "PriceService",
@@ -578,6 +714,14 @@ export const PriceServiceDefinition = {
       responseStream: false,
       options: {},
     },
+    listCoins: {
+      name: "ListCoins",
+      requestType: ListCoinsRequest,
+      requestStream: false,
+      responseType: ListCoinsResponse,
+      responseStream: false,
+      options: {},
+    },
   },
 } as const;
 
@@ -587,6 +731,7 @@ export interface PriceServiceImplementation<CallContextExt = {}> {
     request: BatchGetPricesRequest,
     context: CallContext & CallContextExt,
   ): Promise<DeepPartial<BatchGetPricesResponse>>;
+  listCoins(request: ListCoinsRequest, context: CallContext & CallContextExt): Promise<DeepPartial<ListCoinsResponse>>;
 }
 
 export interface PriceServiceClient<CallOptionsExt = {}> {
@@ -595,6 +740,7 @@ export interface PriceServiceClient<CallOptionsExt = {}> {
     request: DeepPartial<BatchGetPricesRequest>,
     options?: CallOptions & CallOptionsExt,
   ): Promise<BatchGetPricesResponse>;
+  listCoins(request: DeepPartial<ListCoinsRequest>, options?: CallOptions & CallOptionsExt): Promise<ListCoinsResponse>;
 }
 
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;

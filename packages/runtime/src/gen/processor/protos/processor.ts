@@ -636,10 +636,7 @@ export interface EventTrackingResult {
   attributes: { [key: string]: any } | undefined;
   severity: LogLevel;
   message: string;
-  runtimeInfo:
-    | RuntimeInfo
-    | undefined;
-  /** @deprecated */
+  runtimeInfo: RuntimeInfo | undefined;
   noMetric: boolean;
 }
 

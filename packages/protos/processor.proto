@@ -466,7 +466,7 @@ message EventTrackingResult {
   RuntimeInfo runtime_info = 5;
 
   // TODO remove this after driver don't use old event tracker
-  bool no_metric = 3 [ deprecated = true ];
+  bool no_metric = 3;
 }
 
 message ExportResult {
