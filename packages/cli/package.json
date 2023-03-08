@@ -16,7 +16,7 @@
     "@mysten/sui.js": "npm:@sentio/sui.js@0.17.0",
     "@types/jest": "^29.0.0",
     "@types/node": "^18.11.18",
-    "aptos-sdk": "npm:@sentio/aptos@^1.6.0",
+    "aptos-sdk": "npm:aptos@^1.7.1",
     "chalk": "^5.2.0",
     "command-line-args": "^5.2.1",
     "command-line-usage": "^6.1.3",

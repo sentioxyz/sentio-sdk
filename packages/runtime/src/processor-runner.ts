@@ -15,7 +15,7 @@ import http from 'http'
 
 const mergedRegistry = Registry.merge([globalRegistry, niceGrpcRegistry])
 
-import { ProcessorDefinition } from '@sentio/protos'
+import { ProcessorDefinition } from './gen/processor/protos/processor.js'
 import { ProcessorServiceImpl } from './service.js'
 import { Endpoints } from './endpoints.js'
 
