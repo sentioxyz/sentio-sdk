@@ -13,7 +13,11 @@ export function normalizeKey(name: string): string {
 }
 
 function normalizeValue(name: string): string {
-  return name.slice(0, 1024)
+  if (name.length > 1024) {
+    console.warn(`${name} is exceed max length for value storage, will be truncate to 1024 characters`)
+    return name.slice(0, 1024)
+  }
+  return name
 }
 
 export function normalizeLabels(labels: Labels): Labels {
@@ -52,6 +56,10 @@ function normalizeObject(obj: any, length: number): any {
       return obj.toISOString()
     }
     if (obj instanceof BigDecimal) {
+      if (obj.isNaN() || !obj.isFinite()) {
+        console.error("can't submit NaN or Infinity value, will store as 0")
+        return 0
+      }
       return obj.toNumber()
     }
     if (obj instanceof Promise) {

@@ -89,6 +89,12 @@ describe('Numberish tests', () => {
     const s3 = Struct.decode(w3.finish())
     console.log(r3)
   })
+
+  test('invalid value', async () => {
+    const t1 = { a: BigDecimal(1).dividedBy(0) }
+    const r1 = normalizeAttribute(t1)
+    expect(r1.a).equals(0)
+  })
 })
 
 // Performance very bad
