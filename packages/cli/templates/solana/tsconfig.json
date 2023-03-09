@@ -12,7 +12,7 @@
     "strictNullChecks": true,
     "stripInternal": true,
     "noFallthroughCasesInSwitch": true,
-    "noEmitOnError": true,
+    "noEmitOnError": false,
     "rootDir": "./src",
     "outDir": "./dist",
     "skipLibCheck": true

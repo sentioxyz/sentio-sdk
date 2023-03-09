@@ -162,7 +162,7 @@ export class ${contract.name}ProcessorTemplate extends BaseProcessorTemplate<${c
         'ContractView',
         'DummyProvider',
         'TypedCallTrace',
-        'toBlockTag',
+        // 'toBlockTag',
       ],
       '@sentio/protos': ['EthFetchConfig'],
       './common.js': ['PromiseOrValue'],

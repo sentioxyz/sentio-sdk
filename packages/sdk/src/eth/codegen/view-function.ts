@@ -62,7 +62,7 @@ export function generateBoundViewFunction(fn: FunctionDeclaration, includeArgTyp
   })}overrides?: Overrides): ${generateReturnTypes(fn)} {
     if (!overrides && this.context) {
       overrides = {
-        blockTag: toBlockTag(this.context.blockNumber),
+        blockTag: this.context.blockNumber,
       }
     }
     return await this.view.${declName}(${

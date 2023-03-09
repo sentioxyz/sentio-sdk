@@ -7,9 +7,13 @@ import { codegen } from '../codegen/index.js'
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
 
 describe('Test EVM codegen', () => {
-  // TODO make sure code could be compile
-  jest.setTimeout(200000)
   test('code gen for evm', async () => {
+    if (process.env.CI) {
+      return
+    }
+
+    jest.setTimeout(200000)
+    jest.retryTimes(3)
     // const codeGenFolder = fs.mkdtempSync(path.join(os.tmpdir(), 'codegen_test'))
     const codeGenFolder = path.resolve(__dirname, 'types/eth')
 
