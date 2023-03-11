@@ -34,6 +34,7 @@
     "ethers": "npm:@sentio/ethers@^6.1.0-patch.1",
     "lodash-es": "^4.17.21",
     "mkdirp": "^2.1.3",
+    "node-fetch": "^3.3.1",
     "p-queue": "^7.3.4",
     "prettier": "^2.8.4",
     "typechain": "^8.0.0"
@@ -57,6 +58,7 @@
     "./eth/builtin/weth9": "./lib/eth/builtin/weth9.js",
     "./move": "./lib/move/index.js",
     "./aptos": "./lib/aptos/index.js",
+    "./aptos/ext": "./lib/aptos/ext/index.js",
     "./aptos/codegen": "./lib/aptos/codegen/index.js",
     "./aptos/builtin": "./lib/aptos/builtin/index.js",
     "./aptos/builtin/0x1": "./lib/aptos/builtin/0x1.js",

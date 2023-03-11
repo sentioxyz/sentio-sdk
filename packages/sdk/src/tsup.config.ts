@@ -25,6 +25,7 @@ export default defineConfig({
     'bs58',
     'bn.js',
     'csv-parse',
+    'node-fetch',
     /^nice-grpc.*$/,
     /^@(ethersproject|solana|project-serum).*$/,
     /^@sentio\/(sdk|runtime|protos|bigdecimal|ethers).*$/,

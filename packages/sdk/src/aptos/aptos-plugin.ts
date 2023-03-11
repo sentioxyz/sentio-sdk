@@ -11,11 +11,14 @@ import {
   HandlerType,
   ProcessConfigResponse,
   ProcessResult,
+  StartRequest,
 } from '@sentio/protos'
 
 import { ServerError, Status } from 'nice-grpc'
 
 import { AptosAccountProcessorState, AptosProcessorState } from './aptos-processor.js'
+
+import { initCoinList } from './ext/coin.js'
 
 export class AptosPlugin extends Plugin {
   name: string = 'AptosPlugin'
@@ -23,6 +26,10 @@ export class AptosPlugin extends Plugin {
   private aptosEventHandlers: ((event: Data_AptEvent) => Promise<ProcessResult>)[] = []
   private aptosCallHandlers: ((func: Data_AptCall) => Promise<ProcessResult>)[] = []
   private aptosResourceHandlers: ((resourceWithVersion: Data_AptResource) => Promise<ProcessResult>)[] = []
+
+  async start(start: StartRequest) {
+    await initCoinList()
+  }
 
   async configure(config: ProcessConfigResponse) {
     for (const aptosProcessor of AptosProcessorState.INSTANCE.getValues()) {
