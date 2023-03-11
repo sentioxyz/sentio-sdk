@@ -207,3 +207,40 @@ export async function getPair(coinx: string, coiny: string): Promise<string> {
   }
   return `${coinXInfo.symbol}-${coinYInfo.symbol}`
 }
+
+export async function getPairValue(
+  ctx: AptosContext,
+  coinx: string,
+  coiny: string,
+  coinXAmount: bigint,
+  coinYAmount: bigint
+): Promise<BigDecimal> {
+  const whitelistx = whiteListed(coinx)
+  const whitelisty = whiteListed(coiny)
+  const coinXInfo = await getCoinInfo(coinx)
+  const coinYInfo = await getCoinInfo(coiny)
+  const timestamp = ctx.transaction.timestamp
+  let result = BigDecimal(0.0)
+
+  if (!whitelistx || !whitelisty) {
+    return result
+  }
+
+  if (whitelistx) {
+    const value = await calculateValueInUsd(coinXAmount, coinXInfo, timestamp)
+    result = value
+
+    if (!whitelisty) {
+      result = result.plus(value)
+    }
+  }
+  if (whitelisty) {
+    const value = await calculateValueInUsd(coinYAmount, coinYInfo, timestamp)
+
+    if (!whitelistx) {
+      result = result.plus(value)
+    }
+  }
+
+  return result
+}
