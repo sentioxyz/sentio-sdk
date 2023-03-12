@@ -34,15 +34,6 @@ export async function initCoinList() {
     if (info.name.includes('Wormhole')) {
       bridge = 'Wormhole'
     }
-    // if (!info.coingecko_id) {
-    //   if (info.symbol.endsWith("APT")) {
-    //     info.coingecko_id = "aptos"
-    //   }
-    //   if (info.symbol.startsWith("USD")) {
-    //     info.coingecko_id = "usd-coin"
-    //   }
-    //   // TODO add moji
-    // }
     WHITELISTED_COINS.set(info.token_type.type, { ...info, bridge })
   }
 }
@@ -58,7 +49,6 @@ export function whiteListed(type: string): boolean {
 export function getCoinInfo(type: string): SimpleCoinInfo {
   const r = WHITELISTED_COINS.get(type)
   if (!r) {
-    console.warn('coin info not existed in white list')
     return {
       token_type: { type: type },
       symbol: type.split('::')[2],
