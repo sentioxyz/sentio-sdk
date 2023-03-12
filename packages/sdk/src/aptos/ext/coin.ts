@@ -50,6 +50,7 @@ export function getCoinInfo(type: string): SimpleCoinInfo {
   const r = WHITELISTED_COINS.get(type)
   if (!r) {
     const parts = type.split('::')
+    // TDDO retrive from network
     return {
       token_type: { type: type, account_address: parts[0] },
       symbol: parts[2],

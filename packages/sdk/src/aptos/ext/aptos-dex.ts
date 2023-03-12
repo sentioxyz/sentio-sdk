@@ -26,14 +26,14 @@ export class AptosDex<T> {
 
   constructor(
     volume: Gauge,
-    volumeSingle: Gauge,
+    // volumeSingle: Gauge,
     tvlAll: Gauge,
     tvlByCoin: Gauge,
     tvlByPool: Gauge,
     poolAdaptor: PoolAdaptor<T>
   ) {
     this.volume = volume
-    this.volumeSingle = volumeSingle
+    // this.volumeSingle = volumeSingle
     this.tvlAll = tvlAll
     this.tvlByPool = tvlByPool
     this.tvlByCoin = tvlByCoin
@@ -48,51 +48,50 @@ export class AptosDex<T> {
     coinYAmount: bigint,
     extraLabels?: any
   ): Promise<BigDecimal> {
+    let result = BigDecimal(0)
+
     const whitelistx = whiteListed(coinx)
     const whitelisty = whiteListed(coiny)
+    if (!whitelistx && !whitelisty) {
+      return result
+    }
     const coinXInfo = await getCoinInfo(coinx)
     const coinYInfo = await getCoinInfo(coiny)
     const timestamp = ctx.transaction.timestamp
-    let result = new BigDecimal(0.0)
+    let resultX = BigDecimal(0)
+    let resultY = BigDecimal(0)
     const pair = await getPair(coinx, coiny)
     const baseLabels: Record<string, string> = extraLabels ? { ...extraLabels, pair } : { pair }
-    if (!whitelistx || !whitelisty) {
-      if (whitelistx) {
-        result = await calculateValueInUsd(coinXAmount, coinXInfo, timestamp)
-        this.volumeSingle.record(ctx, result, {
-          ...baseLabels,
-          coin: coinXInfo.symbol,
-          type: coinXInfo.token_type.type,
-        })
-      }
-      if (whitelisty) {
-        result = await calculateValueInUsd(coinYAmount, coinYInfo, timestamp)
-        this.volumeSingle.record(ctx, result, {
-          ...baseLabels,
-          coin: coinYInfo.symbol,
-          type: coinYInfo.token_type.type,
-        })
-      }
-      return result
+    if (whitelistx) {
+      resultX = await calculateValueInUsd(coinXAmount, coinXInfo, timestamp)
     }
-
-    // Both x and y are whitelisted
-    let value = await calculateValueInUsd(coinXAmount, coinXInfo, timestamp)
-    this.volume.record(ctx, value, {
-      ...baseLabels,
-      coin: coinXInfo.symbol,
-      bridge: coinXInfo.bridge,
-      type: coinXInfo.token_type.type,
-    })
-    value = await calculateValueInUsd(coinYAmount, coinYInfo, timestamp)
-    this.volume.record(ctx, value, {
-      ...baseLabels,
-      coin: coinYInfo.symbol,
-      bridge: coinYInfo.bridge,
-      type: coinYInfo.token_type.type,
-    })
-    this.volumeSingle.record(ctx, value, { ...baseLabels, coin: coinYInfo.symbol, type: coinYInfo.token_type.type })
-    return value
+    if (whitelisty) {
+      resultY = await calculateValueInUsd(coinYAmount, coinYInfo, timestamp)
+    }
+    if (resultX.eq(0)) {
+      resultX = BigDecimal(resultY)
+    }
+    if (resultY.eq(0)) {
+      resultY = BigDecimal(resultX)
+    }
+    if (resultX.gt(0)) {
+      this.volume.record(ctx, resultX, {
+        ...baseLabels,
+        coin: coinXInfo.symbol,
+        bridge: coinXInfo.bridge,
+        type: coinXInfo.token_type.type,
+      })
+    }
+    if (resultY.gt(0)) {
+      this.volume.record(ctx, resultY, {
+        ...baseLabels,
+        coin: coinYInfo.symbol,
+        bridge: coinYInfo.bridge,
+        type: coinYInfo.token_type.type,
+      })
+    }
+    result = resultX.plus(resultY).div(2)
+    return result
   }
 
   async syncPools(
@@ -131,44 +130,38 @@ export class AptosDex<T> {
       const coinx_amount = this.poolAdaptor.getXReserve(pool.data_decoded)
       const coiny_amount = this.poolAdaptor.getYReserve(pool.data_decoded)
 
-      let poolValue = BigDecimal(0)
+      let resultX = BigDecimal(0)
+      let resultY = BigDecimal(0)
 
       if (whitelistx) {
-        const value = await calculateValueInUsd(coinx_amount, coinXInfo, timestamp)
-        poolValue = poolValue.plus(value)
-        // tvlTotal.record(ctx, value, { pool: poolName, type: coinXInfo.token_type.type })
-
+        resultX = await calculateValueInUsd(coinx_amount, coinXInfo, timestamp)
         let coinXTotal = volumeByCoin.get(coinXInfo.token_type.type)
         if (!coinXTotal) {
-          coinXTotal = value
+          coinXTotal = resultX
         } else {
-          coinXTotal = coinXTotal.plus(value)
+          coinXTotal = coinXTotal.plus(resultX)
         }
         volumeByCoin.set(coinXInfo.token_type.type, coinXTotal)
-
-        if (!whitelisty) {
-          poolValue = poolValue.plus(value)
-          // tvlTotal.record(ctx, value, { pool: poolName, type: coinYInfo.token_type.type})
-        }
       }
       if (whitelisty) {
-        const value = await calculateValueInUsd(coiny_amount, coinYInfo, timestamp)
-        poolValue = poolValue.plus(value)
-        // tvlTotal.record(ctx, value, { pool: poolName, type: coinYInfo.token_type.type })
-
+        resultY = await calculateValueInUsd(coiny_amount, coinYInfo, timestamp)
         let coinYTotal = volumeByCoin.get(coinYInfo.token_type.type)
         if (!coinYTotal) {
-          coinYTotal = value
+          coinYTotal = resultY
         } else {
-          coinYTotal = coinYTotal.plus(value)
+          coinYTotal = coinYTotal.plus(resultY)
         }
         volumeByCoin.set(coinYInfo.token_type.type, coinYTotal)
-
-        if (!whitelistx) {
-          tvlAllValue = tvlAllValue.plus(value)
-          // tvlTotal.record(ctx, value, { pool: poolName, type: coinXInfo.token_type.type })
-        }
       }
+
+      if (resultX.eq(0)) {
+        resultX = BigDecimal(resultY)
+      }
+      if (resultY.eq(0)) {
+        resultY = BigDecimal(resultX)
+      }
+
+      const poolValue = resultX.plus(resultY)
 
       if (poolValue.isGreaterThan(0)) {
         this.tvlByPool.record(ctx, poolValue, baseLabels)
