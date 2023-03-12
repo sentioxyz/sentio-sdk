@@ -6,7 +6,7 @@ import fetch from 'node-fetch'
 const WHITELISTED_COINS = new Map<string, SimpleCoinInfo>()
 
 export interface SimpleCoinInfo {
-  token_type: { type: string }
+  token_type: { type: string; account_address: string }
   symbol: string
   decimals: number
   bridge: string
@@ -49,9 +49,10 @@ export function whiteListed(type: string): boolean {
 export function getCoinInfo(type: string): SimpleCoinInfo {
   const r = WHITELISTED_COINS.get(type)
   if (!r) {
+    const parts = type.split('::')
     return {
-      token_type: { type: type },
-      symbol: type.split('::')[2],
+      token_type: { type: type, account_address: parts[0] },
+      symbol: parts[2],
       decimals: 1,
       bridge: 'native',
     }
