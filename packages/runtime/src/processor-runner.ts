@@ -118,7 +118,7 @@ server.listen('0.0.0.0:' + options.port)
 console.log('Processor Server Started at:', options.port)
 
 const metricsPort = 4040
-http
+const httpServer = http
   .createServer(async function (req, res) {
     if (req.url && new URL(req.url, `http://${req.headers.host}`).pathname === '/metrics') {
       const metrics = await mergedRegistry.metrics()
@@ -131,3 +131,13 @@ http
   .listen(metricsPort)
 
 console.log('Metric Server Started at:', metricsPort)
+
+process.on('SIGINT', function () {
+  server.forceShutdown()
+  console.log('RPC server shut down')
+
+  httpServer.close(function () {
+    console.log('Http server shut down')
+    process.exit(0)
+  })
+})
