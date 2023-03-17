@@ -16,6 +16,7 @@ import { PromiseOrVoid } from '../promise-or-void.js'
 import { Trace } from './trace.js'
 import { ServerError, Status } from 'nice-grpc'
 import { decodeResult, EthEvent, formatEthData } from './eth.js'
+import * as console from 'console'
 
 export interface AddressOrTypeEventFilter extends DeferredTopicFilter {
   addressType?: AddressType
@@ -231,8 +232,14 @@ export abstract class BaseProcessor<
           return ProcessResult.fromPartial({})
         }
         const traceData = '0x' + trace.action.input.slice(10)
-        trace.args = contractInterface.getAbiCoder().decode(fragment.inputs, traceData, true)
-
+        try {
+          trace.args = contractInterface.getAbiCoder().decode(fragment.inputs, traceData, true)
+        } catch (e) {
+          if (!trace.error) {
+            throw e
+          }
+          console.error('Failed to decode successful trace', e)
+        }
         const ctx = new ContractContext<TContract, TBoundContractView>(
           contractName,
           contractView,
