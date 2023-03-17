@@ -81,7 +81,7 @@ export abstract class BaseProcessor<
     handler: (event: EthEvent, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     filter: DeferredTopicFilter | DeferredTopicFilter[],
     fetchConfig?: Partial<EthFetchConfig>
-  ) {
+  ): this {
     const chainId = this.getChainId()
     let _filters: DeferredTopicFilter[] = []
 
@@ -133,7 +133,7 @@ export abstract class BaseProcessor<
     handler: (block: BlockParams, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     blockInterval = 250,
     backfillBlockInterval = 1000
-  ) {
+  ): this {
     return this.onInterval(handler, undefined, {
       recentInterval: blockInterval,
       backfillInterval: backfillBlockInterval,
@@ -144,7 +144,7 @@ export abstract class BaseProcessor<
     handler: (block: BlockParams, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     timeIntervalInMinutes = 60,
     backfillTimeIntervalInMinutes = 240
-  ) {
+  ): this {
     return this.onInterval(
       handler,
       { recentInterval: timeIntervalInMinutes, backfillInterval: backfillTimeIntervalInMinutes },
@@ -156,7 +156,7 @@ export abstract class BaseProcessor<
     handler: (block: BlockParams, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     timeInterval: HandleInterval | undefined,
     blockInterval: HandleInterval | undefined
-  ) {
+  ): this {
     const chainId = this.getChainId()
     const processor = this
     const contractName = this.config.name
@@ -189,7 +189,9 @@ export abstract class BaseProcessor<
     return this
   }
 
-  public onAllEvents(handler: (event: EthEvent, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid) {
+  public onAllEvents(
+    handler: (event: EthEvent, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid
+  ): this {
     const _filters: DeferredTopicFilter[] = []
     const tmpContract = this.CreateBoundContractView()
 
@@ -208,7 +210,7 @@ export abstract class BaseProcessor<
     signature: string,
     handler: (trace: Trace, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     fetchConfig?: Partial<EthFetchConfig>
-  ) {
+  ): this {
     const chainId = this.getChainId()
     const contractName = this.config.name
     const processor = this

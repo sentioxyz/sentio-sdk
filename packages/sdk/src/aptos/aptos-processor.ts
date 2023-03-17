@@ -55,7 +55,7 @@ export class AptosBaseProcessor {
     handler: (transaction: Transaction_UserTransaction, ctx: AptosContext) => void,
     includedFailed = false,
     fetchConfig?: MoveFetchConfig
-  ): AptosBaseProcessor {
+  ): this {
     const _fetchConfig = fetchConfig || MoveFetchConfig.fromPartial({})
 
     // const address = this.config.address
@@ -87,7 +87,7 @@ export class AptosBaseProcessor {
     handler: (event: EventInstance, ctx: AptosContext) => void,
     filter: EventFilter | EventFilter[],
     fetchConfig?: MoveFetchConfig
-  ): AptosBaseProcessor {
+  ): this {
     let _filters: EventFilter[] = []
     const _fetchConfig = fetchConfig || MoveFetchConfig.fromPartial({})
 
@@ -140,7 +140,7 @@ export class AptosBaseProcessor {
     handler: (call: TransactionPayload_EntryFunctionPayload, ctx: AptosContext) => void,
     filter: FunctionNameAndCallFilter | FunctionNameAndCallFilter[],
     fetchConfig?: MoveFetchConfig
-  ): AptosBaseProcessor {
+  ): this {
     let _filters: FunctionNameAndCallFilter[] = []
     const _fetchConfig = fetchConfig || MoveFetchConfig.fromPartial({})
 
@@ -225,7 +225,7 @@ export class AptosAccountProcessor {
     timeInterval: HandleInterval | undefined,
     versionInterval: HandleInterval | undefined,
     type: string | undefined
-  ) {
+  ): this {
     const processor = this
     this.resourcesHandlers.push({
       handler: async function (data) {
@@ -255,7 +255,7 @@ export class AptosAccountProcessor {
     timeIntervalInMinutes = 60,
     backfillTimeIntervalInMinutes = 240,
     type?: string
-  ) {
+  ): this {
     return this.onInterval(
       handler,
       {
@@ -272,7 +272,7 @@ export class AptosAccountProcessor {
     versionInterval = 100000,
     backfillVersionInterval = 400000,
     typePrefix?: string
-  ) {
+  ): this {
     return this.onInterval(
       handler,
       undefined,

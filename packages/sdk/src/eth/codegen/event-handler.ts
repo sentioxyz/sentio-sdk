@@ -12,7 +12,7 @@ export function generateEventHandler(event: EventDeclaration, contractName: stri
     handler: (event: ${eventNamePrefix}Event, ctx: ${contractName}Context) => void,
     filter?: ${eventNamePrefix}EventFilter | ${eventNamePrefix}EventFilter[],
     fetchConfig?: Partial<EthFetchConfig>
-  ) {
+  ): this {
     if (!filter) {
       filter = templateContract.filters['${filterName}'](${event.inputs.map(() => 'null').join(',')})
     }
