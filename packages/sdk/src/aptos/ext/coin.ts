@@ -23,6 +23,10 @@ export async function initCoinList() {
     console.warn("Can't not fetch newest coin list, use default list")
   }
 
+  setCoinList(list)
+}
+
+function setCoinList(list: (Omit<SimpleCoinInfo, 'bridge'> & { name: string })[]) {
   for (const info of list) {
     let bridge = 'native'
     if (info.name.includes('Celer')) {
@@ -1507,3 +1511,5 @@ const DEFAULT_LIST = [
     pancake_symbol: 'ar-USDC',
   },
 ]
+
+setCoinList(DEFAULT_LIST)
