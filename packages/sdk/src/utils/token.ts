@@ -33,8 +33,8 @@ async function getTokenInfoPromise(
 }
 
 export async function getERC20TokenInfo(
-  tokenAddress: string,
-  contextOrNetworkish: BaseContext | Networkish
+  contextOrNetworkish: BaseContext | Networkish,
+  tokenAddress: string
 ): Promise<TokenInfo> {
   const chainId = getNetworkFromCtxOrNetworkish(contextOrNetworkish).chainId.toString()
   const key = chainId + tokenAddress
@@ -42,8 +42,8 @@ export async function getERC20TokenInfo(
   if (res) {
     return res
   }
-  const contract = getERC20Contract(tokenAddress, chainId)
-  const bytesContract = getERC20BytesContract(tokenAddress, chainId)
+  const contract = getERC20Contract(chainId, tokenAddress)
+  const bytesContract = getERC20BytesContract(chainId, tokenAddress)
 
   let name = ''
   try {
@@ -67,10 +67,10 @@ export async function getERC20TokenInfo(
 }
 
 export async function getER20NormalizedAmount(
+  contextOrNetworkish: BaseContext | Networkish,
   tokenAddress: string,
-  amount: bigint,
-  contextOrNetworkish: BaseContext | Networkish
+  amount: bigint
 ): Promise<BigDecimal> {
-  const tokenInfo = await getERC20TokenInfo(tokenAddress, contextOrNetworkish)
+  const tokenInfo = await getERC20TokenInfo(contextOrNetworkish, tokenAddress)
   return scaleDown(amount, tokenInfo.decimal)
 }

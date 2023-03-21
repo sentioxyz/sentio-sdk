@@ -100,7 +100,7 @@ class DexPrice {
       }
     }
 
-    const contract = getEACAggregatorProxyContract(addr, this.chainId)
+    const contract = getEACAggregatorProxyContract(this.chainId, addr)
     try {
       const price = await contract.latestAnswer({
         blockTag: blockTag,

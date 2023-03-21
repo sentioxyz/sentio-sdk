@@ -62,7 +62,7 @@ export function codeGenSentioFile(contract: Contract): string {
   }
   
   protected CreateBoundContractView(): ${contract.name}BoundContractView {
-    const view = get${contract.name}Contract(this.config.address, this.config.network)
+    const view = get${contract.name}Contract(this.config.network, this.config.address)
     return new ${contract.name}BoundContractView(this.config.address, view)
   }
 
@@ -105,7 +105,7 @@ export class ${contract.name}ProcessorTemplate extends BaseProcessorTemplate<${c
     .join('\n')}
   }
 
-  export function get${contract.name}Contract(address: string, contextOrNetwork: BaseContext | Networkish): ${
+  export function get${contract.name}Contract(contextOrNetwork: BaseContext | Networkish, address: string): ${
     contract.name
   }ContractView {
     const network = getNetworkFromCtxOrNetworkish(contextOrNetwork) 
@@ -230,7 +230,7 @@ function generateMockEventLogFunction(event: EventDeclaration, contractName: str
 
   return `
     export function mock${eventName}Log(contractAddress: string, event: ${eventName}EventObject): LogParams {
-      const contract = get${contractName}Contract(contractAddress, 1)
+      const contract = get${contractName}Contract(1, contractAddress)
       const encodedLog = contract.rawContract.interface.encodeEventLog(
         '${getFullSignatureForEvent(event)}',
         [${eventArgs.join(', ')}]
