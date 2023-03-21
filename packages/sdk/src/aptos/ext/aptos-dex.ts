@@ -19,21 +19,21 @@ export interface PoolAdaptor<T> {
 export class AptosDex<T> {
   poolAdaptor: PoolAdaptor<T>
   volume: Gauge
-  volumeSingle: Gauge
+  volumeByCoin: Gauge
   tvlAll: Gauge
   tvlByPool: Gauge
   tvlByCoin: Gauge
 
   constructor(
     volume: Gauge,
-    // volumeSingle: Gauge,
+    volumeByCoin: Gauge,
     tvlAll: Gauge,
     tvlByCoin: Gauge,
     tvlByPool: Gauge,
     poolAdaptor: PoolAdaptor<T>
   ) {
     this.volume = volume
-    // this.volumeSingle = volumeSingle
+    this.volumeByCoin = volumeByCoin
     this.tvlAll = tvlAll
     this.tvlByPool = tvlByPool
     this.tvlByCoin = tvlByCoin
@@ -74,19 +74,22 @@ export class AptosDex<T> {
     if (resultY.eq(0)) {
       resultY = BigDecimal(resultX)
     }
-    if (resultX.gt(0)) {
-      this.volume.record(ctx, resultX, {
+    const total = resultX.plus(resultY)
+    if (total.gt(0)) {
+      this.volume.record(ctx, total, {
         ...baseLabels,
-        coin: coinXInfo.symbol,
         bridge: coinXInfo.bridge,
+      })
+    }
+    if (resultX.gt(0)) {
+      this.volumeByCoin.record(ctx, resultX, {
+        coin: coinXInfo.symbol,
         type: coinXInfo.token_type.type,
       })
     }
     if (resultY.gt(0)) {
-      this.volume.record(ctx, resultY, {
-        ...baseLabels,
+      this.volumeByCoin.record(ctx, resultY, {
         coin: coinYInfo.symbol,
-        bridge: coinYInfo.bridge,
         type: coinYInfo.token_type.type,
       })
     }
