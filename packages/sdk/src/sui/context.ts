@@ -30,6 +30,10 @@ export class SuiContext extends BaseContext {
     }
   }
 
+  getChainId(): string {
+    return getChainId(this.network)
+  }
+
   getMetaData(name: string, labels: Labels): RecordMetaData {
     return {
       address: this.address,
@@ -38,7 +42,7 @@ export class SuiContext extends BaseContext {
       transactionIndex: 0,
       transactionHash: this.transaction?.certificate.transactionDigest || '', // TODO
       logIndex: 0,
-      chainId: getChainId(this.network),
+      chainId: this.getChainId(),
       name: name,
       labels: normalizeLabels(labels),
     }

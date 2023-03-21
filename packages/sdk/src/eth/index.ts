@@ -1,7 +1,7 @@
 export { BaseProcessor } from './base-processor.js'
 export { GenericProcessor } from './generic-processor.js'
 export { BaseProcessorTemplate } from './base-processor-template.js'
-export { getProvider, DummyProvider } from './provider.js'
+export { getProvider, DummyProvider, getNetworkFromCtxOrNetworkish } from './provider.js'
 export type { TypedCallTrace, Trace } from './trace.js'
 export * from './eth.js'
 export { BindOptions, AccountBindOptions } from './bind-options.js'

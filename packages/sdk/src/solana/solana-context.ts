@@ -14,6 +14,10 @@ export class SolanaContext extends BaseContext {
     this.blockNumber = slot
   }
 
+  getChainId(): string {
+    return this.network
+  }
+
   getMetaData(name: string, labels: Labels): RecordMetaData {
     return {
       address: this.address,
@@ -22,7 +26,7 @@ export class SolanaContext extends BaseContext {
       transactionIndex: 0,
       transactionHash: '', // TODO add
       logIndex: 0,
-      chainId: this.network,
+      chainId: this.getChainId(),
       name: name,
       labels: normalizeLabels(labels),
     }

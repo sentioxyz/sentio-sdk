@@ -2,7 +2,9 @@ import { getERC20Contract } from '../eth/builtin/erc20.js'
 import { getERC20BytesContract } from '../eth/builtin/erc20bytes.js'
 import { BigDecimal, scaleDown } from '../core/big-decimal.js'
 import { PromiseOrValue } from '../eth/builtin/internal/common.js'
-import { decodeBytes32String } from 'ethers'
+import { decodeBytes32String, Networkish } from 'ethers'
+import { BaseContext } from '../core/index.js'
+import { getNetworkFromCtxOrNetworkish } from '../eth/index.js'
 
 export interface TokenInfo {
   symbol: string
@@ -30,7 +32,11 @@ async function getTokenInfoPromise(
   }
 }
 
-export async function getERC20TokenInfo(tokenAddress: string, chainId = 1): Promise<TokenInfo> {
+export async function getERC20TokenInfo(
+  tokenAddress: string,
+  contextOrNetworkish: BaseContext | Networkish
+): Promise<TokenInfo> {
+  const chainId = getNetworkFromCtxOrNetworkish(contextOrNetworkish).chainId.toString()
   const key = chainId + tokenAddress
   const res = TOKEN_INFOS.get(key)
   if (res) {
@@ -63,8 +69,8 @@ export async function getERC20TokenInfo(tokenAddress: string, chainId = 1): Prom
 export async function getER20NormalizedAmount(
   tokenAddress: string,
   amount: bigint,
-  chainId: number
+  contextOrNetworkish: BaseContext | Networkish
 ): Promise<BigDecimal> {
-  const tokenInfo = await getERC20TokenInfo(tokenAddress, chainId)
+  const tokenInfo = await getERC20TokenInfo(tokenAddress, contextOrNetworkish)
   return scaleDown(amount, tokenInfo.decimal)
 }

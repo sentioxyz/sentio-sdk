@@ -23,4 +23,6 @@ export abstract class BaseContext {
   }
 
   abstract getMetaData(name: string, labels: Labels): RecordMetaData
+
+  abstract getChainId(): string
 }

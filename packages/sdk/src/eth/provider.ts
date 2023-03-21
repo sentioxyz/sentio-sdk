@@ -3,14 +3,18 @@ import { Networkish } from 'ethers/providers'
 
 import PQueue from 'p-queue'
 import { Endpoints } from '@sentio/runtime'
+import { BaseContext } from '../core/index.js'
 
 export const DummyProvider = new JsonRpcProvider('', Network.from(1))
 
 const providers = new Map<string, JsonRpcProvider>()
 
-export function getProvider(networkish?: Networkish): Provider {
+export function getNetworkFromCtxOrNetworkish(networkish?: BaseContext | Networkish) {
   if (!networkish) {
     networkish = 1
+  }
+  if (networkish instanceof BaseContext) {
+    networkish = networkish.getChainId()
   }
   if (typeof networkish === 'string') {
     const id = parseInt(networkish)
@@ -18,7 +22,11 @@ export function getProvider(networkish?: Networkish): Provider {
       networkish = 1
     }
   }
-  const network = Network.from(networkish)
+  return Network.from(networkish)
+}
+
+export function getProvider(networkish?: Networkish): Provider {
+  const network = getNetworkFromCtxOrNetworkish(networkish)
   // TODO check if other key needed
 
   const address = Endpoints.INSTANCE.chainServer.get(network.chainId.toString())

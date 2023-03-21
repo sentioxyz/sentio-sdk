@@ -105,8 +105,10 @@ export class ${contract.name}ProcessorTemplate extends BaseProcessorTemplate<${c
     .join('\n')}
   }
 
-
-  export function get${contract.name}Contract(address: string, network: Networkish = 1): ${contract.name}ContractView {
+  export function get${contract.name}Contract(address: string, contextOrNetwork: BaseContext | Networkish): ${
+    contract.name
+  }ContractView {
+    const network = getNetworkFromCtxOrNetworkish(contextOrNetwork) 
     let contract = getContractByABI("${contract.name}", address, network) as ${contract.name}ContractView
     if (!contract) {
       const rawContract = ${contract.name}__factory.connect(address, getProvider(network))
@@ -162,8 +164,10 @@ export class ${contract.name}ProcessorTemplate extends BaseProcessorTemplate<${c
         'ContractView',
         'DummyProvider',
         'TypedCallTrace',
+        'getNetworkFromCtxOrNetworkish',
         // 'toBlockTag',
       ],
+      '@sentio/sdk': ['BaseContext'],
       '@sentio/protos': ['EthFetchConfig'],
       './common.js': ['PromiseOrValue'],
       './index.js': [`${contract.name}`, `${contract.name}__factory`],
@@ -226,7 +230,7 @@ function generateMockEventLogFunction(event: EventDeclaration, contractName: str
 
   return `
     export function mock${eventName}Log(contractAddress: string, event: ${eventName}EventObject): LogParams {
-      const contract = get${contractName}Contract(contractAddress)
+      const contract = get${contractName}Contract(contractAddress, 1)
       const encodedLog = contract.rawContract.interface.encodeEventLog(
         '${getFullSignatureForEvent(event)}',
         [${eventArgs.join(', ')}]

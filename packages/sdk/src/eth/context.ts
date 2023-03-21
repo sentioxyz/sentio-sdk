@@ -50,6 +50,10 @@ export abstract class EthContext extends BaseContext {
 
   protected abstract getContractName(): string
 
+  getChainId(): string {
+    return this.chainId.toString()
+  }
+
   getMetaData(name: string, labels: Labels): RecordMetaData {
     if (this.log) {
       return {
