@@ -84,12 +84,14 @@ export class AptosDex<T> {
     if (resultX.gt(0)) {
       this.volumeByCoin.record(ctx, resultX, {
         coin: coinXInfo.symbol,
+        bridge: coinXInfo.bridge,
         type: coinXInfo.token_type.type,
       })
     }
     if (resultY.gt(0)) {
       this.volumeByCoin.record(ctx, resultY, {
         coin: coinYInfo.symbol,
+        bridge: coinYInfo.bridge,
         type: coinYInfo.token_type.type,
       })
     }
