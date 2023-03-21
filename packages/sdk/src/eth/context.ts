@@ -33,7 +33,7 @@ export abstract class EthContext extends BaseContext {
     this.log = log
     this.block = block
     this.trace = trace
-    this.address = address
+    this.address = address.toLowerCase()
     this.transaction = transaction
     this.transactionReceipt = transactionReceipt
     this.timestamp = timestamp || new Date(0)

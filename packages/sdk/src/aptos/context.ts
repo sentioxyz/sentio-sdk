@@ -18,7 +18,7 @@ export class AptosContext extends BaseContext {
     transaction?: Transaction_UserTransaction
   ) {
     super()
-    this.address = address
+    this.address = address.toLowerCase()
     this.network = network
     this.moduleName = moduleName
     this.version = version

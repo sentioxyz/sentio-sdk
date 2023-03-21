@@ -20,7 +20,7 @@ export class SuiContext extends BaseContext {
     transaction?: SuiTransactionResponse
   ) {
     super()
-    this.address = address
+    this.address = address.toLowerCase()
     this.network = network
     this.moduleName = moduleName
     this.timestamp = timestamp
