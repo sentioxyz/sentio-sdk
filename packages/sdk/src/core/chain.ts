@@ -131,3 +131,57 @@ export function getChainType(chainId?: string | number): string {
   }
   return 'EVM'
 }
+
+export function getChainScanUrl(
+  chainId?: string | number,
+  hash?: string,
+  subtype?: 'block' | 'address' | 'transaction'
+): string | undefined {
+  const chainName = getChainName(chainId)
+  if (chainName === 'Ethereum') {
+    if (subtype === 'block') {
+      return `https://etherscan.io/block/${hash}`
+    } else if (subtype === 'address') {
+      return `https://etherscan.io/address/${hash}`
+    } else {
+      return `https://etherscan.io/tx/${hash}`
+    }
+  }
+  if (chainName === 'Polygon') {
+    if (subtype === 'block') {
+      return `https://polygonscan.com/block/${hash}`
+    } else if (subtype === 'address') {
+      return `https://polygonscan.com/address/${hash}`
+    } else {
+      return `https://polygonscan.com/tx/${hash}`
+    }
+  }
+  if (chainName.startsWith('Aptos ')) {
+    if (subtype === 'block') {
+      return `https://explorer.aptos.io/block/${hash}`
+    } else if (subtype === 'address') {
+      return `https://explorer.aptos.io/account/${hash}`
+    } else {
+      return `https://explorer.aptos.io/txn/${hash}`
+    }
+  }
+  if (chainName.startsWith('Solana ')) {
+    if (subtype === 'block') {
+      return `https://explorer.solana.com/block/${hash}`
+    } else if (subtype === 'address') {
+      return `https://explorer.solana.com/address/${hash}`
+    } else {
+      return `https://explorer.solana.io/tx/${hash}`
+    }
+  }
+  if (chainName.startsWith('Sui ')) {
+    if (subtype === 'block') {
+      return `https://explorer.sui.io/block/${hash}`
+    } else if (subtype === 'address') {
+      return `https://explorer.sui.io/address/${hash}`
+    } else {
+      return `https://explorer.sui.io/transaction/${hash}`
+    }
+  }
+  return undefined
+}

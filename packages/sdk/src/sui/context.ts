@@ -48,3 +48,36 @@ export class SuiContext extends BaseContext {
     }
   }
 }
+
+export class SuiObjectContext extends BaseContext {
+  address: string
+  network: SuiNetwork
+  slot: bigint
+  timestamp: Date
+
+  constructor(network: SuiNetwork, address: string, slot: bigint, timestamp: Date) {
+    super()
+    this.address = address
+    this.network = network
+    this.slot = slot
+    this.timestamp = timestamp
+  }
+
+  getChainId(): string {
+    return getChainId(this.network)
+  }
+
+  getMetaData(name: string, labels: Labels): RecordMetaData {
+    return {
+      address: this.address,
+      contractName: 'objects',
+      blockNumber: this.slot,
+      transactionIndex: 0,
+      transactionHash: '',
+      logIndex: 0,
+      chainId: this.getChainId(),
+      name: name,
+      labels: normalizeLabels(labels),
+    }
+  }
+}

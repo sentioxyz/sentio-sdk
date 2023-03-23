@@ -134,6 +134,7 @@ export enum HandlerType {
   APT_RESOURCE = 8,
   SUI_EVENT = 3,
   SUI_CALL = 9,
+  SUI_OBJECT = 10,
   UNRECOGNIZED = -1,
 }
 
@@ -169,6 +170,9 @@ export function handlerTypeFromJSON(object: any): HandlerType {
     case 9:
     case "SUI_CALL":
       return HandlerType.SUI_CALL;
+    case 10:
+    case "SUI_OBJECT":
+      return HandlerType.SUI_OBJECT;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -198,6 +202,8 @@ export function handlerTypeToJSON(object: HandlerType): string {
       return "SUI_EVENT";
     case HandlerType.SUI_CALL:
       return "SUI_CALL";
+    case HandlerType.SUI_OBJECT:
+      return "SUI_OBJECT";
     case HandlerType.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
@@ -364,6 +370,7 @@ export interface AccountConfig {
   startBlock: bigint;
   intervalConfigs: OnIntervalConfig[];
   aptosIntervalConfigs: AptosOnIntervalConfig[];
+  suiIntervalConfigs: SuiOnIntervalConfig[];
   logConfigs: LogHandlerConfig[];
 }
 
@@ -383,6 +390,10 @@ export interface OnIntervalConfig {
 export interface AptosOnIntervalConfig {
   intervalConfig: OnIntervalConfig | undefined;
   type: string;
+}
+
+export interface SuiOnIntervalConfig {
+  intervalConfig: OnIntervalConfig | undefined;
 }
 
 export interface ContractInfo {
@@ -496,6 +507,7 @@ export interface Data {
   aptResource?: Data_AptResource | undefined;
   suiEvent?: Data_SuiEvent | undefined;
   suiCall?: Data_SuiCall | undefined;
+  suiObject?: Data_SuiObject | undefined;
 }
 
 export interface Data_EthLog {
@@ -555,6 +567,12 @@ export interface Data_SuiEvent {
 
 export interface Data_SuiCall {
   transaction: { [key: string]: any } | undefined;
+  timestamp: Date | undefined;
+  slot: bigint;
+}
+
+export interface Data_SuiObject {
+  objects: { [key: string]: any } | undefined;
   timestamp: Date | undefined;
   slot: bigint;
 }
@@ -1629,6 +1647,7 @@ function createBaseAccountConfig(): AccountConfig {
     startBlock: BigInt("0"),
     intervalConfigs: [],
     aptosIntervalConfigs: [],
+    suiIntervalConfigs: [],
     logConfigs: [],
   };
 }
@@ -1649,6 +1668,9 @@ export const AccountConfig = {
     }
     for (const v of message.aptosIntervalConfigs) {
       AptosOnIntervalConfig.encode(v!, writer.uint32(42).fork()).ldelim();
+    }
+    for (const v of message.suiIntervalConfigs) {
+      SuiOnIntervalConfig.encode(v!, writer.uint32(58).fork()).ldelim();
     }
     for (const v of message.logConfigs) {
       LogHandlerConfig.encode(v!, writer.uint32(50).fork()).ldelim();
@@ -1678,6 +1700,9 @@ export const AccountConfig = {
         case 5:
           message.aptosIntervalConfigs.push(AptosOnIntervalConfig.decode(reader, reader.uint32()));
           break;
+        case 7:
+          message.suiIntervalConfigs.push(SuiOnIntervalConfig.decode(reader, reader.uint32()));
+          break;
         case 6:
           message.logConfigs.push(LogHandlerConfig.decode(reader, reader.uint32()));
           break;
@@ -1699,6 +1724,9 @@ export const AccountConfig = {
         : [],
       aptosIntervalConfigs: Array.isArray(object?.aptosIntervalConfigs)
         ? object.aptosIntervalConfigs.map((e: any) => AptosOnIntervalConfig.fromJSON(e))
+        : [],
+      suiIntervalConfigs: Array.isArray(object?.suiIntervalConfigs)
+        ? object.suiIntervalConfigs.map((e: any) => SuiOnIntervalConfig.fromJSON(e))
         : [],
       logConfigs: Array.isArray(object?.logConfigs)
         ? object.logConfigs.map((e: any) => LogHandlerConfig.fromJSON(e))
@@ -1723,6 +1751,11 @@ export const AccountConfig = {
     } else {
       obj.aptosIntervalConfigs = [];
     }
+    if (message.suiIntervalConfigs) {
+      obj.suiIntervalConfigs = message.suiIntervalConfigs.map((e) => e ? SuiOnIntervalConfig.toJSON(e) : undefined);
+    } else {
+      obj.suiIntervalConfigs = [];
+    }
     if (message.logConfigs) {
       obj.logConfigs = message.logConfigs.map((e) => e ? LogHandlerConfig.toJSON(e) : undefined);
     } else {
@@ -1742,6 +1775,7 @@ export const AccountConfig = {
     message.startBlock = object.startBlock ?? BigInt("0");
     message.intervalConfigs = object.intervalConfigs?.map((e) => OnIntervalConfig.fromPartial(e)) || [];
     message.aptosIntervalConfigs = object.aptosIntervalConfigs?.map((e) => AptosOnIntervalConfig.fromPartial(e)) || [];
+    message.suiIntervalConfigs = object.suiIntervalConfigs?.map((e) => SuiOnIntervalConfig.fromPartial(e)) || [];
     message.logConfigs = object.logConfigs?.map((e) => LogHandlerConfig.fromPartial(e)) || [];
     return message;
   },
@@ -1965,6 +1999,62 @@ export const AptosOnIntervalConfig = {
       ? OnIntervalConfig.fromPartial(object.intervalConfig)
       : undefined;
     message.type = object.type ?? "";
+    return message;
+  },
+};
+
+function createBaseSuiOnIntervalConfig(): SuiOnIntervalConfig {
+  return { intervalConfig: undefined };
+}
+
+export const SuiOnIntervalConfig = {
+  encode(message: SuiOnIntervalConfig, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.intervalConfig !== undefined) {
+      OnIntervalConfig.encode(message.intervalConfig, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): SuiOnIntervalConfig {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseSuiOnIntervalConfig();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.intervalConfig = OnIntervalConfig.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): SuiOnIntervalConfig {
+    return {
+      intervalConfig: isSet(object.intervalConfig) ? OnIntervalConfig.fromJSON(object.intervalConfig) : undefined,
+    };
+  },
+
+  toJSON(message: SuiOnIntervalConfig): unknown {
+    const obj: any = {};
+    message.intervalConfig !== undefined &&
+      (obj.intervalConfig = message.intervalConfig ? OnIntervalConfig.toJSON(message.intervalConfig) : undefined);
+    return obj;
+  },
+
+  create(base?: DeepPartial<SuiOnIntervalConfig>): SuiOnIntervalConfig {
+    return SuiOnIntervalConfig.fromPartial(base ?? {});
+  },
+
+  fromPartial(object: DeepPartial<SuiOnIntervalConfig>): SuiOnIntervalConfig {
+    const message = createBaseSuiOnIntervalConfig();
+    message.intervalConfig = (object.intervalConfig !== undefined && object.intervalConfig !== null)
+      ? OnIntervalConfig.fromPartial(object.intervalConfig)
+      : undefined;
     return message;
   },
 };
@@ -3219,6 +3309,7 @@ function createBaseData(): Data {
     aptResource: undefined,
     suiEvent: undefined,
     suiCall: undefined,
+    suiObject: undefined,
   };
 }
 
@@ -3256,6 +3347,9 @@ export const Data = {
     }
     if (message.suiCall !== undefined) {
       Data_SuiCall.encode(message.suiCall, writer.uint32(90).fork()).ldelim();
+    }
+    if (message.suiObject !== undefined) {
+      Data_SuiObject.encode(message.suiObject, writer.uint32(98).fork()).ldelim();
     }
     return writer;
   },
@@ -3300,6 +3394,9 @@ export const Data = {
         case 11:
           message.suiCall = Data_SuiCall.decode(reader, reader.uint32());
           break;
+        case 12:
+          message.suiObject = Data_SuiObject.decode(reader, reader.uint32());
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -3321,6 +3418,7 @@ export const Data = {
       aptResource: isSet(object.aptResource) ? Data_AptResource.fromJSON(object.aptResource) : undefined,
       suiEvent: isSet(object.suiEvent) ? Data_SuiEvent.fromJSON(object.suiEvent) : undefined,
       suiCall: isSet(object.suiCall) ? Data_SuiCall.fromJSON(object.suiCall) : undefined,
+      suiObject: isSet(object.suiObject) ? Data_SuiObject.fromJSON(object.suiObject) : undefined,
     };
   },
 
@@ -3345,6 +3443,8 @@ export const Data = {
     message.suiEvent !== undefined &&
       (obj.suiEvent = message.suiEvent ? Data_SuiEvent.toJSON(message.suiEvent) : undefined);
     message.suiCall !== undefined && (obj.suiCall = message.suiCall ? Data_SuiCall.toJSON(message.suiCall) : undefined);
+    message.suiObject !== undefined &&
+      (obj.suiObject = message.suiObject ? Data_SuiObject.toJSON(message.suiObject) : undefined);
     return obj;
   },
 
@@ -3384,6 +3484,9 @@ export const Data = {
       : undefined;
     message.suiCall = (object.suiCall !== undefined && object.suiCall !== null)
       ? Data_SuiCall.fromPartial(object.suiCall)
+      : undefined;
+    message.suiObject = (object.suiObject !== undefined && object.suiObject !== null)
+      ? Data_SuiObject.fromPartial(object.suiObject)
       : undefined;
     return message;
   },
@@ -4116,6 +4219,77 @@ export const Data_SuiCall = {
   fromPartial(object: DeepPartial<Data_SuiCall>): Data_SuiCall {
     const message = createBaseData_SuiCall();
     message.transaction = object.transaction ?? undefined;
+    message.timestamp = object.timestamp ?? undefined;
+    message.slot = object.slot ?? BigInt("0");
+    return message;
+  },
+};
+
+function createBaseData_SuiObject(): Data_SuiObject {
+  return { objects: undefined, timestamp: undefined, slot: BigInt("0") };
+}
+
+export const Data_SuiObject = {
+  encode(message: Data_SuiObject, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.objects !== undefined) {
+      Struct.encode(Struct.wrap(message.objects), writer.uint32(10).fork()).ldelim();
+    }
+    if (message.timestamp !== undefined) {
+      Timestamp.encode(toTimestamp(message.timestamp), writer.uint32(18).fork()).ldelim();
+    }
+    if (message.slot !== BigInt("0")) {
+      writer.uint32(24).uint64(message.slot.toString());
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Data_SuiObject {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseData_SuiObject();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.objects = Struct.unwrap(Struct.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.timestamp = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+          break;
+        case 3:
+          message.slot = longToBigint(reader.uint64() as Long);
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Data_SuiObject {
+    return {
+      objects: isObject(object.objects) ? object.objects : undefined,
+      timestamp: isSet(object.timestamp) ? fromJsonTimestamp(object.timestamp) : undefined,
+      slot: isSet(object.slot) ? BigInt(object.slot) : BigInt("0"),
+    };
+  },
+
+  toJSON(message: Data_SuiObject): unknown {
+    const obj: any = {};
+    message.objects !== undefined && (obj.objects = message.objects);
+    message.timestamp !== undefined && (obj.timestamp = message.timestamp.toISOString());
+    message.slot !== undefined && (obj.slot = message.slot.toString());
+    return obj;
+  },
+
+  create(base?: DeepPartial<Data_SuiObject>): Data_SuiObject {
+    return Data_SuiObject.fromPartial(base ?? {});
+  },
+
+  fromPartial(object: DeepPartial<Data_SuiObject>): Data_SuiObject {
+    const message = createBaseData_SuiObject();
+    message.objects = object.objects ?? undefined;
     message.timestamp = object.timestamp ?? undefined;
     message.slot = object.slot ?? BigInt("0");
     return message;

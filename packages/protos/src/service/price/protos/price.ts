@@ -45,7 +45,7 @@ export interface BatchGetPricesResponse_CoinPrice_Price {
 export interface ListCoinsRequest {
   limit: number;
   offset: number;
-  queryString: string;
+  searchQuery: string;
 }
 
 export interface ListCoinsResponse {
@@ -568,7 +568,7 @@ export const BatchGetPricesResponse_CoinPrice_Price = {
 };
 
 function createBaseListCoinsRequest(): ListCoinsRequest {
-  return { limit: 0, offset: 0, queryString: "" };
+  return { limit: 0, offset: 0, searchQuery: "" };
 }
 
 export const ListCoinsRequest = {
@@ -579,8 +579,8 @@ export const ListCoinsRequest = {
     if (message.offset !== 0) {
       writer.uint32(16).int32(message.offset);
     }
-    if (message.queryString !== "") {
-      writer.uint32(26).string(message.queryString);
+    if (message.searchQuery !== "") {
+      writer.uint32(26).string(message.searchQuery);
     }
     return writer;
   },
@@ -599,7 +599,7 @@ export const ListCoinsRequest = {
           message.offset = reader.int32();
           break;
         case 3:
-          message.queryString = reader.string();
+          message.searchQuery = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -613,7 +613,7 @@ export const ListCoinsRequest = {
     return {
       limit: isSet(object.limit) ? Number(object.limit) : 0,
       offset: isSet(object.offset) ? Number(object.offset) : 0,
-      queryString: isSet(object.queryString) ? String(object.queryString) : "",
+      searchQuery: isSet(object.searchQuery) ? String(object.searchQuery) : "",
     };
   },
 
@@ -621,7 +621,7 @@ export const ListCoinsRequest = {
     const obj: any = {};
     message.limit !== undefined && (obj.limit = Math.round(message.limit));
     message.offset !== undefined && (obj.offset = Math.round(message.offset));
-    message.queryString !== undefined && (obj.queryString = message.queryString);
+    message.searchQuery !== undefined && (obj.searchQuery = message.searchQuery);
     return obj;
   },
 
@@ -633,7 +633,7 @@ export const ListCoinsRequest = {
     const message = createBaseListCoinsRequest();
     message.limit = object.limit ?? 0;
     message.offset = object.offset ?? 0;
-    message.queryString = object.queryString ?? "";
+    message.searchQuery = object.searchQuery ?? "";
     return message;
   },
 };

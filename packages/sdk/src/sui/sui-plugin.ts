@@ -1,8 +1,10 @@
 import { errorString, mergeProcessResults, Plugin, PluginManager, USER_PROCESSOR } from '@sentio/runtime'
 import {
+  AccountConfig,
   ContractConfig,
   Data_SuiCall,
   Data_SuiEvent,
+  Data_SuiObject,
   DataBinding,
   HandlerType,
   MoveCallHandlerConfig,
@@ -13,7 +15,7 @@ import {
 
 import { ServerError, Status } from 'nice-grpc'
 
-import { SuiProcessorState } from './sui-processor.js'
+import { SuiAccountProcessorState, SuiProcessorState } from './sui-processor.js'
 import { getChainId } from './network.js'
 
 export class SuiPlugin extends Plugin {
@@ -21,6 +23,7 @@ export class SuiPlugin extends Plugin {
 
   private suiEventHandlers: ((event: Data_SuiEvent) => Promise<ProcessResult>)[] = []
   private suiCallHandlers: ((func: Data_SuiCall) => Promise<ProcessResult>)[] = []
+  private suiObjectHandlers: ((object: Data_SuiObject) => Promise<ProcessResult>)[] = []
 
   async configure(config: ProcessConfigResponse) {
     for (const suiProcessor of SuiProcessorState.INSTANCE.getValues()) {
@@ -67,6 +70,27 @@ export class SuiPlugin extends Plugin {
       }
       config.contractConfigs.push(contractConfig)
     }
+
+    for (const processor of SuiAccountProcessorState.INSTANCE.getValues()) {
+      const accountConfig = AccountConfig.fromPartial({
+        address: processor.config.address,
+        chainId: processor.getChainId(),
+        startBlock: BigInt(processor.config.startTimestamp), // TODO maybe use another field
+      })
+      for (const handler of processor.objectHandlers) {
+        const handlerId = this.suiObjectHandlers.push(handler.handler) - 1
+        accountConfig.suiIntervalConfigs.push({
+          intervalConfig: {
+            handlerId: handlerId,
+            minutes: 0,
+            minutesInterval: handler.timeIntervalInMinutes,
+            slot: 0,
+            slotInterval: handler.versionInterval,
+          },
+        })
+      }
+      config.accountConfigs.push(accountConfig)
+    }
   }
 
   supportedHandlers = [HandlerType.SUI_EVENT, HandlerType.SUI_CALL]
@@ -107,12 +131,34 @@ export class SuiPlugin extends Plugin {
     return mergeProcessResults(await Promise.all(promises))
   }
 
+  async processSuiObject(binding: DataBinding): Promise<ProcessResult> {
+    if (!binding.data?.suiObject) {
+      throw new ServerError(Status.INVALID_ARGUMENT, "Object can't be empty")
+    }
+    const object = binding.data.suiObject
+
+    const promises: Promise<ProcessResult>[] = []
+    for (const handlerId of binding.handlerIds) {
+      promises.push(
+        this.suiObjectHandlers[handlerId](object).catch((e) => {
+          throw new ServerError(
+            Status.INTERNAL,
+            'error processing object: ' + JSON.stringify(object) + '\n' + errorString(e)
+          )
+        })
+      )
+    }
+    return mergeProcessResults(await Promise.all(promises))
+  }
+
   processBinding(request: DataBinding): Promise<ProcessResult> {
     switch (request.handlerType) {
       case HandlerType.SUI_EVENT:
         return this.processSuiEvent(request)
       case HandlerType.SUI_CALL:
         return this.processSuiFunctionCall(request)
+      case HandlerType.SUI_OBJECT:
+        return this.processSuiObject(request)
       default:
         throw new ServerError(Status.INVALID_ARGUMENT, 'No handle type registered ' + request.handlerType)
     }

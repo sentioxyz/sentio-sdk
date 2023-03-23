@@ -1,9 +1,16 @@
-import { Data_SuiCall, Data_SuiEvent, MoveFetchConfig } from '@sentio/protos'
+import {
+  Data_SuiCall,
+  Data_SuiEvent,
+  MoveFetchConfig,
+  Data_SuiObject,
+  ProcessResult,
+  HandleInterval,
+} from '@sentio/protos'
 import { ListStateStorage } from '@sentio/runtime'
 import { SuiNetwork, getChainId } from './network.js'
 import { ServerError, Status } from 'nice-grpc'
-import { SuiContext } from './context.js'
-import { MoveEvent, SuiTransactionResponse, MoveCall } from '@mysten/sui.js'
+import { SuiContext, SuiObjectContext } from './context.js'
+import { MoveEvent, SuiTransactionResponse, MoveCall, SuiMoveObject } from '@mysten/sui.js'
 import { CallHandler, EventFilter, EventHandler, FunctionNameAndCallFilter } from '../move/index.js'
 import { getMoveCalls } from './utils.js'
 import { defaultMoveCoder } from './move-coder.js'
@@ -145,6 +152,81 @@ export class SuiBaseProcessor {
       fetchConfig: _fetchConfig,
     })
     return this
+  }
+}
+
+class ObjectHandler {
+  versionInterval?: HandleInterval
+  timeIntervalInMinutes?: HandleInterval
+  handler: (resource: Data_SuiObject) => Promise<ProcessResult>
+}
+
+export class SuiAccountProcessorState extends ListStateStorage<SuiAccountProcessor> {
+  static INSTANCE = new SuiAccountProcessorState()
+}
+
+export class SuiAccountProcessor {
+  config: IndexConfigure
+
+  objectHandlers: ObjectHandler[] = []
+
+  static bind(options: SuiBindOptions): SuiAccountProcessor {
+    return new SuiAccountProcessor(options)
+  }
+
+  protected constructor(options: SuiBindOptions) {
+    this.config = configure(options)
+    SuiAccountProcessorState.INSTANCE.addValue(this)
+  }
+
+  getChainId(): string {
+    return getChainId(this.config.network)
+  }
+
+  private onInterval(
+    handler: (resources: SuiMoveObject[], ctx: SuiObjectContext) => void,
+    timeInterval: HandleInterval | undefined,
+    versionInterval: HandleInterval | undefined
+  ): this {
+    const processor = this
+    this.objectHandlers.push({
+      handler: async function (data) {
+        const ctx = new SuiObjectContext(
+          processor.config.network,
+          processor.config.address,
+          data.slot,
+          data.timestamp || new Date(0)
+        )
+        await handler(data.objects as SuiMoveObject[], ctx)
+        return ctx.getProcessResult()
+      },
+      timeIntervalInMinutes: timeInterval,
+      versionInterval: versionInterval,
+    })
+    return this
+  }
+
+  public onTimeInterval(
+    handler: (objects: SuiMoveObject[], ctx: SuiObjectContext) => void,
+    timeIntervalInMinutes = 60,
+    backfillTimeIntervalInMinutes = 240
+  ): this {
+    return this.onInterval(
+      handler,
+      {
+        recentInterval: timeIntervalInMinutes,
+        backfillInterval: backfillTimeIntervalInMinutes,
+      },
+      undefined
+    )
+  }
+
+  public onSlotInterval(
+    handler: (objects: SuiMoveObject[], ctx: SuiObjectContext) => void,
+    slotInterval = 100000,
+    backfillSlotInterval = 400000
+  ): this {
+    return this.onInterval(handler, undefined, { recentInterval: slotInterval, backfillInterval: backfillSlotInterval })
   }
 }
 

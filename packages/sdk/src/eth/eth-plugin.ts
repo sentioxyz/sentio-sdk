@@ -114,14 +114,11 @@ export class EthPlugin extends Plugin {
 
     // part 1.b prepare EVM account processors
     for (const processor of AccountProcessorState.INSTANCE.getValues()) {
-      const accountConfig: AccountConfig = {
+      const accountConfig = AccountConfig.fromPartial({
         address: processor.config.address,
         chainId: processor.getChainId().toString(),
         startBlock: processor.config.startBlock ? BigInt(processor.config.startBlock) : 0n,
-        aptosIntervalConfigs: [],
-        intervalConfigs: [],
-        logConfigs: [],
-      }
+      })
       // TODO add interval
       for (const eventsHandler of processor.eventHandlers) {
         // associate id with filter

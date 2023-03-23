@@ -146,6 +146,7 @@ message AccountConfig {
 
   repeated OnIntervalConfig interval_configs = 4;
   repeated AptosOnIntervalConfig aptos_interval_configs = 5;
+  repeated SuiOnIntervalConfig sui_interval_configs = 7;
   // TODO add tx handler config related to the account
 
   repeated LogHandlerConfig log_configs = 6;
@@ -170,6 +171,10 @@ message OnIntervalConfig {
 message AptosOnIntervalConfig {
   OnIntervalConfig interval_config = 1;
   string type = 2;
+}
+
+message SuiOnIntervalConfig {
+  OnIntervalConfig interval_config = 1;
 }
 
 message ContractInfo {
@@ -337,6 +342,11 @@ message Data {
     google.protobuf.Timestamp timestamp = 2;
     uint64 slot = 3;
   }
+  message SuiObject {
+    google.protobuf.Struct objects = 1;
+    google.protobuf.Timestamp timestamp = 2;
+    uint64 slot = 3;
+  }
 
   bytes raw = 1 [deprecated = true]; // can be removed anytime
   oneof value {
@@ -350,6 +360,7 @@ message Data {
     AptResource apt_resource = 9;
     SuiEvent sui_event = 10;
     SuiCall sui_call = 11;
+    SuiObject sui_object = 12;
   }
 }
 
@@ -418,6 +429,7 @@ enum HandlerType {
   APT_RESOURCE = 8;
   SUI_EVENT = 3;
   SUI_CALL = 9;
+  SUI_OBJECT = 10;
 }
 
 message RuntimeInfo {

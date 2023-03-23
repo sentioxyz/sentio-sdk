@@ -3,7 +3,7 @@ import { EventTrackingResult, LogLevel } from '@sentio/protos'
 import { normalizeAttribute } from './normalization.js'
 
 export interface Attribute<T> {
-  [key: string]: Exclude<T | number | bigint | string | LogLevel | Attribute<T> | undefined, Promise<any>>
+  [key: string]: Exclude<T | number | bigint | string | boolean | LogLevel | Attribute<T> | undefined, Promise<any>>
 }
 
 export interface Event<T> extends Attribute<T> {

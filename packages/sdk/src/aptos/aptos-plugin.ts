@@ -80,14 +80,11 @@ export class AptosPlugin extends Plugin {
     }
 
     for (const aptosProcessor of AptosAccountProcessorState.INSTANCE.getValues()) {
-      const accountConfig: AccountConfig = {
+      const accountConfig = AccountConfig.fromPartial({
         address: aptosProcessor.config.address,
         chainId: aptosProcessor.getChainId(),
         startBlock: aptosProcessor.config.startVersion,
-        aptosIntervalConfigs: [],
-        intervalConfigs: [],
-        logConfigs: [],
-      }
+      })
       for (const handler of aptosProcessor.resourcesHandlers) {
         const handlerId = this.aptosResourceHandlers.push(handler.handler) - 1
         accountConfig.aptosIntervalConfigs.push({
