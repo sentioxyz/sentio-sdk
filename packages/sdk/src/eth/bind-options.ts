@@ -1,4 +1,5 @@
 import { Networkish, Network } from 'ethers/providers'
+import { getNetworkFromCtxOrNetworkish } from './provider.js'
 
 export class BindOptions {
   // Contract address
@@ -14,13 +15,8 @@ export class BindOptions {
 export function getOptionsSignature(opts: BindOptions): string {
   const sig = [opts.address]
   if (opts.network) {
-    if (typeof opts.network === 'string') {
-      const asInt = parseInt(opts.network)
-      if (Number.isFinite(asInt)) {
-        opts.network = asInt
-      }
-    }
-    sig.push(Network.from(opts.network).chainId.toString())
+    const n = getNetworkFromCtxOrNetworkish(opts.network)
+    sig.push(n.chainId.toString())
   }
   if (opts.name) {
     sig.push(opts.name)
@@ -34,16 +30,8 @@ export function getOptionsSignature(opts: BindOptions): string {
   return sig.join('_')
 }
 
-export class BindInternalOptions {
-  address: string
-  network: Networkish
-  name: string
-  startBlock: bigint
-  endBlock?: bigint
-}
-
 export class AccountBindOptions {
   address: string
-  network?: Networkish
+  network: Network
   startBlock?: bigint | number
 }

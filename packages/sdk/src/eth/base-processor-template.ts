@@ -6,9 +6,10 @@ import { EthFetchConfig, HandleInterval, TemplateInstance } from '@sentio/protos
 import { PromiseOrVoid } from '../promise-or-void.js'
 import { Trace } from './trace.js'
 import { ListStateStorage } from '@sentio/runtime'
-import { BlockParams, Network } from 'ethers/providers'
+import { BlockParams } from 'ethers/providers'
 import { DeferredTopicFilter } from 'ethers/contract'
 import { EthEvent } from './eth.js'
+import { getNetworkFromCtxOrNetworkish } from './provider.js'
 
 export class ProcessorTemplateProcessorState extends ListStateStorage<
   BaseProcessorTemplate<BaseContract, BoundContractView<BaseContract, any>>
@@ -71,7 +72,7 @@ export abstract class BaseProcessorTemplate<
       contract: {
         address: options.address,
         name: options.name || '',
-        chainId: options.network ? Network.from(options.network).chainId.toString() : '1',
+        chainId: getNetworkFromCtxOrNetworkish(options.network).chainId.toString(),
         abi: '',
       },
       startBlock: 0n,

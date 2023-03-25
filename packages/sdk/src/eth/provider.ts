@@ -18,9 +18,10 @@ export function getNetworkFromCtxOrNetworkish(networkish?: BaseContext | Network
   }
   if (typeof networkish === 'string') {
     const id = parseInt(networkish)
-    if (!isNaN(id)) {
-      networkish = 1
+    if (isNaN(id)) {
+      throw Error('Unexpected Network')
     }
+    networkish = id
   }
   return Network.from(networkish)
 }
@@ -45,7 +46,7 @@ export function getProvider(networkish?: Networkish): Provider {
         [...Endpoints.INSTANCE.chainServer.keys()].join(' ')
     )
   }
-  provider = new QueuedStaticJsonRpcProvider(address, Network.from(network), Endpoints.INSTANCE.concurrency)
+  provider = new QueuedStaticJsonRpcProvider(address, network, Endpoints.INSTANCE.concurrency)
   providers.set(network.chainId.toString(), provider)
   return provider
 }

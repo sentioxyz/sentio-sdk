@@ -11,12 +11,13 @@ import {
   HandleInterval,
   ProcessResult,
 } from '@sentio/protos'
-import { BindInternalOptions, BindOptions } from './bind-options.js'
+import { BindOptions } from './bind-options.js'
 import { PromiseOrVoid } from '../promise-or-void.js'
 import { Trace } from './trace.js'
 import { ServerError, Status } from 'nice-grpc'
 import { decodeResult, EthEvent, formatEthData } from './eth.js'
 import * as console from 'console'
+import { getNetworkFromCtxOrNetworkish } from './provider.js'
 
 export interface AddressOrTypeEventFilter extends DeferredTopicFilter {
   addressType?: AddressType
@@ -41,6 +42,14 @@ export class BlockHandlder {
   handler: (block: Data_EthBlock) => Promise<ProcessResult>
 }
 
+class BindInternalOptions {
+  address: string
+  network: Network
+  name: string
+  startBlock: bigint
+  endBlock?: bigint
+}
+
 export abstract class BaseProcessor<
   TContract extends BaseContract,
   TBoundContractView extends BoundContractView<TContract, ContractView<TContract>>
@@ -55,14 +64,8 @@ export abstract class BaseProcessor<
     this.config = {
       address: config.address,
       name: config.name || '',
-      network: config.network ? config.network : 1,
+      network: getNetworkFromCtxOrNetworkish(config.network),
       startBlock: 0n,
-    }
-    if (typeof this.config.network === 'string') {
-      const asInt = parseInt(this.config.network)
-      if (Number.isFinite(asInt)) {
-        this.config.network = asInt
-      }
     }
     if (config.startBlock) {
       this.config.startBlock = BigInt(config.startBlock)
@@ -75,7 +78,7 @@ export abstract class BaseProcessor<
   protected abstract CreateBoundContractView(): TBoundContractView
 
   public getChainId(): number {
-    return Number(Network.from(this.config.network).chainId)
+    return Number(this.config.network.chainId)
   }
 
   public onEvent(

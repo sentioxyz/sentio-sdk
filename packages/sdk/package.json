@@ -7,7 +7,7 @@
     "compile": "tsc && cp src/utils/*.csv lib/utils && cp src/tsup.config.ts lib",
     "build": "yarn gen && yarn compile",
     "build_all": "yarn lerna run --scope=@sentio/sdk build --include-dependencies",
-    "test": "NODE_OPTIONS=--experimental-vm-modules yarn jest",
+    "test": "NODE_OPTIONS=--experimental-vm-modules yarn jest --runInBand --detectOpenHandles",
     "gen": "yarn gen:eth && yarn gen:aptos && yarn gen:sui && yarn gen:solana",
     "gen:eth": "ts-node-esm src/eth/codegen/run.ts src/eth/abis src/eth/builtin && yarn gen:eth_test",
     "gen:eth_test": "ts-node-esm src/eth/codegen/run.ts src/eth/tests/abis/eth ./src/eth/tests/types",

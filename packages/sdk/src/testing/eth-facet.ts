@@ -1,8 +1,9 @@
 import { TestProcessorServer } from './test-processor-server.js'
 import { DataBinding, HandlerType, ProcessBindingResponse } from '@sentio/protos'
 import { Trace } from '../eth/trace.js'
-import { BlockParams, LogParams, Network, Networkish } from 'ethers/providers'
+import { BlockParams, LogParams, Networkish } from 'ethers/providers'
 import { Block } from 'ethers'
+import { getNetworkFromCtxOrNetworkish } from '../eth/provider.js'
 
 export class EthFacet {
   server: TestProcessorServer
@@ -36,7 +37,7 @@ export class EthFacet {
     const signature = trace.action.input.slice(0, 10)
 
     for (const contract of this.server.contractConfigs) {
-      if (contract.contract?.chainId !== Network.from(network).chainId.toString()) {
+      if (contract.contract?.chainId !== getNetworkFromCtxOrNetworkish(network).chainId.toString()) {
         continue
       }
       if (trace.action.to?.toLowerCase() !== contract.contract?.address.toLowerCase()) {
@@ -80,7 +81,7 @@ export class EthFacet {
 
   buildLogBinding(log: LogParams, network: Networkish = 1): DataBinding | undefined {
     for (const contract of this.server.contractConfigs) {
-      if (contract.contract?.chainId !== Network.from(network).chainId.toString()) {
+      if (contract.contract?.chainId !== getNetworkFromCtxOrNetworkish(network).chainId.toString()) {
         continue
       }
       if (log.address.toLowerCase() !== contract.contract?.address.toLowerCase()) {
@@ -141,7 +142,7 @@ export class EthFacet {
 
   buildAccountLogBinding(address: string, log: LogParams, network: Networkish = 1): DataBinding | undefined {
     for (const account of this.server.accountConfigs) {
-      if (account.chainId !== Network.from(network).chainId.toString()) {
+      if (account.chainId !== getNetworkFromCtxOrNetworkish(network).chainId.toString()) {
         continue
       }
       if (address.toLowerCase() !== account.address.toLowerCase()) {
@@ -213,7 +214,7 @@ export class EthFacet {
       handlerIds: [],
     }
     for (const contract of this.server.contractConfigs) {
-      if (contract.contract?.chainId !== Network.from(network).chainId.toString()) {
+      if (contract.contract?.chainId !== getNetworkFromCtxOrNetworkish(network).chainId.toString()) {
         continue
       }
       const longBlockNumber = block.number

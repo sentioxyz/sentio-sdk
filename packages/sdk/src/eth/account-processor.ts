@@ -2,8 +2,6 @@ import { ERC20__factory, ERC721__factory } from './builtin/internal/index.js'
 import { AddressType, EthFetchConfig, ProcessResult } from '@sentio/protos'
 import { AccountBindOptions } from './bind-options.js'
 
-import { Network } from 'ethers/providers'
-
 import { TransferEvent as ERC20TransferEvent, ERC20Processor } from './builtin/erc20.js'
 import { TransferEvent as ERC721TransferEvent, ERC721Processor } from './builtin/erc721.js'
 
@@ -13,6 +11,8 @@ import { AddressOrTypeEventFilter, EventsHandler } from './base-processor.js'
 import { Block, LogDescription } from 'ethers'
 import { AccountProcessorState } from './account-processor-state.js'
 import { formatEthData } from './eth.js'
+import { getNetworkFromCtxOrNetworkish } from './provider.js'
+import { PartiallyOptional } from '../core/partial-optional.js'
 
 const ERC20_INTERFACE = ERC20__factory.createInterface()
 const ERC721_INTERFACE = ERC721__factory.createInterface()
@@ -21,24 +21,21 @@ export class AccountProcessor {
   config: AccountBindOptions
   eventHandlers: EventsHandler[] = []
 
-  static bind(config: AccountBindOptions): AccountProcessor {
+  static bind(config: PartiallyOptional<AccountBindOptions, 'network'>): AccountProcessor {
     const processor = new AccountProcessor(config)
     AccountProcessorState.INSTANCE.addValue(processor)
     return processor
   }
 
-  protected constructor(config: AccountBindOptions) {
-    this.config = config
-    if (typeof this.config.network === 'string') {
-      const asInt = parseInt(this.config.network)
-      if (Number.isFinite(asInt)) {
-        this.config.network = asInt
-      }
+  protected constructor(config: PartiallyOptional<AccountBindOptions, 'network'>) {
+    this.config = {
+      ...config,
+      network: getNetworkFromCtxOrNetworkish(config.network),
     }
   }
 
   public getChainId(): number {
-    return Number(Network.from(this.config.network || 1).chainId)
+    return Number(this.config.network.chainId)
   }
 
   /**

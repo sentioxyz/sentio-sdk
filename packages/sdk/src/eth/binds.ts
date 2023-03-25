@@ -1,10 +1,11 @@
 import { BindOptions, getOptionsSignature } from './bind-options.js'
 import { ContractView } from './context.js'
 import { BaseProcessor } from './base-processor.js'
-import { Networkish, Network } from 'ethers/providers'
+import { Networkish } from 'ethers/providers'
 
 import { BaseContract } from 'ethers'
 import { MapStateStorage } from '@sentio/runtime'
+import { getNetworkFromCtxOrNetworkish } from './provider.js'
 
 export class ProcessorState extends MapStateStorage<BaseProcessor<any, any>> {
   static INSTANCE = new ProcessorState()
@@ -14,7 +15,7 @@ export class ProcessorState extends MapStateStorage<BaseProcessor<any, any>> {
 const contracts = new Map<string, ContractView<BaseContract>>()
 
 function getKey(abiName: string, address: string, network: Networkish) {
-  const chainId = Network.from(network).chainId.toString()
+  const chainId = getNetworkFromCtxOrNetworkish(network).chainId.toString()
   return [abiName, address.toLowerCase(), chainId].join('_')
 }
 

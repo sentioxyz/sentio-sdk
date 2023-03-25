@@ -1,4 +1,5 @@
 export { BigDecimal, scaleDown } from './big-decimal.js'
+export type { PartiallyOptional } from './partial-optional.js'
 export { BaseContext } from './base-context.js'
 export { normalizeLabels } from './normalization.js'
 export { CounterBinding, Meter, type Labels, GaugeBinding, Counter, Gauge, MetricOptions } from './meter.js'
