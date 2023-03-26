@@ -22,12 +22,19 @@ let priceClient: PriceServiceClient<RetryOptions>
 interface PriceOptions {
   toleranceInDays?: number
 }
-
 async function getPriceByTypeOrSymbol(date: Date, coinId: CoinID, options?: PriceOptions): Promise<number | undefined> {
   if (!priceClient) {
     priceClient = getPriceClient()
   }
+  return getPriceByTypeOrSymbolInternal(priceClient, date, coinId, options)
+}
 
+export async function getPriceByTypeOrSymbolInternal(
+  priceClient: PriceServiceClient<RetryOptions>,
+  date: Date,
+  coinId: CoinID,
+  options?: PriceOptions
+): Promise<number | undefined> {
   const dateStr = dateString(date)
   const todayDateString = dateString(new Date())
 
