@@ -370,7 +370,7 @@ export interface AccountConfig {
   startBlock: bigint;
   intervalConfigs: OnIntervalConfig[];
   aptosIntervalConfigs: AptosOnIntervalConfig[];
-  suiIntervalConfigs: SuiOnIntervalConfig[];
+  moveIntervalConfigs: MoveOnIntervalConfig[];
   logConfigs: LogHandlerConfig[];
 }
 
@@ -392,8 +392,43 @@ export interface AptosOnIntervalConfig {
   type: string;
 }
 
-export interface SuiOnIntervalConfig {
+export interface MoveOnIntervalConfig {
   intervalConfig: OnIntervalConfig | undefined;
+  type: string;
+  ownerType: MoveOnIntervalConfig_OwnerType;
+}
+
+export enum MoveOnIntervalConfig_OwnerType {
+  ADDRESS = 0,
+  OBJECT = 1,
+  UNRECOGNIZED = -1,
+}
+
+export function moveOnIntervalConfig_OwnerTypeFromJSON(object: any): MoveOnIntervalConfig_OwnerType {
+  switch (object) {
+    case 0:
+    case "ADDRESS":
+      return MoveOnIntervalConfig_OwnerType.ADDRESS;
+    case 1:
+    case "OBJECT":
+      return MoveOnIntervalConfig_OwnerType.OBJECT;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return MoveOnIntervalConfig_OwnerType.UNRECOGNIZED;
+  }
+}
+
+export function moveOnIntervalConfig_OwnerTypeToJSON(object: MoveOnIntervalConfig_OwnerType): string {
+  switch (object) {
+    case MoveOnIntervalConfig_OwnerType.ADDRESS:
+      return "ADDRESS";
+    case MoveOnIntervalConfig_OwnerType.OBJECT:
+      return "OBJECT";
+    case MoveOnIntervalConfig_OwnerType.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
 }
 
 export interface ContractInfo {
@@ -1632,7 +1667,7 @@ function createBaseAccountConfig(): AccountConfig {
     startBlock: BigInt("0"),
     intervalConfigs: [],
     aptosIntervalConfigs: [],
-    suiIntervalConfigs: [],
+    moveIntervalConfigs: [],
     logConfigs: [],
   };
 }
@@ -1654,8 +1689,8 @@ export const AccountConfig = {
     for (const v of message.aptosIntervalConfigs) {
       AptosOnIntervalConfig.encode(v!, writer.uint32(42).fork()).ldelim();
     }
-    for (const v of message.suiIntervalConfigs) {
-      SuiOnIntervalConfig.encode(v!, writer.uint32(58).fork()).ldelim();
+    for (const v of message.moveIntervalConfigs) {
+      MoveOnIntervalConfig.encode(v!, writer.uint32(58).fork()).ldelim();
     }
     for (const v of message.logConfigs) {
       LogHandlerConfig.encode(v!, writer.uint32(50).fork()).ldelim();
@@ -1686,7 +1721,7 @@ export const AccountConfig = {
           message.aptosIntervalConfigs.push(AptosOnIntervalConfig.decode(reader, reader.uint32()));
           break;
         case 7:
-          message.suiIntervalConfigs.push(SuiOnIntervalConfig.decode(reader, reader.uint32()));
+          message.moveIntervalConfigs.push(MoveOnIntervalConfig.decode(reader, reader.uint32()));
           break;
         case 6:
           message.logConfigs.push(LogHandlerConfig.decode(reader, reader.uint32()));
@@ -1710,8 +1745,8 @@ export const AccountConfig = {
       aptosIntervalConfigs: Array.isArray(object?.aptosIntervalConfigs)
         ? object.aptosIntervalConfigs.map((e: any) => AptosOnIntervalConfig.fromJSON(e))
         : [],
-      suiIntervalConfigs: Array.isArray(object?.suiIntervalConfigs)
-        ? object.suiIntervalConfigs.map((e: any) => SuiOnIntervalConfig.fromJSON(e))
+      moveIntervalConfigs: Array.isArray(object?.moveIntervalConfigs)
+        ? object.moveIntervalConfigs.map((e: any) => MoveOnIntervalConfig.fromJSON(e))
         : [],
       logConfigs: Array.isArray(object?.logConfigs)
         ? object.logConfigs.map((e: any) => LogHandlerConfig.fromJSON(e))
@@ -1736,10 +1771,10 @@ export const AccountConfig = {
     } else {
       obj.aptosIntervalConfigs = [];
     }
-    if (message.suiIntervalConfigs) {
-      obj.suiIntervalConfigs = message.suiIntervalConfigs.map((e) => e ? SuiOnIntervalConfig.toJSON(e) : undefined);
+    if (message.moveIntervalConfigs) {
+      obj.moveIntervalConfigs = message.moveIntervalConfigs.map((e) => e ? MoveOnIntervalConfig.toJSON(e) : undefined);
     } else {
-      obj.suiIntervalConfigs = [];
+      obj.moveIntervalConfigs = [];
     }
     if (message.logConfigs) {
       obj.logConfigs = message.logConfigs.map((e) => e ? LogHandlerConfig.toJSON(e) : undefined);
@@ -1760,7 +1795,7 @@ export const AccountConfig = {
     message.startBlock = object.startBlock ?? BigInt("0");
     message.intervalConfigs = object.intervalConfigs?.map((e) => OnIntervalConfig.fromPartial(e)) || [];
     message.aptosIntervalConfigs = object.aptosIntervalConfigs?.map((e) => AptosOnIntervalConfig.fromPartial(e)) || [];
-    message.suiIntervalConfigs = object.suiIntervalConfigs?.map((e) => SuiOnIntervalConfig.fromPartial(e)) || [];
+    message.moveIntervalConfigs = object.moveIntervalConfigs?.map((e) => MoveOnIntervalConfig.fromPartial(e)) || [];
     message.logConfigs = object.logConfigs?.map((e) => LogHandlerConfig.fromPartial(e)) || [];
     return message;
   },
@@ -1988,27 +2023,39 @@ export const AptosOnIntervalConfig = {
   },
 };
 
-function createBaseSuiOnIntervalConfig(): SuiOnIntervalConfig {
-  return { intervalConfig: undefined };
+function createBaseMoveOnIntervalConfig(): MoveOnIntervalConfig {
+  return { intervalConfig: undefined, type: "", ownerType: 0 };
 }
 
-export const SuiOnIntervalConfig = {
-  encode(message: SuiOnIntervalConfig, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const MoveOnIntervalConfig = {
+  encode(message: MoveOnIntervalConfig, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.intervalConfig !== undefined) {
       OnIntervalConfig.encode(message.intervalConfig, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.type !== "") {
+      writer.uint32(18).string(message.type);
+    }
+    if (message.ownerType !== 0) {
+      writer.uint32(24).int32(message.ownerType);
     }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): SuiOnIntervalConfig {
+  decode(input: _m0.Reader | Uint8Array, length?: number): MoveOnIntervalConfig {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseSuiOnIntervalConfig();
+    const message = createBaseMoveOnIntervalConfig();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
           message.intervalConfig = OnIntervalConfig.decode(reader, reader.uint32());
+          break;
+        case 2:
+          message.type = reader.string();
+          break;
+        case 3:
+          message.ownerType = reader.int32() as any;
           break;
         default:
           reader.skipType(tag & 7);
@@ -2018,28 +2065,34 @@ export const SuiOnIntervalConfig = {
     return message;
   },
 
-  fromJSON(object: any): SuiOnIntervalConfig {
+  fromJSON(object: any): MoveOnIntervalConfig {
     return {
       intervalConfig: isSet(object.intervalConfig) ? OnIntervalConfig.fromJSON(object.intervalConfig) : undefined,
+      type: isSet(object.type) ? String(object.type) : "",
+      ownerType: isSet(object.ownerType) ? moveOnIntervalConfig_OwnerTypeFromJSON(object.ownerType) : 0,
     };
   },
 
-  toJSON(message: SuiOnIntervalConfig): unknown {
+  toJSON(message: MoveOnIntervalConfig): unknown {
     const obj: any = {};
     message.intervalConfig !== undefined &&
       (obj.intervalConfig = message.intervalConfig ? OnIntervalConfig.toJSON(message.intervalConfig) : undefined);
+    message.type !== undefined && (obj.type = message.type);
+    message.ownerType !== undefined && (obj.ownerType = moveOnIntervalConfig_OwnerTypeToJSON(message.ownerType));
     return obj;
   },
 
-  create(base?: DeepPartial<SuiOnIntervalConfig>): SuiOnIntervalConfig {
-    return SuiOnIntervalConfig.fromPartial(base ?? {});
+  create(base?: DeepPartial<MoveOnIntervalConfig>): MoveOnIntervalConfig {
+    return MoveOnIntervalConfig.fromPartial(base ?? {});
   },
 
-  fromPartial(object: DeepPartial<SuiOnIntervalConfig>): SuiOnIntervalConfig {
-    const message = createBaseSuiOnIntervalConfig();
+  fromPartial(object: DeepPartial<MoveOnIntervalConfig>): MoveOnIntervalConfig {
+    const message = createBaseMoveOnIntervalConfig();
     message.intervalConfig = (object.intervalConfig !== undefined && object.intervalConfig !== null)
       ? OnIntervalConfig.fromPartial(object.intervalConfig)
       : undefined;
+    message.type = object.type ?? "";
+    message.ownerType = object.ownerType ?? 0;
     return message;
   },
 };

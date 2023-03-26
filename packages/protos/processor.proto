@@ -146,7 +146,9 @@ message AccountConfig {
 
   repeated OnIntervalConfig interval_configs = 4;
   repeated AptosOnIntervalConfig aptos_interval_configs = 5;
-  repeated SuiOnIntervalConfig sui_interval_configs = 7;
+  // TODO migrate aptos_interval_configs to move_interval_configs
+  repeated MoveOnIntervalConfig move_interval_configs = 7;
+
   // TODO add tx handler config related to the account
 
   repeated LogHandlerConfig log_configs = 6;
@@ -173,8 +175,14 @@ message AptosOnIntervalConfig {
   string type = 2;
 }
 
-message SuiOnIntervalConfig {
+message MoveOnIntervalConfig {
   OnIntervalConfig interval_config = 1;
+  string type = 2;
+  enum OwnerType {
+    ADDRESS = 0;
+    OBJECT = 1;
+  }
+  OwnerType owner_type = 3;
 }
 
 message ContractInfo {

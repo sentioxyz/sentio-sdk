@@ -79,7 +79,7 @@ export class SuiPlugin extends Plugin {
       })
       for (const handler of processor.objectHandlers) {
         const handlerId = this.suiObjectHandlers.push(handler.handler) - 1
-        accountConfig.suiIntervalConfigs.push({
+        accountConfig.moveIntervalConfigs.push({
           intervalConfig: {
             handlerId: handlerId,
             minutes: 0,
@@ -87,6 +87,8 @@ export class SuiPlugin extends Plugin {
             slot: 0,
             slotInterval: handler.versionInterval,
           },
+          type: handler.type || '',
+          ownerType: processor.ownerType,
         })
       }
       config.accountConfigs.push(accountConfig)

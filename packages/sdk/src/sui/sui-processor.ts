@@ -5,6 +5,7 @@ import {
   Data_SuiObject,
   ProcessResult,
   HandleInterval,
+  MoveOnIntervalConfig_OwnerType,
 } from '@sentio/protos'
 import { ListStateStorage } from '@sentio/runtime'
 import { SuiNetwork, getChainId } from './network.js'
@@ -156,26 +157,33 @@ export class SuiBaseProcessor {
 }
 
 class ObjectHandler {
+  type?: string
   versionInterval?: HandleInterval
   timeIntervalInMinutes?: HandleInterval
   handler: (resource: Data_SuiObject) => Promise<ProcessResult>
 }
 
-export class SuiAccountProcessorState extends ListStateStorage<SuiAccountProcessor> {
+export class SuiAccountProcessorState extends ListStateStorage<SuiObjectsProcessor> {
   static INSTANCE = new SuiAccountProcessorState()
 }
 
-export class SuiAccountProcessor {
+class SuiObjectBindOptions extends SuiBindOptions {
+  ownerType: MoveOnIntervalConfig_OwnerType
+}
+
+export class SuiObjectsProcessor {
   config: IndexConfigure
+  ownerType: MoveOnIntervalConfig_OwnerType
 
   objectHandlers: ObjectHandler[] = []
 
-  static bind(options: SuiBindOptions): SuiAccountProcessor {
-    return new SuiAccountProcessor(options)
+  static bind(options: SuiObjectBindOptions): SuiObjectsProcessor {
+    return new SuiObjectsProcessor(options)
   }
 
-  protected constructor(options: SuiBindOptions) {
+  protected constructor(options: SuiObjectBindOptions) {
     this.config = configure(options)
+    this.ownerType = options.ownerType
     SuiAccountProcessorState.INSTANCE.addValue(this)
   }
 
@@ -186,7 +194,8 @@ export class SuiAccountProcessor {
   private onInterval(
     handler: (resources: SuiMoveObject[], ctx: SuiObjectContext) => void,
     timeInterval: HandleInterval | undefined,
-    versionInterval: HandleInterval | undefined
+    versionInterval: HandleInterval | undefined,
+    type: string | undefined
   ): this {
     const processor = this
     this.objectHandlers.push({
@@ -202,6 +211,7 @@ export class SuiAccountProcessor {
       },
       timeIntervalInMinutes: timeInterval,
       versionInterval: versionInterval,
+      type,
     })
     return this
   }
@@ -209,7 +219,8 @@ export class SuiAccountProcessor {
   public onTimeInterval(
     handler: (objects: SuiMoveObject[], ctx: SuiObjectContext) => void,
     timeIntervalInMinutes = 60,
-    backfillTimeIntervalInMinutes = 240
+    backfillTimeIntervalInMinutes = 240,
+    type?: string
   ): this {
     return this.onInterval(
       handler,
@@ -217,16 +228,23 @@ export class SuiAccountProcessor {
         recentInterval: timeIntervalInMinutes,
         backfillInterval: backfillTimeIntervalInMinutes,
       },
-      undefined
+      undefined,
+      type
     )
   }
 
   public onSlotInterval(
     handler: (objects: SuiMoveObject[], ctx: SuiObjectContext) => void,
     slotInterval = 100000,
-    backfillSlotInterval = 400000
+    backfillSlotInterval = 400000,
+    type?: string
   ): this {
-    return this.onInterval(handler, undefined, { recentInterval: slotInterval, backfillInterval: backfillSlotInterval })
+    return this.onInterval(
+      handler,
+      undefined,
+      { recentInterval: slotInterval, backfillInterval: backfillSlotInterval },
+      type
+    )
   }
 }
 
