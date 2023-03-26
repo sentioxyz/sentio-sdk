@@ -46,7 +46,7 @@ export class AptosContext extends BaseContext {
   }
 }
 
-export class AptosResourceContext extends BaseContext {
+export class AptosResourcesContext extends BaseContext {
   address: string
   network: AptosNetwork
   version: bigint

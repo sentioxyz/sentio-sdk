@@ -2,7 +2,7 @@ import { MoveResource, Transaction_UserTransaction, TransactionPayload_EntryFunc
 
 import { MOVE_CODER, MoveCoder } from './move-coder.js'
 import { AptosBindOptions, AptosNetwork, getChainId } from './network.js'
-import { AptosContext, AptosResourceContext } from './context.js'
+import { AptosContext, AptosResourcesContext } from './context.js'
 import { EventInstance } from './models.js'
 import { ListStateStorage } from '@sentio/runtime'
 import {
@@ -198,17 +198,17 @@ export class AptosBaseProcessor {
   }
 }
 
-export class AptosAccountProcessorState extends ListStateStorage<AptosAccountProcessor> {
+export class AptosAccountProcessorState extends ListStateStorage<AptosResourcesProcessor> {
   static INSTANCE = new AptosAccountProcessorState()
 }
 
-export class AptosAccountProcessor {
+export class AptosResourcesProcessor {
   config: IndexConfigure
 
   resourcesHandlers: ResourceHandlder[] = []
 
-  static bind(options: AptosBindOptions): AptosAccountProcessor {
-    return new AptosAccountProcessor(options)
+  static bind(options: AptosBindOptions): AptosResourcesProcessor {
+    return new AptosResourcesProcessor(options)
   }
 
   protected constructor(options: AptosBindOptions) {
@@ -221,7 +221,7 @@ export class AptosAccountProcessor {
   }
 
   private onInterval(
-    handler: (resources: MoveResource[], ctx: AptosResourceContext) => void,
+    handler: (resources: MoveResource[], ctx: AptosResourcesContext) => void,
     timeInterval: HandleInterval | undefined,
     versionInterval: HandleInterval | undefined,
     type: string | undefined
@@ -234,7 +234,7 @@ export class AptosAccountProcessor {
         }
         const timestamp = Number(data.timestampMicros)
 
-        const ctx = new AptosResourceContext(
+        const ctx = new AptosResourcesContext(
           processor.config.network,
           processor.config.address,
           data.version,
@@ -251,7 +251,7 @@ export class AptosAccountProcessor {
   }
 
   public onTimeInterval(
-    handler: (resources: MoveResource[], ctx: AptosResourceContext) => void,
+    handler: (resources: MoveResource[], ctx: AptosResourcesContext) => void,
     timeIntervalInMinutes = 60,
     backfillTimeIntervalInMinutes = 240,
     type?: string
@@ -268,7 +268,7 @@ export class AptosAccountProcessor {
   }
 
   public onVersionInterval(
-    handler: (resources: MoveResource[], ctx: AptosResourceContext) => void,
+    handler: (resources: MoveResource[], ctx: AptosResourcesContext) => void,
     versionInterval = 100000,
     backfillVersionInterval = 400000,
     typePrefix?: string

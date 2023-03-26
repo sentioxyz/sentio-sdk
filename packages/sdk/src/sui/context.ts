@@ -49,7 +49,7 @@ export class SuiContext extends BaseContext {
   }
 }
 
-export class SuiObjectContext extends BaseContext {
+export class SuiObjectsContext extends BaseContext {
   address: string
   network: SuiNetwork
   slot: bigint

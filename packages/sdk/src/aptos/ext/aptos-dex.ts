@@ -2,7 +2,7 @@ import { Gauge } from '@sentio/sdk'
 import { BigDecimal } from '@sentio/bigdecimal'
 import { calculateValueInUsd, getCoinInfo, whitelistCoins, whiteListed } from './coin.js'
 import {
-  AptosResourceContext,
+  AptosResourcesContext,
   TypedMoveResource,
   MoveResource,
   defaultMoveCoder,
@@ -101,7 +101,7 @@ export class AptosDex<T> {
 
   async syncPools(
     resources: MoveResource[],
-    ctx: AptosResourceContext,
+    ctx: AptosResourcesContext,
     poolsHandler?: (pools: TypedMoveResource<T>[]) => Promise<void> | void
   ) {
     const pools: TypedMoveResource<T>[] = defaultMoveCoder().filterAndDecodeResources(

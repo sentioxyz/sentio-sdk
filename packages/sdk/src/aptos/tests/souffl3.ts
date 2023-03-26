@@ -1,4 +1,4 @@
-import { AptosAccountProcessor, defaultMoveCoder } from '@sentio/sdk/aptos'
+import { AptosResourcesProcessor, defaultMoveCoder } from '@sentio/sdk/aptos'
 import { SouffleChefCampaign, CandyMachine } from './types/souffle.js'
 import { token } from '../builtin/0x3.js'
 import { aptos_account, voting } from '../builtin/0x1.js'
@@ -43,7 +43,7 @@ voting.bind().onEventCreateProposalEvent((evt, ctx) => {
   ctx.meter.Gauge('size').record(evt.data_decoded.metadata.data.length)
 })
 
-AptosAccountProcessor.bind({ address: '0x1' }).onTimeInterval((resources, ctx) => {
+AptosResourcesProcessor.bind({ address: '0x1' }).onTimeInterval((resources, ctx) => {
   ctx.meter.Counter('onTimer').add(1)
 }, 10000)
 

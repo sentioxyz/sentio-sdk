@@ -10,7 +10,7 @@ import {
 import { ListStateStorage } from '@sentio/runtime'
 import { SuiNetwork, getChainId } from './network.js'
 import { ServerError, Status } from 'nice-grpc'
-import { SuiContext, SuiObjectContext } from './context.js'
+import { SuiContext, SuiObjectsContext } from './context.js'
 import { MoveEvent, SuiTransactionResponse, MoveCall, SuiMoveObject } from '@mysten/sui.js'
 import { CallHandler, EventFilter, EventHandler, FunctionNameAndCallFilter } from '../move/index.js'
 import { getMoveCalls } from './utils.js'
@@ -167,7 +167,7 @@ export class SuiAccountProcessorState extends ListStateStorage<SuiObjectsProcess
   static INSTANCE = new SuiAccountProcessorState()
 }
 
-class SuiObjectBindOptions extends SuiBindOptions {
+class SuiObjectsBindOptions extends SuiBindOptions {
   ownerType: MoveOnIntervalConfig_OwnerType
 }
 
@@ -177,11 +177,11 @@ export class SuiObjectsProcessor {
 
   objectHandlers: ObjectHandler[] = []
 
-  static bind(options: SuiObjectBindOptions): SuiObjectsProcessor {
+  static bind(options: SuiObjectsBindOptions): SuiObjectsProcessor {
     return new SuiObjectsProcessor(options)
   }
 
-  protected constructor(options: SuiObjectBindOptions) {
+  protected constructor(options: SuiObjectsBindOptions) {
     this.config = configure(options)
     this.ownerType = options.ownerType
     SuiAccountProcessorState.INSTANCE.addValue(this)
@@ -192,7 +192,7 @@ export class SuiObjectsProcessor {
   }
 
   private onInterval(
-    handler: (resources: SuiMoveObject[], ctx: SuiObjectContext) => void,
+    handler: (resources: SuiMoveObject[], ctx: SuiObjectsContext) => void,
     timeInterval: HandleInterval | undefined,
     versionInterval: HandleInterval | undefined,
     type: string | undefined
@@ -200,7 +200,7 @@ export class SuiObjectsProcessor {
     const processor = this
     this.objectHandlers.push({
       handler: async function (data) {
-        const ctx = new SuiObjectContext(
+        const ctx = new SuiObjectsContext(
           processor.config.network,
           processor.config.address,
           data.slot,
@@ -217,7 +217,7 @@ export class SuiObjectsProcessor {
   }
 
   public onTimeInterval(
-    handler: (objects: SuiMoveObject[], ctx: SuiObjectContext) => void,
+    handler: (objects: SuiMoveObject[], ctx: SuiObjectsContext) => void,
     timeIntervalInMinutes = 60,
     backfillTimeIntervalInMinutes = 240,
     type?: string
@@ -234,7 +234,7 @@ export class SuiObjectsProcessor {
   }
 
   public onSlotInterval(
-    handler: (objects: SuiMoveObject[], ctx: SuiObjectContext) => void,
+    handler: (objects: SuiMoveObject[], ctx: SuiObjectsContext) => void,
     slotInterval = 100000,
     backfillSlotInterval = 400000,
     type?: string
