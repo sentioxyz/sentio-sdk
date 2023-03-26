@@ -15,7 +15,7 @@ export function getFullSignatureAsSymbolForFunction(fn: FunctionDeclaration): st
 
 function formatType(type: EvmType): string {
   if (type.type === 'array') {
-    return formatType(type.itemType) + '[]'
+    return formatType(type.itemType) + `[${type.size || ''}]`
   } else if (type.type === 'tuple') {
     return '(' + type.components.map((s) => formatType(s.type)).join(',') + ')'
   } else {
