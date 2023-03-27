@@ -1,7 +1,7 @@
 import { assert, expect } from 'chai'
 import { Interface } from 'ethers'
 
-import { decodeResult } from './index.js'
+import { fixEmptyKey } from './index.js'
 
 describe('eth test', () => {
   test('event encoding', async () => {
@@ -36,11 +36,20 @@ describe('eth test', () => {
     const parsed = iface.parseLog(encodedLog)
     assert(parsed)
 
-    const args = decodeResult(parsed)
+    const args = fixEmptyKey(parsed)
 
-    expect(args.length).equals(2)
+    expect(args.toArray().length).equals(2)
 
+    const object = args.toObject()
+    expect(object).eqls({
+      arg0: '0x634316eA0EE79c701c6F67C53A4C54cBAfd2316d',
+      amount: 1111n,
+    })
+
+    expect(args.toArray()[0]).equals('0x634316eA0EE79c701c6F67C53A4C54cBAfd2316d')
     expect(args.arg0).equals('0x634316eA0EE79c701c6F67C53A4C54cBAfd2316d')
+
+    expect(args.toArray()[1]).equals(1111n)
     expect(args.amount).equals(1111n)
   })
 })

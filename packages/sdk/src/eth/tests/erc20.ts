@@ -41,6 +41,12 @@ ERC20Processor.bind({ address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', net
       exporter.emit(ctx, { ...event, x: 100n })
     } /*filter*/
   )
+  // .onAllEvents((evt, ctx) => {
+  //   ctx.meter.Counter("event_count").add(1, { name: evt.name })
+  //   ctx.eventLogger.emit(evt.name, {
+  //     ...evt.args.toObject()
+  //   })
+  // })
   .onBlockInterval(async function (block, ctx) {
     ctx.meter.Gauge('g2').record(20, { k: 'v' })
   })

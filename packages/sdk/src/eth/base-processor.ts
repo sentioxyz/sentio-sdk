@@ -15,7 +15,7 @@ import { BindOptions } from './bind-options.js'
 import { PromiseOrVoid } from '../promise-or-void.js'
 import { Trace } from './trace.js'
 import { ServerError, Status } from 'nice-grpc'
-import { decodeResult, EthEvent, formatEthData } from './eth.js'
+import { fixEmptyKey, EthEvent, formatEthData } from './eth.js'
 import * as console from 'console'
 import { getNetworkFromCtxOrNetworkish } from './provider.js'
 
@@ -123,7 +123,7 @@ export abstract class BaseProcessor<
         const parsed = contractView.rawContract.interface.parseLog(logParam)
 
         if (parsed) {
-          const event: EthEvent = { ...log, name: parsed.name, args: decodeResult(parsed) }
+          const event: EthEvent = { ...log, name: parsed.name, args: fixEmptyKey(parsed) }
           await handler(event, ctx)
           return ctx.getProcessResult()
         }

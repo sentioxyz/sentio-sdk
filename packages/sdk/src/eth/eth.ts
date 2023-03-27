@@ -1,5 +1,4 @@
 import {
-  BlockTag,
   LogParams,
   formatBlock,
   formatLog,
@@ -12,7 +11,7 @@ import {
   object,
   formatData,
 } from 'ethers/providers'
-import { CallExceptionError, Result, LogDescription } from 'ethers'
+import { CallExceptionError, LogDescription, Result } from 'ethers'
 import { ContractContext } from './context.js'
 import { Trace } from './trace.js'
 import { getAddress } from 'ethers/address'
@@ -21,16 +20,6 @@ import { getBigInt, getNumber, hexlify } from 'ethers/utils'
 export interface EthEvent<TArgsArray extends Array<any> = any, TArgsObject = any> extends LogParams {
   args: TArgsArray & TArgsObject & Result
   name: string
-}
-
-export function toBlockTag(a: number | bigint): BlockTag {
-  if (typeof a === 'number') {
-    return a
-  }
-  if (a > Number.MAX_SAFE_INTEGER) {
-    return '0x' + a.toString(16)
-  }
-  return Number(a)
 }
 
 export class SimpleEthersError extends Error {
@@ -76,17 +65,17 @@ export function transformEtherError(e: Error, ctx: ContractContext<any, any> | u
   return new Error(msg)
 }
 
-export function decodeResult(result: LogDescription): any {
-  const decoded = [] as any
+export function fixEmptyKey(result: LogDescription): Result {
+  const keys = []
+
   for (const [i, arg] of result.fragment.inputs.entries()) {
     if (arg.name === '') {
-      decoded['arg' + i] = result.args[i]
+      keys.push('arg' + i)
     } else {
-      decoded[arg.name] = result.args[i]
+      keys.push(arg.name)
     }
-    decoded.push(result.args[i])
   }
-  return decoded
+  return Result.fromItems(Array.from(result.args.values()), keys)
 }
 
 const _formatTransactionReceipt = object(
