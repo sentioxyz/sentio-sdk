@@ -42,6 +42,7 @@ export const CHAIN_IDS = {
   HPB: '269',
   BOBA: '288',
   KUCOIN: '321',
+  ZKSYNC_ERA: '324',
   SHIDEN: '336',
   THETA: '361',
   SX: '416',
@@ -49,6 +50,7 @@ export const CHAIN_IDS = {
   ASTAR: '592',
   CALLISTO: '820',
   WANCHAIN: '888',
+  POLYGON_ZKEVM: '1101',
   METIS: '1088',
   OMCHAIN: '1246',
   MOONBEAM: '1284',
@@ -97,12 +99,18 @@ export const CHAIN_IDS = {
 export const CHAIN_MAP: Record<string, string> = {}
 
 for (const [key, value] of Object.entries(CHAIN_IDS)) {
-  const parts = key.split('_')
-  CHAIN_MAP[value] = parts
-    .map((part, index) => {
-      return part[0] + part.slice(1).toLowerCase()
-    })
-    .join(' ')
+  if (value === CHAIN_IDS.POLYGON_ZKEVM) {
+    CHAIN_MAP[value] = 'Polygon zkEVM'
+  } else if (value === CHAIN_IDS.ZKSYNC_ERA) {
+    CHAIN_MAP[value] = 'zkSync Era'
+  } else {
+    const parts = key.split('_')
+    CHAIN_MAP[value] = parts
+      .map((part, index) => {
+        return part[0] + part.slice(1).toLowerCase()
+      })
+      .join(' ')
+  }
 }
 
 export function getChainName(chainId: string | number | null | undefined): string {
