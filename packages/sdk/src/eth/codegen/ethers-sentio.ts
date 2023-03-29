@@ -10,9 +10,10 @@ import {
 } from 'typechain'
 import { dirname, join, relative } from 'path'
 import { codeGenIndex, codeGenSentioFile, codeGenTestUtilsFile } from './file.js'
+import { YamlContractConfig } from '../../core/yaml-contract-config.js'
 
 export interface SentioEthersConfig extends Config {
-  genUsage?: boolean
+  contractsToGenExample: YamlContractConfig[]
 }
 
 export default class EthersSentio extends Ethers.default {
@@ -23,7 +24,7 @@ export default class EthersSentio extends Ethers.default {
     super(config)
   }
 
-  private processedContracts: Contract[] = []
+  private processedABIs: Contract[] = []
 
   // TODO(pc): also have to override transformBinFile, transformFile
   override transformAbiOrFullJsonFile(file: FileDescription): FileDescription[] | void {
@@ -37,7 +38,7 @@ export default class EthersSentio extends Ethers.default {
     const jsonPath = relative(this.cfg.inputDir, shortenFullJsonFilePath(file.path, this.cfg.allFiles))
     const contract = parse(abi, jsonPath, documentation)
     const files = super.transformAbiOrFullJsonFile(file)
-    this.processedContracts.push(contract)
+    this.processedABIs.push(contract)
 
     if (files !== undefined) {
       // files.forEach(this.transformFilePath)
@@ -74,20 +75,50 @@ export default class EthersSentio extends Ethers.default {
       }
     }
     let indexContent = ''
-    for (const contract of this.processedContracts) {
-      indexContent =
-        indexContent +
-        `
+    for (const contract of this.processedABIs) {
+      const content = `
             export * as ${contract.name.toLowerCase().replaceAll('-', '_')} from './${contract.name.toLowerCase()}.js'
             export { ${contract.name}Processor, ${
-          contract.name
-        }ProcessorTemplate } from './${contract.name.toLowerCase()}.js'
+        contract.name
+      }ProcessorTemplate } from './${contract.name.toLowerCase()}.js'
             `
+      indexContent += content
     }
     files.push({
       path: join(dirname(files[0].path), '../index.ts'),
       contents: indexContent,
     })
+
+    const rootDir = join(dirname(files[0].path), '../../..')
+
+    const contractsToGenExample = (this.cfg as SentioEthersConfig).contractsToGenExample
+    if (contractsToGenExample.length > 0) {
+      const processors = this.processedABIs.map((abi) => `${abi.name}Processor`).join(',')
+      let exampleContent = `import { ${processors} } from './types/eth/index.js'`
+
+      for (const contract of contractsToGenExample) {
+        const chainId = parseInt(contract.chain)
+        if (isNaN(chainId) || !isFinite(chainId)) {
+          continue
+        }
+
+        const content = `
+
+${contract.name}Processor.bind({ address: '${contract.address}', network: ${contract.chain} })
+  .onAllEvents((evt, ctx) => {
+    ctx.meter.Counter('event_count').add(1, { name: evt.name })
+    ctx.eventLogger.emit(evt.name, {
+      ...evt.args.toObject(),
+    })
+})`
+        exampleContent += content
+      }
+
+      files.push({
+        path: join(rootDir, 'processor.eth.example.ts'),
+        contents: exampleContent,
+      })
+    }
     return files
   }
 }

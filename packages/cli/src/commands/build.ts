@@ -7,7 +7,7 @@ import { getPackageRoot } from '../utils.js'
 import commandLineArgs from 'command-line-args'
 import commandLineUsage from 'command-line-usage'
 import yaml from 'yaml'
-import { SentioProjectConfig } from '../config.js'
+import { YamlProjectConfig } from '../config.js'
 import { getABIFilePath, getABI, writeABIFile } from '../abi.js'
 
 export const buildOptionDefinitions = [
@@ -34,12 +34,20 @@ export const buildOptionDefinitions = [
   },
 ]
 
+export const GenOptionDefinitions = [
+  {
+    name: 'example',
+    type: Boolean,
+    description: 'Generate example usage of the processor.',
+  },
+]
+
 export async function buildProcessorWithArgs(argv: string[]) {
   const options = commandLineArgs(buildOptionDefinitions, { argv })
   const usage = commandLineUsage([
     {
-      header: 'Create a template project',
-      content: 'sentio create <name>',
+      header: 'Build project',
+      content: 'sentio build',
     },
     {
       header: 'Options',
@@ -52,6 +60,26 @@ export async function buildProcessorWithArgs(argv: string[]) {
     process.exit(0)
   }
   await buildProcessor(false, options)
+}
+
+export async function generate(argv: string[]) {
+  const options = commandLineArgs(GenOptionDefinitions, { argv })
+  const usage = commandLineUsage([
+    {
+      header: 'Generate type binding',
+      content: 'sentio gen [--example]',
+    },
+    {
+      header: 'Options',
+      optionList: GenOptionDefinitions,
+    },
+  ])
+
+  if (options.help) {
+    console.log(usage)
+    process.exit(0)
+  }
+  await buildProcessor(true, options)
 }
 
 export async function buildProcessor(onlyGen: boolean, options: commandLineArgs.CommandLineOptions) {
@@ -95,9 +123,21 @@ import 'mine.js'
   }
 }
 
-export async function codegen(genExample = false) {
-  await prepareABI()
+export async function codegen(genExample: boolean) {
+  const processorConfig = yaml.parse(fs.readFileSync('sentio.yaml', 'utf8')) as YamlProjectConfig
+
+  for (const contract of processorConfig.contracts || []) {
+    const outputPath = getABIFilePath(contract.chain, contract.name || contract.address)
+    if (fs.existsSync(outputPath)) {
+      continue
+    }
+    console.log('Download Missing ABI specified in sentio.yaml')
+    const res = await getABI(contract.chain, contract.address, contract.name)
+    writeABIFile(res.abi, outputPath)
+  }
+
   const outputBase = path.resolve('src', 'types')
+
   try {
     // @ts-ignore dynamic import
     const codegen = await import('@sentio/sdk/eth/codegen')
@@ -109,7 +149,7 @@ export async function codegen(genExample = false) {
     }
     fs.emptyDirSync(output)
     // @ts-ignore dynamic import
-    await codegen.codegen(input, output, genExample)
+    await codegen.codegen(input, output, processorConfig.contracts)
   } catch (e) {
     console.error('code gen error', e)
   }
@@ -180,22 +220,4 @@ async function execStep(cmd: string, stepName: string) {
   }
   console.log(chalk.blue(stepName + ' success'))
   console.log()
-}
-
-async function prepareABI() {
-  const processorConfig = yaml.parse(fs.readFileSync('sentio.yaml', 'utf8')) as SentioProjectConfig
-
-  if (!processorConfig.contracts) {
-    return
-  }
-
-  for (const contract of processorConfig.contracts) {
-    const outputPath = getABIFilePath(contract.chain, contract.name || contract.address)
-    if (fs.existsSync(outputPath)) {
-      continue
-    }
-    console.log('Download Missing ABI specified in sentio.yaml')
-    const res = await getABI(contract.chain, contract.address, contract.name)
-    writeABIFile(res.abi, outputPath)
-  }
 }

@@ -1,6 +1,6 @@
 import commandLineArgs from 'command-line-args'
 import commandLineUsage from 'command-line-usage'
-import { finalizeHost, FinalizeProjectName, SentioProjectConfig } from '../config.js'
+import { finalizeHost, FinalizeProjectName, YamlProjectConfig } from '../config.js'
 import { URL } from 'url'
 import fetch from 'node-fetch'
 import { buildOptionDefinitions, buildProcessor } from './build.js'
@@ -67,7 +67,7 @@ function mergeOptions(options1: commandLineArgs.OptionDefinition[], options2: co
   return res
 }
 
-export async function runUpload(processorConfig: SentioProjectConfig, argv: string[]) {
+export async function runUpload(processorConfig: YamlProjectConfig, argv: string[]) {
   const optionDefinitions = mergeOptions(uploadOptionDefinitions, buildOptionDefinitions)
 
   const options = commandLineArgs(optionDefinitions, { argv })
@@ -109,7 +109,7 @@ export async function runUpload(processorConfig: SentioProjectConfig, argv: stri
   return uploadFile(processorConfig, apiOverride)
 }
 
-async function createProject(options: SentioProjectConfig, apiKey: string) {
+async function createProject(options: YamlProjectConfig, apiKey: string) {
   const url = new URL('/api/v1/projects', options.host)
   const [ownerName, slug] = options.project.includes('/') ? options.project.split('/') : [undefined, options.project]
   return fetch(url.href, {
@@ -121,7 +121,7 @@ async function createProject(options: SentioProjectConfig, apiKey: string) {
   })
 }
 
-export async function uploadFile(options: SentioProjectConfig, apiKeyOverride: string) {
+export async function uploadFile(options: YamlProjectConfig, apiKeyOverride: string) {
   console.log(chalk.blue('Prepare to upload'))
 
   const PROCESSOR_FILE = path.join(process.cwd(), 'dist/lib.js')

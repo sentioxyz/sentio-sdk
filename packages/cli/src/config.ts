@@ -5,17 +5,17 @@ const HostMap: { [host: string]: string } = {
   prod: 'https://app.sentio.xyz',
 }
 
-export interface ContractConfig {
+export interface YamlContractConfig {
   address: string
   chain: string
   name: string
 }
 
-export interface SentioProjectConfig {
+export interface YamlProjectConfig {
   project: string
   host: string
   build: boolean
-  contracts: ContractConfig[]
+  contracts: YamlContractConfig[]
   debug: boolean
 }
 
@@ -62,11 +62,11 @@ export function getAuthConfig(host: string): {
   return { domain, clientId, audience, redirectUri }
 }
 
-export function finalizeHost(config: SentioProjectConfig) {
+export function finalizeHost(config: YamlProjectConfig) {
   config.host = getFinalizedHost(config.host)
 }
 
-export function FinalizeProjectName(config: SentioProjectConfig, owner: string | undefined, slug: string | undefined) {
+export function FinalizeProjectName(config: YamlProjectConfig, owner: string | undefined, slug: string | undefined) {
   if (owner || slug) {
     let name = config.project
     if (name.includes('/')) {

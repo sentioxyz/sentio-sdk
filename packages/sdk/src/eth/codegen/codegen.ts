@@ -5,15 +5,20 @@ import EthersSentio, { SentioEthersConfig } from './ethers-sentio.js'
 import * as prettier from 'prettier'
 import path from 'path'
 import mkdirp from 'mkdirp'
+import { YamlContractConfig } from '../../core/yaml-contract-config.js'
 
-export async function codegen(abisDir: string, outDir: string, genExample: boolean = false) {
+export async function codegen(abisDir: string, outDir: string, contractsToGenExample: YamlContractConfig[] = []) {
   if (!fs.existsSync(abisDir)) {
     return
   }
-  console.log('Generated', await codegenInternal(abisDir, outDir, genExample), 'files')
+  console.log('Generated', await codegenInternal(abisDir, outDir, contractsToGenExample), 'files')
 }
 
-async function codegenInternal(abisDir: string, outDir: string, genUsage: boolean): Promise<number> {
+async function codegenInternal(
+  abisDir: string,
+  outDir: string,
+  contractsToGenExample: YamlContractConfig[]
+): Promise<number> {
   let allFiles = fs.readdirSync(abisDir)
   if (allFiles.length === 0) {
     return 0
@@ -38,7 +43,7 @@ async function codegenInternal(abisDir: string, outDir: string, genUsage: boolea
     outDir: outInternal,
     allFiles: allFiles,
     filesToProcess: allFiles,
-    genUsage: genUsage,
+    contractsToGenExample: contractsToGenExample,
   }
   const services: Services = {
     fs,

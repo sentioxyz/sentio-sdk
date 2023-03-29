@@ -94,6 +94,6 @@ export async function runAdd(argv: string[]) {
     }
 
     // Run gen
-    await codegen()
+    await codegen(false)
   }
 }

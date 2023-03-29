@@ -1,11 +1,11 @@
 {
-  "name": "@sentio-example/mixed",
+  "name": "@sentio-example/auto",
   "private": true,
   "version": "1.0.0",
   "type": "module",
   "scripts": {
     "test": "sentio test",
-    "gen": "sentio gen",
+    "gen": "sentio gen --example && mv src/processor.eth.example.ts src/processor.ts",
     "build": "sentio build --skip-deps",
     "upload": "sentio upload"
   },

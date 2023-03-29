@@ -6,3 +6,9 @@ contracts:
   - chain: aptos_testnet
     address: '0x4188c8694687e844677c2aa87171019e23d61cac60de5082a278a8aa47e9d807'
     name: Souffle
+  - name: Pyth
+    chain: '1'
+    address: '0x4305FB66699C3B2702D4d05CF36551390A4c69C6'
+  - name: Pyth
+    chain: '56'
+    address: '0x4D7E825f80bDf85e913E0DD2A2D54927e9dE1594'
