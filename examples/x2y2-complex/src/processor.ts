@@ -1,6 +1,6 @@
 import { Counter, Gauge, Exporter } from '@sentio/sdk'
 import { ERC20Processor } from '@sentio/sdk/eth/builtin'
-import { X2y2Processor } from './types/eth/x2y2.js'
+import { TokenDistributorProcessor } from './types/eth/tokendistributor.js'
 
 // import { AggregationType } from '@sentio/sdk/lib/gen/processor/protos/processor'
 
@@ -22,7 +22,7 @@ const vol = Gauge.register('x2y2_vol', {
 
 const exporter = Exporter.register('x2y2', 'x2y2_mint')
 
-X2y2Processor.bind({ address: '0xB329e39Ebefd16f40d38f07643652cE17Ca5Bac1' }).onTimeInterval(
+TokenDistributorProcessor.bind({ address: '0xB329e39Ebefd16f40d38f07643652cE17Ca5Bac1' }).onTimeInterval(
   async (_, ctx) => {
     const phase = (await ctx.contract.currentPhase()).toString()
     const reward = (await ctx.contract.rewardPerBlockForStaking()).scaleDown(18)
@@ -68,6 +68,6 @@ ERC20Processor.bind({ address: '0x1e4ede388cbc9f4b5c79681b7f94d36a11abebc9' }).o
 ERC20Processor.bind({ address: '0x1e4ede388cbc9f4b5c79681b7f94d36a11abebc9' }).onAllEvents((evt, ctx) => {
   ctx.meter.Counter('event_count').add(1, { name: evt.name })
   ctx.eventLogger.emit(evt.name, {
-    ...evt.args,
+    ...evt.args.toObject(),
   })
 })

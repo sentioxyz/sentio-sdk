@@ -8,7 +8,7 @@ import { getMeaningfulFunctionParams } from '../utils.js'
 import { InternalMoveModule, InternalMoveStruct } from '../../move/internal-models.js'
 import { AbstractCodegen } from '../../move/abstract-codegen.js'
 
-export async function codegen(abisDir: string, outDir = 'src/types/aptos') {
+export async function codegen(abisDir: string, outDir = 'src/types/aptos', genExample = false) {
   if (!fs.existsSync(abisDir)) {
     return
   }

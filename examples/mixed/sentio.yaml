@@ -1,0 +1,8 @@
+project: mixed
+contracts:
+  - chain: '1'
+    address: '0xB329e39Ebefd16f40d38f07643652cE17Ca5Bac1'
+    name: TokenDistributor
+  - chain: aptos_testnet
+    address: '0x4188c8694687e844677c2aa87171019e23d61cac60de5082a278a8aa47e9d807'
+    name: Souffle

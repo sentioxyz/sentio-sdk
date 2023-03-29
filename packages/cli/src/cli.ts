@@ -5,7 +5,7 @@ import commandLineUsage from 'command-line-usage'
 import fs from 'fs'
 import path from 'path'
 
-import yaml from 'js-yaml'
+import yaml from 'yaml'
 import { SentioProjectConfig } from './config.js'
 import chalk from 'chalk'
 import { buildProcessor, buildProcessorWithArgs } from './commands/build.js'
@@ -41,7 +41,7 @@ if (mainOptions.command === 'login') {
   // TODO move them to their own modules
 
   // Process configs
-  let processorConfig: SentioProjectConfig = { host: '', project: '', build: true, debug: false }
+  let processorConfig: SentioProjectConfig = { host: '', project: '', build: true, debug: false, contracts: [] }
   // Fist step, read from project yaml file
   try {
     console.log(chalk.blue('Loading Process config'))
@@ -59,7 +59,7 @@ if (mainOptions.command === 'login') {
       process.exit(1)
     }
 
-    processorConfig = yaml.load(fs.readFileSync('sentio.yaml', 'utf8')) as SentioProjectConfig
+    processorConfig = yaml.parse(fs.readFileSync('sentio.yaml', 'utf8')) as SentioProjectConfig
     if (!processorConfig.project === undefined) {
       console.error('Config yaml must have contain a valid project identifier')
       process.exit(1)

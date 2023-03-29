@@ -25,20 +25,19 @@
     "form-data": "^4.0.0",
     "fs-extra": "^11.0.0",
     "jest": "^29.5.0",
-    "js-yaml": "^4.1.0",
     "latest-version": "^7.0.0",
     "node-fetch": "^3.3.0",
     "open": "^9.0.0",
     "ts-jest": "^29.0.5",
     "ts-node": "^10.9.1",
-    "tsup": "npm:@sentio/tsup@^6.6.3"
+    "tsup": "npm:@sentio/tsup@^6.6.3",
+    "yaml": "^2.2.1"
   },
   "devDependencies": {
     "@types/command-line-args": "^5.2.0",
     "@types/command-line-usage": "^5.0.2",
     "@types/express": "^4.17.14",
     "@types/fs-extra": "^11.0.1",
-    "@types/js-yaml": "^4.0.5",
     "@types/node-fetch": "^3.0.3"
   },
   "bin": {

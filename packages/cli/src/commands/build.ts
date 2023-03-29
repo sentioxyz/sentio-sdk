@@ -6,6 +6,9 @@ import * as process from 'process'
 import { getPackageRoot } from '../utils.js'
 import commandLineArgs from 'command-line-args'
 import commandLineUsage from 'command-line-usage'
+import yaml from 'yaml'
+import { SentioProjectConfig } from '../config.js'
+import { getABIFilePath, getABI, writeABIFile } from '../abi.js'
 
 export const buildOptionDefinitions = [
   {
@@ -23,6 +26,11 @@ export const buildOptionDefinitions = [
     name: 'skip-deps',
     type: Boolean,
     description: 'Skip dependency enforce.',
+  },
+  {
+    name: 'example',
+    type: Boolean,
+    description: 'Generate example usage of the processor.',
   },
 ]
 
@@ -52,7 +60,7 @@ export async function buildProcessor(onlyGen: boolean, options: commandLineArgs.
   }
 
   if (!options['skip-gen']) {
-    await codegen()
+    await codegen(options.example || false)
   }
 
   if (!onlyGen) {
@@ -87,7 +95,8 @@ import 'mine.js'
   }
 }
 
-export async function codegen() {
+export async function codegen(genExample = false) {
+  await prepareABI()
   const outputBase = path.resolve('src', 'types')
   try {
     // @ts-ignore dynamic import
@@ -100,7 +109,7 @@ export async function codegen() {
     }
     fs.emptyDirSync(output)
     // @ts-ignore dynamic import
-    await codegen.codegen(input, output)
+    await codegen.codegen(input, output, genExample)
   } catch (e) {
     console.error('code gen error', e)
   }
@@ -113,7 +122,7 @@ export async function codegen() {
     fs.emptyDirSync(output)
 
     // @ts-ignore dynamic import
-    await codegen.codegen(path.resolve('abis', 'solana'), output)
+    await codegen.codegen(path.resolve('abis', 'solana'), output, genExample)
   } catch (e) {
     console.error('code gen error', e)
   }
@@ -126,7 +135,7 @@ export async function codegen() {
     fs.emptyDirSync(output)
 
     // @ts-ignore dynamic import
-    await codegen.codegen(path.resolve('abis', 'aptos'), output)
+    await codegen.codegen(path.resolve('abis', 'aptos'), output, genExample)
   } catch (e) {
     console.error('code gen error', e)
   }
@@ -139,7 +148,7 @@ export async function codegen() {
     fs.emptyDirSync(output)
 
     // @ts-ignore dynamic import
-    await codegen.codegen(path.resolve('abis', 'sui'), output)
+    await codegen.codegen(path.resolve('abis', 'sui'), output, genExample)
   } catch (e) {
     console.error('code gen error', e)
   }
@@ -171,4 +180,22 @@ async function execStep(cmd: string, stepName: string) {
   }
   console.log(chalk.blue(stepName + ' success'))
   console.log()
+}
+
+async function prepareABI() {
+  const processorConfig = yaml.parse(fs.readFileSync('sentio.yaml', 'utf8')) as SentioProjectConfig
+
+  if (!processorConfig.contracts) {
+    return
+  }
+
+  for (const contract of processorConfig.contracts) {
+    const outputPath = getABIFilePath(contract.chain, contract.name || contract.address)
+    if (fs.existsSync(outputPath)) {
+      continue
+    }
+    console.log('Download Missing ABI specified in sentio.yaml')
+    const res = await getABI(contract.chain, contract.address, contract.name)
+    writeABIFile(res.abi, outputPath)
+  }
 }

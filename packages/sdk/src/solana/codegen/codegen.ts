@@ -4,7 +4,7 @@ import chalk from 'chalk'
 import { Idl } from '@project-serum/anchor'
 import { IdlAccountItem, IdlField, IdlInstruction, IdlType } from '@project-serum/anchor/dist/cjs/idl.js'
 
-export function codegen(abisDir: string, targetPath = path.join('src', 'types', 'solana')) {
+export function codegen(abisDir: string, targetPath = path.join('src', 'types', 'solana'), genExample = false) {
   if (!fs.existsSync(abisDir)) {
     return
   }

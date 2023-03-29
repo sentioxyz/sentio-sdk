@@ -1,2 +1,6 @@
 project: x2y2-complex
 host: http://localhost:10000
+contracts:
+  - chain: '1'
+    address: '0xB329e39Ebefd16f40d38f07643652cE17Ca5Bac1'
+    name: TokenDistributor

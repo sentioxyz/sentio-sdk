@@ -1,15 +1,13 @@
 import commandLineArgs from 'command-line-args'
 import commandLineUsage from 'command-line-usage'
-import path from 'path'
 import fs from 'fs-extra'
 import chalk from 'chalk'
 
 import { codegen } from './build.js'
 
-// @ts-ignore no types
-import { init } from 'etherscan-api'
-import { AptosClient } from 'aptos-sdk'
-import { JsonRpcProvider } from '@mysten/sui.js'
+import * as process from 'process'
+import yaml from 'yaml'
+import { getABIFilePath, getABI, writeABIFile } from '../abi.js'
 
 export async function runAdd(argv: string[]) {
   const optionDefinitions = [
@@ -23,9 +21,9 @@ export async function runAdd(argv: string[]) {
       name: 'chain',
       alias: 'c',
       type: String,
-      defaultValue: 'homestead',
+      defaultValue: '1',
       description:
-        'Chain identifier, can be: homestead/mainnet,goerli,arbitrum,avalanche, apots, aptos/testnet and sui, sui/testnet',
+        'Chain id define from here: https://raw.githubusercontent.com/sentioxyz/sentio-sdk/main/packages/sdk/src/core/chain.ts notice some chain may not support this command',
     },
     {
       name: 'address',
@@ -64,91 +62,38 @@ export async function runAdd(argv: string[]) {
       process.exit(1)
     }
 
-    let ethApi
-    let aptosClient: AptosClient | undefined
-    let suiClient: JsonRpcProvider | undefined
-    switch (chain) {
-      case 'aptos':
-        aptosClient = new AptosClient('https://mainnet.aptoslabs.com/')
-        break
-      case 'aptos/testnet':
-        aptosClient = new AptosClient('https://testnet.aptoslabs.com/')
-        break
-      case 'sui':
-        throw Error('SUI mainnet is not support yet, try sui/testnet')
-      // suiClient = new JsonRpcProvider('https://fullnode.mainnet.sui.io/')
-      // break
-      case 'sui/testnet':
-        suiClient = new JsonRpcProvider('https://fullnode.testnet.sui.io/')
-        break
-      case 'mainnet':
-      case 'homestead':
-        ethApi = init()
-        break
-      default:
-        ethApi = init(undefined, chain)
+    const abiRes = await getABI(chain, address, options.name)
+    const filename = abiRes.name || address
+
+    writeABIFile(abiRes.abi, getABIFilePath(chain, filename))
+
+    // Write contract info to sentio.yaml
+    const yamlDocument: yaml.Document = yaml.parseDocument(fs.readFileSync('sentio.yaml', 'utf8'))
+    let contracts = yamlDocument.get('contracts') as yaml.YAMLSeq
+    if (!contracts) {
+      contracts = new yaml.YAMLSeq()
+      yamlDocument.set('contracts', contracts)
     }
 
-    const baseErrMsg = chalk.red(
-      `Failed to automatic download contract ${address} from ${chain}, please manually download abi and put it into abis/eth directory`
-    )
-
-    const filename = options.name ? options.name : address
-
-    if (aptosClient) {
-      try {
-        const module = await aptosClient.getAccountModules(address)
-        writeToDirectory(module, chain, filename)
-      } catch (e) {
-        console.error(baseErrMsg, e)
-        process.exit(1)
-      }
-    }
-    if (suiClient) {
-      try {
-        const module = await suiClient.getNormalizedMoveModulesByPackage(address)
-        writeToDirectory(module, chain, filename)
-      } catch (e) {
-        console.error(baseErrMsg, e)
-        process.exit(1)
+    let hasContract = false
+    for (const item of contracts.items as yaml.YAMLMap[]) {
+      if (item.get('chain') === chain && item.get('address') === address) {
+        hasContract = true
       }
     }
 
-    if (ethApi) {
-      try {
-        const resp = await ethApi.contract.getabi(address)
-        if (resp.status !== '1') {
-          throw Error(resp.message)
-        }
-        writeToDirectory(resp.result, chain, filename)
-      } catch (e) {
-        console.error(baseErrMsg, e)
-        process.exit(1)
+    if (!hasContract) {
+      const newContract = new yaml.YAMLMap()
+      newContract.set('chain', chain)
+      newContract.set('address', address)
+      if (address !== filename) {
+        newContract.set('name', filename)
       }
+      contracts.add(newContract)
+      fs.writeFileSync('sentio.yaml', yamlDocument.toString(), 'utf8')
     }
+
     // Run gen
     await codegen()
   }
-}
-
-function writeToDirectory(obj: object | string, chain: string, name: string) {
-  if (typeof obj === 'string') {
-    obj = JSON.parse(obj)
-  }
-  const data = JSON.stringify(obj, null, 2)
-  let subpath = chain
-  switch (chain) {
-    case 'aptos':
-    case 'aptos/testnet':
-    case 'sui':
-    case 'sui/testnet':
-      break
-    default:
-      subpath = 'eth'
-  }
-
-  const output = path.join('abis', subpath, name + '.json')
-  fs.mkdirSync(path.dirname(output), { recursive: true })
-  fs.writeFileSync(output, data)
-  console.log(chalk.green('ABI has been downloaded to', output))
 }

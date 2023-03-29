@@ -2,7 +2,7 @@
   "name": "@sentio-example/x2y2-complex",
   "license": "Apache-2.0",
   "version": "1.0.0",
-  "private": "true",
+  "private": true,
   "type": "module",
   "scripts": {
     "compile": "tsc -p .",
@@ -10,6 +10,7 @@
     "build": "sentio build --skip-deps",
     "upload": "sentio upload",
     "tsnode": "yarn ts-node",
+    "add": "sentio add",
     "build_all": "yarn lerna run --scope=@sentio-example/x2y2-complex build --include-dependencies"
   },
   "dependencies": {

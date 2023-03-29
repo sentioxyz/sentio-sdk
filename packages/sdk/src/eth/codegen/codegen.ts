@@ -1,19 +1,19 @@
 import { loadFileDescriptions, processOutput, skipEmptyAbis } from 'typechain/dist/typechain/io.js'
 import * as fs from 'fs'
-import { Config, DEFAULT_FLAGS, Services } from 'typechain'
-import EthersSentio from './ethers-sentio.js'
+import { DEFAULT_FLAGS, Services } from 'typechain'
+import EthersSentio, { SentioEthersConfig } from './ethers-sentio.js'
 import * as prettier from 'prettier'
 import path from 'path'
 import mkdirp from 'mkdirp'
 
-export async function codegen(abisDir: string, outDir: string) {
+export async function codegen(abisDir: string, outDir: string, genExample: boolean = false) {
   if (!fs.existsSync(abisDir)) {
     return
   }
-  console.log('Generated', await codegenInternal(abisDir, outDir), 'files')
+  console.log('Generated', await codegenInternal(abisDir, outDir, genExample), 'files')
 }
 
-async function codegenInternal(abisDir: string, outDir: string): Promise<number> {
+async function codegenInternal(abisDir: string, outDir: string, genUsage: boolean): Promise<number> {
   let allFiles = fs.readdirSync(abisDir)
   if (allFiles.length === 0) {
     return 0
@@ -30,7 +30,7 @@ async function codegenInternal(abisDir: string, outDir: string): Promise<number>
   }
 
   // skip empty paths
-  const config: Config = {
+  const config: SentioEthersConfig = {
     cwd: process.cwd(),
     flags: DEFAULT_FLAGS,
     inputDir: abisDir,
@@ -38,6 +38,7 @@ async function codegenInternal(abisDir: string, outDir: string): Promise<number>
     outDir: outInternal,
     allFiles: allFiles,
     filesToProcess: allFiles,
+    genUsage: genUsage,
   }
   const services: Services = {
     fs,

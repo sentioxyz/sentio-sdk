@@ -5,12 +5,17 @@ const HostMap: { [host: string]: string } = {
   prod: 'https://app.sentio.xyz',
 }
 
+export interface ContractConfig {
+  address: string
+  chain: string
+  name: string
+}
+
 export interface SentioProjectConfig {
   project: string
   host: string
-  // source: string
   build: boolean
-  // targets: Target[]
+  contracts: ContractConfig[]
   debug: boolean
 }
 

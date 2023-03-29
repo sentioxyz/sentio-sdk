@@ -11,8 +11,12 @@ import {
 import { dirname, join, relative } from 'path'
 import { codeGenIndex, codeGenSentioFile, codeGenTestUtilsFile } from './file.js'
 
+export interface SentioEthersConfig extends Config {
+  genUsage?: boolean
+}
+
 export default class EthersSentio extends Ethers.default {
-  constructor(config: Config) {
+  constructor(config: SentioEthersConfig) {
     if (!config.outDir) {
       throw new Error('Out put path not specificed')
     }
