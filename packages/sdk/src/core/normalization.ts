@@ -1,6 +1,9 @@
 import { Labels } from './meter.js'
 import { BigDecimal } from './big-decimal.js'
 
+export const SENTIO_BIGINT_STRING_SUFFIX = ':sto_bi'
+export const SENTIO_BIGDECIMAL_STRING_SUFFIX = ':sto_bd'
+
 function normalizeName(name: string): string {
   return name.slice(0, 128).replace(/[^_\-a-zA-Z0-9]/g, '_')
 }
@@ -36,7 +39,8 @@ function normalizeObject(obj: any, length: number): any {
     case 'string':
       return obj.slice(0, length)
     case 'bigint':
-      return Number(obj)
+      return obj.toString() + SENTIO_BIGINT_STRING_SUFFIX
+    // return Number(obj)
     case 'number':
       return obj
     case 'function':
@@ -60,7 +64,8 @@ function normalizeObject(obj: any, length: number): any {
         console.error("can't submit NaN or Infinity value, will store as 0")
         return 0
       }
-      return obj.toNumber()
+      return obj.toString() + SENTIO_BIGDECIMAL_STRING_SUFFIX
+      // return obj.toNumber()
     }
     if (obj instanceof Promise) {
       console.error('Cannot submit promise')
