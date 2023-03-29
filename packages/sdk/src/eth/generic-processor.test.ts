@@ -13,11 +13,21 @@ describe('Test Generic Processor', () => {
       [
         'event Transfer(address indexed from, address indexed to, uint256 value)',
         'event Approval(address indexed from, address indexed to, uint256 value)',
+        'function transferFrom(address from, address to, uint value)',
+        'function balanceOf(address owner) view returns (uint balance)',
       ],
       { address: '0x1E4EDE388cbc9F4b5c79681B7f94d36a11ABEBC9' }
-    ).onAllEvents(function (log, ctx) {
-      ctx.meter.Counter('event_num').add(1)
-    })
+    )
+      .onAllEvents(function (log, ctx) {
+        ctx.meter.Counter('event_num').add(1)
+      })
+      .onAllTraces(function (trace, ctx) {
+        ctx.meter.Counter('trace_count').add(1, { name: trace.name })
+        ctx.eventLogger.emit(trace.name, {
+          distinctId: trace.action.from,
+          ...trace.args.toObject(),
+        })
+      })
 
     GenericProcessor.bind('event WalletCreated(address wallet, address owner)', {
       address: '0x57E037F4d2c8BEa011Ad8a9A5AF4AaEEd508650f',
@@ -34,6 +44,8 @@ describe('Test Generic Processor', () => {
     const config = await service.getConfig({})
     expect(config.contractConfigs).length(2)
     expect(config.contractConfigs?.[0].contract?.name).equals('Generic')
+    const traceConfigs = config.contractConfigs?.[0].traceConfigs
+    expect(traceConfigs.length).equals(2)
   })
 
   test('Check log dispatch', async () => {

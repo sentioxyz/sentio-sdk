@@ -110,7 +110,15 @@ ${contract.name}Processor.bind({ address: '${contract.address}', network: ${cont
     ctx.eventLogger.emit(evt.name, {
       ...evt.args.toObject(),
     })
-})`
+})
+  .onAllTraces(function (trace, ctx) {
+    ctx.meter.Counter('trace_count').add(1, { name: trace.name })
+    ctx.eventLogger.emit(trace.name, {
+      distinctId: trace.action.from,
+      ...trace.args.toObject(),
+    })
+  })
+`
         exampleContent += content
       }
 

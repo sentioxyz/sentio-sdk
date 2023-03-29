@@ -7,7 +7,7 @@ import { getPackageRoot } from '../utils.js'
 import commandLineArgs from 'command-line-args'
 import commandLineUsage from 'command-line-usage'
 import yaml from 'yaml'
-import { YamlProjectConfig } from '../config.js'
+import { YamlContractConfig, YamlProjectConfig } from '../config.js'
 import { getABIFilePath, getABI, writeABIFile } from '../abi.js'
 
 export const buildOptionDefinitions = [
@@ -124,9 +124,12 @@ import 'mine.js'
 }
 
 export async function codegen(genExample: boolean) {
-  const processorConfig = yaml.parse(fs.readFileSync('sentio.yaml', 'utf8')) as YamlProjectConfig
-
-  for (const contract of processorConfig.contracts || []) {
+  let contractsForUsage: YamlContractConfig[] = []
+  if (genExample) {
+    const processorConfig = yaml.parse(fs.readFileSync('sentio.yaml', 'utf8')) as YamlProjectConfig
+    contractsForUsage = processorConfig.contracts
+  }
+  for (const contract of contractsForUsage) {
     const outputPath = getABIFilePath(contract.chain, contract.name || contract.address)
     if (fs.existsSync(outputPath)) {
       continue
@@ -149,7 +152,7 @@ export async function codegen(genExample: boolean) {
     }
     fs.emptyDirSync(output)
     // @ts-ignore dynamic import
-    await codegen.codegen(input, output, processorConfig.contracts)
+    await codegen.codegen(input, output, contractsForUsage)
   } catch (e) {
     console.error('code gen error', e)
   }

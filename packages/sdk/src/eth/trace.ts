@@ -6,7 +6,10 @@ export interface TypedCallTrace<TArgsArray extends Array<any> = any, TArgsObject
 }
 
 export interface Trace {
-  args?: Result
+  args: Result
+  name: string
+  functionSignature: string
+
   action: TraceAction
   blockHash: string
   blockNumber: number

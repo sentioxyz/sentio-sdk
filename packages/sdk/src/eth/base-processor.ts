@@ -18,6 +18,7 @@ import { ServerError, Status } from 'nice-grpc'
 import { fixEmptyKey, EthEvent, formatEthData } from './eth.js'
 import * as console from 'console'
 import { getNetworkFromCtxOrNetworkish } from './provider.js'
+import sha3 from 'js-sha3'
 
 export interface AddressOrTypeEventFilter extends DeferredTopicFilter {
   addressType?: AddressType
@@ -31,7 +32,7 @@ export class EventsHandler {
 }
 
 export class TraceHandler {
-  signature: string
+  signatures: string[]
   handler: (trace: Data_EthTrace) => Promise<ProcessResult>
   fetchConfig: EthFetchConfig
 }
@@ -194,7 +195,8 @@ export abstract class BaseProcessor<
   }
 
   public onAllEvents(
-    handler: (event: EthEvent, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid
+    handler: (event: EthEvent, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
+    fetchConfig?: Partial<EthFetchConfig>
   ): this {
     const _filters: DeferredTopicFilter[] = []
     const tmpContract = this.CreateBoundContractView()
@@ -205,31 +207,45 @@ export abstract class BaseProcessor<
         _filters.push(filter())
       }
     }
-    return this.onEvent(function (log, ctx) {
-      return handler(log, ctx)
-    }, _filters)
+    return this.onEvent(
+      function (log, ctx) {
+        return handler(log, ctx)
+      },
+      _filters,
+      fetchConfig
+    )
   }
 
   public onTrace(
-    signature: string,
+    signatures: string | string[],
     handler: (trace: Trace, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     fetchConfig?: Partial<EthFetchConfig>
   ): this {
     const chainId = this.getChainId()
     const contractName = this.config.name
     const processor = this
+    if (typeof signatures === 'string') {
+      signatures = [signatures]
+    }
 
     this.traceHandlers.push({
-      signature,
+      signatures,
       fetchConfig: EthFetchConfig.fromPartial(fetchConfig || {}),
       handler: async function (data: Data_EthTrace) {
         const contractView = processor.CreateBoundContractView()
         const contractInterface = contractView.rawContract.interface
-        const fragment = contractInterface.getFunction(signature)
         const { trace, block, transaction, transactionReceipt } = formatEthData(data)
+        const sighash = trace?.action.input?.slice(0, 10)
+        if (!sighash) {
+          throw new ServerError(Status.INVALID_ARGUMENT, 'trace has no sighash')
+        }
+        const fragment = contractInterface.getFunction(sighash)
+
         if (!trace || !fragment) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'trace is null')
         }
+        trace.name = fragment.name
+        trace.functionSignature = fragment.format()
         // const trace = data.trace as Trace
         if (!trace?.action.input) {
           return ProcessResult.fromPartial({})
@@ -259,5 +275,29 @@ export abstract class BaseProcessor<
       },
     })
     return this
+  }
+
+  public onAllTraces(
+    handler: (event: Trace, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
+    fetchConfig?: Partial<EthFetchConfig>
+  ): this {
+    const tmpContract = this.CreateBoundContractView()
+    const sighashes = []
+
+    for (const fragment of tmpContract.rawContract.interface.fragments) {
+      if (fragment.type === 'function') {
+        const signature = fragment.format()
+        const test = new TextEncoder().encode(signature)
+        const sighash = '0x' + sha3.keccak_256(test).substring(0, 8)
+        sighashes.push(sighash)
+      }
+    }
+    return this.onTrace(
+      sighashes,
+      function (trace, ctx) {
+        return handler(trace, ctx)
+      },
+      fetchConfig
+    )
   }
 }

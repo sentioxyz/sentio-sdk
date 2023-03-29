@@ -6,29 +6,53 @@ import { PythProcessor, TokenDistributorProcessor } from './types/eth/index.js'
 TokenDistributorProcessor.bind({
   address: '0xB329e39Ebefd16f40d38f07643652cE17Ca5Bac1',
   network: 1,
-}).onAllEvents((evt, ctx) => {
-  ctx.meter.Counter('event_count').add(1, { name: evt.name })
-  ctx.eventLogger.emit(evt.name, {
-    ...evt.args.toObject(),
-  })
 })
+  .onAllEvents((evt, ctx) => {
+    ctx.meter.Counter('event_count').add(1, { name: evt.name })
+    ctx.eventLogger.emit(evt.name, {
+      ...evt.args.toObject(),
+    })
+  })
+  .onAllTraces(function (trace, ctx) {
+    ctx.meter.Counter('trace_count').add(1, { name: trace.name })
+    ctx.eventLogger.emit(trace.name, {
+      distinctId: trace.action.from,
+      ...trace.args.toObject(),
+    })
+  })
 
 PythProcessor.bind({
   address: '0x4305FB66699C3B2702D4d05CF36551390A4c69C6',
   network: 1,
-}).onAllEvents((evt, ctx) => {
-  ctx.meter.Counter('event_count').add(1, { name: evt.name })
-  ctx.eventLogger.emit(evt.name, {
-    ...evt.args.toObject(),
-  })
 })
+  .onAllEvents((evt, ctx) => {
+    ctx.meter.Counter('event_count').add(1, { name: evt.name })
+    ctx.eventLogger.emit(evt.name, {
+      ...evt.args.toObject(),
+    })
+  })
+  .onAllTraces(function (trace, ctx) {
+    ctx.meter.Counter('trace_count').add(1, { name: trace.name })
+    ctx.eventLogger.emit(trace.name, {
+      distinctId: trace.action.from,
+      ...trace.args.toObject(),
+    })
+  })
 
 PythProcessor.bind({
   address: '0x4D7E825f80bDf85e913E0DD2A2D54927e9dE1594',
   network: 56,
-}).onAllEvents((evt, ctx) => {
-  ctx.meter.Counter('event_count').add(1, { name: evt.name })
-  ctx.eventLogger.emit(evt.name, {
-    ...evt.args.toObject(),
-  })
 })
+  .onAllEvents((evt, ctx) => {
+    ctx.meter.Counter('event_count').add(1, { name: evt.name })
+    ctx.eventLogger.emit(evt.name, {
+      ...evt.args.toObject(),
+    })
+  })
+  .onAllTraces(function (trace, ctx) {
+    ctx.meter.Counter('trace_count').add(1, { name: trace.name })
+    ctx.eventLogger.emit(trace.name, {
+      distinctId: trace.action.from,
+      ...trace.args.toObject(),
+    })
+  })

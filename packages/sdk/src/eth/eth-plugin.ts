@@ -65,11 +65,13 @@ export class EthPlugin extends Plugin {
       // Step 2. Prepare all trace handlers
       for (const traceHandler of processor.traceHandlers) {
         const handlerId = this.traceHandlers.push(traceHandler.handler) - 1
-        contractConfig.traceConfigs.push({
-          signature: traceHandler.signature,
-          handlerId: handlerId,
-          fetchConfig: traceHandler.fetchConfig,
-        })
+        for (const signature of traceHandler.signatures) {
+          contractConfig.traceConfigs.push({
+            signature: signature,
+            handlerId: handlerId,
+            fetchConfig: traceHandler.fetchConfig,
+          })
+        }
       }
 
       // Step 3. Prepare all the event handlers

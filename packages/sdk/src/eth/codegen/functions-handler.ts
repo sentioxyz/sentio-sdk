@@ -39,8 +39,6 @@ function codegenCallTraceType(fn: FunctionDeclaration, overloadedName?: string):
 
 function generateCallHandler(fn: FunctionDeclaration, contractName: string, overloadedName?: string): string {
   const signature = getSignatureForFn(fn)
-  // utils.toUtf8Bytes(signature))
-
   const test = new TextEncoder().encode(signature)
   const sighash = '0x' + sha3.keccak_256(test).substring(0, 8)
 
