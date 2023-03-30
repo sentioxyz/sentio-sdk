@@ -36,6 +36,12 @@ export const buildOptionDefinitions = [
 
 export const GenOptionDefinitions = [
   {
+    name: 'help',
+    alias: 'h',
+    type: Boolean,
+    description: 'Display this usage guide.',
+  },
+  {
     name: 'example',
     type: Boolean,
     description: 'Generate example usage of the processor.',
