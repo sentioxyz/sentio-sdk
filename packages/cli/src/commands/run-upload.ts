@@ -24,7 +24,14 @@ const uploadOptionDefinitions = [
   {
     name: 'api-key',
     type: String,
-    description: '(Optional) Manually provide API key rather than use saved credential',
+    description:
+      '(Optional) Manually provide API key rather than use saved credential, if both api-key and jwt-token is provided, use api-key.',
+  },
+  {
+    name: 'token',
+    type: String,
+    description:
+      '(Optional) Manually provide token rather than use saved credential, if both api-key and token is provided, use api-key.',
   },
   {
     name: 'host',
@@ -99,41 +106,50 @@ export async function runUpload(processorConfig: YamlProjectConfig, argv: string
   FinalizeProjectName(processorConfig, options.owner, options.name)
   console.log(processorConfig)
 
-  let apiOverride = undefined
+  const uploadAuth: Auth = {}
+
+  let apiKey = ReadKey(options.host)
   if (options['api-key']) {
-    apiOverride = options['api-key']
+    apiKey = options['api-key']
   }
+  if (apiKey) {
+    uploadAuth['api-key'] = apiKey
+  } else if (options['token']) {
+    uploadAuth.authorization = 'Bearer ' + options['token']
+  } else {
+    const isProd = options.host === 'https://app.sentio.xyz'
+    const cmd = isProd ? 'sentio login' : 'sentio login --host=' + options.host
+    console.error(chalk.red('No Credential found for', options.host, '. Please run `' + cmd + '`.'))
+    process.exit(1)
+  }
+
   if (processorConfig.build) {
     await buildProcessor(false, options)
   }
-  return uploadFile(processorConfig, apiOverride)
+  return uploadFile(processorConfig, uploadAuth)
 }
 
-async function createProject(options: YamlProjectConfig, apiKey: string) {
+async function createProject(options: YamlProjectConfig, auth: Auth) {
   const url = new URL('/api/v1/projects', options.host)
   const [ownerName, slug] = options.project.includes('/') ? options.project.split('/') : [undefined, options.project]
   return fetch(url.href, {
     method: 'POST',
     headers: {
-      'api-key': apiKey,
+      ...auth,
     },
     body: JSON.stringify({ slug, ownerName, visibility: 'PRIVATE' }),
   })
 }
 
-export async function uploadFile(options: YamlProjectConfig, apiKeyOverride: string) {
+interface Auth {
+  'api-key'?: string
+  authorization?: string
+}
+
+export async function uploadFile(options: YamlProjectConfig, auth: Auth) {
   console.log(chalk.blue('Prepare to upload'))
 
   const PROCESSOR_FILE = path.join(process.cwd(), 'dist/lib.js')
-
-  const apiKey = apiKeyOverride || ReadKey(options.host)
-
-  const isProd = options.host === 'https://app.sentio.xyz'
-  if (!apiKey) {
-    const cmd = isProd ? 'sentio login' : 'sentio login --host=' + options.host
-    console.error(chalk.red('No Credential found for', options.host, '. Please run `' + cmd + '`.'))
-    process.exit(1)
-  }
 
   if (!fs.existsSync(PROCESSOR_FILE)) {
     console.error(chalk.red('File not existed ', PROCESSOR_FILE, "don't use --nobuild"))
@@ -165,7 +181,7 @@ export async function uploadFile(options: YamlProjectConfig, apiKeyOverride: str
     console.log(chalk.blue(triedCount > 1 ? 'Retry uploading' : 'Uploading'))
 
     // get gcs upload url
-    const initUploadResRaw = await initUpload(options.host, apiKey, options.project, getSdkVersion())
+    const initUploadResRaw = await initUpload(options.host, auth, options.project, getSdkVersion())
     if (!initUploadResRaw.ok) {
       // console.error(chalk.red('Failed to get upload url'))
       console.error(chalk.red(((await initUploadResRaw.json()) as { message: string }).message))
@@ -182,7 +198,7 @@ export async function uploadFile(options: YamlProjectConfig, apiKeyOverride: str
           )
           if (['y', 'yes'].includes(answer.toLowerCase())) {
             rl.close()
-            const res = await createProject(options, apiKey)
+            const res = await createProject(options, auth)
             if (!res.ok) {
               console.error(chalk.red('Create Project Failed'))
               console.error(chalk.red(((await res.json()) as { message: string }).message))
@@ -221,7 +237,7 @@ export async function uploadFile(options: YamlProjectConfig, apiKeyOverride: str
     // finish uploading
     const finishUploadResRaw = await finishUpload(
       options.host,
-      apiKey,
+      auth,
       options.project,
       getSdkVersion(),
       sha256,
@@ -270,12 +286,12 @@ export async function uploadFile(options: YamlProjectConfig, apiKeyOverride: str
   await tryUploading()
 }
 
-async function initUpload(host: string, apiKey: string, projectSlug: string, sdkVersion: string) {
+async function initUpload(host: string, auth: Auth, projectSlug: string, sdkVersion: string) {
   const initUploadUrl = new URL(`/api/v1/processors/init_upload`, host)
   return fetch(initUploadUrl.href, {
     method: 'POST',
     headers: {
-      'api-key': apiKey,
+      ...auth,
     },
     body: JSON.stringify({
       project_slug: projectSlug,
@@ -286,7 +302,7 @@ async function initUpload(host: string, apiKey: string, projectSlug: string, sdk
 
 async function finishUpload(
   host: string,
-  apiKey: string,
+  auth: Auth,
   projectSlug: string,
   sdkVersion: string,
   sha256: string,
@@ -298,7 +314,7 @@ async function finishUpload(
   return fetch(finishUploadUrl.href, {
     method: 'POST',
     headers: {
-      'api-key': apiKey,
+      ...auth,
     },
     body: JSON.stringify({
       project_slug: projectSlug,

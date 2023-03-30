@@ -54,20 +54,20 @@ ERC20Processor.bind({ address: '0x1e4ede388cbc9f4b5c79681b7f94d36a11abebc9' }).o
   },
   filter // filter is an optional parameter
 )
-//
-// ERC20Processor.bind({ address: '0x1e4ede388cbc9f4b5c79681b7f94d36a11abebc9' }).onEventTransfer(async (event, ctx) => {
-//   const val = event.args.value.scaleDown(18)
-//   vol.record(ctx, val)
-//   ctx.eventLogger.emit('Transfer', {
-//     distinctId: event.args.from,
-//     amount: val,
-//     coin_symbol: 'X2Y2',
-//   })
-// })
 
-ERC20Processor.bind({ address: '0x1e4ede388cbc9f4b5c79681b7f94d36a11abebc9' }).onAllEvents((evt, ctx) => {
-  ctx.meter.Counter('event_count').add(1, { name: evt.name })
-  ctx.eventLogger.emit(evt.name, {
-    ...evt.args.toObject(),
+ERC20Processor.bind({ address: '0x1e4ede388cbc9f4b5c79681b7f94d36a11abebc9' }).onEventTransfer(async (event, ctx) => {
+  const val = event.args.value.scaleDown(18)
+  vol.record(ctx, val)
+  ctx.eventLogger.emit('Transfer', {
+    distinctId: event.args.from,
+    amount: val,
+    coin_symbol: 'X2Y2',
   })
 })
+
+// ERC20Processor.bind({ address: '0x1e4ede388cbc9f4b5c79681b7f94d36a11abebc9' }).onAllEvents((evt, ctx) => {
+//   ctx.meter.Counter('event_count').add(1, { name: evt.name })
+//   ctx.eventLogger.emit(evt.name, {
+//     ...evt.args.toObject(),
+//   })
+// })
