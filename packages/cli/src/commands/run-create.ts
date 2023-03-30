@@ -76,12 +76,17 @@ export async function runCreate(argv: string[]) {
     }
 
     const templateFolder = url.fileURLToPath(new URL('../../templates/' + chainType, import.meta.url))
-    const projectName = options.name || 'default'
+    const projectFullName = options.name || 'default'
+    let projectSlug = projectFullName
+    const projectParts = projectSlug.split('/')
+    if (projectParts.length > 0) {
+      projectSlug = projectParts[1]
+    }
 
     const rootDir = options.directory || process.cwd()
-    const dstFolder = path.resolve(rootDir, projectName)
+    const dstFolder = path.resolve(rootDir, projectSlug)
     if (fs.existsSync(dstFolder)) {
-      console.error(chalk.red("can't create project '" + projectName + "', directory already existed"))
+      console.error(chalk.red("can't create project '" + projectSlug + "', directory already existed"))
       process.exit(1)
     }
 
@@ -107,7 +112,7 @@ export async function runCreate(argv: string[]) {
     }
     if (options.name) {
       const sentioYamlPath = path.resolve(dstFolder, 'sentio.yaml')
-      fs.writeFileSync(sentioYamlPath, 'project: ' + projectName + '\n', { flag: 'w+' })
+      fs.writeFileSync(sentioYamlPath, 'project: ' + projectFullName + '\n', { flag: 'w+' })
 
       const packageJsonPath = path.resolve(dstFolder, 'package.json')
       const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'))
@@ -117,7 +122,7 @@ export async function runCreate(argv: string[]) {
 
       const cliVersion = '^' + (await latestVersion('@sentio/cli'))
       packageJson.devDependencies['@sentio/cli'] = cliVersion
-      packageJson.name = projectName
+      packageJson.name = projectSlug
 
       if (options.subproject) {
         delete packageJson.dependencies['@sentio/sdk']
@@ -129,6 +134,6 @@ export async function runCreate(argv: string[]) {
 
       fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2))
     }
-    console.log(chalk.green("successfully create project '" + projectName + "'"))
+    console.log(chalk.green("successfully create project '" + projectFullName + "'"))
   }
 }
