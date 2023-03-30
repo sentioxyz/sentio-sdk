@@ -12,9 +12,9 @@ export async function codegen(abisDir: string, outDir = 'src/types/aptos', genEx
   if (!fs.existsSync(abisDir)) {
     return
   }
-  console.log(chalk.green('Generated Types for Aptos'))
   const gen = new AptosCodegen()
-  await gen.generate(abisDir, outDir)
+  const numFiles = await gen.generate(abisDir, outDir)
+  console.log(chalk.green(`Generated ${numFiles} for Aptos`))
 }
 
 function getRpcEndpoint(network: AptosNetwork): string {

@@ -10,10 +10,7 @@ export function codegen(abisDir: string, targetPath = path.join('src', 'types', 
   }
 
   const abisFiles = fs.readdirSync(abisDir)
-
-  if (abisFiles.length > 0) {
-    console.log(chalk.green('Generated Types for Solana'))
-  }
+  let numFiles = 0
 
   for (const file of abisFiles) {
     if (path.extname(file) === '.json') {
@@ -26,8 +23,11 @@ export function codegen(abisDir: string, targetPath = path.join('src', 'types', 
       const idlFile = path.join(targetPath, idlName + '.ts')
       fs.writeFileSync(idlFile, `export const ${idlName}_idl = ${idlContent}`)
       fs.writeFileSync(path.join(targetPath, `${idlName}_processor.ts`), codeGenSolanaIdlProcessor(idlObj))
+      numFiles += 2
     }
   }
+
+  console.log(chalk.green(`Generated ${numFiles} for Solana`))
 }
 
 function codeGenSolanaIdlProcessor(idlObj: Idl): string {

@@ -44,14 +44,19 @@ export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
     return JSON.parse(fs.readFileSync(fullPath, 'utf-8'))
   }
 
-  async generate(srcDir: string, outputDir: string) {
-    await this.generateForNetwork(srcDir, outputDir, this.MAIN_NET)
-    await this.generateForNetwork(path.join(srcDir, 'testnet'), path.join(outputDir, 'testnet'), this.TEST_NET)
+  async generate(srcDir: string, outputDir: string): Promise<number> {
+    const num1 = await this.generateForNetwork(srcDir, outputDir, this.MAIN_NET)
+    const num2 = await this.generateForNetwork(
+      path.join(srcDir, 'testnet'),
+      path.join(outputDir, 'testnet'),
+      this.TEST_NET
+    )
+    return num1 + num2
   }
 
   async generateForNetwork(srcDir: string, outputDir: string, network: NetworkType) {
     if (!fs.existsSync(srcDir)) {
-      return
+      return 0
     }
 
     const files = fs.readdirSync(srcDir)
@@ -97,7 +102,6 @@ export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
           const modules = this.toInternalModules(rawModules)
 
           fs.writeFileSync(path.resolve(srcDir, account + '.json'), JSON.stringify(rawModules, null, '\t'))
-
           for (const module of modules) {
             loader.register(module, account)
           }
@@ -139,6 +143,7 @@ export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
       const content = `export * as _${parsed.name.replaceAll('-', '_')} from './${parsed.name}.js'\n`
       fs.appendFileSync(rootFile, content)
     }
+    return outputs.length + 1
   }
 
   generateNetworkOption(network: NetworkType) {

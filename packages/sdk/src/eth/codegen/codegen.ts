@@ -6,12 +6,15 @@ import * as prettier from 'prettier'
 import path from 'path'
 import mkdirp from 'mkdirp'
 import { YamlContractConfig } from '../../core/yaml-contract-config.js'
+import chalk from 'chalk'
 
 export async function codegen(abisDir: string, outDir: string, contractsToGenExample: YamlContractConfig[] = []) {
   if (!fs.existsSync(abisDir)) {
     return
   }
-  console.log('Generated', await codegenInternal(abisDir, outDir, contractsToGenExample), 'files')
+
+  const numFiles = await codegenInternal(abisDir, outDir, contractsToGenExample)
+  console.log(chalk.green(`Generated ${numFiles} files for ETH`))
 }
 
 async function codegenInternal(
@@ -19,14 +22,19 @@ async function codegenInternal(
   outDir: string,
   contractsToGenExample: YamlContractConfig[]
 ): Promise<number> {
-  let allFiles = fs.readdirSync(abisDir)
+  const allFiles = fs.readdirSync(abisDir)
   if (allFiles.length === 0) {
     return 0
   }
-  allFiles = allFiles.map((f) => path.resolve(abisDir, f))
+  let allABIFiles = []
+  for (const f of allFiles) {
+    if (f.toLowerCase().endsWith('.json')) {
+      allABIFiles.push(path.resolve(abisDir, f))
+    }
+  }
 
-  allFiles = skipEmptyAbis(allFiles)
-  if (allFiles.length === 0) {
+  allABIFiles = skipEmptyAbis(allABIFiles)
+  if (allABIFiles.length === 0) {
     return 0
   }
   const outInternal = path.resolve(outDir, 'internal')
@@ -41,8 +49,8 @@ async function codegenInternal(
     inputDir: abisDir,
     target: '',
     outDir: outInternal,
-    allFiles: allFiles,
-    filesToProcess: allFiles,
+    allFiles: allABIFiles,
+    filesToProcess: allABIFiles,
     contractsToGenExample: contractsToGenExample,
   }
   const services: Services = {

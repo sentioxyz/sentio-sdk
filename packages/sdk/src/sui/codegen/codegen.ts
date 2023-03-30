@@ -12,9 +12,9 @@ export async function codegen(abisDir: string, outDir = 'src/types/sui', genExam
   if (!fs.existsSync(abisDir)) {
     return
   }
-  console.log(chalk.green('Generated Types for Sui'))
   const gen = new SuiCodegen()
-  await gen.generate(abisDir, outDir)
+  const numFiles = await gen.generate(abisDir, outDir)
+  console.log(chalk.green(`Generated ${numFiles} for Sui`))
 }
 
 function getRpcEndpoint(network: SuiNetwork): string {
