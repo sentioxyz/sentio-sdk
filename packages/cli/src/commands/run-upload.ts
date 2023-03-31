@@ -108,7 +108,7 @@ export async function runUpload(processorConfig: YamlProjectConfig, argv: string
 
   const uploadAuth: Auth = {}
 
-  let apiKey = ReadKey(options.host)
+  let apiKey = ReadKey(processorConfig.host)
   if (options['api-key']) {
     apiKey = options['api-key']
   }
