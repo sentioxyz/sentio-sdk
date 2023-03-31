@@ -124,13 +124,13 @@ export function getABIFilePath(chain: string, name: string): string {
       subpath = 'aptos'
       break
     case CHAIN_IDS.APTOS_TESTNET:
-      subpath = 'aptos/test'
+      subpath = 'aptos/testnet'
       break
     case CHAIN_IDS.SUI_MAINNET:
       subpath = 'sui'
       break
     case CHAIN_IDS.SUI_TESTNET:
-      subpath = 'sui/test'
+      subpath = 'sui/testnet'
       break
     default:
       subpath = 'eth'

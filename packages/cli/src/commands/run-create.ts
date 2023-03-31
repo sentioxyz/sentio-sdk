@@ -79,7 +79,7 @@ export async function runCreate(argv: string[]) {
     const projectFullName = options.name || 'default'
     let projectSlug = projectFullName
     const projectParts = projectSlug.split('/')
-    if (projectParts.length > 0) {
+    if (projectParts.length > 1) {
       projectSlug = projectParts[1]
     }
 
