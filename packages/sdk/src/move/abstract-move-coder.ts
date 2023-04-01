@@ -3,12 +3,12 @@ import { parseMoveType, TypeDescriptor } from './types.js'
 import { InternalMoveFunction, InternalMoveModule, InternalMoveStruct } from './internal-models.js'
 import { bytesToBigInt } from '../utils/index.js'
 
-type StructWithTag<Base> = Base & {
+export type StructWithTag<Base> = Base & {
   type: string
   data: any
 }
 
-type DecodedStructWithTag<B, T> = StructWithTag<B> & {
+export type DecodedStructWithTag<B, T> = StructWithTag<B> & {
   data_decoded: T
   type_arguments: string[]
 }
@@ -245,7 +245,11 @@ export abstract class AbstractMoveCoder<StructType> {
     }
     const results: DecodedStructWithTag<StructType, T>[] = []
     for (const resource of structs) {
-      if (resource.type.split('<')[0] !== typeQname) {
+      if (typeQname.includes('<')) {
+        if (resource.type !== typeQname) {
+          continue
+        }
+      } else if (resource.type.split('<')[0] !== typeQname) {
         continue
       }
       const result = this.decodedInternal(resource)

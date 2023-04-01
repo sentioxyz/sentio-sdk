@@ -1,9 +1,10 @@
-import { TypedEventInstance, TypedFunctionPayload } from './models.js'
-import { AbstractMoveCoder } from '../move/abstract-move-coder.js'
-import { MoveCallSuiTransaction, SuiEvent, SuiMoveNormalizedModule, SuiCallArg } from '@mysten/sui.js'
+import { TypedEventInstance, TypedFunctionPayload, TypedSuiMoveObject } from './models.js'
+import { AbstractMoveCoder, StructWithTag } from '../move/abstract-move-coder.js'
+import { MoveCallSuiTransaction, SuiEvent, SuiMoveNormalizedModule, SuiCallArg, SuiMoveObject } from '@mysten/sui.js'
 import { toInternalModule } from './move-types.js'
 import { SPLITTER, TypeDescriptor } from '../move/index.js'
 import { getMeaningfulFunctionParams } from './utils.js'
+import { dynamic_field } from './builtin/0x2.js'
 
 export class MoveCoder extends AbstractMoveCoder<SuiEvent> {
   load(module: SuiMoveNormalizedModule) {
@@ -37,11 +38,28 @@ export class MoveCoder extends AbstractMoveCoder<SuiEvent> {
       })
     )
     return resp.map((res) => {
-      delete res.data_decoded
+      delete res.data
       const event = res as SuiEvent
       return { ...event, data_decoded: res?.data_decoded as T, type_arguments: res?.type_arguments || [] }
     })
   }
+
+  getObjectsFromDynamicFields<Name, Value>(objects: SuiMoveObject[]): dynamic_field.Field<Name, Value>[] {
+    return this.filterAndDecodeObjects(`0x2::dynamic_field::Field`, objects).map((o) => o.data_decoded) as any
+  }
+
+  filterAndDecodeObjects<T>(typeQname: string, objects: SuiMoveObject[]): TypedSuiMoveObject<T>[] {
+    const structs = objects.map((obj) => {
+      return { ...obj, data: obj.fields, type: obj.type }
+    }) as StructWithTag<any>
+    const resp = this.filterAndDecodeInternal(typeQname, structs)
+    return resp.map((res) => {
+      delete res.data
+      const event = res as any as SuiMoveObject
+      return { ...event, data_decoded: res?.data_decoded as T, type_arguments: res?.type_arguments || [] }
+    })
+  }
+
   getMeaningfulFunctionParams(params: TypeDescriptor[]): TypeDescriptor[] {
     return getMeaningfulFunctionParams(params)
   }
@@ -56,7 +74,15 @@ export class MoveCoder extends AbstractMoveCoder<SuiEvent> {
       if ('Input' in (argValue as any)) {
         const idx = argValue.Input
         const arg = inputs[idx]
-        args.push(arg) // TODO check why ts not work using arg.push(arg)
+        if (arg.type === 'pure') {
+          args.push(arg.value)
+        } else if (arg.type === 'object') {
+          args.push(arg.objectId)
+        } else {
+          console.error('unexpected function arg value')
+          args.push(undefined)
+        }
+        // args.push(arg) // TODO check why ts not work using arg.push(arg)
       } else {
         args.push(undefined)
       }

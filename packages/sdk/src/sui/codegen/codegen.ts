@@ -36,7 +36,7 @@ class SuiCodegen extends AbstractCodegen<SuiMoveNormalizedModules, SuiNetwork> {
   TEST_NET = SuiNetwork.TEST_NET
   PREFIX = 'Sui'
   STRUCT_FIELD_NAME = 'fields'
-  GENERATE_ON_ENTRY = true
+  // GENERATE_ON_ENTRY = true
 
   async fetchModules(account: string, network: SuiNetwork): Promise<SuiMoveNormalizedModules> {
     const client = getRpcClient(network)

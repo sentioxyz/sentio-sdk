@@ -1,4 +1,4 @@
-import { SuiEvent, MoveCallSuiTransaction } from '@mysten/sui.js'
+import { SuiEvent, MoveCallSuiTransaction, SuiMoveObject } from '@mysten/sui.js'
 
 export type TypedEventInstance<T> = SuiEvent & {
   /**
@@ -14,4 +14,9 @@ export type TypedFunctionPayload<T extends Array<any>> = MoveCallSuiTransaction 
    * decoded argument data using ABI, undefined if there is decoding error, usually because the ABI/data mismatch
    */
   arguments_decoded: T
+}
+
+export type TypedSuiMoveObject<T> = SuiMoveObject & {
+  data_decoded: T
+  type_arguments: string[]
 }
