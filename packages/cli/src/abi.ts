@@ -1,5 +1,5 @@
 import { AptosClient } from 'aptos-sdk'
-import { JsonRpcProvider } from '@mysten/sui.js'
+import { JsonRpcProvider, Connection } from '@mysten/sui.js'
 import { CHAIN_IDS } from './chain.js'
 import chalk from 'chalk'
 import process from 'process'
@@ -29,7 +29,7 @@ export async function getABI(
     // suiClient = new JsonRpcProvider('https://fullnode.mainnet.sui.io/')
     // break
     case CHAIN_IDS.SUI_TESTNET:
-      suiClient = new JsonRpcProvider('https://fullnode.testnet.sui.io/')
+      suiClient = new JsonRpcProvider(new Connection({ fullnode: 'https://fullnode.testnet.sui.io/' }))
       break
     case CHAIN_IDS.ETHEREUM:
       ethApi = init()
@@ -81,7 +81,7 @@ export async function getABI(
   if (suiClient) {
     try {
       return {
-        abi: await suiClient.getNormalizedMoveModulesByPackage(address),
+        abi: await suiClient.getNormalizedMoveModulesByPackage({ package: address }),
       }
     } catch (e) {
       console.error(baseErrMsg, e)

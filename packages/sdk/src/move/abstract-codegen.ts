@@ -30,7 +30,8 @@ export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
   ADDRESS_TYPE: string
   PREFIX: string
   STRUCT_FIELD_NAME: string = 'data'
-  GENERATED_CLIENT = false
+  GENERATE_CLIENT = false
+  GENERATE_ON_ENTRY = true
 
   abstract fetchModules(account: string, network: NetworkType): Promise<ModuleTypes>
   abstract toInternalModules(modules: ModuleTypes): InternalMoveModule[]
@@ -155,12 +156,12 @@ export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
   }
 
   generateModule(module: InternalMoveModule, network: NetworkType) {
-    const functions = module.exposedFunctions
-      .map((f) => this.generateOnEntryFunctions(module, f))
-      .filter((s) => s !== '')
-    const clientFunctions = module.exposedFunctions
-      .map((f) => this.generateClientFunctions(module, f))
-      .filter((s) => s !== '')
+    const functions = this.GENERATE_ON_ENTRY
+      ? module.exposedFunctions.map((f) => this.generateOnEntryFunctions(module, f)).filter((s) => s !== '')
+      : []
+    const clientFunctions = this.GENERATE_CLIENT
+      ? module.exposedFunctions.map((f) => this.generateClientFunctions(module, f)).filter((s) => s !== '')
+      : []
     const eventStructs = this.getEventStructs(module)
     const eventTypes = new Set(eventStructs.keys())
     const events = Array.from(eventStructs.values())
@@ -173,7 +174,7 @@ export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
     let processor = ''
     let client = ''
 
-    if (this.GENERATED_CLIENT && clientFunctions.length > 0) {
+    if (clientFunctions.length > 0) {
       client = `
       export class ${moduleName}_client extends ModuleClient {
         ${clientFunctions.join('\n')}

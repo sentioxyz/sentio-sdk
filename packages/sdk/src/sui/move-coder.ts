@@ -1,11 +1,11 @@
 import { TypedEventInstance, TypedFunctionPayload } from './models.js'
 import { AbstractMoveCoder } from '../move/abstract-move-coder.js'
-import { MoveCall, MoveEvent, SuiMoveNormalizedModule } from '@mysten/sui.js'
+import { MoveCallSuiTransaction, SuiEvent, SuiMoveNormalizedModule, SuiCallArg } from '@mysten/sui.js'
 import { toInternalModule } from './move-types.js'
 import { SPLITTER, TypeDescriptor } from '../move/index.js'
 import { getMeaningfulFunctionParams } from './utils.js'
 
-export class MoveCoder extends AbstractMoveCoder<MoveEvent> {
+export class MoveCoder extends AbstractMoveCoder<SuiEvent> {
   load(module: SuiMoveNormalizedModule) {
     if (this.contains(module.address, module.name)) {
       return
@@ -25,32 +25,44 @@ export class MoveCoder extends AbstractMoveCoder<MoveEvent> {
     }
   }
 
-  decodeEvent<T>(event: MoveEvent): TypedEventInstance<T> | undefined {
-    const res = this.decodedInternal<T>({ ...event, data: event.fields })
-    return { ...event, fields_decoded: res?.data_decoded as T, type_arguments: res?.type_arguments || [] }
+  decodeEvent<T>(event: SuiEvent): TypedEventInstance<T> | undefined {
+    const res = this.decodedInternal<T>({ ...event, data: event.parsedJson })
+    return { ...event, data_decoded: res?.data_decoded as T, type_arguments: res?.type_arguments || [] }
   }
-  filterAndDecodeEvents<T>(typeQname: string, resources: MoveEvent[]): TypedEventInstance<T>[] {
+  filterAndDecodeEvents<T>(typeQname: string, resources: SuiEvent[]): TypedEventInstance<T>[] {
     const resp = this.filterAndDecodeInternal(
       typeQname,
       resources.map((event) => {
-        return { ...event, data: event.fields, type: event.type }
+        return { ...event, data: event.parsedJson, type: event.type }
       })
     )
     return resp.map((res) => {
       delete res.data_decoded
-      const event = res as MoveEvent
-      return { ...event, fields_decoded: res?.data_decoded as T, type_arguments: res?.type_arguments || [] }
+      const event = res as SuiEvent
+      return { ...event, data_decoded: res?.data_decoded as T, type_arguments: res?.type_arguments || [] }
     })
   }
   getMeaningfulFunctionParams(params: TypeDescriptor[]): TypeDescriptor[] {
     return getMeaningfulFunctionParams(params)
   }
 
-  decodeFunctionPayload(payload: MoveCall): MoveCall {
-    const functionType = [payload.package.objectId, payload.module, payload.function].join(SPLITTER)
+  decodeFunctionPayload(payload: MoveCallSuiTransaction, inputs: SuiCallArg[]): MoveCallSuiTransaction {
+    const functionType = [payload.package, payload.module, payload.function].join(SPLITTER)
     const func = this.getMoveFunction(functionType)
     const params = getMeaningfulFunctionParams(func.params)
-    const argumentsTyped = this.decodeArray(payload.arguments || [], params)
+    const args = []
+    for (const value of payload.arguments || []) {
+      const argValue = value as any
+      if ('Input' in (argValue as any)) {
+        const idx = argValue.Input
+        const arg = inputs[idx]
+        args.push(arg) // TODO check why ts not work using arg.push(arg)
+      } else {
+        args.push(undefined)
+      }
+    }
+
+    const argumentsTyped = this.decodeArray(args, params)
     return {
       ...payload,
       arguments_decoded: argumentsTyped,

@@ -1,7 +1,7 @@
 import { RecordMetaData } from '@sentio/protos'
 import { type Labels, BaseContext, normalizeLabels } from '../index.js'
 import { SuiNetwork, getChainId } from './network.js'
-import { SuiTransactionResponse } from '@mysten/sui.js'
+import { SuiTransactionBlockResponse } from '@mysten/sui.js'
 
 export class SuiContext extends BaseContext {
   address: string
@@ -9,7 +9,7 @@ export class SuiContext extends BaseContext {
   moduleName: string
   timestamp: Date
   slot: bigint
-  transaction: SuiTransactionResponse
+  transaction: SuiTransactionBlockResponse
 
   constructor(
     moduleName: string,
@@ -17,7 +17,7 @@ export class SuiContext extends BaseContext {
     address: string,
     timestamp: Date,
     slot: bigint,
-    transaction?: SuiTransactionResponse
+    transaction?: SuiTransactionBlockResponse
   ) {
     super()
     this.address = address.toLowerCase()
@@ -40,7 +40,7 @@ export class SuiContext extends BaseContext {
       contractName: this.moduleName,
       blockNumber: this.slot,
       transactionIndex: 0,
-      transactionHash: this.transaction?.certificate.transactionDigest || '', // TODO
+      transactionHash: this.transaction?.digest || '', // TODO
       logIndex: 0,
       chainId: this.getChainId(),
       name: name,

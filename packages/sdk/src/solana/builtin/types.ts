@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-redeclare */
 // copy from https://github.com/solana-labs/solana/blob/master/explorer/src/components/instruction/token/types.ts
+// https://github.com/solana-labs/explorer/blob/411b42439553262ef9036985d287a7249acaad77/src/components/instruction/token/types.ts
 
 import {
   enums,
@@ -13,7 +14,7 @@ import {
   union,
   coerce,
   instance,
-} from "superstruct";
+} from "superstruct_solana";
 
 // Replace with string
 export const PublicKeyFromString = coerce(

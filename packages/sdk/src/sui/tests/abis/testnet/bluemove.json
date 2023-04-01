@@ -1,0 +1,317 @@
+{
+  "id": 1,
+  "jsonrpc": "2.0",
+  "result": {
+    "bluemove_x_testnet": {
+      "fileFormatVersion": 6,
+      "address": "0xe220547c8a45080146d09cbb22578996628779890d70bd38ee4cf2eb05a4777d",
+      "name": "bluemove_x_testnet",
+      "friends": [],
+      "structs": {
+        "BLUEMOVE_X_TESTNET": {
+          "abilities": {
+            "abilities": ["Drop"]
+          },
+          "typeParameters": [],
+          "fields": [
+            {
+              "name": "dummy_field",
+              "type": "Bool"
+            }
+          ]
+        },
+        "BlueMoveNFT": {
+          "abilities": {
+            "abilities": ["Store", "Key"]
+          },
+          "typeParameters": [],
+          "fields": [
+            {
+              "name": "id",
+              "type": {
+                "Struct": {
+                  "address": "0x2",
+                  "module": "object",
+                  "name": "UID",
+                  "typeArguments": []
+                }
+              }
+            },
+            {
+              "name": "name",
+              "type": {
+                "Struct": {
+                  "address": "0x1",
+                  "module": "string",
+                  "name": "String",
+                  "typeArguments": []
+                }
+              }
+            },
+            {
+              "name": "img_url",
+              "type": {
+                "Struct": {
+                  "address": "0x1",
+                  "module": "string",
+                  "name": "String",
+                  "typeArguments": []
+                }
+              }
+            },
+            {
+              "name": "url",
+              "type": {
+                "Struct": {
+                  "address": "0x1",
+                  "module": "string",
+                  "name": "String",
+                  "typeArguments": []
+                }
+              }
+            },
+            {
+              "name": "image_url",
+              "type": {
+                "Struct": {
+                  "address": "0x1",
+                  "module": "string",
+                  "name": "String",
+                  "typeArguments": []
+                }
+              }
+            }
+          ]
+        },
+        "MintNFTEvent": {
+          "abilities": {
+            "abilities": ["Copy", "Drop"]
+          },
+          "typeParameters": [],
+          "fields": [
+            {
+              "name": "object_id",
+              "type": {
+                "Struct": {
+                  "address": "0x2",
+                  "module": "object",
+                  "name": "ID",
+                  "typeArguments": []
+                }
+              }
+            },
+            {
+              "name": "creator",
+              "type": "Address"
+            },
+            {
+              "name": "name",
+              "type": {
+                "Struct": {
+                  "address": "0x1",
+                  "module": "string",
+                  "name": "String",
+                  "typeArguments": []
+                }
+              }
+            }
+          ]
+        },
+        "MintedByUser": {
+          "abilities": {
+            "abilities": ["Store"]
+          },
+          "typeParameters": [],
+          "fields": [
+            {
+              "name": "minted",
+              "type": "U64"
+            }
+          ]
+        },
+        "MintedStore": {
+          "abilities": {
+            "abilities": ["Store", "Key"]
+          },
+          "typeParameters": [],
+          "fields": [
+            {
+              "name": "id",
+              "type": {
+                "Struct": {
+                  "address": "0x2",
+                  "module": "object",
+                  "name": "UID",
+                  "typeArguments": []
+                }
+              }
+            },
+            {
+              "name": "minted",
+              "type": "U64"
+            },
+            {
+              "name": "urls",
+              "type": {
+                "Vector": {
+                  "Struct": {
+                    "address": "0x1",
+                    "module": "string",
+                    "name": "String",
+                    "typeArguments": []
+                  }
+                }
+              }
+            },
+            {
+              "name": "members",
+              "type": {
+                "Vector": "Address"
+              }
+            },
+            {
+              "name": "start_time",
+              "type": "U64"
+            },
+            {
+              "name": "expired_time",
+              "type": "U64"
+            },
+            {
+              "name": "nft_per_user",
+              "type": "U64"
+            },
+            {
+              "name": "base_uri",
+              "type": {
+                "Struct": {
+                  "address": "0x1",
+                  "module": "string",
+                  "name": "String",
+                  "typeArguments": []
+                }
+              }
+            },
+            {
+              "name": "price_per_item",
+              "type": "U64"
+            },
+            {
+              "name": "fund_address",
+              "type": "Address"
+            },
+            {
+              "name": "balance",
+              "type": {
+                "Struct": {
+                  "address": "0x2",
+                  "module": "balance",
+                  "name": "Balance",
+                  "typeArguments": [
+                    {
+                      "Struct": {
+                        "address": "0x2",
+                        "module": "sui",
+                        "name": "SUI",
+                        "typeArguments": []
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      },
+      "exposedFunctions": {
+        "claim_token_to_fund": {
+          "visibility": "Public",
+          "isEntry": true,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "MutableReference": {
+                "Struct": {
+                  "address": "0xe220547c8a45080146d09cbb22578996628779890d70bd38ee4cf2eb05a4777d",
+                  "module": "bluemove_x_testnet",
+                  "name": "MintedStore",
+                  "typeArguments": []
+                }
+              }
+            },
+            {
+              "MutableReference": {
+                "Struct": {
+                  "address": "0x2",
+                  "module": "tx_context",
+                  "name": "TxContext",
+                  "typeArguments": []
+                }
+              }
+            }
+          ],
+          "return": []
+        },
+        "mint_with_quantity": {
+          "visibility": "Public",
+          "isEntry": true,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "MutableReference": {
+                "Struct": {
+                  "address": "0xe220547c8a45080146d09cbb22578996628779890d70bd38ee4cf2eb05a4777d",
+                  "module": "bluemove_x_testnet",
+                  "name": "MintedStore",
+                  "typeArguments": []
+                }
+              }
+            },
+            "U64",
+            {
+              "MutableReference": {
+                "Struct": {
+                  "address": "0x2",
+                  "module": "tx_context",
+                  "name": "TxContext",
+                  "typeArguments": []
+                }
+              }
+            }
+          ],
+          "return": []
+        },
+        "update_time_to_mint": {
+          "visibility": "Public",
+          "isEntry": true,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "MutableReference": {
+                "Struct": {
+                  "address": "0xe220547c8a45080146d09cbb22578996628779890d70bd38ee4cf2eb05a4777d",
+                  "module": "bluemove_x_testnet",
+                  "name": "MintedStore",
+                  "typeArguments": []
+                }
+              }
+            },
+            "U64",
+            "U64",
+            {
+              "MutableReference": {
+                "Struct": {
+                  "address": "0x2",
+                  "module": "tx_context",
+                  "name": "TxContext",
+                  "typeArguments": []
+                }
+              }
+            }
+          ],
+          "return": []
+        }
+      }
+    }
+  }
+}

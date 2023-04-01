@@ -19,7 +19,7 @@
     "docs": "typedoc --options typedoc.json"
   },
   "dependencies": {
-    "@mysten/sui.js": "npm:@sentio/sui.js@0.17.0",
+    "@mysten/sui.js": "npm:@sentio/sui.js@^0.30.0",
     "@project-serum/anchor": "^0.26.0",
     "@sentio/bigdecimal": "^9.1.1-patch.3",
     "@sentio/ethers-v6": "^1.0.25",
@@ -37,6 +37,8 @@
     "node-fetch": "^3.3.1",
     "p-queue": "^7.3.4",
     "prettier": "^2.8.4",
+    "superstruct_solana": "npm:superstruct@^0.14.2",
+    "superstruct": "^1.0.3",
     "typechain": "^8.0.0",
     "yaml": "^2.2.1"
   },

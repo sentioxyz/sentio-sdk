@@ -1,9 +1,9 @@
+import { SuiEvent, SuiTransactionBlockResponse, MoveCallSuiTransaction } from '@mysten/sui.js'
 import { DataBinding, HandlerType } from '@sentio/protos'
 import { getChainId } from '../sui/network.js'
 import { TestProcessorServer } from './test-processor-server.js'
 import { parseMoveType } from '../move/types.js'
 import { SuiNetwork } from '../sui/index.js'
-import { MoveEvent, SuiTransactionResponse, MoveCall } from '@mysten/sui.js'
 import { getMoveCalls } from '../sui/utils.js'
 import { SPLITTER } from '../move/index.js'
 
@@ -13,11 +13,11 @@ export class SuiFacet {
     this.server = server
   }
 
-  testEntryFunctionCall(transaction: SuiTransactionResponse, network: SuiNetwork = SuiNetwork.MAIN_NET) {
+  testEntryFunctionCall(transaction: SuiTransactionBlockResponse, network: SuiNetwork = SuiNetwork.MAIN_NET) {
     return this.testEntryFunctionCalls([transaction], network)
   }
 
-  testEntryFunctionCalls(transactions: SuiTransactionResponse[], network: SuiNetwork = SuiNetwork.MAIN_NET) {
+  testEntryFunctionCalls(transactions: SuiTransactionBlockResponse[], network: SuiNetwork = SuiNetwork.MAIN_NET) {
     const bindings = []
     for (const trans of transactions) {
       const binding = this.buildEntryFunctionCallBinding(trans, network)
@@ -32,14 +32,14 @@ export class SuiFacet {
   }
 
   private buildEntryFunctionCallBinding(
-    transaction: SuiTransactionResponse,
+    transaction: SuiTransactionBlockResponse,
     network: SuiNetwork = SuiNetwork.MAIN_NET
   ): DataBinding | undefined {
-    const calls: MoveCall[] = getMoveCalls(transaction)
+    const calls: MoveCallSuiTransaction[] = getMoveCalls(transaction)
     if (calls.length !== 1) {
       throw Error('Transaction has more than one calls')
     }
-    const functionType = [calls[0].package.objectId, calls[0].module, calls[0].function].join(SPLITTER)
+    const functionType = [calls[0].package, calls[0].module, calls[0].function].join(SPLITTER)
 
     for (const config of this.server.contractConfigs) {
       if (config.contract?.chainId !== getChainId(network)) {
@@ -66,12 +66,16 @@ export class SuiFacet {
     return undefined
   }
 
-  testEvent(transaction: SuiTransactionResponse, event: number | MoveEvent, network: SuiNetwork = SuiNetwork.MAIN_NET) {
+  testEvent(
+    transaction: SuiTransactionBlockResponse,
+    event: number | SuiEvent,
+    network: SuiNetwork = SuiNetwork.MAIN_NET
+  ) {
     if (typeof event !== 'number') {
-      const transaction2: SuiTransactionResponse = {} as any
+      const transaction2: SuiTransactionBlockResponse = {} as any
       Object.assign(transaction2, transaction)
       transaction = transaction2
-      transaction.effects.events = [event]
+      transaction.events = [event]
       event = 0
     }
     const binding = this.buildEventBinding(transaction, event, network)
@@ -82,13 +86,13 @@ export class SuiFacet {
   }
 
   private buildEventBinding(
-    transaction: SuiTransactionResponse,
+    transaction: SuiTransactionBlockResponse,
     eventIdx: number,
     network: SuiNetwork = SuiNetwork.MAIN_NET
   ): DataBinding | undefined {
     // const allEvents = new Set(transaction.events.map(e => e.type))
-    const event = transaction.effects.events?.[eventIdx]
-    if (!event || !event.moveEvent) {
+    const event = transaction.events?.[eventIdx]
+    if (!event) {
       throw Error('Invaild test transaction, no event located')
     }
 
@@ -98,13 +102,13 @@ export class SuiFacet {
       }
       for (const eventConfig of config.moveEventConfigs) {
         for (const eventFilter of eventConfig.filters) {
-          if (config.contract.address + '::' + eventFilter.type === parseMoveType(event.moveEvent.type).qname) {
-            transaction.effects.events = [event]
+          if (config.contract.address + '::' + eventFilter.type === parseMoveType(event.type).qname) {
+            transaction.events = [event]
             return {
               data: {
                 suiEvent: {
                   transaction,
-                  timestamp: new Date(transaction.timestamp_ms || 0),
+                  timestamp: new Date(transaction.timestampMs || 0),
                   slot: 10000n,
                 },
               },

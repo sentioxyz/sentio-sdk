@@ -1,26 +1,40 @@
 import { expect } from 'chai'
 import { TestProcessorServer } from '../../testing/index.js'
 
-import { pool } from './types/testnet/swap.js'
+// import { bluemove_x_testnet } from './types/testnet/bluemove.js'
 import { SuiNetwork } from '../network.js'
+import { validator } from '../builtin/0x3.js'
 
 describe('Test Sui Example', () => {
   const service = new TestProcessorServer(async () => {
-    pool
-      .bind({
-        startTimestamp: 0,
-        address: '0x8235459df815e77668b4a49bb36e229f3321f432',
-      })
-      .onEventLiquidityEvent((evt, ctx) => {
-        const amount_original = BigInt(evt.fields?.x_amount)
-        const amount = evt.fields_decoded.x_amount
-        expect(amount_original).eq(amount)
-        ctx.meter.Counter('amount').add(amount, { pool: evt.fields_decoded.pool_id })
-      })
-      .onEntryAddLiquidity((call, ctx) => {
-        const amount = call.arguments_decoded[3]
-        ctx.meter.Gauge('amount2').record(amount)
-      })
+    validator.bind({ network: SuiNetwork.TEST_NET }).onEventStakingRequestEvent((evt, ctx) => {
+      const amount_original = BigInt(evt.parsedJson?.amount)
+      const amount = evt.data_decoded.amount
+      expect(amount_original).eq(amount)
+      ctx.meter.Counter('amount').add(amount, { pool: evt.data_decoded.pool_id })
+    })
+
+    //
+    // bluemove_x_testnet
+    //   .bind({
+    //     startTimestamp: 0,
+    //   })
+    //   // .onEventMintNFTEvent(async (evt: bluemove_x_testnet.MintNFTEventInstance, ctx) => {
+    //   //   ctx.eventLogger.emit("User",{
+    //   //     distinctId: evt.data_decoded.creator,
+    //   //   })
+    //   // const amount_original = BigInt(evt.fields?.x_amount)
+    //   // const amount = evt.data_decoded.x_amount
+    //   // expect(amount_original).eq(amount)
+    //   // ctx.meter.Counter('amount').add(amount, { pool: evt.data_decoded.pool_id })
+    //   // })
+    //   .onEntryMintWithQuantity(async (call, ctx) => {
+    //     // call.arguments_decoded
+    //     const amount = call.arguments_decoded[1]
+    //     ctx.meter.Gauge('amount2').record(amount)
+    //   })
+
+    // sui_system.bind().
   })
 
   beforeAll(async () => {
@@ -33,110 +47,282 @@ describe('Test Sui Example', () => {
   })
 
   test('Check event dispatch', async () => {
-    const res = await service.sui.testEvent(testData as any, testData.effects.events.length - 1, SuiNetwork.TEST_NET)
+    const res = await service.sui.testEvent(testData as any, testData.events[0], SuiNetwork.TEST_NET)
     expect(res.result?.counters).length(1)
     expect(res.result?.gauges).length(0)
   })
 
-  test('Check call dispatch', async () => {
-    const res = await service.sui.testEntryFunctionCall(testData as any, SuiNetwork.TEST_NET)
-    expect(res.result?.counters).length(0)
-    expect(res.result?.gauges).length(1)
-  })
+  // test('Check call dispatch', async () => {
+  //   const res = await service.sui.testEntryFunctionCall(testData as any, SuiNetwork.TEST_NET)
+  //   expect(res.result?.counters).length(0)
+  //   expect(res.result?.gauges).length(1)
+  // })
 })
 
 const testData = {
-  certificate: {
-    transactionDigest: '7DSTY6euDQKq7fn3N7654Xf1pbpSuBuYarW2c6B6ixio',
+  digest: '1Jo5RUSfLknKiGkZUxVxkWhTbX7CD3Jm3fQzaCEV3JM',
+  transaction: {
     data: {
-      transactions: [
-        {
-          Call: {
-            package: {
-              objectId: '0x8235459df815e77668b4a49bb36e229f3321f432',
-              version: 1,
-              digest: 'THgI2ZcsS4aU5UNvLjB1huyOTXZ+QEavMOWGPC1UnHE=',
-            },
-            module: 'pool',
-            function: 'add_liquidity',
-            typeArguments: ['0x8235459df815e77668b4a49bb36e229f3321f432::pool::TestSOL', '0x2::sui::SUI'],
-            arguments: [
-              '0x481a9c313aa7275e6fc9ff60eba919564b385086',
-              '0xc9b60a9fd79a9536f2f49e6827a51e8e62a7a544',
-              '0x84210e7d5fb0be0b359ef8cdacb0d0448baf8478',
-              [64, 13, 3, 0, 0, 0, 0, 0],
-              [16, 0, 0, 0, 0, 0, 0, 0],
+      messageVersion: 'v1',
+      transaction: {
+        kind: 'ProgrammableTransaction',
+        inputs: [
+          {
+            type: 'pure',
+            valueType: 'u64',
+            value: '1013400000',
+          },
+          {
+            type: 'object',
+            objectType: 'sharedObject',
+            objectId: '0x0000000000000000000000000000000000000000000000000000000000000005',
+            initialSharedVersion: 1,
+            mutable: true,
+          },
+          {
+            type: 'pure',
+            valueType: 'address',
+            value: '0x6daaa84982e84af05db193f48afd979990af2d2a7aa65b398c398db9a79b603f',
+          },
+        ],
+        transactions: [
+          {
+            SplitCoins: [
+              'GasCoin',
+              [
+                {
+                  Input: 0,
+                },
+              ],
             ],
           },
-        },
-      ],
-      sender: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
-      gasPayment: {
-        objectId: '0xd5bc168c9cbddf5918818c1d544580e97de3bd46',
-        version: 2493759,
-        digest: '+AVDN5/rqB755p9bU4Qh0gpn8FlaA6+ZRO//VPUSTVA=',
+          {
+            MoveCall: {
+              package: '0x0000000000000000000000000000000000000000000000000000000000000003',
+              module: 'sui_system',
+              function: 'request_add_stake',
+              arguments: [
+                {
+                  Input: 1,
+                },
+                {
+                  Result: 0,
+                },
+                {
+                  Input: 2,
+                },
+              ],
+            },
+          },
+        ],
       },
-      gasPrice: 618,
-      gasBudget: 1000,
+      sender: '0x4928b3478f47a5f845096fbe08cbaaa1e9122f8a3a3634c8454e2bafc46b7ad8',
+      gasData: {
+        payment: [
+          {
+            objectId: '0x06549c4fa56f5c55b45f2bb6d5e41c9ffe93322c9c0cf8a6fa332e03d57cd818',
+            version: 248215,
+            digest: '457NDp7i5cFVf4uq6XFpG8g5QgcbsM3mHZ5eaJJwCMcM',
+          },
+          {
+            objectId: '0x09aa7eb7348209863a467ec19ba43f06b009d79d1b3bbcedc45804bf99d83eac',
+            version: 248215,
+            digest: '3QYAYsWqEKiJe6znxfPBmiGdqz9q9Tb6tvZsq1rs9YMk',
+          },
+          {
+            objectId: '0x784d237927050a245a9ba5e0354ec8fea5b69bfaf37aaada70f8acc5b72e7e44',
+            version: 10210,
+            digest: 'FjHUKzJ8g66cc9jy3aRU6ruPshYah3NL8SzPoou6L2v3',
+          },
+          {
+            objectId: '0x7bca72a25735ab5becda8537878cc13cb811879adaef531d23bcc6edc92d2d6c',
+            version: 10210,
+            digest: '4pMGJznp7gWQHJEajafjjmXQHRr6zNSBBFsWJjYPeeDj',
+          },
+          {
+            objectId: '0x9319084a620be0e87b3b17f4ae26dfb51fdbfa2d7bb439e7dfc046a1de091ec8',
+            version: 10210,
+            digest: '9awSRVSdPKLw7D4gyuq4MoAGxPJsggTVwMLGF15w12z7',
+          },
+          {
+            objectId: '0xa20665dfd4d6a527c0d4a502f1523014d10494deb4c4ff46becf606cbbb437a1',
+            version: 10210,
+            digest: 'EXC5JUtiKHayta6dP9UyvR3ZequEmzULMJUvVWnLkRVf',
+          },
+          {
+            objectId: '0xacb23c3e52f27eddd94bc78b45028ee40ed1cc3da6445a7c24c20e68593e6d5a',
+            version: 10400,
+            digest: 'HbS7pRsL5fxrWvrRTzGYzDw9vv6vGWS51qyDn52whptA',
+          },
+          {
+            objectId: '0xb0ed1bac02fa29a039b9951fedab90938fc2b2f4798bcebf731f909d36522736',
+            version: 10400,
+            digest: 'F4DZCuVpU5NZ4LfvSrKg6zoudJPZvAwUi4rRyU2VFJfg',
+          },
+          {
+            objectId: '0xbc9e291e42202c0e74eeefa9a6f391735fc92d9e350be7d8553f1c1e0c7b0d61',
+            version: 10210,
+            digest: 'GerpPcqdHjMXDo2pBbh7bEXiL1MSEJYfcQ4tG71sp2B7',
+          },
+          {
+            objectId: '0xc1249d21c5cd64069fcee8f27cebb7a0dfce5494fb266c5e941ea5791118f4cc',
+            version: 10210,
+            digest: 'BmV26Z1K8QLqGKsAHYy92T58h2t9eT5h5cfZrwFiZyfY',
+          },
+          {
+            objectId: '0xc7658384ee1298bb43107794ccae10d7a13dc6544043299affea621116170bcd',
+            version: 10210,
+            digest: '1PC3n5KNxScBB6QbhVMKoGJocHxzxQZaeDYrb5JCCw4',
+          },
+          {
+            objectId: '0xdde6e8a18c4717054b9abef47f0b3b4fa8c3c9d670bf59fd3b11ac6478d17668',
+            version: 10400,
+            digest: 'G5tZLDPZ2MXDnsi1zn1HfGUXG524XxNLNontmv5cTZgg',
+          },
+          {
+            objectId: '0xe1f247f4edf3326161f74115470afe5c51c8700843ae594dfa4e82780a6fdc3b',
+            version: 10400,
+            digest: 'GpmL8i5yFTA5QrtF3pf1LjgFybfCUddPVASySfmrhrHc',
+          },
+          {
+            objectId: '0xe5181942681d8b49afbb4d70804148e2a6a837b6887ba8967d6254b71d3195e0',
+            version: 10210,
+            digest: 'GBeGY8DYitfyC2RaaRpxGYteB4tBPMfBaipKok8Kyz17',
+          },
+          {
+            objectId: '0xee94d0332dfe9cbf7cbc25bdc2a21e2ed3fc48d18edab2b2121cb6a2f3a7c358',
+            version: 10210,
+            digest: 'DozeCXEGmPeQB8EnFxyJkA8nC98CqvynpZX5ENT9ebgN',
+          },
+          {
+            objectId: '0xf14c33c7419ccf21b75d82c78350e41b4096e411d8f2cbf00fa01f0ab9b21c63',
+            version: 10400,
+            digest: '58Xvu2GtxJR6unXpFyWchayEoovUGJT24aisD4oUsUrm',
+          },
+          {
+            objectId: '0xf673811fe05efd3b9c40f8dac6f44a6af080377d0149c6e5304167fab84ba579',
+            version: 10210,
+            digest: 'GAcbDUHzBaPEov5p9D754FiBjK76EDcuheMrEL9kx8Hh',
+          },
+        ],
+        owner: '0x4928b3478f47a5f845096fbe08cbaaa1e9122f8a3a3634c8454e2bafc46b7ad8',
+        price: 1000,
+        budget: 10227000,
+      },
     },
-    txSignature:
-      'ANprZ/tjWOt7YBpfksRHlcRfMzHFNd1flhkSs6ld/CX8h6CYkdctIXPrcyLrUpwEDqM7XLJ1v4x/1670E6sfngv83dcb+0vmesdX0PdnU6Mte4NGe5+0kTZ3/sb71VTMNA==',
-    authSignInfo: {
-      epoch: 22,
-      signature: 'AZKQTmXsBGPz0Z3IKNXJCiCuIkFEqmGfQnm6R+umm34ppHHMSIvre1ThTcwSAnp3zQ==',
-      signers_map: [
-        58, 48, 0, 0, 1, 0, 0, 0, 0, 0, 27, 0, 16, 0, 0, 0, 0, 0, 1, 0, 3, 0, 4, 0, 7, 0, 8, 0, 9, 0, 10, 0, 13, 0, 15,
-        0, 16, 0, 18, 0, 19, 0, 21, 0, 22, 0, 24, 0, 25, 0, 26, 0, 27, 0, 28, 0, 29, 0, 30, 0, 31, 0, 32, 0, 33, 0, 35,
-        0, 36, 0, 40, 0,
-      ],
-    },
+    txSignatures: [
+      'AEPwkUYAr4jL78Qi2Fk4/W/q1841F6sdYEUXlMNj5zK8Q5EgzHGDipN+ceKkQPiJfF0gCwxIe4BUaiUdnGJI8gJznTI5itVTVu6dyxa9sXlAWOsNzUcBHLI6C98q41Yw0w==',
+    ],
   },
+  rawTransaction:
+    'AQAAAAAAAwAIwEFnPAAAAAABAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFAQAAAAAAAAABACBtqqhJguhK8F2xk/SK/ZeZkK8tKnqmWzmMOY25p5tgPwICAAEBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMKc3VpX3N5c3RlbRFyZXF1ZXN0X2FkZF9zdGFrZQADAQEAAgAAAQIASSizR49HpfhFCW++CMuqoekSL4o6NjTIRU4rr8RretgRBlScT6VvXFW0Xyu21eQcn/6TMiycDPim+jMuA9V82BiXyQMAAAAAACAtoJT5xElfPw2G3ssXyvosNNXtAv57rOp4k5VpEDWRSgmqfrc0ggmGOkZ+wZukPwawCdedGzu87cRYBL+Z2D6sl8kDAAAAAAAgI774brrikrWy9Kp1tlE4gT/2imz00sBTh7HvpewWJA94TSN5JwUKJFqbpeA1Tsj+pbab+vN6qtpw+KzFty5+ROInAAAAAAAAINrYoow2I38Gqj+G7LbAG7kfMkQf4TWIE4MZeFNM9l5we8pyolc1q1vs2oU3h4zBPLgRh5ra71MdI7zG7cktLWziJwAAAAAAACA4tEV3MKU+Jitrj0Ftjr2G1BJ/FRmRgfA5XRJMsEqgnpMZCEpiC+DoezsX9K4m37Uf2/ote7Q559/ARqHeCR7I4icAAAAAAAAgf483OLJQvi0sG3pmECRkTiy695JkVSZ/fuarP3MTwfSiBmXf1NalJ8DUpQLxUjAU0QSU3rTE/0a+z2Bsu7Q3oeInAAAAAAAAIMjj4DueNeHj/vbHmKwSxd4Uq0WHep4YaeddogbNSg4mrLI8PlLyft3ZS8eLRQKO5A7RzD2mRFp8JMIOaFk+bVqgKAAAAAAAACD2jSOKc2iRFvLs6abuisjL/xd1bpCXbntKUZjmM+tv87DtG6wC+imgObmVH+2rkJOPwrL0eYvOv3MfkJ02Uic2oCgAAAAAAAAg0NaOQOAdtKJ2O4nryEg4s47v00RpgGeCqiKysl9qBHe8nikeQiAsDnTu76mm85FzX8ktnjUL59hVPxweDHsNYeInAAAAAAAAIOiSH0aFXQDZ2jEEe0uZo0BAFESqvr0pynsFC28ccOHmwSSdIcXNZAafzujyfOu3oN/OVJT7JmxelB6leREY9MziJwAAAAAAACCf+hsd4eAQziL6YAscPAOrp1s+NsfZRVHdW4HLNlvP68dlg4TuEpi7QxB3lMyuENehPcZUQEMpmv/qYhEWFwvN4icAAAAAAAAgABkXQl/VLicUkymfgY09aWFAqNc2dvnxvnHXUFNmGxPd5uihjEcXBUuavvR/CztPqMPJ1nC/Wf07EaxkeNF2aKAoAAAAAAAAIOAf7F4KfSk5zDmnlfVc/eQQkSuR+fsPY2OY/CjBsCN94fJH9O3zMmFh90EVRwr+XFHIcAhDrllN+k6CeApv3DugKAAAAAAAACDrG7nS5SxzaQzbrf7EiyS5sWjoNFtj2grnlrN2vbPvd+UYGUJoHYtJr7tNcIBBSOKmqDe2iHuoln1iVLcdMZXg4icAAAAAAAAg4ZlAO0L14pWeLScc/E+VRqqRjccB6nOMWGNekwU63ArulNAzLf6cv3y8Jb3Coh4u0/xI0Y7asrISHLai86fDWOInAAAAAAAAIL5WIrgo9Ewnj3R/OVZnvummwUdPalRenzlmEVuUgU378Uwzx0GczyG3XYLHg1DkG0CW5BHY8svwD6AfCrmyHGOgKAAAAAAAACA9XMkCVFI6kKl1ZWAUAj0FmkvANqXnMMpwnME/R3VGEvZzgR/gXv07nED42sb0SmrwgDd9AUnG5TBBZ/q4S6V54icAAAAAAAAg4VXF15hWyRpFwJ6SMahCofEONEkLJuypZAHc5aK8SUxJKLNHj0el+EUJb74Iy6qh6RIvijo2NMhFTiuvxGt62OgDAAAAAAAAOA2cAAAAAAAAAWEAQ/CRRgCviMvvxCLYWTj9b+rXzjUXqx1gRReUw2PnMrxDkSDMcYOKk35x4qRA+Il8XSALDEh7gFRqJR2cYkjyAnOdMjmK1VNW7p3LFr2xeUBY6w3NRwEcsjoL3yrjVjDT',
   effects: {
+    messageVersion: 'v1',
     status: {
       status: 'success',
     },
+    executedEpoch: '744',
     gasUsed: {
-      computationCost: 268212,
-      storageCost: 95,
-      storageRebate: 73,
+      computationCost: '1000000',
+      storageCost: '9057',
+      storageRebate: '9248',
+      nonRefundableStorageFee: '0',
     },
-    sharedObjects: [
+    modifiedAtVersions: [
       {
-        objectId: '0x481a9c313aa7275e6fc9ff60eba919564b385086',
-        version: 2493761,
-        digest: 'SoxFXUfrWjtkqQ2zfCFxykkM0epbShSqc/5JfSAJgB4=',
+        objectId: '0x0000000000000000000000000000000000000000000000000000000000000005',
+        sequenceNumber: 280243,
+      },
+      {
+        objectId: '0x06549c4fa56f5c55b45f2bb6d5e41c9ffe93322c9c0cf8a6fa332e03d57cd818',
+        sequenceNumber: 248215,
+      },
+      {
+        objectId: '0x6af2a2b7ca60bf76174adfd3e9c4957f8e937759603182f9b46c7f6c5f19c6d2',
+        sequenceNumber: 280243,
+      },
+      {
+        objectId: '0x09aa7eb7348209863a467ec19ba43f06b009d79d1b3bbcedc45804bf99d83eac',
+        sequenceNumber: 248215,
+      },
+      {
+        objectId: '0x784d237927050a245a9ba5e0354ec8fea5b69bfaf37aaada70f8acc5b72e7e44',
+        sequenceNumber: 10210,
+      },
+      {
+        objectId: '0x7bca72a25735ab5becda8537878cc13cb811879adaef531d23bcc6edc92d2d6c',
+        sequenceNumber: 10210,
+      },
+      {
+        objectId: '0x9319084a620be0e87b3b17f4ae26dfb51fdbfa2d7bb439e7dfc046a1de091ec8',
+        sequenceNumber: 10210,
+      },
+      {
+        objectId: '0xa20665dfd4d6a527c0d4a502f1523014d10494deb4c4ff46becf606cbbb437a1',
+        sequenceNumber: 10210,
+      },
+      {
+        objectId: '0xacb23c3e52f27eddd94bc78b45028ee40ed1cc3da6445a7c24c20e68593e6d5a',
+        sequenceNumber: 10400,
+      },
+      {
+        objectId: '0xb0ed1bac02fa29a039b9951fedab90938fc2b2f4798bcebf731f909d36522736',
+        sequenceNumber: 10400,
+      },
+      {
+        objectId: '0xbc9e291e42202c0e74eeefa9a6f391735fc92d9e350be7d8553f1c1e0c7b0d61',
+        sequenceNumber: 10210,
+      },
+      {
+        objectId: '0xc1249d21c5cd64069fcee8f27cebb7a0dfce5494fb266c5e941ea5791118f4cc',
+        sequenceNumber: 10210,
+      },
+      {
+        objectId: '0xc7658384ee1298bb43107794ccae10d7a13dc6544043299affea621116170bcd',
+        sequenceNumber: 10210,
+      },
+      {
+        objectId: '0xdde6e8a18c4717054b9abef47f0b3b4fa8c3c9d670bf59fd3b11ac6478d17668',
+        sequenceNumber: 10400,
+      },
+      {
+        objectId: '0xe1f247f4edf3326161f74115470afe5c51c8700843ae594dfa4e82780a6fdc3b',
+        sequenceNumber: 10400,
+      },
+      {
+        objectId: '0xe5181942681d8b49afbb4d70804148e2a6a837b6887ba8967d6254b71d3195e0',
+        sequenceNumber: 10210,
+      },
+      {
+        objectId: '0xee94d0332dfe9cbf7cbc25bdc2a21e2ed3fc48d18edab2b2121cb6a2f3a7c358',
+        sequenceNumber: 10210,
+      },
+      {
+        objectId: '0xf14c33c7419ccf21b75d82c78350e41b4096e411d8f2cbf00fa01f0ab9b21c63',
+        sequenceNumber: 10400,
+      },
+      {
+        objectId: '0xf673811fe05efd3b9c40f8dac6f44a6af080377d0149c6e5304167fab84ba579',
+        sequenceNumber: 10210,
       },
     ],
-    transactionDigest: '7DSTY6euDQKq7fn3N7654Xf1pbpSuBuYarW2c6B6ixio',
+    sharedObjects: [
+      {
+        objectId: '0x0000000000000000000000000000000000000000000000000000000000000005',
+        version: 280243,
+        digest: '89PKQ9Rvi1jN3Qx8dwLY4NLHWcBhZ5tJfu6fKEdUP5N2',
+      },
+    ],
+    transactionDigest: '1Jo5RUSfLknKiGkZUxVxkWhTbX7CD3Jm3fQzaCEV3JM',
     created: [
       {
         owner: {
-          AddressOwner: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+          AddressOwner: '0x4928b3478f47a5f845096fbe08cbaaa1e9122f8a3a3634c8454e2bafc46b7ad8',
         },
         reference: {
-          objectId: '0x3f0b179f7787ed98a2ef2e6f5c6a016c982c6c6c',
-          version: 2493762,
-          digest: '6HGSh1X72r21XbHg0zEo43uIkEfyVVALbASxB7N1eIs=',
-        },
-      },
-      {
-        owner: {
-          AddressOwner: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
-        },
-        reference: {
-          objectId: '0xa7fe715725aa608e5102765f3af7d4d85de1a24f',
-          version: 2493762,
-          digest: 'pTWwShZgjwZAZrVDI/i0xV25TTWEPBRbsCBBVZJsiXc=',
-        },
-      },
-      {
-        owner: {
-          AddressOwner: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
-        },
-        reference: {
-          objectId: '0xcd127e648c10649935a86d74833a9c22b7ccb10c',
-          version: 2493762,
-          digest: '0Wo2uSBUhqNGI6mveDBAwlckVKBFkW9MjPjjTiiKBHU=',
+          objectId: '0x746cb3749d743d9f2f9384df3c6d9076ffa0ed748b4e827508632e167be3973f',
+          version: 280244,
+          digest: 'AWojdmyZ6dSG56J2zYsyxKGJupR6yFqgNhPsbT2kirZ',
         },
       },
     ],
@@ -144,191 +330,1224 @@ const testData = {
       {
         owner: {
           Shared: {
-            initial_shared_version: 1020,
+            initial_shared_version: 1,
           },
         },
         reference: {
-          objectId: '0x481a9c313aa7275e6fc9ff60eba919564b385086',
-          version: 2493762,
-          digest: 'Y7lbJv2OkIe+awkSaZn6RGw6ga1IhklP1/Ij+vhu1Ns=',
+          objectId: '0x0000000000000000000000000000000000000000000000000000000000000005',
+          version: 280244,
+          digest: '395mZycSW6f4hRQbToe4UuEvc5QHcXJxAiNYPjnf9UD5',
         },
       },
       {
         owner: {
-          AddressOwner: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+          AddressOwner: '0x4928b3478f47a5f845096fbe08cbaaa1e9122f8a3a3634c8454e2bafc46b7ad8',
         },
         reference: {
-          objectId: '0xd5bc168c9cbddf5918818c1d544580e97de3bd46',
-          version: 2493762,
-          digest: 'V1y2V81JUTb1YTAy9bh/b7QOXH4RGbZ71Pstxf+6bjQ=',
+          objectId: '0x06549c4fa56f5c55b45f2bb6d5e41c9ffe93322c9c0cf8a6fa332e03d57cd818',
+          version: 280244,
+          digest: 'EFrBdvNNQyjoXkBRGQnSmj1ELV18a1p7hb4dnuxKWPyY',
+        },
+      },
+      {
+        owner: {
+          ObjectOwner: '0x0000000000000000000000000000000000000000000000000000000000000005',
+        },
+        reference: {
+          objectId: '0x6af2a2b7ca60bf76174adfd3e9c4957f8e937759603182f9b46c7f6c5f19c6d2',
+          version: 280244,
+          digest: 'D7UBCDNU5TPXxcQzyVLBU6mdfoafQBFqKsYi4oYXrnvr',
         },
       },
     ],
     deleted: [
       {
-        objectId: '0x84210e7d5fb0be0b359ef8cdacb0d0448baf8478',
-        version: 2493762,
-        digest: 'Y2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2M=',
+        objectId: '0x09aa7eb7348209863a467ec19ba43f06b009d79d1b3bbcedc45804bf99d83eac',
+        version: 280244,
+        digest: '7gyGAp71YXQRoxmFBaHxofQXAipvgHyBKPyxmdSJxyvz',
       },
       {
-        objectId: '0xc9b60a9fd79a9536f2f49e6827a51e8e62a7a544',
-        version: 2493762,
-        digest: 'Y2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2M=',
+        objectId: '0x784d237927050a245a9ba5e0354ec8fea5b69bfaf37aaada70f8acc5b72e7e44',
+        version: 280244,
+        digest: '7gyGAp71YXQRoxmFBaHxofQXAipvgHyBKPyxmdSJxyvz',
+      },
+      {
+        objectId: '0x7bca72a25735ab5becda8537878cc13cb811879adaef531d23bcc6edc92d2d6c',
+        version: 280244,
+        digest: '7gyGAp71YXQRoxmFBaHxofQXAipvgHyBKPyxmdSJxyvz',
+      },
+      {
+        objectId: '0x9319084a620be0e87b3b17f4ae26dfb51fdbfa2d7bb439e7dfc046a1de091ec8',
+        version: 280244,
+        digest: '7gyGAp71YXQRoxmFBaHxofQXAipvgHyBKPyxmdSJxyvz',
+      },
+      {
+        objectId: '0xa20665dfd4d6a527c0d4a502f1523014d10494deb4c4ff46becf606cbbb437a1',
+        version: 280244,
+        digest: '7gyGAp71YXQRoxmFBaHxofQXAipvgHyBKPyxmdSJxyvz',
+      },
+      {
+        objectId: '0xacb23c3e52f27eddd94bc78b45028ee40ed1cc3da6445a7c24c20e68593e6d5a',
+        version: 280244,
+        digest: '7gyGAp71YXQRoxmFBaHxofQXAipvgHyBKPyxmdSJxyvz',
+      },
+      {
+        objectId: '0xb0ed1bac02fa29a039b9951fedab90938fc2b2f4798bcebf731f909d36522736',
+        version: 280244,
+        digest: '7gyGAp71YXQRoxmFBaHxofQXAipvgHyBKPyxmdSJxyvz',
+      },
+      {
+        objectId: '0xbc9e291e42202c0e74eeefa9a6f391735fc92d9e350be7d8553f1c1e0c7b0d61',
+        version: 280244,
+        digest: '7gyGAp71YXQRoxmFBaHxofQXAipvgHyBKPyxmdSJxyvz',
+      },
+      {
+        objectId: '0xc1249d21c5cd64069fcee8f27cebb7a0dfce5494fb266c5e941ea5791118f4cc',
+        version: 280244,
+        digest: '7gyGAp71YXQRoxmFBaHxofQXAipvgHyBKPyxmdSJxyvz',
+      },
+      {
+        objectId: '0xc7658384ee1298bb43107794ccae10d7a13dc6544043299affea621116170bcd',
+        version: 280244,
+        digest: '7gyGAp71YXQRoxmFBaHxofQXAipvgHyBKPyxmdSJxyvz',
+      },
+      {
+        objectId: '0xdde6e8a18c4717054b9abef47f0b3b4fa8c3c9d670bf59fd3b11ac6478d17668',
+        version: 280244,
+        digest: '7gyGAp71YXQRoxmFBaHxofQXAipvgHyBKPyxmdSJxyvz',
+      },
+      {
+        objectId: '0xe1f247f4edf3326161f74115470afe5c51c8700843ae594dfa4e82780a6fdc3b',
+        version: 280244,
+        digest: '7gyGAp71YXQRoxmFBaHxofQXAipvgHyBKPyxmdSJxyvz',
+      },
+      {
+        objectId: '0xe5181942681d8b49afbb4d70804148e2a6a837b6887ba8967d6254b71d3195e0',
+        version: 280244,
+        digest: '7gyGAp71YXQRoxmFBaHxofQXAipvgHyBKPyxmdSJxyvz',
+      },
+      {
+        objectId: '0xee94d0332dfe9cbf7cbc25bdc2a21e2ed3fc48d18edab2b2121cb6a2f3a7c358',
+        version: 280244,
+        digest: '7gyGAp71YXQRoxmFBaHxofQXAipvgHyBKPyxmdSJxyvz',
+      },
+      {
+        objectId: '0xf14c33c7419ccf21b75d82c78350e41b4096e411d8f2cbf00fa01f0ab9b21c63',
+        version: 280244,
+        digest: '7gyGAp71YXQRoxmFBaHxofQXAipvgHyBKPyxmdSJxyvz',
+      },
+      {
+        objectId: '0xf673811fe05efd3b9c40f8dac6f44a6af080377d0149c6e5304167fab84ba579',
+        version: 280244,
+        digest: '7gyGAp71YXQRoxmFBaHxofQXAipvgHyBKPyxmdSJxyvz',
       },
     ],
     gasObject: {
       owner: {
-        AddressOwner: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+        AddressOwner: '0x4928b3478f47a5f845096fbe08cbaaa1e9122f8a3a3634c8454e2bafc46b7ad8',
       },
       reference: {
-        objectId: '0xd5bc168c9cbddf5918818c1d544580e97de3bd46',
-        version: 2493762,
-        digest: 'V1y2V81JUTb1YTAy9bh/b7QOXH4RGbZ71Pstxf+6bjQ=',
+        objectId: '0x06549c4fa56f5c55b45f2bb6d5e41c9ffe93322c9c0cf8a6fa332e03d57cd818',
+        version: 280244,
+        digest: 'EFrBdvNNQyjoXkBRGQnSmj1ELV18a1p7hb4dnuxKWPyY',
       },
     },
-    events: [
-      {
-        coinBalanceChange: {
-          packageId: '0x0000000000000000000000000000000000000002',
-          transactionModule: 'gas',
-          sender: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
-          changeType: 'Gas',
-          owner: {
-            AddressOwner: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
-          },
-          coinType: '0x2::sui::SUI',
-          coinObjectId: '0xd5bc168c9cbddf5918818c1d544580e97de3bd46',
-          version: 2493759,
-          amount: -268234,
-        },
-      },
-      {
-        coinBalanceChange: {
-          packageId: '0x8235459df815e77668b4a49bb36e229f3321f432',
-          transactionModule: 'pool',
-          sender: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
-          changeType: 'Receive',
-          owner: {
-            AddressOwner: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
-          },
-          coinType: '0x2::sui::SUI',
-          coinObjectId: '0x3f0b179f7787ed98a2ef2e6f5c6a016c982c6c6c',
-          version: 2493762,
-          amount: 199999984,
-        },
-      },
-      {
-        mutateObject: {
-          packageId: '0x8235459df815e77668b4a49bb36e229f3321f432',
-          transactionModule: 'pool',
-          sender: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
-          objectType:
-            '0x8235459df815e77668b4a49bb36e229f3321f432::pool::Pool<0x8235459df815e77668b4a49bb36e229f3321f432::pool::TestSOL, 0x2::sui::SUI>',
-          objectId: '0x481a9c313aa7275e6fc9ff60eba919564b385086',
-          version: 2493762,
-        },
-      },
-      {
-        coinBalanceChange: {
-          packageId: '0x8235459df815e77668b4a49bb36e229f3321f432',
-          transactionModule: 'pool',
-          sender: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
-          changeType: 'Receive',
-          owner: {
-            AddressOwner: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
-          },
-          coinType:
-            '0x8235459df815e77668b4a49bb36e229f3321f432::pool::LSP<0x8235459df815e77668b4a49bb36e229f3321f432::pool::TestSOL, 0x2::sui::SUI>',
-          coinObjectId: '0xa7fe715725aa608e5102765f3af7d4d85de1a24f',
-          version: 2493762,
-          amount: 741,
-        },
-      },
-      {
-        coinBalanceChange: {
-          packageId: '0x8235459df815e77668b4a49bb36e229f3321f432',
-          transactionModule: 'pool',
-          sender: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
-          changeType: 'Receive',
-          owner: {
-            AddressOwner: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
-          },
-          coinType: '0x8235459df815e77668b4a49bb36e229f3321f432::pool::TestSOL',
-          coinObjectId: '0xcd127e648c10649935a86d74833a9c22b7ccb10c',
-          version: 2493762,
-          amount: 800000,
-        },
-      },
-      {
-        coinBalanceChange: {
-          packageId: '0x0000000000000000000000000000000000000002',
-          transactionModule: 'gas',
-          sender: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
-          changeType: 'Pay',
-          owner: {
-            AddressOwner: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
-          },
-          coinType: '0x2::sui::SUI',
-          coinObjectId: '0xd5bc168c9cbddf5918818c1d544580e97de3bd46',
-          version: 2493759,
-          amount: -1,
-        },
-      },
-      {
-        coinBalanceChange: {
-          packageId: '0x8235459df815e77668b4a49bb36e229f3321f432',
-          transactionModule: 'pool',
-          sender: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
-          changeType: 'Pay',
-          owner: {
-            AddressOwner: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
-          },
-          coinType: '0x2::sui::SUI',
-          coinObjectId: '0x84210e7d5fb0be0b359ef8cdacb0d0448baf8478',
-          version: 5624,
-          amount: -200000000,
-        },
-      },
-      {
-        coinBalanceChange: {
-          packageId: '0x8235459df815e77668b4a49bb36e229f3321f432',
-          transactionModule: 'pool',
-          sender: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
-          changeType: 'Pay',
-          owner: {
-            AddressOwner: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
-          },
-          coinType: '0x8235459df815e77668b4a49bb36e229f3321f432::pool::TestSOL',
-          coinObjectId: '0xc9b60a9fd79a9536f2f49e6827a51e8e62a7a544',
-          version: 2492561,
-          amount: -1000000,
-        },
-      },
-      {
-        moveEvent: {
-          packageId: '0x8235459df815e77668b4a49bb36e229f3321f432',
-          transactionModule: 'pool',
-          sender: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
-          type: '0x8235459df815e77668b4a49bb36e229f3321f432::pool::LiquidityEvent',
-          fields: {
-            is_added: true,
-            lsp_amount: '741',
-            pool_id: '0x481a9c313aa7275e6fc9ff60eba919564b385086',
-            x_amount: '200000',
-            y_amount: '16',
-          },
-          bcs: 'SBqcMTqnJ15vyf9g66kZVks4UIYBQA0DAAAAAAAQAAAAAAAAAOUCAAAAAAAA',
-        },
-      },
-    ],
+    eventsDigest: '7Qgc6Uhd2hd2P246qU24Qyeva5CGgFvMZ4rv2hB2x34s',
     dependencies: [
-      '4EXKjF3vTnoDEz54pDk6d2njs8roWwq3cfFAg2kUgKU4',
-      '791GgUyLfBEhdsPSJ2HrHBPTm2599JLBnjbn6ySZhK3z',
-      '8rq48ohgYu2QAHbwNHv1bLh8ZMgwiyghx1rzTzbWUB5B',
-      'CN8EG4p7x2mWuX8Tt82kWuSWLC43Vjfgp1nDzRLkibYE',
-      'DYUqe5hDjvyhG2EF2WsShTYAauVuC8oavB9U3eABScu3',
+      '8CLu2i7jB1GQjt9h6EyPZmrdHeWCHrJYddiT4dTnecH3',
+      'AGBCaUGj4iGpGYyQvto9Bke1EwouY8LGMoTzzuPMx4nd',
+      'BD5BNdX54tX3Z3oAnzCpCCfsA94FX7bibM8dKSxMGfZm',
+      'BcYN71Dg7czVQjUFsVWEqDEHQQvFXBcQAWzAMM27FUNL',
+      'H5LafzisLsy3d3tLJNPeA1ZTtwUraHZBzcYKFwCpw81g',
+      'HSJTmPHs5K1ffRkR8McjgckD7agweSa5Nws1pCiWRsTZ',
     ],
   },
-  timestamp_ms: 1676013644266,
-  parsed_data: null,
+  events: [
+    {
+      id: {
+        txDigest: '1Jo5RUSfLknKiGkZUxVxkWhTbX7CD3Jm3fQzaCEV3JM',
+        eventSeq: 0,
+      },
+      packageId: '0x0000000000000000000000000000000000000000000000000000000000000003',
+      transactionModule: 'sui_system',
+      sender: '0x4928b3478f47a5f845096fbe08cbaaa1e9122f8a3a3634c8454e2bafc46b7ad8',
+      type: '0x3::validator::StakingRequestEvent',
+      parsedJson: {
+        amount: '1013400000',
+        epoch: '744',
+        pool_id: '0x8f3c1872502008904d027ca7d2935434ad1c030174a77eabd8d4e0b6a1b38d77',
+        staker_address: '0x4928b3478f47a5f845096fbe08cbaaa1e9122f8a3a3634c8454e2bafc46b7ad8',
+        validator_address: '0x6daaa84982e84af05db193f48afd979990af2d2a7aa65b398c398db9a79b603f',
+      },
+      bcs: 'Ttm2PrMwJN6CeVHDa3Zw4ocifhrqbrrCPt12v2fj8cjsQKswxceNqK7oWBnnKUkY8oUvEmuHuJ8srUm28PeFvqz7BrUnTVV1AAxEV2BY24d3JVuxezp4px16vGPrQsPHzaoPoMjkdYtiPLt29Nk4FA6uV',
+    },
+  ],
+  objectChanges: [
+    {
+      type: 'mutated',
+      sender: '0x4928b3478f47a5f845096fbe08cbaaa1e9122f8a3a3634c8454e2bafc46b7ad8',
+      owner: {
+        Shared: {
+          initial_shared_version: 1,
+        },
+      },
+      objectType: '0x3::sui_system::SuiSystemState',
+      objectId: '0x0000000000000000000000000000000000000000000000000000000000000005',
+      version: 280244,
+      previousVersion: 280243,
+      digest: '395mZycSW6f4hRQbToe4UuEvc5QHcXJxAiNYPjnf9UD5',
+    },
+    {
+      type: 'mutated',
+      sender: '0x4928b3478f47a5f845096fbe08cbaaa1e9122f8a3a3634c8454e2bafc46b7ad8',
+      owner: {
+        AddressOwner: '0x4928b3478f47a5f845096fbe08cbaaa1e9122f8a3a3634c8454e2bafc46b7ad8',
+      },
+      objectType: '0x2::coin::Coin<0x2::sui::SUI>',
+      objectId: '0x06549c4fa56f5c55b45f2bb6d5e41c9ffe93322c9c0cf8a6fa332e03d57cd818',
+      version: 280244,
+      previousVersion: 248215,
+      digest: 'EFrBdvNNQyjoXkBRGQnSmj1ELV18a1p7hb4dnuxKWPyY',
+    },
+    {
+      type: 'mutated',
+      sender: '0x4928b3478f47a5f845096fbe08cbaaa1e9122f8a3a3634c8454e2bafc46b7ad8',
+      owner: {
+        ObjectOwner: '0x0000000000000000000000000000000000000000000000000000000000000005',
+      },
+      objectType: '0x2::dynamic_field::Field<u64, 0x3::sui_system_state_inner::SuiSystemStateInner>',
+      objectId: '0x6af2a2b7ca60bf76174adfd3e9c4957f8e937759603182f9b46c7f6c5f19c6d2',
+      version: 280244,
+      previousVersion: 280243,
+      digest: 'D7UBCDNU5TPXxcQzyVLBU6mdfoafQBFqKsYi4oYXrnvr',
+    },
+    {
+      type: 'created',
+      sender: '0x4928b3478f47a5f845096fbe08cbaaa1e9122f8a3a3634c8454e2bafc46b7ad8',
+      owner: {
+        AddressOwner: '0x4928b3478f47a5f845096fbe08cbaaa1e9122f8a3a3634c8454e2bafc46b7ad8',
+      },
+      objectType: '0x3::staking_pool::StakedSui',
+      objectId: '0x746cb3749d743d9f2f9384df3c6d9076ffa0ed748b4e827508632e167be3973f',
+      version: 280244,
+      digest: 'AWojdmyZ6dSG56J2zYsyxKGJupR6yFqgNhPsbT2kirZ',
+    },
+  ],
+  balanceChanges: [
+    {
+      owner: {
+        AddressOwner: '0x4928b3478f47a5f845096fbe08cbaaa1e9122f8a3a3634c8454e2bafc46b7ad8',
+      },
+      coinType: '0x2::sui::SUI',
+      amount: '-1014399901',
+    },
+  ],
+  timestampMs: 1680304142717,
+  checkpoint: 233041,
 }
+
+// import { expect } from 'chai'
+// import { TestProcessorServer } from '../../testing/index.js'
+//
+// import { pool } from './types/testnet/swap.js'
+// import { SuiNetwork } from '../network.js'
+//
+// describe('Test Sui Example', () => {
+//   const service = new TestProcessorServer(async () => {
+//     pool
+//       .bind({
+//         startTimestamp: 0,
+//         address: '0x8235459df815e77668b4a49bb36e229f3321f432',
+//       })
+//       .onEventLiquidityEvent((evt, ctx) => {
+//         const amount_original = BigInt(evt.fields?.x_amount)
+//         const amount = evt.data_decoded.x_amount
+//         expect(amount_original).eq(amount)
+//         ctx.meter.Counter('amount').add(amount, { pool: evt.data_decoded.pool_id })
+//       })
+//       .onEntryAddLiquidity((call, ctx) => {
+//         const amount = call.arguments_decoded[3]
+//         ctx.meter.Gauge('amount2').record(amount)
+//       })
+//   })
+//
+//   beforeAll(async () => {
+//     await service.start({ templateInstances: [] })
+//   })
+//
+//   test('check configuration ', async () => {
+//     const config = await service.getConfig({})
+//     expect(config.contractConfigs).length(1)
+//   })
+//
+//   test('Check event dispatch', async () => {
+//     const res = await service.sui.testEvent(testData as any, testData.effects.events.length - 1, SuiNetwork.TEST_NET)
+//     expect(res.result?.counters).length(1)
+//     expect(res.result?.gauges).length(0)
+//   })
+//
+//   test('Check call dispatch', async () => {
+//     const res = await service.sui.testEntryFunctionCall(testData as any, SuiNetwork.TEST_NET)
+//     expect(res.result?.counters).length(0)
+//     expect(res.result?.gauges).length(1)
+//   })
+// })
+//
+// const testData = {
+//   certificate: {
+//     transactionDigest: '7DSTY6euDQKq7fn3N7654Xf1pbpSuBuYarW2c6B6ixio',
+//     data: {
+//       transactions: [
+//         {
+//           Call: {
+//             package: {
+//               objectId: '0x8235459df815e77668b4a49bb36e229f3321f432',
+//               version: 1,
+//               digest: 'THgI2ZcsS4aU5UNvLjB1huyOTXZ+QEavMOWGPC1UnHE=',
+//             },
+//             module: 'pool',
+//             function: 'add_liquidity',
+//             typeArguments: ['0x8235459df815e77668b4a49bb36e229f3321f432::pool::TestSOL', '0x2::sui::SUI'],
+//             arguments: [
+//               '0x481a9c313aa7275e6fc9ff60eba919564b385086',
+//               '0xc9b60a9fd79a9536f2f49e6827a51e8e62a7a544',
+//               '0x84210e7d5fb0be0b359ef8cdacb0d0448baf8478',
+//               [64, 13, 3, 0, 0, 0, 0, 0],
+//               [16, 0, 0, 0, 0, 0, 0, 0],
+//             ],
+//           },
+//         },
+//       ],
+//       sender: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+//       gasPayment: {
+//         objectId: '0xd5bc168c9cbddf5918818c1d544580e97de3bd46',
+//         version: 2493759,
+//         digest: '+AVDN5/rqB755p9bU4Qh0gpn8FlaA6+ZRO//VPUSTVA=',
+//       },
+//       gasPrice: 618,
+//       gasBudget: 1000,
+//     },
+//     txSignature:
+//       'ANprZ/tjWOt7YBpfksRHlcRfMzHFNd1flhkSs6ld/CX8h6CYkdctIXPrcyLrUpwEDqM7XLJ1v4x/1670E6sfngv83dcb+0vmesdX0PdnU6Mte4NGe5+0kTZ3/sb71VTMNA==',
+//     authSignInfo: {
+//       epoch: 22,
+//       signature: 'AZKQTmXsBGPz0Z3IKNXJCiCuIkFEqmGfQnm6R+umm34ppHHMSIvre1ThTcwSAnp3zQ==',
+//       signers_map: [
+//         58, 48, 0, 0, 1, 0, 0, 0, 0, 0, 27, 0, 16, 0, 0, 0, 0, 0, 1, 0, 3, 0, 4, 0, 7, 0, 8, 0, 9, 0, 10, 0, 13, 0, 15,
+//         0, 16, 0, 18, 0, 19, 0, 21, 0, 22, 0, 24, 0, 25, 0, 26, 0, 27, 0, 28, 0, 29, 0, 30, 0, 31, 0, 32, 0, 33, 0, 35,
+//         0, 36, 0, 40, 0,
+//       ],
+//     },
+//   },
+//   effects: {
+//     status: {
+//       status: 'success',
+//     },
+//     gasUsed: {
+//       computationCost: 268212,
+//       storageCost: 95,
+//       storageRebate: 73,
+//     },
+//     sharedObjects: [
+//       {
+//         objectId: '0x481a9c313aa7275e6fc9ff60eba919564b385086',
+//         version: 2493761,
+//         digest: 'SoxFXUfrWjtkqQ2zfCFxykkM0epbShSqc/5JfSAJgB4=',
+//       },
+//     ],
+//     transactionDigest: '7DSTY6euDQKq7fn3N7654Xf1pbpSuBuYarW2c6B6ixio',
+//     created: [
+//       {
+//         owner: {
+//           AddressOwner: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+//         },
+//         reference: {
+//           objectId: '0x3f0b179f7787ed98a2ef2e6f5c6a016c982c6c6c',
+//           version: 2493762,
+//           digest: '6HGSh1X72r21XbHg0zEo43uIkEfyVVALbASxB7N1eIs=',
+//         },
+//       },
+//       {
+//         owner: {
+//           AddressOwner: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+//         },
+//         reference: {
+//           objectId: '0xa7fe715725aa608e5102765f3af7d4d85de1a24f',
+//           version: 2493762,
+//           digest: 'pTWwShZgjwZAZrVDI/i0xV25TTWEPBRbsCBBVZJsiXc=',
+//         },
+//       },
+//       {
+//         owner: {
+//           AddressOwner: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+//         },
+//         reference: {
+//           objectId: '0xcd127e648c10649935a86d74833a9c22b7ccb10c',
+//           version: 2493762,
+//           digest: '0Wo2uSBUhqNGI6mveDBAwlckVKBFkW9MjPjjTiiKBHU=',
+//         },
+//       },
+//     ],
+//     mutated: [
+//       {
+//         owner: {
+//           Shared: {
+//             initial_shared_version: 1020,
+//           },
+//         },
+//         reference: {
+//           objectId: '0x481a9c313aa7275e6fc9ff60eba919564b385086',
+//           version: 2493762,
+//           digest: 'Y7lbJv2OkIe+awkSaZn6RGw6ga1IhklP1/Ij+vhu1Ns=',
+//         },
+//       },
+//       {
+//         owner: {
+//           AddressOwner: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+//         },
+//         reference: {
+//           objectId: '0xd5bc168c9cbddf5918818c1d544580e97de3bd46',
+//           version: 2493762,
+//           digest: 'V1y2V81JUTb1YTAy9bh/b7QOXH4RGbZ71Pstxf+6bjQ=',
+//         },
+//       },
+//     ],
+//     deleted: [
+//       {
+//         objectId: '0x84210e7d5fb0be0b359ef8cdacb0d0448baf8478',
+//         version: 2493762,
+//         digest: 'Y2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2M=',
+//       },
+//       {
+//         objectId: '0xc9b60a9fd79a9536f2f49e6827a51e8e62a7a544',
+//         version: 2493762,
+//         digest: 'Y2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2M=',
+//       },
+//     ],
+//     gasObject: {
+//       owner: {
+//         AddressOwner: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+//       },
+//       reference: {
+//         objectId: '0xd5bc168c9cbddf5918818c1d544580e97de3bd46',
+//         version: 2493762,
+//         digest: 'V1y2V81JUTb1YTAy9bh/b7QOXH4RGbZ71Pstxf+6bjQ=',
+//       },
+//     },
+//     events: [
+//       {
+//         coinBalanceChange: {
+//           packageId: '0x0000000000000000000000000000000000000002',
+//           transactionModule: 'gas',
+//           sender: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+//           changeType: 'Gas',
+//           owner: {
+//             AddressOwner: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+//           },
+//           coinType: '0x2::sui::SUI',
+//           coinObjectId: '0xd5bc168c9cbddf5918818c1d544580e97de3bd46',
+//           version: 2493759,
+//           amount: -268234,
+//         },
+//       },
+//       {
+//         coinBalanceChange: {
+//           packageId: '0x8235459df815e77668b4a49bb36e229f3321f432',
+//           transactionModule: 'pool',
+//           sender: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+//           changeType: 'Receive',
+//           owner: {
+//             AddressOwner: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+//           },
+//           coinType: '0x2::sui::SUI',
+//           coinObjectId: '0x3f0b179f7787ed98a2ef2e6f5c6a016c982c6c6c',
+//           version: 2493762,
+//           amount: 199999984,
+//         },
+//       },
+//       {
+//         mutateObject: {
+//           packageId: '0x8235459df815e77668b4a49bb36e229f3321f432',
+//           transactionModule: 'pool',
+//           sender: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+//           objectType:
+//             '0x8235459df815e77668b4a49bb36e229f3321f432::pool::Pool<0x8235459df815e77668b4a49bb36e229f3321f432::pool::TestSOL, 0x2::sui::SUI>',
+//           objectId: '0x481a9c313aa7275e6fc9ff60eba919564b385086',
+//           version: 2493762,
+//         },
+//       },
+//       {
+//         coinBalanceChange: {
+//           packageId: '0x8235459df815e77668b4a49bb36e229f3321f432',
+//           transactionModule: 'pool',
+//           sender: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+//           changeType: 'Receive',
+//           owner: {
+//             AddressOwner: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+//           },
+//           coinType:
+//             '0x8235459df815e77668b4a49bb36e229f3321f432::pool::LSP<0x8235459df815e77668b4a49bb36e229f3321f432::pool::TestSOL, 0x2::sui::SUI>',
+//           coinObjectId: '0xa7fe715725aa608e5102765f3af7d4d85de1a24f',
+//           version: 2493762,
+//           amount: 741,
+//         },
+//       },
+//       {
+//         coinBalanceChange: {
+//           packageId: '0x8235459df815e77668b4a49bb36e229f3321f432',
+//           transactionModule: 'pool',
+//           sender: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+//           changeType: 'Receive',
+//           owner: {
+//             AddressOwner: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+//           },
+//           coinType: '0x8235459df815e77668b4a49bb36e229f3321f432::pool::TestSOL',
+//           coinObjectId: '0xcd127e648c10649935a86d74833a9c22b7ccb10c',
+//           version: 2493762,
+//           amount: 800000,
+//         },
+//       },
+//       {
+//         coinBalanceChange: {
+//           packageId: '0x0000000000000000000000000000000000000002',
+//           transactionModule: 'gas',
+//           sender: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+//           changeType: 'Pay',
+//           owner: {
+//             AddressOwner: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+//           },
+//           coinType: '0x2::sui::SUI',
+//           coinObjectId: '0xd5bc168c9cbddf5918818c1d544580e97de3bd46',
+//           version: 2493759,
+//           amount: -1,
+//         },
+//       },
+//       {
+//         coinBalanceChange: {
+//           packageId: '0x8235459df815e77668b4a49bb36e229f3321f432',
+//           transactionModule: 'pool',
+//           sender: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+//           changeType: 'Pay',
+//           owner: {
+//             AddressOwner: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+//           },
+//           coinType: '0x2::sui::SUI',
+//           coinObjectId: '0x84210e7d5fb0be0b359ef8cdacb0d0448baf8478',
+//           version: 5624,
+//           amount: -200000000,
+//         },
+//       },
+//       {
+//         coinBalanceChange: {
+//           packageId: '0x8235459df815e77668b4a49bb36e229f3321f432',
+//           transactionModule: 'pool',
+//           sender: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+//           changeType: 'Pay',
+//           owner: {
+//             AddressOwner: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+//           },
+//           coinType: '0x8235459df815e77668b4a49bb36e229f3321f432::pool::TestSOL',
+//           coinObjectId: '0xc9b60a9fd79a9536f2f49e6827a51e8e62a7a544',
+//           version: 2492561,
+//           amount: -1000000,
+//         },
+//       },
+//       {
+//         moveEvent: {
+//           packageId: '0x8235459df815e77668b4a49bb36e229f3321f432',
+//           transactionModule: 'pool',
+//           sender: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+//           type: '0x8235459df815e77668b4a49bb36e229f3321f432::pool::LiquidityEvent',
+//           fields: {
+//             is_added: true,
+//             lsp_amount: '741',
+//             pool_id: '0x481a9c313aa7275e6fc9ff60eba919564b385086',
+//             x_amount: '200000',
+//             y_amount: '16',
+//           },
+//           bcs: 'SBqcMTqnJ15vyf9g66kZVks4UIYBQA0DAAAAAAAQAAAAAAAAAOUCAAAAAAAA',
+//         },
+//       },
+//     ],
+//     dependencies: [
+//       '4EXKjF3vTnoDEz54pDk6d2njs8roWwq3cfFAg2kUgKU4',
+//       '791GgUyLfBEhdsPSJ2HrHBPTm2599JLBnjbn6ySZhK3z',
+//       '8rq48ohgYu2QAHbwNHv1bLh8ZMgwiyghx1rzTzbWUB5B',
+//       'CN8EG4p7x2mWuX8Tt82kWuSWLC43Vjfgp1nDzRLkibYE',
+//       'DYUqe5hDjvyhG2EF2WsShTYAauVuC8oavB9U3eABScu3',
+//     ],
+//   },
+//   timestamp_ms: 1676013644266,
+//   parsed_data: null,
+// }
+
+// import { expect } from 'chai'
+// import { TestProcessorServer } from '../../testing/index.js'
+//
+// import { pool } from './types/testnet/swap.js'
+// import { SuiNetwork } from '../network.js'
+//
+// describe('Test Sui Example', () => {
+//   const service = new TestProcessorServer(async () => {
+//     pool
+//         .bind({
+//           startTimestamp: 0,
+//           address: '0x8235459df815e77668b4a49bb36e229f3321f432',
+//         })
+//         .onEventLiquidityEvent((evt, ctx) => {
+//           const amount_original = BigInt(evt.fields?.x_amount)
+//           const amount = evt.data_decoded.x_amount
+//           expect(amount_original).eq(amount)
+//           ctx.meter.Counter('amount').add(amount, { pool: evt.data_decoded.pool_id })
+//         })
+//         .onEntryAddLiquidity((call, ctx) => {
+//           const amount = call.arguments_decoded[3]
+//           ctx.meter.Gauge('amount2').record(amount)
+//         })
+//   })
+//
+//   beforeAll(async () => {
+//     await service.start({ templateInstances: [] })
+//   })
+//
+//   test('check configuration ', async () => {
+//     const config = await service.getConfig({})
+//     expect(config.contractConfigs).length(1)
+//   })
+//
+//   test('Check event dispatch', async () => {
+//     const res = await service.sui.testEvent(testData as any, testData.effects.events.length - 1, SuiNetwork.TEST_NET)
+//     expect(res.result?.counters).length(1)
+//     expect(res.result?.gauges).length(0)
+//   })
+//
+//   test('Check call dispatch', async () => {
+//     const res = await service.sui.testEntryFunctionCall(testData as any, SuiNetwork.TEST_NET)
+//     expect(res.result?.counters).length(0)
+//     expect(res.result?.gauges).length(1)
+//   })
+// })
+//
+// const testData = {
+//   certificate: {
+//     transactionDigest: '7DSTY6euDQKq7fn3N7654Xf1pbpSuBuYarW2c6B6ixio',
+//     data: {
+//       transactions: [
+//         {
+//           Call: {
+//             package: {
+//               objectId: '0x8235459df815e77668b4a49bb36e229f3321f432',
+//               version: 1,
+//               digest: 'THgI2ZcsS4aU5UNvLjB1huyOTXZ+QEavMOWGPC1UnHE=',
+//             },
+//             module: 'pool',
+//             function: 'add_liquidity',
+//             typeArguments: ['0x8235459df815e77668b4a49bb36e229f3321f432::pool::TestSOL', '0x2::sui::SUI'],
+//             arguments: [
+//               '0x481a9c313aa7275e6fc9ff60eba919564b385086',
+//               '0xc9b60a9fd79a9536f2f49e6827a51e8e62a7a544',
+//               '0x84210e7d5fb0be0b359ef8cdacb0d0448baf8478',
+//               [64, 13, 3, 0, 0, 0, 0, 0],
+//               [16, 0, 0, 0, 0, 0, 0, 0],
+//             ],
+//           },
+//         },
+//       ],
+//       sender: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+//       gasPayment: {
+//         objectId: '0xd5bc168c9cbddf5918818c1d544580e97de3bd46',
+//         version: 2493759,
+//         digest: '+AVDN5/rqB755p9bU4Qh0gpn8FlaA6+ZRO//VPUSTVA=',
+//       },
+//       gasPrice: 618,
+//       gasBudget: 1000,
+//     },
+//     txSignature:
+//         'ANprZ/tjWOt7YBpfksRHlcRfMzHFNd1flhkSs6ld/CX8h6CYkdctIXPrcyLrUpwEDqM7XLJ1v4x/1670E6sfngv83dcb+0vmesdX0PdnU6Mte4NGe5+0kTZ3/sb71VTMNA==',
+//     authSignInfo: {
+//       epoch: 22,
+//       signature: 'AZKQTmXsBGPz0Z3IKNXJCiCuIkFEqmGfQnm6R+umm34ppHHMSIvre1ThTcwSAnp3zQ==',
+//       signers_map: [
+//         58, 48, 0, 0, 1, 0, 0, 0, 0, 0, 27, 0, 16, 0, 0, 0, 0, 0, 1, 0, 3, 0, 4, 0, 7, 0, 8, 0, 9, 0, 10, 0, 13, 0, 15,
+//         0, 16, 0, 18, 0, 19, 0, 21, 0, 22, 0, 24, 0, 25, 0, 26, 0, 27, 0, 28, 0, 29, 0, 30, 0, 31, 0, 32, 0, 33, 0, 35,
+//         0, 36, 0, 40, 0,
+//       ],
+//     },
+//   },
+//   effects: {
+//     status: {
+//       status: 'success',
+//     },
+//     gasUsed: {
+//       computationCost: 268212,
+//       storageCost: 95,
+//       storageRebate: 73,
+//     },
+//     sharedObjects: [
+//       {
+//         objectId: '0x481a9c313aa7275e6fc9ff60eba919564b385086',
+//         version: 2493761,
+//         digest: 'SoxFXUfrWjtkqQ2zfCFxykkM0epbShSqc/5JfSAJgB4=',
+//       },
+//     ],
+//     transactionDigest: '7DSTY6euDQKq7fn3N7654Xf1pbpSuBuYarW2c6B6ixio',
+//     created: [
+//       {
+//         owner: {
+//           AddressOwner: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+//         },
+//         reference: {
+//           objectId: '0x3f0b179f7787ed98a2ef2e6f5c6a016c982c6c6c',
+//           version: 2493762,
+//           digest: '6HGSh1X72r21XbHg0zEo43uIkEfyVVALbASxB7N1eIs=',
+//         },
+//       },
+//       {
+//         owner: {
+//           AddressOwner: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+//         },
+//         reference: {
+//           objectId: '0xa7fe715725aa608e5102765f3af7d4d85de1a24f',
+//           version: 2493762,
+//           digest: 'pTWwShZgjwZAZrVDI/i0xV25TTWEPBRbsCBBVZJsiXc=',
+//         },
+//       },
+//       {
+//         owner: {
+//           AddressOwner: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+//         },
+//         reference: {
+//           objectId: '0xcd127e648c10649935a86d74833a9c22b7ccb10c',
+//           version: 2493762,
+//           digest: '0Wo2uSBUhqNGI6mveDBAwlckVKBFkW9MjPjjTiiKBHU=',
+//         },
+//       },
+//     ],
+//     mutated: [
+//       {
+//         owner: {
+//           Shared: {
+//             initial_shared_version: 1020,
+//           },
+//         },
+//         reference: {
+//           objectId: '0x481a9c313aa7275e6fc9ff60eba919564b385086',
+//           version: 2493762,
+//           digest: 'Y7lbJv2OkIe+awkSaZn6RGw6ga1IhklP1/Ij+vhu1Ns=',
+//         },
+//       },
+//       {
+//         owner: {
+//           AddressOwner: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+//         },
+//         reference: {
+//           objectId: '0xd5bc168c9cbddf5918818c1d544580e97de3bd46',
+//           version: 2493762,
+//           digest: 'V1y2V81JUTb1YTAy9bh/b7QOXH4RGbZ71Pstxf+6bjQ=',
+//         },
+//       },
+//     ],
+//     deleted: [
+//       {
+//         objectId: '0x84210e7d5fb0be0b359ef8cdacb0d0448baf8478',
+//         version: 2493762,
+//         digest: 'Y2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2M=',
+//       },
+//       {
+//         objectId: '0xc9b60a9fd79a9536f2f49e6827a51e8e62a7a544',
+//         version: 2493762,
+//         digest: 'Y2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2M=',
+//       },
+//     ],
+//     gasObject: {
+//       owner: {
+//         AddressOwner: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+//       },
+//       reference: {
+//         objectId: '0xd5bc168c9cbddf5918818c1d544580e97de3bd46',
+//         version: 2493762,
+//         digest: 'V1y2V81JUTb1YTAy9bh/b7QOXH4RGbZ71Pstxf+6bjQ=',
+//       },
+//     },
+//     events: [
+//       {
+//         coinBalanceChange: {
+//           packageId: '0x0000000000000000000000000000000000000002',
+//           transactionModule: 'gas',
+//           sender: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+//           changeType: 'Gas',
+//           owner: {
+//             AddressOwner: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+//           },
+//           coinType: '0x2::sui::SUI',
+//           coinObjectId: '0xd5bc168c9cbddf5918818c1d544580e97de3bd46',
+//           version: 2493759,
+//           amount: -268234,
+//         },
+//       },
+//       {
+//         coinBalanceChange: {
+//           packageId: '0x8235459df815e77668b4a49bb36e229f3321f432',
+//           transactionModule: 'pool',
+//           sender: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+//           changeType: 'Receive',
+//           owner: {
+//             AddressOwner: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+//           },
+//           coinType: '0x2::sui::SUI',
+//           coinObjectId: '0x3f0b179f7787ed98a2ef2e6f5c6a016c982c6c6c',
+//           version: 2493762,
+//           amount: 199999984,
+//         },
+//       },
+//       {
+//         mutateObject: {
+//           packageId: '0x8235459df815e77668b4a49bb36e229f3321f432',
+//           transactionModule: 'pool',
+//           sender: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+//           objectType:
+//               '0x8235459df815e77668b4a49bb36e229f3321f432::pool::Pool<0x8235459df815e77668b4a49bb36e229f3321f432::pool::TestSOL, 0x2::sui::SUI>',
+//           objectId: '0x481a9c313aa7275e6fc9ff60eba919564b385086',
+//           version: 2493762,
+//         },
+//       },
+//       {
+//         coinBalanceChange: {
+//           packageId: '0x8235459df815e77668b4a49bb36e229f3321f432',
+//           transactionModule: 'pool',
+//           sender: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+//           changeType: 'Receive',
+//           owner: {
+//             AddressOwner: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+//           },
+//           coinType:
+//               '0x8235459df815e77668b4a49bb36e229f3321f432::pool::LSP<0x8235459df815e77668b4a49bb36e229f3321f432::pool::TestSOL, 0x2::sui::SUI>',
+//           coinObjectId: '0xa7fe715725aa608e5102765f3af7d4d85de1a24f',
+//           version: 2493762,
+//           amount: 741,
+//         },
+//       },
+//       {
+//         coinBalanceChange: {
+//           packageId: '0x8235459df815e77668b4a49bb36e229f3321f432',
+//           transactionModule: 'pool',
+//           sender: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+//           changeType: 'Receive',
+//           owner: {
+//             AddressOwner: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+//           },
+//           coinType: '0x8235459df815e77668b4a49bb36e229f3321f432::pool::TestSOL',
+//           coinObjectId: '0xcd127e648c10649935a86d74833a9c22b7ccb10c',
+//           version: 2493762,
+//           amount: 800000,
+//         },
+//       },
+//       {
+//         coinBalanceChange: {
+//           packageId: '0x0000000000000000000000000000000000000002',
+//           transactionModule: 'gas',
+//           sender: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+//           changeType: 'Pay',
+//           owner: {
+//             AddressOwner: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+//           },
+//           coinType: '0x2::sui::SUI',
+//           coinObjectId: '0xd5bc168c9cbddf5918818c1d544580e97de3bd46',
+//           version: 2493759,
+//           amount: -1,
+//         },
+//       },
+//       {
+//         coinBalanceChange: {
+//           packageId: '0x8235459df815e77668b4a49bb36e229f3321f432',
+//           transactionModule: 'pool',
+//           sender: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+//           changeType: 'Pay',
+//           owner: {
+//             AddressOwner: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+//           },
+//           coinType: '0x2::sui::SUI',
+//           coinObjectId: '0x84210e7d5fb0be0b359ef8cdacb0d0448baf8478',
+//           version: 5624,
+//           amount: -200000000,
+//         },
+//       },
+//       {
+//         coinBalanceChange: {
+//           packageId: '0x8235459df815e77668b4a49bb36e229f3321f432',
+//           transactionModule: 'pool',
+//           sender: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+//           changeType: 'Pay',
+//           owner: {
+//             AddressOwner: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+//           },
+//           coinType: '0x8235459df815e77668b4a49bb36e229f3321f432::pool::TestSOL',
+//           coinObjectId: '0xc9b60a9fd79a9536f2f49e6827a51e8e62a7a544',
+//           version: 2492561,
+//           amount: -1000000,
+//         },
+//       },
+//       {
+//         moveEvent: {
+//           packageId: '0x8235459df815e77668b4a49bb36e229f3321f432',
+//           transactionModule: 'pool',
+//           sender: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+//           type: '0x8235459df815e77668b4a49bb36e229f3321f432::pool::LiquidityEvent',
+//           fields: {
+//             is_added: true,
+//             lsp_amount: '741',
+//             pool_id: '0x481a9c313aa7275e6fc9ff60eba919564b385086',
+//             x_amount: '200000',
+//             y_amount: '16',
+//           },
+//           bcs: 'SBqcMTqnJ15vyf9g66kZVks4UIYBQA0DAAAAAAAQAAAAAAAAAOUCAAAAAAAA',
+//         },
+//       },
+//     ],
+//     dependencies: [
+//       '4EXKjF3vTnoDEz54pDk6d2njs8roWwq3cfFAg2kUgKU4',
+//       '791GgUyLfBEhdsPSJ2HrHBPTm2599JLBnjbn6ySZhK3z',
+//       '8rq48ohgYu2QAHbwNHv1bLh8ZMgwiyghx1rzTzbWUB5B',
+//       'CN8EG4p7x2mWuX8Tt82kWuSWLC43Vjfgp1nDzRLkibYE',
+//       'DYUqe5hDjvyhG2EF2WsShTYAauVuC8oavB9U3eABScu3',
+//     ],
+//   },
+//   timestamp_ms: 1676013644266,
+//   parsed_data: null,
+// }
+//
+//
+// // import { expect } from 'chai'
+// // import { TestProcessorServer } from '../../testing/index.js'
+// //
+// // import { pool } from './types/testnet/swap.js'
+// // import { SuiNetwork } from '../network.js'
+// //
+// // describe('Test Sui Example', () => {
+// //   const service = new TestProcessorServer(async () => {
+// //     pool
+// //       .bind({
+// //         startTimestamp: 0,
+// //         address: '0x8235459df815e77668b4a49bb36e229f3321f432',
+// //       })
+// //       .onEventLiquidityEvent((evt, ctx) => {
+// //         const amount_original = BigInt(evt.fields?.x_amount)
+// //         const amount = evt.data_decoded.x_amount
+// //         expect(amount_original).eq(amount)
+// //         ctx.meter.Counter('amount').add(amount, { pool: evt.data_decoded.pool_id })
+// //       })
+// //       .onEntryAddLiquidity((call, ctx) => {
+// //         const amount = call.arguments_decoded[3]
+// //         ctx.meter.Gauge('amount2').record(amount)
+// //       })
+// //   })
+// //
+// //   beforeAll(async () => {
+// //     await service.start({ templateInstances: [] })
+// //   })
+// //
+// //   test('check configuration ', async () => {
+// //     const config = await service.getConfig({})
+// //     expect(config.contractConfigs).length(1)
+// //   })
+// //
+// //   test('Check event dispatch', async () => {
+// //     const res = await service.sui.testEvent(testData as any, testData.effects.events.length - 1, SuiNetwork.TEST_NET)
+// //     expect(res.result?.counters).length(1)
+// //     expect(res.result?.gauges).length(0)
+// //   })
+// //
+// //   test('Check call dispatch', async () => {
+// //     const res = await service.sui.testEntryFunctionCall(testData as any, SuiNetwork.TEST_NET)
+// //     expect(res.result?.counters).length(0)
+// //     expect(res.result?.gauges).length(1)
+// //   })
+// // })
+// //
+// // const testData = {
+// //   certificate: {
+// //     transactionDigest: '7DSTY6euDQKq7fn3N7654Xf1pbpSuBuYarW2c6B6ixio',
+// //     data: {
+// //       transactions: [
+// //         {
+// //           Call: {
+// //             package: {
+// //               objectId: '0x8235459df815e77668b4a49bb36e229f3321f432',
+// //               version: 1,
+// //               digest: 'THgI2ZcsS4aU5UNvLjB1huyOTXZ+QEavMOWGPC1UnHE=',
+// //             },
+// //             module: 'pool',
+// //             function: 'add_liquidity',
+// //             typeArguments: ['0x8235459df815e77668b4a49bb36e229f3321f432::pool::TestSOL', '0x2::sui::SUI'],
+// //             arguments: [
+// //               '0x481a9c313aa7275e6fc9ff60eba919564b385086',
+// //               '0xc9b60a9fd79a9536f2f49e6827a51e8e62a7a544',
+// //               '0x84210e7d5fb0be0b359ef8cdacb0d0448baf8478',
+// //               [64, 13, 3, 0, 0, 0, 0, 0],
+// //               [16, 0, 0, 0, 0, 0, 0, 0],
+// //             ],
+// //           },
+// //         },
+// //       ],
+// //       sender: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+// //       gasPayment: {
+// //         objectId: '0xd5bc168c9cbddf5918818c1d544580e97de3bd46',
+// //         version: 2493759,
+// //         digest: '+AVDN5/rqB755p9bU4Qh0gpn8FlaA6+ZRO//VPUSTVA=',
+// //       },
+// //       gasPrice: 618,
+// //       gasBudget: 1000,
+// //     },
+// //     txSignature:
+// //       'ANprZ/tjWOt7YBpfksRHlcRfMzHFNd1flhkSs6ld/CX8h6CYkdctIXPrcyLrUpwEDqM7XLJ1v4x/1670E6sfngv83dcb+0vmesdX0PdnU6Mte4NGe5+0kTZ3/sb71VTMNA==',
+// //     authSignInfo: {
+// //       epoch: 22,
+// //       signature: 'AZKQTmXsBGPz0Z3IKNXJCiCuIkFEqmGfQnm6R+umm34ppHHMSIvre1ThTcwSAnp3zQ==',
+// //       signers_map: [
+// //         58, 48, 0, 0, 1, 0, 0, 0, 0, 0, 27, 0, 16, 0, 0, 0, 0, 0, 1, 0, 3, 0, 4, 0, 7, 0, 8, 0, 9, 0, 10, 0, 13, 0, 15,
+// //         0, 16, 0, 18, 0, 19, 0, 21, 0, 22, 0, 24, 0, 25, 0, 26, 0, 27, 0, 28, 0, 29, 0, 30, 0, 31, 0, 32, 0, 33, 0, 35,
+// //         0, 36, 0, 40, 0,
+// //       ],
+// //     },
+// //   },
+// //   effects: {
+// //     status: {
+// //       status: 'success',
+// //     },
+// //     gasUsed: {
+// //       computationCost: 268212,
+// //       storageCost: 95,
+// //       storageRebate: 73,
+// //     },
+// //     sharedObjects: [
+// //       {
+// //         objectId: '0x481a9c313aa7275e6fc9ff60eba919564b385086',
+// //         version: 2493761,
+// //         digest: 'SoxFXUfrWjtkqQ2zfCFxykkM0epbShSqc/5JfSAJgB4=',
+// //       },
+// //     ],
+// //     transactionDigest: '7DSTY6euDQKq7fn3N7654Xf1pbpSuBuYarW2c6B6ixio',
+// //     created: [
+// //       {
+// //         owner: {
+// //           AddressOwner: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+// //         },
+// //         reference: {
+// //           objectId: '0x3f0b179f7787ed98a2ef2e6f5c6a016c982c6c6c',
+// //           version: 2493762,
+// //           digest: '6HGSh1X72r21XbHg0zEo43uIkEfyVVALbASxB7N1eIs=',
+// //         },
+// //       },
+// //       {
+// //         owner: {
+// //           AddressOwner: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+// //         },
+// //         reference: {
+// //           objectId: '0xa7fe715725aa608e5102765f3af7d4d85de1a24f',
+// //           version: 2493762,
+// //           digest: 'pTWwShZgjwZAZrVDI/i0xV25TTWEPBRbsCBBVZJsiXc=',
+// //         },
+// //       },
+// //       {
+// //         owner: {
+// //           AddressOwner: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+// //         },
+// //         reference: {
+// //           objectId: '0xcd127e648c10649935a86d74833a9c22b7ccb10c',
+// //           version: 2493762,
+// //           digest: '0Wo2uSBUhqNGI6mveDBAwlckVKBFkW9MjPjjTiiKBHU=',
+// //         },
+// //       },
+// //     ],
+// //     mutated: [
+// //       {
+// //         owner: {
+// //           Shared: {
+// //             initial_shared_version: 1020,
+// //           },
+// //         },
+// //         reference: {
+// //           objectId: '0x481a9c313aa7275e6fc9ff60eba919564b385086',
+// //           version: 2493762,
+// //           digest: 'Y7lbJv2OkIe+awkSaZn6RGw6ga1IhklP1/Ij+vhu1Ns=',
+// //         },
+// //       },
+// //       {
+// //         owner: {
+// //           AddressOwner: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+// //         },
+// //         reference: {
+// //           objectId: '0xd5bc168c9cbddf5918818c1d544580e97de3bd46',
+// //           version: 2493762,
+// //           digest: 'V1y2V81JUTb1YTAy9bh/b7QOXH4RGbZ71Pstxf+6bjQ=',
+// //         },
+// //       },
+// //     ],
+// //     deleted: [
+// //       {
+// //         objectId: '0x84210e7d5fb0be0b359ef8cdacb0d0448baf8478',
+// //         version: 2493762,
+// //         digest: 'Y2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2M=',
+// //       },
+// //       {
+// //         objectId: '0xc9b60a9fd79a9536f2f49e6827a51e8e62a7a544',
+// //         version: 2493762,
+// //         digest: 'Y2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2M=',
+// //       },
+// //     ],
+// //     gasObject: {
+// //       owner: {
+// //         AddressOwner: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+// //       },
+// //       reference: {
+// //         objectId: '0xd5bc168c9cbddf5918818c1d544580e97de3bd46',
+// //         version: 2493762,
+// //         digest: 'V1y2V81JUTb1YTAy9bh/b7QOXH4RGbZ71Pstxf+6bjQ=',
+// //       },
+// //     },
+// //     events: [
+// //       {
+// //         coinBalanceChange: {
+// //           packageId: '0x0000000000000000000000000000000000000002',
+// //           transactionModule: 'gas',
+// //           sender: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+// //           changeType: 'Gas',
+// //           owner: {
+// //             AddressOwner: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+// //           },
+// //           coinType: '0x2::sui::SUI',
+// //           coinObjectId: '0xd5bc168c9cbddf5918818c1d544580e97de3bd46',
+// //           version: 2493759,
+// //           amount: -268234,
+// //         },
+// //       },
+// //       {
+// //         coinBalanceChange: {
+// //           packageId: '0x8235459df815e77668b4a49bb36e229f3321f432',
+// //           transactionModule: 'pool',
+// //           sender: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+// //           changeType: 'Receive',
+// //           owner: {
+// //             AddressOwner: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+// //           },
+// //           coinType: '0x2::sui::SUI',
+// //           coinObjectId: '0x3f0b179f7787ed98a2ef2e6f5c6a016c982c6c6c',
+// //           version: 2493762,
+// //           amount: 199999984,
+// //         },
+// //       },
+// //       {
+// //         mutateObject: {
+// //           packageId: '0x8235459df815e77668b4a49bb36e229f3321f432',
+// //           transactionModule: 'pool',
+// //           sender: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+// //           objectType:
+// //             '0x8235459df815e77668b4a49bb36e229f3321f432::pool::Pool<0x8235459df815e77668b4a49bb36e229f3321f432::pool::TestSOL, 0x2::sui::SUI>',
+// //           objectId: '0x481a9c313aa7275e6fc9ff60eba919564b385086',
+// //           version: 2493762,
+// //         },
+// //       },
+// //       {
+// //         coinBalanceChange: {
+// //           packageId: '0x8235459df815e77668b4a49bb36e229f3321f432',
+// //           transactionModule: 'pool',
+// //           sender: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+// //           changeType: 'Receive',
+// //           owner: {
+// //             AddressOwner: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+// //           },
+// //           coinType:
+// //             '0x8235459df815e77668b4a49bb36e229f3321f432::pool::LSP<0x8235459df815e77668b4a49bb36e229f3321f432::pool::TestSOL, 0x2::sui::SUI>',
+// //           coinObjectId: '0xa7fe715725aa608e5102765f3af7d4d85de1a24f',
+// //           version: 2493762,
+// //           amount: 741,
+// //         },
+// //       },
+// //       {
+// //         coinBalanceChange: {
+// //           packageId: '0x8235459df815e77668b4a49bb36e229f3321f432',
+// //           transactionModule: 'pool',
+// //           sender: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+// //           changeType: 'Receive',
+// //           owner: {
+// //             AddressOwner: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+// //           },
+// //           coinType: '0x8235459df815e77668b4a49bb36e229f3321f432::pool::TestSOL',
+// //           coinObjectId: '0xcd127e648c10649935a86d74833a9c22b7ccb10c',
+// //           version: 2493762,
+// //           amount: 800000,
+// //         },
+// //       },
+// //       {
+// //         coinBalanceChange: {
+// //           packageId: '0x0000000000000000000000000000000000000002',
+// //           transactionModule: 'gas',
+// //           sender: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+// //           changeType: 'Pay',
+// //           owner: {
+// //             AddressOwner: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+// //           },
+// //           coinType: '0x2::sui::SUI',
+// //           coinObjectId: '0xd5bc168c9cbddf5918818c1d544580e97de3bd46',
+// //           version: 2493759,
+// //           amount: -1,
+// //         },
+// //       },
+// //       {
+// //         coinBalanceChange: {
+// //           packageId: '0x8235459df815e77668b4a49bb36e229f3321f432',
+// //           transactionModule: 'pool',
+// //           sender: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+// //           changeType: 'Pay',
+// //           owner: {
+// //             AddressOwner: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+// //           },
+// //           coinType: '0x2::sui::SUI',
+// //           coinObjectId: '0x84210e7d5fb0be0b359ef8cdacb0d0448baf8478',
+// //           version: 5624,
+// //           amount: -200000000,
+// //         },
+// //       },
+// //       {
+// //         coinBalanceChange: {
+// //           packageId: '0x8235459df815e77668b4a49bb36e229f3321f432',
+// //           transactionModule: 'pool',
+// //           sender: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+// //           changeType: 'Pay',
+// //           owner: {
+// //             AddressOwner: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+// //           },
+// //           coinType: '0x8235459df815e77668b4a49bb36e229f3321f432::pool::TestSOL',
+// //           coinObjectId: '0xc9b60a9fd79a9536f2f49e6827a51e8e62a7a544',
+// //           version: 2492561,
+// //           amount: -1000000,
+// //         },
+// //       },
+// //       {
+// //         moveEvent: {
+// //           packageId: '0x8235459df815e77668b4a49bb36e229f3321f432',
+// //           transactionModule: 'pool',
+// //           sender: '0x4b63cec2b85cf31ed0ec42e5c7e79d54db1411b6',
+// //           type: '0x8235459df815e77668b4a49bb36e229f3321f432::pool::LiquidityEvent',
+// //           fields: {
+// //             is_added: true,
+// //             lsp_amount: '741',
+// //             pool_id: '0x481a9c313aa7275e6fc9ff60eba919564b385086',
+// //             x_amount: '200000',
+// //             y_amount: '16',
+// //           },
+// //           bcs: 'SBqcMTqnJ15vyf9g66kZVks4UIYBQA0DAAAAAAAQAAAAAAAAAOUCAAAAAAAA',
+// //         },
+// //       },
+// //     ],
+// //     dependencies: [
+// //       '4EXKjF3vTnoDEz54pDk6d2njs8roWwq3cfFAg2kUgKU4',
+// //       '791GgUyLfBEhdsPSJ2HrHBPTm2599JLBnjbn6ySZhK3z',
+// //       '8rq48ohgYu2QAHbwNHv1bLh8ZMgwiyghx1rzTzbWUB5B',
+// //       'CN8EG4p7x2mWuX8Tt82kWuSWLC43Vjfgp1nDzRLkibYE',
+// //       'DYUqe5hDjvyhG2EF2WsShTYAauVuC8oavB9U3eABScu3',
+// //     ],
+// //   },
+// //   timestamp_ms: 1676013644266,
+// //   parsed_data: null,
+// // }

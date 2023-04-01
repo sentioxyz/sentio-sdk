@@ -11,7 +11,14 @@ import { ListStateStorage } from '@sentio/runtime'
 import { SuiNetwork, getChainId } from './network.js'
 import { ServerError, Status } from 'nice-grpc'
 import { SuiContext, SuiObjectsContext } from './context.js'
-import { MoveEvent, SuiTransactionResponse, MoveCall, SuiMoveObject } from '@mysten/sui.js'
+import {
+  MoveCallSuiTransaction,
+  SuiEvent,
+  SuiMoveObject,
+  SuiTransactionBlockResponse,
+  getTransactionKind,
+  getProgrammableTransaction,
+} from '@mysten/sui.js'
 import { CallHandler, EventFilter, EventHandler, FunctionNameAndCallFilter } from '../move/index.js'
 import { getMoveCalls } from './utils.js'
 import { defaultMoveCoder } from './move-coder.js'
@@ -50,7 +57,7 @@ export class SuiBaseProcessor {
   }
 
   public onMoveEvent(
-    handler: (event: MoveEvent, ctx: SuiContext) => void,
+    handler: (event: SuiEvent, ctx: SuiContext) => void,
     filter: EventFilter | EventFilter[],
     fetchConfig?: MoveFetchConfig
   ): SuiBaseProcessor {
@@ -73,8 +80,8 @@ export class SuiBaseProcessor {
         if (!data.transaction) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'event is null')
         }
-        const txn = data.transaction as SuiTransactionResponse
-        if (!txn.effects.events || !txn.effects.events.length) {
+        const txn = data.transaction as SuiTransactionBlockResponse
+        if (!txn.events || !txn.events.length) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'no event in the transactions')
         }
 
@@ -87,14 +94,14 @@ export class SuiBaseProcessor {
           txn
         )
 
-        const events = txn.effects.events
-        txn.effects.events = []
+        const events = txn.events
+        txn.events = []
         for (const evt of events) {
-          if ('moveEvent' in evt) {
-            const eventInstance = evt.moveEvent as MoveEvent
-            const decoded = defaultMoveCoder().decodeEvent<any>(eventInstance)
-            await handler(decoded || eventInstance, ctx)
-          }
+          // if ('moveEvent' in evt) {
+          //   const eventInstance = evt.moveEvent as SuiEvent
+          const decoded = defaultMoveCoder().decodeEvent<any>(evt)
+          await handler(decoded || evt, ctx)
+          // }
         }
 
         return ctx.getProcessResult()
@@ -106,7 +113,7 @@ export class SuiBaseProcessor {
   }
 
   public onEntryFunctionCall(
-    handler: (call: MoveCall, ctx: SuiContext) => void,
+    handler: (call: MoveCallSuiTransaction, ctx: SuiContext) => void,
     filter: FunctionNameAndCallFilter | FunctionNameAndCallFilter[],
     fetchConfig?: MoveFetchConfig
   ): SuiBaseProcessor {
@@ -128,7 +135,7 @@ export class SuiBaseProcessor {
         if (!data.transaction) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'call is null')
         }
-        const tx = data.transaction as SuiTransactionResponse
+        const tx = data.transaction as SuiTransactionBlockResponse
 
         const ctx = new SuiContext(
           processor.moduleName,
@@ -139,12 +146,18 @@ export class SuiBaseProcessor {
           tx
         )
         if (tx) {
-          const calls: MoveCall[] = getMoveCalls(tx)
+          const calls: MoveCallSuiTransaction[] = getMoveCalls(tx)
           if (calls.length !== 1) {
             throw new ServerError(Status.INVALID_ARGUMENT, 'Unexpected number of call transactions ' + calls.length)
           }
+          const txKind = getTransactionKind(tx)
+          if (!txKind) {
+            throw new ServerError(Status.INVALID_ARGUMENT, 'Unexpected getTransactionKind get empty')
+          }
+          const programmableTx = getProgrammableTransaction(txKind)
+
           const payload = calls[0]
-          const decoded = defaultMoveCoder().decodeFunctionPayload(payload)
+          const decoded = defaultMoveCoder().decodeFunctionPayload(payload, programmableTx?.inputs || [])
           await handler(decoded, ctx)
         }
         return ctx.getProcessResult()

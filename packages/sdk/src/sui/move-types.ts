@@ -19,7 +19,7 @@ export type { SuiAddress } from '@mysten/sui.js'
 export function toInternalModule(module: SuiMoveNormalizedModule): InternalMoveModule {
   return {
     address: module.address,
-    exposedFunctions: Object.entries(module.exposed_functions).map(([n, f]) => toInternalFunction(n, f)),
+    exposedFunctions: Object.entries(module.exposedFunctions).map(([n, f]) => toInternalFunction(n, f)),
     name: module.name,
     structs: Object.entries(module.structs).map(([n, s]) => toInternalStruct(n, s)),
   }
@@ -41,13 +41,13 @@ export function toInternalFunction(name: string, func: SuiMoveNormalizedFunction
       throw Error('No visibility for function' + name)
   }
   return {
-    typeParams: func.type_parameters.map((p: any) => {
+    typeParams: func.typeParameters.map((p: any) => {
       return { constraints: p.abilities }
     }),
-    isEntry: func.is_entry,
+    isEntry: func.isEntry,
     name: name,
     params: func.parameters.map(toTypeDescriptor),
-    return: func.return_.map(toTypeDescriptor),
+    return: func.return.map(toTypeDescriptor),
     visibility: visibility,
   }
 }
@@ -56,7 +56,7 @@ export function toInternalStruct(name: string, struct: SuiMoveNormalizedStruct):
   return {
     abilities: struct.abilities.abilities,
     fields: struct.fields.map(toInternalField),
-    typeParams: struct.type_parameters.map((p: any) => {
+    typeParams: struct.typeParameters.map((p: any) => {
       return { constraints: p.constraints.abilities }
     }),
     isNative: false,
@@ -67,7 +67,7 @@ export function toInternalStruct(name: string, struct: SuiMoveNormalizedStruct):
 export function toInternalField(module: SuiMoveNormalizedField): InternalMoveStructField {
   return {
     name: module.name,
-    type: toTypeDescriptor(module.type_),
+    type: toTypeDescriptor(module.type),
   }
 }
 
@@ -81,7 +81,7 @@ export function toTypeDescriptor(normalizedType: SuiMoveNormalizedType): TypeDes
       SPLITTER
     )
 
-    const args = normalizedType.Struct.type_arguments.map(toTypeDescriptor)
+    const args = normalizedType.Struct.typeArguments.map(toTypeDescriptor)
 
     return new TypeDescriptor(qname, args)
   }
