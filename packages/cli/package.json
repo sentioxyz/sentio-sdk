@@ -16,7 +16,7 @@
     "@mysten/sui.js": "npm:@sentio/sui.js@^0.30.0",
     "@types/jest": "^29.0.0",
     "@types/node": "^18.11.18",
-    "aptos-sdk": "npm:aptos@^1.7.1",
+    "aptos-sdk": "npm:aptos@^1.7.2",
     "chalk": "^5.2.0",
     "command-line-args": "^5.2.1",
     "command-line-usage": "^7.0.1",
@@ -28,9 +28,9 @@
     "latest-version": "^7.0.0",
     "node-fetch": "^3.3.0",
     "open": "^9.0.0",
-    "ts-jest": "^29.0.5",
+    "ts-jest": "^29.1.0",
     "ts-node": "^10.9.1",
-    "tsup": "npm:@sentio/tsup@^6.6.3",
+    "tsup": "npm:@sentio/tsup@^6.7.0",
     "yaml": "^2.2.1"
   },
   "devDependencies": {

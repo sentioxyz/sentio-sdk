@@ -17,7 +17,7 @@
     "command-line-args": "^5.2.1",
     "command-line-usage": "^7.0.1",
     "fs-extra": "^11.0.0",
-    "google-protobuf": "^3.15.8",
+    "google-protobuf": "^3.21.2",
     "nice-grpc": "^2.1.0",
     "nice-grpc-client-middleware-retry": "^3.1.2",
     "nice-grpc-prometheus": "^0.1.2",
