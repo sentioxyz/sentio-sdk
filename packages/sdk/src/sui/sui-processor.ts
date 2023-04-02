@@ -278,9 +278,9 @@ function configure(options: SuiBindOptions): IndexConfigure {
   }
 }
 
-export class SuiObjectsOfAddressProcessor extends SuiBaseObjectsProcessor<SuiMoveObject> {
-  static bind(options: SuiBindOptions): SuiObjectsOfAddressProcessor {
-    return new SuiObjectsOfAddressProcessor({ ...options, ownerType: MoveOnIntervalConfig_OwnerType.ADDRESS })
+export class SuiAddressObjectsProcessor extends SuiBaseObjectsProcessor<SuiMoveObject> {
+  static bind(options: SuiBindOptions): SuiAddressObjectsProcessor {
+    return new SuiAddressObjectsProcessor({ ...options, ownerType: MoveOnIntervalConfig_OwnerType.ADDRESS })
   }
 
   protected transformObjects(objects: SuiMoveObject[]): SuiMoveObject[] {
@@ -288,9 +288,9 @@ export class SuiObjectsOfAddressProcessor extends SuiBaseObjectsProcessor<SuiMov
   }
 }
 
-export class SuiObjectsOfDynamicFieldProcessor extends SuiBaseObjectsProcessor<dynamic_field.Field<any, any>> {
-  static bind(options: SuiObjectBindOptions): SuiObjectsOfDynamicFieldProcessor {
-    return new SuiObjectsOfDynamicFieldProcessor({
+export class SuiDynamicFieldObjectsProcessor extends SuiBaseObjectsProcessor<dynamic_field.Field<any, any>> {
+  static bind(options: SuiObjectBindOptions): SuiDynamicFieldObjectsProcessor {
+    return new SuiDynamicFieldObjectsProcessor({
       address: options.objectId,
       network: options.network,
       startTimestamp: options.startTimestamp,

@@ -1,4 +1,10 @@
-export { SuiBaseProcessor, SuiBindOptions } from './sui-processor.js'
+export {
+  SuiBaseProcessor,
+  SuiAddressObjectsProcessor,
+  SuiDynamicFieldObjectsProcessor,
+  SuiBindOptions,
+  SuiObjectBindOptions,
+} from './sui-processor.js'
 
 export * from './network.js'
 export * from './context.js'

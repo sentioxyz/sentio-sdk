@@ -73,7 +73,8 @@
     "./sui/codegen": "./lib/sui/codegen/index.js",
     "./sui/builtin": "./lib/sui/builtin/index.js",
     "./sui/builtin/0x1": "./lib/sui/builtin/0x1.js",
-    "./sui/builtin/0x2": "./lib/sui/builtin/0x2.js"
+    "./sui/builtin/0x2": "./lib/sui/builtin/0x2.js",
+    "./sui/builtin/0x3": "./lib/sui/builtin/0x3.js"
   },
   "files": [
     "{lib,src}",
