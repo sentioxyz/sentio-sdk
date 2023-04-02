@@ -1,6 +1,33 @@
-import { Event, Transaction_UserTransaction } from '../move-types.js'
+import { Event, Transaction_UserTransaction } from '@sentio/sdk/aptos'
 import { Types } from 'aptos-sdk'
+import { coin } from '../builtin/0x1.js'
 import { parseMoveType } from '../../move/index.js'
+
+export function findNewCoinBalances(
+  evt: Event,
+  tx: Transaction_UserTransaction,
+  coin: string
+): coin.Coin<any> | undefined {
+  if (!tx.changes) {
+    throw Error('No resource change found, did you forget set fetchOption to { resourceChanges: true  } ')
+  }
+  for (const change of tx.changes) {
+    if (change.type !== 'write_resource') {
+      continue
+    }
+    const writeResource = change as Types.WriteSetChange_WriteResource
+    if (writeResource.address !== evt.guid.account_address) {
+      continue
+    }
+    if (writeResource.data.type !== `0x1::coin::CoinStore<${coin}>`) {
+      continue
+    }
+    return {
+      value: BigInt((writeResource.data.data as any).coin.value),
+    }
+  }
+  return undefined
+}
 
 interface EventHandlerState {
   counter: string
