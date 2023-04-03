@@ -13,6 +13,6 @@
     "@sentio/sdk": "^2.0.0-development"
   },
   "devDependencies": {
-    "typescript": "^4.9.0"
+    "typescript": "^5.0.3"
   }
 }

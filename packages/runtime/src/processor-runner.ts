@@ -2,11 +2,9 @@
 
 import path from 'path'
 import fs from 'fs-extra'
-import * as util from 'util'
 
 import commandLineArgs from 'command-line-args'
 import { createServer } from 'nice-grpc'
-import { createLogger, transports, format } from 'winston'
 import { compressionAlgorithms } from '@grpc/grpc-js'
 
 import { register as globalRegistry, Registry } from 'prom-client'
@@ -21,6 +19,7 @@ import { Endpoints } from './endpoints.js'
 
 import { FullProcessorServiceImpl } from './full-service.js'
 import { ChainConfig } from './chain-config.js'
+import { setupJsonLogger } from './logger.js'
 
 const optionDefinitions = [
   { name: 'target', type: String, defaultOption: true },
@@ -42,30 +41,7 @@ const optionDefinitions = [
 const options = commandLineArgs(optionDefinitions, { partial: true })
 
 if (options['log-format'] === 'json') {
-  const utilFormatter = {
-    transform: (info: any) => {
-      const args = info[Symbol.for('splat')]
-      if (args) {
-        info.message = util.format(info.message, ...args)
-      }
-      return info
-    },
-  }
-  const logger = createLogger({
-    format: format.combine(
-      format.timestamp({ format: 'YYYY-MM-DDTHH:mm:ss.SSSZ' }),
-      utilFormatter,
-      format.errors({ stack: true }),
-      format.json()
-    ),
-    transports: [new transports.Console()],
-  })
-
-  console.log = (...args) => logger.info.call(logger, ...args)
-  console.info = (...args) => logger.info.call(logger, ...args)
-  console.warn = (...args) => logger.warn.call(logger, ...args)
-  console.error = (...args) => logger.error.call(logger, ...args)
-  console.debug = (...args) => logger.debug.call(logger, ...args)
+  setupJsonLogger()
 }
 if (options.debug) {
   console.log('Starting with', options.target)
