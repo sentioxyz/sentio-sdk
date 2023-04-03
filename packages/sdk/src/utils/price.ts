@@ -69,7 +69,7 @@ export async function getPriceByTypeOrSymbolInternal(
           // https://www.javatpoint.com/javascript-date-difference
           const diff = Math.abs(res.timestamp.getTime() - date.getTime())
           const daysDiff = diff / (1000 * 60 * 60 * 24)
-          const tolerance = options?.toleranceInDays || 1
+          const tolerance = options?.toleranceInDays || 2
           if (daysDiff > tolerance) {
             priceMap.delete(key)
             return undefined

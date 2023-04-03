@@ -1,6 +1,5 @@
 import { getPriceByType } from '@sentio/sdk/utils'
 import { CHAIN_IDS } from '@sentio/sdk'
-import { Status, ClientError } from 'nice-grpc-common'
 import fetch from 'node-fetch'
 
 const WHITELISTED_COINS = new Map<string, SimpleCoinInfo>()
@@ -73,9 +72,6 @@ export async function getPrice(coinType: string, timestamp: number): Promise<num
   try {
     return (await getPriceByType(CHAIN_IDS.APTOS_MAINNET, coinType, date)) || 0
   } catch (error) {
-    if (error instanceof ClientError && error.code === Status.NOT_FOUND) {
-      return 0
-    }
     console.log(JSON.stringify(error))
     throw error
   }
