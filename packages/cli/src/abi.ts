@@ -5,8 +5,17 @@ import chalk from 'chalk'
 import process from 'process'
 import path from 'path'
 import fs from 'fs-extra'
-// @ts-ignore no types
-import { init } from 'etherscan-api'
+import fetch from 'node-fetch'
+
+export const ETH_API_URL_MAP: Record<string, string> = {}
+
+ETH_API_URL_MAP[CHAIN_IDS.ETHEREUM] = 'https://api.etherscan.io'
+ETH_API_URL_MAP[CHAIN_IDS.RINKEBY] = 'https://api-rinkeby.etherscan.io'
+ETH_API_URL_MAP[CHAIN_IDS.ROPSTEN] = 'https://api-ropsten.etherscan.io'
+ETH_API_URL_MAP[CHAIN_IDS.GOERLI] = 'https://api-goerli.etherscan.io'
+ETH_API_URL_MAP[CHAIN_IDS.SEPOLIA] = 'https://api-sepolia.etherscan.io'
+ETH_API_URL_MAP[CHAIN_IDS.ARBITRUM] = 'https://api.arbiscan.io'
+ETH_API_URL_MAP[CHAIN_IDS.AVALANCHE] = 'https://api.snowtrace.io'
 
 export async function getABI(
   chain: string,
@@ -31,37 +40,12 @@ export async function getABI(
     case CHAIN_IDS.SUI_TESTNET:
       suiClient = new JsonRpcProvider(new Connection({ fullnode: 'https://fullnode.testnet.sui.io/' }))
       break
-    case CHAIN_IDS.ETHEREUM:
-      ethApi = init()
-      break
-    // case CHAIN_IDS.ROPSTEN:
-    //   ethApi = init(undefined, "ropsten")
-    //   break
-    // case CHAIN_IDS.RINKEBY:
-    //   ethApi = init(undefined, "rinkeby")
-    //   break
-    case CHAIN_IDS.GOERLI:
-      ethApi = init(undefined, 'goerli')
-      break
-    // case CHAIN_IDS.SEPOLIA:
-    //   ethApi = init(undefined, "sepolia")
-    //   break
-
-    case CHAIN_IDS.ARBITRUM:
-      ethApi = init(undefined, 'arbitrum')
-      break
-    case CHAIN_IDS.ARBITRUM_GOERLI:
-      ethApi = init(undefined, 'arbitrum_rinkeby')
-      break
-    case CHAIN_IDS.AVALANCHE:
-      ethApi = init(undefined, 'avalanche')
-      break
-    // case CHAIN_IDS.KOVAN:
-    //   ethApi = init(undefined, "kovan")
-    //   break
     default:
-      console.error(chalk.red(`chain ${chain} not supported for direct add, please download the ABI manually`))
-      process.exit(1)
+      ethApi = ETH_API_URL_MAP[chain]
+      if (!ethApi) {
+        console.error(chalk.red(`chain ${chain} not supported for direct add, please download the ABI manually`))
+        process.exit(1)
+      }
   }
 
   const baseErrMsg = chalk.red(
@@ -90,15 +74,17 @@ export async function getABI(
   }
 
   try {
-    let resp = await ethApi.contract.getabi(address)
+    let resp = (await (await fetch(`${ethApi}/api?module=contract&action=getabi&address=${address}`)).json()) as any
     if (resp.status !== '1') {
       throw Error(resp.message)
     }
     const abi = resp.result
 
     if (!name) {
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-      resp = await ethApi.contract.getsourcecode(address)
+      await new Promise((resolve) => setTimeout(resolve, 5000))
+      resp = (await (
+        await fetch(`${ethApi}/api?module=contract&action=getsourcecode&address=${address}`)
+      ).json()) as any
       if (resp.status !== '1') {
         throw Error(resp.message)
       }

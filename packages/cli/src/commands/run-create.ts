@@ -5,6 +5,8 @@ import fs from 'fs-extra'
 import chalk from 'chalk'
 import latestVersion from 'latest-version'
 import url from 'url'
+import { exec } from 'child_process'
+import process from 'process'
 
 export async function runCreate(argv: string[]) {
   const optionDefinitions = [
@@ -135,5 +137,18 @@ export async function runCreate(argv: string[]) {
       fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2))
     }
     console.log(chalk.green("successfully create project '" + projectFullName + "'"))
+    if (!options.subproject) {
+      console.log(chalk.green('running yarn install for initialization'))
+
+      const child = exec('yarn install', { cwd: dstFolder })
+      if (!child.stdout || !child.stderr) {
+        process.exit(1)
+      }
+      child.stdout.pipe(process.stdout)
+      child.stderr.pipe(process.stderr)
+      await new Promise((resolve) => {
+        child.on('close', resolve)
+      })
+    }
   }
 }

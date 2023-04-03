@@ -7,9 +7,19 @@ import { codegen } from './build.js'
 
 import * as process from 'process'
 import yaml from 'yaml'
-import { getABIFilePath, getABI, writeABIFile } from '../abi.js'
+import { getABIFilePath, getABI, writeABIFile, ETH_API_URL_MAP } from '../abi.js'
+import { CHAIN_IDS, getChainName } from '../chain.js'
 
 export async function runAdd(argv: string[]) {
+  const supportedChain: string[] = [CHAIN_IDS.APTOS_MAINNET, CHAIN_IDS.APTOS_TESTNET, CHAIN_IDS.SUI_TESTNET]
+  supportedChain.push(...Object.keys(ETH_API_URL_MAP))
+  const supprtedChainMessage = [
+    '',
+    ...supportedChain.map(
+      (chainId, idx) => `  ${getChainName(chainId)}:\t${chainId}${idx === supportedChain.length - 1 ? '' : '\n'}`
+    ),
+  ]
+
   const optionDefinitions = [
     {
       name: 'help',
@@ -22,8 +32,7 @@ export async function runAdd(argv: string[]) {
       alias: 'c',
       type: String,
       defaultValue: '1',
-      description:
-        'Chain id define from here: https://raw.githubusercontent.com/sentioxyz/sentio-sdk/main/packages/sdk/src/core/chain.ts notice some chain may not support this command',
+      description: 'Chain id, current support (chain name: id)s are:\n' + supprtedChainMessage,
     },
     {
       name: 'address',
