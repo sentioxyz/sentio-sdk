@@ -1,8 +1,24 @@
 // https://github.com/openethereum/parity-ethereum/blob/55c90d4016505317034e3e98f699af07f5404b63/rpc/src/v1/types/trace.rs#L482
+
 import { Result } from 'ethers'
 
 export interface TypedCallTrace<TArgsArray extends Array<any> = any, TArgsObject = any> {
-  args: TArgsArray & TArgsObject
+  args: TArgsObject & {
+    /**
+     *  Returns the Result as a normal Array.
+     *
+     *  This will throw if there are any outstanding deferred
+     *  errors.
+     */
+    toArray(): Array<any>
+    /**
+     *  Returns the Result as an Object with each name-value pair.
+     *
+     *  This will throw if any value is unnamed, or if there are
+     *  any outstanding deferred errors.
+     */
+    toObject(): Record<string, any>
+  }
 }
 
 export interface Trace {

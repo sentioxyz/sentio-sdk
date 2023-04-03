@@ -33,7 +33,7 @@ function codegenCallTraceType(fn: FunctionDeclaration, overloadedName?: string):
   return `
   export interface ${identifier}CallObject ${objectOutput}
     
-  export type ${identifier}CallTrace = TypedCallTrace<${arrayOutput}, ${identifier}CallObject> & Trace
+  export type ${identifier}CallTrace = TypedCallTrace<${arrayOutput}, ${identifier}CallObject>
   `
 }
 
@@ -47,7 +47,7 @@ function generateCallHandler(fn: FunctionDeclaration, contractName: string, over
     handler: (call: ${upperFirst(overloadedName ?? fn.name)}CallTrace, ctx: ${contractName}Context) => void,
     fetchConfig?: Partial<EthFetchConfig>
   ): this {
-    return super.onTrace("${sighash}", handler, fetchConfig);
+    return super.onTrace("${sighash}", handler as any, fetchConfig);
   }
 `
 }
