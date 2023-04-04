@@ -28,7 +28,7 @@ export interface IResult {
 }
 
 export interface TypedEvent<TArgsArray extends Array<any> = any, TArgsObject = any> extends LogParams {
-  args: TArgsArray & TArgsObject & IResult
+  args: TArgsObject & IResult
   name: string
 }
 

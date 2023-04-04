@@ -6,6 +6,7 @@ import { firstCounterValue, firstGaugeValue, TestProcessorServer } from '@sentio
 import { mockTransferLog } from '../builtin/erc20.js'
 import { HandlerType } from '@sentio/protos'
 import { BlockParams } from 'ethers/providers'
+import { SENTIO_BIGINT_STRING_SUFFIX } from '../../core/normalization.js'
 
 describe('Test Basic Examples', () => {
   const service = new TestProcessorServer(async () => {
@@ -53,6 +54,8 @@ describe('Test Basic Examples', () => {
     const counters = res.result?.counters
     expect(counters).length(1)
     expect(firstCounterValue(res.result, 'c1')).equals(1)
+    const event = res.result?.events[0]
+    expect(event?.attributes?.value.endsWith(SENTIO_BIGINT_STRING_SUFFIX)).equals(true)
 
     expect(counters?.[0].metadata?.chainId).equals('1')
     expect(counters?.[0].runtimeInfo?.from).equals(HandlerType.ETH_LOG)
