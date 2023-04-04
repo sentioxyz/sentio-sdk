@@ -48,9 +48,10 @@ export abstract class BaseProcessorTemplate<
     ProcessorTemplateProcessorState.INSTANCE.addValue(this)
   }
 
-  public bind(options: BindOptions) {
-    const sig = getOptionsSignature(options)
+  public bind(options: BindOptions): void {
+    const sig = getOptionsSignature({ address: options.address, network: options.network })
     if (this.binds.has(sig)) {
+      console.log('Same address can be bind to one template only once')
       return
     }
     this.binds.add(sig)
@@ -85,7 +86,6 @@ export abstract class BaseProcessorTemplate<
       instance.endBlock = BigInt(options.endBlock)
     }
     TemplateInstanceState.INSTANCE.addValue(instance)
-    return processor
   }
 
   public onEvent(
