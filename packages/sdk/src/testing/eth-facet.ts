@@ -1,6 +1,6 @@
 import { TestProcessorServer } from './test-processor-server.js'
 import { DataBinding, HandlerType, ProcessBindingResponse } from '@sentio/protos'
-import { Trace } from '../eth/trace.js'
+import { Trace } from '../eth/eth.js'
 import { BlockParams, LogParams, Networkish } from 'ethers/providers'
 import { Block } from 'ethers'
 import { getNetworkFromCtxOrNetworkish } from '../eth/provider.js'

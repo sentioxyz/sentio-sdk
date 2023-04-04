@@ -2,7 +2,7 @@ import { BaseContract } from 'ethers'
 import { LogParams, BlockParams, TransactionReceiptParams, TransactionResponseParams } from 'ethers/providers'
 
 import { RecordMetaData } from '@sentio/protos'
-import { Trace } from './trace.js'
+import { Trace } from './eth.js'
 import { Labels, normalizeLabels } from '../core/index.js'
 import { BaseContext } from '../core/base-context.js'
 

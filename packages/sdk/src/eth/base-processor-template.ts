@@ -3,12 +3,11 @@ import { BaseContract } from 'ethers'
 import { BaseProcessor } from './base-processor.js'
 import { BindOptions, getOptionsSignature } from './bind-options.js'
 import { EthFetchConfig, HandleInterval, TemplateInstance } from '@sentio/protos'
-import { PromiseOrVoid } from '../promise-or-void.js'
-import { Trace } from './trace.js'
+import { PromiseOrVoid } from '../core/promises.js'
 import { ListStateStorage } from '@sentio/runtime'
 import { BlockParams } from 'ethers/providers'
 import { DeferredTopicFilter } from 'ethers/contract'
-import { EthEvent } from './eth.js'
+import { TypedEvent, TypedCallTrace } from './eth.js'
 import { getNetworkFromCtxOrNetworkish } from './provider.js'
 
 export class ProcessorTemplateProcessorState extends ListStateStorage<
@@ -34,11 +33,11 @@ export abstract class BaseProcessorTemplate<
   }[] = []
   traceHandlers: {
     signature: string
-    handler: (trace: Trace, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid
+    handler: (trace: TypedCallTrace, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid
     fetchConfig?: EthFetchConfig
   }[] = []
   eventHandlers: {
-    handler: (event: EthEvent, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid
+    handler: (event: TypedEvent, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid
     filter: DeferredTopicFilter | DeferredTopicFilter[]
     fetchConfig?: EthFetchConfig
   }[] = []
@@ -89,7 +88,7 @@ export abstract class BaseProcessorTemplate<
   }
 
   public onEvent(
-    handler: (event: EthEvent, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
+    handler: (event: TypedEvent, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     filter: DeferredTopicFilter | DeferredTopicFilter[],
     fetchConfig?: Partial<EthFetchConfig>
   ) {
@@ -135,7 +134,7 @@ export abstract class BaseProcessorTemplate<
 
   public onTrace(
     signature: string,
-    handler: (trace: Trace, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
+    handler: (trace: TypedCallTrace, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     fetchConfig?: Partial<EthFetchConfig>
   ) {
     this.traceHandlers.push({ signature, handler, fetchConfig: EthFetchConfig.fromPartial(fetchConfig || {}) })

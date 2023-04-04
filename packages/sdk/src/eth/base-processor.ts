@@ -12,10 +12,9 @@ import {
   ProcessResult,
 } from '@sentio/protos'
 import { BindOptions } from './bind-options.js'
-import { PromiseOrVoid } from '../promise-or-void.js'
-import { Trace } from './trace.js'
+import { PromiseOrVoid } from '../core/promises.js'
 import { ServerError, Status } from 'nice-grpc'
-import { fixEmptyKey, EthEvent, formatEthData } from './eth.js'
+import { fixEmptyKey, TypedEvent, TypedCallTrace, formatEthData } from './eth.js'
 import * as console from 'console'
 import { getNetworkFromCtxOrNetworkish } from './provider.js'
 import sha3 from 'js-sha3'
@@ -83,7 +82,7 @@ export abstract class BaseProcessor<
   }
 
   public onEvent(
-    handler: (event: EthEvent, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
+    handler: (event: TypedEvent, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     filter: DeferredTopicFilter | DeferredTopicFilter[],
     fetchConfig?: Partial<EthFetchConfig>
   ): this {
@@ -124,7 +123,7 @@ export abstract class BaseProcessor<
         const parsed = contractView.rawContract.interface.parseLog(logParam)
 
         if (parsed) {
-          const event: EthEvent = { ...log, name: parsed.name, args: fixEmptyKey(parsed) }
+          const event: TypedEvent = { ...log, name: parsed.name, args: fixEmptyKey(parsed) }
           await handler(event, ctx)
           return ctx.getProcessResult()
         }
@@ -195,7 +194,7 @@ export abstract class BaseProcessor<
   }
 
   public onAllEvents(
-    handler: (event: EthEvent, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
+    handler: (event: TypedEvent, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     fetchConfig?: Partial<EthFetchConfig>
   ): this {
     const _filters: DeferredTopicFilter[] = []
@@ -218,7 +217,7 @@ export abstract class BaseProcessor<
 
   public onTrace(
     signatures: string | string[],
-    handler: (trace: Trace, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
+    handler: (trace: TypedCallTrace, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     fetchConfig?: Partial<EthFetchConfig>
   ): this {
     const chainId = this.getChainId()
@@ -244,15 +243,16 @@ export abstract class BaseProcessor<
         if (!trace || !fragment) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'trace is null')
         }
-        trace.name = fragment.name
-        trace.functionSignature = fragment.format()
+        const typedTrace = trace as TypedCallTrace
+        typedTrace.name = fragment.name
+        typedTrace.functionSignature = fragment.format()
         // const trace = data.trace as Trace
         if (!trace?.action.input) {
           return ProcessResult.fromPartial({})
         }
         const traceData = '0x' + trace.action.input.slice(10)
         try {
-          trace.args = contractInterface.getAbiCoder().decode(fragment.inputs, traceData, true)
+          typedTrace.args = contractInterface.getAbiCoder().decode(fragment.inputs, traceData, true)
         } catch (e) {
           if (!trace.error) {
             throw e
@@ -270,7 +270,7 @@ export abstract class BaseProcessor<
           transaction,
           transactionReceipt
         )
-        await handler(trace, ctx)
+        await handler(typedTrace, ctx)
         return ctx.getProcessResult()
       },
     })
@@ -278,7 +278,7 @@ export abstract class BaseProcessor<
   }
 
   public onAllTraces(
-    handler: (event: Trace, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
+    handler: (event: TypedCallTrace, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     fetchConfig?: Partial<EthFetchConfig>
   ): this {
     const tmpContract = this.CreateBoundContractView()

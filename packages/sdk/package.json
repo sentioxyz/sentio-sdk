@@ -49,6 +49,7 @@
   },
   "exports": {
     ".": "./lib/index.js",
+    "./core": "./lib/core/index.js",
     "./testing": "./lib/testing/index.js",
     "./utils": "./lib/utils/index.js",
     "./eth": "./lib/eth/index.js",

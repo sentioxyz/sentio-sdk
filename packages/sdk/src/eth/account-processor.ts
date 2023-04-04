@@ -1,18 +1,17 @@
 import { ERC20__factory, ERC721__factory } from './builtin/internal/index.js'
 import { AddressType, EthFetchConfig, ProcessResult } from '@sentio/protos'
-import { AccountBindOptions } from './bind-options.js'
 
+import { PromiseOrVoid, PartiallyOptional } from '../core/index.js'
+
+import { AccountBindOptions } from './bind-options.js'
 import { TransferEvent as ERC20TransferEvent, ERC20Processor } from './builtin/erc20.js'
 import { TransferEvent as ERC721TransferEvent, ERC721Processor } from './builtin/erc721.js'
-
 import { AccountContext } from './context.js'
-import { PromiseOrVoid } from '../promise-or-void.js'
 import { AddressOrTypeEventFilter, EventsHandler } from './base-processor.js'
 import { Block, LogDescription } from 'ethers'
 import { AccountProcessorState } from './account-processor-state.js'
 import { formatEthData } from './eth.js'
 import { getNetworkFromCtxOrNetworkish } from './provider.js'
-import { PartiallyOptional } from '../core/partial-optional.js'
 
 const ERC20_INTERFACE = ERC20__factory.createInterface()
 const ERC721_INTERFACE = ERC721__factory.createInterface()

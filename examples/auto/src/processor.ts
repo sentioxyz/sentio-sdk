@@ -50,9 +50,12 @@ PythProcessor.bind({
     })
   })
   .onAllTraces(function (trace, ctx) {
-    ctx.meter.Counter('trace_count').add(1, { name: trace.name })
-    ctx.eventLogger.emit(trace.name, {
-      distinctId: trace.action.from,
-      ...trace.args.toObject(),
-    })
+    const succeed = trace.error === undefined
+    ctx.meter.Counter('trace_count').add(1, { name: trace.name, success: String(succeed) })
+    if (succeed) {
+      ctx.eventLogger.emit(trace.name, {
+        distinctId: trace.action.from,
+        ...trace.args.toObject(),
+      })
+    }
   })
