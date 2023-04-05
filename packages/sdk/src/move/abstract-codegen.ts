@@ -32,6 +32,7 @@ export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
   STRUCT_FIELD_NAME: string = 'data'
   GENERATE_CLIENT = false
   GENERATE_ON_ENTRY = true
+  PAYLOAD_OPTIONAL = false
 
   abstract fetchModules(account: string, network: NetworkType): Promise<ModuleTypes>
   abstract toInternalModules(modules: ModuleTypes): InternalMoveModule[]
@@ -282,7 +283,7 @@ export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
     }
 
     const fields = this.getMeaningfulFunctionParams(func.params).map((param) => {
-      return this.generateTypeForDescriptor(param, module.address)
+      return this.generateTypeForDescriptor(param, module.address) + (this.PAYLOAD_OPTIONAL ? ' | undefined' : '')
     })
 
     const camelFuncName = upperFirst(camelCase(func.name))

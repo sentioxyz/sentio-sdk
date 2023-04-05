@@ -13,7 +13,8 @@ describe('Test Sui Example', () => {
     })
 
     sui_system.bind({ network: SuiNetwork.TEST_NET }).onEntryRequestAddStake((call, ctx) => {
-      ctx.meter.Gauge('tmp').record(1, { coin: call.arguments_decoded[2] })
+      // TODO check why only jest report error but tsc won't if use infer library's sui
+      ctx.meter.Gauge('tmp').record(1, { coin: call.arguments_decoded[2] || '' })
     })
   })
 

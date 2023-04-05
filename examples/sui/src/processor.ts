@@ -7,6 +7,7 @@
 
 import { sui_system, validator } from '@sentio/sdk/sui/builtin/0x3'
 import { SuiNetwork, SuiDynamicFieldObjectsProcessor } from '@sentio/sdk/sui'
+import RequestAddStakePayload = sui_system.RequestAddStakePayload
 
 validator.bind({ network: SuiNetwork.TEST_NET }).onEventStakingRequestEvent((evt, ctx) => {
   const amount_original = BigInt(evt.parsedJson?.amount)
@@ -15,8 +16,8 @@ validator.bind({ network: SuiNetwork.TEST_NET }).onEventStakingRequestEvent((evt
   ctx.meter.Counter('amount').add(amount, { pool: evt.data_decoded.pool_id })
 })
 
-sui_system.bind({ network: SuiNetwork.TEST_NET }).onEntryRequestAddStake((call, ctx) => {
-  ctx.meter.Gauge('tmp').record(1, { coin: call.arguments_decoded[2] })
+sui_system.bind({ network: SuiNetwork.TEST_NET }).onEntryRequestAddStake((call: RequestAddStakePayload, ctx) => {
+  ctx.meter.Gauge('tmp').record(1, { coin: call.arguments_decoded[2] || '' })
 })
 
 SuiDynamicFieldObjectsProcessor.bind({

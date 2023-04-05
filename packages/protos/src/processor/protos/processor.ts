@@ -605,7 +605,7 @@ export interface Data_SuiCall {
 }
 
 export interface Data_SuiObject {
-  objects: { [key: string]: any } | undefined;
+  objects: { [key: string]: any }[];
   timestamp: Date | undefined;
   slot: bigint;
 }
@@ -4253,13 +4253,13 @@ export const Data_SuiCall = {
 };
 
 function createBaseData_SuiObject(): Data_SuiObject {
-  return { objects: undefined, timestamp: undefined, slot: BigInt("0") };
+  return { objects: [], timestamp: undefined, slot: BigInt("0") };
 }
 
 export const Data_SuiObject = {
   encode(message: Data_SuiObject, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.objects !== undefined) {
-      Struct.encode(Struct.wrap(message.objects), writer.uint32(10).fork()).ldelim();
+    for (const v of message.objects) {
+      Struct.encode(Struct.wrap(v!), writer.uint32(10).fork()).ldelim();
     }
     if (message.timestamp !== undefined) {
       Timestamp.encode(toTimestamp(message.timestamp), writer.uint32(18).fork()).ldelim();
@@ -4278,7 +4278,7 @@ export const Data_SuiObject = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.objects = Struct.unwrap(Struct.decode(reader, reader.uint32()));
+          message.objects.push(Struct.unwrap(Struct.decode(reader, reader.uint32())));
           break;
         case 2:
           message.timestamp = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
@@ -4296,7 +4296,7 @@ export const Data_SuiObject = {
 
   fromJSON(object: any): Data_SuiObject {
     return {
-      objects: isObject(object.objects) ? object.objects : undefined,
+      objects: Array.isArray(object?.objects) ? [...object.objects] : [],
       timestamp: isSet(object.timestamp) ? fromJsonTimestamp(object.timestamp) : undefined,
       slot: isSet(object.slot) ? BigInt(object.slot) : BigInt("0"),
     };
@@ -4304,7 +4304,11 @@ export const Data_SuiObject = {
 
   toJSON(message: Data_SuiObject): unknown {
     const obj: any = {};
-    message.objects !== undefined && (obj.objects = message.objects);
+    if (message.objects) {
+      obj.objects = message.objects.map((e) => e);
+    } else {
+      obj.objects = [];
+    }
     message.timestamp !== undefined && (obj.timestamp = message.timestamp.toISOString());
     message.slot !== undefined && (obj.slot = message.slot.toString());
     return obj;
@@ -4316,7 +4320,7 @@ export const Data_SuiObject = {
 
   fromPartial(object: DeepPartial<Data_SuiObject>): Data_SuiObject {
     const message = createBaseData_SuiObject();
-    message.objects = object.objects ?? undefined;
+    message.objects = object.objects?.map((e) => e) || [];
     message.timestamp = object.timestamp ?? undefined;
     message.slot = object.slot ?? BigInt("0");
     return message;

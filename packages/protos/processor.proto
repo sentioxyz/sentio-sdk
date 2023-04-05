@@ -351,7 +351,7 @@ message Data {
     uint64 slot = 3;
   }
   message SuiObject {
-    google.protobuf.Struct objects = 1;
+    repeated google.protobuf.Struct objects = 1;
     google.protobuf.Timestamp timestamp = 2;
     uint64 slot = 3;
   }
