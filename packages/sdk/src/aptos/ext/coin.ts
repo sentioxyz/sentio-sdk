@@ -14,9 +14,7 @@ export interface SimpleCoinInfo {
 export async function initCoinList() {
   let list = DEFAULT_LIST
   try {
-    const resp = await fetch(
-      'https://raw.githubusercontent.com/hippospace/aptos-coin-list/main/src/defaultList.mainnet.json'
-    )
+    const resp = await fetch('https://github.com/hippospace/aptos-coin-list/blob/main/src/permissionless.json')
     list = (await resp.json()) as any[]
   } catch (e) {
     console.warn("Can't not fetch newest coin list, use default list")
@@ -57,7 +55,7 @@ export function getCoinInfo(type: string): SimpleCoinInfo {
     return {
       token_type: { type: type, account_address: parts[0] },
       symbol: parts[2],
-      decimals: 1,
+      decimals: 8,
       bridge: 'native',
     }
   }
@@ -138,6 +136,75 @@ const DEFAULT_LIST = [
     pancake_symbol: 'MEE',
   },
   {
+    name: 'Move Dollar',
+    symbol: 'MOD',
+    official_symbol: 'MOD',
+    coingecko_id: '',
+    decimals: 8,
+    logo_url: 'https://raw.githubusercontent.com/hippospace/aptos-coin-list/main/icons/MOD.svg',
+    project_url: 'https://www.thala.fi/',
+    token_type: {
+      type: '0x6f986d146e4a90b828d8c12c14b6f4e003fdff11a8eecceceb63744363eaac01::mod_coin::MOD',
+      account_address: '0x6f986d146e4a90b828d8c12c14b6f4e003fdff11a8eecceceb63744363eaac01',
+      module_name: 'mod_coin',
+      struct_name: 'MOD',
+    },
+    extensions: {
+      data: [],
+    },
+    unique_index: 128,
+    source: 'native',
+    permissioned_listing: true,
+    hippo_symbol: 'MOD',
+    pancake_symbol: 'MOD',
+  },
+  {
+    name: 'Thala Token',
+    symbol: 'THL',
+    official_symbol: 'THL',
+    coingecko_id: '',
+    decimals: 8,
+    logo_url: 'https://raw.githubusercontent.com/hippospace/aptos-coin-list/main/icons/THL.svg',
+    project_url: 'https://www.thala.fi/',
+    token_type: {
+      type: '0x07fd500c11216f0fe3095d0c4b8aa4d64a4e2e04f83758462f2b127255643615::thl_coin::THL',
+      account_address: '0x07fd500c11216f0fe3095d0c4b8aa4d64a4e2e04f83758462f2b127255643615',
+      module_name: 'thl_coin',
+      struct_name: 'THL',
+    },
+    extensions: {
+      data: [],
+    },
+    unique_index: 129,
+    source: 'native',
+    permissioned_listing: true,
+    hippo_symbol: 'THL',
+    pancake_symbol: 'THL',
+  },
+  {
+    name: 'Aptopad Coin',
+    symbol: 'APD',
+    official_symbol: 'APD',
+    coingecko_id: '',
+    decimals: 8,
+    logo_url: 'https://raw.githubusercontent.com/hippospace/aptos-coin-list/main/icons/aptopad.png',
+    project_url: 'https://aptopad.io',
+    token_type: {
+      type: '0xcc78307c77f1c2c0fdfee17269bfca7876a0b35438c3442417480c0d5c370fbc::AptopadCoin::APD',
+      account_address: '0xcc78307c77f1c2c0fdfee17269bfca7876a0b35438c3442417480c0d5c370fbc',
+      module_name: 'AptopadCoin',
+      struct_name: 'APD',
+    },
+    extensions: {
+      data: [],
+    },
+    unique_index: 130,
+    source: 'native',
+    hippo_symbol: 'APD',
+    pancake_symbol: 'APD',
+    permissioned_listing: false,
+  },
+  {
     name: 'Ditto Staked Aptos',
     symbol: 'stAPT',
     official_symbol: 'stAPT',
@@ -182,29 +249,6 @@ const DEFAULT_LIST = [
     permissioned_listing: true,
     hippo_symbol: 'DTO',
     pancake_symbol: 'DTO',
-  },
-  {
-    name: 'DAI',
-    symbol: 'devDAI',
-    official_symbol: 'DAI',
-    coingecko_id: 'dai',
-    decimals: 8,
-    logo_url: 'https://raw.githubusercontent.com/hippospace/aptos-coin-list/main/icons/DAI.webp',
-    project_url: 'project_url',
-    token_type: {
-      type: '0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68::devnet_coins::DevnetDAI',
-      account_address: '0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68',
-      module_name: 'devnet_coins',
-      struct_name: 'DevnetDAI',
-    },
-    extensions: {
-      data: [],
-    },
-    unique_index: 213,
-    source: 'native',
-    hippo_symbol: 'devDAI',
-    pancake_symbol: 'devDAI',
-    permissioned_listing: false,
   },
   {
     name: 'Aptoge',
@@ -368,29 +412,6 @@ const DEFAULT_LIST = [
     permissioned_listing: false,
   },
   {
-    name: 'USD Coin',
-    symbol: 'devUSDC',
-    official_symbol: 'USDC',
-    coingecko_id: 'usd-coin',
-    decimals: 8,
-    logo_url: 'https://raw.githubusercontent.com/hippospace/aptos-coin-list/main/icons/USDC.webp',
-    project_url: 'project_url',
-    token_type: {
-      type: '0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68::devnet_coins::DevnetUSDC',
-      account_address: '0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68',
-      module_name: 'devnet_coins',
-      struct_name: 'DevnetUSDC',
-    },
-    extensions: {
-      data: [],
-    },
-    unique_index: 553,
-    source: 'native',
-    hippo_symbol: 'devUSDC',
-    pancake_symbol: 'devUSDC',
-    permissioned_listing: false,
-  },
-  {
     name: 'Doglaika Coin',
     symbol: 'DLC',
     official_symbol: 'DLC',
@@ -412,29 +433,6 @@ const DEFAULT_LIST = [
     permissioned_listing: true,
     hippo_symbol: 'DLC',
     pancake_symbol: 'DLC',
-  },
-  {
-    name: 'Bitcoin',
-    symbol: 'devBTC',
-    official_symbol: 'BTC',
-    coingecko_id: 'bitcoin',
-    decimals: 8,
-    logo_url: 'https://raw.githubusercontent.com/hippospace/aptos-coin-list/main/icons/BTC.webp',
-    project_url: 'project_url',
-    token_type: {
-      type: '0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68::devnet_coins::DevnetBTC',
-      account_address: '0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68',
-      module_name: 'devnet_coins',
-      struct_name: 'DevnetBTC',
-    },
-    extensions: {
-      data: [],
-    },
-    unique_index: 662,
-    source: 'native',
-    hippo_symbol: 'devBTC',
-    pancake_symbol: 'devBTC',
-    permissioned_listing: false,
   },
   {
     name: 'The People',
@@ -552,29 +550,6 @@ const DEFAULT_LIST = [
     pancake_symbol: 'MOVE',
   },
   {
-    name: 'Tether',
-    symbol: 'devUSDT',
-    official_symbol: 'USDT',
-    coingecko_id: 'tether',
-    decimals: 8,
-    logo_url: 'https://raw.githubusercontent.com/hippospace/aptos-coin-list/main/icons/USDT.webp',
-    project_url: 'project_url',
-    token_type: {
-      type: '0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68::devnet_coins::DevnetUSDT',
-      account_address: '0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68',
-      module_name: 'devnet_coins',
-      struct_name: 'DevnetUSDT',
-    },
-    extensions: {
-      data: [],
-    },
-    unique_index: 923,
-    source: 'native',
-    hippo_symbol: 'devUSDT',
-    pancake_symbol: 'devUSDT',
-    permissioned_listing: false,
-  },
-  {
     name: 'AptosLaunch Token',
     symbol: 'ALT',
     official_symbol: 'ALT',
@@ -608,8 +583,8 @@ const DEFAULT_LIST = [
     token_type: {
       type: '0x27975005fd8b836a905dc7f81c51f89e76091a4d0c4d694265f6eae0c05cb400::proton_a5d::PROTON_E54',
       account_address: '0x27975005fd8b836a905dc7f81c51f89e76091a4d0c4d694265f6eae0c05cb400',
-      module_name: 'coin',
-      struct_name: 'ALI',
+      module_name: 'proton_a5d',
+      struct_name: 'PROTON_E54',
     },
     extensions: {
       data: [],
