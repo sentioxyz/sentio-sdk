@@ -2,6 +2,8 @@ import { expect } from 'chai'
 import { TestProcessorServer } from '../../testing/index.js'
 import { SuiNetwork } from '../network.js'
 import { sui_system, validator } from '../builtin/0x3.js'
+import { SuiDynamicFieldObjectsProcessor } from '../sui-processor.js'
+import { MoveOnIntervalConfig_OwnerType } from '@sentio/protos'
 
 describe('Test Sui Example', () => {
   const service = new TestProcessorServer(async () => {
@@ -16,6 +18,10 @@ describe('Test Sui Example', () => {
       // TODO check why only jest report error but tsc won't if use infer library's sui
       ctx.meter.Gauge('tmp').record(1, { coin: call.arguments_decoded[2] || '' })
     })
+
+    SuiDynamicFieldObjectsProcessor.bind({ objectId: 'xxx' }).onTimeInterval((objects, ctx) => {
+      ctx.meter.Gauge('size').record(objects.length)
+    })
   })
 
   beforeAll(async () => {
@@ -25,6 +31,8 @@ describe('Test Sui Example', () => {
   test('check configuration ', async () => {
     const config = await service.getConfig({})
     expect(config.contractConfigs).length(2)
+    expect(config.accountConfigs).length(1)
+    expect(config.accountConfigs[0].moveIntervalConfigs[0].ownerType).eq(MoveOnIntervalConfig_OwnerType.OBJECT)
   })
 
   test('Check event dispatch', async () => {

@@ -294,7 +294,7 @@ export class SuiDynamicFieldObjectsProcessor extends SuiBaseObjectsProcessor<dyn
       address: options.objectId,
       network: options.network,
       startTimestamp: options.startTimestamp,
-      ownerType: MoveOnIntervalConfig_OwnerType.ADDRESS,
+      ownerType: MoveOnIntervalConfig_OwnerType.OBJECT,
     })
   }
 
