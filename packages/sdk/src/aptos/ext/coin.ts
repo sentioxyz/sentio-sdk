@@ -14,7 +14,9 @@ export interface SimpleCoinInfo {
 export async function initCoinList() {
   let list = DEFAULT_LIST
   try {
-    const resp = await fetch('https://github.com/hippospace/aptos-coin-list/blob/main/src/permissionless.json')
+    const resp = await fetch(
+      'https://raw.githubusercontent.com/hippospace/aptos-coin-list/main/src/permissionless.json'
+    )
     list = (await resp.json()) as any[]
   } catch (e) {
     console.warn("Can't not fetch newest coin list, use default list")

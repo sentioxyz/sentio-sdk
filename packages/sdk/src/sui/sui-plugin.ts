@@ -95,7 +95,7 @@ export class SuiPlugin extends Plugin {
     }
   }
 
-  supportedHandlers = [HandlerType.SUI_EVENT, HandlerType.SUI_CALL]
+  supportedHandlers = [HandlerType.SUI_EVENT, HandlerType.SUI_CALL, HandlerType.SUI_OBJECT]
 
   async processSuiEvent(binding: DataBinding): Promise<ProcessResult> {
     if (!binding.data?.suiEvent) {
