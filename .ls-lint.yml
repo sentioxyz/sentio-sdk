@@ -25,6 +25,7 @@ ignore:
   - docs
   - debug
   - node_modules
+  - packages/cli/lib
   - packages/cli/node_modules
   - packages/cli/templates
   - packages/sdk/src/eth/abis

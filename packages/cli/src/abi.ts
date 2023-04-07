@@ -10,12 +10,16 @@ import fetch from 'node-fetch'
 export const ETH_API_URL_MAP: Record<string, string> = {}
 
 ETH_API_URL_MAP[CHAIN_IDS.ETHEREUM] = 'https://api.etherscan.io'
-ETH_API_URL_MAP[CHAIN_IDS.RINKEBY] = 'https://api-rinkeby.etherscan.io'
-ETH_API_URL_MAP[CHAIN_IDS.ROPSTEN] = 'https://api-ropsten.etherscan.io'
 ETH_API_URL_MAP[CHAIN_IDS.GOERLI] = 'https://api-goerli.etherscan.io'
-ETH_API_URL_MAP[CHAIN_IDS.SEPOLIA] = 'https://api-sepolia.etherscan.io'
+ETH_API_URL_MAP[CHAIN_IDS.BINANCE] = 'https://api.bscscan.com'
+ETH_API_URL_MAP[CHAIN_IDS.POLYGON] = 'https://api.polygonscan.com'
 ETH_API_URL_MAP[CHAIN_IDS.ARBITRUM] = 'https://api.arbiscan.io'
+ETH_API_URL_MAP[CHAIN_IDS.OPTIMISM] = 'https://api-optimistic.etherscan.io'
+// ETH_API_URL_MAP[CHAIN_IDS.BASE_GOERLI] = 'https://api-goerli.basescan.org' // didn't see any verified contract
+
 ETH_API_URL_MAP[CHAIN_IDS.AVALANCHE] = 'https://api.snowtrace.io'
+ETH_API_URL_MAP[CHAIN_IDS.CRONOS] = 'https://api.cronoscan.com'
+ETH_API_URL_MAP[CHAIN_IDS.MOONBEAM] = 'https://api-moonbeam.moonscan.io'
 
 export async function getABI(
   chain: string,
