@@ -20,6 +20,7 @@ ETH_API_URL_MAP[CHAIN_IDS.OPTIMISM] = 'https://api-optimistic.etherscan.io'
 ETH_API_URL_MAP[CHAIN_IDS.AVALANCHE] = 'https://api.snowtrace.io'
 ETH_API_URL_MAP[CHAIN_IDS.CRONOS] = 'https://api.cronoscan.com'
 ETH_API_URL_MAP[CHAIN_IDS.MOONBEAM] = 'https://api-moonbeam.moonscan.io'
+ETH_API_URL_MAP[CHAIN_IDS.FANTOM] = 'https://api.ftmscan.com'
 
 export async function getABI(
   chain: string,

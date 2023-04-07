@@ -36,4 +36,18 @@ describe('Test ABI get', () => {
     const abi = await getABI(CHAIN_IDS.POLYGON, '0x7FFB3d637014488b63fb9858E279385685AFc1e2', undefined)
     expect(abi.abi !== undefined).eq(true)
   })
+
+  test('fantom', async () => {
+    const abi = await getABI(CHAIN_IDS.FANTOM, '0x04068DA6C83AFCFA0e13ba15A6696662335D5B75', undefined)
+    expect(abi.abi !== undefined).eq(true)
+  })
+
+  test('sui_test', async () => {
+    const abi = await getABI(
+      CHAIN_IDS.SUI_TESTNET,
+      '0xebaa2ad3eacc230f309cd933958cc52684df0a41ae7ac214d186b80f830867d2',
+      undefined
+    )
+    expect(abi.abi !== undefined).eq(true)
+  })
 })

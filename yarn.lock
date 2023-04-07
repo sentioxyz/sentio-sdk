@@ -1318,10 +1318,10 @@
   dependencies:
     bs58 "^5.0.0"
 
-"@mysten/sui.js@npm:@sentio/sui.js@^0.30.0":
-  version "0.30.0"
-  resolved "https://registry.yarnpkg.com/@sentio/sui.js/-/sui.js-0.30.0.tgz#a366c993d924fb6c71995159e03986142cbcb656"
-  integrity sha512-Z1y5Pr8vz4YwA4C8xgOPQ3FsBkGq++kVkEV1KdZwnn5JcTab1UFbLigvDTO5Yh4w6j0VBmDuQu8S4liAz4m/nA==
+"@mysten/sui.js@npm:@sentio/sui.js@^0.30.0-patch.1":
+  version "0.30.0-patch.1"
+  resolved "https://registry.yarnpkg.com/@sentio/sui.js/-/sui.js-0.30.0-patch.1.tgz#d24654832413f9189f951b0ebfcb33042132da6e"
+  integrity sha512-rArg+gesgAyoD+WhKNmoE3lqL2lpVuZnWxiwIUPvAvOxkr8hSHHhP+/tk6Kj3Z82dVAgM+DL5EGVfG4pm/q0Kg==
   dependencies:
     "@mysten/bcs" "0.7.0"
     "@noble/curves" "^0.9.0"
