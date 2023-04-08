@@ -3,9 +3,9 @@ import { parseMoveType, TypeDescriptor } from './types.js'
 import { InternalMoveFunction, InternalMoveModule, InternalMoveStruct } from './internal-models.js'
 import { bytesToBigInt } from '../utils/index.js'
 
-export type StructWithTag<Base> = Base & {
+export type StructWithTag<Base> = {
   type: string
-  data: any
+  data: Base
 }
 
 export type DecodedStructWithTag<B, T> = StructWithTag<B> & {
@@ -23,6 +23,10 @@ export abstract class AbstractMoveCoder<StructType> {
   }
 
   protected abstract getMeaningfulFunctionParams(params: TypeDescriptor[]): TypeDescriptor[]
+
+  protected toStructWithTag(val: StructType): StructWithTag<StructType> {
+    return val as any
+  }
 
   protected loadInternal(module: InternalMoveModule) {
     if (this.contains(module.address, module.name)) {
@@ -236,15 +240,23 @@ export abstract class AbstractMoveCoder<StructType> {
     return this.decodeArray(res, f.return)
   }
 
-  protected filterAndDecodeInternal<T>(
-    typeQname: string,
-    structs: StructWithTag<StructType>[]
-  ): DecodedStructWithTag<StructType, T>[] {
+  protected filterAndDecodeStruct(typeQname: string, structs: StructType[]): any {
     if (!structs) {
       return []
     }
+    const withTags = structs.map((s) => this.toStructWithTag(s))
+    return this.filterAndDecodeStructWithTags(typeQname, withTags)
+  }
+
+  private filterAndDecodeStructWithTags<T>(
+    typeQname: string,
+    structsWithTags: StructWithTag<StructType>[]
+  ): DecodedStructWithTag<StructType, T>[] {
+    if (!structsWithTags) {
+      return []
+    }
     const results: DecodedStructWithTag<StructType, T>[] = []
-    for (const resource of structs) {
+    for (const resource of structsWithTags) {
       if (typeQname.includes('<')) {
         if (resource.type !== typeQname) {
           continue
@@ -252,7 +264,7 @@ export abstract class AbstractMoveCoder<StructType> {
       } else if (resource.type.split('<')[0] !== typeQname) {
         continue
       }
-      const result = this.decodedInternal(resource)
+      const result = this.decodedStructWithTag(resource)
       if (result) {
         results.push(result as DecodedStructWithTag<StructType, T>)
       }
@@ -260,13 +272,19 @@ export abstract class AbstractMoveCoder<StructType> {
     return results
   }
 
-  protected decodedInternal<T>(typeStruct: StructWithTag<StructType>): DecodedStructWithTag<StructType, T> | undefined {
+  protected decodedStruct<T>(typeStruct: StructType): DecodedStructWithTag<StructType, T> | undefined {
+    return this.decodedStructWithTag(this.toStructWithTag(typeStruct)) as any
+  }
+
+  private decodedStructWithTag<T>(
+    typeStruct: StructWithTag<StructType>
+  ): DecodedStructWithTag<StructType, T> | undefined {
     const typeDescriptor = parseMoveType(typeStruct.type)
     const typeArguments = typeDescriptor.typeArgs.map((t) => t.getSignature())
 
     let dataTyped = undefined
     try {
-      dataTyped = this.decode(typeStruct.data, typeDescriptor)
+      dataTyped = this.decode(this.toStructWithTag(typeStruct.data), typeDescriptor)
     } catch (e) {
       console.error('Decoding error for ', JSON.stringify(typeStruct), e)
       return undefined

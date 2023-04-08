@@ -1,12 +1,19 @@
 import { TypedEventInstance, TypedFunctionPayload, TypedSuiMoveObject } from './models.js'
 import { AbstractMoveCoder, StructWithTag } from '../move/abstract-move-coder.js'
-import { MoveCallSuiTransaction, SuiEvent, SuiMoveNormalizedModule, SuiCallArg, SuiMoveObject } from '@mysten/sui.js'
+import {
+  MoveCallSuiTransaction,
+  SuiEvent,
+  SuiMoveNormalizedModule,
+  SuiCallArg,
+  SuiMoveObject,
+  SuiRawData,
+} from '@mysten/sui.js'
 import { toInternalModule } from './move-types.js'
 import { SPLITTER, TypeDescriptor } from '../move/index.js'
 import { getMeaningfulFunctionParams } from './utils.js'
 import { dynamic_field } from './builtin/0x2.js'
 
-export class MoveCoder extends AbstractMoveCoder<SuiEvent> {
+export class MoveCoder extends AbstractMoveCoder<SuiEvent | SuiMoveObject> {
   load(module: SuiMoveNormalizedModule) {
     if (this.contains(module.address, module.name)) {
       return
@@ -26,22 +33,27 @@ export class MoveCoder extends AbstractMoveCoder<SuiEvent> {
     }
   }
 
+  toStructWithTag(val: SuiEvent | SuiMoveObject): StructWithTag<SuiEvent> {
+    if (SuiEvent.is(val)) {
+      return {
+        ...val,
+        data: val.parsedJson as any,
+      }
+    }
+    if (SuiRawData.is(val)) {
+      return {
+        ...val,
+        data: val.fields as any,
+      }
+    }
+    return val as any
+  }
+
   decodeEvent<T>(event: SuiEvent): TypedEventInstance<T> | undefined {
-    const res = this.decodedInternal<T>({ ...event, data: event.parsedJson })
-    return { ...event, data_decoded: res?.data_decoded as T, type_arguments: res?.type_arguments || [] }
+    return this.decodedStruct<T>(event) as any
   }
   filterAndDecodeEvents<T>(typeQname: string, resources: SuiEvent[]): TypedEventInstance<T>[] {
-    const resp = this.filterAndDecodeInternal(
-      typeQname,
-      resources.map((event) => {
-        return { ...event, data: event.parsedJson, type: event.type }
-      })
-    )
-    return resp.map((res) => {
-      delete res.data
-      const event = res as SuiEvent
-      return { ...event, data_decoded: res?.data_decoded as T, type_arguments: res?.type_arguments || [] }
-    })
+    return this.filterAndDecodeStruct(typeQname, resources)
   }
 
   getObjectsFromDynamicFields<Name, Value>(objects: SuiMoveObject[]): dynamic_field.Field<Name, Value>[] {
@@ -49,15 +61,7 @@ export class MoveCoder extends AbstractMoveCoder<SuiEvent> {
   }
 
   filterAndDecodeObjects<T>(typeQname: string, objects: SuiMoveObject[]): TypedSuiMoveObject<T>[] {
-    const structs = objects.map((obj) => {
-      return { ...obj, data: obj.fields, type: obj.type }
-    }) as StructWithTag<any>
-    const resp = this.filterAndDecodeInternal(typeQname, structs)
-    return resp.map((res) => {
-      delete res.data
-      const event = res as any as SuiMoveObject
-      return { ...event, data_decoded: res?.data_decoded as T, type_arguments: res?.type_arguments || [] }
-    })
+    return this.filterAndDecodeStruct(typeQname, objects)
   }
 
   getMeaningfulFunctionParams(params: TypeDescriptor[]): TypeDescriptor[] {
