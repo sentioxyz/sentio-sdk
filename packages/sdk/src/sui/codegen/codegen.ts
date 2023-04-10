@@ -8,8 +8,9 @@ import { AbstractCodegen } from '../../move/abstract-codegen.js'
 import { toInternalModule } from '../move-types.js'
 import { moduleQname, SPLITTER, structQname, TypeDescriptor } from '../../move/index.js'
 import { getMeaningfulFunctionParams } from '../utils.js'
+import {join} from "path";
 
-export async function codegen(abisDir: string, outDir = 'src/types/sui', genExample = false) {
+export async function codegen(abisDir: string, outDir = join('src','types','sui'), genExample = false) {
   if (!fs.existsSync(abisDir)) {
     return
   }

@@ -70,7 +70,7 @@ export default class EthersSentio extends Ethers.default {
     for (const [idx, file] of files.entries()) {
       if (file.path.endsWith('__factory.ts')) {
         file.contents = '// @ts-nocheck\n' + file.contents
-      } else if (file.path.endsWith('factories/index.ts')) {
+      } else if (file.path.endsWith(join('factories', 'index.ts'))) {
         file.contents = file.contents.replaceAll("__factory'", "__factory.js'")
       } else if (file.path.endsWith('_processor.ts')) {
       } else if (file.path.endsWith(commonPath)) {

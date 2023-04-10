@@ -7,8 +7,9 @@ import { AptosClient } from 'aptos-sdk'
 import { getMeaningfulFunctionParams } from '../utils.js'
 import { InternalMoveModule, InternalMoveStruct } from '../../move/internal-models.js'
 import { AbstractCodegen } from '../../move/abstract-codegen.js'
+import {join} from "path";
 
-export async function codegen(abisDir: string, outDir = 'src/types/aptos', genExample = false) {
+export async function codegen(abisDir: string, outDir = join('src', 'types', 'aptos'), genExample = false) {
   if (!fs.existsSync(abisDir)) {
     return
   }
