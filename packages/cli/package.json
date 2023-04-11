@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@jest/types": "^29.4.1",
-    "@mysten/sui.js": "npm:@sentio/sui.js@^0.30.0-patch.1",
+    "@mysten/sui.js": "npm:@sentio/sui.js@^0.32.0-patch.1",
     "@types/jest": "^29.0.0",
     "@types/node": "^18.11.18",
     "aptos-sdk": "npm:aptos@^1.7.2",
