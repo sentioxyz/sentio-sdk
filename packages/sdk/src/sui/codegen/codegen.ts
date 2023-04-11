@@ -8,9 +8,9 @@ import { AbstractCodegen } from '../../move/abstract-codegen.js'
 import { toInternalModule } from '../move-types.js'
 import { moduleQname, SPLITTER, structQname, TypeDescriptor } from '../../move/index.js'
 import { getMeaningfulFunctionParams } from '../utils.js'
-import {join} from "path";
+import { join } from 'path'
 
-export async function codegen(abisDir: string, outDir = join('src','types','sui'), genExample = false) {
+export async function codegen(abisDir: string, outDir = join('src', 'types', 'sui'), genExample = false) {
   if (!fs.existsSync(abisDir)) {
     return
   }
@@ -36,7 +36,7 @@ class SuiCodegen extends AbstractCodegen<SuiMoveNormalizedModules, SuiNetwork> {
   MAIN_NET = SuiNetwork.MAIN_NET
   TEST_NET = SuiNetwork.TEST_NET
   PREFIX = 'Sui'
-  STRUCT_FIELD_NAME = 'fields'
+  // STRUCT_FIELD_NAME = 'fields'
   // GENERATE_ON_ENTRY = true
   PAYLOAD_OPTIONAL = true
 
