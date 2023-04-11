@@ -27,7 +27,8 @@ export class MoveCoder extends AbstractMoveCoder<SuiEvent | SuiMoveObject> {
       case '0x2::coin::Coin':
         return data
       case '0x1::option::Option':
-        return this.decode(data, type.typeArgs[0])
+        // return this.decode(data, type.typeArgs[0])
+        return data
       default:
         return super.decode(data, type)
     }
