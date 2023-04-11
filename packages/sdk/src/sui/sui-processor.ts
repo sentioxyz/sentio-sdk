@@ -22,7 +22,7 @@ import {
 import { CallHandler, EventFilter, EventHandler, FunctionNameAndCallFilter } from '../move/index.js'
 import { getMoveCalls } from './utils.js'
 import { defaultMoveCoder } from './move-coder.js'
-import { dynamic_field } from './builtin/0x2.js'
+// import { dynamic_field } from './builtin/0x2.js'
 
 class IndexConfigure {
   address: string
@@ -287,8 +287,8 @@ export class SuiAddressObjectsProcessor extends SuiBaseObjectsProcessor<SuiMoveO
     return objects
   }
 }
-
-export class SuiDynamicFieldObjectsProcessor extends SuiBaseObjectsProcessor<dynamic_field.Field<any, any>> {
+// export class SuiDynamicFieldObjectsProcessor extends SuiBaseObjectsProcessor<dynamic_field.Field<any, any>> {
+export class SuiDynamicFieldObjectsProcessor extends SuiBaseObjectsProcessor<SuiMoveObject> {
   static bind(options: SuiObjectBindOptions): SuiDynamicFieldObjectsProcessor {
     return new SuiDynamicFieldObjectsProcessor({
       address: options.objectId,
@@ -299,6 +299,7 @@ export class SuiDynamicFieldObjectsProcessor extends SuiBaseObjectsProcessor<dyn
   }
 
   protected transformObjects(objects: SuiMoveObject[]) {
-    return defaultMoveCoder().getObjectsFromDynamicFields(objects)
+    return objects
+    // return defaultMoveCoder().getObjectsFromDynamicFields(objects)
   }
 }

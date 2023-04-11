@@ -1,4 +1,4 @@
-project: mixed
+project: auto
 contracts:
   - chain: '1'
     address: '0xB329e39Ebefd16f40d38f07643652cE17Ca5Bac1'
