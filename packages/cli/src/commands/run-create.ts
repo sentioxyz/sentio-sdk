@@ -5,7 +5,7 @@ import fs from 'fs-extra'
 import chalk from 'chalk'
 import latestVersion from 'latest-version'
 import url from 'url'
-import { exec } from 'child_process'
+import { execFile } from 'child_process'
 import process from 'process'
 
 export async function runCreate(argv: string[]) {
@@ -140,7 +140,7 @@ export async function runCreate(argv: string[]) {
     if (!options.subproject) {
       console.log(chalk.green('running yarn install for initialization'))
 
-      const child = exec('yarn install', { cwd: dstFolder })
+      const child = execFile('yarn', ['install'], { cwd: dstFolder })
       if (!child.stdout || !child.stderr) {
         process.exit(1)
       }

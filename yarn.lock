@@ -10,10 +10,10 @@
     lodash.assignwith "^4.2.0"
     typical "^7.1.1"
 
-"@adraffy/ens-normalize@1.8.9":
-  version "1.8.9"
-  resolved "https://registry.yarnpkg.com/@adraffy/ens-normalize/-/ens-normalize-1.8.9.tgz#67b3acadebbb551669c9a1da15fac951db795b85"
-  integrity sha512-93OmGCV0vO8+JQ3FHG+gZk/MPHzzMPDRiCiFcCQNTCnHaaxsacO3ScTPGlu2wX2dOtgfalbchPcw1cOYYjHCYQ==
+"@adraffy/ens-normalize@1.9.0":
+  version "1.9.0"
+  resolved "https://registry.yarnpkg.com/@adraffy/ens-normalize/-/ens-normalize-1.9.0.tgz#223572538f6bea336750039bb43a4016dcc8182d"
+  integrity sha512-iowxq3U30sghZotgl4s/oJRci6WPBfNO5YYgk2cIOMCHr3LeGPcsZjCEr+33Q4N+oV3OABDAtA+pyvWjbvBifQ==
 
 "@ampproject/remapping@^2.1.0":
   version "2.2.0"
@@ -2525,6 +2525,13 @@
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/@types/minimist/-/minimist-1.2.2.tgz#ee771e2ba4b3dc5b372935d549fd9617bf345b8c"
   integrity sha512-jhuKLIRrhvCPLqwPcx6INqmKeiA5EWrsCOPhrlFSrbrmU4ZMPjj5Ul/oLCMDO98XRUIwVm78xICz4EPCektzeQ==
+
+"@types/mkdirp@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@types/mkdirp/-/mkdirp-1.0.2.tgz#8d0bad7aa793abe551860be1f7ae7f3198c16666"
+  integrity sha512-o0K1tSO0Dx5X6xlU5F1D6625FawhC3dU3iqr25lluNv/+/QIVH8RLNEiVokgIZo+mz+87w/3Mkg/VvQS+J51fQ==
+  dependencies:
+    "@types/node" "*"
 
 "@types/ms@*":
   version "0.7.31"
@@ -5246,12 +5253,12 @@ ethereumjs-util@^6.0.0, ethereumjs-util@^6.2.1:
     ethjs-util "0.1.6"
     rlp "^2.2.3"
 
-ethers@5.7.2, ethers@^5.6.4, "ethers@npm:@sentio/ethers@6.1.0-patch.1", "ethers@npm:@sentio/ethers@^6.1.0-patch.1":
-  version "6.1.0-patch.1"
-  resolved "https://registry.yarnpkg.com/@sentio/ethers/-/ethers-6.1.0-patch.1.tgz#323a9e9f68ce2bdb873b8646eeff60f11e53c670"
-  integrity sha512-mUYvI8Cf2+UJFNGTMBPyTqLqGyxdhn7ws2qM9kvmAu9qzvc3dZHxUNkhERKHjD7nsqOzzM7hdwKcddXmJSMnjQ==
+ethers@5.7.2, ethers@^5.6.4, "ethers@npm:@sentio/ethers@6.3.0-patch.1", "ethers@npm:@sentio/ethers@^6.3.0-patch.1":
+  version "6.3.0-patch.1"
+  resolved "https://registry.yarnpkg.com/@sentio/ethers/-/ethers-6.3.0-patch.1.tgz#00ffd6387784b83c8bc12a4cc1df9fe089302c14"
+  integrity sha512-va/po5zY12ulRzy2QYI1JmVib9787DCs/tM+dpr5dhPYRletMuYYfkMh2zo6Y8SfhIy+8GndfSYKFT98DvOJFQ==
   dependencies:
-    "@adraffy/ens-normalize" "1.8.9"
+    "@adraffy/ens-normalize" "1.9.0"
     "@noble/hashes" "1.1.2"
     "@noble/secp256k1" "1.7.1"
     aes-js "4.0.0-beta.3"
@@ -8323,11 +8330,6 @@ mkdirp@^1.0.3, mkdirp@^1.0.4:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-1.0.4.tgz#3eb5ed62622756d79a5f0e2a221dfebad75c2f7e"
   integrity sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==
-
-mkdirp@^2.1.3:
-  version "2.1.3"
-  resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-2.1.3.tgz#b083ff37be046fd3d6552468c1f0ff44c1545d1f"
-  integrity sha512-sjAkg21peAG9HS+Dkx7hlG9Ztx7HLeKnvB3NQRcu/mltCVmvkF0pisbiTSfDVYTT86XEfZrTUosLdZLStquZUw==
 
 modify-values@^1.0.0:
   version "1.0.1"

@@ -9,7 +9,7 @@ import path from 'path'
 import { ReadKey } from '../key.js'
 import fs from 'fs'
 import { createHash } from 'crypto'
-import { execSync } from 'child_process'
+import { execFileSync } from 'child_process'
 import { getSdkVersion } from '../utils.js'
 import readline from 'readline'
 import * as process from 'process'
@@ -169,12 +169,12 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth) {
     let gitUrl = ''
     const sha256 = digest
     try {
-      commitSha = execSync('git rev-parse HEAD').toString().trim()
+      commitSha = execFileSync('git', ['rev-parse', 'HEAD']).toString().trim()
     } catch (e) {
       chalk.yellow(e)
     }
     try {
-      gitUrl = execSync('git remote get-url origin').toString().trim()
+      gitUrl = execFileSync('git', ['remote', 'get-url', 'origin']).toString().trim()
     } catch (e) {
       // skip errors
     }

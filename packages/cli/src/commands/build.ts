@@ -1,7 +1,7 @@
 import chalk from 'chalk'
 import path from 'path'
 import fs from 'fs-extra'
-import { exec } from 'child_process'
+import { execFile } from 'child_process'
 import * as process from 'process'
 import { getPackageRoot } from '../utils.js'
 import commandLineArgs from 'command-line-args'
@@ -108,7 +108,7 @@ export async function buildProcessor(onlyGen: boolean, options: commandLineArgs.
 
     const tsup = path.resolve(getPackageRoot('tsup'), 'dist', 'cli-default.js')
     // await execStep('yarn tsc -p .', 'Compile')
-    await execStep(`node ${tsup} --config=${tsupConfig}`, 'Packaging')
+    await execStep(['node', tsup, '--config', tsupConfig], 'Packaging')
 
     const dir = fs.readdirSync(path.join(process.cwd(), 'dist'))
     const generated = dir.filter((d) => d.endsWith('.js')).length
@@ -204,11 +204,12 @@ export async function codegen(genExample: boolean) {
 }
 
 async function installDeps() {
-  await execStep('yarn install --ignore-scripts', 'Yarn Install')
+  await execStep(['yarn', 'install', '--ignore-scripts'], 'Yarn Install')
 }
 
-async function execStep(cmd: string, stepName: string) {
-  const child = exec(cmd)
+async function execStep(cmds: string[], stepName: string) {
+  const child = execFile(cmds[0], cmds.splice(1))
+
   console.log(chalk.blue(stepName + ' begin'))
 
   if (!child.stdout || !child.stderr) {
