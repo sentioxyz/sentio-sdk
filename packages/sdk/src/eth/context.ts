@@ -107,6 +107,23 @@ export class AccountContext extends EthContext {
   }
 }
 
+export class GlobalContext extends EthContext {
+  constructor(
+    chainId: number,
+    timestamp?: Date,
+    block?: BlockParams,
+    log?: LogParams,
+    trace?: Trace,
+    transaction?: TransactionResponseParams,
+    transactionReceipt?: TransactionReceiptParams
+  ) {
+    super(chainId, '*', timestamp, block, log, trace, transaction, transactionReceipt)
+  }
+  protected getContractName(): string {
+    return '*'
+  }
+}
+
 export class ContractContext<
   TContract extends BaseContract,
   TContractBoundView extends BoundContractView<TContract, ContractView<TContract>>

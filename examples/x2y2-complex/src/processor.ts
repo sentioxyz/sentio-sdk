@@ -1,4 +1,6 @@
 import { Counter, Gauge, Exporter } from '@sentio/sdk'
+import { GlobalProcessor } from '@sentio/sdk/eth'
+
 import { ERC20Processor } from '@sentio/sdk/eth/builtin'
 import { TokenDistributorProcessor } from './types/eth/tokendistributor.js'
 
@@ -63,6 +65,10 @@ ERC20Processor.bind({ address: '0x1e4ede388cbc9f4b5c79681b7f94d36a11abebc9' }).o
     amount: val,
     coin_symbol: 'X2Y2',
   })
+})
+
+GlobalProcessor.bind({ startBlock: 17029962 }).onTransaction(async (tx, ctx) => {
+  ctx.meter.Counter('all_tx').add(1)
 })
 
 // ERC20Processor.bind({ address: '0x1e4ede388cbc9f4b5c79681b7f94d36a11abebc9' }).onAllEvents((evt, ctx) => {

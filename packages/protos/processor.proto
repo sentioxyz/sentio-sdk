@@ -212,6 +212,7 @@ message EthFetchConfig {
   bool transaction = 1;
   bool transaction_receipt = 2;
   bool block = 3;
+  bool trace = 4;
 }
 
 message TraceHandlerConfig {
@@ -313,6 +314,7 @@ message Data {
     google.protobuf.Timestamp timestamp = 5;
     optional google.protobuf.Struct transaction_receipt = 3;
     optional google.protobuf.Struct block = 6;
+    optional google.protobuf.Struct trace = 7;
   }
   message EthTrace {
     google.protobuf.Struct trace = 4;
@@ -431,6 +433,7 @@ enum HandlerType {
   ETH_LOG = 1;
   ETH_BLOCK = 2;
   ETH_TRACE = 5;
+  ETH_TRANSACTION = 11;
   SOL_INSTRUCTION = 4;
   APT_EVENT = 6;
   APT_CALL = 7;

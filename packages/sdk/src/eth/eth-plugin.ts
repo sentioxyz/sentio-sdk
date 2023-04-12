@@ -1,10 +1,11 @@
-import { Plugin, PluginManager, errorString, mergeProcessResults, USER_PROCESSOR } from '@sentio/runtime'
+import { errorString, mergeProcessResults, Plugin, PluginManager, USER_PROCESSOR } from '@sentio/runtime'
 import {
   AccountConfig,
   ContractConfig,
   Data_EthBlock,
   Data_EthLog,
   Data_EthTrace,
+  Data_EthTransaction,
   DataBinding,
   HandlerType,
   LogFilter,
@@ -18,6 +19,7 @@ import { ServerError, Status } from 'nice-grpc'
 import { ProcessorState } from './binds.js'
 import { AccountProcessorState } from './account-processor-state.js'
 import { ProcessorTemplateProcessorState, TemplateInstanceState } from './base-processor-template.js'
+import { GlobalProcessorState } from './base-processor.js'
 
 export class EthPlugin extends Plugin {
   name: string = 'EthPlugin'
@@ -25,6 +27,7 @@ export class EthPlugin extends Plugin {
   private eventHandlers: ((event: Data_EthLog) => Promise<ProcessResult>)[] = []
   private traceHandlers: ((trace: Data_EthTrace) => Promise<ProcessResult>)[] = []
   private blockHandlers: ((block: Data_EthBlock) => Promise<ProcessResult>)[] = []
+  private transactionHandlers: ((trace: Data_EthTransaction) => Promise<ProcessResult>)[] = []
 
   async configure(config: ProcessConfigResponse) {
     // This syntax is to copy values instead of using references
@@ -114,6 +117,42 @@ export class EthPlugin extends Plugin {
       config.contractConfigs.push(contractConfig)
     }
 
+    for (const processor of GlobalProcessorState.INSTANCE.getValues()) {
+      const chainId = processor.getChainId()
+
+      const contractConfig = ContractConfig.fromPartial({
+        processorType: USER_PROCESSOR,
+        contract: {
+          name: processor.config.name,
+          chainId: chainId.toString(),
+          address: processor.config.address,
+          abi: '',
+        },
+        startBlock: processor.config.startBlock,
+        endBlock: processor.config.endBlock,
+      })
+
+      for (const blockHandler of processor.blockHandlers) {
+        const handlerId = this.blockHandlers.push(blockHandler.handler) - 1
+        contractConfig.intervalConfigs.push({
+          slot: 0,
+          slotInterval: blockHandler.blockInterval,
+          minutes: 0,
+          minutesInterval: blockHandler.timeIntervalInMinutes,
+          handlerId: handlerId,
+        })
+      }
+
+      for (const transactionHandler of processor.transactionHandler) {
+        const handlerId = this.transactionHandlers.push(transactionHandler.handler) - 1
+        contractConfig.transactionConfig.push({
+          handlerId: handlerId,
+          fetchConfig: transactionHandler.fetchConfig,
+        })
+      }
+      config.contractConfigs.push(contractConfig)
+    }
+
     // part 1.b prepare EVM account processors
     for (const processor of AccountProcessorState.INSTANCE.getValues()) {
       const accountConfig = AccountConfig.fromPartial({
@@ -164,7 +203,7 @@ export class EthPlugin extends Plugin {
     }
   }
 
-  supportedHandlers = [HandlerType.ETH_LOG, HandlerType.ETH_BLOCK, HandlerType.ETH_TRACE]
+  supportedHandlers = [HandlerType.ETH_LOG, HandlerType.ETH_BLOCK, HandlerType.ETH_TRACE, HandlerType.ETH_TRANSACTION]
 
   processBinding(request: DataBinding): Promise<ProcessResult> {
     // return Promise.resolve(undefined);
@@ -175,6 +214,8 @@ export class EthPlugin extends Plugin {
         return this.processTrace(request)
       case HandlerType.ETH_BLOCK:
         return this.processBlock(request)
+      case HandlerType.ETH_TRANSACTION:
+        return this.processTransaction(request)
       default:
         throw new ServerError(Status.INVALID_ARGUMENT, 'No handle type registered ' + request.handlerType)
     }
@@ -258,6 +299,27 @@ export class EthPlugin extends Plugin {
           throw new ServerError(
             Status.INTERNAL,
             'error processing block: ' + ethBlock.block?.number + '\n' + errorString(e)
+          )
+        })
+      )
+    }
+    return mergeProcessResults(await Promise.all(promises))
+  }
+
+  async processTransaction(binding: DataBinding): Promise<ProcessResult> {
+    if (!binding.data?.ethTransaction?.transaction) {
+      throw new ServerError(Status.INVALID_ARGUMENT, "transaction can't be null")
+    }
+    const ethTransaction = binding.data.ethTransaction
+
+    const promises: Promise<ProcessResult>[] = []
+
+    for (const handlerId of binding.handlerIds) {
+      promises.push(
+        this.transactionHandlers[handlerId](ethTransaction).catch((e) => {
+          throw new ServerError(
+            Status.INTERNAL,
+            'error processing transaction: ' + JSON.stringify(ethTransaction.transaction) + '\n' + errorString(e)
           )
         })
       )

@@ -1,12 +1,13 @@
-import { BaseContract, DeferredTopicFilter } from 'ethers'
+import { BaseContract, DeferredTopicFilter, TransactionResponseParams } from 'ethers'
 import { BlockParams, Network } from 'ethers/providers'
 
-import { BoundContractView, ContractContext, ContractView } from './context.js'
+import { BoundContractView, ContractContext, ContractView, GlobalContext } from './context.js'
 import {
   AddressType,
   Data_EthBlock,
   Data_EthLog,
   Data_EthTrace,
+  Data_EthTransaction,
   EthFetchConfig,
   HandleInterval,
   ProcessResult,
@@ -18,6 +19,7 @@ import { fixEmptyKey, TypedEvent, TypedCallTrace, formatEthData } from './eth.js
 import * as console from 'console'
 import { getNetworkFromCtxOrNetworkish } from './provider.js'
 import sha3 from 'js-sha3'
+import { ListStateStorage } from '@sentio/runtime'
 
 export interface AddressOrTypeEventFilter extends DeferredTopicFilter {
   addressType?: AddressType
@@ -36,10 +38,15 @@ export class TraceHandler {
   fetchConfig: EthFetchConfig
 }
 
-export class BlockHandlder {
+export class BlockHandler {
   blockInterval?: HandleInterval
   timeIntervalInMinutes?: HandleInterval
   handler: (block: Data_EthBlock) => Promise<ProcessResult>
+}
+
+export class TransactionHandler {
+  handler: (block: Data_EthTransaction) => Promise<ProcessResult>
+  fetchConfig: EthFetchConfig
 }
 
 class BindInternalOptions {
@@ -50,11 +57,115 @@ class BindInternalOptions {
   endBlock?: bigint
 }
 
+export class GlobalProcessorState extends ListStateStorage<GlobalProcessor> {
+  static INSTANCE = new GlobalProcessorState()
+}
+
+export class GlobalProcessor {
+  config: BindInternalOptions
+  blockHandlers: BlockHandler[] = []
+  transactionHandler: TransactionHandler[] = []
+
+  static bind(config: Omit<BindOptions, 'address'>): GlobalProcessor {
+    const processor = new GlobalProcessor(config)
+    GlobalProcessorState.INSTANCE.addValue(processor)
+    return processor
+  }
+
+  constructor(config: Omit<BindOptions, 'address'>) {
+    this.config = {
+      address: '*',
+      name: config.name || 'Global',
+      network: getNetworkFromCtxOrNetworkish(config.network),
+      startBlock: 0n,
+    }
+    if (config.startBlock) {
+      this.config.startBlock = BigInt(config.startBlock)
+    }
+    if (config.endBlock) {
+      this.config.endBlock = BigInt(config.endBlock)
+    }
+  }
+
+  public onBlockInterval(
+    handler: (block: BlockParams, ctx: GlobalContext) => PromiseOrVoid,
+    blockInterval = 250,
+    backfillBlockInterval = 1000
+  ): this {
+    return this.onInterval(handler, undefined, {
+      recentInterval: blockInterval,
+      backfillInterval: backfillBlockInterval,
+    })
+  }
+
+  public onTimeInterval(
+    handler: (block: BlockParams, ctx: GlobalContext) => PromiseOrVoid,
+    timeIntervalInMinutes = 60,
+    backfillTimeIntervalInMinutes = 240
+  ): this {
+    return this.onInterval(
+      handler,
+      { recentInterval: timeIntervalInMinutes, backfillInterval: backfillTimeIntervalInMinutes },
+      undefined
+    )
+  }
+
+  public getChainId(): number {
+    return Number(this.config.network.chainId)
+  }
+
+  public onInterval(
+    handler: (block: BlockParams, ctx: GlobalContext) => PromiseOrVoid,
+    timeInterval: HandleInterval | undefined,
+    blockInterval: HandleInterval | undefined
+  ): this {
+    const chainId = this.getChainId()
+
+    this.blockHandlers.push({
+      handler: async function (data: Data_EthBlock) {
+        const { block } = formatEthData(data)
+
+        if (!block) {
+          throw new ServerError(Status.INVALID_ARGUMENT, 'Block is empty')
+        }
+
+        const ctx = new GlobalContext(chainId, new Date(block.timestamp * 1000), block, undefined, undefined)
+        await handler(block, ctx)
+        return ctx.getProcessResult()
+      },
+      timeIntervalInMinutes: timeInterval,
+      blockInterval: blockInterval,
+    })
+    return this
+  }
+
+  public onTransaction(
+    handler: (transaction: TransactionResponseParams, ctx: GlobalContext) => PromiseOrVoid,
+    fetchConfig?: Partial<EthFetchConfig>
+  ): this {
+    const chainId = this.getChainId()
+    this.transactionHandler.push({
+      handler: async function (data: Data_EthTransaction) {
+        const { trace, block, transaction, transactionReceipt } = formatEthData(data)
+
+        if (!transaction) {
+          throw new ServerError(Status.INVALID_ARGUMENT, 'transaction is empty')
+        }
+        const ctx = new GlobalContext(chainId, data.timestamp, block, undefined, trace, transaction, transactionReceipt)
+        await handler(transaction, ctx)
+        return ctx.getProcessResult()
+      },
+      fetchConfig: EthFetchConfig.fromPartial(fetchConfig || {}),
+    })
+    return this
+  }
+}
+
 export abstract class BaseProcessor<
   TContract extends BaseContract,
   TBoundContractView extends BoundContractView<TContract, ContractView<TContract>>
 > {
-  blockHandlers: BlockHandlder[] = []
+  blockHandlers: BlockHandler[] = []
   eventHandlers: EventsHandler[] = []
   traceHandlers: TraceHandler[] = []
 

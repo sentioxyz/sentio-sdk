@@ -128,6 +128,7 @@ export enum HandlerType {
   ETH_LOG = 1,
   ETH_BLOCK = 2,
   ETH_TRACE = 5,
+  ETH_TRANSACTION = 11,
   SOL_INSTRUCTION = 4,
   APT_EVENT = 6,
   APT_CALL = 7,
@@ -152,6 +153,9 @@ export function handlerTypeFromJSON(object: any): HandlerType {
     case 5:
     case "ETH_TRACE":
       return HandlerType.ETH_TRACE;
+    case 11:
+    case "ETH_TRANSACTION":
+      return HandlerType.ETH_TRANSACTION;
     case 4:
     case "SOL_INSTRUCTION":
       return HandlerType.SOL_INSTRUCTION;
@@ -190,6 +194,8 @@ export function handlerTypeToJSON(object: HandlerType): string {
       return "ETH_BLOCK";
     case HandlerType.ETH_TRACE:
       return "ETH_TRACE";
+    case HandlerType.ETH_TRANSACTION:
+      return "ETH_TRANSACTION";
     case HandlerType.SOL_INSTRUCTION:
       return "SOL_INSTRUCTION";
     case HandlerType.APT_EVENT:
@@ -457,6 +463,7 @@ export interface EthFetchConfig {
   transaction: boolean;
   transactionReceipt: boolean;
   block: boolean;
+  trace: boolean;
 }
 
 export interface TraceHandlerConfig {
@@ -560,6 +567,7 @@ export interface Data_EthTransaction {
   timestamp: Date | undefined;
   transactionReceipt?: { [key: string]: any } | undefined;
   block?: { [key: string]: any } | undefined;
+  trace?: { [key: string]: any } | undefined;
 }
 
 export interface Data_EthTrace {
@@ -2371,7 +2379,7 @@ export const BlockHandlerConfig = {
 };
 
 function createBaseEthFetchConfig(): EthFetchConfig {
-  return { transaction: false, transactionReceipt: false, block: false };
+  return { transaction: false, transactionReceipt: false, block: false, trace: false };
 }
 
 export const EthFetchConfig = {
@@ -2384,6 +2392,9 @@ export const EthFetchConfig = {
     }
     if (message.block === true) {
       writer.uint32(24).bool(message.block);
+    }
+    if (message.trace === true) {
+      writer.uint32(32).bool(message.trace);
     }
     return writer;
   },
@@ -2404,6 +2415,9 @@ export const EthFetchConfig = {
         case 3:
           message.block = reader.bool();
           break;
+        case 4:
+          message.trace = reader.bool();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -2417,6 +2431,7 @@ export const EthFetchConfig = {
       transaction: isSet(object.transaction) ? Boolean(object.transaction) : false,
       transactionReceipt: isSet(object.transactionReceipt) ? Boolean(object.transactionReceipt) : false,
       block: isSet(object.block) ? Boolean(object.block) : false,
+      trace: isSet(object.trace) ? Boolean(object.trace) : false,
     };
   },
 
@@ -2425,6 +2440,7 @@ export const EthFetchConfig = {
     message.transaction !== undefined && (obj.transaction = message.transaction);
     message.transactionReceipt !== undefined && (obj.transactionReceipt = message.transactionReceipt);
     message.block !== undefined && (obj.block = message.block);
+    message.trace !== undefined && (obj.trace = message.trace);
     return obj;
   },
 
@@ -2437,6 +2453,7 @@ export const EthFetchConfig = {
     message.transaction = object.transaction ?? false;
     message.transactionReceipt = object.transactionReceipt ?? false;
     message.block = object.block ?? false;
+    message.trace = object.trace ?? false;
     return message;
   },
 };
@@ -3666,7 +3683,13 @@ export const Data_EthBlock = {
 };
 
 function createBaseData_EthTransaction(): Data_EthTransaction {
-  return { transaction: undefined, timestamp: undefined, transactionReceipt: undefined, block: undefined };
+  return {
+    transaction: undefined,
+    timestamp: undefined,
+    transactionReceipt: undefined,
+    block: undefined,
+    trace: undefined,
+  };
 }
 
 export const Data_EthTransaction = {
@@ -3682,6 +3705,9 @@ export const Data_EthTransaction = {
     }
     if (message.block !== undefined) {
       Struct.encode(Struct.wrap(message.block), writer.uint32(50).fork()).ldelim();
+    }
+    if (message.trace !== undefined) {
+      Struct.encode(Struct.wrap(message.trace), writer.uint32(58).fork()).ldelim();
     }
     return writer;
   },
@@ -3705,6 +3731,9 @@ export const Data_EthTransaction = {
         case 6:
           message.block = Struct.unwrap(Struct.decode(reader, reader.uint32()));
           break;
+        case 7:
+          message.trace = Struct.unwrap(Struct.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -3719,6 +3748,7 @@ export const Data_EthTransaction = {
       timestamp: isSet(object.timestamp) ? fromJsonTimestamp(object.timestamp) : undefined,
       transactionReceipt: isObject(object.transactionReceipt) ? object.transactionReceipt : undefined,
       block: isObject(object.block) ? object.block : undefined,
+      trace: isObject(object.trace) ? object.trace : undefined,
     };
   },
 
@@ -3728,6 +3758,7 @@ export const Data_EthTransaction = {
     message.timestamp !== undefined && (obj.timestamp = message.timestamp.toISOString());
     message.transactionReceipt !== undefined && (obj.transactionReceipt = message.transactionReceipt);
     message.block !== undefined && (obj.block = message.block);
+    message.trace !== undefined && (obj.trace = message.trace);
     return obj;
   },
 
@@ -3741,6 +3772,7 @@ export const Data_EthTransaction = {
     message.timestamp = object.timestamp ?? undefined;
     message.transactionReceipt = object.transactionReceipt ?? undefined;
     message.block = object.block ?? undefined;
+    message.trace = object.trace ?? undefined;
     return message;
   },
 };
