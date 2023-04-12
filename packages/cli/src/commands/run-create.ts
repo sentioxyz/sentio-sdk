@@ -5,8 +5,8 @@ import fs from 'fs-extra'
 import chalk from 'chalk'
 import latestVersion from 'latest-version'
 import url from 'url'
-import { execFile } from 'child_process'
 import process from 'process'
+import { execYarn } from '../execution.js'
 
 export async function runCreate(argv: string[]) {
   const optionDefinitions = [
@@ -140,15 +140,7 @@ export async function runCreate(argv: string[]) {
     if (!options.subproject) {
       console.log(chalk.green('running yarn install for initialization'))
 
-      const child = execFile('yarn', ['install'], { cwd: dstFolder })
-      if (!child.stdout || !child.stderr) {
-        process.exit(1)
-      }
-      child.stdout.pipe(process.stdout)
-      child.stderr.pipe(process.stderr)
-      await new Promise((resolve) => {
-        child.on('close', resolve)
-      })
+      await execYarn(['install'], 'install', { cwd: dstFolder })
     }
   }
 }

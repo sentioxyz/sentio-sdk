@@ -1,7 +1,6 @@
 import chalk from 'chalk'
 import path from 'path'
 import fs from 'fs-extra'
-import { execFile } from 'child_process'
 import * as process from 'process'
 import { getPackageRoot } from '../utils.js'
 import commandLineArgs from 'command-line-args'
@@ -9,6 +8,7 @@ import commandLineUsage from 'command-line-usage'
 import yaml from 'yaml'
 import { YamlContractConfig, YamlProjectConfig } from '../config.js'
 import { getABIFilePath, getABI, writeABIFile } from '../abi.js'
+import { execStep, execYarn } from '../execution.js'
 
 export const buildOptionDefinitions = [
   {
@@ -204,30 +204,5 @@ export async function codegen(genExample: boolean) {
 }
 
 async function installDeps() {
-  await execStep(['yarn', 'install', '--ignore-scripts'], 'Yarn Install')
-}
-
-async function execStep(cmds: string[], stepName: string) {
-  const child = execFile(cmds[0], cmds.splice(1))
-
-  console.log(chalk.blue(stepName + ' begin'))
-
-  if (!child.stdout || !child.stderr) {
-    console.error(chalk.red(stepName + ' failed'))
-    process.exit(1)
-  }
-
-  child.stdout.pipe(process.stdout)
-  child.stderr.pipe(process.stderr)
-
-  await new Promise((resolve) => {
-    child.on('close', resolve)
-  })
-
-  if (child.exitCode) {
-    console.error(chalk.red(stepName + ' failed'))
-    process.exit(child.exitCode)
-  }
-  console.log(chalk.blue(stepName + ' success'))
-  console.log()
+  await execYarn(['install', '--ignore-scripts'], 'Yarn Install')
 }
