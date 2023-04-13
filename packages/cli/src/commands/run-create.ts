@@ -127,8 +127,8 @@ export async function runCreate(argv: string[]) {
       packageJson.name = projectSlug
 
       if (options.subproject) {
-        delete packageJson.dependencies['@sentio/sdk']
-        delete packageJson.devDependencies['@sentio/cli']
+        delete packageJson.dependencies
+        delete packageJson.devDependencies
       }
 
       // Don't add directly to avoid deps issue

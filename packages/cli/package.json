@@ -48,7 +48,7 @@
   },
   "files": [
     "{lib,src,templates}",
-    "!**/*.test.{js,ts}"
+    "!{lib,src}/**/*.test.{js,ts}"
   ],
   "engines": {
     "node": ">=16"
