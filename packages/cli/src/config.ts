@@ -15,7 +15,7 @@ export interface YamlProjectConfig {
   project: string
   host: string
   build: boolean
-  contracts: YamlContractConfig[]
+  contracts?: YamlContractConfig[]
   debug: boolean
 }
 

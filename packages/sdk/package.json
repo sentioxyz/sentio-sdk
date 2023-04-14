@@ -27,7 +27,7 @@
     "@sentio/runtime": "^2.0.0-development",
     "@solana/web3.js": "^1.74.0",
     "@types/prettier": "^2.7.2",
-    "aptos-sdk": "npm:aptos@^1.7.2",
+    "aptos-sdk": "npm:aptos@^1.8.3",
     "bs58": "^5.0.0",
     "chalk": "^5.2.0",
     "csv-parse": "^5.3.0",

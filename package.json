@@ -9,6 +9,7 @@
     "@ls-lint/ls-lint": "^1.11.2",
     "@nrwl/nx-cloud": "^15.3.5",
     "@types/chai": "^4.3.4",
+    "@jest/types": "^29.5.0",
     "@types/jest": "^29.5.0",
     "@types/node": "^18.11.18",
     "@typescript-eslint/eslint-plugin": "^5.58.0",
