@@ -61,6 +61,7 @@ export async function getABI(
     try {
       return {
         abi: await aptosClient.getAccountModules(address),
+        name,
       }
     } catch (e) {
       console.error(baseErrMsg, e)
@@ -71,6 +72,7 @@ export async function getABI(
     try {
       return {
         abi: await suiClient.getNormalizedMoveModulesByPackage({ package: address }),
+        name,
       }
     } catch (e) {
       console.error(baseErrMsg, e)

@@ -6,7 +6,7 @@ import { getPackageRoot } from '../utils.js'
 import commandLineArgs from 'command-line-args'
 import commandLineUsage from 'command-line-usage'
 import yaml from 'yaml'
-import { YamlContractConfig, YamlProjectConfig } from '../config.js'
+import { YamlProjectConfig } from '../config.js'
 import { getABIFilePath, getABI, writeABIFile } from '../abi.js'
 import { execStep, execYarn } from '../execution.js'
 
@@ -130,17 +130,20 @@ import 'mine.js'
 }
 
 export async function codegen(genExample: boolean) {
-  let contractsForUsage: YamlContractConfig[] = []
-  if (genExample) {
-    const processorConfig = yaml.parse(fs.readFileSync('sentio.yaml', 'utf8')) as YamlProjectConfig
-    contractsForUsage = processorConfig.contracts
-  }
+  const processorConfig = yaml.parse(fs.readFileSync('sentio.yaml', 'utf8')) as YamlProjectConfig
+  const contractsForUsage = processorConfig.contracts
+  let previousChain = ''
   for (const contract of contractsForUsage) {
     const outputPath = getABIFilePath(contract.chain, contract.name || contract.address)
     if (fs.existsSync(outputPath)) {
       continue
     }
     console.log('Download Missing ABI specified in sentio.yaml')
+    if (contract.chain === previousChain) {
+      await new Promise((resolve) => setTimeout(resolve, 5000))
+    } else {
+      previousChain = contract.chain
+    }
     const res = await getABI(contract.chain, contract.address, contract.name)
     writeABIFile(res.abi, outputPath)
   }

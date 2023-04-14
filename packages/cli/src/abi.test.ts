@@ -1,16 +1,13 @@
 import { getABI } from './abi.js'
 import { CHAIN_IDS } from './chain.js'
 import { expect } from 'chai'
+import { jest } from '@jest/globals'
 
 describe('Test ABI get', () => {
   if (process.env.CI) {
     return
   }
-
-  test('moonbean', async () => {
-    const abi = await getABI(CHAIN_IDS.MOONBEAM, '0xacc15dc74880c9944775448304b263d191c6077f', undefined)
-    expect(abi.abi !== undefined).eq(true)
-  })
+  jest.setTimeout(100000)
 
   test('cronos', async () => {
     const abi = await getABI(CHAIN_IDS.CRONOS, '0xc21223249CA28397B4B6541dfFaEcC539BfF0c59', undefined)

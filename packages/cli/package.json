@@ -9,14 +9,15 @@
     "build": "yarn compile",
     "postbuild": "../../scripts/link-bin.sh",
     "cli": "ts-node-esm src/cli.ts",
+    "test": "NODE_OPTIONS=--experimental-vm-modules yarn jest",
     "pub": "yarn build && yarn publish --no-git-tag-version"
   },
   "dependencies": {
-    "@jest/types": "^29.4.1",
+    "@jest/types": "^29.5.0",
+    "@types/jest": "^29.5.0",
     "@mysten/sui.js": "npm:@sentio/sui.js@^0.32.0-patch.1",
-    "@types/jest": "^29.0.0",
     "@types/node": "^18.11.18",
-    "aptos-sdk": "npm:aptos@^1.7.2",
+    "aptos-sdk": "npm:aptos@^1.8.3",
     "chalk": "^5.2.0",
     "command-line-args": "^5.2.1",
     "command-line-usage": "^7.0.1",
@@ -36,8 +37,7 @@
     "@types/command-line-args": "^5.2.0",
     "@types/command-line-usage": "^5.0.2",
     "@types/express": "^4.17.14",
-    "@types/fs-extra": "^11.0.1",
-    "@types/node-fetch": "^3.0.3"
+    "@types/fs-extra": "^11.0.1"
   },
   "bin": {
     "sentio": "./lib/cli.js"
