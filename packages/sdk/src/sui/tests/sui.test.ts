@@ -36,7 +36,7 @@ describe('Test Sui Example', () => {
   })
 
   test('Check event dispatch', async () => {
-    const res = await service.sui.testEvent(testData as any, testData.events[0], SuiNetwork.TEST_NET)
+    const res = await service.sui.testEvent(testData as any, SuiNetwork.TEST_NET)
     expect(res.result?.counters).length(1)
     expect(res.result?.gauges).length(0)
   })

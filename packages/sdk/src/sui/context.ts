@@ -10,6 +10,7 @@ export class SuiContext extends BaseContext {
   timestamp: Date
   slot: bigint
   transaction: SuiTransactionBlockResponse
+  eventIndex: number
 
   constructor(
     moduleName: string,
@@ -17,7 +18,8 @@ export class SuiContext extends BaseContext {
     address: string,
     timestamp: Date,
     slot: bigint,
-    transaction?: SuiTransactionBlockResponse
+    transaction: SuiTransactionBlockResponse,
+    eventIndex: number
   ) {
     super()
     this.address = address.toLowerCase()
@@ -25,6 +27,7 @@ export class SuiContext extends BaseContext {
     this.moduleName = moduleName
     this.timestamp = timestamp
     this.slot = slot
+    this.eventIndex = eventIndex
     if (transaction) {
       this.transaction = transaction
     }

@@ -1,4 +1,4 @@
-import { SuiEvent, SuiTransactionBlockResponse, MoveCallSuiTransaction } from '@mysten/sui.js'
+import { SuiTransactionBlockResponse, MoveCallSuiTransaction } from '@mysten/sui.js'
 import { DataBinding, HandlerType } from '@sentio/protos'
 import { getChainId } from '../sui/network.js'
 import { TestProcessorServer } from './test-processor-server.js'
@@ -66,19 +66,8 @@ export class SuiFacet {
     return undefined
   }
 
-  testEvent(
-    transaction: SuiTransactionBlockResponse,
-    event: number | SuiEvent,
-    network: SuiNetwork = SuiNetwork.MAIN_NET
-  ) {
-    if (typeof event !== 'number') {
-      const transaction2: SuiTransactionBlockResponse = {} as any
-      Object.assign(transaction2, transaction)
-      transaction = transaction2
-      transaction.events = [event]
-      event = 0
-    }
-    const binding = this.buildEventBinding(transaction, event, network)
+  testEvent(transaction: SuiTransactionBlockResponse, network: SuiNetwork = SuiNetwork.MAIN_NET) {
+    const binding = this.buildEventBinding(transaction, network)
     if (!binding) {
       throw Error('Invalid test event: ' + JSON.stringify(transaction))
     }
@@ -87,14 +76,9 @@ export class SuiFacet {
 
   private buildEventBinding(
     transaction: SuiTransactionBlockResponse,
-    eventIdx: number,
     network: SuiNetwork = SuiNetwork.MAIN_NET
   ): DataBinding | undefined {
     // const allEvents = new Set(transaction.events.map(e => e.type))
-    const event = transaction.events?.[eventIdx]
-    if (!event) {
-      throw Error('Invaild test transaction, no event located')
-    }
 
     for (const config of this.server.contractConfigs) {
       if (config.contract?.chainId !== getChainId(network)) {
@@ -102,18 +86,19 @@ export class SuiFacet {
       }
       for (const eventConfig of config.moveEventConfigs) {
         for (const eventFilter of eventConfig.filters) {
-          if (config.contract.address + '::' + eventFilter.type === parseMoveType(event.type).qname) {
-            transaction.events = [event]
-            return {
-              data: {
-                suiEvent: {
-                  transaction,
-                  timestamp: new Date(transaction.timestampMs || 0),
-                  slot: 10000n,
+          for (const event of transaction.events || []) {
+            if (config.contract.address + '::' + eventFilter.type === parseMoveType(event.type).qname) {
+              return {
+                data: {
+                  suiEvent: {
+                    transaction,
+                    timestamp: new Date(transaction.timestampMs || 0),
+                    slot: 10000n,
+                  },
                 },
-              },
-              handlerIds: [eventConfig.handlerId],
-              handlerType: HandlerType.SUI_EVENT,
+                handlerIds: [eventConfig.handlerId],
+                handlerType: HandlerType.SUI_EVENT,
+              }
             }
           }
         }

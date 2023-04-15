@@ -161,7 +161,7 @@ export async function codegen(genExample: boolean) {
     }
     fs.emptyDirSync(output)
     // @ts-ignore dynamic import
-    await codegen.codegen(input, output, contractsForUsage)
+    await codegen.codegen(input, output, genExample ? contractsForUsage : [])
   } catch (e) {
     console.error('code gen error', e)
   }

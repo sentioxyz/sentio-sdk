@@ -54,9 +54,9 @@ export class AptosBaseProcessor {
   public onTransaction(
     handler: (transaction: Transaction_UserTransaction, ctx: AptosContext) => void,
     includedFailed = false,
-    fetchConfig?: MoveFetchConfig
+    fetchConfig?: Partial<MoveFetchConfig>
   ): this {
-    const _fetchConfig = fetchConfig || MoveFetchConfig.fromPartial({})
+    const _fetchConfig = MoveFetchConfig.fromPartial(fetchConfig || {})
 
     // const address = this.config.address
     // const moduleName = this.moduleName
@@ -87,10 +87,10 @@ export class AptosBaseProcessor {
   public onMoveEvent(
     handler: (event: EventInstance, ctx: AptosContext) => void,
     filter: EventFilter | EventFilter[],
-    fetchConfig?: MoveFetchConfig
+    fetchConfig?: Partial<MoveFetchConfig>
   ): this {
     let _filters: EventFilter[] = []
-    const _fetchConfig = fetchConfig || MoveFetchConfig.fromPartial({})
+    const _fetchConfig = MoveFetchConfig.fromPartial(fetchConfig || {})
 
     if (Array.isArray(filter)) {
       _filters = filter
@@ -98,11 +98,10 @@ export class AptosBaseProcessor {
       _filters.push(filter)
     }
 
-    const address = this.config.address
     // const moduleName = this.moduleName
 
     const processor = this
-    const allEventType = new Set(_filters.map((f) => address + '::' + f.type))
+    const allEventType = new Set(_filters.map((f) => processor.config.address + '::' + f.type))
 
     this.eventHandlers.push({
       handler: async function (data) {
@@ -114,11 +113,8 @@ export class AptosBaseProcessor {
           throw new ServerError(Status.INVALID_ARGUMENT, 'no event in the transactions')
         }
 
-        const events = txn.events
-        txn.events = []
         const processResults = []
-
-        for (const [idx, evt] of events.entries()) {
+        for (const [idx, evt] of txn.events.entries()) {
           const typeQname = parseMoveType(evt.type).qname
           if (!allEventType.has(typeQname)) {
             continue

@@ -7,7 +7,7 @@ import {
   MoveOnIntervalConfig_OwnerType,
   ProcessResult,
 } from '@sentio/protos'
-import { ListStateStorage } from '@sentio/runtime'
+import { ListStateStorage, mergeProcessResults } from '@sentio/runtime'
 import { getChainId, SuiNetwork } from './network.js'
 import { ServerError, Status } from 'nice-grpc'
 import { SuiContext, SuiObjectsContext } from './context.js'
@@ -19,7 +19,7 @@ import {
   SuiMoveObject,
   SuiTransactionBlockResponse,
 } from '@mysten/sui.js'
-import { CallHandler, EventFilter, EventHandler, FunctionNameAndCallFilter } from '../move/index.js'
+import { CallHandler, EventFilter, EventHandler, FunctionNameAndCallFilter, parseMoveType } from '../move/index.js'
 import { getMoveCalls } from './utils.js'
 import { defaultMoveCoder } from './move-coder.js'
 // import { dynamic_field } from './builtin/0x2.js'
@@ -81,6 +81,7 @@ export class SuiBaseProcessor {
     // const moduleName = this.moduleName
 
     const processor = this
+    const allEventType = new Set(_filters.map((f) => processor.config.address + '::' + f.type))
 
     this.eventHandlers.push({
       handler: async function (data) {
@@ -92,26 +93,29 @@ export class SuiBaseProcessor {
           throw new ServerError(Status.INVALID_ARGUMENT, 'no event in the transactions')
         }
 
-        const ctx = new SuiContext(
-          processor.moduleName,
-          processor.config.network,
-          processor.config.address,
-          data.timestamp || new Date(0),
-          data.slot,
-          txn
-        )
+        const processResults = []
+        for (const [idx, evt] of (txn.events as SuiEvent[]).entries()) {
+          const typeQname = parseMoveType(evt.type).qname
+          if (!allEventType.has(typeQname)) {
+            continue
+          }
 
-        const events = txn.events
-        txn.events = []
-        for (const evt of events) {
-          // if ('moveEvent' in evt) {
-          //   const eventInstance = evt.moveEvent as SuiEvent
+          const ctx = new SuiContext(
+            processor.moduleName,
+            processor.config.network,
+            processor.config.address,
+            data.timestamp || new Date(0),
+            data.slot,
+            txn,
+            idx
+          )
+
           const decoded = defaultMoveCoder().decodeEvent<any>(evt)
           await handler(decoded || evt, ctx)
-          // }
+          processResults.push(ctx.getProcessResult())
         }
 
-        return ctx.getProcessResult()
+        return mergeProcessResults(processResults)
       },
       filters: _filters,
       fetchConfig: _fetchConfig,
@@ -150,7 +154,8 @@ export class SuiBaseProcessor {
           processor.config.address,
           data.timestamp || new Date(0),
           data.slot,
-          tx
+          tx,
+          0
         )
         if (tx) {
           const calls: MoveCallSuiTransaction[] = getMoveCalls(tx)

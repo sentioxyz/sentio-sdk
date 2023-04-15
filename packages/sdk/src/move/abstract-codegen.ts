@@ -359,7 +359,7 @@ export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
     const source = `
   onEvent${struct.name}(func: (event: ${moduleName}.${normalizeToJSName(struct.name)}Instance, ctx: ${
       this.PREFIX
-    }Context) => void, fetchConfig?: MoveFetchConfig): ${moduleName} {
+    }Context) => void, fetchConfig?: Partial<MoveFetchConfig>): ${moduleName} {
     this.onMoveEvent(func, {
       type: '${module.name}::${struct.name}'
     },
