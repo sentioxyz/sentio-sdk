@@ -5,9 +5,9 @@ import {
   SuiCallArg,
   SuiEvent,
   SuiMoveNormalizedModule,
+  SuiMoveNormalizedModules,
   SuiMoveObject,
   SuiRawData,
-  SuiMoveNormalizedModules,
 } from '@mysten/sui.js'
 import { toInternalModule } from './move-types.js'
 import { SPLITTER, TypeDescriptor } from '../move/index.js'
@@ -104,8 +104,12 @@ export class MoveCoder extends AbstractMoveCoder<SuiNetwork, SuiMoveNormalizedMo
   }
 }
 
-export const MOVE_CODER = new MoveCoder(SuiNetwork.MAIN_NET)
+const MOVE_CODER = new MoveCoder(SuiNetwork.MAIN_NET)
+const TESTNET_MOVE_CODER = new MoveCoder(SuiNetwork.TEST_NET)
 
-export function defaultMoveCoder(): MoveCoder {
-  return MOVE_CODER
+export function defaultMoveCoder(network: SuiNetwork = SuiNetwork.MAIN_NET): MoveCoder {
+  if (network == SuiNetwork.MAIN_NET) {
+    return MOVE_CODER
+  }
+  return TESTNET_MOVE_CODER
 }

@@ -2,6 +2,7 @@ import { RecordMetaData } from '@sentio/protos'
 import { type Labels, BaseContext, normalizeLabels } from '@sentio/sdk'
 import { Transaction_UserTransaction } from './move-types.js'
 import { AptosNetwork, getChainId } from './network.js'
+import { defaultMoveCoder, MoveCoder } from './move-coder.js'
 
 export class AptosContext extends BaseContext {
   address: string
@@ -10,6 +11,7 @@ export class AptosContext extends BaseContext {
   version: bigint
   transaction: Transaction_UserTransaction
   eventIndex: number
+  coder: MoveCoder
 
   constructor(
     moduleName: string,
@@ -25,6 +27,7 @@ export class AptosContext extends BaseContext {
     this.moduleName = moduleName
     this.version = version
     this.eventIndex = eventIndex
+    this.coder = defaultMoveCoder(network)
     if (transaction) {
       this.transaction = transaction
     }
@@ -54,6 +57,7 @@ export class AptosResourcesContext extends BaseContext {
   network: AptosNetwork
   version: bigint
   timestampInMicros: number
+  coder: MoveCoder
 
   constructor(network: AptosNetwork, address: string, version: bigint, timestampInMicros: number) {
     super()
@@ -61,6 +65,7 @@ export class AptosResourcesContext extends BaseContext {
     this.network = network
     this.version = version
     this.timestampInMicros = timestampInMicros
+    this.coder = defaultMoveCoder(network)
   }
 
   getChainId(): string {

@@ -1,6 +1,6 @@
 import { MoveResource, Transaction_UserTransaction, TransactionPayload_EntryFunctionPayload } from './move-types.js'
 
-import { MOVE_CODER, MoveCoder } from './move-coder.js'
+import { defaultMoveCoder, MoveCoder } from './move-coder.js'
 import { AptosBindOptions, AptosNetwork, getChainId } from './network.js'
 import { AptosContext, AptosResourcesContext } from './context.js'
 import { EventInstance } from './models.js'
@@ -39,12 +39,14 @@ export class AptosBaseProcessor {
   config: IndexConfigure
   eventHandlers: EventHandler<Data_AptEvent>[] = []
   callHandlers: CallHandler<Data_AptCall>[] = []
+  coder: MoveCoder
 
   constructor(moduleName: string, options: AptosBindOptions) {
     this.moduleName = moduleName
     this.config = configure(options)
     AptosProcessorState.INSTANCE.addValue(this)
-    this.loadTypes(MOVE_CODER)
+    this.coder = defaultMoveCoder(this.config.network)
+    // this.loadTypes(this.coder)
   }
 
   // getABI(): MoveModule | undefined {
@@ -129,7 +131,7 @@ export class AptosBaseProcessor {
             idx
           )
           const eventInstance = evt as EventInstance
-          const decoded = MOVE_CODER.decodeEvent<any>(eventInstance)
+          const decoded = processor.coder.decodeEvent<any>(eventInstance)
           await handler(decoded || eventInstance, ctx)
           processResults.push(ctx.getProcessResult())
         }
@@ -177,7 +179,7 @@ export class AptosBaseProcessor {
         )
         if (tx) {
           const payload = tx.payload as TransactionPayload_EntryFunctionPayload
-          const decoded = MOVE_CODER.decodeFunctionPayload(payload)
+          const decoded = processor.coder.decodeFunctionPayload(payload)
           await handler(decoded, ctx)
         }
         return ctx.getProcessResult()
@@ -192,17 +194,17 @@ export class AptosBaseProcessor {
     return getChainId(this.config.network)
   }
 
-  loadTypes(registry: MoveCoder) {
-    if (registry.contains(this.config.address, this.moduleName)) {
-      return
-    }
-    this.loadTypesInternal(registry)
-  }
-
-  protected loadTypesInternal(registry: MoveCoder) {
-    // should be override by subclass
-    console.log('')
-  }
+  // loadTypes(registry: MoveCoder) {
+  //   if (registry.contains(this.config.address, this.moduleName)) {
+  //     return
+  //   }
+  //   this.loadTypesInternal(registry)
+  // }
+  //
+  // protected loadTypesInternal(registry: MoveCoder) {
+  //   // should be override by subclass
+  //   console.log('')
+  // }
 }
 
 export class AptosAccountProcessorState extends ListStateStorage<AptosResourcesProcessor> {

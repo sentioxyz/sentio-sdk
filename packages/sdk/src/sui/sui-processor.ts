@@ -21,7 +21,7 @@ import {
 } from '@mysten/sui.js'
 import { CallHandler, EventFilter, EventHandler, FunctionNameAndCallFilter, parseMoveType } from '../move/index.js'
 import { getMoveCalls } from './utils.js'
-import { defaultMoveCoder } from './move-coder.js'
+import { defaultMoveCoder, MoveCoder } from './move-coder.js'
 // import { dynamic_field } from './builtin/0x2.js'
 
 class IndexConfigure {
@@ -52,11 +52,13 @@ export class SuiBaseProcessor {
 
   eventHandlers: EventHandler<Data_SuiEvent>[] = []
   callHandlers: CallHandler<Data_SuiCall>[] = []
+  coder: MoveCoder
 
   constructor(name: string, options: SuiBindOptions) {
     this.moduleName = name
     this.config = configure(options)
     SuiProcessorState.INSTANCE.addValue(this)
+    this.coder = defaultMoveCoder(this.config.network)
   }
 
   getChainId(): string {
@@ -110,7 +112,7 @@ export class SuiBaseProcessor {
             idx
           )
 
-          const decoded = defaultMoveCoder().decodeEvent<any>(evt)
+          const decoded = processor.coder.decodeEvent<any>(evt)
           await handler(decoded || evt, ctx)
           processResults.push(ctx.getProcessResult())
         }
@@ -169,7 +171,7 @@ export class SuiBaseProcessor {
           const programmableTx = getProgrammableTransaction(txKind)
 
           const payload = calls[0]
-          const decoded = defaultMoveCoder().decodeFunctionPayload(payload, programmableTx?.inputs || [])
+          const decoded = processor.coder.decodeFunctionPayload(payload, programmableTx?.inputs || [])
           await handler(decoded, ctx)
         }
         return ctx.getProcessResult()

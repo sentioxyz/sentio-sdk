@@ -2,6 +2,7 @@ import { RecordMetaData } from '@sentio/protos'
 import { type Labels, BaseContext, normalizeLabels } from '../index.js'
 import { SuiNetwork, getChainId } from './network.js'
 import { SuiTransactionBlockResponse } from '@mysten/sui.js'
+import { MoveCoder, defaultMoveCoder } from './move-coder.js'
 
 export class SuiContext extends BaseContext {
   address: string
@@ -11,6 +12,7 @@ export class SuiContext extends BaseContext {
   slot: bigint
   transaction: SuiTransactionBlockResponse
   eventIndex: number
+  coder: MoveCoder
 
   constructor(
     moduleName: string,
@@ -28,6 +30,7 @@ export class SuiContext extends BaseContext {
     this.timestamp = timestamp
     this.slot = slot
     this.eventIndex = eventIndex
+    this.coder = defaultMoveCoder(network)
     if (transaction) {
       this.transaction = transaction
     }
