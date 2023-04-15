@@ -2,7 +2,7 @@ import { Transaction_UserTransaction, TransactionPayload_EntryFunctionPayload } 
 import { DataBinding, HandlerType } from '@sentio/protos'
 import { getChainId } from '../aptos/network.js'
 import { TestProcessorServer } from './test-processor-server.js'
-import { AptosNetwork, Event } from '@sentio/sdk/aptos'
+import { AptosNetwork } from '@sentio/sdk/aptos'
 import { parseMoveType } from '../move/types.js'
 
 export class AptosFacet {
@@ -57,19 +57,8 @@ export class AptosFacet {
     return undefined
   }
 
-  testEvent(
-    transaction: Transaction_UserTransaction,
-    event: number | Event,
-    network: AptosNetwork = AptosNetwork.MAIN_NET
-  ) {
-    if (typeof event !== 'number') {
-      const transaction2: Transaction_UserTransaction = {} as any
-      Object.assign(transaction2, transaction)
-      transaction = transaction2
-      transaction.events = [event]
-      event = 0
-    }
-    const binding = this.buildEventBinding(transaction, event, network)
+  testEvent(transaction: Transaction_UserTransaction, network: AptosNetwork = AptosNetwork.MAIN_NET) {
+    const binding = this.buildEventBinding(transaction, network)
     if (!binding) {
       throw Error('Invalid test event: ' + JSON.stringify(transaction))
     }
@@ -78,7 +67,6 @@ export class AptosFacet {
 
   private buildEventBinding(
     transaction: Transaction_UserTransaction,
-    eventIdx: number,
     network: AptosNetwork = AptosNetwork.MAIN_NET
   ): DataBinding | undefined {
     // const allEvents = new Set(transaction.events.map(e => e.type))
@@ -88,19 +76,17 @@ export class AptosFacet {
       }
       for (const eventConfig of config.moveEventConfigs) {
         for (const eventFilter of eventConfig.filters) {
-          if (
-            config.contract.address + '::' + eventFilter.type ===
-            parseMoveType(transaction.events[eventIdx].type).qname
-          ) {
-            transaction.events = [transaction.events[eventIdx]]
-            return {
-              data: {
-                aptEvent: {
-                  transaction,
+          for (const event of transaction.events) {
+            if (config.contract.address + '::' + eventFilter.type === parseMoveType(event.type).qname) {
+              return {
+                data: {
+                  aptEvent: {
+                    transaction,
+                  },
                 },
-              },
-              handlerIds: [eventConfig.handlerId],
-              handlerType: HandlerType.APT_EVENT,
+                handlerIds: [eventConfig.handlerId],
+                handlerType: HandlerType.APT_EVENT,
+              }
             }
           }
         }

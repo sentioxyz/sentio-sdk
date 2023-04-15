@@ -4,7 +4,7 @@ import { MOVE_CODER, MoveCoder } from './move-coder.js'
 import { AptosBindOptions, AptosNetwork, getChainId } from './network.js'
 import { AptosContext, AptosResourcesContext } from './context.js'
 import { EventInstance } from './models.js'
-import { ListStateStorage } from '@sentio/runtime'
+import { ListStateStorage, mergeProcessResults } from '@sentio/runtime'
 import {
   MoveFetchConfig,
   Data_AptResource,
@@ -14,7 +14,7 @@ import {
   Data_AptCall,
 } from '@sentio/protos'
 import { ServerError, Status } from 'nice-grpc'
-import { CallHandler, EventFilter, EventHandler, FunctionNameAndCallFilter } from '../move/index.js'
+import { CallHandler, EventFilter, EventHandler, FunctionNameAndCallFilter, parseMoveType } from '../move/index.js'
 
 type IndexConfigure = {
   address: string
@@ -72,7 +72,8 @@ export class AptosBaseProcessor {
           processor.config.network,
           processor.config.address,
           BigInt(data.transaction.version),
-          call
+          call,
+          0
         )
         await handler(call, ctx)
         return ctx.getProcessResult()
@@ -97,10 +98,11 @@ export class AptosBaseProcessor {
       _filters.push(filter)
     }
 
-    // const address = this.config.address
+    const address = this.config.address
     // const moduleName = this.moduleName
 
     const processor = this
+    const allEventType = new Set(_filters.map((f) => address + '::' + f.type))
 
     this.eventHandlers.push({
       handler: async function (data) {
@@ -112,23 +114,31 @@ export class AptosBaseProcessor {
           throw new ServerError(Status.INVALID_ARGUMENT, 'no event in the transactions')
         }
 
-        const ctx = new AptosContext(
-          processor.moduleName,
-          processor.config.network,
-          processor.config.address,
-          BigInt(txn.version),
-          txn
-        )
-
         const events = txn.events
         txn.events = []
-        for (const evt of events) {
+        const processResults = []
+
+        for (const [idx, evt] of events.entries()) {
+          const typeQname = parseMoveType(evt.type).qname
+          if (!allEventType.has(typeQname)) {
+            continue
+          }
+
+          const ctx = new AptosContext(
+            processor.moduleName,
+            processor.config.network,
+            processor.config.address,
+            BigInt(txn.version),
+            txn,
+            idx
+          )
           const eventInstance = evt as EventInstance
           const decoded = MOVE_CODER.decodeEvent<any>(eventInstance)
           await handler(decoded || eventInstance, ctx)
+          processResults.push(ctx.getProcessResult())
         }
 
-        return ctx.getProcessResult()
+        return mergeProcessResults(processResults)
       },
       filters: _filters,
       fetchConfig: _fetchConfig,
@@ -139,10 +149,10 @@ export class AptosBaseProcessor {
   public onEntryFunctionCall(
     handler: (call: TransactionPayload_EntryFunctionPayload, ctx: AptosContext) => void,
     filter: FunctionNameAndCallFilter | FunctionNameAndCallFilter[],
-    fetchConfig?: MoveFetchConfig
+    fetchConfig?: Partial<MoveFetchConfig>
   ): this {
     let _filters: FunctionNameAndCallFilter[] = []
-    const _fetchConfig = fetchConfig || MoveFetchConfig.fromPartial({})
+    const _fetchConfig = MoveFetchConfig.fromPartial(fetchConfig || {})
 
     if (Array.isArray(filter)) {
       _filters = filter
@@ -166,7 +176,8 @@ export class AptosBaseProcessor {
           processor.config.network,
           processor.config.address,
           BigInt(tx.version),
-          tx
+          tx,
+          0
         )
         if (tx) {
           const payload = tx.payload as TransactionPayload_EntryFunctionPayload

@@ -335,7 +335,7 @@ export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
 
     const camelFuncName = upperFirst(camelCase(func.name))
     const source = `
-  onEntry${camelFuncName}(func: (call: ${moduleName}.${camelFuncName}Payload, ctx: ${this.PREFIX}Context) => void, filter?: CallFilter, fetchConfig?: MoveFetchConfig): ${moduleName} {
+  onEntry${camelFuncName}(func: (call: ${moduleName}.${camelFuncName}Payload, ctx: ${this.PREFIX}Context) => void, filter?: CallFilter, fetchConfig?: Partial<MoveFetchConfig>): ${moduleName} {
     this.onEntryFunctionCall(func, {
       ...filter,
       function: '${module.name}::${func.name}'

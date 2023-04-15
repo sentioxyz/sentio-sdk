@@ -45,7 +45,7 @@ describe('Test Aptos Example', () => {
   })
 
   test('Check souffl3 event dispatch', async () => {
-    const res = await service.aptos.testEvent(testData as any, testData.events.length - 1)
+    const res = await service.aptos.testEvent(testData as any)
     expect(res.result?.counters).length(1)
     expect(res.result?.gauges).length(0)
     expect(res.result?.counters[0].metadata?.blockNumber).equal(18483034n)
@@ -53,13 +53,15 @@ describe('Test Aptos Example', () => {
   })
 
   test('Check token deposit event dispatch', async () => {
-    const res = await service.aptos.testEvent(testData as any, tokenTestData)
+    testData.events = [tokenTestData]
+    const res = await service.aptos.testEvent(testData as any)
     expect(firstCounterValue(res.result, 'deposit')).equal(1n)
     expect(firstGaugeValue(res.result, 'version')).equal(0n)
   })
 
   test('Check create poposal event dispatch', async () => {
-    const res = await service.aptos.testEvent(testData as any, createProposalData)
+    testData.events = [createProposalData as any]
+    const res = await service.aptos.testEvent(testData as any)
     expect(firstGaugeValue(res.result, 'size')).equal(2)
   })
 
@@ -256,6 +258,7 @@ const tokenTestData = {
 }
 
 const createProposalData = {
+  version: '1',
   guid: {
     creation_number: '5',
     account_address: '0x1',

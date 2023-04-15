@@ -255,6 +255,7 @@ message InstructionHandlerConfig {
 
 message MoveFetchConfig {
   bool resource_changes = 1;
+  bool all_events = 2;
 }
 
 message MoveEventHandlerConfig {

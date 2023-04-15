@@ -9,19 +9,22 @@ export class AptosContext extends BaseContext {
   moduleName: string
   version: bigint
   transaction: Transaction_UserTransaction
+  eventIndex: number
 
   constructor(
     moduleName: string,
     network: AptosNetwork,
     address: string,
     version: bigint,
-    transaction?: Transaction_UserTransaction
+    transaction: Transaction_UserTransaction,
+    eventIndex: number
   ) {
     super()
     this.address = address.toLowerCase()
     this.network = network
     this.moduleName = moduleName
     this.version = version
+    this.eventIndex = eventIndex
     if (transaction) {
       this.transaction = transaction
     }
@@ -38,7 +41,7 @@ export class AptosContext extends BaseContext {
       blockNumber: this.version,
       transactionIndex: 0,
       transactionHash: this.transaction?.hash || '', // TODO
-      logIndex: 0,
+      logIndex: this.eventIndex,
       chainId: this.getChainId(),
       name: name,
       labels: normalizeLabels(labels),

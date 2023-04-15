@@ -66,10 +66,10 @@ export class SuiBaseProcessor {
   public onMoveEvent(
     handler: (event: SuiEvent, ctx: SuiContext) => void,
     filter: EventFilter | EventFilter[],
-    fetchConfig?: MoveFetchConfig
+    fetchConfig?: Partial<MoveFetchConfig>
   ): SuiBaseProcessor {
     let _filters: EventFilter[] = []
-    const _fetchConfig = fetchConfig || MoveFetchConfig.fromPartial({})
+    const _fetchConfig = MoveFetchConfig.fromPartial(fetchConfig || {})
 
     if (Array.isArray(filter)) {
       _filters = filter
@@ -122,10 +122,10 @@ export class SuiBaseProcessor {
   public onEntryFunctionCall(
     handler: (call: MoveCallSuiTransaction, ctx: SuiContext) => void,
     filter: FunctionNameAndCallFilter | FunctionNameAndCallFilter[],
-    fetchConfig?: MoveFetchConfig
+    fetchConfig?: Partial<MoveFetchConfig>
   ): SuiBaseProcessor {
     let _filters: FunctionNameAndCallFilter[] = []
-    const _fetchConfig = fetchConfig || MoveFetchConfig.fromPartial({})
+    const _fetchConfig = MoveFetchConfig.fromPartial(fetchConfig || {})
 
     if (Array.isArray(filter)) {
       _filters = filter

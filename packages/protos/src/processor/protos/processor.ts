@@ -497,6 +497,7 @@ export interface InstructionHandlerConfig {
 
 export interface MoveFetchConfig {
   resourceChanges: boolean;
+  allEvents: boolean;
 }
 
 export interface MoveEventHandlerConfig {
@@ -2823,13 +2824,16 @@ export const InstructionHandlerConfig = {
 };
 
 function createBaseMoveFetchConfig(): MoveFetchConfig {
-  return { resourceChanges: false };
+  return { resourceChanges: false, allEvents: false };
 }
 
 export const MoveFetchConfig = {
   encode(message: MoveFetchConfig, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.resourceChanges === true) {
       writer.uint32(8).bool(message.resourceChanges);
+    }
+    if (message.allEvents === true) {
+      writer.uint32(16).bool(message.allEvents);
     }
     return writer;
   },
@@ -2844,6 +2848,9 @@ export const MoveFetchConfig = {
         case 1:
           message.resourceChanges = reader.bool();
           break;
+        case 2:
+          message.allEvents = reader.bool();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -2853,12 +2860,16 @@ export const MoveFetchConfig = {
   },
 
   fromJSON(object: any): MoveFetchConfig {
-    return { resourceChanges: isSet(object.resourceChanges) ? Boolean(object.resourceChanges) : false };
+    return {
+      resourceChanges: isSet(object.resourceChanges) ? Boolean(object.resourceChanges) : false,
+      allEvents: isSet(object.allEvents) ? Boolean(object.allEvents) : false,
+    };
   },
 
   toJSON(message: MoveFetchConfig): unknown {
     const obj: any = {};
     message.resourceChanges !== undefined && (obj.resourceChanges = message.resourceChanges);
+    message.allEvents !== undefined && (obj.allEvents = message.allEvents);
     return obj;
   },
 
@@ -2869,6 +2880,7 @@ export const MoveFetchConfig = {
   fromPartial(object: DeepPartial<MoveFetchConfig>): MoveFetchConfig {
     const message = createBaseMoveFetchConfig();
     message.resourceChanges = object.resourceChanges ?? false;
+    message.allEvents = object.allEvents ?? false;
     return message;
   },
 };
