@@ -1,14 +1,13 @@
-import { Connection, JsonRpcProvider, SuiMoveNormalizedModules } from '@mysten/sui.js'
+import { SuiMoveNormalizedModules } from '@mysten/sui.js'
 
 import { SuiNetwork } from '../network.js'
 import * as fs from 'fs'
 import chalk from 'chalk'
 import { InternalMoveModule, InternalMoveStruct } from '../../move/internal-models.js'
 import { AbstractCodegen } from '../../move/abstract-codegen.js'
-import { toInternalModule } from '../move-types.js'
-import { moduleQname, SPLITTER, structQname, TypeDescriptor } from '../../move/index.js'
-import { getMeaningfulFunctionParams } from '../utils.js'
+import { structQname } from '../../move/index.js'
 import { join } from 'path'
+import { SuiChainAdapter } from '../sui-chain-adapter.js'
 
 export async function codegen(abisDir: string, outDir = join('src', 'types', 'sui'), genExample = false) {
   if (!fs.existsSync(abisDir)) {
@@ -17,18 +16,6 @@ export async function codegen(abisDir: string, outDir = join('src', 'types', 'su
   const gen = new SuiCodegen()
   const numFiles = await gen.generate(abisDir, outDir)
   console.log(chalk.green(`Generated ${numFiles} for Sui`))
-}
-
-function getRpcEndpoint(network: SuiNetwork): string {
-  switch (network) {
-    case SuiNetwork.TEST_NET:
-      return 'https://fullnode.testnet.sui.io/'
-  }
-  return 'https://fullnode.mainnet.sui.io/'
-}
-
-function getRpcClient(network: SuiNetwork): JsonRpcProvider {
-  return new JsonRpcProvider(new Connection({ fullnode: getRpcEndpoint(network) }))
 }
 
 class SuiCodegen extends AbstractCodegen<SuiMoveNormalizedModules, SuiNetwork> {
@@ -40,30 +27,8 @@ class SuiCodegen extends AbstractCodegen<SuiMoveNormalizedModules, SuiNetwork> {
   // GENERATE_ON_ENTRY = true
   PAYLOAD_OPTIONAL = true
 
-  async fetchModules(account: string, network: SuiNetwork): Promise<SuiMoveNormalizedModules> {
-    const client = getRpcClient(network)
-    return await client.getNormalizedMoveModulesByPackage({ package: account })
-  }
-
-  getMeaningfulFunctionParams(params: TypeDescriptor[]): TypeDescriptor[] {
-    return getMeaningfulFunctionParams(params)
-  }
-
-  toInternalModules(modules: SuiMoveNormalizedModules): InternalMoveModule[] {
-    return Object.values(modules).map(toInternalModule)
-  }
-
-  getEventStructs(module: InternalMoveModule) {
-    const qname = moduleQname(module)
-    const eventMap = new Map<string, InternalMoveStruct>()
-
-    for (const struct of module.structs) {
-      const abilities = new Set(struct.abilities)
-      if (abilities.has('Drop') && abilities.has('Copy')) {
-        eventMap.set(qname + SPLITTER + struct.name, struct)
-      }
-    }
-    return eventMap
+  constructor() {
+    super(new SuiChainAdapter())
   }
 
   readModulesFile(fullPath: string) {

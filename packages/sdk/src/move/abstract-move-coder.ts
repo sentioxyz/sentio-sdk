@@ -2,6 +2,7 @@ import { moduleQname, SPLITTER, VECTOR_STR } from './utils.js'
 import { parseMoveType, TypeDescriptor } from './types.js'
 import { InternalMoveFunction, InternalMoveModule, InternalMoveStruct } from './internal-models.js'
 import { bytesToBigInt } from '../utils/index.js'
+import { ChainAdapter } from './chain-adapter.js'
 
 export type StructWithTag<Base> = {
   type: string
@@ -13,16 +14,22 @@ export type DecodedStructWithTag<B, T> = StructWithTag<B> & {
   type_arguments: string[]
 }
 
-export abstract class AbstractMoveCoder<StructType> {
+export abstract class AbstractMoveCoder<Network, ModuleTypes, StructType> {
   private moduleMapping = new Map<string, InternalMoveModule>()
   private typeMapping = new Map<string, InternalMoveStruct>()
   private funcMapping = new Map<string, InternalMoveFunction>()
+  network: Network
+  adapter: ChainAdapter<Network, ModuleTypes>
+
+  protected constructor(network: Network) {
+    this.network = network
+  }
 
   contains(account: string, name: string) {
     return this.moduleMapping.has(account + '::' + name)
   }
 
-  protected abstract getMeaningfulFunctionParams(params: TypeDescriptor[]): TypeDescriptor[]
+  // protected abstract getMeaningfulFunctionParams(params: TypeDescriptor[]): TypeDescriptor[]
 
   protected toStructWithTag(val: StructType): StructWithTag<StructType> {
     return val as any
@@ -232,7 +239,7 @@ export abstract class AbstractMoveCoder<StructType> {
 
   encodeCallArgs(args: any[], func: string): any[] {
     const f = this.getMoveFunction(func)
-    return this.encodeArray(args, this.getMeaningfulFunctionParams(f.params))
+    return this.encodeArray(args, this.adapter.getMeaningfulFunctionParams(f.params))
   }
 
   decodeCallResult(res: any[], func: string): any[] {

@@ -6,7 +6,6 @@ import {
   ProgrammableTransaction,
   SuiTransaction,
 } from '@mysten/sui.js'
-import { TypeDescriptor } from '../move/index.js'
 
 export function getMoveCalls(txBlock: SuiTransactionBlockResponse) {
   const txKind = getTransactionKind(txBlock)
@@ -32,11 +31,4 @@ export function getMoveCalls(txBlock: SuiTransactionBlockResponse) {
     }
     return []
   })
-}
-
-export function getMeaningfulFunctionParams(params: TypeDescriptor[]): TypeDescriptor[] {
-  if (params.length === 0) {
-    return params
-  }
-  return params.slice(0, params.length - 1)
 }

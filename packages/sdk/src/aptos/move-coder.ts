@@ -6,12 +6,17 @@ import {
   TransactionPayload_EntryFunctionPayload,
 } from './move-types.js'
 
-import { TypedEventInstance, TypedMoveResource, TypedFunctionPayload } from './models.js'
-import { getMeaningfulFunctionParams } from './utils.js'
+import { TypedEventInstance, TypedFunctionPayload, TypedMoveResource } from './models.js'
 import { AbstractMoveCoder } from '../move/abstract-move-coder.js'
-import { TypeDescriptor } from '../move/index.js'
+import { AptosNetwork } from './network.js'
+import { AptosChainAdapter } from './aptos-chain-adapter.js'
 
-export class MoveCoder extends AbstractMoveCoder<Event | MoveResource> {
+export class MoveCoder extends AbstractMoveCoder<AptosNetwork, MoveModuleBytecode[], Event | MoveResource> {
+  constructor(network: AptosNetwork) {
+    super(network)
+    this.adapter = new AptosChainAdapter()
+  }
+
   load(module: MoveModuleBytecode) {
     if (!module.abi) {
       throw Error('Module without abi')
@@ -35,13 +40,9 @@ export class MoveCoder extends AbstractMoveCoder<Event | MoveResource> {
     return this.filterAndDecodeStruct(typeQname, resources) as any
   }
 
-  getMeaningfulFunctionParams(params: TypeDescriptor[]): TypeDescriptor[] {
-    return getMeaningfulFunctionParams(params)
-  }
-
   decodeFunctionPayload(payload: TransactionPayload_EntryFunctionPayload): TransactionPayload_EntryFunctionPayload {
     const func = this.getMoveFunction(payload.function)
-    const params = getMeaningfulFunctionParams(func.params)
+    const params = this.adapter.getMeaningfulFunctionParams(func.params)
     const argumentsDecoded = this.decodeArray(payload.arguments, params)
 
     return {
@@ -51,7 +52,7 @@ export class MoveCoder extends AbstractMoveCoder<Event | MoveResource> {
   }
 }
 
-export const MOVE_CODER = new MoveCoder()
+export const MOVE_CODER = new MoveCoder(AptosNetwork.MAIN_NET)
 
 export function defaultMoveCoder(): MoveCoder {
   return MOVE_CODER

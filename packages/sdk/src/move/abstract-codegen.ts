@@ -12,6 +12,7 @@ import { format } from 'prettier'
 import { isFrameworkAccount, moduleQname, normalizeToJSName, SPLITTER, VECTOR_STR } from './utils.js'
 import { camelCase, upperFirst } from 'lodash-es'
 import { TypeDescriptor } from './types.js'
+import { ChainAdapter } from './chain-adapter.js'
 
 interface OutputFile {
   fileName: string
@@ -34,13 +35,11 @@ export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
   GENERATE_ON_ENTRY = true
   PAYLOAD_OPTIONAL = false
 
-  abstract fetchModules(account: string, network: NetworkType): Promise<ModuleTypes>
-  abstract toInternalModules(modules: ModuleTypes): InternalMoveModule[]
-  // Get the structs that represent Events
-  abstract getEventStructs(module: InternalMoveModule): Map<string, InternalMoveStruct>
-  // Get the parameters that actually have arguments in runtime
-  // Aptos first signer and Sui's last TxContext are no use
-  abstract getMeaningfulFunctionParams(params: TypeDescriptor[]): TypeDescriptor[]
+  chainAdapter: ChainAdapter<NetworkType, ModuleTypes>
+
+  protected constructor(chainAdapter: ChainAdapter<NetworkType, ModuleTypes>) {
+    this.chainAdapter = chainAdapter
+  }
 
   readModulesFile(fullPath: string) {
     return JSON.parse(fs.readFileSync(fullPath, 'utf-8'))
@@ -81,7 +80,7 @@ export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
       }
       const fullPath = path.resolve(srcDir, file)
       const abi = this.readModulesFile(fullPath)
-      const modules = this.toInternalModules(abi)
+      const modules = this.chainAdapter.toInternalModules(abi)
 
       for (const module of modules) {
         loader.register(module, path.basename(file, '.json'))
@@ -100,8 +99,8 @@ export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
         console.log(`download dependent module for account ${account} at ${network}`)
 
         try {
-          const rawModules = await this.fetchModules(account, network)
-          const modules = this.toInternalModules(rawModules)
+          const rawModules = await this.chainAdapter.fetchModules(account, network)
+          const modules = this.chainAdapter.toInternalModules(rawModules)
 
           fs.writeFileSync(path.resolve(srcDir, account + '.json'), JSON.stringify(rawModules, null, '\t'))
           for (const module of modules) {
@@ -163,7 +162,7 @@ export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
     const clientFunctions = this.GENERATE_CLIENT
       ? module.exposedFunctions.map((f) => this.generateClientFunctions(module, f)).filter((s) => s !== '')
       : []
-    const eventStructs = this.getEventStructs(module)
+    const eventStructs = this.chainAdapter.getEventStructs(module)
     const eventTypes = new Set(eventStructs.keys())
     const events = Array.from(eventStructs.values())
       .map((e) => this.generateOnEvents(module, e))
@@ -282,7 +281,7 @@ export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
       return
     }
 
-    const fields = this.getMeaningfulFunctionParams(func.params).map((param) => {
+    const fields = this.chainAdapter.getMeaningfulFunctionParams(func.params).map((param) => {
       return this.generateTypeForDescriptor(param, module.address) + (this.PAYLOAD_OPTIONAL ? ' | undefined' : '')
     })
 
@@ -307,7 +306,7 @@ export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
     }
     // const moduleName = normalizeToJSName(module.name)
     const funcName = camelCase(func.name)
-    const fields = this.getMeaningfulFunctionParams(func.params).map((param) => {
+    const fields = this.chainAdapter.getMeaningfulFunctionParams(func.params).map((param) => {
       return this.generateTypeForDescriptor(param, module.address)
     })
     const genericString = this.generateFunctionTypeParameters(func)

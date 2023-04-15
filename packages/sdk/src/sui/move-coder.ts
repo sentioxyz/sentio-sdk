@@ -2,18 +2,25 @@ import { TypedEventInstance, TypedFunctionPayload, TypedSuiMoveObject } from './
 import { AbstractMoveCoder, StructWithTag } from '../move/abstract-move-coder.js'
 import {
   MoveCallSuiTransaction,
+  SuiCallArg,
   SuiEvent,
   SuiMoveNormalizedModule,
-  SuiCallArg,
   SuiMoveObject,
   SuiRawData,
+  SuiMoveNormalizedModules,
 } from '@mysten/sui.js'
 import { toInternalModule } from './move-types.js'
 import { SPLITTER, TypeDescriptor } from '../move/index.js'
-import { getMeaningfulFunctionParams } from './utils.js'
 import { dynamic_field } from './builtin/0x2.js'
+import { SuiNetwork } from './network.js'
+import { SuiChainAdapter } from './sui-chain-adapter.js'
 
-export class MoveCoder extends AbstractMoveCoder<SuiEvent | SuiMoveObject> {
+export class MoveCoder extends AbstractMoveCoder<SuiNetwork, SuiMoveNormalizedModules, SuiEvent | SuiMoveObject> {
+  constructor(network: SuiNetwork) {
+    super(network)
+    this.adapter = new SuiChainAdapter()
+  }
+
   load(module: SuiMoveNormalizedModule) {
     if (this.contains(module.address, module.name)) {
       return
@@ -65,14 +72,10 @@ export class MoveCoder extends AbstractMoveCoder<SuiEvent | SuiMoveObject> {
     return this.filterAndDecodeStruct(typeQname, objects)
   }
 
-  getMeaningfulFunctionParams(params: TypeDescriptor[]): TypeDescriptor[] {
-    return getMeaningfulFunctionParams(params)
-  }
-
   decodeFunctionPayload(payload: MoveCallSuiTransaction, inputs: SuiCallArg[]): MoveCallSuiTransaction {
     const functionType = [payload.package, payload.module, payload.function].join(SPLITTER)
     const func = this.getMoveFunction(functionType)
-    const params = getMeaningfulFunctionParams(func.params)
+    const params = this.adapter.getMeaningfulFunctionParams(func.params)
     const args = []
     for (const value of payload.arguments || []) {
       const argValue = value as any
@@ -101,7 +104,7 @@ export class MoveCoder extends AbstractMoveCoder<SuiEvent | SuiMoveObject> {
   }
 }
 
-export const MOVE_CODER = new MoveCoder()
+export const MOVE_CODER = new MoveCoder(SuiNetwork.MAIN_NET)
 
 export function defaultMoveCoder(): MoveCoder {
   return MOVE_CODER
