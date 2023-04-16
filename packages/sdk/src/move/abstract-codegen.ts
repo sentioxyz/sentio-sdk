@@ -450,14 +450,14 @@ export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
 export class AccountCodegen<ModuleType, NetworkType> {
   modules: InternalMoveModule[]
   config: Config<NetworkType>
-  abi: ModuleType
+  abi: ModuleType[]
   loader: AccountRegister
   moduleGen: AbstractCodegen<ModuleType, NetworkType>
 
   constructor(
     moduleGen: AbstractCodegen<ModuleType, NetworkType>,
     loader: AccountRegister,
-    abi: ModuleType,
+    abi: ModuleType[],
     modules: InternalMoveModule[],
     config: Config<NetworkType>
   ) {

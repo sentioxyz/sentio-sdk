@@ -5,7 +5,6 @@ import {
   SuiCallArg,
   SuiEvent,
   SuiMoveNormalizedModule,
-  SuiMoveNormalizedModules,
   SuiMoveObject,
   SuiRawData,
 } from '@mysten/sui.js'
@@ -15,7 +14,7 @@ import { dynamic_field } from './builtin/0x2.js'
 import { SuiNetwork } from './network.js'
 import { SuiChainAdapter } from './sui-chain-adapter.js'
 
-export class MoveCoder extends AbstractMoveCoder<SuiNetwork, SuiMoveNormalizedModules, SuiEvent | SuiMoveObject> {
+export class MoveCoder extends AbstractMoveCoder<SuiNetwork, SuiMoveNormalizedModule, SuiEvent | SuiMoveObject> {
   constructor(network: SuiNetwork) {
     super(network)
     this.adapter = new SuiChainAdapter()

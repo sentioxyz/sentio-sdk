@@ -14,12 +14,12 @@ export type DecodedStructWithTag<B, T> = StructWithTag<B> & {
   type_arguments: string[]
 }
 
-export abstract class AbstractMoveCoder<Network, ModuleTypes, StructType> {
+export abstract class AbstractMoveCoder<Network, ModuleType, StructType> {
   private moduleMapping = new Map<string, InternalMoveModule>()
   private typeMapping = new Map<string, InternalMoveStruct>()
   private funcMapping = new Map<string, InternalMoveFunction>()
   network: Network
-  adapter: ChainAdapter<Network, ModuleTypes>
+  adapter: ChainAdapter<Network, ModuleType>
 
   protected constructor(network: Network) {
     this.network = network

@@ -1,4 +1,4 @@
-import { SuiMoveNormalizedModules } from '@mysten/sui.js'
+import { SuiMoveNormalizedModule } from '@mysten/sui.js'
 
 import { SuiNetwork } from '../network.js'
 import * as fs from 'fs'
@@ -18,7 +18,7 @@ export async function codegen(abisDir: string, outDir = join('src', 'types', 'su
   console.log(chalk.green(`Generated ${numFiles} for Sui`))
 }
 
-class SuiCodegen extends AbstractCodegen<SuiMoveNormalizedModules, SuiNetwork> {
+class SuiCodegen extends AbstractCodegen<SuiMoveNormalizedModule, SuiNetwork> {
   ADDRESS_TYPE = 'SuiAddress'
   MAIN_NET = SuiNetwork.MAIN_NET
   TEST_NET = SuiNetwork.TEST_NET

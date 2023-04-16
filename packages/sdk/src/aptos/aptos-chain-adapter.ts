@@ -4,12 +4,17 @@ import { AptosNetwork } from './network.js'
 import { InternalMoveModule, InternalMoveStruct } from '../move/internal-models.js'
 import { AptosClient } from 'aptos-sdk'
 
-export class AptosChainAdapter extends ChainAdapter<AptosNetwork, MoveModuleBytecode[]> {
+export class AptosChainAdapter extends ChainAdapter<AptosNetwork, MoveModuleBytecode> {
   static INSTANCE = new AptosChainAdapter()
 
   async fetchModules(account: string, network: AptosNetwork): Promise<MoveModuleBytecode[]> {
     const client = getRpcClient(network)
     return await client.getAccountModules(account)
+  }
+
+  async fetchModule(account: string, module: string, network: AptosNetwork): Promise<MoveModuleBytecode> {
+    const client = getRpcClient(network)
+    return await client.getAccountModule(account, module)
   }
 
   toInternalModules(modules: MoveModuleBytecode[]): InternalMoveModule[] {

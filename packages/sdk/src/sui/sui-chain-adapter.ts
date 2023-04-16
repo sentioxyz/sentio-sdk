@@ -2,14 +2,20 @@ import { ChainAdapter, moduleQname, SPLITTER, TypeDescriptor } from '../move/ind
 import { toInternalModule } from './move-types.js'
 import { SuiNetwork } from './network.js'
 import { InternalMoveModule, InternalMoveStruct } from '../move/internal-models.js'
-import { Connection, JsonRpcProvider, SuiMoveNormalizedModules } from '@mysten/sui.js'
+import { Connection, JsonRpcProvider, SuiMoveNormalizedModule } from '@mysten/sui.js'
 
-export class SuiChainAdapter extends ChainAdapter<SuiNetwork, SuiMoveNormalizedModules> {
+export class SuiChainAdapter extends ChainAdapter<SuiNetwork, SuiMoveNormalizedModule> {
   static INSTANCE = new SuiChainAdapter()
 
-  async fetchModules(account: string, network: SuiNetwork): Promise<SuiMoveNormalizedModules> {
+  async fetchModule(account: string, module: string, network: SuiNetwork): Promise<SuiMoveNormalizedModule> {
     const client = getRpcClient(network)
-    return await client.getNormalizedMoveModulesByPackage({ package: account })
+    return await client.getNormalizedMoveModule({ package: account, module })
+  }
+
+  async fetchModules(account: string, network: SuiNetwork): Promise<SuiMoveNormalizedModule[]> {
+    const client = getRpcClient(network)
+    const modules = await client.getNormalizedMoveModulesByPackage({ package: account })
+    return Object.values(modules)
   }
 
   getMeaningfulFunctionParams(params: TypeDescriptor[]): TypeDescriptor[] {
@@ -19,7 +25,7 @@ export class SuiChainAdapter extends ChainAdapter<SuiNetwork, SuiMoveNormalizedM
     return params.slice(0, params.length - 1)
   }
 
-  toInternalModules(modules: SuiMoveNormalizedModules): InternalMoveModule[] {
+  toInternalModules(modules: SuiMoveNormalizedModule[]): InternalMoveModule[] {
     return Object.values(modules).map(toInternalModule)
   }
 

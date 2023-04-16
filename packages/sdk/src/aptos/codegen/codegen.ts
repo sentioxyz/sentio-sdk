@@ -15,7 +15,7 @@ export async function codegen(abisDir: string, outDir = join('src', 'types', 'ap
   console.log(chalk.green(`Generated ${numFiles} for Aptos`))
 }
 
-class AptosCodegen extends AbstractCodegen<MoveModuleBytecode[], AptosNetwork> {
+class AptosCodegen extends AbstractCodegen<MoveModuleBytecode, AptosNetwork> {
   ADDRESS_TYPE = 'Address'
   MAIN_NET = AptosNetwork.MAIN_NET
   TEST_NET = AptosNetwork.TEST_NET

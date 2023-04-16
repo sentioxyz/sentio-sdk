@@ -11,7 +11,7 @@ import { AbstractMoveCoder } from '../move/abstract-move-coder.js'
 import { AptosNetwork } from './network.js'
 import { AptosChainAdapter } from './aptos-chain-adapter.js'
 
-export class MoveCoder extends AbstractMoveCoder<AptosNetwork, MoveModuleBytecode[], Event | MoveResource> {
+export class MoveCoder extends AbstractMoveCoder<AptosNetwork, MoveModuleBytecode, Event | MoveResource> {
   constructor(network: AptosNetwork) {
     super(network)
     this.adapter = new AptosChainAdapter()
