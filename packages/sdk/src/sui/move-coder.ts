@@ -1,18 +1,12 @@
-import { TypedEventInstance, TypedFunctionPayload, TypedSuiMoveObject } from './models.js'
-import { AbstractMoveCoder, StructWithTag } from '../move/abstract-move-coder.js'
-import {
-  MoveCallSuiTransaction,
-  SuiCallArg,
-  SuiEvent,
-  SuiMoveNormalizedModule,
-  SuiMoveObject,
-  SuiRawData,
-} from '@mysten/sui.js'
+import { TypedEventInstance, TypedFunctionPayload } from './models.js'
+import { AbstractMoveCoder } from '../move/abstract-move-coder.js'
+import { MoveCallSuiTransaction, SuiCallArg, SuiEvent, SuiMoveNormalizedModule, SuiMoveObject } from '@mysten/sui.js'
 import { toInternalModule } from './move-types.js'
 import { SPLITTER, TypeDescriptor } from '../move/index.js'
 import { dynamic_field } from './builtin/0x2.js'
 import { SuiNetwork } from './network.js'
 import { SuiChainAdapter } from './sui-chain-adapter.js'
+import { InternalMoveModule } from '../move/internal-models.js'
 
 export class MoveCoder extends AbstractMoveCoder<SuiNetwork, SuiMoveNormalizedModule, SuiEvent | SuiMoveObject> {
   constructor(network: SuiNetwork) {
@@ -20,60 +14,58 @@ export class MoveCoder extends AbstractMoveCoder<SuiNetwork, SuiMoveNormalizedMo
     this.adapter = new SuiChainAdapter()
   }
 
-  load(module: SuiMoveNormalizedModule) {
-    if (this.contains(module.address, module.name)) {
-      return
+  load(module: SuiMoveNormalizedModule): InternalMoveModule {
+    let m = this.moduleMapping.get(module.address + '::' + module.name)
+    if (m) {
+      return m
     }
-    this.loadInternal(toInternalModule(module))
+    m = toInternalModule(module)
+    this.loadInternal(m)
+    return m
   }
 
   decode(data: any, type: TypeDescriptor): any {
     switch (type.qname) {
       case '0x2::object::ID':
       case '0x2::coin::Coin':
+      case '0x2::balance::Balance':
         return data
       case '0x1::option::Option':
-        // return this.decode(data, type.typeArgs[0])
-        return data
+        if (data === null) {
+          return data
+        }
+        return this.decode(data, type.typeArgs[0])
       default:
         return super.decode(data, type)
     }
   }
 
-  toStructWithTag(val: SuiEvent | SuiMoveObject): StructWithTag<SuiEvent> {
-    if (SuiEvent.is(val)) {
-      return {
-        ...val,
-        data: val.parsedJson as any,
-      }
-    }
-    if (SuiRawData.is(val)) {
-      return {
-        ...val,
-        data: val.fields as any,
-      }
-    }
-    return val as any
-  }
-
-  decodeEvent<T>(event: SuiEvent): TypedEventInstance<T> | undefined {
+  decodeEvent<T>(event: SuiEvent): Promise<TypedEventInstance<T> | undefined> {
     return this.decodedStruct<T>(event) as any
   }
-  filterAndDecodeEvents<T>(typeQname: string, resources: SuiEvent[]): TypedEventInstance<T>[] {
-    return this.filterAndDecodeStruct(typeQname, resources)
+  filterAndDecodeEvents<T>(typeQname: string, resources: SuiEvent[]): Promise<TypedEventInstance<T>[]> {
+    return this.filterAndDecodeStruct(typeQname, resources) as any
   }
 
-  getObjectsFromDynamicFields<Name, Value>(objects: SuiMoveObject[]): dynamic_field.Field<Name, Value>[] {
-    return this.filterAndDecodeObjects(`0x2::dynamic_field::Field`, objects).map((o) => o.data_decoded) as any
+  async getDynamicFields(
+    objects: SuiMoveObject[],
+    keyTypeMatcher: string = 'any',
+    valueTypeMatcher: string = 'any'
+  ): Promise<dynamic_field.Field<any, any>[]> {
+    const res = (await this.filterAndDecodeObjects(
+      `0x2::dynamic_field::Field<${keyTypeMatcher}, ${valueTypeMatcher}>`,
+      objects
+    )) as any[]
+    return res.map((o) => o.data_decoded) as any
   }
 
-  filterAndDecodeObjects<T>(typeQname: string, objects: SuiMoveObject[]): TypedSuiMoveObject<T>[] {
-    return this.filterAndDecodeStruct(typeQname, objects)
+  filterAndDecodeObjects(typeMatcher: string, objects: SuiMoveObject[]): Promise<any[]> {
+    return this.filterAndDecodeStruct(typeMatcher, objects) as any
   }
 
-  decodeFunctionPayload(payload: MoveCallSuiTransaction, inputs: SuiCallArg[]): MoveCallSuiTransaction {
+  async decodeFunctionPayload(payload: MoveCallSuiTransaction, inputs: SuiCallArg[]): Promise<MoveCallSuiTransaction> {
     const functionType = [payload.package, payload.module, payload.function].join(SPLITTER)
-    const func = this.getMoveFunction(functionType)
+    const func = await this.getMoveFunction(functionType)
     const params = this.adapter.getMeaningfulFunctionParams(func.params)
     const args = []
     for (const value of payload.arguments || []) {
@@ -95,7 +87,7 @@ export class MoveCoder extends AbstractMoveCoder<SuiNetwork, SuiMoveNormalizedMo
       }
     }
 
-    const argumentsTyped = this.decodeArray(args, params)
+    const argumentsTyped = await this.decodeArray(args, params)
     return {
       ...payload,
       arguments_decoded: argumentsTyped,

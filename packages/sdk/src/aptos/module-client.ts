@@ -17,7 +17,7 @@ export class ModuleClient {
     ledger_version?: bigint
   ): Promise<any[]> {
     const coder = defaultMoveCoder()
-    const encodedArgs = coder.encodeCallArgs(args, func)
+    const encodedArgs = await coder.encodeCallArgs(args, func)
 
     const request: Types.ViewRequest = {
       function: func,

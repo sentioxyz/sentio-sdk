@@ -21,29 +21,37 @@ export class MoveCoder extends AbstractMoveCoder<AptosNetwork, MoveModuleBytecod
     if (!module.abi) {
       throw Error('Module without abi')
     }
-    if (this.contains(module.abi.address, module.abi.name)) {
-      return
+    let m = this.moduleMapping.get(module.abi.address + '::' + module.abi.name)
+    // if (this.contains(module.abi.address, module.abi.name)) {
+    //   return
+    // }
+    if (m) {
+      return m
     }
-    this.loadInternal(toInternalModule(module))
+    m = toInternalModule(module)
+    this.loadInternal(m)
+    return m
   }
 
-  decodeEvent<T>(event: Event): TypedEventInstance<T> | undefined {
-    return this.decodedStruct<T>(event) as TypedEventInstance<T>
+  decodeEvent<T>(event: Event): Promise<TypedEventInstance<T> | undefined> {
+    return this.decodedStruct<T>(event) as any
   }
-  filterAndDecodeEvents<T>(typeQname: string, resources: Event[]): TypedEventInstance<T>[] {
-    return this.filterAndDecodeStruct(typeQname, resources) as TypedEventInstance<T>[]
+  filterAndDecodeEvents<T>(typeQname: string, resources: Event[]): Promise<TypedEventInstance<T>[]> {
+    return this.filterAndDecodeStruct(typeQname, resources) as any
   }
-  decodeResource<T>(res: MoveResource): TypedMoveResource<T> | undefined {
+  decodeResource<T>(res: MoveResource): Promise<TypedMoveResource<T> | undefined> {
     return this.decodedStruct<T>(res)
   }
-  filterAndDecodeResources<T>(typeQname: string, resources: MoveResource[]): TypedMoveResource<T>[] {
+  filterAndDecodeResources<T>(typeQname: string, resources: MoveResource[]): Promise<TypedMoveResource<T>[]> {
     return this.filterAndDecodeStruct(typeQname, resources) as any
   }
 
-  decodeFunctionPayload(payload: TransactionPayload_EntryFunctionPayload): TransactionPayload_EntryFunctionPayload {
-    const func = this.getMoveFunction(payload.function)
+  async decodeFunctionPayload(
+    payload: TransactionPayload_EntryFunctionPayload
+  ): Promise<TransactionPayload_EntryFunctionPayload> {
+    const func = await this.getMoveFunction(payload.function)
     const params = this.adapter.getMeaningfulFunctionParams(func.params)
-    const argumentsDecoded = this.decodeArray(payload.arguments, params)
+    const argumentsDecoded = await this.decodeArray(payload.arguments, params)
 
     return {
       ...payload,

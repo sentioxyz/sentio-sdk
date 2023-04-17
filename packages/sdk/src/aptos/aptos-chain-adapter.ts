@@ -1,10 +1,10 @@
 import { ChainAdapter, moduleQname, SPLITTER, TypeDescriptor } from '../move/index.js'
-import { MoveModuleBytecode, toInternalModule } from './move-types.js'
+import { Event, MoveModuleBytecode, MoveResource, toInternalModule } from './move-types.js'
 import { AptosNetwork } from './network.js'
 import { InternalMoveModule, InternalMoveStruct } from '../move/internal-models.js'
 import { AptosClient } from 'aptos-sdk'
 
-export class AptosChainAdapter extends ChainAdapter<AptosNetwork, MoveModuleBytecode> {
+export class AptosChainAdapter extends ChainAdapter<AptosNetwork, MoveModuleBytecode, Event | MoveResource> {
   static INSTANCE = new AptosChainAdapter()
 
   async fetchModules(account: string, network: AptosNetwork): Promise<MoveModuleBytecode[]> {
@@ -54,6 +54,17 @@ export class AptosChainAdapter extends ChainAdapter<AptosNetwork, MoveModuleByte
     }
 
     return eventMap
+  }
+
+  getType(data: Event | MoveResource): string {
+    return data.type
+  }
+
+  getData(data: Event | MoveResource) {
+    if ('data' in data && 'type' in data) {
+      return data.data
+    }
+    return data
   }
 }
 

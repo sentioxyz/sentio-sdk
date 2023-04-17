@@ -60,6 +60,7 @@ export class SuiObjectsContext extends BaseContext {
   network: SuiNetwork
   slot: bigint
   timestamp: Date
+  coder: MoveCoder
 
   constructor(network: SuiNetwork, address: string, slot: bigint, timestamp: Date) {
     super()
@@ -67,6 +68,7 @@ export class SuiObjectsContext extends BaseContext {
     this.network = network
     this.slot = slot
     this.timestamp = timestamp
+    this.coder = defaultMoveCoder(network)
   }
 
   getChainId(): string {

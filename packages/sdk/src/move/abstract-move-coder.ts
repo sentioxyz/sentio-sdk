@@ -1,25 +1,20 @@
 import { moduleQname, SPLITTER, VECTOR_STR } from './utils.js'
-import { parseMoveType, TypeDescriptor } from './types.js'
+import { matchType, parseMoveType, TypeDescriptor } from './types.js'
 import { InternalMoveFunction, InternalMoveModule, InternalMoveStruct } from './internal-models.js'
 import { bytesToBigInt } from '../utils/index.js'
 import { ChainAdapter } from './chain-adapter.js'
 
-export type StructWithTag<Base> = {
-  type: string
-  data: Base
-}
-
-export type DecodedStructWithTag<B, T> = StructWithTag<B> & {
+export type DecodedStructWithTag<B, T> = B & {
   data_decoded: T
   type_arguments: string[]
 }
 
 export abstract class AbstractMoveCoder<Network, ModuleType, StructType> {
-  private moduleMapping = new Map<string, InternalMoveModule>()
+  protected moduleMapping = new Map<string, InternalMoveModule>()
   private typeMapping = new Map<string, InternalMoveStruct>()
   private funcMapping = new Map<string, InternalMoveFunction>()
   network: Network
-  adapter: ChainAdapter<Network, ModuleType>
+  adapter: ChainAdapter<Network, ModuleType, StructType>
 
   protected constructor(network: Network) {
     this.network = network
@@ -29,11 +24,7 @@ export abstract class AbstractMoveCoder<Network, ModuleType, StructType> {
     return this.moduleMapping.has(account + '::' + name)
   }
 
-  // protected abstract getMeaningfulFunctionParams(params: TypeDescriptor[]): TypeDescriptor[]
-
-  protected toStructWithTag(val: StructType): StructWithTag<StructType> {
-    return val as any
-  }
+  abstract load(module: ModuleType): InternalMoveModule
 
   protected loadInternal(module: InternalMoveModule) {
     if (this.contains(module.address, module.name)) {
@@ -70,23 +61,53 @@ export abstract class AbstractMoveCoder<Network, ModuleType, StructType> {
     return '0x' + data.toString(16)
   }
 
-  getMoveStruct(type: string): InternalMoveStruct {
-    const struct = this.typeMapping.get(type)
-    if (!struct) {
-      throw new Error('Failed to load type' + type + ' type are not imported anywhere')
+  private requestMap = new Map<string, Promise<InternalMoveModule>>()
+
+  async getMoveStruct(type: string): Promise<InternalMoveStruct> {
+    let struct = this.typeMapping.get(type)
+    if (struct) {
+      return struct
     }
-    return struct
+    const [account, module, typeName] = type.split(SPLITTER)
+    const key = account + SPLITTER + module
+    let resp = this.requestMap.get(account + SPLITTER + module)
+    if (!resp) {
+      resp = this.adapter.fetchModule(account, module, this.network).then((m) => {
+        return this.load(m)
+      })
+      this.requestMap.set(key, resp)
+    }
+    await resp
+    struct = this.typeMapping.get(type)
+    if (struct) {
+      return struct
+    }
+    throw new Error('Failed to load function ' + type + ' type are not imported anywhere')
   }
 
-  getMoveFunction(type: string): InternalMoveFunction {
-    const func = this.funcMapping.get(type)
-    if (!func) {
-      throw new Error('Failed to load function ' + type + ' type are not imported anywhere')
+  async getMoveFunction(type: string): Promise<InternalMoveFunction> {
+    let func = this.funcMapping.get(type)
+    if (func) {
+      return func
     }
-    return func
+    const [account, module, typeName] = type.split(SPLITTER)
+    const key = account + SPLITTER + module
+    let resp = this.requestMap.get(account + SPLITTER + module)
+    if (!resp) {
+      resp = this.adapter.fetchModule(account, module, this.network).then((m) => {
+        return this.load(m)
+      })
+      this.requestMap.set(key, resp)
+    }
+    await resp
+    func = this.funcMapping.get(type)
+    if (func) {
+      return func
+    }
+    throw new Error('Failed to load function ' + type + ' type are not imported anywhere')
   }
 
-  decode(data: any, type: TypeDescriptor): any {
+  async decode(data: any, type: TypeDescriptor): Promise<any> {
     // process simple type
     if (type.reference) {
       return data
@@ -121,13 +142,13 @@ export abstract class AbstractMoveCoder<Network, ModuleType, StructType> {
 
       const res = []
       for (const entry of data) {
-        res.push(this.decode(entry, type.typeArgs[0]))
+        res.push(await this.decode(entry, type.typeArgs[0]))
       }
       return res
     }
 
     // Process complex type
-    const struct = this.getMoveStruct(type.qname)
+    const struct = await this.getMoveStruct(type.qname)
 
     const typeCtx = new Map<string, TypeDescriptor>()
     for (const [idx, typeArg] of type.typeArgs.entries()) {
@@ -139,13 +160,14 @@ export abstract class AbstractMoveCoder<Network, ModuleType, StructType> {
     for (const field of struct.fields) {
       let filedType = field.type
       filedType = filedType.applyTypeArgs(typeCtx)
-      const value = this.decode(data[field.name], filedType)
+      const fieldValue = this.adapter.getData(data)[field.name]
+      const value = await this.decode(fieldValue, filedType)
       typedData[field.name] = value
     }
     return typedData
   }
 
-  encode(data: any, type: TypeDescriptor): any {
+  async encode(data: any, type: TypeDescriptor): Promise<any> {
     // process simple type
     if (type.reference) {
       return data
@@ -190,7 +212,7 @@ export abstract class AbstractMoveCoder<Network, ModuleType, StructType> {
     }
 
     // Process complex type
-    const struct = this.getMoveStruct(type.qname)
+    const struct = await this.getMoveStruct(type.qname)
 
     const typeCtx = new Map<string, TypeDescriptor>()
     for (const [idx, typeArg] of type.typeArgs.entries()) {
@@ -202,19 +224,19 @@ export abstract class AbstractMoveCoder<Network, ModuleType, StructType> {
     for (const field of struct.fields) {
       let filedType = field.type
       filedType = filedType.applyTypeArgs(typeCtx)
-      const value = this.encode(data[field.name], filedType)
+      const value = await this.encode(data[field.name], filedType)
       typedData[field.name] = value
     }
     return typedData
   }
 
-  decodeArray(entries: any[], types: TypeDescriptor[]): any[] {
+  async decodeArray(entries: any[], types: TypeDescriptor[]): Promise<any[]> {
     const entriesDecoded: any[] = []
     for (const [idx, arg] of entries.entries()) {
       // TODO consider apply payload.type_arguments, but this might be hard since we don't code gen for them
       const argType = types[idx]
       try {
-        entriesDecoded.push(this.decode(arg, argType))
+        entriesDecoded.push(await this.decode(arg, argType))
       } catch (e) {
         console.error(e, 'Decoding error for ', JSON.stringify(arg), 'using type', argType)
         return entries
@@ -223,13 +245,13 @@ export abstract class AbstractMoveCoder<Network, ModuleType, StructType> {
     return entriesDecoded
   }
 
-  encodeArray(entriesDecoded: any[], types: TypeDescriptor[]): any[] {
+  async encodeArray(entriesDecoded: any[], types: TypeDescriptor[]): Promise<any[]> {
     const entries: any[] = []
     for (const [idx, arg] of entriesDecoded.entries()) {
       // TODO consider apply payload.type_arguments, but this might be hard since we don't code gen for them
       const argType = types[idx]
       try {
-        entries.push(this.encode(arg, argType))
+        entries.push(await this.encode(arg, argType))
       } catch (e) {
         throw Error('Decoding error for ' + JSON.stringify(arg) + 'using type' + argType + e.toString())
       }
@@ -237,61 +259,49 @@ export abstract class AbstractMoveCoder<Network, ModuleType, StructType> {
     return entries
   }
 
-  encodeCallArgs(args: any[], func: string): any[] {
-    const f = this.getMoveFunction(func)
+  async encodeCallArgs(args: any[], func: string): Promise<any[]> {
+    const f = await this.getMoveFunction(func)
     return this.encodeArray(args, this.adapter.getMeaningfulFunctionParams(f.params))
   }
 
-  decodeCallResult(res: any[], func: string): any[] {
-    const f = this.getMoveFunction(func)
+  async decodeCallResult(res: any[], func: string): Promise<any[]> {
+    const f = await this.getMoveFunction(func)
     return this.decodeArray(res, f.return)
   }
 
-  protected filterAndDecodeStruct(typeQname: string, structs: StructType[]): any {
-    if (!structs) {
-      return []
-    }
-    const withTags = structs.map((s) => this.toStructWithTag(s))
-    return this.filterAndDecodeStructWithTags(typeQname, withTags)
-  }
-
-  private filterAndDecodeStructWithTags<T>(
-    typeQname: string,
-    structsWithTags: StructWithTag<StructType>[]
-  ): DecodedStructWithTag<StructType, T>[] {
+  protected async filterAndDecodeStruct<T>(
+    typeMatcher: string,
+    structsWithTags: StructType[]
+  ): Promise<DecodedStructWithTag<StructType, T>[]> {
     if (!structsWithTags) {
-      return []
+      return [] as any
     }
+    const typeMatcherDescriptor = parseMoveType(typeMatcher)
     const results: DecodedStructWithTag<StructType, T>[] = []
     for (const resource of structsWithTags) {
-      if (typeQname.includes('<')) {
-        if (resource.type !== typeQname) {
-          continue
-        }
-      } else if (resource.type.split('<')[0] !== typeQname) {
+      const resourceType = this.adapter.getType(resource)
+      const resourceTypeDescriptor = parseMoveType(resourceType)
+      if (!matchType(typeMatcherDescriptor, resourceTypeDescriptor)) {
         continue
       }
-      const result = this.decodedStructWithTag(resource)
+
+      const result = await this.decodedStruct(resource)
       if (result) {
         results.push(result as DecodedStructWithTag<StructType, T>)
+      } else {
+        console.log('')
       }
     }
     return results
   }
 
-  protected decodedStruct<T>(typeStruct: StructType): DecodedStructWithTag<StructType, T> | undefined {
-    return this.decodedStructWithTag(this.toStructWithTag(typeStruct)) as any
-  }
-
-  private decodedStructWithTag<T>(
-    typeStruct: StructWithTag<StructType>
-  ): DecodedStructWithTag<StructType, T> | undefined {
-    const typeDescriptor = parseMoveType(typeStruct.type)
+  protected async decodedStruct<T>(typeStruct: StructType): Promise<DecodedStructWithTag<StructType, T> | undefined> {
+    const typeDescriptor = parseMoveType(this.adapter.getType(typeStruct))
     const typeArguments = typeDescriptor.typeArgs.map((t) => t.getSignature())
 
     let dataTyped = undefined
     try {
-      dataTyped = this.decode(this.toStructWithTag(typeStruct.data), typeDescriptor)
+      dataTyped = await this.decode(typeStruct, typeDescriptor)
     } catch (e) {
       console.error('Decoding error for ', JSON.stringify(typeStruct), e)
       return undefined

@@ -25,7 +25,7 @@ interface Config<NetworkType> {
   network: NetworkType
 }
 
-export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
+export abstract class AbstractCodegen<NetworkType, ModuleTypes, StructType> {
   TEST_NET: NetworkType
   MAIN_NET: NetworkType
   ADDRESS_TYPE: string
@@ -36,9 +36,9 @@ export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
   PAYLOAD_OPTIONAL = false
   SYSTEM_MODULES = new Set(['0x1', '0x2', '0x3'])
 
-  chainAdapter: ChainAdapter<NetworkType, ModuleTypes>
+  chainAdapter: ChainAdapter<NetworkType, ModuleTypes, StructType>
 
-  protected constructor(chainAdapter: ChainAdapter<NetworkType, ModuleTypes>) {
+  protected constructor(chainAdapter: ChainAdapter<NetworkType, ModuleTypes, StructType>) {
     this.chainAdapter = chainAdapter
   }
 
@@ -447,15 +447,15 @@ export abstract class AbstractCodegen<ModuleTypes, NetworkType> {
   }
 }
 
-export class AccountCodegen<ModuleType, NetworkType> {
+export class AccountCodegen<NetworkType, ModuleType, StructType> {
   modules: InternalMoveModule[]
   config: Config<NetworkType>
   abi: ModuleType[]
   loader: AccountRegister
-  moduleGen: AbstractCodegen<ModuleType, NetworkType>
+  moduleGen: AbstractCodegen<NetworkType, ModuleType, StructType>
 
   constructor(
-    moduleGen: AbstractCodegen<ModuleType, NetworkType>,
+    moduleGen: AbstractCodegen<NetworkType, ModuleType, StructType>,
     loader: AccountRegister,
     abi: ModuleType[],
     modules: InternalMoveModule[],

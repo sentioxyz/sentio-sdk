@@ -1,4 +1,4 @@
-import { SuiMoveNormalizedModule } from '@mysten/sui.js'
+import { SuiMoveNormalizedModule, SuiEvent, SuiMoveObject } from '@mysten/sui.js'
 
 import { SuiNetwork } from '../network.js'
 import * as fs from 'fs'
@@ -18,7 +18,7 @@ export async function codegen(abisDir: string, outDir = join('src', 'types', 'su
   console.log(chalk.green(`Generated ${numFiles} for Sui`))
 }
 
-class SuiCodegen extends AbstractCodegen<SuiMoveNormalizedModule, SuiNetwork> {
+class SuiCodegen extends AbstractCodegen<SuiNetwork, SuiMoveNormalizedModule, SuiEvent | SuiMoveObject> {
   ADDRESS_TYPE = 'SuiAddress'
   MAIN_NET = SuiNetwork.MAIN_NET
   TEST_NET = SuiNetwork.TEST_NET
@@ -45,6 +45,8 @@ class SuiCodegen extends AbstractCodegen<SuiMoveNormalizedModule, SuiNetwork> {
         return `export type ${struct.name} = string`
       case '0x2::coin::Coin':
         return `export type ${struct.name}<T> = string`
+      case '0x2::balance::Balance':
+        return `export type ${struct.name}<T> = string`
       case '0x1::option::Option':
         return `export type Option<T> = T | undefined`
     }
@@ -56,6 +58,7 @@ class SuiCodegen extends AbstractCodegen<SuiMoveNormalizedModule, SuiNetwork> {
       case '0x2::object::ID':
       case '0x2::coin::Coin':
       case '0x1::option::Option':
+      case '0x2::balance::Balance':
         return ''
     }
     return super.generateOnEvents(module, struct)

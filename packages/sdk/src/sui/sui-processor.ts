@@ -22,6 +22,7 @@ import {
 import { CallHandler, EventFilter, EventHandler, FunctionNameAndCallFilter, parseMoveType } from '../move/index.js'
 import { getMoveCalls } from './utils.js'
 import { defaultMoveCoder, MoveCoder } from './move-coder.js'
+import { PromiseOrVoid } from '../core/index.js'
 // import { dynamic_field } from './builtin/0x2.js'
 
 class IndexConfigure {
@@ -112,7 +113,7 @@ export class SuiBaseProcessor {
             idx
           )
 
-          const decoded = processor.coder.decodeEvent<any>(evt)
+          const decoded = await processor.coder.decodeEvent<any>(evt)
           await handler(decoded || evt, ctx)
           processResults.push(ctx.getProcessResult())
         }
@@ -171,7 +172,7 @@ export class SuiBaseProcessor {
           const programmableTx = getProgrammableTransaction(txKind)
 
           const payload = calls[0]
-          const decoded = processor.coder.decodeFunctionPayload(payload, programmableTx?.inputs || [])
+          const decoded = await processor.coder.decodeFunctionPayload(payload, programmableTx?.inputs || [])
           await handler(decoded, ctx)
         }
         return ctx.getProcessResult()
@@ -221,7 +222,7 @@ abstract class SuiBaseObjectsProcessor<HandlerType> {
   protected abstract transformObjects(objects: SuiMoveObject[]): HandlerType[]
 
   protected onInterval(
-    handler: (resources: HandlerType[], ctx: SuiObjectsContext) => void,
+    handler: (resources: HandlerType[], ctx: SuiObjectsContext) => PromiseOrVoid,
     timeInterval: HandleInterval | undefined,
     versionInterval: HandleInterval | undefined,
     type: string | undefined
@@ -246,7 +247,7 @@ abstract class SuiBaseObjectsProcessor<HandlerType> {
   }
 
   public onTimeInterval(
-    handler: (objects: HandlerType[], ctx: SuiObjectsContext) => void,
+    handler: (objects: HandlerType[], ctx: SuiObjectsContext) => PromiseOrVoid,
     timeIntervalInMinutes = 60,
     backfillTimeIntervalInMinutes = 240,
     type?: string
@@ -263,7 +264,7 @@ abstract class SuiBaseObjectsProcessor<HandlerType> {
   }
 
   public onSlotInterval(
-    handler: (objects: HandlerType[], ctx: SuiObjectsContext) => void,
+    handler: (objects: HandlerType[], ctx: SuiObjectsContext) => PromiseOrVoid,
     slotInterval = 100000,
     backfillSlotInterval = 400000,
     type?: string

@@ -2,9 +2,16 @@ import { ChainAdapter, moduleQname, SPLITTER, TypeDescriptor } from '../move/ind
 import { toInternalModule } from './move-types.js'
 import { SuiNetwork } from './network.js'
 import { InternalMoveModule, InternalMoveStruct } from '../move/internal-models.js'
-import { Connection, JsonRpcProvider, SuiMoveNormalizedModule } from '@mysten/sui.js'
+import {
+  Connection,
+  JsonRpcProvider,
+  SuiMoveNormalizedModule,
+  SuiEvent,
+  SuiMoveObject,
+  SuiParsedData,
+} from '@mysten/sui.js'
 
-export class SuiChainAdapter extends ChainAdapter<SuiNetwork, SuiMoveNormalizedModule> {
+export class SuiChainAdapter extends ChainAdapter<SuiNetwork, SuiMoveNormalizedModule, SuiEvent | SuiMoveObject> {
   static INSTANCE = new SuiChainAdapter()
 
   async fetchModule(account: string, module: string, network: SuiNetwork): Promise<SuiMoveNormalizedModule> {
@@ -40,6 +47,29 @@ export class SuiChainAdapter extends ChainAdapter<SuiNetwork, SuiMoveNormalizedM
       }
     }
     return eventMap
+  }
+
+  getType(base: SuiEvent | SuiMoveObject): string {
+    return base.type
+  }
+
+  getData(val: SuiEvent | SuiMoveObject) {
+    if (SuiEvent.is(val)) {
+      return val.parsedJson as any
+    }
+    if (SuiParsedData.is(val)) {
+      return val.fields as any
+    }
+    // if (SuiMoveObject.is(val)) {
+    //   return val.fields as any
+    // }
+    // This may not be perfect, just think everything has
+    if ('fields' in val) {
+      if ('type' in val && Object.keys(val).length === 2) {
+        return val.fields as any
+      }
+    }
+    return val as any
   }
 }
 

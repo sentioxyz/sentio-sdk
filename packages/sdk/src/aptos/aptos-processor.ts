@@ -15,6 +15,7 @@ import {
 } from '@sentio/protos'
 import { ServerError, Status } from 'nice-grpc'
 import { CallHandler, EventFilter, EventHandler, FunctionNameAndCallFilter, parseMoveType } from '../move/index.js'
+import { PromiseOrVoid } from '../core/index.js'
 
 type IndexConfigure = {
   address: string
@@ -54,7 +55,7 @@ export class AptosBaseProcessor {
   // }
 
   public onTransaction(
-    handler: (transaction: Transaction_UserTransaction, ctx: AptosContext) => void,
+    handler: (transaction: Transaction_UserTransaction, ctx: AptosContext) => PromiseOrVoid,
     includedFailed = false,
     fetchConfig?: Partial<MoveFetchConfig>
   ): this {
@@ -131,7 +132,7 @@ export class AptosBaseProcessor {
             idx
           )
           const eventInstance = evt as EventInstance
-          const decoded = processor.coder.decodeEvent<any>(eventInstance)
+          const decoded = await processor.coder.decodeEvent<any>(eventInstance)
           await handler(decoded || eventInstance, ctx)
           processResults.push(ctx.getProcessResult())
         }
@@ -145,7 +146,7 @@ export class AptosBaseProcessor {
   }
 
   public onEntryFunctionCall(
-    handler: (call: TransactionPayload_EntryFunctionPayload, ctx: AptosContext) => void,
+    handler: (call: TransactionPayload_EntryFunctionPayload, ctx: AptosContext) => PromiseOrVoid,
     filter: FunctionNameAndCallFilter | FunctionNameAndCallFilter[],
     fetchConfig?: Partial<MoveFetchConfig>
   ): this {
@@ -179,7 +180,7 @@ export class AptosBaseProcessor {
         )
         if (tx) {
           const payload = tx.payload as TransactionPayload_EntryFunctionPayload
-          const decoded = processor.coder.decodeFunctionPayload(payload)
+          const decoded = await processor.coder.decodeFunctionPayload(payload)
           await handler(decoded, ctx)
         }
         return ctx.getProcessResult()
@@ -230,7 +231,7 @@ export class AptosResourcesProcessor {
   }
 
   private onInterval(
-    handler: (resources: MoveResource[], ctx: AptosResourcesContext) => void,
+    handler: (resources: MoveResource[], ctx: AptosResourcesContext) => PromiseOrVoid,
     timeInterval: HandleInterval | undefined,
     versionInterval: HandleInterval | undefined,
     type: string | undefined
@@ -260,7 +261,7 @@ export class AptosResourcesProcessor {
   }
 
   public onTimeInterval(
-    handler: (resources: MoveResource[], ctx: AptosResourcesContext) => void,
+    handler: (resources: MoveResource[], ctx: AptosResourcesContext) => PromiseOrVoid,
     timeIntervalInMinutes = 60,
     backfillTimeIntervalInMinutes = 240,
     type?: string
@@ -277,7 +278,7 @@ export class AptosResourcesProcessor {
   }
 
   public onVersionInterval(
-    handler: (resources: MoveResource[], ctx: AptosResourcesContext) => void,
+    handler: (resources: MoveResource[], ctx: AptosResourcesContext) => PromiseOrVoid,
     versionInterval = 100000,
     backfillVersionInterval = 400000,
     typePrefix?: string

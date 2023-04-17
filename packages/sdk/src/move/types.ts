@@ -154,3 +154,24 @@ function adjustType(type: TypeDescriptor) {
     type.qname = type.qname.slice(3)
   }
 }
+
+/**
+ *
+ * @param matcher
+ * @param type
+ */
+export function matchType(matcher: TypeDescriptor, type: TypeDescriptor): boolean {
+  if (matcher.qname === 'any') {
+    return true
+  }
+  if (matcher.qname !== type.qname) {
+    return false
+  }
+  for (const [idx, matcherTarg] of matcher.typeArgs.entries()) {
+    const targ = type.typeArgs[idx]
+    if (!matchType(matcherTarg, targ)) {
+      return false
+    }
+  }
+  return true
+}

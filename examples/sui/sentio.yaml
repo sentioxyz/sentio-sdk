@@ -1,2 +1,5 @@
 project: sui
 host: local
+contracts:
+  - chain: sui_testnet
+    address: '0xebaa2ad3eacc230f309cd933958cc52684df0a41ae7ac214d186b80f830867d2'

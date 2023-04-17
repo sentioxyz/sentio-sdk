@@ -98,7 +98,10 @@ export class AptosDex<T> {
     ctx: AptosResourcesContext,
     poolsHandler?: (pools: TypedMoveResource<T>[]) => Promise<void> | void
   ) {
-    const pools: TypedMoveResource<T>[] = ctx.coder.filterAndDecodeResources(this.poolAdaptor.poolTypeName, resources)
+    const pools: TypedMoveResource<T>[] = await ctx.coder.filterAndDecodeResources(
+      this.poolAdaptor.poolTypeName,
+      resources
+    )
 
     const volumeByCoin = new Map<string, BigDecimal>()
     const timestamp = ctx.timestampInMicros

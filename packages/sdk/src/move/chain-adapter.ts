@@ -1,7 +1,7 @@
 import { InternalMoveModule, InternalMoveStruct } from './internal-models.js'
 import { TypeDescriptor } from './types.js'
 
-export abstract class ChainAdapter<NetworkType, ModuleType> {
+export abstract class ChainAdapter<NetworkType, ModuleType, StructType> {
   abstract fetchModule(account: string, module: string, network: NetworkType): Promise<ModuleType>
 
   abstract fetchModules(account: string, network: NetworkType): Promise<ModuleType[]>
@@ -11,4 +11,7 @@ export abstract class ChainAdapter<NetworkType, ModuleType> {
   // Get the parameters that actually have arguments in runtime
   // Aptos first signer and Sui's last TxContext are no use
   abstract getMeaningfulFunctionParams(params: TypeDescriptor[]): TypeDescriptor[]
+
+  abstract getType(base: StructType): string
+  abstract getData<T>(base: StructType): any
 }
