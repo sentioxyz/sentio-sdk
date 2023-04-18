@@ -1,5 +1,5 @@
 import { BaseContract, DeferredTopicFilter, TransactionResponseParams } from 'ethers'
-import { BlockParams, Network } from 'ethers/providers'
+import { Network } from 'ethers/providers'
 
 import { BoundContractView, ContractContext, ContractView, GlobalContext } from './context.js'
 import {
@@ -15,8 +15,7 @@ import {
 import { BindOptions } from './bind-options.js'
 import { PromiseOrVoid } from '../core/promises.js'
 import { ServerError, Status } from 'nice-grpc'
-import { fixEmptyKey, TypedEvent, TypedCallTrace, formatEthData } from './eth.js'
-import * as console from 'console'
+import { fixEmptyKey, TypedEvent, TypedCallTrace, formatEthData, RichBlock } from './eth.js'
 import { getNetworkFromCtxOrNetworkish } from './provider.js'
 import sha3 from 'js-sha3'
 import { ListStateStorage } from '@sentio/runtime'
@@ -88,7 +87,7 @@ export class GlobalProcessor {
   }
 
   public onBlockInterval(
-    handler: (block: BlockParams, ctx: GlobalContext) => PromiseOrVoid,
+    handler: (block: RichBlock, ctx: GlobalContext) => PromiseOrVoid,
     blockInterval = 250,
     backfillBlockInterval = 1000
   ): this {
@@ -99,7 +98,7 @@ export class GlobalProcessor {
   }
 
   public onTimeInterval(
-    handler: (block: BlockParams, ctx: GlobalContext) => PromiseOrVoid,
+    handler: (block: RichBlock, ctx: GlobalContext) => PromiseOrVoid,
     timeIntervalInMinutes = 60,
     backfillTimeIntervalInMinutes = 240
   ): this {
@@ -115,7 +114,7 @@ export class GlobalProcessor {
   }
 
   public onInterval(
-    handler: (block: BlockParams, ctx: GlobalContext) => PromiseOrVoid,
+    handler: (block: RichBlock, ctx: GlobalContext) => PromiseOrVoid,
     timeInterval: HandleInterval | undefined,
     blockInterval: HandleInterval | undefined
   ): this {
@@ -245,7 +244,7 @@ export abstract class BaseProcessor<
   }
 
   public onBlockInterval(
-    handler: (block: BlockParams, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
+    handler: (block: RichBlock, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     blockInterval = 250,
     backfillBlockInterval = 1000
   ): this {
@@ -256,7 +255,7 @@ export abstract class BaseProcessor<
   }
 
   public onTimeInterval(
-    handler: (block: BlockParams, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
+    handler: (block: RichBlock, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     timeIntervalInMinutes = 60,
     backfillTimeIntervalInMinutes = 240
   ): this {
@@ -268,7 +267,7 @@ export abstract class BaseProcessor<
   }
 
   public onInterval(
-    handler: (block: BlockParams, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
+    handler: (block: RichBlock, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     timeInterval: HandleInterval | undefined,
     blockInterval: HandleInterval | undefined
   ): this {

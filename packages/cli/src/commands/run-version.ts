@@ -1,7 +1,6 @@
 import commandLineArgs from 'command-line-args'
 import commandLineUsage from 'command-line-usage'
 import { getCliVersion, getSdkVersion } from '../utils.js'
-import * as console from 'console'
 
 export function runVersion(argv: string[]) {
   const optionDefinitions = [

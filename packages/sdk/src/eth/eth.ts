@@ -11,7 +11,7 @@ import {
   object,
   formatData,
 } from 'ethers/providers'
-import { CallExceptionError, LogDescription, Result, DeferredTopicFilter } from 'ethers'
+import { CallExceptionError, LogDescription, Result, DeferredTopicFilter, BlockParams } from 'ethers'
 import { ContractContext } from './context.js'
 import { getAddress } from 'ethers/address'
 import { getBigInt, getNumber, hexlify } from 'ethers/utils'
@@ -33,6 +33,11 @@ export interface TypedEvent<TArgsArray extends Array<any> = any, TArgsObject = a
 }
 
 export type TypedEventFilter<_TEvent extends TypedEvent> = DeferredTopicFilter
+
+export interface RichBlock extends BlockParams {
+  traces?: Trace[]
+  transactionReceipts?: TransactionReceiptParams[]
+}
 
 export class SimpleEthersError extends Error {
   e: Error
@@ -132,7 +137,7 @@ export function formatEthData(data: {
   if (data.block && !data.block.transactions) {
     data.block.transactions = []
   }
-  const block = data.block ? formatBlock(data.block) : undefined
+  const block = data.block ? formatRichBlock(data.block) : undefined
   const trace = data.trace ? (data.trace as Trace) : undefined
   const transaction = data.transaction ? formatTransactionResponse(data.transaction) : undefined
   const transactionReceipt = data.transactionReceipt ? formatTransactionReceipt(data.transactionReceipt) : undefined
@@ -143,6 +148,14 @@ export function formatEthData(data: {
     transaction,
     transactionReceipt,
   }
+}
+
+export function formatRichBlock(block: RichBlock): RichBlock {
+  formatBlock(block)
+  if (block.transactionReceipts) {
+    block.transactionReceipts = block.transactionReceipts.map((t) => formatTransactionReceipt(t))
+  }
+  return block
 }
 
 export interface TypedCallTrace<TArgsArray extends Array<any> = any, TArgsObject = any> extends Trace {

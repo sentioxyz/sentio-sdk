@@ -17,6 +17,11 @@ import { ServerError, Status } from 'nice-grpc'
 import { CallHandler, EventFilter, EventHandler, FunctionNameAndCallFilter, parseMoveType } from '../move/index.js'
 import { PromiseOrVoid } from '../core/index.js'
 
+const DEFAULT_FETCH_CONFIG: MoveFetchConfig = {
+  resourceChanges: false,
+  allEvents: true,
+}
+
 type IndexConfigure = {
   address: string
   network: AptosNetwork
@@ -59,7 +64,7 @@ export class AptosBaseProcessor {
     includedFailed = false,
     fetchConfig?: Partial<MoveFetchConfig>
   ): this {
-    const _fetchConfig = MoveFetchConfig.fromPartial(fetchConfig || {})
+    const _fetchConfig = MoveFetchConfig.fromPartial({ ...DEFAULT_FETCH_CONFIG, ...fetchConfig })
 
     // const address = this.config.address
     // const moduleName = this.moduleName
@@ -93,7 +98,7 @@ export class AptosBaseProcessor {
     fetchConfig?: Partial<MoveFetchConfig>
   ): this {
     let _filters: EventFilter[] = []
-    const _fetchConfig = MoveFetchConfig.fromPartial(fetchConfig || {})
+    const _fetchConfig = MoveFetchConfig.fromPartial({ ...DEFAULT_FETCH_CONFIG, ...fetchConfig })
 
     if (Array.isArray(filter)) {
       _filters = filter
@@ -151,7 +156,7 @@ export class AptosBaseProcessor {
     fetchConfig?: Partial<MoveFetchConfig>
   ): this {
     let _filters: FunctionNameAndCallFilter[] = []
-    const _fetchConfig = MoveFetchConfig.fromPartial(fetchConfig || {})
+    const _fetchConfig = MoveFetchConfig.fromPartial({ ...DEFAULT_FETCH_CONFIG, ...fetchConfig })
 
     if (Array.isArray(filter)) {
       _filters = filter

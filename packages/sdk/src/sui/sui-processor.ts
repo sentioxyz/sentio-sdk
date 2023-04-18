@@ -25,6 +25,11 @@ import { defaultMoveCoder, MoveCoder } from './move-coder.js'
 import { PromiseOrVoid } from '../core/index.js'
 // import { dynamic_field } from './builtin/0x2.js'
 
+const DEFAULT_FETCH_CONFIG: MoveFetchConfig = {
+  resourceChanges: false,
+  allEvents: true,
+}
+
 class IndexConfigure {
   address: string
   network: SuiNetwork
@@ -72,7 +77,7 @@ export class SuiBaseProcessor {
     fetchConfig?: Partial<MoveFetchConfig>
   ): SuiBaseProcessor {
     let _filters: EventFilter[] = []
-    const _fetchConfig = MoveFetchConfig.fromPartial(fetchConfig || {})
+    const _fetchConfig = MoveFetchConfig.fromPartial({ ...DEFAULT_FETCH_CONFIG, ...fetchConfig })
 
     if (Array.isArray(filter)) {
       _filters = filter
@@ -132,7 +137,7 @@ export class SuiBaseProcessor {
     fetchConfig?: Partial<MoveFetchConfig>
   ): SuiBaseProcessor {
     let _filters: FunctionNameAndCallFilter[] = []
-    const _fetchConfig = MoveFetchConfig.fromPartial(fetchConfig || {})
+    const _fetchConfig = MoveFetchConfig.fromPartial({ ...DEFAULT_FETCH_CONFIG, ...fetchConfig })
 
     if (Array.isArray(filter)) {
       _filters = filter
