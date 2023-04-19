@@ -1,7 +1,7 @@
 import { SouffleChefCampaign, CandyMachine } from './types/aptos/souffle.js'
 import { token } from '@sentio/sdk/aptos/builtin/0x3'
 import { coin } from '@sentio/sdk/aptos/builtin/0x1'
-import { AptosNetwork, defaultMoveCoder } from '@sentio/sdk/aptos'
+import { AptosNetwork } from '@sentio/sdk/aptos'
 
 coin.bind({ network: AptosNetwork.MAIN_NET }).onEventWithdrawEvent((evt, ctx) => {
   if (evt.guid.account_address === '0x9c5382a5aa6cd92f38ffa50bd8ec2879833997116499cc5bcd6d4688a962e330') {
@@ -21,7 +21,7 @@ SouffleChefCampaign.bind({ network: AptosNetwork.TEST_NET, startVersion: 6604913
     ctx.meter.Counter('burned').add(1)
   })
   .onTransaction(async (txn, ctx) => {
-    const events = await defaultMoveCoder().filterAndDecodeEvents(token.DepositEvent.type(), txn.events)
+    const events = await ctx.coder.filterAndDecodeEvents(token.DepositEvent.type(), txn.events)
     for (const event of events) {
       // const depositEventInstance = DEFAULT_TYPE_REGISTRY.decodeEvent(event) as DepositEventInstance
       ctx.meter.Counter('deposit_token_count').add(event.data_decoded.amount)

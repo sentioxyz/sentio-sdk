@@ -30,6 +30,7 @@ export abstract class BaseProcessorTemplate<
     handler: (block: BlockParams, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid
     blockInterval?: HandleInterval
     timeIntervalInMinutes?: HandleInterval
+    fetchConfig?: EthFetchConfig
   }[] = []
   traceHandlers: {
     signature: string
@@ -64,7 +65,7 @@ export abstract class BaseProcessorTemplate<
       processor.onTrace(th.signature, th.handler, th.fetchConfig)
     }
     for (const bh of this.blockHandlers) {
-      processor.onInterval(bh.handler, bh.timeIntervalInMinutes, bh.blockInterval)
+      processor.onInterval(bh.handler, bh.timeIntervalInMinutes, bh.blockInterval, bh.fetchConfig)
     }
 
     const instance: TemplateInstance = {
@@ -103,32 +104,41 @@ export abstract class BaseProcessorTemplate<
   public onBlockInterval(
     handler: (block: BlockParams, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     blockInterval = 1000,
-    backfillBlockInterval = 4000
+    backfillBlockInterval = 4000,
+    fetchConfig?: EthFetchConfig
   ) {
-    return this.onInterval(handler, undefined, {
-      recentInterval: blockInterval,
-      backfillInterval: backfillBlockInterval,
-    })
+    return this.onInterval(
+      handler,
+      undefined,
+      {
+        recentInterval: blockInterval,
+        backfillInterval: backfillBlockInterval,
+      },
+      fetchConfig
+    )
   }
 
   public onTimeInterval(
     handler: (block: BlockParams, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     timeIntervalInMinutes = 60,
-    backfillBlockInterval = 240
+    backfillBlockInterval = 240,
+    fetchConfig?: EthFetchConfig
   ) {
     return this.onInterval(
       handler,
       { recentInterval: timeIntervalInMinutes, backfillInterval: backfillBlockInterval },
-      undefined
+      undefined,
+      fetchConfig
     )
   }
 
   public onInterval(
     handler: (block: BlockParams, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     timeInterval: HandleInterval | undefined,
-    blockInterval: HandleInterval | undefined
+    blockInterval: HandleInterval | undefined,
+    fetchConfig: EthFetchConfig | undefined
   ) {
-    this.blockHandlers.push({ handler, timeIntervalInMinutes: timeInterval, blockInterval: blockInterval })
+    this.blockHandlers.push({ handler, timeIntervalInMinutes: timeInterval, blockInterval, fetchConfig })
     return this
   }
 

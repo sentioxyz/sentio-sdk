@@ -96,6 +96,7 @@ export class AptosPlugin extends Plugin {
             minutesInterval: handler.timeIntervalInMinutes,
             slot: 0,
             slotInterval: handler.versionInterval,
+            fetchConfig: undefined,
           },
           type: handler.type || '',
         })
@@ -107,6 +108,7 @@ export class AptosPlugin extends Plugin {
             minutesInterval: handler.timeIntervalInMinutes,
             slot: 0,
             slotInterval: handler.versionInterval,
+            fetchConfig: undefined,
           },
           type: handler.type || '',
           ownerType: MoveOnIntervalConfig_OwnerType.ADDRESS,

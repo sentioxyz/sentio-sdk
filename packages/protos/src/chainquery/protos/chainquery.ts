@@ -25,6 +25,7 @@ export interface AptosGetTxnsByEventRequest {
   toVersion: bigint;
   address: string;
   type: string;
+  includeAllEvents: boolean;
 }
 
 export interface AptosSQLQueryRequest {
@@ -292,7 +293,14 @@ export const AptosGetTxnsByVersionRequest = {
 };
 
 function createBaseAptosGetTxnsByEventRequest(): AptosGetTxnsByEventRequest {
-  return { network: "", fromVersion: BigInt("0"), toVersion: BigInt("0"), address: "", type: "" };
+  return {
+    network: "",
+    fromVersion: BigInt("0"),
+    toVersion: BigInt("0"),
+    address: "",
+    type: "",
+    includeAllEvents: false,
+  };
 }
 
 export const AptosGetTxnsByEventRequest = {
@@ -311,6 +319,9 @@ export const AptosGetTxnsByEventRequest = {
     }
     if (message.type !== "") {
       writer.uint32(42).string(message.type);
+    }
+    if (message.includeAllEvents === true) {
+      writer.uint32(48).bool(message.includeAllEvents);
     }
     return writer;
   },
@@ -337,6 +348,9 @@ export const AptosGetTxnsByEventRequest = {
         case 5:
           message.type = reader.string();
           break;
+        case 6:
+          message.includeAllEvents = reader.bool();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -352,6 +366,7 @@ export const AptosGetTxnsByEventRequest = {
       toVersion: isSet(object.toVersion) ? BigInt(object.toVersion) : BigInt("0"),
       address: isSet(object.address) ? String(object.address) : "",
       type: isSet(object.type) ? String(object.type) : "",
+      includeAllEvents: isSet(object.includeAllEvents) ? Boolean(object.includeAllEvents) : false,
     };
   },
 
@@ -362,6 +377,7 @@ export const AptosGetTxnsByEventRequest = {
     message.toVersion !== undefined && (obj.toVersion = message.toVersion.toString());
     message.address !== undefined && (obj.address = message.address);
     message.type !== undefined && (obj.type = message.type);
+    message.includeAllEvents !== undefined && (obj.includeAllEvents = message.includeAllEvents);
     return obj;
   },
 
@@ -376,6 +392,7 @@ export const AptosGetTxnsByEventRequest = {
     message.toVersion = object.toVersion ?? BigInt("0");
     message.address = object.address ?? "";
     message.type = object.type ?? "";
+    message.includeAllEvents = object.includeAllEvents ?? false;
     return message;
   },
 };

@@ -62,6 +62,7 @@ export class EthPlugin extends Plugin {
           minutes: 0,
           minutesInterval: blockHandler.timeIntervalInMinutes,
           handlerId: handlerId,
+          fetchConfig: blockHandler.fetchConfig,
         })
       }
 
@@ -140,6 +141,7 @@ export class EthPlugin extends Plugin {
           minutes: 0,
           minutesInterval: blockHandler.timeIntervalInMinutes,
           handlerId: handlerId,
+          fetchConfig: blockHandler.fetchConfig,
         })
       }
 

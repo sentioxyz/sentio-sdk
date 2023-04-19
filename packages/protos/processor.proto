@@ -168,6 +168,9 @@ message OnIntervalConfig {
   // block or version
   int32 slot = 3;
   optional HandleInterval slot_interval = 5;
+
+  // eth fetch config
+  EthFetchConfig fetch_config = 6;
 }
 
 message AptosOnIntervalConfig {

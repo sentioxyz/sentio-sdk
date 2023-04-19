@@ -391,6 +391,7 @@ export interface OnIntervalConfig {
   minutesInterval?: HandleInterval | undefined;
   slot: number;
   slotInterval?: HandleInterval | undefined;
+  fetchConfig: EthFetchConfig | undefined;
 }
 
 export interface AptosOnIntervalConfig {
@@ -1873,7 +1874,14 @@ export const HandleInterval = {
 };
 
 function createBaseOnIntervalConfig(): OnIntervalConfig {
-  return { handlerId: 0, minutes: 0, minutesInterval: undefined, slot: 0, slotInterval: undefined };
+  return {
+    handlerId: 0,
+    minutes: 0,
+    minutesInterval: undefined,
+    slot: 0,
+    slotInterval: undefined,
+    fetchConfig: undefined,
+  };
 }
 
 export const OnIntervalConfig = {
@@ -1892,6 +1900,9 @@ export const OnIntervalConfig = {
     }
     if (message.slotInterval !== undefined) {
       HandleInterval.encode(message.slotInterval, writer.uint32(42).fork()).ldelim();
+    }
+    if (message.fetchConfig !== undefined) {
+      EthFetchConfig.encode(message.fetchConfig, writer.uint32(50).fork()).ldelim();
     }
     return writer;
   },
@@ -1918,6 +1929,9 @@ export const OnIntervalConfig = {
         case 5:
           message.slotInterval = HandleInterval.decode(reader, reader.uint32());
           break;
+        case 6:
+          message.fetchConfig = EthFetchConfig.decode(reader, reader.uint32());
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1933,6 +1947,7 @@ export const OnIntervalConfig = {
       minutesInterval: isSet(object.minutesInterval) ? HandleInterval.fromJSON(object.minutesInterval) : undefined,
       slot: isSet(object.slot) ? Number(object.slot) : 0,
       slotInterval: isSet(object.slotInterval) ? HandleInterval.fromJSON(object.slotInterval) : undefined,
+      fetchConfig: isSet(object.fetchConfig) ? EthFetchConfig.fromJSON(object.fetchConfig) : undefined,
     };
   },
 
@@ -1945,6 +1960,8 @@ export const OnIntervalConfig = {
     message.slot !== undefined && (obj.slot = Math.round(message.slot));
     message.slotInterval !== undefined &&
       (obj.slotInterval = message.slotInterval ? HandleInterval.toJSON(message.slotInterval) : undefined);
+    message.fetchConfig !== undefined &&
+      (obj.fetchConfig = message.fetchConfig ? EthFetchConfig.toJSON(message.fetchConfig) : undefined);
     return obj;
   },
 
@@ -1962,6 +1979,9 @@ export const OnIntervalConfig = {
     message.slot = object.slot ?? 0;
     message.slotInterval = (object.slotInterval !== undefined && object.slotInterval !== null)
       ? HandleInterval.fromPartial(object.slotInterval)
+      : undefined;
+    message.fetchConfig = (object.fetchConfig !== undefined && object.fetchConfig !== null)
+      ? EthFetchConfig.fromPartial(object.fetchConfig)
       : undefined;
     return message;
   },

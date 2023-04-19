@@ -86,6 +86,7 @@ export class SuiPlugin extends Plugin {
             minutesInterval: handler.timeIntervalInMinutes,
             slot: 0,
             slotInterval: handler.versionInterval,
+            fetchConfig: undefined,
           },
           type: handler.type || '',
           ownerType: processor.ownerType,

@@ -41,6 +41,7 @@ export class BlockHandler {
   blockInterval?: HandleInterval
   timeIntervalInMinutes?: HandleInterval
   handler: (block: Data_EthBlock) => Promise<ProcessResult>
+  fetchConfig: EthFetchConfig
 }
 
 export class TransactionHandler {
@@ -89,23 +90,31 @@ export class GlobalProcessor {
   public onBlockInterval(
     handler: (block: RichBlock, ctx: GlobalContext) => PromiseOrVoid,
     blockInterval = 250,
-    backfillBlockInterval = 1000
+    backfillBlockInterval = 1000,
+    fetchConfig?: Partial<EthFetchConfig>
   ): this {
-    return this.onInterval(handler, undefined, {
-      recentInterval: blockInterval,
-      backfillInterval: backfillBlockInterval,
-    })
+    return this.onInterval(
+      handler,
+      undefined,
+      {
+        recentInterval: blockInterval,
+        backfillInterval: backfillBlockInterval,
+      },
+      fetchConfig
+    )
   }
 
   public onTimeInterval(
     handler: (block: RichBlock, ctx: GlobalContext) => PromiseOrVoid,
     timeIntervalInMinutes = 60,
-    backfillTimeIntervalInMinutes = 240
+    backfillTimeIntervalInMinutes = 240,
+    fetchConfig?: Partial<EthFetchConfig>
   ): this {
     return this.onInterval(
       handler,
       { recentInterval: timeIntervalInMinutes, backfillInterval: backfillTimeIntervalInMinutes },
-      undefined
+      undefined,
+      fetchConfig
     )
   }
 
@@ -116,7 +125,8 @@ export class GlobalProcessor {
   public onInterval(
     handler: (block: RichBlock, ctx: GlobalContext) => PromiseOrVoid,
     timeInterval: HandleInterval | undefined,
-    blockInterval: HandleInterval | undefined
+    blockInterval: HandleInterval | undefined,
+    fetchConfig: Partial<EthFetchConfig> | undefined
   ): this {
     const chainId = this.getChainId()
 
@@ -134,6 +144,7 @@ export class GlobalProcessor {
       },
       timeIntervalInMinutes: timeInterval,
       blockInterval: blockInterval,
+      fetchConfig: EthFetchConfig.fromPartial(fetchConfig || {}),
     })
     return this
   }
@@ -246,30 +257,39 @@ export abstract class BaseProcessor<
   public onBlockInterval(
     handler: (block: RichBlock, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     blockInterval = 250,
-    backfillBlockInterval = 1000
+    backfillBlockInterval = 1000,
+    fetchConfig?: Partial<EthFetchConfig>
   ): this {
-    return this.onInterval(handler, undefined, {
-      recentInterval: blockInterval,
-      backfillInterval: backfillBlockInterval,
-    })
+    return this.onInterval(
+      handler,
+      undefined,
+      {
+        recentInterval: blockInterval,
+        backfillInterval: backfillBlockInterval,
+      },
+      fetchConfig
+    )
   }
 
   public onTimeInterval(
     handler: (block: RichBlock, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     timeIntervalInMinutes = 60,
-    backfillTimeIntervalInMinutes = 240
+    backfillTimeIntervalInMinutes = 240,
+    fetchConfig?: Partial<EthFetchConfig>
   ): this {
     return this.onInterval(
       handler,
       { recentInterval: timeIntervalInMinutes, backfillInterval: backfillTimeIntervalInMinutes },
-      undefined
+      undefined,
+      fetchConfig
     )
   }
 
   public onInterval(
     handler: (block: RichBlock, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     timeInterval: HandleInterval | undefined,
-    blockInterval: HandleInterval | undefined
+    blockInterval: HandleInterval | undefined,
+    fetchConfig: Partial<EthFetchConfig> | undefined
   ): this {
     const chainId = this.getChainId()
     const processor = this
@@ -299,6 +319,7 @@ export abstract class BaseProcessor<
       },
       timeIntervalInMinutes: timeInterval,
       blockInterval: blockInterval,
+      fetchConfig: EthFetchConfig.fromPartial(fetchConfig || {}),
     })
     return this
   }
