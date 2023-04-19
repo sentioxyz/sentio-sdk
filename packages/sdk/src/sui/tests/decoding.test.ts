@@ -1,9 +1,11 @@
 import { defaultMoveCoder } from '../move-coder.js'
+
 import { dynamic_field, loadAllTypes } from '../builtin/0x2.js'
 import { expect } from 'chai'
 import { TypedSuiMoveObject } from '../models.js'
 import { SuiNetwork } from '../network.js'
-import { parseMoveType } from '../../move/index.js'
+import { BUILTIN_TYPES, parseMoveType } from '../../move/index.js'
+import { single_collateral } from './types/testnet/0xebaa2ad3eacc230f309cd933958cc52684df0a41ae7ac214d186b80f830867d2.js'
 
 describe('Test Sui Example', () => {
   const coder = defaultMoveCoder(SuiNetwork.TEST_NET)
@@ -104,13 +106,16 @@ describe('Test Sui Example', () => {
 
   test('decode dynamic fields', async () => {
     const objects = data.map((d) => d.data.content)
-    const res: TypedSuiMoveObject<dynamic_field.Field<string, boolean>>[] = await coder.filterAndDecodeObjects(
-      '0x2::dynamic_field::Field<address, bool>',
+    const res = (await coder.filterAndDecodeObjects(
+      parseMoveType('0x2::dynamic_field::Field<address, bool>'),
       objects
-    )
+    )) as any
     expect(res.length).eq(objects.length)
+    const fieldType = dynamic_field.Field.type(BUILTIN_TYPES.ADDRESS_TYPE, BUILTIN_TYPES.BOOL_TYPE)
+    const res2 = (await coder.filterAndDecodeObjects(fieldType, objects)).map((e) => e.data_decoded)
+    expect(res2.length).eq(objects.length)
 
-    const decodedObjects = await coder.getDynamicFields(objects, 'address', 'bool')
+    const decodedObjects = await coder.getDynamicFields(objects, BUILTIN_TYPES.ADDRESS_TYPE, BUILTIN_TYPES.BOOL_TYPE)
     expect(res.length).eq(decodedObjects.length)
     console.log(decodedObjects)
   })
@@ -118,15 +123,15 @@ describe('Test Sui Example', () => {
   test('decode dynamic fields 2', async () => {
     const objects = data2.map((d) => d.data.content)
     const res: TypedSuiMoveObject<dynamic_field.Field<any, any>>[] = await coder.filterAndDecodeObjects(
-      '0x2::dynamic_field::Field',
+      dynamic_field.Field.type(),
       objects
     )
     expect(res.length).eq(objects.length)
 
     const decodedObjects = await coder.getDynamicFields(
       objects,
-      'u64',
-      '0xebaa2ad3eacc230f309cd933958cc52684df0a41ae7ac214d186b80f830867d2::single_collateral::PortfolioVault'
+      BUILTIN_TYPES.U64_TYPE,
+      single_collateral.PortfolioVault.type()
     )
     expect(res.length).eq(1)
     console.log(decodedObjects)

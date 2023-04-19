@@ -10,6 +10,7 @@ import { TypedEventInstance, TypedFunctionPayload, TypedMoveResource } from './m
 import { AbstractMoveCoder } from '../move/abstract-move-coder.js'
 import { AptosNetwork } from './network.js'
 import { AptosChainAdapter } from './aptos-chain-adapter.js'
+import { parseMoveType, TypeDescriptor } from '../move/index.js'
 
 export class MoveCoder extends AbstractMoveCoder<AptosNetwork, MoveModuleBytecode, Event | MoveResource> {
   constructor(network: AptosNetwork) {
@@ -36,14 +37,23 @@ export class MoveCoder extends AbstractMoveCoder<AptosNetwork, MoveModuleBytecod
   decodeEvent<T>(event: Event): Promise<TypedEventInstance<T> | undefined> {
     return this.decodedStruct<T>(event) as any
   }
-  filterAndDecodeEvents<T>(typeQname: string, resources: Event[]): Promise<TypedEventInstance<T>[]> {
-    return this.filterAndDecodeStruct(typeQname, resources) as any
+  filterAndDecodeEvents<T>(type: string | TypeDescriptor<T>, resources: Event[]): Promise<TypedEventInstance<T>[]> {
+    if (typeof type === 'string') {
+      type = parseMoveType(type)
+    }
+    return this.filterAndDecodeStruct(type, resources) as any
   }
   decodeResource<T>(res: MoveResource): Promise<TypedMoveResource<T> | undefined> {
     return this.decodedStruct<T>(res)
   }
-  filterAndDecodeResources<T>(typeQname: string, resources: MoveResource[]): Promise<TypedMoveResource<T>[]> {
-    return this.filterAndDecodeStruct(typeQname, resources) as any
+  filterAndDecodeResources<T>(
+    type: string | TypeDescriptor<T>,
+    resources: MoveResource[]
+  ): Promise<TypedMoveResource<T>[]> {
+    if (typeof type === 'string') {
+      type = parseMoveType(type)
+    }
+    return this.filterAndDecodeStruct(type, resources)
   }
 
   async decodeFunctionPayload(

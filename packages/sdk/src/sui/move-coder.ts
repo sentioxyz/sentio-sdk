@@ -2,11 +2,11 @@ import { TypedEventInstance, TypedFunctionPayload } from './models.js'
 import { AbstractMoveCoder } from '../move/abstract-move-coder.js'
 import { MoveCallSuiTransaction, SuiCallArg, SuiEvent, SuiMoveNormalizedModule, SuiMoveObject } from '@mysten/sui.js'
 import { toInternalModule } from './move-types.js'
-import { SPLITTER, TypeDescriptor } from '../move/index.js'
-import { dynamic_field } from './builtin/0x2.js'
+import { ANY_TYPE, DecodedStruct, parseMoveType, SPLITTER, TypeDescriptor } from '../move/index.js'
 import { SuiNetwork } from './network.js'
 import { SuiChainAdapter } from './sui-chain-adapter.js'
 import { InternalMoveModule } from '../move/internal-models.js'
+import { dynamic_field } from './builtin/0x2.js'
 
 export class MoveCoder extends AbstractMoveCoder<SuiNetwork, SuiMoveNormalizedModule, SuiEvent | SuiMoveObject> {
   constructor(network: SuiNetwork) {
@@ -43,24 +43,31 @@ export class MoveCoder extends AbstractMoveCoder<SuiNetwork, SuiMoveNormalizedMo
   decodeEvent<T>(event: SuiEvent): Promise<TypedEventInstance<T> | undefined> {
     return this.decodedStruct<T>(event) as any
   }
-  filterAndDecodeEvents<T>(typeQname: string, resources: SuiEvent[]): Promise<TypedEventInstance<T>[]> {
-    return this.filterAndDecodeStruct(typeQname, resources) as any
+  filterAndDecodeEvents<T>(type: TypeDescriptor<T> | string, resources: SuiEvent[]): Promise<TypedEventInstance<T>[]> {
+    if (typeof type === 'string') {
+      type = parseMoveType(type)
+    }
+    return this.filterAndDecodeStruct(type, resources) as any
   }
 
-  async getDynamicFields(
+  async getDynamicFields<T1, T2>(
     objects: SuiMoveObject[],
-    keyTypeMatcher: string = 'any',
-    valueTypeMatcher: string = 'any'
-  ): Promise<dynamic_field.Field<any, any>[]> {
-    const res = (await this.filterAndDecodeObjects(
-      `0x2::dynamic_field::Field<${keyTypeMatcher}, ${valueTypeMatcher}>`,
-      objects
-    )) as any[]
-    return res.map((o) => o.data_decoded) as any
+    keyType: TypeDescriptor<T1> = ANY_TYPE,
+    valueType: TypeDescriptor<T2> = ANY_TYPE
+  ): Promise<dynamic_field.Field<T1, T2>[]> {
+    // const type = dynamic_field.Field.TYPE
+    // Not using the code above to avoid cycle initialize failed
+    const type = new TypeDescriptor<dynamic_field.Field<T1, T2>>('0x2::dynamic_field::Field')
+    type.typeArgs = [keyType, valueType]
+    const res = await this.filterAndDecodeObjects(type, objects)
+    return res.map((o) => o.data_decoded)
   }
 
-  filterAndDecodeObjects(typeMatcher: string, objects: SuiMoveObject[]): Promise<any[]> {
-    return this.filterAndDecodeStruct(typeMatcher, objects) as any
+  filterAndDecodeObjects<T>(
+    type: TypeDescriptor<T>,
+    objects: SuiMoveObject[]
+  ): Promise<DecodedStruct<SuiMoveObject, T>[]> {
+    return this.filterAndDecodeStruct(type, objects) as any
   }
 
   async decodeFunctionPayload(payload: MoveCallSuiTransaction, inputs: SuiCallArg[]): Promise<MoveCallSuiTransaction> {

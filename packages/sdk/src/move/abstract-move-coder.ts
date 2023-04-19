@@ -1,13 +1,8 @@
 import { moduleQname, SPLITTER, VECTOR_STR } from './utils.js'
-import { matchType, parseMoveType, TypeDescriptor } from './types.js'
+import { DecodedStruct, matchType, parseMoveType, TypeDescriptor } from './types.js'
 import { InternalMoveFunction, InternalMoveModule, InternalMoveStruct } from './internal-models.js'
 import { bytesToBigInt } from '../utils/index.js'
 import { ChainAdapter } from './chain-adapter.js'
-
-export type DecodedStructWithTag<B, T> = B & {
-  data_decoded: T
-  type_arguments: string[]
-}
 
 export abstract class AbstractMoveCoder<Network, ModuleType, StructType> {
   protected moduleMapping = new Map<string, InternalMoveModule>()
@@ -270,32 +265,32 @@ export abstract class AbstractMoveCoder<Network, ModuleType, StructType> {
   }
 
   protected async filterAndDecodeStruct<T>(
-    typeMatcher: string,
+    typeMatcher: TypeDescriptor<T>,
     structsWithTags: StructType[]
-  ): Promise<DecodedStructWithTag<StructType, T>[]> {
+  ): Promise<DecodedStruct<StructType, T>[]> {
     if (!structsWithTags) {
       return [] as any
     }
-    const typeMatcherDescriptor = parseMoveType(typeMatcher)
-    const results: DecodedStructWithTag<StructType, T>[] = []
+    // const typeMatcherDescriptor = parseMoveType(typeMatcher)
+    const results: DecodedStruct<StructType, T>[] = []
     for (const resource of structsWithTags) {
       const resourceType = this.adapter.getType(resource)
       const resourceTypeDescriptor = parseMoveType(resourceType)
-      if (!matchType(typeMatcherDescriptor, resourceTypeDescriptor)) {
+      if (!matchType(typeMatcher, resourceTypeDescriptor)) {
         continue
       }
 
-      const result = await this.decodedStruct(resource)
+      const result = await this.decodedStruct<T>(resource)
       if (result) {
-        results.push(result as DecodedStructWithTag<StructType, T>)
+        results.push(result)
       } else {
-        console.log('')
+        console.error('decoding error')
       }
     }
     return results
   }
 
-  protected async decodedStruct<T>(typeStruct: StructType): Promise<DecodedStructWithTag<StructType, T> | undefined> {
+  protected async decodedStruct<T>(typeStruct: StructType): Promise<DecodedStruct<StructType, T> | undefined> {
     const typeDescriptor = parseMoveType(this.adapter.getType(typeStruct))
     const typeArguments = typeDescriptor.typeArgs.map((t) => t.getSignature())
 
@@ -310,6 +305,6 @@ export abstract class AbstractMoveCoder<Network, ModuleType, StructType> {
       ...typeStruct,
       data_decoded: dataTyped,
       type_arguments: typeArguments,
-    } as DecodedStructWithTag<StructType, T>
+    } as DecodedStruct<StructType, T>
   }
 }

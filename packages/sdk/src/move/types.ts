@@ -1,6 +1,14 @@
 import { SPLITTER, VECTOR_STR } from './utils.js'
 
-export class TypeDescriptor {
+export type DecodedStruct<B, T> = B & {
+  /**
+   * decoded data using ABI, undefined if there is decoding error, usually because the ABI/data mismatch
+   */
+  data_decoded: T
+  type_arguments: string[]
+}
+
+export class TypeDescriptor<T = any> {
   qname: string
   reference: boolean
   mutable: boolean
@@ -11,6 +19,32 @@ export class TypeDescriptor {
     this.reference = false
     this.mutable = false
     this.typeArgs = typeParams || []
+  }
+
+  apply(...typeArgs: TypeDescriptor[]): TypeDescriptor {
+    const newObj = this.clone()
+    newObj.typeArgs = typeArgs
+    return newObj
+  }
+
+  clone(): this {
+    const newObj = new TypeDescriptor(this.qname, this.typeArgs)
+    newObj.reference = this.reference
+    newObj.mutable = this.mutable
+    return newObj as any
+  }
+
+  // compare qname without consider case for system type
+  compareQname(t: TypeDescriptor): boolean {
+    let t1 = this.qname
+    if (BUILTIN_TYPES_SET.has(this.qname.toLowerCase())) {
+      t1 = this.qname.toLowerCase()
+    }
+    let t2 = t.qname
+    if (BUILTIN_TYPES_SET.has(t.qname.toLowerCase())) {
+      t2 = t.qname
+    }
+    return t1 === t2
   }
 
   getSignature(): string {
@@ -51,25 +85,12 @@ export class TypeDescriptor {
     if (this.reference) {
       return []
     }
+    if (BUILTIN_TYPES_SET.has(this.qname.toLowerCase())) {
+      return []
+    }
     switch (this.qname) {
       case 'signer':
-      case 'address':
-      case 'Address':
       case '0x1::string::String':
-      case 'bool':
-      case 'Bool':
-      case 'u8':
-      case 'U8':
-      case 'u16':
-      case 'U16':
-      case 'u32':
-      case 'U32':
-      case 'u64':
-      case 'U64':
-      case 'u128':
-      case 'U128':
-      case 'u256':
-      case 'U256':
         return []
     }
 
@@ -155,6 +176,30 @@ function adjustType(type: TypeDescriptor) {
   }
 }
 
+export const ANY_TYPE = new TypeDescriptor<any>('any')
+
+export const BUILTIN_TYPES = {
+  ADDRESS_TYPE: new TypeDescriptor<string>('address'),
+  // export const Address = new TypeDescriptor<string>("Address")
+
+  BOOL_TYPE: new TypeDescriptor<number>('bool'),
+
+  U8_TYPE: new TypeDescriptor<number>('u8'),
+  // export const U8 = new TypeDescriptor<number>("U8")
+  U16_TYPE: new TypeDescriptor<number>('u16'),
+  // export const U16 = new TypeDescriptor<number>("U16")
+  U32_TYPE: new TypeDescriptor<number>('u32'),
+  // export const U32 = new TypeDescriptor<number>("U32")
+  U64_TYPE: new TypeDescriptor<number>('u64'),
+  // export const U64 = new TypeDescriptor<number>("U64")
+  U128_TYPE: new TypeDescriptor<number>('u128'),
+  // export const U128 = new TypeDescriptor<number>("U128")
+  U256_TYPE: new TypeDescriptor<number>('u256'),
+  // export const U256 = new TypeDescriptor<number>("U256")
+}
+
+const BUILTIN_TYPES_SET = new Set(Object.values(BUILTIN_TYPES).map((t) => t.qname.toLowerCase()))
+
 /**
  *
  * @param matcher
@@ -164,7 +209,7 @@ export function matchType(matcher: TypeDescriptor, type: TypeDescriptor): boolea
   if (matcher.qname === 'any') {
     return true
   }
-  if (matcher.qname !== type.qname) {
+  if (!matcher.compareQname(type)) {
     return false
   }
   for (const [idx, matcherTarg] of matcher.typeArgs.entries()) {

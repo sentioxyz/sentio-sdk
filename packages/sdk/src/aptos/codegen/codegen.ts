@@ -6,12 +6,17 @@ import { join } from 'path'
 import { AptosChainAdapter } from '../aptos-chain-adapter.js'
 import { AbstractCodegen } from '../../move/abstract-codegen.js'
 
-export async function codegen(abisDir: string, outDir = join('src', 'types', 'aptos'), genExample = false) {
+export async function codegen(
+  abisDir: string,
+  outDir = join('src', 'types', 'aptos'),
+  genExample = false,
+  builtin = false
+) {
   if (!fs.existsSync(abisDir)) {
     return
   }
   const gen = new AptosCodegen()
-  const numFiles = await gen.generate(abisDir, outDir)
+  const numFiles = await gen.generate(abisDir, outDir, builtin)
   console.log(chalk.green(`Generated ${numFiles} for Aptos`))
 }
 

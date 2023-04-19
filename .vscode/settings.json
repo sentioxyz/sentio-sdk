@@ -1,0 +1,6 @@
+{
+  "files.exclude": {
+    "**/dist": true,
+    "**/packages/*/lib": true
+  }
+}

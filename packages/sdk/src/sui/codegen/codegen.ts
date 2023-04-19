@@ -9,17 +9,23 @@ import { structQname } from '../../move/index.js'
 import { join } from 'path'
 import { SuiChainAdapter } from '../sui-chain-adapter.js'
 
-export async function codegen(abisDir: string, outDir = join('src', 'types', 'sui'), genExample = false) {
+export async function codegen(
+  abisDir: string,
+  outDir = join('src', 'types', 'sui'),
+  genExample = false,
+  builtin = false
+) {
   if (!fs.existsSync(abisDir)) {
     return
   }
   const gen = new SuiCodegen()
-  const numFiles = await gen.generate(abisDir, outDir)
+  const numFiles = await gen.generate(abisDir, outDir, builtin)
   console.log(chalk.green(`Generated ${numFiles} for Sui`))
 }
 
 class SuiCodegen extends AbstractCodegen<SuiNetwork, SuiMoveNormalizedModule, SuiEvent | SuiMoveObject> {
   ADDRESS_TYPE = 'SuiAddress'
+  // ADDRESS_TYPE = 'string'
   MAIN_NET = SuiNetwork.MAIN_NET
   TEST_NET = SuiNetwork.TEST_NET
   PREFIX = 'Sui'

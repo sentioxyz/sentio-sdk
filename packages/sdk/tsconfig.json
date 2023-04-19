@@ -3,7 +3,10 @@
     "inlineSources": true,
     "rootDir": "./src",
     "baseUrl": "./src",
-    "outDir": "lib"
+    "outDir": "lib",
+    "paths": {
+      "@sentio/sdk/*": ["./*/index.js"]
+    }
   },
   "exclude": ["lib", "jest.config.ts", "src/tsup.config.ts"],
   "extends": "../../tsconfig.json"
