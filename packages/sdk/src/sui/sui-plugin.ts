@@ -17,6 +17,7 @@ import { ServerError, Status } from 'nice-grpc'
 
 import { SuiAccountProcessorState, SuiProcessorState } from './sui-processor.js'
 import { getChainId } from './network.js'
+import { validateAndNormalizeAddress } from './utils.js'
 
 export class SuiPlugin extends Plugin {
   name: string = 'SuiPlugin'
@@ -33,7 +34,7 @@ export class SuiPlugin extends Plugin {
         contract: {
           name: suiProcessor.moduleName,
           chainId: getChainId(suiProcessor.config.network),
-          address: suiProcessor.config.address,
+          address: validateAndNormalizeAddress(suiProcessor.config.address),
           abi: '',
         },
         startBlock: BigInt(suiProcessor.config.startTimestamp),
@@ -73,7 +74,7 @@ export class SuiPlugin extends Plugin {
 
     for (const processor of SuiAccountProcessorState.INSTANCE.getValues()) {
       const accountConfig = AccountConfig.fromPartial({
-        address: processor.config.address,
+        address: validateAndNormalizeAddress(processor.config.address),
         chainId: processor.getChainId(),
         startBlock: BigInt(processor.config.startTimestamp), // TODO maybe use another field
       })

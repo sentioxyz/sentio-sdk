@@ -19,7 +19,7 @@ describe('Test Sui Example', () => {
       ctx.meter.Gauge('tmp').record(1, { coin: call.arguments_decoded[2] || '' })
     })
 
-    SuiDynamicFieldObjectsProcessor.bind({ objectId: 'xxx' }).onTimeInterval((objects, ctx) => {
+    SuiDynamicFieldObjectsProcessor.bind({ objectId: '0x56a' }).onTimeInterval((objects, ctx) => {
       ctx.meter.Gauge('size').record(objects.length)
     })
   })

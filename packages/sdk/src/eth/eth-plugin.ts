@@ -20,6 +20,7 @@ import { ProcessorState } from './binds.js'
 import { AccountProcessorState } from './account-processor-state.js'
 import { ProcessorTemplateProcessorState, TemplateInstanceState } from './base-processor-template.js'
 import { GlobalProcessorState } from './base-processor.js'
+import { validateAndNormalizeAddress } from './eth.js'
 
 export class EthPlugin extends Plugin {
   name: string = 'EthPlugin'
@@ -44,7 +45,7 @@ export class EthPlugin extends Plugin {
         contract: {
           name: processor.config.name,
           chainId: chainId.toString(),
-          address: processor.config.address,
+          address: validateAndNormalizeAddress(processor.config.address),
           abi: '',
         },
         startBlock: processor.config.startBlock,
@@ -96,7 +97,7 @@ export class EthPlugin extends Plugin {
           // }
           const logFilter: LogFilter = {
             addressType: undefined,
-            address: contractConfig.contract?.address,
+            address: contractConfig.contract?.address && validateAndNormalizeAddress(contractConfig.contract.address),
             topics: [],
           }
 
@@ -126,7 +127,7 @@ export class EthPlugin extends Plugin {
         contract: {
           name: processor.config.name,
           chainId: chainId.toString(),
-          address: processor.config.address,
+          address: processor.config.address, // can only be *
           abi: '',
         },
         startBlock: processor.config.startBlock,
@@ -158,7 +159,7 @@ export class EthPlugin extends Plugin {
     // part 1.b prepare EVM account processors
     for (const processor of AccountProcessorState.INSTANCE.getValues()) {
       const accountConfig = AccountConfig.fromPartial({
-        address: processor.config.address,
+        address: validateAndNormalizeAddress(processor.config.address),
         chainId: processor.getChainId().toString(),
         startBlock: processor.config.startBlock ? BigInt(processor.config.startBlock) : 0n,
       })
@@ -183,7 +184,7 @@ export class EthPlugin extends Plugin {
           }
           const logFilter: LogFilter = {
             addressType: filter.addressType,
-            address,
+            address: address && validateAndNormalizeAddress(address),
             topics: [],
           }
 
@@ -234,7 +235,7 @@ export class EthPlugin extends Plugin {
       }
       template.bind({
         name: instance.contract.name,
-        address: instance.contract.address,
+        address: validateAndNormalizeAddress(instance.contract.address),
         network: Number(instance.contract.chainId),
         startBlock: instance.startBlock,
         endBlock: instance.endBlock,

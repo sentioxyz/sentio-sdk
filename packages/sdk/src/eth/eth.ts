@@ -241,3 +241,19 @@ export interface TraceResult {
 //       "transactionPosition": 22,
 //       "type": "create"
 //     }
+
+export function isNullAddress(address: string) {
+  try {
+    // Normalize the input address
+    const normalizedAddress = getAddress(address)
+    // Check if the normalized address is equal to the null address (all zeros)
+    return normalizedAddress === '0x0000000000000000000000000000000000000000'
+  } catch (error) {
+    return false
+  }
+}
+
+export function validateAndNormalizeAddress(address: string): string {
+  const normalizedAddress = getAddress(address)
+  return normalizedAddress.toLowerCase()
+}

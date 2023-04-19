@@ -1,11 +1,16 @@
 import { InternalMoveModule, InternalMoveStruct } from './internal-models.js'
+import { parseInt } from 'lodash-es'
 
 export const SPLITTER = '::'
 
 export const VECTOR_STR = 'vector'
 
 export function isFrameworkAccount(account: string) {
-  return account === '0x1' || account === '0x2' || account === '0x3'
+  const n = parseInt(account, 16)
+  if (Number.isNaN(n)) {
+    return false
+  }
+  return n >= 0 && n < 16
 }
 
 const KEYWORDS = new Set(['package', 'namespace', 'volatile', 'object', 'string', 'number', 'bigint', 'any'])

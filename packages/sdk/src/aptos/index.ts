@@ -10,3 +10,5 @@ export { ModuleClient } from './module-client.js'
 export { AptosPlugin } from './aptos-plugin.js'
 
 export { BUILTIN_TYPES } from '../move/types.js'
+
+export * from './utils.js'

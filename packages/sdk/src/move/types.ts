@@ -178,9 +178,16 @@ function adjustType(type: TypeDescriptor) {
 
 export const ANY_TYPE = new TypeDescriptor<any>('any')
 
+export function vectorType<T>(t: TypeDescriptor<T> = ANY_TYPE): TypeDescriptor<T[]> {
+  return BUILTIN_TYPES.VECTOR_TYPE_ANY.apply(t)
+}
+
 export const BUILTIN_TYPES = {
   ADDRESS_TYPE: new TypeDescriptor<string>('address'),
   // export const Address = new TypeDescriptor<string>("Address")
+
+  VECTOR_TYPE_ANY: new TypeDescriptor<any[]>('vector'),
+  VECTOR_TYPE: vectorType,
 
   BOOL_TYPE: new TypeDescriptor<number>('bool'),
 
@@ -198,7 +205,14 @@ export const BUILTIN_TYPES = {
   // export const U256 = new TypeDescriptor<number>("U256")
 }
 
-const BUILTIN_TYPES_SET = new Set(Object.values(BUILTIN_TYPES).map((t) => t.qname.toLowerCase()))
+const BUILTIN_TYPES_SET = new Set(
+  Object.values(BUILTIN_TYPES).flatMap((t) => {
+    if (typeof t === 'object') {
+      return [t.qname.toLowerCase()]
+    }
+    return []
+  })
+)
 
 /**
  *

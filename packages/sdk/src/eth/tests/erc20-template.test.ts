@@ -37,7 +37,7 @@ describe('Test Template', () => {
       templateInstances: [
         {
           contract: {
-            address: 'dynamic2',
+            address: '0xb329e39ebefd16f40d38f07643652ce17ca5bac1',
             name: 'dynamic2',
             chainId: '1',
             abi: '',
