@@ -2,12 +2,13 @@ import { Gauge } from '@sentio/sdk'
 import { BigDecimal } from '@sentio/bigdecimal'
 import { calculateValueInUsd, getCoinInfo, whitelistCoins, whiteListed } from './coin.js'
 import { AptosResourcesContext, TypedMoveResource, MoveResource, AptosContext } from '@sentio/sdk/aptos'
+import { TypeDescriptor } from '../../move/index.js'
 
 export interface PoolAdaptor<T> {
   getXReserve(pool: T): bigint
   getYReserve(pool: T): bigint
   getExtraPoolTags(pool: TypedMoveResource<T>): any
-  poolTypeName: string
+  poolType: TypeDescriptor<T>
 }
 
 export class AptosDex<T> {
@@ -98,10 +99,7 @@ export class AptosDex<T> {
     ctx: AptosResourcesContext,
     poolsHandler?: (pools: TypedMoveResource<T>[]) => Promise<void> | void
   ) {
-    const pools: TypedMoveResource<T>[] = await ctx.coder.filterAndDecodeResources(
-      this.poolAdaptor.poolTypeName,
-      resources
-    )
+    const pools = await ctx.coder.filterAndDecodeResources(this.poolAdaptor.poolType, resources)
 
     const volumeByCoin = new Map<string, BigDecimal>()
     const timestamp = ctx.timestampInMicros
