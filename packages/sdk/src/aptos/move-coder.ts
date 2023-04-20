@@ -35,16 +35,16 @@ export class MoveCoder extends AbstractMoveCoder<AptosNetwork, MoveModuleBytecod
   }
 
   decodeEvent<T>(event: Event): Promise<TypedEventInstance<T> | undefined> {
-    return this.decodedStruct<T>(event) as any
+    return this.decodedStruct(event)
   }
   filterAndDecodeEvents<T>(type: string | TypeDescriptor<T>, resources: Event[]): Promise<TypedEventInstance<T>[]> {
     if (typeof type === 'string') {
       type = parseMoveType(type)
     }
-    return this.filterAndDecodeStruct(type, resources) as any
+    return this.filterAndDecodeStruct(type, resources)
   }
   decodeResource<T>(res: MoveResource): Promise<TypedMoveResource<T> | undefined> {
-    return this.decodedStruct<T>(res)
+    return this.decodedStruct(res)
   }
   filterAndDecodeResources<T>(
     type: string | TypeDescriptor<T>,

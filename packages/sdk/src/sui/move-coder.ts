@@ -41,13 +41,13 @@ export class MoveCoder extends AbstractMoveCoder<SuiNetwork, SuiMoveNormalizedMo
   }
 
   decodeEvent<T>(event: SuiEvent): Promise<TypedEventInstance<T> | undefined> {
-    return this.decodedStruct<T>(event) as any
+    return this.decodedStruct(event)
   }
   filterAndDecodeEvents<T>(type: TypeDescriptor<T> | string, resources: SuiEvent[]): Promise<TypedEventInstance<T>[]> {
     if (typeof type === 'string') {
       type = parseMoveType(type)
     }
-    return this.filterAndDecodeStruct(type, resources) as any
+    return this.filterAndDecodeStruct(type, resources)
   }
 
   async getDynamicFields<T1, T2>(
@@ -67,7 +67,7 @@ export class MoveCoder extends AbstractMoveCoder<SuiNetwork, SuiMoveNormalizedMo
     type: TypeDescriptor<T>,
     objects: SuiMoveObject[]
   ): Promise<DecodedStruct<SuiMoveObject, T>[]> {
-    return this.filterAndDecodeStruct(type, objects) as any
+    return this.filterAndDecodeStruct(type, objects)
   }
 
   async decodeFunctionPayload(payload: MoveCallSuiTransaction, inputs: SuiCallArg[]): Promise<MoveCallSuiTransaction> {

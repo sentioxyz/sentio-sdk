@@ -1,11 +1,7 @@
 import { Event, MoveResource, TransactionPayload_EntryFunctionPayload } from './move-types.js'
 import { DecodedStruct } from '../move/types.js'
 
-export type EventInstance = Event & {
-  version: string
-}
-
-export type TypedEventInstance<T> = DecodedStruct<EventInstance, T>
+export type TypedEventInstance<T> = DecodedStruct<Event, T>
 export type TypedMoveResource<T> = DecodedStruct<MoveResource, T>
 
 // Don't use intermediate type to make IDE happier

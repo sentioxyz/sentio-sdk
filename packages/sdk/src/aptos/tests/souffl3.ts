@@ -23,10 +23,7 @@ SouffleChefCampaign.bind({ startVersion: 3212312n })
     }
   )
   .onTransaction(async (txn, ctx) => {
-    const events = await defaultMoveCoder().filterAndDecodeEvents<token.DepositEvent>(
-      '0x3::token::DepositEvent',
-      txn.events
-    )
+    const events = await defaultMoveCoder().filterAndDecodeEvents(token.DepositEvent.type(), txn.events)
     for (const event of events) {
       // const depositEventInstance = DEFAULT_TYPE_REGISTRY.decodeEvent(event) as DepositEventInstance
       ctx.meter.Counter('deposit_token_count').add(event.data_decoded.amount)

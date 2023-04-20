@@ -1,9 +1,13 @@
-import { MoveResource, Transaction_UserTransaction, TransactionPayload_EntryFunctionPayload } from './move-types.js'
+import {
+  Event,
+  MoveResource,
+  Transaction_UserTransaction,
+  TransactionPayload_EntryFunctionPayload,
+} from './move-types.js'
 
 import { defaultMoveCoder, MoveCoder } from './move-coder.js'
 import { AptosBindOptions, AptosNetwork, getChainId } from './network.js'
 import { AptosContext, AptosResourcesContext } from './context.js'
-import { EventInstance } from './models.js'
 import { ListStateStorage, mergeProcessResults } from '@sentio/runtime'
 import {
   MoveFetchConfig,
@@ -93,7 +97,7 @@ export class AptosBaseProcessor {
   }
 
   public onMoveEvent(
-    handler: (event: EventInstance, ctx: AptosContext) => void,
+    handler: (event: Event, ctx: AptosContext) => void,
     filter: EventFilter | EventFilter[],
     fetchConfig?: Partial<MoveFetchConfig>
   ): this {
@@ -136,9 +140,9 @@ export class AptosBaseProcessor {
             txn,
             idx
           )
-          const eventInstance = evt as EventInstance
-          const decoded = await processor.coder.decodeEvent<any>(eventInstance)
-          await handler(decoded || eventInstance, ctx)
+
+          const decoded = await processor.coder.decodeEvent<any>(evt)
+          await handler(decoded || evt, ctx)
           processResults.push(ctx.getProcessResult())
         }
 
