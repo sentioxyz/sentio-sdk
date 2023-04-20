@@ -58,5 +58,5 @@ export function validateAndNormalizeAddress(address: string): string {
   if (!isValidSuiAddress(address)) {
     throw Error('Not valid Address')
   }
-  return normalizeSuiAddress(address, true)
+  return normalizeSuiAddress(address)
 }
