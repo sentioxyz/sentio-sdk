@@ -11,6 +11,11 @@ describe('Test Sui Example', () => {
   const coder = defaultMoveCoder(SuiNetwork.TEST_NET)
   loadAllTypes(coder)
 
+  test('decode string', async () => {
+    const res = await coder.decode('mystring', parseMoveType('0x1::ascii::String'))
+    expect(res).equals('mystring')
+  })
+
   test('decode object', async () => {
     const data = {
       type: '0xebaa2ad3eacc230f309cd933958cc52684df0a41ae7ac214d186b80f830867d2::single_collateral::Info',

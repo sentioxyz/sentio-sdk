@@ -26,10 +26,13 @@ export class MoveCoder extends AbstractMoveCoder<SuiNetwork, SuiMoveNormalizedMo
 
   decode(data: any, type: TypeDescriptor): any {
     switch (type.qname) {
+      case '0x1::ascii::Char':
+      case '0x1::ascii::String':
       case '0x2::object::ID':
       case '0x2::coin::Coin':
-      case '0x2::balance::Balance':
         return data
+      case '0x2::balance::Balance':
+        return BigInt(data)
       case '0x1::option::Option':
         if (data === null) {
           return data
