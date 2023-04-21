@@ -148,6 +148,7 @@ export class SuiBaseProcessor {
     // const address = this.config.address
     // const moduleName = this.moduleName
     const processor = this
+    const allFunctionType = new Set(_filters.map((f) => processor.config.address + '::' + f.function))
 
     this.callHandlers.push({
       handler: async function (data) {
@@ -167,18 +168,27 @@ export class SuiBaseProcessor {
         )
         if (tx) {
           const calls: MoveCallSuiTransaction[] = getMoveCalls(tx)
-          if (calls.length !== 1) {
-            throw new ServerError(Status.INVALID_ARGUMENT, 'Unexpected number of call transactions ' + calls.length)
-          }
+          // if (calls.length !== 1) {
+          //   throw new ServerError(Status.INVALID_ARGUMENT, 'Unexpected number of call transactions ' + calls.length)
+          // }
           const txKind = getTransactionKind(tx)
           if (!txKind) {
             throw new ServerError(Status.INVALID_ARGUMENT, 'Unexpected getTransactionKind get empty')
           }
           const programmableTx = getProgrammableTransaction(txKind)
 
-          const payload = calls[0]
-          const decoded = await processor.coder.decodeFunctionPayload(payload, programmableTx?.inputs || [])
-          await handler(decoded, ctx)
+          let matched: MoveCallSuiTransaction
+          // TODO potential pass index
+          for (const call of calls) {
+            if (allFunctionType.has(call.function)) {
+              matched = call
+              break
+            }
+
+            const payload = calls[0]
+            const decoded = await processor.coder.decodeFunctionPayload(payload, programmableTx?.inputs || [])
+            await handler(decoded, ctx)
+          }
         }
         return ctx.getProcessResult()
       },
