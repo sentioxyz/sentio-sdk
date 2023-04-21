@@ -220,7 +220,7 @@ export abstract class AbstractCodegen<NetworkType, ModuleTypes, StructType> {
   `
   }
 
-  generateStructs(module: InternalMoveModule, struct: InternalMoveStruct, events: Set<string>) {
+  generateStructs(module: InternalMoveModule, struct: InternalMoveStruct, events: Set<string>, typeOnly = false) {
     const typeParams = struct.typeParams || []
     const genericString = this.generateStructTypeParameters(struct)
     const genericStringAny = this.generateStructTypeParameters(struct, true)
@@ -231,17 +231,6 @@ export abstract class AbstractCodegen<NetworkType, ModuleTypes, StructType> {
       const type = this.generateTypeForDescriptor(field.type, module.address)
       return `${field.name}: ${type}`
     })
-
-    let eventPayload = ''
-    if (events.has(moduleQname(module) + SPLITTER + struct.name)) {
-      eventPayload = `
-    export interface ${structName}Instance extends
-        TypedEventInstance<${structName}${genericStringAny}> {
-      ${this.STRUCT_FIELD_NAME}_decoded: ${structName}${genericStringAny}
-      type_arguments: [${struct.typeParams.map((_) => 'string').join(', ')}]
-    }
-    `
-    }
 
     const typeParamApplyArg = typeParams
       .map((v, idx) => {
@@ -254,23 +243,38 @@ export abstract class AbstractCodegen<NetworkType, ModuleTypes, StructType> {
       })
       .join(',')
 
-    const typeWithArg = `
+    const typeDescriptor = `
+  export namespace ${structName}{
+    export const TYPE_QNAME = '${module.address}::${module.name}::${struct.name}'
+    
+    const TYPE = new TypeDescriptor<${structName}${genericStringAny}>(${structName}.TYPE_QNAME)
+
   export function type${genericString}(${typeParamApplyArg}): TypeDescriptor<${structName}${genericString}> {
     return TYPE.apply(${typeParamApply})
-  }`
+  }
+}
+`
+    if (typeOnly) {
+      return typeDescriptor
+    }
+
+    let eventPayload = ''
+    if (events.has(moduleQname(module) + SPLITTER + struct.name)) {
+      eventPayload = `
+    export interface ${structName}Instance extends
+        TypedEventInstance<${structName}${genericStringAny}> {
+      ${this.STRUCT_FIELD_NAME}_decoded: ${structName}${genericStringAny}
+      type_arguments: [${struct.typeParams.map((_) => 'string').join(', ')}]
+    }
+    `
+    }
 
     return `
   export interface ${structName}${genericString} {
     ${fields.join('\n')}
   }
   
-  export namespace ${structName}{
-    export const TYPE_QNAME = '${module.address}::${module.name}::${struct.name}'
-    
-    const TYPE = new TypeDescriptor<${structName}${genericStringAny}>(${structName}.TYPE_QNAME)
-
-    ${typeWithArg}
-  }
+  ${typeDescriptor}
 
   ${eventPayload}
   `

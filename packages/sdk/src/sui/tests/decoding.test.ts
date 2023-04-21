@@ -6,13 +6,14 @@ import { TypedSuiMoveObject } from '../models.js'
 import { SuiNetwork } from '../network.js'
 import { BUILTIN_TYPES, parseMoveType } from '../../move/index.js'
 import { single_collateral } from './types/testnet/0xebaa2ad3eacc230f309cd933958cc52684df0a41ae7ac214d186b80f830867d2.js'
+import { ascii } from '../builtin/0x1.js'
 
 describe('Test Sui Example', () => {
   const coder = defaultMoveCoder(SuiNetwork.TEST_NET)
   loadAllTypes(coder)
 
   test('decode string', async () => {
-    const res = await coder.decode('mystring', parseMoveType('0x1::ascii::String'))
+    const res = await coder.decode('mystring', ascii.String.type())
     expect(res).equals('mystring')
   })
 

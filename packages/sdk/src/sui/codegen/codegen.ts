@@ -46,20 +46,25 @@ class SuiCodegen extends AbstractCodegen<SuiNetwork, SuiMoveNormalizedModule, Su
   }
 
   generateStructs(module: InternalMoveModule, struct: InternalMoveStruct, events: Set<string>): string {
+    let content = ''
     switch (structQname(module, struct)) {
       // TODO they should still have module code generated
       case '0x1::ascii::Char':
       case '0x1::ascii::String':
       case '0x2::object::ID':
-        return `export type ${struct.name} = string`
+        content += `export type ${struct.name} = string`
+        break
       case '0x2::coin::Coin':
-        return `export type ${struct.name}<T> = string`
+        content += `export type ${struct.name}<T> = string`
+        break
       case '0x2::balance::Balance':
-        return `export type ${struct.name}<T> = bigint`
+        content += `export type ${struct.name}<T> = bigint`
+        break
       case '0x1::option::Option':
-        return `export type Option<T> = T | undefined`
+        content += `export type Option<T> = T | undefined`
+        break
     }
-    return super.generateStructs(module, struct, events)
+    return content + super.generateStructs(module, struct, events, content !== '')
   }
 
   generateOnEvents(module: InternalMoveModule, struct: InternalMoveStruct): string {
