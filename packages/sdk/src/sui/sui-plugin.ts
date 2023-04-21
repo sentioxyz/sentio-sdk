@@ -37,7 +37,7 @@ export class SuiPlugin extends Plugin {
           address: validateAndNormalizeAddress(suiProcessor.config.address),
           abi: '',
         },
-        startBlock: BigInt(suiProcessor.config.startTimestamp),
+        startBlock: suiProcessor.config.startCheckpoint,
       })
       for (const handler of suiProcessor.eventHandlers) {
         const handlerId = this.suiEventHandlers.push(handler.handler) - 1
@@ -76,7 +76,7 @@ export class SuiPlugin extends Plugin {
       const accountConfig = AccountConfig.fromPartial({
         address: validateAndNormalizeAddress(processor.config.address),
         chainId: processor.getChainId(),
-        startBlock: BigInt(processor.config.startTimestamp), // TODO maybe use another field
+        startBlock: processor.config.startCheckpoint, // TODO maybe use another field
       })
       for (const handler of processor.objectHandlers) {
         const handlerId = this.suiObjectHandlers.push(handler.handler) - 1

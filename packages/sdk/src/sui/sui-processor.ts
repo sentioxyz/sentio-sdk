@@ -33,19 +33,19 @@ const DEFAULT_FETCH_CONFIG: MoveFetchConfig = {
 class IndexConfigure {
   address: string
   network: SuiNetwork
-  startTimestamp: number
+  startCheckpoint: bigint
 }
 
 export class SuiBindOptions {
   address: string
   network?: SuiNetwork
-  startTimestamp?: number
+  startCheckpoint?: bigint
 }
 
 export class SuiObjectBindOptions {
   objectId: string
   network?: SuiNetwork
-  startTimestamp?: number
+  startCheckpoint?: bigint
 }
 
 export class SuiProcessorState extends ListStateStorage<SuiBaseProcessor> {
@@ -285,7 +285,7 @@ abstract class SuiBaseObjectsProcessor<HandlerType> {
 
 function configure(options: SuiBindOptions): IndexConfigure {
   return {
-    startTimestamp: options.startTimestamp || 0,
+    startCheckpoint: options.startCheckpoint || 0n,
     address: options.address,
     network: options.network || SuiNetwork.MAIN_NET,
   }
@@ -306,7 +306,7 @@ export class SuiDynamicFieldObjectsProcessor extends SuiBaseObjectsProcessor<Sui
     return new SuiDynamicFieldObjectsProcessor({
       address: options.objectId,
       network: options.network,
-      startTimestamp: options.startTimestamp,
+      startCheckpoint: options.startCheckpoint,
       ownerType: MoveOnIntervalConfig_OwnerType.OBJECT,
     })
   }
