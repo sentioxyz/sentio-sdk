@@ -24,7 +24,7 @@ export class MoveCoder extends AbstractMoveCoder<SuiNetwork, SuiMoveNormalizedMo
     return m
   }
 
-  decode(data: any, type: TypeDescriptor): any {
+  protected decode(data: any, type: TypeDescriptor): any {
     switch (type.qname) {
       case '0x1::ascii::Char':
       case '0x1::ascii::String':

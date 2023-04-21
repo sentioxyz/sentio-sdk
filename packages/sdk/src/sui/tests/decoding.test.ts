@@ -13,7 +13,7 @@ describe('Test Sui Example', () => {
   loadAllTypes(coder)
 
   test('decode string', async () => {
-    const res = await coder.decode('mystring', ascii.String.type())
+    const res = await coder.decodedType('mystring', ascii.String.type())
     expect(res).equals('mystring')
   })
 
@@ -37,7 +37,7 @@ describe('Test Sui Example', () => {
         round: '11',
       },
     }
-    const res = await coder.decode(
+    const res = await coder.decodedType(
       data,
       parseMoveType(
         '0x1::option::Option<0xebaa2ad3eacc230f309cd933958cc52684df0a41ae7ac214d186b80f830867d2::single_collateral::Info>'
@@ -106,7 +106,7 @@ describe('Test Sui Example', () => {
         },
       },
     }
-    const res = await coder.decode(data, parseMoveType(data.type))
+    const res = await coder.decodedType(data, parseMoveType(data.type))
     console.log(res)
   })
 

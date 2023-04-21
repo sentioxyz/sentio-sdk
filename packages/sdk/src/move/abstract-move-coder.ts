@@ -102,7 +102,7 @@ export abstract class AbstractMoveCoder<Network, ModuleType, StructType> {
     throw new Error('Failed to load function ' + type + ' type are not imported anywhere')
   }
 
-  async decode(data: any, type: TypeDescriptor): Promise<any> {
+  protected async decode<T>(data: any, type: TypeDescriptor<T>): Promise<T> {
     // process simple type
     if (type.reference) {
       return data
@@ -125,7 +125,7 @@ export abstract class AbstractMoveCoder<Network, ModuleType, StructType> {
       case 'U64':
       case 'u128':
       case 'U128':
-        return this.decodeBigInt(data)
+        return this.decodeBigInt(data) as any
     }
 
     // process vector
@@ -139,7 +139,7 @@ export abstract class AbstractMoveCoder<Network, ModuleType, StructType> {
       for (const entry of data) {
         res.push(await this.decode(entry, type.typeArgs[0]))
       }
-      return res
+      return res as any
     }
 
     // Process complex type
@@ -162,7 +162,7 @@ export abstract class AbstractMoveCoder<Network, ModuleType, StructType> {
     return typedData
   }
 
-  async encode(data: any, type: TypeDescriptor): Promise<any> {
+  protected async encode(data: any, type: TypeDescriptor): Promise<any> {
     // process simple type
     if (type.reference) {
       return data
@@ -306,5 +306,20 @@ export abstract class AbstractMoveCoder<Network, ModuleType, StructType> {
       data_decoded: dataTyped,
       type_arguments: typeArguments,
     }
+  }
+  async decodedType<T, ST>(typeStruct: ST, type: TypeDescriptor<T>): Promise<T | undefined> {
+    if (typeStruct === null || typeStruct == undefined) {
+      return typeStruct as any
+    }
+    if (typeof typeStruct === 'object') {
+      if ('type' in typeStruct) {
+        const typeInStruct = parseMoveType((typeStruct.type as any).toString() || '')
+        if (!matchType(type, typeInStruct)) {
+          return undefined
+        }
+      }
+    }
+
+    return await this.decode(typeStruct, type)
   }
 }

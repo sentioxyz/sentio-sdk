@@ -249,10 +249,10 @@ export abstract class AbstractCodegen<NetworkType, ModuleTypes, StructType> {
     
     const TYPE = new TypeDescriptor<${structName}${genericStringAny}>(${structName}.TYPE_QNAME)
 
-  export function type${genericString}(${typeParamApplyArg}): TypeDescriptor<${structName}${genericString}> {
-    return TYPE.apply(${typeParamApply})
+    export function type${genericString}(${typeParamApplyArg}): TypeDescriptor<${structName}${genericString}> {
+      return TYPE.apply(${typeParamApply})
+    }
   }
-}
 `
     if (typeOnly) {
       return typeDescriptor
