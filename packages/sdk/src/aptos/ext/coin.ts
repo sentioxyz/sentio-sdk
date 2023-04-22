@@ -1,6 +1,7 @@
 import { getPriceByType } from '@sentio/sdk/utils'
 import { CHAIN_IDS } from '@sentio/sdk'
 import fetch from 'node-fetch'
+import { validateAndNormalizeAddress } from '../utils.js'
 
 const WHITELISTED_COINS = new Map<string, SimpleCoinInfo>()
 
@@ -46,7 +47,7 @@ export function whitelistCoins() {
 }
 
 export function whiteListed(type: string): boolean {
-  return WHITELISTED_COINS.has(type)
+  return WHITELISTED_COINS.has(validateAndNormalizeAddress(type))
 }
 
 export function getCoinInfo(type: string): SimpleCoinInfo {
