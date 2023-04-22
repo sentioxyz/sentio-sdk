@@ -234,10 +234,12 @@ abstract class SuiBaseObjectsProcessor<HandlerType> {
     return getChainId(this.config.network)
   }
 
-  protected abstract transformObjects(objects: SuiMoveObject[]): HandlerType[]
+  // protected abstract transformObjects(objects: SuiMoveObject[]): SuiMoveObject[]
+
+  protected abstract doHandle(handler: HandlerType, data: Data_SuiObject, ctx: SuiObjectsContext): PromiseOrVoid
 
   protected onInterval(
-    handler: (resources: HandlerType[], ctx: SuiObjectsContext) => PromiseOrVoid,
+    handler: HandlerType, //(resources: SuiMoveObject[], ctx: SuiObjectsContext) => PromiseOrVoid,
     timeInterval: HandleInterval | undefined,
     versionInterval: HandleInterval | undefined,
     type: string | undefined
@@ -251,7 +253,7 @@ abstract class SuiBaseObjectsProcessor<HandlerType> {
           data.slot,
           data.timestamp || new Date(0)
         )
-        await handler(processor.transformObjects(data.objects as SuiMoveObject[]), ctx)
+        await processor.doHandle(handler, data, ctx)
         return ctx.getProcessResult()
       },
       timeIntervalInMinutes: timeInterval,
@@ -262,7 +264,7 @@ abstract class SuiBaseObjectsProcessor<HandlerType> {
   }
 
   public onTimeInterval(
-    handler: (objects: HandlerType[], ctx: SuiObjectsContext) => PromiseOrVoid,
+    handler: HandlerType,
     timeIntervalInMinutes = 60,
     backfillTimeIntervalInMinutes = 240,
     type?: string
@@ -279,7 +281,7 @@ abstract class SuiBaseObjectsProcessor<HandlerType> {
   }
 
   public onSlotInterval(
-    handler: (objects: HandlerType[], ctx: SuiObjectsContext) => PromiseOrVoid,
+    handler: HandlerType,
     slotInterval = 100000,
     backfillSlotInterval = 400000,
     type?: string
@@ -301,19 +303,27 @@ function configure(options: SuiBindOptions): IndexConfigure {
   }
 }
 
-export class SuiAddressObjectsProcessor extends SuiBaseObjectsProcessor<SuiMoveObject> {
-  static bind(options: SuiBindOptions): SuiAddressObjectsProcessor {
-    return new SuiAddressObjectsProcessor({ ...options, ownerType: MoveOnIntervalConfig_OwnerType.ADDRESS })
+export class SuiAddressProcessor extends SuiBaseObjectsProcessor<
+  (objects: SuiMoveObject[], ctx: SuiObjectsContext) => PromiseOrVoid
+> {
+  static bind(options: SuiBindOptions): SuiAddressProcessor {
+    return new SuiAddressProcessor({ ...options, ownerType: MoveOnIntervalConfig_OwnerType.ADDRESS })
   }
 
-  protected transformObjects(objects: SuiMoveObject[]): SuiMoveObject[] {
-    return objects
+  protected doHandle(
+    handler: (objects: SuiMoveObject[], ctx: SuiObjectsContext) => PromiseOrVoid,
+    data: Data_SuiObject,
+    ctx: SuiObjectsContext
+  ): PromiseOrVoid {
+    return handler(data.objects as SuiMoveObject[], ctx)
   }
 }
 // export class SuiDynamicFieldObjectsProcessor extends SuiBaseObjectsProcessor<dynamic_field.Field<any, any>> {
-export class SuiDynamicFieldObjectsProcessor extends SuiBaseObjectsProcessor<SuiMoveObject> {
-  static bind(options: SuiObjectBindOptions): SuiDynamicFieldObjectsProcessor {
-    return new SuiDynamicFieldObjectsProcessor({
+export class SuiObjectProcessor extends SuiBaseObjectsProcessor<
+  (self: SuiMoveObject, dynamicFieldObjects: SuiMoveObject[], ctx: SuiObjectsContext) => PromiseOrVoid
+> {
+  static bind(options: SuiObjectBindOptions): SuiObjectProcessor {
+    return new SuiObjectProcessor({
       address: options.objectId,
       network: options.network,
       startCheckpoint: options.startCheckpoint,
@@ -321,8 +331,11 @@ export class SuiDynamicFieldObjectsProcessor extends SuiBaseObjectsProcessor<Sui
     })
   }
 
-  protected transformObjects(objects: SuiMoveObject[]) {
-    return objects
-    // return defaultMoveCoder().getObjectsFromDynamicFields(objects)
+  protected doHandle(
+    handler: (self: SuiMoveObject, dynamicFieldObjects: SuiMoveObject[], ctx: SuiObjectsContext) => PromiseOrVoid,
+    data: Data_SuiObject,
+    ctx: SuiObjectsContext
+  ): PromiseOrVoid {
+    return handler(data.self as SuiMoveObject, data.objects as SuiMoveObject[], ctx)
   }
 }

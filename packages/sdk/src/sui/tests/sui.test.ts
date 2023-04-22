@@ -2,7 +2,7 @@ import { expect } from 'chai'
 import { TestProcessorServer } from '../../testing/index.js'
 import { SuiNetwork } from '../network.js'
 import { sui_system, validator } from '../builtin/0x3.js'
-import { SuiDynamicFieldObjectsProcessor } from '../sui-processor.js'
+import { SuiObjectProcessor } from '../sui-processor.js'
 import { MoveOnIntervalConfig_OwnerType } from '@sentio/protos'
 
 describe('Test Sui Example', () => {
@@ -19,7 +19,7 @@ describe('Test Sui Example', () => {
       ctx.meter.Gauge('tmp').record(1, { coin: call.arguments_decoded[2] || '' })
     })
 
-    SuiDynamicFieldObjectsProcessor.bind({ objectId: '0x56a' }).onTimeInterval((objects, ctx) => {
+    SuiObjectProcessor.bind({ objectId: '0x56a' }).onTimeInterval((self, objects, ctx) => {
       ctx.meter.Gauge('size').record(objects.length)
     })
   })

@@ -7,7 +7,7 @@
 
 import { sui_system, validator } from '@sentio/sdk/sui/builtin/0x3'
 
-import { SuiNetwork, SuiDynamicFieldObjectsProcessor, BUILTIN_TYPES } from '@sentio/sdk/sui'
+import { SuiNetwork, SuiObjectProcessor, BUILTIN_TYPES } from '@sentio/sdk/sui'
 import RequestAddStakePayload = sui_system.RequestAddStakePayload
 import { single_collateral } from './types/sui/testnet/0xebaa2ad3eacc230f309cd933958cc52684df0a41ae7ac214d186b80f830867d2.js'
 
@@ -22,9 +22,9 @@ sui_system.bind({ network: SuiNetwork.TEST_NET }).onEntryRequestAddStake((call: 
   ctx.meter.Gauge('tmp').record(1, { coin: call.arguments_decoded[2] || '' })
 })
 
-SuiDynamicFieldObjectsProcessor.bind({
+SuiObjectProcessor.bind({
   objectId: '0xa14f85860d6ce99154ecbb13570ba5fba1d8dc16b290de13f036b016fd19a29c',
-}).onTimeInterval(async (objects, ctx) => {
+}).onTimeInterval(async (self, objects, ctx) => {
   const fields = await ctx.coder.getDynamicFields(
     objects,
     BUILTIN_TYPES.U64_TYPE,

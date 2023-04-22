@@ -616,6 +616,7 @@ export interface Data_SuiCall {
 
 export interface Data_SuiObject {
   objects: { [key: string]: any }[];
+  self?: { [key: string]: any } | undefined;
   timestamp: Date | undefined;
   slot: bigint;
 }
@@ -4317,13 +4318,16 @@ export const Data_SuiCall = {
 };
 
 function createBaseData_SuiObject(): Data_SuiObject {
-  return { objects: [], timestamp: undefined, slot: BigInt("0") };
+  return { objects: [], self: undefined, timestamp: undefined, slot: BigInt("0") };
 }
 
 export const Data_SuiObject = {
   encode(message: Data_SuiObject, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     for (const v of message.objects) {
       Struct.encode(Struct.wrap(v!), writer.uint32(10).fork()).ldelim();
+    }
+    if (message.self !== undefined) {
+      Struct.encode(Struct.wrap(message.self), writer.uint32(34).fork()).ldelim();
     }
     if (message.timestamp !== undefined) {
       Timestamp.encode(toTimestamp(message.timestamp), writer.uint32(18).fork()).ldelim();
@@ -4344,6 +4348,9 @@ export const Data_SuiObject = {
         case 1:
           message.objects.push(Struct.unwrap(Struct.decode(reader, reader.uint32())));
           break;
+        case 4:
+          message.self = Struct.unwrap(Struct.decode(reader, reader.uint32()));
+          break;
         case 2:
           message.timestamp = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
           break;
@@ -4361,6 +4368,7 @@ export const Data_SuiObject = {
   fromJSON(object: any): Data_SuiObject {
     return {
       objects: Array.isArray(object?.objects) ? [...object.objects] : [],
+      self: isObject(object.self) ? object.self : undefined,
       timestamp: isSet(object.timestamp) ? fromJsonTimestamp(object.timestamp) : undefined,
       slot: isSet(object.slot) ? BigInt(object.slot) : BigInt("0"),
     };
@@ -4373,6 +4381,7 @@ export const Data_SuiObject = {
     } else {
       obj.objects = [];
     }
+    message.self !== undefined && (obj.self = message.self);
     message.timestamp !== undefined && (obj.timestamp = message.timestamp.toISOString());
     message.slot !== undefined && (obj.slot = message.slot.toString());
     return obj;
@@ -4385,6 +4394,7 @@ export const Data_SuiObject = {
   fromPartial(object: DeepPartial<Data_SuiObject>): Data_SuiObject {
     const message = createBaseData_SuiObject();
     message.objects = object.objects?.map((e) => e) || [];
+    message.self = object.self ?? undefined;
     message.timestamp = object.timestamp ?? undefined;
     message.slot = object.slot ?? BigInt("0");
     return message;

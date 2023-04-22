@@ -1,7 +1,7 @@
 export {
   SuiBaseProcessor,
-  SuiAddressObjectsProcessor,
-  SuiDynamicFieldObjectsProcessor,
+  SuiAddressProcessor,
+  SuiObjectProcessor,
   SuiBindOptions,
   SuiObjectBindOptions,
 } from './sui-processor.js'
