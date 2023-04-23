@@ -2,4 +2,7 @@
 
 set -e
 
-pnpm  --filter "@sentio/sdk..." exec pnpm json -I -f package.json -e "this.version=\"${1}\""
+FILTER=$1
+VERSION=$2
+
+pnpm  --filter "${FILTER}" exec pnpm json -I -f package.json -e "this.version=\"${VERSION}\""

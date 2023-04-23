@@ -23,11 +23,23 @@ jobs:
         with:
           node-version: 18
           cache: 'pnpm'
+          registry-url: 'https://registry.npmjs.org'
+      - name: Set NPM variables
+        id: npm
+        run: |
+          BRANCH=${GITHUB_REF##*/}
+          DIST_TAG=rc
+          if [[ $BRANCH == "release" ]]; then
+            DIST_TAG=latest
+          fi
+          echo "dist_tag=${DIST_TAG}" >> $GITHUB_OUTPUT
+          
+          pnpm config list
       - name: Install
         run: pnpm install
       - name: Build SDK & CLI
         run: pnpm --filter "./packages/*..." build
-      - name: Semantic Release
+      - name: SDK Semantic Release
         id: semantic
         uses: cycjimmy/semantic-release-action@v3
         env:
@@ -40,33 +52,28 @@ jobs:
           echo "${{ steps.semantic.outputs.new_release_notes }}" >> $GITHUB_STEP_SUMMARY
         env:
           GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+      - name: SDK NPM Publish
+        if: steps.semantic.outputs.new_release_published == 'true'
+        run: |
+          ./scripts/update-version.sh @sentio/sdk... ${{ steps.semantic.outputs.new_release_version }}
+          pnpm publish --filter "@sentio/sdk..." --no-git-checks --tag ${{ steps.npm.outputs.dist_tag }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: report error
         if: steps.semantic.outputs.new_release_published == 'false'
         run: |
           echo "### No SDK version cut" >> $GITHUB_STEP_SUMMARY
           echo "Check Semantic Release output for details"
-      - name: PNPM Publish for SDK
-        run: |
-          DIST_TAG=latest
-          if [[ "${{ contains(steps.semantic.outputs.new_release_version, '-rc.') }}" == "true" ]]; then          
-            DIST_TAG=rc
-          fi
-          echo //registry.npmjs.org/:_authToken=${NPM_TOKEN} > .npmrc
-          ./scripts/update-version.sh ${{ steps.semantic.outputs.new_release_version }}
-          pnpm publish --filter "@sentio/sdk..." --no-git-checks --tag $DIST_TAG
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Clean templates node modules
         run: "rm -rf */node_modules"
         working-directory: packages/cli/templates
-      - name: Semantic Release CLI
+      - name: CLI Semantic Release
         id: semantic_cli
         uses: cycjimmy/semantic-release-action@v3
         with:
           working_directory: packages/cli
         env:
           GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: CLI Release Summary
         if: steps.semantic_cli.outputs.new_release_published == 'true'
         run: |
@@ -75,8 +82,15 @@ jobs:
           echo "${{ steps.semantic_cli.outputs.new_release_notes }}" >> $GITHUB_STEP_SUMMARY
         env:
           GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+      - name: CLI NPM Publish
+        if: steps.semantic_cli.outputs.new_release_published == 'true'
+        run: |
+          ./scripts/update-version.sh @sentio/cli ${{ steps.semantic_cli.outputs.new_release_version }}
+          pnpm publish --filter "@sentio/cli" --no-git-checks --tag ${{ steps.npm.outputs.dist_tag }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: report error
-        if: steps.semantic.outputs.new_release_published == 'false'
+        if: steps.semantic_cli.outputs.new_release_published == 'false'
         run: |
           echo "### No CLI version cut" >> $GITHUB_STEP_SUMMARY
           echo "Check Semantic Release output for details"
