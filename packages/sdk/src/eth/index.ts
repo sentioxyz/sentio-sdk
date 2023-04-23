@@ -9,3 +9,5 @@ export { getProcessor, addProcessor, getContractByABI, addContractByABI } from '
 export { ContractContext, GlobalContext, ContractView, BoundContractView } from './context.js'
 
 export { EthPlugin } from './eth-plugin.js'
+
+export { EthFetchConfig } from '@sentio/protos'

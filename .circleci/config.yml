@@ -15,13 +15,33 @@ jobs:
     executor: node/default # use the default executor defined within the orb
     steps:
       - checkout
-      - node/install-packages:
-          pkg-manager: yarn
+      - restore_cache:
+          name: Restore pnpm Package Cache
+          keys:
+            - pnpm-packages-{{ checksum "pnpm-lock.yaml" }}
+      - run:
+          name: Install pnpm package manager
+          command: |
+            sudo corepack enable
+            sudo corepack prepare pnpm@latest-8 --activate
+      - run:
+          name: Install Dependencies
+          command: |
+            pnpm install
+      - save_cache:
+          name: Save pnpm Package Cache
+          key: pnpm-packages-2-{{ checksum "pnpm-lock.yaml" }}
+          paths:
+            - node_modules
+            - ~/.local/share/pnpm/store/v3
+      - run:
+          command: pnpm store path
+          name: confirm pnpm store
       - run:
           command: ./scripts/test-all.sh
           name: Build & Test All
       - run:
-          command: yarn lint
+          command: pnpm lint
           name: Lint
 #      - persist_to_workspace:
 #          root: ~/project

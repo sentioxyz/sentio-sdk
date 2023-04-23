@@ -10,7 +10,7 @@
     "upload": "sentio upload"
   },
   "dependencies": {
-    "@sentio/sdk": "^2.0.0-development"
+    "@sentio/sdk": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.0.3"

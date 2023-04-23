@@ -6,11 +6,11 @@
   "version": "2.0.0-development",
   "scripts": {
     "compile": "tsc",
-    "build": "yarn compile",
-    "postbuild": "../../scripts/link-bin.sh",
+    "build": "pnpm compile",
+    "__postbuild": "../../scripts/link-bin.sh",
     "cli": "ts-node-esm src/cli.ts",
-    "test": "NODE_OPTIONS=--experimental-vm-modules yarn jest",
-    "pub": "yarn build && yarn publish --no-git-tag-version"
+    "test": "NODE_OPTIONS=--experimental-vm-modules pnpm jest",
+    "pub": "pnpm build && pnpm publish --no-git-tag-version"
   },
   "dependencies": {
     "@jest/types": "^29.5.0",
@@ -25,6 +25,7 @@
     "form-data": "^4.0.0",
     "fs-extra": "^11.0.0",
     "jest": "^29.5.0",
+    "@jest/globals": "^29.5.0",
     "latest-version": "^7.0.0",
     "node-fetch": "^3.3.0",
     "open": "^9.0.0",
@@ -38,6 +39,9 @@
     "@types/command-line-usage": "^5.0.2",
     "@types/express": "^4.17.14",
     "@types/fs-extra": "^11.0.1"
+  },
+  "peerDependencies": {
+    "@sentio/sdk": "workspace:^"
   },
   "bin": {
     "sentio": "./lib/cli.js"

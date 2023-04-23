@@ -8,12 +8,12 @@
     "build": "sentio build --skip-deps",
     "test": "sentio test",
     "upload": "sentio upload",
-    "build_all": "yarn lerna run --scope=@sentio-example/aurory build --include-dependencies"
+    "build:all": "pnpm --filter=$(node -p \"require('./package.json').name\")... build"
   },
   "dependencies": {
-    "@sentio/sdk": "^2.0.0-development"
+    "@sentio/sdk": "workspace:*"
   },
   "devDependencies": {
-    "@sentio/cli": "^2.0.0-development"
+    "@sentio/cli": "workspace:*"
   }
 }

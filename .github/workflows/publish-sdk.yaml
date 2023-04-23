@@ -16,14 +16,18 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
           ref: ${{ github.event.inputs.commit }}
+      - uses: pnpm/action-setup@v2
+        with:
+          version: latest
       - uses: actions/setup-node@v3
         with:
-          cache: yarn
           node-version: 16
+          cache: 'pnpm'
       - name: Install
-        run: yarn install
-      - name: Build
-        run: yarn lerna run build --no-private
+        run: pnpm install
+      - name: Build SDK
+        run: pnpm build:all
+        working-directory: packages/sdk
       - name: Semantic Release
         id: semantic
         uses: cycjimmy/semantic-release-action@v3
@@ -42,25 +46,26 @@ jobs:
         run: |
           echo "### No SDK version cut" >> $GITHUB_STEP_SUMMARY
           echo "Check Semantic Release output for details"
-      - name: Lerna Publish
+      - name: PNPM Publish for SDK
         run: |
           DIST_TAG=latest
           if [[ "${{ contains(steps.semantic.outputs.new_release_version, '-rc.') }}" == "true" ]]; then          
             DIST_TAG=rc
           fi
           echo //registry.npmjs.org/:_authToken=${NPM_TOKEN} > .npmrc
-          yarn lerna publish ${{ steps.semantic.outputs.new_release_version }} --no-private --yes --no-push --no-git-tag-version --dist-tag $DIST_TAG
+          ./scripts/update-version.sh ${{ steps.semantic.outputs.new_release_version }}
+          pnpm publish --filter "@sentio/sdk..." --no-git-checks --tag $DIST_TAG
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Build CLI
-        run: yarn build
+        run: pnpm build:all
         working-directory: packages/cli
       - name: Clean templates node mdules
         run: "rm -rf */node_modules"
         working-directory: packages/cli/templates
-      - name: CLI Prepare
-        run: npx -y json -I -f package.json -e "this.private=false"
-        working-directory: packages/cli
+#      - name: CLI Prepare
+#        run: npx -y json -I -f package.json -e "this.private=false"
+#        working-directory: packages/cli
       - name: Semantic Release CLI
         id: semantic_cli
         uses: cycjimmy/semantic-release-action@v3

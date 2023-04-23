@@ -7,13 +7,13 @@
   "scripts": {
     "compile": "tsc",
     "test": "sentio test",
-    "build": "yarn sentio build --skip-deps",
-    "build_all": "yarn lerna run --scope=@sentio-example/wormhole build --include-dependencies"
+    "build": "pnpm sentio build --skip-deps",
+    "build:all": "pnpm --filter=$(node -p \"require('./package.json').name\")... build"
   },
   "dependencies": {
-    "@sentio/sdk": "^2.0.0-development"
+    "@sentio/sdk": "workspace:*"
   },
   "devDependencies": {
-    "@sentio/cli": "^2.0.0-development"
+    "@sentio/cli": "workspace:*"
   }
 }

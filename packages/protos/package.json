@@ -6,11 +6,14 @@
   "scripts": {
     "compile": "tsc",
     "clean": "tsc --build --clean",
-    "build": "yarn compile"
+    "build": "pnpm compile"
   },
   "dependencies": {
     "google-protobuf": "^3.21.2",
-    "nice-grpc": "^2.1.0"
+    "nice-grpc": "^2.1.0",
+    "long": "^5.2.3",
+    "nice-grpc-common": "^2.0.2",
+    "protobufjs": "^7.2.3"
   },
   "exports": {
     ".": "./lib/index.js",
@@ -19,5 +22,8 @@
   },
   "files": [
     "{lib,src}"
-  ]
+  ],
+  "engines": {
+    "node": ">=16"
+  }
 }

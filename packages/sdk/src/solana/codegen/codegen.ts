@@ -34,7 +34,7 @@ function codeGenSolanaIdlProcessor(idlObj: Idl): string {
   const idlName = idlObj.name
   const idlNamePascalCase = toPascalCase(idlName)
   const instructions: any[] = idlObj.instructions
-  return `import { BorshInstructionCoder, Instruction, Idl } from '@project-serum/anchor'
+  return `import { BorshInstructionCoder, Instruction, Idl } from '@sentio/sdk/solana'
 import { SolanaBaseProcessor, SolanaContext, SolanaBindOptions } from "@sentio/sdk/solana"
 import { ${idlName}_idl } from "./${idlName}.js"
 import { PublicKey } from '@solana/web3.js'

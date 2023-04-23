@@ -14,18 +14,20 @@ jobs:
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v3
-
+      - uses: pnpm/action-setup@v2
+        with:
+          version: latest
       - uses: actions/setup-node@v3
         with:
-          cache: yarn
           node-version: 16
+          cache: 'pnpm'
       - name: Install
-        run: yarn install
+        run: pnpm install
       - name: Build
-        run: yarn build_all
+        run: pnpm build:all
         working-directory: packages/sdk
       - name: Create the docs directory locally in CI
-        run: yarn docs
+        run: pnpm docs
         working-directory: packages/sdk
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4.4.1

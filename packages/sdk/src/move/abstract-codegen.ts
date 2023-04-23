@@ -514,12 +514,11 @@ export class AccountCodegen<NetworkType, ModuleType, StructType> {
     }
 
     const imports = `
-    import { CallFilter, TypeDescriptor, ANY_TYPE } from "@sentio/sdk/move"
+    import { CallFilter, TypeDescriptor, ANY_TYPE, MoveFetchConfig } from "@sentio/sdk/move"
     import {
       MoveCoder, defaultMoveCoder, ${this.moduleGen.PREFIX}BindOptions, ${this.moduleGen.PREFIX}BaseProcessor,
       TypedEventInstance, ${this.moduleGen.PREFIX}Network, TypedFunctionPayload,
       ${this.moduleGen.PREFIX}Context } from "@sentio/sdk/${this.moduleGen.PREFIX.toLowerCase()}"
-    import { MoveFetchConfig } from "@sentio/protos"
     import { ${this.moduleGen.ADDRESS_TYPE}, ModuleClient } from "@sentio/sdk/${this.moduleGen.PREFIX.toLowerCase()}"
     `
 

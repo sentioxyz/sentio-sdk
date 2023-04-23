@@ -1,9 +1,0 @@
-{
-  "command": {},
-  "concurrency": 4,
-  "npmClient": "yarn",
-  "packages_no_need": ["sdk", "cli", "cli/templates", "examples/*"],
-  "stream": true,
-  "useWorkspaces": true,
-  "version": "1.0.0-rc.5"
-}

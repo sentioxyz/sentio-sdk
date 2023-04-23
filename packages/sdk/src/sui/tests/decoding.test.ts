@@ -39,11 +39,10 @@ describe('Test Sui Example', () => {
     }
     const res = await coder.decodedType(
       data,
-      parseMoveType(
-        '0x1::option::Option<0xebaa2ad3eacc230f309cd933958cc52684df0a41ae7ac214d186b80f830867d2::single_collateral::Info>'
-      )
+      parseMoveType('0xebaa2ad3eacc230f309cd933958cc52684df0a41ae7ac214d186b80f830867d2::single_collateral::Info')
     )
-    console.log(res)
+    expect(res.delivery_info.price).equals(603716059n)
+    // console.log(res)
   })
 
   test('decode object2', async () => {
@@ -107,7 +106,8 @@ describe('Test Sui Example', () => {
       },
     }
     const res = await coder.decodedType(data, parseMoveType(data.type))
-    console.log(res)
+    expect(res.performance_fee_sub_vault.balance).equals(0n)
+    // console.log(res)
   })
 
   test('decode dynamic fields', async () => {
@@ -123,7 +123,7 @@ describe('Test Sui Example', () => {
 
     const decodedObjects = await coder.getDynamicFields(objects, BUILTIN_TYPES.ADDRESS_TYPE, BUILTIN_TYPES.BOOL_TYPE)
     expect(res.length).eq(decodedObjects.length)
-    console.log(decodedObjects)
+    // console.log(decodedObjects)
   })
 
   test('decode dynamic fields 2', async () => {
@@ -140,7 +140,7 @@ describe('Test Sui Example', () => {
       single_collateral.PortfolioVault.type()
     )
     expect(res.length).eq(1)
-    console.log(decodedObjects)
+    // console.log(decodedObjects)
   })
 })
 

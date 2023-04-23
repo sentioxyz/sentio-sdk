@@ -15,9 +15,6 @@ module.exports = {
         ],
       },
     ],
-    // ["@semantic-release/npm", {
-      // "pkgRoot": "dist"
-    // }],
     ['@semantic-release/release-notes-generator', {
       preset: 'conventionalcommits',
       presetConfig: {

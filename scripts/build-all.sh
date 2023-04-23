@@ -2,6 +2,8 @@
 
 set -e
 
-yarn install
-yarn lerna run build --scope="@sentio/*" --scope="@sentio-example/*"
-yarn lerna run build --scope="template-*" --concurrency=1
+pnpm install
+pnpm --filter "./packages/**" build
+
+pnpm install
+pnpm --filter "./examples/**" build

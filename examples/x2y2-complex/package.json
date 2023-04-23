@@ -9,14 +9,14 @@
     "test": "sentio test",
     "build": "sentio build --skip-deps",
     "upload": "sentio upload",
-    "tsnode": "yarn ts-node",
     "add": "sentio add",
-    "build_all": "yarn lerna run --scope=@sentio-example/x2y2-complex build --include-dependencies"
+    "build:all": "pnpm --filter=$(node -p \"require('./package.json').name\")... build"
   },
   "dependencies": {
-    "@sentio/sdk": "^2.0.0-development"
+    "@sentio/sdk": "workspace:*",
+    "ethers": "^6.3.0"
   },
   "devDependencies": {
-    "@sentio/cli": "^2.0.0-development"
+    "@sentio/cli": "workspace:*"
   }
 }

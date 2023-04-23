@@ -7,3 +7,4 @@ packages/protos/src
 docs
 types
 builtin
+pnpm-*.yaml
