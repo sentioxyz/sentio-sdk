@@ -52,7 +52,7 @@ export const GenOptionDefinitions = [
 ]
 
 export async function buildProcessorWithArgs(argv: string[]) {
-  const options = commandLineArgs(buildOptionDefinitions, { argv })
+  const options = commandLineArgs(buildOptionDefinitions, { argv, partial: true })
   const usage = commandLineUsage([
     {
       header: 'Build project',
@@ -72,7 +72,7 @@ export async function buildProcessorWithArgs(argv: string[]) {
 }
 
 export async function generate(argv: string[]) {
-  const options = commandLineArgs(GenOptionDefinitions, { argv })
+  const options = commandLineArgs(GenOptionDefinitions, { argv, partial: true })
   const usage = commandLineUsage([
     {
       header: 'Generate type binding',

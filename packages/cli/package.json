@@ -7,10 +7,9 @@
   "scripts": {
     "compile": "tsc",
     "build": "pnpm compile",
-    "__postbuild": "../../scripts/link-bin.sh",
+    "postbuild": "pnpm install",
     "cli": "ts-node-esm src/cli.ts",
-    "test": "NODE_OPTIONS=--experimental-vm-modules pnpm jest",
-    "pub": "pnpm build && pnpm publish --no-git-tag-version"
+    "test": "NODE_OPTIONS=--experimental-vm-modules pnpm jest"
   },
   "dependencies": {
     "@jest/types": "^29.5.0",

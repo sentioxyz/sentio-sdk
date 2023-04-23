@@ -30,7 +30,7 @@ export function runLogin(argv: string[]) {
       description: '(Optional) Your API key',
     },
   ]
-  const options = commandLineArgs(optionDefinitions, { argv })
+  const options = commandLineArgs(optionDefinitions, { argv, partial: true })
 
   const host = getFinalizedHost(options.host)
   if (options.help) {

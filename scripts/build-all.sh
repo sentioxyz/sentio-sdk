@@ -3,7 +3,6 @@
 set -e
 
 pnpm install
-pnpm --filter "./packages/**" build
+pnpm --filter "./packages/*" -filter "./examples/*" build
 
-pnpm install
-pnpm --filter "./examples/**" build
+pnpm --filter "./packages/cli/templates/**"  build --skip-deps

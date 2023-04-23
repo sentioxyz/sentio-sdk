@@ -77,7 +77,7 @@ function mergeOptions(options1: commandLineArgs.OptionDefinition[], options2: co
 export async function runUpload(processorConfig: YamlProjectConfig, argv: string[]) {
   const optionDefinitions = mergeOptions(uploadOptionDefinitions, buildOptionDefinitions)
 
-  const options = commandLineArgs(optionDefinitions, { argv })
+  const options = commandLineArgs(optionDefinitions, { argv, partial: true })
   if (options.help) {
     const usage = commandLineUsage([
       {

@@ -11,7 +11,7 @@ export function runVersion(argv: string[]) {
       description: 'Display this usage guide.',
     },
   ]
-  const options = commandLineArgs(optionDefinitions, { argv })
+  const options = commandLineArgs(optionDefinitions, { argv, partial: true })
 
   if (options.help) {
     const usage = commandLineUsage([

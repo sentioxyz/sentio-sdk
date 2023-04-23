@@ -46,7 +46,7 @@ export async function runCreate(argv: string[]) {
     },
   ]
 
-  const options = commandLineArgs(optionDefinitions, { argv })
+  const options = commandLineArgs(optionDefinitions, { argv, partial: true })
   const usage = commandLineUsage([
     {
       header: 'Create a template project',

@@ -25,9 +25,8 @@ jobs:
           cache: 'pnpm'
       - name: Install
         run: pnpm install
-      - name: Build SDK
-        run: pnpm build:all
-        working-directory: packages/sdk
+      - name: Build SDK & CLI
+        run: pnpm --filter "./packages/*..." build
       - name: Semantic Release
         id: semantic
         uses: cycjimmy/semantic-release-action@v3
@@ -57,15 +56,9 @@ jobs:
           pnpm publish --filter "@sentio/sdk..." --no-git-checks --tag $DIST_TAG
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - name: Build CLI
-        run: pnpm build:all
-        working-directory: packages/cli
-      - name: Clean templates node mdules
+      - name: Clean templates node modules
         run: "rm -rf */node_modules"
         working-directory: packages/cli/templates
-#      - name: CLI Prepare
-#        run: npx -y json -I -f package.json -e "this.private=false"
-#        working-directory: packages/cli
       - name: Semantic Release CLI
         id: semantic_cli
         uses: cycjimmy/semantic-release-action@v3

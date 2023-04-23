@@ -248,6 +248,58 @@ importers:
         specifier: ^11.0.1
         version: 11.0.1
 
+  packages/cli/templates/aptos:
+    dependencies:
+      '@sentio/sdk':
+        specifier: workspace:*
+        version: link:../../../sdk
+    devDependencies:
+      '@sentio/cli':
+        specifier: workspace:*
+        version: link:../..
+      typescript:
+        specifier: ^5.0.3
+        version: 5.0.4
+
+  packages/cli/templates/eth:
+    dependencies:
+      '@sentio/sdk':
+        specifier: workspace:*
+        version: link:../../../sdk
+    devDependencies:
+      '@sentio/cli':
+        specifier: workspace:*
+        version: link:../..
+      typescript:
+        specifier: ^5.0.3
+        version: 5.0.4
+
+  packages/cli/templates/raw:
+    dependencies:
+      '@sentio/sdk':
+        specifier: workspace:*
+        version: link:../../../sdk
+    devDependencies:
+      '@sentio/cli':
+        specifier: workspace:*
+        version: link:../..
+      typescript:
+        specifier: ^5.0.3
+        version: 5.0.4
+
+  packages/cli/templates/solana:
+    dependencies:
+      '@sentio/sdk':
+        specifier: workspace:*
+        version: link:../../../sdk
+    devDependencies:
+      '@sentio/cli':
+        specifier: workspace:*
+        version: link:../..
+      typescript:
+        specifier: ^5.0.3
+        version: 5.0.4
+
   packages/protos:
     dependencies:
       google-protobuf:

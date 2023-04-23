@@ -1,6 +1,6 @@
 packages:
   - 'packages/*'
-#  - 'packages/cli/templates/*'
+  - 'packages/cli/templates/*'
   - 'examples/*'
   # if required, exclude some directories
   # - '!**/test/**'
