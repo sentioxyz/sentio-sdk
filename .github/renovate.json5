@@ -10,7 +10,6 @@
     {
       "matchPackageNames": [
         "node",
-        "semantic-release",
         "superstruct_solana"
       ],
       "enabled": false

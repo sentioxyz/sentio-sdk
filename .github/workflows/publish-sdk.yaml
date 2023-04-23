@@ -21,7 +21,7 @@ jobs:
           version: latest
       - uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
           cache: 'pnpm'
       - name: Install
         run: pnpm install
@@ -80,3 +80,8 @@ jobs:
         run: |
           echo "### No CLI version cut" >> $GITHUB_STEP_SUMMARY
           echo "Check Semantic Release output for details"
+      - name: Clean Github Release for RC
+        if: contains(steps.semantic.outputs.new_release_version, '-rc.')
+        run:  ./scripts/clean-rc-releases.sh
+        env:
+          GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}

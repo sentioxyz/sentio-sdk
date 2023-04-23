@@ -16,7 +16,7 @@
     "gen:sui": "ts-node-esm  src/sui/codegen/run.ts src/sui/abis src/sui/builtin && pnpm gen:sui_test",
     "gen:sui_test": "ts-node-esm  src/sui/codegen/run.ts src/sui/tests/abis src/sui/tests/types",
     "gen:solana": "ts-node-esm src/solana/codegen/run.ts src/solana/tests/abis src/solana/tests/types",
-    "docs": "typedoc --options typedoc.json"
+    "gen:docs": "typedoc --options typedoc.json"
   },
   "dependencies": {
     "@mysten/sui.js": "npm:@sentio/sui.js@^0.32.0-patch.1",
