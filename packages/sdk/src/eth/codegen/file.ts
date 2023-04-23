@@ -14,8 +14,9 @@ import { generateBoundViewFunctions, generateViewFunctions } from './view-functi
 export function codeGenIndex(contract: Contract): string {
   return ` 
   export * from './internal/${contract.name.toLowerCase()}-processor.js'
-  export * from './internal/${contract.name}.js'
   export * from './internal/${contract.name.toLowerCase()}-test-utils.js'
+  export * from './internal/${contract.name}.js'
+  export * from './internal/factories/${contract.name}__factory.js'
   `
 }
 
