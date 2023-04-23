@@ -2,6 +2,7 @@ import { getPriceByType } from '@sentio/sdk/utils'
 import { CHAIN_IDS } from '@sentio/sdk'
 import fetch from 'node-fetch'
 import { validateAndNormalizeAddress } from '../utils.js'
+import { SPLITTER } from '../../move/index.js'
 
 const WHITELISTED_COINS = new Map<string, SimpleCoinInfo>()
 
@@ -46,8 +47,10 @@ export function whitelistCoins() {
   return WHITELISTED_COINS
 }
 
-export function whiteListed(type: string): boolean {
-  return WHITELISTED_COINS.has(validateAndNormalizeAddress(type))
+export function whiteListed(coin: string): boolean {
+  const [addr, module, type] = coin.split(SPLITTER)
+  const normalized = [validateAndNormalizeAddress(addr), module, type].join(SPLITTER)
+  return WHITELISTED_COINS.has(normalized)
 }
 
 export function getCoinInfo(type: string): SimpleCoinInfo {
@@ -142,7 +145,7 @@ const DEFAULT_LIST = [
     name: 'Move Dollar',
     symbol: 'MOD',
     official_symbol: 'MOD',
-    coingecko_id: '',
+    coingecko_id: 'move-dollar',
     decimals: 8,
     logo_url: 'https://raw.githubusercontent.com/hippospace/aptos-coin-list/main/icons/MOD.svg',
     project_url: 'https://www.thala.fi/',
@@ -165,13 +168,13 @@ const DEFAULT_LIST = [
     name: 'Thala Token',
     symbol: 'THL',
     official_symbol: 'THL',
-    coingecko_id: '',
+    coingecko_id: 'thala',
     decimals: 8,
     logo_url: 'https://raw.githubusercontent.com/hippospace/aptos-coin-list/main/icons/THL.svg',
     project_url: 'https://www.thala.fi/',
     token_type: {
-      type: '0x07fd500c11216f0fe3095d0c4b8aa4d64a4e2e04f83758462f2b127255643615::thl_coin::THL',
-      account_address: '0x07fd500c11216f0fe3095d0c4b8aa4d64a4e2e04f83758462f2b127255643615',
+      type: '0x7fd500c11216f0fe3095d0c4b8aa4d64a4e2e04f83758462f2b127255643615::thl_coin::THL',
+      account_address: '0x7fd500c11216f0fe3095d0c4b8aa4d64a4e2e04f83758462f2b127255643615',
       module_name: 'thl_coin',
       struct_name: 'THL',
     },
@@ -206,6 +209,29 @@ const DEFAULT_LIST = [
     hippo_symbol: 'APD',
     pancake_symbol: 'APD',
     permissioned_listing: false,
+  },
+  {
+    name: 'Mover',
+    symbol: 'MOVER',
+    official_symbol: 'MOVER',
+    coingecko_id: 'mover-xyz',
+    decimals: 8,
+    logo_url: 'https://raw.githubusercontent.com/hippospace/aptos-coin-list/main/icons/MOVER.svg',
+    project_url: 'https://mov3r.xyz/',
+    token_type: {
+      type: '0x14b0ef0ec69f346bea3dfa0c5a8c3942fb05c08760059948f9f24c02cd0d4fd8::mover_token::Mover',
+      account_address: '0x14b0ef0ec69f346bea3dfa0c5a8c3942fb05c08760059948f9f24c02cd0d4fd8',
+      module_name: 'mover_token',
+      struct_name: 'Mover',
+    },
+    extensions: {
+      data: [],
+    },
+    unique_index: 131,
+    source: 'native',
+    permissioned_listing: true,
+    hippo_symbol: 'MOVER',
+    pancake_symbol: 'MOVER',
   },
   {
     name: 'Ditto Staked Aptos',
@@ -528,6 +554,29 @@ const DEFAULT_LIST = [
     hippo_symbol: 'SPRING',
     pancake_symbol: 'SPRING',
     permissioned_listing: false,
+  },
+  {
+    name: 'Gari',
+    symbol: 'GARI',
+    official_symbol: 'GARI',
+    coingecko_id: 'gari-network',
+    decimals: 8,
+    logo_url: 'https://raw.githubusercontent.com/hippospace/aptos-coin-list/main/icons/GARI.svg',
+    project_url: 'https://gari.network',
+    token_type: {
+      type: '0x4def3d3dee27308886f0a3611dd161ce34f977a9a5de4e80b237225923492a2a::coin::T',
+      account_address: '0x4def3d3dee27308886f0a3611dd161ce34f977a9a5de4e80b237225923492a2a',
+      module_name: 'coin',
+      struct_name: 'T',
+    },
+    extensions: {
+      data: [['bridge', 'wormhole']],
+    },
+    unique_index: 800,
+    source: 'wormhole',
+    permissioned_listing: true,
+    hippo_symbol: 'wGARI',
+    pancake_symbol: 'whGARI',
   },
   {
     name: 'BlueMove',

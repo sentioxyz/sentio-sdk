@@ -30,7 +30,7 @@ jobs:
             pnpm install
       - save_cache:
           name: Save pnpm Package Cache
-          key: pnpm-packages-2-{{ checksum "pnpm-lock.yaml" }}
+          key: pnpm-packages-{{ checksum "pnpm-lock.yaml" }}
           paths:
             - node_modules
             - ~/.local/share/pnpm/store/v3
