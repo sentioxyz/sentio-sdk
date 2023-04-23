@@ -248,6 +248,12 @@ importers:
         specifier: ^11.0.1
         version: 11.0.1
 
+  packages/cli-alias:
+    dependencies:
+      '@sentio/cli':
+        specifier: workspace:*
+        version: link:../cli
+
   packages/cli/templates/aptos:
     dependencies:
       '@sentio/sdk':
@@ -324,10 +330,10 @@ importers:
         specifier: ^1.8.14
         version: 1.8.14
       '@sentio/protos':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../protos
       '@sentio/sdk':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../sdk
       command-line-args:
         specifier: ^5.2.1
@@ -403,10 +409,10 @@ importers:
         specifier: ^1.0.28
         version: 1.0.28(@sentio/ethers@6.3.0-patch.4)(typescript@5.0.4)
       '@sentio/protos':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../protos
       '@sentio/runtime':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../runtime
       '@solana/web3.js':
         specifier: ^1.74.0
