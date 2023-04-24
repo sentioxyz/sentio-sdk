@@ -233,8 +233,7 @@ export abstract class AbstractMoveCoder<Network, ModuleType, StructType> {
       try {
         entriesDecoded.push(await this.decode(arg, argType))
       } catch (e) {
-        console.error(e, 'Decoding error for ', JSON.stringify(arg), 'using type', argType)
-        return entries
+        throw Error('Decoding error for ' + JSON.stringify(arg) + 'using type' + argType + e.toString())
       }
     }
     return entriesDecoded
@@ -298,8 +297,8 @@ export abstract class AbstractMoveCoder<Network, ModuleType, StructType> {
     try {
       dataTyped = await this.decode(typeStruct, typeDescriptor)
     } catch (e) {
-      console.error('Decoding error for ', JSON.stringify(typeStruct), e)
-      return undefined
+      throw Error('Decoding error for struct' + JSON.stringify(typeStruct) + e.toString())
+      // return undefined
     }
     return {
       ...typeStruct,
