@@ -26,10 +26,11 @@ export class SuiChainAdapter extends ChainAdapter<SuiNetwork, SuiMoveNormalizedM
   }
 
   getMeaningfulFunctionParams(params: TypeDescriptor[]): TypeDescriptor[] {
-    if (params.length === 0) {
-      return params
-    }
-    return params.slice(0, params.length - 1)
+    return params
+    // if (params.length === 0) {
+    //   return params
+    // }
+    // return params.slice(0, params.length - 1)
   }
 
   toInternalModules(modules: SuiMoveNormalizedModule[]): InternalMoveModule[] {

@@ -1,6 +1,6 @@
 import { defaultMoveCoder } from '../move-coder.js'
 
-import { dynamic_field, loadAllTypes } from '../builtin/0x2.js'
+import { coin, dynamic_field, loadAllTypes } from '../builtin/0x2.js'
 import { expect } from 'chai'
 import { TypedSuiMoveObject } from '../models.js'
 import { SuiNetwork } from '../network.js'
@@ -141,6 +141,22 @@ describe('Test Sui Example', () => {
     )
     expect(res.length).eq(1)
     // console.log(decodedObjects)
+  })
+
+  test('decode array', async () => {
+    const res = await coder.decodeArray(
+      [
+        '0x7778e8c334013aacc9308eeea1f3cb377cc483a46a0dd2d09293996724c64d4a',
+        '0xf9a081de27ab4ef435c619e032082e279830726453cbec62cfb84477b350aaf6',
+        undefined,
+      ],
+      [
+        parseMoveType('&0xf0bae856227dd70c836a9efa09d18807b56e16434a7bd3e0bd1c85ecbd9ed1af::pause::Pause'),
+        parseMoveType('&0xf0bae856227dd70c836a9efa09d18807b56e16434a7bd3e0bd1c85ecbd9ed1af::maven::Maven'),
+        coin.Coin.type(),
+      ]
+    )
+    expect(res.length).equals(3)
   })
 })
 
