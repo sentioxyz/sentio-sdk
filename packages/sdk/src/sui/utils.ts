@@ -10,7 +10,6 @@ import {
   SuiAddress,
 } from '@mysten/sui.js'
 import { isFrameworkAccount } from '../move/index.js'
-import { parseInt } from 'lodash-es'
 
 export function getMoveCalls(txBlock: SuiTransactionBlockResponse) {
   const txKind = getTransactionKind(txBlock)

@@ -1,5 +1,4 @@
 import { InternalMoveModule, InternalMoveStruct } from './internal-models.js'
-import { parseInt } from 'lodash-es'
 
 export const SPLITTER = '::'
 
