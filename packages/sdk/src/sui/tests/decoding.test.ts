@@ -158,6 +158,15 @@ describe('Test Sui Example', () => {
     )
     expect(res.length).equals(3)
   })
+
+  test('check account norm', async () => {
+    const f1 = await coder.getMoveStruct('0x2::bcs::BCS')
+    const f2 = await coder.getMoveStruct('0x002::bcs::BCS')
+    const f3 = await coder.getMoveStruct('0x1::option::Option')
+
+    expect(f1).equals(f2)
+    expect(f1).not.equals(f3)
+  })
 })
 
 const data = [

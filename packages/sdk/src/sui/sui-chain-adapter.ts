@@ -10,6 +10,7 @@ import {
   SuiMoveObject,
   SuiParsedData,
 } from '@mysten/sui.js'
+import { validateAndNormalizeAddress } from './utils.js'
 
 export class SuiChainAdapter extends ChainAdapter<SuiNetwork, SuiMoveNormalizedModule, SuiEvent | SuiMoveObject> {
   static INSTANCE = new SuiChainAdapter()
@@ -71,6 +72,9 @@ export class SuiChainAdapter extends ChainAdapter<SuiNetwork, SuiMoveNormalizedM
       }
     }
     return val as any
+  }
+  validateAndNormalizeAddress(address: string) {
+    return validateAndNormalizeAddress(address)
   }
 }
 

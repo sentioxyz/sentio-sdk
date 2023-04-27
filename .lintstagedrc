@@ -1,3 +1,5 @@
 {
-  "*.ts|*.tsx|*.js|*.jsx|*.json|*.yml|*.yaml": ["prettier --write"]
+  "package.json": ["prettier-package-json --write"],
+  "!(package).json": ["prettier --write"],
+  "*.ts|*.tsx|*.js|*.jsx|*.yml|*.yaml": ["prettier --write"]
 }

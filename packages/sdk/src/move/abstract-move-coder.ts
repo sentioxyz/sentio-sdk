@@ -22,14 +22,15 @@ export abstract class AbstractMoveCoder<Network, ModuleType, StructType> {
   abstract load(module: ModuleType): InternalMoveModule
 
   protected loadInternal(module: InternalMoveModule) {
-    if (this.contains(module.address, module.name)) {
+    const account = this.adapter.validateAndNormalizeAddress(module.address)
+    if (this.contains(account, module.name)) {
       return
     }
-    this.moduleMapping.set(moduleQname(module), module)
+    this.moduleMapping.set(moduleQname({ address: account, name: module.name }), module)
 
     for (const struct of module.structs) {
       // TODO move to util
-      const key = [module.address, module.name, struct.name].join(SPLITTER)
+      const key = [account, module.name, struct.name].join(SPLITTER)
       this.typeMapping.set(key, struct)
     }
 
@@ -37,7 +38,7 @@ export abstract class AbstractMoveCoder<Network, ModuleType, StructType> {
       // if (!func.isEntry) {
       //   continue
       // }
-      const key = [module.address, module.name, func.name].join(SPLITTER)
+      const key = [account, module.name, func.name].join(SPLITTER)
       this.funcMapping.set(key, func)
     }
   }
@@ -59,11 +60,14 @@ export abstract class AbstractMoveCoder<Network, ModuleType, StructType> {
   private requestMap = new Map<string, Promise<InternalMoveModule>>()
 
   async getMoveStruct(type: string): Promise<InternalMoveStruct> {
+    const [account_, module, typeName] = type.split(SPLITTER)
+    const account = this.adapter.validateAndNormalizeAddress(account_)
+    type = [account, module, typeName].join(SPLITTER)
+
     let struct = this.typeMapping.get(type)
     if (struct) {
       return struct
     }
-    const [account, module, typeName] = type.split(SPLITTER)
     const key = account + SPLITTER + module
     let resp = this.requestMap.get(account + SPLITTER + module)
     if (!resp) {
@@ -81,11 +85,14 @@ export abstract class AbstractMoveCoder<Network, ModuleType, StructType> {
   }
 
   async getMoveFunction(type: string): Promise<InternalMoveFunction> {
+    const [account_, module, typeName] = type.split(SPLITTER)
+    const account = this.adapter.validateAndNormalizeAddress(account_)
+    type = [account, module, typeName].join(SPLITTER)
+
     let func = this.funcMapping.get(type)
     if (func) {
       return func
     }
-    const [account, module, typeName] = type.split(SPLITTER)
     const key = account + SPLITTER + module
     let resp = this.requestMap.get(account + SPLITTER + module)
     if (!resp) {

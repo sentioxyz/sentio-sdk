@@ -3,6 +3,7 @@ import { Event, MoveModuleBytecode, MoveResource, toInternalModule } from './mov
 import { AptosNetwork } from './network.js'
 import { InternalMoveModule, InternalMoveStruct } from '../move/internal-models.js'
 import { AptosClient } from 'aptos-sdk'
+import { validateAndNormalizeAddress } from './utils.js'
 
 export class AptosChainAdapter extends ChainAdapter<AptosNetwork, MoveModuleBytecode, Event | MoveResource> {
   static INSTANCE = new AptosChainAdapter()
@@ -65,6 +66,9 @@ export class AptosChainAdapter extends ChainAdapter<AptosNetwork, MoveModuleByte
       return data.data
     }
     return data
+  }
+  validateAndNormalizeAddress(address: string): string {
+    return validateAndNormalizeAddress(address)
   }
 }
 
