@@ -535,7 +535,6 @@ export interface ProcessBindingsRequest {
 
 export interface ProcessBindingResponse {
   result: ProcessResult | undefined;
-  configUpdated: boolean;
 }
 
 export interface Data {
@@ -627,11 +626,16 @@ export interface DataBinding {
   handlerIds: number[];
 }
 
+export interface StateResult {
+  configUpdated: boolean;
+}
+
 export interface ProcessResult {
   gauges: GaugeResult[];
   counters: CounterResult[];
   events: EventTrackingResult[];
   exports: ExportResult[];
+  states: StateResult | undefined;
 }
 
 export interface RecordMetaData {
@@ -3321,16 +3325,13 @@ export const ProcessBindingsRequest = {
 };
 
 function createBaseProcessBindingResponse(): ProcessBindingResponse {
-  return { result: undefined, configUpdated: false };
+  return { result: undefined };
 }
 
 export const ProcessBindingResponse = {
   encode(message: ProcessBindingResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.result !== undefined) {
       ProcessResult.encode(message.result, writer.uint32(10).fork()).ldelim();
-    }
-    if (message.configUpdated === true) {
-      writer.uint32(32).bool(message.configUpdated);
     }
     return writer;
   },
@@ -3345,9 +3346,6 @@ export const ProcessBindingResponse = {
         case 1:
           message.result = ProcessResult.decode(reader, reader.uint32());
           break;
-        case 4:
-          message.configUpdated = reader.bool();
-          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -3357,16 +3355,12 @@ export const ProcessBindingResponse = {
   },
 
   fromJSON(object: any): ProcessBindingResponse {
-    return {
-      result: isSet(object.result) ? ProcessResult.fromJSON(object.result) : undefined,
-      configUpdated: isSet(object.configUpdated) ? Boolean(object.configUpdated) : false,
-    };
+    return { result: isSet(object.result) ? ProcessResult.fromJSON(object.result) : undefined };
   },
 
   toJSON(message: ProcessBindingResponse): unknown {
     const obj: any = {};
     message.result !== undefined && (obj.result = message.result ? ProcessResult.toJSON(message.result) : undefined);
-    message.configUpdated !== undefined && (obj.configUpdated = message.configUpdated);
     return obj;
   },
 
@@ -3379,7 +3373,6 @@ export const ProcessBindingResponse = {
     message.result = (object.result !== undefined && object.result !== null)
       ? ProcessResult.fromPartial(object.result)
       : undefined;
-    message.configUpdated = object.configUpdated ?? false;
     return message;
   },
 };
@@ -4485,8 +4478,59 @@ export const DataBinding = {
   },
 };
 
+function createBaseStateResult(): StateResult {
+  return { configUpdated: false };
+}
+
+export const StateResult = {
+  encode(message: StateResult, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.configUpdated === true) {
+      writer.uint32(8).bool(message.configUpdated);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): StateResult {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseStateResult();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.configUpdated = reader.bool();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): StateResult {
+    return { configUpdated: isSet(object.configUpdated) ? Boolean(object.configUpdated) : false };
+  },
+
+  toJSON(message: StateResult): unknown {
+    const obj: any = {};
+    message.configUpdated !== undefined && (obj.configUpdated = message.configUpdated);
+    return obj;
+  },
+
+  create(base?: DeepPartial<StateResult>): StateResult {
+    return StateResult.fromPartial(base ?? {});
+  },
+
+  fromPartial(object: DeepPartial<StateResult>): StateResult {
+    const message = createBaseStateResult();
+    message.configUpdated = object.configUpdated ?? false;
+    return message;
+  },
+};
+
 function createBaseProcessResult(): ProcessResult {
-  return { gauges: [], counters: [], events: [], exports: [] };
+  return { gauges: [], counters: [], events: [], exports: [], states: undefined };
 }
 
 export const ProcessResult = {
@@ -4502,6 +4546,9 @@ export const ProcessResult = {
     }
     for (const v of message.exports) {
       ExportResult.encode(v!, writer.uint32(42).fork()).ldelim();
+    }
+    if (message.states !== undefined) {
+      StateResult.encode(message.states, writer.uint32(50).fork()).ldelim();
     }
     return writer;
   },
@@ -4525,6 +4572,9 @@ export const ProcessResult = {
         case 5:
           message.exports.push(ExportResult.decode(reader, reader.uint32()));
           break;
+        case 6:
+          message.states = StateResult.decode(reader, reader.uint32());
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -4539,6 +4589,7 @@ export const ProcessResult = {
       counters: Array.isArray(object?.counters) ? object.counters.map((e: any) => CounterResult.fromJSON(e)) : [],
       events: Array.isArray(object?.events) ? object.events.map((e: any) => EventTrackingResult.fromJSON(e)) : [],
       exports: Array.isArray(object?.exports) ? object.exports.map((e: any) => ExportResult.fromJSON(e)) : [],
+      states: isSet(object.states) ? StateResult.fromJSON(object.states) : undefined,
     };
   },
 
@@ -4564,6 +4615,7 @@ export const ProcessResult = {
     } else {
       obj.exports = [];
     }
+    message.states !== undefined && (obj.states = message.states ? StateResult.toJSON(message.states) : undefined);
     return obj;
   },
 
@@ -4577,6 +4629,9 @@ export const ProcessResult = {
     message.counters = object.counters?.map((e) => CounterResult.fromPartial(e)) || [];
     message.events = object.events?.map((e) => EventTrackingResult.fromPartial(e)) || [];
     message.exports = object.exports?.map((e) => ExportResult.fromPartial(e)) || [];
+    message.states = (object.states !== undefined && object.states !== null)
+      ? StateResult.fromPartial(object.states)
+      : undefined;
     return message;
   },
 };

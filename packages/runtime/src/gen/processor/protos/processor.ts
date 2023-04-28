@@ -534,7 +534,10 @@ export interface ProcessBindingsRequest {
 }
 
 export interface ProcessBindingResponse {
-  result: ProcessResult | undefined;
+  result:
+    | ProcessResult
+    | undefined;
+  /** @deprecated */
   configUpdated: boolean;
 }
 
@@ -629,6 +632,10 @@ export interface DataBinding {
   handlerIds: number[];
 }
 
+export interface StateResult {
+  configUpdated: boolean;
+}
+
 export interface ProcessResult {
   gauges: GaugeResult[];
   counters: CounterResult[];
@@ -636,6 +643,7 @@ export interface ProcessResult {
   logs: LogResult[];
   events: EventTrackingResult[];
   exports: ExportResult[];
+  states: StateResult | undefined;
 }
 
 export interface RecordMetaData {
@@ -4511,8 +4519,59 @@ export const DataBinding = {
   },
 };
 
+function createBaseStateResult(): StateResult {
+  return { configUpdated: false };
+}
+
+export const StateResult = {
+  encode(message: StateResult, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.configUpdated === true) {
+      writer.uint32(8).bool(message.configUpdated);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): StateResult {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseStateResult();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.configUpdated = reader.bool();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): StateResult {
+    return { configUpdated: isSet(object.configUpdated) ? Boolean(object.configUpdated) : false };
+  },
+
+  toJSON(message: StateResult): unknown {
+    const obj: any = {};
+    message.configUpdated !== undefined && (obj.configUpdated = message.configUpdated);
+    return obj;
+  },
+
+  create(base?: DeepPartial<StateResult>): StateResult {
+    return StateResult.fromPartial(base ?? {});
+  },
+
+  fromPartial(object: DeepPartial<StateResult>): StateResult {
+    const message = createBaseStateResult();
+    message.configUpdated = object.configUpdated ?? false;
+    return message;
+  },
+};
+
 function createBaseProcessResult(): ProcessResult {
-  return { gauges: [], counters: [], logs: [], events: [], exports: [] };
+  return { gauges: [], counters: [], logs: [], events: [], exports: [], states: undefined };
 }
 
 export const ProcessResult = {
@@ -4531,6 +4590,9 @@ export const ProcessResult = {
     }
     for (const v of message.exports) {
       ExportResult.encode(v!, writer.uint32(42).fork()).ldelim();
+    }
+    if (message.states !== undefined) {
+      StateResult.encode(message.states, writer.uint32(50).fork()).ldelim();
     }
     return writer;
   },
@@ -4557,6 +4619,9 @@ export const ProcessResult = {
         case 5:
           message.exports.push(ExportResult.decode(reader, reader.uint32()));
           break;
+        case 6:
+          message.states = StateResult.decode(reader, reader.uint32());
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -4572,6 +4637,7 @@ export const ProcessResult = {
       logs: Array.isArray(object?.logs) ? object.logs.map((e: any) => LogResult.fromJSON(e)) : [],
       events: Array.isArray(object?.events) ? object.events.map((e: any) => EventTrackingResult.fromJSON(e)) : [],
       exports: Array.isArray(object?.exports) ? object.exports.map((e: any) => ExportResult.fromJSON(e)) : [],
+      states: isSet(object.states) ? StateResult.fromJSON(object.states) : undefined,
     };
   },
 
@@ -4602,6 +4668,7 @@ export const ProcessResult = {
     } else {
       obj.exports = [];
     }
+    message.states !== undefined && (obj.states = message.states ? StateResult.toJSON(message.states) : undefined);
     return obj;
   },
 
@@ -4616,6 +4683,9 @@ export const ProcessResult = {
     message.logs = object.logs?.map((e) => LogResult.fromPartial(e)) || [];
     message.events = object.events?.map((e) => EventTrackingResult.fromPartial(e)) || [];
     message.exports = object.exports?.map((e) => ExportResult.fromPartial(e)) || [];
+    message.states = (object.states !== undefined && object.states !== null)
+      ? StateResult.fromPartial(object.states)
+      : undefined;
     return message;
   },
 };

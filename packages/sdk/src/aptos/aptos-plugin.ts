@@ -22,18 +22,29 @@ import { AptosAccountProcessorState, AptosProcessorState } from './aptos-process
 import { initCoinList } from './ext/coin.js'
 import { validateAndNormalizeAddress } from './utils.js'
 
+interface Handlers {
+  aptosEventHandlers: ((event: Data_AptEvent) => Promise<ProcessResult>)[]
+  aptosCallHandlers: ((func: Data_AptCall) => Promise<ProcessResult>)[]
+  aptosResourceHandlers: ((resourceWithVersion: Data_AptResource) => Promise<ProcessResult>)[]
+}
 export class AptosPlugin extends Plugin {
   name: string = 'AptosPlugin'
-
-  private aptosEventHandlers: ((event: Data_AptEvent) => Promise<ProcessResult>)[] = []
-  private aptosCallHandlers: ((func: Data_AptCall) => Promise<ProcessResult>)[] = []
-  private aptosResourceHandlers: ((resourceWithVersion: Data_AptResource) => Promise<ProcessResult>)[] = []
+  handlers: Handlers = {
+    aptosEventHandlers: [],
+    aptosCallHandlers: [],
+    aptosResourceHandlers: [],
+  }
 
   async start(start: StartRequest) {
     await initCoinList()
   }
 
   async configure(config: ProcessConfigResponse) {
+    const handlers: Handlers = {
+      aptosEventHandlers: [],
+      aptosCallHandlers: [],
+      aptosResourceHandlers: [],
+    }
     for (const aptosProcessor of AptosProcessorState.INSTANCE.getValues()) {
       const contractConfig = ContractConfig.fromPartial({
         processorType: USER_PROCESSOR,
@@ -47,7 +58,7 @@ export class AptosPlugin extends Plugin {
       })
       // 1. Prepare event handlers
       for (const handler of aptosProcessor.eventHandlers) {
-        const handlerId = this.aptosEventHandlers.push(handler.handler) - 1
+        const handlerId = handlers.aptosEventHandlers.push(handler.handler) - 1
         const eventHandlerConfig: MoveEventHandlerConfig = {
           filters: handler.filters.map((f) => {
             return {
@@ -63,7 +74,7 @@ export class AptosPlugin extends Plugin {
 
       // 2. Prepare function handlers
       for (const handler of aptosProcessor.callHandlers) {
-        const handlerId = this.aptosCallHandlers.push(handler.handler) - 1
+        const handlerId = handlers.aptosCallHandlers.push(handler.handler) - 1
         const functionHandlerConfig: MoveCallHandlerConfig = {
           filters: handler.filters.map((filter) => {
             return {
@@ -88,7 +99,7 @@ export class AptosPlugin extends Plugin {
         startBlock: aptosProcessor.config.startVersion,
       })
       for (const handler of aptosProcessor.resourcesHandlers) {
-        const handlerId = this.aptosResourceHandlers.push(handler.handler) - 1
+        const handlerId = handlers.aptosResourceHandlers.push(handler.handler) - 1
         // TODO move to only use moveIntervalConfigs
         accountConfig.aptosIntervalConfigs.push({
           intervalConfig: {
@@ -117,6 +128,7 @@ export class AptosPlugin extends Plugin {
       }
       config.accountConfigs.push(accountConfig)
     }
+    this.handlers = handlers
   }
 
   supportedHandlers = [HandlerType.APT_CALL, HandlerType.APT_RESOURCE, HandlerType.APT_EVENT]
@@ -144,7 +156,7 @@ export class AptosPlugin extends Plugin {
     for (const handlerId of binding.handlerIds) {
       // only support aptos event for now
       promises.push(
-        this.aptosEventHandlers[handlerId](event).catch((e) => {
+        this.handlers.aptosEventHandlers[handlerId](event).catch((e) => {
           throw new ServerError(
             Status.INTERNAL,
             'error processing event: ' + JSON.stringify(event) + '\n' + errorString(e)
@@ -164,7 +176,7 @@ export class AptosPlugin extends Plugin {
     const promises: Promise<ProcessResult>[] = []
     for (const handlerId of binding.handlerIds) {
       promises.push(
-        this.aptosResourceHandlers[handlerId](resource).catch((e) => {
+        this.handlers.aptosResourceHandlers[handlerId](resource).catch((e) => {
           throw new ServerError(
             Status.INTERNAL,
             'error processing resource: ' + JSON.stringify(resource) + '\n' + errorString(e)
@@ -184,7 +196,7 @@ export class AptosPlugin extends Plugin {
     const promises: Promise<ProcessResult>[] = []
     for (const handlerId of binding.handlerIds) {
       // only support aptos call for now
-      const promise = this.aptosCallHandlers[handlerId](call).catch((e) => {
+      const promise = this.handlers.aptosCallHandlers[handlerId](call).catch((e) => {
         throw new ServerError(Status.INTERNAL, 'error processing call: ' + JSON.stringify(call) + '\n' + errorString(e))
       })
       promises.push(promise)

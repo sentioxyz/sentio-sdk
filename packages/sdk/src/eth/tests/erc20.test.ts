@@ -59,7 +59,7 @@ describe('Test Basic Examples', () => {
 
     expect(counters?.[0].metadata?.chainId).equals('1')
     expect(counters?.[0].runtimeInfo?.from).equals(HandlerType.ETH_LOG)
-    expect(res.configUpdated).equals(true)
+    expect(res.result?.states?.configUpdated).equals(true)
 
     const logData2 = Object.assign({}, logData)
     logData2.address = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'

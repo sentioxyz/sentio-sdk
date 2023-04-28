@@ -9,6 +9,7 @@ import { BlockParams } from 'ethers/providers'
 import { DeferredTopicFilter } from 'ethers/contract'
 import { TypedEvent, TypedCallTrace } from './eth.js'
 import { getNetworkFromCtxOrNetworkish } from './provider.js'
+import { BaseContext } from '../core/index.js'
 
 export class ProcessorTemplateProcessorState extends ListStateStorage<
   BaseProcessorTemplate<BaseContract, BoundContractView<BaseContract, any>>
@@ -48,8 +49,19 @@ export abstract class BaseProcessorTemplate<
     ProcessorTemplateProcessorState.INSTANCE.addValue(this)
   }
 
-  public bind(options: BindOptions): void {
-    const sig = getOptionsSignature({ address: options.address, network: options.network })
+  /**
+   * Bind template using {@param options}, using {@param ctx}'s network value if not provided in the option
+   * @param options
+   * @param ctx
+   */
+  public bind(options: BindOptions, ctx: BaseContext): void {
+    if (!options.network) {
+      options.network = ctx.getChainId()
+    }
+    const sig = getOptionsSignature({
+      address: options.address,
+      network: options.network,
+    })
     if (this.binds.has(sig)) {
       console.log('Same address can be bind to one template only once')
       return
@@ -86,6 +98,7 @@ export abstract class BaseProcessorTemplate<
       instance.endBlock = BigInt(options.endBlock)
     }
     TemplateInstanceState.INSTANCE.addValue(instance)
+    ctx._res.states.configUpdated = true
   }
 
   public onEvent(

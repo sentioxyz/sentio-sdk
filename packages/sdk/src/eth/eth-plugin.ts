@@ -12,6 +12,7 @@ import {
   LogHandlerConfig,
   ProcessConfigResponse,
   ProcessResult,
+  RecordMetaData,
   StartRequest,
 } from '@sentio/protos'
 
@@ -21,16 +22,31 @@ import { AccountProcessorState } from './account-processor-state.js'
 import { ProcessorTemplateProcessorState, TemplateInstanceState } from './base-processor-template.js'
 import { GlobalProcessorState } from './base-processor.js'
 import { validateAndNormalizeAddress } from './eth.js'
+import { BaseContext, Labels } from '../core/index.js'
+
+interface Handlers {
+  eventHandlers: ((event: Data_EthLog) => Promise<ProcessResult>)[]
+  traceHandlers: ((trace: Data_EthTrace) => Promise<ProcessResult>)[]
+  blockHandlers: ((block: Data_EthBlock) => Promise<ProcessResult>)[]
+  transactionHandlers: ((trace: Data_EthTransaction) => Promise<ProcessResult>)[]
+}
 
 export class EthPlugin extends Plugin {
   name: string = 'EthPlugin'
-
-  private eventHandlers: ((event: Data_EthLog) => Promise<ProcessResult>)[] = []
-  private traceHandlers: ((trace: Data_EthTrace) => Promise<ProcessResult>)[] = []
-  private blockHandlers: ((block: Data_EthBlock) => Promise<ProcessResult>)[] = []
-  private transactionHandlers: ((trace: Data_EthTransaction) => Promise<ProcessResult>)[] = []
+  handlers: Handlers = {
+    blockHandlers: [],
+    eventHandlers: [],
+    traceHandlers: [],
+    transactionHandlers: [],
+  }
 
   async configure(config: ProcessConfigResponse) {
+    const handlers: Handlers = {
+      blockHandlers: [],
+      eventHandlers: [],
+      traceHandlers: [],
+      transactionHandlers: [],
+    }
     // This syntax is to copy values instead of using references
     config.templateInstances = [...TemplateInstanceState.INSTANCE.getValues()]
 
@@ -54,7 +70,7 @@ export class EthPlugin extends Plugin {
 
       // Step 1. Prepare all the block handlers
       for (const blockHandler of processor.blockHandlers) {
-        const handlerId = this.blockHandlers.push(blockHandler.handler) - 1
+        const handlerId = handlers.blockHandlers.push(blockHandler.handler) - 1
         // TODO wrap the block handler into one
 
         contractConfig.intervalConfigs.push({
@@ -69,7 +85,7 @@ export class EthPlugin extends Plugin {
 
       // Step 2. Prepare all trace handlers
       for (const traceHandler of processor.traceHandlers) {
-        const handlerId = this.traceHandlers.push(traceHandler.handler) - 1
+        const handlerId = handlers.traceHandlers.push(traceHandler.handler) - 1
         for (const signature of traceHandler.signatures) {
           contractConfig.traceConfigs.push({
             signature: signature,
@@ -82,7 +98,7 @@ export class EthPlugin extends Plugin {
       // Step 3. Prepare all the event handlers
       for (const eventsHandler of processor.eventHandlers) {
         // associate id with filter
-        const handlerId = this.eventHandlers.push(eventsHandler.handler) - 1
+        const handlerId = handlers.eventHandlers.push(eventsHandler.handler) - 1
         const logConfig: LogHandlerConfig = {
           handlerId: handlerId,
           filters: [],
@@ -135,7 +151,7 @@ export class EthPlugin extends Plugin {
       })
 
       for (const blockHandler of processor.blockHandlers) {
-        const handlerId = this.blockHandlers.push(blockHandler.handler) - 1
+        const handlerId = handlers.blockHandlers.push(blockHandler.handler) - 1
         contractConfig.intervalConfigs.push({
           slot: 0,
           slotInterval: blockHandler.blockInterval,
@@ -147,7 +163,7 @@ export class EthPlugin extends Plugin {
       }
 
       for (const transactionHandler of processor.transactionHandler) {
-        const handlerId = this.transactionHandlers.push(transactionHandler.handler) - 1
+        const handlerId = handlers.transactionHandlers.push(transactionHandler.handler) - 1
         contractConfig.transactionConfig.push({
           handlerId: handlerId,
           fetchConfig: transactionHandler.fetchConfig,
@@ -166,7 +182,7 @@ export class EthPlugin extends Plugin {
       // TODO add interval
       for (const eventsHandler of processor.eventHandlers) {
         // associate id with filter
-        const handlerId = this.eventHandlers.push(eventsHandler.handler) - 1
+        const handlerId = handlers.eventHandlers.push(eventsHandler.handler) - 1
         const logConfig: LogHandlerConfig = {
           handlerId: handlerId,
           filters: [],
@@ -204,6 +220,8 @@ export class EthPlugin extends Plugin {
 
       config.accountConfigs.push(accountConfig)
     }
+
+    this.handlers = handlers
   }
 
   supportedHandlers = [HandlerType.ETH_LOG, HandlerType.ETH_BLOCK, HandlerType.ETH_TRACE, HandlerType.ETH_TRANSACTION]
@@ -225,6 +243,7 @@ export class EthPlugin extends Plugin {
   }
 
   async start(request: StartRequest) {
+    const ctx = new NoopContext()
     for (const instance of request.templateInstances) {
       const template = ProcessorTemplateProcessorState.INSTANCE.getValues()[instance.templateId]
       if (!template) {
@@ -233,13 +252,16 @@ export class EthPlugin extends Plugin {
       if (!instance.contract) {
         throw new ServerError(Status.INVALID_ARGUMENT, 'Contract Empty from:' + instance)
       }
-      template.bind({
-        name: instance.contract.name,
-        address: validateAndNormalizeAddress(instance.contract.address),
-        network: Number(instance.contract.chainId),
-        startBlock: instance.startBlock,
-        endBlock: instance.endBlock,
-      })
+      template.bind(
+        {
+          name: instance.contract.name,
+          address: validateAndNormalizeAddress(instance.contract.address),
+          network: Number(instance.contract.chainId),
+          startBlock: instance.startBlock,
+          endBlock: instance.endBlock,
+        },
+        ctx
+      )
     }
   }
 
@@ -255,7 +277,7 @@ export class EthPlugin extends Plugin {
 
     const promises: Promise<ProcessResult>[] = []
     for (const handlerId of request.handlerIds) {
-      const handler = this.eventHandlers[handlerId]
+      const handler = this.handlers.eventHandlers[handlerId]
       promises.push(
         handler(ethLog).catch((e) => {
           throw new ServerError(
@@ -278,7 +300,7 @@ export class EthPlugin extends Plugin {
 
     for (const handlerId of binding.handlerIds) {
       promises.push(
-        this.traceHandlers[handlerId](ethTrace).catch((e) => {
+        this.handlers.traceHandlers[handlerId](ethTrace).catch((e) => {
           throw new ServerError(
             Status.INTERNAL,
             'error processing trace: ' + JSON.stringify(ethTrace.trace) + '\n' + errorString(e)
@@ -298,7 +320,7 @@ export class EthPlugin extends Plugin {
     const promises: Promise<ProcessResult>[] = []
     for (const handlerId of binding.handlerIds) {
       promises.push(
-        this.blockHandlers[handlerId](ethBlock).catch((e) => {
+        this.handlers.blockHandlers[handlerId](ethBlock).catch((e) => {
           throw new ServerError(
             Status.INTERNAL,
             'error processing block: ' + ethBlock.block?.number + '\n' + errorString(e)
@@ -319,7 +341,7 @@ export class EthPlugin extends Plugin {
 
     for (const handlerId of binding.handlerIds) {
       promises.push(
-        this.transactionHandlers[handlerId](ethTransaction).catch((e) => {
+        this.handlers.transactionHandlers[handlerId](ethTransaction).catch((e) => {
           throw new ServerError(
             Status.INTERNAL,
             'error processing transaction: ' + JSON.stringify(ethTransaction.transaction) + '\n' + errorString(e)
@@ -332,3 +354,16 @@ export class EthPlugin extends Plugin {
 }
 
 PluginManager.INSTANCE.register(new EthPlugin())
+
+class NoopContext extends BaseContext {
+  public constructor() {
+    super()
+  }
+  getChainId(): string {
+    return ''
+  }
+
+  getMetaData(name: string, labels: Labels): RecordMetaData {
+    return RecordMetaData.create()
+  }
+}

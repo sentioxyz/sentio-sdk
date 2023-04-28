@@ -22,11 +22,14 @@ describe('Test Template', () => {
       name: 'x2y2',
       startBlock: 14201940,
     }).onEventTransfer(async function (event, ctx) {
-      processorTemplate.bind({
-        address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
-        network: 3,
-        name: 'dynamic',
-      })
+      processorTemplate.bind(
+        {
+          address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+          network: 3,
+          name: 'dynamic',
+        },
+        ctx
+      )
       // template.bind('0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', 3, 'dynamic')
       ctx.meter.Counter('c1').add(1)
     }, filter)

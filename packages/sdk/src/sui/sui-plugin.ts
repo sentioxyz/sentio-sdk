@@ -19,14 +19,26 @@ import { SuiAccountProcessorState, SuiProcessorState } from './sui-processor.js'
 import { getChainId } from './network.js'
 import { validateAndNormalizeAddress } from './utils.js'
 
+interface Handlers {
+  suiEventHandlers: ((event: Data_SuiEvent) => Promise<ProcessResult>)[]
+  suiCallHandlers: ((func: Data_SuiCall) => Promise<ProcessResult>)[]
+  suiObjectHandlers: ((object: Data_SuiObject) => Promise<ProcessResult>)[]
+}
+
 export class SuiPlugin extends Plugin {
   name: string = 'SuiPlugin'
-
-  private suiEventHandlers: ((event: Data_SuiEvent) => Promise<ProcessResult>)[] = []
-  private suiCallHandlers: ((func: Data_SuiCall) => Promise<ProcessResult>)[] = []
-  private suiObjectHandlers: ((object: Data_SuiObject) => Promise<ProcessResult>)[] = []
+  handlers: Handlers = {
+    suiCallHandlers: [],
+    suiEventHandlers: [],
+    suiObjectHandlers: [],
+  }
 
   async configure(config: ProcessConfigResponse) {
+    const handlers: Handlers = {
+      suiCallHandlers: [],
+      suiEventHandlers: [],
+      suiObjectHandlers: [],
+    }
     for (const suiProcessor of SuiProcessorState.INSTANCE.getValues()) {
       const contractConfig = ContractConfig.fromPartial({
         transactionConfig: [],
@@ -40,7 +52,7 @@ export class SuiPlugin extends Plugin {
         startBlock: suiProcessor.config.startCheckpoint,
       })
       for (const handler of suiProcessor.eventHandlers) {
-        const handlerId = this.suiEventHandlers.push(handler.handler) - 1
+        const handlerId = handlers.suiEventHandlers.push(handler.handler) - 1
         const eventHandlerConfig: MoveEventHandlerConfig = {
           filters: handler.filters.map((f) => {
             return {
@@ -54,7 +66,7 @@ export class SuiPlugin extends Plugin {
         contractConfig.moveEventConfigs.push(eventHandlerConfig)
       }
       for (const handler of suiProcessor.callHandlers) {
-        const handlerId = this.suiCallHandlers.push(handler.handler) - 1
+        const handlerId = handlers.suiCallHandlers.push(handler.handler) - 1
         const functionHandlerConfig: MoveCallHandlerConfig = {
           filters: handler.filters.map((filter) => {
             return {
@@ -79,7 +91,7 @@ export class SuiPlugin extends Plugin {
         startBlock: processor.config.startCheckpoint, // TODO maybe use another field
       })
       for (const handler of processor.objectHandlers) {
-        const handlerId = this.suiObjectHandlers.push(handler.handler) - 1
+        const handlerId = handlers.suiObjectHandlers.push(handler.handler) - 1
         accountConfig.moveIntervalConfigs.push({
           intervalConfig: {
             handlerId: handlerId,
@@ -95,6 +107,7 @@ export class SuiPlugin extends Plugin {
       }
       config.accountConfigs.push(accountConfig)
     }
+    this.handlers = handlers
   }
 
   supportedHandlers = [HandlerType.SUI_EVENT, HandlerType.SUI_CALL, HandlerType.SUI_OBJECT]
@@ -108,7 +121,7 @@ export class SuiPlugin extends Plugin {
 
     for (const handlerId of binding.handlerIds) {
       promises.push(
-        this.suiEventHandlers[handlerId](event).catch((e) => {
+        this.handlers.suiEventHandlers[handlerId](event).catch((e) => {
           throw new ServerError(
             Status.INTERNAL,
             'error processing event: ' + JSON.stringify(event) + '\n' + errorString(e)
@@ -127,7 +140,7 @@ export class SuiPlugin extends Plugin {
 
     const promises: Promise<ProcessResult>[] = []
     for (const handlerId of binding.handlerIds) {
-      const promise = this.suiCallHandlers[handlerId](call).catch((e) => {
+      const promise = this.handlers.suiCallHandlers[handlerId](call).catch((e) => {
         throw new ServerError(Status.INTERNAL, 'error processing call: ' + JSON.stringify(call) + '\n' + errorString(e))
       })
       promises.push(promise)
@@ -144,7 +157,7 @@ export class SuiPlugin extends Plugin {
     const promises: Promise<ProcessResult>[] = []
     for (const handlerId of binding.handlerIds) {
       promises.push(
-        this.suiObjectHandlers[handlerId](object).catch((e) => {
+        this.handlers.suiObjectHandlers[handlerId](object).catch((e) => {
           throw new ServerError(
             Status.INTERNAL,
             'error processing object: ' + JSON.stringify(object) + '\n' + errorString(e)

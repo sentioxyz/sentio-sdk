@@ -1,4 +1,4 @@
-import { ProcessResult, RecordMetaData } from '@sentio/protos'
+import { ProcessResult, RecordMetaData, StateResult } from '@sentio/protos'
 import { EventLogger } from './event-logger.js'
 import { Meter, Labels } from './meter.js'
 
@@ -6,11 +6,14 @@ export abstract class BaseContext {
   meter: Meter
   eventLogger: EventLogger
 
-  _res: ProcessResult = {
+  _res: ProcessResult & { states: StateResult } = {
     counters: [],
     events: [],
     exports: [],
     gauges: [],
+    states: {
+      configUpdated: false,
+    },
   }
 
   protected constructor() {

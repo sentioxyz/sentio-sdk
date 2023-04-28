@@ -8,6 +8,9 @@ export function mergeProcessResults(results: ProcessResult[]): ProcessResult {
     res.gauges = res.gauges.concat(r.gauges)
     res.events = res.events.concat(r.events)
     res.exports = res.exports.concat(r.exports)
+    res.states = {
+      configUpdated: res.states?.configUpdated || r.states?.configUpdated || false,
+    }
   }
   return res
 }

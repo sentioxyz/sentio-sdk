@@ -21,7 +21,7 @@ import { errorString, mergeProcessResults } from './utils.js'
 
 export class ProcessorServiceImpl implements ProcessorServiceImplementation {
   private started = false
-  private processorConfig: ProcessConfigResponse
+  // private processorConfig: ProcessConfigResponse
 
   private readonly loader: () => Promise<any>
 
@@ -36,16 +36,20 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     if (!this.started) {
       throw new ServerError(Status.UNAVAILABLE, 'Service Not started.')
     }
-    if (!this.processorConfig) {
-      throw new ServerError(Status.INTERNAL, 'Process config empty.')
-    }
-    return this.processorConfig
+    // if (!this.processorConfig) {
+    //   throw new ServerError(Status.INTERNAL, 'Process config empty.')
+    // }
+
+    const newConfig = ProcessConfigResponse.create()
+    await PluginManager.INSTANCE.configure(newConfig)
+    return newConfig
   }
 
-  async configure() {
-    this.processorConfig = ProcessConfigResponse.fromPartial({})
-    await PluginManager.INSTANCE.configure(this.processorConfig)
-  }
+  //
+  // async configure() {
+  //   this.processorConfig = ProcessConfigResponse.fromPartial({})
+  //   await PluginManager.INSTANCE.configure(this.processorConfig)
+  // }
 
   async start(request: StartRequest, context: CallContext): Promise<Empty> {
     if (this.started) {
@@ -74,11 +78,11 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
 
     await PluginManager.INSTANCE.start(request)
 
-    try {
-      await this.configure()
-    } catch (e) {
-      throw new ServerError(Status.INTERNAL, 'Failed to start processor : ' + errorString(e))
-    }
+    // try {
+    //   await this.configure()
+    // } catch (e) {
+    //   throw new ServerError(Status.INTERNAL, 'Failed to start processor : ' + errorString(e))
+    // }
     this.started = true
     return {}
   }
@@ -105,15 +109,14 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     }
     const result = mergeProcessResults(promise)
 
-    let updated = false
-    if (PluginManager.INSTANCE.stateDiff(this.processorConfig)) {
-      await this.configure()
-      updated = true
-    }
+    // let updated = false
+    // if (PluginManager.INSTANCE.stateDiff(this.processorConfig)) {
+    //   await this.configure()
+    //   updated = true
+    // }
 
     return {
       result,
-      configUpdated: updated,
     }
   }
 
@@ -126,14 +129,14 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
   async *processBindingsStream(requests: AsyncIterable<DataBinding>, context: CallContext) {
     for await (const request of requests) {
       const result = await this.processBinding(request)
-      let updated = false
-      if (PluginManager.INSTANCE.stateDiff(this.processorConfig)) {
-        await this.configure()
-        updated = true
-      }
+      // let updated = false
+      // if (PluginManager.INSTANCE.stateDiff(this.processorConfig)) {
+      //   await this.configure()
+      //   updated = true
+      // }
       yield {
         result,
-        configUpdated: updated,
+        configUpdated: result.states?.configUpdated || false,
       }
     }
   }

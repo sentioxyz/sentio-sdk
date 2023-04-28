@@ -296,9 +296,7 @@ message ProcessBindingsRequest {
 message ProcessBindingResponse {
   ProcessResult result = 1;
 
-  // Whether config update because of dynamic contract processor creation
-  // Currently only support log handler in ethereum
-  bool config_updated = 4;
+  bool config_updated = 4 [deprecated = true];
 }
 
 message Data {
@@ -385,12 +383,19 @@ message DataBinding {
   repeated int32 handler_ids = 4;
 }
 
+message StateResult {
+  // Whether config update because of dynamic contract processor creation
+  // Currently only support log handler in ethereum
+  bool config_updated = 1;
+}
+
 message ProcessResult {
   repeated GaugeResult gauges = 1;
   repeated CounterResult counters = 2;
   repeated LogResult logs = 3 [deprecated = true];
   repeated EventTrackingResult events = 4;
   repeated ExportResult exports = 5;
+  StateResult states = 6;
 }
 
 message RecordMetaData {

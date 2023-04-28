@@ -6,11 +6,15 @@ export abstract class Plugin {
 
   async configure(config: ProcessConfigResponse): Promise<void> {}
   async start(start: StartRequest): Promise<void> {}
+
+  /**
+   * @deprecated The method should not be used, use ctx.states instead
+   */
   stateDiff(config: ProcessConfigResponse): boolean {
     return false
   }
   async processBinding(request: DataBinding): Promise<ProcessResult> {
-    return ProcessResult.fromPartial({})
+    return ProcessResult.create()
   }
 }
 
@@ -43,6 +47,9 @@ export class PluginManager {
     return Promise.all(this.plugins.map((plugin) => plugin.start(start)))
   }
 
+  /**
+   * @deprecated The method should not be used, use ctx.states instead
+   */
   stateDiff(config: ProcessConfigResponse): boolean {
     return this.plugins.some((plugin) => plugin.stateDiff(config))
   }

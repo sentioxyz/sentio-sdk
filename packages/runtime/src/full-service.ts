@@ -76,6 +76,9 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
     }
     const result = await this.instance.processBindings(request, options)
     this.adjustResult(result.result as ProcessResult)
+    if (!result.configUpdated && result.result?.states?.configUpdated) {
+      result.configUpdated = result.result?.states?.configUpdated
+    }
     return result
   }
 
