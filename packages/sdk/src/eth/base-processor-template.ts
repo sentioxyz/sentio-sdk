@@ -63,7 +63,7 @@ export abstract class BaseProcessorTemplate<
       network: options.network,
     })
     if (this.binds.has(sig)) {
-      console.log('Same address can be bind to one template only once')
+      console.log(`Same address can be bind to one template only once, ignore duplicate bind: ${sig}`)
       return
     }
     this.binds.add(sig)

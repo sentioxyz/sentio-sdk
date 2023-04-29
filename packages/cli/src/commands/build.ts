@@ -109,6 +109,9 @@ export async function buildProcessor(onlyGen: boolean, options: commandLineArgs.
       process.exit(1)
     }
 
+    const tsc = path.resolve(getPackageRoot('typescript'), 'bin', 'tsc')
+    await execStep(['node', tsc, '--noEmit'], 'type checking')
+
     const tsup = path.resolve(getPackageRoot('tsup'), 'dist', 'cli-default.js')
     // await execStep('yarn tsc -p .', 'Compile')
     await execStep(['node', tsup, '--config', tsupConfig], 'Packaging')

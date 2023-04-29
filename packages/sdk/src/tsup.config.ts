@@ -13,9 +13,10 @@ export default defineConfig({
   sourcemap: 'inline',
   clean: true,
   format: 'esm',
-  dts: {
-    resolve: true,
-  },
+  // dts: {
+  //   resolve: true,
+  // },
+  publicDir: '../abis',
   splitting: false,
   external: [
     'protobufjs',
