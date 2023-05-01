@@ -8,7 +8,7 @@
     "lint": "ls-lint && eslint ."
   },
   "resolutions": {
-    "ethers": "npm:@sentio/ethers@6.3.0-patch.4",
+    "ethers": "npm:@sentio/ethers@6.4.0",
     "superstruct": "^1.0.3"
   },
   "devDependencies": {

@@ -1,17 +1,17 @@
 {
-  "name": "@sentio-example/auto",
   "private": true,
+  "name": "@sentio-example/auto",
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "test": "sentio test",
-    "gen": "sentio gen --example && mv src/processor.eth.example.ts src/processor.ts",
     "build": "sentio build --skip-deps",
+    "gen": "sentio gen --example && mv src/processor.eth.example.ts src/processor.ts",
+    "test": "sentio test",
     "upload": "sentio upload"
   },
   "dependencies": {
     "@sentio/sdk": "workspace:*",
-    "ethers": "^6.3.0"
+    "ethers": "^6.4.0"
   },
   "devDependencies": {
     "@sentio/cli": "workspace:*"

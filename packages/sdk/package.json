@@ -1,68 +1,8 @@
 {
   "name": "@sentio/sdk",
-  "license": "Apache-2.0",
   "version": "2.0.0-development",
+  "license": "Apache-2.0",
   "type": "module",
-  "scripts": {
-    "compile": "tsc && cp src/utils/*.csv lib/utils && cp src/tsup.config.ts lib",
-    "build": "pnpm gen && pnpm compile",
-    "build:all": "pnpm --filter=$(node -p \"require('./package.json').name\")... build",
-    "test": "NODE_OPTIONS=--experimental-vm-modules pnpm jest --runInBand --detectOpenHandles",
-    "gen": "pnpm gen:eth && pnpm gen:aptos && pnpm gen:sui && pnpm gen:solana",
-    "gen:eth": "ts-node-esm src/eth/codegen/run.ts src/eth/abis src/eth/builtin && pnpm gen:eth_test",
-    "gen:eth_test": "ts-node-esm src/eth/codegen/run.ts src/eth/tests/abis/eth ./src/eth/tests/types",
-    "gen:aptos": "ts-node-esm  src/aptos/codegen/run.ts src/aptos/abis src/aptos/builtin && pnpm gen:aptos_test",
-    "gen:aptos_test": "ts-node-esm  src/aptos/codegen/run.ts src/aptos/tests/abis src/aptos/tests/types",
-    "gen:sui": "ts-node-esm  src/sui/codegen/run.ts src/sui/abis src/sui/builtin && pnpm gen:sui_test",
-    "gen:sui_test": "ts-node-esm  src/sui/codegen/run.ts src/sui/tests/abis src/sui/tests/types",
-    "gen:solana": "ts-node-esm src/solana/codegen/run.ts src/solana/tests/abis src/solana/tests/types",
-    "gen:docs": "typedoc --options typedoc.json"
-  },
-  "dependencies": {
-    "@mysten/sui.js": "npm:@sentio/sui.js@^0.32.0-patch.1",
-    "@project-serum/anchor": "^0.26.0",
-    "@sentio/bigdecimal": "^9.1.1-patch.3",
-    "@sentio/ethers-v6": "^1.0.28",
-    "@sentio/protos": "workspace:^",
-    "@sentio/runtime": "workspace:^",
-    "@solana/web3.js": "^1.74.0",
-    "@types/prettier": "^2.7.2",
-    "aptos-sdk": "npm:aptos@^1.8.3",
-    "bs58": "^5.0.0",
-    "chalk": "^5.2.0",
-    "csv-parse": "^5.3.0",
-    "ethers": "npm:@sentio/ethers@^6.3.0-patch.4",
-    "lodash-es": "^4.17.21",
-    "mkdirp": "^1.0.4",
-    "node-fetch": "^3.3.1",
-    "p-queue": "^7.3.4",
-    "prettier": "^2.8.7",
-    "superstruct_solana": "npm:superstruct@^0.14.2",
-    "typechain": "^8.0.0",
-    "yaml": "^2.2.1",
-    "js-sha3": "^0.8.0",
-    "nice-grpc-client-middleware-retry": "^3.1.3",
-    "nice-grpc-prometheus": "^0.1.6",
-    "nice-grpc": "^2.1.4",
-    "nice-grpc-common": "^2.0.2",
-    "@coral-xyz/borsh": "^0.27.0",
-    "typedoc": "^0.24.1"
-  },
-  "devDependencies": {
-    "@certusone/wormhole-sdk": "^0.9.10",
-    "@types/google-protobuf": "^3.15.6",
-    "@types/lodash-es": "^4.17.6",
-    "@types/mkdirp": "^1.0.2",
-    "typescript": "^5.0.4",
-    "tslib": "^2.5.0",
-    "jest": "^29.5.0"
-  },
-  "peerDependencies": {
-    "tsup": "npm:@sentio/tsup@^6.7.0"
-  },
-  "resolutions": {
-    "superstruct": "^1.0.3"
-  },
   "exports": {
     ".": "./lib/index.js",
     "./core": "./lib/core/index.js",
@@ -95,9 +35,69 @@
   },
   "files": [
     "{lib,src}",
-    "!{lib,src}/*/tests",
-    "!**/*.test.{js,ts}"
+    "!**/*.test.{js,ts}",
+    "!{lib,src}/*/tests"
   ],
+  "scripts": {
+    "build": "pnpm gen && pnpm compile",
+    "build:all": "pnpm --filter=$(node -p \"require('./package.json').name\")... build",
+    "compile": "tsc && cp src/utils/*.csv lib/utils && cp src/tsup.config.ts lib",
+    "gen": "pnpm gen:eth && pnpm gen:aptos && pnpm gen:sui && pnpm gen:solana",
+    "gen:aptos": "ts-node-esm  src/aptos/codegen/run.ts src/aptos/abis src/aptos/builtin && pnpm gen:aptos_test",
+    "gen:aptos_test": "ts-node-esm  src/aptos/codegen/run.ts src/aptos/tests/abis src/aptos/tests/types",
+    "gen:docs": "typedoc --options typedoc.json",
+    "gen:eth": "ts-node-esm src/eth/codegen/run.ts src/eth/abis src/eth/builtin && pnpm gen:eth_test",
+    "gen:eth_test": "ts-node-esm src/eth/codegen/run.ts src/eth/tests/abis/eth ./src/eth/tests/types",
+    "gen:solana": "ts-node-esm src/solana/codegen/run.ts src/solana/tests/abis src/solana/tests/types",
+    "gen:sui": "ts-node-esm  src/sui/codegen/run.ts src/sui/abis src/sui/builtin && pnpm gen:sui_test",
+    "gen:sui_test": "ts-node-esm  src/sui/codegen/run.ts src/sui/tests/abis src/sui/tests/types",
+    "test": "NODE_OPTIONS=--experimental-vm-modules pnpm jest --runInBand --detectOpenHandles"
+  },
+  "resolutions": {
+    "superstruct": "^1.0.3"
+  },
+  "dependencies": {
+    "@coral-xyz/borsh": "^0.27.0",
+    "@mysten/sui.js": "npm:@sentio/sui.js@^0.32.0-patch.1",
+    "@project-serum/anchor": "^0.26.0",
+    "@sentio/bigdecimal": "^9.1.1-patch.3",
+    "@sentio/ethers-v6": "^1.0.28",
+    "@sentio/protos": "workspace:^",
+    "@sentio/runtime": "workspace:^",
+    "@solana/web3.js": "^1.74.0",
+    "@types/prettier": "^2.7.2",
+    "aptos-sdk": "npm:aptos@^1.8.3",
+    "bs58": "^5.0.0",
+    "chalk": "^5.2.0",
+    "csv-parse": "^5.3.0",
+    "ethers": "npm:@sentio/ethers@^6.4.0",
+    "js-sha3": "^0.8.0",
+    "lodash-es": "^4.17.21",
+    "mkdirp": "^1.0.4",
+    "nice-grpc": "^2.1.4",
+    "nice-grpc-client-middleware-retry": "^3.1.3",
+    "nice-grpc-common": "^2.0.2",
+    "nice-grpc-prometheus": "^0.1.6",
+    "node-fetch": "^3.3.1",
+    "p-queue": "^7.3.4",
+    "prettier": "^2.8.7",
+    "superstruct_solana": "npm:superstruct@^0.14.2",
+    "typechain": "^8.0.0",
+    "typedoc": "^0.24.1",
+    "yaml": "^2.2.1"
+  },
+  "peerDependencies": {
+    "tsup": "npm:@sentio/tsup@^6.7.0"
+  },
+  "devDependencies": {
+    "@certusone/wormhole-sdk": "^0.9.10",
+    "@types/google-protobuf": "^3.15.6",
+    "@types/lodash-es": "^4.17.6",
+    "@types/mkdirp": "^1.0.2",
+    "jest": "^29.5.0",
+    "tslib": "^2.5.0",
+    "typescript": "^5.0.4"
+  },
   "engines": {
     "node": ">=16"
   }

@@ -1,7 +1,7 @@
 lockfileVersion: '6.0'
 
 overrides:
-  ethers: npm:@sentio/ethers@6.3.0-patch.4
+  ethers: npm:@sentio/ethers@6.4.0
   superstruct: ^1.0.3
 
 importers:
@@ -116,8 +116,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/sdk
       ethers:
-        specifier: npm:@sentio/ethers@6.3.0-patch.4
-        version: /@sentio/ethers@6.3.0-patch.4
+        specifier: npm:@sentio/ethers@6.4.0
+        version: /@sentio/ethers@6.4.0
     devDependencies:
       '@sentio/cli':
         specifier: workspace:*
@@ -149,8 +149,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/sdk
       ethers:
-        specifier: npm:@sentio/ethers@6.3.0-patch.4
-        version: /@sentio/ethers@6.3.0-patch.4
+        specifier: npm:@sentio/ethers@6.4.0
+        version: /@sentio/ethers@6.4.0
     devDependencies:
       '@sentio/cli':
         specifier: workspace:*
@@ -162,8 +162,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/sdk
       ethers:
-        specifier: npm:@sentio/ethers@6.3.0-patch.4
-        version: /@sentio/ethers@6.3.0-patch.4
+        specifier: npm:@sentio/ethers@6.4.0
+        version: /@sentio/ethers@6.4.0
     devDependencies:
       '@sentio/cli':
         specifier: workspace:*
@@ -407,7 +407,7 @@ importers:
         version: 9.1.1-patch.3
       '@sentio/ethers-v6':
         specifier: ^1.0.28
-        version: 1.0.28(@sentio/ethers@6.3.0-patch.4)(typescript@5.0.4)
+        version: 1.0.28(@sentio/ethers@6.4.0)(typescript@5.0.4)
       '@sentio/protos':
         specifier: workspace:^
         version: link:../protos
@@ -433,8 +433,8 @@ importers:
         specifier: ^5.3.0
         version: 5.3.5
       ethers:
-        specifier: npm:@sentio/ethers@6.3.0-patch.4
-        version: /@sentio/ethers@6.3.0-patch.4
+        specifier: npm:@sentio/ethers@6.4.0
+        version: /@sentio/ethers@6.4.0
       js-sha3:
         specifier: ^0.8.0
         version: 0.8.0
@@ -512,9 +512,6 @@ packages:
       lodash.assignwith: 4.2.0
       typical: 7.1.1
     dev: false
-
-  /@adraffy/ens-normalize@1.9.0:
-    resolution: {integrity: sha512-iowxq3U30sghZotgl4s/oJRci6WPBfNO5YYgk2cIOMCHr3LeGPcsZjCEr+33Q4N+oV3OABDAtA+pyvWjbvBifQ==}
 
   /@ampproject/remapping@2.2.0:
     resolution: {integrity: sha512-qRmjj8nj9qmLTQXXmaR1cck3UXSRMPrbsLJAasZpF+t3riI71BXed5ebIOYwQntykeZuhjsdweEc9BxH5Jc26w==}
@@ -1767,7 +1764,7 @@ packages:
       eth-crypto: 2.5.0
       ethereumjs-abi: 0.6.8
       ethereumjs-util: 7.1.5
-      ethers: /@sentio/ethers@6.3.0-patch.4
+      ethers: /@sentio/ethers@6.4.0
       ethjs-util: 0.1.6
       google-protobuf: 3.21.2
       graphql: 16.6.0
@@ -2583,26 +2580,27 @@ packages:
     resolution: {integrity: sha512-O5w8XdyeatUcwI+ZbpSw60/cXFPJk3NbpIupwMHfYmW8fpxpXyRbyGESNJNufWWrB6CadsWGh1R3rd7owvrmlw==}
     dev: false
 
-  /@sentio/ethers-v6@1.0.28(@sentio/ethers@6.3.0-patch.4)(typescript@5.0.4):
+  /@sentio/ethers-v6@1.0.28(@sentio/ethers@6.4.0)(typescript@5.0.4):
     resolution: {integrity: sha512-5wCtsOhB5uySaVV0PxfXjX0tfEOxZzT5UWzONkiW+QnXgShaEtSqXQUfvAuF7f2i+Wz8bXHC/AIYYRQZLHHKfg==}
     peerDependencies:
       ethers: ^6.0.0
       typescript: '>=4.3.0'
     dependencies:
-      ethers: /@sentio/ethers@6.3.0-patch.4
+      ethers: /@sentio/ethers@6.4.0
       lodash: 4.17.21
       ts-essentials: 7.0.3(typescript@5.0.4)
       typescript: 5.0.4
     dev: false
 
-  /@sentio/ethers@6.3.0-patch.4:
-    resolution: {integrity: sha512-kXL82EdJFFcZTTs/khcufBuM+uCulZf0VHwCpkhk9kkzv5FSJbdtU3E3exuNkj7AkuaZXX5sQH3aLJ7ci/1hQA==}
+  /@sentio/ethers@6.4.0:
+    resolution: {integrity: sha512-+onSU9SUZO44RRtgQGD1QndJg8ZScUjOlnFA/GyATxXbIwBUhMvY4szv44k98v/i9OzYO1GaLTEqsyID6M3Eag==}
     engines: {node: '>=14.0.0'}
     dependencies:
-      '@adraffy/ens-normalize': 1.9.0
+      '@adraffy/ens-normalize': github.com/ricmoo/ens-normalize.js/2d040533e57e4f25f9a7cc4715e219658ad454b5
       '@noble/hashes': 1.1.2
       '@noble/secp256k1': 1.7.1
-      aes-js: 4.0.0-beta.3
+      '@types/node': 18.15.13
+      aes-js: 4.0.0-beta.5
       tslib: 2.4.0
       ws: 8.5.0
     transitivePeerDependencies:
@@ -3021,6 +3019,9 @@ packages:
   /@types/node@18.14.0:
     resolution: {integrity: sha512-5EWrvLmglK+imbCJY0+INViFWUHg1AHel1sq4ZVSfdcNqGy9Edv3UB9IIzzg+xPaUcAgZYcfVs2fBcwDeZzU0A==}
 
+  /@types/node@18.15.13:
+    resolution: {integrity: sha512-N+0kuo9KgrUQ1Sn/ifDXsvg0TTleP7rIy4zOBGECxAljqvqfqpTfzx0Q1NUedOixRMBfe2Whhb056a42cWs26Q==}
+
   /@types/node@18.16.0:
     resolution: {integrity: sha512-BsAaKhB+7X+H4GnSjGhJG9Qi8Tw+inU9nJDwmD5CgOmBLEI6ArdhikpLX7DjbjDRDTbqZzU2LSQNZg8WGPiSZQ==}
 
@@ -3332,8 +3333,8 @@ packages:
     engines: {node: '>=0.4.0'}
     hasBin: true
 
-  /aes-js@4.0.0-beta.3:
-    resolution: {integrity: sha512-/xJX0/VTPcbc5xQE2VUP91y1xN8q/rDfhEzLm+vLc3hYvb5+qHCnpJRuFcrKn63zumK/sCwYYzhG8HP78JYSTA==}
+  /aes-js@4.0.0-beta.5:
+    resolution: {integrity: sha512-G965FqalsNyrPqgEGON7nIx1e/OVENSgiEIzyC63haUMuvNnwIgIjMs52hlTCKhkBny7A2ORNlfY9Zu+jmGk1Q==}
 
   /agent-base@6.0.2:
     resolution: {integrity: sha512-RZNwNclF7+MS/8bDg70amg32dyeZGZxiDuQmZxKLAlQjr3jGyLx+4Kkk58UO7D2QdgFIQCovuSuZESne6RG6XQ==}
@@ -5337,7 +5338,7 @@ packages:
       '@types/bn.js': 5.1.1
       eccrypto: 1.1.6
       ethereumjs-util: 7.1.5
-      ethers: /@sentio/ethers@6.3.0-patch.4
+      ethers: /@sentio/ethers@6.4.0
       secp256k1: 4.0.3
     transitivePeerDependencies:
       - bufferutil
@@ -10811,3 +10812,8 @@ packages:
   /zen-observable@0.8.15:
     resolution: {integrity: sha512-PQ2PC7R9rslx84ndNBZB/Dkv8V8fZEpk83RLgXtYd0fwUgEjseMn1Dgajh2x6S8QbZAFa9p2qVCEuYZNgve0dQ==}
     dev: true
+
+  github.com/ricmoo/ens-normalize.js/2d040533e57e4f25f9a7cc4715e219658ad454b5:
+    resolution: {tarball: https://codeload.github.com/ricmoo/ens-normalize.js/tar.gz/2d040533e57e4f25f9a7cc4715e219658ad454b5}
+    name: '@adraffy/ens-normalize'
+    version: 1.9.0

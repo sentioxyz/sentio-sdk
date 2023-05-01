@@ -1,6 +1,17 @@
 {
+  "ignorePatterns": [
+    ",.*",
+    "*.config.ts",
+    "*.config.cjs",
+    "dist",
+    "debug",
+    "lib",
+    "docs",
+    "gen",
+    "types",
+    "builtin"
+  ],
   "extends": [
-//    "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:import/recommended",
     "plugin:import/typescript",

@@ -1,12 +1,2 @@
-.*
-jest.config.ts
-release.config.cjs
-dist
-debug
-lib
-docs
-gen
-types
-builtin
 templates
 packages/protos
