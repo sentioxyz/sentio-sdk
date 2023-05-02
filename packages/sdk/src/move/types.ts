@@ -82,9 +82,9 @@ export class TypeDescriptor<T = any> {
       console.error('Not expected &')
       return []
     }
-    if (this.reference) {
-      return []
-    }
+    // if (this.reference) {
+    //   return []
+    // }
     if (BUILTIN_TYPES_SET.has(this.qname.toLowerCase())) {
       return []
     }
