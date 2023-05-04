@@ -81,7 +81,14 @@ export async function getABI(
   }
 
   try {
-    let resp = (await (await fetch(`${ethApi}/api?module=contract&action=getabi&address=${address}`)).json()) as any
+    const apiKey = process.env['ETHERSCAN_API_KEY_' + chain]
+    if (apiKey) {
+      ethApi = `${ethApi}/api?apikey=${apiKey}&`
+    } else {
+      ethApi = `${ethApi}/api?`
+    }
+
+    let resp = (await (await fetch(`${ethApi}module=contract&action=getabi&address=${address}`)).json()) as any
     if (resp.status !== '1') {
       throw Error(resp.message)
     }
@@ -89,9 +96,7 @@ export async function getABI(
 
     if (!name) {
       await new Promise((resolve) => setTimeout(resolve, 5000))
-      resp = (await (
-        await fetch(`${ethApi}/api?module=contract&action=getsourcecode&address=${address}`)
-      ).json()) as any
+      resp = (await (await fetch(`${ethApi}module=contract&action=getsourcecode&address=${address}`)).json()) as any
       if (resp.status !== '1') {
         throw Error(resp.message)
       }

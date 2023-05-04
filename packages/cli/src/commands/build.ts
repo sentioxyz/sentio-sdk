@@ -9,9 +9,6 @@ import yaml from 'yaml'
 import { YamlProjectConfig } from '../config.js'
 import { getABIFilePath, getABI, writeABIFile } from '../abi.js'
 import { execStep, execYarn } from '../execution.js'
-import { createRequire } from 'module'
-
-const require = createRequire(import.meta.url)
 
 export const buildOptionDefinitions = [
   {

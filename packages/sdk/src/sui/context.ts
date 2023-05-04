@@ -1,8 +1,10 @@
 import { RecordMetaData } from '@sentio/protos'
 import { type Labels, BaseContext, normalizeLabels } from '../index.js'
 import { SuiNetwork, getChainId } from './network.js'
-import { SuiTransactionBlockResponse } from '@mysten/sui.js'
+import { SuiTransactionBlockResponse, JsonRpcProvider, Connection } from '@mysten/sui.js'
 import { MoveCoder, defaultMoveCoder } from './move-coder.js'
+import { Endpoints } from '@sentio/runtime'
+import { ServerError, Status } from 'nice-grpc'
 
 export class SuiContext extends BaseContext {
   address: string
@@ -87,5 +89,13 @@ export class SuiObjectsContext extends BaseContext {
       name: name,
       labels: normalizeLabels(labels),
     }
+  }
+
+  getClient(): JsonRpcProvider {
+    const chainServer = Endpoints.INSTANCE.chainServer.get(getChainId(this.network))
+    if (!chainServer) {
+      throw new ServerError(Status.INTERNAL, 'RPC endpoint not provided')
+    }
+    return new JsonRpcProvider(new Connection({ fullnode: chainServer }))
   }
 }
