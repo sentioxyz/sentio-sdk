@@ -36,28 +36,30 @@ export class SuiFacet {
     network: SuiNetwork = SuiNetwork.MAIN_NET
   ): DataBinding | undefined {
     const calls: MoveCallSuiTransaction[] = getMoveCalls(transaction)
-    if (calls.length !== 1) {
-      throw Error('Transaction has more than one calls')
-    }
-    const functionType = [calls[0].package, calls[0].module, calls[0].function].join(SPLITTER)
+    // if (calls.length !== 1) {
+    //   throw Error('Transaction has more than one calls')
+    // }
+    for (const call of calls) {
+      const functionType = [call.package, call.module, call.function].join(SPLITTER)
 
-    for (const config of this.server.contractConfigs) {
-      if (config.contract?.chainId !== getChainId(network)) {
-        continue
-      }
-      for (const callConfig of config.moveCallConfigs) {
-        for (const callFilter of callConfig.filters) {
-          if (config.contract.address + '::' + callFilter.function === functionType) {
-            return {
-              data: {
-                suiCall: {
-                  transaction,
-                  timestamp: new Date(),
-                  slot: 10000n,
+      for (const config of this.server.contractConfigs) {
+        if (config.contract?.chainId !== getChainId(network)) {
+          continue
+        }
+        for (const callConfig of config.moveCallConfigs) {
+          for (const callFilter of callConfig.filters) {
+            if (config.contract.address + '::' + callFilter.function === functionType) {
+              return {
+                data: {
+                  suiCall: {
+                    transaction,
+                    timestamp: new Date(),
+                    slot: 10000n,
+                  },
                 },
-              },
-              handlerIds: [callConfig.handlerId],
-              handlerType: HandlerType.SUI_CALL,
+                handlerIds: [callConfig.handlerId],
+                handlerType: HandlerType.SUI_CALL,
+              }
             }
           }
         }
