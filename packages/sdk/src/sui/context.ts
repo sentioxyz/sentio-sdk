@@ -55,6 +55,14 @@ export class SuiContext extends BaseContext {
       labels: normalizeLabels(labels),
     }
   }
+
+  get client(): JsonRpcProvider {
+    const chainServer = Endpoints.INSTANCE.chainServer.get(getChainId(this.network))
+    if (!chainServer) {
+      throw new ServerError(Status.INTERNAL, 'RPC endpoint not provided')
+    }
+    return new JsonRpcProvider(new Connection({ fullnode: chainServer }))
+  }
 }
 
 export class SuiObjectsContext extends BaseContext {
@@ -91,7 +99,7 @@ export class SuiObjectsContext extends BaseContext {
     }
   }
 
-  getClient(): JsonRpcProvider {
+  get client(): JsonRpcProvider {
     const chainServer = Endpoints.INSTANCE.chainServer.get(getChainId(this.network))
     if (!chainServer) {
       throw new ServerError(Status.INTERNAL, 'RPC endpoint not provided')

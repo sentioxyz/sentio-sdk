@@ -336,6 +336,10 @@ export class SuiObjectProcessor extends SuiBaseObjectsProcessor<
     data: Data_SuiObject,
     ctx: SuiObjectsContext
   ): PromiseOrVoid {
+    if (!data.self) {
+      console.log(`Sui object not existed in ${ctx.slot}, please specific a start time`)
+      return
+    }
     return handler(data.self as SuiMoveObject, data.objects as SuiMoveObject[], ctx)
   }
 }
