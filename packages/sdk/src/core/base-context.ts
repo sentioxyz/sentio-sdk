@@ -5,6 +5,7 @@ import { Meter, Labels } from './meter.js'
 export abstract class BaseContext {
   meter: Meter
   eventLogger: EventLogger
+  protected baseLabels: Labels
 
   _res: ProcessResult & { states: StateResult } = {
     counters: [],
@@ -16,16 +17,24 @@ export abstract class BaseContext {
     },
   }
 
-  protected constructor() {
+  protected constructor(baseLabels: Labels | undefined) {
     this.meter = new Meter(this)
     this.eventLogger = new EventLogger(this)
+    this.baseLabels = baseLabels || {}
   }
 
   getProcessResult(): ProcessResult {
     return this._res
   }
 
-  abstract getMetaData(name: string, labels: Labels): RecordMetaData
+  getMetaData(name: string, labels: Labels): RecordMetaData {
+    return {
+      ...this.baseLabels,
+      ...this.getMetaDataInternal(name, labels),
+    }
+  }
+
+  protected abstract getMetaDataInternal(name: string, labels: Labels): RecordMetaData
 
   abstract getChainId(): string
 }

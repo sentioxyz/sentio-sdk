@@ -22,7 +22,7 @@ import {
 import { CallHandler, EventFilter, EventHandler, FunctionNameAndCallFilter, parseMoveType } from '../move/index.js'
 import { getMoveCalls } from './utils.js'
 import { defaultMoveCoder, MoveCoder } from './move-coder.js'
-import { PromiseOrVoid } from '../core/index.js'
+import { Labels, PromiseOrVoid } from '../core/index.js'
 // import { dynamic_field } from './builtin/0x2.js'
 
 const DEFAULT_FETCH_CONFIG: MoveFetchConfig = {
@@ -34,18 +34,21 @@ class IndexConfigure {
   address: string
   network: SuiNetwork
   startCheckpoint: bigint
+  baseLabels?: Labels
 }
 
 export class SuiBindOptions {
   address: string
   network?: SuiNetwork
   startCheckpoint?: bigint
+  baseLabels?: Labels
 }
 
 export class SuiObjectBindOptions {
   objectId: string
   network?: SuiNetwork
   startCheckpoint?: bigint
+  baseLabels?: { [key: string]: string }
 }
 
 export class SuiProcessorState extends ListStateStorage<SuiBaseProcessor> {
@@ -115,7 +118,8 @@ export class SuiBaseProcessor {
             data.timestamp || new Date(0),
             data.slot,
             txn,
-            idx
+            idx,
+            processor.config.baseLabels
           )
 
           const decoded = await processor.coder.decodeEvent<any>(evt)
@@ -164,7 +168,8 @@ export class SuiBaseProcessor {
           data.timestamp || new Date(0),
           data.slot,
           tx,
-          0
+          0,
+          processor.config.baseLabels
         )
         if (tx) {
           const calls: MoveCallSuiTransaction[] = getMoveCalls(tx)
@@ -251,7 +256,8 @@ abstract class SuiBaseObjectsProcessor<HandlerType> {
           processor.config.network,
           processor.config.address,
           data.slot,
-          data.timestamp || new Date(0)
+          data.timestamp || new Date(0),
+          processor.config.baseLabels
         )
         await processor.doHandle(handler, data, ctx)
         return ctx.getProcessResult()
@@ -300,6 +306,7 @@ function configure(options: SuiBindOptions): IndexConfigure {
     startCheckpoint: options.startCheckpoint || 0n,
     address: options.address,
     network: options.network || SuiNetwork.MAIN_NET,
+    baseLabels: options.baseLabels,
   }
 }
 
@@ -328,6 +335,7 @@ export class SuiObjectProcessor extends SuiBaseObjectsProcessor<
       network: options.network,
       startCheckpoint: options.startCheckpoint,
       ownerType: MoveOnIntervalConfig_OwnerType.OBJECT,
+      baseLabels: options.baseLabels,
     })
   }
 

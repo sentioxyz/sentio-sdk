@@ -193,3 +193,25 @@ export function getChainScanUrl(
   }
   return undefined
 }
+
+export function chainInitialLabel(chainType: string) {
+  switch (chainType) {
+    case 'aptos':
+      return 'Initial start version'
+    case 'sui':
+      return 'Initial start checkpoint'
+    default:
+      return 'Initial start block number'
+  }
+}
+
+export function chainBlockLabel(chainType: string) {
+  switch (chainType) {
+    case 'aptos':
+      return 'Version'
+    case 'sui':
+      return 'Checkpoint'
+    default:
+      return 'Block number'
+  }
+}

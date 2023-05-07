@@ -26,9 +26,10 @@ export abstract class EthContext extends BaseContext {
     log?: LogParams,
     trace?: Trace,
     transaction?: TransactionResponseParams,
-    transactionReceipt?: TransactionReceiptParams
+    transactionReceipt?: TransactionReceiptParams,
+    baseLabels?: Labels
   ) {
-    super()
+    super(baseLabels)
     this.chainId = chainId
     this.log = log
     this.block = block
@@ -54,7 +55,7 @@ export abstract class EthContext extends BaseContext {
     return this.chainId.toString()
   }
 
-  getMetaData(name: string, labels: Labels): RecordMetaData {
+  getMetaDataInternal(name: string, labels: Labels): RecordMetaData {
     if (this.log) {
       return {
         address: this.address,
@@ -140,9 +141,10 @@ export class ContractContext<
     log?: LogParams,
     trace?: Trace,
     transaction?: TransactionResponseParams,
-    transactionReceipt?: TransactionReceiptParams
+    transactionReceipt?: TransactionReceiptParams,
+    baseLabels?: Labels
   ) {
-    super(chainId, view.address, timestamp, block, log, trace, transaction, transactionReceipt)
+    super(chainId, view.address, timestamp, block, log, trace, transaction, transactionReceipt, baseLabels)
     view.context = this
     this.contractName = contractName
     this.contract = view

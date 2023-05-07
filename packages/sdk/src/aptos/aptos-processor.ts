@@ -19,7 +19,7 @@ import {
 } from '@sentio/protos'
 import { ServerError, Status } from 'nice-grpc'
 import { CallHandler, EventFilter, EventHandler, FunctionNameAndCallFilter, parseMoveType } from '../move/index.js'
-import { PromiseOrVoid } from '../core/index.js'
+import { Labels, PromiseOrVoid } from '../core/index.js'
 
 const DEFAULT_FETCH_CONFIG: MoveFetchConfig = {
   resourceChanges: false,
@@ -30,6 +30,7 @@ type IndexConfigure = {
   address: string
   network: AptosNetwork
   startVersion: bigint
+  baseLabels?: Labels
   // endSeqNumber?: Long
 }
 
@@ -85,7 +86,8 @@ export class AptosBaseProcessor {
           processor.config.address,
           BigInt(data.transaction.version),
           call,
-          0
+          0,
+          processor.config.baseLabels
         )
         await handler(call, ctx)
         return ctx.getProcessResult()
@@ -138,7 +140,8 @@ export class AptosBaseProcessor {
             processor.config.address,
             BigInt(txn.version),
             txn,
-            idx
+            idx,
+            processor.config.baseLabels
           )
 
           const decoded = await processor.coder.decodeEvent<any>(evt)
@@ -185,7 +188,8 @@ export class AptosBaseProcessor {
           processor.config.address,
           BigInt(tx.version),
           tx,
-          0
+          0,
+          processor.config.baseLabels
         )
         if (tx) {
           const payload = tx.payload as TransactionPayload_EntryFunctionPayload
@@ -257,7 +261,8 @@ export class AptosResourcesProcessor {
           processor.config.network,
           processor.config.address,
           data.version,
-          timestamp
+          timestamp,
+          processor.config.baseLabels
         )
         await handler(data.resources as MoveResource[], ctx)
         return ctx.getProcessResult()
@@ -315,5 +320,6 @@ function configure(options: AptosBindOptions): IndexConfigure {
     startVersion: startVersion,
     address: options.address,
     network: options.network || AptosNetwork.MAIN_NET,
+    baseLabels: options.baseLabels,
   }
 }

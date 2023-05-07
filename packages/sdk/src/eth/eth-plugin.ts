@@ -357,13 +357,13 @@ PluginManager.INSTANCE.register(new EthPlugin())
 
 class NoopContext extends BaseContext {
   public constructor() {
-    super()
+    super({})
   }
   getChainId(): string {
     return ''
   }
 
-  getMetaData(name: string, labels: Labels): RecordMetaData {
+  getMetaDataInternal(name: string, labels: Labels): RecordMetaData {
     return RecordMetaData.create()
   }
 }

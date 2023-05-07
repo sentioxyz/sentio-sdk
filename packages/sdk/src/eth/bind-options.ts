@@ -10,6 +10,7 @@ export class BindOptions {
   name?: string
   startBlock?: bigint | number
   endBlock?: bigint | number
+  baseLabels?: { [key: string]: string }
 }
 
 export function getOptionsSignature(opts: BindOptions): string {
@@ -34,4 +35,5 @@ export class AccountBindOptions {
   address: string
   network: Network
   startBlock?: bigint | number
+  baseLabels?: { [key: string]: string }
 }

@@ -23,9 +23,10 @@ export class SuiContext extends BaseContext {
     timestamp: Date,
     slot: bigint,
     transaction: SuiTransactionBlockResponse,
-    eventIndex: number
+    eventIndex: number,
+    baseLabels: Labels | undefined
   ) {
-    super()
+    super(baseLabels)
     this.address = address.toLowerCase()
     this.network = network
     this.moduleName = moduleName
@@ -42,7 +43,7 @@ export class SuiContext extends BaseContext {
     return getChainId(this.network)
   }
 
-  getMetaData(name: string, labels: Labels): RecordMetaData {
+  getMetaDataInternal(name: string, labels: Labels): RecordMetaData {
     return {
       address: this.address,
       contractName: this.moduleName,
@@ -72,8 +73,8 @@ export class SuiObjectsContext extends BaseContext {
   timestamp: Date
   coder: MoveCoder
 
-  constructor(network: SuiNetwork, address: string, slot: bigint, timestamp: Date) {
-    super()
+  constructor(network: SuiNetwork, address: string, slot: bigint, timestamp: Date, baseLabels: Labels | undefined) {
+    super(baseLabels)
     this.address = address
     this.network = network
     this.slot = slot
@@ -85,7 +86,7 @@ export class SuiObjectsContext extends BaseContext {
     return getChainId(this.network)
   }
 
-  getMetaData(name: string, labels: Labels): RecordMetaData {
+  getMetaDataInternal(name: string, labels: Labels): RecordMetaData {
     return {
       address: this.address,
       contractName: 'objects',

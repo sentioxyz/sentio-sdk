@@ -4,6 +4,7 @@ import { Instruction } from '@project-serum/anchor'
 import { SolanaBindOptions } from './solana-options.js'
 import { ListStateStorage } from '@sentio/runtime'
 import { CHAIN_IDS } from '@sentio/sdk'
+import { Labels } from '../core/index.js'
 
 type IndexConfigure = {
   startSlot: bigint
@@ -25,6 +26,7 @@ export class SolanaBaseProcessor {
   address: string
   endpoint: string
   contractName: string
+  baseLabels?: Labels
   network: string
   processInnerInstruction: boolean
   config: IndexConfigure = { startSlot: 0n }
@@ -54,6 +56,7 @@ export class SolanaBaseProcessor {
       this.endBlock(options.endBlock)
     }
     this.endpoint = options.network || 'https://api.mainnet-beta.solana.com'
+    this.baseLabels = options.baseLabels
 
     SolanaProcessorState.INSTANCE.addValue(this)
   }
@@ -85,7 +88,7 @@ export class SolanaBaseProcessor {
     handler: SolanaInstructionHandler,
     slot: bigint
   ): Promise<ProcessResult> {
-    const ctx = new SolanaContext(this.contractName, this.network, this.address, slot)
+    const ctx = new SolanaContext(this.contractName, this.network, this.address, slot, this.baseLabels)
     await handler(parsedInstruction, ctx, accounts)
     return ctx.getProcessResult()
   }

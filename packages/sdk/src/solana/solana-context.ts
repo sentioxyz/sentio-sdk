@@ -6,8 +6,8 @@ export class SolanaContext extends BaseContext {
   programName: string
   blockNumber: bigint
 
-  constructor(programName: string, network: string, address: string, slot: bigint) {
-    super()
+  constructor(programName: string, network: string, address: string, slot: bigint, baseLabels: Labels | undefined) {
+    super(baseLabels)
     this.network = network || CHAIN_IDS.SOLANA_MAINNET
     this.programName = programName
     this.address = address
@@ -18,7 +18,7 @@ export class SolanaContext extends BaseContext {
     return this.network
   }
 
-  getMetaData(name: string, labels: Labels): RecordMetaData {
+  getMetaDataInternal(name: string, labels: Labels): RecordMetaData {
     return {
       address: this.address,
       contractName: this.programName,

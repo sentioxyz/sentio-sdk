@@ -55,6 +55,7 @@ class BindInternalOptions {
   name: string
   startBlock: bigint
   endBlock?: bigint
+  baseLabels?: { [key: string]: string }
 }
 
 export class GlobalProcessorState extends ListStateStorage<GlobalProcessor> {
@@ -187,6 +188,7 @@ export abstract class BaseProcessor<
       name: config.name || '',
       network: getNetworkFromCtxOrNetworkish(config.network),
       startBlock: 0n,
+      baseLabels: config.baseLabels,
     }
     if (config.startBlock) {
       this.config.startBlock = BigInt(config.startBlock)

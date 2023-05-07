@@ -22,9 +22,10 @@ export class AptosContext extends BaseContext {
     address: string,
     version: bigint,
     transaction: Transaction_UserTransaction,
-    eventIndex: number
+    eventIndex: number,
+    baseLabels: Labels | undefined
   ) {
-    super()
+    super(baseLabels)
     this.address = address.toLowerCase()
     this.network = network
     this.moduleName = moduleName
@@ -40,7 +41,7 @@ export class AptosContext extends BaseContext {
     return getChainId(this.network)
   }
 
-  getMetaData(name: string, labels: Labels): RecordMetaData {
+  getMetaDataInternal(name: string, labels: Labels): RecordMetaData {
     return {
       address: this.address,
       contractName: this.moduleName,
@@ -62,8 +63,8 @@ export class AptosResourcesContext extends BaseContext {
   timestampInMicros: number
   coder: MoveCoder
 
-  constructor(network: AptosNetwork, address: string, version: bigint, timestampInMicros: number) {
-    super()
+  constructor(network: AptosNetwork, address: string, version: bigint, timestampInMicros: number, baseLabels?: Labels) {
+    super(baseLabels)
     this.address = address
     this.network = network
     this.version = version
@@ -75,7 +76,7 @@ export class AptosResourcesContext extends BaseContext {
     return getChainId(this.network)
   }
 
-  getMetaData(name: string, labels: Labels): RecordMetaData {
+  getMetaDataInternal(name: string, labels: Labels): RecordMetaData {
     return {
       address: this.address,
       contractName: 'resources',
