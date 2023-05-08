@@ -44,6 +44,7 @@ export enum EthChainId {
   KUCOIN = '321',
   ZKSYNC_ERA = '324',
   SHIDEN = '336',
+  CRONOS_TESTNET = '338',
   THETA = '361',
   SX = '416',
   CANDLE = '534',
