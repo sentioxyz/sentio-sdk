@@ -38,14 +38,17 @@ export class SuiChainAdapter extends ChainAdapter<SuiNetwork, SuiMoveNormalizedM
     return Object.values(modules).map(toInternalModule)
   }
 
-  getEventStructs(module: InternalMoveModule) {
-    const qname = moduleQname(module)
+  getAllEventStructs(modules: InternalMoveModule[]): Map<string, InternalMoveStruct> {
     const eventMap = new Map<string, InternalMoveStruct>()
 
-    for (const struct of module.structs) {
-      const abilities = new Set(struct.abilities)
-      if (abilities.has('Drop') && abilities.has('Copy')) {
-        eventMap.set(qname + SPLITTER + struct.name, struct)
+    for (const module of modules) {
+      const qname = moduleQname(module)
+
+      for (const struct of module.structs) {
+        const abilities = new Set(struct.abilities)
+        if (abilities.has('Drop') && abilities.has('Copy')) {
+          eventMap.set(qname + SPLITTER + struct.name, struct)
+        }
       }
     }
     return eventMap

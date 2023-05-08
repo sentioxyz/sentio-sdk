@@ -6,8 +6,10 @@ export abstract class ChainAdapter<NetworkType, ModuleType, StructType> {
 
   abstract fetchModules(account: string, network: NetworkType): Promise<ModuleType[]>
   abstract toInternalModules(modules: ModuleType[]): InternalMoveModule[]
-  // Get the structs that represent Events
-  abstract getEventStructs(module: InternalMoveModule): Map<string, InternalMoveStruct>
+
+  // Get all structs that represent Events
+  abstract getAllEventStructs(module: InternalMoveModule[]): Map<string, InternalMoveStruct>
+
   // Get the parameters that actually have arguments in runtime
   // Aptos first signer and Sui's last TxContext are no use
   abstract getMeaningfulFunctionParams(params: TypeDescriptor[]): TypeDescriptor[]

@@ -32,28 +32,30 @@ export class AptosChainAdapter extends ChainAdapter<AptosNetwork, MoveModuleByte
     return params
   }
 
-  getEventStructs(module: InternalMoveModule) {
-    const qname = moduleQname(module)
-    const structMap = new Map<string, InternalMoveStruct>()
+  getAllEventStructs(modules: InternalMoveModule[]) {
     const eventMap = new Map<string, InternalMoveStruct>()
-
-    for (const struct of module.structs) {
-      structMap.set(qname + SPLITTER + struct.name, struct)
+    const structMap = new Map<string, InternalMoveStruct>()
+    for (const module of modules) {
+      const qname = moduleQname(module)
+      for (const struct of module.structs) {
+        structMap.set(qname + SPLITTER + struct.name, struct)
+      }
     }
 
-    for (const struct of module.structs) {
-      for (const field of struct.fields) {
-        const t = field.type
-        if (t.qname === '0x1::event::EventHandle') {
-          const event = t.typeArgs[0].qname
-          const eventStruct = structMap.get(event)
-          if (eventStruct) {
-            eventMap.set(event, eventStruct)
+    for (const module of modules) {
+      for (const struct of module.structs) {
+        for (const field of struct.fields) {
+          const t = field.type
+          if (t.qname === '0x1::event::EventHandle') {
+            const event = t.typeArgs[0].qname
+            const eventStruct = structMap.get(event)
+            if (eventStruct) {
+              eventMap.set(event, eventStruct)
+            }
           }
         }
       }
     }
-
     return eventMap
   }
 
