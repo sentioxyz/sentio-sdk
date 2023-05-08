@@ -4,7 +4,7 @@ import { Endpoints } from '@sentio/runtime'
 import { retryMiddleware } from 'nice-grpc-client-middleware-retry'
 import { prometheusClientMiddleware } from 'nice-grpc-prometheus'
 import { AptosClient } from 'aptos-sdk'
-import { AptosNetwork, getChainId } from './network.js'
+import { AptosNetwork } from './network.js'
 
 export function getChainQueryClient(address?: string): AptosQueryClient {
   if (!address) {
@@ -19,7 +19,7 @@ export function getChainQueryClient(address?: string): AptosQueryClient {
 }
 
 export function getAptosClient(network = AptosNetwork.MAIN_NET): AptosClient | undefined {
-  const chainServer = Endpoints.INSTANCE.chainServer.get(getChainId(network))
+  const chainServer = Endpoints.INSTANCE.chainServer.get(network)
   if (chainServer) {
     return new AptosClient(chainServer)
   }

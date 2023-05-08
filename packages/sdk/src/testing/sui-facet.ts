@@ -1,6 +1,5 @@
 import { SuiTransactionBlockResponse, MoveCallSuiTransaction } from '@mysten/sui.js'
 import { DataBinding, HandlerType } from '@sentio/protos'
-import { getChainId } from '../sui/network.js'
 import { TestProcessorServer } from './test-processor-server.js'
 import { parseMoveType } from '../move/types.js'
 import { SuiNetwork } from '../sui/index.js'
@@ -43,7 +42,7 @@ export class SuiFacet {
       const functionType = [call.package, call.module, call.function].join(SPLITTER)
 
       for (const config of this.server.contractConfigs) {
-        if (config.contract?.chainId !== getChainId(network)) {
+        if (config.contract?.chainId !== network) {
           continue
         }
         for (const callConfig of config.moveCallConfigs) {
@@ -83,7 +82,7 @@ export class SuiFacet {
     // const allEvents = new Set(transaction.events.map(e => e.type))
 
     for (const config of this.server.contractConfigs) {
-      if (config.contract?.chainId !== getChainId(network)) {
+      if (config.contract?.chainId !== network) {
         continue
       }
       for (const eventConfig of config.moveEventConfigs) {

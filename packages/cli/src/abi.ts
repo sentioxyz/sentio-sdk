@@ -1,29 +1,29 @@
 import { AptosClient } from 'aptos-sdk'
 import { JsonRpcProvider, Connection } from '@mysten/sui.js'
-import { CHAIN_IDS } from './chain.js'
 import chalk from 'chalk'
 import process from 'process'
 import path from 'path'
 import fs from 'fs-extra'
 import fetch from 'node-fetch'
+import { AptosChainId, ChainId, EthChainId, SuiChainId } from './chain.js'
 
 export const ETH_API_URL_MAP: Record<string, string> = {}
 
-ETH_API_URL_MAP[CHAIN_IDS.ETHEREUM] = 'https://api.etherscan.io'
-ETH_API_URL_MAP[CHAIN_IDS.GOERLI] = 'https://api-goerli.etherscan.io'
-ETH_API_URL_MAP[CHAIN_IDS.BINANCE] = 'https://api.bscscan.com'
-ETH_API_URL_MAP[CHAIN_IDS.POLYGON] = 'https://api.polygonscan.com'
-ETH_API_URL_MAP[CHAIN_IDS.ARBITRUM] = 'https://api.arbiscan.io'
-ETH_API_URL_MAP[CHAIN_IDS.OPTIMISM] = 'https://api-optimistic.etherscan.io'
+ETH_API_URL_MAP[EthChainId.ETHEREUM] = 'https://api.etherscan.io'
+ETH_API_URL_MAP[EthChainId.GOERLI] = 'https://api-goerli.etherscan.io'
+ETH_API_URL_MAP[EthChainId.BINANCE] = 'https://api.bscscan.com'
+ETH_API_URL_MAP[EthChainId.POLYGON] = 'https://api.polygonscan.com'
+ETH_API_URL_MAP[EthChainId.ARBITRUM] = 'https://api.arbiscan.io'
+ETH_API_URL_MAP[EthChainId.OPTIMISM] = 'https://api-optimistic.etherscan.io'
 // ETH_API_URL_MAP[CHAIN_IDS.BASE_GOERLI] = 'https://api-goerli.basescan.org' // didn't see any verified contract
 
-ETH_API_URL_MAP[CHAIN_IDS.AVALANCHE] = 'https://api.snowtrace.io'
-ETH_API_URL_MAP[CHAIN_IDS.CRONOS] = 'https://api.cronoscan.com'
-ETH_API_URL_MAP[CHAIN_IDS.MOONBEAM] = 'https://api-moonbeam.moonscan.io'
-ETH_API_URL_MAP[CHAIN_IDS.FANTOM] = 'https://api.ftmscan.com'
+ETH_API_URL_MAP[EthChainId.AVALANCHE] = 'https://api.snowtrace.io'
+ETH_API_URL_MAP[EthChainId.CRONOS] = 'https://api.cronoscan.com'
+ETH_API_URL_MAP[EthChainId.MOONBEAM] = 'https://api-moonbeam.moonscan.io'
+ETH_API_URL_MAP[EthChainId.FANTOM] = 'https://api.ftmscan.com'
 
 export async function getABI(
-  chain: string,
+  chain: ChainId,
   address: string,
   name: string | undefined
 ): Promise<{ name?: string; abi: object | string }> {
@@ -32,17 +32,16 @@ export async function getABI(
   let suiClient: JsonRpcProvider | undefined
 
   switch (chain) {
-    case CHAIN_IDS.APTOS_MAINNET:
+    case AptosChainId.APTOS_MAINNET:
       aptosClient = new AptosClient('https://mainnet.aptoslabs.com/')
       break
-    case CHAIN_IDS.APTOS_TESTNET:
+    case AptosChainId.APTOS_TESTNET:
       aptosClient = new AptosClient('https://testnet.aptoslabs.com/')
       break
-    case CHAIN_IDS.SUI_MAINNET:
-      throw Error('SUI mainnet is not support yet, try sui/testnet')
-    // suiClient = new JsonRpcProvider('https://fullnode.mainnet.sui.io/')
-    // break
-    case CHAIN_IDS.SUI_TESTNET:
+    case SuiChainId.SUI_MAINNET:
+      suiClient = new JsonRpcProvider(new Connection({ fullnode: 'https://fullnode.mainnet.sui.io/' }))
+      break
+    case SuiChainId.SUI_TESTNET:
       suiClient = new JsonRpcProvider(new Connection({ fullnode: 'https://fullnode.testnet.sui.io/' }))
       break
     default:
@@ -118,16 +117,16 @@ export async function getABI(
 export function getABIFilePath(chain: string, name: string): string {
   let subpath
   switch (chain) {
-    case CHAIN_IDS.APTOS_MAINNET:
+    case AptosChainId.APTOS_MAINNET:
       subpath = 'aptos'
       break
-    case CHAIN_IDS.APTOS_TESTNET:
+    case AptosChainId.APTOS_TESTNET:
       subpath = 'aptos/testnet'
       break
-    case CHAIN_IDS.SUI_MAINNET:
+    case SuiChainId.SUI_MAINNET:
       subpath = 'sui'
       break
-    case CHAIN_IDS.SUI_TESTNET:
+    case SuiChainId.SUI_TESTNET:
       subpath = 'sui/testnet'
       break
     default:

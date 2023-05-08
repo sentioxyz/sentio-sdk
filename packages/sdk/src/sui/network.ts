@@ -1,23 +1,10 @@
-import { CHAIN_IDS, getChainName } from '../core/chain.js'
+import { SuiChainId } from '../core/chain.js'
 
-export enum SuiNetwork {
-  MAIN_NET = 1,
-  TEST_NET = 2,
-  DEV_NET = 3,
-}
-
-export function getChainId(network: SuiNetwork): string {
-  switch (network) {
-    case SuiNetwork.TEST_NET:
-      return CHAIN_IDS.SUI_TESTNET
-    case SuiNetwork.DEV_NET:
-      return CHAIN_IDS.SUI_DEVNET
-  }
-  return CHAIN_IDS.SUI_MAINNET
-}
-
-export function getSuiChainName(network: SuiNetwork): string {
-  return getChainName(getChainId(network))
+export type SuiNetwork = SuiChainId
+export const SuiNetwork = <const>{
+  MAIN_NET: SuiChainId.SUI_MAINNET,
+  TEST_NET: SuiChainId.SUI_TESTNET,
+  DEV_NET: SuiChainId.SUI_DEVNET,
 }
 
 export class SuiBindOptions {

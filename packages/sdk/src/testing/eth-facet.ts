@@ -1,9 +1,9 @@
 import { TestProcessorServer } from './test-processor-server.js'
 import { DataBinding, HandlerType, ProcessBindingResponse } from '@sentio/protos'
 import { Trace } from '../eth/eth.js'
-import { BlockParams, LogParams, Networkish } from 'ethers/providers'
+import { BlockParams, LogParams } from 'ethers/providers'
 import { Block } from 'ethers'
-import { getNetworkFromCtxOrNetworkish } from '../eth/provider.js'
+import { ChainId, EthChainId } from '../core/chain.js'
 
 export class EthFacet {
   server: TestProcessorServer
@@ -12,11 +12,11 @@ export class EthFacet {
     this.server = server
   }
 
-  testTrace(trace: Trace, network: Networkish = 1): Promise<ProcessBindingResponse> {
+  testTrace(trace: Trace, network: EthChainId = EthChainId.ETHEREUM): Promise<ProcessBindingResponse> {
     return this.testTraces([trace], network)
   }
 
-  testTraces(traces: Trace[], network: Networkish = 1): Promise<ProcessBindingResponse> {
+  testTraces(traces: Trace[], network: EthChainId = EthChainId.ETHEREUM): Promise<ProcessBindingResponse> {
     const bindings = []
     for (const trace of traces) {
       const binding = this.buildTraceBinding(trace, network)
@@ -30,14 +30,14 @@ export class EthFacet {
     })
   }
 
-  buildTraceBinding(trace: Trace, network: Networkish = 1): DataBinding | undefined {
+  buildTraceBinding(trace: Trace, network: ChainId = EthChainId.ETHEREUM): DataBinding | undefined {
     if (trace.type !== 'call' || !trace.action.input) {
       throw Error('Invalid test trace: ' + JSON.stringify(trace))
     }
     const signature = trace.action.input.slice(0, 10)
 
     for (const contract of this.server.contractConfigs) {
-      if (contract.contract?.chainId !== getNetworkFromCtxOrNetworkish(network).chainId.toString()) {
+      if (contract.contract?.chainId !== network) {
         continue
       }
       if (trace.action.to?.toLowerCase() !== contract.contract?.address.toLowerCase()) {
@@ -61,11 +61,11 @@ export class EthFacet {
     return undefined
   }
 
-  testLog(log: LogParams, network: Networkish = 1): Promise<ProcessBindingResponse> {
+  testLog(log: LogParams, network: EthChainId = EthChainId.ETHEREUM): Promise<ProcessBindingResponse> {
     return this.testLogs([log], network)
   }
 
-  testLogs(logs: LogParams[], network: Networkish = 1): Promise<ProcessBindingResponse> {
+  testLogs(logs: LogParams[], network: EthChainId = EthChainId.ETHEREUM): Promise<ProcessBindingResponse> {
     const bindings = []
     for (const log of logs) {
       const binding = this.buildLogBinding(log, network)
@@ -79,9 +79,9 @@ export class EthFacet {
     })
   }
 
-  buildLogBinding(log: LogParams, network: Networkish = 1): DataBinding | undefined {
+  buildLogBinding(log: LogParams, network: EthChainId = EthChainId.ETHEREUM): DataBinding | undefined {
     for (const contract of this.server.contractConfigs) {
-      if (contract.contract?.chainId !== getNetworkFromCtxOrNetworkish(network).chainId.toString()) {
+      if (contract.contract?.chainId !== network) {
         continue
       }
       if (log.address.toLowerCase() !== contract.contract?.address.toLowerCase()) {
@@ -122,11 +122,19 @@ export class EthFacet {
     }
     return undefined
   }
-  testAccountLog(address: string, log: LogParams, network: Networkish = 1): Promise<ProcessBindingResponse> {
+  testAccountLog(
+    address: string,
+    log: LogParams,
+    network: EthChainId = EthChainId.ETHEREUM
+  ): Promise<ProcessBindingResponse> {
     return this.testAccountLogs(address, [log], network)
   }
 
-  testAccountLogs(address: string, logs: LogParams[], network: Networkish = 1): Promise<ProcessBindingResponse> {
+  testAccountLogs(
+    address: string,
+    logs: LogParams[],
+    network: EthChainId = EthChainId.ETHEREUM
+  ): Promise<ProcessBindingResponse> {
     const bindings = []
     for (const log of logs) {
       const binding = this.buildAccountLogBinding(address, log, network)
@@ -140,9 +148,13 @@ export class EthFacet {
     })
   }
 
-  buildAccountLogBinding(address: string, log: LogParams, network: Networkish = 1): DataBinding | undefined {
+  buildAccountLogBinding(
+    address: string,
+    log: LogParams,
+    network: EthChainId = EthChainId.ETHEREUM
+  ): DataBinding | undefined {
     for (const account of this.server.accountConfigs) {
-      if (account.chainId !== getNetworkFromCtxOrNetworkish(network).chainId.toString()) {
+      if (account.chainId !== network) {
         continue
       }
       if (address.toLowerCase() !== account.address.toLowerCase()) {
@@ -186,12 +198,12 @@ export class EthFacet {
 
   testBlock(
     block: Partial<BlockParams> & { number: number },
-    network: Networkish = 1
+    network: EthChainId = EthChainId.ETHEREUM
   ): Promise<ProcessBindingResponse> {
     return this.testBlocks([block], network)
   }
 
-  testBlocks(blocks: Partial<BlockParams> & { number: number }[], network: Networkish = 1) {
+  testBlocks(blocks: Partial<BlockParams> & { number: number }[], network: EthChainId = EthChainId.ETHEREUM) {
     const bindings = []
     for (const block of blocks) {
       const binding = this.buildBlockBinding(block, network)
@@ -205,7 +217,10 @@ export class EthFacet {
     })
   }
 
-  buildBlockBinding(block: Partial<Block> & { number: number }, network: Networkish = 1): DataBinding {
+  buildBlockBinding(
+    block: Partial<Block> & { number: number },
+    network: EthChainId = EthChainId.ETHEREUM
+  ): DataBinding {
     const binding: DataBinding = {
       data: {
         ethBlock: { block },
@@ -214,7 +229,7 @@ export class EthFacet {
       handlerIds: [],
     }
     for (const contract of this.server.contractConfigs) {
-      if (contract.contract?.chainId !== getNetworkFromCtxOrNetworkish(network).chainId.toString()) {
+      if (contract.contract?.chainId !== network) {
         continue
       }
       const longBlockNumber = block.number

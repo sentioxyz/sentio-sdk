@@ -16,7 +16,6 @@ import {
 import { ServerError, Status } from 'nice-grpc'
 
 import { SuiAccountProcessorState, SuiProcessorState } from './sui-processor.js'
-import { getChainId } from './network.js'
 import { validateAndNormalizeAddress } from './utils.js'
 
 interface Handlers {
@@ -45,7 +44,7 @@ export class SuiPlugin extends Plugin {
         processorType: USER_PROCESSOR,
         contract: {
           name: suiProcessor.moduleName,
-          chainId: getChainId(suiProcessor.config.network),
+          chainId: suiProcessor.config.network,
           address: validateAndNormalizeAddress(suiProcessor.config.address),
           abi: '',
         },

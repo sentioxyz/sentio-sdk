@@ -1,36 +1,34 @@
-import { Provider, Network, JsonRpcProvider } from 'ethers'
-import { Networkish } from 'ethers/providers'
+import { JsonRpcProvider, Network, Provider } from 'ethers'
 
 import PQueue from 'p-queue'
 import { Endpoints } from '@sentio/runtime'
 import { BaseContext } from '../core/index.js'
+import { EthChainId } from '../core/chain.js'
+import { EthContext } from './context.js'
 
 export const DummyProvider = new JsonRpcProvider('', Network.from(1))
 
 const providers = new Map<string, JsonRpcProvider>()
 
-export function getNetworkFromCtxOrNetworkish(networkish?: BaseContext | Networkish) {
+export function getEthChainId(networkish?: EthContext | EthChainId): EthChainId {
   if (!networkish) {
-    networkish = 1
+    networkish = EthChainId.ETHEREUM
   }
   if (networkish instanceof BaseContext) {
     networkish = networkish.getChainId()
   }
-  if (typeof networkish === 'string') {
-    const id = parseInt(networkish)
-    if (isNaN(id)) {
-      throw Error('Unexpected Network')
-    }
-    networkish = id
-  }
-  return Network.from(networkish)
+  return networkish
 }
 
-export function getProvider(networkish?: Networkish): Provider {
-  const network = getNetworkFromCtxOrNetworkish(networkish)
+export function getProvider(chainId?: EthChainId): Provider {
+  // const network = getNetworkFromCtxOrNetworkish(networkish)
+  if (!chainId) {
+    chainId = EthChainId.ETHEREUM
+  }
+  const network = Network.from(parseInt(chainId))
   // TODO check if other key needed
 
-  const address = Endpoints.INSTANCE.chainServer.get(network.chainId.toString())
+  const address = Endpoints.INSTANCE.chainServer.get(chainId)
   const key = network.chainId.toString() + '-' + address
   let provider = providers.get(key)
 

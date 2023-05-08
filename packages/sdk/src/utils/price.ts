@@ -3,6 +3,7 @@ import { createChannel, createClientFactory, Status } from 'nice-grpc'
 import { prometheusClientMiddleware } from 'nice-grpc-prometheus'
 import { retryMiddleware, RetryOptions } from 'nice-grpc-client-middleware-retry'
 import { Endpoints } from '@sentio/runtime'
+import { ChainId } from '../core/chain.js'
 
 export function getPriceClient(address?: string) {
   if (!address) {
@@ -98,7 +99,7 @@ export async function getPriceByTypeOrSymbolInternal(
  * @param options other behavior options
  */
 export async function getPriceByType(
-  chainId: string,
+  chainId: ChainId,
   coinType: string,
   date: Date,
   options?: PriceOptions

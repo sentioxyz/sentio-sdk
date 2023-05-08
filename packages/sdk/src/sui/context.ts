@@ -1,6 +1,6 @@
 import { RecordMetaData } from '@sentio/protos'
 import { type Labels, BaseContext, normalizeLabels } from '../index.js'
-import { SuiNetwork, getChainId } from './network.js'
+import { SuiNetwork } from './network.js'
 import { SuiTransactionBlockResponse, JsonRpcProvider, Connection } from '@mysten/sui.js'
 import { MoveCoder, defaultMoveCoder } from './move-coder.js'
 import { Endpoints } from '@sentio/runtime'
@@ -39,8 +39,8 @@ export class SuiContext extends BaseContext {
     }
   }
 
-  getChainId(): string {
-    return getChainId(this.network)
+  getChainId() {
+    return this.network as any
   }
 
   getMetaDataInternal(name: string, labels: Labels): RecordMetaData {
@@ -58,7 +58,7 @@ export class SuiContext extends BaseContext {
   }
 
   get client(): JsonRpcProvider {
-    const chainServer = Endpoints.INSTANCE.chainServer.get(getChainId(this.network))
+    const chainServer = Endpoints.INSTANCE.chainServer.get(this.network)
     if (!chainServer) {
       throw new ServerError(Status.INTERNAL, 'RPC endpoint not provided')
     }
@@ -82,8 +82,8 @@ export class SuiObjectsContext extends BaseContext {
     this.coder = defaultMoveCoder(network)
   }
 
-  getChainId(): string {
-    return getChainId(this.network)
+  getChainId() {
+    return this.network as any
   }
 
   getMetaDataInternal(name: string, labels: Labels): RecordMetaData {
@@ -101,7 +101,7 @@ export class SuiObjectsContext extends BaseContext {
   }
 
   get client(): JsonRpcProvider {
-    const chainServer = Endpoints.INSTANCE.chainServer.get(getChainId(this.network))
+    const chainServer = Endpoints.INSTANCE.chainServer.get(this.network)
     if (!chainServer) {
       throw new ServerError(Status.INTERNAL, 'RPC endpoint not provided')
     }

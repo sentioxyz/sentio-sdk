@@ -1,4 +1,4 @@
-import { BoundContractView, ContractContext, ContractView } from './context.js'
+import { BoundContractView, ContractContext, ContractView, EthContext } from './context.js'
 import { BaseContract } from 'ethers'
 import { BaseProcessor } from './base-processor.js'
 import { BindOptions, getOptionsSignature } from './bind-options.js'
@@ -8,8 +8,6 @@ import { ListStateStorage } from '@sentio/runtime'
 import { BlockParams } from 'ethers/providers'
 import { DeferredTopicFilter } from 'ethers/contract'
 import { TypedEvent, TypedCallTrace } from './eth.js'
-import { getNetworkFromCtxOrNetworkish } from './provider.js'
-import { BaseContext } from '../core/index.js'
 
 export class ProcessorTemplateProcessorState extends ListStateStorage<
   BaseProcessorTemplate<BaseContract, BoundContractView<BaseContract, any>>
@@ -54,7 +52,7 @@ export abstract class BaseProcessorTemplate<
    * @param options
    * @param ctx
    */
-  public bind(options: BindOptions, ctx: BaseContext): void {
+  public bind(options: BindOptions, ctx: EthContext): void {
     if (!options.network) {
       options.network = ctx.getChainId()
     }
@@ -85,7 +83,7 @@ export abstract class BaseProcessorTemplate<
       contract: {
         address: options.address,
         name: options.name || '',
-        chainId: getNetworkFromCtxOrNetworkish(options.network).chainId.toString(),
+        chainId: options.network,
         abi: '',
       },
       startBlock: 0n,

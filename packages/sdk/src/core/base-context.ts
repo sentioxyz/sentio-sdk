@@ -1,6 +1,7 @@
 import { ProcessResult, RecordMetaData, StateResult } from '@sentio/protos'
 import { EventLogger } from './event-logger.js'
 import { Meter, Labels } from './meter.js'
+import { ChainId } from './chain.js'
 
 export abstract class BaseContext {
   meter: Meter
@@ -36,5 +37,5 @@ export abstract class BaseContext {
 
   protected abstract getMetaDataInternal(name: string, labels: Labels): RecordMetaData
 
-  abstract getChainId(): string
+  abstract getChainId(): ChainId
 }

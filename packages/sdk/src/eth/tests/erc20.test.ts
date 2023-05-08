@@ -7,6 +7,7 @@ import { mockTransferLog } from '../builtin/erc20.js'
 import { HandlerType } from '@sentio/protos'
 import { SENTIO_BIGINT_STRING_SUFFIX } from '../../core/normalization.js'
 import { RichBlock } from '../eth.js'
+import { EthChainId } from '../../core/chain.js'
 
 describe('Test Basic Examples', () => {
   const service = new TestProcessorServer(async () => {
@@ -37,7 +38,7 @@ describe('Test Basic Examples', () => {
     expect(gauge?.metadata?.blockNumber?.toString()).equals('14373295')
     expect(gauge?.runtimeInfo?.from).equals(HandlerType.ETH_BLOCK)
 
-    const res2 = (await service.eth.testBlock(blockData, 56)).result
+    const res2 = (await service.eth.testBlock(blockData, EthChainId.BINANCE)).result
     expect(res2?.counters).length(0)
     expect(res2?.gauges).length(1)
     expect(firstGaugeValue(res2, 'g2')).equals(20)
@@ -63,7 +64,7 @@ describe('Test Basic Examples', () => {
 
     const logData2 = Object.assign({}, logData)
     logData2.address = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
-    res = await service.eth.testLog(logData2, 56)
+    res = await service.eth.testLog(logData2, EthChainId.BINANCE)
 
     expect(firstCounterValue(res.result, 'c2')).equals(2)
     expect(res.result?.counters[0].metadata?.chainId).equals('56')

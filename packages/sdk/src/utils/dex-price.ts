@@ -4,6 +4,7 @@ import { parse } from 'csv-parse/sync'
 import { BlockTag } from 'ethers/providers'
 import url from 'url'
 import { scaleDown } from '../core/big-decimal.js'
+import { EthChainId } from '../core/chain.js'
 
 type OralceRecord = {
   Pair: string
@@ -31,9 +32,9 @@ class DexPrice {
   BTC_ORACLE_MAP = new Map<string, string>()
   ASSETS_INFOS = new Map<string, number>()
 
-  readonly chainId: number
+  readonly chainId: EthChainId
 
-  constructor(csvFileName: string, chainId: number) {
+  constructor(csvFileName: string, chainId: EthChainId) {
     this.chainId = chainId
     const csvFilePath = url.fileURLToPath(new URL('./' + csvFileName, import.meta.url))
     const fileContent = fs.readFileSync(csvFilePath, { encoding: 'utf-8' })
@@ -131,5 +132,5 @@ class DexPrice {
   }
 }
 
-export const EthereumDexPrice = new DexPrice('chainlink-oracles.csv', 1)
-export const GoerliDexPrice = new DexPrice('chainlink-oracles-goerli.csv', 5)
+export const EthereumDexPrice = new DexPrice('chainlink-oracles.csv', EthChainId.ETHEREUM)
+export const GoerliDexPrice = new DexPrice('chainlink-oracles-goerli.csv', EthChainId.GOERLI)

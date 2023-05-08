@@ -1,5 +1,6 @@
 import { ERC20Processor, ERC20ProcessorTemplate } from '../builtin/erc20.js'
 import { Exporter } from '../../core/exporter.js'
+import { EthChainId } from '../../core/chain.js'
 
 export const filter = ERC20Processor.filters.Transfer(
   '0x0000000000000000000000000000000000000000',
@@ -19,7 +20,10 @@ ERC20Processor.bind({
   startBlock: 14201940,
 })
   .onEventTransfer(async function (event, ctx) {
-    processorTemplate.bind({ address: '0x1E4EDE388cbc9F4b5c79681B7f94d36a11ABEBC9', network: 3, name: 'dynamic' }, ctx)
+    processorTemplate.bind(
+      { address: '0x1E4EDE388cbc9F4b5c79681B7f94d36a11ABEBC9', network: EthChainId.ROPSTEN, name: 'dynamic' },
+      ctx
+    )
     // template.bind('0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', 3, 'dynamic')
     ctx.meter.Counter('c1').add(1)
     ctx.eventLogger.emit(event.name, {
@@ -33,7 +37,11 @@ ERC20Processor.bind({
     ctx.meter.Counter('added').add(call.args.amount, { spender: call.args.spender })
   })
 
-ERC20Processor.bind({ address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', network: 56, name: 'usdc' })
+ERC20Processor.bind({
+  address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+  network: EthChainId.BINANCE,
+  name: 'usdc',
+})
   .onEventTransfer(
     async function (event, ctx) {
       ctx.meter.Counter('c2').add(2)
@@ -57,13 +65,13 @@ ERC20Processor.bind({ address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', net
 //   BigNumber.from(10 ** 18)
 //   // console.log(n)
 // })
-ERC20Processor.bind({ address: '0x2e4ede388cbc9f4b5c79681b7f94d36a11abebc9', network: 56 })
+ERC20Processor.bind({ address: '0x2e4ede388cbc9f4b5c79681b7f94d36a11abebc9', network: EthChainId.BINANCE })
 
-ERC20Processor.bind({ address: '0x3e4ede388cbc9f4b5c79681b7f94d36a11abebc9', network: 1 })
-ERC20Processor.bind({ address: '0x3e4ede388cbc9f4b5c79681b7f94d36a11abebc9', network: 1 })
+ERC20Processor.bind({ address: '0x3e4ede388cbc9f4b5c79681b7f94d36a11abebc9', network: EthChainId.ETHEREUM })
+ERC20Processor.bind({ address: '0x3e4ede388cbc9f4b5c79681b7f94d36a11abebc9', network: EthChainId.ETHEREUM })
 ERC20Processor.bind({
   address: '0x3e4ede388cbc9f4b5c79681b7f94d36a11abebc9',
-  network: 1,
+  network: EthChainId.ETHEREUM,
   startBlock: 21,
   name: 'ytoken',
 })

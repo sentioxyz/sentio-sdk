@@ -106,10 +106,10 @@ export class ${contract.name}ProcessorTemplate extends BaseProcessorTemplate<${c
     .join('\n')}
   }
 
-  export function get${contract.name}Contract(contextOrNetwork: BaseContext | Networkish, address: string): ${
+  export function get${contract.name}Contract(contextOrNetwork: EthContext | EthChainId, address: string): ${
     contract.name
   }ContractView {
-    const network = getNetworkFromCtxOrNetworkish(contextOrNetwork) 
+    const network = getEthChainId(contextOrNetwork) 
     let contract = getContractByABI("${contract.name}", address, network) as ${contract.name}ContractView
     if (!contract) {
       const rawContract = ${contract.name}__factory.connect(address, getProvider(network))
@@ -148,7 +148,7 @@ export class ${contract.name}ProcessorTemplate extends BaseProcessorTemplate<${c
   const imports = createImportsForUsedIdentifiers(
     {
       ethers: ['BigNumberish', 'Overrides', 'BytesLike'],
-      'ethers/providers': ['Networkish'],
+      // 'ethers/providers': ['Networkish'],
       '@sentio/sdk/eth': [
         'addContractByABI',
         'getContractByABI',
@@ -164,12 +164,14 @@ export class ${contract.name}ProcessorTemplate extends BaseProcessorTemplate<${c
         'ContractContext',
         'ContractView',
         'DummyProvider',
+        'EthChainId',
         'TypedCallTrace',
-        'getNetworkFromCtxOrNetworkish',
+        'getEthChainId',
         // 'toBlockTag',
+        'EthContext',
         'EthFetchConfig',
       ],
-      '@sentio/sdk': ['BaseContext'],
+      // '@sentio/sdk/eth': ['BaseContext'],
       // '@sentio/protos': ['EthFetchConfig'],
       './common.js': ['PromiseOrValue'],
       './index.js': [`${contract.name}`, `${contract.name}__factory`],
@@ -206,6 +208,7 @@ export function codeGenTestUtilsFile(contract: Contract): string {
 
   const possibleImports = {
     'ethers/providers': ['LogParams'],
+    '@sentio/sdk/eth': ['EthChainId'],
   } as any
   possibleImports[`./${contract.name}.js`] = Object.values(contract.events).flatMap((events) => {
     if (events.length === 1) {
@@ -232,7 +235,7 @@ function generateMockEventLogFunction(event: EventDeclaration, contractName: str
 
   return `
     export function mock${eventName}Log(contractAddress: string, event: ${eventName}EventObject): LogParams {
-      const contract = get${contractName}Contract(1, contractAddress)
+      const contract = get${contractName}Contract(EthChainId.ETHEREUM, contractAddress)
       const encodedLog = contract.rawContract.interface.encodeEventLog(
         '${getFullSignatureForEvent(event)}',
         [${eventArgs.join(', ')}]

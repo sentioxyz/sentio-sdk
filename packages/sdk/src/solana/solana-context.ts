@@ -1,20 +1,27 @@
-import { normalizeLabels, Labels, BaseContext, RecordMetaData, CHAIN_IDS } from '@sentio/sdk'
+import { normalizeLabels, Labels, BaseContext, RecordMetaData } from '@sentio/sdk'
+import { SolanaChainId } from '../core/chain.js'
 
 export class SolanaContext extends BaseContext {
-  network: string
+  network: SolanaChainId
   address: string
   programName: string
   blockNumber: bigint
 
-  constructor(programName: string, network: string, address: string, slot: bigint, baseLabels: Labels | undefined) {
+  constructor(
+    programName: string,
+    network: SolanaChainId,
+    address: string,
+    slot: bigint,
+    baseLabels: Labels | undefined
+  ) {
     super(baseLabels)
-    this.network = network || CHAIN_IDS.SOLANA_MAINNET
+    this.network = network || SolanaChainId.SOLANA_MAINNET
     this.programName = programName
     this.address = address
     this.blockNumber = slot
   }
 
-  getChainId(): string {
+  getChainId() {
     return this.network
   }
 

@@ -8,10 +8,15 @@ import { codegen } from './build.js'
 import * as process from 'process'
 import yaml from 'yaml'
 import { getABIFilePath, getABI, writeABIFile, ETH_API_URL_MAP } from '../abi.js'
-import { CHAIN_IDS, getChainName } from '../chain.js'
+import { AptosChainId, ChainId, getChainName, SuiChainId } from '../chain.js'
 
 export async function runAdd(argv: string[]) {
-  const supportedChain: string[] = [CHAIN_IDS.APTOS_MAINNET, CHAIN_IDS.APTOS_TESTNET, CHAIN_IDS.SUI_TESTNET]
+  const supportedChain: string[] = [
+    AptosChainId.APTOS_MAINNET,
+    AptosChainId.APTOS_TESTNET,
+    SuiChainId.SUI_TESTNET,
+    SuiChainId.SUI_MAINNET,
+  ]
   supportedChain.push(...Object.keys(ETH_API_URL_MAP))
   const supprtedChainMessage = [
     '',
@@ -63,7 +68,7 @@ export async function runAdd(argv: string[]) {
   if (options.help || !options.address) {
     console.log(usage)
   } else {
-    const chain: string = options['chain'].toLowerCase()
+    const chain = options['chain'].toLowerCase() as ChainId
     const address: string = options.address
     if (!address.startsWith('0x')) {
       console.error(chalk.red('Address must start with 0x'))

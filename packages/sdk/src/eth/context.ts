@@ -5,9 +5,10 @@ import { RecordMetaData } from '@sentio/protos'
 import { Trace } from './eth.js'
 import { Labels, normalizeLabels } from '../core/index.js'
 import { BaseContext } from '../core/base-context.js'
+import { EthChainId } from '../core/chain.js'
 
 export abstract class EthContext extends BaseContext {
-  chainId: number
+  chainId: EthChainId
   address: string
   private readonly log?: LogParams
   block?: BlockParams
@@ -19,7 +20,7 @@ export abstract class EthContext extends BaseContext {
   timestamp: Date
 
   constructor(
-    chainId: number,
+    chainId: EthChainId,
     address: string,
     timestamp?: Date,
     block?: BlockParams,
@@ -51,8 +52,8 @@ export abstract class EthContext extends BaseContext {
 
   protected abstract getContractName(): string
 
-  getChainId(): string {
-    return this.chainId.toString()
+  getChainId(): EthChainId {
+    return this.chainId
   }
 
   getMetaDataInternal(name: string, labels: Labels): RecordMetaData {
@@ -64,7 +65,7 @@ export abstract class EthContext extends BaseContext {
         transactionIndex: this.log.transactionIndex,
         transactionHash: this.transactionHash || '',
         logIndex: this.log.index,
-        chainId: this.chainId.toString(),
+        chainId: this.chainId,
         name: name,
         labels: normalizeLabels(labels),
       }
@@ -110,7 +111,7 @@ export class AccountContext extends EthContext {
 
 export class GlobalContext extends EthContext {
   constructor(
-    chainId: number,
+    chainId: EthChainId,
     timestamp?: Date,
     block?: BlockParams,
     log?: LogParams,
@@ -135,7 +136,7 @@ export class ContractContext<
   constructor(
     contractName: string,
     view: TContractBoundView,
-    chainId: number,
+    chainId: EthChainId,
     timestamp?: Date,
     block?: BlockParams,
     log?: LogParams,

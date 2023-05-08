@@ -2,9 +2,8 @@ import { getERC20Contract } from '../eth/builtin/erc20.js'
 import { getERC20BytesContract } from '../eth/builtin/erc20bytes.js'
 import { BigDecimal, scaleDown } from '../core/big-decimal.js'
 import { PromiseOrValue } from '../eth/builtin/internal/common.js'
-import { decodeBytes32String, Networkish } from 'ethers'
-import { BaseContext } from '../core/index.js'
-import { getNetworkFromCtxOrNetworkish } from '../eth/index.js'
+import { decodeBytes32String } from 'ethers'
+import { EthChainId, EthContext, getEthChainId } from '../eth/index.js'
 
 export interface TokenInfo {
   symbol: string
@@ -33,10 +32,10 @@ async function getTokenInfoPromise(
 }
 
 export async function getERC20TokenInfo(
-  contextOrNetworkish: BaseContext | Networkish,
+  contextOrNetworkish: EthContext | EthChainId,
   tokenAddress: string
 ): Promise<TokenInfo> {
-  const chainId = getNetworkFromCtxOrNetworkish(contextOrNetworkish).chainId.toString()
+  const chainId = getEthChainId(contextOrNetworkish)
   const key = chainId + tokenAddress
   const res = TOKEN_INFOS.get(key)
   if (res) {
@@ -67,7 +66,7 @@ export async function getERC20TokenInfo(
 }
 
 export async function getER20NormalizedAmount(
-  contextOrNetworkish: BaseContext | Networkish,
+  contextOrNetworkish: EthContext | EthChainId,
   tokenAddress: string,
   amount: bigint
 ): Promise<BigDecimal> {

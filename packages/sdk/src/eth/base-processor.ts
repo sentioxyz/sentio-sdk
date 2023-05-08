@@ -1,5 +1,4 @@
 import { BaseContract, DeferredTopicFilter, TransactionResponseParams } from 'ethers'
-import { Network } from 'ethers/providers'
 
 import { BoundContractView, ContractContext, ContractView, GlobalContext } from './context.js'
 import {
@@ -15,10 +14,10 @@ import {
 import { BindOptions } from './bind-options.js'
 import { PromiseOrVoid } from '../core/promises.js'
 import { ServerError, Status } from 'nice-grpc'
-import { fixEmptyKey, TypedEvent, TypedCallTrace, formatEthData, RichBlock } from './eth.js'
-import { getNetworkFromCtxOrNetworkish } from './provider.js'
+import { fixEmptyKey, formatEthData, RichBlock, TypedCallTrace, TypedEvent } from './eth.js'
 import sha3 from 'js-sha3'
 import { ListStateStorage } from '@sentio/runtime'
+import { EthChainId } from '../core/chain.js'
 
 export interface AddressOrTypeEventFilter extends DeferredTopicFilter {
   addressType?: AddressType
@@ -51,7 +50,7 @@ export class TransactionHandler {
 
 class BindInternalOptions {
   address: string
-  network: Network
+  network: EthChainId
   name: string
   startBlock: bigint
   endBlock?: bigint
@@ -77,7 +76,7 @@ export class GlobalProcessor {
     this.config = {
       address: '*',
       name: config.name || 'Global',
-      network: getNetworkFromCtxOrNetworkish(config.network),
+      network: config.network || EthChainId.ETHEREUM,
       startBlock: 0n,
     }
     if (config.startBlock) {
@@ -119,8 +118,8 @@ export class GlobalProcessor {
     )
   }
 
-  public getChainId(): number {
-    return Number(this.config.network.chainId)
+  public getChainId(): EthChainId {
+    return this.config.network
   }
 
   public onInterval(
@@ -186,7 +185,7 @@ export abstract class BaseProcessor<
     this.config = {
       address: config.address,
       name: config.name || '',
-      network: getNetworkFromCtxOrNetworkish(config.network),
+      network: config.network || EthChainId.ETHEREUM,
       startBlock: 0n,
       baseLabels: config.baseLabels,
     }
@@ -200,8 +199,8 @@ export abstract class BaseProcessor<
 
   protected abstract CreateBoundContractView(): TBoundContractView
 
-  public getChainId(): number {
-    return Number(this.config.network.chainId)
+  public getChainId(): EthChainId {
+    return this.config.network
   }
 
   public onEvent(

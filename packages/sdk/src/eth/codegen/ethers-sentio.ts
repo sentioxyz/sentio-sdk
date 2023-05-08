@@ -11,6 +11,7 @@ import {
 import { dirname, join, relative } from 'path'
 import { codeGenIndex, codeGenSentioFile, codeGenTestUtilsFile } from './file.js'
 import { YamlContractConfig } from '../../core/yaml-contract-config.js'
+import { ChainId, EthChainId } from '../../core/chain.js'
 
 export interface SentioEthersConfig extends Config {
   contractsToGenExample: YamlContractConfig[]
@@ -98,17 +99,23 @@ export default class EthersSentio extends Ethers.default {
     const contractsToGenExample = (this.cfg as SentioEthersConfig).contractsToGenExample
     if (contractsToGenExample.length > 0) {
       const processors = this.processedABIs.map((abi) => `${abi.name}Processor`).join(',')
-      let exampleContent = `import { ${processors} } from './types/eth/index.js'`
+      let exampleContent = `
+      import { EthChainId } from '@sentio/sdk/eth' 
+      import { ${processors} } from './types/eth/index.js'`
+
+      const ethChainIdValues = new Map<ChainId, string>()
+      for (const [key, value] of Object.entries(EthChainId)) {
+        ethChainIdValues.set(value, key)
+      }
 
       for (const contract of contractsToGenExample) {
-        const chainId = parseInt(contract.chain)
-        if (isNaN(chainId) || !isFinite(chainId)) {
+        const chainKey = ethChainIdValues.get(contract.chain)
+        if (!chainKey) {
           continue
         }
-
         const content = `
 
-${contract.name}Processor.bind({ address: '${contract.address}', network: ${contract.chain} })
+${contract.name}Processor.bind({ address: '${contract.address}', network: EthChainId.${chainKey} })
   .onAllEvents((evt, ctx) => {
     ctx.meter.Counter('event_count').add(1, { name: evt.name })
     ctx.eventLogger.emit(evt.name, {

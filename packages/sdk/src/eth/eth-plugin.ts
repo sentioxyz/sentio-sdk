@@ -12,7 +12,6 @@ import {
   LogHandlerConfig,
   ProcessConfigResponse,
   ProcessResult,
-  RecordMetaData,
   StartRequest,
 } from '@sentio/protos'
 
@@ -22,7 +21,8 @@ import { AccountProcessorState } from './account-processor-state.js'
 import { ProcessorTemplateProcessorState, TemplateInstanceState } from './base-processor-template.js'
 import { GlobalProcessorState } from './base-processor.js'
 import { validateAndNormalizeAddress } from './eth.js'
-import { BaseContext, Labels } from '../core/index.js'
+import { EthChainId } from '../core/chain.js'
+import { EthContext } from './context.js'
 
 interface Handlers {
   eventHandlers: ((event: Data_EthLog) => Promise<ProcessResult>)[]
@@ -256,7 +256,7 @@ export class EthPlugin extends Plugin {
         {
           name: instance.contract.name,
           address: validateAndNormalizeAddress(instance.contract.address),
-          network: Number(instance.contract.chainId),
+          network: instance.contract.chainId as EthChainId,
           startBlock: instance.startBlock,
           endBlock: instance.endBlock,
         },
@@ -355,15 +355,12 @@ export class EthPlugin extends Plugin {
 
 PluginManager.INSTANCE.register(new EthPlugin())
 
-class NoopContext extends BaseContext {
+class NoopContext extends EthContext {
   public constructor() {
-    super({})
-  }
-  getChainId(): string {
-    return ''
+    super(EthChainId.ETHEREUM, '')
   }
 
-  getMetaDataInternal(name: string, labels: Labels): RecordMetaData {
-    return RecordMetaData.create()
+  protected getContractName(): string {
+    return ''
   }
 }

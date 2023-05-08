@@ -1,6 +1,5 @@
 import { Transaction_UserTransaction, TransactionPayload_EntryFunctionPayload } from '../aptos/index.js'
 import { DataBinding, HandlerType } from '@sentio/protos'
-import { getChainId } from '../aptos/network.js'
 import { TestProcessorServer } from './test-processor-server.js'
 import { AptosNetwork } from '@sentio/sdk/aptos'
 import { parseMoveType } from '../move/types.js'
@@ -35,7 +34,7 @@ export class AptosFacet {
   ): DataBinding | undefined {
     const payload = transaction.payload as TransactionPayload_EntryFunctionPayload
     for (const config of this.server.contractConfigs) {
-      if (config.contract?.chainId !== getChainId(network)) {
+      if (config.contract?.chainId !== network) {
         continue
       }
       for (const callConfig of config.moveCallConfigs) {
@@ -71,7 +70,7 @@ export class AptosFacet {
   ): DataBinding | undefined {
     // const allEvents = new Set(transaction.events.map(e => e.type))
     for (const config of this.server.contractConfigs) {
-      if (config.contract?.chainId !== getChainId(network)) {
+      if (config.contract?.chainId !== network) {
         continue
       }
       for (const eventConfig of config.moveEventConfigs) {

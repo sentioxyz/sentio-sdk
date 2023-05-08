@@ -1,7 +1,7 @@
 import { RecordMetaData } from '@sentio/protos'
 import { type Labels, BaseContext, normalizeLabels } from '@sentio/sdk'
 import { Transaction_UserTransaction } from './move-types.js'
-import { AptosNetwork, getChainId } from './network.js'
+import { AptosNetwork } from './network.js'
 import { defaultMoveCoder, MoveCoder } from './move-coder.js'
 import { Endpoints } from '@sentio/runtime'
 import { ServerError, Status } from 'nice-grpc'
@@ -37,8 +37,8 @@ export class AptosContext extends BaseContext {
     }
   }
 
-  getChainId(): string {
-    return getChainId(this.network)
+  getChainId() {
+    return this.network
   }
 
   getMetaDataInternal(name: string, labels: Labels): RecordMetaData {
@@ -72,8 +72,8 @@ export class AptosResourcesContext extends BaseContext {
     this.coder = defaultMoveCoder(network)
   }
 
-  getChainId(): string {
-    return getChainId(this.network)
+  getChainId() {
+    return this.network
   }
 
   getMetaDataInternal(name: string, labels: Labels): RecordMetaData {
@@ -91,7 +91,7 @@ export class AptosResourcesContext extends BaseContext {
   }
 
   getClient(): AptosClient {
-    const chainServer = Endpoints.INSTANCE.chainServer.get(getChainId(this.network))
+    const chainServer = Endpoints.INSTANCE.chainServer.get(this.network)
     if (!chainServer) {
       throw new ServerError(Status.INTERNAL, 'RPC endpoint not provided')
     }

@@ -3,8 +3,8 @@ import { SolanaContext } from './solana-context.js'
 import { Instruction } from '@project-serum/anchor'
 import { SolanaBindOptions } from './solana-options.js'
 import { ListStateStorage } from '@sentio/runtime'
-import { CHAIN_IDS } from '@sentio/sdk'
 import { Labels } from '../core/index.js'
+import { SolanaChainId } from '../core/chain.js'
 
 type IndexConfigure = {
   startSlot: bigint
@@ -27,7 +27,7 @@ export class SolanaBaseProcessor {
   endpoint: string
   contractName: string
   baseLabels?: Labels
-  network: string
+  network: SolanaChainId
   processInnerInstruction: boolean
   config: IndexConfigure = { startSlot: 0n }
   instructionCoder: InstructionCoder
@@ -45,7 +45,7 @@ export class SolanaBaseProcessor {
     this.address = options.address
     this.contractName = options.name || ''
     this.processInnerInstruction = options.processInnerInstruction || false
-    this.network = options.network || CHAIN_IDS.SOLANA_MAINNET
+    this.network = options.network || SolanaChainId.SOLANA_MAINNET
     if (options.instructionCoder) {
       this.instructionCoder = options.instructionCoder
     }

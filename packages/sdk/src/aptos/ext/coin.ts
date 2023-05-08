@@ -1,8 +1,8 @@
 import { getPriceByType } from '@sentio/sdk/utils'
-import { CHAIN_IDS } from '@sentio/sdk'
 import fetch from 'node-fetch'
 import { validateAndNormalizeAddress } from '../utils.js'
 import { SPLITTER } from '../../move/index.js'
+import { AptosChainId } from '../../core/chain.js'
 
 const WHITELISTED_COINS = new Map<string, SimpleCoinInfo>()
 
@@ -74,7 +74,7 @@ export async function getPrice(coinType: string, timestamp: number): Promise<num
   }
   const date = new Date(timestamp / 1000)
   try {
-    return (await getPriceByType(CHAIN_IDS.APTOS_MAINNET, coinType, date)) || 0
+    return (await getPriceByType(AptosChainId.APTOS_MAINNET, coinType, date)) || 0
   } catch (error) {
     console.log(JSON.stringify(error))
     throw error

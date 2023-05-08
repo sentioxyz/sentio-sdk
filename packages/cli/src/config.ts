@@ -1,3 +1,5 @@
+import { ChainId } from './chain.js'
+
 const HostMap: { [host: string]: string } = {
   local: 'http://localhost:10000',
   test: 'https://test.sentio.xyz',
@@ -7,7 +9,7 @@ const HostMap: { [host: string]: string } = {
 
 export interface YamlContractConfig {
   address: string
-  chain: string
+  chain: ChainId
   name: string
 }
 

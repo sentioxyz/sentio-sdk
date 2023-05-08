@@ -8,7 +8,7 @@ import {
   ProcessResult,
 } from '@sentio/protos'
 import { ListStateStorage, mergeProcessResults } from '@sentio/runtime'
-import { getChainId, SuiNetwork } from './network.js'
+import { SuiNetwork } from './network.js'
 import { ServerError, Status } from 'nice-grpc'
 import { SuiContext, SuiObjectsContext } from './context.js'
 import {
@@ -71,7 +71,7 @@ export class SuiBaseProcessor {
   }
 
   getChainId(): string {
-    return getChainId(this.config.network)
+    return this.config.network
   }
 
   public onMoveEvent(
@@ -236,7 +236,7 @@ abstract class SuiBaseObjectsProcessor<HandlerType> {
   }
 
   getChainId(): string {
-    return getChainId(this.config.network)
+    return this.config.network
   }
 
   // protected abstract transformObjects(objects: SuiMoveObject[]): SuiMoveObject[]

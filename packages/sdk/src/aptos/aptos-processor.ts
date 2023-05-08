@@ -6,7 +6,7 @@ import {
 } from './move-types.js'
 
 import { defaultMoveCoder, MoveCoder } from './move-coder.js'
-import { AptosBindOptions, AptosNetwork, getChainId } from './network.js'
+import { AptosBindOptions, AptosNetwork } from './network.js'
 import { AptosContext, AptosResourcesContext } from './context.js'
 import { ListStateStorage, mergeProcessResults } from '@sentio/runtime'
 import {
@@ -205,7 +205,7 @@ export class AptosBaseProcessor {
   }
 
   getChainId(): string {
-    return getChainId(this.config.network)
+    return this.config.network
   }
 
   // loadTypes(registry: MoveCoder) {
@@ -240,7 +240,7 @@ export class AptosResourcesProcessor {
   }
 
   getChainId(): string {
-    return getChainId(this.config.network)
+    return this.config.network
   }
 
   private onInterval(
