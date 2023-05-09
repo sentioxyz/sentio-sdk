@@ -1,16 +1,11 @@
 import { BigDecimal } from '@sentio/bigdecimal'
 import { calculateValueInUsd, getCoinInfo, whitelistCoins, whiteListed } from './coin.js'
-import {
-  AptosResourcesContext,
-  MoveResource,
-  AptosContext,
-  AptosNetwork,
-  MoveModuleBytecode,
-  Event,
-} from '@sentio/sdk/aptos'
 import { MoveCoinList, MoveDex, MovePoolAdaptor, SimpleCoinInfo } from '../../move/ext/index.js'
+import { SuiMoveObject, SuiMovePackage } from '@mysten/sui.js'
+import { SuiNetwork } from '../network.js'
+import { SuiContext, SuiObjectsContext } from '../context.js'
 
-export type PoolAdaptor<T> = MovePoolAdaptor<MoveResource, T>
+export type PoolAdaptor<T> = MovePoolAdaptor<SuiMoveObject, T>
 
 export class CoinList implements MoveCoinList {
   calculateValueInUsd(amount: bigint, coinInfo: SimpleCoinInfo, timestamp: number): Promise<BigDecimal> {
@@ -30,17 +25,17 @@ export class CoinList implements MoveCoinList {
   }
 }
 
-export const AptosCoinList = new CoinList()
+export const SuiCoinList = new CoinList()
 
-export class AptosDex<T> extends MoveDex<
-  AptosNetwork,
-  MoveModuleBytecode,
-  MoveResource,
+export class SuiDex<T> extends MoveDex<
+  SuiNetwork,
+  SuiMovePackage,
+  SuiMoveObject,
   Event,
-  AptosContext,
-  AptosResourcesContext,
+  SuiContext,
+  SuiObjectsContext,
   T
 > {
-  coinList = new CoinList()
+  coinList = SuiCoinList
   declare poolAdaptor: PoolAdaptor<T>
 }

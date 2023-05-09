@@ -1,14 +1,20 @@
 import { RecordMetaData } from '@sentio/protos'
-import { type Labels, BaseContext, normalizeLabels } from '../index.js'
+import { type Labels, normalizeLabels } from '../index.js'
 import { SuiNetwork } from './network.js'
-import { SuiTransactionBlockResponse, JsonRpcProvider, Connection } from '@mysten/sui.js'
+import {
+  SuiTransactionBlockResponse,
+  JsonRpcProvider,
+  Connection,
+  SuiEvent,
+  SuiMoveNormalizedModule,
+  SuiMoveObject,
+} from '@mysten/sui.js'
 import { MoveCoder, defaultMoveCoder } from './move-coder.js'
 import { Endpoints } from '@sentio/runtime'
 import { ServerError, Status } from 'nice-grpc'
+import { MoveAccountContext, MoveContext } from '../move/index.js'
 
-export class SuiContext extends BaseContext {
-  address: string
-  network: SuiNetwork
+export class SuiContext extends MoveContext<SuiNetwork, SuiMoveNormalizedModule, SuiEvent | SuiMoveObject> {
   moduleName: string
   timestamp: Date
   slot: bigint
@@ -40,7 +46,11 @@ export class SuiContext extends BaseContext {
   }
 
   getChainId() {
-    return this.network as any
+    return this.network
+  }
+
+  getTimestamp(): number {
+    return this.timestamp.getDate()
   }
 
   getMetaDataInternal(name: string, labels: Labels): RecordMetaData {
@@ -66,7 +76,11 @@ export class SuiContext extends BaseContext {
   }
 }
 
-export class SuiObjectsContext extends BaseContext {
+export class SuiObjectsContext extends MoveAccountContext<
+  SuiNetwork,
+  SuiMoveNormalizedModule,
+  SuiEvent | SuiMoveObject
+> {
   address: string
   network: SuiNetwork
   slot: bigint
@@ -83,7 +97,7 @@ export class SuiObjectsContext extends BaseContext {
   }
 
   getChainId() {
-    return this.network as any
+    return this.network
   }
 
   getMetaDataInternal(name: string, labels: Labels): RecordMetaData {
@@ -106,5 +120,9 @@ export class SuiObjectsContext extends BaseContext {
       throw new ServerError(Status.INTERNAL, 'RPC endpoint not provided')
     }
     return new JsonRpcProvider(new Connection({ fullnode: chainServer }))
+  }
+
+  getTimestamp(): number {
+    return this.timestamp.getDate()
   }
 }

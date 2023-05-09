@@ -3,15 +3,9 @@ import fetch from 'node-fetch'
 import { validateAndNormalizeAddress } from '../utils.js'
 import { SPLITTER } from '../../move/index.js'
 import { AptosChainId } from '../../core/chain.js'
+import { SimpleCoinInfo } from '../../move/ext/move-dex.js'
 
 const WHITELISTED_COINS = new Map<string, SimpleCoinInfo>()
-
-export interface SimpleCoinInfo {
-  token_type: { type: string; account_address: string }
-  symbol: string
-  decimals: number
-  bridge: string
-}
 
 export async function initCoinList() {
   let list = DEFAULT_LIST
@@ -81,10 +75,7 @@ export async function getPrice(coinType: string, timestamp: number): Promise<num
   }
 }
 
-export async function calculateValueInUsd(n: bigint, coinInfo: SimpleCoinInfo, timestamp: number | string) {
-  if (typeof timestamp === 'string') {
-    timestamp = parseInt(timestamp)
-  }
+export async function calculateValueInUsd(n: bigint, coinInfo: SimpleCoinInfo, timestamp: number) {
   const price = await getPrice(coinInfo.token_type.type, timestamp)
   const amount = n.scaleDown(coinInfo.decimals)
   return amount.multipliedBy(price)

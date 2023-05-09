@@ -1,15 +1,14 @@
 import { RecordMetaData } from '@sentio/protos'
-import { type Labels, BaseContext, normalizeLabels } from '@sentio/sdk'
-import { Transaction_UserTransaction } from './move-types.js'
+import { type Labels, normalizeLabels } from '@sentio/sdk'
+import { Event, MoveModuleBytecode, MoveResource, Transaction_UserTransaction } from './move-types.js'
 import { AptosNetwork } from './network.js'
 import { defaultMoveCoder, MoveCoder } from './move-coder.js'
 import { Endpoints } from '@sentio/runtime'
 import { ServerError, Status } from 'nice-grpc'
 import { AptosClient } from 'aptos-sdk'
+import { MoveAccountContext, MoveContext } from '../move/index.js'
 
-export class AptosContext extends BaseContext {
-  address: string
-  network: AptosNetwork
+export class AptosContext extends MoveContext<AptosNetwork, MoveModuleBytecode, Event | MoveResource> {
   moduleName: string
   version: bigint
   transaction: Transaction_UserTransaction
@@ -41,6 +40,10 @@ export class AptosContext extends BaseContext {
     return this.network
   }
 
+  getTimestamp(): number {
+    return parseInt(this.transaction.timestamp)
+  }
+
   getMetaDataInternal(name: string, labels: Labels): RecordMetaData {
     return {
       address: this.address,
@@ -56,9 +59,7 @@ export class AptosContext extends BaseContext {
   }
 }
 
-export class AptosResourcesContext extends BaseContext {
-  address: string
-  network: AptosNetwork
+export class AptosResourcesContext extends MoveAccountContext<AptosNetwork, MoveModuleBytecode, Event | MoveResource> {
   version: bigint
   timestampInMicros: number
   coder: MoveCoder
@@ -74,6 +75,10 @@ export class AptosResourcesContext extends BaseContext {
 
   getChainId() {
     return this.network
+  }
+
+  getTimestamp(): number {
+    return this.timestampInMicros
   }
 
   getMetaDataInternal(name: string, labels: Labels): RecordMetaData {

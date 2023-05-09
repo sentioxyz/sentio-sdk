@@ -270,7 +270,7 @@ export abstract class AbstractMoveCoder<Network, ModuleType, StructType> {
     return this.decodeArray(res, f.return)
   }
 
-  protected async filterAndDecodeStruct<T, ST extends StructType>(
+  async filterAndDecodeStruct<T, ST extends StructType>(
     typeMatcher: TypeDescriptor<T>,
     structsWithTags: ST[]
   ): Promise<DecodedStruct<ST, T>[]> {
