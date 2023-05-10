@@ -1,5 +1,5 @@
 import { SimpleCoinInfo } from '../../move/ext/index.js'
-// import fetch from "node-fetch";
+import fetch from 'node-fetch'
 import { SPLITTER } from '../../move/index.js'
 import { getPriceByType } from '../../utils/index.js'
 import { SuiChainId } from '../../core/chain.js'
@@ -8,15 +8,13 @@ import { validateAndNormalizeAddress } from '../utils.js'
 const WHITELISTED_COINS = new Map<string, SimpleCoinInfo>()
 
 export async function initCoinList() {
-  const list = DEFAULT_LIST.coinlist
-  // try {
-  //   const resp = await fetch(
-  //       'https://raw.githubusercontent.com/hippospace/aptos-coin-list/main/src/permissionless.json'
-  //   )
-  //   list = (await resp.json()) as any[]
-  // } catch (e) {
-  //   console.warn("Can't not fetch newest coin list, use default list")
-  // }
+  let list = DEFAULT_LIST.coinlist
+  try {
+    const resp = await fetch('https://raw.githubusercontent.com/solflare-wallet/sui-coinlist/master/sui-coinlist.json')
+    list = ((await resp.json()) as any).coinlist
+  } catch (e) {
+    console.warn("Can't not fetch newest coin list, use default list")
+  }
 
   setCoinList(list)
 }
@@ -27,11 +25,6 @@ export interface SuiCoinInfo {
   symbol: string
   name: string
   decimals: number
-  // "logoURI": "https://cryptototem.com/wp-content/uploads/2022/08/SUI-logo.jpg",
-  // "tags": [],
-  // "extensions": {
-  //   "coingeckoId": "sui"
-  // }
 }
 
 function setCoinList(list: SuiCoinInfo[]) {

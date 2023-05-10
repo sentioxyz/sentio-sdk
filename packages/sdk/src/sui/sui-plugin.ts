@@ -11,12 +11,14 @@ import {
   MoveEventHandlerConfig,
   ProcessConfigResponse,
   ProcessResult,
+  StartRequest,
 } from '@sentio/protos'
 
 import { ServerError, Status } from 'nice-grpc'
 
 import { SuiAccountProcessorState, SuiProcessorState } from './sui-processor.js'
 import { validateAndNormalizeAddress } from './utils.js'
+import { initCoinList } from './ext/coin.js'
 
 interface Handlers {
   suiEventHandlers: ((event: Data_SuiEvent) => Promise<ProcessResult>)[]
@@ -30,6 +32,9 @@ export class SuiPlugin extends Plugin {
     suiCallHandlers: [],
     suiEventHandlers: [],
     suiObjectHandlers: [],
+  }
+  async start(start: StartRequest): Promise<void> {
+    await initCoinList()
   }
 
   async configure(config: ProcessConfigResponse) {
