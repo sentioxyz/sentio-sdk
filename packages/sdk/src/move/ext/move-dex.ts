@@ -215,41 +215,42 @@ export class MoveDex<
     }
     return `${coinXInfo.symbol}-${coinYInfo.symbol}`
   }
+}
 
-  async getPairValue(
-    ctx: ContextType,
-    coinx: string,
-    coiny: string,
-    coinXAmount: bigint,
-    coinYAmount: bigint
-  ): Promise<BigDecimal> {
-    const whitelistx = this.coinList.whiteListed(coinx)
-    const whitelisty = this.coinList.whiteListed(coiny)
-    const coinXInfo = await this.coinList.getCoinInfo(coinx)
-    const coinYInfo = await this.coinList.getCoinInfo(coiny)
-    const timestamp = ctx.getTimestamp()
-    let result = BigDecimal(0.0)
+export async function moveGetPairValue<ContextType extends MoveAccountContext<any, any, any>>(
+  coinList: MoveCoinList,
+  ctx: ContextType,
+  coinx: string,
+  coiny: string,
+  coinXAmount: bigint,
+  coinYAmount: bigint
+): Promise<BigDecimal> {
+  const whitelistx = coinList.whiteListed(coinx)
+  const whitelisty = coinList.whiteListed(coiny)
+  const coinXInfo = await coinList.getCoinInfo(coinx)
+  const coinYInfo = await coinList.getCoinInfo(coiny)
+  const timestamp = ctx.getTimestamp()
+  let result = BigDecimal(0.0)
 
-    if (!whitelistx || !whitelisty) {
-      return result
-    }
-
-    if (whitelistx) {
-      const value = await this.coinList.calculateValueInUsd(coinXAmount, coinXInfo, timestamp)
-      result = value
-
-      if (!whitelisty) {
-        result = result.plus(value)
-      }
-    }
-    if (whitelisty) {
-      const value = await this.coinList.calculateValueInUsd(coinYAmount, coinYInfo, timestamp)
-
-      if (!whitelistx) {
-        result = result.plus(value)
-      }
-    }
-
+  if (!whitelistx || !whitelisty) {
     return result
   }
+
+  if (whitelistx) {
+    const value = await coinList.calculateValueInUsd(coinXAmount, coinXInfo, timestamp)
+    result = value
+
+    if (!whitelisty) {
+      result = result.plus(value)
+    }
+  }
+  if (whitelisty) {
+    const value = await coinList.calculateValueInUsd(coinYAmount, coinYInfo, timestamp)
+
+    if (!whitelistx) {
+      result = result.plus(value)
+    }
+  }
+
+  return result
 }

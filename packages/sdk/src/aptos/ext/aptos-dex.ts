@@ -8,7 +8,7 @@ import {
   MoveModuleBytecode,
   Event,
 } from '@sentio/sdk/aptos'
-import { MoveCoinList, MoveDex, MovePoolAdaptor, SimpleCoinInfo } from '../../move/ext/index.js'
+import { MoveCoinList, MoveDex, moveGetPairValue, MovePoolAdaptor, SimpleCoinInfo } from '../../move/ext/index.js'
 
 export type PoolAdaptor<T> = MovePoolAdaptor<MoveResource, T>
 
@@ -43,4 +43,14 @@ export class AptosDex<T> extends MoveDex<
 > {
   coinList = new CoinList()
   declare poolAdaptor: PoolAdaptor<T>
+}
+
+export async function getPairValue(
+  ctx: AptosContext,
+  coinx: string,
+  coiny: string,
+  coinXAmount: bigint,
+  coinYAmount: bigint
+): Promise<BigDecimal> {
+  return moveGetPairValue(AptosCoinList, ctx, coinx, coiny, coinXAmount, coinYAmount)
 }

@@ -1,6 +1,6 @@
 import { BigDecimal } from '@sentio/bigdecimal'
 import { calculateValueInUsd, getCoinInfo, whitelistCoins, whiteListed } from './coin.js'
-import { MoveCoinList, MoveDex, MovePoolAdaptor, SimpleCoinInfo } from '../../move/ext/index.js'
+import { MoveCoinList, MoveDex, moveGetPairValue, MovePoolAdaptor, SimpleCoinInfo } from '../../move/ext/index.js'
 import { SuiMoveObject, SuiMovePackage } from '@mysten/sui.js'
 import { SuiNetwork } from '../network.js'
 import { SuiContext, SuiObjectsContext } from '../context.js'
@@ -38,4 +38,14 @@ export class SuiDex<T> extends MoveDex<
 > {
   coinList = SuiCoinList
   declare poolAdaptor: PoolAdaptor<T>
+}
+
+export async function getPairValue(
+  ctx: SuiContext,
+  coinx: string,
+  coiny: string,
+  coinXAmount: bigint,
+  coinYAmount: bigint
+): Promise<BigDecimal> {
+  return moveGetPairValue(SuiCoinList, ctx, coinx, coiny, coinXAmount, coinYAmount)
 }
