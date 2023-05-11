@@ -351,3 +351,25 @@ export class SuiObjectProcessor extends SuiBaseObjectsProcessor<
     return handler(data.self as SuiMoveObject, data.objects as SuiMoveObject[], ctx)
   }
 }
+
+export class SuiWrappedObjectProcessor extends SuiBaseObjectsProcessor<
+  (dynamicFieldObjects: SuiMoveObject[], ctx: SuiObjectsContext) => PromiseOrVoid
+> {
+  static bind(options: SuiObjectBindOptions): SuiObjectProcessor {
+    return new SuiObjectProcessor({
+      address: options.objectId,
+      network: options.network,
+      startCheckpoint: options.startCheckpoint,
+      ownerType: MoveOnIntervalConfig_OwnerType.WRAPPED_OBJECT,
+      baseLabels: options.baseLabels,
+    })
+  }
+
+  protected doHandle(
+    handler: (dynamicFieldObjects: SuiMoveObject[], ctx: SuiObjectsContext) => PromiseOrVoid,
+    data: Data_SuiObject,
+    ctx: SuiObjectsContext
+  ): PromiseOrVoid {
+    return handler(data.objects as SuiMoveObject[], ctx)
+  }
+}

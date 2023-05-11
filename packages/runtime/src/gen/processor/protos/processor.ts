@@ -408,6 +408,7 @@ export interface MoveOnIntervalConfig {
 export enum MoveOnIntervalConfig_OwnerType {
   ADDRESS = 0,
   OBJECT = 1,
+  WRAPPED_OBJECT = 2,
   UNRECOGNIZED = -1,
 }
 
@@ -419,6 +420,9 @@ export function moveOnIntervalConfig_OwnerTypeFromJSON(object: any): MoveOnInter
     case 1:
     case "OBJECT":
       return MoveOnIntervalConfig_OwnerType.OBJECT;
+    case 2:
+    case "WRAPPED_OBJECT":
+      return MoveOnIntervalConfig_OwnerType.WRAPPED_OBJECT;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -432,6 +436,8 @@ export function moveOnIntervalConfig_OwnerTypeToJSON(object: MoveOnIntervalConfi
       return "ADDRESS";
     case MoveOnIntervalConfig_OwnerType.OBJECT:
       return "OBJECT";
+    case MoveOnIntervalConfig_OwnerType.WRAPPED_OBJECT:
+      return "WRAPPED_OBJECT";
     case MoveOnIntervalConfig_OwnerType.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";

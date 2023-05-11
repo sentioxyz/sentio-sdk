@@ -184,6 +184,7 @@ message MoveOnIntervalConfig {
   enum OwnerType {
     ADDRESS = 0;
     OBJECT = 1;
+    WRAPPED_OBJECT = 2;
   }
   OwnerType owner_type = 3;
 }
