@@ -355,8 +355,8 @@ export class SuiObjectProcessor extends SuiBaseObjectsProcessor<
 export class SuiWrappedObjectProcessor extends SuiBaseObjectsProcessor<
   (dynamicFieldObjects: SuiMoveObject[], ctx: SuiObjectsContext) => PromiseOrVoid
 > {
-  static bind(options: SuiObjectBindOptions): SuiObjectProcessor {
-    return new SuiObjectProcessor({
+  static bind(options: SuiObjectBindOptions): SuiWrappedObjectProcessor {
+    return new SuiWrappedObjectProcessor({
       address: options.objectId,
       network: options.network,
       startCheckpoint: options.startCheckpoint,
