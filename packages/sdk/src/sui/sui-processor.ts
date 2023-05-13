@@ -19,7 +19,14 @@ import {
   SuiMoveObject,
   SuiTransactionBlockResponse,
 } from '@mysten/sui.js'
-import { CallHandler, EventFilter, EventHandler, FunctionNameAndCallFilter, parseMoveType } from '../move/index.js'
+import {
+  CallHandler,
+  EventFilter,
+  EventHandler,
+  FunctionNameAndCallFilter,
+  parseMoveType,
+  SPLITTER,
+} from '../move/index.js'
 import { getMoveCalls } from './utils.js'
 import { defaultMoveCoder, MoveCoder } from './move-coder.js'
 import { Labels, PromiseOrVoid } from '../core/index.js'
@@ -173,25 +180,21 @@ export class SuiBaseProcessor {
         )
         if (tx) {
           const calls: MoveCallSuiTransaction[] = getMoveCalls(tx)
-          // if (calls.length !== 1) {
-          //   throw new ServerError(Status.INVALID_ARGUMENT, 'Unexpected number of call transactions ' + calls.length)
-          // }
           const txKind = getTransactionKind(tx)
           if (!txKind) {
             throw new ServerError(Status.INVALID_ARGUMENT, 'Unexpected getTransactionKind get empty')
           }
           const programmableTx = getProgrammableTransaction(txKind)
 
-          let matched: MoveCallSuiTransaction
           // TODO potential pass index
           for (const call of calls) {
-            if (allFunctionType.has(call.function)) {
-              matched = call
-              break
+            const functionType = [call.package, call.module, call.function].join(SPLITTER)
+            if (!allFunctionType.has(functionType)) {
+              continue
             }
 
-            const payload = calls[0]
-            const decoded = await processor.coder.decodeFunctionPayload(payload, programmableTx?.inputs || [])
+            // TODO maybe do in parallel
+            const decoded = await processor.coder.decodeFunctionPayload(call, programmableTx?.inputs || [])
             await handler(decoded, ctx)
           }
         }
