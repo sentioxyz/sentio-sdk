@@ -1,17 +1,14 @@
 import { RecordMetaData } from '@sentio/protos'
 import { type Labels, normalizeLabels } from '../index.js'
-import { SuiNetwork } from './network.js'
+import { getClient, SuiNetwork } from './network.js'
 import {
   SuiTransactionBlockResponse,
   JsonRpcProvider,
-  Connection,
   SuiEvent,
   SuiMoveNormalizedModule,
   SuiMoveObject,
 } from '@mysten/sui.js'
 import { MoveCoder, defaultMoveCoder } from './move-coder.js'
-import { Endpoints } from '@sentio/runtime'
-import { ServerError, Status } from 'nice-grpc'
 import { MoveAccountContext, MoveContext } from '../move/index.js'
 
 export class SuiContext extends MoveContext<SuiNetwork, SuiMoveNormalizedModule, SuiEvent | SuiMoveObject> {
@@ -68,11 +65,7 @@ export class SuiContext extends MoveContext<SuiNetwork, SuiMoveNormalizedModule,
   }
 
   get client(): JsonRpcProvider {
-    const chainServer = Endpoints.INSTANCE.chainServer.get(this.network)
-    if (!chainServer) {
-      throw new ServerError(Status.INTERNAL, 'RPC endpoint not provided')
-    }
-    return new JsonRpcProvider(new Connection({ fullnode: chainServer }))
+    return getClient(this.network)
   }
 }
 
@@ -115,11 +108,7 @@ export class SuiObjectsContext extends MoveAccountContext<
   }
 
   get client(): JsonRpcProvider {
-    const chainServer = Endpoints.INSTANCE.chainServer.get(this.network)
-    if (!chainServer) {
-      throw new ServerError(Status.INTERNAL, 'RPC endpoint not provided')
-    }
-    return new JsonRpcProvider(new Connection({ fullnode: chainServer }))
+    return getClient(this.network)
   }
 
   getTimestamp(): number {

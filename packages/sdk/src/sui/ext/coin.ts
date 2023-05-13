@@ -4,6 +4,8 @@ import { SPLITTER } from '../../move/index.js'
 import { getPriceByType } from '../../utils/index.js'
 import { SuiChainId } from '../../core/chain.js'
 import { validateAndNormalizeAddress } from '../utils.js'
+import { getClient, SuiNetwork } from '../network.js'
+import { CoinMetadata } from '@mysten/sui.js'
 
 const WHITELISTED_COINS = new Map<string, SimpleCoinInfo>()
 
@@ -76,6 +78,32 @@ export function getCoinInfo(type: string): SimpleCoinInfo {
       token_type: { type: type, account_address: parts[0] },
       symbol: parts[2],
       decimals: 8,
+      bridge: 'native',
+    }
+  }
+  return r
+}
+
+const COIN_METADATA_CACHE = new Map<string, Promise<CoinMetadata>>()
+
+export async function getCoinInfoWithFallback(type: string, network?: SuiNetwork): Promise<SimpleCoinInfo> {
+  const r = WHITELISTED_COINS.get(type)
+  if (!r) {
+    network = network || SuiChainId.SUI_MAINNET
+    const key = network + '_' + type
+    let promise = COIN_METADATA_CACHE.get(key)
+    if (!promise) {
+      const client = getClient(network)
+      promise = client.getCoinMetadata({ coinType: type })
+      COIN_METADATA_CACHE.set(key, promise)
+    }
+    const meta = await promise
+
+    const parts = type.split(SPLITTER)
+    return {
+      token_type: { type: type, account_address: parts[0] },
+      symbol: meta.symbol,
+      decimals: meta.decimals,
       bridge: 'native',
     }
   }

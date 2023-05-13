@@ -12,3 +12,5 @@ export * from './move-coder.js'
 export { SuiPlugin } from './sui-plugin.js'
 
 export { ModuleClient } from './module-client.js'
+
+export { validateAndNormalizeAddress, isValidSuiAddress } from './utils.js'
