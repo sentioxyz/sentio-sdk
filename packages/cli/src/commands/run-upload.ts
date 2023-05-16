@@ -256,11 +256,12 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth) {
     if (commitSha) {
       console.log('\t', chalk.blue('Git commit SHA:'), commitSha)
     }
-    const { projectFullSlug, version } = (await finishUploadResRaw.json()) as {
+    const { projectFullSlug, processorId, version } = (await finishUploadResRaw.json()) as {
       projectFullSlug: string
+      processorId: string
       version: string
     }
-    console.log('\t', chalk.blue('Check status:'), `${options.host}/${projectFullSlug}/datasource`)
+    console.log('\t', chalk.blue('Check status:'), `${options.host}/${projectFullSlug}/datasource/${processorId}`)
     console.log('\t', chalk.blue('Version:'), version)
   }
 
