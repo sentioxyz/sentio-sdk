@@ -8,10 +8,11 @@ import { ERC20Processor, TransferEvent as ERC20TransferEvent } from './builtin/e
 import { ERC721Processor, TransferEvent as ERC721TransferEvent } from './builtin/erc721.js'
 import { AccountContext } from './context.js'
 import { AddressOrTypeEventFilter, EventsHandler } from './base-processor.js'
-import { Block, LogDescription } from 'ethers'
+import { Block } from 'ethers'
 import { AccountProcessorState } from './account-processor-state.js'
-import { formatEthData } from './eth.js'
+import { fixEmptyKey, formatEthData, TypedEvent } from './eth.js'
 import { EthChainId } from '../core/chain.js'
+import { ServerError, Status } from 'nice-grpc'
 
 const ERC20_INTERFACE = ERC20__factory.createInterface()
 const ERC721_INTERFACE = ERC721__factory.createInterface()
@@ -194,7 +195,7 @@ export class AccountProcessor {
   }
 
   protected onEvent(
-    handler: (event: LogDescription, ctx: AccountContext) => PromiseOrVoid,
+    handler: (event: TypedEvent, ctx: AccountContext) => PromiseOrVoid,
     filter: AddressOrTypeEventFilter | AddressOrTypeEventFilter[],
     fetchConfig?: Partial<EthFetchConfig>
   ) {
@@ -231,7 +232,9 @@ export class AccountProcessor {
       fetchConfig: EthFetchConfig.fromPartial(fetchConfig || {}),
       handler: async function (data) {
         const { log, block, transaction, transactionReceipt } = formatEthData(data)
-
+        if (!log) {
+          throw new ServerError(Status.INVALID_ARGUMENT, 'Log is empty')
+        }
         // const log = data.log as { topics: Array<string>; data: string }
         const ctx = new AccountContext(
           chainId,
@@ -243,10 +246,12 @@ export class AccountProcessor {
           transaction,
           transactionReceipt
         )
+
         const logParam = log as any as { topics: Array<string>; data: string }
         const parsed = ERC20_INTERFACE.parseLog(logParam)
         if (parsed) {
-          await handler(parsed, ctx)
+          const event: TypedEvent = { ...log, name: parsed.name, args: fixEmptyKey(parsed) }
+          await handler(event, ctx)
           return ctx.getProcessResult()
         }
         return ProcessResult.fromPartial({})
