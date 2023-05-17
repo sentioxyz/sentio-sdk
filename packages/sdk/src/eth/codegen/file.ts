@@ -119,7 +119,9 @@ export class ${contract.name}ProcessorTemplate extends BaseProcessorTemplate<${c
   export function get${contract.name}ContractOnContext(context: EthContext, address: string): 
     ${contract.name}BoundContractView {
     const view = get${contract.name}Contract(context.getChainId(), address)
-    return new ${contract.name}BoundContractView(address, view) 
+    const boundView = new ${contract.name}BoundContractView(address, view) 
+    boundView.context = context as any;
+    return boundView;
   }
   `
   const eventsImports = Object.values(contract.events).flatMap((events) => {

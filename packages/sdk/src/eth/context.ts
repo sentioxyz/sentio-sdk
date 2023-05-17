@@ -179,7 +179,8 @@ export class BoundContractView<TContract extends BaseContract, TContractView ext
   protected view: TContractView
   readonly address: string
   // context will be set right after context creation (in context's constructor)
-  context: ContractContext<TContract, BoundContractView<TContract, TContractView>>
+  // context: ContractContext<TContract, BoundContractView<TContract, TContractView>>
+  context: EthContext
 
   constructor(address: string, view: TContractView) {
     this.address = address
