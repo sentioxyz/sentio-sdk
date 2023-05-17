@@ -3,7 +3,8 @@ import { getERC20BytesContract } from '../eth/builtin/erc20bytes.js'
 import { BigDecimal, scaleDown } from '../core/big-decimal.js'
 import { PromiseOrValue } from '../eth/builtin/internal/common.js'
 import { decodeBytes32String } from 'ethers'
-import { EthChainId, EthContext, getEthChainId } from '../eth/index.js'
+import { EthChainId, EthContext } from '../eth/index.js'
+import { BaseContext } from '../core/index.js'
 
 export interface TokenInfo {
   symbol: string
@@ -35,7 +36,13 @@ export async function getERC20TokenInfo(
   contextOrNetworkish: EthContext | EthChainId,
   tokenAddress: string
 ): Promise<TokenInfo> {
-  const chainId = getEthChainId(contextOrNetworkish)
+  let chainId: EthChainId
+  if (contextOrNetworkish instanceof BaseContext) {
+    chainId = contextOrNetworkish.getChainId()
+  } else {
+    chainId = contextOrNetworkish || EthChainId.ETHEREUM
+  }
+
   const key = chainId + tokenAddress
   const res = TOKEN_INFOS.get(key)
   if (res) {

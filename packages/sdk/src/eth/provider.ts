@@ -2,23 +2,21 @@ import { JsonRpcProvider, Network, Provider } from 'ethers'
 
 import PQueue from 'p-queue'
 import { Endpoints } from '@sentio/runtime'
-import { BaseContext } from '../core/index.js'
 import { EthChainId } from '../core/chain.js'
-import { EthContext } from './context.js'
 
 export const DummyProvider = new JsonRpcProvider('', Network.from(1))
 
 const providers = new Map<string, JsonRpcProvider>()
 
-export function getEthChainId(networkish?: EthContext | EthChainId): EthChainId {
-  if (!networkish) {
-    networkish = EthChainId.ETHEREUM
-  }
-  if (networkish instanceof BaseContext) {
-    networkish = networkish.getChainId()
-  }
-  return networkish
-}
+// export function getEthChainId(networkish?: EthContext | EthChainId): EthChainId {
+//   if (!networkish) {
+//     networkish = EthChainId.ETHEREUM
+//   }
+//   if (networkish instanceof BaseContext) {
+//     networkish = networkish.getChainId()
+//   }
+//   return networkish
+// }
 
 export function getProvider(chainId?: EthChainId): Provider {
   // const network = getNetworkFromCtxOrNetworkish(networkish)

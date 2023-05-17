@@ -106,17 +106,20 @@ export class ${contract.name}ProcessorTemplate extends BaseProcessorTemplate<${c
     .join('\n')}
   }
 
-  export function get${contract.name}Contract(contextOrNetwork: EthContext | EthChainId, address: string): ${
-    contract.name
-  }ContractView {
-    const network = getEthChainId(contextOrNetwork) 
-    let contract = getContractByABI("${contract.name}", address, network) as ${contract.name}ContractView
+  export function get${contract.name}Contract(chainId: EthChainId, address: string): ${contract.name}ContractView {
+    let contract = getContractByABI("${contract.name}", address, chainId) as ${contract.name}ContractView
     if (!contract) {
-      const rawContract = ${contract.name}__factory.connect(address, getProvider(network))
+      const rawContract = ${contract.name}__factory.connect(address, getProvider(chainId))
       contract = new ${contract.name}ContractView(rawContract)
-      addContractByABI("${contract.name}", address, network, contract)
+      addContractByABI("${contract.name}", address, chainId, contract)
     }
     return contract
+  }
+  
+  export function get${contract.name}ContractOnContext(context: EthContext, address: string): 
+    ${contract.name}BoundContractView {
+    const view = get${contract.name}Contract(context.getChainId(), address)
+    return new ${contract.name}BoundContractView(address, view) 
   }
   `
   const eventsImports = Object.values(contract.events).flatMap((events) => {
@@ -166,8 +169,6 @@ export class ${contract.name}ProcessorTemplate extends BaseProcessorTemplate<${c
         'DummyProvider',
         'EthChainId',
         'TypedCallTrace',
-        'getEthChainId',
-        // 'toBlockTag',
         'EthContext',
         'EthFetchConfig',
       ],
