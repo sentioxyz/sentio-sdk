@@ -175,8 +175,8 @@ export class ${contract.name}ProcessorTemplate extends BaseProcessorTemplate<${c
       // '@sentio/sdk/eth': ['BaseContext'],
       // '@sentio/protos': ['EthFetchConfig'],
       './common.js': ['PromiseOrValue'],
-      './index.js': [`${contract.name}`, `${contract.name}__factory`],
-      [`./${contract.name}.js`]: eventsImports.concat(uniqueStructImports),
+      './index.js': [`${contract.name}__factory`],
+      [`./${contract.name}.js`]: [`${contract.name}`, ...eventsImports, ...uniqueStructImports],
     },
     source
   )
