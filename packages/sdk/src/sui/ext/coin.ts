@@ -84,7 +84,7 @@ export function getCoinInfo(type: string): SimpleCoinInfo {
   return r
 }
 
-const COIN_METADATA_CACHE = new Map<string, Promise<CoinMetadata>>()
+const COIN_METADATA_CACHE = new Map<string, Promise<CoinMetadata | null>>()
 
 export async function getCoinInfoWithFallback(type: string, network?: SuiNetwork): Promise<SimpleCoinInfo> {
   const r = WHITELISTED_COINS.get(type)
@@ -98,6 +98,9 @@ export async function getCoinInfoWithFallback(type: string, network?: SuiNetwork
       COIN_METADATA_CACHE.set(key, promise)
     }
     const meta = await promise
+    if (meta === null) {
+      throw Error('Coin not existed ' + key)
+    }
 
     const parts = type.split(SPLITTER)
     return {
