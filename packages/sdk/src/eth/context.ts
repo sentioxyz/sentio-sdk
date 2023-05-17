@@ -13,7 +13,7 @@ export abstract class EthContext extends BaseContext {
   private readonly log?: LogParams
   block?: BlockParams
   private readonly trace?: Trace
-  blockNumber: bigint | number
+  blockNumber: number
   transactionHash?: string
   transaction?: TransactionResponseParams
   transactionReceipt?: TransactionReceiptParams
