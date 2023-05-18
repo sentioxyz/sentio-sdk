@@ -2,8 +2,8 @@ import { expect } from 'chai'
 import { TestProcessorServer } from '../../testing/index.js'
 import { SuiNetwork } from '../network.js'
 import { sui_system, validator } from '../builtin/0x3.js'
-import { SuiObjectProcessor } from '../sui-processor.js'
-import { MoveOnIntervalConfig_OwnerType } from '@sentio/protos'
+import { SuiObjectProcessor } from '../sui-object-processor.js'
+import { MoveOwnerType } from '@sentio/protos'
 
 describe('Test Sui Example', () => {
   const service = new TestProcessorServer(async () => {
@@ -32,7 +32,7 @@ describe('Test Sui Example', () => {
     const config = await service.getConfig({})
     expect(config.contractConfigs).length(2)
     expect(config.accountConfigs).length(1)
-    expect(config.accountConfigs[0].moveIntervalConfigs[0].ownerType).eq(MoveOnIntervalConfig_OwnerType.OBJECT)
+    expect(config.accountConfigs[0].moveIntervalConfigs[0].ownerType).eq(MoveOwnerType.OBJECT)
   })
 
   test('Check event dispatch', async () => {

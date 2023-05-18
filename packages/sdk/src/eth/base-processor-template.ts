@@ -8,15 +8,12 @@ import { ListStateStorage } from '@sentio/runtime'
 import { BlockParams } from 'ethers/providers'
 import { DeferredTopicFilter } from 'ethers/contract'
 import { TypedEvent, TypedCallTrace } from './eth.js'
+import { TemplateInstanceState } from '../core/template.js'
 
 export class ProcessorTemplateProcessorState extends ListStateStorage<
   BaseProcessorTemplate<BaseContract, BoundContractView<BaseContract, any>>
 > {
   static INSTANCE = new ProcessorTemplateProcessorState()
-}
-
-export class TemplateInstanceState extends ListStateStorage<TemplateInstance> {
-  static INSTANCE = new TemplateInstanceState()
 }
 
 export abstract class BaseProcessorTemplate<
@@ -53,9 +50,7 @@ export abstract class BaseProcessorTemplate<
    * @param ctx
    */
   public bind(options: BindOptions, ctx: EthContext): void {
-    if (!options.network) {
-      options.network = ctx.getChainId()
-    }
+    options.network = options.network || ctx.chainId
     const sig = getOptionsSignature({
       address: options.address,
       network: options.network,

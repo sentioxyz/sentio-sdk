@@ -9,10 +9,10 @@ import {
   HandlerType,
   MoveCallHandlerConfig,
   MoveEventHandlerConfig,
+  MoveOwnerType,
   ProcessConfigResponse,
   ProcessResult,
   StartRequest,
-  MoveOnIntervalConfig_OwnerType,
 } from '@sentio/protos'
 
 import { ServerError, Status } from 'nice-grpc'
@@ -100,19 +100,6 @@ export class AptosPlugin extends Plugin {
       })
       for (const handler of aptosProcessor.resourcesHandlers) {
         const handlerId = handlers.aptosResourceHandlers.push(handler.handler) - 1
-        // TODO move to only use moveIntervalConfigs
-        accountConfig.aptosIntervalConfigs.push({
-          intervalConfig: {
-            handlerId: handlerId,
-            minutes: 0,
-            minutesInterval: handler.timeIntervalInMinutes,
-            slot: 0,
-            slotInterval: handler.versionInterval,
-            fetchConfig: undefined,
-          },
-          type: handler.type || '',
-        })
-
         accountConfig.moveIntervalConfigs.push({
           intervalConfig: {
             handlerId: handlerId,
@@ -123,7 +110,8 @@ export class AptosPlugin extends Plugin {
             fetchConfig: undefined,
           },
           type: handler.type || '',
-          ownerType: MoveOnIntervalConfig_OwnerType.ADDRESS,
+          ownerType: MoveOwnerType.ADDRESS,
+          fetchConfig: undefined,
         })
       }
       config.accountConfigs.push(accountConfig)

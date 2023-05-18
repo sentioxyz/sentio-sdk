@@ -84,6 +84,45 @@ export function aggregationTypeToJSON(object: AggregationType): string {
   }
 }
 
+export enum MoveOwnerType {
+  ADDRESS = 0,
+  OBJECT = 1,
+  WRAPPED_OBJECT = 2,
+  UNRECOGNIZED = -1,
+}
+
+export function moveOwnerTypeFromJSON(object: any): MoveOwnerType {
+  switch (object) {
+    case 0:
+    case "ADDRESS":
+      return MoveOwnerType.ADDRESS;
+    case 1:
+    case "OBJECT":
+      return MoveOwnerType.OBJECT;
+    case 2:
+    case "WRAPPED_OBJECT":
+      return MoveOwnerType.WRAPPED_OBJECT;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return MoveOwnerType.UNRECOGNIZED;
+  }
+}
+
+export function moveOwnerTypeToJSON(object: MoveOwnerType): string {
+  switch (object) {
+    case MoveOwnerType.ADDRESS:
+      return "ADDRESS";
+    case MoveOwnerType.OBJECT:
+      return "OBJECT";
+    case MoveOwnerType.WRAPPED_OBJECT:
+      return "WRAPPED_OBJECT";
+    case MoveOwnerType.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
 export enum AddressType {
   ERC20 = 0,
   ERC721 = 1,
@@ -375,7 +414,6 @@ export interface AccountConfig {
   address: string;
   startBlock: bigint;
   intervalConfigs: OnIntervalConfig[];
-  aptosIntervalConfigs: AptosOnIntervalConfig[];
   moveIntervalConfigs: MoveOnIntervalConfig[];
   logConfigs: LogHandlerConfig[];
 }
@@ -402,46 +440,8 @@ export interface AptosOnIntervalConfig {
 export interface MoveOnIntervalConfig {
   intervalConfig: OnIntervalConfig | undefined;
   type: string;
-  ownerType: MoveOnIntervalConfig_OwnerType;
-}
-
-export enum MoveOnIntervalConfig_OwnerType {
-  ADDRESS = 0,
-  OBJECT = 1,
-  WRAPPED_OBJECT = 2,
-  UNRECOGNIZED = -1,
-}
-
-export function moveOnIntervalConfig_OwnerTypeFromJSON(object: any): MoveOnIntervalConfig_OwnerType {
-  switch (object) {
-    case 0:
-    case "ADDRESS":
-      return MoveOnIntervalConfig_OwnerType.ADDRESS;
-    case 1:
-    case "OBJECT":
-      return MoveOnIntervalConfig_OwnerType.OBJECT;
-    case 2:
-    case "WRAPPED_OBJECT":
-      return MoveOnIntervalConfig_OwnerType.WRAPPED_OBJECT;
-    case -1:
-    case "UNRECOGNIZED":
-    default:
-      return MoveOnIntervalConfig_OwnerType.UNRECOGNIZED;
-  }
-}
-
-export function moveOnIntervalConfig_OwnerTypeToJSON(object: MoveOnIntervalConfig_OwnerType): string {
-  switch (object) {
-    case MoveOnIntervalConfig_OwnerType.ADDRESS:
-      return "ADDRESS";
-    case MoveOnIntervalConfig_OwnerType.OBJECT:
-      return "OBJECT";
-    case MoveOnIntervalConfig_OwnerType.WRAPPED_OBJECT:
-      return "WRAPPED_OBJECT";
-    case MoveOnIntervalConfig_OwnerType.UNRECOGNIZED:
-    default:
-      return "UNRECOGNIZED";
-  }
+  ownerType: MoveOwnerType;
+  fetchConfig: MoveAccountFetchConfig | undefined;
 }
 
 export interface ContractInfo {
@@ -505,6 +505,10 @@ export interface InstructionHandlerConfig {
 export interface MoveFetchConfig {
   resourceChanges: boolean;
   allEvents: boolean;
+}
+
+export interface MoveAccountFetchConfig {
+  owned: boolean;
 }
 
 export interface MoveEventHandlerConfig {
@@ -1687,7 +1691,6 @@ function createBaseAccountConfig(): AccountConfig {
     address: "",
     startBlock: BigInt("0"),
     intervalConfigs: [],
-    aptosIntervalConfigs: [],
     moveIntervalConfigs: [],
     logConfigs: [],
   };
@@ -1706,9 +1709,6 @@ export const AccountConfig = {
     }
     for (const v of message.intervalConfigs) {
       OnIntervalConfig.encode(v!, writer.uint32(34).fork()).ldelim();
-    }
-    for (const v of message.aptosIntervalConfigs) {
-      AptosOnIntervalConfig.encode(v!, writer.uint32(42).fork()).ldelim();
     }
     for (const v of message.moveIntervalConfigs) {
       MoveOnIntervalConfig.encode(v!, writer.uint32(58).fork()).ldelim();
@@ -1738,9 +1738,6 @@ export const AccountConfig = {
         case 4:
           message.intervalConfigs.push(OnIntervalConfig.decode(reader, reader.uint32()));
           break;
-        case 5:
-          message.aptosIntervalConfigs.push(AptosOnIntervalConfig.decode(reader, reader.uint32()));
-          break;
         case 7:
           message.moveIntervalConfigs.push(MoveOnIntervalConfig.decode(reader, reader.uint32()));
           break;
@@ -1763,9 +1760,6 @@ export const AccountConfig = {
       intervalConfigs: Array.isArray(object?.intervalConfigs)
         ? object.intervalConfigs.map((e: any) => OnIntervalConfig.fromJSON(e))
         : [],
-      aptosIntervalConfigs: Array.isArray(object?.aptosIntervalConfigs)
-        ? object.aptosIntervalConfigs.map((e: any) => AptosOnIntervalConfig.fromJSON(e))
-        : [],
       moveIntervalConfigs: Array.isArray(object?.moveIntervalConfigs)
         ? object.moveIntervalConfigs.map((e: any) => MoveOnIntervalConfig.fromJSON(e))
         : [],
@@ -1784,13 +1778,6 @@ export const AccountConfig = {
       obj.intervalConfigs = message.intervalConfigs.map((e) => e ? OnIntervalConfig.toJSON(e) : undefined);
     } else {
       obj.intervalConfigs = [];
-    }
-    if (message.aptosIntervalConfigs) {
-      obj.aptosIntervalConfigs = message.aptosIntervalConfigs.map((e) =>
-        e ? AptosOnIntervalConfig.toJSON(e) : undefined
-      );
-    } else {
-      obj.aptosIntervalConfigs = [];
     }
     if (message.moveIntervalConfigs) {
       obj.moveIntervalConfigs = message.moveIntervalConfigs.map((e) => e ? MoveOnIntervalConfig.toJSON(e) : undefined);
@@ -1815,7 +1802,6 @@ export const AccountConfig = {
     message.address = object.address ?? "";
     message.startBlock = object.startBlock ?? BigInt("0");
     message.intervalConfigs = object.intervalConfigs?.map((e) => OnIntervalConfig.fromPartial(e)) || [];
-    message.aptosIntervalConfigs = object.aptosIntervalConfigs?.map((e) => AptosOnIntervalConfig.fromPartial(e)) || [];
     message.moveIntervalConfigs = object.moveIntervalConfigs?.map((e) => MoveOnIntervalConfig.fromPartial(e)) || [];
     message.logConfigs = object.logConfigs?.map((e) => LogHandlerConfig.fromPartial(e)) || [];
     return message;
@@ -2064,7 +2050,7 @@ export const AptosOnIntervalConfig = {
 };
 
 function createBaseMoveOnIntervalConfig(): MoveOnIntervalConfig {
-  return { intervalConfig: undefined, type: "", ownerType: 0 };
+  return { intervalConfig: undefined, type: "", ownerType: 0, fetchConfig: undefined };
 }
 
 export const MoveOnIntervalConfig = {
@@ -2077,6 +2063,9 @@ export const MoveOnIntervalConfig = {
     }
     if (message.ownerType !== 0) {
       writer.uint32(24).int32(message.ownerType);
+    }
+    if (message.fetchConfig !== undefined) {
+      MoveAccountFetchConfig.encode(message.fetchConfig, writer.uint32(34).fork()).ldelim();
     }
     return writer;
   },
@@ -2097,6 +2086,9 @@ export const MoveOnIntervalConfig = {
         case 3:
           message.ownerType = reader.int32() as any;
           break;
+        case 4:
+          message.fetchConfig = MoveAccountFetchConfig.decode(reader, reader.uint32());
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -2109,7 +2101,8 @@ export const MoveOnIntervalConfig = {
     return {
       intervalConfig: isSet(object.intervalConfig) ? OnIntervalConfig.fromJSON(object.intervalConfig) : undefined,
       type: isSet(object.type) ? String(object.type) : "",
-      ownerType: isSet(object.ownerType) ? moveOnIntervalConfig_OwnerTypeFromJSON(object.ownerType) : 0,
+      ownerType: isSet(object.ownerType) ? moveOwnerTypeFromJSON(object.ownerType) : 0,
+      fetchConfig: isSet(object.fetchConfig) ? MoveAccountFetchConfig.fromJSON(object.fetchConfig) : undefined,
     };
   },
 
@@ -2118,7 +2111,9 @@ export const MoveOnIntervalConfig = {
     message.intervalConfig !== undefined &&
       (obj.intervalConfig = message.intervalConfig ? OnIntervalConfig.toJSON(message.intervalConfig) : undefined);
     message.type !== undefined && (obj.type = message.type);
-    message.ownerType !== undefined && (obj.ownerType = moveOnIntervalConfig_OwnerTypeToJSON(message.ownerType));
+    message.ownerType !== undefined && (obj.ownerType = moveOwnerTypeToJSON(message.ownerType));
+    message.fetchConfig !== undefined &&
+      (obj.fetchConfig = message.fetchConfig ? MoveAccountFetchConfig.toJSON(message.fetchConfig) : undefined);
     return obj;
   },
 
@@ -2133,6 +2128,9 @@ export const MoveOnIntervalConfig = {
       : undefined;
     message.type = object.type ?? "";
     message.ownerType = object.ownerType ?? 0;
+    message.fetchConfig = (object.fetchConfig !== undefined && object.fetchConfig !== null)
+      ? MoveAccountFetchConfig.fromPartial(object.fetchConfig)
+      : undefined;
     return message;
   },
 };
@@ -2912,6 +2910,57 @@ export const MoveFetchConfig = {
     const message = createBaseMoveFetchConfig();
     message.resourceChanges = object.resourceChanges ?? false;
     message.allEvents = object.allEvents ?? false;
+    return message;
+  },
+};
+
+function createBaseMoveAccountFetchConfig(): MoveAccountFetchConfig {
+  return { owned: false };
+}
+
+export const MoveAccountFetchConfig = {
+  encode(message: MoveAccountFetchConfig, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.owned === true) {
+      writer.uint32(8).bool(message.owned);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MoveAccountFetchConfig {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMoveAccountFetchConfig();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.owned = reader.bool();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MoveAccountFetchConfig {
+    return { owned: isSet(object.owned) ? Boolean(object.owned) : false };
+  },
+
+  toJSON(message: MoveAccountFetchConfig): unknown {
+    const obj: any = {};
+    message.owned !== undefined && (obj.owned = message.owned);
+    return obj;
+  },
+
+  create(base?: DeepPartial<MoveAccountFetchConfig>): MoveAccountFetchConfig {
+    return MoveAccountFetchConfig.fromPartial(base ?? {});
+  },
+
+  fromPartial(object: DeepPartial<MoveAccountFetchConfig>): MoveAccountFetchConfig {
+    const message = createBaseMoveAccountFetchConfig();
+    message.owned = object.owned ?? false;
     return message;
   },
 };

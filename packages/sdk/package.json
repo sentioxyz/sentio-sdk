@@ -86,6 +86,7 @@
     "superstruct_solana": "npm:superstruct@^0.14.2",
     "typechain": "^8.0.0",
     "typedoc": "^0.24.1",
+    "utility-types": "^3.10.0",
     "yaml": "^2.2.1"
   },
   "peerDependencies": {

@@ -18,11 +18,12 @@ import {
 import { ServerError, Status } from 'nice-grpc'
 import { ProcessorState } from './binds.js'
 import { AccountProcessorState } from './account-processor-state.js'
-import { ProcessorTemplateProcessorState, TemplateInstanceState } from './base-processor-template.js'
+import { ProcessorTemplateProcessorState } from './base-processor-template.js'
 import { GlobalProcessorState } from './base-processor.js'
 import { validateAndNormalizeAddress } from './eth.js'
 import { EthChainId } from '../core/chain.js'
 import { EthContext } from './context.js'
+import { TemplateInstanceState } from '../core/template.js'
 
 interface Handlers {
   eventHandlers: ((event: Data_EthLog) => Promise<ProcessResult>)[]
@@ -244,7 +245,13 @@ export class EthPlugin extends Plugin {
 
   async start(request: StartRequest) {
     const ctx = new NoopContext()
+    const allowedChainIds = new Set<string>(Object.values(EthChainId))
+
     for (const instance of request.templateInstances) {
+      if (!allowedChainIds.has(instance.contract?.chainId || '')) {
+        continue
+      }
+
       const template = ProcessorTemplateProcessorState.INSTANCE.getValues()[instance.templateId]
       if (!template) {
         throw new ServerError(Status.INVALID_ARGUMENT, 'Invalid template contract:' + instance)

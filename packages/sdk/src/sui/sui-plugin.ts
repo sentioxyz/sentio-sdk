@@ -16,9 +16,14 @@ import {
 
 import { ServerError, Status } from 'nice-grpc'
 
-import { SuiAccountProcessorState, SuiProcessorState } from './sui-processor.js'
+import { SuiProcessorState } from './sui-processor.js'
+import { SuiAccountProcessorState } from './sui-object-processor.js'
 import { validateAndNormalizeAddress } from './utils.js'
 import { initCoinList } from './ext/coin.js'
+import { SuiChainId } from '../core/chain.js'
+import { SuiAccountProcessorTemplateState, SuiBaseObjectsProcessorTemplate } from './sui-objects-processor-template.js'
+import { SuiNetwork } from './network.js'
+import { SuiContext } from './context.js'
 
 interface Handlers {
   suiEventHandlers: ((event: Data_SuiEvent) => Promise<ProcessResult>)[]
@@ -33,8 +38,27 @@ export class SuiPlugin extends Plugin {
     suiEventHandlers: [],
     suiObjectHandlers: [],
   }
-  async start(start: StartRequest): Promise<void> {
+  async start(request: StartRequest): Promise<void> {
     await initCoinList()
+
+    const allowedChainIds = new Set<string>(Object.values(SuiChainId))
+    for (const instance of request.templateInstances) {
+      if (!allowedChainIds.has(instance.contract?.chainId || '')) {
+        continue
+      }
+
+      const template: SuiBaseObjectsProcessorTemplate<any, any> =
+        SuiAccountProcessorTemplateState.INSTANCE.getValues()[instance.templateId]
+
+      template.bind(
+        {
+          objectId: instance.contract?.address || '',
+          network: <SuiNetwork>instance.contract?.chainId || SuiNetwork.MAIN_NET,
+          startCheckpoint: instance.startBlock || 0n,
+        },
+        NoopContext
+      )
+    }
   }
 
   async configure(config: ProcessConfigResponse) {
@@ -107,6 +131,7 @@ export class SuiPlugin extends Plugin {
           },
           type: handler.type || '',
           ownerType: processor.ownerType,
+          fetchConfig: undefined,
         })
       }
       config.accountConfigs.push(accountConfig)
@@ -187,3 +212,5 @@ export class SuiPlugin extends Plugin {
 }
 
 PluginManager.INSTANCE.register(new SuiPlugin())
+
+const NoopContext = new SuiContext('', SuiChainId.SUI_MAINNET, '', new Date(), 0n, {} as any, 0, {})

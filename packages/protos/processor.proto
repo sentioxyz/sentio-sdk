@@ -145,7 +145,7 @@ message AccountConfig {
   uint64 start_block = 3;
 
   repeated OnIntervalConfig interval_configs = 4;
-  repeated AptosOnIntervalConfig aptos_interval_configs = 5;
+  repeated AptosOnIntervalConfig aptos_interval_configs = 5 [deprecated = true];
   // TODO migrate aptos_interval_configs to move_interval_configs
   repeated MoveOnIntervalConfig move_interval_configs = 7;
 
@@ -178,15 +178,17 @@ message AptosOnIntervalConfig {
   string type = 2;
 }
 
+enum MoveOwnerType {
+  ADDRESS = 0;
+  OBJECT = 1;
+  WRAPPED_OBJECT = 2;
+}
+
 message MoveOnIntervalConfig {
   OnIntervalConfig interval_config = 1;
   string type = 2;
-  enum OwnerType {
-    ADDRESS = 0;
-    OBJECT = 1;
-    WRAPPED_OBJECT = 2;
-  }
-  OwnerType owner_type = 3;
+  MoveOwnerType owner_type = 3;
+  MoveAccountFetchConfig fetch_config = 4;
 }
 
 message ContractInfo {
@@ -260,6 +262,10 @@ message InstructionHandlerConfig {
 message MoveFetchConfig {
   bool resource_changes = 1;
   bool all_events = 2;
+}
+
+message MoveAccountFetchConfig {
+  bool owned = 1;
 }
 
 message MoveEventHandlerConfig {

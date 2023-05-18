@@ -1,22 +1,13 @@
-import {
-  Data_SuiCall,
-  Data_SuiEvent,
-  Data_SuiObject,
-  HandleInterval,
-  MoveFetchConfig,
-  MoveOnIntervalConfig_OwnerType,
-  ProcessResult,
-} from '@sentio/protos'
+import { Data_SuiCall, Data_SuiEvent, MoveFetchConfig } from '@sentio/protos'
 import { ListStateStorage, mergeProcessResults } from '@sentio/runtime'
 import { SuiNetwork } from './network.js'
 import { ServerError, Status } from 'nice-grpc'
-import { SuiContext, SuiObjectsContext } from './context.js'
+import { SuiContext } from './context.js'
 import {
   getProgrammableTransaction,
   getTransactionKind,
   MoveCallSuiTransaction,
   SuiEvent,
-  SuiMoveObject,
   SuiTransactionBlockResponse,
 } from '@mysten/sui.js'
 import {
@@ -29,33 +20,30 @@ import {
 } from '../move/index.js'
 import { getMoveCalls } from './utils.js'
 import { defaultMoveCoder, MoveCoder } from './move-coder.js'
-import { Labels, PromiseOrVoid } from '../core/index.js'
-// import { dynamic_field } from './builtin/0x2.js'
+import { Labels } from '../core/index.js'
+import { Required } from 'utility-types'
 
 const DEFAULT_FETCH_CONFIG: MoveFetchConfig = {
   resourceChanges: false,
   allEvents: true,
 }
 
-class IndexConfigure {
-  address: string
-  network: SuiNetwork
-  startCheckpoint: bigint
-  baseLabels?: Labels
+export type IndexConfigure = Required<SuiBindOptions, 'startCheckpoint' | 'network'>
+
+export function configure(options: SuiBindOptions): IndexConfigure {
+  return {
+    startCheckpoint: options.startCheckpoint || 0n,
+    address: options.address,
+    network: options.network || SuiNetwork.MAIN_NET,
+    baseLabels: options.baseLabels,
+  }
 }
 
-export class SuiBindOptions {
+export interface SuiBindOptions {
   address: string
   network?: SuiNetwork
   startCheckpoint?: bigint
   baseLabels?: Labels
-}
-
-export class SuiObjectBindOptions {
-  objectId: string
-  network?: SuiNetwork
-  startCheckpoint?: bigint
-  baseLabels?: { [key: string]: string }
 }
 
 export class SuiProcessorState extends ListStateStorage<SuiBaseProcessor> {
@@ -204,175 +192,5 @@ export class SuiBaseProcessor {
       fetchConfig: _fetchConfig,
     })
     return this
-  }
-}
-
-class ObjectHandler {
-  type?: string
-  versionInterval?: HandleInterval
-  timeIntervalInMinutes?: HandleInterval
-  handler: (resource: Data_SuiObject) => Promise<ProcessResult>
-}
-
-export class SuiAccountProcessorState extends ListStateStorage<SuiBaseObjectsProcessor<any>> {
-  static INSTANCE = new SuiAccountProcessorState()
-}
-
-class SuiObjectsBindOptions extends SuiBindOptions {
-  ownerType: MoveOnIntervalConfig_OwnerType
-}
-
-abstract class SuiBaseObjectsProcessor<HandlerType> {
-  config: IndexConfigure
-  ownerType: MoveOnIntervalConfig_OwnerType
-
-  objectHandlers: ObjectHandler[] = []
-
-  // static bind(options: SuiObjectsBindOptions): SuiBaseObjectsProcessor<any> {
-  //   return new SuiBaseObjectsProcessor(options)
-  // }
-
-  protected constructor(options: SuiObjectsBindOptions) {
-    this.config = configure(options)
-    this.ownerType = options.ownerType
-    SuiAccountProcessorState.INSTANCE.addValue(this)
-  }
-
-  getChainId(): string {
-    return this.config.network
-  }
-
-  // protected abstract transformObjects(objects: SuiMoveObject[]): SuiMoveObject[]
-
-  protected abstract doHandle(handler: HandlerType, data: Data_SuiObject, ctx: SuiObjectsContext): PromiseOrVoid
-
-  protected onInterval(
-    handler: HandlerType, //(resources: SuiMoveObject[], ctx: SuiObjectsContext) => PromiseOrVoid,
-    timeInterval: HandleInterval | undefined,
-    versionInterval: HandleInterval | undefined,
-    type: string | undefined
-  ): this {
-    const processor = this
-    this.objectHandlers.push({
-      handler: async function (data) {
-        const ctx = new SuiObjectsContext(
-          processor.config.network,
-          processor.config.address,
-          data.slot,
-          data.timestamp || new Date(0),
-          processor.config.baseLabels
-        )
-        await processor.doHandle(handler, data, ctx)
-        return ctx.getProcessResult()
-      },
-      timeIntervalInMinutes: timeInterval,
-      versionInterval: versionInterval,
-      type,
-    })
-    return this
-  }
-
-  public onTimeInterval(
-    handler: HandlerType,
-    timeIntervalInMinutes = 60,
-    backfillTimeIntervalInMinutes = 240,
-    type?: string
-  ): this {
-    return this.onInterval(
-      handler,
-      {
-        recentInterval: timeIntervalInMinutes,
-        backfillInterval: backfillTimeIntervalInMinutes,
-      },
-      undefined,
-      type
-    )
-  }
-
-  public onSlotInterval(
-    handler: HandlerType,
-    slotInterval = 100000,
-    backfillSlotInterval = 400000,
-    type?: string
-  ): this {
-    return this.onInterval(
-      handler,
-      undefined,
-      { recentInterval: slotInterval, backfillInterval: backfillSlotInterval },
-      type
-    )
-  }
-}
-
-function configure(options: SuiBindOptions): IndexConfigure {
-  return {
-    startCheckpoint: options.startCheckpoint || 0n,
-    address: options.address,
-    network: options.network || SuiNetwork.MAIN_NET,
-    baseLabels: options.baseLabels,
-  }
-}
-
-export class SuiAddressProcessor extends SuiBaseObjectsProcessor<
-  (objects: SuiMoveObject[], ctx: SuiObjectsContext) => PromiseOrVoid
-> {
-  static bind(options: SuiBindOptions): SuiAddressProcessor {
-    return new SuiAddressProcessor({ ...options, ownerType: MoveOnIntervalConfig_OwnerType.ADDRESS })
-  }
-
-  protected doHandle(
-    handler: (objects: SuiMoveObject[], ctx: SuiObjectsContext) => PromiseOrVoid,
-    data: Data_SuiObject,
-    ctx: SuiObjectsContext
-  ): PromiseOrVoid {
-    return handler(data.objects as SuiMoveObject[], ctx)
-  }
-}
-// export class SuiDynamicFieldObjectsProcessor extends SuiBaseObjectsProcessor<dynamic_field.Field<any, any>> {
-export class SuiObjectProcessor extends SuiBaseObjectsProcessor<
-  (self: SuiMoveObject, dynamicFieldObjects: SuiMoveObject[], ctx: SuiObjectsContext) => PromiseOrVoid
-> {
-  static bind(options: SuiObjectBindOptions): SuiObjectProcessor {
-    return new SuiObjectProcessor({
-      address: options.objectId,
-      network: options.network,
-      startCheckpoint: options.startCheckpoint,
-      ownerType: MoveOnIntervalConfig_OwnerType.OBJECT,
-      baseLabels: options.baseLabels,
-    })
-  }
-
-  protected doHandle(
-    handler: (self: SuiMoveObject, dynamicFieldObjects: SuiMoveObject[], ctx: SuiObjectsContext) => PromiseOrVoid,
-    data: Data_SuiObject,
-    ctx: SuiObjectsContext
-  ): PromiseOrVoid {
-    if (!data.self) {
-      console.log(`Sui object not existed in ${ctx.slot}, please specific a start time`)
-      return
-    }
-    return handler(data.self as SuiMoveObject, data.objects as SuiMoveObject[], ctx)
-  }
-}
-
-export class SuiWrappedObjectProcessor extends SuiBaseObjectsProcessor<
-  (dynamicFieldObjects: SuiMoveObject[], ctx: SuiObjectsContext) => PromiseOrVoid
-> {
-  static bind(options: SuiObjectBindOptions): SuiWrappedObjectProcessor {
-    return new SuiWrappedObjectProcessor({
-      address: options.objectId,
-      network: options.network,
-      startCheckpoint: options.startCheckpoint,
-      ownerType: MoveOnIntervalConfig_OwnerType.WRAPPED_OBJECT,
-      baseLabels: options.baseLabels,
-    })
-  }
-
-  protected doHandle(
-    handler: (dynamicFieldObjects: SuiMoveObject[], ctx: SuiObjectsContext) => PromiseOrVoid,
-    data: Data_SuiObject,
-    ctx: SuiObjectsContext
-  ): PromiseOrVoid {
-    return handler(data.objects as SuiMoveObject[], ctx)
   }
 }

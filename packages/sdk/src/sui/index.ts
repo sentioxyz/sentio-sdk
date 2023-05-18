@@ -1,4 +1,16 @@
-export * from './sui-processor.js'
+export { SuiBaseProcessor, type SuiBindOptions } from './sui-processor.js'
+export {
+  SuiAddressProcessor,
+  SuiObjectProcessor,
+  SuiWrappedObjectProcessor,
+  type SuiObjectBindOptions,
+} from './sui-object-processor.js'
+
+export {
+  // SuiAddressProcessorTemplate,
+  SuiObjectsProcessorTemplate,
+  SuiWrappedObjectProcessorTemplate,
+} from './sui-objects-processor-template.js'
 
 export * from './network.js'
 export * from './context.js'
