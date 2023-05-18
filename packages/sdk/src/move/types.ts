@@ -82,9 +82,11 @@ export class TypeDescriptor<T = any> {
       console.error('Not expected &')
       return []
     }
-    // if (this.reference) {
-    //   return []
-    // }
+
+    if (this.qname.toLowerCase() === VECTOR_STR) {
+      return this.typeArgs[0].dependedTypes()
+    }
+
     if (BUILTIN_TYPES_SET.has(this.qname.toLowerCase())) {
       return []
     }
@@ -106,9 +108,7 @@ export class TypeDescriptor<T = any> {
       param.dependedTypes().forEach((t) => types.add(t))
     }
 
-    if (this.qname !== VECTOR_STR) {
-      types.add(this.qname)
-    }
+    types.add(this.qname)
 
     return Array.from(types)
   }

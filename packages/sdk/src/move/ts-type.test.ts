@@ -32,6 +32,14 @@ describe('type gen', () => {
     const computedTypeString = res.getSignature()
     assert(computedTypeString === typeString)
   })
+
+  test('test depended types array', async () => {
+    const typeString = '0x2::table::Table<U64, vector<0x1.ascii.String>>'
+    const res = parseMoveType(typeString)
+
+    const deps = res.dependedTypes()
+    assert(deps.length === 2)
+  })
   // test('type type gen', async () => {
   //
   //   const res = parseGenericType('x<g1<a,g2<c,d>>,b,g3<a,b>,e>')

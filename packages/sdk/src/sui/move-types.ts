@@ -87,7 +87,7 @@ export function toTypeDescriptor(normalizedType: SuiMoveNormalizedType): TypeDes
   }
 
   if ('Vector' in normalizedType) {
-    return new TypeDescriptor('vector', [toTypeDescriptor(normalizedType.Vector)])
+    return new TypeDescriptor('Vector', [toTypeDescriptor(normalizedType.Vector)])
   }
   if ('TypeParameter' in normalizedType) {
     return new TypeDescriptor('T' + normalizedType.TypeParameter)

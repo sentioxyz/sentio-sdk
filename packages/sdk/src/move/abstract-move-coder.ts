@@ -136,7 +136,7 @@ export abstract class AbstractMoveCoder<Network, ModuleType, StructType> {
     }
 
     // process vector
-    if (type.qname === VECTOR_STR) {
+    if (type.qname.toLowerCase() === VECTOR_STR) {
       // vector<u8> as hex string
       if (type.typeArgs[0].qname === 'u8' || type.typeArgs[0].qname === 'U8') {
         return data
@@ -200,7 +200,7 @@ export abstract class AbstractMoveCoder<Network, ModuleType, StructType> {
     }
 
     // process vector
-    if (type.qname === VECTOR_STR) {
+    if (type.qname.toLowerCase() === VECTOR_STR) {
       // vector<u8> as hex string
       if (type.typeArgs[0].qname === 'u8' || type.typeArgs[0].qname === 'U8') {
         return data
