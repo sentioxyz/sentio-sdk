@@ -187,6 +187,13 @@ enum MoveOwnerType {
 message MoveOnIntervalConfig {
   OnIntervalConfig interval_config = 1;
   string type = 2;
+  enum OwnerType {
+    // TODO deprecate this
+    // option deprecated = true;
+    ADDRESS = 0;
+    OBJECT = 1;
+    WRAPPED_OBJECT = 2;
+  }
   MoveOwnerType owner_type = 3;
   MoveAccountFetchConfig fetch_config = 4;
 }

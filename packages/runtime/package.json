@@ -1,59 +1,59 @@
 {
   "name": "@sentio/runtime",
-  "license": "Apache-2.0",
   "version": "2.0.0-development",
-  "scripts": {
-    "compile": "tsc",
-    "build": "pnpm compile",
-    "build:all": "pnpm --filter=$(node -p \"require('./package.json').name\")... build",
-    "test": "NODE_OPTIONS=--experimental-vm-modules pnpm jest",
-    "run": "ts-node-esm --files src/processor-runner.ts --log-format=json",
-    "run-benchmark": "ts-node-esm --files src/decode-benchmark.ts",
-    "start_ts": "ts-node-esm --files ./lib/processor-runner.js --log-format=json $PWD/../../debug/src/processor.ts",
-    "start_js": "ts-node-esm --files ./lib/processor-runner.js $PWD/../../debug/dist/lib.js"
-  },
-  "dependencies": {
-    "@sentio/protos": "workspace:^",
-    "command-line-args": "^5.2.1",
-    "command-line-usage": "^7.0.1",
-    "fs-extra": "^11.0.0",
-    "google-protobuf": "^3.21.2",
-    "nice-grpc": "^2.1.0",
-    "nice-grpc-client-middleware-retry": "^3.1.2",
-    "nice-grpc-prometheus": "^0.1.2",
-    "winston": "^3.8.2",
-    "long": "^5.2.3",
-    "nice-grpc-common": "^2.0.2",
-    "protobufjs": "^7.2.3",
-    "@grpc/grpc-js": "^1.8.14",
-    "prom-client": "^14.2.0"
-  },
-  "devDependencies": {
-    "jest": "^29.5.0",
-    "@types/command-line-args": "^5.2.0",
-    "@types/command-line-usage": "^5.0.2",
-    "@types/fs-extra": "^11.0.1",
-    "@types/google-protobuf": "^3.15.6",
-    "tslib": "^2.5.0"
-  },
-  "peerDependencies": {
-    "@sentio/sdk": "workspace:^"
-  },
-  "bin": {
-    "processor-runner": "./lib/processor-runner.js"
-  },
+  "license": "Apache-2.0",
   "type": "module",
   "exports": {
     ".": "./lib/index.js"
   },
-  "resolutions": {
-    "@grpc/grpc-js": "^1.8.7"
+  "bin": {
+    "processor-runner": "./lib/processor-runner.js"
   },
   "files": [
     "{lib,src}",
-    "!{lib,src}/tests",
-    "!**/*.test.{js,ts}"
+    "!**/*.test.{js,ts}",
+    "!{lib,src}/tests"
   ],
+  "scripts": {
+    "build": "pnpm compile",
+    "build:all": "pnpm --filter=$(node -p \"require('./package.json').name\")... build",
+    "compile": "tsc",
+    "run": "ts-node-esm --files src/processor-runner.ts --log-format=json",
+    "run-benchmark": "ts-node-esm --files src/decode-benchmark.ts",
+    "start_js": "ts-node-esm --files ./lib/processor-runner.js $PWD/../../debug/dist/lib.js",
+    "start_ts": "ts-node-esm --files ./lib/processor-runner.js --log-format=json $PWD/../../debug/src/processor.ts",
+    "test": "NODE_OPTIONS=--experimental-vm-modules pnpm jest"
+  },
+  "resolutions": {
+    "@grpc/grpc-js": "^1.8.7"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.8.14",
+    "@sentio/protos": "workspace:*",
+    "command-line-args": "^5.2.1",
+    "command-line-usage": "^7.0.1",
+    "fs-extra": "^11.0.0",
+    "google-protobuf": "^3.21.2",
+    "long": "^5.2.3",
+    "nice-grpc": "^2.1.0",
+    "nice-grpc-client-middleware-retry": "^3.1.2",
+    "nice-grpc-common": "^2.0.2",
+    "nice-grpc-prometheus": "^0.1.2",
+    "prom-client": "^14.2.0",
+    "protobufjs": "^7.2.3",
+    "winston": "^3.8.2"
+  },
+  "peerDependencies": {
+    "@sentio/sdk": "workspace:^"
+  },
+  "devDependencies": {
+    "@types/command-line-args": "^5.2.0",
+    "@types/command-line-usage": "^5.0.2",
+    "@types/fs-extra": "^11.0.1",
+    "@types/google-protobuf": "^3.15.6",
+    "jest": "^29.5.0",
+    "tslib": "^2.5.0"
+  },
   "engines": {
     "node": ">=16"
   }

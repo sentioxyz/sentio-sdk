@@ -330,7 +330,7 @@ importers:
         specifier: ^1.8.14
         version: 1.8.14
       '@sentio/protos':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../protos
       '@sentio/sdk':
         specifier: workspace:^
@@ -409,7 +409,7 @@ importers:
         specifier: ^1.0.28
         version: 1.0.28(@sentio/ethers@6.4.0)(typescript@5.0.4)
       '@sentio/protos':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../protos
       '@sentio/runtime':
         specifier: workspace:^
