@@ -3,7 +3,7 @@ import { calculateValueInUsd, getCoinInfo, whitelistCoins, whiteListed } from '.
 import { MoveCoinList, MoveDex, moveGetPairValue, MovePoolAdaptor, SimpleCoinInfo } from '../../move/ext/index.js'
 import { SuiMoveObject, SuiMovePackage } from '@mysten/sui.js'
 import { SuiNetwork } from '../network.js'
-import { SuiContext, SuiObjectsContext } from '../context.js'
+import { SuiContext, SuiObjectContext } from '../context.js'
 
 export type PoolAdaptor<T> = MovePoolAdaptor<SuiMoveObject, T>
 
@@ -33,7 +33,7 @@ export class SuiDex<T> extends MoveDex<
   SuiMoveObject,
   Event,
   SuiContext,
-  SuiObjectsContext,
+  SuiObjectContext,
   T
 > {
   coinList = SuiCoinList

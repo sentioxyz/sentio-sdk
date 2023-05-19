@@ -48,8 +48,6 @@ export class EthPlugin extends Plugin {
       traceHandlers: [],
       transactionHandlers: [],
     }
-    // This syntax is to copy values instead of using references
-    config.templateInstances = [...TemplateInstanceState.INSTANCE.getValues()]
 
     for (const processor of ProcessorState.INSTANCE.getValues()) {
       // If server favor incremental update this need to change

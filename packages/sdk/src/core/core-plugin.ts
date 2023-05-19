@@ -4,11 +4,15 @@ import { ProcessConfigResponse } from '@sentio/protos'
 import { MetricState } from './meter.js'
 import { ExporterState } from './exporter.js'
 import { EventTrackerState } from './event-tracker.js'
+import { TemplateInstanceState } from './template.js'
 
 export class CorePlugin extends Plugin {
   name: string = 'CorePlugin'
 
   async configure(config: ProcessConfigResponse): Promise<void> {
+    // This syntax is to copy values instead of using references
+    config.templateInstances = [...TemplateInstanceState.INSTANCE.getValues()]
+
     for (const metric of MetricState.INSTANCE.getValues()) {
       config.metricConfigs.push({
         ...metric.config,

@@ -69,7 +69,8 @@ export class SuiContext extends MoveContext<SuiNetwork, SuiMoveNormalizedModule,
   }
 }
 
-export class SuiObjectsContext extends MoveAccountContext<
+// TODO address handler should use this context
+export class SuiAddressContext extends MoveAccountContext<
   SuiNetwork,
   SuiMoveNormalizedModule,
   SuiEvent | SuiMoveObject
@@ -79,6 +80,8 @@ export class SuiObjectsContext extends MoveAccountContext<
   slot: bigint
   timestamp: Date
   coder: MoveCoder
+
+  protected contractName = 'address'
 
   constructor(network: SuiNetwork, address: string, slot: bigint, timestamp: Date, baseLabels: Labels | undefined) {
     super(baseLabels)
@@ -96,7 +99,7 @@ export class SuiObjectsContext extends MoveAccountContext<
   getMetaDataInternal(name: string, labels: Labels): RecordMetaData {
     return {
       address: this.address,
-      contractName: 'objects',
+      contractName: this.contractName,
       blockNumber: this.slot,
       transactionIndex: 0,
       transactionHash: '',
@@ -113,5 +116,15 @@ export class SuiObjectsContext extends MoveAccountContext<
 
   getTimestamp(): number {
     return this.timestamp.getDate()
+  }
+}
+
+export class SuiObjectContext extends SuiAddressContext {
+  contractName = 'object'
+  objectId: string
+
+  constructor(network: SuiNetwork, objectId: string, slot: bigint, timestamp: Date, baseLabels: Labels | undefined) {
+    super(network, objectId, slot, timestamp, baseLabels)
+    this.objectId = objectId
   }
 }

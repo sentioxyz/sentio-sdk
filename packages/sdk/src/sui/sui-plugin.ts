@@ -21,7 +21,10 @@ import { SuiAccountProcessorState } from './sui-object-processor.js'
 import { validateAndNormalizeAddress } from './utils.js'
 import { initCoinList } from './ext/coin.js'
 import { SuiChainId } from '../core/chain.js'
-import { SuiAccountProcessorTemplateState, SuiBaseObjectsProcessorTemplate } from './sui-objects-processor-template.js'
+import {
+  SuiAccountProcessorTemplateState,
+  SuiObjectOrAddressProcessorTemplate,
+} from './sui-object-processor-template.js'
 import { SuiNetwork } from './network.js'
 import { SuiContext } from './context.js'
 
@@ -47,7 +50,7 @@ export class SuiPlugin extends Plugin {
         continue
       }
 
-      const template: SuiBaseObjectsProcessorTemplate<any, any> =
+      const template: SuiObjectOrAddressProcessorTemplate<any, any> =
         SuiAccountProcessorTemplateState.INSTANCE.getValues()[instance.templateId]
 
       template.bind(

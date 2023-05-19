@@ -8,9 +8,9 @@ export {
 
 export {
   // SuiAddressProcessorTemplate,
-  SuiObjectsProcessorTemplate,
+  SuiObjectProcessorTemplate,
   SuiWrappedObjectProcessorTemplate,
-} from './sui-objects-processor-template.js'
+} from './sui-object-processor-template.js'
 
 export * from './network.js'
 export * from './context.js'

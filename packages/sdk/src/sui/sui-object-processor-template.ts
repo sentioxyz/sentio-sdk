@@ -1,11 +1,11 @@
 import { HandleInterval, MoveAccountFetchConfig } from '@sentio/protos'
 import { ListStateStorage } from '@sentio/runtime'
-import { SuiContext, SuiObjectsContext } from './context.js'
+import { SuiContext, SuiObjectContext } from './context.js'
 import { SuiMoveObject } from '@mysten/sui.js'
 import { PromiseOrVoid } from '../core/index.js'
 import {
   DEFAULT_FETCH_CONFIG,
-  SuiBaseObjectsProcessor,
+  SuiBaseObjectOrAddressProcessor,
   SuiObjectBindOptions,
   SuiObjectProcessor,
   SuiWrappedObjectProcessor,
@@ -20,25 +20,25 @@ class ObjectHandler<HandlerType> {
   fetchConfig: MoveAccountFetchConfig
 }
 
-export class SuiAccountProcessorTemplateState extends ListStateStorage<SuiBaseObjectsProcessorTemplate<any, any>> {
+export class SuiAccountProcessorTemplateState extends ListStateStorage<SuiObjectOrAddressProcessorTemplate<any, any>> {
   static INSTANCE = new SuiAccountProcessorTemplateState()
 }
 
-export abstract class SuiBaseObjectsProcessorTemplate<
+export abstract class SuiObjectOrAddressProcessorTemplate<
   HandlerType,
   // OptionType,
-  ProcessorType extends SuiBaseObjectsProcessor<HandlerType>
+  ProcessorType extends SuiBaseObjectOrAddressProcessor<HandlerType>
 > {
   id: number
   objectHandlers: ObjectHandler<HandlerType>[] = []
   binds = new Set<string>()
 
-  protected constructor() {
+  constructor() {
     this.id = SuiAccountProcessorTemplateState.INSTANCE.getValues().length
     SuiAccountProcessorTemplateState.INSTANCE.addValue(this)
   }
 
-  abstract createProcessor(options: SuiObjectBindOptions): ProcessorType
+  protected abstract createProcessor(options: SuiObjectBindOptions): ProcessorType
 
   bind(options: SuiObjectBindOptions, ctx: SuiContext): void {
     options.network = options.network || ctx.network
@@ -132,8 +132,8 @@ export abstract class SuiBaseObjectsProcessorTemplate<
 //   }
 // }
 
-export class SuiObjectsProcessorTemplate extends SuiBaseObjectsProcessorTemplate<
-  (self: SuiMoveObject, dynamicFieldObjects: SuiMoveObject[], ctx: SuiObjectsContext) => PromiseOrVoid,
+export class SuiObjectProcessorTemplate extends SuiObjectOrAddressProcessorTemplate<
+  (self: SuiMoveObject, dynamicFieldObjects: SuiMoveObject[], ctx: SuiObjectContext) => PromiseOrVoid,
   // SuiObjectBindOptions,
   SuiObjectProcessor
 > {
@@ -142,8 +142,8 @@ export class SuiObjectsProcessorTemplate extends SuiBaseObjectsProcessorTemplate
   }
 }
 
-export class SuiWrappedObjectProcessorTemplate extends SuiBaseObjectsProcessorTemplate<
-  (dynamicFieldObjects: SuiMoveObject[], ctx: SuiObjectsContext) => PromiseOrVoid,
+export class SuiWrappedObjectProcessorTemplate extends SuiObjectOrAddressProcessorTemplate<
+  (dynamicFieldObjects: SuiMoveObject[], ctx: SuiObjectContext) => PromiseOrVoid,
   // SuiObjectBindOptions,
   SuiWrappedObjectProcessor
 > {
