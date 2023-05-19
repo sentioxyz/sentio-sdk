@@ -134,7 +134,7 @@ export class SuiPlugin extends Plugin {
           },
           type: handler.type || '',
           ownerType: processor.ownerType,
-          fetchConfig: undefined,
+          fetchConfig: handler.fetchConfig,
         })
       }
       config.accountConfigs.push(accountConfig)
