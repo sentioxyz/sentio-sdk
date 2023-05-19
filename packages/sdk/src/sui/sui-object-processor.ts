@@ -15,7 +15,7 @@ export interface SuiObjectBindOptions {
 
 interface ObjectHandler {
   type?: string
-  versionInterval?: HandleInterval
+  checkPointInterval?: HandleInterval
   timeIntervalInMinutes?: HandleInterval
   fetchConfig: MoveAccountFetchConfig
   handler: (resource: Data_SuiObject) => Promise<ProcessResult>
@@ -60,7 +60,7 @@ export abstract class SuiBaseObjectOrAddressProcessor<HandlerType> {
   public onInterval(
     handler: HandlerType, //(resources: SuiMoveObject[], ctx: SuiObjectsContext) => PromiseOrVoid,
     timeInterval: HandleInterval | undefined,
-    versionInterval: HandleInterval | undefined,
+    checkpointInterval: HandleInterval | undefined,
     type: string | undefined,
     fetchConfig: Partial<MoveAccountFetchConfig> | undefined
   ): this {
@@ -78,7 +78,7 @@ export abstract class SuiBaseObjectOrAddressProcessor<HandlerType> {
         return ctx.getProcessResult()
       },
       timeIntervalInMinutes: timeInterval,
-      versionInterval: versionInterval,
+      checkPointInterval: checkpointInterval,
       type,
       fetchConfig: { ...DEFAULT_FETCH_CONFIG, ...fetchConfig },
     })
@@ -104,17 +104,17 @@ export abstract class SuiBaseObjectOrAddressProcessor<HandlerType> {
     )
   }
 
-  public onSlotInterval(
+  public onCheckpointInterval(
     handler: HandlerType,
-    slotInterval = 100000,
-    backfillSlotInterval = 400000,
+    checkpointInterval = 100000,
+    backfillCheckpointInterval = 400000,
     type?: string,
     fetchConfig?: Partial<MoveAccountFetchConfig>
   ): this {
     return this.onInterval(
       handler,
       undefined,
-      { recentInterval: slotInterval, backfillInterval: backfillSlotInterval },
+      { recentInterval: checkpointInterval, backfillInterval: backfillCheckpointInterval },
       type,
       fetchConfig
     )
@@ -156,7 +156,7 @@ export class SuiObjectProcessor extends SuiBaseObjectOrAddressProcessor<
     ctx: SuiObjectContext
   ): PromiseOrVoid {
     if (!data.self) {
-      console.log(`Sui object not existed in ${ctx.slot}, please specific a start time`)
+      console.log(`Sui object not existed in ${ctx.checkpoint}, please specific a start time`)
       return
     }
     return handler(data.self as SuiMoveObject, data.objects as SuiMoveObject[], ctx)

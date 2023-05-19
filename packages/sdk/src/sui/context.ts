@@ -14,7 +14,7 @@ import { MoveAccountContext, MoveContext } from '../move/index.js'
 export class SuiContext extends MoveContext<SuiNetwork, SuiMoveNormalizedModule, SuiEvent | SuiMoveObject> {
   moduleName: string
   timestamp: Date
-  slot: bigint
+  checkpoint: bigint
   transaction: SuiTransactionBlockResponse
   eventIndex: number
   coder: MoveCoder
@@ -24,7 +24,7 @@ export class SuiContext extends MoveContext<SuiNetwork, SuiMoveNormalizedModule,
     network: SuiNetwork,
     address: string,
     timestamp: Date,
-    slot: bigint,
+    checkpoint: bigint,
     transaction: SuiTransactionBlockResponse,
     eventIndex: number,
     baseLabels: Labels | undefined
@@ -34,7 +34,7 @@ export class SuiContext extends MoveContext<SuiNetwork, SuiMoveNormalizedModule,
     this.network = network
     this.moduleName = moduleName
     this.timestamp = timestamp
-    this.slot = slot
+    this.checkpoint = checkpoint
     this.eventIndex = eventIndex
     this.coder = defaultMoveCoder(network)
     if (transaction) {
@@ -54,7 +54,7 @@ export class SuiContext extends MoveContext<SuiNetwork, SuiMoveNormalizedModule,
     return {
       address: this.address,
       contractName: this.moduleName,
-      blockNumber: this.slot,
+      blockNumber: this.checkpoint,
       transactionIndex: 0,
       transactionHash: this.transaction?.digest || '', // TODO
       logIndex: 0,
@@ -77,17 +77,23 @@ export class SuiAddressContext extends MoveAccountContext<
 > {
   address: string
   network: SuiNetwork
-  slot: bigint
+  checkpoint: bigint
   timestamp: Date
   coder: MoveCoder
 
   protected contractName = 'address'
 
-  constructor(network: SuiNetwork, address: string, slot: bigint, timestamp: Date, baseLabels: Labels | undefined) {
+  constructor(
+    network: SuiNetwork,
+    address: string,
+    checkpoint: bigint,
+    timestamp: Date,
+    baseLabels: Labels | undefined
+  ) {
     super(baseLabels)
     this.address = address
     this.network = network
-    this.slot = slot
+    this.checkpoint = checkpoint
     this.timestamp = timestamp
     this.coder = defaultMoveCoder(network)
   }
@@ -100,7 +106,7 @@ export class SuiAddressContext extends MoveAccountContext<
     return {
       address: this.address,
       contractName: this.contractName,
-      blockNumber: this.slot,
+      blockNumber: this.checkpoint,
       transactionIndex: 0,
       transactionHash: '',
       logIndex: 0,
@@ -123,8 +129,14 @@ export class SuiObjectContext extends SuiAddressContext {
   contractName = 'object'
   objectId: string
 
-  constructor(network: SuiNetwork, objectId: string, slot: bigint, timestamp: Date, baseLabels: Labels | undefined) {
-    super(network, objectId, slot, timestamp, baseLabels)
+  constructor(
+    network: SuiNetwork,
+    objectId: string,
+    checkpoint: bigint,
+    timestamp: Date,
+    baseLabels: Labels | undefined
+  ) {
+    super(network, objectId, checkpoint, timestamp, baseLabels)
     this.objectId = objectId
   }
 }

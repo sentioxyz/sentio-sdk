@@ -14,7 +14,7 @@ import { TemplateInstanceState } from '../core/template.js'
 
 class ObjectHandler<HandlerType> {
   type?: string
-  versionInterval?: HandleInterval
+  checkpointInterval?: HandleInterval
   timeIntervalInMinutes?: HandleInterval
   handler: HandlerType
   fetchConfig: MoveAccountFetchConfig
@@ -42,6 +42,7 @@ export abstract class SuiObjectOrAddressProcessorTemplate<
 
   bind(options: SuiObjectBindOptions, ctx: SuiContext): void {
     options.network = options.network || ctx.network
+    options.startCheckpoint = options.startCheckpoint || ctx.checkpoint
     const sig = [options.network, options.objectId].join('_')
     if (this.binds.has(sig)) {
       console.log(`Same object id can be bind to one template only once, ignore duplicate bind: ${sig}`)
@@ -51,7 +52,7 @@ export abstract class SuiObjectOrAddressProcessorTemplate<
 
     const processor = this.createProcessor(options)
     for (const h of this.objectHandlers) {
-      processor.onInterval(h.handler, h.timeIntervalInMinutes, h.versionInterval, h.type, h.fetchConfig)
+      processor.onInterval(h.handler, h.timeIntervalInMinutes, h.checkpointInterval, h.type, h.fetchConfig)
     }
     const config = processor.config
 
@@ -72,14 +73,14 @@ export abstract class SuiObjectOrAddressProcessorTemplate<
   protected onInterval(
     handler: HandlerType,
     timeInterval: HandleInterval | undefined,
-    versionInterval: HandleInterval | undefined,
+    checkpointInterval: HandleInterval | undefined,
     type: string | undefined,
     fetchConfig: Partial<MoveAccountFetchConfig> | undefined
   ): this {
     this.objectHandlers.push({
       handler: handler,
       timeIntervalInMinutes: timeInterval,
-      versionInterval: versionInterval,
+      checkpointInterval: checkpointInterval,
       type,
       fetchConfig: { ...DEFAULT_FETCH_CONFIG, ...fetchConfig },
     })
@@ -105,17 +106,17 @@ export abstract class SuiObjectOrAddressProcessorTemplate<
     )
   }
 
-  public onSlotInterval(
+  public onCheckpointInterval(
     handler: HandlerType,
-    slotInterval = 100000,
-    backfillSlotInterval = 400000,
+    checkpointInterval = 100000,
+    backfillCheckpointInterval = 400000,
     type?: string,
     fetchConfig?: Partial<MoveAccountFetchConfig>
   ): this {
     return this.onInterval(
       handler,
       undefined,
-      { recentInterval: slotInterval, backfillInterval: backfillSlotInterval },
+      { recentInterval: checkpointInterval, backfillInterval: backfillCheckpointInterval },
       type,
       fetchConfig
     )

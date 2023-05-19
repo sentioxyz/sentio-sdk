@@ -129,7 +129,7 @@ export class SuiPlugin extends Plugin {
             minutes: 0,
             minutesInterval: handler.timeIntervalInMinutes,
             slot: 0,
-            slotInterval: handler.versionInterval,
+            slotInterval: handler.checkPointInterval,
             fetchConfig: undefined,
           },
           type: handler.type || '',
