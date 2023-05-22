@@ -3,8 +3,6 @@ import { SouffleChefCampaign, CandyMachine } from './types/souffle.js'
 import { token } from '../builtin/0x3.js'
 import { aptos_account, voting } from '../builtin/0x1.js'
 
-// const accountTracker = AccountEventTracker.register('pull')
-
 SouffleChefCampaign.bind({ startVersion: 3212312n })
   .onEntryPullTokenV2((call: SouffleChefCampaign.PullTokenV2Payload, ctx) => {
     ctx.meter.Counter('call_num').add(1)
@@ -14,14 +12,6 @@ SouffleChefCampaign.bind({ startVersion: 3212312n })
     ctx.meter.Counter('burned').add(1)
     ctx.eventLogger.emit('pull', { distinctId: ctx.transaction.sender })
   })
-  .onMoveEvent(
-    (event, ctx) => {
-      ctx.meter.Counter('evt_num').add(1)
-    },
-    {
-      type: '0x1::coin::DepositEvent',
-    }
-  )
   .onTransaction(async (txn, ctx) => {
     const events = await defaultMoveCoder().filterAndDecodeEvents(token.DepositEvent.type(), txn.events)
     for (const event of events) {

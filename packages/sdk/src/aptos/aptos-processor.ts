@@ -60,7 +60,7 @@ export class AptosBaseProcessor {
     // this.loadTypes(this.coder)
   }
 
-  public onMoveEvent(
+  protected onMoveEvent(
     handler: (event: Event, ctx: AptosContext) => void,
     filter: EventFilter | EventFilter[],
     fetchConfig?: Partial<MoveFetchConfig>
@@ -205,6 +205,12 @@ export class AptosBaseProcessor {
 
   getChainId(): string {
     return this.config.network
+  }
+}
+
+export class AptosModulesProcessor extends AptosBaseProcessor {
+  constructor(options: AptosBindOptions) {
+    super('*', options)
   }
 }
 
