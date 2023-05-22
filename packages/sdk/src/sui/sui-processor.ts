@@ -236,7 +236,11 @@ export class SuiBaseProcessor {
 }
 
 export class SuiModulesProcessor extends SuiBaseProcessor {
-  constructor(options: SuiBindOptions) {
+  protected constructor(options: SuiBindOptions) {
     super('*', options)
+  }
+
+  static bind(options: SuiBindOptions): SuiModulesProcessor {
+    return new SuiModulesProcessor(options)
   }
 }

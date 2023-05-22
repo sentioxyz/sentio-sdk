@@ -209,8 +209,12 @@ export class AptosBaseProcessor {
 }
 
 export class AptosModulesProcessor extends AptosBaseProcessor {
-  constructor(options: AptosBindOptions) {
+  private constructor(options: AptosBindOptions) {
     super('*', options)
+  }
+
+  static bind(options: AptosBindOptions): AptosModulesProcessor {
+    return new AptosModulesProcessor(options)
   }
 }
 
