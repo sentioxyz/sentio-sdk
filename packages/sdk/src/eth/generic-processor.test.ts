@@ -18,10 +18,10 @@ describe('Test Generic Processor', () => {
       ],
       { address: '0x1E4EDE388cbc9F4b5c79681B7f94d36a11ABEBC9' }
     )
-      .onAllEvents(function (log, ctx) {
+      .onEvent(function (log, ctx) {
         ctx.meter.Counter('event_num').add(1)
       })
-      .onAllTraces(function (trace, ctx) {
+      .onTrace(function (trace, ctx) {
         ctx.meter.Counter('trace_count').add(1, { name: trace.name })
         ctx.eventLogger.emit(trace.name, {
           distinctId: trace.action.from,
@@ -31,7 +31,7 @@ describe('Test Generic Processor', () => {
 
     GenericProcessor.bind('event WalletCreated(address wallet, address owner)', {
       address: '0x57E037F4d2c8BEa011Ad8a9A5AF4AaEEd508650f',
-    }).onAllEvents(function (log, ctx) {
+    }).onEvent(function (log, ctx) {
       ctx.meter.Counter('wallet').add(1)
     })
   })

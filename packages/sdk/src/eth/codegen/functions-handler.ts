@@ -47,7 +47,7 @@ function generateCallHandler(fn: FunctionDeclaration, contractName: string, over
     handler: (call: ${upperFirst(overloadedName ?? fn.name)}CallTrace, ctx: ${contractName}Context) => void,
     fetchConfig?: Partial<EthFetchConfig>
   ): this {
-    return super.onTrace("${sighash}", handler as any, fetchConfig);
+    return super.onEthTrace("${sighash}", handler as any, fetchConfig);
   }
 `
 }

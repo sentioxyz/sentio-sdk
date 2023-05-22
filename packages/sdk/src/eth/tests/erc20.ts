@@ -52,7 +52,7 @@ ERC20Processor.bind({
       exporter.emit(ctx, { ...event, x: 100n })
     } /*filter*/
   )
-  // .onAllEvents((evt, ctx) => {
+  // .onEvent((evt, ctx) => {
   //   ctx.meter.Counter("event_count").add(1, { name: evt.name })
   //   ctx.eventLogger.emit(evt.name, {
   //     ...evt.args.toObject()

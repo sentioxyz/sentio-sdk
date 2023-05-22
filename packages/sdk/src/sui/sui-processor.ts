@@ -69,7 +69,7 @@ export class SuiBaseProcessor {
     return this.config.network
   }
 
-  public onMoveEvent(
+  protected onMoveEvent(
     handler: (event: SuiEvent, ctx: SuiContext) => void,
     filter: EventFilter | EventFilter[],
     fetchConfig?: Partial<MoveFetchConfig>
@@ -130,7 +130,7 @@ export class SuiBaseProcessor {
     return this
   }
 
-  public onEntryFunctionCall(
+  protected onEntryFunctionCall(
     handler: (call: MoveCallSuiTransaction, ctx: SuiContext) => void,
     filter: FunctionNameAndCallFilter | FunctionNameAndCallFilter[],
     fetchConfig?: Partial<MoveFetchConfig>
@@ -144,8 +144,6 @@ export class SuiBaseProcessor {
       _filters.push(filter)
     }
 
-    // const address = this.config.address
-    // const moduleName = this.moduleName
     const processor = this
     const allFunctionType = new Set(_filters.map((f) => processor.config.address + '::' + f.function))
 
@@ -189,6 +187,48 @@ export class SuiBaseProcessor {
         return ctx.getProcessResult()
       },
       filters: _filters,
+      fetchConfig: _fetchConfig,
+    })
+    return this
+  }
+
+  onEvent(handler: (event: SuiEvent, ctx: SuiContext) => void, fetchConfig?: Partial<MoveFetchConfig>): this {
+    this.onMoveEvent(handler, { type: '' }, fetchConfig)
+    return this
+  }
+
+  onTransactionBlock(
+    handler: (call: SuiTransactionBlockResponse, ctx: SuiContext) => void,
+    includeFailed = false,
+    fetchConfig?: Partial<MoveFetchConfig>
+  ): this {
+    const _fetchConfig = MoveFetchConfig.fromPartial({ ...DEFAULT_FETCH_CONFIG, ...fetchConfig })
+
+    const processor = this
+
+    this.callHandlers.push({
+      handler: async function (data) {
+        if (!data.transaction) {
+          throw new ServerError(Status.INVALID_ARGUMENT, 'call is null')
+        }
+        const tx = data.transaction as SuiTransactionBlockResponse
+
+        const ctx = new SuiContext(
+          processor.moduleName,
+          processor.config.network,
+          processor.config.address,
+          data.timestamp || new Date(0),
+          data.slot,
+          tx,
+          0,
+          processor.config.baseLabels
+        )
+        if (tx) {
+          await handler(tx, ctx)
+        }
+        return ctx.getProcessResult()
+      },
+      filters: [{ function: '', includeFailed }],
       fetchConfig: _fetchConfig,
     })
     return this

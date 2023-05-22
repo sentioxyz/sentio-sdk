@@ -64,10 +64,12 @@ export abstract class BaseProcessorTemplate<
     const processor = this.bindInternal(options)
 
     for (const eh of this.eventHandlers) {
-      processor.onEvent(eh.handler, eh.filter, eh.fetchConfig)
+      // @ts-ignore friendly
+      processor.onEthEvent(eh.handler, eh.filter, eh.fetchConfig)
     }
     for (const th of this.traceHandlers) {
-      processor.onTrace(th.signature, th.handler, th.fetchConfig)
+      // @ts-ignore friendly
+      processor.onEthTrace(th.signature, th.handler, th.fetchConfig)
     }
     for (const bh of this.blockHandlers) {
       processor.onInterval(bh.handler, bh.timeIntervalInMinutes, bh.blockInterval, bh.fetchConfig)
@@ -94,7 +96,7 @@ export abstract class BaseProcessorTemplate<
     ctx._res.states.configUpdated = true
   }
 
-  public onEvent(
+  protected onEthEvent(
     handler: (event: TypedEvent, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     filter: DeferredTopicFilter | DeferredTopicFilter[],
     fetchConfig?: Partial<EthFetchConfig>

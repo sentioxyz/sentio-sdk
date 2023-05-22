@@ -205,6 +205,28 @@ export abstract class BaseProcessor<
 
   public onEvent(
     handler: (event: TypedEvent, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
+    fetchConfig?: Partial<EthFetchConfig>
+  ): this {
+    const _filters: DeferredTopicFilter[] = []
+    const tmpContract = this.CreateBoundContractView()
+
+    for (const fragment of tmpContract.rawContract.interface.fragments) {
+      if (fragment.type === 'event') {
+        const filter = tmpContract.rawContract.filters[fragment.format()]
+        _filters.push(filter())
+      }
+    }
+    return this.onEthEvent(
+      function (log, ctx) {
+        return handler(log, ctx)
+      },
+      _filters,
+      fetchConfig
+    )
+  }
+
+  protected onEthEvent(
+    handler: (event: TypedEvent, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     filter: DeferredTopicFilter | DeferredTopicFilter[],
     fetchConfig?: Partial<EthFetchConfig>
   ): this {
@@ -325,29 +347,7 @@ export abstract class BaseProcessor<
     return this
   }
 
-  public onAllEvents(
-    handler: (event: TypedEvent, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
-    fetchConfig?: Partial<EthFetchConfig>
-  ): this {
-    const _filters: DeferredTopicFilter[] = []
-    const tmpContract = this.CreateBoundContractView()
-
-    for (const fragment of tmpContract.rawContract.interface.fragments) {
-      if (fragment.type === 'event') {
-        const filter = tmpContract.rawContract.filters[fragment.format()]
-        _filters.push(filter())
-      }
-    }
-    return this.onEvent(
-      function (log, ctx) {
-        return handler(log, ctx)
-      },
-      _filters,
-      fetchConfig
-    )
-  }
-
-  public onTrace(
+  protected onEthTrace(
     signatures: string | string[],
     handler: (trace: TypedCallTrace, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     fetchConfig?: Partial<EthFetchConfig>
@@ -409,7 +409,7 @@ export abstract class BaseProcessor<
     return this
   }
 
-  public onAllTraces(
+  public onTrace(
     handler: (event: TypedCallTrace, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     fetchConfig?: Partial<EthFetchConfig>
   ): this {
@@ -424,7 +424,7 @@ export abstract class BaseProcessor<
         sighashes.push(sighash)
       }
     }
-    return this.onTrace(
+    return this.onEthTrace(
       sighashes,
       function (trace, ctx) {
         return handler(trace, ctx)

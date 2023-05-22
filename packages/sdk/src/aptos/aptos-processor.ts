@@ -60,44 +60,6 @@ export class AptosBaseProcessor {
     // this.loadTypes(this.coder)
   }
 
-  // getABI(): MoveModule | undefined {
-  //   return undefined
-  // }
-
-  public onTransaction(
-    handler: (transaction: Transaction_UserTransaction, ctx: AptosContext) => PromiseOrVoid,
-    includedFailed = false,
-    fetchConfig?: Partial<MoveFetchConfig>
-  ): this {
-    const _fetchConfig = MoveFetchConfig.fromPartial({ ...DEFAULT_FETCH_CONFIG, ...fetchConfig })
-
-    // const address = this.config.address
-    // const moduleName = this.moduleName
-    const processor = this
-    this.callHandlers.push({
-      handler: async function (data) {
-        if (!data.transaction) {
-          throw new ServerError(Status.INVALID_ARGUMENT, 'call is null')
-        }
-        const call = data.transaction as Transaction_UserTransaction
-        const ctx = new AptosContext(
-          processor.moduleName,
-          processor.config.network,
-          processor.config.address,
-          BigInt(data.transaction.version),
-          call,
-          0,
-          processor.config.baseLabels
-        )
-        await handler(call, ctx)
-        return ctx.getProcessResult()
-      },
-      filters: [{ function: '', includeFailed: includedFailed }],
-      fetchConfig: _fetchConfig,
-    })
-    return this
-  }
-
   public onMoveEvent(
     handler: (event: Event, ctx: AptosContext) => void,
     filter: EventFilter | EventFilter[],
@@ -157,7 +119,7 @@ export class AptosBaseProcessor {
     return this
   }
 
-  public onEntryFunctionCall(
+  protected onEntryFunctionCall(
     handler: (call: TransactionPayload_EntryFunctionPayload, ctx: AptosContext) => PromiseOrVoid,
     filter: FunctionNameAndCallFilter | FunctionNameAndCallFilter[],
     fetchConfig?: Partial<MoveFetchConfig>
@@ -204,21 +166,46 @@ export class AptosBaseProcessor {
     return this
   }
 
+  public onTransaction(
+    handler: (transaction: Transaction_UserTransaction, ctx: AptosContext) => PromiseOrVoid,
+    includedFailed = false,
+    fetchConfig?: Partial<MoveFetchConfig>
+  ): this {
+    const _fetchConfig = MoveFetchConfig.fromPartial({ ...DEFAULT_FETCH_CONFIG, ...fetchConfig })
+
+    const processor = this
+    this.callHandlers.push({
+      handler: async function (data) {
+        if (!data.transaction) {
+          throw new ServerError(Status.INVALID_ARGUMENT, 'call is null')
+        }
+        const call = data.transaction as Transaction_UserTransaction
+        const ctx = new AptosContext(
+          processor.moduleName,
+          processor.config.network,
+          processor.config.address,
+          BigInt(data.transaction.version),
+          call,
+          0,
+          processor.config.baseLabels
+        )
+        await handler(call, ctx)
+        return ctx.getProcessResult()
+      },
+      filters: [{ function: '', includeFailed: includedFailed }],
+      fetchConfig: _fetchConfig,
+    })
+    return this
+  }
+
+  public onEvent(handler: (event: Event, ctx: AptosContext) => void, fetchConfig?: Partial<MoveFetchConfig>): this {
+    this.onMoveEvent(handler, { type: '' }, fetchConfig)
+    return this
+  }
+
   getChainId(): string {
     return this.config.network
   }
-
-  // loadTypes(registry: MoveCoder) {
-  //   if (registry.contains(this.config.address, this.moduleName)) {
-  //     return
-  //   }
-  //   this.loadTypesInternal(registry)
-  // }
-  //
-  // protected loadTypesInternal(registry: MoveCoder) {
-  //   // should be override by subclass
-  //   console.log('')
-  // }
 }
 
 export class AptosAccountProcessorState extends ListStateStorage<AptosResourcesProcessor> {

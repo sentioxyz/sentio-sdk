@@ -71,7 +71,7 @@ GlobalProcessor.bind({ startBlock: 17029962 }).onTransaction(async (tx, ctx) => 
   ctx.meter.Counter('all_tx').add(1)
 })
 
-// ERC20Processor.bind({ address: '0x1e4ede388cbc9f4b5c79681b7f94d36a11abebc9' }).onAllEvents((evt, ctx) => {
+// ERC20Processor.bind({ address: '0x1e4ede388cbc9f4b5c79681b7f94d36a11abebc9' }).onEvent((evt, ctx) => {
 //   ctx.meter.Counter('event_count').add(1, { name: evt.name })
 //   ctx.eventLogger.emit(evt.name, {
 //     ...evt.args.toObject(),

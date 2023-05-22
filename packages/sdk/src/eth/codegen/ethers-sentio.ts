@@ -116,25 +116,25 @@ export default class EthersSentio extends Ethers.default {
         const content = `
 
 ${contract.name}Processor.bind({ address: '${contract.address}', network: EthChainId.${chainKey} })
-  .onAllEvents((evt, ctx) => {
+  .onEvent((evt, ctx) => {
     ctx.meter.Counter('event_count').add(1, { name: evt.name })
     ctx.eventLogger.emit(evt.name, {
       ...evt.args.toObject(),
     })
 })
-  .onAllTraces(function (trace, ctx) {
-    const succeed = trace.error === undefined
-    ctx.meter.Counter('trace_count').add(1, { name: trace.name, success: String(succeed) })
-    if (succeed) {
-      ctx.eventLogger.emit(trace.name, {
-        distinctId: trace.action.from,
-        ...trace.args.toObject(),
-      })
-    }
-  })
 `
         exampleContent += content
       }
+      // .onAllTraces(function (trace, ctx) {
+      //   const succeed = trace.error === undefined
+      //   ctx.meter.Counter('trace_count').add(1, { name: trace.name, success: String(succeed) })
+      //   if (succeed) {
+      //     ctx.eventLogger.emit(trace.name, {
+      //       distinctId: trace.action.from,
+      //       ...trace.args.toObject(),
+      //     })
+      //   }
+      // })
 
       files.push({
         path: join(rootDir, 'processor.eth.example.ts'),

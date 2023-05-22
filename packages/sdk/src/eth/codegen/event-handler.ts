@@ -16,7 +16,7 @@ export function generateEventHandler(event: EventDeclaration, contractName: stri
     if (!filter) {
       filter = templateContract.filters['${filterName}'](${event.inputs.map(() => 'null').join(',')})
     }
-    return super.onEvent(handler, filter!, fetchConfig)
+    return super.onEthEvent(handler, filter!, fetchConfig)
   }
   `
 }
