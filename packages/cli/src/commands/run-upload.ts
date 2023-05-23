@@ -13,6 +13,7 @@ import { execFileSync } from 'child_process'
 import { getSdkVersion } from '../utils.js'
 import readline from 'readline'
 import * as process from 'process'
+import JSZip from 'jszip'
 
 const uploadOptionDefinitions = [
   {
@@ -181,7 +182,7 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth) {
     console.log(chalk.blue(triedCount > 1 ? 'Retry uploading' : 'Uploading'))
 
     // get gcs upload url
-    const initUploadResRaw = await initUpload(options.host, auth, options.project, getSdkVersion())
+    const initUploadResRaw = await initUpload(options.host, auth, options.project, getSdkVersion(), 0)
     if (!initUploadResRaw.ok) {
       // console.error(chalk.red('Failed to get upload url'))
       console.error(chalk.red(((await initUploadResRaw.json()) as { message: string }).message))
@@ -233,6 +234,8 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth) {
       console.error(chalk.red(await uploadResRaw.text()))
       return
     }
+
+    await uploadZip(options.host, auth, options.project, getSdkVersion())
 
     // finish uploading
     const finishUploadResRaw = await finishUpload(
@@ -287,7 +290,7 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth) {
   await tryUploading()
 }
 
-async function initUpload(host: string, auth: Auth, projectSlug: string, sdkVersion: string) {
+async function initUpload(host: string, auth: Auth, projectSlug: string, sdkVersion: string, sequence: number) {
   const initUploadUrl = new URL(`/api/v1/processors/init_upload`, host)
   return fetch(initUploadUrl.href, {
     method: 'POST',
@@ -297,6 +300,7 @@ async function initUpload(host: string, auth: Auth, projectSlug: string, sdkVers
     body: JSON.stringify({
       project_slug: projectSlug,
       sdk_version: sdkVersion,
+      sequence,
     }),
   })
 }
@@ -324,6 +328,46 @@ async function finishUpload(
       commit_sha: commitSha,
       git_url: gitUrl,
       debug: debug,
+      sequence: 1,
     }),
   })
+}
+
+async function uploadZip(host: string, auth: Auth, projectSlug: string, sdkVersion: string) {
+  const initUploadResRaw = await initUpload(host, auth, projectSlug, sdkVersion, 1)
+  const initUploadRes = (await initUploadResRaw.json()) as { url: string }
+  const uploadUrl = initUploadRes.url
+
+  const zip = new JSZip()
+  ;['package.json', 'tsconfig.json', 'sentio.yaml'].forEach((p) => {
+    if (fs.existsSync(p)) {
+      zip.file(p, fs.readFileSync(p))
+    }
+  })
+  if (fs.existsSync('abis') && fs.lstatSync('abis').isDirectory()) {
+    fs.readdirSync('abis').forEach((p) => {
+      const item = path.join('abis', p)
+      if (fs.lstatSync(item).isDirectory()) {
+        fs.readdirSync(item).forEach((p) => {
+          if (p.endsWith('.json')) {
+            zip.file(`${item}/${p}`, fs.readFileSync(path.join(item, p)))
+          }
+        })
+      } else if (p.endsWith('.json')) {
+        zip.file(`abis/${p}`, fs.readFileSync(item))
+      }
+    })
+  }
+
+  const uploadResRaw = await fetch(uploadUrl, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/octet-stream',
+    },
+    body: zip.generateNodeStream(),
+  })
+  if (!uploadResRaw.ok) {
+    console.error(chalk.red('Failed to upload'))
+    throw uploadResRaw.text()
+  }
 }
