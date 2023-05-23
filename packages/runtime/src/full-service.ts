@@ -16,6 +16,7 @@ import {
 import { Empty } from '@sentio/protos'
 import fs from 'fs-extra'
 import path from 'path'
+import os from 'os'
 
 function locatePackageJson(pkgId: string) {
   const m = require.resolve(pkgId)
@@ -74,12 +75,26 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
     for (const binding of request.bindings) {
       this.adjustDataBinding(binding)
     }
-    const result = await this.instance.processBindings(request, options)
-    this.adjustResult(result.result as ProcessResult)
-    if (!result.configUpdated && result.result?.states?.configUpdated) {
-      result.configUpdated = result.result?.states?.configUpdated
+    try {
+      const result = await this.instance.processBindings(request, options)
+      this.adjustResult(result.result as ProcessResult)
+      if (!result.configUpdated && result.result?.states?.configUpdated) {
+        result.configUpdated = result.result?.states?.configUpdated
+      }
+      return result
+    } catch (e) {
+      if (this.sdkMinorVersion <= 16) {
+        // Old sdk doesn't handle this well
+        if (
+          e.code === os.constants.errno.ECONNRESET ||
+          e.code === os.constants.errno.ECONNREFUSED ||
+          e.code === os.constants.errno.ECONNABORTED
+        ) {
+          process.exit(1)
+        }
+      }
+      throw e
     }
-    return result
   }
 
   async *processBindingsStream(requests: AsyncIterable<DataBinding>, context: CallContext) {

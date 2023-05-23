@@ -12,7 +12,6 @@ import { createHash } from 'crypto'
 import { execFileSync } from 'child_process'
 import { getSdkVersion } from '../utils.js'
 import readline from 'readline'
-import * as process from 'process'
 import JSZip from 'jszip'
 
 const uploadOptionDefinitions = [

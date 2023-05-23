@@ -85,6 +85,8 @@ export async function getPriceByTypeOrSymbolInternal(
       if (e.code === Status.NOT_FOUND) {
         return undefined
       }
+      // TODO maybe use small set of error
+      priceMap.delete(key)
       throw e
     })
   priceMap.set(key, price)

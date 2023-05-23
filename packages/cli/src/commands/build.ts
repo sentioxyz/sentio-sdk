@@ -1,7 +1,6 @@
 import chalk from 'chalk'
 import path from 'path'
 import fs from 'fs-extra'
-import * as process from 'process'
 import { getPackageRoot } from '../utils.js'
 import commandLineArgs from 'command-line-args'
 import commandLineUsage from 'command-line-usage'

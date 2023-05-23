@@ -5,7 +5,6 @@ import chalk from 'chalk'
 
 import { codegen } from './build.js'
 
-import * as process from 'process'
 import yaml from 'yaml'
 import { getABIFilePath, getABI, writeABIFile, ETH_API_URL_MAP } from '../abi.js'
 import { AptosChainId, ChainId, getChainName, SuiChainId } from '../chain.js'
