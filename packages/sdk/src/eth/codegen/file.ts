@@ -9,7 +9,7 @@ import {
 import { reservedKeywords } from '@sentio/ethers-v6/dist/codegen/reserved-keywords.js'
 import { codegenCallTraceTypes, generateCallHandlers } from './functions-handler.js'
 import { generateEventFilters, generateEventHandlers } from './event-handler.js'
-import { generateBoundViewFunctions, generateViewFunctions } from './view-function.js'
+import { generateBoundViewFunctions, generateViewFunctions } from './function-calls.js'
 
 export function codeGenIndex(contract: Contract): string {
   return ` 
@@ -29,23 +29,41 @@ export function codeGenSentioFile(contract: Contract): string {
   export class ${contract.name}ContractView extends ContractView<${contract.name}> {
     constructor (contract: ${contract.name}) {
       super(contract);
+      this.callStatic.contract = contract;
     }
 
     ${Object.values(contract.functions)
       .filter((f) => !reservedKeywords.has(f[0].name))
-      .map((fs) => generateViewFunctions(fs))
+      .flatMap((fs) => generateViewFunctions(true, fs))
       .join('\n')}
+    
+    callStatic = {
+      contract: this.contract,
+      ${Object.values(contract.functions)
+        .filter((f) => !reservedKeywords.has(f[0].name))
+        .flatMap((fs) => generateViewFunctions(false, fs))
+        .join(',\n')}
+    }
   }
   
   export class ${contract.name}BoundContractView extends BoundContractView<${contract.name}, 
     ${contract.name}ContractView> {
   ${Object.values(contract.functions)
     .filter((f) => !reservedKeywords.has(f[0].name))
-    .map((fs) => generateBoundViewFunctions(fs))
+    .flatMap((fs) => generateBoundViewFunctions(true, fs))
     .join('\n')}
+  
+    callStatic = {
+      view: this.view,
+      context: this.context,
+      ${Object.values(contract.functions)
+        .filter((f) => !reservedKeywords.has(f[0].name))
+        .flatMap((fs) => generateBoundViewFunctions(false, fs))
+        .join(',\n')}
+    }
   }
 
-    export type ${contract.name}Context = ContractContext<${contract.name}, ${contract.name}BoundContractView>
+  export type ${contract.name}Context = ContractContext<${contract.name}, ${contract.name}BoundContractView>
 
   export class ${contract.name}Processor extends BaseProcessor<${contract.name}, ${contract.name}BoundContractView> {
     ${Object.values(contract.events)
