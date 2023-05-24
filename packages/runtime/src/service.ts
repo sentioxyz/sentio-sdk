@@ -40,7 +40,8 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     //   throw new ServerError(Status.INTERNAL, 'Process config empty.')
     // }
 
-    const newConfig = ProcessConfigResponse.create()
+    // Don't use .create to keep compatiblity
+    const newConfig = ProcessConfigResponse.fromPartial({})
     await PluginManager.INSTANCE.configure(newConfig)
     return newConfig
   }
