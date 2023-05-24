@@ -1,4 +1,4 @@
-import { Counter, Gauge, Exporter } from '@sentio/sdk'
+import { Counter, Gauge, Exporter, EventLogger } from '@sentio/sdk'
 import { GlobalProcessor } from '@sentio/sdk/eth'
 
 import { ERC20Processor } from '@sentio/sdk/eth/builtin'
@@ -12,6 +12,8 @@ const rewardPerBlock = Gauge.register('reward_per_block', {
 })
 
 const tokenCounter = Counter.register('token')
+
+const rewardLogger = EventLogger.register('reward')
 
 const vol = Gauge.register('x2y2_vol', {
   description: 'transfer activities',
@@ -28,7 +30,7 @@ TokenDistributorProcessor.bind({ address: '0xB329e39Ebefd16f40d38f07643652cE17Ca
   async (_, ctx) => {
     const phase = (await ctx.contract.currentPhase()).toString()
     const reward = (await ctx.contract.rewardPerBlockForStaking()).scaleDown(18)
-    ctx.eventLogger.emit('reward', { message: `reward ${reward.toFormat(6)} for block ${ctx.blockNumber}`, phase })
+    rewardLogger.emit(ctx, { message: `reward ${reward.toFormat(6)} for block ${ctx.blockNumber}`, phase })
     rewardPerBlock.record(ctx, reward, {
       phase,
     })

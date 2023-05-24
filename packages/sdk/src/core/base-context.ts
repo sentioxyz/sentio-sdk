@@ -1,11 +1,11 @@
 import { ProcessResult, RecordMetaData, StateResult } from '@sentio/protos'
-import { EventLogger } from './event-logger.js'
+import { EventLoggerBinding } from './event-logger.js'
 import { Meter, Labels } from './meter.js'
 import { ChainId } from './chain.js'
 
 export abstract class BaseContext {
   meter: Meter
-  eventLogger: EventLogger
+  eventLogger: EventLoggerBinding
   protected baseLabels: Labels
 
   _res: ProcessResult & { states: StateResult } = {
@@ -20,7 +20,7 @@ export abstract class BaseContext {
 
   protected constructor(baseLabels: Labels | undefined) {
     this.meter = new Meter(this)
-    this.eventLogger = new EventLogger(this)
+    this.eventLogger = new EventLoggerBinding(this)
     this.baseLabels = baseLabels || {}
   }
 
