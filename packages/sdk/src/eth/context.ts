@@ -147,6 +147,9 @@ export class ContractContext<
   ) {
     super(chainId, view.address, timestamp, block, log, trace, transaction, transactionReceipt, baseLabels)
     view.context = this
+    if (view.callStatic) {
+      view.callStatic.context = this
+    }
     this.contractName = contractName
     this.contract = view
   }
@@ -181,6 +184,10 @@ export class BoundContractView<TContract extends BaseContract, TContractView ext
   // context will be set right after context creation (in context's constructor)
   // context: ContractContext<TContract, BoundContractView<TContract, TContractView>>
   context: EthContext
+  callStatic: {
+    context: EthContext
+    view: TContractView
+  }
 
   constructor(address: string, view: TContractView) {
     this.address = address
