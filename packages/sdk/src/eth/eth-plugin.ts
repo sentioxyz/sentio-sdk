@@ -242,7 +242,6 @@ export class EthPlugin extends Plugin {
   }
 
   async start(request: StartRequest) {
-    const ctx = new NoopContext()
     const allowedChainIds = new Set<string>(Object.values(EthChainId))
 
     for (const instance of request.templateInstances) {
@@ -257,11 +256,11 @@ export class EthPlugin extends Plugin {
       if (!instance.contract) {
         throw new ServerError(Status.INVALID_ARGUMENT, 'Contract Empty from:' + instance)
       }
+      const ctx = new NoopContext(instance.contract.chainId as EthChainId)
       template.bind(
         {
           name: instance.contract.name,
           address: validateAndNormalizeAddress(instance.contract.address),
-          network: instance.contract.chainId as EthChainId,
           startBlock: instance.startBlock,
           endBlock: instance.endBlock,
         },
@@ -361,8 +360,8 @@ export class EthPlugin extends Plugin {
 PluginManager.INSTANCE.register(new EthPlugin())
 
 class NoopContext extends EthContext {
-  public constructor() {
-    super(EthChainId.ETHEREUM, '')
+  public constructor(chainId: EthChainId) {
+    super(chainId, '')
   }
 
   protected getContractName(): string {

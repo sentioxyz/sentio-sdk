@@ -49,11 +49,10 @@ export abstract class BaseProcessorTemplate<
    * @param options
    * @param ctx
    */
-  public bind(options: BindOptions, ctx: EthContext): void {
-    options.network = options.network || ctx.chainId
+  public bind(options: Omit<BindOptions, 'network'>, ctx: EthContext): void {
     const sig = getOptionsSignature({
       address: options.address,
-      network: options.network,
+      network: ctx.chainId,
     })
     if (this.binds.has(sig)) {
       console.log(`Same address can be bind to one template only once, ignore duplicate bind: ${sig}`)
@@ -80,7 +79,7 @@ export abstract class BaseProcessorTemplate<
       contract: {
         address: options.address,
         name: options.name || '',
-        chainId: options.network,
+        chainId: ctx.chainId,
         abi: '',
       },
       startBlock: 0n,

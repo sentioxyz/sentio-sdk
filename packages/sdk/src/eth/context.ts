@@ -8,16 +8,16 @@ import { BaseContext } from '../core/base-context.js'
 import { EthChainId } from '../core/chain.js'
 
 export abstract class EthContext extends BaseContext {
-  chainId: EthChainId
-  address: string
+  readonly chainId: EthChainId
+  readonly address: string
   private readonly log?: LogParams
-  block?: BlockParams
+  readonly block?: BlockParams
   private readonly trace?: Trace
-  blockNumber: number
-  transactionHash?: string
-  transaction?: TransactionResponseParams
-  transactionReceipt?: TransactionReceiptParams
-  timestamp: Date
+  readonly blockNumber: number
+  readonly transactionHash?: string
+  readonly transaction?: TransactionResponseParams
+  readonly transactionReceipt?: TransactionReceiptParams
+  readonly timestamp: Date
 
   constructor(
     chainId: EthChainId,

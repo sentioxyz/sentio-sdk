@@ -20,10 +20,7 @@ ERC20Processor.bind({
   startBlock: 14201940,
 })
   .onEventTransfer(async function (event, ctx) {
-    processorTemplate.bind(
-      { address: '0x1E4EDE388cbc9F4b5c79681B7f94d36a11ABEBC9', network: EthChainId.ROPSTEN, name: 'dynamic' },
-      ctx
-    )
+    processorTemplate.bind({ address: '0x1E4EDE388cbc9F4b5c79681B7f94d36a11ABEBC9', name: 'dynamic' }, ctx)
     // template.bind('0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', 3, 'dynamic')
     ctx.meter.Counter('c1').add(1)
     ctx.eventLogger.emit(event.name, {
