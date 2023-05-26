@@ -138,7 +138,10 @@ export class ${contract.name}ProcessorTemplate extends BaseProcessorTemplate<${c
     ${contract.name}BoundContractView {
     const view = get${contract.name}Contract(context.getChainId(), address)
     const boundView = new ${contract.name}BoundContractView(address, view) 
-    boundView.context = context as any;
+    boundView.context = context;
+    if (boundView.callStatic) {
+      boundView.callStatic.context = context;
+    }
     return boundView;
   }
   `
