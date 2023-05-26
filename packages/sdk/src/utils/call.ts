@@ -2,7 +2,7 @@
  * ignore eth call exception and return undefined if that happened
  * @param call
  */
-async function ignoreCallException<Res>(call: () => Promise<Res>): Promise<Res | undefined> {
+export async function ethCallIgnoreException<Res>(call: () => Promise<Res>): Promise<Res | undefined> {
   try {
     return await call()
   } catch (err) {
