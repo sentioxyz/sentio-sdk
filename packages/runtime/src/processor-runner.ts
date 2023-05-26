@@ -3,23 +3,21 @@
 import path from 'path'
 import fs from 'fs-extra'
 
+import { compressionAlgorithms } from '@grpc/grpc-js'
 import commandLineArgs from 'command-line-args'
 import { createServer } from 'nice-grpc'
-import { compressionAlgorithms } from '@grpc/grpc-js'
-
-import { register as globalRegistry, Registry } from 'prom-client'
 import { registry as niceGrpcRegistry, prometheusServerMiddleware } from 'nice-grpc-prometheus'
+import { register as globalRegistry, Registry } from 'prom-client'
 import http from 'http'
-
-const mergedRegistry = Registry.merge([globalRegistry, niceGrpcRegistry])
 
 import { ProcessorDefinition } from './gen/processor/protos/processor.js'
 import { ProcessorServiceImpl } from './service.js'
 import { Endpoints } from './endpoints.js'
-
 import { FullProcessorServiceImpl } from './full-service.js'
 import { ChainConfig } from './chain-config.js'
 import { setupJsonLogger } from './logger.js'
+
+const mergedRegistry = Registry.merge([globalRegistry, niceGrpcRegistry])
 
 const optionDefinitions = [
   { name: 'target', type: String, defaultOption: true },
@@ -108,12 +106,25 @@ const httpServer = http
 
 console.log('Metric Server Started at:', metricsPort)
 
-process.on('SIGINT', function () {
+process
+  .on('SIGINT', function () {
+    shutdownServers(0)
+  })
+  .on('uncaughtException', (err) => {
+    console.error('Uncaught Exception, please checking if await is properly used', err)
+    shutdownServers(1)
+  })
+  .on('unhandledRejection', (reason, p) => {
+    console.error('Unhandled Rejection, please checking if await is properly', reason)
+    shutdownServers(1)
+  })
+
+function shutdownServers(exitCode: number) {
   server.forceShutdown()
   console.log('RPC server shut down')
 
   httpServer.close(function () {
     console.log('Http server shut down')
-    process.exit(0)
+    process.exit(exitCode)
   })
-})
+}
