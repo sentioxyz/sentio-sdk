@@ -62,7 +62,7 @@ export function transformEtherError(e: Error, ctx: ContractContext<any, any> | u
 
   let msg = ''
   const err = e as CallExceptionError
-  if (err.code === 'CALL_EXCEPTION') {
+  if (err.code === 'CALL_EXCEPTION' || err.code === 'BAD_DATA') {
     if (err.data === '0x') {
       if (ctx) {
         msg =
@@ -80,7 +80,7 @@ export function transformEtherError(e: Error, ctx: ContractContext<any, any> | u
     }
   }
 
-  msg = 'ethers call error\n' + JSON.stringify(e) + '\n' + e.stack?.toString() + '\n' + checkPage
+  msg = 'other error during call error\n' + JSON.stringify(e) + '\n' + e.stack?.toString() + '\n' + checkPage
   return new Error(msg)
 }
 

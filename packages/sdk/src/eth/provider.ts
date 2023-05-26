@@ -97,7 +97,7 @@ class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
     if (!perform) {
       perform = this.executor.add(() => super.send(method, params))
       perform.catch((e) => {
-        if (e.code !== 'CALL_EXCEPTION') {
+        if (e.code !== 'CALL_EXCEPTION' && e.code !== 'BAD_DATA') {
           setTimeout(() => {
             if (this.#performCache.get(tag) === perform) {
               this.#performCache.delete(tag)
