@@ -75,6 +75,8 @@ export function transformEtherError(e: Error, ctx: ContractContext<any, any> | u
       }
       msg += '\n' + checkPage
       return new SimpleEthersError(msg, err)
+    } else {
+      return new SimpleEthersError('eth call error, ' + checkPage, err)
     }
   }
 
