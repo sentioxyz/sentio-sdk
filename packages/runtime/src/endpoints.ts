@@ -1,7 +1,7 @@
 export class Endpoints {
   static INSTANCE: Endpoints = new Endpoints()
 
-  concurrency = 4
+  concurrency = 8
   chainQueryAPI = ''
   priceFeedAPI = ''
 
