@@ -125,12 +125,16 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       throw new ServerError(Status.UNAVAILABLE, 'Service Not started.')
     }
     if (this.unhandled) {
-      throw new RichServerError(Status.UNAVAILABLE, 'Unhandled exception/rejection in previous request', [
-        DebugInfo.fromPartial({
-          detail: this.unhandled.message,
-          stackEntries: this.unhandled.stack?.split('\n'),
-        }),
-      ])
+      throw new RichServerError(
+        Status.UNAVAILABLE,
+        'Unhandled exception/rejection in previous request' + errorString(this.unhandled),
+        [
+          DebugInfo.fromPartial({
+            detail: this.unhandled.message,
+            stackEntries: this.unhandled.stack?.split('\n'),
+          }),
+        ]
+      )
     }
     const result = await PluginManager.INSTANCE.processBinding(request)
     recordRuntimeInfo(result, request.handlerType)
