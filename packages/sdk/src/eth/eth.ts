@@ -63,7 +63,6 @@ export function transformEtherError(e: Error, ctx: ContractContext<any, any> | u
   let msg = ''
   const err = e as CallExceptionError
   if (err.code === 'CALL_EXCEPTION' || err.code === 'BAD_DATA') {
-    const stack = new Error().stack
     if (err.data === '0x') {
       if (ctx) {
         msg = `jsonrpc eth_call return '0x' (likely contract not existed) at chain ${ctx.chainId}, ${checkPage}:\n${e.message}`

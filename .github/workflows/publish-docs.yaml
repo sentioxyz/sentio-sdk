@@ -30,7 +30,7 @@ jobs:
         run: pnpm gen:docs
         working-directory: packages/sdk
       - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@v4.4.1
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages
           folder: packages/sdk/docs
