@@ -35,12 +35,13 @@ export function generateViewFunction(view: boolean, fn: FunctionDeclaration, inc
   async ${declName}(${generateInputTypes(fn.inputs, {
       useStructs: true,
     })}overrides?: Overrides): ${generateReturnTypes(fn)} {
+    const stack = new Error().stack
     try {    
        return await ${func}${call}(${
       fn.inputs.length > 0 ? fn.inputs.map((input, index) => input.name || `arg${index}`).join(',') + ',' : ''
     } overrides || {})
     } catch (e) {
-      throw transformEtherError(e, undefined)
+      throw transformEtherError(e, undefined, stack)
     }
   }
   `,

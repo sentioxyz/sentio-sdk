@@ -42,9 +42,9 @@ export interface RichBlock extends BlockParams {
 export class SimpleEthersError extends Error {
   e: Error
 
-  constructor(message: string, e: Error) {
+  constructor(message: string, e: Error, stack?: string) {
     super(message)
-    this.stack = e.stack
+    this.stack = stack
   }
 
   toString() {
@@ -52,7 +52,7 @@ export class SimpleEthersError extends Error {
   }
 }
 
-export function transformEtherError(e: Error, ctx: ContractContext<any, any> | undefined): Error {
+export function transformEtherError(e: Error, ctx: ContractContext<any, any> | undefined, stack?: string): Error {
   if (e instanceof SimpleEthersError) {
     return e
   }
@@ -63,24 +63,20 @@ export function transformEtherError(e: Error, ctx: ContractContext<any, any> | u
   let msg = ''
   const err = e as CallExceptionError
   if (err.code === 'CALL_EXCEPTION' || err.code === 'BAD_DATA') {
+    const stack = new Error().stack
     if (err.data === '0x') {
       if (ctx) {
-        msg =
-          "jsonrpc eth_call return '0x' (likely contract not existed) at chain " +
-          ctx.chainId +
-          ': ' +
-          JSON.stringify(e)
+        msg = `jsonrpc eth_call return '0x' (likely contract not existed) at chain ${ctx.chainId}, ${checkPage}:\n${e.message}`
       } else {
-        msg = "jsonrpc eth_call return '0x' (likely contract not existed): " + JSON.stringify(err)
+        msg = `jsonrpc eth_call return '0x' (likely contract not existed), ${checkPage}:\n${e.message}`
       }
-      msg += '\n' + checkPage
-      return new SimpleEthersError(msg, err)
+      return new SimpleEthersError(msg, err, stack)
     } else {
-      return new SimpleEthersError('eth call error, ' + checkPage, err)
+      return new SimpleEthersError(`eth call error, ${checkPage}:\nerr.message`, err, stack)
     }
   }
 
-  msg = 'other error during call error\n' + JSON.stringify(e) + '\n' + e.stack?.toString() + '\n' + checkPage
+  msg = 'other error during call error\n' + JSON.stringify(e) + '\n' + stack?.toString() + '\n' + checkPage
   return new Error(msg)
 }
 
