@@ -1,4 +1,5 @@
 import { CallContext, ServerError, Status } from 'nice-grpc'
+import { RichServerError, DebugInfo } from 'nice-grpc-error-details'
 
 import {
   DataBinding,
@@ -21,6 +22,8 @@ import { errorString, mergeProcessResults } from './utils.js'
 
 export class ProcessorServiceImpl implements ProcessorServiceImplementation {
   private started = false
+  // When there is unhandled error, stop process and return unavailable error
+  unhandled: Error
   // private processorConfig: ProcessConfigResponse
 
   private readonly loader: () => Promise<any>
@@ -97,10 +100,6 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
   }
 
   async processBindings(request: ProcessBindingsRequest, options?: CallContext): Promise<ProcessBindingResponse> {
-    if (!this.started) {
-      throw new ServerError(Status.UNAVAILABLE, 'Service Not started.')
-    }
-
     const promises = request.bindings.map((binding) => this.processBinding(binding))
     let promise
     try {
@@ -122,6 +121,17 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
   }
 
   async processBinding(request: DataBinding, options?: CallContext): Promise<ProcessResult> {
+    if (!this.started) {
+      throw new ServerError(Status.UNAVAILABLE, 'Service Not started.')
+    }
+    if (this.unhandled) {
+      throw new RichServerError(Status.UNAVAILABLE, 'Unhandled exception/rejection in previous request', [
+        DebugInfo.fromPartial({
+          detail: this.unhandled.message,
+          stackEntries: this.unhandled.stack?.split('\n'),
+        }),
+      ])
+    }
     const result = await PluginManager.INSTANCE.processBinding(request)
     recordRuntimeInfo(result, request.handlerType)
     return result

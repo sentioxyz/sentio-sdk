@@ -6,6 +6,7 @@ import fs from 'fs-extra'
 import { compressionAlgorithms } from '@grpc/grpc-js'
 import commandLineArgs from 'command-line-args'
 import { createServer } from 'nice-grpc'
+import { errorDetailsServerMiddleware } from 'nice-grpc-error-details'
 import { registry as niceGrpcRegistry, prometheusServerMiddleware } from 'nice-grpc-prometheus'
 import { register as globalRegistry, Registry } from 'prom-client'
 import http from 'http'
@@ -74,8 +75,9 @@ const server = createServer({
   'grpc.max_send_message_length': 128 * 1024 * 1024,
   'grpc.max_receive_message_length': 128 * 1024 * 1024,
   'grpc.default_compression_algorithm': compressionAlgorithms.gzip,
-}).use(prometheusServerMiddleware())
-
+})
+  .use(prometheusServerMiddleware())
+  .use(errorDetailsServerMiddleware)
 const baseService = new ProcessorServiceImpl(async () => {
   const m = await import(options.target)
   if (options.debug) {
@@ -112,11 +114,13 @@ process
   })
   .on('uncaughtException', (err) => {
     console.error('Uncaught Exception, please checking if await is properly used', err)
-    shutdownServers(1)
+    baseService.unhandled = err
+    // shutdownServers(1)
   })
   .on('unhandledRejection', (reason, p) => {
     console.error('Unhandled Rejection, please checking if await is properly', reason)
-    shutdownServers(1)
+    baseService.unhandled = reason as Error
+    // shutdownServers(1)
   })
 
 function shutdownServers(exitCode: number) {
