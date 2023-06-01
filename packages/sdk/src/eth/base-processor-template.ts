@@ -60,7 +60,7 @@ export abstract class BaseProcessorTemplate<
     }
     this.binds.add(sig)
 
-    const processor = this.bindInternal(options)
+    const processor = this.bindInternal({ ...options, network: ctx.chainId })
 
     for (const eh of this.eventHandlers) {
       // @ts-ignore friendly

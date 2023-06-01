@@ -19,7 +19,7 @@ describe('Test Template', () => {
 
     ERC20Processor.bind({
       address: '0x1e4ede388cbc9f4b5c79681b7f94d36a11abebc9',
-      network: EthChainId.ETHEREUM,
+      network: EthChainId.ARBITRUM,
       name: 'x2y2',
       startBlock: 14201940,
     }).onEventTransfer(async function (event, ctx) {
@@ -42,7 +42,7 @@ describe('Test Template', () => {
           contract: {
             address: '0xb329e39ebefd16f40d38f07643652ce17ca5bac1',
             name: 'dynamic2',
-            chainId: '1',
+            chainId: '42161',
             abi: '',
           },
           startBlock: 0n,
@@ -57,7 +57,9 @@ describe('Test Template', () => {
   test('Check template instantiate', async () => {
     const config = await service.getConfig({})
     expect(config.contractConfigs).length(2)
+    expect(config.contractConfigs[1].contract?.chainId).equals(EthChainId.ARBITRUM)
     expect(config.contractConfigs?.[1].contract?.name).equals('dynamic2')
     expect(config.templateInstances).length(1)
+    expect(config.templateInstances[0].contract?.chainId).equals(EthChainId.ARBITRUM)
   })
 })
