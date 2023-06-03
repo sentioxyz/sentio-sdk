@@ -127,7 +127,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     if (this.unhandled) {
       throw new RichServerError(
         Status.UNAVAILABLE,
-        'Unhandled exception/rejection in previous request' + errorString(this.unhandled),
+        'Unhandled exception/rejection in previous request: ' + errorString(this.unhandled),
         [
           DebugInfo.fromPartial({
             detail: this.unhandled.message,

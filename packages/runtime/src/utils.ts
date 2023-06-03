@@ -16,7 +16,7 @@ export function mergeProcessResults(results: ProcessResult[]): ProcessResult {
 }
 
 export function errorString(e: Error): string {
-  return e.stack || e.message
+  return e.message + '\n' + e.stack
 }
 
 export const USER_PROCESSOR = 'user_processor'
