@@ -129,6 +129,11 @@ export class GlobalProcessor {
     fetchConfig: Partial<EthFetchConfig> | undefined
   ): this {
     const chainId = this.getChainId()
+    if (timeInterval) {
+      if (timeInterval.backfillInterval < timeInterval.recentInterval) {
+        timeInterval.backfillInterval = timeInterval.recentInterval
+      }
+    }
 
     this.blockHandlers.push({
       handler: async function (data: Data_EthBlock) {
