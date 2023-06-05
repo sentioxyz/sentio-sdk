@@ -52,6 +52,7 @@ export enum EthChainId {
   CALLISTO = '820',
   WANCHAIN = '888',
   POLYGON_ZKEVM = '1101',
+  CONFLUX = '1030',
   METIS = '1088',
   OMCHAIN = '1246',
   MOONBEAM = '1284',
