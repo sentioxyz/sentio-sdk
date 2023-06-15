@@ -31,9 +31,21 @@ const DEFAULT_FETCH_CONFIG: MoveFetchConfig = {
 export type IndexConfigure = Required<SuiBindOptions, 'startCheckpoint' | 'network'>
 
 export function configure(options: SuiBindOptions): IndexConfigure {
+  let addressNoPrefix = options.address
+
+  if (addressNoPrefix.startsWith('0x')) {
+    addressNoPrefix = addressNoPrefix.slice(2)
+  }
+  for (let i = 0; i < addressNoPrefix.length; i++) {
+    if (addressNoPrefix[i] !== '0') {
+      addressNoPrefix = addressNoPrefix.slice(i)
+      break
+    }
+  }
+
   return {
     startCheckpoint: options.startCheckpoint || 0n,
-    address: options.address,
+    address: '0x' + addressNoPrefix,
     network: options.network || SuiNetwork.MAIN_NET,
     baseLabels: options.baseLabels,
   }
