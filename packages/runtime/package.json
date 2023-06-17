@@ -24,9 +24,6 @@
     "start_ts": "ts-node-esm --files ./lib/processor-runner.js --log-format=json $PWD/../../debug/src/processor.ts",
     "test": "NODE_OPTIONS=--experimental-vm-modules pnpm jest"
   },
-  "resolutions": {
-    "@grpc/grpc-js": "^1.8.7"
-  },
   "dependencies": {
     "@grpc/grpc-js": "^1.8.14",
     "@sentio/protos": "workspace:*",

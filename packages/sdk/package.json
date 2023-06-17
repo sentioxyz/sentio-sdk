@@ -55,12 +55,9 @@
     "gen:sui_test": "ts-node-esm  src/sui/codegen/run.ts src/sui/tests/abis src/sui/tests/types",
     "test": "NODE_OPTIONS=--experimental-vm-modules pnpm jest --runInBand --detectOpenHandles"
   },
-  "resolutions": {
-    "superstruct": "^1.0.3"
-  },
   "dependencies": {
     "@coral-xyz/borsh": "^0.28.0",
-    "@mysten/sui.js": "npm:@sentio/sui.js@^0.34.0",
+    "@mysten/sui.js": "^0.36.0",
     "@project-serum/anchor": "^0.26.0",
     "@sentio/bigdecimal": "^9.1.1-patch.3",
     "@sentio/chain": "^1.0.0",
@@ -69,11 +66,11 @@
     "@sentio/runtime": "workspace:^",
     "@solana/web3.js": "^1.74.0",
     "@types/prettier": "^2.7.2",
-    "aptos-sdk": "npm:aptos@^1.8.5",
+    "aptos-sdk": "npm:aptos@^1.10.0",
     "bs58": "^5.0.0",
     "chalk": "^5.2.0",
     "csv-parse": "^5.3.0",
-    "ethers": "npm:@sentio/ethers@^6.4.0",
+    "ethers": "npm:@sentio/ethers@^6.6.0",
     "js-sha3": "^0.8.0",
     "lodash-es": "^4.17.21",
     "mkdirp": "^1.0.4",
