@@ -3,7 +3,7 @@ import { createChannel, createClientFactory, Status } from 'nice-grpc'
 import { prometheusClientMiddleware } from 'nice-grpc-prometheus'
 import { retryMiddleware, RetryOptions } from 'nice-grpc-client-middleware-retry'
 import { Endpoints } from '@sentio/runtime'
-import { ChainId } from '../core/chain.js'
+import { ChainId } from '@sentio/chain'
 
 export function getPriceClient(address?: string) {
   if (!address) {

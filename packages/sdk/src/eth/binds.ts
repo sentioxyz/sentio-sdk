@@ -4,7 +4,7 @@ import { BaseProcessor } from './base-processor.js'
 
 import { BaseContract } from 'ethers'
 import { MapStateStorage } from '@sentio/runtime'
-import { EthChainId } from '../core/chain.js'
+import { EthChainId } from '@sentio/chain'
 
 export class ProcessorState extends MapStateStorage<BaseProcessor<any, any>> {
   static INSTANCE = new ProcessorState()

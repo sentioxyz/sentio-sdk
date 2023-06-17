@@ -1,4 +1,4 @@
-import { SuiChainId } from '../core/chain.js'
+import { SuiChainId } from '@sentio/chain'
 import { Connection, JsonRpcProvider } from '@mysten/sui.js'
 import { Endpoints } from '@sentio/runtime'
 import { ServerError, Status } from 'nice-grpc'

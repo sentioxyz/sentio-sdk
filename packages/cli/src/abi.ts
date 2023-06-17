@@ -5,7 +5,7 @@ import process from 'process'
 import path from 'path'
 import fs from 'fs-extra'
 import fetch from 'node-fetch'
-import { AptosChainId, ChainId, EthChainId, SuiChainId } from './chain.js'
+import { AptosChainId, ChainId, EthChainId, SuiChainId } from '@sentio/chain'
 
 export const ETH_API_URL_MAP: Record<string, string> = {}
 

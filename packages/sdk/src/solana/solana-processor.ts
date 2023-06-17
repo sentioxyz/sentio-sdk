@@ -4,7 +4,7 @@ import { Instruction } from '@project-serum/anchor'
 import { SolanaBindOptions } from './solana-options.js'
 import { ListStateStorage } from '@sentio/runtime'
 import { Labels } from '../core/index.js'
-import { SolanaChainId } from '../core/chain.js'
+import { SolanaChainId } from '@sentio/chain'
 
 type IndexConfigure = {
   startSlot: bigint

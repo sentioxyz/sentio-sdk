@@ -4,7 +4,7 @@ import { parse } from 'csv-parse/sync'
 import { BlockTag } from 'ethers/providers'
 import url from 'url'
 import { scaleDown } from '../core/big-decimal.js'
-import { EthChainId } from '../core/chain.js'
+import { EthChainId } from '@sentio/chain'
 
 type OralceRecord = {
   Pair: string

@@ -1,7 +1,7 @@
 import { State } from '@sentio/runtime'
 import { getERC20TokenInfo } from './token.js'
 import { loadTestProvidersFromEnv } from '../testing/test-provider.js'
-import { EthChainId } from '../core/chain.js'
+import { EthChainId } from '@sentio/chain'
 
 describe('erc20 tests', () => {
   State.reset()

@@ -17,7 +17,7 @@ import { ServerError, Status } from 'nice-grpc'
 import { fixEmptyKey, formatEthData, RichBlock, TypedCallTrace, TypedEvent } from './eth.js'
 import sha3 from 'js-sha3'
 import { ListStateStorage } from '@sentio/runtime'
-import { EthChainId } from '../core/chain.js'
+import { EthChainId } from '@sentio/chain'
 
 export interface AddressOrTypeEventFilter extends DeferredTopicFilter {
   addressType?: AddressType

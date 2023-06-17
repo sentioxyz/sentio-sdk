@@ -11,7 +11,7 @@ import { AddressOrTypeEventFilter, EventsHandler } from './base-processor.js'
 import { Block } from 'ethers'
 import { AccountProcessorState } from './account-processor-state.js'
 import { fixEmptyKey, formatEthData, TypedEvent } from './eth.js'
-import { EthChainId } from '../core/chain.js'
+import { EthChainId } from '@sentio/chain'
 import { ServerError, Status } from 'nice-grpc'
 
 const ERC20_INTERFACE = ERC20__factory.createInterface()

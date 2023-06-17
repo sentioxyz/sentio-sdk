@@ -1,5 +1,5 @@
 import { getABI } from './abi.js'
-import { EthChainId, SuiChainId } from './chain.js'
+import { EthChainId, SuiChainId } from '@sentio/chain'
 import { expect } from 'chai'
 import { jest } from '@jest/globals'
 

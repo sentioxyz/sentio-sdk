@@ -12,7 +12,7 @@ import {
 } from '@sentio/protos'
 import { CallContext } from 'nice-grpc-common'
 import { Endpoints, ProcessorServiceImpl, State } from '@sentio/runtime'
-import { CHAIN_MAP } from '../core/chain.js'
+import { CHAIN_MAP } from '@sentio/chain'
 
 import { AptosFacet } from './aptos-facet.js'
 import { SolanaFacet } from './solana-facet.js'

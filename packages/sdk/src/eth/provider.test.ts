@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import { AccountContext } from './context.js'
-import { EthChainId } from '../core/chain.js'
+import { EthChainId } from '@sentio/chain'
 
 describe('provider test', () => {
   // test('network test with string', async () => {

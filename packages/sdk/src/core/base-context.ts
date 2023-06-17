@@ -1,7 +1,7 @@
 import { ProcessResult, RecordMetaData, StateResult } from '@sentio/protos'
 import { EventLoggerBinding } from './event-logger.js'
 import { Meter, Labels } from './meter.js'
-import { ChainId } from './chain.js'
+import { ChainId } from '@sentio/chain'
 
 export abstract class BaseContext {
   meter: Meter

@@ -3,7 +3,7 @@ import { expect } from 'chai'
 import { StartRequest } from '@sentio/protos'
 import { TestProcessorServer } from '../../testing/index.js'
 import { ERC20Processor, ERC20ProcessorTemplate } from '../builtin/erc20.js'
-import { EthChainId } from '../../core/chain.js'
+import { EthChainId } from '@sentio/chain'
 // import { TestProcessorServer } from '../testing/index.js'
 
 describe('Test Template', () => {

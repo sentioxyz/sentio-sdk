@@ -1,4 +1,4 @@
-import { ChainId } from './chain.js'
+import { ChainId } from '@sentio/chain'
 
 const HostMap: { [host: string]: string } = {
   local: 'http://localhost:10000',

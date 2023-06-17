@@ -1,5 +1,5 @@
 import { Endpoints } from '@sentio/runtime'
-import { CHAIN_MAP } from '../core/chain.js'
+import { CHAIN_MAP } from '@sentio/chain'
 
 export function loadTestProvidersFromEnv(requiredChainIds: string[] | string): boolean {
   const found: string[] = []

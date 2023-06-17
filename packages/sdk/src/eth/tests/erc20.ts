@@ -1,6 +1,6 @@
 import { ERC20Processor, ERC20ProcessorTemplate } from '../builtin/erc20.js'
 import { Exporter } from '../../core/exporter.js'
-import { EthChainId } from '../../core/chain.js'
+import { EthChainId } from '@sentio/chain'
 
 export const filter = ERC20Processor.filters.Transfer(
   '0x0000000000000000000000000000000000000000',

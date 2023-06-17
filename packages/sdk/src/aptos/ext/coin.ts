@@ -2,7 +2,7 @@ import { getPriceByType } from '@sentio/sdk/utils'
 import fetch from 'node-fetch'
 import { validateAndNormalizeAddress } from '../utils.js'
 import { SPLITTER } from '../../move/index.js'
-import { AptosChainId } from '../../core/chain.js'
+import { AptosChainId } from '@sentio/chain'
 import { SimpleCoinInfo } from '../../move/ext/move-dex.js'
 
 const WHITELISTED_COINS = new Map<string, SimpleCoinInfo>()

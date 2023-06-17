@@ -1,4 +1,4 @@
-import { EthChainId } from '../core/chain.js'
+import { EthChainId } from '@sentio/chain'
 
 export class BindOptions {
   // Contract address

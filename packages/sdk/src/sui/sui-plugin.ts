@@ -20,7 +20,7 @@ import { SuiProcessorState } from './sui-processor.js'
 import { SuiAccountProcessorState } from './sui-object-processor.js'
 import { validateAndNormalizeAddress } from './utils.js'
 import { initCoinList } from './ext/coin.js'
-import { SuiChainId } from '../core/chain.js'
+import { SuiChainId } from '@sentio/chain'
 import {
   SuiAccountProcessorTemplateState,
   SuiObjectOrAddressProcessorTemplate,

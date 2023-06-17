@@ -7,7 +7,7 @@ import { mockTransferLog } from '../builtin/erc20.js'
 import { HandlerType } from '@sentio/protos'
 import { SENTIO_BIGINT_STRING_SUFFIX } from '../../core/normalization.js'
 import { RichBlock } from '../eth.js'
-import { EthChainId } from '../../core/chain.js'
+import { EthChainId } from '@sentio/chain'
 
 describe('Test Basic Examples', () => {
   const service = new TestProcessorServer(async () => {

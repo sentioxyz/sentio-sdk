@@ -5,7 +5,7 @@ import { RecordMetaData } from '@sentio/protos'
 import { Trace } from './eth.js'
 import { Labels, normalizeLabels } from '../core/index.js'
 import { BaseContext } from '../core/base-context.js'
-import { EthChainId } from '../core/chain.js'
+import { EthChainId } from '@sentio/chain'
 
 export abstract class EthContext extends BaseContext {
   readonly chainId: EthChainId

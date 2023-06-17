@@ -7,7 +7,7 @@ import { codegen } from './build.js'
 
 import yaml from 'yaml'
 import { getABIFilePath, getABI, writeABIFile, ETH_API_URL_MAP } from '../abi.js'
-import { AptosChainId, ChainId, getChainName, SuiChainId } from '../chain.js'
+import { AptosChainId, ChainId, getChainName, SuiChainId } from '@sentio/chain'
 
 export async function runAdd(argv: string[]) {
   const supportedChain: string[] = [

@@ -2,7 +2,7 @@ import { JsonRpcProvider, Network, Provider } from 'ethers'
 
 import PQueue from 'p-queue'
 import { Endpoints } from '@sentio/runtime'
-import { EthChainId } from '../core/chain.js'
+import { EthChainId } from '@sentio/chain'
 
 export const DummyProvider = new JsonRpcProvider('', Network.from(1))
 

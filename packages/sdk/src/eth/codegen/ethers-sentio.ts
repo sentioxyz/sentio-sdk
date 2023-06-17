@@ -11,7 +11,7 @@ import {
 import { dirname, join, relative } from 'path'
 import { codeGenIndex, codeGenSentioFile, codeGenTestUtilsFile } from './file.js'
 import { YamlContractConfig } from '../../core/yaml-contract-config.js'
-import { ChainId, EthChainId } from '../../core/chain.js'
+import { ChainId, EthChainId } from '@sentio/chain'
 
 export interface SentioEthersConfig extends Config {
   contractsToGenExample: YamlContractConfig[]

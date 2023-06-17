@@ -21,7 +21,7 @@ import { AccountProcessorState } from './account-processor-state.js'
 import { ProcessorTemplateProcessorState } from './base-processor-template.js'
 import { GlobalProcessorState } from './base-processor.js'
 import { validateAndNormalizeAddress } from './eth.js'
-import { EthChainId } from '../core/chain.js'
+import { EthChainId } from '@sentio/chain'
 import { EthContext } from './context.js'
 import { TemplateInstanceState } from '../core/template.js'
 

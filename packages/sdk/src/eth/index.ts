@@ -13,4 +13,4 @@ export { EthPlugin } from './eth-plugin.js'
 
 export { EthFetchConfig } from '@sentio/protos'
 
-export { EthChainId } from '../core/chain.js'
+export { EthChainId } from '@sentio/chain'

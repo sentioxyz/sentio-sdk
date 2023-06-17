@@ -1,4 +1,4 @@
-import { ChainId } from './chain.js'
+import { ChainId } from '@sentio/chain'
 
 export interface YamlContractConfig {
   address: string

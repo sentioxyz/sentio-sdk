@@ -1,4 +1,4 @@
-import { AptosChainId } from '../core/chain.js'
+import { AptosChainId } from '@sentio/chain'
 import { AptosClient } from 'aptos-sdk'
 import { Labels } from '../core/index.js'
 

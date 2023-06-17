@@ -1,5 +1,5 @@
 import { normalizeLabels, Labels, BaseContext, RecordMetaData } from '@sentio/sdk'
-import { SolanaChainId } from '../core/chain.js'
+import { SolanaChainId } from '@sentio/chain'
 
 export class SolanaContext extends BaseContext {
   network: SolanaChainId
