@@ -1,4 +1,4 @@
-export { SuiBaseProcessor, SuiGlobalProcessor, type SuiBindOptions } from './sui-processor.js'
+export { SuiBaseProcessor, SuiGlobalProcessor, SuiModulesProcessor, type SuiBindOptions } from './sui-processor.js'
 export {
   SuiAddressProcessor,
   SuiObjectProcessor,

@@ -211,7 +211,7 @@ export class SuiBaseProcessor {
   }
 
   onTransactionBlock(
-    handler: (call: SuiTransactionBlockResponse, ctx: SuiContext) => void,
+    handler: (transaction: SuiTransactionBlockResponse, ctx: SuiContext) => void,
     filter?: TransactionFilter,
     fetchConfig?: Partial<MoveFetchConfig>
   ): this {
@@ -259,7 +259,7 @@ export class SuiGlobalProcessor extends SuiBaseProcessor {
     return new SuiGlobalProcessor('*', { ...options, address: '*' })
   }
   onTransactionBlock(
-    handler: (call: SuiTransactionBlockResponse, ctx: SuiContext) => void,
+    handler: (transaction: SuiTransactionBlockResponse, ctx: SuiContext) => void,
     filter: TransactionFilter,
     fetchConfig?: Partial<MoveFetchConfig>
   ): this {
