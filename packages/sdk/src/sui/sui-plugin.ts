@@ -77,7 +77,7 @@ export class SuiPlugin extends Plugin {
         contract: {
           name: suiProcessor.moduleName,
           chainId: suiProcessor.config.network,
-          address: validateAndNormalizeAddress(suiProcessor.config.address),
+          address: suiProcessor.config.address === '*' ? '*' : validateAndNormalizeAddress(suiProcessor.config.address),
           abi: '',
         },
         startBlock: suiProcessor.config.startCheckpoint,
