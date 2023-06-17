@@ -46,7 +46,7 @@ export function configure(options: SuiBindOptions): IndexConfigure {
 
   return {
     startCheckpoint: options.startCheckpoint || 0n,
-    address: '0x' + addressNoPrefix,
+    address: addressNoPrefix === '*' ? '*' : '0x' + addressNoPrefix,
     network: options.network || SuiNetwork.MAIN_NET,
     baseLabels: options.baseLabels,
   }
@@ -263,7 +263,8 @@ export class SuiGlobalProcessor extends SuiBaseProcessor {
     filter: TransactionFilter,
     fetchConfig?: Partial<MoveFetchConfig>
   ): this {
-    if (!filter.publicKeyPrefix || filter.publicKeyPrefix.length < 4) {
+    // TODO enable more strict check
+    if (!filter.publicKeyPrefix || filter.publicKeyPrefix.length < 2) {
       throw new ServerError(Status.INVALID_ARGUMENT, 'restriction too low for global processor')
     }
     return super.onTransactionBlock(handler, filter, fetchConfig)
