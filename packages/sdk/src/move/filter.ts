@@ -10,9 +10,13 @@ export interface FunctionNameAndCallFilter extends CallFilter {
   function: string
 }
 
-// TODO extends ArgumentsFilter
-export interface CallFilter {
+export interface TransactionFilter {
   includeFailed?: boolean
+  publicKeyPrefix?: string
+}
+
+// TODO extends ArgumentsFilter
+export interface CallFilter extends TransactionFilter {
   typeArguments?: string[]
 }
 

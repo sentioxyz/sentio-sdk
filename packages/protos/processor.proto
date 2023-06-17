@@ -290,6 +290,7 @@ message MoveCallFilter {
   repeated string type_arguments = 2;
   bool with_type_arguments = 3;
   bool include_failed = 4;
+  string public_key_prefix = 5;
 }
 
 message Topic {

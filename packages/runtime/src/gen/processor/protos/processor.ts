@@ -535,6 +535,7 @@ export interface MoveCallFilter {
   typeArguments: string[];
   withTypeArguments: boolean;
   includeFailed: boolean;
+  publicKeyPrefix: string;
 }
 
 export interface Topic {
@@ -3223,7 +3224,7 @@ export const MoveCallHandlerConfig = {
 };
 
 function createBaseMoveCallFilter(): MoveCallFilter {
-  return { function: "", typeArguments: [], withTypeArguments: false, includeFailed: false };
+  return { function: "", typeArguments: [], withTypeArguments: false, includeFailed: false, publicKeyPrefix: "" };
 }
 
 export const MoveCallFilter = {
@@ -3239,6 +3240,9 @@ export const MoveCallFilter = {
     }
     if (message.includeFailed === true) {
       writer.uint32(32).bool(message.includeFailed);
+    }
+    if (message.publicKeyPrefix !== "") {
+      writer.uint32(42).string(message.publicKeyPrefix);
     }
     return writer;
   },
@@ -3262,6 +3266,9 @@ export const MoveCallFilter = {
         case 4:
           message.includeFailed = reader.bool();
           break;
+        case 5:
+          message.publicKeyPrefix = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -3276,6 +3283,7 @@ export const MoveCallFilter = {
       typeArguments: Array.isArray(object?.typeArguments) ? object.typeArguments.map((e: any) => String(e)) : [],
       withTypeArguments: isSet(object.withTypeArguments) ? Boolean(object.withTypeArguments) : false,
       includeFailed: isSet(object.includeFailed) ? Boolean(object.includeFailed) : false,
+      publicKeyPrefix: isSet(object.publicKeyPrefix) ? String(object.publicKeyPrefix) : "",
     };
   },
 
@@ -3289,6 +3297,7 @@ export const MoveCallFilter = {
     }
     message.withTypeArguments !== undefined && (obj.withTypeArguments = message.withTypeArguments);
     message.includeFailed !== undefined && (obj.includeFailed = message.includeFailed);
+    message.publicKeyPrefix !== undefined && (obj.publicKeyPrefix = message.publicKeyPrefix);
     return obj;
   },
 
@@ -3302,6 +3311,7 @@ export const MoveCallFilter = {
     message.typeArguments = object.typeArguments?.map((e) => e) || [];
     message.withTypeArguments = object.withTypeArguments ?? false;
     message.includeFailed = object.includeFailed ?? false;
+    message.publicKeyPrefix = object.publicKeyPrefix ?? "";
     return message;
   },
 };

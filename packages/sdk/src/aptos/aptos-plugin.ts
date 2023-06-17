@@ -82,6 +82,7 @@ export class AptosPlugin extends Plugin {
               typeArguments: filter.typeArguments || [],
               withTypeArguments: !!filter.typeArguments,
               includeFailed: filter.includeFailed || false,
+              publicKeyPrefix: filter.publicKeyPrefix || '',
             }
           }),
           fetchConfig: handler.fetchConfig,

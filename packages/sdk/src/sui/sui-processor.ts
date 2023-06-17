@@ -17,6 +17,7 @@ import {
   FunctionNameAndCallFilter,
   parseMoveType,
   SPLITTER,
+  TransactionFilter,
 } from '../move/index.js'
 import { getMoveCalls } from './utils.js'
 import { defaultMoveCoder, MoveCoder } from './move-coder.js'
@@ -211,7 +212,7 @@ export class SuiBaseProcessor {
 
   onTransactionBlock(
     handler: (call: SuiTransactionBlockResponse, ctx: SuiContext) => void,
-    includeFailed = false,
+    filter?: TransactionFilter,
     fetchConfig?: Partial<MoveFetchConfig>
   ): this {
     const _fetchConfig = MoveFetchConfig.fromPartial({ ...DEFAULT_FETCH_CONFIG, ...fetchConfig })
@@ -221,7 +222,7 @@ export class SuiBaseProcessor {
     this.callHandlers.push({
       handler: async function (data) {
         if (!data.transaction) {
-          throw new ServerError(Status.INVALID_ARGUMENT, 'call is null')
+          throw new ServerError(Status.INVALID_ARGUMENT, 'transaction is null')
         }
         const tx = data.transaction as SuiTransactionBlockResponse
 
@@ -240,7 +241,7 @@ export class SuiBaseProcessor {
         }
         return ctx.getProcessResult()
       },
-      filters: [{ function: '', includeFailed }],
+      filters: [{ ...filter, function: '' }],
       fetchConfig: _fetchConfig,
     })
     return this
@@ -248,11 +249,23 @@ export class SuiBaseProcessor {
 }
 
 export class SuiModulesProcessor extends SuiBaseProcessor {
-  protected constructor(options: SuiBindOptions) {
-    super('*', options)
-  }
-
   static bind(options: SuiBindOptions): SuiModulesProcessor {
-    return new SuiModulesProcessor(options)
+    return new SuiModulesProcessor('*', options)
+  }
+}
+
+export class SuiGlobalProcessor extends SuiBaseProcessor {
+  static bind(options: Omit<SuiBindOptions, 'address'>): SuiModulesProcessor {
+    return new SuiGlobalProcessor('*', { ...options, address: '*' })
+  }
+  onTransactionBlock(
+    handler: (call: SuiTransactionBlockResponse, ctx: SuiContext) => void,
+    filter: TransactionFilter,
+    fetchConfig?: Partial<MoveFetchConfig>
+  ): this {
+    if (!filter.publicKeyPrefix || filter.publicKeyPrefix.length < 4) {
+      throw new ServerError(Status.INVALID_ARGUMENT, 'restriction too low for global processor')
+    }
+    return super.onTransactionBlock(handler, filter, fetchConfig)
   }
 }
