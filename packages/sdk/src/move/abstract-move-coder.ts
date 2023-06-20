@@ -232,13 +232,17 @@ export abstract class AbstractMoveCoder<Network, ModuleType, StructType> {
     return typedData
   }
 
-  async decodeArray(entries: any[], types: TypeDescriptor[]): Promise<any[]> {
+  async decodeArray(entries: any[], types: TypeDescriptor[], strict = true): Promise<any[]> {
     const entriesDecoded: any[] = []
     for (const [idx, arg] of entries.entries()) {
       // TODO consider apply payload.type_arguments, but this might be hard since we don't code gen for them
       const argType = types[idx]
       try {
-        entriesDecoded.push(await this.decode(arg, argType))
+        if (!strict && arg === undefined) {
+          entriesDecoded.push(arg)
+        } else {
+          entriesDecoded.push(await this.decode(arg, argType))
+        }
       } catch (e) {
         throw Error('Decoding error for ' + JSON.stringify(arg) + 'using type' + argType + e.toString())
       }

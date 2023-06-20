@@ -86,7 +86,8 @@ export class MoveCoder extends AbstractMoveCoder<SuiNetwork, SuiMoveNormalizedMo
         if (arg.type === 'pure') {
           args.push(arg.value)
         } else if (arg.type === 'object') {
-          args.push(arg.objectId)
+          // object is not there
+          args.push(undefined)
         } else {
           console.error('unexpected function arg value')
           args.push(undefined)
@@ -97,7 +98,7 @@ export class MoveCoder extends AbstractMoveCoder<SuiNetwork, SuiMoveNormalizedMo
       }
     }
 
-    const argumentsTyped = await this.decodeArray(args, params)
+    const argumentsTyped = await this.decodeArray(args, params, false)
     return {
       ...payload,
       arguments_decoded: argumentsTyped,
