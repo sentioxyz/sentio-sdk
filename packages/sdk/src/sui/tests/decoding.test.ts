@@ -143,6 +143,25 @@ describe('Test Sui Example', () => {
     // console.log(decodedObjects)
   })
 
+  test('decode dynamic fields 3', async () => {
+    const objects = data3.objects
+    const coder = defaultMoveCoder(SuiNetwork.MAIN_NET)
+
+    const res: TypedSuiMoveObject<dynamic_field.Field<any, any>>[] = await coder.filterAndDecodeObjects(
+      dynamic_field.Field.type(),
+      objects
+    )
+    expect(res.length).eq(objects.length)
+
+    // const decodedObjects = await coder.getDynamicFields(
+    //     objects,
+    //     BUILTIN_TYPES.U8_TYPE,
+    //     single_collateral.PortfolioVault.type()
+    // )
+    // expect(res.length).eq(5)
+    console.log(objects)
+  })
+
   test('decode array', async () => {
     const res = await coder.decodeArray(
       [
@@ -622,3 +641,75 @@ const data2 = [
   //   }
   // }
 ]
+
+const data3 = {
+  objects: [
+    {
+      dataType: 'moveObject',
+      fields: {
+        name: 1,
+        value: {
+          fields: { timestamp: '1687233731874', value: '1000000', decimal: 6 },
+          type: '0xccdf4385016f20c784e68376359ddc2f6a9e050ec431ca5c85f1bc81024d4427::oracle::Price',
+        },
+        id: { id: '0x568cd069dc536eeb49374c2628ceee60d94b4d515799f46017bedbb7683b1ed4' },
+      },
+      hasPublicTransfer: false,
+      type: '0x2::dynamic_field::Field<u8, 0xccdf4385016f20c784e68376359ddc2f6a9e050ec431ca5c85f1bc81024d4427::oracle::Price>',
+    },
+    {
+      fields: {
+        name: 0,
+        value: {
+          fields: { decimal: 9, timestamp: '1687233658805', value: '1200000000' },
+          type: '0xccdf4385016f20c784e68376359ddc2f6a9e050ec431ca5c85f1bc81024d4427::oracle::Price',
+        },
+        id: { id: '0x79468ede1c9a8a2e6815b89c48df407e7291e668cb625f68c11ff13febce3baf' },
+      },
+      hasPublicTransfer: false,
+      type: '0x2::dynamic_field::Field<u8, 0xccdf4385016f20c784e68376359ddc2f6a9e050ec431ca5c85f1bc81024d4427::oracle::Price>',
+      dataType: 'moveObject',
+    },
+    {
+      hasPublicTransfer: false,
+      type: '0x2::dynamic_field::Field<u8, 0xccdf4385016f20c784e68376359ddc2f6a9e050ec431ca5c85f1bc81024d4427::oracle::Price>',
+      dataType: 'moveObject',
+      fields: {
+        value: {
+          fields: { decimal: 9, timestamp: '1687233770630', value: '1600000000000' },
+          type: '0xccdf4385016f20c784e68376359ddc2f6a9e050ec431ca5c85f1bc81024d4427::oracle::Price',
+        },
+        id: { id: '0xf2ee4a57108529829087a2dcc464c4b826bb300c4bb481014493a98bd015f2a0' },
+        name: 3,
+      },
+    },
+    {
+      hasPublicTransfer: false,
+      type: '0x2::dynamic_field::Field<u8, 0xccdf4385016f20c784e68376359ddc2f6a9e050ec431ca5c85f1bc81024d4427::oracle::Price>',
+      dataType: 'moveObject',
+      fields: {
+        id: { id: '0xf4c06eb58d2b70b97c4f4e621b0a3269b2f79d12fc52a43670dea4c05b3b7b8a' },
+        name: 2,
+        value: {
+          fields: { decimal: 6, timestamp: '1687233752800', value: '990000' },
+          type: '0xccdf4385016f20c784e68376359ddc2f6a9e050ec431ca5c85f1bc81024d4427::oracle::Price',
+        },
+      },
+    },
+    {
+      type: '0x2::dynamic_field::Field<u8, 0xccdf4385016f20c784e68376359ddc2f6a9e050ec431ca5c85f1bc81024d4427::oracle::Price>',
+      dataType: 'moveObject',
+      fields: {
+        id: { id: '0xf79c96dc3197aa2dd676465305bababf76a79950af405580dbb6b0d9ae6e2809' },
+        name: 4,
+        value: {
+          fields: { decimal: 9, timestamp: '1687233789583', value: '21000000000000' },
+          type: '0xccdf4385016f20c784e68376359ddc2f6a9e050ec431ca5c85f1bc81024d4427::oracle::Price',
+        },
+      },
+      hasPublicTransfer: false,
+    },
+  ],
+  timestamp: '2023-06-20T07:59:59.478Z',
+  slot: '5595091',
+}
