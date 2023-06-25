@@ -61,5 +61,5 @@ function emit<T>(ctx: BaseContext, eventName: string, event: Event<T>) {
     runtimeInfo: undefined,
     noMetric: true,
   }
-  ctx._res.events.push(res)
+  ctx.update({ events: [res] })
 }

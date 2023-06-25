@@ -56,7 +56,11 @@ export abstract class SuiObjectOrAddressProcessorTemplate<
     }
     const config = processor.config
 
-    ctx._res.states.configUpdated = true
+    ctx.update({
+      states: {
+        configUpdated: true,
+      },
+    })
     TemplateInstanceState.INSTANCE.addValue({
       templateId: this.id,
       contract: {

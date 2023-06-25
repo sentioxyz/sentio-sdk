@@ -75,7 +75,7 @@ export abstract class SuiBaseObjectOrAddressProcessor<HandlerType> {
           processor.config.baseLabels
         )
         await processor.doHandle(handler, data, ctx)
-        return ctx.getProcessResult()
+        return ctx.stopAndGetResult()
       },
       timeIntervalInMinutes: timeInterval,
       checkPointInterval: checkpointInterval,

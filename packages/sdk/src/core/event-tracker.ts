@@ -51,7 +51,7 @@ export class EventTracker extends NamedResultDescriptor {
       runtimeInfo: undefined,
       noMetric: false,
     }
-    ctx._res.events.push(res)
+    ctx.update({ events: [res] })
   }
 }
 /** @deprecated */

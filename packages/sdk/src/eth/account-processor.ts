@@ -252,7 +252,7 @@ export class AccountProcessor {
         if (parsed) {
           const event: TypedEvent = { ...log, name: parsed.name, args: fixEmptyKey(parsed) }
           await handler(event, ctx)
-          return ctx.getProcessResult()
+          return ctx.stopAndGetResult()
         }
         return ProcessResult.fromPartial({})
       },

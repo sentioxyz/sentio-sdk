@@ -108,7 +108,7 @@ export class AptosBaseProcessor {
 
           const decoded = await processor.coder.decodeEvent<any>(evt)
           await handler(decoded || evt, ctx)
-          processResults.push(ctx.getProcessResult())
+          processResults.push(ctx.stopAndGetResult())
         }
 
         return mergeProcessResults(processResults)
@@ -158,7 +158,7 @@ export class AptosBaseProcessor {
           const decoded = await processor.coder.decodeFunctionPayload(payload)
           await handler(decoded, ctx)
         }
-        return ctx.getProcessResult()
+        return ctx.stopAndGetResult()
       },
       filters: _filters,
       fetchConfig: _fetchConfig,
@@ -190,7 +190,7 @@ export class AptosBaseProcessor {
           processor.config.baseLabels
         )
         await handler(call, ctx)
-        return ctx.getProcessResult()
+        return ctx.stopAndGetResult()
       },
       filters: [{ function: '', includeFailed: includedFailed }],
       fetchConfig: _fetchConfig,
@@ -262,7 +262,7 @@ export class AptosResourcesProcessor {
           processor.config.baseLabels
         )
         await handler(data.resources as MoveResource[], ctx)
-        return ctx.getProcessResult()
+        return ctx.stopAndGetResult()
       },
       timeIntervalInMinutes: timeInterval,
       versionInterval: versionInterval,

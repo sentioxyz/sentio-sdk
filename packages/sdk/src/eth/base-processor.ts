@@ -145,7 +145,7 @@ export class GlobalProcessor {
 
         const ctx = new GlobalContext(chainId, new Date(block.timestamp * 1000), block, undefined, undefined)
         await handler(block, ctx)
-        return ctx.getProcessResult()
+        return ctx.stopAndGetResult()
       },
       timeIntervalInMinutes: timeInterval,
       blockInterval: blockInterval,
@@ -168,7 +168,7 @@ export class GlobalProcessor {
         }
         const ctx = new GlobalContext(chainId, data.timestamp, block, undefined, trace, transaction, transactionReceipt)
         await handler(transaction, ctx)
-        return ctx.getProcessResult()
+        return ctx.stopAndGetResult()
       },
       fetchConfig: EthFetchConfig.fromPartial(fetchConfig || {}),
     })
@@ -274,7 +274,7 @@ export abstract class BaseProcessor<
         if (parsed) {
           const event: TypedEvent = { ...log, name: parsed.name, args: fixEmptyKey(parsed) }
           await handler(event, ctx)
-          return ctx.getProcessResult()
+          return ctx.stopAndGetResult()
         }
         return ProcessResult.fromPartial({})
       },
@@ -343,7 +343,7 @@ export abstract class BaseProcessor<
           undefined
         )
         await handler(block, ctx)
-        return ctx.getProcessResult()
+        return ctx.stopAndGetResult()
       },
       timeIntervalInMinutes: timeInterval,
       blockInterval: blockInterval,
@@ -408,7 +408,7 @@ export abstract class BaseProcessor<
           transactionReceipt
         )
         await handler(typedTrace, ctx)
-        return ctx.getProcessResult()
+        return ctx.stopAndGetResult()
       },
     })
     return this

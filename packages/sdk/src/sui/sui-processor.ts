@@ -132,7 +132,7 @@ export class SuiBaseProcessor {
 
           const decoded = await processor.coder.decodeEvent<any>(evt)
           await handler(decoded || evt, ctx)
-          processResults.push(ctx.getProcessResult())
+          processResults.push(ctx.stopAndGetResult())
         }
 
         return mergeProcessResults(processResults)
@@ -197,7 +197,7 @@ export class SuiBaseProcessor {
             await handler(decoded, ctx)
           }
         }
-        return ctx.getProcessResult()
+        return ctx.stopAndGetResult()
       },
       filters: _filters,
       fetchConfig: _fetchConfig,
@@ -239,7 +239,7 @@ export class SuiBaseProcessor {
         if (tx) {
           await handler(tx, ctx)
         }
-        return ctx.getProcessResult()
+        return ctx.stopAndGetResult()
       },
       filters: [{ ...filter, function: '' }],
       fetchConfig: _fetchConfig,

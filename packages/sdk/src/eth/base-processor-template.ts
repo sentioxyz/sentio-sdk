@@ -92,7 +92,11 @@ export abstract class BaseProcessorTemplate<
       instance.endBlock = BigInt(options.endBlock)
     }
     TemplateInstanceState.INSTANCE.addValue(instance)
-    ctx._res.states.configUpdated = true
+    ctx.update({
+      states: {
+        configUpdated: true,
+      },
+    })
   }
 
   protected onEthEvent(

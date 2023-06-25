@@ -39,6 +39,7 @@
     "nice-grpc-prometheus": "^0.1.2",
     "prom-client": "^14.2.0",
     "protobufjs": "^7.2.3",
+    "utility-types": "^3.10.0",
     "winston": "^3.8.2"
   },
   "peerDependencies": {

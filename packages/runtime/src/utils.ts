@@ -1,7 +1,11 @@
-import { ProcessResult } from '@sentio/protos'
+import { ProcessResult, StateResult } from '@sentio/protos'
+import { Required } from 'utility-types'
 
-export function mergeProcessResults(results: ProcessResult[]): ProcessResult {
-  const res = ProcessResult.fromPartial({})
+export function mergeProcessResults(results: ProcessResult[]): Required<ProcessResult, 'states'> {
+  const res = {
+    ...ProcessResult.create(),
+    states: StateResult.create(),
+  }
 
   for (const r of results) {
     res.counters = res.counters.concat(r.counters)

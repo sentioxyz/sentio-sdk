@@ -90,7 +90,7 @@ export class SolanaBaseProcessor {
   ): Promise<ProcessResult> {
     const ctx = new SolanaContext(this.contractName, this.network, this.address, slot, this.baseLabels)
     await handler(parsedInstruction, ctx, accounts)
-    return ctx.getProcessResult()
+    return ctx.stopAndGetResult()
   }
 
   public startSlot(startSlot: bigint | number) {

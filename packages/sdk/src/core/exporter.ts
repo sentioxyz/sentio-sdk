@@ -27,6 +27,6 @@ export class Exporter extends NamedResultDescriptor {
       payload: JSON.stringify(data),
       runtimeInfo: undefined,
     }
-    ctx._res.exports.push(res)
+    ctx.update({ exports: [res] })
   }
 }
