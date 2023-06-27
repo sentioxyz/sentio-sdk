@@ -7,7 +7,7 @@ export {
 } from './sui-object-processor.js'
 
 export {
-  // SuiAddressProcessorTemplate,
+  SuiAddressProcessorTemplate,
   SuiObjectProcessorTemplate,
   SuiWrappedObjectProcessorTemplate,
 } from './sui-object-processor-template.js'

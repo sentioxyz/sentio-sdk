@@ -50,7 +50,7 @@ export class SuiPlugin extends Plugin {
         continue
       }
 
-      const template: SuiObjectOrAddressProcessorTemplate<any, any> =
+      const template: SuiObjectOrAddressProcessorTemplate<any, any, any> =
         SuiAccountProcessorTemplateState.INSTANCE.getValues()[instance.templateId]
 
       template.bind(

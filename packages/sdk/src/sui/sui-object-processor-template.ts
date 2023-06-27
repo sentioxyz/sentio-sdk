@@ -5,12 +5,14 @@ import { SuiMoveObject } from '@mysten/sui.js'
 import { PromiseOrVoid } from '../core/index.js'
 import {
   DEFAULT_FETCH_CONFIG,
+  SuiAddressProcessor,
   SuiBaseObjectOrAddressProcessor,
   SuiObjectBindOptions,
   SuiObjectProcessor,
   SuiWrappedObjectProcessor,
 } from './sui-object-processor.js'
 import { TemplateInstanceState } from '../core/template.js'
+import { SuiBindOptions } from './sui-processor.js'
 
 class ObjectHandler<HandlerType> {
   type?: string
@@ -20,13 +22,15 @@ class ObjectHandler<HandlerType> {
   fetchConfig: MoveAccountFetchConfig
 }
 
-export class SuiAccountProcessorTemplateState extends ListStateStorage<SuiObjectOrAddressProcessorTemplate<any, any>> {
+export class SuiAccountProcessorTemplateState extends ListStateStorage<
+  SuiObjectOrAddressProcessorTemplate<any, any, any>
+> {
   static INSTANCE = new SuiAccountProcessorTemplateState()
 }
 
 export abstract class SuiObjectOrAddressProcessorTemplate<
   HandlerType,
-  // OptionType,
+  OptionType extends SuiObjectBindOptions | SuiBindOptions,
   ProcessorType extends SuiBaseObjectOrAddressProcessor<HandlerType>
 > {
   id: number
@@ -38,12 +42,14 @@ export abstract class SuiObjectOrAddressProcessorTemplate<
     SuiAccountProcessorTemplateState.INSTANCE.addValue(this)
   }
 
-  protected abstract createProcessor(options: SuiObjectBindOptions): ProcessorType
+  protected abstract createProcessor(options: SuiObjectBindOptions | SuiBindOptions): ProcessorType
 
-  bind(options: SuiObjectBindOptions, ctx: SuiContext): void {
+  bind(options: OptionType, ctx: SuiContext): void {
     options.network = options.network || ctx.network
     options.startCheckpoint = options.startCheckpoint || ctx.checkpoint
-    const sig = [options.network, options.objectId].join('_')
+    const id = (options as SuiObjectBindOptions).objectId || (options as SuiBindOptions).address
+
+    const sig = [options.network, id].join('_')
     if (this.binds.has(sig)) {
       console.log(`Same object id can be bind to one template only once, ignore duplicate bind: ${sig}`)
       return
@@ -127,19 +133,19 @@ export abstract class SuiObjectOrAddressProcessorTemplate<
   }
 }
 
-// export class SuiAddressProcessorTemplate extends SuiBaseObjectsProcessorTemplate<
-//   (objects: SuiMoveObject[], ctx: SuiObjectsContext) => PromiseOrVoid,
-//   SuiBindOptions,
-//   SuiAddressProcessor
-// > {
-//   bind(options: SuiBindOptions, ctx: SuiContext): SuiAddressProcessor {
-//     return this.bindInternal(SuiAddressProcessorTemplate.bind(options), ctx)
-//   }
-// }
+export class SuiAddressProcessorTemplate extends SuiObjectOrAddressProcessorTemplate<
+  (objects: SuiMoveObject[], ctx: SuiObjectContext) => PromiseOrVoid,
+  SuiBindOptions,
+  SuiAddressProcessor
+> {
+  createProcessor(options: SuiBindOptions): SuiAddressProcessor {
+    return SuiAddressProcessor.bind(options)
+  }
+}
 
 export class SuiObjectProcessorTemplate extends SuiObjectOrAddressProcessorTemplate<
   (self: SuiMoveObject, dynamicFieldObjects: SuiMoveObject[], ctx: SuiObjectContext) => PromiseOrVoid,
-  // SuiObjectBindOptions,
+  SuiObjectBindOptions,
   SuiObjectProcessor
 > {
   createProcessor(options: SuiObjectBindOptions): SuiObjectProcessor {
@@ -149,7 +155,7 @@ export class SuiObjectProcessorTemplate extends SuiObjectOrAddressProcessorTempl
 
 export class SuiWrappedObjectProcessorTemplate extends SuiObjectOrAddressProcessorTemplate<
   (dynamicFieldObjects: SuiMoveObject[], ctx: SuiObjectContext) => PromiseOrVoid,
-  // SuiObjectBindOptions,
+  SuiObjectBindOptions,
   SuiWrappedObjectProcessor
 > {
   createProcessor(options: SuiObjectBindOptions): SuiWrappedObjectProcessor {
