@@ -1,6 +1,6 @@
 import { HandleInterval, MoveAccountFetchConfig } from '@sentio/protos'
 import { ListStateStorage } from '@sentio/runtime'
-import { SuiContext, SuiObjectContext } from './context.js'
+import { SuiAddressContext, SuiContext, SuiObjectContext } from './context.js'
 import { SuiMoveObject } from '@mysten/sui.js'
 import { PromiseOrVoid } from '../core/index.js'
 import {
@@ -134,7 +134,7 @@ export abstract class SuiObjectOrAddressProcessorTemplate<
 }
 
 export class SuiAddressProcessorTemplate extends SuiObjectOrAddressProcessorTemplate<
-  (objects: SuiMoveObject[], ctx: SuiObjectContext) => PromiseOrVoid,
+  (objects: SuiMoveObject[], ctx: SuiAddressContext) => PromiseOrVoid,
   SuiBindOptions,
   SuiAddressProcessor
 > {

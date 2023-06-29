@@ -1,7 +1,7 @@
 import { Data_SuiObject, HandleInterval, MoveAccountFetchConfig, MoveOwnerType, ProcessResult } from '@sentio/protos'
 import { ListStateStorage } from '@sentio/runtime'
 import { SuiNetwork } from './network.js'
-import { SuiObjectContext } from './context.js'
+import { SuiAddressContext, SuiObjectContext } from './context.js'
 import { SuiMoveObject } from '@mysten/sui.js'
 import { PromiseOrVoid } from '../core/index.js'
 import { configure, IndexConfigure, SuiBindOptions } from './sui-processor.js'
@@ -122,7 +122,7 @@ export abstract class SuiBaseObjectOrAddressProcessor<HandlerType> {
 }
 
 export class SuiAddressProcessor extends SuiBaseObjectOrAddressProcessor<
-  (objects: SuiMoveObject[], ctx: SuiObjectContext) => PromiseOrVoid
+  (objects: SuiMoveObject[], ctx: SuiAddressContext) => PromiseOrVoid
 > {
   static bind(options: SuiBindOptions): SuiAddressProcessor {
     return new SuiAddressProcessor({ ...options, ownerType: MoveOwnerType.ADDRESS })
