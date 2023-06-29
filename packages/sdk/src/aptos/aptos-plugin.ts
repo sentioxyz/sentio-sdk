@@ -20,7 +20,6 @@ import { ServerError, Status } from 'nice-grpc'
 import { AptosAccountProcessorState, AptosProcessorState } from './aptos-processor.js'
 
 import { initCoinList } from './ext/coin.js'
-import { validateAndNormalizeAddress } from './utils.js'
 
 interface Handlers {
   aptosEventHandlers: ((event: Data_AptEvent) => Promise<ProcessResult>)[]
@@ -51,7 +50,7 @@ export class AptosPlugin extends Plugin {
         contract: {
           name: aptosProcessor.moduleName,
           chainId: aptosProcessor.getChainId(),
-          address: validateAndNormalizeAddress(aptosProcessor.config.address),
+          address: aptosProcessor.config.address,
           abi: '',
         },
         startBlock: aptosProcessor.config.startVersion,
@@ -95,7 +94,7 @@ export class AptosPlugin extends Plugin {
 
     for (const aptosProcessor of AptosAccountProcessorState.INSTANCE.getValues()) {
       const accountConfig = AccountConfig.fromPartial({
-        address: validateAndNormalizeAddress(aptosProcessor.config.address),
+        address: aptosProcessor.config.address,
         chainId: aptosProcessor.getChainId(),
         startBlock: aptosProcessor.config.startVersion,
       })

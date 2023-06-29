@@ -4,7 +4,7 @@ import { TokenBridgeProcessor } from './types/token_bridge_processor.js'
 import { token_bridge_idl } from './types/token_bridge.js'
 import { Idl, Instruction } from '@project-serum/anchor'
 import bs58 from 'bs58'
-import { camelCase } from 'lodash-es'
+import { camel } from 'radash'
 // @ts-ignore no type definition
 import { Layout } from 'buffer-layout'
 import { IdlField, IdlStateMethod } from '@project-serum/anchor/dist/cjs/idl.js'
@@ -27,7 +27,7 @@ class TokenBridgeDecoder {
         const fieldLayouts = m.args.map((arg: IdlField) => {
           return IdlCoder.fieldLayout(arg, Array.from([...(idl.accounts ?? []), ...(idl.types ?? [])]))
         })
-        const name = camelCase(m.name)
+        const name = camel(m.name)
         return [name, borsh.struct(fieldLayouts, name)]
       })
       .concat(
@@ -35,7 +35,7 @@ class TokenBridgeDecoder {
           const fieldLayouts = ix.args.map((arg: IdlField) =>
             IdlCoder.fieldLayout(arg, Array.from([...(idl.accounts ?? []), ...(idl.types ?? [])]))
           )
-          const name = camelCase(ix.name)
+          const name = camel(ix.name)
           return [name, borsh.struct(fieldLayouts, name)]
         })
       )
@@ -49,7 +49,7 @@ class TokenBridgeDecoder {
     const discriminator = ix.subarray(0, 1).readInt8()
     const data = ix.subarray(1)
 
-    const name = camelCase(TokenBridgeInstruction[discriminator])
+    const name = camel(TokenBridgeInstruction[discriminator])
     const layout = this.ixLayout.get(name)
 
     if (!layout) {

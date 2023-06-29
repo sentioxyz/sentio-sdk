@@ -1,5 +1,6 @@
 import { InternalMoveModule, InternalMoveStruct } from './internal-models.js'
 import { TypeDescriptor } from './types.js'
+import { accountAddressString } from './utils.js'
 
 export abstract class ChainAdapter<NetworkType, ModuleType, StructType> {
   abstract fetchModule(account: string, module: string, network: NetworkType): Promise<ModuleType>
@@ -16,5 +17,8 @@ export abstract class ChainAdapter<NetworkType, ModuleType, StructType> {
 
   abstract getType(base: StructType): string
   abstract getData<T>(base: StructType): any
-  abstract validateAndNormalizeAddress(address: string): string
+
+  validateAndNormalizeAddress(address: string): string {
+    return accountAddressString(address)
+  }
 }

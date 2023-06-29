@@ -4,7 +4,7 @@ import { TestProcessorServer } from './test-processor-server.js'
 import { parseMoveType } from '../move/types.js'
 import { SuiNetwork } from '../sui/index.js'
 import { getMoveCalls } from '../sui/utils.js'
-import { SPLITTER } from '../move/index.js'
+import { accountTypeString, SPLITTER } from '../move/index.js'
 
 export class SuiFacet {
   server: TestProcessorServer
@@ -39,7 +39,7 @@ export class SuiFacet {
     //   throw Error('Transaction has more than one calls')
     // }
     for (const call of calls) {
-      const functionType = [call.package, call.module, call.function].join(SPLITTER)
+      const functionType = [accountTypeString(call.package), call.module, call.function].join(SPLITTER)
 
       for (const config of this.server.contractConfigs) {
         if (config.contract?.chainId !== network) {
@@ -47,7 +47,7 @@ export class SuiFacet {
         }
         for (const callConfig of config.moveCallConfigs) {
           for (const callFilter of callConfig.filters) {
-            if (config.contract.address + '::' + callFilter.function === functionType) {
+            if (accountTypeString(config.contract.address) + '::' + callFilter.function === functionType) {
               return {
                 data: {
                   suiCall: {
@@ -88,7 +88,10 @@ export class SuiFacet {
       for (const eventConfig of config.moveEventConfigs) {
         for (const eventFilter of eventConfig.filters) {
           for (const event of transaction.events || []) {
-            if (config.contract.address + '::' + eventFilter.type === parseMoveType(event.type).qname) {
+            if (
+              accountTypeString(config.contract.address) + '::' + eventFilter.type ===
+              parseMoveType(event.type).qname
+            ) {
               return {
                 data: {
                   suiEvent: {

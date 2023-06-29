@@ -16,7 +16,7 @@ export abstract class AbstractMoveCoder<Network, ModuleType, StructType> {
   }
 
   contains(account: string, name: string) {
-    return this.moduleMapping.has(account + '::' + name)
+    return this.moduleMapping.has(moduleQname({ address: account, name }))
   }
 
   abstract load(module: ModuleType): InternalMoveModule

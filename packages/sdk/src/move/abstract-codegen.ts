@@ -9,8 +9,8 @@ import fs from 'fs'
 import { AccountModulesImportInfo, AccountRegister } from './account.js'
 import chalk from 'chalk'
 import { format } from 'prettier'
-import { isFrameworkAccount, moduleQname, normalizeToJSName, SPLITTER, VECTOR_STR } from './utils.js'
-import { camelCase, upperFirst } from 'lodash-es'
+import { isFrameworkAccount, moduleQname, normalizeToJSName, SPLITTER, upperFirst, VECTOR_STR } from './utils.js'
+import { camel } from 'radash'
 import { TypeDescriptor } from './types.js'
 import { ChainAdapter } from './chain-adapter.js'
 
@@ -323,7 +323,7 @@ export abstract class AbstractCodegen<NetworkType, ModuleTypes, StructType> {
       return this.generateTypeForDescriptor(param, module.address) + (this.PAYLOAD_OPTIONAL ? ' | undefined' : '')
     })
 
-    const camelFuncName = upperFirst(camelCase(func.name))
+    const camelFuncName = upperFirst(camel(func.name))
 
     const genericString = this.generateFunctionTypeParameters(func)
     return `
@@ -343,7 +343,7 @@ export abstract class AbstractCodegen<NetworkType, ModuleTypes, StructType> {
       return ''
     }
     // const moduleName = normalizeToJSName(module.name)
-    const funcName = camelCase(func.name)
+    const funcName = camel(func.name)
     const fields = this.chainAdapter.getMeaningfulFunctionParams(func.params).map((param) => {
       return this.generateTypeForDescriptor(param, module.address)
     })
@@ -370,7 +370,7 @@ export abstract class AbstractCodegen<NetworkType, ModuleTypes, StructType> {
     // const genericString = generateFunctionTypeParameters(func)
     const moduleName = normalizeToJSName(module.name)
 
-    const camelFuncName = upperFirst(camelCase(func.name))
+    const camelFuncName = upperFirst(camel(func.name))
     const source = `
   onEntry${camelFuncName}(func: (call: ${moduleName}.${camelFuncName}Payload, ctx: ${this.PREFIX}Context) => void, filter?: CallFilter, fetchConfig?: Partial<MoveFetchConfig>): ${moduleName} {
     this.onEntryFunctionCall(func, {

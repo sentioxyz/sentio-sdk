@@ -1,7 +1,7 @@
 import { getPriceByType } from '@sentio/sdk/utils'
 import fetch from 'node-fetch'
-import { validateAndNormalizeAddress } from '../utils.js'
-import { SPLITTER } from '../../move/index.js'
+// import { validateAndNormalizeAddress } from '../utils.js'
+import { accountTypeString, SPLITTER } from '../../move/index.js'
 import { AptosChainId } from '@sentio/chain'
 import { SimpleCoinInfo } from '../../move/ext/move-dex.js'
 
@@ -43,7 +43,7 @@ export function whitelistCoins() {
 
 export function whiteListed(coin: string): boolean {
   const [addr, module, type] = coin.split(SPLITTER)
-  const normalized = [validateAndNormalizeAddress(addr), module, type].join(SPLITTER)
+  const normalized = [accountTypeString(addr), module, type].join(SPLITTER)
   return WHITELISTED_COINS.has(normalized)
 }
 

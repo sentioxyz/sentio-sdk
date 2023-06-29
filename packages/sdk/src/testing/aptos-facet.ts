@@ -3,6 +3,7 @@ import { DataBinding, HandlerType } from '@sentio/protos'
 import { TestProcessorServer } from './test-processor-server.js'
 import { AptosNetwork } from '@sentio/sdk/aptos'
 import { parseMoveType } from '../move/types.js'
+import { accountTypeString } from '../move/index.js'
 
 export class AptosFacet {
   server: TestProcessorServer
@@ -39,7 +40,7 @@ export class AptosFacet {
       }
       for (const callConfig of config.moveCallConfigs) {
         for (const callFilter of callConfig.filters) {
-          if (config.contract.address + '::' + callFilter.function === payload.function) {
+          if (accountTypeString(config.contract.address) + '::' + callFilter.function === payload.function) {
             return {
               data: {
                 aptCall: {
@@ -76,7 +77,10 @@ export class AptosFacet {
       for (const eventConfig of config.moveEventConfigs) {
         for (const eventFilter of eventConfig.filters) {
           for (const event of transaction.events) {
-            if (config.contract.address + '::' + eventFilter.type === parseMoveType(event.type).qname) {
+            if (
+              accountTypeString(config.contract.address) + '::' + eventFilter.type ===
+              parseMoveType(event.type).qname
+            ) {
               return {
                 data: {
                   aptEvent: {

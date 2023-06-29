@@ -11,6 +11,8 @@ import {
   SuiTransactionBlockResponse,
 } from '@mysten/sui.js'
 import {
+  accountAddressString,
+  accountTypeString,
   CallHandler,
   EventFilter,
   EventHandler,
@@ -32,21 +34,9 @@ const DEFAULT_FETCH_CONFIG: MoveFetchConfig = {
 export type IndexConfigure = Required<SuiBindOptions, 'startCheckpoint' | 'network'>
 
 export function configure(options: SuiBindOptions): IndexConfigure {
-  let addressNoPrefix = options.address
-
-  if (addressNoPrefix.startsWith('0x')) {
-    addressNoPrefix = addressNoPrefix.slice(2)
-  }
-  for (let i = 0; i < addressNoPrefix.length; i++) {
-    if (addressNoPrefix[i] !== '0') {
-      addressNoPrefix = addressNoPrefix.slice(i)
-      break
-    }
-  }
-
   return {
     startCheckpoint: options.startCheckpoint || 0n,
-    address: addressNoPrefix === '*' ? '*' : '0x' + addressNoPrefix,
+    address: options.address === '*' ? '*' : accountAddressString(options.address),
     network: options.network || SuiNetwork.MAIN_NET,
     baseLabels: options.baseLabels,
   }
@@ -100,7 +90,7 @@ export class SuiBaseProcessor {
     // const moduleName = this.moduleName
 
     const processor = this
-    const allEventType = new Set(_filters.map((f) => processor.config.address + '::' + f.type))
+    const allEventType = new Set(_filters.map((f) => accountTypeString(processor.config.address) + '::' + f.type))
 
     this.eventHandlers.push({
       handler: async function (data) {
@@ -158,7 +148,9 @@ export class SuiBaseProcessor {
     }
 
     const processor = this
-    const allFunctionType = new Set(_filters.map((f) => processor.config.address + '::' + f.function))
+    const allFunctionType = new Set(
+      _filters.map((f) => accountTypeString(processor.config.address) + '::' + f.function)
+    )
 
     this.callHandlers.push({
       handler: async function (data) {

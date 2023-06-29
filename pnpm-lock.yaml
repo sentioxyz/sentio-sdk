@@ -458,9 +458,6 @@ importers:
       js-sha3:
         specifier: ^0.8.0
         version: 0.8.0
-      lodash-es:
-        specifier: ^4.17.21
-        version: 4.17.21
       mkdirp:
         specifier: ^1.0.4
         version: 1.0.4
@@ -485,6 +482,9 @@ importers:
       prettier:
         specifier: ^2.8.7
         version: 2.8.7
+      radash:
+        specifier: ^11.0.0
+        version: 11.0.0
       superstruct_solana:
         specifier: npm:superstruct@^0.14.2
         version: /superstruct@0.14.2
@@ -510,9 +510,6 @@ importers:
       '@types/google-protobuf':
         specifier: ^3.15.6
         version: 3.15.6
-      '@types/lodash-es':
-        specifier: ^4.17.6
-        version: 4.17.6
       '@types/mkdirp':
         specifier: ^1.0.2
         version: 1.0.2
@@ -3102,12 +3099,6 @@ packages:
     resolution: {integrity: sha512-GSgiRCVeapDN+3pqA35IkQwasaCh/0YFH5dEF6S88iDvEn901DjOeH3/QPY+XYP1DFzDZPvIvfeEgk+7br5png==}
     dependencies:
       '@types/node': 18.16.18
-    dev: true
-
-  /@types/lodash-es@4.17.6:
-    resolution: {integrity: sha512-R+zTeVUKDdfoRxpAryaQNRKk3105Rrgx2CFRClIgRGaqDTdjsm8h6IYA8ir584W3ePzkZfst5xIgDwYrlh9HLg==}
-    dependencies:
-      '@types/lodash': 4.14.191
     dev: true
 
   /@types/lodash.values@4.3.7:
@@ -7444,10 +7435,6 @@ packages:
       p-locate: 5.0.0
     dev: true
 
-  /lodash-es@4.17.21:
-    resolution: {integrity: sha512-mKnC+QJ9pWVzv+C4/U3rRsHapFfHvQFoFB92e52xeyGMcX6/OlIl78je1u8vePzYZSkkogMPJ2yjxxsb89cxyw==}
-    dev: false
-
   /lodash.assignwith@4.2.0:
     resolution: {integrity: sha512-ZznplvbvtjK2gMvnQ1BR/zqPFZmS6jbK4p+6Up4xcRYA7yMIwxHCfbTcrYxXKzzqLsQ05eJPVznEW3tuwV7k1g==}
     dev: false
@@ -8668,6 +8655,11 @@ packages:
   /quick-lru@5.1.1:
     resolution: {integrity: sha512-WuyALRjWPDGtt/wzJiadO5AXY+8hZ80hVpe6MyivgraREW751X3SbhRvG3eLKOYN+8VEvqLcf3wdnt44Z4S4SA==}
     engines: {node: '>=10'}
+    dev: false
+
+  /radash@11.0.0:
+    resolution: {integrity: sha512-CRWxTFTDff0IELGJ/zz58yY4BDgyI14qSM5OLNKbCItJrff7m7dXbVF0kWYVCXQtPb3SXIVhXvAImH6eT7VLSg==}
+    engines: {node: '>=14.18.0'}
     dev: false
 
   /ramda@0.25.0:

@@ -18,7 +18,15 @@ import {
   Data_AptCall,
 } from '@sentio/protos'
 import { ServerError, Status } from 'nice-grpc'
-import { CallHandler, EventFilter, EventHandler, FunctionNameAndCallFilter, parseMoveType } from '../move/index.js'
+import {
+  accountAddressString,
+  accountTypeString,
+  CallHandler,
+  EventFilter,
+  EventHandler,
+  FunctionNameAndCallFilter,
+  parseMoveType,
+} from '../move/index.js'
 import { Labels, PromiseOrVoid } from '../core/index.js'
 
 const DEFAULT_FETCH_CONFIG: MoveFetchConfig = {
@@ -77,7 +85,7 @@ export class AptosBaseProcessor {
     // const moduleName = this.moduleName
 
     const processor = this
-    const allEventType = new Set(_filters.map((f) => processor.config.address + '::' + f.type))
+    const allEventType = new Set(_filters.map((f) => accountTypeString(processor.config.address) + '::' + f.type))
 
     this.eventHandlers.push({
       handler: async function (data) {
@@ -315,7 +323,7 @@ function configure(options: AptosBindOptions): IndexConfigure {
 
   return {
     startVersion: startVersion,
-    address: options.address,
+    address: options.address === '*' ? '*' : accountAddressString(options.address),
     network: options.network || AptosNetwork.MAIN_NET,
     baseLabels: options.baseLabels,
   }

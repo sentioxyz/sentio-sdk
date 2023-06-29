@@ -6,7 +6,7 @@ describe('Test leading zero', () => {
   const service = new TestProcessorServer(async () => {
     event
       .bind({
-        address: '0x00b53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302',
+        address: '0x0b53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302',
       })
       .onEventPriceFeedUpdateEvent((evt, ctx) => {
         ctx.meter.Counter('test').add(1)
@@ -20,11 +20,14 @@ describe('Test leading zero', () => {
   test('check configuration ', async () => {
     const config = await service.getConfig({})
     expect(config.contractConfigs).length(1)
+    expect(config.contractConfigs[0].contract?.address).eq(
+      '0x00b53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302'
+    )
   })
 
   test('Check call dispatch', async () => {
     const res = await service.sui.testEvent(testData.result as any)
-    expect(res.result?.counters).length(0)
+    expect(res.result?.counters).length(1)
   })
 })
 

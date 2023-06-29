@@ -1,4 +1,4 @@
-import { SPLITTER, VECTOR_STR } from './utils.js'
+import { accountTypeString, SPLITTER, VECTOR_STR } from './utils.js'
 
 export type DecodedStruct<B, T> = B & {
   /**
@@ -173,6 +173,11 @@ function adjustType(type: TypeDescriptor) {
   if (type.qname.startsWith('mut')) {
     type.mutable = true
     type.qname = type.qname.slice(3)
+  }
+  const parts = type.qname.split(SPLITTER)
+  if (parts.length > 1) {
+    const [account, module, name] = parts
+    type.qname = [accountTypeString(account), module, name].join(SPLITTER)
   }
 }
 

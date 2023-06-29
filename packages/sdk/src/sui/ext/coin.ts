@@ -1,9 +1,9 @@
 import { SimpleCoinInfo } from '../../move/ext/index.js'
 import fetch from 'node-fetch'
-import { SPLITTER } from '../../move/index.js'
+import { accountTypeString, SPLITTER } from '../../move/index.js'
 import { getPriceByType } from '../../utils/index.js'
 import { SuiChainId } from '@sentio/chain'
-import { validateAndNormalizeAddress } from '../utils.js'
+// import { validateAndNormalizeAddress } from '../utils.js'
 import { getClient, SuiNetwork } from '../network.js'
 import { CoinMetadata } from '@mysten/sui.js'
 
@@ -65,7 +65,7 @@ export function whitelistCoins() {
 
 export function whiteListed(coin: string): boolean {
   const [addr, module, type] = coin.split(SPLITTER)
-  const normalized = [validateAndNormalizeAddress(addr), module, type].join(SPLITTER)
+  const normalized = [accountTypeString(addr), module, type].join(SPLITTER)
   return WHITELISTED_COINS.has(normalized)
 }
 

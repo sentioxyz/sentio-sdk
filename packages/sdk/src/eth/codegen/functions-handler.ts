@@ -5,7 +5,7 @@ import {
 import sha3 from 'js-sha3'
 import { FunctionDeclaration, getSignatureForFn } from 'typechain'
 import { getFullSignatureAsSymbolForFunction } from './types.js'
-import { upperFirst } from 'lodash-es'
+import { upperFirst } from '../../move/index.js'
 
 export function generateCallHandlers(fns: FunctionDeclaration[], contractName: string): string {
   if (fns.length === 1) {
