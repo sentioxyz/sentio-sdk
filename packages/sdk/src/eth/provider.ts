@@ -104,6 +104,13 @@ class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
             }
           }, 1000)
         }
+        if (e.code === 'CALL_EXCEPTION' && !e.data) {
+          setTimeout(() => {
+            if (this.#performCache.get(tag) === perform) {
+              this.#performCache.delete(tag)
+            }
+          }, 1000)
+        }
       })
       this.#performCache.set(tag, perform)
       // For non latest block call, we cache permanently, otherwise we cache for one minute

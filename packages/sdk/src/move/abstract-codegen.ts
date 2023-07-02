@@ -1,6 +1,6 @@
 import {
   InternalMoveFunction,
-  InternalMoveFunctionVisibility,
+  // InternalMoveFunctionVisibility,
   InternalMoveModule,
   InternalMoveStruct,
 } from './internal-models.js'
@@ -161,11 +161,11 @@ export abstract class AbstractCodegen<NetworkType, ModuleTypes, StructType> {
   generateModule(module: InternalMoveModule, allEventStructs: Map<string, InternalMoveStruct>, network: NetworkType) {
     const qname = moduleQname(module)
     const functions = this.GENERATE_ON_ENTRY
-      ? module.exposedFunctions.map((f) => this.generateOnEntryFunctions(module, f)).filter((s) => s !== '')
+      ? module.exposedFunctions.map((f) => this.generateForEntryFunctions(module, f)).filter((s) => s !== '')
       : []
-    const clientFunctions = this.GENERATE_CLIENT
-      ? module.exposedFunctions.map((f) => this.generateClientFunctions(module, f)).filter((s) => s !== '')
-      : []
+    // const clientFunctions = this.GENERATE_CLIENT
+    //   ? module.exposedFunctions.map((f) => this.generateClientFunctions(module, f)).filter((s) => s !== '')
+    //   : []
     const eventStructs = new Map<string, InternalMoveStruct>()
     for (const [type, struct] of allEventStructs.entries()) {
       if (type.startsWith(qname + SPLITTER)) {
@@ -175,22 +175,21 @@ export abstract class AbstractCodegen<NetworkType, ModuleTypes, StructType> {
 
     const eventTypes = new Set(eventStructs.keys())
     const events = Array.from(eventStructs.values())
-      .map((e) => this.generateOnEvents(module, e))
+      .map((e) => this.generateForEvents(module, e))
       .filter((s) => s !== '')
     const structs = module.structs.map((s) => this.generateStructs(module, s, eventTypes))
     const callArgs = module.exposedFunctions.map((f) => this.generateCallArgsStructs(module, f))
 
     const moduleName = normalizeToJSName(module.name)
     let processor = ''
-    let client = ''
-
-    if (clientFunctions.length > 0) {
-      client = `
-      export class ${moduleName}_client extends ModuleClient {
-        ${clientFunctions.join('\n')}
-      }
-      `
-    }
+    // let client = ''
+    // if (clientFunctions.length > 0) {
+    //   client = `
+    //   export class ${moduleName}_client extends ModuleClient {
+    //     ${clientFunctions.join('\n')}
+    //   }
+    //   `
+    // }
 
     if (functions.length > 0 || events.length > 0) {
       processor = `export class ${moduleName} extends ${this.PREFIX}BaseProcessor {
@@ -215,7 +214,6 @@ export abstract class AbstractCodegen<NetworkType, ModuleTypes, StructType> {
     }
 
     return `
-  ${client}
 
   ${processor}
 
@@ -335,34 +333,34 @@ export abstract class AbstractCodegen<NetworkType, ModuleTypes, StructType> {
   `
   }
 
-  generateClientFunctions(module: InternalMoveModule, func: InternalMoveFunction) {
-    if (func.visibility === InternalMoveFunctionVisibility.PRIVATE) {
-      return ''
-    }
-    if (func.isEntry) {
-      return ''
-    }
-    // const moduleName = normalizeToJSName(module.name)
-    const funcName = camel(func.name)
-    const fields = this.chainAdapter.getMeaningfulFunctionParams(func.params).map((param) => {
-      return this.generateTypeForDescriptor(param, module.address)
-    })
-    const genericString = this.generateFunctionTypeParameters(func)
+  // generateClientFunctions(module: InternalMoveModule, func: InternalMoveFunction) {
+  //   if (func.visibility === InternalMoveFunctionVisibility.PRIVATE) {
+  //     return ''
+  //   }
+  //   if (func.isEntry) {
+  //     return ''
+  //   }
+  //   // const moduleName = normalizeToJSName(module.name)
+  //   const funcName = camel(func.name)
+  //   const fields = this.chainAdapter.getMeaningfulFunctionParams(func.params).map((param) => {
+  //     return this.generateTypeForDescriptor(param, module.address)
+  //   })
+  //   const genericString = this.generateFunctionTypeParameters(func)
+  //
+  //   const returns = func.return.map((param) => {
+  //     return this.generateTypeForDescriptor(param, module.address)
+  //   })
+  //
+  //   const source = `
+  // ${funcName}${genericString}(type_arguments: [${func.typeParams
+  //     .map((_) => 'string')
+  //     .join(', ')}], args: [${fields.join(',')}], version?: bigint): Promise<[${returns.join(',')}]> {
+  //   return this.viewDecoded('${module.address}::${module.name}::${func.name}', type_arguments, args, version) as any
+  // }`
+  //   return source
+  // }
 
-    const returns = func.return.map((param) => {
-      return this.generateTypeForDescriptor(param, module.address)
-    })
-
-    const source = `
-  ${funcName}${genericString}(type_arguments: [${func.typeParams
-      .map((_) => 'string')
-      .join(', ')}], args: [${fields.join(',')}], version?: bigint): Promise<[${returns.join(',')}]> {
-    return this.viewDecoded('${module.address}::${module.name}::${func.name}', type_arguments, args, version) as any
-  }`
-    return source
-  }
-
-  generateOnEntryFunctions(module: InternalMoveModule, func: InternalMoveFunction) {
+  generateForEntryFunctions(module: InternalMoveModule, func: InternalMoveFunction) {
     if (!func.isEntry) {
       return ''
     }
@@ -384,7 +382,7 @@ export abstract class AbstractCodegen<NetworkType, ModuleTypes, StructType> {
     return source
   }
 
-  generateOnEvents(module: InternalMoveModule, struct: InternalMoveStruct): string {
+  generateForEvents(module: InternalMoveModule, struct: InternalMoveStruct): string {
     // for struct that has drop + store
     // if (!isEvent(struct, module)) {
     //   return ''

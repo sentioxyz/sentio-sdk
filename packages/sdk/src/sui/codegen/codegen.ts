@@ -67,7 +67,7 @@ class SuiCodegen extends AbstractCodegen<SuiNetwork, SuiMoveNormalizedModule, Su
     return content + super.generateStructs(module, struct, events, content !== '')
   }
 
-  generateOnEvents(module: InternalMoveModule, struct: InternalMoveStruct): string {
+  generateForEvents(module: InternalMoveModule, struct: InternalMoveStruct): string {
     switch (structQname(module, struct)) {
       case '0x1::ascii::Char':
       case '0x1::ascii::String':
@@ -77,6 +77,6 @@ class SuiCodegen extends AbstractCodegen<SuiNetwork, SuiMoveNormalizedModule, Su
       case '0x2::balance::Balance':
         return ''
     }
-    return super.generateOnEvents(module, struct)
+    return super.generateForEvents(module, struct)
   }
 }
