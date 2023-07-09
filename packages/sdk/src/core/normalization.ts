@@ -26,7 +26,12 @@ function normalizeValue(name: string): string {
 export function normalizeLabels(labels: Labels): Labels {
   const normLabels: Labels = {}
   for (const key in labels) {
-    normLabels[normalizeKey(key)] = normalizeValue(labels[key])
+    const value = labels[key]
+    if (value !== undefined) {
+      normLabels[normalizeKey(key)] = normalizeValue(labels[key])
+    } else {
+      console.warn(`key: ${key} has empty value in attributes`)
+    }
   }
   return normLabels
 }
