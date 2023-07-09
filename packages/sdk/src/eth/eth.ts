@@ -251,6 +251,9 @@ export function isNullAddress(address: string) {
 }
 
 export function validateAndNormalizeAddress(address: string): string {
+  if (address === '*') {
+    return address
+  }
   const normalizedAddress = getAddress(address)
   return normalizedAddress.toLowerCase()
 }

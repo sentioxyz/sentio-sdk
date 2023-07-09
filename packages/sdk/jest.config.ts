@@ -6,4 +6,5 @@ export default {
     '^(\\.{1,2}/.*)\\.js$': '$1',
     '^@sentio/sdk(.*)$': '<rootDir>/src/$1',
   },
+  setupFiles: ['<rootDir>/setup.js'],
 }

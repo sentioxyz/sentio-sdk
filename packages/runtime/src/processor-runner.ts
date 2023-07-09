@@ -118,6 +118,10 @@ process
     // shutdownServers(1)
   })
   .on('unhandledRejection', (reason, p) => {
+    // @ts-ignore ignore invalid ens error
+    if (reason?.message.startsWith('invalid ENS name (disallowed character: "*"')) {
+      return
+    }
     console.error('Unhandled Rejection, please checking if await is properly', reason)
     baseService.unhandled = reason as Error
     // shutdownServers(1)

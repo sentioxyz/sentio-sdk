@@ -254,7 +254,13 @@ export abstract class BaseProcessor<
         if (!log) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'Log is empty')
         }
-        const contractView = processor.CreateBoundContractView()
+        let contractView
+        try {
+          contractView = processor.CreateBoundContractView()
+        } catch (e) {
+          throw e
+          // console.log(e)
+        }
 
         const ctx = new ContractContext<TContract, TBoundContractView>(
           contractName,

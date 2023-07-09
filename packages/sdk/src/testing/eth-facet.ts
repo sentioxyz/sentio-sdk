@@ -40,7 +40,10 @@ export class EthFacet {
       if (contract.contract?.chainId !== network) {
         continue
       }
-      if (trace.action.to?.toLowerCase() !== contract.contract?.address.toLowerCase()) {
+      if (
+        trace.action.to?.toLowerCase() !== contract.contract?.address.toLowerCase() &&
+        contract.contract?.address !== '*'
+      ) {
         continue
       }
       for (const config of contract.traceConfigs) {
@@ -84,7 +87,10 @@ export class EthFacet {
       if (contract.contract?.chainId !== network) {
         continue
       }
-      if (log.address.toLowerCase() !== contract.contract?.address.toLowerCase()) {
+      if (
+        log.address.toLowerCase() !== contract.contract?.address.toLowerCase() &&
+        contract.contract?.address !== '*'
+      ) {
         continue
       }
       for (const config of contract.logConfigs) {
