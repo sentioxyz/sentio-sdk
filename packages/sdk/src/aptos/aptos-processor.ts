@@ -16,6 +16,7 @@ import {
   ProcessResult,
   Data_AptEvent,
   Data_AptCall,
+  MoveAccountFetchConfig,
 } from '@sentio/protos'
 import { ServerError, Status } from 'nice-grpc'
 import {
@@ -34,6 +35,10 @@ const DEFAULT_FETCH_CONFIG: MoveFetchConfig = {
   allEvents: true,
 }
 
+export const DEFAULT_RESOURCE_FETCH_CONFIG: MoveAccountFetchConfig = {
+  owned: true,
+}
+
 type IndexConfigure = {
   address: string
   network: AptosNetwork
@@ -47,6 +52,7 @@ class ResourceHandlder {
   versionInterval?: HandleInterval
   timeIntervalInMinutes?: HandleInterval
   handler: (resource: Data_AptResource) => Promise<ProcessResult>
+  fetchConfig: MoveAccountFetchConfig
 }
 
 export class AptosProcessorState extends ListStateStorage<AptosBaseProcessor> {
@@ -226,8 +232,8 @@ export class AptosModulesProcessor extends AptosBaseProcessor {
   }
 }
 
-export class AptosAccountProcessorState extends ListStateStorage<AptosResourcesProcessor> {
-  static INSTANCE = new AptosAccountProcessorState()
+export class AptosResourceProcessorState extends ListStateStorage<AptosResourcesProcessor> {
+  static INSTANCE = new AptosResourceProcessorState()
 }
 
 export class AptosResourcesProcessor {
@@ -241,18 +247,19 @@ export class AptosResourcesProcessor {
 
   protected constructor(options: AptosBindOptions) {
     this.config = configure(options)
-    AptosAccountProcessorState.INSTANCE.addValue(this)
+    AptosResourceProcessorState.INSTANCE.addValue(this)
   }
 
   getChainId(): string {
     return this.config.network
   }
 
-  private onInterval(
+  onInterval(
     handler: (resources: MoveResource[], ctx: AptosResourcesContext) => PromiseOrVoid,
     timeInterval: HandleInterval | undefined,
     versionInterval: HandleInterval | undefined,
-    type: string | undefined
+    type: string | undefined,
+    fetchConfig: Partial<MoveAccountFetchConfig> | undefined
   ): this {
     const processor = this
     this.resourcesHandlers.push({
@@ -275,6 +282,7 @@ export class AptosResourcesProcessor {
       timeIntervalInMinutes: timeInterval,
       versionInterval: versionInterval,
       type: type,
+      fetchConfig: { ...DEFAULT_RESOURCE_FETCH_CONFIG, ...fetchConfig },
     })
     return this
   }
@@ -283,7 +291,8 @@ export class AptosResourcesProcessor {
     handler: (resources: MoveResource[], ctx: AptosResourcesContext) => PromiseOrVoid,
     timeIntervalInMinutes = 60,
     backfillTimeIntervalInMinutes = 240,
-    type?: string
+    type?: string,
+    fetchConfig?: Partial<MoveAccountFetchConfig>
   ): this {
     return this.onInterval(
       handler,
@@ -292,7 +301,8 @@ export class AptosResourcesProcessor {
         backfillInterval: backfillTimeIntervalInMinutes,
       },
       undefined,
-      type
+      type,
+      fetchConfig
     )
   }
 
@@ -300,13 +310,15 @@ export class AptosResourcesProcessor {
     handler: (resources: MoveResource[], ctx: AptosResourcesContext) => PromiseOrVoid,
     versionInterval = 100000,
     backfillVersionInterval = 400000,
-    typePrefix?: string
+    typePrefix?: string,
+    fetchConfig?: Partial<MoveAccountFetchConfig>
   ): this {
     return this.onInterval(
       handler,
       undefined,
       { recentInterval: versionInterval, backfillInterval: backfillVersionInterval },
-      typePrefix
+      typePrefix,
+      fetchConfig
     )
   }
 }

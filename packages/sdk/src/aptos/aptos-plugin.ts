@@ -17,9 +17,16 @@ import {
 
 import { ServerError, Status } from 'nice-grpc'
 
-import { AptosAccountProcessorState, AptosProcessorState } from './aptos-processor.js'
+import { AptosProcessorState, AptosResourceProcessorState } from './aptos-processor.js'
 
 import { initCoinList } from './ext/coin.js'
+import { AptosChainId } from '@sentio/chain'
+import { AptosResourcesContext } from './context.js'
+import {
+  AptosResourceProcessorTemplate,
+  AptosResourceProcessorTemplateState,
+} from './aptos-resource-processor-template.js'
+import { AptosNetwork } from './network.js'
 
 interface Handlers {
   aptosEventHandlers: ((event: Data_AptEvent) => Promise<ProcessResult>)[]
@@ -34,8 +41,27 @@ export class AptosPlugin extends Plugin {
     aptosResourceHandlers: [],
   }
 
-  async start(start: StartRequest) {
+  async start(request: StartRequest) {
     await initCoinList()
+
+    const allowedChainIds = new Set<string>(Object.values(AptosChainId))
+    for (const instance of request.templateInstances) {
+      if (!allowedChainIds.has(instance.contract?.chainId || '')) {
+        continue
+      }
+
+      const template: AptosResourceProcessorTemplate =
+        AptosResourceProcessorTemplateState.INSTANCE.getValues()[instance.templateId]
+
+      template.bind(
+        {
+          address: instance.contract?.address || '',
+          network: <AptosNetwork>instance.contract?.chainId || AptosNetwork.MAIN_NET,
+          startVersion: instance.startBlock || 0n,
+        },
+        NoopContext
+      )
+    }
   }
 
   async configure(config: ProcessConfigResponse) {
@@ -92,7 +118,7 @@ export class AptosPlugin extends Plugin {
       config.contractConfigs.push(contractConfig)
     }
 
-    for (const aptosProcessor of AptosAccountProcessorState.INSTANCE.getValues()) {
+    for (const aptosProcessor of AptosResourceProcessorState.INSTANCE.getValues()) {
       const accountConfig = AccountConfig.fromPartial({
         address: aptosProcessor.config.address,
         chainId: aptosProcessor.getChainId(),
@@ -194,3 +220,5 @@ export class AptosPlugin extends Plugin {
 }
 
 PluginManager.INSTANCE.register(new AptosPlugin())
+
+const NoopContext = new AptosResourcesContext(AptosChainId.APTOS_MAINNET, '', 0n, 1, {})
