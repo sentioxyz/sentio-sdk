@@ -1,12 +1,13 @@
 import { ProcessResult } from '@sentio/protos'
+
 // TODO better handling this, because old proto doesn't have this
-import { StateResult } from './gen/processor/protos/processor.js'
+import { StateResult, ProcessResult as ProcessResultFull } from './gen/processor/protos/processor.js'
 
 import { Required } from 'utility-types'
 
 export function mergeProcessResults(results: ProcessResult[]): Required<ProcessResult, 'states'> {
   const res = {
-    ...ProcessResult.create(),
+    ...ProcessResultFull.create(),
     states: StateResult.create(),
   }
 
