@@ -5,7 +5,7 @@ export const SENTIO_BIGINT_STRING_SUFFIX = ':sto_bi'
 export const SENTIO_BIGDECIMAL_STRING_SUFFIX = ':sto_bd'
 
 function normalizeName(name: string): string {
-  return name.slice(0, 128).replace(/[^_\-a-zA-Z0-9]/g, '_')
+  return name.slice(0, 128).replace(/[^_a-zA-Z0-9]/g, '_')
 }
 
 export function normalizeKey(name: string): string {

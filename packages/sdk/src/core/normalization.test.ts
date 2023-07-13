@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import { Struct } from '@sentio/protos'
 import { BigDecimal } from './big-decimal.js'
-import { normalizeAttribute } from './normalization.js'
+import { normalizeAttribute, normalizeKey, normalizeLabels } from './normalization.js'
 
 // TODO add test for type conversion
 describe('Normalization tests', () => {
@@ -27,5 +27,26 @@ describe('Normalization tests', () => {
     const w3 = Struct.encode(Struct.wrap(r3))
     const s3 = Struct.decode(w3.finish())
     console.log(r3)
+  })
+
+  test('test key ', async () => {
+    expect(normalizeKey('abc')).eq('abc')
+    expect(normalizeKey('a-b-c')).eq('a_b_c')
+    expect(normalizeKey('_a-B-1.')).eq('_a_B_1_')
+
+    expect(normalizeKey('a/b\\c\n')).eq('a_b_c_')
+    expect(normalizeKey('abc abc')).eq('abc_abc')
+    expect(normalizeKey('*&~')).eq('___')
+
+    expect(normalizeKey('vo total')).eq('vo_total')
+
+    expect(normalizeKey('x'.repeat(200)).length).eq(128)
+  })
+
+  test('test  labels', async () => {
+    const labels = { labels: '0' }
+    const updated = normalizeLabels(labels)
+
+    expect(updated['labels_']).eq('0')
   })
 })
