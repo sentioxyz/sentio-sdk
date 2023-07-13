@@ -89,6 +89,9 @@ export async function getABI(
 
     let resp = (await (await fetch(`${ethApi}module=contract&action=getabi&address=${address}`)).json()) as any
     if (resp.status !== '1') {
+      if (resp.result?.startsWith('Contract source code not verified')) {
+        throw Error(resp.result + "(API can't retrieve ABI based on similar contract)")
+      }
       throw Error(resp.message)
     }
     const abi = resp.result
