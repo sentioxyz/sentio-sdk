@@ -57,6 +57,14 @@ export class AptosContext extends MoveContext<AptosNetwork, MoveModuleBytecode, 
       labels: normalizeLabels(labels),
     }
   }
+
+  getClient(): AptosClient {
+    const chainServer = Endpoints.INSTANCE.chainServer.get(this.network)
+    if (!chainServer) {
+      throw new ServerError(Status.INTERNAL, 'RPC endpoint not provided')
+    }
+    return new AptosClient(chainServer)
+  }
 }
 
 export class AptosResourcesContext extends MoveAccountContext<AptosNetwork, MoveModuleBytecode, Event | MoveResource> {
