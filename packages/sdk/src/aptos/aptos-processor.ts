@@ -20,7 +20,6 @@ import {
 } from '@sentio/protos'
 import { ServerError, Status } from 'nice-grpc'
 import {
-  accountAddressString,
   accountTypeString,
   CallHandler,
   EventFilter,
@@ -335,7 +334,7 @@ function configure(options: AptosBindOptions): IndexConfigure {
 
   return {
     startVersion: startVersion,
-    address: options.address === '*' ? '*' : accountAddressString(options.address),
+    address: options.address === '*' ? '*' : accountTypeString(options.address), // aptos don't use address string in api, so only use type string
     network: options.network || AptosNetwork.MAIN_NET,
     baseLabels: options.baseLabels,
   }
