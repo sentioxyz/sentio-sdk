@@ -441,8 +441,8 @@ importers:
         specifier: ^2.7.2
         version: 2.7.2
       aptos-sdk:
-        specifier: npm:aptos@^1.10.0
-        version: /aptos@1.10.0
+        specifier: npm:aptos@^1.13.2
+        version: /aptos@1.13.2
       bs58:
         specifier: ^5.0.0
         version: 5.0.0
@@ -2178,7 +2178,7 @@ packages:
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
     dependencies:
       '@jridgewell/resolve-uri': 3.1.0
-      '@jridgewell/sourcemap-codec': 1.4.14
+      '@jridgewell/sourcemap-codec': 1.4.15
 
   /@ls-lint/ls-lint@2.0.0:
     resolution: {integrity: sha512-1QEk2tzSH5YBCgP+klCZJvdGHJFNQgJb8qPFpFwQPmvjmZMV0aPE11TZ4qd+BlTcteeCWzs5ewSIOVRx2xT+Lw==}
@@ -3630,8 +3630,8 @@ packages:
       normalize-path: 3.0.0
       picomatch: 2.3.1
 
-  /aptos@1.10.0:
-    resolution: {integrity: sha512-iapFseSv1GQn9nVXZzuk9LyrFCN/3/lg/kPgjbAeM2M66Fb2TZkN8khbTat4ol5qo4TXPWoMJdyzR8PwE6KlXA==}
+  /aptos@1.13.2:
+    resolution: {integrity: sha512-UjZSxMPuyG2mQU/fhx5mqtuJZlPwk2EWxRH45271kiph0FugJhgqC54zX7IAvpD3ZKZsZZg3OVKiOiE7pr6MCg==}
     engines: {node: '>=11.0.0'}
     dependencies:
       '@noble/hashes': 1.1.3
