@@ -256,9 +256,9 @@ export class SuiGlobalProcessor extends SuiBaseProcessor {
     fetchConfig?: Partial<MoveFetchConfig>
   ): this {
     // TODO enable more strict check
-    if (!filter.publicKeyPrefix || filter.publicKeyPrefix.length < 2) {
-      throw new ServerError(Status.INVALID_ARGUMENT, 'restriction too low for global processor')
-    }
+    // if (!filter.publicKeyPrefix || filter.publicKeyPrefix.length < 2) {
+    //   throw new ServerError(Status.INVALID_ARGUMENT, 'restriction too low for global processor')
+    // }
     return super.onTransactionBlock(handler, filter, fetchConfig)
   }
 }
