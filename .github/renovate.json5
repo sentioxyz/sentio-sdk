@@ -11,7 +11,8 @@
       "matchPackageNames": [
         "node",
         "superstruct_solana",
-        "semantic-release"
+        "semantic-release",
+        "mkdirp"
       ],
       "enabled": false
     }

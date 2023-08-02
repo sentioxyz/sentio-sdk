@@ -24,8 +24,8 @@
   "dependencies": {
     "@jest/globals": "^29.5.0",
     "@jest/types": "^29.5.0",
-    "@mysten/sui.js": "npm:@sentio/sui.js@^0.34",
-    "@sentio/chain": "^1.0.0",
+    "@mysten/sui.js": "^0.39.0",
+    "@sentio/chain": "^1.0.3",
     "@types/jest": "^29.5.0",
     "@types/node": "^18.11.18",
     "aptos-sdk": "npm:aptos@^1.8.5",

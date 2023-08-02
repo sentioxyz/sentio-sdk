@@ -24,8 +24,6 @@ export async function codegen(
 }
 
 class SuiCodegen extends AbstractCodegen<SuiNetwork, SuiMoveNormalizedModule, SuiEvent | SuiMoveObject> {
-  ADDRESS_TYPE = 'SuiAddress'
-  // ADDRESS_TYPE = 'string'
   MAIN_NET = SuiNetwork.MAIN_NET
   TEST_NET = SuiNetwork.TEST_NET
   PREFIX = 'Sui'

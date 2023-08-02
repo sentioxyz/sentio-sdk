@@ -21,7 +21,6 @@ export async function codegen(
 }
 
 class AptosCodegen extends AbstractCodegen<AptosNetwork, MoveModuleBytecode, Event | MoveResource> {
-  ADDRESS_TYPE = 'Address'
   MAIN_NET = AptosNetwork.MAIN_NET
   TEST_NET = AptosNetwork.TEST_NET
   PREFIX = 'Aptos'

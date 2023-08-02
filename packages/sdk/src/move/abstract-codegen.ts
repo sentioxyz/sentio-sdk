@@ -28,7 +28,7 @@ interface Config<NetworkType> {
 export abstract class AbstractCodegen<NetworkType, ModuleTypes, StructType> {
   TEST_NET: NetworkType
   MAIN_NET: NetworkType
-  ADDRESS_TYPE: string
+  ADDRESS_TYPE: string = 'string'
   PREFIX: string
   STRUCT_FIELD_NAME: string = 'data'
   GENERATE_CLIENT = false
@@ -524,7 +524,7 @@ export class AccountCodegen<NetworkType, ModuleType, StructType> {
       MoveCoder, defaultMoveCoder, ${this.moduleGen.PREFIX}BindOptions, ${this.moduleGen.PREFIX}BaseProcessor,
       TypedEventInstance, ${this.moduleGen.PREFIX}Network, TypedFunctionPayload,
       ${this.moduleGen.PREFIX}Context } from "@sentio/sdk/${this.moduleGen.PREFIX.toLowerCase()}"
-    import { ${this.moduleGen.ADDRESS_TYPE}, ModuleClient } from "@sentio/sdk/${this.moduleGen.PREFIX.toLowerCase()}"
+    import { ModuleClient } from "@sentio/sdk/${this.moduleGen.PREFIX.toLowerCase()}"
     `
 
     const dependedAccounts: string[] = []

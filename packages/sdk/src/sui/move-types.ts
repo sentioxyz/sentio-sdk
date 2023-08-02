@@ -14,8 +14,6 @@ import {
 } from '../move/internal-models.js'
 import { SPLITTER, TypeDescriptor } from '../move/index.js'
 
-export type { SuiAddress } from '@mysten/sui.js'
-
 export function toInternalModule(module: SuiMoveNormalizedModule): InternalMoveModule {
   return {
     address: module.address,
