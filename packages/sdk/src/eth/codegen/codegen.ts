@@ -20,7 +20,7 @@ export async function codegen(abisDir: string, outDir: string, contractsToGenExa
 async function codegenInternal(
   abisDir: string,
   outDir: string,
-  contractsToGenExample: YamlContractConfig[]
+  contractsToGenExample: YamlContractConfig[],
 ): Promise<number> {
   const allFiles = fs.readdirSync(abisDir)
   if (allFiles.length === 0) {
@@ -57,7 +57,7 @@ async function codegenInternal(
     fs,
     // @ts-ignore for test
     // prettier: { format: (s) => s },
-    prettier,
+    prettier: prettier,
     mkdirp: mkdirp.sync,
   }
   let filesGenerated = 0

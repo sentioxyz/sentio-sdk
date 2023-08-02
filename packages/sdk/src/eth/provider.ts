@@ -39,7 +39,7 @@ export function getProvider(chainId?: EthChainId): Provider {
       'Provider not found for chain ' +
         network.chainId +
         ', configured chains: ' +
-        [...Endpoints.INSTANCE.chainServer.keys()].join(' ')
+        [...Endpoints.INSTANCE.chainServer.keys()].join(' '),
     )
   }
   provider = new QueuedStaticJsonRpcProvider(address, network, Endpoints.INSTANCE.concurrency)
@@ -66,10 +66,13 @@ function getTag(prefix: string, value: any): string {
       if (typeof v === 'object' && !Array.isArray(v)) {
         const keys = Object.keys(v)
         keys.sort()
-        return keys.reduce((accum, key) => {
-          accum[key] = v[key]
-          return accum
-        }, <any>{})
+        return keys.reduce(
+          (accum, key) => {
+            accum[key] = v[key]
+            return accum
+          },
+          <any>{},
+        )
       }
 
       return v
@@ -97,20 +100,20 @@ class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
     if (!perform) {
       perform = this.executor.add(() => super.send(method, params))
       perform.catch((e) => {
-        if (e.code !== 'CALL_EXCEPTION' && e.code !== 'BAD_DATA') {
-          setTimeout(() => {
-            if (this.#performCache.get(tag) === perform) {
-              this.#performCache.delete(tag)
-            }
-          }, 1000)
-        }
-        if (e.code === 'CALL_EXCEPTION' && !e.data) {
-          setTimeout(() => {
-            if (this.#performCache.get(tag) === perform) {
-              this.#performCache.delete(tag)
-            }
-          }, 1000)
-        }
+        // if (e.code !== 'CALL_EXCEPTION' && e.code !== 'BAD_DATA') {
+        setTimeout(() => {
+          if (this.#performCache.get(tag) === perform) {
+            this.#performCache.delete(tag)
+          }
+        }, 1000)
+        // }
+        // if (e.code === 'CALL_EXCEPTION' && !e.data) {
+        //   setTimeout(() => {
+        //     if (this.#performCache.get(tag) === perform) {
+        //       this.#performCache.delete(tag)
+        //     }
+        //   }, 1000)
+        // }
       })
       this.#performCache.set(tag, perform)
       // For non latest block call, we cache permanently, otherwise we cache for one minute
