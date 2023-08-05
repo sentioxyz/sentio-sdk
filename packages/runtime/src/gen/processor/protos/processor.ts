@@ -471,6 +471,7 @@ export interface BlockHandlerConfig {
 export interface EthFetchConfig {
   transaction: boolean;
   transactionReceipt: boolean;
+  transactionReceiptLogs: boolean;
   block: boolean;
   trace: boolean;
 }
@@ -536,6 +537,12 @@ export interface MoveCallFilter {
   withTypeArguments: boolean;
   includeFailed: boolean;
   publicKeyPrefix: string;
+  fromAndToAddress?: MoveCallFilter_FromAndToAddress | undefined;
+}
+
+export interface MoveCallFilter_FromAndToAddress {
+  from: string;
+  to: string;
 }
 
 export interface Topic {
@@ -2449,7 +2456,7 @@ export const BlockHandlerConfig = {
 };
 
 function createBaseEthFetchConfig(): EthFetchConfig {
-  return { transaction: false, transactionReceipt: false, block: false, trace: false };
+  return { transaction: false, transactionReceipt: false, transactionReceiptLogs: false, block: false, trace: false };
 }
 
 export const EthFetchConfig = {
@@ -2459,6 +2466,9 @@ export const EthFetchConfig = {
     }
     if (message.transactionReceipt === true) {
       writer.uint32(16).bool(message.transactionReceipt);
+    }
+    if (message.transactionReceiptLogs === true) {
+      writer.uint32(40).bool(message.transactionReceiptLogs);
     }
     if (message.block === true) {
       writer.uint32(24).bool(message.block);
@@ -2482,6 +2492,9 @@ export const EthFetchConfig = {
         case 2:
           message.transactionReceipt = reader.bool();
           break;
+        case 5:
+          message.transactionReceiptLogs = reader.bool();
+          break;
         case 3:
           message.block = reader.bool();
           break;
@@ -2500,6 +2513,7 @@ export const EthFetchConfig = {
     return {
       transaction: isSet(object.transaction) ? Boolean(object.transaction) : false,
       transactionReceipt: isSet(object.transactionReceipt) ? Boolean(object.transactionReceipt) : false,
+      transactionReceiptLogs: isSet(object.transactionReceiptLogs) ? Boolean(object.transactionReceiptLogs) : false,
       block: isSet(object.block) ? Boolean(object.block) : false,
       trace: isSet(object.trace) ? Boolean(object.trace) : false,
     };
@@ -2509,6 +2523,7 @@ export const EthFetchConfig = {
     const obj: any = {};
     message.transaction !== undefined && (obj.transaction = message.transaction);
     message.transactionReceipt !== undefined && (obj.transactionReceipt = message.transactionReceipt);
+    message.transactionReceiptLogs !== undefined && (obj.transactionReceiptLogs = message.transactionReceiptLogs);
     message.block !== undefined && (obj.block = message.block);
     message.trace !== undefined && (obj.trace = message.trace);
     return obj;
@@ -2522,6 +2537,7 @@ export const EthFetchConfig = {
     const message = createBaseEthFetchConfig();
     message.transaction = object.transaction ?? false;
     message.transactionReceipt = object.transactionReceipt ?? false;
+    message.transactionReceiptLogs = object.transactionReceiptLogs ?? false;
     message.block = object.block ?? false;
     message.trace = object.trace ?? false;
     return message;
@@ -3224,7 +3240,14 @@ export const MoveCallHandlerConfig = {
 };
 
 function createBaseMoveCallFilter(): MoveCallFilter {
-  return { function: "", typeArguments: [], withTypeArguments: false, includeFailed: false, publicKeyPrefix: "" };
+  return {
+    function: "",
+    typeArguments: [],
+    withTypeArguments: false,
+    includeFailed: false,
+    publicKeyPrefix: "",
+    fromAndToAddress: undefined,
+  };
 }
 
 export const MoveCallFilter = {
@@ -3243,6 +3266,9 @@ export const MoveCallFilter = {
     }
     if (message.publicKeyPrefix !== "") {
       writer.uint32(42).string(message.publicKeyPrefix);
+    }
+    if (message.fromAndToAddress !== undefined) {
+      MoveCallFilter_FromAndToAddress.encode(message.fromAndToAddress, writer.uint32(50).fork()).ldelim();
     }
     return writer;
   },
@@ -3269,6 +3295,9 @@ export const MoveCallFilter = {
         case 5:
           message.publicKeyPrefix = reader.string();
           break;
+        case 6:
+          message.fromAndToAddress = MoveCallFilter_FromAndToAddress.decode(reader, reader.uint32());
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -3284,6 +3313,9 @@ export const MoveCallFilter = {
       withTypeArguments: isSet(object.withTypeArguments) ? Boolean(object.withTypeArguments) : false,
       includeFailed: isSet(object.includeFailed) ? Boolean(object.includeFailed) : false,
       publicKeyPrefix: isSet(object.publicKeyPrefix) ? String(object.publicKeyPrefix) : "",
+      fromAndToAddress: isSet(object.fromAndToAddress)
+        ? MoveCallFilter_FromAndToAddress.fromJSON(object.fromAndToAddress)
+        : undefined,
     };
   },
 
@@ -3298,6 +3330,9 @@ export const MoveCallFilter = {
     message.withTypeArguments !== undefined && (obj.withTypeArguments = message.withTypeArguments);
     message.includeFailed !== undefined && (obj.includeFailed = message.includeFailed);
     message.publicKeyPrefix !== undefined && (obj.publicKeyPrefix = message.publicKeyPrefix);
+    message.fromAndToAddress !== undefined && (obj.fromAndToAddress = message.fromAndToAddress
+      ? MoveCallFilter_FromAndToAddress.toJSON(message.fromAndToAddress)
+      : undefined);
     return obj;
   },
 
@@ -3312,6 +3347,68 @@ export const MoveCallFilter = {
     message.withTypeArguments = object.withTypeArguments ?? false;
     message.includeFailed = object.includeFailed ?? false;
     message.publicKeyPrefix = object.publicKeyPrefix ?? "";
+    message.fromAndToAddress = (object.fromAndToAddress !== undefined && object.fromAndToAddress !== null)
+      ? MoveCallFilter_FromAndToAddress.fromPartial(object.fromAndToAddress)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseMoveCallFilter_FromAndToAddress(): MoveCallFilter_FromAndToAddress {
+  return { from: "", to: "" };
+}
+
+export const MoveCallFilter_FromAndToAddress = {
+  encode(message: MoveCallFilter_FromAndToAddress, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.from !== "") {
+      writer.uint32(10).string(message.from);
+    }
+    if (message.to !== "") {
+      writer.uint32(18).string(message.to);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MoveCallFilter_FromAndToAddress {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMoveCallFilter_FromAndToAddress();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.from = reader.string();
+          break;
+        case 2:
+          message.to = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MoveCallFilter_FromAndToAddress {
+    return { from: isSet(object.from) ? String(object.from) : "", to: isSet(object.to) ? String(object.to) : "" };
+  },
+
+  toJSON(message: MoveCallFilter_FromAndToAddress): unknown {
+    const obj: any = {};
+    message.from !== undefined && (obj.from = message.from);
+    message.to !== undefined && (obj.to = message.to);
+    return obj;
+  },
+
+  create(base?: DeepPartial<MoveCallFilter_FromAndToAddress>): MoveCallFilter_FromAndToAddress {
+    return MoveCallFilter_FromAndToAddress.fromPartial(base ?? {});
+  },
+
+  fromPartial(object: DeepPartial<MoveCallFilter_FromAndToAddress>): MoveCallFilter_FromAndToAddress {
+    const message = createBaseMoveCallFilter_FromAndToAddress();
+    message.from = object.from ?? "";
+    message.to = object.to ?? "";
     return message;
   },
 };

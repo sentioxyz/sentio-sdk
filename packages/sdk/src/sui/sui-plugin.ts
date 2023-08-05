@@ -11,7 +11,7 @@ import {
   MoveEventHandlerConfig,
   ProcessConfigResponse,
   ProcessResult,
-  StartRequest,
+  StartRequest
 } from '@sentio/protos'
 
 import { ServerError, Status } from 'nice-grpc'
@@ -22,7 +22,7 @@ import { initCoinList } from './ext/coin.js'
 import { SuiChainId } from '@sentio/chain'
 import {
   SuiAccountProcessorTemplateState,
-  SuiObjectOrAddressProcessorTemplate,
+  SuiObjectOrAddressProcessorTemplate
 } from './sui-object-processor-template.js'
 import { SuiNetwork } from './network.js'
 import { SuiContext } from './context.js'
@@ -38,7 +38,7 @@ export class SuiPlugin extends Plugin {
   handlers: Handlers = {
     suiCallHandlers: [],
     suiEventHandlers: [],
-    suiObjectHandlers: [],
+    suiObjectHandlers: []
   }
   async start(request: StartRequest): Promise<void> {
     await initCoinList()
@@ -56,7 +56,7 @@ export class SuiPlugin extends Plugin {
         {
           objectId: instance.contract?.address || '',
           network: <SuiNetwork>instance.contract?.chainId || SuiNetwork.MAIN_NET,
-          startCheckpoint: instance.startBlock || 0n,
+          startCheckpoint: instance.startBlock || 0n
         },
         NoopContext
       )
@@ -67,7 +67,7 @@ export class SuiPlugin extends Plugin {
     const handlers: Handlers = {
       suiCallHandlers: [],
       suiEventHandlers: [],
-      suiObjectHandlers: [],
+      suiObjectHandlers: []
     }
     for (const suiProcessor of SuiProcessorState.INSTANCE.getValues()) {
       const contractConfig = ContractConfig.fromPartial({
@@ -77,9 +77,9 @@ export class SuiPlugin extends Plugin {
           name: suiProcessor.moduleName,
           chainId: suiProcessor.config.network,
           address: suiProcessor.config.address,
-          abi: '',
+          abi: ''
         },
-        startBlock: suiProcessor.config.startCheckpoint,
+        startBlock: suiProcessor.config.startCheckpoint
       })
       for (const handler of suiProcessor.eventHandlers) {
         const handlerId = handlers.suiEventHandlers.push(handler.handler) - 1
@@ -87,11 +87,11 @@ export class SuiPlugin extends Plugin {
           filters: handler.filters.map((f) => {
             return {
               type: f.type,
-              account: f.account || '',
+              account: f.account || ''
             }
           }),
           fetchConfig: handler.fetchConfig,
-          handlerId,
+          handlerId
         }
         contractConfig.moveEventConfigs.push(eventHandlerConfig)
       }
@@ -105,10 +105,11 @@ export class SuiPlugin extends Plugin {
               withTypeArguments: !!filter.typeArguments,
               includeFailed: filter.includeFailed || false,
               publicKeyPrefix: filter.publicKeyPrefix || '',
+              fromAndToAddress: filter.fromAndToAddress
             }
           }),
           fetchConfig: handler.fetchConfig,
-          handlerId,
+          handlerId
         }
         contractConfig.moveCallConfigs.push(functionHandlerConfig)
       }
@@ -119,7 +120,7 @@ export class SuiPlugin extends Plugin {
       const accountConfig = AccountConfig.fromPartial({
         address: processor.config.address,
         chainId: processor.getChainId(),
-        startBlock: processor.config.startCheckpoint, // TODO maybe use another field
+        startBlock: processor.config.startCheckpoint // TODO maybe use another field
       })
       for (const handler of processor.objectHandlers) {
         const handlerId = handlers.suiObjectHandlers.push(handler.handler) - 1
@@ -130,11 +131,11 @@ export class SuiPlugin extends Plugin {
             minutesInterval: handler.timeIntervalInMinutes,
             slot: 0,
             slotInterval: handler.checkPointInterval,
-            fetchConfig: undefined,
+            fetchConfig: undefined
           },
           type: handler.type || '',
           ownerType: processor.ownerType,
-          fetchConfig: handler.fetchConfig,
+          fetchConfig: handler.fetchConfig
         })
       }
       config.accountConfigs.push(accountConfig)

@@ -1604,6 +1604,14 @@ export const RemoteResultTransferServiceDefinition = {
       responseStream: false,
       options: {},
     },
+    destroyResult: {
+      name: "DestroyResult",
+      requestType: RemoteResultRequest,
+      requestStream: false,
+      responseType: VoidResponse,
+      responseStream: false,
+      options: {},
+    },
   },
 } as const;
 
@@ -1612,6 +1620,10 @@ export interface RemoteResultTransferServiceImplementation<CallContextExt = {}> 
     request: RemoteResultRequest,
     context: CallContext & CallContextExt,
   ): Promise<DeepPartial<RemoteResultResponse>>;
+  destroyResult(
+    request: RemoteResultRequest,
+    context: CallContext & CallContextExt,
+  ): Promise<DeepPartial<VoidResponse>>;
 }
 
 export interface RemoteResultTransferServiceClient<CallOptionsExt = {}> {
@@ -1619,6 +1631,10 @@ export interface RemoteResultTransferServiceClient<CallOptionsExt = {}> {
     request: DeepPartial<RemoteResultRequest>,
     options?: CallOptions & CallOptionsExt,
   ): Promise<RemoteResultResponse>;
+  destroyResult(
+    request: DeepPartial<RemoteResultRequest>,
+    options?: CallOptions & CallOptionsExt,
+  ): Promise<VoidResponse>;
 }
 
 declare var self: any | undefined;

@@ -13,6 +13,7 @@ export interface FunctionNameAndCallFilter extends CallFilter {
 export interface TransactionFilter {
   includeFailed?: boolean
   publicKeyPrefix?: string
+  fromAndToAddress?: { from: string; to: string }
 }
 
 // TODO extends ArgumentsFilter

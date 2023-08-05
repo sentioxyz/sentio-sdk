@@ -217,6 +217,7 @@ message BlockHandlerConfig {
 message EthFetchConfig {
   bool transaction = 1;
   bool transaction_receipt = 2;
+  bool transaction_receipt_logs = 5;
   bool block = 3;
   bool trace = 4;
 }
@@ -286,11 +287,17 @@ message MoveCallHandlerConfig {
 }
 
 message MoveCallFilter {
+  message FromAndToAddress {
+    string from = 1;
+    string to = 2;
+  }
+
   string function = 1;
   repeated string type_arguments = 2;
   bool with_type_arguments = 3;
   bool include_failed = 4;
   string public_key_prefix = 5;
+  optional FromAndToAddress from_and_to_address = 6;
 }
 
 message Topic {
