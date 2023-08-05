@@ -1,4 +1,4 @@
-import { AptosClient } from 'aptos-sdk'
+import { AptosClient } from 'aptos'
 import { JsonRpcProvider, Connection } from '@mysten/sui.js'
 import chalk from 'chalk'
 import process from 'process'
@@ -60,7 +60,7 @@ export async function getABI(
     try {
       return {
         abi: await aptosClient.getAccountModules(address),
-        name,
+        name
       }
     } catch (e) {
       console.error(baseErrMsg, e)
@@ -71,7 +71,7 @@ export async function getABI(
     try {
       return {
         abi: await suiClient.getNormalizedMoveModulesByPackage({ package: address }),
-        name,
+        name
       }
     } catch (e) {
       console.error(baseErrMsg, e)
@@ -109,7 +109,7 @@ export async function getABI(
     }
     return {
       name,
-      abi,
+      abi
     }
   } catch (e) {
     console.error(baseErrMsg, e)

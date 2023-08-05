@@ -197,9 +197,9 @@ importers:
       '@types/node':
         specifier: ^18.11.18
         version: 18.14.0
-      aptos-sdk:
-        specifier: npm:aptos@^1.8.5
-        version: /aptos@1.8.5
+      aptos:
+        specifier: ^1.17.0
+        version: 1.17.0
       chalk:
         specifier: ^5.2.0
         version: 5.2.0
@@ -405,8 +405,8 @@ importers:
         specifier: ^29.5.0
         version: 29.5.0(@types/node@18.16.18)(ts-node@10.9.1)
       tslib:
-        specifier: ^2.5.0
-        version: 2.5.0
+        specifier: ^2.6.1
+        version: 2.6.1
 
   packages/sdk:
     dependencies:
@@ -438,11 +438,14 @@ importers:
         specifier: ^1.74.0
         version: 1.74.0
       '@types/prettier':
-        specifier: ^2.7.2
-        version: 2.7.2
+        specifier: ^2.7.3
+        version: 2.7.3
+      aptos:
+        specifier: ^1.17.0
+        version: 1.17.0
       aptos-sdk:
-        specifier: npm:aptos@^1.14.0
-        version: /aptos@1.14.0
+        specifier: npm:aptos
+        version: /aptos@1.17.0
       bs58:
         specifier: ^5.0.0
         version: 5.0.0
@@ -517,11 +520,8 @@ importers:
         specifier: ^29.5.0
         version: 29.5.0(@types/node@18.16.18)(ts-node@10.9.1)
       tslib:
-        specifier: ^2.5.0
-        version: 2.5.0
-      typescript:
-        specifier: ^5.0.4
-        version: 5.0.4
+        specifier: ^2.6.1
+        version: 2.6.1
 
 packages:
 
@@ -3172,8 +3172,8 @@ packages:
       '@types/node': 18.16.18
     dev: true
 
-  /@types/prettier@2.7.2:
-    resolution: {integrity: sha512-KufADq8uQqo1pYKVIYzfKbJfBAc0sOeXqGbFaSpv8MRmC/zXgowNZmFcbngndGk922QDmOASEXUZCaY48gs4cg==}
+  /@types/prettier@2.7.3:
+    resolution: {integrity: sha512-+68kP9yzs4LMp7VNh8gdzMSPZFL44MLGqiHWvttYJe+6qnuVr4Ek9wSBQoveqY/r+LwjCcU29kNVkidwim+kYA==}
 
   /@types/qs@6.9.7:
     resolution: {integrity: sha512-FGa1F62FT09qcrueBA6qYTrJPVDzah9a+493+o2PCXsesWHIn27G98TsSMs3WPNbZIEj4+VJf6saSFpvD+3Zsw==}
@@ -3641,13 +3641,14 @@ packages:
       normalize-path: 3.0.0
       picomatch: 2.3.1
 
-  /aptos@1.14.0:
-    resolution: {integrity: sha512-Lg3gq27gytHgiwB3l2X9vX0E/zxmJMnafLw8bBMyeojutv5vbMj88ZtgH2jAKZ/nNwepUzLZLtv76I4nkljoCA==}
+  /aptos@1.17.0:
+    resolution: {integrity: sha512-C+jNub8Sgg32F2t4TwYqMfHHWyuxLjNwoJGlRz5CTR52V4fTFjGvP6nlqE4MphwAWrIQnHKo93Thai7kNe3OvA==}
     engines: {node: '>=11.0.0'}
     dependencies:
       '@aptos-labs/aptos-client': 0.0.2
       '@noble/hashes': 1.1.3
       '@scure/bip39': 1.1.0
+      eventemitter3: 5.0.1
       form-data: 4.0.0
       tweetnacl: 1.0.3
     transitivePeerDependencies:
@@ -3666,19 +3667,6 @@ packages:
     transitivePeerDependencies:
       - debug
     dev: true
-
-  /aptos@1.8.5:
-    resolution: {integrity: sha512-iQxliWesNHjGQ5YYXCyss9eg4+bDGQWqAZa73vprqGQ9tungK0cRjUI2fmnp63Ed6UG6rurHrL+b0ckbZAOZZQ==}
-    engines: {node: '>=11.0.0'}
-    dependencies:
-      '@noble/hashes': 1.1.3
-      '@scure/bip39': 1.1.0
-      axios: 0.27.2
-      form-data: 4.0.0
-      tweetnacl: 1.0.3
-    transitivePeerDependencies:
-      - debug
-    dev: false
 
   /arg@4.1.3:
     resolution: {integrity: sha512-58S9QDqG0Xx27YwPSt9fJxivjYl432YCwfDMfZ+71RAqUrZef7LrKQZ3LHLOwCS4FLNBplP533Zx895SeOCHvA==}
@@ -5255,7 +5243,7 @@ packages:
     dependencies:
       '@typescript-eslint/utils': 5.60.0(eslint@8.43.0)(typescript@5.1.6)
       eslint: 8.43.0
-      tslib: 2.5.3
+      tslib: 2.6.1
       tsutils: 3.21.0(typescript@5.1.6)
       typescript: 5.1.6
     transitivePeerDependencies:
@@ -5507,6 +5495,10 @@ packages:
 
   /eventemitter3@4.0.7:
     resolution: {integrity: sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw==}
+
+  /eventemitter3@5.0.1:
+    resolution: {integrity: sha512-GWkBvjiSZK87ELrYOSESUYeVIc9mvLLf/nXalMOS5dYrgZq9o5OVkbZAVM06CVxYsCwH9BDZFPlQTlPA1j4ahA==}
+    dev: false
 
   /events@3.3.0:
     resolution: {integrity: sha512-mQw+2fkQbALzQ7V0MY0IqdnXNOeTtP4r0lN9z7AAawCXgqea7bDii20AYrIBrFd/Hx0M2Ocz6S111CaFkUcb0Q==}
@@ -7099,7 +7091,7 @@ packages:
       '@jest/transform': 29.5.0
       '@jest/types': 29.5.0
       '@types/babel__traverse': 7.18.3
-      '@types/prettier': 2.7.2
+      '@types/prettier': 2.7.3
       babel-preset-current-node-syntax: 1.0.1(@babel/core@7.21.4)
       chalk: 4.1.2
       expect: 29.5.0
@@ -10077,14 +10069,6 @@ packages:
   /tslib@2.4.0:
     resolution: {integrity: sha512-d6xOpEDfsi2CZVlPQzGeux8XMwLT9hssAsaPYExaQMuYskwb+x1x7J371tWlbBdWHroy99KnVB6qIkUbs5X3UQ==}
 
-  /tslib@2.5.0:
-    resolution: {integrity: sha512-336iVw3rtn2BUK7ORdIAHTyxHGRIHVReokCR3XjbckJMK7ms8FysBfhLR8IXnAgy7T0PTPNBWKiH514FOW/WSg==}
-    dev: true
-
-  /tslib@2.5.3:
-    resolution: {integrity: sha512-mSxlJJwl3BMEQCUNnxXBU9jP4JBktcEGhURcPR6VQVlnP0FdDEsIaz0C35dXNGLyRfrATNofF0F5p2KPxQgB+w==}
-    dev: true
-
   /tslib@2.6.1:
     resolution: {integrity: sha512-t0hLfiEKfMUoqhG+U1oid7Pva4bbDPHYfJNiB7BiIjRkj1pyC++4N3huJfqY6aRH6VTB0rvtzQwjM4K6qpfOig==}
 
@@ -10169,7 +10153,7 @@ packages:
     peerDependencies:
       typescript: '>=4.3.0'
     dependencies:
-      '@types/prettier': 2.7.2
+      '@types/prettier': 2.7.3
       debug: 4.3.4
       fs-extra: 7.0.1
       glob: 7.1.7
