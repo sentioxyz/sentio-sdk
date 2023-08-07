@@ -1,10 +1,11 @@
 import * as fs from 'fs'
-import { Event, MoveModuleBytecode, MoveResource } from '../move-types.js'
 import chalk from 'chalk'
-import { AptosNetwork } from '../network.js'
-import { join } from 'path'
-import { AptosChainAdapter } from '../aptos-chain-adapter.js'
-import { AbstractCodegen } from '../../move/abstract-codegen.js'
+import path, { join } from 'path'
+import { AptosCodegen as BaseAptosCodegen } from '@typemove/aptos/codegen'
+import { InternalMoveModule, InternalMoveStruct } from '@typemove/move'
+import { AptosNetwork, getRpcEndpoint } from '../network.js'
+import { MoveModuleBytecode, MoveResource } from '@typemove/aptos'
+import { SharedNetworkCodegen } from '../../move/shared-network-codegen.js'
 
 export async function codegen(
   abisDir: string,
@@ -20,12 +21,50 @@ export async function codegen(
   console.log(chalk.green(`Generated ${numFiles} for Aptos`))
 }
 
-class AptosCodegen extends AbstractCodegen<AptosNetwork, MoveModuleBytecode, Event | MoveResource> {
-  MAIN_NET = AptosNetwork.MAIN_NET
-  TEST_NET = AptosNetwork.TEST_NET
-  PREFIX = 'Aptos'
+class AptosNetworkCodegen extends BaseAptosCodegen {
+  moduleGenerator: SharedNetworkCodegen<AptosNetwork, MoveModuleBytecode, Event | MoveResource>
 
-  constructor() {
-    super(AptosChainAdapter.INSTANCE)
+  constructor(network: AptosNetwork) {
+    const endpoint = getRpcEndpoint(network)
+    super(endpoint)
+    this.moduleGenerator = new (class extends SharedNetworkCodegen<
+      AptosNetwork,
+      MoveModuleBytecode,
+      Event | MoveResource
+    > {
+      ADDRESS_TYPE = 'Address'
+      PREFIX = 'Aptos'
+      SYSTEM_PACKAGE = '@typemove/aptos'
+
+      generateNetworkOption(network: AptosNetwork): string {
+        switch (network) {
+          case AptosNetwork.MAIN_NET:
+            return 'MAIN_NET'
+          default:
+            return 'TEST_NET'
+        }
+      }
+    })(network, this.chainAdapter)
+  }
+
+  generateModule(module: InternalMoveModule, allEventStructs: Map<string, InternalMoveStruct>) {
+    return this.moduleGenerator.generateModule(module, allEventStructs)
+  }
+  generateImports() {
+    return this.moduleGenerator.generateImports()
+  }
+  generateLoadAll(isSystem: boolean): string {
+    return this.moduleGenerator.generateLoadAll(isSystem)
+  }
+}
+
+const MAINNET_CODEGEN = new AptosNetworkCodegen(AptosNetwork.MAIN_NET)
+const TESTNET_CODEGEN = new AptosNetworkCodegen(AptosNetwork.TEST_NET)
+
+class AptosCodegen {
+  async generate(srcDir: string, outputDir: string, builtin = false): Promise<number> {
+    const num1 = await MAINNET_CODEGEN.generate(srcDir, outputDir, builtin)
+    const num2 = await TESTNET_CODEGEN.generate(path.join(srcDir, 'testnet'), path.join(outputDir, 'testnet'), builtin)
+    return num1 + num2
   }
 }

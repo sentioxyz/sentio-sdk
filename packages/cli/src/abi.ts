@@ -1,5 +1,5 @@
-import { AptosClient } from 'aptos'
-import { JsonRpcProvider, Connection } from '@mysten/sui.js'
+import { AptosClient } from 'aptos-sdk'
+import { SuiClient } from '@mysten/sui.js/client'
 import chalk from 'chalk'
 import process from 'process'
 import path from 'path'
@@ -29,7 +29,7 @@ export async function getABI(
 ): Promise<{ name?: string; abi: object | string }> {
   let ethApi
   let aptosClient: AptosClient | undefined
-  let suiClient: JsonRpcProvider | undefined
+  let suiClient: SuiClient | undefined
 
   switch (chain) {
     case AptosChainId.APTOS_MAINNET:
@@ -39,10 +39,10 @@ export async function getABI(
       aptosClient = new AptosClient('https://testnet.aptoslabs.com/')
       break
     case SuiChainId.SUI_MAINNET:
-      suiClient = new JsonRpcProvider(new Connection({ fullnode: 'https://fullnode.mainnet.sui.io/' }))
+      suiClient = new SuiClient({ url: 'https://fullnode.mainnet.sui.io/' })
       break
     case SuiChainId.SUI_TESTNET:
-      suiClient = new JsonRpcProvider(new Connection({ fullnode: 'https://fullnode.testnet.sui.io/' }))
+      suiClient = new SuiClient({ url: 'https://fullnode.testnet.sui.io/' })
       break
     default:
       ethApi = ETH_API_URL_MAP[chain]

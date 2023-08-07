@@ -2,7 +2,8 @@ import { loadFileDescriptions, processOutput, skipEmptyAbis } from 'typechain/di
 import * as fs from 'fs'
 import { DEFAULT_FLAGS, Services } from 'typechain'
 import EthersSentio, { SentioEthersConfig } from './ethers-sentio.js'
-import * as prettier from 'prettier'
+// @ts-ignore - no types
+import * as prettier from 'prettier2'
 import path from 'path'
 import mkdirp from 'mkdirp'
 import { YamlContractConfig } from '../../core/yaml-contract-config.js'
@@ -20,7 +21,7 @@ export async function codegen(abisDir: string, outDir: string, contractsToGenExa
 async function codegenInternal(
   abisDir: string,
   outDir: string,
-  contractsToGenExample: YamlContractConfig[],
+  contractsToGenExample: YamlContractConfig[]
 ): Promise<number> {
   const allFiles = fs.readdirSync(abisDir)
   if (allFiles.length === 0) {
@@ -51,14 +52,14 @@ async function codegenInternal(
     outDir: outInternal,
     allFiles: allABIFiles,
     filesToProcess: allABIFiles,
-    contractsToGenExample: contractsToGenExample,
+    contractsToGenExample: contractsToGenExample
   }
   const services: Services = {
     fs,
     // @ts-ignore for test
     // prettier: { format: (s) => s },
     prettier: prettier,
-    mkdirp: mkdirp.sync,
+    mkdirp: mkdirp.sync
   }
   let filesGenerated = 0
 

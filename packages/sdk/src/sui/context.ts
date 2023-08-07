@@ -3,12 +3,13 @@ import { type Labels, normalizeLabels } from '../index.js'
 import { getClient, SuiNetwork } from './network.js'
 import {
   SuiTransactionBlockResponse,
-  JsonRpcProvider,
   SuiEvent,
   SuiMoveNormalizedModule,
   SuiMoveObject,
-} from '@mysten/sui.js'
-import { MoveCoder, defaultMoveCoder } from './move-coder.js'
+  SuiClient
+} from '@mysten/sui.js/client'
+import { MoveCoder } from '@sentio/sdk/sui'
+import { defaultMoveCoder } from './move-coder.js'
 import { MoveAccountContext, MoveContext } from '../move/index.js'
 
 export class SuiContext extends MoveContext<SuiNetwork, SuiMoveNormalizedModule, SuiEvent | SuiMoveObject> {
@@ -60,11 +61,11 @@ export class SuiContext extends MoveContext<SuiNetwork, SuiMoveNormalizedModule,
       logIndex: 0,
       chainId: this.getChainId(),
       name: name,
-      labels: normalizeLabels(labels),
+      labels: normalizeLabels(labels)
     }
   }
 
-  get client(): JsonRpcProvider {
+  get client(): SuiClient {
     return getClient(this.network)
   }
 }
@@ -112,11 +113,11 @@ export class SuiAddressContext extends MoveAccountContext<
       logIndex: 0,
       chainId: this.getChainId(),
       name: name,
-      labels: normalizeLabels(labels),
+      labels: normalizeLabels(labels)
     }
   }
 
-  get client(): JsonRpcProvider {
+  get client(): SuiClient {
     return getClient(this.network)
   }
 

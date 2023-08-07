@@ -1,7 +1,7 @@
 import { HandleInterval, MoveAccountFetchConfig } from '@sentio/protos'
 import { ListStateStorage } from '@sentio/runtime'
 import { SuiAddressContext, SuiContext, SuiObjectContext } from './context.js'
-import { SuiMoveObject } from '@mysten/sui.js'
+import { SuiMoveObject } from '@mysten/sui.js/client'
 import { PromiseOrVoid } from '../core/index.js'
 import {
   DEFAULT_FETCH_CONFIG,
@@ -9,7 +9,7 @@ import {
   SuiBaseObjectOrAddressProcessor,
   SuiObjectBindOptions,
   SuiObjectProcessor,
-  SuiWrappedObjectProcessor,
+  SuiWrappedObjectProcessor
 } from './sui-object-processor.js'
 import { TemplateInstanceState } from '../core/template.js'
 import { SuiBindOptions } from './sui-processor.js'
@@ -64,8 +64,8 @@ export abstract class SuiObjectOrAddressProcessorTemplate<
 
     ctx.update({
       states: {
-        configUpdated: true,
-      },
+        configUpdated: true
+      }
     })
     TemplateInstanceState.INSTANCE.addValue({
       templateId: this.id,
@@ -73,10 +73,10 @@ export abstract class SuiObjectOrAddressProcessorTemplate<
         name: '',
         chainId: config.network,
         address: config.address,
-        abi: '',
+        abi: ''
       },
       startBlock: config.startCheckpoint,
-      endBlock: 0n,
+      endBlock: 0n
     })
   }
 
@@ -92,7 +92,7 @@ export abstract class SuiObjectOrAddressProcessorTemplate<
       timeIntervalInMinutes: timeInterval,
       checkpointInterval: checkpointInterval,
       type,
-      fetchConfig: { ...DEFAULT_FETCH_CONFIG, ...fetchConfig },
+      fetchConfig: { ...DEFAULT_FETCH_CONFIG, ...fetchConfig }
     })
     return this
   }
@@ -108,7 +108,7 @@ export abstract class SuiObjectOrAddressProcessorTemplate<
       handler,
       {
         recentInterval: timeIntervalInMinutes,
-        backfillInterval: backfillTimeIntervalInMinutes,
+        backfillInterval: backfillTimeIntervalInMinutes
       },
       undefined,
       type,

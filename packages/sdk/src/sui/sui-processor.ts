@@ -3,13 +3,7 @@ import { ListStateStorage, mergeProcessResults } from '@sentio/runtime'
 import { SuiNetwork } from './network.js'
 import { ServerError, Status } from 'nice-grpc'
 import { SuiContext } from './context.js'
-import {
-  getProgrammableTransaction,
-  getTransactionKind,
-  MoveCallSuiTransaction,
-  SuiEvent,
-  SuiTransactionBlockResponse,
-} from '@mysten/sui.js'
+import { MoveCallSuiTransaction, SuiEvent, SuiTransactionBlockResponse } from '@mysten/sui.js/client'
 import {
   accountAddressString,
   accountTypeString,
@@ -19,16 +13,16 @@ import {
   FunctionNameAndCallFilter,
   parseMoveType,
   SPLITTER,
-  TransactionFilter,
+  TransactionFilter
 } from '../move/index.js'
 import { getMoveCalls } from './utils.js'
-import { defaultMoveCoder, MoveCoder } from './move-coder.js'
+import { defaultMoveCoder, MoveCoder } from '@sentio/sdk/sui'
 import { Labels } from '../core/index.js'
 import { Required } from 'utility-types'
 
 const DEFAULT_FETCH_CONFIG: MoveFetchConfig = {
   resourceChanges: false,
-  allEvents: true,
+  allEvents: true
 }
 
 export type IndexConfigure = Required<SuiBindOptions, 'startCheckpoint' | 'network'>
@@ -38,7 +32,7 @@ export function configure(options: SuiBindOptions): IndexConfigure {
     startCheckpoint: options.startCheckpoint || 0n,
     address: options.address === '*' ? '*' : accountAddressString(options.address),
     network: options.network || SuiNetwork.MAIN_NET,
-    baseLabels: options.baseLabels,
+    baseLabels: options.baseLabels
   }
 }
 
@@ -128,7 +122,7 @@ export class SuiBaseProcessor {
         return mergeProcessResults(processResults)
       },
       filters: _filters,
-      fetchConfig: _fetchConfig,
+      fetchConfig: _fetchConfig
     })
     return this
   }
@@ -171,11 +165,13 @@ export class SuiBaseProcessor {
         )
         if (tx) {
           const calls: MoveCallSuiTransaction[] = getMoveCalls(tx)
-          const txKind = getTransactionKind(tx)
+          const txKind = tx.transaction?.data?.transaction
           if (!txKind) {
             throw new ServerError(Status.INVALID_ARGUMENT, 'Unexpected getTransactionKind get empty')
           }
-          const programmableTx = getProgrammableTransaction(txKind)
+
+          // getProgrammableTransaction(txKind)
+          const programmableTx = txKind.kind === 'ProgrammableTransaction' ? txKind : undefined
 
           // TODO potential pass index
           for (const call of calls) {
@@ -192,7 +188,7 @@ export class SuiBaseProcessor {
         return ctx.stopAndGetResult()
       },
       filters: _filters,
-      fetchConfig: _fetchConfig,
+      fetchConfig: _fetchConfig
     })
     return this
   }
@@ -234,7 +230,7 @@ export class SuiBaseProcessor {
         return ctx.stopAndGetResult()
       },
       filters: [{ ...filter, function: '' }],
-      fetchConfig: _fetchConfig,
+      fetchConfig: _fetchConfig
     })
     return this
   }

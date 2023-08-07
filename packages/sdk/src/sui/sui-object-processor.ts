@@ -2,7 +2,7 @@ import { Data_SuiObject, HandleInterval, MoveAccountFetchConfig, MoveOwnerType, 
 import { ListStateStorage } from '@sentio/runtime'
 import { SuiNetwork } from './network.js'
 import { SuiAddressContext, SuiObjectContext } from './context.js'
-import { SuiMoveObject } from '@mysten/sui.js'
+import { SuiMoveObject } from '@mysten/sui.js/client'
 import { PromiseOrVoid } from '../core/index.js'
 import { configure, IndexConfigure, SuiBindOptions } from './sui-processor.js'
 
@@ -22,7 +22,7 @@ interface ObjectHandler {
 }
 
 export const DEFAULT_FETCH_CONFIG: MoveAccountFetchConfig = {
-  owned: true,
+  owned: true
 }
 
 export class SuiAccountProcessorState extends ListStateStorage<SuiBaseObjectOrAddressProcessor<any>> {
@@ -80,7 +80,7 @@ export abstract class SuiBaseObjectOrAddressProcessor<HandlerType> {
       timeIntervalInMinutes: timeInterval,
       checkPointInterval: checkpointInterval,
       type,
-      fetchConfig: { ...DEFAULT_FETCH_CONFIG, ...fetchConfig },
+      fetchConfig: { ...DEFAULT_FETCH_CONFIG, ...fetchConfig }
     })
     return this
   }
@@ -96,7 +96,7 @@ export abstract class SuiBaseObjectOrAddressProcessor<HandlerType> {
       handler,
       {
         recentInterval: timeIntervalInMinutes,
-        backfillInterval: backfillTimeIntervalInMinutes,
+        backfillInterval: backfillTimeIntervalInMinutes
       },
       undefined,
       type,
@@ -146,7 +146,7 @@ export class SuiObjectProcessor extends SuiBaseObjectOrAddressProcessor<
       network: options.network,
       startCheckpoint: options.startCheckpoint,
       ownerType: MoveOwnerType.OBJECT,
-      baseLabels: options.baseLabels,
+      baseLabels: options.baseLabels
     })
   }
 
@@ -172,7 +172,7 @@ export class SuiWrappedObjectProcessor extends SuiBaseObjectOrAddressProcessor<
       network: options.network,
       startCheckpoint: options.startCheckpoint,
       ownerType: MoveOwnerType.WRAPPED_OBJECT,
-      baseLabels: options.baseLabels,
+      baseLabels: options.baseLabels
     })
   }
 

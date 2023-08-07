@@ -5,7 +5,7 @@ import { getPriceByType } from '../../utils/index.js'
 import { SuiChainId } from '@sentio/chain'
 // import { validateAndNormalizeAddress } from '../utils.js'
 import { getClient, SuiNetwork } from '../network.js'
-import { CoinMetadata } from '@mysten/sui.js'
+import { CoinMetadata } from '@mysten/sui.js/client'
 
 const WHITELISTED_COINS = new Map<string, SimpleCoinInfo>()
 
@@ -50,11 +50,11 @@ function setCoinList(list: SuiCoinInfo[]) {
     WHITELISTED_COINS.set(info.address, {
       token_type: {
         type: info.address,
-        account_address: info.address.split('::')[0],
+        account_address: info.address.split('::')[0]
       },
       symbol: info.symbol,
       decimals: info.decimals,
-      bridge,
+      bridge
     })
   }
 }
@@ -78,7 +78,7 @@ export function getCoinInfo(type: string): SimpleCoinInfo {
       token_type: { type: type, account_address: parts[0] },
       symbol: parts[2],
       decimals: 8,
-      bridge: 'native',
+      bridge: 'native'
     }
   }
   return r
@@ -107,7 +107,7 @@ export async function getCoinInfoWithFallback(type: string, network?: SuiNetwork
       token_type: { type: type, account_address: parts[0] },
       symbol: meta.symbol,
       decimals: meta.decimals,
-      bridge: 'native',
+      bridge: 'native'
     }
   }
   return r
@@ -146,8 +146,8 @@ const DEFAULT_LIST = {
       logoURI: 'https://cryptototem.com/wp-content/uploads/2022/08/SUI-logo.jpg',
       tags: [],
       extensions: {
-        coingeckoId: 'sui',
-      },
+        coingeckoId: 'sui'
+      }
     },
     {
       network: 'testnet',
@@ -158,8 +158,8 @@ const DEFAULT_LIST = {
       logoURI: 'https://cryptototem.com/wp-content/uploads/2022/08/SUI-logo.jpg',
       tags: [],
       extensions: {
-        coingeckoId: 'sui',
-      },
+        coingeckoId: 'sui'
+      }
     },
     {
       network: 'devnet',
@@ -170,8 +170,8 @@ const DEFAULT_LIST = {
       logoURI: 'https://cryptototem.com/wp-content/uploads/2022/08/SUI-logo.jpg',
       tags: [],
       extensions: {
-        coingeckoId: 'sui',
-      },
+        coingeckoId: 'sui'
+      }
     },
     {
       network: 'mainnet',
@@ -182,8 +182,8 @@ const DEFAULT_LIST = {
       logoURI: 'https://cryptototem.com/wp-content/uploads/2022/08/SUI-logo.jpg',
       tags: [],
       extensions: {
-        coingeckoId: 'sui',
-      },
+        coingeckoId: 'sui'
+      }
     },
     {
       network: 'testnet',
@@ -194,8 +194,8 @@ const DEFAULT_LIST = {
       logoURI: 'https://cryptototem.com/wp-content/uploads/2022/08/SUI-logo.jpg',
       tags: [],
       extensions: {
-        coingeckoId: 'sui',
-      },
+        coingeckoId: 'sui'
+      }
     },
     {
       network: 'devnet',
@@ -206,8 +206,8 @@ const DEFAULT_LIST = {
       logoURI: 'https://cryptototem.com/wp-content/uploads/2022/08/SUI-logo.jpg',
       tags: [],
       extensions: {
-        coingeckoId: 'sui',
-      },
+        coingeckoId: 'sui'
+      }
     },
     {
       network: 'testnet',
@@ -217,7 +217,7 @@ const DEFAULT_LIST = {
       logoURI: 'https://suiswap.app/images/token/suiswap-test.svg',
       tags: [],
       decimals: 8,
-      extensions: {},
+      extensions: {}
     },
     {
       network: 'testnet',
@@ -229,8 +229,8 @@ const DEFAULT_LIST = {
       tags: [],
       decimals: 8,
       extensions: {
-        coingeckoId: 'tether',
-      },
+        coingeckoId: 'tether'
+      }
     },
     {
       network: 'testnet',
@@ -242,8 +242,8 @@ const DEFAULT_LIST = {
       decimals: 8,
       tags: [],
       extensions: {
-        coingeckoId: 'usd-coin',
-      },
+        coingeckoId: 'usd-coin'
+      }
     },
     {
       network: 'testnet',
@@ -254,8 +254,8 @@ const DEFAULT_LIST = {
         'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png',
       decimals: 8,
       extensions: {
-        coingeckoId: 'solana',
-      },
+        coingeckoId: 'solana'
+      }
     },
     {
       network: 'testnet',
@@ -267,8 +267,8 @@ const DEFAULT_LIST = {
       decimals: 8,
       tags: [],
       extensions: {
-        coingeckoId: 'bitcoin',
-      },
+        coingeckoId: 'bitcoin'
+      }
     },
     {
       network: 'testnet',
@@ -280,8 +280,8 @@ const DEFAULT_LIST = {
       decimals: 8,
       tags: [],
       extensions: {
-        coingeckoId: 'dai',
-      },
+        coingeckoId: 'dai'
+      }
     },
     {
       network: 'testnet',
@@ -292,8 +292,8 @@ const DEFAULT_LIST = {
       decimals: 8,
       tags: [],
       extensions: {
-        coingeckoId: 'binancecoin',
-      },
+        coingeckoId: 'binancecoin'
+      }
     },
     {
       network: 'testnet',
@@ -304,8 +304,8 @@ const DEFAULT_LIST = {
       decimals: 8,
       tags: [],
       extensions: {
-        coingeckoId: 'ethereum',
-      },
+        coingeckoId: 'ethereum'
+      }
     },
     {
       network: 'testnet',
@@ -317,8 +317,8 @@ const DEFAULT_LIST = {
       decimals: 8,
       tags: [],
       extensions: {
-        coingeckoId: 'usd-coin',
-      },
+        coingeckoId: 'usd-coin'
+      }
     },
     {
       network: 'devnet',
@@ -328,7 +328,7 @@ const DEFAULT_LIST = {
       logoURI: 'https://suiswap.app/images/token/suiswap-test.svg',
       tags: [],
       decimals: 8,
-      extensions: {},
+      extensions: {}
     },
     {
       network: 'devnet',
@@ -340,8 +340,8 @@ const DEFAULT_LIST = {
       tags: [],
       decimals: 8,
       extensions: {
-        coingeckoId: 'tether',
-      },
+        coingeckoId: 'tether'
+      }
     },
     {
       network: 'devnet',
@@ -353,8 +353,8 @@ const DEFAULT_LIST = {
       decimals: 8,
       tags: [],
       extensions: {
-        coingeckoId: 'usd-coin',
-      },
+        coingeckoId: 'usd-coin'
+      }
     },
     {
       network: 'devnet',
@@ -365,8 +365,8 @@ const DEFAULT_LIST = {
         'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png',
       decimals: 8,
       extensions: {
-        coingeckoId: 'solana',
-      },
+        coingeckoId: 'solana'
+      }
     },
     {
       network: 'devnet',
@@ -378,8 +378,8 @@ const DEFAULT_LIST = {
       decimals: 8,
       tags: [],
       extensions: {
-        coingeckoId: 'bitcoin',
-      },
+        coingeckoId: 'bitcoin'
+      }
     },
     {
       network: 'devnet',
@@ -391,8 +391,8 @@ const DEFAULT_LIST = {
       decimals: 8,
       tags: [],
       extensions: {
-        coingeckoId: 'dai',
-      },
+        coingeckoId: 'dai'
+      }
     },
     {
       network: 'devnet',
@@ -403,8 +403,8 @@ const DEFAULT_LIST = {
       decimals: 8,
       tags: [],
       extensions: {
-        coingeckoId: 'binancecoin',
-      },
+        coingeckoId: 'binancecoin'
+      }
     },
     {
       network: 'devnet',
@@ -415,8 +415,8 @@ const DEFAULT_LIST = {
       decimals: 8,
       tags: [],
       extensions: {
-        coingeckoId: 'ethereum',
-      },
+        coingeckoId: 'ethereum'
+      }
     },
     {
       network: 'mainnet',
@@ -427,8 +427,8 @@ const DEFAULT_LIST = {
       logoURI: 'https://assets.coingecko.com/coins/images/279/large/ethereum.png',
       tags: [],
       extensions: {
-        coingeckoId: 'ethereum',
-      },
+        coingeckoId: 'ethereum'
+      }
     },
     {
       network: 'mainnet',
@@ -440,8 +440,8 @@ const DEFAULT_LIST = {
         'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/BQcdHdAQW1hczDbBi9hiegXAR7A98Q9jx3X3iBBBDiq4/logo.png',
       tags: [],
       extensions: {
-        coingeckoId: 'tether',
-      },
+        coingeckoId: 'tether'
+      }
     },
     {
       network: 'mainnet',
@@ -453,8 +453,8 @@ const DEFAULT_LIST = {
         'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png',
       tags: [],
       extensions: {
-        coingeckoId: 'usd-coin',
-      },
+        coingeckoId: 'usd-coin'
+      }
     },
     {
       network: 'mainnet',
@@ -465,8 +465,8 @@ const DEFAULT_LIST = {
       logoURI: 'https://assets.coingecko.com/coins/images/11090/large/InjXBNx9_400x400.jpg',
       tags: [],
       extensions: {
-        coingeckoId: 'celo',
-      },
+        coingeckoId: 'celo'
+      }
     },
     {
       network: 'mainnet',
@@ -477,8 +477,8 @@ const DEFAULT_LIST = {
       logoURI: 'https://assets.coingecko.com/coins/images/4713/large/matic-token-icon.png',
       tags: [],
       extensions: {
-        coingeckoId: 'matic-network',
-      },
+        coingeckoId: 'matic-network'
+      }
     },
     {
       network: 'mainnet',
@@ -489,8 +489,8 @@ const DEFAULT_LIST = {
       logoURI: 'https://assets.coingecko.com/coins/images/825/large/bnb-icon2_2x.png',
       tags: [],
       extensions: {
-        coingeckoId: 'binancecoin',
-      },
+        coingeckoId: 'binancecoin'
+      }
     },
     {
       network: 'mainnet',
@@ -501,8 +501,8 @@ const DEFAULT_LIST = {
       logoURI: 'https://assets.coingecko.com/coins/images/1/large/bitcoin.png',
       tags: [],
       extensions: {
-        coingeckoId: 'bitcoin',
-      },
+        coingeckoId: 'bitcoin'
+      }
     },
     {
       network: 'mainnet',
@@ -513,8 +513,8 @@ const DEFAULT_LIST = {
       logoURI: 'https://assets.coingecko.com/coins/images/12559/large/Avalanche_Circle_RedWhite_Trans.png',
       tags: [],
       extensions: {
-        coingeckoId: 'avalanche-2',
-      },
+        coingeckoId: 'avalanche-2'
+      }
     },
     {
       network: 'mainnet',
@@ -525,8 +525,8 @@ const DEFAULT_LIST = {
       logoURI: 'https://assets.coingecko.com/coins/images/4001/large/Fantom_round.png',
       tags: [],
       extensions: {
-        coingeckoId: 'fantom',
-      },
+        coingeckoId: 'fantom'
+      }
     },
     {
       network: 'mainnet',
@@ -537,8 +537,8 @@ const DEFAULT_LIST = {
       logoURI: 'https://assets.coingecko.com/coins/images/22459/large/glmr.png',
       tags: [],
       extensions: {
-        coingeckoId: 'moonbeam',
-      },
+        coingeckoId: 'moonbeam'
+      }
     },
     {
       network: 'mainnet',
@@ -549,8 +549,8 @@ const DEFAULT_LIST = {
       logoURI: 'https://assets.coingecko.com/coins/images/4128/large/solana.png',
       tags: [],
       extensions: {
-        coingeckoId: 'solana',
-      },
+        coingeckoId: 'solana'
+      }
     },
     {
       network: 'mainnet',
@@ -561,8 +561,8 @@ const DEFAULT_LIST = {
       logoURI: 'https://assets.coingecko.com/coins/images/6319/large/USD_Coin_icon.png',
       tags: [],
       extensions: {
-        coingeckoId: 'usd-coin',
-      },
-    },
-  ],
+        coingeckoId: 'usd-coin'
+      }
+    }
+  ]
 }

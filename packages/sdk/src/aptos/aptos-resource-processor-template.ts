@@ -4,7 +4,7 @@ import { AptosResourcesContext } from './context.js'
 import { AptosBindOptions } from './network.js'
 import { AptosResourcesProcessor, DEFAULT_RESOURCE_FETCH_CONFIG } from './aptos-processor.js'
 import { HandleInterval, MoveAccountFetchConfig } from '@sentio/protos'
-import { MoveResource } from './move-types.js'
+import { MoveResource } from '@sentio/sdk/aptos'
 import { PromiseOrVoid } from '../core/index.js'
 
 export class AptosResourceProcessorTemplateState extends ListStateStorage<AptosResourceProcessorTemplate> {
@@ -53,8 +53,8 @@ export class AptosResourceProcessorTemplate {
 
     ctx.update({
       states: {
-        configUpdated: true,
-      },
+        configUpdated: true
+      }
     })
     TemplateInstanceState.INSTANCE.addValue({
       templateId: this.id,
@@ -62,10 +62,10 @@ export class AptosResourceProcessorTemplate {
         name: '',
         chainId: config.network,
         address: config.address,
-        abi: '',
+        abi: ''
       },
       startBlock: config.startVersion,
-      endBlock: 0n,
+      endBlock: 0n
     })
   }
 
@@ -81,7 +81,7 @@ export class AptosResourceProcessorTemplate {
       timeIntervalInMinutes: timeInterval,
       checkpointInterval: checkpointInterval,
       type,
-      fetchConfig: { ...DEFAULT_RESOURCE_FETCH_CONFIG, ...fetchConfig },
+      fetchConfig: { ...DEFAULT_RESOURCE_FETCH_CONFIG, ...fetchConfig }
     })
     return this
   }
@@ -97,7 +97,7 @@ export class AptosResourceProcessorTemplate {
       handler,
       {
         recentInterval: timeIntervalInMinutes,
-        backfillInterval: backfillTimeIntervalInMinutes,
+        backfillInterval: backfillTimeIntervalInMinutes
       },
       undefined,
       type,

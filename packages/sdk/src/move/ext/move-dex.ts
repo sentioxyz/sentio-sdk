@@ -1,4 +1,4 @@
-import { DecodedStruct, TypeDescriptor } from '../types.js'
+import { DecodedStruct, TypeDescriptor } from '@typemove/move'
 import { BigDecimal } from '@sentio/bigdecimal'
 import { Gauge } from '../../core/index.js'
 import { MoveAccountContext, MoveContext } from '../move-context.js'
@@ -92,21 +92,21 @@ export class MoveDex<
     if (total.gt(0)) {
       this.volume.record(ctx, total, {
         ...baseLabels,
-        bridge: coinXInfo.bridge,
+        bridge: coinXInfo.bridge
       })
     }
     if (resultX.gt(0)) {
       this.volumeByCoin.record(ctx, resultX, {
         coin: coinXInfo.symbol,
         bridge: coinXInfo.bridge,
-        type: coinXInfo.token_type.type,
+        type: coinXInfo.token_type.type
       })
     }
     if (resultY.gt(0)) {
       this.volumeByCoin.record(ctx, resultY, {
         coin: coinYInfo.symbol,
         bridge: coinYInfo.bridge,
-        type: coinYInfo.token_type.type,
+        type: coinYInfo.token_type.type
       })
     }
     result = resultX.plus(resultY).div(2)
@@ -201,7 +201,7 @@ export class MoveDex<
         this.tvlByCoin.record(ctx, v, {
           coin: coinInfo.symbol,
           bridge: coinInfo.bridge,
-          type: coinInfo.token_type.type,
+          type: coinInfo.token_type.type
         })
       }
     }

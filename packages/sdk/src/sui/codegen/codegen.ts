@@ -1,13 +1,12 @@
-import { SuiMoveNormalizedModule, SuiEvent, SuiMoveObject } from '@mysten/sui.js'
+import { SuiMoveNormalizedModule, SuiEvent, SuiMoveObject } from '@mysten/sui.js/client'
 
-import { SuiNetwork } from '../network.js'
 import * as fs from 'fs'
 import chalk from 'chalk'
-import { InternalMoveModule, InternalMoveStruct } from '../../move/internal-models.js'
-import { AbstractCodegen } from '../../move/abstract-codegen.js'
-import { structQname } from '../../move/index.js'
-import { join } from 'path'
-import { SuiChainAdapter } from '../sui-chain-adapter.js'
+import { InternalMoveModule, InternalMoveStruct, structQname } from '@typemove/move'
+import { SuiCodegen as BaseSuiCodegen } from '@typemove/sui/codegen'
+import path, { join } from 'path'
+import { SharedNetworkCodegen } from '../../move/shared-network-codegen.js'
+import { getRpcEndpoint, SuiNetwork } from '../network.js'
 
 export async function codegen(
   abisDir: string,
@@ -23,58 +22,85 @@ export async function codegen(
   console.log(chalk.green(`Generated ${numFiles} for Sui`))
 }
 
-class SuiCodegen extends AbstractCodegen<SuiNetwork, SuiMoveNormalizedModule, SuiEvent | SuiMoveObject> {
-  MAIN_NET = SuiNetwork.MAIN_NET
-  TEST_NET = SuiNetwork.TEST_NET
-  PREFIX = 'Sui'
-  // STRUCT_FIELD_NAME = 'fields'
-  // GENERATE_ON_ENTRY = true
-  PAYLOAD_OPTIONAL = true
+class SuiNetworkCodegen extends BaseSuiCodegen {
+  moduleGenerator: SharedNetworkCodegen<SuiNetwork, SuiMoveNormalizedModule, SuiEvent | SuiMoveObject>
 
-  constructor() {
-    super(new SuiChainAdapter())
+  constructor(network: SuiNetwork) {
+    const endpoint = getRpcEndpoint(network)
+    super(endpoint)
+    this.moduleGenerator = new (class extends SharedNetworkCodegen<
+      SuiNetwork,
+      SuiMoveNormalizedModule,
+      SuiEvent | SuiMoveObject
+    > {
+      ADDRESS_TYPE = 'string'
+      PREFIX = 'Sui'
+      SYSTEM_PACKAGE = '@typemove/sui'
+
+      generateNetworkOption(network: SuiNetwork): string {
+        switch (network) {
+          case SuiNetwork.MAIN_NET:
+            return 'MAIN_NET'
+          default:
+            return 'TEST_NET'
+        }
+      }
+
+      generateStructs(module: InternalMoveModule, struct: InternalMoveStruct, events: Set<string>): string {
+        let content = ''
+        switch (structQname(module, struct)) {
+          // TODO they should still have module code generated
+          case '0x1::ascii::Char':
+          case '0x1::ascii::String':
+          case '0x2::object::ID':
+            content += `export type ${struct.name} = string`
+            break
+          case '0x2::coin::Coin':
+            content += `export type ${struct.name}<T> = string`
+            break
+          case '0x2::balance::Balance':
+            content += `export type ${struct.name}<T> = bigint`
+            break
+          case '0x1::option::Option':
+            content += `export type Option<T> = T | undefined`
+            break
+        }
+        return content + super.generateStructs(module, struct, events, content !== '')
+      }
+
+      generateForOnEvents(module: InternalMoveModule, struct: InternalMoveStruct): string {
+        switch (structQname(module, struct)) {
+          case '0x1::ascii::Char':
+          case '0x1::ascii::String':
+          case '0x2::object::ID':
+          case '0x2::coin::Coin':
+          case '0x1::option::Option':
+          case '0x2::balance::Balance':
+            return ''
+        }
+        return super.generateForOnEvents(module, struct)
+      }
+    })(network, this.chainAdapter)
   }
 
-  readModulesFile(fullPath: string) {
-    const res = super.readModulesFile(fullPath)
-    if (res.result) {
-      return res.result
-    }
-    return res
+  generateModule(module: InternalMoveModule, allEventStructs: Map<string, InternalMoveStruct>) {
+    return this.moduleGenerator.generateModule(module, allEventStructs)
   }
-
-  generateStructs(module: InternalMoveModule, struct: InternalMoveStruct, events: Set<string>): string {
-    let content = ''
-    switch (structQname(module, struct)) {
-      // TODO they should still have module code generated
-      case '0x1::ascii::Char':
-      case '0x1::ascii::String':
-      case '0x2::object::ID':
-        content += `export type ${struct.name} = string`
-        break
-      case '0x2::coin::Coin':
-        content += `export type ${struct.name}<T> = string`
-        break
-      case '0x2::balance::Balance':
-        content += `export type ${struct.name}<T> = bigint`
-        break
-      case '0x1::option::Option':
-        content += `export type Option<T> = T | undefined`
-        break
-    }
-    return content + super.generateStructs(module, struct, events, content !== '')
+  generateImports() {
+    return this.moduleGenerator.generateImports()
   }
+  generateLoadAll(isSystem: boolean): string {
+    return this.moduleGenerator.generateLoadAll(isSystem)
+  }
+}
+//
+const MAINNET_CODEGEN = new SuiNetworkCodegen(SuiNetwork.MAIN_NET)
+const TESTNET_CODEGEN = new SuiNetworkCodegen(SuiNetwork.TEST_NET)
 
-  generateForEvents(module: InternalMoveModule, struct: InternalMoveStruct): string {
-    switch (structQname(module, struct)) {
-      case '0x1::ascii::Char':
-      case '0x1::ascii::String':
-      case '0x2::object::ID':
-      case '0x2::coin::Coin':
-      case '0x1::option::Option':
-      case '0x2::balance::Balance':
-        return ''
-    }
-    return super.generateForEvents(module, struct)
+class SuiCodegen {
+  async generate(srcDir: string, outputDir: string, builtin = false): Promise<number> {
+    const num1 = await MAINNET_CODEGEN.generate(srcDir, outputDir, builtin)
+    const num2 = await TESTNET_CODEGEN.generate(path.join(srcDir, 'testnet'), path.join(outputDir, 'testnet'), builtin)
+    return num1 + num2
   }
 }

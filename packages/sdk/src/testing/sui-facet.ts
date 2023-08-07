@@ -1,10 +1,9 @@
-import { SuiTransactionBlockResponse, MoveCallSuiTransaction } from '@mysten/sui.js'
+import { SuiTransactionBlockResponse, MoveCallSuiTransaction } from '@mysten/sui.js/client'
 import { DataBinding, HandlerType } from '@sentio/protos'
 import { TestProcessorServer } from './test-processor-server.js'
-import { parseMoveType } from '../move/types.js'
+import { parseMoveType, accountTypeString, SPLITTER } from '@sentio/sdk/move'
 import { SuiNetwork } from '../sui/index.js'
 import { getMoveCalls } from '../sui/utils.js'
-import { accountTypeString, SPLITTER } from '../move/index.js'
 
 export class SuiFacet {
   server: TestProcessorServer
@@ -26,7 +25,7 @@ export class SuiFacet {
       bindings.push(binding)
     }
     return this.server.processBindings({
-      bindings: bindings,
+      bindings: bindings
     })
   }
 
@@ -53,11 +52,11 @@ export class SuiFacet {
                   suiCall: {
                     transaction,
                     timestamp: new Date(),
-                    slot: 10000n,
-                  },
+                    slot: 10000n
+                  }
                 },
                 handlerIds: [callConfig.handlerId],
-                handlerType: HandlerType.SUI_CALL,
+                handlerType: HandlerType.SUI_CALL
               }
             }
           }
@@ -97,11 +96,11 @@ export class SuiFacet {
                   suiEvent: {
                     transaction,
                     timestamp: new Date(transaction.timestampMs || 0),
-                    slot: 10000n,
-                  },
+                    slot: 10000n
+                  }
                 },
                 handlerIds: [eventConfig.handlerId],
-                handlerType: HandlerType.SUI_EVENT,
+                handlerType: HandlerType.SUI_EVENT
               }
             }
           }

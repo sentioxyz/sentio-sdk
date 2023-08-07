@@ -1,5 +1,5 @@
 import { Event, Transaction_UserTransaction } from '@sentio/sdk/aptos'
-import { Types } from 'aptos-sdk'
+import { Types } from 'aptos-sdk' // TODO just use aptos without break test
 import { coin } from '../builtin/0x1.js'
 import { parseMoveType } from '../../move/index.js'
 
@@ -23,7 +23,7 @@ export function findNewCoinBalances(
       continue
     }
     return {
-      value: BigInt((writeResource.data.data as any).coin.value),
+      value: BigInt((writeResource.data.data as any).coin.value)
     }
   }
   return undefined

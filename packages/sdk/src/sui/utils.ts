@@ -1,19 +1,18 @@
 import {
   SuiTransactionBlockResponse,
   MoveCallSuiTransaction,
-  getTransactionKind,
-  getProgrammableTransaction,
   ProgrammableTransaction,
-  SuiTransaction,
-} from '@mysten/sui.js'
-import { accountTypeString } from '../move/index.js'
+  SuiTransaction
+} from '@mysten/sui.js/client'
+import { accountTypeString } from '@typemove/move'
 
 export function getMoveCalls(txBlock: SuiTransactionBlockResponse) {
-  const txKind = getTransactionKind(txBlock)
+  const txKind = txBlock.transaction?.data.transaction
   if (!txKind) {
     return []
   }
-  const programmableTx: ProgrammableTransaction | undefined = getProgrammableTransaction(txKind)
+  const programmableTx: ProgrammableTransaction | undefined =
+    txKind.kind === 'ProgrammableTransaction' ? txKind : undefined
   if (!programmableTx) {
     return []
   }

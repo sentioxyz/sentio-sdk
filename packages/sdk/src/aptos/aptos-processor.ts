@@ -3,9 +3,10 @@ import {
   MoveResource,
   Transaction_UserTransaction,
   TransactionPayload_EntryFunctionPayload,
-} from './move-types.js'
+  defaultMoveCoder,
+  MoveCoder
+} from '@sentio/sdk/aptos'
 
-import { defaultMoveCoder, MoveCoder } from './move-coder.js'
 import { AptosBindOptions, AptosNetwork } from './network.js'
 import { AptosContext, AptosResourcesContext } from './context.js'
 import { ListStateStorage, mergeProcessResults } from '@sentio/runtime'
@@ -16,7 +17,7 @@ import {
   ProcessResult,
   Data_AptEvent,
   Data_AptCall,
-  MoveAccountFetchConfig,
+  MoveAccountFetchConfig
 } from '@sentio/protos'
 import { ServerError, Status } from 'nice-grpc'
 import {
@@ -25,17 +26,17 @@ import {
   EventFilter,
   EventHandler,
   FunctionNameAndCallFilter,
-  parseMoveType,
+  parseMoveType
 } from '../move/index.js'
 import { Labels, PromiseOrVoid } from '../core/index.js'
 
 const DEFAULT_FETCH_CONFIG: MoveFetchConfig = {
   resourceChanges: false,
-  allEvents: true,
+  allEvents: true
 }
 
 export const DEFAULT_RESOURCE_FETCH_CONFIG: MoveAccountFetchConfig = {
-  owned: true,
+  owned: true
 }
 
 type IndexConfigure = {
@@ -127,7 +128,7 @@ export class AptosBaseProcessor {
         return mergeProcessResults(processResults)
       },
       filters: _filters,
-      fetchConfig: _fetchConfig,
+      fetchConfig: _fetchConfig
     })
     return this
   }
@@ -174,7 +175,7 @@ export class AptosBaseProcessor {
         return ctx.stopAndGetResult()
       },
       filters: _filters,
-      fetchConfig: _fetchConfig,
+      fetchConfig: _fetchConfig
     })
     return this
   }
@@ -206,7 +207,7 @@ export class AptosBaseProcessor {
         return ctx.stopAndGetResult()
       },
       filters: [{ function: '', includeFailed: includedFailed }],
-      fetchConfig: _fetchConfig,
+      fetchConfig: _fetchConfig
     })
     return this
   }
@@ -281,7 +282,7 @@ export class AptosResourcesProcessor {
       timeIntervalInMinutes: timeInterval,
       versionInterval: versionInterval,
       type: type,
-      fetchConfig: { ...DEFAULT_RESOURCE_FETCH_CONFIG, ...fetchConfig },
+      fetchConfig: { ...DEFAULT_RESOURCE_FETCH_CONFIG, ...fetchConfig }
     })
     return this
   }
@@ -297,7 +298,7 @@ export class AptosResourcesProcessor {
       handler,
       {
         recentInterval: timeIntervalInMinutes,
-        backfillInterval: backfillTimeIntervalInMinutes,
+        backfillInterval: backfillTimeIntervalInMinutes
       },
       undefined,
       type,
@@ -336,6 +337,6 @@ function configure(options: AptosBindOptions): IndexConfigure {
     startVersion: startVersion,
     address: options.address === '*' ? '*' : accountTypeString(options.address), // aptos don't use address string in api, so only use type string
     network: options.network || AptosNetwork.MAIN_NET,
-    baseLabels: options.baseLabels,
+    baseLabels: options.baseLabels
   }
 }

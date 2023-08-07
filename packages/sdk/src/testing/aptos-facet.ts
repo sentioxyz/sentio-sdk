@@ -2,8 +2,7 @@ import { Transaction_UserTransaction, TransactionPayload_EntryFunctionPayload } 
 import { DataBinding, HandlerType } from '@sentio/protos'
 import { TestProcessorServer } from './test-processor-server.js'
 import { AptosNetwork } from '@sentio/sdk/aptos'
-import { parseMoveType } from '../move/types.js'
-import { accountTypeString } from '../move/index.js'
+import { parseMoveType, accountTypeString } from '@sentio/sdk/move'
 
 export class AptosFacet {
   server: TestProcessorServer
@@ -25,7 +24,7 @@ export class AptosFacet {
       bindings.push(binding)
     }
     return this.server.processBindings({
-      bindings: bindings,
+      bindings: bindings
     })
   }
 
@@ -44,11 +43,11 @@ export class AptosFacet {
             return {
               data: {
                 aptCall: {
-                  transaction,
-                },
+                  transaction
+                }
               },
               handlerIds: [callConfig.handlerId],
-              handlerType: HandlerType.APT_CALL,
+              handlerType: HandlerType.APT_CALL
             }
           }
         }
@@ -84,11 +83,11 @@ export class AptosFacet {
               return {
                 data: {
                   aptEvent: {
-                    transaction,
-                  },
+                    transaction
+                  }
                 },
                 handlerIds: [eventConfig.handlerId],
-                handlerType: HandlerType.APT_EVENT,
+                handlerType: HandlerType.APT_EVENT
               }
             }
           }

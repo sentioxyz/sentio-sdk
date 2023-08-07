@@ -6,7 +6,7 @@ export type AptosNetwork = AptosChainId
 export const AptosNetwork = <const>{
   MAIN_NET: AptosChainId.APTOS_MAINNET,
   TEST_NET: AptosChainId.APTOS_TESTNET,
-  DEV_NET: AptosChainId.APTOS_DEVNET,
+  DEV_NET: AptosChainId.APTOS_DEVNET
 }
 
 export class AptosBindOptions {
@@ -15,4 +15,12 @@ export class AptosBindOptions {
   client?: AptosClient
   startVersion?: bigint | number
   baseLabels?: Labels
+}
+
+export function getRpcEndpoint(network: AptosNetwork): string {
+  switch (network) {
+    case AptosNetwork.TEST_NET:
+      return 'https://testnet.aptoslabs.com/'
+  }
+  return 'https://mainnet.aptoslabs.com/'
 }

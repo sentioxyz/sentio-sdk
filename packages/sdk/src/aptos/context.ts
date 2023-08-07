@@ -1,8 +1,8 @@
 import { RecordMetaData } from '@sentio/protos'
 import { type Labels, normalizeLabels } from '@sentio/sdk'
-import { Event, MoveModuleBytecode, MoveResource, Transaction_UserTransaction } from './move-types.js'
+import { Event, MoveModuleBytecode, MoveResource, Transaction_UserTransaction, MoveCoder } from '@sentio/sdk/aptos'
+import { defaultMoveCoder } from './move-coder.js'
 import { AptosNetwork } from './network.js'
-import { defaultMoveCoder, MoveCoder } from './move-coder.js'
 import { Endpoints } from '@sentio/runtime'
 import { ServerError, Status } from 'nice-grpc'
 import { AptosClient } from 'aptos-sdk'
@@ -54,7 +54,7 @@ export class AptosContext extends MoveContext<AptosNetwork, MoveModuleBytecode, 
       logIndex: this.eventIndex,
       chainId: this.getChainId(),
       name: name,
-      labels: normalizeLabels(labels),
+      labels: normalizeLabels(labels)
     }
   }
 
@@ -99,7 +99,7 @@ export class AptosResourcesContext extends MoveAccountContext<AptosNetwork, Move
       logIndex: 0,
       chainId: this.getChainId(),
       name: name,
-      labels: normalizeLabels(labels),
+      labels: normalizeLabels(labels)
     }
   }
 
