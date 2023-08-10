@@ -1,4 +1,4 @@
-import { AptosClient } from 'aptos-sdk'
+import { AptosClient } from 'aptos'
 import { SuiClient } from '@mysten/sui.js/client'
 import chalk from 'chalk'
 import process from 'process'
