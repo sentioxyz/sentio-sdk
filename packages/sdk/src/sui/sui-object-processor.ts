@@ -22,7 +22,7 @@ interface ObjectHandler {
 }
 
 export const DEFAULT_FETCH_CONFIG: MoveAccountFetchConfig = {
-  owned: true
+  owned: false
 }
 
 export class SuiAccountProcessorState extends ListStateStorage<SuiBaseObjectOrAddressProcessor<any>> {
