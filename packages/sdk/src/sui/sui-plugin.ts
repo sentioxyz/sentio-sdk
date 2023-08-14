@@ -43,11 +43,14 @@ export class SuiPlugin extends Plugin {
   async start(request: StartRequest): Promise<void> {
     await initCoinList()
 
+    console.log('total instances:', request.templateInstances.length)
     const allowedChainIds = new Set<string>(Object.values(SuiChainId))
     for (const instance of request.templateInstances) {
       if (!allowedChainIds.has(instance.contract?.chainId || '')) {
         continue
       }
+
+      console.log('start template instance', instance.templateId)
 
       const template: SuiObjectOrAddressProcessorTemplate<any, any, any> =
         SuiAccountProcessorTemplateState.INSTANCE.getValues()[instance.templateId]
