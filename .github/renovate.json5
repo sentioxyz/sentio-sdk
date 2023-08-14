@@ -12,7 +12,8 @@
         "node",
         "superstruct_solana",
         "semantic-release",
-        "mkdirp"
+        "mkdirp",
+        "prettier2"
       ],
       "enabled": false
     }
