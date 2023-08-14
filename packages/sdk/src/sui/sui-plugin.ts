@@ -51,12 +51,12 @@ export class SuiPlugin extends Plugin {
       }
 
       console.log('start template instance', instance.templateId)
-
       const template: SuiObjectOrAddressProcessorTemplate<any, any, any> =
         SuiAccountProcessorTemplateState.INSTANCE.getValues()[instance.templateId]
 
       template.bind(
         {
+          address: instance.contract?.address || '',
           objectId: instance.contract?.address || '',
           network: <SuiNetwork>instance.contract?.chainId || SuiNetwork.MAIN_NET,
           startCheckpoint: instance.startBlock || 0n
