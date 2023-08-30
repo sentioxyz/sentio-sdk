@@ -20,7 +20,7 @@ import { defaultMoveCoder, MoveCoder } from '@sentio/sdk/sui'
 import { Labels } from '../core/index.js'
 import { Required } from 'utility-types'
 
-const DEFAULT_FETCH_CONFIG: MoveFetchConfig = {
+export const DEFAULT_FETCH_CONFIG: MoveFetchConfig = {
   resourceChanges: false,
   allEvents: true
 }
@@ -243,7 +243,7 @@ export class SuiModulesProcessor extends SuiBaseProcessor {
 }
 
 export class SuiGlobalProcessor extends SuiBaseProcessor {
-  static bind(options: Omit<SuiBindOptions, 'address'>): SuiModulesProcessor {
+  static bind(options: Omit<SuiBindOptions, 'address'>): SuiGlobalProcessor {
     return new SuiGlobalProcessor('*', { ...options, address: '*' })
   }
   onTransactionBlock(

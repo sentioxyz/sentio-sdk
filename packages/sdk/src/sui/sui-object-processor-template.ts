@@ -1,10 +1,10 @@
-import { HandleInterval, MoveAccountFetchConfig } from '@sentio/protos'
+import { HandleInterval, MoveAccountFetchConfig, MoveFetchConfig } from '@sentio/protos'
 import { ListStateStorage } from '@sentio/runtime'
 import { SuiAddressContext, SuiContext, SuiObjectContext } from './context.js'
-import { SuiMoveObject } from '@mysten/sui.js/client'
+import { SuiMoveObject, SuiTransactionBlockResponse } from '@mysten/sui.js/client'
 import { PromiseOrVoid } from '../core/index.js'
 import {
-  DEFAULT_FETCH_CONFIG,
+  DEFAULT_ACCOUNT_FETCH_CONFIG,
   SuiAddressProcessor,
   SuiBaseObjectOrAddressProcessor,
   SuiObjectBindOptions,
@@ -13,6 +13,7 @@ import {
 } from './sui-object-processor.js'
 import { TemplateInstanceState } from '../core/template.js'
 import { SuiBindOptions } from './sui-processor.js'
+import { TransactionFilter } from '../move/index.js'
 
 class ObjectHandler<HandlerType> {
   type?: string
@@ -92,7 +93,7 @@ export abstract class SuiObjectOrAddressProcessorTemplate<
       timeIntervalInMinutes: timeInterval,
       checkpointInterval: checkpointInterval,
       type,
-      fetchConfig: { ...DEFAULT_FETCH_CONFIG, ...fetchConfig }
+      fetchConfig: { ...DEFAULT_ACCOUNT_FETCH_CONFIG, ...fetchConfig }
     })
     return this
   }
@@ -133,13 +134,38 @@ export abstract class SuiObjectOrAddressProcessorTemplate<
   }
 }
 
+class AddressTransactionHandler {
+  handler: (transaction: SuiTransactionBlockResponse, ctx: SuiContext) => void
+  filter?: TransactionFilter
+  fetchConfig?: Partial<MoveFetchConfig>
+}
+
 export class SuiAddressProcessorTemplate extends SuiObjectOrAddressProcessorTemplate<
   (objects: SuiMoveObject[], ctx: SuiAddressContext) => PromiseOrVoid,
   SuiBindOptions,
   SuiAddressProcessor
 > {
+  private handlers: AddressTransactionHandler[] = []
+
   createProcessor(options: SuiBindOptions): SuiAddressProcessor {
-    return SuiAddressProcessor.bind(options)
+    const p = SuiAddressProcessor.bind(options)
+    for (const handler of this.handlers) {
+      p.onTransactionBlock(handler.handler, handler.filter, handler.fetchConfig)
+    }
+    return p
+  }
+
+  onTransactionBlock(
+    handler: (transaction: SuiTransactionBlockResponse, ctx: SuiContext) => void,
+    filter?: TransactionFilter,
+    fetchConfig?: Partial<MoveFetchConfig>
+  ): this {
+    this.handlers.push({
+      handler,
+      filter,
+      fetchConfig
+    })
+    return this
   }
 }
 

@@ -417,6 +417,7 @@ export interface AccountConfig {
   /** @deprecated */
   aptosIntervalConfigs: AptosOnIntervalConfig[];
   moveIntervalConfigs: MoveOnIntervalConfig[];
+  moveCallConfigs: MoveCallHandlerConfig[];
   logConfigs: LogHandlerConfig[];
 }
 
@@ -1722,6 +1723,7 @@ function createBaseAccountConfig(): AccountConfig {
     intervalConfigs: [],
     aptosIntervalConfigs: [],
     moveIntervalConfigs: [],
+    moveCallConfigs: [],
     logConfigs: [],
   };
 }
@@ -1745,6 +1747,9 @@ export const AccountConfig = {
     }
     for (const v of message.moveIntervalConfigs) {
       MoveOnIntervalConfig.encode(v!, writer.uint32(58).fork()).ldelim();
+    }
+    for (const v of message.moveCallConfigs) {
+      MoveCallHandlerConfig.encode(v!, writer.uint32(66).fork()).ldelim();
     }
     for (const v of message.logConfigs) {
       LogHandlerConfig.encode(v!, writer.uint32(50).fork()).ldelim();
@@ -1777,6 +1782,9 @@ export const AccountConfig = {
         case 7:
           message.moveIntervalConfigs.push(MoveOnIntervalConfig.decode(reader, reader.uint32()));
           break;
+        case 8:
+          message.moveCallConfigs.push(MoveCallHandlerConfig.decode(reader, reader.uint32()));
+          break;
         case 6:
           message.logConfigs.push(LogHandlerConfig.decode(reader, reader.uint32()));
           break;
@@ -1801,6 +1809,9 @@ export const AccountConfig = {
         : [],
       moveIntervalConfigs: Array.isArray(object?.moveIntervalConfigs)
         ? object.moveIntervalConfigs.map((e: any) => MoveOnIntervalConfig.fromJSON(e))
+        : [],
+      moveCallConfigs: Array.isArray(object?.moveCallConfigs)
+        ? object.moveCallConfigs.map((e: any) => MoveCallHandlerConfig.fromJSON(e))
         : [],
       logConfigs: Array.isArray(object?.logConfigs)
         ? object.logConfigs.map((e: any) => LogHandlerConfig.fromJSON(e))
@@ -1830,6 +1841,11 @@ export const AccountConfig = {
     } else {
       obj.moveIntervalConfigs = [];
     }
+    if (message.moveCallConfigs) {
+      obj.moveCallConfigs = message.moveCallConfigs.map((e) => e ? MoveCallHandlerConfig.toJSON(e) : undefined);
+    } else {
+      obj.moveCallConfigs = [];
+    }
     if (message.logConfigs) {
       obj.logConfigs = message.logConfigs.map((e) => e ? LogHandlerConfig.toJSON(e) : undefined);
     } else {
@@ -1850,6 +1866,7 @@ export const AccountConfig = {
     message.intervalConfigs = object.intervalConfigs?.map((e) => OnIntervalConfig.fromPartial(e)) || [];
     message.aptosIntervalConfigs = object.aptosIntervalConfigs?.map((e) => AptosOnIntervalConfig.fromPartial(e)) || [];
     message.moveIntervalConfigs = object.moveIntervalConfigs?.map((e) => MoveOnIntervalConfig.fromPartial(e)) || [];
+    message.moveCallConfigs = object.moveCallConfigs?.map((e) => MoveCallHandlerConfig.fromPartial(e)) || [];
     message.logConfigs = object.logConfigs?.map((e) => LogHandlerConfig.fromPartial(e)) || [];
     return message;
   },

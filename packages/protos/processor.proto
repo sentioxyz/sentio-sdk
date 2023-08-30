@@ -148,6 +148,7 @@ message AccountConfig {
   repeated AptosOnIntervalConfig aptos_interval_configs = 5 [deprecated = true];
   // TODO migrate aptos_interval_configs to move_interval_configs
   repeated MoveOnIntervalConfig move_interval_configs = 7;
+  repeated MoveCallHandlerConfig move_call_configs = 8;
 
   // TODO add tx handler config related to the account
 

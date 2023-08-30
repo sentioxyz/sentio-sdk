@@ -17,7 +17,7 @@ import {
 import { ServerError, Status } from 'nice-grpc'
 
 import { SuiProcessorState } from './sui-processor.js'
-import { SuiAccountProcessorState } from './sui-object-processor.js'
+import { SuiAccountProcessorState, SuiAddressProcessor } from './sui-object-processor.js'
 import { initCoinList } from './ext/coin.js'
 import { SuiChainId } from '@sentio/chain'
 import {
@@ -141,6 +141,28 @@ export class SuiPlugin extends Plugin {
           fetchConfig: handler.fetchConfig
         })
       }
+
+      if (processor instanceof SuiAddressProcessor) {
+        for (const handler of processor.callHandlers) {
+          const handlerId = handlers.suiCallHandlers.push(handler.handler) - 1
+          const functionHandlerConfig: MoveCallHandlerConfig = {
+            filters: handler.filters.map((filter) => {
+              return {
+                function: filter.function,
+                typeArguments: filter.typeArguments || [],
+                withTypeArguments: !!filter.typeArguments,
+                includeFailed: filter.includeFailed || false,
+                publicKeyPrefix: filter.publicKeyPrefix || '',
+                fromAndToAddress: filter.fromAndToAddress
+              }
+            }),
+            fetchConfig: handler.fetchConfig,
+            handlerId
+          }
+          accountConfig.moveCallConfigs.push(functionHandlerConfig)
+        }
+      }
+
       config.accountConfigs.push(accountConfig)
     }
     this.handlers = handlers

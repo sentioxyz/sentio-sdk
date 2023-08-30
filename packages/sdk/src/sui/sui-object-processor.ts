@@ -1,10 +1,20 @@
-import { Data_SuiObject, HandleInterval, MoveAccountFetchConfig, MoveOwnerType, ProcessResult } from '@sentio/protos'
+import {
+  Data_SuiCall,
+  Data_SuiObject,
+  HandleInterval,
+  MoveAccountFetchConfig,
+  MoveFetchConfig,
+  MoveOwnerType,
+  ProcessResult
+} from '@sentio/protos'
 import { ListStateStorage } from '@sentio/runtime'
 import { SuiNetwork } from './network.js'
-import { SuiAddressContext, SuiObjectContext } from './context.js'
-import { SuiMoveObject } from '@mysten/sui.js/client'
+import { SuiAddressContext, SuiContext, SuiObjectContext } from './context.js'
+import { SuiMoveObject, SuiTransactionBlockResponse } from '@mysten/sui.js/client'
 import { PromiseOrVoid } from '../core/index.js'
-import { configure, IndexConfigure, SuiBindOptions } from './sui-processor.js'
+import { configure, DEFAULT_FETCH_CONFIG, IndexConfigure, SuiBindOptions } from './sui-processor.js'
+import { CallHandler, TransactionFilter } from '../move/index.js'
+import { ServerError, Status } from 'nice-grpc'
 
 export interface SuiObjectBindOptions {
   objectId: string
@@ -21,7 +31,7 @@ interface ObjectHandler {
   handler: (resource: Data_SuiObject) => Promise<ProcessResult>
 }
 
-export const DEFAULT_FETCH_CONFIG: MoveAccountFetchConfig = {
+export const DEFAULT_ACCOUNT_FETCH_CONFIG: MoveAccountFetchConfig = {
   owned: false
 }
 
@@ -80,7 +90,7 @@ export abstract class SuiBaseObjectOrAddressProcessor<HandlerType> {
       timeIntervalInMinutes: timeInterval,
       checkPointInterval: checkpointInterval,
       type,
-      fetchConfig: { ...DEFAULT_FETCH_CONFIG, ...fetchConfig }
+      fetchConfig: { ...DEFAULT_ACCOUNT_FETCH_CONFIG, ...fetchConfig }
     })
     return this
   }
@@ -124,6 +134,8 @@ export abstract class SuiBaseObjectOrAddressProcessor<HandlerType> {
 export class SuiAddressProcessor extends SuiBaseObjectOrAddressProcessor<
   (objects: SuiMoveObject[], ctx: SuiAddressContext) => PromiseOrVoid
 > {
+  callHandlers: CallHandler<Data_SuiCall>[] = []
+
   static bind(options: SuiBindOptions): SuiAddressProcessor {
     return new SuiAddressProcessor({ ...options, ownerType: MoveOwnerType.ADDRESS })
   }
@@ -134,6 +146,50 @@ export class SuiAddressProcessor extends SuiBaseObjectOrAddressProcessor<
     ctx: SuiObjectContext
   ): PromiseOrVoid {
     return handler(data.objects as SuiMoveObject[], ctx)
+  }
+
+  onTransactionBlock(
+    handler: (transaction: SuiTransactionBlockResponse, ctx: SuiContext) => void,
+    filter?: TransactionFilter,
+    fetchConfig?: Partial<MoveFetchConfig>
+  ) {
+    const _fetchConfig = MoveFetchConfig.fromPartial({ ...DEFAULT_FETCH_CONFIG, ...fetchConfig })
+    const _filter: TransactionFilter = {
+      fromAndToAddress: {
+        from: '',
+        to: this.config.address
+      },
+      ...filter
+    }
+
+    const processor = this
+
+    this.callHandlers.push({
+      handler: async function (data) {
+        if (!data.transaction) {
+          throw new ServerError(Status.INVALID_ARGUMENT, 'transaction is null')
+        }
+        const tx = data.transaction as SuiTransactionBlockResponse
+
+        const ctx = new SuiContext(
+          'object',
+          processor.config.network,
+          processor.config.address,
+          data.timestamp || new Date(0),
+          data.slot,
+          tx,
+          0,
+          processor.config.baseLabels
+        )
+        if (tx) {
+          await handler(tx, ctx)
+        }
+        return ctx.stopAndGetResult()
+      },
+      filters: [{ ..._filter, function: '' }],
+      fetchConfig: _fetchConfig
+    })
+    return this
   }
 }
 

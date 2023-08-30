@@ -10,6 +10,7 @@ export interface AptosGetTxnsByFunctionRequest {
   function: string;
   matchAll: boolean;
   typedArguments: string[];
+  includeChanges: boolean;
 }
 
 export interface AptosGetTxnsByVersionRequest {
@@ -26,6 +27,7 @@ export interface AptosGetTxnsByEventRequest {
   address: string;
   type: string;
   includeAllEvents: boolean;
+  includeChanges: boolean;
 }
 
 export interface AptosSQLQueryRequest {
@@ -111,6 +113,7 @@ function createBaseAptosGetTxnsByFunctionRequest(): AptosGetTxnsByFunctionReques
     function: "",
     matchAll: false,
     typedArguments: [],
+    includeChanges: false,
   };
 }
 
@@ -133,6 +136,9 @@ export const AptosGetTxnsByFunctionRequest = {
     }
     for (const v of message.typedArguments) {
       writer.uint32(50).string(v!);
+    }
+    if (message.includeChanges === true) {
+      writer.uint32(56).bool(message.includeChanges);
     }
     return writer;
   },
@@ -162,6 +168,9 @@ export const AptosGetTxnsByFunctionRequest = {
         case 6:
           message.typedArguments.push(reader.string());
           break;
+        case 7:
+          message.includeChanges = reader.bool();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -178,6 +187,7 @@ export const AptosGetTxnsByFunctionRequest = {
       function: isSet(object.function) ? String(object.function) : "",
       matchAll: isSet(object.matchAll) ? Boolean(object.matchAll) : false,
       typedArguments: Array.isArray(object?.typedArguments) ? object.typedArguments.map((e: any) => String(e)) : [],
+      includeChanges: isSet(object.includeChanges) ? Boolean(object.includeChanges) : false,
     };
   },
 
@@ -193,6 +203,7 @@ export const AptosGetTxnsByFunctionRequest = {
     } else {
       obj.typedArguments = [];
     }
+    message.includeChanges !== undefined && (obj.includeChanges = message.includeChanges);
     return obj;
   },
 
@@ -208,6 +219,7 @@ export const AptosGetTxnsByFunctionRequest = {
     message.function = object.function ?? "";
     message.matchAll = object.matchAll ?? false;
     message.typedArguments = object.typedArguments?.map((e) => e) || [];
+    message.includeChanges = object.includeChanges ?? false;
     return message;
   },
 };
@@ -300,6 +312,7 @@ function createBaseAptosGetTxnsByEventRequest(): AptosGetTxnsByEventRequest {
     address: "",
     type: "",
     includeAllEvents: false,
+    includeChanges: false,
   };
 }
 
@@ -322,6 +335,9 @@ export const AptosGetTxnsByEventRequest = {
     }
     if (message.includeAllEvents === true) {
       writer.uint32(48).bool(message.includeAllEvents);
+    }
+    if (message.includeChanges === true) {
+      writer.uint32(56).bool(message.includeChanges);
     }
     return writer;
   },
@@ -351,6 +367,9 @@ export const AptosGetTxnsByEventRequest = {
         case 6:
           message.includeAllEvents = reader.bool();
           break;
+        case 7:
+          message.includeChanges = reader.bool();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -367,6 +386,7 @@ export const AptosGetTxnsByEventRequest = {
       address: isSet(object.address) ? String(object.address) : "",
       type: isSet(object.type) ? String(object.type) : "",
       includeAllEvents: isSet(object.includeAllEvents) ? Boolean(object.includeAllEvents) : false,
+      includeChanges: isSet(object.includeChanges) ? Boolean(object.includeChanges) : false,
     };
   },
 
@@ -378,6 +398,7 @@ export const AptosGetTxnsByEventRequest = {
     message.address !== undefined && (obj.address = message.address);
     message.type !== undefined && (obj.type = message.type);
     message.includeAllEvents !== undefined && (obj.includeAllEvents = message.includeAllEvents);
+    message.includeChanges !== undefined && (obj.includeChanges = message.includeChanges);
     return obj;
   },
 
@@ -393,6 +414,7 @@ export const AptosGetTxnsByEventRequest = {
     message.address = object.address ?? "";
     message.type = object.type ?? "";
     message.includeAllEvents = object.includeAllEvents ?? false;
+    message.includeChanges = object.includeChanges ?? false;
     return message;
   },
 };
