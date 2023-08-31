@@ -75,6 +75,7 @@
     "csv-parse": "^5.3.0",
     "ethers": "npm:@sentio/ethers@^6.6.0",
     "js-sha3": "^0.8.0",
+    "lru-cache": "^10.0.1",
     "mkdirp": "^1.0.4",
     "nice-grpc": "^2.1.4",
     "nice-grpc-client-middleware-retry": "^3.1.3",

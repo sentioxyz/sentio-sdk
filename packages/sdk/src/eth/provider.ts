@@ -3,6 +3,7 @@ import { JsonRpcProvider, Network, Provider } from 'ethers'
 import PQueue from 'p-queue'
 import { Endpoints } from '@sentio/runtime'
 import { EthChainId } from '@sentio/chain'
+import { LRUCache } from 'lru-cache'
 
 export const DummyProvider = new JsonRpcProvider('', Network.from(1))
 
@@ -39,7 +40,7 @@ export function getProvider(chainId?: EthChainId): Provider {
       'Provider not found for chain ' +
         network.chainId +
         ', configured chains: ' +
-        [...Endpoints.INSTANCE.chainServer.keys()].join(' '),
+        [...Endpoints.INSTANCE.chainServer.keys()].join(' ')
     )
   }
   provider = new QueuedStaticJsonRpcProvider(address, network, Endpoints.INSTANCE.concurrency)
@@ -71,7 +72,7 @@ function getTag(prefix: string, value: any): string {
             accum[key] = v[key]
             return accum
           },
-          <any>{},
+          <any>{}
         )
       }
 
@@ -82,7 +83,9 @@ function getTag(prefix: string, value: any): string {
 
 class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
   executor: PQueue
-  #performCache = new Map<string, Promise<any>>()
+  #performCache = new LRUCache<string, Promise<any>>({
+    max: 10000
+  })
 
   constructor(url: string, network: Network, concurrency: number) {
     // TODO re-enable match when possible

@@ -4,6 +4,7 @@ import { prometheusClientMiddleware } from 'nice-grpc-prometheus'
 import { retryMiddleware, RetryOptions } from 'nice-grpc-client-middleware-retry'
 import { Endpoints } from '@sentio/runtime'
 import { ChainId } from '@sentio/chain'
+import { LRUCache } from 'lru-cache'
 
 export function getPriceClient(address?: string) {
   if (!address) {
@@ -17,7 +18,9 @@ export function getPriceClient(address?: string) {
     .create(PriceServiceDefinition, channel)
 }
 
-const priceMap = new Map<string, Promise<number | undefined>>()
+const priceMap = new LRUCache<string, Promise<number | undefined>>({
+  max: 100000
+})
 let priceClient: PriceServiceClient<RetryOptions>
 
 interface PriceOptions {
@@ -34,7 +37,7 @@ export async function getPriceByTypeOrSymbolInternal(
   priceClient: PriceServiceClient<RetryOptions>,
   date: Date,
   coinId: CoinID,
-  options?: PriceOptions,
+  options?: PriceOptions
 ): Promise<number | undefined> {
   const dateStr = dateString(date)
   const todayDateString = dateString(new Date())
@@ -53,12 +56,12 @@ export async function getPriceByTypeOrSymbolInternal(
   const response = priceClient.getPrice(
     {
       timestamp: date,
-      coinId,
+      coinId
     },
     {
       retry: true,
-      retryMaxAttempts: 5,
-    },
+      retryMaxAttempts: 5
+    }
   )
   price = response
     .then((res) => {
@@ -107,17 +110,17 @@ export async function getPriceByType(
   chainId: ChainId,
   coinType: string,
   date: Date,
-  options?: PriceOptions,
+  options?: PriceOptions
 ): Promise<number | undefined> {
   return getPriceByTypeOrSymbol(
     date,
     {
       address: {
         chain: chainId,
-        address: coinType,
-      },
+        address: coinType
+      }
     },
-    options,
+    options
   )
 }
 
@@ -129,7 +132,7 @@ export async function getPriceByType(
 export async function getPriceBySymbol(
   symbol: string,
   date: Date,
-  options?: PriceOptions,
+  options?: PriceOptions
 ): Promise<number | undefined> {
   return getPriceByTypeOrSymbol(date, { symbol }, options)
 }
