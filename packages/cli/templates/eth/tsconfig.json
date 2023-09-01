@@ -7,7 +7,7 @@
     "esModuleInterop": true,
     "noImplicitReturns": true,
     "noImplicitAny": true,
-    "module": "esnext",
+    "module": "nodenext",
     "moduleResolution": "nodenext",
     "strictNullChecks": true,
     "stripInternal": true,

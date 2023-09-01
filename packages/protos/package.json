@@ -1,20 +1,8 @@
 {
   "name": "@sentio/protos",
-  "license": "Apache-2.0",
   "version": "2.0.0-development",
+  "license": "Apache-2.0",
   "type": "module",
-  "scripts": {
-    "compile": "tsc",
-    "clean": "tsc --build --clean",
-    "build": "pnpm compile"
-  },
-  "dependencies": {
-    "google-protobuf": "^3.21.2",
-    "nice-grpc": "^2.1.0",
-    "long": "^5.2.3",
-    "nice-grpc-common": "^2.0.2",
-    "protobufjs": "^7.2.3"
-  },
   "exports": {
     ".": "./lib/index.js",
     "./price": "./lib/service/price/protos/price.js",
@@ -23,6 +11,18 @@
   "files": [
     "{lib,src}"
   ],
+  "scripts": {
+    "build": "pnpm compile",
+    "clean": "tsc --build --clean",
+    "compile": "tsc"
+  },
+  "dependencies": {
+    "google-protobuf": "^3.21.2",
+    "long": "^5.2.3",
+    "nice-grpc": "^2.1.5",
+    "nice-grpc-common": "^2.0.2",
+    "protobufjs": "^7.2.5"
+  },
   "engines": {
     "node": ">=16"
   }

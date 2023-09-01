@@ -12,7 +12,7 @@
     "noImplicitThis": true,
     "noImplicitAny": true,
     "resolveJsonModule": true,
-    "module": "esnext",
+    "module": "nodenext",
     "moduleResolution": "nodenext",
     "isolatedModules": true,
     "strictNullChecks": true,
