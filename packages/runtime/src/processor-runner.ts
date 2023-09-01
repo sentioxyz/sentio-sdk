@@ -29,12 +29,12 @@ const optionDefinitions = [
     name: 'chains-config',
     alias: 'c',
     type: String,
-    defaultValue: 'chains-config.json',
+    defaultValue: 'chains-config.json'
   },
   { name: 'chainquery-server', type: String, defaultValue: '' },
   { name: 'pricefeed-server', type: String, defaultValue: '' },
   { name: 'log-format', type: String, defaultValue: 'console' },
-  { name: 'debug', type: Boolean, defaultValue: false },
+  { name: 'debug', type: Boolean, defaultValue: false }
 ]
 
 const options = commandLineArgs(optionDefinitions, { partial: true })
@@ -45,6 +45,8 @@ if (options['log-format'] === 'json') {
 if (options.debug) {
   console.log('Starting with', options.target)
 }
+
+Error.stackTraceLimit = 20
 
 const fullPath = path.resolve(options['chains-config'])
 const chainsConfig = fs.readJsonSync(fullPath)
@@ -74,7 +76,7 @@ if (options.debug) {
 const server = createServer({
   'grpc.max_send_message_length': 128 * 1024 * 1024,
   'grpc.max_receive_message_length': 128 * 1024 * 1024,
-  'grpc.default_compression_algorithm': compressionAlgorithms.gzip,
+  'grpc.default_compression_algorithm': compressionAlgorithms.gzip
 })
   .use(prometheusServerMiddleware())
   .use(errorDetailsServerMiddleware)

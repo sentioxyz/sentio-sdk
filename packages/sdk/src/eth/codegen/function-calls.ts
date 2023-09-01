@@ -33,18 +33,18 @@ export function generateViewFunction(view: boolean, fn: FunctionDeclaration, inc
   return [
     `
   async ${declName}(${generateInputTypes(fn.inputs, {
-      useStructs: true,
-    })}overrides?: Overrides): ${generateReturnTypes(fn)} {
-    const stack = new Error().stack
+    useStructs: true
+  })}overrides?: Overrides): ${generateReturnTypes(fn)} {
     try {    
        return await ${func}${call}(${
-      fn.inputs.length > 0 ? fn.inputs.map((input, index) => input.name || `arg${index}`).join(',') + ',' : ''
-    } overrides || {})
+         fn.inputs.length > 0 ? fn.inputs.map((input, index) => input.name || `arg${index}`).join(',') + ',' : ''
+       } overrides || {})
     } catch (e) {
+      const stack = new Error().stack
       throw transformEtherError(e, undefined, stack)
     }
   }
-  `,
+  `
   ]
 }
 
@@ -65,8 +65,8 @@ export function generateBoundViewFunction(view: boolean, fn: FunctionDeclaration
   return [
     `
   async ${declName ?? fn.name}(${generateInputTypes(fn.inputs, {
-      useStructs: true,
-    })}overrides?: Overrides): ${generateReturnTypes(fn)} {
+    useStructs: true
+  })}overrides?: Overrides): ${generateReturnTypes(fn)} {
     return await this.${qualifier}.${declName}(${
       fn.inputs.length > 0 ? fn.inputs.map((input, index) => input.name || `arg${index}`).join(',') + ',' : ''
     } {
@@ -74,6 +74,6 @@ export function generateBoundViewFunction(view: boolean, fn: FunctionDeclaration
       ...overrides
     })
   }
-  `,
+  `
   ]
 }
