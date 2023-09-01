@@ -10,7 +10,7 @@ export class MetricOptions {
   unit?: string
   description?: string
   sparse?: boolean
-  persistentBetweenVersion?: boolean
+  // persistentBetweenVersion?: boolean
   aggregationConfig?: Partial<AggregationConfig>
 }
 
@@ -18,6 +18,9 @@ export class CounterOptions {
   unit?: string
   description?: string
   sparse?: boolean
+  resolutionConfig?: {
+    intervalInMinutes: number
+  }
 }
 
 // enum MetricType {
@@ -27,9 +30,9 @@ export class CounterOptions {
 
 export class Metric extends NamedResultDescriptor {
   config: MetricConfig
-  constructor(type: MetricType, name: string, option?: MetricOptions) {
+  constructor(type: MetricType, name: string, option?: MetricConfig) {
     super(name)
-    this.config = MetricConfig.fromPartial({ name: this.name, type: type, ...option })
+    this.config = MetricConfig.fromPartial({ ...option, name: this.name, type })
     const aggregationConfig = this.config.aggregationConfig
     if (aggregationConfig && aggregationConfig.intervalInMinutes.length) {
       if (aggregationConfig.intervalInMinutes.length > 1) {
@@ -72,12 +75,21 @@ export class Counter extends Metric {
   /**
    * internal use only, to create a metric use {@link register} instead
    */
-  static _create(name: string, option?: MetricOptions): Counter {
+  static _create(name: string, option?: CounterOptions): Counter {
     return new Counter(name, option)
   }
 
-  private constructor(name: string, option?: MetricOptions) {
-    super(MetricType.COUNTER, name, option)
+  private constructor(name: string, option?: CounterOptions) {
+    super(
+      MetricType.COUNTER,
+      name,
+      MetricConfig.fromPartial({
+        ...option,
+        aggregationConfig: {
+          intervalInMinutes: option?.resolutionConfig ? [option?.resolutionConfig?.intervalInMinutes] : []
+        }
+      })
+    )
   }
 
   add(ctx: BaseContext, value: Numberish, labels: Labels = {}) {
@@ -95,9 +107,9 @@ export class Counter extends Metric {
           metadata: ctx.getMetaData(this.name, labels),
           metricValue: toMetricValue(value),
           add: add,
-          runtimeInfo: undefined,
-        },
-      ],
+          runtimeInfo: undefined
+        }
+      ]
     })
   }
 }
@@ -133,7 +145,7 @@ export class Gauge extends Metric {
   }
 
   private constructor(name: string, option?: MetricOptions) {
-    super(MetricType.GAUGE, name, option)
+    super(MetricType.GAUGE, name, MetricConfig.fromPartial({ ...option }))
   }
 
   record(ctx: BaseContext, value: Numberish, labels: Labels = {}) {
@@ -142,9 +154,9 @@ export class Gauge extends Metric {
         {
           metadata: ctx.getMetaData(this.config.name, labels),
           metricValue: toMetricValue(value),
-          runtimeInfo: undefined,
-        },
-      ],
+          runtimeInfo: undefined
+        }
+      ]
     })
   }
 }

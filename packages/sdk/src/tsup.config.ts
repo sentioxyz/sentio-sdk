@@ -3,11 +3,11 @@ import { defineConfig } from 'tsup'
 export default defineConfig({
   esbuildOptions: (options) => {
     options.banner = {
-      js: `import { createRequire } from 'module'; const require = createRequire(import.meta.url);`,
+      js: `import { createRequire } from 'module'; const require = createRequire(import.meta.url);`
     }
   },
   entry: {
-    lib: 'src/processor.ts',
+    lib: 'src/processor.ts'
   },
   minify: true,
   sourcemap: 'inline',
@@ -28,7 +28,10 @@ export default defineConfig({
     'csv-parse',
     'node-fetch',
     /^nice-grpc.*$/,
+    /^prettier.*$/,
     /^@(ethersproject|solana|project-serum).*$/,
     /^@sentio\/(sdk|runtime|protos|bigdecimal|ethers).*$/,
-  ],
+    /^@typemove\/.*$/,
+    /^@mysten\/(bcs|sui.js).*$/
+  ]
 })
