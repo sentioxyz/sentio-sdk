@@ -183,8 +183,8 @@ importers:
         specifier: ^29.5.0
         version: 29.5.0
       '@mysten/sui.js':
-        specifier: ^0.41.0
-        version: 0.41.1
+        specifier: ^0.42.0
+        version: 0.42.0
       '@sentio/chain':
         specifier: ^1.0.3
         version: 1.0.3
@@ -414,8 +414,8 @@ importers:
         specifier: ^0.28.0
         version: 0.28.0(@solana/web3.js@1.78.3)
       '@mysten/sui.js':
-        specifier: ~0.41.0
-        version: 0.41.2
+        specifier: ~0.42.0
+        version: 0.42.0
       '@project-serum/anchor':
         specifier: ^0.26.0
         version: 0.26.0
@@ -438,14 +438,14 @@ importers:
         specifier: ^1.78.3
         version: 1.78.3
       '@typemove/aptos':
-        specifier: ~1.2.0
-        version: 1.2.0
+        specifier: ~1.2.1
+        version: 1.2.1
       '@typemove/move':
-        specifier: ~1.2.0
-        version: 1.2.0
+        specifier: ~1.2.1
+        version: 1.2.1
       '@typemove/sui':
-        specifier: ~1.2.0
-        version: 1.2.0
+        specifier: ~1.2.1
+        version: 1.2.1
       aptos:
         specifier: ~1.19.0
         version: 1.19.0
@@ -558,7 +558,7 @@ packages:
     engines: {node: '>=6.0.0'}
     dependencies:
       '@jridgewell/gen-mapping': 0.3.3
-      '@jridgewell/trace-mapping': 0.3.18
+      '@jridgewell/trace-mapping': 0.3.19
 
   /@apollo/client@3.7.8(graphql@16.6.0):
     resolution: {integrity: sha512-o1NxF4ytET2w9HSVMLwYUEEdv6H3XPpbh9M+ABVGnUVT0s6T9pgqRtYO4pFP1TmeDmb1pbRfVhFwh3gC167j5Q==}
@@ -715,7 +715,7 @@ packages:
     dependencies:
       '@babel/types': 7.21.4
       '@jridgewell/gen-mapping': 0.3.3
-      '@jridgewell/trace-mapping': 0.3.18
+      '@jridgewell/trace-mapping': 0.3.19
       jsesc: 2.5.2
 
   /@babel/generator@7.22.10:
@@ -1653,7 +1653,7 @@ packages:
       '@cosmjs/utils': 0.30.1
       cosmjs-types: 0.7.2
       long: 4.0.0
-      protobufjs: 6.11.3
+      protobufjs: 6.11.4
       xstream: 11.14.0
     transitivePeerDependencies:
       - bufferutil
@@ -2610,7 +2610,7 @@ packages:
     resolution: {integrity: sha512-qyt/mb6rLyd9j1jUts4EQncvS6Yy3PM9HghnNv86QBlV+zdL2inCdK1tuVlL+J+lpiw2BI67qXOrX3UurBqQ1w==}
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
     dependencies:
-      '@jridgewell/trace-mapping': 0.3.18
+      '@jridgewell/trace-mapping': 0.3.19
       callsites: 3.1.0
       graceful-fs: 4.2.11
 
@@ -2815,12 +2815,6 @@ packages:
       bs58: 5.0.0
     dev: true
 
-  /@mysten/bcs@0.7.3:
-    resolution: {integrity: sha512-fbusBfsyc2MpTACi72H5edWJ670T84va+qn9jSPpb5BzZ+pzUM1Q0ApPrF5OT+mB1o5Ng+mxPQpBCZQkfiV2TA==}
-    dependencies:
-      bs58: 5.0.0
-    dev: false
-
   /@mysten/bcs@0.7.4:
     resolution: {integrity: sha512-6DKzM4L10Au3Og5EJRBqJZmXWZ7hS/clVjbVUH4sA0aFtS3AZo2xc+r5fUFfdJbaWZUxVaDiQ8BNiEZWkAnEOw==}
     dependencies:
@@ -2846,28 +2840,8 @@ packages:
       - utf-8-validate
     dev: true
 
-  /@mysten/sui.js@0.41.1:
-    resolution: {integrity: sha512-qSFVqr6Z2LboHhiaP51kluZQaW2oCY4gOF8JBZOl/cB/tvOPoQvdvtfNqViDkTZcaJrYRk8gOCYjozvW4VGX0A==}
-    engines: {node: '>=16'}
-    dependencies:
-      '@mysten/bcs': 0.7.3
-      '@noble/curves': 1.1.0
-      '@noble/hashes': 1.3.1
-      '@open-rpc/client-js': 1.8.1
-      '@scure/bip32': 1.3.1
-      '@scure/bip39': 1.2.1
-      '@suchipi/femver': 1.0.0
-      events: 3.3.0
-      superstruct: 1.0.3
-      tweetnacl: 1.0.3
-    transitivePeerDependencies:
-      - bufferutil
-      - encoding
-      - utf-8-validate
-    dev: false
-
-  /@mysten/sui.js@0.41.2:
-    resolution: {integrity: sha512-00Kkk4don9H9iRWBqXfRC4wUPY0hqAvmzxhwaYZIHj9Tmb71Nx51zLLFsxeA7dlR6cJFaXFMbZkt6WR2vP8WLQ==}
+  /@mysten/sui.js@0.42.0:
+    resolution: {integrity: sha512-khYpfrWTRNk7WTuDWJx/KCbleqY1B40gVRt1DttqlNkD2lvg134xZn7F/r94jxgnUETbK+hVoQvBY7F36MsfRw==}
     engines: {node: '>=16'}
     dependencies:
       '@mysten/bcs': 0.7.4
@@ -3527,11 +3501,11 @@ packages:
     resolution: {integrity: sha512-vxhUy4J8lyeyinH7Azl1pdd43GJhZH/tP2weN8TntQblOY+A0XbT8DJk1/oCPuOOyg/Ja757rG0CgHcWC8OfMA==}
     dev: true
 
-  /@typemove/aptos@1.2.0:
-    resolution: {integrity: sha512-wvKvgqAAySm4NPA+95EIiP/0lcmjxITtRTgE5DTRzIra/5NFcuGEdaUhhxI6voonDygCmHEQO2+4jHqx4l9LpA==}
+  /@typemove/aptos@1.2.1:
+    resolution: {integrity: sha512-LucPfIkXI7qvRV78gfifIlxhutYsrx8C5Og7xNz44uFCFn3grWwN9NJxOE4x5+nD12bXXKbRGNkhdqvvW+Q13w==}
     hasBin: true
     dependencies:
-      '@typemove/move': 1.2.0
+      '@typemove/move': 1.2.1
       aptos: 1.19.0
       chalk: 5.3.0
       radash: 11.0.0
@@ -3539,20 +3513,20 @@ packages:
       - debug
     dev: false
 
-  /@typemove/move@1.2.0:
-    resolution: {integrity: sha512-hihFr9ZUFTVto7J0NxhvqeSozNNoU1tNofFBYqgTdi5UwzqIiS9DDvTdHnKZsWa46y/wy2ne+7aF27IDEvyaZA==}
+  /@typemove/move@1.2.1:
+    resolution: {integrity: sha512-XhiJVfhfhGhk4tKJj5B1h9BdWN4vt470GeYaySItRRhpz6ZlExp+NVJs0nlKKLw/VNuGPyv1LC9KAIJkGY6Jvg==}
     dependencies:
       chalk: 5.3.0
       radash: 11.0.0
     dev: false
 
-  /@typemove/sui@1.2.0:
-    resolution: {integrity: sha512-0JWCoSOmmcY27FnEWXgtIh1CrRUAb/3MXWeaKqF6h5Xo/slBR/4uqS2euef/KrLY/MbY9jiYyIELOGC0PV61Kw==}
+  /@typemove/sui@1.2.1:
+    resolution: {integrity: sha512-qude2I2ne9+NcSW8dSNPj0GZ7cGvPvqWVSHdDJqZgf9FGBZzYpKBRzXLht+Wh0/W0fxDHyiml41pHhUX2qNEzw==}
     hasBin: true
     dependencies:
       '@mysten/bcs': 0.7.4
-      '@mysten/sui.js': 0.41.2
-      '@typemove/move': 1.2.0
+      '@mysten/sui.js': 0.42.0
+      '@typemove/move': 1.2.1
       chalk: 5.3.0
       radash: 11.0.0
     transitivePeerDependencies:
@@ -5320,7 +5294,7 @@ packages:
     requiresBuild: true
     dependencies:
       long: 4.0.0
-      protobufjs: 6.11.3
+      protobufjs: 6.11.4
     dev: true
     optional: true
 
@@ -5366,7 +5340,7 @@ packages:
   /cross-fetch@4.0.0:
     resolution: {integrity: sha512-e4a5N8lVvuLgAWgnCrLr2PP0YyDOTHa9H/Rj54dirp61qXnNq46m82bRhNqIA5VccJtWBvPTFRV3TtvHUKPB1g==}
     dependencies:
-      node-fetch: 2.6.12
+      node-fetch: 2.7.0
     transitivePeerDependencies:
       - encoding
     dev: true
@@ -7340,7 +7314,7 @@ packages:
   /isomorphic-fetch@3.0.0:
     resolution: {integrity: sha512-qvUtwJ3j6qwsF3jLxkZ72qCgjMysPzDfeV240JHiGZsANBYd+EEuu35v7dfrJ9Up0Ak07D7GGSkGhCHTqg/5wA==}
     dependencies:
-      node-fetch: 2.6.12
+      node-fetch: 2.7.0
       whatwg-fetch: 3.6.2
     transitivePeerDependencies:
       - encoding
@@ -9150,7 +9124,6 @@ packages:
         optional: true
     dependencies:
       whatwg-url: 5.0.0
-    dev: true
 
   /node-fetch@3.3.0:
     resolution: {integrity: sha512-BKwRP/O0UvoMKp7GNdwPlObhYGB5DQqwhEDQlNKuoqwVYSxkSZCSbHjnFFmUEtwSKRPU4kNK8PbDYYitwaE3QA==}
@@ -11614,7 +11587,7 @@ packages:
     resolution: {integrity: sha512-6z3GW9x8G1gd+JIIgQQQxXuiJtCXeAjp6RaPEPLv62mH3iPHPxV6W3robxtCzNErRo6ZwTmzWhsbNvjyEBKzKA==}
     engines: {node: '>=10.12.0'}
     dependencies:
-      '@jridgewell/trace-mapping': 0.3.18
+      '@jridgewell/trace-mapping': 0.3.19
       '@types/istanbul-lib-coverage': 2.0.4
       convert-source-map: 1.9.0
 
