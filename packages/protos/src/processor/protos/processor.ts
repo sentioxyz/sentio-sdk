@@ -54,6 +54,10 @@ export function metricTypeToJSON(object: MetricType): string {
 export enum AggregationType {
   COUNT = 0,
   SUM = 1,
+  AVG = 2,
+  MIN = 3,
+  MAX = 4,
+  LAST = 5,
   UNRECOGNIZED = -1,
 }
 
@@ -65,6 +69,18 @@ export function aggregationTypeFromJSON(object: any): AggregationType {
     case 1:
     case "SUM":
       return AggregationType.SUM;
+    case 2:
+    case "AVG":
+      return AggregationType.AVG;
+    case 3:
+    case "MIN":
+      return AggregationType.MIN;
+    case 4:
+    case "MAX":
+      return AggregationType.MAX;
+    case 5:
+    case "LAST":
+      return AggregationType.LAST;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -78,6 +94,14 @@ export function aggregationTypeToJSON(object: AggregationType): string {
       return "COUNT";
     case AggregationType.SUM:
       return "SUM";
+    case AggregationType.AVG:
+      return "AVG";
+    case AggregationType.MIN:
+      return "MIN";
+    case AggregationType.MAX:
+      return "MAX";
+    case AggregationType.LAST:
+      return "LAST";
     case AggregationType.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
