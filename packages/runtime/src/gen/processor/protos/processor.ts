@@ -530,9 +530,14 @@ export interface InstructionHandlerConfig {
   rawDataInstruction: boolean;
 }
 
+export interface ResourceConfig {
+  moveTypePrefix: string;
+}
+
 export interface MoveFetchConfig {
   resourceChanges: boolean;
   allEvents: boolean;
+  resourceConfig?: ResourceConfig | undefined;
 }
 
 export interface MoveAccountFetchConfig {
@@ -2949,8 +2954,59 @@ export const InstructionHandlerConfig = {
   },
 };
 
+function createBaseResourceConfig(): ResourceConfig {
+  return { moveTypePrefix: "" };
+}
+
+export const ResourceConfig = {
+  encode(message: ResourceConfig, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.moveTypePrefix !== "") {
+      writer.uint32(10).string(message.moveTypePrefix);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ResourceConfig {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseResourceConfig();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.moveTypePrefix = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ResourceConfig {
+    return { moveTypePrefix: isSet(object.moveTypePrefix) ? String(object.moveTypePrefix) : "" };
+  },
+
+  toJSON(message: ResourceConfig): unknown {
+    const obj: any = {};
+    message.moveTypePrefix !== undefined && (obj.moveTypePrefix = message.moveTypePrefix);
+    return obj;
+  },
+
+  create(base?: DeepPartial<ResourceConfig>): ResourceConfig {
+    return ResourceConfig.fromPartial(base ?? {});
+  },
+
+  fromPartial(object: DeepPartial<ResourceConfig>): ResourceConfig {
+    const message = createBaseResourceConfig();
+    message.moveTypePrefix = object.moveTypePrefix ?? "";
+    return message;
+  },
+};
+
 function createBaseMoveFetchConfig(): MoveFetchConfig {
-  return { resourceChanges: false, allEvents: false };
+  return { resourceChanges: false, allEvents: false, resourceConfig: undefined };
 }
 
 export const MoveFetchConfig = {
@@ -2960,6 +3016,9 @@ export const MoveFetchConfig = {
     }
     if (message.allEvents === true) {
       writer.uint32(16).bool(message.allEvents);
+    }
+    if (message.resourceConfig !== undefined) {
+      ResourceConfig.encode(message.resourceConfig, writer.uint32(26).fork()).ldelim();
     }
     return writer;
   },
@@ -2977,6 +3036,9 @@ export const MoveFetchConfig = {
         case 2:
           message.allEvents = reader.bool();
           break;
+        case 3:
+          message.resourceConfig = ResourceConfig.decode(reader, reader.uint32());
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -2989,6 +3051,7 @@ export const MoveFetchConfig = {
     return {
       resourceChanges: isSet(object.resourceChanges) ? Boolean(object.resourceChanges) : false,
       allEvents: isSet(object.allEvents) ? Boolean(object.allEvents) : false,
+      resourceConfig: isSet(object.resourceConfig) ? ResourceConfig.fromJSON(object.resourceConfig) : undefined,
     };
   },
 
@@ -2996,6 +3059,8 @@ export const MoveFetchConfig = {
     const obj: any = {};
     message.resourceChanges !== undefined && (obj.resourceChanges = message.resourceChanges);
     message.allEvents !== undefined && (obj.allEvents = message.allEvents);
+    message.resourceConfig !== undefined &&
+      (obj.resourceConfig = message.resourceConfig ? ResourceConfig.toJSON(message.resourceConfig) : undefined);
     return obj;
   },
 
@@ -3007,6 +3072,9 @@ export const MoveFetchConfig = {
     const message = createBaseMoveFetchConfig();
     message.resourceChanges = object.resourceChanges ?? false;
     message.allEvents = object.allEvents ?? false;
+    message.resourceConfig = (object.resourceConfig !== undefined && object.resourceConfig !== null)
+      ? ResourceConfig.fromPartial(object.resourceConfig)
+      : undefined;
     return message;
   },
 };

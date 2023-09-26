@@ -262,9 +262,14 @@ message InstructionHandlerConfig {
   bool raw_data_instruction = 3;
 }
 
+message ResourceConfig {
+  string move_type_prefix = 1;
+}
+
 message MoveFetchConfig {
   bool resource_changes = 1;
   bool all_events = 2;
+  optional ResourceConfig resource_config = 3;
 }
 
 message MoveAccountFetchConfig {
