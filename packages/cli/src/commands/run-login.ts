@@ -17,18 +17,18 @@ export function runLogin(argv: string[]) {
       name: 'help',
       alias: 'h',
       type: Boolean,
-      description: 'Display this usage guide.',
+      description: 'Display this usage guide.'
     },
     {
       name: 'host',
       description: '(Optional) Override Sentio Host name',
-      type: String,
+      type: String
     },
     {
       name: 'api-key',
       type: String,
-      description: '(Optional) Your API key',
-    },
+      description: '(Optional) Your API key'
+    }
   ]
   const options = commandLineArgs(optionDefinitions, { argv, partial: true })
 
@@ -37,21 +37,22 @@ export function runLogin(argv: string[]) {
     const usage = commandLineUsage([
       {
         header: 'Login to Sentio',
-        content: 'sentio login',
+        content: 'sentio login'
       },
       {
         header: 'Options',
-        optionList: optionDefinitions,
-      },
+        optionList: optionDefinitions
+      }
     ])
     console.log(usage)
   } else if (options['api-key']) {
     console.log(chalk.blue('login to ' + host))
     const apiKey = options['api-key']
-    checkKey(host, apiKey).then((res) => {
+    checkKey(host, apiKey).then(async (res) => {
       if (res.status == 200) {
         WriteKey(host, apiKey)
-        console.log(chalk.green('login success'))
+        const { username } = (await res.json()) as { username: string }
+        console.log(chalk.green(`login success with ${username}`))
       } else {
         console.error(chalk.red('login failed, code:', res.status, res.statusText))
       }
@@ -74,7 +75,7 @@ export function runLogin(argv: string[]) {
       client_id: conf.clientId,
       redirect_uri: conf.redirectUri,
       audience: conf.audience,
-      prompt: 'login',
+      prompt: 'login'
     })
     authURL.search = params.toString()
 
@@ -87,7 +88,7 @@ export function runLogin(argv: string[]) {
     startServer({
       serverPort: port,
       sentioHost: options.host,
-      codeVerifier: verifier,
+      codeVerifier: verifier
     })
   }
 }
@@ -105,7 +106,7 @@ async function checkKey(host: string, apiKey: string) {
   return fetch(checkApiKeyUrl.href, {
     method: 'GET',
     headers: {
-      'api-key': apiKey,
-    },
+      'api-key': apiKey
+    }
   })
 }

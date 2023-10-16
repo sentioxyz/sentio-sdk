@@ -72,14 +72,13 @@ app.get('/callback', async (req, res) => {
     fail(`Failed to create API key: ${createApiKeyResRaw.status} ${createApiKeyResRaw.statusText}`)
     return
   }
-  const createApiKeyRes = (await createApiKeyResRaw.json()) as { key: string }
-  const apiKey = createApiKeyRes.key
-  WriteKey(host, apiKey)
+  const { key, username } = (await createApiKeyResRaw.json()) as { key: string; username: string }
+  WriteKey(host, key)
 
   res.end('Login success, please go back to CLI to continue')
-  console.log(chalk.green('Login success, new API key: ' + apiKey))
+  console.log(chalk.green(`Login success with ${username}, new API key: ${key}`))
 
-  server.close();
+  server.close()
   setTimeout(() => process.exit(), 1000)
 })
 
@@ -90,14 +89,14 @@ async function getToken(host: string, code: string) {
     client_id: authConf.clientId,
     code_verifier: authParams.codeVerifier,
     code: code,
-    redirect_uri: authConf.redirectUri,
+    redirect_uri: authConf.redirectUri
   })
   return fetch(`${authConf.domain}/oauth/token`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
+      'Content-Type': 'application/x-www-form-urlencoded'
     },
-    body: params.toString(),
+    body: params.toString()
   })
 }
 
@@ -107,13 +106,13 @@ async function createApiKey(host: string, name: string, source: string, accessTo
     method: 'POST',
     headers: {
       Authorization: 'Bearer ' + accessToken,
-      version: getCliVersion(),
+      version: getCliVersion()
     },
     body: JSON.stringify({
       name: name,
       scopes: ['write:project'],
-      source: source,
-    }),
+      source: source
+    })
   })
 }
 
@@ -123,7 +122,7 @@ async function getUser(host: string, accessToken: string) {
     method: 'GET',
     headers: {
       Authorization: 'Bearer ' + accessToken,
-      version: getCliVersion(),
-    },
+      version: getCliVersion()
+    }
   })
 }
