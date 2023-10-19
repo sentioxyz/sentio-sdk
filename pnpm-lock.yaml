@@ -235,7 +235,7 @@ importers:
         version: 9.0.0
       ts-jest:
         specifier: ^29.1.0
-        version: 29.1.0(@babel/core@7.22.5)(@jest/types@29.5.0)(esbuild@0.17.19)(jest@29.5.0)(typescript@5.2.2)
+        version: 29.1.0(@babel/core@7.23.0)(@jest/types@29.5.0)(esbuild@0.17.19)(jest@29.5.0)(typescript@5.2.2)
       ts-node:
         specifier: ^10.9.1
         version: 10.9.1(@types/node@18.14.0)(typescript@5.2.2)
@@ -414,8 +414,8 @@ importers:
         specifier: ^0.28.0
         version: 0.28.0(@solana/web3.js@1.78.3)
       '@mysten/sui.js':
-        specifier: ~0.42.0
-        version: 0.42.0
+        specifier: ~0.44.0
+        version: 0.44.0
       '@project-serum/anchor':
         specifier: ^0.26.0
         version: 0.26.0
@@ -438,14 +438,14 @@ importers:
         specifier: ^1.78.3
         version: 1.78.3
       '@typemove/aptos':
-        specifier: ~1.2.2
-        version: 1.2.2
+        specifier: ~1.2.3
+        version: 1.2.3
       '@typemove/move':
-        specifier: ~1.2.2
-        version: 1.2.2
+        specifier: ~1.2.3
+        version: 1.2.3
       '@typemove/sui':
-        specifier: ~1.2.2
-        version: 1.2.2
+        specifier: ~1.2.3
+        version: 1.2.3
       aptos:
         specifier: ~1.20.0
         version: 1.20.0
@@ -2863,6 +2863,12 @@ packages:
       bs58: 5.0.0
     dev: false
 
+  /@mysten/bcs@0.8.1:
+    resolution: {integrity: sha512-wSEdP7QEfGQdb34g+7R0f3OdRqrv88iIABfJVDVJ6IsGLYVILreh8dZfNpZNUUyzctiyhX7zB9e/lR5qkddFPA==}
+    dependencies:
+      bs58: 5.0.0
+    dev: false
+
   /@mysten/sui.js@0.32.2:
     resolution: {integrity: sha512-/Hm4xkGolJhqj8FvQr7QSHDTlxIvL52mtbOao9f75YjrBh7y1Uh9kbJSY7xiTF1NY9sv6p5hUVlYRJuM0Hvn9A==}
     engines: {node: '>=16'}
@@ -2887,6 +2893,26 @@ packages:
     engines: {node: '>=16'}
     dependencies:
       '@mysten/bcs': 0.7.4
+      '@noble/curves': 1.1.0
+      '@noble/hashes': 1.3.2
+      '@open-rpc/client-js': 1.8.1
+      '@scure/bip32': 1.3.1
+      '@scure/bip39': 1.2.1
+      '@suchipi/femver': 1.0.0
+      events: 3.3.0
+      superstruct: 1.0.3
+      tweetnacl: 1.0.3
+    transitivePeerDependencies:
+      - bufferutil
+      - encoding
+      - utf-8-validate
+    dev: false
+
+  /@mysten/sui.js@0.44.0:
+    resolution: {integrity: sha512-c/d1fKUCK6+QBQuIaufC79vbvNfx4KcEEO25F/NZFs3cQCoqgVrQC6wuv1P4lpqFOq3S9jhz2NrkIcU0yzkIOw==}
+    engines: {node: '>=16'}
+    dependencies:
+      '@mysten/bcs': 0.8.1
       '@noble/curves': 1.1.0
       '@noble/hashes': 1.3.2
       '@open-rpc/client-js': 1.8.1
@@ -3543,11 +3569,11 @@ packages:
     resolution: {integrity: sha512-vxhUy4J8lyeyinH7Azl1pdd43GJhZH/tP2weN8TntQblOY+A0XbT8DJk1/oCPuOOyg/Ja757rG0CgHcWC8OfMA==}
     dev: true
 
-  /@typemove/aptos@1.2.2:
-    resolution: {integrity: sha512-fgiEelxMcgn/HIDuZWWvGNzOCe9eGwrayiN/piFkhk79cbytJmHQJMtbjPq2jAzf1P1auAhrnf8t0sRs2C4YYQ==}
+  /@typemove/aptos@1.2.3:
+    resolution: {integrity: sha512-YKhWc7F6CFmjKThFUaAKk+4UL1ufvCn+ZDHgWM+n8eUqdR55iB11gXNrVFuvbBmwAQBkLfyIzGNsXqw+sULlyg==}
     hasBin: true
     dependencies:
-      '@typemove/move': 1.2.2
+      '@typemove/move': 1.2.3
       aptos: 1.20.0
       chalk: 5.3.0
       radash: 11.0.0
@@ -3555,20 +3581,20 @@ packages:
       - debug
     dev: false
 
-  /@typemove/move@1.2.2:
-    resolution: {integrity: sha512-DieXj2887A9mze6B9VPDObCqfQtPdYPQNYiJpqIW3Zbl7uC6BM7rTFlH9re9Z/DSFMkj83yZgW6wj4+DfsHUqg==}
+  /@typemove/move@1.2.3:
+    resolution: {integrity: sha512-OBPcypQltY8ji3BH0r2Cfb0TqludAqXLoTJLNLWrjuQ0Ce5urg+KhomeYZXZilST9nWD/sh9QFCHFFS6+peN5Q==}
     dependencies:
       chalk: 5.3.0
       radash: 11.0.0
     dev: false
 
-  /@typemove/sui@1.2.2:
-    resolution: {integrity: sha512-sR15lbJsLgfoaLC23SNBFaiFQg2FlDte9lBZnAbihTAB6DcrPTdt5Qx3SSNbK3Qm3gdHBi8q11/C8SWZgLUk1w==}
+  /@typemove/sui@1.2.3:
+    resolution: {integrity: sha512-4CxQX+JUltfFeLl6cyjs8cbt7ZdmeDJ+HisaP7eWbM+PtfJWaP64G4os5pQOw29Nq4suxk5fctSDeeSWdunLJg==}
     hasBin: true
     dependencies:
-      '@mysten/bcs': 0.7.4
-      '@mysten/sui.js': 0.42.0
-      '@typemove/move': 1.2.2
+      '@mysten/bcs': 0.8.1
+      '@mysten/sui.js': 0.44.0
+      '@typemove/move': 1.2.3
       chalk: 5.3.0
       radash: 11.0.0
     transitivePeerDependencies:
@@ -11240,7 +11266,7 @@ packages:
     dev: true
     optional: true
 
-  /ts-jest@29.1.0(@babel/core@7.22.5)(@jest/types@29.5.0)(esbuild@0.17.19)(jest@29.5.0)(typescript@5.2.2):
+  /ts-jest@29.1.0(@babel/core@7.23.0)(@jest/types@29.5.0)(esbuild@0.17.19)(jest@29.5.0)(typescript@5.2.2):
     resolution: {integrity: sha512-ZhNr7Z4PcYa+JjMl62ir+zPiNJfXJN6E8hSLnaUKhOgqcn8vb3e537cpkd0FuAfRK3sR1LSqM1MOhliXNgOFPA==}
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
     hasBin: true
@@ -11261,7 +11287,7 @@ packages:
       esbuild:
         optional: true
     dependencies:
-      '@babel/core': 7.22.5
+      '@babel/core': 7.23.0
       '@jest/types': 29.5.0
       bs-logger: 0.2.6
       esbuild: 0.17.19
