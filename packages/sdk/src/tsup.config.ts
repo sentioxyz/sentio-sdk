@@ -32,6 +32,6 @@ export default defineConfig({
     /^@(ethersproject|solana|project-serum).*$/,
     /^@sentio\/(sdk|runtime|protos|bigdecimal|ethers).*$/,
     /^@typemove\/.*$/,
-    /^@mysten\/(bcs|sui.js).*$/
+    /^@mysten\/(bcs|sui.js\/).*$/
   ]
 })
