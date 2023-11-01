@@ -19,8 +19,10 @@ export function getPriceClient(address?: string) {
 }
 
 const priceMap = new LRUCache<string, Promise<number | undefined>>({
-  max: 100000
+  max: 100000,
+  ttl: 1000 * 60 * 60 // 1 hour
 })
+
 let priceClient: PriceServiceClient<RetryOptions>
 
 interface PriceOptions {

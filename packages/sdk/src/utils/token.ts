@@ -5,6 +5,7 @@ import { PromiseOrValue } from '../eth/builtin/internal/common.js'
 import { decodeBytes32String } from 'ethers'
 import { EthChainId, EthContext } from '../eth/index.js'
 import { BaseContext } from '../core/index.js'
+import { LRUCache } from 'lru-cache'
 
 export interface TokenInfo {
   symbol: string
@@ -15,10 +16,13 @@ export interface TokenInfo {
 export const NATIVE_ETH = {
   symbol: 'ETH',
   decimal: 18,
-  name: 'Native ETH',
+  name: 'Native ETH'
 }
 
-const TOKEN_INFOS = new Map<string, Promise<TokenInfo>>()
+const TOKEN_INFOS = new LRUCache<string, Promise<TokenInfo>>({
+  max: 10000,
+  ttl: 1000 * 60 * 60 // 1 hour
+})
 
 async function getTokenInfoPromise(
   symbol: PromiseOrValue<string> | string,
@@ -28,7 +32,7 @@ async function getTokenInfoPromise(
   return {
     symbol: await symbol,
     name: await name,
-    decimal: Number(await decimal),
+    decimal: Number(await decimal)
   }
 }
 

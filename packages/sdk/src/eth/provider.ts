@@ -84,7 +84,8 @@ function getTag(prefix: string, value: any): string {
 class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
   executor: PQueue
   #performCache = new LRUCache<string, Promise<any>>({
-    max: 10000
+    max: 10000,
+    ttl: 1000 * 60 * 60 // 1 hour
   })
 
   constructor(url: string, network: Network, concurrency: number) {
