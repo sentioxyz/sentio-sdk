@@ -199,6 +199,7 @@ export enum HandlerType {
   SUI_EVENT = 3,
   SUI_CALL = 9,
   SUI_OBJECT = 10,
+  SUI_OBJECT_CHANGE = 12,
   UNRECOGNIZED = -1,
 }
 
@@ -240,6 +241,9 @@ export function handlerTypeFromJSON(object: any): HandlerType {
     case 10:
     case "SUI_OBJECT":
       return HandlerType.SUI_OBJECT;
+    case 12:
+    case "SUI_OBJECT_CHANGE":
+      return HandlerType.SUI_OBJECT_CHANGE;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -273,6 +277,8 @@ export function handlerTypeToJSON(object: HandlerType): string {
       return "SUI_CALL";
     case HandlerType.SUI_OBJECT:
       return "SUI_OBJECT";
+    case HandlerType.SUI_OBJECT_CHANGE:
+      return "SUI_OBJECT_CHANGE";
     case HandlerType.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
@@ -356,6 +362,7 @@ export interface ContractConfig {
   transactionConfig: TransactionHandlerConfig[];
   moveEventConfigs: MoveEventHandlerConfig[];
   moveCallConfigs: MoveCallHandlerConfig[];
+  moveResourceChangeConfigs: MoveResourceChangeConfig[];
   instructionConfig: InstructionHandlerConfig | undefined;
   startBlock: bigint;
   endBlock: bigint;
@@ -559,6 +566,11 @@ export interface MoveCallHandlerConfig {
   fetchConfig: MoveFetchConfig | undefined;
 }
 
+export interface MoveResourceChangeConfig {
+  type: string;
+  handlerId: number;
+}
+
 export interface MoveCallFilter {
   function: string;
   typeArguments: string[];
@@ -597,6 +609,7 @@ export interface Data {
   suiEvent?: Data_SuiEvent | undefined;
   suiCall?: Data_SuiCall | undefined;
   suiObject?: Data_SuiObject | undefined;
+  suiObjectChange?: Data_SuiObjectChange | undefined;
 }
 
 export interface Data_EthLog {
@@ -664,6 +677,12 @@ export interface Data_SuiCall {
 export interface Data_SuiObject {
   objects: { [key: string]: any }[];
   self?: { [key: string]: any } | undefined;
+  timestamp: Date | undefined;
+  slot: bigint;
+}
+
+export interface Data_SuiObjectChange {
+  changes: { [key: string]: any }[];
   timestamp: Date | undefined;
   slot: bigint;
 }
@@ -1014,6 +1033,7 @@ function createBaseContractConfig(): ContractConfig {
     transactionConfig: [],
     moveEventConfigs: [],
     moveCallConfigs: [],
+    moveResourceChangeConfigs: [],
     instructionConfig: undefined,
     startBlock: BigInt("0"),
     endBlock: BigInt("0"),
@@ -1043,6 +1063,9 @@ export const ContractConfig = {
     }
     for (const v of message.moveCallConfigs) {
       MoveCallHandlerConfig.encode(v!, writer.uint32(82).fork()).ldelim();
+    }
+    for (const v of message.moveResourceChangeConfigs) {
+      MoveResourceChangeConfig.encode(v!, writer.uint32(98).fork()).ldelim();
     }
     if (message.instructionConfig !== undefined) {
       InstructionHandlerConfig.encode(message.instructionConfig, writer.uint32(50).fork()).ldelim();
@@ -1087,6 +1110,9 @@ export const ContractConfig = {
         case 10:
           message.moveCallConfigs.push(MoveCallHandlerConfig.decode(reader, reader.uint32()));
           break;
+        case 12:
+          message.moveResourceChangeConfigs.push(MoveResourceChangeConfig.decode(reader, reader.uint32()));
+          break;
         case 6:
           message.instructionConfig = InstructionHandlerConfig.decode(reader, reader.uint32());
           break;
@@ -1127,6 +1153,9 @@ export const ContractConfig = {
         : [],
       moveCallConfigs: Array.isArray(object?.moveCallConfigs)
         ? object.moveCallConfigs.map((e: any) => MoveCallHandlerConfig.fromJSON(e))
+        : [],
+      moveResourceChangeConfigs: Array.isArray(object?.moveResourceChangeConfigs)
+        ? object.moveResourceChangeConfigs.map((e: any) => MoveResourceChangeConfig.fromJSON(e))
         : [],
       instructionConfig: isSet(object.instructionConfig)
         ? InstructionHandlerConfig.fromJSON(object.instructionConfig)
@@ -1171,6 +1200,13 @@ export const ContractConfig = {
     } else {
       obj.moveCallConfigs = [];
     }
+    if (message.moveResourceChangeConfigs) {
+      obj.moveResourceChangeConfigs = message.moveResourceChangeConfigs.map((e) =>
+        e ? MoveResourceChangeConfig.toJSON(e) : undefined
+      );
+    } else {
+      obj.moveResourceChangeConfigs = [];
+    }
     message.instructionConfig !== undefined && (obj.instructionConfig = message.instructionConfig
       ? InstructionHandlerConfig.toJSON(message.instructionConfig)
       : undefined);
@@ -1195,6 +1231,8 @@ export const ContractConfig = {
     message.transactionConfig = object.transactionConfig?.map((e) => TransactionHandlerConfig.fromPartial(e)) || [];
     message.moveEventConfigs = object.moveEventConfigs?.map((e) => MoveEventHandlerConfig.fromPartial(e)) || [];
     message.moveCallConfigs = object.moveCallConfigs?.map((e) => MoveCallHandlerConfig.fromPartial(e)) || [];
+    message.moveResourceChangeConfigs =
+      object.moveResourceChangeConfigs?.map((e) => MoveResourceChangeConfig.fromPartial(e)) || [];
     message.instructionConfig = (object.instructionConfig !== undefined && object.instructionConfig !== null)
       ? InstructionHandlerConfig.fromPartial(object.instructionConfig)
       : undefined;
@@ -3309,6 +3347,68 @@ export const MoveCallHandlerConfig = {
   },
 };
 
+function createBaseMoveResourceChangeConfig(): MoveResourceChangeConfig {
+  return { type: "", handlerId: 0 };
+}
+
+export const MoveResourceChangeConfig = {
+  encode(message: MoveResourceChangeConfig, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.type !== "") {
+      writer.uint32(10).string(message.type);
+    }
+    if (message.handlerId !== 0) {
+      writer.uint32(16).int32(message.handlerId);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MoveResourceChangeConfig {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMoveResourceChangeConfig();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.type = reader.string();
+          break;
+        case 2:
+          message.handlerId = reader.int32();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MoveResourceChangeConfig {
+    return {
+      type: isSet(object.type) ? String(object.type) : "",
+      handlerId: isSet(object.handlerId) ? Number(object.handlerId) : 0,
+    };
+  },
+
+  toJSON(message: MoveResourceChangeConfig): unknown {
+    const obj: any = {};
+    message.type !== undefined && (obj.type = message.type);
+    message.handlerId !== undefined && (obj.handlerId = Math.round(message.handlerId));
+    return obj;
+  },
+
+  create(base?: DeepPartial<MoveResourceChangeConfig>): MoveResourceChangeConfig {
+    return MoveResourceChangeConfig.fromPartial(base ?? {});
+  },
+
+  fromPartial(object: DeepPartial<MoveResourceChangeConfig>): MoveResourceChangeConfig {
+    const message = createBaseMoveResourceChangeConfig();
+    message.type = object.type ?? "";
+    message.handlerId = object.handlerId ?? 0;
+    return message;
+  },
+};
+
 function createBaseMoveCallFilter(): MoveCallFilter {
   return {
     function: "",
@@ -3661,6 +3761,7 @@ function createBaseData(): Data {
     suiEvent: undefined,
     suiCall: undefined,
     suiObject: undefined,
+    suiObjectChange: undefined,
   };
 }
 
@@ -3698,6 +3799,9 @@ export const Data = {
     }
     if (message.suiObject !== undefined) {
       Data_SuiObject.encode(message.suiObject, writer.uint32(98).fork()).ldelim();
+    }
+    if (message.suiObjectChange !== undefined) {
+      Data_SuiObjectChange.encode(message.suiObjectChange, writer.uint32(106).fork()).ldelim();
     }
     return writer;
   },
@@ -3742,6 +3846,9 @@ export const Data = {
         case 12:
           message.suiObject = Data_SuiObject.decode(reader, reader.uint32());
           break;
+        case 13:
+          message.suiObjectChange = Data_SuiObjectChange.decode(reader, reader.uint32());
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -3763,6 +3870,9 @@ export const Data = {
       suiEvent: isSet(object.suiEvent) ? Data_SuiEvent.fromJSON(object.suiEvent) : undefined,
       suiCall: isSet(object.suiCall) ? Data_SuiCall.fromJSON(object.suiCall) : undefined,
       suiObject: isSet(object.suiObject) ? Data_SuiObject.fromJSON(object.suiObject) : undefined,
+      suiObjectChange: isSet(object.suiObjectChange)
+        ? Data_SuiObjectChange.fromJSON(object.suiObjectChange)
+        : undefined,
     };
   },
 
@@ -3787,6 +3897,10 @@ export const Data = {
     message.suiCall !== undefined && (obj.suiCall = message.suiCall ? Data_SuiCall.toJSON(message.suiCall) : undefined);
     message.suiObject !== undefined &&
       (obj.suiObject = message.suiObject ? Data_SuiObject.toJSON(message.suiObject) : undefined);
+    message.suiObjectChange !== undefined &&
+      (obj.suiObjectChange = message.suiObjectChange
+        ? Data_SuiObjectChange.toJSON(message.suiObjectChange)
+        : undefined);
     return obj;
   },
 
@@ -3828,6 +3942,9 @@ export const Data = {
       : undefined;
     message.suiObject = (object.suiObject !== undefined && object.suiObject !== null)
       ? Data_SuiObject.fromPartial(object.suiObject)
+      : undefined;
+    message.suiObjectChange = (object.suiObjectChange !== undefined && object.suiObjectChange !== null)
+      ? Data_SuiObjectChange.fromPartial(object.suiObjectChange)
       : undefined;
     return message;
   },
@@ -4659,6 +4776,81 @@ export const Data_SuiObject = {
     const message = createBaseData_SuiObject();
     message.objects = object.objects?.map((e) => e) || [];
     message.self = object.self ?? undefined;
+    message.timestamp = object.timestamp ?? undefined;
+    message.slot = object.slot ?? BigInt("0");
+    return message;
+  },
+};
+
+function createBaseData_SuiObjectChange(): Data_SuiObjectChange {
+  return { changes: [], timestamp: undefined, slot: BigInt("0") };
+}
+
+export const Data_SuiObjectChange = {
+  encode(message: Data_SuiObjectChange, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.changes) {
+      Struct.encode(Struct.wrap(v!), writer.uint32(10).fork()).ldelim();
+    }
+    if (message.timestamp !== undefined) {
+      Timestamp.encode(toTimestamp(message.timestamp), writer.uint32(18).fork()).ldelim();
+    }
+    if (message.slot !== BigInt("0")) {
+      writer.uint32(24).uint64(message.slot.toString());
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Data_SuiObjectChange {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseData_SuiObjectChange();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.changes.push(Struct.unwrap(Struct.decode(reader, reader.uint32())));
+          break;
+        case 2:
+          message.timestamp = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+          break;
+        case 3:
+          message.slot = longToBigint(reader.uint64() as Long);
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Data_SuiObjectChange {
+    return {
+      changes: Array.isArray(object?.changes) ? [...object.changes] : [],
+      timestamp: isSet(object.timestamp) ? fromJsonTimestamp(object.timestamp) : undefined,
+      slot: isSet(object.slot) ? BigInt(object.slot) : BigInt("0"),
+    };
+  },
+
+  toJSON(message: Data_SuiObjectChange): unknown {
+    const obj: any = {};
+    if (message.changes) {
+      obj.changes = message.changes.map((e) => e);
+    } else {
+      obj.changes = [];
+    }
+    message.timestamp !== undefined && (obj.timestamp = message.timestamp.toISOString());
+    message.slot !== undefined && (obj.slot = message.slot.toString());
+    return obj;
+  },
+
+  create(base?: DeepPartial<Data_SuiObjectChange>): Data_SuiObjectChange {
+    return Data_SuiObjectChange.fromPartial(base ?? {});
+  },
+
+  fromPartial(object: DeepPartial<Data_SuiObjectChange>): Data_SuiObjectChange {
+    const message = createBaseData_SuiObjectChange();
+    message.changes = object.changes?.map((e) => e) || [];
     message.timestamp = object.timestamp ?? undefined;
     message.slot = object.slot ?? BigInt("0");
     return message;

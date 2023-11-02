@@ -70,6 +70,53 @@ export class SuiContext extends MoveContext<SuiNetwork, SuiMoveNormalizedModule,
   }
 }
 
+export class SuiObjectChangeContext extends MoveContext<SuiNetwork, SuiMoveNormalizedModule, SuiEvent | SuiMoveObject> {
+  timestamp: Date
+  checkpoint: bigint
+  coder: MoveCoder
+
+  constructor(
+    network: SuiNetwork,
+    address: string,
+    timestamp: Date,
+    checkpoint: bigint,
+    baseLabels: Labels | undefined
+  ) {
+    super(baseLabels)
+    this.address = address
+    this.network = network
+    this.timestamp = timestamp
+    this.checkpoint = checkpoint
+    this.coder = defaultMoveCoder(network)
+  }
+
+  getChainId() {
+    return this.network
+  }
+
+  getTimestamp(): number {
+    return this.timestamp.getDate()
+  }
+
+  getMetaDataInternal(name: string, labels: Labels): RecordMetaData {
+    return {
+      address: this.address,
+      contractName: '*',
+      blockNumber: this.checkpoint,
+      transactionIndex: 0,
+      transactionHash: '',
+      logIndex: 0,
+      chainId: this.getChainId(),
+      name: name,
+      labels: normalizeLabels(labels)
+    }
+  }
+
+  get client(): SuiClient {
+    return getClient(this.network)
+  }
+}
+
 // TODO address handler should use this context
 export class SuiAddressContext extends MoveAccountContext<
   SuiNetwork,

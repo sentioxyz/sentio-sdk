@@ -1,9 +1,9 @@
-import { Data_SuiCall, Data_SuiEvent, MoveFetchConfig } from '@sentio/protos'
+import { Data_SuiCall, Data_SuiEvent, Data_SuiObjectChange, MoveFetchConfig } from '@sentio/protos'
 import { ListStateStorage, mergeProcessResults } from '@sentio/runtime'
 import { SuiNetwork } from './network.js'
 import { ServerError, Status } from 'nice-grpc'
-import { SuiContext } from './context.js'
-import { MoveCallSuiTransaction, SuiEvent, SuiTransactionBlockResponse } from '@mysten/sui.js/client'
+import { SuiContext, SuiObjectChangeContext } from './context.js'
+import { MoveCallSuiTransaction, SuiEvent, SuiTransactionBlockResponse, SuiObjectChange } from '@mysten/sui.js/client'
 import {
   accountAddressString,
   accountTypeString,
@@ -11,6 +11,7 @@ import {
   EventFilter,
   EventHandler,
   FunctionNameAndCallFilter,
+  ObjectChangeHandler,
   parseMoveType,
   SPLITTER,
   TransactionFilter
@@ -53,6 +54,8 @@ export class SuiBaseProcessor {
 
   eventHandlers: EventHandler<Data_SuiEvent>[] = []
   callHandlers: CallHandler<Data_SuiCall>[] = []
+  objectChangeHandlers: ObjectChangeHandler<Data_SuiObjectChange>[] = []
+
   coder: MoveCoder
 
   constructor(name: string, options: SuiBindOptions) {
@@ -234,6 +237,29 @@ export class SuiBaseProcessor {
     })
     return this
   }
+
+  protected onObjectChange(
+    handler: (changes: SuiObjectChange[], ctx: SuiObjectChangeContext) => void,
+    type: string
+  ): this {
+    const processor = this
+    this.objectChangeHandlers.push({
+      handler: async function (data) {
+        const ctx = new SuiObjectChangeContext(
+          processor.config.network,
+          processor.config.address,
+          data.timestamp || new Date(0),
+          data.slot,
+          processor.config.baseLabels
+        )
+        await handler(data.changes as SuiObjectChange[], ctx)
+        return ctx.stopAndGetResult()
+      },
+      type
+    })
+
+    return this
+  }
 }
 
 export class SuiModulesProcessor extends SuiBaseProcessor {
@@ -256,5 +282,12 @@ export class SuiGlobalProcessor extends SuiBaseProcessor {
     //   throw new ServerError(Status.INVALID_ARGUMENT, 'restriction too low for global processor')
     // }
     return super.onTransactionBlock(handler, filter, fetchConfig)
+  }
+
+  public onObjectChange(
+    handler: (changes: SuiObjectChange[], ctx: SuiObjectChangeContext) => void,
+    type: string
+  ): this {
+    return super.onObjectChange(handler, type)
   }
 }

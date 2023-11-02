@@ -11,6 +11,7 @@ export interface AptosGetTxnsByFunctionRequest {
   matchAll: boolean;
   typedArguments: string[];
   includeChanges: boolean;
+  resourceChangesMoveTypePrefix: string;
 }
 
 export interface AptosGetTxnsByVersionRequest {
@@ -28,6 +29,7 @@ export interface AptosGetTxnsByEventRequest {
   type: string;
   includeAllEvents: boolean;
   includeChanges: boolean;
+  resourceChangesMoveTypePrefix: string;
 }
 
 export interface AptosSQLQueryRequest {
@@ -114,6 +116,7 @@ function createBaseAptosGetTxnsByFunctionRequest(): AptosGetTxnsByFunctionReques
     matchAll: false,
     typedArguments: [],
     includeChanges: false,
+    resourceChangesMoveTypePrefix: "",
   };
 }
 
@@ -139,6 +142,9 @@ export const AptosGetTxnsByFunctionRequest = {
     }
     if (message.includeChanges === true) {
       writer.uint32(56).bool(message.includeChanges);
+    }
+    if (message.resourceChangesMoveTypePrefix !== "") {
+      writer.uint32(66).string(message.resourceChangesMoveTypePrefix);
     }
     return writer;
   },
@@ -171,6 +177,9 @@ export const AptosGetTxnsByFunctionRequest = {
         case 7:
           message.includeChanges = reader.bool();
           break;
+        case 8:
+          message.resourceChangesMoveTypePrefix = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -188,6 +197,9 @@ export const AptosGetTxnsByFunctionRequest = {
       matchAll: isSet(object.matchAll) ? Boolean(object.matchAll) : false,
       typedArguments: Array.isArray(object?.typedArguments) ? object.typedArguments.map((e: any) => String(e)) : [],
       includeChanges: isSet(object.includeChanges) ? Boolean(object.includeChanges) : false,
+      resourceChangesMoveTypePrefix: isSet(object.resourceChangesMoveTypePrefix)
+        ? String(object.resourceChangesMoveTypePrefix)
+        : "",
     };
   },
 
@@ -204,6 +216,8 @@ export const AptosGetTxnsByFunctionRequest = {
       obj.typedArguments = [];
     }
     message.includeChanges !== undefined && (obj.includeChanges = message.includeChanges);
+    message.resourceChangesMoveTypePrefix !== undefined &&
+      (obj.resourceChangesMoveTypePrefix = message.resourceChangesMoveTypePrefix);
     return obj;
   },
 
@@ -220,6 +234,7 @@ export const AptosGetTxnsByFunctionRequest = {
     message.matchAll = object.matchAll ?? false;
     message.typedArguments = object.typedArguments?.map((e) => e) || [];
     message.includeChanges = object.includeChanges ?? false;
+    message.resourceChangesMoveTypePrefix = object.resourceChangesMoveTypePrefix ?? "";
     return message;
   },
 };
@@ -313,6 +328,7 @@ function createBaseAptosGetTxnsByEventRequest(): AptosGetTxnsByEventRequest {
     type: "",
     includeAllEvents: false,
     includeChanges: false,
+    resourceChangesMoveTypePrefix: "",
   };
 }
 
@@ -338,6 +354,9 @@ export const AptosGetTxnsByEventRequest = {
     }
     if (message.includeChanges === true) {
       writer.uint32(56).bool(message.includeChanges);
+    }
+    if (message.resourceChangesMoveTypePrefix !== "") {
+      writer.uint32(66).string(message.resourceChangesMoveTypePrefix);
     }
     return writer;
   },
@@ -370,6 +389,9 @@ export const AptosGetTxnsByEventRequest = {
         case 7:
           message.includeChanges = reader.bool();
           break;
+        case 8:
+          message.resourceChangesMoveTypePrefix = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -387,6 +409,9 @@ export const AptosGetTxnsByEventRequest = {
       type: isSet(object.type) ? String(object.type) : "",
       includeAllEvents: isSet(object.includeAllEvents) ? Boolean(object.includeAllEvents) : false,
       includeChanges: isSet(object.includeChanges) ? Boolean(object.includeChanges) : false,
+      resourceChangesMoveTypePrefix: isSet(object.resourceChangesMoveTypePrefix)
+        ? String(object.resourceChangesMoveTypePrefix)
+        : "",
     };
   },
 
@@ -399,6 +424,8 @@ export const AptosGetTxnsByEventRequest = {
     message.type !== undefined && (obj.type = message.type);
     message.includeAllEvents !== undefined && (obj.includeAllEvents = message.includeAllEvents);
     message.includeChanges !== undefined && (obj.includeChanges = message.includeChanges);
+    message.resourceChangesMoveTypePrefix !== undefined &&
+      (obj.resourceChangesMoveTypePrefix = message.resourceChangesMoveTypePrefix);
     return obj;
   },
 
@@ -415,6 +442,7 @@ export const AptosGetTxnsByEventRequest = {
     message.type = object.type ?? "";
     message.includeAllEvents = object.includeAllEvents ?? false;
     message.includeChanges = object.includeChanges ?? false;
+    message.resourceChangesMoveTypePrefix = object.resourceChangesMoveTypePrefix ?? "";
     return message;
   },
 };

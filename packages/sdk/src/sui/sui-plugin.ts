@@ -5,10 +5,12 @@ import {
   Data_SuiCall,
   Data_SuiEvent,
   Data_SuiObject,
+  Data_SuiObjectChange,
   DataBinding,
   HandlerType,
   MoveCallHandlerConfig,
   MoveEventHandlerConfig,
+  MoveResourceChangeConfig,
   ProcessConfigResponse,
   ProcessResult,
   StartRequest
@@ -31,6 +33,7 @@ interface Handlers {
   suiEventHandlers: ((event: Data_SuiEvent) => Promise<ProcessResult>)[]
   suiCallHandlers: ((func: Data_SuiCall) => Promise<ProcessResult>)[]
   suiObjectHandlers: ((object: Data_SuiObject) => Promise<ProcessResult>)[]
+  suiObjectChangeHandlers: ((object: Data_SuiObjectChange) => Promise<ProcessResult>)[]
 }
 
 export class SuiPlugin extends Plugin {
@@ -38,7 +41,8 @@ export class SuiPlugin extends Plugin {
   handlers: Handlers = {
     suiCallHandlers: [],
     suiEventHandlers: [],
-    suiObjectHandlers: []
+    suiObjectHandlers: [],
+    suiObjectChangeHandlers: []
   }
   async start(request: StartRequest): Promise<void> {
     await initCoinList()
@@ -70,7 +74,8 @@ export class SuiPlugin extends Plugin {
     const handlers: Handlers = {
       suiCallHandlers: [],
       suiEventHandlers: [],
-      suiObjectHandlers: []
+      suiObjectHandlers: [],
+      suiObjectChangeHandlers: []
     }
     for (const suiProcessor of SuiProcessorState.INSTANCE.getValues()) {
       const contractConfig = ContractConfig.fromPartial({
@@ -115,6 +120,14 @@ export class SuiPlugin extends Plugin {
           handlerId
         }
         contractConfig.moveCallConfigs.push(functionHandlerConfig)
+      }
+      for (const handler of suiProcessor.objectChangeHandlers) {
+        const handlerId = handlers.suiObjectChangeHandlers.push(handler.handler) - 1
+        const objectChangeHandler: MoveResourceChangeConfig = {
+          type: handler.type,
+          handlerId
+        }
+        contractConfig.moveResourceChangeConfigs.push(objectChangeHandler)
       }
       config.contractConfigs.push(contractConfig)
     }
@@ -226,6 +239,26 @@ export class SuiPlugin extends Plugin {
     return mergeProcessResults(await Promise.all(promises))
   }
 
+  async processSuiObjectChange(binding: DataBinding): Promise<ProcessResult> {
+    if (!binding.data?.suiObjectChange) {
+      throw new ServerError(Status.INVALID_ARGUMENT, "Object change can't be empty")
+    }
+    const objectChange = binding.data.suiObjectChange
+
+    const promises: Promise<ProcessResult>[] = []
+    for (const handlerId of binding.handlerIds) {
+      promises.push(
+        this.handlers.suiObjectChangeHandlers[handlerId](objectChange).catch((e) => {
+          throw new ServerError(
+            Status.INTERNAL,
+            'error processing object change: ' + JSON.stringify(objectChange) + '\n' + errorString(e)
+          )
+        })
+      )
+    }
+    return mergeProcessResults(await Promise.all(promises))
+  }
+
   processBinding(request: DataBinding): Promise<ProcessResult> {
     switch (request.handlerType) {
       case HandlerType.SUI_EVENT:
@@ -234,6 +267,8 @@ export class SuiPlugin extends Plugin {
         return this.processSuiFunctionCall(request)
       case HandlerType.SUI_OBJECT:
         return this.processSuiObject(request)
+      case HandlerType.SUI_OBJECT_CHANGE:
+        return this.processSuiObjectChange(request)
       default:
         throw new ServerError(Status.INVALID_ARGUMENT, 'No handle type registered ' + request.handlerType)
     }

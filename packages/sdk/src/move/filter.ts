@@ -36,3 +36,8 @@ export class CallHandler<T> {
   handler: (call: T) => Promise<ProcessResult>
   fetchConfig: MoveFetchConfig
 }
+
+export class ObjectChangeHandler<T> {
+  handler: (call: T) => Promise<ProcessResult>
+  type: string
+}

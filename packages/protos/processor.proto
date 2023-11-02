@@ -51,6 +51,7 @@ message ContractConfig {
   repeated TransactionHandlerConfig transaction_config = 7;
   repeated MoveEventHandlerConfig move_event_configs = 9;
   repeated MoveCallHandlerConfig move_call_configs = 10;
+  repeated MoveResourceChangeConfig move_resource_change_configs = 12;
   InstructionHandlerConfig instruction_config = 6;
   uint64 start_block = 4;
   uint64 end_block = 5;
@@ -293,6 +294,11 @@ message MoveCallHandlerConfig {
   MoveFetchConfig fetch_config = 3;
 }
 
+message MoveResourceChangeConfig {
+  string type = 1;
+  int32 handler_id = 2;
+}
+
 message MoveCallFilter {
   message FromAndToAddress {
     string from = 1;
@@ -382,6 +388,11 @@ message Data {
     google.protobuf.Timestamp timestamp = 2;
     uint64 slot = 3;
   }
+  message SuiObjectChange {
+    repeated google.protobuf.Struct changes = 1;
+    google.protobuf.Timestamp timestamp = 2;
+    uint64 slot = 3;
+  }
 
   bytes raw = 1 [deprecated = true]; // can be removed anytime
   oneof value {
@@ -396,6 +407,7 @@ message Data {
     SuiEvent sui_event = 10;
     SuiCall sui_call = 11;
     SuiObject sui_object = 12;
+    SuiObjectChange sui_object_change = 13;
   }
 }
 
@@ -473,6 +485,7 @@ enum HandlerType {
   SUI_EVENT = 3;
   SUI_CALL = 9;
   SUI_OBJECT = 10;
+  SUI_OBJECT_CHANGE = 12;
 }
 
 message RuntimeInfo {
