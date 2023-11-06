@@ -23,7 +23,7 @@ jobs:
           name: Install pnpm package manager
           command: |
             sudo corepack enable
-            sudo corepack prepare pnpm@latest-8 --activate
+            sudo corepack prepare pnpm@8.9.2 --activate
       - run:
           name: Install Dependencies
           command: |

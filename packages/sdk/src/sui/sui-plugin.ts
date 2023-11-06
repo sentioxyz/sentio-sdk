@@ -181,8 +181,6 @@ export class SuiPlugin extends Plugin {
     this.handlers = handlers
   }
 
-  supportedHandlers = [HandlerType.SUI_EVENT, HandlerType.SUI_CALL, HandlerType.SUI_OBJECT]
-
   async processSuiEvent(binding: DataBinding): Promise<ProcessResult> {
     if (!binding.data?.suiEvent) {
       throw new ServerError(Status.INVALID_ARGUMENT, "Event can't be empty")
@@ -258,6 +256,13 @@ export class SuiPlugin extends Plugin {
     }
     return mergeProcessResults(await Promise.all(promises))
   }
+
+  supportedHandlers = [
+    HandlerType.SUI_EVENT,
+    HandlerType.SUI_CALL,
+    HandlerType.SUI_OBJECT,
+    HandlerType.SUI_OBJECT_CHANGE
+  ]
 
   processBinding(request: DataBinding): Promise<ProcessResult> {
     switch (request.handlerType) {
