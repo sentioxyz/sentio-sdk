@@ -14,27 +14,33 @@ export async function runCreate(argv: string[]) {
       name: 'help',
       alias: 'h',
       type: Boolean,
-      description: 'Display this usage guide.',
+      description: 'Display this usage guide.'
     },
     {
       name: 'name',
       alias: 'n',
       defaultOption: true,
       type: String,
-      description: 'Project name',
+      description: 'Project name'
     },
     {
       name: 'subproject',
       alias: 'p',
       type: Boolean,
       description:
-        'If this is a subproject in mono-repo setup, in this case sdk version is controlled in parent package.json.',
+        'If this is a subproject in mono-repo setup, in this case sdk version is controlled in parent package.json.'
+    },
+    {
+      name: 'sdk-version',
+      alias: 's',
+      type: String,
+      description: '(Optional) The version of @sentio/sdk to use, default latest'
     },
     {
       name: 'directory',
       alias: 'd',
       description: '(Optional) The root direct new project will be created, default current working dir',
-      type: String,
+      type: String
     },
     {
       name: 'chain-type',
@@ -42,20 +48,20 @@ export async function runCreate(argv: string[]) {
       description:
         'The type of project you want to create, can be eth, aptos, solana, raw (if you want to start from scratch and support multiple types of chains)',
       type: String,
-      defaultValue: 'eth',
-    },
+      defaultValue: 'eth'
+    }
   ]
 
   const options = commandLineArgs(optionDefinitions, { argv, partial: true })
   const usage = commandLineUsage([
     {
       header: 'Create a template project',
-      content: 'sentio create <name>',
+      content: 'sentio create <name>'
     },
     {
       header: 'Options',
-      optionList: optionDefinitions,
-    },
+      optionList: optionDefinitions
+    }
   ])
 
   if (options.help || !options.name) {
@@ -106,7 +112,7 @@ export async function runCreate(argv: string[]) {
         }
         return true
       },
-      overwrite: false,
+      overwrite: false
     })
     const gitignoreFile = path.join(dstFolder, 'gitignore')
     if (fs.existsSync(gitignoreFile)) {
@@ -119,7 +125,11 @@ export async function runCreate(argv: string[]) {
       const packageJsonPath = path.resolve(dstFolder, 'package.json')
       const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'))
 
-      const sdkVersion = '^' + (await latestVersion('@sentio/sdk'))
+      let sdkVersion = options.sdkVersion
+
+      if (!sdkVersion) {
+        sdkVersion = '^' + (await latestVersion('@sentio/sdk'))
+      }
       packageJson.dependencies['@sentio/sdk'] = sdkVersion
 
       const cliVersion = '^' + (await latestVersion('@sentio/cli'))
