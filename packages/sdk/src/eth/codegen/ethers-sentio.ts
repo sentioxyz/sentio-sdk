@@ -6,7 +6,7 @@ import {
   FileDescription,
   parse,
   shortenFullJsonFilePath,
-  Contract,
+  Contract
 } from 'typechain'
 import { dirname, join, relative } from 'path'
 import { codeGenIndex, codeGenSentioFile, codeGenTestUtilsFile } from './file.js'
@@ -51,16 +51,16 @@ export default class EthersSentio extends Ethers.default {
         ...files,
         {
           path: join(dirname(files[0].path), `${contract.name.toLowerCase()}-processor.ts`),
-          contents: codeGenSentioFile(contract),
+          contents: codeGenSentioFile(contract)
         },
         {
           path: join(dirname(files[0].path), '..', `${contract.name.toLowerCase()}.ts`),
-          contents: codeGenIndex(contract),
+          contents: codeGenIndex(contract)
         },
         {
           path: join(dirname(files[0].path), `${contract.name.toLowerCase()}-test-utils.ts`),
-          contents: codeGenTestUtilsFile(contract),
-        },
+          contents: codeGenTestUtilsFile(contract)
+        }
       ]
     }
   }
@@ -84,14 +84,14 @@ export default class EthersSentio extends Ethers.default {
       const content = `
             export * as ${contract.name.toLowerCase().replaceAll('-', '_')} from './${contract.name.toLowerCase()}.js'
             export { ${contract.name}Processor, ${
-        contract.name
-      }ProcessorTemplate } from './${contract.name.toLowerCase()}.js'
+              contract.name
+            }ProcessorTemplate } from './${contract.name.toLowerCase()}.js'
             `
       indexContent += content
     }
     files.push({
       path: join(dirname(files[0].path), '../index.ts'),
-      contents: indexContent,
+      contents: indexContent
     })
 
     const rootDir = join(dirname(files[0].path), '../../..')
@@ -117,7 +117,7 @@ export default class EthersSentio extends Ethers.default {
 
 ${contract.name}Processor.bind({ address: '${contract.address}', network: EthChainId.${chainKey} })
   .onEvent((evt, ctx) => {
-    ctx.meter.Counter('event_count').add(1, { name: evt.name })
+    ctx.meter.Counter('events').add(1, { name: evt.name })
     ctx.eventLogger.emit(evt.name, {
       ...evt.args.toObject(),
     })
@@ -138,7 +138,7 @@ ${contract.name}Processor.bind({ address: '${contract.address}', network: EthCha
 
       files.push({
         path: join(rootDir, 'processor.eth.example.ts'),
-        contents: exampleContent,
+        contents: exampleContent
       })
     }
     return files

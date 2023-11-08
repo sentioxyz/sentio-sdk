@@ -235,7 +235,7 @@ importers:
         version: 9.0.0
       ts-jest:
         specifier: ^29.1.0
-        version: 29.1.0(@babel/core@7.23.0)(@jest/types@29.5.0)(esbuild@0.17.19)(jest@29.5.0)(typescript@5.2.2)
+        version: 29.1.0(@babel/core@7.22.5)(@jest/types@29.5.0)(esbuild@0.17.19)(jest@29.5.0)(typescript@5.2.2)
       ts-node:
         specifier: ^10.9.1
         version: 10.9.1(@types/node@18.14.0)(typescript@5.2.2)
@@ -438,14 +438,14 @@ importers:
         specifier: ^1.78.3
         version: 1.78.3
       '@typemove/aptos':
-        specifier: ~1.2.5
-        version: 1.2.5
+        specifier: ~1.2.6
+        version: 1.2.6
       '@typemove/move':
-        specifier: ~1.2.5
-        version: 1.2.5
+        specifier: ~1.2.6
+        version: 1.2.6
       '@typemove/sui':
-        specifier: ~1.2.5
-        version: 1.2.5
+        specifier: ~1.2.6
+        version: 1.2.6
       aptos:
         specifier: ~1.20.0
         version: 1.20.0
@@ -3539,33 +3539,37 @@ packages:
   /@tsconfig/node16@1.0.3:
     resolution: {integrity: sha512-yOlFc+7UtL/89t2ZhjPvvB/DeAr3r+Dq58IgzsFkOAvVC6NMJXmCGjbptdXdR9qsX7pKcTL+s87FtYREi2dEEQ==}
 
-  /@typemove/aptos@1.2.5:
-    resolution: {integrity: sha512-HYTCASl5scr1R4zYIPTTcPkDHhqRvXbTVvnHowebDUTTnOXT7UpBUFlLS6o0UKhG80HLKHPcu5zgAGvwR+ocoA==}
+  /@typemove/aptos@1.2.6:
+    resolution: {integrity: sha512-kAhmcRPO0VrE+9PtwaqFZQbon7FBQelMmiVFRV+u1s5h72qZkSfgGUXSu5egPEascAhnv1s7R6EKvcb8eT/DVQ==}
     hasBin: true
     dependencies:
-      '@typemove/move': 1.2.5
+      '@typemove/move': 1.2.6
       aptos: 1.20.0
       chalk: 5.3.0
+      commander: 11.1.0
+      prettier: 3.0.3
       radash: 11.0.0
     transitivePeerDependencies:
       - debug
     dev: false
 
-  /@typemove/move@1.2.5:
-    resolution: {integrity: sha512-8MVnaZtRYsnH3/7gVpDL9sm5LfEacs4Y4DQPtrPXwjaw74ylZnHchP9gNK8qqQYQWEzfhBACAWV+8sNily4Z/g==}
+  /@typemove/move@1.2.6:
+    resolution: {integrity: sha512-3sruZ3Ndznc9tZMVMoLbzbgphqeXnXWHLJzSSSwIW6SQ6LdbRrb85N86foxifMckHfAvidzXcU8n7xx9bnsmew==}
     dependencies:
       chalk: 5.3.0
       radash: 11.0.0
     dev: false
 
-  /@typemove/sui@1.2.5:
-    resolution: {integrity: sha512-Dje3WFNQrVtiZktEAfUEAGM5Il4/zLcTImWttDjP8kbZNGbPNrASdnp/UgfssbrvauI59UpIqfIlY+jb/DLocA==}
+  /@typemove/sui@1.2.6:
+    resolution: {integrity: sha512-CbVGy1RG2fN89TsaKYwfkOEudSaYfcS3TDMsxLCon67f+2gxXYRFOg11CTqKiKXwjxhyuz4KIA5DlXu+SQdtAQ==}
     hasBin: true
     dependencies:
       '@mysten/bcs': 0.8.1
       '@mysten/sui.js': 0.45.1
-      '@typemove/move': 1.2.5
+      '@typemove/move': 1.2.6
       chalk: 5.3.0
+      commander: 11.1.0
+      prettier: 3.0.3
       radash: 11.0.0
     transitivePeerDependencies:
       - bufferutil
@@ -5228,7 +5232,6 @@ packages:
   /commander@11.1.0:
     resolution: {integrity: sha512-yPVavfyCcRhmorC7rWlkHn15b4wDVgVmBA7kV4QVBsF7kv/9TKJAbAXVTxvTnwP8HHKjRCJDClKbciiYS7p0DQ==}
     engines: {node: '>=16'}
-    dev: true
 
   /commander@2.20.3:
     resolution: {integrity: sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==}
@@ -9861,7 +9864,6 @@ packages:
     resolution: {integrity: sha512-L/4pUDMxcNa8R/EthV08Zt42WBO4h1rarVtK0K+QJG0X187OLo7l699jWw0GKuwzkPQ//jMFA/8Xm6Fh3J/DAg==}
     engines: {node: '>=14'}
     hasBin: true
-    dev: true
 
   /pretty-format@29.5.0:
     resolution: {integrity: sha512-V2mGkI31qdttvTFX7Mt4efOqHXqJWMu4/r66Xh3Z3BwZaPfPJgp6/gbwoujRpPUtfEF6AUUWx3Jim3GCw5g/Qw==}
@@ -11248,7 +11250,7 @@ packages:
     dev: true
     optional: true
 
-  /ts-jest@29.1.0(@babel/core@7.23.0)(@jest/types@29.5.0)(esbuild@0.17.19)(jest@29.5.0)(typescript@5.2.2):
+  /ts-jest@29.1.0(@babel/core@7.22.5)(@jest/types@29.5.0)(esbuild@0.17.19)(jest@29.5.0)(typescript@5.2.2):
     resolution: {integrity: sha512-ZhNr7Z4PcYa+JjMl62ir+zPiNJfXJN6E8hSLnaUKhOgqcn8vb3e537cpkd0FuAfRK3sR1LSqM1MOhliXNgOFPA==}
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
     hasBin: true
@@ -11269,7 +11271,7 @@ packages:
       esbuild:
         optional: true
     dependencies:
-      '@babel/core': 7.23.0
+      '@babel/core': 7.22.5
       '@jest/types': 29.5.0
       bs-logger: 0.2.6
       esbuild: 0.17.19
