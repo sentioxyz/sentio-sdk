@@ -186,8 +186,8 @@ importers:
         specifier: ~0.45.0
         version: 0.45.1
       '@sentio/chain':
-        specifier: ^1.0.3
-        version: 1.0.3
+        specifier: ^1.0.6
+        version: 1.0.6
       '@sentio/sdk':
         specifier: workspace:^
         version: link:../sdk
@@ -3310,13 +3310,13 @@ packages:
     resolution: {integrity: sha512-O5w8XdyeatUcwI+ZbpSw60/cXFPJk3NbpIupwMHfYmW8fpxpXyRbyGESNJNufWWrB6CadsWGh1R3rd7owvrmlw==}
     dev: false
 
-  /@sentio/chain@1.0.3:
-    resolution: {integrity: sha512-39+ar3e8ZtgpM8HrJAvH3rcTjaBGxV2ABmZRPbiJebtMRObhHv9CVn5XOxdMi0/imHNPjBmKPZbmomM8fdDGKQ==}
+  /@sentio/chain@1.0.4:
+    resolution: {integrity: sha512-aFMqh6dJs7lewnXb20vm/EEovwTvTHnTUau82vlC7lgmokVWDo1IDwEZpXPBr8y4tSnUg7LiDOysJjrFLVcxiA==}
     requiresBuild: true
     dev: false
 
-  /@sentio/chain@1.0.4:
-    resolution: {integrity: sha512-aFMqh6dJs7lewnXb20vm/EEovwTvTHnTUau82vlC7lgmokVWDo1IDwEZpXPBr8y4tSnUg7LiDOysJjrFLVcxiA==}
+  /@sentio/chain@1.0.6:
+    resolution: {integrity: sha512-0SMID7zaZ8VO666yPbdUxQzSU4waLvF3dxPE05A1xq4Xs6XDv25jyakPdXcPgdnM0cxUnaf5WbeHdtq8Pvq2lw==}
     requiresBuild: true
     dev: false
 
