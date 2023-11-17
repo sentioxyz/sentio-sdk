@@ -19,45 +19,51 @@ const uploadOptionDefinitions = [
     name: 'help',
     alias: 'h',
     type: Boolean,
-    description: 'Display this usage guide.',
+    description: 'Display this usage guide.'
   },
   {
     name: 'api-key',
     type: String,
     description:
-      '(Optional) Manually provide API key rather than use saved credential, if both api-key and jwt-token is provided, use api-key.',
+      '(Optional) Manually provide API key rather than use saved credential, if both api-key and jwt-token is provided, use api-key.'
   },
   {
     name: 'token',
     type: String,
     description:
-      '(Optional) Manually provide token rather than use saved credential, if both api-key and token is provided, use api-key.',
+      '(Optional) Manually provide token rather than use saved credential, if both api-key and token is provided, use api-key.'
   },
   {
     name: 'host',
     description: '(Optional) Override Sentio Host name',
-    type: String,
+    type: String
   },
   {
     name: 'owner',
     description: '(Optional) Override Project owner',
-    type: String,
+    type: String
   },
   {
     name: 'name',
     description: '(Optional) Override Project name',
-    type: String,
+    type: String
+  },
+  {
+    name: 'continue-from',
+    description:
+      '(Optional) Continue processing data from the specific processor version which will keeping the old data from previous version and will STOP that version IMMEDIATELY.',
+    type: Number
   },
   {
     name: 'nobuild',
     description: '(Optional) Skip build & pack file before uploading, default false',
-    type: Boolean,
+    type: Boolean
   },
   {
     name: 'debug',
     description: '(Optional) Run driver in debug mode, default false',
-    type: Boolean,
-  },
+    type: Boolean
+  }
 ]
 
 function mergeOptions(options1: commandLineArgs.OptionDefinition[], options2: commandLineArgs.OptionDefinition[]) {
@@ -82,12 +88,12 @@ export async function runUpload(processorConfig: YamlProjectConfig, argv: string
     const usage = commandLineUsage([
       {
         header: 'Sentio upload',
-        content: 'sentio upload',
+        content: 'sentio upload'
       },
       {
         header: 'Options',
-        optionList: optionDefinitions,
-      },
+        optionList: optionDefinitions
+      }
     ])
     console.log(usage)
     process.exit(0)
@@ -126,7 +132,8 @@ export async function runUpload(processorConfig: YamlProjectConfig, argv: string
   if (processorConfig.build) {
     await buildProcessor(false, options)
   }
-  return uploadFile(processorConfig, uploadAuth)
+  const continueFrom = options['continue-from']
+  return uploadFile(processorConfig, uploadAuth, continueFrom)
 }
 
 async function createProject(options: YamlProjectConfig, auth: Auth) {
@@ -135,9 +142,9 @@ async function createProject(options: YamlProjectConfig, auth: Auth) {
   return fetch(url.href, {
     method: 'POST',
     headers: {
-      ...auth,
+      ...auth
     },
-    body: JSON.stringify({ slug, ownerName, visibility: 'PRIVATE' }),
+    body: JSON.stringify({ slug, ownerName, visibility: 'PRIVATE' })
   })
 }
 
@@ -146,7 +153,7 @@ interface Auth {
   authorization?: string
 }
 
-export async function uploadFile(options: YamlProjectConfig, auth: Auth) {
+export async function uploadFile(options: YamlProjectConfig, auth: Auth, continueFrom: number | undefined) {
   console.log(chalk.blue('Prepare to upload'))
 
   const PROCESSOR_FILE = path.join(process.cwd(), 'dist/lib.js')
@@ -181,7 +188,7 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth) {
     console.log(chalk.blue(triedCount > 1 ? 'Retry uploading' : 'Uploading'))
 
     // get gcs upload url
-    const initUploadResRaw = await initUpload(options.host, auth, options.project, getSdkVersion(), 0)
+    const initUploadResRaw = await initUpload(options.host, auth, options.project, getSdkVersion(), 0, continueFrom)
     if (!initUploadResRaw.ok) {
       // console.error(chalk.red('Failed to get upload url'))
       console.error(chalk.red(((await initUploadResRaw.json()) as { message: string }).message))
@@ -190,7 +197,7 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth) {
         // create project if not exist
         const rl = readline.createInterface({
           input: process.stdin,
-          output: process.stdout,
+          output: process.stdout
         })
         const prompt = async () => {
           const answer: string = await new Promise((resolve) =>
@@ -224,9 +231,9 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth) {
     const uploadResRaw = await fetch(uploadUrl, {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/octet-stream',
+        'Content-Type': 'application/octet-stream'
       },
-      body: file,
+      body: file
     })
     if (!uploadResRaw.ok) {
       console.error(chalk.red('Failed to upload'))
@@ -234,7 +241,7 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth) {
       return
     }
 
-    await uploadZip(options.host, auth, options.project, getSdkVersion())
+    await uploadZip(options.host, auth, options.project, getSdkVersion(), continueFrom)
 
     // finish uploading
     const finishUploadResRaw = await finishUpload(
@@ -289,18 +296,26 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth) {
   await tryUploading()
 }
 
-async function initUpload(host: string, auth: Auth, projectSlug: string, sdkVersion: string, sequence: number) {
+async function initUpload(
+  host: string,
+  auth: Auth,
+  projectSlug: string,
+  sdkVersion: string,
+  sequence: number,
+  continueFrom?: number
+) {
   const initUploadUrl = new URL(`/api/v1/processors/init_upload`, host)
   return fetch(initUploadUrl.href, {
     method: 'POST',
     headers: {
-      ...auth,
+      ...auth
     },
     body: JSON.stringify({
       project_slug: projectSlug,
       sdk_version: sdkVersion,
       sequence,
-    }),
+      continueFrom
+    })
   })
 }
 
@@ -318,7 +333,7 @@ async function finishUpload(
   return fetch(finishUploadUrl.href, {
     method: 'POST',
     headers: {
-      ...auth,
+      ...auth
     },
     body: JSON.stringify({
       project_slug: projectSlug,
@@ -327,13 +342,19 @@ async function finishUpload(
       commit_sha: commitSha,
       git_url: gitUrl,
       debug: debug,
-      sequence: 1,
-    }),
+      sequence: 1
+    })
   })
 }
 
-async function uploadZip(host: string, auth: Auth, projectSlug: string, sdkVersion: string) {
-  const initUploadResRaw = await initUpload(host, auth, projectSlug, sdkVersion, 1)
+async function uploadZip(
+  host: string,
+  auth: Auth,
+  projectSlug: string,
+  sdkVersion: string,
+  continueFrom: number | undefined
+) {
+  const initUploadResRaw = await initUpload(host, auth, projectSlug, sdkVersion, 1, continueFrom)
   const initUploadRes = (await initUploadResRaw.json()) as { url: string }
   const uploadUrl = initUploadRes.url
 
@@ -361,9 +382,9 @@ async function uploadZip(host: string, auth: Auth, projectSlug: string, sdkVersi
   const uploadResRaw = await fetch(uploadUrl, {
     method: 'PUT',
     headers: {
-      'Content-Type': 'application/octet-stream',
+      'Content-Type': 'application/octet-stream'
     },
-    body: zip.generateNodeStream(),
+    body: zip.generateNodeStream()
   })
   if (!uploadResRaw.ok) {
     console.error(chalk.red('Failed to upload'))

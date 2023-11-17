@@ -14,14 +14,14 @@ export async function runAdd(argv: string[]) {
     AptosChainId.APTOS_MAINNET,
     AptosChainId.APTOS_TESTNET,
     SuiChainId.SUI_TESTNET,
-    SuiChainId.SUI_MAINNET,
+    SuiChainId.SUI_MAINNET
   ]
   supportedChain.push(...Object.keys(ETH_API_URL_MAP))
-  const supprtedChainMessage = [
+  const supportedChainMessage = [
     '',
     ...supportedChain.map(
       (chainId, idx) => `  ${getChainName(chainId)}:\t${chainId}${idx === supportedChain.length - 1 ? '' : '\n'}`
-    ),
+    )
   ]
 
   const optionDefinitions = [
@@ -29,39 +29,39 @@ export async function runAdd(argv: string[]) {
       name: 'help',
       alias: 'h',
       type: Boolean,
-      description: 'Display this usage guide.',
+      description: 'Display this usage guide.'
     },
     {
       name: 'chain',
       alias: 'c',
       type: String,
       defaultValue: '1',
-      description: 'Chain id, current support (chain name: id)s are:\n' + supprtedChainMessage,
+      description: 'Chain id, current support (chain name: id)s are:\n' + supportedChainMessage
     },
     {
       name: 'address',
       defaultOption: true,
       description: 'Address of the contract',
-      type: String,
+      type: String
     },
     {
       name: 'name',
       alias: 'n',
       description: 'File name for the downloaded contract, if empty, use address as file name',
-      type: String,
-    },
+      type: String
+    }
   ]
 
   const options = commandLineArgs(optionDefinitions, { argv, partial: true })
   const usage = commandLineUsage([
     {
       header: "Add contract's ABI to the project",
-      content: 'sentio add [--chain <chain> --name <name>] <address>',
+      content: 'sentio add [--chain <chain> --name <name>] <address>'
     },
     {
       header: 'Options',
-      optionList: optionDefinitions,
-    },
+      optionList: optionDefinitions
+    }
   ])
 
   if (options.help || !options.address) {
