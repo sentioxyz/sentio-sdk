@@ -188,7 +188,7 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth, continu
     console.log(chalk.blue(triedCount > 1 ? 'Retry uploading' : 'Uploading'))
 
     // get gcs upload url
-    const initUploadResRaw = await initUpload(options.host, auth, options.project, getSdkVersion(), 0, continueFrom)
+    const initUploadResRaw = await initUpload(options.host, auth, options.project, getSdkVersion(), 0)
     if (!initUploadResRaw.ok) {
       // console.error(chalk.red('Failed to get upload url'))
       console.error(chalk.red(((await initUploadResRaw.json()) as { message: string }).message))
@@ -252,7 +252,8 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth, continu
       sha256,
       commitSha,
       gitUrl,
-      options.debug
+      options.debug,
+      continueFrom
     )
     if (!finishUploadResRaw.ok) {
       console.error(chalk.red('Failed to finish uploading'))
@@ -296,14 +297,7 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth, continu
   await tryUploading()
 }
 
-async function initUpload(
-  host: string,
-  auth: Auth,
-  projectSlug: string,
-  sdkVersion: string,
-  sequence: number,
-  continueFrom?: number
-) {
+async function initUpload(host: string, auth: Auth, projectSlug: string, sdkVersion: string, sequence: number) {
   const initUploadUrl = new URL(`/api/v1/processors/init_upload`, host)
   return fetch(initUploadUrl.href, {
     method: 'POST',
@@ -313,8 +307,7 @@ async function initUpload(
     body: JSON.stringify({
       project_slug: projectSlug,
       sdk_version: sdkVersion,
-      sequence,
-      continueFrom
+      sequence
     })
   })
 }
@@ -327,7 +320,8 @@ async function finishUpload(
   sha256: string,
   commitSha: string,
   gitUrl: string,
-  debug: boolean
+  debug: boolean,
+  continueFrom: number | undefined
 ) {
   const finishUploadUrl = new URL(`/api/v1/processors/finish_upload`, host)
   return fetch(finishUploadUrl.href, {
@@ -342,7 +336,8 @@ async function finishUpload(
       commit_sha: commitSha,
       git_url: gitUrl,
       debug: debug,
-      sequence: 1
+      sequence: 1,
+      continueFrom
     })
   })
 }
@@ -354,7 +349,7 @@ async function uploadZip(
   sdkVersion: string,
   continueFrom: number | undefined
 ) {
-  const initUploadResRaw = await initUpload(host, auth, projectSlug, sdkVersion, 1, continueFrom)
+  const initUploadResRaw = await initUpload(host, auth, projectSlug, sdkVersion, 1)
   const initUploadRes = (await initUploadResRaw.json()) as { url: string }
   const uploadUrl = initUploadRes.url
 
