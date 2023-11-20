@@ -1651,6 +1651,26 @@
           }
         ]
       },
+      "get_with_original_ids": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "type_name",
+              "name": "TypeName",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
       "into_string": {
         "visibility": "Public",
         "isEntry": false,

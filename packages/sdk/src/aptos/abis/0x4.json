@@ -1,0 +1,1675 @@
+[
+  {
+    "bytecode": "0xa11ceb0b060000000c010014021436034ab40204fe023605b403860307ba06ea0708a40e4006e40e7e10e20f94040af613390caf14850b0db41f100000010101020103010401050106010700080009000a0600000b0600000c0600000d080006100700031107010001081308000315020004160701000009170b0003270600022e04010601000e000100000f02030000120405010800140406010800180708000019070800001a070800001b090100001c0a0b00001d04010108001e04050108001f0c020000200c0d000021040501080009040e010800220f030000230f030000240f0300002504050108042f1112010004301113010003311401000432161701000333100300093401120009330103000235190301060436171b010008371c030003381d01010801391a1a00082104050108053a200100033b010800063c211a00013d1a1a00033e0c2200083f23010003400104010808412425000442261701030343201901060944280300034520080003462a080003472b01000648212c0007492e030100081d04010108034a0c1200034b0c1000044c031b0100034d0c0100034e0c040108094f040e010806500b0500025134030106131014101401161016011a181b1a1d171f1e261e281a2918132716272f2d301e1b10330133101b0135311d31361709170217361e381801060800010501080000010b05010900010804010b0501080606060c0804080408040b08010809080401080703060506080406080402060804060804010a0201060807010802010b0801080902060802080401080a01060b080109000101010609000106080a070505050b05010806080a030b0b01080101070b08010900010900010801010b0b0109000103010b0801090003060b05010806050b08010301060b050109000108060f070b0801030b050108060b0501080608040807060807050508040b08010308040c0b080108090803080401060c01060804010c02060506080402060b0501080605010b08010302060b08010900090001080902060807080910070b0801030b050108060b0501080608040807060807050508040b08010308040c0b080108090a020803080402060c0a020206050a0201060a02010202070a09000a0900060b0801080a0b0801050b080105050b0801080a0b080105010b05010803010803050b080108090804050b08010809050206080207080302070b0b010900090005746f6b656e056572726f72056576656e74066f626a656374066f7074696f6e067369676e657206737472696e6706766563746f720a636f6c6c656374696f6e07726f79616c7479074275726e5265660d4d75746174696f6e4576656e740a4d757461746f7252656605546f6b656e15616464726573735f66726f6d5f6275726e5f726566046275726e06537472696e67064f626a6563740f636f6c6c656374696f6e5f6e616d650a436f6c6c656374696f6e11636f6c6c656374696f6e5f6f626a6563740e436f6e7374727563746f72526566064f7074696f6e07526f79616c747906637265617465136372656174655f66726f6d5f6163636f756e74126372656174655f6e616d65645f746f6b656e146372656174655f746f6b656e5f61646472657373116372656174655f746f6b656e5f736565640763726561746f720b6465736372697074696f6e1167656e65726174655f6275726e5f7265661467656e65726174655f6d757461746f725f726566046e616d650f7365745f6465736372697074696f6e087365745f6e616d65077365745f7572690375726905696e6e65720944656c6574655265660473656c66126d7574617465645f6669656c645f6e616d65096f6c645f76616c7565096e65775f76616c756505696e6465780f6d75746174696f6e5f6576656e74730b4576656e7448616e646c650769735f736f6d6506626f72726f7717616464726573735f66726f6d5f64656c6574655f72656607657874726163740664656c657465096578697374735f61740e64657374726f795f68616e646c6504736f6d651064656372656d656e745f737570706c790e6f626a6563745f61646472657373096e6f745f666f756e640a616464726573735f6f660d6372656174655f6f626a656374066c656e6774680c6f75745f6f665f72616e67650f67656e65726174655f7369676e6572196372656174655f636f6c6c656374696f6e5f6164647265737311616464726573735f746f5f6f626a65637410696e6372656d656e745f737570706c79106765745f776974685f64656661756c74106e65775f6576656e745f68616e646c6504696e69741a6372656174655f6f626a6563745f66726f6d5f6163636f756e74136372656174655f6e616d65645f6f626a656374156372656174655f6f626a6563745f6164647265737305627974657306617070656e641763616e5f67656e65726174655f64656c6574655f7265661367656e65726174655f64656c6574655f726566046e6f6e651c616464726573735f66726f6d5f636f6e7374727563746f725f7265661b6f626a6563745f66726f6d5f636f6e7374727563746f725f7265660367657404757466380a656d69745f6576656e74000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000010308060000000000000003080300000000000000030802000000000000000308010000000000000003080400000000000000030805000000000000000308000800000000000003088000000000000000030800020000000000000a0203023a3a0a020c0b6465736372697074696f6e0a0205046e616d650a020403757269126170746f733a3a6d657461646174615f7631ff030601000000000000001545544f4b454e5f444f45535f4e4f545f45584953541854686520746f6b656e20646f6573206e6f7420657869737402000000000000000c454e4f545f43524541544f52265468652070726f7669646564207369676e6572206973206e6f74207468652063726561746f72030000000000000012454649454c445f4e4f545f4d555441424c4526546865206669656c64206265696e67206368616e676564206973206e6f74206d757461626c6504000000000000001445544f4b454e5f4e414d455f544f4f5f4c4f4e472954686520746f6b656e206e616d65206973206f76657220746865206d6178696d756d206c656e67746805000000000000000d455552495f544f4f5f4c4f4e472254686520555249206973206f76657220746865206d6178696d756d206c656e677468060000000000000015454445534352495054494f4e5f544f4f5f4c4f4e472a546865206465736372697074696f6e206973206f76657220746865206d6178696d756d206c656e6774680105546f6b656e010301183078313a3a6f626a6563743a3a4f626a65637447726f75700703757269010100046e616d650101000763726561746f7201010007726f79616c74790101000b6465736372697074696f6e0101000f636f6c6c656374696f6e5f6e616d6501010011636f6c6c656374696f6e5f6f626a656374010100000202260b0801080a280b0801050102032908042a08042b08040202012805030206080b050108062c031e08042108042508042d0b0b0108010001000001110a0010003800040a0b001000380111150c01050f0b0010013802140c010b01020101000103152c0e001000380004100d000f0038030c050e0511150c020b0511170b020c0105140d000f0138040c010b010c030a031118041b0a0311190a032c0313030c070101010c060c040b0738050e040b030b063806111c02020100010301100e0038070c010a0129030407050a0703111e270b012b031002143808020301000103010f0e0038070c010a0129030407050a0703111e270b012b0310021402040100001f610b0011200c0c0a0c11210c0a0e0a0b0c0b010b020b030b040b050c140c120c100c0e0c090c0d0c0b0e101122070725041a051f0b0b0107041123270e0e11220706250425052a0b0b0107001123270e141122070825043005350b0b0107051123270a0b11240c110e0d0e09112538090c080e080e11112011270c0f0b080c070d0f0c060b070b062e060000000000000000380a0b0e0b100b140e11380b12030c130e110b132d030e12380c045d0b0b0d12380d112a055f0b0b010b0a02050100001f610a0011200c0c0b00112b0c0a0e0a0b0c0b010b020b030b040b050c140c120c100c0e0c090c0d0c0b0e101122070725041a051f0b0b0107041123270e0e11220706250425052a0b0b0107001123270e141122070825043005350b0b0107051123270a0b11240c110e0d0e09112538090c080e080e11112011270c0f0b080c070d0f0c060b070b062e060000000000000000380a0b0e0b100b140e11380b12030c130e110b132d030e12380c045d0b0b0d12380d112a055f0b0b010b0a020601000029660a0011200c0c0e010e0311080c130b000b13112c0c0a0e0a0b0c0b010b020b030b040b050c150c120c100c0e0c090c0d0c0b0e101122070725041f05240b0b0107041123270e0e1122070625042a052f0b0b0107001123270e1511220708250435053a0b0b0107051123270a0b11240c110e0d0e09112538090c080e080e11112011270c0f0b080c070d0f0c060b070b062e060000000000000000380a0b0e0b100b150e11380b12030c140e110b142d030e12380c04620b0b0d12380d112a05640b0b010b0a020701000003060b000b010b021108112d02080100000b1b0a0111220707250406050d0b01010b000107041123270b00112e140c020d020709380e0d020b01112e14380e0b0202090100010301100e0038070c010a0129030407050a0703111e270b012b03100214380f020a01000103010f0e0038070c010a0129030407050a0703111e270b012b03100314020b0100002f1c0a001131040a0b001132381038110c020c0105120b0011340c0438120b0438130c020c010b010b020c060c050b060c030b050b031200020c01000030070b0038140c010e0138151202020d01000103010f0e0038070c010a0129030407050a0703111e270b012b03100414020e0100010332240e0038070c050a0529030407050a0703111e270b052b03010a0038160c040e04380c04160b040c0105220a0038170c030b0038180c020e030e021125380938190c010b01020f01000103332c0e0111220706250406050b0b000107001123270b000c020a021005142903041305180b02010703111e270b021005142a030c030a030f06070a11370a031003140a011201381a0b010b030f0315021001000103332c0e0111220707250406050b0b000107041123270b000c020a021005142903041305180b02010703111e270b021005142a030c030a030f06070b11370a031004140a011201381a0b010b030f0415021101000103332c0e0111220708250406050b0b000107051123270b000c020a021005142903041305180b02010703111e270b021005142a030c030a030f06070c11370a031007140a011201381a0b010b030f0715021201000103010f0e0038070c010a0129030407050a0703111e270b012b03100714020000000103000302030302000305030400",
+    "abi": {
+      "address": "0x4",
+      "name": "token",
+      "friends": [],
+      "exposed_functions": [
+        {
+          "name": "address_from_burn_ref",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": ["&0x4::token::BurnRef"],
+          "return": ["address"]
+        },
+        {
+          "name": "burn",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": ["0x4::token::BurnRef"],
+          "return": []
+        },
+        {
+          "name": "collection_name",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": true,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["0x1::object::Object<T0>"],
+          "return": ["0x1::string::String"]
+        },
+        {
+          "name": "collection_object",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": true,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["0x1::object::Object<T0>"],
+          "return": ["0x1::object::Object<0x4::collection::Collection>"]
+        },
+        {
+          "name": "create",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [
+            "&signer",
+            "0x1::string::String",
+            "0x1::string::String",
+            "0x1::string::String",
+            "0x1::option::Option<0x4::royalty::Royalty>",
+            "0x1::string::String"
+          ],
+          "return": ["0x1::object::ConstructorRef"]
+        },
+        {
+          "name": "create_from_account",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [
+            "&signer",
+            "0x1::string::String",
+            "0x1::string::String",
+            "0x1::string::String",
+            "0x1::option::Option<0x4::royalty::Royalty>",
+            "0x1::string::String"
+          ],
+          "return": ["0x1::object::ConstructorRef"]
+        },
+        {
+          "name": "create_named_token",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [
+            "&signer",
+            "0x1::string::String",
+            "0x1::string::String",
+            "0x1::string::String",
+            "0x1::option::Option<0x4::royalty::Royalty>",
+            "0x1::string::String"
+          ],
+          "return": ["0x1::object::ConstructorRef"]
+        },
+        {
+          "name": "create_token_address",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": ["&address", "&0x1::string::String", "&0x1::string::String"],
+          "return": ["address"]
+        },
+        {
+          "name": "create_token_seed",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": ["&0x1::string::String", "&0x1::string::String"],
+          "return": ["vector<u8>"]
+        },
+        {
+          "name": "creator",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": true,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["0x1::object::Object<T0>"],
+          "return": ["address"]
+        },
+        {
+          "name": "description",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": true,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["0x1::object::Object<T0>"],
+          "return": ["0x1::string::String"]
+        },
+        {
+          "name": "generate_burn_ref",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": ["&0x1::object::ConstructorRef"],
+          "return": ["0x4::token::BurnRef"]
+        },
+        {
+          "name": "generate_mutator_ref",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": ["&0x1::object::ConstructorRef"],
+          "return": ["0x4::token::MutatorRef"]
+        },
+        {
+          "name": "name",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": true,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["0x1::object::Object<T0>"],
+          "return": ["0x1::string::String"]
+        },
+        {
+          "name": "royalty",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": true,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["0x1::object::Object<T0>"],
+          "return": ["0x1::option::Option<0x4::royalty::Royalty>"]
+        },
+        {
+          "name": "set_description",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": ["&0x4::token::MutatorRef", "0x1::string::String"],
+          "return": []
+        },
+        {
+          "name": "set_name",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": ["&0x4::token::MutatorRef", "0x1::string::String"],
+          "return": []
+        },
+        {
+          "name": "set_uri",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": ["&0x4::token::MutatorRef", "0x1::string::String"],
+          "return": []
+        },
+        {
+          "name": "uri",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": true,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["0x1::object::Object<T0>"],
+          "return": ["0x1::string::String"]
+        }
+      ],
+      "structs": [
+        {
+          "name": "BurnRef",
+          "is_native": false,
+          "abilities": ["drop", "store"],
+          "generic_type_params": [],
+          "fields": [
+            {
+              "name": "inner",
+              "type": "0x1::option::Option<0x1::object::DeleteRef>"
+            },
+            {
+              "name": "self",
+              "type": "0x1::option::Option<address>"
+            }
+          ]
+        },
+        {
+          "name": "MutationEvent",
+          "is_native": false,
+          "abilities": ["drop", "store"],
+          "generic_type_params": [],
+          "fields": [
+            {
+              "name": "mutated_field_name",
+              "type": "0x1::string::String"
+            },
+            {
+              "name": "old_value",
+              "type": "0x1::string::String"
+            },
+            {
+              "name": "new_value",
+              "type": "0x1::string::String"
+            }
+          ]
+        },
+        {
+          "name": "MutatorRef",
+          "is_native": false,
+          "abilities": ["drop", "store"],
+          "generic_type_params": [],
+          "fields": [
+            {
+              "name": "self",
+              "type": "address"
+            }
+          ]
+        },
+        {
+          "name": "Token",
+          "is_native": false,
+          "abilities": ["key"],
+          "generic_type_params": [],
+          "fields": [
+            {
+              "name": "collection",
+              "type": "0x1::object::Object<0x4::collection::Collection>"
+            },
+            {
+              "name": "index",
+              "type": "u64"
+            },
+            {
+              "name": "description",
+              "type": "0x1::string::String"
+            },
+            {
+              "name": "name",
+              "type": "0x1::string::String"
+            },
+            {
+              "name": "uri",
+              "type": "0x1::string::String"
+            },
+            {
+              "name": "mutation_events",
+              "type": "0x1::event::EventHandle<0x4::token::MutationEvent>"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "bytecode": "0xa11ceb0b060000000d01000802081c03245e048201060588015407dc01b9020895044006d5041e10f30485020af8060f0c8707e7010dee08080ff6080200010102010301040005060000060b00020b0600030d07010000020e0701000102100200000700010000080203000009040500000a020600000c070800000f090a010800110b03000012040500001304020000140c03000116050500011705050002180f02010803190e100100031a03100100021b121100021c140200021d1411000c0e0d010e01030303050108010105000106080101030101010802010800010b04010900010b03010801020608050801020608000801020b030108010501090001060b04010900010b03010900010c0106080502050c0106080205746f6b656e07726f79616c7479056572726f72066f626a656374066f7074696f6e0a4d757461746f7252656607526f79616c7479066372656174650664656c6574650b64656e6f6d696e61746f72096578697374735f617409457874656e645265661467656e65726174655f6d757461746f725f726566064f7074696f6e064f626a656374036765740e436f6e7374727563746f7252656604696e6974096e756d657261746f720d70617965655f616464726573730675706461746505696e6e65720c6f75745f6f665f72616e6765096e6f745f666f756e640e6f626a6563745f6164647265737304736f6d65046e6f6e650f67656e65726174655f7369676e657217616464726573735f66726f6d5f657874656e645f7265661d67656e65726174655f7369676e65725f666f725f657874656e64696e6700000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000001030803000000000000000308010000000000000003080200000000000000126170746f733a3a6d657461646174615f7631f0010301000000000000001745524f59414c54595f444f45535f4e4f545f455849535416526f79616c747920646f6573206e6f7420657869737402000000000000001845524f59414c54595f455843454544535f4d4158494d554d2754686520726f79616c74792063616e6e6f742062652067726561746572207468616e203130302503000000000000001c45524f59414c54595f44454e4f4d494e41544f525f49535f5a45524f2354686520726f79616c74792064656e6f6d696e61746f722063616e6e6f7420626520300107526f79616c7479010301183078313a3a6f626a6563743a3a4f626a65637447726f7570000002011508020102031203090313050001000003150a0106000000000000000022040505080700110a270a000a0125040d05100702110a270b000b010b021201020103000101030b0a002901040405070701110b270b002c0101020201000003040b00100014020301000003030b002901020401000003030b0012000205010001010d100e0038000c020a022901040c0b022b011438010c01050e38020c010b01020601000011070b00110f0c020e020b012d01020701000003040b00100114020801000003040b0010021402090100010113120a00100311100c020a022901040a0b022c01010b00100311110c030e030b012d01020101010001020000000000",
+    "abi": {
+      "address": "0x4",
+      "name": "royalty",
+      "friends": ["0x4::token"],
+      "exposed_functions": [
+        {
+          "name": "create",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": ["u64", "u64", "address"],
+          "return": ["0x4::royalty::Royalty"]
+        },
+        {
+          "name": "delete",
+          "visibility": "friend",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": ["address"],
+          "return": []
+        },
+        {
+          "name": "denominator",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": ["&0x4::royalty::Royalty"],
+          "return": ["u64"]
+        },
+        {
+          "name": "exists_at",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": ["address"],
+          "return": ["bool"]
+        },
+        {
+          "name": "generate_mutator_ref",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": ["0x1::object::ExtendRef"],
+          "return": ["0x4::royalty::MutatorRef"]
+        },
+        {
+          "name": "get",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["0x1::object::Object<T0>"],
+          "return": ["0x1::option::Option<0x4::royalty::Royalty>"]
+        },
+        {
+          "name": "init",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": ["&0x1::object::ConstructorRef", "0x4::royalty::Royalty"],
+          "return": []
+        },
+        {
+          "name": "numerator",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": ["&0x4::royalty::Royalty"],
+          "return": ["u64"]
+        },
+        {
+          "name": "payee_address",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": ["&0x4::royalty::Royalty"],
+          "return": ["address"]
+        },
+        {
+          "name": "update",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": ["&0x4::royalty::MutatorRef", "0x4::royalty::Royalty"],
+          "return": []
+        }
+      ],
+      "structs": [
+        {
+          "name": "MutatorRef",
+          "is_native": false,
+          "abilities": ["drop", "store"],
+          "generic_type_params": [],
+          "fields": [
+            {
+              "name": "inner",
+              "type": "0x1::object::ExtendRef"
+            }
+          ]
+        },
+        {
+          "name": "Royalty",
+          "is_native": false,
+          "abilities": ["copy", "drop", "key"],
+          "generic_type_params": [],
+          "fields": [
+            {
+              "name": "numerator",
+              "type": "u64"
+            },
+            {
+              "name": "denominator",
+              "type": "u64"
+            },
+            {
+              "name": "payee_address",
+              "type": "address"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "bytecode": "0xa11ceb0b060000000d01001002103e034ed30104a1022e05cf02d80207a705ee0608950c4006d50c7010c50d9f050ae412550cb913f40a0dad1e1e0fcb1e020001010201030104010501060107000800090600000a0800000b0800000c0600000d0600000e0600000f0800041007010000031107010001061307000316020007170b00022604010601033606000012000101080014020300001504050000180607000019080700001a080700001b00030108001c090a00001d000b0108001e0c0d00001f0e01000020000b010800210f0a0000220f0a000023000b0108032e12030108012f13130004301114010004310a14010003321503000633041300013413130006350416000137131300033818070003390c1900033a1b1c0106053b1b0300043c20210100043d14110100043e140a0100043f231101000740240a0003410c25000342260a000443202c010002442d0a010603450c0001080646050b000f11111312131a1a1a1d111e1a1f1c1e1d1e1e1e1c221f2211281c281d281e28121e0f2b2313241a252b241d241f010b08010900010b070103020605060809010501060809010a0206060c08090308090b0701080b080901080a05060c080908090b0701080b080903060b08010801050b070103000108090106080a01080502060b0801080105020608050809030b0701030b0701030501090001060b080109000103010b070109000206050a0201060a020e08010a02080a080a060c080908090c0c0b0701080b08020b07010802080d080902060c0a02010c01080001060c010b0c01090001080301080201080401060b07010900010101080b01070b070109000206080a080b01080d0106080d0e08010a02080a080a060c080908090c0c0b0701080b08060b07010806080d08090108060c08010a02080a080a060c080908090c0b0701080b0b07010802080d080903050708020708060108010106090002070b0c0109000900010b08010801050b0701030b070103050708020708060207080106080505746f6b656e0a636f6c6c656374696f6e056572726f72056576656e74066f626a656374066f7074696f6e067369676e657206737472696e6707726f79616c7479094275726e4576656e740a436f6c6c656374696f6e0b4669786564537570706c79094d696e744576656e740d4d75746174696f6e4576656e740a4d757461746f725265660f556e6c696d69746564537570706c79064f7074696f6e064f626a65637405636f756e7406537472696e67196372656174655f636f6c6c656374696f6e5f61646472657373166372656174655f636f6c6c656374696f6e5f736565640e436f6e7374727563746f7252656607526f79616c7479176372656174655f66697865645f636f6c6c656374696f6e1b6372656174655f756e6c696d697465645f636f6c6c656374696f6e1b6372656174655f756e747261636b65645f636f6c6c656374696f6e0763726561746f721064656372656d656e745f737570706c790b6465736372697074696f6e1467656e65726174655f6d757461746f725f72656610696e6372656d656e745f737570706c79046e616d650f7365745f6465736372697074696f6e077365745f7572690375726905696e6465780f6d75746174696f6e5f6576656e74730b4576656e7448616e646c650e63757272656e745f737570706c790a6d61785f737570706c790c746f74616c5f6d696e7465640b6275726e5f6576656e74730b6d696e745f6576656e7473126d7574617465645f6669656c645f6e616d650473656c660e6f626a6563745f61646472657373096e6f745f666f756e6404736f6d65046e6f6e65156372656174655f6f626a6563745f61646472657373066c656e6774680c6f75745f6f665f72616e67650562797465730b5472616e7366657252656610696e76616c69645f617267756d656e74136372656174655f6e616d65645f6f626a6563740f67656e65726174655f7369676e6572106e65775f6576656e745f68616e646c650a616464726573735f6f660769735f736f6d650c64657374726f795f736f6d650c64657374726f795f6e6f6e65076578747261637404696e69741567656e65726174655f7472616e736665725f7265661864697361626c655f756e67617465645f7472616e7366657206626f72726f770a656d69745f6576656e741b6f626a6563745f66726f6d5f636f6e7374727563746f725f7265660475746638000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000010308010000000000000003080300000000000000030802000000000000000308050000000000000003080600000000000000030804000000000000000308800000000000000003080008000000000000030800020000000000000a020c0b6465736372697074696f6e0a020403757269126170746f733a3a6d657461646174615f76318a050601000000000000001a45434f4c4c454354494f4e5f444f45535f4e4f545f45584953541d54686520636f6c6c656374696f6e20646f6573206e6f7420657869737402000000000000001b45434f4c4c454354494f4e5f535550504c595f45584345454445445e54686520636f6c6c656374696f6e2068617320726561636865642069747320737570706c7920616e64206e6f206d6f726520746f6b656e732063616e206265206d696e7465642c20756e6c65737320736f6d6520617265206275726e656403000000000000001945434f4c4c454354494f4e5f4e414d455f544f4f5f4c4f4e472e54686520636f6c6c656374696f6e206e616d65206973206f76657220746865206d6178696d756d206c656e67746804000000000000000d455552495f544f4f5f4c4f4e472254686520555249206973206f76657220746865206d6178696d756d206c656e677468050000000000000015454445534352495054494f4e5f544f4f5f4c4f4e472a546865206465736372697074696f6e206973206f76657220746865206d6178696d756d206c656e67746806000000000000001a454d41585f535550504c595f43414e4e4f545f42455f5a45524f1f546865206d617820737570706c79206d75737420626520706f736974697665030a436f6c6c656374696f6e010301183078313a3a6f626a6563743a3a4f626a65637447726f75700b4669786564537570706c79010301183078313a3a6f626a6563743a3a4f626a65637447726f75700f556e6c696d69746564537570706c79010301183078313a3a6f626a6563743a3a4f626a65637447726f75700503757269010100046e616d6501010005636f756e740101000763726561746f720101000b6465736372697074696f6e010100000202240300050102051b051d0809200809230809250b0c0108040202052703280329032a0b0c0108002b0b0c010803030202240300050402012c08090502012d05060204270329032a0b0c0108002b0b0c01080300010002020610240e0038000c030a0329010407050a07001110270a03290204140b032a0210001438010c0205220a032906041e0b032a0610011438010c01052038020c010b010c020b0202010100000a050b000b011102111302020100000a0f0a0011140706250406050b0b000107011115270b00111614020301000017740a02060000000000000000220405050a0b000107041117270e0311020c070a000b0711180c080e0811190c0d0600000000000000000b020600000000000000000e0d38030e0d380412020c100b000b080b010b030b040b050b1038050c110c130c0f0c0c0c0b0c090c0a0e0c1114070625043205370b0a0107011115270e131114070825043d05420b0a0107051115270e0b11140707250448054d0b0a0107031115270e0911190c0e0b0a111b0b0b0b0c0b130e0e380612010c060e0e0b062d010e11380704640e0e0b1138082d0205660b1138090e0f380a046d0e090d0f380b11200e0911210c120e1211220b09020401000027690e0211020c060a000b0611180c070e0711190c0c0600000000000000000600000000000000000e0c38030e0c380412060c0f0b000b070b010b020b030b040b0f380c0c100c120c0e0c0b0c0a0c080c090e0b11140706250427052c0b090107011115270e121114070825043205370b090107051115270e0a1114070725043d05420b090107031115270e0811190c0d0b09111b0b0a0b0b0b120e0d380612010c050e0d0b052d010e10380d04590e0d0b10380e2d06055b0b10380f0e0e380a04620e080d0e380b11200e0811210c110e1111220b080205000000295d0e0211020c060a000b0611180c070b000b070b010b020b030b0438100c0e0c100c0d0c0b0c0a0c080c090e0b1114070625041b05200b090107011115270e1011140708250426052b0b090107051115270e0a1114070725043105360b090107031115270e0811190c0c0b09111b0b0a0b0b0b100e0c380612010c050e0c0b052d010e0e3807044d0e0c0b0e38082d02054f0b0e38090e0d380a04560e080d0d380b11200e0811210c0f0e0f11220b08020601000101030f0e0038000c010a0129010407050a07001110270b012b01100214020703000202062a310b0038110c030a032902041a0b032a020c040a04100014060100000000000000170a040f00150b040f030e023812140b011200381305300a03290604300b032a060c050a05100114060100000000000000170a050f01150b050f040e023812140b0112003813020801000101030f0e0038000c010a0129010407050a07001110270b012b0110051402090100002e070b0038140c010e0138111205020a03000202062f5f0b0038110c040a04290204350b042a020c050a05100014060100000000000000160a050f00150a05100614060100000000000000160a050f06150a051000140a0510071425042205270b050107021115270a050f080a051006140b01120338150b0510061438010c03055d0a04290604590b042a060c060a06100114060100000000000000160a060f01150a06100914060100000000000000160a060f09150a060f0a0a061009140b01120338150b0610091438010c02055b38020c020b020c030b03020b01000101030f0e0038000c010a0129010407050a07001110270b012b01100b14020c0100010130280e0111140707250406050b0b000107031115270b000c030a03100c142901041305180b030107001110270b03100c142a010c020b010a020f05150b020f0d0709112612043816020d0100010130280e0111140708250406050b0b000107051115270b000c030a03100c142901041305180b030107001110270b03100c142a010c020b010a020f0e150b020f0d070a112612043816020e01000101030f0e0038000c010a0129010407050a07001110270b012b01100e1402020006000100020306020101020202010204060106030102050001040103000000",
+    "abi": {
+      "address": "0x4",
+      "name": "collection",
+      "friends": ["0x4::token"],
+      "exposed_functions": [
+        {
+          "name": "count",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": true,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["0x1::object::Object<T0>"],
+          "return": ["0x1::option::Option<u64>"]
+        },
+        {
+          "name": "create_collection_address",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": ["&address", "&0x1::string::String"],
+          "return": ["address"]
+        },
+        {
+          "name": "create_collection_seed",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": ["&0x1::string::String"],
+          "return": ["vector<u8>"]
+        },
+        {
+          "name": "create_fixed_collection",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [
+            "&signer",
+            "0x1::string::String",
+            "u64",
+            "0x1::string::String",
+            "0x1::option::Option<0x4::royalty::Royalty>",
+            "0x1::string::String"
+          ],
+          "return": ["0x1::object::ConstructorRef"]
+        },
+        {
+          "name": "create_unlimited_collection",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [
+            "&signer",
+            "0x1::string::String",
+            "0x1::string::String",
+            "0x1::option::Option<0x4::royalty::Royalty>",
+            "0x1::string::String"
+          ],
+          "return": ["0x1::object::ConstructorRef"]
+        },
+        {
+          "name": "creator",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": true,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["0x1::object::Object<T0>"],
+          "return": ["address"]
+        },
+        {
+          "name": "decrement_supply",
+          "visibility": "friend",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": ["&0x1::object::Object<0x4::collection::Collection>", "address", "0x1::option::Option<u64>"],
+          "return": []
+        },
+        {
+          "name": "description",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": true,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["0x1::object::Object<T0>"],
+          "return": ["0x1::string::String"]
+        },
+        {
+          "name": "generate_mutator_ref",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": ["&0x1::object::ConstructorRef"],
+          "return": ["0x4::collection::MutatorRef"]
+        },
+        {
+          "name": "increment_supply",
+          "visibility": "friend",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": ["&0x1::object::Object<0x4::collection::Collection>", "address"],
+          "return": ["0x1::option::Option<u64>"]
+        },
+        {
+          "name": "name",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": true,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["0x1::object::Object<T0>"],
+          "return": ["0x1::string::String"]
+        },
+        {
+          "name": "set_description",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": ["&0x4::collection::MutatorRef", "0x1::string::String"],
+          "return": []
+        },
+        {
+          "name": "set_uri",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": ["&0x4::collection::MutatorRef", "0x1::string::String"],
+          "return": []
+        },
+        {
+          "name": "uri",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": true,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["0x1::object::Object<T0>"],
+          "return": ["0x1::string::String"]
+        }
+      ],
+      "structs": [
+        {
+          "name": "BurnEvent",
+          "is_native": false,
+          "abilities": ["drop", "store"],
+          "generic_type_params": [],
+          "fields": [
+            {
+              "name": "index",
+              "type": "u64"
+            },
+            {
+              "name": "token",
+              "type": "address"
+            }
+          ]
+        },
+        {
+          "name": "Collection",
+          "is_native": false,
+          "abilities": ["key"],
+          "generic_type_params": [],
+          "fields": [
+            {
+              "name": "creator",
+              "type": "address"
+            },
+            {
+              "name": "description",
+              "type": "0x1::string::String"
+            },
+            {
+              "name": "name",
+              "type": "0x1::string::String"
+            },
+            {
+              "name": "uri",
+              "type": "0x1::string::String"
+            },
+            {
+              "name": "mutation_events",
+              "type": "0x1::event::EventHandle<0x4::collection::MutationEvent>"
+            }
+          ]
+        },
+        {
+          "name": "FixedSupply",
+          "is_native": false,
+          "abilities": ["key"],
+          "generic_type_params": [],
+          "fields": [
+            {
+              "name": "current_supply",
+              "type": "u64"
+            },
+            {
+              "name": "max_supply",
+              "type": "u64"
+            },
+            {
+              "name": "total_minted",
+              "type": "u64"
+            },
+            {
+              "name": "burn_events",
+              "type": "0x1::event::EventHandle<0x4::collection::BurnEvent>"
+            },
+            {
+              "name": "mint_events",
+              "type": "0x1::event::EventHandle<0x4::collection::MintEvent>"
+            }
+          ]
+        },
+        {
+          "name": "MintEvent",
+          "is_native": false,
+          "abilities": ["drop", "store"],
+          "generic_type_params": [],
+          "fields": [
+            {
+              "name": "index",
+              "type": "u64"
+            },
+            {
+              "name": "token",
+              "type": "address"
+            }
+          ]
+        },
+        {
+          "name": "MutationEvent",
+          "is_native": false,
+          "abilities": ["drop", "store"],
+          "generic_type_params": [],
+          "fields": [
+            {
+              "name": "mutated_field_name",
+              "type": "0x1::string::String"
+            }
+          ]
+        },
+        {
+          "name": "MutatorRef",
+          "is_native": false,
+          "abilities": ["drop", "store"],
+          "generic_type_params": [],
+          "fields": [
+            {
+              "name": "self",
+              "type": "address"
+            }
+          ]
+        },
+        {
+          "name": "UnlimitedSupply",
+          "is_native": false,
+          "abilities": ["key"],
+          "generic_type_params": [],
+          "fields": [
+            {
+              "name": "current_supply",
+              "type": "u64"
+            },
+            {
+              "name": "total_minted",
+              "type": "u64"
+            },
+            {
+              "name": "burn_events",
+              "type": "0x1::event::EventHandle<0x4::collection::BurnEvent>"
+            },
+            {
+              "name": "mint_events",
+              "type": "0x1::event::EventHandle<0x4::collection::MintEvent>"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "bytecode": "0xa11ceb0b060000000c010016021648035edc0304ba0452058c05a20407ae09a30e08d117400691183c10cd18f5040ac21d370cf91dce120dc7301c0000010101020103010401050106000700080009000a000b0800000c0800030d07010001060e070003250200092c0b0004370701000007380600093806000a430600034506000a38060008380600074e080003580600085d0a0003660200000f000101080010020102080200110304010800120304010800130304010800140501010800150601000016060700001705010108001803040108001903040108001a03040108001b03040108001c03040108001d03040108001e03040108001f030401080020030401080021030401080022030401080023030401080024080100002608090000270a010000280a0b000029080b00002a0c010108002b0c010108002d0d010108002e0e010108002f0c01010800300c01010800310c01010800320c0101080033050101080034000101080035020102080203471112010801481313000a4903120108054a141200014b131300084c150100084d170101020a4f0319010804501d04010008141e010004511f1001000a141c0100095221220004531023010007542409000355252600075625270004570123010003592528000956282900035a25030108045b1d2d0100035c2e0100025e0104000a523009000a5f30090007603112000361120301080a562532000a62251c000856251e00086333340008643501000365252c0003672e370003683801000369251200046a3b010100086b3c010007490312010807303e0100096c3f010007323e01000a304101000a314101000a32410100036d2e0100086c420100086e430101022510271004102b162c10251a2d1c2f1c32223227362732293629392a031a2d2c3a2c2d290d1a0e1a101a3622402a252a32323632321c361c362c3939032a4a2c4c103a273a291c1012103a3213101410551605060c0b02010900080308030a020004060c0b0201090008030901010b02010900010102060c0b0201090010060c080303080308030101010101010101010303010b0201080008060c08030803080308030a08030a08030a0a0201080409060c08030803080308030a08030a08030a0a0205010b0201080103060c0b02010900080303060c0b02010900080505060c0b0201090003030504060801060c060b020109000501090001060b020109000105010301060c0406080c080308030a020109010306080c08030900020b0201080d05010b0201080d01080d060608010b06010809060c080c060b020109000501080901060b0601090001080c01070b06010900090b060108070b0601080808000804050b060108070c08050b0601080803030305010805010b0601090006060c08030308030b06010805080301060804010c01080701080e0108080108000501060801060c060b020109000501080a010609000106080a0f08040501010b0601080b0b060108090801060800050b0201080008040b0601080b0608030c080f06060c0803080308030b06010805080302060506080301080b030a08030a08030a0a0201080f02060804080f020804080a0108100208100501080105050708010804060803080a02070b0601090009000206080c06080304060800060b0201090005060c02060807080302060808080503060c060b02010900050206080b08030406080c06080308030a020306080c06080309000b6170746f735f746f6b656e056572726f72086665617475726573066f626a656374066f7074696f6e067369676e657206737472696e670a636f6c6c656374696f6e0c70726f70657274795f6d617007726f79616c747905746f6b656e0f4170746f73436f6c6c656374696f6e0a4170746f73546f6b656e064f626a65637406537472696e670c6164645f70726f7065727479126164645f74797065645f70726f70657274791e6172655f636f6c6c656374696f6e5f746f6b656e735f6275726e61626c651f6172655f636f6c6c656374696f6e5f746f6b656e735f667265657a61626c65166172655f70726f706572746965735f6d757461626c65046275726e116372656174655f636f6c6c656374696f6e186372656174655f636f6c6c656374696f6e5f6f626a6563740f667265657a655f7472616e736665720b69735f6275726e61626c651769735f667265657a61626c655f62795f63726561746f722169735f6d757461626c655f636f6c6c656374696f6e5f6465736372697074696f6e1d69735f6d757461626c655f636f6c6c656374696f6e5f726f79616c74792769735f6d757461626c655f636f6c6c656374696f6e5f746f6b656e5f6465736372697074696f6e2069735f6d757461626c655f636f6c6c656374696f6e5f746f6b656e5f6e616d652669735f6d757461626c655f636f6c6c656374696f6e5f746f6b656e5f70726f706572746965731f69735f6d757461626c655f636f6c6c656374696f6e5f746f6b656e5f7572691969735f6d757461626c655f636f6c6c656374696f6e5f7572691669735f6d757461626c655f6465736372697074696f6e0f69735f6d757461626c655f6e616d650e69735f6d757461626c655f757269046d696e740e436f6e7374727563746f725265660d6d696e745f696e7465726e616c0f6d696e745f736f756c5f626f756e641c6d696e745f736f756c5f626f756e645f746f6b656e5f6f626a656374116d696e745f746f6b656e5f6f626a6563740f72656d6f76655f70726f70657274791a7365745f636f6c6c656374696f6e5f6465736372697074696f6e07526f79616c7479187365745f636f6c6c656374696f6e5f726f79616c746965731d7365745f636f6c6c656374696f6e5f726f79616c746965735f63616c6c127365745f636f6c6c656374696f6e5f7572690f7365745f6465736372697074696f6e087365745f6e616d65077365745f75726911756e667265657a655f7472616e736665720f7570646174655f70726f7065727479157570646174655f74797065645f70726f70657274790b6d757461746f725f726566064f7074696f6e0a4d757461746f7252656613726f79616c74795f6d757461746f725f726566136d757461626c655f6465736372697074696f6e0b6d757461626c655f757269196d757461626c655f746f6b656e5f6465736372697074696f6e126d757461626c655f746f6b656e5f6e616d65186d757461626c655f746f6b656e5f70726f70657274696573116d757461626c655f746f6b656e5f7572691a746f6b656e735f6275726e61626c655f62795f63726561746f721b746f6b656e735f667265657a61626c655f62795f63726561746f72086275726e5f726566074275726e5265660c7472616e736665725f7265660b5472616e736665725265661470726f70657274795f6d757461746f725f7265660e6f626a6563745f61646472657373096e6f745f666f756e640763726561746f720a616464726573735f6f66117065726d697373696f6e5f64656e69656403616464096164645f74797065640a436f6c6c656374696f6e11636f6c6c656374696f6e5f6f626a6563740769735f736f6d6507657874726163740663726561746504736f6d65176372656174655f66697865645f636f6c6c656374696f6e0f67656e65726174655f7369676e65721467656e65726174655f6d757461746f725f726566046e6f6e6509457874656e645265661367656e65726174655f657874656e645f7265661b6f626a6563745f66726f6d5f636f6e7374727563746f725f72656606626f72726f771864697361626c655f756e67617465645f7472616e736665720b50726f70657274794d61700d61756964735f656e61626c6564136372656174655f66726f6d5f6163636f756e74196372656174655f636f6c6c656374696f6e5f6164647265737311616464726573735f746f5f6f626a6563741167656e65726174655f6275726e5f7265660d707265706172655f696e70757404696e69741567656e65726174655f7472616e736665725f726566114c696e6561725472616e736665725265661c67656e65726174655f6c696e6561725f7472616e736665725f726566117472616e736665725f776974685f7265661c616464726573735f66726f6d5f636f6e7374727563746f725f7265660466696c6c0672656d6f76650675706461746517656e61626c655f756e67617465645f7472616e736665720c7570646174655f747970656400000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000001030801000000000000000308040000000000000003080300000000000000030806000000000000000308020000000000000003080500000000000000126170746f733a3a6d657461646174615f7631e0040601000000000000001a45434f4c4c454354494f4e5f444f45535f4e4f545f45584953541d54686520636f6c6c656374696f6e20646f6573206e6f7420657869737402000000000000001545544f4b454e5f444f45535f4e4f545f45584953541854686520746f6b656e20646f6573206e6f7420657869737403000000000000000c454e4f545f43524541544f52265468652070726f7669646564207369676e6572206973206e6f74207468652063726561746f72040000000000000012454649454c445f4e4f545f4d555441424c4526546865206669656c64206265696e67206368616e676564206973206e6f74206d757461626c6505000000000000001345544f4b454e5f4e4f545f4255524e41424c452654686520746f6b656e206265696e67206275726e6564206973206e6f74206275726e61626c650600000000000000174550524f504552544945535f4e4f545f4d555441424c452d5468652070726f7065727479206d6170206265696e67206d757461746564206973206e6f74206d757461626c65020a4170746f73546f6b656e010301183078313a3a6f626a6563743a3a4f626a65637447726f75700f4170746f73436f6c6c656374696f6e010301183078313a3a6f626a6563743a3a4f626a65637447726f7570060b69735f6275726e61626c650101000e69735f6d757461626c655f7572690101000f69735f6d757461626c655f6e616d65010100166172655f70726f706572746965735f6d757461626c650101001669735f6d757461626c655f6465736372697074696f6e0101001769735f667265657a61626c655f62795f63726561746f7201010000020a360b06010807390b060108083a013b013c013d013e013f0140014101010204420b06010809440b0601080a360b0601080b46080c0001040200010f300e010b000c060c070a0738000c080a082901040b05120b07010b060107041126270b071438010b06112821041a051d07021129270b082b010c050b013802042405290b050107031129270b0510000b020b030b04112a020101040200010f2f0e010b000c050c060a0638000c070a072901040b05120b06010b050107041126270b061438010b05112821041a051d07021129270b072b010c040b013802042405290b040107031129270b0410000b020b033803020201000100120f0e0038000c010a0129000407050a07001126270b012b00100114020301000100120f0e0038000c010a0129000407050a07001126270b012b0010021402040100010018120b0038040c010e0138050c020a022900040a050d07001126270b022b001003140205010401011b3a0e010b000c040c060a0638000c070a072901040b05120b06010b040107041126270b061438010b04112821041a051d07021129270b072b010c020a02100438060425052a0b020107051129270b02010e0138002c0113010c0501010c030b05112e0d0338071130020601040001130b000b010b020b030b040b050b060b070b080b090b0a0b0b0b0c0b0d0b0e0b0f1107010207010000203f0a0011280c140b0e0b0f0b1411310c170b000b010b020b030b1738080b0411330c130e1311340c160a050a071e041d0e13113538090c10051f380a0c100b100c150b0604290e1311371138380b0c11052b380c0c110b110c180b150b180b050b070b080b090b0a0b0b0b0c0b0d12000c120e160b122d000e13380d020801040200012b380e010b000c040c050a0538000c060a062901040b05120b05010b040107041126270b051438010b04112821041a051d07021129270b062b010c030b013804380e04290a031005380f0c02052b090c020b02042e05330b030107011129270b0310053810113b020901000101120f0e0038000c010a0129010407050a07041126270b012b0110043806020a0100010001040b003804380e020b01000100120f0e0038000c010a0129000407050a07001126270b012b00100614020c01000100120f0e0038000c010a0129000407050a07001126270b012b0010073811020d01000100120f0e0038000c010a0129000407050a07001126270b012b00100814020e01000100120f0e0038000c010a0129000407050a07001126270b012b00100914020f01000100120f0e0038000c010a0129000407050a07001126270b012b00100314021001000100120f0e0038000c010a0129000407050a07001126270b012b00100a14021101000100120f0e0038000c010a0129000407050a07001126270b012b00100b1402120100010001040b003804381202130100010001040b003804381302140100010001040b003804381402150104020001010b0b000b010b020b030b040b050b060b071119010216000001002f6d113c040b0a000a010b020b0338150b04113d0c0805130a000a010b020b0338150b04113e0c080b080c120e1211340c150b000e010c1411280c090e090b14113f38160c110e1138170c100a1029000429052c07001126270b102b000c0f0a0f1008140436080c0a053a0a0f1009140c0a0b0a043f080c0b05430a0f100a140c0b0b0b044a0e12114138180c0c054c38190c0c0b0c0c130b0f10011404570e121142381a0c0d0559381b0c0d0b0d381c0b130e12114312010c0e0e150b0e2d010b050b060b0711440c160e120b1611450b12021701040100010c0b000b010b020b030b040b050b060b070b0811180102180100010036160b000b010b020b030b040b050b060b0711160c090e0911460c0a0e0a11470b0811480e0a113b0e09381d021901000200013a230a000a010b020b030b040b050b060b0711160c0a0b000e010c0b11280c080e080b0b113f3816381e04200e0a11492a010c090e0a11460c0c0b090f050b0c381f0e0a381d021a01040200010f2e0e010b000c040c050a0538000c060a062901040b05120b05010b040107041126270b051438010b04112821041a051d07021129270b062b010c030b013802042405290b030107031129270b0310000e02114b021b010401003d300e010b000c060c040a0438000c050a052900040b05120b06010b040107001126270b041438200b06112821041a051d07021129270b052b000c030a031006140425052a0b030107011129270b03100c38210b02114d021c010001003d300e010b000c060c040a0438000c050a052900040b05120b06010b040107001126270b041438200b06112821041a051d07021129270b052b000c030a03100738110425052a0b030107011129270b03100738220b02114e021d00040100220a0b020b030b0411310c050b000b010b053823021e010401003d300e010b000c060c040a0438000c050a052900040b05120b06010b040107001126270b041438200b06112821041a051d07021129270b052b000c030a03100b140425052a0b030107011129270b03100c38210b02114f021f0104020001402d0a013824040405090b000107011129270e010b000c030c040a0438000c050a0529010414051b0b04010b030107041126270b041438010b031128210423052607021129270b052b01100d38250b02115002200104020001402d0a013826040405090b000107011129270e010b000c030c040a0438000c050a0529010414051b0b04010b030107041126270b041438010b031128210423052607021129270b052b01100d38250b02115102210104020001402d0a013827040405090b000107011129270e010b000c030c040a0438000c050a0529010414051b0b04010b030107041126270b041438010b031128210423052607021129270b052b01100d38250b021152022201040200012b380e010b000c040c050a0538000c060a062901040b05120b05010b040107041126270b051438010b04112821041a051d07021129270b062b010c030b013804380e04290a031005380f0c02052b090c020b02042e05330b030107011129270b03100538101153022301040200010f300e010b000c060c070a0738000c080a082901040b05120b07010b060107041126270b071438010b06112821041a051d07021129270b082b010c050b013802042405290b050107031129270b0510000e020b030b041154022401040200010f2f0e010b000c050c060a0638000c070a072901040b05120b06010b050107041126270b061438010b05112821041a051d07021129270b072b010c040b013802042405290b040107031129270b0410000e020b033828020103000800090006010001010002000100040005000700030000010200",
+    "abi": {
+      "address": "0x4",
+      "name": "aptos_token",
+      "friends": [],
+      "exposed_functions": [
+        {
+          "name": "add_property",
+          "visibility": "public",
+          "is_entry": true,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["&signer", "0x1::object::Object<T0>", "0x1::string::String", "0x1::string::String", "vector<u8>"],
+          "return": []
+        },
+        {
+          "name": "add_typed_property",
+          "visibility": "public",
+          "is_entry": true,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            },
+            {
+              "constraints": ["drop"]
+            }
+          ],
+          "params": ["&signer", "0x1::object::Object<T0>", "0x1::string::String", "T1"],
+          "return": []
+        },
+        {
+          "name": "are_collection_tokens_burnable",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["0x1::object::Object<T0>"],
+          "return": ["bool"]
+        },
+        {
+          "name": "are_collection_tokens_freezable",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["0x1::object::Object<T0>"],
+          "return": ["bool"]
+        },
+        {
+          "name": "are_properties_mutable",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": true,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["0x1::object::Object<T0>"],
+          "return": ["bool"]
+        },
+        {
+          "name": "burn",
+          "visibility": "public",
+          "is_entry": true,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["&signer", "0x1::object::Object<T0>"],
+          "return": []
+        },
+        {
+          "name": "create_collection",
+          "visibility": "public",
+          "is_entry": true,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [
+            "&signer",
+            "0x1::string::String",
+            "u64",
+            "0x1::string::String",
+            "0x1::string::String",
+            "bool",
+            "bool",
+            "bool",
+            "bool",
+            "bool",
+            "bool",
+            "bool",
+            "bool",
+            "bool",
+            "u64",
+            "u64"
+          ],
+          "return": []
+        },
+        {
+          "name": "create_collection_object",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [
+            "&signer",
+            "0x1::string::String",
+            "u64",
+            "0x1::string::String",
+            "0x1::string::String",
+            "bool",
+            "bool",
+            "bool",
+            "bool",
+            "bool",
+            "bool",
+            "bool",
+            "bool",
+            "bool",
+            "u64",
+            "u64"
+          ],
+          "return": ["0x1::object::Object<0x4::aptos_token::AptosCollection>"]
+        },
+        {
+          "name": "freeze_transfer",
+          "visibility": "public",
+          "is_entry": true,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["&signer", "0x1::object::Object<T0>"],
+          "return": []
+        },
+        {
+          "name": "is_burnable",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": true,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["0x1::object::Object<T0>"],
+          "return": ["bool"]
+        },
+        {
+          "name": "is_freezable_by_creator",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": true,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["0x1::object::Object<T0>"],
+          "return": ["bool"]
+        },
+        {
+          "name": "is_mutable_collection_description",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["0x1::object::Object<T0>"],
+          "return": ["bool"]
+        },
+        {
+          "name": "is_mutable_collection_royalty",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["0x1::object::Object<T0>"],
+          "return": ["bool"]
+        },
+        {
+          "name": "is_mutable_collection_token_description",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["0x1::object::Object<T0>"],
+          "return": ["bool"]
+        },
+        {
+          "name": "is_mutable_collection_token_name",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["0x1::object::Object<T0>"],
+          "return": ["bool"]
+        },
+        {
+          "name": "is_mutable_collection_token_properties",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["0x1::object::Object<T0>"],
+          "return": ["bool"]
+        },
+        {
+          "name": "is_mutable_collection_token_uri",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["0x1::object::Object<T0>"],
+          "return": ["bool"]
+        },
+        {
+          "name": "is_mutable_collection_uri",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["0x1::object::Object<T0>"],
+          "return": ["bool"]
+        },
+        {
+          "name": "is_mutable_description",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": true,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["0x1::object::Object<T0>"],
+          "return": ["bool"]
+        },
+        {
+          "name": "is_mutable_name",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": true,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["0x1::object::Object<T0>"],
+          "return": ["bool"]
+        },
+        {
+          "name": "is_mutable_uri",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": true,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["0x1::object::Object<T0>"],
+          "return": ["bool"]
+        },
+        {
+          "name": "mint",
+          "visibility": "public",
+          "is_entry": true,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [
+            "&signer",
+            "0x1::string::String",
+            "0x1::string::String",
+            "0x1::string::String",
+            "0x1::string::String",
+            "vector<0x1::string::String>",
+            "vector<0x1::string::String>",
+            "vector<vector<u8>>"
+          ],
+          "return": []
+        },
+        {
+          "name": "mint_soul_bound",
+          "visibility": "public",
+          "is_entry": true,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [
+            "&signer",
+            "0x1::string::String",
+            "0x1::string::String",
+            "0x1::string::String",
+            "0x1::string::String",
+            "vector<0x1::string::String>",
+            "vector<0x1::string::String>",
+            "vector<vector<u8>>",
+            "address"
+          ],
+          "return": []
+        },
+        {
+          "name": "mint_soul_bound_token_object",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [
+            "&signer",
+            "0x1::string::String",
+            "0x1::string::String",
+            "0x1::string::String",
+            "0x1::string::String",
+            "vector<0x1::string::String>",
+            "vector<0x1::string::String>",
+            "vector<vector<u8>>",
+            "address"
+          ],
+          "return": ["0x1::object::Object<0x4::aptos_token::AptosToken>"]
+        },
+        {
+          "name": "mint_token_object",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [
+            "&signer",
+            "0x1::string::String",
+            "0x1::string::String",
+            "0x1::string::String",
+            "0x1::string::String",
+            "vector<0x1::string::String>",
+            "vector<0x1::string::String>",
+            "vector<vector<u8>>"
+          ],
+          "return": ["0x1::object::Object<0x4::aptos_token::AptosToken>"]
+        },
+        {
+          "name": "remove_property",
+          "visibility": "public",
+          "is_entry": true,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["&signer", "0x1::object::Object<T0>", "0x1::string::String"],
+          "return": []
+        },
+        {
+          "name": "set_collection_description",
+          "visibility": "public",
+          "is_entry": true,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["&signer", "0x1::object::Object<T0>", "0x1::string::String"],
+          "return": []
+        },
+        {
+          "name": "set_collection_royalties",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["&signer", "0x1::object::Object<T0>", "0x4::royalty::Royalty"],
+          "return": []
+        },
+        {
+          "name": "set_collection_royalties_call",
+          "visibility": "private",
+          "is_entry": true,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["&signer", "0x1::object::Object<T0>", "u64", "u64", "address"],
+          "return": []
+        },
+        {
+          "name": "set_collection_uri",
+          "visibility": "public",
+          "is_entry": true,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["&signer", "0x1::object::Object<T0>", "0x1::string::String"],
+          "return": []
+        },
+        {
+          "name": "set_description",
+          "visibility": "public",
+          "is_entry": true,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["&signer", "0x1::object::Object<T0>", "0x1::string::String"],
+          "return": []
+        },
+        {
+          "name": "set_name",
+          "visibility": "public",
+          "is_entry": true,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["&signer", "0x1::object::Object<T0>", "0x1::string::String"],
+          "return": []
+        },
+        {
+          "name": "set_uri",
+          "visibility": "public",
+          "is_entry": true,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["&signer", "0x1::object::Object<T0>", "0x1::string::String"],
+          "return": []
+        },
+        {
+          "name": "unfreeze_transfer",
+          "visibility": "public",
+          "is_entry": true,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["&signer", "0x1::object::Object<T0>"],
+          "return": []
+        },
+        {
+          "name": "update_property",
+          "visibility": "public",
+          "is_entry": true,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["&signer", "0x1::object::Object<T0>", "0x1::string::String", "0x1::string::String", "vector<u8>"],
+          "return": []
+        },
+        {
+          "name": "update_typed_property",
+          "visibility": "public",
+          "is_entry": true,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            },
+            {
+              "constraints": ["drop"]
+            }
+          ],
+          "params": ["&signer", "0x1::object::Object<T0>", "0x1::string::String", "T1"],
+          "return": []
+        }
+      ],
+      "structs": [
+        {
+          "name": "AptosCollection",
+          "is_native": false,
+          "abilities": ["key"],
+          "generic_type_params": [],
+          "fields": [
+            {
+              "name": "mutator_ref",
+              "type": "0x1::option::Option<0x4::collection::MutatorRef>"
+            },
+            {
+              "name": "royalty_mutator_ref",
+              "type": "0x1::option::Option<0x4::royalty::MutatorRef>"
+            },
+            {
+              "name": "mutable_description",
+              "type": "bool"
+            },
+            {
+              "name": "mutable_uri",
+              "type": "bool"
+            },
+            {
+              "name": "mutable_token_description",
+              "type": "bool"
+            },
+            {
+              "name": "mutable_token_name",
+              "type": "bool"
+            },
+            {
+              "name": "mutable_token_properties",
+              "type": "bool"
+            },
+            {
+              "name": "mutable_token_uri",
+              "type": "bool"
+            },
+            {
+              "name": "tokens_burnable_by_creator",
+              "type": "bool"
+            },
+            {
+              "name": "tokens_freezable_by_creator",
+              "type": "bool"
+            }
+          ]
+        },
+        {
+          "name": "AptosToken",
+          "is_native": false,
+          "abilities": ["key"],
+          "generic_type_params": [],
+          "fields": [
+            {
+              "name": "burn_ref",
+              "type": "0x1::option::Option<0x4::token::BurnRef>"
+            },
+            {
+              "name": "transfer_ref",
+              "type": "0x1::option::Option<0x1::object::TransferRef>"
+            },
+            {
+              "name": "mutator_ref",
+              "type": "0x1::option::Option<0x4::token::MutatorRef>"
+            },
+            {
+              "name": "property_mutator_ref",
+              "type": "0x4::property_map::MutatorRef"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "bytecode": "0xa11ceb0b060000000c0100120212220334960204ca022c05f602f00207e605d90408bf0a4006ff0ae50110e40cf0040ad411180cec11ea140dd6260800000101010201030104010501060107010800090600000a0a00000b0600060c0700041007010001041202000527070200000000000d000100000e02010102000f0301000011040501080013060300001407010000150809010800160a0b000017040c01080018040d0108001904050108001a040e0108001b040f0108001c04100108001d04110108001e04120108001f0413010800200409010800210414010800221501000023160100002417010102062a0e0f00022b090900032c0e0500032d0e1400032e0e1100032f0e130003300e090003310e100003320e120003330e0d0003340e0f000235090900050d1a010204040736010f010001371d0e01000438080d010805111e050204040439060d00043a061f0005152009020404053b0122020404083c230501000615240900053d1e2602040403370e0e0005222728020404053e272a0204042219231c241c251c261929192a192b0f2d19081c230d2305230e230f2310231123122313230923142f19301904060800080308030a0200030608000803090001080002060b0401090006080301010106080502060805080101060b040109000103030a08030a08030a0a020108010208030a020105010a020108030104010d010f010e0102020608000608030406080006080308030a0203060800060803090011020202020202020202080302060800080302020a020a02020803080203070b060209000901090009010f0202020202020202020803060800020803020a020109000106090002060b060209000901060900010c01060b06020900090115020a02020803070b06020803080202020202020202020b060208030802080303020803020a020a02010b06020900090101060a0900010608030b080308030803080308030803080308030803060802020106090102070b06020900090106090002090009011202020202020202020206080302070802060800080302020a020a020107090110020202020202020202060803070802060800020803020a020c70726f70657274795f6d617003626373056572726f720866726f6d5f626373066f626a6563740a73696d706c655f6d617006737472696e6709747970655f696e666f06766563746f720a4d757461746f725265660b50726f70657274794d61700d50726f706572747956616c756506537472696e6703616464096164645f7479706564046275726e064f626a6563740c636f6e7461696e735f6b65790e436f6e7374727563746f725265661467656e65726174655f6d757461746f725f72656604696e6974066c656e6774680d707265706172655f696e70757404726561640c726561645f6164647265737309726561645f626f6f6c0a726561645f62797465730b726561645f737472696e6709726561645f7531323808726561645f75313609726561645f7532353608726561645f75333208726561645f75363407726561645f75380672656d6f7665067570646174650c7570646174655f74797065640473656c6605696e6e65720953696d706c654d617004747970650576616c7565047574663810696e76616c69645f617267756d656e7407746f5f626f6f6c05746f5f753806746f5f75313606746f5f75333206746f5f75363407746f5f7531323807746f5f753235360a746f5f6164647265737309746f5f737472696e67096e6f745f666f756e6409747970655f6e616d6508746f5f62797465730e6f626a6563745f616464726573731c616464726573735f66726f6d5f636f6e7374727563746f725f7265660f67656e65726174655f7369676e6572066372656174650869735f656d70747906626f72726f770a626f72726f775f6d75740000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000102010702010002010803080200000000000000030805000000000000000308040000000000000003080100000000000000030808000000000000000308030000000000000003080700000000000000030806000000000000000308e803000000000000030880000000000000000201090201050201020201060201030201040201010a020504626f6f6c0a02030275380a0204037531360a0204037533320a0204037536340a020504753132380a020504753235360a020807616464726573730a020b0a766563746f723c75383e0a0214133078313a3a737472696e673a3a537472696e67126170746f733a3a6d657461646174615f7631db040801000000000000001c4550524f50455254595f4d41505f444f45535f4e4f545f45584953541f5468652070726f7065727479206d617020646f6573206e6f74206578697374020000000000000023454b45595f414c52454144595f4558495354535f494e5f50524f50455254595f4d41501f5468652070726f7065727479206b657920616c72656164792065786973747303000000000000001445544f4f5f4d414e595f50524f504552544945532c546865206e756d626572206f662070726f70657274696573206578636565647320746865206d6178696d756d040000000000000019454b45595f56414c55455f434f554e545f4d49534d415443482a50726f7065727479206b657920616e642076616c756520636f756e747320646f206e6f74206d61746368050000000000000018454b45595f545950455f434f554e545f4d49534d415443482950726f7065727479206b657920616e64207479706520636f756e747320646f206e6f74206d6174636806000000000000000e45545950455f4d49534d415443482b50726f70657274792076616c756520646f6573206e6f74206d61746368206578706563746564207479706507000000000000000d45545950455f494e56414c49441c496e76616c69642076616c756520747970652073706563696669656408000000000000001a4550524f50455254595f4d41505f4b45595f544f4f5f4c4f4e4723546865206b6579206f66207468652070726f706572747920697320746f6f206c6f6e67010b50726f70657274794d6170010301183078313a3a6f626a6563743a3a4f626a65637447726f7570000002012505010201260b0602080308020202022802290a02000100010118dd010b020c100a100714111621040a07010c0405670a100715111621041207130c0c05650a100716111621041a070f0c0b05630a100717111621042207110c0a05610a100718111621042a07120c09055f0a1007191116210432070e0c08055d0a10071a111621043a07100c07055b0a10071b111621044207000c0605590a10071c111621044a07020c0505570b10071d111621045005550b00010709111727070d0c050b050c060b060c070b070c080b080c090b090c0a0b0a0c0b0b0b0c0c0b0c0c040b040c0e0a0e0a030c130c110a1107012104750b1311180105bf010a11071321047d0b1311190105bf010a11070f210485010b13111a0105bf010a11071121048d010b13111b0105bf010a110712210495010b13111c0105bf010a11070e21049d010b13111d0105bf010a1107102104a5010b13111e0105bf010a1107002104ad010b13111f0105bf010a1107022104b20105bf010b11070d2104b70105bc010b0001070a1117270b131120010b000b010b0e0b030c140c120c0d0c0f0a0f100014290104cd0105d2010b0f0107061121270b0f1000142a010f010b0d0b120b14120238000201010001011b880138010c0f0a0f0714111621040a07010c0305670a0f0715111621041207130c0b05650a0f0716111621041a070f0c0a05630a0f0717111621042207110c0905610a0f0718111621042a07120c08055f0a0f07191116210432070e0c07055d0a0f071a111621043a07100c06055b0a0f071b111621044207000c0505590a0f071c111621044a07020c0405570b0f071d111621045005550b00010709111727070d0c040b040c050b050c060b060c070b070c080b080c090b090c0a0b0a0c0b0b0b0c030b030c0e0b000b010b0e0e0238020c110c100c0c0c0d0a0d10001429010478057d0b0d0107061121270b0d1000142a010f010b0c0b100b111202380002020100010101060e001000142c010102030100010101130a00380329010405050c0b00010b010107061121270b0038032b0110010b013804020401000001040b001127120002050100001f070b0011280c020e020b012d0102060100010101100a00380329010405050a0b000107061121270b0038032b011001380502070100002181020e00410f0c120a12070b250408050b07081117270a120e02410e210411051407051117270b120e01410f21041a051d070411172738060c100e0038072004fe0105240d00450f0c110e11112c070c25042d053007071117270d02450e0c160d01450f0c140a140714111621043e07010c030599010a140715111621044607130c0f0597010a140716111621044e070f0c0e0595010a140717111621045607110c0d0593010a140718111621045e07120c0c0591010a1407191116210466070e0c0b058f010a14071a111621046e07100c0a058d010a14071b111621047607000c09058b010a14071c111621047e07020c080589010b14071d1116210484010587010709111727070d0c080b080c090b090c0a0b0a0c0b0b0b0c0c0b0c0c0d0b0d0c0e0b0e0c0f0b0f0c030b030c130a130a160c170c150a1507012104a7010b1711180105ef010a1507132104af010b1711190105ef010a15070f2104b7010b17111a0105ef010a1507112104bf010b17111b0105ef010a1507122104c7010b17111c0105ef010a15070e2104cf010b17111d0105ef010a1507102104d7010b17111e0105ef010a1507002104df010b17111f0105ef010a1507022104e40105ef010b15070d2104e90105ec01070a1117270b171120010d100c070b110c060b160c040b130c050b070b060b050b0412023800051f0b1012010208010001012581010a00380329010405050c0b00010b010107061121270b0038032b0110010b0138080c0b0a0b1002140c0c0a0c070121041f071411160c02057c0a0c0713210427071511160c0a057a0a0c070f21042f071611160c0905780a0c0711210437071711160c0805760a0c071221043f071811160c0705740a0c070e210447071911160c0605720a0c071021044f071a11160c0505700a0c0700210457071b11160c04056e0a0c070221045f071c11160c03056c0b0c070d21046405690b0b010709111727071d11160c030b030c040b040c050b050c060b060c070b070c080b080c090b090c0a0b0a0c020b020b0b1003140209010001010e0e0b000b0138090c02380a210408050b070a1117270b02111f020a010001010e0e0b000b0138090c02380b210408050b070a1117270b021118020b010001010e0e0b000b0138090c02380c210408050b070a1117270b02112e020c010001010e0e0b000b0138090c02380d210408050b070a1117270b021120020d010001010e0e0b000b0138090c02380e210408050b070a1117270b02111d020e010001010e0e0b000b0138090c02380f210408050b070a1117270b02111a020f010001010e0e0b000b0138090c023810210408050b070a1117270b02111e0210010001010e0e0b000b0138090c023811210408050b070a1117270b02111b0211010001010e0e0b000b0138090c023812210408050b070a1117270b02111c0212010001010e0e0b000b0138090c023813210408050b070a1117270b02111902130100010101170a0010001429010406050d0b00010b010107061121270b001000142a010f010b013814010102140100010129e6010b020c110a110714111621040a07010c0405690a110715111621041207130c0c05670a110716111621041a070f0c0b05650a110717111621042207110c0a05630a110718111621042a07120c0905610a1107191116210432070e0c08055f0a11071a111621043a07100c07055d0a11071b111621044207000c06055b0a11071c111621044a07020c0505590b11071d111621045005570b00010b01010709111727070d0c050b050c060b060c070b070c080b080c090b090c0a0b0a0c0b0b0b0c0c0b0c0c040b040c0e0a0e0a030c140c120a1207012104770b1411180105c3010a12071321047f0b1411190105c3010a12070f210487010b14111a0105c3010a12071121048f010b14111b0105c3010a120712210497010b14111c0105c3010a12070e21049f010b14111d0105c3010a1207102104a7010b14111e0105c3010a1207002104af010b14111f0105c3010a1207022104b40105c3010b12070d2104b90105c0010b00010b0101070a1117270b141120010b000b010b0e0b030c150c130c0d0c100a10100014290104d10105d8010b10010b0d0107061121270b101000142a010f010b0d38150c0f0b130b1512020b0f150215010001012b8f0138010c100a100714111621040a07010c0305690a100715111621041207130c0b05670a100716111621041a070f0c0a05650a100717111621042207110c0905630a100718111621042a07120c0805610a1007191116210432070e0c07055f0a10071a111621043a07100c06055d0a10071b111621044207000c05055b0a10071c111621044a07020c0405590b10071d111621045005570b00010b01010709111727070d0c040b040c050b050c060b060c070b070c080b080c090b090c0a0b0a0c0b0b0b0c030b030c0f0b000b010b0f0e0238020c120c110c0c0c0e0a0e1000142901047a0581010b0e010b0c0107061121270b0e1000142a010f010b0c38150c0d0b110b1212020b0d1502000001000200020100",
+    "abi": {
+      "address": "0x4",
+      "name": "property_map",
+      "friends": [],
+      "exposed_functions": [
+        {
+          "name": "add",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": ["&0x4::property_map::MutatorRef", "0x1::string::String", "0x1::string::String", "vector<u8>"],
+          "return": []
+        },
+        {
+          "name": "add_typed",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": ["drop"]
+            }
+          ],
+          "params": ["&0x4::property_map::MutatorRef", "0x1::string::String", "T0"],
+          "return": []
+        },
+        {
+          "name": "burn",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": ["0x4::property_map::MutatorRef"],
+          "return": []
+        },
+        {
+          "name": "contains_key",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["&0x1::object::Object<T0>", "&0x1::string::String"],
+          "return": ["bool"]
+        },
+        {
+          "name": "generate_mutator_ref",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": ["&0x1::object::ConstructorRef"],
+          "return": ["0x4::property_map::MutatorRef"]
+        },
+        {
+          "name": "init",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": ["&0x1::object::ConstructorRef", "0x4::property_map::PropertyMap"],
+          "return": []
+        },
+        {
+          "name": "length",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["&0x1::object::Object<T0>"],
+          "return": ["u64"]
+        },
+        {
+          "name": "prepare_input",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": ["vector<0x1::string::String>", "vector<0x1::string::String>", "vector<vector<u8>>"],
+          "return": ["0x4::property_map::PropertyMap"]
+        },
+        {
+          "name": "read",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["&0x1::object::Object<T0>", "&0x1::string::String"],
+          "return": ["0x1::string::String", "vector<u8>"]
+        },
+        {
+          "name": "read_address",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["&0x1::object::Object<T0>", "&0x1::string::String"],
+          "return": ["address"]
+        },
+        {
+          "name": "read_bool",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["&0x1::object::Object<T0>", "&0x1::string::String"],
+          "return": ["bool"]
+        },
+        {
+          "name": "read_bytes",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["&0x1::object::Object<T0>", "&0x1::string::String"],
+          "return": ["vector<u8>"]
+        },
+        {
+          "name": "read_string",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["&0x1::object::Object<T0>", "&0x1::string::String"],
+          "return": ["0x1::string::String"]
+        },
+        {
+          "name": "read_u128",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["&0x1::object::Object<T0>", "&0x1::string::String"],
+          "return": ["u128"]
+        },
+        {
+          "name": "read_u16",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["&0x1::object::Object<T0>", "&0x1::string::String"],
+          "return": ["u16"]
+        },
+        {
+          "name": "read_u256",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["&0x1::object::Object<T0>", "&0x1::string::String"],
+          "return": ["u256"]
+        },
+        {
+          "name": "read_u32",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["&0x1::object::Object<T0>", "&0x1::string::String"],
+          "return": ["u32"]
+        },
+        {
+          "name": "read_u64",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["&0x1::object::Object<T0>", "&0x1::string::String"],
+          "return": ["u64"]
+        },
+        {
+          "name": "read_u8",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": ["key"]
+            }
+          ],
+          "params": ["&0x1::object::Object<T0>", "&0x1::string::String"],
+          "return": ["u8"]
+        },
+        {
+          "name": "remove",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": ["&0x4::property_map::MutatorRef", "&0x1::string::String"],
+          "return": []
+        },
+        {
+          "name": "update",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": ["&0x4::property_map::MutatorRef", "&0x1::string::String", "0x1::string::String", "vector<u8>"],
+          "return": []
+        },
+        {
+          "name": "update_typed",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": ["drop"]
+            }
+          ],
+          "params": ["&0x4::property_map::MutatorRef", "&0x1::string::String", "T0"],
+          "return": []
+        }
+      ],
+      "structs": [
+        {
+          "name": "MutatorRef",
+          "is_native": false,
+          "abilities": ["drop", "store"],
+          "generic_type_params": [],
+          "fields": [
+            {
+              "name": "self",
+              "type": "address"
+            }
+          ]
+        },
+        {
+          "name": "PropertyMap",
+          "is_native": false,
+          "abilities": ["drop", "key"],
+          "generic_type_params": [],
+          "fields": [
+            {
+              "name": "inner",
+              "type": "0x1::simple_map::SimpleMap<0x1::string::String, 0x4::property_map::PropertyValue>"
+            }
+          ]
+        },
+        {
+          "name": "PropertyValue",
+          "is_native": false,
+          "abilities": ["drop", "store"],
+          "generic_type_params": [],
+          "fields": [
+            {
+              "name": "type",
+              "type": "u8"
+            },
+            {
+              "name": "value",
+              "type": "vector<u8>"
+            }
+          ]
+        }
+      ]
+    }
+  }
+]

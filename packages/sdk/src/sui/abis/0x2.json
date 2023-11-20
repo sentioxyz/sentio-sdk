@@ -90,6 +90,179 @@
       }
     }
   },
+  "authenticator_state": {
+    "fileFormatVersion": 6,
+    "address": "0x2",
+    "name": "authenticator_state",
+    "friends": [],
+    "structs": {
+      "ActiveJwk": {
+        "abilities": {
+          "abilities": ["Copy", "Drop", "Store"]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "jwk_id",
+            "type": {
+              "Struct": {
+                "address": "0x2",
+                "module": "authenticator_state",
+                "name": "JwkId",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "jwk",
+            "type": {
+              "Struct": {
+                "address": "0x2",
+                "module": "authenticator_state",
+                "name": "JWK",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "epoch",
+            "type": "U64"
+          }
+        ]
+      },
+      "AuthenticatorState": {
+        "abilities": {
+          "abilities": ["Key"]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "id",
+            "type": {
+              "Struct": {
+                "address": "0x2",
+                "module": "object",
+                "name": "UID",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "version",
+            "type": "U64"
+          }
+        ]
+      },
+      "AuthenticatorStateInner": {
+        "abilities": {
+          "abilities": ["Store"]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "version",
+            "type": "U64"
+          },
+          {
+            "name": "active_jwks",
+            "type": {
+              "Vector": {
+                "Struct": {
+                  "address": "0x2",
+                  "module": "authenticator_state",
+                  "name": "ActiveJwk",
+                  "typeArguments": []
+                }
+              }
+            }
+          }
+        ]
+      },
+      "JWK": {
+        "abilities": {
+          "abilities": ["Copy", "Drop", "Store"]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "kty",
+            "type": {
+              "Struct": {
+                "address": "0x1",
+                "module": "string",
+                "name": "String",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "e",
+            "type": {
+              "Struct": {
+                "address": "0x1",
+                "module": "string",
+                "name": "String",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "n",
+            "type": {
+              "Struct": {
+                "address": "0x1",
+                "module": "string",
+                "name": "String",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "alg",
+            "type": {
+              "Struct": {
+                "address": "0x1",
+                "module": "string",
+                "name": "String",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      },
+      "JwkId": {
+        "abilities": {
+          "abilities": ["Copy", "Drop", "Store"]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "iss",
+            "type": {
+              "Struct": {
+                "address": "0x1",
+                "module": "string",
+                "name": "String",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "kid",
+            "type": {
+              "Struct": {
+                "address": "0x1",
+                "module": "string",
+                "name": "String",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {}
+  },
   "bag": {
     "fileFormatVersion": 6,
     "address": "0x2",
@@ -4980,7 +5153,12 @@
     "fileFormatVersion": 6,
     "address": "0x2",
     "name": "kiosk",
-    "friends": [],
+    "friends": [
+      {
+        "address": "0x2",
+        "name": "kiosk_extension"
+      }
+    ],
     "structs": {
       "Borrow": {
         "abilities": {
@@ -5523,6 +5701,24 @@
           }
         ]
       },
+      "default": {
+        "visibility": "Private",
+        "isEntry": true,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": []
+      },
       "delist": {
         "visibility": "Public",
         "isEntry": false,
@@ -5743,6 +5939,33 @@
         ],
         "return": ["U32"]
       },
+      "kiosk_owner_cap_for": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "kiosk",
+                "name": "KioskOwnerCap",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "object",
+              "name": "ID",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
       "list": {
         "visibility": "Public",
         "isEntry": false,
@@ -5897,6 +6120,31 @@
         ],
         "return": []
       },
+      "lock_internal": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Store", "Key"]
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "kiosk",
+                "name": "Kiosk",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "TypeParameter": 0
+          }
+        ],
+        "return": []
+      },
       "new": {
         "visibility": "Public",
         "isEntry": false,
@@ -6018,6 +6266,31 @@
             "TypeParameter": 0
           },
           "U64"
+        ],
+        "return": []
+      },
+      "place_internal": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Store", "Key"]
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "kiosk",
+                "name": "Kiosk",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "TypeParameter": 0
+          }
         ],
         "return": []
       },
@@ -6617,6 +6890,35 @@
           }
         ]
       },
+      "uid_mut_internal": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "kiosk",
+                "name": "Kiosk",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "object",
+                "name": "UID",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      },
       "withdraw": {
         "visibility": "Public",
         "isEntry": false,
@@ -6677,6 +6979,454 @@
                   }
                 }
               ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "kiosk_extension": {
+    "fileFormatVersion": 6,
+    "address": "0x2",
+    "name": "kiosk_extension",
+    "friends": [],
+    "structs": {
+      "Extension": {
+        "abilities": {
+          "abilities": ["Store"]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "storage",
+            "type": {
+              "Struct": {
+                "address": "0x2",
+                "module": "bag",
+                "name": "Bag",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "permissions",
+            "type": "U128"
+          },
+          {
+            "name": "is_enabled",
+            "type": "Bool"
+          }
+        ]
+      },
+      "ExtensionKey": {
+        "abilities": {
+          "abilities": ["Copy", "Drop", "Store"]
+        },
+        "typeParameters": [
+          {
+            "constraints": {
+              "abilities": []
+            },
+            "isPhantom": true
+          }
+        ],
+        "fields": [
+          {
+            "name": "dummy_field",
+            "type": "Bool"
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {
+      "add": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Drop"]
+          }
+        ],
+        "parameters": [
+          {
+            "TypeParameter": 0
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "kiosk",
+                "name": "Kiosk",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "kiosk",
+                "name": "KioskOwnerCap",
+                "typeArguments": []
+              }
+            }
+          },
+          "U128",
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": []
+      },
+      "can_lock": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Drop"]
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "kiosk",
+                "name": "Kiosk",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": ["Bool"]
+      },
+      "can_place": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Drop"]
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "kiosk",
+                "name": "Kiosk",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": ["Bool"]
+      },
+      "disable": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Drop"]
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "kiosk",
+                "name": "Kiosk",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "kiosk",
+                "name": "KioskOwnerCap",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": []
+      },
+      "enable": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Drop"]
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "kiosk",
+                "name": "Kiosk",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "kiosk",
+                "name": "KioskOwnerCap",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": []
+      },
+      "is_enabled": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Drop"]
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "kiosk",
+                "name": "Kiosk",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": ["Bool"]
+      },
+      "is_installed": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Drop"]
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "kiosk",
+                "name": "Kiosk",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": ["Bool"]
+      },
+      "lock": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Drop"]
+          },
+          {
+            "abilities": ["Store", "Key"]
+          }
+        ],
+        "parameters": [
+          {
+            "TypeParameter": 0
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "kiosk",
+                "name": "Kiosk",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "TypeParameter": 1
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "transfer_policy",
+                "name": "TransferPolicy",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 1
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": []
+      },
+      "place": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Drop"]
+          },
+          {
+            "abilities": ["Store", "Key"]
+          }
+        ],
+        "parameters": [
+          {
+            "TypeParameter": 0
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "kiosk",
+                "name": "Kiosk",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "TypeParameter": 1
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "transfer_policy",
+                "name": "TransferPolicy",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 1
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": []
+      },
+      "remove": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Drop"]
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "kiosk",
+                "name": "Kiosk",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "kiosk",
+                "name": "KioskOwnerCap",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": []
+      },
+      "storage": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Drop"]
+          }
+        ],
+        "parameters": [
+          {
+            "TypeParameter": 0
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "kiosk",
+                "name": "Kiosk",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "bag",
+                "name": "Bag",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      },
+      "storage_mut": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Drop"]
+          }
+        ],
+        "parameters": [
+          {
+            "TypeParameter": 0
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "kiosk",
+                "name": "Kiosk",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "bag",
+                "name": "Bag",
+                "typeArguments": []
+              }
             }
           }
         ]
@@ -7550,6 +8300,10 @@
     "friends": [
       {
         "address": "0x2",
+        "name": "authenticator_state"
+      },
+      {
+        "address": "0x2",
         "name": "clock"
       },
       {
@@ -7599,6 +8353,22 @@
       }
     },
     "exposedFunctions": {
+      "authenticator_state": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "object",
+              "name": "UID",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
       "borrow_id": {
         "visibility": "Public",
         "isEntry": false,
@@ -10509,6 +11279,30 @@
         ],
         "return": []
       },
+      "drop": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Drop", "Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "table_vec",
+              "name": "TableVec",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          }
+        ],
+        "return": []
+      },
       "empty": {
         "visibility": "Public",
         "isEntry": false,
@@ -10692,6 +11486,65 @@
             }
           }
         ]
+      },
+      "swap": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "table_vec",
+                "name": "TableVec",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          },
+          "U64",
+          "U64"
+        ],
+        "return": []
+      },
+      "swap_remove": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "table_vec",
+                "name": "TableVec",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          },
+          "U64"
+        ],
+        "return": [
+          {
+            "TypeParameter": 0
+          }
+        ]
       }
     }
   },
@@ -10700,7 +11553,38 @@
     "address": "0x2",
     "name": "transfer",
     "friends": [],
-    "structs": {},
+    "structs": {
+      "Receiving": {
+        "abilities": {
+          "abilities": ["Drop"]
+        },
+        "typeParameters": [
+          {
+            "constraints": {
+              "abilities": ["Key"]
+            },
+            "isPhantom": true
+          }
+        ],
+        "fields": [
+          {
+            "name": "id",
+            "type": {
+              "Struct": {
+                "address": "0x2",
+                "module": "object",
+                "name": "ID",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "version",
+            "type": "U64"
+          }
+        ]
+      }
+    },
     "exposedFunctions": {
       "freeze_object": {
         "visibility": "Public",
@@ -10777,6 +11661,44 @@
           "Address"
         ],
         "return": []
+      },
+      "receive": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Key"]
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "object",
+                "name": "UID",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "transfer",
+              "name": "Receiving",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          }
+        ],
+        "return": [
+          {
+            "TypeParameter": 0
+          }
+        ]
       },
       "share_object": {
         "visibility": "Public",
@@ -11247,6 +12169,38 @@
             }
           }
         ]
+      },
+      "default": {
+        "visibility": "Private",
+        "isEntry": true,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "package",
+                "name": "Publisher",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": []
       },
       "destroy_and_withdraw": {
         "visibility": "Public",
@@ -11873,6 +12827,30 @@
       }
     },
     "exposedFunctions": {
+      "digest": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Reference": {
+              "Vector": "U8"
+            }
+          }
+        ]
+      },
       "epoch": {
         "visibility": "Public",
         "isEntry": false,
@@ -13063,6 +14041,40 @@
         ],
         "return": ["Bool"]
       },
+      "keys": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Copy", "Drop"]
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "vec_set",
+                "name": "VecSet",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Reference": {
+              "Vector": {
+                "TypeParameter": 0
+              }
+            }
+          }
+        ]
+      },
       "remove": {
         "visibility": "Public",
         "isEntry": false,
@@ -13404,6 +14416,456 @@
           }
         ],
         "return": ["U64"]
+      }
+    }
+  },
+  "zklogin_verified_id": {
+    "fileFormatVersion": 6,
+    "address": "0x2",
+    "name": "zklogin_verified_id",
+    "friends": [],
+    "structs": {
+      "VerifiedID": {
+        "abilities": {
+          "abilities": ["Key"]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "id",
+            "type": {
+              "Struct": {
+                "address": "0x2",
+                "module": "object",
+                "name": "UID",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "owner",
+            "type": "Address"
+          },
+          {
+            "name": "key_claim_name",
+            "type": {
+              "Struct": {
+                "address": "0x1",
+                "module": "string",
+                "name": "String",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "key_claim_value",
+            "type": {
+              "Struct": {
+                "address": "0x1",
+                "module": "string",
+                "name": "String",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "issuer",
+            "type": {
+              "Struct": {
+                "address": "0x1",
+                "module": "string",
+                "name": "String",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "audience",
+            "type": {
+              "Struct": {
+                "address": "0x1",
+                "module": "string",
+                "name": "String",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {
+      "audience": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "zklogin_verified_id",
+                "name": "VerifiedID",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x1",
+                "module": "string",
+                "name": "String",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      },
+      "check_zklogin_id": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "Address",
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x1",
+                "module": "string",
+                "name": "String",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x1",
+                "module": "string",
+                "name": "String",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x1",
+                "module": "string",
+                "name": "String",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x1",
+                "module": "string",
+                "name": "String",
+                "typeArguments": []
+              }
+            }
+          },
+          "U256"
+        ],
+        "return": ["Bool"]
+      },
+      "issuer": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "zklogin_verified_id",
+                "name": "VerifiedID",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x1",
+                "module": "string",
+                "name": "String",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      },
+      "key_claim_name": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "zklogin_verified_id",
+                "name": "VerifiedID",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x1",
+                "module": "string",
+                "name": "String",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      },
+      "key_claim_value": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "zklogin_verified_id",
+                "name": "VerifiedID",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x1",
+                "module": "string",
+                "name": "String",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      },
+      "owner": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "zklogin_verified_id",
+                "name": "VerifiedID",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": ["Address"]
+      },
+      "verify_zklogin_id": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "string",
+              "name": "String",
+              "typeArguments": []
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "string",
+              "name": "String",
+              "typeArguments": []
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "string",
+              "name": "String",
+              "typeArguments": []
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "string",
+              "name": "String",
+              "typeArguments": []
+            }
+          },
+          "U256",
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": []
+      }
+    }
+  },
+  "zklogin_verified_issuer": {
+    "fileFormatVersion": 6,
+    "address": "0x2",
+    "name": "zklogin_verified_issuer",
+    "friends": [],
+    "structs": {
+      "VerifiedIssuer": {
+        "abilities": {
+          "abilities": ["Key"]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "id",
+            "type": {
+              "Struct": {
+                "address": "0x2",
+                "module": "object",
+                "name": "UID",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "owner",
+            "type": "Address"
+          },
+          {
+            "name": "issuer",
+            "type": {
+              "Struct": {
+                "address": "0x1",
+                "module": "string",
+                "name": "String",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {
+      "check_zklogin_issuer": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "Address",
+          "U256",
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x1",
+                "module": "string",
+                "name": "String",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": ["Bool"]
+      },
+      "issuer": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "zklogin_verified_issuer",
+                "name": "VerifiedIssuer",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x1",
+                "module": "string",
+                "name": "String",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      },
+      "owner": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "zklogin_verified_issuer",
+                "name": "VerifiedIssuer",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": ["Address"]
+      },
+      "verify_zklogin_issuer": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U256",
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "string",
+              "name": "String",
+              "typeArguments": []
+            }
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": []
       }
     }
   }

@@ -414,8 +414,8 @@ importers:
         specifier: ^0.29.0
         version: 0.29.0(@solana/web3.js@1.78.3)
       '@mysten/sui.js':
-        specifier: ~0.45.0
-        version: 0.45.1
+        specifier: ~0.46.1
+        version: 0.46.1
       '@project-serum/anchor':
         specifier: ^0.26.0
         version: 0.26.0
@@ -438,14 +438,14 @@ importers:
         specifier: ^1.78.3
         version: 1.78.3
       '@typemove/aptos':
-        specifier: ~1.2.6
-        version: 1.2.6
+        specifier: ~1.2.7
+        version: 1.2.7
       '@typemove/move':
-        specifier: ~1.2.6
-        version: 1.2.6
+        specifier: ~1.2.7
+        version: 1.2.7
       '@typemove/sui':
-        specifier: ~1.2.6
-        version: 1.2.6
+        specifier: ~1.2.7
+        version: 1.2.7
       aptos:
         specifier: ~1.20.0
         version: 1.20.0
@@ -2902,6 +2902,26 @@ packages:
       - utf-8-validate
     dev: false
 
+  /@mysten/sui.js@0.46.1:
+    resolution: {integrity: sha512-YSqay1RJbstJt1AILoAcucWhm72ywB//qQrECl1b3CNiuAHG5iYUxlQk7i0a+2+cBnhlVvkOU4PePBMkABqn3w==}
+    engines: {node: '>=16'}
+    dependencies:
+      '@mysten/bcs': 0.8.1
+      '@noble/curves': 1.1.0
+      '@noble/hashes': 1.3.2
+      '@open-rpc/client-js': 1.8.1
+      '@scure/bip32': 1.3.1
+      '@scure/bip39': 1.2.1
+      '@suchipi/femver': 1.0.0
+      events: 3.3.0
+      superstruct: 1.0.3
+      tweetnacl: 1.0.3
+    transitivePeerDependencies:
+      - bufferutil
+      - encoding
+      - utf-8-validate
+    dev: false
+
   /@noble/curves@1.1.0:
     resolution: {integrity: sha512-091oBExgENk/kGj3AZmtBDMpxQPDtxQABR2B9lb1JbVTs6ytdzZNwvhxQ4MWasRNEzlbEH8jCWFCwhF/Obj5AA==}
     dependencies:
@@ -3539,11 +3559,11 @@ packages:
   /@tsconfig/node16@1.0.3:
     resolution: {integrity: sha512-yOlFc+7UtL/89t2ZhjPvvB/DeAr3r+Dq58IgzsFkOAvVC6NMJXmCGjbptdXdR9qsX7pKcTL+s87FtYREi2dEEQ==}
 
-  /@typemove/aptos@1.2.6:
-    resolution: {integrity: sha512-kAhmcRPO0VrE+9PtwaqFZQbon7FBQelMmiVFRV+u1s5h72qZkSfgGUXSu5egPEascAhnv1s7R6EKvcb8eT/DVQ==}
+  /@typemove/aptos@1.2.7:
+    resolution: {integrity: sha512-XlpqFSvcT8ctTp/iOrRRewxTCjQ4J+/5UYjiNsvhN4iefrl7t1mRgb1MAD5vKqKaI57eqWlFopByNme+PeSf8g==}
     hasBin: true
     dependencies:
-      '@typemove/move': 1.2.6
+      '@typemove/move': 1.2.7
       aptos: 1.20.0
       chalk: 5.3.0
       commander: 11.1.0
@@ -3553,20 +3573,20 @@ packages:
       - debug
     dev: false
 
-  /@typemove/move@1.2.6:
-    resolution: {integrity: sha512-3sruZ3Ndznc9tZMVMoLbzbgphqeXnXWHLJzSSSwIW6SQ6LdbRrb85N86foxifMckHfAvidzXcU8n7xx9bnsmew==}
+  /@typemove/move@1.2.7:
+    resolution: {integrity: sha512-KwCaVDd+M3eUSjJBENHe5VQasGzB9i192cfzdxv+USpzkk3rc68UEHAcusjUcRpyJP3hhE8OW0OLvRUqp2p47A==}
     dependencies:
       chalk: 5.3.0
       radash: 11.0.0
     dev: false
 
-  /@typemove/sui@1.2.6:
-    resolution: {integrity: sha512-CbVGy1RG2fN89TsaKYwfkOEudSaYfcS3TDMsxLCon67f+2gxXYRFOg11CTqKiKXwjxhyuz4KIA5DlXu+SQdtAQ==}
+  /@typemove/sui@1.2.7:
+    resolution: {integrity: sha512-aDkUvH/JUvEneoYX97A5hKrQ8ZhIyyCWn4E+ow5rkluAfuMnf07x0UqZaT/ZNfwjNWkHgBKqkqxsRYrfLkIX1g==}
     hasBin: true
     dependencies:
       '@mysten/bcs': 0.8.1
-      '@mysten/sui.js': 0.45.1
-      '@typemove/move': 1.2.6
+      '@mysten/sui.js': 0.46.1
+      '@typemove/move': 1.2.7
       chalk: 5.3.0
       commander: 11.1.0
       prettier: 3.0.3
