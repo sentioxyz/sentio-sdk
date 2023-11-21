@@ -235,13 +235,13 @@ importers:
         version: 9.0.0
       ts-jest:
         specifier: ^29.1.0
-        version: 29.1.0(@babel/core@7.23.0)(@jest/types@29.5.0)(esbuild@0.17.19)(jest@29.5.0)(typescript@5.2.2)
+        version: 29.1.0(@babel/core@7.22.5)(@jest/types@29.5.0)(esbuild@0.17.19)(jest@29.5.0)(typescript@5.2.2)
       ts-node:
         specifier: ^10.9.1
         version: 10.9.1(@types/node@18.14.0)(typescript@5.2.2)
       tsup:
-        specifier: npm:@sentio/tsup@^6.7.0
-        version: /@sentio/tsup@6.7.0(ts-node@10.9.1)(typescript@5.2.2)
+        specifier: npm:@sentio/tsup@^6.7.2
+        version: /@sentio/tsup@6.7.2(ts-node@10.9.1)(typescript@5.2.2)
       yaml:
         specifier: ^2.2.1
         version: 2.2.1
@@ -504,8 +504,8 @@ importers:
         specifier: npm:superstruct@^0.14.2
         version: /superstruct@0.14.2
       tsup:
-        specifier: npm:@sentio/tsup@^6.7.0
-        version: /@sentio/tsup@6.7.0(ts-node@10.9.1)(typescript@5.2.2)
+        specifier: npm:@sentio/tsup@^6.7.2
+        version: /@sentio/tsup@6.7.2(ts-node@10.9.1)(typescript@5.2.2)
       typechain:
         specifier: ^8.0.0
         version: 8.1.1(jest@29.5.0)(typescript@5.2.2)
@@ -2577,7 +2577,7 @@ packages:
       '@jest/test-result': 29.5.0
       '@jest/transform': 29.5.0
       '@jest/types': 29.6.3
-      '@jridgewell/trace-mapping': 0.3.18
+      '@jridgewell/trace-mapping': 0.3.19
       '@types/node': 18.18.0
       chalk: 4.1.2
       collect-v8-coverage: 1.0.1
@@ -2709,7 +2709,7 @@ packages:
     dependencies:
       '@babel/core': 7.22.5
       '@jest/types': 29.6.3
-      '@jridgewell/trace-mapping': 0.3.18
+      '@jridgewell/trace-mapping': 0.3.19
       babel-plugin-istanbul: 6.1.1
       chalk: 4.1.2
       convert-source-map: 2.0.0
@@ -2777,10 +2777,6 @@ packages:
       '@jridgewell/sourcemap-codec': 1.4.15
       '@jridgewell/trace-mapping': 0.3.19
 
-  /@jridgewell/resolve-uri@3.1.0:
-    resolution: {integrity: sha512-F2msla3tad+Mfht5cJq7LSXcdudKTWCVYUgw6pLFOOHSTtZlj6SWNYAp+AhuqLmWdBO2X5hPrLcu8cVP8fy28w==}
-    engines: {node: '>=6.0.0'}
-
   /@jridgewell/resolve-uri@3.1.1:
     resolution: {integrity: sha512-dSYZh7HhCDtCKm4QakX0xFpsRDqjjtZf/kjI/v3T3Nwt5r8/qz/M19F9ySyOqU94SXBmeG9ttTul+YnR4LOxFA==}
     engines: {node: '>=6.0.0'}
@@ -2789,17 +2785,8 @@ packages:
     resolution: {integrity: sha512-xnkseuNADM0gt2bs+BvhO0p78Mk762YnZdsuzFV018NoG1Sj1SCQvpSqa7XUaTam5vAGasABV9qXASMKnFMwMw==}
     engines: {node: '>=6.0.0'}
 
-  /@jridgewell/sourcemap-codec@1.4.14:
-    resolution: {integrity: sha512-XPSJHWmi394fuUuzDnGz1wiKqWfo1yXecHQMRf2l6hztTO+nPru658AyDngaBe7isIxEkRsPR3FZh+s7iVa4Uw==}
-
   /@jridgewell/sourcemap-codec@1.4.15:
     resolution: {integrity: sha512-eF2rxCRulEKXHTRiDrDy6erMYWqNw4LPdQ8UQA4huuxaQsVeRPFl2oM8oDGxMFhJUWZf9McpLtJasDDZb/Bpeg==}
-
-  /@jridgewell/trace-mapping@0.3.18:
-    resolution: {integrity: sha512-w+niJYzMHdd7USdiH2U6869nqhD2nbfZXND5Yp93qIbEmnDNk7PD48o+YchRVpzMU7M6jVCbenTR7PA1FLQ9pA==}
-    dependencies:
-      '@jridgewell/resolve-uri': 3.1.0
-      '@jridgewell/sourcemap-codec': 1.4.14
 
   /@jridgewell/trace-mapping@0.3.19:
     resolution: {integrity: sha512-kf37QtfW+Hwx/buWGMPcR60iF9ziHa6r/CZJIHbmcm4+0qrXiVdxegAH0F6yddEVQ7zdkjcGCgCzUu+BcbhQxw==}
@@ -2810,7 +2797,7 @@ packages:
   /@jridgewell/trace-mapping@0.3.9:
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
     dependencies:
-      '@jridgewell/resolve-uri': 3.1.0
+      '@jridgewell/resolve-uri': 3.1.1
       '@jridgewell/sourcemap-codec': 1.4.15
 
   /@ls-lint/ls-lint@2.1.0:
@@ -3367,8 +3354,8 @@ packages:
       - bufferutil
       - utf-8-validate
 
-  /@sentio/tsup@6.7.0(ts-node@10.9.1)(typescript@5.2.2):
-    resolution: {integrity: sha512-tyQNVHKLSu3WIYQPerZVajJsMHxXmEcMwmacfampY6/PqdAmFptcMuCuklUlMPad//ponOjRjR+RZddw88O7Hw==}
+  /@sentio/tsup@6.7.2(ts-node@10.9.1)(typescript@5.2.2):
+    resolution: {integrity: sha512-bKY2Hn03poUeYqvuvxm/Irkt9qpNo2wrg1QQHh5Jd/XTu1XypaPWIEnavFXkMd4xMzFazibkrjoPi99yY3G5cQ==}
     engines: {node: '>=14.18'}
     hasBin: true
     peerDependencies:
@@ -3393,7 +3380,7 @@ packages:
       joycon: 3.1.1
       postcss-load-config: 3.1.4(ts-node@10.9.1)
       resolve-from: 5.0.0
-      rollup: 3.29.3
+      rollup: 3.29.4
       source-map: 0.8.0-beta.0
       sucrase: 3.34.0
       tree-kill: 1.2.2
@@ -10326,8 +10313,8 @@ packages:
       bn.js: 5.2.1
     dev: true
 
-  /rollup@3.29.3:
-    resolution: {integrity: sha512-T7du6Hum8jOkSWetjRgbwpM6Sy0nECYrYRSmZjayFcOddtKJWU4d17AC3HNUk7HRuqy4p+G7aEZclSHytqUmEg==}
+  /rollup@3.29.4:
+    resolution: {integrity: sha512-oWzmBZwvYrU0iJHtDmhsm662rC15FRXmcjCk1xD771dFDx5jJ02ufAQQTn0etB2emNk4J9EZg/yWKpsn9BWGRw==}
     engines: {node: '>=14.18.0', npm: '>=8.0.0'}
     hasBin: true
     optionalDependencies:
@@ -11270,7 +11257,7 @@ packages:
     dev: true
     optional: true
 
-  /ts-jest@29.1.0(@babel/core@7.23.0)(@jest/types@29.5.0)(esbuild@0.17.19)(jest@29.5.0)(typescript@5.2.2):
+  /ts-jest@29.1.0(@babel/core@7.22.5)(@jest/types@29.5.0)(esbuild@0.17.19)(jest@29.5.0)(typescript@5.2.2):
     resolution: {integrity: sha512-ZhNr7Z4PcYa+JjMl62ir+zPiNJfXJN6E8hSLnaUKhOgqcn8vb3e537cpkd0FuAfRK3sR1LSqM1MOhliXNgOFPA==}
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
     hasBin: true
@@ -11291,7 +11278,7 @@ packages:
       esbuild:
         optional: true
     dependencies:
-      '@babel/core': 7.23.0
+      '@babel/core': 7.22.5
       '@jest/types': 29.5.0
       bs-logger: 0.2.6
       esbuild: 0.17.19
