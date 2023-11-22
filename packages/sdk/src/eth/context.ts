@@ -70,19 +70,6 @@ export abstract class EthContext extends BaseContext {
         labels: normalizeLabels(labels)
       }
     }
-    if (this.block) {
-      return {
-        address: this.address,
-        contractName: this.getContractName(),
-        blockNumber: BigInt(this.blockNumber),
-        transactionIndex: -1,
-        transactionHash: '',
-        logIndex: -1,
-        chainId: this.chainId.toString(),
-        name: name,
-        labels: normalizeLabels(labels)
-      }
-    }
     if (this.trace) {
       return {
         address: this.address,
@@ -103,6 +90,19 @@ export abstract class EthContext extends BaseContext {
         blockNumber: BigInt(this.blockNumber),
         transactionIndex: this.transaction.index || 0,
         transactionHash: this.transaction.hash || '',
+        logIndex: -1,
+        chainId: this.chainId.toString(),
+        name: name,
+        labels: normalizeLabels(labels)
+      }
+    }
+    if (this.block) {
+      return {
+        address: this.address,
+        contractName: this.getContractName(),
+        blockNumber: BigInt(this.blockNumber),
+        transactionIndex: -1,
+        transactionHash: '',
         logIndex: -1,
         chainId: this.chainId.toString(),
         name: name,
