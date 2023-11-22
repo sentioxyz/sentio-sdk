@@ -67,7 +67,7 @@ export abstract class EthContext extends BaseContext {
         logIndex: this.log.index,
         chainId: this.chainId,
         name: name,
-        labels: normalizeLabels(labels),
+        labels: normalizeLabels(labels)
       }
     }
     if (this.block) {
@@ -80,7 +80,7 @@ export abstract class EthContext extends BaseContext {
         logIndex: -1,
         chainId: this.chainId.toString(),
         name: name,
-        labels: normalizeLabels(labels),
+        labels: normalizeLabels(labels)
       }
     }
     if (this.trace) {
@@ -93,7 +93,20 @@ export abstract class EthContext extends BaseContext {
         logIndex: -1,
         chainId: this.chainId.toString(),
         name: name,
-        labels: normalizeLabels(labels),
+        labels: normalizeLabels(labels)
+      }
+    }
+    if (this.transaction) {
+      return {
+        address: this.address,
+        contractName: this.getContractName(),
+        blockNumber: BigInt(this.blockNumber),
+        transactionIndex: this.transaction.index || 0,
+        transactionHash: this.transaction.hash || '',
+        logIndex: -1,
+        chainId: this.chainId.toString(),
+        name: name,
+        labels: normalizeLabels(labels)
       }
     }
     throw new Error("Invaid ctx argument can't happen")
