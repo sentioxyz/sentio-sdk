@@ -74,12 +74,14 @@ export class SuiObjectChangeContext extends MoveContext<SuiNetwork, SuiMoveNorma
   timestamp: Date
   checkpoint: bigint
   coder: MoveCoder
+  txDigest: string
 
   constructor(
     network: SuiNetwork,
     address: string,
     timestamp: Date,
     checkpoint: bigint,
+    txDigest: string,
     baseLabels: Labels | undefined
   ) {
     super(baseLabels)
@@ -87,6 +89,7 @@ export class SuiObjectChangeContext extends MoveContext<SuiNetwork, SuiMoveNorma
     this.network = network
     this.timestamp = timestamp
     this.checkpoint = checkpoint
+    this.txDigest = txDigest
     this.coder = defaultMoveCoder(network)
   }
 
@@ -103,8 +106,8 @@ export class SuiObjectChangeContext extends MoveContext<SuiNetwork, SuiMoveNorma
       address: this.address,
       contractName: '*',
       blockNumber: this.checkpoint,
-      transactionIndex: 0,
-      transactionHash: '',
+      transactionIndex: -1,
+      transactionHash: this.txDigest,
       logIndex: 0,
       chainId: this.getChainId(),
       name: name,
