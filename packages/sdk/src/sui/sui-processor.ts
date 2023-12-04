@@ -245,30 +245,16 @@ export class SuiBaseProcessor {
     const processor = this
     this.objectChangeHandlers.push({
       handler: async function (data: Data_SuiObjectChange) {
-        const txBundle = new Map<string, SuiObjectChange[]>()
-        for (const change of data.changes as SuiObjectChange[]) {
-          // @ts-ignore force cast
-          const key = change.txDigest
-          if (!txBundle.has(key)) {
-            txBundle.set(key, [])
-          }
-          txBundle.get(key)?.push(change)
-        }
-
-        const processResults = []
-        for (const [key, changes] of txBundle.entries()) {
-          const ctx = new SuiObjectChangeContext(
-            processor.config.network,
-            processor.config.address,
-            data.timestamp || new Date(0),
-            data.slot,
-            key,
-            processor.config.baseLabels
-          )
-          await handler(changes, ctx)
-          processResults.push(ctx.stopAndGetResult())
-        }
-        return mergeProcessResults(processResults)
+        const ctx = new SuiObjectChangeContext(
+          processor.config.network,
+          processor.config.address,
+          data.timestamp || new Date(0),
+          data.slot,
+          data.txDigest,
+          processor.config.baseLabels
+        )
+        await handler(data.changes as SuiObjectChange[], ctx)
+        return ctx.stopAndGetResult()
       },
       type
     })

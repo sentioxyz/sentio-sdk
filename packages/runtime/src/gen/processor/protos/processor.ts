@@ -692,6 +692,7 @@ export interface Data_SuiObject {
 export interface Data_SuiObjectChange {
   changes: { [key: string]: any }[];
   timestamp: Date | undefined;
+  txDigest: string;
   slot: bigint;
 }
 
@@ -4844,7 +4845,7 @@ export const Data_SuiObject = {
 };
 
 function createBaseData_SuiObjectChange(): Data_SuiObjectChange {
-  return { changes: [], timestamp: undefined, slot: BigInt("0") };
+  return { changes: [], timestamp: undefined, txDigest: "", slot: BigInt("0") };
 }
 
 export const Data_SuiObjectChange = {
@@ -4854,6 +4855,9 @@ export const Data_SuiObjectChange = {
     }
     if (message.timestamp !== undefined) {
       Timestamp.encode(toTimestamp(message.timestamp), writer.uint32(18).fork()).ldelim();
+    }
+    if (message.txDigest !== "") {
+      writer.uint32(34).string(message.txDigest);
     }
     if (message.slot !== BigInt("0")) {
       writer.uint32(24).uint64(message.slot.toString());
@@ -4874,6 +4878,9 @@ export const Data_SuiObjectChange = {
         case 2:
           message.timestamp = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
           break;
+        case 4:
+          message.txDigest = reader.string();
+          break;
         case 3:
           message.slot = longToBigint(reader.uint64() as Long);
           break;
@@ -4889,6 +4896,7 @@ export const Data_SuiObjectChange = {
     return {
       changes: Array.isArray(object?.changes) ? [...object.changes] : [],
       timestamp: isSet(object.timestamp) ? fromJsonTimestamp(object.timestamp) : undefined,
+      txDigest: isSet(object.txDigest) ? String(object.txDigest) : "",
       slot: isSet(object.slot) ? BigInt(object.slot) : BigInt("0"),
     };
   },
@@ -4901,6 +4909,7 @@ export const Data_SuiObjectChange = {
       obj.changes = [];
     }
     message.timestamp !== undefined && (obj.timestamp = message.timestamp.toISOString());
+    message.txDigest !== undefined && (obj.txDigest = message.txDigest);
     message.slot !== undefined && (obj.slot = message.slot.toString());
     return obj;
   },
@@ -4913,6 +4922,7 @@ export const Data_SuiObjectChange = {
     const message = createBaseData_SuiObjectChange();
     message.changes = object.changes?.map((e) => e) || [];
     message.timestamp = object.timestamp ?? undefined;
+    message.txDigest = object.txDigest ?? "";
     message.slot = object.slot ?? BigInt("0");
     return message;
   },

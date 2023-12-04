@@ -391,6 +391,7 @@ message Data {
   message SuiObjectChange {
     repeated google.protobuf.Struct changes = 1;
     google.protobuf.Timestamp timestamp = 2;
+    string tx_digest = 4;
     uint64 slot = 3;
   }
 
