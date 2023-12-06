@@ -6,15 +6,20 @@ import {
   AptosContext,
   AptosNetwork,
   MoveModuleBytecode,
-  Event,
+  Event
 } from '@sentio/sdk/aptos'
 import { MoveCoinList, MoveDex, moveGetPairValue, MovePoolAdaptor, SimpleCoinInfo } from '../../move/ext/index.js'
 
 export type PoolAdaptor<T> = MovePoolAdaptor<MoveResource, T>
 
-export class CoinList implements MoveCoinList {
-  calculateValueInUsd(amount: bigint, coinInfo: SimpleCoinInfo, timestamp: number): Promise<BigDecimal> {
-    return calculateValueInUsd(amount, coinInfo, timestamp)
+export class CoinList implements MoveCoinList<AptosNetwork> {
+  calculateValueInUsd(
+    amount: bigint,
+    coinInfo: SimpleCoinInfo,
+    timestamp: number,
+    network: AptosNetwork = AptosNetwork.MAIN_NET
+  ): Promise<BigDecimal> {
+    return calculateValueInUsd(amount, coinInfo, timestamp, network)
   }
 
   getCoinInfo(type: string): SimpleCoinInfo {

@@ -7,7 +7,7 @@ import { SuiContext, SuiObjectContext } from '../context.js'
 
 export type PoolAdaptor<T> = MovePoolAdaptor<SuiMoveObject, T>
 
-export class CoinList implements MoveCoinList {
+export class CoinList implements MoveCoinList<SuiNetwork> {
   calculateValueInUsd(amount: bigint, coinInfo: SimpleCoinInfo, timestamp: number): Promise<BigDecimal> {
     return calculateValueInUsd(amount, coinInfo, timestamp)
   }

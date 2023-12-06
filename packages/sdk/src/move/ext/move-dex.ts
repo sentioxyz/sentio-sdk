@@ -30,7 +30,7 @@ export class MoveDex<
   AccountContextType extends MoveAccountContext<Network, ModuleType, StructType | EventType>,
   T
 > {
-  coinList: MoveCoinList
+  coinList: MoveCoinList<Network>
   poolAdaptor: MovePoolAdaptor<StructType, T>
   volume: Gauge
   volumeByCoin: Gauge
@@ -77,10 +77,10 @@ export class MoveDex<
     const pair = await this.getPair(coinx, coiny)
     const baseLabels: Record<string, string> = extraLabels ? { ...extraLabels, pair } : { pair }
     if (whitelistx) {
-      resultX = await this.coinList.calculateValueInUsd(coinXAmount, coinXInfo, timestamp)
+      resultX = await this.coinList.calculateValueInUsd(coinXAmount, coinXInfo, timestamp, ctx.network)
     }
     if (whitelisty) {
-      resultY = await this.coinList.calculateValueInUsd(coinYAmount, coinYInfo, timestamp)
+      resultY = await this.coinList.calculateValueInUsd(coinYAmount, coinYInfo, timestamp, ctx.network)
     }
     if (resultX.eq(0)) {
       resultX = BigDecimal(resultY)
@@ -150,7 +150,7 @@ export class MoveDex<
       let resultY = BigDecimal(0)
 
       if (whitelistx) {
-        resultX = await this.coinList.calculateValueInUsd(coinx_amount, coinXInfo, timestamp)
+        resultX = await this.coinList.calculateValueInUsd(coinx_amount, coinXInfo, timestamp, ctx.network)
         let coinXTotal = volumeByCoin.get(coinXInfo.token_type.type)
         if (!coinXTotal) {
           coinXTotal = resultX
@@ -160,7 +160,7 @@ export class MoveDex<
         volumeByCoin.set(coinXInfo.token_type.type, coinXTotal)
       }
       if (whitelisty) {
-        resultY = await this.coinList.calculateValueInUsd(coiny_amount, coinYInfo, timestamp)
+        resultY = await this.coinList.calculateValueInUsd(coiny_amount, coinYInfo, timestamp, ctx.network)
         let coinYTotal = volumeByCoin.get(coinYInfo.token_type.type)
         if (!coinYTotal) {
           coinYTotal = resultY
@@ -217,8 +217,8 @@ export class MoveDex<
   }
 }
 
-export async function moveGetPairValue<ContextType extends MoveAccountContext<any, any, any>>(
-  coinList: MoveCoinList,
+export async function moveGetPairValue<Network, ContextType extends MoveAccountContext<Network, any, any>>(
+  coinList: MoveCoinList<Network>,
   ctx: ContextType,
   coinx: string,
   coiny: string,
@@ -237,7 +237,7 @@ export async function moveGetPairValue<ContextType extends MoveAccountContext<an
   }
 
   if (whitelistx) {
-    const value = await coinList.calculateValueInUsd(coinXAmount, coinXInfo, timestamp)
+    const value = await coinList.calculateValueInUsd(coinXAmount, coinXInfo, timestamp, ctx.network)
     result = value
 
     if (!whitelisty) {
@@ -245,7 +245,7 @@ export async function moveGetPairValue<ContextType extends MoveAccountContext<an
     }
   }
   if (whitelisty) {
-    const value = await coinList.calculateValueInUsd(coinYAmount, coinYInfo, timestamp)
+    const value = await coinList.calculateValueInUsd(coinYAmount, coinYInfo, timestamp, ctx.network)
 
     if (!whitelistx) {
       result = result.plus(value)

@@ -62,21 +62,30 @@ export function getCoinInfo(type: string): SimpleCoinInfo {
   return r
 }
 
-export async function getPrice(coinType: string, timestamp: number): Promise<number> {
+export async function getPrice(
+  coinType: string,
+  timestamp: number,
+  network = AptosChainId.APTOS_MAINNET
+): Promise<number> {
   if (!whiteListed(coinType)) {
     return 0.0
   }
   const date = new Date(timestamp / 1000)
   try {
-    return (await getPriceByType(AptosChainId.APTOS_MAINNET, coinType, date)) || 0
+    return (await getPriceByType(network, coinType, date)) || 0
   } catch (error) {
     console.log(JSON.stringify(error))
     throw error
   }
 }
 
-export async function calculateValueInUsd(n: bigint, coinInfo: SimpleCoinInfo, timestamp: number) {
-  const price = await getPrice(coinInfo.token_type.type, timestamp)
+export async function calculateValueInUsd(
+  n: bigint,
+  coinInfo: SimpleCoinInfo,
+  timestamp: number,
+  network = AptosChainId.APTOS_MAINNET
+) {
+  const price = await getPrice(coinInfo.token_type.type, timestamp, network)
   const amount = n.scaleDown(coinInfo.decimals)
   return amount.multipliedBy(price)
 }
