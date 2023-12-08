@@ -6,7 +6,7 @@ settings:
 
 overrides:
   '@grpc/grpc-js': ^1.8.21
-  ethers: npm:@sentio/ethers@6.7.1-patch.3
+  ethers: npm:@sentio/ethers@6.7.1-patch.4
   superstruct: ^1.0.3
 
 importers:
@@ -121,8 +121,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/sdk
       ethers:
-        specifier: npm:@sentio/ethers@6.7.1-patch.3
-        version: /@sentio/ethers@6.7.1-patch.3
+        specifier: npm:@sentio/ethers@6.7.1-patch.4
+        version: /@sentio/ethers@6.7.1-patch.4
     devDependencies:
       '@sentio/cli':
         specifier: workspace:*
@@ -154,8 +154,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/sdk
       ethers:
-        specifier: npm:@sentio/ethers@6.7.1-patch.3
-        version: /@sentio/ethers@6.7.1-patch.3
+        specifier: npm:@sentio/ethers@6.7.1-patch.4
+        version: /@sentio/ethers@6.7.1-patch.4
     devDependencies:
       '@sentio/cli':
         specifier: workspace:*
@@ -167,8 +167,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/sdk
       ethers:
-        specifier: npm:@sentio/ethers@6.7.1-patch.3
-        version: /@sentio/ethers@6.7.1-patch.3
+        specifier: npm:@sentio/ethers@6.7.1-patch.4
+        version: /@sentio/ethers@6.7.1-patch.4
     devDependencies:
       '@sentio/cli':
         specifier: workspace:*
@@ -427,7 +427,7 @@ importers:
         version: 1.0.4
       '@sentio/ethers-v6':
         specifier: ^1.0.28
-        version: 1.0.28(@sentio/ethers@6.7.1-patch.3)(typescript@5.2.2)
+        version: 1.0.28(@sentio/ethers@6.7.1-patch.4)(typescript@5.2.2)
       '@sentio/protos':
         specifier: workspace:*
         version: link:../protos
@@ -462,8 +462,8 @@ importers:
         specifier: ^5.3.0
         version: 5.3.5
       ethers:
-        specifier: npm:@sentio/ethers@6.7.1-patch.3
-        version: /@sentio/ethers@6.7.1-patch.3
+        specifier: npm:@sentio/ethers@6.7.1-patch.4
+        version: /@sentio/ethers@6.7.1-patch.4
       js-sha3:
         specifier: ^0.9.0
         version: 0.9.1
@@ -2241,7 +2241,7 @@ packages:
       cosmjs-types: 0.7.2
       eth-crypto: 2.6.0
       ethereumjs-util: 7.1.5
-      ethers: /@sentio/ethers@6.7.1-patch.3
+      ethers: /@sentio/ethers@6.7.1-patch.4
       google-protobuf: 3.21.2
       graphql: 16.6.0
       http-status-codes: 2.2.0
@@ -3327,20 +3327,20 @@ packages:
     requiresBuild: true
     dev: false
 
-  /@sentio/ethers-v6@1.0.28(@sentio/ethers@6.7.1-patch.3)(typescript@5.2.2):
+  /@sentio/ethers-v6@1.0.28(@sentio/ethers@6.7.1-patch.4)(typescript@5.2.2):
     resolution: {integrity: sha512-5wCtsOhB5uySaVV0PxfXjX0tfEOxZzT5UWzONkiW+QnXgShaEtSqXQUfvAuF7f2i+Wz8bXHC/AIYYRQZLHHKfg==}
     peerDependencies:
-      ethers: npm:@sentio/ethers@6.7.1-patch.3
+      ethers: npm:@sentio/ethers@6.7.1-patch.4
       typescript: '>=4.3.0'
     dependencies:
-      ethers: /@sentio/ethers@6.7.1-patch.3
+      ethers: /@sentio/ethers@6.7.1-patch.4
       lodash: 4.17.21
       ts-essentials: 7.0.3(typescript@5.2.2)
       typescript: 5.2.2
     dev: false
 
-  /@sentio/ethers@6.7.1-patch.3:
-    resolution: {integrity: sha512-z1bLjs2AStV9E8Y2ga1ToVMg+qXK3wa9VxGOYiI/ILFk+CJ7e/Bs2KMG1gvVTgwNAbVggYjnPH3VbHJ0RpjuNA==}
+  /@sentio/ethers@6.7.1-patch.4:
+    resolution: {integrity: sha512-i010RsWy2KB9kCzTMXRGQEnJ8IQO5vQwMd9jHD7dHOmNlqb6N7HLQ2x8uFD9YmGBdGcrHfP2o1TNsKdZAgYgxQ==}
     engines: {node: '>=14.0.0'}
     dependencies:
       '@adraffy/ens-normalize': 1.9.2
@@ -6223,7 +6223,7 @@ packages:
       '@types/bn.js': 5.1.1
       eccrypto: 1.1.6
       ethereumjs-util: 7.1.5
-      ethers: /@sentio/ethers@6.7.1-patch.3
+      ethers: /@sentio/ethers@6.7.1-patch.4
       secp256k1: 5.0.0
     transitivePeerDependencies:
       - bufferutil

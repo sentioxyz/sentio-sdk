@@ -9,7 +9,7 @@
   },
   "resolutions": {
     "@grpc/grpc-js": "^1.8.21",
-    "ethers": "npm:@sentio/ethers@6.7.1-patch.3",
+    "ethers": "npm:@sentio/ethers@6.7.1-patch.4",
     "superstruct": "^1.0.3"
   },
   "devDependencies": {
