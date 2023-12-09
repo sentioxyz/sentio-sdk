@@ -24,7 +24,7 @@
   "dependencies": {
     "@jest/globals": "^29.5.0",
     "@jest/types": "^29.5.0",
-    "@mysten/sui.js": "~0.45.0",
+    "@mysten/sui.js": "~0.48.0",
     "@sentio/chain": "^1.0.6",
     "@types/jest": "^29.5.0",
     "@types/node": "^18.11.18",
