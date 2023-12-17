@@ -9,7 +9,7 @@ import {
   Data_EthTransaction,
   EthFetchConfig,
   HandleInterval,
-  ProcessResult,
+  ProcessResult
 } from '@sentio/protos'
 import { BindOptions } from './bind-options.js'
 import { PromiseOrVoid } from '../core/promises.js'
@@ -77,7 +77,7 @@ export class GlobalProcessor {
       address: '*',
       name: config.name || 'Global',
       network: config.network || EthChainId.ETHEREUM,
-      startBlock: 0n,
+      startBlock: 0n
     }
     if (config.startBlock) {
       this.config.startBlock = BigInt(config.startBlock)
@@ -98,7 +98,7 @@ export class GlobalProcessor {
       undefined,
       {
         recentInterval: blockInterval,
-        backfillInterval: backfillBlockInterval,
+        backfillInterval: backfillBlockInterval
       },
       fetchConfig
     )
@@ -143,13 +143,13 @@ export class GlobalProcessor {
           throw new ServerError(Status.INVALID_ARGUMENT, 'Block is empty')
         }
 
-        const ctx = new GlobalContext(chainId, new Date(block.timestamp * 1000), block, undefined, undefined)
+        const ctx = new GlobalContext(chainId, '*', new Date(block.timestamp * 1000), block, undefined, undefined)
         await handler(block, ctx)
         return ctx.stopAndGetResult()
       },
       timeIntervalInMinutes: timeInterval,
       blockInterval: blockInterval,
-      fetchConfig: EthFetchConfig.fromPartial(fetchConfig || {}),
+      fetchConfig: EthFetchConfig.fromPartial(fetchConfig || {})
     })
     return this
   }
@@ -166,11 +166,20 @@ export class GlobalProcessor {
         if (!transaction) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'transaction is empty')
         }
-        const ctx = new GlobalContext(chainId, data.timestamp, block, undefined, trace, transaction, transactionReceipt)
+        const ctx = new GlobalContext(
+          chainId,
+          transaction.to || '*',
+          data.timestamp,
+          block,
+          undefined,
+          trace,
+          transaction,
+          transactionReceipt
+        )
         await handler(transaction, ctx)
         return ctx.stopAndGetResult()
       },
-      fetchConfig: EthFetchConfig.fromPartial(fetchConfig || {}),
+      fetchConfig: EthFetchConfig.fromPartial(fetchConfig || {})
     })
     return this
   }
@@ -192,7 +201,7 @@ export abstract class BaseProcessor<
       name: config.name || '',
       network: config.network || EthChainId.ETHEREUM,
       startBlock: 0n,
-      baseLabels: config.baseLabels,
+      baseLabels: config.baseLabels
     }
     if (config.startBlock) {
       this.config.startBlock = BigInt(config.startBlock)
@@ -261,6 +270,9 @@ export abstract class BaseProcessor<
           throw e
           // console.log(e)
         }
+        if (processor.config.address === '*') {
+          contractView.address = log.address
+        }
 
         const ctx = new ContractContext<TContract, TBoundContractView>(
           contractName,
@@ -283,7 +295,7 @@ export abstract class BaseProcessor<
           return ctx.stopAndGetResult()
         }
         return ProcessResult.fromPartial({})
-      },
+      }
     })
     return this
   }
@@ -299,7 +311,7 @@ export abstract class BaseProcessor<
       undefined,
       {
         recentInterval: blockInterval,
-        backfillInterval: backfillBlockInterval,
+        backfillInterval: backfillBlockInterval
       },
       fetchConfig
     )
@@ -353,7 +365,7 @@ export abstract class BaseProcessor<
       },
       timeIntervalInMinutes: timeInterval,
       blockInterval: blockInterval,
-      fetchConfig: EthFetchConfig.fromPartial(fetchConfig || {}),
+      fetchConfig: EthFetchConfig.fromPartial(fetchConfig || {})
     })
     return this
   }
@@ -415,7 +427,7 @@ export abstract class BaseProcessor<
         )
         await handler(typedTrace, ctx)
         return ctx.stopAndGetResult()
-      },
+      }
     })
     return this
   }

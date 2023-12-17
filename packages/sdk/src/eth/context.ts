@@ -125,6 +125,7 @@ export class AccountContext extends EthContext {
 export class GlobalContext extends EthContext {
   constructor(
     chainId: EthChainId,
+    address: string,
     timestamp?: Date,
     block?: BlockParams,
     log?: LogParams,
@@ -193,7 +194,7 @@ export class ContractView<TContract extends BaseContract> {
 
 export class BoundContractView<TContract extends BaseContract, TContractView extends ContractView<TContract>> {
   protected view: TContractView
-  readonly address: string
+  address: string
   // context will be set right after context creation (in context's constructor)
   // context: ContractContext<TContract, BoundContractView<TContract, TContractView>>
   context: EthContext
