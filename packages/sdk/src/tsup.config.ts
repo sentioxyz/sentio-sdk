@@ -20,8 +20,7 @@ export default defineConfig({
   splitting: false,
   external: [
     'protobufjs',
-    'aptos',
-    'aptos-sdk',
+    '@aptos-labs/ts-sdk',
     'ethers',
     'bs58',
     'bn.js',

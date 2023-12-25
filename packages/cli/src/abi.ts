@@ -1,4 +1,4 @@
-import { AptosClient } from 'aptos'
+import { Aptos, AptosConfig } from '@aptos-labs/ts-sdk'
 import { SuiClient } from '@mysten/sui.js/client'
 import chalk from 'chalk'
 import process from 'process'
@@ -28,15 +28,15 @@ export async function getABI(
   name: string | undefined
 ): Promise<{ name?: string; abi: object | string }> {
   let ethApi
-  let aptosClient: AptosClient | undefined
+  let aptosClient: Aptos | undefined
   let suiClient: SuiClient | undefined
 
   switch (chain) {
     case AptosChainId.APTOS_MAINNET:
-      aptosClient = new AptosClient('https://mainnet.aptoslabs.com/')
+      aptosClient = new Aptos(new AptosConfig({ fullnode: 'https://mainnet.aptoslabs.com/v1' }))
       break
     case AptosChainId.APTOS_TESTNET:
-      aptosClient = new AptosClient('https://testnet.aptoslabs.com/')
+      aptosClient = new Aptos(new AptosConfig({ fullnode: 'https://testnet.aptoslabs.com/v1' }))
       break
     case SuiChainId.SUI_MAINNET:
       suiClient = new SuiClient({ url: 'https://fullnode.mainnet.sui.io/' })
@@ -59,7 +59,7 @@ export async function getABI(
   if (aptosClient) {
     try {
       return {
-        abi: await aptosClient.getAccountModules(address),
+        abi: await aptosClient.getAccountModules({ accountAddress: address }),
         name
       }
     } catch (e) {

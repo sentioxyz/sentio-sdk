@@ -4,7 +4,7 @@ import path, { join } from 'path'
 import { AptosCodegen as BaseAptosCodegen } from '@typemove/aptos/codegen'
 import { InternalMoveModule, InternalMoveStruct } from '@typemove/move'
 import { AptosNetwork, getRpcEndpoint } from '../network.js'
-import { MoveModuleBytecode, MoveResource } from '@typemove/aptos'
+import { MoveModuleBytecode, MoveResource, Event } from '@aptos-labs/ts-sdk'
 import { SharedNetworkCodegen } from '../../move/shared-network-codegen.js'
 
 export async function codegen(
@@ -32,7 +32,7 @@ class AptosNetworkCodegen extends BaseAptosCodegen {
       MoveModuleBytecode,
       Event | MoveResource
     > {
-      ADDRESS_TYPE = 'Address'
+      ADDRESS_TYPE = 'MoveAddressType'
       PREFIX = 'Aptos'
       SYSTEM_PACKAGE = '@typemove/aptos'
 
@@ -51,7 +51,10 @@ class AptosNetworkCodegen extends BaseAptosCodegen {
     return this.moduleGenerator.generateModule(module, allEventStructs)
   }
   generateImports() {
-    return this.moduleGenerator.generateImports()
+    return (
+      this.moduleGenerator.generateImports() +
+      `import { Aptos, Account as AptosAccount, MoveAddressType, PendingTransactionResponse, InputGenerateTransactionOptions, MoveStructId, InputViewRequestData } from '@aptos-labs/ts-sdk'`
+    )
   }
   generateLoadAll(isSystem: boolean): string {
     return this.moduleGenerator.generateLoadAll(isSystem)

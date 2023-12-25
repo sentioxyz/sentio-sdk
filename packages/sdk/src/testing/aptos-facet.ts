@@ -1,4 +1,4 @@
-import { Transaction_UserTransaction, TransactionPayload_EntryFunctionPayload } from '../aptos/index.js'
+import { UserTransactionResponse, EntryFunctionPayloadResponse } from '@aptos-labs/ts-sdk'
 import { DataBinding, HandlerType } from '@sentio/protos'
 import { TestProcessorServer } from './test-processor-server.js'
 import { AptosNetwork } from '@sentio/sdk/aptos'
@@ -10,11 +10,11 @@ export class AptosFacet {
     this.server = server
   }
 
-  testEntryFunctionCall(transaction: Transaction_UserTransaction, network: AptosNetwork = AptosNetwork.MAIN_NET) {
+  testEntryFunctionCall(transaction: UserTransactionResponse, network: AptosNetwork = AptosNetwork.MAIN_NET) {
     return this.testEntryFunctionCalls([transaction], network)
   }
 
-  testEntryFunctionCalls(transactions: Transaction_UserTransaction[], network: AptosNetwork = AptosNetwork.MAIN_NET) {
+  testEntryFunctionCalls(transactions: UserTransactionResponse[], network: AptosNetwork = AptosNetwork.MAIN_NET) {
     const bindings = []
     for (const trans of transactions) {
       const binding = this.buildEntryFunctionCallBinding(trans, network)
@@ -29,10 +29,10 @@ export class AptosFacet {
   }
 
   private buildEntryFunctionCallBinding(
-    transaction: Transaction_UserTransaction,
+    transaction: UserTransactionResponse,
     network: AptosNetwork = AptosNetwork.MAIN_NET
   ): DataBinding | undefined {
-    const payload = transaction.payload as TransactionPayload_EntryFunctionPayload
+    const payload = transaction.payload as EntryFunctionPayloadResponse
     for (const config of this.server.contractConfigs) {
       if (config.contract?.chainId !== network) {
         continue
@@ -56,7 +56,7 @@ export class AptosFacet {
     return undefined
   }
 
-  testEvent(transaction: Transaction_UserTransaction, network: AptosNetwork = AptosNetwork.MAIN_NET) {
+  testEvent(transaction: UserTransactionResponse, network: AptosNetwork = AptosNetwork.MAIN_NET) {
     const binding = this.buildEventBinding(transaction, network)
     if (!binding) {
       throw Error('Invalid test event: ' + JSON.stringify(transaction))
@@ -65,7 +65,7 @@ export class AptosFacet {
   }
 
   private buildEventBinding(
-    transaction: Transaction_UserTransaction,
+    transaction: UserTransactionResponse,
     network: AptosNetwork = AptosNetwork.MAIN_NET
   ): DataBinding | undefined {
     // const allEvents = new Set(transaction.events.map(e => e.type))

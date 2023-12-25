@@ -1,6 +1,6 @@
 import { findNewCoinBalances, getDepositCoinType, getWithDrawCoinType } from './coin-event.js'
 import { expect } from 'chai'
-import { Transaction_UserTransaction } from '@typemove/aptos'
+import { TransactionResponseType, UserTransactionResponse } from '@aptos-labs/ts-sdk'
 
 describe('resource change ', () => {
   test('withdraw usdc', () => {
@@ -99,7 +99,7 @@ describe('resource change ', () => {
   })
 })
 
-const tx: Transaction_UserTransaction = {
+const tx: UserTransactionResponse = {
   version: '112145263',
   hash: '0xe8a9cc7e974ce2c0b737241f034e76dc03c6b6e2eea2deb3538ba9c5fa18c6c6',
   state_change_hash: '0xc8e8d9cebaf525d1a330cd68bfcff596e364f67df37ccb50a4ad2f5ce7855e36',
@@ -312,8 +312,9 @@ const tx: Transaction_UserTransaction = {
   },
   signature: {
     public_key: '0xb9c9d2fc80b377d75d5b78d30cc2f0edb046a215c3e46444ed2ce66b0788ebff',
-    signature:
-      '0x5b9cd5d8ae0d100e956ec2d8a15844de0777b692985a61b7038b6a9d5c28e5ad03606f82760bf0fa6312697dfc2c56f47665d12ddfaf056d3e00583a8ed7840a',
+    signature: 'ed25519_signature',
+    // signature:
+    //   '0x5b9cd5d8ae0d100e956ec2d8a15844de0777b692985a61b7038b6a9d5c28e5ad03606f82760bf0fa6312697dfc2c56f47665d12ddfaf056d3e00583a8ed7840a',
     type: 'ed25519_signature'
   },
   events: [
@@ -390,10 +391,10 @@ const tx: Transaction_UserTransaction = {
     }
   ],
   timestamp: '1680391881111067',
-  type: 'user_transaction'
+  type: TransactionResponseType.User
 }
 
-const tx2: Transaction_UserTransaction = {
+const tx2: UserTransactionResponse = {
   sequence_number: '10',
   hash: '0x54ce83a3278c97dcea3854728333b7d6502acd11a42aa669b3260d0fe5ea6cad',
   state_root_hash: '',
@@ -1048,7 +1049,7 @@ const tx2: Transaction_UserTransaction = {
   ]
 } as any
 
-const tx3: Transaction_UserTransaction = {
+const tx3: UserTransactionResponse = {
   version: '111523396',
   hash: '0x86a58499f43b357e74060c4f29eca1cb84287558a58cfcfd8c5354678955b37d',
   state_change_hash: '0x1c0dfabf2396b0ce8c460071bccfc688101709ffc13039232046c09cf06ec18b',

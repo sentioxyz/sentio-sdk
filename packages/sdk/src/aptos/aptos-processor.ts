@@ -1,11 +1,6 @@
-import {
-  Event,
-  MoveResource,
-  Transaction_UserTransaction,
-  TransactionPayload_EntryFunctionPayload,
-  defaultMoveCoder,
-  MoveCoder
-} from '@sentio/sdk/aptos'
+import { defaultMoveCoder, MoveCoder } from '@sentio/sdk/aptos'
+
+import { Event, MoveResource, UserTransactionResponse, EntryFunctionPayloadResponse } from '@aptos-labs/ts-sdk'
 
 import { AptosBindOptions, AptosNetwork } from './network.js'
 import { AptosContext, AptosResourcesContext } from './context.js'
@@ -98,7 +93,7 @@ export class AptosBaseProcessor {
         if (!data.transaction) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'event is null')
         }
-        const txn = data.transaction as Transaction_UserTransaction
+        const txn = data.transaction as UserTransactionResponse
         if (!txn.events.length) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'no event in the transactions')
         }
@@ -134,7 +129,7 @@ export class AptosBaseProcessor {
   }
 
   protected onEntryFunctionCall(
-    handler: (call: TransactionPayload_EntryFunctionPayload, ctx: AptosContext) => PromiseOrVoid,
+    handler: (call: EntryFunctionPayloadResponse, ctx: AptosContext) => PromiseOrVoid,
     filter: FunctionNameAndCallFilter | FunctionNameAndCallFilter[],
     fetchConfig?: Partial<MoveFetchConfig>
   ): this {
@@ -156,7 +151,7 @@ export class AptosBaseProcessor {
         if (!data.transaction) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'call is null')
         }
-        const tx = data.transaction as Transaction_UserTransaction
+        const tx = data.transaction as UserTransactionResponse
 
         const ctx = new AptosContext(
           processor.moduleName,
@@ -168,7 +163,7 @@ export class AptosBaseProcessor {
           processor.config.baseLabels
         )
         if (tx) {
-          const payload = tx.payload as TransactionPayload_EntryFunctionPayload
+          const payload = tx.payload as EntryFunctionPayloadResponse
           const decoded = await processor.coder.decodeFunctionPayload(payload)
           await handler(decoded, ctx)
         }
@@ -181,7 +176,7 @@ export class AptosBaseProcessor {
   }
 
   public onTransaction(
-    handler: (transaction: Transaction_UserTransaction, ctx: AptosContext) => PromiseOrVoid,
+    handler: (transaction: UserTransactionResponse, ctx: AptosContext) => PromiseOrVoid,
     includedFailed = false,
     fetchConfig?: Partial<MoveFetchConfig>
   ): this {
@@ -193,7 +188,7 @@ export class AptosBaseProcessor {
         if (!data.transaction) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'call is null')
         }
-        const call = data.transaction as Transaction_UserTransaction
+        const call = data.transaction as UserTransactionResponse
         const ctx = new AptosContext(
           processor.moduleName,
           processor.config.network,

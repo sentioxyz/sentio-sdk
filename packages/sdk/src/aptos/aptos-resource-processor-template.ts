@@ -4,7 +4,7 @@ import { AptosResourcesContext } from './context.js'
 import { AptosBindOptions } from './network.js'
 import { AptosResourcesProcessor, DEFAULT_RESOURCE_FETCH_CONFIG } from './aptos-processor.js'
 import { HandleInterval, MoveAccountFetchConfig } from '@sentio/protos'
-import { MoveResource } from '@sentio/sdk/aptos'
+import { MoveResource } from '@aptos-labs/ts-sdk'
 import { PromiseOrVoid } from '../core/index.js'
 
 export class AptosResourceProcessorTemplateState extends ListStateStorage<AptosResourceProcessorTemplate> {

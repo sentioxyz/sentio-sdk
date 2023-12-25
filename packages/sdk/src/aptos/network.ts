@@ -1,5 +1,5 @@
 import { AptosChainId } from '@sentio/chain'
-import { AptosClient } from 'aptos-sdk'
+import { Aptos, AptosConfig } from '@aptos-labs/ts-sdk'
 import { Labels } from '../core/index.js'
 import { Endpoints } from '@sentio/runtime'
 
@@ -13,7 +13,7 @@ export const AptosNetwork = <const>{
 export class AptosBindOptions {
   address: string
   network?: AptosNetwork = AptosNetwork.MAIN_NET
-  client?: AptosClient
+  client?: Aptos
   startVersion?: bigint | number
   baseLabels?: Labels
 }
@@ -21,16 +21,18 @@ export class AptosBindOptions {
 export function getRpcEndpoint(network: AptosNetwork): string {
   switch (network) {
     case AptosNetwork.TEST_NET:
-      return 'https://testnet.aptoslabs.com/'
+      return 'https://testnet.aptoslabs.com/v1'
   }
-  return 'https://mainnet.aptoslabs.com/'
+  return 'https://mainnet.aptoslabs.com/v1'
 }
 
-export function getClient(network: AptosNetwork): AptosClient {
+export function getClient(network: AptosNetwork): Aptos {
   let chainServer = Endpoints.INSTANCE.chainServer.get(network)
   if (!chainServer) {
     chainServer = getRpcEndpoint(network)
     // throw new ServerError(Status.INTERNAL, 'RPC endpoint not provided')
+  } else {
+    chainServer = chainServer + '/v1'
   }
-  return new AptosClient(chainServer)
+  return new Aptos(new AptosConfig({ fullnode: chainServer }))
 }

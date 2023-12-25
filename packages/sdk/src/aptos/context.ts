@@ -1,17 +1,24 @@
 import { RecordMetaData } from '@sentio/protos'
 import { type Labels, normalizeLabels } from '@sentio/sdk'
-import { Event, MoveModuleBytecode, MoveResource, Transaction_UserTransaction, MoveCoder } from '@sentio/sdk/aptos'
+import { MoveCoder } from '@sentio/sdk/aptos'
+import {
+  Aptos,
+  Event,
+  MoveResource,
+  UserTransactionResponse,
+  MoveModuleBytecode,
+  AptosConfig
+} from '@aptos-labs/ts-sdk'
 import { defaultMoveCoder } from './move-coder.js'
 import { AptosNetwork } from './network.js'
 import { Endpoints } from '@sentio/runtime'
 import { ServerError, Status } from 'nice-grpc'
-import { AptosClient } from 'aptos-sdk'
 import { MoveAccountContext, MoveContext } from '../move/index.js'
 
 export class AptosContext extends MoveContext<AptosNetwork, MoveModuleBytecode, Event | MoveResource> {
   moduleName: string
   version: bigint
-  transaction: Transaction_UserTransaction
+  transaction: UserTransactionResponse
   eventIndex: number
   coder: MoveCoder
 
@@ -20,7 +27,7 @@ export class AptosContext extends MoveContext<AptosNetwork, MoveModuleBytecode, 
     network: AptosNetwork,
     address: string,
     version: bigint,
-    transaction: Transaction_UserTransaction,
+    transaction: UserTransactionResponse,
     eventIndex: number,
     baseLabels: Labels | undefined
   ) {
@@ -58,12 +65,13 @@ export class AptosContext extends MoveContext<AptosNetwork, MoveModuleBytecode, 
     }
   }
 
-  getClient(): AptosClient {
-    const chainServer = Endpoints.INSTANCE.chainServer.get(this.network)
+  getClient(): Aptos {
+    let chainServer = Endpoints.INSTANCE.chainServer.get(this.network)
     if (!chainServer) {
       throw new ServerError(Status.INTERNAL, 'RPC endpoint not provided')
     }
-    return new AptosClient(chainServer)
+    chainServer = chainServer + '/v1'
+    return new Aptos(new AptosConfig({ fullnode: chainServer }))
   }
 }
 
@@ -103,11 +111,12 @@ export class AptosResourcesContext extends MoveAccountContext<AptosNetwork, Move
     }
   }
 
-  getClient(): AptosClient {
-    const chainServer = Endpoints.INSTANCE.chainServer.get(this.network)
+  getClient(): Aptos {
+    let chainServer = Endpoints.INSTANCE.chainServer.get(this.network)
     if (!chainServer) {
       throw new ServerError(Status.INTERNAL, 'RPC endpoint not provided')
     }
-    return new AptosClient(chainServer)
+    chainServer = chainServer + '/v1'
+    return new Aptos(new AptosConfig({ fullnode: chainServer }))
   }
 }

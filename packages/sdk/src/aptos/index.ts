@@ -9,16 +9,6 @@ export { AptosPlugin } from './aptos-plugin.js'
 
 export { defaultMoveCoder } from './move-coder.js'
 
-export type {
-  Event,
-  Transaction_UserTransaction,
-  Address,
-  MoveResource,
-  MoveFunction,
-  MoveStruct,
-  MoveModuleBytecode,
-  TransactionPayload_EntryFunctionPayload
-} from '@typemove/aptos'
 export { MoveCoder } from '@typemove/aptos'
 
 export { BUILTIN_TYPES } from '@typemove/move'

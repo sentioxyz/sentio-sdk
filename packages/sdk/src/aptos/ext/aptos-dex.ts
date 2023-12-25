@@ -1,14 +1,8 @@
 import { BigDecimal } from '@sentio/bigdecimal'
 import { calculateValueInUsd, getCoinInfo, whitelistCoins, whiteListed } from './coin.js'
-import {
-  AptosResourcesContext,
-  MoveResource,
-  AptosContext,
-  AptosNetwork,
-  MoveModuleBytecode,
-  Event
-} from '@sentio/sdk/aptos'
+import { AptosResourcesContext, AptosContext, AptosNetwork } from '@sentio/sdk/aptos'
 import { MoveCoinList, MoveDex, moveGetPairValue, MovePoolAdaptor, SimpleCoinInfo } from '../../move/ext/index.js'
+import { MoveResource, Event, MoveModuleBytecode } from '@aptos-labs/ts-sdk'
 
 export type PoolAdaptor<T> = MovePoolAdaptor<MoveResource, T>
 

@@ -176,6 +176,9 @@ importers:
 
   packages/cli:
     dependencies:
+      '@aptos-labs/ts-sdk':
+        specifier: ~1.2.0
+        version: 1.2.0
       '@jest/globals':
         specifier: ^29.5.0
         version: 29.5.0
@@ -197,9 +200,6 @@ importers:
       '@types/node':
         specifier: ^18.11.18
         version: 18.14.0
-      aptos:
-        specifier: ^1.17.0
-        version: 1.17.0
       chalk:
         specifier: ^5.2.0
         version: 5.2.0
@@ -410,6 +410,9 @@ importers:
 
   packages/sdk:
     dependencies:
+      '@aptos-labs/ts-sdk':
+        specifier: ~1.2.0
+        version: 1.2.0
       '@coral-xyz/borsh':
         specifier: ^0.29.0
         version: 0.29.0(@solana/web3.js@1.78.3)
@@ -438,20 +441,14 @@ importers:
         specifier: ^1.78.3
         version: 1.78.3
       '@typemove/aptos':
-        specifier: ~1.2.9
-        version: 1.2.9
+        specifier: ~1.3.1
+        version: 1.3.1
       '@typemove/move':
-        specifier: ~1.2.9
-        version: 1.2.9
+        specifier: ~1.3.1
+        version: 1.3.1
       '@typemove/sui':
-        specifier: ~1.2.9
-        version: 1.2.9
-      aptos:
-        specifier: ~1.20.0
-        version: 1.20.0
-      aptos-sdk:
-        specifier: npm:aptos@^1.20.0
-        version: /aptos@1.20.0
+        specifier: ~1.3.1
+        version: 1.3.1
       bs58:
         specifier: ^5.0.0
         version: 5.0.0
@@ -596,12 +593,27 @@ packages:
     dev: true
     optional: true
 
-  /@aptos-labs/aptos-client@0.0.2:
-    resolution: {integrity: sha512-FgKZb5zDPz8MmAcVxXzYhxP6OkzuIPoDRJp48YJ8+vrZ9EOZ35HaWGN2M3u+GPdnFE9mODFqkxw3azh3kHGZjQ==}
+  /@aptos-labs/aptos-client@0.1.0:
+    resolution: {integrity: sha512-q3s6pPq8H2buGp+tPuIRInWsYOuhSEwuNJPwd2YnsiID3YSLihn2ug39ktDJAcSOprUcp7Nid8WK7hKqnUmSdA==}
     engines: {node: '>=15.10.0'}
     dependencies:
-      axios: 0.27.2
+      axios: 1.6.2
       got: 11.8.6
+    transitivePeerDependencies:
+      - debug
+    dev: false
+
+  /@aptos-labs/ts-sdk@1.2.0:
+    resolution: {integrity: sha512-pe7MhSmyZ6ez4tPud8Q3KOsthdJOR8SNUT/c0gPUIET2yVOf/cmx9TT/dIBm8kwX7hVWZGX4aBWDvZJbeY6dRg==}
+    engines: {node: '>=11.0.0'}
+    dependencies:
+      '@aptos-labs/aptos-client': 0.1.0
+      '@noble/curves': 1.3.0
+      '@noble/hashes': 1.3.3
+      '@scure/bip32': 1.3.3
+      '@scure/bip39': 1.2.1
+      form-data: 4.0.0
+      tweetnacl: 1.0.3
     transitivePeerDependencies:
       - debug
     dev: false
@@ -2930,11 +2942,18 @@ packages:
     dependencies:
       '@noble/hashes': 1.3.1
 
+  /@noble/curves@1.3.0:
+    resolution: {integrity: sha512-t01iSXPuN+Eqzb4eBX0S5oubSqXbK/xXa1Ne18Hj8f9pStxztHCE2gfboSp/dZRLSqfuLpRK2nDXDK+W9puocA==}
+    dependencies:
+      '@noble/hashes': 1.3.3
+    dev: false
+
   /@noble/hashes@1.1.2:
     resolution: {integrity: sha512-KYRCASVTv6aeUi1tsF8/vpyR7zpfs3FUzy2Jqm+MU+LmUKhQ0y2FpfwqkCcxSg2ua4GALJd8k2R76WxwZGbQpA==}
 
   /@noble/hashes@1.1.3:
     resolution: {integrity: sha512-CE0FCR57H2acVI5UOzIGSSIYxZ6v/HOhDR0Ro9VLyhnzLwx0o8W1mmgaqlEUx4049qJDlIBRztv5k+MM8vbO3A==}
+    dev: true
 
   /@noble/hashes@1.3.1:
     resolution: {integrity: sha512-EbqwksQwz9xDRGfDST86whPBgM65E0OH/pCgqW0GBVzO22bNE+NuIbeTb714+IfSjU3aRk47EUvXIb5bTsenKA==}
@@ -2943,6 +2962,11 @@ packages:
   /@noble/hashes@1.3.2:
     resolution: {integrity: sha512-MVC8EAQp7MvEcm30KWENFjgR+Mkmf+D189XJTkFIlwohU5hcBbn1ZkKq7KVTi2Hme3PMGF390DaL52beVrIihQ==}
     engines: {node: '>= 16'}
+
+  /@noble/hashes@1.3.3:
+    resolution: {integrity: sha512-V7/fPHgl+jsVPXqqeOzT8egNj2iBIVt+ECeMMG8TdcnTikP3oaBtUVqpT/gYCR68aEBJSF+XbYUxStjbFMqIIA==}
+    engines: {node: '>= 16'}
+    dev: false
 
   /@noble/secp256k1@1.7.1:
     resolution: {integrity: sha512-hOUk6AyBFmqVrv7k5WAw/LpszxVbj9gGN4JRkIX52fdFAj1UA61KXmZDvqVEm+pOyec3+fIeZB02LYa/pWOArw==}
@@ -3202,6 +3226,10 @@ packages:
   /@scure/base@1.1.1:
     resolution: {integrity: sha512-ZxOhsSyxYwLJj3pLZCefNitxsj093tb2vq90mp2txoYeBqbcjDjqFhyM8eUjq/uFm6zJ+mUuqxlS2FkuSY1MTA==}
 
+  /@scure/base@1.1.5:
+    resolution: {integrity: sha512-Brj9FiG2W1MRQSTB212YVPRrcbjkv48FoZi/u4l/zds/ieRrqsh7aUf6CLwkAq61oKXr/ZlTzlY66gLIj3TFTQ==}
+    dev: false
+
   /@scure/bip32@1.3.1:
     resolution: {integrity: sha512-osvveYtyzdEVbt3OfwwXFr4P2iVBL5u1Q3q4ONBfDY/UpOuXmOlbgwc1xECEboY8wIays8Yt6onaWMUdUbfl0A==}
     dependencies:
@@ -3209,11 +3237,20 @@ packages:
       '@noble/hashes': 1.3.2
       '@scure/base': 1.1.1
 
+  /@scure/bip32@1.3.3:
+    resolution: {integrity: sha512-LJaN3HwRbfQK0X1xFSi0Q9amqOgzQnnDngIt+ZlsBC3Bm7/nE7K0kwshZHyaru79yIVRv/e1mQAjZyuZG6jOFQ==}
+    dependencies:
+      '@noble/curves': 1.3.0
+      '@noble/hashes': 1.3.3
+      '@scure/base': 1.1.5
+    dev: false
+
   /@scure/bip39@1.1.0:
     resolution: {integrity: sha512-pwrPOS16VeTKg98dYXQyIjJEcWfz7/1YJIwxUEPFfQPtc86Ym/1sVgQ2RLoD43AazMk2l/unK4ITySSpW2+82w==}
     dependencies:
       '@noble/hashes': 1.1.3
       '@scure/base': 1.1.1
+    dev: true
 
   /@scure/bip39@1.2.1:
     resolution: {integrity: sha512-Z3/Fsz1yr904dduJD0NpiyRHhRYHdcnyh73FZWiV+/qhWi83wNJ3NWolYqCEN+ZWsUz2TWwajJggcRE9r1zUYg==}
@@ -3585,12 +3622,12 @@ packages:
   /@tsconfig/node16@1.0.3:
     resolution: {integrity: sha512-yOlFc+7UtL/89t2ZhjPvvB/DeAr3r+Dq58IgzsFkOAvVC6NMJXmCGjbptdXdR9qsX7pKcTL+s87FtYREi2dEEQ==}
 
-  /@typemove/aptos@1.2.9:
-    resolution: {integrity: sha512-Hfthr3ojWW0OD4e2z1UFdyDj+1W35YC3qUvi94xq7pEqaY/l3z5TGLbHVKDT9AX7fuNsDiQhXU1euA2T7vYZ1A==}
+  /@typemove/aptos@1.3.1:
+    resolution: {integrity: sha512-/fQ3fRx9ZHiLQmuBNBJ6ZmL/BdAGhPLM/WbMrr8MMEm96V+koyG/qkNDH+OGMTtD5o71XEpRkpfPoIaTmWGOzQ==}
     hasBin: true
     dependencies:
-      '@typemove/move': 1.2.9
-      aptos: 1.20.0
+      '@aptos-labs/ts-sdk': 1.2.0
+      '@typemove/move': 1.3.1
       chalk: 5.3.0
       commander: 11.1.0
       prettier: 3.0.3
@@ -3599,20 +3636,20 @@ packages:
       - debug
     dev: false
 
-  /@typemove/move@1.2.9:
-    resolution: {integrity: sha512-0B7yNzt7COmcstjv8mBPlKvQtXUFVjhdraLCawDPUb1i9/4QKy8UuOUkFj6NnuX1PuohHMK8PFhnkKsIRidrcQ==}
+  /@typemove/move@1.3.1:
+    resolution: {integrity: sha512-mOMtcW8lMCnR/wn/tGKcHtAPqCwF/MBUNCK6au97CDjcu7mlkA1+HyqYJR+QGDxI6veLDX7RLjtYIh+VmeWrZw==}
     dependencies:
       chalk: 5.3.0
       radash: 11.0.0
     dev: false
 
-  /@typemove/sui@1.2.9:
-    resolution: {integrity: sha512-/IkOm1jfHJmkrhZY/78yaMHMEap/KJl8Dt2KUYSLQIu69/1lslKA5VE0uPRS+sam3tPiUFvXvaJLy1k4+nUNwQ==}
+  /@typemove/sui@1.3.1:
+    resolution: {integrity: sha512-siFZ/Qgelh4IMaEAM0h+iPw+kTdx25iYidRCGLBELPUi8QMD4MJAh0UoEq4QbG7zRWfQCF+LdroOioCwM9b7Pg==}
     hasBin: true
     dependencies:
       '@mysten/bcs': 0.9.0
       '@mysten/sui.js': 0.48.0
-      '@typemove/move': 1.2.9
+      '@typemove/move': 1.3.1
       chalk: 5.3.0
       commander: 11.1.0
       prettier: 3.0.3
@@ -4320,34 +4357,6 @@ packages:
       normalize-path: 3.0.0
       picomatch: 2.3.1
 
-  /aptos@1.17.0:
-    resolution: {integrity: sha512-C+jNub8Sgg32F2t4TwYqMfHHWyuxLjNwoJGlRz5CTR52V4fTFjGvP6nlqE4MphwAWrIQnHKo93Thai7kNe3OvA==}
-    engines: {node: '>=11.0.0'}
-    dependencies:
-      '@aptos-labs/aptos-client': 0.0.2
-      '@noble/hashes': 1.1.3
-      '@scure/bip39': 1.1.0
-      eventemitter3: 5.0.1
-      form-data: 4.0.0
-      tweetnacl: 1.0.3
-    transitivePeerDependencies:
-      - debug
-    dev: false
-
-  /aptos@1.20.0:
-    resolution: {integrity: sha512-driZt7qEr4ndKqqVHMyuFsQAHy4gJ4HPQttgVIpeDfnOIEnIV7A2jyJ9EYO2A+MayuyxXB+7yCNXT4HyBFJdpA==}
-    engines: {node: '>=11.0.0'}
-    dependencies:
-      '@aptos-labs/aptos-client': 0.0.2
-      '@noble/hashes': 1.1.3
-      '@scure/bip39': 1.1.0
-      eventemitter3: 5.0.1
-      form-data: 4.0.0
-      tweetnacl: 1.0.3
-    transitivePeerDependencies:
-      - debug
-    dev: false
-
   /aptos@1.5.0:
     resolution: {integrity: sha512-N7OuRtU7IYHkDkNx+4QS3g/QQGCp+36KzYn3oXPmT7Kttfuv+UKliQVdjy3cLmwd/DCQSh9ObTovwdxnHjUn0g==}
     engines: {node: '>=11.0.0'}
@@ -4525,6 +4534,17 @@ packages:
       form-data: 4.0.0
     transitivePeerDependencies:
       - debug
+    dev: true
+
+  /axios@1.6.2:
+    resolution: {integrity: sha512-7i24Ri4pmDRfJTR7LDBhsOTtcm+9kjX5WiY1X3wIisx6G9So3pfMkEiU7emUBe46oceVImccTEM3k6C5dbVW8A==}
+    dependencies:
+      follow-redirects: 1.15.2
+      form-data: 4.0.0
+      proxy-from-env: 1.1.0
+    transitivePeerDependencies:
+      - debug
+    dev: false
 
   /babel-jest@29.5.0(@babel/core@7.22.5):
     resolution: {integrity: sha512-mA4eCDh5mSo2EcA9xQjVTpmbbNk32Zb3Q3QFQsNhaK56Q+yoXowzFodLux30HRgyOho5rsQ6B0P9QpMkvvnJ0Q==}
@@ -6336,6 +6356,7 @@ packages:
 
   /eventemitter3@5.0.1:
     resolution: {integrity: sha512-GWkBvjiSZK87ELrYOSESUYeVIc9mvLLf/nXalMOS5dYrgZq9o5OVkbZAVM06CVxYsCwH9BDZFPlQTlPA1j4ahA==}
+    dev: true
 
   /evp_bytestokey@1.0.3:
     resolution: {integrity: sha512-/f2Go4TognH/KvCISP7OUsHn85hT9nUkxxA9BEWxFn+Oj9o8ZNLm/40hdlgSLyuOimsrTKLUMEorQexp/aPQeA==}
@@ -10053,6 +10074,10 @@ packages:
     dependencies:
       forwarded: 0.2.0
       ipaddr.js: 1.9.1
+    dev: false
+
+  /proxy-from-env@1.1.0:
+    resolution: {integrity: sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==}
     dev: false
 
   /pseudomap@1.0.2:
