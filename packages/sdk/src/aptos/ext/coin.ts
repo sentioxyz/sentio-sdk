@@ -1,9 +1,11 @@
 import { getPriceByType } from '@sentio/sdk/utils'
 import fetch from 'node-fetch'
-// import { validateAndNormalizeAddress } from '../utils.js'
-import { accountTypeString, SPLITTER } from '@typemove/move'
-import { AptosChainId } from '@sentio/chain'
+import { accountTypeString, parseMoveType, SPLITTER } from '@typemove/move'
 import { SimpleCoinInfo } from '../../move/ext/move-dex.js'
+import { AptosNetwork, getClient } from '../network.js'
+import { _0x1 } from '@sentio/sdk/aptos/builtin'
+import { MoveStructId } from '@aptos-labs/ts-sdk'
+import { AptosChainId } from '@sentio/chain'
 
 const WHITELISTED_COINS = new Map<string, SimpleCoinInfo>()
 
@@ -56,6 +58,38 @@ export function getCoinInfo(type: string): SimpleCoinInfo {
       token_type: { type: type, account_address: parts[0] },
       symbol: parts[2],
       decimals: 8,
+      bridge: 'native'
+    }
+  }
+  return r
+}
+
+const COIN_METADATA_CACHE = new Map<string, Promise<any | null>>()
+
+export async function getCoinInfoWithFallback(type: string, network?: AptosNetwork): Promise<SimpleCoinInfo> {
+  const r = WHITELISTED_COINS.get(type)
+  if (!r) {
+    network = network || AptosNetwork.MAIN_NET
+    const key = network + '_' + type
+    let promise = COIN_METADATA_CACHE.get(key)
+    if (!promise) {
+      const client = getClient(network)
+      // client.getDigitalAssetData()
+      const account = type.split(SPLITTER)[0]
+      const coinInfo = _0x1.coin.CoinInfo.type(parseMoveType(type)).getSignature() as MoveStructId
+      promise = client.getAccountResource({ accountAddress: account, resourceType: coinInfo })
+      COIN_METADATA_CACHE.set(key, promise)
+    }
+    const meta = await promise
+    if (meta === null) {
+      throw Error('Coin not existed ' + key)
+    }
+
+    const parts = type.split(SPLITTER)
+    return {
+      token_type: { type: type, account_address: parts[0] },
+      symbol: meta.symbol,
+      decimals: meta.decimals,
       bridge: 'native'
     }
   }
