@@ -167,9 +167,13 @@ export class GlobalProcessor {
         if (!transaction) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'transaction is empty')
         }
+        let to = transaction.to
+        if (to === trace?.action.from) {
+          to = '*'
+        }
         const ctx = new GlobalContext(
           chainId,
-          transaction.to || '*',
+          to || '*',
           data.timestamp,
           block,
           undefined,
@@ -185,7 +189,7 @@ export class GlobalProcessor {
     return this
   }
 
-  protected onTrace(
+  public onTrace(
     signatures: string | string[],
     handler: (trace: Trace, ctx: GlobalContext) => PromiseOrVoid,
     fetchConfig?: Partial<EthFetchConfig>

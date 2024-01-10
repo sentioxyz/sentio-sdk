@@ -133,7 +133,7 @@ export class GlobalContext extends EthContext {
     transaction?: TransactionResponseParams,
     transactionReceipt?: TransactionReceiptParams
   ) {
-    super(chainId, '*', timestamp, block, log, trace, transaction, transactionReceipt)
+    super(chainId, address, timestamp, block, log, trace, transaction, transactionReceipt)
   }
   protected getContractName(): string {
     return '*'
