@@ -14,7 +14,7 @@ import {
 import { BindOptions } from './bind-options.js'
 import { PromiseOrVoid } from '../core/promises.js'
 import { ServerError, Status } from 'nice-grpc'
-import { fixEmptyKey, formatEthData, RichBlock, TypedCallTrace, TypedEvent } from './eth.js'
+import { fixEmptyKey, formatEthData, RichBlock, Trace, TypedCallTrace, TypedEvent } from './eth.js'
 import sha3 from 'js-sha3'
 import { ListStateStorage } from '@sentio/runtime'
 import { EthChainId } from '@sentio/chain'
@@ -65,6 +65,7 @@ export class GlobalProcessor {
   config: BindInternalOptions
   blockHandlers: BlockHandler[] = []
   transactionHandler: TransactionHandler[] = []
+  traceHandlers: TraceHandler[] = []
 
   static bind(config: Omit<BindOptions, 'address'>): GlobalProcessor {
     const processor = new GlobalProcessor(config)
@@ -180,6 +181,47 @@ export class GlobalProcessor {
         return ctx.stopAndGetResult()
       },
       fetchConfig: EthFetchConfig.fromPartial(fetchConfig || {})
+    })
+    return this
+  }
+
+  protected onTrace(
+    signatures: string | string[],
+    handler: (trace: Trace, ctx: GlobalContext) => PromiseOrVoid,
+    fetchConfig?: Partial<EthFetchConfig>
+  ): this {
+    const chainId = this.getChainId()
+    if (typeof signatures === 'string') {
+      signatures = [signatures]
+    }
+    for (const signature of signatures) {
+      if (signature.length <= 2) {
+        throw new Error('Invalid signature length, must start with 0x')
+      }
+    }
+
+    this.traceHandlers.push({
+      signatures,
+      fetchConfig: EthFetchConfig.fromPartial(fetchConfig || {}),
+      handler: async function (data: Data_EthTrace) {
+        const { trace, block, transaction, transactionReceipt } = formatEthData(data)
+
+        if (!trace) {
+          throw new ServerError(Status.INVALID_ARGUMENT, 'trace is null')
+        }
+        const ctx = new GlobalContext(
+          chainId,
+          trace.action.to || '*',
+          data.timestamp,
+          block,
+          undefined,
+          trace,
+          transaction,
+          transactionReceipt
+        )
+        await handler(trace, ctx)
+        return ctx.stopAndGetResult()
+      }
     })
     return this
   }

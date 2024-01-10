@@ -12,7 +12,7 @@ import {
   LogHandlerConfig,
   ProcessConfigResponse,
   ProcessResult,
-  StartRequest,
+  StartRequest
 } from '@sentio/protos'
 
 import { ServerError, Status } from 'nice-grpc'
@@ -38,7 +38,7 @@ export class EthPlugin extends Plugin {
     blockHandlers: [],
     eventHandlers: [],
     traceHandlers: [],
-    transactionHandlers: [],
+    transactionHandlers: []
   }
 
   async configure(config: ProcessConfigResponse) {
@@ -46,7 +46,7 @@ export class EthPlugin extends Plugin {
       blockHandlers: [],
       eventHandlers: [],
       traceHandlers: [],
-      transactionHandlers: [],
+      transactionHandlers: []
     }
 
     for (const processor of ProcessorState.INSTANCE.getValues()) {
@@ -61,10 +61,10 @@ export class EthPlugin extends Plugin {
           name: processor.config.name,
           chainId: chainId.toString(),
           address: validateAndNormalizeAddress(processor.config.address),
-          abi: '',
+          abi: ''
         },
         startBlock: processor.config.startBlock,
-        endBlock: processor.config.endBlock,
+        endBlock: processor.config.endBlock
       })
 
       // Step 1. Prepare all the block handlers
@@ -78,7 +78,7 @@ export class EthPlugin extends Plugin {
           minutes: 0,
           minutesInterval: blockHandler.timeIntervalInMinutes,
           handlerId: handlerId,
-          fetchConfig: blockHandler.fetchConfig,
+          fetchConfig: blockHandler.fetchConfig
         })
       }
 
@@ -89,7 +89,7 @@ export class EthPlugin extends Plugin {
           contractConfig.traceConfigs.push({
             signature: signature,
             handlerId: handlerId,
-            fetchConfig: traceHandler.fetchConfig,
+            fetchConfig: traceHandler.fetchConfig
           })
         }
       }
@@ -101,7 +101,7 @@ export class EthPlugin extends Plugin {
         const logConfig: LogHandlerConfig = {
           handlerId: handlerId,
           filters: [],
-          fetchConfig: eventsHandler.fetchConfig,
+          fetchConfig: eventsHandler.fetchConfig
         }
 
         for (const filter of eventsHandler.filters) {
@@ -113,7 +113,7 @@ export class EthPlugin extends Plugin {
           const logFilter: LogFilter = {
             addressType: undefined,
             address: contractConfig.contract?.address && validateAndNormalizeAddress(contractConfig.contract.address),
-            topics: [],
+            topics: []
           }
 
           for (const ts of topics) {
@@ -143,10 +143,10 @@ export class EthPlugin extends Plugin {
           name: processor.config.name,
           chainId: chainId.toString(),
           address: processor.config.address, // can only be *
-          abi: '',
+          abi: ''
         },
         startBlock: processor.config.startBlock,
-        endBlock: processor.config.endBlock,
+        endBlock: processor.config.endBlock
       })
 
       for (const blockHandler of processor.blockHandlers) {
@@ -157,7 +157,7 @@ export class EthPlugin extends Plugin {
           minutes: 0,
           minutesInterval: blockHandler.timeIntervalInMinutes,
           handlerId: handlerId,
-          fetchConfig: blockHandler.fetchConfig,
+          fetchConfig: blockHandler.fetchConfig
         })
       }
 
@@ -165,8 +165,19 @@ export class EthPlugin extends Plugin {
         const handlerId = handlers.transactionHandlers.push(transactionHandler.handler) - 1
         contractConfig.transactionConfig.push({
           handlerId: handlerId,
-          fetchConfig: transactionHandler.fetchConfig,
+          fetchConfig: transactionHandler.fetchConfig
         })
+      }
+
+      for (const traceHandler of processor.traceHandlers) {
+        const handlerId = handlers.traceHandlers.push(traceHandler.handler) - 1
+        for (const signature of traceHandler.signatures) {
+          contractConfig.traceConfigs.push({
+            signature: signature,
+            handlerId: handlerId,
+            fetchConfig: traceHandler.fetchConfig
+          })
+        }
       }
       config.contractConfigs.push(contractConfig)
     }
@@ -176,7 +187,7 @@ export class EthPlugin extends Plugin {
       const accountConfig = AccountConfig.fromPartial({
         address: validateAndNormalizeAddress(processor.config.address),
         chainId: processor.getChainId().toString(),
-        startBlock: processor.config.startBlock ? BigInt(processor.config.startBlock) : 0n,
+        startBlock: processor.config.startBlock ? BigInt(processor.config.startBlock) : 0n
       })
       // TODO add interval
       for (const eventsHandler of processor.eventHandlers) {
@@ -185,7 +196,7 @@ export class EthPlugin extends Plugin {
         const logConfig: LogHandlerConfig = {
           handlerId: handlerId,
           filters: [],
-          fetchConfig: eventsHandler.fetchConfig,
+          fetchConfig: eventsHandler.fetchConfig
         }
 
         for (const filter of eventsHandler.filters) {
@@ -200,7 +211,7 @@ export class EthPlugin extends Plugin {
           const logFilter: LogFilter = {
             addressType: filter.addressType,
             address: address && validateAndNormalizeAddress(address),
-            topics: [],
+            topics: []
           }
 
           for (const ts of topics) {
@@ -262,7 +273,7 @@ export class EthPlugin extends Plugin {
           name: instance.contract.name,
           address: validateAndNormalizeAddress(instance.contract.address),
           startBlock: instance.startBlock,
-          endBlock: instance.endBlock,
+          endBlock: instance.endBlock
         },
         ctx
       )
