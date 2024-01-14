@@ -345,7 +345,7 @@ export abstract class BaseProcessor<
           // RangeError data out-of-bounds
           if (e instanceof Error) {
             if (e.message.includes('data out-of-bounds')) {
-              console.error("Can't decode log, may because of incompatible ABIs, e.g. string vs indexed string", e)
+              console.error("Can't decode", log, 'may because of incompatible ABIs, e.g. string vs indexed string', e)
               return ProcessResult.fromPartial({})
             }
           }
