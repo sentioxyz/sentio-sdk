@@ -333,12 +333,23 @@ export abstract class BaseProcessor<
         )
         const logParam = log as any as { topics: Array<string>; data: string }
 
-        const parsed = contractView.rawContract.interface.parseLog(logParam)
+        try {
+          const parsed = contractView.rawContract.interface.parseLog(logParam)
 
-        if (parsed) {
-          const event: TypedEvent = { ...log, name: parsed.name, args: fixEmptyKey(parsed) }
-          await handler(event, ctx)
-          return ctx.stopAndGetResult()
+          if (parsed) {
+            const event: TypedEvent = { ...log, name: parsed.name, args: fixEmptyKey(parsed) }
+            await handler(event, ctx)
+            return ctx.stopAndGetResult()
+          }
+        } catch (e) {
+          // RangeError data out-of-bounds
+          if (e instanceof Error) {
+            if (e.message.includes('data out-of-bounds')) {
+              console.error("Can't decode log, may because of incompatible ABIs, e.g. string vs indexed string", e)
+              return ProcessResult.fromPartial({})
+            }
+          }
+          throw e
         }
         return ProcessResult.fromPartial({})
       }
