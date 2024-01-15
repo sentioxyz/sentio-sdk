@@ -5,6 +5,7 @@ package processor;
 import "google/protobuf/empty.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
+import "service/common/protos/common.proto";
 
 option go_package = "sentioxyz/sentio/processor/protos";
 
@@ -41,6 +42,7 @@ message ProcessConfigResponse {
   repeated MetricConfig metric_configs = 5;
   repeated EventTrackingConfig event_tracking_configs = 6;
   repeated ExportConfig export_configs = 7;
+  repeated EventLogConfig event_log_configs = 8;
 }
 
 message ContractConfig {
@@ -103,6 +105,29 @@ message MetricConfig {
 
   MetricType type = 7;
   AggregationConfig aggregation_config = 6;
+}
+
+message EventLogConfig {
+  // numbers are by default using big integer, if has decimal, use big decimal
+  enum BasicFieldType {
+    STRING = 0;
+    DOUBLE = 1; // to support
+    BOOL = 2;
+    TIMESTAMP = 3;
+    BIG_INTEGER = 4; // 256 bit integer
+    BIG_DECIMAL = 5; // 244 bit integer, 12 bit decimal
+  }
+
+  message Field {
+    string name = 1;
+    oneof type {
+      BasicFieldType basic_type = 2;
+      common.CoinID coin_type = 3;
+    };
+  }
+
+  string name = 1;
+  repeated Field fields = 2;
 }
 
 /*

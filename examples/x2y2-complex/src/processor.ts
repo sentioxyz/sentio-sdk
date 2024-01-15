@@ -1,4 +1,4 @@
-import { Counter, Gauge, Exporter, EventLogger } from '@sentio/sdk'
+import { Counter, EventLogConfig_BasicFieldType, EventLogger, Exporter, Gauge } from '@sentio/sdk'
 import { GlobalProcessor } from '@sentio/sdk/eth'
 
 import { ERC20Processor } from '@sentio/sdk/eth/builtin'
@@ -8,16 +8,20 @@ import { TokenDistributorProcessor } from './types/eth/tokendistributor.js'
 
 const rewardPerBlock = Gauge.register('reward_per_block', {
   description: 'rewards for each block grouped by phase',
-  unit: 'x2y2',
+  unit: 'x2y2'
 })
 
 const tokenCounter = Counter.register('token')
 
-const rewardLogger = EventLogger.register('reward')
+const rewardLogger = EventLogger.register('reward', {
+  fields: {
+    phase: EventLogConfig_BasicFieldType.STRING
+  }
+})
 
 const vol = Gauge.register('x2y2_vol', {
   description: 'transfer activities',
-  unit: 'x2y2',
+  unit: 'x2y2'
   // aggregationConfig: {
   //   intervalInMinutes: 60,
   //   types: [AggregationType.COUNT, AggregationType.SUM],
@@ -32,7 +36,7 @@ TokenDistributorProcessor.bind({ address: '0xB329e39Ebefd16f40d38f07643652cE17Ca
     const reward = (await ctx.contract.rewardPerBlockForStaking()).scaleDown(18)
     rewardLogger.emit(ctx, { message: `reward ${reward.toFormat(6)} for block ${ctx.blockNumber}`, phase })
     rewardPerBlock.record(ctx, reward, {
-      phase,
+      phase
     })
     // exporter.emit(ctx, { reward, phase })
   },
@@ -53,7 +57,7 @@ ERC20Processor.bind({ address: '0x1e4ede388cbc9f4b5c79681b7f94d36a11abebc9' }).o
 
     ctx.eventLogger.emit('Mint', {
       amount: val,
-      coin_symbol: 'X2Y2',
+      coin_symbol: 'X2Y2'
     })
   },
   filter // filter is an optional parameter
@@ -65,7 +69,7 @@ ERC20Processor.bind({ address: '0x1e4ede388cbc9f4b5c79681b7f94d36a11abebc9' }).o
   ctx.eventLogger.emit('Transfer', {
     distinctId: event.args.from,
     amount: val,
-    coin_symbol: 'X2Y2',
+    coin_symbol: 'X2Y2'
   })
 })
 

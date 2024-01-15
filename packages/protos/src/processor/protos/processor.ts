@@ -5,6 +5,7 @@ import _m0 from "protobufjs/minimal.js";
 import { Empty } from "../../google/protobuf/empty.js";
 import { Struct } from "../../google/protobuf/struct.js";
 import { Timestamp } from "../../google/protobuf/timestamp.js";
+import { CoinID } from "../../service/common/protos/common.js";
 
 export enum MetricType {
   UNKNOWN_TYPE = 0,
@@ -352,6 +353,7 @@ export interface ProcessConfigResponse {
   metricConfigs: MetricConfig[];
   eventTrackingConfigs: EventTrackingConfig[];
   exportConfigs: ExportConfig[];
+  eventLogConfigs: EventLogConfig[];
 }
 
 export interface ContractConfig {
@@ -432,6 +434,74 @@ export interface MetricConfig {
   persistentBetweenVersion: boolean;
   type: MetricType;
   aggregationConfig: AggregationConfig | undefined;
+}
+
+export interface EventLogConfig {
+  name: string;
+  fields: EventLogConfig_Field[];
+}
+
+export enum EventLogConfig_BasicFieldType {
+  STRING = 0,
+  DOUBLE = 1,
+  BOOL = 2,
+  TIMESTAMP = 3,
+  BIG_INTEGER = 4,
+  BIG_DECIMAL = 5,
+  UNRECOGNIZED = -1,
+}
+
+export function eventLogConfig_BasicFieldTypeFromJSON(object: any): EventLogConfig_BasicFieldType {
+  switch (object) {
+    case 0:
+    case "STRING":
+      return EventLogConfig_BasicFieldType.STRING;
+    case 1:
+    case "DOUBLE":
+      return EventLogConfig_BasicFieldType.DOUBLE;
+    case 2:
+    case "BOOL":
+      return EventLogConfig_BasicFieldType.BOOL;
+    case 3:
+    case "TIMESTAMP":
+      return EventLogConfig_BasicFieldType.TIMESTAMP;
+    case 4:
+    case "BIG_INTEGER":
+      return EventLogConfig_BasicFieldType.BIG_INTEGER;
+    case 5:
+    case "BIG_DECIMAL":
+      return EventLogConfig_BasicFieldType.BIG_DECIMAL;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return EventLogConfig_BasicFieldType.UNRECOGNIZED;
+  }
+}
+
+export function eventLogConfig_BasicFieldTypeToJSON(object: EventLogConfig_BasicFieldType): string {
+  switch (object) {
+    case EventLogConfig_BasicFieldType.STRING:
+      return "STRING";
+    case EventLogConfig_BasicFieldType.DOUBLE:
+      return "DOUBLE";
+    case EventLogConfig_BasicFieldType.BOOL:
+      return "BOOL";
+    case EventLogConfig_BasicFieldType.TIMESTAMP:
+      return "TIMESTAMP";
+    case EventLogConfig_BasicFieldType.BIG_INTEGER:
+      return "BIG_INTEGER";
+    case EventLogConfig_BasicFieldType.BIG_DECIMAL:
+      return "BIG_DECIMAL";
+    case EventLogConfig_BasicFieldType.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
+export interface EventLogConfig_Field {
+  name: string;
+  basicType?: EventLogConfig_BasicFieldType | undefined;
+  coinType?: CoinID | undefined;
 }
 
 export interface AggregationConfig {
@@ -881,6 +951,7 @@ function createBaseProcessConfigResponse(): ProcessConfigResponse {
     metricConfigs: [],
     eventTrackingConfigs: [],
     exportConfigs: [],
+    eventLogConfigs: [],
   };
 }
 
@@ -906,6 +977,9 @@ export const ProcessConfigResponse = {
     }
     for (const v of message.exportConfigs) {
       ExportConfig.encode(v!, writer.uint32(58).fork()).ldelim();
+    }
+    for (const v of message.eventLogConfigs) {
+      EventLogConfig.encode(v!, writer.uint32(66).fork()).ldelim();
     }
     return writer;
   },
@@ -938,6 +1012,9 @@ export const ProcessConfigResponse = {
         case 7:
           message.exportConfigs.push(ExportConfig.decode(reader, reader.uint32()));
           break;
+        case 8:
+          message.eventLogConfigs.push(EventLogConfig.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -966,6 +1043,9 @@ export const ProcessConfigResponse = {
         : [],
       exportConfigs: Array.isArray(object?.exportConfigs)
         ? object.exportConfigs.map((e: any) => ExportConfig.fromJSON(e))
+        : [],
+      eventLogConfigs: Array.isArray(object?.eventLogConfigs)
+        ? object.eventLogConfigs.map((e: any) => EventLogConfig.fromJSON(e))
         : [],
     };
   },
@@ -1003,6 +1083,11 @@ export const ProcessConfigResponse = {
     } else {
       obj.exportConfigs = [];
     }
+    if (message.eventLogConfigs) {
+      obj.eventLogConfigs = message.eventLogConfigs.map((e) => e ? EventLogConfig.toJSON(e) : undefined);
+    } else {
+      obj.eventLogConfigs = [];
+    }
     return obj;
   },
 
@@ -1021,6 +1106,7 @@ export const ProcessConfigResponse = {
     message.metricConfigs = object.metricConfigs?.map((e) => MetricConfig.fromPartial(e)) || [];
     message.eventTrackingConfigs = object.eventTrackingConfigs?.map((e) => EventTrackingConfig.fromPartial(e)) || [];
     message.exportConfigs = object.exportConfigs?.map((e) => ExportConfig.fromPartial(e)) || [];
+    message.eventLogConfigs = object.eventLogConfigs?.map((e) => EventLogConfig.fromPartial(e)) || [];
     return message;
   },
 };
@@ -1658,6 +1744,147 @@ export const MetricConfig = {
     message.type = object.type ?? 0;
     message.aggregationConfig = (object.aggregationConfig !== undefined && object.aggregationConfig !== null)
       ? AggregationConfig.fromPartial(object.aggregationConfig)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseEventLogConfig(): EventLogConfig {
+  return { name: "", fields: [] };
+}
+
+export const EventLogConfig = {
+  encode(message: EventLogConfig, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.name !== "") {
+      writer.uint32(10).string(message.name);
+    }
+    for (const v of message.fields) {
+      EventLogConfig_Field.encode(v!, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): EventLogConfig {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseEventLogConfig();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.name = reader.string();
+          break;
+        case 2:
+          message.fields.push(EventLogConfig_Field.decode(reader, reader.uint32()));
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): EventLogConfig {
+    return {
+      name: isSet(object.name) ? String(object.name) : "",
+      fields: Array.isArray(object?.fields) ? object.fields.map((e: any) => EventLogConfig_Field.fromJSON(e)) : [],
+    };
+  },
+
+  toJSON(message: EventLogConfig): unknown {
+    const obj: any = {};
+    message.name !== undefined && (obj.name = message.name);
+    if (message.fields) {
+      obj.fields = message.fields.map((e) => e ? EventLogConfig_Field.toJSON(e) : undefined);
+    } else {
+      obj.fields = [];
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<EventLogConfig>): EventLogConfig {
+    return EventLogConfig.fromPartial(base ?? {});
+  },
+
+  fromPartial(object: DeepPartial<EventLogConfig>): EventLogConfig {
+    const message = createBaseEventLogConfig();
+    message.name = object.name ?? "";
+    message.fields = object.fields?.map((e) => EventLogConfig_Field.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseEventLogConfig_Field(): EventLogConfig_Field {
+  return { name: "", basicType: undefined, coinType: undefined };
+}
+
+export const EventLogConfig_Field = {
+  encode(message: EventLogConfig_Field, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.name !== "") {
+      writer.uint32(10).string(message.name);
+    }
+    if (message.basicType !== undefined) {
+      writer.uint32(16).int32(message.basicType);
+    }
+    if (message.coinType !== undefined) {
+      CoinID.encode(message.coinType, writer.uint32(26).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): EventLogConfig_Field {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseEventLogConfig_Field();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.name = reader.string();
+          break;
+        case 2:
+          message.basicType = reader.int32() as any;
+          break;
+        case 3:
+          message.coinType = CoinID.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): EventLogConfig_Field {
+    return {
+      name: isSet(object.name) ? String(object.name) : "",
+      basicType: isSet(object.basicType) ? eventLogConfig_BasicFieldTypeFromJSON(object.basicType) : undefined,
+      coinType: isSet(object.coinType) ? CoinID.fromJSON(object.coinType) : undefined,
+    };
+  },
+
+  toJSON(message: EventLogConfig_Field): unknown {
+    const obj: any = {};
+    message.name !== undefined && (obj.name = message.name);
+    message.basicType !== undefined && (obj.basicType = message.basicType !== undefined
+      ? eventLogConfig_BasicFieldTypeToJSON(message.basicType)
+      : undefined);
+    message.coinType !== undefined && (obj.coinType = message.coinType ? CoinID.toJSON(message.coinType) : undefined);
+    return obj;
+  },
+
+  create(base?: DeepPartial<EventLogConfig_Field>): EventLogConfig_Field {
+    return EventLogConfig_Field.fromPartial(base ?? {});
+  },
+
+  fromPartial(object: DeepPartial<EventLogConfig_Field>): EventLogConfig_Field {
+    const message = createBaseEventLogConfig_Field();
+    message.name = object.name ?? "";
+    message.basicType = object.basicType ?? undefined;
+    message.coinType = (object.coinType !== undefined && object.coinType !== null)
+      ? CoinID.fromPartial(object.coinType)
       : undefined;
     return message;
   },
