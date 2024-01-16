@@ -1,5 +1,13 @@
 import { BaseContext } from './base-context.js'
-import { CoinID, EventLogConfig, EventLogConfig_BasicFieldType, EventTrackingResult, LogLevel } from '@sentio/protos'
+import {
+  CoinID,
+  EventLogConfig,
+  EventLogConfig_BasicFieldType,
+  EventLogConfig_Field,
+  EventLogConfig_StructFieldType,
+  EventTrackingResult,
+  LogLevel
+} from '@sentio/protos'
 import { normalizeAttribute } from './normalization.js'
 import { MapStateStorage } from '@sentio/runtime'
 
@@ -32,8 +40,43 @@ export class EventLoggerBinding {
   }
 }
 
+export type BasicFieldType = EventLogConfig_BasicFieldType
+export const BasicFieldType = EventLogConfig_BasicFieldType
+
+export type FieldType = CoinID | BasicFieldType | Fields
+
+export type Fields = { [key: string]: FieldType }
+
 export interface EventLogOptions {
-  fields: Record<string, CoinID | EventLogConfig_BasicFieldType>
+  fields: Fields
+}
+
+export function fieldsToProtos(fields: Fields): EventLogConfig_Field[] {
+  const fieldsProto: EventLogConfig_Field[] = []
+  for (const [key, value] of Object.entries(fields)) {
+    let basicType: BasicFieldType | undefined
+    let coinType: CoinID | undefined
+    let structType: EventLogConfig_StructFieldType | undefined
+
+    if (typeof value === 'number') {
+      basicType = value
+    } else {
+      if (value.address || value.symbol) {
+        coinType = value
+      } else {
+        structType = EventLogConfig_StructFieldType.create({
+          fields: fieldsToProtos(value as Fields)
+        })
+      }
+    }
+    fieldsProto.push({
+      name: key,
+      basicType,
+      coinType,
+      structType
+    })
+  }
+  return fieldsProto
 }
 
 export class EventLogger {
@@ -46,19 +89,11 @@ export class EventLogger {
   }
 
   static register(eventName: string, options?: EventLogOptions): EventLogger {
-    const config = EventLogConfig.create()
-    for (const [key, value] of Object.entries(options?.fields || {})) {
-      let basicType: EventLogConfig_BasicFieldType | undefined
-      let coinType: CoinID | undefined
-      if (typeof value === 'number') {
-        basicType = value
-      } else {
-        coinType = value
-      }
-      config.fields.push({
-        name: key,
-        basicType,
-        coinType
+    let config: EventLogConfig | undefined
+
+    if (options?.fields) {
+      config = EventLogConfig.create({
+        fields: fieldsToProtos(options.fields)
       })
     }
 

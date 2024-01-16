@@ -118,11 +118,16 @@ message EventLogConfig {
     BIG_DECIMAL = 5; // 244 bit integer, 12 bit decimal
   }
 
+  message StructFieldType {
+    repeated Field fields = 2;
+  }
+
   message Field {
     string name = 1;
     oneof type {
       BasicFieldType basic_type = 2;
       common.CoinID coin_type = 3;
+      StructFieldType struct_type = 4;
     };
   }
 

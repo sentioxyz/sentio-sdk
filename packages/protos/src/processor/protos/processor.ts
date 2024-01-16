@@ -498,10 +498,15 @@ export function eventLogConfig_BasicFieldTypeToJSON(object: EventLogConfig_Basic
   }
 }
 
+export interface EventLogConfig_StructFieldType {
+  fields: EventLogConfig_Field[];
+}
+
 export interface EventLogConfig_Field {
   name: string;
   basicType?: EventLogConfig_BasicFieldType | undefined;
   coinType?: CoinID | undefined;
+  structType?: EventLogConfig_StructFieldType | undefined;
 }
 
 export interface AggregationConfig {
@@ -1815,8 +1820,65 @@ export const EventLogConfig = {
   },
 };
 
+function createBaseEventLogConfig_StructFieldType(): EventLogConfig_StructFieldType {
+  return { fields: [] };
+}
+
+export const EventLogConfig_StructFieldType = {
+  encode(message: EventLogConfig_StructFieldType, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.fields) {
+      EventLogConfig_Field.encode(v!, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): EventLogConfig_StructFieldType {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseEventLogConfig_StructFieldType();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 2:
+          message.fields.push(EventLogConfig_Field.decode(reader, reader.uint32()));
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): EventLogConfig_StructFieldType {
+    return {
+      fields: Array.isArray(object?.fields) ? object.fields.map((e: any) => EventLogConfig_Field.fromJSON(e)) : [],
+    };
+  },
+
+  toJSON(message: EventLogConfig_StructFieldType): unknown {
+    const obj: any = {};
+    if (message.fields) {
+      obj.fields = message.fields.map((e) => e ? EventLogConfig_Field.toJSON(e) : undefined);
+    } else {
+      obj.fields = [];
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<EventLogConfig_StructFieldType>): EventLogConfig_StructFieldType {
+    return EventLogConfig_StructFieldType.fromPartial(base ?? {});
+  },
+
+  fromPartial(object: DeepPartial<EventLogConfig_StructFieldType>): EventLogConfig_StructFieldType {
+    const message = createBaseEventLogConfig_StructFieldType();
+    message.fields = object.fields?.map((e) => EventLogConfig_Field.fromPartial(e)) || [];
+    return message;
+  },
+};
+
 function createBaseEventLogConfig_Field(): EventLogConfig_Field {
-  return { name: "", basicType: undefined, coinType: undefined };
+  return { name: "", basicType: undefined, coinType: undefined, structType: undefined };
 }
 
 export const EventLogConfig_Field = {
@@ -1829,6 +1891,9 @@ export const EventLogConfig_Field = {
     }
     if (message.coinType !== undefined) {
       CoinID.encode(message.coinType, writer.uint32(26).fork()).ldelim();
+    }
+    if (message.structType !== undefined) {
+      EventLogConfig_StructFieldType.encode(message.structType, writer.uint32(34).fork()).ldelim();
     }
     return writer;
   },
@@ -1849,6 +1914,9 @@ export const EventLogConfig_Field = {
         case 3:
           message.coinType = CoinID.decode(reader, reader.uint32());
           break;
+        case 4:
+          message.structType = EventLogConfig_StructFieldType.decode(reader, reader.uint32());
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1862,6 +1930,7 @@ export const EventLogConfig_Field = {
       name: isSet(object.name) ? String(object.name) : "",
       basicType: isSet(object.basicType) ? eventLogConfig_BasicFieldTypeFromJSON(object.basicType) : undefined,
       coinType: isSet(object.coinType) ? CoinID.fromJSON(object.coinType) : undefined,
+      structType: isSet(object.structType) ? EventLogConfig_StructFieldType.fromJSON(object.structType) : undefined,
     };
   },
 
@@ -1872,6 +1941,8 @@ export const EventLogConfig_Field = {
       ? eventLogConfig_BasicFieldTypeToJSON(message.basicType)
       : undefined);
     message.coinType !== undefined && (obj.coinType = message.coinType ? CoinID.toJSON(message.coinType) : undefined);
+    message.structType !== undefined &&
+      (obj.structType = message.structType ? EventLogConfig_StructFieldType.toJSON(message.structType) : undefined);
     return obj;
   },
 
@@ -1885,6 +1956,9 @@ export const EventLogConfig_Field = {
     message.basicType = object.basicType ?? undefined;
     message.coinType = (object.coinType !== undefined && object.coinType !== null)
       ? CoinID.fromPartial(object.coinType)
+      : undefined;
+    message.structType = (object.structType !== undefined && object.structType !== null)
+      ? EventLogConfig_StructFieldType.fromPartial(object.structType)
       : undefined;
     return message;
   },

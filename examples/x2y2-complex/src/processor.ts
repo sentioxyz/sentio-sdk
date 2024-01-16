@@ -15,7 +15,10 @@ const tokenCounter = Counter.register('token')
 
 const rewardLogger = EventLogger.register('reward', {
   fields: {
-    phase: EventLogConfig_BasicFieldType.STRING
+    phase: EventLogConfig_BasicFieldType.STRING,
+    xx: {
+      aaa: EventLogConfig_BasicFieldType.BOOL
+    }
   }
 })
 
