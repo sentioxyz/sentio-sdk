@@ -9,7 +9,7 @@ import {
   formatHash,
   formatReceiptLog,
   object,
-  formatData,
+  formatData
 } from 'ethers/providers'
 import { CallExceptionError, LogDescription, Result, DeferredTopicFilter, BlockParams } from 'ethers'
 import { ContractContext } from './context.js'
@@ -109,13 +109,14 @@ const _formatTransactionReceipt = object(
     //confirmations: allowNull(getNumber, null),
     cumulativeGasUsed: getBigInt,
     effectiveGasPrice: allowNull(getBigInt),
+    gasPrice: allowNull(getBigInt),
     status: allowNull(getNumber),
-    type: allowNull(getNumber, 0),
+    type: allowNull(getNumber, 0)
   },
   {
-    effectiveGasPrice: ['gasPrice'],
+    // effectiveGasPrice: ['gasPrice'],
     hash: ['transactionHash'],
-    index: ['transactionIndex'],
+    index: ['transactionIndex']
   }
 )
 
@@ -143,7 +144,7 @@ export function formatEthData(data: {
     block,
     trace,
     transaction,
-    transactionReceipt,
+    transactionReceipt
   }
 }
 
