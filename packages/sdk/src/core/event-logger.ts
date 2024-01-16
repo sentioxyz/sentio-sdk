@@ -83,16 +83,17 @@ export class EventLogger {
   private readonly eventName: string
   config: EventLogConfig
 
-  private constructor(eventName: string, config?: EventLogConfig) {
+  private constructor(eventName: string, config: EventLogConfig) {
     this.eventName = eventName
-    this.config = EventLogConfig.fromPartial({ name: eventName, ...config })
+    this.config = config
   }
 
   static register(eventName: string, options?: EventLogOptions): EventLogger {
-    let config: EventLogConfig | undefined
+    let config = EventLogConfig.create()
 
     if (options?.fields) {
       config = EventLogConfig.create({
+        name: eventName,
         fields: fieldsToProtos(options.fields)
       })
     }
