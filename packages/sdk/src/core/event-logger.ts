@@ -85,7 +85,7 @@ export class EventLogger {
 
   private constructor(eventName: string, config?: EventLogConfig) {
     this.eventName = eventName
-    this.config = EventLogConfig.fromPartial(config || {})
+    this.config = EventLogConfig.fromPartial({ name: eventName, ...config })
   }
 
   static register(eventName: string, options?: EventLogOptions): EventLogger {
