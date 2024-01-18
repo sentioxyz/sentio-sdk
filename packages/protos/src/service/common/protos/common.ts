@@ -4117,7 +4117,7 @@ export const Function = {
   },
 
   create(base?: DeepPartial<Function>): Function {
-    return Function.fromPartial(base ?? ({} as any));
+    return Function.fromPartial(base ?? {} as any);
   },
 
   fromPartial(object: DeepPartial<Function>): Function {

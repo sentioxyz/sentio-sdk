@@ -2,7 +2,16 @@
 import type { CallContext, CallOptions } from "nice-grpc-common";
 import _m0 from "protobufjs/minimal.js";
 import { Timestamp } from "../../../google/protobuf/timestamp.js";
-import { CoinID } from "../../common/protos/common.js";
+
+export interface CoinID {
+  symbol?: string | undefined;
+  address?: CoinID_AddressIdentifier | undefined;
+}
+
+export interface CoinID_AddressIdentifier {
+  address: string;
+  chain: string;
+}
 
 export interface GetPriceRequest {
   timestamp: Date | undefined;
@@ -37,11 +46,145 @@ export interface ListCoinsRequest {
   limit: number;
   offset: number;
   searchQuery: string;
+  chain: string;
 }
 
 export interface ListCoinsResponse {
   coins: CoinID[];
+  coinAddressesInChain: { [key: string]: CoinID };
 }
+
+export interface ListCoinsResponse_CoinAddressesInChainEntry {
+  key: string;
+  value: CoinID | undefined;
+}
+
+function createBaseCoinID(): CoinID {
+  return { symbol: undefined, address: undefined };
+}
+
+export const CoinID = {
+  encode(message: CoinID, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.symbol !== undefined) {
+      writer.uint32(18).string(message.symbol);
+    }
+    if (message.address !== undefined) {
+      CoinID_AddressIdentifier.encode(message.address, writer.uint32(26).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): CoinID {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCoinID();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 2:
+          message.symbol = reader.string();
+          break;
+        case 3:
+          message.address = CoinID_AddressIdentifier.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): CoinID {
+    return {
+      symbol: isSet(object.symbol) ? String(object.symbol) : undefined,
+      address: isSet(object.address) ? CoinID_AddressIdentifier.fromJSON(object.address) : undefined,
+    };
+  },
+
+  toJSON(message: CoinID): unknown {
+    const obj: any = {};
+    message.symbol !== undefined && (obj.symbol = message.symbol);
+    message.address !== undefined &&
+      (obj.address = message.address ? CoinID_AddressIdentifier.toJSON(message.address) : undefined);
+    return obj;
+  },
+
+  create(base?: DeepPartial<CoinID>): CoinID {
+    return CoinID.fromPartial(base ?? {});
+  },
+
+  fromPartial(object: DeepPartial<CoinID>): CoinID {
+    const message = createBaseCoinID();
+    message.symbol = object.symbol ?? undefined;
+    message.address = (object.address !== undefined && object.address !== null)
+      ? CoinID_AddressIdentifier.fromPartial(object.address)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseCoinID_AddressIdentifier(): CoinID_AddressIdentifier {
+  return { address: "", chain: "" };
+}
+
+export const CoinID_AddressIdentifier = {
+  encode(message: CoinID_AddressIdentifier, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.address !== "") {
+      writer.uint32(10).string(message.address);
+    }
+    if (message.chain !== "") {
+      writer.uint32(18).string(message.chain);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): CoinID_AddressIdentifier {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCoinID_AddressIdentifier();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.address = reader.string();
+          break;
+        case 2:
+          message.chain = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): CoinID_AddressIdentifier {
+    return {
+      address: isSet(object.address) ? String(object.address) : "",
+      chain: isSet(object.chain) ? String(object.chain) : "",
+    };
+  },
+
+  toJSON(message: CoinID_AddressIdentifier): unknown {
+    const obj: any = {};
+    message.address !== undefined && (obj.address = message.address);
+    message.chain !== undefined && (obj.chain = message.chain);
+    return obj;
+  },
+
+  create(base?: DeepPartial<CoinID_AddressIdentifier>): CoinID_AddressIdentifier {
+    return CoinID_AddressIdentifier.fromPartial(base ?? {});
+  },
+
+  fromPartial(object: DeepPartial<CoinID_AddressIdentifier>): CoinID_AddressIdentifier {
+    const message = createBaseCoinID_AddressIdentifier();
+    message.address = object.address ?? "";
+    message.chain = object.chain ?? "";
+    return message;
+  },
+};
 
 function createBaseGetPriceRequest(): GetPriceRequest {
   return { timestamp: undefined, coinId: undefined };
@@ -432,7 +575,7 @@ export const BatchGetPricesResponse_CoinPrice_Price = {
 };
 
 function createBaseListCoinsRequest(): ListCoinsRequest {
-  return { limit: 0, offset: 0, searchQuery: "" };
+  return { limit: 0, offset: 0, searchQuery: "", chain: "" };
 }
 
 export const ListCoinsRequest = {
@@ -445,6 +588,9 @@ export const ListCoinsRequest = {
     }
     if (message.searchQuery !== "") {
       writer.uint32(26).string(message.searchQuery);
+    }
+    if (message.chain !== "") {
+      writer.uint32(34).string(message.chain);
     }
     return writer;
   },
@@ -465,6 +611,9 @@ export const ListCoinsRequest = {
         case 3:
           message.searchQuery = reader.string();
           break;
+        case 4:
+          message.chain = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -478,6 +627,7 @@ export const ListCoinsRequest = {
       limit: isSet(object.limit) ? Number(object.limit) : 0,
       offset: isSet(object.offset) ? Number(object.offset) : 0,
       searchQuery: isSet(object.searchQuery) ? String(object.searchQuery) : "",
+      chain: isSet(object.chain) ? String(object.chain) : "",
     };
   },
 
@@ -486,6 +636,7 @@ export const ListCoinsRequest = {
     message.limit !== undefined && (obj.limit = Math.round(message.limit));
     message.offset !== undefined && (obj.offset = Math.round(message.offset));
     message.searchQuery !== undefined && (obj.searchQuery = message.searchQuery);
+    message.chain !== undefined && (obj.chain = message.chain);
     return obj;
   },
 
@@ -498,12 +649,13 @@ export const ListCoinsRequest = {
     message.limit = object.limit ?? 0;
     message.offset = object.offset ?? 0;
     message.searchQuery = object.searchQuery ?? "";
+    message.chain = object.chain ?? "";
     return message;
   },
 };
 
 function createBaseListCoinsResponse(): ListCoinsResponse {
-  return { coins: [] };
+  return { coins: [], coinAddressesInChain: {} };
 }
 
 export const ListCoinsResponse = {
@@ -511,6 +663,9 @@ export const ListCoinsResponse = {
     for (const v of message.coins) {
       CoinID.encode(v!, writer.uint32(10).fork()).ldelim();
     }
+    Object.entries(message.coinAddressesInChain).forEach(([key, value]) => {
+      ListCoinsResponse_CoinAddressesInChainEntry.encode({ key: key as any, value }, writer.uint32(18).fork()).ldelim();
+    });
     return writer;
   },
 
@@ -524,6 +679,12 @@ export const ListCoinsResponse = {
         case 1:
           message.coins.push(CoinID.decode(reader, reader.uint32()));
           break;
+        case 2:
+          const entry2 = ListCoinsResponse_CoinAddressesInChainEntry.decode(reader, reader.uint32());
+          if (entry2.value !== undefined) {
+            message.coinAddressesInChain[entry2.key] = entry2.value;
+          }
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -533,7 +694,15 @@ export const ListCoinsResponse = {
   },
 
   fromJSON(object: any): ListCoinsResponse {
-    return { coins: Array.isArray(object?.coins) ? object.coins.map((e: any) => CoinID.fromJSON(e)) : [] };
+    return {
+      coins: Array.isArray(object?.coins) ? object.coins.map((e: any) => CoinID.fromJSON(e)) : [],
+      coinAddressesInChain: isObject(object.coinAddressesInChain)
+        ? Object.entries(object.coinAddressesInChain).reduce<{ [key: string]: CoinID }>((acc, [key, value]) => {
+          acc[key] = CoinID.fromJSON(value);
+          return acc;
+        }, {})
+        : {},
+    };
   },
 
   toJSON(message: ListCoinsResponse): unknown {
@@ -542,6 +711,12 @@ export const ListCoinsResponse = {
       obj.coins = message.coins.map((e) => e ? CoinID.toJSON(e) : undefined);
     } else {
       obj.coins = [];
+    }
+    obj.coinAddressesInChain = {};
+    if (message.coinAddressesInChain) {
+      Object.entries(message.coinAddressesInChain).forEach(([k, v]) => {
+        obj.coinAddressesInChain[k] = CoinID.toJSON(v);
+      });
     }
     return obj;
   },
@@ -553,6 +728,81 @@ export const ListCoinsResponse = {
   fromPartial(object: DeepPartial<ListCoinsResponse>): ListCoinsResponse {
     const message = createBaseListCoinsResponse();
     message.coins = object.coins?.map((e) => CoinID.fromPartial(e)) || [];
+    message.coinAddressesInChain = Object.entries(object.coinAddressesInChain ?? {}).reduce<{ [key: string]: CoinID }>(
+      (acc, [key, value]) => {
+        if (value !== undefined) {
+          acc[key] = CoinID.fromPartial(value);
+        }
+        return acc;
+      },
+      {},
+    );
+    return message;
+  },
+};
+
+function createBaseListCoinsResponse_CoinAddressesInChainEntry(): ListCoinsResponse_CoinAddressesInChainEntry {
+  return { key: "", value: undefined };
+}
+
+export const ListCoinsResponse_CoinAddressesInChainEntry = {
+  encode(message: ListCoinsResponse_CoinAddressesInChainEntry, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.key !== "") {
+      writer.uint32(10).string(message.key);
+    }
+    if (message.value !== undefined) {
+      CoinID.encode(message.value, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ListCoinsResponse_CoinAddressesInChainEntry {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseListCoinsResponse_CoinAddressesInChainEntry();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.key = reader.string();
+          break;
+        case 2:
+          message.value = CoinID.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ListCoinsResponse_CoinAddressesInChainEntry {
+    return {
+      key: isSet(object.key) ? String(object.key) : "",
+      value: isSet(object.value) ? CoinID.fromJSON(object.value) : undefined,
+    };
+  },
+
+  toJSON(message: ListCoinsResponse_CoinAddressesInChainEntry): unknown {
+    const obj: any = {};
+    message.key !== undefined && (obj.key = message.key);
+    message.value !== undefined && (obj.value = message.value ? CoinID.toJSON(message.value) : undefined);
+    return obj;
+  },
+
+  create(base?: DeepPartial<ListCoinsResponse_CoinAddressesInChainEntry>): ListCoinsResponse_CoinAddressesInChainEntry {
+    return ListCoinsResponse_CoinAddressesInChainEntry.fromPartial(base ?? {});
+  },
+
+  fromPartial(
+    object: DeepPartial<ListCoinsResponse_CoinAddressesInChainEntry>,
+  ): ListCoinsResponse_CoinAddressesInChainEntry {
+    const message = createBaseListCoinsResponse_CoinAddressesInChainEntry();
+    message.key = object.key ?? "";
+    message.value = (object.value !== undefined && object.value !== null)
+      ? CoinID.fromPartial(object.value)
+      : undefined;
     return message;
   },
 };
@@ -634,6 +884,10 @@ function fromJsonTimestamp(o: any): Date {
   } else {
     return fromTimestamp(Timestamp.fromJSON(o));
   }
+}
+
+function isObject(value: any): boolean {
+  return typeof value === "object" && value !== null;
 }
 
 function isSet(value: any): boolean {

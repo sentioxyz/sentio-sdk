@@ -143,3 +143,21 @@ export async function getPriceBySymbol(
 function dateString(date: Date) {
   return [date.getUTCDate(), date.getUTCMonth() + 1, date.getUTCFullYear()].join('-')
 }
+
+/**
+ * get coins that has price, return results are list of coin id with both symbol and address field set
+ * @param chainId
+ */
+export async function getCoinsThatHasPrice(chainId: ChainId) {
+  if (!priceClient) {
+    priceClient = getPriceClient()
+  }
+  const response = await priceClient.listCoins({
+    chain: chainId
+  })
+
+  return Object.entries(response.coinAddressesInChain).map(([symbol, coin]) => {
+    coin.symbol = symbol
+    return coin
+  })
+}
