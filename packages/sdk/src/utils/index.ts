@@ -1,5 +1,5 @@
 export * from './conversion.js'
 export * as token from './token.js'
 export * from './dex-price.js'
-export { getPriceByType, getPriceClient, getPriceBySymbol } from './price.js'
+export { getPriceByType, getPriceClient, getPriceBySymbol, getCoinsThatHasPrice } from './price.js'
 export * from './call.js'
