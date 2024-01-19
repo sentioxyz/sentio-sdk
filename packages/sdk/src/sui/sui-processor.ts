@@ -119,7 +119,7 @@ export class SuiBaseProcessor {
 
           const parts = typeQname.split(SPLITTER)
           if (evt.packageId && parts[0] != evt.packageId) {
-            evt.type.replace(parts[0], evt.packageId)
+            evt.type = evt.type.replace(parts[0], evt.packageId)
           }
           const decoded = await processor.coder.decodeEvent<any>(evt)
           await handler(decoded || evt, ctx)
