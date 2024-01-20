@@ -117,10 +117,10 @@ export class SuiBaseProcessor {
             processor.config.baseLabels
           )
 
-          const parts = typeQname.split(SPLITTER)
-          if (evt.packageId && parts[0] != evt.packageId) {
-            evt.type = evt.type.replace(parts[0], evt.packageId)
-          }
+          // const parts = typeQname.split(SPLITTER)
+          // if (evt.packageId && parts[0] != evt.packageId) {
+          //   evt.type = evt.type.replace(parts[0], evt.packageId)
+          // }
           const decoded = await processor.coder.decodeEvent<any>(evt)
           await handler(decoded || evt, ctx)
           processResults.push(ctx.stopAndGetResult())
