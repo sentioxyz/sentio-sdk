@@ -441,14 +441,14 @@ importers:
         specifier: ^1.78.3
         version: 1.78.3
       '@typemove/aptos':
-        specifier: ~1.3.4
-        version: 1.3.4
+        specifier: ~1.4.0
+        version: 1.4.0
       '@typemove/move':
-        specifier: ~1.3.4
-        version: 1.3.4
+        specifier: ~1.4.0
+        version: 1.4.0
       '@typemove/sui':
-        specifier: ~1.3.4
-        version: 1.3.4
+        specifier: ~1.4.0
+        version: 1.4.0
       bs58:
         specifier: ^5.0.0
         version: 5.0.0
@@ -3622,12 +3622,12 @@ packages:
   /@tsconfig/node16@1.0.3:
     resolution: {integrity: sha512-yOlFc+7UtL/89t2ZhjPvvB/DeAr3r+Dq58IgzsFkOAvVC6NMJXmCGjbptdXdR9qsX7pKcTL+s87FtYREi2dEEQ==}
 
-  /@typemove/aptos@1.3.4:
-    resolution: {integrity: sha512-gnVJbKEi9BzZ3wZUSAQl20uE7rxolqlvGklNZ+nkqWT688KW6DFDHWcXekpCONP9hi91JGV8BgdvI02BUlbtog==}
+  /@typemove/aptos@1.4.0:
+    resolution: {integrity: sha512-KjWhtccngsm8foMnuqsa0tyy8n3IF0bubhIzRstyzth5QzRf2T9e4fXyAEdZfiPMungXbmpb2s8U0xcpLPzXtw==}
     hasBin: true
     dependencies:
       '@aptos-labs/ts-sdk': 1.4.0
-      '@typemove/move': 1.3.4
+      '@typemove/move': 1.4.0
       chalk: 5.3.0
       commander: 11.1.0
       prettier: 3.0.3
@@ -3636,20 +3636,20 @@ packages:
       - debug
     dev: false
 
-  /@typemove/move@1.3.4:
-    resolution: {integrity: sha512-oLbdoTnhcINA5jNJ3tVLGo3dBPQ2fmo3mBcqgX90Huvfor/I1Op0Nt/33YIFtV7d0mqQ7CBjKd2bOAMzMRjNPg==}
+  /@typemove/move@1.4.0:
+    resolution: {integrity: sha512-lXKid9kBTGMsM3fWB1z1SzKCzrwcmw34I2t5c9iMMS+iCcJWlGYamLpnRcCZbYIuk3UQ2tiA6nwW6NoifuNpdw==}
     dependencies:
       chalk: 5.3.0
       radash: 11.0.0
     dev: false
 
-  /@typemove/sui@1.3.4:
-    resolution: {integrity: sha512-a3A/iTcn0OhnOVB563PqlbgmL9nCt/Z6zad+bNEtC/GW9se7LrLYgoITgXwoyKw5UDqxAtkgxQrOWsS1D5tqyA==}
+  /@typemove/sui@1.4.0:
+    resolution: {integrity: sha512-yl8cuHVLNMtatbGCajmlSAds+PN1L8stdqsrQK3s4DQjyASeCP2yPlAHg+nxdWeB86LCNA1TlewhjeAj6NzFYg==}
     hasBin: true
     dependencies:
       '@mysten/bcs': 0.10.1
       '@mysten/sui.js': 0.49.1
-      '@typemove/move': 1.3.4
+      '@typemove/move': 1.4.0
       chalk: 5.3.0
       commander: 11.1.0
       prettier: 3.0.3
