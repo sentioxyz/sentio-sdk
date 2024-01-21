@@ -10,13 +10,14 @@ import {
   ProcessConfigRequest,
   ProcessorServiceImplementation,
   StartRequest,
-  ProcessResult,
+  ProcessResult
 } from './gen/processor/protos/processor.js'
 
 import { Empty } from '@sentio/protos'
 import fs from 'fs-extra'
 import path from 'path'
 import os from 'os'
+import { GLOBAL_CONFIG } from './global-config.js'
 
 function locatePackageJson(pkgId: string) {
   const m = require.resolve(pkgId)
@@ -46,6 +47,8 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
 
   async getConfig(request: ProcessConfigRequest, context: CallContext) {
     const config = await this.instance.getConfig(request, context)
+    config.executionConfig = GLOBAL_CONFIG.execution
+
     if (config.contractConfigs) {
       for (const contract of config.contractConfigs) {
         // @ts-ignore old fields
@@ -72,6 +75,8 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
   }
 
   async processBindings(request: ProcessBindingsRequest, options: CallContext) {
+    request.bindings = request.bindings.sort(dataCompare)
+
     for (const binding of request.bindings) {
       this.adjustDataBinding(binding)
     }
@@ -128,4 +133,33 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
         break
     }
   }
+}
+
+// TODO push the logic into sdk
+function dataCompare(a: DataBinding, b: DataBinding): number {
+  const timeA = getTimestamp(a) || new Date(0)
+  const timeB = getTimestamp(b) || new Date(0)
+  const timeCmp = timeA.getTime() - timeB.getTime()
+  if (timeCmp !== 0) {
+    return timeCmp
+  }
+  return getSecondary(a) - getSecondary(b)
+}
+
+function getTimestamp(d: DataBinding): Date | undefined {
+  return (
+    d.data?.ethLog?.timestamp ||
+    d.data?.ethTransaction?.timestamp ||
+    d.data?.ethBlock?.block?.timestamp ||
+    d.data?.ethTrace?.timestamp
+  )
+}
+
+function getSecondary(d: DataBinding) {
+  return (
+    d.data?.ethLog?.log?.logIndex ||
+    d.data?.ethTransaction?.transaction?.transactionIndex ||
+    d.data?.ethBlock?.block?.number ||
+    d.data?.ethTrace?.trace?.transactionPosition
+  )
 }

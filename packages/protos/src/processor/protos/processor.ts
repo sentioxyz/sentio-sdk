@@ -342,11 +342,16 @@ export interface ProjectConfig {
   version: string;
 }
 
+export interface ExecutionConfig {
+  sequential: boolean;
+}
+
 export interface ProcessConfigRequest {
 }
 
 export interface ProcessConfigResponse {
   config: ProjectConfig | undefined;
+  executionConfig: ExecutionConfig | undefined;
   contractConfigs: ContractConfig[];
   templateInstances: TemplateInstance[];
   accountConfigs: AccountConfig[];
@@ -904,6 +909,57 @@ export const ProjectConfig = {
   },
 };
 
+function createBaseExecutionConfig(): ExecutionConfig {
+  return { sequential: false };
+}
+
+export const ExecutionConfig = {
+  encode(message: ExecutionConfig, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.sequential === true) {
+      writer.uint32(8).bool(message.sequential);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ExecutionConfig {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseExecutionConfig();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.sequential = reader.bool();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ExecutionConfig {
+    return { sequential: isSet(object.sequential) ? Boolean(object.sequential) : false };
+  },
+
+  toJSON(message: ExecutionConfig): unknown {
+    const obj: any = {};
+    message.sequential !== undefined && (obj.sequential = message.sequential);
+    return obj;
+  },
+
+  create(base?: DeepPartial<ExecutionConfig>): ExecutionConfig {
+    return ExecutionConfig.fromPartial(base ?? {});
+  },
+
+  fromPartial(object: DeepPartial<ExecutionConfig>): ExecutionConfig {
+    const message = createBaseExecutionConfig();
+    message.sequential = object.sequential ?? false;
+    return message;
+  },
+};
+
 function createBaseProcessConfigRequest(): ProcessConfigRequest {
   return {};
 }
@@ -950,6 +1006,7 @@ export const ProcessConfigRequest = {
 function createBaseProcessConfigResponse(): ProcessConfigResponse {
   return {
     config: undefined,
+    executionConfig: undefined,
     contractConfigs: [],
     templateInstances: [],
     accountConfigs: [],
@@ -964,6 +1021,9 @@ export const ProcessConfigResponse = {
   encode(message: ProcessConfigResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.config !== undefined) {
       ProjectConfig.encode(message.config, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.executionConfig !== undefined) {
+      ExecutionConfig.encode(message.executionConfig, writer.uint32(74).fork()).ldelim();
     }
     for (const v of message.contractConfigs) {
       ContractConfig.encode(v!, writer.uint32(18).fork()).ldelim();
@@ -999,6 +1059,9 @@ export const ProcessConfigResponse = {
         case 1:
           message.config = ProjectConfig.decode(reader, reader.uint32());
           break;
+        case 9:
+          message.executionConfig = ExecutionConfig.decode(reader, reader.uint32());
+          break;
         case 2:
           message.contractConfigs.push(ContractConfig.decode(reader, reader.uint32()));
           break;
@@ -1031,6 +1094,7 @@ export const ProcessConfigResponse = {
   fromJSON(object: any): ProcessConfigResponse {
     return {
       config: isSet(object.config) ? ProjectConfig.fromJSON(object.config) : undefined,
+      executionConfig: isSet(object.executionConfig) ? ExecutionConfig.fromJSON(object.executionConfig) : undefined,
       contractConfigs: Array.isArray(object?.contractConfigs)
         ? object.contractConfigs.map((e: any) => ContractConfig.fromJSON(e))
         : [],
@@ -1058,6 +1122,8 @@ export const ProcessConfigResponse = {
   toJSON(message: ProcessConfigResponse): unknown {
     const obj: any = {};
     message.config !== undefined && (obj.config = message.config ? ProjectConfig.toJSON(message.config) : undefined);
+    message.executionConfig !== undefined &&
+      (obj.executionConfig = message.executionConfig ? ExecutionConfig.toJSON(message.executionConfig) : undefined);
     if (message.contractConfigs) {
       obj.contractConfigs = message.contractConfigs.map((e) => e ? ContractConfig.toJSON(e) : undefined);
     } else {
@@ -1104,6 +1170,9 @@ export const ProcessConfigResponse = {
     const message = createBaseProcessConfigResponse();
     message.config = (object.config !== undefined && object.config !== null)
       ? ProjectConfig.fromPartial(object.config)
+      : undefined;
+    message.executionConfig = (object.executionConfig !== undefined && object.executionConfig !== null)
+      ? ExecutionConfig.fromPartial(object.executionConfig)
       : undefined;
     message.contractConfigs = object.contractConfigs?.map((e) => ContractConfig.fromPartial(e)) || [];
     message.templateInstances = object.templateInstances?.map((e) => TemplateInstance.fromPartial(e)) || [];

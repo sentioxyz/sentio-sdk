@@ -29,11 +29,16 @@ message ProjectConfig {
   string version = 3;
 }
 
+message ExecutionConfig {
+  bool sequential = 1;
+}
+
 message ProcessConfigRequest {
 }
 
 message ProcessConfigResponse {
   ProjectConfig config = 1;
+  ExecutionConfig execution_config = 9;
   repeated ContractConfig contract_configs = 2;
   repeated TemplateInstance template_instances = 3;
 

@@ -1,7 +1,5 @@
-export interface ExecutionConfig {
-  // Whether to execute transactions sequentially, by default it's false
-  sequential: boolean
-}
+import { ExecutionConfig } from './gen/processor/protos/processor.js'
+
 export interface GlobalConfig {
   execution: ExecutionConfig
 }
