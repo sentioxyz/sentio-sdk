@@ -24,6 +24,7 @@ import { validateAndNormalizeAddress } from './eth.js'
 import { EthChainId } from '@sentio/chain'
 import { EthContext } from './context.js'
 import { TemplateInstanceState } from '../core/template.js'
+import { GLOBAL_CONFIG } from '../core/index.js'
 
 interface Handlers {
   eventHandlers: ((event: Data_EthLog) => Promise<ProcessResult>)[]
@@ -293,14 +294,16 @@ export class EthPlugin extends Plugin {
     const promises: Promise<ProcessResult>[] = []
     for (const handlerId of request.handlerIds) {
       const handler = this.handlers.eventHandlers[handlerId]
-      promises.push(
-        handler(ethLog).catch((e) => {
-          throw new ServerError(
-            Status.INTERNAL,
-            'error processing log: ' + JSON.stringify(ethLog.log) + '\n' + errorString(e)
-          )
-        })
-      )
+      const promise = handler(ethLog).catch((e) => {
+        throw new ServerError(
+          Status.INTERNAL,
+          'error processing log: ' + JSON.stringify(ethLog.log) + '\n' + errorString(e)
+        )
+      })
+      if (GLOBAL_CONFIG.execution.sequential) {
+        await promise
+      }
+      promises.push(promise)
     }
     return mergeProcessResults(await Promise.all(promises))
   }
@@ -314,14 +317,16 @@ export class EthPlugin extends Plugin {
     const promises: Promise<ProcessResult>[] = []
 
     for (const handlerId of binding.handlerIds) {
-      promises.push(
-        this.handlers.traceHandlers[handlerId](ethTrace).catch((e) => {
-          throw new ServerError(
-            Status.INTERNAL,
-            'error processing trace: ' + JSON.stringify(ethTrace.trace) + '\n' + errorString(e)
-          )
-        })
-      )
+      const promise = this.handlers.traceHandlers[handlerId](ethTrace).catch((e) => {
+        throw new ServerError(
+          Status.INTERNAL,
+          'error processing trace: ' + JSON.stringify(ethTrace.trace) + '\n' + errorString(e)
+        )
+      })
+      if (GLOBAL_CONFIG.execution.sequential) {
+        await promise
+      }
+      promises.push(promise)
     }
     return mergeProcessResults(await Promise.all(promises))
   }
@@ -334,14 +339,16 @@ export class EthPlugin extends Plugin {
 
     const promises: Promise<ProcessResult>[] = []
     for (const handlerId of binding.handlerIds) {
-      promises.push(
-        this.handlers.blockHandlers[handlerId](ethBlock).catch((e) => {
-          throw new ServerError(
-            Status.INTERNAL,
-            'error processing block: ' + ethBlock.block?.number + '\n' + errorString(e)
-          )
-        })
-      )
+      const promise = this.handlers.blockHandlers[handlerId](ethBlock).catch((e) => {
+        throw new ServerError(
+          Status.INTERNAL,
+          'error processing block: ' + ethBlock.block?.number + '\n' + errorString(e)
+        )
+      })
+      if (GLOBAL_CONFIG.execution.sequential) {
+        await promise
+      }
+      promises.push(promise)
     }
     return mergeProcessResults(await Promise.all(promises))
   }
@@ -355,14 +362,16 @@ export class EthPlugin extends Plugin {
     const promises: Promise<ProcessResult>[] = []
 
     for (const handlerId of binding.handlerIds) {
-      promises.push(
-        this.handlers.transactionHandlers[handlerId](ethTransaction).catch((e) => {
-          throw new ServerError(
-            Status.INTERNAL,
-            'error processing transaction: ' + JSON.stringify(ethTransaction.transaction) + '\n' + errorString(e)
-          )
-        })
-      )
+      const promise = this.handlers.transactionHandlers[handlerId](ethTransaction).catch((e) => {
+        throw new ServerError(
+          Status.INTERNAL,
+          'error processing transaction: ' + JSON.stringify(ethTransaction.transaction) + '\n' + errorString(e)
+        )
+      })
+      if (GLOBAL_CONFIG.execution.sequential) {
+        await promise
+      }
+      promises.push(promise)
     }
     return mergeProcessResults(await Promise.all(promises))
   }
