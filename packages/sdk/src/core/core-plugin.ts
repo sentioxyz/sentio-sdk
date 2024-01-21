@@ -6,11 +6,14 @@ import { ExporterState } from './exporter.js'
 import { EventTrackerState } from './event-tracker.js'
 import { TemplateInstanceState } from './template.js'
 import { EventLoggerState } from './event-logger.js'
+import { freezeGlobalConfig } from './global-config.js'
 
 export class CorePlugin extends Plugin {
   name: string = 'CorePlugin'
 
   async configure(config: ProcessConfigResponse): Promise<void> {
+    freezeGlobalConfig()
+
     // This syntax is to copy values instead of using references
     config.templateInstances = [...TemplateInstanceState.INSTANCE.getValues()]
 
