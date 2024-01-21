@@ -11,11 +11,13 @@ import {
   ProcessorServiceImplementation,
   ProcessResult,
   StartRequest,
-  Empty,
+  Empty
 } from '@sentio/protos'
 
 import { PluginManager } from './plugin.js'
 import { errorString, mergeProcessResults } from './utils.js'
+import { freezeGlobalConfig, GLOBAL_CONFIG } from './global-config.js'
+
 ;(BigInt.prototype as any).toJSON = function () {
   return this.toString()
 }
@@ -60,6 +62,8 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       return {}
     }
 
+    freezeGlobalConfig()
+
     try {
       // for (const plugin of ['@sentio/sdk', '@sentio/sdk/eth']) {
       //   try {
@@ -100,7 +104,15 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
   }
 
   async processBindings(request: ProcessBindingsRequest, options?: CallContext): Promise<ProcessBindingResponse> {
-    const promises = request.bindings.map((binding) => this.processBinding(binding))
+    const promises = []
+
+    for (const binding of request.bindings) {
+      const promise = this.processBinding(binding)
+      if (GLOBAL_CONFIG.execution.sequential) {
+        await promise
+      }
+      promises.push(promise)
+    }
     let promise
     try {
       promise = await Promise.all(promises)
@@ -116,7 +128,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     // }
 
     return {
-      result,
+      result
     }
   }
 
@@ -131,8 +143,8 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         [
           DebugInfo.fromPartial({
             detail: this.unhandled.message,
-            stackEntries: this.unhandled.stack?.split('\n'),
-          }),
+            stackEntries: this.unhandled.stack?.split('\n')
+          })
         ]
       )
     }
@@ -151,7 +163,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       // }
       yield {
         result,
-        configUpdated: result.states?.configUpdated || false,
+        configUpdated: result.states?.configUpdated || false
       }
     }
   }
@@ -161,7 +173,7 @@ function recordRuntimeInfo(results: ProcessResult, handlerType: HandlerType) {
   for (const list of [results.gauges, results.counters, results.events, results.exports]) {
     list.forEach((e) => {
       e.runtimeInfo = {
-        from: handlerType,
+        from: handlerType
       }
     })
   }

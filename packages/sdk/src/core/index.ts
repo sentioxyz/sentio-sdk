@@ -10,5 +10,3 @@ export * from './event-logger.js'
 export { type Numberish, toBigInteger, toMetricValue } from './numberish.js'
 
 export { CorePlugin } from './core-plugin.js'
-
-export { GLOBAL_CONFIG, type ExecutionConfig, type GlobalConfig } from './global-config.js'

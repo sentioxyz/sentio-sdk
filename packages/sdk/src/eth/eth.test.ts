@@ -2,7 +2,7 @@ import { assert, expect } from 'chai'
 import { Interface } from 'ethers'
 
 import { fixEmptyKey } from './index.js'
-import { GLOBAL_CONFIG } from '@sentio/sdk'
+import { GLOBAL_CONFIG } from '@sentio/runtime'
 
 GLOBAL_CONFIG.execution = {
   sequential: false

@@ -1,4 +1,4 @@
-import { errorString, mergeProcessResults, Plugin, PluginManager, USER_PROCESSOR } from '@sentio/runtime'
+import { errorString, mergeProcessResults, Plugin, PluginManager, USER_PROCESSOR, GLOBAL_CONFIG } from '@sentio/runtime'
 import {
   AccountConfig,
   ContractConfig,
@@ -24,7 +24,6 @@ import { validateAndNormalizeAddress } from './eth.js'
 import { EthChainId } from '@sentio/chain'
 import { EthContext } from './context.js'
 import { TemplateInstanceState } from '../core/template.js'
-import { GLOBAL_CONFIG } from '../core/index.js'
 
 interface Handlers {
   eventHandlers: ((event: Data_EthLog) => Promise<ProcessResult>)[]
