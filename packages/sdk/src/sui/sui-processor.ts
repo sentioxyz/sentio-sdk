@@ -6,7 +6,6 @@ import { SuiContext, SuiObjectChangeContext } from './context.js'
 import { MoveCallSuiTransaction, SuiEvent, SuiTransactionBlockResponse, SuiObjectChange } from '@mysten/sui.js/client'
 import {
   accountAddressString,
-  accountTypeString,
   CallHandler,
   EventFilter,
   EventHandler,
@@ -87,7 +86,7 @@ export class SuiBaseProcessor {
     // const moduleName = this.moduleName
 
     const processor = this
-    const allEventType = new Set(_filters.map((f) => accountTypeString(processor.config.address) + '::' + f.type))
+    const allEventType = new Set(_filters.map((f) => f.type))
 
     this.eventHandlers.push({
       handler: async function (data) {
@@ -101,8 +100,8 @@ export class SuiBaseProcessor {
 
         const processResults = []
         for (const [idx, evt] of (txn.events as SuiEvent[]).entries()) {
-          const typeQname = parseMoveType(evt.type).qname
-          if (!allEventType.has(typeQname)) {
+          const [_, module, type] = parseMoveType(evt.type).qname.split(SPLITTER)
+          if (!allEventType.has([module, type].join(SPLITTER))) {
             continue
           }
 
@@ -149,9 +148,7 @@ export class SuiBaseProcessor {
     }
 
     const processor = this
-    const allFunctionType = new Set(
-      _filters.map((f) => accountTypeString(processor.config.address) + '::' + f.function)
-    )
+    const allFunctionType = new Set(_filters.map((f) => f.function))
 
     this.callHandlers.push({
       handler: async function (data) {
@@ -182,7 +179,7 @@ export class SuiBaseProcessor {
 
           // TODO potential pass index
           for (const call of calls) {
-            const functionType = [call.package, call.module, call.function].join(SPLITTER)
+            const functionType = [call.module, call.function].join(SPLITTER)
             if (!allFunctionType.has(functionType)) {
               continue
             }
