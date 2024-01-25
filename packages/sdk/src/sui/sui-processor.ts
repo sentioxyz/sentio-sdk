@@ -22,7 +22,7 @@ import { Required } from 'utility-types'
 
 export const DEFAULT_FETCH_CONFIG: MoveFetchConfig = {
   resourceChanges: false,
-  allEvents: true
+  allEvents: false
 }
 
 export type IndexConfigure = Required<SuiBindOptions, 'startCheckpoint' | 'network'>
