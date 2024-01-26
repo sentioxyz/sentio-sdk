@@ -1,7 +1,7 @@
-import { SuiTransactionBlockResponse, MoveCallSuiTransaction } from '@mysten/sui.js/client'
+import { MoveCallSuiTransaction, SuiTransactionBlockResponse } from '@mysten/sui.js/client'
 import { DataBinding, HandlerType } from '@sentio/protos'
 import { TestProcessorServer } from './test-processor-server.js'
-import { parseMoveType, accountTypeString, SPLITTER } from '@sentio/sdk/move'
+import { accountTypeString, parseMoveType, SPLITTER } from '@sentio/sdk/move'
 import { SuiNetwork } from '../sui/index.js'
 import { getMoveCalls } from '../sui/utils.js'
 
@@ -70,6 +70,36 @@ export class SuiFacet {
     const binding = this.buildEventBinding(transaction, network)
     if (!binding) {
       throw Error('Invalid test event: ' + JSON.stringify(transaction))
+    }
+    return this.server.processBinding(binding)
+  }
+
+  // limitation, can't really do filter logic
+  testGlobalTransaction(transaction: SuiTransactionBlockResponse, network: SuiNetwork = SuiNetwork.MAIN_NET) {
+    const handlerIds = []
+    for (const config of this.server.contractConfigs) {
+      if (config.contract?.address === '*') {
+        for (const callConfig of config.moveCallConfigs) {
+          if (callConfig.filters.length === 1 && callConfig.filters[0].function === '') {
+            handlerIds.push(callConfig.handlerId)
+          }
+        }
+      }
+    }
+    if (handlerIds.length === 0) {
+      throw Error('Invalid test global transaction: ' + JSON.stringify(transaction))
+    }
+
+    const binding: DataBinding = {
+      handlerIds,
+      handlerType: HandlerType.SUI_CALL,
+      data: {
+        suiCall: {
+          transaction,
+          timestamp: transaction.timestampMs ? new Date(transaction.timestampMs) : new Date(),
+          slot: BigInt(transaction.checkpoint || 0)
+        }
+      }
     }
     return this.server.processBinding(binding)
   }
