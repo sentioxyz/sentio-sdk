@@ -75,7 +75,9 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
   }
 
   async processBindings(request: ProcessBindingsRequest, options: CallContext) {
-    request.bindings = request.bindings.sort(dataCompare)
+    if (GLOBAL_CONFIG.execution.sequential) {
+      request.bindings = request.bindings.sort(dataCompare)
+    }
 
     for (const binding of request.bindings) {
       this.adjustDataBinding(binding)
@@ -150,7 +152,7 @@ function getTimestamp(d: DataBinding): Date | undefined {
   return (
     d.data?.ethLog?.timestamp ||
     d.data?.ethTransaction?.timestamp ||
-    d.data?.ethBlock?.block?.timestamp ||
+    // d.data?.ethBlock?.block.time ||
     d.data?.ethTrace?.timestamp
   )
 }
