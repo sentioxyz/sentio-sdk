@@ -39,7 +39,7 @@
     "jszip": "^3.10.1",
     "latest-version": "^8.0.0",
     "node-fetch": "^3.3.2",
-    "open": "^9.1.0",
+    "open": "^10.0.3",
     "ts-jest": "^29.1.2",
     "ts-node": "^10.9.2",
     "tsup": "npm:@sentio/tsup@^6.7.2",

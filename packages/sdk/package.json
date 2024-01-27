@@ -81,7 +81,7 @@
     "nice-grpc-common": "^2.0.2",
     "nice-grpc-prometheus": "^0.2.2",
     "node-fetch": "^3.3.2",
-    "p-queue": "^7.4.1",
+    "p-queue": "^8.0.1",
     "prettier": "^3.2.4",
     "prettier2": "npm:prettier@2.8.8",
     "radash": "^11.0.0",
