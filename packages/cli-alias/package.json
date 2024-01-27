@@ -1,14 +1,14 @@
 {
   "name": "sentio-cli",
   "version": "2.0.0-development",
-  "dependencies": {
-    "@sentio/cli": "workspace:*"
-  },
-  "types": "module",
   "bin": {
     "sentio": "./index.js"
   },
+  "types": "module",
+  "dependencies": {
+    "@sentio/cli": "workspace:*"
+  },
   "engines": {
-    "node": ">=16"
+    "node": ">=18"
   }
 }

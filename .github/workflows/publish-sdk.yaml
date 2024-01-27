@@ -18,10 +18,10 @@ jobs:
           ref: ${{ github.event.inputs.commit }}
       - uses: pnpm/action-setup@v2
         with:
-          version: 8.9.2
+          version: 8
       - uses: actions/setup-node@v4
         with:
-          node-version: 18.18
+          node-version: 20
           cache: 'pnpm'
           registry-url: 'https://registry.npmjs.org'
       - name: Set NPM variables
@@ -41,7 +41,7 @@ jobs:
         run: pnpm --filter "./packages/*..." build
       - name: SDK Semantic Release
         id: semantic
-        uses: cycjimmy/semantic-release-action@v3
+        uses: cycjimmy/semantic-release-action@v4
         env:
           GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
       - name: SDK Release Summary

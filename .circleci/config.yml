@@ -14,7 +14,7 @@ jobs:
 #          - main
     executor:
       name: node/default # use the default executor defined within the orb
-      tag: '18.18'
+      tag: '20.11'
     steps:
       - checkout
       - restore_cache:
@@ -25,7 +25,7 @@ jobs:
           name: Install pnpm package manager
           command: |
             sudo corepack enable
-            sudo corepack prepare pnpm@8.9.2 --activate
+            sudo corepack prepare pnpm@8 --activate
       - run:
           name: Install Dependencies
           command: |
