@@ -6,10 +6,10 @@ import {
   InternalMoveStruct,
   moduleQname,
   SPLITTER,
+  camel,
   normalizeToJSName,
   upperFirst
 } from '@typemove/move'
-import { camel } from 'radash'
 
 export abstract class SharedNetworkCodegen<NetworkType, ModuleTypes, StructType> extends AbstractCodegen<
   ModuleTypes,
