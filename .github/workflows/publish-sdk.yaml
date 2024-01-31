@@ -73,7 +73,7 @@ jobs:
         working-directory: packages/cli
       - name: CLI Semantic Release
         id: semantic_cli
-        uses: cycjimmy/semantic-release-action@v3
+        uses: cycjimmy/semantic-release-action@v4
         with:
           working_directory: packages/cli
         env:
