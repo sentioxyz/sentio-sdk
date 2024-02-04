@@ -96,7 +96,7 @@ class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
 
   async send(method: string, params: Array<any>): Promise<any> {
     if (method !== 'eth_call') {
-      return super.send(method, params)
+      return await this.executor.add(() => super.send(method, params))
     }
     const tag = getTag(method, params)
     const block = params[params.length - 1]
@@ -110,14 +110,6 @@ class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
             this.#performCache.delete(tag)
           }
         }, 1000)
-        // }
-        // if (e.code === 'CALL_EXCEPTION' && !e.data) {
-        //   setTimeout(() => {
-        //     if (this.#performCache.get(tag) === perform) {
-        //       this.#performCache.delete(tag)
-        //     }
-        //   }, 1000)
-        // }
       })
       this.#performCache.set(tag, perform)
       // For non latest block call, we cache permanently, otherwise we cache for one minute
