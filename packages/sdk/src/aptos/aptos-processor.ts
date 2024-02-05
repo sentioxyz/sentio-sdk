@@ -27,7 +27,8 @@ import { Labels, PromiseOrVoid } from '../core/index.js'
 
 const DEFAULT_FETCH_CONFIG: MoveFetchConfig = {
   resourceChanges: false,
-  allEvents: true
+  allEvents: true,
+  inputs: false
 }
 
 export const DEFAULT_RESOURCE_FETCH_CONFIG: MoveAccountFetchConfig = {

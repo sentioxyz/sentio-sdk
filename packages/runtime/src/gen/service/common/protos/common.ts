@@ -1560,6 +1560,35 @@ export interface ComputeStats {
   computedBy: string;
 }
 
+export interface ClickhouseStatus {
+  mutations: { [key: number]: ClickhouseStatus_Mutation };
+  processes: { [key: number]: ClickhouseStatus_Processes };
+}
+
+export interface ClickhouseStatus_Mutation {
+  undoneCnt: number;
+}
+
+export interface ClickhouseStatus_Process {
+  query: string;
+  queryKind: string;
+  elapsed: number;
+}
+
+export interface ClickhouseStatus_Processes {
+  processes: ClickhouseStatus_Process[];
+}
+
+export interface ClickhouseStatus_MutationsEntry {
+  key: number;
+  value: ClickhouseStatus_Mutation | undefined;
+}
+
+export interface ClickhouseStatus_ProcessesEntry {
+  key: number;
+  value: ClickhouseStatus_Processes | undefined;
+}
+
 function createBaseUsageTracker(): UsageTracker {
   return {
     apiSku: "",
@@ -8541,6 +8570,424 @@ export const ComputeStats = {
     message.computeCostMs = object.computeCostMs ?? BigInt("0");
     message.binaryVersionHash = object.binaryVersionHash ?? BigInt("0");
     message.computedBy = object.computedBy ?? "";
+    return message;
+  },
+};
+
+function createBaseClickhouseStatus(): ClickhouseStatus {
+  return { mutations: {}, processes: {} };
+}
+
+export const ClickhouseStatus = {
+  encode(message: ClickhouseStatus, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    Object.entries(message.mutations).forEach(([key, value]) => {
+      ClickhouseStatus_MutationsEntry.encode({ key: key as any, value }, writer.uint32(10).fork()).ldelim();
+    });
+    Object.entries(message.processes).forEach(([key, value]) => {
+      ClickhouseStatus_ProcessesEntry.encode({ key: key as any, value }, writer.uint32(18).fork()).ldelim();
+    });
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ClickhouseStatus {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseClickhouseStatus();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          const entry1 = ClickhouseStatus_MutationsEntry.decode(reader, reader.uint32());
+          if (entry1.value !== undefined) {
+            message.mutations[entry1.key] = entry1.value;
+          }
+          break;
+        case 2:
+          const entry2 = ClickhouseStatus_ProcessesEntry.decode(reader, reader.uint32());
+          if (entry2.value !== undefined) {
+            message.processes[entry2.key] = entry2.value;
+          }
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ClickhouseStatus {
+    return {
+      mutations: isObject(object.mutations)
+        ? Object.entries(object.mutations).reduce<{ [key: number]: ClickhouseStatus_Mutation }>((acc, [key, value]) => {
+          acc[Number(key)] = ClickhouseStatus_Mutation.fromJSON(value);
+          return acc;
+        }, {})
+        : {},
+      processes: isObject(object.processes)
+        ? Object.entries(object.processes).reduce<{ [key: number]: ClickhouseStatus_Processes }>(
+          (acc, [key, value]) => {
+            acc[Number(key)] = ClickhouseStatus_Processes.fromJSON(value);
+            return acc;
+          },
+          {},
+        )
+        : {},
+    };
+  },
+
+  toJSON(message: ClickhouseStatus): unknown {
+    const obj: any = {};
+    obj.mutations = {};
+    if (message.mutations) {
+      Object.entries(message.mutations).forEach(([k, v]) => {
+        obj.mutations[k] = ClickhouseStatus_Mutation.toJSON(v);
+      });
+    }
+    obj.processes = {};
+    if (message.processes) {
+      Object.entries(message.processes).forEach(([k, v]) => {
+        obj.processes[k] = ClickhouseStatus_Processes.toJSON(v);
+      });
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<ClickhouseStatus>): ClickhouseStatus {
+    return ClickhouseStatus.fromPartial(base ?? {});
+  },
+
+  fromPartial(object: DeepPartial<ClickhouseStatus>): ClickhouseStatus {
+    const message = createBaseClickhouseStatus();
+    message.mutations = Object.entries(object.mutations ?? {}).reduce<{ [key: number]: ClickhouseStatus_Mutation }>(
+      (acc, [key, value]) => {
+        if (value !== undefined) {
+          acc[Number(key)] = ClickhouseStatus_Mutation.fromPartial(value);
+        }
+        return acc;
+      },
+      {},
+    );
+    message.processes = Object.entries(object.processes ?? {}).reduce<{ [key: number]: ClickhouseStatus_Processes }>(
+      (acc, [key, value]) => {
+        if (value !== undefined) {
+          acc[Number(key)] = ClickhouseStatus_Processes.fromPartial(value);
+        }
+        return acc;
+      },
+      {},
+    );
+    return message;
+  },
+};
+
+function createBaseClickhouseStatus_Mutation(): ClickhouseStatus_Mutation {
+  return { undoneCnt: 0 };
+}
+
+export const ClickhouseStatus_Mutation = {
+  encode(message: ClickhouseStatus_Mutation, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.undoneCnt !== 0) {
+      writer.uint32(8).int32(message.undoneCnt);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ClickhouseStatus_Mutation {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseClickhouseStatus_Mutation();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.undoneCnt = reader.int32();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ClickhouseStatus_Mutation {
+    return { undoneCnt: isSet(object.undoneCnt) ? Number(object.undoneCnt) : 0 };
+  },
+
+  toJSON(message: ClickhouseStatus_Mutation): unknown {
+    const obj: any = {};
+    message.undoneCnt !== undefined && (obj.undoneCnt = Math.round(message.undoneCnt));
+    return obj;
+  },
+
+  create(base?: DeepPartial<ClickhouseStatus_Mutation>): ClickhouseStatus_Mutation {
+    return ClickhouseStatus_Mutation.fromPartial(base ?? {});
+  },
+
+  fromPartial(object: DeepPartial<ClickhouseStatus_Mutation>): ClickhouseStatus_Mutation {
+    const message = createBaseClickhouseStatus_Mutation();
+    message.undoneCnt = object.undoneCnt ?? 0;
+    return message;
+  },
+};
+
+function createBaseClickhouseStatus_Process(): ClickhouseStatus_Process {
+  return { query: "", queryKind: "", elapsed: 0 };
+}
+
+export const ClickhouseStatus_Process = {
+  encode(message: ClickhouseStatus_Process, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.query !== "") {
+      writer.uint32(10).string(message.query);
+    }
+    if (message.queryKind !== "") {
+      writer.uint32(18).string(message.queryKind);
+    }
+    if (message.elapsed !== 0) {
+      writer.uint32(25).double(message.elapsed);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ClickhouseStatus_Process {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseClickhouseStatus_Process();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.query = reader.string();
+          break;
+        case 2:
+          message.queryKind = reader.string();
+          break;
+        case 3:
+          message.elapsed = reader.double();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ClickhouseStatus_Process {
+    return {
+      query: isSet(object.query) ? String(object.query) : "",
+      queryKind: isSet(object.queryKind) ? String(object.queryKind) : "",
+      elapsed: isSet(object.elapsed) ? Number(object.elapsed) : 0,
+    };
+  },
+
+  toJSON(message: ClickhouseStatus_Process): unknown {
+    const obj: any = {};
+    message.query !== undefined && (obj.query = message.query);
+    message.queryKind !== undefined && (obj.queryKind = message.queryKind);
+    message.elapsed !== undefined && (obj.elapsed = message.elapsed);
+    return obj;
+  },
+
+  create(base?: DeepPartial<ClickhouseStatus_Process>): ClickhouseStatus_Process {
+    return ClickhouseStatus_Process.fromPartial(base ?? {});
+  },
+
+  fromPartial(object: DeepPartial<ClickhouseStatus_Process>): ClickhouseStatus_Process {
+    const message = createBaseClickhouseStatus_Process();
+    message.query = object.query ?? "";
+    message.queryKind = object.queryKind ?? "";
+    message.elapsed = object.elapsed ?? 0;
+    return message;
+  },
+};
+
+function createBaseClickhouseStatus_Processes(): ClickhouseStatus_Processes {
+  return { processes: [] };
+}
+
+export const ClickhouseStatus_Processes = {
+  encode(message: ClickhouseStatus_Processes, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.processes) {
+      ClickhouseStatus_Process.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ClickhouseStatus_Processes {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseClickhouseStatus_Processes();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.processes.push(ClickhouseStatus_Process.decode(reader, reader.uint32()));
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ClickhouseStatus_Processes {
+    return {
+      processes: Array.isArray(object?.processes)
+        ? object.processes.map((e: any) => ClickhouseStatus_Process.fromJSON(e))
+        : [],
+    };
+  },
+
+  toJSON(message: ClickhouseStatus_Processes): unknown {
+    const obj: any = {};
+    if (message.processes) {
+      obj.processes = message.processes.map((e) => e ? ClickhouseStatus_Process.toJSON(e) : undefined);
+    } else {
+      obj.processes = [];
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<ClickhouseStatus_Processes>): ClickhouseStatus_Processes {
+    return ClickhouseStatus_Processes.fromPartial(base ?? {});
+  },
+
+  fromPartial(object: DeepPartial<ClickhouseStatus_Processes>): ClickhouseStatus_Processes {
+    const message = createBaseClickhouseStatus_Processes();
+    message.processes = object.processes?.map((e) => ClickhouseStatus_Process.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseClickhouseStatus_MutationsEntry(): ClickhouseStatus_MutationsEntry {
+  return { key: 0, value: undefined };
+}
+
+export const ClickhouseStatus_MutationsEntry = {
+  encode(message: ClickhouseStatus_MutationsEntry, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.key !== 0) {
+      writer.uint32(8).int32(message.key);
+    }
+    if (message.value !== undefined) {
+      ClickhouseStatus_Mutation.encode(message.value, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ClickhouseStatus_MutationsEntry {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseClickhouseStatus_MutationsEntry();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.key = reader.int32();
+          break;
+        case 2:
+          message.value = ClickhouseStatus_Mutation.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ClickhouseStatus_MutationsEntry {
+    return {
+      key: isSet(object.key) ? Number(object.key) : 0,
+      value: isSet(object.value) ? ClickhouseStatus_Mutation.fromJSON(object.value) : undefined,
+    };
+  },
+
+  toJSON(message: ClickhouseStatus_MutationsEntry): unknown {
+    const obj: any = {};
+    message.key !== undefined && (obj.key = Math.round(message.key));
+    message.value !== undefined &&
+      (obj.value = message.value ? ClickhouseStatus_Mutation.toJSON(message.value) : undefined);
+    return obj;
+  },
+
+  create(base?: DeepPartial<ClickhouseStatus_MutationsEntry>): ClickhouseStatus_MutationsEntry {
+    return ClickhouseStatus_MutationsEntry.fromPartial(base ?? {});
+  },
+
+  fromPartial(object: DeepPartial<ClickhouseStatus_MutationsEntry>): ClickhouseStatus_MutationsEntry {
+    const message = createBaseClickhouseStatus_MutationsEntry();
+    message.key = object.key ?? 0;
+    message.value = (object.value !== undefined && object.value !== null)
+      ? ClickhouseStatus_Mutation.fromPartial(object.value)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseClickhouseStatus_ProcessesEntry(): ClickhouseStatus_ProcessesEntry {
+  return { key: 0, value: undefined };
+}
+
+export const ClickhouseStatus_ProcessesEntry = {
+  encode(message: ClickhouseStatus_ProcessesEntry, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.key !== 0) {
+      writer.uint32(8).int32(message.key);
+    }
+    if (message.value !== undefined) {
+      ClickhouseStatus_Processes.encode(message.value, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ClickhouseStatus_ProcessesEntry {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseClickhouseStatus_ProcessesEntry();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.key = reader.int32();
+          break;
+        case 2:
+          message.value = ClickhouseStatus_Processes.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ClickhouseStatus_ProcessesEntry {
+    return {
+      key: isSet(object.key) ? Number(object.key) : 0,
+      value: isSet(object.value) ? ClickhouseStatus_Processes.fromJSON(object.value) : undefined,
+    };
+  },
+
+  toJSON(message: ClickhouseStatus_ProcessesEntry): unknown {
+    const obj: any = {};
+    message.key !== undefined && (obj.key = Math.round(message.key));
+    message.value !== undefined &&
+      (obj.value = message.value ? ClickhouseStatus_Processes.toJSON(message.value) : undefined);
+    return obj;
+  },
+
+  create(base?: DeepPartial<ClickhouseStatus_ProcessesEntry>): ClickhouseStatus_ProcessesEntry {
+    return ClickhouseStatus_ProcessesEntry.fromPartial(base ?? {});
+  },
+
+  fromPartial(object: DeepPartial<ClickhouseStatus_ProcessesEntry>): ClickhouseStatus_ProcessesEntry {
+    const message = createBaseClickhouseStatus_ProcessesEntry();
+    message.key = object.key ?? 0;
+    message.value = (object.value !== undefined && object.value !== null)
+      ? ClickhouseStatus_Processes.fromPartial(object.value)
+      : undefined;
     return message;
   },
 };

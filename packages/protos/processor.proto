@@ -305,6 +305,7 @@ message ResourceConfig {
 message MoveFetchConfig {
   bool resource_changes = 1;
   bool all_events = 2;
+  bool inputs = 4;
   optional ResourceConfig resource_config = 3;
 }
 

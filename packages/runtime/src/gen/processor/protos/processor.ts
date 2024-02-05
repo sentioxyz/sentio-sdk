@@ -624,6 +624,7 @@ export interface ResourceConfig {
 export interface MoveFetchConfig {
   resourceChanges: boolean;
   allEvents: boolean;
+  inputs: boolean;
   resourceConfig?: ResourceConfig | undefined;
 }
 
@@ -3415,7 +3416,7 @@ export const ResourceConfig = {
 };
 
 function createBaseMoveFetchConfig(): MoveFetchConfig {
-  return { resourceChanges: false, allEvents: false, resourceConfig: undefined };
+  return { resourceChanges: false, allEvents: false, inputs: false, resourceConfig: undefined };
 }
 
 export const MoveFetchConfig = {
@@ -3425,6 +3426,9 @@ export const MoveFetchConfig = {
     }
     if (message.allEvents === true) {
       writer.uint32(16).bool(message.allEvents);
+    }
+    if (message.inputs === true) {
+      writer.uint32(32).bool(message.inputs);
     }
     if (message.resourceConfig !== undefined) {
       ResourceConfig.encode(message.resourceConfig, writer.uint32(26).fork()).ldelim();
@@ -3445,6 +3449,9 @@ export const MoveFetchConfig = {
         case 2:
           message.allEvents = reader.bool();
           break;
+        case 4:
+          message.inputs = reader.bool();
+          break;
         case 3:
           message.resourceConfig = ResourceConfig.decode(reader, reader.uint32());
           break;
@@ -3460,6 +3467,7 @@ export const MoveFetchConfig = {
     return {
       resourceChanges: isSet(object.resourceChanges) ? Boolean(object.resourceChanges) : false,
       allEvents: isSet(object.allEvents) ? Boolean(object.allEvents) : false,
+      inputs: isSet(object.inputs) ? Boolean(object.inputs) : false,
       resourceConfig: isSet(object.resourceConfig) ? ResourceConfig.fromJSON(object.resourceConfig) : undefined,
     };
   },
@@ -3468,6 +3476,7 @@ export const MoveFetchConfig = {
     const obj: any = {};
     message.resourceChanges !== undefined && (obj.resourceChanges = message.resourceChanges);
     message.allEvents !== undefined && (obj.allEvents = message.allEvents);
+    message.inputs !== undefined && (obj.inputs = message.inputs);
     message.resourceConfig !== undefined &&
       (obj.resourceConfig = message.resourceConfig ? ResourceConfig.toJSON(message.resourceConfig) : undefined);
     return obj;
@@ -3481,6 +3490,7 @@ export const MoveFetchConfig = {
     const message = createBaseMoveFetchConfig();
     message.resourceChanges = object.resourceChanges ?? false;
     message.allEvents = object.allEvents ?? false;
+    message.inputs = object.inputs ?? false;
     message.resourceConfig = (object.resourceConfig !== undefined && object.resourceConfig !== null)
       ? ResourceConfig.fromPartial(object.resourceConfig)
       : undefined;

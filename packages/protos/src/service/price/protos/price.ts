@@ -1,6 +1,7 @@
 /* eslint-disable */
 import type { CallContext, CallOptions } from "nice-grpc-common";
 import _m0 from "protobufjs/minimal.js";
+import { Empty } from "../../../google/protobuf/empty.js";
 import { Timestamp } from "../../../google/protobuf/timestamp.js";
 
 export interface CoinID {
@@ -57,6 +58,17 @@ export interface ListCoinsResponse {
 export interface ListCoinsResponse_CoinAddressesInChainEntry {
   key: string;
   value: CoinID | undefined;
+}
+
+export interface CheckLatestPriceResponse {
+  prices: CheckLatestPriceResponse_CoinPrice[];
+  latestPrice: CheckLatestPriceResponse_CoinPrice | undefined;
+}
+
+export interface CheckLatestPriceResponse_CoinPrice {
+  coinId: CoinID | undefined;
+  price: number;
+  timestamp: Date | undefined;
 }
 
 function createBaseCoinID(): CoinID {
@@ -807,6 +819,153 @@ export const ListCoinsResponse_CoinAddressesInChainEntry = {
   },
 };
 
+function createBaseCheckLatestPriceResponse(): CheckLatestPriceResponse {
+  return { prices: [], latestPrice: undefined };
+}
+
+export const CheckLatestPriceResponse = {
+  encode(message: CheckLatestPriceResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.prices) {
+      CheckLatestPriceResponse_CoinPrice.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.latestPrice !== undefined) {
+      CheckLatestPriceResponse_CoinPrice.encode(message.latestPrice, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): CheckLatestPriceResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCheckLatestPriceResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.prices.push(CheckLatestPriceResponse_CoinPrice.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.latestPrice = CheckLatestPriceResponse_CoinPrice.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): CheckLatestPriceResponse {
+    return {
+      prices: Array.isArray(object?.prices)
+        ? object.prices.map((e: any) => CheckLatestPriceResponse_CoinPrice.fromJSON(e))
+        : [],
+      latestPrice: isSet(object.latestPrice)
+        ? CheckLatestPriceResponse_CoinPrice.fromJSON(object.latestPrice)
+        : undefined,
+    };
+  },
+
+  toJSON(message: CheckLatestPriceResponse): unknown {
+    const obj: any = {};
+    if (message.prices) {
+      obj.prices = message.prices.map((e) => e ? CheckLatestPriceResponse_CoinPrice.toJSON(e) : undefined);
+    } else {
+      obj.prices = [];
+    }
+    message.latestPrice !== undefined && (obj.latestPrice = message.latestPrice
+      ? CheckLatestPriceResponse_CoinPrice.toJSON(message.latestPrice)
+      : undefined);
+    return obj;
+  },
+
+  create(base?: DeepPartial<CheckLatestPriceResponse>): CheckLatestPriceResponse {
+    return CheckLatestPriceResponse.fromPartial(base ?? {});
+  },
+
+  fromPartial(object: DeepPartial<CheckLatestPriceResponse>): CheckLatestPriceResponse {
+    const message = createBaseCheckLatestPriceResponse();
+    message.prices = object.prices?.map((e) => CheckLatestPriceResponse_CoinPrice.fromPartial(e)) || [];
+    message.latestPrice = (object.latestPrice !== undefined && object.latestPrice !== null)
+      ? CheckLatestPriceResponse_CoinPrice.fromPartial(object.latestPrice)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseCheckLatestPriceResponse_CoinPrice(): CheckLatestPriceResponse_CoinPrice {
+  return { coinId: undefined, price: 0, timestamp: undefined };
+}
+
+export const CheckLatestPriceResponse_CoinPrice = {
+  encode(message: CheckLatestPriceResponse_CoinPrice, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.coinId !== undefined) {
+      CoinID.encode(message.coinId, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.price !== 0) {
+      writer.uint32(17).double(message.price);
+    }
+    if (message.timestamp !== undefined) {
+      Timestamp.encode(toTimestamp(message.timestamp), writer.uint32(26).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): CheckLatestPriceResponse_CoinPrice {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCheckLatestPriceResponse_CoinPrice();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.coinId = CoinID.decode(reader, reader.uint32());
+          break;
+        case 2:
+          message.price = reader.double();
+          break;
+        case 3:
+          message.timestamp = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): CheckLatestPriceResponse_CoinPrice {
+    return {
+      coinId: isSet(object.coinId) ? CoinID.fromJSON(object.coinId) : undefined,
+      price: isSet(object.price) ? Number(object.price) : 0,
+      timestamp: isSet(object.timestamp) ? fromJsonTimestamp(object.timestamp) : undefined,
+    };
+  },
+
+  toJSON(message: CheckLatestPriceResponse_CoinPrice): unknown {
+    const obj: any = {};
+    message.coinId !== undefined && (obj.coinId = message.coinId ? CoinID.toJSON(message.coinId) : undefined);
+    message.price !== undefined && (obj.price = message.price);
+    message.timestamp !== undefined && (obj.timestamp = message.timestamp.toISOString());
+    return obj;
+  },
+
+  create(base?: DeepPartial<CheckLatestPriceResponse_CoinPrice>): CheckLatestPriceResponse_CoinPrice {
+    return CheckLatestPriceResponse_CoinPrice.fromPartial(base ?? {});
+  },
+
+  fromPartial(object: DeepPartial<CheckLatestPriceResponse_CoinPrice>): CheckLatestPriceResponse_CoinPrice {
+    const message = createBaseCheckLatestPriceResponse_CoinPrice();
+    message.coinId = (object.coinId !== undefined && object.coinId !== null)
+      ? CoinID.fromPartial(object.coinId)
+      : undefined;
+    message.price = object.price ?? 0;
+    message.timestamp = object.timestamp ?? undefined;
+    return message;
+  },
+};
+
 export type PriceServiceDefinition = typeof PriceServiceDefinition;
 export const PriceServiceDefinition = {
   name: "PriceService",
@@ -836,6 +995,14 @@ export const PriceServiceDefinition = {
       responseStream: false,
       options: {},
     },
+    checkLatestPrice: {
+      name: "CheckLatestPrice",
+      requestType: Empty,
+      requestStream: false,
+      responseType: CheckLatestPriceResponse,
+      responseStream: false,
+      options: {},
+    },
   },
 } as const;
 
@@ -846,6 +1013,10 @@ export interface PriceServiceImplementation<CallContextExt = {}> {
     context: CallContext & CallContextExt,
   ): Promise<DeepPartial<BatchGetPricesResponse>>;
   listCoins(request: ListCoinsRequest, context: CallContext & CallContextExt): Promise<DeepPartial<ListCoinsResponse>>;
+  checkLatestPrice(
+    request: Empty,
+    context: CallContext & CallContextExt,
+  ): Promise<DeepPartial<CheckLatestPriceResponse>>;
 }
 
 export interface PriceServiceClient<CallOptionsExt = {}> {
@@ -855,6 +1026,10 @@ export interface PriceServiceClient<CallOptionsExt = {}> {
     options?: CallOptions & CallOptionsExt,
   ): Promise<BatchGetPricesResponse>;
   listCoins(request: DeepPartial<ListCoinsRequest>, options?: CallOptions & CallOptionsExt): Promise<ListCoinsResponse>;
+  checkLatestPrice(
+    request: DeepPartial<Empty>,
+    options?: CallOptions & CallOptionsExt,
+  ): Promise<CheckLatestPriceResponse>;
 }
 
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
