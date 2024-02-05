@@ -35,6 +35,17 @@ function setCoinList(list: (Omit<SimpleCoinInfo, 'bridge'> & { name: string })[]
     if (info.name.includes('Wormhole')) {
       bridge = 'Wormhole'
     }
+    if (
+      info.token_type.type ===
+        '0x111ae3e5bc816a5e63c2da97d0aa3886519e0cd5e4b046659fa35796bd11542a::stapt_token::StakedApt' &&
+      info.symbol === 'stAPT'
+    ) {
+      info.symbol = 'amStApt'
+    } else {
+      if (info.hippo_symbol) {
+        info.symbol = info.hippo_symbol
+      }
+    }
     WHITELISTED_COINS.set(info.token_type.type, { ...info, bridge })
   }
 }

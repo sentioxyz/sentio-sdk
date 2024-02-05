@@ -7,6 +7,7 @@ import { MoveCoinList } from './coin-list.js'
 export interface SimpleCoinInfo {
   token_type: { type: string; account_address: string }
   symbol: string
+  hippo_symbol?: string
   decimals: number
   bridge: string
 }
