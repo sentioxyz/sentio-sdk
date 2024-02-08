@@ -83,8 +83,8 @@ importers:
         specifier: ^23.0.0
         version: 23.0.0(typescript@5.3.3)
       semantic-release-monorepo:
-        specifier: ^8.0.1
-        version: 8.0.1(semantic-release@23.0.0)
+        specifier: ^8.0.2
+        version: 8.0.2(semantic-release@23.0.0)
       ts-jest:
         specifier: ^29.1.2
         version: 29.1.2(@babel/core@7.23.9)(@jest/types@29.6.3)(esbuild@0.17.19)(jest@29.7.0)(typescript@5.3.3)
@@ -8772,8 +8772,8 @@ packages:
     dev: true
     optional: true
 
-  /semantic-release-monorepo@8.0.1(semantic-release@23.0.0):
-    resolution: {integrity: sha512-AF8PYDxQxUo/P/eb0i5HgJ9Dmfb5+CSZmP4fXAZWuH6zw09OzPBXMtwtu5FQ2ol9kDFvrCa55/N8Ef2dU8JmVQ==}
+  /semantic-release-monorepo@8.0.2(semantic-release@23.0.0):
+    resolution: {integrity: sha512-TQC6KKIA0ATjii1OT0ZmQqcVzBJoaetJaJBC8FmKkg1IbDR4wBsuX6gl6UHDdijRDl8YyXqahj2hkJNyV6m9Jg==}
     peerDependencies:
       semantic-release: '>=22.0.7'
     dependencies:
