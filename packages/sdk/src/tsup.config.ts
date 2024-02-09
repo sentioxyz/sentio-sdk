@@ -28,7 +28,7 @@ export default defineConfig({
     'node-fetch',
     /^nice-grpc.*$/,
     /^prettier.*$/,
-    /^@(ethersproject|solana|project-serum).*$/,
+    /^@(solana|project-serum).*$/,
     /^@sentio\/(sdk|runtime|protos|bigdecimal|ethers).*$/,
     /^@typemove\/.*$/,
     /^@mysten\/(bcs|sui.js\/).*$/
