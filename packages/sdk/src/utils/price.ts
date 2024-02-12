@@ -153,7 +153,8 @@ export async function getCoinsThatHasPrice(chainId: ChainId) {
     priceClient = getPriceClient()
   }
   const response = await priceClient.listCoins({
-    chain: chainId
+    chain: chainId,
+    limit: 1000
   })
 
   return Object.entries(response.coinAddressesInChain).map(([symbol, coin]) => {
