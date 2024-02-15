@@ -429,8 +429,8 @@ importers:
         specifier: ^1.0.7
         version: 1.0.7
       '@sentio/ethers-v6':
-        specifier: ^1.0.28
-        version: 1.0.28(@sentio/ethers@6.7.1-patch.4)(typescript@5.3.3)
+        specifier: ^1.0.29
+        version: 1.0.29(@sentio/ethers@6.7.1-patch.4)(typescript@5.3.3)
       '@sentio/protos':
         specifier: workspace:*
         version: link:../protos
@@ -2482,8 +2482,8 @@ packages:
     requiresBuild: true
     dev: false
 
-  /@sentio/ethers-v6@1.0.28(@sentio/ethers@6.7.1-patch.4)(typescript@5.3.3):
-    resolution: {integrity: sha512-5wCtsOhB5uySaVV0PxfXjX0tfEOxZzT5UWzONkiW+QnXgShaEtSqXQUfvAuF7f2i+Wz8bXHC/AIYYRQZLHHKfg==}
+  /@sentio/ethers-v6@1.0.29(@sentio/ethers@6.7.1-patch.4)(typescript@5.3.3):
+    resolution: {integrity: sha512-/4jZZn+eM3EfI0bUMBAf5vu8muy8ABptu8ucFoMDTZLLTjxcSKRffLP3RL7w1JHGjyC2V6oEQfwS4cn9JEohHQ==}
     peerDependencies:
       ethers: npm:@sentio/ethers@6.7.1-patch.4
       typescript: '>=4.3.0'
