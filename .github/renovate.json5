@@ -13,7 +13,8 @@
         "superstruct_solana",
         "mkdirp",
         "prettier2",
-        "chai"
+        "chai",
+        "prom-client",
       ],
       "enabled": false
     }

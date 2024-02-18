@@ -1,17 +1,31 @@
-import util from 'util'
 import { createLogger, format, transports } from 'winston'
 
 export function setupJsonLogger() {
   const utilFormatter = {
     transform: (info: any) => {
+      const stringRes = []
+
+      if (typeof info.message === 'object') {
+        stringRes.push(JSON.stringify(info.message))
+      } else {
+        stringRes.push(info.message)
+      }
+
       const args = info[Symbol.for('splat')]
       if (args) {
-        info.message = util.format(info.message, ...args)
-      } else {
-        info.message = util.format(info.message)
+        for (const idx in args) {
+          const arg = args[idx]
+          if (typeof arg === 'object') {
+            stringRes.push(JSON.stringify(arg))
+          } else {
+            stringRes.push(arg)
+          }
+        }
       }
+
+      info.message = stringRes.join(' ')
       return info
-    },
+    }
   }
   const logger = createLogger({
     format: format.combine(
@@ -20,7 +34,7 @@ export function setupJsonLogger() {
       format.errors({ stack: true }),
       format.json()
     ),
-    transports: [new transports.Console()],
+    transports: [new transports.Console()]
   })
 
   console.log = (...args) => logger.info.call(logger, ...args)
