@@ -12,7 +12,8 @@
         "node",
         "superstruct_solana",
         "mkdirp",
-        "prettier2"
+        "prettier2",
+        "chai"
       ],
       "enabled": false
     }
