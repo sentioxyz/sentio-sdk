@@ -152,7 +152,7 @@ function getTimestamp(d: DataBinding): Date | undefined {
   return (
     d.data?.ethLog?.timestamp ||
     d.data?.ethTransaction?.timestamp ||
-    d.data?.ethBlock?.block?.timestamp ||
+    new Date(Number(d.data?.ethBlock?.block?.timestamp)) ||
     d.data?.ethTrace?.timestamp
   )
 }
