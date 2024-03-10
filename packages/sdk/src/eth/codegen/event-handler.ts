@@ -31,12 +31,13 @@ export function generateEventHandlers(events: EventDeclaration[], contractName: 
 
 function generateEventFilter(event: EventDeclaration, includeArgTypes: boolean): string {
   const eventName = includeArgTypes ? getFullSignatureAsSymbolForEvent(event) : event.name
+  const eventNamePrefix = includeArgTypes ? eventName + '_' : eventName
 
   const filterName = getFullSignatureForEventPatched(event)
   return `
-    ${eventName}(${generateEventInputs(event.inputs)}) { return templateContract.filters['${filterName}'](${event.inputs
-    .map((i, idx) => i.name || `arg${idx}`)
-    .join(',')}) }
+    ${eventNamePrefix}(${generateEventInputs(event.inputs)}): ${eventNamePrefix}EventFilter { return templateContract.filters['${filterName}'](${event.inputs
+      .map((i, idx) => i.name || `arg${idx}`)
+      .join(',')}) }
   `
 }
 
