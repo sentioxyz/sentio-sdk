@@ -16,7 +16,7 @@ type OralceRecord = {
 export enum PriceUnit {
   USD = 0,
   ETH = 1,
-  BTC = 2,
+  BTC = 2
 }
 
 export interface DexPriceResult {
@@ -43,7 +43,7 @@ class DexPrice {
     const records: OralceRecord[] = parse(fileContent, {
       delimiter: ',',
       columns: headers,
-      skip_empty_lines: true,
+      skip_empty_lines: true
     })
 
     for (const record of records) {
@@ -97,14 +97,14 @@ class DexPrice {
     const addr = oracleMap.get(asset)
     if (!addr) {
       return {
-        error: 'No price feed found for asset',
+        error: 'No price feed found for asset'
       }
     }
 
     const contract = getEACAggregatorProxyContract(this.chainId, addr)
     try {
       const price = await contract.latestAnswer({
-        blockTag: blockTag,
+        blockTag: blockTag
       })
 
       let decimal = this.ASSETS_INFOS.get(asset)
@@ -114,7 +114,7 @@ class DexPrice {
       }
 
       return {
-        price: scaleDown(price, decimal).toNumber(),
+        price: scaleDown(price, decimal).toNumber()
       }
     } catch (e) {
       return {
@@ -126,11 +126,11 @@ class DexPrice {
           ' at chain ' +
           this.chainId +
           '. Details: ' +
-          e.toString(),
+          e.toString()
       }
     }
   }
 }
 
 export const EthereumDexPrice = new DexPrice('chainlink-oracles.csv', EthChainId.ETHEREUM)
-export const GoerliDexPrice = new DexPrice('chainlink-oracles-goerli.csv', EthChainId.GOERLI)
+export const SepoliaDexPrice = new DexPrice('chainlink-oracles-sepolia.csv', EthChainId.SEPOLIA)

@@ -1,4 +1,4 @@
-import { EthereumDexPrice, GoerliDexPrice } from './dex-price.js'
+import { EthereumDexPrice, SepoliaDexPrice } from './dex-price.js'
 import { State } from '@sentio/runtime'
 import { loadTestProvidersFromEnv } from '@sentio/sdk/testing'
 
@@ -8,7 +8,7 @@ describe('dex price tests', () => {
   State.reset()
   // Endpoints.reset()
 
-  const haveProviders = loadTestProvidersFromEnv(['1', '5'])
+  const haveProviders = loadTestProvidersFromEnv(['1', '11155111'])
 
   const testIf = haveProviders ? test : test.skip
 
@@ -20,8 +20,8 @@ describe('dex price tests', () => {
     expect(compound.price).eq(60.27)
   })
 
-  testIf('get price at goerli', async () => {
-    const dai = await GoerliDexPrice.getPrice('DAI', 7712734)
-    expect(dai.price).eq(0.99971281)
+  testIf('get price at sepolia', async () => {
+    const dai = await SepoliaDexPrice.getPrice('DAI', 5472495)
+    expect(dai.price).eq(0.99993996)
   })
 })
