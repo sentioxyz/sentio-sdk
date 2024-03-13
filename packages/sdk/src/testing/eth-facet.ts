@@ -2,7 +2,6 @@ import { TestProcessorServer } from './test-processor-server.js'
 import { DataBinding, HandlerType, ProcessBindingResponse } from '@sentio/protos'
 import { Trace } from '../eth/eth.js'
 import { BlockParams, LogParams } from 'ethers/providers'
-import { Block } from 'ethers'
 import { ChainId, EthChainId } from '@sentio/chain'
 
 export class EthFacet {
@@ -26,7 +25,7 @@ export class EthFacet {
       bindings.push(binding)
     }
     return this.server.processBindings({
-      bindings: bindings,
+      bindings: bindings
     })
   }
 
@@ -52,11 +51,11 @@ export class EthFacet {
             data: {
               ethTrace: {
                 trace,
-                timestamp: new Date(),
-              },
+                timestamp: new Date()
+              }
             },
             handlerIds: [config.handlerId],
-            handlerType: HandlerType.ETH_TRACE,
+            handlerType: HandlerType.ETH_TRACE
           }
         }
       }
@@ -78,7 +77,7 @@ export class EthFacet {
       bindings.push(binding)
     }
     return this.server.processBindings({
-      bindings: bindings,
+      bindings: bindings
     })
   }
 
@@ -117,10 +116,10 @@ export class EthFacet {
           if (match) {
             return {
               data: {
-                ethLog: { log, timestamp: new Date() },
+                ethLog: { log, timestamp: new Date() }
               },
               handlerIds: [config.handlerId],
-              handlerType: HandlerType.ETH_LOG,
+              handlerType: HandlerType.ETH_LOG
             }
           }
         }
@@ -150,7 +149,7 @@ export class EthFacet {
       bindings.push(binding)
     }
     return this.server.processBindings({
-      bindings: bindings,
+      bindings: bindings
     })
   }
 
@@ -190,10 +189,10 @@ export class EthFacet {
           if (match) {
             return {
               data: {
-                ethLog: { log, timestamp: new Date() },
+                ethLog: { log, timestamp: new Date() }
               },
               handlerIds: [config.handlerId],
-              handlerType: HandlerType.ETH_LOG,
+              handlerType: HandlerType.ETH_LOG
             }
           }
         }
@@ -209,7 +208,7 @@ export class EthFacet {
     return this.testBlocks([block], network)
   }
 
-  testBlocks(blocks: Partial<BlockParams> & { number: number }[], network: EthChainId = EthChainId.ETHEREUM) {
+  testBlocks(blocks: (Partial<BlockParams> & { number: number })[], network: EthChainId = EthChainId.ETHEREUM) {
     const bindings = []
     for (const block of blocks) {
       const binding = this.buildBlockBinding(block, network)
@@ -219,20 +218,20 @@ export class EthFacet {
       bindings.push(binding)
     }
     return this.server.processBindings({
-      bindings: bindings,
+      bindings: bindings
     })
   }
 
   buildBlockBinding(
-    block: Partial<Block> & { number: number },
+    block: Partial<BlockParams> & { number: number },
     network: EthChainId = EthChainId.ETHEREUM
   ): DataBinding {
     const binding: DataBinding = {
       data: {
-        ethBlock: { block },
+        ethBlock: { block }
       },
       handlerType: HandlerType.ETH_BLOCK,
-      handlerIds: [],
+      handlerIds: []
     }
     for (const contract of this.server.contractConfigs) {
       if (contract.contract?.chainId !== network) {
