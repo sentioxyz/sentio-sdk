@@ -190,7 +190,7 @@ importers:
         version: 0.50.1
       '@sentio/chain':
         specifier: '*'
-        version: 1.0.9
+        version: 1.0.11
       '@sentio/sdk':
         specifier: workspace:^
         version: link:../sdk
@@ -426,8 +426,8 @@ importers:
         specifier: 9.1.1-patch.3
         version: 9.1.1-patch.3
       '@sentio/chain':
-        specifier: ^1.0.10
-        version: 1.0.10
+        specifier: ^1.0.11
+        version: 1.0.11
       '@sentio/ethers-v6':
         specifier: ^1.0.29
         version: 1.0.29(@sentio/ethers@6.7.1-patch.4)(typescript@5.3.3)
@@ -2511,14 +2511,8 @@ packages:
     resolution: {integrity: sha512-O5w8XdyeatUcwI+ZbpSw60/cXFPJk3NbpIupwMHfYmW8fpxpXyRbyGESNJNufWWrB6CadsWGh1R3rd7owvrmlw==}
     dev: false
 
-  /@sentio/chain@1.0.10:
-    resolution: {integrity: sha512-gAeGdGeDtMNCKe5YP2hSc/HI7XZ+pCq58D2+/MG4uLRtSsig9lNjdyY+wz204p3OuwRpviSVWpV7zMuhGXBS0Q==}
-    requiresBuild: true
-    dev: false
-
-  /@sentio/chain@1.0.9:
-    resolution: {integrity: sha512-RbuBV3anEAEncPJDjewXh/vAiazQBa784UTSqGyKhM6dibXjs2td/C5oKQbMZiwUACbW/MYt2TSZ+ks71UTmSw==}
-    requiresBuild: true
+  /@sentio/chain@1.0.11:
+    resolution: {integrity: sha512-NmlTRD38I7QSAcYganpps+Z4bcz34nHE0KyZ21jfdJLEunn0IR6NtucxjDREBs5WP7xyp6szAwjFbyR5bHgCsg==}
     dev: false
 
   /@sentio/ethers-v6@1.0.29(@sentio/ethers@6.7.1-patch.4)(typescript@5.3.3):
