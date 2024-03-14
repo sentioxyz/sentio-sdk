@@ -244,6 +244,9 @@ export class SuiBaseProcessor {
     handler: (changes: SuiObjectChange[], ctx: SuiObjectChangeContext) => void,
     type: string
   ): this {
+    if (this.config.network === SuiNetwork.TEST_NET) {
+      throw new ServerError(Status.INVALID_ARGUMENT, 'object change not supported in testnet')
+    }
     const processor = this
     this.objectChangeHandlers.push({
       handler: async function (data: Data_SuiObjectChange) {
