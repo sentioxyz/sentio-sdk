@@ -100,7 +100,8 @@ export class SuiBaseProcessor {
         }
 
         const processResults = []
-        for (const [idx, evt] of (txn.events as SuiEvent[]).entries()) {
+        for (const evt of txn.events) {
+          const idx = Number(evt.id.eventSeq) || 0
           const [_, module, type] = parseMoveType(evt.type).qname.split(SPLITTER)
           if (!allEventType.has([module, type].join(SPLITTER))) {
             continue
