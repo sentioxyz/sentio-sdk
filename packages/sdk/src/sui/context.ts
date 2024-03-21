@@ -58,7 +58,7 @@ export class SuiContext extends MoveContext<SuiNetwork, SuiMoveNormalizedModule,
       blockNumber: this.checkpoint,
       transactionIndex: 0,
       transactionHash: this.transaction?.digest || '', // TODO
-      logIndex: 0,
+      logIndex: this.eventIndex,
       chainId: this.getChainId(),
       name: name,
       labels: normalizeLabels(labels)
