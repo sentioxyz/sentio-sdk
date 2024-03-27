@@ -1558,6 +1558,8 @@ export interface ComputeStats {
   computeCostMs: bigint;
   binaryVersionHash: bigint;
   computedBy: string;
+  isCached: boolean;
+  isRefreshing: boolean;
 }
 
 export interface ClickhouseStatus {
@@ -1587,6 +1589,115 @@ export interface ClickhouseStatus_MutationsEntry {
 export interface ClickhouseStatus_ProcessesEntry {
   key: number;
   value: ClickhouseStatus_Processes | undefined;
+}
+
+export interface ProjectVariables {
+  projectId: string;
+  variables: ProjectVariables_Variable[];
+}
+
+export interface ProjectVariables_Variable {
+  key: string;
+  value: string;
+  isSecret: boolean;
+  updatedAt: Date | undefined;
+}
+
+export interface CachePolicy {
+  cacheTtlSecs: number;
+  cacheRefreshTtlSecs: number;
+  forceRefresh: boolean;
+  noCache: boolean;
+}
+
+export interface SystemSQLQuery {
+  id: string;
+  alias: string;
+  name: string;
+  tableName: string;
+  aggregation: SystemSQLQuery_Aggregation | undefined;
+  selectorExpr: SelectorExpr | undefined;
+  groupBy: string[];
+  disabled: boolean;
+}
+
+export interface SystemSQLQuery_Aggregation {
+  total?: SystemSQLQuery_Aggregation_Total | undefined;
+  countUnique?: SystemSQLQuery_Aggregation_CountUnique | undefined;
+  aggregateProperties?: SystemSQLQuery_Aggregation_AggregateProperties | undefined;
+}
+
+export interface SystemSQLQuery_Aggregation_Total {
+}
+
+export interface SystemSQLQuery_Aggregation_CountUnique {
+  duration: Duration | undefined;
+}
+
+export interface SystemSQLQuery_Aggregation_AggregateProperties {
+  type: SystemSQLQuery_Aggregation_AggregateProperties_AggregationType;
+  propertyName: string;
+}
+
+export enum SystemSQLQuery_Aggregation_AggregateProperties_AggregationType {
+  SUM = 0,
+  AVG = 1,
+  MEDIAN = 2,
+  MIN = 3,
+  MAX = 4,
+  DISTINCT_COUNT = 5,
+  UNRECOGNIZED = -1,
+}
+
+export function systemSQLQuery_Aggregation_AggregateProperties_AggregationTypeFromJSON(
+  object: any,
+): SystemSQLQuery_Aggregation_AggregateProperties_AggregationType {
+  switch (object) {
+    case 0:
+    case "SUM":
+      return SystemSQLQuery_Aggregation_AggregateProperties_AggregationType.SUM;
+    case 1:
+    case "AVG":
+      return SystemSQLQuery_Aggregation_AggregateProperties_AggregationType.AVG;
+    case 2:
+    case "MEDIAN":
+      return SystemSQLQuery_Aggregation_AggregateProperties_AggregationType.MEDIAN;
+    case 3:
+    case "MIN":
+      return SystemSQLQuery_Aggregation_AggregateProperties_AggregationType.MIN;
+    case 4:
+    case "MAX":
+      return SystemSQLQuery_Aggregation_AggregateProperties_AggregationType.MAX;
+    case 5:
+    case "DISTINCT_COUNT":
+      return SystemSQLQuery_Aggregation_AggregateProperties_AggregationType.DISTINCT_COUNT;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return SystemSQLQuery_Aggregation_AggregateProperties_AggregationType.UNRECOGNIZED;
+  }
+}
+
+export function systemSQLQuery_Aggregation_AggregateProperties_AggregationTypeToJSON(
+  object: SystemSQLQuery_Aggregation_AggregateProperties_AggregationType,
+): string {
+  switch (object) {
+    case SystemSQLQuery_Aggregation_AggregateProperties_AggregationType.SUM:
+      return "SUM";
+    case SystemSQLQuery_Aggregation_AggregateProperties_AggregationType.AVG:
+      return "AVG";
+    case SystemSQLQuery_Aggregation_AggregateProperties_AggregationType.MEDIAN:
+      return "MEDIAN";
+    case SystemSQLQuery_Aggregation_AggregateProperties_AggregationType.MIN:
+      return "MIN";
+    case SystemSQLQuery_Aggregation_AggregateProperties_AggregationType.MAX:
+      return "MAX";
+    case SystemSQLQuery_Aggregation_AggregateProperties_AggregationType.DISTINCT_COUNT:
+      return "DISTINCT_COUNT";
+    case SystemSQLQuery_Aggregation_AggregateProperties_AggregationType.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
 }
 
 function createBaseUsageTracker(): UsageTracker {
@@ -8495,7 +8606,14 @@ export const RetentionMatrix_Sample_LabelsEntry = {
 };
 
 function createBaseComputeStats(): ComputeStats {
-  return { computedAt: undefined, computeCostMs: BigInt("0"), binaryVersionHash: BigInt("0"), computedBy: "" };
+  return {
+    computedAt: undefined,
+    computeCostMs: BigInt("0"),
+    binaryVersionHash: BigInt("0"),
+    computedBy: "",
+    isCached: false,
+    isRefreshing: false,
+  };
 }
 
 export const ComputeStats = {
@@ -8511,6 +8629,12 @@ export const ComputeStats = {
     }
     if (message.computedBy !== "") {
       writer.uint32(34).string(message.computedBy);
+    }
+    if (message.isCached === true) {
+      writer.uint32(40).bool(message.isCached);
+    }
+    if (message.isRefreshing === true) {
+      writer.uint32(48).bool(message.isRefreshing);
     }
     return writer;
   },
@@ -8534,6 +8658,12 @@ export const ComputeStats = {
         case 4:
           message.computedBy = reader.string();
           break;
+        case 5:
+          message.isCached = reader.bool();
+          break;
+        case 6:
+          message.isRefreshing = reader.bool();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -8548,6 +8678,8 @@ export const ComputeStats = {
       computeCostMs: isSet(object.computeCostMs) ? BigInt(object.computeCostMs) : BigInt("0"),
       binaryVersionHash: isSet(object.binaryVersionHash) ? BigInt(object.binaryVersionHash) : BigInt("0"),
       computedBy: isSet(object.computedBy) ? String(object.computedBy) : "",
+      isCached: isSet(object.isCached) ? Boolean(object.isCached) : false,
+      isRefreshing: isSet(object.isRefreshing) ? Boolean(object.isRefreshing) : false,
     };
   },
 
@@ -8557,6 +8689,8 @@ export const ComputeStats = {
     message.computeCostMs !== undefined && (obj.computeCostMs = message.computeCostMs.toString());
     message.binaryVersionHash !== undefined && (obj.binaryVersionHash = message.binaryVersionHash.toString());
     message.computedBy !== undefined && (obj.computedBy = message.computedBy);
+    message.isCached !== undefined && (obj.isCached = message.isCached);
+    message.isRefreshing !== undefined && (obj.isRefreshing = message.isRefreshing);
     return obj;
   },
 
@@ -8570,6 +8704,8 @@ export const ComputeStats = {
     message.computeCostMs = object.computeCostMs ?? BigInt("0");
     message.binaryVersionHash = object.binaryVersionHash ?? BigInt("0");
     message.computedBy = object.computedBy ?? "";
+    message.isCached = object.isCached ?? false;
+    message.isRefreshing = object.isRefreshing ?? false;
     return message;
   },
 };
@@ -8988,6 +9124,624 @@ export const ClickhouseStatus_ProcessesEntry = {
     message.value = (object.value !== undefined && object.value !== null)
       ? ClickhouseStatus_Processes.fromPartial(object.value)
       : undefined;
+    return message;
+  },
+};
+
+function createBaseProjectVariables(): ProjectVariables {
+  return { projectId: "", variables: [] };
+}
+
+export const ProjectVariables = {
+  encode(message: ProjectVariables, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.projectId !== "") {
+      writer.uint32(10).string(message.projectId);
+    }
+    for (const v of message.variables) {
+      ProjectVariables_Variable.encode(v!, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ProjectVariables {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseProjectVariables();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.projectId = reader.string();
+          break;
+        case 2:
+          message.variables.push(ProjectVariables_Variable.decode(reader, reader.uint32()));
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ProjectVariables {
+    return {
+      projectId: isSet(object.projectId) ? String(object.projectId) : "",
+      variables: Array.isArray(object?.variables)
+        ? object.variables.map((e: any) => ProjectVariables_Variable.fromJSON(e))
+        : [],
+    };
+  },
+
+  toJSON(message: ProjectVariables): unknown {
+    const obj: any = {};
+    message.projectId !== undefined && (obj.projectId = message.projectId);
+    if (message.variables) {
+      obj.variables = message.variables.map((e) => e ? ProjectVariables_Variable.toJSON(e) : undefined);
+    } else {
+      obj.variables = [];
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<ProjectVariables>): ProjectVariables {
+    return ProjectVariables.fromPartial(base ?? {});
+  },
+
+  fromPartial(object: DeepPartial<ProjectVariables>): ProjectVariables {
+    const message = createBaseProjectVariables();
+    message.projectId = object.projectId ?? "";
+    message.variables = object.variables?.map((e) => ProjectVariables_Variable.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseProjectVariables_Variable(): ProjectVariables_Variable {
+  return { key: "", value: "", isSecret: false, updatedAt: undefined };
+}
+
+export const ProjectVariables_Variable = {
+  encode(message: ProjectVariables_Variable, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.key !== "") {
+      writer.uint32(26).string(message.key);
+    }
+    if (message.value !== "") {
+      writer.uint32(34).string(message.value);
+    }
+    if (message.isSecret === true) {
+      writer.uint32(56).bool(message.isSecret);
+    }
+    if (message.updatedAt !== undefined) {
+      Timestamp.encode(toTimestamp(message.updatedAt), writer.uint32(42).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ProjectVariables_Variable {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseProjectVariables_Variable();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 3:
+          message.key = reader.string();
+          break;
+        case 4:
+          message.value = reader.string();
+          break;
+        case 7:
+          message.isSecret = reader.bool();
+          break;
+        case 5:
+          message.updatedAt = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ProjectVariables_Variable {
+    return {
+      key: isSet(object.key) ? String(object.key) : "",
+      value: isSet(object.value) ? String(object.value) : "",
+      isSecret: isSet(object.isSecret) ? Boolean(object.isSecret) : false,
+      updatedAt: isSet(object.updatedAt) ? fromJsonTimestamp(object.updatedAt) : undefined,
+    };
+  },
+
+  toJSON(message: ProjectVariables_Variable): unknown {
+    const obj: any = {};
+    message.key !== undefined && (obj.key = message.key);
+    message.value !== undefined && (obj.value = message.value);
+    message.isSecret !== undefined && (obj.isSecret = message.isSecret);
+    message.updatedAt !== undefined && (obj.updatedAt = message.updatedAt.toISOString());
+    return obj;
+  },
+
+  create(base?: DeepPartial<ProjectVariables_Variable>): ProjectVariables_Variable {
+    return ProjectVariables_Variable.fromPartial(base ?? {});
+  },
+
+  fromPartial(object: DeepPartial<ProjectVariables_Variable>): ProjectVariables_Variable {
+    const message = createBaseProjectVariables_Variable();
+    message.key = object.key ?? "";
+    message.value = object.value ?? "";
+    message.isSecret = object.isSecret ?? false;
+    message.updatedAt = object.updatedAt ?? undefined;
+    return message;
+  },
+};
+
+function createBaseCachePolicy(): CachePolicy {
+  return { cacheTtlSecs: 0, cacheRefreshTtlSecs: 0, forceRefresh: false, noCache: false };
+}
+
+export const CachePolicy = {
+  encode(message: CachePolicy, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.cacheTtlSecs !== 0) {
+      writer.uint32(8).int32(message.cacheTtlSecs);
+    }
+    if (message.cacheRefreshTtlSecs !== 0) {
+      writer.uint32(16).int32(message.cacheRefreshTtlSecs);
+    }
+    if (message.forceRefresh === true) {
+      writer.uint32(24).bool(message.forceRefresh);
+    }
+    if (message.noCache === true) {
+      writer.uint32(32).bool(message.noCache);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): CachePolicy {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCachePolicy();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.cacheTtlSecs = reader.int32();
+          break;
+        case 2:
+          message.cacheRefreshTtlSecs = reader.int32();
+          break;
+        case 3:
+          message.forceRefresh = reader.bool();
+          break;
+        case 4:
+          message.noCache = reader.bool();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): CachePolicy {
+    return {
+      cacheTtlSecs: isSet(object.cacheTtlSecs) ? Number(object.cacheTtlSecs) : 0,
+      cacheRefreshTtlSecs: isSet(object.cacheRefreshTtlSecs) ? Number(object.cacheRefreshTtlSecs) : 0,
+      forceRefresh: isSet(object.forceRefresh) ? Boolean(object.forceRefresh) : false,
+      noCache: isSet(object.noCache) ? Boolean(object.noCache) : false,
+    };
+  },
+
+  toJSON(message: CachePolicy): unknown {
+    const obj: any = {};
+    message.cacheTtlSecs !== undefined && (obj.cacheTtlSecs = Math.round(message.cacheTtlSecs));
+    message.cacheRefreshTtlSecs !== undefined && (obj.cacheRefreshTtlSecs = Math.round(message.cacheRefreshTtlSecs));
+    message.forceRefresh !== undefined && (obj.forceRefresh = message.forceRefresh);
+    message.noCache !== undefined && (obj.noCache = message.noCache);
+    return obj;
+  },
+
+  create(base?: DeepPartial<CachePolicy>): CachePolicy {
+    return CachePolicy.fromPartial(base ?? {});
+  },
+
+  fromPartial(object: DeepPartial<CachePolicy>): CachePolicy {
+    const message = createBaseCachePolicy();
+    message.cacheTtlSecs = object.cacheTtlSecs ?? 0;
+    message.cacheRefreshTtlSecs = object.cacheRefreshTtlSecs ?? 0;
+    message.forceRefresh = object.forceRefresh ?? false;
+    message.noCache = object.noCache ?? false;
+    return message;
+  },
+};
+
+function createBaseSystemSQLQuery(): SystemSQLQuery {
+  return {
+    id: "",
+    alias: "",
+    name: "",
+    tableName: "",
+    aggregation: undefined,
+    selectorExpr: undefined,
+    groupBy: [],
+    disabled: false,
+  };
+}
+
+export const SystemSQLQuery = {
+  encode(message: SystemSQLQuery, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    if (message.alias !== "") {
+      writer.uint32(18).string(message.alias);
+    }
+    if (message.name !== "") {
+      writer.uint32(26).string(message.name);
+    }
+    if (message.tableName !== "") {
+      writer.uint32(34).string(message.tableName);
+    }
+    if (message.aggregation !== undefined) {
+      SystemSQLQuery_Aggregation.encode(message.aggregation, writer.uint32(42).fork()).ldelim();
+    }
+    if (message.selectorExpr !== undefined) {
+      SelectorExpr.encode(message.selectorExpr, writer.uint32(50).fork()).ldelim();
+    }
+    for (const v of message.groupBy) {
+      writer.uint32(58).string(v!);
+    }
+    if (message.disabled === true) {
+      writer.uint32(64).bool(message.disabled);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): SystemSQLQuery {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseSystemSQLQuery();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.id = reader.string();
+          break;
+        case 2:
+          message.alias = reader.string();
+          break;
+        case 3:
+          message.name = reader.string();
+          break;
+        case 4:
+          message.tableName = reader.string();
+          break;
+        case 5:
+          message.aggregation = SystemSQLQuery_Aggregation.decode(reader, reader.uint32());
+          break;
+        case 6:
+          message.selectorExpr = SelectorExpr.decode(reader, reader.uint32());
+          break;
+        case 7:
+          message.groupBy.push(reader.string());
+          break;
+        case 8:
+          message.disabled = reader.bool();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): SystemSQLQuery {
+    return {
+      id: isSet(object.id) ? String(object.id) : "",
+      alias: isSet(object.alias) ? String(object.alias) : "",
+      name: isSet(object.name) ? String(object.name) : "",
+      tableName: isSet(object.tableName) ? String(object.tableName) : "",
+      aggregation: isSet(object.aggregation) ? SystemSQLQuery_Aggregation.fromJSON(object.aggregation) : undefined,
+      selectorExpr: isSet(object.selectorExpr) ? SelectorExpr.fromJSON(object.selectorExpr) : undefined,
+      groupBy: Array.isArray(object?.groupBy) ? object.groupBy.map((e: any) => String(e)) : [],
+      disabled: isSet(object.disabled) ? Boolean(object.disabled) : false,
+    };
+  },
+
+  toJSON(message: SystemSQLQuery): unknown {
+    const obj: any = {};
+    message.id !== undefined && (obj.id = message.id);
+    message.alias !== undefined && (obj.alias = message.alias);
+    message.name !== undefined && (obj.name = message.name);
+    message.tableName !== undefined && (obj.tableName = message.tableName);
+    message.aggregation !== undefined &&
+      (obj.aggregation = message.aggregation ? SystemSQLQuery_Aggregation.toJSON(message.aggregation) : undefined);
+    message.selectorExpr !== undefined &&
+      (obj.selectorExpr = message.selectorExpr ? SelectorExpr.toJSON(message.selectorExpr) : undefined);
+    if (message.groupBy) {
+      obj.groupBy = message.groupBy.map((e) => e);
+    } else {
+      obj.groupBy = [];
+    }
+    message.disabled !== undefined && (obj.disabled = message.disabled);
+    return obj;
+  },
+
+  create(base?: DeepPartial<SystemSQLQuery>): SystemSQLQuery {
+    return SystemSQLQuery.fromPartial(base ?? {});
+  },
+
+  fromPartial(object: DeepPartial<SystemSQLQuery>): SystemSQLQuery {
+    const message = createBaseSystemSQLQuery();
+    message.id = object.id ?? "";
+    message.alias = object.alias ?? "";
+    message.name = object.name ?? "";
+    message.tableName = object.tableName ?? "";
+    message.aggregation = (object.aggregation !== undefined && object.aggregation !== null)
+      ? SystemSQLQuery_Aggregation.fromPartial(object.aggregation)
+      : undefined;
+    message.selectorExpr = (object.selectorExpr !== undefined && object.selectorExpr !== null)
+      ? SelectorExpr.fromPartial(object.selectorExpr)
+      : undefined;
+    message.groupBy = object.groupBy?.map((e) => e) || [];
+    message.disabled = object.disabled ?? false;
+    return message;
+  },
+};
+
+function createBaseSystemSQLQuery_Aggregation(): SystemSQLQuery_Aggregation {
+  return { total: undefined, countUnique: undefined, aggregateProperties: undefined };
+}
+
+export const SystemSQLQuery_Aggregation = {
+  encode(message: SystemSQLQuery_Aggregation, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.total !== undefined) {
+      SystemSQLQuery_Aggregation_Total.encode(message.total, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.countUnique !== undefined) {
+      SystemSQLQuery_Aggregation_CountUnique.encode(message.countUnique, writer.uint32(26).fork()).ldelim();
+    }
+    if (message.aggregateProperties !== undefined) {
+      SystemSQLQuery_Aggregation_AggregateProperties.encode(message.aggregateProperties, writer.uint32(34).fork())
+        .ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): SystemSQLQuery_Aggregation {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseSystemSQLQuery_Aggregation();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.total = SystemSQLQuery_Aggregation_Total.decode(reader, reader.uint32());
+          break;
+        case 3:
+          message.countUnique = SystemSQLQuery_Aggregation_CountUnique.decode(reader, reader.uint32());
+          break;
+        case 4:
+          message.aggregateProperties = SystemSQLQuery_Aggregation_AggregateProperties.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): SystemSQLQuery_Aggregation {
+    return {
+      total: isSet(object.total) ? SystemSQLQuery_Aggregation_Total.fromJSON(object.total) : undefined,
+      countUnique: isSet(object.countUnique)
+        ? SystemSQLQuery_Aggregation_CountUnique.fromJSON(object.countUnique)
+        : undefined,
+      aggregateProperties: isSet(object.aggregateProperties)
+        ? SystemSQLQuery_Aggregation_AggregateProperties.fromJSON(object.aggregateProperties)
+        : undefined,
+    };
+  },
+
+  toJSON(message: SystemSQLQuery_Aggregation): unknown {
+    const obj: any = {};
+    message.total !== undefined &&
+      (obj.total = message.total ? SystemSQLQuery_Aggregation_Total.toJSON(message.total) : undefined);
+    message.countUnique !== undefined && (obj.countUnique = message.countUnique
+      ? SystemSQLQuery_Aggregation_CountUnique.toJSON(message.countUnique)
+      : undefined);
+    message.aggregateProperties !== undefined && (obj.aggregateProperties = message.aggregateProperties
+      ? SystemSQLQuery_Aggregation_AggregateProperties.toJSON(message.aggregateProperties)
+      : undefined);
+    return obj;
+  },
+
+  create(base?: DeepPartial<SystemSQLQuery_Aggregation>): SystemSQLQuery_Aggregation {
+    return SystemSQLQuery_Aggregation.fromPartial(base ?? {});
+  },
+
+  fromPartial(object: DeepPartial<SystemSQLQuery_Aggregation>): SystemSQLQuery_Aggregation {
+    const message = createBaseSystemSQLQuery_Aggregation();
+    message.total = (object.total !== undefined && object.total !== null)
+      ? SystemSQLQuery_Aggregation_Total.fromPartial(object.total)
+      : undefined;
+    message.countUnique = (object.countUnique !== undefined && object.countUnique !== null)
+      ? SystemSQLQuery_Aggregation_CountUnique.fromPartial(object.countUnique)
+      : undefined;
+    message.aggregateProperties = (object.aggregateProperties !== undefined && object.aggregateProperties !== null)
+      ? SystemSQLQuery_Aggregation_AggregateProperties.fromPartial(object.aggregateProperties)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseSystemSQLQuery_Aggregation_Total(): SystemSQLQuery_Aggregation_Total {
+  return {};
+}
+
+export const SystemSQLQuery_Aggregation_Total = {
+  encode(_: SystemSQLQuery_Aggregation_Total, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): SystemSQLQuery_Aggregation_Total {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseSystemSQLQuery_Aggregation_Total();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(_: any): SystemSQLQuery_Aggregation_Total {
+    return {};
+  },
+
+  toJSON(_: SystemSQLQuery_Aggregation_Total): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create(base?: DeepPartial<SystemSQLQuery_Aggregation_Total>): SystemSQLQuery_Aggregation_Total {
+    return SystemSQLQuery_Aggregation_Total.fromPartial(base ?? {});
+  },
+
+  fromPartial(_: DeepPartial<SystemSQLQuery_Aggregation_Total>): SystemSQLQuery_Aggregation_Total {
+    const message = createBaseSystemSQLQuery_Aggregation_Total();
+    return message;
+  },
+};
+
+function createBaseSystemSQLQuery_Aggregation_CountUnique(): SystemSQLQuery_Aggregation_CountUnique {
+  return { duration: undefined };
+}
+
+export const SystemSQLQuery_Aggregation_CountUnique = {
+  encode(message: SystemSQLQuery_Aggregation_CountUnique, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.duration !== undefined) {
+      Duration.encode(message.duration, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): SystemSQLQuery_Aggregation_CountUnique {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseSystemSQLQuery_Aggregation_CountUnique();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.duration = Duration.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): SystemSQLQuery_Aggregation_CountUnique {
+    return { duration: isSet(object.duration) ? Duration.fromJSON(object.duration) : undefined };
+  },
+
+  toJSON(message: SystemSQLQuery_Aggregation_CountUnique): unknown {
+    const obj: any = {};
+    message.duration !== undefined && (obj.duration = message.duration ? Duration.toJSON(message.duration) : undefined);
+    return obj;
+  },
+
+  create(base?: DeepPartial<SystemSQLQuery_Aggregation_CountUnique>): SystemSQLQuery_Aggregation_CountUnique {
+    return SystemSQLQuery_Aggregation_CountUnique.fromPartial(base ?? {});
+  },
+
+  fromPartial(object: DeepPartial<SystemSQLQuery_Aggregation_CountUnique>): SystemSQLQuery_Aggregation_CountUnique {
+    const message = createBaseSystemSQLQuery_Aggregation_CountUnique();
+    message.duration = (object.duration !== undefined && object.duration !== null)
+      ? Duration.fromPartial(object.duration)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseSystemSQLQuery_Aggregation_AggregateProperties(): SystemSQLQuery_Aggregation_AggregateProperties {
+  return { type: 0, propertyName: "" };
+}
+
+export const SystemSQLQuery_Aggregation_AggregateProperties = {
+  encode(
+    message: SystemSQLQuery_Aggregation_AggregateProperties,
+    writer: _m0.Writer = _m0.Writer.create(),
+  ): _m0.Writer {
+    if (message.type !== 0) {
+      writer.uint32(8).int32(message.type);
+    }
+    if (message.propertyName !== "") {
+      writer.uint32(18).string(message.propertyName);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): SystemSQLQuery_Aggregation_AggregateProperties {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseSystemSQLQuery_Aggregation_AggregateProperties();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.type = reader.int32() as any;
+          break;
+        case 2:
+          message.propertyName = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): SystemSQLQuery_Aggregation_AggregateProperties {
+    return {
+      type: isSet(object.type)
+        ? systemSQLQuery_Aggregation_AggregateProperties_AggregationTypeFromJSON(object.type)
+        : 0,
+      propertyName: isSet(object.propertyName) ? String(object.propertyName) : "",
+    };
+  },
+
+  toJSON(message: SystemSQLQuery_Aggregation_AggregateProperties): unknown {
+    const obj: any = {};
+    message.type !== undefined &&
+      (obj.type = systemSQLQuery_Aggregation_AggregateProperties_AggregationTypeToJSON(message.type));
+    message.propertyName !== undefined && (obj.propertyName = message.propertyName);
+    return obj;
+  },
+
+  create(
+    base?: DeepPartial<SystemSQLQuery_Aggregation_AggregateProperties>,
+  ): SystemSQLQuery_Aggregation_AggregateProperties {
+    return SystemSQLQuery_Aggregation_AggregateProperties.fromPartial(base ?? {});
+  },
+
+  fromPartial(
+    object: DeepPartial<SystemSQLQuery_Aggregation_AggregateProperties>,
+  ): SystemSQLQuery_Aggregation_AggregateProperties {
+    const message = createBaseSystemSQLQuery_Aggregation_AggregateProperties();
+    message.type = object.type ?? 0;
+    message.propertyName = object.propertyName ?? "";
     return message;
   },
 };

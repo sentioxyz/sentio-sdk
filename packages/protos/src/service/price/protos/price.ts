@@ -17,6 +17,7 @@ export interface CoinID_AddressIdentifier {
 export interface GetPriceRequest {
   timestamp: Date | undefined;
   coinId: CoinID | undefined;
+  source: string;
 }
 
 export interface GetPriceResponse {
@@ -69,6 +70,25 @@ export interface CheckLatestPriceResponse_CoinPrice {
   coinId: CoinID | undefined;
   price: number;
   timestamp: Date | undefined;
+}
+
+export interface BackfillCoinRequest {
+  name: string;
+  symbol: string;
+  chain: string;
+  address: string;
+  coingeckoId: string;
+  decimals: number;
+  logoUrl: string;
+  projectUrl: string;
+  accountAddress: string;
+  moduleName: string;
+  structName: string;
+}
+
+export interface BackfillCoinResponse {
+  symbol: string;
+  message: string;
 }
 
 function createBaseCoinID(): CoinID {
@@ -199,7 +219,7 @@ export const CoinID_AddressIdentifier = {
 };
 
 function createBaseGetPriceRequest(): GetPriceRequest {
-  return { timestamp: undefined, coinId: undefined };
+  return { timestamp: undefined, coinId: undefined, source: "" };
 }
 
 export const GetPriceRequest = {
@@ -209,6 +229,9 @@ export const GetPriceRequest = {
     }
     if (message.coinId !== undefined) {
       CoinID.encode(message.coinId, writer.uint32(18).fork()).ldelim();
+    }
+    if (message.source !== "") {
+      writer.uint32(26).string(message.source);
     }
     return writer;
   },
@@ -226,6 +249,9 @@ export const GetPriceRequest = {
         case 2:
           message.coinId = CoinID.decode(reader, reader.uint32());
           break;
+        case 3:
+          message.source = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -238,6 +264,7 @@ export const GetPriceRequest = {
     return {
       timestamp: isSet(object.timestamp) ? fromJsonTimestamp(object.timestamp) : undefined,
       coinId: isSet(object.coinId) ? CoinID.fromJSON(object.coinId) : undefined,
+      source: isSet(object.source) ? String(object.source) : "",
     };
   },
 
@@ -245,6 +272,7 @@ export const GetPriceRequest = {
     const obj: any = {};
     message.timestamp !== undefined && (obj.timestamp = message.timestamp.toISOString());
     message.coinId !== undefined && (obj.coinId = message.coinId ? CoinID.toJSON(message.coinId) : undefined);
+    message.source !== undefined && (obj.source = message.source);
     return obj;
   },
 
@@ -258,6 +286,7 @@ export const GetPriceRequest = {
     message.coinId = (object.coinId !== undefined && object.coinId !== null)
       ? CoinID.fromPartial(object.coinId)
       : undefined;
+    message.source = object.source ?? "";
     return message;
   },
 };
@@ -966,6 +995,223 @@ export const CheckLatestPriceResponse_CoinPrice = {
   },
 };
 
+function createBaseBackfillCoinRequest(): BackfillCoinRequest {
+  return {
+    name: "",
+    symbol: "",
+    chain: "",
+    address: "",
+    coingeckoId: "",
+    decimals: 0,
+    logoUrl: "",
+    projectUrl: "",
+    accountAddress: "",
+    moduleName: "",
+    structName: "",
+  };
+}
+
+export const BackfillCoinRequest = {
+  encode(message: BackfillCoinRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.name !== "") {
+      writer.uint32(10).string(message.name);
+    }
+    if (message.symbol !== "") {
+      writer.uint32(18).string(message.symbol);
+    }
+    if (message.chain !== "") {
+      writer.uint32(26).string(message.chain);
+    }
+    if (message.address !== "") {
+      writer.uint32(34).string(message.address);
+    }
+    if (message.coingeckoId !== "") {
+      writer.uint32(42).string(message.coingeckoId);
+    }
+    if (message.decimals !== 0) {
+      writer.uint32(48).uint32(message.decimals);
+    }
+    if (message.logoUrl !== "") {
+      writer.uint32(58).string(message.logoUrl);
+    }
+    if (message.projectUrl !== "") {
+      writer.uint32(66).string(message.projectUrl);
+    }
+    if (message.accountAddress !== "") {
+      writer.uint32(74).string(message.accountAddress);
+    }
+    if (message.moduleName !== "") {
+      writer.uint32(82).string(message.moduleName);
+    }
+    if (message.structName !== "") {
+      writer.uint32(90).string(message.structName);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): BackfillCoinRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseBackfillCoinRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.name = reader.string();
+          break;
+        case 2:
+          message.symbol = reader.string();
+          break;
+        case 3:
+          message.chain = reader.string();
+          break;
+        case 4:
+          message.address = reader.string();
+          break;
+        case 5:
+          message.coingeckoId = reader.string();
+          break;
+        case 6:
+          message.decimals = reader.uint32();
+          break;
+        case 7:
+          message.logoUrl = reader.string();
+          break;
+        case 8:
+          message.projectUrl = reader.string();
+          break;
+        case 9:
+          message.accountAddress = reader.string();
+          break;
+        case 10:
+          message.moduleName = reader.string();
+          break;
+        case 11:
+          message.structName = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): BackfillCoinRequest {
+    return {
+      name: isSet(object.name) ? String(object.name) : "",
+      symbol: isSet(object.symbol) ? String(object.symbol) : "",
+      chain: isSet(object.chain) ? String(object.chain) : "",
+      address: isSet(object.address) ? String(object.address) : "",
+      coingeckoId: isSet(object.coingeckoId) ? String(object.coingeckoId) : "",
+      decimals: isSet(object.decimals) ? Number(object.decimals) : 0,
+      logoUrl: isSet(object.logoUrl) ? String(object.logoUrl) : "",
+      projectUrl: isSet(object.projectUrl) ? String(object.projectUrl) : "",
+      accountAddress: isSet(object.accountAddress) ? String(object.accountAddress) : "",
+      moduleName: isSet(object.moduleName) ? String(object.moduleName) : "",
+      structName: isSet(object.structName) ? String(object.structName) : "",
+    };
+  },
+
+  toJSON(message: BackfillCoinRequest): unknown {
+    const obj: any = {};
+    message.name !== undefined && (obj.name = message.name);
+    message.symbol !== undefined && (obj.symbol = message.symbol);
+    message.chain !== undefined && (obj.chain = message.chain);
+    message.address !== undefined && (obj.address = message.address);
+    message.coingeckoId !== undefined && (obj.coingeckoId = message.coingeckoId);
+    message.decimals !== undefined && (obj.decimals = Math.round(message.decimals));
+    message.logoUrl !== undefined && (obj.logoUrl = message.logoUrl);
+    message.projectUrl !== undefined && (obj.projectUrl = message.projectUrl);
+    message.accountAddress !== undefined && (obj.accountAddress = message.accountAddress);
+    message.moduleName !== undefined && (obj.moduleName = message.moduleName);
+    message.structName !== undefined && (obj.structName = message.structName);
+    return obj;
+  },
+
+  create(base?: DeepPartial<BackfillCoinRequest>): BackfillCoinRequest {
+    return BackfillCoinRequest.fromPartial(base ?? {});
+  },
+
+  fromPartial(object: DeepPartial<BackfillCoinRequest>): BackfillCoinRequest {
+    const message = createBaseBackfillCoinRequest();
+    message.name = object.name ?? "";
+    message.symbol = object.symbol ?? "";
+    message.chain = object.chain ?? "";
+    message.address = object.address ?? "";
+    message.coingeckoId = object.coingeckoId ?? "";
+    message.decimals = object.decimals ?? 0;
+    message.logoUrl = object.logoUrl ?? "";
+    message.projectUrl = object.projectUrl ?? "";
+    message.accountAddress = object.accountAddress ?? "";
+    message.moduleName = object.moduleName ?? "";
+    message.structName = object.structName ?? "";
+    return message;
+  },
+};
+
+function createBaseBackfillCoinResponse(): BackfillCoinResponse {
+  return { symbol: "", message: "" };
+}
+
+export const BackfillCoinResponse = {
+  encode(message: BackfillCoinResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.symbol !== "") {
+      writer.uint32(10).string(message.symbol);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): BackfillCoinResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseBackfillCoinResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.symbol = reader.string();
+          break;
+        case 2:
+          message.message = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): BackfillCoinResponse {
+    return {
+      symbol: isSet(object.symbol) ? String(object.symbol) : "",
+      message: isSet(object.message) ? String(object.message) : "",
+    };
+  },
+
+  toJSON(message: BackfillCoinResponse): unknown {
+    const obj: any = {};
+    message.symbol !== undefined && (obj.symbol = message.symbol);
+    message.message !== undefined && (obj.message = message.message);
+    return obj;
+  },
+
+  create(base?: DeepPartial<BackfillCoinResponse>): BackfillCoinResponse {
+    return BackfillCoinResponse.fromPartial(base ?? {});
+  },
+
+  fromPartial(object: DeepPartial<BackfillCoinResponse>): BackfillCoinResponse {
+    const message = createBaseBackfillCoinResponse();
+    message.symbol = object.symbol ?? "";
+    message.message = object.message ?? "";
+    return message;
+  },
+};
+
 export type PriceServiceDefinition = typeof PriceServiceDefinition;
 export const PriceServiceDefinition = {
   name: "PriceService",
@@ -1003,6 +1249,14 @@ export const PriceServiceDefinition = {
       responseStream: false,
       options: {},
     },
+    backfillCoin: {
+      name: "BackfillCoin",
+      requestType: BackfillCoinRequest,
+      requestStream: false,
+      responseType: BackfillCoinResponse,
+      responseStream: false,
+      options: {},
+    },
   },
 } as const;
 
@@ -1017,6 +1271,10 @@ export interface PriceServiceImplementation<CallContextExt = {}> {
     request: Empty,
     context: CallContext & CallContextExt,
   ): Promise<DeepPartial<CheckLatestPriceResponse>>;
+  backfillCoin(
+    request: BackfillCoinRequest,
+    context: CallContext & CallContextExt,
+  ): Promise<DeepPartial<BackfillCoinResponse>>;
 }
 
 export interface PriceServiceClient<CallOptionsExt = {}> {
@@ -1030,6 +1288,10 @@ export interface PriceServiceClient<CallOptionsExt = {}> {
     request: DeepPartial<Empty>,
     options?: CallOptions & CallOptionsExt,
   ): Promise<CheckLatestPriceResponse>;
+  backfillCoin(
+    request: DeepPartial<BackfillCoinRequest>,
+    options?: CallOptions & CallOptionsExt,
+  ): Promise<BackfillCoinResponse>;
 }
 
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;

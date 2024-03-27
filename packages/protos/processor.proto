@@ -31,6 +31,7 @@ message ProjectConfig {
 
 message ExecutionConfig {
   bool sequential = 1;
+  bool forceExactBlockTime = 2;
 }
 
 message ProcessConfigRequest {

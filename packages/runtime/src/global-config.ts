@@ -1,13 +1,14 @@
 import { ExecutionConfig } from './gen/processor/protos/processor.js'
 
 export interface GlobalConfig {
-  execution: ExecutionConfig
+  execution: Partial<ExecutionConfig>
 }
 
 // Experimental global config, only apply to eth for now
 export const GLOBAL_CONFIG: GlobalConfig = {
   execution: {
-    sequential: false
+    sequential: false,
+    forceExactBlockTime: false
   }
 }
 

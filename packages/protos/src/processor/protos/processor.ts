@@ -344,6 +344,7 @@ export interface ProjectConfig {
 
 export interface ExecutionConfig {
   sequential: boolean;
+  forceExactBlockTime: boolean;
 }
 
 export interface ProcessConfigRequest {
@@ -911,13 +912,16 @@ export const ProjectConfig = {
 };
 
 function createBaseExecutionConfig(): ExecutionConfig {
-  return { sequential: false };
+  return { sequential: false, forceExactBlockTime: false };
 }
 
 export const ExecutionConfig = {
   encode(message: ExecutionConfig, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.sequential === true) {
       writer.uint32(8).bool(message.sequential);
+    }
+    if (message.forceExactBlockTime === true) {
+      writer.uint32(16).bool(message.forceExactBlockTime);
     }
     return writer;
   },
@@ -932,6 +936,9 @@ export const ExecutionConfig = {
         case 1:
           message.sequential = reader.bool();
           break;
+        case 2:
+          message.forceExactBlockTime = reader.bool();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -941,12 +948,16 @@ export const ExecutionConfig = {
   },
 
   fromJSON(object: any): ExecutionConfig {
-    return { sequential: isSet(object.sequential) ? Boolean(object.sequential) : false };
+    return {
+      sequential: isSet(object.sequential) ? Boolean(object.sequential) : false,
+      forceExactBlockTime: isSet(object.forceExactBlockTime) ? Boolean(object.forceExactBlockTime) : false,
+    };
   },
 
   toJSON(message: ExecutionConfig): unknown {
     const obj: any = {};
     message.sequential !== undefined && (obj.sequential = message.sequential);
+    message.forceExactBlockTime !== undefined && (obj.forceExactBlockTime = message.forceExactBlockTime);
     return obj;
   },
 
@@ -957,6 +968,7 @@ export const ExecutionConfig = {
   fromPartial(object: DeepPartial<ExecutionConfig>): ExecutionConfig {
     const message = createBaseExecutionConfig();
     message.sequential = object.sequential ?? false;
+    message.forceExactBlockTime = object.forceExactBlockTime ?? false;
     return message;
   },
 };

@@ -10,7 +10,8 @@ import {
   ProcessConfigRequest,
   ProcessorServiceImplementation,
   StartRequest,
-  ProcessResult
+  ProcessResult,
+  ExecutionConfig
 } from './gen/processor/protos/processor.js'
 
 import { Empty } from '@sentio/protos'
@@ -47,7 +48,7 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
 
   async getConfig(request: ProcessConfigRequest, context: CallContext) {
     const config = await this.instance.getConfig(request, context)
-    config.executionConfig = GLOBAL_CONFIG.execution
+    config.executionConfig = ExecutionConfig.fromPartial(GLOBAL_CONFIG.execution)
 
     if (config.contractConfigs) {
       for (const contract of config.contractConfigs) {
