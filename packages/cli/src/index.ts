@@ -15,10 +15,11 @@ import { runLogin } from './commands/run-login.js'
 import { runUpload } from './commands/run-upload.js'
 import { runTest } from './commands/run-test.js'
 import { runAdd } from './commands/run-add.js'
+import { runCompile } from './commands/run-compile.js'
 
 const mainDefinitions = [{ name: 'command', defaultOption: true }]
 const mainOptions = commandLineArgs(mainDefinitions, {
-  stopAtFirstUnknown: true,
+  stopAtFirstUnknown: true
 })
 const argv = mainOptions._unknown || []
 
@@ -36,6 +37,8 @@ if (mainOptions.command === 'login') {
   runTest(argv)
 } else if (mainOptions.command === 'add') {
   await runAdd(argv)
+} else if (mainOptions.command === 'compile') {
+  await runCompile(argv)
 } else {
   // For all the commands that need read project configs
   // TODO move them to their own modules
@@ -105,7 +108,7 @@ function usage() {
   const usage = commandLineUsage([
     {
       header: 'Sentio',
-      content: 'Login & Manage your project files to Sentio.',
+      content: 'Login & Manage your project files to Sentio.'
     },
     {
       header: 'Usage',
@@ -118,9 +121,10 @@ function usage() {
         'sentio gen\t\t\t\tgenerate abi',
         'sentio build\t\t\t\tgenerate abi and build',
         'sentio test\t\t\t\trun tests',
-        'sentio version\t\t\tcurrent cli version',
-      ],
-    },
+        'sentio compile\t\t\tcompile and upload local contract',
+        'sentio version\t\t\tcurrent cli version'
+      ]
+    }
   ])
   console.log(usage)
   process.exit(1)

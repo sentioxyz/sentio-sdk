@@ -148,7 +148,7 @@ async function createProject(options: YamlProjectConfig, auth: Auth) {
   })
 }
 
-interface Auth {
+export interface Auth {
   'api-key'?: string
   authorization?: string
 }
