@@ -429,8 +429,8 @@ importers:
         specifier: 9.1.1-patch.3
         version: 9.1.1-patch.3
       '@sentio/chain':
-        specifier: ^1.0.11
-        version: 1.0.11
+        specifier: ^1.0.16
+        version: 1.0.16
       '@sentio/ethers-v6':
         specifier: ^1.0.29
         version: 1.0.29(@sentio/ethers@6.7.1-patch.4)(typescript@5.3.3)
@@ -2518,10 +2518,14 @@ packages:
     resolution: {integrity: sha512-NmlTRD38I7QSAcYganpps+Z4bcz34nHE0KyZ21jfdJLEunn0IR6NtucxjDREBs5WP7xyp6szAwjFbyR5bHgCsg==}
     dev: false
 
+  /@sentio/chain@1.0.16:
+    resolution: {integrity: sha512-SaqlcI/h166u4X6UP+PVkrHoydg6kLFu2srefdVIE3pVlWK5a9fXcNX1f2xcPWQN3pTED3kpmRyuvKA/NAHenA==}
+    dev: false
+
   /@sentio/ethers-v6@1.0.29(@sentio/ethers@6.7.1-patch.4)(typescript@5.3.3):
     resolution: {integrity: sha512-/4jZZn+eM3EfI0bUMBAf5vu8muy8ABptu8ucFoMDTZLLTjxcSKRffLP3RL7w1JHGjyC2V6oEQfwS4cn9JEohHQ==}
     peerDependencies:
-      ethers: ^6.0.0
+      ethers: npm:@sentio/ethers@6.7.1-patch.4
       typescript: '>=4.3.0'
     dependencies:
       ethers: /@sentio/ethers@6.7.1-patch.4
@@ -5378,6 +5382,7 @@ packages:
       strip-hex-prefix: 1.0.0
     dev: true
     optional: true
+    bundledDependencies: false
 
   /eventemitter3@4.0.7:
     resolution: {integrity: sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw==}
