@@ -74,8 +74,8 @@ if (options.debug) {
 }
 
 const server = createServer({
-  'grpc.max_send_message_length': 128 * 1024 * 1024,
-  'grpc.max_receive_message_length': 128 * 1024 * 1024,
+  'grpc.max_send_message_length': 384 * 1024 * 1024,
+  'grpc.max_receive_message_length': 384 * 1024 * 1024,
   'grpc.default_compression_algorithm': compressionAlgorithms.gzip
 })
   .use(prometheusServerMiddleware())
