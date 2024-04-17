@@ -65,7 +65,7 @@
     "@sentio/ethers-v6": "^1.0.29",
     "@sentio/protos": "workspace:*",
     "@sentio/runtime": "workspace:^",
-    "@solana/web3.js": "^1.89.1",
+    "@solana/web3.js": "1.89.1",
     "@typemove/aptos": "~1.5.5",
     "@typemove/move": "~1.5.5",
     "@typemove/sui": "~1.5.5",
