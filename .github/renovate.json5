@@ -9,6 +9,7 @@
   "packageRules": [
     {
       "matchPackageNames": [
+        "@types/mkdirp",
         "node",
         "superstruct_solana",
         "mkdirp",

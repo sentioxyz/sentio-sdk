@@ -32,6 +32,7 @@ message ProjectConfig {
 message ExecutionConfig {
   bool sequential = 1;
   bool forceExactBlockTime = 2;
+  int32 processBindingTimeout = 3;
 }
 
 message ProcessConfigRequest {
@@ -60,6 +61,7 @@ message ContractConfig {
   repeated MoveEventHandlerConfig move_event_configs = 9;
   repeated MoveCallHandlerConfig move_call_configs = 10;
   repeated MoveResourceChangeConfig move_resource_change_configs = 12;
+  repeated FuelCallHandlerConfig fuel_call_configs = 13;
   InstructionHandlerConfig instruction_config = 6;
   uint64 start_block = 4;
   uint64 end_block = 5;
@@ -348,6 +350,16 @@ message MoveCallFilter {
   bool include_failed = 4;
   string public_key_prefix = 5;
   optional FromAndToAddress from_and_to_address = 6;
+}
+
+message FuelCallFilter {
+  string function = 1; // "" means all transaction
+  bool include_failed = 2;
+}
+
+message FuelCallHandlerConfig {
+  repeated FuelCallFilter filters = 1;
+  int32 handler_id = 2;
 }
 
 message Topic {

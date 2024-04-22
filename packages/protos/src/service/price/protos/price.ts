@@ -107,45 +107,56 @@ export const CoinID = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): CoinID {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseCoinID();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.symbol = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.address = CoinID_AddressIdentifier.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): CoinID {
     return {
-      symbol: isSet(object.symbol) ? String(object.symbol) : undefined,
+      symbol: isSet(object.symbol) ? globalThis.String(object.symbol) : undefined,
       address: isSet(object.address) ? CoinID_AddressIdentifier.fromJSON(object.address) : undefined,
     };
   },
 
   toJSON(message: CoinID): unknown {
     const obj: any = {};
-    message.symbol !== undefined && (obj.symbol = message.symbol);
-    message.address !== undefined &&
-      (obj.address = message.address ? CoinID_AddressIdentifier.toJSON(message.address) : undefined);
+    if (message.symbol !== undefined) {
+      obj.symbol = message.symbol;
+    }
+    if (message.address !== undefined) {
+      obj.address = CoinID_AddressIdentifier.toJSON(message.address);
+    }
     return obj;
   },
 
   create(base?: DeepPartial<CoinID>): CoinID {
     return CoinID.fromPartial(base ?? {});
   },
-
   fromPartial(object: DeepPartial<CoinID>): CoinID {
     const message = createBaseCoinID();
     message.symbol = object.symbol ?? undefined;
@@ -172,44 +183,56 @@ export const CoinID_AddressIdentifier = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): CoinID_AddressIdentifier {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseCoinID_AddressIdentifier();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.address = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.chain = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): CoinID_AddressIdentifier {
     return {
-      address: isSet(object.address) ? String(object.address) : "",
-      chain: isSet(object.chain) ? String(object.chain) : "",
+      address: isSet(object.address) ? globalThis.String(object.address) : "",
+      chain: isSet(object.chain) ? globalThis.String(object.chain) : "",
     };
   },
 
   toJSON(message: CoinID_AddressIdentifier): unknown {
     const obj: any = {};
-    message.address !== undefined && (obj.address = message.address);
-    message.chain !== undefined && (obj.chain = message.chain);
+    if (message.address !== "") {
+      obj.address = message.address;
+    }
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
     return obj;
   },
 
   create(base?: DeepPartial<CoinID_AddressIdentifier>): CoinID_AddressIdentifier {
     return CoinID_AddressIdentifier.fromPartial(base ?? {});
   },
-
   fromPartial(object: DeepPartial<CoinID_AddressIdentifier>): CoinID_AddressIdentifier {
     const message = createBaseCoinID_AddressIdentifier();
     message.address = object.address ?? "";
@@ -237,25 +260,38 @@ export const GetPriceRequest = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): GetPriceRequest {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGetPriceRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.timestamp = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.coinId = CoinID.decode(reader, reader.uint32());
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.source = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -264,22 +300,27 @@ export const GetPriceRequest = {
     return {
       timestamp: isSet(object.timestamp) ? fromJsonTimestamp(object.timestamp) : undefined,
       coinId: isSet(object.coinId) ? CoinID.fromJSON(object.coinId) : undefined,
-      source: isSet(object.source) ? String(object.source) : "",
+      source: isSet(object.source) ? globalThis.String(object.source) : "",
     };
   },
 
   toJSON(message: GetPriceRequest): unknown {
     const obj: any = {};
-    message.timestamp !== undefined && (obj.timestamp = message.timestamp.toISOString());
-    message.coinId !== undefined && (obj.coinId = message.coinId ? CoinID.toJSON(message.coinId) : undefined);
-    message.source !== undefined && (obj.source = message.source);
+    if (message.timestamp !== undefined) {
+      obj.timestamp = message.timestamp.toISOString();
+    }
+    if (message.coinId !== undefined) {
+      obj.coinId = CoinID.toJSON(message.coinId);
+    }
+    if (message.source !== "") {
+      obj.source = message.source;
+    }
     return obj;
   },
 
   create(base?: DeepPartial<GetPriceRequest>): GetPriceRequest {
     return GetPriceRequest.fromPartial(base ?? {});
   },
-
   fromPartial(object: DeepPartial<GetPriceRequest>): GetPriceRequest {
     const message = createBaseGetPriceRequest();
     message.timestamp = object.timestamp ?? undefined;
@@ -307,44 +348,56 @@ export const GetPriceResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): GetPriceResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGetPriceResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 9) {
+            break;
+          }
+
           message.price = reader.double();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.timestamp = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): GetPriceResponse {
     return {
-      price: isSet(object.price) ? Number(object.price) : 0,
+      price: isSet(object.price) ? globalThis.Number(object.price) : 0,
       timestamp: isSet(object.timestamp) ? fromJsonTimestamp(object.timestamp) : undefined,
     };
   },
 
   toJSON(message: GetPriceResponse): unknown {
     const obj: any = {};
-    message.price !== undefined && (obj.price = message.price);
-    message.timestamp !== undefined && (obj.timestamp = message.timestamp.toISOString());
+    if (message.price !== 0) {
+      obj.price = message.price;
+    }
+    if (message.timestamp !== undefined) {
+      obj.timestamp = message.timestamp.toISOString();
+    }
     return obj;
   },
 
   create(base?: DeepPartial<GetPriceResponse>): GetPriceResponse {
     return GetPriceResponse.fromPartial(base ?? {});
   },
-
   fromPartial(object: DeepPartial<GetPriceResponse>): GetPriceResponse {
     const message = createBaseGetPriceResponse();
     message.price = object.price ?? 0;
@@ -369,44 +422,51 @@ export const BatchGetPricesRequest = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): BatchGetPricesRequest {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseBatchGetPricesRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.timestamps.push(fromTimestamp(Timestamp.decode(reader, reader.uint32())));
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.coinIds.push(CoinID.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): BatchGetPricesRequest {
     return {
-      timestamps: Array.isArray(object?.timestamps) ? object.timestamps.map((e: any) => fromJsonTimestamp(e)) : [],
-      coinIds: Array.isArray(object?.coinIds) ? object.coinIds.map((e: any) => CoinID.fromJSON(e)) : [],
+      timestamps: globalThis.Array.isArray(object?.timestamps)
+        ? object.timestamps.map((e: any) => fromJsonTimestamp(e))
+        : [],
+      coinIds: globalThis.Array.isArray(object?.coinIds) ? object.coinIds.map((e: any) => CoinID.fromJSON(e)) : [],
     };
   },
 
   toJSON(message: BatchGetPricesRequest): unknown {
     const obj: any = {};
-    if (message.timestamps) {
+    if (message.timestamps?.length) {
       obj.timestamps = message.timestamps.map((e) => e.toISOString());
-    } else {
-      obj.timestamps = [];
     }
-    if (message.coinIds) {
-      obj.coinIds = message.coinIds.map((e) => e ? CoinID.toJSON(e) : undefined);
-    } else {
-      obj.coinIds = [];
+    if (message.coinIds?.length) {
+      obj.coinIds = message.coinIds.map((e) => CoinID.toJSON(e));
     }
     return obj;
   },
@@ -414,7 +474,6 @@ export const BatchGetPricesRequest = {
   create(base?: DeepPartial<BatchGetPricesRequest>): BatchGetPricesRequest {
     return BatchGetPricesRequest.fromPartial(base ?? {});
   },
-
   fromPartial(object: DeepPartial<BatchGetPricesRequest>): BatchGetPricesRequest {
     const message = createBaseBatchGetPricesRequest();
     message.timestamps = object.timestamps?.map((e) => e) || [];
@@ -436,26 +495,31 @@ export const BatchGetPricesResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): BatchGetPricesResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseBatchGetPricesResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.prices.push(BatchGetPricesResponse_CoinPrice.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): BatchGetPricesResponse {
     return {
-      prices: Array.isArray(object?.prices)
+      prices: globalThis.Array.isArray(object?.prices)
         ? object.prices.map((e: any) => BatchGetPricesResponse_CoinPrice.fromJSON(e))
         : [],
     };
@@ -463,10 +527,8 @@ export const BatchGetPricesResponse = {
 
   toJSON(message: BatchGetPricesResponse): unknown {
     const obj: any = {};
-    if (message.prices) {
-      obj.prices = message.prices.map((e) => e ? BatchGetPricesResponse_CoinPrice.toJSON(e) : undefined);
-    } else {
-      obj.prices = [];
+    if (message.prices?.length) {
+      obj.prices = message.prices.map((e) => BatchGetPricesResponse_CoinPrice.toJSON(e));
     }
     return obj;
   },
@@ -474,7 +536,6 @@ export const BatchGetPricesResponse = {
   create(base?: DeepPartial<BatchGetPricesResponse>): BatchGetPricesResponse {
     return BatchGetPricesResponse.fromPartial(base ?? {});
   },
-
   fromPartial(object: DeepPartial<BatchGetPricesResponse>): BatchGetPricesResponse {
     const message = createBaseBatchGetPricesResponse();
     message.prices = object.prices?.map((e) => BatchGetPricesResponse_CoinPrice.fromPartial(e)) || [];
@@ -501,25 +562,38 @@ export const BatchGetPricesResponse_CoinPrice = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): BatchGetPricesResponse_CoinPrice {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseBatchGetPricesResponse_CoinPrice();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.coinId = CoinID.decode(reader, reader.uint32());
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.price = BatchGetPricesResponse_CoinPrice_Price.decode(reader, reader.uint32());
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.error = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -528,23 +602,27 @@ export const BatchGetPricesResponse_CoinPrice = {
     return {
       coinId: isSet(object.coinId) ? CoinID.fromJSON(object.coinId) : undefined,
       price: isSet(object.price) ? BatchGetPricesResponse_CoinPrice_Price.fromJSON(object.price) : undefined,
-      error: isSet(object.error) ? String(object.error) : undefined,
+      error: isSet(object.error) ? globalThis.String(object.error) : undefined,
     };
   },
 
   toJSON(message: BatchGetPricesResponse_CoinPrice): unknown {
     const obj: any = {};
-    message.coinId !== undefined && (obj.coinId = message.coinId ? CoinID.toJSON(message.coinId) : undefined);
-    message.price !== undefined &&
-      (obj.price = message.price ? BatchGetPricesResponse_CoinPrice_Price.toJSON(message.price) : undefined);
-    message.error !== undefined && (obj.error = message.error);
+    if (message.coinId !== undefined) {
+      obj.coinId = CoinID.toJSON(message.coinId);
+    }
+    if (message.price !== undefined) {
+      obj.price = BatchGetPricesResponse_CoinPrice_Price.toJSON(message.price);
+    }
+    if (message.error !== undefined) {
+      obj.error = message.error;
+    }
     return obj;
   },
 
   create(base?: DeepPartial<BatchGetPricesResponse_CoinPrice>): BatchGetPricesResponse_CoinPrice {
     return BatchGetPricesResponse_CoinPrice.fromPartial(base ?? {});
   },
-
   fromPartial(object: DeepPartial<BatchGetPricesResponse_CoinPrice>): BatchGetPricesResponse_CoinPrice {
     const message = createBaseBatchGetPricesResponse_CoinPrice();
     message.coinId = (object.coinId !== undefined && object.coinId !== null)
@@ -571,35 +649,40 @@ export const BatchGetPricesResponse_CoinPrice_Price = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): BatchGetPricesResponse_CoinPrice_Price {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseBatchGetPricesResponse_CoinPrice_Price();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.results.push(GetPriceResponse.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): BatchGetPricesResponse_CoinPrice_Price {
     return {
-      results: Array.isArray(object?.results) ? object.results.map((e: any) => GetPriceResponse.fromJSON(e)) : [],
+      results: globalThis.Array.isArray(object?.results)
+        ? object.results.map((e: any) => GetPriceResponse.fromJSON(e))
+        : [],
     };
   },
 
   toJSON(message: BatchGetPricesResponse_CoinPrice_Price): unknown {
     const obj: any = {};
-    if (message.results) {
-      obj.results = message.results.map((e) => e ? GetPriceResponse.toJSON(e) : undefined);
-    } else {
-      obj.results = [];
+    if (message.results?.length) {
+      obj.results = message.results.map((e) => GetPriceResponse.toJSON(e));
     }
     return obj;
   },
@@ -607,7 +690,6 @@ export const BatchGetPricesResponse_CoinPrice_Price = {
   create(base?: DeepPartial<BatchGetPricesResponse_CoinPrice_Price>): BatchGetPricesResponse_CoinPrice_Price {
     return BatchGetPricesResponse_CoinPrice_Price.fromPartial(base ?? {});
   },
-
   fromPartial(object: DeepPartial<BatchGetPricesResponse_CoinPrice_Price>): BatchGetPricesResponse_CoinPrice_Price {
     const message = createBaseBatchGetPricesResponse_CoinPrice_Price();
     message.results = object.results?.map((e) => GetPriceResponse.fromPartial(e)) || [];
@@ -637,54 +719,78 @@ export const ListCoinsRequest = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): ListCoinsRequest {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseListCoinsRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.limit = reader.int32();
-          break;
+          continue;
         case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.offset = reader.int32();
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.searchQuery = reader.string();
-          break;
+          continue;
         case 4:
+          if (tag !== 34) {
+            break;
+          }
+
           message.chain = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): ListCoinsRequest {
     return {
-      limit: isSet(object.limit) ? Number(object.limit) : 0,
-      offset: isSet(object.offset) ? Number(object.offset) : 0,
-      searchQuery: isSet(object.searchQuery) ? String(object.searchQuery) : "",
-      chain: isSet(object.chain) ? String(object.chain) : "",
+      limit: isSet(object.limit) ? globalThis.Number(object.limit) : 0,
+      offset: isSet(object.offset) ? globalThis.Number(object.offset) : 0,
+      searchQuery: isSet(object.searchQuery) ? globalThis.String(object.searchQuery) : "",
+      chain: isSet(object.chain) ? globalThis.String(object.chain) : "",
     };
   },
 
   toJSON(message: ListCoinsRequest): unknown {
     const obj: any = {};
-    message.limit !== undefined && (obj.limit = Math.round(message.limit));
-    message.offset !== undefined && (obj.offset = Math.round(message.offset));
-    message.searchQuery !== undefined && (obj.searchQuery = message.searchQuery);
-    message.chain !== undefined && (obj.chain = message.chain);
+    if (message.limit !== 0) {
+      obj.limit = Math.round(message.limit);
+    }
+    if (message.offset !== 0) {
+      obj.offset = Math.round(message.offset);
+    }
+    if (message.searchQuery !== "") {
+      obj.searchQuery = message.searchQuery;
+    }
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
     return obj;
   },
 
   create(base?: DeepPartial<ListCoinsRequest>): ListCoinsRequest {
     return ListCoinsRequest.fromPartial(base ?? {});
   },
-
   fromPartial(object: DeepPartial<ListCoinsRequest>): ListCoinsRequest {
     const message = createBaseListCoinsRequest();
     message.limit = object.limit ?? 0;
@@ -711,32 +817,41 @@ export const ListCoinsResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): ListCoinsResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseListCoinsResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.coins.push(CoinID.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           const entry2 = ListCoinsResponse_CoinAddressesInChainEntry.decode(reader, reader.uint32());
           if (entry2.value !== undefined) {
             message.coinAddressesInChain[entry2.key] = entry2.value;
           }
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): ListCoinsResponse {
     return {
-      coins: Array.isArray(object?.coins) ? object.coins.map((e: any) => CoinID.fromJSON(e)) : [],
+      coins: globalThis.Array.isArray(object?.coins) ? object.coins.map((e: any) => CoinID.fromJSON(e)) : [],
       coinAddressesInChain: isObject(object.coinAddressesInChain)
         ? Object.entries(object.coinAddressesInChain).reduce<{ [key: string]: CoinID }>((acc, [key, value]) => {
           acc[key] = CoinID.fromJSON(value);
@@ -748,16 +863,17 @@ export const ListCoinsResponse = {
 
   toJSON(message: ListCoinsResponse): unknown {
     const obj: any = {};
-    if (message.coins) {
-      obj.coins = message.coins.map((e) => e ? CoinID.toJSON(e) : undefined);
-    } else {
-      obj.coins = [];
+    if (message.coins?.length) {
+      obj.coins = message.coins.map((e) => CoinID.toJSON(e));
     }
-    obj.coinAddressesInChain = {};
     if (message.coinAddressesInChain) {
-      Object.entries(message.coinAddressesInChain).forEach(([k, v]) => {
-        obj.coinAddressesInChain[k] = CoinID.toJSON(v);
-      });
+      const entries = Object.entries(message.coinAddressesInChain);
+      if (entries.length > 0) {
+        obj.coinAddressesInChain = {};
+        entries.forEach(([k, v]) => {
+          obj.coinAddressesInChain[k] = CoinID.toJSON(v);
+        });
+      }
     }
     return obj;
   },
@@ -765,7 +881,6 @@ export const ListCoinsResponse = {
   create(base?: DeepPartial<ListCoinsResponse>): ListCoinsResponse {
     return ListCoinsResponse.fromPartial(base ?? {});
   },
-
   fromPartial(object: DeepPartial<ListCoinsResponse>): ListCoinsResponse {
     const message = createBaseListCoinsResponse();
     message.coins = object.coins?.map((e) => CoinID.fromPartial(e)) || [];
@@ -798,44 +913,56 @@ export const ListCoinsResponse_CoinAddressesInChainEntry = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): ListCoinsResponse_CoinAddressesInChainEntry {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseListCoinsResponse_CoinAddressesInChainEntry();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.key = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.value = CoinID.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): ListCoinsResponse_CoinAddressesInChainEntry {
     return {
-      key: isSet(object.key) ? String(object.key) : "",
+      key: isSet(object.key) ? globalThis.String(object.key) : "",
       value: isSet(object.value) ? CoinID.fromJSON(object.value) : undefined,
     };
   },
 
   toJSON(message: ListCoinsResponse_CoinAddressesInChainEntry): unknown {
     const obj: any = {};
-    message.key !== undefined && (obj.key = message.key);
-    message.value !== undefined && (obj.value = message.value ? CoinID.toJSON(message.value) : undefined);
+    if (message.key !== "") {
+      obj.key = message.key;
+    }
+    if (message.value !== undefined) {
+      obj.value = CoinID.toJSON(message.value);
+    }
     return obj;
   },
 
   create(base?: DeepPartial<ListCoinsResponse_CoinAddressesInChainEntry>): ListCoinsResponse_CoinAddressesInChainEntry {
     return ListCoinsResponse_CoinAddressesInChainEntry.fromPartial(base ?? {});
   },
-
   fromPartial(
     object: DeepPartial<ListCoinsResponse_CoinAddressesInChainEntry>,
   ): ListCoinsResponse_CoinAddressesInChainEntry {
@@ -864,29 +991,38 @@ export const CheckLatestPriceResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): CheckLatestPriceResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseCheckLatestPriceResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.prices.push(CheckLatestPriceResponse_CoinPrice.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.latestPrice = CheckLatestPriceResponse_CoinPrice.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): CheckLatestPriceResponse {
     return {
-      prices: Array.isArray(object?.prices)
+      prices: globalThis.Array.isArray(object?.prices)
         ? object.prices.map((e: any) => CheckLatestPriceResponse_CoinPrice.fromJSON(e))
         : [],
       latestPrice: isSet(object.latestPrice)
@@ -897,21 +1033,18 @@ export const CheckLatestPriceResponse = {
 
   toJSON(message: CheckLatestPriceResponse): unknown {
     const obj: any = {};
-    if (message.prices) {
-      obj.prices = message.prices.map((e) => e ? CheckLatestPriceResponse_CoinPrice.toJSON(e) : undefined);
-    } else {
-      obj.prices = [];
+    if (message.prices?.length) {
+      obj.prices = message.prices.map((e) => CheckLatestPriceResponse_CoinPrice.toJSON(e));
     }
-    message.latestPrice !== undefined && (obj.latestPrice = message.latestPrice
-      ? CheckLatestPriceResponse_CoinPrice.toJSON(message.latestPrice)
-      : undefined);
+    if (message.latestPrice !== undefined) {
+      obj.latestPrice = CheckLatestPriceResponse_CoinPrice.toJSON(message.latestPrice);
+    }
     return obj;
   },
 
   create(base?: DeepPartial<CheckLatestPriceResponse>): CheckLatestPriceResponse {
     return CheckLatestPriceResponse.fromPartial(base ?? {});
   },
-
   fromPartial(object: DeepPartial<CheckLatestPriceResponse>): CheckLatestPriceResponse {
     const message = createBaseCheckLatestPriceResponse();
     message.prices = object.prices?.map((e) => CheckLatestPriceResponse_CoinPrice.fromPartial(e)) || [];
@@ -941,25 +1074,38 @@ export const CheckLatestPriceResponse_CoinPrice = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): CheckLatestPriceResponse_CoinPrice {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseCheckLatestPriceResponse_CoinPrice();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.coinId = CoinID.decode(reader, reader.uint32());
-          break;
+          continue;
         case 2:
+          if (tag !== 17) {
+            break;
+          }
+
           message.price = reader.double();
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.timestamp = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -967,23 +1113,28 @@ export const CheckLatestPriceResponse_CoinPrice = {
   fromJSON(object: any): CheckLatestPriceResponse_CoinPrice {
     return {
       coinId: isSet(object.coinId) ? CoinID.fromJSON(object.coinId) : undefined,
-      price: isSet(object.price) ? Number(object.price) : 0,
+      price: isSet(object.price) ? globalThis.Number(object.price) : 0,
       timestamp: isSet(object.timestamp) ? fromJsonTimestamp(object.timestamp) : undefined,
     };
   },
 
   toJSON(message: CheckLatestPriceResponse_CoinPrice): unknown {
     const obj: any = {};
-    message.coinId !== undefined && (obj.coinId = message.coinId ? CoinID.toJSON(message.coinId) : undefined);
-    message.price !== undefined && (obj.price = message.price);
-    message.timestamp !== undefined && (obj.timestamp = message.timestamp.toISOString());
+    if (message.coinId !== undefined) {
+      obj.coinId = CoinID.toJSON(message.coinId);
+    }
+    if (message.price !== 0) {
+      obj.price = message.price;
+    }
+    if (message.timestamp !== undefined) {
+      obj.timestamp = message.timestamp.toISOString();
+    }
     return obj;
   },
 
   create(base?: DeepPartial<CheckLatestPriceResponse_CoinPrice>): CheckLatestPriceResponse_CoinPrice {
     return CheckLatestPriceResponse_CoinPrice.fromPartial(base ?? {});
   },
-
   fromPartial(object: DeepPartial<CheckLatestPriceResponse_CoinPrice>): CheckLatestPriceResponse_CoinPrice {
     const message = createBaseCheckLatestPriceResponse_CoinPrice();
     message.coinId = (object.coinId !== undefined && object.coinId !== null)
@@ -1050,89 +1201,155 @@ export const BackfillCoinRequest = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): BackfillCoinRequest {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseBackfillCoinRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.name = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.symbol = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.chain = reader.string();
-          break;
+          continue;
         case 4:
+          if (tag !== 34) {
+            break;
+          }
+
           message.address = reader.string();
-          break;
+          continue;
         case 5:
+          if (tag !== 42) {
+            break;
+          }
+
           message.coingeckoId = reader.string();
-          break;
+          continue;
         case 6:
+          if (tag !== 48) {
+            break;
+          }
+
           message.decimals = reader.uint32();
-          break;
+          continue;
         case 7:
+          if (tag !== 58) {
+            break;
+          }
+
           message.logoUrl = reader.string();
-          break;
+          continue;
         case 8:
+          if (tag !== 66) {
+            break;
+          }
+
           message.projectUrl = reader.string();
-          break;
+          continue;
         case 9:
+          if (tag !== 74) {
+            break;
+          }
+
           message.accountAddress = reader.string();
-          break;
+          continue;
         case 10:
+          if (tag !== 82) {
+            break;
+          }
+
           message.moduleName = reader.string();
-          break;
+          continue;
         case 11:
+          if (tag !== 90) {
+            break;
+          }
+
           message.structName = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): BackfillCoinRequest {
     return {
-      name: isSet(object.name) ? String(object.name) : "",
-      symbol: isSet(object.symbol) ? String(object.symbol) : "",
-      chain: isSet(object.chain) ? String(object.chain) : "",
-      address: isSet(object.address) ? String(object.address) : "",
-      coingeckoId: isSet(object.coingeckoId) ? String(object.coingeckoId) : "",
-      decimals: isSet(object.decimals) ? Number(object.decimals) : 0,
-      logoUrl: isSet(object.logoUrl) ? String(object.logoUrl) : "",
-      projectUrl: isSet(object.projectUrl) ? String(object.projectUrl) : "",
-      accountAddress: isSet(object.accountAddress) ? String(object.accountAddress) : "",
-      moduleName: isSet(object.moduleName) ? String(object.moduleName) : "",
-      structName: isSet(object.structName) ? String(object.structName) : "",
+      name: isSet(object.name) ? globalThis.String(object.name) : "",
+      symbol: isSet(object.symbol) ? globalThis.String(object.symbol) : "",
+      chain: isSet(object.chain) ? globalThis.String(object.chain) : "",
+      address: isSet(object.address) ? globalThis.String(object.address) : "",
+      coingeckoId: isSet(object.coingeckoId) ? globalThis.String(object.coingeckoId) : "",
+      decimals: isSet(object.decimals) ? globalThis.Number(object.decimals) : 0,
+      logoUrl: isSet(object.logoUrl) ? globalThis.String(object.logoUrl) : "",
+      projectUrl: isSet(object.projectUrl) ? globalThis.String(object.projectUrl) : "",
+      accountAddress: isSet(object.accountAddress) ? globalThis.String(object.accountAddress) : "",
+      moduleName: isSet(object.moduleName) ? globalThis.String(object.moduleName) : "",
+      structName: isSet(object.structName) ? globalThis.String(object.structName) : "",
     };
   },
 
   toJSON(message: BackfillCoinRequest): unknown {
     const obj: any = {};
-    message.name !== undefined && (obj.name = message.name);
-    message.symbol !== undefined && (obj.symbol = message.symbol);
-    message.chain !== undefined && (obj.chain = message.chain);
-    message.address !== undefined && (obj.address = message.address);
-    message.coingeckoId !== undefined && (obj.coingeckoId = message.coingeckoId);
-    message.decimals !== undefined && (obj.decimals = Math.round(message.decimals));
-    message.logoUrl !== undefined && (obj.logoUrl = message.logoUrl);
-    message.projectUrl !== undefined && (obj.projectUrl = message.projectUrl);
-    message.accountAddress !== undefined && (obj.accountAddress = message.accountAddress);
-    message.moduleName !== undefined && (obj.moduleName = message.moduleName);
-    message.structName !== undefined && (obj.structName = message.structName);
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
+    if (message.symbol !== "") {
+      obj.symbol = message.symbol;
+    }
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
+    if (message.address !== "") {
+      obj.address = message.address;
+    }
+    if (message.coingeckoId !== "") {
+      obj.coingeckoId = message.coingeckoId;
+    }
+    if (message.decimals !== 0) {
+      obj.decimals = Math.round(message.decimals);
+    }
+    if (message.logoUrl !== "") {
+      obj.logoUrl = message.logoUrl;
+    }
+    if (message.projectUrl !== "") {
+      obj.projectUrl = message.projectUrl;
+    }
+    if (message.accountAddress !== "") {
+      obj.accountAddress = message.accountAddress;
+    }
+    if (message.moduleName !== "") {
+      obj.moduleName = message.moduleName;
+    }
+    if (message.structName !== "") {
+      obj.structName = message.structName;
+    }
     return obj;
   },
 
   create(base?: DeepPartial<BackfillCoinRequest>): BackfillCoinRequest {
     return BackfillCoinRequest.fromPartial(base ?? {});
   },
-
   fromPartial(object: DeepPartial<BackfillCoinRequest>): BackfillCoinRequest {
     const message = createBaseBackfillCoinRequest();
     message.name = object.name ?? "";
@@ -1166,44 +1383,56 @@ export const BackfillCoinResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): BackfillCoinResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseBackfillCoinResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.symbol = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.message = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): BackfillCoinResponse {
     return {
-      symbol: isSet(object.symbol) ? String(object.symbol) : "",
-      message: isSet(object.message) ? String(object.message) : "",
+      symbol: isSet(object.symbol) ? globalThis.String(object.symbol) : "",
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
     };
   },
 
   toJSON(message: BackfillCoinResponse): unknown {
     const obj: any = {};
-    message.symbol !== undefined && (obj.symbol = message.symbol);
-    message.message !== undefined && (obj.message = message.message);
+    if (message.symbol !== "") {
+      obj.symbol = message.symbol;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
     return obj;
   },
 
   create(base?: DeepPartial<BackfillCoinResponse>): BackfillCoinResponse {
     return BackfillCoinResponse.fromPartial(base ?? {});
   },
-
   fromPartial(object: DeepPartial<BackfillCoinResponse>): BackfillCoinResponse {
     const message = createBaseBackfillCoinResponse();
     message.symbol = object.symbol ?? "";
@@ -1223,7 +1452,11 @@ export const PriceServiceDefinition = {
       requestStream: false,
       responseType: GetPriceResponse,
       responseStream: false,
-      options: {},
+      options: {
+        _unknownFields: {
+          578365826: [new Uint8Array([16, 18, 14, 47, 97, 112, 105, 47, 118, 49, 47, 112, 114, 105, 99, 101, 115])],
+        },
+      },
     },
     batchGetPrices: {
       name: "BatchGetPrices",
@@ -1231,7 +1464,37 @@ export const PriceServiceDefinition = {
       requestStream: false,
       responseType: BatchGetPricesResponse,
       responseStream: false,
-      options: {},
+      options: {
+        _unknownFields: {
+          578365826: [
+            new Uint8Array([
+              22,
+              18,
+              20,
+              47,
+              97,
+              112,
+              105,
+              47,
+              118,
+              49,
+              47,
+              112,
+              114,
+              105,
+              99,
+              101,
+              115,
+              47,
+              98,
+              97,
+              116,
+              99,
+              104,
+            ]),
+          ],
+        },
+      },
     },
     listCoins: {
       name: "ListCoins",
@@ -1239,7 +1502,37 @@ export const PriceServiceDefinition = {
       requestStream: false,
       responseType: ListCoinsResponse,
       responseStream: false,
-      options: {},
+      options: {
+        _unknownFields: {
+          578365826: [
+            new Uint8Array([
+              22,
+              18,
+              20,
+              47,
+              97,
+              112,
+              105,
+              47,
+              118,
+              49,
+              47,
+              112,
+              114,
+              105,
+              99,
+              101,
+              115,
+              47,
+              99,
+              111,
+              105,
+              110,
+              115,
+            ]),
+          ],
+        },
+      },
     },
     checkLatestPrice: {
       name: "CheckLatestPrice",
@@ -1247,7 +1540,44 @@ export const PriceServiceDefinition = {
       requestStream: false,
       responseType: CheckLatestPriceResponse,
       responseStream: false,
-      options: {},
+      options: {
+        _unknownFields: {
+          578365826: [
+            new Uint8Array([
+              29,
+              18,
+              27,
+              47,
+              97,
+              112,
+              105,
+              47,
+              118,
+              49,
+              47,
+              112,
+              114,
+              105,
+              99,
+              101,
+              115,
+              47,
+              99,
+              104,
+              101,
+              99,
+              107,
+              95,
+              108,
+              97,
+              116,
+              101,
+              115,
+              116,
+            ]),
+          ],
+        },
+      },
     },
     backfillCoin: {
       name: "BackfillCoin",
@@ -1255,7 +1585,43 @@ export const PriceServiceDefinition = {
       requestStream: false,
       responseType: BackfillCoinResponse,
       responseStream: false,
-      options: {},
+      options: {
+        _unknownFields: {
+          578365826: [
+            new Uint8Array([
+              28,
+              34,
+              23,
+              47,
+              97,
+              112,
+              105,
+              47,
+              118,
+              49,
+              47,
+              112,
+              114,
+              105,
+              99,
+              101,
+              115,
+              47,
+              98,
+              97,
+              99,
+              107,
+              102,
+              105,
+              108,
+              108,
+              58,
+              1,
+              42,
+            ]),
+          ],
+        },
+      },
     },
   },
 } as const;
@@ -1294,10 +1660,11 @@ export interface PriceServiceClient<CallOptionsExt = {}> {
   ): Promise<BackfillCoinResponse>;
 }
 
-type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
+type Builtin = Date | Function | Uint8Array | string | number | boolean | bigint | undefined;
 
 type DeepPartial<T> = T extends Builtin ? T
-  : T extends Array<infer U> ? Array<DeepPartial<U>> : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
   : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 
@@ -1308,16 +1675,16 @@ function toTimestamp(date: Date): Timestamp {
 }
 
 function fromTimestamp(t: Timestamp): Date {
-  let millis = Number(t.seconds.toString()) * 1_000;
-  millis += t.nanos / 1_000_000;
-  return new Date(millis);
+  let millis = (globalThis.Number(t.seconds.toString()) || 0) * 1_000;
+  millis += (t.nanos || 0) / 1_000_000;
+  return new globalThis.Date(millis);
 }
 
 function fromJsonTimestamp(o: any): Date {
-  if (o instanceof Date) {
+  if (o instanceof globalThis.Date) {
     return o;
   } else if (typeof o === "string") {
-    return new Date(o);
+    return new globalThis.Date(o);
   } else {
     return fromTimestamp(Timestamp.fromJSON(o));
   }

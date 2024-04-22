@@ -53,7 +53,7 @@ class AptosNetworkCodegen extends BaseAptosCodegen {
   generateImports() {
     return (
       this.moduleGenerator.generateImports() +
-      `import { Aptos, Account as AptosAccount, MoveAddressType, PendingTransactionResponse, InputGenerateTransactionOptions, MoveStructId, InputViewRequestData } from '@aptos-labs/ts-sdk'`
+      `import { Aptos, Account as AptosAccount, MoveAddressType, PendingTransactionResponse, InputGenerateTransactionOptions, MoveStructId } from '@aptos-labs/ts-sdk'`
     )
   }
   generateLoadAll(isSystem: boolean): string {

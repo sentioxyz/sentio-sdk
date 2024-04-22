@@ -65,22 +65,27 @@ export const Struct = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Struct {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseStruct();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           const entry1 = Struct_FieldsEntry.decode(reader, reader.uint32());
           if (entry1.value !== undefined) {
             message.fields[entry1.key] = entry1.value;
           }
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -98,11 +103,14 @@ export const Struct = {
 
   toJSON(message: Struct): unknown {
     const obj: any = {};
-    obj.fields = {};
     if (message.fields) {
-      Object.entries(message.fields).forEach(([k, v]) => {
-        obj.fields[k] = v;
-      });
+      const entries = Object.entries(message.fields);
+      if (entries.length > 0) {
+        obj.fields = {};
+        entries.forEach(([k, v]) => {
+          obj.fields[k] = v;
+        });
+      }
     }
     return obj;
   },
@@ -110,7 +118,6 @@ export const Struct = {
   create(base?: DeepPartial<Struct>): Struct {
     return Struct.fromPartial(base ?? {});
   },
-
   fromPartial(object: DeepPartial<Struct>): Struct {
     const message = createBaseStruct();
     message.fields = Object.entries(object.fields ?? {}).reduce<{ [key: string]: any | undefined }>(
@@ -127,10 +134,11 @@ export const Struct = {
 
   wrap(object: { [key: string]: any } | undefined): Struct {
     const struct = createBaseStruct();
+
     if (object !== undefined) {
-      Object.keys(object).forEach((key) => {
+      for (const key of Object.keys(object)) {
         struct.fields[key] = object[key];
-      });
+      }
     }
     return struct;
   },
@@ -138,9 +146,9 @@ export const Struct = {
   unwrap(message: Struct): { [key: string]: any } {
     const object: { [key: string]: any } = {};
     if (message.fields) {
-      Object.keys(message.fields).forEach((key) => {
+      for (const key of Object.keys(message.fields)) {
         object[key] = message.fields[key];
-      });
+      }
     }
     return object;
   },
@@ -162,41 +170,56 @@ export const Struct_FieldsEntry = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Struct_FieldsEntry {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseStruct_FieldsEntry();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.key = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.value = Value.unwrap(Value.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): Struct_FieldsEntry {
-    return { key: isSet(object.key) ? String(object.key) : "", value: isSet(object?.value) ? object.value : undefined };
+    return {
+      key: isSet(object.key) ? globalThis.String(object.key) : "",
+      value: isSet(object?.value) ? object.value : undefined,
+    };
   },
 
   toJSON(message: Struct_FieldsEntry): unknown {
     const obj: any = {};
-    message.key !== undefined && (obj.key = message.key);
-    message.value !== undefined && (obj.value = message.value);
+    if (message.key !== "") {
+      obj.key = message.key;
+    }
+    if (message.value !== undefined) {
+      obj.value = message.value;
+    }
     return obj;
   },
 
   create(base?: DeepPartial<Struct_FieldsEntry>): Struct_FieldsEntry {
     return Struct_FieldsEntry.fromPartial(base ?? {});
   },
-
   fromPartial(object: DeepPartial<Struct_FieldsEntry>): Struct_FieldsEntry {
     const message = createBaseStruct_FieldsEntry();
     message.key = object.key ?? "";
@@ -240,34 +263,59 @@ export const Value = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Value {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseValue();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 8) {
+            break;
+          }
+
           message.nullValue = reader.int32() as any;
-          break;
+          continue;
         case 2:
+          if (tag !== 17) {
+            break;
+          }
+
           message.numberValue = reader.double();
-          break;
+          continue;
         case 3:
+          if (tag !== 26) {
+            break;
+          }
+
           message.stringValue = reader.string();
-          break;
+          continue;
         case 4:
+          if (tag !== 32) {
+            break;
+          }
+
           message.boolValue = reader.bool();
-          break;
+          continue;
         case 5:
+          if (tag !== 42) {
+            break;
+          }
+
           message.structValue = Struct.unwrap(Struct.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 6:
+          if (tag !== 50) {
+            break;
+          }
+
           message.listValue = ListValue.unwrap(ListValue.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -275,30 +323,40 @@ export const Value = {
   fromJSON(object: any): Value {
     return {
       nullValue: isSet(object.nullValue) ? nullValueFromJSON(object.nullValue) : undefined,
-      numberValue: isSet(object.numberValue) ? Number(object.numberValue) : undefined,
-      stringValue: isSet(object.stringValue) ? String(object.stringValue) : undefined,
-      boolValue: isSet(object.boolValue) ? Boolean(object.boolValue) : undefined,
+      numberValue: isSet(object.numberValue) ? globalThis.Number(object.numberValue) : undefined,
+      stringValue: isSet(object.stringValue) ? globalThis.String(object.stringValue) : undefined,
+      boolValue: isSet(object.boolValue) ? globalThis.Boolean(object.boolValue) : undefined,
       structValue: isObject(object.structValue) ? object.structValue : undefined,
-      listValue: Array.isArray(object.listValue) ? [...object.listValue] : undefined,
+      listValue: globalThis.Array.isArray(object.listValue) ? [...object.listValue] : undefined,
     };
   },
 
   toJSON(message: Value): unknown {
     const obj: any = {};
-    message.nullValue !== undefined &&
-      (obj.nullValue = message.nullValue !== undefined ? nullValueToJSON(message.nullValue) : undefined);
-    message.numberValue !== undefined && (obj.numberValue = message.numberValue);
-    message.stringValue !== undefined && (obj.stringValue = message.stringValue);
-    message.boolValue !== undefined && (obj.boolValue = message.boolValue);
-    message.structValue !== undefined && (obj.structValue = message.structValue);
-    message.listValue !== undefined && (obj.listValue = message.listValue);
+    if (message.nullValue !== undefined) {
+      obj.nullValue = nullValueToJSON(message.nullValue);
+    }
+    if (message.numberValue !== undefined) {
+      obj.numberValue = message.numberValue;
+    }
+    if (message.stringValue !== undefined) {
+      obj.stringValue = message.stringValue;
+    }
+    if (message.boolValue !== undefined) {
+      obj.boolValue = message.boolValue;
+    }
+    if (message.structValue !== undefined) {
+      obj.structValue = message.structValue;
+    }
+    if (message.listValue !== undefined) {
+      obj.listValue = message.listValue;
+    }
     return obj;
   },
 
   create(base?: DeepPartial<Value>): Value {
     return Value.fromPartial(base ?? {});
   },
-
   fromPartial(object: DeepPartial<Value>): Value {
     const message = createBaseValue();
     message.nullValue = object.nullValue ?? undefined;
@@ -320,12 +378,12 @@ export const Value = {
       result.numberValue = value;
     } else if (typeof value === "string") {
       result.stringValue = value;
-    } else if (Array.isArray(value)) {
+    } else if (globalThis.Array.isArray(value)) {
       result.listValue = value;
     } else if (typeof value === "object") {
       result.structValue = value;
     } else if (typeof value !== "undefined") {
-      throw new Error("Unsupported any value type: " + typeof value);
+      throw new globalThis.Error("Unsupported any value type: " + typeof value);
     }
     return result;
   },
@@ -361,33 +419,36 @@ export const ListValue = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): ListValue {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseListValue();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag !== 10) {
+            break;
+          }
+
           message.values.push(Value.unwrap(Value.decode(reader, reader.uint32())));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
   fromJSON(object: any): ListValue {
-    return { values: Array.isArray(object?.values) ? [...object.values] : [] };
+    return { values: globalThis.Array.isArray(object?.values) ? [...object.values] : [] };
   },
 
   toJSON(message: ListValue): unknown {
     const obj: any = {};
-    if (message.values) {
-      obj.values = message.values.map((e) => e);
-    } else {
-      obj.values = [];
+    if (message.values?.length) {
+      obj.values = message.values;
     }
     return obj;
   },
@@ -395,7 +456,6 @@ export const ListValue = {
   create(base?: DeepPartial<ListValue>): ListValue {
     return ListValue.fromPartial(base ?? {});
   },
-
   fromPartial(object: DeepPartial<ListValue>): ListValue {
     const message = createBaseListValue();
     message.values = object.values?.map((e) => e) || [];
@@ -409,7 +469,7 @@ export const ListValue = {
   },
 
   unwrap(message: ListValue): Array<any> {
-    if (message?.hasOwnProperty("values") && Array.isArray(message.values)) {
+    if (message?.hasOwnProperty("values") && globalThis.Array.isArray(message.values)) {
       return message.values;
     } else {
       return message as any;
@@ -417,10 +477,11 @@ export const ListValue = {
   },
 };
 
-type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
+type Builtin = Date | Function | Uint8Array | string | number | boolean | bigint | undefined;
 
 type DeepPartial<T> = T extends Builtin ? T
-  : T extends Array<infer U> ? Array<DeepPartial<U>> : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
   : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 
