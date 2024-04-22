@@ -149,7 +149,7 @@ export function formatEthData(data: {
 }
 
 export function formatRichBlock(block: RichBlock): RichBlock {
-  formatBlock(block)
+  block = { ...block, ...formatBlock(block) }
   if (block.transactionReceipts) {
     block.transactionReceipts = block.transactionReceipts.map((t) => formatTransactionReceipt(t))
   }
