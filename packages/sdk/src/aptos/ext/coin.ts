@@ -3,7 +3,7 @@ import fetch from 'node-fetch'
 import { accountTypeString, parseMoveType, SPLITTER } from '@typemove/move'
 import { SimpleCoinInfo } from '../../move/ext/move-dex.js'
 import { AptosNetwork, getClient } from '../network.js'
-import { _0x1 } from '@sentio/sdk/aptos/builtin'
+import { coin } from '@sentio/sdk/aptos/builtin/0x1'
 import { MoveStructId } from '@aptos-labs/ts-sdk'
 import { AptosChainId } from '@sentio/chain'
 
@@ -87,7 +87,7 @@ export async function getCoinInfoWithFallback(type: string, network?: AptosNetwo
       const client = getClient(network)
       // client.getDigitalAssetData()
       const account = type.split(SPLITTER)[0]
-      const coinInfo = _0x1.coin.CoinInfo.type(parseMoveType(type)).getSignature() as MoveStructId
+      const coinInfo = coin.CoinInfo.type(parseMoveType(type)).getSignature() as MoveStructId
       promise = client.getAccountResource({ accountAddress: account, resourceType: coinInfo })
       COIN_METADATA_CACHE.set(key, promise)
     }

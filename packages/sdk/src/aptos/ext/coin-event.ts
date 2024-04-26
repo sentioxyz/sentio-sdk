@@ -1,5 +1,5 @@
 import { Event, UserTransactionResponse, WriteSetChangeWriteResource } from '@aptos-labs/ts-sdk'
-import { coin } from '../builtin/0x1.js'
+import { coin } from '@sentio/sdk/aptos/builtin/0x1'
 import { parseMoveType } from '../../move/index.js'
 
 export function findNewCoinBalances(evt: Event, tx: UserTransactionResponse, coin: string): coin.Coin<any> | undefined {
