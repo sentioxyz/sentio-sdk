@@ -14,23 +14,23 @@ export const buildOptionDefinitions = [
     name: 'help',
     alias: 'h',
     type: Boolean,
-    description: 'Display this usage guide.',
+    description: 'Display this usage guide.'
   },
   {
     name: 'skip-gen',
     type: Boolean,
-    description: 'Skip code generation.',
+    description: 'Skip code generation.'
   },
   {
     name: 'skip-deps',
     type: Boolean,
-    description: 'Skip dependency enforce.',
+    description: 'Skip dependency enforce.'
   },
   {
     name: 'example',
     type: Boolean,
-    description: 'Generate example usage of the processor.',
-  },
+    description: 'Generate example usage of the processor.'
+  }
 ]
 
 export const GenOptionDefinitions = [
@@ -38,13 +38,13 @@ export const GenOptionDefinitions = [
     name: 'help',
     alias: 'h',
     type: Boolean,
-    description: 'Display this usage guide.',
+    description: 'Display this usage guide.'
   },
   {
     name: 'example',
     type: Boolean,
-    description: 'Generate example usage of the processor.',
-  },
+    description: 'Generate example usage of the processor.'
+  }
 ]
 
 export async function buildProcessorWithArgs(argv: string[]) {
@@ -52,12 +52,12 @@ export async function buildProcessorWithArgs(argv: string[]) {
   const usage = commandLineUsage([
     {
       header: 'Build project',
-      content: 'sentio build',
+      content: 'sentio build'
     },
     {
       header: 'Options',
-      optionList: buildOptionDefinitions,
-    },
+      optionList: buildOptionDefinitions
+    }
   ])
 
   if (options.help) {
@@ -72,12 +72,12 @@ export async function generate(argv: string[]) {
   const usage = commandLineUsage([
     {
       header: 'Generate type binding',
-      content: 'sentio gen [--example]',
+      content: 'sentio gen [--example]'
     },
     {
       header: 'Options',
-      optionList: GenOptionDefinitions,
-    },
+      optionList: GenOptionDefinitions
+    }
   ])
 
   if (options.help) {
@@ -203,6 +203,19 @@ export async function codegen(genExample: boolean) {
 
     // @ts-ignore dynamic import
     await codegen.codegen(path.resolve('abis', 'sui'), output, genExample)
+  } catch (e) {
+    console.error('code gen error', e)
+  }
+
+  try {
+    // @ts-ignore dynamic import
+    const codegen = await import('@sentio/sdk/fuel/codegen')
+
+    const output = path.resolve(outputBase, 'fuel')
+    fs.emptyDirSync(output)
+
+    // @ts-ignore dynamic import
+    await codegen.codegen(path.resolve('abis', 'fuel'), output, genExample)
   } catch (e) {
     console.error('code gen error', e)
   }

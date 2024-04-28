@@ -121,3 +121,4 @@ package-lock.json
 
 # codegen files in the test folder
 sdk/src/tests/types/
+sdk/src/fuel/tests/types/

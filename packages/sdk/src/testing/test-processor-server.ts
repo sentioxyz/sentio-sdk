@@ -8,7 +8,7 @@ import {
   ProcessConfigRequest,
   ProcessConfigResponse,
   ProcessorServiceImplementation,
-  StartRequest,
+  StartRequest
 } from '@sentio/protos'
 import { CallContext } from 'nice-grpc-common'
 import { Endpoints, ProcessorServiceImpl, State } from '@sentio/runtime'
@@ -18,6 +18,7 @@ import { AptosFacet } from './aptos-facet.js'
 import { SolanaFacet } from './solana-facet.js'
 import { EthFacet } from './eth-facet.js'
 import { SuiFacet } from './sui-facet.js'
+import { FuelFacet } from './fuel-facet.js'
 
 export const TEST_CONTEXT: CallContext = <CallContext>{}
 
@@ -34,6 +35,7 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
   eth: EthFacet
   solana: SolanaFacet
   sui: SuiFacet
+  fuel: FuelFacet
 
   constructor(loader: () => Promise<any>, httpEndpoints: Record<string, string> = {}) {
     cleanTest()
@@ -43,6 +45,7 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
     this.solana = new SolanaFacet(this)
     this.eth = new EthFacet(this)
     this.sui = new SuiFacet(this)
+    this.fuel = new FuelFacet(this)
 
     for (const k in CHAIN_MAP) {
       const http = httpEndpoints[k] || ''

@@ -40,3 +40,4 @@ ignore:
   - packages/runtime/lib
   - packages/runtime/node_modules
   - packages/sdk/src/solana/tests
+  - packages/sdk/src/fuel/tests

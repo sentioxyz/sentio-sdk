@@ -16,7 +16,7 @@ import {
 } from '@sentio/protos'
 
 import { ServerError, Status } from 'nice-grpc'
-import { ProcessorState } from './binds.js'
+import { EthProcessorState } from './binds.js'
 import { AccountProcessorState } from './account-processor-state.js'
 import { ProcessorTemplateProcessorState } from './base-processor-template.js'
 import { GlobalProcessorState } from './base-processor.js'
@@ -49,7 +49,7 @@ export class EthPlugin extends Plugin {
       transactionHandlers: []
     }
 
-    for (const processor of ProcessorState.INSTANCE.getValues()) {
+    for (const processor of EthProcessorState.INSTANCE.getValues()) {
       // If server favor incremental update this need to change
       // Start basic config for contract
       const chainId = processor.getChainId()

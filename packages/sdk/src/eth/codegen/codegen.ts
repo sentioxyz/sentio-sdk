@@ -67,9 +67,11 @@ async function codegenInternal(
 
   const fileDescriptions = loadFileDescriptions(services, config.filesToProcess)
 
+  // @ts-ignore - no types
   filesGenerated += processOutput(services, config, await target.beforeRun())
 
   for (const fd of fileDescriptions) {
+    // @ts-ignore - no types
     filesGenerated += processOutput(services, config, await target.transformFile(fd))
   }
 

@@ -6,8 +6,8 @@ import { BaseContract } from 'ethers'
 import { MapStateStorage } from '@sentio/runtime'
 import { EthChainId } from '@sentio/chain'
 
-export class ProcessorState extends MapStateStorage<BaseProcessor<any, any>> {
-  static INSTANCE = new ProcessorState()
+export class EthProcessorState extends MapStateStorage<BaseProcessor<any, any>> {
+  static INSTANCE = new EthProcessorState()
 }
 
 // from abiName_address_chainId => contract wrapper
@@ -20,13 +20,13 @@ function getKey(abiName: string, address: string, network: EthChainId) {
 // Dedup processor that bind multiple times
 export function getProcessor(opts: BindOptions) {
   const sig = getOptionsSignature(opts)
-  return ProcessorState.INSTANCE.getValue(sig)
+  return EthProcessorState.INSTANCE.getValue(sig)
 }
 
 export function addProcessor(opts: BindOptions, processor: BaseProcessor<any, any>) {
   const sig = getOptionsSignature(opts)
 
-  ProcessorState.INSTANCE.getOrSetValue(sig, processor)
+  EthProcessorState.INSTANCE.getOrSetValue(sig, processor)
 }
 
 export function getContractByABI(abiName: string, address: string, network: EthChainId) {

@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+
 import Ethers from '@sentio/ethers-v6'
 import {
   Config,
@@ -65,7 +68,7 @@ export default class EthersSentio extends Ethers.default {
     }
   }
 
-  override afterRun() {
+  override afterRun(): FileDescription[] {
     const commonPath = join('internal', 'common.ts')
     const files = super.afterRun()
     for (const [idx, file] of files.entries()) {

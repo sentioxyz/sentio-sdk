@@ -443,6 +443,10 @@ message Data {
     string tx_digest = 4;
     uint64 slot = 3;
   }
+  message FuelCall {
+    google.protobuf.Struct transaction = 1;
+    google.protobuf.Timestamp timestamp = 2;
+  }
 
   bytes raw = 1 [deprecated = true]; // can be removed anytime
   oneof value {
@@ -458,6 +462,7 @@ message Data {
     SuiCall sui_call = 11;
     SuiObject sui_object = 12;
     SuiObjectChange sui_object_change = 13;
+    FuelCall fuel_call = 14;
   }
 }
 
@@ -536,6 +541,7 @@ enum HandlerType {
   SUI_CALL = 9;
   SUI_OBJECT = 10;
   SUI_OBJECT_CHANGE = 12;
+  FUEL_CALL = 13;
 }
 
 message RuntimeInfo {
