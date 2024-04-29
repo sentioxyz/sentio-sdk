@@ -153,8 +153,11 @@ function getTimestamp(d: DataBinding): Date | undefined {
   return (
     d.data?.ethLog?.timestamp ||
     d.data?.ethTransaction?.timestamp ||
-    new Date(Number(d.data?.ethBlock?.block?.timestamp) * 1000) ||
-    d.data?.ethTrace?.timestamp
+    (d.data?.ethBlock?.block?.timestamp ? new Date(Number(d.data.ethBlock.block.timestamp) * 1000) : undefined) ||
+    d.data?.ethTrace?.timestamp ||
+    (d.data?.aptCall?.transaction ? new Date(Number(d.data.aptCall.transaction.timestamp) / 1000) : undefined) ||
+    (d.data?.aptEvent?.transaction ? new Date(Number(d.data.aptEvent.transaction.timestamp) / 1000) : undefined) ||
+    (d.data?.aptResource?.timestampMicros ? new Date(Number(d.data.aptResource.timestampMicros) / 1000) : undefined)
   )
 }
 
