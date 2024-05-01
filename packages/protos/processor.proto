@@ -62,10 +62,13 @@ message ContractConfig {
   repeated MoveCallHandlerConfig move_call_configs = 10;
   repeated MoveResourceChangeConfig move_resource_change_configs = 12;
   repeated FuelCallHandlerConfig fuel_call_configs = 13;
+  repeated FuelAssetHandlerConfig asset_configs = 14;
+
   InstructionHandlerConfig instruction_config = 6;
   uint64 start_block = 4;
   uint64 end_block = 5;
   string processor_type = 8;
+
 }
 
 message TotalPerEntityAggregation {
@@ -278,6 +281,16 @@ message LogHandlerConfig {
   repeated LogFilter filters = 1;
   int32 handler_id = 2;
   EthFetchConfig fetch_config = 3;
+}
+
+message FuelAssetHandlerConfig {
+  repeated AssetFilter filters = 1;
+  int32 handler_id = 2;
+  message AssetFilter {
+    optional string asset_id = 1;
+    optional string from_address = 2;
+    optional string to_address = 3;
+  }
 }
 
 message LogFilter {

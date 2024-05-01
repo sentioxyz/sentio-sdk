@@ -4,6 +4,11 @@ import { FuelProcessor } from '../fuel-processor.js'
 import { FuelChainId } from '@sentio/chain'
 import abi from './abis/counter-contract-abi.json'
 import testData from './test-data.json'
+import testTransferData from './transfer-data.json'
+import { FuelAssetProcessor } from '../asset-processor.js'
+import { BaseAssetId } from 'fuels'
+import { afterAll } from '@jest/globals'
+import { State } from '@sentio/runtime'
 
 describe('fuel network tests', () => {
   const ADDRESS = '0x730adcb9974977e0f4fd46488b6aac04dade7d846d15ca026bff61279e265813'
@@ -51,5 +56,63 @@ describe('fuel network tests', () => {
     const events = res.result?.events
     expect(events).length(2)
     expect(events?.[1]?.message).contains('increment call')
+  })
+
+  afterAll(async () => {
+    State.reset()
+  })
+})
+
+describe('fuel network transfer tests', () => {
+  const service = new TestProcessorServer(async () => {
+    FuelAssetProcessor.bind({
+      chainId: FuelChainId.FUEL_TESTNET_BETA_V5
+    }).onTransfer(
+      {
+        assetId: BaseAssetId
+      },
+      async (transfer, ctx) => {
+        const from = transfer.from[0].address
+        const to = transfer.to[0].address
+        const amount = transfer.to[0].amount
+        ctx.eventLogger.emit('transfer', {
+          distinctId: `${ctx.transaction?.id}_${ctx.transaction?.blockId}`,
+          message: `transfered ${amount} from ${from} to ${to}`,
+          attributes: {
+            amount: amount.toString(),
+            from,
+            to
+          }
+        })
+      }
+    )
+  })
+  beforeAll(async () => {
+    await service.start()
+  })
+
+  test('check configuration ', async () => {
+    const config = await service.getConfig({})
+    expect(config.contractConfigs).length(1)
+    expect(config.contractConfigs[0].assetConfigs).length(1)
+  })
+
+  test('test onTransfer ', async () => {
+    const res = await service.fuel.testOnTransaction(testTransferData, FuelChainId.FUEL_TESTNET_BETA_V5)
+
+    const events = res.result?.events
+    expect(events).length(1)
+    expect(events?.[0]?.message).contains('transfered')
+    expect(events?.[0]?.attributes).to.deep.equal({
+      attributes: {
+        amount: '100000',
+        from: '0xd3fe20c8ff68a4054d8587ac170c40db7d1e200208a575780542bd9a7e3eec08',
+        to: '0xd914531010bb159182a20429f04a438eff268cad1c288df23b92dfb388cb5a24'
+      }
+    })
+  })
+
+  afterAll(async () => {
+    State.reset()
   })
 })

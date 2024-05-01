@@ -22,12 +22,12 @@ export class FuelContext extends BaseContext {
     return {
       address: this.transaction?.id || '',
       contractName: this.transaction?.id || '', // TODO
-      blockNumber: 0n,
+      blockNumber: BigInt(this.transaction?.blockNumber || 0),
       transactionIndex: 0,
       transactionHash: this.transaction?.id || '', // TODO
       chainId: this.getChainId(),
       name: name,
-      logIndex: 0,
+      logIndex: -1,
       labels: normalizeLabels(labels)
     }
   }

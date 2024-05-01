@@ -379,6 +379,7 @@ export interface ContractConfig {
   moveCallConfigs: MoveCallHandlerConfig[];
   moveResourceChangeConfigs: MoveResourceChangeConfig[];
   fuelCallConfigs: FuelCallHandlerConfig[];
+  assetConfigs: FuelAssetHandlerConfig[];
   instructionConfig: InstructionHandlerConfig | undefined;
   startBlock: bigint;
   endBlock: bigint;
@@ -612,6 +613,17 @@ export interface LogHandlerConfig {
   filters: LogFilter[];
   handlerId: number;
   fetchConfig: EthFetchConfig | undefined;
+}
+
+export interface FuelAssetHandlerConfig {
+  filters: FuelAssetHandlerConfig_AssetFilter[];
+  handlerId: number;
+}
+
+export interface FuelAssetHandlerConfig_AssetFilter {
+  assetId?: string | undefined;
+  fromAddress?: string | undefined;
+  toAddress?: string | undefined;
 }
 
 export interface LogFilter {
@@ -1318,6 +1330,7 @@ function createBaseContractConfig(): ContractConfig {
     moveCallConfigs: [],
     moveResourceChangeConfigs: [],
     fuelCallConfigs: [],
+    assetConfigs: [],
     instructionConfig: undefined,
     startBlock: BigInt("0"),
     endBlock: BigInt("0"),
@@ -1353,6 +1366,9 @@ export const ContractConfig = {
     }
     for (const v of message.fuelCallConfigs) {
       FuelCallHandlerConfig.encode(v!, writer.uint32(106).fork()).ldelim();
+    }
+    for (const v of message.assetConfigs) {
+      FuelAssetHandlerConfig.encode(v!, writer.uint32(114).fork()).ldelim();
     }
     if (message.instructionConfig !== undefined) {
       InstructionHandlerConfig.encode(message.instructionConfig, writer.uint32(50).fork()).ldelim();
@@ -1445,6 +1461,13 @@ export const ContractConfig = {
 
           message.fuelCallConfigs.push(FuelCallHandlerConfig.decode(reader, reader.uint32()));
           continue;
+        case 14:
+          if (tag !== 114) {
+            break;
+          }
+
+          message.assetConfigs.push(FuelAssetHandlerConfig.decode(reader, reader.uint32()));
+          continue;
         case 6:
           if (tag !== 50) {
             break;
@@ -1509,6 +1532,9 @@ export const ContractConfig = {
       fuelCallConfigs: globalThis.Array.isArray(object?.fuelCallConfigs)
         ? object.fuelCallConfigs.map((e: any) => FuelCallHandlerConfig.fromJSON(e))
         : [],
+      assetConfigs: globalThis.Array.isArray(object?.assetConfigs)
+        ? object.assetConfigs.map((e: any) => FuelAssetHandlerConfig.fromJSON(e))
+        : [],
       instructionConfig: isSet(object.instructionConfig)
         ? InstructionHandlerConfig.fromJSON(object.instructionConfig)
         : undefined,
@@ -1547,6 +1573,9 @@ export const ContractConfig = {
     if (message.fuelCallConfigs?.length) {
       obj.fuelCallConfigs = message.fuelCallConfigs.map((e) => FuelCallHandlerConfig.toJSON(e));
     }
+    if (message.assetConfigs?.length) {
+      obj.assetConfigs = message.assetConfigs.map((e) => FuelAssetHandlerConfig.toJSON(e));
+    }
     if (message.instructionConfig !== undefined) {
       obj.instructionConfig = InstructionHandlerConfig.toJSON(message.instructionConfig);
     }
@@ -1579,6 +1608,7 @@ export const ContractConfig = {
     message.moveResourceChangeConfigs =
       object.moveResourceChangeConfigs?.map((e) => MoveResourceChangeConfig.fromPartial(e)) || [];
     message.fuelCallConfigs = object.fuelCallConfigs?.map((e) => FuelCallHandlerConfig.fromPartial(e)) || [];
+    message.assetConfigs = object.assetConfigs?.map((e) => FuelAssetHandlerConfig.fromPartial(e)) || [];
     message.instructionConfig = (object.instructionConfig !== undefined && object.instructionConfig !== null)
       ? InstructionHandlerConfig.fromPartial(object.instructionConfig)
       : undefined;
@@ -3764,6 +3794,171 @@ export const LogHandlerConfig = {
     message.fetchConfig = (object.fetchConfig !== undefined && object.fetchConfig !== null)
       ? EthFetchConfig.fromPartial(object.fetchConfig)
       : undefined;
+    return message;
+  },
+};
+
+function createBaseFuelAssetHandlerConfig(): FuelAssetHandlerConfig {
+  return { filters: [], handlerId: 0 };
+}
+
+export const FuelAssetHandlerConfig = {
+  encode(message: FuelAssetHandlerConfig, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.filters) {
+      FuelAssetHandlerConfig_AssetFilter.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.handlerId !== 0) {
+      writer.uint32(16).int32(message.handlerId);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): FuelAssetHandlerConfig {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseFuelAssetHandlerConfig();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.filters.push(FuelAssetHandlerConfig_AssetFilter.decode(reader, reader.uint32()));
+          continue;
+        case 2:
+          if (tag !== 16) {
+            break;
+          }
+
+          message.handlerId = reader.int32();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): FuelAssetHandlerConfig {
+    return {
+      filters: globalThis.Array.isArray(object?.filters)
+        ? object.filters.map((e: any) => FuelAssetHandlerConfig_AssetFilter.fromJSON(e))
+        : [],
+      handlerId: isSet(object.handlerId) ? globalThis.Number(object.handlerId) : 0,
+    };
+  },
+
+  toJSON(message: FuelAssetHandlerConfig): unknown {
+    const obj: any = {};
+    if (message.filters?.length) {
+      obj.filters = message.filters.map((e) => FuelAssetHandlerConfig_AssetFilter.toJSON(e));
+    }
+    if (message.handlerId !== 0) {
+      obj.handlerId = Math.round(message.handlerId);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<FuelAssetHandlerConfig>): FuelAssetHandlerConfig {
+    return FuelAssetHandlerConfig.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<FuelAssetHandlerConfig>): FuelAssetHandlerConfig {
+    const message = createBaseFuelAssetHandlerConfig();
+    message.filters = object.filters?.map((e) => FuelAssetHandlerConfig_AssetFilter.fromPartial(e)) || [];
+    message.handlerId = object.handlerId ?? 0;
+    return message;
+  },
+};
+
+function createBaseFuelAssetHandlerConfig_AssetFilter(): FuelAssetHandlerConfig_AssetFilter {
+  return { assetId: undefined, fromAddress: undefined, toAddress: undefined };
+}
+
+export const FuelAssetHandlerConfig_AssetFilter = {
+  encode(message: FuelAssetHandlerConfig_AssetFilter, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.assetId !== undefined) {
+      writer.uint32(10).string(message.assetId);
+    }
+    if (message.fromAddress !== undefined) {
+      writer.uint32(18).string(message.fromAddress);
+    }
+    if (message.toAddress !== undefined) {
+      writer.uint32(26).string(message.toAddress);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): FuelAssetHandlerConfig_AssetFilter {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseFuelAssetHandlerConfig_AssetFilter();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.assetId = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.fromAddress = reader.string();
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.toAddress = reader.string();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): FuelAssetHandlerConfig_AssetFilter {
+    return {
+      assetId: isSet(object.assetId) ? globalThis.String(object.assetId) : undefined,
+      fromAddress: isSet(object.fromAddress) ? globalThis.String(object.fromAddress) : undefined,
+      toAddress: isSet(object.toAddress) ? globalThis.String(object.toAddress) : undefined,
+    };
+  },
+
+  toJSON(message: FuelAssetHandlerConfig_AssetFilter): unknown {
+    const obj: any = {};
+    if (message.assetId !== undefined) {
+      obj.assetId = message.assetId;
+    }
+    if (message.fromAddress !== undefined) {
+      obj.fromAddress = message.fromAddress;
+    }
+    if (message.toAddress !== undefined) {
+      obj.toAddress = message.toAddress;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<FuelAssetHandlerConfig_AssetFilter>): FuelAssetHandlerConfig_AssetFilter {
+    return FuelAssetHandlerConfig_AssetFilter.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<FuelAssetHandlerConfig_AssetFilter>): FuelAssetHandlerConfig_AssetFilter {
+    const message = createBaseFuelAssetHandlerConfig_AssetFilter();
+    message.assetId = object.assetId ?? undefined;
+    message.fromAddress = object.fromAddress ?? undefined;
+    message.toAddress = object.toAddress ?? undefined;
     return message;
   },
 };

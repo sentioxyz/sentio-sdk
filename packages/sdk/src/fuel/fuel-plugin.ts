@@ -10,9 +10,10 @@ import {
 } from '@sentio/protos'
 
 import { ServerError, Status } from 'nice-grpc'
-import { GlobalProcessorState } from '../eth/base-processor.js'
 import { TemplateInstanceState } from '../core/template.js'
-import { FuelProcessorState } from './fuel-processor.js'
+import { FuelAssetProcessor } from './asset-processor.js'
+import { FuelProcessorState } from './types.js'
+import { FuelProcessor } from './fuel-processor.js'
 
 interface Handlers {
   callHandlers: ((trace: Data_FuelCall) => Promise<ProcessResult>)[]
@@ -42,35 +43,24 @@ export class FuelPlugin extends Plugin {
         startBlock: processor.config.startBlock,
         endBlock: processor.config.endBlock
       })
-
       for (const callHandler of processor.callHandlers) {
         const handlerId = handlers.callHandlers.push(callHandler.handler) - 1
-        const fetchConfig = {
-          handlerId,
-          filters: callHandler.fetchConfig.filters || []
+        if (processor instanceof FuelProcessor) {
+          const fetchConfig = {
+            handlerId,
+            filters: callHandler.fetchConfig?.filters || []
+          }
+          contractConfig.fuelCallConfigs.push(fetchConfig)
+        } else if (processor instanceof FuelAssetProcessor) {
+          const assetConfig = callHandler.assetConfig
+          contractConfig.assetConfigs.push({
+            filters: assetConfig?.filters || [],
+            handlerId
+          })
         }
-        contractConfig.fuelCallConfigs.push(fetchConfig)
       }
 
       // Finish up a contract
-      config.contractConfigs.push(contractConfig)
-    }
-
-    for (const processor of GlobalProcessorState.INSTANCE.getValues()) {
-      const chainId = processor.getChainId()
-
-      const contractConfig = ContractConfig.fromPartial({
-        processorType: USER_PROCESSOR,
-        contract: {
-          name: processor.config.name,
-          chainId: chainId.toString(),
-          address: processor.config.address, // can only be *
-          abi: ''
-        },
-        startBlock: processor.config.startBlock,
-        endBlock: processor.config.endBlock
-      })
-
       config.contractConfigs.push(contractConfig)
     }
 
@@ -80,14 +70,7 @@ export class FuelPlugin extends Plugin {
   supportedHandlers = [HandlerType.FUEL_CALL]
 
   processBinding(request: DataBinding): Promise<ProcessResult> {
-    // return Promise.resolve(undefined);
     switch (request.handlerType) {
-      // case HandlerType.FUEL_LOG:
-      //   return this.processLog(request)
-      // case HandlerType.FUEL_TRACE:
-      //   return this.processTrace(request)
-      // case HandlerType.FUEL_BLOCK:
-      //   return this.processBlock(request)
       case HandlerType.FUEL_CALL:
         return this.processTransaction(request)
       default:

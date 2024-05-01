@@ -1,15 +1,16 @@
-import { ListStateStorage } from '@sentio/runtime'
-import { Data_FuelCall, FuelCallFilter, FuelCallHandlerConfig, ProcessResult } from '@sentio/protos'
+import { Data_FuelCall, FuelCallFilter } from '@sentio/protos'
 import { FuelCall, FuelContext } from './context.js'
 import { bn, Contract, Interface, InvocationCallResult, JsonAbi, Provider } from 'fuels'
 import { FuelNetwork, getRpcEndpoint } from './network.js'
-import { decodeFuelTransaction, DEFAULT_FUEL_FETCH_CONFIG, FuelFetchConfig, FuelTransaction } from './transaction.js'
+import {
+  decodeFuelTransactionWithAbi,
+  DEFAULT_FUEL_FETCH_CONFIG,
+  FuelFetchConfig,
+  FuelTransaction
+} from './transaction.js'
+import { CallHandler, FuelBaseProcessor, FuelProcessorState } from './types.js'
 
-export class FuelProcessorState extends ListStateStorage<FuelProcessor> {
-  static INSTANCE = new FuelProcessorState()
-}
-
-export class FuelProcessor {
+export class FuelProcessor implements FuelBaseProcessor<FuelProcessorConfig> {
   callHandlers: CallHandler<Data_FuelCall>[] = []
 
   private provider: Provider
@@ -38,7 +39,7 @@ export class FuelProcessor {
               [this.config.address]: this.config.abi
             }
           : {}
-        const tx = decodeFuelTransaction(call.transaction, abiMap, this.provider)
+        const tx = decodeFuelTransactionWithAbi(call.transaction, abiMap, this.provider)
 
         const ctx = new FuelContext(tx, this.config.chainId)
         await handler(tx, ctx)
@@ -84,7 +85,7 @@ export class FuelProcessor {
       handler: async (call: Data_FuelCall) => {
         const contract = new Contract(this.config.address, abi, this.provider)
         const gqlTransaction = call.transaction
-        const tx = decodeFuelTransaction(gqlTransaction, { [this.config.address]: abi }, this.provider)
+        const tx = decodeFuelTransactionWithAbi(gqlTransaction, { [this.config.address]: abi }, this.provider)
 
         const ctx = new FuelContext(tx, this.config.chainId)
         for (const op of tx.operations) {
@@ -108,11 +109,6 @@ export class FuelProcessor {
     this.callHandlers.push(callHandler)
     return this
   }
-}
-
-export type CallHandler<T> = {
-  handler: (call: T) => Promise<ProcessResult>
-  fetchConfig: Partial<FuelCallHandlerConfig>
 }
 
 export type FuelProcessorConfig = {

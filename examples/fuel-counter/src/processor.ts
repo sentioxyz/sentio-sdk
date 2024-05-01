@@ -40,4 +40,21 @@ FuelProcessor.bind({
 CounterContractProcessor.bind({
   address: '0xa14f85860d6ce99154ecbb13570ba5fba1d8dc16b290de13f036b016fd19a29c',
   chainId: FuelNetwork.TEST_NET
-}).onCallComplext(async (call, ctx) => {}, {})
+}).onCallComplext(async (call, ctx) => {
+  const [arg1, arg2] = call.args
+  const { Ok, Err } = call.returnValue
+  ctx.eventLogger.emit('increment', {
+    distinctId: ctx.transaction?.id,
+    message: 'complex',
+    properties: {
+      baz: arg1.baz,
+      bar: arg1.bar,
+      tuple0: arg1.tuple[0],
+      tuple1: arg1.tuple[1],
+      arg2: arg2,
+      ret: String(Ok),
+      error: Err
+    },
+    severity: ctx.transaction?.status === 'success' ? LogLevel.INFO : LogLevel.ERROR
+  })
+}, {})

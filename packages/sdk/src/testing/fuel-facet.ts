@@ -51,6 +51,20 @@ export class FuelFacet {
           res.push(binding)
         }
       }
+      for (const assetConfig of config.assetConfigs) {
+        const binding = {
+          data: {
+            fuelCall: {
+              transaction,
+              timestamp: new Date()
+            }
+          },
+          handlerIds: [assetConfig.handlerId],
+          handlerType: HandlerType.FUEL_CALL
+        }
+
+        res.push(binding)
+      }
     }
 
     return res

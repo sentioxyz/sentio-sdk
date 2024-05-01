@@ -17,9 +17,33 @@ export const DEFAULT_FUEL_FETCH_CONFIG: FuelFetchConfig = {
   includeFailed: false
 }
 
-export type FuelTransaction = TransactionSummary
+export type FuelTransaction = TransactionSummary & {
+  blockNumber?: string
+}
 
-export function decodeFuelTransaction(gqlTransaction: any, abiMap: AbiMap, provider: Provider): FuelTransaction {
+export function decodeFuelTransaction(gqlTransaction: any, provider: Provider): FuelTransaction {
+  const rawPayload = arrayify(gqlTransaction.rawPayload)
+
+  const [decodedTransaction] = new TransactionCoder().decode(rawPayload, 0)
+  const { gasPerByte, gasPriceFactor, maxInputs, gasCosts } = provider.getChain().consensusParameters
+  const blockNumber = gqlTransaction.status?.block?.header?.header
+  return {
+    ...assembleTransactionSummary({
+      id: gqlTransaction.id,
+      receipts: [],
+      transaction: decodedTransaction,
+      transactionBytes: rawPayload,
+      gqlTransactionStatus: gqlTransaction.status,
+      gasPerByte: bn(gasPerByte),
+      gasPriceFactor: bn(gasPriceFactor),
+      maxInputs,
+      gasCosts
+    }),
+    blockNumber
+  }
+}
+
+export function decodeFuelTransactionWithAbi(gqlTransaction: any, abiMap: AbiMap, provider: Provider): FuelTransaction {
   const rawPayload = arrayify(gqlTransaction.rawPayload)
 
   const [decodedTransaction] = new TransactionCoder().decode(rawPayload, 0)
@@ -27,17 +51,21 @@ export function decodeFuelTransaction(gqlTransaction: any, abiMap: AbiMap, provi
   const receipts = gqlTransaction.receipts?.map(processGqlReceipt) || []
 
   const { gasPerByte, gasPriceFactor, maxInputs, gasCosts } = provider.getChain().consensusParameters
+  const blockNumber = gqlTransaction.status?.block?.header?.header
 
-  return assembleTransactionSummary({
-    id: gqlTransaction.id,
-    receipts,
-    transaction: decodedTransaction,
-    transactionBytes: rawPayload,
-    gqlTransactionStatus: gqlTransaction.status,
-    gasPerByte: bn(gasPerByte),
-    gasPriceFactor: bn(gasPriceFactor),
-    abiMap,
-    maxInputs,
-    gasCosts
-  })
+  return {
+    ...assembleTransactionSummary({
+      id: gqlTransaction.id,
+      receipts,
+      transaction: decodedTransaction,
+      transactionBytes: rawPayload,
+      gqlTransactionStatus: gqlTransaction.status,
+      gasPerByte: bn(gasPerByte),
+      gasPriceFactor: bn(gasPriceFactor),
+      abiMap,
+      maxInputs,
+      gasCosts
+    }),
+    blockNumber
+  }
 }
