@@ -1,5 +1,5 @@
 import { FuelProcessor, FuelProcessorConfig } from './fuel-processor.js'
-import { JsonAbi } from 'fuels'
+import { JsonAbi } from '@fuel-ts/abi-coder'
 import { FuelCall, FuelContext } from './context.js'
 import { FuelFetchConfig } from './transaction.js'
 import { FuelChainId } from '@sentio/chain'

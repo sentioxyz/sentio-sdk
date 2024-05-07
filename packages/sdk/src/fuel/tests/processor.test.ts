@@ -6,9 +6,9 @@ import abi from './abis/counter-contract-abi.json'
 import testData from './test-data.json'
 import testTransferData from './transfer-data.json'
 import { FuelAssetProcessor } from '../asset-processor.js'
-import { BaseAssetId } from 'fuels'
 import { afterAll } from '@jest/globals'
 import { State } from '@sentio/runtime'
+import { BaseAssetId } from '@fuel-ts/address/configs'
 
 describe('fuel network tests', () => {
   const ADDRESS = '0x730adcb9974977e0f4fd46488b6aac04dade7d846d15ca026bff61279e265813'

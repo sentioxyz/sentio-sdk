@@ -1,13 +1,7 @@
-import {
-  AbiMap,
-  arrayify,
-  assembleTransactionSummary,
-  bn,
-  processGqlReceipt,
-  Provider,
-  TransactionCoder,
-  TransactionSummary
-} from 'fuels'
+import { AbiMap, assembleTransactionSummary, processGqlReceipt, Provider, TransactionSummary } from '@fuel-ts/account'
+import { TransactionCoder } from '@fuel-ts/transactions'
+import { bn } from '@fuel-ts/math'
+import { arrayify } from '@fuel-ts/utils'
 
 export type FuelFetchConfig = {
   includeFailed?: boolean
@@ -25,7 +19,7 @@ export function decodeFuelTransaction(gqlTransaction: any, provider: Provider): 
   const rawPayload = arrayify(gqlTransaction.rawPayload)
 
   const [decodedTransaction] = new TransactionCoder().decode(rawPayload, 0)
-  const { gasPerByte, gasPriceFactor, maxInputs, gasCosts } = provider.getChain().consensusParameters
+  const { gasCosts, maxInputs, gasPerByte, gasPriceFactor } = provider.getChain().consensusParameters
   const blockNumber = gqlTransaction.status?.block?.header?.height
   return {
     ...assembleTransactionSummary({
@@ -50,7 +44,8 @@ export function decodeFuelTransactionWithAbi(gqlTransaction: any, abiMap: AbiMap
 
   const receipts = gqlTransaction.receipts?.map(processGqlReceipt) || []
 
-  const { gasPerByte, gasPriceFactor, maxInputs, gasCosts } = provider.getChain().consensusParameters
+  const { gasCosts, maxInputs, gasPerByte, gasPriceFactor } = provider.getChain().consensusParameters
+
   const blockNumber = gqlTransaction.status?.block?.header?.height
 
   return {

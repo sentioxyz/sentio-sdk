@@ -1,6 +1,9 @@
 import { Data_FuelCall, FuelCallFilter } from '@sentio/protos'
 import { FuelCall, FuelContext } from './context.js'
-import { bn, Contract, Interface, InvocationCallResult, JsonAbi, Provider } from 'fuels'
+import { Provider } from '@fuel-ts/account'
+import { Contract, InvocationCallResult } from '@fuel-ts/program'
+import { Interface, JsonAbi } from '@fuel-ts/abi-coder'
+import { bn } from '@fuel-ts/math'
 import { FuelNetwork, getRpcEndpoint } from './network.js'
 import {
   decodeFuelTransactionWithAbi,

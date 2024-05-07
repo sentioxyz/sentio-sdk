@@ -15,7 +15,22 @@ export async function codegen(abisDir: string, outDir: string) {
 }
 
 function patchImport(contents: string) {
-  return contents.replace(/from\s+['"](\..+)['"]/g, `from '\$1.js'`)
+  return contents
+    .replace(
+      `import { Interface, Contract, ContractFactory } from "fuels";`,
+      `import { Contract, } from "@fuel-ts/program";
+import { ContractFactory } from "@fuel-ts/contract";
+import { Interface } from "@fuel-ts/abi-coder";`
+    )
+    .replace(
+      `import type { Provider, Account, AbstractAddress, BytesLike, DeployContractOptions, StorageSlot } from "fuels";
+`,
+      `import type { Provider, Account } from "@fuel-ts/account";
+import type { AbstractAddress, BytesLike } from "@fuel-ts/interfaces";
+import type { DeployContractOptions } from "@fuel-ts/contract";
+import type { StorageSlot } from "@fuel-ts/transactions";`
+    )
+    .replace(/from\s+['"](\..+)['"]/g, `from '\$1.js'`)
 }
 
 function patchEnumType(contents: string) {
@@ -65,12 +80,13 @@ async function codegenInternal(abisDir: string, outDir: string): Promise<number>
 
   mkdirp.sync(outDir)
   mkdirp.sync(path.join(outDir, 'factories'))
-
+  let count = 0
   abiTypeGen.files.forEach((file) => {
     if (!file.path.endsWith('.hex.ts')) {
       let content = patchImport(file.contents)
       content = patchEnumType(content)
       writeFileSync(file.path, content)
+      count++
     }
   })
 
@@ -89,11 +105,8 @@ import {${abi.name}__factory } from './factories/${abi.name}__factory.js'
 import {${abi.commonTypesInUse.join(',')}} from './common.js'
 import {${importedTypes.join(',')}} from './${abi.name}.js'
 
-import type {
-  BigNumberish,
-  BN,
-  BytesLike,
-} from 'fuels';
+import type { BigNumberish, BN } from '@fuel-ts/math';
+import type { BytesLike } from '@fuel-ts/interfaces';
 
 
 namespace ${name} {
@@ -116,9 +129,10 @@ ${abi.functions.map((f) => genOnCallFunction(name, f)).join('\n')}
 }
 `
     writeFileSync(filePath, content)
+    count++
   }
 
-  return allABIFiles.length
+  return count
 }
 
 function genCallType(f: IFunction) {
