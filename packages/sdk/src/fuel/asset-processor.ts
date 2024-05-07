@@ -46,7 +46,6 @@ export class FuelAssetProcessor implements FuelBaseProcessor<FuelAssetProcessorC
         const gqlTransaction = call.transaction
         const tx = decodeFuelTransaction(gqlTransaction, this.provider)
 
-        const ctx = new FuelContext(tx, this.config.chainId)
         const transfer: FuelTransfer = {
           from: [],
           to: []
@@ -71,6 +70,9 @@ export class FuelAssetProcessor implements FuelBaseProcessor<FuelAssetProcessorC
           }
         }
 
+        const assetId = transfer.from[0].assetId || ''
+
+        const ctx = new FuelContext(this.config.chainId, assetId, this.config.name ?? '', tx)
         await handler(transfer, ctx)
         return ctx.stopAndGetResult()
       },

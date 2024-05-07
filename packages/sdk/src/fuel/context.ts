@@ -8,8 +8,10 @@ export type FuelCall = InvocationCallResult
 
 export class FuelContext extends BaseContext {
   constructor(
-    readonly transaction: FuelTransaction | null,
-    readonly chainId: ChainId
+    readonly chainId: ChainId,
+    readonly contractAddress: string,
+    readonly contractName: string,
+    readonly transaction: FuelTransaction | null
   ) {
     super({})
   }
@@ -27,8 +29,8 @@ export class FuelContext extends BaseContext {
     }
 
     return {
-      address,
-      contractName: this.transaction?.id || '', // TODO
+      address: this.contractAddress,
+      contractName: this.contractName,
       blockNumber: BigInt(this.transaction?.blockNumber || 0),
       transactionIndex: 0,
       transactionHash: this.transaction?.id || '', // TODO

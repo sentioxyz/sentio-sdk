@@ -105,8 +105,11 @@ export class ${name}Processor extends FuelAbstractProcessor {
     super(${abi.name}__factory.abi, config)
   }
   
-  static bind(config?: FuelProcessorConfig) {
-    return new ${name}Processor(config)
+  static bind(config: FuelProcessorConfig) {
+    return new ${name}Processor({
+      name: '${name}',
+      ...config,
+    })
   }
 
 ${abi.functions.map((f) => genOnCallFunction(name, f)).join('\n')}   

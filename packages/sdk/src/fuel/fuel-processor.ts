@@ -41,7 +41,12 @@ export class FuelProcessor implements FuelBaseProcessor<FuelProcessorConfig> {
           : {}
         const tx = decodeFuelTransactionWithAbi(call.transaction, abiMap, this.provider)
 
-        const ctx = new FuelContext(tx, this.config.chainId)
+        const ctx = new FuelContext(
+          this.config.chainId,
+          this.config.address,
+          this.config.name ?? this.config.address,
+          tx
+        )
         await handler(tx, ctx)
         return ctx.stopAndGetResult()
       },
@@ -87,7 +92,12 @@ export class FuelProcessor implements FuelBaseProcessor<FuelProcessorConfig> {
         const gqlTransaction = call.transaction
         const tx = decodeFuelTransactionWithAbi(gqlTransaction, { [this.config.address]: abi }, this.provider)
 
-        const ctx = new FuelContext(tx, this.config.chainId)
+        const ctx = new FuelContext(
+          this.config.chainId,
+          this.config.address,
+          this.config.name ?? this.config.address,
+          tx
+        )
         for (const op of tx.operations) {
           for (const call of op.calls || []) {
             if (names.has(call.functionName)) {
