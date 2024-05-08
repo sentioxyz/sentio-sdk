@@ -37,7 +37,7 @@ export class FuelPlugin extends Plugin {
         contract: {
           name: processor.config.name,
           chainId: processor.config.chainId.toString(),
-          address: processor.config.address,
+          address: processor.config.address || '*',
           abi: ''
         },
         startBlock: processor.config.startBlock,

@@ -10,7 +10,7 @@ export abstract class FuelAbstractProcessor extends FuelProcessor {
     if (!config) {
       config = {
         chainId: FuelChainId.FUEL_MAINNET,
-        address: ''
+        address: '*'
       }
     }
     config.abi = abi
