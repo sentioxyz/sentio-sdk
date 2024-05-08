@@ -21,13 +21,17 @@ export function decodeFuelTransaction(gqlTransaction: any, provider: Provider): 
   const [decodedTransaction] = new TransactionCoder().decode(rawPayload, 0)
   const { gasCosts, maxInputs, gasPerByte, gasPriceFactor } = provider.getChain().consensusParameters
   const blockNumber = gqlTransaction.status?.block?.header?.height
+  const gqlTransactionStatus = {
+    type: gqlTransaction.status?.__typename,
+    ...gqlTransaction.status
+  }
   return {
     ...assembleTransactionSummary({
       id: gqlTransaction.id,
       receipts: [],
       transaction: decodedTransaction,
       transactionBytes: rawPayload,
-      gqlTransactionStatus: gqlTransaction.status,
+      gqlTransactionStatus,
       gasPerByte: bn(gasPerByte),
       gasPriceFactor: bn(gasPriceFactor),
       maxInputs,
@@ -46,7 +50,11 @@ export function decodeFuelTransactionWithAbi(gqlTransaction: any, abiMap: AbiMap
 
   const { gasCosts, maxInputs, gasPerByte, gasPriceFactor } = provider.getChain().consensusParameters
 
-  const blockNumber = gqlTransaction.status?.block?.header?.height
+  const gqlTransactionStatus = {
+    type: gqlTransaction.status?.__typename,
+    ...gqlTransaction.status
+  }
+  const blockNumber = gqlTransactionStatus?.block?.header?.height
 
   return {
     ...assembleTransactionSummary({
@@ -54,7 +62,7 @@ export function decodeFuelTransactionWithAbi(gqlTransaction: any, abiMap: AbiMap
       receipts,
       transaction: decodedTransaction,
       transactionBytes: rawPayload,
-      gqlTransactionStatus: gqlTransaction.status,
+      gqlTransactionStatus,
       gasPerByte: bn(gasPerByte),
       gasPriceFactor: bn(gasPriceFactor),
       abiMap,
