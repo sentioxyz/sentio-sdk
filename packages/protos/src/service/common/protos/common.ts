@@ -166,6 +166,105 @@ export function permissionToJSON(object: Permission): string {
   }
 }
 
+export enum NotificationType {
+  GENERAL = 0,
+  PROCESSOR_UPLOAD_FAILED = 101,
+  PROCESSOR_UPLOAD_SUCCESS = 102,
+  PROCESSOR_OBSOLETED = 103,
+  PROCESSOR_STOPPED = 104,
+  PROCESSOR_ACTIVATED = 105,
+  PROCESSOR_GENERAL = 106,
+  PROCESSOR_ERROR = 107,
+  EXPORT_TASK_FAILED = 201,
+  EXPORT_TASK_SUCCESS = 202,
+  BILLING_INVOICE = 301,
+  BILLING_PAYMENT = 302,
+  BILLING_SUBSCRIPTION = 303,
+  UNRECOGNIZED = -1,
+}
+
+export function notificationTypeFromJSON(object: any): NotificationType {
+  switch (object) {
+    case 0:
+    case "GENERAL":
+      return NotificationType.GENERAL;
+    case 101:
+    case "PROCESSOR_UPLOAD_FAILED":
+      return NotificationType.PROCESSOR_UPLOAD_FAILED;
+    case 102:
+    case "PROCESSOR_UPLOAD_SUCCESS":
+      return NotificationType.PROCESSOR_UPLOAD_SUCCESS;
+    case 103:
+    case "PROCESSOR_OBSOLETED":
+      return NotificationType.PROCESSOR_OBSOLETED;
+    case 104:
+    case "PROCESSOR_STOPPED":
+      return NotificationType.PROCESSOR_STOPPED;
+    case 105:
+    case "PROCESSOR_ACTIVATED":
+      return NotificationType.PROCESSOR_ACTIVATED;
+    case 106:
+    case "PROCESSOR_GENERAL":
+      return NotificationType.PROCESSOR_GENERAL;
+    case 107:
+    case "PROCESSOR_ERROR":
+      return NotificationType.PROCESSOR_ERROR;
+    case 201:
+    case "EXPORT_TASK_FAILED":
+      return NotificationType.EXPORT_TASK_FAILED;
+    case 202:
+    case "EXPORT_TASK_SUCCESS":
+      return NotificationType.EXPORT_TASK_SUCCESS;
+    case 301:
+    case "BILLING_INVOICE":
+      return NotificationType.BILLING_INVOICE;
+    case 302:
+    case "BILLING_PAYMENT":
+      return NotificationType.BILLING_PAYMENT;
+    case 303:
+    case "BILLING_SUBSCRIPTION":
+      return NotificationType.BILLING_SUBSCRIPTION;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return NotificationType.UNRECOGNIZED;
+  }
+}
+
+export function notificationTypeToJSON(object: NotificationType): string {
+  switch (object) {
+    case NotificationType.GENERAL:
+      return "GENERAL";
+    case NotificationType.PROCESSOR_UPLOAD_FAILED:
+      return "PROCESSOR_UPLOAD_FAILED";
+    case NotificationType.PROCESSOR_UPLOAD_SUCCESS:
+      return "PROCESSOR_UPLOAD_SUCCESS";
+    case NotificationType.PROCESSOR_OBSOLETED:
+      return "PROCESSOR_OBSOLETED";
+    case NotificationType.PROCESSOR_STOPPED:
+      return "PROCESSOR_STOPPED";
+    case NotificationType.PROCESSOR_ACTIVATED:
+      return "PROCESSOR_ACTIVATED";
+    case NotificationType.PROCESSOR_GENERAL:
+      return "PROCESSOR_GENERAL";
+    case NotificationType.PROCESSOR_ERROR:
+      return "PROCESSOR_ERROR";
+    case NotificationType.EXPORT_TASK_FAILED:
+      return "EXPORT_TASK_FAILED";
+    case NotificationType.EXPORT_TASK_SUCCESS:
+      return "EXPORT_TASK_SUCCESS";
+    case NotificationType.BILLING_INVOICE:
+      return "BILLING_INVOICE";
+    case NotificationType.BILLING_PAYMENT:
+      return "BILLING_PAYMENT";
+    case NotificationType.BILLING_SUBSCRIPTION:
+      return "BILLING_SUBSCRIPTION";
+    case NotificationType.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
 export interface UsageTracker {
   apiSku: string;
   webuiSku: string;
@@ -1707,6 +1806,26 @@ export function systemSQLQuery_Aggregation_AggregateProperties_AggregationTypeTo
     default:
       return "UNRECOGNIZED";
   }
+}
+
+export interface Notification {
+  id: string;
+  projectId: string;
+  source: string;
+  level: string;
+  message: string;
+  createdAt: Date | undefined;
+  type: NotificationType;
+  ownerId: string;
+  owner: Owner | undefined;
+  project: Project | undefined;
+  attributes: { [key: string]: string };
+  read: boolean;
+}
+
+export interface Notification_AttributesEntry {
+  key: string;
+  value: string;
 }
 
 function createBaseUsageTracker(): UsageTracker {
@@ -11986,6 +12105,341 @@ export const SystemSQLQuery_Aggregation_AggregateProperties = {
     const message = createBaseSystemSQLQuery_Aggregation_AggregateProperties();
     message.type = object.type ?? 0;
     message.propertyName = object.propertyName ?? "";
+    return message;
+  },
+};
+
+function createBaseNotification(): Notification {
+  return {
+    id: "",
+    projectId: "",
+    source: "",
+    level: "",
+    message: "",
+    createdAt: undefined,
+    type: 0,
+    ownerId: "",
+    owner: undefined,
+    project: undefined,
+    attributes: {},
+    read: false,
+  };
+}
+
+export const Notification = {
+  encode(message: Notification, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    if (message.projectId !== "") {
+      writer.uint32(18).string(message.projectId);
+    }
+    if (message.source !== "") {
+      writer.uint32(26).string(message.source);
+    }
+    if (message.level !== "") {
+      writer.uint32(34).string(message.level);
+    }
+    if (message.message !== "") {
+      writer.uint32(42).string(message.message);
+    }
+    if (message.createdAt !== undefined) {
+      Timestamp.encode(toTimestamp(message.createdAt), writer.uint32(50).fork()).ldelim();
+    }
+    if (message.type !== 0) {
+      writer.uint32(64).int32(message.type);
+    }
+    if (message.ownerId !== "") {
+      writer.uint32(74).string(message.ownerId);
+    }
+    if (message.owner !== undefined) {
+      Owner.encode(message.owner, writer.uint32(82).fork()).ldelim();
+    }
+    if (message.project !== undefined) {
+      Project.encode(message.project, writer.uint32(90).fork()).ldelim();
+    }
+    Object.entries(message.attributes).forEach(([key, value]) => {
+      Notification_AttributesEntry.encode({ key: key as any, value }, writer.uint32(98).fork()).ldelim();
+    });
+    if (message.read !== false) {
+      writer.uint32(104).bool(message.read);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Notification {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseNotification();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.projectId = reader.string();
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.source = reader.string();
+          continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.level = reader.string();
+          continue;
+        case 5:
+          if (tag !== 42) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+        case 6:
+          if (tag !== 50) {
+            break;
+          }
+
+          message.createdAt = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+          continue;
+        case 8:
+          if (tag !== 64) {
+            break;
+          }
+
+          message.type = reader.int32() as any;
+          continue;
+        case 9:
+          if (tag !== 74) {
+            break;
+          }
+
+          message.ownerId = reader.string();
+          continue;
+        case 10:
+          if (tag !== 82) {
+            break;
+          }
+
+          message.owner = Owner.decode(reader, reader.uint32());
+          continue;
+        case 11:
+          if (tag !== 90) {
+            break;
+          }
+
+          message.project = Project.decode(reader, reader.uint32());
+          continue;
+        case 12:
+          if (tag !== 98) {
+            break;
+          }
+
+          const entry12 = Notification_AttributesEntry.decode(reader, reader.uint32());
+          if (entry12.value !== undefined) {
+            message.attributes[entry12.key] = entry12.value;
+          }
+          continue;
+        case 13:
+          if (tag !== 104) {
+            break;
+          }
+
+          message.read = reader.bool();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Notification {
+    return {
+      id: isSet(object.id) ? globalThis.String(object.id) : "",
+      projectId: isSet(object.projectId) ? globalThis.String(object.projectId) : "",
+      source: isSet(object.source) ? globalThis.String(object.source) : "",
+      level: isSet(object.level) ? globalThis.String(object.level) : "",
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      createdAt: isSet(object.createdAt) ? fromJsonTimestamp(object.createdAt) : undefined,
+      type: isSet(object.type) ? notificationTypeFromJSON(object.type) : 0,
+      ownerId: isSet(object.ownerId) ? globalThis.String(object.ownerId) : "",
+      owner: isSet(object.owner) ? Owner.fromJSON(object.owner) : undefined,
+      project: isSet(object.project) ? Project.fromJSON(object.project) : undefined,
+      attributes: isObject(object.attributes)
+        ? Object.entries(object.attributes).reduce<{ [key: string]: string }>((acc, [key, value]) => {
+          acc[key] = String(value);
+          return acc;
+        }, {})
+        : {},
+      read: isSet(object.read) ? globalThis.Boolean(object.read) : false,
+    };
+  },
+
+  toJSON(message: Notification): unknown {
+    const obj: any = {};
+    if (message.id !== "") {
+      obj.id = message.id;
+    }
+    if (message.projectId !== "") {
+      obj.projectId = message.projectId;
+    }
+    if (message.source !== "") {
+      obj.source = message.source;
+    }
+    if (message.level !== "") {
+      obj.level = message.level;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.createdAt !== undefined) {
+      obj.createdAt = message.createdAt.toISOString();
+    }
+    if (message.type !== 0) {
+      obj.type = notificationTypeToJSON(message.type);
+    }
+    if (message.ownerId !== "") {
+      obj.ownerId = message.ownerId;
+    }
+    if (message.owner !== undefined) {
+      obj.owner = Owner.toJSON(message.owner);
+    }
+    if (message.project !== undefined) {
+      obj.project = Project.toJSON(message.project);
+    }
+    if (message.attributes) {
+      const entries = Object.entries(message.attributes);
+      if (entries.length > 0) {
+        obj.attributes = {};
+        entries.forEach(([k, v]) => {
+          obj.attributes[k] = v;
+        });
+      }
+    }
+    if (message.read !== false) {
+      obj.read = message.read;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<Notification>): Notification {
+    return Notification.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<Notification>): Notification {
+    const message = createBaseNotification();
+    message.id = object.id ?? "";
+    message.projectId = object.projectId ?? "";
+    message.source = object.source ?? "";
+    message.level = object.level ?? "";
+    message.message = object.message ?? "";
+    message.createdAt = object.createdAt ?? undefined;
+    message.type = object.type ?? 0;
+    message.ownerId = object.ownerId ?? "";
+    message.owner = (object.owner !== undefined && object.owner !== null) ? Owner.fromPartial(object.owner) : undefined;
+    message.project = (object.project !== undefined && object.project !== null)
+      ? Project.fromPartial(object.project)
+      : undefined;
+    message.attributes = Object.entries(object.attributes ?? {}).reduce<{ [key: string]: string }>(
+      (acc, [key, value]) => {
+        if (value !== undefined) {
+          acc[key] = globalThis.String(value);
+        }
+        return acc;
+      },
+      {},
+    );
+    message.read = object.read ?? false;
+    return message;
+  },
+};
+
+function createBaseNotification_AttributesEntry(): Notification_AttributesEntry {
+  return { key: "", value: "" };
+}
+
+export const Notification_AttributesEntry = {
+  encode(message: Notification_AttributesEntry, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.key !== "") {
+      writer.uint32(10).string(message.key);
+    }
+    if (message.value !== "") {
+      writer.uint32(18).string(message.value);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Notification_AttributesEntry {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseNotification_AttributesEntry();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.key = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.value = reader.string();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Notification_AttributesEntry {
+    return {
+      key: isSet(object.key) ? globalThis.String(object.key) : "",
+      value: isSet(object.value) ? globalThis.String(object.value) : "",
+    };
+  },
+
+  toJSON(message: Notification_AttributesEntry): unknown {
+    const obj: any = {};
+    if (message.key !== "") {
+      obj.key = message.key;
+    }
+    if (message.value !== "") {
+      obj.value = message.value;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<Notification_AttributesEntry>): Notification_AttributesEntry {
+    return Notification_AttributesEntry.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<Notification_AttributesEntry>): Notification_AttributesEntry {
+    const message = createBaseNotification_AttributesEntry();
+    message.key = object.key ?? "";
+    message.value = object.value ?? "";
     return message;
   },
 };

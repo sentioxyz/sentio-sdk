@@ -63,6 +63,7 @@ message ContractConfig {
   repeated MoveResourceChangeConfig move_resource_change_configs = 12;
   repeated FuelCallHandlerConfig fuel_call_configs = 13;
   repeated FuelAssetHandlerConfig asset_configs = 14;
+  repeated FuelLogHandlerConfig fuel_log_configs = 15;
 
   InstructionHandlerConfig instruction_config = 6;
   uint64 start_block = 4;
@@ -291,6 +292,11 @@ message FuelAssetHandlerConfig {
     optional string from_address = 2;
     optional string to_address = 3;
   }
+}
+
+message FuelLogHandlerConfig {
+  repeated string log_ids = 1;
+  int32 handler_id = 2;
 }
 
 message LogFilter {

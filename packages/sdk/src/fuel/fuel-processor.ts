@@ -123,6 +123,36 @@ export class FuelProcessor implements FuelBaseProcessor<FuelProcessorConfig> {
     this.callHandlers.push(callHandler)
     return this
   }
+
+  public onLog<T>(logIdFilter: number | number[], handler: (logs: T[], ctx: FuelContext) => void | Promise<void>) {
+    const logIds = new Set(Array.isArray(logIdFilter) ? logIdFilter : [logIdFilter])
+
+    const callHandler = {
+      handler: async (call: Data_FuelCall) => {
+        const gqlTransaction = call.transaction
+        const tx = decodeFuelTransactionWithAbi(
+          gqlTransaction,
+          { [this.config.address]: this.config.abi! },
+          this.provider
+        )
+
+        const ctx = new FuelContext(
+          this.config.chainId,
+          this.config.address,
+          this.config.name ?? this.config.address,
+          tx
+        )
+        const logs = (tx.logs || []).filter((log) => logIds.has(log.logId)).map((log) => log.decodedLog as T)
+        await handler(logs, ctx)
+        return ctx.stopAndGetResult()
+      },
+      logConfig: {
+        logIds: Array.from(logIds)
+      }
+    }
+    this.callHandlers.push(callHandler)
+    return this
+  }
 }
 
 export type FuelProcessorConfig = {

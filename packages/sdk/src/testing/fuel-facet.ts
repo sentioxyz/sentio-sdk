@@ -51,6 +51,27 @@ export class FuelFacet {
           res.push(binding)
         }
       }
+
+      for (const logConfig of config.fuelLogConfigs) {
+        const binding = {
+          data: {
+            fuelCall: {
+              transaction,
+              timestamp: new Date()
+            }
+          },
+          handlerIds: [logConfig.handlerId],
+          handlerType: HandlerType.FUEL_CALL
+        }
+
+        const logIds = logConfig.logIds
+        for (const receipt of transaction.receipts || []) {
+          if ((receipt.receiptType == 'LOG' || receipt.receiptType == 'LOG_DATA') && logIds.includes(receipt.rb)) {
+            res.push(binding)
+          }
+        }
+      }
+
       for (const assetConfig of config.assetConfigs) {
         const binding = {
           data: {

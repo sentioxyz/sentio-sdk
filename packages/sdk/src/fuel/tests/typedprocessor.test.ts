@@ -15,19 +15,28 @@ describe('typed fuel processor tests', () => {
       address: ADDRESS,
       chainId: FuelChainId.FUEL_TESTNET_BETA_V5,
       abi
-    }).onCallComplex(async (call, ctx) => {
-      ctx.eventLogger.emit('call complex', {
-        distinctId: `${ctx.transaction?.id}_${ctx.transaction?.blockId}`,
-        message: `complex call: (${call.args}) -> (${call.returnValue})`
-      })
-      const foo = call.getLog1()[0]
-      if (foo) {
-        ctx.eventLogger.emit('foo', {
-          distinctId: `${ctx.transaction?.id}_${ctx.transaction?.blockId}`,
-          message: `foo: ${foo}`
-        })
-      }
     })
+      .onCallComplex(async (call, ctx) => {
+        ctx.eventLogger.emit('call complex', {
+          distinctId: `${ctx.transaction?.id}_${ctx.transaction?.blockId}`,
+          message: `complex call: (${call.args}) -> (${call.returnValue})`
+        })
+        const foo = call.getLog1()[0]
+        if (foo) {
+          ctx.eventLogger.emit('foo', {
+            distinctId: `${ctx.transaction?.id}_${ctx.transaction?.blockId}`,
+            message: `foo: ${foo}`
+          })
+        }
+      })
+      .onLogFoo(async (logs, ctx) => {
+        for (const log of logs) {
+          ctx.eventLogger.emit('log foo', {
+            distinctId: `${ctx.transaction?.id}_${ctx.transaction?.blockId}`,
+            message: `log foo: ${log}`
+          })
+        }
+      })
   })
   beforeAll(async () => {
     await service.start()
@@ -43,10 +52,18 @@ describe('typed fuel processor tests', () => {
     const res = await service.fuel.testOnTransaction(testData, FuelChainId.FUEL_TESTNET_BETA_V5)
 
     const events = res.result?.events
-    expect(events).length(2)
+    expect(events).length(3)
     expect(events?.[0]?.message).contains('complex call')
 
     expect(events?.[1]?.message).contains('foo')
+  })
+
+  test('test onLog ', async () => {
+    const res = await service.fuel.testOnTransaction(testData, FuelChainId.FUEL_TESTNET_BETA_V5)
+
+    const events = res.result?.events
+    expect(events).length(3)
+    expect(events?.[2]?.message).contains('log foo')
   })
 
   afterAll(async () => {

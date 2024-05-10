@@ -15,6 +15,9 @@ export type CallHandler<T> = {
   handler: (call: T) => Promise<ProcessResult>
   fetchConfig?: Partial<FuelCallHandlerConfig>
   assetConfig?: Partial<FuelAssetHandlerConfig>
+  logConfig?: {
+    logIds: number[]
+  }
 }
 
 export interface FuelLog {
