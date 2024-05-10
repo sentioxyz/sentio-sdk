@@ -11,7 +11,7 @@ import { State } from '@sentio/runtime'
 import { BaseAssetId } from '@fuel-ts/address/configs'
 
 describe('fuel network tests', () => {
-  const ADDRESS = '0x730adcb9974977e0f4fd46488b6aac04dade7d846d15ca026bff61279e265813'
+  const ADDRESS = '0xa50da2237febdd382512180b4a0dc6d4e358a8d13ad6e95c350f367a1ba68129'
 
   const service = new TestProcessorServer(async () => {
     FuelProcessor.bind({
@@ -25,10 +25,10 @@ describe('fuel network tests', () => {
           message: 'status is ' + tx.status
         })
       })
-      .onCall('increment', async (call, ctx) => {
+      .onCall('complex', async (call, ctx) => {
         ctx.eventLogger.emit('call', {
           distinctId: `${ctx.transaction?.id}_${ctx.transaction?.blockId}`,
-          message: `increment call: (${call.functionScopes[0].getCallConfig().args}) -> (${call.value})`
+          message: `complex call: (${call.functionScopes[0].getCallConfig().args}) -> (${call.value})`
         })
       })
   })
@@ -55,7 +55,7 @@ describe('fuel network tests', () => {
 
     const events = res.result?.events
     expect(events).length(2)
-    expect(events?.[1]?.message).contains('increment call')
+    expect(events?.[1]?.message).contains('complex call')
   })
 
   afterAll(async () => {

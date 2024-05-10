@@ -8,35 +8,18 @@
     },
     {
       "typeId": 1,
-      "type": "(_, _)",
-      "components": [
-        {
-          "name": "__tuple_element",
-          "type": 13,
-          "typeArguments": null
-        },
-        {
-          "name": "__tuple_element",
-          "type": 3,
-          "typeArguments": null
-        }
-      ],
-      "typeParameters": null
-    },
-    {
-      "typeId": 2,
       "type": "b256",
       "components": null,
       "typeParameters": null
     },
     {
-      "typeId": 3,
+      "typeId": 2,
       "type": "bool",
       "components": null,
       "typeParameters": null
     },
     {
-      "typeId": 4,
+      "typeId": 3,
       "type": "enum ColorError",
       "components": [
         {
@@ -63,7 +46,7 @@
       "typeParameters": null
     },
     {
-      "typeId": 5,
+      "typeId": 4,
       "type": "enum Option",
       "components": [
         {
@@ -73,88 +56,78 @@
         },
         {
           "name": "Some",
-          "type": 8,
-          "typeArguments": null
-        }
-      ],
-      "typeParameters": [
-        8
-      ]
-    },
-    {
-      "typeId": 6,
-      "type": "enum Result",
-      "components": [
-        {
-          "name": "Ok",
-          "type": 8,
-          "typeArguments": null
-        },
-        {
-          "name": "Err",
           "type": 7,
           "typeArguments": null
         }
       ],
-      "typeParameters": [
-        8,
-        7
-      ]
+      "typeParameters": [7]
     },
     {
-      "typeId": 7,
+      "typeId": 5,
+      "type": "enum Result",
+      "components": [
+        {
+          "name": "Ok",
+          "type": 7,
+          "typeArguments": null
+        },
+        {
+          "name": "Err",
+          "type": 6,
+          "typeArguments": null
+        }
+      ],
+      "typeParameters": [7, 6]
+    },
+    {
+      "typeId": 6,
       "type": "generic E",
       "components": null,
       "typeParameters": null
     },
     {
-      "typeId": 8,
+      "typeId": 7,
       "type": "generic T",
       "components": null,
       "typeParameters": null
     },
     {
-      "typeId": 9,
+      "typeId": 8,
       "type": "str[1]",
       "components": null,
       "typeParameters": null
     },
     {
-      "typeId": 10,
+      "typeId": 9,
       "type": "str[25]",
       "components": null,
       "typeParameters": null
     },
     {
-      "typeId": 11,
+      "typeId": 10,
       "type": "struct Foo",
       "components": [
         {
           "name": "bar",
-          "type": 13,
+          "type": 12,
           "typeArguments": null
         },
         {
           "name": "baz",
-          "type": 3,
-          "typeArguments": null
-        },
-        {
-          "name": "tuple",
-          "type": 1,
+          "type": 2,
           "typeArguments": null
         }
       ],
       "typeParameters": null
     },
     {
-      "typeId": 12,
+      "typeId": 11,
       "type": "u32",
       "components": null,
       "typeParameters": null
     },
     {
-      "typeId": 13,
+      "typeId": 12,
       "type": "u64",
       "components": null,
       "typeParameters": null
@@ -165,34 +138,34 @@
       "inputs": [
         {
           "name": "foo",
-          "type": 11,
+          "type": 10,
           "typeArguments": null
         },
         {
           "name": "option",
-          "type": 5,
+          "type": 4,
           "typeArguments": [
             {
               "name": "",
-              "type": 9,
+              "type": 8,
               "typeArguments": null
             }
           ]
         }
       ],
-      "name": "complext",
+      "name": "complex",
       "output": {
         "name": "",
-        "type": 6,
+        "type": 5,
         "typeArguments": [
           {
             "name": "",
-            "type": 11,
+            "type": 10,
             "typeArguments": null
           },
           {
             "name": "",
-            "type": 4,
+            "type": 3,
             "typeArguments": null
           }
         ]
@@ -200,10 +173,7 @@
       "attributes": [
         {
           "name": "storage",
-          "arguments": [
-            "read",
-            "write"
-          ]
+          "arguments": ["read", "write"]
         }
       ]
     },
@@ -212,15 +182,13 @@
       "name": "count",
       "output": {
         "name": "",
-        "type": 13,
+        "type": 12,
         "typeArguments": null
       },
       "attributes": [
         {
           "name": "storage",
-          "arguments": [
-            "read"
-          ]
+          "arguments": ["read"]
         }
       ]
     },
@@ -228,33 +196,30 @@
       "inputs": [
         {
           "name": "add",
-          "type": 12,
+          "type": 11,
           "typeArguments": null
         },
         {
           "name": "two",
-          "type": 13,
+          "type": 12,
           "typeArguments": null
         },
         {
           "name": "three",
-          "type": 2,
+          "type": 1,
           "typeArguments": null
         }
       ],
       "name": "increment",
       "output": {
         "name": "",
-        "type": 13,
+        "type": 12,
         "typeArguments": null
       },
       "attributes": [
         {
           "name": "storage",
-          "arguments": [
-            "read",
-            "write"
-          ]
+          "arguments": ["read", "write"]
         }
       ]
     }
@@ -264,7 +229,7 @@
       "logId": 0,
       "loggedType": {
         "name": "",
-        "type": 10,
+        "type": 12,
         "typeArguments": null
       }
     },
@@ -272,15 +237,15 @@
       "logId": 1,
       "loggedType": {
         "name": "",
-        "type": 12,
-        "typeArguments": null
+        "type": 10,
+        "typeArguments": []
       }
     },
     {
       "logId": 2,
       "loggedType": {
         "name": "",
-        "type": 13,
+        "type": 9,
         "typeArguments": null
       }
     },
@@ -288,7 +253,23 @@
       "logId": 3,
       "loggedType": {
         "name": "",
-        "type": 2,
+        "type": 11,
+        "typeArguments": null
+      }
+    },
+    {
+      "logId": 4,
+      "loggedType": {
+        "name": "",
+        "type": 12,
+        "typeArguments": null
+      }
+    },
+    {
+      "logId": 5,
+      "loggedType": {
+        "name": "",
+        "type": 1,
         "typeArguments": null
       }
     }

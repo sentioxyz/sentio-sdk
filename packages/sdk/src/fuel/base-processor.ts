@@ -1,9 +1,8 @@
 import { FuelProcessor, FuelProcessorConfig } from './fuel-processor.js'
 import { JsonAbi } from '@fuel-ts/abi-coder'
-import { FuelCall, FuelContext } from './context.js'
-import { FuelFetchConfig } from './transaction.js'
+import { FuelCall } from './context.js'
 import { FuelChainId } from '@sentio/chain'
-import { FuelProcessorState } from './types.js'
+import { FuelLog, FuelProcessorState } from './types.js'
 
 export abstract class FuelAbstractProcessor extends FuelProcessor {
   protected constructor(abi: JsonAbi, config?: FuelProcessorConfig) {
@@ -17,27 +16,18 @@ export abstract class FuelAbstractProcessor extends FuelProcessor {
     super(config)
     FuelProcessorState.INSTANCE.addValue(this)
   }
-
-  protected onCallMethod<T extends Array<any>, R>(
-    method: string,
-    fn: (call: TypedCall<T, R>, ctx: FuelContext) => void | Promise<void>,
-    config: FuelFetchConfig
-  ): this {
-    const nameFilter = method
-    const handler = async (call: FuelCall, ctx: FuelContext) => {
-      await fn(
-        {
-          args: call.functionScopes[0].getCallConfig().args as T,
-          returnValue: call.value as R
-        },
-        ctx
-      )
-    }
-    return super.onCall(nameFilter, handler, config)
-  }
 }
 
-export type TypedCall<T extends Array<any>, R> = {
+export class TypedCall<T extends Array<any>, R> {
   args: T
   returnValue: R
+  argsObject?: Record<string, any>
+  logs?: FuelLog[]
+
+  constructor(call: FuelCall) {
+    this.args = call.functionScopes[0].getCallConfig().args as T
+    this.returnValue = call.value as R
+    this.argsObject = call.args
+    this.logs = call.logs
+  }
 }

@@ -1,7 +1,7 @@
 import { Data_FuelCall, FuelCallFilter } from '@sentio/protos'
 import { FuelCall, FuelContext } from './context.js'
 import { Provider } from '@fuel-ts/account'
-import { Contract, InvocationCallResult } from '@fuel-ts/program'
+import { Contract } from '@fuel-ts/program'
 import { Interface, JsonAbi } from '@fuel-ts/abi-coder'
 import { bn } from '@fuel-ts/math'
 import { FuelNetwork, getRpcEndpoint } from './network.js'
@@ -107,7 +107,8 @@ export class FuelProcessor implements FuelBaseProcessor<FuelProcessorConfig> {
               const fn = contract.functions[call.functionName]
               const args = Object.values(call.argumentsProvided || {})
               const scope = fn(...args)
-              const invocationResult = await InvocationCallResult.build(scope, tx, false)
+              const invocationResult = new FuelCall(scope, tx, false, call.argumentsProvided, tx.logs)
+
               await handler(invocationResult, ctx)
             }
           }

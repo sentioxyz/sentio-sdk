@@ -16,3 +16,8 @@ export type CallHandler<T> = {
   fetchConfig?: Partial<FuelCallHandlerConfig>
   assetConfig?: Partial<FuelAssetHandlerConfig>
 }
+
+export interface FuelLog {
+  logId: number
+  decodedLog: any
+}

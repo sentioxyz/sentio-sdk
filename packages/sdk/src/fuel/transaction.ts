@@ -1,7 +1,9 @@
 import { AbiMap, assembleTransactionSummary, processGqlReceipt, Provider, TransactionSummary } from '@fuel-ts/account'
-import { TransactionCoder } from '@fuel-ts/transactions'
+import { ReceiptType, TransactionCoder } from '@fuel-ts/transactions'
 import { bn } from '@fuel-ts/math'
 import { arrayify } from '@fuel-ts/utils'
+import { Interface, BigNumberCoder } from '@fuel-ts/abi-coder'
+import { FuelLog } from './types.js'
 
 export type FuelFetchConfig = {
   includeFailed?: boolean
@@ -13,6 +15,7 @@ export const DEFAULT_FUEL_FETCH_CONFIG: FuelFetchConfig = {
 
 export type FuelTransaction = TransactionSummary & {
   blockNumber?: string
+  logs?: FuelLog[]
 }
 
 export function decodeFuelTransaction(gqlTransaction: any, provider: Provider): FuelTransaction {
@@ -56,6 +59,21 @@ export function decodeFuelTransactionWithAbi(gqlTransaction: any, abiMap: AbiMap
   }
   const blockNumber = gqlTransactionStatus?.block?.header?.height
 
+  const abi = Object.values(abiMap)[0]
+
+  const logs: FuelLog[] = []
+  for (const receipt of receipts) {
+    if (receipt.type === ReceiptType.LogData || receipt.type === ReceiptType.Log) {
+      const interfaceToUse = new Interface(abi)
+
+      const data = receipt.type === ReceiptType.Log ? new BigNumberCoder('u64').encode(receipt.val0) : receipt.data
+
+      const logId = receipt.val1.toNumber()
+      const [decodedLog] = interfaceToUse.decodeLog(data, logId)
+      logs.push({ logId, decodedLog })
+    }
+  }
+
   return {
     ...assembleTransactionSummary({
       id: gqlTransaction.id,
@@ -69,6 +87,7 @@ export function decodeFuelTransactionWithAbi(gqlTransaction: any, abiMap: AbiMap
       maxInputs,
       gasCosts
     }),
-    blockNumber
+    blockNumber,
+    logs
   }
 }
