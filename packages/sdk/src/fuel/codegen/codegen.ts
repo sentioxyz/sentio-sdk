@@ -135,13 +135,20 @@ import type { BytesLike } from '@fuel-ts/interfaces';
 namespace ${name} {
   export abstract class CallWithLogs<T extends Array<any>, R> extends TypedCall<T, R> {
 ${Object.entries(logByTypes)
-  .flatMap(([t, ids]) =>
-    ids.map(
-      (id) => `   getLog${id}(): Array<${t}>  {
+  .flatMap(([t, ids]) => {
+    const s = ids.map(
+      (id) => `
+    getLog${id}(): Array<${t}>  {
       return this.logs?.filter(l => l.logId == ${id})?.map(l => l.decodedLog) as Array<${t}>
     }`
     )
-  )
+    s.push(`
+    getLogsOfType${getTypeName(t)}(): Array<${t}> {
+      return this.logs?.filter(l =>[${ids.join(', ')}].includes(l.logId) ).map(l => l.decodedLog) as Array<${t}>
+    }`)
+
+    return s
+  })
   .join('\n')}
   }
 
@@ -218,9 +225,13 @@ function collectImportedTypes(types: any[]): string[] {
 }
 
 function genOnLogFunction([type, ids]: [string, string[]]) {
-  const name = upperFirst(type.replace('Output', ''))
+  const name = getTypeName(type)
   return `
   onLog${name}(handler: (logs: ${type}[], ctx: FuelContext) => void | Promise<void>, logIdFilter?: number | number[]) {
     return super.onLog<${type}>(logIdFilter ?? [${ids.join(', ')}], (logs, ctx) => handler(logs, ctx))
   }`
+}
+
+function getTypeName(type: string) {
+  return upperFirst(type.replace('Output', ''))
 }
