@@ -22,7 +22,7 @@ export class TypedCall<T extends Array<any>, R> {
   args: T
   returnValue: R
   argsObject?: Record<string, any>
-  logs?: FuelLog[]
+  logs?: FuelLog<unknown>[]
 
   constructor(call: FuelCall) {
     this.args = call.functionScopes[0].getCallConfig().args as T

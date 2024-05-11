@@ -123,7 +123,7 @@ async function codegenInternal(abisDir: string, outDir: string): Promise<number>
 /* tslint:disable */
 /* eslint-disable */
     
-import { FuelAbstractProcessor, FuelContext, FuelProcessorConfig, TypedCall, FuelFetchConfig, FuelCall} from '@sentio/sdk/fuel'
+import { FuelAbstractProcessor, FuelContext, FuelProcessorConfig, TypedCall, FuelFetchConfig, FuelCall, FuelLog} from '@sentio/sdk/fuel'
 import {${abi.name}__factory } from './factories/${abi.name}__factory.js'
 import {${abi.commonTypesInUse.join(',')}} from './common.js'
 import {${importedTypes.join(',')}} from './${abi.name}.js'
@@ -139,12 +139,12 @@ ${Object.entries(logByTypes)
     const s = ids.map(
       (id) => `
     getLog${id}(): Array<${t}>  {
-      return this.logs?.filter(l => l.logId == ${id})?.map(l => l.decodedLog) as Array<${t}>
+      return this.logs?.filter(l => l.logId == ${id})?.map(l => l.data) as Array<${t}>
     }`
     )
     s.push(`
     getLogsOfType${getTypeName(t)}(): Array<${t}> {
-      return this.logs?.filter(l =>[${ids.join(', ')}].includes(l.logId) ).map(l => l.decodedLog) as Array<${t}>
+      return this.logs?.filter(l =>[${ids.join(', ')}].includes(l.logId) ).map(l => l.data) as Array<${t}>
     }`)
 
     return s
@@ -227,8 +227,8 @@ function collectImportedTypes(types: any[]): string[] {
 function genOnLogFunction([type, ids]: [string, string[]]) {
   const name = getTypeName(type)
   return `
-  onLog${name}(handler: (logs: ${type}[], ctx: FuelContext) => void | Promise<void>, logIdFilter?: number | number[]) {
-    return super.onLog<${type}>(logIdFilter ?? [${ids.join(', ')}], (logs, ctx) => handler(logs, ctx))
+  onLog${name}(handler: (log: FuelLog<${type}>, ctx: FuelContext) => void | Promise<void>, logIdFilter?: number | number[]) {
+    return super.onLog<${type}>(logIdFilter ?? [${ids.join(', ')}], (log, ctx) => handler(log, ctx))
   }`
 }
 

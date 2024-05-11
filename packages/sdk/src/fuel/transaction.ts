@@ -1,9 +1,10 @@
 import { AbiMap, assembleTransactionSummary, processGqlReceipt, Provider, TransactionSummary } from '@fuel-ts/account'
-import { ReceiptType, TransactionCoder } from '@fuel-ts/transactions'
+import { Input, InputType, ReceiptType, TransactionCoder } from '@fuel-ts/transactions'
 import { bn } from '@fuel-ts/math'
 import { arrayify } from '@fuel-ts/utils'
-import { Interface, BigNumberCoder } from '@fuel-ts/abi-coder'
+import { BigNumberCoder, Interface } from '@fuel-ts/abi-coder'
 import { FuelLog } from './types.js'
+import { BaseAssetId } from '@fuel-ts/address/configs'
 
 export type FuelFetchConfig = {
   includeFailed?: boolean
@@ -15,7 +16,17 @@ export const DEFAULT_FUEL_FETCH_CONFIG: FuelFetchConfig = {
 
 export type FuelTransaction = TransactionSummary & {
   blockNumber?: string
-  logs?: FuelLog[]
+  logs?: FuelLog<any>[]
+  sender?: string
+}
+
+function findSenderFromInputs(inputs: Input[] | undefined): string | undefined {
+  for (const input of inputs || []) {
+    if (input.type == InputType.Coin && input.assetId == BaseAssetId) {
+      return input.owner
+    }
+  }
+  return undefined
 }
 
 export function decodeFuelTransaction(gqlTransaction: any, provider: Provider): FuelTransaction {
@@ -40,7 +51,8 @@ export function decodeFuelTransaction(gqlTransaction: any, provider: Provider): 
       maxInputs,
       gasCosts
     }),
-    blockNumber
+    blockNumber,
+    sender: findSenderFromInputs(decodedTransaction.inputs)
   }
 }
 
@@ -61,8 +73,8 @@ export function decodeFuelTransactionWithAbi(gqlTransaction: any, abiMap: AbiMap
 
   const abi = Object.values(abiMap)[0]
 
-  const logs: FuelLog[] = []
-  for (const receipt of receipts) {
+  const logs = [] as FuelLog<any>[]
+  ;(receipts as any[]).forEach((receipt, idx) => {
     if (receipt.type === ReceiptType.LogData || receipt.type === ReceiptType.Log) {
       const interfaceToUse = new Interface(abi)
 
@@ -70,9 +82,9 @@ export function decodeFuelTransactionWithAbi(gqlTransaction: any, abiMap: AbiMap
 
       const logId = receipt.val1.toNumber()
       const [decodedLog] = interfaceToUse.decodeLog(data, logId)
-      logs.push({ logId, decodedLog })
+      logs.push({ logId, data: decodedLog, receiptIndex: idx })
     }
-  }
+  })
 
   return {
     ...assembleTransactionSummary({
@@ -88,6 +100,7 @@ export function decodeFuelTransactionWithAbi(gqlTransaction: any, abiMap: AbiMap
       gasCosts
     }),
     blockNumber,
-    logs
+    logs,
+    sender: findSenderFromInputs(decodedTransaction.inputs)
   }
 }

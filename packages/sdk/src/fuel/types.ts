@@ -20,7 +20,8 @@ export type CallHandler<T> = {
   }
 }
 
-export interface FuelLog {
+export interface FuelLog<T> {
   logId: number
-  decodedLog: any
+  data: T
+  receiptIndex: number
 }

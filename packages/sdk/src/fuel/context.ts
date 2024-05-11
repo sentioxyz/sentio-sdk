@@ -12,7 +12,7 @@ export class FuelCall extends InvocationCallResult {
     callResult: CallResult,
     isMultiCall: boolean,
     readonly args?: Record<string, any>,
-    readonly logs?: FuelLog[]
+    readonly logs?: FuelLog<unknown>[]
   ) {
     super(funcScopes, callResult, isMultiCall)
   }

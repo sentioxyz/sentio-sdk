@@ -11,7 +11,7 @@ import {
   FuelFetchConfig,
   FuelTransaction
 } from './transaction.js'
-import { CallHandler, FuelBaseProcessor, FuelProcessorState } from './types.js'
+import { CallHandler, FuelBaseProcessor, FuelLog, FuelProcessorState } from './types.js'
 
 export class FuelProcessor implements FuelBaseProcessor<FuelProcessorConfig> {
   callHandlers: CallHandler<Data_FuelCall>[] = []
@@ -124,7 +124,10 @@ export class FuelProcessor implements FuelBaseProcessor<FuelProcessorConfig> {
     return this
   }
 
-  public onLog<T>(logIdFilter: number | number[], handler: (logs: T[], ctx: FuelContext) => void | Promise<void>) {
+  public onLog<T>(
+    logIdFilter: number | number[],
+    handler: (logs: FuelLog<T>, ctx: FuelContext) => void | Promise<void>
+  ) {
     const logIds = new Set(Array.isArray(logIdFilter) ? logIdFilter : [logIdFilter])
 
     const callHandler = {
@@ -142,8 +145,10 @@ export class FuelProcessor implements FuelBaseProcessor<FuelProcessorConfig> {
           this.config.name ?? this.config.address,
           tx
         )
-        const logs = (tx.logs || []).filter((log) => logIds.has(log.logId)).map((log) => log.decodedLog as T)
-        await handler(logs, ctx)
+        const logs = (tx.logs || []).filter((log) => logIds.has(log.logId))
+        for (const log of logs) {
+          await handler(log, ctx)
+        }
         return ctx.stopAndGetResult()
       },
       logConfig: {

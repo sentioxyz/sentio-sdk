@@ -1,4 +1,5 @@
 import { BigDecimal } from '@sentio/bigdecimal'
+import { BN } from '@fuel-ts/math'
 
 export { BigDecimal } from '@sentio/bigdecimal'
 
@@ -8,6 +9,14 @@ declare global {
     scaleDown(decimal: number | bigint): BigDecimal
   }
 }
+
+declare module '@fuel-ts/math' {
+  interface BN {
+    asBigDecimal(): BigDecimal
+    scaleDown(decimal: number | bigint): BigDecimal
+  }
+}
+
 BigInt.prototype.asBigDecimal = function () {
   return new BigDecimal(this.toString())
 }
@@ -15,6 +24,14 @@ BigInt.prototype.asBigDecimal = function () {
 BigInt.prototype.scaleDown = function (decimal: number | bigint) {
   // @ts-ignore this is fine
   return scaleDown(this, decimal)
+}
+
+BN.prototype.asBigDecimal = function () {
+  return new BigDecimal(this.toString(10))
+}
+
+BN.prototype.scaleDown = function (decimal: number | bigint) {
+  return scaleDown(BigInt(this.toString(10)), decimal)
 }
 
 export function scaleDown(amount: bigint, decimal: number | bigint): BigDecimal {

@@ -1,5 +1,6 @@
 import { Labels } from './meter.js'
 import { BigDecimal } from './big-decimal.js'
+import { BN } from '@fuel-ts/math'
 
 export const SENTIO_BIGINT_STRING_SUFFIX = ':sto_bi'
 export const SENTIO_BIGDECIMAL_STRING_SUFFIX = ':sto_bd'
@@ -71,6 +72,9 @@ function normalizeObject(obj: any, length: number): any {
       }
       return obj.toString() + SENTIO_BIGDECIMAL_STRING_SUFFIX
       // return obj.toNumber()
+    }
+    if (BN.isBN(obj)) {
+      return obj.toString(10) + SENTIO_BIGINT_STRING_SUFFIX
     }
     if (obj instanceof Promise) {
       console.error('Cannot submit promise')

@@ -29,13 +29,11 @@ describe('typed fuel processor tests', () => {
           })
         }
       })
-      .onLogFoo(async (logs, ctx) => {
-        for (const log of logs) {
-          ctx.eventLogger.emit('log foo', {
-            distinctId: `${ctx.transaction?.id}_${ctx.transaction?.blockId}`,
-            message: `log foo: ${log}`
-          })
-        }
+      .onLogFoo(async (log, ctx) => {
+        ctx.eventLogger.emit('log foo', {
+          distinctId: `${ctx.transaction?.id}_${ctx.transaction?.blockId}`,
+          message: `log foo: ${log.data}`
+        })
       })
   })
   beforeAll(async () => {
