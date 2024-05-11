@@ -22,10 +22,10 @@
   },
   "types": "module",
   "dependencies": {
-    "@aptos-labs/ts-sdk": "~1.13.0",
+    "@aptos-labs/ts-sdk": "~1.14.0",
     "@jest/globals": "^29.7.0",
     "@jest/types": "^29.6.3",
-    "@mysten/sui.js": "~0.52.0",
+    "@mysten/sui.js": "~0.54.1",
     "@sentio/chain": "^1.0.21",
     "@types/jest": "^29.5.11",
     "@types/node": "^20.11.7",
