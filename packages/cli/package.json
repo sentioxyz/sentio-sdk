@@ -16,7 +16,7 @@
   "scripts": {
     "build": "pnpm compile",
     "postbuild": "pnpm install",
-    "cli": "node --loader ts-node/esm src/index.ts",
+    "cli": "tsx src/index.ts",
     "compile": "tsc",
     "test": "NODE_OPTIONS=--experimental-vm-modules pnpm jest"
   },
@@ -25,7 +25,7 @@
     "@aptos-labs/ts-sdk": "~1.13.0",
     "@jest/globals": "^29.7.0",
     "@jest/types": "^29.6.3",
-    "@mysten/sui.js": "*",
+    "@mysten/sui.js": "~0.52.0",
     "@sentio/chain": "^1.0.21",
     "@types/jest": "^29.5.11",
     "@types/node": "^20.11.7",
@@ -42,7 +42,6 @@
     "open": "^10.0.3",
     "solc": "^0.8.25",
     "ts-jest": "^29.1.2",
-    "ts-node": "^10.9.2",
     "tsup": "npm:@sentio/tsup@^6.7.2",
     "yaml": "^2.3.4"
   },

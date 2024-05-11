@@ -18,10 +18,10 @@
     "build": "pnpm compile",
     "build:all": "pnpm --filter=$(node -p \"require('./package.json').name\")... build",
     "compile": "tsc",
-    "run": "node --loader ts-node/esm --files src/processor-runner.ts --log-format=json",
-    "run-benchmark": "node --loader ts-node/esm --files src/decode-benchmark.ts",
-    "start_js": "node --loader ts-node/esm --files ./lib/processor-runner.js $PWD/../../debug/dist/lib.js",
-    "start_ts": "node --loader ts-node/esm --files ./lib/processor-runner.js --log-format=json $PWD/../../debug/src/processor.ts",
+    "run": "tsx --files src/processor-runner.ts --log-format=json",
+    "run-benchmark": "tsx --files src/decode-benchmark.ts",
+    "start_js": "tsx --files ./lib/processor-runner.js $PWD/../../debug/dist/lib.js",
+    "start_ts": "tsx --files ./lib/processor-runner.js --log-format=json $PWD/../../debug/src/processor.ts",
     "test": "NODE_OPTIONS=--experimental-vm-modules pnpm jest"
   },
   "dependencies": {

@@ -1,16 +1,16 @@
 {
-  "name": "@sentio-example/aptos",
-  "license": "Apache-2.0",
-  "version": "1.0.0",
   "private": true,
+  "name": "@sentio-example/aptos",
+  "version": "1.0.0",
+  "license": "Apache-2.0",
   "type": "module",
   "scripts": {
+    "build": "sentio build --skip-deps",
+    "build:all": "pnpm --filter=$(node -p \"require('./package.json').name\")... build",
+    "cli": "tsx src/cli.ts",
     "compile": "tsc -p .",
     "test": "sentio test",
-    "build": "sentio build --skip-deps",
-    "upload": "sentio upload --skip-deps",
-    "build:all": "pnpm --filter=$(node -p \"require('./package.json').name\")... build",
-    "cli": "ts-node --files src/cli.ts"
+    "upload": "sentio upload --skip-deps"
   },
   "dependencies": {
     "@sentio/sdk": "workspace:*"

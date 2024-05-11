@@ -16,9 +16,9 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
           ref: ${{ github.event.inputs.commit }}
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v4
         with:
-          version: 8.15.1
+          version: 9
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -33,7 +33,7 @@ jobs:
             DIST_TAG=latest
           fi
           echo "dist_tag=${DIST_TAG}" >> $GITHUB_OUTPUT
-          
+
           pnpm config list
       - name: Install
         run: pnpm install
