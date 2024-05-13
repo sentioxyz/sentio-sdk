@@ -1,4 +1,4 @@
-import { Data_FuelCall, FuelCallFilter } from '@sentio/protos'
+import { Data_FuelCall, FuelCallFilter, ProcessResult } from '@sentio/protos'
 import { FuelCall, FuelContext } from './context.js'
 import { Provider } from '@fuel-ts/account'
 import { Contract } from '@fuel-ts/program'
@@ -12,6 +12,7 @@ import {
   FuelTransaction
 } from './transaction.js'
 import { CallHandler, FuelBaseProcessor, FuelLog, FuelProcessorState } from './types.js'
+import { mergeProcessResults } from '@sentio/runtime'
 
 export class FuelProcessor implements FuelBaseProcessor<FuelProcessorConfig> {
   callHandlers: CallHandler<Data_FuelCall>[] = []
@@ -139,17 +140,20 @@ export class FuelProcessor implements FuelBaseProcessor<FuelProcessorConfig> {
           this.provider
         )
 
-        const ctx = new FuelContext(
-          this.config.chainId,
-          this.config.address,
-          this.config.name ?? this.config.address,
-          tx
-        )
+        const results: ProcessResult[] = []
         const logs = (tx.logs || []).filter((log) => logIds.has(log.logId))
         for (const log of logs) {
+          const ctx = new FuelContext(
+            this.config.chainId,
+            this.config.address,
+            this.config.name ?? this.config.address,
+            tx
+          )
+          ctx.setLogIndex(log.receiptIndex)
           await handler(log, ctx)
+          results.push(ctx.stopAndGetResult())
         }
-        return ctx.stopAndGetResult()
+        return mergeProcessResults(results)
       },
       logConfig: {
         logIds: Array.from(logIds)

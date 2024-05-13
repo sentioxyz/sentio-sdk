@@ -19,6 +19,7 @@ export class FuelCall extends InvocationCallResult {
 }
 
 export class FuelContext extends BaseContext {
+  private logIndex: number = -1
   constructor(
     readonly chainId: ChainId,
     readonly contractAddress: string,
@@ -32,6 +33,10 @@ export class FuelContext extends BaseContext {
     return this.chainId
   }
 
+  setLogIndex(logIndex: number): void {
+    this.logIndex = logIndex
+  }
+
   protected getMetaDataInternal(name: string, labels: Labels): RecordMetaData {
     return {
       address: this.contractAddress,
@@ -41,7 +46,7 @@ export class FuelContext extends BaseContext {
       transactionHash: this.transaction?.id || '', // TODO
       chainId: this.getChainId(),
       name: name,
-      logIndex: -1,
+      logIndex: this.logIndex,
       labels: normalizeLabels(labels)
     }
   }

@@ -15,6 +15,7 @@ import { FuelAssetProcessor } from './asset-processor.js'
 import { FuelProcessorState } from './types.js'
 import { FuelProcessor } from './fuel-processor.js'
 import { BN } from '@fuel-ts/math'
+import { FuelGlobalProcessor } from './global-processor.js'
 
 interface Handlers {
   callHandlers: ((trace: Data_FuelCall) => Promise<ProcessResult>)[]
@@ -65,6 +66,13 @@ export class FuelPlugin extends Plugin {
             filters: assetConfig?.filters || [],
             handlerId
           })
+        } else if (processor instanceof FuelGlobalProcessor) {
+          const fetchConfig = {
+            handlerId,
+            filters: []
+          }
+          contractConfig.fuelCallConfigs.push(fetchConfig)
+          contractConfig.contract!.address = '*'
         }
       }
 
