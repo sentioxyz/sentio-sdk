@@ -1,5 +1,6 @@
 {
   "private": true,
+  "type": "module",
   "scripts": {
     "cleanjest": "pnpm jest --clearCache",
     "format": "prettier --write .",

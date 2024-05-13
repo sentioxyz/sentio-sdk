@@ -61,7 +61,7 @@
   },
   "dependencies": {
     "@aptos-labs/ts-sdk": "~1.14.0",
-    "@coral-xyz/borsh": "^0.29.0",
+    "@coral-xyz/borsh": "^0.30.0",
     "@fuel-ts/abi-typegen": "0.81.0",
     "@fuel-ts/account": "0.81.0",
     "@fuel-ts/address": "0.81.0",
