@@ -42,9 +42,6 @@
     "utility-types": "^3.11.0",
     "winston": "^3.11.0"
   },
-  "peerDependencies": {
-    "@sentio/sdk": "workspace:^"
-  },
   "devDependencies": {
     "@types/command-line-args": "^5.2.3",
     "@types/command-line-usage": "^5.0.4",
