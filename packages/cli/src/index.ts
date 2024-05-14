@@ -16,6 +16,7 @@ import { runUpload } from './commands/run-upload.js'
 import { runTest } from './commands/run-test.js'
 import { runAdd } from './commands/run-add.js'
 import { runCompile } from './commands/run-compile.js'
+import { runGraph } from './commands/run-graph.js'
 
 const mainDefinitions = [{ name: 'command', defaultOption: true }]
 const mainOptions = commandLineArgs(mainDefinitions, {
@@ -95,6 +96,8 @@ if (mainOptions.command === 'login') {
 
   if (mainOptions.command === 'upload') {
     await runUpload(processorConfig, argv)
+  } else if (mainOptions.command === 'graph') {
+    await runGraph(processorConfig, argv)
   } else if (mainOptions.command === 'build') {
     await buildProcessorWithArgs(argv)
   } else if (mainOptions.command === 'gen') {
@@ -118,6 +121,7 @@ function usage() {
         'sentio create\t\t\t\tcreate a template project',
         'sentio add\t\t\t\tadd contract ABI to the project',
         'sentio upload\t\t\t\tbuild and upload processor to sentio',
+        'sentio graph\t\t\t\tbuild and upload subgraph processor to sentio',
         'sentio gen\t\t\t\tgenerate abi',
         'sentio build\t\t\t\tgenerate abi and build',
         'sentio test\t\t\t\trun tests',
@@ -127,5 +131,5 @@ function usage() {
     }
   ])
   console.log(usage)
-  process.exit(1)
+  process.exit(0)
 }

@@ -99,16 +99,13 @@ export async function runUpload(processorConfig: YamlProjectConfig, argv: string
     process.exit(0)
   }
 
-  if (options.host) {
-    processorConfig.host = options.host
-  }
   if (options.nobuild) {
     processorConfig.build = false
   }
   if (options.debug) {
     processorConfig.debug = true
   }
-  finalizeHost(processorConfig)
+  finalizeHost(processorConfig, options.host)
   FinalizeProjectName(processorConfig, options.owner, options.name)
   console.log(processorConfig)
 
@@ -153,6 +150,22 @@ export interface Auth {
   authorization?: string
 }
 
+export function getGitAttributes() {
+  let commitSha = ''
+  let gitUrl = ''
+  try {
+    commitSha = execFileSync('git', ['rev-parse', 'HEAD']).toString().trim()
+  } catch (e) {
+    chalk.yellow(e)
+  }
+  try {
+    gitUrl = execFileSync('git', ['remote', 'get-url', 'origin']).toString().trim()
+  } catch (e) {
+    // skip errors
+  }
+  return { commitSha, gitUrl }
+}
+
 export async function uploadFile(options: YamlProjectConfig, auth: Auth, continueFrom: number | undefined) {
   console.log(chalk.blue('Prepare to upload'))
 
@@ -172,19 +185,8 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth, continu
 
   let triedCount = 0
   const upload = async () => {
-    let commitSha = ''
-    let gitUrl = ''
+    const { commitSha, gitUrl } = getGitAttributes()
     const sha256 = digest
-    try {
-      commitSha = execFileSync('git', ['rev-parse', 'HEAD']).toString().trim()
-    } catch (e) {
-      chalk.yellow(e)
-    }
-    try {
-      gitUrl = execFileSync('git', ['remote', 'get-url', 'origin']).toString().trim()
-    } catch (e) {
-      // skip errors
-    }
     console.log(chalk.blue(triedCount > 1 ? 'Retry uploading' : 'Uploading'))
 
     // get gcs upload url
@@ -297,7 +299,7 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth, continu
   await tryUploading()
 }
 
-async function initUpload(host: string, auth: Auth, projectSlug: string, sdkVersion: string, sequence: number) {
+export async function initUpload(host: string, auth: Auth, projectSlug: string, sdkVersion: string, sequence: number) {
   const initUploadUrl = new URL(`/api/v1/processors/init_upload`, host)
   return fetch(initUploadUrl.href, {
     method: 'POST',
@@ -312,7 +314,7 @@ async function initUpload(host: string, auth: Auth, projectSlug: string, sdkVers
   })
 }
 
-async function finishUpload(
+export async function finishUpload(
   host: string,
   auth: Auth,
   projectSlug: string,
@@ -321,7 +323,8 @@ async function finishUpload(
   commitSha: string,
   gitUrl: string,
   debug: boolean,
-  continueFrom: number | undefined
+  continueFrom: number | undefined,
+  sequence = 1
 ) {
   const finishUploadUrl = new URL(`/api/v1/processors/finish_upload`, host)
   return fetch(finishUploadUrl.href, {
@@ -336,7 +339,7 @@ async function finishUpload(
       commit_sha: commitSha,
       git_url: gitUrl,
       debug: debug,
-      sequence: 1,
+      sequence,
       continueFrom
     })
   })

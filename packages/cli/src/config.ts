@@ -4,7 +4,7 @@ const HostMap: { [host: string]: string } = {
   local: 'http://localhost:10000',
   test: 'https://test.sentio.xyz',
   staging: 'https://staging.sentio.xyz',
-  prod: 'https://app.sentio.xyz',
+  prod: 'https://app.sentio.xyz'
 }
 
 export interface YamlContractConfig {
@@ -64,8 +64,8 @@ export function getAuthConfig(host: string): {
   return { domain, clientId, audience, redirectUri }
 }
 
-export function finalizeHost(config: YamlProjectConfig) {
-  config.host = getFinalizedHost(config.host)
+export function finalizeHost(config: YamlProjectConfig, host?: string) {
+  config.host = getFinalizedHost(host || config.host)
 }
 
 export function FinalizeProjectName(config: YamlProjectConfig, owner: string | undefined, slug: string | undefined) {
