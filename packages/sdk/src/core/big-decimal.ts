@@ -1,5 +1,5 @@
 import { BigDecimal } from '@sentio/bigdecimal'
-import { BN } from '@fuel-ts/math'
+import { BN } from 'fuels'
 
 export { BigDecimal } from '@sentio/bigdecimal'
 
@@ -10,7 +10,7 @@ declare global {
   }
 }
 
-declare module '@fuel-ts/math' {
+declare module 'fuels' {
   interface BN {
     asBigDecimal(): BigDecimal
     scaleDown(decimal: number | bigint): BigDecimal

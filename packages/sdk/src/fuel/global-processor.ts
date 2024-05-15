@@ -1,6 +1,6 @@
 import { CallHandler, FuelBaseProcessor, FuelProcessorState } from './types.js'
 import { Data_FuelCall } from '@sentio/protos'
-import { Provider } from '@fuel-ts/account'
+import { Provider } from 'fuels'
 import { getRpcEndpoint } from './network.js'
 import { decodeFuelTransaction, DEFAULT_FUEL_FETCH_CONFIG, FuelFetchConfig, FuelTransaction } from './transaction.js'
 import { FuelContext } from './context.js'

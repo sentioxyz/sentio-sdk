@@ -1,6 +1,6 @@
 import { Labels } from './meter.js'
 import { BigDecimal } from './big-decimal.js'
-import { BN } from '@fuel-ts/math'
+import { BN } from 'fuels'
 
 export const SENTIO_BIGINT_STRING_SUFFIX = ':sto_bi'
 export const SENTIO_BIGDECIMAL_STRING_SUFFIX = ':sto_bd'

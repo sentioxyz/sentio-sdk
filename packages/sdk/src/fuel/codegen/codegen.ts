@@ -15,8 +15,9 @@ export async function codegen(abisDir: string, outDir: string) {
 }
 
 function patchImport(contents: string) {
-  return contents
-    .replace(
+  return (
+    contents
+      /* .replace(
       `import { Interface, Contract, ContractFactory } from "fuels";`,
       `import { Contract, } from "@fuel-ts/program";
 import { ContractFactory } from "@fuel-ts/contract";
@@ -29,8 +30,9 @@ import { Interface } from "@fuel-ts/abi-coder";`
 import type { AbstractAddress, BytesLike } from "@fuel-ts/interfaces";
 import type { DeployContractOptions } from "@fuel-ts/contract";
 import type { StorageSlot } from "@fuel-ts/transactions";`
-    )
-    .replace(/from\s+['"](\..+)['"]/g, `from '\$1.js'`)
+    )*/
+      .replace(/from\s+['"](\..+)['"]/g, `from '\$1.js'`)
+  )
 }
 
 function patchEnumType(contents: string) {
@@ -128,8 +130,8 @@ import {${abi.name}__factory } from './factories/${abi.name}__factory.js'
 import {${abi.commonTypesInUse.join(',')}} from './common.js'
 import {${importedTypes.join(',')}} from './${abi.name}.js'
 
-import type { BigNumberish, BN } from '@fuel-ts/math';
-import type { BytesLike } from '@fuel-ts/interfaces';
+import type { BigNumberish, BN } from 'fuels';
+import type { BytesLike } from 'fuels';
 
 
 namespace ${name} {

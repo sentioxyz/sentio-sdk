@@ -1,10 +1,10 @@
-import { AbiMap, assembleTransactionSummary, processGqlReceipt, Provider, TransactionSummary } from '@fuel-ts/account'
-import { Input, InputType, ReceiptType, TransactionCoder } from '@fuel-ts/transactions'
-import { bn } from '@fuel-ts/math'
-import { arrayify } from '@fuel-ts/utils'
-import { BigNumberCoder, Interface } from '@fuel-ts/abi-coder'
+import { AbiMap, assembleTransactionSummary, processGqlReceipt, Provider, TransactionSummary } from 'fuels'
+import { Input, InputType, ReceiptType, TransactionCoder } from 'fuels'
+import { bn } from 'fuels'
+import { arrayify } from 'fuels'
+import { BigNumberCoder, Interface } from 'fuels'
 import { FuelLog } from './types.js'
-import { BaseAssetId } from '@fuel-ts/address/configs'
+import { BaseAssetId } from 'fuels'
 
 export type FuelFetchConfig = {
   includeFailed?: boolean

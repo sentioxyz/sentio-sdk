@@ -1,9 +1,9 @@
 import { BaseContext, Labels, normalizeLabels } from '../core/index.js'
 import { ChainId } from '@sentio/chain'
 import { RecordMetaData } from '@sentio/protos'
-import { InvocationCallResult, InvocationScopeLike } from '@fuel-ts/program'
+import { InvocationCallResult, InvocationScopeLike } from 'fuels'
 import { FuelTransaction } from './transaction.js'
-import type { CallResult } from '@fuel-ts/account'
+import type { CallResult } from 'fuels'
 import { FuelLog } from './types.js'
 
 export class FuelCall extends InvocationCallResult {

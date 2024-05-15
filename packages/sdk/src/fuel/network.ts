@@ -1,5 +1,5 @@
 import { FuelChainId } from '@sentio/chain'
-import { FUEL_BETA_5_NETWORK_URL, FUEL_NETWORK_URL } from '@fuel-ts/account/configs'
+import { FUEL_BETA_5_NETWORK_URL, FUEL_NETWORK_URL } from 'fuels'
 
 export type FuelNetwork = FuelChainId
 export const FuelNetwork = <const>{

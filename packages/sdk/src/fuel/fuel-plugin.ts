@@ -14,7 +14,7 @@ import { TemplateInstanceState } from '../core/template.js'
 import { FuelAssetProcessor } from './asset-processor.js'
 import { FuelProcessorState } from './types.js'
 import { FuelProcessor } from './fuel-processor.js'
-import { BN } from '@fuel-ts/math'
+import { BN } from 'fuels'
 import { FuelGlobalProcessor } from './global-processor.js'
 
 interface Handlers {

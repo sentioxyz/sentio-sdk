@@ -8,7 +8,7 @@ import testTransferData from './transfer-data.json'
 import { FuelAssetProcessor } from '../asset-processor.js'
 import { afterAll } from '@jest/globals'
 import { State } from '@sentio/runtime'
-import { BaseAssetId } from '@fuel-ts/address/configs'
+import { BaseAssetId } from 'fuels'
 
 describe('fuel network tests', () => {
   const ADDRESS = '0xa50da2237febdd382512180b4a0dc6d4e358a8d13ad6e95c350f367a1ba68129'
