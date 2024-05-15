@@ -1,10 +1,20 @@
-import { AbiMap, assembleTransactionSummary, processGqlReceipt, Provider, TransactionSummary } from 'fuels'
-import { Input, InputType, ReceiptType, TransactionCoder } from 'fuels'
-import { bn } from 'fuels'
-import { arrayify } from 'fuels'
-import { BigNumberCoder, Interface } from 'fuels'
+import {
+  AbiMap,
+  arrayify,
+  assembleTransactionSummary,
+  BaseAssetId,
+  BigNumberCoder,
+  bn,
+  Input,
+  InputType,
+  Interface,
+  processGqlReceipt,
+  Provider,
+  ReceiptType,
+  TransactionCoder,
+  TransactionSummary
+} from 'fuels'
 import { FuelLog } from './types.js'
-import { BaseAssetId } from 'fuels'
 
 export type FuelFetchConfig = {
   includeFailed?: boolean

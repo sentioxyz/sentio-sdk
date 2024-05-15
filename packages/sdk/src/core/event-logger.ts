@@ -10,9 +10,13 @@ import {
 } from '@sentio/protos'
 import { normalizeAttribute } from './normalization.js'
 import { MapStateStorage } from '@sentio/runtime'
+import { BN } from 'fuels'
 
 export interface Attribute<T> {
-  [key: string]: Exclude<T | number | bigint | string | boolean | LogLevel | Attribute<T> | undefined, Promise<any>>
+  [key: string]: Exclude<
+    T | number | bigint | string | boolean | LogLevel | Attribute<T> | BN | undefined,
+    Promise<any>
+  >
 }
 
 export interface Event<T> extends Attribute<T> {
