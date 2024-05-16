@@ -13,7 +13,7 @@ declare global {
 declare module 'fuels' {
   interface BN {
     asBigDecimal(): BigDecimal
-    scaleDown(decimal: number | bigint): BN
+    scaleDown(decimal: number | bigint): BigDecimal
   }
 }
 
@@ -31,8 +31,7 @@ BN.prototype.asBigDecimal = function () {
 }
 
 BN.prototype.scaleDown = function (decimal: number | bigint) {
-  const divider = new BN(10).pow(new BN(`${decimal}`))
-  return this.div(divider)
+  return scaleDown(BigInt(this.toString(10)), decimal)
 }
 
 export function scaleDown(amount: bigint, decimal: number | bigint): BigDecimal {
