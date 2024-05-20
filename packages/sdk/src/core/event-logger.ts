@@ -11,10 +11,11 @@ import {
 import { normalizeAttribute } from './normalization.js'
 import { MapStateStorage } from '@sentio/runtime'
 import { BN } from 'fuels'
+import { BigDecimal } from '@sentio/bigdecimal'
 
 export interface Attribute<T> {
   [key: string]: Exclude<
-    T | number | bigint | string | boolean | LogLevel | Attribute<T> | BN | undefined,
+    T | number | bigint | string | boolean | LogLevel | Attribute<T> | BN | BigDecimal | undefined,
     Promise<any>
   >
 }
