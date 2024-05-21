@@ -1,0 +1,37 @@
+type Transaction @entity {
+  id: ID!
+  sender: Owner!
+  gas: BigInt!
+  gasPrice: BigDecimal!
+  isSuccess: Boolean
+  receipts: [TransactionReceipt!]! @derivedFrom(field: "transaction")
+}
+
+type TransactionReceipt @entity {
+  id: ID!
+  status: TransactionStatus
+  transaction: Transaction
+}
+
+interface Owner  {
+  id: ID!
+  name: String!
+}
+
+type User implements Owner @entity {
+  id: ID!
+  name: String!
+  transactions: [Transaction!]! @derivedFrom(field: "sender")
+  organizations: [Organization!]! @derivedFrom(field: "members")
+}
+
+type Organization implements Owner @entity {
+  id: ID!
+  name: String!
+  members: [User!]!
+}
+
+enum TransactionStatus {
+  SUCCESS
+  FAILURE
+}

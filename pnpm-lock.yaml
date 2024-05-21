@@ -187,6 +187,19 @@ importers:
         specifier: workspace:*
         version: link:../../packages/cli
 
+  examples/x2y2-database:
+    dependencies:
+      '@sentio/sdk':
+        specifier: workspace:*
+        version: link:../../packages/sdk
+      ethers:
+        specifier: npm:@sentio/ethers@6.7.1-patch.4
+        version: '@sentio/ethers@6.7.1-patch.4(bufferutil@4.0.8)(utf-8-validate@5.0.10)'
+    devDependencies:
+      '@sentio/cli':
+        specifier: workspace:*
+        version: link:../../packages/cli
+
   packages/cli:
     dependencies:
       '@aptos-labs/ts-sdk':
@@ -330,6 +343,21 @@ importers:
         specifier: ^5.4.5
         version: 5.4.5
 
+  packages/db:
+    dependencies:
+      '@sentio/protos':
+        specifier: workspace:*
+        version: link:../protos
+      graphql:
+        specifier: ^16.8.1
+        version: 16.8.1
+      ix:
+        specifier: ^5.0.0
+        version: 5.0.0
+      rxjs:
+        specifier: ^7.8.1
+        version: 7.8.1
+
   packages/protos:
     dependencies:
       google-protobuf:
@@ -353,6 +381,9 @@ importers:
       '@grpc/grpc-js':
         specifier: ^1.9.14
         version: 1.10.7
+      '@sentio/db':
+        specifier: workspace:*
+        version: link:../db
       '@sentio/protos':
         specifier: workspace:*
         version: link:../protos
@@ -368,6 +399,9 @@ importers:
       google-protobuf:
         specifier: ^3.21.2
         version: 3.21.2
+      ix:
+        specifier: ^5.0.0
+        version: 5.0.0
       long:
         specifier: ^5.2.3
         version: 5.2.3
@@ -441,6 +475,9 @@ importers:
       '@sentio/chain':
         specifier: ^1.0.21
         version: 1.0.23
+      '@sentio/db':
+        specifier: workspace:*
+        version: link:../db
       '@sentio/ethers-v6':
         specifier: ^1.0.29
         version: 1.0.29(@sentio/ethers@6.7.1-patch.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typescript@5.4.5)
@@ -2049,6 +2086,9 @@ packages:
 
   '@types/node@12.20.55':
     resolution: {integrity: sha512-J8xLz7q2OFulZ2cyGTLE1TbbZcjpno7FaN6zdJNrgAdrJ+DZzh/uFR6YrTb4C+nXakvud8Q4+rbhoIWlYQbUFQ==}
+
+  '@types/node@13.13.52':
+    resolution: {integrity: sha512-s3nugnZumCC//n4moGGe6tkNMyYEdaDBitVjwPxXmR5lnMG5dHePinH2EdxkG3Rh1ghFHHixAG4NJhpJW1rthQ==}
 
   '@types/node@18.15.13':
     resolution: {integrity: sha512-N+0kuo9KgrUQ1Sn/ifDXsvg0TTleP7rIy4zOBGECxAljqvqfqpTfzx0Q1NUedOixRMBfe2Whhb056a42cWs26Q==}
@@ -4114,6 +4154,9 @@ packages:
   istanbul-reports@3.1.7:
     resolution: {integrity: sha512-BewmUXImeuRk2YY0PVbxgKAysvhRPUQE0h5QRM++nVWyubKGV0l8qQ5op8+B2DOmwSe63Jivj0BjkPQVf8fP5g==}
     engines: {node: '>=8'}
+
+  ix@5.0.0:
+    resolution: {integrity: sha512-6LyyrHnvNrSy5pKtW/KA+KKusHrB223aBJCJlIGPN7QBfDkEEtNrAkAz9lLLShIcdJntq6BiPCHuKaCM/9wwXw==}
 
   jackspeak@2.3.6:
     resolution: {integrity: sha512-N3yCS/NegsOBokc8GAdM8UcmfsKiSS8cipheD/nivzr700H+nsMOxJjQnvwOcRYVuFkdH0wGUvW2WbXGmrZGbQ==}
@@ -8511,6 +8554,8 @@ snapshots:
 
   '@types/node@12.20.55': {}
 
+  '@types/node@13.13.52': {}
+
   '@types/node@18.15.13': {}
 
   '@types/node@18.19.33':
@@ -11091,6 +11136,11 @@ snapshots:
     dependencies:
       html-escaper: 2.0.2
       istanbul-lib-report: 3.0.1
+
+  ix@5.0.0:
+    dependencies:
+      '@types/node': 13.13.52
+      tslib: 2.6.2
 
   jackspeak@2.3.6:
     dependencies:

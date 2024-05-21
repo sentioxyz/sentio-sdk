@@ -1,8 +1,11 @@
 import { CallContext, ServerError, Status } from 'nice-grpc'
-import { RichServerError, DebugInfo } from 'nice-grpc-error-details'
+import { DebugInfo, RichServerError } from 'nice-grpc-error-details'
+import { from } from 'ix/Ix.dom.asynciterable.js'
+import { withAbort } from 'ix/Ix.dom.asynciterable.operators.js'
 
 import {
   DataBinding,
+  Empty,
   HandlerType,
   ProcessBindingResponse,
   ProcessBindingsRequest,
@@ -10,13 +13,15 @@ import {
   ProcessConfigResponse,
   ProcessorServiceImplementation,
   ProcessResult,
-  StartRequest,
-  Empty
+  ProcessStreamRequest,
+  StartRequest
 } from '@sentio/protos'
 
 import { PluginManager } from './plugin.js'
 import { errorString, mergeProcessResults } from './utils.js'
 import { freezeGlobalConfig, GLOBAL_CONFIG } from './global-config.js'
+
+import { StoreContext } from '@sentio/db'
 
 ;(BigInt.prototype as any).toJSON = function () {
   return this.toString()
@@ -153,19 +158,34 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     return result
   }
 
-  async *processBindingsStream(requests: AsyncIterable<DataBinding>, context: CallContext) {
-    for await (const request of requests) {
-      const result = await this.processBinding(request)
-      // let updated = false
-      // if (PluginManager.INSTANCE.stateDiff(this.processorConfig)) {
-      //   await this.configure()
-      //   updated = true
-      // }
-      yield {
-        result,
-        configUpdated: result.states?.configUpdated || false
-      }
+  async *processBindingsStream(requests: AsyncIterable<ProcessStreamRequest>, context: CallContext) {
+    if (!this.started) {
+      throw new ServerError(Status.UNAVAILABLE, 'Service Not started.')
     }
+
+    const dbContext = new StoreContext()
+    new Promise(async (resolve, reject) => {
+      for await (const request of requests) {
+        if (request.binding) {
+          const binding = request.binding
+          PluginManager.INSTANCE.processBinding(binding, dbContext).then((result) => {
+            dbContext.subject.next({
+              result,
+              processId: request.processId
+            })
+            // dbContext.subject.complete()
+            recordRuntimeInfo(result, binding.handlerType)
+          })
+        }
+        if (request.dbResult) {
+          dbContext.result(request.dbResult)
+        }
+      }
+      resolve(null)
+    }).then(() => {
+      dbContext.subject.complete()
+    })
+    yield* from(dbContext.subject).pipe(withAbort(context.signal))
   }
 }
 

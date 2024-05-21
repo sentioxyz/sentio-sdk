@@ -1,0 +1,18 @@
+type Reward @entity {
+  id: ID!
+  value: BigDecimal!
+  phase: String
+}
+
+type Transfer @entity {
+  id: ID!
+  from: User!
+  to: User!
+  amount: BigDecimal!
+}
+
+type User @entity {
+  id: ID!
+  name: String!
+  rewards: [Reward!]! @derivedFrom(field: "owner")
+}

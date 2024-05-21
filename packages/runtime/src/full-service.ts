@@ -7,6 +7,7 @@ import {
   DataBinding,
   HandlerType,
   ProcessBindingsRequest,
+  ProcessStreamRequest,
   ProcessConfigRequest,
   ProcessorServiceImplementation,
   StartRequest,
@@ -105,9 +106,9 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
     }
   }
 
-  async *processBindingsStream(requests: AsyncIterable<DataBinding>, context: CallContext) {
-    throw new Error('Not Implemented for streaming')
-    // y this.instance.processBindingsStream(requests, context)
+  async *processBindingsStream(requests: AsyncIterable<ProcessStreamRequest>, context: CallContext) {
+    // throw new Error('Not Implemented for streaming')
+    yield* this.instance.processBindingsStream(requests, context)
   }
 
   private adjustResult(res: ProcessResult): void {}

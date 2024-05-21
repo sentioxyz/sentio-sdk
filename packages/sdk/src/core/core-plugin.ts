@@ -6,6 +6,7 @@ import { ExporterState } from './exporter.js'
 import { EventTrackerState } from './event-tracker.js'
 import { TemplateInstanceState } from './template.js'
 import { EventLoggerState } from './event-logger.js'
+import { DatabaseSchemaState } from './database-schema.js'
 
 export class CorePlugin extends Plugin {
   name: string = 'CorePlugin'
@@ -43,6 +44,12 @@ export class CorePlugin extends Plugin {
         name: exporter.name,
         channel: exporter.channel
       })
+    }
+
+    if (DatabaseSchemaState.INSTANCE.getValues().length > 0) {
+      config.dbSchema = {
+        gqlSchema: DatabaseSchemaState.INSTANCE.getValues().join('\n\n')
+      }
     }
   }
 }

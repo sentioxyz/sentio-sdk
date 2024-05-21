@@ -2,12 +2,16 @@ import {
   AccountConfig,
   ContractConfig,
   DataBinding,
+  DeepPartial,
   Empty,
   ProcessBindingResponse,
   ProcessBindingsRequest,
   ProcessConfigRequest,
   ProcessConfigResponse,
   ProcessorServiceImplementation,
+  ProcessStreamRequest,
+  ProcessStreamResponse,
+  ServerStreamingMethodResult,
   StartRequest
 } from '@sentio/protos'
 import { CallContext } from 'nice-grpc-common'
@@ -80,7 +84,14 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
     return this.service.processBindings({ bindings: [request] }, context)
   }
 
-  processBindingsStream(request: AsyncIterable<DataBinding>, context: CallContext) {
-    return this.service.processBindingsStream(request, context)
+  processBindingsStream(
+    requests: AsyncIterable<ProcessStreamRequest>,
+    context: CallContext
+  ): ServerStreamingMethodResult<DeepPartial<ProcessStreamResponse>> {
+    throw new Error('Method not implemented.')
   }
+
+  // processBindingsStream(request: AsyncIterable<ProcessStreamRequest>, context: CallContext) {
+  //   return this.service.processBindingsStream(request, context)
+  // }
 }

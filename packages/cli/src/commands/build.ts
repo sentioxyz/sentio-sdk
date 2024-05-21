@@ -219,6 +219,18 @@ export async function codegen(genExample: boolean) {
   } catch (e) {
     console.error('code gen error', e)
   }
+
+  try {
+    const src = path.resolve('.')
+
+    // @ts-ignore dynamic import
+    const codegen = await import('@sentio/db/codegen')
+    const output = path.resolve('src', 'schema')
+    fs.emptyDirSync(output)
+    await codegen.codegen(src, output)
+  } catch (e) {
+    console.error('database schema gen failed', e)
+  }
 }
 
 async function installDeps() {

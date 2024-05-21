@@ -367,6 +367,7 @@ export interface ProcessConfigResponse {
   eventTrackingConfigs: EventTrackingConfig[];
   exportConfigs: ExportConfig[];
   eventLogConfigs: EventLogConfig[];
+  dbSchema: DataBaseSchema | undefined;
 }
 
 export interface ContractConfig {
@@ -385,6 +386,10 @@ export interface ContractConfig {
   startBlock: bigint;
   endBlock: bigint;
   processorType: string;
+}
+
+export interface DataBaseSchema {
+  gqlSchema: string;
 }
 
 export interface TotalPerEntityAggregation {
@@ -719,6 +724,54 @@ export interface ProcessBindingResponse {
     | undefined;
   /** @deprecated */
   configUpdated: boolean;
+}
+
+export interface ProcessStreamRequest {
+  processId: number;
+  binding?: DataBinding | undefined;
+  dbResult?: DBResponse | undefined;
+}
+
+export interface ProcessStreamResponse {
+  processId: number;
+  dbRequest?: DBRequest | undefined;
+  result?: ProcessResult | undefined;
+}
+
+export interface DBResponse {
+  opId: bigint;
+  data?: { [key: string]: any } | undefined;
+  error?: string | undefined;
+}
+
+export interface DBRequest {
+  opId: bigint;
+  get?: DBRequest_DBGet | undefined;
+  upsert?: DBRequest_DBUpsert | undefined;
+  delete?: DBRequest_DBDelete | undefined;
+  list?: DBRequest_DBList | undefined;
+}
+
+export interface DBRequest_DBGet {
+  entity: string;
+  id: string;
+}
+
+export interface DBRequest_DBList {
+  entity: string;
+  limit: number;
+  offset: number;
+}
+
+export interface DBRequest_DBUpsert {
+  entity: string;
+  id: string[];
+  data: { [key: string]: any }[];
+}
+
+export interface DBRequest_DBDelete {
+  entity: string;
+  id: string[];
 }
 
 export interface Data {
@@ -1129,6 +1182,7 @@ function createBaseProcessConfigResponse(): ProcessConfigResponse {
     eventTrackingConfigs: [],
     exportConfigs: [],
     eventLogConfigs: [],
+    dbSchema: undefined,
   };
 }
 
@@ -1160,6 +1214,9 @@ export const ProcessConfigResponse = {
     }
     for (const v of message.eventLogConfigs) {
       EventLogConfig.encode(v!, writer.uint32(66).fork()).ldelim();
+    }
+    if (message.dbSchema !== undefined) {
+      DataBaseSchema.encode(message.dbSchema, writer.uint32(82).fork()).ldelim();
     }
     return writer;
   },
@@ -1234,6 +1291,13 @@ export const ProcessConfigResponse = {
 
           message.eventLogConfigs.push(EventLogConfig.decode(reader, reader.uint32()));
           continue;
+        case 10:
+          if (tag !== 82) {
+            break;
+          }
+
+          message.dbSchema = DataBaseSchema.decode(reader, reader.uint32());
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -1268,6 +1332,7 @@ export const ProcessConfigResponse = {
       eventLogConfigs: globalThis.Array.isArray(object?.eventLogConfigs)
         ? object.eventLogConfigs.map((e: any) => EventLogConfig.fromJSON(e))
         : [],
+      dbSchema: isSet(object.dbSchema) ? DataBaseSchema.fromJSON(object.dbSchema) : undefined,
     };
   },
 
@@ -1300,6 +1365,9 @@ export const ProcessConfigResponse = {
     if (message.eventLogConfigs?.length) {
       obj.eventLogConfigs = message.eventLogConfigs.map((e) => EventLogConfig.toJSON(e));
     }
+    if (message.dbSchema !== undefined) {
+      obj.dbSchema = DataBaseSchema.toJSON(message.dbSchema);
+    }
     return obj;
   },
 
@@ -1321,6 +1389,9 @@ export const ProcessConfigResponse = {
     message.eventTrackingConfigs = object.eventTrackingConfigs?.map((e) => EventTrackingConfig.fromPartial(e)) || [];
     message.exportConfigs = object.exportConfigs?.map((e) => ExportConfig.fromPartial(e)) || [];
     message.eventLogConfigs = object.eventLogConfigs?.map((e) => EventLogConfig.fromPartial(e)) || [];
+    message.dbSchema = (object.dbSchema !== undefined && object.dbSchema !== null)
+      ? DataBaseSchema.fromPartial(object.dbSchema)
+      : undefined;
     return message;
   },
 };
@@ -1639,6 +1710,63 @@ export const ContractConfig = {
     message.startBlock = object.startBlock ?? BigInt("0");
     message.endBlock = object.endBlock ?? BigInt("0");
     message.processorType = object.processorType ?? "";
+    return message;
+  },
+};
+
+function createBaseDataBaseSchema(): DataBaseSchema {
+  return { gqlSchema: "" };
+}
+
+export const DataBaseSchema = {
+  encode(message: DataBaseSchema, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.gqlSchema !== "") {
+      writer.uint32(10).string(message.gqlSchema);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): DataBaseSchema {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDataBaseSchema();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.gqlSchema = reader.string();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): DataBaseSchema {
+    return { gqlSchema: isSet(object.gqlSchema) ? globalThis.String(object.gqlSchema) : "" };
+  },
+
+  toJSON(message: DataBaseSchema): unknown {
+    const obj: any = {};
+    if (message.gqlSchema !== "") {
+      obj.gqlSchema = message.gqlSchema;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<DataBaseSchema>): DataBaseSchema {
+    return DataBaseSchema.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<DataBaseSchema>): DataBaseSchema {
+    const message = createBaseDataBaseSchema();
+    message.gqlSchema = object.gqlSchema ?? "";
     return message;
   },
 };
@@ -5360,6 +5488,740 @@ export const ProcessBindingResponse = {
   },
 };
 
+function createBaseProcessStreamRequest(): ProcessStreamRequest {
+  return { processId: 0, binding: undefined, dbResult: undefined };
+}
+
+export const ProcessStreamRequest = {
+  encode(message: ProcessStreamRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.processId !== 0) {
+      writer.uint32(8).int32(message.processId);
+    }
+    if (message.binding !== undefined) {
+      DataBinding.encode(message.binding, writer.uint32(18).fork()).ldelim();
+    }
+    if (message.dbResult !== undefined) {
+      DBResponse.encode(message.dbResult, writer.uint32(26).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ProcessStreamRequest {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseProcessStreamRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 8) {
+            break;
+          }
+
+          message.processId = reader.int32();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.binding = DataBinding.decode(reader, reader.uint32());
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.dbResult = DBResponse.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ProcessStreamRequest {
+    return {
+      processId: isSet(object.processId) ? globalThis.Number(object.processId) : 0,
+      binding: isSet(object.binding) ? DataBinding.fromJSON(object.binding) : undefined,
+      dbResult: isSet(object.dbResult) ? DBResponse.fromJSON(object.dbResult) : undefined,
+    };
+  },
+
+  toJSON(message: ProcessStreamRequest): unknown {
+    const obj: any = {};
+    if (message.processId !== 0) {
+      obj.processId = Math.round(message.processId);
+    }
+    if (message.binding !== undefined) {
+      obj.binding = DataBinding.toJSON(message.binding);
+    }
+    if (message.dbResult !== undefined) {
+      obj.dbResult = DBResponse.toJSON(message.dbResult);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<ProcessStreamRequest>): ProcessStreamRequest {
+    return ProcessStreamRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ProcessStreamRequest>): ProcessStreamRequest {
+    const message = createBaseProcessStreamRequest();
+    message.processId = object.processId ?? 0;
+    message.binding = (object.binding !== undefined && object.binding !== null)
+      ? DataBinding.fromPartial(object.binding)
+      : undefined;
+    message.dbResult = (object.dbResult !== undefined && object.dbResult !== null)
+      ? DBResponse.fromPartial(object.dbResult)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseProcessStreamResponse(): ProcessStreamResponse {
+  return { processId: 0, dbRequest: undefined, result: undefined };
+}
+
+export const ProcessStreamResponse = {
+  encode(message: ProcessStreamResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.processId !== 0) {
+      writer.uint32(8).int32(message.processId);
+    }
+    if (message.dbRequest !== undefined) {
+      DBRequest.encode(message.dbRequest, writer.uint32(18).fork()).ldelim();
+    }
+    if (message.result !== undefined) {
+      ProcessResult.encode(message.result, writer.uint32(26).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ProcessStreamResponse {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseProcessStreamResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 8) {
+            break;
+          }
+
+          message.processId = reader.int32();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.dbRequest = DBRequest.decode(reader, reader.uint32());
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.result = ProcessResult.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ProcessStreamResponse {
+    return {
+      processId: isSet(object.processId) ? globalThis.Number(object.processId) : 0,
+      dbRequest: isSet(object.dbRequest) ? DBRequest.fromJSON(object.dbRequest) : undefined,
+      result: isSet(object.result) ? ProcessResult.fromJSON(object.result) : undefined,
+    };
+  },
+
+  toJSON(message: ProcessStreamResponse): unknown {
+    const obj: any = {};
+    if (message.processId !== 0) {
+      obj.processId = Math.round(message.processId);
+    }
+    if (message.dbRequest !== undefined) {
+      obj.dbRequest = DBRequest.toJSON(message.dbRequest);
+    }
+    if (message.result !== undefined) {
+      obj.result = ProcessResult.toJSON(message.result);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<ProcessStreamResponse>): ProcessStreamResponse {
+    return ProcessStreamResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ProcessStreamResponse>): ProcessStreamResponse {
+    const message = createBaseProcessStreamResponse();
+    message.processId = object.processId ?? 0;
+    message.dbRequest = (object.dbRequest !== undefined && object.dbRequest !== null)
+      ? DBRequest.fromPartial(object.dbRequest)
+      : undefined;
+    message.result = (object.result !== undefined && object.result !== null)
+      ? ProcessResult.fromPartial(object.result)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseDBResponse(): DBResponse {
+  return { opId: BigInt("0"), data: undefined, error: undefined };
+}
+
+export const DBResponse = {
+  encode(message: DBResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.opId !== BigInt("0")) {
+      if (BigInt.asUintN(64, message.opId) !== message.opId) {
+        throw new globalThis.Error("value provided for field message.opId of type uint64 too large");
+      }
+      writer.uint32(8).uint64(message.opId.toString());
+    }
+    if (message.data !== undefined) {
+      Struct.encode(Struct.wrap(message.data), writer.uint32(18).fork()).ldelim();
+    }
+    if (message.error !== undefined) {
+      writer.uint32(26).string(message.error);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): DBResponse {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDBResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 8) {
+            break;
+          }
+
+          message.opId = longToBigint(reader.uint64() as Long);
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.data = Struct.unwrap(Struct.decode(reader, reader.uint32()));
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.error = reader.string();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): DBResponse {
+    return {
+      opId: isSet(object.opId) ? BigInt(object.opId) : BigInt("0"),
+      data: isObject(object.data) ? object.data : undefined,
+      error: isSet(object.error) ? globalThis.String(object.error) : undefined,
+    };
+  },
+
+  toJSON(message: DBResponse): unknown {
+    const obj: any = {};
+    if (message.opId !== BigInt("0")) {
+      obj.opId = message.opId.toString();
+    }
+    if (message.data !== undefined) {
+      obj.data = message.data;
+    }
+    if (message.error !== undefined) {
+      obj.error = message.error;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<DBResponse>): DBResponse {
+    return DBResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<DBResponse>): DBResponse {
+    const message = createBaseDBResponse();
+    message.opId = object.opId ?? BigInt("0");
+    message.data = object.data ?? undefined;
+    message.error = object.error ?? undefined;
+    return message;
+  },
+};
+
+function createBaseDBRequest(): DBRequest {
+  return { opId: BigInt("0"), get: undefined, upsert: undefined, delete: undefined, list: undefined };
+}
+
+export const DBRequest = {
+  encode(message: DBRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.opId !== BigInt("0")) {
+      if (BigInt.asUintN(64, message.opId) !== message.opId) {
+        throw new globalThis.Error("value provided for field message.opId of type uint64 too large");
+      }
+      writer.uint32(8).uint64(message.opId.toString());
+    }
+    if (message.get !== undefined) {
+      DBRequest_DBGet.encode(message.get, writer.uint32(18).fork()).ldelim();
+    }
+    if (message.upsert !== undefined) {
+      DBRequest_DBUpsert.encode(message.upsert, writer.uint32(26).fork()).ldelim();
+    }
+    if (message.delete !== undefined) {
+      DBRequest_DBDelete.encode(message.delete, writer.uint32(34).fork()).ldelim();
+    }
+    if (message.list !== undefined) {
+      DBRequest_DBList.encode(message.list, writer.uint32(42).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): DBRequest {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDBRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 8) {
+            break;
+          }
+
+          message.opId = longToBigint(reader.uint64() as Long);
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.get = DBRequest_DBGet.decode(reader, reader.uint32());
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.upsert = DBRequest_DBUpsert.decode(reader, reader.uint32());
+          continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.delete = DBRequest_DBDelete.decode(reader, reader.uint32());
+          continue;
+        case 5:
+          if (tag !== 42) {
+            break;
+          }
+
+          message.list = DBRequest_DBList.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): DBRequest {
+    return {
+      opId: isSet(object.opId) ? BigInt(object.opId) : BigInt("0"),
+      get: isSet(object.get) ? DBRequest_DBGet.fromJSON(object.get) : undefined,
+      upsert: isSet(object.upsert) ? DBRequest_DBUpsert.fromJSON(object.upsert) : undefined,
+      delete: isSet(object.delete) ? DBRequest_DBDelete.fromJSON(object.delete) : undefined,
+      list: isSet(object.list) ? DBRequest_DBList.fromJSON(object.list) : undefined,
+    };
+  },
+
+  toJSON(message: DBRequest): unknown {
+    const obj: any = {};
+    if (message.opId !== BigInt("0")) {
+      obj.opId = message.opId.toString();
+    }
+    if (message.get !== undefined) {
+      obj.get = DBRequest_DBGet.toJSON(message.get);
+    }
+    if (message.upsert !== undefined) {
+      obj.upsert = DBRequest_DBUpsert.toJSON(message.upsert);
+    }
+    if (message.delete !== undefined) {
+      obj.delete = DBRequest_DBDelete.toJSON(message.delete);
+    }
+    if (message.list !== undefined) {
+      obj.list = DBRequest_DBList.toJSON(message.list);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<DBRequest>): DBRequest {
+    return DBRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<DBRequest>): DBRequest {
+    const message = createBaseDBRequest();
+    message.opId = object.opId ?? BigInt("0");
+    message.get = (object.get !== undefined && object.get !== null)
+      ? DBRequest_DBGet.fromPartial(object.get)
+      : undefined;
+    message.upsert = (object.upsert !== undefined && object.upsert !== null)
+      ? DBRequest_DBUpsert.fromPartial(object.upsert)
+      : undefined;
+    message.delete = (object.delete !== undefined && object.delete !== null)
+      ? DBRequest_DBDelete.fromPartial(object.delete)
+      : undefined;
+    message.list = (object.list !== undefined && object.list !== null)
+      ? DBRequest_DBList.fromPartial(object.list)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseDBRequest_DBGet(): DBRequest_DBGet {
+  return { entity: "", id: "" };
+}
+
+export const DBRequest_DBGet = {
+  encode(message: DBRequest_DBGet, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.entity !== "") {
+      writer.uint32(10).string(message.entity);
+    }
+    if (message.id !== "") {
+      writer.uint32(18).string(message.id);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): DBRequest_DBGet {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDBRequest_DBGet();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.entity = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): DBRequest_DBGet {
+    return {
+      entity: isSet(object.entity) ? globalThis.String(object.entity) : "",
+      id: isSet(object.id) ? globalThis.String(object.id) : "",
+    };
+  },
+
+  toJSON(message: DBRequest_DBGet): unknown {
+    const obj: any = {};
+    if (message.entity !== "") {
+      obj.entity = message.entity;
+    }
+    if (message.id !== "") {
+      obj.id = message.id;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<DBRequest_DBGet>): DBRequest_DBGet {
+    return DBRequest_DBGet.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<DBRequest_DBGet>): DBRequest_DBGet {
+    const message = createBaseDBRequest_DBGet();
+    message.entity = object.entity ?? "";
+    message.id = object.id ?? "";
+    return message;
+  },
+};
+
+function createBaseDBRequest_DBList(): DBRequest_DBList {
+  return { entity: "", limit: 0, offset: 0 };
+}
+
+export const DBRequest_DBList = {
+  encode(message: DBRequest_DBList, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.entity !== "") {
+      writer.uint32(10).string(message.entity);
+    }
+    if (message.limit !== 0) {
+      writer.uint32(16).uint32(message.limit);
+    }
+    if (message.offset !== 0) {
+      writer.uint32(24).uint32(message.offset);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): DBRequest_DBList {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDBRequest_DBList();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.entity = reader.string();
+          continue;
+        case 2:
+          if (tag !== 16) {
+            break;
+          }
+
+          message.limit = reader.uint32();
+          continue;
+        case 3:
+          if (tag !== 24) {
+            break;
+          }
+
+          message.offset = reader.uint32();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): DBRequest_DBList {
+    return {
+      entity: isSet(object.entity) ? globalThis.String(object.entity) : "",
+      limit: isSet(object.limit) ? globalThis.Number(object.limit) : 0,
+      offset: isSet(object.offset) ? globalThis.Number(object.offset) : 0,
+    };
+  },
+
+  toJSON(message: DBRequest_DBList): unknown {
+    const obj: any = {};
+    if (message.entity !== "") {
+      obj.entity = message.entity;
+    }
+    if (message.limit !== 0) {
+      obj.limit = Math.round(message.limit);
+    }
+    if (message.offset !== 0) {
+      obj.offset = Math.round(message.offset);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<DBRequest_DBList>): DBRequest_DBList {
+    return DBRequest_DBList.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<DBRequest_DBList>): DBRequest_DBList {
+    const message = createBaseDBRequest_DBList();
+    message.entity = object.entity ?? "";
+    message.limit = object.limit ?? 0;
+    message.offset = object.offset ?? 0;
+    return message;
+  },
+};
+
+function createBaseDBRequest_DBUpsert(): DBRequest_DBUpsert {
+  return { entity: "", id: [], data: [] };
+}
+
+export const DBRequest_DBUpsert = {
+  encode(message: DBRequest_DBUpsert, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.entity !== "") {
+      writer.uint32(10).string(message.entity);
+    }
+    for (const v of message.id) {
+      writer.uint32(18).string(v!);
+    }
+    for (const v of message.data) {
+      Struct.encode(Struct.wrap(v!), writer.uint32(26).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): DBRequest_DBUpsert {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDBRequest_DBUpsert();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.entity = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.id.push(reader.string());
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.data.push(Struct.unwrap(Struct.decode(reader, reader.uint32())));
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): DBRequest_DBUpsert {
+    return {
+      entity: isSet(object.entity) ? globalThis.String(object.entity) : "",
+      id: globalThis.Array.isArray(object?.id) ? object.id.map((e: any) => globalThis.String(e)) : [],
+      data: globalThis.Array.isArray(object?.data) ? [...object.data] : [],
+    };
+  },
+
+  toJSON(message: DBRequest_DBUpsert): unknown {
+    const obj: any = {};
+    if (message.entity !== "") {
+      obj.entity = message.entity;
+    }
+    if (message.id?.length) {
+      obj.id = message.id;
+    }
+    if (message.data?.length) {
+      obj.data = message.data;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<DBRequest_DBUpsert>): DBRequest_DBUpsert {
+    return DBRequest_DBUpsert.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<DBRequest_DBUpsert>): DBRequest_DBUpsert {
+    const message = createBaseDBRequest_DBUpsert();
+    message.entity = object.entity ?? "";
+    message.id = object.id?.map((e) => e) || [];
+    message.data = object.data?.map((e) => e) || [];
+    return message;
+  },
+};
+
+function createBaseDBRequest_DBDelete(): DBRequest_DBDelete {
+  return { entity: "", id: [] };
+}
+
+export const DBRequest_DBDelete = {
+  encode(message: DBRequest_DBDelete, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.entity !== "") {
+      writer.uint32(10).string(message.entity);
+    }
+    for (const v of message.id) {
+      writer.uint32(18).string(v!);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): DBRequest_DBDelete {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDBRequest_DBDelete();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.entity = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.id.push(reader.string());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): DBRequest_DBDelete {
+    return {
+      entity: isSet(object.entity) ? globalThis.String(object.entity) : "",
+      id: globalThis.Array.isArray(object?.id) ? object.id.map((e: any) => globalThis.String(e)) : [],
+    };
+  },
+
+  toJSON(message: DBRequest_DBDelete): unknown {
+    const obj: any = {};
+    if (message.entity !== "") {
+      obj.entity = message.entity;
+    }
+    if (message.id?.length) {
+      obj.id = message.id;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<DBRequest_DBDelete>): DBRequest_DBDelete {
+    return DBRequest_DBDelete.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<DBRequest_DBDelete>): DBRequest_DBDelete {
+    const message = createBaseDBRequest_DBDelete();
+    message.entity = object.entity ?? "";
+    message.id = object.id?.map((e) => e) || [];
+    return message;
+  },
+};
+
 function createBaseData(): Data {
   return {
     raw: new Uint8Array(0),
@@ -8337,9 +9199,9 @@ export const ProcessorDefinition = {
     },
     processBindingsStream: {
       name: "ProcessBindingsStream",
-      requestType: DataBinding,
+      requestType: ProcessStreamRequest,
       requestStream: true,
-      responseType: ProcessBindingResponse,
+      responseType: ProcessStreamResponse,
       responseStream: true,
       options: {},
     },
@@ -8358,9 +9220,9 @@ export interface ProcessorServiceImplementation<CallContextExt = {}> {
     context: CallContext & CallContextExt,
   ): Promise<DeepPartial<ProcessBindingResponse>>;
   processBindingsStream(
-    request: AsyncIterable<DataBinding>,
+    request: AsyncIterable<ProcessStreamRequest>,
     context: CallContext & CallContextExt,
-  ): ServerStreamingMethodResult<DeepPartial<ProcessBindingResponse>>;
+  ): ServerStreamingMethodResult<DeepPartial<ProcessStreamResponse>>;
 }
 
 export interface ProcessorClient<CallOptionsExt = {}> {
@@ -8375,9 +9237,9 @@ export interface ProcessorClient<CallOptionsExt = {}> {
     options?: CallOptions & CallOptionsExt,
   ): Promise<ProcessBindingResponse>;
   processBindingsStream(
-    request: AsyncIterable<DeepPartial<DataBinding>>,
+    request: AsyncIterable<DeepPartial<ProcessStreamRequest>>,
     options?: CallOptions & CallOptionsExt,
-  ): AsyncIterable<ProcessBindingResponse>;
+  ): AsyncIterable<ProcessStreamResponse>;
 }
 
 function bytesFromBase64(b64: string): Uint8Array {

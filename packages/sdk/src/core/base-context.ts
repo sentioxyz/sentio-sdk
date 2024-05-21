@@ -2,13 +2,15 @@ import { ProcessResult, RecordMetaData } from '@sentio/protos'
 import { EventLoggerBinding } from './event-logger.js'
 import { Meter, Labels } from './meter.js'
 import { ChainId } from '@sentio/chain'
-import { mergeProcessResults } from '@sentio/runtime'
+import { mergeProcessResults, PluginManager } from '@sentio/runtime'
 import { Required } from 'utility-types'
 import { ServerError, Status } from 'nice-grpc'
+import { Store } from '@sentio/db'
 
 export abstract class BaseContext {
   meter: Meter
   eventLogger: EventLoggerBinding
+  private _store: Store
   protected baseLabels: Labels
   private active: boolean
 
@@ -18,8 +20,8 @@ export abstract class BaseContext {
     exports: [],
     gauges: [],
     states: {
-      configUpdated: false,
-    },
+      configUpdated: false
+    }
   }
 
   public update(res: Partial<ProcessResult>) {
@@ -35,6 +37,7 @@ export abstract class BaseContext {
     this.eventLogger = new EventLoggerBinding(this)
     this.baseLabels = baseLabels || {}
     this.active = true
+    this.initStore()
   }
 
   stopAndGetResult(): ProcessResult {
@@ -49,11 +52,26 @@ export abstract class BaseContext {
   getMetaData(name: string, labels: Labels): RecordMetaData {
     return {
       ...this.baseLabels,
-      ...this.getMetaDataInternal(name, labels),
+      ...this.getMetaDataInternal(name, labels)
     }
   }
 
   protected abstract getMetaDataInternal(name: string, labels: Labels): RecordMetaData
 
   abstract getChainId(): ChainId
+
+  get store() {
+    if (this._store == null) {
+      console.warn('Store is not set, please initialize the processor with your database schema first.')
+    }
+    return this._store
+  }
+
+  // this method must be called within the dbContextLocalStorage scope
+  initStore() {
+    const dbContext = PluginManager.INSTANCE.dbContextLocalStorage.getStore()
+    if (dbContext) {
+      this._store = new Store(dbContext)
+    }
+  }
 }

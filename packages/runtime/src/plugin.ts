@@ -1,4 +1,6 @@
 import { DataBinding, HandlerType, ProcessConfigResponse, ProcessResult, StartRequest } from '@sentio/protos'
+import { StoreContext } from '@sentio/db'
+import { AsyncLocalStorage } from 'node:async_hooks'
 
 export abstract class Plugin {
   name: string
@@ -13,6 +15,7 @@ export abstract class Plugin {
   stateDiff(config: ProcessConfigResponse): boolean {
     return false
   }
+
   async processBinding(request: DataBinding): Promise<ProcessResult> {
     return ProcessResult.create()
   }
@@ -21,6 +24,7 @@ export abstract class Plugin {
 export class PluginManager {
   static INSTANCE = new PluginManager()
 
+  dbContextLocalStorage = new AsyncLocalStorage<StoreContext | undefined>()
   plugins: Plugin[] = []
   typesToPlugin = new Map<HandlerType, Plugin>()
 
@@ -54,11 +58,13 @@ export class PluginManager {
     return this.plugins.some((plugin) => plugin.stateDiff(config))
   }
 
-  processBinding(request: DataBinding): Promise<ProcessResult> {
+  processBinding(request: DataBinding, dbContext?: StoreContext): Promise<ProcessResult> {
     const plugin = this.typesToPlugin.get(request.handlerType)
     if (!plugin) {
       throw new Error(`No plugin for ${request.handlerType}`)
     }
-    return plugin.processBinding(request)
+    return this.dbContextLocalStorage.run(dbContext, () => {
+      return plugin.processBinding(request)
+    })
   }
 }
