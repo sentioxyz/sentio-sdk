@@ -5,7 +5,7 @@ import { ChainId } from '@sentio/chain'
 import { mergeProcessResults, PluginManager } from '@sentio/runtime'
 import { Required } from 'utility-types'
 import { ServerError, Status } from 'nice-grpc'
-import { Store } from '@sentio/db'
+import { Store } from '../store/store.js'
 
 export abstract class BaseContext {
   meter: Meter

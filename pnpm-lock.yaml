@@ -343,21 +343,6 @@ importers:
         specifier: ^5.4.5
         version: 5.4.5
 
-  packages/db:
-    dependencies:
-      '@sentio/protos':
-        specifier: workspace:*
-        version: link:../protos
-      graphql:
-        specifier: ^16.8.1
-        version: 16.8.1
-      ix:
-        specifier: ^5.0.0
-        version: 5.0.0
-      rxjs:
-        specifier: ^7.8.1
-        version: 7.8.1
-
   packages/protos:
     dependencies:
       google-protobuf:
@@ -381,9 +366,6 @@ importers:
       '@grpc/grpc-js':
         specifier: ^1.9.14
         version: 1.10.7
-      '@sentio/db':
-        specifier: workspace:*
-        version: link:../db
       '@sentio/protos':
         specifier: workspace:*
         version: link:../protos
@@ -475,9 +457,6 @@ importers:
       '@sentio/chain':
         specifier: ^1.0.21
         version: 1.0.23
-      '@sentio/db':
-        specifier: workspace:*
-        version: link:../db
       '@sentio/ethers-v6':
         specifier: ^1.0.29
         version: 1.0.29(@sentio/ethers@6.7.1-patch.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typescript@5.4.5)

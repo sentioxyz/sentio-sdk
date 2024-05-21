@@ -1,4 +1,4 @@
-import { StoreContext } from '@sentio/db'
+import { StoreContext } from '../context.js'
 import { ProcessStreamResponse } from '@sentio/protos'
 
 export class MemoryDatabase {

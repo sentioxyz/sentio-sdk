@@ -1,5 +1,5 @@
 import { DataBinding, HandlerType, ProcessConfigResponse, ProcessResult, StartRequest } from '@sentio/protos'
-import { StoreContext } from '@sentio/db'
+import { StoreContext } from './db-context.js'
 import { AsyncLocalStorage } from 'node:async_hooks'
 
 export abstract class Plugin {

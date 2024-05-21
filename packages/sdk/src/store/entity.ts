@@ -15,7 +15,7 @@ export abstract class Entity {
   protected constructor(data: Record<string, any>) {
     Object.entries(data).forEach(([key, value]) => {
       if (Array.isArray(value)) {
-        this.data[key] = value.map(v => this.getIdFromEntity(v))
+        this.data[key] = value.map((v) => this.getIdFromEntity(v))
       } else {
         this.data[key] = this.getIdFromEntity(value)
       }

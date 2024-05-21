@@ -1,7 +1,8 @@
-import { Store, StoreContext } from '@sentio/db'
+import { Store } from '../store.js'
 import { User } from './generated/schema.js'
 import { MemoryDatabase } from './memory-database.js'
 import { afterAll, afterEach } from '@jest/globals'
+import { StoreContext } from '../context.js'
 
 describe('Test Database', () => {
   const storeContext = new StoreContext()

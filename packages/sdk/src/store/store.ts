@@ -12,8 +12,8 @@ export class Store {
       }
     })
 
-    const data =  await promise as any
-    if (data?.["id"] != null) {
+    const data = (await promise) as any
+    if (data?.['id'] != null) {
       return this.newEntity(entity as EntityClass<T>, data)
     }
     return undefined
@@ -32,7 +32,7 @@ export class Store {
     const promise = this.context.sendRequest({
       upsert: {
         entity: entity.constructor.name,
-        data: Array.isArray(entity) ? entity.map(e=>e.data) : [entity.data]
+        data: Array.isArray(entity) ? entity.map((e) => e.data) : [entity.data]
       }
     })
 
@@ -54,7 +54,7 @@ export class Store {
       }
     })
 
-    const list = await promise as any[]
+    const list = (await promise) as any[]
     return list.map((data) => {
       return this.newEntity(entity, data)
     })

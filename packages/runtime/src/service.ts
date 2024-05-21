@@ -21,8 +21,7 @@ import { PluginManager } from './plugin.js'
 import { errorString, mergeProcessResults } from './utils.js'
 import { freezeGlobalConfig, GLOBAL_CONFIG } from './global-config.js'
 
-import { StoreContext } from '@sentio/db'
-
+import { StoreContext } from './db-context.js'
 ;(BigInt.prototype as any).toJSON = function () {
   return this.toString()
 }

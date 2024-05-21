@@ -35,7 +35,9 @@
     "./sui/builtin/0x2": "./lib/sui/builtin/0x2.js",
     "./sui/builtin/0x3": "./lib/sui/builtin/0x3.js",
     "./fuel": "./lib/fuel/index.js",
-    "./fuel/codegen": "./lib/fuel/codegen/index.js"
+    "./fuel/codegen": "./lib/fuel/codegen/index.js",
+    "./store": "./lib/store/index.js",
+    "./store/codegen": "./lib/store/codegen.js"
   },
   "files": [
     "{lib,src}",
@@ -46,16 +48,16 @@
     "build": "pnpm gen && pnpm compile",
     "build:all": "pnpm --filter=$(node -p \"require('./package.json').name\")... build",
     "compile": "tsc && cp src/utils/*.csv lib/utils && cp src/tsup.config.ts lib",
-    "gen": "pnpm gen:eth && pnpm gen:aptos && pnpm gen:sui && pnpm gen:solana && pnpm gen:fuel && pnpm gen:db",
+    "gen": "pnpm gen:eth && pnpm gen:aptos && pnpm gen:sui && pnpm gen:solana && pnpm gen:fuel && pnpm gen:store",
     "gen:aptos": "tsx src/aptos/codegen/run.ts src/aptos/abis src/aptos/builtin && pnpm gen:aptos_test",
     "gen:aptos_test": "tsx src/aptos/codegen/run.ts src/aptos/tests/abis src/aptos/tests/types",
-    "gen:db": "tsx src/db/run.ts src/db/tests src/db/tests/generated",
     "gen:docs": "typedoc --options typedoc.json",
     "gen:eth": "tsx src/eth/codegen/run.ts src/eth/abis src/eth/builtin && pnpm gen:eth_test",
     "gen:eth_test": "tsx src/eth/codegen/run.ts src/eth/tests/abis/eth ./src/eth/tests/types",
     "gen:fuel": "tsx src/fuel/codegen/run.ts src/fuel/abis src/sui/builtin && pnpm gen:fuel_test",
     "gen:fuel_test": "tsx src/fuel/codegen/run.ts src/fuel/tests/abis src/fuel/tests/types",
     "gen:solana": "tsx src/solana/codegen/run.ts src/solana/tests/abis src/solana/tests/types",
+    "gen:store": "tsx src/store/run.ts src/store/tests src/store/tests/generated",
     "gen:sui": "tsx src/sui/codegen/run.ts src/sui/abis src/sui/builtin && pnpm gen:sui_test",
     "gen:sui_test": "tsx src/sui/codegen/run.ts src/sui/tests/abis src/sui/tests/types",
     "test": "NODE_OPTIONS=--experimental-vm-modules pnpm jest --runInBand --detectOpenHandles"
@@ -68,7 +70,6 @@
     "@project-serum/anchor": "^0.26.0",
     "@sentio/bigdecimal": "9.1.1-patch.3",
     "@sentio/chain": "^1.0.21",
-    "@sentio/db": "workspace:*",
     "@sentio/ethers-v6": "^1.0.29",
     "@sentio/protos": "workspace:*",
     "@sentio/runtime": "workspace:^",

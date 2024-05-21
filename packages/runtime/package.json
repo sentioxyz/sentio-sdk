@@ -26,12 +26,12 @@
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.9.14",
-    "@sentio/db": "workspace:*",
     "@sentio/protos": "workspace:*",
     "command-line-args": "^5.2.1",
     "command-line-usage": "^7.0.1",
     "fs-extra": "^11.2.0",
     "google-protobuf": "^3.21.2",
+    "ix": "^5.0.0",
     "long": "^5.2.3",
     "nice-grpc": "^2.1.7",
     "nice-grpc-client-middleware-retry": "^3.1.6",
@@ -41,8 +41,7 @@
     "prom-client": "^14.2.0",
     "protobufjs": "^7.2.6",
     "utility-types": "^3.11.0",
-    "winston": "^3.11.0",
-    "ix": "^5.0.0"
+    "winston": "^3.11.0"
   },
   "devDependencies": {
     "@types/command-line-args": "^5.2.3",

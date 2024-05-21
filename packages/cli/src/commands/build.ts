@@ -224,7 +224,7 @@ export async function codegen(genExample: boolean) {
     const src = path.resolve('.')
 
     // @ts-ignore dynamic import
-    const codegen = await import('@sentio/db/codegen')
+    const codegen = await import('@sentio/sdk/store/codegen')
     const output = path.resolve('src', 'schema')
     fs.emptyDirSync(output)
     await codegen.codegen(src, output)

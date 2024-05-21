@@ -1,4 +1,4 @@
-import { codegen } from '@sentio/db/codegen'
+import { codegen } from './codegen.js'
 
 if (process.argv.length > 3) {
   const srcFile = process.argv[2]
