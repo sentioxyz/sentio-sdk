@@ -89,30 +89,42 @@ export class FuelProcessor implements FuelBaseProcessor<FuelProcessorConfig> {
 
     const callHandler = {
       handler: async (call: Data_FuelCall) => {
-        const contract = new Contract(this.config.address, abi, this.provider)
-        const gqlTransaction = call.transaction
-        const tx = decodeFuelTransactionWithAbi(gqlTransaction, { [this.config.address]: abi }, this.provider)
+        try {
+          const contract = new Contract(this.config.address, abi, this.provider)
+          const gqlTransaction = call.transaction
+          const tx = decodeFuelTransactionWithAbi(gqlTransaction, { [this.config.address]: abi }, this.provider)
 
-        const ctx = new FuelContext(
-          this.config.chainId,
-          this.config.address,
-          this.config.name ?? this.config.address,
-          tx
-        )
-        for (const op of tx.operations) {
-          for (const call of op.calls || []) {
-            if (names.has(call.functionName)) {
-              const fn = contract.functions[call.functionName]
-              const args = Object.values(call.argumentsProvided || {})
-              const scope = fn(...args)
-              const invocationResult = new FuelCall(scope, tx, false, call.argumentsProvided, tx.logs)
+          const ctx = new FuelContext(
+            this.config.chainId,
+            this.config.address,
+            this.config.name ?? this.config.address,
+            tx
+          )
+          for (const op of tx.operations) {
+            for (const call of op.calls || []) {
+              if (names.has(call.functionName)) {
+                const fn = contract.functions[call.functionName]
+                const args = Object.values(call.argumentsProvided || {})
+                const scope = fn(...args)
+                const invocationResult = new FuelCall(scope, tx, false, call.argumentsProvided, tx.logs)
+                await handler(invocationResult, ctx)
+              }
+            }
+          }
 
-              await handler(invocationResult, ctx)
+          return ctx.stopAndGetResult()
+        } catch (e) {
+          console.error(e)
+          return {
+            gauges: [],
+            counters: [],
+            events: [],
+            exports: [],
+            states: {
+              configUpdated: false
             }
           }
         }
-
-        return ctx.stopAndGetResult()
       },
       fetchConfig: {
         filters: Object.values(filters)
@@ -130,27 +142,40 @@ export class FuelProcessor implements FuelBaseProcessor<FuelProcessorConfig> {
 
     const callHandler = {
       handler: async (call: Data_FuelCall) => {
-        const gqlTransaction = call.transaction
-        const tx = decodeFuelTransactionWithAbi(
-          gqlTransaction,
-          { [this.config.address]: this.config.abi! },
-          this.provider
-        )
-
-        const results: ProcessResult[] = []
-        const logs = (tx.logs || []).filter((log) => logIds.has(log.logId))
-        for (const log of logs) {
-          const ctx = new FuelContext(
-            this.config.chainId,
-            this.config.address,
-            this.config.name ?? this.config.address,
-            tx
+        try {
+          const gqlTransaction = call.transaction
+          const tx = decodeFuelTransactionWithAbi(
+            gqlTransaction,
+            { [this.config.address]: this.config.abi! },
+            this.provider
           )
-          ctx.setLogIndex(log.receiptIndex)
-          await handler(log, ctx)
-          results.push(ctx.stopAndGetResult())
+
+          const results: ProcessResult[] = []
+          const logs = (tx.logs || []).filter((log) => logIds.has(log.logId))
+          for (const log of logs) {
+            const ctx = new FuelContext(
+              this.config.chainId,
+              this.config.address,
+              this.config.name ?? this.config.address,
+              tx
+            )
+            ctx.setLogIndex(log.receiptIndex)
+            await handler(log, ctx)
+            results.push(ctx.stopAndGetResult())
+          }
+          return mergeProcessResults(results)
+        } catch (e) {
+          console.error(e)
+          return {
+            gauges: [],
+            counters: [],
+            events: [],
+            exports: [],
+            states: {
+              configUpdated: false
+            }
+          }
         }
-        return mergeProcessResults(results)
       },
       logConfig: {
         logIds: Array.from(logIds)
