@@ -158,6 +158,18 @@ function genField(field: GraphQLField<any, any>) {
   set ${field.name}(value: ${type}) { this.set("${field.name}", value) }`
 }
 
+function genDataType(t: GraphQLObjectType<any, any>) {
+  let output = `type ${t.name}Data = `
+  const relationsFields = Object.values(t.getFields()).filter((f) => isObject(f.type))
+  if (relationsFields.length > 0) {
+    output += `Omit<${t.name}, ${relationsFields.map((f) => `"${f.name}"`).join(' | ')}>`
+    output += ' & {' + relationsFields.map((f) => `${f.name}?: ${isList(f.type) ? 'ID[]' : 'ID'}`).join(', ') + '}'
+  } else {
+    output += `${t.name}`
+  }
+  return output
+}
+
 function genEntity(t: GraphQLObjectType<any, any>) {
   const decorators = t.astNode?.directives?.map(directive2decorator) || []
 
@@ -172,9 +184,10 @@ function genEntity(t: GraphQLObjectType<any, any>) {
   }
 
   return `
+${genDataType(t)}
 ${decorators.join('\n')}
 export class ${t.name} extends Entity${impls} {
-  constructor(data: Partial<${t.name}>) {
+  constructor(data: Partial<${t.name}Data>) {
     super(data)
   }
 ${Object.values(t.getFields()).map(genField).join('\n')}

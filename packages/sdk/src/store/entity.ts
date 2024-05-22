@@ -12,7 +12,7 @@ export abstract class Entity {
 
   private _store: Store | undefined
   data: Record<string, any> = {}
-  protected constructor(data: Record<string, any>) {
+  protected constructor(data: any) {
     Object.entries(data).forEach(([key, value]) => {
       if (Array.isArray(value)) {
         this.data[key] = value.map((v) => this.getIdFromEntity(v))
