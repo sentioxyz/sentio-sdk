@@ -41,7 +41,7 @@ async function codegenInternal(schema: GraphQLSchema, source: string, target: st
     "import {entity, derivedFrom, BigDecimal, DateTime, Json, Bytes, ID, Entity, Store} from '@sentio/sdk/store'",
     `import { DatabaseSchema } from "@sentio/sdk"`
   ]
-
+  const entities: string[] = []
   for (const t of Object.values(schema.getTypeMap())) {
     if (t.name.startsWith('__')) {
       continue
@@ -50,6 +50,7 @@ async function codegenInternal(schema: GraphQLSchema, source: string, target: st
     if (t instanceof GraphQLObjectType) {
       const entityContent = genEntity(t)
       results.push(entityContent)
+      entities.push(t.name)
     }
     if (t instanceof GraphQLEnumType) {
       results.push(genEnum(t))
@@ -63,7 +64,12 @@ async function codegenInternal(schema: GraphQLSchema, source: string, target: st
     results.join('\n') +
     `\n
 const source = \`${source.replaceAll('`', '`')}\`
-DatabaseSchema.register(source)
+DatabaseSchema.register({
+  source,
+  entities: {
+    ${entities.map((e) => `"${e}": ${e}`).join(',\n\t\t')}
+  }
+})
 `
   await mkdirp(path.dirname(target))
 

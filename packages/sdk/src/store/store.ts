@@ -1,5 +1,6 @@
 import { Entity, EntityClass } from './entity.js'
 import { StoreContext } from './context.js'
+import { DatabaseSchema } from '../core/index.js'
 
 export class Store {
   constructor(private readonly context: StoreContext) {}
@@ -12,9 +13,9 @@ export class Store {
       }
     })
 
-    const data =  await promise as any
-    if (data?.["id"] != null) {
-      return this.newEntity(entity as EntityClass<T>, data)
+    const data = (await promise) as any
+    if (data?.['id'] != null) {
+      return this.newEntity(entity, data)
     }
     return undefined
   }
@@ -32,7 +33,7 @@ export class Store {
     const promise = this.context.sendRequest({
       upsert: {
         entity: entity.constructor.name,
-        data: Array.isArray(entity) ? entity.map(e=>e.data) : [entity.data]
+        data: Array.isArray(entity) ? entity.map((e) => e.data) : [entity.data]
       }
     })
 
@@ -54,13 +55,22 @@ export class Store {
       }
     })
 
-    const list = await promise as any[]
+    const list = (await promise) as any[]
     return list.map((data) => {
       return this.newEntity(entity, data)
     })
   }
 
-  private newEntity<T extends Entity>(entity: EntityClass<T>, data: any) {
+  private newEntity<T extends Entity>(entity: EntityClass<T> | string, data: any) {
+    if (typeof entity == 'string') {
+      const en = DatabaseSchema.findEntity(entity)
+      if (!en) {
+        // it is an interface
+        return new Entity(data) as T
+      }
+      entity = en
+    }
+
     const e = new (entity as EntityClass<T>)(data)
     e.store = this
     return e

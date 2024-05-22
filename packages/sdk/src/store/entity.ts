@@ -5,14 +5,14 @@ export interface EntityClass<T extends Entity> {
   new (data: any): T
 }
 
-export abstract class Entity {
+export class Entity {
   get id(): ID {
     return this.get('id')
   }
 
   private _store: Store | undefined
   data: Record<string, any> = {}
-  protected constructor(data: any) {
+  constructor(data: any) {
     Object.entries(data).forEach(([key, value]) => {
       if (Array.isArray(value)) {
         this.data[key] = value.map((v) => this.getIdFromEntity(v))

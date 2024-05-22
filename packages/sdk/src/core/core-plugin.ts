@@ -48,7 +48,9 @@ export class CorePlugin extends Plugin {
 
     if (DatabaseSchemaState.INSTANCE.getValues().length > 0) {
       config.dbSchema = {
-        gqlSchema: DatabaseSchemaState.INSTANCE.getValues().join('\n\n')
+        gqlSchema: DatabaseSchemaState.INSTANCE.getValues()
+          .map((e) => e.source)
+          .join('\n\n')
       }
     }
   }
