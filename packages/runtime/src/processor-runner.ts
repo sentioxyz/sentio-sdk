@@ -16,7 +16,7 @@ import { ProcessorServiceImpl } from './service.js'
 import { Endpoints } from './endpoints.js'
 import { FullProcessorServiceImpl } from './full-service.js'
 import { ChainConfig } from './chain-config.js'
-import { setupJsonLogger } from './logger.js'
+import { setupLogger } from './logger.js'
 
 const mergedRegistry = Registry.merge([globalRegistry, niceGrpcRegistry])
 
@@ -39,12 +39,8 @@ const optionDefinitions = [
 
 const options = commandLineArgs(optionDefinitions, { partial: true })
 
-if (options['log-format'] === 'json') {
-  setupJsonLogger()
-}
-if (options.debug) {
-  console.log('Starting with', options.target)
-}
+setupLogger(options['log-format'] === 'json', options.debug)
+console.debug('Starting with', options.target)
 
 Error.stackTraceLimit = 20
 
@@ -69,9 +65,7 @@ for (const [id, config] of Object.entries(chainsConfig)) {
   }
 }
 
-if (options.debug) {
-  console.log('Starting Server', options)
-}
+console.debug('Starting Server', options)
 
 const server = createServer({
   'grpc.max_send_message_length': 384 * 1024 * 1024,
@@ -82,9 +76,7 @@ const server = createServer({
   .use(errorDetailsServerMiddleware)
 const baseService = new ProcessorServiceImpl(async () => {
   const m = await import(options.target)
-  if (options.debug) {
-    console.log('Module loaded', m)
-  }
+  console.debug('Module loaded', m)
   return m
 }, server.shutdown)
 const service = new FullProcessorServiceImpl(baseService)

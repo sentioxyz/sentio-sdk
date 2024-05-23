@@ -1,6 +1,6 @@
 import { createLogger, format, transports } from 'winston'
 
-export function setupJsonLogger() {
+export function setupLogger(json: boolean, enableDebug: boolean) {
   const utilFormatter = {
     transform: (info: any) => {
       const stringRes = []
@@ -32,8 +32,9 @@ export function setupJsonLogger() {
       format.timestamp({ format: 'YYYY-MM-DDTHH:mm:ss.SSSZ' }),
       utilFormatter,
       format.errors({ stack: true }),
-      format.json()
+      json ? format.json() : format.simple()
     ),
+    level: enableDebug ? 'debug' : 'info',
     transports: [new transports.Console()]
   })
 
