@@ -29,7 +29,7 @@ export class Store {
     })
   }
 
-  async upsert<T extends Entity>(entity: T | T[]): Promise<T> {
+  async upsert<T extends Entity>(entity: T | T[]): Promise<void> {
     const promise = this.context.sendRequest({
       upsert: {
         entity: entity.constructor.prototype.entityName,
@@ -44,7 +44,7 @@ export class Store {
       entity.store = this
     }
 
-    return promise as Promise<T>
+    await promise
   }
 
   async list<T extends Entity>(entity: EntityClass<T>, limit?: number, offset?: number): Promise<T[]> {
