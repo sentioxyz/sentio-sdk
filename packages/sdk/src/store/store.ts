@@ -38,12 +38,6 @@ export class Store {
       }
     })
 
-    if (Array.isArray(entity)) {
-      entity.forEach((e) => (e.store = this))
-    } else {
-      entity.store = this
-    }
-
     await promise
   }
 
@@ -72,8 +66,6 @@ export class Store {
       entity = en
     }
 
-    const e = new (entity as EntityClass<T>)(data)
-    e.store = this
-    return e
+    return new (entity as EntityClass<T>)(data)
   }
 }

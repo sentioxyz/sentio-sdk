@@ -20,7 +20,7 @@ describe('Test Database', () => {
 
     await store.upsert(user)
     const u = await store.get(User, 'test-id-1')
-
+    console.log(u)
     expect(u).toEqual(user)
   })
 

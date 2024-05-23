@@ -167,23 +167,31 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       for await (const request of requests) {
         if (request.binding) {
           const binding = request.binding
-          PluginManager.INSTANCE.processBinding(binding, dbContext).then((result) => {
-            dbContext.subject.next({
-              result,
-              processId: request.processId
+          PluginManager.INSTANCE.processBinding(binding, dbContext)
+            .then((result) => {
+              dbContext.subject.next({
+                result,
+                processId: request.processId
+              })
+              // dbContext.subject.complete()
+              recordRuntimeInfo(result, binding.handlerType)
             })
-            // dbContext.subject.complete()
-            recordRuntimeInfo(result, binding.handlerType)
-          })
+            .catch((e) => {
+              dbContext.subject.error(e)
+            })
         }
         if (request.dbResult) {
           dbContext.result(request.dbResult)
         }
       }
       resolve(null)
-    }).then(() => {
-      dbContext.subject.complete()
     })
+      .then(() => {
+        dbContext.subject.complete()
+      })
+      .catch((e) => {
+        dbContext.subject.error(e)
+      })
     yield* from(dbContext.subject).pipe(withAbort(context.signal))
   }
 }
