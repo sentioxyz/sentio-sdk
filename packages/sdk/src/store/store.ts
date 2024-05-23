@@ -33,7 +33,8 @@ export class Store {
     const promise = this.context.sendRequest({
       upsert: {
         entity: entity.constructor.prototype.entityName,
-        data: Array.isArray(entity) ? entity.map((e) => e.data) : [entity.data]
+        data: Array.isArray(entity) ? entity.map((e) => e.data) : [entity.data],
+        id: Array.isArray(entity) ? entity.map((e) => e.id) : [entity.id]
       }
     })
 

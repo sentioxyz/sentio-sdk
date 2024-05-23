@@ -1,8 +1,9 @@
 import { Store } from '../store.js'
-import { User } from './generated/schema.js'
+import { User, Transaction } from './generated/schema.js'
 import { MemoryDatabase } from './memory-database.js'
 import { afterAll, afterEach } from '@jest/globals'
 import { StoreContext } from '../context.js'
+import { BigDecimal } from '@sentio/bigdecimal'
 
 describe('Test Database', () => {
   const storeContext = new StoreContext()
@@ -55,6 +56,19 @@ describe('Test Database', () => {
 
     const list = await store.list(User, 2, 0)
     expect(list).toEqual([user1, user2])
+  })
+
+  it('type tests', async () => {
+    const store = new Store(storeContext)
+    const tx = new Transaction({
+      id: 'test-id-1',
+      gas: 100n,
+      gasPrice: new BigDecimal('100.0'),
+      raw: new Uint8Array([1, 2, 3])
+    })
+    await store.upsert(tx)
+    const tx2 = await store.get(Transaction, 'test-id-1')
+    expect(tx2).toEqual(tx)
   })
 
   afterEach(() => {
