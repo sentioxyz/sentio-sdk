@@ -1,7 +1,10 @@
 type Constructor = { new (...args: any[]): any }
 
-export function entity<T extends Constructor>(constructor: T, context: any) {
-  return constructor
+export function entity(name: string) {
+  return function <T extends Constructor>(constructor: T, context: any) {
+    constructor.prototype.entityName = name
+    return constructor
+  }
 }
 
 export function derivedFrom(field: string) {

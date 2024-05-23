@@ -8,7 +8,7 @@ export class Store {
   async get<T extends Entity>(entity: EntityClass<T> | string, id: string): Promise<T | undefined> {
     const promise = this.context.sendRequest({
       get: {
-        entity: typeof entity == 'string' ? entity : entity.name,
+        entity: typeof entity == 'string' ? entity : entity.prototype.entityName,
         id
       }
     })
@@ -23,7 +23,7 @@ export class Store {
   async delete(entity: EntityClass<any>, id: string | string[]): Promise<void> {
     await this.context.sendRequest({
       delete: {
-        entity: entity.name,
+        entity: entity.prototype.entityName,
         id: Array.isArray(id) ? id : [id]
       }
     })
@@ -32,7 +32,7 @@ export class Store {
   async upsert<T extends Entity>(entity: T | T[]): Promise<T> {
     const promise = this.context.sendRequest({
       upsert: {
-        entity: entity.constructor.name,
+        entity: entity.constructor.prototype.entityName,
         data: Array.isArray(entity) ? entity.map((e) => e.data) : [entity.data]
       }
     })
@@ -49,7 +49,7 @@ export class Store {
   async list<T extends Entity>(entity: EntityClass<T>, limit?: number, offset?: number): Promise<T[]> {
     const promise = this.context.sendRequest({
       list: {
-        entity: entity.name,
+        entity: entity.constructor.prototype.entityName,
         limit,
         offset
       }

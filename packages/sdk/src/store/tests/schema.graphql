@@ -4,6 +4,7 @@ type Transaction @entity {
   gas: BigInt!
   gasPrice: BigDecimal!
   isSuccess: Boolean
+  raw: Bytes
   receipts: [TransactionReceipt!]! @derivedFrom(field: "transaction")
 }
 
