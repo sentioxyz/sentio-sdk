@@ -1,5 +1,5 @@
 import { Subject } from 'rxjs'
-import { DBRequest, DBResponse, DeepPartial, ProcessStreamResponse } from '@sentio/protos'
+import { DBRequest, DBResponse, DeepPartial, ProcessResult, ProcessStreamResponse } from '@sentio/protos'
 
 type Request = Omit<DBRequest, 'opId'>
 
@@ -32,7 +32,7 @@ export class StoreContext {
   result(dbResult: DBResponse) {
     const opId = dbResult.opId
     const defer = this.defers.get(opId)
-    console.log('received db result ', opId, dbResult)
+    console.debug('received db result ', opId, dbResult)
     if (defer) {
       if (dbResult.error) {
         defer.reject(dbResult.error)
@@ -41,5 +41,17 @@ export class StoreContext {
       }
       this.defers.delete(opId)
     }
+  }
+
+  error(processId: number, e: any) {
+    const errorResult = ProcessResult.create({
+      states: {
+        error: e?.toString()
+      }
+    })
+    this.subject.next({
+      result: errorResult,
+      processId
+    })
   }
 }

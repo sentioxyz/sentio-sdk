@@ -758,13 +758,13 @@ export interface DBRequest_DBList {
 }
 
 export interface DBRequest_DBUpsert {
-  entity: string;
+  entity: string[];
   id: string[];
   data: { [key: string]: any }[];
 }
 
 export interface DBRequest_DBDelete {
-  entity: string;
+  entity: string[];
   id: string[];
 }
 
@@ -873,6 +873,7 @@ export interface DataBinding {
 
 export interface StateResult {
   configUpdated: boolean;
+  error?: string | undefined;
 }
 
 export interface ProcessResult {
@@ -6004,13 +6005,13 @@ export const DBRequest_DBList = {
 };
 
 function createBaseDBRequest_DBUpsert(): DBRequest_DBUpsert {
-  return { entity: "", id: [], data: [] };
+  return { entity: [], id: [], data: [] };
 }
 
 export const DBRequest_DBUpsert = {
   encode(message: DBRequest_DBUpsert, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.entity !== "") {
-      writer.uint32(10).string(message.entity);
+    for (const v of message.entity) {
+      writer.uint32(10).string(v!);
     }
     for (const v of message.id) {
       writer.uint32(18).string(v!);
@@ -6033,7 +6034,7 @@ export const DBRequest_DBUpsert = {
             break;
           }
 
-          message.entity = reader.string();
+          message.entity.push(reader.string());
           continue;
         case 2:
           if (tag !== 18) {
@@ -6060,7 +6061,7 @@ export const DBRequest_DBUpsert = {
 
   fromJSON(object: any): DBRequest_DBUpsert {
     return {
-      entity: isSet(object.entity) ? globalThis.String(object.entity) : "",
+      entity: globalThis.Array.isArray(object?.entity) ? object.entity.map((e: any) => globalThis.String(e)) : [],
       id: globalThis.Array.isArray(object?.id) ? object.id.map((e: any) => globalThis.String(e)) : [],
       data: globalThis.Array.isArray(object?.data) ? [...object.data] : [],
     };
@@ -6068,7 +6069,7 @@ export const DBRequest_DBUpsert = {
 
   toJSON(message: DBRequest_DBUpsert): unknown {
     const obj: any = {};
-    if (message.entity !== "") {
+    if (message.entity?.length) {
       obj.entity = message.entity;
     }
     if (message.id?.length) {
@@ -6085,7 +6086,7 @@ export const DBRequest_DBUpsert = {
   },
   fromPartial(object: DeepPartial<DBRequest_DBUpsert>): DBRequest_DBUpsert {
     const message = createBaseDBRequest_DBUpsert();
-    message.entity = object.entity ?? "";
+    message.entity = object.entity?.map((e) => e) || [];
     message.id = object.id?.map((e) => e) || [];
     message.data = object.data?.map((e) => e) || [];
     return message;
@@ -6093,13 +6094,13 @@ export const DBRequest_DBUpsert = {
 };
 
 function createBaseDBRequest_DBDelete(): DBRequest_DBDelete {
-  return { entity: "", id: [] };
+  return { entity: [], id: [] };
 }
 
 export const DBRequest_DBDelete = {
   encode(message: DBRequest_DBDelete, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.entity !== "") {
-      writer.uint32(10).string(message.entity);
+    for (const v of message.entity) {
+      writer.uint32(10).string(v!);
     }
     for (const v of message.id) {
       writer.uint32(18).string(v!);
@@ -6119,7 +6120,7 @@ export const DBRequest_DBDelete = {
             break;
           }
 
-          message.entity = reader.string();
+          message.entity.push(reader.string());
           continue;
         case 2:
           if (tag !== 18) {
@@ -6139,14 +6140,14 @@ export const DBRequest_DBDelete = {
 
   fromJSON(object: any): DBRequest_DBDelete {
     return {
-      entity: isSet(object.entity) ? globalThis.String(object.entity) : "",
+      entity: globalThis.Array.isArray(object?.entity) ? object.entity.map((e: any) => globalThis.String(e)) : [],
       id: globalThis.Array.isArray(object?.id) ? object.id.map((e: any) => globalThis.String(e)) : [],
     };
   },
 
   toJSON(message: DBRequest_DBDelete): unknown {
     const obj: any = {};
-    if (message.entity !== "") {
+    if (message.entity?.length) {
       obj.entity = message.entity;
     }
     if (message.id?.length) {
@@ -6160,7 +6161,7 @@ export const DBRequest_DBDelete = {
   },
   fromPartial(object: DeepPartial<DBRequest_DBDelete>): DBRequest_DBDelete {
     const message = createBaseDBRequest_DBDelete();
-    message.entity = object.entity ?? "";
+    message.entity = object.entity?.map((e) => e) || [];
     message.id = object.id?.map((e) => e) || [];
     return message;
   },
@@ -7786,13 +7787,16 @@ export const DataBinding = {
 };
 
 function createBaseStateResult(): StateResult {
-  return { configUpdated: false };
+  return { configUpdated: false, error: undefined };
 }
 
 export const StateResult = {
   encode(message: StateResult, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.configUpdated !== false) {
       writer.uint32(8).bool(message.configUpdated);
+    }
+    if (message.error !== undefined) {
+      writer.uint32(18).string(message.error);
     }
     return writer;
   },
@@ -7811,6 +7815,13 @@ export const StateResult = {
 
           message.configUpdated = reader.bool();
           continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.error = reader.string();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -7821,13 +7832,19 @@ export const StateResult = {
   },
 
   fromJSON(object: any): StateResult {
-    return { configUpdated: isSet(object.configUpdated) ? globalThis.Boolean(object.configUpdated) : false };
+    return {
+      configUpdated: isSet(object.configUpdated) ? globalThis.Boolean(object.configUpdated) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : undefined,
+    };
   },
 
   toJSON(message: StateResult): unknown {
     const obj: any = {};
     if (message.configUpdated !== false) {
       obj.configUpdated = message.configUpdated;
+    }
+    if (message.error !== undefined) {
+      obj.error = message.error;
     }
     return obj;
   },
@@ -7838,6 +7855,7 @@ export const StateResult = {
   fromPartial(object: DeepPartial<StateResult>): StateResult {
     const message = createBaseStateResult();
     message.configUpdated = object.configUpdated ?? false;
+    message.error = object.error ?? undefined;
     return message;
   },
 };

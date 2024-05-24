@@ -444,12 +444,12 @@ message DBRequest {
     uint32 offset = 3;
   }
   message DBUpsert {
-    string entity = 1;
+    repeated string entity = 1;
     repeated string id = 2;
     repeated google.protobuf.Struct data = 3;
   }
   message DBDelete {
-    string entity = 1;
+    repeated string entity = 1;
     repeated string id = 2;
   }
 }
@@ -555,6 +555,8 @@ message StateResult {
   // Whether config update because of dynamic contract processor creation
   // Currently only support log handler in ethereum
   bool config_updated = 1;
+  // whether the processor run is failed
+  optional string error = 2;
 }
 
 message ProcessResult {

@@ -177,7 +177,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
               recordRuntimeInfo(result, binding.handlerType)
             })
             .catch((e) => {
-              dbContext.subject.error(e)
+              dbContext.error(request.processId, e)
             })
         }
         if (request.dbResult) {
@@ -190,6 +190,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         dbContext.subject.complete()
       })
       .catch((e) => {
+        // should not happen
         dbContext.subject.error(e)
       })
     yield* from(dbContext.subject).pipe(withAbort(context.signal))

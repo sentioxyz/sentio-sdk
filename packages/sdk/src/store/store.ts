@@ -21,20 +21,29 @@ export class Store {
   }
 
   async delete(entity: EntityClass<any>, id: string | string[]): Promise<void> {
+    const toBeDeleted = []
+    if (Array.isArray(id)) {
+      for (const i of id) {
+        toBeDeleted.push({ entity: entity.prototype.entityName, id: i })
+      }
+    } else {
+      toBeDeleted.push({ entity: entity.prototype.entityName, id })
+    }
     await this.context.sendRequest({
       delete: {
-        entity: entity.prototype.entityName,
-        id: Array.isArray(id) ? id : [id]
+        entity: toBeDeleted.map((e) => e.entity) as string[],
+        id: toBeDeleted.map((e) => e.id) as string[]
       }
     })
   }
 
   async upsert<T extends Entity>(entity: T | T[]): Promise<void> {
+    const entities = Array.isArray(entity) ? entity : [entity]
     const promise = this.context.sendRequest({
       upsert: {
-        entity: entity.constructor.prototype.entityName,
-        data: Array.isArray(entity) ? entity.map((e) => e.data) : [entity.data],
-        id: Array.isArray(entity) ? entity.map((e) => e.id) : [entity.id]
+        entity: entities.map((e) => e.constructor.prototype.entityName),
+        data: entities.map((e) => e.data),
+        id: entities.map((e) => e.id)
       }
     })
 

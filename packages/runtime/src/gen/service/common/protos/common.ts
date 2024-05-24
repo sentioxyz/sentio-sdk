@@ -1821,6 +1821,7 @@ export interface Notification {
   project: Project | undefined;
   attributes: { [key: string]: string };
   read: boolean;
+  repeat: number;
 }
 
 export interface Notification_AttributesEntry {
@@ -12123,6 +12124,7 @@ function createBaseNotification(): Notification {
     project: undefined,
     attributes: {},
     read: false,
+    repeat: 0,
   };
 }
 
@@ -12163,6 +12165,9 @@ export const Notification = {
     });
     if (message.read !== false) {
       writer.uint32(104).bool(message.read);
+    }
+    if (message.repeat !== 0) {
+      writer.uint32(112).uint32(message.repeat);
     }
     return writer;
   },
@@ -12261,6 +12266,13 @@ export const Notification = {
 
           message.read = reader.bool();
           continue;
+        case 14:
+          if (tag !== 112) {
+            break;
+          }
+
+          message.repeat = reader.uint32();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -12289,6 +12301,7 @@ export const Notification = {
         }, {})
         : {},
       read: isSet(object.read) ? globalThis.Boolean(object.read) : false,
+      repeat: isSet(object.repeat) ? globalThis.Number(object.repeat) : 0,
     };
   },
 
@@ -12336,6 +12349,9 @@ export const Notification = {
     if (message.read !== false) {
       obj.read = message.read;
     }
+    if (message.repeat !== 0) {
+      obj.repeat = Math.round(message.repeat);
+    }
     return obj;
   },
 
@@ -12366,6 +12382,7 @@ export const Notification = {
       {},
     );
     message.read = object.read ?? false;
+    message.repeat = object.repeat ?? 0;
     return message;
   },
 };

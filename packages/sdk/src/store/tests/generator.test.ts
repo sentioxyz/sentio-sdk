@@ -26,10 +26,10 @@ class AsyncContext {
     const opId = dbResult.opId
     const defer = this.defers.get(opId)
     if (defer) {
-      if (dbResult.data) {
-        defer.resolve(dbResult.data)
+      if (dbResult.error) {
+        defer.reject(dbResult.error)
       } else {
-        defer.reject('no data')
+        defer.resolve(dbResult.data)
       }
       this.defers.delete(opId)
     }

@@ -183,7 +183,16 @@ function genDataType(t: GraphQLObjectType<any, any>) {
   const relationsFields = Object.values(t.getFields()).filter((f) => isObject(f.type))
   if (relationsFields.length > 0) {
     output += `Omit<${t.name}, ${relationsFields.map((f) => `"${f.name}"`).join(' | ')}>`
-    output += ' & {' + relationsFields.map((f) => `${f.name}?: ${isList(f.type) ? 'ID[]' : 'ID'}`).join(', ') + '}'
+
+    output +=
+      ' & {' +
+      relationsFields
+        .map((f) => {
+          const type = genType(getElementType(f.type))
+          return `${f.name}?: ${isList(f.type) ? `Array<ID|${type}>` : `ID | ${type}`}`
+        })
+        .join(', ') +
+      '}'
   } else {
     output += `${t.name}`
   }
