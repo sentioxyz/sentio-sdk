@@ -68,7 +68,9 @@ describe('Test Database', () => {
     })
     await store.upsert(tx)
     const tx2 = await store.get(Transaction, 'test-id-1')
-    expect(tx2).toEqual(tx)
+    expect(tx2?.gas).toEqual(tx.gas)
+    expect(tx2?.id).toEqual(tx.id)
+    expect(tx2?.gasPrice).toEqual(tx.gasPrice)
   })
 
   afterEach(() => {

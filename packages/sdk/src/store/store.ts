@@ -1,6 +1,7 @@
 import { Entity, EntityClass } from './entity.js'
 import { StoreContext } from './context.js'
 import { DatabaseSchema } from '../core/index.js'
+import { BigDecimal } from '@sentio/bigdecimal'
 
 export class Store {
   constructor(private readonly context: StoreContext) {}
@@ -42,7 +43,7 @@ export class Store {
     const promise = this.context.sendRequest({
       upsert: {
         entity: entities.map((e) => e.constructor.prototype.entityName),
-        data: entities.map((e) => e.data),
+        data: entities.map((e) => serialize(e.data)),
         id: entities.map((e) => e.id)
       }
     })
@@ -77,4 +78,30 @@ export class Store {
 
     return new (entity as EntityClass<T>)(data)
   }
+}
+
+function serialize(data: Record<string, any>) {
+  const ret: Record<string, any> = {}
+  for (const [k, v] of Object.entries(data)) {
+    if (v instanceof Entity) {
+      ret[k] = v.id
+    } else if (Array.isArray(v) && v[0] instanceof Entity) {
+      ret[k] = v.map((e) => e.id)
+    } else if (typeof v === 'bigint') {
+      ret[k] = v.toString()
+    } else if (typeof v === 'object') {
+      if (v instanceof Date) {
+        ret[k] = v.toISOString()
+      } else if (v instanceof Uint8Array) {
+        ret[k] = Buffer.from(v).toString('hex')
+      } else if (v instanceof BigDecimal) {
+        ret[k] = v.toString()
+      } else {
+        ret[k] = serialize(v)
+      }
+    } else {
+      ret[k] = v
+    }
+  }
+  return ret
 }
