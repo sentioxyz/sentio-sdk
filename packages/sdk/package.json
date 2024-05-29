@@ -62,6 +62,9 @@
     "gen:sui_test": "tsx src/sui/codegen/run.ts src/sui/tests/abis src/sui/tests/types",
     "test": "NODE_OPTIONS=--experimental-vm-modules pnpm jest --runInBand --detectOpenHandles"
   },
+  "resolutions": {
+    "ethers": "npm:@sentio/ethers@6.7.1-patch.4"
+  },
   "dependencies": {
     "@aptos-labs/ts-sdk": "~1.14.0",
     "@coral-xyz/borsh": "^0.30.0",
