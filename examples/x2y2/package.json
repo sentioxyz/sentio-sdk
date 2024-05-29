@@ -12,8 +12,7 @@
     "upload": "sentio upload"
   },
   "dependencies": {
-    "@sentio/sdk": "workspace:*",
-    "ethers": "*"
+    "@sentio/sdk": "workspace:*"
   },
   "devDependencies": {
     "@sentio/cli": "workspace:*"
