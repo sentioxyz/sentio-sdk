@@ -1,4 +1,5 @@
 {
+  "encoding": "1",
   "types": [
     {
       "typeId": 0,
@@ -226,7 +227,7 @@
   ],
   "loggedTypes": [
     {
-      "logId": 0,
+      "logId": "1515152261580153489",
       "loggedType": {
         "name": "",
         "type": 12,
@@ -234,7 +235,7 @@
       }
     },
     {
-      "logId": 1,
+      "logId": "9006093109815063660",
       "loggedType": {
         "name": "",
         "type": 10,
@@ -242,7 +243,7 @@
       }
     },
     {
-      "logId": 2,
+      "logId": "14631882454972838106",
       "loggedType": {
         "name": "",
         "type": 9,
@@ -250,7 +251,7 @@
       }
     },
     {
-      "logId": 3,
+      "logId": "15520703124961489725",
       "loggedType": {
         "name": "",
         "type": 11,
@@ -258,15 +259,7 @@
       }
     },
     {
-      "logId": 4,
-      "loggedType": {
-        "name": "",
-        "type": 12,
-        "typeArguments": null
-      }
-    },
-    {
-      "logId": 5,
+      "logId": "8961848586872524460",
       "loggedType": {
         "name": "",
         "type": 1,

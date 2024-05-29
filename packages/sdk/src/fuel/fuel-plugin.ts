@@ -14,7 +14,6 @@ import { TemplateInstanceState } from '../core/template.js'
 import { FuelAssetProcessor } from './asset-processor.js'
 import { FuelProcessorState } from './types.js'
 import { FuelProcessor } from './fuel-processor.js'
-import { BN } from 'fuels'
 import { FuelGlobalProcessor } from './global-processor.js'
 
 interface Handlers {
@@ -50,7 +49,7 @@ export class FuelPlugin extends Plugin {
         if (processor instanceof FuelProcessor) {
           if (callHandler.logConfig?.logIds?.length) {
             contractConfig.fuelLogConfigs.push({
-              logIds: callHandler.logConfig.logIds.map((logId) => new BN(logId).toString(10)),
+              logIds: callHandler.logConfig.logIds,
               handlerId
             })
           } else {

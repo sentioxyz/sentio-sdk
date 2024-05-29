@@ -1,29 +1,119 @@
 {
-  "id": "0xcfca569d6c4ae61f79f0900136c1c5e292ec53908a8b02fb6339f771e4c8e71f",
-  "inputAssetIds": ["0x0000000000000000000000000000000000000000000000000000000000000000"],
-  "inputContracts": [],
-  "rawPayload": "0x000000000000000000000000000002dd000000000000000400000000000000000000000000000001000000000000000100000000000000020000000000000001e7f678a2e8df7da272cf303aff96023da2ab1968b74d86bb92f5b558d38ed6bd2400000000000000000000000000000100000000000000005016d5cbb5e8899432a6c05cd9fba51a87cdacacfbd12fdbfa92bdd8ca25b2320000000000000001d3fe20c8ff68a4054d8587ac170c40db7d1e200208a575780542bd9a7e3eec0800000000001e27b600000000000000000000000000000000000000000000000000000000000000000000000000a7821e0000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000d914531010bb159182a20429f04a438eff268cad1c288df23b92dfb388cb5a2400000000000186a000000000000000000000000000000000000000000000000000000000000000000000000000000002d3fe20c8ff68a4054d8587ac170c40db7d1e200208a575780542bd9a7e3eec0800000000001c9d9f00000000000000000000000000000000000000000000000000000000000000000000000000000040cec32d1f531aee56394df0ceb32c1f4a1ba57839eeb5ffb310cd980d53fecea70558b6244150b785ff62bcb5b36196cbe0d60265db6e60d78d956139ba222924",
-  "inputContract": null,
-  "inputs": [
-    {
-      "__typename": "InputCoin",
-      "owner": "0xd3fe20c8ff68a4054d8587ac170c40db7d1e200208a575780542bd9a7e3eec08",
-      "amount": "1976246",
-      "assetId": "0x0000000000000000000000000000000000000000000000000000000000000000"
-    }
-  ],
+  "id": "0x7e12e44f307e8d03f1db6b339f358ff46c24f410807d703413c0c8e6afcb6afc",
+  "txPointer": null,
   "outputs": [
     {
-      "__typename": "CoinOutput",
-      "to": "0xd914531010bb159182a20429f04a438eff268cad1c288df23b92dfb388cb5a24",
-      "amount": "100000",
-      "assetId": "0x0000000000000000000000000000000000000000000000000000000000000000"
+      "to": "0xd3fe20c8ff68a4054d8587ac170c40db7d1e200208a575780542bd9a7e3eec08",
+      "amount": "1000000",
+      "assetId": "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07"
     },
     {
-      "__typename": "ChangeOutput",
-      "to": "0xd3fe20c8ff68a4054d8587ac170c40db7d1e200208a575780542bd9a7e3eec08",
-      "amount": "1875359",
-      "assetId": "0x0000000000000000000000000000000000000000000000000000000000000000"
+      "to": "0xd914531010bb159182a20429f04a438eff268cad1c288df23b92dfb388cb5a24",
+      "amount": "941063",
+      "assetId": "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07"
+    }
+  ],
+  "receiptsRoot": "0x174182a64890043940b63189219a347b3b310e0712f630d4a8094279927d7964",
+  "status": {
+    "__typename": "SuccessStatus",
+    "transactionId": "0x7e12e44f307e8d03f1db6b339f358ff46c24f410807d703413c0c8e6afcb6afc",
+    "time": "4611686020144341747",
+    "totalGas": "5330199",
+    "totalFee": "58937",
+    "block": {
+      "id": "0x23c2eec8cd4e60d2f2efa79b5d2cccf85afe07606cb83073ae5a24cddd421a13",
+      "height": "1073739",
+      "header": {
+        "id": "0x23c2eec8cd4e60d2f2efa79b5d2cccf85afe07606cb83073ae5a24cddd421a13",
+        "daHeight": "5997859",
+        "consensusParametersVersion": "1",
+        "stateTransitionBytecodeVersion": "0",
+        "transactionsCount": "2",
+        "messageReceiptCount": "0",
+        "transactionsRoot": "0xcfe8da74ceac545900c29319004fd20860d69ae8b2b82b1ce2ccb2e7f48f99b5",
+        "messageOutboxRoot": "0xe3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "eventInboxRoot": "0xe3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "height": "1073739",
+        "prevRoot": "0xd5d3c7538a33df0dd3da85e0108cf4a1f81e769602a8ded385d4e62cf5ae33db",
+        "time": "4611686020144341747",
+        "applicationHash": "0x82026354303680f591b4d9b791d67033ab288ee50bc76ec60ca8057101b146fe"
+      }
+    },
+    "receipts": [
+      {
+        "id": null,
+        "pc": "10368",
+        "is": "10368",
+        "to": null,
+        "toAddress": null,
+        "amount": null,
+        "assetId": null,
+        "gas": null,
+        "param1": null,
+        "param2": null,
+        "val": "0",
+        "ptr": null,
+        "digest": null,
+        "reason": null,
+        "ra": null,
+        "rb": null,
+        "rc": null,
+        "rd": null,
+        "len": null,
+        "receiptType": "RETURN",
+        "result": null,
+        "gasUsed": null,
+        "data": null,
+        "sender": null,
+        "recipient": null,
+        "nonce": null,
+        "contractId": null,
+        "subId": null
+      },
+      {
+        "id": null,
+        "pc": null,
+        "is": null,
+        "to": null,
+        "toAddress": null,
+        "amount": null,
+        "assetId": null,
+        "gas": null,
+        "param1": null,
+        "param2": null,
+        "val": null,
+        "ptr": null,
+        "digest": null,
+        "reason": null,
+        "ra": null,
+        "rb": null,
+        "rc": null,
+        "rd": null,
+        "len": null,
+        "receiptType": "SCRIPT_RESULT",
+        "result": "0",
+        "gasUsed": "134",
+        "data": null,
+        "sender": null,
+        "recipient": null,
+        "nonce": null,
+        "contractId": null,
+        "subId": null
+      }
+    ]
+  },
+  "rawPayload": "0x00000000000000000000000000000086174182a64890043940b63189219a347b3b310e0712f630d4a8094279927d7964000000000000000400000000000000000000000000000009000000000000000100000000000000020000000000000001240000000000000000000000000003e8000000000000e6390000000000000000090785baa768e511d9aa42bc22d7c973d8ef126097bf7a84ec5cd68ff5cb26f10000000000000000d914531010bb159182a20429f04a438eff268cad1c288df23b92dfb388cb5a2400000000001e8480f8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07000000000010620a000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000d3fe20c8ff68a4054d8587ac170c40db7d1e200208a575780542bd9a7e3eec0800000000000f4240f8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad070000000000000002d914531010bb159182a20429f04a438eff268cad1c288df23b92dfb388cb5a2400000000000e5c07f8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad0700000000000000407ff8272a76851659b4117d749692ba0b718cad5d969a2367e01e0a412a12728a2fdddc50164a43aacbe3be9f47e9fcbcd1382f158bf0e1c38df1324f064b45ac",
+  "inputs": [
+    {
+      "utxoId": "0x090785baa768e511d9aa42bc22d7c973d8ef126097bf7a84ec5cd68ff5cb26f10000",
+      "owner": "0xd914531010bb159182a20429f04a438eff268cad1c288df23b92dfb388cb5a24",
+      "amount": "2000000",
+      "assetId": "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07",
+      "txPointer": "0010620a0000",
+      "witnessIndex": 0,
+      "predicateGasUsed": "0",
+      "predicate": "0x",
+      "predicateData": "0x"
     }
   ]
 }

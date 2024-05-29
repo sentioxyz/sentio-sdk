@@ -40,7 +40,7 @@ export class FuelProcessor implements FuelBaseProcessor<FuelProcessorConfig> {
               [this.config.address]: this.config.abi
             }
           : {}
-        const tx = decodeFuelTransactionWithAbi(call.transaction, abiMap, this.provider)
+        const tx = await decodeFuelTransactionWithAbi(call.transaction, abiMap, this.provider)
 
         const ctx = new FuelContext(
           this.config.chainId,
@@ -92,7 +92,7 @@ export class FuelProcessor implements FuelBaseProcessor<FuelProcessorConfig> {
         try {
           const contract = new Contract(this.config.address, abi, this.provider)
           const gqlTransaction = call.transaction
-          const tx = decodeFuelTransactionWithAbi(gqlTransaction, { [this.config.address]: abi }, this.provider)
+          const tx = await decodeFuelTransactionWithAbi(gqlTransaction, { [this.config.address]: abi }, this.provider)
 
           const ctx = new FuelContext(
             this.config.chainId,
@@ -135,7 +135,7 @@ export class FuelProcessor implements FuelBaseProcessor<FuelProcessorConfig> {
   }
 
   public onLog<T>(
-    logIdFilter: number | number[],
+    logIdFilter: string | string[],
     handler: (logs: FuelLog<T>, ctx: FuelContext) => void | Promise<void>
   ) {
     const logIds = new Set(Array.isArray(logIdFilter) ? logIdFilter : [logIdFilter])
@@ -144,7 +144,7 @@ export class FuelProcessor implements FuelBaseProcessor<FuelProcessorConfig> {
       handler: async (call: Data_FuelCall) => {
         try {
           const gqlTransaction = call.transaction
-          const tx = decodeFuelTransactionWithAbi(
+          const tx = await decodeFuelTransactionWithAbi(
             gqlTransaction,
             { [this.config.address]: this.config.abi! },
             this.provider

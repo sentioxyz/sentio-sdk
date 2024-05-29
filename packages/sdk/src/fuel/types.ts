@@ -16,12 +16,12 @@ export type CallHandler<T> = {
   fetchConfig?: Partial<FuelCallHandlerConfig>
   assetConfig?: Partial<FuelAssetHandlerConfig>
   logConfig?: {
-    logIds: number[]
+    logIds: string[]
   }
 }
 
 export interface FuelLog<T> {
-  logId: number
+  logId: string
   data: T
   receiptIndex: number
 }

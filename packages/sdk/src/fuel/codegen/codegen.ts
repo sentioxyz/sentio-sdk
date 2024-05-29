@@ -85,8 +85,8 @@ async function codegenInternal(abisDir: string, outDir: string): Promise<number>
   let count = 0
   abiTypeGen.files.forEach((file) => {
     if (!file.path.endsWith('.hex.ts')) {
-      let content = patchImport(file.contents)
-      content = patchEnumType(content)
+      const content = patchImport(file.contents)
+      // content = patchEnumType(content)
       writeFileSync(file.path, content)
       count++
     }
@@ -138,15 +138,10 @@ namespace ${name} {
   export abstract class CallWithLogs<T extends Array<any>, R> extends TypedCall<T, R> {
 ${Object.entries(logByTypes)
   .flatMap(([t, ids]) => {
-    const s = ids.map(
-      (id) => `
-    getLog${id}(): Array<${t}>  {
-      return this.logs?.filter(l => l.logId == ${id})?.map(l => l.data) as Array<${t}>
-    }`
-    )
+    const s = []
     s.push(`
     getLogsOfType${getTypeName(t)}(): Array<${t}> {
-      return this.logs?.filter(l =>[${ids.join(', ')}].includes(l.logId) ).map(l => l.data) as Array<${t}>
+      return this.logs?.filter(l =>[${ids.map((id) => `"${id}"`).join(', ')}].includes(l.logId) ).map(l => l.data) as Array<${t}>
     }`)
 
     return s
@@ -229,8 +224,8 @@ function collectImportedTypes(types: any[]): string[] {
 function genOnLogFunction([type, ids]: [string, string[]]) {
   const name = getTypeName(type)
   return `
-  onLog${name}(handler: (log: FuelLog<${type}>, ctx: FuelContext) => void | Promise<void>, logIdFilter?: number | number[]) {
-    return super.onLog<${type}>(logIdFilter ?? [${ids.join(', ')}], (log, ctx) => handler(log, ctx))
+  onLog${name}(handler: (log: FuelLog<${type}>, ctx: FuelContext) => void | Promise<void>, logIdFilter?: string | string[]) {
+    return super.onLog<${type}>(logIdFilter ?? [${ids.map((id) => `"${id}"`).join(', ')}], (log, ctx) => handler(log, ctx))
   }`
 }
 

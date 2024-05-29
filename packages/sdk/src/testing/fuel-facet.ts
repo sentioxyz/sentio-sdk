@@ -42,7 +42,7 @@ export class FuelFacet {
         const filter = callConfig.filters[0]?.function
         if (filter) {
           // filter out by tx receipt
-          for (const receipt of transaction.receipts || []) {
+          for (const receipt of transaction.status.receipts || []) {
             if (receipt.receiptType == 'CALL' && receipt.param1 == filter) {
               res.push(binding)
             }
@@ -65,9 +65,10 @@ export class FuelFacet {
         }
 
         const logIds = logConfig.logIds
-        for (const receipt of transaction.receipts || []) {
+        for (const receipt of transaction.status.receipts || []) {
           if ((receipt.receiptType == 'LOG' || receipt.receiptType == 'LOG_DATA') && logIds.includes(receipt.rb)) {
             res.push(binding)
+            break
           }
         }
       }
