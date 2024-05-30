@@ -10,6 +10,8 @@ import { errorDetailsServerMiddleware } from 'nice-grpc-error-details'
 import { registry as niceGrpcRegistry, prometheusServerMiddleware } from 'nice-grpc-prometheus'
 import { register as globalRegistry, Registry } from 'prom-client'
 import http from 'http'
+// @ts-ignore inspector promises is not included in @type/node
+import { Session } from 'node:inspector/promises'
 
 import { ProcessorDefinition } from './gen/processor/protos/processor.js'
 import { ProcessorServiceImpl } from './service.js'
@@ -90,9 +92,37 @@ console.log('Processor Server Started at:', options.port)
 const metricsPort = 4040
 const httpServer = http
   .createServer(async function (req, res) {
-    if (req.url && new URL(req.url, `http://${req.headers.host}`).pathname === '/metrics') {
-      const metrics = await mergedRegistry.metrics()
-      res.write(metrics)
+    if (req.url) {
+      const reqUrl = new URL(req.url, `http://${req.headers.host}`)
+      const queries = reqUrl.searchParams
+      switch (reqUrl.pathname) {
+        case '/metrics':
+          const metrics = await mergedRegistry.metrics()
+          res.write(metrics)
+          break
+        case '/profile': {
+          try {
+            const profileTime = parseInt(queries.get('t') || '1000', 10) || 1000
+            const session = new Session()
+            session.connect()
+
+            await session.post('Profiler.enable')
+            await session.post('Profiler.start')
+
+            await new Promise((resolve) => setTimeout(resolve, profileTime))
+            const { profile } = await session.post('Profiler.stop')
+
+            res.writeHead(200, { 'Content-Type': 'application/json' })
+            res.write(JSON.stringify(profile))
+            session.disconnect()
+          } catch {
+            res.writeHead(500)
+          }
+          break
+        }
+        default:
+          res.writeHead(404)
+      }
     } else {
       res.writeHead(404)
     }
