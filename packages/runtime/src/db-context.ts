@@ -46,6 +46,7 @@ export class StoreContext {
   }
 
   error(processId: number, e: any) {
+    console.error('process error', processId, e)
     const errorResult = ProcessResult.create({
       states: {
         error: e?.toString()
