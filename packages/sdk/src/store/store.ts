@@ -54,7 +54,7 @@ export class Store {
   async list<T extends Entity>(entity: EntityClass<T>, limit?: number, offset?: number): Promise<T[]> {
     const promise = this.context.sendRequest({
       list: {
-        entity: entity.constructor.prototype.entityName,
+        entity: entity.prototype.entityName,
         limit,
         offset
       }
