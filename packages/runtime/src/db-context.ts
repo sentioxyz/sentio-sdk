@@ -35,9 +35,9 @@ export class StoreContext {
     console.debug('received db result ', opId, dbResult)
     if (defer) {
       if (dbResult.error) {
-        defer.reject(dbResult.error)
+        defer.reject(new Error(dbResult.error))
       } else if (dbResult.list) {
-        defer.reject(dbResult.list)
+        defer.resolve(dbResult.list)
       } else {
         defer.resolve(dbResult.data)
       }

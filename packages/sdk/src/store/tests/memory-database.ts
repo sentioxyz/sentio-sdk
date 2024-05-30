@@ -51,7 +51,7 @@ export class MemoryDatabase {
         const list = Array.from(this.db.values())
         this.dbContext.result({
           opId: req.opId,
-          data: list
+          list: list
         })
       }
     }
