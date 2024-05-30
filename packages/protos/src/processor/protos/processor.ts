@@ -3,7 +3,7 @@ import Long from "long";
 import type { CallContext, CallOptions } from "nice-grpc-common";
 import _m0 from "protobufjs/minimal.js";
 import { Empty } from "../../google/protobuf/empty.js";
-import { Struct } from "../../google/protobuf/struct.js";
+import { ListValue, Struct } from "../../google/protobuf/struct.js";
 import { Timestamp } from "../../google/protobuf/timestamp.js";
 import { CoinID } from "../../service/common/protos/common.js";
 
@@ -735,6 +735,7 @@ export interface ProcessStreamResponse {
 export interface DBResponse {
   opId: bigint;
   data?: { [key: string]: any } | undefined;
+  list?: Array<any> | undefined;
   error?: string | undefined;
 }
 
@@ -5620,7 +5621,7 @@ export const ProcessStreamResponse = {
 };
 
 function createBaseDBResponse(): DBResponse {
-  return { opId: BigInt("0"), data: undefined, error: undefined };
+  return { opId: BigInt("0"), data: undefined, list: undefined, error: undefined };
 }
 
 export const DBResponse = {
@@ -5633,6 +5634,9 @@ export const DBResponse = {
     }
     if (message.data !== undefined) {
       Struct.encode(Struct.wrap(message.data), writer.uint32(18).fork()).ldelim();
+    }
+    if (message.list !== undefined) {
+      ListValue.encode(ListValue.wrap(message.list), writer.uint32(34).fork()).ldelim();
     }
     if (message.error !== undefined) {
       writer.uint32(26).string(message.error);
@@ -5661,6 +5665,13 @@ export const DBResponse = {
 
           message.data = Struct.unwrap(Struct.decode(reader, reader.uint32()));
           continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.list = ListValue.unwrap(ListValue.decode(reader, reader.uint32()));
+          continue;
         case 3:
           if (tag !== 26) {
             break;
@@ -5681,6 +5692,7 @@ export const DBResponse = {
     return {
       opId: isSet(object.opId) ? BigInt(object.opId) : BigInt("0"),
       data: isObject(object.data) ? object.data : undefined,
+      list: globalThis.Array.isArray(object.list) ? [...object.list] : undefined,
       error: isSet(object.error) ? globalThis.String(object.error) : undefined,
     };
   },
@@ -5692,6 +5704,9 @@ export const DBResponse = {
     }
     if (message.data !== undefined) {
       obj.data = message.data;
+    }
+    if (message.list !== undefined) {
+      obj.list = message.list;
     }
     if (message.error !== undefined) {
       obj.error = message.error;
@@ -5706,6 +5721,7 @@ export const DBResponse = {
     const message = createBaseDBResponse();
     message.opId = object.opId ?? BigInt("0");
     message.data = object.data ?? undefined;
+    message.list = object.list ?? undefined;
     message.error = object.error ?? undefined;
     return message;
   },

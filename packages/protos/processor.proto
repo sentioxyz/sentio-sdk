@@ -421,6 +421,7 @@ message DBResponse {
   uint64 op_id = 1;
   oneof value {
     google.protobuf.Struct data = 2;
+    google.protobuf.ListValue list = 4;
     string error = 3;
   }
 }
