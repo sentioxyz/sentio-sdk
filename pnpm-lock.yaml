@@ -302,6 +302,19 @@ importers:
         specifier: ^5.4.5
         version: 5.4.5
 
+  packages/cli/templates/fuel:
+    dependencies:
+      '@sentio/sdk':
+        specifier: workspace:*
+        version: link:../../../sdk
+    devDependencies:
+      '@sentio/cli':
+        specifier: workspace:*
+        version: link:../..
+      typescript:
+        specifier: ^5.4.5
+        version: 5.4.5
+
   packages/cli/templates/raw:
     dependencies:
       '@sentio/sdk':

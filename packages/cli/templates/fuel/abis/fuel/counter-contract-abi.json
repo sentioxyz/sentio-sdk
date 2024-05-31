@@ -1,0 +1,272 @@
+{
+  "encoding": "1",
+  "types": [
+    {
+      "typeId": 0,
+      "type": "()",
+      "components": [],
+      "typeParameters": null
+    },
+    {
+      "typeId": 1,
+      "type": "b256",
+      "components": null,
+      "typeParameters": null
+    },
+    {
+      "typeId": 2,
+      "type": "bool",
+      "components": null,
+      "typeParameters": null
+    },
+    {
+      "typeId": 3,
+      "type": "enum ColorError",
+      "components": [
+        {
+          "name": "Blue",
+          "type": 0,
+          "typeArguments": null
+        },
+        {
+          "name": "Green",
+          "type": 0,
+          "typeArguments": null
+        },
+        {
+          "name": "Red",
+          "type": 0,
+          "typeArguments": null
+        },
+        {
+          "name": "Other",
+          "type": 0,
+          "typeArguments": null
+        }
+      ],
+      "typeParameters": null
+    },
+    {
+      "typeId": 4,
+      "type": "enum Option",
+      "components": [
+        {
+          "name": "None",
+          "type": 0,
+          "typeArguments": null
+        },
+        {
+          "name": "Some",
+          "type": 7,
+          "typeArguments": null
+        }
+      ],
+      "typeParameters": [7]
+    },
+    {
+      "typeId": 5,
+      "type": "enum Result",
+      "components": [
+        {
+          "name": "Ok",
+          "type": 7,
+          "typeArguments": null
+        },
+        {
+          "name": "Err",
+          "type": 6,
+          "typeArguments": null
+        }
+      ],
+      "typeParameters": [7, 6]
+    },
+    {
+      "typeId": 6,
+      "type": "generic E",
+      "components": null,
+      "typeParameters": null
+    },
+    {
+      "typeId": 7,
+      "type": "generic T",
+      "components": null,
+      "typeParameters": null
+    },
+    {
+      "typeId": 8,
+      "type": "str[1]",
+      "components": null,
+      "typeParameters": null
+    },
+    {
+      "typeId": 9,
+      "type": "str[25]",
+      "components": null,
+      "typeParameters": null
+    },
+    {
+      "typeId": 10,
+      "type": "struct Foo",
+      "components": [
+        {
+          "name": "bar",
+          "type": 12,
+          "typeArguments": null
+        },
+        {
+          "name": "baz",
+          "type": 2,
+          "typeArguments": null
+        }
+      ],
+      "typeParameters": null
+    },
+    {
+      "typeId": 11,
+      "type": "u32",
+      "components": null,
+      "typeParameters": null
+    },
+    {
+      "typeId": 12,
+      "type": "u64",
+      "components": null,
+      "typeParameters": null
+    }
+  ],
+  "functions": [
+    {
+      "inputs": [
+        {
+          "name": "foo",
+          "type": 10,
+          "typeArguments": null
+        },
+        {
+          "name": "option",
+          "type": 4,
+          "typeArguments": [
+            {
+              "name": "",
+              "type": 8,
+              "typeArguments": null
+            }
+          ]
+        }
+      ],
+      "name": "complex",
+      "output": {
+        "name": "",
+        "type": 5,
+        "typeArguments": [
+          {
+            "name": "",
+            "type": 10,
+            "typeArguments": null
+          },
+          {
+            "name": "",
+            "type": 3,
+            "typeArguments": null
+          }
+        ]
+      },
+      "attributes": [
+        {
+          "name": "storage",
+          "arguments": ["read", "write"]
+        }
+      ]
+    },
+    {
+      "inputs": [],
+      "name": "count",
+      "output": {
+        "name": "",
+        "type": 12,
+        "typeArguments": null
+      },
+      "attributes": [
+        {
+          "name": "storage",
+          "arguments": ["read"]
+        }
+      ]
+    },
+    {
+      "inputs": [
+        {
+          "name": "add",
+          "type": 11,
+          "typeArguments": null
+        },
+        {
+          "name": "two",
+          "type": 12,
+          "typeArguments": null
+        },
+        {
+          "name": "three",
+          "type": 1,
+          "typeArguments": null
+        }
+      ],
+      "name": "increment",
+      "output": {
+        "name": "",
+        "type": 12,
+        "typeArguments": null
+      },
+      "attributes": [
+        {
+          "name": "storage",
+          "arguments": ["read", "write"]
+        }
+      ]
+    }
+  ],
+  "loggedTypes": [
+    {
+      "logId": "1515152261580153489",
+      "loggedType": {
+        "name": "",
+        "type": 12,
+        "typeArguments": null
+      }
+    },
+    {
+      "logId": "9006093109815063660",
+      "loggedType": {
+        "name": "",
+        "type": 10,
+        "typeArguments": []
+      }
+    },
+    {
+      "logId": "14631882454972838106",
+      "loggedType": {
+        "name": "",
+        "type": 9,
+        "typeArguments": null
+      }
+    },
+    {
+      "logId": "15520703124961489725",
+      "loggedType": {
+        "name": "",
+        "type": 11,
+        "typeArguments": null
+      }
+    },
+    {
+      "logId": "8961848586872524460",
+      "loggedType": {
+        "name": "",
+        "type": 1,
+        "typeArguments": null
+      }
+    }
+  ],
+  "messagesTypes": [],
+  "configurables": []
+}

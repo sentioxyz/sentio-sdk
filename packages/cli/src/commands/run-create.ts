@@ -77,6 +77,8 @@ export async function runCreate(argv: string[]) {
         break
       case 'solana':
         break
+      case 'fuel':
+        break
       default:
         console.error(chalk.red('non supported chain-type for template creation, use --help for more information.'))
         console.log(usage)
