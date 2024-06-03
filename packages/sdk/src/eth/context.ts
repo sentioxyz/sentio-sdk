@@ -9,7 +9,7 @@ import { EthChainId } from '@sentio/chain'
 
 export abstract class EthContext extends BaseContext {
   readonly chainId: EthChainId
-  readonly address: string
+  address: string
   private readonly log?: LogParams
   readonly block?: BlockParams
   private readonly trace?: Trace
@@ -137,6 +137,13 @@ export class GlobalContext extends EthContext {
   }
   protected getContractName(): string {
     return '*'
+  }
+  getMetaDataInternal(name: string, labels: Labels): RecordMetaData {
+    const address = this.address
+    this.address = '*'
+    const res = super.getMetaDataInternal(name, labels)
+    this.address = address
+    return res
   }
 }
 
