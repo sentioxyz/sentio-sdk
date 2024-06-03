@@ -12,6 +12,7 @@ import { normalizeAttribute } from './normalization.js'
 import { MapStateStorage } from '@sentio/runtime'
 import { BN } from 'fuels'
 import { BigDecimal } from '@sentio/bigdecimal'
+import { DatabaseSchema } from './database-schema.js'
 
 export interface Attribute<T> {
   [key: string]: Exclude<
@@ -41,6 +42,7 @@ export class EventLoggerBinding {
   }
 
   emit<T>(eventName: string, event: Event<T>) {
+    checkEventName(eventName)
     emit(this.ctx, eventName, event)
   }
 }
@@ -94,6 +96,7 @@ export class EventLogger {
   }
 
   static register(eventName: string, options?: EventLogOptions): EventLogger {
+    checkEventName(eventName)
     let config = EventLogConfig.create()
 
     if (options?.fields) {
@@ -125,4 +128,11 @@ function emit<T>(ctx: BaseContext, eventName: string, event: Event<T>) {
     noMetric: true
   }
   ctx.update({ events: [res] })
+}
+
+function checkEventName(eventName: string) {
+  const entity = DatabaseSchema.findEntity(eventName)
+  if (entity) {
+    throw new Error(`Event name ${eventName} is already used in the database schema`)
+  }
 }

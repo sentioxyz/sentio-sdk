@@ -35,7 +35,7 @@ import type { StorageSlot } from "@fuel-ts/transactions";`
   )
 }
 
-function patchEnumType(contents: string) {
+/*function patchEnumType(contents: string) {
   const matches = contents.matchAll(/export type (.+) = Enum<{ Ok: T, Err: E }>;/g)
 
   for (const m of matches) {
@@ -46,7 +46,7 @@ function patchEnumType(contents: string) {
     contents = contents.replace(reg, `export type \$1<T,E> = ${vname}<T,E>`)
   }
   return contents
-}
+}*/
 
 async function codegenInternal(abisDir: string, outDir: string): Promise<number> {
   const allFiles = fs.readdirSync(abisDir)
@@ -164,7 +164,11 @@ export class ${name}Processor extends FuelAbstractProcessor {
     })
   }
 
-${abi.functions.map((f) => genOnCallFunction(name, f)).join('\n')}   
+${
+  ''
+  /* disable codegen for now
+       abi.functions.map((f) => genOnCallFunction(name, f)).join('\n') */
+}   
 
 ${Object.entries(logByTypes).map(genOnLogFunction).join('\n')}
 

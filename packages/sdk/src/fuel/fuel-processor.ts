@@ -60,7 +60,8 @@ export class FuelProcessor implements FuelBaseProcessor<FuelProcessorConfig> {
     return this
   }
 
-  public onCall(
+  // hide onCall for now
+  private onCall(
     nameFilter: string | string[],
     handler: (call: FuelCall, ctx: FuelContext) => void | Promise<void>,
     config: FuelFetchConfig = DEFAULT_FUEL_FETCH_CONFIG

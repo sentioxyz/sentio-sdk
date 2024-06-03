@@ -16,9 +16,12 @@ export class DatabaseSchema {
   }
 
   static findEntity(name: string) {
-    const s = DatabaseSchemaState.INSTANCE.getValues().find((s) => {
-      return s.entities[name] != null
-    })
-    return s?.entities[name]
+    for (const schema of DatabaseSchemaState.INSTANCE.getValues()) {
+      if (schema.entities[name]) {
+        return schema.entities[name]
+      }
+    }
+
+    return undefined
   }
 }
