@@ -21,12 +21,12 @@ describe('Test Template', () => {
       address: '0x1e4ede388cbc9f4b5c79681b7f94d36a11abebc9',
       network: EthChainId.ARBITRUM,
       name: 'x2y2',
-      startBlock: 14201940,
+      startBlock: 14201940
     }).onEventTransfer(async function (event, ctx) {
       processorTemplate.bind(
         {
           address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
-          name: 'dynamic',
+          name: 'dynamic'
         },
         ctx
       )
@@ -43,13 +43,14 @@ describe('Test Template', () => {
             address: '0xb329e39ebefd16f40d38f07643652ce17ca5bac1',
             name: 'dynamic2',
             chainId: '42161',
-            abi: '',
+            abi: ''
           },
           startBlock: 0n,
           endBlock: 0n,
           templateId: 0,
-        },
-      ],
+          baseLabels: {}
+        }
+      ]
     }
     await service.start(request)
   })

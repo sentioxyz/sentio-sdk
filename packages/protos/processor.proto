@@ -255,6 +255,7 @@ message TemplateInstance {
   uint64 start_block = 2;
   uint64 end_block = 3;
   int32 template_id = 4;
+  google.protobuf.Struct base_labels = 5;
 }
 
 message StartRequest {

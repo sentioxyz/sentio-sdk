@@ -52,7 +52,7 @@ export abstract class BaseProcessorTemplate<
   public bind(options: Omit<BindOptions, 'network'>, ctx: EthContext): void {
     const sig = getOptionsSignature({
       address: options.address,
-      network: ctx.chainId,
+      network: ctx.chainId
     })
     if (this.binds.has(sig)) {
       console.log(`Same address can be bind to one template only once, ignore duplicate bind: ${sig}`)
@@ -80,22 +80,17 @@ export abstract class BaseProcessorTemplate<
         address: options.address,
         name: options.name || '',
         chainId: ctx.chainId,
-        abi: '',
+        abi: ''
       },
-      startBlock: 0n,
-      endBlock: 0n,
-    }
-    if (options.startBlock) {
-      instance.startBlock = BigInt(options.startBlock)
-    }
-    if (options.endBlock) {
-      instance.endBlock = BigInt(options.endBlock)
+      startBlock: BigInt(options.startBlock || 0),
+      endBlock: BigInt(options.endBlock || 0),
+      baseLabels: options.baseLabels
     }
     TemplateInstanceState.INSTANCE.addValue(instance)
     ctx.update({
       states: {
-        configUpdated: true,
-      },
+        configUpdated: true
+      }
     })
   }
 
@@ -107,7 +102,7 @@ export abstract class BaseProcessorTemplate<
     this.eventHandlers.push({
       handler: handler,
       filter: filter,
-      fetchConfig: EthFetchConfig.fromPartial(fetchConfig || {}),
+      fetchConfig: EthFetchConfig.fromPartial(fetchConfig || {})
     })
     return this
   }
@@ -123,7 +118,7 @@ export abstract class BaseProcessorTemplate<
       undefined,
       {
         recentInterval: blockInterval,
-        backfillInterval: backfillBlockInterval,
+        backfillInterval: backfillBlockInterval
       },
       fetchConfig
     )

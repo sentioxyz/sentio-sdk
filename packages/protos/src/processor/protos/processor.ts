@@ -584,6 +584,7 @@ export interface TemplateInstance {
   startBlock: bigint;
   endBlock: bigint;
   templateId: number;
+  baseLabels: { [key: string]: any } | undefined;
 }
 
 export interface StartRequest {
@@ -3305,7 +3306,7 @@ export const ContractInfo = {
 };
 
 function createBaseTemplateInstance(): TemplateInstance {
-  return { contract: undefined, startBlock: BigInt("0"), endBlock: BigInt("0"), templateId: 0 };
+  return { contract: undefined, startBlock: BigInt("0"), endBlock: BigInt("0"), templateId: 0, baseLabels: undefined };
 }
 
 export const TemplateInstance = {
@@ -3327,6 +3328,9 @@ export const TemplateInstance = {
     }
     if (message.templateId !== 0) {
       writer.uint32(32).int32(message.templateId);
+    }
+    if (message.baseLabels !== undefined) {
+      Struct.encode(Struct.wrap(message.baseLabels), writer.uint32(42).fork()).ldelim();
     }
     return writer;
   },
@@ -3366,6 +3370,13 @@ export const TemplateInstance = {
 
           message.templateId = reader.int32();
           continue;
+        case 5:
+          if (tag !== 42) {
+            break;
+          }
+
+          message.baseLabels = Struct.unwrap(Struct.decode(reader, reader.uint32()));
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -3381,6 +3392,7 @@ export const TemplateInstance = {
       startBlock: isSet(object.startBlock) ? BigInt(object.startBlock) : BigInt("0"),
       endBlock: isSet(object.endBlock) ? BigInt(object.endBlock) : BigInt("0"),
       templateId: isSet(object.templateId) ? globalThis.Number(object.templateId) : 0,
+      baseLabels: isObject(object.baseLabels) ? object.baseLabels : undefined,
     };
   },
 
@@ -3398,6 +3410,9 @@ export const TemplateInstance = {
     if (message.templateId !== 0) {
       obj.templateId = Math.round(message.templateId);
     }
+    if (message.baseLabels !== undefined) {
+      obj.baseLabels = message.baseLabels;
+    }
     return obj;
   },
 
@@ -3412,6 +3427,7 @@ export const TemplateInstance = {
     message.startBlock = object.startBlock ?? BigInt("0");
     message.endBlock = object.endBlock ?? BigInt("0");
     message.templateId = object.templateId ?? 0;
+    message.baseLabels = object.baseLabels ?? undefined;
     return message;
   },
 };

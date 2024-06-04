@@ -63,7 +63,8 @@ export class SuiPlugin extends Plugin {
           address: instance.contract?.address || '',
           objectId: instance.contract?.address || '',
           network: <SuiNetwork>instance.contract?.chainId || SuiNetwork.MAIN_NET,
-          startCheckpoint: instance.startBlock || 0n
+          startCheckpoint: instance.startBlock || 0n,
+          baseLabels: instance.baseLabels
         },
         NoopContext
       )

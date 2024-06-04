@@ -77,7 +77,8 @@ export abstract class SuiObjectOrAddressProcessorTemplate<
         abi: ''
       },
       startBlock: config.startCheckpoint,
-      endBlock: 0n
+      endBlock: 0n,
+      baseLabels: config.baseLabels
     })
   }
 

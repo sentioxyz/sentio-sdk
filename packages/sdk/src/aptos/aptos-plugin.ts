@@ -57,7 +57,8 @@ export class AptosPlugin extends Plugin {
         {
           address: instance.contract?.address || '',
           network: <AptosNetwork>instance.contract?.chainId || AptosNetwork.MAIN_NET,
-          startVersion: instance.startBlock || 0n
+          startVersion: instance.startBlock || 0n,
+          baseLabels: instance.baseLabels
         },
         NoopContext
       )

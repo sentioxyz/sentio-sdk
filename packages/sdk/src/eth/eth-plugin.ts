@@ -273,7 +273,8 @@ export class EthPlugin extends Plugin {
           name: instance.contract.name,
           address: validateAndNormalizeAddress(instance.contract.address),
           startBlock: instance.startBlock,
-          endBlock: instance.endBlock
+          endBlock: instance.endBlock,
+          baseLabels: instance.baseLabels
         },
         ctx
       )

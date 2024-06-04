@@ -65,7 +65,8 @@ export class AptosResourceProcessorTemplate {
         abi: ''
       },
       startBlock: config.startVersion,
-      endBlock: 0n
+      endBlock: 0n,
+      baseLabels: config.baseLabels
     })
   }
 
