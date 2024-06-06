@@ -202,6 +202,7 @@ export enum HandlerType {
   SUI_OBJECT = 10,
   SUI_OBJECT_CHANGE = 12,
   FUEL_CALL = 13,
+  COSMOS_CALL = 14,
   UNRECOGNIZED = -1,
 }
 
@@ -249,6 +250,9 @@ export function handlerTypeFromJSON(object: any): HandlerType {
     case 13:
     case "FUEL_CALL":
       return HandlerType.FUEL_CALL;
+    case 14:
+    case "COSMOS_CALL":
+      return HandlerType.COSMOS_CALL;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -286,6 +290,8 @@ export function handlerTypeToJSON(object: HandlerType): string {
       return "SUI_OBJECT_CHANGE";
     case HandlerType.FUEL_CALL:
       return "FUEL_CALL";
+    case HandlerType.COSMOS_CALL:
+      return "COSMOS_CALL";
     case HandlerType.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
@@ -382,6 +388,7 @@ export interface ContractConfig {
   fuelCallConfigs: FuelCallHandlerConfig[];
   assetConfigs: FuelAssetHandlerConfig[];
   fuelLogConfigs: FuelLogHandlerConfig[];
+  cosmosLogConfigs: CosmosLogHandlerConfig[];
   instructionConfig: InstructionHandlerConfig | undefined;
   startBlock: bigint;
   endBlock: bigint;
@@ -638,6 +645,11 @@ export interface FuelLogHandlerConfig {
   handlerId: number;
 }
 
+export interface CosmosLogHandlerConfig {
+  logFilters: string[];
+  handlerId: number;
+}
+
 export interface LogFilter {
   topics: Topic[];
   address?: string | undefined;
@@ -792,6 +804,7 @@ export interface Data {
   suiObject?: Data_SuiObject | undefined;
   suiObjectChange?: Data_SuiObjectChange | undefined;
   fuelCall?: Data_FuelCall | undefined;
+  cosmosCall?: Data_CosmosCall | undefined;
 }
 
 export interface Data_EthLog {
@@ -871,6 +884,11 @@ export interface Data_SuiObjectChange {
 }
 
 export interface Data_FuelCall {
+  transaction: { [key: string]: any } | undefined;
+  timestamp: Date | undefined;
+}
+
+export interface Data_CosmosCall {
   transaction: { [key: string]: any } | undefined;
   timestamp: Date | undefined;
 }
@@ -1412,6 +1430,7 @@ function createBaseContractConfig(): ContractConfig {
     fuelCallConfigs: [],
     assetConfigs: [],
     fuelLogConfigs: [],
+    cosmosLogConfigs: [],
     instructionConfig: undefined,
     startBlock: BigInt("0"),
     endBlock: BigInt("0"),
@@ -1453,6 +1472,9 @@ export const ContractConfig = {
     }
     for (const v of message.fuelLogConfigs) {
       FuelLogHandlerConfig.encode(v!, writer.uint32(122).fork()).ldelim();
+    }
+    for (const v of message.cosmosLogConfigs) {
+      CosmosLogHandlerConfig.encode(v!, writer.uint32(130).fork()).ldelim();
     }
     if (message.instructionConfig !== undefined) {
       InstructionHandlerConfig.encode(message.instructionConfig, writer.uint32(50).fork()).ldelim();
@@ -1559,6 +1581,13 @@ export const ContractConfig = {
 
           message.fuelLogConfigs.push(FuelLogHandlerConfig.decode(reader, reader.uint32()));
           continue;
+        case 16:
+          if (tag !== 130) {
+            break;
+          }
+
+          message.cosmosLogConfigs.push(CosmosLogHandlerConfig.decode(reader, reader.uint32()));
+          continue;
         case 6:
           if (tag !== 50) {
             break;
@@ -1629,6 +1658,9 @@ export const ContractConfig = {
       fuelLogConfigs: globalThis.Array.isArray(object?.fuelLogConfigs)
         ? object.fuelLogConfigs.map((e: any) => FuelLogHandlerConfig.fromJSON(e))
         : [],
+      cosmosLogConfigs: globalThis.Array.isArray(object?.cosmosLogConfigs)
+        ? object.cosmosLogConfigs.map((e: any) => CosmosLogHandlerConfig.fromJSON(e))
+        : [],
       instructionConfig: isSet(object.instructionConfig)
         ? InstructionHandlerConfig.fromJSON(object.instructionConfig)
         : undefined,
@@ -1673,6 +1705,9 @@ export const ContractConfig = {
     if (message.fuelLogConfigs?.length) {
       obj.fuelLogConfigs = message.fuelLogConfigs.map((e) => FuelLogHandlerConfig.toJSON(e));
     }
+    if (message.cosmosLogConfigs?.length) {
+      obj.cosmosLogConfigs = message.cosmosLogConfigs.map((e) => CosmosLogHandlerConfig.toJSON(e));
+    }
     if (message.instructionConfig !== undefined) {
       obj.instructionConfig = InstructionHandlerConfig.toJSON(message.instructionConfig);
     }
@@ -1707,6 +1742,7 @@ export const ContractConfig = {
     message.fuelCallConfigs = object.fuelCallConfigs?.map((e) => FuelCallHandlerConfig.fromPartial(e)) || [];
     message.assetConfigs = object.assetConfigs?.map((e) => FuelAssetHandlerConfig.fromPartial(e)) || [];
     message.fuelLogConfigs = object.fuelLogConfigs?.map((e) => FuelLogHandlerConfig.fromPartial(e)) || [];
+    message.cosmosLogConfigs = object.cosmosLogConfigs?.map((e) => CosmosLogHandlerConfig.fromPartial(e)) || [];
     message.instructionConfig = (object.instructionConfig !== undefined && object.instructionConfig !== null)
       ? InstructionHandlerConfig.fromPartial(object.instructionConfig)
       : undefined;
@@ -4207,6 +4243,82 @@ export const FuelLogHandlerConfig = {
   },
 };
 
+function createBaseCosmosLogHandlerConfig(): CosmosLogHandlerConfig {
+  return { logFilters: [], handlerId: 0 };
+}
+
+export const CosmosLogHandlerConfig = {
+  encode(message: CosmosLogHandlerConfig, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.logFilters) {
+      writer.uint32(10).string(v!);
+    }
+    if (message.handlerId !== 0) {
+      writer.uint32(16).int32(message.handlerId);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): CosmosLogHandlerConfig {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCosmosLogHandlerConfig();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.logFilters.push(reader.string());
+          continue;
+        case 2:
+          if (tag !== 16) {
+            break;
+          }
+
+          message.handlerId = reader.int32();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): CosmosLogHandlerConfig {
+    return {
+      logFilters: globalThis.Array.isArray(object?.logFilters)
+        ? object.logFilters.map((e: any) => globalThis.String(e))
+        : [],
+      handlerId: isSet(object.handlerId) ? globalThis.Number(object.handlerId) : 0,
+    };
+  },
+
+  toJSON(message: CosmosLogHandlerConfig): unknown {
+    const obj: any = {};
+    if (message.logFilters?.length) {
+      obj.logFilters = message.logFilters;
+    }
+    if (message.handlerId !== 0) {
+      obj.handlerId = Math.round(message.handlerId);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<CosmosLogHandlerConfig>): CosmosLogHandlerConfig {
+    return CosmosLogHandlerConfig.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<CosmosLogHandlerConfig>): CosmosLogHandlerConfig {
+    const message = createBaseCosmosLogHandlerConfig();
+    message.logFilters = object.logFilters?.map((e) => e) || [];
+    message.handlerId = object.handlerId ?? 0;
+    return message;
+  },
+};
+
 function createBaseLogFilter(): LogFilter {
   return { topics: [], address: undefined, addressType: undefined };
 }
@@ -6271,6 +6383,7 @@ function createBaseData(): Data {
     suiObject: undefined,
     suiObjectChange: undefined,
     fuelCall: undefined,
+    cosmosCall: undefined,
   };
 }
 
@@ -6317,6 +6430,9 @@ export const Data = {
     }
     if (message.fuelCall !== undefined) {
       Data_FuelCall.encode(message.fuelCall, writer.uint32(114).fork()).ldelim();
+    }
+    if (message.cosmosCall !== undefined) {
+      Data_CosmosCall.encode(message.cosmosCall, writer.uint32(122).fork()).ldelim();
     }
     return writer;
   },
@@ -6426,6 +6542,13 @@ export const Data = {
 
           message.fuelCall = Data_FuelCall.decode(reader, reader.uint32());
           continue;
+        case 15:
+          if (tag !== 122) {
+            break;
+          }
+
+          message.cosmosCall = Data_CosmosCall.decode(reader, reader.uint32());
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -6453,6 +6576,7 @@ export const Data = {
         ? Data_SuiObjectChange.fromJSON(object.suiObjectChange)
         : undefined,
       fuelCall: isSet(object.fuelCall) ? Data_FuelCall.fromJSON(object.fuelCall) : undefined,
+      cosmosCall: isSet(object.cosmosCall) ? Data_CosmosCall.fromJSON(object.cosmosCall) : undefined,
     };
   },
 
@@ -6499,6 +6623,9 @@ export const Data = {
     }
     if (message.fuelCall !== undefined) {
       obj.fuelCall = Data_FuelCall.toJSON(message.fuelCall);
+    }
+    if (message.cosmosCall !== undefined) {
+      obj.cosmosCall = Data_CosmosCall.toJSON(message.cosmosCall);
     }
     return obj;
   },
@@ -6547,6 +6674,9 @@ export const Data = {
       : undefined;
     message.fuelCall = (object.fuelCall !== undefined && object.fuelCall !== null)
       ? Data_FuelCall.fromPartial(object.fuelCall)
+      : undefined;
+    message.cosmosCall = (object.cosmosCall !== undefined && object.cosmosCall !== null)
+      ? Data_CosmosCall.fromPartial(object.cosmosCall)
       : undefined;
     return message;
   },
@@ -7781,6 +7911,80 @@ export const Data_FuelCall = {
   },
   fromPartial(object: DeepPartial<Data_FuelCall>): Data_FuelCall {
     const message = createBaseData_FuelCall();
+    message.transaction = object.transaction ?? undefined;
+    message.timestamp = object.timestamp ?? undefined;
+    return message;
+  },
+};
+
+function createBaseData_CosmosCall(): Data_CosmosCall {
+  return { transaction: undefined, timestamp: undefined };
+}
+
+export const Data_CosmosCall = {
+  encode(message: Data_CosmosCall, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.transaction !== undefined) {
+      Struct.encode(Struct.wrap(message.transaction), writer.uint32(10).fork()).ldelim();
+    }
+    if (message.timestamp !== undefined) {
+      Timestamp.encode(toTimestamp(message.timestamp), writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Data_CosmosCall {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseData_CosmosCall();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.transaction = Struct.unwrap(Struct.decode(reader, reader.uint32()));
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.timestamp = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Data_CosmosCall {
+    return {
+      transaction: isObject(object.transaction) ? object.transaction : undefined,
+      timestamp: isSet(object.timestamp) ? fromJsonTimestamp(object.timestamp) : undefined,
+    };
+  },
+
+  toJSON(message: Data_CosmosCall): unknown {
+    const obj: any = {};
+    if (message.transaction !== undefined) {
+      obj.transaction = message.transaction;
+    }
+    if (message.timestamp !== undefined) {
+      obj.timestamp = message.timestamp.toISOString();
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<Data_CosmosCall>): Data_CosmosCall {
+    return Data_CosmosCall.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<Data_CosmosCall>): Data_CosmosCall {
+    const message = createBaseData_CosmosCall();
     message.transaction = object.transaction ?? undefined;
     message.timestamp = object.timestamp ?? undefined;
     return message;

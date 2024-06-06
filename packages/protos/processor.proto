@@ -66,6 +66,7 @@ message ContractConfig {
   repeated FuelCallHandlerConfig fuel_call_configs = 13;
   repeated FuelAssetHandlerConfig asset_configs = 14;
   repeated FuelLogHandlerConfig fuel_log_configs = 15;
+  repeated CosmosLogHandlerConfig cosmos_log_configs = 16;
 
   InstructionHandlerConfig instruction_config = 6;
   uint64 start_block = 4;
@@ -306,6 +307,11 @@ message FuelLogHandlerConfig {
   int32 handler_id = 2;
 }
 
+message CosmosLogHandlerConfig {
+  repeated string log_filters = 1;
+  int32 handler_id = 2;
+}
+
 message LogFilter {
   repeated Topic topics = 1;
   // only used for when in account config
@@ -528,6 +534,10 @@ message Data {
     google.protobuf.Struct transaction = 1;
     google.protobuf.Timestamp timestamp = 2;
   }
+  message CosmosCall {
+    google.protobuf.Struct transaction = 1;
+    google.protobuf.Timestamp timestamp = 2;
+  }
 
   bytes raw = 1 [deprecated = true]; // can be removed anytime
   oneof value {
@@ -544,6 +554,7 @@ message Data {
     SuiObject sui_object = 12;
     SuiObjectChange sui_object_change = 13;
     FuelCall fuel_call = 14;
+    CosmosCall cosmos_call = 15;
   }
 }
 
@@ -625,6 +636,7 @@ enum HandlerType {
   SUI_OBJECT = 10;
   SUI_OBJECT_CHANGE = 12;
   FUEL_CALL = 13;
+  COSMOS_CALL = 14;
 }
 
 message RuntimeInfo {

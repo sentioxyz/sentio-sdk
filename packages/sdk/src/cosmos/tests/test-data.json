@@ -1,0 +1,1429 @@
+{
+  "height": "72625150",
+  "txhash": "70E259E1D22AD62FCB871FCFB6A55C95A0C8FFD819D6CD3DB517AE04D7A1E3AD",
+  "codespace": "",
+  "code": 0,
+  "data": "122E0A2C2F636F736D7761736D2E7761736D2E76312E4D736745786563757465436F6E7472616374526573706F6E7365",
+  "raw_log": "[{\"msg_index\":0,\"events\":[{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"/cosmwasm.wasm.v1.MsgExecuteContract\"},{\"key\":\"sender\",\"value\":\"inj1p8e8j5j8djxrfkmlsvpg9xpmn7t2ergd00cq9u\"},{\"key\":\"module\",\"value\":\"wasm\"}]},{\"type\":\"coin_spent\",\"attributes\":[{\"key\":\"spender\",\"value\":\"inj1p8e8j5j8djxrfkmlsvpg9xpmn7t2ergd00cq9u\"},{\"key\":\"amount\",\"value\":\"100000000000000000inj\"}]},{\"type\":\"coin_received\",\"attributes\":[{\"key\":\"receiver\",\"value\":\"inj1akvg3kxj5u57py0kejwzkng2ww945a5ana5zct\"},{\"key\":\"amount\",\"value\":\"100000000000000000inj\"}]},{\"type\":\"transfer\",\"attributes\":[{\"key\":\"recipient\",\"value\":\"inj1akvg3kxj5u57py0kejwzkng2ww945a5ana5zct\"},{\"key\":\"sender\",\"value\":\"inj1p8e8j5j8djxrfkmlsvpg9xpmn7t2ergd00cq9u\"},{\"key\":\"amount\",\"value\":\"100000000000000000inj\"}]},{\"type\":\"execute\",\"attributes\":[{\"key\":\"_contract_address\",\"value\":\"inj1akvg3kxj5u57py0kejwzkng2ww945a5ana5zct\"}]},{\"type\":\"wasm\",\"attributes\":[{\"key\":\"_contract_address\",\"value\":\"inj1akvg3kxj5u57py0kejwzkng2ww945a5ana5zct\"},{\"key\":\"action\",\"value\":\"swap\"}]},{\"type\":\"execute\",\"attributes\":[{\"key\":\"_contract_address\",\"value\":\"inj1akvg3kxj5u57py0kejwzkng2ww945a5ana5zct\"}]},{\"type\":\"wasm\",\"attributes\":[{\"key\":\"_contract_address\",\"value\":\"inj1akvg3kxj5u57py0kejwzkng2ww945a5ana5zct\"},{\"key\":\"action\",\"value\":\"swap_hook\"},{\"key\":\"source_amount\",\"value\":\"100000000000000000\"},{\"key\":\"source_denom\",\"value\":\"inj\"},{\"key\":\"target_denom\",\"value\":\"peggy0xdAC17F958D2ee523a2206206994597C13D831ec7\"}]},{\"type\":\"coin_spent\",\"attributes\":[{\"key\":\"amount\",\"value\":\"100000000000000000inj\"},{\"key\":\"spender\",\"value\":\"inj1akvg3kxj5u57py0kejwzkng2ww945a5ana5zct\"}]},{\"type\":\"coin_received\",\"attributes\":[{\"key\":\"amount\",\"value\":\"100000000000000000inj\"},{\"key\":\"receiver\",\"value\":\"inj1r8lc3dfxqxs65rkng70ngvgdr8myvu9y7q2pru\"}]},{\"type\":\"transfer\",\"attributes\":[{\"key\":\"amount\",\"value\":\"100000000000000000inj\"},{\"key\":\"recipient\",\"value\":\"inj1r8lc3dfxqxs65rkng70ngvgdr8myvu9y7q2pru\"},{\"key\":\"sender\",\"value\":\"inj1akvg3kxj5u57py0kejwzkng2ww945a5ana5zct\"}]},{\"type\":\"execute\",\"attributes\":[{\"key\":\"_contract_address\",\"value\":\"inj1r8lc3dfxqxs65rkng70ngvgdr8myvu9y7q2pru\"}]},{\"type\":\"coin_spent\",\"attributes\":[{\"key\":\"amount\",\"value\":\"100000000000000000inj\"},{\"key\":\"spender\",\"value\":\"inj1r8lc3dfxqxs65rkng70ngvgdr8myvu9y7q2pru\"}]},{\"type\":\"coin_received\",\"attributes\":[{\"key\":\"amount\",\"value\":\"100000000000000000inj\"},{\"key\":\"receiver\",\"value\":\"inj14vnmw2wee3xtrsqfvpcqg35jg9v7j2vdpzx0kk\"}]},{\"type\":\"transfer\",\"attributes\":[{\"key\":\"amount\",\"value\":\"100000000000000000inj\"},{\"key\":\"recipient\",\"value\":\"inj14vnmw2wee3xtrsqfvpcqg35jg9v7j2vdpzx0kk\"},{\"key\":\"sender\",\"value\":\"inj1r8lc3dfxqxs65rkng70ngvgdr8myvu9y7q2pru\"}]},{\"type\":\"coin_spent\",\"attributes\":[{\"key\":\"amount\",\"value\":\"100000000000000000inj\"},{\"key\":\"spender\",\"value\":\"inj14vnmw2wee3xtrsqfvpcqg35jg9v7j2vdpzx0kk\"}]},{\"type\":\"coin_received\",\"attributes\":[{\"key\":\"amount\",\"value\":\"100000000000000000inj\"},{\"key\":\"receiver\",\"value\":\"inj1akxycslq8cjt0uffw4rjmfm3echchptu52a2dq\"}]},{\"type\":\"transfer\",\"attributes\":[{\"key\":\"amount\",\"value\":\"100000000000000000inj\"},{\"key\":\"recipient\",\"value\":\"inj1akxycslq8cjt0uffw4rjmfm3echchptu52a2dq\"},{\"key\":\"sender\",\"value\":\"inj14vnmw2wee3xtrsqfvpcqg35jg9v7j2vdpzx0kk\"}]},{\"type\":\"coin_spent\",\"attributes\":[{\"key\":\"amount\",\"value\":\"2496297peggy0xdAC17F958D2ee523a2206206994597C13D831ec7\"},{\"key\":\"spender\",\"value\":\"inj14vnmw2wee3xtrsqfvpcqg35jg9v7j2vdpzx0kk\"}]},{\"type\":\"coin_received\",\"attributes\":[{\"key\":\"amount\",\"value\":\"2496297peggy0xdAC17F958D2ee523a2206206994597C13D831ec7\"},{\"key\":\"receiver\",\"value\":\"inj1r8lc3dfxqxs65rkng70ngvgdr8myvu9y7q2pru\"}]},{\"type\":\"transfer\",\"attributes\":[{\"key\":\"amount\",\"value\":\"2496297peggy0xdAC17F958D2ee523a2206206994597C13D831ec7\"},{\"key\":\"recipient\",\"value\":\"inj1r8lc3dfxqxs65rkng70ngvgdr8myvu9y7q2pru\"},{\"key\":\"sender\",\"value\":\"inj14vnmw2wee3xtrsqfvpcqg35jg9v7j2vdpzx0kk\"}]},{\"type\":\"coin_spent\",\"attributes\":[{\"key\":\"amount\",\"value\":\"2001peggy0xdAC17F958D2ee523a2206206994597C13D831ec7\"},{\"key\":\"spender\",\"value\":\"inj14vnmw2wee3xtrsqfvpcqg35jg9v7j2vdpzx0kk\"}]},{\"type\":\"coin_received\",\"attributes\":[{\"key\":\"amount\",\"value\":\"2001peggy0xdAC17F958D2ee523a2206206994597C13D831ec7\"},{\"key\":\"receiver\",\"value\":\"inj18ny5lj29p3nhhd22hsqr5j5rdm3xsk2nl5rdad\"}]},{\"type\":\"transfer\",\"attributes\":[{\"key\":\"amount\",\"value\":\"2001peggy0xdAC17F958D2ee523a2206206994597C13D831ec7\"},{\"key\":\"recipient\",\"value\":\"inj18ny5lj29p3nhhd22hsqr5j5rdm3xsk2nl5rdad\"},{\"key\":\"sender\",\"value\":\"inj14vnmw2wee3xtrsqfvpcqg35jg9v7j2vdpzx0kk\"}]},{\"type\":\"coin_spent\",\"attributes\":[{\"key\":\"amount\",\"value\":\"250peggy0xdAC17F958D2ee523a2206206994597C13D831ec7\"},{\"key\":\"spender\",\"value\":\"inj14vnmw2wee3xtrsqfvpcqg35jg9v7j2vdpzx0kk\"}]},{\"type\":\"coin_received\",\"attributes\":[{\"key\":\"amount\",\"value\":\"250peggy0xdAC17F958D2ee523a2206206994597C13D831ec7\"},{\"key\":\"receiver\",\"value\":\"inj1akxycslq8cjt0uffw4rjmfm3echchptu52a2dq\"}]},{\"type\":\"transfer\",\"attributes\":[{\"key\":\"amount\",\"value\":\"250peggy0xdAC17F958D2ee523a2206206994597C13D831ec7\"},{\"key\":\"recipient\",\"value\":\"inj1akxycslq8cjt0uffw4rjmfm3echchptu52a2dq\"},{\"key\":\"sender\",\"value\":\"inj14vnmw2wee3xtrsqfvpcqg35jg9v7j2vdpzx0kk\"}]},{\"type\":\"injective.exchange.v1beta1.EventBatchSpotExecution\",\"attributes\":[{\"key\":\"executionType\",\"value\":\"\\\"Market\\\"\"},{\"key\":\"is_buy\",\"value\":\"false\"},{\"key\":\"market_id\",\"value\":\"\\\"0xa508cb32923323679f29a032c70342c147c17d0145625922b0ef22e955c844c0\\\"\"},{\"key\":\"trades\",\"value\":\"[{\\\"quantity\\\":\\\"100000000000000000.000000000000000000\\\",\\\"price\\\":\\\"0.000000000025013000\\\",\\\"subaccount_id\\\":\\\"Gf+ItSYBoaoO00efNDENGfZGcKQAAAAAAAAAAAAAAAA=\\\",\\\"fee\\\":\\\"5002.600000000000000000\\\",\\\"order_hash\\\":\\\"oyChUWmUzecpRcaRn/s8MmInRCIUkFOs0/d2goI4V/0=\\\",\\\"fee_recipient_address\\\":\\\"PMlPyUUMZ3u1SrwAOkqDbuJoWVM=\\\",\\\"cid\\\":\\\"\\\"}]\"}]},{\"type\":\"injective.exchange.v1beta1.EventBatchSpotExecution\",\"attributes\":[{\"key\":\"executionType\",\"value\":\"\\\"LimitFill\\\"\"},{\"key\":\"is_buy\",\"value\":\"true\"},{\"key\":\"market_id\",\"value\":\"\\\"0xa508cb32923323679f29a032c70342c147c17d0145625922b0ef22e955c844c0\\\"\"},{\"key\":\"trades\",\"value\":\"[{\\\"quantity\\\":\\\"100000000000000000.000000000000000000\\\",\\\"price\\\":\\\"0.000000000025013000\\\",\\\"subaccount_id\\\":\\\"7YxMQ+A+JLfxKXVHLadxzi+LhXwAAAAAAAAAAAAAAAA=\\\",\\\"fee\\\":\\\"-250.130000000000000000\\\",\\\"order_hash\\\":\\\"axAMu7IuOPG1st6gpRNGCfRnmo9vJu91fzU1GO8A8Ho=\\\",\\\"fee_recipient_address\\\":\\\"7YxMQ+A+JLfxKXVHLadxzi+LhXw=\\\",\\\"cid\\\":\\\"e8699466-0342-4307-b809-1b334fb20e12\\\"}]\"}]},{\"type\":\"reply\",\"attributes\":[{\"key\":\"_contract_address\",\"value\":\"inj1r8lc3dfxqxs65rkng70ngvgdr8myvu9y7q2pru\"}]},{\"type\":\"wasm-atomic_swap_execution\",\"attributes\":[{\"key\":\"_contract_address\",\"value\":\"inj1r8lc3dfxqxs65rkng70ngvgdr8myvu9y7q2pru\"},{\"key\":\"refund_amount\",\"value\":\"0\"},{\"key\":\"sender\",\"value\":\"inj1akvg3kxj5u57py0kejwzkng2ww945a5ana5zct\"},{\"key\":\"swap_final_amount\",\"value\":\"2496297.4\"},{\"key\":\"swap_final_denom\",\"value\":\"peggy0xdAC17F958D2ee523a2206206994597C13D831ec7\"},{\"key\":\"swap_input_amount\",\"value\":\"100000000000000000\"},{\"key\":\"swap_input_denom\",\"value\":\"inj\"},{\"key\":\"swap_results\",\"value\":\"[{\\\"market_id\\\":\\\"0xa508cb32923323679f29a032c70342c147c17d0145625922b0ef22e955c844c0\\\",\\\"quantity\\\":\\\"2496297.4\\\",\\\"price\\\":\\\"0.000000000025013\\\",\\\"fee\\\":\\\"5002.6\\\"}]\"}]},{\"type\":\"coin_spent\",\"attributes\":[{\"key\":\"amount\",\"value\":\"2496297peggy0xdAC17F958D2ee523a2206206994597C13D831ec7\"},{\"key\":\"spender\",\"value\":\"inj1r8lc3dfxqxs65rkng70ngvgdr8myvu9y7q2pru\"}]},{\"type\":\"coin_received\",\"attributes\":[{\"key\":\"amount\",\"value\":\"2496297peggy0xdAC17F958D2ee523a2206206994597C13D831ec7\"},{\"key\":\"receiver\",\"value\":\"inj1akvg3kxj5u57py0kejwzkng2ww945a5ana5zct\"}]},{\"type\":\"transfer\",\"attributes\":[{\"key\":\"amount\",\"value\":\"2496297peggy0xdAC17F958D2ee523a2206206994597C13D831ec7\"},{\"key\":\"recipient\",\"value\":\"inj1akvg3kxj5u57py0kejwzkng2ww945a5ana5zct\"},{\"key\":\"sender\",\"value\":\"inj1r8lc3dfxqxs65rkng70ngvgdr8myvu9y7q2pru\"}]},{\"type\":\"execute\",\"attributes\":[{\"key\":\"_contract_address\",\"value\":\"inj1akvg3kxj5u57py0kejwzkng2ww945a5ana5zct\"}]},{\"type\":\"wasm\",\"attributes\":[{\"key\":\"_contract_address\",\"value\":\"inj1akvg3kxj5u57py0kejwzkng2ww945a5ana5zct\"},{\"key\":\"action\",\"value\":\"swap_result_hook\"}]},{\"type\":\"coin_spent\",\"attributes\":[{\"key\":\"amount\",\"value\":\"2496297peggy0xdAC17F958D2ee523a2206206994597C13D831ec7\"},{\"key\":\"spender\",\"value\":\"inj1akvg3kxj5u57py0kejwzkng2ww945a5ana5zct\"}]},{\"type\":\"coin_received\",\"attributes\":[{\"key\":\"amount\",\"value\":\"2496297peggy0xdAC17F958D2ee523a2206206994597C13D831ec7\"},{\"key\":\"receiver\",\"value\":\"inj1p8e8j5j8djxrfkmlsvpg9xpmn7t2ergd00cq9u\"}]},{\"type\":\"transfer\",\"attributes\":[{\"key\":\"amount\",\"value\":\"2496297peggy0xdAC17F958D2ee523a2206206994597C13D831ec7\"},{\"key\":\"recipient\",\"value\":\"inj1p8e8j5j8djxrfkmlsvpg9xpmn7t2ergd00cq9u\"},{\"key\":\"sender\",\"value\":\"inj1akvg3kxj5u57py0kejwzkng2ww945a5ana5zct\"}]}]}]",
+  "logs": [
+    {
+      "msg_index": 0,
+      "log": "",
+      "events": [
+        {
+          "type": "message",
+          "attributes": [
+            {
+              "key": "action",
+              "value": "/cosmwasm.wasm.v1.MsgExecuteContract"
+            },
+            {
+              "key": "sender",
+              "value": "inj1p8e8j5j8djxrfkmlsvpg9xpmn7t2ergd00cq9u"
+            },
+            {
+              "key": "module",
+              "value": "wasm"
+            }
+          ]
+        },
+        {
+          "type": "coin_spent",
+          "attributes": [
+            {
+              "key": "spender",
+              "value": "inj1p8e8j5j8djxrfkmlsvpg9xpmn7t2ergd00cq9u"
+            },
+            {
+              "key": "amount",
+              "value": "100000000000000000inj"
+            }
+          ]
+        },
+        {
+          "type": "coin_received",
+          "attributes": [
+            {
+              "key": "receiver",
+              "value": "inj1akvg3kxj5u57py0kejwzkng2ww945a5ana5zct"
+            },
+            {
+              "key": "amount",
+              "value": "100000000000000000inj"
+            }
+          ]
+        },
+        {
+          "type": "transfer",
+          "attributes": [
+            {
+              "key": "recipient",
+              "value": "inj1akvg3kxj5u57py0kejwzkng2ww945a5ana5zct"
+            },
+            {
+              "key": "sender",
+              "value": "inj1p8e8j5j8djxrfkmlsvpg9xpmn7t2ergd00cq9u"
+            },
+            {
+              "key": "amount",
+              "value": "100000000000000000inj"
+            }
+          ]
+        },
+        {
+          "type": "execute",
+          "attributes": [
+            {
+              "key": "_contract_address",
+              "value": "inj1akvg3kxj5u57py0kejwzkng2ww945a5ana5zct"
+            }
+          ]
+        },
+        {
+          "type": "wasm",
+          "attributes": [
+            {
+              "key": "_contract_address",
+              "value": "inj1akvg3kxj5u57py0kejwzkng2ww945a5ana5zct"
+            },
+            {
+              "key": "action",
+              "value": "swap"
+            }
+          ]
+        },
+        {
+          "type": "execute",
+          "attributes": [
+            {
+              "key": "_contract_address",
+              "value": "inj1akvg3kxj5u57py0kejwzkng2ww945a5ana5zct"
+            }
+          ]
+        },
+        {
+          "type": "wasm",
+          "attributes": [
+            {
+              "key": "_contract_address",
+              "value": "inj1akvg3kxj5u57py0kejwzkng2ww945a5ana5zct"
+            },
+            {
+              "key": "action",
+              "value": "swap_hook"
+            },
+            {
+              "key": "source_amount",
+              "value": "100000000000000000"
+            },
+            {
+              "key": "source_denom",
+              "value": "inj"
+            },
+            {
+              "key": "target_denom",
+              "value": "peggy0xdAC17F958D2ee523a2206206994597C13D831ec7"
+            }
+          ]
+        },
+        {
+          "type": "coin_spent",
+          "attributes": [
+            {
+              "key": "amount",
+              "value": "100000000000000000inj"
+            },
+            {
+              "key": "spender",
+              "value": "inj1akvg3kxj5u57py0kejwzkng2ww945a5ana5zct"
+            }
+          ]
+        },
+        {
+          "type": "coin_received",
+          "attributes": [
+            {
+              "key": "amount",
+              "value": "100000000000000000inj"
+            },
+            {
+              "key": "receiver",
+              "value": "inj1r8lc3dfxqxs65rkng70ngvgdr8myvu9y7q2pru"
+            }
+          ]
+        },
+        {
+          "type": "transfer",
+          "attributes": [
+            {
+              "key": "amount",
+              "value": "100000000000000000inj"
+            },
+            {
+              "key": "recipient",
+              "value": "inj1r8lc3dfxqxs65rkng70ngvgdr8myvu9y7q2pru"
+            },
+            {
+              "key": "sender",
+              "value": "inj1akvg3kxj5u57py0kejwzkng2ww945a5ana5zct"
+            }
+          ]
+        },
+        {
+          "type": "execute",
+          "attributes": [
+            {
+              "key": "_contract_address",
+              "value": "inj1r8lc3dfxqxs65rkng70ngvgdr8myvu9y7q2pru"
+            }
+          ]
+        },
+        {
+          "type": "coin_spent",
+          "attributes": [
+            {
+              "key": "amount",
+              "value": "100000000000000000inj"
+            },
+            {
+              "key": "spender",
+              "value": "inj1r8lc3dfxqxs65rkng70ngvgdr8myvu9y7q2pru"
+            }
+          ]
+        },
+        {
+          "type": "coin_received",
+          "attributes": [
+            {
+              "key": "amount",
+              "value": "100000000000000000inj"
+            },
+            {
+              "key": "receiver",
+              "value": "inj14vnmw2wee3xtrsqfvpcqg35jg9v7j2vdpzx0kk"
+            }
+          ]
+        },
+        {
+          "type": "transfer",
+          "attributes": [
+            {
+              "key": "amount",
+              "value": "100000000000000000inj"
+            },
+            {
+              "key": "recipient",
+              "value": "inj14vnmw2wee3xtrsqfvpcqg35jg9v7j2vdpzx0kk"
+            },
+            {
+              "key": "sender",
+              "value": "inj1r8lc3dfxqxs65rkng70ngvgdr8myvu9y7q2pru"
+            }
+          ]
+        },
+        {
+          "type": "coin_spent",
+          "attributes": [
+            {
+              "key": "amount",
+              "value": "100000000000000000inj"
+            },
+            {
+              "key": "spender",
+              "value": "inj14vnmw2wee3xtrsqfvpcqg35jg9v7j2vdpzx0kk"
+            }
+          ]
+        },
+        {
+          "type": "coin_received",
+          "attributes": [
+            {
+              "key": "amount",
+              "value": "100000000000000000inj"
+            },
+            {
+              "key": "receiver",
+              "value": "inj1akxycslq8cjt0uffw4rjmfm3echchptu52a2dq"
+            }
+          ]
+        },
+        {
+          "type": "transfer",
+          "attributes": [
+            {
+              "key": "amount",
+              "value": "100000000000000000inj"
+            },
+            {
+              "key": "recipient",
+              "value": "inj1akxycslq8cjt0uffw4rjmfm3echchptu52a2dq"
+            },
+            {
+              "key": "sender",
+              "value": "inj14vnmw2wee3xtrsqfvpcqg35jg9v7j2vdpzx0kk"
+            }
+          ]
+        },
+        {
+          "type": "coin_spent",
+          "attributes": [
+            {
+              "key": "amount",
+              "value": "2496297peggy0xdAC17F958D2ee523a2206206994597C13D831ec7"
+            },
+            {
+              "key": "spender",
+              "value": "inj14vnmw2wee3xtrsqfvpcqg35jg9v7j2vdpzx0kk"
+            }
+          ]
+        },
+        {
+          "type": "coin_received",
+          "attributes": [
+            {
+              "key": "amount",
+              "value": "2496297peggy0xdAC17F958D2ee523a2206206994597C13D831ec7"
+            },
+            {
+              "key": "receiver",
+              "value": "inj1r8lc3dfxqxs65rkng70ngvgdr8myvu9y7q2pru"
+            }
+          ]
+        },
+        {
+          "type": "transfer",
+          "attributes": [
+            {
+              "key": "amount",
+              "value": "2496297peggy0xdAC17F958D2ee523a2206206994597C13D831ec7"
+            },
+            {
+              "key": "recipient",
+              "value": "inj1r8lc3dfxqxs65rkng70ngvgdr8myvu9y7q2pru"
+            },
+            {
+              "key": "sender",
+              "value": "inj14vnmw2wee3xtrsqfvpcqg35jg9v7j2vdpzx0kk"
+            }
+          ]
+        },
+        {
+          "type": "coin_spent",
+          "attributes": [
+            {
+              "key": "amount",
+              "value": "2001peggy0xdAC17F958D2ee523a2206206994597C13D831ec7"
+            },
+            {
+              "key": "spender",
+              "value": "inj14vnmw2wee3xtrsqfvpcqg35jg9v7j2vdpzx0kk"
+            }
+          ]
+        },
+        {
+          "type": "coin_received",
+          "attributes": [
+            {
+              "key": "amount",
+              "value": "2001peggy0xdAC17F958D2ee523a2206206994597C13D831ec7"
+            },
+            {
+              "key": "receiver",
+              "value": "inj18ny5lj29p3nhhd22hsqr5j5rdm3xsk2nl5rdad"
+            }
+          ]
+        },
+        {
+          "type": "transfer",
+          "attributes": [
+            {
+              "key": "amount",
+              "value": "2001peggy0xdAC17F958D2ee523a2206206994597C13D831ec7"
+            },
+            {
+              "key": "recipient",
+              "value": "inj18ny5lj29p3nhhd22hsqr5j5rdm3xsk2nl5rdad"
+            },
+            {
+              "key": "sender",
+              "value": "inj14vnmw2wee3xtrsqfvpcqg35jg9v7j2vdpzx0kk"
+            }
+          ]
+        },
+        {
+          "type": "coin_spent",
+          "attributes": [
+            {
+              "key": "amount",
+              "value": "250peggy0xdAC17F958D2ee523a2206206994597C13D831ec7"
+            },
+            {
+              "key": "spender",
+              "value": "inj14vnmw2wee3xtrsqfvpcqg35jg9v7j2vdpzx0kk"
+            }
+          ]
+        },
+        {
+          "type": "coin_received",
+          "attributes": [
+            {
+              "key": "amount",
+              "value": "250peggy0xdAC17F958D2ee523a2206206994597C13D831ec7"
+            },
+            {
+              "key": "receiver",
+              "value": "inj1akxycslq8cjt0uffw4rjmfm3echchptu52a2dq"
+            }
+          ]
+        },
+        {
+          "type": "transfer",
+          "attributes": [
+            {
+              "key": "amount",
+              "value": "250peggy0xdAC17F958D2ee523a2206206994597C13D831ec7"
+            },
+            {
+              "key": "recipient",
+              "value": "inj1akxycslq8cjt0uffw4rjmfm3echchptu52a2dq"
+            },
+            {
+              "key": "sender",
+              "value": "inj14vnmw2wee3xtrsqfvpcqg35jg9v7j2vdpzx0kk"
+            }
+          ]
+        },
+        {
+          "type": "injective.exchange.v1beta1.EventBatchSpotExecution",
+          "attributes": [
+            {
+              "key": "executionType",
+              "value": "\"Market\""
+            },
+            {
+              "key": "is_buy",
+              "value": "false"
+            },
+            {
+              "key": "market_id",
+              "value": "\"0xa508cb32923323679f29a032c70342c147c17d0145625922b0ef22e955c844c0\""
+            },
+            {
+              "key": "trades",
+              "value": "[{\"quantity\":\"100000000000000000.000000000000000000\",\"price\":\"0.000000000025013000\",\"subaccount_id\":\"Gf+ItSYBoaoO00efNDENGfZGcKQAAAAAAAAAAAAAAAA=\",\"fee\":\"5002.600000000000000000\",\"order_hash\":\"oyChUWmUzecpRcaRn/s8MmInRCIUkFOs0/d2goI4V/0=\",\"fee_recipient_address\":\"PMlPyUUMZ3u1SrwAOkqDbuJoWVM=\",\"cid\":\"\"}]"
+            }
+          ]
+        },
+        {
+          "type": "injective.exchange.v1beta1.EventBatchSpotExecution",
+          "attributes": [
+            {
+              "key": "executionType",
+              "value": "\"LimitFill\""
+            },
+            {
+              "key": "is_buy",
+              "value": "true"
+            },
+            {
+              "key": "market_id",
+              "value": "\"0xa508cb32923323679f29a032c70342c147c17d0145625922b0ef22e955c844c0\""
+            },
+            {
+              "key": "trades",
+              "value": "[{\"quantity\":\"100000000000000000.000000000000000000\",\"price\":\"0.000000000025013000\",\"subaccount_id\":\"7YxMQ+A+JLfxKXVHLadxzi+LhXwAAAAAAAAAAAAAAAA=\",\"fee\":\"-250.130000000000000000\",\"order_hash\":\"axAMu7IuOPG1st6gpRNGCfRnmo9vJu91fzU1GO8A8Ho=\",\"fee_recipient_address\":\"7YxMQ+A+JLfxKXVHLadxzi+LhXw=\",\"cid\":\"e8699466-0342-4307-b809-1b334fb20e12\"}]"
+            }
+          ]
+        },
+        {
+          "type": "reply",
+          "attributes": [
+            {
+              "key": "_contract_address",
+              "value": "inj1r8lc3dfxqxs65rkng70ngvgdr8myvu9y7q2pru"
+            }
+          ]
+        },
+        {
+          "type": "wasm-atomic_swap_execution",
+          "attributes": [
+            {
+              "key": "_contract_address",
+              "value": "inj1r8lc3dfxqxs65rkng70ngvgdr8myvu9y7q2pru"
+            },
+            {
+              "key": "refund_amount",
+              "value": "0"
+            },
+            {
+              "key": "sender",
+              "value": "inj1akvg3kxj5u57py0kejwzkng2ww945a5ana5zct"
+            },
+            {
+              "key": "swap_final_amount",
+              "value": "2496297.4"
+            },
+            {
+              "key": "swap_final_denom",
+              "value": "peggy0xdAC17F958D2ee523a2206206994597C13D831ec7"
+            },
+            {
+              "key": "swap_input_amount",
+              "value": "100000000000000000"
+            },
+            {
+              "key": "swap_input_denom",
+              "value": "inj"
+            },
+            {
+              "key": "swap_results",
+              "value": "[{\"market_id\":\"0xa508cb32923323679f29a032c70342c147c17d0145625922b0ef22e955c844c0\",\"quantity\":\"2496297.4\",\"price\":\"0.000000000025013\",\"fee\":\"5002.6\"}]"
+            }
+          ]
+        },
+        {
+          "type": "coin_spent",
+          "attributes": [
+            {
+              "key": "amount",
+              "value": "2496297peggy0xdAC17F958D2ee523a2206206994597C13D831ec7"
+            },
+            {
+              "key": "spender",
+              "value": "inj1r8lc3dfxqxs65rkng70ngvgdr8myvu9y7q2pru"
+            }
+          ]
+        },
+        {
+          "type": "coin_received",
+          "attributes": [
+            {
+              "key": "amount",
+              "value": "2496297peggy0xdAC17F958D2ee523a2206206994597C13D831ec7"
+            },
+            {
+              "key": "receiver",
+              "value": "inj1akvg3kxj5u57py0kejwzkng2ww945a5ana5zct"
+            }
+          ]
+        },
+        {
+          "type": "transfer",
+          "attributes": [
+            {
+              "key": "amount",
+              "value": "2496297peggy0xdAC17F958D2ee523a2206206994597C13D831ec7"
+            },
+            {
+              "key": "recipient",
+              "value": "inj1akvg3kxj5u57py0kejwzkng2ww945a5ana5zct"
+            },
+            {
+              "key": "sender",
+              "value": "inj1r8lc3dfxqxs65rkng70ngvgdr8myvu9y7q2pru"
+            }
+          ]
+        },
+        {
+          "type": "execute",
+          "attributes": [
+            {
+              "key": "_contract_address",
+              "value": "inj1akvg3kxj5u57py0kejwzkng2ww945a5ana5zct"
+            }
+          ]
+        },
+        {
+          "type": "wasm",
+          "attributes": [
+            {
+              "key": "_contract_address",
+              "value": "inj1akvg3kxj5u57py0kejwzkng2ww945a5ana5zct"
+            },
+            {
+              "key": "action",
+              "value": "swap_result_hook"
+            }
+          ]
+        },
+        {
+          "type": "coin_spent",
+          "attributes": [
+            {
+              "key": "amount",
+              "value": "2496297peggy0xdAC17F958D2ee523a2206206994597C13D831ec7"
+            },
+            {
+              "key": "spender",
+              "value": "inj1akvg3kxj5u57py0kejwzkng2ww945a5ana5zct"
+            }
+          ]
+        },
+        {
+          "type": "coin_received",
+          "attributes": [
+            {
+              "key": "amount",
+              "value": "2496297peggy0xdAC17F958D2ee523a2206206994597C13D831ec7"
+            },
+            {
+              "key": "receiver",
+              "value": "inj1p8e8j5j8djxrfkmlsvpg9xpmn7t2ergd00cq9u"
+            }
+          ]
+        },
+        {
+          "type": "transfer",
+          "attributes": [
+            {
+              "key": "amount",
+              "value": "2496297peggy0xdAC17F958D2ee523a2206206994597C13D831ec7"
+            },
+            {
+              "key": "recipient",
+              "value": "inj1p8e8j5j8djxrfkmlsvpg9xpmn7t2ergd00cq9u"
+            },
+            {
+              "key": "sender",
+              "value": "inj1akvg3kxj5u57py0kejwzkng2ww945a5ana5zct"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "info": "",
+  "gas_wanted": "853497",
+  "gas_used": "776717",
+  "tx": {
+    "@type": "/cosmos.tx.v1beta1.Tx",
+    "body": {
+      "messages": [
+        {
+          "@type": "/cosmwasm.wasm.v1.MsgExecuteContract",
+          "sender": "inj1p8e8j5j8djxrfkmlsvpg9xpmn7t2ergd00cq9u",
+          "contract": "inj1akvg3kxj5u57py0kejwzkng2ww945a5ana5zct",
+          "msg": {
+            "swap": {
+              "target_denom": {
+                "native": "peggy0xdAC17F958D2ee523a2206206994597C13D831ec7"
+              }
+            }
+          },
+          "funds": [
+            {
+              "denom": "inj",
+              "amount": "100000000000000000"
+            }
+          ]
+        }
+      ],
+      "memo": "",
+      "timeout_height": "0",
+      "extension_options": [],
+      "non_critical_extension_options": []
+    },
+    "auth_info": {
+      "signer_infos": [
+        {
+          "public_key": {
+            "@type": "/injective.crypto.v1beta1.ethsecp256k1.PubKey",
+            "key": "AilwSf6J6IDVGMDjR0Nj1Y5QKBWbUsMdj9CdOBppPHWE"
+          },
+          "mode_info": {
+            "single": {
+              "mode": "SIGN_MODE_DIRECT"
+            }
+          },
+          "sequence": "73"
+        }
+      ],
+      "fee": {
+        "amount": [
+          {
+            "denom": "inj",
+            "amount": "426748850000000"
+          }
+        ],
+        "gas_limit": "853497",
+        "payer": "",
+        "granter": ""
+      },
+      "tip": null
+    },
+    "signatures": ["2GWbdsiGK1h106LxKdysjMM0W2twz+Ks6tPSX3bGP9ccetairM+e5+WnRHXGCfsznjMkYajOQD/oQqWJ5vn1IA=="]
+  },
+  "timestamp": "2024-06-04T06:30:12Z",
+  "events": [
+    {
+      "type": "coin_spent",
+      "attributes": [
+        {
+          "key": "spender",
+          "value": "inj1p8e8j5j8djxrfkmlsvpg9xpmn7t2ergd00cq9u",
+          "index": true
+        },
+        {
+          "key": "amount",
+          "value": "426748850000000inj",
+          "index": true
+        }
+      ]
+    },
+    {
+      "type": "coin_received",
+      "attributes": [
+        {
+          "key": "receiver",
+          "value": "inj17xpfvakm2amg962yls6f84z3kell8c5l6s5ye9",
+          "index": true
+        },
+        {
+          "key": "amount",
+          "value": "426748850000000inj",
+          "index": true
+        }
+      ]
+    },
+    {
+      "type": "transfer",
+      "attributes": [
+        {
+          "key": "recipient",
+          "value": "inj17xpfvakm2amg962yls6f84z3kell8c5l6s5ye9",
+          "index": true
+        },
+        {
+          "key": "sender",
+          "value": "inj1p8e8j5j8djxrfkmlsvpg9xpmn7t2ergd00cq9u",
+          "index": true
+        },
+        {
+          "key": "amount",
+          "value": "426748850000000inj",
+          "index": true
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "attributes": [
+        {
+          "key": "sender",
+          "value": "inj1p8e8j5j8djxrfkmlsvpg9xpmn7t2ergd00cq9u",
+          "index": true
+        }
+      ]
+    },
+    {
+      "type": "tx",
+      "attributes": [
+        {
+          "key": "fee",
+          "value": "426748850000000inj",
+          "index": true
+        },
+        {
+          "key": "fee_payer",
+          "value": "inj1p8e8j5j8djxrfkmlsvpg9xpmn7t2ergd00cq9u",
+          "index": true
+        }
+      ]
+    },
+    {
+      "type": "tx",
+      "attributes": [
+        {
+          "key": "acc_seq",
+          "value": "inj1p8e8j5j8djxrfkmlsvpg9xpmn7t2ergd00cq9u/73",
+          "index": true
+        }
+      ]
+    },
+    {
+      "type": "tx",
+      "attributes": [
+        {
+          "key": "signature",
+          "value": "2GWbdsiGK1h106LxKdysjMM0W2twz+Ks6tPSX3bGP9ccetairM+e5+WnRHXGCfsznjMkYajOQD/oQqWJ5vn1IA==",
+          "index": true
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "attributes": [
+        {
+          "key": "action",
+          "value": "/cosmwasm.wasm.v1.MsgExecuteContract",
+          "index": true
+        },
+        {
+          "key": "sender",
+          "value": "inj1p8e8j5j8djxrfkmlsvpg9xpmn7t2ergd00cq9u",
+          "index": true
+        },
+        {
+          "key": "module",
+          "value": "wasm",
+          "index": true
+        }
+      ]
+    },
+    {
+      "type": "coin_spent",
+      "attributes": [
+        {
+          "key": "spender",
+          "value": "inj1p8e8j5j8djxrfkmlsvpg9xpmn7t2ergd00cq9u",
+          "index": true
+        },
+        {
+          "key": "amount",
+          "value": "100000000000000000inj",
+          "index": true
+        }
+      ]
+    },
+    {
+      "type": "coin_received",
+      "attributes": [
+        {
+          "key": "receiver",
+          "value": "inj1akvg3kxj5u57py0kejwzkng2ww945a5ana5zct",
+          "index": true
+        },
+        {
+          "key": "amount",
+          "value": "100000000000000000inj",
+          "index": true
+        }
+      ]
+    },
+    {
+      "type": "transfer",
+      "attributes": [
+        {
+          "key": "recipient",
+          "value": "inj1akvg3kxj5u57py0kejwzkng2ww945a5ana5zct",
+          "index": true
+        },
+        {
+          "key": "sender",
+          "value": "inj1p8e8j5j8djxrfkmlsvpg9xpmn7t2ergd00cq9u",
+          "index": true
+        },
+        {
+          "key": "amount",
+          "value": "100000000000000000inj",
+          "index": true
+        }
+      ]
+    },
+    {
+      "type": "execute",
+      "attributes": [
+        {
+          "key": "_contract_address",
+          "value": "inj1akvg3kxj5u57py0kejwzkng2ww945a5ana5zct",
+          "index": true
+        }
+      ]
+    },
+    {
+      "type": "wasm",
+      "attributes": [
+        {
+          "key": "_contract_address",
+          "value": "inj1akvg3kxj5u57py0kejwzkng2ww945a5ana5zct",
+          "index": true
+        },
+        {
+          "key": "action",
+          "value": "swap",
+          "index": true
+        }
+      ]
+    },
+    {
+      "type": "execute",
+      "attributes": [
+        {
+          "key": "_contract_address",
+          "value": "inj1akvg3kxj5u57py0kejwzkng2ww945a5ana5zct",
+          "index": true
+        }
+      ]
+    },
+    {
+      "type": "wasm",
+      "attributes": [
+        {
+          "key": "_contract_address",
+          "value": "inj1akvg3kxj5u57py0kejwzkng2ww945a5ana5zct",
+          "index": true
+        },
+        {
+          "key": "action",
+          "value": "swap_hook",
+          "index": true
+        },
+        {
+          "key": "source_amount",
+          "value": "100000000000000000",
+          "index": true
+        },
+        {
+          "key": "source_denom",
+          "value": "inj",
+          "index": true
+        },
+        {
+          "key": "target_denom",
+          "value": "peggy0xdAC17F958D2ee523a2206206994597C13D831ec7",
+          "index": true
+        }
+      ]
+    },
+    {
+      "type": "coin_spent",
+      "attributes": [
+        {
+          "key": "amount",
+          "value": "100000000000000000inj",
+          "index": true
+        },
+        {
+          "key": "spender",
+          "value": "inj1akvg3kxj5u57py0kejwzkng2ww945a5ana5zct",
+          "index": true
+        }
+      ]
+    },
+    {
+      "type": "coin_received",
+      "attributes": [
+        {
+          "key": "amount",
+          "value": "100000000000000000inj",
+          "index": true
+        },
+        {
+          "key": "receiver",
+          "value": "inj1r8lc3dfxqxs65rkng70ngvgdr8myvu9y7q2pru",
+          "index": true
+        }
+      ]
+    },
+    {
+      "type": "transfer",
+      "attributes": [
+        {
+          "key": "amount",
+          "value": "100000000000000000inj",
+          "index": true
+        },
+        {
+          "key": "recipient",
+          "value": "inj1r8lc3dfxqxs65rkng70ngvgdr8myvu9y7q2pru",
+          "index": true
+        },
+        {
+          "key": "sender",
+          "value": "inj1akvg3kxj5u57py0kejwzkng2ww945a5ana5zct",
+          "index": true
+        }
+      ]
+    },
+    {
+      "type": "execute",
+      "attributes": [
+        {
+          "key": "_contract_address",
+          "value": "inj1r8lc3dfxqxs65rkng70ngvgdr8myvu9y7q2pru",
+          "index": true
+        }
+      ]
+    },
+    {
+      "type": "coin_spent",
+      "attributes": [
+        {
+          "key": "amount",
+          "value": "100000000000000000inj",
+          "index": true
+        },
+        {
+          "key": "spender",
+          "value": "inj1r8lc3dfxqxs65rkng70ngvgdr8myvu9y7q2pru",
+          "index": true
+        }
+      ]
+    },
+    {
+      "type": "coin_received",
+      "attributes": [
+        {
+          "key": "amount",
+          "value": "100000000000000000inj",
+          "index": true
+        },
+        {
+          "key": "receiver",
+          "value": "inj14vnmw2wee3xtrsqfvpcqg35jg9v7j2vdpzx0kk",
+          "index": true
+        }
+      ]
+    },
+    {
+      "type": "transfer",
+      "attributes": [
+        {
+          "key": "amount",
+          "value": "100000000000000000inj",
+          "index": true
+        },
+        {
+          "key": "recipient",
+          "value": "inj14vnmw2wee3xtrsqfvpcqg35jg9v7j2vdpzx0kk",
+          "index": true
+        },
+        {
+          "key": "sender",
+          "value": "inj1r8lc3dfxqxs65rkng70ngvgdr8myvu9y7q2pru",
+          "index": true
+        }
+      ]
+    },
+    {
+      "type": "coin_spent",
+      "attributes": [
+        {
+          "key": "amount",
+          "value": "100000000000000000inj",
+          "index": true
+        },
+        {
+          "key": "spender",
+          "value": "inj14vnmw2wee3xtrsqfvpcqg35jg9v7j2vdpzx0kk",
+          "index": true
+        }
+      ]
+    },
+    {
+      "type": "coin_received",
+      "attributes": [
+        {
+          "key": "amount",
+          "value": "100000000000000000inj",
+          "index": true
+        },
+        {
+          "key": "receiver",
+          "value": "inj1akxycslq8cjt0uffw4rjmfm3echchptu52a2dq",
+          "index": true
+        }
+      ]
+    },
+    {
+      "type": "transfer",
+      "attributes": [
+        {
+          "key": "amount",
+          "value": "100000000000000000inj",
+          "index": true
+        },
+        {
+          "key": "recipient",
+          "value": "inj1akxycslq8cjt0uffw4rjmfm3echchptu52a2dq",
+          "index": true
+        },
+        {
+          "key": "sender",
+          "value": "inj14vnmw2wee3xtrsqfvpcqg35jg9v7j2vdpzx0kk",
+          "index": true
+        }
+      ]
+    },
+    {
+      "type": "coin_spent",
+      "attributes": [
+        {
+          "key": "amount",
+          "value": "2496297peggy0xdAC17F958D2ee523a2206206994597C13D831ec7",
+          "index": true
+        },
+        {
+          "key": "spender",
+          "value": "inj14vnmw2wee3xtrsqfvpcqg35jg9v7j2vdpzx0kk",
+          "index": true
+        }
+      ]
+    },
+    {
+      "type": "coin_received",
+      "attributes": [
+        {
+          "key": "amount",
+          "value": "2496297peggy0xdAC17F958D2ee523a2206206994597C13D831ec7",
+          "index": true
+        },
+        {
+          "key": "receiver",
+          "value": "inj1r8lc3dfxqxs65rkng70ngvgdr8myvu9y7q2pru",
+          "index": true
+        }
+      ]
+    },
+    {
+      "type": "transfer",
+      "attributes": [
+        {
+          "key": "amount",
+          "value": "2496297peggy0xdAC17F958D2ee523a2206206994597C13D831ec7",
+          "index": true
+        },
+        {
+          "key": "recipient",
+          "value": "inj1r8lc3dfxqxs65rkng70ngvgdr8myvu9y7q2pru",
+          "index": true
+        },
+        {
+          "key": "sender",
+          "value": "inj14vnmw2wee3xtrsqfvpcqg35jg9v7j2vdpzx0kk",
+          "index": true
+        }
+      ]
+    },
+    {
+      "type": "coin_spent",
+      "attributes": [
+        {
+          "key": "amount",
+          "value": "2001peggy0xdAC17F958D2ee523a2206206994597C13D831ec7",
+          "index": true
+        },
+        {
+          "key": "spender",
+          "value": "inj14vnmw2wee3xtrsqfvpcqg35jg9v7j2vdpzx0kk",
+          "index": true
+        }
+      ]
+    },
+    {
+      "type": "coin_received",
+      "attributes": [
+        {
+          "key": "amount",
+          "value": "2001peggy0xdAC17F958D2ee523a2206206994597C13D831ec7",
+          "index": true
+        },
+        {
+          "key": "receiver",
+          "value": "inj18ny5lj29p3nhhd22hsqr5j5rdm3xsk2nl5rdad",
+          "index": true
+        }
+      ]
+    },
+    {
+      "type": "transfer",
+      "attributes": [
+        {
+          "key": "amount",
+          "value": "2001peggy0xdAC17F958D2ee523a2206206994597C13D831ec7",
+          "index": true
+        },
+        {
+          "key": "recipient",
+          "value": "inj18ny5lj29p3nhhd22hsqr5j5rdm3xsk2nl5rdad",
+          "index": true
+        },
+        {
+          "key": "sender",
+          "value": "inj14vnmw2wee3xtrsqfvpcqg35jg9v7j2vdpzx0kk",
+          "index": true
+        }
+      ]
+    },
+    {
+      "type": "coin_spent",
+      "attributes": [
+        {
+          "key": "amount",
+          "value": "250peggy0xdAC17F958D2ee523a2206206994597C13D831ec7",
+          "index": true
+        },
+        {
+          "key": "spender",
+          "value": "inj14vnmw2wee3xtrsqfvpcqg35jg9v7j2vdpzx0kk",
+          "index": true
+        }
+      ]
+    },
+    {
+      "type": "coin_received",
+      "attributes": [
+        {
+          "key": "amount",
+          "value": "250peggy0xdAC17F958D2ee523a2206206994597C13D831ec7",
+          "index": true
+        },
+        {
+          "key": "receiver",
+          "value": "inj1akxycslq8cjt0uffw4rjmfm3echchptu52a2dq",
+          "index": true
+        }
+      ]
+    },
+    {
+      "type": "transfer",
+      "attributes": [
+        {
+          "key": "amount",
+          "value": "250peggy0xdAC17F958D2ee523a2206206994597C13D831ec7",
+          "index": true
+        },
+        {
+          "key": "recipient",
+          "value": "inj1akxycslq8cjt0uffw4rjmfm3echchptu52a2dq",
+          "index": true
+        },
+        {
+          "key": "sender",
+          "value": "inj14vnmw2wee3xtrsqfvpcqg35jg9v7j2vdpzx0kk",
+          "index": true
+        }
+      ]
+    },
+    {
+      "type": "injective.exchange.v1beta1.EventBatchSpotExecution",
+      "attributes": [
+        {
+          "key": "executionType",
+          "value": "\"Market\"",
+          "index": true
+        },
+        {
+          "key": "is_buy",
+          "value": "false",
+          "index": true
+        },
+        {
+          "key": "market_id",
+          "value": "\"0xa508cb32923323679f29a032c70342c147c17d0145625922b0ef22e955c844c0\"",
+          "index": true
+        },
+        {
+          "key": "trades",
+          "value": "[{\"quantity\":\"100000000000000000.000000000000000000\",\"price\":\"0.000000000025013000\",\"subaccount_id\":\"Gf+ItSYBoaoO00efNDENGfZGcKQAAAAAAAAAAAAAAAA=\",\"fee\":\"5002.600000000000000000\",\"order_hash\":\"oyChUWmUzecpRcaRn/s8MmInRCIUkFOs0/d2goI4V/0=\",\"fee_recipient_address\":\"PMlPyUUMZ3u1SrwAOkqDbuJoWVM=\",\"cid\":\"\"}]",
+          "index": true
+        }
+      ]
+    },
+    {
+      "type": "injective.exchange.v1beta1.EventBatchSpotExecution",
+      "attributes": [
+        {
+          "key": "executionType",
+          "value": "\"LimitFill\"",
+          "index": true
+        },
+        {
+          "key": "is_buy",
+          "value": "true",
+          "index": true
+        },
+        {
+          "key": "market_id",
+          "value": "\"0xa508cb32923323679f29a032c70342c147c17d0145625922b0ef22e955c844c0\"",
+          "index": true
+        },
+        {
+          "key": "trades",
+          "value": "[{\"quantity\":\"100000000000000000.000000000000000000\",\"price\":\"0.000000000025013000\",\"subaccount_id\":\"7YxMQ+A+JLfxKXVHLadxzi+LhXwAAAAAAAAAAAAAAAA=\",\"fee\":\"-250.130000000000000000\",\"order_hash\":\"axAMu7IuOPG1st6gpRNGCfRnmo9vJu91fzU1GO8A8Ho=\",\"fee_recipient_address\":\"7YxMQ+A+JLfxKXVHLadxzi+LhXw=\",\"cid\":\"e8699466-0342-4307-b809-1b334fb20e12\"}]",
+          "index": true
+        }
+      ]
+    },
+    {
+      "type": "reply",
+      "attributes": [
+        {
+          "key": "_contract_address",
+          "value": "inj1r8lc3dfxqxs65rkng70ngvgdr8myvu9y7q2pru",
+          "index": true
+        }
+      ]
+    },
+    {
+      "type": "wasm-atomic_swap_execution",
+      "attributes": [
+        {
+          "key": "_contract_address",
+          "value": "inj1r8lc3dfxqxs65rkng70ngvgdr8myvu9y7q2pru",
+          "index": true
+        },
+        {
+          "key": "refund_amount",
+          "value": "0",
+          "index": true
+        },
+        {
+          "key": "sender",
+          "value": "inj1akvg3kxj5u57py0kejwzkng2ww945a5ana5zct",
+          "index": true
+        },
+        {
+          "key": "swap_final_amount",
+          "value": "2496297.4",
+          "index": true
+        },
+        {
+          "key": "swap_final_denom",
+          "value": "peggy0xdAC17F958D2ee523a2206206994597C13D831ec7",
+          "index": true
+        },
+        {
+          "key": "swap_input_amount",
+          "value": "100000000000000000",
+          "index": true
+        },
+        {
+          "key": "swap_input_denom",
+          "value": "inj",
+          "index": true
+        },
+        {
+          "key": "swap_results",
+          "value": "[{\"market_id\":\"0xa508cb32923323679f29a032c70342c147c17d0145625922b0ef22e955c844c0\",\"quantity\":\"2496297.4\",\"price\":\"0.000000000025013\",\"fee\":\"5002.6\"}]",
+          "index": true
+        }
+      ]
+    },
+    {
+      "type": "coin_spent",
+      "attributes": [
+        {
+          "key": "amount",
+          "value": "2496297peggy0xdAC17F958D2ee523a2206206994597C13D831ec7",
+          "index": true
+        },
+        {
+          "key": "spender",
+          "value": "inj1r8lc3dfxqxs65rkng70ngvgdr8myvu9y7q2pru",
+          "index": true
+        }
+      ]
+    },
+    {
+      "type": "coin_received",
+      "attributes": [
+        {
+          "key": "amount",
+          "value": "2496297peggy0xdAC17F958D2ee523a2206206994597C13D831ec7",
+          "index": true
+        },
+        {
+          "key": "receiver",
+          "value": "inj1akvg3kxj5u57py0kejwzkng2ww945a5ana5zct",
+          "index": true
+        }
+      ]
+    },
+    {
+      "type": "transfer",
+      "attributes": [
+        {
+          "key": "amount",
+          "value": "2496297peggy0xdAC17F958D2ee523a2206206994597C13D831ec7",
+          "index": true
+        },
+        {
+          "key": "recipient",
+          "value": "inj1akvg3kxj5u57py0kejwzkng2ww945a5ana5zct",
+          "index": true
+        },
+        {
+          "key": "sender",
+          "value": "inj1r8lc3dfxqxs65rkng70ngvgdr8myvu9y7q2pru",
+          "index": true
+        }
+      ]
+    },
+    {
+      "type": "execute",
+      "attributes": [
+        {
+          "key": "_contract_address",
+          "value": "inj1akvg3kxj5u57py0kejwzkng2ww945a5ana5zct",
+          "index": true
+        }
+      ]
+    },
+    {
+      "type": "wasm",
+      "attributes": [
+        {
+          "key": "_contract_address",
+          "value": "inj1akvg3kxj5u57py0kejwzkng2ww945a5ana5zct",
+          "index": true
+        },
+        {
+          "key": "action",
+          "value": "swap_result_hook",
+          "index": true
+        }
+      ]
+    },
+    {
+      "type": "coin_spent",
+      "attributes": [
+        {
+          "key": "amount",
+          "value": "2496297peggy0xdAC17F958D2ee523a2206206994597C13D831ec7",
+          "index": true
+        },
+        {
+          "key": "spender",
+          "value": "inj1akvg3kxj5u57py0kejwzkng2ww945a5ana5zct",
+          "index": true
+        }
+      ]
+    },
+    {
+      "type": "coin_received",
+      "attributes": [
+        {
+          "key": "amount",
+          "value": "2496297peggy0xdAC17F958D2ee523a2206206994597C13D831ec7",
+          "index": true
+        },
+        {
+          "key": "receiver",
+          "value": "inj1p8e8j5j8djxrfkmlsvpg9xpmn7t2ergd00cq9u",
+          "index": true
+        }
+      ]
+    },
+    {
+      "type": "transfer",
+      "attributes": [
+        {
+          "key": "amount",
+          "value": "2496297peggy0xdAC17F958D2ee523a2206206994597C13D831ec7",
+          "index": true
+        },
+        {
+          "key": "recipient",
+          "value": "inj1p8e8j5j8djxrfkmlsvpg9xpmn7t2ergd00cq9u",
+          "index": true
+        },
+        {
+          "key": "sender",
+          "value": "inj1akvg3kxj5u57py0kejwzkng2ww945a5ana5zct",
+          "index": true
+        }
+      ]
+    }
+  ]
+}

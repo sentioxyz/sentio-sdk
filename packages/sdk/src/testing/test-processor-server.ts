@@ -23,6 +23,7 @@ import { SolanaFacet } from './solana-facet.js'
 import { EthFacet } from './eth-facet.js'
 import { SuiFacet } from './sui-facet.js'
 import { FuelFacet } from './fuel-facet.js'
+import { CosmosFacet } from './cosmos-facet.js'
 
 export const TEST_CONTEXT: CallContext = <CallContext>{}
 
@@ -40,6 +41,7 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
   solana: SolanaFacet
   sui: SuiFacet
   fuel: FuelFacet
+  cosmos: CosmosFacet
 
   constructor(loader: () => Promise<any>, httpEndpoints: Record<string, string> = {}) {
     cleanTest()
@@ -50,6 +52,7 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
     this.eth = new EthFacet(this)
     this.sui = new SuiFacet(this)
     this.fuel = new FuelFacet(this)
+    this.cosmos = new CosmosFacet(this)
 
     for (const k in CHAIN_MAP) {
       const http = httpEndpoints[k] || ''
