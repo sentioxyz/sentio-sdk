@@ -8,7 +8,7 @@ import {
   EventTrackingResult,
   LogLevel
 } from '@sentio/protos'
-import { normalizeAttribute } from './normalization.js'
+import { normalizeAttribute, normalizeLabels } from './normalization.js'
 import { MapStateStorage } from '@sentio/runtime'
 import { BN } from 'fuels'
 import { BigDecimal } from '@sentio/bigdecimal'
@@ -125,7 +125,8 @@ function emit<T>(ctx: BaseContext, eventName: string, event: Event<T>) {
     distinctEntityId: distinctId || '',
     attributes: normalizeAttribute(payload),
     runtimeInfo: undefined,
-    noMetric: true
+    noMetric: true,
+    ...normalizeLabels(ctx.baseLabels) // TODO avoid dup label in metadata
   }
   ctx.update({ events: [res] })
 }

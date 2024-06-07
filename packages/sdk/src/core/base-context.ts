@@ -11,7 +11,7 @@ export abstract class BaseContext {
   meter: Meter
   eventLogger: EventLoggerBinding
   private _store: Store
-  protected baseLabels: Labels
+  baseLabels: Labels
   private active: boolean
 
   private _res: Required<ProcessResult, 'states'> = {
