@@ -48,7 +48,7 @@ describe('Test Basic Examples', () => {
     const logData = mockTransferLog('0x1E4EDE388cbc9F4b5c79681B7f94d36a11ABEBC9', {
       from: '0x0000000000000000000000000000000000000000',
       to: '0xB329e39Ebefd16f40d38f07643652cE17Ca5Bac1',
-      value: BigInt('0x9a71db64810aaa0000'),
+      value: BigInt('0x9a71db64810aaa0000')
     })
     let res = await service.eth.testLog(logData)
 
@@ -57,6 +57,7 @@ describe('Test Basic Examples', () => {
     expect(firstCounterValue(res.result, 'c1')).equals(1)
     const event = res.result?.events[0]
     expect(event?.attributes?.value.endsWith(SENTIO_BIGINT_STRING_SUFFIX)).equals(true)
+    expect(event?.attributes?.project).equals('a')
 
     expect(counters?.[0].metadata?.chainId).equals('1')
     expect(counters?.[0].runtimeInfo?.from).equals(HandlerType.ETH_LOG)
@@ -101,13 +102,13 @@ describe('Test Basic Examples', () => {
               contractAddress: '0x0000000000000000000000000000000000000000',
               blockNumber: '0xb8ba23',
               type: '0x0',
-              cumulativeGasUsed: '0x8b56b3',
+              cumulativeGasUsed: '0x8b56b3'
             },
-            timestamp: new Date(),
-          },
+            timestamp: new Date()
+          }
         },
         handlerIds: [0],
-        handlerType: HandlerType.ETH_TRACE,
+        handlerType: HandlerType.ETH_TRACE
       })
     ).result
 
@@ -122,19 +123,19 @@ describe('Test Basic Examples', () => {
       input:
         '0x095ea7b30000000000000000000000003eabf546fff0a41edaaf5b667333a846285713180000000000000000000000000000000000000000000000000000002a03956d85',
       to: '0x1E4EDE388cbc9F4b5c79681B7f94d36a11ABEBC9',
-      value: 0x0,
+      value: 0x0
     },
     blockHash: '0xb1fe1fefca4063ab9cc06a10356a6dd397b8c3dd38e21470e107a711ad559c13',
     blockNumber: 15548801,
     result: {
       gasUsed: 0x95df,
-      output: '0x0000000000000000000000000000000000000000000000000000000000000001',
+      output: '0x0000000000000000000000000000000000000000000000000000000000000001'
     },
     subtraces: 1,
     traceAddress: [],
     transactionHash: '0xc05c37b34e13380d0b7e0475b27a0c77fda826f82c603f9c45922e952d63b7a5',
     transactionPosition: 69,
-    type: 'call',
+    type: 'call'
   }
 
   const blockData: RichBlock = {
@@ -150,6 +151,6 @@ describe('Test Basic Examples', () => {
     miner: '0xbb7b8287f3f0a933474a79eae42cbca977791171',
     baseFeePerGas: null,
     transactions: [],
-    traces: [traceData],
+    traces: [traceData]
   }
 })

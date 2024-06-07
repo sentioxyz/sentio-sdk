@@ -123,10 +123,12 @@ function emit<T>(ctx: BaseContext, eventName: string, event: Event<T>) {
     severity: severity || LogLevel.INFO,
     message: message || '',
     distinctEntityId: distinctId || '',
-    attributes: normalizeAttribute(payload),
+    attributes: {
+      ...normalizeLabels(ctx.baseLabels), // TODO avoid dup label in metadata
+      ...normalizeAttribute(payload)
+    },
     runtimeInfo: undefined,
-    noMetric: true,
-    ...normalizeLabels(ctx.baseLabels) // TODO avoid dup label in metadata
+    noMetric: true
   }
   ctx.update({ events: [res] })
 }
