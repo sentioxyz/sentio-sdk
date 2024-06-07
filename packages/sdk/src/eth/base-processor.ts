@@ -136,6 +136,7 @@ export class GlobalProcessor {
       }
     }
 
+    const processor = this
     this.blockHandlers.push({
       handler: async function (data: Data_EthBlock) {
         const { block } = formatEthData(data)
@@ -144,7 +145,17 @@ export class GlobalProcessor {
           throw new ServerError(Status.INVALID_ARGUMENT, 'Block is empty')
         }
 
-        const ctx = new GlobalContext(chainId, '*', new Date(block.timestamp * 1000), block, undefined, undefined)
+        const ctx = new GlobalContext(
+          chainId,
+          '*',
+          new Date(block.timestamp * 1000),
+          block,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          processor.config.baseLabels
+        )
         await handler(block, ctx)
         return ctx.stopAndGetResult()
       },
@@ -160,6 +171,8 @@ export class GlobalProcessor {
     fetchConfig?: Partial<EthFetchConfig>
   ): this {
     const chainId = this.getChainId()
+    const processor = this
+
     this.transactionHandler.push({
       handler: async function (data: Data_EthTransaction) {
         const { trace, block, transaction, transactionReceipt } = formatEthData(data)
@@ -179,7 +192,8 @@ export class GlobalProcessor {
           undefined,
           trace,
           transaction,
-          transactionReceipt
+          transactionReceipt,
+          processor.config.baseLabels
         )
         await handler(transaction, ctx)
         return ctx.stopAndGetResult()
@@ -204,6 +218,8 @@ export class GlobalProcessor {
       }
     }
 
+    const processor = this
+
     this.traceHandlers.push({
       signatures,
       fetchConfig: EthFetchConfig.fromPartial(fetchConfig || {}),
@@ -221,7 +237,8 @@ export class GlobalProcessor {
           undefined,
           trace,
           transaction,
-          transactionReceipt
+          transactionReceipt,
+          processor.config.baseLabels
         )
         await handler(trace, ctx)
         return ctx.stopAndGetResult()
@@ -329,7 +346,8 @@ export abstract class BaseProcessor<
           log,
           undefined,
           transaction,
-          transactionReceipt
+          transactionReceipt,
+          processor.config.baseLabels
         )
         const logParam = log as any as { topics: Array<string>; data: string }
 
@@ -415,7 +433,10 @@ export abstract class BaseProcessor<
           new Date(block.timestamp * 1000),
           block,
           undefined,
-          undefined
+          undefined,
+          undefined,
+          undefined,
+          processor.config.baseLabels
         )
         await handler(block, ctx)
         return ctx.stopAndGetResult()
@@ -480,7 +501,8 @@ export abstract class BaseProcessor<
           undefined,
           trace,
           transaction,
-          transactionReceipt
+          transactionReceipt,
+          processor.config.baseLabels
         )
         await handler(typedTrace, ctx)
         return ctx.stopAndGetResult()
