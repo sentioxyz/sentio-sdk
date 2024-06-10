@@ -120,9 +120,9 @@ export async function runUpload(processorConfig: YamlProjectConfig, argv: string
   } else if (options['token']) {
     uploadAuth.authorization = 'Bearer ' + options['token']
   } else {
-    const isProd = options.host === 'https://app.sentio.xyz'
-    const cmd = isProd ? 'sentio login' : 'sentio login --host=' + options.host
-    console.error(chalk.red('No Credential found for', options.host, '. Please run `' + cmd + '`.'))
+    const isProd = processorConfig.host === 'https://app.sentio.xyz'
+    const cmd = isProd ? 'sentio login' : 'sentio login --host=' + processorConfig.host
+    console.error(chalk.red('No Credential found for', processorConfig.host, '. Please run `' + cmd + '`.'))
     process.exit(1)
   }
 

@@ -26,6 +26,11 @@ const argv = mainOptions._unknown || []
 
 if (!mainOptions.command) {
   usage()
+  process.exit(0)
+}
+
+if (argv.length) {
+  console.log(chalk.yellow('Unknown option:', argv.join(' ')))
 }
 
 if (mainOptions.command === 'login') {
