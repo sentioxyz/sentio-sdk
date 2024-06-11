@@ -24,9 +24,19 @@ export class FuelProcessor implements FuelBaseProcessor<FuelProcessorConfig> {
 
   constructor(readonly config: FuelProcessorConfig) {}
 
+  latestGasPrice: string | undefined
   async configure() {
     const url = getRpcEndpoint(this.config.chainId)
     this.provider = await Provider.create(url)
+    this.provider.getLatestGasPrice = async () => {
+      // avoid flood the endpoint, cache the latest gas price
+      if (this.latestGasPrice) {
+        return bn(this.latestGasPrice)
+      }
+      const { latestGasPrice } = await this.provider.operations.getLatestGasPrice()
+      this.latestGasPrice = latestGasPrice?.gasPrice
+      return bn(latestGasPrice.gasPrice)
+    }
   }
 
   public onTransaction(
