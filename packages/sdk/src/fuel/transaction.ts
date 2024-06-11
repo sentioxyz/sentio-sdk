@@ -12,8 +12,7 @@ import {
   ReceiptType,
   TransactionCoder,
   TransactionResponse,
-  TransactionSummary,
-  ZeroBytes32 as BaseAssetId
+  TransactionSummary
 } from 'fuels'
 import { FuelLog } from './types.js'
 
@@ -33,7 +32,7 @@ export type FuelTransaction = TransactionSummary & {
 
 function findSenderFromInputs(inputs: Input[] | undefined): string | undefined {
   for (const input of inputs || []) {
-    if (input.type == InputType.Coin && input.assetId == BaseAssetId) {
+    if (input.type == InputType.Coin) {
       return input.owner
     }
   }
