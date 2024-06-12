@@ -37,7 +37,7 @@ export function normalizeLabels(labels: Labels): Labels {
   return normLabels
 }
 
-function normalizeObject(obj: any, length: number): any {
+function normalizeObject(obj: any, length: number, path?: string): any {
   let ret: any
 
   const typeString = typeof obj
@@ -55,7 +55,9 @@ function normalizeObject(obj: any, length: number): any {
       return null
   }
   if (Array.isArray(obj)) {
-    console.warn('Array type inside log/event payload is not currently supported and will be ignored.')
+    console.warn(
+      `Array type inside log/event payload is not currently supported and will be ignored. Path: ${path ?? ''}`
+    )
     return null
     // ret = []
     // for (const val of obj) {
@@ -82,7 +84,7 @@ function normalizeObject(obj: any, length: number): any {
     }
     ret = {}
     for (const [key, value] of Object.entries(obj)) {
-      const normValue = normalizeObject(value, length)
+      const normValue = normalizeObject(value, length, `${path ?? ''}.${key}`)
       if (normValue != null) {
         ret[key] = normValue
       }

@@ -36,7 +36,6 @@
     "./sui/builtin/0x3": "./lib/sui/builtin/0x3.js",
     "./fuel": "./lib/fuel/index.js",
     "./fuel/codegen": "./lib/fuel/codegen/index.js",
-    "./cosmos": "./lib/cosmos/index.js",
     "./store": "./lib/store/index.js",
     "./store/codegen": "./lib/store/codegen.js"
   },
