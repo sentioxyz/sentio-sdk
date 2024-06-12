@@ -84,8 +84,13 @@ function getTag(prefix: string, value: any): string {
 class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
   executor: PQueue
   #performCache = new LRUCache<string, Promise<any>>({
-    max: 10000,
-    ttl: 1000 * 60 * 60 // 1 hour
+    max: 100000, // 100k items
+    maxSize: 300 * 1024 * 1024, // 300mb for cache
+    ttl: 1000 * 60 * 60, // 1 hour
+    sizeCalculation: (value: any) => {
+      // assume each item is 1kb for simplicity
+      return 1024
+    }
   })
 
   constructor(url: string, network: Network, concurrency: number) {
@@ -102,7 +107,9 @@ class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
     const block = params[params.length - 1]
     let perform = this.#performCache.get(tag)
     if (!perform) {
-      perform = this.executor.add(() => super.send(method, params))
+      perform = this.executor.add(() => super.send(method, params), {
+        //timeout: 10000
+      })
       perform.catch((e) => {
         // if (e.code !== 'CALL_EXCEPTION' && e.code !== 'BAD_DATA') {
         setTimeout(() => {
