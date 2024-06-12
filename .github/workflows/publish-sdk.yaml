@@ -68,8 +68,6 @@ jobs:
           echo "Check Semantic Release output for details"
       - name: Clean peerDependencies & templates' node_modules
         run: |
-          # Dependencies are bundled.
-          pnpm json -I -f package.json -e "this.dependencies={}"
           # PeerDeps only for development with pnpm
           # templates' node_modules shouldn't go into registry
           pnpm json -I -f package.json -e "this.peerDependencies={}"

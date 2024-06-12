@@ -14,9 +14,8 @@
     "!{lib,src}/**/*.test.{js,ts}"
   ],
   "scripts": {
-    "build": "pnpm bundle",
+    "build": "pnpm compile",
     "postbuild": "pnpm install",
-    "bundle": "esbuild --platform=node --format=esm --bundle src/index.ts --outfile=lib/index.js --minify --sourcemap --inject:src/cjs-shim.ts --external:@sentio/sdk",
     "cli": "tsx src/index.ts",
     "compile": "tsc",
     "test": "NODE_OPTIONS=--experimental-vm-modules pnpm jest"
