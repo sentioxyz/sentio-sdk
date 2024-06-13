@@ -44,7 +44,7 @@ export function getProvider(chainId?: EthChainId): Provider {
     )
   }
   provider = new QueuedStaticJsonRpcProvider(address, network, Endpoints.INSTANCE.concurrency)
-  providers.set(network.chainId.toString(), provider)
+  providers.set(key, provider)
   return provider
 }
 
