@@ -84,13 +84,13 @@ function getTag(prefix: string, value: any): string {
 class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
   executor: PQueue
   #performCache = new LRUCache<string, Promise<any>>({
-    max: 100000, // 100k items
-    maxSize: 300 * 1024 * 1024, // 300mb for cache
-    ttl: 1000 * 60 * 60, // 1 hour
-    sizeCalculation: (value: any) => {
-      // assume each item is 1kb for simplicity
-      return 1024
-    }
+    max: 300000 // 300k items
+    // maxSize: 300 * 1024 * 1024, // 300mb for cache
+    // ttl: 1000 * 60 * 60, // 1 hour   no ttl for better performance
+    // sizeCalculation: (value: any) => {
+    // assume each item is 1kb for simplicity
+    // return 1024
+    // }
   })
   hits = 0
   misses = 0
