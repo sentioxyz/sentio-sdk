@@ -112,25 +112,23 @@ class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
     let perform = this.#performCache.get(tag)
     if (!perform) {
       this.misses++
-      let ts: number = 0
+      const queued: number = Date.now()
       perform = this.executor.add(() => {
         const started = Date.now()
-        this.totalQueued += started - ts
-        ts = started
-        super.send(method, params)
+        this.totalQueued += started - queued
+        return super.send(method, params).finally(() => {
+          this.totalDuration += Date.now() - started
+        })
       })
-      perform
-        .catch((e) => {
-          // if (e.code !== 'CALL_EXCEPTION' && e.code !== 'BAD_DATA') {
-          setTimeout(() => {
-            if (this.#performCache.get(tag) === perform) {
-              this.#performCache.delete(tag)
-            }
-          }, 1000)
-        })
-        .finally(() => {
-          this.totalDuration = Date.now() - ts
-        })
+      perform.catch((e) => {
+        // if (e.code !== 'CALL_EXCEPTION' && e.code !== 'BAD_DATA') {
+        setTimeout(() => {
+          if (this.#performCache.get(tag) === perform) {
+            this.#performCache.delete(tag)
+          }
+        }, 1000)
+      })
+
       this.#performCache.set(tag, perform)
       // For non latest block call, we cache permanently, otherwise we cache for one minute
       if (block === 'latest') {
