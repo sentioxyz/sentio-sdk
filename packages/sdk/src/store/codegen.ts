@@ -161,7 +161,7 @@ function genField(field: GraphQLField<any, any>) {
   }
 
   if (returnType == 'BigInt') {
-    return `${directives.join()}\tget ${field.name}(): ${returnType} { return BigInt(this.get("${field.name}")) }
+    return `${directives.join()}\tget ${field.name}(): bigint { return BigInt(this.get("${field.name}")) }
   set ${field.name}(value: ${type}) { this.set("${field.name}", value.toString()) }`
   }
   if (returnType == 'BigDecimal') {
