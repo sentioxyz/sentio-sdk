@@ -94,6 +94,8 @@ class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
   })
   hits = 0
   misses = 0
+  totalDuration = 0
+  totalQueued = 0
 
   constructor(url: string, network: Network, concurrency: number) {
     // TODO re-enable match when possible
@@ -110,17 +112,25 @@ class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
     let perform = this.#performCache.get(tag)
     if (!perform) {
       this.misses++
-      perform = this.executor.add(() => super.send(method, params), {
-        //timeout: 10000
+      let ts: number = 0
+      perform = this.executor.add(() => {
+        const started = Date.now()
+        this.totalQueued += started - ts
+        ts = started
+        super.send(method, params)
       })
-      perform.catch((e) => {
-        // if (e.code !== 'CALL_EXCEPTION' && e.code !== 'BAD_DATA') {
-        setTimeout(() => {
-          if (this.#performCache.get(tag) === perform) {
-            this.#performCache.delete(tag)
-          }
-        }, 1000)
-      })
+      perform
+        .catch((e) => {
+          // if (e.code !== 'CALL_EXCEPTION' && e.code !== 'BAD_DATA') {
+          setTimeout(() => {
+            if (this.#performCache.get(tag) === perform) {
+              this.#performCache.delete(tag)
+            }
+          }, 1000)
+        })
+        .finally(() => {
+          this.totalDuration = Date.now() - ts
+        })
       this.#performCache.set(tag, perform)
       // For non latest block call, we cache permanently, otherwise we cache for one minute
       if (block === 'latest') {
@@ -142,10 +152,13 @@ class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
   }
 
   stats() {
+    const count = this.hits + this.misses
     return {
       queueSize: this.executor.size,
       hits: this.hits,
-      misses: this.misses
+      misses: this.misses,
+      avgDuration: count == 0 ? 0 : this.totalDuration / count,
+      avgQueued: count == 0 ? 0 : this.totalQueued / count
     }
   }
 }
