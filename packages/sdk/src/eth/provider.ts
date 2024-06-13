@@ -92,6 +92,8 @@ class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
       return 1024
     }
   })
+  hits = 0
+  misses = 0
 
   constructor(url: string, network: Network, concurrency: number) {
     // TODO re-enable match when possible
@@ -107,6 +109,7 @@ class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
     const block = params[params.length - 1]
     let perform = this.#performCache.get(tag)
     if (!perform) {
+      this.misses++
       perform = this.executor.add(() => super.send(method, params), {
         //timeout: 10000
       })
@@ -127,6 +130,8 @@ class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
           }
         }, 60 * 1000)
       }
+    } else {
+      this.hits++
     }
 
     const result = await perform
@@ -134,5 +139,13 @@ class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
       throw Error('Unexpected null response')
     }
     return result
+  }
+
+  stats() {
+    return {
+      queueSize: this.executor.size,
+      hits: this.hits,
+      misses: this.misses
+    }
   }
 }
