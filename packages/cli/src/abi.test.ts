@@ -1,14 +1,13 @@
+import { describe, test } from 'node:test'
 import { getABI } from './abi.js'
 import { EthChainId, SuiChainId } from '@sentio/chain'
 import { expect } from 'chai'
-import { jest } from '@jest/globals'
 
 describe('Test ABI get', () => {
   if (process.env.CI) {
     test.todo(`don't run test in ci`)
     return
   }
-  jest.setTimeout(100000)
 
   test('cronos', async () => {
     const abi = await getABI(EthChainId.CRONOS, '0xc21223249CA28397B4B6541dfFaEcC539BfF0c59', undefined)

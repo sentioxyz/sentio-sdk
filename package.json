@@ -39,7 +39,7 @@
     "semantic-release": "^23.1.1",
     "semantic-release-monorepo": "^8.0.2",
     "ts-jest": "^29.1.2",
-    "tsx": "^4.10.0",
+    "tsx": "^4.15.2",
     "typescript": "^5.4.5"
   },
   "engines": {

@@ -17,5 +17,5 @@
     "outDir": "./dist",
     "skipLibCheck": true
   },
-  "exclude": ["dist", "jest.config.ts"]
+  "exclude": ["dist"]
 }

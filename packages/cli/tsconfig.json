@@ -5,6 +5,6 @@
     "baseUrl": "./src",
     "outDir": "lib"
   },
-  "exclude": ["lib", "templates", "jest.config.ts"],
+  "exclude": ["lib", "templates"],
   "extends": "../../tsconfig.json"
 }
