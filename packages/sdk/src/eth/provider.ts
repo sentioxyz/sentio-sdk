@@ -99,7 +99,7 @@ class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
 
   constructor(url: string, network: Network, concurrency: number) {
     // TODO re-enable match when possible
-    super(url, network, { staticNetwork: network, batchMaxCount: 1 })
+    super(url, network, { staticNetwork: network, batchMaxCount: 100 })
     this.executor = new PQueue({ concurrency: concurrency })
   }
 
