@@ -99,6 +99,10 @@ export async function runUpload(processorConfig: YamlProjectConfig, argv: string
     process.exit(0)
   }
 
+  if (options._unknown?.length) {
+    console.log(chalk.yellow('Unknown option:', options._unknown.join(' ')))
+  }
+
   if (options.nobuild) {
     processorConfig.build = false
   }

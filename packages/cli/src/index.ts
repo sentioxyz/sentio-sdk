@@ -29,10 +29,6 @@ if (!mainOptions.command) {
   process.exit(0)
 }
 
-if (argv.length) {
-  console.log(chalk.yellow('Unknown option:', argv.join(' ')))
-}
-
 if (mainOptions.command === 'login') {
   runLogin(argv)
 } else if (mainOptions.command === 'create') {
