@@ -4,9 +4,9 @@ import path from 'path'
 import fs from 'fs-extra'
 import chalk from 'chalk'
 import latestVersion from 'latest-version'
-import url from 'url'
 import process from 'process'
 import { execYarn } from '../execution.js'
+import { getPackageRoot } from '../utils.js'
 
 export async function runCreate(argv: string[]) {
   const optionDefinitions = [
@@ -85,7 +85,8 @@ export async function runCreate(argv: string[]) {
         process.exit(1)
     }
 
-    const templateFolder = url.fileURLToPath(new URL('../../templates/' + chainType, import.meta.url))
+    const packageRoot = getPackageRoot('@sentio/cli')
+    const templateFolder = path.join(packageRoot, 'templates', chainType)
     const projectFullName = options.name || 'default'
     let projectSlug = projectFullName
     const projectParts = projectSlug.split('/')
