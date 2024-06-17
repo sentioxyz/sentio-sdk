@@ -30,9 +30,9 @@ export type FuelTransaction = TransactionSummary & {
   sender?: string
 }
 
-function findSenderFromInputs(inputs: Input[] | undefined): string | undefined {
+function findSenderFromInputs(inputs: Input[] | undefined, baseAssetId: string): string | undefined {
   for (const input of inputs || []) {
-    if (input.type == InputType.Coin) {
+    if (input.type == InputType.Coin && input.assetId == baseAssetId) {
       return input.owner
     }
   }
@@ -41,9 +41,10 @@ function findSenderFromInputs(inputs: Input[] | undefined): string | undefined {
 
 export function decodeFuelTransaction(gqlTransaction: any, provider: Provider): FuelTransaction {
   const rawPayload = arrayify(gqlTransaction.rawPayload)
+  const receipts = gqlTransaction?.status.receipts?.map(processGqlReceipt) || []
 
   const [decodedTransaction] = new TransactionCoder().decode(rawPayload, 0)
-  const { gasCosts, feeParameters, txParameters } = provider.getChain().consensusParameters
+  const { gasCosts, feeParameters, txParameters, baseAssetId } = provider.getChain().consensusParameters
   const blockNumber = gqlTransaction.status?.block?.header?.height
   const { gasPriceFactor, gasPerByte } = feeParameters
   const { maxInputs, maxGasPerTx } = txParameters
@@ -54,7 +55,7 @@ export function decodeFuelTransaction(gqlTransaction: any, provider: Provider): 
   return {
     ...assembleTransactionSummary({
       id: gqlTransaction.id,
-      receipts: [],
+      receipts,
       transaction: decodedTransaction,
       transactionBytes: rawPayload,
       gqlTransactionStatus,
@@ -63,10 +64,11 @@ export function decodeFuelTransaction(gqlTransaction: any, provider: Provider): 
       maxInputs,
       gasCosts,
       gasPrice: bn(gqlTransaction.gasPrice),
-      maxGasPerTx
+      maxGasPerTx,
+      baseAssetId
     }),
     blockNumber,
-    sender: findSenderFromInputs(decodedTransaction.inputs)
+    sender: findSenderFromInputs(decodedTransaction.inputs, baseAssetId)
   }
 }
 
@@ -134,6 +136,6 @@ export async function decodeFuelTransactionWithAbi(
     ...summary,
     blockNumber,
     logs,
-    sender: findSenderFromInputs(decodedTransaction.inputs)
+    sender: findSenderFromInputs(decodedTransaction.inputs, provider.getChain().consensusParameters.baseAssetId)
   }
 }

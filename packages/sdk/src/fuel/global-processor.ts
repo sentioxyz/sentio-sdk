@@ -5,6 +5,7 @@ import { getRpcEndpoint } from './network.js'
 import { decodeFuelTransaction, DEFAULT_FUEL_FETCH_CONFIG, FuelFetchConfig, FuelTransaction } from './transaction.js'
 import { FuelContext } from './context.js'
 import { FuelProcessorConfig } from './fuel-processor.js'
+import { mergeProcessResults } from '@sentio/runtime'
 
 type GlobalFuelProcessorConfig = Omit<FuelProcessorConfig, 'address' | 'abi'>
 
@@ -32,7 +33,13 @@ export class FuelGlobalProcessor implements FuelBaseProcessor<GlobalFuelProcesso
   ) {
     const callHandler = {
       handler: async (call: Data_FuelCall) => {
-        const tx = decodeFuelTransaction(call.transaction, this.provider)
+        let tx: FuelTransaction
+        try {
+          tx = decodeFuelTransaction(call.transaction, this.provider)
+        } catch (e) {
+          console.error('error decoding transaction', e)
+          return mergeProcessResults([])
+        }
         const ctx = new FuelContext(this.config.chainId, '*', this.config.name ?? '*', tx)
         await handler(tx, ctx)
         return ctx.stopAndGetResult()

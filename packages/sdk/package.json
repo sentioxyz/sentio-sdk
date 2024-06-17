@@ -84,7 +84,7 @@
     "chalk": "^5.3.0",
     "csv-parse": "^5.5.3",
     "ethers": "npm:@sentio/ethers@6.12.2",
-    "fuels": "^0.88.1",
+    "fuels": "^0.89.2",
     "js-sha3": "^0.9.3",
     "lru-cache": "^10.2.0",
     "mkdirp": "^1.0.4",
