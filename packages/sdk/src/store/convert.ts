@@ -1,5 +1,5 @@
 import { RichStruct, RichValue, RichValue_NullValue } from '@sentio/protos'
-import { String, Int, Float, ID, Bytes, DateTime, Boolean } from './types.js'
+import { String, Int, Float, ID, Bytes, Timestamp, Boolean } from './types.js'
 import { Entity } from './entity.js'
 import { BigDecimal } from '@sentio/bigdecimal'
 
@@ -146,8 +146,8 @@ export const BooleanConverter: ValueConverter<Boolean | undefined> = {
   }
 }
 
-export const DateTimeConverter: ValueConverter<DateTime | undefined> = {
-  from: (value: DateTime | undefined) => {
+export const TimestampConverter: ValueConverter<Timestamp | undefined> = {
+  from: (value: Timestamp | undefined) => {
     if (value == null) {
       return {
         nullValue: RichValue_NullValue.NULL_VALUE

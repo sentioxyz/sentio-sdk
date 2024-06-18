@@ -1,7 +1,7 @@
 import { buildASTSchema, DocumentNode, extendSchema, GraphQLSchema, parse, validateSchema } from 'graphql/index.js'
 import * as fs from 'node:fs'
 
-const customScalars = ['BigInt', 'BigDecimal', 'DateTime', 'JSON', 'Bytes', 'ID']
+const customScalars = ['BigInt', 'BigDecimal', 'Timestamp', 'JSON', 'Bytes', 'ID']
 
 const baseSchema = buildASTSchema(
   parse(`

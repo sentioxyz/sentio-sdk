@@ -15,7 +15,7 @@ type Transfer @entity {
   floatValue: Float
   booleanValue: Boolean
   arrayValue: [String]!
-  dateValue: DateTime
+  dateValue: Timestamp
 
 }
 

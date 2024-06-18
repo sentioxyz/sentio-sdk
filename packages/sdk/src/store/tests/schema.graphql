@@ -9,6 +9,7 @@ type Transaction @entity {
   value: Float
   arrayValue: [String]!
   arrayValue2: [String!]
+  dateValue: Timestamp
   receipts: [TransactionReceipt!]! @derivedFrom(field: "transaction")
 }
 

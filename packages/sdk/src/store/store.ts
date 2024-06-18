@@ -2,12 +2,12 @@ import { Entity, EntityClass } from './entity.js'
 import { StoreContext } from './context.js'
 import { DatabaseSchema } from '../core/index.js'
 import { BigDecimal } from '@sentio/bigdecimal'
-import { Bytes, DateTime, Float, ID, Int } from './types.js'
+import { Bytes, Timestamp, Float, ID, Int } from './types.js'
 import { DBRequest_DBOperator, DBResponse } from '@sentio/protos'
 import type { RichStruct, RichValue } from '@sentio/protos'
 import { toBigInteger } from './convert.js'
 
-type Value = ID | string | Int | Float | boolean | DateTime | Bytes | BigDecimal | bigint
+type Value = ID | string | Int | Float | boolean | Timestamp | Bytes | BigDecimal | bigint
 
 export class Store {
   constructor(private readonly context: StoreContext) {}
