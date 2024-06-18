@@ -5,6 +5,10 @@ type Transaction @entity {
   gasPrice: BigDecimal!
   isSuccess: Boolean
   raw: Bytes
+  count: Int
+  value: Float
+  arrayValue: [String]!
+  arrayValue2: [String!]
   receipts: [TransactionReceipt!]! @derivedFrom(field: "transaction")
 }
 

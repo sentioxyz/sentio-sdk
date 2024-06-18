@@ -36,10 +36,8 @@ export class StoreContext {
     if (defer) {
       if (dbResult.error) {
         defer.reject(new Error(dbResult.error))
-      } else if (dbResult.list) {
-        defer.resolve(dbResult.list)
       } else {
-        defer.resolve(dbResult.data)
+        defer.resolve(dbResult)
       }
       this.defers.delete(opId)
     }

@@ -1,4 +1,4 @@
-import { Counter, Gauge } from '@sentio/sdk'
+import { Counter, Gauge, BigDecimal } from '@sentio/sdk'
 import { ERC20Processor } from '@sentio/sdk/eth/builtin'
 import { X2y2Processor } from './types/eth/x2y2.js'
 import { Reward, Transfer, User } from './schema/schema.js'
@@ -51,6 +51,15 @@ ERC20Processor.bind({ address: '0x1e4ede388cbc9f4b5c79681b7f94d36a11abebc9' }).o
     transfer.from = from
     transfer.to = to
     await ctx.store.upsert(transfer)
+
+    const transfers = ctx.store.list(Transfer, [
+      {
+        field: 'amount',
+        op: '>=',
+        value: new BigDecimal(100)
+      }
+    ])
+    console.log('transfers', transfers)
   },
   filter // filter is an optional parameter
 )

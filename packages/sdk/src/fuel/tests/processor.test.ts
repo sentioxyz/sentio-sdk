@@ -6,6 +6,8 @@ import abi from './abis/counter-contract-abi.json'
 import testData from './test-data.json'
 import { afterAll } from '@jest/globals'
 import { State } from '@sentio/runtime'
+import { bn, calculateVmTxMemory, Interface, Provider } from 'fuels'
+import { getRpcEndpoint } from '../network.js'
 
 describe('fuel network tests', () => {
   const ADDRESS = '0xdb0d550935d601c45791ba18664f0a821c11745b1f938e87f10a79e21988e850'
@@ -55,6 +57,28 @@ describe('fuel network tests', () => {
     const events = res.result?.events
     expect(events).length(2)
     expect(events?.[1]?.message).contains('complex call')
+  })
+
+  test('test decode', async () => {
+    const receipt = testData.status.receipts[0]
+    const param1 = receipt.param1
+    const url = getRpcEndpoint(FuelChainId.FUEL_TESTNET)
+    const provider = await Provider.create(url)
+    const chain = provider.getChain()
+    const maxInputs = chain.consensusParameters.txParameters.maxInputs
+    const argsOffset = bn(param1)
+      .sub(calculateVmTxMemory({ maxInputs: maxInputs.toNumber() }))
+      .toNumber()
+    const argsOffset2 = bn(receipt.param2)
+      .sub(calculateVmTxMemory({ maxInputs: maxInputs.toNumber() }))
+      .toNumber()
+    const rawPayload = testData.rawPayload
+    // slice(2) to remove first 0x, then slice again to remove offset and get only args
+    const encodedArgs = `0x${rawPayload.slice(2).slice(argsOffset * 2, argsOffset2 * 2)}`
+    const jsonAbi = new Interface(abi)
+    const callFunctionSelector = jsonAbi.getFunction('complex').selectorBytes
+    const selectorHex = Buffer.from(callFunctionSelector).toString('hex')
+    console.log(encodedArgs, selectorHex)
   })
 
   afterAll(async () => {

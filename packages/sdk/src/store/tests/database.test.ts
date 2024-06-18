@@ -1,5 +1,5 @@
 import { Store } from '../store.js'
-import { User, Transaction } from './generated/schema.js'
+import { Transaction, User } from './generated/schema.js'
 import { MemoryDatabase } from './memory-database.js'
 import { afterAll, afterEach } from '@jest/globals'
 import { StoreContext } from '../context.js'
@@ -53,8 +53,10 @@ describe('Test Database', () => {
     })
 
     await store.upsert([user1, user2])
-
-    const list = await store.list(User, 2, 0)
+    const list = []
+    for await (const u of store.list(User, [])) {
+      list.push(u)
+    }
     expect(list).toEqual([user1, user2])
   })
 

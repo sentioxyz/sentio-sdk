@@ -9,6 +9,14 @@ type Transfer @entity {
   from: User!
   to: User!
   amount: BigDecimal!
+  intValue: Int
+  bigIntValue: BigInt!
+  stringValue: String
+  floatValue: Float
+  booleanValue: Boolean
+  arrayValue: [String]!
+  dateValue: DateTime
+
 }
 
 type User @entity {

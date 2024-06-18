@@ -5,7 +5,7 @@ import _m0 from "protobufjs/minimal.js";
 import { Empty } from "../../google/protobuf/empty.js";
 import { ListValue, Struct } from "../../google/protobuf/struct.js";
 import { Timestamp } from "../../google/protobuf/timestamp.js";
-import { CoinID } from "../../service/common/protos/common.js";
+import { BigInteger, CoinID, RichStruct, RichStructList, RichValueList } from "../../service/common/protos/common.js";
 
 export enum MetricType {
   UNKNOWN_TYPE = 0,
@@ -750,6 +750,8 @@ export interface DBResponse {
   data?: { [key: string]: any } | undefined;
   list?: Array<any> | undefined;
   error?: string | undefined;
+  entities?: RichStructList | undefined;
+  nextCursor?: string | undefined;
 }
 
 export interface DBRequest {
@@ -760,6 +762,75 @@ export interface DBRequest {
   list?: DBRequest_DBList | undefined;
 }
 
+export enum DBRequest_DBOperator {
+  EQ = 0,
+  NE = 1,
+  GT = 2,
+  GE = 3,
+  LT = 4,
+  LE = 5,
+  IN = 6,
+  NOT_IN = 7,
+  UNRECOGNIZED = -1,
+}
+
+export function dBRequest_DBOperatorFromJSON(object: any): DBRequest_DBOperator {
+  switch (object) {
+    case 0:
+    case "EQ":
+      return DBRequest_DBOperator.EQ;
+    case 1:
+    case "NE":
+      return DBRequest_DBOperator.NE;
+    case 2:
+    case "GT":
+      return DBRequest_DBOperator.GT;
+    case 3:
+    case "GE":
+      return DBRequest_DBOperator.GE;
+    case 4:
+    case "LT":
+      return DBRequest_DBOperator.LT;
+    case 5:
+    case "LE":
+      return DBRequest_DBOperator.LE;
+    case 6:
+    case "IN":
+      return DBRequest_DBOperator.IN;
+    case 7:
+    case "NOT_IN":
+      return DBRequest_DBOperator.NOT_IN;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return DBRequest_DBOperator.UNRECOGNIZED;
+  }
+}
+
+export function dBRequest_DBOperatorToJSON(object: DBRequest_DBOperator): string {
+  switch (object) {
+    case DBRequest_DBOperator.EQ:
+      return "EQ";
+    case DBRequest_DBOperator.NE:
+      return "NE";
+    case DBRequest_DBOperator.GT:
+      return "GT";
+    case DBRequest_DBOperator.GE:
+      return "GE";
+    case DBRequest_DBOperator.LT:
+      return "LT";
+    case DBRequest_DBOperator.LE:
+      return "LE";
+    case DBRequest_DBOperator.IN:
+      return "IN";
+    case DBRequest_DBOperator.NOT_IN:
+      return "NOT_IN";
+    case DBRequest_DBOperator.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
 export interface DBRequest_DBGet {
   entity: string;
   id: string;
@@ -767,19 +838,26 @@ export interface DBRequest_DBGet {
 
 export interface DBRequest_DBList {
   entity: string;
-  limit: number;
-  offset: number;
+  filters: DBRequest_DBFilter[];
+  cursor: string;
 }
 
 export interface DBRequest_DBUpsert {
   entity: string[];
   id: string[];
   data: { [key: string]: any }[];
+  entityData: RichStruct[];
 }
 
 export interface DBRequest_DBDelete {
   entity: string[];
   id: string[];
+}
+
+export interface DBRequest_DBFilter {
+  field: string;
+  op: DBRequest_DBOperator;
+  value: RichValueList | undefined;
 }
 
 export interface Data {
@@ -925,11 +1003,6 @@ export interface MetricValue {
   bigDecimal?: string | undefined;
   doubleValue?: number | undefined;
   bigInteger?: BigInteger | undefined;
-}
-
-export interface BigInteger {
-  negative: boolean;
-  data: Uint8Array;
 }
 
 export interface RuntimeInfo {
@@ -5749,7 +5822,14 @@ export const ProcessStreamResponse = {
 };
 
 function createBaseDBResponse(): DBResponse {
-  return { opId: BigInt("0"), data: undefined, list: undefined, error: undefined };
+  return {
+    opId: BigInt("0"),
+    data: undefined,
+    list: undefined,
+    error: undefined,
+    entities: undefined,
+    nextCursor: undefined,
+  };
 }
 
 export const DBResponse = {
@@ -5768,6 +5848,12 @@ export const DBResponse = {
     }
     if (message.error !== undefined) {
       writer.uint32(26).string(message.error);
+    }
+    if (message.entities !== undefined) {
+      RichStructList.encode(message.entities, writer.uint32(50).fork()).ldelim();
+    }
+    if (message.nextCursor !== undefined) {
+      writer.uint32(42).string(message.nextCursor);
     }
     return writer;
   },
@@ -5807,6 +5893,20 @@ export const DBResponse = {
 
           message.error = reader.string();
           continue;
+        case 6:
+          if (tag !== 50) {
+            break;
+          }
+
+          message.entities = RichStructList.decode(reader, reader.uint32());
+          continue;
+        case 5:
+          if (tag !== 42) {
+            break;
+          }
+
+          message.nextCursor = reader.string();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -5822,6 +5922,8 @@ export const DBResponse = {
       data: isObject(object.data) ? object.data : undefined,
       list: globalThis.Array.isArray(object.list) ? [...object.list] : undefined,
       error: isSet(object.error) ? globalThis.String(object.error) : undefined,
+      entities: isSet(object.entities) ? RichStructList.fromJSON(object.entities) : undefined,
+      nextCursor: isSet(object.nextCursor) ? globalThis.String(object.nextCursor) : undefined,
     };
   },
 
@@ -5839,6 +5941,12 @@ export const DBResponse = {
     if (message.error !== undefined) {
       obj.error = message.error;
     }
+    if (message.entities !== undefined) {
+      obj.entities = RichStructList.toJSON(message.entities);
+    }
+    if (message.nextCursor !== undefined) {
+      obj.nextCursor = message.nextCursor;
+    }
     return obj;
   },
 
@@ -5851,6 +5959,10 @@ export const DBResponse = {
     message.data = object.data ?? undefined;
     message.list = object.list ?? undefined;
     message.error = object.error ?? undefined;
+    message.entities = (object.entities !== undefined && object.entities !== null)
+      ? RichStructList.fromPartial(object.entities)
+      : undefined;
+    message.nextCursor = object.nextCursor ?? undefined;
     return message;
   },
 };
@@ -6060,7 +6172,7 @@ export const DBRequest_DBGet = {
 };
 
 function createBaseDBRequest_DBList(): DBRequest_DBList {
-  return { entity: "", limit: 0, offset: 0 };
+  return { entity: "", filters: [], cursor: "" };
 }
 
 export const DBRequest_DBList = {
@@ -6068,11 +6180,11 @@ export const DBRequest_DBList = {
     if (message.entity !== "") {
       writer.uint32(10).string(message.entity);
     }
-    if (message.limit !== 0) {
-      writer.uint32(16).uint32(message.limit);
+    for (const v of message.filters) {
+      DBRequest_DBFilter.encode(v!, writer.uint32(34).fork()).ldelim();
     }
-    if (message.offset !== 0) {
-      writer.uint32(24).uint32(message.offset);
+    if (message.cursor !== "") {
+      writer.uint32(42).string(message.cursor);
     }
     return writer;
   },
@@ -6091,19 +6203,19 @@ export const DBRequest_DBList = {
 
           message.entity = reader.string();
           continue;
-        case 2:
-          if (tag !== 16) {
+        case 4:
+          if (tag !== 34) {
             break;
           }
 
-          message.limit = reader.uint32();
+          message.filters.push(DBRequest_DBFilter.decode(reader, reader.uint32()));
           continue;
-        case 3:
-          if (tag !== 24) {
+        case 5:
+          if (tag !== 42) {
             break;
           }
 
-          message.offset = reader.uint32();
+          message.cursor = reader.string();
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -6117,8 +6229,10 @@ export const DBRequest_DBList = {
   fromJSON(object: any): DBRequest_DBList {
     return {
       entity: isSet(object.entity) ? globalThis.String(object.entity) : "",
-      limit: isSet(object.limit) ? globalThis.Number(object.limit) : 0,
-      offset: isSet(object.offset) ? globalThis.Number(object.offset) : 0,
+      filters: globalThis.Array.isArray(object?.filters)
+        ? object.filters.map((e: any) => DBRequest_DBFilter.fromJSON(e))
+        : [],
+      cursor: isSet(object.cursor) ? globalThis.String(object.cursor) : "",
     };
   },
 
@@ -6127,11 +6241,11 @@ export const DBRequest_DBList = {
     if (message.entity !== "") {
       obj.entity = message.entity;
     }
-    if (message.limit !== 0) {
-      obj.limit = Math.round(message.limit);
+    if (message.filters?.length) {
+      obj.filters = message.filters.map((e) => DBRequest_DBFilter.toJSON(e));
     }
-    if (message.offset !== 0) {
-      obj.offset = Math.round(message.offset);
+    if (message.cursor !== "") {
+      obj.cursor = message.cursor;
     }
     return obj;
   },
@@ -6142,14 +6256,14 @@ export const DBRequest_DBList = {
   fromPartial(object: DeepPartial<DBRequest_DBList>): DBRequest_DBList {
     const message = createBaseDBRequest_DBList();
     message.entity = object.entity ?? "";
-    message.limit = object.limit ?? 0;
-    message.offset = object.offset ?? 0;
+    message.filters = object.filters?.map((e) => DBRequest_DBFilter.fromPartial(e)) || [];
+    message.cursor = object.cursor ?? "";
     return message;
   },
 };
 
 function createBaseDBRequest_DBUpsert(): DBRequest_DBUpsert {
-  return { entity: [], id: [], data: [] };
+  return { entity: [], id: [], data: [], entityData: [] };
 }
 
 export const DBRequest_DBUpsert = {
@@ -6162,6 +6276,9 @@ export const DBRequest_DBUpsert = {
     }
     for (const v of message.data) {
       Struct.encode(Struct.wrap(v!), writer.uint32(26).fork()).ldelim();
+    }
+    for (const v of message.entityData) {
+      RichStruct.encode(v!, writer.uint32(34).fork()).ldelim();
     }
     return writer;
   },
@@ -6194,6 +6311,13 @@ export const DBRequest_DBUpsert = {
 
           message.data.push(Struct.unwrap(Struct.decode(reader, reader.uint32())));
           continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.entityData.push(RichStruct.decode(reader, reader.uint32()));
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -6208,6 +6332,9 @@ export const DBRequest_DBUpsert = {
       entity: globalThis.Array.isArray(object?.entity) ? object.entity.map((e: any) => globalThis.String(e)) : [],
       id: globalThis.Array.isArray(object?.id) ? object.id.map((e: any) => globalThis.String(e)) : [],
       data: globalThis.Array.isArray(object?.data) ? [...object.data] : [],
+      entityData: globalThis.Array.isArray(object?.entityData)
+        ? object.entityData.map((e: any) => RichStruct.fromJSON(e))
+        : [],
     };
   },
 
@@ -6222,6 +6349,9 @@ export const DBRequest_DBUpsert = {
     if (message.data?.length) {
       obj.data = message.data;
     }
+    if (message.entityData?.length) {
+      obj.entityData = message.entityData.map((e) => RichStruct.toJSON(e));
+    }
     return obj;
   },
 
@@ -6233,6 +6363,7 @@ export const DBRequest_DBUpsert = {
     message.entity = object.entity?.map((e) => e) || [];
     message.id = object.id?.map((e) => e) || [];
     message.data = object.data?.map((e) => e) || [];
+    message.entityData = object.entityData?.map((e) => RichStruct.fromPartial(e)) || [];
     return message;
   },
 };
@@ -6307,6 +6438,97 @@ export const DBRequest_DBDelete = {
     const message = createBaseDBRequest_DBDelete();
     message.entity = object.entity?.map((e) => e) || [];
     message.id = object.id?.map((e) => e) || [];
+    return message;
+  },
+};
+
+function createBaseDBRequest_DBFilter(): DBRequest_DBFilter {
+  return { field: "", op: 0, value: undefined };
+}
+
+export const DBRequest_DBFilter = {
+  encode(message: DBRequest_DBFilter, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.field !== "") {
+      writer.uint32(10).string(message.field);
+    }
+    if (message.op !== 0) {
+      writer.uint32(16).int32(message.op);
+    }
+    if (message.value !== undefined) {
+      RichValueList.encode(message.value, writer.uint32(26).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): DBRequest_DBFilter {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDBRequest_DBFilter();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.field = reader.string();
+          continue;
+        case 2:
+          if (tag !== 16) {
+            break;
+          }
+
+          message.op = reader.int32() as any;
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.value = RichValueList.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): DBRequest_DBFilter {
+    return {
+      field: isSet(object.field) ? globalThis.String(object.field) : "",
+      op: isSet(object.op) ? dBRequest_DBOperatorFromJSON(object.op) : 0,
+      value: isSet(object.value) ? RichValueList.fromJSON(object.value) : undefined,
+    };
+  },
+
+  toJSON(message: DBRequest_DBFilter): unknown {
+    const obj: any = {};
+    if (message.field !== "") {
+      obj.field = message.field;
+    }
+    if (message.op !== 0) {
+      obj.op = dBRequest_DBOperatorToJSON(message.op);
+    }
+    if (message.value !== undefined) {
+      obj.value = RichValueList.toJSON(message.value);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<DBRequest_DBFilter>): DBRequest_DBFilter {
+    return DBRequest_DBFilter.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<DBRequest_DBFilter>): DBRequest_DBFilter {
+    const message = createBaseDBRequest_DBFilter();
+    message.field = object.field ?? "";
+    message.op = object.op ?? 0;
+    message.value = (object.value !== undefined && object.value !== null)
+      ? RichValueList.fromPartial(object.value)
+      : undefined;
     return message;
   },
 };
@@ -8599,80 +8821,6 @@ export const MetricValue = {
   },
 };
 
-function createBaseBigInteger(): BigInteger {
-  return { negative: false, data: new Uint8Array(0) };
-}
-
-export const BigInteger = {
-  encode(message: BigInteger, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.negative !== false) {
-      writer.uint32(8).bool(message.negative);
-    }
-    if (message.data.length !== 0) {
-      writer.uint32(18).bytes(message.data);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): BigInteger {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseBigInteger();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 8) {
-            break;
-          }
-
-          message.negative = reader.bool();
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.data = reader.bytes();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): BigInteger {
-    return {
-      negative: isSet(object.negative) ? globalThis.Boolean(object.negative) : false,
-      data: isSet(object.data) ? bytesFromBase64(object.data) : new Uint8Array(0),
-    };
-  },
-
-  toJSON(message: BigInteger): unknown {
-    const obj: any = {};
-    if (message.negative !== false) {
-      obj.negative = message.negative;
-    }
-    if (message.data.length !== 0) {
-      obj.data = base64FromBytes(message.data);
-    }
-    return obj;
-  },
-
-  create(base?: DeepPartial<BigInteger>): BigInteger {
-    return BigInteger.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<BigInteger>): BigInteger {
-    const message = createBaseBigInteger();
-    message.negative = object.negative ?? false;
-    message.data = object.data ?? new Uint8Array(0);
-    return message;
-  },
-};
-
 function createBaseRuntimeInfo(): RuntimeInfo {
   return { from: 0 };
 }
@@ -9269,31 +9417,6 @@ export interface ProcessorClient<CallOptionsExt = {}> {
     request: AsyncIterable<DeepPartial<ProcessStreamRequest>>,
     options?: CallOptions & CallOptionsExt,
   ): AsyncIterable<ProcessStreamResponse>;
-}
-
-function bytesFromBase64(b64: string): Uint8Array {
-  if ((globalThis as any).Buffer) {
-    return Uint8Array.from(globalThis.Buffer.from(b64, "base64"));
-  } else {
-    const bin = globalThis.atob(b64);
-    const arr = new Uint8Array(bin.length);
-    for (let i = 0; i < bin.length; ++i) {
-      arr[i] = bin.charCodeAt(i);
-    }
-    return arr;
-  }
-}
-
-function base64FromBytes(arr: Uint8Array): string {
-  if ((globalThis as any).Buffer) {
-    return globalThis.Buffer.from(arr).toString("base64");
-  } else {
-    const bin: string[] = [];
-    arr.forEach((byte) => {
-      bin.push(globalThis.String.fromCharCode(byte));
-    });
-    return globalThis.btoa(bin.join(""));
-  }
 }
 
 type Builtin = Date | Function | Uint8Array | string | number | boolean | bigint | undefined;

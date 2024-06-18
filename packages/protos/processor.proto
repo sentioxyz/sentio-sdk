@@ -412,7 +412,7 @@ message ProcessStreamRequest {
   int32 process_id = 1;  // used to identify the processor run
   oneof value {
     DataBinding binding = 2; // start processor run
-    DBResponse db_result= 3; // send db response back during processor run
+    DBResponse db_result = 3; // send db response back during processor run
   }
 }
 
@@ -427,10 +427,12 @@ message ProcessStreamResponse {
 message DBResponse {
   uint64 op_id = 1;
   oneof value {
-    google.protobuf.Struct data = 2;
-    google.protobuf.ListValue list = 4;
+    google.protobuf.Struct data = 2; // @deprecate
+    google.protobuf.ListValue list = 4; // @deprecate
     string error = 3;
+    common.RichStructList entities = 6;
   }
+  optional string next_cursor = 5;
 }
 
 message DBRequest {
@@ -448,17 +450,41 @@ message DBRequest {
   }
   message DBList {
     string entity = 1;
-    uint32 limit = 2;
-    uint32 offset = 3;
+    //    uint32 limit = 2; deprecated
+    //    uint32 offset = 3; deprecated
+    repeated DBFilter filters = 4;
+    string cursor = 5;
   }
   message DBUpsert {
     repeated string entity = 1;
     repeated string id = 2;
-    repeated google.protobuf.Struct data = 3;
+    repeated google.protobuf.Struct data = 3; // @deprecate
+    repeated common.RichStruct entity_data = 4;
   }
+
+
   message DBDelete {
     repeated string entity = 1;
     repeated string id = 2;
+  }
+  message DBFilter {
+    string field = 1;
+    DBOperator op = 2;
+    common.RichValueList value = 3;
+  }
+  enum DBOperator {
+    EQ = 0;
+    NE = 1;
+    GT = 2;
+    GE = 3;
+    LT = 4;
+    LE = 5;
+    IN = 6;
+    NOT_IN = 7;
+    //    LIKE = 8;
+    //    NOT_LIKE = 9;
+    //    IS_NULL = 10;
+    //    IS_NOT_NULL = 11;
   }
 }
 
@@ -497,7 +523,7 @@ message Data {
     optional google.protobuf.Struct parsed = 4;
   }
   message AptEvent {
-//    google.protobuf.Struct event = 1;
+    //    google.protobuf.Struct event = 1;
     google.protobuf.Struct transaction = 2;
   }
   message AptCall {
@@ -612,14 +638,11 @@ message MetricValue {
   oneof value {
     string big_decimal = 1;
     double double_value = 2;
-    BigInteger big_integer = 3;
+    common.BigInteger big_integer = 3;
   }
 }
 
-message BigInteger {
-  bool negative = 1;
-  bytes data = 2;
-}
+
 
 enum HandlerType {
   UNKNOWN = 0;
@@ -671,7 +694,7 @@ message LogResult {
   LogLevel level = 2;
   string message = 3;
   // JSON payload
-  string attributes = 6 [ deprecated = true ];
+  string attributes = 6 [deprecated = true];
   google.protobuf.Struct attributes2 = 7;
   RuntimeInfo runtime_info = 4;
 }

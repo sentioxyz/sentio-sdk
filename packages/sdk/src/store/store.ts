@@ -2,6 +2,12 @@ import { Entity, EntityClass } from './entity.js'
 import { StoreContext } from './context.js'
 import { DatabaseSchema } from '../core/index.js'
 import { BigDecimal } from '@sentio/bigdecimal'
+import { Bytes, DateTime, Float, ID, Int } from './types.js'
+import { DBRequest_DBOperator, DBResponse } from '@sentio/protos'
+import type { RichStruct, RichValue } from '@sentio/protos'
+import { toBigInteger } from './convert.js'
+
+type Value = ID | string | Int | Float | boolean | DateTime | Bytes | BigDecimal | bigint
 
 export class Store {
   constructor(private readonly context: StoreContext) {}
@@ -14,10 +20,12 @@ export class Store {
       }
     })
 
-    const data = (await promise) as any
-    if (data?.['id'] != null) {
-      return this.newEntity(entity, data)
+    const data = (await promise) as DBResponse
+    if (data.entities?.entities[0]) {
+      const entityData = data.entities.entities[0]
+      return this.newEntity(entity, entityData)
     }
+
     return undefined
   }
 
@@ -43,65 +51,127 @@ export class Store {
     const promise = this.context.sendRequest({
       upsert: {
         entity: entities.map((e) => e.constructor.prototype.entityName),
-        data: entities.map((e) => serialize(e.data)),
-        id: entities.map((e) => e.id)
+        // data: entities.map((e) => serialize(e.data)),
+        id: entities.map((e) => e.id),
+        entityData: entities.map((e) => e.serialize())
       }
     })
 
     await promise
   }
 
-  async list<T extends Entity>(entity: EntityClass<T>, limit?: number, offset?: number): Promise<T[]> {
-    const promise = this.context.sendRequest({
-      list: {
-        entity: entity.prototype.entityName,
-        limit,
-        offset
-      }
-    })
+  async *list<T extends Entity>(entity: EntityClass<T>, filters?: ListFilter<T>[]) {
+    let cursor: string | undefined = undefined
 
-    const list = (await promise) as any[]
-    return list.map((data) => {
-      return this.newEntity(entity, data)
-    })
+    while (true) {
+      const promise = this.context.sendRequest({
+        list: {
+          entity: entity.prototype.entityName,
+          cursor,
+          filters:
+            filters?.map((f) => ({
+              field: f.field as string,
+              op: ops[f.op],
+              value: { values: Array.isArray(f.value) ? f.value.map((v) => serialize(v)) : [serialize(f.value)] }
+            })) || []
+        }
+      })
+      const response = (await promise) as DBResponse
+      for (const data of response.entities?.entities || []) {
+        yield this.newEntity(entity, data)
+      }
+      if (!response.nextCursor) {
+        break
+      }
+      cursor = response.nextCursor
+    }
   }
 
-  private newEntity<T extends Entity>(entity: EntityClass<T> | string, data: any) {
+  private newEntity<T extends Entity>(entity: EntityClass<T> | string, data: RichStruct) {
     if (typeof entity == 'string') {
       const en = DatabaseSchema.findEntity(entity)
       if (!en) {
         // it is an interface
-        return new Entity(data) as T
+        return new Entity() as T
       }
       entity = en
     }
 
-    return new (entity as EntityClass<T>)(data)
+    const res = new (entity as EntityClass<T>)({}) as T
+    res.setData(data)
+    return res
   }
 }
 
-function serialize(data: Record<string, any>) {
-  const ret: Record<string, any> = {}
-  for (const [k, v] of Object.entries(data)) {
-    if (v instanceof Entity) {
-      ret[k] = v.id
-    } else if (Array.isArray(v) && v[0] instanceof Entity) {
-      ret[k] = v.map((e) => e.id)
-    } else if (typeof v === 'bigint') {
-      ret[k] = v.toString()
-    } else if (typeof v === 'object') {
-      if (v instanceof Date) {
-        ret[k] = v.toISOString()
-      } else if (v instanceof Uint8Array) {
-        ret[k] = Buffer.from(v).toString('hex')
-      } else if (v instanceof BigDecimal) {
-        ret[k] = v.toString()
-      } else {
-        ret[k] = serialize(v)
-      }
-    } else {
-      ret[k] = v
+export type Operators = '=' | '!=' | '<' | '<=' | '>' | '>=' | 'in' | 'not in'
+
+export interface ListFilter<T extends Entity> {
+  field: keyof T
+  op: Operators
+  value: Value | Value[] | null
+}
+
+export interface ListOptions<T extends Entity> {
+  cursor: string
+}
+
+const ops: Record<Operators, DBRequest_DBOperator> = {
+  '=': DBRequest_DBOperator.EQ,
+  '!=': DBRequest_DBOperator.NE,
+  '<': DBRequest_DBOperator.LT,
+  '<=': DBRequest_DBOperator.LE,
+  '>': DBRequest_DBOperator.GT,
+  '>=': DBRequest_DBOperator.GE,
+  in: DBRequest_DBOperator.IN,
+  'not in': DBRequest_DBOperator.NOT_IN
+}
+
+function serialize(v: any): RichValue {
+  if (v == null) {
+    return { nullValue: 0 }
+  }
+  if (typeof v == 'boolean') {
+    return { boolValue: v }
+  }
+  if (typeof v == 'string') {
+    return { stringValue: v }
+  }
+
+  if (typeof v == 'number') {
+    return { floatValue: v }
+  }
+  if (typeof v == 'bigint') {
+    return {
+      bigintValue: toBigInteger(v)
     }
   }
-  return ret
+
+  if (v instanceof BigDecimal) {
+    return serializeBigDecimal(v)
+  }
+
+  if (v instanceof Date) {
+    return {
+      timestampValue: v
+    }
+  }
+
+  if (v instanceof Uint8Array) {
+    return { bytesValue: v }
+  }
+
+  if (Array.isArray(v)) {
+    return {
+      listValue: { values: v.map((v) => serialize(v)) }
+    }
+  }
+  return {
+    nullValue: 0
+  }
+}
+
+function serializeBigDecimal(v: BigDecimal): RichValue {
+  return {
+    bigdecimalValue: undefined
+  }
 }

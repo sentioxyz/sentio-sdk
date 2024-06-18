@@ -1,5 +1,5 @@
 import { StoreContext } from '../context.js'
-import { ProcessStreamResponse } from '@sentio/protos'
+import { ProcessStreamResponse, RichStruct } from '@sentio/protos'
 
 export class MemoryDatabase {
   db = new Map<string, any>()
@@ -19,9 +19,9 @@ export class MemoryDatabase {
     const req = request.dbRequest
     if (req) {
       if (req.upsert) {
-        const { data } = req.upsert
-        for (const d of data) {
-          const id = d['id'] as string
+        const { entityData } = req.upsert
+        for (const d of entityData) {
+          const id = d.fields['id'].stringValue!
           this.db.set(id, d)
         }
         this.dbContext.result({
@@ -43,16 +43,27 @@ export class MemoryDatabase {
         const data = this.db.get(id)
         this.dbContext.result({
           opId: req.opId,
-          data
+          entities: { entities: data ? [data] : [] }
         })
       }
       if (req.list) {
-        const { entity, limit, offset } = req.list
+        const { entity, cursor } = req.list
         const list = Array.from(this.db.values())
-        this.dbContext.result({
-          opId: req.opId,
-          list: list
-        })
+        if (cursor) {
+          const idx = parseInt(cursor)
+
+          this.dbContext.result({
+            opId: req.opId,
+            entities: { entities: list.slice(idx, idx + 1) as RichStruct[] },
+            nextCursor: idx + 1 < list.length ? `${idx + 1}` : undefined
+          })
+        } else {
+          this.dbContext.result({
+            opId: req.opId,
+            entities: { entities: [list[0]] },
+            nextCursor: '1'
+          })
+        }
       }
     }
   }

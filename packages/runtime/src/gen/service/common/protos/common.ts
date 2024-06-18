@@ -1829,6 +1829,73 @@ export interface Notification_AttributesEntry {
   value: string;
 }
 
+export interface RichValue {
+  nullValue?: RichValue_NullValue | undefined;
+  intValue?: number | undefined;
+  floatValue?: number | undefined;
+  bytesValue?: Uint8Array | undefined;
+  boolValue?: boolean | undefined;
+  stringValue?: string | undefined;
+  timestampValue?: Date | undefined;
+  bigintValue?: BigInteger | undefined;
+  bigdecimalValue?: BigDecimal | undefined;
+  listValue?: RichValueList | undefined;
+}
+
+export enum RichValue_NullValue {
+  NULL_VALUE = 0,
+  UNRECOGNIZED = -1,
+}
+
+export function richValue_NullValueFromJSON(object: any): RichValue_NullValue {
+  switch (object) {
+    case 0:
+    case "NULL_VALUE":
+      return RichValue_NullValue.NULL_VALUE;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return RichValue_NullValue.UNRECOGNIZED;
+  }
+}
+
+export function richValue_NullValueToJSON(object: RichValue_NullValue): string {
+  switch (object) {
+    case RichValue_NullValue.NULL_VALUE:
+      return "NULL_VALUE";
+    case RichValue_NullValue.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
+export interface RichStruct {
+  fields: { [key: string]: RichValue };
+}
+
+export interface RichStruct_FieldsEntry {
+  key: string;
+  value: RichValue | undefined;
+}
+
+export interface RichValueList {
+  values: RichValue[];
+}
+
+export interface RichStructList {
+  entities: RichStruct[];
+}
+
+export interface BigDecimal {
+  value: BigInteger | undefined;
+  exp: number;
+}
+
+export interface BigInteger {
+  negative: boolean;
+  data: Uint8Array;
+}
+
 function createBaseUsageTracker(): UsageTracker {
   return {
     apiSku: "",
@@ -12460,6 +12527,666 @@ export const Notification_AttributesEntry = {
     return message;
   },
 };
+
+function createBaseRichValue(): RichValue {
+  return {
+    nullValue: undefined,
+    intValue: undefined,
+    floatValue: undefined,
+    bytesValue: undefined,
+    boolValue: undefined,
+    stringValue: undefined,
+    timestampValue: undefined,
+    bigintValue: undefined,
+    bigdecimalValue: undefined,
+    listValue: undefined,
+  };
+}
+
+export const RichValue = {
+  encode(message: RichValue, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.nullValue !== undefined) {
+      writer.uint32(8).int32(message.nullValue);
+    }
+    if (message.intValue !== undefined) {
+      writer.uint32(16).int32(message.intValue);
+    }
+    if (message.floatValue !== undefined) {
+      writer.uint32(25).double(message.floatValue);
+    }
+    if (message.bytesValue !== undefined) {
+      writer.uint32(34).bytes(message.bytesValue);
+    }
+    if (message.boolValue !== undefined) {
+      writer.uint32(40).bool(message.boolValue);
+    }
+    if (message.stringValue !== undefined) {
+      writer.uint32(50).string(message.stringValue);
+    }
+    if (message.timestampValue !== undefined) {
+      Timestamp.encode(toTimestamp(message.timestampValue), writer.uint32(58).fork()).ldelim();
+    }
+    if (message.bigintValue !== undefined) {
+      BigInteger.encode(message.bigintValue, writer.uint32(66).fork()).ldelim();
+    }
+    if (message.bigdecimalValue !== undefined) {
+      BigDecimal.encode(message.bigdecimalValue, writer.uint32(74).fork()).ldelim();
+    }
+    if (message.listValue !== undefined) {
+      RichValueList.encode(message.listValue, writer.uint32(82).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): RichValue {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRichValue();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 8) {
+            break;
+          }
+
+          message.nullValue = reader.int32() as any;
+          continue;
+        case 2:
+          if (tag !== 16) {
+            break;
+          }
+
+          message.intValue = reader.int32();
+          continue;
+        case 3:
+          if (tag !== 25) {
+            break;
+          }
+
+          message.floatValue = reader.double();
+          continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.bytesValue = reader.bytes();
+          continue;
+        case 5:
+          if (tag !== 40) {
+            break;
+          }
+
+          message.boolValue = reader.bool();
+          continue;
+        case 6:
+          if (tag !== 50) {
+            break;
+          }
+
+          message.stringValue = reader.string();
+          continue;
+        case 7:
+          if (tag !== 58) {
+            break;
+          }
+
+          message.timestampValue = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+          continue;
+        case 8:
+          if (tag !== 66) {
+            break;
+          }
+
+          message.bigintValue = BigInteger.decode(reader, reader.uint32());
+          continue;
+        case 9:
+          if (tag !== 74) {
+            break;
+          }
+
+          message.bigdecimalValue = BigDecimal.decode(reader, reader.uint32());
+          continue;
+        case 10:
+          if (tag !== 82) {
+            break;
+          }
+
+          message.listValue = RichValueList.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): RichValue {
+    return {
+      nullValue: isSet(object.nullValue) ? richValue_NullValueFromJSON(object.nullValue) : undefined,
+      intValue: isSet(object.intValue) ? globalThis.Number(object.intValue) : undefined,
+      floatValue: isSet(object.floatValue) ? globalThis.Number(object.floatValue) : undefined,
+      bytesValue: isSet(object.bytesValue) ? bytesFromBase64(object.bytesValue) : undefined,
+      boolValue: isSet(object.boolValue) ? globalThis.Boolean(object.boolValue) : undefined,
+      stringValue: isSet(object.stringValue) ? globalThis.String(object.stringValue) : undefined,
+      timestampValue: isSet(object.timestampValue) ? fromJsonTimestamp(object.timestampValue) : undefined,
+      bigintValue: isSet(object.bigintValue) ? BigInteger.fromJSON(object.bigintValue) : undefined,
+      bigdecimalValue: isSet(object.bigdecimalValue) ? BigDecimal.fromJSON(object.bigdecimalValue) : undefined,
+      listValue: isSet(object.listValue) ? RichValueList.fromJSON(object.listValue) : undefined,
+    };
+  },
+
+  toJSON(message: RichValue): unknown {
+    const obj: any = {};
+    if (message.nullValue !== undefined) {
+      obj.nullValue = richValue_NullValueToJSON(message.nullValue);
+    }
+    if (message.intValue !== undefined) {
+      obj.intValue = Math.round(message.intValue);
+    }
+    if (message.floatValue !== undefined) {
+      obj.floatValue = message.floatValue;
+    }
+    if (message.bytesValue !== undefined) {
+      obj.bytesValue = base64FromBytes(message.bytesValue);
+    }
+    if (message.boolValue !== undefined) {
+      obj.boolValue = message.boolValue;
+    }
+    if (message.stringValue !== undefined) {
+      obj.stringValue = message.stringValue;
+    }
+    if (message.timestampValue !== undefined) {
+      obj.timestampValue = message.timestampValue.toISOString();
+    }
+    if (message.bigintValue !== undefined) {
+      obj.bigintValue = BigInteger.toJSON(message.bigintValue);
+    }
+    if (message.bigdecimalValue !== undefined) {
+      obj.bigdecimalValue = BigDecimal.toJSON(message.bigdecimalValue);
+    }
+    if (message.listValue !== undefined) {
+      obj.listValue = RichValueList.toJSON(message.listValue);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<RichValue>): RichValue {
+    return RichValue.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<RichValue>): RichValue {
+    const message = createBaseRichValue();
+    message.nullValue = object.nullValue ?? undefined;
+    message.intValue = object.intValue ?? undefined;
+    message.floatValue = object.floatValue ?? undefined;
+    message.bytesValue = object.bytesValue ?? undefined;
+    message.boolValue = object.boolValue ?? undefined;
+    message.stringValue = object.stringValue ?? undefined;
+    message.timestampValue = object.timestampValue ?? undefined;
+    message.bigintValue = (object.bigintValue !== undefined && object.bigintValue !== null)
+      ? BigInteger.fromPartial(object.bigintValue)
+      : undefined;
+    message.bigdecimalValue = (object.bigdecimalValue !== undefined && object.bigdecimalValue !== null)
+      ? BigDecimal.fromPartial(object.bigdecimalValue)
+      : undefined;
+    message.listValue = (object.listValue !== undefined && object.listValue !== null)
+      ? RichValueList.fromPartial(object.listValue)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseRichStruct(): RichStruct {
+  return { fields: {} };
+}
+
+export const RichStruct = {
+  encode(message: RichStruct, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    Object.entries(message.fields).forEach(([key, value]) => {
+      RichStruct_FieldsEntry.encode({ key: key as any, value }, writer.uint32(10).fork()).ldelim();
+    });
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): RichStruct {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRichStruct();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          const entry1 = RichStruct_FieldsEntry.decode(reader, reader.uint32());
+          if (entry1.value !== undefined) {
+            message.fields[entry1.key] = entry1.value;
+          }
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): RichStruct {
+    return {
+      fields: isObject(object.fields)
+        ? Object.entries(object.fields).reduce<{ [key: string]: RichValue }>((acc, [key, value]) => {
+          acc[key] = RichValue.fromJSON(value);
+          return acc;
+        }, {})
+        : {},
+    };
+  },
+
+  toJSON(message: RichStruct): unknown {
+    const obj: any = {};
+    if (message.fields) {
+      const entries = Object.entries(message.fields);
+      if (entries.length > 0) {
+        obj.fields = {};
+        entries.forEach(([k, v]) => {
+          obj.fields[k] = RichValue.toJSON(v);
+        });
+      }
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<RichStruct>): RichStruct {
+    return RichStruct.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<RichStruct>): RichStruct {
+    const message = createBaseRichStruct();
+    message.fields = Object.entries(object.fields ?? {}).reduce<{ [key: string]: RichValue }>((acc, [key, value]) => {
+      if (value !== undefined) {
+        acc[key] = RichValue.fromPartial(value);
+      }
+      return acc;
+    }, {});
+    return message;
+  },
+};
+
+function createBaseRichStruct_FieldsEntry(): RichStruct_FieldsEntry {
+  return { key: "", value: undefined };
+}
+
+export const RichStruct_FieldsEntry = {
+  encode(message: RichStruct_FieldsEntry, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.key !== "") {
+      writer.uint32(10).string(message.key);
+    }
+    if (message.value !== undefined) {
+      RichValue.encode(message.value, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): RichStruct_FieldsEntry {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRichStruct_FieldsEntry();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.key = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.value = RichValue.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): RichStruct_FieldsEntry {
+    return {
+      key: isSet(object.key) ? globalThis.String(object.key) : "",
+      value: isSet(object.value) ? RichValue.fromJSON(object.value) : undefined,
+    };
+  },
+
+  toJSON(message: RichStruct_FieldsEntry): unknown {
+    const obj: any = {};
+    if (message.key !== "") {
+      obj.key = message.key;
+    }
+    if (message.value !== undefined) {
+      obj.value = RichValue.toJSON(message.value);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<RichStruct_FieldsEntry>): RichStruct_FieldsEntry {
+    return RichStruct_FieldsEntry.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<RichStruct_FieldsEntry>): RichStruct_FieldsEntry {
+    const message = createBaseRichStruct_FieldsEntry();
+    message.key = object.key ?? "";
+    message.value = (object.value !== undefined && object.value !== null)
+      ? RichValue.fromPartial(object.value)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseRichValueList(): RichValueList {
+  return { values: [] };
+}
+
+export const RichValueList = {
+  encode(message: RichValueList, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.values) {
+      RichValue.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): RichValueList {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRichValueList();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.values.push(RichValue.decode(reader, reader.uint32()));
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): RichValueList {
+    return {
+      values: globalThis.Array.isArray(object?.values) ? object.values.map((e: any) => RichValue.fromJSON(e)) : [],
+    };
+  },
+
+  toJSON(message: RichValueList): unknown {
+    const obj: any = {};
+    if (message.values?.length) {
+      obj.values = message.values.map((e) => RichValue.toJSON(e));
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<RichValueList>): RichValueList {
+    return RichValueList.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<RichValueList>): RichValueList {
+    const message = createBaseRichValueList();
+    message.values = object.values?.map((e) => RichValue.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseRichStructList(): RichStructList {
+  return { entities: [] };
+}
+
+export const RichStructList = {
+  encode(message: RichStructList, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.entities) {
+      RichStruct.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): RichStructList {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRichStructList();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.entities.push(RichStruct.decode(reader, reader.uint32()));
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): RichStructList {
+    return {
+      entities: globalThis.Array.isArray(object?.entities)
+        ? object.entities.map((e: any) => RichStruct.fromJSON(e))
+        : [],
+    };
+  },
+
+  toJSON(message: RichStructList): unknown {
+    const obj: any = {};
+    if (message.entities?.length) {
+      obj.entities = message.entities.map((e) => RichStruct.toJSON(e));
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<RichStructList>): RichStructList {
+    return RichStructList.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<RichStructList>): RichStructList {
+    const message = createBaseRichStructList();
+    message.entities = object.entities?.map((e) => RichStruct.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseBigDecimal(): BigDecimal {
+  return { value: undefined, exp: 0 };
+}
+
+export const BigDecimal = {
+  encode(message: BigDecimal, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.value !== undefined) {
+      BigInteger.encode(message.value, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.exp !== 0) {
+      writer.uint32(16).int32(message.exp);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): BigDecimal {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseBigDecimal();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.value = BigInteger.decode(reader, reader.uint32());
+          continue;
+        case 2:
+          if (tag !== 16) {
+            break;
+          }
+
+          message.exp = reader.int32();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): BigDecimal {
+    return {
+      value: isSet(object.value) ? BigInteger.fromJSON(object.value) : undefined,
+      exp: isSet(object.exp) ? globalThis.Number(object.exp) : 0,
+    };
+  },
+
+  toJSON(message: BigDecimal): unknown {
+    const obj: any = {};
+    if (message.value !== undefined) {
+      obj.value = BigInteger.toJSON(message.value);
+    }
+    if (message.exp !== 0) {
+      obj.exp = Math.round(message.exp);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<BigDecimal>): BigDecimal {
+    return BigDecimal.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<BigDecimal>): BigDecimal {
+    const message = createBaseBigDecimal();
+    message.value = (object.value !== undefined && object.value !== null)
+      ? BigInteger.fromPartial(object.value)
+      : undefined;
+    message.exp = object.exp ?? 0;
+    return message;
+  },
+};
+
+function createBaseBigInteger(): BigInteger {
+  return { negative: false, data: new Uint8Array(0) };
+}
+
+export const BigInteger = {
+  encode(message: BigInteger, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.negative !== false) {
+      writer.uint32(8).bool(message.negative);
+    }
+    if (message.data.length !== 0) {
+      writer.uint32(18).bytes(message.data);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): BigInteger {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseBigInteger();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 8) {
+            break;
+          }
+
+          message.negative = reader.bool();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.data = reader.bytes();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): BigInteger {
+    return {
+      negative: isSet(object.negative) ? globalThis.Boolean(object.negative) : false,
+      data: isSet(object.data) ? bytesFromBase64(object.data) : new Uint8Array(0),
+    };
+  },
+
+  toJSON(message: BigInteger): unknown {
+    const obj: any = {};
+    if (message.negative !== false) {
+      obj.negative = message.negative;
+    }
+    if (message.data.length !== 0) {
+      obj.data = base64FromBytes(message.data);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<BigInteger>): BigInteger {
+    return BigInteger.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<BigInteger>): BigInteger {
+    const message = createBaseBigInteger();
+    message.negative = object.negative ?? false;
+    message.data = object.data ?? new Uint8Array(0);
+    return message;
+  },
+};
+
+function bytesFromBase64(b64: string): Uint8Array {
+  if ((globalThis as any).Buffer) {
+    return Uint8Array.from(globalThis.Buffer.from(b64, "base64"));
+  } else {
+    const bin = globalThis.atob(b64);
+    const arr = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; ++i) {
+      arr[i] = bin.charCodeAt(i);
+    }
+    return arr;
+  }
+}
+
+function base64FromBytes(arr: Uint8Array): string {
+  if ((globalThis as any).Buffer) {
+    return globalThis.Buffer.from(arr).toString("base64");
+  } else {
+    const bin: string[] = [];
+    arr.forEach((byte) => {
+      bin.push(globalThis.String.fromCharCode(byte));
+    });
+    return globalThis.btoa(bin.join(""));
+  }
+}
 
 type Builtin = Date | Function | Uint8Array | string | number | boolean | bigint | undefined;
 

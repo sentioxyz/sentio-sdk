@@ -1,6 +1,8 @@
 import { ID } from './types.js'
 import { PluginManager } from '@sentio/runtime'
 import { Store } from './store.js'
+import { RichStruct } from '@sentio/protos'
+import { array_, IDConverter, required_, ValueConverter } from './convert.js'
 
 export interface EntityClass<T extends Entity> {
   new (data: any): T
@@ -8,24 +10,25 @@ export interface EntityClass<T extends Entity> {
 
 export class Entity {
   get id(): ID {
-    return this.get('id')
+    return this.get('id', required_(IDConverter))
   }
 
-  data: Record<string, any> = {}
-  constructor(data: any) {
-    Object.entries(data).forEach(([key, value]) => {
-      if (Array.isArray(value)) {
-        this.data[key] = value.map((v) => this.getIdFromEntity(v))
-      } else {
-        this.data[key] = this.getIdFromEntity(value)
+  protected fromPojo(data: any, converters: Record<string, ValueConverter<any>>) {
+    for (const [field, value] of Object.entries(data)) {
+      if (converters[field] !== undefined) {
+        this.set(field, value, converters[field])
       }
-    })
+    }
+  }
+
+  constructor(private _data: RichStruct = { fields: {} }) {}
+
+  setData(data: RichStruct) {
+    this._data = data
   }
 
   private getIdFromEntity(entity: any): any {
-    if (entity instanceof Entity) {
-      return entity.id
-    } else if (typeof entity === 'object' && entity.id) {
+    if (typeof entity === 'object' && entity.id) {
       return entity.id
     }
     return entity
@@ -39,26 +42,32 @@ export class Entity {
     return undefined
   }
 
-  get<T>(field: string): T {
-    return this.data[field]
+  get<T>(field: string, converter: ValueConverter<T>): T {
+    const value = this._data.fields[field]
+    return converter.to(value)
   }
 
-  set<T>(field: string, value: T | T[] | ID | ID[]): void {
-    if (Array.isArray(value) && value instanceof Entity) {
-      this.data[field] = value.map((v) => (v as Entity).id)
-    } else if (value instanceof Entity) {
-      this.data[field] = (value as Entity).id
+  set<T>(field: string, value: T, serializer: ValueConverter<T>): void {
+    if (Array.isArray(value)) {
+      this._data.fields[field] = {
+        listValue: { values: value.map((v) => serializer.from(v)) }
+      }
+    } else {
+      this._data.fields[field] = serializer.from(value)
     }
-    this.data[field] = value
   }
 
-  protected getFieldObject<T extends Entity>(entity: EntityClass<T> | string, field: string): Promise<T | undefined> {
-    const id = this.data[field]
+  protected getObject<T extends Entity>(entity: EntityClass<T> | string, field: string): Promise<T | undefined> {
+    const id = this.get(field, IDConverter)
     return id ? (this.getStore()?.get(entity, id) as Promise<T>) : Promise.resolve(undefined)
   }
 
+  protected setObject(field: string, value: any): void {
+    this.set(field, this.getIdFromEntity(value), IDConverter)
+  }
+
   protected getFieldObjectArray<T extends Entity>(entity: EntityClass<T>, field: string): Promise<T[]> {
-    const ids = this.data[field]
+    const ids = this.get(field, array_(IDConverter))
     const promises = ids.map((id: string) => this.getStore()?.get(entity, id))
     return Promise.all(promises) as Promise<T[]>
   }
@@ -66,6 +75,10 @@ export class Entity {
   toString(): string {
     const entityName = this.constructor.prototype.entityName
     const id = this.id
-    return `${entityName}#${id} ${JSON.stringify(this.data)}`
+    return `${entityName}#${id} ${JSON.stringify(this._data)}`
+  }
+
+  serialize(): RichStruct {
+    return this._data
   }
 }
