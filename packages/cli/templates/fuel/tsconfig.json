@@ -1,8 +1,22 @@
 {
   "compilerOptions": {
+    "importHelpers": true,
+    "alwaysStrict": true,
+    "sourceMap": true,
+    "target": "esnext",
+    "esModuleInterop": true,
+    "noImplicitReturns": true,
+    "noImplicitAny": true,
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "strictNullChecks": true,
+    "stripInternal": true,
+    "noFallthroughCasesInSwitch": true,
+    "noEmitOnError": false,
     "rootDir": "./src",
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "skipLibCheck": true,
+    "resolveJsonModule": true
   },
-  "exclude": ["dist"],
-  "extends": "../../tsconfig.json"
+  "exclude": ["dist"]
 }
