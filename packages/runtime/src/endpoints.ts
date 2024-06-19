@@ -6,4 +6,6 @@ export class Endpoints {
   priceFeedAPI = ''
 
   chainServer = new Map<string, string>()
+
+  batchCount = 1
 }

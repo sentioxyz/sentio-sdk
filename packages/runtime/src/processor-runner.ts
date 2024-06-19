@@ -26,6 +26,7 @@ const optionDefinitions = [
   { name: 'target', type: String, defaultOption: true },
   { name: 'port', alias: 'p', type: String, defaultValue: '4000' },
   { name: 'concurrency', type: Number, defaultValue: 4 },
+  { name: 'batch-count', type: Number, defaultValue: 1 },
   // { name: 'use-chainserver', type: Boolean, defaultValue: false },
   {
     name: 'chains-config',
@@ -50,6 +51,7 @@ const fullPath = path.resolve(options['chains-config'])
 const chainsConfig = fs.readJsonSync(fullPath)
 
 Endpoints.INSTANCE.concurrency = options.concurrency
+Endpoints.INSTANCE.batchCount = options['batch-count']
 Endpoints.INSTANCE.chainQueryAPI = options['chainquery-server']
 Endpoints.INSTANCE.priceFeedAPI = options['pricefeed-server']
 

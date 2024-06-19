@@ -43,7 +43,12 @@ export function getProvider(chainId?: EthChainId): Provider {
         [...Endpoints.INSTANCE.chainServer.keys()].join(' ')
     )
   }
-  provider = new QueuedStaticJsonRpcProvider(address, network, Endpoints.INSTANCE.concurrency)
+  provider = new QueuedStaticJsonRpcProvider(
+    address,
+    network,
+    Endpoints.INSTANCE.concurrency,
+    Endpoints.INSTANCE.batchCount
+  )
   providers.set(key, provider)
   return provider
 }
@@ -97,9 +102,9 @@ class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
   totalDuration = 0
   totalQueued = 0
 
-  constructor(url: string, network: Network, concurrency: number) {
+  constructor(url: string, network: Network, concurrency: number, batchCount = 1) {
     // TODO re-enable match when possible
-    super(url, network, { staticNetwork: network, batchMaxCount: 100 })
+    super(url, network, { staticNetwork: network, batchMaxCount: batchCount })
     this.executor = new PQueue({ concurrency: concurrency })
   }
 
