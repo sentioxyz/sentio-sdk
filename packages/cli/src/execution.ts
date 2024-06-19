@@ -1,9 +1,10 @@
-import { execFile, ExecFileOptions } from 'child_process'
+import { exec, execFile, ExecFileOptions } from 'child_process'
 import chalk from 'chalk'
 import process from 'process'
 
 export async function execStep(cmds: string[], stepName: string, options?: ExecFileOptions) {
-  const child = execFile(cmds[0], cmds.slice(1), options)
+  // https://nodejs.org/api/child_process.html#child_process_spawning_bat_and_cmd_files_on_windows
+  const child = process.platform === 'win32' ? exec(cmds.join(' ')) : execFile(cmds[0], cmds.slice(1), options)
 
   console.log(chalk.blue(stepName + ' begin'))
 
