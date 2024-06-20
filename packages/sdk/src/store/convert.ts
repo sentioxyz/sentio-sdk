@@ -187,9 +187,8 @@ export const BigDecimalConverter: ValueConverter<BigDecimal | undefined> = {
         nullValue: RichValue_NullValue.NULL_VALUE
       }
     }
-
-    const exp = value.decimalPlaces() ?? 0
-    const s = value.multipliedBy(new BigDecimal(10).pow(exp)).toFixed()
+    const s = (value.c || []).join('')
+    const exp = -(s.length - (value.e ?? 0) - 1)
 
     return {
       bigdecimalValue: {
@@ -202,7 +201,13 @@ export const BigDecimalConverter: ValueConverter<BigDecimal | undefined> = {
     const d = v.bigdecimalValue
     if (d) {
       const i = bytesToBigInt(d.value!.data)
-      return new BigDecimal(`${i}`).dividedBy(new BigDecimal(10).pow(d.exp)).multipliedBy(d.value?.negative ? -1 : 1)
+      let ret = new BigDecimal(i.toString())
+      if (d.exp < 0) {
+        ret = ret.dividedBy(new BigDecimal(10).pow(-d.exp))
+      } else {
+        ret = ret.multipliedBy(new BigDecimal(10).pow(d.exp))
+      }
+      return ret.multipliedBy(d.value?.negative ? -1 : 1)
     }
     return undefined
   }
