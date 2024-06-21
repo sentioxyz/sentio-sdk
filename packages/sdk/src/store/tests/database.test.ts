@@ -4,9 +4,13 @@ import { MemoryDatabase } from './memory-database.js'
 import { afterAll, afterEach } from '@jest/globals'
 import { StoreContext } from '../context.js'
 import { BigDecimal } from '@sentio/bigdecimal'
+import { Subject } from 'rxjs'
+import { DeepPartial, ProcessStreamResponse } from '@sentio/protos'
 
 describe('Test Database', () => {
-  const storeContext = new StoreContext()
+  const subject = new Subject<DeepPartial<ProcessStreamResponse>>()
+
+  const storeContext = new StoreContext(subject, 1)
   const db = new MemoryDatabase(storeContext)
   db.start()
 

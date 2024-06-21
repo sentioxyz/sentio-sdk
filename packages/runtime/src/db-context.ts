@@ -4,11 +4,14 @@ import { DBRequest, DBResponse, DeepPartial, ProcessResult, ProcessStreamRespons
 type Request = Omit<DBRequest, 'opId'>
 
 export class StoreContext {
-  private opCounter = 0n
+  private static opCounter = 0n
 
   private defers = new Map<bigint, { resolve: (value: any) => void; reject: (reason?: any) => void }>()
 
-  subject = new Subject<DeepPartial<ProcessStreamResponse>>()
+  constructor(
+    readonly subject: Subject<DeepPartial<ProcessStreamResponse>>,
+    readonly processId: number
+  ) {}
 
   newPromise<T>(opId: bigint) {
     return new Promise<T>((resolve, reject) => {
@@ -17,14 +20,15 @@ export class StoreContext {
   }
 
   sendRequest(request: DeepPartial<Request>) {
-    const opId = this.opCounter++
+    const opId = StoreContext.opCounter++
     const promise = this.newPromise(opId)
     console.debug('sending db request ', opId, request)
     this.subject.next({
       dbRequest: {
         ...request,
         opId
-      }
+      },
+      processId: this.processId
     })
     return promise
   }

@@ -5,6 +5,7 @@ import { withAbort } from 'ix/Ix.dom.asynciterable.operators.js'
 
 import {
   DataBinding,
+  DeepPartial,
   Empty,
   HandlerType,
   ProcessBindingResponse,
@@ -14,6 +15,7 @@ import {
   ProcessorServiceImplementation,
   ProcessResult,
   ProcessStreamRequest,
+  ProcessStreamResponse,
   StartRequest
 } from '@sentio/protos'
 
@@ -22,6 +24,8 @@ import { errorString, mergeProcessResults } from './utils.js'
 import { freezeGlobalConfig, GLOBAL_CONFIG } from './global-config.js'
 
 import { StoreContext } from './db-context.js'
+import { Subject } from 'rxjs'
+
 ;(BigInt.prototype as any).toJSON = function () {
   return this.toString()
 }
@@ -162,38 +166,44 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       throw new ServerError(Status.UNAVAILABLE, 'Service Not started.')
     }
 
-    const dbContext = new StoreContext()
+    const subject = new Subject<DeepPartial<ProcessStreamResponse>>()
+    const contexts: Record<number, StoreContext> = {}
     new Promise(async (resolve, reject) => {
       for await (const request of requests) {
         if (request.binding) {
           const binding = request.binding
+          const dbContext = new StoreContext(subject, request.processId)
+          contexts[request.processId] = dbContext
           PluginManager.INSTANCE.processBinding(binding, dbContext)
             .then((result) => {
-              dbContext.subject.next({
+              subject.next({
                 result,
                 processId: request.processId
               })
-              // dbContext.subject.complete()
               recordRuntimeInfo(result, binding.handlerType)
             })
             .catch((e) => {
               dbContext.error(request.processId, e)
             })
+            .finally(() => {
+              delete contexts[request.processId]
+            })
         }
         if (request.dbResult) {
-          dbContext.result(request.dbResult)
+          const dbContext = contexts[request.processId]
+          dbContext?.result(request.dbResult)
         }
       }
       resolve(null)
     })
       .then(() => {
-        dbContext.subject.complete()
+        subject.complete()
       })
       .catch((e) => {
         // should not happen
-        dbContext.subject.error(e)
+        subject.error(e)
       })
-    yield* from(dbContext.subject).pipe(withAbort(context.signal))
+    yield* from(subject).pipe(withAbort(context.signal))
   }
 }
 
