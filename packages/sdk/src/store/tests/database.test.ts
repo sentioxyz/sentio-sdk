@@ -14,18 +14,28 @@ describe('Test Database', () => {
   const db = new MemoryDatabase(storeContext)
   db.start()
 
+  function expectEntityEqual(a: any, b: any) {
+    expect(a._data).toEqual(b._data)
+  }
+
+  function expectListEntityEqual(a: any[], b: any[]) {
+    expect(a.map((e) => e._data)).toEqual(b.map((e) => e._data))
+  }
+
   it('should upsert to database', async () => {
     const store = new Store(storeContext)
 
     const user = new User({
       id: 'test-id-1',
-      name: 'test'
+      name: 'test',
+      transactionsIDs: [],
+      organizationsIDs: []
     })
 
     await store.upsert(user)
     const u = await store.get(User, 'test-id-1')
     console.log(u)
-    expect(u).toEqual(user)
+    expectEntityEqual(u, user)
   })
 
   it('should delete from database', async () => {
@@ -33,7 +43,9 @@ describe('Test Database', () => {
 
     const user = new User({
       id: 'test-id-2',
-      name: 'test'
+      name: 'test',
+      transactionsIDs: [],
+      organizationsIDs: []
     })
 
     await store.upsert(user)
@@ -48,12 +60,16 @@ describe('Test Database', () => {
 
     const user1 = new User({
       id: 'test-id-1',
-      name: 'test'
+      name: 'test',
+      transactionsIDs: [],
+      organizationsIDs: []
     })
 
     const user2 = new User({
       id: 'test-id-2',
-      name: 'test'
+      name: 'test',
+      transactionsIDs: [],
+      organizationsIDs: []
     })
 
     await store.upsert([user1, user2])
@@ -61,7 +77,7 @@ describe('Test Database', () => {
     for await (const u of store.list(User, [])) {
       list.push(u)
     }
-    expect(list).toEqual([user1, user2])
+    expectListEntityEqual(list, [user1, user2])
   })
 
   it('type tests', async () => {

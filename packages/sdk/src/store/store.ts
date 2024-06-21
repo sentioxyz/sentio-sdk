@@ -1,22 +1,30 @@
-import { Entity, EntityClass } from './entity.js'
 import { StoreContext } from './context.js'
 import { DatabaseSchema } from '../core/index.js'
 import { BigDecimal } from '@sentio/bigdecimal'
-import { Bytes, Timestamp, Float, ID, Int } from './types.js'
-import { DBRequest_DBOperator, DBResponse } from '@sentio/protos'
+import { Bytes, Float, ID, Int, Timestamp } from './types.js'
 import type { RichStruct, RichValue } from '@sentio/protos'
+import { DBRequest_DBOperator, DBResponse } from '@sentio/protos'
 import { toBigInteger } from './convert.js'
+import { PluginManager } from '@sentio/runtime'
 
 type Value = ID | string | Int | Float | boolean | Timestamp | Bytes | BigDecimal | bigint
+
+interface Entity {
+  id: ID
+}
+
+export interface EntityClass<T> {
+  new (data: Partial<T>): T
+}
 
 export class Store {
   constructor(private readonly context: StoreContext) {}
 
-  async get<T extends Entity>(entity: EntityClass<T> | string, id: string): Promise<T | undefined> {
+  async get<T extends Entity>(entity: EntityClass<T> | string, id: ID): Promise<T | undefined> {
     const promise = this.context.sendRequest({
       get: {
         entity: typeof entity == 'string' ? entity : entity.prototype.entityName,
-        id
+        id: id.toString()
       }
     })
 
@@ -29,20 +37,32 @@ export class Store {
     return undefined
   }
 
-  async delete(entity: EntityClass<any>, id: string | string[]): Promise<void> {
-    const toBeDeleted = []
-    if (Array.isArray(id)) {
-      for (const i of id) {
-        toBeDeleted.push({ entity: entity.prototype.entityName, id: i })
+  async delete<T extends Entity>(entity: EntityClass<T> | T | T[], id?: string | string[]): Promise<void> {
+    const request = {
+      entity: [] as string[],
+      id: [] as string[]
+    }
+    if (id) {
+      if (Array.isArray(id)) {
+        for (const i of id) {
+          const items = (entity as any).prototype.entityName
+          request.entity.push(items)
+          request.id.push(i.toString())
+        }
+      } else {
+        request.entity.push((entity as any).prototype.entityName)
+        request.id.push(id)
       }
     } else {
-      toBeDeleted.push({ entity: entity.prototype.entityName, id })
-    }
-    await this.context.sendRequest({
-      delete: {
-        entity: toBeDeleted.map((e) => e.entity) as string[],
-        id: toBeDeleted.map((e) => e.id) as string[]
+      const entities = Array.isArray(entity) ? entity : [entity]
+      for (const e of entities) {
+        request.entity.push(e.constructor.prototype.entityName)
+        request.id.push((e as Entity).id.toString())
       }
+    }
+
+    await this.context.sendRequest({
+      delete: request
     })
   }
 
@@ -52,8 +72,8 @@ export class Store {
       upsert: {
         entity: entities.map((e) => e.constructor.prototype.entityName),
         // data: entities.map((e) => serialize(e.data)),
-        id: entities.map((e) => e.id),
-        entityData: entities.map((e) => e.serialize())
+        id: entities.map((e) => e.id.toString()),
+        entityData: entities.map((e: any) => e._data)
       }
     })
 
@@ -89,16 +109,19 @@ export class Store {
 
   private newEntity<T extends Entity>(entity: EntityClass<T> | string, data: RichStruct) {
     if (typeof entity == 'string') {
-      const en = DatabaseSchema.findEntity(entity)
+      let en = DatabaseSchema.findEntity(entity)
       if (!en) {
         // it is an interface
-        return new Entity() as T
+        en = DatabaseSchema.findEntity(data.entityName)
+        if (!en) {
+          throw new Error(`Entity ${entity} not found`)
+        }
       }
       entity = en
     }
 
     const res = new (entity as EntityClass<T>)({}) as T
-    res.setData(data)
+    ;(res as any)._data = data
     return res
   }
 }
@@ -174,4 +197,12 @@ function serializeBigDecimal(v: BigDecimal): RichValue {
   return {
     bigdecimalValue: undefined
   }
+}
+
+export function getStore() {
+  const dbContext = PluginManager.INSTANCE.dbContextLocalStorage.getStore()
+  if (dbContext) {
+    return new Store(dbContext)
+  }
+  return undefined
 }

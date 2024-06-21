@@ -1871,6 +1871,7 @@ export function richValue_NullValueToJSON(object: RichValue_NullValue): string {
 
 export interface RichStruct {
   fields: { [key: string]: RichValue };
+  entityName: string;
 }
 
 export interface RichStruct_FieldsEntry {
@@ -12740,7 +12741,7 @@ export const RichValue = {
 };
 
 function createBaseRichStruct(): RichStruct {
-  return { fields: {} };
+  return { fields: {}, entityName: "" };
 }
 
 export const RichStruct = {
@@ -12748,6 +12749,9 @@ export const RichStruct = {
     Object.entries(message.fields).forEach(([key, value]) => {
       RichStruct_FieldsEntry.encode({ key: key as any, value }, writer.uint32(10).fork()).ldelim();
     });
+    if (message.entityName !== "") {
+      writer.uint32(18).string(message.entityName);
+    }
     return writer;
   },
 
@@ -12768,6 +12772,13 @@ export const RichStruct = {
             message.fields[entry1.key] = entry1.value;
           }
           continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.entityName = reader.string();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -12785,6 +12796,7 @@ export const RichStruct = {
           return acc;
         }, {})
         : {},
+      entityName: isSet(object.entityName) ? globalThis.String(object.entityName) : "",
     };
   },
 
@@ -12798,6 +12810,9 @@ export const RichStruct = {
           obj.fields[k] = RichValue.toJSON(v);
         });
       }
+    }
+    if (message.entityName !== "") {
+      obj.entityName = message.entityName;
     }
     return obj;
   },
@@ -12813,6 +12828,7 @@ export const RichStruct = {
       }
       return acc;
     }, {});
+    message.entityName = object.entityName ?? "";
     return message;
   },
 };

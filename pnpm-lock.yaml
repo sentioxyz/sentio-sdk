@@ -521,6 +521,9 @@ importers:
       radash:
         specifier: ^12.0.0
         version: 12.1.0
+      reflect-metadata:
+        specifier: ^0.2.2
+        version: 0.2.2
       superstruct_solana:
         specifier: npm:superstruct@^0.14.2
         version: superstruct@0.14.2
@@ -5364,6 +5367,9 @@ packages:
   reduce-flatten@2.0.0:
     resolution: {integrity: sha512-EJ4UNY/U1t2P/2k6oqotuX2Cc3T6nxJwsM0N0asT7dhrtH1ltUxDn4NalSYmPE2rCkVpcf/X6R0wDwcFpzhd4w==}
     engines: {node: '>=6'}
+
+  reflect-metadata@0.2.2:
+    resolution: {integrity: sha512-urBwgfrvVP/eAyXx4hluJivBKzuEbSQs9rKWCrCkbSxNv8mxPcUZKeuoF3Uy4mJl3Lwprp6yy5/39VWigZ4K6Q==}
 
   regenerator-runtime@0.13.11:
     resolution: {integrity: sha512-kY1AZVr2Ra+t+piVaJ4gxaFaReZVH40AKNo7UCX6W+dEwBo/2oZJzqfuN1qLq1oL45o56cPaTXELwrTh8Fpggg==}
@@ -12498,6 +12504,8 @@ snapshots:
     optional: true
 
   reduce-flatten@2.0.0: {}
+
+  reflect-metadata@0.2.2: {}
 
   regenerator-runtime@0.13.11:
     optional: true

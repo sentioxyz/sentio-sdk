@@ -1,6 +1,5 @@
 export * from './decorators.js'
 export * from './types.js'
-export * from './entity.js'
 export * from './store.js'
 export * from './context.js'
 export * from './convert.js'

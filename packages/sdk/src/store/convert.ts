@@ -1,27 +1,35 @@
-import { RichStruct, RichValue, RichValue_NullValue } from '@sentio/protos'
-import { String, Int, Float, ID, Bytes, Timestamp, Boolean } from './types.js'
-import { Entity } from './entity.js'
+import { RichValue, RichValue_NullValue } from '@sentio/protos'
+import type { String, Int, Float, ID, Bytes, Timestamp, Boolean } from './types.js'
 import { BigDecimal } from '@sentio/bigdecimal'
 
 export interface ValueConverter<T> {
   from: (value: T) => RichValue
   to: (value: RichValue) => T
+  required?: boolean
+  isArray?: boolean
+  isRelation?: boolean
+  relationName?: string
 }
 
+export const ValueRequiredError = new Error('Value is required but received null or undefined')
+
 export function required_<T>(converter: ValueConverter<T | undefined>): ValueConverter<T> {
+  const { from, to, ...rest } = converter
   return {
     from: (value: T | undefined) => {
       if (value == null) {
-        throw new Error('Value is required but received null or undefined')
+        throw ValueRequiredError
       }
-      return converter.from(value)
+      return from(value)
     },
     to: (value: RichValue) => {
       if (value == null || value.nullValue) {
-        throw new Error('Value is required but received null')
+        throw ValueRequiredError
       }
-      return converter.to(value)!
-    }
+      return to(value)!
+    },
+    ...rest,
+    required: true
   }
 }
 
@@ -36,7 +44,10 @@ export function array_<T>(converter: ValueConverter<T>): ValueConverter<T[]> {
     },
     to: (value: RichValue) => {
       return value.listValue?.values.map(converter.to) || []
-    }
+    },
+    isArray: true,
+    isRelation: converter.isRelation,
+    relationName: converter.relationName
   }
 }
 
@@ -58,7 +69,7 @@ export function enumerate_<T extends string | number>(values: Record<T, string>)
   }
 }
 
-export function objectId_<T>(): ValueConverter<T | ID> {
+export function objectId_<T>(entityName: string): ValueConverter<T | ID> {
   return {
     from: (value: T | ID) => {
       if (typeof value == 'string') {
@@ -66,9 +77,16 @@ export function objectId_<T>(): ValueConverter<T | ID> {
           stringValue: value
         }
       }
-      if (value instanceof Entity) {
+      if (value instanceof Uint8Array) {
         return {
-          stringValue: value.id
+          stringValue: `0x${Buffer.from(value).toString('hex')}`
+        }
+      }
+
+      if (typeof value == 'object') {
+        const entity = value as any
+        return {
+          stringValue: entity.id.toString()
         }
       }
       return {
@@ -77,7 +95,9 @@ export function objectId_<T>(): ValueConverter<T | ID> {
     },
     to(v) {
       return v.stringValue as T | ID
-    }
+    },
+    isRelation: true,
+    relationName: entityName
   }
 }
 
@@ -178,7 +198,33 @@ export const BytesConverter: ValueConverter<Bytes | undefined> = {
   }
 }
 
-export const IDConverter: ValueConverter<ID | undefined> = StringConverter
+export const IDConverter: ValueConverter<ID | undefined> = {
+  from(value: ID | undefined): RichValue {
+    if (typeof value == 'string') {
+      return {
+        stringValue: value
+      }
+    }
+    if (value instanceof Uint8Array) {
+      return {
+        stringValue: `0x${Buffer.from(value).toString('hex')}`
+      }
+    }
+    return {
+      nullValue: RichValue_NullValue.NULL_VALUE
+    }
+  },
+  to(value: RichValue): ID | undefined {
+    if (value.stringValue) {
+      return value.stringValue as ID
+    }
+    if (value.bytesValue) {
+      const v = `0x${Buffer.from(value.bytesValue).toString('hex')}`
+      return v as ID
+    }
+    return undefined
+  }
+}
 
 export const BigDecimalConverter: ValueConverter<BigDecimal | undefined> = {
   from: (value?: BigDecimal): RichValue => {
@@ -236,20 +282,6 @@ export const BigIntConverter: ValueConverter<bigint | undefined> = {
   }
 }
 
-export class StructConverter<T extends Entity> {
-  constructor(private converters: Record<string, ValueConverter<any>>) {}
-
-  from(data: any): RichStruct {
-    const fields: Record<string, RichValue> = {}
-    for (const [field, value] of Object.entries(data)) {
-      if (this.converters[field] !== undefined) {
-        fields[field] = this.converters[field].from(value)
-      }
-    }
-    return { fields }
-  }
-}
-
 export function bytesToBigInt(bytes: Uint8Array) {
   let intValue = BigInt(0)
   for (let i = 0; i < bytes.length; i++) {
@@ -273,4 +305,17 @@ export function toBigInteger(a: bigint) {
     negative: negative,
     data: new Uint8Array(buffer)
   }
+}
+
+export const TypeConverters: Record<string, ValueConverter<any>> = {
+  BigDecimal: BigDecimalConverter,
+  BigInt: BigIntConverter,
+  String: StringConverter,
+  Boolean: BooleanConverter,
+  Uint8Array: BytesConverter,
+  ID: IDConverter,
+  Bytes: BytesConverter,
+  Int: IntConverter,
+  Float: FloatConverter,
+  Timestamp: TimestampConverter
 }
