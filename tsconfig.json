@@ -22,6 +22,7 @@
     // by pass issue: Could not find a declaration file for module 'buffer-layout' for now.
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
   }
 }

@@ -2,6 +2,7 @@ type Reward @entity {
   id: ID!
   value: BigDecimal!
   phase: String
+  owner: User!
 }
 
 type Transfer @entity {

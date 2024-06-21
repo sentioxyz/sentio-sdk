@@ -757,7 +757,20 @@ export interface DBResponse {
   list?: Array<any> | undefined;
   error?: string | undefined;
   entities?: RichStructList | undefined;
+  entityList?: EntityList | undefined;
   nextCursor?: string | undefined;
+}
+
+export interface Entity {
+  entity: string;
+  genBlockNumber: bigint;
+  genBlockChain: string;
+  genBlockTime: Date | undefined;
+  data: RichStruct | undefined;
+}
+
+export interface EntityList {
+  entities: Entity[];
 }
 
 export interface DBRequest {
@@ -5884,6 +5897,7 @@ function createBaseDBResponse(): DBResponse {
     list: undefined,
     error: undefined,
     entities: undefined,
+    entityList: undefined,
     nextCursor: undefined,
   };
 }
@@ -5907,6 +5921,9 @@ export const DBResponse = {
     }
     if (message.entities !== undefined) {
       RichStructList.encode(message.entities, writer.uint32(50).fork()).ldelim();
+    }
+    if (message.entityList !== undefined) {
+      EntityList.encode(message.entityList, writer.uint32(58).fork()).ldelim();
     }
     if (message.nextCursor !== undefined) {
       writer.uint32(42).string(message.nextCursor);
@@ -5956,6 +5973,13 @@ export const DBResponse = {
 
           message.entities = RichStructList.decode(reader, reader.uint32());
           continue;
+        case 7:
+          if (tag !== 58) {
+            break;
+          }
+
+          message.entityList = EntityList.decode(reader, reader.uint32());
+          continue;
         case 5:
           if (tag !== 42) {
             break;
@@ -5979,6 +6003,7 @@ export const DBResponse = {
       list: globalThis.Array.isArray(object.list) ? [...object.list] : undefined,
       error: isSet(object.error) ? globalThis.String(object.error) : undefined,
       entities: isSet(object.entities) ? RichStructList.fromJSON(object.entities) : undefined,
+      entityList: isSet(object.entityList) ? EntityList.fromJSON(object.entityList) : undefined,
       nextCursor: isSet(object.nextCursor) ? globalThis.String(object.nextCursor) : undefined,
     };
   },
@@ -6000,6 +6025,9 @@ export const DBResponse = {
     if (message.entities !== undefined) {
       obj.entities = RichStructList.toJSON(message.entities);
     }
+    if (message.entityList !== undefined) {
+      obj.entityList = EntityList.toJSON(message.entityList);
+    }
     if (message.nextCursor !== undefined) {
       obj.nextCursor = message.nextCursor;
     }
@@ -6018,7 +6046,193 @@ export const DBResponse = {
     message.entities = (object.entities !== undefined && object.entities !== null)
       ? RichStructList.fromPartial(object.entities)
       : undefined;
+    message.entityList = (object.entityList !== undefined && object.entityList !== null)
+      ? EntityList.fromPartial(object.entityList)
+      : undefined;
     message.nextCursor = object.nextCursor ?? undefined;
+    return message;
+  },
+};
+
+function createBaseEntity(): Entity {
+  return { entity: "", genBlockNumber: BigInt("0"), genBlockChain: "", genBlockTime: undefined, data: undefined };
+}
+
+export const Entity = {
+  encode(message: Entity, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.entity !== "") {
+      writer.uint32(10).string(message.entity);
+    }
+    if (message.genBlockNumber !== BigInt("0")) {
+      if (BigInt.asUintN(64, message.genBlockNumber) !== message.genBlockNumber) {
+        throw new globalThis.Error("value provided for field message.genBlockNumber of type uint64 too large");
+      }
+      writer.uint32(16).uint64(message.genBlockNumber.toString());
+    }
+    if (message.genBlockChain !== "") {
+      writer.uint32(26).string(message.genBlockChain);
+    }
+    if (message.genBlockTime !== undefined) {
+      Timestamp.encode(toTimestamp(message.genBlockTime), writer.uint32(34).fork()).ldelim();
+    }
+    if (message.data !== undefined) {
+      RichStruct.encode(message.data, writer.uint32(42).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Entity {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseEntity();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.entity = reader.string();
+          continue;
+        case 2:
+          if (tag !== 16) {
+            break;
+          }
+
+          message.genBlockNumber = longToBigint(reader.uint64() as Long);
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.genBlockChain = reader.string();
+          continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.genBlockTime = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+          continue;
+        case 5:
+          if (tag !== 42) {
+            break;
+          }
+
+          message.data = RichStruct.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Entity {
+    return {
+      entity: isSet(object.entity) ? globalThis.String(object.entity) : "",
+      genBlockNumber: isSet(object.genBlockNumber) ? BigInt(object.genBlockNumber) : BigInt("0"),
+      genBlockChain: isSet(object.genBlockChain) ? globalThis.String(object.genBlockChain) : "",
+      genBlockTime: isSet(object.genBlockTime) ? fromJsonTimestamp(object.genBlockTime) : undefined,
+      data: isSet(object.data) ? RichStruct.fromJSON(object.data) : undefined,
+    };
+  },
+
+  toJSON(message: Entity): unknown {
+    const obj: any = {};
+    if (message.entity !== "") {
+      obj.entity = message.entity;
+    }
+    if (message.genBlockNumber !== BigInt("0")) {
+      obj.genBlockNumber = message.genBlockNumber.toString();
+    }
+    if (message.genBlockChain !== "") {
+      obj.genBlockChain = message.genBlockChain;
+    }
+    if (message.genBlockTime !== undefined) {
+      obj.genBlockTime = message.genBlockTime.toISOString();
+    }
+    if (message.data !== undefined) {
+      obj.data = RichStruct.toJSON(message.data);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<Entity>): Entity {
+    return Entity.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<Entity>): Entity {
+    const message = createBaseEntity();
+    message.entity = object.entity ?? "";
+    message.genBlockNumber = object.genBlockNumber ?? BigInt("0");
+    message.genBlockChain = object.genBlockChain ?? "";
+    message.genBlockTime = object.genBlockTime ?? undefined;
+    message.data = (object.data !== undefined && object.data !== null)
+      ? RichStruct.fromPartial(object.data)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseEntityList(): EntityList {
+  return { entities: [] };
+}
+
+export const EntityList = {
+  encode(message: EntityList, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.entities) {
+      Entity.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): EntityList {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseEntityList();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.entities.push(Entity.decode(reader, reader.uint32()));
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): EntityList {
+    return {
+      entities: globalThis.Array.isArray(object?.entities) ? object.entities.map((e: any) => Entity.fromJSON(e)) : [],
+    };
+  },
+
+  toJSON(message: EntityList): unknown {
+    const obj: any = {};
+    if (message.entities?.length) {
+      obj.entities = message.entities.map((e) => Entity.toJSON(e));
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<EntityList>): EntityList {
+    return EntityList.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<EntityList>): EntityList {
+    const message = createBaseEntityList();
+    message.entities = object.entities?.map((e) => Entity.fromPartial(e)) || [];
     return message;
   },
 };

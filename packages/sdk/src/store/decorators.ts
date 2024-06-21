@@ -15,8 +15,8 @@ import {
   TypeConverters,
   ValueConverter
 } from './convert.js'
-import { getStore } from './store.js'
 import { RichStruct } from '@sentio/protos'
+import { getStore } from './store.js'
 
 type Constructor = { new (...args: any[]): any }
 
@@ -30,71 +30,78 @@ function handleError(entity: string, key: string, fn: () => any) {
 
 export function Entity(name: string) {
   return function <T extends Constructor>(BaseClass: T) {
-    return class extends BaseClass {
-      static entityName = name
-      readonly _data: RichStruct = { fields: {}, entityName: name }
+    Object.defineProperty(BaseClass, 'entityName', {
+      value: name
+    })
 
+    const meta: Record<string, ValueConverter<any>> = (BaseClass as any).meta || {}
+    const target = BaseClass.prototype
+    for (const [propertyKey, type] of Object.entries(meta)) {
+      if (type.isRelation && type.relationName) {
+        const relationName = type.relationName
+        const idGetter = function (this: any) {
+          return handleError(this.constructor.entityName, propertyKey, () => type!.to(this._data.fields[propertyKey]))
+        }
+        const idSetter = function (this: any, value: any) {
+          this._data.fields[propertyKey] = handleError(this.constructor.entityName, propertyKey, () =>
+            type!.from(value)
+          )
+        }
+        const idKey = type.isArray ? propertyKey + 'IDs' : propertyKey + 'ID'
+
+        Reflect.defineProperty(target, idKey, {
+          get: idGetter,
+          set: idSetter
+        })
+        Reflect.defineProperty(target, propertyKey, {
+          get: function () {
+            const ids = idGetter.call(this)
+            if (Array.isArray(ids)) {
+              return Promise.all(
+                ids.map((id) => {
+                  return getStore()?.get(relationName, id)
+                })
+              )
+            } else {
+              return getStore()?.get(relationName, ids)
+            }
+          },
+          set: function (value) {
+            if (value instanceof Promise) {
+              value.then((v) => {
+                idSetter.call(this, v)
+              })
+            } else {
+              idSetter.call(this, value)
+            }
+          }
+        })
+      } else {
+        Reflect.defineProperty(target, propertyKey, {
+          configurable: true,
+          get: function () {
+            return handleError(this.constructor.entityName, propertyKey, () => type!.to(this._data.fields[propertyKey]))
+          },
+          set: function (value) {
+            this._data.fields[propertyKey] = handleError(this.constructor.entityName, propertyKey, () =>
+              type!.from(value)
+            )
+          }
+        })
+      }
+    }
+
+    return class extends BaseClass {
+      readonly _data: RichStruct = { fields: {} }
       constructor(...args: any[]) {
         super()
-        const meta = (BaseClass as any).meta
-        for (const [propertyKey, t] of Object.entries(meta)) {
-          const converter = t as ValueConverter<any>
-          if (converter.isRelation && converter.relationName) {
-            const relationName = converter.relationName
-            const idGetter = () => {
-              return handleError(name, propertyKey, () => converter.to(this._data.fields[propertyKey]))
-            }
-            const idSetter = (value: any) => {
-              this._data.fields[propertyKey] = handleError(name, propertyKey, () => converter.from(value))
-            }
-            const idKey = converter.isArray ? propertyKey + 'IDs' : propertyKey + 'ID'
-
-            Object.defineProperty(this, idKey, {
-              get: idGetter,
-              set: idSetter
-            })
-
-            Object.defineProperty(this, propertyKey, {
-              get: () => {
-                const ids = idGetter()
-                if (Array.isArray(ids)) {
-                  return Promise.all(
-                    ids.map((id) => {
-                      return getStore()?.get(relationName, id)
-                    })
-                  )
-                } else {
-                  return getStore()?.get(relationName, ids)
-                }
-              },
-              set: (value) => {
-                if (value instanceof Promise) {
-                  value.then((v) => {
-                    idSetter(v)
-                  })
-                } else {
-                  idSetter(value)
-                }
-              }
-            })
-          } else {
-            Object.defineProperty(this, propertyKey, {
-              get: () => {
-                return handleError(name, propertyKey, () => converter.to(this._data.fields[propertyKey]))
-              },
-              set: (value) => {
-                this._data.fields[propertyKey] = handleError(name, propertyKey, () => converter.from(value))
-              }
-            })
+        for (const key of Object.getOwnPropertyNames(this)) {
+          if (BaseClass.prototype.hasOwnProperty(key)) {
+            delete this[key]
           }
-          const initData = args[0]
-          if (initData) {
-            for (const [key, value] of Object.entries(initData)) {
-              if (this.hasOwnProperty(key)) {
-                this[key] = value
-              }
-            }
-          }
+        }
+        if (args[0]) {
+          Object.assign(this, args[0])
         }
       }
     }

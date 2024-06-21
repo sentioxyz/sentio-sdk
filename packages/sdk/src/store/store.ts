@@ -2,7 +2,7 @@ import { StoreContext } from './context.js'
 import { DatabaseSchema } from '../core/index.js'
 import { BigDecimal } from '@sentio/bigdecimal'
 import { Bytes, Float, ID, Int, Timestamp } from './types.js'
-import type { RichStruct, RichValue } from '@sentio/protos'
+import type { Entity as EntityStruct, RichValue } from '@sentio/protos'
 import { DBRequest_DBOperator, DBResponse } from '@sentio/protos'
 import { toBigInteger } from './convert.js'
 import { PluginManager } from '@sentio/runtime'
@@ -29,8 +29,8 @@ export class Store {
     })
 
     const data = (await promise) as DBResponse
-    if (data.entities?.entities[0]) {
-      const entityData = data.entities.entities[0]
+    if (data.entityList?.entities[0]) {
+      const entityData = data.entityList?.entities[0]
       return this.newEntity(entity, entityData)
     }
 
@@ -97,7 +97,7 @@ export class Store {
         }
       })
       const response = (await promise) as DBResponse
-      for (const data of response.entities?.entities || []) {
+      for (const data of response.entityList?.entities || []) {
         yield this.newEntity(entity, data)
       }
       if (!response.nextCursor) {
@@ -107,12 +107,12 @@ export class Store {
     }
   }
 
-  private newEntity<T extends Entity>(entity: EntityClass<T> | string, data: RichStruct) {
+  private newEntity<T extends Entity>(entity: EntityClass<T> | string, data: EntityStruct) {
     if (typeof entity == 'string') {
       let en = DatabaseSchema.findEntity(entity)
       if (!en) {
         // it is an interface
-        en = DatabaseSchema.findEntity(data.entityName)
+        en = DatabaseSchema.findEntity(data.entity)
         if (!en) {
           throw new Error(`Entity ${entity} not found`)
         }
@@ -121,7 +121,7 @@ export class Store {
     }
 
     const res = new (entity as EntityClass<T>)({}) as T
-    ;(res as any)._data = data
+    ;(res as any)._data = data.data
     return res
   }
 }

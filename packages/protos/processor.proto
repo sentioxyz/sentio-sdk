@@ -430,9 +430,22 @@ message DBResponse {
     google.protobuf.Struct data = 2; // @deprecate
     google.protobuf.ListValue list = 4; // @deprecate
     string error = 3;
-    common.RichStructList entities = 6;
+    common.RichStructList entities = 6; // @deprecate
+    EntityList entity_list = 7;
   }
   optional string next_cursor = 5;
+}
+
+message Entity {
+  string entity = 1;
+  uint64 gen_block_number = 2;
+  string gen_block_chain = 3;
+  google.protobuf.Timestamp gen_block_time = 4;
+  common.RichStruct data = 5;
+}
+
+message EntityList {
+  repeated Entity entities = 1;
 }
 
 message DBRequest {

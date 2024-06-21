@@ -90,8 +90,9 @@ describe('entity tests', () => {
     expect(meta['id']).toBeDefined()
   })
 
-  it('define constructor ', () => {
+  it('define constructor ', async () => {
     const now = new Date()
+    const p = new Pet({ id: 'pet' })
     const t = new Person({
       id: 'test',
       intValue: 100,
@@ -102,7 +103,8 @@ describe('entity tests', () => {
       dateValue: now,
       floatValue: 0.1,
       booleanValue: true,
-      arrayInt: [1, 2, 3]
+      arrayInt: [1, 2, 3],
+      pets: Promise.resolve([p])
     })
 
     expect(t.id).toBe('test')
@@ -115,6 +117,9 @@ describe('entity tests', () => {
     expect(t.floatValue).toBe(0.1)
     expect(t.booleanValue).toBe(true)
     expect(t.arrayInt).toEqual([1, 2, 3])
+    await sleep(1)
+    expect(t.pets).toBeDefined()
+    expect(t.petsIDs).toStrictEqual([p.id])
   })
 
   it('define getter & setter', () => {

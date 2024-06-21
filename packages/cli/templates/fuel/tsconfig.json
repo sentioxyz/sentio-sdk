@@ -16,7 +16,9 @@
     "rootDir": "./src",
     "outDir": "./dist",
     "skipLibCheck": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
   },
   "exclude": ["dist"]
 }

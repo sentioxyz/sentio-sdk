@@ -1,5 +1,5 @@
 import { StoreContext } from '../context.js'
-import { ProcessStreamResponse, RichStruct } from '@sentio/protos'
+import { ProcessStreamResponse } from '@sentio/protos'
 
 export class MemoryDatabase {
   db = new Map<string, any>()
@@ -43,7 +43,10 @@ export class MemoryDatabase {
         const data = this.db.get(id)
         this.dbContext.result({
           opId: req.opId,
-          entities: { entities: data ? [data] : [] }
+          // entities: { entities: data ? [data] : [] },
+          entityList: {
+            entities: data ? [toEntity(entity, data)] : []
+          }
         })
       }
       if (req.list) {
@@ -54,13 +57,13 @@ export class MemoryDatabase {
 
           this.dbContext.result({
             opId: req.opId,
-            entities: { entities: list.slice(idx, idx + 1) as RichStruct[] },
+            entityList: { entities: list.slice(idx, idx + 1).map((d) => toEntity(entity, d)) },
             nextCursor: idx + 1 < list.length ? `${idx + 1}` : undefined
           })
         } else {
           this.dbContext.result({
             opId: req.opId,
-            entities: { entities: [list[0]] },
+            entityList: { entities: [toEntity(entity, list[0])] },
             nextCursor: '1'
           })
         }
@@ -70,5 +73,15 @@ export class MemoryDatabase {
 
   reset() {
     this.db.clear()
+  }
+}
+
+function toEntity(entity: string, data: any) {
+  return {
+    entity,
+    genBlockChain: '',
+    genBlockNumber: 0n,
+    genBlockTime: new Date(),
+    data
   }
 }

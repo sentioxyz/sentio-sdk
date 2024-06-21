@@ -1,5 +1,6 @@
 import { buildASTSchema, DocumentNode, extendSchema, GraphQLSchema, parse, validateSchema } from 'graphql/index.js'
 import * as fs from 'node:fs'
+import { GraphQLObjectType, GraphQLOutputType, isListType, isNonNullType } from 'graphql'
 
 const customScalars = ['BigInt', 'BigDecimal', 'Timestamp', 'JSON', 'Bytes', 'ID']
 
@@ -19,12 +20,51 @@ const baseSchema = buildASTSchema(
 `)
 )
 
+function getElemType(type: GraphQLOutputType) {
+  if (isNonNullType(type)) {
+    return getElemType(type.ofType)
+  }
+  if (isListType(type)) {
+    return getElemType(type.ofType)
+  }
+  return type
+}
+
+function checkRelations(schema: GraphQLSchema) {
+  for (const t of Object.values(schema.getTypeMap())) {
+    if (t.name.startsWith('__')) {
+      continue
+    }
+    if (t instanceof GraphQLObjectType) {
+      for (const f of Object.values(t.getFields())) {
+        if (f.astNode) {
+          for (const d of f.astNode.directives ?? []) {
+            if (d.name.value === 'derivedFrom') {
+              const arg = (d.arguments ?? []).find((a) => a.name.value === 'field')
+              if (!arg || !arg.value || arg.value.kind !== 'StringValue') {
+                throw new Error(`@derivedFrom directive must have a 'field' argument`)
+              }
+              const fieldName = arg.value.value
+              const targetType = getElemType(f.type) as GraphQLObjectType
+              // Check if the target type has a field with the same name
+              if (!targetType.getFields()[fieldName]) {
+                throw new Error(`Field '${fieldName}' not found in type '${targetType.name}'`)
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
 export function buildSchema(doc: DocumentNode): GraphQLSchema {
   const schema = extendSchema(baseSchema, doc)
   const errors = validateSchema(schema).filter((err) => !/query root/i.test(err.message))
   if (errors.length > 0) {
     throw errors[0]
   }
+  checkRelations(schema)
   return schema
 }
 
