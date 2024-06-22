@@ -167,43 +167,49 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     }
 
     const subject = new Subject<DeepPartial<ProcessStreamResponse>>()
-    const contexts: Record<number, StoreContext> = {}
-    new Promise(async (resolve, reject) => {
-      for await (const request of requests) {
-        if (request.binding) {
-          const binding = request.binding
-          const dbContext = new StoreContext(subject, request.processId)
-          contexts[request.processId] = dbContext
-          PluginManager.INSTANCE.processBinding(binding, dbContext)
-            .then((result) => {
-              subject.next({
-                result,
-                processId: request.processId
-              })
-              recordRuntimeInfo(result, binding.handlerType)
-            })
-            .catch((e) => {
-              dbContext.error(request.processId, e)
-            })
-            .finally(() => {
-              delete contexts[request.processId]
-            })
-        }
-        if (request.dbResult) {
-          const dbContext = contexts[request.processId]
-          dbContext?.result(request.dbResult)
-        }
-      }
-      resolve(null)
-    })
+    this.handleRequests(requests, subject)
       .then(() => {
         subject.complete()
       })
       .catch((e) => {
-        // should not happen
+        console.error(e)
         subject.error(e)
       })
     yield* from(subject).pipe(withAbort(context.signal))
+  }
+
+  private async handleRequests(
+    requests: AsyncIterable<ProcessStreamRequest>,
+    subject: Subject<DeepPartial<ProcessStreamResponse>>
+  ) {
+    const contexts: Record<number, StoreContext> = {}
+
+    for await (const request of requests) {
+      if (request.binding) {
+        const binding = request.binding
+        const dbContext = new StoreContext(subject, request.processId)
+        contexts[request.processId] = dbContext
+        PluginManager.INSTANCE.processBinding(binding, dbContext)
+          .then((result) => {
+            subject.next({
+              result,
+              processId: request.processId
+            })
+            recordRuntimeInfo(result, binding.handlerType)
+          })
+          .catch((e) => {
+            console.error(e)
+            dbContext.error(request.processId, e)
+          })
+          .finally(() => {
+            delete contexts[request.processId]
+          })
+      }
+      if (request.dbResult) {
+        const dbContext = contexts[request.processId]
+        dbContext?.result(request.dbResult)
+      }
+    }
   }
 }
 
