@@ -26,6 +26,7 @@
     "@aptos-labs/ts-sdk": "~1.14.0",
     "@mysten/sui.js": "~0.54.1",
     "@sentio/chain": "^1.1.4",
+    "@sentio/graph-cli": "^0.75.0",
     "@types/node": "^20.11.7",
     "chalk": "^5.3.0",
     "command-line-args": "^5.2.1",
@@ -49,7 +50,8 @@
     "@types/command-line-args": "^5.2.3",
     "@types/command-line-usage": "^5.0.4",
     "@types/express": "^4.17.21",
-    "@types/fs-extra": "^11.0.4"
+    "@types/fs-extra": "^11.0.4",
+    "glob": "^10.4.2"
   },
   "engines": {
     "node": ">=16"

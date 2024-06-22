@@ -2,10 +2,11 @@ import commandLineArgs from 'command-line-args'
 import commandLineUsage from 'command-line-usage'
 import path from 'path'
 import { finalizeHost, FinalizeProjectName, YamlProjectConfig } from '../config.js'
-import { getSdkVersion } from '../utils.js'
+import { getSdkVersion, getPackageRoot } from '../utils.js'
 import { execStep } from '../execution.js'
 import { ReadKey } from '../key.js'
 import fs from 'fs'
+import { readdir, readFile, writeFile } from 'fs/promises'
 import JSZip from 'jszip'
 import chalk from 'chalk'
 import { Auth, initUpload, finishUpload, getGitAttributes } from './run-upload.js'
@@ -70,10 +71,12 @@ export async function runGraph(processorConfig: YamlProjectConfig, argv: string[
     apiKey = options['api-key']
   }
 
+  const graph = path.resolve(getPackageRoot('@sentio/graph-cli'), 'bin', 'run')
+  await execStep(['node', graph, 'codegen'], 'Graph codegen')
   await execStep(
     [
-      'npx',
-      'graph',
+      'node',
+      graph,
       'deploy',
       '--node',
       new URL('/api/v1/graph-node', processorConfig.host).toString(),
@@ -88,30 +91,66 @@ export async function runGraph(processorConfig: YamlProjectConfig, argv: string[
     'Graph deploy'
   )
 
-  await uploadFile(processorConfig, { 'api-key': apiKey })
+  await bundleSourceMap()
+
+  const zip = await await genZip()
+  await uploadFile(zip, processorConfig, { 'api-key': apiKey })
 }
 
-const IGNORE_LIST = ['build', 'node_modules']
+async function bundleSourceMap() {
+  const fileMap = new Map<string, string>()
 
-async function uploadFile(options: YamlProjectConfig, auth: Auth, continueFrom?: number) {
-  const zip = new JSZip()
-  fs.readdirSync('.').forEach((item) => {
-    if (item.startsWith('.') || item.includes('lock') || IGNORE_LIST.includes(item)) {
-      return
+  const files = await readdir('build', { recursive: true })
+  for (const file of files) {
+    if (!file.endsWith('.wasm.map')) {
+      continue
     }
-    if (fs.lstatSync(item).isDirectory()) {
-      fs.readdirSync(item, { recursive: true }).forEach((p) => {
-        const filepath = path.join(item, p as string)
-        if (fs.lstatSync(filepath).isDirectory()) {
-          return
-        }
-        zip.file(`${item}/${p}`, fs.readFileSync(filepath))
-      })
-    } else {
-      zip.file(item, fs.readFileSync(item))
+    const content = await readFile(path.join('build', file), 'utf8')
+    const { sources, sourcesContent } = JSON.parse(content) as { sources: string[]; sourcesContent: string[] }
+    sources.forEach((name, index) => fileMap.set(name, sourcesContent[index]))
+  }
+  await writeFile(
+    'build/sentio-graph.wasm.map',
+    JSON.stringify({
+      sources: [...fileMap.keys()],
+      sourcesContent: [...fileMap.values()]
+    })
+  )
+}
+
+async function genZip() {
+  const zip = new JSZip()
+  ;[
+    'package.json',
+    'tsconfig.json',
+    'sentio.yaml',
+    'build/sentio-graph.wasm.map',
+    'subgraph.yaml',
+    'schema.graphql'
+  ].forEach((p) => {
+    if (fs.existsSync(p)) {
+      zip.file(p, fs.readFileSync(p))
     }
   })
+  if (fs.existsSync('abis') && fs.lstatSync('abis').isDirectory()) {
+    fs.readdirSync('abis').forEach((p) => {
+      const item = path.join('abis', p)
+      if (fs.lstatSync(item).isDirectory()) {
+        fs.readdirSync(item).forEach((p) => {
+          if (p.endsWith('.json')) {
+            zip.file(`${item}/${p}`, fs.readFileSync(path.join(item, p)))
+          }
+        })
+      } else if (p.endsWith('.json')) {
+        zip.file(`abis/${p}`, fs.readFileSync(item))
+      }
+    })
+  }
 
+  return zip
+}
+
+async function uploadFile(zip: JSZip, options: YamlProjectConfig, auth: Auth, continueFrom?: number) {
   const sdkVersion = getSdkVersion()
   const sequence = 2
   const initUploadResRaw = await initUpload(options.host, auth, options.project, sdkVersion, sequence)
