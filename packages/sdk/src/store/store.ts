@@ -17,13 +17,29 @@ export interface EntityClass<T> {
   new (data: Partial<T>): T
 }
 
+function getEntityName<T>(entity: EntityClass<T> | T | string): string {
+  if (entity == null) {
+    throw new Error("can't figure out entityName from undefined")
+  }
+  if (typeof entity == 'string') {
+    return entity
+  }
+  if (typeof entity == 'function') {
+    return (entity as any).entityName
+  }
+  if (typeof entity == 'object') {
+    return (entity.constructor as any).entityName
+  }
+  throw new Error(`can't figure out entityName from ${typeof entity}`)
+}
+
 export class Store {
   constructor(private readonly context: StoreContext) {}
 
   async get<T extends Entity>(entity: EntityClass<T> | string, id: ID): Promise<T | undefined> {
     const promise = this.context.sendRequest({
       get: {
-        entity: typeof entity == 'string' ? entity : entity.prototype.entityName,
+        entity: getEntityName(entity),
         id: id.toString()
       }
     })
@@ -45,18 +61,17 @@ export class Store {
     if (id) {
       if (Array.isArray(id)) {
         for (const i of id) {
-          const items = (entity as any).prototype.entityName
-          request.entity.push(items)
+          request.entity.push(getEntityName(entity))
           request.id.push(i.toString())
         }
       } else {
-        request.entity.push((entity as any).prototype.entityName)
+        request.entity.push(getEntityName(entity))
         request.id.push(id)
       }
     } else {
       const entities = Array.isArray(entity) ? entity : [entity]
       for (const e of entities) {
-        request.entity.push(e.constructor.prototype.entityName)
+        request.entity.push(getEntityName(entity))
         request.id.push((e as Entity).id.toString())
       }
     }
@@ -70,7 +85,7 @@ export class Store {
     const entities = Array.isArray(entity) ? entity : [entity]
     const promise = this.context.sendRequest({
       upsert: {
-        entity: entities.map((e) => e.constructor.prototype.entityName),
+        entity: entities.map((e) => getEntityName(e)),
         // data: entities.map((e) => serialize(e.data)),
         id: entities.map((e) => e.id.toString()),
         entityData: entities.map((e: any) => e._data)
@@ -86,7 +101,7 @@ export class Store {
     while (true) {
       const promise = this.context.sendRequest({
         list: {
-          entity: entity.prototype.entityName,
+          entity: getEntityName(entity),
           cursor,
           filters:
             filters?.map((f) => ({

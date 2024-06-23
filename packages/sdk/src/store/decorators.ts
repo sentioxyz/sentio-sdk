@@ -28,12 +28,8 @@ function handleError(entity: string, key: string, fn: () => any) {
   }
 }
 
-export function Entity(name: string) {
+export function Entity(entityName: string) {
   return function <T extends Constructor>(BaseClass: T) {
-    Object.defineProperty(BaseClass, 'entityName', {
-      value: name
-    })
-
     const meta: Record<string, ValueConverter<any>> = (BaseClass as any).meta || {}
     const target = BaseClass.prototype
     for (const [propertyKey, type] of Object.entries(meta)) {
@@ -93,6 +89,7 @@ export function Entity(name: string) {
 
     return class extends BaseClass {
       readonly _data: RichStruct = { fields: {} }
+      static entityName = entityName
       constructor(...args: any[]) {
         super()
         for (const key of Object.getOwnPropertyNames(this)) {

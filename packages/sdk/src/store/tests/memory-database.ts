@@ -19,20 +19,23 @@ export class MemoryDatabase {
     const req = request.dbRequest
     if (req) {
       if (req.upsert) {
-        const { entityData } = req.upsert
-        for (const d of entityData) {
+        const { entityData, entity } = req.upsert
+        entityData.forEach((d, i) => {
           const id = d.fields['id'].stringValue!
-          this.db.set(id, d)
-        }
+          const entityName = entity[i]
+          this.db.set(`${entityName}-${id}`, d)
+        })
+
         this.dbContext.result({
           opId: req.opId
         })
       }
       if (req.delete) {
-        const { id } = req.delete
-        for (const i of id) {
-          this.db.delete(i)
-        }
+        const { id, entity } = req.delete
+        id.forEach((i, idx) => {
+          const entityName = entity[idx]
+          this.db.delete(`${entityName}-${id}`)
+        })
         this.dbContext.result({
           opId: req.opId
         })
@@ -40,7 +43,7 @@ export class MemoryDatabase {
 
       if (req.get) {
         const { entity, id } = req.get
-        const data = this.db.get(id)
+        const data = this.db.get(`${entity}-${id}`)
         this.dbContext.result({
           opId: req.opId,
           // entities: { entities: data ? [data] : [] },
@@ -51,7 +54,12 @@ export class MemoryDatabase {
       }
       if (req.list) {
         const { entity, cursor } = req.list
-        const list = Array.from(this.db.values())
+        const list = []
+        for (const key of this.db.keys()) {
+          if (key.startsWith(entity)) {
+            list.push(this.db.get(key))
+          }
+        }
         if (cursor) {
           const idx = parseInt(cursor)
 

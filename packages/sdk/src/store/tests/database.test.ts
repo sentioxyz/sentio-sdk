@@ -33,6 +33,7 @@ describe('Test Database', () => {
     })
 
     await store.upsert(user)
+    expect(db.db.has('User-test-id-1')).toBeTruthy()
     const u = await store.get(User, 'test-id-1')
     console.log(u)
     expectEntityEqual(u, user)
@@ -49,10 +50,11 @@ describe('Test Database', () => {
     })
 
     await store.upsert(user)
+    expect(db.db.has('User-test-id-2')).toBeTruthy()
     await store.delete(User, 'test-id-2')
     const u = await store.get(User, 'test-id-2')
-
     expect(u).toBeUndefined()
+    expect(db.db.has('User-test-id-2')).toBeFalsy()
   })
 
   it('should list from database', async () => {

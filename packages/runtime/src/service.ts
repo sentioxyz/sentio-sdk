@@ -184,7 +184,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     const contexts: Record<number, StoreContext> = {}
 
     for await (const request of requests) {
-      console.log('received request:', request)
+      console.debug('received request:', request)
       if (request.binding) {
         const binding = request.binding
         const dbContext = new StoreContext(subject, request.processId)
