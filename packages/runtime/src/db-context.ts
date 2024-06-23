@@ -22,7 +22,7 @@ export class StoreContext {
   sendRequest(request: DeepPartial<Request>) {
     const opId = StoreContext.opCounter++
     const promise = this.newPromise(opId)
-    console.debug('sending db request ', opId, request)
+    console.log('sending db request ', opId, request)
     this.subject.next({
       dbRequest: {
         ...request,
@@ -36,7 +36,7 @@ export class StoreContext {
   result(dbResult: DBResponse) {
     const opId = dbResult.opId
     const defer = this.defers.get(opId)
-    console.debug('received db result ', opId, dbResult)
+    console.log('received db result ', opId, dbResult)
     if (defer) {
       if (dbResult.error) {
         defer.reject(new Error(dbResult.error))

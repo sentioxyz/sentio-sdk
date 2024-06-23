@@ -25,7 +25,6 @@ import { freezeGlobalConfig, GLOBAL_CONFIG } from './global-config.js'
 
 import { StoreContext } from './db-context.js'
 import { Subject } from 'rxjs'
-
 ;(BigInt.prototype as any).toJSON = function () {
   return this.toString()
 }
@@ -185,6 +184,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     const contexts: Record<number, StoreContext> = {}
 
     for await (const request of requests) {
+      console.log('received request:', request)
       if (request.binding) {
         const binding = request.binding
         const dbContext = new StoreContext(subject, request.processId)
