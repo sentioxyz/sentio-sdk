@@ -76,7 +76,7 @@ describe('Test Database', () => {
 
     await store.upsert([user1, user2])
     const list = []
-    for await (const u of store.list(User, [])) {
+    for (const u of await store.list(User, [])) {
       list.push(u)
     }
     expectListEntityEqual(list, [user1, user2])

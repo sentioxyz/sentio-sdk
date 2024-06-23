@@ -9,7 +9,9 @@
     "docs",
     "gen",
     "types",
-    "builtin"
+    "builtin",
+    "templates",
+    "packages/protos"
   ],
   "extends": [
     "plugin:@typescript-eslint/recommended",
