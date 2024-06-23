@@ -14,6 +14,6 @@
   },
   "devDependencies": {
     "@sentio/cli": "workspace:*",
-    "typescript": "^5.5.2"
+    "typescript": "^5.4.5"
   }
 }

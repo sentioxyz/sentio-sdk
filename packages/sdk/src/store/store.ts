@@ -95,7 +95,7 @@ export class Store {
     await promise
   }
 
-  async *listIterator<T extends Entity>(entity: EntityClass<T>, filters?: ListFilter<T>[]) {
+  async *list<T extends Entity>(entity: EntityClass<T>, filters?: ListFilter<T>[]) {
     let cursor: string | undefined = undefined
 
     while (true) {
@@ -122,9 +122,9 @@ export class Store {
     }
   }
 
-  async list<T extends Entity>(entity: EntityClass<T>, filters?: ListFilter<T>[]) {
+  async listPromise<T extends Entity>(entity: EntityClass<T>, filters?: ListFilter<T>[]) {
     // TODO Array.fromAsync when upgrade to node 22
-    return this.fromAsync(this.listIterator(entity, filters))
+    return this.fromAsync(this.list(entity, filters))
   }
 
   private async fromAsync<T>(gen: AsyncIterable<T>): Promise<T[]> {

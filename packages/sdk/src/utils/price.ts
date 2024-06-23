@@ -88,12 +88,11 @@ export async function getPriceByTypeOrSymbolInternal(
       return res.price
     })
     .catch((e) => {
-      setTimeout(() => {
-        priceMap.delete(key)
-      }, 1000)
-
       if (e.code === Status.NOT_FOUND || e.code === Status.UNKNOWN) {
         console.error('price not found for ', JSON.stringify(coinId), ' at ', dateStr)
+        setTimeout(() => {
+          priceMap.delete(key)
+        }, 1000)
         return undefined
       }
       // TODO maybe use small set of error

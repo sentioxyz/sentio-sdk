@@ -52,7 +52,7 @@ ERC20Processor.bind({ address: '0x1e4ede388cbc9f4b5c79681b7f94d36a11abebc9' }).o
     transfer.to = Promise.resolve(to)
     await ctx.store.upsert(transfer)
 
-    const transfers = await ctx.store.list(Transfer, [
+    const transfers = ctx.store.list(Transfer, [
       {
         field: 'amount',
         op: '>=',
