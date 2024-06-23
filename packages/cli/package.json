@@ -27,7 +27,7 @@
     "@mysten/sui.js": "~0.54.1",
     "@sentio/chain": "^1.1.4",
     "@sentio/graph-cli": "^0.75.0",
-    "@types/node": "^20.11.7",
+    "@types/node": "^20.14.8",
     "chalk": "^5.3.0",
     "command-line-args": "^5.2.1",
     "command-line-usage": "^7.0.1",
