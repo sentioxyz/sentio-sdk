@@ -108,7 +108,7 @@ async function codegenInternal(schema: GraphQLSchema, source: string, target: st
       types: ['DatabaseSchema']
     }
   ]
-  const enumns: Enum[] = []
+  const enums: Enum[] = []
   const interfaces: Interface[] = []
   const classes: Class[] = []
 
@@ -117,7 +117,7 @@ async function codegenInternal(schema: GraphQLSchema, source: string, target: st
       continue
     }
     if (t instanceof GraphQLEnumType) {
-      enumns.push({
+      enums.push({
         name: t.name,
         values: t.getValues().map((v) => v.value)
       })
@@ -179,7 +179,7 @@ async function codegenInternal(schema: GraphQLSchema, source: string, target: st
 /* eslint-disable */
 ${imports.map((i) => `import ${i.importType ? 'type ' : ''}{ ${i.types.join(', ')} } from '${i.module}'`).join('\n')}
 
-${enumns
+${enums
   .map(
     (e) => `export enum ${e.name} {
   ${e.values.map((v) => `${v} = "${v}"`).join(', ')}
