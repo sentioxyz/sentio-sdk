@@ -1,5 +1,4 @@
 import { TestProcessorServer } from '../../testing/index.js'
-import { expect } from 'chai'
 import { FuelProcessor } from '../fuel-processor.js'
 import { FuelChainId } from '@sentio/chain'
 import abi from './abis/counter-contract-abi.json'
@@ -8,6 +7,7 @@ import { afterAll } from '@jest/globals'
 import { State } from '@sentio/runtime'
 import { bn, calculateVmTxMemory, Interface, Provider } from 'fuels'
 import { getRpcEndpoint } from '../network.js'
+import { decodeFuelTransactionWithAbi } from '../transaction.js'
 
 describe('fuel network tests', () => {
   const ADDRESS = '0xdb0d550935d601c45791ba18664f0a821c11745b1f938e87f10a79e21988e850'
@@ -37,8 +37,8 @@ describe('fuel network tests', () => {
 
   test('check configuration ', async () => {
     const config = await service.getConfig({})
-    expect(config.contractConfigs.length).gte(1)
-    expect(config.contractConfigs[0].fuelCallConfigs.length).gte(1)
+    expect(config.contractConfigs.length).toBeGreaterThan(0)
+    expect(config.contractConfigs[0].fuelCallConfigs.length).toBeGreaterThanOrEqual(1)
   })
 
   // skip for now until onCall is fixed
@@ -46,8 +46,8 @@ describe('fuel network tests', () => {
     const res = await service.fuel.testOnTransaction(testData, FuelChainId.FUEL_TESTNET)
 
     const events = res.result?.events
-    expect(events).length(2)
-    expect(events?.[0]?.message).to.equal('status is success')
+    expect(events).toHaveLength(2)
+    expect(events?.[0]?.message).toEqual('status is success')
   })
 
   // skip for now until onCall is fixed
@@ -55,8 +55,17 @@ describe('fuel network tests', () => {
     const res = await service.fuel.testOnTransaction(testData, FuelChainId.FUEL_TESTNET)
 
     const events = res.result?.events
-    expect(events).length(2)
-    expect(events?.[1]?.message).contains('complex call')
+    expect(events).toHaveLength(2)
+    expect(events?.[1]?.message).toContain('complex call')
+  })
+
+  test('tx decode', async () => {
+    const tx = await decodeFuelTransactionWithAbi(
+      testData,
+      { ADDRESS: abi },
+      await Provider.create(getRpcEndpoint(FuelChainId.FUEL_TESTNET))
+    )
+    expect(tx.operations).toBeDefined()
   })
 
   test('test decode', async () => {
