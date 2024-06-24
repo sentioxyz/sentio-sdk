@@ -69,7 +69,7 @@ jobs:
       - name: Clean peerDependencies & templates' node_modules
         run: |
           # Dependencies are bundled.
-          pnpm json -I -f package.json -e "this.dependencies=Object.fromEntries(Object.entries(this.dependencies).filter((entry) => ['tsup', 'tsx'].includes(entry['0'])))"
+          pnpm json -I -f package.json -e "this.dependencies=Object.fromEntries(Object.entries(this.dependencies).filter((entry) => ['@sentio/graph-cli', 'tsup', 'tsx'].includes(entry['0'])))"
           # PeerDeps only for development with pnpm
           # templates' node_modules shouldn't go into registry
           pnpm json -I -f package.json -e "this.peerDependencies={}"
