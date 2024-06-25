@@ -784,6 +784,8 @@ export enum DBRequest_DBOperator {
   LE = 5,
   IN = 6,
   NOT_IN = 7,
+  LIKE = 8,
+  NOT_LIKE = 9,
   UNRECOGNIZED = -1,
 }
 
@@ -813,6 +815,12 @@ export function dBRequest_DBOperatorFromJSON(object: any): DBRequest_DBOperator 
     case 7:
     case "NOT_IN":
       return DBRequest_DBOperator.NOT_IN;
+    case 8:
+    case "LIKE":
+      return DBRequest_DBOperator.LIKE;
+    case 9:
+    case "NOT_LIKE":
+      return DBRequest_DBOperator.NOT_LIKE;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -838,6 +846,10 @@ export function dBRequest_DBOperatorToJSON(object: DBRequest_DBOperator): string
       return "IN";
     case DBRequest_DBOperator.NOT_IN:
       return "NOT_IN";
+    case DBRequest_DBOperator.LIKE:
+      return "LIKE";
+    case DBRequest_DBOperator.NOT_LIKE:
+      return "NOT_LIKE";
     case DBRequest_DBOperator.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
@@ -853,6 +865,7 @@ export interface DBRequest_DBList {
   entity: string;
   filters: DBRequest_DBFilter[];
   cursor: string;
+  pageSize?: number | undefined;
 }
 
 export interface DBRequest_DBUpsert {
@@ -6386,7 +6399,7 @@ export const DBRequest_DBGet = {
 };
 
 function createBaseDBRequest_DBList(): DBRequest_DBList {
-  return { entity: "", filters: [], cursor: "" };
+  return { entity: "", filters: [], cursor: "", pageSize: undefined };
 }
 
 export const DBRequest_DBList = {
@@ -6399,6 +6412,9 @@ export const DBRequest_DBList = {
     }
     if (message.cursor !== "") {
       writer.uint32(42).string(message.cursor);
+    }
+    if (message.pageSize !== undefined) {
+      writer.uint32(48).uint32(message.pageSize);
     }
     return writer;
   },
@@ -6431,6 +6447,13 @@ export const DBRequest_DBList = {
 
           message.cursor = reader.string();
           continue;
+        case 6:
+          if (tag !== 48) {
+            break;
+          }
+
+          message.pageSize = reader.uint32();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -6447,6 +6470,7 @@ export const DBRequest_DBList = {
         ? object.filters.map((e: any) => DBRequest_DBFilter.fromJSON(e))
         : [],
       cursor: isSet(object.cursor) ? globalThis.String(object.cursor) : "",
+      pageSize: isSet(object.pageSize) ? globalThis.Number(object.pageSize) : undefined,
     };
   },
 
@@ -6461,6 +6485,9 @@ export const DBRequest_DBList = {
     if (message.cursor !== "") {
       obj.cursor = message.cursor;
     }
+    if (message.pageSize !== undefined) {
+      obj.pageSize = Math.round(message.pageSize);
+    }
     return obj;
   },
 
@@ -6472,6 +6499,7 @@ export const DBRequest_DBList = {
     message.entity = object.entity ?? "";
     message.filters = object.filters?.map((e) => DBRequest_DBFilter.fromPartial(e)) || [];
     message.cursor = object.cursor ?? "";
+    message.pageSize = object.pageSize ?? undefined;
     return message;
   },
 };

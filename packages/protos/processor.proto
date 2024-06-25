@@ -467,6 +467,7 @@ message DBRequest {
     //    uint32 offset = 3; deprecated
     repeated DBFilter filters = 4;
     string cursor = 5;
+    optional uint32 page_size = 6;
   }
   message DBUpsert {
     repeated string entity = 1;
@@ -494,10 +495,10 @@ message DBRequest {
     LE = 5;
     IN = 6;
     NOT_IN = 7;
-    //    LIKE = 8;
-    //    NOT_LIKE = 9;
-    //    IS_NULL = 10;
-    //    IS_NOT_NULL = 11;
+    LIKE = 8;
+    NOT_LIKE = 9;
+    // IS_NULL = 10;
+    // IS_NOT_NULL = 11;
   }
 }
 

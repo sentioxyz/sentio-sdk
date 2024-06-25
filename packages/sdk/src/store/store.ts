@@ -6,6 +6,7 @@ import type { Entity as EntityStruct, RichValue } from '@sentio/protos'
 import { DBRequest_DBOperator, DBResponse } from '@sentio/protos'
 import { toBigInteger } from './convert.js'
 import { PluginManager } from '@sentio/runtime'
+import { Cursor } from './cursor.js'
 
 type Value = ID | string | Int | Float | boolean | Timestamp | Bytes | BigDecimal | bigint
 
@@ -99,19 +100,7 @@ export class Store {
     let cursor: string | undefined = undefined
 
     while (true) {
-      const promise = this.context.sendRequest({
-        list: {
-          entity: getEntityName(entity),
-          cursor,
-          filters:
-            filters?.map((f) => ({
-              field: f.field as string,
-              op: ops[f.op],
-              value: { values: Array.isArray(f.value) ? f.value.map((v) => serialize(v)) : [serialize(f.value)] }
-            })) || []
-        }
-      })
-      const response = (await promise) as DBResponse
+      const response: DBResponse = await this.listRequest(entity, filters || [], cursor)
       for (const data of response.entityList?.entities || []) {
         yield this.newEntity(entity, data)
       }
@@ -122,7 +111,47 @@ export class Store {
     }
   }
 
-  async list<T extends Entity>(entity: EntityClass<T>, filters?: ListFilter<T>[]) {
+  async *listBatched<T extends Entity>(entity: EntityClass<T>, filters?: ListFilter<T>[], batchSize = 100) {
+    let cursor: string | undefined = undefined
+
+    while (true) {
+      const response: DBResponse = await this.listRequest(entity, filters || [], cursor, batchSize)
+      const entities = (response.entityList?.entities || []).map((data) => this.newEntity(entity, data))
+      yield entities
+      if (!response.nextCursor) {
+        break
+      }
+      cursor = response.nextCursor
+    }
+  }
+
+  private async listRequest<T extends Entity>(
+    entity: EntityClass<T>,
+    filters: ListFilter<T>[],
+    cursor: string | undefined,
+    pageSize?: number
+  ): Promise<DBResponse> {
+    return (await this.context.sendRequest({
+      list: {
+        entity: getEntityName(entity),
+        cursor,
+        pageSize,
+        filters:
+          filters?.map((f) => ({
+            field: f.field as string,
+            op: ops[f.op],
+            value: { values: Array.isArray(f.value) ? f.value.map((v) => serialize(v)) : [serialize(f.value)] }
+          })) || []
+      }
+    })) as DBResponse
+  }
+
+  async list<T extends Entity>(entity: EntityClass<T>, filters?: ListFilter<T>[], cursor?: Cursor) {
+    if (cursor) {
+      const response = await this.listRequest(entity, filters || [], cursor.cursor, cursor.pageSize)
+      cursor.cursor = response.nextCursor
+      return response.entityList?.entities.map((data) => this.newEntity(entity, data)) || []
+    }
     // TODO Array.fromAsync when upgrade to node 22
     return this.fromAsync(this.listIterator(entity, filters))
   }
@@ -160,10 +189,6 @@ export interface ListFilter<T extends Entity> {
   field: keyof T
   op: Operators
   value: Value | Value[] | null
-}
-
-export interface ListOptions<T extends Entity> {
-  cursor: string
 }
 
 const ops: Record<Operators, DBRequest_DBOperator> = {
