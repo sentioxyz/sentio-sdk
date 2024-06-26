@@ -59,15 +59,18 @@ if (mainOptions.command === 'login') {
     }
 
     const yamlPath = path.join(pwd, 'sentio.yaml')
-    if (!fs.existsSync(yamlPath)) {
+    const yamlExists = fs.existsSync(yamlPath)
+    if (!yamlExists && mainOptions.command !== 'graph') {
       console.error('sentio.yaml not found, please create one according to: TODO docs')
       process.exit(1)
     }
 
-    processorConfig = yaml.parse(fs.readFileSync('sentio.yaml', 'utf8')) as YamlProjectConfig
-    if (!processorConfig.project === undefined) {
-      console.error('Config yaml must have contain a valid project identifier')
-      process.exit(1)
+    if (yamlExists) {
+      processorConfig = yaml.parse(fs.readFileSync('sentio.yaml', 'utf8')) as YamlProjectConfig
+      if (!processorConfig.project) {
+        console.error('Config yaml must contain a valid project identifier')
+        process.exit(1)
+      }
     }
     if (processorConfig.build === undefined) {
       processorConfig.build = true

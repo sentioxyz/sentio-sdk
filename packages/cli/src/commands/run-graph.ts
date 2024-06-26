@@ -65,6 +65,10 @@ export async function runGraph(processorConfig: YamlProjectConfig, argv: string[
 
   finalizeHost(processorConfig, options.host)
   FinalizeProjectName(processorConfig, options.owner, options.name)
+  if (!/^[\w-]+\/[\w-]+$/.test(processorConfig.project)) {
+    console.error('Must provide a valid project identifier: --owner OWNER --name NAME')
+    process.exit(1)
+  }
 
   let apiKey = ReadKey(processorConfig.host) as string
   if (options['api-key']) {
