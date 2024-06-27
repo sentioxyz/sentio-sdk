@@ -126,11 +126,11 @@ export const IntConverter: ValueConverter<Int | undefined> = {
       }
     }
     return {
-      intValue: value
+      intValue: Math.floor(value)
     }
   },
   to(v) {
-    return v.intValue
+    return v.intValue as Int
   }
 }
 

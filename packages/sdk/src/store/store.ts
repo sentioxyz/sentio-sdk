@@ -96,7 +96,10 @@ export class Store {
     await promise
   }
 
-  async *listIterator<T extends Entity>(entity: EntityClass<T>, filters?: ListFilter<T>[]) {
+  async *listIterator<T extends Entity, P extends keyof T, O extends Operators<T[P]>>(
+    entity: EntityClass<T>,
+    filters: ListFilter<T, P, O>[]
+  ) {
     let cursor: string | undefined = undefined
 
     while (true) {
@@ -111,7 +114,11 @@ export class Store {
     }
   }
 
-  async *listBatched<T extends Entity>(entity: EntityClass<T>, filters?: ListFilter<T>[], batchSize = 100) {
+  async *listBatched<T extends Entity, P extends keyof T, O extends Operators<T[P]>>(
+    entity: EntityClass<T>,
+    filters: ListFilter<T, P, O>[],
+    batchSize = 100
+  ) {
     let cursor: string | undefined = undefined
 
     while (true) {
@@ -125,9 +132,9 @@ export class Store {
     }
   }
 
-  private async listRequest<T extends Entity>(
+  private async listRequest<T extends Entity, P extends keyof T, O extends Operators<T[P]>>(
     entity: EntityClass<T>,
-    filters: ListFilter<T>[],
+    filters: ListFilter<T, P, O>[],
     cursor: string | undefined,
     pageSize?: number
   ): Promise<DBResponse> {
@@ -146,7 +153,11 @@ export class Store {
     })) as DBResponse
   }
 
-  async list<T extends Entity>(entity: EntityClass<T>, filters?: ListFilter<T>[], cursor?: Cursor) {
+  async list<T extends Entity, P extends keyof T, O extends Operators<T[P]>>(
+    entity: EntityClass<T>,
+    filters: ListFilter<T, P, O>[],
+    cursor?: Cursor
+  ) {
     if (cursor) {
       const response = await this.listRequest(entity, filters || [], cursor.cursor, cursor.pageSize)
       cursor.cursor = response.nextCursor
@@ -183,15 +194,56 @@ export class Store {
   }
 }
 
-export type Operators = '=' | '!=' | '<' | '<=' | '>' | '>=' | 'in' | 'not in'
+type ArrayOperators = 'in' | 'not in'
 
-export interface ListFilter<T extends Entity> {
-  field: keyof T
-  op: Operators
-  value: Value | Value[] | null
+export type Operators<T> =
+  T extends Array<any>
+    ? 'in' | 'not in' | '=' | '!='
+    : T extends Int
+      ? '=' | '!=' | '<' | '<=' | '>' | '>=' | 'in' | 'not in'
+      : T extends Bytes
+        ? '=' | '!=' | 'in' | 'not in'
+        : T extends ID
+          ? '=' | '!=' | 'like' | 'not like' | 'in' | 'not in'
+          : T extends string
+            ? '=' | '!=' | 'like' | 'not like' | 'in' | 'not in'
+            : T extends Timestamp
+              ? '=' | '!=' | '<' | '<=' | '>' | '>=' | 'in' | 'not in'
+              : T extends boolean
+                ? '=' | '!=' | 'in' | 'not in'
+                : T extends BigDecimal
+                  ? '=' | '!=' | '<' | '<=' | '>' | '>=' | 'in' | 'not in'
+                  : T extends bigint
+                    ? '=' | '!=' | '<' | '<=' | '>' | '>=' | 'in' | 'not in'
+                    : '=' | '!=' | 'in' | 'not in'
+
+type Concrete<Type> = {
+  [Property in keyof Type]-?: Type[Property]
 }
 
-const ops: Record<Operators, DBRequest_DBOperator> = {
+type CompatibleValue<T, O extends Operators<T>> = O extends ArrayOperators
+  ? T extends Array<any>
+    ? T
+    : T[]
+  : T extends Int
+    ? number
+    : T extends Bytes
+      ? Bytes | string
+      : T extends ID
+        ? ID | string
+        : T extends BigDecimal
+          ? BigDecimal | number
+          : T extends Int
+            ? number
+            : T
+
+export type ListFilter<T extends Entity, P extends keyof T, O extends Operators<T[P]>> = {
+  field: P
+  op: O
+  value: CompatibleValue<T[P], O> | null
+}
+
+const ops: Record<Operators<any>, DBRequest_DBOperator> = {
   '=': DBRequest_DBOperator.EQ,
   '!=': DBRequest_DBOperator.NE,
   '<': DBRequest_DBOperator.LT,
@@ -199,7 +251,9 @@ const ops: Record<Operators, DBRequest_DBOperator> = {
   '>': DBRequest_DBOperator.GT,
   '>=': DBRequest_DBOperator.GE,
   in: DBRequest_DBOperator.IN,
-  'not in': DBRequest_DBOperator.NOT_IN
+  'not in': DBRequest_DBOperator.NOT_IN,
+  like: DBRequest_DBOperator.LIKE,
+  'not like': DBRequest_DBOperator.NOT_LIKE
 }
 
 function serialize(v: any): RichValue {

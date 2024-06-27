@@ -26,6 +26,7 @@ interface Import {
 interface Field {
   name: string
   type: string
+  optional?: boolean
   annotations: string[]
 }
 
@@ -159,7 +160,8 @@ async function codegenInternal(schema: GraphQLSchema, source: string, target: st
         } else {
           fields.push({
             name: f.name,
-            type: type,
+            optional: !f.type.toString().endsWith('!'),
+            type: type.replace(' | undefined', ''),
             annotations
           })
         }
@@ -200,7 +202,9 @@ ${classes
     (c) => `
 ${c.annotations.join('\n')}
 export class ${c.name} ${c.interfaces.length > 0 ? `implements ${c.interfaces.join(', ')}` : ''} {
-${c.fields.map((f) => `${f.annotations.map((a) => `\n\t${a}`).join('')}\n\t${f.name}: ${f.type}`).join('\n')}
+${c.fields
+  .map((f) => `${f.annotations.map((a) => `\n\t${a}`).join('')}\n\t${f.name}${f.optional ? '?' : ''}: ${f.type}`)
+  .join('\n')}
 
   constructor(data: Partial<${c.name}>) {}
 

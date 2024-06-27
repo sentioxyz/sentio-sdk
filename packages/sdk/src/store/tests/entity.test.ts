@@ -12,7 +12,8 @@ import {
   One,
   Required,
   StringColumn,
-  TimestampColumn
+  TimestampColumn,
+  ListColumn
 } from '../decorators.js'
 import type { Boolean, Bytes, Float, ID, Int, String } from '../types.js'
 import { BigDecimal } from '@sentio/bigdecimal'
@@ -50,7 +51,7 @@ class Person {
   @BooleanColumn
   booleanValue: Boolean
 
-  @IntColumn
+  @ListColumn('Int')
   arrayInt?: Array<Int | undefined>
 
   @Many('Pet')

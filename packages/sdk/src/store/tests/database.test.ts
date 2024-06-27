@@ -80,6 +80,24 @@ describe('Test Database', () => {
       list.push(u)
     }
     expectListEntityEqual(list, [user1, user2])
+
+    await store.list(Transaction, [
+      {
+        field: 'arrayValue',
+        op: '=',
+        value: ['']
+      },
+      {
+        field: 'gas',
+        op: 'in',
+        value: [0n]
+      },
+      {
+        field: 'senderID',
+        op: 'like',
+        value: 'aaa%'
+      }
+    ])
   })
 
   it('type tests', async () => {
@@ -87,6 +105,7 @@ describe('Test Database', () => {
     const tx = new Transaction({
       id: 'test-id-1',
       gas: 100n,
+      count: 0,
       gasPrice: new BigDecimal('100.0'),
       raw: new Uint8Array([1, 2, 3])
     })
