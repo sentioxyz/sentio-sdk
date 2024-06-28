@@ -59,4 +59,12 @@ export class StoreContext {
       processId
     })
   }
+
+  close() {
+    for (const [opId, defer] of this.defers) {
+      console.warn('context closed before db response', opId)
+      defer.reject(new Error('context closed'))
+    }
+    this.defers.clear()
+  }
 }

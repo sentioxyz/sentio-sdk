@@ -181,14 +181,14 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     requests: AsyncIterable<ProcessStreamRequest>,
     subject: Subject<DeepPartial<ProcessStreamResponse>>
   ) {
-    const contexts: Record<number, StoreContext> = {}
+    const contexts = new Contexts()
 
     for await (const request of requests) {
       console.debug('received request:', request)
       if (request.binding) {
         const binding = request.binding
-        const dbContext = new StoreContext(subject, request.processId)
-        contexts[request.processId] = dbContext
+        const dbContext = contexts.new(request.processId, subject)
+
         PluginManager.INSTANCE.processBinding(binding, dbContext)
           .then((result) => {
             subject.next({
@@ -202,11 +202,11 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
             dbContext.error(request.processId, e)
           })
           .finally(() => {
-            delete contexts[request.processId]
+            contexts.delete(request.processId)
           })
       }
       if (request.dbResult) {
-        const dbContext = contexts[request.processId]
+        const dbContext = contexts.get(request.processId)
         dbContext?.result(request.dbResult)
       }
     }
@@ -220,5 +220,25 @@ function recordRuntimeInfo(results: ProcessResult, handlerType: HandlerType) {
         from: handlerType
       }
     })
+  }
+}
+
+class Contexts {
+  private contexts: Map<number, StoreContext> = new Map()
+
+  get(processId: number) {
+    return this.contexts.get(processId)
+  }
+
+  new(processId: number, subject: Subject<DeepPartial<ProcessStreamResponse>>) {
+    const context = new StoreContext(subject, processId)
+    this.contexts.set(processId, context)
+    return context
+  }
+
+  delete(processId: number) {
+    const context = this.get(processId)
+    context?.close()
+    this.contexts.delete(processId)
   }
 }
