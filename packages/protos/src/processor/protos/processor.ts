@@ -786,6 +786,8 @@ export enum DBRequest_DBOperator {
   NOT_IN = 7,
   LIKE = 8,
   NOT_LIKE = 9,
+  HAS_ALL = 10,
+  HAS_ANY = 11,
   UNRECOGNIZED = -1,
 }
 
@@ -821,6 +823,12 @@ export function dBRequest_DBOperatorFromJSON(object: any): DBRequest_DBOperator 
     case 9:
     case "NOT_LIKE":
       return DBRequest_DBOperator.NOT_LIKE;
+    case 10:
+    case "HAS_ALL":
+      return DBRequest_DBOperator.HAS_ALL;
+    case 11:
+    case "HAS_ANY":
+      return DBRequest_DBOperator.HAS_ANY;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -850,6 +858,10 @@ export function dBRequest_DBOperatorToJSON(object: DBRequest_DBOperator): string
       return "LIKE";
     case DBRequest_DBOperator.NOT_LIKE:
       return "NOT_LIKE";
+    case DBRequest_DBOperator.HAS_ALL:
+      return "HAS_ALL";
+    case DBRequest_DBOperator.HAS_ANY:
+      return "HAS_ANY";
     case DBRequest_DBOperator.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";

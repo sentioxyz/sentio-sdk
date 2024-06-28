@@ -497,8 +497,8 @@ message DBRequest {
     NOT_IN = 7;
     LIKE = 8;
     NOT_LIKE = 9;
-    // IS_NULL = 10;
-    // IS_NOT_NULL = 11;
+    HAS_ALL = 10; // https://clickhouse.com/docs/en/sql-reference/functions/array-functions#hasall
+    HAS_ANY = 11; // https://clickhouse.com/docs/en/sql-reference/functions/array-functions#hasany
   }
 }
 

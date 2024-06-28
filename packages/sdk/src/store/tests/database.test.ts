@@ -116,6 +116,84 @@ describe('Test Database', () => {
     expect(tx2?.gasPrice).toEqual(tx.gasPrice)
   })
 
+  it('filter constraints', async () => {
+    const store = new Store(storeContext)
+    // wrong type won't compile
+
+    store.list(Transaction, [
+      {
+        field: 'arrayValue',
+        op: '=',
+        value: null
+      }
+    ])
+    store.list(Transaction, [
+      {
+        field: 'arrayValue',
+        op: '=',
+        value: ['s']
+      }
+    ])
+    store.list(Transaction, [
+      {
+        field: 'gas',
+        op: '>',
+        value: 1n
+      }
+    ])
+    /* can't  bigint > null
+    await store.list(Transaction, [
+      {
+        field: 'gas',
+        op: '>',
+        value: null
+      }
+    ])*/
+    store.list(Transaction, [
+      {
+        field: 'gas',
+        op: '=',
+        value: null
+      }
+    ])
+    store.list(Transaction, [
+      {
+        field: 'gas',
+        op: 'in',
+        value: [1n, 2n]
+      }
+    ])
+    store.list(Transaction, [
+      {
+        field: 'gasPrice',
+        op: '>',
+        value: 0.0
+      }
+    ])
+    store.list(Transaction, [
+      {
+        field: 'gasPrice',
+        op: '>',
+        value: new BigDecimal(0)
+      }
+    ])
+    // "has any"/"has all" must followed by value in array
+    /*await store.list(Transaction, [
+      {
+        field: 'arrayValue',
+        op: 'has any',
+        value: ""
+      }
+    ])*/
+    store.list(Transaction, [
+      {
+        field: 'arrayValue',
+        op: 'has all',
+        value: ['']
+      }
+    ])
+  })
+
   afterEach(() => {
     db.reset()
   })

@@ -194,54 +194,66 @@ export class Store {
   }
 }
 
-type ArrayOperators = 'in' | 'not in'
+type ArrayOperators = 'in' | 'not in' | 'has all' | 'has any'
 
 export type Operators<T> =
   T extends Array<any>
-    ? 'in' | 'not in' | '=' | '!='
+    ? 'in' | 'not in' | '=' | '!=' | 'has all' | 'has any'
     : T extends Int
       ? '=' | '!=' | '<' | '<=' | '>' | '>=' | 'in' | 'not in'
-      : T extends Bytes
-        ? '=' | '!=' | 'in' | 'not in'
-        : T extends ID
-          ? '=' | '!=' | 'like' | 'not like' | 'in' | 'not in'
-          : T extends string
+      : T extends Float
+        ? '=' | '!=' | '<' | '<=' | '>' | '>=' | 'in' | 'not in'
+        : T extends Bytes
+          ? '=' | '!=' | 'in' | 'not in'
+          : T extends ID
             ? '=' | '!=' | 'like' | 'not like' | 'in' | 'not in'
-            : T extends Timestamp
-              ? '=' | '!=' | '<' | '<=' | '>' | '>=' | 'in' | 'not in'
-              : T extends boolean
-                ? '=' | '!=' | 'in' | 'not in'
-                : T extends BigDecimal
-                  ? '=' | '!=' | '<' | '<=' | '>' | '>=' | 'in' | 'not in'
-                  : T extends bigint
+            : T extends string
+              ? '=' | '!=' | 'like' | 'not like' | 'in' | 'not in'
+              : T extends Timestamp
+                ? '=' | '!=' | '<' | '<=' | '>' | '>=' | 'in' | 'not in'
+                : T extends boolean
+                  ? '=' | '!=' | 'in' | 'not in'
+                  : T extends BigDecimal
                     ? '=' | '!=' | '<' | '<=' | '>' | '>=' | 'in' | 'not in'
-                    : '=' | '!=' | 'in' | 'not in'
-
-type Concrete<Type> = {
-  [Property in keyof Type]-?: Type[Property]
-}
+                    : T extends bigint
+                      ? '=' | '!=' | '<' | '<=' | '>' | '>=' | 'in' | 'not in'
+                      : '=' | '!=' | 'in' | 'not in'
 
 type CompatibleValue<T, O extends Operators<T>> = O extends ArrayOperators
-  ? T extends Array<any>
-    ? T
+  ? T extends Array<infer U>
+    ? U[]
     : T[]
-  : T extends Int
-    ? number
-    : T extends Bytes
-      ? Bytes | string
-      : T extends ID
-        ? ID | string
-        : T extends BigDecimal
-          ? BigDecimal | number
+  :
+      | (T extends bigint
+          ? bigint
           : T extends Int
             ? number
-            : T
+            : T extends Float
+              ? number
+              : T extends Bytes
+                ? Bytes | string
+                : T extends ID
+                  ? ID | string
+                  : T extends BigDecimal
+                    ? BigDecimal | number
+                    : T extends Int
+                      ? number
+                      : T)
+      | Nullable<O>
+
+type Nullable<O> = O extends '=' | '!=' ? null : never
 
 export type ListFilter<T extends Entity, P extends keyof T, O extends Operators<T[P]>> = {
   field: P
   op: O
-  value: CompatibleValue<T[P], O> | null
+  value: CompatibleValue<T[P], O>
 }
+
+export type ArrayFilter<T extends Entity, P extends keyof T, O extends Operators<T[P]>> = [
+  P,
+  O,
+  CompatibleValue<T[P], O>
+]
 
 const ops: Record<Operators<any>, DBRequest_DBOperator> = {
   '=': DBRequest_DBOperator.EQ,
@@ -253,7 +265,9 @@ const ops: Record<Operators<any>, DBRequest_DBOperator> = {
   in: DBRequest_DBOperator.IN,
   'not in': DBRequest_DBOperator.NOT_IN,
   like: DBRequest_DBOperator.LIKE,
-  'not like': DBRequest_DBOperator.NOT_LIKE
+  'not like': DBRequest_DBOperator.NOT_LIKE,
+  'has all': DBRequest_DBOperator.HAS_ALL,
+  'has any': DBRequest_DBOperator.HAS_ANY
 }
 
 function serialize(v: any): RichValue {
