@@ -1,3 +1,4 @@
+import { describe, test } from 'node:test'
 import { expect } from 'chai'
 import { Struct } from '@sentio/protos'
 import { BigDecimal } from './big-decimal.js'
@@ -21,7 +22,7 @@ describe('Normalization tests', () => {
 
     const t3 = {
       token0Symbol: null,
-      token1Symbol: 't2',
+      token1Symbol: 't2'
     }
     const r3 = normalizeAttribute(t3)
     const w3 = Struct.encode(Struct.wrap(r3))

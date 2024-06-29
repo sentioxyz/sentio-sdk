@@ -1,3 +1,4 @@
+import { describe, test } from 'node:test'
 import { expect } from 'chai'
 import { toBigInteger, toMetricValue } from './numberish.js'
 import { webcrypto } from 'crypto'
@@ -31,9 +32,6 @@ describe('Numberish tests', () => {
   })
 
   test.skip('random big integer performance', async () => {
-    jest.setTimeout(100000)
-    jest.retryTimes(3)
-
     let timer1 = 0
     let timer2 = 0
     for (let i = 0; i < 1000; i++) {

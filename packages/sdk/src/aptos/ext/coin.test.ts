@@ -1,3 +1,4 @@
+import { describe, test } from 'node:test'
 import { getCoinInfoWithFallback } from './coin.js'
 import { expect } from 'chai'
 

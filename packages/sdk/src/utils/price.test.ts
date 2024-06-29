@@ -1,6 +1,6 @@
+import { describe, test, mock } from 'node:test'
 import { getPriceByTypeOrSymbolInternal, getPriceClient } from './price.js'
 import { GetPriceRequest, GetPriceResponse } from '@sentio/protos/price'
-import { jest } from '@jest/globals'
 import { expect } from 'chai'
 
 describe('price client', () => {
@@ -8,11 +8,11 @@ describe('price client', () => {
 
   test('get price', async () => {
     let priceValue = 1
-    jest.spyOn(client, 'getPrice').mockImplementation((request: GetPriceRequest) => {
+    mock.method(client, 'getPrice', (request: GetPriceRequest) => {
       return Promise.resolve(
         GetPriceResponse.create({
           timestamp: new Date(),
-          price: priceValue++,
+          price: priceValue++
         })
       )
     })

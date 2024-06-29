@@ -1,3 +1,4 @@
+import { before, describe, test } from 'node:test'
 // TODO move out of this package
 
 import { expect } from 'chai'
@@ -14,7 +15,7 @@ describe('Test Basic Examples', () => {
     await import('./erc20.js')
   })
 
-  beforeAll(async () => {
+  before(async () => {
     await service.start()
   })
 

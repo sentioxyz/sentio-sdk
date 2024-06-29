@@ -1,3 +1,4 @@
+import { before, describe, test } from 'node:test'
 import { expect } from 'chai'
 import { TestProcessorServer } from '../../testing/index.js'
 import { event } from './types/0x00b53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302.js'
@@ -13,7 +14,7 @@ describe('Test leading zero', () => {
       })
   })
 
-  beforeAll(async () => {
+  before(async () => {
     await service.start({ templateInstances: [] })
   })
 

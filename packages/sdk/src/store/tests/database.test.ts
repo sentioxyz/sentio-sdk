@@ -1,7 +1,8 @@
+import { after, afterEach, describe, it } from 'node:test'
+import assert from 'assert'
 import { Store } from '../store.js'
 import { Transaction, User } from './generated/schema.js'
 import { MemoryDatabase } from './memory-database.js'
-import { afterAll, afterEach } from '@jest/globals'
 import { StoreContext } from '../context.js'
 import { BigDecimal } from '@sentio/bigdecimal'
 import { Subject } from 'rxjs'
@@ -15,11 +16,14 @@ describe('Test Database', () => {
   db.start()
 
   function expectEntityEqual(a: any, b: any) {
-    expect(a._data).toEqual(b._data)
+    assert.equal(a._data, b._data)
   }
 
   function expectListEntityEqual(a: any[], b: any[]) {
-    expect(a.map((e) => e._data)).toEqual(b.map((e) => e._data))
+    assert.deepEqual(
+      a.map((e) => e._data),
+      b.map((e) => e._data)
+    )
   }
 
   it('should upsert to database', async () => {
@@ -33,7 +37,7 @@ describe('Test Database', () => {
     })
 
     await store.upsert(user)
-    expect(db.db.has('User-test-id-1')).toBeTruthy()
+    assert.ok(db.db.has('User-test-id-1'))
     const u = await store.get(User, 'test-id-1')
     console.log(u)
     expectEntityEqual(u, user)
@@ -50,11 +54,11 @@ describe('Test Database', () => {
     })
 
     await store.upsert(user)
-    expect(db.db.has('User-test-id-2')).toBeTruthy()
+    assert.ok(db.db.has('User-test-id-2'))
     await store.delete(User, 'test-id-2')
     const u = await store.get(User, 'test-id-2')
-    expect(u).toBeUndefined()
-    expect(db.db.has('User-test-id-2')).toBeFalsy()
+    assert.ok(!u)
+    assert.ok(!db.db.has('User-test-id-2'))
   })
 
   it('should list from database', async () => {
@@ -111,9 +115,9 @@ describe('Test Database', () => {
     })
     await store.upsert(tx)
     const tx2 = await store.get(Transaction, 'test-id-1')
-    expect(tx2?.gas).toEqual(tx.gas)
-    expect(tx2?.id).toEqual(tx.id)
-    expect(tx2?.gasPrice).toEqual(tx.gasPrice)
+    assert.equal(tx2?.gas, tx.gas)
+    assert.equal(tx2?.id, tx.id)
+    assert.deepEqual(tx2?.gasPrice, tx.gasPrice)
   })
 
   it('filter constraints', async () => {
@@ -198,7 +202,7 @@ describe('Test Database', () => {
     db.reset()
   })
 
-  afterAll(() => {
+  after(() => {
     // db.stop()
   })
 })

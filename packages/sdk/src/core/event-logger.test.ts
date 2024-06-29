@@ -1,3 +1,5 @@
+import { describe, test } from 'node:test'
+import assert from 'assert'
 import { BasicFieldType, Fields, fieldsToProtos } from './event-logger.js'
 
 describe('event logger tests', () => {
@@ -9,18 +11,24 @@ describe('event logger tests', () => {
     }
 
     const fieldsProto = fieldsToProtos(fields)
-    expect(fieldsProto).toEqual([
+    assert.deepEqual(fieldsProto, [
       {
         name: 'phase',
-        basicType: BasicFieldType.STRING
+        basicType: BasicFieldType.STRING,
+        coinType: undefined,
+        structType: undefined
       },
       {
         name: 'reward',
-        basicType: BasicFieldType.DOUBLE
+        basicType: BasicFieldType.DOUBLE,
+        coinType: undefined,
+        structType: undefined
       },
       {
         name: 'isX2',
-        basicType: BasicFieldType.BOOL
+        basicType: BasicFieldType.BOOL,
+        coinType: undefined,
+        structType: undefined
       }
     ])
   })
@@ -34,18 +42,24 @@ describe('event logger tests', () => {
     }
 
     const fieldsProto = fieldsToProtos(fields)
-    expect(fieldsProto).toEqual([
+    assert.deepEqual(fieldsProto, [
       {
         name: 'phase',
-        basicType: BasicFieldType.STRING
+        basicType: BasicFieldType.STRING,
+        coinType: undefined,
+        structType: undefined
       },
       {
         name: 'xx',
+        basicType: undefined,
+        coinType: undefined,
         structType: {
           fields: [
             {
               name: 'aaa',
-              basicType: BasicFieldType.BOOL
+              basicType: BasicFieldType.BOOL,
+              coinType: undefined,
+              structType: undefined
             }
           ]
         }
@@ -60,12 +74,14 @@ describe('event logger tests', () => {
       }
     }
     const fieldsProto = fieldsToProtos(fields)
-    expect(fieldsProto).toEqual([
+    assert.deepEqual(fieldsProto, [
       {
         name: 'coin',
         coinType: {
           symbol: 'WETH'
-        }
+        },
+        basicType: undefined,
+        structType: undefined
       }
     ])
   })

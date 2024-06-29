@@ -1,9 +1,9 @@
+import { before, after, describe, test } from 'node:test'
 import { TestProcessorServer } from '../../testing/index.js'
 import { FuelChainId } from '@sentio/chain'
 import abi from './abis/counter-contract-abi.json'
 import { expect } from 'chai'
 import testData from './test-data.json'
-import { afterAll } from '@jest/globals'
 import { State } from '@sentio/runtime'
 import { CounterContractProcessor } from './types/CounterContractProcessor.js'
 
@@ -36,7 +36,7 @@ describe('typed fuel processor tests', () => {
         })
       })
   })
-  beforeAll(async () => {
+  before(async () => {
     await service.start()
   })
 
@@ -65,7 +65,7 @@ describe('typed fuel processor tests', () => {
     expect(events?.[1]?.message).contains('log foo')
   })
 
-  afterAll(async () => {
+  after(async () => {
     State.reset()
   })
 })

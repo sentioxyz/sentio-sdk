@@ -1,3 +1,4 @@
+import { describe, test } from 'node:test'
 import { defaultMoveCoder } from '../move-coder.js'
 
 import { coin, dynamic_field, loadAllTypes } from '../builtin/0x2.js'

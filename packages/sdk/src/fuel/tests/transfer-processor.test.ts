@@ -1,10 +1,10 @@
+import { before, after, describe, test } from 'node:test'
 import { TestProcessorServer } from '../../testing/index.js'
 import { FuelAssetProcessor } from '../asset-processor.js'
 import { FuelChainId } from '@sentio/chain'
 import { ZeroBytes32 as BaseAssetId } from '@fuel-ts/address/configs'
 import { expect } from 'chai'
 import testTransferData from './transfer-data.json'
-import { afterAll } from '@jest/globals'
 import { State } from '@sentio/runtime'
 
 describe('fuel network transfer tests', () => {
@@ -31,7 +31,7 @@ describe('fuel network transfer tests', () => {
       }
     )
   })
-  beforeAll(async () => {
+  before(async () => {
     await service.start()
   })
 
@@ -56,7 +56,7 @@ describe('fuel network transfer tests', () => {
     })
   })
 
-  afterAll(async () => {
+  after(async () => {
     State.reset()
   })
 })

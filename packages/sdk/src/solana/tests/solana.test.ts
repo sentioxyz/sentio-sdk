@@ -1,3 +1,4 @@
+import { before, describe, test } from 'node:test'
 // TODO move out of this package
 
 import { expect } from 'chai'
@@ -11,7 +12,7 @@ describe('Test Solana Example', () => {
     await import('./wormhole-token-bridge.js')
   })
 
-  beforeAll(async () => {
+  before(async () => {
     await service.start({ templateInstances: [] })
   })
 
@@ -26,14 +27,14 @@ describe('Test Solana Example', () => {
         instructionData: '33G5T8yXAQWdH8FX7fTy1mBJ6e4dUKfQWbViSrT7qJjpS8UAA3ftEQx9sNzrkaJm56xtENhDsWf',
         slot: 12345n,
         programAccountId: 'wormDTUJ6AWPNvk59vGQbDvGJmqbDTdgWgAqcLBCgUb',
-        accounts: ['worm'],
+        accounts: ['worm']
       },
       {
         instructionData: '33G5T8yXAQWdH8FX7fTy1mBJ6e4dUKfQWbViSrT7qJjpS8UAA3ftEQx9sNzrkaJm56xtENhDsWf',
         slot: 1n,
         programAccountId: 'wormDTUJ6AWPNvk59vGQbDvGJmqbDTdgWgAqcLBCgUb',
-        accounts: ['worm'],
-      },
+        accounts: ['worm']
+      }
     ]
 
     const res = await service.solana.testInstructions(instructions)
@@ -51,9 +52,9 @@ describe('Test Solana Example', () => {
         account: '2SDN4vEJdCdW3pGyhx2km9gB3LeHzMGLrG2j4uVNZfrx',
         amount: '12000000000000',
         mint: '7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs',
-        mintAuthority: 'BCD75RNBHrJJpW4dXVagL5mPjzRLnVZq4YirJdjEYMV7',
+        mintAuthority: 'BCD75RNBHrJJpW4dXVagL5mPjzRLnVZq4YirJdjEYMV7'
       },
-      type: 'mintTo',
+      type: 'mintTo'
     }
     const instructions = [
       {
@@ -61,8 +62,8 @@ describe('Test Solana Example', () => {
         slot: 0n,
         programAccountId: 'wormDTUJ6AWPNvk59vGQbDvGJmqbDTdgWgAqcLBCgUb',
         parsed: parsedIns,
-        accounts: [],
-      },
+        accounts: []
+      }
     ]
     const res = await service.solana.testInstructions(instructions)
     expect(res.result?.counters).length(1)

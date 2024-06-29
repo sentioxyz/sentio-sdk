@@ -1,3 +1,4 @@
+import { describe, test } from 'node:test'
 import { findNewCoinBalances, getDepositCoinType, getWithDrawCoinType } from './coin-event.js'
 import { expect } from 'chai'
 import { TransactionResponseType, UserTransactionResponse } from '@aptos-labs/ts-sdk'

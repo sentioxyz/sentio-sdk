@@ -1,3 +1,4 @@
+import { before, describe, test } from 'node:test'
 import { assert, expect } from 'chai'
 
 import { firstCounterValue, TestProcessorServer } from '../../testing/index.js'
@@ -22,7 +23,7 @@ describe(' erc20 account transfer Examples', () => {
       )
   })
 
-  beforeAll(async () => {
+  before(async () => {
     await service.start()
   })
 
@@ -41,13 +42,13 @@ describe(' erc20 account transfer Examples', () => {
       mockTransferLog('0x1E4EDE388cbc9F4b5c79681B7f94d36a11ABEBC9', {
         from: ADDRESS,
         to: '0xB329e39Ebefd16f40d38f07643652cE17Ca5Bac1',
-        value: BigInt(100),
+        value: BigInt(100)
       }),
       mockTransferLog('0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', {
         from: '0xB329e39Ebefd16f40d38f07643652cE17Ca5Bac1',
         to: ADDRESS,
-        value: BigInt(200),
-      }),
+        value: BigInt(200)
+      })
     ])
 
     const counters = res.result?.counters

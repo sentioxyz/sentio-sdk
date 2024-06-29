@@ -1,3 +1,4 @@
+import { describe, test } from 'node:test'
 import { defaultMoveCoder } from '../index.js'
 import { loadAllTypes } from '../builtin/0x1.js'
 import { MoveFunctionId } from '@aptos-labs/ts-sdk'

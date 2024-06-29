@@ -1,3 +1,4 @@
+import { before, describe, test } from 'node:test'
 import { assert } from 'chai'
 
 import { TestProcessorServer } from '../../testing/index.js'
@@ -20,7 +21,7 @@ describe('Test Error Capture', () => {
       })
   })
 
-  beforeAll(async () => {
+  before(async () => {
     await service.start()
   })
 
@@ -37,7 +38,7 @@ describe('Test Error Capture', () => {
         mockApprovalLog('0x80009ff8154bd5653c6dda2fa5f5053e5a5c1a91', {
           owner: '0x80009ff8154bd5653c6dda2fa5f5053e5a5c1a91',
           spender: '0x0000000000000000000000000000000000000000',
-          value: 0n,
+          value: 0n
         })
       )
     } catch (e) {
@@ -53,7 +54,7 @@ describe('Test Error Capture', () => {
         mockTransferLog('0x80009ff8154bd5653c6dda2fa5f5053e5a5c1a91', {
           from: '0x80009ff8154bd5653c6dda2fa5f5053e5a5c1a91',
           to: '0x0000000000000000000000000000000000000000',
-          value: 0n,
+          value: 0n
         })
       )
     } catch (e) {
@@ -68,7 +69,7 @@ describe('Test Error Capture', () => {
       await service.eth.testLog(
         mockOwnershipTransferredLog('0x80009ff8154bd5653c6dda2fa5f5053e5a5c1a91', {
           previousOwner: '0x80009ff8154bd5653c6dda2fa5f5053e5a5c1a91',
-          newOwner: '0x0000000000000000000000000000000000000000',
+          newOwner: '0x0000000000000000000000000000000000000000'
         })
       )
     } catch (e) {

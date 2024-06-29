@@ -1,8 +1,8 @@
+import { before, after, describe, test } from 'node:test'
 import { TestProcessorServer } from '../../testing/index.js'
 import { expect } from 'chai'
 import { CosmosChainId } from '@sentio/chain'
 import testData from './test-data.json'
-import { afterAll } from '@jest/globals'
 import { State } from '@sentio/runtime'
 import { CosmosProcessor } from '../index.js'
 
@@ -23,7 +23,7 @@ describe('cosmos network tests', () => {
       })
     })
   })
-  beforeAll(async () => {
+  before(async () => {
     await service.start()
   })
 
@@ -41,7 +41,7 @@ describe('cosmos network tests', () => {
     expect(events?.[0]?.message).contains('message')
   })
 
-  afterAll(async () => {
+  after(async () => {
     State.reset()
   })
 })

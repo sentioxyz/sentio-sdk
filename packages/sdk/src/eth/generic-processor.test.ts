@@ -1,3 +1,4 @@
+import { before, describe, test } from 'node:test'
 // TODO move out of this package
 
 import { expect } from 'chai'
@@ -14,7 +15,7 @@ describe('Test Generic Processor', () => {
         'event Transfer(address indexed from, address indexed to, uint256 value)',
         'event Approval(address indexed from, address indexed to, uint256 value)',
         'function transferFrom(address from, address to, uint value)',
-        'function balanceOf(address owner) view returns (uint balance)',
+        'function balanceOf(address owner) view returns (uint balance)'
       ],
       { address: '0x1E4EDE388cbc9F4b5c79681B7f94d36a11ABEBC9' }
     )
@@ -25,18 +26,18 @@ describe('Test Generic Processor', () => {
         ctx.meter.Counter('trace_count').add(1, { name: trace.name })
         ctx.eventLogger.emit(trace.name, {
           distinctId: trace.action.from,
-          ...trace.args.toObject(),
+          ...trace.args.toObject()
         })
       })
 
     GenericProcessor.bind('event WalletCreated(address wallet, address owner)', {
-      address: '0x57E037F4d2c8BEa011Ad8a9A5AF4AaEEd508650f',
+      address: '0x57E037F4d2c8BEa011Ad8a9A5AF4AaEEd508650f'
     }).onEvent(function (log, ctx) {
       ctx.meter.Counter('wallet').add(1)
     })
   })
 
-  beforeAll(async () => {
+  before(async () => {
     await service.start()
   })
 
@@ -74,9 +75,9 @@ describe('Test Generic Processor', () => {
     topics: [
       '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
       '0x0000000000000000000000000000000000000000000000000000000000000000',
-      '0x000000000000000000000000b329e39ebefd16f40d38f07643652ce17ca5bac1',
+      '0x000000000000000000000000b329e39ebefd16f40d38f07643652ce17ca5bac1'
     ],
     transactionHash: '0x93355e0cb2c3490cb8a747029ff2dc8cdbde2407025b8391398436955afae303',
-    logIndex: 428,
+    logIndex: 428
   }
 })

@@ -1,3 +1,4 @@
+import { before, describe, test } from 'node:test'
 import { expect } from 'chai'
 import { TestProcessorServer } from '../../testing/index.js'
 import { router } from './types/testnet/wisp.js'
@@ -10,7 +11,7 @@ describe('Test entry call decoding', () => {
     })
   })
 
-  beforeAll(async () => {
+  before(async () => {
     await service.start({ templateInstances: [] })
   })
 

@@ -1,9 +1,10 @@
+import { before, after, describe, test } from 'node:test'
+import assert from 'assert'
 import { TestProcessorServer } from '../../testing/index.js'
 import { FuelProcessor } from '../fuel-processor.js'
 import { FuelChainId } from '@sentio/chain'
 import abi from './abis/counter-contract-abi.json'
 import testData from './test-data.json'
-import { afterAll } from '@jest/globals'
 import { State } from '@sentio/runtime'
 import { bn, calculateVmTxMemory, Interface, Provider } from 'fuels'
 import { getRpcEndpoint } from '../network.js'
@@ -31,14 +32,14 @@ describe('fuel network tests', () => {
         })
       })*/
   })
-  beforeAll(async () => {
+  before(async () => {
     await service.start()
   })
 
   test('check configuration ', async () => {
     const config = await service.getConfig({})
-    expect(config.contractConfigs.length).toBeGreaterThan(0)
-    expect(config.contractConfigs[0].fuelCallConfigs.length).toBeGreaterThanOrEqual(1)
+    assert.ok(config.contractConfigs.length > 0)
+    assert.ok(config.contractConfigs[0].fuelCallConfigs.length >= 1)
   })
 
   // skip for now until onCall is fixed
@@ -46,8 +47,8 @@ describe('fuel network tests', () => {
     const res = await service.fuel.testOnTransaction(testData, FuelChainId.FUEL_TESTNET)
 
     const events = res.result?.events
-    expect(events).toHaveLength(2)
-    expect(events?.[0]?.message).toEqual('status is success')
+    assert.equal(events?.length, 2)
+    assert.equal(events?.[0]?.message, 'status is success')
   })
 
   // skip for now until onCall is fixed
@@ -55,8 +56,8 @@ describe('fuel network tests', () => {
     const res = await service.fuel.testOnTransaction(testData, FuelChainId.FUEL_TESTNET)
 
     const events = res.result?.events
-    expect(events).toHaveLength(2)
-    expect(events?.[1]?.message).toContain('complex call')
+    assert.equal(events?.length, 2)
+    assert.ok(events?.[1]?.message.includes('complex call'))
   })
 
   test('tx decode', async () => {
@@ -65,7 +66,7 @@ describe('fuel network tests', () => {
       { ADDRESS: abi },
       await Provider.create(getRpcEndpoint(FuelChainId.FUEL_TESTNET))
     )
-    expect(tx.operations).toBeDefined()
+    assert.ok(tx.operations)
   })
 
   test('test decode', async () => {
@@ -90,7 +91,7 @@ describe('fuel network tests', () => {
     console.log(encodedArgs, selectorHex)
   })
 
-  afterAll(async () => {
+  after(async () => {
     State.reset()
   })
 })

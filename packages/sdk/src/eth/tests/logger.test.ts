@@ -1,3 +1,4 @@
+import { before, describe, test } from 'node:test'
 import { assert, expect } from 'chai'
 
 import { TestProcessorServer } from '../../testing/index.js'
@@ -13,7 +14,7 @@ describe('Test Error Capture', () => {
           message: `approve ${evt.args}`,
           owner: evt.args.owner,
           spender: evt.args.spender,
-          value: evt.args.value,
+          value: evt.args.value
         })
       })
       .onEventTransfer((evt: TransferEvent, ctx) => {
@@ -23,12 +24,12 @@ describe('Test Error Capture', () => {
           owner: evt.args.from,
           to: evt.args.to,
           from: evt.args.from,
-          value: evt.args.value,
+          value: evt.args.value
         })
       })
   })
 
-  beforeAll(async () => {
+  before(async () => {
     await service.start()
   })
 
@@ -37,7 +38,7 @@ describe('Test Error Capture', () => {
       mockApprovalLog('0x80009ff8154bd5653c6dda2fa5f5053e5a5c1a91', {
         owner: '0x80009ff8154bd5653c6dda2fa5f5053e5a5c1a91',
         spender: '0x0000000000000000000000000000000000000000',
-        value: 0n,
+        value: 0n
       })
     )
     assert(res.result?.events?.[0].message.includes('approve '))
@@ -48,7 +49,7 @@ describe('Test Error Capture', () => {
       mockTransferLog('0x80009ff8154bd5653c6dda2fa5f5053e5a5c1a91', {
         from: '0x80009ff8154bd5653c6dda2fa5f5053e5a5c1a91',
         to: '0x0000000000000000000000000000000000000000',
-        value: 0n,
+        value: 0n
       })
     )
     const events = res.result?.events?.[0]

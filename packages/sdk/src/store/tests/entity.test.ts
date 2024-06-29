@@ -1,4 +1,5 @@
-import { describe } from '@jest/globals'
+import { describe, it } from 'node:test'
+import assert from 'assert'
 import {
   Entity,
   BigDecimalColumn,
@@ -82,13 +83,13 @@ describe('entity tests', () => {
   it('define entity name', () => {
     const t = new Person({ id: 'test' })
     const entityName = (t.constructor as any).entityName
-    expect(entityName).toBe('Person')
+    assert.equal(entityName, 'Person')
   })
 
   it('define proto ', () => {
     const t = new Person()
     const meta = (t.constructor as any).meta
-    expect(meta['id']).toBeDefined()
+    assert.ok(meta['id'])
   })
 
   it('define constructor ', async () => {
@@ -108,37 +109,37 @@ describe('entity tests', () => {
       pets: Promise.resolve([p])
     })
 
-    expect(t.id).toBe('test')
-    expect(t.intValue).toBe(100)
-    expect(t.bytesValue).toEqual(new Uint8Array([1, 2, 3]))
-    expect(t.bigDecimalValue).toEqual(new BigDecimal('123.456'))
-    expect(t.stringValue).toBe('test')
-    expect(t.bigIntValue).toBe(1000n)
-    expect(t.dateValue).toBe(now)
-    expect(t.floatValue).toBe(0.1)
-    expect(t.booleanValue).toBe(true)
-    expect(t.arrayInt).toEqual([1, 2, 3])
+    assert.equal(t.id, 'test')
+    assert.equal(t.intValue, 100)
+    assert.deepEqual(t.bytesValue, new Uint8Array([1, 2, 3]))
+    assert.deepEqual(t.bigDecimalValue, new BigDecimal('123.456'))
+    assert.equal(t.stringValue, 'test')
+    assert.equal(t.bigIntValue, 1000n)
+    assert.equal(t.dateValue, now)
+    assert.equal(t.floatValue, 0.1)
+    assert.equal(t.booleanValue, true)
+    assert.deepEqual(t.arrayInt, [1, 2, 3])
     await sleep(1)
-    expect(t.pets).toBeDefined()
-    expect(t.petsIDs).toStrictEqual([p.id])
+    assert.ok(t.pets)
+    assert.deepEqual(t.petsIDs, [p.id])
   })
 
   it('define getter & setter', () => {
     const t = new Person()
     t.intValue = 100
-    expect(t.intValue).toBe(100)
+    assert.equal(t.intValue, 100)
 
     // required value must be set
-    expect(() => {
+    assert.throws(() => {
       // @ts-ignore
       t.booleanValue = null
-    }).toThrowError()
+    })
 
     // required value must be get
-    expect(() => {
+    assert.throws(() => {
       // @ts-ignore
       console.log(t.booleanValue)
-    }).toThrowError()
+    })
   })
 
   it('defines getter & setter for relation', async () => {
@@ -149,7 +150,7 @@ describe('entity tests', () => {
     t.owner = Promise.resolve(p)
     await sleep(1)
 
-    expect(t.ownerID).toBe('person')
+    assert.equal(t.ownerID, 'person')
 
     const t2 = new Pet({ id: 'pet2' })
 
@@ -157,6 +158,6 @@ describe('entity tests', () => {
 
     await sleep(1)
 
-    expect(p.petsIDs).toStrictEqual([t.id, t2.id])
+    assert.deepEqual(p.petsIDs, [t.id, t2.id])
   })
 })

@@ -1,3 +1,4 @@
+import { before, describe, test } from 'node:test'
 import { expect } from 'chai'
 import { HandlerType, ProcessBindingsRequest } from '@sentio/protos'
 
@@ -8,7 +9,7 @@ describe('Test Aptos Example', () => {
     await import('./souffl3.js')
   })
 
-  beforeAll(async () => {
+  before(async () => {
     await service.start({ templateInstances: [] })
   })
 
@@ -23,13 +24,13 @@ describe('Test Aptos Example', () => {
         {
           data: {
             aptCall: {
-              transaction: testData,
-            },
+              transaction: testData
+            }
           },
           handlerIds: [1],
-          handlerType: HandlerType.APT_CALL,
-        },
-      ],
+          handlerType: HandlerType.APT_CALL
+        }
+      ]
     }
     const res = await service.processBindings(request)
     expect(res.result?.counters).length(1)
@@ -76,17 +77,17 @@ describe('Test Aptos Example', () => {
                 {
                   type: '0x1::coin::SupplyConfig',
                   data: {
-                    allow_upgrades: false,
-                  },
-                },
+                    allow_upgrades: false
+                  }
+                }
               ],
-              timestampMicros: 1n,
-            },
+              timestampMicros: 1n
+            }
           },
           handlerIds: [0],
-          handlerType: HandlerType.APT_RESOURCE,
-        },
-      ],
+          handlerType: HandlerType.APT_RESOURCE
+        }
+      ]
     }
     const res = await service.processBindings(request)
     expect(firstCounterValue(res.result, 'onTimer')).equal(1)
@@ -98,13 +99,13 @@ describe('Test Aptos Example', () => {
         {
           data: {
             aptCall: {
-              transaction: dataCreate,
-            },
+              transaction: dataCreate
+            }
           },
           handlerIds: [3],
-          handlerType: HandlerType.APT_CALL,
-        },
-      ],
+          handlerType: HandlerType.APT_CALL
+        }
+      ]
     }
     const res = await service.processBindings(request)
     expect(res.result?.counters).length(1)
@@ -134,44 +135,44 @@ const testData = {
       '0x4188c8694687e844677c2aa87171019e23d61cac60de5082a278a8aa47e9d807',
       '0x4188c8694687e844677c2aa87171019e23d61cac60de5082a278a8aa47e9d807',
       'Souffl3 BlueBerry',
-      '1',
+      '1'
     ],
-    type: 'entry_function_payload',
+    type: 'entry_function_payload'
   },
   signature: {
     public_key: '0x6c3f579afbf8a728827385039f7604ec1d06e5c802d8f9689ee8ec9d349fedc5',
     signature:
       '0xd2db95052e774f095d924030a50c29325a17e8d69d35c748f45bb0e22eb7d3b9e47545c98bd7130fd3ef46cbedc30c9aaeaf39c2d922ee8e7d578c0b1e76f30b',
-    type: 'ed25519_signature',
+    type: 'ed25519_signature'
   },
   events: [
     {
       guid: {
         creation_number: '3',
-        account_address: '0x4188c8694687e844677c2aa87171019e23d61cac60de5082a278a8aa47e9d807',
+        account_address: '0x4188c8694687e844677c2aa87171019e23d61cac60de5082a278a8aa47e9d807'
       },
       sequence_number: '10',
       type: '0x1::coin::WithdrawEvent',
       data: {
-        amount: '1',
-      },
+        amount: '1'
+      }
     },
     {
       version: '18483034',
       guid: {
         creation_number: '2',
-        account_address: '0x4188c8694687e844677c2aa87171019e23d61cac60de5082a278a8aa47e9d807',
+        account_address: '0x4188c8694687e844677c2aa87171019e23d61cac60de5082a278a8aa47e9d807'
       },
       sequence_number: '11',
       type: '0x1::coin::DepositEvent',
       data: {
-        amount: '1',
-      },
+        amount: '1'
+      }
     },
     {
       guid: {
         creation_number: '9',
-        account_address: '0x21d5fe032affa1c8b10d343e9ad5a5618bc13baf5ed4a674fafaa12c54f416cc',
+        account_address: '0x21d5fe032affa1c8b10d343e9ad5a5618bc13baf5ed4a674fafaa12c54f416cc'
       },
       sequence_number: '9',
       type: '0x3::token::CreateTokenDataEvent',
@@ -181,7 +182,7 @@ const testData = {
         id: {
           collection: 'Souffl3 BlueBerry',
           creator: '0x21d5fe032affa1c8b10d343e9ad5a5618bc13baf5ed4a674fafaa12c54f416cc',
-          name: 'Souffl3 BlueBerry #2',
+          name: 'Souffl3 BlueBerry #2'
         },
         maximum: '999999999999',
         mutability_config: {
@@ -189,7 +190,7 @@ const testData = {
           maximum: true,
           properties: true,
           royalty: true,
-          uri: true,
+          uri: true
         },
         name: 'Souffl3 BlueBerry #2',
         property_keys: ['author', 'point'],
@@ -198,13 +199,13 @@ const testData = {
         royalty_payee_address: '0x4188c8694687e844677c2aa87171019e23d61cac60de5082a278a8aa47e9d807',
         royalty_points_denominator: '100',
         royalty_points_numerator: '20',
-        uri: 'https://y3x4txhvirx5zl57efzbl6dg7psaier5q35hhwuqwzjwuahrycya.arweave.net/xu_J3PVEb9yvvyFyFfhm--QEEj2G-nPakLZTagDxwLA',
-      },
+        uri: 'https://y3x4txhvirx5zl57efzbl6dg7psaier5q35hhwuqwzjwuahrycya.arweave.net/xu_J3PVEb9yvvyFyFfhm--QEEj2G-nPakLZTagDxwLA'
+      }
     },
     {
       guid: {
         creation_number: '2',
-        account_address: '0x21d5fe032affa1c8b10d343e9ad5a5618bc13baf5ed4a674fafaa12c54f416cc',
+        account_address: '0x21d5fe032affa1c8b10d343e9ad5a5618bc13baf5ed4a674fafaa12c54f416cc'
       },
       sequence_number: '27',
       type: '0x3::token::DepositEvent',
@@ -215,32 +216,32 @@ const testData = {
           token_data_id: {
             collection: 'Souffl3 BlueBerry',
             creator: '0x21d5fe032affa1c8b10d343e9ad5a5618bc13baf5ed4a674fafaa12c54f416cc',
-            name: 'Souffl3 BlueBerry #2',
-          },
-        },
-      },
+            name: 'Souffl3 BlueBerry #2'
+          }
+        }
+      }
     },
     {
       version: '18483034',
       guid: {
         creation_number: '7',
-        account_address: '0x21d5fe032affa1c8b10d343e9ad5a5618bc13baf5ed4a674fafaa12c54f416cc',
+        account_address: '0x21d5fe032affa1c8b10d343e9ad5a5618bc13baf5ed4a674fafaa12c54f416cc'
       },
       sequence_number: '980533',
       type: '0x4188c8694687e844677c2aa87171019e23d61cac60de5082a278a8aa47e9d807::SouffleChefCampaign::PullTokenEvent<0x1::aptos_coin::AptosCoin>',
       data: {
-        receiver: '0x3a80be5daa84f2da7e07b3ec9234da48a5647f757187879c97a1fa03f31f1195',
-      },
-    },
+        receiver: '0x3a80be5daa84f2da7e07b3ec9234da48a5647f757187879c97a1fa03f31f1195'
+      }
+    }
   ],
   timestamp: '1663143945131218',
-  type: 'user_transaction',
+  type: 'user_transaction'
 }
 
 const tokenTestData = {
   guid: {
     creation_number: '4',
-    account_address: '0x89bc80de59187f707a59ae7a4121718dafe3e6068e0509104ef7e41a56bc97db',
+    account_address: '0x89bc80de59187f707a59ae7a4121718dafe3e6068e0509104ef7e41a56bc97db'
   },
   sequence_number: '10',
   type: '0x3::token::DepositEvent',
@@ -251,23 +252,23 @@ const tokenTestData = {
       token_data_id: {
         collection: 'Topaz Troopers',
         creator: '0x9125e4054d884fdc7296b66e12c0d63a7baa0d88c77e8e784987c0a967c670ac',
-        name: 'Topaz Trooper #11293',
-      },
-    },
-  },
+        name: 'Topaz Trooper #11293'
+      }
+    }
+  }
 }
 
 const createProposalData = {
   version: '1',
   guid: {
     creation_number: '5',
-    account_address: '0x1',
+    account_address: '0x1'
   },
   sequence_number: '3',
   type: '0x1::voting::CreateProposalEvent',
   data: {
     early_resolution_vote_threshold: {
-      vec: ['9272156337856446330'],
+      vec: ['9272156337856446330']
     },
     execution_hash: '0x31549239ce8abdc1e9c259178614c3d44d015bd6d48635ddcfbfa4a77e7222b0',
     expiration_secs: '1665463839',
@@ -276,18 +277,18 @@ const createProposalData = {
         {
           key: 'metadata_hash',
           value:
-            '0x61633230656566373063616466363939663530353564323463356363353931396463306330656562643463303662653332346336323030313561633361653066',
+            '0x61633230656566373063616466363939663530353564323463356363353931396463306330656562643463303662653332346336323030313561633361653066'
         },
         {
           key: 'metadata_location',
           value:
-            '0x68747470733a2f2f676973742e67697468756275736572636f6e74656e742e636f6d2f6d6f76656b6576696e2f30353766623134356234303836366566663863323263393166623964613931392f7261772f626162383566306637343334663030386138373831656563376663616464316163356135353438312f6769737466696c65312e747874',
-        },
-      ],
+            '0x68747470733a2f2f676973742e67697468756275736572636f6e74656e742e636f6d2f6d6f76656b6576696e2f30353766623134356234303836366566663863323263393166623964613931392f7261772f626162383566306637343334663030386138373831656563376663616464316163356135353438312f6769737466696c65312e747874'
+        }
+      ]
     },
     min_vote_threshold: '100000000000000',
-    proposal_id: '3',
-  },
+    proposal_id: '3'
+  }
 }
 
 const dataCreate = {
@@ -302,7 +303,7 @@ const dataCreate = {
     type_arguments: [],
     arguments: ['0xd582e092190feda35a2f737123f86e33a1b592596804f40b1d539ab603a82a24'],
     code: { bytecode: '' },
-    function: '0x1::aptos_account::create_account',
+    function: '0x1::aptos_account::create_account'
   },
   max_gas_amount: '2000',
   gas_unit_price: '100',
@@ -319,7 +320,7 @@ const dataCreate = {
     bitmap: '',
     sender: { type: '', public_key: '', signature: '', public_keys: null, signatures: null, threshold: 0, bitmap: '' },
     secondary_signer_addresses: null,
-    secondary_signers: null,
+    secondary_signers: null
   },
   type: 'user_transaction',
   timestamp: '1666174688494614',
@@ -328,7 +329,7 @@ const dataCreate = {
       version: '3121410',
       guid: {
         creation_number: '0',
-        account_address: '0xd582e092190feda35a2f737123f86e33a1b592596804f40b1d539ab603a82a24',
+        account_address: '0xd582e092190feda35a2f737123f86e33a1b592596804f40b1d539ab603a82a24'
       },
       sequence_number: '0',
       type: '0x1::account::CoinRegisterEvent',
@@ -336,10 +337,10 @@ const dataCreate = {
         type_info: {
           account_address: '0x1',
           module_name: '0x6170746f735f636f696e',
-          struct_name: '0x4170746f73436f696e',
-        },
-      },
-    },
+          struct_name: '0x4170746f73436f696e'
+        }
+      }
+    }
   ],
   version: '3121410',
   hash: '0xcae7d97c9f43d90e247a366688905bc8e83ee0ad4baddbf3cc2fdda56e4d6926',
@@ -349,5 +350,5 @@ const dataCreate = {
   success: true,
   vm_status: 'Executed successfully',
   accumulator_root_hash: '0x7563d6ed58b011e512d53cce2bc1a70716fc6362e12fb6af8fe6d459ae71dffc',
-  changes: undefined,
+  changes: undefined
 }

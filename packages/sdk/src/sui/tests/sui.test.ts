@@ -1,3 +1,4 @@
+import { before, describe, test } from 'node:test'
 import { expect } from 'chai'
 import { TestProcessorServer } from '../../testing/index.js'
 import { SuiNetwork } from '../network.js'
@@ -15,7 +16,6 @@ describe('Test Sui Example', () => {
     })
 
     sui_system.bind({ network: SuiNetwork.TEST_NET }).onEntryRequestAddStake((call, ctx) => {
-      // TODO check why only jest report error but tsc won't if use infer library's sui
       ctx.meter.Gauge('tmp').record(1, { coin: call.arguments_decoded[2] || '' })
     })
 
@@ -24,7 +24,7 @@ describe('Test Sui Example', () => {
     })
   })
 
-  beforeAll(async () => {
+  before(async () => {
     await service.start({ templateInstances: [] })
   })
 

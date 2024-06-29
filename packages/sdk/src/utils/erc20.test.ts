@@ -1,3 +1,4 @@
+import { describe, test } from 'node:test'
 import { State } from '@sentio/runtime'
 import { getERC20TokenInfo } from './token.js'
 import { loadTestProvidersFromEnv } from '../testing/test-provider.js'

@@ -1,3 +1,4 @@
+import { before, describe, test } from 'node:test'
 import { expect } from 'chai'
 
 import { StartRequest } from '@sentio/protos'
@@ -35,7 +36,7 @@ describe('Test Template', () => {
     }, filter)
   })
 
-  beforeAll(async () => {
+  before(async () => {
     const request: StartRequest = {
       templateInstances: [
         {

@@ -1,3 +1,4 @@
+import { describe, test } from 'node:test'
 import { EthereumDexPrice, SepoliaDexPrice } from './dex-price.js'
 import { State } from '@sentio/runtime'
 import { loadTestProvidersFromEnv } from '@sentio/sdk/testing'

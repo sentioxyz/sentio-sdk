@@ -1,3 +1,4 @@
+import { describe, it } from 'node:test'
 import { Subject } from 'rxjs'
 import { from } from 'ix/asynciterable'
 import {
@@ -9,7 +10,6 @@ import {
   ProcessStreamResponse
 } from '@sentio/protos'
 import { withAbort } from 'ix/Ix.dom.asynciterable.operators.js'
-import { describe } from '@jest/globals'
 
 class AsyncContext {
   private defers = new Map<bigint, { resolve: (value: any) => void; reject: (reason?: any) => void }>()
