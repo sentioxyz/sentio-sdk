@@ -27,7 +27,7 @@ export class StoreContext {
     let timer: NodeJS.Timeout
     const start = Date.now()
     const requestType = Object.keys(request)[0] as string
-    const timeoutPromise = new Promise((_r, rej) => (timer = setTimeout(rej, timeout, timeoutError)))
+    const timeoutPromise = new Promise((_r, rej) => (timer = setTimeout(rej, timeout * 1000, timeoutError)))
     this.subject.next({
       dbRequest: {
         ...request,
@@ -38,12 +38,12 @@ export class StoreContext {
 
     return Promise.race([promise, timeoutPromise])
       .then((result) => {
-        console.info('db request', opId, 'type', requestType, ' took', Date.now() - start, 'ms')
+        console.info('db request', requestType, 'op', opId, ' took', Date.now() - start, 'ms')
         return result
       })
       .catch((e) => {
         if (e === timeoutError) {
-          console.error('db request', opId, 'type', requestType, ' timeout')
+          console.error('db request', requestType, 'op:', opId, ' timeout')
           throw new Error('timeout')
         }
       })
