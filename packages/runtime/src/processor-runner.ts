@@ -8,6 +8,7 @@ import commandLineArgs from 'command-line-args'
 import { createServer } from 'nice-grpc'
 import { errorDetailsServerMiddleware } from 'nice-grpc-error-details'
 import { registry as niceGrpcRegistry, prometheusServerMiddleware } from 'nice-grpc-prometheus'
+import { openTelemetryServerMiddleware } from 'nice-grpc-opentelemetry'
 import { register as globalRegistry, Registry } from 'prom-client'
 import http from 'http'
 // @ts-ignore inspector promises is not included in @type/node
@@ -19,6 +20,21 @@ import { Endpoints } from './endpoints.js'
 import { FullProcessorServiceImpl } from './full-service.js'
 import { ChainConfig } from './chain-config.js'
 import { setupLogger } from './logger.js'
+
+import { NodeSDK } from '@opentelemetry/sdk-node'
+import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc'
+import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc'
+import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics'
+
+const sdk = new NodeSDK({
+  traceExporter: new OTLPTraceExporter(),
+  metricReader: new PeriodicExportingMetricReader({
+    exporter: new OTLPMetricExporter()
+  })
+  // instrumentations: [getNodeAutoInstrumentations()],
+})
+
+sdk.start()
 
 const mergedRegistry = Registry.merge([globalRegistry, niceGrpcRegistry])
 
@@ -77,6 +93,7 @@ const server = createServer({
   'grpc.default_compression_algorithm': compressionAlgorithms.gzip
 })
   .use(prometheusServerMiddleware())
+  .use(openTelemetryServerMiddleware())
   .use(errorDetailsServerMiddleware)
 const baseService = new ProcessorServiceImpl(async () => {
   const m = await import(options.target)
