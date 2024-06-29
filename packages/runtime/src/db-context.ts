@@ -2,6 +2,7 @@ import { Subject } from 'rxjs'
 import { DBRequest, DBResponse, DeepPartial, ProcessResult, ProcessStreamResponse } from '@sentio/protos'
 
 type Request = Omit<DBRequest, 'opId'>
+export const timeoutError = Symbol()
 
 export class StoreContext {
   private static opCounter = 0n
@@ -19,10 +20,14 @@ export class StoreContext {
     })
   }
 
-  sendRequest(request: DeepPartial<Request>) {
+  sendRequest(request: DeepPartial<Request>, timeout = 60) {
     const opId = StoreContext.opCounter++
     const promise = this.newPromise(opId)
     console.debug('sending db request ', opId, request)
+    let timer: NodeJS.Timeout
+    const start = Date.now()
+    const requestType = Object.keys(request)[0] as string
+    const timeoutPromise = new Promise((_r, rej) => (timer = setTimeout(rej, timeout, timeoutError)))
     this.subject.next({
       dbRequest: {
         ...request,
@@ -30,7 +35,21 @@ export class StoreContext {
       },
       processId: this.processId
     })
-    return promise
+
+    return Promise.race([promise, timeoutPromise])
+      .then((result) => {
+        console.info('db request', opId, 'type', requestType, ' took', Date.now() - start, 'ms')
+        return result
+      })
+      .catch((e) => {
+        if (e === timeoutError) {
+          console.error('db request', opId, 'type', requestType, ' timeout')
+          throw new Error('timeout')
+        }
+      })
+      .finally(() => {
+        clearTimeout(timer)
+      })
   }
 
   result(dbResult: DBResponse) {

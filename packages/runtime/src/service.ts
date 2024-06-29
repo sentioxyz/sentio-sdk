@@ -188,7 +188,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       if (request.binding) {
         const binding = request.binding
         const dbContext = contexts.new(request.processId, subject)
-
+        const start = Date.now()
         PluginManager.INSTANCE.processBinding(binding, dbContext)
           .then((result) => {
             subject.next({
@@ -202,6 +202,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
             dbContext.error(request.processId, e)
           })
           .finally(() => {
+            console.info('processBinding', request.processId, ' took', Date.now() - start, 'ms')
             contexts.delete(request.processId)
           })
       }
