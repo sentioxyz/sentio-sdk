@@ -20,7 +20,7 @@ export class StoreContext {
     })
   }
 
-  sendRequest(request: DeepPartial<Request>, timeoutSecs?: number) {
+  sendRequest(request: DeepPartial<Request>, timeoutSecs?: number): Promise<DBResponse> {
     const opId = StoreContext.opCounter++
     const promise = this.newPromise(opId)
 
@@ -43,15 +43,15 @@ export class StoreContext {
     })
 
     return Promise.race(promises)
-      .then((result) => {
+      .then((result: DBResponse) => {
         console.info('db request', requestType, 'op', opId, ' took', Date.now() - start, 'ms')
         return result
       })
       .catch((e) => {
         if (e === timeoutError) {
           console.error('db request', requestType, 'op:', opId, ' timeout')
-          throw new Error('timeout')
         }
+        throw e
       })
       .finally(() => {
         clearTimeout(timer)
