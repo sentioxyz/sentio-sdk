@@ -20,14 +20,20 @@ export class StoreContext {
     })
   }
 
-  sendRequest(request: DeepPartial<Request>, timeout = 60) {
+  sendRequest(request: DeepPartial<Request>, timeoutSecs?: number) {
     const opId = StoreContext.opCounter++
     const promise = this.newPromise(opId)
-    console.debug('sending db request ', opId, request)
-    let timer: NodeJS.Timeout
+
     const start = Date.now()
+    const promises = [promise]
+    console.debug('sending db request ', opId, request)
+    if (timeoutSecs) {
+      const timeoutPromise = new Promise((_r, rej) => (timer = setTimeout(rej, timeoutSecs * 1000, timeoutError)))
+      promises.push(timeoutPromise)
+    }
+
+    let timer: NodeJS.Timeout
     const requestType = Object.keys(request)[0] as string
-    const timeoutPromise = new Promise((_r, rej) => (timer = setTimeout(rej, timeout * 1000, timeoutError)))
     this.subject.next({
       dbRequest: {
         ...request,
@@ -36,7 +42,7 @@ export class StoreContext {
       processId: this.processId
     })
 
-    return Promise.race([promise, timeoutPromise])
+    return Promise.race(promises)
       .then((result) => {
         console.info('db request', requestType, 'op', opId, ' took', Date.now() - start, 'ms')
         return result

@@ -107,6 +107,7 @@ export class Store {
       for (const data of response.entityList?.entities || []) {
         yield this.newEntity(entity, data)
       }
+      console.log('list returned ', response.entityList?.entities.length, ' entities, next cursor', response.nextCursor)
       if (!response.nextCursor) {
         break
       }
@@ -138,19 +139,22 @@ export class Store {
     cursor: string | undefined,
     pageSize?: number
   ): Promise<DBResponse> {
-    return (await this.context.sendRequest({
-      list: {
-        entity: getEntityName(entity),
-        cursor,
-        pageSize,
-        filters:
-          filters?.map((f) => ({
-            field: f.field as string,
-            op: ops[f.op],
-            value: { values: Array.isArray(f.value) ? f.value.map((v) => serialize(v)) : [serialize(f.value)] }
-          })) || []
-      }
-    })) as DBResponse
+    return (await this.context.sendRequest(
+      {
+        list: {
+          entity: getEntityName(entity),
+          cursor,
+          pageSize,
+          filters:
+            filters?.map((f) => ({
+              field: f.field as string,
+              op: ops[f.op],
+              value: { values: Array.isArray(f.value) ? f.value.map((v) => serialize(v)) : [serialize(f.value)] }
+            })) || []
+        }
+      },
+      60
+    )) as DBResponse
   }
 
   async list<T extends Entity, P extends keyof T, O extends Operators<T[P]>>(
