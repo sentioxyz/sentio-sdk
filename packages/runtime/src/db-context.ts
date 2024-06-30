@@ -32,7 +32,7 @@ export class StoreContext {
       promises.push(timeoutPromise)
     }
 
-    let timer: NodeJS.Timeout
+    let timer: NodeJS.Timeout | undefined
     const requestType = Object.keys(request)[0] as string
     this.subject.next({
       dbRequest: {
@@ -54,7 +54,9 @@ export class StoreContext {
         throw e
       })
       .finally(() => {
-        clearTimeout(timer)
+        if (timer) {
+          clearTimeout(timer)
+        }
       })
   }
 
