@@ -27,12 +27,12 @@ export class StoreContext {
     const start = Date.now()
     const promises = [promise]
     console.debug('sending db request ', opId, request)
+    let timer: NodeJS.Timeout | undefined
     if (timeoutSecs) {
       const timeoutPromise = new Promise((_r, rej) => (timer = setTimeout(rej, timeoutSecs * 1000, timeoutError)))
       promises.push(timeoutPromise)
     }
 
-    let timer: NodeJS.Timeout | undefined
     const requestType = Object.keys(request)[0] as string
     this.subject.next({
       dbRequest: {
