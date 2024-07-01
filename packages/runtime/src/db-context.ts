@@ -134,7 +134,7 @@ export class StoreContext {
       req.entity = this.queuedUpsert.entity.concat(req.entity)
       req.entityData = this.queuedUpsert.entityData.concat(req.entityData)
       req.id = this.queuedUpsert.id.concat(req.id)
-      req.data = this.queuedUpsert.data.concat(req.data)
+
       return this.queuedUpsertPromise
     } else {
       this.queuedUpsert = req
