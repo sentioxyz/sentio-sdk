@@ -173,14 +173,14 @@ export class StoreContext {
   private async sendUpsertInBatch(req: DBRequest_DBUpsert): Promise<DBResponse> {
     if (this.upsertBatch) {
       // merge the upserts
-      const { request } = this.upsertBatch
+      const { request, promise } = this.upsertBatch
       request.entity = this.upsertBatch.request.entity.concat(req.entity)
       request.entityData = this.upsertBatch.request.entityData.concat(req.entityData)
       request.id = this.upsertBatch.request.id.concat(req.id)
       if (request.entity.length >= STORE_BATCH_SIZE) {
         this.sendBatch()
       }
-      return this.upsertBatch.promise
+      return promise
     } else {
       const opId = StoreContext.opCounter++
       const promise = this.newPromise<DBResponse>(opId, 'upsert')
