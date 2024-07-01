@@ -27,7 +27,7 @@ import { StoreContext } from './db-context.js'
 import { Subject } from 'rxjs'
 import { metrics } from '@opentelemetry/api'
 
-const meter = metrics.getMeter('store')
+const meter = metrics.getMeter('processor_service')
 const process_binding_count = meter.createCounter('process_binding_count')
 const process_binding_time = meter.createCounter('process_binding_time')
 const process_binding_error = meter.createCounter('process_binding_error')

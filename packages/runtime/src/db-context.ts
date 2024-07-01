@@ -16,7 +16,7 @@ const STORE_BATCH_SIZE = process.env['STORE_BATCH_SIZE'] ? parseInt(process.env[
 type Request = Omit<DBRequest, 'opId'>
 type RequestType = keyof Request
 
-const meter = metrics.getMeter('store')
+const meter = metrics.getMeter('processor_store')
 const send_counts: Record<RequestType, Counter<Attributes>> = {
   get: meter.createCounter('store_get_count'),
   upsert: meter.createCounter('store_upsert_count'),
@@ -41,6 +41,9 @@ const request_errors: Record<RequestType, Counter<Attributes>> = {
   list: meter.createCounter('store_list_error'),
   delete: meter.createCounter('store_delete_error')
 }
+
+const batched_total_count = meter.createCounter('batched_total_count')
+const batched_request_count = meter.createCounter('batched_request_count')
 
 const unsolved_requests = meter.createGauge('store_unsolved_requests')
 
@@ -210,6 +213,8 @@ export class StoreContext {
         processId: this.processId
       })
       send_counts['upsert']?.add(1)
+      batched_request_count.add(1)
+      batched_total_count.add(request.entity.length)
     }
   }
 }
