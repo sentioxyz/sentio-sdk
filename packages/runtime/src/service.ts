@@ -184,31 +184,36 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     const contexts = new Contexts()
 
     for await (const request of requests) {
-      console.debug('received request:', request)
-      if (request.binding) {
-        const binding = request.binding
-        const dbContext = contexts.new(request.processId, subject)
-        const start = Date.now()
-        PluginManager.INSTANCE.processBinding(binding, dbContext)
-          .then((result) => {
-            subject.next({
-              result,
-              processId: request.processId
+      try {
+        console.debug('received request:', request)
+        if (request.binding) {
+          const binding = request.binding
+          const dbContext = contexts.new(request.processId, subject)
+          const start = Date.now()
+          PluginManager.INSTANCE.processBinding(binding, dbContext)
+            .then((result) => {
+              subject.next({
+                result,
+                processId: request.processId
+              })
+              recordRuntimeInfo(result, binding.handlerType)
             })
-            recordRuntimeInfo(result, binding.handlerType)
-          })
-          .catch((e) => {
-            console.debug(e)
-            dbContext.error(request.processId, e)
-          })
-          .finally(() => {
-            console.info('processBinding', request.processId, ' took', Date.now() - start, 'ms')
-            contexts.delete(request.processId)
-          })
-      }
-      if (request.dbResult) {
-        const dbContext = contexts.get(request.processId)
-        dbContext?.result(request.dbResult)
+            .catch((e) => {
+              console.debug(e)
+              dbContext.error(request.processId, e)
+            })
+            .finally(() => {
+              console.info('processBinding', request.processId, ' took', Date.now() - start, 'ms')
+              contexts.delete(request.processId)
+            })
+        }
+        if (request.dbResult) {
+          const dbContext = contexts.get(request.processId)
+          dbContext?.result(request.dbResult)
+        }
+      } catch (e) {
+        // should not happen
+        console.error('unexpect error during handle loop', e)
       }
     }
   }
@@ -233,6 +238,7 @@ class Contexts {
 
   new(processId: number, subject: Subject<DeepPartial<ProcessStreamResponse>>) {
     const context = new StoreContext(subject, processId)
+    context.startPrintStats()
     this.contexts.set(processId, context)
     return context
   }

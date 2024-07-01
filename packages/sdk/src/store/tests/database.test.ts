@@ -204,5 +204,6 @@ describe('Test Database', () => {
 
   after(() => {
     // db.stop()
+    storeContext.close()
   })
 })

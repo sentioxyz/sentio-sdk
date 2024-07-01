@@ -7,6 +7,9 @@ import {
   ProcessResult,
   ProcessStreamResponse
 } from '@sentio/protos'
+import * as process from 'node:process'
+
+const STORE_BATCH_IDLE = process.env['STORE_BATCH_IDLE'] ? parseInt(process.env['STORE_BATCH_IDLE']) : 1
 
 type Request = Omit<DBRequest, 'opId'>
 export const timeoutError = Symbol()
@@ -14,23 +17,30 @@ export const timeoutError = Symbol()
 export class StoreContext {
   private static opCounter = 0n
 
-  private defers = new Map<bigint, { resolve: (value: any) => void; reject: (reason?: any) => void }>()
+  private send_counts: Record<string, number> = {}
+  private recv_counts: Record<string, number> = {}
+
+  private defers = new Map<
+    bigint,
+    { resolve: (value: any) => void; reject: (reason?: any) => void; requestType?: string }
+  >()
+  private statsInterval: NodeJS.Timeout | undefined
 
   constructor(
     readonly subject: Subject<DeepPartial<ProcessStreamResponse>>,
     readonly processId: number
   ) {}
 
-  newPromise<T>(opId: bigint) {
+  newPromise<T>(opId: bigint, requestType?: string) {
     return new Promise<T>((resolve, reject) => {
-      this.defers.set(opId, { resolve, reject })
+      this.defers.set(opId, { resolve, reject, requestType })
     })
   }
 
   sendRequest(request: DeepPartial<Request>, timeoutSecs?: number): Promise<DBResponse> {
-    if (request.upsert) {
+    if (STORE_BATCH_IDLE > 0 && request.upsert) {
       // batch upsert if possible
-      return this.sendUpsert(request.upsert as DBRequest_DBUpsert)
+      return this.sendUpsert(request.upsert as DBRequest_DBUpsert, STORE_BATCH_IDLE)
     }
 
     const opId = StoreContext.opCounter++
@@ -53,6 +63,8 @@ export class StoreContext {
       },
       processId: this.processId
     })
+
+    this.send_counts[requestType] = (this.send_counts[requestType] || 0) + 1
 
     return Promise.race(promises)
       .then((result: DBResponse) => {
@@ -77,6 +89,9 @@ export class StoreContext {
     const defer = this.defers.get(opId)
     console.debug('received db result ', opId, dbResult)
     if (defer) {
+      if (defer.requestType) {
+        this.recv_counts[defer.requestType] = (this.recv_counts[defer.requestType] || 0) + 1
+      }
       if (dbResult.error) {
         defer.reject(new Error(dbResult.error))
       } else {
@@ -105,12 +120,15 @@ export class StoreContext {
       defer.reject(new Error('context closed'))
     }
     this.defers.clear()
+    if (this.statsInterval) {
+      clearInterval(this.statsInterval)
+    }
   }
 
   queuedUpsert: DBRequest_DBUpsert | undefined
   queuedUpsertPromise: Promise<DBResponse> | undefined
 
-  private async sendUpsert(req: DBRequest_DBUpsert, batchIdleMs = 1): Promise<DBResponse> {
+  private async sendUpsert(req: DBRequest_DBUpsert, batchIdleMs: number): Promise<DBResponse> {
     if (this.queuedUpsert && this.queuedUpsertPromise) {
       // merge the upserts
       req.entity = this.queuedUpsert.entity.concat(req.entity)
@@ -134,9 +152,17 @@ export class StoreContext {
         },
         processId: this.processId
       })
+      this.send_counts['upsert'] = (this.send_counts['upsert'] || 0) + 1
 
       return promise
     }
+  }
+
+  startPrintStats() {
+    this.statsInterval = setInterval(() => {
+      console.log('send counts', this.send_counts)
+      console.log('recv counts', this.recv_counts)
+    }, 10000)
   }
 }
 
