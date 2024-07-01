@@ -107,7 +107,7 @@ export class Store {
       for (const data of response.entityList?.entities || []) {
         yield this.newEntity(entity, data)
       }
-      console.log(
+      console.debug(
         'list returned ',
         response.entityList?.entities?.length,
         ' entities, next cursor',

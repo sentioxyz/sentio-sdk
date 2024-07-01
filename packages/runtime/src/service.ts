@@ -25,6 +25,13 @@ import { freezeGlobalConfig, GLOBAL_CONFIG } from './global-config.js'
 
 import { StoreContext } from './db-context.js'
 import { Subject } from 'rxjs'
+import { metrics } from '@opentelemetry/api'
+
+const meter = metrics.getMeter('store')
+const process_binding_count = meter.createCounter('process_binding_count')
+const process_binding_time = meter.createCounter('process_binding_time')
+const process_binding_error = meter.createCounter('process_binding_error')
+
 ;(BigInt.prototype as any).toJSON = function () {
   return this.toString()
 }
@@ -187,6 +194,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       try {
         console.debug('received request:', request)
         if (request.binding) {
+          process_binding_count.add(1)
           const binding = request.binding
           const dbContext = contexts.new(request.processId, subject)
           const start = Date.now()
@@ -201,9 +209,12 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
             .catch((e) => {
               console.debug(e)
               dbContext.error(request.processId, e)
+              process_binding_error.add(1)
             })
             .finally(() => {
-              console.info('processBinding', request.processId, ' took', Date.now() - start, 'ms')
+              const cost = Date.now() - start
+              console.debug('processBinding', request.processId, ' took', cost, 'ms')
+              process_binding_time.add(cost)
               contexts.delete(request.processId)
             })
         }
@@ -238,7 +249,6 @@ class Contexts {
 
   new(processId: number, subject: Subject<DeepPartial<ProcessStreamResponse>>) {
     const context = new StoreContext(subject, processId)
-    context.startPrintStats()
     this.contexts.set(processId, context)
     return context
   }

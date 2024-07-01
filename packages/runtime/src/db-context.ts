@@ -8,21 +8,49 @@ import {
   ProcessStreamResponse
 } from '@sentio/protos'
 import * as process from 'node:process'
+import { Attributes, Counter, metrics } from '@opentelemetry/api'
 
-const STORE_BATCH_IDLE = process.env['STORE_BATCH_IDLE'] ? parseInt(process.env['STORE_BATCH_IDLE']) : 10
+const STORE_BATCH_IDLE = process.env['STORE_BATCH_IDLE'] ? parseInt(process.env['STORE_BATCH_IDLE']) : 0
 
 type Request = Omit<DBRequest, 'opId'>
+type RequestType = keyof Request
+
+const meter = metrics.getMeter('store')
+const send_counts: Record<RequestType, Counter<Attributes>> = {
+  get: meter.createCounter('store_get_count'),
+  upsert: meter.createCounter('store_upsert_count'),
+  list: meter.createCounter('store_list_count'),
+  delete: meter.createCounter('store_delete_count')
+}
+const recv_counts: Record<RequestType, Counter<Attributes>> = {
+  get: meter.createCounter('store_get_count'),
+  upsert: meter.createCounter('store_upsert_count'),
+  list: meter.createCounter('store_list_count'),
+  delete: meter.createCounter('store_delete_count')
+}
+const request_times: Record<RequestType, Counter<Attributes>> = {
+  get: meter.createCounter('store_get_time'),
+  upsert: meter.createCounter('store_upsert_time'),
+  list: meter.createCounter('store_list_time'),
+  delete: meter.createCounter('store_delete_time')
+}
+const request_errors: Record<RequestType, Counter<Attributes>> = {
+  get: meter.createCounter('store_get_error'),
+  upsert: meter.createCounter('store_upsert_error'),
+  list: meter.createCounter('store_list_error'),
+  delete: meter.createCounter('store_delete_error')
+}
+
+const unsolved_requests = meter.createGauge('store_unsolved_requests')
+
 export const timeoutError = Symbol()
 
 export class StoreContext {
   private static opCounter = 0n
 
-  private send_counts: Record<string, number> = {}
-  private recv_counts: Record<string, number> = {}
-
   private defers = new Map<
     bigint,
-    { resolve: (value: any) => void; reject: (reason?: any) => void; requestType?: string }
+    { resolve: (value: any) => void; reject: (reason?: any) => void; requestType?: RequestType }
   >()
   private statsInterval: NodeJS.Timeout | undefined
 
@@ -31,9 +59,10 @@ export class StoreContext {
     readonly processId: number
   ) {}
 
-  newPromise<T>(opId: bigint, requestType?: string) {
+  newPromise<T>(opId: bigint, requestType?: RequestType) {
     return new Promise<T>((resolve, reject) => {
       this.defers.set(opId, { resolve, reject, requestType })
+      unsolved_requests.record(this.defers.size, { processId: this.processId })
     })
   }
 
@@ -43,7 +72,7 @@ export class StoreContext {
       return this.sendUpsert(request.upsert as DBRequest_DBUpsert, STORE_BATCH_IDLE)
     }
 
-    const requestType = Object.keys(request)[0] as string
+    const requestType = Object.keys(request)[0] as RequestType
     const opId = StoreContext.opCounter++
     const promise = this.newPromise(opId, requestType)
 
@@ -64,17 +93,19 @@ export class StoreContext {
       processId: this.processId
     })
 
-    this.send_counts[requestType] = (this.send_counts[requestType] || 0) + 1
+    send_counts[requestType]?.add(1)
 
     return Promise.race(promises)
       .then((result: DBResponse) => {
-        console.info('db request', requestType, 'op', opId, ' took', Date.now() - start, 'ms')
+        console.debug('db request', requestType, 'op', opId, ' took', Date.now() - start, 'ms')
+        request_times[requestType]?.add(Date.now() - start)
         return result
       })
       .catch((e) => {
         if (e === timeoutError) {
           console.error('db request', requestType, 'op:', opId, ' timeout')
         }
+        request_errors[requestType]?.add(1)
         throw e
       })
       .finally(() => {
@@ -90,7 +121,7 @@ export class StoreContext {
     console.debug('received db result ', opId, dbResult)
     if (defer) {
       if (defer.requestType) {
-        this.recv_counts[defer.requestType] = (this.recv_counts[defer.requestType] || 0) + 1
+        recv_counts[defer.requestType]?.add(1)
       }
       if (dbResult.error) {
         defer.reject(new Error(dbResult.error))
@@ -99,6 +130,7 @@ export class StoreContext {
       }
       this.defers.delete(opId)
     }
+    unsolved_requests.record(this.defers.size, { processId: this.processId })
   }
 
   error(processId: number, e: any) {
@@ -144,7 +176,7 @@ export class StoreContext {
       await delay(batchIdleMs)
       this.queuedUpsertPromise = undefined
       this.queuedUpsert = undefined
-      console.log('sending upsert', opId, 'batch size', req.entity.length)
+      console.debug('sending upsert', opId, 'batch size', req.entity.length)
       this.subject.next({
         dbRequest: {
           upsert: req,
@@ -152,17 +184,10 @@ export class StoreContext {
         },
         processId: this.processId
       })
-      this.send_counts['upsert'] = (this.send_counts['upsert'] || 0) + 1
+      send_counts['upsert']?.add(1)
 
       return promise
     }
-  }
-
-  startPrintStats() {
-    this.statsInterval = setInterval(() => {
-      console.log('send counts', this.send_counts)
-      console.log('recv counts', this.recv_counts)
-    }, 10000)
   }
 }
 
