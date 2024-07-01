@@ -10,7 +10,8 @@ import {
 import * as process from 'node:process'
 import { Attributes, Counter, metrics } from '@opentelemetry/api'
 
-const STORE_BATCH_IDLE = process.env['STORE_BATCH_IDLE'] ? parseInt(process.env['STORE_BATCH_IDLE']) : 0
+const STORE_BATCH_IDLE = process.env['STORE_BATCH_MAX_IDLE'] ? parseInt(process.env['STORE_BATCH_MAX_IDLE']) : 1
+const STORE_BATCH_SIZE = process.env['STORE_BATCH_SIZE'] ? parseInt(process.env['STORE_BATCH_SIZE']) : 10
 
 type Request = Omit<DBRequest, 'opId'>
 type RequestType = keyof Request
@@ -67,9 +68,9 @@ export class StoreContext {
   }
 
   sendRequest(request: DeepPartial<Request>, timeoutSecs?: number): Promise<DBResponse> {
-    if (STORE_BATCH_IDLE > 0 && request.upsert) {
+    if (STORE_BATCH_IDLE > 0 && STORE_BATCH_SIZE > 1 && request.upsert) {
       // batch upsert if possible
-      return this.sendUpsert(request.upsert as DBRequest_DBUpsert, STORE_BATCH_IDLE)
+      return this.sendUpsertInBatch(request.upsert as DBRequest_DBUpsert)
     }
 
     const requestType = Object.keys(request)[0] as RequestType
@@ -157,40 +158,58 @@ export class StoreContext {
     }
   }
 
-  queuedUpsert: DBRequest_DBUpsert | undefined
-  queuedUpsertPromise: Promise<DBResponse> | undefined
+  upsertBatch:
+    | {
+        opId: bigint
+        request: DBRequest_DBUpsert
+        promise: Promise<DBResponse>
+        timer: NodeJS.Timeout
+      }
+    | undefined = undefined
 
-  private async sendUpsert(req: DBRequest_DBUpsert, batchIdleMs: number): Promise<DBResponse> {
-    if (this.queuedUpsert && this.queuedUpsertPromise) {
+  private async sendUpsertInBatch(req: DBRequest_DBUpsert): Promise<DBResponse> {
+    if (this.upsertBatch) {
       // merge the upserts
-      req.entity = this.queuedUpsert.entity.concat(req.entity)
-      req.entityData = this.queuedUpsert.entityData.concat(req.entityData)
-      req.id = this.queuedUpsert.id.concat(req.id)
-
-      return this.queuedUpsertPromise
+      const { request } = this.upsertBatch
+      request.entity = this.upsertBatch.request.entity.concat(req.entity)
+      request.entityData = this.upsertBatch.request.entityData.concat(req.entityData)
+      request.id = this.upsertBatch.request.id.concat(req.id)
+      if (request.entity.length >= STORE_BATCH_SIZE) {
+        this.sendBatch()
+      }
+      return this.upsertBatch.promise
     } else {
-      this.queuedUpsert = req
       const opId = StoreContext.opCounter++
       const promise = this.newPromise<DBResponse>(opId, 'upsert')
-      this.queuedUpsertPromise = promise
-      await delay(batchIdleMs)
-      this.queuedUpsertPromise = undefined
-      this.queuedUpsert = undefined
-      console.debug('sending upsert', opId, 'batch size', req.entity.length)
+      const timeout = setTimeout(() => {
+        this.sendBatch()
+      }, STORE_BATCH_IDLE)
+
+      this.upsertBatch = {
+        opId,
+        request: req,
+        promise,
+        timer: timeout
+      }
+
+      return promise
+    }
+  }
+
+  private sendBatch() {
+    if (this.upsertBatch) {
+      const { request, opId, timer } = this.upsertBatch
+      console.debug('sending batch upsert', opId, 'batch size', request?.entity.length)
+      clearTimeout(timer)
+      this.upsertBatch = undefined
       this.subject.next({
         dbRequest: {
-          upsert: req,
+          upsert: request,
           opId
         },
         processId: this.processId
       })
       send_counts['upsert']?.add(1)
-
-      return promise
     }
   }
-}
-
-function delay(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
 }

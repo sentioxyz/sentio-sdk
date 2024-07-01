@@ -66,8 +66,15 @@ Error.stackTraceLimit = 20
 const fullPath = path.resolve(options['chains-config'])
 const chainsConfig = fs.readJsonSync(fullPath)
 
-Endpoints.INSTANCE.concurrency = options.concurrency
-Endpoints.INSTANCE.batchCount = options['batch-count']
+const concurrencyOverride = process.env['OVERRIDE_CONCURRENCY']
+  ? parseInt(process.env['OVERRIDE_CONCURRENCY'])
+  : undefined
+const batchCountOverride = process.env['OVERRIDE_BATCH_COUNT']
+  ? parseInt(process.env['OVERRIDE_BATCH_COUNT'])
+  : undefined
+
+Endpoints.INSTANCE.concurrency = concurrencyOverride ?? options.concurrency
+Endpoints.INSTANCE.batchCount = batchCountOverride ?? options['batch-count']
 Endpoints.INSTANCE.chainQueryAPI = options['chainquery-server']
 Endpoints.INSTANCE.priceFeedAPI = options['pricefeed-server']
 
