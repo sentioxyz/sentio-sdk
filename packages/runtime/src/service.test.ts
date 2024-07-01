@@ -1,3 +1,4 @@
+import { before, describe, test } from 'node:test'
 import { ProcessorServiceImpl } from './service.js'
 import { FullProcessorServiceImpl } from './full-service.js'
 import { CallContext } from 'nice-grpc-common'
@@ -25,7 +26,7 @@ describe('Test Service Compatibility', () => {
   })
   const service = new FullProcessorServiceImpl(baseService)
 
-  beforeAll(async () => {
+  before(async () => {
     await service.start({ templateInstances: [] }, TEST_CONTEXT)
   })
 
@@ -35,12 +36,12 @@ describe('Test Service Compatibility', () => {
         raw: new Uint8Array(),
         ethBlock: {
           block: {
-            number: '0x1',
-          },
-        },
+            number: '0x1'
+          }
+        }
       },
       handlerType: HandlerType.UNKNOWN,
-      handlerIds: [0],
+      handlerIds: [0]
     }
 
     await service.processBindings({ bindings: [binding1] }, TEST_CONTEXT)

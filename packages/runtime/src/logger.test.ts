@@ -1,3 +1,4 @@
+import { describe, test } from 'node:test'
 import { setupLogger } from './logger.js'
 
 describe('Test logger', () => {

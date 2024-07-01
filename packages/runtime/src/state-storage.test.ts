@@ -1,3 +1,4 @@
+import { describe, test } from 'node:test'
 import { assert } from 'chai'
 import { State, MapStateStorage } from './state.js'
 

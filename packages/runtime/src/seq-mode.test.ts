@@ -1,3 +1,4 @@
+import { before, describe, test } from 'node:test'
 import { ProcessorServiceImpl } from './service.js'
 import { FullProcessorServiceImpl } from './full-service.js'
 import { CallContext } from 'nice-grpc-common'
@@ -24,7 +25,7 @@ describe('Test seq mode', () => {
   })
   const service = new FullProcessorServiceImpl(baseService)
 
-  beforeAll(async () => {
+  before(async () => {
     GLOBAL_CONFIG.execution.sequential = true
 
     await service.start({ templateInstances: [] }, TEST_CONTEXT)
