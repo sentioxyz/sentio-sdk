@@ -1,4 +1,4 @@
-import { BaseContract, DeferredTopicFilter, TransactionResponseParams } from 'ethers'
+import { BaseContract, DeferredTopicFilter, LogDescription, TransactionResponseParams } from 'ethers'
 
 import { BoundContractView, ContractContext, ContractView, GlobalContext } from './context.js'
 import {
@@ -351,14 +351,9 @@ export abstract class BaseProcessor<
         )
         const logParam = log as any as { topics: Array<string>; data: string }
 
+        let parsed: LogDescription | null = null
         try {
-          const parsed = contractView.rawContract.interface.parseLog(logParam)
-
-          if (parsed) {
-            const event: TypedEvent = { ...log, name: parsed.name, args: fixEmptyKey(parsed) }
-            await handler(event, ctx)
-            return ctx.stopAndGetResult()
-          }
+          parsed = contractView.rawContract.interface.parseLog(logParam)
         } catch (e) {
           // RangeError data out-of-bounds
           if (e instanceof Error) {
@@ -368,6 +363,11 @@ export abstract class BaseProcessor<
             }
           }
           throw e
+        }
+        if (parsed) {
+          const event: TypedEvent = { ...log, name: parsed.name, args: fixEmptyKey(parsed) }
+          await handler(event, ctx)
+          return ctx.stopAndGetResult()
         }
         return ProcessResult.fromPartial({})
       }
