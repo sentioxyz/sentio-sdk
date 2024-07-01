@@ -1,5 +1,12 @@
 import { Subject } from 'rxjs'
-import { DBRequest, DBResponse, DeepPartial, ProcessResult, ProcessStreamResponse } from '@sentio/protos'
+import {
+  DBRequest,
+  DBRequest_DBUpsert,
+  DBResponse,
+  DeepPartial,
+  ProcessResult,
+  ProcessStreamResponse
+} from '@sentio/protos'
 
 type Request = Omit<DBRequest, 'opId'>
 export const timeoutError = Symbol()
@@ -21,6 +28,11 @@ export class StoreContext {
   }
 
   sendRequest(request: DeepPartial<Request>, timeoutSecs?: number): Promise<DBResponse> {
+    if (request.upsert) {
+      // batch upsert if possible
+      return this.sendUpsert(request.upsert as DBRequest_DBUpsert)
+    }
+
     const opId = StoreContext.opCounter++
     const promise = this.newPromise(opId)
 
@@ -94,4 +106,40 @@ export class StoreContext {
     }
     this.defers.clear()
   }
+
+  queuedUpsert: DBRequest_DBUpsert | undefined
+  queuedUpsertPromise: Promise<DBResponse> | undefined
+
+  private async sendUpsert(req: DBRequest_DBUpsert, batchIdleMs = 1): Promise<DBResponse> {
+    if (this.queuedUpsert && this.queuedUpsertPromise) {
+      // merge the upserts
+      req.entity = this.queuedUpsert.entity.concat(req.entity)
+      req.entityData = this.queuedUpsert.entityData.concat(req.entityData)
+      req.id = this.queuedUpsert.id.concat(req.id)
+      req.data = this.queuedUpsert.data.concat(req.data)
+      return this.queuedUpsertPromise
+    } else {
+      this.queuedUpsert = req
+      const opId = StoreContext.opCounter++
+      const promise = this.newPromise<DBResponse>(opId)
+      this.queuedUpsertPromise = promise
+      await delay(batchIdleMs)
+      this.queuedUpsertPromise = undefined
+      this.queuedUpsert = undefined
+      console.log('sending upsert', opId, 'batch size', req.entity.length)
+      this.subject.next({
+        dbRequest: {
+          upsert: req,
+          opId
+        },
+        processId: this.processId
+      })
+
+      return promise
+    }
+  }
+}
+
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }
