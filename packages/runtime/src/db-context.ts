@@ -9,7 +9,7 @@ import {
 } from '@sentio/protos'
 import * as process from 'node:process'
 
-const STORE_BATCH_IDLE = process.env['STORE_BATCH_IDLE'] ? parseInt(process.env['STORE_BATCH_IDLE']) : 1
+const STORE_BATCH_IDLE = process.env['STORE_BATCH_IDLE'] ? parseInt(process.env['STORE_BATCH_IDLE']) : 10
 
 type Request = Omit<DBRequest, 'opId'>
 export const timeoutError = Symbol()
@@ -43,8 +43,9 @@ export class StoreContext {
       return this.sendUpsert(request.upsert as DBRequest_DBUpsert, STORE_BATCH_IDLE)
     }
 
+    const requestType = Object.keys(request)[0] as string
     const opId = StoreContext.opCounter++
-    const promise = this.newPromise(opId)
+    const promise = this.newPromise(opId, requestType)
 
     const start = Date.now()
     const promises = [promise]
@@ -55,7 +56,6 @@ export class StoreContext {
       promises.push(timeoutPromise)
     }
 
-    const requestType = Object.keys(request)[0] as string
     this.subject.next({
       dbRequest: {
         ...request,
@@ -139,7 +139,7 @@ export class StoreContext {
     } else {
       this.queuedUpsert = req
       const opId = StoreContext.opCounter++
-      const promise = this.newPromise<DBResponse>(opId)
+      const promise = this.newPromise<DBResponse>(opId, 'upsert')
       this.queuedUpsertPromise = promise
       await delay(batchIdleMs)
       this.queuedUpsertPromise = undefined
