@@ -4,8 +4,16 @@ import PQueue from 'p-queue'
 import { Endpoints } from '@sentio/runtime'
 import { EthChainId } from '@sentio/chain'
 import { LRUCache } from 'lru-cache'
+import { metrics } from '@opentelemetry/api'
 
 export const DummyProvider = new JsonRpcProvider('', Network.from(1))
+
+const meter = metrics.getMeter('processor_provider')
+const hit_count = meter.createCounter('provider_hit_count')
+const miss_count = meter.createCounter('provider_miss_count')
+const queue_size = meter.createGauge('provider_queue_size')
+const total_duration = meter.createCounter('provider_total_duration')
+const total_queued = meter.createCounter('provider_total_queued')
 
 const providers = new Map<string, JsonRpcProvider>()
 
@@ -97,10 +105,6 @@ class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
     // return 1024
     // }
   })
-  hits = 0
-  misses = 0
-  totalDuration = 0
-  totalQueued = 0
 
   constructor(url: string, network: Network, concurrency: number, batchCount = 1) {
     // TODO re-enable match when possible
@@ -116,13 +120,14 @@ class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
     const block = params[params.length - 1]
     let perform = this.#performCache.get(tag)
     if (!perform) {
-      this.misses++
+      miss_count.add(1)
       const queued: number = Date.now()
       perform = this.executor.add(() => {
         const started = Date.now()
-        this.totalQueued += started - queued
+        total_queued.add(started - queued)
+
         return super.send(method, params).finally(() => {
-          this.totalDuration += Date.now() - started
+          total_duration.add(Date.now() - started)
         })
       })
       perform.catch((e) => {
@@ -134,6 +139,8 @@ class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
         }, 1000)
       })
 
+      queue_size.record(this.executor.size)
+
       this.#performCache.set(tag, perform)
       // For non latest block call, we cache permanently, otherwise we cache for one minute
       if (block === 'latest') {
@@ -144,7 +151,7 @@ class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
         }, 60 * 1000)
       }
     } else {
-      this.hits++
+      hit_count.add(1)
     }
 
     const result = await perform
@@ -152,16 +159,5 @@ class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
       throw Error('Unexpected null response')
     }
     return result
-  }
-
-  stats() {
-    const count = this.hits + this.misses
-    return {
-      queueSize: this.executor.size,
-      hits: this.hits,
-      misses: this.misses,
-      avgDuration: count == 0 ? 0 : this.totalDuration / count,
-      avgQueued: count == 0 ? 0 : this.totalQueued / count
-    }
   }
 }
