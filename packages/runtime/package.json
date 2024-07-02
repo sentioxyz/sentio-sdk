@@ -15,8 +15,9 @@
     "!{lib,src}/tests"
   ],
   "scripts": {
-    "build": "pnpm compile",
+    "build": "pnpm bundle",
     "build:all": "pnpm --filter=$(node -p \"require('./package.json').name\")... build",
+    "bundle": "tsup --config src/tsup.config.ts",
     "compile": "tsc",
     "run": "tsx src/processor-runner.ts --log-format=json",
     "run-benchmark": "tsx src/decode-benchmark.ts",
