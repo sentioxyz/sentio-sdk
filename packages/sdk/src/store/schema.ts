@@ -6,7 +6,7 @@ const customScalars = ['BigInt', 'BigDecimal', 'Timestamp', 'JSON', 'Bytes', 'ID
 
 const baseSchema = buildASTSchema(
   parse(`
-    directive @entity on OBJECT
+    directive @entity(immutable: Boolean! = false, sparse: Boolean! = false) on OBJECT
     directive @query on INTERFACE
     directive @derivedFrom(field: String!) on FIELD_DEFINITION
     directive @unique on FIELD_DEFINITION

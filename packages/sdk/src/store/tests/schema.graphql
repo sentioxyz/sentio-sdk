@@ -32,7 +32,7 @@ type User implements Owner @entity {
   organizations: [Organization!]! @derivedFrom(field: "members")
 }
 
-type Organization implements Owner @entity {
+type Organization implements Owner @entity(sparse: true) {
   id: ID!
   name: String!
   members: [User!]!
