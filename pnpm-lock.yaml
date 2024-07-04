@@ -6,7 +6,7 @@ settings:
 
 overrides:
   '@grpc/grpc-js': ^1.9.14
-  ethers: npm:@sentio/ethers@6.12.2
+  ethers: npm:@sentio/ethers@6.13.1
   rpc-websockets: 7.11.0
   superstruct: ^1.0.3
 
@@ -459,7 +459,7 @@ importers:
         version: 1.1.5
       '@sentio/ethers-v6':
         specifier: ^1.0.29
-        version: 1.0.29(@sentio/ethers@6.12.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typescript@5.5.2)
+        version: 1.0.29(@sentio/ethers@6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typescript@5.5.2)
       '@sentio/protos':
         specifier: workspace:*
         version: link:../protos
@@ -488,8 +488,8 @@ importers:
         specifier: ^5.5.3
         version: 5.5.6
       ethers:
-        specifier: npm:@sentio/ethers@6.12.2
-        version: '@sentio/ethers@6.12.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)'
+        specifier: npm:@sentio/ethers@6.13.1
+        version: '@sentio/ethers@6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)'
       fuels:
         specifier: ^0.90.0
         version: 0.90.0(encoding@0.1.13)
@@ -1861,11 +1861,11 @@ packages:
   '@sentio/ethers-v6@1.0.29':
     resolution: {integrity: sha512-/4jZZn+eM3EfI0bUMBAf5vu8muy8ABptu8ucFoMDTZLLTjxcSKRffLP3RL7w1JHGjyC2V6oEQfwS4cn9JEohHQ==}
     peerDependencies:
-      ethers: npm:@sentio/ethers@6.12.2
+      ethers: npm:@sentio/ethers@6.13.1
       typescript: '>=4.3.0'
 
-  '@sentio/ethers@6.12.2':
-    resolution: {integrity: sha512-yCUtB4nNVT4XZ8uUfMtw+fBMw6iqt4RBlVMX8e4Lay6NntXgF/H6q7uYx9Lltny+n6muQKBEzFak+d48QBEZ0g==}
+  '@sentio/ethers@6.13.1':
+    resolution: {integrity: sha512-l43gBZxML3G68W/Y3ByfUoYIul3aAK/y0L1HLpIuZEYpU7Suwe+mtfq7GyX8gTlaDN4j3GGU98iYMl44SlxOaA==}
     engines: {node: '>=14.0.0'}
 
   '@sentio/graph-cli@0.75.0':
@@ -6644,18 +6644,6 @@ packages:
       utf-8-validate:
         optional: true
 
-  ws@8.5.0:
-    resolution: {integrity: sha512-BWX0SWVgLPzYwF8lTzEy1egjhS4S4OEAHfsO8o65WOVsrnSRGaSiUaa9e0ggGlkMTtBlmOpEXiie9RUcBO86qg==}
-    engines: {node: '>=10.0.0'}
-    peerDependencies:
-      bufferutil: ^4.0.1
-      utf-8-validate: ^5.0.2
-    peerDependenciesMeta:
-      bufferutil:
-        optional: true
-      utf-8-validate:
-        optional: true
-
   xstream@11.14.0:
     resolution: {integrity: sha512-1bLb+kKKtKPbgTK6i/BaoAn03g47PpFstlbe1BA+y3pNS/LfvcaghS5BFf9+EE1J+KwSQsEpfJvFN5GqFtiNmw==}
 
@@ -7827,7 +7815,7 @@ snapshots:
       cosmjs-types: 0.7.2
       eth-crypto: 2.6.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       ethereumjs-util: 7.1.5
-      ethers: '@sentio/ethers@6.12.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)'
+      ethers: '@sentio/ethers@6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)'
       google-protobuf: 3.21.2
       graphql: 16.9.0
       http-status-codes: 2.3.0
@@ -8577,14 +8565,14 @@ snapshots:
 
   '@sentio/chain@1.1.5': {}
 
-  '@sentio/ethers-v6@1.0.29(@sentio/ethers@6.12.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typescript@5.5.2)':
+  '@sentio/ethers-v6@1.0.29(@sentio/ethers@6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typescript@5.5.2)':
     dependencies:
-      ethers: '@sentio/ethers@6.12.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)'
+      ethers: '@sentio/ethers@6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)'
       lodash: 4.17.21
       ts-essentials: 7.0.3(typescript@5.5.2)
       typescript: 5.5.2
 
-  '@sentio/ethers@6.12.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@sentio/ethers@6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
       '@adraffy/ens-normalize': 1.10.1
       '@noble/curves': 1.2.0
@@ -8592,7 +8580,7 @@ snapshots:
       '@types/node': 18.15.13
       aes-js: 4.0.0-beta.5
       tslib: 2.4.0
-      ws: 8.5.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      ws: 8.17.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -10721,7 +10709,7 @@ snapshots:
       '@types/bn.js': 5.1.1
       eccrypto: 1.1.6
       ethereumjs-util: 7.1.5
-      ethers: '@sentio/ethers@6.12.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)'
+      ethers: '@sentio/ethers@6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)'
       secp256k1: 5.0.0
     transitivePeerDependencies:
       - bufferutil
@@ -14185,11 +14173,6 @@ snapshots:
       utf-8-validate: 5.0.10
 
   ws@8.17.1(bufferutil@4.0.8)(utf-8-validate@5.0.10):
-    optionalDependencies:
-      bufferutil: 4.0.8
-      utf-8-validate: 5.0.10
-
-  ws@8.5.0(bufferutil@4.0.8)(utf-8-validate@5.0.10):
     optionalDependencies:
       bufferutil: 4.0.8
       utf-8-validate: 5.0.10
