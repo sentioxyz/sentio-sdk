@@ -1,4 +1,12 @@
-import { DataBinding, HandlerType, ProcessConfigResponse, ProcessResult, StartRequest } from '@sentio/protos'
+import {
+  DataBinding,
+  HandlerType,
+  PreparedData,
+  PreprocessResult,
+  ProcessConfigResponse,
+  ProcessResult,
+  StartRequest
+} from '@sentio/protos'
 import { StoreContext } from './db-context.js'
 import { AsyncLocalStorage } from 'node:async_hooks'
 
@@ -16,8 +24,12 @@ export abstract class Plugin {
     return false
   }
 
-  async processBinding(request: DataBinding): Promise<ProcessResult> {
+  async processBinding(request: DataBinding, preparedData: PreparedData | undefined): Promise<ProcessResult> {
     return ProcessResult.create()
+  }
+
+  async preprocessBinding(request: DataBinding): Promise<PreprocessResult> {
+    return PreprocessResult.create()
   }
 }
 
@@ -58,13 +70,27 @@ export class PluginManager {
     return this.plugins.some((plugin) => plugin.stateDiff(config))
   }
 
-  processBinding(request: DataBinding, dbContext?: StoreContext): Promise<ProcessResult> {
+  processBinding(
+    request: DataBinding,
+    preparedData: PreparedData | undefined,
+    dbContext?: StoreContext
+  ): Promise<ProcessResult> {
     const plugin = this.typesToPlugin.get(request.handlerType)
     if (!plugin) {
       throw new Error(`No plugin for ${request.handlerType}`)
     }
     return this.dbContextLocalStorage.run(dbContext, () => {
-      return plugin.processBinding(request)
+      return plugin.processBinding(request, preparedData)
+    })
+  }
+
+  preprocessBinding(request: DataBinding, dbContext?: StoreContext): Promise<PreprocessResult> {
+    const plugin = this.typesToPlugin.get(request.handlerType)
+    if (!plugin) {
+      throw new Error(`No plugin for ${request.handlerType}`)
+    }
+    return this.dbContextLocalStorage.run(dbContext, () => {
+      return plugin.preprocessBinding(request)
     })
   }
 }

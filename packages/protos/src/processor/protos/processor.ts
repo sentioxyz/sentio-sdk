@@ -3,7 +3,7 @@ import Long from "long";
 import type { CallContext, CallOptions } from "nice-grpc-common";
 import _m0 from "protobufjs/minimal.js";
 import { Empty } from "../../google/protobuf/empty.js";
-import { ListValue, Struct } from "../../google/protobuf/struct.js";
+import { ListValue, Struct, Value } from "../../google/protobuf/struct.js";
 import { Timestamp } from "../../google/protobuf/timestamp.js";
 import { BigInteger, CoinID, RichStruct, RichStructList, RichValueList } from "../../service/common/protos/common.js";
 
@@ -1018,6 +1018,27 @@ export interface ProcessResult {
   events: EventTrackingResult[];
   exports: ExportResult[];
   states: StateResult | undefined;
+}
+
+export interface EthCallParam {
+  chainId: string;
+  address: string;
+  function: string;
+  signature: string;
+  args: any[];
+}
+
+export interface PreprocessResult {
+  ethCallParams: EthCallParam[];
+}
+
+export interface PreparedData {
+  ethCallResults: { [key: string]: Array<any> | undefined };
+}
+
+export interface PreparedData_EthCallResultsEntry {
+  key: string;
+  value: Array<any> | undefined;
 }
 
 export interface RecordMetaData {
@@ -8695,6 +8716,345 @@ export const ProcessResult = {
     message.states = (object.states !== undefined && object.states !== null)
       ? StateResult.fromPartial(object.states)
       : undefined;
+    return message;
+  },
+};
+
+function createBaseEthCallParam(): EthCallParam {
+  return { chainId: "", address: "", function: "", signature: "", args: [] };
+}
+
+export const EthCallParam = {
+  encode(message: EthCallParam, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.chainId !== "") {
+      writer.uint32(10).string(message.chainId);
+    }
+    if (message.address !== "") {
+      writer.uint32(18).string(message.address);
+    }
+    if (message.function !== "") {
+      writer.uint32(26).string(message.function);
+    }
+    if (message.signature !== "") {
+      writer.uint32(34).string(message.signature);
+    }
+    for (const v of message.args) {
+      Value.encode(Value.wrap(v!), writer.uint32(42).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): EthCallParam {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseEthCallParam();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.chainId = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.address = reader.string();
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.function = reader.string();
+          continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.signature = reader.string();
+          continue;
+        case 5:
+          if (tag !== 42) {
+            break;
+          }
+
+          message.args.push(Value.unwrap(Value.decode(reader, reader.uint32())));
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): EthCallParam {
+    return {
+      chainId: isSet(object.chainId) ? globalThis.String(object.chainId) : "",
+      address: isSet(object.address) ? globalThis.String(object.address) : "",
+      function: isSet(object.function) ? globalThis.String(object.function) : "",
+      signature: isSet(object.signature) ? globalThis.String(object.signature) : "",
+      args: globalThis.Array.isArray(object?.args) ? [...object.args] : [],
+    };
+  },
+
+  toJSON(message: EthCallParam): unknown {
+    const obj: any = {};
+    if (message.chainId !== "") {
+      obj.chainId = message.chainId;
+    }
+    if (message.address !== "") {
+      obj.address = message.address;
+    }
+    if (message.function !== "") {
+      obj.function = message.function;
+    }
+    if (message.signature !== "") {
+      obj.signature = message.signature;
+    }
+    if (message.args?.length) {
+      obj.args = message.args;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<EthCallParam>): EthCallParam {
+    return EthCallParam.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<EthCallParam>): EthCallParam {
+    const message = createBaseEthCallParam();
+    message.chainId = object.chainId ?? "";
+    message.address = object.address ?? "";
+    message.function = object.function ?? "";
+    message.signature = object.signature ?? "";
+    message.args = object.args?.map((e) => e) || [];
+    return message;
+  },
+};
+
+function createBasePreprocessResult(): PreprocessResult {
+  return { ethCallParams: [] };
+}
+
+export const PreprocessResult = {
+  encode(message: PreprocessResult, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.ethCallParams) {
+      EthCallParam.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): PreprocessResult {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasePreprocessResult();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.ethCallParams.push(EthCallParam.decode(reader, reader.uint32()));
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): PreprocessResult {
+    return {
+      ethCallParams: globalThis.Array.isArray(object?.ethCallParams)
+        ? object.ethCallParams.map((e: any) => EthCallParam.fromJSON(e))
+        : [],
+    };
+  },
+
+  toJSON(message: PreprocessResult): unknown {
+    const obj: any = {};
+    if (message.ethCallParams?.length) {
+      obj.ethCallParams = message.ethCallParams.map((e) => EthCallParam.toJSON(e));
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<PreprocessResult>): PreprocessResult {
+    return PreprocessResult.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<PreprocessResult>): PreprocessResult {
+    const message = createBasePreprocessResult();
+    message.ethCallParams = object.ethCallParams?.map((e) => EthCallParam.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBasePreparedData(): PreparedData {
+  return { ethCallResults: {} };
+}
+
+export const PreparedData = {
+  encode(message: PreparedData, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    Object.entries(message.ethCallResults).forEach(([key, value]) => {
+      if (value !== undefined) {
+        PreparedData_EthCallResultsEntry.encode({ key: key as any, value }, writer.uint32(10).fork()).ldelim();
+      }
+    });
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): PreparedData {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasePreparedData();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          const entry1 = PreparedData_EthCallResultsEntry.decode(reader, reader.uint32());
+          if (entry1.value !== undefined) {
+            message.ethCallResults[entry1.key] = entry1.value;
+          }
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): PreparedData {
+    return {
+      ethCallResults: isObject(object.ethCallResults)
+        ? Object.entries(object.ethCallResults).reduce<{ [key: string]: Array<any> | undefined }>(
+          (acc, [key, value]) => {
+            acc[key] = value as Array<any> | undefined;
+            return acc;
+          },
+          {},
+        )
+        : {},
+    };
+  },
+
+  toJSON(message: PreparedData): unknown {
+    const obj: any = {};
+    if (message.ethCallResults) {
+      const entries = Object.entries(message.ethCallResults);
+      if (entries.length > 0) {
+        obj.ethCallResults = {};
+        entries.forEach(([k, v]) => {
+          obj.ethCallResults[k] = v;
+        });
+      }
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<PreparedData>): PreparedData {
+    return PreparedData.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<PreparedData>): PreparedData {
+    const message = createBasePreparedData();
+    message.ethCallResults = Object.entries(object.ethCallResults ?? {}).reduce<
+      { [key: string]: Array<any> | undefined }
+    >((acc, [key, value]) => {
+      if (value !== undefined) {
+        acc[key] = value;
+      }
+      return acc;
+    }, {});
+    return message;
+  },
+};
+
+function createBasePreparedData_EthCallResultsEntry(): PreparedData_EthCallResultsEntry {
+  return { key: "", value: undefined };
+}
+
+export const PreparedData_EthCallResultsEntry = {
+  encode(message: PreparedData_EthCallResultsEntry, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.key !== "") {
+      writer.uint32(10).string(message.key);
+    }
+    if (message.value !== undefined) {
+      ListValue.encode(ListValue.wrap(message.value), writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): PreparedData_EthCallResultsEntry {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasePreparedData_EthCallResultsEntry();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.key = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.value = ListValue.unwrap(ListValue.decode(reader, reader.uint32()));
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): PreparedData_EthCallResultsEntry {
+    return {
+      key: isSet(object.key) ? globalThis.String(object.key) : "",
+      value: globalThis.Array.isArray(object.value) ? [...object.value] : undefined,
+    };
+  },
+
+  toJSON(message: PreparedData_EthCallResultsEntry): unknown {
+    const obj: any = {};
+    if (message.key !== "") {
+      obj.key = message.key;
+    }
+    if (message.value !== undefined) {
+      obj.value = message.value;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<PreparedData_EthCallResultsEntry>): PreparedData_EthCallResultsEntry {
+    return PreparedData_EthCallResultsEntry.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<PreparedData_EthCallResultsEntry>): PreparedData_EthCallResultsEntry {
+    const message = createBasePreparedData_EthCallResultsEntry();
+    message.key = object.key ?? "";
+    message.value = object.value ?? undefined;
     return message;
   },
 };

@@ -1,7 +1,7 @@
 import { BaseContract } from 'ethers'
 import { LogParams, BlockParams, TransactionReceiptParams, TransactionResponseParams } from 'ethers/providers'
 
-import { RecordMetaData } from '@sentio/protos'
+import { PreparedData, RecordMetaData } from '@sentio/protos'
 import { Trace } from './eth.js'
 import { Labels, normalizeLabels } from '../core/index.js'
 import { BaseContext } from '../core/base-context.js'
@@ -18,6 +18,7 @@ export abstract class EthContext extends BaseContext {
   readonly transaction?: TransactionResponseParams
   readonly transactionReceipt?: TransactionReceiptParams
   readonly timestamp: Date
+  readonly preparedData?: PreparedData
 
   constructor(
     chainId: EthChainId,
@@ -28,7 +29,8 @@ export abstract class EthContext extends BaseContext {
     trace?: Trace,
     transaction?: TransactionResponseParams,
     transactionReceipt?: TransactionReceiptParams,
-    baseLabels?: Labels
+    baseLabels?: Labels,
+    preparedData?: PreparedData
   ) {
     super(baseLabels)
     this.chainId = chainId
@@ -39,6 +41,7 @@ export abstract class EthContext extends BaseContext {
     this.transaction = transaction
     this.transactionReceipt = transactionReceipt
     this.timestamp = timestamp || new Date(0)
+    this.preparedData = preparedData
     if (log) {
       this.blockNumber = log.blockNumber
       this.transactionHash = log.transactionHash
@@ -132,9 +135,10 @@ export class GlobalContext extends EthContext {
     trace?: Trace,
     transaction?: TransactionResponseParams,
     transactionReceipt?: TransactionReceiptParams,
-    baseLabels?: Labels
+    baseLabels?: Labels,
+    preparedData?: PreparedData
   ) {
-    super(chainId, address, timestamp, block, log, trace, transaction, transactionReceipt, baseLabels)
+    super(chainId, address, timestamp, block, log, trace, transaction, transactionReceipt, baseLabels, preparedData)
   }
   protected getContractName(): string {
     return '*'
@@ -165,9 +169,21 @@ export class ContractContext<
     trace?: Trace,
     transaction?: TransactionResponseParams,
     transactionReceipt?: TransactionReceiptParams,
-    baseLabels?: Labels
+    baseLabels?: Labels,
+    preparedData?: PreparedData
   ) {
-    super(chainId, view.address, timestamp, block, log, trace, transaction, transactionReceipt, baseLabels)
+    super(
+      chainId,
+      view.address,
+      timestamp,
+      block,
+      log,
+      trace,
+      transaction,
+      transactionReceipt,
+      baseLabels,
+      preparedData
+    )
     view.context = this
     if (view.callStatic) {
       view.callStatic.context = this

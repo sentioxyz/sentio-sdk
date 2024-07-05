@@ -9,6 +9,8 @@ import {
   Data_EthTransaction,
   EthFetchConfig,
   HandleInterval,
+  PreparedData,
+  PreprocessResult,
   ProcessResult
 } from '@sentio/protos'
 import { BindOptions } from './bind-options.js'
@@ -24,15 +26,19 @@ export interface AddressOrTypeEventFilter extends DeferredTopicFilter {
   address?: string
 }
 
+export const defaultPreprocessHandler = () => (<PreprocessResult>{ ethCallParams: [] }) as any
+
 export class EventsHandler {
   filters: AddressOrTypeEventFilter[]
   handler: (event: Data_EthLog) => Promise<ProcessResult>
+  preprocessHandler?: (event: Data_EthLog) => Promise<PreprocessResult>
   fetchConfig: EthFetchConfig
 }
 
 export class TraceHandler {
   signatures: string[]
   handler: (trace: Data_EthTrace) => Promise<ProcessResult>
+  preprocessHandler?: (event: Data_EthTrace) => Promise<PreprocessResult>
   fetchConfig: EthFetchConfig
 }
 
@@ -40,11 +46,13 @@ export class BlockHandler {
   blockInterval?: HandleInterval
   timeIntervalInMinutes?: HandleInterval
   handler: (block: Data_EthBlock) => Promise<ProcessResult>
+  preprocessHandler?: (event: Data_EthBlock) => Promise<PreprocessResult>
   fetchConfig: EthFetchConfig
 }
 
 export class TransactionHandler {
   handler: (block: Data_EthTransaction) => Promise<ProcessResult>
+  preprocessHandler?: (event: Data_EthTransaction) => Promise<PreprocessResult>
   fetchConfig: EthFetchConfig
 }
 
@@ -282,7 +290,11 @@ export abstract class BaseProcessor<
 
   public onEvent(
     handler: (event: TypedEvent, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
-    fetchConfig?: Partial<EthFetchConfig>
+    fetchConfig?: Partial<EthFetchConfig>,
+    preprocessHandler: (
+      event: TypedEvent,
+      ctx: ContractContext<TContract, TBoundContractView>
+    ) => Promise<PreprocessResult> = defaultPreprocessHandler
   ): this {
     const _filters: DeferredTopicFilter[] = []
     const tmpContract = this.CreateBoundContractView()
@@ -293,19 +305,17 @@ export abstract class BaseProcessor<
         _filters.push(filter())
       }
     }
-    return this.onEthEvent(
-      function (log, ctx) {
-        return handler(log, ctx)
-      },
-      _filters,
-      fetchConfig
-    )
+    return this.onEthEvent(handler, _filters, fetchConfig, preprocessHandler)
   }
 
   protected onEthEvent(
     handler: (event: TypedEvent, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     filter: DeferredTopicFilter | DeferredTopicFilter[],
-    fetchConfig?: Partial<EthFetchConfig>
+    fetchConfig?: Partial<EthFetchConfig>,
+    preprocessHandler: (
+      event: TypedEvent,
+      ctx: ContractContext<TContract, TBoundContractView>
+    ) => Promise<PreprocessResult> = defaultPreprocessHandler
   ): this {
     const chainId = this.getChainId()
     let _filters: DeferredTopicFilter[] = []
@@ -321,7 +331,58 @@ export abstract class BaseProcessor<
     this.eventHandlers.push({
       filters: _filters,
       fetchConfig: EthFetchConfig.fromPartial(fetchConfig || {}),
-      handler: async function (data: Data_EthLog) {
+      handler: async function (data: Data_EthLog, preparedData?: PreparedData) {
+        const { log, block, transaction, transactionReceipt } = formatEthData(data)
+        if (!log) {
+          throw new ServerError(Status.INVALID_ARGUMENT, 'Log is empty')
+        }
+        let contractView
+        try {
+          contractView = processor.CreateBoundContractView()
+        } catch (e) {
+          throw e
+          // console.log(e)
+        }
+        if (processor.config.address === '*') {
+          contractView.address = log.address
+        }
+
+        const ctx = new ContractContext<TContract, TBoundContractView>(
+          contractName,
+          contractView,
+          chainId,
+          data.timestamp,
+          block,
+          log,
+          undefined,
+          transaction,
+          transactionReceipt,
+          processor.config.baseLabels,
+          preparedData
+        )
+        const logParam = log as any as { topics: Array<string>; data: string }
+
+        let parsed: LogDescription | null = null
+        try {
+          parsed = contractView.rawContract.interface.parseLog(logParam)
+        } catch (e) {
+          // RangeError data out-of-bounds
+          if (e instanceof Error) {
+            if (e.message.includes('data out-of-bounds')) {
+              console.error("Can't decode", log, 'may because of incompatible ABIs, e.g. string vs indexed string', e)
+              return ProcessResult.fromPartial({})
+            }
+          }
+          throw e
+        }
+        if (parsed) {
+          const event: TypedEvent = { ...log, name: parsed.name, args: fixEmptyKey(parsed) }
+          await handler(event, ctx)
+          return ctx.stopAndGetResult()
+        }
+        return ProcessResult.fromPartial({})
+      },
+      preprocessHandler: async function (data: Data_EthLog): Promise<PreprocessResult> {
         const { log, block, transaction, transactionReceipt } = formatEthData(data)
         if (!log) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'Log is empty')
@@ -359,17 +420,16 @@ export abstract class BaseProcessor<
           if (e instanceof Error) {
             if (e.message.includes('data out-of-bounds')) {
               console.error("Can't decode", log, 'may because of incompatible ABIs, e.g. string vs indexed string', e)
-              return ProcessResult.fromPartial({})
+              return PreprocessResult.fromPartial({})
             }
           }
           throw e
         }
         if (parsed) {
           const event: TypedEvent = { ...log, name: parsed.name, args: fixEmptyKey(parsed) }
-          await handler(event, ctx)
-          return ctx.stopAndGetResult()
+          return preprocessHandler(event, ctx)
         }
-        return ProcessResult.fromPartial({})
+        return PreprocessResult.fromPartial({})
       }
     })
     return this
@@ -379,7 +439,11 @@ export abstract class BaseProcessor<
     handler: (block: RichBlock, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     blockInterval = 250,
     backfillBlockInterval = 1000,
-    fetchConfig?: Partial<EthFetchConfig>
+    fetchConfig?: Partial<EthFetchConfig>,
+    preprocessHandler: (
+      block: RichBlock,
+      ctx: ContractContext<TContract, TBoundContractView>
+    ) => Promise<PreprocessResult> = defaultPreprocessHandler
   ): this {
     return this.onInterval(
       handler,
@@ -388,7 +452,8 @@ export abstract class BaseProcessor<
         recentInterval: blockInterval,
         backfillInterval: backfillBlockInterval
       },
-      fetchConfig
+      fetchConfig,
+      preprocessHandler
     )
   }
 
@@ -396,13 +461,18 @@ export abstract class BaseProcessor<
     handler: (block: RichBlock, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     timeIntervalInMinutes = 60,
     backfillTimeIntervalInMinutes = 240,
-    fetchConfig?: Partial<EthFetchConfig>
+    fetchConfig?: Partial<EthFetchConfig>,
+    preprocessHandler: (
+      block: RichBlock,
+      ctx: ContractContext<TContract, TBoundContractView>
+    ) => Promise<PreprocessResult> = defaultPreprocessHandler
   ): this {
     return this.onInterval(
       handler,
       { recentInterval: timeIntervalInMinutes, backfillInterval: backfillTimeIntervalInMinutes },
       undefined,
-      fetchConfig
+      fetchConfig,
+      preprocessHandler
     )
   }
 
@@ -410,14 +480,43 @@ export abstract class BaseProcessor<
     handler: (block: RichBlock, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     timeInterval: HandleInterval | undefined,
     blockInterval: HandleInterval | undefined,
-    fetchConfig: Partial<EthFetchConfig> | undefined
+    fetchConfig: Partial<EthFetchConfig> | undefined,
+    preprocessHandler: (
+      block: RichBlock,
+      ctx: ContractContext<TContract, TBoundContractView>
+    ) => Promise<PreprocessResult> = defaultPreprocessHandler
   ): this {
     const chainId = this.getChainId()
     const processor = this
     const contractName = this.config.name
 
     this.blockHandlers.push({
-      handler: async function (data: Data_EthBlock) {
+      handler: async function (data: Data_EthBlock, preparedData?: PreparedData) {
+        const { block } = formatEthData(data)
+
+        if (!block) {
+          throw new ServerError(Status.INVALID_ARGUMENT, 'Block is empty')
+        }
+
+        const contractView = processor.CreateBoundContractView()
+
+        const ctx = new ContractContext<TContract, TBoundContractView>(
+          contractName,
+          contractView,
+          chainId,
+          new Date(block.timestamp * 1000),
+          block,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          processor.config.baseLabels,
+          preparedData
+        )
+        await handler(block, ctx)
+        return ctx.stopAndGetResult()
+      },
+      preprocessHandler: async function (data: Data_EthBlock) {
         const { block } = formatEthData(data)
 
         if (!block) {
@@ -438,8 +537,7 @@ export abstract class BaseProcessor<
           undefined,
           processor.config.baseLabels
         )
-        await handler(block, ctx)
-        return ctx.stopAndGetResult()
+        return preprocessHandler(block, ctx)
       },
       timeIntervalInMinutes: timeInterval,
       blockInterval: blockInterval,
@@ -451,7 +549,11 @@ export abstract class BaseProcessor<
   protected onEthTrace(
     signatures: string | string[],
     handler: (trace: TypedCallTrace, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
-    fetchConfig?: Partial<EthFetchConfig>
+    fetchConfig?: Partial<EthFetchConfig>,
+    preprocessHandler: (
+      trace: TypedCallTrace,
+      ctx: ContractContext<TContract, TBoundContractView>
+    ) => Promise<PreprocessResult> = defaultPreprocessHandler
   ): this {
     const chainId = this.getChainId()
     const contractName = this.config.name
@@ -463,7 +565,7 @@ export abstract class BaseProcessor<
     this.traceHandlers.push({
       signatures,
       fetchConfig: EthFetchConfig.fromPartial(fetchConfig || {}),
-      handler: async function (data: Data_EthTrace) {
+      handler: async function (data: Data_EthTrace, preparedData?: PreparedData) {
         const contractView = processor.CreateBoundContractView()
         const contractInterface = contractView.rawContract.interface
         const { trace, block, transaction, transactionReceipt } = formatEthData(data)
@@ -502,10 +604,54 @@ export abstract class BaseProcessor<
           trace,
           transaction,
           transactionReceipt,
-          processor.config.baseLabels
+          processor.config.baseLabels,
+          preparedData
         )
         await handler(typedTrace, ctx)
         return ctx.stopAndGetResult()
+      },
+      preprocessHandler: async function (data: Data_EthTrace) {
+        const contractView = processor.CreateBoundContractView()
+        const contractInterface = contractView.rawContract.interface
+        const { trace, block, transaction, transactionReceipt } = formatEthData(data)
+        const sighash = trace?.action.input?.slice(0, 10)
+        if (!sighash) {
+          throw new ServerError(Status.INVALID_ARGUMENT, 'trace has no sighash')
+        }
+        const fragment = contractInterface.getFunction(sighash)
+
+        if (!trace || !fragment) {
+          throw new ServerError(Status.INVALID_ARGUMENT, 'trace is null')
+        }
+        const typedTrace = trace as TypedCallTrace
+        typedTrace.name = fragment.name
+        typedTrace.functionSignature = fragment.format()
+        // const trace = data.trace as Trace
+        if (!trace?.action.input) {
+          return PreprocessResult.fromPartial({})
+        }
+        const traceData = '0x' + trace.action.input.slice(10)
+        try {
+          typedTrace.args = contractInterface.getAbiCoder().decode(fragment.inputs, traceData, true)
+        } catch (e) {
+          if (!trace.error) {
+            throw e
+          }
+          console.error('Failed to decode successful trace', e)
+        }
+        const ctx = new ContractContext<TContract, TBoundContractView>(
+          contractName,
+          contractView,
+          chainId,
+          data.timestamp,
+          block,
+          undefined,
+          trace,
+          transaction,
+          transactionReceipt,
+          processor.config.baseLabels
+        )
+        return preprocessHandler(typedTrace, ctx)
       }
     })
     return this
@@ -513,7 +659,11 @@ export abstract class BaseProcessor<
 
   public onTrace(
     handler: (event: TypedCallTrace, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
-    fetchConfig?: Partial<EthFetchConfig>
+    fetchConfig?: Partial<EthFetchConfig>,
+    preprocessHandler: (
+      trace: TypedCallTrace,
+      ctx: ContractContext<TContract, TBoundContractView>
+    ) => Promise<PreprocessResult> = defaultPreprocessHandler
   ): this {
     const tmpContract = this.CreateBoundContractView()
     const sighashes = []
@@ -526,12 +676,6 @@ export abstract class BaseProcessor<
         sighashes.push(sighash)
       }
     }
-    return this.onEthTrace(
-      sighashes,
-      function (trace, ctx) {
-        return handler(trace, ctx)
-      },
-      fetchConfig
-    )
+    return this.onEthTrace(sighashes, handler, fetchConfig, preprocessHandler)
   }
 }

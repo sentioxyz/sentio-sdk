@@ -7,7 +7,10 @@ import {
   DataBinding,
   DeepPartial,
   Empty,
+  EthCallParam,
   HandlerType,
+  PreparedData,
+  PreprocessResult,
   ProcessBindingResponse,
   ProcessBindingsRequest,
   ProcessConfigRequest,
@@ -26,6 +29,9 @@ import { freezeGlobalConfig, GLOBAL_CONFIG } from './global-config.js'
 import { StoreContext } from './db-context.js'
 import { Subject } from 'rxjs'
 import { metrics } from '@opentelemetry/api'
+import { getProvider } from './provider.js'
+import { EthChainId } from '@sentio/chain'
+import { Provider, Interface } from 'ethers'
 
 const meter = metrics.getMeter('processor_service')
 const process_binding_count = meter.createCounter('process_binding_count')
@@ -118,10 +124,11 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
   }
 
   async processBindings(request: ProcessBindingsRequest, options?: CallContext): Promise<ProcessBindingResponse> {
-    const promises = []
+    const ethCallResults = await this.preprocessBindings(request, options)
 
+    const promises = []
     for (const binding of request.bindings) {
-      const promise = this.processBinding(binding)
+      const promise = this.processBinding(binding, { ethCallResults })
       if (GLOBAL_CONFIG.execution.sequential) {
         await promise
       }
@@ -146,7 +153,59 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     }
   }
 
-  async processBinding(request: DataBinding, options?: CallContext): Promise<ProcessResult> {
+  async preprocessBindings(
+    request: ProcessBindingsRequest,
+    options?: CallContext
+  ): Promise<{ [calldata: string]: any[] }> {
+    const promises = []
+    for (const binding of request.bindings) {
+      promises.push(this.preprocessBinding(binding, options))
+    }
+    let preprocessResults: PreprocessResult[]
+    try {
+      preprocessResults = await Promise.all(promises)
+    } catch (e) {
+      throw e
+    }
+    const groupedRequests = new Map<string, EthCallParam[]>()
+    const providers = new Map<string, Provider>()
+    for (const result of preprocessResults) {
+      for (const param of result.ethCallParams) {
+        if (!providers.has(param.chainId)) {
+          providers.set(param.chainId, getProvider(param.chainId as EthChainId))
+        }
+        const key = param.chainId + '|' + param.address
+        if (!groupedRequests.has(key)) {
+          groupedRequests.set(key, [])
+        }
+        groupedRequests.get(key)!.push(param)
+      }
+    }
+
+    const start = Date.now()
+    const callPromises = []
+    for (const params of groupedRequests.values()) {
+      console.log(`chain: ${params[0].chainId}, address: ${params[0].address}, totalCalls: ${params.length}`)
+      for (const param of params) {
+        const frag = new Interface(param.signature)
+        const calldata = frag.encodeFunctionData(param.function, param.args)
+        callPromises.push(
+          providers
+            .get(param.chainId)!
+            .call({
+              to: param.address,
+              data: calldata
+            })
+            .then((ret) => [calldata, frag.decodeFunctionResult(param.function, ret).toArray()] as [string, any[]])
+        )
+      }
+    }
+    const results = Object.fromEntries(await Promise.all(callPromises))
+    console.log(`${callPromises.length} calls finished, elapsed: ${Date.now() - start}ms`)
+    return results
+  }
+
+  async preprocessBinding(request: DataBinding, options?: CallContext): Promise<PreprocessResult> {
     if (!this.started) {
       throw new ServerError(Status.UNAVAILABLE, 'Service Not started.')
     }
@@ -162,7 +221,30 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         ]
       )
     }
-    const result = await PluginManager.INSTANCE.processBinding(request)
+    return await PluginManager.INSTANCE.preprocessBinding(request)
+  }
+
+  async processBinding(
+    request: DataBinding,
+    preparedData: PreparedData | undefined,
+    options?: CallContext
+  ): Promise<ProcessResult> {
+    if (!this.started) {
+      throw new ServerError(Status.UNAVAILABLE, 'Service Not started.')
+    }
+    if (this.unhandled) {
+      throw new RichServerError(
+        Status.UNAVAILABLE,
+        'Unhandled exception/rejection in previous request: ' + errorString(this.unhandled),
+        [
+          DebugInfo.fromPartial({
+            detail: this.unhandled.message,
+            stackEntries: this.unhandled.stack?.split('\n')
+          })
+        ]
+      )
+    }
+    const result = await PluginManager.INSTANCE.processBinding(request, preparedData)
     recordRuntimeInfo(result, request.handlerType)
     return result
   }
@@ -198,7 +280,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
           const binding = request.binding
           const dbContext = contexts.new(request.processId, subject)
           const start = Date.now()
-          PluginManager.INSTANCE.processBinding(binding, dbContext)
+          PluginManager.INSTANCE.processBinding(binding, undefined, dbContext)
             .then((result) => {
               subject.next({
                 result,

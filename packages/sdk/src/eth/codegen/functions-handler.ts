@@ -1,6 +1,6 @@
 import {
   generateOutputComplexTypeAsArray,
-  generateOutputComplexTypesAsObject,
+  generateOutputComplexTypesAsObject
 } from '@sentio/ethers-v6/dist/codegen/types.js'
 import sha3 from 'js-sha3'
 import { FunctionDeclaration, getSignatureForFn } from 'typechain'
@@ -45,9 +45,10 @@ function generateCallHandler(fn: FunctionDeclaration, contractName: string, over
   return `
   onCall${upperFirst(overloadedName ?? fn.name)}(
     handler: (call: ${upperFirst(overloadedName ?? fn.name)}CallTrace, ctx: ${contractName}Context) => void,
-    fetchConfig?: Partial<EthFetchConfig>
+    fetchConfig?: Partial<EthFetchConfig>,
+    preprocessHandler?: (call: ${upperFirst(overloadedName ?? fn.name)}CallTrace, ctx: ${contractName}Context) => Promise<PreprocessResult>
   ): this {
-    return super.onEthTrace("${sighash}", handler as any, fetchConfig);
+    return super.onEthTrace("${sighash}", handler as any, fetchConfig, preprocessHandler);
   }
 `
 }

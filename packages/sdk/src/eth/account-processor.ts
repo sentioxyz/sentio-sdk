@@ -1,5 +1,5 @@
 import { ERC20__factory, ERC721__factory } from './builtin/internal/index.js'
-import { AddressType, EthFetchConfig, ProcessResult } from '@sentio/protos'
+import { AddressType, EthFetchConfig, PreprocessResult, ProcessResult } from '@sentio/protos'
 
 import { PartiallyOptional, PromiseOrVoid } from '../core/index.js'
 
@@ -7,7 +7,7 @@ import { AccountBindOptions } from './bind-options.js'
 import { ERC20Processor, TransferEvent as ERC20TransferEvent } from './builtin/erc20.js'
 import { ERC721Processor, TransferEvent as ERC721TransferEvent } from './builtin/erc721.js'
 import { AccountContext } from './context.js'
-import { AddressOrTypeEventFilter, EventsHandler } from './base-processor.js'
+import { AddressOrTypeEventFilter, defaultPreprocessHandler, EventsHandler } from './base-processor.js'
 import { Block } from 'ethers'
 import { AccountProcessorState } from './account-processor-state.js'
 import { fixEmptyKey, formatEthData, TypedEvent } from './eth.js'
@@ -30,7 +30,7 @@ export class AccountProcessor {
   protected constructor(config: PartiallyOptional<AccountBindOptions, 'network'>) {
     this.config = {
       ...config,
-      network: config.network || EthChainId.ETHEREUM,
+      network: config.network || EthChainId.ETHEREUM
     }
   }
 
@@ -43,17 +43,23 @@ export class AccountProcessor {
    * @param handler custom handler function
    * @param tokensAddresses all the erc20 token address to watch
    * @param fetchConfig
+   * @param preprocessHandler
    */
   onERC20TransferIn(
     handler: (event: ERC20TransferEvent, ctx: AccountContext) => PromiseOrVoid,
     tokensAddresses: string[] = [],
-    fetchConfig?: Partial<EthFetchConfig>
+    fetchConfig?: Partial<EthFetchConfig>,
+    preprocessHandler: (
+      event: ERC20TransferEvent,
+      ctx: AccountContext
+    ) => Promise<PreprocessResult> = defaultPreprocessHandler
   ) {
     return this.onERC20(
       handler,
       tokensAddresses,
       (address: string) => ERC721Processor.filters.Transfer(null, this.config.address),
-      fetchConfig
+      fetchConfig,
+      preprocessHandler
     )
   }
 
@@ -62,17 +68,23 @@ export class AccountProcessor {
    * @param handler custom handler function
    * @param tokensAddresses all the erc20 token address to watch
    * @param fetchConfig
+   * @param preprocessHandler
    */
   onERC20TransferOut(
     handler: (event: ERC20TransferEvent, ctx: AccountContext) => PromiseOrVoid,
     tokensAddresses: string[] = [],
-    fetchConfig?: Partial<EthFetchConfig>
+    fetchConfig?: Partial<EthFetchConfig>,
+    preprocessHandler: (
+      event: ERC20TransferEvent,
+      ctx: AccountContext
+    ) => Promise<PreprocessResult> = defaultPreprocessHandler
   ) {
     return this.onERC20(
       handler,
       tokensAddresses,
       (address: string) => ERC20Processor.filters.Transfer(this.config.address),
-      fetchConfig
+      fetchConfig,
+      preprocessHandler
     )
   }
 
@@ -81,18 +93,24 @@ export class AccountProcessor {
    * @param handler custom handler function
    * @param tokensAddresses all the erc20 token address to watch
    * @param fetchConfig
+   * @param preprocessHandler
    */
   onERC20Minted(
     handler: (event: ERC20TransferEvent, ctx: AccountContext) => PromiseOrVoid,
     tokensAddresses: string[] = [],
-    fetchConfig?: Partial<EthFetchConfig>
+    fetchConfig?: Partial<EthFetchConfig>,
+    preprocessHandler: (
+      event: ERC20TransferEvent,
+      ctx: AccountContext
+    ) => Promise<PreprocessResult> = defaultPreprocessHandler
   ) {
     return this.onERC20(
       handler,
       tokensAddresses,
       (address: string) =>
         ERC20Processor.filters.Transfer('0x0000000000000000000000000000000000000000', this.config.address),
-      fetchConfig
+      fetchConfig,
+      preprocessHandler
     )
   }
 
@@ -100,9 +118,13 @@ export class AccountProcessor {
     handler: (event: ERC20TransferEvent, ctx: AccountContext) => PromiseOrVoid,
     tokensAddresses: string[] = [],
     defaultFilter: (address: string) => AddressOrTypeEventFilter,
-    fetchConfig?: Partial<EthFetchConfig>
+    fetchConfig?: Partial<EthFetchConfig>,
+    preprocessHandler: (
+      event: ERC20TransferEvent,
+      ctx: AccountContext
+    ) => Promise<PreprocessResult> = defaultPreprocessHandler
   ) {
-    return this.onERC(handler, tokensAddresses, defaultFilter, AddressType.ERC20, fetchConfig)
+    return this.onERC(handler, tokensAddresses, defaultFilter, AddressType.ERC20, fetchConfig, preprocessHandler)
   }
 
   /**
@@ -110,17 +132,23 @@ export class AccountProcessor {
    * @param handler custom handler function
    * @param collections all the ERC721 token address to watch, if not provided then watch all ERC721
    * @param fetchConfig
+   * @param preprocessHandler
    */
   onERC721TransferIn(
     handler: (event: ERC721TransferEvent, ctx: AccountContext) => PromiseOrVoid,
     collections: string[],
-    fetchConfig?: Partial<EthFetchConfig>
+    fetchConfig?: Partial<EthFetchConfig>,
+    preprocessHandler: (
+      event: ERC721TransferEvent,
+      ctx: AccountContext
+    ) => Promise<PreprocessResult> = defaultPreprocessHandler
   ) {
     return this.onERC721(
       handler,
       collections,
       (address: string) => ERC721Processor.filters.Transfer(null, this.config.address),
-      fetchConfig
+      fetchConfig,
+      preprocessHandler
     )
   }
 
@@ -129,17 +157,23 @@ export class AccountProcessor {
    * @param handler custom handler function
    * @param collections all the ERC721 token address to watch, if not provided then watch all ERC721
    * @param fetchConfig
+   * @param preprocessHandler
    */
   onERC721TransferOut(
     handler: (event: ERC721TransferEvent, ctx: AccountContext) => PromiseOrVoid,
     collections: string[],
-    fetchConfig?: Partial<EthFetchConfig>
+    fetchConfig?: Partial<EthFetchConfig>,
+    preprocessHandler: (
+      event: ERC721TransferEvent,
+      ctx: AccountContext
+    ) => Promise<PreprocessResult> = defaultPreprocessHandler
   ) {
     return this.onERC721(
       handler,
       collections,
       (address: string) => ERC721Processor.filters.Transfer(this.config.address),
-      fetchConfig
+      fetchConfig,
+      preprocessHandler
     )
   }
 
@@ -148,18 +182,24 @@ export class AccountProcessor {
    * @param handler custom handler function
    * @param collections all the ERC721 token address to watch, if not provided then watch all ERC721
    * @param fetchConfig
+   * @param preprocessHandler
    */
   onERC721Minted(
     handler: (event: ERC721TransferEvent, ctx: AccountContext) => PromiseOrVoid,
     collections: string[] = [],
-    fetchConfig?: Partial<EthFetchConfig>
+    fetchConfig?: Partial<EthFetchConfig>,
+    preprocessHandler: (
+      event: ERC721TransferEvent,
+      ctx: AccountContext
+    ) => Promise<PreprocessResult> = defaultPreprocessHandler
   ) {
     return this.onERC721(
       handler,
       collections,
       (address: string) =>
         ERC721Processor.filters.Transfer('0x0000000000000000000000000000000000000000', this.config.address),
-      fetchConfig
+      fetchConfig,
+      preprocessHandler
     )
   }
 
@@ -167,9 +207,13 @@ export class AccountProcessor {
     handler: (event: ERC721TransferEvent, ctx: AccountContext) => PromiseOrVoid,
     collections: string[],
     defaultFilter: (address: string) => AddressOrTypeEventFilter,
-    fetchConfig?: Partial<EthFetchConfig>
+    fetchConfig?: Partial<EthFetchConfig>,
+    preprocessHandler: (
+      event: ERC721TransferEvent,
+      ctx: AccountContext
+    ) => Promise<PreprocessResult> = defaultPreprocessHandler
   ) {
-    return this.onERC(handler, collections, defaultFilter, AddressType.ERC721, fetchConfig)
+    return this.onERC(handler, collections, defaultFilter, AddressType.ERC721, fetchConfig, preprocessHandler)
   }
 
   private onERC(
@@ -177,7 +221,8 @@ export class AccountProcessor {
     contractAddresses: string[],
     defaultFilter: (address: string) => AddressOrTypeEventFilter,
     addressType: AddressType,
-    fetchConfig?: Partial<EthFetchConfig>
+    fetchConfig?: Partial<EthFetchConfig>,
+    preprocessHandler: (event: any, ctx: AccountContext) => Promise<PreprocessResult> = defaultPreprocessHandler
   ) {
     const filters = []
     for (const token of contractAddresses) {
@@ -191,13 +236,14 @@ export class AccountProcessor {
       filter.addressType = addressType
       filters.push(filter)
     }
-    return this.onEvent(handler, filters, fetchConfig)
+    return this.onEvent(handler, filters, fetchConfig, preprocessHandler)
   }
 
   protected onEvent(
     handler: (event: TypedEvent, ctx: AccountContext) => PromiseOrVoid,
     filter: AddressOrTypeEventFilter | AddressOrTypeEventFilter[],
-    fetchConfig?: Partial<EthFetchConfig>
+    fetchConfig?: Partial<EthFetchConfig>,
+    preprocessHandler: (event: TypedEvent, ctx: AccountContext) => Promise<PreprocessResult> = defaultPreprocessHandler
   ) {
     const chainId = this.getChainId()
 
@@ -256,6 +302,31 @@ export class AccountProcessor {
         }
         return ProcessResult.fromPartial({})
       },
+      preprocessHandler: async function (data) {
+        const { log, block, transaction, transactionReceipt } = formatEthData(data)
+        if (!log) {
+          throw new ServerError(Status.INVALID_ARGUMENT, 'Log is empty')
+        }
+        // const log = data.log as { topics: Array<string>; data: string }
+        const ctx = new AccountContext(
+          chainId,
+          config.address,
+          data.timestamp,
+          data.block as Block,
+          log,
+          undefined,
+          transaction,
+          transactionReceipt
+        )
+
+        const logParam = log as any as { topics: Array<string>; data: string }
+        const parsed = ERC20_INTERFACE.parseLog(logParam)
+        if (parsed) {
+          const event: TypedEvent = { ...log, name: parsed.name, args: fixEmptyKey(parsed) }
+          return preprocessHandler(event, ctx)
+        }
+        return PreprocessResult.fromPartial({})
+      }
     })
 
     return this

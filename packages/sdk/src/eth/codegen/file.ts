@@ -3,7 +3,7 @@ import {
   createImportsForUsedIdentifiers,
   EventDeclaration,
   getFullSignatureAsSymbolForEvent,
-  getFullSignatureForEvent,
+  getFullSignatureForEvent
 } from 'typechain'
 
 import { reservedKeywords } from '@sentio/ethers-v6/dist/codegen/reserved-keywords.js'
@@ -151,7 +151,7 @@ export class ${contract.name}ProcessorTemplate extends BaseProcessorTemplate<${c
     } else {
       return events.flatMap((e) => [
         `${getFullSignatureAsSymbolForEvent(e)}_Event`,
-        `${getFullSignatureAsSymbolForEvent(e)}_EventFilter`,
+        `${getFullSignatureAsSymbolForEvent(e)}_EventFilter`
       ])
     }
   })
@@ -182,6 +182,7 @@ export class ${contract.name}ProcessorTemplate extends BaseProcessorTemplate<${c
         'getProcessor',
         'getProvider',
         'transformEtherError',
+        'defaultPreprocessHandler',
         'Trace',
         'BindOptions',
         'BaseProcessor',
@@ -194,12 +195,13 @@ export class ${contract.name}ProcessorTemplate extends BaseProcessorTemplate<${c
         'TypedCallTrace',
         'EthContext',
         'EthFetchConfig',
+        'PreprocessResult'
       ],
       // '@sentio/sdk/eth': ['BaseContext'],
       // '@sentio/protos': ['EthFetchConfig'],
       './common.js': ['PromiseOrValue'],
       './index.js': [`${contract.name}__factory`],
-      [`./${contract.name}.js`]: [`${contract.name}`, ...eventsImports, ...uniqueStructImports],
+      [`./${contract.name}.js`]: [`${contract.name}`, ...eventsImports, ...uniqueStructImports]
     },
     source
   )
@@ -232,7 +234,7 @@ export function codeGenTestUtilsFile(contract: Contract): string {
 
   const possibleImports = {
     'ethers/providers': ['LogParams'],
-    '@sentio/sdk/eth': ['EthChainId'],
+    '@sentio/sdk/eth': ['EthChainId']
   } as any
   possibleImports[`./${contract.name}.js`] = Object.values(contract.events).flatMap((events) => {
     if (events.length === 1) {

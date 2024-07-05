@@ -1,4 +1,4 @@
-export { BaseProcessor, GlobalProcessor } from './base-processor.js'
+export { BaseProcessor, GlobalProcessor, defaultPreprocessHandler } from './base-processor.js'
 export { GenericProcessor } from './generic-processor.js'
 export { BaseProcessorTemplate } from './base-processor-template.js'
 export { AccountProcessor } from './account-processor.js'
@@ -11,6 +11,6 @@ export { AccountContext, ContractContext, GlobalContext, ContractView, BoundCont
 
 export { EthPlugin } from './eth-plugin.js'
 
-export { EthFetchConfig } from '@sentio/protos'
+export { EthFetchConfig, PreprocessResult } from '@sentio/protos'
 
 export { EthChainId } from '@sentio/chain'

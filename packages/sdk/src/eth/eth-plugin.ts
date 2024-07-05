@@ -10,6 +10,8 @@ import {
   HandlerType,
   LogFilter,
   LogHandlerConfig,
+  PreparedData,
+  PreprocessResult,
   ProcessConfigResponse,
   ProcessResult,
   StartRequest
@@ -19,17 +21,24 @@ import { ServerError, Status } from 'nice-grpc'
 import { EthProcessorState } from './binds.js'
 import { AccountProcessorState } from './account-processor-state.js'
 import { ProcessorTemplateProcessorState } from './base-processor-template.js'
-import { GlobalProcessorState } from './base-processor.js'
+import { defaultPreprocessHandler, GlobalProcessorState } from './base-processor.js'
 import { validateAndNormalizeAddress } from './eth.js'
 import { EthChainId } from '@sentio/chain'
 import { EthContext } from './context.js'
 import { TemplateInstanceState } from '../core/template.js'
 
 interface Handlers {
-  eventHandlers: ((event: Data_EthLog) => Promise<ProcessResult>)[]
-  traceHandlers: ((trace: Data_EthTrace) => Promise<ProcessResult>)[]
-  blockHandlers: ((block: Data_EthBlock) => Promise<ProcessResult>)[]
-  transactionHandlers: ((trace: Data_EthTransaction) => Promise<ProcessResult>)[]
+  eventHandlers: ((event: Data_EthLog, preparedData?: PreparedData) => Promise<ProcessResult>)[]
+  traceHandlers: ((trace: Data_EthTrace, preparedData?: PreparedData) => Promise<ProcessResult>)[]
+  blockHandlers: ((block: Data_EthBlock, preparedData?: PreparedData) => Promise<ProcessResult>)[]
+  transactionHandlers: ((trace: Data_EthTransaction, preparedData?: PreparedData) => Promise<ProcessResult>)[]
+}
+
+interface PreprocessHandlers {
+  eventHandlers: ((event: Data_EthLog) => Promise<PreprocessResult>)[]
+  traceHandlers: ((trace: Data_EthTrace) => Promise<PreprocessResult>)[]
+  blockHandlers: ((block: Data_EthBlock) => Promise<PreprocessResult>)[]
+  transactionHandlers: ((txn: Data_EthTransaction) => Promise<PreprocessResult>)[]
 }
 
 export class EthPlugin extends Plugin {
@@ -40,9 +49,21 @@ export class EthPlugin extends Plugin {
     traceHandlers: [],
     transactionHandlers: []
   }
+  preprocessHandlers: PreprocessHandlers = {
+    blockHandlers: [],
+    eventHandlers: [],
+    traceHandlers: [],
+    transactionHandlers: []
+  }
 
   async configure(config: ProcessConfigResponse) {
     const handlers: Handlers = {
+      blockHandlers: [],
+      eventHandlers: [],
+      traceHandlers: [],
+      transactionHandlers: []
+    }
+    const preprocessHandlers: PreprocessHandlers = {
       blockHandlers: [],
       eventHandlers: [],
       traceHandlers: [],
@@ -69,6 +90,7 @@ export class EthPlugin extends Plugin {
 
       // Step 1. Prepare all the block handlers
       for (const blockHandler of processor.blockHandlers) {
+        preprocessHandlers.blockHandlers.push(blockHandler.preprocessHandler ?? defaultPreprocessHandler)
         const handlerId = handlers.blockHandlers.push(blockHandler.handler) - 1
         // TODO wrap the block handler into one
 
@@ -84,6 +106,7 @@ export class EthPlugin extends Plugin {
 
       // Step 2. Prepare all trace handlers
       for (const traceHandler of processor.traceHandlers) {
+        preprocessHandlers.traceHandlers.push(traceHandler.preprocessHandler ?? defaultPreprocessHandler)
         const handlerId = handlers.traceHandlers.push(traceHandler.handler) - 1
         for (const signature of traceHandler.signatures) {
           contractConfig.traceConfigs.push({
@@ -97,6 +120,7 @@ export class EthPlugin extends Plugin {
       // Step 3. Prepare all the event handlers
       for (const eventsHandler of processor.eventHandlers) {
         // associate id with filter
+        preprocessHandlers.eventHandlers.push(eventsHandler.preprocessHandler ?? defaultPreprocessHandler)
         const handlerId = handlers.eventHandlers.push(eventsHandler.handler) - 1
         const logConfig: LogHandlerConfig = {
           handlerId: handlerId,
@@ -192,6 +216,7 @@ export class EthPlugin extends Plugin {
       // TODO add interval
       for (const eventsHandler of processor.eventHandlers) {
         // associate id with filter
+        preprocessHandlers.eventHandlers.push(eventsHandler.preprocessHandler ?? defaultPreprocessHandler)
         const handlerId = handlers.eventHandlers.push(eventsHandler.handler) - 1
         const logConfig: LogHandlerConfig = {
           handlerId: handlerId,
@@ -232,21 +257,37 @@ export class EthPlugin extends Plugin {
     }
 
     this.handlers = handlers
+    this.preprocessHandlers = preprocessHandlers
   }
 
   supportedHandlers = [HandlerType.ETH_LOG, HandlerType.ETH_BLOCK, HandlerType.ETH_TRACE, HandlerType.ETH_TRANSACTION]
 
-  processBinding(request: DataBinding): Promise<ProcessResult> {
+  processBinding(request: DataBinding, preparedData: PreparedData | undefined): Promise<ProcessResult> {
     // return Promise.resolve(undefined);
     switch (request.handlerType) {
       case HandlerType.ETH_LOG:
-        return this.processLog(request)
+        return this.processLog(request, preparedData)
       case HandlerType.ETH_TRACE:
-        return this.processTrace(request)
+        return this.processTrace(request, preparedData)
       case HandlerType.ETH_BLOCK:
-        return this.processBlock(request)
+        return this.processBlock(request, preparedData)
       case HandlerType.ETH_TRANSACTION:
-        return this.processTransaction(request)
+        return this.processTransaction(request, preparedData)
+      default:
+        throw new ServerError(Status.INVALID_ARGUMENT, 'No handle type registered ' + request.handlerType)
+    }
+  }
+
+  preprocessBinding(request: DataBinding): Promise<PreprocessResult> {
+    switch (request.handlerType) {
+      case HandlerType.ETH_LOG:
+        return this.preprocessLog(request)
+      case HandlerType.ETH_TRACE:
+        return this.preprocessTrace(request)
+      case HandlerType.ETH_BLOCK:
+        return this.preprocessBlock(request)
+      case HandlerType.ETH_TRANSACTION:
+        return this.preprocessTransaction(request)
       default:
         throw new ServerError(Status.INVALID_ARGUMENT, 'No handle type registered ' + request.handlerType)
     }
@@ -285,7 +326,86 @@ export class EthPlugin extends Plugin {
     return TemplateInstanceState.INSTANCE.getValues().length !== config.templateInstances.length
   }
 
-  async processLog(request: DataBinding): Promise<ProcessResult> {
+  async preprocessLog(request: DataBinding): Promise<PreprocessResult> {
+    if (!request.data?.ethLog?.log) {
+      throw new ServerError(Status.INVALID_ARGUMENT, "Log can't be null")
+    }
+    const ethLog = request.data.ethLog
+
+    const promises: Promise<PreprocessResult>[] = []
+    for (const handlerId of request.handlerIds) {
+      const handler = this.preprocessHandlers.eventHandlers[handlerId]
+      const promise = handler(ethLog).catch((e) => {
+        throw new ServerError(
+          Status.INTERNAL,
+          'error processing log: ' + JSON.stringify(ethLog.log) + '\n' + errorString(e)
+        )
+      })
+      promises.push(promise)
+    }
+    return mergePreprocessResults(await Promise.all(promises))
+  }
+
+  async preprocessTrace(binding: DataBinding): Promise<PreprocessResult> {
+    if (!binding.data?.ethTrace?.trace) {
+      throw new ServerError(Status.INVALID_ARGUMENT, "Trace can't be null")
+    }
+    const ethTrace = binding.data.ethTrace
+
+    const promises: Promise<PreprocessResult>[] = []
+
+    for (const handlerId of binding.handlerIds) {
+      const promise = this.preprocessHandlers.traceHandlers[handlerId](ethTrace).catch((e) => {
+        throw new ServerError(
+          Status.INTERNAL,
+          'error processing trace: ' + JSON.stringify(ethTrace.trace) + '\n' + errorString(e)
+        )
+      })
+      promises.push(promise)
+    }
+    return mergePreprocessResults(await Promise.all(promises))
+  }
+
+  async preprocessBlock(binding: DataBinding): Promise<PreprocessResult> {
+    if (!binding.data?.ethBlock?.block) {
+      throw new ServerError(Status.INVALID_ARGUMENT, "Block can't be empty")
+    }
+    const ethBlock = binding.data.ethBlock
+
+    const promises: Promise<PreprocessResult>[] = []
+    for (const handlerId of binding.handlerIds) {
+      const promise = this.preprocessHandlers.blockHandlers[handlerId](ethBlock).catch((e) => {
+        throw new ServerError(
+          Status.INTERNAL,
+          'error processing block: ' + ethBlock.block?.number + '\n' + errorString(e)
+        )
+      })
+      promises.push(promise)
+    }
+    return mergePreprocessResults(await Promise.all(promises))
+  }
+
+  async preprocessTransaction(binding: DataBinding): Promise<PreprocessResult> {
+    if (!binding.data?.ethTransaction?.transaction) {
+      throw new ServerError(Status.INVALID_ARGUMENT, "transaction can't be null")
+    }
+    const ethTransaction = binding.data.ethTransaction
+
+    const promises: Promise<PreprocessResult>[] = []
+
+    for (const handlerId of binding.handlerIds) {
+      const promise = this.preprocessHandlers.transactionHandlers[handlerId](ethTransaction).catch((e) => {
+        throw new ServerError(
+          Status.INTERNAL,
+          'error processing transaction: ' + JSON.stringify(ethTransaction.transaction) + '\n' + errorString(e)
+        )
+      })
+      promises.push(promise)
+    }
+    return mergePreprocessResults(await Promise.all(promises))
+  }
+
+  async processLog(request: DataBinding, preparedData: PreparedData | undefined): Promise<ProcessResult> {
     if (!request.data?.ethLog?.log) {
       throw new ServerError(Status.INVALID_ARGUMENT, "Log can't be null")
     }
@@ -308,7 +428,7 @@ export class EthPlugin extends Plugin {
     return mergeProcessResults(await Promise.all(promises))
   }
 
-  async processTrace(binding: DataBinding): Promise<ProcessResult> {
+  async processTrace(binding: DataBinding, preparedData: PreparedData | undefined): Promise<ProcessResult> {
     if (!binding.data?.ethTrace?.trace) {
       throw new ServerError(Status.INVALID_ARGUMENT, "Trace can't be null")
     }
@@ -331,7 +451,7 @@ export class EthPlugin extends Plugin {
     return mergeProcessResults(await Promise.all(promises))
   }
 
-  async processBlock(binding: DataBinding): Promise<ProcessResult> {
+  async processBlock(binding: DataBinding, preparedData: PreparedData | undefined): Promise<ProcessResult> {
     if (!binding.data?.ethBlock?.block) {
       throw new ServerError(Status.INVALID_ARGUMENT, "Block can't be empty")
     }
@@ -353,7 +473,7 @@ export class EthPlugin extends Plugin {
     return mergeProcessResults(await Promise.all(promises))
   }
 
-  async processTransaction(binding: DataBinding): Promise<ProcessResult> {
+  async processTransaction(binding: DataBinding, preparedData: PreparedData | undefined): Promise<ProcessResult> {
     if (!binding.data?.ethTransaction?.transaction) {
       throw new ServerError(Status.INVALID_ARGUMENT, "transaction can't be null")
     }
@@ -387,4 +507,12 @@ class NoopContext extends EthContext {
   protected getContractName(): string {
     return ''
   }
+}
+
+function mergePreprocessResults(results: PreprocessResult[]): PreprocessResult {
+  const res: PreprocessResult = { ethCallParams: [] }
+  for (const r of results) {
+    res.ethCallParams = res.ethCallParams.concat(r.ethCallParams)
+  }
+  return res
 }

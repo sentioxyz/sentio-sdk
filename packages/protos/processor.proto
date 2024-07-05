@@ -621,6 +621,22 @@ message ProcessResult {
   StateResult states = 6;
 }
 
+message EthCallParam {
+  string chain_id = 1;
+  string address = 2;
+  string function = 3; // balanceOf
+  string signature = 4; // balanceOf(address)
+  repeated google.protobuf.Value args = 5;
+}
+
+message PreprocessResult {
+  repeated EthCallParam ethCallParams = 1;
+}
+
+message PreparedData {
+  map<string, google.protobuf.ListValue> eth_call_results = 1;
+}
+
 message RecordMetaData {
   // These are populated by systems.
 
