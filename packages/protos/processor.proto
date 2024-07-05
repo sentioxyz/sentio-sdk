@@ -22,6 +22,8 @@ service Processor {
   rpc ProcessBindings(ProcessBindingsRequest) returns (ProcessBindingResponse);
 
   rpc ProcessBindingsStream(stream ProcessStreamRequest) returns (stream ProcessStreamResponse);
+
+  rpc PreprocessBindingsStream(stream PreprocessStreamRequest) returns (stream PreprocessStreamResponse);
 }
 
 message ProjectConfig {
@@ -67,6 +69,7 @@ message ContractConfig {
   repeated FuelAssetHandlerConfig asset_configs = 14;
   repeated FuelLogHandlerConfig fuel_log_configs = 15;
   repeated CosmosLogHandlerConfig cosmos_log_configs = 16;
+  repeated StarknetEventHandlerConfig starknet_event_configs = 17;
 
   InstructionHandlerConfig instruction_config = 6;
   uint64 start_block = 4;
@@ -384,6 +387,16 @@ message MoveCallFilter {
   optional FromAndToAddress from_and_to_address = 6;
 }
 
+message StarknetEventHandlerConfig {
+  repeated StarknetEventFilter filters = 1;
+  int32 handler_id = 2;
+}
+
+message StarknetEventFilter {
+  string address = 1;
+  repeated string keys = 2;
+}
+
 message FuelCallFilter {
   string function = 1; // "" means all transaction
   bool include_failed = 2;
@@ -422,6 +435,23 @@ message ProcessStreamResponse {
     DBRequest db_request = 2;  // processor send db request during processor run
     ProcessResult result = 3;  // finish processor run
   }
+}
+
+message PreprocessStreamRequest {
+  message DataBindings {
+    repeated DataBinding bindings = 1;
+  }
+
+  int32 process_id = 1;
+  oneof value {
+    DataBindings bindings = 2;
+    DBResponse db_result = 3; // send db response back during processor run
+  }
+}
+
+message PreprocessStreamResponse {
+  int32 process_id = 1;
+  DBRequest db_request = 2;  // processor send db request during processor run
 }
 
 message DBResponse {
@@ -578,6 +608,10 @@ message Data {
     google.protobuf.Struct transaction = 1;
     google.protobuf.Timestamp timestamp = 2;
   }
+  message StarknetEvent {
+    google.protobuf.Struct result = 1;
+    google.protobuf.Timestamp timestamp = 2;
+  }
 
   bytes raw = 1 [deprecated = true]; // can be removed anytime
   oneof value {
@@ -595,6 +629,7 @@ message Data {
     SuiObjectChange sui_object_change = 13;
     FuelCall fuel_call = 14;
     CosmosCall cosmos_call = 15;
+    StarknetEvent starknet_events = 16;
   }
 }
 
@@ -690,6 +725,7 @@ enum HandlerType {
   SUI_OBJECT_CHANGE = 12;
   FUEL_CALL = 13;
   COSMOS_CALL = 14;
+  STARKNET_EVENT = 15;
 }
 
 message RuntimeInfo {

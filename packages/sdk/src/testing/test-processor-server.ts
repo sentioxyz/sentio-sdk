@@ -4,6 +4,8 @@ import {
   DataBinding,
   DeepPartial,
   Empty,
+  PreprocessStreamRequest,
+  PreprocessStreamResponse,
   ProcessBindingResponse,
   ProcessBindingsRequest,
   ProcessConfigRequest,
@@ -91,6 +93,13 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
     requests: AsyncIterable<ProcessStreamRequest>,
     context: CallContext
   ): ServerStreamingMethodResult<DeepPartial<ProcessStreamResponse>> {
+    throw new Error('Method not implemented.')
+  }
+
+  preprocessBindingsStream(
+    requests: AsyncIterable<PreprocessStreamRequest>,
+    context: CallContext
+  ): ServerStreamingMethodResult<DeepPartial<PreprocessStreamResponse>> {
     throw new Error('Method not implemented.')
   }
 

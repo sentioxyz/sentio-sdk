@@ -203,6 +203,7 @@ export enum HandlerType {
   SUI_OBJECT_CHANGE = 12,
   FUEL_CALL = 13,
   COSMOS_CALL = 14,
+  STARKNET_EVENT = 15,
   UNRECOGNIZED = -1,
 }
 
@@ -253,6 +254,9 @@ export function handlerTypeFromJSON(object: any): HandlerType {
     case 14:
     case "COSMOS_CALL":
       return HandlerType.COSMOS_CALL;
+    case 15:
+    case "STARKNET_EVENT":
+      return HandlerType.STARKNET_EVENT;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -292,6 +296,8 @@ export function handlerTypeToJSON(object: HandlerType): string {
       return "FUEL_CALL";
     case HandlerType.COSMOS_CALL:
       return "COSMOS_CALL";
+    case HandlerType.STARKNET_EVENT:
+      return "STARKNET_EVENT";
     case HandlerType.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
@@ -389,6 +395,7 @@ export interface ContractConfig {
   assetConfigs: FuelAssetHandlerConfig[];
   fuelLogConfigs: FuelLogHandlerConfig[];
   cosmosLogConfigs: CosmosLogHandlerConfig[];
+  starknetEventConfigs: StarknetEventHandlerConfig[];
   instructionConfig: InstructionHandlerConfig | undefined;
   startBlock: bigint;
   endBlock: bigint;
@@ -711,6 +718,16 @@ export interface MoveCallFilter_FromAndToAddress {
   to: string;
 }
 
+export interface StarknetEventHandlerConfig {
+  filters: StarknetEventFilter[];
+  handlerId: number;
+}
+
+export interface StarknetEventFilter {
+  address: string;
+  keys: string[];
+}
+
 export interface FuelCallFilter {
   function: string;
   includeFailed: boolean;
@@ -743,6 +760,21 @@ export interface ProcessStreamResponse {
   processId: number;
   dbRequest?: DBRequest | undefined;
   result?: ProcessResult | undefined;
+}
+
+export interface PreprocessStreamRequest {
+  processId: number;
+  bindings?: PreprocessStreamRequest_DataBindings | undefined;
+  dbResult?: DBResponse | undefined;
+}
+
+export interface PreprocessStreamRequest_DataBindings {
+  bindings: DataBinding[];
+}
+
+export interface PreprocessStreamResponse {
+  processId: number;
+  dbRequest: DBRequest | undefined;
 }
 
 export interface DBResponse {
@@ -913,6 +945,7 @@ export interface Data {
   suiObjectChange?: Data_SuiObjectChange | undefined;
   fuelCall?: Data_FuelCall | undefined;
   cosmosCall?: Data_CosmosCall | undefined;
+  starknetEvents?: Data_StarknetEvent | undefined;
 }
 
 export interface Data_EthLog {
@@ -998,6 +1031,11 @@ export interface Data_FuelCall {
 
 export interface Data_CosmosCall {
   transaction: { [key: string]: any } | undefined;
+  timestamp: Date | undefined;
+}
+
+export interface Data_StarknetEvent {
+  result: { [key: string]: any } | undefined;
   timestamp: Date | undefined;
 }
 
@@ -1542,6 +1580,7 @@ function createBaseContractConfig(): ContractConfig {
     assetConfigs: [],
     fuelLogConfigs: [],
     cosmosLogConfigs: [],
+    starknetEventConfigs: [],
     instructionConfig: undefined,
     startBlock: BigInt("0"),
     endBlock: BigInt("0"),
@@ -1586,6 +1625,9 @@ export const ContractConfig = {
     }
     for (const v of message.cosmosLogConfigs) {
       CosmosLogHandlerConfig.encode(v!, writer.uint32(130).fork()).ldelim();
+    }
+    for (const v of message.starknetEventConfigs) {
+      StarknetEventHandlerConfig.encode(v!, writer.uint32(138).fork()).ldelim();
     }
     if (message.instructionConfig !== undefined) {
       InstructionHandlerConfig.encode(message.instructionConfig, writer.uint32(50).fork()).ldelim();
@@ -1699,6 +1741,13 @@ export const ContractConfig = {
 
           message.cosmosLogConfigs.push(CosmosLogHandlerConfig.decode(reader, reader.uint32()));
           continue;
+        case 17:
+          if (tag !== 138) {
+            break;
+          }
+
+          message.starknetEventConfigs.push(StarknetEventHandlerConfig.decode(reader, reader.uint32()));
+          continue;
         case 6:
           if (tag !== 50) {
             break;
@@ -1772,6 +1821,9 @@ export const ContractConfig = {
       cosmosLogConfigs: globalThis.Array.isArray(object?.cosmosLogConfigs)
         ? object.cosmosLogConfigs.map((e: any) => CosmosLogHandlerConfig.fromJSON(e))
         : [],
+      starknetEventConfigs: globalThis.Array.isArray(object?.starknetEventConfigs)
+        ? object.starknetEventConfigs.map((e: any) => StarknetEventHandlerConfig.fromJSON(e))
+        : [],
       instructionConfig: isSet(object.instructionConfig)
         ? InstructionHandlerConfig.fromJSON(object.instructionConfig)
         : undefined,
@@ -1819,6 +1871,9 @@ export const ContractConfig = {
     if (message.cosmosLogConfigs?.length) {
       obj.cosmosLogConfigs = message.cosmosLogConfigs.map((e) => CosmosLogHandlerConfig.toJSON(e));
     }
+    if (message.starknetEventConfigs?.length) {
+      obj.starknetEventConfigs = message.starknetEventConfigs.map((e) => StarknetEventHandlerConfig.toJSON(e));
+    }
     if (message.instructionConfig !== undefined) {
       obj.instructionConfig = InstructionHandlerConfig.toJSON(message.instructionConfig);
     }
@@ -1854,6 +1909,8 @@ export const ContractConfig = {
     message.assetConfigs = object.assetConfigs?.map((e) => FuelAssetHandlerConfig.fromPartial(e)) || [];
     message.fuelLogConfigs = object.fuelLogConfigs?.map((e) => FuelLogHandlerConfig.fromPartial(e)) || [];
     message.cosmosLogConfigs = object.cosmosLogConfigs?.map((e) => CosmosLogHandlerConfig.fromPartial(e)) || [];
+    message.starknetEventConfigs = object.starknetEventConfigs?.map((e) => StarknetEventHandlerConfig.fromPartial(e)) ||
+      [];
     message.instructionConfig = (object.instructionConfig !== undefined && object.instructionConfig !== null)
       ? InstructionHandlerConfig.fromPartial(object.instructionConfig)
       : undefined;
@@ -5365,6 +5422,156 @@ export const MoveCallFilter_FromAndToAddress = {
   },
 };
 
+function createBaseStarknetEventHandlerConfig(): StarknetEventHandlerConfig {
+  return { filters: [], handlerId: 0 };
+}
+
+export const StarknetEventHandlerConfig = {
+  encode(message: StarknetEventHandlerConfig, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.filters) {
+      StarknetEventFilter.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.handlerId !== 0) {
+      writer.uint32(16).int32(message.handlerId);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): StarknetEventHandlerConfig {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseStarknetEventHandlerConfig();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.filters.push(StarknetEventFilter.decode(reader, reader.uint32()));
+          continue;
+        case 2:
+          if (tag !== 16) {
+            break;
+          }
+
+          message.handlerId = reader.int32();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): StarknetEventHandlerConfig {
+    return {
+      filters: globalThis.Array.isArray(object?.filters)
+        ? object.filters.map((e: any) => StarknetEventFilter.fromJSON(e))
+        : [],
+      handlerId: isSet(object.handlerId) ? globalThis.Number(object.handlerId) : 0,
+    };
+  },
+
+  toJSON(message: StarknetEventHandlerConfig): unknown {
+    const obj: any = {};
+    if (message.filters?.length) {
+      obj.filters = message.filters.map((e) => StarknetEventFilter.toJSON(e));
+    }
+    if (message.handlerId !== 0) {
+      obj.handlerId = Math.round(message.handlerId);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<StarknetEventHandlerConfig>): StarknetEventHandlerConfig {
+    return StarknetEventHandlerConfig.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<StarknetEventHandlerConfig>): StarknetEventHandlerConfig {
+    const message = createBaseStarknetEventHandlerConfig();
+    message.filters = object.filters?.map((e) => StarknetEventFilter.fromPartial(e)) || [];
+    message.handlerId = object.handlerId ?? 0;
+    return message;
+  },
+};
+
+function createBaseStarknetEventFilter(): StarknetEventFilter {
+  return { address: "", keys: [] };
+}
+
+export const StarknetEventFilter = {
+  encode(message: StarknetEventFilter, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.address !== "") {
+      writer.uint32(10).string(message.address);
+    }
+    for (const v of message.keys) {
+      writer.uint32(18).string(v!);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): StarknetEventFilter {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseStarknetEventFilter();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.address = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.keys.push(reader.string());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): StarknetEventFilter {
+    return {
+      address: isSet(object.address) ? globalThis.String(object.address) : "",
+      keys: globalThis.Array.isArray(object?.keys) ? object.keys.map((e: any) => globalThis.String(e)) : [],
+    };
+  },
+
+  toJSON(message: StarknetEventFilter): unknown {
+    const obj: any = {};
+    if (message.address !== "") {
+      obj.address = message.address;
+    }
+    if (message.keys?.length) {
+      obj.keys = message.keys;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<StarknetEventFilter>): StarknetEventFilter {
+    return StarknetEventFilter.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<StarknetEventFilter>): StarknetEventFilter {
+    const message = createBaseStarknetEventFilter();
+    message.address = object.address ?? "";
+    message.keys = object.keys?.map((e) => e) || [];
+    return message;
+  },
+};
+
 function createBaseFuelCallFilter(): FuelCallFilter {
   return { function: "", includeFailed: false };
 }
@@ -5875,6 +6082,236 @@ export const ProcessStreamResponse = {
       : undefined;
     message.result = (object.result !== undefined && object.result !== null)
       ? ProcessResult.fromPartial(object.result)
+      : undefined;
+    return message;
+  },
+};
+
+function createBasePreprocessStreamRequest(): PreprocessStreamRequest {
+  return { processId: 0, bindings: undefined, dbResult: undefined };
+}
+
+export const PreprocessStreamRequest = {
+  encode(message: PreprocessStreamRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.processId !== 0) {
+      writer.uint32(8).int32(message.processId);
+    }
+    if (message.bindings !== undefined) {
+      PreprocessStreamRequest_DataBindings.encode(message.bindings, writer.uint32(18).fork()).ldelim();
+    }
+    if (message.dbResult !== undefined) {
+      DBResponse.encode(message.dbResult, writer.uint32(26).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): PreprocessStreamRequest {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasePreprocessStreamRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 8) {
+            break;
+          }
+
+          message.processId = reader.int32();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.bindings = PreprocessStreamRequest_DataBindings.decode(reader, reader.uint32());
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.dbResult = DBResponse.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): PreprocessStreamRequest {
+    return {
+      processId: isSet(object.processId) ? globalThis.Number(object.processId) : 0,
+      bindings: isSet(object.bindings) ? PreprocessStreamRequest_DataBindings.fromJSON(object.bindings) : undefined,
+      dbResult: isSet(object.dbResult) ? DBResponse.fromJSON(object.dbResult) : undefined,
+    };
+  },
+
+  toJSON(message: PreprocessStreamRequest): unknown {
+    const obj: any = {};
+    if (message.processId !== 0) {
+      obj.processId = Math.round(message.processId);
+    }
+    if (message.bindings !== undefined) {
+      obj.bindings = PreprocessStreamRequest_DataBindings.toJSON(message.bindings);
+    }
+    if (message.dbResult !== undefined) {
+      obj.dbResult = DBResponse.toJSON(message.dbResult);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<PreprocessStreamRequest>): PreprocessStreamRequest {
+    return PreprocessStreamRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<PreprocessStreamRequest>): PreprocessStreamRequest {
+    const message = createBasePreprocessStreamRequest();
+    message.processId = object.processId ?? 0;
+    message.bindings = (object.bindings !== undefined && object.bindings !== null)
+      ? PreprocessStreamRequest_DataBindings.fromPartial(object.bindings)
+      : undefined;
+    message.dbResult = (object.dbResult !== undefined && object.dbResult !== null)
+      ? DBResponse.fromPartial(object.dbResult)
+      : undefined;
+    return message;
+  },
+};
+
+function createBasePreprocessStreamRequest_DataBindings(): PreprocessStreamRequest_DataBindings {
+  return { bindings: [] };
+}
+
+export const PreprocessStreamRequest_DataBindings = {
+  encode(message: PreprocessStreamRequest_DataBindings, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.bindings) {
+      DataBinding.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): PreprocessStreamRequest_DataBindings {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasePreprocessStreamRequest_DataBindings();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.bindings.push(DataBinding.decode(reader, reader.uint32()));
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): PreprocessStreamRequest_DataBindings {
+    return {
+      bindings: globalThis.Array.isArray(object?.bindings)
+        ? object.bindings.map((e: any) => DataBinding.fromJSON(e))
+        : [],
+    };
+  },
+
+  toJSON(message: PreprocessStreamRequest_DataBindings): unknown {
+    const obj: any = {};
+    if (message.bindings?.length) {
+      obj.bindings = message.bindings.map((e) => DataBinding.toJSON(e));
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<PreprocessStreamRequest_DataBindings>): PreprocessStreamRequest_DataBindings {
+    return PreprocessStreamRequest_DataBindings.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<PreprocessStreamRequest_DataBindings>): PreprocessStreamRequest_DataBindings {
+    const message = createBasePreprocessStreamRequest_DataBindings();
+    message.bindings = object.bindings?.map((e) => DataBinding.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBasePreprocessStreamResponse(): PreprocessStreamResponse {
+  return { processId: 0, dbRequest: undefined };
+}
+
+export const PreprocessStreamResponse = {
+  encode(message: PreprocessStreamResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.processId !== 0) {
+      writer.uint32(8).int32(message.processId);
+    }
+    if (message.dbRequest !== undefined) {
+      DBRequest.encode(message.dbRequest, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): PreprocessStreamResponse {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasePreprocessStreamResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 8) {
+            break;
+          }
+
+          message.processId = reader.int32();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.dbRequest = DBRequest.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): PreprocessStreamResponse {
+    return {
+      processId: isSet(object.processId) ? globalThis.Number(object.processId) : 0,
+      dbRequest: isSet(object.dbRequest) ? DBRequest.fromJSON(object.dbRequest) : undefined,
+    };
+  },
+
+  toJSON(message: PreprocessStreamResponse): unknown {
+    const obj: any = {};
+    if (message.processId !== 0) {
+      obj.processId = Math.round(message.processId);
+    }
+    if (message.dbRequest !== undefined) {
+      obj.dbRequest = DBRequest.toJSON(message.dbRequest);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<PreprocessStreamResponse>): PreprocessStreamResponse {
+    return PreprocessStreamResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<PreprocessStreamResponse>): PreprocessStreamResponse {
+    const message = createBasePreprocessStreamResponse();
+    message.processId = object.processId ?? 0;
+    message.dbRequest = (object.dbRequest !== undefined && object.dbRequest !== null)
+      ? DBRequest.fromPartial(object.dbRequest)
       : undefined;
     return message;
   },
@@ -6824,6 +7261,7 @@ function createBaseData(): Data {
     suiObjectChange: undefined,
     fuelCall: undefined,
     cosmosCall: undefined,
+    starknetEvents: undefined,
   };
 }
 
@@ -6870,6 +7308,9 @@ export const Data = {
     }
     if (message.cosmosCall !== undefined) {
       Data_CosmosCall.encode(message.cosmosCall, writer.uint32(122).fork()).ldelim();
+    }
+    if (message.starknetEvents !== undefined) {
+      Data_StarknetEvent.encode(message.starknetEvents, writer.uint32(130).fork()).ldelim();
     }
     return writer;
   },
@@ -6979,6 +7420,13 @@ export const Data = {
 
           message.cosmosCall = Data_CosmosCall.decode(reader, reader.uint32());
           continue;
+        case 16:
+          if (tag !== 130) {
+            break;
+          }
+
+          message.starknetEvents = Data_StarknetEvent.decode(reader, reader.uint32());
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -7006,6 +7454,7 @@ export const Data = {
         : undefined,
       fuelCall: isSet(object.fuelCall) ? Data_FuelCall.fromJSON(object.fuelCall) : undefined,
       cosmosCall: isSet(object.cosmosCall) ? Data_CosmosCall.fromJSON(object.cosmosCall) : undefined,
+      starknetEvents: isSet(object.starknetEvents) ? Data_StarknetEvent.fromJSON(object.starknetEvents) : undefined,
     };
   },
 
@@ -7052,6 +7501,9 @@ export const Data = {
     }
     if (message.cosmosCall !== undefined) {
       obj.cosmosCall = Data_CosmosCall.toJSON(message.cosmosCall);
+    }
+    if (message.starknetEvents !== undefined) {
+      obj.starknetEvents = Data_StarknetEvent.toJSON(message.starknetEvents);
     }
     return obj;
   },
@@ -7102,6 +7554,9 @@ export const Data = {
       : undefined;
     message.cosmosCall = (object.cosmosCall !== undefined && object.cosmosCall !== null)
       ? Data_CosmosCall.fromPartial(object.cosmosCall)
+      : undefined;
+    message.starknetEvents = (object.starknetEvents !== undefined && object.starknetEvents !== null)
+      ? Data_StarknetEvent.fromPartial(object.starknetEvents)
       : undefined;
     return message;
   },
@@ -8411,6 +8866,80 @@ export const Data_CosmosCall = {
   fromPartial(object: DeepPartial<Data_CosmosCall>): Data_CosmosCall {
     const message = createBaseData_CosmosCall();
     message.transaction = object.transaction ?? undefined;
+    message.timestamp = object.timestamp ?? undefined;
+    return message;
+  },
+};
+
+function createBaseData_StarknetEvent(): Data_StarknetEvent {
+  return { result: undefined, timestamp: undefined };
+}
+
+export const Data_StarknetEvent = {
+  encode(message: Data_StarknetEvent, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.result !== undefined) {
+      Struct.encode(Struct.wrap(message.result), writer.uint32(10).fork()).ldelim();
+    }
+    if (message.timestamp !== undefined) {
+      Timestamp.encode(toTimestamp(message.timestamp), writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Data_StarknetEvent {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseData_StarknetEvent();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.result = Struct.unwrap(Struct.decode(reader, reader.uint32()));
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.timestamp = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Data_StarknetEvent {
+    return {
+      result: isObject(object.result) ? object.result : undefined,
+      timestamp: isSet(object.timestamp) ? fromJsonTimestamp(object.timestamp) : undefined,
+    };
+  },
+
+  toJSON(message: Data_StarknetEvent): unknown {
+    const obj: any = {};
+    if (message.result !== undefined) {
+      obj.result = message.result;
+    }
+    if (message.timestamp !== undefined) {
+      obj.timestamp = message.timestamp.toISOString();
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<Data_StarknetEvent>): Data_StarknetEvent {
+    return Data_StarknetEvent.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<Data_StarknetEvent>): Data_StarknetEvent {
+    const message = createBaseData_StarknetEvent();
+    message.result = object.result ?? undefined;
     message.timestamp = object.timestamp ?? undefined;
     return message;
   },
@@ -9996,6 +10525,14 @@ export const ProcessorDefinition = {
       responseStream: true,
       options: {},
     },
+    preprocessBindingsStream: {
+      name: "PreprocessBindingsStream",
+      requestType: PreprocessStreamRequest,
+      requestStream: true,
+      responseType: PreprocessStreamResponse,
+      responseStream: true,
+      options: {},
+    },
   },
 } as const;
 
@@ -10014,6 +10551,10 @@ export interface ProcessorServiceImplementation<CallContextExt = {}> {
     request: AsyncIterable<ProcessStreamRequest>,
     context: CallContext & CallContextExt,
   ): ServerStreamingMethodResult<DeepPartial<ProcessStreamResponse>>;
+  preprocessBindingsStream(
+    request: AsyncIterable<PreprocessStreamRequest>,
+    context: CallContext & CallContextExt,
+  ): ServerStreamingMethodResult<DeepPartial<PreprocessStreamResponse>>;
 }
 
 export interface ProcessorClient<CallOptionsExt = {}> {
@@ -10031,6 +10572,10 @@ export interface ProcessorClient<CallOptionsExt = {}> {
     request: AsyncIterable<DeepPartial<ProcessStreamRequest>>,
     options?: CallOptions & CallOptionsExt,
   ): AsyncIterable<ProcessStreamResponse>;
+  preprocessBindingsStream(
+    request: AsyncIterable<DeepPartial<PreprocessStreamRequest>>,
+    options?: CallOptions & CallOptionsExt,
+  ): AsyncIterable<PreprocessStreamResponse>;
 }
 
 type Builtin = Date | Function | Uint8Array | string | number | boolean | bigint | undefined;

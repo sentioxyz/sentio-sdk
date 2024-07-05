@@ -6,6 +6,7 @@ const require = createRequire(import.meta.url)
 import {
   DataBinding,
   HandlerType,
+  PreprocessStreamRequest,
   ProcessBindingsRequest,
   ProcessStreamRequest,
   ProcessConfigRequest,
@@ -109,6 +110,10 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
   async *processBindingsStream(requests: AsyncIterable<ProcessStreamRequest>, context: CallContext) {
     // throw new Error('Not Implemented for streaming')
     yield* this.instance.processBindingsStream(requests, context)
+  }
+
+  async *preprocessBindingsStream(requests: AsyncIterable<PreprocessStreamRequest>, context: CallContext) {
+    yield* this.instance.preprocessBindingsStream(requests, context)
   }
 
   private adjustResult(res: ProcessResult): void {}

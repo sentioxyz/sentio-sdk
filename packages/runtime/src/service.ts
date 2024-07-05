@@ -11,6 +11,8 @@ import {
   HandlerType,
   PreparedData,
   PreprocessResult,
+  PreprocessStreamRequest,
+  PreprocessStreamResponse,
   ProcessBindingResponse,
   ProcessBindingsRequest,
   ProcessConfigRequest,
@@ -124,7 +126,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
   }
 
   async processBindings(request: ProcessBindingsRequest, options?: CallContext): Promise<ProcessBindingResponse> {
-    const ethCallResults = await this.preprocessBindings(request, options)
+    const ethCallResults = await this.preprocessBindings(request.bindings, undefined, options)
 
     const promises = []
     for (const binding of request.bindings) {
@@ -154,12 +156,14 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
   }
 
   async preprocessBindings(
-    request: ProcessBindingsRequest,
+    bindings: DataBinding[],
+    dbContext?: StoreContext,
     options?: CallContext
   ): Promise<{ [calldata: string]: any[] }> {
+    console.log('preprocessBindings start')
     const promises = []
-    for (const binding of request.bindings) {
-      promises.push(this.preprocessBinding(binding, options))
+    for (const binding of bindings) {
+      promises.push(this.preprocessBinding(binding, dbContext, options))
     }
     let preprocessResults: PreprocessResult[]
     try {
@@ -167,6 +171,10 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     } catch (e) {
       throw e
     }
+    console.log(
+      'ethCallParams: ',
+      preprocessResults.map((r) => r.ethCallParams)
+    )
     const groupedRequests = new Map<string, EthCallParam[]>()
     const providers = new Map<string, Provider>()
     for (const result of preprocessResults) {
@@ -205,7 +213,11 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     return results
   }
 
-  async preprocessBinding(request: DataBinding, options?: CallContext): Promise<PreprocessResult> {
+  async preprocessBinding(
+    request: DataBinding,
+    dbContext?: StoreContext,
+    options?: CallContext
+  ): Promise<PreprocessResult> {
     if (!this.started) {
       throw new ServerError(Status.UNAVAILABLE, 'Service Not started.')
     }
@@ -221,7 +233,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         ]
       )
     }
-    return await PluginManager.INSTANCE.preprocessBinding(request)
+    return await PluginManager.INSTANCE.preprocessBinding(request, dbContext)
   }
 
   async processBinding(
@@ -256,6 +268,65 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
 
     const subject = new Subject<DeepPartial<ProcessStreamResponse>>()
     this.handleRequests(requests, subject)
+      .then(() => {
+        subject.complete()
+      })
+      .catch((e) => {
+        console.error(e)
+        subject.error(e)
+      })
+    yield* from(subject).pipe(withAbort(context.signal))
+  }
+
+  async handlePreprocessRequests(
+    requests: AsyncIterable<PreprocessStreamRequest>,
+    subject: Subject<DeepPartial<PreprocessStreamResponse>>
+  ) {
+    const contexts = new Contexts()
+
+    for await (const request of requests) {
+      try {
+        console.debug('received request:', request)
+        if (request.bindings) {
+          const bindings = request.bindings.bindings
+          const dbContext = contexts.new(request.processId, subject)
+          const start = Date.now()
+          this.preprocessBindings(bindings, dbContext)
+            .then(() => {
+              subject.next({
+                processId: request.processId
+              })
+            })
+            .catch((e) => {
+              console.debug(e)
+              dbContext.error(request.processId, e)
+              process_binding_error.add(1)
+            })
+            .finally(() => {
+              const cost = Date.now() - start
+              console.debug('preprocessBinding', request.processId, ' took', cost, 'ms')
+              process_binding_time.add(cost)
+              contexts.delete(request.processId)
+            })
+        }
+        if (request.dbResult) {
+          const dbContext = contexts.get(request.processId)
+          dbContext?.result(request.dbResult)
+        }
+      } catch (e) {
+        // should not happen
+        console.error('unexpect error during handle loop', e)
+      }
+    }
+  }
+
+  async *preprocessBindingsStream(requests: AsyncIterable<PreprocessStreamRequest>, context: CallContext) {
+    if (!this.started) {
+      throw new ServerError(Status.UNAVAILABLE, 'Service Not started.')
+    }
+
+    const subject = new Subject<DeepPartial<PreprocessStreamResponse>>()
+    this.handlePreprocessRequests(requests, subject)
       .then(() => {
         subject.complete()
       })
