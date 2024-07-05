@@ -38,7 +38,7 @@ export function getProvider(chainId?: EthChainId): Provider {
   const address = Endpoints.INSTANCE.chainServer.get(chainId)
   const key = network.chainId.toString() + '-' + address
 
-  console.log(`init provider for ${chainId}, address: ${address}`)
+  console.debug(`init provider for ${chainId}, address: ${address}`)
   let provider = providers.get(key)
 
   if (provider) {

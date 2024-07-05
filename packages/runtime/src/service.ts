@@ -195,7 +195,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     for (const params of groupedRequests.values()) {
       console.log(`chain: ${params[0].chainId}, address: ${params[0].address}, totalCalls: ${params.length}`)
       for (const param of params) {
-        const frag = new Interface(param.signature)
+        const frag = new Interface([param.signature])
         const calldata = frag.encodeFunctionData(param.function, param.args)
         callPromises.push(
           providers
