@@ -160,7 +160,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     dbContext?: StoreContext,
     options?: CallContext
   ): Promise<{ [calldata: string]: any[] }> {
-    console.log('preprocessBindings start')
+    console.log(`preprocessBindings start, bindings: ${bindings.length}`)
     const promises = []
     for (const binding of bindings) {
       promises.push(this.preprocessBinding(binding, dbContext, options))
@@ -208,7 +208,12 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         )
       }
     }
-    const results = Object.fromEntries(await Promise.all(callPromises))
+    let results = {}
+    try {
+      results = Object.fromEntries(await Promise.all(callPromises))
+    } catch (e) {
+      console.error(`eth call error: ${e}`)
+    }
     console.log(`${callPromises.length} calls finished, elapsed: ${Date.now() - start}ms`)
     return results
   }
