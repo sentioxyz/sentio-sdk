@@ -657,11 +657,14 @@ message ProcessResult {
 }
 
 message EthCallParam {
+  EthCallContext context = 1;
+  string calldata = 2;
+}
+
+message EthCallContext {
   string chain_id = 1;
   string address = 2;
-  string function = 3; // balanceOf
-  string signature = 4; // balanceOf(address)
-  repeated google.protobuf.Value args = 5;
+  string block_tag = 3;
 }
 
 message PreprocessResult {
@@ -669,7 +672,7 @@ message PreprocessResult {
 }
 
 message PreparedData {
-  map<string, google.protobuf.ListValue> eth_call_results = 1;
+  map<string, string> eth_call_results = 1;
 }
 
 message RecordMetaData {

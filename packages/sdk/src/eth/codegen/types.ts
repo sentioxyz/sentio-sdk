@@ -1,4 +1,11 @@
-import { EventDeclaration, FunctionDeclaration } from 'typechain'
+import {
+  AbiOutputParameter,
+  AbiParameter,
+  EventDeclaration,
+  FunctionDeclaration,
+  getArgumentForSignature,
+  getSignatureForFn
+} from 'typechain'
 import { EvmType } from 'typechain/dist/parser/parseEvmType.js'
 
 export function getFullSignatureAsSymbolForFunction(fn: FunctionDeclaration): string {
@@ -38,5 +45,19 @@ export function getFullSignatureForFunction(fn: FunctionDeclaration): string {
     .map((e) => {
       return formatType(e.type)
     })
+    .join(',')})`
+}
+
+function getOutputArgumentForSignature(argument: AbiOutputParameter) {
+  if (argument.type.type == 'void') {
+    return ''
+  }
+  return getArgumentForSignature(argument as AbiParameter)
+}
+
+export function getFullSignatureWithOutputForFn(fn: FunctionDeclaration) {
+  return `${getSignatureForFn(fn)} ${fn.stateMutability} returns (${fn.outputs
+    .map((i) => getOutputArgumentForSignature(i))
+    .filter((s) => s != '')
     .join(',')})`
 }

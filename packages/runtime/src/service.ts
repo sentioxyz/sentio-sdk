@@ -25,7 +25,7 @@ import {
 } from '@sentio/protos'
 
 import { PluginManager } from './plugin.js'
-import { errorString, mergeProcessResults } from './utils.js'
+import { errorString, makeEthCallKey, mergeProcessResults } from './utils.js'
 import { freezeGlobalConfig, GLOBAL_CONFIG } from './global-config.js'
 
 import { StoreContext } from './db-context.js'
@@ -33,7 +33,7 @@ import { Subject } from 'rxjs'
 import { metrics } from '@opentelemetry/api'
 import { getProvider } from './provider.js'
 import { EthChainId } from '@sentio/chain'
-import { Provider, Interface } from 'ethers'
+import { Provider } from 'ethers'
 
 const meter = metrics.getMeter('processor_service')
 const process_binding_count = meter.createCounter('process_binding_count')
@@ -53,6 +53,8 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
   private readonly loader: () => Promise<any>
 
   private readonly shutdownHandler?: () => void
+
+  private readonly preprocessedEthCalls: { [calldata: string]: any[] }
 
   constructor(loader: () => Promise<any>, shutdownHandler?: () => void) {
     this.loader = loader
@@ -159,8 +161,8 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     bindings: DataBinding[],
     dbContext?: StoreContext,
     options?: CallContext
-  ): Promise<{ [calldata: string]: any[] }> {
-    console.log(`preprocessBindings start, bindings: ${bindings.length}`)
+  ): Promise<{ [ethCallKey: string]: string }> {
+    console.debug(`preprocessBindings start, bindings: ${bindings.length}`)
     const promises = []
     for (const binding of bindings) {
       promises.push(this.preprocessBinding(binding, dbContext, options))
@@ -171,7 +173,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     } catch (e) {
       throw e
     }
-    console.log(
+    console.debug(
       'ethCallParams: ',
       preprocessResults.map((r) => r.ethCallParams)
     )
@@ -179,10 +181,11 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     const providers = new Map<string, Provider>()
     for (const result of preprocessResults) {
       for (const param of result.ethCallParams) {
-        if (!providers.has(param.chainId)) {
-          providers.set(param.chainId, getProvider(param.chainId as EthChainId))
+        const { chainId, address, blockTag } = param.context!
+        if (!providers.has(chainId)) {
+          providers.set(chainId, getProvider(chainId as EthChainId))
         }
-        const key = param.chainId + '|' + param.address
+        const key = [chainId, address, blockTag].join('|')
         if (!groupedRequests.has(key)) {
           groupedRequests.set(key, [])
         }
@@ -193,18 +196,19 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     const start = Date.now()
     const callPromises = []
     for (const params of groupedRequests.values()) {
-      console.log(`chain: ${params[0].chainId}, address: ${params[0].address}, totalCalls: ${params.length}`)
+      const { chainId, address, blockTag } = params[0].context!
+      console.log(`chain: ${chainId}, address: ${address}, blockTag: ${blockTag}, totalCalls: ${params.length}`)
+      // TODO multicall
       for (const param of params) {
-        const frag = new Interface([param.signature])
-        const calldata = frag.encodeFunctionData(param.function, param.args)
         callPromises.push(
           providers
-            .get(param.chainId)!
+            .get(chainId)!
             .call({
-              to: param.address,
-              data: calldata
+              to: address,
+              data: param.calldata,
+              blockTag
             })
-            .then((ret) => [calldata, frag.decodeFunctionResult(param.function, ret).toArray()] as [string, any[]])
+            .then((result) => [makeEthCallKey(param), result])
         )
       }
     }
@@ -305,12 +309,10 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
             .catch((e) => {
               console.debug(e)
               dbContext.error(request.processId, e)
-              process_binding_error.add(1)
             })
             .finally(() => {
               const cost = Date.now() - start
               console.debug('preprocessBinding', request.processId, ' took', cost, 'ms')
-              process_binding_time.add(cost)
               contexts.delete(request.processId)
             })
         }

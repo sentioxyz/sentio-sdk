@@ -14,3 +14,5 @@ export { EthPlugin } from './eth-plugin.js'
 export { EthFetchConfig, PreprocessResult } from '@sentio/protos'
 
 export { EthChainId } from '@sentio/chain'
+
+export { makeEthCallKey } from '@sentio/runtime'

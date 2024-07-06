@@ -9,7 +9,12 @@ import {
 import { reservedKeywords } from '@sentio/ethers-v6/dist/codegen/reserved-keywords.js'
 import { codegenCallTraceTypes, generateCallHandlers } from './functions-handler.js'
 import { generateEventFilters, generateEventHandlers } from './event-handler.js'
-import { generateBoundViewFunctions, generateViewFunctions } from './function-calls.js'
+import {
+  generateBoundFunctionCallEncoders,
+  generateBoundViewFunctions,
+  generateFunctionCallEncoders,
+  generateViewFunctions
+} from './function-calls.js'
 
 export function codeGenIndex(contract: Contract): string {
   return ` 
@@ -44,6 +49,13 @@ export function codeGenSentioFile(contract: Contract): string {
         .flatMap((fs) => generateViewFunctions(false, fs))
         .join(',\n')}
     }
+    
+    encodeCall = {
+      ${Object.values(contract.functions)
+        .filter((f) => !reservedKeywords.has(f[0].name))
+        .flatMap((fs) => generateFunctionCallEncoders(fs))
+        .join(',\n')}
+    }
   }
   
   export class ${contract.name}BoundContractView extends BoundContractView<${contract.name}, 
@@ -59,6 +71,15 @@ export function codeGenSentioFile(contract: Contract): string {
       ${Object.values(contract.functions)
         .filter((f) => !reservedKeywords.has(f[0].name))
         .flatMap((fs) => generateBoundViewFunctions(false, fs))
+        .join(',\n')}
+    }
+    
+    encodeCall = {
+      view: this.view,
+      context: this.context,
+      ${Object.values(contract.functions)
+        .filter((f) => !reservedKeywords.has(f[0].name))
+        .flatMap((fs) => generateBoundFunctionCallEncoders(fs))
         .join(',\n')}
     }
   }
@@ -173,7 +194,7 @@ export class ${contract.name}ProcessorTemplate extends BaseProcessorTemplate<${c
 
   const imports = createImportsForUsedIdentifiers(
     {
-      ethers: ['BigNumberish', 'Overrides', 'BytesLike'],
+      ethers: ['BigNumberish', 'Overrides', 'BytesLike', 'Interface'],
       // 'ethers/providers': ['Networkish'],
       '@sentio/sdk/eth': [
         'addContractByABI',
@@ -195,10 +216,12 @@ export class ${contract.name}ProcessorTemplate extends BaseProcessorTemplate<${c
         'TypedCallTrace',
         'EthContext',
         'EthFetchConfig',
-        'PreprocessResult'
+        'PreprocessResult',
+        'makeEthCallKey'
       ],
       // '@sentio/sdk/eth': ['BaseContext'],
       // '@sentio/protos': ['EthFetchConfig'],
+      '@sentio/protos': ['EthCallParam', 'EthCallContext', 'PreparedData'],
       './common.js': ['PromiseOrValue'],
       './index.js': [`${contract.name}__factory`],
       [`./${contract.name}.js`]: [`${contract.name}`, ...eventsImports, ...uniqueStructImports]

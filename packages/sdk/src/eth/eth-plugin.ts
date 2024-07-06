@@ -414,7 +414,7 @@ export class EthPlugin extends Plugin {
     const promises: Promise<ProcessResult>[] = []
     for (const handlerId of request.handlerIds) {
       const handler = this.handlers.eventHandlers[handlerId]
-      const promise = handler(ethLog).catch((e) => {
+      const promise = handler(ethLog, preparedData).catch((e) => {
         throw new ServerError(
           Status.INTERNAL,
           'error processing log: ' + JSON.stringify(ethLog.log) + '\n' + errorString(e)
@@ -437,7 +437,7 @@ export class EthPlugin extends Plugin {
     const promises: Promise<ProcessResult>[] = []
 
     for (const handlerId of binding.handlerIds) {
-      const promise = this.handlers.traceHandlers[handlerId](ethTrace).catch((e) => {
+      const promise = this.handlers.traceHandlers[handlerId](ethTrace, preparedData).catch((e) => {
         throw new ServerError(
           Status.INTERNAL,
           'error processing trace: ' + JSON.stringify(ethTrace.trace) + '\n' + errorString(e)
@@ -459,7 +459,7 @@ export class EthPlugin extends Plugin {
 
     const promises: Promise<ProcessResult>[] = []
     for (const handlerId of binding.handlerIds) {
-      const promise = this.handlers.blockHandlers[handlerId](ethBlock).catch((e) => {
+      const promise = this.handlers.blockHandlers[handlerId](ethBlock, preparedData).catch((e) => {
         throw new ServerError(
           Status.INTERNAL,
           'error processing block: ' + ethBlock.block?.number + '\n' + errorString(e)
@@ -482,7 +482,7 @@ export class EthPlugin extends Plugin {
     const promises: Promise<ProcessResult>[] = []
 
     for (const handlerId of binding.handlerIds) {
-      const promise = this.handlers.transactionHandlers[handlerId](ethTransaction).catch((e) => {
+      const promise = this.handlers.transactionHandlers[handlerId](ethTransaction, preparedData).catch((e) => {
         throw new ServerError(
           Status.INTERNAL,
           'error processing transaction: ' + JSON.stringify(ethTransaction.transaction) + '\n' + errorString(e)
