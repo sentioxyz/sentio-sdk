@@ -1,4 +1,4 @@
-import { AptosResourcesProcessor, defaultMoveCoder } from '@sentio/sdk/aptos'
+import { AptosResourcesProcessor, defaultMoveCoder } from '../index.js'
 import { SouffleChefCampaign, CandyMachine } from './types/souffle.js'
 import { token } from '../builtin/0x3.js'
 import { aptos_account, voting } from '../builtin/0x1.js'

@@ -1,4 +1,4 @@
-import { SPLTokenProcessor } from '@sentio/sdk/solana/builtin'
+import { SPLTokenProcessor } from '../builtin/index.js'
 import { TokenBridgeProcessor } from './types/token_bridge_processor.js'
 
 import { token_bridge_idl } from './types/token_bridge.js'
@@ -72,12 +72,12 @@ export enum TokenBridgeInstruction {
   CompleteNativeWithPayload,
   CompleteWrappedWithPayload,
   TransferWrappedWithPayload,
-  TransferNativeWithPayload,
+  TransferNativeWithPayload
 }
 
 TokenBridgeProcessor.bind({
   address: 'wormDTUJ6AWPNvk59vGQbDvGJmqbDTdgWgAqcLBCgUb',
-  instructionCoder: new TokenBridgeDecoder(token_bridge_idl as Idl),
+  instructionCoder: new TokenBridgeDecoder(token_bridge_idl as Idl)
 }).onTransferNative((args, accounts, ctx) => {
   ctx.meter.Counter('total_transfer_amount').add(args.amount)
   ctx.meter.Counter(accounts.payer).add(args.amount)

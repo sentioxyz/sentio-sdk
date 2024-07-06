@@ -178,13 +178,13 @@ importers:
         version: 1.14.0
       '@mysten/sui.js':
         specifier: ~0.54.1
-        version: 0.54.1(svelte@4.2.18)(typescript@5.5.2)
+        version: 0.54.1(svelte@4.2.18)(typescript@5.5.3)
       '@sentio/chain':
         specifier: ^1.1.4
         version: 1.1.5
       '@sentio/graph-cli':
         specifier: ^0.75.0
-        version: 0.75.0(@types/node@20.14.9)(bufferutil@4.0.8)(encoding@0.1.13)(node-fetch@3.3.2)(typescript@5.5.2)(utf-8-validate@5.0.10)
+        version: 0.75.0(@types/node@20.14.9)(bufferutil@4.0.8)(encoding@0.1.13)(node-fetch@3.3.2)(typescript@5.5.3)(utf-8-validate@5.0.10)
       '@sentio/sdk':
         specifier: workspace:^
         version: link:../sdk
@@ -226,7 +226,7 @@ importers:
         version: 0.8.26
       tsup:
         specifier: npm:@sentio/tsup@^6.7.2
-        version: '@sentio/tsup@6.7.3(ts-node@10.9.2(@types/node@20.14.9)(typescript@5.5.2))(typescript@5.5.2)'
+        version: '@sentio/tsup@6.7.3(ts-node@10.9.2(@types/node@20.14.9)(typescript@5.5.3))(typescript@5.5.3)'
       tsx:
         specifier: ^4.15.2
         version: 4.15.7
@@ -447,7 +447,7 @@ importers:
         version: 0.88.1(encoding@0.1.13)
       '@mysten/sui.js':
         specifier: ~0.54.1
-        version: 0.54.1(svelte@4.2.18)(typescript@5.5.2)
+        version: 0.54.1(svelte@4.2.18)(typescript@5.5.3)
       '@project-serum/anchor':
         specifier: ^0.26.0
         version: 0.26.0(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
@@ -459,7 +459,7 @@ importers:
         version: 1.1.5
       '@sentio/ethers-v6':
         specifier: ^1.0.29
-        version: 1.0.29(@sentio/ethers@6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typescript@5.5.2)
+        version: 1.0.29(@sentio/ethers@6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typescript@5.5.3)
       '@sentio/protos':
         specifier: workspace:*
         version: link:../protos
@@ -477,7 +477,7 @@ importers:
         version: 1.6.1
       '@typemove/sui':
         specifier: ~1.6.1
-        version: 1.6.1(svelte@4.2.18)(typescript@5.5.2)
+        version: 1.6.1(svelte@4.2.18)(typescript@5.5.3)
       bs58:
         specifier: ^5.0.0
         version: 5.0.0
@@ -493,6 +493,9 @@ importers:
       fuels:
         specifier: ^0.90.0
         version: 0.90.0(encoding@0.1.13)
+      graphql:
+        specifier: ^16.9.0
+        version: 16.9.0
       js-sha3:
         specifier: ^0.9.3
         version: 0.9.3
@@ -520,9 +523,6 @@ importers:
       p-queue:
         specifier: ^8.0.1
         version: 8.0.1
-      prettier:
-        specifier: ^3.2.4
-        version: 3.3.2
       prettier2:
         specifier: npm:prettier@2.8.8
         version: prettier@2.8.8
@@ -537,13 +537,10 @@ importers:
         version: superstruct@0.14.2
       tsup:
         specifier: npm:@sentio/tsup@^6.7.2
-        version: '@sentio/tsup@6.7.3(ts-node@10.9.2(@types/node@20.14.9)(typescript@5.5.2))(typescript@5.5.2)'
+        version: '@sentio/tsup@6.7.3(ts-node@10.9.2(@types/node@20.14.9)(typescript@5.5.3))(typescript@5.5.3)'
       typechain:
         specifier: ^8.3.2
-        version: 8.3.2(typescript@5.5.2)
-      typedoc:
-        specifier: ^0.26.0
-        version: 0.26.2(typescript@5.5.2)
+        version: 8.3.2(typescript@5.5.3)
       utility-types:
         specifier: ^3.11.0
         version: 3.11.0
@@ -560,9 +557,15 @@ importers:
       '@types/mkdirp':
         specifier: ^1.0.2
         version: 1.0.2
+      prettier:
+        specifier: ^3.2.4
+        version: 3.3.2
       tslib:
         specifier: ^2.6.2
         version: 2.6.3
+      typedoc:
+        specifier: ^0.26.0
+        version: 0.26.2(typescript@5.5.3)
 
 packages:
 
@@ -1151,6 +1154,10 @@ packages:
 
   '@eslint-community/regexpp@4.10.1':
     resolution: {integrity: sha512-Zm2NGpWELsQAD1xsJzGQpYfvICSsFkEpU0jxBjfdC6uNEWXcHnfs9hScFWtXVDVl+rBQJGrl4g1vcKIejpH9dA==}
+    engines: {node: ^12.0.0 || ^14.0.0 || >=16.0.0}
+
+  '@eslint-community/regexpp@4.11.0':
+    resolution: {integrity: sha512-G/M/tIiMrTAxEWRfLfQJMmGNX28IxBg4PBz8XqQhqUHLFI6TL2htpIB1iQCj144V5ee/JaKyT9/WZ0MGZWfA7A==}
     engines: {node: ^12.0.0 || ^14.0.0 || >=16.0.0}
 
   '@eslint/eslintrc@2.1.4':
@@ -2300,8 +2307,8 @@ packages:
     engines: {node: '>=0.4.0'}
     hasBin: true
 
-  acorn@8.12.0:
-    resolution: {integrity: sha512-RTvkC4w+KNXrM39/lWCUaG0IbRkWdCv7W/IOW9oU6SawyxulvkQy5HQPVTKxEjczcUvapcrw3cFx/60VN/NRNw==}
+  acorn@8.12.1:
+    resolution: {integrity: sha512-tcpGyI9zbizT9JbV6oYE477V6mTlXvvi0T0G3SNIYE2apm/G5huBa1+K89VGeovbg+jycCrfhl3ADxErOuO6Jg==}
     engines: {node: '>=0.4.0'}
     hasBin: true
 
@@ -6411,6 +6418,11 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
+  typescript@5.5.3:
+    resolution: {integrity: sha512-/hreyEujaB0w76zKo6717l3L0o/qEUtRgdvUBvlkhoWeOVMjMuHNHk0BRBzikzuGDqNmPQbg5ifMEqsHLiIUcQ==}
+    engines: {node: '>=14.17'}
+    hasBin: true
+
   typical@4.0.0:
     resolution: {integrity: sha512-VAH4IvQ7BDFYglMd7BPRDfLgxZZX4O4TFcRDA6EN5X7erNJJq+McIEp8np9aVtxrCJ6qx4GTYVfOWNjcqwZgRw==}
     engines: {node: '>=8'}
@@ -6711,11 +6723,11 @@ snapshots:
     optionalDependencies:
       graphql: 16.9.0
 
-  '@0no-co/graphqlsp@1.12.8(graphql@16.9.0)(typescript@5.5.2)':
+  '@0no-co/graphqlsp@1.12.8(graphql@16.9.0)(typescript@5.5.3)':
     dependencies:
-      '@gql.tada/internal': 1.0.1(graphql@16.9.0)(typescript@5.5.2)
+      '@gql.tada/internal': 1.0.1(graphql@16.9.0)(typescript@5.5.3)
       graphql: 16.9.0
-      typescript: 5.5.2
+      typescript: 5.5.3
 
   '@75lb/deep-merge@1.1.1':
     dependencies:
@@ -7219,6 +7231,8 @@ snapshots:
 
   '@eslint-community/regexpp@4.10.1': {}
 
+  '@eslint-community/regexpp@4.11.0': {}
+
   '@eslint/eslintrc@2.1.4':
     dependencies:
       ajv: 6.12.6
@@ -7658,23 +7672,23 @@ snapshots:
 
   '@fuels/vm-asm@0.54.0': {}
 
-  '@gql.tada/cli-utils@1.3.10(graphql@16.9.0)(svelte@4.2.18)(typescript@5.5.2)':
+  '@gql.tada/cli-utils@1.3.10(graphql@16.9.0)(svelte@4.2.18)(typescript@5.5.3)':
     dependencies:
-      '@0no-co/graphqlsp': 1.12.8(graphql@16.9.0)(typescript@5.5.2)
-      '@gql.tada/internal': 1.0.1(graphql@16.9.0)(typescript@5.5.2)
+      '@0no-co/graphqlsp': 1.12.8(graphql@16.9.0)(typescript@5.5.3)
+      '@gql.tada/internal': 1.0.1(graphql@16.9.0)(typescript@5.5.3)
       '@vue/compiler-dom': 3.4.30
-      '@vue/language-core': 2.0.22(typescript@5.5.2)
+      '@vue/language-core': 2.0.22(typescript@5.5.3)
       graphql: 16.9.0
-      svelte2tsx: 0.7.11(svelte@4.2.18)(typescript@5.5.2)
-      typescript: 5.5.2
+      svelte2tsx: 0.7.11(svelte@4.2.18)(typescript@5.5.3)
+      typescript: 5.5.3
     transitivePeerDependencies:
       - svelte
 
-  '@gql.tada/internal@1.0.1(graphql@16.9.0)(typescript@5.5.2)':
+  '@gql.tada/internal@1.0.1(graphql@16.9.0)(typescript@5.5.3)':
     dependencies:
       '@0no-co/graphql.web': 1.0.7(graphql@16.9.0)
       graphql: 16.9.0
-      typescript: 5.5.2
+      typescript: 5.5.3
 
   '@graphql-typed-document-node/core@3.2.0(graphql@16.9.0)':
     dependencies:
@@ -7988,7 +8002,7 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  '@mysten/sui.js@0.54.1(svelte@4.2.18)(typescript@5.5.2)':
+  '@mysten/sui.js@0.54.1(svelte@4.2.18)(typescript@5.5.3)':
     dependencies:
       '@graphql-typed-document-node/core': 3.2.0(graphql@16.9.0)
       '@mysten/bcs': 0.11.1
@@ -7998,7 +8012,7 @@ snapshots:
       '@scure/bip39': 1.3.0
       '@suchipi/femver': 1.0.0
       bech32: 2.0.0
-      gql.tada: 1.7.6(graphql@16.9.0)(svelte@4.2.18)(typescript@5.5.2)
+      gql.tada: 1.7.6(graphql@16.9.0)(svelte@4.2.18)(typescript@5.5.3)
       graphql: 16.9.0
       superstruct: 1.0.4
       tweetnacl: 1.0.3
@@ -8032,7 +8046,7 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.17.1
 
-  '@oclif/core@2.16.0(@types/node@20.14.9)(typescript@5.5.2)':
+  '@oclif/core@2.16.0(@types/node@20.14.9)(typescript@5.5.3)':
     dependencies:
       '@types/cli-progress': 3.11.5
       ansi-escapes: 4.3.2
@@ -8041,7 +8055,7 @@ snapshots:
       chalk: 4.1.2
       clean-stack: 3.0.1
       cli-progress: 3.12.0
-      debug: 4.3.4(supports-color@8.1.1)
+      debug: 4.3.5(supports-color@8.1.1)
       ejs: 3.1.10
       get-package-type: 0.1.0
       globby: 11.1.0
@@ -8057,7 +8071,7 @@ snapshots:
       strip-ansi: 6.0.1
       supports-color: 8.1.1
       supports-hyperlinks: 2.3.0
-      ts-node: 10.9.2(@types/node@20.14.9)(typescript@5.5.2)
+      ts-node: 10.9.2(@types/node@20.14.9)(typescript@5.5.3)
       tslib: 2.6.3
       widest-line: 3.1.0
       wordwrap: 1.0.0
@@ -8068,7 +8082,7 @@ snapshots:
       - '@types/node'
       - typescript
 
-  '@oclif/core@2.8.6(@types/node@20.14.9)(typescript@5.5.2)':
+  '@oclif/core@2.8.6(@types/node@20.14.9)(typescript@5.5.3)':
     dependencies:
       '@types/cli-progress': 3.11.5
       ansi-escapes: 4.3.2
@@ -8094,7 +8108,7 @@ snapshots:
       strip-ansi: 6.0.1
       supports-color: 8.1.1
       supports-hyperlinks: 2.3.0
-      ts-node: 10.9.2(@types/node@20.14.9)(typescript@5.5.2)
+      ts-node: 10.9.2(@types/node@20.14.9)(typescript@5.5.3)
       tslib: 2.6.3
       widest-line: 3.1.0
       wordwrap: 1.0.0
@@ -8105,11 +8119,11 @@ snapshots:
       - '@types/node'
       - typescript
 
-  '@oclif/plugin-autocomplete@2.3.10(@types/node@20.14.9)(typescript@5.5.2)':
+  '@oclif/plugin-autocomplete@2.3.10(@types/node@20.14.9)(typescript@5.5.3)':
     dependencies:
-      '@oclif/core': 2.16.0(@types/node@20.14.9)(typescript@5.5.2)
+      '@oclif/core': 2.16.0(@types/node@20.14.9)(typescript@5.5.3)
       chalk: 4.1.2
-      debug: 4.3.4(supports-color@8.1.1)
+      debug: 4.3.4
     transitivePeerDependencies:
       - '@swc/core'
       - '@swc/wasm'
@@ -8117,9 +8131,9 @@ snapshots:
       - supports-color
       - typescript
 
-  '@oclif/plugin-not-found@2.4.3(@types/node@20.14.9)(typescript@5.5.2)':
+  '@oclif/plugin-not-found@2.4.3(@types/node@20.14.9)(typescript@5.5.3)':
     dependencies:
-      '@oclif/core': 2.16.0(@types/node@20.14.9)(typescript@5.5.2)
+      '@oclif/core': 2.16.0(@types/node@20.14.9)(typescript@5.5.3)
       chalk: 4.1.2
       fast-levenshtein: 3.0.0
     transitivePeerDependencies:
@@ -8565,12 +8579,12 @@ snapshots:
 
   '@sentio/chain@1.1.5': {}
 
-  '@sentio/ethers-v6@1.0.29(@sentio/ethers@6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typescript@5.5.2)':
+  '@sentio/ethers-v6@1.0.29(@sentio/ethers@6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typescript@5.5.3)':
     dependencies:
       ethers: '@sentio/ethers@6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)'
       lodash: 4.17.21
-      ts-essentials: 7.0.3(typescript@5.5.2)
-      typescript: 5.5.2
+      ts-essentials: 7.0.3(typescript@5.5.3)
+      typescript: 5.5.3
 
   '@sentio/ethers@6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
@@ -8585,18 +8599,18 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  '@sentio/graph-cli@0.75.0(@types/node@20.14.9)(bufferutil@4.0.8)(encoding@0.1.13)(node-fetch@3.3.2)(typescript@5.5.2)(utf-8-validate@5.0.10)':
+  '@sentio/graph-cli@0.75.0(@types/node@20.14.9)(bufferutil@4.0.8)(encoding@0.1.13)(node-fetch@3.3.2)(typescript@5.5.3)(utf-8-validate@5.0.10)':
     dependencies:
       '@float-capital/float-subgraph-uncrashable': 0.0.0-internal-testing.5
-      '@oclif/core': 2.8.6(@types/node@20.14.9)(typescript@5.5.2)
-      '@oclif/plugin-autocomplete': 2.3.10(@types/node@20.14.9)(typescript@5.5.2)
-      '@oclif/plugin-not-found': 2.4.3(@types/node@20.14.9)(typescript@5.5.2)
+      '@oclif/core': 2.8.6(@types/node@20.14.9)(typescript@5.5.3)
+      '@oclif/plugin-autocomplete': 2.3.10(@types/node@20.14.9)(typescript@5.5.3)
+      '@oclif/plugin-not-found': 2.4.3(@types/node@20.14.9)(typescript@5.5.3)
       '@whatwg-node/fetch': 0.8.8
       assemblyscript: 0.19.23
       binary-install-raw: 0.0.13(debug@4.3.4)
       chalk: 3.0.0
       chokidar: 3.5.3
-      debug: 4.3.4(supports-color@8.1.1)
+      debug: 4.3.4
       docker-compose: 0.23.19
       dockerode: 2.5.8
       fs-extra: 9.1.0
@@ -8626,7 +8640,7 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@sentio/tsup@6.7.3(ts-node@10.9.2(@types/node@20.14.9)(typescript@5.5.2))(typescript@5.5.2)':
+  '@sentio/tsup@6.7.3(ts-node@10.9.2(@types/node@20.14.9)(typescript@5.5.3))(typescript@5.5.3)':
     dependencies:
       bundle-require: 4.0.1(esbuild@0.17.19)
       cac: 6.7.14
@@ -8636,14 +8650,14 @@ snapshots:
       execa: 5.1.1
       globby: 11.1.0
       joycon: 3.1.1
-      postcss-load-config: 3.1.4(ts-node@10.9.2(@types/node@20.14.9)(typescript@5.5.2))
+      postcss-load-config: 3.1.4(ts-node@10.9.2(@types/node@20.14.9)(typescript@5.5.3))
       resolve-from: 5.0.0
       rollup: 3.29.4
       source-map: 0.8.0-beta.0
       sucrase: 3.35.0
       tree-kill: 1.2.2
     optionalDependencies:
-      typescript: 5.5.2
+      typescript: 5.5.3
     transitivePeerDependencies:
       - supports-color
       - ts-node
@@ -8821,10 +8835,10 @@ snapshots:
     dependencies:
       radash: 12.1.0
 
-  '@typemove/sui@1.6.1(svelte@4.2.18)(typescript@5.5.2)':
+  '@typemove/sui@1.6.1(svelte@4.2.18)(typescript@5.5.3)':
     dependencies:
       '@mysten/bcs': 0.11.1
-      '@mysten/sui.js': 0.54.1(svelte@4.2.18)(typescript@5.5.2)
+      '@mysten/sui.js': 0.54.1(svelte@4.2.18)(typescript@5.5.3)
       '@typemove/move': 1.6.1
       chalk: 5.3.0
       commander: 12.1.0
@@ -9101,7 +9115,7 @@ snapshots:
       '@vue/compiler-core': 3.4.30
       '@vue/shared': 3.4.30
 
-  '@vue/language-core@2.0.22(typescript@5.5.2)':
+  '@vue/language-core@2.0.22(typescript@5.5.3)':
     dependencies:
       '@volar/language-core': 2.3.4
       '@vue/compiler-dom': 3.4.30
@@ -9112,7 +9126,7 @@ snapshots:
       path-browserify: 1.0.1
       vue-template-compiler: 2.7.16
     optionalDependencies:
-      typescript: 5.5.2
+      typescript: 5.5.3
 
   '@vue/shared@3.4.30': {}
 
@@ -9205,22 +9219,22 @@ snapshots:
       mime-types: 2.1.35
       negotiator: 0.6.3
 
-  acorn-import-attributes@1.9.5(acorn@8.12.0):
+  acorn-import-attributes@1.9.5(acorn@8.12.1):
     dependencies:
-      acorn: 8.12.0
+      acorn: 8.12.1
 
-  acorn-jsx@5.3.2(acorn@8.12.0):
+  acorn-jsx@5.3.2(acorn@8.12.1):
     dependencies:
-      acorn: 8.12.0
+      acorn: 8.12.1
 
   acorn-walk@8.3.3:
     dependencies:
-      acorn: 8.12.0
+      acorn: 8.12.1
 
   acorn@7.1.1:
     optional: true
 
-  acorn@8.12.0: {}
+  acorn@8.12.1: {}
 
   aes-js@4.0.0-beta.5: {}
 
@@ -9862,7 +9876,7 @@ snapshots:
     dependencies:
       '@jridgewell/sourcemap-codec': 1.4.15
       '@types/estree': 1.0.5
-      acorn: 8.12.0
+      acorn: 8.12.1
       estree-walker: 3.0.3
       periscopic: 3.1.0
 
@@ -10128,11 +10142,9 @@ snapshots:
     dependencies:
       ms: 2.1.3
 
-  debug@4.3.4(supports-color@8.1.1):
+  debug@4.3.4:
     dependencies:
       ms: 2.1.2
-    optionalDependencies:
-      supports-color: 8.1.1
 
   debug@4.3.5(supports-color@8.1.1):
     dependencies:
@@ -10634,7 +10646,7 @@ snapshots:
   eslint@8.57.0:
     dependencies:
       '@eslint-community/eslint-utils': 4.4.0(eslint@8.57.0)
-      '@eslint-community/regexpp': 4.10.1
+      '@eslint-community/regexpp': 4.11.0
       '@eslint/eslintrc': 2.1.4
       '@eslint/js': 8.57.0
       '@humanwhocodes/config-array': 0.11.14
@@ -10676,8 +10688,8 @@ snapshots:
 
   espree@9.6.1:
     dependencies:
-      acorn: 8.12.0
-      acorn-jsx: 5.3.2(acorn@8.12.0)
+      acorn: 8.12.1
+      acorn-jsx: 5.3.2(acorn@8.12.1)
       eslint-visitor-keys: 3.4.3
 
   esprima@4.0.1: {}
@@ -10985,7 +10997,7 @@ snapshots:
 
   follow-redirects@1.15.6(debug@4.3.4):
     optionalDependencies:
-      debug: 4.3.4(supports-color@8.1.1)
+      debug: 4.3.4
 
   for-each@0.3.3:
     dependencies:
@@ -11294,12 +11306,12 @@ snapshots:
       p-cancelable: 2.1.1
       responselike: 2.0.1
 
-  gql.tada@1.7.6(graphql@16.9.0)(svelte@4.2.18)(typescript@5.5.2):
+  gql.tada@1.7.6(graphql@16.9.0)(svelte@4.2.18)(typescript@5.5.3):
     dependencies:
       '@0no-co/graphql.web': 1.0.7(graphql@16.9.0)
-      '@gql.tada/cli-utils': 1.3.10(graphql@16.9.0)(svelte@4.2.18)(typescript@5.5.2)
-      '@gql.tada/internal': 1.0.1(graphql@16.9.0)(typescript@5.5.2)
-      typescript: 5.5.2
+      '@gql.tada/cli-utils': 1.3.10(graphql@16.9.0)(svelte@4.2.18)(typescript@5.5.3)
+      '@gql.tada/internal': 1.0.1(graphql@16.9.0)(typescript@5.5.3)
+      typescript: 5.5.3
     transitivePeerDependencies:
       - graphql
       - svelte
@@ -11493,8 +11505,8 @@ snapshots:
 
   import-in-the-middle@1.8.1:
     dependencies:
-      acorn: 8.12.0
-      acorn-import-attributes: 1.9.5(acorn@8.12.0)
+      acorn: 8.12.1
+      acorn-import-attributes: 1.9.5(acorn@8.12.1)
       cjs-module-lexer: 1.3.1
       module-details-from-path: 1.0.3
 
@@ -12765,12 +12777,12 @@ snapshots:
 
   possible-typed-array-names@1.0.0: {}
 
-  postcss-load-config@3.1.4(ts-node@10.9.2(@types/node@20.14.9)(typescript@5.5.2)):
+  postcss-load-config@3.1.4(ts-node@10.9.2(@types/node@20.14.9)(typescript@5.5.3)):
     dependencies:
       lilconfig: 2.1.0
       yaml: 1.10.2
     optionalDependencies:
-      ts-node: 10.9.2(@types/node@20.14.9)(typescript@5.5.2)
+      ts-node: 10.9.2(@types/node@20.14.9)(typescript@5.5.3)
 
   prelude-ls@1.2.1: {}
 
@@ -13586,12 +13598,12 @@ snapshots:
 
   supports-preserve-symlinks-flag@1.0.0: {}
 
-  svelte2tsx@0.7.11(svelte@4.2.18)(typescript@5.5.2):
+  svelte2tsx@0.7.11(svelte@4.2.18)(typescript@5.5.3):
     dependencies:
       dedent-js: 1.0.1
       pascal-case: 3.1.2
       svelte: 4.2.18
-      typescript: 5.5.2
+      typescript: 5.5.3
 
   svelte@4.2.18:
     dependencies:
@@ -13599,7 +13611,7 @@ snapshots:
       '@jridgewell/sourcemap-codec': 1.4.15
       '@jridgewell/trace-mapping': 0.3.25
       '@types/estree': 1.0.5
-      acorn: 8.12.0
+      acorn: 8.12.1
       aria-query: 5.3.0
       axobject-query: 4.0.0
       code-red: 1.0.4
@@ -13802,9 +13814,9 @@ snapshots:
 
   ts-error@1.0.6: {}
 
-  ts-essentials@7.0.3(typescript@5.5.2):
+  ts-essentials@7.0.3(typescript@5.5.3):
     dependencies:
-      typescript: 5.5.2
+      typescript: 5.5.3
 
   ts-interface-checker@0.1.13: {}
 
@@ -13813,7 +13825,7 @@ snapshots:
       tslib: 2.6.3
     optional: true
 
-  ts-node@10.9.2(@types/node@20.14.9)(typescript@5.5.2):
+  ts-node@10.9.2(@types/node@20.14.9)(typescript@5.5.3):
     dependencies:
       '@cspotcode/source-map-support': 0.8.1
       '@tsconfig/node10': 1.0.11
@@ -13821,13 +13833,13 @@ snapshots:
       '@tsconfig/node14': 1.0.3
       '@tsconfig/node16': 1.0.4
       '@types/node': 20.14.9
-      acorn: 8.12.0
+      acorn: 8.12.1
       acorn-walk: 8.3.3
       arg: 4.1.3
       create-require: 1.1.1
       diff: 4.0.2
       make-error: 1.3.6
-      typescript: 5.5.2
+      typescript: 5.5.3
       v8-compile-cache-lib: 3.0.1
       yn: 3.1.1
 
@@ -13881,7 +13893,7 @@ snapshots:
       media-typer: 0.3.0
       mime-types: 2.1.35
 
-  typechain@8.3.2(typescript@5.5.2):
+  typechain@8.3.2(typescript@5.5.3):
     dependencies:
       '@types/prettier': 2.7.3
       debug: 4.3.5(supports-color@8.1.1)
@@ -13892,8 +13904,8 @@ snapshots:
       mkdirp: 1.0.4
       prettier: 2.8.8
       ts-command-line-args: 2.5.1
-      ts-essentials: 7.0.3(typescript@5.5.2)
-      typescript: 5.5.2
+      ts-essentials: 7.0.3(typescript@5.5.3)
+      typescript: 5.5.3
     transitivePeerDependencies:
       - supports-color
 
@@ -13940,18 +13952,20 @@ snapshots:
 
   typedarray@0.0.6: {}
 
-  typedoc@0.26.2(typescript@5.5.2):
+  typedoc@0.26.2(typescript@5.5.3):
     dependencies:
       lunr: 2.3.9
       markdown-it: 14.1.0
       minimatch: 9.0.5
       shiki: 1.9.1
-      typescript: 5.5.2
+      typescript: 5.5.3
       yaml: 2.4.5
 
   typeforce@1.18.0: {}
 
   typescript@5.5.2: {}
+
+  typescript@5.5.3: {}
 
   typical@4.0.0: {}
 

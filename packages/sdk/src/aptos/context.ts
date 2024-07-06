@@ -1,6 +1,6 @@
 import { RecordMetaData } from '@sentio/protos'
-import { type Labels, normalizeLabels } from '@sentio/sdk'
-import { MoveCoder } from '@sentio/sdk/aptos'
+import { type Labels, normalizeLabels } from '../index.js'
+import { MoveCoder } from './index.js'
 import {
   Aptos,
   Event,

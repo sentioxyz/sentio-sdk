@@ -1,4 +1,4 @@
-import { defaultMoveCoder, MoveCoder } from '@sentio/sdk/aptos'
+import { defaultMoveCoder, MoveCoder } from './index.js'
 
 import { Event, MoveResource, UserTransactionResponse, EntryFunctionPayloadResponse } from '@aptos-labs/ts-sdk'
 

@@ -16,7 +16,7 @@ import {
   TransactionFilter
 } from '../move/index.js'
 import { getMoveCalls } from './utils.js'
-import { defaultMoveCoder, MoveCoder } from '@sentio/sdk/sui'
+import { defaultMoveCoder, MoveCoder } from './index.js'
 import { Labels } from '../core/index.js'
 import { Required } from 'utility-types'
 

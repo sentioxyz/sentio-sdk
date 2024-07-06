@@ -8,7 +8,7 @@ import {
   SuiMoveObject,
   SuiClient
 } from '@mysten/sui.js/client'
-import { MoveCoder } from '@sentio/sdk/sui'
+import { MoveCoder } from './index.js'
 import { defaultMoveCoder } from './move-coder.js'
 import { MoveAccountContext, MoveContext } from '../move/index.js'
 

@@ -1,4 +1,4 @@
-import { SolanaBaseProcessor, SolanaContext, SolanaBindOptions } from '@sentio/sdk/solana'
+import { SolanaBaseProcessor, SolanaContext, SolanaBindOptions } from "../index.js"
 import { Instruction } from '@project-serum/anchor'
 import { AmountToUiAmount, Approve, ApproveChecked, Burn, BurnChecked, CloseAccount, CreateNativeMint, DefaultAccountStateExtension, FreezeAccount, GetAccountDataSize, InitializeAccount, InitializeAccount2, InitializeAccount3, InitializeImmutableOwner, InitializeMint, InitializeMintCloseAuthority, InitializeMultisig, MemoTransferExtension, MintTo, MintToChecked, Reallocate, Revoke, SyncNative, ThawAccount, Transfer, TransferChecked, TransferFeeExtension, UiAmountToAmount } from './types.js';
 

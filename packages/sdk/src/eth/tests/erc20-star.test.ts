@@ -3,7 +3,7 @@ import { before, describe, test } from 'node:test'
 
 import { expect } from 'chai'
 
-import { firstCounterValue, TestProcessorServer } from '@sentio/sdk/testing'
+import { firstCounterValue, TestProcessorServer } from '../../testing/index.js'
 import { ERC20Processor, mockTransferLog } from '../builtin/erc20.js'
 
 describe('Test star Examples', () => {

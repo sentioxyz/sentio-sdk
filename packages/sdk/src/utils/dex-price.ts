@@ -2,9 +2,10 @@ import { getEACAggregatorProxyContract } from '../eth/builtin/eacaggregatorproxy
 import fs from 'fs'
 import { parse } from 'csv-parse/sync'
 import { BlockTag } from 'ethers/providers'
-import url from 'url'
 import { scaleDown } from '../core/big-decimal.js'
 import { EthChainId } from '@sentio/chain'
+import { createRequire } from 'module'
+import path from 'path'
 
 type OralceRecord = {
   Pair: string
@@ -24,6 +25,17 @@ export interface DexPriceResult {
   error?: string
 }
 
+export function getPackageRoot(pkgId: string): string {
+  const require = createRequire(import.meta.url)
+  const m = require.resolve(pkgId)
+
+  let dir = path.dirname(m)
+  while (!fs.existsSync(path.join(dir, 'package.json'))) {
+    dir = path.dirname(dir)
+  }
+  return dir
+}
+
 // Load price feed from https://docs.chain.link/docs/data-feeds/price-feeds/addresses/?network=ethereum
 // and then use EACAggregatorProxy contract to get price
 class DexPrice {
@@ -36,7 +48,8 @@ class DexPrice {
 
   constructor(csvFileName: string, chainId: EthChainId) {
     this.chainId = chainId
-    const csvFilePath = url.fileURLToPath(new URL('./' + csvFileName, import.meta.url))
+    const packageRoot = getPackageRoot('@sentio/sdk')
+    const csvFilePath = path.join(packageRoot, 'src', 'utils', csvFileName)
     const fileContent = fs.readFileSync(csvFilePath, { encoding: 'utf-8' })
     const headers = ['Pair', 'Asset', 'Type', 'Address']
 

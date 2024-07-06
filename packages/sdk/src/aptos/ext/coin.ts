@@ -1,9 +1,9 @@
-import { getPriceByType } from '@sentio/sdk/utils'
+import { getPriceByType } from '../../utils/index.js'
 import fetch from 'node-fetch'
 import { accountTypeString, parseMoveType, SPLITTER } from '@typemove/move'
 import { SimpleCoinInfo } from '../../move/ext/move-dex.js'
 import { AptosNetwork, getClient } from '../network.js'
-import { coin } from '@sentio/sdk/aptos/builtin/0x1'
+import { coin } from '../builtin/0x1.js'
 import { MoveStructId } from '@aptos-labs/ts-sdk'
 import { AptosChainId } from '@sentio/chain'
 

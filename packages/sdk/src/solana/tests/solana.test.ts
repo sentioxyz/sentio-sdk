@@ -3,9 +3,9 @@ import { before, describe, test } from 'node:test'
 
 import { expect } from 'chai'
 
-import { HandlerType } from '@sentio/sdk'
+import { HandlerType } from '../../index.js'
 
-import { TestProcessorServer, firstCounterValue } from '@sentio/sdk/testing'
+import { TestProcessorServer, firstCounterValue } from '../../testing/index.js'
 
 describe('Test Solana Example', () => {
   const service = new TestProcessorServer(async () => {

@@ -3,7 +3,7 @@ import { before, describe, test } from 'node:test'
 
 import { expect } from 'chai'
 
-import { firstCounterValue, firstGaugeValue, TestProcessorServer } from '@sentio/sdk/testing'
+import { firstCounterValue, firstGaugeValue, TestProcessorServer } from '../../testing/index.js'
 import { mockTransferLog } from '../builtin/erc20.js'
 import { HandlerType } from '@sentio/protos'
 import { SENTIO_BIGINT_STRING_SUFFIX } from '../../core/normalization.js'

@@ -1,8 +1,8 @@
 import { UserTransactionResponse, EntryFunctionPayloadResponse } from '@aptos-labs/ts-sdk'
 import { DataBinding, HandlerType } from '@sentio/protos'
 import { TestProcessorServer } from './test-processor-server.js'
-import { AptosNetwork } from '@sentio/sdk/aptos'
-import { parseMoveType, accountTypeString } from '@sentio/sdk/move'
+import { AptosNetwork } from '../aptos/index.js'
+import { parseMoveType, accountTypeString } from '../move/index.js'
 
 export class AptosFacet {
   server: TestProcessorServer
