@@ -197,7 +197,6 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     const callPromises = []
     for (const params of groupedRequests.values()) {
       const { chainId, address, blockTag } = params[0].context!
-      console.log(`chain: ${chainId}, address: ${address}, blockTag: ${blockTag}, totalCalls: ${params.length}`)
       // TODO multicall
       for (const param of params) {
         callPromises.push(
@@ -208,7 +207,11 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
               data: param.calldata,
               blockTag
             })
-            .then((result) => [makeEthCallKey(param), result])
+            .then((result) => {
+              const ret = [makeEthCallKey(param), result]
+              console.log(`got eth call result, key: ${ret[0]}, result: ${result}`)
+              return ret
+            })
         )
       }
     }
@@ -280,6 +283,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     const subject = new Subject<DeepPartial<ProcessStreamResponse>>()
     this.handleRequests(requests, subject)
       .then(() => {
+        console.log('clearing prepared data')
         this.preparedData = { ethCallResults: {} }
         subject.complete()
       })
@@ -306,6 +310,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
           this.preprocessBindings(bindings, dbContext)
             .then((preparedData) => {
               // TODO maybe not proper to pass data in this way
+              Object.keys(preparedData.ethCallResults).forEach((key) => console.log('got prepared data, key:', key))
               this.preparedData = {
                 ethCallResults: {
                   ...this.preparedData?.ethCallResults,

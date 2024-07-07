@@ -34,5 +34,5 @@ export function makeEthCallKey(param: EthCallParam) {
     throw new Error('null context for eth call')
   }
   const { chainId, address, blockTag } = param.context
-  return `${chainId}|${address}|${blockTag}|${param.calldata}`
+  return `${chainId}|${address}|${blockTag}|${param.calldata}`.toLowerCase()
 }

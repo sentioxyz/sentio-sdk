@@ -58,10 +58,10 @@ export function generateViewFunction(view: boolean, fn: FunctionDeclaration, inc
           const result = iface.decodeFunctionResult("${fn.name}", ret).toArray()
           return result.length == 1? result[0]: result
         }
+        console.log("missing eth call key:", "${fn.name}", ${
+          fn.inputs.length > 0 ? fn.inputs.map((input, index) => input.name || `arg${index}`).join(',') + ',' : ''
+        }key)
       }
-      console.debug("missing eth call:", "${fn.name}", ${
-        fn.inputs.length > 0 ? fn.inputs.map((input, index) => input.name || `arg${index}`).join(',') + ',' : ''
-      })
       return await ${func}${call}(${
         fn.inputs.length > 0 ? fn.inputs.map((input, index) => input.name || `arg${index}`).join(',') + ',' : ''
       } overrides || {})
