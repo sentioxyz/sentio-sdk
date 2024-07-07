@@ -51,8 +51,10 @@ export function generateViewFunction(view: boolean, fn: FunctionDeclaration, inc
           context: ethCallContext,
           calldata
         })
+        console.debug("looking up eth call key:", key)
         const ret = preparedData.ethCallResults[key]
         if (ret) {
+          console.debug("prepared eth call found:", key)
           const result = iface.decodeFunctionResult("${fn.name}", ret).toArray()
           return result.length == 1? result[0]: result
         }
@@ -90,7 +92,7 @@ export function generateBoundViewFunction(view: boolean, fn: FunctionDeclaration
   })}overrides?: Overrides): ${generateReturnTypes(fn)} {
     const ethCallContext = {
       chainId: this.context.chainId,
-      blockTag: this.context.blockNumber.toString(16),
+      blockTag: "0x" + this.context.blockNumber.toString(16),
       address: this.context.address,
     }
     return await this.${qualifier}.${declName}(${
@@ -152,8 +154,11 @@ export function generateBoundFunctionCallEncoder(fn: FunctionDeclaration, includ
     useStructs: true
   })}overrides?: Overrides): EthCallParam {
     const chainId = overrides?.chainId?.toString() ?? this.context.chainId.toString()
-    const blockTag = overrides?.blockTag?.toString() ?? this.context.blockNumber.toString(16)
     const address = this.context.address
+    let blockTag = "0x" + this.context.blockNumber.toString(16)
+    if (overrides?.blockTag) {
+      blockTag = typeof(overrides.blockTag) == 'string'? overrides.blockTag: "0x" + overrides.blockTag.toString(16)
+    }
     
     return this.view.encodeCall.${declName}(${
       fn.inputs.length > 0 ? fn.inputs.map((input, index) => input.name || `arg${index}`).join(',') + ',' : ''
