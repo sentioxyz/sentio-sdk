@@ -280,6 +280,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     const subject = new Subject<DeepPartial<ProcessStreamResponse>>()
     this.handleRequests(requests, subject)
       .then(() => {
+        this.preparedData = { ethCallResults: {} }
         subject.complete()
       })
       .catch((e) => {
@@ -305,7 +306,12 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
           this.preprocessBindings(bindings, dbContext)
             .then((preparedData) => {
               // TODO maybe not proper to pass data in this way
-              this.preparedData = preparedData
+              this.preparedData = {
+                ethCallResults: {
+                  ...this.preparedData?.ethCallResults,
+                  ...preparedData.ethCallResults
+                }
+              }
               subject.next({
                 processId: request.processId
               })
