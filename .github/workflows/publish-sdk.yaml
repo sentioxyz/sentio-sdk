@@ -62,7 +62,7 @@ jobs:
       - name: Clean sdk dependencies
         run: |
           # Dependencies are bundled.
-          pnpm json -I -f package.json -e "this.dependencies=Object.fromEntries(Object.entries(this.dependencies).filter((entry) => ['@project-serum/anchor', '@sentio/ethers-v6', 'graphql', 'typechain', '@sentio/protos', '@sentio/runtime'].includes(entry['0'])))"
+          pnpm json -I -f package.json -e "this.dependencies=Object.fromEntries(Object.entries(this.dependencies).filter((entry) => ['@project-serum/anchor', '@sentio/ethers-v6', 'graphql', 'typechain', '@sentio/runtime'].includes(entry['0'])))"
         working-directory: packages/sdk
       - name: SDK NPM Publish
         if: steps.semantic.outputs.new_release_published == 'true'

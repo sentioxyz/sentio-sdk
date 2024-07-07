@@ -15,5 +15,5 @@ export default defineConfig({
   dts: true,
   format: 'esm',
   // keepNames: true,
-  external: ['@project-serum/anchor', /^@sentio\/(ethers).*$/, 'graphql', 'typechain']
+  external: ['@project-serum/anchor', /^@sentio\/(runtime|ethers).*$/, 'graphql', 'typechain']
 })
