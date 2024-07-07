@@ -188,6 +188,9 @@ export class ContractContext<
     if (view.callStatic) {
       view.callStatic.context = this
     }
+    if (view.encodeCall) {
+      view.encodeCall.context = this
+    }
     this.contractName = contractName
     this.contract = view
   }
@@ -223,6 +226,10 @@ export class BoundContractView<TContract extends BaseContract, TContractView ext
   // context: ContractContext<TContract, BoundContractView<TContract, TContractView>>
   context: EthContext
   callStatic: {
+    context: EthContext
+    view: TContractView
+  }
+  encodeCall: {
     context: EthContext
     view: TContractView
   }
