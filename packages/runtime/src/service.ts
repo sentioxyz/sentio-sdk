@@ -54,7 +54,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
 
   private readonly shutdownHandler?: () => void
 
-  private readonly preprocessedEthCalls: { [calldata: string]: any[] }
+  private preparedData: PreparedData | undefined
 
   constructor(loader: () => Promise<any>, shutdownHandler?: () => void) {
     this.loader = loader
@@ -128,11 +128,11 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
   }
 
   async processBindings(request: ProcessBindingsRequest, options?: CallContext): Promise<ProcessBindingResponse> {
-    const ethCallResults = await this.preprocessBindings(request.bindings, undefined, options)
+    const preparedData = await this.preprocessBindings(request.bindings, undefined, options)
 
     const promises = []
     for (const binding of request.bindings) {
-      const promise = this.processBinding(binding, { ethCallResults })
+      const promise = this.processBinding(binding, preparedData)
       if (GLOBAL_CONFIG.execution.sequential) {
         await promise
       }
@@ -161,7 +161,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     bindings: DataBinding[],
     dbContext?: StoreContext,
     options?: CallContext
-  ): Promise<{ [ethCallKey: string]: string }> {
+  ): Promise<PreparedData> {
     console.debug(`preprocessBindings start, bindings: ${bindings.length}`)
     const promises = []
     for (const binding of bindings) {
@@ -212,14 +212,16 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         )
       }
     }
-    let results = {}
+    let results: { [p: string]: string } = {}
     try {
       results = Object.fromEntries(await Promise.all(callPromises))
     } catch (e) {
       console.error(`eth call error: ${e}`)
     }
     console.log(`${callPromises.length} calls finished, elapsed: ${Date.now() - start}ms`)
-    return results
+    return {
+      ethCallResults: results
+    }
   }
 
   async preprocessBinding(
@@ -301,7 +303,9 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
           const dbContext = contexts.new(request.processId, subject)
           const start = Date.now()
           this.preprocessBindings(bindings, dbContext)
-            .then(() => {
+            .then((preparedData) => {
+              // TODO maybe not proper to pass data in this way
+              this.preparedData = preparedData
               subject.next({
                 processId: request.processId
               })
@@ -358,7 +362,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
           const binding = request.binding
           const dbContext = contexts.new(request.processId, subject)
           const start = Date.now()
-          PluginManager.INSTANCE.processBinding(binding, undefined, dbContext)
+          PluginManager.INSTANCE.processBinding(binding, this.preparedData, dbContext)
             .then((result) => {
               subject.next({
                 result,
