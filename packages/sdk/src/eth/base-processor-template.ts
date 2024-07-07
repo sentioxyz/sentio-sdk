@@ -26,7 +26,8 @@ export abstract class BaseProcessorTemplate<
     handler: (block: BlockParams, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid
     preprocessHandler: (
       block: BlockParams,
-      ctx: ContractContext<TContract, TBoundContractView>
+      ctx: ContractContext<TContract, TBoundContractView>,
+      preprocessStore: { [k: string]: any }
     ) => Promise<PreprocessResult>
     blockInterval?: HandleInterval
     timeIntervalInMinutes?: HandleInterval
@@ -37,7 +38,8 @@ export abstract class BaseProcessorTemplate<
     handler: (trace: TypedCallTrace, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid
     preprocessHandler: (
       trace: TypedCallTrace,
-      ctx: ContractContext<TContract, TBoundContractView>
+      ctx: ContractContext<TContract, TBoundContractView>,
+      preprocessStore: { [k: string]: any }
     ) => Promise<PreprocessResult>
     fetchConfig?: EthFetchConfig
   }[] = []
@@ -45,7 +47,8 @@ export abstract class BaseProcessorTemplate<
     handler: (event: TypedEvent, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid
     preprocessHandler: (
       event: TypedEvent,
-      ctx: ContractContext<TContract, TBoundContractView>
+      ctx: ContractContext<TContract, TBoundContractView>,
+      preprocessStore: { [k: string]: any }
     ) => Promise<PreprocessResult>
     filter: DeferredTopicFilter | DeferredTopicFilter[]
     fetchConfig?: EthFetchConfig
@@ -112,7 +115,8 @@ export abstract class BaseProcessorTemplate<
     fetchConfig?: Partial<EthFetchConfig>,
     preprocessHandler: (
       event: TypedEvent,
-      ctx: ContractContext<TContract, TBoundContractView>
+      ctx: ContractContext<TContract, TBoundContractView>,
+      preprocessStore: { [k: string]: any }
     ) => Promise<PreprocessResult> = defaultPreprocessHandler
   ) {
     this.eventHandlers.push({
@@ -131,7 +135,8 @@ export abstract class BaseProcessorTemplate<
     fetchConfig?: EthFetchConfig,
     preprocessHandler: (
       block: BlockParams,
-      ctx: ContractContext<TContract, TBoundContractView>
+      ctx: ContractContext<TContract, TBoundContractView>,
+      preprocessStore: { [k: string]: any }
     ) => Promise<PreprocessResult> = defaultPreprocessHandler
   ) {
     return this.onInterval(
@@ -153,7 +158,8 @@ export abstract class BaseProcessorTemplate<
     fetchConfig?: EthFetchConfig,
     preprocessHandler: (
       block: BlockParams,
-      ctx: ContractContext<TContract, TBoundContractView>
+      ctx: ContractContext<TContract, TBoundContractView>,
+      preprocessStore: { [k: string]: any }
     ) => Promise<PreprocessResult> = defaultPreprocessHandler
   ) {
     return this.onInterval(
@@ -172,7 +178,8 @@ export abstract class BaseProcessorTemplate<
     fetchConfig: EthFetchConfig | undefined,
     preprocessHandler: (
       block: BlockParams,
-      ctx: ContractContext<TContract, TBoundContractView>
+      ctx: ContractContext<TContract, TBoundContractView>,
+      preprocessStore: { [k: string]: any }
     ) => Promise<PreprocessResult> = defaultPreprocessHandler
   ) {
     this.blockHandlers.push({
@@ -191,7 +198,8 @@ export abstract class BaseProcessorTemplate<
     fetchConfig?: Partial<EthFetchConfig>,
     preprocessHandler: (
       trace: TypedCallTrace,
-      ctx: ContractContext<TContract, TBoundContractView>
+      ctx: ContractContext<TContract, TBoundContractView>,
+      preprocessStore: { [k: string]: any }
     ) => Promise<PreprocessResult> = defaultPreprocessHandler
   ) {
     this.traceHandlers.push({

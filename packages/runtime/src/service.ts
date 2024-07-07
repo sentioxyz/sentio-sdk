@@ -128,7 +128,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
   }
 
   async processBindings(request: ProcessBindingsRequest, options?: CallContext): Promise<ProcessBindingResponse> {
-    const preparedData = await this.preprocessBindings(request.bindings, undefined, options)
+    const preparedData = await this.preprocessBindings(request.bindings, {}, undefined, options)
 
     const promises = []
     for (const binding of request.bindings) {
@@ -159,13 +159,14 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
 
   async preprocessBindings(
     bindings: DataBinding[],
+    preprocessStore: { [k: string]: any },
     dbContext?: StoreContext,
     options?: CallContext
   ): Promise<PreparedData> {
     console.debug(`preprocessBindings start, bindings: ${bindings.length}`)
     const promises = []
     for (const binding of bindings) {
-      promises.push(this.preprocessBinding(binding, dbContext, options))
+      promises.push(this.preprocessBinding(binding, preprocessStore, dbContext, options))
     }
     let preprocessResults: PreprocessResult[]
     try {
@@ -173,10 +174,6 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     } catch (e) {
       throw e
     }
-    console.debug(
-      'ethCallParams: ',
-      preprocessResults.map((r) => r.ethCallParams)
-    )
     const groupedRequests = new Map<string, EthCallParam[]>()
     const providers = new Map<string, Provider>()
     for (const result of preprocessResults) {
@@ -229,6 +226,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
 
   async preprocessBinding(
     request: DataBinding,
+    preprocessStore: { [k: string]: any },
     dbContext?: StoreContext,
     options?: CallContext
   ): Promise<PreprocessResult> {
@@ -247,7 +245,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         ]
       )
     }
-    return await PluginManager.INSTANCE.preprocessBinding(request, dbContext)
+    return await PluginManager.INSTANCE.preprocessBinding(request, preprocessStore, dbContext)
   }
 
   async processBinding(
@@ -299,18 +297,17 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     subject: Subject<DeepPartial<PreprocessStreamResponse>>
   ) {
     const contexts = new Contexts()
+    const preprocessStore: { [k: string]: any } = {}
 
     for await (const request of requests) {
       try {
-        console.debug('received request:', request)
         if (request.bindings) {
           const bindings = request.bindings.bindings
           const dbContext = contexts.new(request.processId, subject)
           const start = Date.now()
-          this.preprocessBindings(bindings, dbContext)
+          this.preprocessBindings(bindings, preprocessStore, dbContext, undefined)
             .then((preparedData) => {
               // TODO maybe not proper to pass data in this way
-              Object.keys(preparedData.ethCallResults).forEach((key) => console.log('got prepared data, key:', key))
               this.preparedData = {
                 ethCallResults: {
                   ...this.preparedData?.ethCallResults,

@@ -51,7 +51,8 @@ export class AccountProcessor {
     fetchConfig?: Partial<EthFetchConfig>,
     preprocessHandler: (
       event: ERC20TransferEvent,
-      ctx: AccountContext
+      ctx: AccountContext,
+      preprocessStore: { [k: string]: any }
     ) => Promise<PreprocessResult> = defaultPreprocessHandler
   ) {
     return this.onERC20(
@@ -76,7 +77,8 @@ export class AccountProcessor {
     fetchConfig?: Partial<EthFetchConfig>,
     preprocessHandler: (
       event: ERC20TransferEvent,
-      ctx: AccountContext
+      ctx: AccountContext,
+      preprocessStore: { [k: string]: any }
     ) => Promise<PreprocessResult> = defaultPreprocessHandler
   ) {
     return this.onERC20(
@@ -101,7 +103,8 @@ export class AccountProcessor {
     fetchConfig?: Partial<EthFetchConfig>,
     preprocessHandler: (
       event: ERC20TransferEvent,
-      ctx: AccountContext
+      ctx: AccountContext,
+      preprocessStore: { [k: string]: any }
     ) => Promise<PreprocessResult> = defaultPreprocessHandler
   ) {
     return this.onERC20(
@@ -121,7 +124,8 @@ export class AccountProcessor {
     fetchConfig?: Partial<EthFetchConfig>,
     preprocessHandler: (
       event: ERC20TransferEvent,
-      ctx: AccountContext
+      ctx: AccountContext,
+      preprocessStore: { [k: string]: any }
     ) => Promise<PreprocessResult> = defaultPreprocessHandler
   ) {
     return this.onERC(handler, tokensAddresses, defaultFilter, AddressType.ERC20, fetchConfig, preprocessHandler)
@@ -140,7 +144,8 @@ export class AccountProcessor {
     fetchConfig?: Partial<EthFetchConfig>,
     preprocessHandler: (
       event: ERC721TransferEvent,
-      ctx: AccountContext
+      ctx: AccountContext,
+      preprocessStore: { [k: string]: any }
     ) => Promise<PreprocessResult> = defaultPreprocessHandler
   ) {
     return this.onERC721(
@@ -165,7 +170,8 @@ export class AccountProcessor {
     fetchConfig?: Partial<EthFetchConfig>,
     preprocessHandler: (
       event: ERC721TransferEvent,
-      ctx: AccountContext
+      ctx: AccountContext,
+      preprocessStore: { [k: string]: any }
     ) => Promise<PreprocessResult> = defaultPreprocessHandler
   ) {
     return this.onERC721(
@@ -190,7 +196,8 @@ export class AccountProcessor {
     fetchConfig?: Partial<EthFetchConfig>,
     preprocessHandler: (
       event: ERC721TransferEvent,
-      ctx: AccountContext
+      ctx: AccountContext,
+      preprocessStore: { [k: string]: any }
     ) => Promise<PreprocessResult> = defaultPreprocessHandler
   ) {
     return this.onERC721(
@@ -210,7 +217,8 @@ export class AccountProcessor {
     fetchConfig?: Partial<EthFetchConfig>,
     preprocessHandler: (
       event: ERC721TransferEvent,
-      ctx: AccountContext
+      ctx: AccountContext,
+      preprocessStore: { [k: string]: any }
     ) => Promise<PreprocessResult> = defaultPreprocessHandler
   ) {
     return this.onERC(handler, collections, defaultFilter, AddressType.ERC721, fetchConfig, preprocessHandler)
@@ -222,7 +230,11 @@ export class AccountProcessor {
     defaultFilter: (address: string) => AddressOrTypeEventFilter,
     addressType: AddressType,
     fetchConfig?: Partial<EthFetchConfig>,
-    preprocessHandler: (event: any, ctx: AccountContext) => Promise<PreprocessResult> = defaultPreprocessHandler
+    preprocessHandler: (
+      event: any,
+      ctx: AccountContext,
+      preprocessStore: { [k: string]: any }
+    ) => Promise<PreprocessResult> = defaultPreprocessHandler
   ) {
     const filters = []
     for (const token of contractAddresses) {
@@ -243,7 +255,11 @@ export class AccountProcessor {
     handler: (event: TypedEvent, ctx: AccountContext) => PromiseOrVoid,
     filter: AddressOrTypeEventFilter | AddressOrTypeEventFilter[],
     fetchConfig?: Partial<EthFetchConfig>,
-    preprocessHandler: (event: TypedEvent, ctx: AccountContext) => Promise<PreprocessResult> = defaultPreprocessHandler
+    preprocessHandler: (
+      event: TypedEvent,
+      ctx: AccountContext,
+      preprocessStore: { [k: string]: any }
+    ) => Promise<PreprocessResult> = defaultPreprocessHandler
   ) {
     const chainId = this.getChainId()
 
@@ -302,7 +318,7 @@ export class AccountProcessor {
         }
         return ProcessResult.fromPartial({})
       },
-      preprocessHandler: async function (data) {
+      preprocessHandler: async function (data, preprocessStore: { [k: string]: any }) {
         const { log, block, transaction, transactionReceipt } = formatEthData(data)
         if (!log) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'Log is empty')
@@ -323,7 +339,7 @@ export class AccountProcessor {
         const parsed = ERC20_INTERFACE.parseLog(logParam)
         if (parsed) {
           const event: TypedEvent = { ...log, name: parsed.name, args: fixEmptyKey(parsed) }
-          return preprocessHandler(event, ctx)
+          return preprocessHandler(event, ctx, preprocessStore)
         }
         return PreprocessResult.fromPartial({})
       }

@@ -28,7 +28,7 @@ export abstract class Plugin {
     return ProcessResult.create()
   }
 
-  async preprocessBinding(request: DataBinding): Promise<PreprocessResult> {
+  async preprocessBinding(request: DataBinding, preprocessStore: { [k: string]: any }): Promise<PreprocessResult> {
     return PreprocessResult.create()
   }
 }
@@ -84,13 +84,17 @@ export class PluginManager {
     })
   }
 
-  preprocessBinding(request: DataBinding, dbContext?: StoreContext): Promise<PreprocessResult> {
+  preprocessBinding(
+    request: DataBinding,
+    preprocessStore: { [k: string]: any },
+    dbContext?: StoreContext
+  ): Promise<PreprocessResult> {
     const plugin = this.typesToPlugin.get(request.handlerType)
     if (!plugin) {
       throw new Error(`No plugin for ${request.handlerType}`)
     }
     return this.dbContextLocalStorage.run(dbContext, () => {
-      return plugin.preprocessBinding(request)
+      return plugin.preprocessBinding(request, preprocessStore)
     })
   }
 }

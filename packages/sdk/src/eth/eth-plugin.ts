@@ -35,10 +35,13 @@ interface Handlers {
 }
 
 interface PreprocessHandlers {
-  eventHandlers: ((event: Data_EthLog) => Promise<PreprocessResult>)[]
-  traceHandlers: ((trace: Data_EthTrace) => Promise<PreprocessResult>)[]
-  blockHandlers: ((block: Data_EthBlock) => Promise<PreprocessResult>)[]
-  transactionHandlers: ((txn: Data_EthTransaction) => Promise<PreprocessResult>)[]
+  eventHandlers: ((event: Data_EthLog, preprocessStore: { [k: string]: any }) => Promise<PreprocessResult>)[]
+  traceHandlers: ((trace: Data_EthTrace, preprocessStore: { [k: string]: any }) => Promise<PreprocessResult>)[]
+  blockHandlers: ((block: Data_EthBlock, preprocessStore: { [k: string]: any }) => Promise<PreprocessResult>)[]
+  transactionHandlers: ((
+    txn: Data_EthTransaction,
+    preprocessStore: { [k: string]: any }
+  ) => Promise<PreprocessResult>)[]
 }
 
 export class EthPlugin extends Plugin {
@@ -278,16 +281,16 @@ export class EthPlugin extends Plugin {
     }
   }
 
-  preprocessBinding(request: DataBinding): Promise<PreprocessResult> {
+  preprocessBinding(request: DataBinding, preprocessStore: { [k: string]: any }): Promise<PreprocessResult> {
     switch (request.handlerType) {
       case HandlerType.ETH_LOG:
-        return this.preprocessLog(request)
+        return this.preprocessLog(request, preprocessStore)
       case HandlerType.ETH_TRACE:
-        return this.preprocessTrace(request)
+        return this.preprocessTrace(request, preprocessStore)
       case HandlerType.ETH_BLOCK:
-        return this.preprocessBlock(request)
+        return this.preprocessBlock(request, preprocessStore)
       case HandlerType.ETH_TRANSACTION:
-        return this.preprocessTransaction(request)
+        return this.preprocessTransaction(request, preprocessStore)
       default:
         throw new ServerError(Status.INVALID_ARGUMENT, 'No handle type registered ' + request.handlerType)
     }
@@ -326,7 +329,7 @@ export class EthPlugin extends Plugin {
     return TemplateInstanceState.INSTANCE.getValues().length !== config.templateInstances.length
   }
 
-  async preprocessLog(request: DataBinding): Promise<PreprocessResult> {
+  async preprocessLog(request: DataBinding, preprocessStore: { [k: string]: any }): Promise<PreprocessResult> {
     if (!request.data?.ethLog?.log) {
       throw new ServerError(Status.INVALID_ARGUMENT, "Log can't be null")
     }
@@ -335,7 +338,7 @@ export class EthPlugin extends Plugin {
     const promises: Promise<PreprocessResult>[] = []
     for (const handlerId of request.handlerIds) {
       const handler = this.preprocessHandlers.eventHandlers[handlerId]
-      const promise = handler(ethLog).catch((e) => {
+      const promise = handler(ethLog, preprocessStore).catch((e) => {
         throw new ServerError(
           Status.INTERNAL,
           'error processing log: ' + JSON.stringify(ethLog.log) + '\n' + errorString(e)
@@ -346,7 +349,7 @@ export class EthPlugin extends Plugin {
     return mergePreprocessResults(await Promise.all(promises))
   }
 
-  async preprocessTrace(binding: DataBinding): Promise<PreprocessResult> {
+  async preprocessTrace(binding: DataBinding, preprocessStore: { [k: string]: any }): Promise<PreprocessResult> {
     if (!binding.data?.ethTrace?.trace) {
       throw new ServerError(Status.INVALID_ARGUMENT, "Trace can't be null")
     }
@@ -355,7 +358,7 @@ export class EthPlugin extends Plugin {
     const promises: Promise<PreprocessResult>[] = []
 
     for (const handlerId of binding.handlerIds) {
-      const promise = this.preprocessHandlers.traceHandlers[handlerId](ethTrace).catch((e) => {
+      const promise = this.preprocessHandlers.traceHandlers[handlerId](ethTrace, preprocessStore).catch((e) => {
         throw new ServerError(
           Status.INTERNAL,
           'error processing trace: ' + JSON.stringify(ethTrace.trace) + '\n' + errorString(e)
@@ -366,7 +369,7 @@ export class EthPlugin extends Plugin {
     return mergePreprocessResults(await Promise.all(promises))
   }
 
-  async preprocessBlock(binding: DataBinding): Promise<PreprocessResult> {
+  async preprocessBlock(binding: DataBinding, preprocessStore: { [k: string]: any }): Promise<PreprocessResult> {
     if (!binding.data?.ethBlock?.block) {
       throw new ServerError(Status.INVALID_ARGUMENT, "Block can't be empty")
     }
@@ -374,7 +377,7 @@ export class EthPlugin extends Plugin {
 
     const promises: Promise<PreprocessResult>[] = []
     for (const handlerId of binding.handlerIds) {
-      const promise = this.preprocessHandlers.blockHandlers[handlerId](ethBlock).catch((e) => {
+      const promise = this.preprocessHandlers.blockHandlers[handlerId](ethBlock, preprocessStore).catch((e) => {
         throw new ServerError(
           Status.INTERNAL,
           'error processing block: ' + ethBlock.block?.number + '\n' + errorString(e)
@@ -385,7 +388,7 @@ export class EthPlugin extends Plugin {
     return mergePreprocessResults(await Promise.all(promises))
   }
 
-  async preprocessTransaction(binding: DataBinding): Promise<PreprocessResult> {
+  async preprocessTransaction(binding: DataBinding, preprocessStore: { [k: string]: any }): Promise<PreprocessResult> {
     if (!binding.data?.ethTransaction?.transaction) {
       throw new ServerError(Status.INVALID_ARGUMENT, "transaction can't be null")
     }
@@ -394,12 +397,14 @@ export class EthPlugin extends Plugin {
     const promises: Promise<PreprocessResult>[] = []
 
     for (const handlerId of binding.handlerIds) {
-      const promise = this.preprocessHandlers.transactionHandlers[handlerId](ethTransaction).catch((e) => {
-        throw new ServerError(
-          Status.INTERNAL,
-          'error processing transaction: ' + JSON.stringify(ethTransaction.transaction) + '\n' + errorString(e)
-        )
-      })
+      const promise = this.preprocessHandlers.transactionHandlers[handlerId](ethTransaction, preprocessStore).catch(
+        (e) => {
+          throw new ServerError(
+            Status.INTERNAL,
+            'error processing transaction: ' + JSON.stringify(ethTransaction.transaction) + '\n' + errorString(e)
+          )
+        }
+      )
       promises.push(promise)
     }
     return mergePreprocessResults(await Promise.all(promises))

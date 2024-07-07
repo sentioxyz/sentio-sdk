@@ -31,14 +31,14 @@ export const defaultPreprocessHandler = () => (<PreprocessResult>{ ethCallParams
 export class EventsHandler {
   filters: AddressOrTypeEventFilter[]
   handler: (event: Data_EthLog) => Promise<ProcessResult>
-  preprocessHandler?: (event: Data_EthLog) => Promise<PreprocessResult>
+  preprocessHandler?: (event: Data_EthLog, preprocessStore: { [k: string]: any }) => Promise<PreprocessResult>
   fetchConfig: EthFetchConfig
 }
 
 export class TraceHandler {
   signatures: string[]
   handler: (trace: Data_EthTrace) => Promise<ProcessResult>
-  preprocessHandler?: (event: Data_EthTrace) => Promise<PreprocessResult>
+  preprocessHandler?: (event: Data_EthTrace, preprocessStore: { [k: string]: any }) => Promise<PreprocessResult>
   fetchConfig: EthFetchConfig
 }
 
@@ -46,13 +46,13 @@ export class BlockHandler {
   blockInterval?: HandleInterval
   timeIntervalInMinutes?: HandleInterval
   handler: (block: Data_EthBlock) => Promise<ProcessResult>
-  preprocessHandler?: (event: Data_EthBlock) => Promise<PreprocessResult>
+  preprocessHandler?: (event: Data_EthBlock, preprocessStore: { [k: string]: any }) => Promise<PreprocessResult>
   fetchConfig: EthFetchConfig
 }
 
 export class TransactionHandler {
   handler: (block: Data_EthTransaction) => Promise<ProcessResult>
-  preprocessHandler?: (event: Data_EthTransaction) => Promise<PreprocessResult>
+  preprocessHandler?: (event: Data_EthTransaction, preprocessStore: { [k: string]: any }) => Promise<PreprocessResult>
   fetchConfig: EthFetchConfig
 }
 
@@ -314,7 +314,8 @@ export abstract class BaseProcessor<
     fetchConfig?: Partial<EthFetchConfig>,
     preprocessHandler: (
       event: TypedEvent,
-      ctx: ContractContext<TContract, TBoundContractView>
+      ctx: ContractContext<TContract, TBoundContractView>,
+      preprocessStore: { [k: string]: any }
     ) => Promise<PreprocessResult> = defaultPreprocessHandler
   ): this {
     const chainId = this.getChainId()
@@ -382,7 +383,10 @@ export abstract class BaseProcessor<
         }
         return ProcessResult.fromPartial({})
       },
-      preprocessHandler: async function (data: Data_EthLog): Promise<PreprocessResult> {
+      preprocessHandler: async function (
+        data: Data_EthLog,
+        preprocessStore: { [k: string]: any }
+      ): Promise<PreprocessResult> {
         const { log, block, transaction, transactionReceipt } = formatEthData(data)
         if (!log) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'Log is empty')
@@ -427,7 +431,7 @@ export abstract class BaseProcessor<
         }
         if (parsed) {
           const event: TypedEvent = { ...log, name: parsed.name, args: fixEmptyKey(parsed) }
-          return preprocessHandler(event, ctx)
+          return preprocessHandler(event, ctx, preprocessStore)
         }
         return PreprocessResult.fromPartial({})
       }
@@ -442,7 +446,8 @@ export abstract class BaseProcessor<
     fetchConfig?: Partial<EthFetchConfig>,
     preprocessHandler: (
       block: RichBlock,
-      ctx: ContractContext<TContract, TBoundContractView>
+      ctx: ContractContext<TContract, TBoundContractView>,
+      preprocessStore: { [k: string]: any }
     ) => Promise<PreprocessResult> = defaultPreprocessHandler
   ): this {
     return this.onInterval(
@@ -464,7 +469,8 @@ export abstract class BaseProcessor<
     fetchConfig?: Partial<EthFetchConfig>,
     preprocessHandler: (
       block: RichBlock,
-      ctx: ContractContext<TContract, TBoundContractView>
+      ctx: ContractContext<TContract, TBoundContractView>,
+      preprocessStore: { [k: string]: any }
     ) => Promise<PreprocessResult> = defaultPreprocessHandler
   ): this {
     return this.onInterval(
@@ -483,7 +489,8 @@ export abstract class BaseProcessor<
     fetchConfig: Partial<EthFetchConfig> | undefined,
     preprocessHandler: (
       block: RichBlock,
-      ctx: ContractContext<TContract, TBoundContractView>
+      ctx: ContractContext<TContract, TBoundContractView>,
+      preprocessStore: { [k: string]: any }
     ) => Promise<PreprocessResult> = defaultPreprocessHandler
   ): this {
     const chainId = this.getChainId()
@@ -516,7 +523,7 @@ export abstract class BaseProcessor<
         await handler(block, ctx)
         return ctx.stopAndGetResult()
       },
-      preprocessHandler: async function (data: Data_EthBlock) {
+      preprocessHandler: async function (data: Data_EthBlock, preprocessStore: { [k: string]: any }) {
         const { block } = formatEthData(data)
 
         if (!block) {
@@ -537,7 +544,7 @@ export abstract class BaseProcessor<
           undefined,
           processor.config.baseLabels
         )
-        return preprocessHandler(block, ctx)
+        return preprocessHandler(block, ctx, preprocessStore)
       },
       timeIntervalInMinutes: timeInterval,
       blockInterval: blockInterval,
@@ -552,7 +559,8 @@ export abstract class BaseProcessor<
     fetchConfig?: Partial<EthFetchConfig>,
     preprocessHandler: (
       trace: TypedCallTrace,
-      ctx: ContractContext<TContract, TBoundContractView>
+      ctx: ContractContext<TContract, TBoundContractView>,
+      preprocessStore: { [k: string]: any }
     ) => Promise<PreprocessResult> = defaultPreprocessHandler
   ): this {
     const chainId = this.getChainId()
@@ -610,7 +618,7 @@ export abstract class BaseProcessor<
         await handler(typedTrace, ctx)
         return ctx.stopAndGetResult()
       },
-      preprocessHandler: async function (data: Data_EthTrace) {
+      preprocessHandler: async function (data: Data_EthTrace, preprocessStore: { [k: string]: any }) {
         const contractView = processor.CreateBoundContractView()
         const contractInterface = contractView.rawContract.interface
         const { trace, block, transaction, transactionReceipt } = formatEthData(data)
@@ -651,7 +659,7 @@ export abstract class BaseProcessor<
           transactionReceipt,
           processor.config.baseLabels
         )
-        return preprocessHandler(typedTrace, ctx)
+        return preprocessHandler(typedTrace, ctx, preprocessStore)
       }
     })
     return this
@@ -662,7 +670,8 @@ export abstract class BaseProcessor<
     fetchConfig?: Partial<EthFetchConfig>,
     preprocessHandler: (
       trace: TypedCallTrace,
-      ctx: ContractContext<TContract, TBoundContractView>
+      ctx: ContractContext<TContract, TBoundContractView>,
+      preprocessStore: { [k: string]: any }
     ) => Promise<PreprocessResult> = defaultPreprocessHandler
   ): this {
     const tmpContract = this.CreateBoundContractView()
