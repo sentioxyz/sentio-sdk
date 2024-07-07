@@ -8,6 +8,6 @@
       "@sentio/sdk/*": ["./*/index.js"]
     }
   },
-  "exclude": ["lib", "src/tsup.config.ts", "src/bundle.config.ts"],
+  "exclude": ["lib", "src/tsup.config.ts"],
   "extends": "../../tsconfig.json"
 }

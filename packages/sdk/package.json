@@ -45,10 +45,9 @@
     "!{lib,src}/*/tests"
   ],
   "scripts": {
-    "build": "pnpm gen && pnpm bundle",
+    "build": "pnpm gen && pnpm compile",
     "build:all": "pnpm --filter=$(node -p \"require('./package.json').name\")... build",
-    "bundle": "tsup --config src/bundle.config.ts && cp src/tsup.config.ts lib",
-    "compile": "tsc && cp src/utils/*.csv lib/utils && cp src/tsup.config.ts lib",
+    "compile": "tsc && cp src/tsup.config.ts lib",
     "gen": "pnpm gen:eth && pnpm gen:aptos && pnpm gen:sui && pnpm gen:solana && pnpm gen:fuel && pnpm gen:store",
     "gen:aptos": "tsx src/aptos/codegen/run.ts src/aptos/abis src/aptos/builtin && pnpm gen:aptos_test",
     "gen:aptos_test": "tsx src/aptos/codegen/run.ts src/aptos/tests/abis src/aptos/tests/types",
