@@ -204,11 +204,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
               data: param.calldata,
               blockTag
             })
-            .then((result) => {
-              const ret = [makeEthCallKey(param), result]
-              console.log(`got eth call result, key: ${ret[0]}, result: ${result}`)
-              return ret
-            })
+            .then((result) => [makeEthCallKey(param), result])
         )
       }
     }
@@ -281,7 +277,6 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     const subject = new Subject<DeepPartial<ProcessStreamResponse>>()
     this.handleRequests(requests, subject)
       .then(() => {
-        console.log('clearing prepared data')
         this.preparedData = { ethCallResults: {} }
         subject.complete()
       })
