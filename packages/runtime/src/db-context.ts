@@ -24,7 +24,7 @@ const STORE_BATCH_SIZE = process.env['STORE_BATCH_SIZE'] ? parseInt(process.env[
 type Request = Omit<DBRequest, 'opId'>
 type RequestType = keyof Request
 
-export const timeoutError = Symbol()
+export const timeoutError = new Error('timeout')
 
 export class StoreContext {
   private static opCounter = 0n
@@ -181,7 +181,7 @@ export class StoreContext {
   private sendBatch() {
     if (this.upsertBatch) {
       const { request, opId, timer } = this.upsertBatch
-      console.debug('sending batch upsert', opId, 'batch size', request?.entity.length)
+      // console.debug('sending batch upsert', opId, 'batch size', request?.entity.length)
       clearTimeout(timer)
       this.upsertBatch = undefined
       this.subject.next({

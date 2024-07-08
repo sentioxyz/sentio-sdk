@@ -403,7 +403,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
 
     for await (const request of requests) {
       try {
-        console.debug('received request:', request)
+        // console.debug('received request:', request)
         if (request.binding) {
           process_binding_count.add(1)
           const binding = request.binding
