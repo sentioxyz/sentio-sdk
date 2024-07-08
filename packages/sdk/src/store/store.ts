@@ -2,25 +2,21 @@ import { StoreContext } from './context.js'
 import { DatabaseSchema } from '../core/index.js'
 import { BigDecimal } from '@sentio/bigdecimal'
 import { Bytes, Float, ID, Int, Timestamp } from './types.js'
-import type { Entity as EntityStruct, RichValue } from '@sentio/protos'
+import type { DBRequest, Entity as EntityStruct, RichValue } from '@sentio/protos'
 import { DBRequest_DBOperator, DBResponse } from '@sentio/protos'
 import { toBigInteger } from './convert.js'
 import { PluginManager } from '@sentio/runtime'
 import { Cursor } from './cursor.js'
+import { Entity, LocalCache } from './cache.js'
 
-type Value = ID | string | Int | Float | boolean | Timestamp | Bytes | BigDecimal | bigint
-
-interface Entity {
-  id: ID
-}
 
 export interface EntityClass<T> {
-  new (data: Partial<T>): T
+  new(data: Partial<T>): T
 }
 
 function getEntityName<T>(entity: EntityClass<T> | T | string): string {
   if (entity == null) {
-    throw new Error("can't figure out entityName from undefined")
+    throw new Error('can\'t figure out entityName from undefined')
   }
   if (typeof entity == 'string') {
     return entity
@@ -35,15 +31,26 @@ function getEntityName<T>(entity: EntityClass<T> | T | string): string {
 }
 
 export class Store {
-  constructor(private readonly context: StoreContext) {}
+
+  private cache = new LocalCache()
+
+  constructor(private readonly context: StoreContext) {
+  }
 
   async get<T extends Entity>(entity: EntityClass<T> | string, id: ID): Promise<T | undefined> {
+    const entityName = getEntityName(entity)
+    const cachedData = this.cache.get(entityName, id)
+    if (cachedData) {
+      return Promise.resolve(this.newEntity(entity, cachedData))
+    }
+
     const promise = this.context.sendRequest({
       get: {
-        entity: getEntityName(entity),
+        entity: entityName,
         id: id.toString()
       }
     })
+
 
     const data = (await promise) as DBResponse
     if (data.entityList?.entities[0]) {
@@ -59,21 +66,25 @@ export class Store {
       entity: [] as string[],
       id: [] as string[]
     }
+    const entityName = getEntityName(entity)
     if (id) {
       if (Array.isArray(id)) {
         for (const i of id) {
-          request.entity.push(getEntityName(entity))
+          request.entity.push(entityName)
           request.id.push(i.toString())
+          this.cache.delete(entityName, i.toString())
         }
       } else {
-        request.entity.push(getEntityName(entity))
+        request.entity.push(entityName)
         request.id.push(id)
+        this.cache.delete(entityName, id)
       }
     } else {
       const entities = Array.isArray(entity) ? entity : [entity]
       for (const e of entities) {
-        request.entity.push(getEntityName(entity))
+        request.entity.push(entityName)
         request.id.push((e as Entity).id.toString())
+        this.cache.delete(entityName, id)
       }
     }
 
@@ -84,19 +95,30 @@ export class Store {
 
   async upsert<T extends Entity>(entity: T | T[]): Promise<void> {
     const entities = Array.isArray(entity) ? entity : [entity]
-    const promise = this.context.sendRequest({
+    const request = {
       upsert: {
         entity: entities.map((e) => getEntityName(e)),
         // data: entities.map((e) => serialize(e.data)),
         id: entities.map((e) => e.id.toString()),
         entityData: entities.map((e: any) => e._data)
       }
-    })
+    } as DBRequest
+    const promise = this.context.sendRequest(request)
 
-    await promise
+    return promise.then((_data) => {
+      request.upsert?.entity.forEach((entity, i) => {
+        this.cache.set({
+          entity: entity,
+          data: request.upsert?.entityData[i],
+          genBlockChain: "",
+          genBlockTime: undefined,
+          genBlockNumber: 0n
+        })
+      })
+    })
   }
 
-  async *listIterator<T extends Entity, P extends keyof T, O extends Operators<T[P]>>(
+  async* listIterator<T extends Entity, P extends keyof T, O extends Operators<T[P]>>(
     entity: EntityClass<T>,
     filters: ListFilter<T, P, O>[]
   ) {
@@ -120,7 +142,7 @@ export class Store {
     }
   }
 
-  async *listBatched<T extends Entity, P extends keyof T, O extends Operators<T[P]>>(
+  async* listBatched<T extends Entity, P extends keyof T, O extends Operators<T[P]>>(
     entity: EntityClass<T>,
     filters: ListFilter<T, P, O>[],
     batchSize = 100
@@ -144,7 +166,7 @@ export class Store {
     cursor: string | undefined,
     pageSize?: number
   ): Promise<DBResponse> {
-    return (await this.context.sendRequest(
+    const response = (await this.context.sendRequest(
       {
         list: {
           entity: getEntityName(entity),
@@ -160,6 +182,12 @@ export class Store {
       },
       60
     )) as DBResponse
+
+    response.entityList?.entities?.forEach((entity) => {
+      this.cache.set(entity)
+    })
+
+    return response
   }
 
   async list<T extends Entity, P extends keyof T, O extends Operators<T[P]>>(
@@ -233,22 +261,22 @@ type CompatibleValue<T, O extends Operators<T>> = O extends ArrayOperators
     ? U[]
     : T[]
   :
-      | (T extends bigint
-          ? bigint
-          : T extends Int
-            ? number
-            : T extends Float
+  | (T extends bigint
+  ? bigint
+  : T extends Int
+    ? number
+    : T extends Float
+      ? number
+      : T extends Bytes
+        ? Bytes | string
+        : T extends ID
+          ? ID | string
+          : T extends BigDecimal
+            ? BigDecimal | number
+            : T extends Int
               ? number
-              : T extends Bytes
-                ? Bytes | string
-                : T extends ID
-                  ? ID | string
-                  : T extends BigDecimal
-                    ? BigDecimal | number
-                    : T extends Int
-                      ? number
-                      : T)
-      | Nullable<O>
+              : T)
+  | Nullable<O>
 
 type Nullable<O> = O extends '=' | '!=' ? null : never
 

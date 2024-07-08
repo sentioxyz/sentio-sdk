@@ -16,7 +16,7 @@ describe('Test Database', () => {
   db.start()
 
   function expectEntityEqual(a: any, b: any) {
-    assert.equal(a._data, b._data)
+    assert.strictEqual(JSON.stringify(a._data), JSON.stringify(b._data))
   }
 
   function expectListEntityEqual(a: any[], b: any[]) {
