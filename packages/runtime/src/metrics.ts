@@ -40,16 +40,16 @@ class G {
 
 export const dbMetrics = {
   send_counts: {
-    get: new C('store_get_count'),
-    upsert: new C('store_upsert_count'),
-    list: new C('store_list_count'),
-    delete: new C('store_delete_count')
+    get: new C('store_get_send'),
+    upsert: new C('store_upsert_send'),
+    list: new C('store_list_send'),
+    delete: new C('store_delete_send')
   },
   recv_counts: {
-    get: new C('store_get_count'),
-    upsert: new C('store_upsert_count'),
-    list: new C('store_list_count'),
-    delete: new C('store_delete_count')
+    get: new C('store_get_recv'),
+    upsert: new C('store_upsert_recv'),
+    list: new C('store_list_recv'),
+    delete: new C('store_delete_recv')
   },
   request_times: {
     get: new C('store_get_time'),
