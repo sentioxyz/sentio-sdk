@@ -131,8 +131,8 @@ export class StoreContext {
 
   close() {
     for (const [opId, defer] of this.defers) {
-      console.warn('context closed before db response', opId)
-      defer.reject(new Error('context closed'))
+      // console.warn('context closed before db response', opId)
+      defer.reject(new Error('context closed before db response, processId: ' + this.processId + ' opId: ' + opId))
     }
     this.defers.clear()
     if (this.statsInterval) {

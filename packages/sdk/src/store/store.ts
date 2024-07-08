@@ -170,7 +170,7 @@ export class Store {
             })) || []
         }
       },
-      60
+      3600
     )) as DBResponse
 
     response.entityList?.entities?.forEach((entity) => {
