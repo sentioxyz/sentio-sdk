@@ -372,6 +372,9 @@ importers:
       command-line-usage:
         specifier: ^7.0.1
         version: 7.0.1
+      ethers:
+        specifier: npm:@sentio/ethers@6.13.1
+        version: '@sentio/ethers@6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)'
       fs-extra:
         specifier: ^11.2.0
         version: 11.2.0

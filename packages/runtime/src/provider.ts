@@ -6,6 +6,7 @@ import { EthChainId } from '@sentio/chain'
 import { LRUCache } from 'lru-cache'
 import { providerMetrics } from './metrics.js'
 const { miss_count, hit_count, total_duration, total_queued, queue_size } = providerMetrics
+
 export const DummyProvider = new JsonRpcProvider('', Network.from(1))
 
 const providers = new Map<string, JsonRpcProvider>()

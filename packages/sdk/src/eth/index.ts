@@ -2,7 +2,9 @@ export { BaseProcessor, GlobalProcessor, defaultPreprocessHandler } from './base
 export { GenericProcessor } from './generic-processor.js'
 export { BaseProcessorTemplate } from './base-processor-template.js'
 export { AccountProcessor } from './account-processor.js'
-export { getProvider, DummyProvider } from './provider.js'
+
+export { getProvider, DummyProvider } from '@sentio/runtime'
+
 export { EthContext } from './context.js'
 export * from './eth.js'
 export { BindOptions, AccountBindOptions } from './bind-options.js'

@@ -33,6 +33,8 @@ import { Subject } from 'rxjs'
 import { getProvider } from './provider.js'
 import { EthChainId } from '@sentio/chain'
 import { Provider } from 'ethers'
+import { decodeMulticallResult, encodeMulticallData, getMulticallAddress, Multicall3Call } from './multicall.js'
+
 import { processMetrics, providerMetrics, dbMetrics } from './metrics.js'
 const { process_binding_count, process_binding_time, process_binding_error } = processMetrics
 
@@ -174,11 +176,11 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     const providers = new Map<string, Provider>()
     for (const result of preprocessResults) {
       for (const param of result.ethCallParams) {
-        const { chainId, address, blockTag } = param.context!
+        const { chainId, blockTag } = param.context!
         if (!providers.has(chainId)) {
           providers.set(chainId, getProvider(chainId as EthChainId))
         }
-        const key = [chainId, address, blockTag].join('|')
+        const key = [chainId, blockTag].join('|')
         if (!groupedRequests.has(key)) {
           groupedRequests.set(key, [])
         }
@@ -187,30 +189,76 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     }
 
     const start = Date.now()
-    const callPromises = []
+    const MULTICALL_THRESHOLD = 1
+    const callPromises: Promise<[string, string]>[] = []
+    const multicallPromises: Promise<[string, string][]>[] = []
+
     for (const params of groupedRequests.values()) {
-      const { chainId, address, blockTag } = params[0].context!
-      // TODO multicall
-      for (const param of params) {
-        callPromises.push(
+      const { chainId, blockTag } = params[0].context!
+      const multicallAddress = getMulticallAddress(chainId as EthChainId)
+      if (params.length <= MULTICALL_THRESHOLD || !multicallAddress) {
+        for (const param of params) {
+          callPromises.push(
+            providers
+              .get(chainId)!
+              .call({
+                to: param.context!.address,
+                data: param.calldata,
+                blockTag
+              })
+              .then((result) => [makeEthCallKey(param), result])
+          )
+        }
+        continue
+      }
+
+      // construct multicalls
+      const CHUNK_SIZE = 128
+      for (let i = 0; i < params.length; i += CHUNK_SIZE) {
+        const chunk = params.slice(i, i + CHUNK_SIZE)
+        const calls: Multicall3Call[] = chunk.map((param) => ({
+          target: param.context!.address,
+          callData: param.calldata
+        }))
+        const data = encodeMulticallData(calls)
+        multicallPromises.push(
           providers
             .get(chainId)!
             .call({
-              to: address,
-              data: param.calldata,
+              to: multicallAddress,
+              data: data,
               blockTag
             })
-            .then((result) => [makeEthCallKey(param), result])
+            .then((raw) => {
+              const result = decodeMulticallResult(raw).returnData
+              if (result.length != chunk.length) {
+                throw new Error(`multicall result length mismatch, params: ${chunk.length}, result: ${result.length}`)
+              }
+              const ret: [string, string][] = []
+              for (let i = 0; i < chunk.length; i++) {
+                ret.push([makeEthCallKey(chunk[i]), result[i]])
+              }
+              return ret
+            })
         )
       }
     }
+
     let results: { [p: string]: string } = {}
     try {
       results = Object.fromEntries(await Promise.all(callPromises))
+      for (const multicallResult of await Promise.all(multicallPromises)) {
+        results = {
+          ...results,
+          ...Object.fromEntries(multicallResult)
+        }
+      }
     } catch (e) {
       console.error(`eth call error: ${e}`)
     }
-    console.log(`${callPromises.length} calls finished, elapsed: ${Date.now() - start}ms`)
+    console.log(
+      `${Object.keys(results).length} calls finished, actual calls: ${callPromises.length + multicallPromises.length}, elapsed: ${Date.now() - start}ms`
+    )
     return {
       ethCallResults: results
     }
