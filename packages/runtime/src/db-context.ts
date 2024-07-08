@@ -8,44 +8,21 @@ import {
   ProcessStreamResponse
 } from '@sentio/protos'
 import * as process from 'node:process'
-import { Attributes, Counter, metrics } from '@opentelemetry/api'
-
+import { dbMetrics } from './metrics.js'
+const {
+  request_errors,
+  unsolved_requests,
+  request_times,
+  batched_request_count,
+  batched_total_count,
+  send_counts,
+  recv_counts
+} = dbMetrics
 const STORE_BATCH_IDLE = process.env['STORE_BATCH_MAX_IDLE'] ? parseInt(process.env['STORE_BATCH_MAX_IDLE']) : 1
 const STORE_BATCH_SIZE = process.env['STORE_BATCH_SIZE'] ? parseInt(process.env['STORE_BATCH_SIZE']) : 10
 
 type Request = Omit<DBRequest, 'opId'>
 type RequestType = keyof Request
-
-const meter = metrics.getMeter('processor_store')
-const send_counts: Record<RequestType, Counter<Attributes>> = {
-  get: meter.createCounter('store_get_count'),
-  upsert: meter.createCounter('store_upsert_count'),
-  list: meter.createCounter('store_list_count'),
-  delete: meter.createCounter('store_delete_count')
-}
-const recv_counts: Record<RequestType, Counter<Attributes>> = {
-  get: meter.createCounter('store_get_count'),
-  upsert: meter.createCounter('store_upsert_count'),
-  list: meter.createCounter('store_list_count'),
-  delete: meter.createCounter('store_delete_count')
-}
-const request_times: Record<RequestType, Counter<Attributes>> = {
-  get: meter.createCounter('store_get_time'),
-  upsert: meter.createCounter('store_upsert_time'),
-  list: meter.createCounter('store_list_time'),
-  delete: meter.createCounter('store_delete_time')
-}
-const request_errors: Record<RequestType, Counter<Attributes>> = {
-  get: meter.createCounter('store_get_error'),
-  upsert: meter.createCounter('store_upsert_error'),
-  list: meter.createCounter('store_list_error'),
-  delete: meter.createCounter('store_delete_error')
-}
-
-const batched_total_count = meter.createCounter('batched_total_count')
-const batched_request_count = meter.createCounter('batched_request_count')
-
-const unsolved_requests = meter.createGauge('store_unsolved_requests')
 
 export const timeoutError = Symbol()
 
@@ -82,7 +59,7 @@ export class StoreContext {
 
     const start = Date.now()
     const promises = [promise]
-    console.debug('sending db request ', opId, request)
+    // console.debug('sending db request ', opId, request)
     let timer: NodeJS.Timeout | undefined
     if (timeoutSecs) {
       const timeoutPromise = new Promise((_r, rej) => (timer = setTimeout(rej, timeoutSecs * 1000, timeoutError)))
@@ -101,7 +78,9 @@ export class StoreContext {
 
     return Promise.race(promises)
       .then((result: DBResponse) => {
-        console.debug('db request', requestType, 'op', opId, ' took', Date.now() - start, 'ms')
+        if (timeoutSecs) {
+          console.debug('db request', requestType, 'op', opId, ' took', Date.now() - start, 'ms')
+        }
         request_times[requestType]?.add(Date.now() - start)
         return result
       })
@@ -122,7 +101,7 @@ export class StoreContext {
   result(dbResult: DBResponse) {
     const opId = dbResult.opId
     const defer = this.defers.get(opId)
-    console.debug('received db result ', opId, dbResult)
+    // console.debug('received db result ', opId, dbResult)
     if (defer) {
       if (defer.requestType) {
         recv_counts[defer.requestType]?.add(1)

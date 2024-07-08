@@ -9,14 +9,13 @@ import { PluginManager } from '@sentio/runtime'
 import { Cursor } from './cursor.js'
 import { Entity, LocalCache } from './cache.js'
 
-
 export interface EntityClass<T> {
-  new(data: Partial<T>): T
+  new (data: Partial<T>): T
 }
 
 function getEntityName<T>(entity: EntityClass<T> | T | string): string {
   if (entity == null) {
-    throw new Error('can\'t figure out entityName from undefined')
+    throw new Error("can't figure out entityName from undefined")
   }
   if (typeof entity == 'string') {
     return entity
@@ -31,11 +30,9 @@ function getEntityName<T>(entity: EntityClass<T> | T | string): string {
 }
 
 export class Store {
-
   private cache = new LocalCache()
 
-  constructor(private readonly context: StoreContext) {
-  }
+  constructor(private readonly context: StoreContext) {}
 
   async get<T extends Entity>(entity: EntityClass<T> | string, id: ID): Promise<T | undefined> {
     const entityName = getEntityName(entity)
@@ -50,7 +47,6 @@ export class Store {
         id: id.toString()
       }
     })
-
 
     const data = (await promise) as DBResponse
     if (data.entityList?.entities[0]) {
@@ -110,7 +106,7 @@ export class Store {
         this.cache.set({
           entity: entity,
           data: request.upsert?.entityData[i],
-          genBlockChain: "",
+          genBlockChain: '',
           genBlockTime: undefined,
           genBlockNumber: 0n
         })
@@ -118,7 +114,7 @@ export class Store {
     })
   }
 
-  async* listIterator<T extends Entity, P extends keyof T, O extends Operators<T[P]>>(
+  async *listIterator<T extends Entity, P extends keyof T, O extends Operators<T[P]>>(
     entity: EntityClass<T>,
     filters: ListFilter<T, P, O>[]
   ) {
@@ -129,12 +125,6 @@ export class Store {
       for (const data of response.entityList?.entities || []) {
         yield this.newEntity(entity, data)
       }
-      console.debug(
-        'list returned ',
-        response.entityList?.entities?.length,
-        ' entities, next cursor',
-        response?.nextCursor
-      )
       if (!response.nextCursor) {
         break
       }
@@ -142,7 +132,7 @@ export class Store {
     }
   }
 
-  async* listBatched<T extends Entity, P extends keyof T, O extends Operators<T[P]>>(
+  async *listBatched<T extends Entity, P extends keyof T, O extends Operators<T[P]>>(
     entity: EntityClass<T>,
     filters: ListFilter<T, P, O>[],
     batchSize = 100
@@ -261,22 +251,22 @@ type CompatibleValue<T, O extends Operators<T>> = O extends ArrayOperators
     ? U[]
     : T[]
   :
-  | (T extends bigint
-  ? bigint
-  : T extends Int
-    ? number
-    : T extends Float
-      ? number
-      : T extends Bytes
-        ? Bytes | string
-        : T extends ID
-          ? ID | string
-          : T extends BigDecimal
-            ? BigDecimal | number
-            : T extends Int
+      | (T extends bigint
+          ? bigint
+          : T extends Int
+            ? number
+            : T extends Float
               ? number
-              : T)
-  | Nullable<O>
+              : T extends Bytes
+                ? Bytes | string
+                : T extends ID
+                  ? ID | string
+                  : T extends BigDecimal
+                    ? BigDecimal | number
+                    : T extends Int
+                      ? number
+                      : T)
+      | Nullable<O>
 
 type Nullable<O> = O extends '=' | '!=' ? null : never
 

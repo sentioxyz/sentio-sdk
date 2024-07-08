@@ -4,16 +4,9 @@ import PQueue from 'p-queue'
 import { Endpoints } from './endpoints.js'
 import { EthChainId } from '@sentio/chain'
 import { LRUCache } from 'lru-cache'
-import { metrics } from '@opentelemetry/api'
-
+import { providerMetrics } from './metrics.js'
+const { miss_count, hit_count, total_duration, total_queued, queue_size } = providerMetrics
 export const DummyProvider = new JsonRpcProvider('', Network.from(1))
-
-const meter = metrics.getMeter('processor_provider')
-const hit_count = meter.createCounter('provider_hit_count')
-const miss_count = meter.createCounter('provider_miss_count')
-const queue_size = meter.createGauge('provider_queue_size')
-const total_duration = meter.createCounter('provider_total_duration')
-const total_queued = meter.createCounter('provider_total_queued')
 
 const providers = new Map<string, JsonRpcProvider>()
 

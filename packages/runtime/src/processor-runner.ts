@@ -58,7 +58,9 @@ const optionDefinitions = [
 
 const options = commandLineArgs(optionDefinitions, { partial: true })
 
-setupLogger(options['log-format'] === 'json', options.debug)
+const logLevel = process.env['LOG_LEVEL']?.toUpperCase()
+
+setupLogger(options['log-format'] === 'json', logLevel === 'debug' ? true : options.debug)
 console.debug('Starting with', options.target)
 
 Error.stackTraceLimit = 20
