@@ -1603,7 +1603,6 @@ export interface AggregateResult {
 const iface = new Interface(ABI)
 
 export function encodeMulticallData(calls: Array<Multicall3Call>) {
-  console.log(calls)
   return iface.encodeFunctionData('aggregate', [calls])
 }
 
