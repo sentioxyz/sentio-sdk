@@ -25,6 +25,7 @@ import { NodeSDK } from '@opentelemetry/sdk-node'
 import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc'
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc'
 import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics'
+import { diag, DiagConsoleLogger, DiagLogLevel } from '@opentelemetry/api'
 
 const sdk = new NodeSDK({
   traceExporter: new OTLPTraceExporter(),
@@ -62,6 +63,10 @@ const logLevel = process.env['LOG_LEVEL']?.toUpperCase()
 
 setupLogger(options['log-format'] === 'json', logLevel === 'debug' ? true : options.debug)
 console.debug('Starting with', options.target)
+
+if (options.debug) {
+  diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG)
+}
 
 Error.stackTraceLimit = 20
 
