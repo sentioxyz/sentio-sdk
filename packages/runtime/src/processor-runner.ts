@@ -7,9 +7,9 @@ import { compressionAlgorithms } from '@grpc/grpc-js'
 import commandLineArgs from 'command-line-args'
 import { createServer } from 'nice-grpc'
 import { errorDetailsServerMiddleware } from 'nice-grpc-error-details'
-import { registry as niceGrpcRegistry, prometheusServerMiddleware } from 'nice-grpc-prometheus'
+// import { registry as niceGrpcRegistry } from 'nice-grpc-prometheus'
 import { openTelemetryServerMiddleware } from 'nice-grpc-opentelemetry'
-import { register as globalRegistry, Registry } from 'prom-client'
+// import { register as globalRegistry, Registry } from 'prom-client'
 import http from 'http'
 // @ts-ignore inspector promises is not included in @type/node
 import { Session } from 'node:inspector/promises'
@@ -21,23 +21,17 @@ import { FullProcessorServiceImpl } from './full-service.js'
 import { ChainConfig } from './chain-config.js'
 import { setupLogger } from './logger.js'
 
-import { NodeSDK } from '@opentelemetry/sdk-node'
+// import { NodeSDK } from '@opentelemetry/sdk-node'
+import { envDetector } from '@opentelemetry/resources'
 import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc'
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc'
-import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics'
-import { diag, DiagConsoleLogger, DiagLogLevel } from '@opentelemetry/api'
+import { PeriodicExportingMetricReader, MeterProvider } from '@opentelemetry/sdk-metrics'
+import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-base'
+import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node'
+import { diag, DiagConsoleLogger, DiagLogLevel, metrics, trace } from '@opentelemetry/api'
+import { PrometheusExporter } from '@opentelemetry/exporter-prometheus'
 
-const sdk = new NodeSDK({
-  traceExporter: new OTLPTraceExporter(),
-  metricReader: new PeriodicExportingMetricReader({
-    exporter: new OTLPMetricExporter()
-  })
-  // instrumentations: [getNodeAutoInstrumentations()],
-})
-
-sdk.start()
-
-const mergedRegistry = Registry.merge([globalRegistry, niceGrpcRegistry])
+// const mergedRegistry = Registry.merge([globalRegistry, niceGrpcRegistry])
 
 const optionDefinitions = [
   { name: 'target', type: String, defaultOption: true },
@@ -66,6 +60,46 @@ console.debug('Starting with', options.target)
 
 if (options.debug) {
   diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG)
+}
+
+const resource = await envDetector.detect()
+
+const meterProvider = new MeterProvider({
+  resource,
+  readers: [
+    new PeriodicExportingMetricReader({
+      exporter: new OTLPMetricExporter()
+    }),
+    new PrometheusExporter({
+      // http://localhost:4041/metrics
+      port: 4041
+    })
+  ]
+})
+
+const traceProvider = new NodeTracerProvider({
+  resource: resource
+})
+const exporter = new OTLPTraceExporter() // new ConsoleSpanExporter();
+const processor = new BatchSpanProcessor(exporter)
+traceProvider.addSpanProcessor(processor)
+traceProvider.register()
+
+metrics.setGlobalMeterProvider(meterProvider)
+trace.setGlobalTracerProvider(traceProvider)
+;['SIGINT', 'SIGTERM'].forEach((signal) => {
+  process.on(signal as any, () => shutdownProvider())
+})
+
+export async function shutdownProvider() {
+  const traceProvider = trace.getTracerProvider()
+  if (traceProvider instanceof NodeTracerProvider) {
+    traceProvider.shutdown().catch(console.error)
+  }
+  const meterProvider = metrics.getMeterProvider()
+  if (meterProvider instanceof MeterProvider) {
+    meterProvider.shutdown().catch(console.error)
+  }
 }
 
 Error.stackTraceLimit = 20
@@ -106,7 +140,7 @@ const server = createServer({
   'grpc.max_receive_message_length': 384 * 1024 * 1024,
   'grpc.default_compression_algorithm': compressionAlgorithms.gzip
 })
-  .use(prometheusServerMiddleware())
+  // .use(prometheusServerMiddleware())
   .use(openTelemetryServerMiddleware())
   .use(errorDetailsServerMiddleware)
 const baseService = new ProcessorServiceImpl(async () => {
@@ -129,10 +163,10 @@ const httpServer = http
       const reqUrl = new URL(req.url, `http://${req.headers.host}`)
       const queries = reqUrl.searchParams
       switch (reqUrl.pathname) {
-        case '/metrics':
-          const metrics = await mergedRegistry.metrics()
-          res.write(metrics)
-          break
+        // case '/metrics':
+        //   const metrics = await mergedRegistry.metrics()
+        //   res.write(metrics)
+        //   break
         case '/profile': {
           try {
             const profileTime = parseInt(queries.get('t') || '1000', 10) || 1000

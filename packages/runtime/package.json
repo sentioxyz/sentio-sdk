@@ -28,6 +28,7 @@
   "dependencies": {
     "@grpc/grpc-js": "^1.9.14",
     "@opentelemetry/exporter-metrics-otlp-grpc": "^0.52.1",
+    "@opentelemetry/exporter-prometheus": "^0.52.1",
     "@opentelemetry/sdk-node": "^0.52.1",
     "@sentio/protos": "workspace:*",
     "command-line-args": "^5.2.1",
