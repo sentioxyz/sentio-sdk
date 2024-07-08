@@ -57,8 +57,7 @@ export function transformEtherError(e: Error, ctx: ContractContext<any, any> | u
     return e
   }
 
-  const checkPage =
-    'Check here for possible cause and fix: https://docs.sentio.xyz/best-practices/handling-errors#ethers-error'
+  const checkPage = 'Check here for possible cause and fix: https://docs.sentio.xyz/docs/handling-errors#ethers-error'
 
   let msg = ''
   const err = e as CallExceptionError
