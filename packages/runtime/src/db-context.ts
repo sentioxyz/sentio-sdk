@@ -20,6 +20,7 @@ const {
 } = dbMetrics
 const STORE_BATCH_IDLE = process.env['STORE_BATCH_MAX_IDLE'] ? parseInt(process.env['STORE_BATCH_MAX_IDLE']) : 1
 const STORE_BATCH_SIZE = process.env['STORE_BATCH_SIZE'] ? parseInt(process.env['STORE_BATCH_SIZE']) : 10
+const STORE_UPSERT_NO_WAIT = process.env['STORE_UPSERT_NO_WAIT'] === 'true'
 
 type Request = Omit<DBRequest, 'opId'>
 type RequestType = keyof Request
@@ -76,6 +77,13 @@ export class StoreContext {
 
     send_counts[requestType]?.add(1)
 
+    if (requestType === 'upsert' && STORE_UPSERT_NO_WAIT) {
+
+      return Promise.resolve({
+        opId,
+      } as DBResponse)
+    }
+
     return Promise.race(promises)
       .then((result: DBResponse) => {
         if (timeoutSecs) {
@@ -107,6 +115,11 @@ export class StoreContext {
         recv_counts[defer.requestType]?.add(1)
       }
       if (dbResult.error) {
+        if (defer.requestType == 'upsert' && STORE_UPSERT_NO_WAIT) {
+          console.error('upsert no_wait enabled, the error may not be thrown in user function', dbResult.error)
+          throw new Error(dbResult.error)
+        }
+
         defer.reject(new Error(dbResult.error))
       } else {
         defer.resolve(dbResult)
@@ -159,15 +172,23 @@ export class StoreContext {
       if (request.entity.length >= STORE_BATCH_SIZE) {
         this.sendBatch()
       }
+      if (STORE_UPSERT_NO_WAIT) {
+        return {
+          opId: this.upsertBatch.opId
+        }
+      }
+
       return promise
     } else {
       const opId = StoreContext.opCounter++
-      const promise = this.newPromise<DBResponse>(opId, 'upsert')
       const timeout = setTimeout(() => {
         this.sendBatch()
       }, STORE_BATCH_IDLE)
-
       const start = Date.now()
+      const promise = this.newPromise<DBResponse>(opId, 'upsert').finally(() => {
+        request_times['upsert'].add(Date.now() - start)
+      })
+
       this.upsertBatch = {
         opId,
         request: req,
@@ -175,9 +196,13 @@ export class StoreContext {
         timer: timeout,
       }
 
-      return promise.finally(() => {
-        request_times['upsert'].add(Date.now() - start)
-      })
+      if (STORE_UPSERT_NO_WAIT) {
+        return {
+          opId: this.upsertBatch.opId
+        }
+      }
+
+      return promise
     }
   }
 

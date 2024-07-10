@@ -433,7 +433,11 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         }
         if (request.dbResult) {
           const dbContext = contexts.get(request.processId)
-          dbContext?.result(request.dbResult)
+          try {
+            dbContext?.result(request.dbResult)
+          } catch (e) {
+            subject.error(new Error("db result error, process should stop"))
+          }
         }
       } catch (e) {
         // should not happen
