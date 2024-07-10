@@ -256,7 +256,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     } catch (e) {
       console.error(`eth call error: ${e}`)
     }
-    console.log(
+    console.debug(
       `${Object.keys(results).length} calls finished, actual calls: ${callPromises.length + multicallPromises.length}, elapsed: ${Date.now() - start}ms`
     )
     return {
@@ -438,7 +438,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
           try {
             dbContext?.result(request.dbResult)
           } catch (e) {
-            subject.error(new Error("db result error, process should stop"))
+            subject.error(new Error('db result error, process should stop'))
           }
         }
       } catch (e) {
