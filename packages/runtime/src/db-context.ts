@@ -167,14 +167,17 @@ export class StoreContext {
         this.sendBatch()
       }, STORE_BATCH_IDLE)
 
+      const start = Date.now()
       this.upsertBatch = {
         opId,
         request: req,
         promise,
-        timer: timeout
+        timer: timeout,
       }
 
-      return promise
+      return promise.finally(() => {
+        request_times['upsert'].add(Date.now() - start)
+      })
     }
   }
 
