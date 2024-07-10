@@ -410,7 +410,9 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
           const dbContext = contexts.new(request.processId, subject)
           const start = Date.now()
           PluginManager.INSTANCE.processBinding(binding, this.preparedData, dbContext)
-            .then((result) => {
+            .then(async (result) => {
+              // await all pending db requests
+              await dbContext.awaitPendings()
               subject.next({
                 result,
                 processId: request.processId

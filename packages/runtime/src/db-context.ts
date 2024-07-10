@@ -29,12 +29,12 @@ export const timeoutError = new Error('timeout')
 
 export class StoreContext {
   private static opCounter = 0n
-
   private defers = new Map<
     bigint,
     { resolve: (value: any) => void; reject: (reason?: any) => void; requestType?: RequestType }
   >()
   private statsInterval: NodeJS.Timeout | undefined
+  private pendings: Promise<unknown>[] = []
 
   constructor(
     readonly subject: Subject<DeepPartial<ProcessStreamResponse>>,
@@ -78,7 +78,7 @@ export class StoreContext {
     send_counts[requestType]?.add(1)
 
     if (requestType === 'upsert' && STORE_UPSERT_NO_WAIT) {
-
+      this.pendings.push(promise)
       return Promise.resolve({
         opId,
       } as DBResponse)
@@ -115,11 +115,6 @@ export class StoreContext {
         recv_counts[defer.requestType]?.add(1)
       }
       if (dbResult.error) {
-        if (defer.requestType == 'upsert' && STORE_UPSERT_NO_WAIT) {
-          console.error('upsert no_wait enabled, the error may not be thrown in user function', dbResult.error)
-          throw new Error(dbResult.error)
-        }
-
         defer.reject(new Error(dbResult.error))
       } else {
         defer.resolve(dbResult)
@@ -197,12 +192,13 @@ export class StoreContext {
       }
 
       if (STORE_UPSERT_NO_WAIT) {
+        this.pendings.push(promise)
         return {
           opId: this.upsertBatch.opId
         }
+      } else {
+        return promise
       }
-
-      return promise
     }
   }
 
@@ -223,5 +219,9 @@ export class StoreContext {
       batched_request_count.add(1)
       batched_total_count.add(request.entity.length)
     }
+  }
+
+  async awaitPendings() {
+    await Promise.all(this.pendings)
   }
 }
