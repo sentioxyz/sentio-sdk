@@ -137,7 +137,7 @@ export async function runCreate(argv: string[]) {
       }
       packageJson.dependencies['@sentio/sdk'] = sdkVersion
 
-      const cliVersion = '^' + (await latestVersion('@sentio/cli'))
+      const cliVersion = '^' + JSON.parse(fs.readFileSync(path.join(packageRoot, 'package.json'), 'utf8')).version
       packageJson.devDependencies['@sentio/cli'] = cliVersion
       packageJson.name = projectSlug
 
