@@ -14,6 +14,9 @@
     "superstruct": "^1.0.3"
   },
   "devDependencies": {
+    "@eslint/compat": "^1.1.0",
+    "@eslint/eslintrc": "^3.1.0",
+    "@eslint/js": "^9.6.0",
     "@ls-lint/ls-lint": "^2.2.3",
     "@types/chai": "^4.3.16",
     "@types/node": "^20.14.8",
@@ -21,11 +24,11 @@
     "@typescript-eslint/parser": "^7.13.1",
     "chai": "^4.4.1",
     "conventional-changelog-conventionalcommits": "^7.0.2",
-    "eslint": "^8.57.0",
+    "eslint": "^9.6.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-deprecation": "^3.0.0",
-    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-import-x": "^0.5.3",
     "eslint-plugin-unused-imports": "^4.0.0",
     "json": "^11.0.0",
     "lint-staged": "^15.2.2",
