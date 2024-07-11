@@ -161,7 +161,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     dbContext?: StoreContext,
     options?: CallContext
   ): Promise<PreparedData> {
-    console.debug(`preprocessBindings start, bindings: ${bindings.length}`)
+    // console.debug(`preprocessBindings start, bindings: ${bindings.length}`)
     const promises = []
     for (const binding of bindings) {
       promises.push(this.preprocessBinding(binding, preprocessStore, dbContext, options))
@@ -256,9 +256,9 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     } catch (e) {
       console.error(`eth call error: ${e}`)
     }
-    console.debug(
-      `${Object.keys(results).length} calls finished, actual calls: ${callPromises.length + multicallPromises.length}, elapsed: ${Date.now() - start}ms`
-    )
+    // console.debug(
+    //   `${Object.keys(results).length} calls finished, actual calls: ${callPromises.length + multicallPromises.length}, elapsed: ${Date.now() - start}ms`
+    // )
     return {
       ethCallResults: results
     }
