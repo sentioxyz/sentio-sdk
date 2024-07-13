@@ -1,0 +1,22 @@
+import { defineConfig } from 'tsup'
+import packageJson from '../package.json'
+
+const entry = Object.values(packageJson.exports).map((p) => p.replace('lib', 'src').replace('.js', '.ts'))
+
+export default defineConfig({
+  esbuildOptions: (options) => {
+    options.banner = {
+      js: `import { createRequire as createRequireSdkShim } from 'module'; const require = createRequireSdkShim(import.meta.url);`
+    }
+  },
+  entry,
+  outDir: 'lib',
+  minify: true,
+  sourcemap: true,
+  clean: true,
+  // https://github.com/egoist/tsup/issues/920, use `tsc --emitDeclarationOnly --declaration` as a workaround
+  // dts: true,
+  format: 'esm',
+  // keepNames: true,
+  external: ['@project-serum/anchor', /^@sentio\/(runtime).*$/, 'graphql']
+})

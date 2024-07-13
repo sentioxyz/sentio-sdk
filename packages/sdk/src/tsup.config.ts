@@ -18,19 +18,5 @@ export default defineConfig({
   // },
   publicDir: '../abis',
   splitting: false,
-  external: [
-    'protobufjs',
-    '@aptos-labs/ts-sdk',
-    'ethers',
-    'bs58',
-    'bn.js',
-    'csv-parse',
-    'node-fetch',
-    /^nice-grpc.*$/,
-    /^prettier.*$/,
-    /^@(solana|project-serum).*$/,
-    /^@sentio\/(sdk|runtime|protos|bigdecimal|ethers).*$/,
-    /^@typemove\/.*$/,
-    /^@mysten\/(bcs|sui.js\/).*$/
-  ]
+  external: [/^@sentio\/(sdk|runtime).*$/]
 })

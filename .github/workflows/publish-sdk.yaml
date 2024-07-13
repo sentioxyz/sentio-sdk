@@ -108,6 +108,19 @@ jobs:
         run: |
           echo "### No CLI version cut" >> $GITHUB_STEP_SUMMARY
           echo "Check Semantic Release output for details"
+      - name: Prepare sdk-bundle
+        if: steps.semantic.outputs.new_release_published == 'true'
+        run: |
+          pnpm build:bundle
+          pnpm json -I -f package.json -e "this.dependencies=Object.fromEntries(Object.entries(this.dependencies).filter((entry) => ['@project-serum/anchor', '@sentio/runtime', 'graphql'].includes(entry['0'])))"
+          pnpm json -I -f package.json -e 'this.name="@sentio/sdk-bundle"; this.scripts={}; this.peerDependencies={}; this.devDependencies={}'
+        working-directory: packages/sdk
+      - name: sdk-bundle NPM Publish
+        if: steps.semantic.outputs.new_release_published == 'true'
+        run: |
+          pnpm publish --filter "@sentio/sdk-bundle" --no-git-checks --tag ${{ steps.npm.outputs.dist_tag }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Clean Github Release for RC
         if: ${{ contains(steps.semantic.outputs.new_release_version, '-rc.') == false }}
         run:  ./scripts/clean-rc-releases.sh
