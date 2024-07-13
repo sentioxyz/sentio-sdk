@@ -118,7 +118,7 @@ jobs:
       - name: sdk-bundle NPM Publish
         if: steps.semantic.outputs.new_release_published == 'true'
         run: |
-          pnpm publish --filter "@sentio/sdk-bundle" --no-git-checks --tag ${{ steps.npm.outputs.dist_tag }}
+          pnpm publish --filter "@sentio/sdk-bundle" --no-git-checks --tag ${{ steps.npm.outputs.dist_tag }} --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Clean Github Release for RC
