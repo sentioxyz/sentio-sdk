@@ -1,5 +1,6 @@
 import { defineConfig } from 'tsup'
 import packageJson from '../package.json'
+import { external } from './tsup.config.js'
 
 const entry = Object.values(packageJson.exports).map((p) => p.replace('lib', 'src').replace('.js', '.ts'))
 
@@ -18,5 +19,5 @@ export default defineConfig({
   // dts: true,
   format: 'esm',
   // keepNames: true,
-  external: ['@project-serum/anchor', /^@sentio\/(runtime).*$/, 'graphql']
+  external
 })

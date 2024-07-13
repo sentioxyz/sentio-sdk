@@ -1,5 +1,7 @@
 import { defineConfig } from 'tsup'
 
+export const external = ['@project-serum/anchor', /^@sentio\/(sdk|runtime|ethers).*$/, 'graphql']
+
 export default defineConfig({
   esbuildOptions: (options) => {
     options.banner = {
@@ -18,5 +20,5 @@ export default defineConfig({
   // },
   publicDir: '../abis',
   splitting: false,
-  external: [/^@sentio\/(sdk|runtime).*$/]
+  external
 })

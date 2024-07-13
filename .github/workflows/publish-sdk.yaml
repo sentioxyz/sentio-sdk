@@ -112,7 +112,7 @@ jobs:
         if: steps.semantic.outputs.new_release_published == 'true'
         run: |
           pnpm build:bundle
-          pnpm json -I -f package.json -e "this.dependencies=Object.fromEntries(Object.entries(this.dependencies).filter((entry) => ['@project-serum/anchor', '@sentio/runtime', 'graphql'].includes(entry['0'])))"
+          pnpm json -I -f package.json -e "this.dependencies=Object.fromEntries(Object.entries(this.dependencies).filter((entry) => ['@project-serum/anchor', '@sentio/ethers-v6', '@sentio/runtime', 'graphql'].includes(entry['0'])))"
           pnpm json -I -f package.json -e 'this.name="@sentio/sdk-bundle"; this.scripts={}; this.peerDependencies={}; this.devDependencies={}'
         working-directory: packages/sdk
       - name: sdk-bundle NPM Publish
