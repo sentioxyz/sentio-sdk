@@ -102,6 +102,8 @@ export async function shutdownProvider() {
   }
 }
 
+metrics.getMeter('processor').createGauge('up').record(1)
+
 Error.stackTraceLimit = 20
 
 const fullPath = path.resolve(options['chains-config'])

@@ -139,7 +139,9 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     let promise
     try {
       promise = await Promise.all(promises)
+      processMetrics.process_binding_count.add(request.bindings.length)
     } catch (e) {
+      processMetrics.process_binding_error.add(request.bindings.length)
       throw e
     }
     const result = mergeProcessResults(promise)

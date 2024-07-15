@@ -7,7 +7,9 @@ export type AptosNetwork = AptosChainId
 export const AptosNetwork = <const>{
   MAIN_NET: AptosChainId.APTOS_MAINNET,
   TEST_NET: AptosChainId.APTOS_TESTNET,
-  DEV_NET: AptosChainId.APTOS_DEVNET
+  DEV_NET: AptosChainId.APTOS_DEVNET,
+  M1_TEST_NET: AptosChainId.M1_TESTNET,
+  M1_MAIN_NET: AptosChainId.M1_MAINNET
 }
 
 export class AptosBindOptions {
@@ -22,6 +24,10 @@ export function getRpcEndpoint(network: AptosNetwork): string {
   switch (network) {
     case AptosNetwork.TEST_NET:
       return 'https://testnet.aptoslabs.com/v1'
+    case AptosNetwork.M1_TEST_NET:
+      return 'https://testnet.m1.movementlabs.xyz/v1'
+    case AptosNetwork.M1_MAIN_NET:
+      return 'https://mainnet.m1.movementlabs.xyz/v1'
   }
   return 'https://mainnet.aptoslabs.com/v1'
 }
