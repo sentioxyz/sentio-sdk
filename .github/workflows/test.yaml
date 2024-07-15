@@ -27,3 +27,7 @@ jobs:
         run: pnpm install
       - name: Build & Test
         run: ./scripts/test-all.sh
+      - name: Test sdk-bundle
+        run: |
+          pnpm --filter "@sentio/sdk" build:bundle
+          pnpm --filter "./packages/*" --filter "./examples/*" test

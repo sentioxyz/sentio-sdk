@@ -1,6 +1,6 @@
 import { defineConfig } from 'tsup'
 
-export const external = ['@project-serum/anchor', /^@sentio\/(sdk|runtime|ethers).*$/, 'graphql']
+export const external = ['@project-serum/anchor', 'graphql']
 
 export default defineConfig({
   esbuildOptions: (options) => {
@@ -20,5 +20,5 @@ export default defineConfig({
   // },
   publicDir: '../abis',
   splitting: false,
-  external
+  external: [...external, /^@sentio\/(sdk|runtime|ethers).*$/]
 })
