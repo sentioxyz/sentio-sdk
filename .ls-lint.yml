@@ -41,5 +41,4 @@ ignore:
   - packages/runtime/node_modules
   - packages/sdk/src/solana/tests
   - packages/sdk/src/fuel/tests
-  - packages/db/lib
-  - packages/db/src/tests
+  - packages/sdk/src/stark/tests

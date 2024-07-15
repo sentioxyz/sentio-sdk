@@ -5,7 +5,8 @@ import process from 'process'
 import path from 'path'
 import fs from 'fs-extra'
 import fetch from 'node-fetch'
-import { AptosChainId, ChainId, EthChainId, SuiChainId } from '@sentio/chain'
+import { AptosChainId, ChainId, EthChainId, StarknetChainId, SuiChainId } from '@sentio/chain'
+import { RpcProvider as Starknet, constants } from 'starknet'
 
 export const ETH_API_URL_MAP: Record<string, string> = {}
 
@@ -30,8 +31,9 @@ export async function getABI(
   let ethApi
   let aptosClient: Aptos | undefined
   let suiClient: SuiClient | undefined
+  let starknetClient: Starknet | undefined
 
-  switch (chain) {
+  switch (chain as string) {
     case AptosChainId.APTOS_MAINNET:
       aptosClient = new Aptos(new AptosConfig({ fullnode: 'https://mainnet.aptoslabs.com/v1' }))
       break
@@ -43,6 +45,16 @@ export async function getABI(
       break
     case SuiChainId.SUI_TESTNET:
       suiClient = new SuiClient({ url: 'https://fullnode.testnet.sui.io/' })
+      break
+    case StarknetChainId.STARKNET_MAINNET:
+      starknetClient = new Starknet({
+        nodeUrl: constants.NetworkName.SN_MAIN
+      })
+      break
+    case StarknetChainId.STARKNET_SEPOLIA:
+      starknetClient = new Starknet({
+        nodeUrl: constants.NetworkName.SN_SEPOLIA
+      })
       break
     default:
       ethApi = ETH_API_URL_MAP[chain]
@@ -77,6 +89,10 @@ export async function getABI(
       console.error(baseErrMsg, e)
       process.exit(1)
     }
+  }
+  if (starknetClient) {
+    const clazz = await starknetClient.getClassAt(address, 'latest')
+    return { abi: clazz.abi, name }
   }
 
   try {
@@ -117,8 +133,9 @@ export async function getABI(
   }
 }
 
-export function getABIFilePath(chain: string, name: string): string {
+export function getABIFilePath(chain: string, name: string, address: string): string {
   let subpath
+  let filename = name ?? address
   switch (chain) {
     case AptosChainId.APTOS_MAINNET:
       subpath = 'aptos'
@@ -132,11 +149,19 @@ export function getABIFilePath(chain: string, name: string): string {
     case SuiChainId.SUI_TESTNET:
       subpath = 'sui/testnet'
       break
+    case StarknetChainId.STARKNET_MAINNET:
+      subpath = 'starknet'
+      filename = name && address ? `${name}-${address}` : name ?? address
+      break
+    case StarknetChainId.STARKNET_SEPOLIA:
+      subpath = 'starknet/sepolia'
+      filename = name && address ? `${name}-${address}` : name ?? address
+      break
     default:
       subpath = 'eth'
   }
 
-  return path.join('abis', subpath, name + '.json')
+  return path.join('abis', subpath, filename + '.json')
 }
 
 export function writeABIFile(obj: string | object, output: string) {
@@ -144,6 +169,7 @@ export function writeABIFile(obj: string | object, output: string) {
     obj = JSON.parse(obj)
   }
   const data = JSON.stringify(obj, null, 2)
+
   fs.mkdirSync(path.dirname(output), { recursive: true })
   fs.writeFileSync(output, data)
   console.log(chalk.green('ABI has been downloaded to', output))

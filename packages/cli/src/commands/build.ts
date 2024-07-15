@@ -136,7 +136,7 @@ export async function codegen(genExample: boolean) {
   const contractsForUsage = processorConfig.contracts || []
   let previousChain = ''
   for (const contract of contractsForUsage) {
-    const outputPath = getABIFilePath(contract.chain, contract.name || contract.address)
+    const outputPath = getABIFilePath(contract.chain, contract.name, contract.address)
     if (fs.existsSync(outputPath)) {
       continue
     }
@@ -216,6 +216,19 @@ export async function codegen(genExample: boolean) {
 
     // @ts-ignore dynamic import
     await codegen.codegen(path.resolve('abis', 'fuel'), output, genExample)
+  } catch (e) {
+    console.error('code gen error', e)
+  }
+
+  try {
+    // @ts-ignore dynamic import
+    const codegen = await import('@sentio/sdk/starknet/codegen')
+
+    const output = path.resolve(outputBase, 'starknet')
+    fs.emptyDirSync(output)
+
+    // @ts-ignore dynamic import
+    await codegen.codegen(path.resolve('abis', 'starknet'), output, genExample)
   } catch (e) {
     console.error('code gen error', e)
   }

@@ -1,0 +1,87 @@
+[
+  {
+    "type": "impl",
+    "name": "VotingContractImpl",
+    "interface_name": "contracts::IVotingContract"
+  },
+  {
+    "type": "interface",
+    "name": "contracts::IVotingContract",
+    "items": [
+      {
+        "type": "function",
+        "name": "vote",
+        "inputs": [
+          {
+            "name": "vote",
+            "type": "core::felt252"
+          }
+        ],
+        "outputs": [],
+        "state_mutability": "external"
+      },
+      {
+        "type": "function",
+        "name": "get_votes",
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "(core::felt252, core::felt252)"
+          }
+        ],
+        "state_mutability": "view"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "contracts::VotingContract::VoteEvent",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "voter",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      },
+      {
+        "name": "vote",
+        "type": "core::felt252",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "contracts::VotingContract::VoteEventTest",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "voter",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      },
+      {
+        "name": "vote",
+        "type": "core::felt252",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "contracts::VotingContract::Event",
+    "kind": "enum",
+    "variants": [
+      {
+        "name": "VoteEvent",
+        "type": "contracts::VotingContract::VoteEvent",
+        "kind": "nested"
+      },
+      {
+        "name": "VoteEvent2",
+        "type": "contracts::VotingContract::VoteEventTest",
+        "kind": "nested"
+      }
+    ]
+  }
+]
