@@ -133,7 +133,7 @@ export async function getABI(
   }
 }
 
-export function getABIFilePath(chain: string, name: string, address: string): string {
+export function getABIFilePath(chain: string, name: string, address?: string): string {
   let subpath
   let filename = name ?? address
   switch (chain) {

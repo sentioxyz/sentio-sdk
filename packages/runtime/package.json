@@ -15,7 +15,7 @@
     "!{lib,src}/tests"
   ],
   "scripts": {
-    "build": "pnpm bundle",
+    "build": "pnpm tsc --noEmit && pnpm bundle",
     "build:all": "pnpm --filter=$(node -p \"require('./package.json').name\")... build",
     "bundle": "tsup --config src/tsup.config.ts",
     "compile": "tsc",
