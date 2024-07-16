@@ -40,6 +40,11 @@ export async function getABI(
     case AptosChainId.APTOS_TESTNET:
       aptosClient = new Aptos(new AptosConfig({ fullnode: 'https://testnet.aptoslabs.com/v1' }))
       break
+    case AptosChainId.APTOS_M2_TESTNET:
+      aptosClient = new Aptos(
+        new AptosConfig({ fullnode: process.env.APTOS_M2_TESTNET_URL || 'https://aptos.testnet.movementlabs.xyz/v1' })
+      )
+      break
     case SuiChainId.SUI_MAINNET:
       suiClient = new SuiClient({ url: 'https://fullnode.mainnet.sui.io/' })
       break
@@ -142,6 +147,12 @@ export function getABIFilePath(chain: string, name: string, address?: string): s
       break
     case AptosChainId.APTOS_TESTNET:
       subpath = 'aptos/testnet'
+      break
+    case AptosChainId.APTOS_M2_TESTNET:
+      subpath = 'aptos/m2-testnet'
+      break
+    case AptosChainId.APTOS_M2_MAINNET:
+      subpath = 'aptos/m2-mainnet'
       break
     case SuiChainId.SUI_MAINNET:
       subpath = 'sui'

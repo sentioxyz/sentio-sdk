@@ -7,7 +7,9 @@ export type SuiNetwork = SuiChainId
 export const SuiNetwork = <const>{
   MAIN_NET: SuiChainId.SUI_MAINNET,
   TEST_NET: SuiChainId.SUI_TESTNET,
-  DEV_NET: SuiChainId.SUI_DEVNET
+  DEV_NET: SuiChainId.SUI_DEVNET,
+  M2_TEST_NET: SuiChainId.SUI_M2_TESTNET,
+  M2_MAIN_NET: SuiChainId.SUI_M2_MAINNET
 }
 
 export function getClient(network: SuiNetwork): SuiClient {

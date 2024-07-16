@@ -2,12 +2,14 @@ import { MoveCoder } from '@typemove/sui'
 
 import { getClient, SuiNetwork } from './network.js'
 
-const MOVE_CODER = new MoveCoder(getClient(SuiNetwork.MAIN_NET))
-const TESTNET_MOVE_CODER = new MoveCoder(getClient(SuiNetwork.TEST_NET))
+const CODERS = new Map<SuiNetwork, MoveCoder>()
 
 export function defaultMoveCoder(network: SuiNetwork = SuiNetwork.MAIN_NET): MoveCoder {
-  if (network == SuiNetwork.MAIN_NET) {
-    return MOVE_CODER
+  let coder = CODERS.get(network)
+  if (!coder) {
+    coder = new MoveCoder(getClient(network))
+    CODERS.set(network, coder)
   }
-  return TESTNET_MOVE_CODER
+
+  return coder
 }

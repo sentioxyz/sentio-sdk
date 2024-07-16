@@ -13,6 +13,7 @@ export async function runAdd(argv: string[]) {
   const supportedChain: string[] = [
     AptosChainId.APTOS_MAINNET,
     AptosChainId.APTOS_TESTNET,
+    AptosChainId.APTOS_M2_TESTNET,
     SuiChainId.SUI_TESTNET,
     SuiChainId.SUI_MAINNET
   ]
@@ -78,7 +79,7 @@ export async function runAdd(argv: string[]) {
     const abiRes = await getABI(chain, address, options.name)
     const filename = abiRes.name || address
 
-    writeABIFile(abiRes.abi, getABIFilePath(chain, filename))
+    writeABIFile(abiRes.abi, getABIFilePath(chain, filename, ''))
 
     // Write contract info to sentio.yaml
     const yamlDocument: yaml.Document = yaml.parseDocument(fs.readFileSync('sentio.yaml', 'utf8'))

@@ -81,7 +81,7 @@
     "@project-serum/anchor": "^0.26.0",
     "@sentio/abi-wan-kanabi": "2.2.2-1",
     "@sentio/bigdecimal": "9.1.1-patch.3",
-    "@sentio/chain": "^1.1.9",
+    "@sentio/chain": "^1.1.12",
     "@sentio/ethers-v6": "^1.0.29",
     "@sentio/protos": "workspace:*",
     "@sentio/runtime": "workspace:^",
