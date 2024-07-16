@@ -177,6 +177,7 @@ export class EthPlugin extends Plugin {
       })
 
       for (const blockHandler of processor.blockHandlers) {
+        preprocessHandlers.blockHandlers.push(blockHandler.preprocessHandler ?? defaultPreprocessHandler)
         const handlerId = handlers.blockHandlers.push(blockHandler.handler) - 1
         contractConfig.intervalConfigs.push({
           slot: 0,
@@ -189,6 +190,7 @@ export class EthPlugin extends Plugin {
       }
 
       for (const transactionHandler of processor.transactionHandler) {
+        preprocessHandlers.transactionHandlers.push(transactionHandler.preprocessHandler ?? defaultPreprocessHandler)
         const handlerId = handlers.transactionHandlers.push(transactionHandler.handler) - 1
         contractConfig.transactionConfig.push({
           handlerId: handlerId,
@@ -197,6 +199,7 @@ export class EthPlugin extends Plugin {
       }
 
       for (const traceHandler of processor.traceHandlers) {
+        preprocessHandlers.traceHandlers.push(traceHandler.preprocessHandler ?? defaultPreprocessHandler)
         const handlerId = handlers.traceHandlers.push(traceHandler.handler) - 1
         for (const signature of traceHandler.signatures) {
           contractConfig.traceConfigs.push({
