@@ -100,7 +100,14 @@ export class GlobalProcessor {
     handler: (block: RichBlock, ctx: GlobalContext) => PromiseOrVoid,
     blockInterval = 250,
     backfillBlockInterval = 1000,
-    fetchConfig?: Partial<EthFetchConfig>
+    fetchConfig?: Partial<EthFetchConfig>,
+    preprocessHandler: (
+      block: RichBlock,
+      ctx: GlobalContext,
+      preprocessStore: {
+        [k: string]: any
+      }
+    ) => Promise<PreprocessResult> = defaultPreprocessHandler
   ): this {
     return this.onInterval(
       handler,
@@ -109,7 +116,8 @@ export class GlobalProcessor {
         recentInterval: blockInterval,
         backfillInterval: backfillBlockInterval
       },
-      fetchConfig
+      fetchConfig,
+      preprocessHandler
     )
   }
 
@@ -117,13 +125,21 @@ export class GlobalProcessor {
     handler: (block: RichBlock, ctx: GlobalContext) => PromiseOrVoid,
     timeIntervalInMinutes = 60,
     backfillTimeIntervalInMinutes = 240,
-    fetchConfig?: Partial<EthFetchConfig>
+    fetchConfig?: Partial<EthFetchConfig>,
+    preprocessHandler: (
+      block: RichBlock,
+      ctx: GlobalContext,
+      preprocessStore: {
+        [k: string]: any
+      }
+    ) => Promise<PreprocessResult> = defaultPreprocessHandler
   ): this {
     return this.onInterval(
       handler,
       { recentInterval: timeIntervalInMinutes, backfillInterval: backfillTimeIntervalInMinutes },
       undefined,
-      fetchConfig
+      fetchConfig,
+      preprocessHandler
     )
   }
 
@@ -135,7 +151,14 @@ export class GlobalProcessor {
     handler: (block: RichBlock, ctx: GlobalContext) => PromiseOrVoid,
     timeInterval: HandleInterval | undefined,
     blockInterval: HandleInterval | undefined,
-    fetchConfig: Partial<EthFetchConfig> | undefined
+    fetchConfig: Partial<EthFetchConfig> | undefined,
+    preprocessHandler: (
+      block: RichBlock,
+      ctx: GlobalContext,
+      preprocessStore: {
+        [k: string]: any
+      }
+    ) => Promise<PreprocessResult> = defaultPreprocessHandler
   ): this {
     const chainId = this.getChainId()
     if (timeInterval) {
@@ -167,6 +190,26 @@ export class GlobalProcessor {
         await handler(block, ctx)
         return ctx.stopAndGetResult()
       },
+      preprocessHandler: async function (data: Data_EthBlock, preprocessStore: { [k: string]: any }) {
+        const { block } = formatEthData(data)
+
+        if (!block) {
+          throw new ServerError(Status.INVALID_ARGUMENT, 'Block is empty')
+        }
+
+        const ctx = new GlobalContext(
+          chainId,
+          '*',
+          new Date(block.timestamp * 1000),
+          block,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          processor.config.baseLabels
+        )
+        return preprocessHandler(block, ctx, preprocessStore)
+      },
       timeIntervalInMinutes: timeInterval,
       blockInterval: blockInterval,
       fetchConfig: EthFetchConfig.fromPartial(fetchConfig || {})
@@ -176,7 +219,14 @@ export class GlobalProcessor {
 
   public onTransaction(
     handler: (transaction: TransactionResponseParams, ctx: GlobalContext) => PromiseOrVoid,
-    fetchConfig?: Partial<EthFetchConfig>
+    fetchConfig?: Partial<EthFetchConfig>,
+    preprocessHandler: (
+      transaction: TransactionResponseParams,
+      ctx: GlobalContext,
+      preprocessStore: {
+        [k: string]: any
+      }
+    ) => Promise<PreprocessResult> = defaultPreprocessHandler
   ): this {
     const chainId = this.getChainId()
     const processor = this
@@ -206,6 +256,29 @@ export class GlobalProcessor {
         await handler(transaction, ctx)
         return ctx.stopAndGetResult()
       },
+      preprocessHandler: async function (data: Data_EthTransaction, preprocessStore: { [k: string]: any }) {
+        const { trace, block, transaction, transactionReceipt } = formatEthData(data)
+
+        if (!transaction) {
+          throw new ServerError(Status.INVALID_ARGUMENT, 'transaction is empty')
+        }
+        let to = transaction.to
+        if (to === trace?.action.from) {
+          to = '*'
+        }
+        const ctx = new GlobalContext(
+          chainId,
+          to || '*',
+          data.timestamp,
+          block,
+          undefined,
+          trace,
+          transaction,
+          transactionReceipt,
+          processor.config.baseLabels
+        )
+        return preprocessHandler(transaction, ctx, preprocessStore)
+      },
       fetchConfig: EthFetchConfig.fromPartial(fetchConfig || {})
     })
     return this
@@ -214,7 +287,14 @@ export class GlobalProcessor {
   public onTrace(
     signatures: string | string[],
     handler: (trace: Trace, ctx: GlobalContext) => PromiseOrVoid,
-    fetchConfig?: Partial<EthFetchConfig>
+    fetchConfig?: Partial<EthFetchConfig>,
+    preprocessHandler: (
+      trace: Trace,
+      ctx: GlobalContext,
+      preprocessStore: {
+        [k: string]: any
+      }
+    ) => Promise<PreprocessResult> = defaultPreprocessHandler
   ): this {
     const chainId = this.getChainId()
     if (typeof signatures === 'string') {
@@ -250,6 +330,25 @@ export class GlobalProcessor {
         )
         await handler(trace, ctx)
         return ctx.stopAndGetResult()
+      },
+      preprocessHandler: async function (data: Data_EthTrace, preprocessStore: { [k: string]: any }) {
+        const { trace, block, transaction, transactionReceipt } = formatEthData(data)
+
+        if (!trace) {
+          throw new ServerError(Status.INVALID_ARGUMENT, 'trace is null')
+        }
+        const ctx = new GlobalContext(
+          chainId,
+          trace.action.to || '*',
+          data.timestamp,
+          block,
+          undefined,
+          trace,
+          transaction,
+          transactionReceipt,
+          processor.config.baseLabels
+        )
+        return preprocessHandler(trace, ctx, preprocessStore)
       }
     })
     return this
@@ -293,7 +392,8 @@ export abstract class BaseProcessor<
     fetchConfig?: Partial<EthFetchConfig>,
     preprocessHandler: (
       event: TypedEvent,
-      ctx: ContractContext<TContract, TBoundContractView>
+      ctx: ContractContext<TContract, TBoundContractView>,
+      preprocessStore: { [k: string]: any }
     ) => Promise<PreprocessResult> = defaultPreprocessHandler
   ): this {
     const _filters: DeferredTopicFilter[] = []
