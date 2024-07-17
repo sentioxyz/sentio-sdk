@@ -4,8 +4,9 @@ import path, { join } from 'path'
 import { AptosCodegen as BaseAptosCodegen } from '@typemove/aptos/codegen'
 import { InternalMoveModule, InternalMoveStruct } from '@typemove/move'
 import { AptosNetwork, getRpcEndpoint } from '../network.js'
-import { MoveModuleBytecode, MoveResource, Event } from '@aptos-labs/ts-sdk'
+import { Event, MoveModuleBytecode, MoveResource } from '@aptos-labs/ts-sdk'
 import { SharedNetworkCodegen } from '../../move/shared-network-codegen.js'
+import { AptosChainId } from '@sentio/chain'
 
 export async function codegen(
   abisDir: string,
@@ -40,6 +41,10 @@ class AptosNetworkCodegen extends BaseAptosCodegen {
         switch (network) {
           case AptosNetwork.MAIN_NET:
             return 'MAIN_NET'
+          case AptosChainId.APTOS_M2_MAINNET:
+            return 'M2_MAIN_NET'
+          case AptosChainId.APTOS_M2_TESTNET:
+            return 'M2_TEST_NET'
           default:
             return 'TEST_NET'
         }
@@ -63,11 +68,23 @@ class AptosNetworkCodegen extends BaseAptosCodegen {
 
 const MAINNET_CODEGEN = new AptosNetworkCodegen(AptosNetwork.MAIN_NET)
 const TESTNET_CODEGEN = new AptosNetworkCodegen(AptosNetwork.TEST_NET)
+const M2_MAINNET_CODEGEN = new AptosNetworkCodegen(AptosNetwork.M2_MAIN_NET)
+const M2_TESTNET_CODEGEN = new AptosNetworkCodegen(AptosNetwork.M2_TEST_NET)
 
 class AptosCodegen {
   async generate(srcDir: string, outputDir: string, builtin = false): Promise<number> {
     const num1 = await MAINNET_CODEGEN.generate(srcDir, outputDir, builtin)
     const num2 = await TESTNET_CODEGEN.generate(path.join(srcDir, 'testnet'), path.join(outputDir, 'testnet'), builtin)
-    return num1 + num2
+    const num3 = await M2_MAINNET_CODEGEN.generate(
+      path.join(srcDir, 'm2-mainnet'),
+      path.join(outputDir, 'm2-mainnet'),
+      builtin
+    )
+    const num4 = await M2_TESTNET_CODEGEN.generate(
+      path.join(srcDir, 'm2-testnet'),
+      path.join(outputDir, 'm2-testnet'),
+      builtin
+    )
+    return num1 + num2 + num3 + num4
   }
 }
