@@ -42,7 +42,9 @@ export async function getABI(
       break
     case AptosChainId.APTOS_M2_TESTNET:
       aptosClient = new Aptos(
-        new AptosConfig({ fullnode: process.env.APTOS_M2_TESTNET_URL || 'https://aptos.testnet.movementlabs.xyz/v1' })
+        new AptosConfig({
+          fullnode: process.env.APTOS_M2_TESTNET_URL || 'https://aptos.testnet.suzuka.movementlabs.xyz/v1'
+        })
       )
       break
     case SuiChainId.SUI_MAINNET:

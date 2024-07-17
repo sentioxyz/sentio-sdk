@@ -26,7 +26,7 @@ export function getRpcEndpoint(network: AptosNetwork): string {
     case AptosNetwork.TEST_NET:
       return 'https://testnet.aptoslabs.com/v1'
     case AptosNetwork.M2_TEST_NET:
-      return process.env.APTOS_M2_TESTNET_URL || 'https://testnet.m1.movementlabs.xyz/v1'
+      return process.env.APTOS_M2_TESTNET_URL || 'https://aptos.testnet.suzuka.movementlabs.xyz/v1'
     case AptosNetwork.M2_MAIN_NET:
       return 'https://mainnet.m1.movementlabs.xyz/v1'
   }
