@@ -1,0 +1,15 @@
+diff --git a/dist/esm/index.js b/dist/esm/index.js
+index be1a18d642ea047746c66823ae48279fe408c203..130fb7de6179c05ac44d517e2478968cbe31d7f5 100644
+--- a/dist/esm/index.js
++++ b/dist/esm/index.js
+@@ -8,8 +8,6 @@ export * from "./coder/index.js";
+ export * as utils from "./utils/index.js";
+ export * from "./program/index.js";
+ export * from "./native/index.js";
+-if (!isBrowser) {
+-    exports.workspace = require("./workspace.js").default;
+-    exports.Wallet = require("./nodewallet.js").default;
+-}
++export { default as workspace } from './workspace.js'
++export { default as Wallet } from './nodewallet.js'
+ //# sourceMappingURL=index.js.map

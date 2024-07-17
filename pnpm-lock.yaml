@@ -10,6 +10,11 @@ overrides:
   rpc-websockets: 7.11.0
   superstruct: ^1.0.3
 
+patchedDependencies:
+  '@project-serum/anchor@0.26.0':
+    hash: clsetxooki5gt3bqisxpc22mka
+    path: patches/@project-serum__anchor@0.26.0.patch
+
 importers:
 
   .:
@@ -481,7 +486,7 @@ importers:
         version: 0.54.1(svelte@4.2.18)(typescript@5.5.2)
       '@project-serum/anchor':
         specifier: ^0.26.0
-        version: 0.26.0(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
+        version: 0.26.0(patch_hash=clsetxooki5gt3bqisxpc22mka)(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
       '@sentio/abi-wan-kanabi':
         specifier: 2.2.2-1
         version: 2.2.2-1
@@ -8562,7 +8567,7 @@ snapshots:
       - encoding
       - utf-8-validate
 
-  '@project-serum/anchor@0.26.0(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)':
+  '@project-serum/anchor@0.26.0(patch_hash=clsetxooki5gt3bqisxpc22mka)(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)':
     dependencies:
       '@coral-xyz/borsh': 0.26.0(@solana/web3.js@1.91.8(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10))
       '@solana/web3.js': 1.91.8(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)

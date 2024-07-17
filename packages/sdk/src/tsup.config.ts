@@ -1,6 +1,6 @@
 import { defineConfig } from 'tsup'
 
-export const external = ['@project-serum/anchor', 'graphql']
+export const external = []
 
 export default defineConfig({
   esbuildOptions: (options) => {

@@ -42,5 +42,10 @@
   },
   "engines": {
     "node": ">=18"
+  },
+  "pnpm": {
+    "patchedDependencies": {
+      "@project-serum/anchor@0.26.0": "patches/@project-serum__anchor@0.26.0.patch"
+    }
   }
 }
