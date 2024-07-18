@@ -47,11 +47,11 @@ export function generateViewFunction(view: boolean, fn: FunctionDeclaration, inc
             fn.inputs.length > 0 ? fn.inputs.map((input, index) => input.name || `arg${index}`).join(',') + ',' : ''
           }] 
         )
-        const key = makeEthCallKey({
+        const ethCallKey = makeEthCallKey({
           context: ethCallContext,
           calldata
         })
-        const ret = preparedData.ethCallResults[key]
+        const ret = preparedData.ethCallResults[ethCallKey]
         if (ret) {
           const result = iface.decodeFunctionResult("${fn.name}", ret).toArray()
           return result.length == 1? result[0]: result
