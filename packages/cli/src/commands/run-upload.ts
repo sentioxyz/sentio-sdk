@@ -361,8 +361,11 @@ async function uploadZip(
   const uploadUrl = initUploadRes.url
 
   const zip = new JSZip()
-  ;['package.json', 'tsconfig.json', 'sentio.yaml'].forEach((p) => {
-    if (fs.existsSync(p)) {
+  fs.readdirSync('.').forEach((p) => {
+    if (
+      fs.lstatSync(p).isFile() &&
+      (['package.json', 'tsconfig.json', 'sentio.yaml'].includes(p) || p.endsWith('.graphql'))
+    ) {
       zip.file(p, fs.readFileSync(p))
     }
   })
