@@ -17,6 +17,10 @@ export function generateViewFunctions(view: boolean, functions: FunctionDeclarat
   return functions.flatMap((fn) => generateViewFunction(view, fn, includeArgTypes))
 }
 
+export function generateFunctionSignatures(functions: FunctionDeclaration[]): string[] {
+  return functions.map((fn) => `"function ${getFullSignatureWithOutputForFn(fn)}"`)
+}
+
 export function generateViewFunction(view: boolean, fn: FunctionDeclaration, includeArgTypes: boolean): string[] {
   const isView = fn.stateMutability === 'view' || fn.stateMutability === 'pure'
   if (view !== isView) {
@@ -41,7 +45,6 @@ export function generateViewFunction(view: boolean, fn: FunctionDeclaration, inc
   })}overrides?: Overrides, preparedData?: PreparedData, ethCallContext?: EthCallContext): ${generateReturnTypes(fn)} {
     try {
       if (preparedData?.ethCallResults && ethCallContext) {
-        const iface = new Interface(["function ${getFullSignatureWithOutputForFn(fn)}"])
         const calldata = iface.encodeFunctionData(
           "${fn.name}",[${
             fn.inputs.length > 0 ? fn.inputs.map((input, index) => input.name || `arg${index}`).join(',') + ',' : ''

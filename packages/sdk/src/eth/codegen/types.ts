@@ -1,10 +1,11 @@
 import {
   AbiOutputParameter,
   AbiParameter,
+  ArrayType,
+  EventArgDeclaration,
   EventDeclaration,
   FunctionDeclaration,
-  getArgumentForSignature,
-  getSignatureForFn
+  TupleType
 } from 'typechain'
 import { EvmType } from 'typechain/dist/parser/parseEvmType.js'
 
@@ -48,6 +49,13 @@ export function getFullSignatureForFunction(fn: FunctionDeclaration): string {
     .join(',')})`
 }
 
+export function getFullSignatureWithOutputForFn(fn: FunctionDeclaration) {
+  return `${fn.name}(${fn.inputs.map((i) => getArgumentForSignature(i)).join(', ')}) ${fn.stateMutability} returns (${fn.outputs
+    .map((i) => getOutputArgumentForSignature(i))
+    .filter((s) => s != '')
+    .join(', ')})`
+}
+
 function getOutputArgumentForSignature(argument: AbiOutputParameter) {
   if (argument.type.type == 'void') {
     return ''
@@ -55,9 +63,23 @@ function getOutputArgumentForSignature(argument: AbiOutputParameter) {
   return getArgumentForSignature(argument as AbiParameter)
 }
 
-export function getFullSignatureWithOutputForFn(fn: FunctionDeclaration) {
-  return `${getSignatureForFn(fn)} ${fn.stateMutability} returns (${fn.outputs
-    .map((i) => getOutputArgumentForSignature(i))
-    .filter((s) => s != '')
-    .join(',')})`
+function getArgumentForSignature(argument: EventArgDeclaration | AbiParameter): string {
+  if (argument.type.originalType === 'tuple') {
+    return `(${(argument.type as TupleType).components.map((i) => getTypeWithName(getArgumentForSignature(i), argument.name)).join(', ')})`
+  } else if (argument.type.originalType.startsWith('tuple')) {
+    const arr = argument.type as ArrayType
+    return getTypeWithName(
+      `${getArgumentForSignature({
+        name: '',
+        type: arr.itemType
+      })}[${arr.size?.toString() || ''}]`,
+      argument.name
+    )
+  } else {
+    return getTypeWithName(argument.type.originalType, argument.name)
+  }
+}
+
+function getTypeWithName(type: string, name?: string) {
+  return (name ?? '').length > 0 ? `${type} ${name}` : type
 }
