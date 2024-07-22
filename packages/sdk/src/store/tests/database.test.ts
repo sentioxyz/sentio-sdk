@@ -114,6 +114,7 @@ describe('Test Database', () => {
       raw: new Uint8Array([1, 2, 3])
     })
     await store.upsert(tx)
+
     const tx2 = await store.get(Transaction, 'test-id-1')
     assert.equal(tx2?.gas, tx.gas)
     assert.equal(tx2?.id, tx.id)
@@ -123,6 +124,14 @@ describe('Test Database', () => {
   it('filter constraints', async () => {
     const store = new Store(storeContext)
     // wrong type won't compile
+
+    // must extends AbstractEntity
+    /*const tx1= {
+      id: 'test-id-1',
+      gas: 100n,
+      count: 0,
+    }
+    await store.upsert(tx1)*/
 
     store.list(Transaction, [
       {

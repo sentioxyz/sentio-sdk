@@ -1,19 +1,19 @@
 import { StoreContext } from './context.js'
 import { DatabaseSchema } from '../core/index.js'
 import { BigDecimal } from '@sentio/bigdecimal'
-import { Bytes, Float, ID, Int, Timestamp } from './types.js'
+import { AbstractEntity as Entity, Bytes, Float, ID, Int, Timestamp } from './types.js'
 import type { DBRequest, Entity as EntityStruct, RichValue } from '@sentio/protos'
 import { DBRequest_DBOperator, DBResponse } from '@sentio/protos'
 import { toBigInteger } from './convert.js'
 import { PluginManager } from '@sentio/runtime'
 import { Cursor } from './cursor.js'
-import { Entity, LocalCache } from './cache.js'
+import { LocalCache } from './cache.js'
 
 export interface EntityClass<T> {
   new (data: Partial<T>): T
 }
 
-function getEntityName<T>(entity: EntityClass<T> | T | string): string {
+export function getEntityName<T>(entity: EntityClass<T> | T | string): string {
   if (entity == null) {
     throw new Error("can't figure out entityName from undefined")
   }
@@ -182,7 +182,7 @@ export class Store {
 
   async list<T extends Entity, P extends keyof T, O extends Operators<T[P]>>(
     entity: EntityClass<T>,
-    filters: ListFilter<T, P, O>[],
+    filters?: ListFilter<T, P, O>[],
     cursor?: Cursor
   ) {
     if (cursor) {
@@ -191,7 +191,7 @@ export class Store {
       return response.entityList?.entities.map((data) => this.newEntity(entity, data)) || []
     }
     // TODO Array.fromAsync when upgrade to node 22
-    return this.fromAsync(this.listIterator(entity, filters))
+    return this.fromAsync(this.listIterator(entity, filters ?? []))
   }
 
   private async fromAsync<T>(gen: AsyncIterable<T>): Promise<T[]> {

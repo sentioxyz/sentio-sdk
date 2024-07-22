@@ -17,12 +17,14 @@ import {
   ListColumn
 } from '../decorators.js'
 import type { Boolean, Bytes, Float, ID, Int, String } from '../types.js'
+import { AbstractEntity } from '../types.js'
+
 import { BigDecimal } from '@sentio/bigdecimal'
 
 /* eslint-disable */
 
 @Entity('Person')
-class Person {
+class Person extends AbstractEntity {
   @Required
   @IDColumn
   id: ID
@@ -59,11 +61,13 @@ class Person {
   pets: Promise<Array<Pet | undefined>>
   petsIDs: Array<ID | undefined>
 
-  constructor(data?: Partial<Person>) {}
+  constructor(data?: Partial<Person>) {
+    super()
+  }
 }
 
 @Entity('Pet')
-class Pet {
+class Pet extends AbstractEntity {
   @IDColumn
   id: ID
 
@@ -72,7 +76,9 @@ class Pet {
   owner: Promise<Person>
   ownerID: ID
 
-  constructor(data?: Partial<Pet>) {}
+  constructor(data?: Partial<Pet>) {
+    super()
+  }
 }
 
 async function sleep(ms: number) {
@@ -159,5 +165,26 @@ describe('entity tests', () => {
     await sleep(1)
 
     assert.deepEqual(p.petsIDs, [t.id, t2.id])
+  })
+
+  it('toJSON', () => {
+    const t = new Pet({
+      id: 'test',
+      ownerID: 'owner'
+    })
+    const obj = t.toJSON()
+    assert.deepEqual(obj, {
+      id: 'test',
+      owner: 'owner'
+    })
+  })
+
+  it('toString', () => {
+    const t = new Pet({
+      id: 'test',
+      ownerID: 'owner'
+    })
+    const obj = t.toString()
+    assert.equal(obj, 'Pet {"id":"test","owner":"owner"}')
   })
 })

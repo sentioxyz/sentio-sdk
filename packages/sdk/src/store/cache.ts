@@ -1,10 +1,6 @@
 import { ID } from './types.js'
 import type { Entity as EntityStruct } from '@sentio/protos'
 
-export interface Entity {
-  id: ID
-}
-
 export class LocalCache {
   private cache: Map<string, EntityStruct> = new Map()
 

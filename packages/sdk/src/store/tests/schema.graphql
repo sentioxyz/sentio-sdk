@@ -38,6 +38,10 @@ type Organization implements Owner @entity(sparse: true) {
   members: [User!]!
 }
 
+type NonEntity {
+  id: ID
+}
+
 enum TransactionStatus {
   SUCCESS
   FAILURE
