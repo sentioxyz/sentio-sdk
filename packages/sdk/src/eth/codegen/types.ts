@@ -50,7 +50,7 @@ export function getFullSignatureForFunction(fn: FunctionDeclaration): string {
 }
 
 export function getFullSignatureWithOutputForFn(fn: FunctionDeclaration) {
-  return `${fn.name}(${fn.inputs.map((i) => getArgumentForSignature(i)).join(', ')}) ${fn.stateMutability} returns (${fn.outputs
+  return `${fn.name}(${fn.inputs.map((i) => getArgumentForSignature(i)).join(', ')}) ${fn.stateMutability != 'nonpayable' ? fn.stateMutability + ' ' : ''}returns (${fn.outputs
     .map((i) => getOutputArgumentForSignature(i))
     .filter((s) => s != '')
     .join(', ')})`
