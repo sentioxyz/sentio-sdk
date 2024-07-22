@@ -65,7 +65,10 @@ function getOutputArgumentForSignature(argument: AbiOutputParameter) {
 
 function getArgumentForSignature(argument: EventArgDeclaration | AbiParameter): string {
   if (argument.type.originalType === 'tuple') {
-    return `(${(argument.type as TupleType).components.map((i) => getTypeWithName(getArgumentForSignature(i), i.name)).join(', ')})`
+    return getTypeWithName(
+      `(${(argument.type as TupleType).components.map((i) => getArgumentForSignature(i)).join(', ')})`,
+      argument.name
+    )
   } else if (argument.type.originalType.startsWith('tuple')) {
     const arr = argument.type as ArrayType
     return getTypeWithName(
