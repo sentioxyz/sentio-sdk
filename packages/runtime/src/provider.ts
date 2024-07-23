@@ -47,9 +47,9 @@ export function getProvider(chainId?: EthChainId): Provider {
         [...Endpoints.INSTANCE.chainServer.keys()].join(' ')
     )
   }
-  console.log(
-    `init provider for chain ${network.chainId}, concurrency: ${Endpoints.INSTANCE.concurrency}, batchCount: ${Endpoints.INSTANCE.batchCount}`
-  )
+  // console.log(
+  //   `init provider for chain ${network.chainId}, concurrency: ${Endpoints.INSTANCE.concurrency}, batchCount: ${Endpoints.INSTANCE.batchCount}`
+  // )
   provider = new QueuedStaticJsonRpcProvider(
     address,
     network,
