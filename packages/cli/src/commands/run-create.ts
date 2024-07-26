@@ -81,6 +81,8 @@ export async function runCreate(argv: string[]) {
         break
       case 'fuel':
         break
+      case 'starknet':
+        break
       default:
         console.error(chalk.red('non supported chain-type for template creation, use --help for more information.'))
         console.log(usage)
