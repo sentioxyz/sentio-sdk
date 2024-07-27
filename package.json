@@ -9,7 +9,7 @@
   },
   "resolutions": {
     "@grpc/grpc-js": "^1.9.14",
-    "ethers": "npm:@sentio/ethers@6.13.1",
+    "ethers": "npm:@sentio/ethers@6.13.1-patch.1",
     "rpc-websockets": "7.11.0",
     "superstruct": "^1.0.3"
   },

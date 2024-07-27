@@ -70,9 +70,6 @@
     "test": "glob -c 'tsx --test' '**/*.test.ts'",
     "test:starknet": "tsx --test src/stark/tests/event.test.ts"
   },
-  "resolutions": {
-    "ethers": "npm:@sentio/ethers@6.13.1"
-  },
   "dependencies": {
     "@aptos-labs/ts-sdk": "~1.14.0",
     "@coral-xyz/borsh": "^0.30.0",
@@ -92,11 +89,11 @@
     "bs58": "^5.0.0",
     "chalk": "^5.3.0",
     "csv-parse": "^5.5.3",
-    "ethers": "npm:@sentio/ethers@6.13.1",
+    "ethers": "npm:@sentio/ethers@6.13.1-patch.1",
     "fuels": "^0.90.0",
     "graphql": "^16.9.0",
     "js-sha3": "^0.9.3",
-    "lru-cache": "^10.2.0",
+    "lru-cache": "^11.0.0",
     "mkdirp": "^1.0.4",
     "nice-grpc": "^2.1.7",
     "nice-grpc-client-middleware-retry": "^3.1.6",
