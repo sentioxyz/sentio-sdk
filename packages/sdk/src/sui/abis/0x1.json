@@ -67,6 +67,32 @@
         ],
         "return": ["Bool"]
       },
+      "append": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x1",
+                "module": "ascii",
+                "name": "String",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "ascii",
+              "name": "String",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": []
+      },
       "as_bytes": {
         "visibility": "Public",
         "isEntry": false,
@@ -123,6 +149,61 @@
           }
         ]
       },
+      "index_of": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x1",
+                "module": "ascii",
+                "name": "String",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x1",
+                "module": "ascii",
+                "name": "String",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": ["U64"]
+      },
+      "insert": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x1",
+                "module": "ascii",
+                "name": "String",
+                "typeArguments": []
+              }
+            }
+          },
+          "U64",
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "ascii",
+              "name": "String",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": []
+      },
       "into_bytes": {
         "visibility": "Public",
         "isEntry": false,
@@ -142,6 +223,24 @@
             "Vector": "U8"
           }
         ]
+      },
+      "is_empty": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x1",
+                "module": "ascii",
+                "name": "String",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": ["Bool"]
       },
       "is_printable_char": {
         "visibility": "Public",
@@ -235,6 +334,89 @@
         "parameters": [
           {
             "Vector": "U8"
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "ascii",
+              "name": "String",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "substring": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x1",
+                "module": "ascii",
+                "name": "String",
+                "typeArguments": []
+              }
+            }
+          },
+          "U64",
+          "U64"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "ascii",
+              "name": "String",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "to_lowercase": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x1",
+                "module": "ascii",
+                "name": "String",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "ascii",
+              "name": "String",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "to_uppercase": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x1",
+                "module": "ascii",
+                "name": "String",
+                "typeArguments": []
+              }
+            }
           }
         ],
         "return": [
@@ -657,6 +839,14 @@
         ]
       }
     }
+  },
+  "macros": {
+    "fileFormatVersion": 6,
+    "address": "0x1",
+    "name": "macros",
+    "friends": [],
+    "structs": {},
+    "exposedFunctions": {}
   },
   "option": {
     "fileFormatVersion": 6,
@@ -1276,6 +1466,30 @@
         ],
         "return": []
       },
+      "as_bytes": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x1",
+                "module": "string",
+                "name": "String",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Reference": {
+              "Vector": "U8"
+            }
+          }
+        ]
+      },
       "bytes": {
         "visibility": "Public",
         "isEntry": false,
@@ -1380,6 +1594,26 @@
         ],
         "return": []
       },
+      "into_bytes": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "string",
+              "name": "String",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": [
+          {
+            "Vector": "U8"
+          }
+        ]
+      },
       "is_empty": {
         "visibility": "Public",
         "isEntry": false,
@@ -1417,6 +1651,35 @@
         "return": ["U64"]
       },
       "sub_string": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x1",
+                "module": "string",
+                "name": "String",
+                "typeArguments": []
+              }
+            }
+          },
+          "U64",
+          "U64"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "string",
+              "name": "String",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "substring": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
@@ -1695,6 +1958,323 @@
             }
           }
         ]
+      },
+      "is_primitive": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x1",
+                "module": "type_name",
+                "name": "TypeName",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": ["Bool"]
+      }
+    }
+  },
+  "u128": {
+    "fileFormatVersion": 6,
+    "address": "0x1",
+    "name": "u128",
+    "friends": [],
+    "structs": {},
+    "exposedFunctions": {
+      "diff": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U128", "U128"],
+        "return": ["U128"]
+      },
+      "divide_and_round_up": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U128", "U128"],
+        "return": ["U128"]
+      },
+      "max": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U128", "U128"],
+        "return": ["U128"]
+      },
+      "min": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U128", "U128"],
+        "return": ["U128"]
+      },
+      "pow": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U128", "U8"],
+        "return": ["U128"]
+      },
+      "sqrt": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U128"],
+        "return": ["U128"]
+      }
+    }
+  },
+  "u16": {
+    "fileFormatVersion": 6,
+    "address": "0x1",
+    "name": "u16",
+    "friends": [],
+    "structs": {},
+    "exposedFunctions": {
+      "diff": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U16", "U16"],
+        "return": ["U16"]
+      },
+      "divide_and_round_up": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U16", "U16"],
+        "return": ["U16"]
+      },
+      "max": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U16", "U16"],
+        "return": ["U16"]
+      },
+      "min": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U16", "U16"],
+        "return": ["U16"]
+      },
+      "pow": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U16", "U8"],
+        "return": ["U16"]
+      },
+      "sqrt": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U16"],
+        "return": ["U16"]
+      }
+    }
+  },
+  "u256": {
+    "fileFormatVersion": 6,
+    "address": "0x1",
+    "name": "u256",
+    "friends": [],
+    "structs": {},
+    "exposedFunctions": {
+      "diff": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U256", "U256"],
+        "return": ["U256"]
+      },
+      "divide_and_round_up": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U256", "U256"],
+        "return": ["U256"]
+      },
+      "max": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U256", "U256"],
+        "return": ["U256"]
+      },
+      "min": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U256", "U256"],
+        "return": ["U256"]
+      },
+      "pow": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U256", "U8"],
+        "return": ["U256"]
+      }
+    }
+  },
+  "u32": {
+    "fileFormatVersion": 6,
+    "address": "0x1",
+    "name": "u32",
+    "friends": [],
+    "structs": {},
+    "exposedFunctions": {
+      "diff": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U32", "U32"],
+        "return": ["U32"]
+      },
+      "divide_and_round_up": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U32", "U32"],
+        "return": ["U32"]
+      },
+      "max": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U32", "U32"],
+        "return": ["U32"]
+      },
+      "min": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U32", "U32"],
+        "return": ["U32"]
+      },
+      "pow": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U32", "U8"],
+        "return": ["U32"]
+      },
+      "sqrt": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U32"],
+        "return": ["U32"]
+      }
+    }
+  },
+  "u64": {
+    "fileFormatVersion": 6,
+    "address": "0x1",
+    "name": "u64",
+    "friends": [],
+    "structs": {},
+    "exposedFunctions": {
+      "diff": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U64", "U64"],
+        "return": ["U64"]
+      },
+      "divide_and_round_up": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U64", "U64"],
+        "return": ["U64"]
+      },
+      "max": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U64", "U64"],
+        "return": ["U64"]
+      },
+      "min": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U64", "U64"],
+        "return": ["U64"]
+      },
+      "pow": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U64", "U8"],
+        "return": ["U64"]
+      },
+      "sqrt": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U64"],
+        "return": ["U64"]
+      }
+    }
+  },
+  "u8": {
+    "fileFormatVersion": 6,
+    "address": "0x1",
+    "name": "u8",
+    "friends": [],
+    "structs": {},
+    "exposedFunctions": {
+      "diff": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U8", "U8"],
+        "return": ["U8"]
+      },
+      "divide_and_round_up": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U8", "U8"],
+        "return": ["U8"]
+      },
+      "max": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U8", "U8"],
+        "return": ["U8"]
+      },
+      "min": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U8", "U8"],
+        "return": ["U8"]
+      },
+      "pow": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U8", "U8"],
+        "return": ["U8"]
+      },
+      "sqrt": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U8"],
+        "return": ["U8"]
       }
     }
   },

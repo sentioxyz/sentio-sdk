@@ -955,7 +955,7 @@
             }
           },
           {
-            "MutableReference": {
+            "Reference": {
               "Struct": {
                 "address": "0x2",
                 "module": "tx_context",
@@ -1046,7 +1046,7 @@
             }
           },
           {
-            "MutableReference": {
+            "Reference": {
               "Struct": {
                 "address": "0x2",
                 "module": "tx_context",
@@ -1221,7 +1221,7 @@
         "typeParameters": [],
         "parameters": [
           {
-            "MutableReference": {
+            "Reference": {
               "Struct": {
                 "address": "0x3",
                 "module": "staking_pool",
@@ -3332,6 +3332,33 @@
           }
         ]
       },
+      "active_validator_voting_powers": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "sui_system_state_inner",
+                "name": "SuiSystemStateInnerV2",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "vec_map",
+              "name": "VecMap",
+              "typeArguments": ["Address", "U64"]
+            }
+          }
+        ]
+      },
       "advance_epoch": {
         "visibility": "Friend",
         "isEntry": false,
@@ -3864,7 +3891,7 @@
             }
           },
           {
-            "MutableReference": {
+            "Reference": {
               "Struct": {
                 "address": "0x2",
                 "module": "tx_context",
@@ -3958,7 +3985,7 @@
             }
           },
           {
-            "MutableReference": {
+            "Reference": {
               "Struct": {
                 "address": "0x2",
                 "module": "tx_context",
@@ -4015,7 +4042,7 @@
           },
           "U64",
           {
-            "MutableReference": {
+            "Reference": {
               "Struct": {
                 "address": "0x2",
                 "module": "tx_context",
@@ -4080,7 +4107,7 @@
             }
           },
           {
-            "MutableReference": {
+            "Reference": {
               "Struct": {
                 "address": "0x2",
                 "module": "tx_context",
@@ -4155,7 +4182,7 @@
           },
           "U64",
           {
-            "MutableReference": {
+            "Reference": {
               "Struct": {
                 "address": "0x2",
                 "module": "tx_context",
@@ -4936,10 +4963,6 @@
       {
         "address": "0x3",
         "name": "validator_set"
-      },
-      {
-        "address": "0x3",
-        "name": "validator_wrapper"
       },
       {
         "address": "0x3",
@@ -6432,7 +6455,7 @@
             }
           },
           {
-            "MutableReference": {
+            "Reference": {
               "Struct": {
                 "address": "0x2",
                 "module": "tx_context",
@@ -6692,7 +6715,7 @@
             }
           },
           {
-            "MutableReference": {
+            "Reference": {
               "Struct": {
                 "address": "0x2",
                 "module": "tx_context",
@@ -8565,7 +8588,7 @@
           },
           "U64",
           {
-            "MutableReference": {
+            "Reference": {
               "Struct": {
                 "address": "0x2",
                 "module": "tx_context",
@@ -8629,7 +8652,7 @@
             }
           },
           {
-            "MutableReference": {
+            "Reference": {
               "Struct": {
                 "address": "0x2",
                 "module": "tx_context",
@@ -8722,7 +8745,7 @@
             }
           },
           {
-            "MutableReference": {
+            "Reference": {
               "Struct": {
                 "address": "0x2",
                 "module": "tx_context",
@@ -8882,6 +8905,25 @@
         ]
       },
       "validator_total_stake_amount": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "validator_set",
+                "name": "ValidatorSet",
+                "typeArguments": []
+              }
+            }
+          },
+          "Address"
+        ],
+        "return": ["U64"]
+      },
+      "validator_voting_power": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
