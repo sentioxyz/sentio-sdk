@@ -25,6 +25,10 @@ function normalizeValue(name: string): string {
 }
 
 export function normalizeLabels(labels: Labels): Labels {
+  if (Object.keys(labels).length === 0) {
+    return labels
+  }
+
   const normLabels: Labels = {}
   for (const key in labels) {
     const value = labels[key]
