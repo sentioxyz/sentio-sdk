@@ -5,23 +5,8 @@ import process from 'process'
 import path from 'path'
 import fs from 'fs-extra'
 import fetch from 'node-fetch'
-import { AptosChainId, ChainId, EthChainId, StarknetChainId, SuiChainId } from '@sentio/chain'
+import { AptosChainId, ChainId, StarknetChainId, SuiChainId, EthChainInfo, ExplorerApiType } from '@sentio/chain'
 import { RpcProvider as Starknet, constants } from 'starknet'
-
-export const ETH_API_URL_MAP: Record<string, string> = {}
-
-ETH_API_URL_MAP[EthChainId.ETHEREUM] = 'https://api.etherscan.io'
-ETH_API_URL_MAP[EthChainId.GOERLI] = 'https://api-goerli.etherscan.io'
-ETH_API_URL_MAP[EthChainId.BINANCE] = 'https://api.bscscan.com'
-ETH_API_URL_MAP[EthChainId.POLYGON] = 'https://api.polygonscan.com'
-ETH_API_URL_MAP[EthChainId.ARBITRUM] = 'https://api.arbiscan.io'
-ETH_API_URL_MAP[EthChainId.OPTIMISM] = 'https://api-optimistic.etherscan.io'
-// ETH_API_URL_MAP[CHAIN_IDS.BASE_GOERLI] = 'https://api-goerli.basescan.org' // didn't see any verified contract
-
-ETH_API_URL_MAP[EthChainId.AVALANCHE] = 'https://api.snowtrace.io'
-ETH_API_URL_MAP[EthChainId.CRONOS] = 'https://api.cronoscan.com'
-ETH_API_URL_MAP[EthChainId.MOONBEAM] = 'https://api-moonbeam.moonscan.io'
-ETH_API_URL_MAP[EthChainId.FANTOM] = 'https://api.ftmscan.com'
 
 export async function getABI(
   chain: ChainId,
@@ -64,8 +49,13 @@ export async function getABI(
       })
       break
     default:
-      ethApi = ETH_API_URL_MAP[chain]
-      if (!ethApi) {
+      const chainDetail = EthChainInfo[chain]
+      ethApi = chainDetail.explorerApi
+      if (
+        !ethApi ||
+        (chainDetail.explorerApiType !== ExplorerApiType.ETHERSCAN &&
+          chainDetail.explorerApiType !== ExplorerApiType.BLOCKSCOUT)
+      ) {
         console.error(chalk.red(`chain ${chain} not supported for direct add, please download the ABI manually`))
         process.exit(1)
       }

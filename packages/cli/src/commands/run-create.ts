@@ -7,8 +7,17 @@ import latestVersion from 'latest-version'
 import process from 'process'
 import { execYarn } from '../execution.js'
 import { getPackageRoot } from '../utils.js'
+import { EthChainInfo, EthChainId } from '@sentio/chain'
 
 export async function runCreate(argv: string[]) {
+  const supportedChain: EthChainId[] = Object.values(EthChainInfo).map((chain) => chain.chainId)
+
+  const supportedChainMessage = [
+    ',  <Chain ID> (<Chain Name>)',
+    '  --------------------',
+    ...Object.values(EthChainInfo).map((info) => `  ${info.chainId} (${info.name})`)
+  ]
+
   const optionDefinitions = [
     {
       name: 'help',
@@ -46,9 +55,15 @@ export async function runCreate(argv: string[]) {
       name: 'chain-type',
       alias: 'c',
       description:
-        'The type of project you want to create, can be eth, aptos, fuel, solana, sui, raw (if you want to start from scratch and support multiple types of chains)',
+        'The type of project you want to create, can be \n,  eth \n,  aptos \n,  fuel\n,  solana\n,  sui\n,  raw (if you want to start from scratch and support multiple types of chains)',
       type: String,
       defaultValue: 'eth'
+    },
+    {
+      name: 'chain-id',
+      type: String,
+      description: '(Optional) The chain id to use for eth. Supported: ' + supportedChainMessage.join('\n,'),
+      defaultValue: '1'
     }
   ]
 

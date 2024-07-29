@@ -6,23 +6,28 @@ import chalk from 'chalk'
 import { codegen } from './build.js'
 
 import yaml from 'yaml'
-import { getABIFilePath, getABI, writeABIFile, ETH_API_URL_MAP } from '../abi.js'
-import { AptosChainId, ChainId, getChainName, SuiChainId } from '@sentio/chain'
+import { getABIFilePath, getABI, writeABIFile } from '../abi.js'
+import { AptosChainId, ChainId, getChainName, SuiChainId, EthChainInfo, ExplorerApiType } from '@sentio/chain'
+
+const supportedChain: string[] = [
+  AptosChainId.APTOS_MAINNET,
+  AptosChainId.APTOS_TESTNET,
+  AptosChainId.APTOS_M2_TESTNET,
+  SuiChainId.SUI_TESTNET,
+  SuiChainId.SUI_MAINNET
+]
 
 export async function runAdd(argv: string[]) {
-  const supportedChain: string[] = [
-    AptosChainId.APTOS_MAINNET,
-    AptosChainId.APTOS_TESTNET,
-    AptosChainId.APTOS_M2_TESTNET,
-    SuiChainId.SUI_TESTNET,
-    SuiChainId.SUI_MAINNET
-  ]
-  supportedChain.push(...Object.keys(ETH_API_URL_MAP))
+  for (const chain of Object.values(EthChainInfo)) {
+    if (chain.explorerApiType === ExplorerApiType.ETHERSCAN || chain.explorerApiType === ExplorerApiType.BLOCKSCOUT) {
+      supportedChain.push(chain.chainId)
+    }
+  }
+
   const supportedChainMessage = [
-    '',
-    ...supportedChain.map(
-      (chainId, idx) => `  ${getChainName(chainId)}:\t${chainId}${idx === supportedChain.length - 1 ? '' : '\n'}`
-    )
+    ',  <Chain ID> (<Chain Name>)',
+    '  --------------------',
+    ...supportedChain.map((chainId, idx) => `  ${chainId} (${getChainName(chainId)})`)
   ]
 
   const optionDefinitions = [
@@ -31,13 +36,6 @@ export async function runAdd(argv: string[]) {
       alias: 'h',
       type: Boolean,
       description: 'Display this usage guide.'
-    },
-    {
-      name: 'chain',
-      alias: 'c',
-      type: String,
-      defaultValue: '1',
-      description: 'Chain id, current support (chain name: id)s are:\n' + supportedChainMessage
     },
     {
       name: 'address',
@@ -50,6 +48,13 @@ export async function runAdd(argv: string[]) {
       alias: 'n',
       description: 'File name for the downloaded contract, if empty, use address as file name',
       type: String
+    },
+    {
+      name: 'chain',
+      alias: 'c',
+      type: String,
+      defaultValue: '1',
+      description: 'Chain ID, current supports the following:\n' + supportedChainMessage.join('\n,')
     }
   ]
 
