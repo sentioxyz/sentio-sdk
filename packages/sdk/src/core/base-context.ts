@@ -49,7 +49,21 @@ export abstract class BaseContext {
     }
   }
 
+  private metadataCache = new Map<string, RecordMetaData>()
+
   getMetaData(name: string, labels: Labels): RecordMetaData {
+    if (Object.keys(labels).length === 0) {
+      let metadata = this.metadataCache.get(name)
+      if (!metadata) {
+        metadata = {
+          ...this.baseLabels,
+          ...this.getMetaDataInternal(name, labels)
+        }
+        this.metadataCache.set(name, metadata)
+      }
+      return metadata
+    }
+
     return {
       ...this.baseLabels,
       ...this.getMetaDataInternal(name, labels)
