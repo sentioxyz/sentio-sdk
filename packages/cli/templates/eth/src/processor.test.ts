@@ -17,7 +17,7 @@ describe('Test Processor', () => {
 
   test('check transfer event handling', async () => {
     const resp = await service.eth.testLog(
-      mockTransferLog('0x1e4ede388cbc9f4b5c79681b7f94d36a11abebc9', {
+      mockTransferLog('0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', {
         from: '0x0000000000000000000000000000000000000000',
         to: '0xb329e39ebefd16f40d38f07643652ce17ca5bac1',
         value: 10n ** 18n * 10n

@@ -83,6 +83,7 @@ export async function runCreate(argv: string[]) {
     console.log(usage)
   } else {
     const chainType: string = options['chain-type'].toLowerCase()
+    const chainId: string = options['chain-id']
     switch (chainType) {
       case 'eth':
         break
@@ -167,6 +168,18 @@ export async function runCreate(argv: string[]) {
       packageJson.scripts.postinstall = 'sentio gen'
 
       fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2))
+    }
+    const chainInfo = EthChainInfo[chainId]
+    if (chainType == 'eth') {
+      fs.readdirSync(dstFolder, { recursive: true }).forEach((p) => {
+        if (typeof p != 'string' || !p.endsWith('.ts')) {
+          return
+        }
+        const item = path.join(dstFolder, p)
+        const template = fs.readFileSync(item, 'utf8')
+        const content = template.replaceAll('0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', chainInfo.wrappedTokenAddress)
+        fs.writeFileSync(item, content)
+      })
     }
     console.log(chalk.green("successfully create project '" + projectFullName + "'"))
     if (!options.subproject) {
