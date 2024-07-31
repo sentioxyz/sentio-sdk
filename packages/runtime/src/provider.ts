@@ -93,7 +93,7 @@ function getTag(prefix: string, value: any): string {
   )
 }
 
-class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
+export class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
   executor: PQueue
   #performCache = new LRUCache<string, Promise<any>>({
     max: 300000 // 300k items
