@@ -132,8 +132,8 @@ onEvent${struct.name}(func: (event: ${moduleName}.${normalizeToJSName(struct.nam
       source = `
       loadAllTypes(defaultMoveCoder(${this.PREFIX}Network.MAIN_NET))
       loadAllTypes(defaultMoveCoder(${this.PREFIX}Network.TEST_NET))
-      loadAllTypes(defaultMoveCoder(${this.PREFIX}Network.M2_TEST_NET))
-      loadAllTypes(defaultMoveCoder(${this.PREFIX}Network.M2_MAIN_NET))
+      loadAllTypes(defaultMoveCoder(${this.PREFIX}Network.MOVEMENT_TEST_NET))
+      loadAllTypes(defaultMoveCoder(${this.PREFIX}Network.MOVEMENT_MAIN_NET))
       `
     }
     return source

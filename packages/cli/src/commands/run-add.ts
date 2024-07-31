@@ -12,7 +12,7 @@ import { AptosChainId, ChainId, getChainName, SuiChainId, EthChainInfo, Explorer
 const supportedChain: string[] = [
   AptosChainId.APTOS_MAINNET,
   AptosChainId.APTOS_TESTNET,
-  AptosChainId.APTOS_M2_TESTNET,
+  AptosChainId.APTOS_MOVEMENT_TESTNET,
   SuiChainId.SUI_TESTNET,
   SuiChainId.SUI_MAINNET
 ]

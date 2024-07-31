@@ -41,10 +41,10 @@ class SuiNetworkCodegen extends BaseSuiCodegen {
         switch (network) {
           case SuiNetwork.MAIN_NET:
             return 'MAIN_NET'
-          case SuiNetwork.M2_MAIN_NET:
-            return 'M2_MAIN_NET'
-          case SuiNetwork.M2_TEST_NET:
-            return 'M2_TEST_NET'
+          case SuiNetwork.MOVEMENT_MAIN_NET:
+            return 'MOVEMENT_MAIN_NET'
+          case SuiNetwork.MOVEMENT_TEST_NET:
+            return 'MOVEMENT_TEST_NET'
           default:
             return 'TEST_NET'
         }

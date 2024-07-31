@@ -6,7 +6,6 @@ import { InternalMoveModule, InternalMoveStruct } from '@typemove/move'
 import { AptosNetwork, getRpcEndpoint } from '../network.js'
 import { Event, MoveModuleBytecode, MoveResource } from '@aptos-labs/ts-sdk'
 import { SharedNetworkCodegen } from '../../move/shared-network-codegen.js'
-import { AptosChainId } from '@sentio/chain'
 
 export async function codegen(
   abisDir: string,
@@ -41,10 +40,10 @@ class AptosNetworkCodegen extends BaseAptosCodegen {
         switch (network) {
           case AptosNetwork.MAIN_NET:
             return 'MAIN_NET'
-          case AptosChainId.APTOS_M2_MAINNET:
-            return 'M2_MAIN_NET'
-          case AptosChainId.APTOS_M2_TESTNET:
-            return 'M2_TEST_NET'
+          case AptosNetwork.MOVEMENT_MAIN_NET:
+            return 'MOVEMENT_MAIN_NET'
+          case AptosNetwork.MOVEMENT_TEST_NET:
+            return 'MOVEMENT_TEST_NET'
           default:
             return 'TEST_NET'
         }
@@ -68,8 +67,8 @@ class AptosNetworkCodegen extends BaseAptosCodegen {
 
 const MAINNET_CODEGEN = new AptosNetworkCodegen(AptosNetwork.MAIN_NET)
 const TESTNET_CODEGEN = new AptosNetworkCodegen(AptosNetwork.TEST_NET)
-const M2_MAINNET_CODEGEN = new AptosNetworkCodegen(AptosNetwork.M2_MAIN_NET)
-const M2_TESTNET_CODEGEN = new AptosNetworkCodegen(AptosNetwork.M2_TEST_NET)
+const M2_MAINNET_CODEGEN = new AptosNetworkCodegen(AptosNetwork.MOVEMENT_MAIN_NET)
+const M2_TESTNET_CODEGEN = new AptosNetworkCodegen(AptosNetwork.MOVEMENT_TEST_NET)
 
 class AptosCodegen {
   async generate(srcDir: string, outputDir: string, builtin = false): Promise<number> {
