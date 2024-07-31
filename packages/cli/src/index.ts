@@ -41,6 +41,8 @@ if (mainOptions.command === 'login') {
   await runAdd(argv)
 } else if (mainOptions.command === 'compile') {
   await runCompile(argv)
+} else if (mainOptions.command === 'graph') {
+  await runGraph(argv)
 } else {
   // For all the commands that need read project configs
   // TODO move them to their own modules
@@ -60,7 +62,7 @@ if (mainOptions.command === 'login') {
 
     const yamlPath = path.join(pwd, 'sentio.yaml')
     const yamlExists = fs.existsSync(yamlPath)
-    if (!yamlExists && mainOptions.command !== 'graph') {
+    if (!yamlExists) {
       console.error('sentio.yaml not found, please create one according to: TODO docs')
       process.exit(1)
     }
@@ -100,8 +102,6 @@ if (mainOptions.command === 'login') {
 
   if (mainOptions.command === 'upload') {
     await runUpload(processorConfig, argv)
-  } else if (mainOptions.command === 'graph') {
-    await runGraph(processorConfig, argv)
   } else if (mainOptions.command === 'build') {
     await buildProcessorWithArgs(argv)
   } else if (mainOptions.command === 'gen') {

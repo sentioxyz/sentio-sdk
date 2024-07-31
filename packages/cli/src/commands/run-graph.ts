@@ -3,7 +3,7 @@ import commandLineUsage from 'command-line-usage'
 import path from 'path'
 import { finalizeHost, FinalizeProjectName, YamlProjectConfig } from '../config.js'
 import { getSdkVersion, getPackageRoot } from '../utils.js'
-import { execStep } from '../execution.js'
+import { execStep, execYarn } from '../execution.js'
 import { ReadKey } from '../key.js'
 import fs from 'fs'
 import { readdir, readFile, writeFile } from 'fs/promises'
@@ -11,8 +11,129 @@ import JSZip from 'jszip'
 import chalk from 'chalk'
 import { Auth, initUpload, finishUpload, getGitAttributes } from './run-upload.js'
 import fetch from 'node-fetch'
+import process from 'process'
+import { supportedChainMessage } from './run-create.js'
+import { EthChainInfo } from '@sentio/chain'
+import yaml from 'yaml'
 
-const optionDefinitions = [
+export async function runGraph(argv: string[]) {
+  const [command, ...rest] = argv
+  if (!['create', 'deploy'].includes(command)) {
+    const usage = commandLineUsage([
+      {
+        header: 'Sentio graph',
+        content: 'Create and deploy sentio subgraph processor'
+      },
+      {
+        header: 'Usage',
+        content: [
+          'sentio graph <subcommand> --help\t\tshow detail usage of specific subcommand',
+          'sentio graph create\t\t\t\tCreate a subgraph processor',
+          'sentio graph deploy\t\t\t\tDeploy subgraph processor to sentio'
+        ]
+      }
+    ])
+    console.log(usage)
+    process.exit(0)
+  }
+
+  switch (command) {
+    case 'create':
+      return runGraphCreate(rest)
+    case 'deploy':
+      return runGraphDeploy(rest)
+  }
+}
+
+const createOptionDefinitions = [
+  {
+    name: 'help',
+    alias: 'h',
+    type: Boolean,
+    description: 'Display this usage guide.'
+  },
+  {
+    name: 'name',
+    alias: 'n',
+    defaultOption: true,
+    type: String,
+    description: 'Project name'
+  },
+  // {
+  //   name: 'chain-type',
+  //   alias: 'c',
+  //   description:
+  //     'The type of project you want to create, can be \n,  eth \n,  aptos \n,  fuel\n,  solana\n,  sui\n,  raw (if you want to start from scratch and support multiple types of chains)',
+  //   type: String,
+  //   defaultValue: 'eth'
+  // },
+  {
+    name: 'chain-id',
+    type: String,
+    description: '(Optional) The chain id to use for eth. Supported: ' + supportedChainMessage.join('\n,'),
+    defaultValue: '1'
+  }
+]
+
+async function runGraphCreate(argv: string[]) {
+  const options = commandLineArgs(createOptionDefinitions, { argv, partial: true })
+  if (options.help || !options.name) {
+    const usage = commandLineUsage([
+      {
+        header: 'Create a subgraph template project',
+        content: 'sentio graph create <name>'
+      },
+      {
+        header: 'Options',
+        optionList: createOptionDefinitions
+      }
+    ])
+    console.log(usage)
+    process.exit(0)
+  }
+
+  const projectName = options.name
+  const chainId: string = options['chain-id']
+  const chainInfo = EthChainInfo[chainId]
+  const network = chainInfo.name == 'Ethereum' ? 'mainnet' : chainInfo.name.toLowerCase().split(' ').join('-')
+
+  const packageRoot = getPackageRoot('@sentio/cli')
+  const templateFolder = path.join(packageRoot, 'templates', 'subgraph')
+  const graph = path.resolve(getPackageRoot('@sentio/graph-cli'), 'bin', 'run')
+  await execStep(
+    [
+      'node',
+      graph,
+      'init',
+      projectName,
+      projectName,
+      '--product',
+      'subgraph-studio',
+      '--protocol',
+      'ethereum',
+      '--network',
+      network,
+      '--from-contract',
+      chainInfo.wrappedTokenAddress,
+      '--abi',
+      path.join(templateFolder, 'abis', 'eth', 'weth.json'),
+      '--skip-git',
+      '--skip-install'
+    ],
+    'Graph init'
+  )
+
+  const dstFolder = path.resolve(process.cwd(), projectName)
+  const packageJsonPath = path.resolve(dstFolder, 'package.json')
+  const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'))
+  const cliVersion = '^' + JSON.parse(fs.readFileSync(path.join(packageRoot, 'package.json'), 'utf8')).version
+  packageJson.devDependencies['@sentio/cli'] = cliVersion
+  fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2))
+
+  await execYarn(['install'], 'install', { cwd: dstFolder })
+}
+
+const deployOptionDefinitions = [
   {
     name: 'help',
     alias: 'h',
@@ -42,21 +163,27 @@ const optionDefinitions = [
   }
 ]
 
-export async function runGraph(processorConfig: YamlProjectConfig, argv: string[]) {
-  const options = commandLineArgs(optionDefinitions, { argv, partial: true })
-  if (options.help || argv[0] != 'deploy') {
+async function runGraphDeploy(argv: string[]) {
+  let processorConfig: YamlProjectConfig = { host: '', project: '', build: true, debug: false, contracts: [] }
+  const yamlPath = path.join(process.cwd(), 'sentio.yaml')
+  if (fs.existsSync(yamlPath)) {
+    processorConfig = yaml.parse(fs.readFileSync('sentio.yaml', 'utf8')) as YamlProjectConfig
+    if (!processorConfig.project) {
+      console.error('Config yaml must contain a valid project identifier')
+      process.exit(1)
+    }
+  }
+
+  const options = commandLineArgs(deployOptionDefinitions, { argv, partial: true })
+  if (options.help) {
     const usage = commandLineUsage([
       {
-        header: 'Sentio graph',
-        content: 'sentio graph'
-      },
-      {
-        header: 'Usage',
-        content: ['sentio graph deploy\t\t\t\tDeploy subgraph processor to sentio']
+        header: 'Create a subgraph template project',
+        content: 'sentio graph create <name>'
       },
       {
         header: 'Options',
-        optionList: optionDefinitions
+        optionList: deployOptionDefinitions
       }
     ])
     console.log(usage)

@@ -9,15 +9,15 @@ import { execYarn } from '../execution.js'
 import { getPackageRoot } from '../utils.js'
 import { EthChainInfo, EthChainId } from '@sentio/chain'
 
+const supportedChain: EthChainId[] = Object.values(EthChainInfo).map((chain) => chain.chainId)
+
+export const supportedChainMessage = [
+  ',  <Chain ID> (<Chain Name>)',
+  '  --------------------',
+  ...Object.values(EthChainInfo).map((info) => `  ${info.chainId} (${info.name})`)
+]
+
 export async function runCreate(argv: string[]) {
-  const supportedChain: EthChainId[] = Object.values(EthChainInfo).map((chain) => chain.chainId)
-
-  const supportedChainMessage = [
-    ',  <Chain ID> (<Chain Name>)',
-    '  --------------------',
-    ...Object.values(EthChainInfo).map((info) => `  ${info.chainId} (${info.name})`)
-  ]
-
   const optionDefinitions = [
     {
       name: 'help',
