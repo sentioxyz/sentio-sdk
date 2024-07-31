@@ -95,7 +95,6 @@ async function runGraphCreate(argv: string[]) {
   const projectName = options.name
   const chainId: string = options['chain-id']
   const chainInfo = EthChainInfo[chainId]
-  const network = chainInfo.name == 'Ethereum' ? 'mainnet' : chainInfo.name.toLowerCase().split(' ').join('-')
 
   const packageRoot = getPackageRoot('@sentio/cli')
   const templateFolder = path.join(packageRoot, 'templates', 'subgraph')
@@ -112,7 +111,7 @@ async function runGraphCreate(argv: string[]) {
       '--protocol',
       'ethereum',
       '--network',
-      network,
+      `"${chainId}"`,
       '--from-contract',
       chainInfo.wrappedTokenAddress,
       '--abi',
