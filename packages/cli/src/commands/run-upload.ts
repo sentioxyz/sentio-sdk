@@ -137,7 +137,7 @@ export async function runUpload(processorConfig: YamlProjectConfig, argv: string
   return uploadFile(processorConfig, uploadAuth, continueFrom)
 }
 
-async function createProject(options: YamlProjectConfig, auth: Auth) {
+async function createProject(options: YamlProjectConfig, auth: Auth, type?: string) {
   const url = new URL('/api/v1/projects', options.host)
   const [ownerName, slug] = options.project.includes('/') ? options.project.split('/') : [undefined, options.project]
   return fetch(url.href, {
@@ -145,8 +145,34 @@ async function createProject(options: YamlProjectConfig, auth: Auth) {
     headers: {
       ...auth
     },
-    body: JSON.stringify({ slug, ownerName, visibility: 'PRIVATE' })
+    body: JSON.stringify({ slug, ownerName, visibility: 'PRIVATE', type })
   })
+}
+
+export async function createProjectPrompt(options: YamlProjectConfig, auth: Auth, type?: string): Promise<boolean> {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  })
+  const answer: string = await new Promise((resolve) =>
+    rl.question(`Project not found, do you want to create it and continue the uploading process? (yes/no) `, resolve)
+  )
+  if (['y', 'yes'].includes(answer.toLowerCase())) {
+    rl.close()
+    const res = await createProject(options, auth, type)
+    if (!res.ok) {
+      console.error(chalk.red('Create Project Failed'))
+      console.error(chalk.red(((await res.json()) as { message: string }).message))
+      return false
+    }
+    console.log(chalk.green('Project created'))
+    return true
+  } else if (['n', 'no'].includes(answer.toLowerCase())) {
+    rl.close()
+    return false
+  } else {
+    return createProjectPrompt(options, auth, type)
+  }
 }
 
 export interface Auth {
@@ -200,32 +226,10 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth, continu
       console.error(chalk.red(((await initUploadResRaw.json()) as { message: string }).message))
 
       if (initUploadResRaw.status === 404) {
-        // create project if not exist
-        const rl = readline.createInterface({
-          input: process.stdin,
-          output: process.stdout
-        })
-        const prompt = async () => {
-          const answer: string = await new Promise((resolve) =>
-            rl.question(`Do you want to create it and continue the uploading process? (yes/no) `, resolve)
-          )
-          if (['y', 'yes'].includes(answer.toLowerCase())) {
-            rl.close()
-            const res = await createProject(options, auth)
-            if (!res.ok) {
-              console.error(chalk.red('Create Project Failed'))
-              console.error(chalk.red(((await res.json()) as { message: string }).message))
-              return
-            }
-            console.log(chalk.green('Project created'))
-            await upload()
-          } else if (['n', 'no'].includes(answer.toLowerCase())) {
-            rl.close()
-          } else {
-            await prompt()
-          }
+        const created = await createProjectPrompt(options, auth)
+        if (created) {
+          await upload()
         }
-        await prompt()
       }
       return
     }

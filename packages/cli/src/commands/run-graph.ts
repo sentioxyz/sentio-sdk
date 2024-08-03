@@ -9,7 +9,7 @@ import fs from 'fs'
 import { readdir, readFile, writeFile } from 'fs/promises'
 import JSZip from 'jszip'
 import chalk from 'chalk'
-import { Auth, initUpload, finishUpload, getGitAttributes } from './run-upload.js'
+import { Auth, initUpload, finishUpload, getGitAttributes, createProjectPrompt } from './run-upload.js'
 import fetch from 'node-fetch'
 import process from 'process'
 import { supportedChainMessage } from './run-create.js'
@@ -162,6 +162,21 @@ const deployOptionDefinitions = [
   }
 ]
 
+async function createProjectIfMissing(options: YamlProjectConfig, apiKey: string) {
+  const [ownerName, slug] = options.project.split('/')
+  const getProjectRes = await fetch(new URL(`/api/v1/project/${ownerName}/${slug}`, options.host), {
+    headers: { 'api-key': apiKey }
+  })
+  const projectData = (await getProjectRes.json()) as any
+  if (projectData.project) {
+    return
+  }
+  const created = await createProjectPrompt(options, { 'api-key': apiKey }, 'SUBGRAPH')
+  if (!created) {
+    process.exit(1)
+  }
+}
+
 async function runGraphDeploy(argv: string[]) {
   let processorConfig: YamlProjectConfig = { host: '', project: '', build: true, debug: false, contracts: [] }
   const yamlPath = path.join(process.cwd(), 'sentio.yaml')
@@ -200,6 +215,8 @@ async function runGraphDeploy(argv: string[]) {
   if (options['api-key']) {
     apiKey = options['api-key']
   }
+
+  await createProjectIfMissing(processorConfig, apiKey)
 
   const graph = path.resolve(getPackageRoot('@sentio/graph-cli'), 'bin', 'run')
   await execStep(['node', graph, 'codegen'], 'Graph codegen')
