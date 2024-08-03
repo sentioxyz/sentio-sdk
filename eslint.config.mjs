@@ -1,7 +1,10 @@
+// @ts-check
+
 import { fixupConfigRules, fixupPluginRules } from '@eslint/compat'
-import typescriptEslint from '@typescript-eslint/eslint-plugin'
+// import typescriptEslint from '@typescript-eslint/eslint-plugin'
 import unusedImports from 'eslint-plugin-unused-imports'
-import tsParser from '@typescript-eslint/parser'
+// import tsParser from '@typescript-eslint/parser'
+import tseslint from 'typescript-eslint';
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import js from '@eslint/js'
@@ -16,7 +19,7 @@ const compat = new FlatCompat({
   allConfig: js.configs.all
 })
 
-export default [
+export default tseslint.config(
   {
     ignores: [
       '**/,.*',
@@ -34,9 +37,11 @@ export default [
     ]
   },
 
+  ...tseslint.configs.recommended,
+
   ...fixupConfigRules(
     compat.extends(
-      'plugin:@typescript-eslint/recommended',
+      // 'plugin:@typescript-eslint/recommended',
       'plugin:import-x/recommended',
       'plugin:import-x/typescript',
       'prettier'
@@ -45,15 +50,18 @@ export default [
 
   {
     plugins: {
-      '@typescript-eslint': fixupPluginRules(typescriptEslint),
+      // '@typescript-eslint': fixupPluginRules(typescriptEslint),
       'unused-imports': unusedImports
     },
     languageOptions: {
-      parser: tsParser,
+      // parser: tsParser,
       ecmaVersion: 'latest',
       sourceType: 'module',
       parserOptions: {
-        project: './tsconfig.json'
+        projectService: {
+          allowDefaultProject: ['*.mjs','*.js'],
+        }
+        // project: './tsconfig.json'
       }
     },
     rules: {
@@ -86,4 +94,4 @@ export default [
       'deprecation/deprecation': 'error'
     }
   }
-]
+)

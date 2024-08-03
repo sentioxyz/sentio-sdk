@@ -19,8 +19,6 @@
     "@ls-lint/ls-lint": "^2.2.3",
     "@types/chai": "^4.3.16",
     "@types/node": "^20.14.8",
-    "@typescript-eslint/eslint-plugin": "^7.13.1",
-    "@typescript-eslint/parser": "^7.13.1",
     "chai": "^4.4.1",
     "conventional-changelog-conventionalcommits": "^8.0.0",
     "eslint": "^9.6.0",
@@ -38,7 +36,8 @@
     "semantic-release": "^24.0.0",
     "semantic-release-monorepo": "^8.0.2",
     "tsx": "^4.15.2",
-    "typescript": "^5.5.2"
+    "typescript": "^5.5.2",
+    "typescript-eslint": "^8.0.0"
   },
   "engines": {
     "node": ">=18"
