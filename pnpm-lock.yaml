@@ -199,8 +199,8 @@ importers:
         specifier: ^2.1.0
         version: 2.1.0
       '@sentio/graph-cli':
-        specifier: ^0.75.0
-        version: 0.75.0(@types/node@20.14.9)(bufferutil@4.0.8)(encoding@0.1.13)(node-fetch@3.3.2)(typescript@5.5.2)(utf-8-validate@5.0.10)
+        specifier: ^0.80.0-patch.1
+        version: 0.80.0-patch.1(@types/node@20.14.9)(bufferutil@4.0.8)(encoding@0.1.13)(node-fetch@3.3.2)(typescript@5.5.2)(utf-8-validate@5.0.10)
       '@sentio/sdk':
         specifier: workspace:^
         version: link:../sdk
@@ -1946,8 +1946,8 @@ packages:
     resolution: {integrity: sha512-bGDXv4S8/wsV4ymvanE/mBJ6quJmJUxwI6uy+4nh0rJfb6wjzph6bZ44+jjAXHQpG9nkGj4uc3vRYiV2Tpoj+w==}
     engines: {node: '>=14.0.0'}
 
-  '@sentio/graph-cli@0.75.0':
-    resolution: {integrity: sha512-I09WI56FV/J9+CJQJnheqMSOgxmJqogORlY1jKj8SFsEnptU/Y9GmkRw/+yHpeWNe+LiPnb/6hAWekDpQumlnQ==}
+  '@sentio/graph-cli@0.80.0-patch.1':
+    resolution: {integrity: sha512-ZQR7tCbb3c3YvP72GM6jPF+OAXE+kZzzWLHQwHmp/fJN8+xhHfphoNE7ygbX4cHFX3wo5nDoYw/RQiL6LHQ2Yg==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -3600,6 +3600,7 @@ packages:
 
   ethereum-bloom-filters@1.1.0:
     resolution: {integrity: sha512-J1gDRkLpuGNvWYzWslBQR9cDV4nd4kfvVTE/Wy4Kkm4yb3EYRSlyi0eB/inTsSTTVyA0+HyzHgbr95Fn/Z1fSw==}
+    deprecated: do not use this package use package versions above as this can miss some topics
 
   ethereum-cryptography@0.1.3:
     resolution: {integrity: sha512-w8/4x1SGGzc+tO97TASLja6SLd3fRIK2tLVcV2Gx4IB21hE19atll5Cq9o3d0ZmAYC/8aw0ipieTSiekAea4SQ==}
@@ -8285,7 +8286,7 @@ snapshots:
     dependencies:
       '@oclif/core': 2.16.0(@types/node@20.14.9)(typescript@5.5.2)
       chalk: 4.1.2
-      debug: 4.3.4
+      debug: 4.3.5(supports-color@8.1.1)
     transitivePeerDependencies:
       - '@swc/core'
       - '@swc/wasm'
@@ -8781,7 +8782,7 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  '@sentio/graph-cli@0.75.0(@types/node@20.14.9)(bufferutil@4.0.8)(encoding@0.1.13)(node-fetch@3.3.2)(typescript@5.5.2)(utf-8-validate@5.0.10)':
+  '@sentio/graph-cli@0.80.0-patch.1(@types/node@20.14.9)(bufferutil@4.0.8)(encoding@0.1.13)(node-fetch@3.3.2)(typescript@5.5.2)(utf-8-validate@5.0.10)':
     dependencies:
       '@float-capital/float-subgraph-uncrashable': 0.0.0-internal-testing.5
       '@oclif/core': 2.8.6(@types/node@20.14.9)(typescript@5.5.2)
