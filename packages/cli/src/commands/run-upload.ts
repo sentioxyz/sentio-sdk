@@ -10,7 +10,7 @@ import { ReadKey } from '../key.js'
 import fs from 'fs'
 import { createHash } from 'crypto'
 import { execFileSync } from 'child_process'
-import { getSdkVersion } from '../utils.js'
+import { getCliVersion, getSdkVersion } from '../utils.js'
 import readline from 'readline'
 import JSZip from 'jszip'
 
@@ -258,7 +258,6 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth, continu
       options.host,
       auth,
       options.project,
-      getSdkVersion(),
       sha256,
       commitSha,
       gitUrl,
@@ -326,7 +325,6 @@ export async function finishUpload(
   host: string,
   auth: Auth,
   projectSlug: string,
-  sdkVersion: string,
   sha256: string,
   commitSha: string,
   gitUrl: string,
@@ -342,7 +340,8 @@ export async function finishUpload(
     },
     body: JSON.stringify({
       project_slug: projectSlug,
-      sdk_version: sdkVersion,
+      cli_version: getCliVersion(),
+      sdk_version: getSdkVersion(),
       sha256: sha256,
       commit_sha: commitSha,
       git_url: gitUrl,

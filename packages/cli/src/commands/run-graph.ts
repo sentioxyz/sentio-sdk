@@ -126,6 +126,7 @@ async function runGraphCreate(argv: string[]) {
   const packageJsonPath = path.resolve(dstFolder, 'package.json')
   const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'))
   const cliVersion = '^' + JSON.parse(fs.readFileSync(path.join(packageRoot, 'package.json'), 'utf8')).version
+  delete packageJson.dependencies['@graphprotocol/graph-cli']
   packageJson.devDependencies['@sentio/cli'] = cliVersion
   fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2))
 
@@ -323,7 +324,6 @@ async function uploadFile(zip: JSZip, options: YamlProjectConfig, auth: Auth, co
     options.host,
     auth,
     options.project,
-    sdkVersion,
     sha256,
     commitSha,
     gitUrl,
