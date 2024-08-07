@@ -1,4 +1,4 @@
-import { ChainId } from '@sentio/chain'
+import { ChainId, EthChainId } from '@sentio/chain'
 
 const HostMap: { [host: string]: string } = {
   local: 'http://localhost:10000',
@@ -13,11 +13,17 @@ export interface YamlContractConfig {
   name: string
 }
 
+export interface YamlNetworkOverride {
+  chain: EthChainId
+  host: string
+}
+
 export interface YamlProjectConfig {
   project: string
   host: string
   build: boolean
   contracts?: YamlContractConfig[]
+  networkOverrides?: YamlNetworkOverride[]
   debug: boolean
 }
 
