@@ -4,6 +4,7 @@ import { createRequire } from 'module'
 import url from 'url'
 import { CommandLineOptions } from 'command-line-args'
 import chalk from 'chalk'
+import latestVersion from 'latest-version'
 
 const require = createRequire(import.meta.url)
 const PACKAGE_JSON = 'package.json'
@@ -42,4 +43,21 @@ export function errorOnUnknownOption(options: CommandLineOptions) {
     console.error(chalk.red('Unknown option:', options._unknown.join(' ')))
     process.exit(1)
   }
+}
+
+export async function printVersions() {
+  const cliVersion = JSON.parse(
+    fs.readFileSync(path.join(getPackageRoot('@sentio/cli'), 'package.json'), 'utf8')
+  ).version
+  const sdkVersion = JSON.parse(
+    fs.readFileSync(path.join(getPackageRoot('@sentio/sdk'), 'package.json'), 'utf8')
+  ).version
+  try {
+    const [latestCliVersion, latestSdkVersion] = await Promise.all([
+      latestVersion('@sentio/cli'),
+      latestVersion('@sentio/sdk')
+    ])
+    console.log(`Using @sentio/cli ${cliVersion}, latest version is ${latestCliVersion}`)
+    console.log(`Using @sentio/sdk ${sdkVersion}, latest version is ${latestSdkVersion}`)
+  } catch (e) {}
 }

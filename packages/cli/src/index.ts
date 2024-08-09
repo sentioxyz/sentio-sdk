@@ -17,6 +17,7 @@ import { runTest } from './commands/run-test.js'
 import { runAdd } from './commands/run-add.js'
 import { runCompile } from './commands/run-compile.js'
 import { runGraph } from './commands/run-graph.js'
+import { printVersions } from './utils.js'
 
 const mainDefinitions = [{ name: 'command', defaultOption: true }]
 const mainOptions = commandLineArgs(mainDefinitions, {
@@ -28,6 +29,8 @@ if (!mainOptions.command) {
   usage()
   process.exit(0)
 }
+
+await printVersions()
 
 if (mainOptions.command === 'login') {
   runLogin(argv)
