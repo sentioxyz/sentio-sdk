@@ -320,17 +320,7 @@ async function uploadFile(zip: JSZip, options: YamlProjectConfig, auth: Auth, co
   const sha256 = ''
   const { commitSha, gitUrl } = getGitAttributes()
   // finish uploading
-  const finishUploadResRaw = await finishUpload(
-    options.host,
-    auth,
-    options.project,
-    sha256,
-    commitSha,
-    gitUrl,
-    options.debug,
-    continueFrom,
-    sequence
-  )
+  const finishUploadResRaw = await finishUpload(options, auth, sha256, commitSha, gitUrl, continueFrom, sequence)
   if (!finishUploadResRaw.ok) {
     console.error(chalk.red('Failed to finish uploading'))
     console.error(chalk.red(await finishUploadResRaw.text()))

@@ -254,16 +254,7 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth, continu
     await uploadZip(options.host, auth, options.project, getSdkVersion(), continueFrom)
 
     // finish uploading
-    const finishUploadResRaw = await finishUpload(
-      options.host,
-      auth,
-      options.project,
-      sha256,
-      commitSha,
-      gitUrl,
-      options.debug,
-      continueFrom
-    )
+    const finishUploadResRaw = await finishUpload(options, auth, sha256, commitSha, gitUrl, continueFrom)
     if (!finishUploadResRaw.ok) {
       console.error(chalk.red('Failed to finish uploading'))
       console.error(chalk.red(await finishUploadResRaw.text()))
@@ -322,32 +313,31 @@ export async function initUpload(host: string, auth: Auth, projectSlug: string, 
 }
 
 export async function finishUpload(
-  host: string,
+  options: YamlProjectConfig,
   auth: Auth,
-  projectSlug: string,
   sha256: string,
   commitSha: string,
   gitUrl: string,
-  debug: boolean,
   continueFrom: number | undefined,
   sequence = 1
 ) {
-  const finishUploadUrl = new URL(`/api/v1/processors/finish_upload`, host)
+  const finishUploadUrl = new URL(`/api/v1/processors/finish_upload`, options.host)
   return fetch(finishUploadUrl.href, {
     method: 'POST',
     headers: {
       ...auth
     },
     body: JSON.stringify({
-      project_slug: projectSlug,
+      project_slug: options.project,
       cli_version: getCliVersion(),
       sdk_version: getSdkVersion(),
       sha256: sha256,
       commit_sha: commitSha,
       git_url: gitUrl,
-      debug: debug,
+      debug: options.debug,
       sequence,
-      continueFrom
+      continueFrom,
+      networkOverrides: options.networkOverrides
     })
   })
 }
