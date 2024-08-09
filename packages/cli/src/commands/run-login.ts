@@ -8,6 +8,7 @@ import chalk from 'chalk'
 import { WriteKey } from '../key.js'
 import fetch from 'node-fetch'
 import open from 'open'
+import { errorOnUnknownOption } from '../utils.js'
 
 const port = 20000
 
@@ -45,7 +46,12 @@ export function runLogin(argv: string[]) {
       }
     ])
     console.log(usage)
-  } else if (options['api-key']) {
+    process.exit(0)
+  }
+
+  errorOnUnknownOption(options)
+
+  if (options['api-key']) {
     console.log(chalk.blue('login to ' + host))
     const apiKey = options['api-key']
     checkKey(host, apiKey).then(async (res) => {

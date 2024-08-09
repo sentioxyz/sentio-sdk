@@ -8,6 +8,7 @@ import { codegen } from './build.js'
 import yaml from 'yaml'
 import { getABIFilePath, getABI, writeABIFile } from '../abi.js'
 import { AptosChainId, ChainId, getChainName, SuiChainId, EthChainInfo, ExplorerApiType } from '@sentio/chain'
+import { errorOnUnknownOption } from '../utils.js'
 
 const supportedChain: string[] = [
   AptosChainId.APTOS_MAINNET,
@@ -72,47 +73,50 @@ export async function runAdd(argv: string[]) {
 
   if (options.help || !options.address) {
     console.log(usage)
-  } else {
-    const chain = options['chain'].toLowerCase() as ChainId
-    const address: string = options.address
-    if (!address.startsWith('0x')) {
-      console.error(chalk.red('Address must start with 0x'))
-      console.log(usage)
-      process.exit(1)
-    }
-
-    const abiRes = await getABI(chain, address, options.name)
-    const filename = abiRes.name || address
-
-    writeABIFile(abiRes.abi, getABIFilePath(chain, filename, ''))
-
-    // Write contract info to sentio.yaml
-    const yamlDocument: yaml.Document = yaml.parseDocument(fs.readFileSync('sentio.yaml', 'utf8'))
-    let contracts = yamlDocument.get('contracts') as yaml.YAMLSeq
-    if (!contracts) {
-      contracts = new yaml.YAMLSeq()
-      yamlDocument.set('contracts', contracts)
-    }
-
-    let hasContract = false
-    for (const item of contracts.items as yaml.YAMLMap[]) {
-      if (item.get('chain') === chain && item.get('address') === address) {
-        hasContract = true
-      }
-    }
-
-    if (!hasContract) {
-      const newContract = new yaml.YAMLMap()
-      newContract.set('chain', chain)
-      newContract.set('address', address)
-      if (address !== filename) {
-        newContract.set('name', filename)
-      }
-      contracts.add(newContract)
-      fs.writeFileSync('sentio.yaml', yamlDocument.toString(), 'utf8')
-    }
-
-    // Run gen
-    await codegen(false)
+    process.exit(0)
   }
+
+  errorOnUnknownOption(options)
+
+  const chain = options['chain'].toLowerCase() as ChainId
+  const address: string = options.address
+  if (!address.startsWith('0x')) {
+    console.error(chalk.red('Address must start with 0x'))
+    console.log(usage)
+    process.exit(1)
+  }
+
+  const abiRes = await getABI(chain, address, options.name)
+  const filename = abiRes.name || address
+
+  writeABIFile(abiRes.abi, getABIFilePath(chain, filename, ''))
+
+  // Write contract info to sentio.yaml
+  const yamlDocument: yaml.Document = yaml.parseDocument(fs.readFileSync('sentio.yaml', 'utf8'))
+  let contracts = yamlDocument.get('contracts') as yaml.YAMLSeq
+  if (!contracts) {
+    contracts = new yaml.YAMLSeq()
+    yamlDocument.set('contracts', contracts)
+  }
+
+  let hasContract = false
+  for (const item of contracts.items as yaml.YAMLMap[]) {
+    if (item.get('chain') === chain && item.get('address') === address) {
+      hasContract = true
+    }
+  }
+
+  if (!hasContract) {
+    const newContract = new yaml.YAMLMap()
+    newContract.set('chain', chain)
+    newContract.set('address', address)
+    if (address !== filename) {
+      newContract.set('name', filename)
+    }
+    contracts.add(newContract)
+    fs.writeFileSync('sentio.yaml', yamlDocument.toString(), 'utf8')
+  }
+
+  // Run gen
+  await codegen(false)
 }

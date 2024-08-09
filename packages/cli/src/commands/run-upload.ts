@@ -10,7 +10,7 @@ import { ReadKey } from '../key.js'
 import fs from 'fs'
 import { createHash } from 'crypto'
 import { execFileSync } from 'child_process'
-import { getCliVersion, getSdkVersion } from '../utils.js'
+import { errorOnUnknownOption, getCliVersion, getSdkVersion } from '../utils.js'
 import readline from 'readline'
 import JSZip from 'jszip'
 
@@ -99,9 +99,7 @@ export async function runUpload(processorConfig: YamlProjectConfig, argv: string
     process.exit(0)
   }
 
-  if (options._unknown?.length) {
-    console.log(chalk.yellow('Unknown option:', options._unknown.join(' ')))
-  }
+  errorOnUnknownOption(options)
 
   if (options.nobuild) {
     processorConfig.build = false

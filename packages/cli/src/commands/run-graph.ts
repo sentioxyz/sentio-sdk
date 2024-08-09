@@ -2,7 +2,7 @@ import commandLineArgs from 'command-line-args'
 import commandLineUsage from 'command-line-usage'
 import path from 'path'
 import { finalizeHost, FinalizeProjectName, YamlProjectConfig } from '../config.js'
-import { getSdkVersion, getPackageRoot } from '../utils.js'
+import { getSdkVersion, getPackageRoot, errorOnUnknownOption } from '../utils.js'
 import { execStep, execYarn } from '../execution.js'
 import { ReadKey } from '../key.js'
 import fs from 'fs'
@@ -91,6 +91,8 @@ async function runGraphCreate(argv: string[]) {
     console.log(usage)
     process.exit(0)
   }
+
+  errorOnUnknownOption(options)
 
   const projectName = options.name
   const chainId: string = options['chain-id']
@@ -204,6 +206,8 @@ async function runGraphDeploy(argv: string[]) {
     console.log(usage)
     process.exit(0)
   }
+
+  errorOnUnknownOption(options)
 
   finalizeHost(processorConfig, options.host)
   FinalizeProjectName(processorConfig, options.owner, options.name)

@@ -9,6 +9,7 @@ import { ReadKey } from '../key.js'
 import chalk from 'chalk'
 import { Auth } from './run-upload.js'
 import { URL } from 'url'
+import { errorOnUnknownOption } from '../utils.js'
 
 const SRC_ROOT = 'src'
 
@@ -71,6 +72,8 @@ export async function runCompile(argv: string[]) {
     console.log(usage)
     process.exit(0)
   }
+
+  errorOnUnknownOption(options)
 
   let projectOwner, projectSlug
   const auth: Auth = {}

@@ -2,6 +2,8 @@ import fs from 'fs-extra'
 import path from 'path'
 import { createRequire } from 'module'
 import url from 'url'
+import { CommandLineOptions } from 'command-line-args'
+import chalk from 'chalk'
 
 const require = createRequire(import.meta.url)
 const PACKAGE_JSON = 'package.json'
@@ -32,5 +34,12 @@ export function getSdkVersion() {
     return packageJson.version
   } catch (e) {
     return undefined
+  }
+}
+
+export function errorOnUnknownOption(options: CommandLineOptions) {
+  if (options._unknown?.length) {
+    console.error(chalk.red('Unknown option:', options._unknown.join(' ')))
+    process.exit(1)
   }
 }
