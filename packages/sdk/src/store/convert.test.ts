@@ -15,8 +15,10 @@ describe('RichStruct converter tests', () => {
   it('bigInteger converter', () => {
     const s = 123456789012345678901234567890123456789012345678901234567890n
     const struct = BigIntConverter.from(s)
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     expect(struct.bigintValue).not.null
     const struct2 = BigIntConverter.from(-s)
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     expect(struct2.bigintValue?.negative).true
     const s1 = BigIntConverter.to(struct)
     expect(s1).eq(s)

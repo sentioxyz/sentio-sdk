@@ -101,7 +101,6 @@ export function objectId_<T>(entityName: string): ValueConverter<T | ID> {
   }
 }
 
-/* eslint-disable */
 export const StringConverter: ValueConverter<String | undefined> = {
   from: (value?: String) => {
     if (value == null) {
