@@ -364,9 +364,9 @@ async function uploadZip(
     fs.readdirSync('abis').forEach((p) => {
       const item = path.join('abis', p)
       if (fs.lstatSync(item).isDirectory()) {
-        fs.readdirSync(item).forEach((p) => {
-          if (p.endsWith('.json')) {
-            zip.file(`${item}/${p}`, fs.readFileSync(path.join(item, p)))
+        fs.readdirSync(item).forEach((pp) => {
+          if (pp.endsWith('.json')) {
+            zip.file(`abis/${p}/${pp}`, fs.readFileSync(path.join(item, pp)))
           }
         })
       } else if (p.endsWith('.json')) {
