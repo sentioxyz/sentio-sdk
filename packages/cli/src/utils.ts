@@ -49,15 +49,15 @@ export async function printVersions() {
   const cliVersion = JSON.parse(
     fs.readFileSync(path.join(getPackageRoot('@sentio/cli'), 'package.json'), 'utf8')
   ).version
-  const sdkVersion = JSON.parse(
-    fs.readFileSync(path.join(getPackageRoot('@sentio/sdk'), 'package.json'), 'utf8')
-  ).version
   try {
     const [latestCliVersion, latestSdkVersion] = await Promise.all([
       latestVersion('@sentio/cli'),
       latestVersion('@sentio/sdk')
     ])
     console.log(`Using @sentio/cli ${cliVersion}, latest version is ${latestCliVersion}`)
+    const sdkVersion = JSON.parse(
+      fs.readFileSync(path.join(getPackageRoot('@sentio/sdk'), 'package.json'), 'utf8')
+    ).version
     console.log(`Using @sentio/sdk ${sdkVersion}, latest version is ${latestSdkVersion}`)
   } catch (e) {}
 }
