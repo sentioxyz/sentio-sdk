@@ -108,10 +108,12 @@ export async function decodeFuelTransactionWithAbi(
     }
   })
 
-  const txResponse = new TransactionResponse(gqlTransaction.id, provider, {
+  const txResponse = new TransactionResponse(gqlTransaction.status.transactionId, provider, {
     main: Object.values(abiMap)[0],
     otherContractsAbis: {}
   })
+
+  // @ts-ignore - hack
   txResponse.gqlTransaction = {
     ...gqlTransaction,
     status: gqlTransactionStatus

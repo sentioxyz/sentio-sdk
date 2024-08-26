@@ -1,5 +1,4 @@
 import { FuelChainId } from '@sentio/chain'
-import { FUEL_NETWORK_URL } from 'fuels'
 
 export type FuelNetwork = FuelChainId
 export const FuelNetwork = <const>{
@@ -12,5 +11,5 @@ export function getRpcEndpoint(network: FuelNetwork): string {
     case FuelNetwork.TEST_NET:
       return 'https://testnet.fuel.network/v1/graphql'
   }
-  return FUEL_NETWORK_URL
+  return 'https://testnet.fuel.network/v1/graphql'
 }

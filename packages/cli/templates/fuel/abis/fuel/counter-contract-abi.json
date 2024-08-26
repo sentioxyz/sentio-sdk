@@ -1,137 +1,136 @@
 {
-  "encoding": "1",
-  "types": [
+  "programType": "contract",
+  "specVersion": "1",
+  "encodingVersion": "1",
+  "concreteTypes": [
     {
-      "typeId": 0,
-      "type": "()",
-      "components": [],
-      "typeParameters": null
-    },
-    {
-      "typeId": 1,
       "type": "b256",
-      "components": null,
-      "typeParameters": null
+      "concreteTypeId": "7c5ee1cecf5f8eacd1284feb5f0bf2bdea533a51e2f0c9aabe9236d335989f3b"
     },
     {
-      "typeId": 2,
-      "type": "bool",
-      "components": null,
-      "typeParameters": null
-    },
-    {
-      "typeId": 3,
       "type": "enum ColorError",
+      "concreteTypeId": "3c5893a10e00114df7da4af22e21bc4e6abb442f0a9a0236892144ef8b5ee356",
+      "metadataTypeId": 2
+    },
+    {
+      "type": "enum std::option::Option<str[1]>",
+      "concreteTypeId": "41a3629cd05378f7fb5c2027250fdfb884768575efbdad2994495e18752a1b96",
+      "metadataTypeId": 3,
+      "typeArguments": ["6354581bfa62ac188c9f243cc30e1bf38a150773f871be8765351ef8c5db6c1e"]
+    },
+    {
+      "type": "enum std::result::Result<struct Foo,enum ColorError>",
+      "concreteTypeId": "19bd183cd8661e37253fee96c5294d94f25d166c405d72794bf29e48d881f69d",
+      "metadataTypeId": 4,
+      "typeArguments": [
+        "7cfc11f7909eb46c488c03c985d20c9937ae8b9ed2083fa0007b3da8f1a79d87",
+        "3c5893a10e00114df7da4af22e21bc4e6abb442f0a9a0236892144ef8b5ee356"
+      ]
+    },
+    {
+      "type": "str[1]",
+      "concreteTypeId": "6354581bfa62ac188c9f243cc30e1bf38a150773f871be8765351ef8c5db6c1e"
+    },
+    {
+      "type": "str[25]",
+      "concreteTypeId": "cb0ee391dbed30daa3cdad5577605a178185248dc00dcf53960b10eea0cab237"
+    },
+    {
+      "type": "struct Foo",
+      "concreteTypeId": "7cfc11f7909eb46c488c03c985d20c9937ae8b9ed2083fa0007b3da8f1a79d87",
+      "metadataTypeId": 7
+    },
+    {
+      "type": "u32",
+      "concreteTypeId": "d7649d428b9ff33d188ecbf38a7e4d8fd167fa01b2e10fe9a8f9308e52f1d7cc"
+    },
+    {
+      "type": "u64",
+      "concreteTypeId": "1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0"
+    }
+  ],
+  "metadataTypes": [
+    {
+      "type": "()",
+      "metadataTypeId": 0
+    },
+    {
+      "type": "bool",
+      "metadataTypeId": 1
+    },
+    {
+      "type": "enum ColorError",
+      "metadataTypeId": 2,
       "components": [
         {
           "name": "Blue",
-          "type": 0,
-          "typeArguments": null
+          "typeId": 0
         },
         {
           "name": "Green",
-          "type": 0,
-          "typeArguments": null
+          "typeId": 0
         },
         {
           "name": "Red",
-          "type": 0,
-          "typeArguments": null
+          "typeId": 0
         },
         {
           "name": "Other",
-          "type": 0,
-          "typeArguments": null
+          "typeId": 0
         }
-      ],
-      "typeParameters": null
+      ]
     },
     {
-      "typeId": 4,
-      "type": "enum Option",
+      "type": "enum std::option::Option",
+      "metadataTypeId": 3,
       "components": [
         {
           "name": "None",
-          "type": 0,
-          "typeArguments": null
+          "typeId": 0
         },
         {
           "name": "Some",
-          "type": 7,
-          "typeArguments": null
+          "typeId": 6
         }
       ],
-      "typeParameters": [7]
+      "typeParameters": [6]
     },
     {
-      "typeId": 5,
-      "type": "enum Result",
+      "type": "enum std::result::Result",
+      "metadataTypeId": 4,
       "components": [
         {
           "name": "Ok",
-          "type": 7,
-          "typeArguments": null
+          "typeId": 6
         },
         {
           "name": "Err",
-          "type": 6,
-          "typeArguments": null
+          "typeId": 5
         }
       ],
-      "typeParameters": [7, 6]
+      "typeParameters": [6, 5]
     },
     {
-      "typeId": 6,
       "type": "generic E",
-      "components": null,
-      "typeParameters": null
+      "metadataTypeId": 5
     },
     {
-      "typeId": 7,
       "type": "generic T",
-      "components": null,
-      "typeParameters": null
+      "metadataTypeId": 6
     },
     {
-      "typeId": 8,
-      "type": "str[1]",
-      "components": null,
-      "typeParameters": null
-    },
-    {
-      "typeId": 9,
-      "type": "str[25]",
-      "components": null,
-      "typeParameters": null
-    },
-    {
-      "typeId": 10,
       "type": "struct Foo",
+      "metadataTypeId": 7,
       "components": [
         {
           "name": "bar",
-          "type": 12,
-          "typeArguments": null
+          "typeId": "1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0"
         },
         {
           "name": "baz",
-          "type": 2,
-          "typeArguments": null
+          "typeId": 1
         }
-      ],
-      "typeParameters": null
-    },
-    {
-      "typeId": 11,
-      "type": "u32",
-      "components": null,
-      "typeParameters": null
-    },
-    {
-      "typeId": 12,
-      "type": "u64",
-      "components": null,
-      "typeParameters": null
+      ]
     }
   ],
   "functions": [
@@ -139,38 +138,15 @@
       "inputs": [
         {
           "name": "foo",
-          "type": 10,
-          "typeArguments": null
+          "concreteTypeId": "7cfc11f7909eb46c488c03c985d20c9937ae8b9ed2083fa0007b3da8f1a79d87"
         },
         {
           "name": "option",
-          "type": 4,
-          "typeArguments": [
-            {
-              "name": "",
-              "type": 8,
-              "typeArguments": null
-            }
-          ]
+          "concreteTypeId": "41a3629cd05378f7fb5c2027250fdfb884768575efbdad2994495e18752a1b96"
         }
       ],
       "name": "complex",
-      "output": {
-        "name": "",
-        "type": 5,
-        "typeArguments": [
-          {
-            "name": "",
-            "type": 10,
-            "typeArguments": null
-          },
-          {
-            "name": "",
-            "type": 3,
-            "typeArguments": null
-          }
-        ]
-      },
+      "output": "19bd183cd8661e37253fee96c5294d94f25d166c405d72794bf29e48d881f69d",
       "attributes": [
         {
           "name": "storage",
@@ -181,11 +157,7 @@
     {
       "inputs": [],
       "name": "count",
-      "output": {
-        "name": "",
-        "type": 12,
-        "typeArguments": null
-      },
+      "output": "1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0",
       "attributes": [
         {
           "name": "storage",
@@ -197,26 +169,19 @@
       "inputs": [
         {
           "name": "add",
-          "type": 11,
-          "typeArguments": null
+          "concreteTypeId": "d7649d428b9ff33d188ecbf38a7e4d8fd167fa01b2e10fe9a8f9308e52f1d7cc"
         },
         {
           "name": "two",
-          "type": 12,
-          "typeArguments": null
+          "concreteTypeId": "1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0"
         },
         {
           "name": "three",
-          "type": 1,
-          "typeArguments": null
+          "concreteTypeId": "7c5ee1cecf5f8eacd1284feb5f0bf2bdea533a51e2f0c9aabe9236d335989f3b"
         }
       ],
       "name": "increment",
-      "output": {
-        "name": "",
-        "type": 12,
-        "typeArguments": null
-      },
+      "output": "1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0",
       "attributes": [
         {
           "name": "storage",
@@ -228,43 +193,23 @@
   "loggedTypes": [
     {
       "logId": "1515152261580153489",
-      "loggedType": {
-        "name": "",
-        "type": 12,
-        "typeArguments": null
-      }
+      "concreteTypeId": "1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0"
     },
     {
       "logId": "9006093109815063660",
-      "loggedType": {
-        "name": "",
-        "type": 10,
-        "typeArguments": []
-      }
+      "concreteTypeId": "7cfc11f7909eb46c488c03c985d20c9937ae8b9ed2083fa0007b3da8f1a79d87"
     },
     {
       "logId": "14631882454972838106",
-      "loggedType": {
-        "name": "",
-        "type": 9,
-        "typeArguments": null
-      }
+      "concreteTypeId": "cb0ee391dbed30daa3cdad5577605a178185248dc00dcf53960b10eea0cab237"
     },
     {
       "logId": "15520703124961489725",
-      "loggedType": {
-        "name": "",
-        "type": 11,
-        "typeArguments": null
-      }
+      "concreteTypeId": "d7649d428b9ff33d188ecbf38a7e4d8fd167fa01b2e10fe9a8f9308e52f1d7cc"
     },
     {
       "logId": "8961848586872524460",
-      "loggedType": {
-        "name": "",
-        "type": 1,
-        "typeArguments": null
-      }
+      "concreteTypeId": "7c5ee1cecf5f8eacd1284feb5f0bf2bdea533a51e2f0c9aabe9236d335989f3b"
     }
   ],
   "messagesTypes": [],

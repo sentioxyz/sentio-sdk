@@ -4,6 +4,7 @@ import { AbiTypeGen, IFile, IFunction, ProgramTypeEnum } from '@fuel-ts/abi-type
 import mkdirp from 'mkdirp'
 import path from 'path'
 import { upperFirst } from './utils.js'
+import { versions as builtinVersions } from '@fuel-ts/versions'
 
 export async function codegen(abisDir: string, outDir: string) {
   if (!fs.existsSync(abisDir)) {
@@ -15,24 +16,7 @@ export async function codegen(abisDir: string, outDir: string) {
 }
 
 function patchImport(contents: string) {
-  return (
-    contents
-      /* .replace(
-      `import { Interface, Contract, ContractFactory } from "fuels";`,
-      `import { Contract, } from "@fuel-ts/program";
-import { ContractFactory } from "@fuel-ts/contract";
-import { Interface } from "@fuel-ts/abi-coder";`
-    )
-    .replace(
-      `import type { Provider, Account, AbstractAddress, BytesLike, DeployContractOptions, StorageSlot } from "fuels";
-`,
-      `import type { Provider, Account } from "@fuel-ts/account";
-import type { AbstractAddress, BytesLike } from "@fuel-ts/interfaces";
-import type { DeployContractOptions } from "@fuel-ts/contract";
-import type { StorageSlot } from "@fuel-ts/transactions";`
-    )*/
-      .replace(/from\s+['"](\..+)['"]/g, `from '\$1.js'`)
-  )
+  return contents.replace(/from\s+['"](\..+)['"]/g, `from '\$1.js'`)
 }
 
 /*function patchEnumType(contents: string) {
@@ -77,11 +61,11 @@ async function codegenInternal(abisDir: string, outDir: string): Promise<number>
     binFiles: [],
     storageSlotsFiles: [],
     outputDir: outDir,
-    programType: ProgramTypeEnum.CONTRACT
+    programType: ProgramTypeEnum.CONTRACT,
+    versions: { FUELS: builtinVersions.FUELS }
   })
 
   mkdirp.sync(outDir)
-  mkdirp.sync(path.join(outDir, 'factories'))
   let count = 0
   abiTypeGen.files.forEach((file) => {
     if (!file.path.endsWith('.hex.ts')) {
@@ -101,15 +85,21 @@ async function codegenInternal(abisDir: string, outDir: string): Promise<number>
   // }
 
   for (const abi of abiTypeGen.abis) {
-    const name = abi.name.endsWith('Abi') ? abi.name.slice(0, -3) : abi.name
+    const name = abi.capitalizedName.endsWith('Abi') ? abi.capitalizedName.slice(0, -3) : abi.capitalizedName
     const filePath = path.join(outDir, `${name}Processor.ts`)
     const importedTypes = collectImportedTypes(abi.types)
 
     const logByTypes: Record<string, string[]> = {}
 
     for (const logType of abi.rawContents.loggedTypes) {
+      const metadataTypeId = abi.rawContents.concreteTypes.find(
+        (t) => t.concreteTypeId == logType.concreteTypeId
+      )?.metadataTypeId
       // @ts-ignore - we know that the type is in the abi
-      const t = abi.types.find((t) => t.rawAbiType.typeId == logType.loggedType?.type)
+      let t = abi.types.find((t) => t.rawAbiType.concreteTypeId == logType.concreteTypeId)
+      if (!t) {
+        t = abi.types.find((t) => t.rawAbiType.typeId == metadataTypeId)
+      }
       // @ts-ignore - we know that the type is in the abi
       const typeName = t?.attributes?.outputLabel
       if (typeName) {
@@ -126,15 +116,14 @@ async function codegenInternal(abisDir: string, outDir: string): Promise<number>
 /* eslint-disable */
     
 import { FuelAbstractProcessor, FuelContext, FuelProcessorConfig, TypedCall, FuelFetchConfig, FuelCall, FuelLog} from '@sentio/sdk/fuel'
-import {${abi.name}__factory } from './factories/${abi.name}__factory.js'
 import {${abi.commonTypesInUse.join(',')}} from './common.js'
-import {${importedTypes.join(',')}} from './${abi.name}.js'
+import {${importedTypes.join(',')}, ${abi.capitalizedName}} from './${abi.capitalizedName}.js'
 
 import type { BigNumberish, BN } from 'fuels';
-import type { BytesLike } from 'fuels';
+import type { BytesLike, Bytes } from 'fuels';
 
 
-namespace ${name} {
+namespace ${name}NS {
   export abstract class CallWithLogs<T extends Array<any>, R> extends TypedCall<T, R> {
 ${Object.entries(logByTypes)
   .flatMap(([t, ids]) => {
@@ -149,12 +138,15 @@ ${Object.entries(logByTypes)
   .join('\n')}
   }
 
-${abi.functions.map(genCallType).join('\n')}
+${
+  ''
+  // abi.functions.map(genCallType).join('\n')
+}
 }
 
 export class ${name}Processor extends FuelAbstractProcessor {
   constructor(config?: FuelProcessorConfig) {
-    super(${abi.name}__factory.abi, config)
+    super(${abi.capitalizedName}.abi, config)
   }
   
   static bind(config: FuelProcessorConfig) {

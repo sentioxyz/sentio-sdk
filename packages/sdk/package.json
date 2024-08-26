@@ -90,7 +90,7 @@
     "chalk": "^5.3.0",
     "csv-parse": "^5.5.3",
     "ethers": "npm:@sentio/ethers@6.13.1-patch.1",
-    "fuels": "^0.90.0",
+    "fuels": "^0.94.1",
     "graphql": "^16.9.0",
     "js-sha3": "^0.9.3",
     "lru-cache": "^11.0.0",
