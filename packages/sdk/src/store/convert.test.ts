@@ -25,6 +25,9 @@ describe('RichStruct converter tests', () => {
   })
 
   it('bigDecimal converter', () => {
+    testConverter(new BigDecimal('-1e100'), BigDecimalConverter)
+    testConverter(new BigDecimal('-0.006266950425962837'), BigDecimalConverter)
+    testConverter(new BigDecimal('1.006266950425962837'), BigDecimalConverter)
     testConverter(
       new BigDecimal('123456789012345678901234567890123456789012345678901234567890.123'),
       BigDecimalConverter

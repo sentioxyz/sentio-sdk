@@ -232,12 +232,16 @@ export const BigDecimalConverter: ValueConverter<BigDecimal | undefined> = {
         nullValue: RichValue_NullValue.NULL_VALUE
       }
     }
-    const s = (value.c || []).join('')
+    const s = (value.c || [])
+      .map((v, idx) => {
+        return idx == 0 ? v.toString() : v.toString().padStart(14, '0')
+      })
+      .join('')
     const exp = -(s.length - (value.e ?? 0) - 1)
 
     return {
       bigdecimalValue: {
-        value: toBigInteger(BigInt(s)),
+        value: toBigInteger(BigInt(s) * BigInt(value.s ?? 1)),
         exp: exp
       }
     }
