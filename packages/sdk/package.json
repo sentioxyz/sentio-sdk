@@ -39,7 +39,8 @@
     "./fuel": "./lib/fuel/index.js",
     "./fuel/codegen": "./lib/fuel/codegen/index.js",
     "./store": "./lib/store/index.js",
-    "./store/codegen": "./lib/store/codegen.js"
+    "./store/codegen": "./lib/store/codegen.js",
+    "./btc": "./lib/btc/index.js"
   },
   "files": [
     "{lib,src}",
@@ -78,7 +79,7 @@
     "@project-serum/anchor": "^0.26.0",
     "@sentio/abi-wan-kanabi": "2.2.2-1",
     "@sentio/bigdecimal": "9.1.1-patch.3",
-    "@sentio/chain": "^2.1.0",
+    "@sentio/chain": "^2.1.6",
     "@sentio/ethers-v6": "^1.0.29",
     "@sentio/protos": "workspace:*",
     "@sentio/runtime": "workspace:^",

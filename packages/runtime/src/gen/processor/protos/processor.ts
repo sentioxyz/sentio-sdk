@@ -204,6 +204,7 @@ export enum HandlerType {
   FUEL_CALL = 13,
   COSMOS_CALL = 14,
   STARKNET_EVENT = 15,
+  BTC_TRANSACTION = 16,
   UNRECOGNIZED = -1,
 }
 
@@ -257,6 +258,9 @@ export function handlerTypeFromJSON(object: any): HandlerType {
     case 15:
     case "STARKNET_EVENT":
       return HandlerType.STARKNET_EVENT;
+    case 16:
+    case "BTC_TRANSACTION":
+      return HandlerType.BTC_TRANSACTION;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -298,6 +302,8 @@ export function handlerTypeToJSON(object: HandlerType): string {
       return "COSMOS_CALL";
     case HandlerType.STARKNET_EVENT:
       return "STARKNET_EVENT";
+    case HandlerType.BTC_TRANSACTION:
+      return "BTC_TRANSACTION";
     case HandlerType.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
@@ -396,6 +402,7 @@ export interface ContractConfig {
   fuelLogConfigs: FuelLogHandlerConfig[];
   cosmosLogConfigs: CosmosLogHandlerConfig[];
   starknetEventConfigs: StarknetEventHandlerConfig[];
+  btcTransactionConfigs: BTCTransactionHandlerConfig[];
   instructionConfig: InstructionHandlerConfig | undefined;
   startBlock: bigint;
   endBlock: bigint;
@@ -725,6 +732,15 @@ export interface StarknetEventHandlerConfig {
   handlerId: number;
 }
 
+export interface BTCTransactionHandlerConfig {
+  filters: BTCTransactionFilter[];
+  handlerId: number;
+}
+
+export interface BTCTransactionFilter {
+  address: string;
+}
+
 export interface StarknetEventFilter {
   address: string;
   keys: string[];
@@ -954,6 +970,7 @@ export interface Data {
   fuelCall?: Data_FuelCall | undefined;
   cosmosCall?: Data_CosmosCall | undefined;
   starknetEvents?: Data_StarknetEvent | undefined;
+  btcTransaction?: Data_BTCTransaction | undefined;
 }
 
 export interface Data_EthLog {
@@ -1044,6 +1061,11 @@ export interface Data_CosmosCall {
 
 export interface Data_StarknetEvent {
   result: { [key: string]: any } | undefined;
+  timestamp: Date | undefined;
+}
+
+export interface Data_BTCTransaction {
+  transaction: { [key: string]: any } | undefined;
   timestamp: Date | undefined;
 }
 
@@ -1605,6 +1627,7 @@ function createBaseContractConfig(): ContractConfig {
     fuelLogConfigs: [],
     cosmosLogConfigs: [],
     starknetEventConfigs: [],
+    btcTransactionConfigs: [],
     instructionConfig: undefined,
     startBlock: BigInt("0"),
     endBlock: BigInt("0"),
@@ -1652,6 +1675,9 @@ export const ContractConfig = {
     }
     for (const v of message.starknetEventConfigs) {
       StarknetEventHandlerConfig.encode(v!, writer.uint32(138).fork()).ldelim();
+    }
+    for (const v of message.btcTransactionConfigs) {
+      BTCTransactionHandlerConfig.encode(v!, writer.uint32(146).fork()).ldelim();
     }
     if (message.instructionConfig !== undefined) {
       InstructionHandlerConfig.encode(message.instructionConfig, writer.uint32(50).fork()).ldelim();
@@ -1772,6 +1798,13 @@ export const ContractConfig = {
 
           message.starknetEventConfigs.push(StarknetEventHandlerConfig.decode(reader, reader.uint32()));
           continue;
+        case 18:
+          if (tag !== 146) {
+            break;
+          }
+
+          message.btcTransactionConfigs.push(BTCTransactionHandlerConfig.decode(reader, reader.uint32()));
+          continue;
         case 6:
           if (tag !== 50) {
             break;
@@ -1848,6 +1881,9 @@ export const ContractConfig = {
       starknetEventConfigs: globalThis.Array.isArray(object?.starknetEventConfigs)
         ? object.starknetEventConfigs.map((e: any) => StarknetEventHandlerConfig.fromJSON(e))
         : [],
+      btcTransactionConfigs: globalThis.Array.isArray(object?.btcTransactionConfigs)
+        ? object.btcTransactionConfigs.map((e: any) => BTCTransactionHandlerConfig.fromJSON(e))
+        : [],
       instructionConfig: isSet(object.instructionConfig)
         ? InstructionHandlerConfig.fromJSON(object.instructionConfig)
         : undefined,
@@ -1898,6 +1934,9 @@ export const ContractConfig = {
     if (message.starknetEventConfigs?.length) {
       obj.starknetEventConfigs = message.starknetEventConfigs.map((e) => StarknetEventHandlerConfig.toJSON(e));
     }
+    if (message.btcTransactionConfigs?.length) {
+      obj.btcTransactionConfigs = message.btcTransactionConfigs.map((e) => BTCTransactionHandlerConfig.toJSON(e));
+    }
     if (message.instructionConfig !== undefined) {
       obj.instructionConfig = InstructionHandlerConfig.toJSON(message.instructionConfig);
     }
@@ -1935,6 +1974,8 @@ export const ContractConfig = {
     message.cosmosLogConfigs = object.cosmosLogConfigs?.map((e) => CosmosLogHandlerConfig.fromPartial(e)) || [];
     message.starknetEventConfigs = object.starknetEventConfigs?.map((e) => StarknetEventHandlerConfig.fromPartial(e)) ||
       [];
+    message.btcTransactionConfigs =
+      object.btcTransactionConfigs?.map((e) => BTCTransactionHandlerConfig.fromPartial(e)) || [];
     message.instructionConfig = (object.instructionConfig !== undefined && object.instructionConfig !== null)
       ? InstructionHandlerConfig.fromPartial(object.instructionConfig)
       : undefined;
@@ -5540,6 +5581,139 @@ export const StarknetEventHandlerConfig = {
   },
 };
 
+function createBaseBTCTransactionHandlerConfig(): BTCTransactionHandlerConfig {
+  return { filters: [], handlerId: 0 };
+}
+
+export const BTCTransactionHandlerConfig = {
+  encode(message: BTCTransactionHandlerConfig, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.filters) {
+      BTCTransactionFilter.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.handlerId !== 0) {
+      writer.uint32(16).int32(message.handlerId);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): BTCTransactionHandlerConfig {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseBTCTransactionHandlerConfig();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.filters.push(BTCTransactionFilter.decode(reader, reader.uint32()));
+          continue;
+        case 2:
+          if (tag !== 16) {
+            break;
+          }
+
+          message.handlerId = reader.int32();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): BTCTransactionHandlerConfig {
+    return {
+      filters: globalThis.Array.isArray(object?.filters)
+        ? object.filters.map((e: any) => BTCTransactionFilter.fromJSON(e))
+        : [],
+      handlerId: isSet(object.handlerId) ? globalThis.Number(object.handlerId) : 0,
+    };
+  },
+
+  toJSON(message: BTCTransactionHandlerConfig): unknown {
+    const obj: any = {};
+    if (message.filters?.length) {
+      obj.filters = message.filters.map((e) => BTCTransactionFilter.toJSON(e));
+    }
+    if (message.handlerId !== 0) {
+      obj.handlerId = Math.round(message.handlerId);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<BTCTransactionHandlerConfig>): BTCTransactionHandlerConfig {
+    return BTCTransactionHandlerConfig.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<BTCTransactionHandlerConfig>): BTCTransactionHandlerConfig {
+    const message = createBaseBTCTransactionHandlerConfig();
+    message.filters = object.filters?.map((e) => BTCTransactionFilter.fromPartial(e)) || [];
+    message.handlerId = object.handlerId ?? 0;
+    return message;
+  },
+};
+
+function createBaseBTCTransactionFilter(): BTCTransactionFilter {
+  return { address: "" };
+}
+
+export const BTCTransactionFilter = {
+  encode(message: BTCTransactionFilter, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.address !== "") {
+      writer.uint32(10).string(message.address);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): BTCTransactionFilter {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseBTCTransactionFilter();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.address = reader.string();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): BTCTransactionFilter {
+    return { address: isSet(object.address) ? globalThis.String(object.address) : "" };
+  },
+
+  toJSON(message: BTCTransactionFilter): unknown {
+    const obj: any = {};
+    if (message.address !== "") {
+      obj.address = message.address;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<BTCTransactionFilter>): BTCTransactionFilter {
+    return BTCTransactionFilter.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<BTCTransactionFilter>): BTCTransactionFilter {
+    const message = createBaseBTCTransactionFilter();
+    message.address = object.address ?? "";
+    return message;
+  },
+};
+
 function createBaseStarknetEventFilter(): StarknetEventFilter {
   return { address: "", keys: [] };
 }
@@ -7322,6 +7496,7 @@ function createBaseData(): Data {
     fuelCall: undefined,
     cosmosCall: undefined,
     starknetEvents: undefined,
+    btcTransaction: undefined,
   };
 }
 
@@ -7374,6 +7549,9 @@ export const Data = {
     }
     if (message.starknetEvents !== undefined) {
       Data_StarknetEvent.encode(message.starknetEvents, writer.uint32(130).fork()).ldelim();
+    }
+    if (message.btcTransaction !== undefined) {
+      Data_BTCTransaction.encode(message.btcTransaction, writer.uint32(138).fork()).ldelim();
     }
     return writer;
   },
@@ -7497,6 +7675,13 @@ export const Data = {
 
           message.starknetEvents = Data_StarknetEvent.decode(reader, reader.uint32());
           continue;
+        case 17:
+          if (tag !== 138) {
+            break;
+          }
+
+          message.btcTransaction = Data_BTCTransaction.decode(reader, reader.uint32());
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -7526,6 +7711,7 @@ export const Data = {
       fuelCall: isSet(object.fuelCall) ? Data_FuelCall.fromJSON(object.fuelCall) : undefined,
       cosmosCall: isSet(object.cosmosCall) ? Data_CosmosCall.fromJSON(object.cosmosCall) : undefined,
       starknetEvents: isSet(object.starknetEvents) ? Data_StarknetEvent.fromJSON(object.starknetEvents) : undefined,
+      btcTransaction: isSet(object.btcTransaction) ? Data_BTCTransaction.fromJSON(object.btcTransaction) : undefined,
     };
   },
 
@@ -7578,6 +7764,9 @@ export const Data = {
     }
     if (message.starknetEvents !== undefined) {
       obj.starknetEvents = Data_StarknetEvent.toJSON(message.starknetEvents);
+    }
+    if (message.btcTransaction !== undefined) {
+      obj.btcTransaction = Data_BTCTransaction.toJSON(message.btcTransaction);
     }
     return obj;
   },
@@ -7632,6 +7821,9 @@ export const Data = {
       : undefined;
     message.starknetEvents = (object.starknetEvents !== undefined && object.starknetEvents !== null)
       ? Data_StarknetEvent.fromPartial(object.starknetEvents)
+      : undefined;
+    message.btcTransaction = (object.btcTransaction !== undefined && object.btcTransaction !== null)
+      ? Data_BTCTransaction.fromPartial(object.btcTransaction)
       : undefined;
     return message;
   },
@@ -9015,6 +9207,80 @@ export const Data_StarknetEvent = {
   fromPartial(object: DeepPartial<Data_StarknetEvent>): Data_StarknetEvent {
     const message = createBaseData_StarknetEvent();
     message.result = object.result ?? undefined;
+    message.timestamp = object.timestamp ?? undefined;
+    return message;
+  },
+};
+
+function createBaseData_BTCTransaction(): Data_BTCTransaction {
+  return { transaction: undefined, timestamp: undefined };
+}
+
+export const Data_BTCTransaction = {
+  encode(message: Data_BTCTransaction, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.transaction !== undefined) {
+      Struct.encode(Struct.wrap(message.transaction), writer.uint32(34).fork()).ldelim();
+    }
+    if (message.timestamp !== undefined) {
+      Timestamp.encode(toTimestamp(message.timestamp), writer.uint32(42).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Data_BTCTransaction {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseData_BTCTransaction();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.transaction = Struct.unwrap(Struct.decode(reader, reader.uint32()));
+          continue;
+        case 5:
+          if (tag !== 42) {
+            break;
+          }
+
+          message.timestamp = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Data_BTCTransaction {
+    return {
+      transaction: isObject(object.transaction) ? object.transaction : undefined,
+      timestamp: isSet(object.timestamp) ? fromJsonTimestamp(object.timestamp) : undefined,
+    };
+  },
+
+  toJSON(message: Data_BTCTransaction): unknown {
+    const obj: any = {};
+    if (message.transaction !== undefined) {
+      obj.transaction = message.transaction;
+    }
+    if (message.timestamp !== undefined) {
+      obj.timestamp = message.timestamp.toISOString();
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<Data_BTCTransaction>): Data_BTCTransaction {
+    return Data_BTCTransaction.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<Data_BTCTransaction>): Data_BTCTransaction {
+    const message = createBaseData_BTCTransaction();
+    message.transaction = object.transaction ?? undefined;
     message.timestamp = object.timestamp ?? undefined;
     return message;
   },

@@ -70,6 +70,7 @@ message ContractConfig {
   repeated FuelLogHandlerConfig fuel_log_configs = 15;
   repeated CosmosLogHandlerConfig cosmos_log_configs = 16;
   repeated StarknetEventHandlerConfig starknet_event_configs = 17;
+  repeated BTCTransactionHandlerConfig btc_transaction_configs = 18;
 
   InstructionHandlerConfig instruction_config = 6;
   uint64 start_block = 4;
@@ -392,6 +393,15 @@ message StarknetEventHandlerConfig {
   int32 handler_id = 2;
 }
 
+message BTCTransactionHandlerConfig {
+  repeated BTCTransactionFilter filters = 1;
+  int32 handler_id = 2;
+}
+
+message BTCTransactionFilter {
+  string address = 1;
+}
+
 message StarknetEventFilter {
   string address = 1;
   repeated string keys = 2;
@@ -613,6 +623,11 @@ message Data {
     google.protobuf.Timestamp timestamp = 2;
   }
 
+  message BTCTransaction {
+    google.protobuf.Struct transaction = 4;
+    google.protobuf.Timestamp timestamp = 5;
+  }
+
   bytes raw = 1 [deprecated = true]; // can be removed anytime
   oneof value {
     EthLog eth_log = 2;
@@ -630,6 +645,7 @@ message Data {
     FuelCall fuel_call = 14;
     CosmosCall cosmos_call = 15;
     StarknetEvent starknet_events = 16;
+    BTCTransaction btc_transaction = 17;
   }
 }
 
@@ -729,6 +745,7 @@ enum HandlerType {
   FUEL_CALL = 13;
   COSMOS_CALL = 14;
   STARKNET_EVENT = 15;
+  BTC_TRANSACTION = 16;
 }
 
 message RuntimeInfo {

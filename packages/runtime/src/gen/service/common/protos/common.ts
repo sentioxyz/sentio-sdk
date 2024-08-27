@@ -1840,6 +1840,7 @@ export interface RichValue {
   bigintValue?: BigInteger | undefined;
   bigdecimalValue?: BigDecimal | undefined;
   listValue?: RichValueList | undefined;
+  structValue?: RichStruct | undefined;
 }
 
 export enum RichValue_NullValue {
@@ -12540,6 +12541,7 @@ function createBaseRichValue(): RichValue {
     bigintValue: undefined,
     bigdecimalValue: undefined,
     listValue: undefined,
+    structValue: undefined,
   };
 }
 
@@ -12574,6 +12576,9 @@ export const RichValue = {
     }
     if (message.listValue !== undefined) {
       RichValueList.encode(message.listValue, writer.uint32(82).fork()).ldelim();
+    }
+    if (message.structValue !== undefined) {
+      RichStruct.encode(message.structValue, writer.uint32(90).fork()).ldelim();
     }
     return writer;
   },
@@ -12655,6 +12660,13 @@ export const RichValue = {
 
           message.listValue = RichValueList.decode(reader, reader.uint32());
           continue;
+        case 11:
+          if (tag !== 90) {
+            break;
+          }
+
+          message.structValue = RichStruct.decode(reader, reader.uint32());
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -12676,6 +12688,7 @@ export const RichValue = {
       bigintValue: isSet(object.bigintValue) ? BigInteger.fromJSON(object.bigintValue) : undefined,
       bigdecimalValue: isSet(object.bigdecimalValue) ? BigDecimal.fromJSON(object.bigdecimalValue) : undefined,
       listValue: isSet(object.listValue) ? RichValueList.fromJSON(object.listValue) : undefined,
+      structValue: isSet(object.structValue) ? RichStruct.fromJSON(object.structValue) : undefined,
     };
   },
 
@@ -12711,6 +12724,9 @@ export const RichValue = {
     if (message.listValue !== undefined) {
       obj.listValue = RichValueList.toJSON(message.listValue);
     }
+    if (message.structValue !== undefined) {
+      obj.structValue = RichStruct.toJSON(message.structValue);
+    }
     return obj;
   },
 
@@ -12734,6 +12750,9 @@ export const RichValue = {
       : undefined;
     message.listValue = (object.listValue !== undefined && object.listValue !== null)
       ? RichValueList.fromPartial(object.listValue)
+      : undefined;
+    message.structValue = (object.structValue !== undefined && object.structValue !== null)
+      ? RichStruct.fromPartial(object.structValue)
       : undefined;
     return message;
   },
