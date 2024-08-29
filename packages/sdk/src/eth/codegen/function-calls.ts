@@ -154,16 +154,14 @@ export function generateBoundFunctionCallEncoder(fn: FunctionDeclaration, includ
   ${declName ?? fn.name}(${generateInputTypes(fn.inputs, {
     useStructs: true
   })}overrides?: Overrides): EthCallParam {
-    const chainId = overrides?.chainId?.toString() ?? this.context.chainId.toString()
-    const address = this.context.address
-    let blockTag = "0x" + this.context.blockNumber.toString(16)
+    let blockTagWithOverride = "0x" + this.context.blockNumber.toString(16)
     if (overrides?.blockTag) {
-      blockTag = typeof(overrides.blockTag) == 'string'? overrides.blockTag: "0x" + overrides.blockTag.toString(16)
+      blockTagWithOverride = typeof(overrides.blockTag) == 'string'? overrides.blockTag: "0x" + overrides.blockTag.toString(16)
     }
     
     return this.view.encodeCall.${declName}(${
       fn.inputs.length > 0 ? fn.inputs.map((input, index) => input.name || `arg${index}`).join(',') + ',' : ''
-    }{chainId, address, blockTag})
+    }{chainId: this.context.chainId.toString(), address: this.context.address, blockTag: blockTagWithOverride})
   }
   `
   ]
