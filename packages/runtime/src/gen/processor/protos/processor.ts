@@ -377,6 +377,7 @@ export interface ExecutionConfig {
   sequential: boolean;
   forceExactBlockTime: boolean;
   processBindingTimeout: number;
+  skipStartBlockValidation: boolean;
 }
 
 export interface ProcessConfigRequest {
@@ -1281,7 +1282,7 @@ export const ProjectConfig = {
 };
 
 function createBaseExecutionConfig(): ExecutionConfig {
-  return { sequential: false, forceExactBlockTime: false, processBindingTimeout: 0 };
+  return { sequential: false, forceExactBlockTime: false, processBindingTimeout: 0, skipStartBlockValidation: false };
 }
 
 export const ExecutionConfig = {
@@ -1294,6 +1295,9 @@ export const ExecutionConfig = {
     }
     if (message.processBindingTimeout !== 0) {
       writer.uint32(24).int32(message.processBindingTimeout);
+    }
+    if (message.skipStartBlockValidation !== false) {
+      writer.uint32(32).bool(message.skipStartBlockValidation);
     }
     return writer;
   },
@@ -1326,6 +1330,13 @@ export const ExecutionConfig = {
 
           message.processBindingTimeout = reader.int32();
           continue;
+        case 4:
+          if (tag !== 32) {
+            break;
+          }
+
+          message.skipStartBlockValidation = reader.bool();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -1340,6 +1351,9 @@ export const ExecutionConfig = {
       sequential: isSet(object.sequential) ? globalThis.Boolean(object.sequential) : false,
       forceExactBlockTime: isSet(object.forceExactBlockTime) ? globalThis.Boolean(object.forceExactBlockTime) : false,
       processBindingTimeout: isSet(object.processBindingTimeout) ? globalThis.Number(object.processBindingTimeout) : 0,
+      skipStartBlockValidation: isSet(object.skipStartBlockValidation)
+        ? globalThis.Boolean(object.skipStartBlockValidation)
+        : false,
     };
   },
 
@@ -1354,6 +1368,9 @@ export const ExecutionConfig = {
     if (message.processBindingTimeout !== 0) {
       obj.processBindingTimeout = Math.round(message.processBindingTimeout);
     }
+    if (message.skipStartBlockValidation !== false) {
+      obj.skipStartBlockValidation = message.skipStartBlockValidation;
+    }
     return obj;
   },
 
@@ -1365,6 +1382,7 @@ export const ExecutionConfig = {
     message.sequential = object.sequential ?? false;
     message.forceExactBlockTime = object.forceExactBlockTime ?? false;
     message.processBindingTimeout = object.processBindingTimeout ?? 0;
+    message.skipStartBlockValidation = object.skipStartBlockValidation ?? false;
     return message;
   },
 };

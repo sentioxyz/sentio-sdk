@@ -55,7 +55,7 @@ export async function runCreate(argv: string[]) {
       name: 'chain-type',
       alias: 'c',
       description:
-        'The type of project you want to create, can be \n,  eth \n,  aptos \n,  fuel\n,  solana\n,  sui\n,  raw (if you want to start from scratch and support multiple types of chains)',
+        'The type of project you want to create, can be \n,  eth \n,  aptos \n,  fuel\n,  solana\n,  sui\n,  starknet\n,  raw (if you want to start from scratch and support multiple types of chains)',
       type: String,
       defaultValue: 'eth'
     },

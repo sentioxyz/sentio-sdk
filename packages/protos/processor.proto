@@ -32,9 +32,15 @@ message ProjectConfig {
 }
 
 message ExecutionConfig {
+  // By default, the processor will run handlers  in parallel, but in some cases, we want to process the data
+  // sequentially, e.g. read the data from the database, then process the data, then write the data back to the database
   bool sequential = 1;
   bool forceExactBlockTime = 2;
   int32 processBindingTimeout = 3;
+  // By default, the processor will try to locate the start block of the contract even user provided one,
+  // but in case that nodes are pruned so it can't be correctly located, this flag will force the processor to start
+  // from user specified block
+  bool skipStartBlockValidation = 4;
 }
 
 message ProcessConfigRequest {
