@@ -6,7 +6,6 @@ import { State } from '@sentio/runtime'
 import { BTCProcessor } from '../btc-processor.js'
 import { BTCContext, Transaction } from '../types.js'
 import testData from './test-data.json'
-import { RichValue } from '@sentio/protos'
 
 describe('btc processor tests', () => {
   const service = new TestProcessorServer(async () => {
