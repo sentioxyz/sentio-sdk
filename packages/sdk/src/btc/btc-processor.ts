@@ -1,5 +1,5 @@
 import { ListStateStorage } from '@sentio/runtime'
-import { BTCContext, Transaction } from './types.js'
+import { BTCContext, Transaction, TransactionFilters } from './types.js'
 import { Data_BTCTransaction, ProcessResult } from '@sentio/protos'
 
 export class BTCProcessorState extends ListStateStorage<BTCProcessor> {
@@ -17,7 +17,10 @@ export class BTCProcessor {
     return processor
   }
 
-  public onTransaction(handler: (transaction: Transaction, ctx: BTCContext) => void | Promise<void>) {
+  public onTransaction(
+    handler: (transaction: Transaction, ctx: BTCContext) => void | Promise<void>,
+    filter?: TransactionFilters
+  ) {
     const callHandler = {
       handler: async (call: Data_BTCTransaction) => {
         const tx = call.transaction as Transaction
@@ -26,11 +29,12 @@ export class BTCProcessor {
           this.config.chainId,
           this.config.name ?? this.config.address ?? '',
           tx,
-          this.config.address
+          this.config.address ?? tx.vout[0].scriptpubkey_address
         )
         await handler(tx, ctx)
         return ctx.stopAndGetResult()
-      }
+      },
+      filter
     }
     this.callHandlers.push(callHandler)
     return this
@@ -40,11 +44,12 @@ export class BTCProcessor {
 interface BTCProcessorConfig {
   chainId: string
   name?: string
-  address: string
+  address?: string
   startBlock?: bigint
   endBlock?: bigint
 }
 
 export type CallHandler<T> = {
   handler: (call: T) => Promise<ProcessResult>
+  filter?: TransactionFilters
 }

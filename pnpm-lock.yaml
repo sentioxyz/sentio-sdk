@@ -124,6 +124,16 @@ importers:
         specifier: workspace:*
         version: link:../../packages/cli
 
+  examples/btc:
+    dependencies:
+      '@sentio/sdk':
+        specifier: workspace:*
+        version: link:../../packages/sdk
+    devDependencies:
+      '@sentio/cli':
+        specifier: workspace:*
+        version: link:../../packages/cli
+
   examples/fuel-counter:
     dependencies:
       '@sentio/sdk':

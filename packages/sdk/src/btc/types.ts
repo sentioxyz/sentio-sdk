@@ -1,6 +1,7 @@
 import { BaseContext, Labels, normalizeLabels } from '../core/index.js'
 import { RecordMetaData } from '@sentio/protos'
 import { ChainId } from '@sentio/chain'
+import { BigDecimal } from '@sentio/bigdecimal'
 
 type Vin = {
   txid: string
@@ -91,3 +92,33 @@ export class BTCContext extends BaseContext {
     return this.chainId as ChainId
   }
 }
+
+export type TransactionFilter = {
+  field:
+    | 'vin.txid'
+    | 'vin.vout'
+    | 'vin.is_coinbase'
+    | 'vin.scriptsig'
+    | 'vin.scriptsig_asm'
+    | 'vout.scriptpubkey'
+    | 'vout.scriptpubkey_asm'
+    | 'vout.scriptpubkey_type'
+    | 'vout.scriptpubkey_address'
+    | 'vout.value'
+    | 'status.block_height'
+    | 'status.block_hash'
+    | 'status.block_time'
+  prefix?: string
+  equals?: Comparable
+  gt?: Comparable
+  gte?: Comparable
+  lt?: Comparable
+  lte?: Comparable
+  ne?: Comparable
+  contains?: string
+  not_contains?: string
+}
+
+type Comparable = number | BigDecimal | bigint | Date
+
+export type TransactionFilters = TransactionFilter | TransactionFilter[]

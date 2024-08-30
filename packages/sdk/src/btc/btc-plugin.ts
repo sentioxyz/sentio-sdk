@@ -1,17 +1,22 @@
 import { errorString, GLOBAL_CONFIG, mergeProcessResults, Plugin, PluginManager, USER_PROCESSOR } from '@sentio/runtime'
 import {
+  BTCTransactionFilter_FieldFilters,
   ContractConfig,
   Data_BTCTransaction,
   DataBinding,
   HandlerType,
   ProcessConfigResponse,
   ProcessResult,
+  RichValue,
   StartRequest
 } from '@sentio/protos'
 
 import { ServerError, Status } from 'nice-grpc'
 import { TemplateInstanceState } from '../core/template.js'
 import { BTCProcessorState } from './btc-processor.js'
+import { TransactionFilter, TransactionFilters } from './types.js'
+import { serializeRichValue } from '../store/util.js'
+import { isArray } from 'radash'
 
 interface Handlers {
   txHandlers: ((trace: Data_BTCTransaction) => Promise<ProcessResult>)[]
@@ -43,14 +48,25 @@ export class BTCPlugin extends Plugin {
       for (const callHandler of processor.callHandlers) {
         const handlerId = handlers.txHandlers.push(callHandler.handler) - 1
 
-        contractConfig.btcTransactionConfigs.push({
-          filters: [
-            {
-              address: contractConfig.contract?.address || '*'
-            }
-          ],
-          handlerId
-        })
+        if (callHandler.filter) {
+          contractConfig.btcTransactionConfigs.push({
+            filters: [
+              {
+                fieldFilters: toFilters(callHandler.filter)
+              }
+            ],
+            handlerId
+          })
+        } else {
+          contractConfig.btcTransactionConfigs.push({
+            filters: [
+              {
+                address: contractConfig.contract?.address || '*'
+              }
+            ],
+            handlerId
+          })
+        }
       }
 
       // Finish up a contract
@@ -103,3 +119,28 @@ export class BTCPlugin extends Plugin {
 }
 
 PluginManager.INSTANCE.register(new BTCPlugin())
+
+function toFilters(filters: TransactionFilters): BTCTransactionFilter_FieldFilters {
+  const arr = !isArray(filters) ? [filters] : filters
+  return {
+    filters: arr.map((f: TransactionFilter) => {
+      const { field, ...rest } = f
+      return {
+        field: field,
+        ...toValues(rest)
+      }
+    })
+  }
+}
+
+function toValues(rest: Omit<TransactionFilter, 'field'>): Record<keyof Omit<TransactionFilter, 'field'>, RichValue> {
+  return Object.entries(rest).reduce(
+    (acc, [key, value]) => {
+      if (value !== undefined) {
+        acc[key] = serializeRichValue(value)
+      }
+      return acc
+    },
+    {} as Record<string, RichValue>
+  )
+}

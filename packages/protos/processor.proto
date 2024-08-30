@@ -399,7 +399,27 @@ message BTCTransactionHandlerConfig {
 }
 
 message BTCTransactionFilter {
-  string address = 1;
+  oneof filter {
+    string address = 1;
+    FieldFilters field_filters = 2;
+  }
+  message FieldFilters {
+    repeated FieldFilter filters = 1;
+  }
+  message FieldFilter {
+    string field = 1;
+    oneof condition {
+      common.RichValue prefix = 2;
+      common.RichValue contains = 3;
+      common.RichValue not_contains = 4;
+      common.RichValue eq = 5;
+      common.RichValue gt = 6;
+      common.RichValue gte = 7;
+      common.RichValue lt = 8;
+      common.RichValue lte = 9;
+      common.RichValue ne = 10;
+    }
+  }
 }
 
 message StarknetEventFilter {

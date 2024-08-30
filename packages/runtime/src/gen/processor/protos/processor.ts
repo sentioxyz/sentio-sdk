@@ -5,7 +5,14 @@ import _m0 from "protobufjs/minimal.js";
 import { Empty } from "../../google/protobuf/empty.js";
 import { ListValue, Struct } from "../../google/protobuf/struct.js";
 import { Timestamp } from "../../google/protobuf/timestamp.js";
-import { BigInteger, CoinID, RichStruct, RichStructList, RichValueList } from "../../service/common/protos/common.js";
+import {
+  BigInteger,
+  CoinID,
+  RichStruct,
+  RichStructList,
+  RichValue,
+  RichValueList,
+} from "../../service/common/protos/common.js";
 
 export enum MetricType {
   UNKNOWN_TYPE = 0,
@@ -738,7 +745,25 @@ export interface BTCTransactionHandlerConfig {
 }
 
 export interface BTCTransactionFilter {
-  address: string;
+  address?: string | undefined;
+  fieldFilters?: BTCTransactionFilter_FieldFilters | undefined;
+}
+
+export interface BTCTransactionFilter_FieldFilters {
+  filters: BTCTransactionFilter_FieldFilter[];
+}
+
+export interface BTCTransactionFilter_FieldFilter {
+  field: string;
+  prefix?: RichValue | undefined;
+  contains?: RichValue | undefined;
+  notContains?: RichValue | undefined;
+  eq?: RichValue | undefined;
+  gt?: RichValue | undefined;
+  gte?: RichValue | undefined;
+  lt?: RichValue | undefined;
+  lte?: RichValue | undefined;
+  ne?: RichValue | undefined;
 }
 
 export interface StarknetEventFilter {
@@ -5658,13 +5683,16 @@ export const BTCTransactionHandlerConfig = {
 };
 
 function createBaseBTCTransactionFilter(): BTCTransactionFilter {
-  return { address: "" };
+  return { address: undefined, fieldFilters: undefined };
 }
 
 export const BTCTransactionFilter = {
   encode(message: BTCTransactionFilter, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.address !== "") {
+    if (message.address !== undefined) {
       writer.uint32(10).string(message.address);
+    }
+    if (message.fieldFilters !== undefined) {
+      BTCTransactionFilter_FieldFilters.encode(message.fieldFilters, writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
@@ -5683,6 +5711,13 @@ export const BTCTransactionFilter = {
 
           message.address = reader.string();
           continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.fieldFilters = BTCTransactionFilter_FieldFilters.decode(reader, reader.uint32());
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -5693,13 +5728,21 @@ export const BTCTransactionFilter = {
   },
 
   fromJSON(object: any): BTCTransactionFilter {
-    return { address: isSet(object.address) ? globalThis.String(object.address) : "" };
+    return {
+      address: isSet(object.address) ? globalThis.String(object.address) : undefined,
+      fieldFilters: isSet(object.fieldFilters)
+        ? BTCTransactionFilter_FieldFilters.fromJSON(object.fieldFilters)
+        : undefined,
+    };
   },
 
   toJSON(message: BTCTransactionFilter): unknown {
     const obj: any = {};
-    if (message.address !== "") {
+    if (message.address !== undefined) {
       obj.address = message.address;
+    }
+    if (message.fieldFilters !== undefined) {
+      obj.fieldFilters = BTCTransactionFilter_FieldFilters.toJSON(message.fieldFilters);
     }
     return obj;
   },
@@ -5709,7 +5752,282 @@ export const BTCTransactionFilter = {
   },
   fromPartial(object: DeepPartial<BTCTransactionFilter>): BTCTransactionFilter {
     const message = createBaseBTCTransactionFilter();
-    message.address = object.address ?? "";
+    message.address = object.address ?? undefined;
+    message.fieldFilters = (object.fieldFilters !== undefined && object.fieldFilters !== null)
+      ? BTCTransactionFilter_FieldFilters.fromPartial(object.fieldFilters)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseBTCTransactionFilter_FieldFilters(): BTCTransactionFilter_FieldFilters {
+  return { filters: [] };
+}
+
+export const BTCTransactionFilter_FieldFilters = {
+  encode(message: BTCTransactionFilter_FieldFilters, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.filters) {
+      BTCTransactionFilter_FieldFilter.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): BTCTransactionFilter_FieldFilters {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseBTCTransactionFilter_FieldFilters();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.filters.push(BTCTransactionFilter_FieldFilter.decode(reader, reader.uint32()));
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): BTCTransactionFilter_FieldFilters {
+    return {
+      filters: globalThis.Array.isArray(object?.filters)
+        ? object.filters.map((e: any) => BTCTransactionFilter_FieldFilter.fromJSON(e))
+        : [],
+    };
+  },
+
+  toJSON(message: BTCTransactionFilter_FieldFilters): unknown {
+    const obj: any = {};
+    if (message.filters?.length) {
+      obj.filters = message.filters.map((e) => BTCTransactionFilter_FieldFilter.toJSON(e));
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<BTCTransactionFilter_FieldFilters>): BTCTransactionFilter_FieldFilters {
+    return BTCTransactionFilter_FieldFilters.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<BTCTransactionFilter_FieldFilters>): BTCTransactionFilter_FieldFilters {
+    const message = createBaseBTCTransactionFilter_FieldFilters();
+    message.filters = object.filters?.map((e) => BTCTransactionFilter_FieldFilter.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseBTCTransactionFilter_FieldFilter(): BTCTransactionFilter_FieldFilter {
+  return {
+    field: "",
+    prefix: undefined,
+    contains: undefined,
+    notContains: undefined,
+    eq: undefined,
+    gt: undefined,
+    gte: undefined,
+    lt: undefined,
+    lte: undefined,
+    ne: undefined,
+  };
+}
+
+export const BTCTransactionFilter_FieldFilter = {
+  encode(message: BTCTransactionFilter_FieldFilter, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.field !== "") {
+      writer.uint32(10).string(message.field);
+    }
+    if (message.prefix !== undefined) {
+      RichValue.encode(message.prefix, writer.uint32(18).fork()).ldelim();
+    }
+    if (message.contains !== undefined) {
+      RichValue.encode(message.contains, writer.uint32(26).fork()).ldelim();
+    }
+    if (message.notContains !== undefined) {
+      RichValue.encode(message.notContains, writer.uint32(34).fork()).ldelim();
+    }
+    if (message.eq !== undefined) {
+      RichValue.encode(message.eq, writer.uint32(42).fork()).ldelim();
+    }
+    if (message.gt !== undefined) {
+      RichValue.encode(message.gt, writer.uint32(50).fork()).ldelim();
+    }
+    if (message.gte !== undefined) {
+      RichValue.encode(message.gte, writer.uint32(58).fork()).ldelim();
+    }
+    if (message.lt !== undefined) {
+      RichValue.encode(message.lt, writer.uint32(66).fork()).ldelim();
+    }
+    if (message.lte !== undefined) {
+      RichValue.encode(message.lte, writer.uint32(74).fork()).ldelim();
+    }
+    if (message.ne !== undefined) {
+      RichValue.encode(message.ne, writer.uint32(82).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): BTCTransactionFilter_FieldFilter {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseBTCTransactionFilter_FieldFilter();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.field = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.prefix = RichValue.decode(reader, reader.uint32());
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.contains = RichValue.decode(reader, reader.uint32());
+          continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.notContains = RichValue.decode(reader, reader.uint32());
+          continue;
+        case 5:
+          if (tag !== 42) {
+            break;
+          }
+
+          message.eq = RichValue.decode(reader, reader.uint32());
+          continue;
+        case 6:
+          if (tag !== 50) {
+            break;
+          }
+
+          message.gt = RichValue.decode(reader, reader.uint32());
+          continue;
+        case 7:
+          if (tag !== 58) {
+            break;
+          }
+
+          message.gte = RichValue.decode(reader, reader.uint32());
+          continue;
+        case 8:
+          if (tag !== 66) {
+            break;
+          }
+
+          message.lt = RichValue.decode(reader, reader.uint32());
+          continue;
+        case 9:
+          if (tag !== 74) {
+            break;
+          }
+
+          message.lte = RichValue.decode(reader, reader.uint32());
+          continue;
+        case 10:
+          if (tag !== 82) {
+            break;
+          }
+
+          message.ne = RichValue.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): BTCTransactionFilter_FieldFilter {
+    return {
+      field: isSet(object.field) ? globalThis.String(object.field) : "",
+      prefix: isSet(object.prefix) ? RichValue.fromJSON(object.prefix) : undefined,
+      contains: isSet(object.contains) ? RichValue.fromJSON(object.contains) : undefined,
+      notContains: isSet(object.notContains) ? RichValue.fromJSON(object.notContains) : undefined,
+      eq: isSet(object.eq) ? RichValue.fromJSON(object.eq) : undefined,
+      gt: isSet(object.gt) ? RichValue.fromJSON(object.gt) : undefined,
+      gte: isSet(object.gte) ? RichValue.fromJSON(object.gte) : undefined,
+      lt: isSet(object.lt) ? RichValue.fromJSON(object.lt) : undefined,
+      lte: isSet(object.lte) ? RichValue.fromJSON(object.lte) : undefined,
+      ne: isSet(object.ne) ? RichValue.fromJSON(object.ne) : undefined,
+    };
+  },
+
+  toJSON(message: BTCTransactionFilter_FieldFilter): unknown {
+    const obj: any = {};
+    if (message.field !== "") {
+      obj.field = message.field;
+    }
+    if (message.prefix !== undefined) {
+      obj.prefix = RichValue.toJSON(message.prefix);
+    }
+    if (message.contains !== undefined) {
+      obj.contains = RichValue.toJSON(message.contains);
+    }
+    if (message.notContains !== undefined) {
+      obj.notContains = RichValue.toJSON(message.notContains);
+    }
+    if (message.eq !== undefined) {
+      obj.eq = RichValue.toJSON(message.eq);
+    }
+    if (message.gt !== undefined) {
+      obj.gt = RichValue.toJSON(message.gt);
+    }
+    if (message.gte !== undefined) {
+      obj.gte = RichValue.toJSON(message.gte);
+    }
+    if (message.lt !== undefined) {
+      obj.lt = RichValue.toJSON(message.lt);
+    }
+    if (message.lte !== undefined) {
+      obj.lte = RichValue.toJSON(message.lte);
+    }
+    if (message.ne !== undefined) {
+      obj.ne = RichValue.toJSON(message.ne);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<BTCTransactionFilter_FieldFilter>): BTCTransactionFilter_FieldFilter {
+    return BTCTransactionFilter_FieldFilter.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<BTCTransactionFilter_FieldFilter>): BTCTransactionFilter_FieldFilter {
+    const message = createBaseBTCTransactionFilter_FieldFilter();
+    message.field = object.field ?? "";
+    message.prefix = (object.prefix !== undefined && object.prefix !== null)
+      ? RichValue.fromPartial(object.prefix)
+      : undefined;
+    message.contains = (object.contains !== undefined && object.contains !== null)
+      ? RichValue.fromPartial(object.contains)
+      : undefined;
+    message.notContains = (object.notContains !== undefined && object.notContains !== null)
+      ? RichValue.fromPartial(object.notContains)
+      : undefined;
+    message.eq = (object.eq !== undefined && object.eq !== null) ? RichValue.fromPartial(object.eq) : undefined;
+    message.gt = (object.gt !== undefined && object.gt !== null) ? RichValue.fromPartial(object.gt) : undefined;
+    message.gte = (object.gte !== undefined && object.gte !== null) ? RichValue.fromPartial(object.gte) : undefined;
+    message.lt = (object.lt !== undefined && object.lt !== null) ? RichValue.fromPartial(object.lt) : undefined;
+    message.lte = (object.lte !== undefined && object.lte !== null) ? RichValue.fromPartial(object.lte) : undefined;
+    message.ne = (object.ne !== undefined && object.ne !== null) ? RichValue.fromPartial(object.ne) : undefined;
     return message;
   },
 };

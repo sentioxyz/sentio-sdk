@@ -69,6 +69,7 @@
     "gen:sui": "cp ../../node_modules/@typemove/sui/src/abis/*.json src/sui/abis && tsx src/sui/codegen/run.ts src/sui/abis src/sui/builtin && pnpm gen:sui_test",
     "gen:sui_test": "tsx src/sui/codegen/run.ts src/sui/tests/abis src/sui/tests/types",
     "test": "glob -c 'tsx --test' '**/*.test.ts'",
+    "test:btc": "tsx --test src/btc/tests/processor.test.ts",
     "test:starknet": "tsx --test src/stark/tests/event.test.ts"
   },
   "dependencies": {

@@ -8,6 +8,7 @@ import { toBigInteger } from './convert.js'
 import { PluginManager } from '@sentio/runtime'
 import { Cursor } from './cursor.js'
 import { LocalCache } from './cache.js'
+import { serializeRichValue } from './util.js'
 
 export interface EntityClass<T> {
   new (data: Partial<T>): T
@@ -166,7 +167,11 @@ export class Store {
             filters?.map((f) => ({
               field: f.field as string,
               op: ops[f.op],
-              value: { values: Array.isArray(f.value) ? f.value.map((v) => serialize(v)) : [serialize(f.value)] }
+              value: {
+                values: Array.isArray(f.value)
+                  ? f.value.map((v) => serializeRichValue(v))
+                  : [serializeRichValue(f.value)]
+              }
             })) || []
         }
       },
@@ -295,56 +300,6 @@ const ops: Record<Operators<any>, DBRequest_DBOperator> = {
   'not like': DBRequest_DBOperator.NOT_LIKE,
   'has all': DBRequest_DBOperator.HAS_ALL,
   'has any': DBRequest_DBOperator.HAS_ANY
-}
-
-function serialize(v: any): RichValue {
-  if (v == null) {
-    return { nullValue: 0 }
-  }
-  if (typeof v == 'boolean') {
-    return { boolValue: v }
-  }
-  if (typeof v == 'string') {
-    return { stringValue: v }
-  }
-
-  if (typeof v == 'number') {
-    return { floatValue: v }
-  }
-  if (typeof v == 'bigint') {
-    return {
-      bigintValue: toBigInteger(v)
-    }
-  }
-
-  if (v instanceof BigDecimal) {
-    return serializeBigDecimal(v)
-  }
-
-  if (v instanceof Date) {
-    return {
-      timestampValue: v
-    }
-  }
-
-  if (v instanceof Uint8Array) {
-    return { bytesValue: v }
-  }
-
-  if (Array.isArray(v)) {
-    return {
-      listValue: { values: v.map((v) => serialize(v)) }
-    }
-  }
-  return {
-    nullValue: 0
-  }
-}
-
-function serializeBigDecimal(v: BigDecimal): RichValue {
-  return {
-    bigdecimalValue: undefined
-  }
 }
 
 export function getStore() {
