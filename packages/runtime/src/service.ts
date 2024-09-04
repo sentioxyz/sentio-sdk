@@ -52,11 +52,17 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
 
   private readonly shutdownHandler?: () => void
 
+  private readonly enablePreprocess: boolean
+
   private preparedData: PreparedData | undefined
 
   constructor(loader: () => Promise<any>, shutdownHandler?: () => void) {
     this.loader = loader
     this.shutdownHandler = shutdownHandler
+
+    this.enablePreprocess = process.env['ENABLE_PREPROCESS']
+      ? process.env['ENABLE_PREPROCESS'].toLowerCase() == 'true'
+      : false
   }
 
   async getConfig(request: ProcessConfigRequest, context: CallContext): Promise<ProcessConfigResponse> {
@@ -126,7 +132,9 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
   }
 
   async processBindings(request: ProcessBindingsRequest, options?: CallContext): Promise<ProcessBindingResponse> {
-    const preparedData = await this.preprocessBindings(request.bindings, {}, undefined, options)
+    const preparedData = this.enablePreprocess
+      ? await this.preprocessBindings(request.bindings, {}, undefined, options)
+      : { ethCallResults: {} }
 
     const promises = []
     for (const binding of request.bindings) {
