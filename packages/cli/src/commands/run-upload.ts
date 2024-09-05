@@ -231,7 +231,10 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth, continu
       }
       return
     }
-    const initUploadRes = (await initUploadResRaw.json()) as { url: string }
+    const initUploadRes = (await initUploadResRaw.json()) as { url: string; warning?: string }
+    if (initUploadRes.warning) {
+      console.warn(chalk.yellow('Warning:', initUploadRes.warning))
+    }
     const uploadUrl = initUploadRes.url
 
     // do actual uploading
