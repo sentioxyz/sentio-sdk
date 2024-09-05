@@ -378,6 +378,7 @@ export interface ExecutionConfig {
   forceExactBlockTime: boolean;
   processBindingTimeout: number;
   skipStartBlockValidation: boolean;
+  rpcRetryTimes: number;
 }
 
 export interface ProcessConfigRequest {
@@ -1261,7 +1262,13 @@ export const ProjectConfig = {
 };
 
 function createBaseExecutionConfig(): ExecutionConfig {
-  return { sequential: false, forceExactBlockTime: false, processBindingTimeout: 0, skipStartBlockValidation: false };
+  return {
+    sequential: false,
+    forceExactBlockTime: false,
+    processBindingTimeout: 0,
+    skipStartBlockValidation: false,
+    rpcRetryTimes: 0,
+  };
 }
 
 export const ExecutionConfig = {
@@ -1277,6 +1284,9 @@ export const ExecutionConfig = {
     }
     if (message.skipStartBlockValidation !== false) {
       writer.uint32(32).bool(message.skipStartBlockValidation);
+    }
+    if (message.rpcRetryTimes !== 0) {
+      writer.uint32(40).int32(message.rpcRetryTimes);
     }
     return writer;
   },
@@ -1316,6 +1326,13 @@ export const ExecutionConfig = {
 
           message.skipStartBlockValidation = reader.bool();
           continue;
+        case 5:
+          if (tag !== 40) {
+            break;
+          }
+
+          message.rpcRetryTimes = reader.int32();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -1333,6 +1350,7 @@ export const ExecutionConfig = {
       skipStartBlockValidation: isSet(object.skipStartBlockValidation)
         ? globalThis.Boolean(object.skipStartBlockValidation)
         : false,
+      rpcRetryTimes: isSet(object.rpcRetryTimes) ? globalThis.Number(object.rpcRetryTimes) : 0,
     };
   },
 
@@ -1350,6 +1368,9 @@ export const ExecutionConfig = {
     if (message.skipStartBlockValidation !== false) {
       obj.skipStartBlockValidation = message.skipStartBlockValidation;
     }
+    if (message.rpcRetryTimes !== 0) {
+      obj.rpcRetryTimes = Math.round(message.rpcRetryTimes);
+    }
     return obj;
   },
 
@@ -1362,6 +1383,7 @@ export const ExecutionConfig = {
     message.forceExactBlockTime = object.forceExactBlockTime ?? false;
     message.processBindingTimeout = object.processBindingTimeout ?? 0;
     message.skipStartBlockValidation = object.skipStartBlockValidation ?? false;
+    message.rpcRetryTimes = object.rpcRetryTimes ?? 0;
     return message;
   },
 };

@@ -5,6 +5,7 @@ import { Endpoints } from './endpoints.js'
 import { EthChainId } from '@sentio/chain'
 import { LRUCache } from 'lru-cache'
 import { providerMetrics } from './metrics.js'
+import { GLOBAL_CONFIG } from 'global-config.js'
 const { miss_count, hit_count, total_duration, total_queued, queue_size } = providerMetrics
 
 export const DummyProvider = new JsonRpcProvider('', Network.from(1))
@@ -104,6 +105,9 @@ export class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
     // return 1024
     // }
   })
+  #retryCache = new LRUCache<string, number>({
+    max: 300000 // 300k items
+  })
 
   constructor(url: string, network: Network, concurrency: number, batchCount = 1) {
     // TODO re-enable match when possible
@@ -120,6 +124,9 @@ export class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
     let perform = this.#performCache.get(tag)
     if (!perform) {
       miss_count.add(1)
+      if (GLOBAL_CONFIG.execution.rpcRetryTimes && this.#retryCache.get(tag) === undefined) {
+        this.#retryCache.set(tag, GLOBAL_CONFIG.execution.rpcRetryTimes)
+      }
       const queued: number = Date.now()
       perform = this.executor.add(() => {
         const started = Date.now()
@@ -128,14 +135,6 @@ export class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
         return super.send(method, params).finally(() => {
           total_duration.add(Date.now() - started)
         })
-      })
-      perform.catch((e) => {
-        // if (e.code !== 'CALL_EXCEPTION' && e.code !== 'BAD_DATA') {
-        setTimeout(() => {
-          if (this.#performCache.get(tag) === perform) {
-            this.#performCache.delete(tag)
-          }
-        }, 1000)
       })
 
       queue_size.record(this.executor.size)
@@ -153,7 +152,20 @@ export class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
       hit_count.add(1)
     }
 
-    const result = await perform
+    let result
+    try {
+      result = await perform
+    } catch (e) {
+      // if (e.code !== 'CALL_EXCEPTION' && e.code !== 'BAD_DATA') {
+      if (this.#performCache.get(tag) === perform) {
+        this.#performCache.delete(tag)
+      }
+      const retryCount = this.#retryCache.get(tag)
+      if (e.code === 'TIMEOUT' && retryCount) {
+        this.#retryCache.set(tag, retryCount - 1)
+        return this.send(method, params)
+      }
+    }
     if (!result) {
       throw Error('Unexpected null response')
     }

@@ -41,6 +41,7 @@ message ExecutionConfig {
   // but in case that nodes are pruned so it can't be correctly located, this flag will force the processor to start
   // from user specified block
   bool skipStartBlockValidation = 4;
+  int32 rpcRetryTimes = 5;
 }
 
 message ProcessConfigRequest {
