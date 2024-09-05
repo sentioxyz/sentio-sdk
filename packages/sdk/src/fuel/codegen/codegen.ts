@@ -115,7 +115,7 @@ async function codegenInternal(abisDir: string, outDir: string): Promise<number>
 /* tslint:disable */
 /* eslint-disable */
     
-import { FuelAbstractProcessor, FuelContext, FuelProcessorConfig, TypedCall, FuelFetchConfig, FuelCall, FuelLog} from '@sentio/sdk/fuel'
+import { FuelAbstractProcessor, FuelContractContext, FuelProcessorConfig, TypedCall, FuelFetchConfig, FuelCall, FuelLog} from '@sentio/sdk/fuel'
 import {${abi.commonTypesInUse.join(',')}} from './common.js'
 import {${importedTypes.join(',')}, ${abi.capitalizedName}} from './${abi.capitalizedName}.js'
 
@@ -144,13 +144,9 @@ ${
 }
 }
 
-export class ${name}Processor extends FuelAbstractProcessor {
-  constructor(config?: FuelProcessorConfig) {
-    super(${abi.capitalizedName}.abi, config)
-  }
-  
-  static bind(config: FuelProcessorConfig) {
-    return new ${name}Processor({
+export class ${name}Processor extends FuelAbstractProcessor<${name}> {
+  static bind(config: Omit<FuelProcessorConfig, 'abi'>) {
+    return new ${name}Processor(${abi.capitalizedName}.abi, {
       name: '${name}',
       ...config,
     })
@@ -162,7 +158,9 @@ ${
        abi.functions.map((f) => genOnCallFunction(name, f)).join('\n') */
 }   
 
-${Object.entries(logByTypes).map(genOnLogFunction).join('\n')}
+${Object.entries(logByTypes)
+  .map((e) => genOnLogFunction(name, e))
+  .join('\n')}
 
 }
 `
@@ -200,7 +198,7 @@ function genCallType(f: IFunction) {
 function genOnCallFunction(contractName: string, f: IFunction) {
   const name = upperFirst(f.name)
   return `
-  onCall${name}(handler: (call: ${contractName}.${name}Call, ctx: FuelContext) => void | Promise<void>, config?: FuelFetchConfig) {
+  onCall${name}(handler: (call: ${contractName}.${name}Call, ctx: FuelContractContext<${contractName}>) => void | Promise<void>, config?: FuelFetchConfig) {
     return super.onCall('${f.name}', (call, ctx) => handler(new ${contractName}.${name}Call(call), ctx), config)
   }`
 }
@@ -217,10 +215,10 @@ function collectImportedTypes(types: any[]): string[] {
   return Array.from(ret)
 }
 
-function genOnLogFunction([type, ids]: [string, string[]]) {
+function genOnLogFunction(contractName: string, [type, ids]: [string, string[]]) {
   const name = getTypeName(type)
   return `
-  onLog${name}(handler: (log: FuelLog<${type}>, ctx: FuelContext) => void | Promise<void>, logIdFilter?: string | string[]) {
+  onLog${name}(handler: (log: FuelLog<${type}>, ctx: FuelContractContext<${contractName}>) => void | Promise<void>, logIdFilter?: string | string[]) {
     return super.onLog<${type}>(logIdFilter ?? [${ids.map((id) => `"${id}"`).join(', ')}], (log, ctx) => handler(log, ctx))
   }`
 }

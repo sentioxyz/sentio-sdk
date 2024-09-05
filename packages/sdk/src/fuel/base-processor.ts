@@ -1,19 +1,21 @@
 import { FuelProcessor, FuelProcessorConfig } from './fuel-processor.js'
-import { JsonAbi } from 'fuels'
+import { Contract, JsonAbi } from 'fuels'
 // import { FuelCall } from './context.js'
 import { FuelChainId } from '@sentio/chain'
 import { FuelLog, FuelProcessorState } from './types.js'
 
-export abstract class FuelAbstractProcessor extends FuelProcessor {
-  protected constructor(abi: JsonAbi, config?: FuelProcessorConfig) {
+export abstract class FuelAbstractProcessor<TContract extends Contract> extends FuelProcessor<TContract> {
+  protected constructor(abi: JsonAbi, config?: Omit<FuelProcessorConfig, 'abi'>) {
     if (!config) {
       config = {
         chainId: FuelChainId.FUEL_MAINNET,
         address: '*'
       }
     }
-    config.abi = abi
-    super(config)
+    super({
+      ...config,
+      abi
+    })
     FuelProcessorState.INSTANCE.addValue(this)
   }
 }

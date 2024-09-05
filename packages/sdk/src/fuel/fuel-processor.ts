@@ -1,5 +1,5 @@
 import { Data_FuelCall, FuelCallFilter, ProcessResult } from '@sentio/protos'
-import { FuelCall, FuelContext } from './context.js'
+import { FuelCall, FuelContext, FuelContractContext } from './context.js'
 import { bn, Contract, Interface, JsonAbi, Provider } from 'fuels'
 import { FuelNetwork, getRpcEndpoint } from './network.js'
 import {
@@ -11,12 +11,13 @@ import {
 import { CallHandler, FuelBaseProcessor, FuelLog, FuelProcessorState } from './types.js'
 import { mergeProcessResults } from '@sentio/runtime'
 
-export class FuelProcessor implements FuelBaseProcessor<FuelProcessorConfig> {
+export class FuelProcessor<TContract extends Contract> implements FuelBaseProcessor<FuelProcessorConfig> {
   callHandlers: CallHandler<Data_FuelCall>[] = []
 
   private provider: Provider
+  private contract: TContract
 
-  static bind(config: FuelProcessorConfig): FuelProcessor {
+  static bind(config: FuelProcessorConfig): FuelProcessor<any> {
     const processor = new FuelProcessor(config)
     FuelProcessorState.INSTANCE.addValue(processor)
     return processor
@@ -37,10 +38,12 @@ export class FuelProcessor implements FuelBaseProcessor<FuelProcessorConfig> {
       this.latestGasPrice = latestGasPrice?.gasPrice
       return bn(latestGasPrice.gasPrice)
     }
+
+    this.contract = new Contract(this.config.address, this.config.abi!, this.provider) as TContract
   }
 
   public onTransaction(
-    handler: (transaction: FuelTransaction, ctx: FuelContext) => void | Promise<void>,
+    handler: (transaction: FuelTransaction, ctx: FuelContractContext<TContract>) => void | Promise<void>,
     config: FuelFetchConfig = DEFAULT_FUEL_FETCH_CONFIG
   ) {
     const callHandler = {
@@ -52,8 +55,9 @@ export class FuelProcessor implements FuelBaseProcessor<FuelProcessorConfig> {
           : {}
         const tx = await decodeFuelTransactionWithAbi(call.transaction, abiMap, this.provider)
 
-        const ctx = new FuelContext(
+        const ctx = new FuelContractContext(
           this.config.chainId,
+          this.contract,
           this.config.address,
           this.config.name ?? this.config.address,
           tx
@@ -101,7 +105,7 @@ export class FuelProcessor implements FuelBaseProcessor<FuelProcessorConfig> {
     const callHandler = {
       handler: async (call: Data_FuelCall) => {
         try {
-          const contract = new Contract(this.config.address, abi, this.provider)
+          // const contract = new Contract(this.config.address, abi, this.provider)
           const gqlTransaction = call.transaction
           const tx = await decodeFuelTransactionWithAbi(gqlTransaction, { [this.config.address]: abi }, this.provider)
 
@@ -114,7 +118,7 @@ export class FuelProcessor implements FuelBaseProcessor<FuelProcessorConfig> {
           for (const op of tx.operations) {
             for (const call of op.calls || []) {
               if (names.has(call.functionName)) {
-                const fn = contract.functions[call.functionName]
+                const fn = this.contract.functions[call.functionName]
                 const args = Object.values(call.argumentsProvided || {})
                 const scope = fn(...args)
                 const invocationResult = new FuelCall(scope, tx, false, call.argumentsProvided, tx.logs)
@@ -147,7 +151,7 @@ export class FuelProcessor implements FuelBaseProcessor<FuelProcessorConfig> {
 
   public onLog<T>(
     logIdFilter: string | string[],
-    handler: (logs: FuelLog<T>, ctx: FuelContext) => void | Promise<void>
+    handler: (logs: FuelLog<T>, ctx: FuelContractContext<TContract>) => void | Promise<void>
   ) {
     const logIds = new Set(Array.isArray(logIdFilter) ? logIdFilter : [logIdFilter])
 
@@ -164,8 +168,9 @@ export class FuelProcessor implements FuelBaseProcessor<FuelProcessorConfig> {
           const results: ProcessResult[] = []
           const logs = (tx.logs || []).filter((log) => logIds.has(log.logId))
           for (const log of logs) {
-            const ctx = new FuelContext(
+            const ctx = new FuelContractContext(
               this.config.chainId,
+              this.contract,
               this.config.address,
               this.config.name ?? this.config.address,
               tx
@@ -203,5 +208,5 @@ export type FuelProcessorConfig = {
   chainId: FuelNetwork
   startBlock?: bigint
   endBlock?: bigint
-  abi?: JsonAbi
+  abi: JsonAbi
 }

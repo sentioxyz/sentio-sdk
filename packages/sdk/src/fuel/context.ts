@@ -1,7 +1,7 @@
 import { BaseContext, Labels, normalizeLabels } from '../core/index.js'
 import { ChainId } from '@sentio/chain'
 import { RecordMetaData } from '@sentio/protos'
-import type { CallResult } from 'fuels'
+import type { CallResult, Contract } from 'fuels'
 import { InvocationScopeLike } from 'fuels'
 import { FuelTransaction } from './transaction.js'
 import { FuelLog } from './types.js'
@@ -49,5 +49,17 @@ export class FuelContext extends BaseContext {
       logIndex: this.logIndex,
       labels: normalizeLabels(labels)
     }
+  }
+}
+
+export class FuelContractContext<TContract extends Contract> extends FuelContext {
+  constructor(
+    readonly chainId: ChainId,
+    readonly contract: TContract,
+    readonly contractAddress: string,
+    readonly contractName: string,
+    readonly transaction: FuelTransaction | null
+  ) {
+    super(chainId, contractAddress, contractName, transaction)
   }
 }

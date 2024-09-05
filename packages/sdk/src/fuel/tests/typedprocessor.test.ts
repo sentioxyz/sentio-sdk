@@ -1,7 +1,6 @@
 import { before, after, describe, test } from 'node:test'
 import { TestProcessorServer } from '../../testing/index.js'
 import { FuelChainId } from '@sentio/chain'
-import abi from './abis/counter-contract-abi.json'
 import { expect } from 'chai'
 import testData from './test-data.json'
 import { State } from '@sentio/runtime'
@@ -13,8 +12,7 @@ describe('typed fuel processor tests', () => {
   const service = new TestProcessorServer(async () => {
     CounterContractProcessor.bind({
       address: ADDRESS,
-      chainId: FuelChainId.FUEL_TESTNET,
-      abi
+      chainId: FuelChainId.FUEL_TESTNET
     })
       /*.onCallComplex(async (call, ctx) => {
         ctx.eventLogger.emit('call complex', {
