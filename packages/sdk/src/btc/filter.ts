@@ -65,11 +65,22 @@ export type TransactionFilters = TransactionFilter | TransactionFilter[]
 
 function toVinFilter(inputFilter?: VinFilter | VinFilter[]): BTCTransactionFilter_VinFilter | undefined {
   if (inputFilter) {
-    const filters = Array.isArray(inputFilter) ? inputFilter : [inputFilter]
+    const filters = []
+    const vouts = []
+    const txs: TransactionFilters = []
 
-    const protoFilters = convertFilters(filters as Filter<VinFields>[])
-    const preVOutFilters = filters.map((f) => f.preVOut)
-    const preTxFilters = filters.map((f) => f.preTransaction) as TransactionFilters
+    for (const f of Array.isArray(inputFilter) ? inputFilter : [inputFilter]) {
+      const { preVOut, preTransaction, ...rest } = f
+      filters.push(rest)
+      if (preVOut) {
+        vouts.push(preVOut)
+      }
+      if (preTransaction) {
+        txs.push(preTransaction)
+      }
+    }
+
+    const protoFilters = convertFilters(filters)
 
     return {
       filters: protoFilters
@@ -77,8 +88,8 @@ function toVinFilter(inputFilter?: VinFilter | VinFilter[]): BTCTransactionFilte
             filters: protoFilters
           }
         : undefined,
-      preVOut: convertFilters(preVOutFilters as Filter<VOutFields>[])?.[0],
-      preTransaction: filters2Proto(preTxFilters)?.[0]
+      preVOut: vouts?.length > 0 ? convertFilters(vouts as Filter<VOutFields>[])?.[0] : undefined,
+      preTransaction: txs.length > 0 ? filters2Proto(txs)?.[0] : undefined
     }
   }
 
@@ -86,8 +97,11 @@ function toVinFilter(inputFilter?: VinFilter | VinFilter[]): BTCTransactionFilte
 }
 
 function toVOutFilter(outputFilter?: VOutFilter | VOutFilter[]) {
-  const filters = Array.isArray(outputFilter) ? outputFilter : ([outputFilter] as Filter<VOutFields>[])
-  return convertFilters(filters)?.[0]
+  if (outputFilter) {
+    const filters = Array.isArray(outputFilter) ? outputFilter : ([outputFilter] as Filter<VOutFields>[])
+    return convertFilters(filters)?.[0]
+  }
+  return undefined
 }
 
 export function filters2Proto(filter: TransactionFilters): BTCTransactionFilter[] {

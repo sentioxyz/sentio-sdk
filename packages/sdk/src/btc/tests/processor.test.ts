@@ -22,10 +22,17 @@ describe('btc processor tests', () => {
         })
       },
       {
-        filter: [{ block_number: { gte: 850000 } }],
-        outputFilter: {
-          vout_index: 1,
-          script_asm: { prefix: 'OP_RETURN 62626e31' }
+        filter: [{ block_number: { gte: 857589 } }],
+        inputFilter: {
+          preTransaction: {
+            // the outbonding transaction's input should be the staking transaction
+            outputFilter: {
+              script_asm: {
+                prefix: 'OP_RETURN 62626e31',
+                length: 152
+              }
+            }
+          }
         }
       }
     )

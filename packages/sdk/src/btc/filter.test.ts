@@ -1,4 +1,6 @@
-import { TransactionFilter } from './filter.js'
+import { filters2Proto, TransactionFilter } from './filter.js'
+import { describe, test } from 'node:test'
+import { expect } from 'chai'
 
 const stakingFilter: TransactionFilter = {
   filter: [{ block_number: { gte: 850000 } }],
@@ -19,3 +21,15 @@ const outboundFilter: TransactionFilter = {
     }
   }
 }
+
+describe('Convert filter to proto', () => {
+  test('staking filter', async () => {
+    const proto = filters2Proto(stakingFilter)
+    expect(proto).length(1)
+  })
+
+  test('outbound filter', async () => {
+    const proto = filters2Proto(outboundFilter)
+    expect(proto).length(1)
+  })
+})
