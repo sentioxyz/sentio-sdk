@@ -406,26 +406,44 @@ message BTCTransactionHandlerConfig {
 }
 
 message BTCTransactionFilter {
-  oneof filter {
-    string address = 1;
-    FieldFilters field_filters = 2;
+  VinFilter inputFilter = 1;
+  VOutFilter outputFilter = 2;
+  repeated Filter filter = 3;
+
+  message Condition {
+    optional common.RichValue eq = 1;
+    optional common.RichValue gt = 2;
+    optional common.RichValue gte = 3;
+    optional common.RichValue lt = 4;
+    optional common.RichValue lte = 5;
+    optional common.RichValue ne = 6;
+    optional string prefix = 7;
+    optional string contains = 8;
+    optional string not_contains = 9;
+    optional int32 length_eq = 10;
+    optional int32 length_gt = 11;
+    optional int32 length_lt = 12;
+    optional common.RichValueList has_any = 13;
+    optional common.RichValueList has_all = 14;
+    optional common.RichValueList in = 15;
   }
-  message FieldFilters {
-    repeated FieldFilter filters = 1;
+
+  message Filter {
+    map<string, Condition> conditions = 1;
   }
-  message FieldFilter {
-    string field = 1;
-    oneof condition {
-      common.RichValue prefix = 2;
-      common.RichValue contains = 3;
-      common.RichValue not_contains = 4;
-      common.RichValue eq = 5;
-      common.RichValue gt = 6;
-      common.RichValue gte = 7;
-      common.RichValue lt = 8;
-      common.RichValue lte = 9;
-      common.RichValue ne = 10;
-    }
+
+  message Filters {
+    repeated Filter filters = 1;
+  }
+
+  message VinFilter {
+    Filters filters = 1;
+    Filter preVOut = 2;
+    BTCTransactionFilter preTransaction = 3;
+  }
+
+  message VOutFilter {
+    Filters filters = 1;
   }
 }
 

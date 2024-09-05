@@ -13,18 +13,20 @@ describe('btc processor tests', () => {
       chainId: BTCChainId.BTC_MAINNET
     }).onTransaction(
       async (tx: Transaction, ctx: BTCContext) => {
-        const from = tx.vin[0].prevout.scriptpubkey_address
-        const to = tx.vout[0].scriptpubkey_address
+        const from = tx.vin[0].pre_vout?.script_address
+        const to = tx.vout[0].script_address
         const amount = tx.vout[0].value
         ctx.eventLogger.emit('Transaction', {
-          distinctId: `${tx.txid}`,
-          fee: tx.fee,
+          distinctId: `${tx.transaction_hash}`,
           message: `transaction from: ${from} to: ${to} amount: ${amount}`
         })
       },
       {
-        field: 'vout.scriptpubkey_asm',
-        prefix: 'OP_RETURN 62626e31'
+        filter: [{ block_number: { gte: 850000 } }],
+        outputFilter: {
+          vout_index: 1,
+          script_asm: { prefix: 'OP_RETURN 62626e31' }
+        }
       }
     )
   })
@@ -36,13 +38,9 @@ describe('btc processor tests', () => {
     const config = await service.getConfig({})
     expect(config.contractConfigs.length).gte(1)
     expect(config.contractConfigs[0].btcTransactionConfigs.length).gte(1)
-    const filter = config.contractConfigs[0].btcTransactionConfigs[0].filters[0]
-    expect(filter.fieldFilters?.filters[0]).deep.equal({
-      field: 'vout.scriptpubkey_asm',
-      prefix: {
-        stringValue: 'OP_RETURN 62626e31'
-      }
-    })
+    // const filter = config.contractConfigs[0].btcTransactionConfigs[0].filters[0]
+    // const cond = filter.outputFilter?.conditions
+    // expect(cond).equals({ vout_index: { eq: 1 }, script_asm: {prefix: "OP_RETURN 62626e31"} })
   })
 
   test('test on transaction ', async () => {

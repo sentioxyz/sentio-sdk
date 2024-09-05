@@ -1,6 +1,7 @@
 import { ListStateStorage } from '@sentio/runtime'
-import { BTCContext, Transaction, TransactionFilters } from './types.js'
+import { BTCContext, Transaction } from './types.js'
 import { Data_BTCTransaction, ProcessResult } from '@sentio/protos'
+import { TransactionFilters } from './filter.js'
 
 export class BTCProcessorState extends ListStateStorage<BTCProcessor> {
   static INSTANCE = new BTCProcessorState()
@@ -29,7 +30,7 @@ export class BTCProcessor {
           this.config.chainId,
           this.config.name ?? this.config.address ?? '',
           tx,
-          this.config.address ?? tx.vout[0].scriptpubkey_address
+          this.config.address ?? tx.vout[0].script_address
         )
         await handler(tx, ctx)
         return ctx.stopAndGetResult()

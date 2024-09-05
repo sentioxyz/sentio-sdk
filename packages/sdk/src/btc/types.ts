@@ -1,67 +1,63 @@
 import { BaseContext, Labels, normalizeLabels } from '../core/index.js'
 import { RecordMetaData } from '@sentio/protos'
 import { ChainId } from '@sentio/chain'
-import { BigDecimal } from '@sentio/bigdecimal'
 
-type Vin = {
-  txid: string
-  vout: number
-  is_coinbase: boolean
-  scriptsig: string
-  scriptsig_asm: string
-  inner_redeemscript_asm?: string
-  inner_witnessscript_asm?: string
+export type Vin = {
+  vin_index: number
+  coinbase?: string
+  spent_transaction_hash?: string
+  spent_output_index?: number
   sequence: number
-  witness: string[]
-  prevout: Vout
-  is_pegin?: boolean
-  issuance?: {
-    asset_id: string
-    is_reissuance: boolean
-    asset_blinding_nonce: string
-    asset_entropy: string
-    contract_hash: string
-    assetamount?: number
-    assetamountcommitment?: string
-    tokenamount?: number
-    tokenamountcommitment?: string
-  }
-}
-
-type Vout = {
-  scriptpubkey: string
-  scriptpubkey_asm: string
-  scriptpubkey_type: string
-  scriptpubkey_address: string
+  witness?: string[]
+  script_asm: string
+  script_hex: string
   value: number
-  valuecommitment?: string
-  asset?: string
-  assetcommitment?: string
-  pegout?: {
-    genesis_hash: string
-    scriptpubkey: string
-    scriptpubkey_asm: string
-    scriptpubkey_address: string
-  }
+  addresses?: string[]
+  pre_vout?: Vout
+  pre_transaction?: Transaction
 }
 
-type Status = {
-  confirmed: boolean
-  block_height?: number
-  block_hash?: string
-  block_time?: number
+export type Vout = {
+  value: number
+  vout_index: number
+  script_asm: string
+  script_hex: string
+  script_type: string
+  script_address: string
+  script_reg_sigs: number
 }
 
 export type Transaction = {
-  txid: string
-  version: number
-  locktime: number
+  transaction_hash: string
+  transaction_index: number
+  block_hash: string
+  block_number: number
+  block_timestamp: Date
   size: number
-  weight: number
-  fee: number
+  virtual_size: number
+  version: number
+  lock_time: number
+  input_count: number
+  output_count: number
   vin: Vin[]
   vout: Vout[]
-  status: Status
+}
+
+export type Block = {
+  block_hash: string
+  block_number: number
+  block_timestamp: Date
+  size: number
+  stripped_size: number
+  weight: number
+  version: number
+  merkle_root: string
+  nonce: number
+  bits: string
+  difficulty: number
+  previous_hash: string
+  next_hash: string
+  transaction_count: number
 }
 
 export class BTCContext extends BaseContext {
@@ -78,9 +74,9 @@ export class BTCContext extends BaseContext {
     return {
       address: this.address,
       contractName: this.name,
-      blockNumber: BigInt(this.tx.status?.block_time ?? 0),
+      blockNumber: BigInt(this.tx.block_number ?? 0),
       transactionIndex: 0,
-      transactionHash: this.tx.txid,
+      transactionHash: this.tx.transaction_hash,
       chainId: this.getChainId(),
       name: name,
       logIndex: 0,
@@ -92,33 +88,3 @@ export class BTCContext extends BaseContext {
     return this.chainId as ChainId
   }
 }
-
-export type TransactionFilter = {
-  field:
-    | 'vin.txid'
-    | 'vin.vout'
-    | 'vin.is_coinbase'
-    | 'vin.scriptsig'
-    | 'vin.scriptsig_asm'
-    | 'vout.scriptpubkey'
-    | 'vout.scriptpubkey_asm'
-    | 'vout.scriptpubkey_type'
-    | 'vout.scriptpubkey_address'
-    | 'vout.value'
-    | 'status.block_height'
-    | 'status.block_hash'
-    | 'status.block_time'
-  prefix?: string
-  equals?: Comparable
-  gt?: Comparable
-  gte?: Comparable
-  lt?: Comparable
-  lte?: Comparable
-  ne?: Comparable
-  contains?: string
-  not_contains?: string
-}
-
-type Comparable = number | BigDecimal | bigint | Date
-
-export type TransactionFilters = TransactionFilter | TransactionFilter[]
