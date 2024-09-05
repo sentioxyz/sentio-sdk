@@ -15,7 +15,7 @@ BTCProcessor.bind({
       amount = o.value
       to = address
       for (const input of tx.vin) {
-        let inputAddress = input.pre_vout?.script_address
+        const inputAddress = input.pre_vout?.script_address
         if (inputAddress && inputAddress != address) {
           from = inputAddress
         }
