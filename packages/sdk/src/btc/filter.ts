@@ -2,7 +2,9 @@ import {
   BTCTransactionFilter,
   BTCTransactionFilter_Condition,
   BTCTransactionFilter_Filter,
-  BTCTransactionFilter_VinFilter
+  BTCTransactionFilter_Filters,
+  BTCTransactionFilter_VinFilter,
+  BTCTransactionFilter_VOutFilter
 } from '@sentio/protos'
 import { serializeRichValue } from '../store/util.js'
 import { BigDecimal } from '@sentio/bigdecimal'
@@ -65,8 +67,9 @@ export type TransactionFilters = TransactionFilter | TransactionFilter[]
 
 function toVinFilter(inputFilter?: VinFilter | VinFilter[]): BTCTransactionFilter_VinFilter | undefined {
   if (inputFilter) {
+    const ret = BTCTransactionFilter_VinFilter.create()
     const filters = []
-    const vouts = []
+    const vouts: Filter<VOutFields>[] = []
     const txs: TransactionFilters = []
 
     for (const f of Array.isArray(inputFilter) ? inputFilter : [inputFilter]) {
@@ -79,27 +82,35 @@ function toVinFilter(inputFilter?: VinFilter | VinFilter[]): BTCTransactionFilte
         txs.push(preTransaction)
       }
     }
+    ret.filters = BTCTransactionFilter_Filters.create({
+      filters: convertFilters(filters)
+    })
 
-    const protoFilters = convertFilters(filters)
-
-    return {
-      filters: protoFilters
-        ? {
-            filters: protoFilters
-          }
-        : undefined,
-      preVOut: vouts?.length > 0 ? convertFilters(vouts as Filter<VOutFields>[])?.[0] : undefined,
-      preTransaction: txs.length > 0 ? filters2Proto(txs)?.[0] : undefined
+    if (vouts.length > 0) {
+      const voutFilters = convertFilters(vouts)
+      if (voutFilters && voutFilters.length > 0) {
+        ret.preVOut = voutFilters[0]
+      }
     }
+    if (txs.length > 0) {
+      ret.preTransaction = filters2Proto(txs)?.[0]
+    }
+
+    return ret
   }
 
   return undefined
 }
 
-function toVOutFilter(outputFilter?: VOutFilter | VOutFilter[]) {
+function toVOutFilter(outputFilter?: VOutFilter | VOutFilter[]): BTCTransactionFilter_VOutFilter | undefined {
   if (outputFilter) {
+    const ret = BTCTransactionFilter_VOutFilter.create()
     const filters = Array.isArray(outputFilter) ? outputFilter : ([outputFilter] as Filter<VOutFields>[])
-    return convertFilters(filters)?.[0]
+    ret.filters = BTCTransactionFilter_Filters.create({
+      filters: convertFilters(filters)
+    })
+
+    return ret
   }
   return undefined
 }
@@ -116,7 +127,7 @@ export function filters2Proto(filter: TransactionFilters): BTCTransactionFilter[
 }
 
 function toCondition(value: Condition | Comparable): BTCTransactionFilter_Condition {
-  const ret: BTCTransactionFilter_Condition = {}
+  const ret: BTCTransactionFilter_Condition = BTCTransactionFilter_Condition.create()
   if (value instanceof Date) {
     ret.eq = serializeRichValue(value)
   }
@@ -178,9 +189,7 @@ function convertFilters<T extends string>(filters?: Array<Filter<T>>): BTCTransa
   if (filters && filters.length > 0) {
     const ret: BTCTransactionFilter_Filter[] = []
     for (const filter of filters) {
-      const f: BTCTransactionFilter_Filter = {
-        conditions: {}
-      }
+      const f: BTCTransactionFilter_Filter = BTCTransactionFilter_Filter.create()
       for (const [key, value] of Object.entries(filter)) {
         f.conditions[key] = toCondition(value as any)
       }
@@ -188,5 +197,5 @@ function convertFilters<T extends string>(filters?: Array<Filter<T>>): BTCTransa
     }
     return ret
   }
-  return undefined
+  return []
 }
