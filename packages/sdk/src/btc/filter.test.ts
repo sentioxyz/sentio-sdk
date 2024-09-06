@@ -4,19 +4,19 @@ import { expect } from 'chai'
 import { BTCTransactionFilter } from '@sentio/protos'
 
 const stakingFilter: TransactionFilter = {
-  filter: [{ block_number: { gte: 850000 } }],
+  filter: [{ blockheight: { gte: 850000 } }],
   outputFilter: {
-    vout_index: 1,
+    n: 1,
     script_asm: { prefix: 'OP_RETURN 62626e31' }
   }
 }
 
 const outboundFilter: TransactionFilter = {
-  filter: [{ block_number: { gte: 850000 } }],
+  filter: [{ blockheight: { gte: 850000 } }],
   inputFilter: {
     preTransaction: {
       outputFilter: {
-        vout_index: { eq: 1 },
+        n: { eq: 1 },
         script_asm: { prefix: 'OP_RETURN 62626e31' }
       }
     }

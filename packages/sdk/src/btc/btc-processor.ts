@@ -30,7 +30,7 @@ export class BTCProcessor {
           this.config.chainId,
           this.config.name ?? this.config.address ?? '',
           tx,
-          this.config.address ?? tx.vout[0].script_address
+          this.config.address ?? tx.vout?.[0]?.scriptPubKey?.address
         )
         await handler(tx, ctx)
         return ctx.stopAndGetResult()

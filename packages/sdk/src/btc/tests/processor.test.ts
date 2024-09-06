@@ -13,16 +13,16 @@ describe('btc processor tests', () => {
       chainId: BTCChainId.BTC_MAINNET
     }).onTransaction(
       async (tx: Transaction, ctx: BTCContext) => {
-        const from = tx.vin[0].pre_vout?.script_address
-        const to = tx.vout[0].script_address
+        const from = tx.vin[0].pre_vout?.scriptPubKey?.address
+        const to = tx.vout[0].scriptPubKey?.address
         const amount = tx.vout[0].value
         ctx.eventLogger.emit('Transaction', {
-          distinctId: `${tx.transaction_hash}`,
+          distinctId: `${tx.txid}`,
           message: `transaction from: ${from} to: ${to} amount: ${amount}`
         })
       },
       {
-        filter: [{ block_number: { gte: 857589 } }],
+        filter: [{ blockheight: { gte: 857589 } }],
         inputFilter: {
           preTransaction: {
             // the outbonding transaction's input should be the staking transaction

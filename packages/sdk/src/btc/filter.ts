@@ -12,9 +12,14 @@ import { Transaction, Vin, Vout } from './types.js'
 
 export type TransactionFields = keyof Omit<Transaction, 'vin' | 'vout'>
 
-export type VinFields = keyof Omit<Vin, 'pre_vout' | 'pre_transaction'>
+export type VinFields = keyof Omit<Vin, 'pre_vout' | 'pre_transaction' | 'scriptSig'> | 'script_asm' | 'script_hex'
 
-export type VOutFields = keyof Vout
+export type VOutFields =
+  | keyof Omit<Vout, 'scriptPubKey'>
+  | 'script_asm'
+  | 'script_hex'
+  | 'script_type'
+  | 'script_address'
 
 export type Filter<F extends string> = {
   [K in F]?: Condition | Comparable

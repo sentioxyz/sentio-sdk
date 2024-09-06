@@ -11,16 +11,16 @@ BTCProcessor.bind({
   let from = ''
   let to = ''
   for (const o of tx.vout) {
-    if (o.script_address == address) {
+    if (o.scriptPubKey?.address == address) {
       amount = o.value
       to = address
       for (const input of tx.vin) {
-        const inputAddress = input.pre_vout?.script_address
+        const inputAddress = input.pre_vout?.scriptPubKey?.address
         if (inputAddress && inputAddress != address) {
           from = inputAddress
         }
         ctx.eventLogger.emit('transfer', {
-          distinctId: tx.transaction_hash,
+          distinctId: tx.txid,
           message: `transfer ${amount} from ${from} to ${to}`,
           from,
           to,

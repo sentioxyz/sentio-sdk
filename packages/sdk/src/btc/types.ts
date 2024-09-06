@@ -2,45 +2,46 @@ import { BaseContext, Labels, normalizeLabels } from '../core/index.js'
 import { RecordMetaData } from '@sentio/protos'
 import { ChainId } from '@sentio/chain'
 
+export type Transaction = {
+  txid: string
+  hash: string
+  txindex: number
+  blockhash: string
+  blockheight: number
+  blocktime: number
+  size: number
+  vsize: number
+  version: number
+  locktime: number
+  vin: Vin[]
+  vout: Vout[]
+}
+
 export type Vin = {
   vin_index: number
   coinbase?: string
-  spent_transaction_hash?: string
-  spent_output_index?: number
+  txid?: string
+  vout?: number
   sequence: number
   witness?: string[]
-  script_asm: string
-  script_hex: string
-  value: number
-  addresses?: string[]
+  scriptSig: {
+    asm: string
+    hex: string
+  }
   pre_vout?: Vout
   pre_transaction?: Transaction
 }
 
 export type Vout = {
   value: number
-  vout_index: number
-  script_asm: string
-  script_hex: string
-  script_type: string
-  script_address: string
-  script_reg_sigs: number
-}
-
-export type Transaction = {
-  transaction_hash: string
-  transaction_index: number
-  block_hash: string
-  block_number: number
-  block_timestamp: Date
-  size: number
-  virtual_size: number
-  version: number
-  lock_time: number
-  input_count: number
-  output_count: number
-  vin: Vin[]
-  vout: Vout[]
+  n: number
+  scriptPubKey: {
+    asm: string
+    hex: string
+    reqSigs: number
+    type: string
+    address: string
+  }
 }
 
 export type Block = {
@@ -74,9 +75,9 @@ export class BTCContext extends BaseContext {
     return {
       address: this.address,
       contractName: this.name,
-      blockNumber: BigInt(this.tx.block_number ?? 0),
+      blockNumber: BigInt(this.tx.blockheight ?? 0),
       transactionIndex: 0,
-      transactionHash: this.tx.transaction_hash,
+      transactionHash: this.tx.txid,
       chainId: this.getChainId(),
       name: name,
       logIndex: 0,
