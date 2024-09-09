@@ -168,6 +168,8 @@ export class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
           this.#retryCache.set(tag, retryCount - 1)
           return this.send(method, params)
         }
+      } else {
+        throw e
       }
     }
     if (!result) {
