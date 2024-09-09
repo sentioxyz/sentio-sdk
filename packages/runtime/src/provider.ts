@@ -97,8 +97,8 @@ function getTag(prefix: string, value: any): string {
 export class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
   executor: PQueue
   #performCache = new LRUCache<string, Promise<any>>({
-    max: 300000 // 300k items
-    // maxSize: 300 * 1024 * 1024, // 300mb for cache
+    max: 300000, // 300k items
+    maxSize: 500 * 1024 * 1024 // 500mb key size for cache
     // ttl: 1000 * 60 * 60, // 1 hour   no ttl for better performance
     // sizeCalculation: (value: any) => {
     // assume each item is 1kb for simplicity
@@ -139,7 +139,9 @@ export class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
 
       queue_size.record(this.executor.size)
 
-      this.#performCache.set(tag, perform)
+      this.#performCache.set(tag, perform, {
+        size: tag.length
+      })
       // For non latest block call, we cache permanently, otherwise we cache for one minute
       if (block === 'latest') {
         setTimeout(() => {
