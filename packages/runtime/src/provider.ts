@@ -124,9 +124,6 @@ export class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
     let perform = this.#performCache.get(tag)
     if (!perform) {
       miss_count.add(1)
-      if (GLOBAL_CONFIG.execution.rpcRetryTimes && this.#retryCache.get(tag) === undefined) {
-        this.#retryCache.set(tag, GLOBAL_CONFIG.execution.rpcRetryTimes)
-      }
       const queued: number = Date.now()
       perform = this.executor.add(() => {
         const started = Date.now()
@@ -162,10 +159,15 @@ export class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
       if (this.#performCache.get(tag) === perform) {
         this.#performCache.delete(tag)
       }
-      const retryCount = this.#retryCache.get(tag)
-      if (e.code === 'TIMEOUT' && retryCount) {
-        this.#retryCache.set(tag, retryCount - 1)
-        return this.send(method, params)
+      if (e.code === 'TIMEOUT') {
+        let retryCount = this.#retryCache.get(tag)
+        if (GLOBAL_CONFIG.execution.rpcRetryTimes && retryCount === undefined) {
+          retryCount = GLOBAL_CONFIG.execution.rpcRetryTimes
+        }
+        if (retryCount) {
+          this.#retryCache.set(tag, retryCount - 1)
+          return this.send(method, params)
+        }
       }
     }
     if (!result) {
