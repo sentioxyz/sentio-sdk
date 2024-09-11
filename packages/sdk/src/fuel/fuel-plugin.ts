@@ -99,7 +99,7 @@ export class FuelPlugin extends Plugin {
     this.handlers = handlers
   }
 
-  supportedHandlers = [HandlerType.FUEL_CALL]
+  supportedHandlers = [HandlerType.FUEL_CALL, HandlerType.FUEL_BLOCK]
 
   processBinding(request: DataBinding): Promise<ProcessResult> {
     switch (request.handlerType) {
