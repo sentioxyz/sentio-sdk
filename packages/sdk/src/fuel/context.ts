@@ -3,8 +3,7 @@ import { ChainId } from '@sentio/chain'
 import { RecordMetaData } from '@sentio/protos'
 import type { CallResult, Contract } from 'fuels'
 import { InvocationScopeLike } from 'fuels'
-import { FuelTransaction } from './transaction.js'
-import { FuelLog } from './types.js'
+import { FuelLog, FuelTransaction } from './types.js'
 
 export class FuelCall {
   constructor(

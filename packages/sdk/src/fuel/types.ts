@@ -8,6 +8,7 @@ import {
   OnIntervalConfig,
   ProcessResult
 } from '@sentio/protos'
+import { Block, TransactionSummary } from 'fuels'
 
 export interface FuelBaseProcessor<T> {
   configure(): Promise<void>
@@ -41,3 +42,11 @@ export interface FuelLog<T> {
   data: T
   receiptIndex: number
 }
+
+export type FuelTransaction = TransactionSummary & {
+  blockNumber?: string
+  logs?: FuelLog<any>[]
+  sender?: string
+}
+
+export type FuelBlock = Omit<Block, 'transactionIds'>

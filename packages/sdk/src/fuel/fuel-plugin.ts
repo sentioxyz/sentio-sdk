@@ -105,6 +105,8 @@ export class FuelPlugin extends Plugin {
     switch (request.handlerType) {
       case HandlerType.FUEL_CALL:
         return this.processTransaction(request)
+      case HandlerType.FUEL_BLOCK:
+        return this.processBlock(request)
       default:
         throw new ServerError(Status.INVALID_ARGUMENT, 'No handle type registered ' + request.handlerType)
     }
@@ -129,6 +131,29 @@ export class FuelPlugin extends Plugin {
         throw new ServerError(
           Status.INTERNAL,
           'error processing transaction: ' + JSON.stringify(fuelTransaction.transaction) + '\n' + errorString(e)
+        )
+      })
+      if (GLOBAL_CONFIG.execution.sequential) {
+        await promise
+      }
+      promises.push(promise)
+    }
+    return mergeProcessResults(await Promise.all(promises))
+  }
+
+  async processBlock(binding: DataBinding): Promise<ProcessResult> {
+    if (!binding.data?.fuelBlock?.block) {
+      throw new ServerError(Status.INVALID_ARGUMENT, "Block can't be empty")
+    }
+    const ethBlock = binding.data.fuelBlock
+
+    const promises: Promise<ProcessResult>[] = []
+    for (const handlerId of binding.handlerIds) {
+      const promise = this.handlers.blockHandlers[handlerId](ethBlock).catch((e) => {
+        console.error('error processing block: ', e)
+        throw new ServerError(
+          Status.INTERNAL,
+          'error processing block: ' + ethBlock.block?.height + '\n' + errorString(e)
         )
       })
       if (GLOBAL_CONFIG.execution.sequential) {

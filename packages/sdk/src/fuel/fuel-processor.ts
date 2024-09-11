@@ -1,14 +1,17 @@
 import { Data_FuelBlock, Data_FuelCall, FuelCallFilter, HandleInterval, ProcessResult } from '@sentio/protos'
 import { FuelCall, FuelContext, FuelContractContext } from './context.js'
-import { bn, Contract, Interface, JsonAbi, Provider, Block } from 'fuels'
+import { bn, Contract, Interface, JsonAbi, Provider } from 'fuels'
 import { FuelNetwork, getRpcEndpoint } from './network.js'
+import { decodeFuelTransactionWithAbi, DEFAULT_FUEL_FETCH_CONFIG, FuelFetchConfig } from './transaction.js'
 import {
-  decodeFuelTransactionWithAbi,
-  DEFAULT_FUEL_FETCH_CONFIG,
-  FuelFetchConfig,
+  BlockHandler,
+  CallHandler,
+  FuelBaseProcessor,
+  FuelBlock,
+  FuelLog,
+  FuelProcessorState,
   FuelTransaction
-} from './transaction.js'
-import { BlockHandler, CallHandler, FuelBaseProcessor, FuelLog, FuelProcessorState } from './types.js'
+} from './types.js'
 import { mergeProcessResults } from '@sentio/runtime'
 import { PromiseOrVoid } from '../core/index.js'
 import { ServerError, Status } from 'nice-grpc'
@@ -208,7 +211,7 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
   }
 
   public onInterval(
-    handler: (block: Block, ctx: FuelContractContext<TContract>) => PromiseOrVoid,
+    handler: (block: FuelBlock, ctx: FuelContractContext<TContract>) => PromiseOrVoid,
     timeInterval: HandleInterval | undefined,
     blockInterval: HandleInterval | undefined
     // fetchConfig: Partial<FuelFetchConfig> | undefined
@@ -225,10 +228,25 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
       blockInterval,
       timeIntervalInMinutes: timeInterval,
       handler: async function (data: Data_FuelBlock) {
-        const block = data.block as Block
-
-        if (!block) {
+        const header = data.block
+        if (!header) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'Block is empty')
+        }
+
+        const block: FuelBlock = {
+          id: header.id,
+          height: bn(header.height),
+          time: header.time,
+          header: {
+            applicationHash: header.applicationHash,
+            daHeight: bn(header.daHeight),
+            eventInboxRoot: header.eventInboxRoot,
+            messageOutboxRoot: header.messageOutboxRoot,
+            prevRoot: header.prevRoot,
+            stateTransitionBytecodeVersion: header.stateTransitionBytecodeVersion,
+            transactionsCount: header.transactionsCount,
+            transactionsRoot: header.transactionsRoot
+          }
         }
 
         const ctx = new FuelContractContext(
@@ -247,10 +265,10 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
   }
 
   public onBlockInterval(
-    handler: (block: Block, ctx: FuelContractContext<TContract>) => PromiseOrVoid,
+    handler: (block: FuelBlock, ctx: FuelContractContext<TContract>) => PromiseOrVoid,
     blockInterval = 250,
-    backfillBlockInterval = 1000,
-    fetchConfig?: Partial<FuelFetchConfig>
+    backfillBlockInterval = 1000
+    // fetchConfig?: Partial<FuelFetchConfig>
   ): this {
     return this.onInterval(
       handler,
@@ -264,7 +282,7 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
   }
 
   public onTimeInterval(
-    handler: (block: Block, ctx: FuelContractContext<TContract>) => PromiseOrVoid,
+    handler: (block: FuelBlock, ctx: FuelContractContext<TContract>) => PromiseOrVoid,
     timeIntervalInMinutes = 60,
     backfillTimeIntervalInMinutes = 240
     // fetchConfig?: Partial<FuelFetchConfig>,

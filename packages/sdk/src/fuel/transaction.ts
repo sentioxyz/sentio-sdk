@@ -11,10 +11,9 @@ import {
   Provider,
   ReceiptType,
   TransactionCoder,
-  TransactionResponse,
-  TransactionSummary
+  TransactionResponse
 } from 'fuels'
-import { FuelLog } from './types.js'
+import { FuelLog, FuelTransaction } from './types.js'
 
 export type FuelFetchConfig = {
   includeFailed?: boolean
@@ -22,12 +21,6 @@ export type FuelFetchConfig = {
 
 export const DEFAULT_FUEL_FETCH_CONFIG: FuelFetchConfig = {
   includeFailed: false
-}
-
-export type FuelTransaction = TransactionSummary & {
-  blockNumber?: string
-  logs?: FuelLog<any>[]
-  sender?: string
 }
 
 function findSenderFromInputs(inputs: Input[] | undefined, baseAssetId: string): string | undefined {

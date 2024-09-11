@@ -209,6 +209,7 @@ export enum HandlerType {
   SUI_OBJECT = 10,
   SUI_OBJECT_CHANGE = 12,
   FUEL_CALL = 13,
+  FUEL_BLOCK = 17,
   COSMOS_CALL = 14,
   STARKNET_EVENT = 15,
   BTC_TRANSACTION = 16,
@@ -259,6 +260,9 @@ export function handlerTypeFromJSON(object: any): HandlerType {
     case 13:
     case "FUEL_CALL":
       return HandlerType.FUEL_CALL;
+    case 17:
+    case "FUEL_BLOCK":
+      return HandlerType.FUEL_BLOCK;
     case 14:
     case "COSMOS_CALL":
       return HandlerType.COSMOS_CALL;
@@ -305,6 +309,8 @@ export function handlerTypeToJSON(object: HandlerType): string {
       return "SUI_OBJECT_CHANGE";
     case HandlerType.FUEL_CALL:
       return "FUEL_CALL";
+    case HandlerType.FUEL_BLOCK:
+      return "FUEL_BLOCK";
     case HandlerType.COSMOS_CALL:
       return "COSMOS_CALL";
     case HandlerType.STARKNET_EVENT:
