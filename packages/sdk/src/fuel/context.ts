@@ -24,6 +24,7 @@ export class FuelContext extends BaseContext {
     readonly chainId: ChainId,
     readonly contractAddress: string,
     readonly contractName: string,
+    readonly timestamp: Date,
     readonly transaction: FuelTransaction | null
   ) {
     super({})
@@ -58,8 +59,13 @@ export class FuelContractContext<TContract extends Contract> extends FuelContext
     readonly contract: TContract,
     readonly contractAddress: string,
     readonly contractName: string,
+    readonly timestamp: Date,
     readonly transaction: FuelTransaction | null
   ) {
-    super(chainId, contractAddress, contractName, transaction)
+    super(chainId, contractAddress, contractName, timestamp, transaction)
+  }
+
+  get provider() {
+    return this.contract.provider
   }
 }

@@ -11,6 +11,7 @@ type GlobalFuelProcessorConfig = Omit<FuelProcessorConfig, 'address' | 'abi'>
 
 export class FuelGlobalProcessor implements FuelBaseProcessor<GlobalFuelProcessorConfig> {
   callHandlers: CallHandler<Data_FuelCall>[] = []
+  blockHandlers = []
 
   private provider: Provider
 
@@ -40,7 +41,13 @@ export class FuelGlobalProcessor implements FuelBaseProcessor<GlobalFuelProcesso
           console.error('error decoding transaction', e)
           return mergeProcessResults([])
         }
-        const ctx = new FuelContext(this.config.chainId, '*', this.config.name ?? '*', tx)
+        const ctx = new FuelContext(
+          this.config.chainId,
+          '*',
+          this.config.name ?? '*',
+          call.timestamp || new Date(0),
+          tx
+        )
         await handler(tx, ctx)
         return ctx.stopAndGetResult()
       },

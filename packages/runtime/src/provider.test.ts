@@ -16,7 +16,7 @@ describe('QueuedStaticJsonRpcProvider', () => {
     const parentSend = mock.method(JsonRpcProvider.prototype, 'send', async () => {
       if (!count) {
         count++
-        throw new Error()
+        throw new Error('Unexpected null response')
       }
       return count
     })

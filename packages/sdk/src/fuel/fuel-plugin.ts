@@ -1,6 +1,7 @@
 import { errorString, GLOBAL_CONFIG, mergeProcessResults, Plugin, PluginManager, USER_PROCESSOR } from '@sentio/runtime'
 import {
   ContractConfig,
+  Data_FuelBlock,
   Data_FuelCall,
   DataBinding,
   HandlerType,
@@ -18,17 +19,20 @@ import { FuelGlobalProcessor } from './global-processor.js'
 
 interface Handlers {
   callHandlers: ((trace: Data_FuelCall) => Promise<ProcessResult>)[]
+  blockHandlers: ((block: Data_FuelBlock) => Promise<ProcessResult>)[]
 }
 
 export class FuelPlugin extends Plugin {
   name: string = 'FuelPlugin'
   handlers: Handlers = {
-    callHandlers: []
+    callHandlers: [],
+    blockHandlers: []
   }
 
   async configure(config: ProcessConfigResponse) {
     const handlers: Handlers = {
-      callHandlers: []
+      callHandlers: [],
+      blockHandlers: []
     }
 
     for (const processor of FuelProcessorState.INSTANCE.getValues()) {
@@ -73,6 +77,19 @@ export class FuelPlugin extends Plugin {
           contractConfig.fuelCallConfigs.push(fetchConfig)
           contractConfig.contract!.address = '*'
         }
+      }
+
+      for (const blockHandler of processor.blockHandlers) {
+        const handlerId = handlers.blockHandlers.push(blockHandler.handler) - 1
+        contractConfig.intervalConfigs.push({
+          slot: 0,
+          slotInterval: blockHandler.blockInterval,
+          minutes: 0,
+          minutesInterval: blockHandler.timeIntervalInMinutes,
+          handlerId: handlerId,
+          fetchConfig: undefined
+          // fetchConfig: blockHandler.fetchConfig
+        })
       }
 
       // Finish up a contract

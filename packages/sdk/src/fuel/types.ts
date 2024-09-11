@@ -1,10 +1,19 @@
 import { ListStateStorage } from '@sentio/runtime'
-import { Data_FuelCall, FuelAssetHandlerConfig, FuelCallHandlerConfig, ProcessResult } from '@sentio/protos'
+import {
+  Data_FuelBlock,
+  Data_FuelCall,
+  FuelAssetHandlerConfig,
+  FuelCallHandlerConfig,
+  HandleInterval,
+  OnIntervalConfig,
+  ProcessResult
+} from '@sentio/protos'
 
 export interface FuelBaseProcessor<T> {
   configure(): Promise<void>
   config: T
   callHandlers: CallHandler<Data_FuelCall>[]
+  blockHandlers: BlockHandler[]
 }
 
 export class FuelProcessorState extends ListStateStorage<FuelBaseProcessor<any>> {
@@ -18,6 +27,13 @@ export type CallHandler<T> = {
   logConfig?: {
     logIds: string[]
   }
+}
+
+export type BlockHandler = {
+  blockInterval?: HandleInterval
+  timeIntervalInMinutes?: HandleInterval
+  handler: (block: Data_FuelBlock) => Promise<ProcessResult>
+  fetchConfig?: Partial<OnIntervalConfig>
 }
 
 export interface FuelLog<T> {

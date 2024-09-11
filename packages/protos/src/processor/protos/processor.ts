@@ -1012,6 +1012,7 @@ export interface Data {
   suiObject?: Data_SuiObject | undefined;
   suiObjectChange?: Data_SuiObjectChange | undefined;
   fuelCall?: Data_FuelCall | undefined;
+  fuelBlock?: Data_FuelBlock | undefined;
   cosmosCall?: Data_CosmosCall | undefined;
   starknetEvents?: Data_StarknetEvent | undefined;
   btcTransaction?: Data_BTCTransaction | undefined;
@@ -1095,6 +1096,11 @@ export interface Data_SuiObjectChange {
 
 export interface Data_FuelCall {
   transaction: { [key: string]: any } | undefined;
+  timestamp: Date | undefined;
+}
+
+export interface Data_FuelBlock {
+  block: { [key: string]: any } | undefined;
   timestamp: Date | undefined;
 }
 
@@ -8232,6 +8238,7 @@ function createBaseData(): Data {
     suiObject: undefined,
     suiObjectChange: undefined,
     fuelCall: undefined,
+    fuelBlock: undefined,
     cosmosCall: undefined,
     starknetEvents: undefined,
     btcTransaction: undefined,
@@ -8278,6 +8285,9 @@ export const Data = {
     }
     if (message.fuelCall !== undefined) {
       Data_FuelCall.encode(message.fuelCall, writer.uint32(114).fork()).ldelim();
+    }
+    if (message.fuelBlock !== undefined) {
+      Data_FuelBlock.encode(message.fuelBlock, writer.uint32(146).fork()).ldelim();
     }
     if (message.cosmosCall !== undefined) {
       Data_CosmosCall.encode(message.cosmosCall, writer.uint32(122).fork()).ldelim();
@@ -8389,6 +8399,13 @@ export const Data = {
 
           message.fuelCall = Data_FuelCall.decode(reader, reader.uint32());
           continue;
+        case 18:
+          if (tag !== 146) {
+            break;
+          }
+
+          message.fuelBlock = Data_FuelBlock.decode(reader, reader.uint32());
+          continue;
         case 15:
           if (tag !== 122) {
             break;
@@ -8436,6 +8453,7 @@ export const Data = {
         ? Data_SuiObjectChange.fromJSON(object.suiObjectChange)
         : undefined,
       fuelCall: isSet(object.fuelCall) ? Data_FuelCall.fromJSON(object.fuelCall) : undefined,
+      fuelBlock: isSet(object.fuelBlock) ? Data_FuelBlock.fromJSON(object.fuelBlock) : undefined,
       cosmosCall: isSet(object.cosmosCall) ? Data_CosmosCall.fromJSON(object.cosmosCall) : undefined,
       starknetEvents: isSet(object.starknetEvents) ? Data_StarknetEvent.fromJSON(object.starknetEvents) : undefined,
       btcTransaction: isSet(object.btcTransaction) ? Data_BTCTransaction.fromJSON(object.btcTransaction) : undefined,
@@ -8482,6 +8500,9 @@ export const Data = {
     }
     if (message.fuelCall !== undefined) {
       obj.fuelCall = Data_FuelCall.toJSON(message.fuelCall);
+    }
+    if (message.fuelBlock !== undefined) {
+      obj.fuelBlock = Data_FuelBlock.toJSON(message.fuelBlock);
     }
     if (message.cosmosCall !== undefined) {
       obj.cosmosCall = Data_CosmosCall.toJSON(message.cosmosCall);
@@ -8538,6 +8559,9 @@ export const Data = {
       : undefined;
     message.fuelCall = (object.fuelCall !== undefined && object.fuelCall !== null)
       ? Data_FuelCall.fromPartial(object.fuelCall)
+      : undefined;
+    message.fuelBlock = (object.fuelBlock !== undefined && object.fuelBlock !== null)
+      ? Data_FuelBlock.fromPartial(object.fuelBlock)
       : undefined;
     message.cosmosCall = (object.cosmosCall !== undefined && object.cosmosCall !== null)
       ? Data_CosmosCall.fromPartial(object.cosmosCall)
@@ -9782,6 +9806,80 @@ export const Data_FuelCall = {
   fromPartial(object: DeepPartial<Data_FuelCall>): Data_FuelCall {
     const message = createBaseData_FuelCall();
     message.transaction = object.transaction ?? undefined;
+    message.timestamp = object.timestamp ?? undefined;
+    return message;
+  },
+};
+
+function createBaseData_FuelBlock(): Data_FuelBlock {
+  return { block: undefined, timestamp: undefined };
+}
+
+export const Data_FuelBlock = {
+  encode(message: Data_FuelBlock, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.block !== undefined) {
+      Struct.encode(Struct.wrap(message.block), writer.uint32(10).fork()).ldelim();
+    }
+    if (message.timestamp !== undefined) {
+      Timestamp.encode(toTimestamp(message.timestamp), writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Data_FuelBlock {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseData_FuelBlock();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.block = Struct.unwrap(Struct.decode(reader, reader.uint32()));
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.timestamp = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Data_FuelBlock {
+    return {
+      block: isObject(object.block) ? object.block : undefined,
+      timestamp: isSet(object.timestamp) ? fromJsonTimestamp(object.timestamp) : undefined,
+    };
+  },
+
+  toJSON(message: Data_FuelBlock): unknown {
+    const obj: any = {};
+    if (message.block !== undefined) {
+      obj.block = message.block;
+    }
+    if (message.timestamp !== undefined) {
+      obj.timestamp = message.timestamp.toISOString();
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<Data_FuelBlock>): Data_FuelBlock {
+    return Data_FuelBlock.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<Data_FuelBlock>): Data_FuelBlock {
+    const message = createBaseData_FuelBlock();
+    message.block = object.block ?? undefined;
     message.timestamp = object.timestamp ?? undefined;
     return message;
   },

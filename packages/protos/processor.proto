@@ -659,6 +659,10 @@ message Data {
     google.protobuf.Struct transaction = 1;
     google.protobuf.Timestamp timestamp = 2;
   }
+  message FuelBlock {
+    google.protobuf.Struct block = 1;
+    google.protobuf.Timestamp timestamp = 2;
+  }
   message CosmosCall {
     google.protobuf.Struct transaction = 1;
     google.protobuf.Timestamp timestamp = 2;
@@ -688,6 +692,7 @@ message Data {
     SuiObject sui_object = 12;
     SuiObjectChange sui_object_change = 13;
     FuelCall fuel_call = 14;
+    FuelBlock fuel_block = 18;
     CosmosCall cosmos_call = 15;
     StarknetEvent starknet_events = 16;
     BTCTransaction btc_transaction = 17;

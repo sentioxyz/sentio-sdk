@@ -7,6 +7,7 @@ import { Provider, InputType, OutputType } from 'fuels'
 
 export class FuelAssetProcessor implements FuelBaseProcessor<FuelAssetProcessorConfig> {
   callHandlers: CallHandler<Data_FuelCall>[] = []
+  blockHandlers = []
   private provider: Provider
 
   static bind(config: FuelAssetProcessorConfig): FuelAssetProcessor {
@@ -72,7 +73,13 @@ export class FuelAssetProcessor implements FuelBaseProcessor<FuelAssetProcessorC
 
         const assetId = transfer.from[0].assetId || ''
 
-        const ctx = new FuelContext(this.config.chainId, assetId, this.config.name ?? '', tx)
+        const ctx = new FuelContext(
+          this.config.chainId,
+          assetId,
+          this.config.name ?? '',
+          call.timestamp || new Date(0),
+          tx
+        )
         await handler(transfer, ctx)
         return ctx.stopAndGetResult()
       },
