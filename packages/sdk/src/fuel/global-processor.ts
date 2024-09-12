@@ -46,7 +46,8 @@ export class FuelGlobalProcessor implements FuelBaseProcessor<GlobalFuelProcesso
           '*',
           this.config.name ?? '*',
           call.timestamp || new Date(0),
-          tx
+          tx,
+          null
         )
         await handler(tx, ctx)
         return ctx.stopAndGetResult()

@@ -67,7 +67,8 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
           this.config.address,
           this.config.name ?? this.config.address,
           call.timestamp || new Date(0),
-          tx
+          tx,
+          null
         )
         await handler(tx, ctx)
         return ctx.stopAndGetResult()
@@ -121,7 +122,8 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
             this.config.address,
             this.config.name ?? this.config.address,
             call.timestamp || new Date(0),
-            tx
+            tx,
+            null
           )
           for (const op of tx.operations) {
             for (const call of op.calls || []) {
@@ -182,7 +184,8 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
               this.config.address,
               this.config.name ?? this.config.address,
               call.timestamp || new Date(0),
-              tx
+              tx,
+              null
             )
             ctx.setLogIndex(log.receiptIndex)
             await handler(log, ctx)
@@ -255,7 +258,8 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
           processor.config.address,
           processor.config.name ?? processor.config.address,
           data.timestamp || new Date(0),
-          null
+          null,
+          block
         )
         await handler(block, ctx)
         return ctx.stopAndGetResult()

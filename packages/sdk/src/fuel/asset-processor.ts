@@ -78,7 +78,8 @@ export class FuelAssetProcessor implements FuelBaseProcessor<FuelAssetProcessorC
           assetId,
           this.config.name ?? '',
           call.timestamp || new Date(0),
-          tx
+          tx,
+          null
         )
         await handler(transfer, ctx)
         return ctx.stopAndGetResult()
