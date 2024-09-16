@@ -331,7 +331,9 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     const subject = new Subject<DeepPartial<ProcessStreamResponse>>()
     this.handleRequests(requests, subject)
       .then(() => {
-        this.preparedData = { ethCallResults: {} }
+        if (this.preparedData) {
+          this.preparedData = { ethCallResults: {} }
+        }
         subject.complete()
       })
       .catch((e) => {
