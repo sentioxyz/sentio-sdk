@@ -251,8 +251,8 @@ importers:
         specifier: ^6.11.0
         version: 6.11.0(encoding@0.1.13)
       tsup:
-        specifier: npm:@sentio/tsup@^6.7.4
-        version: '@sentio/tsup@6.7.4(ts-node@10.9.2(@types/node@20.14.9)(typescript@5.5.2))(typescript@5.5.2)'
+        specifier: npm:@sentio/tsup@^6.7.5
+        version: '@sentio/tsup@6.7.5(ts-node@10.9.2(@types/node@20.14.9)(typescript@5.5.2))(typescript@5.5.2)'
       tsx:
         specifier: ^4.15.2
         version: 4.15.7
@@ -584,8 +584,8 @@ importers:
         specifier: npm:superstruct@^0.14.2
         version: superstruct@0.14.2
       tsup:
-        specifier: npm:@sentio/tsup@^6.7.2
-        version: '@sentio/tsup@6.7.3(ts-node@10.9.2(@types/node@20.14.9)(typescript@5.5.2))(typescript@5.5.2)'
+        specifier: npm:@sentio/tsup@^6.7.5
+        version: '@sentio/tsup@6.7.5(ts-node@10.9.2(@types/node@20.14.9)(typescript@5.5.2))(typescript@5.5.2)'
       typechain:
         specifier: ^8.3.2
         version: 8.3.2(typescript@5.5.2)
@@ -1904,24 +1904,8 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
-  '@sentio/tsup@6.7.3':
-    resolution: {integrity: sha512-e3fGjdTCaRTGHA7nbHitkLSI3mcNQRc6yroLkzywX2hhwbLLpf0F43ELnjmnqY+wfmHGzDISo7E/pkD5qdv17Q==}
-    engines: {node: '>=14.18'}
-    hasBin: true
-    peerDependencies:
-      '@swc/core': ^1
-      postcss: ^8.4.12
-      typescript: '>=4.1.0'
-    peerDependenciesMeta:
-      '@swc/core':
-        optional: true
-      postcss:
-        optional: true
-      typescript:
-        optional: true
-
-  '@sentio/tsup@6.7.4':
-    resolution: {integrity: sha512-6XUtqXKts5gTWujttH1HS6O2lo6t5un1rjjIs/xZ27UDJ5DuFZgW9hdlKAOA/zAyjAJlfI/TgdO8nDj2srpc2w==}
+  '@sentio/tsup@6.7.5':
+    resolution: {integrity: sha512-C0S/U3jYnyQjFxhQy3KZ3A3KqvgVikqUv1X2iuEnE/tfVGZt/nxMlTw+aO1RqGvEq93uv4ch1kdI+MFkVXcT4A==}
     engines: {node: '>=14.18'}
     hasBin: true
     peerDependencies:
@@ -8708,29 +8692,7 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@sentio/tsup@6.7.3(ts-node@10.9.2(@types/node@20.14.9)(typescript@5.5.2))(typescript@5.5.2)':
-    dependencies:
-      bundle-require: 4.0.1(esbuild@0.17.19)
-      cac: 6.7.14
-      chokidar: 3.6.0
-      debug: 4.3.5(supports-color@8.1.1)
-      esbuild: 0.17.19
-      execa: 5.1.1
-      globby: 11.1.0
-      joycon: 3.1.1
-      postcss-load-config: 3.1.4(ts-node@10.9.2(@types/node@20.14.9)(typescript@5.5.2))
-      resolve-from: 5.0.0
-      rollup: 3.29.4
-      source-map: 0.8.0-beta.0
-      sucrase: 3.35.0
-      tree-kill: 1.2.2
-    optionalDependencies:
-      typescript: 5.5.2
-    transitivePeerDependencies:
-      - supports-color
-      - ts-node
-
-  '@sentio/tsup@6.7.4(ts-node@10.9.2(@types/node@20.14.9)(typescript@5.5.2))(typescript@5.5.2)':
+  '@sentio/tsup@6.7.5(ts-node@10.9.2(@types/node@20.14.9)(typescript@5.5.2))(typescript@5.5.2)':
     dependencies:
       bundle-require: 4.0.1(esbuild@0.17.19)
       cac: 6.7.14
