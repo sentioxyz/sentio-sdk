@@ -44,22 +44,6 @@ export function generateViewFunction(view: boolean, fn: FunctionDeclaration, inc
     useStructs: true
   })}overrides?: Overrides, preparedData?: PreparedData, ethCallContext?: EthCallContext): ${generateReturnTypes(fn)} {
     try {
-      if (preparedData?.ethCallResults && ethCallContext) {
-        const calldata = iface.encodeFunctionData(
-          "${fn.name}",[${
-            fn.inputs.length > 0 ? fn.inputs.map((input, index) => input.name || `arg${index}`).join(',') + ',' : ''
-          }] 
-        )
-        const ethCallKey = makeEthCallKey({
-          context: ethCallContext,
-          calldata
-        })
-        const ret = preparedData.ethCallResults[ethCallKey]
-        if (ret) {
-          const result = iface.decodeFunctionResult("${fn.name}", ret).toArray()
-          return result.length == 1? result[0]: result
-        }
-      }
       return await ${func}${call}(${
         fn.inputs.length > 0 ? fn.inputs.map((input, index) => input.name || `arg${index}`).join(',') + ',' : ''
       } overrides || {})
