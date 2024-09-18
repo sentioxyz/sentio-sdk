@@ -70,11 +70,11 @@ export function transformEtherError(e: Error, ctx: ContractContext<any, any> | u
       }
       return new SimpleEthersError(msg, err, stack)
     } else {
-      return new SimpleEthersError(`eth call error, ${checkPage}:\n${JSON.stringify(err)}`, err, stack)
+      return new SimpleEthersError(`eth call error ${err.message}, ${checkPage}:\n${JSON.stringify(err)}`, err, stack)
     }
   }
 
-  msg = 'other error during call error\n' + JSON.stringify(e) + '\n' + stack?.toString() + '\n' + checkPage
+  msg = 'other error during call error ${e.message}\n' + JSON.stringify(e) + '\n' + stack?.toString() + '\n' + checkPage
   return new Error(msg)
 }
 
