@@ -1,6 +1,14 @@
 import { defaultMoveCoder, MoveCoder } from './index.js'
 
-import { Event, MoveResource, UserTransactionResponse, EntryFunctionPayloadResponse } from '@aptos-labs/ts-sdk'
+import {
+  Event,
+  WriteSetChangeWriteResource,
+  WriteSetChangeWriteModule,
+  MoveResource,
+  UserTransactionResponse,
+  EntryFunctionPayloadResponse,
+  WriteSetChangeDeleteResource
+} from '@aptos-labs/ts-sdk'
 
 import { AptosBindOptions, AptosNetwork } from './network.js'
 import { AptosContext, AptosResourcesContext } from './context.js'
@@ -21,7 +29,8 @@ import {
   EventFilter,
   EventHandler,
   FunctionNameAndCallFilter,
-  parseMoveType
+  parseMoveType,
+  ResourceChangeHandler
 } from '../move/index.js'
 import { Labels, PromiseOrVoid } from '../core/index.js'
 
@@ -34,6 +43,8 @@ const DEFAULT_FETCH_CONFIG: MoveFetchConfig = {
 export const DEFAULT_RESOURCE_FETCH_CONFIG: MoveAccountFetchConfig = {
   owned: true
 }
+
+export type ResourceChange = WriteSetChangeWriteResource | WriteSetChangeDeleteResource
 
 type IndexConfigure = {
   address: string
@@ -60,6 +71,7 @@ export class AptosBaseProcessor {
   config: IndexConfigure
   eventHandlers: EventHandler<Data_AptEvent>[] = []
   callHandlers: CallHandler<Data_AptCall>[] = []
+  resourceHandlers: ResourceChangeHandler<Data_AptResource>[] = []
   coder: MoveCoder
 
   constructor(moduleName: string, options: AptosBindOptions) {
@@ -210,6 +222,35 @@ export class AptosBaseProcessor {
 
   public onEvent(handler: (event: Event, ctx: AptosContext) => void, fetchConfig?: Partial<MoveFetchConfig>): this {
     this.onMoveEvent(handler, { type: '' }, fetchConfig)
+    return this
+  }
+
+  public onResourceChange(
+    handler: (changes: ResourceChange[], ctx: AptosContext) => Promise<ProcessResult>,
+    type: string
+  ): this {
+    const processor = this
+    this.resourceHandlers.push({
+      handler: async function (data) {
+        if (!data.resources || !data.version) {
+          throw new ServerError(Status.INVALID_ARGUMENT, 'resource is null')
+        }
+        const resources = data.resources as ResourceChange[]
+        const ctx = new AptosContext(
+          processor.moduleName,
+          processor.config.network,
+          processor.config.address,
+          BigInt(data.version),
+          // @ts-ignore
+          null,
+          0,
+          processor.config.baseLabels
+        )
+        await handler(resources, ctx)
+        return ctx.stopAndGetResult()
+      },
+      type
+    })
     return this
   }
 

@@ -116,7 +116,25 @@ export class AptosPlugin extends Plugin {
         }
         contractConfig.moveCallConfigs.push(functionHandlerConfig)
       }
+
       config.contractConfigs.push(contractConfig)
+    }
+
+    // Prepare resource handlers
+    for (const aptosProcessor of AptosProcessorState.INSTANCE.getValues()) {
+      const accountConfig = AccountConfig.fromPartial({
+        address: aptosProcessor.config.address,
+        chainId: aptosProcessor.getChainId(),
+        startBlock: aptosProcessor.config.startVersion
+      })
+      for (const handler of aptosProcessor.resourceHandlers) {
+        const handlerId = handlers.aptosResourceHandlers.push(handler.handler) - 1
+        accountConfig.moveResourceChangeConfigs.push({
+          handlerId: handlerId,
+          type: handler.type
+        })
+      }
+      config.accountConfigs.push(accountConfig)
     }
 
     for (const aptosProcessor of AptosResourceProcessorState.INSTANCE.getValues()) {

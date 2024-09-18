@@ -41,3 +41,8 @@ export class ObjectChangeHandler<T> {
   handler: (call: T) => Promise<ProcessResult>
   type: string
 }
+
+export class ResourceChangeHandler<T> {
+  handler: (call: T) => Promise<ProcessResult>
+  type: string
+}
