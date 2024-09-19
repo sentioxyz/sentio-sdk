@@ -27,7 +27,7 @@ export class AptosContext extends MoveContext<AptosNetwork, MoveModuleBytecode, 
     network: AptosNetwork,
     address: string,
     version: bigint,
-    transaction: UserTransactionResponse,
+    transaction: UserTransactionResponse | null,
     eventIndex: number,
     baseLabels: Labels | undefined
   ) {

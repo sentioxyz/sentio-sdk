@@ -3,7 +3,6 @@ import { defaultMoveCoder, MoveCoder } from './index.js'
 import {
   Event,
   WriteSetChangeWriteResource,
-  WriteSetChangeWriteModule,
   MoveResource,
   UserTransactionResponse,
   EntryFunctionPayloadResponse,
@@ -241,7 +240,6 @@ export class AptosBaseProcessor {
           processor.config.network,
           processor.config.address,
           BigInt(data.version),
-          // @ts-ignore
           null,
           0,
           processor.config.baseLabels
