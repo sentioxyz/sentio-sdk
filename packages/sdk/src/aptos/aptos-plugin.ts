@@ -145,19 +145,27 @@ export class AptosPlugin extends Plugin {
       })
       for (const handler of aptosProcessor.resourcesHandlers) {
         const handlerId = handlers.aptosResourceHandlers.push(handler.handler) - 1
-        accountConfig.moveIntervalConfigs.push({
-          intervalConfig: {
-            handlerId: handlerId,
-            minutes: 0,
-            minutesInterval: handler.timeIntervalInMinutes,
-            slot: 0,
-            slotInterval: handler.versionInterval,
+        if (handler.timeIntervalInMinutes || handler.versionInterval) {
+          accountConfig.moveIntervalConfigs.push({
+            intervalConfig: {
+              handlerId: handlerId,
+              minutes: 0,
+              minutesInterval: handler.timeIntervalInMinutes,
+              slot: 0,
+              slotInterval: handler.versionInterval,
+              fetchConfig: undefined
+            },
+            type: handler.type || '',
+            ownerType: MoveOwnerType.ADDRESS,
             fetchConfig: undefined
-          },
-          type: handler.type || '',
-          ownerType: MoveOwnerType.ADDRESS,
-          fetchConfig: undefined
-        })
+          })
+        } else if (handler.type) {
+          // on resource change
+          accountConfig.moveResourceChangeConfigs.push({
+            handlerId,
+            type: handler.type
+          })
+        }
       }
       config.accountConfigs.push(accountConfig)
     }

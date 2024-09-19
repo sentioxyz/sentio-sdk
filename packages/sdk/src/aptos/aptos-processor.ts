@@ -225,7 +225,7 @@ export class AptosBaseProcessor {
   }
 
   public onResourceChange(
-    handler: (changes: ResourceChange[], ctx: AptosContext) => Promise<ProcessResult>,
+    handler: (changes: ResourceChange[], ctx: AptosResourcesContext) => PromiseOrVoid,
     type: string
   ): this {
     const processor = this
@@ -235,13 +235,13 @@ export class AptosBaseProcessor {
           throw new ServerError(Status.INVALID_ARGUMENT, 'resource is null')
         }
         const resources = data.resources as ResourceChange[]
-        const ctx = new AptosContext(
-          processor.moduleName,
+        const timestamp = Number(data.timestampMicros)
+
+        const ctx = new AptosResourcesContext(
           processor.config.network,
           processor.config.address,
-          BigInt(data.version),
-          null,
-          0,
+          data.version,
+          timestamp,
           processor.config.baseLabels
         )
         await handler(resources, ctx)
@@ -355,6 +355,35 @@ export class AptosResourcesProcessor {
       typePrefix,
       fetchConfig
     )
+  }
+
+  public onResourceChange(
+    handler: (changes: ResourceChange[], ctx: AptosResourcesContext) => PromiseOrVoid,
+    typeOrPrefix: string
+  ): this {
+    const processor = this
+    this.resourcesHandlers.push({
+      fetchConfig: DEFAULT_RESOURCE_FETCH_CONFIG,
+      handler: async function (data) {
+        const timestamp = Number(data.timestampMicros)
+
+        if (!data.resources || !data.version) {
+          throw new ServerError(Status.INVALID_ARGUMENT, 'resource is null')
+        }
+        const resources = data.resources as ResourceChange[]
+        const ctx = new AptosResourcesContext(
+          processor.config.network,
+          processor.config.address,
+          data.version,
+          timestamp,
+          processor.config.baseLabels
+        )
+        await handler(resources, ctx)
+        return ctx.stopAndGetResult()
+      },
+      type: typeOrPrefix
+    })
+    return this
   }
 }
 

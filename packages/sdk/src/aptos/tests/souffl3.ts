@@ -33,9 +33,13 @@ voting.bind().onEventCreateProposalEvent((evt, ctx) => {
   ctx.meter.Gauge('size').record(evt.data_decoded.metadata.data.length)
 })
 
-AptosResourcesProcessor.bind({ address: '0x1' }).onTimeInterval((resources, ctx) => {
-  ctx.meter.Counter('onTimer').add(1)
-}, 10000)
+AptosResourcesProcessor.bind({ address: '0x1' })
+  .onTimeInterval((resources, ctx) => {
+    ctx.meter.Counter('onTimer').add(1)
+  }, 10000)
+  .onResourceChange((resources, ctx) => {
+    ctx.meter.Counter('onResourceChange').add(resources.length)
+  }, '0x1::coin::CoinStore<0x1::aptos_coin::AptosCoin>')
 
 aptos_account.bind().onEntryCreateAccount(
   (call, ctx) => {
