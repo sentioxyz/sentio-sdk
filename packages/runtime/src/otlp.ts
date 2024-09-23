@@ -5,7 +5,7 @@ import { PrometheusExporter } from '@opentelemetry/exporter-prometheus'
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node'
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc'
 import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-base'
-import { metrics, trace } from '@opentelemetry/api'
+import { metrics, trace, ProxyTracerProvider } from '@opentelemetry/api'
 
 export async function setupOTLP() {
   const resource = await envDetector.detect()
@@ -29,7 +29,6 @@ export async function setupOTLP() {
   const exporter = new OTLPTraceExporter() // new ConsoleSpanExporter();
   const processor = new BatchSpanProcessor(exporter)
   traceProvider.addSpanProcessor(processor)
-  traceProvider.register()
 
   metrics.setGlobalMeterProvider(meterProvider)
   trace.setGlobalTracerProvider(traceProvider)
@@ -40,8 +39,12 @@ export async function setupOTLP() {
 
 export async function shutdownProvider() {
   const traceProvider = trace.getTracerProvider()
-  if (traceProvider instanceof NodeTracerProvider) {
-    traceProvider.shutdown().catch(console.error)
+
+  if (traceProvider instanceof ProxyTracerProvider) {
+    const delegate = traceProvider.getDelegate()
+    if (delegate instanceof NodeTracerProvider) {
+      delegate.shutdown().catch(console.error)
+    }
   }
   const meterProvider = metrics.getMeterProvider()
   if (meterProvider instanceof MeterProvider) {
