@@ -6,7 +6,8 @@ import {
   MoveResource,
   UserTransactionResponse,
   EntryFunctionPayloadResponse,
-  WriteSetChangeDeleteResource
+  WriteSetChangeDeleteResource,
+  MultisigPayloadResponse
 } from '@aptos-labs/ts-sdk'
 
 import { AptosBindOptions, AptosNetwork } from './network.js'
@@ -36,7 +37,9 @@ import { Labels, PromiseOrVoid } from '../core/index.js'
 const DEFAULT_FETCH_CONFIG: MoveFetchConfig = {
   resourceChanges: false,
   allEvents: true,
-  inputs: false
+  inputs: false,
+  // for backward compatibility
+  supportMultisigFunc: true
 }
 
 export const DEFAULT_RESOURCE_FETCH_CONFIG: MoveAccountFetchConfig = {
@@ -175,8 +178,12 @@ export class AptosBaseProcessor {
           processor.config.baseLabels
         )
         if (tx) {
-          const payload = tx.payload as EntryFunctionPayloadResponse
-          const decoded = await processor.coder.decodeFunctionPayload(payload)
+          let payload = tx.payload
+          if (payload.type === 'multisig_payload') {
+            payload = (payload as MultisigPayloadResponse).transaction_payload ?? payload
+          }
+
+          const decoded = await processor.coder.decodeFunctionPayload(payload as EntryFunctionPayloadResponse)
           await handler(decoded, ctx)
         }
         return ctx.stopAndGetResult()

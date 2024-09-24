@@ -354,6 +354,7 @@ message MoveFetchConfig {
   bool all_events = 2;
   bool inputs = 4;
   optional ResourceConfig resource_config = 3;
+  optional bool support_multisig_func = 5;
 }
 
 message MoveAccountFetchConfig {

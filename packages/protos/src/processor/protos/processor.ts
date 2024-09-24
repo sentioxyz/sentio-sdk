@@ -699,6 +699,7 @@ export interface MoveFetchConfig {
   allEvents: boolean;
   inputs: boolean;
   resourceConfig?: ResourceConfig | undefined;
+  supportMultisigFunc?: boolean | undefined;
 }
 
 export interface MoveAccountFetchConfig {
@@ -4871,7 +4872,13 @@ export const ResourceConfig = {
 };
 
 function createBaseMoveFetchConfig(): MoveFetchConfig {
-  return { resourceChanges: false, allEvents: false, inputs: false, resourceConfig: undefined };
+  return {
+    resourceChanges: false,
+    allEvents: false,
+    inputs: false,
+    resourceConfig: undefined,
+    supportMultisigFunc: undefined,
+  };
 }
 
 export const MoveFetchConfig = {
@@ -4887,6 +4894,9 @@ export const MoveFetchConfig = {
     }
     if (message.resourceConfig !== undefined) {
       ResourceConfig.encode(message.resourceConfig, writer.uint32(26).fork()).ldelim();
+    }
+    if (message.supportMultisigFunc !== undefined) {
+      writer.uint32(40).bool(message.supportMultisigFunc);
     }
     return writer;
   },
@@ -4926,6 +4936,13 @@ export const MoveFetchConfig = {
 
           message.resourceConfig = ResourceConfig.decode(reader, reader.uint32());
           continue;
+        case 5:
+          if (tag !== 40) {
+            break;
+          }
+
+          message.supportMultisigFunc = reader.bool();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -4941,6 +4958,9 @@ export const MoveFetchConfig = {
       allEvents: isSet(object.allEvents) ? globalThis.Boolean(object.allEvents) : false,
       inputs: isSet(object.inputs) ? globalThis.Boolean(object.inputs) : false,
       resourceConfig: isSet(object.resourceConfig) ? ResourceConfig.fromJSON(object.resourceConfig) : undefined,
+      supportMultisigFunc: isSet(object.supportMultisigFunc)
+        ? globalThis.Boolean(object.supportMultisigFunc)
+        : undefined,
     };
   },
 
@@ -4958,6 +4978,9 @@ export const MoveFetchConfig = {
     if (message.resourceConfig !== undefined) {
       obj.resourceConfig = ResourceConfig.toJSON(message.resourceConfig);
     }
+    if (message.supportMultisigFunc !== undefined) {
+      obj.supportMultisigFunc = message.supportMultisigFunc;
+    }
     return obj;
   },
 
@@ -4972,6 +4995,7 @@ export const MoveFetchConfig = {
     message.resourceConfig = (object.resourceConfig !== undefined && object.resourceConfig !== null)
       ? ResourceConfig.fromPartial(object.resourceConfig)
       : undefined;
+    message.supportMultisigFunc = object.supportMultisigFunc ?? undefined;
     return message;
   },
 };
