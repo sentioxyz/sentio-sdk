@@ -427,8 +427,8 @@ importers:
         specifier: ^5.2.3
         version: 5.2.3
       nice-grpc:
-        specifier: ^2.1.7
-        version: 2.1.9
+        specifier: ^2.1.10
+        version: 2.1.10
       nice-grpc-client-middleware-retry:
         specifier: ^3.1.6
         version: 3.1.8
@@ -5038,6 +5038,9 @@ packages:
 
   nice-grpc-prometheus@0.2.4:
     resolution: {integrity: sha512-l2arWpgXwUgCQJvYziNK+VeeRuT8yipyxxGLlTRf4PHI1CFtRuCn43BboBHLVlu68Jg1278HRG6gqbIwfekLWQ==}
+
+  nice-grpc@2.1.10:
+    resolution: {integrity: sha512-Nujs/4wWJvE5OSxWPp3M5H+zHJAgsWMo38bMNfKQP1VDeCChp7MiKTkhJBV5JZvrBIkPhYQCLIbfvVqEoSuTuA==}
 
   nice-grpc@2.1.9:
     resolution: {integrity: sha512-shJlg1t4Wn3qTVE31gxofbTrgCX/p4tS1xRnk4bNskCYKvXNEUpJQZpjModsVk1aau69YZDViyC18K9nC7QHYA==}
@@ -12542,6 +12545,12 @@ snapshots:
       abort-controller-x: 0.4.3
       nice-grpc-common: 2.0.2
       prom-client: 15.1.2
+
+  nice-grpc@2.1.10:
+    dependencies:
+      '@grpc/grpc-js': 1.10.10
+      abort-controller-x: 0.4.3
+      nice-grpc-common: 2.0.2
 
   nice-grpc@2.1.9:
     dependencies:
