@@ -46,6 +46,7 @@ export interface SuiInternalObjectsBindOptions extends SuiBindOptions {
 export abstract class SuiBaseObjectOrAddressProcessor<HandlerType> {
   config: IndexConfigure
   ownerType: MoveOwnerType
+  templateId: number | undefined
 
   objectHandlers: ObjectHandler[] = []
 

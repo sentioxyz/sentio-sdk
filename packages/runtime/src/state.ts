@@ -29,6 +29,12 @@ export abstract class StateStorage<T> {
     }
     return metricState
   }
+
+  unregister(): T {
+    const value = State.INSTANCE.stateMap.get(this.key())
+    State.INSTANCE.stateMap.delete(this.key())
+    return value
+  }
 }
 
 export abstract class MapStateStorage<T> extends StateStorage<Map<string, T>> {

@@ -5,6 +5,7 @@ import { SuiMoveObject, SuiTransactionBlockResponse } from '@mysten/sui.js/clien
 import { PromiseOrVoid } from '../core/index.js'
 import {
   DEFAULT_ACCOUNT_FETCH_CONFIG,
+  SuiAccountProcessorState,
   SuiAddressProcessor,
   SuiBaseObjectOrAddressProcessor,
   SuiObjectBindOptions,
@@ -13,7 +14,8 @@ import {
 } from './sui-object-processor.js'
 import { TemplateInstanceState } from '../core/template.js'
 import { SuiBindOptions } from './sui-processor.js'
-import { TransactionFilter } from '../move/index.js'
+import { TransactionFilter, accountAddressString } from '../move/index.js'
+import { ServerError, Status } from 'nice-grpc'
 
 class ObjectHandler<HandlerType> {
   type?: string
@@ -48,7 +50,12 @@ export abstract class SuiObjectOrAddressProcessorTemplate<
   bind(options: OptionType, ctx: SuiContext): void {
     options.network = options.network || ctx.network
     options.startCheckpoint = options.startCheckpoint || ctx.checkpoint
-    const id = (options as SuiObjectBindOptions).objectId || (options as SuiBindOptions).address
+    let id = (options as SuiObjectBindOptions).objectId || (options as SuiBindOptions).address
+
+    if (id === '*') {
+      throw new ServerError(Status.INVALID_ARGUMENT, "can't bind template instance with *")
+    }
+    id = accountAddressString(id)
 
     const sig = [options.network, id].join('_')
     if (this.binds.has(sig)) {
@@ -79,6 +86,69 @@ export abstract class SuiObjectOrAddressProcessorTemplate<
       startBlock: config.startCheckpoint,
       endBlock: 0n,
       baseLabels: config.baseLabels
+    })
+    console.log(`successfully bind template ${sig}`)
+  }
+
+  unbind(options: OptionType, ctx: SuiContext): void {
+    options.network = options.network || ctx.network
+    options.startCheckpoint = options.startCheckpoint || ctx.checkpoint
+    let id = (options as SuiObjectBindOptions).objectId || (options as SuiBindOptions).address
+
+    if (id === '*') {
+      throw new ServerError(Status.INVALID_ARGUMENT, "can't delete template instance bind with *")
+    }
+    id = accountAddressString(id)
+
+    const sig = [options.network, id].join('_')
+    if (!this.binds.has(sig)) {
+      console.log(`the template instance ${sig} not existed or already unbind`)
+      return
+    }
+    this.binds.delete(sig)
+
+    let deleted = 0
+    const oldTemplateInstances = TemplateInstanceState.INSTANCE.unregister()
+    for (const templateInstance of oldTemplateInstances) {
+      if (templateInstance.contract?.chainId === options.network && templateInstance.contract.address == id) {
+        deleted++
+        continue
+      }
+      TemplateInstanceState.INSTANCE.addValue(templateInstance)
+    }
+
+    if (deleted !== 1) {
+      throw new ServerError(
+        Status.INVALID_ARGUMENT,
+        `Failed to delete template instance ${sig}, deleted ${deleted} times`
+      )
+    }
+
+    const oldProcessors = SuiAccountProcessorState.INSTANCE.unregister()
+    deleted = 0
+    for (const processor of oldProcessors) {
+      if (processor.templateId === this.id) {
+        if (processor.config.network == options.network && processor.config.address === id) {
+          deleted++
+          continue
+        }
+      }
+      SuiAccountProcessorState.INSTANCE.addValue(processor)
+    }
+
+    if (deleted !== 1) {
+      throw new ServerError(
+        Status.INVALID_ARGUMENT,
+        `Failed to delete processor for template ${this.id}, ${sig}. deleted ${deleted} times`
+      )
+    }
+
+    console.log(`successfully unbind template ${sig}`)
+
+    ctx.update({
+      states: {
+        configUpdated: true
+      }
     })
   }
 
@@ -153,6 +223,7 @@ export class SuiAddressProcessorTemplate extends SuiObjectOrAddressProcessorTemp
     for (const handler of this.handlers) {
       p.onTransactionBlock(handler.handler, handler.filter, handler.fetchConfig)
     }
+    p.templateId = this.id
     return p
   }
 
@@ -176,7 +247,9 @@ export class SuiObjectProcessorTemplate extends SuiObjectOrAddressProcessorTempl
   SuiObjectProcessor
 > {
   createProcessor(options: SuiObjectBindOptions): SuiObjectProcessor {
-    return SuiObjectProcessor.bind(options)
+    const p = SuiObjectProcessor.bind(options)
+    p.templateId = this.id
+    return p
   }
 }
 
@@ -186,6 +259,8 @@ export class SuiWrappedObjectProcessorTemplate extends SuiObjectOrAddressProcess
   SuiWrappedObjectProcessor
 > {
   createProcessor(options: SuiObjectBindOptions): SuiWrappedObjectProcessor {
-    return SuiWrappedObjectProcessor.bind(options)
+    const p = SuiWrappedObjectProcessor.bind(options)
+    p.templateId = this.id
+    return p
   }
 }
