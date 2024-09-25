@@ -21,15 +21,7 @@ import { FullProcessorServiceImpl } from './full-service.js'
 import { ChainConfig } from './chain-config.js'
 import { setupLogger } from './logger.js'
 
-// import { NodeSDK } from '@opentelemetry/sdk-node'
-import { envDetector } from '@opentelemetry/resources'
-import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc'
-import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc'
-import { PeriodicExportingMetricReader, MeterProvider } from '@opentelemetry/sdk-metrics'
-import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-base'
-import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node'
-import { diag, DiagConsoleLogger, DiagLogLevel, metrics, trace } from '@opentelemetry/api'
-import { PrometheusExporter } from '@opentelemetry/exporter-prometheus'
+import { setupOTLP } from './otlp.js'
 
 // const mergedRegistry = Registry.merge([globalRegistry, niceGrpcRegistry])
 
@@ -58,51 +50,7 @@ const logLevel = process.env['LOG_LEVEL']?.toUpperCase()
 setupLogger(options['log-format'] === 'json', logLevel === 'debug' ? true : options.debug)
 console.debug('Starting with', options.target)
 
-if (options.debug) {
-  diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG)
-}
-
-const resource = await envDetector.detect()
-
-const meterProvider = new MeterProvider({
-  resource,
-  readers: [
-    new PeriodicExportingMetricReader({
-      exporter: new OTLPMetricExporter()
-    }),
-    new PrometheusExporter({
-      // http://localhost:4041/metrics
-      port: 4041
-    })
-  ]
-})
-
-const traceProvider = new NodeTracerProvider({
-  resource: resource
-})
-const exporter = new OTLPTraceExporter() // new ConsoleSpanExporter();
-const processor = new BatchSpanProcessor(exporter)
-traceProvider.addSpanProcessor(processor)
-traceProvider.register()
-
-metrics.setGlobalMeterProvider(meterProvider)
-trace.setGlobalTracerProvider(traceProvider)
-;['SIGINT', 'SIGTERM'].forEach((signal) => {
-  process.on(signal as any, () => shutdownProvider())
-})
-
-export async function shutdownProvider() {
-  const traceProvider = trace.getTracerProvider()
-  if (traceProvider instanceof NodeTracerProvider) {
-    traceProvider.shutdown().catch(console.error)
-  }
-  const meterProvider = metrics.getMeterProvider()
-  if (meterProvider instanceof MeterProvider) {
-    meterProvider.shutdown().catch(console.error)
-  }
-}
-
-metrics.getMeter('processor').createGauge('up').record(1)
+await setupOTLP(options.debug)
 
 Error.stackTraceLimit = 20
 

@@ -1,13 +1,18 @@
 import { Attributes, Counter, metrics, Gauge } from '@opentelemetry/api'
 
-const meter = metrics.getMeter('processor')
+const getMeter = () => metrics.getMeter('processor')
 
 class C {
-  private counter: Counter<Attributes>
+  private _counter: Counter<Attributes>
   private value: number = 0
 
-  constructor(name: string) {
-    this.counter = meter.createCounter(name)
+  constructor(private name: string) {}
+
+  get counter(): Counter<Attributes> {
+    if (!this._counter) {
+      this._counter = getMeter().createCounter(this.name)
+    }
+    return this._counter
   }
 
   add(value: number, attributes?: Attributes) {
@@ -21,11 +26,16 @@ class C {
 }
 
 class G {
-  private gauge: Gauge<Attributes>
+  private _gauge: Gauge<Attributes>
   private value: number = 0
 
-  constructor(name: string) {
-    this.gauge = meter.createGauge(name)
+  constructor(private name: string) {}
+
+  get gauge(): Gauge<Attributes> {
+    if (!this._gauge) {
+      this._gauge = getMeter().createGauge(this.name)
+    }
+    return this._gauge
   }
 
   record(value: number, attributes?: Attributes) {

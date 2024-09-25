@@ -5,9 +5,13 @@ import { PrometheusExporter } from '@opentelemetry/exporter-prometheus'
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node'
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc'
 import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-base'
-import { metrics, trace, ProxyTracerProvider } from '@opentelemetry/api'
+import { diag, DiagConsoleLogger, DiagLogLevel, metrics, trace, ProxyTracerProvider } from '@opentelemetry/api'
 
-export async function setupOTLP() {
+export async function setupOTLP(debug?: boolean) {
+  if (debug) {
+    diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG)
+  }
+
   const resource = await envDetector.detect()
 
   const meterProvider = new MeterProvider({
@@ -29,12 +33,15 @@ export async function setupOTLP() {
   const exporter = new OTLPTraceExporter() // new ConsoleSpanExporter();
   const processor = new BatchSpanProcessor(exporter)
   traceProvider.addSpanProcessor(processor)
+  traceProvider.register()
 
   metrics.setGlobalMeterProvider(meterProvider)
   trace.setGlobalTracerProvider(traceProvider)
   ;['SIGINT', 'SIGTERM'].forEach((signal) => {
     process.on(signal as any, () => shutdownProvider())
   })
+
+  metrics.getMeter('processor').createGauge('up').record(1)
 }
 
 export async function shutdownProvider() {
