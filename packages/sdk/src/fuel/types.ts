@@ -1,4 +1,4 @@
-import { ListStateStorage } from '@sentio/runtime'
+import { MapStateStorage } from '@sentio/runtime'
 import {
   Data_FuelBlock,
   Data_FuelCall,
@@ -17,7 +17,7 @@ export interface FuelBaseProcessor<T> {
   blockHandlers: BlockHandler[]
 }
 
-export class FuelProcessorState extends ListStateStorage<FuelBaseProcessor<any>> {
+export class FuelProcessorState extends MapStateStorage<FuelBaseProcessor<any>> {
   static INSTANCE = new FuelProcessorState()
 }
 

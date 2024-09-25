@@ -4,6 +4,7 @@ import { FuelNetwork, getRpcEndpoint } from './network.js'
 import { FuelContext } from './context.js'
 import { decodeFuelTransaction } from './transaction.js'
 import { Provider, InputType, OutputType } from 'fuels'
+import { getOptionsSignature } from './fuel-processor.js'
 
 export class FuelAssetProcessor implements FuelBaseProcessor<FuelAssetProcessorConfig> {
   callHandlers: CallHandler<Data_FuelCall>[] = []
@@ -12,7 +13,13 @@ export class FuelAssetProcessor implements FuelBaseProcessor<FuelAssetProcessorC
 
   static bind(config: FuelAssetProcessorConfig): FuelAssetProcessor {
     const processor = new FuelAssetProcessor(config)
-    FuelProcessorState.INSTANCE.addValue(processor)
+    const sig =
+      'assets_' +
+      getOptionsSignature({
+        ...config,
+        address: '*'
+      })
+    FuelProcessorState.INSTANCE.getOrSetValue(sig, processor)
     return processor
   }
 

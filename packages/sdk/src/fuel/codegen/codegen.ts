@@ -115,7 +115,7 @@ async function codegenInternal(abisDir: string, outDir: string): Promise<number>
 /* tslint:disable */
 /* eslint-disable */
     
-import { FuelAbstractProcessor, FuelContractContext, FuelProcessorConfig, TypedCall, FuelFetchConfig, FuelCall, FuelLog} from '@sentio/sdk/fuel'
+import { FuelAbstractProcessor, FuelContractContext, FuelProcessorConfig, TypedCall, FuelFetchConfig, FuelCall, FuelLog, addFuelProcessor, getFuelProcessor, FuelBaseProcessorTemplate } from '@sentio/sdk/fuel'
 import {${abi.commonTypesInUse.join(',')}} from './common.js'
 import {${importedTypes.join(',')}, ${abi.capitalizedName}} from './${abi.capitalizedName}.js'
 
@@ -145,11 +145,19 @@ ${
 }
 
 export class ${name}Processor extends FuelAbstractProcessor<${name}> {
-  static bind(config: Omit<FuelProcessorConfig, 'abi'>) {
-    return new ${name}Processor(${abi.capitalizedName}.abi, {
-      name: '${name}',
-      ...config,
-    })
+  static bind(options: Omit<FuelProcessorConfig, 'abi'>) {
+    if (!options.name) {
+      options.name = "${name}"
+    }
+    let processor = getFuelProcessor(options) as ${name}Processor
+    if (!processor) {
+      processor = new ${name}Processor(${abi.capitalizedName}.abi, {
+        name: '${name}',
+        ...options,
+      })
+      addFuelProcessor(options, processor)
+    }
+    return processor
   }
 
 ${
@@ -158,11 +166,22 @@ ${
        abi.functions.map((f) => genOnCallFunction(name, f)).join('\n') */
 }   
 
-${Object.entries(logByTypes)
-  .map((e) => genOnLogFunction(name, e))
-  .join('\n')}
+  ${Object.entries(logByTypes)
+    .map((e) => genOnLogFunction(name, e))
+    .join('\n')}
 
 }
+
+export class ${name}ProcessorTemplate extends FuelBaseProcessorTemplate<${name}> {
+  bindInternal(options: Omit<FuelProcessorConfig, 'abi'>) {
+    return ${name}Processor.bind(options)
+  }
+
+  ${Object.entries(logByTypes)
+    .map((e) => genOnLogFunction(name, e))
+    .join('\n')}
+}
+
 `
     writeFileSync(filePath, content)
     count++

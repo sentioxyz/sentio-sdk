@@ -25,7 +25,7 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
 
   static bind(config: FuelProcessorConfig): FuelProcessor<any> {
     const processor = new FuelProcessor(config)
-    FuelProcessorState.INSTANCE.addValue(processor)
+    addFuelProcessor(config, processor)
     return processor
   }
 
@@ -324,4 +324,16 @@ export function getOptionsSignature(opts: Omit<FuelProcessorConfig, 'abi'>): str
     sig.push(opts.endBlock.toString())
   }
   return sig.join('_')
+}
+
+// Dedup processor that bind multiple times
+export function getFuelProcessor(opts: Omit<FuelProcessorConfig, 'abi'>) {
+  const sig = getOptionsSignature(opts)
+  return FuelProcessorState.INSTANCE.getValue(sig)
+}
+
+export function addFuelProcessor(opts: Omit<FuelProcessorConfig, 'abi'>, processor: FuelBaseProcessor<any>) {
+  const sig = getOptionsSignature(opts)
+
+  FuelProcessorState.INSTANCE.getOrSetValue(sig, processor)
 }

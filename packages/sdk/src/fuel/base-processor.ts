@@ -1,8 +1,8 @@
-import { FuelProcessor, FuelProcessorConfig } from './fuel-processor.js'
+import { addFuelProcessor, FuelProcessor, FuelProcessorConfig } from './fuel-processor.js'
 import { Contract, JsonAbi } from 'fuels'
 // import { FuelCall } from './context.js'
 import { FuelChainId } from '@sentio/chain'
-import { FuelLog, FuelProcessorState } from './types.js'
+import { FuelLog } from './types.js'
 
 export abstract class FuelAbstractProcessor<TContract extends Contract> extends FuelProcessor<TContract> {
   protected constructor(abi: JsonAbi, config?: Omit<FuelProcessorConfig, 'abi'>) {
@@ -16,7 +16,7 @@ export abstract class FuelAbstractProcessor<TContract extends Contract> extends 
       ...config,
       abi
     })
-    FuelProcessorState.INSTANCE.addValue(this)
+    addFuelProcessor(config, this)
   }
 }
 

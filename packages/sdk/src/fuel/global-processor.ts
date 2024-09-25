@@ -4,7 +4,7 @@ import { Provider } from 'fuels'
 import { getRpcEndpoint } from './network.js'
 import { decodeFuelTransaction, DEFAULT_FUEL_FETCH_CONFIG, FuelFetchConfig } from './transaction.js'
 import { FuelContext } from './context.js'
-import { FuelProcessorConfig } from './fuel-processor.js'
+import { FuelProcessorConfig, getOptionsSignature } from './fuel-processor.js'
 import { mergeProcessResults } from '@sentio/runtime'
 
 type GlobalFuelProcessorConfig = Omit<FuelProcessorConfig, 'address' | 'abi'>
@@ -17,7 +17,13 @@ export class FuelGlobalProcessor implements FuelBaseProcessor<GlobalFuelProcesso
 
   static bind(config: GlobalFuelProcessorConfig): FuelGlobalProcessor {
     const processor = new FuelGlobalProcessor(config)
-    FuelProcessorState.INSTANCE.addValue(processor)
+    const sig =
+      'global_' +
+      getOptionsSignature({
+        ...config,
+        address: '*'
+      })
+    FuelProcessorState.INSTANCE.getOrSetValue(sig, processor)
     return processor
   }
 

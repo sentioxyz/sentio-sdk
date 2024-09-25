@@ -87,9 +87,9 @@ export abstract class FuelBaseProcessorTemplate<TContract extends Contract> {
     })
   }
 
-  protected onLog(
+  protected onLog<T>(
     logIdFilter: string | string[],
-    handler: (logs: FuelLog<any>, ctx: FuelContractContext<TContract>) => PromiseOrVoid
+    handler: (logs: FuelLog<T>, ctx: FuelContractContext<TContract>) => PromiseOrVoid
     // fetchConfig?: Partial<FuelFetchConfig>
   ) {
     this.logHandlers.push({
