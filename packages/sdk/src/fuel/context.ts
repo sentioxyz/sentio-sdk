@@ -1,5 +1,5 @@
 import { BaseContext, Labels, normalizeLabels } from '../core/index.js'
-import { ChainId } from '@sentio/chain'
+import { FuelChainId } from '@sentio/chain'
 import { RecordMetaData } from '@sentio/protos'
 import type { CallResult, Contract } from 'fuels'
 import { InvocationScopeLike } from 'fuels'
@@ -20,7 +20,7 @@ export class FuelCall {
 export class FuelContext extends BaseContext {
   private logIndex: number = -1
   constructor(
-    readonly chainId: ChainId,
+    readonly chainId: FuelChainId,
     readonly contractAddress: string,
     readonly contractName: string,
     readonly timestamp: Date,
@@ -30,7 +30,7 @@ export class FuelContext extends BaseContext {
     super({})
   }
 
-  getChainId(): ChainId {
+  getChainId(): FuelChainId {
     return this.chainId
   }
 
@@ -55,7 +55,7 @@ export class FuelContext extends BaseContext {
 
 export class FuelContractContext<TContract extends Contract> extends FuelContext {
   constructor(
-    readonly chainId: ChainId,
+    readonly chainId: FuelChainId,
     readonly contract: TContract,
     readonly contractAddress: string,
     readonly contractName: string,

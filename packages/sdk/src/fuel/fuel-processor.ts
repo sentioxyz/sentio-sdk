@@ -49,7 +49,7 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
   }
 
   public onTransaction(
-    handler: (transaction: FuelTransaction, ctx: FuelContractContext<TContract>) => void | Promise<void>,
+    handler: (transaction: FuelTransaction, ctx: FuelContractContext<TContract>) => PromiseOrVoid,
     config: FuelFetchConfig = DEFAULT_FUEL_FETCH_CONFIG
   ) {
     const callHandler = {
@@ -161,7 +161,7 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
 
   public onLog<T>(
     logIdFilter: string | string[],
-    handler: (logs: FuelLog<T>, ctx: FuelContractContext<TContract>) => void | Promise<void>
+    handler: (logs: FuelLog<T>, ctx: FuelContractContext<TContract>) => PromiseOrVoid
   ) {
     const logIds = new Set(Array.isArray(logIdFilter) ? logIdFilter : [logIdFilter])
 
@@ -307,4 +307,21 @@ export type FuelProcessorConfig = {
   startBlock?: bigint
   endBlock?: bigint
   abi: JsonAbi
+}
+
+export function getOptionsSignature(opts: Omit<FuelProcessorConfig, 'abi'>): string {
+  const sig = [opts.address]
+  if (opts.chainId) {
+    sig.push(opts.chainId)
+  }
+  if (opts.name) {
+    sig.push(opts.name)
+  }
+  if (opts.startBlock) {
+    sig.push(opts.startBlock.toString())
+  }
+  if (opts.endBlock) {
+    sig.push(opts.endBlock.toString())
+  }
+  return sig.join('_')
 }
