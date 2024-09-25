@@ -144,6 +144,9 @@ ${
 }
 }
 
+type LogIdFilter<T> = T | T[]
+${getLogConstants(logByTypes)}
+
 export class ${name}Processor extends FuelAbstractProcessor<${name}> {
   static bind(options: Omit<FuelProcessorConfig, 'abi'>) {
     if (!options.name) {
@@ -234,11 +237,33 @@ function collectImportedTypes(types: any[]): string[] {
   return Array.from(ret)
 }
 
+function getLogConstants(logByTypes: Record<string, string[]>) {
+  return Object.entries(logByTypes)
+    .map(([t, ids]) => {
+      const name = getTypeName(t)
+      if (ids.length == 1) {
+        return `const Log${name}Id = "${ids[0]}"`
+      }
+      return ids.map((id, idx) => `const Log${name}Id${idx} = "${id}"`).join('\n')
+    })
+    .join('\n')
+}
+
 function genOnLogFunction(contractName: string, [type, ids]: [string, string[]]) {
   const name = getTypeName(type)
+
+  if (ids.length == 1) {
+    return `
+  onLog${name}(handler: (log: FuelLog<${type}>, ctx: FuelContractContext<${contractName}>) => void | Promise<void>) {
+    return super.onLog<${type}>([Log${name}Id], (log, ctx) => handler(log, ctx))
+  }`
+  }
+  const logIdFilterValues = ids.map((_, idx) => `Log${name}Id${idx}`)
+
   return `
-  onLog${name}(handler: (log: FuelLog<${type}>, ctx: FuelContractContext<${contractName}>) => void | Promise<void>, logIdFilter?: string | string[]) {
-    return super.onLog<${type}>(logIdFilter ?? [${ids.map((id) => `"${id}"`).join(', ')}], (log, ctx) => handler(log, ctx))
+  onLog${name}(handler: (log: FuelLog<${type}>, ctx: FuelContractContext<${contractName}>) => void | Promise<void>, 
+               logIdFilter?: LogIdFilter<${logIdFilterValues.map((d) => `typeof ${d}`).join(' | ')}> ) {
+    return super.onLog<${type}>(logIdFilter ?? [${logIdFilterValues.join(', ')}], (log, ctx) => handler(log, ctx))
   }`
 }
 
