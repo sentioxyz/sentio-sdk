@@ -96,6 +96,8 @@ export class BTCPlugin extends Plugin {
     switch (request.handlerType) {
       case HandlerType.BTC_TRANSACTION:
         return this.processTransaction(request)
+      case HandlerType.BTC_BLOCK:
+        return this.processBlock(request)
       default:
         throw new ServerError(Status.INVALID_ARGUMENT, 'No handle type registered ' + request.handlerType)
     }
@@ -121,6 +123,29 @@ export class BTCPlugin extends Plugin {
         throw new ServerError(
           Status.INTERNAL,
           'error processing transaction: ' + JSON.stringify(result) + '\n' + errorString(e)
+        )
+      })
+      if (GLOBAL_CONFIG.execution.sequential) {
+        await promise
+      }
+      promises.push(promise)
+    }
+    return mergeProcessResults(await Promise.all(promises))
+  }
+
+  private async processBlock(request: DataBinding) {
+    if (!request.data?.btcBlock) {
+      throw new ServerError(Status.INVALID_ARGUMENT, "Block can't be empty")
+    }
+
+    const block = request.data.btcBlock
+
+    const promises: Promise<ProcessResult>[] = []
+    for (const handlerId of request.handlerIds) {
+      const promise = this.handlers.blockHandlers[handlerId](block).catch((e) => {
+        throw new ServerError(
+          Status.INTERNAL,
+          'error processing block: ' + JSON.stringify(block) + '\n' + errorString(e)
         )
       })
       if (GLOBAL_CONFIG.execution.sequential) {
