@@ -90,7 +90,7 @@ export class BTCPlugin extends Plugin {
     this.handlers = handlers
   }
 
-  supportedHandlers = [HandlerType.BTC_TRANSACTION]
+  supportedHandlers = [HandlerType.BTC_TRANSACTION, HandlerType.BTC_BLOCK]
 
   processBinding(request: DataBinding): Promise<ProcessResult> {
     switch (request.handlerType) {

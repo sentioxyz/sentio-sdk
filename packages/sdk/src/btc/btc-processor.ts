@@ -90,8 +90,8 @@ export class BTCProcessor {
   public onBlockInterval(
     handler: (block: BTCBlock, ctx: BTCBlockContext) => PromiseOrVoid,
     blockInterval = 250,
-    backfillBlockInterval = 1000
-    // fetchConfig?: Partial<FuelFetchConfig>
+    backfillBlockInterval = 1000,
+    fetchConfig?: BTCOnIntervalFetchConfig
   ): this {
     return this.onInterval(
       handler,
@@ -99,22 +99,22 @@ export class BTCProcessor {
       {
         recentInterval: blockInterval,
         backfillInterval: backfillBlockInterval
-      }
-      // fetchConfig,
+      },
+      fetchConfig
     )
   }
 
   public onTimeInterval(
     handler: (block: BTCBlock, ctx: BTCBlockContext) => PromiseOrVoid,
     timeIntervalInMinutes = 60,
-    backfillTimeIntervalInMinutes = 240
-    // fetchConfig?: Partial<FuelFetchConfig>,
+    backfillTimeIntervalInMinutes = 240,
+    fetchConfig?: BTCOnIntervalFetchConfig
   ): this {
     return this.onInterval(
       handler,
       { recentInterval: timeIntervalInMinutes, backfillInterval: backfillTimeIntervalInMinutes },
-      undefined
-      // fetchConfig
+      undefined,
+      fetchConfig
     )
   }
 }
