@@ -679,6 +679,11 @@ message Data {
     google.protobuf.Timestamp timestamp = 5;
   }
 
+  message BTCBlock {
+    google.protobuf.Struct block = 1;
+    google.protobuf.Timestamp timestamp = 2;
+  }
+
   bytes raw = 1 [deprecated = true]; // can be removed anytime
   oneof value {
     EthLog eth_log = 2;
@@ -698,6 +703,7 @@ message Data {
     CosmosCall cosmos_call = 15;
     StarknetEvent starknet_events = 16;
     BTCTransaction btc_transaction = 17;
+    BTCBlock btc_block = 19;
   }
 }
 
@@ -799,6 +805,7 @@ enum HandlerType {
   COSMOS_CALL = 14;
   STARKNET_EVENT = 15;
   BTC_TRANSACTION = 16;
+  BTC_BLOCK = 18;
 }
 
 message RuntimeInfo {

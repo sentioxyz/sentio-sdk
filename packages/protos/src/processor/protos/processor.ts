@@ -213,6 +213,7 @@ export enum HandlerType {
   COSMOS_CALL = 14,
   STARKNET_EVENT = 15,
   BTC_TRANSACTION = 16,
+  BTC_BLOCK = 18,
   UNRECOGNIZED = -1,
 }
 
@@ -272,6 +273,9 @@ export function handlerTypeFromJSON(object: any): HandlerType {
     case 16:
     case "BTC_TRANSACTION":
       return HandlerType.BTC_TRANSACTION;
+    case 18:
+    case "BTC_BLOCK":
+      return HandlerType.BTC_BLOCK;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -317,6 +321,8 @@ export function handlerTypeToJSON(object: HandlerType): string {
       return "STARKNET_EVENT";
     case HandlerType.BTC_TRANSACTION:
       return "BTC_TRANSACTION";
+    case HandlerType.BTC_BLOCK:
+      return "BTC_BLOCK";
     case HandlerType.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
@@ -1024,6 +1030,7 @@ export interface Data {
   cosmosCall?: Data_CosmosCall | undefined;
   starknetEvents?: Data_StarknetEvent | undefined;
   btcTransaction?: Data_BTCTransaction | undefined;
+  btcBlock?: Data_BTCBlock | undefined;
 }
 
 export interface Data_EthLog {
@@ -1124,6 +1131,11 @@ export interface Data_StarknetEvent {
 
 export interface Data_BTCTransaction {
   transaction: { [key: string]: any } | undefined;
+  timestamp: Date | undefined;
+}
+
+export interface Data_BTCBlock {
+  block: { [key: string]: any } | undefined;
   timestamp: Date | undefined;
 }
 
@@ -8292,6 +8304,7 @@ function createBaseData(): Data {
     cosmosCall: undefined,
     starknetEvents: undefined,
     btcTransaction: undefined,
+    btcBlock: undefined,
   };
 }
 
@@ -8347,6 +8360,9 @@ export const Data = {
     }
     if (message.btcTransaction !== undefined) {
       Data_BTCTransaction.encode(message.btcTransaction, writer.uint32(138).fork()).ldelim();
+    }
+    if (message.btcBlock !== undefined) {
+      Data_BTCBlock.encode(message.btcBlock, writer.uint32(154).fork()).ldelim();
     }
     return writer;
   },
@@ -8477,6 +8493,13 @@ export const Data = {
 
           message.btcTransaction = Data_BTCTransaction.decode(reader, reader.uint32());
           continue;
+        case 19:
+          if (tag !== 154) {
+            break;
+          }
+
+          message.btcBlock = Data_BTCBlock.decode(reader, reader.uint32());
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -8507,6 +8530,7 @@ export const Data = {
       cosmosCall: isSet(object.cosmosCall) ? Data_CosmosCall.fromJSON(object.cosmosCall) : undefined,
       starknetEvents: isSet(object.starknetEvents) ? Data_StarknetEvent.fromJSON(object.starknetEvents) : undefined,
       btcTransaction: isSet(object.btcTransaction) ? Data_BTCTransaction.fromJSON(object.btcTransaction) : undefined,
+      btcBlock: isSet(object.btcBlock) ? Data_BTCBlock.fromJSON(object.btcBlock) : undefined,
     };
   },
 
@@ -8562,6 +8586,9 @@ export const Data = {
     }
     if (message.btcTransaction !== undefined) {
       obj.btcTransaction = Data_BTCTransaction.toJSON(message.btcTransaction);
+    }
+    if (message.btcBlock !== undefined) {
+      obj.btcBlock = Data_BTCBlock.toJSON(message.btcBlock);
     }
     return obj;
   },
@@ -8621,6 +8648,9 @@ export const Data = {
       : undefined;
     message.btcTransaction = (object.btcTransaction !== undefined && object.btcTransaction !== null)
       ? Data_BTCTransaction.fromPartial(object.btcTransaction)
+      : undefined;
+    message.btcBlock = (object.btcBlock !== undefined && object.btcBlock !== null)
+      ? Data_BTCBlock.fromPartial(object.btcBlock)
       : undefined;
     return message;
   },
@@ -10152,6 +10182,80 @@ export const Data_BTCTransaction = {
   fromPartial(object: DeepPartial<Data_BTCTransaction>): Data_BTCTransaction {
     const message = createBaseData_BTCTransaction();
     message.transaction = object.transaction ?? undefined;
+    message.timestamp = object.timestamp ?? undefined;
+    return message;
+  },
+};
+
+function createBaseData_BTCBlock(): Data_BTCBlock {
+  return { block: undefined, timestamp: undefined };
+}
+
+export const Data_BTCBlock = {
+  encode(message: Data_BTCBlock, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.block !== undefined) {
+      Struct.encode(Struct.wrap(message.block), writer.uint32(10).fork()).ldelim();
+    }
+    if (message.timestamp !== undefined) {
+      Timestamp.encode(toTimestamp(message.timestamp), writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Data_BTCBlock {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseData_BTCBlock();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.block = Struct.unwrap(Struct.decode(reader, reader.uint32()));
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.timestamp = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Data_BTCBlock {
+    return {
+      block: isObject(object.block) ? object.block : undefined,
+      timestamp: isSet(object.timestamp) ? fromJsonTimestamp(object.timestamp) : undefined,
+    };
+  },
+
+  toJSON(message: Data_BTCBlock): unknown {
+    const obj: any = {};
+    if (message.block !== undefined) {
+      obj.block = message.block;
+    }
+    if (message.timestamp !== undefined) {
+      obj.timestamp = message.timestamp.toISOString();
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<Data_BTCBlock>): Data_BTCBlock {
+    return Data_BTCBlock.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<Data_BTCBlock>): Data_BTCBlock {
+    const message = createBaseData_BTCBlock();
+    message.block = object.block ?? undefined;
     message.timestamp = object.timestamp ?? undefined;
     return message;
   },

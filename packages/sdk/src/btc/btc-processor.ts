@@ -1,7 +1,9 @@
 import { ListStateStorage } from '@sentio/runtime'
-import { BTCContext, Transaction } from './types.js'
-import { Data_BTCTransaction, ProcessResult } from '@sentio/protos'
+import { BlockHandler, BTCBlock, BTCBlockContext, BTCContext, BTCOnIntervalFetchConfig, Transaction } from './types.js'
+import { Data_BTCBlock, Data_BTCTransaction, HandleInterval, ProcessResult } from '@sentio/protos'
 import { TransactionFilters } from './filter.js'
+import { PromiseOrVoid } from '../core/index.js'
+import { ServerError, Status } from 'nice-grpc'
 
 export class BTCProcessorState extends ListStateStorage<BTCProcessor> {
   static INSTANCE = new BTCProcessorState()
@@ -9,6 +11,7 @@ export class BTCProcessorState extends ListStateStorage<BTCProcessor> {
 
 export class BTCProcessor {
   callHandlers: CallHandler<Data_BTCTransaction>[] = []
+  blockHandlers: BlockHandler[] = []
 
   constructor(readonly config: BTCProcessorConfig) {}
 
@@ -39,6 +42,80 @@ export class BTCProcessor {
     }
     this.callHandlers.push(callHandler)
     return this
+  }
+
+  public onInterval(
+    handler: (block: BTCBlock, ctx: BTCBlockContext) => PromiseOrVoid,
+    timeInterval: HandleInterval | undefined,
+    blockInterval: HandleInterval | undefined,
+    fetchConfig?: BTCOnIntervalFetchConfig
+  ): this {
+    if (timeInterval) {
+      if (timeInterval.backfillInterval < timeInterval.recentInterval) {
+        timeInterval.backfillInterval = timeInterval.recentInterval
+      }
+    }
+
+    const processor = this
+
+    this.blockHandlers.push({
+      blockInterval,
+      timeIntervalInMinutes: timeInterval,
+      handler: async function (data: Data_BTCBlock) {
+        const header = data.block
+        if (!header) {
+          throw new ServerError(Status.INVALID_ARGUMENT, 'Block is empty')
+        }
+
+        const block = {
+          ...header
+        } as BTCBlock
+        if (fetchConfig?.getTransactions) {
+          block.tx = header.rawTx.map((tx: any) => tx as Transaction)
+        }
+
+        const ctx = new BTCBlockContext(
+          processor.config.chainId,
+          processor.config.name ?? processor.config.address ?? '',
+          block,
+          processor.config.address
+        )
+        await handler(block, ctx)
+        return ctx.stopAndGetResult()
+      }
+    })
+    return this
+  }
+
+  public onBlockInterval(
+    handler: (block: BTCBlock, ctx: BTCBlockContext) => PromiseOrVoid,
+    blockInterval = 250,
+    backfillBlockInterval = 1000
+    // fetchConfig?: Partial<FuelFetchConfig>
+  ): this {
+    return this.onInterval(
+      handler,
+      undefined,
+      {
+        recentInterval: blockInterval,
+        backfillInterval: backfillBlockInterval
+      }
+      // fetchConfig,
+    )
+  }
+
+  public onTimeInterval(
+    handler: (block: BTCBlock, ctx: BTCBlockContext) => PromiseOrVoid,
+    timeIntervalInMinutes = 60,
+    backfillTimeIntervalInMinutes = 240
+    // fetchConfig?: Partial<FuelFetchConfig>,
+  ): this {
+    return this.onInterval(
+      handler,
+      { recentInterval: timeIntervalInMinutes, backfillInterval: backfillTimeIntervalInMinutes },
+      undefined
+      // fetchConfig
+    )
   }
 }
 

@@ -1,5 +1,5 @@
 import { BaseContext, Labels, normalizeLabels } from '../core/index.js'
-import { RecordMetaData } from '@sentio/protos'
+import { Data_BTCBlock, HandleInterval, ProcessResult, RecordMetaData } from '@sentio/protos'
 import { ChainId } from '@sentio/chain'
 
 export type Transaction = {
@@ -44,21 +44,22 @@ export type Vout = {
   }
 }
 
-export type Block = {
-  block_hash: string
-  block_number: number
-  block_timestamp: Date
+export type BTCBlock = {
+  hash: string
+  confirmations: number
+  strippedsize: number
   size: number
-  stripped_size: number
   weight: number
+  height: number
   version: number
-  merkle_root: string
+  merkleroot: string
+  tx?: Transaction[]
+  time: number
   nonce: number
   bits: string
   difficulty: number
-  previous_hash: string
-  next_hash: string
-  transaction_count: number
+  previousblockhash: string
+  nextblockhash: string
 }
 
 export class BTCContext extends BaseContext {
@@ -88,4 +89,44 @@ export class BTCContext extends BaseContext {
   getChainId(): ChainId {
     return this.chainId as ChainId
   }
+}
+
+export class BTCBlockContext extends BaseContext {
+  constructor(
+    readonly chainId: string,
+    readonly name: string,
+    readonly block: BTCBlock,
+    readonly address?: string
+  ) {
+    super({})
+  }
+
+  protected getMetaDataInternal(name: string, labels: Labels): RecordMetaData {
+    return {
+      address: this.address ?? '',
+      contractName: this.name,
+      blockNumber: BigInt(this.block.height ?? 0),
+      transactionIndex: 0,
+      transactionHash: '',
+      chainId: this.getChainId(),
+      name: name,
+      logIndex: 0,
+      labels: normalizeLabels(labels)
+    }
+  }
+
+  getChainId(): ChainId {
+    return this.chainId as ChainId
+  }
+}
+
+export type BlockHandler = {
+  blockInterval?: HandleInterval
+  timeIntervalInMinutes?: HandleInterval
+  handler: (block: Data_BTCBlock) => Promise<ProcessResult>
+  fetchConfig?: BTCOnIntervalFetchConfig
+}
+
+export type BTCOnIntervalFetchConfig = {
+  getTransactions: boolean
 }

@@ -1,6 +1,7 @@
 import { errorString, GLOBAL_CONFIG, mergeProcessResults, Plugin, PluginManager, USER_PROCESSOR } from '@sentio/runtime'
 import {
   ContractConfig,
+  Data_BTCBlock,
   Data_BTCTransaction,
   DataBinding,
   HandlerType,
@@ -16,17 +17,20 @@ import { filters2Proto, TransactionFilter } from './filter.js'
 
 interface Handlers {
   txHandlers: ((trace: Data_BTCTransaction) => Promise<ProcessResult>)[]
+  blockHandlers: ((trace: Data_BTCBlock) => Promise<ProcessResult>)[]
 }
 
 export class BTCPlugin extends Plugin {
   name: string = 'BTCPlugin'
   handlers: Handlers = {
-    txHandlers: []
+    txHandlers: [],
+    blockHandlers: []
   }
 
   async configure(config: ProcessConfigResponse) {
     const handlers: Handlers = {
-      txHandlers: []
+      txHandlers: [],
+      blockHandlers: []
     }
 
     for (const processor of BTCProcessorState.INSTANCE.getValues()) {
@@ -59,6 +63,24 @@ export class BTCPlugin extends Plugin {
             handlerId
           })
         }
+      }
+
+      for (const blockHandler of processor.blockHandlers) {
+        const handlerId = handlers.blockHandlers.push(blockHandler.handler) - 1
+        contractConfig.intervalConfigs.push({
+          slot: 0,
+          slotInterval: blockHandler.blockInterval,
+          minutes: 0,
+          minutesInterval: blockHandler.timeIntervalInMinutes,
+          handlerId,
+          fetchConfig: {
+            transaction: blockHandler.fetchConfig?.getTransactions ?? false,
+            trace: false,
+            block: true,
+            transactionReceipt: false,
+            transactionReceiptLogs: false
+          }
+        })
       }
 
       // Finish up a contract
