@@ -71,7 +71,7 @@ export class BTCProcessor {
           ...header
         } as BTCBlock
         if (fetchConfig?.getTransactions) {
-          block.tx = header.rawTx.map((tx: any) => tx as Transaction)
+          block.tx = header.rawtx?.map((tx: any) => tx as Transaction)
         }
 
         const ctx = new BTCBlockContext(
