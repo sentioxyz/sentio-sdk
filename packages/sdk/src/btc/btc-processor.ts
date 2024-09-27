@@ -82,7 +82,8 @@ export class BTCProcessor {
         )
         await handler(block, ctx)
         return ctx.stopAndGetResult()
-      }
+      },
+      fetchConfig
     })
     return this
   }
