@@ -3,7 +3,7 @@ import commandLineUsage from 'command-line-usage'
 import path from 'path'
 import { finalizeHost, FinalizeProjectName, YamlProjectConfig } from '../config.js'
 import { getSdkVersion, getPackageRoot, errorOnUnknownOption } from '../utils.js'
-import { execStep, execYarn } from '../execution.js'
+import { execStep, execPackageManager } from '../execution.js'
 import { ReadKey } from '../key.js'
 import fs from 'fs'
 import { readdir, readFile, writeFile } from 'fs/promises'
@@ -132,7 +132,7 @@ async function runGraphCreate(argv: string[]) {
   packageJson.devDependencies['@sentio/cli'] = cliVersion
   fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2))
 
-  await execYarn(['install'], 'install', { cwd: dstFolder })
+  await execPackageManager(['install'], 'install', { cwd: dstFolder })
 }
 
 const deployOptionDefinitions = [

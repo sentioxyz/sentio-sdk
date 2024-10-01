@@ -1,10 +1,10 @@
 {
   "name": "sentio-cli",
   "version": "2.0.0-development",
+  "type": "module",
   "bin": {
     "sentio": "./index.js"
   },
-  "types": "module",
   "dependencies": {
     "@sentio/cli": "workspace:*"
   },

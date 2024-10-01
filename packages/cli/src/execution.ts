@@ -1,6 +1,7 @@
 import { exec, execFile, ExecFileOptions } from 'child_process'
 import chalk from 'chalk'
 import process from 'process'
+import { getPackageManager } from 'package-manager-manager'
 
 export async function execStep(cmds: string[], stepName: string, options?: ExecFileOptions) {
   // https://nodejs.org/api/child_process.html#child_process_spawning_bat_and_cmd_files_on_windows
@@ -32,7 +33,8 @@ export async function execStep(cmds: string[], stepName: string, options?: ExecF
   console.log()
 }
 
-export async function execYarn(args: string[], stepName: string, options?: ExecFileOptions) {
-  const yarn = process.platform === 'win32' ? 'yarn.cmd' : 'yarn'
-  return execStep([yarn, ...args], stepName, options)
+export async function execPackageManager(args: string[], stepName: string, options?: ExecFileOptions) {
+  const packageManager = await getPackageManager()
+  const pm = packageManager.name
+  return execStep([pm, ...args], stepName, options)
 }

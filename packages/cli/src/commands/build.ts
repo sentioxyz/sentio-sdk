@@ -7,7 +7,7 @@ import commandLineUsage from 'command-line-usage'
 import yaml from 'yaml'
 import { YamlProjectConfig } from '../config.js'
 import { getABIFilePath, getABI, writeABIFile } from '../abi.js'
-import { execStep, execYarn } from '../execution.js'
+import { execStep, execPackageManager } from '../execution.js'
 
 export const buildOptionDefinitions = [
   {
@@ -247,5 +247,5 @@ export async function codegen(genExample: boolean) {
 }
 
 async function installDeps() {
-  await execYarn(['install', '--ignore-scripts'], 'Yarn Install')
+  await execPackageManager(['install', '--ignore-scripts'], 'Install')
 }

@@ -5,7 +5,7 @@ import fs from 'fs-extra'
 import chalk from 'chalk'
 import latestVersion from 'latest-version'
 import process from 'process'
-import { execYarn } from '../execution.js'
+import { execPackageManager } from '../execution.js'
 import { errorOnUnknownOption, getPackageRoot } from '../utils.js'
 import { EthChainInfo, EthChainId } from '@sentio/chain'
 
@@ -187,8 +187,8 @@ export async function runCreate(argv: string[]) {
   }
   console.log(chalk.green("successfully create project '" + projectFullName + "'"))
   if (!options.subproject) {
-    console.log(chalk.green('running yarn install for initialization'))
+    console.log(chalk.green('running install for initialization'))
 
-    await execYarn(['install'], 'install', { cwd: dstFolder })
+    await execPackageManager(['install'], 'install', { cwd: dstFolder })
   }
 }
