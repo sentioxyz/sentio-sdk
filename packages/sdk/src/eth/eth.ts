@@ -136,7 +136,15 @@ export function formatEthData(data: {
   }
   const block = data.block ? formatRichBlock(data.block) : undefined
   const trace = data.trace ? (data.trace as Trace) : undefined
-  const transaction = data.transaction ? formatTransactionResponse(data.transaction) : undefined
+  let transaction = undefined
+  if (data.transaction) {
+    if (!data.transaction.v) {
+      data.transaction.v = '0x1c'
+      data.transaction.r = '0x88ff6cf0fefd94db46111149ae4bfc179e9b94721fffd821d38d16464b3f71d0'
+      data.transaction.s = '0x45e0aff800961cfce805daef7016b9b675c137a6a41a548f7b60a3484c06a33a'
+    }
+    transaction = formatTransactionResponse(data.transaction)
+  }
   const transactionReceipt = data.transactionReceipt ? formatTransactionReceipt(data.transactionReceipt) : undefined
   return {
     log,
