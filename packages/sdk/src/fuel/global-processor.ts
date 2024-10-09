@@ -1,7 +1,7 @@
 import { CallHandler, FuelBaseProcessor, FuelProcessorState, FuelTransaction } from './types.js'
 import { Data_FuelCall } from '@sentio/protos'
 import { Provider } from 'fuels'
-import { getRpcEndpoint } from './network.js'
+import { getProvider } from './network.js'
 import { decodeFuelTransaction, DEFAULT_FUEL_FETCH_CONFIG, FuelFetchConfig } from './transaction.js'
 import { FuelContext } from './context.js'
 import { FuelProcessorConfig, getOptionsSignature } from './fuel-processor.js'
@@ -30,8 +30,7 @@ export class FuelGlobalProcessor implements FuelBaseProcessor<GlobalFuelProcesso
   constructor(readonly config: GlobalFuelProcessorConfig) {}
 
   async configure() {
-    const url = getRpcEndpoint(this.config.chainId)
-    this.provider = await Provider.create(url)
+    this.provider = await getProvider(this.config.chainId)
   }
 
   public onTransaction(

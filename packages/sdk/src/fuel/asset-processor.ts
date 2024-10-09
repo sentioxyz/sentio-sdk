@@ -1,6 +1,6 @@
 import { CallHandler, FuelBaseProcessor, FuelProcessorState } from './types.js'
 import { Data_FuelCall, FuelAssetHandlerConfig_AssetFilter } from '@sentio/protos'
-import { FuelNetwork, getRpcEndpoint } from './network.js'
+import { FuelNetwork, getProvider } from './network.js'
 import { FuelContext } from './context.js'
 import { decodeFuelTransaction } from './transaction.js'
 import { Provider, InputType, OutputType } from 'fuels'
@@ -26,8 +26,7 @@ export class FuelAssetProcessor implements FuelBaseProcessor<FuelAssetProcessorC
   constructor(readonly config: FuelAssetProcessorConfig) {}
 
   async configure(): Promise<void> {
-    const url = getRpcEndpoint(this.config.chainId)
-    this.provider = await Provider.create(url)
+    this.provider = await getProvider(this.config.chainId)
   }
 
   onTransfer(filter: TransferFilter, handler: (transfers: FuelTransfer, ctx: FuelContext) => void | Promise<void>) {

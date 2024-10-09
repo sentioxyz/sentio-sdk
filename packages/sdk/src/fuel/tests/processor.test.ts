@@ -6,8 +6,8 @@ import { FuelChainId } from '@sentio/chain'
 import abi from './abis/counter-contract-abi.json'
 import testData from './test-data.json'
 import { State } from '@sentio/runtime'
-import { bn, calculateVmTxMemory, Interface, Provider } from 'fuels'
-import { getRpcEndpoint } from '../network.js'
+import { bn, calculateVmTxMemory, Interface } from 'fuels'
+import { getProvider } from '../network.js'
 import { decodeFuelTransactionWithAbi } from '../transaction.js'
 
 describe('fuel network tests', () => {
@@ -64,7 +64,7 @@ describe('fuel network tests', () => {
     const tx = await decodeFuelTransactionWithAbi(
       testData,
       { ADDRESS: abi },
-      await Provider.create(getRpcEndpoint(FuelChainId.FUEL_TESTNET))
+      await getProvider(FuelChainId.FUEL_TESTNET)
     )
     assert.ok(tx.operations)
   })
@@ -72,8 +72,7 @@ describe('fuel network tests', () => {
   test('test decode', async () => {
     const receipt = testData.status.receipts[0]
     const param1 = receipt.param1
-    const url = getRpcEndpoint(FuelChainId.FUEL_TESTNET)
-    const provider = await Provider.create(url)
+    const provider = await getProvider(FuelChainId.FUEL_TESTNET)
     const chain = provider.getChain()
     const maxInputs = chain.consensusParameters.txParameters.maxInputs
     const argsOffset = bn(param1)

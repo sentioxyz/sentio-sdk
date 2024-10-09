@@ -1,7 +1,7 @@
 import { Data_FuelBlock, Data_FuelCall, FuelCallFilter, HandleInterval, ProcessResult } from '@sentio/protos'
 import { FuelCall, FuelContext, FuelContractContext } from './context.js'
 import { bn, Contract, Interface, JsonAbi, Provider } from 'fuels'
-import { FuelNetwork, getRpcEndpoint } from './network.js'
+import { FuelNetwork, getProvider } from './network.js'
 import { decodeFuelTransactionWithAbi, DEFAULT_FUEL_FETCH_CONFIG, FuelFetchConfig } from './transaction.js'
 import {
   BlockHandler,
@@ -33,8 +33,7 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
 
   latestGasPrice: string | undefined
   async configure() {
-    const url = getRpcEndpoint(this.config.chainId)
-    this.provider = await Provider.create(url)
+    this.provider = await getProvider(this.config.chainId)
     this.provider.getLatestGasPrice = async () => {
       // avoid flood the endpoint, cache the latest gas price
       if (this.latestGasPrice) {
