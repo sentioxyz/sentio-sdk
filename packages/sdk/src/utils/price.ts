@@ -1,22 +1,15 @@
-import { PriceServiceClient, PriceServiceDefinition } from '@sentio/protos/price'
 import { CoinID } from '@sentio/protos'
-import { createChannel, createClientFactory, Status } from 'nice-grpc'
-import { prometheusClientMiddleware } from 'nice-grpc-prometheus'
-import { retryMiddleware, RetryOptions } from 'nice-grpc-client-middleware-retry'
-import { Endpoints } from '@sentio/runtime'
+import { Status } from 'nice-grpc'
 import { ChainId } from '@sentio/chain'
 import { LRUCache } from 'lru-cache'
+import { Configuration, PriceApi } from '@sentio/api'
 
 export function getPriceClient(address?: string) {
-  if (!address) {
-    address = Endpoints.INSTANCE.priceFeedAPI
-  }
-  const channel = createChannel(address)
-
-  return createClientFactory()
-    .use(prometheusClientMiddleware())
-    .use(retryMiddleware)
-    .create(PriceServiceDefinition, channel)
+  const config = new Configuration({
+    apiKey: process.env.SENTIO_API_KEY
+  })
+  const api = new PriceApi(config)
+  return api
 }
 
 const priceMap = new LRUCache<string, Promise<number | undefined>>({
@@ -24,7 +17,7 @@ const priceMap = new LRUCache<string, Promise<number | undefined>>({
   ttl: 1000 * 60 * 60 // 1 hour
 })
 
-let priceClient: PriceServiceClient<RetryOptions>
+let priceClient: PriceApi
 
 interface PriceOptions {
   toleranceInDays?: number
@@ -37,7 +30,7 @@ async function getPriceByTypeOrSymbol(date: Date, coinId: CoinID, options?: Pric
 }
 
 export async function getPriceByTypeOrSymbolInternal(
-  priceClient: PriceServiceClient<RetryOptions>,
+  priceClient: PriceApi,
   date: Date,
   coinId: CoinID,
   options?: PriceOptions
@@ -56,16 +49,12 @@ export async function getPriceByTypeOrSymbolInternal(
     return price
   }
 
-  const response = priceClient.getPrice(
-    {
-      timestamp: date,
-      coinId
-    },
-    {
-      retry: true,
-      retryMaxAttempts: 5
-    }
-  )
+  const response = priceClient.getPrice({
+    timestamp: date,
+    coinIdSymbol: coinId.symbol,
+    coinIdAddressAddress: coinId.address?.address,
+    coinIdAddressChain: coinId.address?.chain
+  })
   price = response
     .then((res) => {
       if (res.timestamp) {
@@ -154,11 +143,14 @@ export async function getCoinsThatHasPrice(chainId: ChainId) {
   if (!priceClient) {
     priceClient = getPriceClient()
   }
-  const response = await priceClient.listCoins({
+  const response = await priceClient.priceListCoins({
     chain: chainId,
     limit: 1000
   })
 
+  if (!response.coinAddressesInChain) {
+    return []
+  }
   return Object.entries(response.coinAddressesInChain).map(([symbol, coin]) => {
     coin.symbol = symbol
     return coin

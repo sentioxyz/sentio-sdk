@@ -499,6 +499,9 @@ importers:
       '@sentio/abi-wan-kanabi':
         specifier: 2.2.2-1
         version: 2.2.2-1
+      '@sentio/api':
+        specifier: 1.0.2-rc.11
+        version: 1.0.2-rc.11
       '@sentio/bigdecimal':
         specifier: 9.1.1-patch.3
         version: 9.1.1-patch.3
@@ -1893,6 +1896,9 @@ packages:
   '@sentio/abi-wan-kanabi@2.2.2-1':
     resolution: {integrity: sha512-GKJiyRwoSSkbenbWVsCbCJ4siSMKGhKUJgpoqjYYcS+CF1kZXIiH+KpS+1skh9hAY/Uk7QNH57SNlKE+0Af5Rg==}
     hasBin: true
+
+  '@sentio/api@1.0.2-rc.11':
+    resolution: {integrity: sha512-MxskMp2jlyzqvmgSPrSrP3MJxO+gPL2es9LiNM+YVNxkSD4gEfcfW1fITpPZZbuBpV4ucyU1UGJwE5DtI8+WIw==}
 
   '@sentio/bigdecimal@9.1.1-patch.3':
     resolution: {integrity: sha512-O5w8XdyeatUcwI+ZbpSw60/cXFPJk3NbpIupwMHfYmW8fpxpXyRbyGESNJNufWWrB6CadsWGh1R3rd7owvrmlw==}
@@ -8666,6 +8672,8 @@ snapshots:
       cardinal: 2.1.1
       fs-extra: 10.1.0
       yargs: 17.7.2
+
+  '@sentio/api@1.0.2-rc.11': {}
 
   '@sentio/bigdecimal@9.1.1-patch.3': {}
 

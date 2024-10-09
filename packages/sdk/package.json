@@ -79,6 +79,7 @@
     "@mysten/sui.js": "~0.54.1",
     "@project-serum/anchor": "^0.26.0",
     "@sentio/abi-wan-kanabi": "2.2.2-1",
+    "@sentio/api": "1.0.2-rc.11",
     "@sentio/bigdecimal": "9.1.1-patch.3",
     "@sentio/chain": "^2.1.9",
     "@sentio/ethers-v6": "^1.0.29",
