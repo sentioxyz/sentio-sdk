@@ -36,7 +36,6 @@ export class FuelPlugin extends Plugin {
     }
 
     for (const processor of FuelProcessorState.INSTANCE.getValues()) {
-      await processor.configure()
       const contractConfig = ContractConfig.fromPartial({
         processorType: USER_PROCESSOR,
         contract: {
@@ -112,7 +111,15 @@ export class FuelPlugin extends Plugin {
     }
   }
 
-  async start(request: StartRequest) {}
+  async start(request: StartRequest) {
+    try {
+      for (const processor of FuelProcessorState.INSTANCE.getValues()) {
+        await processor.configure()
+      }
+    } catch (e) {
+      throw new ServerError(Status.INTERNAL, 'error starting FuelPlugin: ' + errorString(e))
+    }
+  }
 
   stateDiff(config: ProcessConfigResponse): boolean {
     return TemplateInstanceState.INSTANCE.getValues().length !== config.templateInstances.length
