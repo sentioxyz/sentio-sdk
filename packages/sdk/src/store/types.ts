@@ -46,7 +46,7 @@ function toJSValue(value: RichValue): any {
   if (value.bigintValue) {
     return BigIntConverter.to(value)
   }
-  if (value.boolValue) {
+  if (value.boolValue != undefined) {
     return value.boolValue
   }
   if (value.timestampValue) {

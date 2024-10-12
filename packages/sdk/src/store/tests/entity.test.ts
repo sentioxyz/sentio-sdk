@@ -76,6 +76,10 @@ class Pet extends AbstractEntity {
   owner: Promise<Person>
   ownerID: ID
 
+  @Required
+  @BooleanColumn
+  isCat: Boolean
+
   constructor(data?: Partial<Pet>) {
     super()
   }
@@ -170,21 +174,24 @@ describe('entity tests', () => {
   it('toJSON', () => {
     const t = new Pet({
       id: 'test',
-      ownerID: 'owner'
+      ownerID: 'owner',
+      isCat: false
     })
     const obj = t.toJSON()
     assert.deepEqual(obj, {
       id: 'test',
-      owner: 'owner'
+      owner: 'owner',
+      isCat: false
     })
   })
 
   it('toString', () => {
     const t = new Pet({
       id: 'test',
-      ownerID: 'owner'
+      ownerID: 'owner',
+      isCat: false
     })
     const obj = t.toString()
-    assert.equal(obj, 'Pet {"id":"test","owner":"owner"}')
+    assert.equal(obj, 'Pet {"id":"test","owner":"owner","isCat":false}')
   })
 })
