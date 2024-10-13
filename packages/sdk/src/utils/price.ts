@@ -1,5 +1,4 @@
 import { CoinID } from '@sentio/protos'
-import { Status } from 'nice-grpc'
 import { Endpoints } from '@sentio/runtime'
 import { ChainId } from '@sentio/chain'
 import { LRUCache } from 'lru-cache'
@@ -89,7 +88,7 @@ export async function getPriceByTypeOrSymbolInternal(
         priceMap.delete(key)
       }, 1000)
 
-      if (e.code === Status.NOT_FOUND || e.code === Status.UNKNOWN) {
+      if (e.response.status === 404) {
         console.error('price not found for ', JSON.stringify(coinId), ' at ', dateStr)
         return undefined
       }
