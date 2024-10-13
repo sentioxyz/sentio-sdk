@@ -1,12 +1,14 @@
 import { CoinID } from '@sentio/protos'
 import { Status } from 'nice-grpc'
+import { Endpoints } from '@sentio/runtime'
 import { ChainId } from '@sentio/chain'
 import { LRUCache } from 'lru-cache'
 import { Configuration, PriceApi } from '@sentio/api'
 
-export function getPriceClient(address?: string) {
+export function getPriceClient(basePath = Endpoints.INSTANCE.priceFeedAPI, apiKey = process.env.SENTIO_API_KEY) {
   const config = new Configuration({
-    apiKey: process.env.SENTIO_API_KEY
+    basePath,
+    apiKey
   })
   const api = new PriceApi(config)
   return api
