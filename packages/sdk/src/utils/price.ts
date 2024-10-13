@@ -3,8 +3,19 @@ import { Endpoints } from '@sentio/runtime'
 import { ChainId } from '@sentio/chain'
 import { LRUCache } from 'lru-cache'
 import { Configuration, PriceApi } from '@sentio/api'
+import path from 'path'
+import fs from 'fs'
+import os from 'os'
 
-export function getPriceClient(basePath = Endpoints.INSTANCE.priceFeedAPI, apiKey = process.env.SENTIO_API_KEY) {
+function getApiKey() {
+  try {
+    const content = fs.readFileSync(path.join(os.homedir(), '.sentio', 'config.json'), 'utf8')
+    const config = JSON.parse(content)
+    return config['https://app.sentio.xyz']?.api_keys
+  } catch (e) {}
+}
+
+export function getPriceClient(basePath = Endpoints.INSTANCE.priceFeedAPI) {
   if (!basePath.startsWith('http')) {
     basePath = 'http://' + basePath
   }
@@ -13,7 +24,7 @@ export function getPriceClient(basePath = Endpoints.INSTANCE.priceFeedAPI, apiKe
   }
   const config = new Configuration({
     basePath,
-    apiKey
+    apiKey: getApiKey()
   })
   const api = new PriceApi(config)
   return api
@@ -88,7 +99,7 @@ export async function getPriceByTypeOrSymbolInternal(
         priceMap.delete(key)
       }, 1000)
 
-      if (e.response.status === 404) {
+      if (e.response?.status === 404) {
         console.error('price not found for ', JSON.stringify(coinId), ' at ', dateStr)
         return undefined
       }
