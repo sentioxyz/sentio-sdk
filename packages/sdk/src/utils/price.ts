@@ -6,6 +6,12 @@ import { LRUCache } from 'lru-cache'
 import { Configuration, PriceApi } from '@sentio/api'
 
 export function getPriceClient(basePath = Endpoints.INSTANCE.priceFeedAPI, apiKey = process.env.SENTIO_API_KEY) {
+  if (!basePath.startsWith('http')) {
+    basePath = 'http://' + basePath
+  }
+  if (basePath.endsWith('/')) {
+    basePath = basePath.slice(0, -1)
+  }
   const config = new Configuration({
     basePath,
     apiKey
