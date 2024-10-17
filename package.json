@@ -10,14 +10,14 @@
   "resolutions": {
     "@grpc/grpc-js": "^1.9.14",
     "ethers": "npm:@sentio/ethers@6.13.1-patch.1",
-    "rpc-websockets": "7.11.0"
+    "rpc-websockets": "9.0.4"
   },
   "devDependencies": {
     "@eslint/compat": "^1.1.0",
     "@eslint/eslintrc": "^3.1.0",
     "@eslint/js": "^9.6.0",
     "@ls-lint/ls-lint": "^2.2.3",
-    "@types/chai": "^4.3.16",
+    "@types/chai": "^5.0.0",
     "@types/node": "^20.14.8",
     "chai": "^4.4.1",
     "conventional-changelog-conventionalcommits": "^8.0.0",
@@ -25,7 +25,7 @@
     "eslint-config-prettier": "^9.1.0",
     "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-deprecation": "^3.0.0",
-    "eslint-plugin-import-x": "^3.0.0",
+    "eslint-plugin-import-x": "^4.0.0",
     "eslint-plugin-unused-imports": "^4.0.0",
     "glob": "^11.0.0",
     "json": "^11.0.0",
