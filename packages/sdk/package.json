@@ -114,7 +114,7 @@
     "yaml": "^2.3.4"
   },
   "peerDependencies": {
-    "tsup": "npm:@sentio/tsup@^6.7.5"
+    "tsup": "npm:@sentio/tsup@^6.7.6"
   },
   "devDependencies": {
     "@certusone/wormhole-sdk": "^0.10.16",
