@@ -1,7 +1,7 @@
 import { HandleInterval, MoveAccountFetchConfig, MoveFetchConfig } from '@sentio/protos'
 import { ListStateStorage } from '@sentio/runtime'
 import { SuiAddressContext, SuiContext, SuiObjectContext } from './context.js'
-import { SuiMoveObject, SuiTransactionBlockResponse } from '@mysten/sui.js/client'
+import { SuiMoveObject, SuiTransactionBlockResponse } from '@mysten/sui/client'
 import { PromiseOrVoid } from '../core/index.js'
 import {
   DEFAULT_ACCOUNT_FETCH_CONFIG,

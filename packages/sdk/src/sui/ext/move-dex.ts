@@ -1,7 +1,7 @@
 import { BigDecimal } from '@sentio/bigdecimal'
 import { calculateValueInUsd, getCoinInfo, whitelistCoins, whiteListed } from './coin.js'
 import { MoveCoinList, MoveDex, moveGetPairValue, MovePoolAdaptor, SimpleCoinInfo } from '../../move/ext/index.js'
-import { SuiEvent, SuiMoveNormalizedModule, SuiMoveObject } from '@mysten/sui.js/client'
+import { SuiEvent, SuiMoveNormalizedModule, SuiMoveObject } from '@mysten/sui/client'
 import { SuiNetwork } from '../network.js'
 import { SuiContext, SuiObjectContext } from '../context.js'
 

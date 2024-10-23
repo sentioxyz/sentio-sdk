@@ -490,9 +490,9 @@ importers:
       '@fuel-ts/program':
         specifier: ^0.96.1
         version: 0.96.1(encoding@0.1.13)
-      '@mysten/sui.js':
-        specifier: ~0.54.1
-        version: 0.54.1(svelte@4.2.18)(typescript@5.5.2)
+      '@mysten/sui':
+        specifier: ~1.13.0
+        version: 1.13.0(typescript@5.5.2)
       '@project-serum/anchor':
         specifier: ^0.26.0
         version: 0.26.0(patch_hash=clsetxooki5gt3bqisxpc22mka)(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
@@ -521,14 +521,14 @@ importers:
         specifier: 1.91.8
         version: 1.91.8(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
       '@typemove/aptos':
-        specifier: ~1.6.3
-        version: 1.6.3
+        specifier: ~1.6.4
+        version: 1.6.4
       '@typemove/move':
-        specifier: ~1.6.3
-        version: 1.6.3
+        specifier: ~1.6.4
+        version: 1.6.4
       '@typemove/sui':
-        specifier: ~1.6.3
-        version: 1.6.3(svelte@4.2.18)(typescript@5.5.2)
+        specifier: ~1.6.4
+        version: 1.6.4(typescript@5.5.2)
       bs58:
         specifier: ^5.0.0
         version: 5.0.0
@@ -630,6 +630,12 @@ packages:
     peerDependenciesMeta:
       graphql:
         optional: true
+
+  '@0no-co/graphqlsp@1.12.16':
+    resolution: {integrity: sha512-B5pyYVH93Etv7xjT6IfB7QtMBdaaC07yjbhN6v8H7KgFStMkPvi+oWYBTibMFRMY89qwc9H8YixXg8SXDVgYWw==}
+    peerDependencies:
+      graphql: ^15.5.0 || ^16.0.0 || ^17.0.0
+      typescript: ^5.0.0
 
   '@0no-co/graphqlsp@1.12.8':
     resolution: {integrity: sha512-arW3ZzifyKIJhehoAlsP069AX73EN6q358bOCf+8z00PmfPR2DSxq7uGGSj0oFNe3vEDtGYl88HmFEWQ+0+dwQ==}
@@ -1375,8 +1381,28 @@ packages:
       graphql: ^15.5.0 || ^16.0.0 || ^17.0.0
       typescript: ^5.0.0
 
+  '@gql.tada/cli-utils@1.6.3':
+    resolution: {integrity: sha512-jFFSY8OxYeBxdKi58UzeMXG1tdm4FVjXa8WHIi66Gzu9JWtCE6mqom3a8xkmSw+mVaybFW5EN2WXf1WztJVNyQ==}
+    peerDependencies:
+      '@0no-co/graphqlsp': ^1.12.13
+      '@gql.tada/svelte-support': 1.0.1
+      '@gql.tada/vue-support': 1.0.1
+      graphql: ^15.5.0 || ^16.0.0 || ^17.0.0
+      typescript: ^5.0.0
+    peerDependenciesMeta:
+      '@gql.tada/svelte-support':
+        optional: true
+      '@gql.tada/vue-support':
+        optional: true
+
   '@gql.tada/internal@1.0.1':
     resolution: {integrity: sha512-VglE9pEUqCD7YwytLehI1RiEpxJsEkO+8onrMI8DEFTcrn+Irv2tQfPUHBC0LjtY5sFgoodCSLIcnxyZOKggYA==}
+    peerDependencies:
+      graphql: ^15.5.0 || ^16.0.0 || ^17.0.0
+      typescript: ^5.0.0
+
+  '@gql.tada/internal@1.0.8':
+    resolution: {integrity: sha512-XYdxJhtHC5WtZfdDqtKjcQ4d7R1s0d1rnlSs3OcBEUbYiPoJJfZU7tWsVXuv047Z6msvmr4ompJ7eLSK5Km57g==}
     peerDependencies:
       graphql: ^15.5.0 || ^16.0.0 || ^17.0.0
       typescript: ^5.0.0
@@ -1516,6 +1542,9 @@ packages:
   '@mysten/bcs@0.7.1':
     resolution: {integrity: sha512-wFPb8bkhwrbiStfZMV5rFM7J+umpke59/dNjDp+UYJKykNlW23LCk2ePyEUvGdb62HGJM1jyOJ8g4egE3OmdKA==}
 
+  '@mysten/bcs@1.1.0':
+    resolution: {integrity: sha512-yy9/1Y4d0FlRywS1+9ze/T7refCbrvwFwJIOKs9M3QBK1njbcHZp+LkVeLqBvIJA5eZ3ZCzmhQ1Xq4Sed5mEBA==}
+
   '@mysten/sui.js@0.32.2':
     resolution: {integrity: sha512-/Hm4xkGolJhqj8FvQr7QSHDTlxIvL52mtbOao9f75YjrBh7y1Uh9kbJSY7xiTF1NY9sv6p5hUVlYRJuM0Hvn9A==}
     engines: {node: '>=16'}
@@ -1523,6 +1552,10 @@ packages:
   '@mysten/sui.js@0.54.1':
     resolution: {integrity: sha512-TSmGIX7U9O/uS9EKIQdv7/S69KTbBhMJVelXCafJE6IJw8iB9cN9uLu0+uklkBSDrbRmLSEY70jMr3uRFjReIg==}
     engines: {node: '>=16'}
+
+  '@mysten/sui@1.13.0':
+    resolution: {integrity: sha512-zxRFWkb5dFjwQh6gGkswNrdSVoeBbjrL70AmRa13seNe8mfnf2lZgE8Kcj1fj4MTsDI2mGNWihQVkK99cprW+w==}
+    engines: {node: '>=18'}
 
   '@noble/curves@1.2.0':
     resolution: {integrity: sha512-oYclrNgRaM9SsBUBVbb8M6DTV7ZHRTKugureoYEncY5c65HOmRzvSiTE3y5CYaPYJA/GVkrhXEoF0M3Ya9PMnw==}
@@ -2035,15 +2068,15 @@ packages:
   '@tsconfig/node16@1.0.4':
     resolution: {integrity: sha512-vxhUy4J8lyeyinH7Azl1pdd43GJhZH/tP2weN8TntQblOY+A0XbT8DJk1/oCPuOOyg/Ja757rG0CgHcWC8OfMA==}
 
-  '@typemove/aptos@1.6.3':
-    resolution: {integrity: sha512-wGdmj0d1Umf+QRZf3tZ9MWd+1kJHHQgiTpSwB1fxENNpbegq2HHV2LonGvCdLXFFNCcjCLWOscFcBsf8St4yaQ==}
+  '@typemove/aptos@1.6.4':
+    resolution: {integrity: sha512-2JR9Rsegv66eiTqtRGkXfQqkNSTKcNOAmf4Ad6+AbuIHcUBMp4qGGe8SyxMamZ7iQ/7D4J4TxYb3DRkakbIm8Q==}
     hasBin: true
 
-  '@typemove/move@1.6.3':
-    resolution: {integrity: sha512-94y93NONW9PTK51OGhVJH1OwoUZjNobIWWBy4pyE0bBoNItono3KU+2PEVpMjUlDlAxfEDU97q1QEYyqtTqZWQ==}
+  '@typemove/move@1.6.4':
+    resolution: {integrity: sha512-NBa/rtD7m+dQJzK4s+ZIZKIkPd5ZunOVBom+jGiKoHsSMvz402IssriJmLBq+ENJUd8s5ANJbX4L2z/uzqBODQ==}
 
-  '@typemove/sui@1.6.3':
-    resolution: {integrity: sha512-9VlRvp8cq65/HLZOCY3XDuDRKHp8X60InGyzH/VSkSgTkBmXMh6yaL87qG/ruQx0R3b2brzGVFcdXIsQHMjDNw==}
+  '@typemove/sui@1.6.4':
+    resolution: {integrity: sha512-jHtMpUFsJOO54PkQLrQsDQpxsd4uPGTowSUb6zgNEG8QfqRLwgRfai1SjX0UAkl/UxfqATRNm9pdkrtsXqIYEw==}
     hasBin: true
 
   '@types/bn.js@4.11.6':
@@ -2615,6 +2648,9 @@ packages:
   base-x@4.0.0:
     resolution: {integrity: sha512-FuwxlW4H5kh37X/oW59pwTzzTKRzfrrQwhmyspRM7swOEZcHtDZSCt45U6oKgtuFE+WYPblePMVIPR4RZrh/hw==}
 
+  base-x@5.0.0:
+    resolution: {integrity: sha512-sMW3VGSX1QWVFA6l8U62MLKz29rRfpTlYdCqLdpLo1/Yd4zZwSbnUaDfciIAowAqvq7YFnWq9hrhdg1KYgc1lQ==}
+
   base64-js@1.5.1:
     resolution: {integrity: sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==}
 
@@ -2725,6 +2761,9 @@ packages:
 
   bs58@5.0.0:
     resolution: {integrity: sha512-r+ihvQJvahgYT50JD05dyJNKlmmSlMoOGwn1lCcEzanPglg7TxYjioQUYehQ9mAR/+hOSd2jRc/Z2y5UxBymvQ==}
+
+  bs58@6.0.0:
+    resolution: {integrity: sha512-PD0wEnEYg6ijszw/u8s+iI3H17cTymlrwkKhDhPZq+Sokl3AU4htyBFTjAeNAlCCmg0f53g6ih3jATyCKftTfw==}
 
   bs58check@2.1.2:
     resolution: {integrity: sha512-0TS1jicxdU09dwJMNZtVAfzPi6Q6QeN0pM1Fkzrjn+XYHvzMKPU3pHVpva+769iNVSfIYWf7LJ6WR+BuuMf8cA==}
@@ -3993,6 +4032,12 @@ packages:
 
   gql.tada@1.7.6:
     resolution: {integrity: sha512-wuFq2qmWFFQETV1qz2rWqIJ65qlLxxpiuMEDOB7zqmWnKGHYQ2k/bttyDGOKwroK2cgPZ8TGhzzaUQj9MZmwxw==}
+    hasBin: true
+    peerDependencies:
+      typescript: ^5.0.0
+
+  gql.tada@1.8.10:
+    resolution: {integrity: sha512-FrvSxgz838FYVPgZHGOSgbpOjhR+yq44rCzww3oOPJYi0OvBJjAgCiP6LEokZIYND2fUTXzQAyLgcvgw1yNP5A==}
     hasBin: true
     peerDependencies:
       typescript: ^5.0.0
@@ -6697,6 +6742,9 @@ packages:
   v8-compile-cache-lib@3.0.1:
     resolution: {integrity: sha512-wa7YjyUGfNZngI/vtK0UHAN+lgDCxBPCylVXGp0zu59Fz5aiGtNXaq3DhIov063MorB+VfufLh3JlF2KdTK3xg==}
 
+  valibot@0.36.0:
+    resolution: {integrity: sha512-CjF1XN4sUce8sBK9TixrDqFM7RwNkuXdJu174/AwmQUB62QbCQADg5lLe8ldBalFgtj1uKj+pKwDJiNo4Mn+eQ==}
+
   validate-npm-package-license@3.0.4:
     resolution: {integrity: sha512-DpKm2Ui/xN7/HQKCtpZxoRWBhZ9Z0kqtygG8XCgNQ8ZlDnxuQmWhj566j8fN4Cu3/JmbhsDo7fcAJq4s9h27Ew==}
 
@@ -6893,6 +6941,12 @@ snapshots:
     optionalDependencies:
       graphql: 16.9.0
 
+  '@0no-co/graphqlsp@1.12.16(graphql@16.9.0)(typescript@5.5.2)':
+    dependencies:
+      '@gql.tada/internal': 1.0.8(graphql@16.9.0)(typescript@5.5.2)
+      graphql: 16.9.0
+      typescript: 5.5.2
+
   '@0no-co/graphqlsp@1.12.8(graphql@16.9.0)(typescript@5.5.2)':
     dependencies:
       '@gql.tada/internal': 1.0.1(graphql@16.9.0)(typescript@5.5.2)
@@ -7056,7 +7110,7 @@ snapshots:
 
   '@confio/ics23@0.6.8':
     dependencies:
-      '@noble/hashes': 1.4.0
+      '@noble/hashes': 1.5.0
       protobufjs: 6.11.4
     optional: true
 
@@ -7091,7 +7145,7 @@ snapshots:
       '@cosmjs/encoding': 0.30.1
       '@cosmjs/math': 0.30.1
       '@cosmjs/utils': 0.30.1
-      '@noble/hashes': 1.4.0
+      '@noble/hashes': 1.5.0
       bn.js: 5.2.1
       elliptic: 6.5.5
       libsodium-wrappers: 0.7.13
@@ -7749,7 +7803,20 @@ snapshots:
     transitivePeerDependencies:
       - svelte
 
+  '@gql.tada/cli-utils@1.6.3(@0no-co/graphqlsp@1.12.16(graphql@16.9.0)(typescript@5.5.2))(graphql@16.9.0)(typescript@5.5.2)':
+    dependencies:
+      '@0no-co/graphqlsp': 1.12.16(graphql@16.9.0)(typescript@5.5.2)
+      '@gql.tada/internal': 1.0.8(graphql@16.9.0)(typescript@5.5.2)
+      graphql: 16.9.0
+      typescript: 5.5.2
+
   '@gql.tada/internal@1.0.1(graphql@16.9.0)(typescript@5.5.2)':
+    dependencies:
+      '@0no-co/graphql.web': 1.0.7(graphql@16.9.0)
+      graphql: 16.9.0
+      typescript: 5.5.2
+
+  '@gql.tada/internal@1.0.8(graphql@16.9.0)(typescript@5.5.2)':
     dependencies:
       '@0no-co/graphql.web': 1.0.7(graphql@16.9.0)
       graphql: 16.9.0
@@ -8043,6 +8110,10 @@ snapshots:
     dependencies:
       bs58: 5.0.0
 
+  '@mysten/bcs@1.1.0':
+    dependencies:
+      bs58: 6.0.0
+
   '@mysten/sui.js@0.32.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
       '@mysten/bcs': 0.7.1
@@ -8075,6 +8146,25 @@ snapshots:
       tweetnacl: 1.0.3
     transitivePeerDependencies:
       - svelte
+      - typescript
+
+  '@mysten/sui@1.13.0(typescript@5.5.2)':
+    dependencies:
+      '@graphql-typed-document-node/core': 3.2.0(graphql@16.9.0)
+      '@mysten/bcs': 1.1.0
+      '@noble/curves': 1.6.0
+      '@noble/hashes': 1.5.0
+      '@scure/bip32': 1.4.0
+      '@scure/bip39': 1.3.0
+      '@suchipi/femver': 1.0.0
+      bech32: 2.0.0
+      gql.tada: 1.8.10(graphql@16.9.0)(typescript@5.5.2)
+      graphql: 16.9.0
+      tweetnacl: 1.0.3
+      valibot: 0.36.0
+    transitivePeerDependencies:
+      - '@gql.tada/svelte-support'
+      - '@gql.tada/vue-support'
       - typescript
 
   '@noble/curves@1.2.0':
@@ -8917,10 +9007,10 @@ snapshots:
 
   '@tsconfig/node16@1.0.4': {}
 
-  '@typemove/aptos@1.6.3':
+  '@typemove/aptos@1.6.4':
     dependencies:
       '@aptos-labs/ts-sdk': 1.26.0
-      '@typemove/move': 1.6.3
+      '@typemove/move': 1.6.4
       chalk: 5.3.0
       commander: 12.1.0
       prettier: 3.3.2
@@ -8928,21 +9018,21 @@ snapshots:
     transitivePeerDependencies:
       - debug
 
-  '@typemove/move@1.6.3':
+  '@typemove/move@1.6.4':
     dependencies:
       radash: 12.1.0
 
-  '@typemove/sui@1.6.3(svelte@4.2.18)(typescript@5.5.2)':
+  '@typemove/sui@1.6.4(typescript@5.5.2)':
     dependencies:
-      '@mysten/bcs': 0.11.1
-      '@mysten/sui.js': 0.54.1(svelte@4.2.18)(typescript@5.5.2)
-      '@typemove/move': 1.6.3
+      '@mysten/sui': 1.13.0(typescript@5.5.2)
+      '@typemove/move': 1.6.4
       chalk: 5.3.0
       commander: 12.1.0
       prettier: 3.3.2
       radash: 12.1.0
     transitivePeerDependencies:
-      - svelte
+      - '@gql.tada/svelte-support'
+      - '@gql.tada/vue-support'
       - typescript
 
   '@types/bn.js@4.11.6':
@@ -9650,6 +9740,8 @@ snapshots:
 
   base-x@4.0.0: {}
 
+  base-x@5.0.0: {}
+
   base64-js@1.5.1: {}
 
   bech32@1.1.4:
@@ -9783,6 +9875,10 @@ snapshots:
   bs58@5.0.0:
     dependencies:
       base-x: 4.0.0
+
+  bs58@6.0.0:
+    dependencies:
+      base-x: 5.0.0
 
   bs58check@2.1.2:
     dependencies:
@@ -10709,7 +10805,7 @@ snapshots:
       debug: 4.3.5(supports-color@8.1.1)
       enhanced-resolve: 5.17.0
       eslint: 9.6.0
-      eslint-module-utils: 2.8.1(@typescript-eslint/parser@8.0.0(eslint@9.6.0)(typescript@5.5.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@8.0.0(eslint@9.6.0)(typescript@5.5.2))(eslint-plugin-import@2.29.1)(eslint@9.6.0))(eslint@9.6.0)
+      eslint-module-utils: 2.8.1(@typescript-eslint/parser@8.0.0(eslint@9.6.0)(typescript@5.5.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1)(eslint@9.6.0)
       eslint-plugin-import: 2.29.1(@typescript-eslint/parser@8.0.0(eslint@9.6.0)(typescript@5.5.2))(eslint-import-resolver-typescript@3.6.1)(eslint@9.6.0)
       fast-glob: 3.3.2
       get-tsconfig: 4.7.5
@@ -10721,7 +10817,7 @@ snapshots:
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-module-utils@2.8.1(@typescript-eslint/parser@8.0.0(eslint@9.6.0)(typescript@5.5.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@8.0.0(eslint@9.6.0)(typescript@5.5.2))(eslint-plugin-import@2.29.1)(eslint@9.6.0))(eslint@9.6.0):
+  eslint-module-utils@2.8.1(@typescript-eslint/parser@8.0.0(eslint@9.6.0)(typescript@5.5.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1)(eslint@9.6.0):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
@@ -10769,7 +10865,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 9.6.0
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.8.1(@typescript-eslint/parser@8.0.0(eslint@9.6.0)(typescript@5.5.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@8.0.0(eslint@9.6.0)(typescript@5.5.2))(eslint-plugin-import@2.29.1)(eslint@9.6.0))(eslint@9.6.0)
+      eslint-module-utils: 2.8.1(@typescript-eslint/parser@8.0.0(eslint@9.6.0)(typescript@5.5.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1)(eslint@9.6.0)
       hasown: 2.0.2
       is-core-module: 2.14.0
       is-glob: 4.0.3
@@ -10887,7 +10983,7 @@ snapshots:
 
   ethereum-bloom-filters@1.1.0:
     dependencies:
-      '@noble/hashes': 1.4.0
+      '@noble/hashes': 1.5.0
 
   ethereum-cryptography@0.1.3:
     dependencies:
@@ -11489,6 +11585,18 @@ snapshots:
     transitivePeerDependencies:
       - graphql
       - svelte
+
+  gql.tada@1.8.10(graphql@16.9.0)(typescript@5.5.2):
+    dependencies:
+      '@0no-co/graphql.web': 1.0.7(graphql@16.9.0)
+      '@0no-co/graphqlsp': 1.12.16(graphql@16.9.0)(typescript@5.5.2)
+      '@gql.tada/cli-utils': 1.6.3(@0no-co/graphqlsp@1.12.16(graphql@16.9.0)(typescript@5.5.2))(graphql@16.9.0)(typescript@5.5.2)
+      '@gql.tada/internal': 1.0.8(graphql@16.9.0)(typescript@5.5.2)
+      typescript: 5.5.2
+    transitivePeerDependencies:
+      - '@gql.tada/svelte-support'
+      - '@gql.tada/vue-support'
+      - graphql
 
   graceful-fs@4.2.10: {}
 
@@ -14309,6 +14417,8 @@ snapshots:
   uuid@8.3.2: {}
 
   v8-compile-cache-lib@3.0.1: {}
+
+  valibot@0.36.0: {}
 
   validate-npm-package-license@3.0.4:
     dependencies:

@@ -1,7 +1,7 @@
 import { SuiChainId } from '@sentio/chain'
 import { Endpoints } from '@sentio/runtime'
 // import { ServerError, Status } from 'nice-grpc'
-import { SuiClient } from '@mysten/sui.js/client'
+import { SuiClient } from '@mysten/sui/client'
 
 export type SuiNetwork = SuiChainId
 export const SuiNetwork = <const>{

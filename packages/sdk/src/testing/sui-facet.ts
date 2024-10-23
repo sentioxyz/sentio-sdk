@@ -1,4 +1,4 @@
-import { MoveCallSuiTransaction, SuiTransactionBlockResponse } from '@mysten/sui.js/client'
+import { MoveCallSuiTransaction, SuiTransactionBlockResponse } from '@mysten/sui/client'
 import { DataBinding, HandlerType } from '@sentio/protos'
 import { TestProcessorServer } from './test-processor-server.js'
 import { accountTypeString, parseMoveType, SPLITTER } from '../move/index.js'

@@ -1,4 +1,4 @@
-import type { SuiEvent, MoveCallSuiTransaction, SuiMoveObject } from '@mysten/sui.js/client'
+import type { SuiEvent, MoveCallSuiTransaction, SuiMoveObject } from '@mysten/sui/client'
 import { DecodedStruct } from '@typemove/move'
 
 export type TypedEventInstance<T> = DecodedStruct<SuiEvent, T>

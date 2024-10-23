@@ -10,7 +10,7 @@ import {
 import { ListStateStorage } from '@sentio/runtime'
 import { SuiNetwork } from './network.js'
 import { SuiAddressContext, SuiContext, SuiObjectContext } from './context.js'
-import { SuiMoveObject, SuiTransactionBlockResponse } from '@mysten/sui.js/client'
+import { SuiMoveObject, SuiTransactionBlockResponse } from '@mysten/sui/client'
 import { PromiseOrVoid } from '../core/index.js'
 import { configure, DEFAULT_FETCH_CONFIG, IndexConfigure, SuiBindOptions } from './sui-processor.js'
 import { CallHandler, TransactionFilter } from '../move/index.js'

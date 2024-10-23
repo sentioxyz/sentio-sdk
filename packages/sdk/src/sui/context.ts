@@ -7,7 +7,7 @@ import {
   SuiMoveNormalizedModule,
   SuiMoveObject,
   SuiClient
-} from '@mysten/sui.js/client'
+} from '@mysten/sui/client'
 import { MoveCoder } from './index.js'
 import { defaultMoveCoder } from './move-coder.js'
 import { MoveAccountContext, MoveContext } from '../move/index.js'
