@@ -251,7 +251,7 @@ export class AptosBaseProcessor {
           timestamp,
           processor.config.baseLabels
         )
-        const resources = await decodeResourceChange<T>(data.resources, ctx)
+        const resources = await decodeResourceChange<T>(data.resources, ctx.coder)
         await handler(resources, ctx)
         return ctx.stopAndGetResult()
       },
@@ -390,7 +390,7 @@ export class AptosResourcesProcessor {
           processor.config.baseLabels
         )
 
-        const resources = (await decodeResourceChange(data.resources, ctx)) as ResourceChange<T>[]
+        const resources = (await decodeResourceChange(data.resources, ctx.coder)) as ResourceChange<T>[]
         await handler(resources, ctx)
         return ctx.stopAndGetResult()
       },
