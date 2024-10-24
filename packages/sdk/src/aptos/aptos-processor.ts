@@ -71,6 +71,17 @@ export class AptosProcessorState extends ListStateStorage<AptosBaseProcessor> {
   static INSTANCE = new AptosProcessorState()
 }
 
+async function decodeResourceChange(resources: { [key: string]: any }[], ctx: AptosResourcesContext) {
+  const promises = resources.map(async (r) => {
+    const data_decoded = await ctx.coder.decodeResource(r.data)
+    return {
+      ...r,
+      data_decoded
+    }
+  })
+  return await Promise.all(promises)
+}
+
 export class AptosBaseProcessor {
   readonly moduleName: string
   config: IndexConfigure
@@ -256,12 +267,7 @@ export class AptosBaseProcessor {
           timestamp,
           processor.config.baseLabels
         )
-
-        const promises = data.resources.map((r) => {
-          return ctx.coder.decodeResource(r.data)
-        })
-        const resources = (await Promise.all(promises)) as ResourceChange<T>[]
-
+        const resources = (await decodeResourceChange(data.resources, ctx)) as ResourceChange<T>[]
         await handler(resources, ctx)
         return ctx.stopAndGetResult()
       },
@@ -400,11 +406,7 @@ export class AptosResourcesProcessor {
           processor.config.baseLabels
         )
 
-        const promises = data.resources.map((r) => {
-          return ctx.coder.decodeResource(r.data)
-        })
-        const resources = (await Promise.all(promises)) as ResourceChange<T>[]
-
+        const resources = (await decodeResourceChange(data.resources, ctx)) as ResourceChange<T>[]
         await handler(resources, ctx)
         return ctx.stopAndGetResult()
       },
