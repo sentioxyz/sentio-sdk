@@ -2,11 +2,9 @@ import { defaultMoveCoder, MoveCoder } from './index.js'
 
 import {
   Event,
-  WriteSetChangeWriteResource,
   MoveResource,
   UserTransactionResponse,
   EntryFunctionPayloadResponse,
-  WriteSetChangeDeleteResource,
   MultisigPayloadResponse
 } from '@aptos-labs/ts-sdk'
 
@@ -33,7 +31,8 @@ import {
   ResourceChangeHandler
 } from '../move/index.js'
 import { Labels, PromiseOrVoid } from '../core/index.js'
-import { TypeDescriptor, DecodedStruct } from '@typemove/move'
+import { TypeDescriptor } from '@typemove/move'
+import { decodeResourceChange, ResourceChange } from '@typemove/aptos'
 
 const DEFAULT_FETCH_CONFIG: MoveFetchConfig = {
   resourceChanges: false,
@@ -46,10 +45,6 @@ const DEFAULT_FETCH_CONFIG: MoveFetchConfig = {
 export const DEFAULT_RESOURCE_FETCH_CONFIG: MoveAccountFetchConfig = {
   owned: true
 }
-
-export type ResourceChange<T> =
-  | DecodedStruct<WriteSetChangeWriteResource, T>
-  | DecodedStruct<WriteSetChangeDeleteResource, T>
 
 type IndexConfigure = {
   address: string
@@ -69,17 +64,6 @@ class ResourceHandlder {
 
 export class AptosProcessorState extends ListStateStorage<AptosBaseProcessor> {
   static INSTANCE = new AptosProcessorState()
-}
-
-async function decodeResourceChange(resources: { [key: string]: any }[], ctx: AptosResourcesContext) {
-  const promises = resources.map(async (r) => {
-    const data_decoded = await ctx.coder.decodeResource(r.data)
-    return {
-      ...r,
-      data_decoded
-    }
-  })
-  return await Promise.all(promises)
 }
 
 export class AptosBaseProcessor {
@@ -267,7 +251,7 @@ export class AptosBaseProcessor {
           timestamp,
           processor.config.baseLabels
         )
-        const resources = (await decodeResourceChange(data.resources, ctx)) as ResourceChange<T>[]
+        const resources = await decodeResourceChange<T>(data.resources, ctx)
         await handler(resources, ctx)
         return ctx.stopAndGetResult()
       },
