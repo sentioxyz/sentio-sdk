@@ -61,7 +61,8 @@ export class FuelAssetProcessor implements FuelBaseProcessor<FuelAssetProcessorC
           if (input.type == InputType.Coin) {
             transfer.from.push({
               address: input.owner,
-              assetId: input.assetId
+              assetId: input.assetId,
+              amount: BigInt(input.amount.toString(10))
             })
           }
         }
@@ -116,6 +117,7 @@ export type FuelTransfer = {
   from: {
     assetId: string
     address: string
+    amount: bigint
   }[]
   to: {
     address: string

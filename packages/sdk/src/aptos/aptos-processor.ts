@@ -33,6 +33,7 @@ import {
   ResourceChangeHandler
 } from '../move/index.js'
 import { Labels, PromiseOrVoid } from '../core/index.js'
+import { TypeDescriptor, DecodedStruct } from '@typemove/move'
 
 const DEFAULT_FETCH_CONFIG: MoveFetchConfig = {
   resourceChanges: false,
@@ -46,7 +47,9 @@ export const DEFAULT_RESOURCE_FETCH_CONFIG: MoveAccountFetchConfig = {
   owned: true
 }
 
-export type ResourceChange = WriteSetChangeWriteResource | WriteSetChangeDeleteResource
+export type ResourceChange<T> =
+  | DecodedStruct<WriteSetChangeWriteResource, T>
+  | DecodedStruct<WriteSetChangeDeleteResource, T>
 
 type IndexConfigure = {
   address: string
@@ -231,19 +234,21 @@ export class AptosBaseProcessor {
     return this
   }
 
-  public onResourceChange(
-    handler: (changes: ResourceChange[], ctx: AptosResourcesContext) => PromiseOrVoid,
-    type: string
+  public onResourceChange<T>(
+    handler: (changes: ResourceChange<T>[], ctx: AptosResourcesContext) => PromiseOrVoid,
+    typeDesc: TypeDescriptor<T> | string
   ): this {
+    if (typeof typeDesc === 'string') {
+      typeDesc = parseMoveType(typeDesc)
+    }
+
     const processor = this
     this.resourceHandlers.push({
       handler: async function (data) {
         if (!data.resources || !data.version) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'resource is null')
         }
-        const resources = data.resources as ResourceChange[]
         const timestamp = Number(data.timestampMicros)
-
         const ctx = new AptosResourcesContext(
           processor.config.network,
           processor.config.address,
@@ -251,10 +256,16 @@ export class AptosBaseProcessor {
           timestamp,
           processor.config.baseLabels
         )
+
+        const promises = data.resources.map((r) => {
+          return ctx.coder.decodeResource(r.data)
+        })
+        const resources = (await Promise.all(promises)) as ResourceChange<T>[]
+
         await handler(resources, ctx)
         return ctx.stopAndGetResult()
       },
-      type
+      type: typeDesc.qname
     })
     return this
   }
@@ -364,10 +375,14 @@ export class AptosResourcesProcessor {
     )
   }
 
-  public onResourceChange(
-    handler: (changes: ResourceChange[], ctx: AptosResourcesContext) => PromiseOrVoid,
-    typeOrPrefix: string
+  public onResourceChange<T>(
+    handler: (changes: ResourceChange<T>[], ctx: AptosResourcesContext) => PromiseOrVoid,
+    typeDesc: TypeDescriptor<T> | string
   ): this {
+    if (typeof typeDesc === 'string') {
+      typeDesc = parseMoveType(typeDesc)
+    }
+
     const processor = this
     this.resourcesHandlers.push({
       fetchConfig: DEFAULT_RESOURCE_FETCH_CONFIG,
@@ -377,7 +392,6 @@ export class AptosResourcesProcessor {
         if (!data.resources || !data.version) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'resource is null')
         }
-        const resources = data.resources as ResourceChange[]
         const ctx = new AptosResourcesContext(
           processor.config.network,
           processor.config.address,
@@ -385,10 +399,16 @@ export class AptosResourcesProcessor {
           timestamp,
           processor.config.baseLabels
         )
+
+        const promises = data.resources.map((r) => {
+          return ctx.coder.decodeResource(r.data)
+        })
+        const resources = (await Promise.all(promises)) as ResourceChange<T>[]
+
         await handler(resources, ctx)
         return ctx.stopAndGetResult()
       },
-      type: typeOrPrefix
+      type: typeDesc.qname
     })
     return this
   }
