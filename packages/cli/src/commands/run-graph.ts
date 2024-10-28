@@ -261,6 +261,14 @@ async function bundleSourceMap() {
     const { sources, sourcesContent } = JSON.parse(content) as { sources: string[]; sourcesContent: string[] }
     sources.forEach((name, index) => fileMap.set(name, sourcesContent[index]))
   }
+  const folder = 'src'
+  fs.readdirSync(folder, { recursive: true, encoding: 'utf8' }).forEach((p) => {
+    const filepath = path.join(folder, p)
+    if (fs.lstatSync(filepath).isDirectory() || !['.ts', '.json', '.graphql'].includes(path.extname(p))) {
+      return
+    }
+    fileMap.set(`${folder}/${p}`, fs.readFileSync(filepath, 'utf8'))
+  })
   await writeFile(
     'build/sentio-graph.wasm.map',
     JSON.stringify({
