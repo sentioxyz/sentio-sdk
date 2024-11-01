@@ -1,25 +1,14 @@
 {
-  "extends": [
-    "config:base",
-    ":preserveSemverRanges"
-  ],
-  "labels": ["dependencies"],
-  "groupName": "all",
-  "separateMajorMinor": false,
-  "packageRules": [
+  extends: ["config:recommended", ":preserveSemverRanges"],
+  labels: ["dependencies"],
+  groupName: "all",
+  separateMajorMinor: false,
+  packageRules: [
     {
-      "matchPackageNames": [
-        "@types/mkdirp",
-        "node",
-        "superstruct_solana",
-        "mkdirp",
-        "prettier2",
-        "chai",
-        "prom-client",
-      ],
-      "enabled": false
-    }
+      matchPackageNames: ["@types/mkdirp", "node", "superstruct_solana", "mkdirp", "prettier2", "chai", "prom-client"],
+      enabled: false,
+    },
   ],
-  "timezone": "America/Los_Angeles",
-  "schedule": ["after 9pm on sunday"]
+  timezone: "America/Los_Angeles",
+  schedule: ["after 9pm on sunday"],
 }
