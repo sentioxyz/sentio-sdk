@@ -6,6 +6,7 @@ import { Trace } from './eth.js'
 import { Labels, normalizeLabels } from '../core/index.js'
 import { BaseContext } from '../core/base-context.js'
 import { EthChainId } from '@sentio/chain'
+import { processMetrics } from '@sentio/runtime'
 
 export abstract class EthContext extends BaseContext {
   readonly chainId: EthChainId
@@ -204,7 +205,14 @@ export class ContractView<TContract extends BaseContract> {
   protected contract: TContract
 
   constructor(contract: TContract) {
-    this.contract = contract
+    this.contract = new Proxy(contract, {
+      get: (target, prop, receiver) => {
+        if (prop == 'getFunction') {
+          processMetrics.process_ethcall_count.add(1)
+        }
+        return Reflect.get(target, prop, receiver)
+      }
+    })
   }
 
   get rawContract() {

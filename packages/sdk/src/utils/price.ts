@@ -1,5 +1,5 @@
 import { CoinID } from '@sentio/protos'
-import { Endpoints } from '@sentio/runtime'
+import { Endpoints, processMetrics } from '@sentio/runtime'
 import { ChainId } from '@sentio/chain'
 import { LRUCache } from 'lru-cache'
 import { Configuration, PriceApi } from '@sentio/api'
@@ -67,6 +67,7 @@ export async function getPriceByTypeOrSymbolInternal(
     return price
   }
 
+  processMetrics.process_pricecall_count.add(1)
   const response = priceClient.getPrice({
     timestamp: date,
     coinIdSymbol: coinId.symbol,

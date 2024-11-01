@@ -2,7 +2,7 @@ import { BaseContext } from './base-context.js'
 import { Numberish, toMetricValue } from './numberish.js'
 import { NamedResultDescriptor } from './metadata.js'
 import { AggregationConfig, AggregationType, MetricConfig, MetricType } from '@sentio/protos'
-import { MapStateStorage } from '@sentio/runtime'
+import { MapStateStorage, processMetrics } from '@sentio/runtime'
 
 export type Labels = { [key: string]: string }
 
@@ -101,6 +101,7 @@ export class Counter extends Metric {
   }
 
   private record(ctx: BaseContext, value: Numberish, labels: Labels, add: boolean) {
+    processMetrics.process_metricrecord_count.add(1)
     ctx.update({
       counters: [
         {
@@ -149,6 +150,7 @@ export class Gauge extends Metric {
   }
 
   record(ctx: BaseContext, value: Numberish, labels: Labels = {}) {
+    processMetrics.process_metricrecord_count.add(1)
     ctx.update({
       gauges: [
         {
