@@ -44,7 +44,6 @@
     "nice-grpc-error-details": "^0.2.4",
     "nice-grpc-opentelemetry": "^0.1.15",
     "nice-grpc-prometheus": "^0.2.2",
-    "prom-client": "^14.2.0",
     "protobufjs": "^7.2.6",
     "rxjs": "^7.8.1",
     "utility-types": "^3.11.0",
@@ -54,10 +53,9 @@
     "@types/command-line-args": "^5.2.3",
     "@types/command-line-usage": "^5.0.4",
     "@types/fs-extra": "^11.0.4",
-    "@types/google-protobuf": "^3.15.12",
-    "tslib": "^2.6.2"
+    "@types/google-protobuf": "^3.15.12"
   },
   "engines": {
-    "node": ">=16"
+    "node": ">=20"
   }
 }

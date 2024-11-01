@@ -1,5 +1,5 @@
 import { Aptos, AptosConfig } from '@aptos-labs/ts-sdk'
-import { SuiClient } from '@mysten/sui.js/client'
+import { SuiClient } from '@mysten/sui/client'
 import chalk from 'chalk'
 import process from 'process'
 import path from 'path'

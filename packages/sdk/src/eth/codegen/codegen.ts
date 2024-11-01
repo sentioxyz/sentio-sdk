@@ -2,10 +2,10 @@ import { loadFileDescriptions, processOutput, skipEmptyAbis } from 'typechain/di
 import * as fs from 'fs'
 import { DEFAULT_FLAGS, Services } from 'typechain'
 import EthersSentio, { SentioEthersConfig } from './ethers-sentio.js'
-// @ts-ignore - no types
-import * as prettier from 'prettier2'
+
+import synchronizedPrettier from '@prettier/sync'
 import path from 'path'
-import mkdirp from 'mkdirp'
+import { mkdirpSync } from 'mkdirp'
 import { YamlContractConfig } from '../../core/yaml-contract-config.js'
 import chalk from 'chalk'
 
@@ -58,8 +58,8 @@ async function codegenInternal(
     fs,
     // @ts-ignore for test
     // prettier: { format: (s) => s },
-    prettier: prettier,
-    mkdirp: mkdirp.sync
+    prettier: synchronizedPrettier,
+    mkdirp: mkdirpSync
   }
   let filesGenerated = 0
 

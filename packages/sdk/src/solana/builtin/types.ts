@@ -14,7 +14,7 @@ import {
   union,
   coerce,
   instance,
-} from "superstruct_solana";
+} from "superstruct";
 
 // Replace with string
 export const PublicKeyFromString = coerce(

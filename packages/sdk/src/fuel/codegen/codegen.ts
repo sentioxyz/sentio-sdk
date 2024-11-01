@@ -1,7 +1,7 @@
 import fs, { readFileSync, writeFileSync } from 'fs'
 import chalk from 'chalk'
 import { AbiTypeGen, IFile, IFunction, ProgramTypeEnum } from '@fuel-ts/abi-typegen'
-import mkdirp from 'mkdirp'
+import { mkdirpSync } from 'mkdirp'
 import path from 'path'
 import { upperFirst } from './utils.js'
 import { versions as builtinVersions } from '@fuel-ts/versions'
@@ -65,7 +65,7 @@ async function codegenInternal(abisDir: string, outDir: string): Promise<number>
     versions: { FUELS: builtinVersions.FUELS }
   })
 
-  mkdirp.sync(outDir)
+  mkdirpSync(outDir)
   let count = 0
   abiTypeGen.files.forEach((file) => {
     if (!file.path.endsWith('.hex.ts')) {

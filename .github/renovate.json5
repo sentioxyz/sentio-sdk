@@ -5,7 +5,7 @@
   separateMajorMinor: false,
   packageRules: [
     {
-      matchPackageNames: ["@types/mkdirp", "node", "superstruct_solana", "mkdirp", "prettier2", "chai", "prom-client"],
+      matchPackageNames: [ "node"],
       enabled: false,
     },
   ],

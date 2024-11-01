@@ -13,7 +13,7 @@ import {
 } from 'graphql'
 import * as fs from 'node:fs'
 import path from 'path'
-import mkdirp from 'mkdirp'
+import { mkdirpSync } from 'mkdirp'
 import { schemaFromFile } from './schema.js'
 import chalk from 'chalk'
 
@@ -239,7 +239,7 @@ DatabaseSchema.register({
   }
 })
 `
-  await mkdirp(path.dirname(target))
+  mkdirpSync(path.dirname(target))
 
   fs.writeFileSync(target, contents)
 }

@@ -1,7 +1,7 @@
 import fs, { readFileSync, writeFileSync } from 'fs'
 import chalk from 'chalk'
 import path from 'path'
-import mkdirp from 'mkdirp'
+import { mkdirpSync } from 'mkdirp'
 import { events } from 'starknet'
 import { StarknetChainId } from '@sentio/chain'
 import { Abi } from '@sentio/abi-wan-kanabi'
@@ -65,7 +65,7 @@ async function codegenInternal(abisDir: string, outDir: string): Promise<number>
     tABIContents.push(`export const ABI_${name} = ${JSON.stringify(abi.abi, null, 2)} as const;`)
   }
 
-  mkdirp.sync(outDir)
+  mkdirpSync(outDir)
   writeFileSync(path.join(outDir, 'tabi.ts'), tABIContents.join('\n'))
   fileCount++
   for (const { name, address, chain, abi: jsonAbi } of Object.values(abis)) {

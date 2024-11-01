@@ -380,6 +380,24 @@
           }
         ],
         "return": ["U64"]
+      },
+      "get_distribution_counter": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "stake_subsidy",
+                "name": "StakeSubsidy",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": ["U64"]
       }
     }
   },
@@ -398,6 +416,95 @@
       }
     ],
     "structs": {
+      "FungibleStakedSui": {
+        "abilities": {
+          "abilities": ["Store", "Key"]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "id",
+            "type": {
+              "Struct": {
+                "address": "0x2",
+                "module": "object",
+                "name": "UID",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "pool_id",
+            "type": {
+              "Struct": {
+                "address": "0x2",
+                "module": "object",
+                "name": "ID",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "value",
+            "type": "U64"
+          }
+        ]
+      },
+      "FungibleStakedSuiData": {
+        "abilities": {
+          "abilities": ["Store", "Key"]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "id",
+            "type": {
+              "Struct": {
+                "address": "0x2",
+                "module": "object",
+                "name": "UID",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "total_supply",
+            "type": "U64"
+          },
+          {
+            "name": "principal",
+            "type": {
+              "Struct": {
+                "address": "0x2",
+                "module": "balance",
+                "name": "Balance",
+                "typeArguments": [
+                  {
+                    "Struct": {
+                      "address": "0x2",
+                      "module": "sui",
+                      "name": "SUI",
+                      "typeArguments": []
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "FungibleStakedSuiDataKey": {
+        "abilities": {
+          "abilities": ["Copy", "Drop", "Store"]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "dummy_field",
+            "type": "Bool"
+          }
+        ]
+      },
       "PoolTokenExchangeRate": {
         "abilities": {
           "abilities": ["Copy", "Drop", "Store"]
@@ -602,6 +709,51 @@
         ],
         "return": []
       },
+      "convert_to_fungible_staked_sui": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "staking_pool",
+                "name": "StakingPool",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x3",
+              "module": "staking_pool",
+              "name": "StakedSui",
+              "typeArguments": []
+            }
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x3",
+              "module": "staking_pool",
+              "name": "FungibleStakedSui",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
       "deactivate_staking_pool": {
         "visibility": "Friend",
         "isEntry": false,
@@ -695,6 +847,51 @@
           }
         ]
       },
+      "fungible_staked_sui_pool_id": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "staking_pool",
+                "name": "FungibleStakedSui",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "object",
+              "name": "ID",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "fungible_staked_sui_value": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "staking_pool",
+                "name": "FungibleStakedSui",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": ["U64"]
+      },
       "is_equal_staking_metadata": {
         "visibility": "Public",
         "isEntry": false,
@@ -758,6 +955,32 @@
           }
         ],
         "return": ["Bool"]
+      },
+      "join_fungible_staked_sui": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "staking_pool",
+                "name": "FungibleStakedSui",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x3",
+              "module": "staking_pool",
+              "name": "FungibleStakedSui",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": []
       },
       "join_staked_sui": {
         "visibility": "Public",
@@ -967,6 +1190,60 @@
         ],
         "return": []
       },
+      "redeem_fungible_staked_sui": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "staking_pool",
+                "name": "StakingPool",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x3",
+              "module": "staking_pool",
+              "name": "FungibleStakedSui",
+              "typeArguments": []
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "balance",
+              "name": "Balance",
+              "typeArguments": [
+                {
+                  "Struct": {
+                    "address": "0x2",
+                    "module": "sui",
+                    "name": "SUI",
+                    "typeArguments": []
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
       "request_add_stake": {
         "visibility": "Friend",
         "isEntry": false,
@@ -1109,6 +1386,44 @@
               "address": "0x3",
               "module": "staking_pool",
               "name": "StakedSui",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "split_fungible_staked_sui": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "staking_pool",
+                "name": "FungibleStakedSui",
+                "typeArguments": []
+              }
+            }
+          },
+          "U64",
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x3",
+              "module": "staking_pool",
+              "name": "FungibleStakedSui",
               "typeArguments": []
             }
           }
@@ -1542,6 +1857,51 @@
           }
         ]
       },
+      "convert_to_fungible_staked_sui": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "sui_system",
+                "name": "SuiSystemState",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x3",
+              "module": "staking_pool",
+              "name": "StakedSui",
+              "typeArguments": []
+            }
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x3",
+              "module": "staking_pool",
+              "name": "FungibleStakedSui",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
       "create": {
         "visibility": "Friend",
         "isEntry": false,
@@ -1658,6 +2018,60 @@
                   }
                 ]
               }
+            }
+          }
+        ]
+      },
+      "redeem_fungible_staked_sui": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "sui_system",
+                "name": "SuiSystemState",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x3",
+              "module": "staking_pool",
+              "name": "FungibleStakedSui",
+              "typeArguments": []
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "balance",
+              "name": "Balance",
+              "typeArguments": [
+                {
+                  "Struct": {
+                    "address": "0x2",
+                    "module": "sui",
+                    "name": "SUI",
+                    "typeArguments": []
+                  }
+                }
+              ]
             }
           }
         ]
@@ -2824,6 +3238,34 @@
           }
         ],
         "return": []
+      },
+      "validator_address_by_pool_id": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "sui_system",
+                "name": "SuiSystemState",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "object",
+                "name": "ID",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": ["Address"]
       }
     }
   },
@@ -3446,6 +3888,51 @@
           }
         ]
       },
+      "convert_to_fungible_staked_sui": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "sui_system_state_inner",
+                "name": "SuiSystemStateInnerV2",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x3",
+              "module": "staking_pool",
+              "name": "StakedSui",
+              "typeArguments": []
+            }
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x3",
+              "module": "staking_pool",
+              "name": "FungibleStakedSui",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
       "create": {
         "visibility": "Friend",
         "isEntry": false,
@@ -3725,6 +4212,60 @@
           }
         ],
         "return": ["U64"]
+      },
+      "redeem_fungible_staked_sui": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "sui_system_state_inner",
+                "name": "SuiSystemStateInnerV2",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x3",
+              "module": "staking_pool",
+              "name": "FungibleStakedSui",
+              "typeArguments": []
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "balance",
+              "name": "Balance",
+              "typeArguments": [
+                {
+                  "Struct": {
+                    "address": "0x2",
+                    "module": "sui",
+                    "name": "SUI",
+                    "typeArguments": []
+                  }
+                }
+              ]
+            }
+          }
+        ]
       },
       "report_validator": {
         "visibility": "Friend",
@@ -4859,6 +5400,34 @@
           }
         ]
       },
+      "validator_address_by_pool_id": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "sui_system_state_inner",
+                "name": "SuiSystemStateInnerV2",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "object",
+                "name": "ID",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": ["Address"]
+      },
       "validator_stake_amount": {
         "visibility": "Friend",
         "isEntry": false,
@@ -4970,6 +5539,64 @@
       }
     ],
     "structs": {
+      "ConvertingToFungibleStakedSuiEvent": {
+        "abilities": {
+          "abilities": ["Copy", "Drop"]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "pool_id",
+            "type": {
+              "Struct": {
+                "address": "0x2",
+                "module": "object",
+                "name": "ID",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "stake_activation_epoch",
+            "type": "U64"
+          },
+          {
+            "name": "staked_sui_principal_amount",
+            "type": "U64"
+          },
+          {
+            "name": "fungible_staked_sui_amount",
+            "type": "U64"
+          }
+        ]
+      },
+      "RedeemingFungibleStakedSuiEvent": {
+        "abilities": {
+          "abilities": ["Copy", "Drop"]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "pool_id",
+            "type": {
+              "Struct": {
+                "address": "0x2",
+                "module": "object",
+                "name": "ID",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "fungible_staked_sui_amount",
+            "type": "U64"
+          },
+          {
+            "name": "sui_amount",
+            "type": "U64"
+          }
+        ]
+      },
       "StakingRequestEvent": {
         "abilities": {
           "abilities": ["Copy", "Drop"]
@@ -5455,6 +6082,51 @@
           }
         ],
         "return": ["U64"]
+      },
+      "convert_to_fungible_staked_sui": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "validator",
+                "name": "Validator",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x3",
+              "module": "staking_pool",
+              "name": "StakedSui",
+              "typeArguments": []
+            }
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x3",
+              "module": "staking_pool",
+              "name": "FungibleStakedSui",
+              "typeArguments": []
+            }
+          }
+        ]
       },
       "deactivate": {
         "visibility": "Friend",
@@ -6540,6 +7212,60 @@
           {
             "Reference": {
               "Vector": "U8"
+            }
+          }
+        ]
+      },
+      "redeem_fungible_staked_sui": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "validator",
+                "name": "Validator",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x3",
+              "module": "staking_pool",
+              "name": "FungibleStakedSui",
+              "typeArguments": []
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "balance",
+              "name": "Balance",
+              "typeArguments": [
+                {
+                  "Struct": {
+                    "address": "0x2",
+                    "module": "sui",
+                    "name": "SUI",
+                    "typeArguments": []
+                  }
+                }
+              ]
             }
           }
         ]
@@ -8059,6 +8785,51 @@
         ],
         "return": []
       },
+      "convert_to_fungible_staked_sui": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "validator_set",
+                "name": "ValidatorSet",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x3",
+              "module": "staking_pool",
+              "name": "StakedSui",
+              "typeArguments": []
+            }
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x3",
+              "module": "staking_pool",
+              "name": "FungibleStakedSui",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
       "derive_reference_gas_price": {
         "visibility": "Public",
         "isEntry": false,
@@ -8516,6 +9287,60 @@
           }
         ]
       },
+      "redeem_fungible_staked_sui": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "validator_set",
+                "name": "ValidatorSet",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x3",
+              "module": "staking_pool",
+              "name": "FungibleStakedSui",
+              "typeArguments": []
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "balance",
+              "name": "Balance",
+              "typeArguments": [
+                {
+                  "Struct": {
+                    "address": "0x2",
+                    "module": "sui",
+                    "name": "SUI",
+                    "typeArguments": []
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
       "request_add_stake": {
         "visibility": "Friend",
         "isEntry": false,
@@ -8856,6 +9681,34 @@
           }
         ],
         "return": ["U64"]
+      },
+      "validator_address_by_pool_id": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "validator_set",
+                "name": "ValidatorSet",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "object",
+                "name": "ID",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": ["Address"]
       },
       "validator_stake_amount": {
         "visibility": "Public",

@@ -1986,6 +1986,13 @@
     "friends": [],
     "structs": {},
     "exposedFunctions": {
+      "bitwise_not": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U128"],
+        "return": ["U128"]
+      },
       "diff": {
         "visibility": "Public",
         "isEntry": false,
@@ -2027,6 +2034,86 @@
         "typeParameters": [],
         "parameters": ["U128"],
         "return": ["U128"]
+      },
+      "to_string": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U128"],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "string",
+              "name": "String",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "try_as_u16": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U128"],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": ["U16"]
+            }
+          }
+        ]
+      },
+      "try_as_u32": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U128"],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": ["U32"]
+            }
+          }
+        ]
+      },
+      "try_as_u64": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U128"],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": ["U64"]
+            }
+          }
+        ]
+      },
+      "try_as_u8": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U128"],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": ["U8"]
+            }
+          }
+        ]
       }
     }
   },
@@ -2037,6 +2124,13 @@
     "friends": [],
     "structs": {},
     "exposedFunctions": {
+      "bitwise_not": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U16"],
+        "return": ["U16"]
+      },
       "diff": {
         "visibility": "Public",
         "isEntry": false,
@@ -2078,6 +2172,38 @@
         "typeParameters": [],
         "parameters": ["U16"],
         "return": ["U16"]
+      },
+      "to_string": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U16"],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "string",
+              "name": "String",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "try_as_u8": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U16"],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": ["U8"]
+            }
+          }
+        ]
       }
     }
   },
@@ -2088,6 +2214,13 @@
     "friends": [],
     "structs": {},
     "exposedFunctions": {
+      "bitwise_not": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U256"],
+        "return": ["U256"]
+      },
       "diff": {
         "visibility": "Public",
         "isEntry": false,
@@ -2122,6 +2255,102 @@
         "typeParameters": [],
         "parameters": ["U256", "U8"],
         "return": ["U256"]
+      },
+      "to_string": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U256"],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "string",
+              "name": "String",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "try_as_u128": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U256"],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": ["U128"]
+            }
+          }
+        ]
+      },
+      "try_as_u16": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U256"],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": ["U16"]
+            }
+          }
+        ]
+      },
+      "try_as_u32": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U256"],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": ["U32"]
+            }
+          }
+        ]
+      },
+      "try_as_u64": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U256"],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": ["U64"]
+            }
+          }
+        ]
+      },
+      "try_as_u8": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U256"],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": ["U8"]
+            }
+          }
+        ]
       }
     }
   },
@@ -2132,6 +2361,13 @@
     "friends": [],
     "structs": {},
     "exposedFunctions": {
+      "bitwise_not": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U32"],
+        "return": ["U32"]
+      },
       "diff": {
         "visibility": "Public",
         "isEntry": false,
@@ -2173,6 +2409,54 @@
         "typeParameters": [],
         "parameters": ["U32"],
         "return": ["U32"]
+      },
+      "to_string": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U32"],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "string",
+              "name": "String",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "try_as_u16": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U32"],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": ["U16"]
+            }
+          }
+        ]
+      },
+      "try_as_u8": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U32"],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": ["U8"]
+            }
+          }
+        ]
       }
     }
   },
@@ -2183,6 +2467,13 @@
     "friends": [],
     "structs": {},
     "exposedFunctions": {
+      "bitwise_not": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U64"],
+        "return": ["U64"]
+      },
       "diff": {
         "visibility": "Public",
         "isEntry": false,
@@ -2224,6 +2515,70 @@
         "typeParameters": [],
         "parameters": ["U64"],
         "return": ["U64"]
+      },
+      "to_string": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U64"],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "string",
+              "name": "String",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "try_as_u16": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U64"],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": ["U16"]
+            }
+          }
+        ]
+      },
+      "try_as_u32": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U64"],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": ["U32"]
+            }
+          }
+        ]
+      },
+      "try_as_u8": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U64"],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": ["U8"]
+            }
+          }
+        ]
       }
     }
   },
@@ -2234,6 +2589,13 @@
     "friends": [],
     "structs": {},
     "exposedFunctions": {
+      "bitwise_not": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U8"],
+        "return": ["U8"]
+      },
       "diff": {
         "visibility": "Public",
         "isEntry": false,
@@ -2275,6 +2637,386 @@
         "typeParameters": [],
         "parameters": ["U8"],
         "return": ["U8"]
+      },
+      "to_string": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U8"],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "string",
+              "name": "String",
+              "typeArguments": []
+            }
+          }
+        ]
+      }
+    }
+  },
+  "uq32_32": {
+    "fileFormatVersion": 6,
+    "address": "0x1",
+    "name": "uq32_32",
+    "friends": [],
+    "structs": {
+      "UQ32_32": {
+        "abilities": {
+          "abilities": ["Copy", "Drop", "Store"]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "pos0",
+            "type": "U64"
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {
+      "add": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq32_32",
+              "name": "UQ32_32",
+              "typeArguments": []
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq32_32",
+              "name": "UQ32_32",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq32_32",
+              "name": "UQ32_32",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "div": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq32_32",
+              "name": "UQ32_32",
+              "typeArguments": []
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq32_32",
+              "name": "UQ32_32",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq32_32",
+              "name": "UQ32_32",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "from_int": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U32"],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq32_32",
+              "name": "UQ32_32",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "from_quotient": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U64", "U64"],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq32_32",
+              "name": "UQ32_32",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "from_raw": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U64"],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq32_32",
+              "name": "UQ32_32",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "ge": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq32_32",
+              "name": "UQ32_32",
+              "typeArguments": []
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq32_32",
+              "name": "UQ32_32",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": ["Bool"]
+      },
+      "gt": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq32_32",
+              "name": "UQ32_32",
+              "typeArguments": []
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq32_32",
+              "name": "UQ32_32",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": ["Bool"]
+      },
+      "int_div": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U64",
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq32_32",
+              "name": "UQ32_32",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": ["U64"]
+      },
+      "int_mul": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U64",
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq32_32",
+              "name": "UQ32_32",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": ["U64"]
+      },
+      "le": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq32_32",
+              "name": "UQ32_32",
+              "typeArguments": []
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq32_32",
+              "name": "UQ32_32",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": ["Bool"]
+      },
+      "lt": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq32_32",
+              "name": "UQ32_32",
+              "typeArguments": []
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq32_32",
+              "name": "UQ32_32",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": ["Bool"]
+      },
+      "mul": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq32_32",
+              "name": "UQ32_32",
+              "typeArguments": []
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq32_32",
+              "name": "UQ32_32",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq32_32",
+              "name": "UQ32_32",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "sub": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq32_32",
+              "name": "UQ32_32",
+              "typeArguments": []
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq32_32",
+              "name": "UQ32_32",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq32_32",
+              "name": "UQ32_32",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "to_int": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq32_32",
+              "name": "UQ32_32",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": ["U32"]
+      },
+      "to_raw": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq32_32",
+              "name": "UQ32_32",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": ["U64"]
       }
     }
   },
@@ -2411,6 +3153,31 @@
           }
         ],
         "parameters": [],
+        "return": [
+          {
+            "Vector": {
+              "TypeParameter": 0
+            }
+          }
+        ]
+      },
+      "flatten": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "Vector": {
+              "Vector": {
+                "TypeParameter": 0
+              }
+            }
+          }
+        ],
         "return": [
           {
             "Vector": {
