@@ -9,7 +9,8 @@ export const AptosNetwork = <const>{
   TEST_NET: AptosChainId.APTOS_TESTNET,
   // DEV_NET: AptosChainId.APTOS_DEVNET,
   MOVEMENT_MAIN_NET: AptosChainId.APTOS_MOVEMENT_MAINNET,
-  MOVEMENT_TEST_NET: AptosChainId.APTOS_MOVEMENT_TESTNET
+  MOVEMENT_TEST_NET: AptosChainId.APTOS_MOVEMENT_TESTNET,
+  MOVEMENT_PORTO: AptosChainId.APTOS_MOVEMENT_PORTO
 }
 
 export class AptosBindOptions {

@@ -36,19 +36,7 @@ class SuiNetworkCodegen extends BaseSuiCodegen {
       ADDRESS_TYPE = 'string'
       PREFIX = 'Sui'
       SYSTEM_PACKAGE = '@typemove/sui'
-
-      generateNetworkOption(network: SuiNetwork): string {
-        switch (network) {
-          case SuiNetwork.MAIN_NET:
-            return 'MAIN_NET'
-          case SuiNetwork.MOVEMENT_MAIN_NET:
-            return 'MOVEMENT_MAIN_NET'
-          case SuiNetwork.MOVEMENT_TEST_NET:
-            return 'MOVEMENT_TEST_NET'
-          default:
-            return 'TEST_NET'
-        }
-      }
+      NETWORK = SuiNetwork
 
       generateStructs(module: InternalMoveModule, struct: InternalMoveStruct, events: Set<string>): string {
         let content = ''

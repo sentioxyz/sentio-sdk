@@ -35,19 +35,7 @@ class AptosNetworkCodegen extends BaseAptosCodegen {
       ADDRESS_TYPE = 'MoveAddressType'
       PREFIX = 'Aptos'
       SYSTEM_PACKAGE = '@typemove/aptos'
-
-      generateNetworkOption(network: AptosNetwork): string {
-        switch (network) {
-          case AptosNetwork.MAIN_NET:
-            return 'MAIN_NET'
-          case AptosNetwork.MOVEMENT_MAIN_NET:
-            return 'MOVEMENT_MAIN_NET'
-          case AptosNetwork.MOVEMENT_TEST_NET:
-            return 'MOVEMENT_TEST_NET'
-          default:
-            return 'TEST_NET'
-        }
-      }
+      NETWORK = AptosNetwork
     })(network, this.chainAdapter)
   }
 

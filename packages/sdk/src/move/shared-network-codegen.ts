@@ -15,6 +15,10 @@ export abstract class SharedNetworkCodegen<NetworkType, ModuleTypes, StructType>
   ModuleTypes,
   StructType
 > {
+  // readonly ALL_NETWORKS: string[]
+  readonly NETWORK: object
+  readonly networkIdToKey = new Map<NetworkType, string>()
+
   network: NetworkType
   constructor(network: NetworkType, chainAdapter: ChainAdapter<ModuleTypes, StructType>) {
     super(chainAdapter)
@@ -24,6 +28,10 @@ export abstract class SharedNetworkCodegen<NetworkType, ModuleTypes, StructType>
     const functions = module.exposedFunctions
       .map((f) => this.generateForEntryFunctions(module, f))
       .filter((s) => s !== '')
+
+    Object.entries(this.NETWORK).forEach(([key, value]) => {
+      this.networkIdToKey.set(value, key)
+    })
 
     const qname = moduleQname(module)
     const eventStructs = new Map<string, InternalMoveStruct>()
@@ -73,7 +81,9 @@ export abstract class SharedNetworkCodegen<NetworkType, ModuleTypes, StructType>
   //   `
   // }
 
-  abstract generateNetworkOption(network: NetworkType): string
+  generateNetworkOption(network: NetworkType): string {
+    return this.networkIdToKey.get(network)!
+  }
 
   generateForEntryFunctions(module: InternalMoveModule, func: InternalMoveFunction) {
     if (!func.isEntry) {
@@ -129,12 +139,9 @@ onEvent${struct.name}(func: (event: ${moduleName}.${normalizeToJSName(struct.nam
   generateLoadAll(isSystem: boolean): string {
     let source = `loadAllTypes(defaultMoveCoder(${this.PREFIX}Network.${this.generateNetworkOption(this.network)}))`
     if (isSystem) {
-      source = `
-      loadAllTypes(defaultMoveCoder(${this.PREFIX}Network.MAIN_NET))
-      loadAllTypes(defaultMoveCoder(${this.PREFIX}Network.TEST_NET))
-      loadAllTypes(defaultMoveCoder(${this.PREFIX}Network.MOVEMENT_TEST_NET))
-      loadAllTypes(defaultMoveCoder(${this.PREFIX}Network.MOVEMENT_MAIN_NET))
-      `
+      source = Object.keys(this.NETWORK)
+        .map((network) => `loadAllTypes(defaultMoveCoder(${this.PREFIX}Network.${network}))`)
+        .join('\n')
     }
     return source
   }

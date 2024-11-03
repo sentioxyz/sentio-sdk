@@ -6,10 +6,10 @@ import { SuiClient } from '@mysten/sui/client'
 export type SuiNetwork = SuiChainId
 export const SuiNetwork = <const>{
   MAIN_NET: SuiChainId.SUI_MAINNET,
-  TEST_NET: SuiChainId.SUI_TESTNET,
+  TEST_NET: SuiChainId.SUI_TESTNET
   // DEV_NET: SuiChainId.SUI_DEVNET,
-  MOVEMENT_MAIN_NET: SuiChainId.SUI_MOVEMENT_MAINNET,
-  MOVEMENT_TEST_NET: SuiChainId.SUI_MOVEMENT_TESTNET
+  // MOVEMENT_MAIN_NET: SuiChainId.SUI_MOVEMENT_MAINNET,
+  // MOVEMENT_TEST_NET: SuiChainId.SUI_MOVEMENT_TESTNET
 }
 
 export function getClient(network: SuiNetwork): SuiClient {
