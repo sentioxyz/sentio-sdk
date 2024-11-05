@@ -23,14 +23,17 @@ export class AptosBindOptions {
 
 export function getRpcEndpoint(network: AptosNetwork): string {
   switch (network) {
+    case AptosNetwork.MAIN_NET:
+      return 'https://mainnet.aptoslabs.com/v1'
     case AptosNetwork.TEST_NET:
       return 'https://testnet.aptoslabs.com/v1'
     case AptosNetwork.MOVEMENT_TEST_NET:
       return 'https://aptos.testnet.suzuka.movementlabs.xyz/v1'
     case AptosNetwork.MOVEMENT_MAIN_NET:
-      return 'https://mainnet.m1.movementlabs.xyz/v1'
+      return 'https://aptos.mainnet.movementlabs.xyz/v1'
+    case AptosNetwork.MOVEMENT_PORTO:
+      return 'https://aptos.testnet.porto.movementlabs.xyz/v1'
   }
-  return 'https://mainnet.aptoslabs.com/v1'
 }
 
 export function getClient(network: AptosNetwork): Aptos {

@@ -7,9 +7,7 @@ import latestVersion from 'latest-version'
 import process from 'process'
 import { execPackageManager } from '../execution.js'
 import { errorOnUnknownOption, getPackageRoot } from '../utils.js'
-import { EthChainInfo, EthChainId } from '@sentio/chain'
-
-const supportedChain: EthChainId[] = Object.values(EthChainInfo).map((chain) => chain.chainId)
+import { EthChainInfo } from '@sentio/chain'
 
 export const supportedChainMessage = [
   ',  <Chain ID> (<Chain Name>)',
