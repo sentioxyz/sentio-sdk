@@ -43,3 +43,4 @@ ignore:
   - packages/sdk/src/fuel/tests
   - packages/sdk/src/stark/tests
   - packages/sdk/src/tests
+  - packages/action/node_modules
