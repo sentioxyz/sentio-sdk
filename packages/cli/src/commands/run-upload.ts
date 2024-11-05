@@ -156,6 +156,10 @@ export async function createProjectPrompt(options: YamlProjectConfig, auth: Auth
     rl.question(`Project not found, do you want to create it and continue the uploading process? (yes/no) `, resolve)
   )
   if (['y', 'yes'].includes(answer.toLowerCase())) {
+    if (!type && options.type == 'action') {
+      type = 'ACTION'
+    }
+
     rl.close()
     const res = await createProject(options, auth, type)
     if (!res.ok) {
@@ -222,9 +226,8 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth, continu
     if (!initUploadResRaw.ok) {
       // console.error(chalk.red('Failed to get upload url'))
       console.error(chalk.red(((await initUploadResRaw.json()) as { message: string }).message))
-
       if (initUploadResRaw.status === 404) {
-        const created = await createProjectPrompt(options, auth)
+        const created = await createProjectPrompt(options, auth )
         if (created) {
           await upload()
         }

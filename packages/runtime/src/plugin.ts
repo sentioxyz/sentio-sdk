@@ -15,7 +15,13 @@ export abstract class Plugin {
   supportedHandlers: HandlerType[] = []
 
   async configure(config: ProcessConfigResponse): Promise<void> {}
-  async start(start: StartRequest): Promise<void> {}
+  async start(start: StartRequest, actionServerPort?: number): Promise<void> {}
+
+  /**
+   * method used by action server only
+   * @param port
+   */
+  async startServer(port?: number): Promise<void> {}
 
   /**
    * @deprecated The method should not be used, use ctx.states instead
@@ -59,8 +65,12 @@ export class PluginManager {
     return Promise.all(this.plugins.map((plugin) => plugin.configure(config)))
   }
 
-  start(start: StartRequest) {
-    return Promise.all(this.plugins.map((plugin) => plugin.start(start)))
+  start(start: StartRequest, actionServerPort?: number) {
+    return Promise.all(this.plugins.map((plugin) => plugin.start(start, actionServerPort)))
+  }
+
+  startServer(port?: number) {
+    return Promise.all(this.plugins.map((plugin) => plugin.startServer(port)))
   }
 
   /**

@@ -1,0 +1,19 @@
+{
+  "private": true,
+  "name": "@sentio-example/action-example",
+  "version": "1.0.0",
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "build": "sentio build --skip-deps",
+    "build:all": "pnpm --filter=$(node -p \"require('./package.json').name\")... build",
+    "compile": "tsc -p .",
+    "upload": "sentio upload"
+  },
+  "dependencies": {
+    "@sentio/action": "workspace:*"
+  },
+  "devDependencies": {
+    "@sentio/cli": "workspace:*"
+  }
+}

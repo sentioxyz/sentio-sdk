@@ -5,7 +5,7 @@ import fs from 'fs-extra'
 
 import { compressionAlgorithms } from '@grpc/grpc-js'
 import commandLineArgs from 'command-line-args'
-import { createServer } from 'nice-grpc'
+import { createServer, Server } from 'nice-grpc'
 import { errorDetailsServerMiddleware } from 'nice-grpc-error-details'
 // import { registry as niceGrpcRegistry } from 'nice-grpc-prometheus'
 import { openTelemetryServerMiddleware } from 'nice-grpc-opentelemetry'
@@ -21,6 +21,8 @@ import { ChainConfig } from './chain-config.js'
 import { setupLogger } from './logger.js'
 
 import { setupOTLP } from './otlp.js'
+import { PluginManager } from './plugin.js'
+import { ProcessConfigResponse } from '@sentio/protos'
 
 // const mergedRegistry = Registry.merge([globalRegistry, niceGrpcRegistry])
 
@@ -39,7 +41,8 @@ const optionDefinitions = [
   { name: 'chainquery-server', type: String, defaultValue: '' },
   { name: 'pricefeed-server', type: String, defaultValue: '' },
   { name: 'log-format', type: String, defaultValue: 'console' },
-  { name: 'debug', type: Boolean, defaultValue: false }
+  { name: 'debug', type: Boolean, defaultValue: false },
+  { name: 'start-action-server', type: Boolean, defaultValue: false }
 ]
 
 const options = commandLineArgs(optionDefinitions, { partial: true })
@@ -84,26 +87,41 @@ for (const [id, config] of Object.entries(chainsConfig)) {
 
 console.debug('Starting Server', options)
 
-const server = createServer({
-  'grpc.max_send_message_length': 384 * 1024 * 1024,
-  'grpc.max_receive_message_length': 384 * 1024 * 1024,
-  'grpc.default_compression_algorithm': compressionAlgorithms.gzip
-})
-  // .use(prometheusServerMiddleware())
-  .use(openTelemetryServerMiddleware())
-  .use(errorDetailsServerMiddleware)
-const baseService = new ProcessorServiceImpl(async () => {
-  const m = await import(options.target)
-  console.debug('Module loaded', m)
-  return m
-}, server.shutdown)
-const service = new FullProcessorServiceImpl(baseService)
+let server: Server
+let baseService: ProcessorServiceImpl
 
-server.add(ProcessorDefinition, service)
+if (options.startActionServer) {
+  const pluginManager = PluginManager.INSTANCE
+  pluginManager
+    .configure(ProcessConfigResponse.create())
+    .then(() => {
+      return pluginManager.startServer(options.port)
+    })
+    .catch((err) => {
+      console.error('Error starting action server', err)
+    })
+} else {
+  server = createServer({
+    'grpc.max_send_message_length': 384 * 1024 * 1024,
+    'grpc.max_receive_message_length': 384 * 1024 * 1024,
+    'grpc.default_compression_algorithm': compressionAlgorithms.gzip
+  })
+    // .use(prometheusServerMiddleware())
+    .use(openTelemetryServerMiddleware())
+    .use(errorDetailsServerMiddleware)
+  baseService = new ProcessorServiceImpl(async () => {
+    const m = await import(options.target)
+    console.debug('Module loaded', m)
+    return m
+  }, server.shutdown)
+  const service = new FullProcessorServiceImpl(baseService)
 
-server.listen('0.0.0.0:' + options.port)
+  server.add(ProcessorDefinition, service)
 
-console.log('Processor Server Started at:', options.port)
+  server.listen('0.0.0.0:' + options.port)
+
+  console.log('Processor Server Started at:', options.port)
+}
 
 const metricsPort = 4040
 const httpServer = http
@@ -154,7 +172,9 @@ process
   })
   .on('uncaughtException', (err) => {
     console.error('Uncaught Exception, please checking if await is properly used', err)
-    baseService.unhandled = err
+    if (baseService) {
+      baseService.unhandled = err
+    }
     // shutdownServers(1)
   })
   .on('unhandledRejection', (reason, p) => {
@@ -163,12 +183,14 @@ process
       return
     }
     console.error('Unhandled Rejection, please checking if await is properly', reason)
-    baseService.unhandled = reason as Error
+    if (baseService) {
+      baseService.unhandled = reason as Error
+    }
     // shutdownServers(1)
   })
 
 function shutdownServers(exitCode: number) {
-  server.forceShutdown()
+  server?.forceShutdown()
   console.log('RPC server shut down')
 
   httpServer.close(function () {
