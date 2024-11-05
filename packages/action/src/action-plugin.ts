@@ -1,7 +1,7 @@
 import fastify from 'fastify'
 
 import { Plugin, PluginManager } from '@sentio/runtime'
-import { ProcessConfigResponse, StartRequest } from '@sentio/protos'
+import { ProcessConfigResponse } from '@sentio/protos'
 import { ActionProcessorState } from './action-processor.js'
 
 export class ActionPlugin extends Plugin {
