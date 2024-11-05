@@ -90,11 +90,12 @@ console.debug('Starting Server', options)
 let server: Server
 let baseService: ProcessorServiceImpl
 
-if (options.startActionServer) {
+if (options['start-action-server']) {
   const pluginManager = PluginManager.INSTANCE
   pluginManager
     .configure(ProcessConfigResponse.create())
     .then(() => {
+      console.log('Starting Action Server at:', options.port)
       return pluginManager.startServer(options.port)
     })
     .catch((err) => {

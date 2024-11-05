@@ -13,25 +13,15 @@
   ],
   "scripts": {
     "build": "pnpm gen && pnpm compile",
-    "gen": "echo",
     "build:all": "pnpm --filter=$(node -p \"require('./package.json').name\")... build",
     "build:bundle": "pnpm gen && pnpm bundle && pnpm bundle:dts",
     "bundle": "tsup --config src/bundle.config.ts && cp src/tsup.config.ts lib",
     "bundle:dts": "tsc --emitDeclarationOnly --declaration",
     "compile": "tsc && cp src/tsup.config.ts lib",
+    "gen": "echo",
     "test": "glob -c 'tsx --test' '**/*.test.ts'"
   },
   "dependencies": {
-    "@aptos-labs/ts-sdk": "~1.26.0",
-    "@coral-xyz/borsh": "^0.30.0",
-    "@fuel-ts/program": "^0.96.1",
-    "@mysten/sui": "~1.13.0",
-    "@project-serum/anchor": "^0.26.0",
-    "@sentio/abi-wan-kanabi": "2.2.2-1",
-    "@sentio/api": "1.0.2-rc.11",
-    "@sentio/bigdecimal": "9.1.1-patch.3",
-    "@sentio/chain": "^2.1.10",
-    "@sentio/ethers-v6": "^1.0.29",
     "@sentio/protos": "workspace:*",
     "@sentio/runtime": "workspace:^",
     "fastify": "^5.1.0"
@@ -40,9 +30,6 @@
     "tsup": "npm:@sentio/tsup@^6.7.6"
   },
   "devDependencies": {
-    "@certusone/wormhole-sdk": "^0.10.16",
-    "@types/google-protobuf": "^3.15.12",
-    "@types/mkdirp": "^1.0.2",
     "prettier": "^3.2.4",
     "tslib": "^2.6.2",
     "typedoc": "^0.26.0"
