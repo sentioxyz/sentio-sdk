@@ -15,13 +15,8 @@ export abstract class Plugin {
   supportedHandlers: HandlerType[] = []
 
   async configure(config: ProcessConfigResponse): Promise<void> {}
-  async start(start: StartRequest, actionServerPort?: number): Promise<void> {}
 
-  /**
-   * method used by action server only
-   * @param port
-   */
-  async startServer(port?: number): Promise<void> {}
+  async start(start: StartRequest): Promise<void> {}
 
   /**
    * @deprecated The method should not be used, use ctx.states instead
@@ -37,6 +32,17 @@ export abstract class Plugin {
   async preprocessBinding(request: DataBinding, preprocessStore: { [k: string]: any }): Promise<PreprocessResult> {
     return PreprocessResult.create()
   }
+
+  /**
+   * method used by action server only
+   * @param port
+   */
+  async startServer(port?: number): Promise<void> {}
+
+  /**
+   * method used by action server only
+   */
+  shutdownServer() {}
 }
 
 export class PluginManager {
@@ -66,11 +72,15 @@ export class PluginManager {
   }
 
   start(start: StartRequest, actionServerPort?: number) {
-    return Promise.all(this.plugins.map((plugin) => plugin.start(start, actionServerPort)))
+    return Promise.all(this.plugins.map((plugin) => plugin.start(start)))
   }
 
   startServer(port?: number) {
     return Promise.all(this.plugins.map((plugin) => plugin.startServer(port)))
+  }
+
+  shutdown() {
+    this.plugins.forEach((plugin) => plugin.shutdownServer())
   }
 
   /**

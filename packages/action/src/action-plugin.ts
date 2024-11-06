@@ -6,6 +6,7 @@ import { ActionProcessorState } from './action-processor.js'
 
 export class ActionPlugin extends Plugin {
   server = fastify()
+  name = 'action-plugin'
 
   constructor() {
     super()
@@ -36,8 +37,12 @@ export class ActionPlugin extends Plugin {
         console.error(err)
         process.exit(1)
       }
-      console.log(`Server listening at ${address}`)
+      console.log(`Action server listening at ${address}`)
     })
+  }
+
+  async shutdownServer() {
+    await this.server.close()
   }
 }
 

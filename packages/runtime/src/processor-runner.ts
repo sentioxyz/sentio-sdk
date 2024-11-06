@@ -5,7 +5,7 @@ import fs from 'fs-extra'
 
 import { compressionAlgorithms } from '@grpc/grpc-js'
 import commandLineArgs from 'command-line-args'
-import { createServer, Server } from 'nice-grpc'
+import { createServer } from 'nice-grpc'
 import { errorDetailsServerMiddleware } from 'nice-grpc-error-details'
 // import { registry as niceGrpcRegistry } from 'nice-grpc-prometheus'
 import { openTelemetryServerMiddleware } from 'nice-grpc-opentelemetry'
@@ -21,8 +21,7 @@ import { ChainConfig } from './chain-config.js'
 import { setupLogger } from './logger.js'
 
 import { setupOTLP } from './otlp.js'
-import { PluginManager } from './plugin.js'
-import { ProcessConfigResponse } from '@sentio/protos'
+import { ActionServer } from './action-server.js'
 
 // const mergedRegistry = Registry.merge([globalRegistry, niceGrpcRegistry])
 
@@ -87,20 +86,16 @@ for (const [id, config] of Object.entries(chainsConfig)) {
 
 console.debug('Starting Server', options)
 
-let server: Server
+let server: any
 let baseService: ProcessorServiceImpl
-
+const loader = async () => {
+  const m = await import(options.target)
+  console.debug('Module loaded', m)
+  return m
+}
 if (options['start-action-server']) {
-  const pluginManager = PluginManager.INSTANCE
-  pluginManager
-    .configure(ProcessConfigResponse.create())
-    .then(() => {
-      console.log('Starting Action Server at:', options.port)
-      return pluginManager.startServer(options.port)
-    })
-    .catch((err) => {
-      console.error('Error starting action server', err)
-    })
+  server = new ActionServer(loader)
+  server.listen(options.port)
 } else {
   server = createServer({
     'grpc.max_send_message_length': 384 * 1024 * 1024,
@@ -110,11 +105,7 @@ if (options['start-action-server']) {
     // .use(prometheusServerMiddleware())
     .use(openTelemetryServerMiddleware())
     .use(errorDetailsServerMiddleware)
-  baseService = new ProcessorServiceImpl(async () => {
-    const m = await import(options.target)
-    console.debug('Module loaded', m)
-    return m
-  }, server.shutdown)
+  baseService = new ProcessorServiceImpl(loader, server.shutdown)
   const service = new FullProcessorServiceImpl(baseService)
 
   server.add(ProcessorDefinition, service)
