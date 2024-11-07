@@ -85,7 +85,7 @@ jobs:
         uses: cycjimmy/semantic-release-action@v4
         with:
           working_directory: packages/cli
-          semantic_version: 23
+          semantic_version: 24
         env:
           GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
       - name: CLI Release Summary
