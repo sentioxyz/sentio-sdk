@@ -5,7 +5,7 @@ import { AptosNetwork, getClient } from '../network.js'
 import { coin } from '../builtin/0x1.js'
 import { MoveStructId } from '@aptos-labs/ts-sdk'
 import { AptosChainId } from '@sentio/chain'
-import DEFAULT_TOKEN_LIST from './token-list.json'
+import DEFAULT_TOKEN_LIST from './token-list.json' assert { type: 'json' }
 
 type TokenInfo = {
   chainId: number

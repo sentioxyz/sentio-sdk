@@ -121,6 +121,33 @@ jobs:
           pnpm publish --filter "@sentio/sdk-bundle" --no-git-checks --tag ${{ steps.npm.outputs.dist_tag }} --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: action Semantic Release
+        id: semantic_action
+        uses: cycjimmy/semantic-release-action@v4
+        with:
+          semantic_version: 24.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+      - name: action Release Summary
+        if: steps.semantic_action.outputs.new_release_published == 'true'
+        run: |
+          echo "### New action version v${{ steps.semantic_action.outputs.new_release_version }} cut" >> $GITHUB_STEP_SUMMARY
+          echo "commit: ${GITHUB_SHA}, branch/tag: ${GITHUB_REF}" >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.semantic_action.outputs.new_release_notes }}" >> $GITHUB_STEP_SUMMARY
+        env:
+          GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+      - name: action NPM Publish
+        if: steps.semantic_action.outputs.new_release_published == 'true'
+        run: |
+          ./scripts/update-version.sh @sentio/action ${{ steps.semantic_action.outputs.new_release_version }}
+          pnpm publish --filter "@sentio/action" --no-git-checks --tag ${{ steps.npm.outputs.dist_tag }} --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: report error
+        if: steps.semantic_action.outputs.new_release_published == 'false'
+        run: |
+          echo "### No action version cut" >> $GITHUB_STEP_SUMMARY
+          echo "Check Semantic Release output for details"
       - name: Clean Github Release for RC
         if: ${{ contains(steps.semantic.outputs.new_release_version, '-rc.') == false }}
         run:  ./scripts/clean-rc-releases.sh
