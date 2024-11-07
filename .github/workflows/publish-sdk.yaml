@@ -125,6 +125,7 @@ jobs:
         id: semantic_action
         uses: cycjimmy/semantic-release-action@v4
         with:
+          working_directory: packages/action
           semantic_version: 24.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
