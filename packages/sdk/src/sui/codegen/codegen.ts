@@ -24,6 +24,7 @@ export async function codegen(
 
 class SuiNetworkCodegen extends BaseSuiCodegen {
   moduleGenerator: SharedNetworkCodegen<SuiNetwork, SuiMoveNormalizedModule, SuiEvent | SuiMoveObject>
+  SYSTEM_PACKAGE = '@sentio/sdk/sui'
 
   constructor(network: SuiNetwork) {
     const endpoint = getRpcEndpoint(network)
