@@ -1,2 +1,2 @@
-export * from './coin-list.js'
+export * from './coin.js'
 export * from './move-dex.js'

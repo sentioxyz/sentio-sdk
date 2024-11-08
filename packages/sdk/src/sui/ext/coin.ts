@@ -1,4 +1,4 @@
-import { SimpleCoinInfo } from '../../move/ext/index.js'
+import { BaseCoinInfo } from '../../move/ext/index.js'
 import fetch from 'node-fetch'
 import { accountTypeString, SPLITTER } from '../../move/index.js'
 import { getPriceByType } from '../../utils/index.js'
@@ -7,7 +7,7 @@ import { SuiChainId } from '@sentio/chain'
 import { getClient, SuiNetwork } from '../network.js'
 import { CoinMetadata } from '@mysten/sui/client'
 
-const WHITELISTED_COINS = new Map<string, SimpleCoinInfo>()
+const WHITELISTED_COINS = new Map<string, BaseCoinInfo>()
 
 export async function initCoinList() {
   let list = DEFAULT_LIST.coinlist
@@ -48,10 +48,7 @@ function setCoinList(list: SuiCoinInfo[]) {
       bridge = 'Wormhole'
     }
     WHITELISTED_COINS.set(info.address, {
-      token_type: {
-        type: info.address,
-        account_address: info.address.split('::')[0]
-      },
+      type: info.address,
       symbol: info.symbol,
       decimals: info.decimals,
       bridge
@@ -69,13 +66,13 @@ export function whiteListed(coin: string): boolean {
   return WHITELISTED_COINS.has(normalized)
 }
 
-export function getCoinInfo(type: string): SimpleCoinInfo {
+export function getCoinInfo(type: string): BaseCoinInfo {
   const r = WHITELISTED_COINS.get(type)
   if (!r) {
     const parts = type.split('::')
     // TDDO retrive from network
     return {
-      token_type: { type: type, account_address: parts[0] },
+      type,
       symbol: parts[2],
       decimals: 8,
       bridge: 'native'
@@ -86,7 +83,7 @@ export function getCoinInfo(type: string): SimpleCoinInfo {
 
 const COIN_METADATA_CACHE = new Map<string, Promise<CoinMetadata | null>>()
 
-export async function getCoinInfoWithFallback(type: string, network?: SuiNetwork): Promise<SimpleCoinInfo> {
+export async function getCoinInfoWithFallback(type: string, network?: SuiNetwork): Promise<BaseCoinInfo> {
   const r = WHITELISTED_COINS.get(type)
   if (!r) {
     network = network || SuiChainId.SUI_MAINNET
@@ -104,7 +101,7 @@ export async function getCoinInfoWithFallback(type: string, network?: SuiNetwork
 
     const parts = type.split(SPLITTER)
     return {
-      token_type: { type: type, account_address: parts[0] },
+      type,
       symbol: meta.symbol,
       decimals: meta.decimals,
       bridge: 'native'
@@ -126,8 +123,8 @@ export async function getPrice(coinType: string, timestamp: number): Promise<num
   }
 }
 
-export async function calculateValueInUsd(n: bigint, coinInfo: SimpleCoinInfo, timestamp: number) {
-  const price = await getPrice(coinInfo.token_type.type, timestamp)
+export async function calculateValueInUsd(n: bigint, coinInfo: BaseCoinInfo, timestamp: number) {
+  const price = await getPrice(coinInfo.type, timestamp)
   const amount = n.scaleDown(coinInfo.decimals)
   return amount.multipliedBy(price)
 }

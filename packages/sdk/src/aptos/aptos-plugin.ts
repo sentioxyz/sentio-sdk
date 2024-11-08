@@ -19,7 +19,7 @@ import { ServerError, Status } from 'nice-grpc'
 
 import { AptosProcessorState, AptosResourceProcessorState } from './aptos-processor.js'
 
-import { initCoinList } from './ext/coin.js'
+import { initTokenList } from './ext/token.js'
 import { AptosChainId } from '@sentio/chain'
 import { AptosResourcesContext } from './context.js'
 import {
@@ -42,7 +42,7 @@ export class AptosPlugin extends Plugin {
   }
 
   async start(request: StartRequest) {
-    await initCoinList()
+    await initTokenList()
 
     const allowedChainIds = new Set<string>(Object.values(AptosChainId))
     for (const instance of request.templateInstances) {

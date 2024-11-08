@@ -6,8 +6,9 @@ import { coin } from '../builtin/0x1.js'
 import { MoveStructId } from '@aptos-labs/ts-sdk'
 import { AptosChainId } from '@sentio/chain'
 import DEFAULT_TOKEN_LIST from './token-list.json' assert { type: 'json' }
+import { BaseCoinInfo } from '../../move/ext/index.js'
 
-type TokenInfo = {
+type InternalTokenInfo = {
   chainId: number
   tokenAddress: `0x${string}` | null
   faAddress: `0x${string}` | null
@@ -26,7 +27,8 @@ type TokenInfo = {
   coinMarketCapId: number | null
 }
 
-export type SimpleTokenInfo = {
+export interface TokenInfo extends BaseCoinInfo {
+  type: `0x${string}` // either tokenAddress or faAddress
   tokenAddress?: `0x${string}`
   faAddress?: `0x${string}`
   name: string
@@ -40,15 +42,15 @@ export type SimpleTokenInfo = {
   coinMarketCapId?: number
 }
 
-const TOKEN_MAP = new Map<string, SimpleTokenInfo>()
+const TOKEN_MAP = new Map<string, TokenInfo>()
 
 export async function initTokenList() {
-  let list = DEFAULT_TOKEN_LIST as TokenInfo[]
+  let list = DEFAULT_TOKEN_LIST as InternalTokenInfo[]
   try {
     const resp = await fetch(
       'https://raw.githubusercontent.com/PanoraExchange/Aptos-Tokens/refs/heads/main/token-list.json'
     )
-    list = (await resp.json()) as TokenInfo[]
+    list = (await resp.json()) as InternalTokenInfo[]
   } catch (e) {
     console.warn("Can't not fetch newest token list, use default list")
   }
@@ -56,8 +58,13 @@ export async function initTokenList() {
   setTokenList(list)
 }
 
-function tokenInfoToSimple(info: TokenInfo): SimpleTokenInfo {
+function tokenInfoToSimple(info: InternalTokenInfo): TokenInfo {
+  const type = info.tokenAddress || info.faAddress
+  if (!type) {
+    throw Error('Token info must have tokenAddress or faAddress')
+  }
   return {
+    type,
     tokenAddress: info.tokenAddress || undefined,
     faAddress: info.faAddress || undefined,
     name: info.name,
@@ -72,7 +79,7 @@ function tokenInfoToSimple(info: TokenInfo): SimpleTokenInfo {
   }
 }
 
-function setTokenList(list: TokenInfo[]) {
+function setTokenList(list: InternalTokenInfo[]) {
   for (const info of list) {
     const simpleInfo = tokenInfoToSimple(info)
     if (
@@ -107,7 +114,7 @@ export function isWhiteListToken(token: string): boolean {
 const TOKEN_METADATA_CACHE = new Map<string, Promise<any | null>>()
 
 // token: address of the fungible asset, e.g. "0xa", or the coin type, e.g. "0x1::aptos::AptosCoin"
-export async function getTokenInfoWithFallback(token: string, network?: AptosNetwork): Promise<SimpleTokenInfo> {
+export async function getTokenInfoWithFallback(token: string, network?: AptosNetwork): Promise<TokenInfo> {
   const r = TOKEN_MAP.get(token)
   if (!r) {
     network = network || AptosNetwork.MAIN_NET
@@ -134,6 +141,7 @@ export async function getTokenInfoWithFallback(token: string, network?: AptosNet
 
     // const parts = type.split(SPLITTER)
     return {
+      type: token as `0x${string}`,
       category: 'Native',
       tokenAddress: token as `0x${string}`,
       name: meta.name,
@@ -166,7 +174,7 @@ export async function getPriceForToken(
 
 export async function tokenTokenValueInUsd(
   n: bigint,
-  coinInfo: SimpleTokenInfo,
+  coinInfo: TokenInfo,
   timestamp: number,
   network = AptosChainId.APTOS_MAINNET
 ) {
@@ -179,4 +187,4 @@ export async function tokenTokenValueInUsd(
   throw Error('Token not found' + JSON.stringify(coinInfo))
 }
 
-setTokenList(DEFAULT_TOKEN_LIST as TokenInfo[])
+setTokenList(DEFAULT_TOKEN_LIST as InternalTokenInfo[])

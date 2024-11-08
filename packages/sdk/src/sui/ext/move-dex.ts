@@ -1,18 +1,18 @@
 import { BigDecimal } from '@sentio/bigdecimal'
 import { calculateValueInUsd, getCoinInfo, whitelistCoins, whiteListed } from './coin.js'
-import { MoveCoinList, MoveDex, moveGetPairValue, MovePoolAdaptor, SimpleCoinInfo } from '../../move/ext/index.js'
+import { MoveCoinList, MoveDex, moveGetPairValue, MovePoolAdaptor, BaseCoinInfo } from '../../move/ext/index.js'
 import { SuiEvent, SuiMoveNormalizedModule, SuiMoveObject } from '@mysten/sui/client'
 import { SuiNetwork } from '../network.js'
 import { SuiContext, SuiObjectContext } from '../context.js'
 
 export type PoolAdaptor<T> = MovePoolAdaptor<SuiMoveObject, T>
 
-export class CoinList implements MoveCoinList<SuiNetwork> {
-  calculateValueInUsd(amount: bigint, coinInfo: SimpleCoinInfo, timestamp: number): Promise<BigDecimal> {
+export class CoinList implements MoveCoinList<BaseCoinInfo, SuiNetwork> {
+  calculateValueInUsd(amount: bigint, coinInfo: BaseCoinInfo, timestamp: number): Promise<BigDecimal> {
     return calculateValueInUsd(amount, coinInfo, timestamp)
   }
 
-  getCoinInfo(type: string): SimpleCoinInfo {
+  async getCoinInfo(type: string) {
     return getCoinInfo(type)
   }
 
@@ -20,7 +20,7 @@ export class CoinList implements MoveCoinList<SuiNetwork> {
     return whiteListed(type)
   }
 
-  whitelistCoins(): Map<string, SimpleCoinInfo> {
+  whitelistCoins(): Map<string, BaseCoinInfo> {
     return whitelistCoins()
   }
 }
@@ -28,6 +28,7 @@ export class CoinList implements MoveCoinList<SuiNetwork> {
 export const SuiCoinList = new CoinList()
 
 export class SuiDex<T> extends MoveDex<
+  BaseCoinInfo,
   SuiNetwork,
   SuiMoveNormalizedModule,
   SuiMoveObject,

@@ -2,15 +2,7 @@ import { DecodedStruct, TypeDescriptor } from '@typemove/move'
 import { BigDecimal } from '@sentio/bigdecimal'
 import { Gauge } from '../../core/index.js'
 import { MoveAccountContext, MoveContext } from '../move-context.js'
-import { MoveCoinList } from './coin-list.js'
-
-export interface SimpleCoinInfo {
-  token_type: { type: string; account_address: string }
-  symbol: string
-  hippo_symbol?: string
-  decimals: number
-  bridge: string
-}
+import { MoveCoinList, BaseCoinInfo } from './coin.js'
 
 export interface MovePoolAdaptor<StructType, T> {
   getXReserve(pool: T): bigint
@@ -23,6 +15,7 @@ export interface MovePoolAdaptor<StructType, T> {
 }
 
 export class MoveDex<
+  TokenType extends BaseCoinInfo,
   Network,
   ModuleType,
   StructType,
@@ -31,7 +24,7 @@ export class MoveDex<
   AccountContextType extends MoveAccountContext<Network, ModuleType, StructType | EventType>,
   T
 > {
-  coinList: MoveCoinList<Network>
+  coinList: MoveCoinList<TokenType, Network>
   poolAdaptor: MovePoolAdaptor<StructType, T>
   volume: Gauge
   volumeByCoin: Gauge
@@ -100,14 +93,14 @@ export class MoveDex<
       this.volumeByCoin.record(ctx, resultX, {
         coin: coinXInfo.symbol,
         bridge: coinXInfo.bridge,
-        type: coinXInfo.token_type.type
+        type: coinXInfo.type
       })
     }
     if (resultY.gt(0)) {
       this.volumeByCoin.record(ctx, resultY, {
         coin: coinYInfo.symbol,
         bridge: coinYInfo.bridge,
-        type: coinYInfo.token_type.type
+        type: coinYInfo.type
       })
     }
     result = resultX.plus(resultY).div(2)
@@ -152,23 +145,23 @@ export class MoveDex<
 
       if (whitelistx) {
         resultX = await this.coinList.calculateValueInUsd(coinx_amount, coinXInfo, timestamp, ctx.network)
-        let coinXTotal = volumeByCoin.get(coinXInfo.token_type.type)
+        let coinXTotal = volumeByCoin.get(coinXInfo.type)
         if (!coinXTotal) {
           coinXTotal = resultX
         } else {
           coinXTotal = coinXTotal.plus(resultX)
         }
-        volumeByCoin.set(coinXInfo.token_type.type, coinXTotal)
+        volumeByCoin.set(coinXInfo.type, coinXTotal)
       }
       if (whitelisty) {
         resultY = await this.coinList.calculateValueInUsd(coiny_amount, coinYInfo, timestamp, ctx.network)
-        let coinYTotal = volumeByCoin.get(coinYInfo.token_type.type)
+        let coinYTotal = volumeByCoin.get(coinYInfo.type)
         if (!coinYTotal) {
           coinYTotal = resultY
         } else {
           coinYTotal = coinYTotal.plus(resultY)
         }
-        volumeByCoin.set(coinYInfo.token_type.type, coinYTotal)
+        volumeByCoin.set(coinYInfo.type, coinYTotal)
       }
 
       if (resultX.eq(0)) {
@@ -202,7 +195,7 @@ export class MoveDex<
         this.tvlByCoin.record(ctx, v, {
           coin: coinInfo.symbol,
           bridge: coinInfo.bridge,
-          type: coinInfo.token_type.type
+          type: coinInfo.type
         })
       }
     }
@@ -218,8 +211,12 @@ export class MoveDex<
   }
 }
 
-export async function moveGetPairValue<Network, ContextType extends MoveAccountContext<Network, any, any>>(
-  coinList: MoveCoinList<Network>,
+export async function moveGetPairValue<
+  TokenType extends BaseCoinInfo,
+  Network,
+  ContextType extends MoveAccountContext<Network, any, any>
+>(
+  coinList: MoveCoinList<TokenType, Network>,
   ctx: ContextType,
   coinx: string,
   coiny: string,
