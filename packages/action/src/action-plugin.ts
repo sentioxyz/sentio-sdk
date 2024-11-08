@@ -32,7 +32,7 @@ export class ActionPlugin extends Plugin {
       return 'OK'
     })
 
-    this.server.listen({ port }, (err, address) => {
+    this.server.listen({ host: '0.0.0.0', port }, (err, address) => {
       if (err) {
         console.error(err)
         process.exit(1)
