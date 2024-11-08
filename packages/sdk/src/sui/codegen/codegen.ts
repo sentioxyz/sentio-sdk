@@ -35,7 +35,7 @@ class SuiNetworkCodegen extends BaseSuiCodegen {
     > {
       ADDRESS_TYPE = 'string'
       PREFIX = 'Sui'
-      SYSTEM_PACKAGE = '@typemove/sui'
+      SYSTEM_PACKAGE = '@sentio/sdk/sui'
       NETWORK = SuiNetwork
 
       generateStructs(module: InternalMoveModule, struct: InternalMoveStruct, events: Set<string>): string {

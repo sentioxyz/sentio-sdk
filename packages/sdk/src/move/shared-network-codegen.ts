@@ -1,5 +1,4 @@
 import {
-  AbstractCodegen,
   ChainAdapter,
   InternalMoveFunction,
   InternalMoveModule,
@@ -10,6 +9,8 @@ import {
   normalizeToJSName,
   upperFirst
 } from '@typemove/move'
+
+import { AbstractCodegen } from '@typemove/move/codegen'
 
 export abstract class SharedNetworkCodegen<NetworkType, ModuleTypes, StructType> extends AbstractCodegen<
   ModuleTypes,
@@ -130,10 +131,6 @@ onEvent${struct.name}(func: (event: ${moduleName}.${normalizeToJSName(struct.nam
       ${this.PREFIX}Context } from "@sentio/sdk/${this.PREFIX.toLowerCase()}"
 `
     )
-  }
-
-  protected defaultCoderPackage(): string {
-    return `@sentio/sdk/${this.PREFIX.toLowerCase()}`
   }
 
   generateLoadAll(isSystem: boolean): string {

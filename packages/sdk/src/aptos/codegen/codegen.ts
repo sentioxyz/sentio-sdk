@@ -23,6 +23,7 @@ export async function codegen(
 
 class AptosNetworkCodegen extends BaseAptosCodegen {
   moduleGenerator: SharedNetworkCodegen<AptosNetwork, MoveModuleBytecode, Event | MoveResource>
+  SYSTEM_PACKAGE = '@sentio/sdk/aptos'
 
   constructor(network: AptosNetwork) {
     const endpoint = getRpcEndpoint(network)
@@ -33,8 +34,8 @@ class AptosNetworkCodegen extends BaseAptosCodegen {
       Event | MoveResource
     > {
       ADDRESS_TYPE = 'MoveAddressType'
+      SYSTEM_PACKAGE = '@sentio/sdk/aptos'
       PREFIX = 'Aptos'
-      SYSTEM_PACKAGE = '@typemove/aptos'
       NETWORK = AptosNetwork
     })(network, this.chainAdapter)
   }
