@@ -1,4 +1,4 @@
-import { ListStateStorage } from '@sentio/runtime'
+import { ListStateStorage, processMetrics } from '@sentio/runtime'
 import { TemplateInstanceState } from '../core/template.js'
 import { AptosResourcesContext } from './context.js'
 import { AptosBindOptions } from './network.js'
@@ -27,6 +27,7 @@ export class AptosResourceProcessorTemplate {
   constructor() {
     this.id = AptosResourceProcessorTemplateState.INSTANCE.getValues().length
     AptosResourceProcessorTemplateState.INSTANCE.addValue(this)
+    processMetrics.process_template_count.add(1)
   }
 
   createProcessor(options: AptosBindOptions): AptosResourcesProcessor {

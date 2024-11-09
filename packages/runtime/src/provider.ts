@@ -5,7 +5,7 @@ import { Endpoints } from './endpoints.js'
 import { EthChainId } from '@sentio/chain'
 import { LRUCache } from 'lru-cache'
 import { providerMetrics } from './metrics.js'
-import { GLOBAL_CONFIG } from 'global-config.js'
+import { GLOBAL_CONFIG } from './global-config.js'
 const { miss_count, hit_count, total_duration, total_queued, queue_size } = providerMetrics
 
 export const DummyProvider = new JsonRpcProvider('', Network.from(1))

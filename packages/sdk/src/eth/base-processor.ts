@@ -1,3 +1,4 @@
+import { AsyncLocalStorage } from 'node:async_hooks'
 import { BaseContract, DeferredTopicFilter, LogDescription, TransactionResponseParams } from 'ethers'
 
 import { BoundContractView, ContractContext, ContractView, GlobalContext } from './context.js'
@@ -20,6 +21,7 @@ import { fixEmptyKey, formatEthData, RichBlock, Trace, TypedCallTrace, TypedEven
 import sha3 from 'js-sha3'
 import { ListStateStorage } from '@sentio/runtime'
 import { EthChainId } from '@sentio/chain'
+import { metricsStorage, handlersProxy } from '../utils/metrics.js'
 
 export interface AddressOrTypeEventFilter extends DeferredTopicFilter {
   addressType?: AddressType
@@ -379,6 +381,22 @@ export abstract class BaseProcessor<
     if (config.endBlock) {
       this.config.endBlock = BigInt(config.endBlock)
     }
+
+    this.blockHandlers = new Proxy(this.blockHandlers, handlersProxy())
+    this.eventHandlers = new Proxy(this.eventHandlers, handlersProxy())
+    this.traceHandlers = new Proxy(this.traceHandlers, handlersProxy())
+
+    return new Proxy(this, {
+      get: (target, prop, receiver) => {
+        return metricsStorage.run(metricsStorage.getStore() || prop.toString(), () => {
+          const fn = (target as any)[prop]
+          if (typeof fn == 'function') {
+            return AsyncLocalStorage.bind((...args: any) => fn.apply(receiver, args))
+          }
+          return Reflect.get(target, prop, receiver)
+        })
+      }
+    })
   }
 
   protected abstract CreateBoundContractView(): TBoundContractView

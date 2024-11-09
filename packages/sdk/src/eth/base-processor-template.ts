@@ -4,7 +4,7 @@ import { BaseProcessor, defaultPreprocessHandler } from './base-processor.js'
 import { BindOptions, getOptionsSignature } from './bind-options.js'
 import { EthFetchConfig, HandleInterval, TemplateInstance, PreprocessResult } from '@sentio/protos'
 import { PromiseOrVoid } from '../core/promises.js'
-import { ListStateStorage } from '@sentio/runtime'
+import { ListStateStorage, processMetrics } from '@sentio/runtime'
 import { BlockParams } from 'ethers/providers'
 import { DeferredTopicFilter } from 'ethers/contract'
 import { TypedEvent, TypedCallTrace } from './eth.js'
@@ -57,6 +57,7 @@ export abstract class BaseProcessorTemplate<
   constructor() {
     this.id = ProcessorTemplateProcessorState.INSTANCE.getValues().length
     ProcessorTemplateProcessorState.INSTANCE.addValue(this)
+    processMetrics.process_template_count.add(1)
   }
 
   /**
