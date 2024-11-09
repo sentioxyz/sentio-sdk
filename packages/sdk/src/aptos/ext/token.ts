@@ -5,27 +5,8 @@ import { AptosNetwork, getClient } from '../network.js'
 import { coin } from '../builtin/0x1.js'
 import { MoveStructId } from '@aptos-labs/ts-sdk'
 import { AptosChainId } from '@sentio/chain'
-import DEFAULT_TOKEN_LIST from './token-list.json' assert { type: 'json' }
+import { DEFAULT_TOKEN_LIST, InternalTokenInfo } from './token-list.js'
 import { BaseCoinInfo } from '../../move/ext/index.js'
-
-type InternalTokenInfo = {
-  chainId: number
-  tokenAddress: `0x${string}` | null
-  faAddress: `0x${string}` | null
-  name: string
-  symbol: string
-  decimals: number
-  bridge: 'LayerZero' | 'Wormhole' | 'Celer' | null
-  panoraSymbol: string
-  logoUrl: string | null
-  websiteUrl: string | null
-  category: 'Native' | 'Bridged' | 'Meme'
-  isInPanoraTokenList: boolean
-  isBanned: boolean
-  panoraOrderIndex: number | null
-  coinGeckoId: string | null
-  coinMarketCapId: number | null
-}
 
 export interface TokenInfo extends BaseCoinInfo {
   type: `0x${string}` // either tokenAddress or faAddress
@@ -34,7 +15,7 @@ export interface TokenInfo extends BaseCoinInfo {
   name: string
   symbol: string
   decimals: number
-  bridge: 'LayerZero' | 'Wormhole' | 'Celer' | 'Native'
+  bridge: 'LayerZero' | 'Wormhole' | 'Celer' | 'Echo' | 'Native'
   logoUrl?: string
   websiteUrl?: string
   category: 'Native' | 'Bridged' | 'Meme'
@@ -45,7 +26,7 @@ export interface TokenInfo extends BaseCoinInfo {
 const TOKEN_MAP = new Map<string, TokenInfo>()
 
 export async function initTokenList() {
-  let list = DEFAULT_TOKEN_LIST as InternalTokenInfo[]
+  let list = DEFAULT_TOKEN_LIST
   try {
     const resp = await fetch(
       'https://raw.githubusercontent.com/PanoraExchange/Aptos-Tokens/refs/heads/main/token-list.json'
