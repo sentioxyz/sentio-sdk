@@ -231,14 +231,14 @@ importers:
   packages/cli:
     dependencies:
       '@aptos-labs/ts-sdk':
-        specifier: ~1.31.0
-        version: 1.31.0
+        specifier: ~1.32.0
+        version: 1.32.0
       '@mysten/sui':
         specifier: ~1.14.0
         version: 1.14.0(typescript@5.5.2)
       '@sentio/chain':
-        specifier: ^2.1.12
-        version: 2.1.12
+        specifier: ^2.1.14
+        version: 2.1.14
       '@sentio/graph-cli':
         specifier: ^0.80.0-patch.1
         version: 0.80.0-patch.1(@types/node@22.8.6)(bufferutil@4.0.8)(encoding@0.1.13)(node-fetch@3.3.2)(typescript@5.5.2)(utf-8-validate@5.0.10)
@@ -510,8 +510,8 @@ importers:
   packages/sdk:
     dependencies:
       '@aptos-labs/ts-sdk':
-        specifier: ~1.31.0
-        version: 1.31.0
+        specifier: ~1.32.0
+        version: 1.32.0
       '@coral-xyz/borsh':
         specifier: ^0.30.0
         version: 0.30.1(@solana/web3.js@1.91.8(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10))
@@ -537,8 +537,8 @@ importers:
         specifier: 9.1.1-patch.3
         version: 9.1.1-patch.3
       '@sentio/chain':
-        specifier: ^2.1.12
-        version: 2.1.12
+        specifier: ^2.1.14
+        version: 2.1.14
       '@sentio/ethers-v6':
         specifier: ^1.0.29
         version: 1.0.29(@sentio/ethers@6.13.1-patch.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typescript@5.5.2)
@@ -552,14 +552,14 @@ importers:
         specifier: 1.91.8
         version: 1.91.8(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
       '@typemove/aptos':
-        specifier: ~1.6.7
-        version: 1.6.7
+        specifier: ~1.6.8
+        version: 1.6.8
       '@typemove/move':
-        specifier: ~1.6.7
-        version: 1.6.7
+        specifier: ~1.6.8
+        version: 1.6.8
       '@typemove/sui':
-        specifier: ~1.6.7
-        version: 1.6.7(typescript@5.5.2)
+        specifier: ~1.6.8
+        version: 1.6.8(typescript@5.5.2)
       bs58:
         specifier: ^5.0.0
         version: 5.0.0
@@ -668,8 +668,8 @@ packages:
     resolution: {integrity: sha512-kJsoy4fAPTOhzVr7Vwq8s/AUg6BQiJDa7WOqRzev4zsuIS3+JCuIZ6vUd7UBsjnxtmguJJulMRs9qWCzVBt2XA==}
     engines: {node: '>=15.10.0'}
 
-  '@aptos-labs/ts-sdk@1.31.0':
-    resolution: {integrity: sha512-Y1jdErSMJe+2+Pm8Yrw/+TBJhGO4KX2db944QsTgqJqkbt26aSBVbeRJ7e6y12vAhsQEkTGtMm4n4Lquz2ldiA==}
+  '@aptos-labs/ts-sdk@1.32.0':
+    resolution: {integrity: sha512-CTCqDbK5c2JwjJbOKPkrBy/GYn9AVBWv74PKIOt94AhtA7LYhaq6AryVae19KqphWyexhIJEAl6sQ3T07Iw3Sw==}
     engines: {node: '>=11.0.0'}
 
   '@babel/code-frame@7.24.7':
@@ -1779,8 +1779,8 @@ packages:
   '@sentio/bigdecimal@9.1.1-patch.3':
     resolution: {integrity: sha512-O5w8XdyeatUcwI+ZbpSw60/cXFPJk3NbpIupwMHfYmW8fpxpXyRbyGESNJNufWWrB6CadsWGh1R3rd7owvrmlw==}
 
-  '@sentio/chain@2.1.12':
-    resolution: {integrity: sha512-Cs/3eE6TaPMUpfiTZBhENkJQ54Q73ioQo42qZpnUPMrGyJi8FVc5Y8C371tqKdID2//4/bAkn7Rc4+Iva+HSqQ==}
+  '@sentio/chain@2.1.14':
+    resolution: {integrity: sha512-g5GXLvSEwBrqzhS68mDcjLOaQCsPN4hn6l1CcAiPo7+Xv+NFTdLMHP6R5hKXiVcatH5WVf/mb85qLEtKrnWPiA==}
 
   '@sentio/ethers-v6@1.0.29':
     resolution: {integrity: sha512-/4jZZn+eM3EfI0bUMBAf5vu8muy8ABptu8ucFoMDTZLLTjxcSKRffLP3RL7w1JHGjyC2V6oEQfwS4cn9JEohHQ==}
@@ -1857,15 +1857,15 @@ packages:
   '@tsconfig/node16@1.0.4':
     resolution: {integrity: sha512-vxhUy4J8lyeyinH7Azl1pdd43GJhZH/tP2weN8TntQblOY+A0XbT8DJk1/oCPuOOyg/Ja757rG0CgHcWC8OfMA==}
 
-  '@typemove/aptos@1.6.7':
-    resolution: {integrity: sha512-Qv673Ka3lwpQrK/TuUmswDg0S6JOlm9AX6CnuVqrbfCEBZqxo3aPvjYLoRrFEKEsH7B1ub+6MBd7e9o8XR4ibQ==}
+  '@typemove/aptos@1.6.8':
+    resolution: {integrity: sha512-ZM4ZrwDaOtF6MEFGamCkhjcUbr5DYcnOAZdTE5RSpaavKQIoCL8ZlUcVNM8yvqhGUNusyUhPEOQVtlc298PK1g==}
     hasBin: true
 
-  '@typemove/move@1.6.7':
-    resolution: {integrity: sha512-w2WwDP0YTsf0DSJcCB4iDeffwJAsjlvXKedlKowUgltnLHQhY1px+J8Fm7iigRh5WHv7nc0dEbNjfwqqslTv9Q==}
+  '@typemove/move@1.6.8':
+    resolution: {integrity: sha512-DLzypM4m2JJyvHKqcFtWtSfV8NPyO8ukN2zyh94yv2SJARfeNdMT576N1dbqroN9/YfO0zsebn3t42Q31+zz4g==}
 
-  '@typemove/sui@1.6.7':
-    resolution: {integrity: sha512-FSV46kw0HjkUjVB0nkK+lB/XoHe82dCutJ9QQ6Gx6YrOZGQL0tEtguWwqogVqoTYjkEhsZH+czfU9+qaQO5jzg==}
+  '@typemove/sui@1.6.8':
+    resolution: {integrity: sha512-/9FHGym3CcVstkCAmwueftKC0riiuXZtrWE2s9RK7SCNX1xSHo2mOPw8ehkGrB4VFRtITWds9EIXSdBlJxmcYg==}
     hasBin: true
 
   '@types/bn.js@5.1.5':
@@ -2113,6 +2113,9 @@ packages:
   '@typescript-eslint/visitor-keys@8.12.2':
     resolution: {integrity: sha512-PChz8UaKQAVNHghsHcPyx1OMHoFRUEA7rJSK/mDhdq85bk+PLsUHUBqTQTFt18VJZbmxBovM65fezlheQRsSDA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+
+  '@wgb5445/aptos-intent-npm@0.1.13':
+    resolution: {integrity: sha512-VvJqYV2FFJQrQRxf+dMS8+oJgxbXi/BGoFgsD7ebryW87KDkc7oMyOiN6lPhdXkbDekqiHHV0EYAxIAoMTdtjw==}
 
   '@whatwg-node/events@0.0.3':
     resolution: {integrity: sha512-IqnKIDWfXBJkvy/k6tzskWTc2NK3LcqHlb+KHGCrjOCH4jfQckRX0NAiIcC/vIqQkzLYw2r2CTSwAxcrtcD6lA==}
@@ -6422,7 +6425,7 @@ snapshots:
     transitivePeerDependencies:
       - debug
 
-  '@aptos-labs/ts-sdk@1.31.0':
+  '@aptos-labs/ts-sdk@1.32.0':
     dependencies:
       '@aptos-labs/aptos-cli': 1.0.2
       '@aptos-labs/aptos-client': 0.1.1
@@ -6430,6 +6433,7 @@ snapshots:
       '@noble/hashes': 1.5.0
       '@scure/bip32': 1.4.0
       '@scure/bip39': 1.3.0
+      '@wgb5445/aptos-intent-npm': 0.1.13
       eventemitter3: 5.0.1
       form-data: 4.0.0
       js-base64: 3.7.7
@@ -7734,7 +7738,7 @@ snapshots:
 
   '@sentio/bigdecimal@9.1.1-patch.3': {}
 
-  '@sentio/chain@2.1.12': {}
+  '@sentio/chain@2.1.14': {}
 
   '@sentio/ethers-v6@1.0.29(@sentio/ethers@6.13.1-patch.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typescript@5.5.2)':
     dependencies:
@@ -7869,10 +7873,10 @@ snapshots:
 
   '@tsconfig/node16@1.0.4': {}
 
-  '@typemove/aptos@1.6.7':
+  '@typemove/aptos@1.6.8':
     dependencies:
-      '@aptos-labs/ts-sdk': 1.31.0
-      '@typemove/move': 1.6.7
+      '@aptos-labs/ts-sdk': 1.32.0
+      '@typemove/move': 1.6.8
       chalk: 5.3.0
       commander: 12.1.0
       prettier: 3.3.2
@@ -7880,14 +7884,14 @@ snapshots:
     transitivePeerDependencies:
       - debug
 
-  '@typemove/move@1.6.7':
+  '@typemove/move@1.6.8':
     dependencies:
       radash: 12.1.0
 
-  '@typemove/sui@1.6.7(typescript@5.5.2)':
+  '@typemove/sui@1.6.8(typescript@5.5.2)':
     dependencies:
       '@mysten/sui': 1.14.0(typescript@5.5.2)
-      '@typemove/move': 1.6.7
+      '@typemove/move': 1.6.8
       chalk: 5.3.0
       commander: 12.1.0
       prettier: 3.3.2
@@ -8199,6 +8203,10 @@ snapshots:
     dependencies:
       '@typescript-eslint/types': 8.12.2
       eslint-visitor-keys: 3.4.3
+
+  '@wgb5445/aptos-intent-npm@0.1.13':
+    dependencies:
+      esbuild: 0.24.0
 
   '@whatwg-node/events@0.0.3': {}
 
