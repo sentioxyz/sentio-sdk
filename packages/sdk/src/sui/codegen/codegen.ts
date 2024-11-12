@@ -29,6 +29,7 @@ class SuiNetworkCodegen extends BaseSuiCodegen {
   constructor(network: SuiNetwork) {
     const endpoint = getRpcEndpoint(network)
     super(endpoint)
+    const generator = this
     this.moduleGenerator = new (class extends SharedNetworkCodegen<
       SuiNetwork,
       SuiMoveNormalizedModule,
@@ -73,6 +74,10 @@ class SuiNetworkCodegen extends BaseSuiCodegen {
         }
         return super.generateForOnEvents(module, struct)
       }
+
+      protected generateExtra(address: string | undefined, module: InternalMoveModule): string {
+        return generator.generateExtra(address, module)
+      }
     })(network, this.chainAdapter)
   }
 
@@ -80,7 +85,7 @@ class SuiNetworkCodegen extends BaseSuiCodegen {
     return this.moduleGenerator.generateModule(module, allEventStructs)
   }
   generateImports() {
-    return this.moduleGenerator.generateImports()
+    return super.generateImports() + this.moduleGenerator.generateImports()
   }
   generateLoadAll(isSystem: boolean): string {
     return this.moduleGenerator.generateLoadAll(isSystem)

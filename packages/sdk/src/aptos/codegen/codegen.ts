@@ -46,7 +46,13 @@ class AptosNetworkCodegen extends BaseAptosCodegen {
   generateImports() {
     return (
       this.moduleGenerator.generateImports() +
-      `import { Aptos, Account as AptosAccount, MoveAddressType, PendingTransactionResponse, InputGenerateTransactionOptions, MoveStructId } from '@aptos-labs/ts-sdk'`
+      `
+      import { TypeDescriptor, ANY_TYPE } from "@typemove/move"
+      import {
+        MoveCoder, TypedEventInstance } from "@typemove/${this.PREFIX.toLowerCase()}"
+      
+      import { defaultMoveCoder } from "${this.defaultCoderPackage()}"
+      import { Aptos, Account as AptosAccount, MoveAddressType, PendingTransactionResponse, InputGenerateTransactionOptions, MoveStructId } from '@aptos-labs/ts-sdk'`
     )
   }
   generateLoadAll(isSystem: boolean): string {

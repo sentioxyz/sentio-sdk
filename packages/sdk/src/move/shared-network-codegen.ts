@@ -121,16 +121,13 @@ onEvent${struct.name}(func: (event: ${moduleName}.${normalizeToJSName(struct.nam
   }
 
   generateImports() {
-    return (
-      super.generateImports() +
-      `
+    return `
     import { CallFilter, MoveFetchConfig } from "@sentio/sdk/move"
     import {
       ${this.PREFIX}BindOptions, ${this.PREFIX}BaseProcessor,
       ${this.PREFIX}Network, TypedFunctionPayload,
       ${this.PREFIX}Context } from "@sentio/sdk/${this.PREFIX.toLowerCase()}"
 `
-    )
   }
 
   generateLoadAll(isSystem: boolean): string {
