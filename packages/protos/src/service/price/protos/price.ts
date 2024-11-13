@@ -1454,6 +1454,7 @@ export const PriceServiceDefinition = {
       responseStream: false,
       options: {
         _unknownFields: {
+          8338: [new Uint8Array([0])],
           578365826: [new Uint8Array([16, 18, 14, 47, 97, 112, 105, 47, 118, 49, 47, 112, 114, 105, 99, 101, 115])],
         },
       },
@@ -1466,10 +1467,11 @@ export const PriceServiceDefinition = {
       responseStream: false,
       options: {
         _unknownFields: {
+          8338: [new Uint8Array([0])],
           578365826: [
             new Uint8Array([
-              22,
-              18,
+              25,
+              34,
               20,
               47,
               97,
@@ -1491,6 +1493,9 @@ export const PriceServiceDefinition = {
               116,
               99,
               104,
+              58,
+              1,
+              42,
             ]),
           ],
         },
@@ -1504,6 +1509,7 @@ export const PriceServiceDefinition = {
       responseStream: false,
       options: {
         _unknownFields: {
+          8338: [new Uint8Array([16, 42, 14, 80, 114, 105, 99, 101, 76, 105, 115, 116, 67, 111, 105, 110, 115])],
           578365826: [
             new Uint8Array([
               22,
@@ -1542,6 +1548,7 @@ export const PriceServiceDefinition = {
       responseStream: false,
       options: {
         _unknownFields: {
+          8338: [new Uint8Array([0])],
           578365826: [
             new Uint8Array([
               29,
@@ -1587,6 +1594,7 @@ export const PriceServiceDefinition = {
       responseStream: false,
       options: {
         _unknownFields: {
+          578365818: [new Uint8Array([10, 18, 8, 73, 78, 84, 69, 82, 78, 65, 76])],
           578365826: [
             new Uint8Array([
               28,

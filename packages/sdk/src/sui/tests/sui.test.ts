@@ -3,7 +3,7 @@ import { expect } from 'chai'
 import { TestProcessorServer } from '../../testing/index.js'
 import { SuiNetwork } from '../network.js'
 import { sui_system, validator } from '../builtin/0x3.js'
-import { SuiObjectProcessor } from '../sui-object-processor.js'
+import { SuiObjectProcessor, SuiObjectTypeProcessor } from '../sui-object-processor.js'
 import { MoveOwnerType } from '@sentio/protos'
 
 describe('Test Sui Example', () => {
@@ -22,6 +22,18 @@ describe('Test Sui Example', () => {
     SuiObjectProcessor.bind({ objectId: '0x56a' }).onTimeInterval((self, objects, ctx) => {
       ctx.meter.Gauge('size').record(objects.length)
     })
+
+    SuiObjectTypeProcessor.bind({ objectType: validator.Validator.type() }).onTimeInterval(
+      (self, objects, ctx) => {
+        ctx.meter
+          .Gauge('validator')
+          .record(self.data_decoded.voting_power, { address: self.data_decoded.metadata.primary_address })
+      },
+      60,
+      60,
+      undefined,
+      { owned: false }
+    )
   })
 
   before(async () => {
@@ -31,7 +43,7 @@ describe('Test Sui Example', () => {
   test('check configuration ', async () => {
     const config = await service.getConfig({})
     expect(config.contractConfigs).length(2)
-    expect(config.accountConfigs).length(1)
+    expect(config.accountConfigs).length(2)
     expect(config.accountConfigs[0].moveIntervalConfigs[0].ownerType).eq(MoveOwnerType.OBJECT)
   })
 

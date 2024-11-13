@@ -11,7 +11,18 @@ import {
   object,
   formatData
 } from 'ethers/providers'
-import { CallExceptionError, LogDescription, Result, DeferredTopicFilter, BlockParams, Interface } from 'ethers'
+import {
+  CallExceptionError,
+  LogDescription,
+  Result,
+  DeferredTopicFilter,
+  BlockParams,
+  Interface,
+  Contract,
+  Addressable,
+  InterfaceAbi,
+  ContractRunner
+} from 'ethers'
 import { ContractContext } from './context.js'
 import { getAddress } from 'ethers/address'
 import { getBigInt, getNumber, hexlify } from 'ethers/utils'
@@ -284,4 +295,16 @@ export function encodeCallData(
     const stack = new Error().stack
     throw transformEtherError(e, undefined, stack)
   }
+}
+
+export function newContract(
+  target: string | Addressable,
+  abi: Interface | InterfaceAbi,
+  runner?: ContractRunner | null | undefined
+) {
+  return new Contract(target, abi, runner)
+}
+
+export function newInterface(fragments: InterfaceAbi) {
+  return new Interface(fragments)
 }

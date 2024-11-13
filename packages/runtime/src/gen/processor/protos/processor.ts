@@ -120,6 +120,7 @@ export enum MoveOwnerType {
   ADDRESS = 0,
   OBJECT = 1,
   WRAPPED_OBJECT = 2,
+  TYPE = 3,
   UNRECOGNIZED = -1,
 }
 
@@ -134,6 +135,9 @@ export function moveOwnerTypeFromJSON(object: any): MoveOwnerType {
     case 2:
     case "WRAPPED_OBJECT":
       return MoveOwnerType.WRAPPED_OBJECT;
+    case 3:
+    case "TYPE":
+      return MoveOwnerType.TYPE;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -149,6 +153,8 @@ export function moveOwnerTypeToJSON(object: MoveOwnerType): string {
       return "OBJECT";
     case MoveOwnerType.WRAPPED_OBJECT:
       return "WRAPPED_OBJECT";
+    case MoveOwnerType.TYPE:
+      return "TYPE";
     case MoveOwnerType.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
@@ -708,6 +714,7 @@ export interface MoveFetchConfig {
   inputs: boolean;
   resourceConfig?: ResourceConfig | undefined;
   supportMultisigFunc?: boolean | undefined;
+  includeFailedTransaction?: boolean | undefined;
 }
 
 export interface MoveAccountFetchConfig {
@@ -4929,6 +4936,7 @@ function createBaseMoveFetchConfig(): MoveFetchConfig {
     inputs: false,
     resourceConfig: undefined,
     supportMultisigFunc: undefined,
+    includeFailedTransaction: undefined,
   };
 }
 
@@ -4948,6 +4956,9 @@ export const MoveFetchConfig = {
     }
     if (message.supportMultisigFunc !== undefined) {
       writer.uint32(40).bool(message.supportMultisigFunc);
+    }
+    if (message.includeFailedTransaction !== undefined) {
+      writer.uint32(48).bool(message.includeFailedTransaction);
     }
     return writer;
   },
@@ -4994,6 +5005,13 @@ export const MoveFetchConfig = {
 
           message.supportMultisigFunc = reader.bool();
           continue;
+        case 6:
+          if (tag !== 48) {
+            break;
+          }
+
+          message.includeFailedTransaction = reader.bool();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -5011,6 +5029,9 @@ export const MoveFetchConfig = {
       resourceConfig: isSet(object.resourceConfig) ? ResourceConfig.fromJSON(object.resourceConfig) : undefined,
       supportMultisigFunc: isSet(object.supportMultisigFunc)
         ? globalThis.Boolean(object.supportMultisigFunc)
+        : undefined,
+      includeFailedTransaction: isSet(object.includeFailedTransaction)
+        ? globalThis.Boolean(object.includeFailedTransaction)
         : undefined,
     };
   },
@@ -5032,6 +5053,9 @@ export const MoveFetchConfig = {
     if (message.supportMultisigFunc !== undefined) {
       obj.supportMultisigFunc = message.supportMultisigFunc;
     }
+    if (message.includeFailedTransaction !== undefined) {
+      obj.includeFailedTransaction = message.includeFailedTransaction;
+    }
     return obj;
   },
 
@@ -5047,6 +5071,7 @@ export const MoveFetchConfig = {
       ? ResourceConfig.fromPartial(object.resourceConfig)
       : undefined;
     message.supportMultisigFunc = object.supportMultisigFunc ?? undefined;
+    message.includeFailedTransaction = object.includeFailedTransaction ?? undefined;
     return message;
   },
 };

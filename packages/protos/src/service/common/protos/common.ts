@@ -418,6 +418,7 @@ export function project_VisibilityToJSON(object: Project_Visibility): string {
 export enum Project_Type {
   SENTIO = 0,
   SUBGRAPH = 1,
+  ACTION = 2,
   UNRECOGNIZED = -1,
 }
 
@@ -429,6 +430,9 @@ export function project_TypeFromJSON(object: any): Project_Type {
     case 1:
     case "SUBGRAPH":
       return Project_Type.SUBGRAPH;
+    case 2:
+    case "ACTION":
+      return Project_Type.ACTION;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -442,6 +446,8 @@ export function project_TypeToJSON(object: Project_Type): string {
       return "SENTIO";
     case Project_Type.SUBGRAPH:
       return "SUBGRAPH";
+    case Project_Type.ACTION:
+      return "ACTION";
     case Project_Type.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
@@ -545,6 +551,7 @@ export interface ApiKey {
   updatedAt: bigint;
   expiresAt: bigint;
   source: string;
+  ownerType: string;
 }
 
 export interface TimeRangeLite {
@@ -1392,6 +1399,18 @@ export interface UserUsage {
   tier: Tier;
   projects: number;
   alerts: number;
+  usageByProjects: { [key: string]: UserUsage_ProjectUsage };
+}
+
+export interface UserUsage_ProjectUsage {
+  owner: string;
+  slug: string;
+  cost: bigint;
+}
+
+export interface UserUsage_UsageByProjectsEntry {
+  key: string;
+  value: UserUsage_ProjectUsage | undefined;
 }
 
 export interface CoinID {
@@ -4468,6 +4487,7 @@ function createBaseApiKey(): ApiKey {
     updatedAt: BigInt("0"),
     expiresAt: BigInt("0"),
     source: "",
+    ownerType: "",
   };
 }
 
@@ -4505,6 +4525,9 @@ export const ApiKey = {
     }
     if (message.source !== "") {
       writer.uint32(74).string(message.source);
+    }
+    if (message.ownerType !== "") {
+      writer.uint32(82).string(message.ownerType);
     }
     return writer;
   },
@@ -4572,6 +4595,13 @@ export const ApiKey = {
 
           message.source = reader.string();
           continue;
+        case 10:
+          if (tag !== 82) {
+            break;
+          }
+
+          message.ownerType = reader.string();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -4591,6 +4621,7 @@ export const ApiKey = {
       updatedAt: isSet(object.updatedAt) ? BigInt(object.updatedAt) : BigInt("0"),
       expiresAt: isSet(object.expiresAt) ? BigInt(object.expiresAt) : BigInt("0"),
       source: isSet(object.source) ? globalThis.String(object.source) : "",
+      ownerType: isSet(object.ownerType) ? globalThis.String(object.ownerType) : "",
     };
   },
 
@@ -4620,6 +4651,9 @@ export const ApiKey = {
     if (message.source !== "") {
       obj.source = message.source;
     }
+    if (message.ownerType !== "") {
+      obj.ownerType = message.ownerType;
+    }
     return obj;
   },
 
@@ -4636,6 +4670,7 @@ export const ApiKey = {
     message.updatedAt = object.updatedAt ?? BigInt("0");
     message.expiresAt = object.expiresAt ?? BigInt("0");
     message.source = object.source ?? "";
+    message.ownerType = object.ownerType ?? "";
     return message;
   },
 };
@@ -9053,7 +9088,7 @@ export const DashboardSharingRequest = {
 };
 
 function createBaseUserUsage(): UserUsage {
-  return { tier: 0, projects: 0, alerts: 0 };
+  return { tier: 0, projects: 0, alerts: 0, usageByProjects: {} };
 }
 
 export const UserUsage = {
@@ -9067,6 +9102,9 @@ export const UserUsage = {
     if (message.alerts !== 0) {
       writer.uint32(24).int32(message.alerts);
     }
+    Object.entries(message.usageByProjects).forEach(([key, value]) => {
+      UserUsage_UsageByProjectsEntry.encode({ key: key as any, value }, writer.uint32(34).fork()).ldelim();
+    });
     return writer;
   },
 
@@ -9098,6 +9136,16 @@ export const UserUsage = {
 
           message.alerts = reader.int32();
           continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          const entry4 = UserUsage_UsageByProjectsEntry.decode(reader, reader.uint32());
+          if (entry4.value !== undefined) {
+            message.usageByProjects[entry4.key] = entry4.value;
+          }
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -9112,6 +9160,15 @@ export const UserUsage = {
       tier: isSet(object.tier) ? tierFromJSON(object.tier) : 0,
       projects: isSet(object.projects) ? globalThis.Number(object.projects) : 0,
       alerts: isSet(object.alerts) ? globalThis.Number(object.alerts) : 0,
+      usageByProjects: isObject(object.usageByProjects)
+        ? Object.entries(object.usageByProjects).reduce<{ [key: string]: UserUsage_ProjectUsage }>(
+          (acc, [key, value]) => {
+            acc[key] = UserUsage_ProjectUsage.fromJSON(value);
+            return acc;
+          },
+          {},
+        )
+        : {},
     };
   },
 
@@ -9126,6 +9183,15 @@ export const UserUsage = {
     if (message.alerts !== 0) {
       obj.alerts = Math.round(message.alerts);
     }
+    if (message.usageByProjects) {
+      const entries = Object.entries(message.usageByProjects);
+      if (entries.length > 0) {
+        obj.usageByProjects = {};
+        entries.forEach(([k, v]) => {
+          obj.usageByProjects[k] = UserUsage_ProjectUsage.toJSON(v);
+        });
+      }
+    }
     return obj;
   },
 
@@ -9137,6 +9203,182 @@ export const UserUsage = {
     message.tier = object.tier ?? 0;
     message.projects = object.projects ?? 0;
     message.alerts = object.alerts ?? 0;
+    message.usageByProjects = Object.entries(object.usageByProjects ?? {}).reduce<
+      { [key: string]: UserUsage_ProjectUsage }
+    >((acc, [key, value]) => {
+      if (value !== undefined) {
+        acc[key] = UserUsage_ProjectUsage.fromPartial(value);
+      }
+      return acc;
+    }, {});
+    return message;
+  },
+};
+
+function createBaseUserUsage_ProjectUsage(): UserUsage_ProjectUsage {
+  return { owner: "", slug: "", cost: BigInt("0") };
+}
+
+export const UserUsage_ProjectUsage = {
+  encode(message: UserUsage_ProjectUsage, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.owner !== "") {
+      writer.uint32(10).string(message.owner);
+    }
+    if (message.slug !== "") {
+      writer.uint32(18).string(message.slug);
+    }
+    if (message.cost !== BigInt("0")) {
+      if (BigInt.asUintN(64, message.cost) !== message.cost) {
+        throw new globalThis.Error("value provided for field message.cost of type uint64 too large");
+      }
+      writer.uint32(24).uint64(message.cost.toString());
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): UserUsage_ProjectUsage {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUserUsage_ProjectUsage();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.owner = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.slug = reader.string();
+          continue;
+        case 3:
+          if (tag !== 24) {
+            break;
+          }
+
+          message.cost = longToBigint(reader.uint64() as Long);
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): UserUsage_ProjectUsage {
+    return {
+      owner: isSet(object.owner) ? globalThis.String(object.owner) : "",
+      slug: isSet(object.slug) ? globalThis.String(object.slug) : "",
+      cost: isSet(object.cost) ? BigInt(object.cost) : BigInt("0"),
+    };
+  },
+
+  toJSON(message: UserUsage_ProjectUsage): unknown {
+    const obj: any = {};
+    if (message.owner !== "") {
+      obj.owner = message.owner;
+    }
+    if (message.slug !== "") {
+      obj.slug = message.slug;
+    }
+    if (message.cost !== BigInt("0")) {
+      obj.cost = message.cost.toString();
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<UserUsage_ProjectUsage>): UserUsage_ProjectUsage {
+    return UserUsage_ProjectUsage.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<UserUsage_ProjectUsage>): UserUsage_ProjectUsage {
+    const message = createBaseUserUsage_ProjectUsage();
+    message.owner = object.owner ?? "";
+    message.slug = object.slug ?? "";
+    message.cost = object.cost ?? BigInt("0");
+    return message;
+  },
+};
+
+function createBaseUserUsage_UsageByProjectsEntry(): UserUsage_UsageByProjectsEntry {
+  return { key: "", value: undefined };
+}
+
+export const UserUsage_UsageByProjectsEntry = {
+  encode(message: UserUsage_UsageByProjectsEntry, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.key !== "") {
+      writer.uint32(10).string(message.key);
+    }
+    if (message.value !== undefined) {
+      UserUsage_ProjectUsage.encode(message.value, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): UserUsage_UsageByProjectsEntry {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUserUsage_UsageByProjectsEntry();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.key = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.value = UserUsage_ProjectUsage.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): UserUsage_UsageByProjectsEntry {
+    return {
+      key: isSet(object.key) ? globalThis.String(object.key) : "",
+      value: isSet(object.value) ? UserUsage_ProjectUsage.fromJSON(object.value) : undefined,
+    };
+  },
+
+  toJSON(message: UserUsage_UsageByProjectsEntry): unknown {
+    const obj: any = {};
+    if (message.key !== "") {
+      obj.key = message.key;
+    }
+    if (message.value !== undefined) {
+      obj.value = UserUsage_ProjectUsage.toJSON(message.value);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<UserUsage_UsageByProjectsEntry>): UserUsage_UsageByProjectsEntry {
+    return UserUsage_UsageByProjectsEntry.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<UserUsage_UsageByProjectsEntry>): UserUsage_UsageByProjectsEntry {
+    const message = createBaseUserUsage_UsageByProjectsEntry();
+    message.key = object.key ?? "";
+    message.value = (object.value !== undefined && object.value !== null)
+      ? UserUsage_ProjectUsage.fromPartial(object.value)
+      : undefined;
     return message;
   },
 };

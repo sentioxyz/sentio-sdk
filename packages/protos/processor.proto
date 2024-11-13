@@ -246,6 +246,7 @@ enum MoveOwnerType {
   ADDRESS = 0;
   OBJECT = 1;
   WRAPPED_OBJECT = 2;
+  TYPE = 3;
 }
 
 message MoveOnIntervalConfig {
@@ -355,6 +356,7 @@ message MoveFetchConfig {
   bool inputs = 4;
   optional ResourceConfig resource_config = 3;
   optional bool support_multisig_func = 5;
+  optional bool include_failed_transaction = 6;
 }
 
 message MoveAccountFetchConfig {

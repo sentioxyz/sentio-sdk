@@ -13,11 +13,20 @@ import { SuiAddressContext, SuiContext, SuiObjectContext } from './context.js'
 import { SuiMoveObject, SuiTransactionBlockResponse } from '@mysten/sui/client'
 import { PromiseOrVoid } from '../core/index.js'
 import { configure, DEFAULT_FETCH_CONFIG, IndexConfigure, SuiBindOptions } from './sui-processor.js'
-import { CallHandler, TransactionFilter } from '../move/index.js'
+import { CallHandler, TransactionFilter, accountTypeString } from '../move/index.js'
 import { ServerError, Status } from 'nice-grpc'
+import { TypeDescriptor } from '@typemove/move'
+import { TypedSuiMoveObject } from './models.js'
 
 export interface SuiObjectBindOptions {
   objectId: string
+  network?: SuiNetwork
+  startCheckpoint?: bigint
+  baseLabels?: { [key: string]: string }
+}
+
+export interface SuiObjectTypeBindOptions<T> {
+  objectType: TypeDescriptor<T>
   network?: SuiNetwork
   startCheckpoint?: bigint
   baseLabels?: { [key: string]: string }
@@ -55,7 +64,16 @@ export abstract class SuiBaseObjectOrAddressProcessor<HandlerType> {
   // }
 
   protected constructor(options: SuiInternalObjectsBindOptions) {
-    this.config = configure(options)
+    if (options.ownerType === MoveOwnerType.TYPE) {
+      this.config = {
+        startCheckpoint: options.startCheckpoint || 0n,
+        address: accountTypeString(options.address),
+        network: options.network || SuiNetwork.MAIN_NET,
+        baseLabels: options.baseLabels
+      }
+    } else {
+      this.config = configure(options)
+    }
     this.ownerType = options.ownerType
     SuiAccountProcessorState.INSTANCE.addValue(this)
   }
@@ -66,7 +84,7 @@ export abstract class SuiBaseObjectOrAddressProcessor<HandlerType> {
 
   // protected abstract transformObjects(objects: SuiMoveObject[]): SuiMoveObject[]
 
-  protected abstract doHandle(handler: HandlerType, data: Data_SuiObject, ctx: SuiObjectContext): PromiseOrVoid
+  protected abstract doHandle(handler: HandlerType, data: Data_SuiObject, ctx: SuiObjectContext): Promise<any>
 
   public onInterval(
     handler: HandlerType, //(resources: SuiMoveObject[], ctx: SuiObjectsContext) => PromiseOrVoid,
@@ -141,11 +159,11 @@ export class SuiAddressProcessor extends SuiBaseObjectOrAddressProcessor<
     return new SuiAddressProcessor({ ...options, ownerType: MoveOwnerType.ADDRESS })
   }
 
-  protected doHandle(
+  protected async doHandle(
     handler: (objects: SuiMoveObject[], ctx: SuiObjectContext) => PromiseOrVoid,
     data: Data_SuiObject,
     ctx: SuiObjectContext
-  ): PromiseOrVoid {
+  ) {
     return handler(data.objects as SuiMoveObject[], ctx)
   }
 
@@ -207,16 +225,50 @@ export class SuiObjectProcessor extends SuiBaseObjectOrAddressProcessor<
     })
   }
 
-  protected doHandle(
+  protected async doHandle(
     handler: (self: SuiMoveObject, dynamicFieldObjects: SuiMoveObject[], ctx: SuiObjectContext) => PromiseOrVoid,
     data: Data_SuiObject,
     ctx: SuiObjectContext
-  ): PromiseOrVoid {
+  ) {
     if (!data.self) {
       console.log(`Sui object not existed in ${ctx.checkpoint}, please specific a start time`)
       return
     }
     return handler(data.self as SuiMoveObject, data.objects as SuiMoveObject[], ctx)
+  }
+}
+
+export class SuiObjectTypeProcessor<T> extends SuiBaseObjectOrAddressProcessor<
+  (self: TypedSuiMoveObject<T>, dynamicFieldObjects: SuiMoveObject[], ctx: SuiObjectContext) => PromiseOrVoid
+> {
+  objectType: TypeDescriptor<T>
+  static bind<T>(options: SuiObjectTypeBindOptions<T>): SuiObjectTypeProcessor<T> {
+    const processor = new SuiObjectTypeProcessor<T>({
+      address: options.objectType.qname,
+      network: options.network,
+      startCheckpoint: options.startCheckpoint,
+      ownerType: MoveOwnerType.TYPE,
+      baseLabels: options.baseLabels
+    })
+    processor.objectType = options.objectType
+    return processor
+  }
+
+  protected async doHandle(
+    handler: (
+      self: TypedSuiMoveObject<T>,
+      dynamicFieldObjects: SuiMoveObject[],
+      ctx: SuiObjectContext
+    ) => PromiseOrVoid,
+    data: Data_SuiObject,
+    ctx: SuiObjectContext
+  ) {
+    if (!data.self) {
+      console.log(`Sui object not existed in ${ctx.checkpoint}, please specific a start time`)
+      return
+    }
+    const object = await ctx.coder.filterAndDecodeObjects(this.objectType, [data.self as SuiMoveObject])
+    return handler(object[0], data.objects as SuiMoveObject[], ctx)
   }
 }
 
@@ -233,11 +285,11 @@ export class SuiWrappedObjectProcessor extends SuiBaseObjectOrAddressProcessor<
     })
   }
 
-  protected doHandle(
+  protected async doHandle(
     handler: (dynamicFieldObjects: SuiMoveObject[], ctx: SuiObjectContext) => PromiseOrVoid,
     data: Data_SuiObject,
     ctx: SuiObjectContext
-  ): PromiseOrVoid {
+  ) {
     return handler(data.objects as SuiMoveObject[], ctx)
   }
 }

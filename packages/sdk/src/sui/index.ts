@@ -2,8 +2,10 @@ export { SuiBaseProcessor, SuiGlobalProcessor, SuiModulesProcessor, type SuiBind
 export {
   SuiAddressProcessor,
   SuiObjectProcessor,
+  SuiObjectTypeProcessor,
   SuiWrappedObjectProcessor,
-  type SuiObjectBindOptions
+  type SuiObjectBindOptions,
+  type SuiObjectTypeBindOptions
 } from './sui-object-processor.js'
 
 export {
