@@ -1,7 +1,7 @@
-import { BaseContract } from 'ethers'
+import { BaseContract, Overrides } from 'ethers'
 import { LogParams, BlockParams, TransactionReceiptParams, TransactionResponseParams } from 'ethers/providers'
 
-import { PreparedData, RecordMetaData } from '@sentio/protos'
+import { EthCallContext, PreparedData, RecordMetaData } from '@sentio/protos'
 import { Trace } from './eth.js'
 import { Labels, normalizeLabels } from '../core/index.js'
 import { BaseContext } from '../core/base-context.js'
@@ -114,6 +114,23 @@ export abstract class EthContext extends BaseContext {
       }
     }
     throw new Error("Invaid ctx argument can't happen")
+  }
+
+  getBlockTag(overrides?: Overrides) {
+    let blockTagWithOverride = '0x' + this.blockNumber.toString(16)
+    if (overrides?.blockTag) {
+      blockTagWithOverride =
+        typeof overrides.blockTag == 'string' ? overrides.blockTag : '0x' + overrides.blockTag.toString(16)
+    }
+    return blockTagWithOverride
+  }
+
+  getEthCallContext(): EthCallContext {
+    return {
+      chainId: this.chainId,
+      blockTag: '0x' + this.blockNumber.toString(16),
+      address: this.address
+    }
   }
 }
 

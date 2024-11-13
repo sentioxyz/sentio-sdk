@@ -13,7 +13,6 @@ import {
   generateBoundFunctionCallEncoders,
   generateBoundViewFunctions,
   generateFunctionCallEncoders,
-  generateFunctionSignatures,
   generateViewFunctions
 } from './function-calls.js'
 
@@ -32,10 +31,6 @@ export function codeGenSentioFile(contract: Contract): string {
 
   const templateContract = ${contract.name}__factory.connect("0x0", DummyProvider)
   
-  const iface = new Interface([${Object.values(contract.functions)
-    .filter((f) => !reservedKeywords.has(f[0].name))
-    .flatMap((fs) => generateFunctionSignatures(fs))}])
-
   export class ${contract.name}ContractView extends ContractView<${contract.name}> {
     constructor (contract: ${contract.name}) {
       super(contract);
@@ -222,7 +217,8 @@ export class ${contract.name}ProcessorTemplate extends BaseProcessorTemplate<${c
         'EthContext',
         'EthFetchConfig',
         'PreprocessResult',
-        'makeEthCallKey'
+        'makeEthCallKey',
+        'encodeCallData'
       ],
       // '@sentio/sdk/eth': ['BaseContext'],
       // '@sentio/protos': ['EthFetchConfig'],

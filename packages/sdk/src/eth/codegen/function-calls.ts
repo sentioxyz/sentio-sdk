@@ -75,17 +75,12 @@ export function generateBoundViewFunction(view: boolean, fn: FunctionDeclaration
   async ${declName ?? fn.name}(${generateInputTypes(fn.inputs, {
     useStructs: true
   })}overrides?: Overrides): ${generateReturnTypes(fn)} {
-    const ethCallContext = {
-      chainId: this.context.chainId,
-      blockTag: "0x" + this.context.blockNumber.toString(16),
-      address: this.context.address,
-    }
     return await this.${qualifier}.${declName}(${
       fn.inputs.length > 0 ? fn.inputs.map((input, index) => input.name || `arg${index}`).join(',') + ',' : ''
     } {
       blockTag: this.context.blockNumber,
       ...overrides
-    }, this.context.preparedData, ethCallContext)
+    }, this.context.preparedData, this.context.getEthCallContext())
   }
   `
   ]
@@ -103,22 +98,10 @@ export function generateFunctionCallEncoder(fn: FunctionDeclaration, includeArgT
     `
   ${declName}(${generateInputTypes(fn.inputs, {
     useStructs: true
-  })}ethCallContext: EthCallContext): EthCallParam {
-    try {
-      const iface = new Interface(["function ${getSignatureForFn(fn)}"])
-      const calldata = iface.encodeFunctionData(
-        "${fn.name}",[${
-          fn.inputs.length > 0 ? fn.inputs.map((input, index) => input.name || `arg${index}`).join(',') + ',' : ''
-        }] 
-      )
-      return {
-        context: ethCallContext,
-        calldata
-      }
-    } catch (e) {
-      const stack = new Error().stack
-      throw transformEtherError(e, undefined, stack)
-    }
+  })}callContext: EthCallContext): EthCallParam {
+    return encodeCallData(callContext, "${fn.name}", "function ${getSignatureForFn(fn)}", [${
+      fn.inputs.length > 0 ? fn.inputs.map((input, index) => input.name || `arg${index}`).join(',') + ',' : ''
+    }])
   }
   `
   ]
@@ -137,15 +120,10 @@ export function generateBoundFunctionCallEncoder(fn: FunctionDeclaration, includ
     `
   ${declName ?? fn.name}(${generateInputTypes(fn.inputs, {
     useStructs: true
-  })}overrides?: Overrides): EthCallParam {
-    let blockTagWithOverride = "0x" + this.context.blockNumber.toString(16)
-    if (overrides?.blockTag) {
-      blockTagWithOverride = typeof(overrides.blockTag) == 'string'? overrides.blockTag: "0x" + overrides.blockTag.toString(16)
-    }
-    
+  })}overrides?: Overrides): EthCallParam {   
     return this.view.encodeCall.${declName}(${
       fn.inputs.length > 0 ? fn.inputs.map((input, index) => input.name || `arg${index}`).join(',') + ',' : ''
-    }{chainId: this.context.chainId.toString(), address: this.context.address, blockTag: blockTagWithOverride})
+    }{chainId: this.context.chainId.toString(), address: this.context.address, blockTag: this.context.getBlockTag(overrides)})
   }
   `
   ]

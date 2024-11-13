@@ -11,10 +11,11 @@ import {
   object,
   formatData
 } from 'ethers/providers'
-import { CallExceptionError, LogDescription, Result, DeferredTopicFilter, BlockParams } from 'ethers'
+import { CallExceptionError, LogDescription, Result, DeferredTopicFilter, BlockParams, Interface } from 'ethers'
 import { ContractContext } from './context.js'
 import { getAddress } from 'ethers/address'
 import { getBigInt, getNumber, hexlify } from 'ethers/utils'
+import { EthCallContext, EthCallParam } from '@sentio/protos'
 
 export interface IResult {
   /**
@@ -264,4 +265,23 @@ export function validateAndNormalizeAddress(address: string): string {
   }
   const normalizedAddress = getAddress(address)
   return normalizedAddress.toLowerCase()
+}
+
+export function encodeCallData(
+  context: EthCallContext,
+  name: string,
+  funcABI: string,
+  values?: ReadonlyArray<any>
+): EthCallParam {
+  try {
+    const iface = new Interface([funcABI])
+    const calldata = iface.encodeFunctionData(name, values)
+    return {
+      context,
+      calldata
+    }
+  } catch (e) {
+    const stack = new Error().stack
+    throw transformEtherError(e, undefined, stack)
+  }
 }
