@@ -1,21 +1,5 @@
-import fastify, { FastifyRequest } from 'fastify'
 import { ListStateStorage } from '@sentio/runtime'
-
-type ActionHandler<RESP> = (request: FastifyRequest, context: any) => Promise<RESP>
-
-type HTTPMethod = 'DELETE' | 'GET' | 'HEAD' | 'PATCH' | 'POST' | 'PUT' | 'OPTIONS'
-
-const HTTPMethods: HTTPMethod[] = ['DELETE', 'GET', 'HEAD', 'PATCH', 'POST', 'PUT', 'OPTIONS']
-
-type ActionProcessorOption = {
-  name?: string
-}
-
-type Route = {
-  method: HTTPMethod | HTTPMethod[]
-  url: string
-  handler: ActionHandler<unknown>
-}
+import { ActionHandler, HTTPMethod, Route, HTTPMethods, ActionProcessorOption } from './types.js'
 
 interface IActionsProcessor<T> {
   onAction<RESP>(handler: ActionHandler<RESP>): T
@@ -28,8 +12,6 @@ interface IActionsProcessor<T> {
 export class ActionProcessorState extends ListStateStorage<ActionProcessor> {
   static INSTANCE = new ActionProcessorState()
 }
-
-const server = fastify()
 
 export class ActionProcessor implements IActionsProcessor<ActionProcessor> {
   route: Route[] = []
@@ -59,10 +41,10 @@ export class ActionProcessor implements IActionsProcessor<ActionProcessor> {
   onAction(method: unknown, url?: unknown, handler?: unknown): ActionProcessor {
     if (typeof method === 'function') {
       const handler = method as ActionHandler<unknown>
-      this.route.push({ handler, url: "*", method: HTTPMethods })
+      this.route.push({ handler, url: '*', method: HTTPMethods })
     } else if (typeof url === 'function') {
       const handler = url as ActionHandler<unknown>
-      this.route.push({ method: method as HTTPMethod, handler, url: "*" })
+      this.route.push({ method: method as HTTPMethod, handler, url: '*' })
     } else {
       const h = handler as ActionHandler<unknown>
       this.route.push({ method: method as HTTPMethod, url: url as string, handler: h })
@@ -75,6 +57,3 @@ export class ActionProcessor implements IActionsProcessor<ActionProcessor> {
     return new ActionProcessor(options)
   }
 }
-
-
-
