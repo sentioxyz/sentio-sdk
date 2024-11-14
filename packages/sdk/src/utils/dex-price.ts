@@ -49,7 +49,7 @@ class DexPrice {
   constructor(csvFileName: string, chainId: EthChainId) {
     this.chainId = chainId
     const packageRoot = getPackageRoot('@sentio/sdk')
-    const csvFilePath = path.join(packageRoot, 'src', 'utils', csvFileName)
+    const csvFilePath = path.join(packageRoot, 'assets', csvFileName)
     const fileContent = fs.readFileSync(csvFilePath, { encoding: 'utf-8' })
     const headers = ['Pair', 'Asset', 'Type', 'Address']
 

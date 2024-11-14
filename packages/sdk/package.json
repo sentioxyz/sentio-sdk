@@ -43,7 +43,7 @@
     "./btc": "./lib/btc/index.js"
   },
   "files": [
-    "{lib,src}",
+    "{lib,src,assets}",
     "!**/*.test.{js,ts}",
     "!{lib,src}/*/tests"
   ],
