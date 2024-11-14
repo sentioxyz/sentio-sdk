@@ -1,6 +1,6 @@
 import { ActionProcessorOption, HTTPMethod, Route } from './types.js'
 import { ListStateStorage } from '@sentio/runtime'
-import { Type, TSchema, TypedActionHandler, TypedActionRequest, T, TSchemNoBody } from './schema.js'
+import { Type, TSchema, TypedActionHandler, TypedActionRequest, TSchemNoBody } from './schema.js'
 
 export class TypedActionProcessorState extends ListStateStorage<TypedActionProcessor> {
   static INSTANCE = new TypedActionProcessorState()
