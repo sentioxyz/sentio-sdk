@@ -18,6 +18,6 @@ export default defineConfig({
   // https://github.com/egoist/tsup/issues/920, use `tsc --emitDeclarationOnly --declaration` as a workaround
   // dts: true,
   format: 'esm',
-  // keepNames: true,
-  external: [...external, /^@sentio\/(runtime|ethers).*$/]
+  keepNames: true,
+  external: [...external, /^@sentio\/(runtime).*$/]
 })

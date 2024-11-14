@@ -15,8 +15,6 @@
     "build": "pnpm gen && pnpm compile",
     "build:all": "pnpm --filter=$(node -p \"require('./package.json').name\")... build",
     "build:bundle": "pnpm gen && pnpm bundle && pnpm bundle:dts",
-    "bundle": "tsup --config src/bundle.config.ts && cp src/tsup.config.ts lib",
-    "bundle:dts": "tsc --emitDeclarationOnly --declaration",
     "compile": "tsc && cp src/tsup.config.ts lib",
     "gen": "echo",
     "test": "glob -c 'tsx --test' '**/*.test.ts'"
@@ -25,9 +23,6 @@
     "@sentio/protos": "workspace:*",
     "@sentio/runtime": "workspace:^",
     "fastify": "^5.1.0"
-  },
-  "peerDependencies": {
-    "tsup": "npm:@sentio/tsup@^6.7.6"
   },
   "devDependencies": {
     "prettier": "^3.2.4",

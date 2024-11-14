@@ -20,5 +20,5 @@ export default defineConfig({
   // },
   publicDir: '../abis',
   splitting: false,
-  external: [...external, /^@sentio\/(sdk|runtime|action|ethers).*$/]
+  external: [...external, /^@sentio\/(sdk|runtime|action).*$/]
 })

@@ -113,7 +113,7 @@
     "yaml": "^2.3.4"
   },
   "peerDependencies": {
-    "tsup": "npm:@sentio/tsup@^6.7.6"
+    "tsup": "npm:@sentio/tsup@^8.3.5-rc.1"
   },
   "devDependencies": {
     "@types/google-protobuf": "^3.15.12",
