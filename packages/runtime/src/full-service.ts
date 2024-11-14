@@ -129,6 +129,11 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
           // }
         }
         break
+      case HandlerType.ETH_BLOCK:
+        if (dataBinding.data?.ethBlock?.block) {
+          dataBinding.data.ethBlock.block.transactions = []
+        }
+        break
       case HandlerType.UNKNOWN:
         if (dataBinding.data?.ethBlock) {
           if (dataBinding.data.raw.length === 0) {
