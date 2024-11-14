@@ -113,7 +113,7 @@ jobs:
         run: |
           pnpm build:bundle
           pnpm json -I -f package.json -e "this.dependencies=Object.fromEntries(Object.entries(this.dependencies).filter((entry) => ['@sentio/runtime'].includes(entry['0'])))"
-          pnpm json -I -f package.json -e 'this.name="@sentio/sdk-bundle"; this.scripts={}; this.peerDependencies={}; this.devDependencies={}'
+          pnpm json -I -f package.json -e 'this.name="@sentio/sdk-bundle"; this.scripts={}; this.peerDependencies={}; this.devDependencies={}; this.files = ["lib"]'
         working-directory: packages/sdk
       - name: sdk-bundle NPM Publish
         if: steps.semantic.outputs.new_release_published == 'true'

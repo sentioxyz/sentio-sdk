@@ -30,4 +30,5 @@ jobs:
       - name: Test sdk-bundle
         run: |
           pnpm --filter "@sentio/sdk" build:bundle
+          pnpm --filter "@sentio/sdk" bundle:dts
           pnpm --filter "./packages/*" --filter "./examples/*" test
