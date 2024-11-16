@@ -30,6 +30,7 @@ export class ActionPlugin extends Plugin {
           url: route.url,
           handler: async (request, reply) => {
             const context = {}
+            reply.header('Action-Route', encodeURIComponent(route.url))
             return route.handler(request, context)
           }
         })
@@ -49,6 +50,7 @@ export class ActionPlugin extends Plugin {
           schema,
           handler: async (request, reply) => {
             const context = {}
+            reply.header('Action-Route', encodeURIComponent(route.url))
             return route.handler(request, context)
           }
         })
