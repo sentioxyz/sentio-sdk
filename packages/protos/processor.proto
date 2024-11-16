@@ -628,14 +628,17 @@ message Data {
   message AptEvent {
     //    google.protobuf.Struct event = 1;
     google.protobuf.Struct transaction = 2;
+    string raw_transaction = 3;
   }
   message AptCall {
     google.protobuf.Struct transaction = 2;
+    string raw_transaction = 3;
   }
   message AptResource {
     repeated google.protobuf.Struct resources = 4;
     int64 version = 2;
     int64 timestampMicros = 5;
+    repeated string raw_resources = 6;
   }
   message SuiEvent {
     google.protobuf.Struct transaction = 1;

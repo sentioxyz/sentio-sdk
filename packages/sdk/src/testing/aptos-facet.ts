@@ -43,6 +43,7 @@ export class AptosFacet {
             return {
               data: {
                 aptCall: {
+                  rawTransaction: '',
                   transaction
                 }
               },
@@ -83,6 +84,7 @@ export class AptosFacet {
               return {
                 data: {
                   aptEvent: {
+                    rawTransaction: '',
                     transaction
                   }
                 },

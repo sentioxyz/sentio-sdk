@@ -141,9 +141,9 @@ export async function getPriceForToken(
   timestamp: number,
   network = AptosChainId.APTOS_MAINNET
 ): Promise<number> {
-  if (!isWhiteListToken(token)) {
-    return 0.0
-  }
+  // if (!isWhiteListToken(token)) {
+  //   return 0.0
+  // }
   const date = new Date(timestamp / 1000)
   try {
     return (await getPriceByType(network, token, date)) || 0

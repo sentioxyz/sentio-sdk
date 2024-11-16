@@ -552,6 +552,7 @@ export interface ApiKey {
   expiresAt: bigint;
   source: string;
   ownerType: string;
+  revealable: boolean;
 }
 
 export interface TimeRangeLite {
@@ -4488,6 +4489,7 @@ function createBaseApiKey(): ApiKey {
     expiresAt: BigInt("0"),
     source: "",
     ownerType: "",
+    revealable: false,
   };
 }
 
@@ -4528,6 +4530,9 @@ export const ApiKey = {
     }
     if (message.ownerType !== "") {
       writer.uint32(82).string(message.ownerType);
+    }
+    if (message.revealable !== false) {
+      writer.uint32(88).bool(message.revealable);
     }
     return writer;
   },
@@ -4602,6 +4607,13 @@ export const ApiKey = {
 
           message.ownerType = reader.string();
           continue;
+        case 11:
+          if (tag !== 88) {
+            break;
+          }
+
+          message.revealable = reader.bool();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -4622,6 +4634,7 @@ export const ApiKey = {
       expiresAt: isSet(object.expiresAt) ? BigInt(object.expiresAt) : BigInt("0"),
       source: isSet(object.source) ? globalThis.String(object.source) : "",
       ownerType: isSet(object.ownerType) ? globalThis.String(object.ownerType) : "",
+      revealable: isSet(object.revealable) ? globalThis.Boolean(object.revealable) : false,
     };
   },
 
@@ -4654,6 +4667,9 @@ export const ApiKey = {
     if (message.ownerType !== "") {
       obj.ownerType = message.ownerType;
     }
+    if (message.revealable !== false) {
+      obj.revealable = message.revealable;
+    }
     return obj;
   },
 
@@ -4671,6 +4687,7 @@ export const ApiKey = {
     message.expiresAt = object.expiresAt ?? BigInt("0");
     message.source = object.source ?? "";
     message.ownerType = object.ownerType ?? "";
+    message.revealable = object.revealable ?? false;
     return message;
   },
 };

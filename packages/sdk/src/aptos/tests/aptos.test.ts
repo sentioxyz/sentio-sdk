@@ -26,6 +26,7 @@ describe('Test Aptos Example', () => {
         {
           data: {
             aptCall: {
+              rawTransaction: '',
               transaction: testData
             }
           },
@@ -74,6 +75,7 @@ describe('Test Aptos Example', () => {
         {
           data: {
             aptResource: {
+              rawResources: [],
               version: 12345n,
               resources: [
                 {
@@ -101,6 +103,7 @@ describe('Test Aptos Example', () => {
         {
           data: {
             aptCall: {
+              rawTransaction: '',
               transaction: dataCreate
             }
           },

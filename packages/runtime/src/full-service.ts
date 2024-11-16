@@ -122,13 +122,25 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
     switch (dataBinding.handlerType) {
       case HandlerType.APT_EVENT:
         if (dataBinding.data?.aptEvent) {
-          // const aptEvent = dataBinding.data.aptEvent
-          // if (aptEvent.event && this.sdkMinorVersion < 40) {
-          //   assert.ok(aptEvent.transaction, 'No Transaction')
-          //   aptEvent.transaction.events = [aptEvent.event]
-          // }
+          if (dataBinding.data.aptEvent.rawTransaction && !dataBinding.data.aptEvent.transaction) {
+            dataBinding.data.aptEvent.transaction = JSON.parse(dataBinding.data.aptEvent.rawTransaction)
+          }
         }
         break
+      case HandlerType.APT_CALL:
+        if (dataBinding.data?.aptCall) {
+          if (dataBinding.data.aptCall.rawTransaction && !dataBinding.data.aptCall.transaction) {
+            dataBinding.data.aptCall.transaction = JSON.parse(dataBinding.data.aptCall.rawTransaction)
+          }
+        }
+        break
+      // case HandlerType.APT_RESOURCE:
+      //   if (dataBinding.data?.aptResource) {
+      //     if (dataBinding.data.aptResource.rawResources && dataBinding.data.aptResource.rawResources.length > 0) {
+      //       dataBinding.data.aptResource.resources = dataBinding.data.aptResource.rawResources.map(e => JSON.parse(e))
+      //     }
+      //   }
+      //   break
       case HandlerType.UNKNOWN:
         if (dataBinding.data?.ethBlock) {
           if (dataBinding.data.raw.length === 0) {

@@ -1086,16 +1086,19 @@ export interface Data_SolInstruction {
 
 export interface Data_AptEvent {
   transaction: { [key: string]: any } | undefined;
+  rawTransaction: string;
 }
 
 export interface Data_AptCall {
   transaction: { [key: string]: any } | undefined;
+  rawTransaction: string;
 }
 
 export interface Data_AptResource {
   resources: { [key: string]: any }[];
   version: bigint;
   timestampMicros: bigint;
+  rawResources: string[];
 }
 
 export interface Data_SuiEvent {
@@ -9308,13 +9311,16 @@ export const Data_SolInstruction = {
 };
 
 function createBaseData_AptEvent(): Data_AptEvent {
-  return { transaction: undefined };
+  return { transaction: undefined, rawTransaction: "" };
 }
 
 export const Data_AptEvent = {
   encode(message: Data_AptEvent, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.transaction !== undefined) {
       Struct.encode(Struct.wrap(message.transaction), writer.uint32(18).fork()).ldelim();
+    }
+    if (message.rawTransaction !== "") {
+      writer.uint32(26).string(message.rawTransaction);
     }
     return writer;
   },
@@ -9333,6 +9339,13 @@ export const Data_AptEvent = {
 
           message.transaction = Struct.unwrap(Struct.decode(reader, reader.uint32()));
           continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.rawTransaction = reader.string();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -9343,13 +9356,19 @@ export const Data_AptEvent = {
   },
 
   fromJSON(object: any): Data_AptEvent {
-    return { transaction: isObject(object.transaction) ? object.transaction : undefined };
+    return {
+      transaction: isObject(object.transaction) ? object.transaction : undefined,
+      rawTransaction: isSet(object.rawTransaction) ? globalThis.String(object.rawTransaction) : "",
+    };
   },
 
   toJSON(message: Data_AptEvent): unknown {
     const obj: any = {};
     if (message.transaction !== undefined) {
       obj.transaction = message.transaction;
+    }
+    if (message.rawTransaction !== "") {
+      obj.rawTransaction = message.rawTransaction;
     }
     return obj;
   },
@@ -9360,18 +9379,22 @@ export const Data_AptEvent = {
   fromPartial(object: DeepPartial<Data_AptEvent>): Data_AptEvent {
     const message = createBaseData_AptEvent();
     message.transaction = object.transaction ?? undefined;
+    message.rawTransaction = object.rawTransaction ?? "";
     return message;
   },
 };
 
 function createBaseData_AptCall(): Data_AptCall {
-  return { transaction: undefined };
+  return { transaction: undefined, rawTransaction: "" };
 }
 
 export const Data_AptCall = {
   encode(message: Data_AptCall, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.transaction !== undefined) {
       Struct.encode(Struct.wrap(message.transaction), writer.uint32(18).fork()).ldelim();
+    }
+    if (message.rawTransaction !== "") {
+      writer.uint32(26).string(message.rawTransaction);
     }
     return writer;
   },
@@ -9390,6 +9413,13 @@ export const Data_AptCall = {
 
           message.transaction = Struct.unwrap(Struct.decode(reader, reader.uint32()));
           continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.rawTransaction = reader.string();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -9400,13 +9430,19 @@ export const Data_AptCall = {
   },
 
   fromJSON(object: any): Data_AptCall {
-    return { transaction: isObject(object.transaction) ? object.transaction : undefined };
+    return {
+      transaction: isObject(object.transaction) ? object.transaction : undefined,
+      rawTransaction: isSet(object.rawTransaction) ? globalThis.String(object.rawTransaction) : "",
+    };
   },
 
   toJSON(message: Data_AptCall): unknown {
     const obj: any = {};
     if (message.transaction !== undefined) {
       obj.transaction = message.transaction;
+    }
+    if (message.rawTransaction !== "") {
+      obj.rawTransaction = message.rawTransaction;
     }
     return obj;
   },
@@ -9417,12 +9453,13 @@ export const Data_AptCall = {
   fromPartial(object: DeepPartial<Data_AptCall>): Data_AptCall {
     const message = createBaseData_AptCall();
     message.transaction = object.transaction ?? undefined;
+    message.rawTransaction = object.rawTransaction ?? "";
     return message;
   },
 };
 
 function createBaseData_AptResource(): Data_AptResource {
-  return { resources: [], version: BigInt("0"), timestampMicros: BigInt("0") };
+  return { resources: [], version: BigInt("0"), timestampMicros: BigInt("0"), rawResources: [] };
 }
 
 export const Data_AptResource = {
@@ -9441,6 +9478,9 @@ export const Data_AptResource = {
         throw new globalThis.Error("value provided for field message.timestampMicros of type int64 too large");
       }
       writer.uint32(40).int64(message.timestampMicros.toString());
+    }
+    for (const v of message.rawResources) {
+      writer.uint32(50).string(v!);
     }
     return writer;
   },
@@ -9473,6 +9513,13 @@ export const Data_AptResource = {
 
           message.timestampMicros = longToBigint(reader.int64() as Long);
           continue;
+        case 6:
+          if (tag !== 50) {
+            break;
+          }
+
+          message.rawResources.push(reader.string());
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -9487,6 +9534,9 @@ export const Data_AptResource = {
       resources: globalThis.Array.isArray(object?.resources) ? [...object.resources] : [],
       version: isSet(object.version) ? BigInt(object.version) : BigInt("0"),
       timestampMicros: isSet(object.timestampMicros) ? BigInt(object.timestampMicros) : BigInt("0"),
+      rawResources: globalThis.Array.isArray(object?.rawResources)
+        ? object.rawResources.map((e: any) => globalThis.String(e))
+        : [],
     };
   },
 
@@ -9501,6 +9551,9 @@ export const Data_AptResource = {
     if (message.timestampMicros !== BigInt("0")) {
       obj.timestampMicros = message.timestampMicros.toString();
     }
+    if (message.rawResources?.length) {
+      obj.rawResources = message.rawResources;
+    }
     return obj;
   },
 
@@ -9512,6 +9565,7 @@ export const Data_AptResource = {
     message.resources = object.resources?.map((e) => e) || [];
     message.version = object.version ?? BigInt("0");
     message.timestampMicros = object.timestampMicros ?? BigInt("0");
+    message.rawResources = object.rawResources?.map((e) => e) || [];
     return message;
   },
 };
