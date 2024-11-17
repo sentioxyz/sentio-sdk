@@ -33,7 +33,6 @@ export async function setupOTLP(debug?: boolean) {
   const exporter = new OTLPTraceExporter() // new ConsoleSpanExporter();
   const processor = new BatchSpanProcessor(exporter)
   traceProvider.addSpanProcessor(processor)
-  traceProvider.register()
 
   metrics.setGlobalMeterProvider(meterProvider)
   trace.setGlobalTracerProvider(traceProvider)
