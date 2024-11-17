@@ -1,12 +1,29 @@
 import { createLogger, format, transports } from 'winston'
 
+function stringify(obj: any) {
+  let cache: any[] = []
+  const str = JSON.stringify(obj, function (key, value) {
+    if (typeof value === 'object' && value !== null) {
+      if (cache.indexOf(value) !== -1) {
+        // Circular reference found, discard key
+        return
+      }
+      // Store value in our collection
+      cache.push(value)
+    }
+    return value
+  })
+  cache = []
+  return str
+}
+
 export function setupLogger(json: boolean, enableDebug: boolean) {
   const utilFormatter = {
     transform: (info: any) => {
       const stringRes = []
 
       if (typeof info.message === 'object') {
-        stringRes.push(JSON.stringify(info.message))
+        stringRes.push(stringify(info.message))
       } else {
         stringRes.push(info.message)
       }
@@ -16,7 +33,7 @@ export function setupLogger(json: boolean, enableDebug: boolean) {
         for (const idx in args) {
           const arg = args[idx]
           if (typeof arg === 'object') {
-            stringRes.push(JSON.stringify(arg))
+            stringRes.push(stringify(arg))
           } else {
             stringRes.push(arg)
           }
