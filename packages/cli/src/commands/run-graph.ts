@@ -162,6 +162,12 @@ const deployOptionDefinitions = [
     name: 'name',
     description: '(Optional) Override Project name',
     type: String
+  },
+  {
+    name: 'continue-from',
+    description:
+      '(Optional) Continue processing data from the specific processor version which will keeping the old data from previous version and will STOP that version IMMEDIATELY.',
+    type: Number
   }
 ]
 
@@ -223,6 +229,9 @@ async function runGraphDeploy(argv: string[]) {
 
   await createProjectIfMissing(processorConfig, apiKey)
 
+  const continueFrom = options['continue-from']
+  const versionLabel = continueFrom ? `continue-from:${continueFrom}` : Date.now().toString()
+
   const graph = path.resolve(getPackageRoot('@sentio/graph-cli'), 'bin', 'run')
   await execStep(['node', graph, 'codegen'], 'Graph codegen')
   await execStep(
@@ -235,7 +244,7 @@ async function runGraphDeploy(argv: string[]) {
       '--ipfs',
       new URL('/api/v1/ipfs', processorConfig.host).toString(),
       '--version-label',
-      Date.now().toString(),
+      versionLabel,
       '--deploy-key',
       apiKey,
       processorConfig.project
