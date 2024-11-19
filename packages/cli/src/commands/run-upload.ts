@@ -63,6 +63,11 @@ const uploadOptionDefinitions = [
     name: 'debug',
     description: '(Optional) Run driver in debug mode, default false',
     type: Boolean
+  },
+  {
+    name: 'silent-overwrite',
+    description: '(Optional) Overwrite exiting processor version without confirmation, default false',
+    type: Boolean
   }
 ]
 
@@ -106,6 +111,9 @@ export async function runUpload(processorConfig: YamlProjectConfig, argv: string
   }
   if (options.debug) {
     processorConfig.debug = true
+  }
+  if (options['silent-overwrite']) {
+    processorConfig.silientOverwrite = true
   }
   finalizeHost(processorConfig, options.host)
   FinalizeProjectName(processorConfig, options.owner, options.name)
@@ -173,7 +181,26 @@ export async function createProjectPrompt(options: YamlProjectConfig, auth: Auth
     rl.close()
     return false
   } else {
+    rl.close()
     return createProjectPrompt(options, auth, type)
+  }
+}
+
+export async function confirm(question: string): Promise<boolean> {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  })
+  const answer: string = await new Promise((resolve) => rl.question(`${question} (yes/no) `, resolve))
+  if (['y', 'yes'].includes(answer.toLowerCase())) {
+    rl.close()
+    return true
+  } else if (['n', 'no'].includes(answer.toLowerCase())) {
+    rl.close()
+    return false
+  } else {
+    rl.close()
+    return confirm(question)
   }
 }
 
@@ -227,14 +254,20 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth, continu
       // console.error(chalk.red('Failed to get upload url'))
       console.error(chalk.red(((await initUploadResRaw.json()) as { message: string }).message))
       if (initUploadResRaw.status === 404) {
-        const created = await createProjectPrompt(options, auth )
+        const created = await createProjectPrompt(options, auth)
         if (created) {
           await upload()
         }
       }
       return
     }
-    const initUploadRes = (await initUploadResRaw.json()) as { url: string; warning?: string }
+    const initUploadRes = (await initUploadResRaw.json()) as { url: string; warning?: string; replacingVersion: number }
+    if (initUploadRes.replacingVersion && !options.silientOverwrite) {
+      const confirmed = await confirm(`Overwrite the existing version ${initUploadRes.replacingVersion}?`)
+      if (!confirmed) {
+        process.exit(0)
+      }
+    }
     if (initUploadRes.warning) {
       console.warn(chalk.yellow('Warning:', initUploadRes.warning))
     }
