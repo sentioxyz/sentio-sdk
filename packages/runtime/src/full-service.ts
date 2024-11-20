@@ -134,13 +134,13 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
           }
         }
         break
-      // case HandlerType.APT_RESOURCE:
-      //   if (dataBinding.data?.aptResource) {
-      //     if (dataBinding.data.aptResource.rawResources && dataBinding.data.aptResource.rawResources.length > 0) {
-      //       dataBinding.data.aptResource.resources = dataBinding.data.aptResource.rawResources.map(e => JSON.parse(e))
-      //     }
-      //   }
-      //   break
+      case HandlerType.APT_RESOURCE:
+        if (dataBinding.data?.aptResource?.resources) {
+          if (dataBinding.data.aptResource.rawResources && dataBinding.data.aptResource.rawResources.length > 0) {
+            dataBinding.data.aptResource.resources = dataBinding.data.aptResource.rawResources.map((e) => JSON.parse(e))
+          }
+        }
+        break
       case HandlerType.UNKNOWN:
         if (dataBinding.data?.ethBlock) {
           if (dataBinding.data.raw.length === 0) {
