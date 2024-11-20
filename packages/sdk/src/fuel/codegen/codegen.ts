@@ -120,7 +120,7 @@ import {${abi.commonTypesInUse.join(',')}} from './common.js'
 import {${importedTypes.join(',')}, ${abi.capitalizedName}} from './${abi.capitalizedName}.js'
 
 import type { BigNumberish, BN } from 'fuels';
-import type { BytesLike, Bytes } from 'fuels';
+import type { BytesLike, Bytes, StdString, StrSlice, RawSlice, B256Address, ChecksumAddress, Bech32Address } from 'fuels';
 
 
 namespace ${name}NS {
