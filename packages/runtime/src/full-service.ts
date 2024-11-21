@@ -107,18 +107,27 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
     }
   }
 
+  async *adjustBindingsStream(requests: AsyncIterable<ProcessStreamRequest>): AsyncIterable<ProcessStreamRequest> {
+    for await (const request of requests) {
+      this.adjustDataBinding(request.binding)
+      yield request
+    }
+  }
+
   async *processBindingsStream(requests: AsyncIterable<ProcessStreamRequest>, context: CallContext) {
-    // throw new Error('Not Implemented for streaming')
-    yield* this.instance.processBindingsStream(requests, context)
+    yield* this.instance.processBindingsStream(this.adjustBindingsStream(requests), context)
   }
 
   async *preprocessBindingsStream(requests: AsyncIterable<PreprocessStreamRequest>, context: CallContext) {
-    yield* this.instance.preprocessBindingsStream(requests, context)
+    yield* this.instance.preprocessBindingsStream(this.adjustBindingsStream(requests), context)
   }
 
   private adjustResult(res: ProcessResult): void {}
 
-  private adjustDataBinding(dataBinding: DataBinding): void {
+  private adjustDataBinding(dataBinding?: DataBinding): void {
+    if (!dataBinding) {
+      return
+    }
     switch (dataBinding.handlerType) {
       case HandlerType.APT_EVENT:
         if (dataBinding.data?.aptEvent) {

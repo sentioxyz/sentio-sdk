@@ -120,7 +120,7 @@ export async function getABI(
     const abi = resp.result
 
     if (!name) {
-      await new Promise((resolve) => setTimeout(resolve, 5000))
+      await new Promise((resolve) => setTimeout(resolve, 10000))
       resp = (await (await fetch(`${ethApi}module=contract&action=getsourcecode&address=${address}`)).json()) as any
       if (resp.status !== '1') {
         throw Error(resp.message)
