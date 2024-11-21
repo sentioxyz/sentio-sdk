@@ -93,11 +93,15 @@ export async function decodeFuelTransactionWithAbi(
   const logs = [] as FuelLog<any>[]
   ;(receipts as any[]).forEach((receipt, idx) => {
     if (receipt.type === ReceiptType.LogData || receipt.type === ReceiptType.Log) {
-      const interfaceToUse = new Interface(abi)
-      const data = receipt.type === ReceiptType.Log ? new BigNumberCoder('u64').encode(receipt.val0) : receipt.data
-      const logId = receipt.val1.toString()
-      const [decodedLog] = interfaceToUse.decodeLog(data, logId)
-      logs.push({ logId, data: decodedLog, receiptIndex: idx })
+      try {
+        const interfaceToUse = new Interface(abi)
+        const data = receipt.type === ReceiptType.Log ? new BigNumberCoder('u64').encode(receipt.val0) : receipt.data
+        const logId = receipt.val1.toString()
+        const [decodedLog] = interfaceToUse.decodeLog(data, logId)
+        logs.push({ logId, data: decodedLog, receiptIndex: idx })
+      } catch (e) {
+        console.warn('Failed to decode log', e)
+      }
     }
   })
 
