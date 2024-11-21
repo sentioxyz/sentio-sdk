@@ -25,7 +25,7 @@ export async function execStep(cmds: string[], stepName: string, options?: ExecF
     child.on('close', resolve)
   })
 
-  if (child.exitCode || (cmds[1] == 'graph' && stderr.includes('Failed'))) {
+  if (child.exitCode || (cmds[1].includes('graph-cli') && stderr.includes('Failed'))) {
     console.error(chalk.red(stepName + ' failed'))
     process.exit(child.exitCode || 1)
   }
