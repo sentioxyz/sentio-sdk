@@ -2,7 +2,7 @@ import { StoreContext } from './context.js'
 import { DatabaseSchema } from '../core/index.js'
 import { BigDecimal } from '@sentio/bigdecimal'
 import { AbstractEntity as Entity, Bytes, Float, ID, Int, Timestamp } from './types.js'
-import type { DBRequest, Entity as EntityStruct } from '@sentio/protos'
+import type { DBRequest, Entity as EntityStruct, RichValue } from '@sentio/protos'
 import { DBRequest_DBOperator, DBResponse } from '@sentio/protos'
 import { PluginManager } from '@sentio/runtime'
 import { Cursor } from './cursor.js'
@@ -163,15 +163,30 @@ export class Store {
           cursor,
           pageSize,
           filters:
-            filters?.map((f) => ({
-              field: f.field as string,
-              op: ops[f.op],
-              value: {
-                values: Array.isArray(f.value)
-                  ? f.value.map((v) => serializeRichValue(v))
-                  : [serializeRichValue(f.value)]
+            filters?.map((f) => {
+              let values: RichValue[]
+              switch (f.op) {
+                case 'in':
+                case 'not in':
+                case 'has all':
+                case 'has any':
+                  values = Array.isArray(f.value)
+                    ? f.value.map((v) => serializeRichValue(v))
+                    : [serializeRichValue(f.value)]
+                  break
+                default:
+                  //   = , != should set it to  [[]]
+                  values = [serializeRichValue(f.value)]
               }
-            })) || []
+
+              return {
+                field: f.field as string,
+                op: ops[f.op],
+                value: {
+                  values
+                }
+              }
+            }) || []
         }
       },
       3600

@@ -1,9 +1,9 @@
 import { StoreContext } from '../context.js'
-import { ProcessStreamResponse } from '@sentio/protos'
+import { DBRequest, ProcessStreamResponse } from '@sentio/protos'
 
 export class MemoryDatabase {
   db = new Map<string, any>()
-
+  public lastDbRequest: DBRequest | undefined
   constructor(readonly dbContext: StoreContext) {}
 
   start() {
@@ -17,6 +17,7 @@ export class MemoryDatabase {
 
   private processRequest(request: ProcessStreamResponse) {
     const req = request.dbRequest
+    this.lastDbRequest = req
     if (req) {
       if (req.upsert) {
         const { entityData, entity } = req.upsert

@@ -121,6 +121,32 @@ describe('Test Database', () => {
     assert.deepEqual(tx2?.gasPrice, tx.gasPrice)
   })
 
+  it('special filter test', async () => {
+    const store = new Store(storeContext)
+    await store.list(Transaction, [
+      {
+        field: 'arrayValue',
+        op: '!=',
+        value: []
+      }
+    ])
+    assert.deepEqual(db.lastDbRequest?.list?.filters, [
+      {
+        field: 'arrayValue',
+        op: 1,
+        value: {
+          values: [
+            {
+              listValue: {
+                values: []
+              }
+            }
+          ]
+        }
+      }
+    ])
+  })
+
   it('filter constraints', async () => {
     const store = new Store(storeContext)
     // wrong type won't compile
