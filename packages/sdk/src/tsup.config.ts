@@ -1,11 +1,15 @@
 import { defineConfig } from 'tsup'
-import dotenv from 'dotenv'
+let env
+try {
+  const dotenv = await import('dotenv')
+  env = dotenv.config().parsed
+} catch (e) {}
 
 export const external = []
 
 export default defineConfig({
   // https://github.com/egoist/tsup/issues/1030#issuecomment-1953502800
-  env: dotenv.config().parsed,
+  env,
   esbuildOptions: (options) => {
     options.banner = {
       js: `import { createRequire } from 'module'; const require = createRequire(import.meta.url);`
