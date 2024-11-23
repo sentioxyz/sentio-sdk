@@ -1,7 +1,7 @@
 import { CallContext, ServerError, Status } from 'nice-grpc'
 import { DebugInfo, RichServerError } from 'nice-grpc-error-details'
-import { from } from 'ix/Ix.dom.asynciterable.js'
-import { withAbort } from 'ix/Ix.dom.asynciterable.operators.js'
+import { from } from 'ix/Ix.asynciterable'
+import { withAbort } from 'ix/Ix.asynciterable.operators'
 
 import {
   DataBinding,

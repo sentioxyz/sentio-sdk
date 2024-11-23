@@ -1688,6 +1688,18 @@
             "type": "Bool"
           }
         ]
+      },
+      "UncompressedG1": {
+        "abilities": {
+          "abilities": []
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "dummy_field",
+            "type": "Bool"
+          }
+        ]
       }
     },
     "exposedFunctions": {
@@ -2179,6 +2191,51 @@
                     "address": "0x2",
                     "module": "bls12381",
                     "name": "G1",
+                    "typeArguments": []
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "g1_to_uncompressed_g1": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "group_ops",
+                "name": "Element",
+                "typeArguments": [
+                  {
+                    "Struct": {
+                      "address": "0x2",
+                      "module": "bls12381",
+                      "name": "G1",
+                      "typeArguments": []
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "group_ops",
+              "name": "Element",
+              "typeArguments": [
+                {
+                  "Struct": {
+                    "address": "0x2",
+                    "module": "bls12381",
+                    "name": "UncompressedG1",
                     "typeArguments": []
                   }
                 }
@@ -3558,6 +3615,98 @@
                     "address": "0x2",
                     "module": "bls12381",
                     "name": "Scalar",
+                    "typeArguments": []
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "uncompressed_g1_sum": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Vector": {
+                "Struct": {
+                  "address": "0x2",
+                  "module": "group_ops",
+                  "name": "Element",
+                  "typeArguments": [
+                    {
+                      "Struct": {
+                        "address": "0x2",
+                        "module": "bls12381",
+                        "name": "UncompressedG1",
+                        "typeArguments": []
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "group_ops",
+              "name": "Element",
+              "typeArguments": [
+                {
+                  "Struct": {
+                    "address": "0x2",
+                    "module": "bls12381",
+                    "name": "UncompressedG1",
+                    "typeArguments": []
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "uncompressed_g1_to_g1": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "group_ops",
+                "name": "Element",
+                "typeArguments": [
+                  {
+                    "Struct": {
+                      "address": "0x2",
+                      "module": "bls12381",
+                      "name": "UncompressedG1",
+                      "typeArguments": []
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "group_ops",
+              "name": "Element",
+              "typeArguments": [
+                {
+                  "Struct": {
+                    "address": "0x2",
+                    "module": "bls12381",
+                    "name": "G1",
                     "typeArguments": []
                   }
                 }
@@ -9273,6 +9422,50 @@
           }
         ]
       },
+      "convert": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          },
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          "U8",
+          "U8",
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "group_ops",
+                "name": "Element",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "group_ops",
+              "name": "Element",
+              "typeArguments": [
+                {
+                  "TypeParameter": 1
+                }
+              ]
+            }
+          }
+        ]
+      },
       "div": {
         "visibility": "Friend",
         "isEntry": false,
@@ -9661,6 +9854,48 @@
                     "TypeParameter": 0
                   }
                 ]
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "group_ops",
+              "name": "Element",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "sum": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          "U8",
+          {
+            "Reference": {
+              "Vector": {
+                "Struct": {
+                  "address": "0x2",
+                  "module": "group_ops",
+                  "name": "Element",
+                  "typeArguments": [
+                    {
+                      "TypeParameter": 0
+                    }
+                  ]
+                }
               }
             }
           }

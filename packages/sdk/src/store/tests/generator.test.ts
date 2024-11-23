@@ -9,7 +9,7 @@ import {
   ProcessStreamRequest,
   ProcessStreamResponse
 } from '@sentio/protos'
-import { withAbort } from 'ix/Ix.dom.asynciterable.operators.js'
+import { withAbort } from 'ix/Ix.asynciterable.operators'
 
 class AsyncContext {
   private defers = new Map<bigint, { resolve: (value: any) => void; reject: (reason?: any) => void }>()
