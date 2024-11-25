@@ -382,9 +382,10 @@ export abstract class BaseProcessor<
       this.config.endBlock = BigInt(config.endBlock)
     }
 
-    this.blockHandlers = new Proxy(this.blockHandlers, handlersProxy())
-    this.eventHandlers = new Proxy(this.eventHandlers, handlersProxy())
-    this.traceHandlers = new Proxy(this.traceHandlers, handlersProxy())
+    const chainId = config.network || EthChainId.ETHEREUM
+    this.blockHandlers = new Proxy(this.blockHandlers, handlersProxy(chainId))
+    this.eventHandlers = new Proxy(this.eventHandlers, handlersProxy(chainId))
+    this.traceHandlers = new Proxy(this.traceHandlers, handlersProxy(chainId))
 
     return new Proxy(this, {
       get: (target, prop, receiver) => {

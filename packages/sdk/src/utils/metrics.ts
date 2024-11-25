@@ -3,7 +3,7 @@ import { processMetrics } from '@sentio/runtime'
 
 export const metricsStorage = new AsyncLocalStorage<string>()
 
-export function handlersProxy<T extends object>(): ProxyHandler<T> {
+export function handlersProxy<T extends object>(chainId: string): ProxyHandler<T> {
   return {
     set: (target, prop, value, receiver) => {
       if (value.handler) {
@@ -12,7 +12,7 @@ export function handlersProxy<T extends object>(): ProxyHandler<T> {
         value.handler = async (...args: any) => {
           const startTs = Date.now()
           const res = await handler(...args)
-          processMetrics.process_handler_duration.record(Date.now() - startTs, { handler: handlerName })
+          processMetrics.process_handler_duration.record(Date.now() - startTs, { handler: handlerName, chainId })
           return res
         }
       }
