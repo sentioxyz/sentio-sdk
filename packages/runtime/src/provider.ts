@@ -155,10 +155,7 @@ export class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
     try {
       result = await perform
     } catch (e) {
-      // if (e.code !== 'CALL_EXCEPTION' && e.code !== 'BAD_DATA') {
-      if (this.#performCache.get(tag) === perform) {
-        this.#performCache.delete(tag)
-      }
+      this.#performCache.delete(tag)
       if (e.code === 'TIMEOUT') {
         let retryCount = this.#retryCache.get(tag)
         if (GLOBAL_CONFIG.execution.rpcRetryTimes && retryCount === undefined) {
