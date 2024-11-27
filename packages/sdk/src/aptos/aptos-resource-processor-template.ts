@@ -27,7 +27,6 @@ export class AptosResourceProcessorTemplate {
   constructor() {
     this.id = AptosResourceProcessorTemplateState.INSTANCE.getValues().length
     AptosResourceProcessorTemplateState.INSTANCE.addValue(this)
-    processMetrics.process_template_count.add(1)
   }
 
   createProcessor(options: AptosBindOptions): AptosResourcesProcessor {
@@ -68,6 +67,11 @@ export class AptosResourceProcessorTemplate {
       startBlock: config.startVersion,
       endBlock: 0n,
       baseLabels: config.baseLabels
+    })
+
+    processMetrics.processor_template_instance_count.add(1, {
+      chain_id: options.network,
+      template: this.constructor.name
     })
   }
 

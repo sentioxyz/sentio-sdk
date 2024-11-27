@@ -19,9 +19,9 @@ import { PromiseOrVoid } from '../core/promises.js'
 import { ServerError, Status } from 'nice-grpc'
 import { fixEmptyKey, formatEthData, RichBlock, Trace, TypedCallTrace, TypedEvent } from './eth.js'
 import sha3 from 'js-sha3'
-import { ListStateStorage } from '@sentio/runtime'
+import { ListStateStorage, metricsStorage } from '@sentio/runtime'
 import { EthChainId } from '@sentio/chain'
-import { metricsStorage, handlersProxy } from '../utils/metrics.js'
+import { handlersProxy } from '../utils/metrics.js'
 
 export interface AddressOrTypeEventFilter extends DeferredTopicFilter {
   addressType?: AddressType
@@ -382,10 +382,10 @@ export abstract class BaseProcessor<
       this.config.endBlock = BigInt(config.endBlock)
     }
 
-    const chainId = config.network || EthChainId.ETHEREUM
-    this.blockHandlers = new Proxy(this.blockHandlers, handlersProxy(chainId))
-    this.eventHandlers = new Proxy(this.eventHandlers, handlersProxy(chainId))
-    this.traceHandlers = new Proxy(this.traceHandlers, handlersProxy(chainId))
+    const chain_id = this.getChainId()
+    this.blockHandlers = new Proxy(this.blockHandlers, handlersProxy({ chain_id, category: 'interval' }))
+    this.eventHandlers = new Proxy(this.eventHandlers, handlersProxy({ chain_id, category: 'event' }))
+    this.traceHandlers = new Proxy(this.traceHandlers, handlersProxy({ chain_id, category: 'call' }))
 
     return new Proxy(this, {
       get: (target, prop, receiver) => {

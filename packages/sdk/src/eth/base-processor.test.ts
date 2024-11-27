@@ -45,7 +45,7 @@ describe('Test Base Processor', () => {
     await service.eth.testLogs([logData, logData])
 
     expect(processMetrics.process_metricrecord_count.get()).equals(2)
-    expect(processMetrics.process_handler_duration.get() >= 135).equals(true)
+    expect(processMetrics.processor_handler_duration.get() >= 135).equals(true)
   })
 
   const logData = {

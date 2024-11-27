@@ -4,9 +4,9 @@ import PQueue from 'p-queue'
 import { Endpoints } from './endpoints.js'
 import { EthChainId } from '@sentio/chain'
 import { LRUCache } from 'lru-cache'
-import { providerMetrics } from './metrics.js'
+import { providerMetrics, processMetrics, metricsStorage } from './metrics.js'
 import { GLOBAL_CONFIG } from './global-config.js'
-const { miss_count, hit_count, total_duration, total_queued, queue_size } = providerMetrics
+const { miss_count, hit_count, queue_size } = providerMetrics
 
 export const DummyProvider = new JsonRpcProvider('', Network.from(1))
 
@@ -127,11 +127,25 @@ export class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
       const queued: number = Date.now()
       perform = this.executor.add(() => {
         const started = Date.now()
-        total_queued.add(started - queued)
-
-        return super.send(method, params).finally(() => {
-          total_duration.add(Date.now() - started)
+        processMetrics.processor_rpc_queue_duration.record(started - queued, {
+          chain_id: this._network.chainId.toString(),
+          handler: metricsStorage.getStore()
         })
+
+        let success = true
+        return super
+          .send(method, params)
+          .catch((e) => {
+            success = false
+            throw e
+          })
+          .finally(() => {
+            processMetrics.processor_rpc_duration.record(Date.now() - started, {
+              chain_id: this._network.chainId.toString(),
+              handler: metricsStorage.getStore(),
+              success
+            })
+          })
       })
 
       queue_size.record(this.executor.size)

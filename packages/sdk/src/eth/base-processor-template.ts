@@ -57,7 +57,6 @@ export abstract class BaseProcessorTemplate<
   constructor() {
     this.id = ProcessorTemplateProcessorState.INSTANCE.getValues().length
     ProcessorTemplateProcessorState.INSTANCE.addValue(this)
-    processMetrics.process_template_count.add(1)
   }
 
   /**
@@ -108,6 +107,8 @@ export abstract class BaseProcessorTemplate<
         configUpdated: true
       }
     })
+
+    processMetrics.processor_template_instance_count.add(1, { chain_id: ctx.chainId, template: this.constructor.name })
   }
 
   protected onEthEvent(

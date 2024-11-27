@@ -1,9 +1,7 @@
-import { AsyncLocalStorage } from 'node:async_hooks'
-import { processMetrics } from '@sentio/runtime'
+import { processMetrics, metricsStorage } from '@sentio/runtime'
+import { Attributes } from '@opentelemetry/api'
 
-export const metricsStorage = new AsyncLocalStorage<string>()
-
-export function handlersProxy<T extends object>(chainId: string): ProxyHandler<T> {
+export function handlersProxy<T extends object>(attributes: Attributes): ProxyHandler<T> {
   return {
     set: (target, prop, value, receiver) => {
       if (value.handler) {
@@ -12,7 +10,10 @@ export function handlersProxy<T extends object>(chainId: string): ProxyHandler<T
         value.handler = async (...args: any) => {
           const startTs = Date.now()
           const res = await handler(...args)
-          processMetrics.process_handler_duration.record(Date.now() - startTs, { handler: handlerName, chainId })
+          processMetrics.processor_handler_duration.record(Date.now() - startTs, {
+            ...attributes,
+            handler: handlerName
+          })
           return res
         }
       }
