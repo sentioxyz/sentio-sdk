@@ -21,7 +21,7 @@ export async function setupOTLP(debug?: boolean) {
         exporter: new OTLPMetricExporter()
       }),
       new PrometheusExporter({
-        // http://localhost:4041/metrics
+        host: '0.0.0.0',
         port: 4041
       })
     ]
