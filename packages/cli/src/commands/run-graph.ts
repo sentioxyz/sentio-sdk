@@ -168,6 +168,11 @@ const deployOptionDefinitions = [
     description:
       '(Optional) Continue processing data from the specific processor version which will keeping the old data from previous version and will STOP that version IMMEDIATELY.',
     type: Number
+  },
+  {
+    name: 'dir',
+    description: '(Optional) The location of subgraph project, default to the current directory',
+    type: String
   }
 ]
 
@@ -233,7 +238,10 @@ async function runGraphDeploy(argv: string[]) {
   const versionLabel = continueFrom ? `continue-from:${continueFrom}` : Date.now().toString()
 
   const graph = path.resolve(getPackageRoot('@sentio/graph-cli'), 'bin', 'run')
-  await execStep(['node', graph, 'codegen'], 'Graph codegen')
+  const execOptions = {
+    cwd: options.dir
+  }
+  await execStep(['node', graph, 'codegen'], 'Graph codegen', execOptions)
   await execStep(
     [
       'node',
@@ -249,12 +257,25 @@ async function runGraphDeploy(argv: string[]) {
       apiKey,
       processorConfig.project
     ],
-    'Graph deploy'
+    'Graph deploy',
+    execOptions
   )
 
-  await bundleSourceMap()
+  const cwd = process.cwd()
 
-  const zip = await await genZip()
+  if (options.dir) {
+    process.chdir(options.dir)
+  }
+  let zip
+  try {
+    await bundleSourceMap()
+    zip = await genZip()
+  } finally {
+    if (options.dir) {
+      process.chdir(cwd)
+    }
+  }
+
   await uploadFile(zip, processorConfig, { 'api-key': apiKey })
 }
 
