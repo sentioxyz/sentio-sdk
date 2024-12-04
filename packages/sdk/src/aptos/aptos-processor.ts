@@ -275,6 +275,26 @@ export class AptosModulesProcessor extends AptosBaseProcessor {
   }
 }
 
+export class AptosGlobalProcessor {
+  private baseProcessor
+  private constructor(options: AptosBindOptions) {
+    this.baseProcessor = new AptosBaseProcessor('*', options)
+  }
+
+  static bind(options: AptosBindOptions): AptosGlobalProcessor {
+    return new AptosGlobalProcessor(options)
+  }
+
+  public onTransaction(
+    handler: (transaction: UserTransactionResponse, ctx: AptosContext) => PromiseOrVoid,
+    includedFailed = false,
+    fetchConfig?: Partial<MoveFetchConfig>
+  ): this {
+    this.baseProcessor.onTransaction(handler, includedFailed, fetchConfig)
+    return this
+  }
+}
+
 export class AptosResourceProcessorState extends ListStateStorage<AptosResourcesProcessor> {
   static INSTANCE = new AptosResourceProcessorState()
 }
