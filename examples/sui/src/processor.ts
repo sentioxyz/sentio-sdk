@@ -47,6 +47,5 @@ SuiObjectTypeProcessor.bind({
   },
   60,
   60 * 24 * 30,
-  undefined,
   { owned: false }
 )

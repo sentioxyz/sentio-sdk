@@ -1,6 +1,7 @@
 import {
   Data_SuiCall,
   Data_SuiObject,
+  Data_SuiObjectChange,
   HandleInterval,
   MoveAccountFetchConfig,
   MoveFetchConfig,
@@ -9,11 +10,11 @@ import {
 } from '@sentio/protos'
 import { ListStateStorage } from '@sentio/runtime'
 import { SuiNetwork } from './network.js'
-import { SuiAddressContext, SuiContext, SuiObjectContext } from './context.js'
-import { SuiMoveObject, SuiTransactionBlockResponse } from '@mysten/sui/client'
-import { PromiseOrVoid } from '../core/index.js'
+import { SuiAddressContext, SuiContext, SuiObjectChangeContext, SuiObjectContext } from './context.js'
+import { SuiMoveObject, SuiObjectChange, SuiTransactionBlockResponse } from '@mysten/sui/client'
+import { ALL_ADDRESS, PromiseOrVoid } from '../core/index.js'
 import { configure, DEFAULT_FETCH_CONFIG, IndexConfigure, SuiBindOptions } from './sui-processor.js'
-import { CallHandler, TransactionFilter, accountTypeString } from '../move/index.js'
+import { CallHandler, TransactionFilter, accountTypeString, ObjectChangeHandler } from '../move/index.js'
 import { ServerError, Status } from 'nice-grpc'
 import { TypeDescriptor } from '@typemove/move'
 import { TypedSuiMoveObject } from './models.js'
@@ -58,6 +59,7 @@ export abstract class SuiBaseObjectOrAddressProcessor<HandlerType> {
   templateId: number | undefined
 
   objectHandlers: ObjectHandler[] = []
+  objectChangeHandlers: ObjectChangeHandler<Data_SuiObjectChange>[] = []
 
   // static bind(options: SuiObjectsBindOptions): SuiBaseObjectsProcessor<any> {
   //   return new SuiBaseObjectsProcessor(options)
@@ -113,7 +115,11 @@ export abstract class SuiBaseObjectOrAddressProcessor<HandlerType> {
     })
     return this
   }
+}
 
+abstract class SuiBaseObjectOrAddressProcessorInternal<
+  HandlerType
+> extends SuiBaseObjectOrAddressProcessor<HandlerType> {
   public onTimeInterval(
     handler: HandlerType,
     timeIntervalInMinutes = 60,
@@ -150,7 +156,7 @@ export abstract class SuiBaseObjectOrAddressProcessor<HandlerType> {
   }
 }
 
-export class SuiAddressProcessor extends SuiBaseObjectOrAddressProcessor<
+export class SuiAddressProcessor extends SuiBaseObjectOrAddressProcessorInternal<
   (objects: SuiMoveObject[], ctx: SuiAddressContext) => PromiseOrVoid
 > {
   callHandlers: CallHandler<Data_SuiCall>[] = []
@@ -212,7 +218,7 @@ export class SuiAddressProcessor extends SuiBaseObjectOrAddressProcessor<
   }
 }
 
-export class SuiObjectProcessor extends SuiBaseObjectOrAddressProcessor<
+export class SuiObjectProcessor extends SuiBaseObjectOrAddressProcessorInternal<
   (self: SuiMoveObject, dynamicFieldObjects: SuiMoveObject[], ctx: SuiObjectContext) => PromiseOrVoid
 > {
   static bind(options: SuiObjectBindOptions): SuiObjectProcessor {
@@ -242,9 +248,10 @@ export class SuiObjectTypeProcessor<T> extends SuiBaseObjectOrAddressProcessor<
   (self: TypedSuiMoveObject<T>, dynamicFieldObjects: SuiMoveObject[], ctx: SuiObjectContext) => PromiseOrVoid
 > {
   objectType: TypeDescriptor<T>
+
   static bind<T>(options: SuiObjectTypeBindOptions<T>): SuiObjectTypeProcessor<T> {
     const processor = new SuiObjectTypeProcessor<T>({
-      address: options.objectType.qname,
+      address: ALL_ADDRESS, // current only support on all address
       network: options.network,
       startCheckpoint: options.startCheckpoint,
       ownerType: MoveOwnerType.TYPE,
@@ -269,6 +276,71 @@ export class SuiObjectTypeProcessor<T> extends SuiBaseObjectOrAddressProcessor<
     }
     const object = await ctx.coder.filterAndDecodeObjects(this.objectType, [data.self as SuiMoveObject])
     return handler(object[0], data.objects as SuiMoveObject[], ctx)
+  }
+
+  public onObjectChange(handler: (changes: SuiObjectChange[], ctx: SuiObjectChangeContext) => void): this {
+    if (this.config.network === SuiNetwork.TEST_NET) {
+      throw new ServerError(Status.INVALID_ARGUMENT, 'object change not supported in testnet')
+    }
+    const processor = this
+    this.objectChangeHandlers.push({
+      handler: async function (data: Data_SuiObjectChange) {
+        const ctx = new SuiObjectChangeContext(
+          processor.config.network,
+          processor.config.address,
+          data.timestamp || new Date(0),
+          data.slot,
+          data.txDigest,
+          processor.config.baseLabels
+        )
+        await handler(data.changes as SuiObjectChange[], ctx)
+        return ctx.stopAndGetResult()
+      },
+      type: this.objectType.qname
+    })
+
+    return this
+  }
+
+  public onTimeInterval(
+    handler: (
+      self: TypedSuiMoveObject<T>,
+      dynamicFieldObjects: SuiMoveObject[],
+      ctx: SuiObjectContext
+    ) => PromiseOrVoid,
+    timeIntervalInMinutes = 60,
+    backfillTimeIntervalInMinutes = 240,
+    fetchConfig?: Partial<MoveAccountFetchConfig>
+  ): this {
+    return this.onInterval(
+      handler,
+      {
+        recentInterval: timeIntervalInMinutes,
+        backfillInterval: backfillTimeIntervalInMinutes
+      },
+      undefined,
+      this.objectType.qname,
+      fetchConfig
+    )
+  }
+
+  public onCheckpointInterval(
+    handler: (
+      self: TypedSuiMoveObject<T>,
+      dynamicFieldObjects: SuiMoveObject[],
+      ctx: SuiObjectContext
+    ) => PromiseOrVoid,
+    checkpointInterval = 100000,
+    backfillCheckpointInterval = 400000,
+    fetchConfig?: Partial<MoveAccountFetchConfig>
+  ): this {
+    return this.onInterval(
+      handler,
+      undefined,
+      { recentInterval: checkpointInterval, backfillInterval: backfillCheckpointInterval },
+      this.objectType.qname,
+      fetchConfig
+    )
   }
 }
 

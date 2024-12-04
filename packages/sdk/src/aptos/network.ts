@@ -9,8 +9,12 @@ export const AptosNetwork = <const>{
   TEST_NET: AptosChainId.APTOS_TESTNET,
   // DEV_NET: AptosChainId.APTOS_DEVNET,
   MOVEMENT_MAIN_NET: AptosChainId.APTOS_MOVEMENT_MAINNET,
-  MOVEMENT_TEST_NET: AptosChainId.APTOS_MOVEMENT_TESTNET,
   MOVEMENT_PORTO: AptosChainId.APTOS_MOVEMENT_PORTO
+}
+
+export const MovementNetwork = <const>{
+  MAIN_NET: AptosChainId.APTOS_MOVEMENT_MAINNET,
+  PORTO: AptosChainId.APTOS_MOVEMENT_PORTO
 }
 
 export class AptosBindOptions {
@@ -27,7 +31,7 @@ export function getRpcEndpoint(network: AptosNetwork): string {
       return 'https://mainnet.aptoslabs.com/v1'
     case AptosNetwork.TEST_NET:
       return 'https://testnet.aptoslabs.com/v1'
-    case AptosNetwork.MOVEMENT_TEST_NET:
+    case AptosChainId.APTOS_MOVEMENT_TESTNET:
       return 'https://aptos.testnet.suzuka.movementlabs.xyz/v1'
     case AptosNetwork.MOVEMENT_MAIN_NET:
       return 'https://mainnet.movementnetwork.xyz/v1'

@@ -30,7 +30,7 @@ import {
   parseMoveType,
   ResourceChangeHandler
 } from '../move/index.js'
-import { Labels, PromiseOrVoid } from '../core/index.js'
+import { ALL_ADDRESS, Labels, PromiseOrVoid } from '../core/index.js'
 import { TypeDescriptor } from '@typemove/move'
 import { decodeResourceChange, ResourceChange } from '@typemove/aptos'
 
@@ -267,7 +267,7 @@ export class AptosBaseProcessor {
 
 export class AptosModulesProcessor extends AptosBaseProcessor {
   private constructor(options: AptosBindOptions) {
-    super('*', options)
+    super(ALL_ADDRESS, options)
   }
 
   static bind(options: AptosBindOptions): AptosModulesProcessor {
@@ -432,7 +432,7 @@ function configure(options: AptosBindOptions): IndexConfigure {
 
   return {
     startVersion: startVersion,
-    address: options.address === '*' ? '*' : accountTypeString(options.address), // aptos don't use address string in api, so only use type string
+    address: options.address === ALL_ADDRESS ? ALL_ADDRESS : accountTypeString(options.address), // aptos don't use address string in api, so only use type string
     network: options.network || AptosNetwork.MAIN_NET,
     baseLabels: options.baseLabels
   }

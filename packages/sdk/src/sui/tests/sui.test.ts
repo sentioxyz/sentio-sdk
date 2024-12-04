@@ -31,7 +31,6 @@ describe('Test Sui Example', () => {
       },
       60,
       60,
-      undefined,
       { owned: false }
     )
   })

@@ -6,6 +6,7 @@ import { decodeFuelTransaction, DEFAULT_FUEL_FETCH_CONFIG, FuelFetchConfig } fro
 import { FuelContext } from './context.js'
 import { FuelProcessorConfig, getOptionsSignature } from './fuel-processor.js'
 import { mergeProcessResults } from '@sentio/runtime'
+import { ALL_ADDRESS } from '../core/index.js'
 
 type GlobalFuelProcessorConfig = Omit<FuelProcessorConfig, 'address' | 'abi'>
 
@@ -21,7 +22,7 @@ export class FuelGlobalProcessor implements FuelBaseProcessor<GlobalFuelProcesso
       'global_' +
       getOptionsSignature({
         ...config,
-        address: '*'
+        address: ALL_ADDRESS
       })
     FuelProcessorState.INSTANCE.getOrSetValue(sig, processor)
     return processor
@@ -48,7 +49,7 @@ export class FuelGlobalProcessor implements FuelBaseProcessor<GlobalFuelProcesso
         }
         const ctx = new FuelContext(
           this.config.chainId,
-          '*',
+          ALL_ADDRESS,
           this.config.name ?? '*',
           call.timestamp || new Date(0),
           tx,

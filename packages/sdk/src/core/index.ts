@@ -11,3 +11,4 @@ export { type Numberish, toBigInteger, toMetricValue } from './numberish.js'
 
 export { CorePlugin } from './core-plugin.js'
 export { DatabaseSchema } from './database-schema.js'
+export * from './constants.js'

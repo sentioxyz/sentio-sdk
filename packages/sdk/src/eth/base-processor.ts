@@ -22,6 +22,7 @@ import sha3 from 'js-sha3'
 import { ListStateStorage, metricsStorage } from '@sentio/runtime'
 import { EthChainId } from '@sentio/chain'
 import { handlersProxy } from '../utils/metrics.js'
+import { ALL_ADDRESS } from '../core/index.js'
 
 export interface AddressOrTypeEventFilter extends DeferredTopicFilter {
   addressType?: AddressType
@@ -85,7 +86,7 @@ export class GlobalProcessor {
 
   constructor(config: Omit<BindOptions, 'address'>) {
     this.config = {
-      address: '*',
+      address: ALL_ADDRESS,
       name: config.name || 'Global',
       network: config.network || EthChainId.ETHEREUM,
       startBlock: 0n
@@ -180,7 +181,7 @@ export class GlobalProcessor {
 
         const ctx = new GlobalContext(
           chainId,
-          '*',
+          ALL_ADDRESS,
           new Date(block.timestamp * 1000),
           block,
           undefined,
@@ -201,7 +202,7 @@ export class GlobalProcessor {
 
         const ctx = new GlobalContext(
           chainId,
-          '*',
+          ALL_ADDRESS,
           new Date(block.timestamp * 1000),
           block,
           undefined,

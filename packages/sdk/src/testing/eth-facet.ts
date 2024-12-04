@@ -3,6 +3,7 @@ import { DataBinding, HandlerType, ProcessBindingResponse } from '@sentio/protos
 import { Trace } from '../eth/eth.js'
 import { BlockParams, LogParams } from 'ethers/providers'
 import { ChainId, EthChainId } from '@sentio/chain'
+import { ALL_ADDRESS } from '../index.js'
 
 export class EthFacet {
   server: TestProcessorServer
@@ -41,7 +42,7 @@ export class EthFacet {
       }
       if (
         trace.action.to?.toLowerCase() !== contract.contract?.address.toLowerCase() &&
-        contract.contract?.address !== '*'
+        contract.contract?.address !== ALL_ADDRESS
       ) {
         continue
       }

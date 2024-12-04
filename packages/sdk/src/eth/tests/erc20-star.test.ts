@@ -5,11 +5,12 @@ import { expect } from 'chai'
 
 import { firstCounterValue, TestProcessorServer } from '../../testing/index.js'
 import { ERC20Processor, mockTransferLog } from '../builtin/erc20.js'
+import { ALL_ADDRESS } from '@sentio/sdk'
 
 describe('Test star Examples', () => {
   const service = new TestProcessorServer(async () => {
     ERC20Processor.bind({
-      address: '*',
+      address: ALL_ADDRESS,
       startBlock: 14201940
     }).onEventTransfer(async (evt, ctx) => {
       ctx.meter.Counter('c1').add(1)

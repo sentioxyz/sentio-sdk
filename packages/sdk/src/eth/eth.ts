@@ -27,6 +27,7 @@ import { ContractContext } from './context.js'
 import { getAddress } from 'ethers/address'
 import { getBigInt, getNumber, hexlify } from 'ethers/utils'
 import { EthCallContext, EthCallParam } from '@sentio/protos'
+import { ALL_ADDRESS } from '../core/index.js'
 
 export interface IResult {
   /**
@@ -271,7 +272,7 @@ export function isNullAddress(address: string) {
 }
 
 export function validateAndNormalizeAddress(address: string): string {
-  if (address === '*') {
+  if (address === ALL_ADDRESS) {
     return address
   }
   const normalizedAddress = getAddress(address)

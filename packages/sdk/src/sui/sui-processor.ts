@@ -17,7 +17,7 @@ import {
 } from '../move/index.js'
 import { getMoveCalls } from './utils.js'
 import { defaultMoveCoder, MoveCoder } from './index.js'
-import { Labels } from '../core/index.js'
+import { ALL_ADDRESS, Labels } from '../core/index.js'
 import { Required } from 'utility-types'
 
 export const DEFAULT_FETCH_CONFIG: MoveFetchConfig = {
@@ -31,7 +31,7 @@ export type IndexConfigure = Required<SuiBindOptions, 'startCheckpoint' | 'netwo
 export function configure(options: SuiBindOptions): IndexConfigure {
   return {
     startCheckpoint: options.startCheckpoint || 0n,
-    address: options.address === '*' ? '*' : accountAddressString(options.address),
+    address: options.address === ALL_ADDRESS ? ALL_ADDRESS : accountAddressString(options.address),
     network: options.network || SuiNetwork.MAIN_NET,
     baseLabels: options.baseLabels
   }
@@ -271,13 +271,13 @@ export class SuiBaseProcessor {
 
 export class SuiModulesProcessor extends SuiBaseProcessor {
   static bind(options: SuiBindOptions): SuiModulesProcessor {
-    return new SuiModulesProcessor('*', options)
+    return new SuiModulesProcessor(ALL_ADDRESS, options)
   }
 }
 
 export class SuiGlobalProcessor extends SuiBaseProcessor {
   static bind(options: Omit<SuiBindOptions, 'address'>): SuiGlobalProcessor {
-    return new SuiGlobalProcessor('*', { ...options, address: '*' })
+    return new SuiGlobalProcessor(ALL_ADDRESS, { ...options, address: ALL_ADDRESS })
   }
   onTransactionBlock(
     handler: (transaction: SuiTransactionBlockResponse, ctx: SuiContext) => void,
@@ -291,6 +291,7 @@ export class SuiGlobalProcessor extends SuiBaseProcessor {
     return super.onTransactionBlock(handler, filter, fetchConfig)
   }
 
+  // deprecated,, use object type processor
   public onObjectChange(
     handler: (changes: SuiObjectChange[], ctx: SuiObjectChangeContext) => void,
     type: string

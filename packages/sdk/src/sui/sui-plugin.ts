@@ -122,6 +122,7 @@ export class SuiPlugin extends Plugin {
         }
         contractConfig.moveCallConfigs.push(functionHandlerConfig)
       }
+      // deprecated, use objectType processor instead
       for (const handler of suiProcessor.objectChangeHandlers) {
         const handlerId = handlers.suiObjectChangeHandlers.push(handler.handler) - 1
         const objectChangeHandler: MoveResourceChangeConfig = {
@@ -141,6 +142,16 @@ export class SuiPlugin extends Plugin {
       })
       for (const handler of processor.objectHandlers) {
         const handlerId = handlers.suiObjectHandlers.push(handler.handler) - 1
+
+        for (const handler of processor.objectChangeHandlers) {
+          const handlerId = handlers.suiObjectChangeHandlers.push(handler.handler) - 1
+          const objectChangeHandler: MoveResourceChangeConfig = {
+            type: handler.type,
+            handlerId
+          }
+          accountConfig.moveResourceChangeConfigs.push(objectChangeHandler)
+        }
+
         accountConfig.moveIntervalConfigs.push({
           intervalConfig: {
             handlerId: handlerId,
