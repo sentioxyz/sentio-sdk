@@ -1,4 +1,3 @@
-import { AsyncLocalStorage } from 'node:async_hooks'
 import { BaseContract, DeferredTopicFilter, LogDescription, TransactionResponseParams } from 'ethers'
 
 import { BoundContractView, ContractContext, ContractView, GlobalContext } from './context.js'
@@ -19,7 +18,7 @@ import { PromiseOrVoid } from '../core/promises.js'
 import { ServerError, Status } from 'nice-grpc'
 import { fixEmptyKey, formatEthData, RichBlock, Trace, TypedCallTrace, TypedEvent } from './eth.js'
 import sha3 from 'js-sha3'
-import { ListStateStorage, metricsStorage } from '@sentio/runtime'
+import { ListStateStorage } from '@sentio/runtime'
 import { EthChainId } from '@sentio/chain'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 import { ALL_ADDRESS } from '../core/index.js'

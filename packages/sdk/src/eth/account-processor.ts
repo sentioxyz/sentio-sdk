@@ -13,7 +13,6 @@ import { AccountProcessorState } from './account-processor-state.js'
 import { fixEmptyKey, formatEthData, TypedEvent } from './eth.js'
 import { EthChainId } from '@sentio/chain'
 import { ServerError, Status } from 'nice-grpc'
-import { metricsStorage } from '@sentio/runtime'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 
 const ERC20_INTERFACE = ERC20__factory.createInterface()

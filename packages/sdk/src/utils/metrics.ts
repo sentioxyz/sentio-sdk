@@ -1,6 +1,5 @@
 import { AsyncLocalStorage } from 'node:async_hooks'
-import { processMetrics, metricsStorage } from '@sentio/runtime'
-import { Attributes } from '@opentelemetry/api'
+import { metricsStorage } from '@sentio/runtime'
 
 export function getHandlerName() {
   return metricsStorage.getStore() || 'unknown'
