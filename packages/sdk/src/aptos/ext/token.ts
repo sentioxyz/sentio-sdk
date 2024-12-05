@@ -2,14 +2,15 @@ import { getPriceByType } from '../../utils/index.js'
 import fetch from 'node-fetch'
 import { accountTypeString, parseMoveType, SPLITTER } from '@typemove/move'
 import { AptosNetwork, getClient } from '../network.js'
-import { coin } from '../builtin/0x1.js'
+import { coin, fungible_asset, type_info } from '../builtin/0x1.js'
 import { MoveStructId } from '@aptos-labs/ts-sdk'
 import { AptosChainId } from '@sentio/chain'
 import { DEFAULT_TOKEN_LIST, InternalTokenInfo } from './token-list.js'
 import { BaseCoinInfo } from '../../move/ext/index.js'
+import { RichAptosClient } from '../api.js'
 
 export interface TokenInfo extends BaseCoinInfo {
-  type: `0x${string}` // either tokenAddress or faAddress
+  type: `0x${string}` // either tokenAddress or faAddress, if both are present, tokenAddress is used
   tokenAddress?: `0x${string}`
   faAddress?: `0x${string}`
   name: string
@@ -92,48 +93,97 @@ export function isWhiteListToken(token: string): boolean {
   return TOKEN_MAP.has(accountTypeString(token))
 }
 
-const TOKEN_METADATA_CACHE = new Map<string, Promise<any | null>>()
+const TOKEN_METADATA_CACHE = new Map<string, Promise<TokenInfo>>()
+
+// Go to more common method
+function toTypeString(ty: type_info.TypeInfo) {
+  const module = Buffer.from(ty.module_name.replace('0x', ''), 'hex')
+  const name = Buffer.from(ty.struct_name.replace('0x', ''), 'hex')
+  return `${ty.account_address}::${module.toString('utf-8')}::${name.toString('utf-8')}`
+}
+
+async function getFungibleTokenInfo(client: RichAptosClient, faAddress: `0x${string}`): Promise<TokenInfo> {
+  const meta = await client.getTypedAccountResource({
+    accountAddress: faAddress,
+    resourceType: fungible_asset.Metadata.type()
+  })
+  if (!meta) {
+    throw Error('fa token not existed: ' + faAddress)
+  }
+
+  const paired = await coin.view.pairedCoin(client, { functionArguments: [faAddress] })
+  let type = faAddress
+  let tokeType
+  if (paired[0].vec[0]) {
+    tokeType = type = toTypeString(paired[0].vec[0]) as `0x${string}`
+  }
+
+  return {
+    type: type,
+    category: 'Native',
+    tokenAddress: tokeType,
+    faAddress: faAddress as `0x${string}`,
+    name: meta.name,
+    symbol: meta.symbol,
+    decimals: meta.decimals,
+    bridge: 'Native',
+    logoUrl: meta.icon_uri,
+    websiteUrl: meta.project_uri
+  }
+}
+
+async function getCoinTokenInfo(client: RichAptosClient, type: MoveStructId): Promise<TokenInfo> {
+  const account = type.split(SPLITTER)[0]
+
+  const info = await client.getTypedAccountResource({
+    accountAddress: account,
+    resourceType: coin.CoinInfo.type(parseMoveType(type))
+  })
+
+  if (!info) {
+    throw Error('coin not existed: ' + type)
+  }
+
+  const paired = await coin.view.pairedMetadata(client, { typeArguments: [type] })
+  let faAddress
+  if (paired[0].vec[0]) {
+    faAddress = paired[0].vec[0] as `0x${string}`
+  }
+
+  return {
+    type: type as `0x${string}`,
+    category: 'Native',
+    tokenAddress: type as `0x${string}`,
+    faAddress,
+    name: info.name,
+    symbol: info.symbol,
+    decimals: info.decimals,
+    bridge: 'Native'
+  }
+}
 
 // token: address of the fungible asset, e.g. "0xa", or the coin type, e.g. "0x1::aptos::AptosCoin"
 export async function getTokenInfoWithFallback(token: string, network?: AptosNetwork): Promise<TokenInfo> {
   const r = TOKEN_MAP.get(token)
-  if (!r) {
-    network = network || AptosNetwork.MAIN_NET
-    const key = network + '_' + token
-    let promise = TOKEN_METADATA_CACHE.get(key)
-    if (!promise) {
-      const client = getClient(network)
-      // client.getDigitalAssetData()
-
-      let account = token
-      let metadataType: MoveStructId = `0x1::fungible_asset::Metadata`
-      if (account.includes(SPLITTER)) {
-        account = account.split(SPLITTER)[0]
-        metadataType = coin.CoinInfo.type(parseMoveType(token)).getSignature() as MoveStructId
-      }
-
-      promise = client.getAccountResource({ accountAddress: account, resourceType: metadataType })
-      TOKEN_METADATA_CACHE.set(key, promise)
-    }
-    const meta = await promise
-    if (meta === null) {
-      throw Error('Coin not existed ' + key)
-    }
-
-    // const parts = type.split(SPLITTER)
-    return {
-      type: token as `0x${string}`,
-      category: 'Native',
-      tokenAddress: token as `0x${string}`,
-      name: meta.name,
-      symbol: meta.symbol,
-      decimals: meta.decimals,
-      bridge: 'Native',
-      logoUrl: meta.icon_uri,
-      websiteUrl: meta.project_uri
-    }
+  if (r) {
+    return r
   }
-  return r
+  network = network || AptosNetwork.MAIN_NET
+  const key = network + '_' + token
+  let promise = TOKEN_METADATA_CACHE.get(key)
+  const isFungibleAsset = !token.includes(SPLITTER)
+  const client = getClient(network)
+
+  if (!promise) {
+    if (isFungibleAsset) {
+      promise = getFungibleTokenInfo(client, token as `0x${string}`)
+    } else {
+      promise = getCoinTokenInfo(client, token as MoveStructId)
+    }
+    TOKEN_METADATA_CACHE.set(key, promise)
+  }
+
+  return promise
 }
 
 export async function getPriceForToken(
@@ -141,9 +191,6 @@ export async function getPriceForToken(
   timestamp: number,
   network = AptosChainId.APTOS_MAINNET
 ): Promise<number> {
-  // if (!isWhiteListToken(token)) {
-  //   return 0.0
-  // }
   const date = new Date(timestamp / 1000)
   try {
     return (await getPriceByType(network, token, date)) || 0

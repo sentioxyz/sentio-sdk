@@ -13,7 +13,7 @@ export * from './api.js'
 
 export { AptosPlugin } from './aptos-plugin.js'
 
-export { defaultMoveCoder } from './move-coder.js'
+export { defaultMoveCoder, defaultMoveCoderForClient } from './move-coder.js'
 
 export { MoveCoder } from '@typemove/aptos'
 

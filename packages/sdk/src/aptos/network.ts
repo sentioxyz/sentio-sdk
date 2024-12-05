@@ -2,6 +2,7 @@ import { AptosChainId } from '@sentio/chain'
 import { Aptos, AptosConfig } from '@aptos-labs/ts-sdk'
 import { Labels } from '../core/index.js'
 import { Endpoints } from '@sentio/runtime'
+import { RichAptosClient } from './api.js'
 
 export type AptosNetwork = AptosChainId
 
@@ -39,7 +40,7 @@ export function getRpcEndpoint(network: AptosNetwork): string {
   }
 }
 
-export function getClient(network: AptosNetwork): Aptos {
+export function getClient(network: AptosNetwork): RichAptosClient {
   let chainServer = Endpoints.INSTANCE.chainServer.get(network)
   if (!chainServer) {
     chainServer = getRpcEndpoint(network)
@@ -47,5 +48,5 @@ export function getClient(network: AptosNetwork): Aptos {
   } else {
     chainServer = chainServer + '/v1'
   }
-  return new Aptos(new AptosConfig({ fullnode: chainServer }))
+  return new RichAptosClient(new AptosConfig({ fullnode: chainServer }))
 }

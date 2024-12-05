@@ -28,6 +28,8 @@ class AptosNetworkCodegen extends BaseAptosCodegen {
   constructor(network: AptosNetwork) {
     const endpoint = getRpcEndpoint(network)
     super(endpoint)
+    const generator = this
+
     this.moduleGenerator = new (class extends SharedNetworkCodegen<
       AptosNetwork,
       MoveModuleBytecode,
@@ -37,12 +39,24 @@ class AptosNetworkCodegen extends BaseAptosCodegen {
       SYSTEM_PACKAGE = '@sentio/sdk/aptos'
       PREFIX = 'Aptos'
       NETWORK = AptosNetwork
+
+      protected generateExtra(address: string | undefined, module: InternalMoveModule): string {
+        return generator.generateExtra(address, module)
+      }
+
+      generateStructs(module: InternalMoveModule, struct: InternalMoveStruct, events: Set<string>) {
+        return generator.generateStructs(module, struct, events)
+      }
     })(network, this.chainAdapter)
   }
 
+  protected getGetDefaultCoder() {
+    return `defaultMoveCoderForClient(client)`
+  }
   generateModule(module: InternalMoveModule, allEventStructs: Map<string, InternalMoveStruct>) {
     return this.moduleGenerator.generateModule(module, allEventStructs)
   }
+
   generateImports() {
     return (
       this.moduleGenerator.generateImports() +
@@ -51,8 +65,8 @@ class AptosNetworkCodegen extends BaseAptosCodegen {
       import {
         MoveCoder, TypedEventInstance } from "@typemove/${this.PREFIX.toLowerCase()}"
       
-      import { defaultMoveCoder } from "${this.defaultCoderPackage()}"
-      import { Aptos, Account as AptosAccount, MoveAddressType, PendingTransactionResponse, InputGenerateTransactionOptions, MoveStructId } from '@aptos-labs/ts-sdk'`
+      import { defaultMoveCoder, defaultMoveCoderForClient } from "${this.defaultCoderPackage()}"
+      import { Aptos, Account as AptosAccount, MoveAddressType, PendingTransactionResponse, InputGenerateTransactionOptions, MoveStructId, InputViewFunctionData } from '@aptos-labs/ts-sdk'`
     )
   }
   generateLoadAll(isSystem: boolean): string {
@@ -74,11 +88,6 @@ class AptosCodegen {
       path.join(outputDir, 'movement-mainnet'),
       builtin
     )
-    // const num4 = await M2_TESTNET_CODEGEN.generate(
-    //   path.join(srcDir, 'm2-testnet'),
-    //   path.join(outputDir, 'm2-testnet'),
-    //   builtin
-    // )
     const num5 = await MOVEMENT_TESTNET_CODEGEN.generate(
       path.join(srcDir, 'movement-testnet'),
       path.join(outputDir, 'movement-testnet'),

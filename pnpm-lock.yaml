@@ -552,14 +552,14 @@ importers:
         specifier: 1.91.8
         version: 1.91.8(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
       '@typemove/aptos':
-        specifier: ~1.7.1
-        version: 1.7.1
+        specifier: ~1.8.0
+        version: 1.8.0
       '@typemove/move':
-        specifier: ~1.7.1
-        version: 1.7.1
+        specifier: ~1.8.0
+        version: 1.8.0
       '@typemove/sui':
-        specifier: ~1.7.1
-        version: 1.7.1(typescript@5.5.2)
+        specifier: ~1.8.0
+        version: 1.8.0(typescript@5.5.2)
       bs58:
         specifier: ^5.0.0
         version: 5.0.0
@@ -1818,15 +1818,15 @@ packages:
   '@tsconfig/node16@1.0.4':
     resolution: {integrity: sha512-vxhUy4J8lyeyinH7Azl1pdd43GJhZH/tP2weN8TntQblOY+A0XbT8DJk1/oCPuOOyg/Ja757rG0CgHcWC8OfMA==}
 
-  '@typemove/aptos@1.7.1':
-    resolution: {integrity: sha512-U3s6nIvKNyMO320MCWX8hx4fbYHYyzNf0lYXvt6rCAvQD1hx/2D8IX1ggU02WzthA0Nh3bkVBmhBEBY7bxR0Rw==}
+  '@typemove/aptos@1.8.0':
+    resolution: {integrity: sha512-lHvDLwD0xTLpbMVuEiYV3oqVEplRsgmXA4jMZwadKStDhwN8kOMNF+w/XhKdu8r5xoe7nLlDSZMijJ0jfZryvw==}
     hasBin: true
 
-  '@typemove/move@1.7.1':
-    resolution: {integrity: sha512-Of4nIoUKaBUCGpsS09HmEXfZc3kMptpWSR4+b6yBMYCHKiJF9QfA6YuqkgmcIsljDxMiSFRH6Ol0xRfh+5K/Dg==}
+  '@typemove/move@1.8.0':
+    resolution: {integrity: sha512-Ghzn7QPOgzDw932cBraJ3AYZyZ52QxFOP+bVpPFSMQGKZ0UAGNXPh0W1RlG64VJH3sv9KC/XUOIDEQzm9CamiA==}
 
-  '@typemove/sui@1.7.1':
-    resolution: {integrity: sha512-JSSjNM+RGsFqRMCZqhON6VJDIBe9rV1P4vMiCbrjdp9mrcMDhF9hLFBus524+rEm+8PqNmzfEm+kNup6WU6LtA==}
+  '@typemove/sui@1.8.0':
+    resolution: {integrity: sha512-0mwtDkPmc5YIMp7MVLLUPy2JA0v/GzZNN3a2p/5beQXA5zqdOdH3UBMaAHZJWlG1sVhbg/bYx7Lz4DWfaRq/WQ==}
     hasBin: true
 
   '@types/bn.js@5.1.5':
@@ -7882,10 +7882,10 @@ snapshots:
 
   '@tsconfig/node16@1.0.4': {}
 
-  '@typemove/aptos@1.7.1':
+  '@typemove/aptos@1.8.0':
     dependencies:
       '@aptos-labs/ts-sdk': 1.33.0
-      '@typemove/move': 1.7.1
+      '@typemove/move': 1.8.0
       chalk: 5.3.0
       commander: 12.1.0
       prettier: 3.3.2
@@ -7893,14 +7893,14 @@ snapshots:
     transitivePeerDependencies:
       - debug
 
-  '@typemove/move@1.7.1':
+  '@typemove/move@1.8.0':
     dependencies:
       radash: 12.1.0
 
-  '@typemove/sui@1.7.1(typescript@5.5.2)':
+  '@typemove/sui@1.8.0(typescript@5.5.2)':
     dependencies:
       '@mysten/sui': 1.15.0(typescript@5.5.2)
-      '@typemove/move': 1.7.1
+      '@typemove/move': 1.8.0
       chalk: 5.3.0
       commander: 12.1.0
       prettier: 3.3.2

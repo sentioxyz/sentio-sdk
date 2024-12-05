@@ -3,10 +3,17 @@ import { token } from '@sentio/sdk/aptos/builtin/0x3'
 import { coin } from '@sentio/sdk/aptos/builtin/0x1'
 import { AptosNetwork } from '@sentio/sdk/aptos'
 
-coin.bind({ network: AptosNetwork.MAIN_NET }).onEventWithdrawEvent((evt, ctx) => {
+coin.bind({ network: AptosNetwork.MAIN_NET }).onEventWithdrawEvent(async (evt, ctx) => {
   if (evt.guid.account_address === '0x9c5382a5aa6cd92f38ffa50bd8ec2879833997116499cc5bcd6d4688a962e330') {
     ctx.meter.Counter('air_dropped').add(evt.data_decoded.amount)
   }
+  const [res] = await coin.view.supply(ctx.getClient(), {
+    typeArguments: ['0x1::aptos_coin::AptosCoin']
+  })
+  if (res.vec.length > 0) {
+    ctx.meter.Gauge('supply').record(res.vec[0])
+  }
+
   ctx.meter.Counter('evt_cnt').add(1)
 })
 

@@ -1,6 +1,6 @@
 import { RecordMetaData } from '@sentio/protos'
 import { type Labels, normalizeLabels } from '../index.js'
-import { MoveCoder } from './index.js'
+import { MoveCoder, RichAptosClientWithContext } from './index.js'
 import {
   Aptos,
   Event,
@@ -13,14 +13,33 @@ import { defaultMoveCoder } from './move-coder.js'
 import { AptosNetwork } from './network.js'
 import { Endpoints } from '@sentio/runtime'
 import { ServerError, Status } from 'nice-grpc'
-import { MoveAccountContext, MoveContext } from '../move/index.js'
+import { MoveContext } from '../move/index.js'
 
-export class AptosContext extends MoveContext<AptosNetwork, MoveModuleBytecode, Event | MoveResource> {
-  moduleName: string
+export abstract class AptosBaseContext extends MoveContext<AptosNetwork, MoveModuleBytecode, Event | MoveResource> {
   version: bigint
+  coder: MoveCoder
+
+  protected constructor(network: AptosNetwork, version: bigint, labels?: Labels) {
+    super(labels)
+    this.network = network
+    this.coder = defaultMoveCoder(this.network)
+    this.version = version
+  }
+
+  getClient(): Aptos {
+    let chainServer = Endpoints.INSTANCE.chainServer.get(this.network)
+    if (!chainServer) {
+      throw new ServerError(Status.INTERNAL, 'RPC endpoint not provided')
+    }
+    chainServer = chainServer + '/v1'
+    return new RichAptosClientWithContext(this, new AptosConfig({ fullnode: chainServer }))
+  }
+}
+
+export class AptosContext extends AptosBaseContext {
+  moduleName: string
   transaction: UserTransactionResponse
   eventIndex: number
-  coder: MoveCoder
 
   constructor(
     moduleName: string,
@@ -31,13 +50,10 @@ export class AptosContext extends MoveContext<AptosNetwork, MoveModuleBytecode, 
     eventIndex: number,
     baseLabels: Labels | undefined
   ) {
-    super(baseLabels)
+    super(network, version, baseLabels)
     this.address = address.toLowerCase()
-    this.network = network
     this.moduleName = moduleName
-    this.version = version
     this.eventIndex = eventIndex
-    this.coder = defaultMoveCoder(network)
     if (transaction) {
       this.transaction = transaction
     }
@@ -71,22 +87,17 @@ export class AptosContext extends MoveContext<AptosNetwork, MoveModuleBytecode, 
       throw new ServerError(Status.INTERNAL, 'RPC endpoint not provided')
     }
     chainServer = chainServer + '/v1'
-    return new Aptos(new AptosConfig({ fullnode: chainServer }))
+    return new RichAptosClientWithContext(this, new AptosConfig({ fullnode: chainServer }))
   }
 }
 
-export class AptosResourcesContext extends MoveAccountContext<AptosNetwork, MoveModuleBytecode, Event | MoveResource> {
-  version: bigint
+export class AptosResourcesContext extends AptosBaseContext {
   timestampInMicros: number
-  coder: MoveCoder
 
   constructor(network: AptosNetwork, address: string, version: bigint, timestampInMicros: number, baseLabels?: Labels) {
-    super(baseLabels)
+    super(network, version, baseLabels)
     this.address = address
-    this.network = network
-    this.version = version
     this.timestampInMicros = timestampInMicros
-    this.coder = defaultMoveCoder(network)
   }
 
   getChainId() {
@@ -109,14 +120,5 @@ export class AptosResourcesContext extends MoveAccountContext<AptosNetwork, Move
       name: name,
       labels: normalizeLabels(labels)
     }
-  }
-
-  getClient(): Aptos {
-    let chainServer = Endpoints.INSTANCE.chainServer.get(this.network)
-    if (!chainServer) {
-      throw new ServerError(Status.INTERNAL, 'RPC endpoint not provided')
-    }
-    chainServer = chainServer + '/v1'
-    return new Aptos(new AptosConfig({ fullnode: chainServer }))
   }
 }
