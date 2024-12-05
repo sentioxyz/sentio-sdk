@@ -22,6 +22,7 @@ export default defineConfig({
   sourcemap: 'inline',
   clean: true,
   format: 'esm',
+  keepNames: true,
   // dts: {
   //   resolve: true,
   // },

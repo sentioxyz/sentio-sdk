@@ -292,6 +292,7 @@ message TraceHandlerConfig {
   string signature = 1;
   int32 handler_id = 2;
   EthFetchConfig fetch_config = 3;
+  string handler_name = 4;
 }
 
 message TransactionHandlerConfig {
@@ -303,6 +304,7 @@ message LogHandlerConfig {
   repeated LogFilter filters = 1;
   int32 handler_id = 2;
   EthFetchConfig fetch_config = 3;
+  string handler_name = 4;
 }
 
 message FuelAssetHandlerConfig {
@@ -857,6 +859,7 @@ message EventTrackingResult {
   LogLevel severity = 7;
   string message = 8;
   RuntimeInfo runtime_info = 5;
+  common.RichStruct attributes2 = 9;
 
   // TODO remove this after driver don't use old event tracker
   bool no_metric = 3;

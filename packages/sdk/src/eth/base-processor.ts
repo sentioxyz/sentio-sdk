@@ -21,7 +21,7 @@ import { fixEmptyKey, formatEthData, RichBlock, Trace, TypedCallTrace, TypedEven
 import sha3 from 'js-sha3'
 import { ListStateStorage, metricsStorage } from '@sentio/runtime'
 import { EthChainId } from '@sentio/chain'
-import { handlersProxy } from '../utils/metrics.js'
+import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 import { ALL_ADDRESS } from '../core/index.js'
 
 export interface AddressOrTypeEventFilter extends DeferredTopicFilter {
@@ -33,6 +33,7 @@ export const defaultPreprocessHandler = () => (<PreprocessResult>{ ethCallParams
 
 export class EventsHandler {
   filters: AddressOrTypeEventFilter[]
+  handlerName: string
   handler: (event: Data_EthLog) => Promise<ProcessResult>
   preprocessHandler?: (event: Data_EthLog, preprocessStore: { [k: string]: any }) => Promise<PreprocessResult>
   fetchConfig: EthFetchConfig
@@ -40,6 +41,7 @@ export class EventsHandler {
 
 export class TraceHandler {
   signatures: string[]
+  handlerName: string
   handler: (trace: Data_EthTrace) => Promise<ProcessResult>
   preprocessHandler?: (event: Data_EthTrace, preprocessStore: { [k: string]: any }) => Promise<PreprocessResult>
   fetchConfig: EthFetchConfig
@@ -314,6 +316,7 @@ export class GlobalProcessor {
     this.traceHandlers.push({
       signatures,
       fetchConfig: EthFetchConfig.fromPartial(fetchConfig || {}),
+      handlerName: getHandlerName(),
       handler: async function (data: Data_EthTrace) {
         const { trace, block, transaction, transactionReceipt } = formatEthData(data)
 
@@ -383,22 +386,7 @@ export abstract class BaseProcessor<
       this.config.endBlock = BigInt(config.endBlock)
     }
 
-    const chain_id = this.getChainId()
-    this.blockHandlers = new Proxy(this.blockHandlers, handlersProxy({ chain_id, category: 'interval' }))
-    this.eventHandlers = new Proxy(this.eventHandlers, handlersProxy({ chain_id, category: 'event' }))
-    this.traceHandlers = new Proxy(this.traceHandlers, handlersProxy({ chain_id, category: 'call' }))
-
-    return new Proxy(this, {
-      get: (target, prop, receiver) => {
-        return metricsStorage.run(metricsStorage.getStore() || prop.toString(), () => {
-          const fn = (target as any)[prop]
-          if (typeof fn == 'function') {
-            return AsyncLocalStorage.bind((...args: any) => fn.apply(receiver, args))
-          }
-          return Reflect.get(target, prop, receiver)
-        })
-      }
-    })
+    return proxyProcessor(this)
   }
 
   protected abstract CreateBoundContractView(): TBoundContractView
@@ -452,6 +440,7 @@ export abstract class BaseProcessor<
     this.eventHandlers.push({
       filters: _filters,
       fetchConfig: EthFetchConfig.fromPartial(fetchConfig || {}),
+      handlerName: getHandlerName(),
       handler: async function (data: Data_EthLog, preparedData?: PreparedData) {
         const { log, block, transaction, transactionReceipt } = formatEthData(data)
         if (!log) {
@@ -693,6 +682,7 @@ export abstract class BaseProcessor<
     this.traceHandlers.push({
       signatures,
       fetchConfig: EthFetchConfig.fromPartial(fetchConfig || {}),
+      handlerName: getHandlerName(),
       handler: async function (data: Data_EthTrace, preparedData?: PreparedData) {
         const contractView = processor.CreateBoundContractView()
         const contractInterface = contractView.rawContract.interface

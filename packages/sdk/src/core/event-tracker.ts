@@ -23,7 +23,7 @@ export class EventTrackerState extends MapStateStorage<EventTracker> {
 export class EventTracker extends NamedResultDescriptor {
   static DEFAULT_OPTIONS: TrackerOptions = {
     totalByDay: true,
-    unique: true,
+    unique: true
   }
 
   static register(eventName: string, options?: TrackerOptions) {
@@ -50,6 +50,7 @@ export class EventTracker extends NamedResultDescriptor {
       attributes: normalizeAttribute(payload),
       runtimeInfo: undefined,
       noMetric: false,
+      attributes2: undefined
     }
     ctx.update({ events: [res] })
   }
@@ -60,7 +61,7 @@ export class AccountEventTracker extends EventTracker {
   static DEFAULT_OPTIONS: TrackerOptions = {
     totalByDay: true,
     unique: true,
-    distinctByDays: [1, 7, 30],
+    distinctByDays: [1, 7, 30]
   }
 
   static register(eventName?: string, options?: TrackerOptions) {

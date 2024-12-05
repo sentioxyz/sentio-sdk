@@ -376,9 +376,12 @@ export interface Project {
   ownerName: string;
   notificationChannels: Channel[];
   views: ProjectView[];
+  /** @deprecated */
   supersetEnable: boolean;
+  /** @deprecated */
   superset: ProjectSuperset | undefined;
   enableDisk: boolean;
+  /** @deprecated */
   enableMaterializedView: boolean;
 }
 
@@ -470,9 +473,12 @@ export interface ProjectInfo {
   visibility: Project_Visibility;
   type: Project_Type;
   multiVersion: boolean;
+  /** @deprecated */
   supersetEnable: boolean;
+  /** @deprecated */
   superset: ProjectSuperset | undefined;
   enableDisk: boolean;
+  /** @deprecated */
   enableMaterializedView: boolean;
 }
 
@@ -553,6 +559,12 @@ export interface ApiKey {
   source: string;
   ownerType: string;
   revealable: boolean;
+  scopeProjects: { [key: string]: ProjectInfo };
+}
+
+export interface ApiKey_ScopeProjectsEntry {
+  key: string;
+  value: ProjectInfo | undefined;
 }
 
 export interface TimeRangeLite {
@@ -1861,6 +1873,7 @@ export interface RichValue {
   bigdecimalValue?: BigDecimal | undefined;
   listValue?: RichValueList | undefined;
   structValue?: RichStruct | undefined;
+  tokenValue?: TokenAmount | undefined;
 }
 
 export enum RichValue_NullValue {
@@ -1915,6 +1928,12 @@ export interface BigDecimal {
 export interface BigInteger {
   negative: boolean;
   data: Uint8Array;
+}
+
+export interface TokenAmount {
+  token: CoinID | undefined;
+  amount: BigDecimal | undefined;
+  specifiedAt: Date | undefined;
 }
 
 function createBaseUsageTracker(): UsageTracker {
@@ -4490,6 +4509,7 @@ function createBaseApiKey(): ApiKey {
     source: "",
     ownerType: "",
     revealable: false,
+    scopeProjects: {},
   };
 }
 
@@ -4534,6 +4554,9 @@ export const ApiKey = {
     if (message.revealable !== false) {
       writer.uint32(88).bool(message.revealable);
     }
+    Object.entries(message.scopeProjects).forEach(([key, value]) => {
+      ApiKey_ScopeProjectsEntry.encode({ key: key as any, value }, writer.uint32(98).fork()).ldelim();
+    });
     return writer;
   },
 
@@ -4614,6 +4637,16 @@ export const ApiKey = {
 
           message.revealable = reader.bool();
           continue;
+        case 12:
+          if (tag !== 98) {
+            break;
+          }
+
+          const entry12 = ApiKey_ScopeProjectsEntry.decode(reader, reader.uint32());
+          if (entry12.value !== undefined) {
+            message.scopeProjects[entry12.key] = entry12.value;
+          }
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -4635,6 +4668,12 @@ export const ApiKey = {
       source: isSet(object.source) ? globalThis.String(object.source) : "",
       ownerType: isSet(object.ownerType) ? globalThis.String(object.ownerType) : "",
       revealable: isSet(object.revealable) ? globalThis.Boolean(object.revealable) : false,
+      scopeProjects: isObject(object.scopeProjects)
+        ? Object.entries(object.scopeProjects).reduce<{ [key: string]: ProjectInfo }>((acc, [key, value]) => {
+          acc[key] = ProjectInfo.fromJSON(value);
+          return acc;
+        }, {})
+        : {},
     };
   },
 
@@ -4670,6 +4709,15 @@ export const ApiKey = {
     if (message.revealable !== false) {
       obj.revealable = message.revealable;
     }
+    if (message.scopeProjects) {
+      const entries = Object.entries(message.scopeProjects);
+      if (entries.length > 0) {
+        obj.scopeProjects = {};
+        entries.forEach(([k, v]) => {
+          obj.scopeProjects[k] = ProjectInfo.toJSON(v);
+        });
+      }
+    }
     return obj;
   },
 
@@ -4688,6 +4736,91 @@ export const ApiKey = {
     message.source = object.source ?? "";
     message.ownerType = object.ownerType ?? "";
     message.revealable = object.revealable ?? false;
+    message.scopeProjects = Object.entries(object.scopeProjects ?? {}).reduce<{ [key: string]: ProjectInfo }>(
+      (acc, [key, value]) => {
+        if (value !== undefined) {
+          acc[key] = ProjectInfo.fromPartial(value);
+        }
+        return acc;
+      },
+      {},
+    );
+    return message;
+  },
+};
+
+function createBaseApiKey_ScopeProjectsEntry(): ApiKey_ScopeProjectsEntry {
+  return { key: "", value: undefined };
+}
+
+export const ApiKey_ScopeProjectsEntry = {
+  encode(message: ApiKey_ScopeProjectsEntry, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.key !== "") {
+      writer.uint32(10).string(message.key);
+    }
+    if (message.value !== undefined) {
+      ProjectInfo.encode(message.value, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ApiKey_ScopeProjectsEntry {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseApiKey_ScopeProjectsEntry();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.key = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.value = ProjectInfo.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ApiKey_ScopeProjectsEntry {
+    return {
+      key: isSet(object.key) ? globalThis.String(object.key) : "",
+      value: isSet(object.value) ? ProjectInfo.fromJSON(object.value) : undefined,
+    };
+  },
+
+  toJSON(message: ApiKey_ScopeProjectsEntry): unknown {
+    const obj: any = {};
+    if (message.key !== "") {
+      obj.key = message.key;
+    }
+    if (message.value !== undefined) {
+      obj.value = ProjectInfo.toJSON(message.value);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<ApiKey_ScopeProjectsEntry>): ApiKey_ScopeProjectsEntry {
+    return ApiKey_ScopeProjectsEntry.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ApiKey_ScopeProjectsEntry>): ApiKey_ScopeProjectsEntry {
+    const message = createBaseApiKey_ScopeProjectsEntry();
+    message.key = object.key ?? "";
+    message.value = (object.value !== undefined && object.value !== null)
+      ? ProjectInfo.fromPartial(object.value)
+      : undefined;
     return message;
   },
 };
@@ -12801,6 +12934,7 @@ function createBaseRichValue(): RichValue {
     bigdecimalValue: undefined,
     listValue: undefined,
     structValue: undefined,
+    tokenValue: undefined,
   };
 }
 
@@ -12838,6 +12972,9 @@ export const RichValue = {
     }
     if (message.structValue !== undefined) {
       RichStruct.encode(message.structValue, writer.uint32(90).fork()).ldelim();
+    }
+    if (message.tokenValue !== undefined) {
+      TokenAmount.encode(message.tokenValue, writer.uint32(98).fork()).ldelim();
     }
     return writer;
   },
@@ -12926,6 +13063,13 @@ export const RichValue = {
 
           message.structValue = RichStruct.decode(reader, reader.uint32());
           continue;
+        case 12:
+          if (tag !== 98) {
+            break;
+          }
+
+          message.tokenValue = TokenAmount.decode(reader, reader.uint32());
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -12948,6 +13092,7 @@ export const RichValue = {
       bigdecimalValue: isSet(object.bigdecimalValue) ? BigDecimal.fromJSON(object.bigdecimalValue) : undefined,
       listValue: isSet(object.listValue) ? RichValueList.fromJSON(object.listValue) : undefined,
       structValue: isSet(object.structValue) ? RichStruct.fromJSON(object.structValue) : undefined,
+      tokenValue: isSet(object.tokenValue) ? TokenAmount.fromJSON(object.tokenValue) : undefined,
     };
   },
 
@@ -12986,6 +13131,9 @@ export const RichValue = {
     if (message.structValue !== undefined) {
       obj.structValue = RichStruct.toJSON(message.structValue);
     }
+    if (message.tokenValue !== undefined) {
+      obj.tokenValue = TokenAmount.toJSON(message.tokenValue);
+    }
     return obj;
   },
 
@@ -13012,6 +13160,9 @@ export const RichValue = {
       : undefined;
     message.structValue = (object.structValue !== undefined && object.structValue !== null)
       ? RichStruct.fromPartial(object.structValue)
+      : undefined;
+    message.tokenValue = (object.tokenValue !== undefined && object.tokenValue !== null)
+      ? TokenAmount.fromPartial(object.tokenValue)
       : undefined;
     return message;
   },
@@ -13437,6 +13588,99 @@ export const BigInteger = {
     const message = createBaseBigInteger();
     message.negative = object.negative ?? false;
     message.data = object.data ?? new Uint8Array(0);
+    return message;
+  },
+};
+
+function createBaseTokenAmount(): TokenAmount {
+  return { token: undefined, amount: undefined, specifiedAt: undefined };
+}
+
+export const TokenAmount = {
+  encode(message: TokenAmount, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.token !== undefined) {
+      CoinID.encode(message.token, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.amount !== undefined) {
+      BigDecimal.encode(message.amount, writer.uint32(18).fork()).ldelim();
+    }
+    if (message.specifiedAt !== undefined) {
+      Timestamp.encode(toTimestamp(message.specifiedAt), writer.uint32(26).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): TokenAmount {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseTokenAmount();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.token = CoinID.decode(reader, reader.uint32());
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.amount = BigDecimal.decode(reader, reader.uint32());
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.specifiedAt = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): TokenAmount {
+    return {
+      token: isSet(object.token) ? CoinID.fromJSON(object.token) : undefined,
+      amount: isSet(object.amount) ? BigDecimal.fromJSON(object.amount) : undefined,
+      specifiedAt: isSet(object.specifiedAt) ? fromJsonTimestamp(object.specifiedAt) : undefined,
+    };
+  },
+
+  toJSON(message: TokenAmount): unknown {
+    const obj: any = {};
+    if (message.token !== undefined) {
+      obj.token = CoinID.toJSON(message.token);
+    }
+    if (message.amount !== undefined) {
+      obj.amount = BigDecimal.toJSON(message.amount);
+    }
+    if (message.specifiedAt !== undefined) {
+      obj.specifiedAt = message.specifiedAt.toISOString();
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<TokenAmount>): TokenAmount {
+    return TokenAmount.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<TokenAmount>): TokenAmount {
+    const message = createBaseTokenAmount();
+    message.token = (object.token !== undefined && object.token !== null)
+      ? CoinID.fromPartial(object.token)
+      : undefined;
+    message.amount = (object.amount !== undefined && object.amount !== null)
+      ? BigDecimal.fromPartial(object.amount)
+      : undefined;
+    message.specifiedAt = object.specifiedAt ?? undefined;
     return message;
   },
 };

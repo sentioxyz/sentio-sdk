@@ -128,7 +128,8 @@ function emit<T>(ctx: BaseContext, eventName: string, event: Event<T>) {
       ...normalizeAttribute(payload)
     },
     runtimeInfo: undefined,
-    noMetric: true
+    noMetric: true,
+    attributes2: undefined
   }
   processMetrics.process_eventemit_count.add(1)
   ctx.update({ events: [res] })

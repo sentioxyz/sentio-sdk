@@ -115,6 +115,7 @@ export class EthPlugin extends Plugin {
           contractConfig.traceConfigs.push({
             signature: signature,
             handlerId: handlerId,
+            handlerName: traceHandler.handlerName,
             fetchConfig: traceHandler.fetchConfig
           })
         }
@@ -127,6 +128,7 @@ export class EthPlugin extends Plugin {
         const handlerId = handlers.eventHandlers.push(eventsHandler.handler) - 1
         const logConfig: LogHandlerConfig = {
           handlerId: handlerId,
+          handlerName: eventsHandler.handlerName,
           filters: [],
           fetchConfig: eventsHandler.fetchConfig
         }
@@ -205,6 +207,7 @@ export class EthPlugin extends Plugin {
           contractConfig.traceConfigs.push({
             signature: signature,
             handlerId: handlerId,
+            handlerName: traceHandler.handlerName,
             fetchConfig: traceHandler.fetchConfig
           })
         }
@@ -226,6 +229,7 @@ export class EthPlugin extends Plugin {
         const handlerId = handlers.eventHandlers.push(eventsHandler.handler) - 1
         const logConfig: LogHandlerConfig = {
           handlerId: handlerId,
+          handlerName: eventsHandler.handlerName,
           filters: [],
           fetchConfig: eventsHandler.fetchConfig
         }

@@ -656,6 +656,7 @@ export interface TraceHandlerConfig {
   signature: string;
   handlerId: number;
   fetchConfig: EthFetchConfig | undefined;
+  handlerName: string;
 }
 
 export interface TransactionHandlerConfig {
@@ -667,6 +668,7 @@ export interface LogHandlerConfig {
   filters: LogFilter[];
   handlerId: number;
   fetchConfig: EthFetchConfig | undefined;
+  handlerName: string;
 }
 
 export interface FuelAssetHandlerConfig {
@@ -1239,6 +1241,7 @@ export interface EventTrackingResult {
   severity: LogLevel;
   message: string;
   runtimeInfo: RuntimeInfo | undefined;
+  attributes2: RichStruct | undefined;
   noMetric: boolean;
 }
 
@@ -4086,7 +4089,7 @@ export const EthFetchConfig = {
 };
 
 function createBaseTraceHandlerConfig(): TraceHandlerConfig {
-  return { signature: "", handlerId: 0, fetchConfig: undefined };
+  return { signature: "", handlerId: 0, fetchConfig: undefined, handlerName: "" };
 }
 
 export const TraceHandlerConfig = {
@@ -4099,6 +4102,9 @@ export const TraceHandlerConfig = {
     }
     if (message.fetchConfig !== undefined) {
       EthFetchConfig.encode(message.fetchConfig, writer.uint32(26).fork()).ldelim();
+    }
+    if (message.handlerName !== "") {
+      writer.uint32(34).string(message.handlerName);
     }
     return writer;
   },
@@ -4131,6 +4137,13 @@ export const TraceHandlerConfig = {
 
           message.fetchConfig = EthFetchConfig.decode(reader, reader.uint32());
           continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.handlerName = reader.string();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -4145,6 +4158,7 @@ export const TraceHandlerConfig = {
       signature: isSet(object.signature) ? globalThis.String(object.signature) : "",
       handlerId: isSet(object.handlerId) ? globalThis.Number(object.handlerId) : 0,
       fetchConfig: isSet(object.fetchConfig) ? EthFetchConfig.fromJSON(object.fetchConfig) : undefined,
+      handlerName: isSet(object.handlerName) ? globalThis.String(object.handlerName) : "",
     };
   },
 
@@ -4159,6 +4173,9 @@ export const TraceHandlerConfig = {
     if (message.fetchConfig !== undefined) {
       obj.fetchConfig = EthFetchConfig.toJSON(message.fetchConfig);
     }
+    if (message.handlerName !== "") {
+      obj.handlerName = message.handlerName;
+    }
     return obj;
   },
 
@@ -4172,6 +4189,7 @@ export const TraceHandlerConfig = {
     message.fetchConfig = (object.fetchConfig !== undefined && object.fetchConfig !== null)
       ? EthFetchConfig.fromPartial(object.fetchConfig)
       : undefined;
+    message.handlerName = object.handlerName ?? "";
     return message;
   },
 };
@@ -4253,7 +4271,7 @@ export const TransactionHandlerConfig = {
 };
 
 function createBaseLogHandlerConfig(): LogHandlerConfig {
-  return { filters: [], handlerId: 0, fetchConfig: undefined };
+  return { filters: [], handlerId: 0, fetchConfig: undefined, handlerName: "" };
 }
 
 export const LogHandlerConfig = {
@@ -4266,6 +4284,9 @@ export const LogHandlerConfig = {
     }
     if (message.fetchConfig !== undefined) {
       EthFetchConfig.encode(message.fetchConfig, writer.uint32(26).fork()).ldelim();
+    }
+    if (message.handlerName !== "") {
+      writer.uint32(34).string(message.handlerName);
     }
     return writer;
   },
@@ -4298,6 +4319,13 @@ export const LogHandlerConfig = {
 
           message.fetchConfig = EthFetchConfig.decode(reader, reader.uint32());
           continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.handlerName = reader.string();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -4312,6 +4340,7 @@ export const LogHandlerConfig = {
       filters: globalThis.Array.isArray(object?.filters) ? object.filters.map((e: any) => LogFilter.fromJSON(e)) : [],
       handlerId: isSet(object.handlerId) ? globalThis.Number(object.handlerId) : 0,
       fetchConfig: isSet(object.fetchConfig) ? EthFetchConfig.fromJSON(object.fetchConfig) : undefined,
+      handlerName: isSet(object.handlerName) ? globalThis.String(object.handlerName) : "",
     };
   },
 
@@ -4326,6 +4355,9 @@ export const LogHandlerConfig = {
     if (message.fetchConfig !== undefined) {
       obj.fetchConfig = EthFetchConfig.toJSON(message.fetchConfig);
     }
+    if (message.handlerName !== "") {
+      obj.handlerName = message.handlerName;
+    }
     return obj;
   },
 
@@ -4339,6 +4371,7 @@ export const LogHandlerConfig = {
     message.fetchConfig = (object.fetchConfig !== undefined && object.fetchConfig !== null)
       ? EthFetchConfig.fromPartial(object.fetchConfig)
       : undefined;
+    message.handlerName = object.handlerName ?? "";
     return message;
   },
 };
@@ -11671,6 +11704,7 @@ function createBaseEventTrackingResult(): EventTrackingResult {
     severity: 0,
     message: "",
     runtimeInfo: undefined,
+    attributes2: undefined,
     noMetric: false,
   };
 }
@@ -11694,6 +11728,9 @@ export const EventTrackingResult = {
     }
     if (message.runtimeInfo !== undefined) {
       RuntimeInfo.encode(message.runtimeInfo, writer.uint32(42).fork()).ldelim();
+    }
+    if (message.attributes2 !== undefined) {
+      RichStruct.encode(message.attributes2, writer.uint32(74).fork()).ldelim();
     }
     if (message.noMetric !== false) {
       writer.uint32(24).bool(message.noMetric);
@@ -11750,6 +11787,13 @@ export const EventTrackingResult = {
 
           message.runtimeInfo = RuntimeInfo.decode(reader, reader.uint32());
           continue;
+        case 9:
+          if (tag !== 74) {
+            break;
+          }
+
+          message.attributes2 = RichStruct.decode(reader, reader.uint32());
+          continue;
         case 3:
           if (tag !== 24) {
             break;
@@ -11774,6 +11818,7 @@ export const EventTrackingResult = {
       severity: isSet(object.severity) ? logLevelFromJSON(object.severity) : 0,
       message: isSet(object.message) ? globalThis.String(object.message) : "",
       runtimeInfo: isSet(object.runtimeInfo) ? RuntimeInfo.fromJSON(object.runtimeInfo) : undefined,
+      attributes2: isSet(object.attributes2) ? RichStruct.fromJSON(object.attributes2) : undefined,
       noMetric: isSet(object.noMetric) ? globalThis.Boolean(object.noMetric) : false,
     };
   },
@@ -11798,6 +11843,9 @@ export const EventTrackingResult = {
     if (message.runtimeInfo !== undefined) {
       obj.runtimeInfo = RuntimeInfo.toJSON(message.runtimeInfo);
     }
+    if (message.attributes2 !== undefined) {
+      obj.attributes2 = RichStruct.toJSON(message.attributes2);
+    }
     if (message.noMetric !== false) {
       obj.noMetric = message.noMetric;
     }
@@ -11818,6 +11866,9 @@ export const EventTrackingResult = {
     message.message = object.message ?? "";
     message.runtimeInfo = (object.runtimeInfo !== undefined && object.runtimeInfo !== null)
       ? RuntimeInfo.fromPartial(object.runtimeInfo)
+      : undefined;
+    message.attributes2 = (object.attributes2 !== undefined && object.attributes2 !== null)
+      ? RichStruct.fromPartial(object.attributes2)
       : undefined;
     message.noMetric = object.noMetric ?? false;
     return message;

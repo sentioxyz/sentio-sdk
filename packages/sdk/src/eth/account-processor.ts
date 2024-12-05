@@ -13,6 +13,8 @@ import { AccountProcessorState } from './account-processor-state.js'
 import { fixEmptyKey, formatEthData, TypedEvent } from './eth.js'
 import { EthChainId } from '@sentio/chain'
 import { ServerError, Status } from 'nice-grpc'
+import { metricsStorage } from '@sentio/runtime'
+import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 
 const ERC20_INTERFACE = ERC20__factory.createInterface()
 const ERC721_INTERFACE = ERC721__factory.createInterface()
@@ -32,6 +34,8 @@ export class AccountProcessor {
       ...config,
       network: config.network || EthChainId.ETHEREUM
     }
+
+    return proxyProcessor(this)
   }
 
   public getChainId(): EthChainId {
@@ -292,6 +296,7 @@ export class AccountProcessor {
     this.eventHandlers.push({
       filters: _filters,
       fetchConfig: EthFetchConfig.fromPartial(fetchConfig || {}),
+      handlerName: getHandlerName(),
       handler: async function (data) {
         const { log, block, transaction, transactionReceipt } = formatEthData(data)
         if (!log) {
