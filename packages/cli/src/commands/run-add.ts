@@ -14,7 +14,7 @@ const supportedChain: string[] = [
   AptosChainId.APTOS_MAINNET,
   AptosChainId.APTOS_TESTNET,
   AptosChainId.APTOS_MOVEMENT_TESTNET,
-  AptosChainId.APTOS_MOVEMENT_PORTO,
+  AptosChainId.APTOS_MOVEMENT_MAINNET,
   SuiChainId.SUI_TESTNET,
   SuiChainId.SUI_MAINNET
 ]

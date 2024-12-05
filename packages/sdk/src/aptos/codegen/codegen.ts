@@ -63,8 +63,7 @@ class AptosNetworkCodegen extends BaseAptosCodegen {
 const MAINNET_CODEGEN = new AptosNetworkCodegen(AptosNetwork.MAIN_NET)
 const TESTNET_CODEGEN = new AptosNetworkCodegen(AptosNetwork.TEST_NET)
 const MOVEMENT_MAINNET_CODEGEN = new AptosNetworkCodegen(AptosNetwork.MOVEMENT_MAIN_NET)
-// const M2_TESTNET_CODEGEN = new AptosNetworkCodegen(AptosNetwork.MOVEMENT_TEST_NET)
-const MOVEMENT_PROTO_CODEGEN = new AptosNetworkCodegen(AptosNetwork.MOVEMENT_PORTO)
+const MOVEMENT_TESTNET_CODEGEN = new AptosNetworkCodegen(AptosNetwork.MOVEMENT_TEST_NET)
 
 class AptosCodegen {
   async generate(srcDir: string, outputDir: string, builtin = false): Promise<number> {
@@ -80,9 +79,9 @@ class AptosCodegen {
     //   path.join(outputDir, 'm2-testnet'),
     //   builtin
     // )
-    const num5 = await MOVEMENT_PROTO_CODEGEN.generate(
-      path.join(srcDir, 'movement-porto'),
-      path.join(outputDir, 'movement-porto'),
+    const num5 = await MOVEMENT_TESTNET_CODEGEN.generate(
+      path.join(srcDir, 'movement-testnet'),
+      path.join(outputDir, 'movement-testnet'),
       builtin
     )
     return num1 + num2 + num3 + num5

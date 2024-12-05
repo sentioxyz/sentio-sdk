@@ -28,14 +28,14 @@ export async function getABI(
     case AptosChainId.APTOS_MOVEMENT_TESTNET:
       aptosClient = new Aptos(
         new AptosConfig({
-          fullnode: 'https://aptos.testnet.suzuka.movementlabs.xyz/v1'
+          fullnode: 'https://aptos.testnet.bardock.movementlabs.xyz/v1'
         })
       )
       break
-    case AptosChainId.APTOS_MOVEMENT_PORTO:
+    case AptosChainId.APTOS_MOVEMENT_MAINNET:
       aptosClient = new Aptos(
         new AptosConfig({
-          fullnode: 'https://aptos.testnet.porto.movementlabs.xyz/v1'
+          fullnode: 'https://mainnet.movementnetwork.xyz/v1'
         })
       )
       break
@@ -153,11 +153,8 @@ export function getABIFilePath(chain: string, name: string, address?: string): s
     case AptosChainId.APTOS_MOVEMENT_MAINNET:
       subpath = 'aptos/movement-mainnet'
       break
-    case AptosChainId.APTOS_MOVEMENT_PORTO:
-      subpath = 'aptos/movement-porto'
-      break
     case AptosChainId.APTOS_MOVEMENT_TESTNET:
-      subpath = 'aptos/m2-testnet'
+      subpath = 'aptos/movement-testnet'
       break
     case SuiChainId.SUI_MAINNET:
       subpath = 'sui'
