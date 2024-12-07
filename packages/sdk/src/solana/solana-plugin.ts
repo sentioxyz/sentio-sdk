@@ -4,7 +4,7 @@ import { ContractConfig, DataBinding, HandlerType, ProcessConfigResponse, Proces
 import { ServerError, Status } from 'nice-grpc'
 
 import { SolanaProcessorState } from './solana-processor.js'
-import { Instruction as SolInstruction } from '@project-serum/anchor'
+import { Instruction as SolInstruction } from '@coral-xyz/anchor'
 
 export class SolanaPlugin extends Plugin {
   name: string = 'SolanaPlugin'
@@ -18,14 +18,14 @@ export class SolanaPlugin extends Plugin {
           name: solanaProcessor.contractName,
           chainId: solanaProcessor.network,
           address: solanaProcessor.address,
-          abi: '',
+          abi: ''
         },
         startBlock: solanaProcessor.config.startSlot,
         instructionConfig: {
           innerInstruction: solanaProcessor.processInnerInstruction,
           parsedInstruction: solanaProcessor.fromParsedInstruction !== null,
-          rawDataInstruction: solanaProcessor.decodeInstruction !== null,
-        },
+          rawDataInstruction: solanaProcessor.decodeInstruction !== null
+        }
       })
       config.contractConfigs.push(contractConfig)
     }

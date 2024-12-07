@@ -1,8 +1,15 @@
 {
+  "address": "",
+  "metadata": {
+    "name": "token_bridge",
+    "version": "0.1.0",
+    "spec": ""
+  },
   "accounts": [],
   "instructions": [
     {
       "name": "initialize",
+      "discriminator": [],
       "accounts": [
         {
           "name": "payer",
@@ -28,12 +35,13 @@
       "args": [
         {
           "name": "wormhole",
-          "type": "publicKey"
+          "type": "pubkey"
         }
       ]
     },
     {
       "name": "attestToken",
+      "discriminator": [],
       "accounts": [
         {
           "name": "payer",
@@ -115,6 +123,7 @@
     },
     {
       "name": "completeNative",
+      "discriminator": [],
       "accounts": [
         {
           "name": "payer",
@@ -191,6 +200,7 @@
     },
     {
       "name": "completeWrapped",
+      "discriminator": [],
       "accounts": [
         {
           "name": "payer",
@@ -267,6 +277,7 @@
     },
     {
       "name": "transferWrapped",
+      "discriminator": [],
       "accounts": [
         {
           "name": "payer",
@@ -381,6 +392,7 @@
     },
     {
       "name": "transferNative",
+      "discriminator": [],
       "accounts": [
         {
           "name": "payer",
@@ -495,6 +507,7 @@
     },
     {
       "name": "registerChain",
+      "discriminator": [],
       "accounts": [
         {
           "name": "payer",
@@ -541,6 +554,7 @@
     },
     {
       "name": "createWrapped",
+      "discriminator": [],
       "accounts": [
         {
           "name": "payer",
@@ -617,6 +631,7 @@
     },
     {
       "name": "upgradeContract",
+      "discriminator": [],
       "accounts": [
         {
           "name": "payer",
@@ -683,6 +698,7 @@
     },
     {
       "name": "transferWrappedWithPayload",
+      "discriminator": [],
       "accounts": [
         {
           "name": "payer",
@@ -801,13 +817,14 @@
         {
           "name": "cpiProgramId",
           "type": {
-            "option": "publicKey"
+            "option": "pubkey"
           }
         }
       ]
     },
     {
       "name": "transferNativeWithPayload",
+      "discriminator": [],
       "accounts": [
         {
           "name": "payer",
@@ -926,12 +943,10 @@
         {
           "name": "cpiProgramId",
           "type": {
-            "option": "publicKey"
+            "option": "pubkey"
           }
         }
       ]
     }
-  ],
-  "name": "token_bridge",
-  "version": "0.1.0"
+  ]
 }

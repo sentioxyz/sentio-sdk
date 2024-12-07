@@ -1,6 +1,6 @@
 import { ProcessResult } from '@sentio/protos'
 import { SolanaContext } from './solana-context.js'
-import { Instruction } from '@project-serum/anchor'
+import { Instruction } from '@coral-xyz/anchor'
 import { SolanaBindOptions } from './solana-options.js'
 import { ListStateStorage } from '@sentio/runtime'
 import { Labels } from '../core/index.js'
