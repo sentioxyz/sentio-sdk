@@ -34,7 +34,10 @@ export async function execStep(cmds: string[], stepName: string, options?: ExecF
 }
 
 export async function execPackageManager(args: string[], stepName: string, options?: ExecFileOptions) {
-  const packageManager = await getPackageManager()
-  const pm = packageManager.name
+  let pm = 'yarn'
+  try {
+    const packageManager = await getPackageManager()
+    pm = packageManager.name
+  } catch (e) {}
   return execStep([pm, ...args], stepName, options)
 }
