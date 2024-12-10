@@ -9,7 +9,7 @@ import path from 'path'
 import { ReadKey } from '../key.js'
 import fs from 'fs'
 import { createHash } from 'crypto'
-import { execFileSync } from 'child_process'
+import { CommonExecOptions, execFileSync } from 'child_process'
 import { errorOnUnknownOption, getCliVersion, getSdkVersion } from '../utils.js'
 import readline from 'readline'
 import JSZip from 'jszip'
@@ -213,15 +213,12 @@ export function getGitAttributes() {
   let commitSha = ''
   let gitUrl = ''
   try {
-    commitSha = execFileSync('git', ['rev-parse', 'HEAD']).toString().trim()
-  } catch (e) {
-    chalk.yellow(e)
-  }
-  try {
-    gitUrl = execFileSync('git', ['remote', 'get-url', 'origin']).toString().trim()
-  } catch (e) {
-    // skip errors
-  }
+    const options: CommonExecOptions = {
+      stdio: [undefined, undefined, 'ignore']
+    }
+    commitSha = execFileSync('git', ['rev-parse', 'HEAD'], options).toString().trim()
+    gitUrl = execFileSync('git', ['remote', 'get-url', 'origin'], options).toString().trim()
+  } catch (e) {}
   return { commitSha, gitUrl }
 }
 
