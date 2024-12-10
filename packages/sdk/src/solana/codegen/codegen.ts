@@ -3,6 +3,7 @@ import fs from 'fs'
 import chalk from 'chalk'
 import { Idl } from '@coral-xyz/anchor'
 import { IdlField, IdlInstruction, IdlType, IdlInstructionAccountItem } from '@coral-xyz/anchor/dist/esm/idl.js'
+import { IdlTypeDef, IdlTypeDefTy } from '@coral-xyz/anchor/dist/cjs/idl.js'
 
 export function codegen(abisDir: string, targetPath = path.join('src', 'types', 'solana'), genExample = false) {
   if (!fs.existsSync(abisDir)) {
@@ -33,11 +34,13 @@ export function codegen(abisDir: string, targetPath = path.join('src', 'types', 
 function codeGenSolanaIdlProcessor(idlObj: Idl): string {
   const idlName = idlObj.metadata.name
   const idlNamePascalCase = toPascalCase(idlName)
-  const instructions: any[] = idlObj.instructions
+  const instructions = idlObj.instructions
   return `import { BorshInstructionCoder, Instruction, Idl } from '@sentio/sdk/solana'
 import { SolanaBaseProcessor, SolanaContext, SolanaBindOptions } from "@sentio/sdk/solana"
 import { ${idlName}_idl } from "./${idlName}.js"
 import { PublicKey } from '@solana/web3.js'
+
+${idlObj.types?.map((def) => codeGenType(def)).join('')}
 
 export class ${idlNamePascalCase}Processor extends SolanaBaseProcessor {
   static DEFAULT_OPTIONS = {
@@ -52,6 +55,24 @@ export class ${idlNamePascalCase}Processor extends SolanaBaseProcessor {
   ${instructions.map((ins) => codeGenSolanaInstruction(idlNamePascalCase, ins)).join('')}
 }
   `
+}
+
+function codeGenType({ name, type }: IdlTypeDef): string {
+  switch (type.kind) {
+    case 'struct':
+      const fields = type.fields
+        ?.map((field) =>
+          typeof field == 'object' && 'name' in field ? `  ${field.name}: ${mapType(field.type)},` : ''
+        )
+        .join('\n')
+      return `
+interface ${name} {
+${fields}
+}
+`
+    default:
+      return ''
+  }
 }
 
 function codeGenSolanaInstruction(idlName: string, ins: IdlInstruction): string {
