@@ -2,7 +2,14 @@ import path from 'path'
 import fs from 'fs'
 import chalk from 'chalk'
 import { Idl } from '@coral-xyz/anchor'
-import { IdlField, IdlInstruction, IdlType, IdlInstructionAccountItem } from '@coral-xyz/anchor/dist/esm/idl.js'
+import {
+  IdlField,
+  IdlInstruction,
+  IdlType,
+  IdlInstructionAccountItem,
+  IdlDefinedFields,
+  IdlTypeDef
+} from '@coral-xyz/anchor/dist/esm/idl.js'
 
 export function codegen(abisDir: string, targetPath = path.join('src', 'types', 'solana'), genExample = false) {
   if (!fs.existsSync(abisDir)) {
@@ -33,11 +40,13 @@ export function codegen(abisDir: string, targetPath = path.join('src', 'types', 
 function codeGenSolanaIdlProcessor(idlObj: Idl): string {
   const idlName = idlObj.metadata.name
   const idlNamePascalCase = toPascalCase(idlName)
-  const instructions: any[] = idlObj.instructions
+  const instructions = idlObj.instructions
   return `import { BorshInstructionCoder, Instruction, Idl } from '@sentio/sdk/solana'
 import { SolanaBaseProcessor, SolanaContext, SolanaBindOptions } from "@sentio/sdk/solana"
 import { ${idlName}_idl } from "./${idlName}.js"
 import { PublicKey } from '@solana/web3.js'
+
+${idlObj.types?.map((def) => codeGenType(def)).join('')}
 
 export class ${idlNamePascalCase}Processor extends SolanaBaseProcessor {
   static DEFAULT_OPTIONS = {
@@ -52,6 +61,49 @@ export class ${idlNamePascalCase}Processor extends SolanaBaseProcessor {
   ${instructions.map((ins) => codeGenSolanaInstruction(idlNamePascalCase, ins)).join('')}
 }
   `
+}
+
+function codeGenDefinedFields(fields: IdlDefinedFields): string[] {
+  if (typeof fields[0] == 'object' && 'name' in fields[0]) {
+    return (fields as IdlField[]).map(({ name, type }) => `${name}: ${mapType(type)},`)
+  }
+
+  return (fields as IdlType[]).map((t) => mapType(t))
+}
+
+function codeGenType({ name, type }: IdlTypeDef): string {
+  switch (type.kind) {
+    case 'struct':
+      const fields = type.fields ? codeGenDefinedFields(type.fields).join('\n  ') : ''
+      return `
+interface ${name} {
+  ${fields}
+}
+`
+    case 'enum':
+      const variants = type.variants
+        .map(({ name, fields }) => {
+          if (fields) {
+            const body = codeGenDefinedFields(fields).join('\n        ')
+            return `{
+      ${name}: {
+        ${body}
+      }
+    }`
+          }
+          return `{ ${name}: {} }`
+        })
+        .join('\n  | ')
+      return `
+type ${name} = ${variants}
+`
+    case 'type':
+      return `
+type ${name} = ${mapType(type.alias)}
+`
+    default:
+      return ''
+  }
 }
 
 function codeGenSolanaInstruction(idlName: string, ins: IdlInstruction): string {
@@ -103,7 +155,24 @@ function codeGenAccountTypeArgs(args: IdlInstructionAccountItem[]): string {
 
 // Reference: https://github.com/coral-xyz/anchor/blob/93332766f13e86efbe77c9986722731742317ede/ts/src/program/namespace/types.ts#L104
 function mapType(tpe: IdlType): string {
-  // TODO handle complex type
+  if (typeof tpe == 'object') {
+    if ('array' in tpe) {
+      //IdlTypeArray
+      return `${mapType(tpe.array[0])}[]`
+    }
+    if ('defined' in tpe) {
+      // IdlTypeDefined
+      return tpe.defined.name
+    }
+    if ('option' in tpe) {
+      // IdlTypeOption
+      return mapType(tpe.option) + ' | null | undefined'
+    }
+    if ('vec' in tpe) {
+      //IdlTypeVec
+      return `${mapType(tpe.vec)}[]`
+    }
+  }
   switch (tpe) {
     case 'pubkey':
       return 'PublicKey'
