@@ -1,8 +1,8 @@
 import path from 'path'
 import fs from 'fs'
 import chalk from 'chalk'
-import { Idl } from '@project-serum/anchor'
-import { IdlAccountItem, IdlField, IdlInstruction, IdlType } from '@project-serum/anchor/dist/cjs/idl.js'
+import { Idl } from '@coral-xyz/anchor'
+import { IdlField, IdlInstruction, IdlType, IdlInstructionAccountItem } from '@coral-xyz/anchor/dist/esm/idl.js'
 
 export function codegen(abisDir: string, targetPath = path.join('src', 'types', 'solana'), genExample = false) {
   if (!fs.existsSync(abisDir)) {
@@ -18,8 +18,8 @@ export function codegen(abisDir: string, targetPath = path.join('src', 'types', 
         fs.mkdirSync(targetPath, { recursive: true })
       }
       const idlContent = fs.readFileSync(path.join(abisDir, file), 'utf-8')
-      const idlObj = JSON.parse(idlContent)
-      const idlName = idlObj.name
+      const idlObj = JSON.parse(idlContent) as Idl
+      const idlName = idlObj.metadata.name
       const idlFile = path.join(targetPath, idlName + '.ts')
       fs.writeFileSync(idlFile, `export const ${idlName}_idl = ${idlContent}`)
       fs.writeFileSync(path.join(targetPath, `${idlName}_processor.ts`), codeGenSolanaIdlProcessor(idlObj))
@@ -31,7 +31,7 @@ export function codegen(abisDir: string, targetPath = path.join('src', 'types', 
 }
 
 function codeGenSolanaIdlProcessor(idlObj: Idl): string {
-  const idlName = idlObj.name
+  const idlName = idlObj.metadata.name
   const idlNamePascalCase = toPascalCase(idlName)
   const instructions: any[] = idlObj.instructions
   return `import { BorshInstructionCoder, Instruction, Idl } from '@sentio/sdk/solana'
@@ -93,11 +93,11 @@ function codeGenInstructionArgsType(args: IdlField[]): string {
   return `{ ${args.map((arg) => arg.name + ': ' + mapType(arg.type)).join(', ')} }`
 }
 
-function codeGenAccountType(args: IdlAccountItem[]): string {
+function codeGenAccountType(args: IdlInstructionAccountItem[]): string {
   return `{ ${args.map((arg) => arg.name + ': string').join(', ')} }`
 }
 
-function codeGenAccountTypeArgs(args: IdlAccountItem[]): string {
+function codeGenAccountTypeArgs(args: IdlInstructionAccountItem[]): string {
   return `{ ${args.map((arg, idx) => `${arg.name}: accounts[${idx}]`).join(', ')} }`
 }
 
@@ -105,7 +105,7 @@ function codeGenAccountTypeArgs(args: IdlAccountItem[]): string {
 function mapType(tpe: IdlType): string {
   // TODO handle complex type
   switch (tpe) {
-    case 'publicKey':
+    case 'pubkey':
       return 'PublicKey'
     case 'bool':
       return 'boolean'

@@ -1,4 +1,4 @@
-project: aurory
+project: pyth-staking
 host: local
 targets:
   - chain: solana

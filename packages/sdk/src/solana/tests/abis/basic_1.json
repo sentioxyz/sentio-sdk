@@ -1,7 +1,14 @@
 {
+  "address": "",
+  "metadata": {
+    "name": "basic_1",
+    "version": "0.1.0",
+    "spec": ""
+  },
   "accounts": [
     {
       "name": "MyAccount",
+      "discriminator": [],
       "type": {
         "kind": "struct",
         "fields": [
@@ -16,6 +23,7 @@
   "instructions": [
     {
       "name": "initialize",
+      "discriminator": [],
       "accounts": [
         {
           "name": "myAccount",
@@ -42,6 +50,7 @@
     },
     {
       "name": "update",
+      "discriminator": [],
       "accounts": [
         {
           "name": "myAccount",
@@ -56,7 +65,5 @@
         }
       ]
     }
-  ],
-  "name": "basic_1",
-  "version": "0.1.0"
+  ]
 }

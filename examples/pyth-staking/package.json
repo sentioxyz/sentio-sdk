@@ -1,14 +1,14 @@
 {
-  "name": "@sentio-example/aurory",
-  "version": "1.0.0",
   "private": true,
+  "name": "@sentio-example/pyth-staking",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "gen": "sentio gen",
     "build": "sentio build --skip-deps",
+    "build:all": "pnpm --filter=$(node -p \"require('./package.json').name\")... build",
+    "gen": "sentio gen",
     "test": "sentio test",
-    "upload": "sentio upload",
-    "build:all": "pnpm --filter=$(node -p \"require('./package.json').name\")... build"
+    "upload": "sentio upload"
   },
   "dependencies": {
     "@sentio/sdk": "workspace:*"
