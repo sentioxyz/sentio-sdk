@@ -69,7 +69,7 @@ export abstract class SuiBaseObjectOrAddressProcessor<HandlerType> {
     if (options.ownerType === MoveOwnerType.TYPE) {
       this.config = {
         startCheckpoint: options.startCheckpoint || 0n,
-        address: accountTypeString(options.address),
+        address: options.address === '*' ? '*' : accountTypeString(options.address),
         network: options.network || SuiNetwork.MAIN_NET,
         baseLabels: options.baseLabels
       }
