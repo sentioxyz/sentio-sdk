@@ -98,8 +98,8 @@ if (options['start-action-server']) {
   server.listen(options.port)
 } else {
   server = createServer({
-    'grpc.max_send_message_length': 384 * 1024 * 1024,
-    'grpc.max_receive_message_length': 384 * 1024 * 1024,
+    'grpc.max_send_message_length': 768 * 1024 * 1024,
+    'grpc.max_receive_message_length': 768 * 1024 * 1024,
     'grpc.default_compression_algorithm': compressionAlgorithms.gzip
   })
     // .use(prometheusServerMiddleware())

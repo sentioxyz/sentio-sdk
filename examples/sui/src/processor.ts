@@ -5,7 +5,7 @@
 //   ctx.meter.Counter('amount').add(amount)
 // })
 
-import { sui_system, validator } from '@sentio/sdk/sui/builtin/0x3'
+import { sui_system, validator, staking_pool } from '@sentio/sdk/sui/builtin/0x3'
 
 import { SuiNetwork, SuiObjectProcessor, BUILTIN_TYPES, SuiObjectTypeProcessor } from '@sentio/sdk/sui'
 import RequestAddStakePayload = sui_system.RequestAddStakePayload
@@ -38,14 +38,15 @@ SuiObjectProcessor.bind({
 })
 
 SuiObjectTypeProcessor.bind({
-  objectType: validator.Validator.type()
-}).onTimeInterval(
-  (self, objects, ctx) => {
-    ctx.meter
-      .Gauge('voting_power')
-      .record(self.data_decoded.voting_power, { address: self.data_decoded.metadata.primary_address })
-  },
-  60,
-  60 * 24 * 30,
-  { owned: false }
-)
+  objectType: staking_pool.StakedSui.type()
+})
+  .onTimeInterval(
+    (self, objects, ctx) => {
+      ctx.meter.Gauge('voting_power').record(self.data_decoded.principal, { pool: self.data_decoded.pool_id })
+    },
+    60,
+    60 * 24 * 30
+  )
+  .onObjectChange((changes, ctx) => {
+    ctx.meter.Counter('updates').add(changes.length)
+  })
