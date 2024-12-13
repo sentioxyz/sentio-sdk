@@ -66,6 +66,8 @@ message ProcessConfigResponse {
 message ContractConfig {
   ContractInfo contract = 1;
   repeated OnIntervalConfig interval_configs = 11;
+  repeated MoveOnIntervalConfig move_interval_configs = 19;
+
   repeated LogHandlerConfig log_configs = 3;
   repeated TraceHandlerConfig trace_configs = 2;
   repeated TransactionHandlerConfig transaction_config = 7;
@@ -251,9 +253,11 @@ enum MoveOwnerType {
 
 message MoveOnIntervalConfig {
   OnIntervalConfig interval_config = 1;
+  // type of the owned object to filter
   string type = 2;
   MoveOwnerType owner_type = 3;
-  MoveAccountFetchConfig fetch_config = 4;
+  MoveAccountFetchConfig resource_fetch_config = 4;
+  MoveFetchConfig  fetch_config = 5;
 }
 
 message ContractInfo {
@@ -653,10 +657,13 @@ message Data {
     uint64 slot = 3;
   }
   message SuiObject {
-    repeated google.protobuf.Struct objects = 1;
-    optional google.protobuf.Struct self = 4;
-    google.protobuf.Timestamp timestamp = 2;
-    uint64 slot = 3;
+    repeated google.protobuf.Struct objects = 1; // just details.content
+    optional google.protobuf.Struct self = 4;    // just details.content
+    string object_id = 5;      // self object property
+    uint64 object_version = 6; // self object property
+    string object_digest = 7;  // self object property
+    google.protobuf.Timestamp timestamp = 2; // checkpoint timestamp
+    uint64 slot = 3;                         // checkpoint number
   }
   message SuiObjectChange {
     repeated google.protobuf.Struct changes = 1;

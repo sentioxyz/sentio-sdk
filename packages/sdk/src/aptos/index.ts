@@ -1,9 +1,10 @@
 export type { TypedEventInstance, TypedFunctionPayload, TypedMoveResource } from './models.js'
 export {
-  AptosBaseProcessor,
+  AptosTransactionProcessor,
   AptosResourcesProcessor,
   AptosModulesProcessor,
-  AptosGlobalProcessor
+  AptosGlobalProcessor,
+  AptosBaseProcessor
 } from './aptos-processor.js'
 export { AptosResourceProcessorTemplate } from './aptos-resource-processor-template.js'
 export { AptosContext, AptosResourcesContext } from './context.js'

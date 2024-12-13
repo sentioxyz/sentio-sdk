@@ -15,6 +15,6 @@ describe('block estimate', () => {
   testIf('get block number at mainnet', async () => {
     const targetDate = new Date('2023-05-02T00:00:00Z')
     const estimatedBlockNumber = await estimateBlockNumberAtDate(getProvider(), targetDate, 0)
-    expect(estimatedBlockNumber).to.equal(16308189)
+    expect(estimatedBlockNumber).to.equal(17169395)
   })
 })

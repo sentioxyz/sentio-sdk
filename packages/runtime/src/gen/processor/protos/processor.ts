@@ -418,6 +418,7 @@ export interface ProcessConfigResponse {
 export interface ContractConfig {
   contract: ContractInfo | undefined;
   intervalConfigs: OnIntervalConfig[];
+  moveIntervalConfigs: MoveOnIntervalConfig[];
   logConfigs: LogHandlerConfig[];
   traceConfigs: TraceHandlerConfig[];
   transactionConfig: TransactionHandlerConfig[];
@@ -620,7 +621,8 @@ export interface MoveOnIntervalConfig {
   intervalConfig: OnIntervalConfig | undefined;
   type: string;
   ownerType: MoveOwnerType;
-  fetchConfig: MoveAccountFetchConfig | undefined;
+  resourceFetchConfig: MoveAccountFetchConfig | undefined;
+  fetchConfig: MoveFetchConfig | undefined;
 }
 
 export interface ContractInfo {
@@ -1118,6 +1120,9 @@ export interface Data_SuiCall {
 export interface Data_SuiObject {
   objects: { [key: string]: any }[];
   self?: { [key: string]: any } | undefined;
+  objectId: string;
+  objectVersion: bigint;
+  objectDigest: string;
   timestamp: Date | undefined;
   slot: bigint;
 }
@@ -1745,6 +1750,7 @@ function createBaseContractConfig(): ContractConfig {
   return {
     contract: undefined,
     intervalConfigs: [],
+    moveIntervalConfigs: [],
     logConfigs: [],
     traceConfigs: [],
     transactionConfig: [],
@@ -1771,6 +1777,9 @@ export const ContractConfig = {
     }
     for (const v of message.intervalConfigs) {
       OnIntervalConfig.encode(v!, writer.uint32(90).fork()).ldelim();
+    }
+    for (const v of message.moveIntervalConfigs) {
+      MoveOnIntervalConfig.encode(v!, writer.uint32(154).fork()).ldelim();
     }
     for (const v of message.logConfigs) {
       LogHandlerConfig.encode(v!, writer.uint32(26).fork()).ldelim();
@@ -1849,6 +1858,13 @@ export const ContractConfig = {
           }
 
           message.intervalConfigs.push(OnIntervalConfig.decode(reader, reader.uint32()));
+          continue;
+        case 19:
+          if (tag !== 154) {
+            break;
+          }
+
+          message.moveIntervalConfigs.push(MoveOnIntervalConfig.decode(reader, reader.uint32()));
           continue;
         case 3:
           if (tag !== 26) {
@@ -1977,6 +1993,9 @@ export const ContractConfig = {
       intervalConfigs: globalThis.Array.isArray(object?.intervalConfigs)
         ? object.intervalConfigs.map((e: any) => OnIntervalConfig.fromJSON(e))
         : [],
+      moveIntervalConfigs: globalThis.Array.isArray(object?.moveIntervalConfigs)
+        ? object.moveIntervalConfigs.map((e: any) => MoveOnIntervalConfig.fromJSON(e))
+        : [],
       logConfigs: globalThis.Array.isArray(object?.logConfigs)
         ? object.logConfigs.map((e: any) => LogHandlerConfig.fromJSON(e))
         : [],
@@ -2029,6 +2048,9 @@ export const ContractConfig = {
     }
     if (message.intervalConfigs?.length) {
       obj.intervalConfigs = message.intervalConfigs.map((e) => OnIntervalConfig.toJSON(e));
+    }
+    if (message.moveIntervalConfigs?.length) {
+      obj.moveIntervalConfigs = message.moveIntervalConfigs.map((e) => MoveOnIntervalConfig.toJSON(e));
     }
     if (message.logConfigs?.length) {
       obj.logConfigs = message.logConfigs.map((e) => LogHandlerConfig.toJSON(e));
@@ -2090,6 +2112,7 @@ export const ContractConfig = {
       ? ContractInfo.fromPartial(object.contract)
       : undefined;
     message.intervalConfigs = object.intervalConfigs?.map((e) => OnIntervalConfig.fromPartial(e)) || [];
+    message.moveIntervalConfigs = object.moveIntervalConfigs?.map((e) => MoveOnIntervalConfig.fromPartial(e)) || [];
     message.logConfigs = object.logConfigs?.map((e) => LogHandlerConfig.fromPartial(e)) || [];
     message.traceConfigs = object.traceConfigs?.map((e) => TraceHandlerConfig.fromPartial(e)) || [];
     message.transactionConfig = object.transactionConfig?.map((e) => TransactionHandlerConfig.fromPartial(e)) || [];
@@ -3550,7 +3573,7 @@ export const AptosOnIntervalConfig = {
 };
 
 function createBaseMoveOnIntervalConfig(): MoveOnIntervalConfig {
-  return { intervalConfig: undefined, type: "", ownerType: 0, fetchConfig: undefined };
+  return { intervalConfig: undefined, type: "", ownerType: 0, resourceFetchConfig: undefined, fetchConfig: undefined };
 }
 
 export const MoveOnIntervalConfig = {
@@ -3564,8 +3587,11 @@ export const MoveOnIntervalConfig = {
     if (message.ownerType !== 0) {
       writer.uint32(24).int32(message.ownerType);
     }
+    if (message.resourceFetchConfig !== undefined) {
+      MoveAccountFetchConfig.encode(message.resourceFetchConfig, writer.uint32(34).fork()).ldelim();
+    }
     if (message.fetchConfig !== undefined) {
-      MoveAccountFetchConfig.encode(message.fetchConfig, writer.uint32(34).fork()).ldelim();
+      MoveFetchConfig.encode(message.fetchConfig, writer.uint32(42).fork()).ldelim();
     }
     return writer;
   },
@@ -3603,7 +3629,14 @@ export const MoveOnIntervalConfig = {
             break;
           }
 
-          message.fetchConfig = MoveAccountFetchConfig.decode(reader, reader.uint32());
+          message.resourceFetchConfig = MoveAccountFetchConfig.decode(reader, reader.uint32());
+          continue;
+        case 5:
+          if (tag !== 42) {
+            break;
+          }
+
+          message.fetchConfig = MoveFetchConfig.decode(reader, reader.uint32());
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -3619,7 +3652,10 @@ export const MoveOnIntervalConfig = {
       intervalConfig: isSet(object.intervalConfig) ? OnIntervalConfig.fromJSON(object.intervalConfig) : undefined,
       type: isSet(object.type) ? globalThis.String(object.type) : "",
       ownerType: isSet(object.ownerType) ? moveOwnerTypeFromJSON(object.ownerType) : 0,
-      fetchConfig: isSet(object.fetchConfig) ? MoveAccountFetchConfig.fromJSON(object.fetchConfig) : undefined,
+      resourceFetchConfig: isSet(object.resourceFetchConfig)
+        ? MoveAccountFetchConfig.fromJSON(object.resourceFetchConfig)
+        : undefined,
+      fetchConfig: isSet(object.fetchConfig) ? MoveFetchConfig.fromJSON(object.fetchConfig) : undefined,
     };
   },
 
@@ -3634,8 +3670,11 @@ export const MoveOnIntervalConfig = {
     if (message.ownerType !== 0) {
       obj.ownerType = moveOwnerTypeToJSON(message.ownerType);
     }
+    if (message.resourceFetchConfig !== undefined) {
+      obj.resourceFetchConfig = MoveAccountFetchConfig.toJSON(message.resourceFetchConfig);
+    }
     if (message.fetchConfig !== undefined) {
-      obj.fetchConfig = MoveAccountFetchConfig.toJSON(message.fetchConfig);
+      obj.fetchConfig = MoveFetchConfig.toJSON(message.fetchConfig);
     }
     return obj;
   },
@@ -3650,8 +3689,11 @@ export const MoveOnIntervalConfig = {
       : undefined;
     message.type = object.type ?? "";
     message.ownerType = object.ownerType ?? 0;
+    message.resourceFetchConfig = (object.resourceFetchConfig !== undefined && object.resourceFetchConfig !== null)
+      ? MoveAccountFetchConfig.fromPartial(object.resourceFetchConfig)
+      : undefined;
     message.fetchConfig = (object.fetchConfig !== undefined && object.fetchConfig !== null)
-      ? MoveAccountFetchConfig.fromPartial(object.fetchConfig)
+      ? MoveFetchConfig.fromPartial(object.fetchConfig)
       : undefined;
     return message;
   },
@@ -9788,7 +9830,15 @@ export const Data_SuiCall = {
 };
 
 function createBaseData_SuiObject(): Data_SuiObject {
-  return { objects: [], self: undefined, timestamp: undefined, slot: BigInt("0") };
+  return {
+    objects: [],
+    self: undefined,
+    objectId: "",
+    objectVersion: BigInt("0"),
+    objectDigest: "",
+    timestamp: undefined,
+    slot: BigInt("0"),
+  };
 }
 
 export const Data_SuiObject = {
@@ -9798,6 +9848,18 @@ export const Data_SuiObject = {
     }
     if (message.self !== undefined) {
       Struct.encode(Struct.wrap(message.self), writer.uint32(34).fork()).ldelim();
+    }
+    if (message.objectId !== "") {
+      writer.uint32(42).string(message.objectId);
+    }
+    if (message.objectVersion !== BigInt("0")) {
+      if (BigInt.asUintN(64, message.objectVersion) !== message.objectVersion) {
+        throw new globalThis.Error("value provided for field message.objectVersion of type uint64 too large");
+      }
+      writer.uint32(48).uint64(message.objectVersion.toString());
+    }
+    if (message.objectDigest !== "") {
+      writer.uint32(58).string(message.objectDigest);
     }
     if (message.timestamp !== undefined) {
       Timestamp.encode(toTimestamp(message.timestamp), writer.uint32(18).fork()).ldelim();
@@ -9832,6 +9894,27 @@ export const Data_SuiObject = {
 
           message.self = Struct.unwrap(Struct.decode(reader, reader.uint32()));
           continue;
+        case 5:
+          if (tag !== 42) {
+            break;
+          }
+
+          message.objectId = reader.string();
+          continue;
+        case 6:
+          if (tag !== 48) {
+            break;
+          }
+
+          message.objectVersion = longToBigint(reader.uint64() as Long);
+          continue;
+        case 7:
+          if (tag !== 58) {
+            break;
+          }
+
+          message.objectDigest = reader.string();
+          continue;
         case 2:
           if (tag !== 18) {
             break;
@@ -9859,6 +9942,9 @@ export const Data_SuiObject = {
     return {
       objects: globalThis.Array.isArray(object?.objects) ? [...object.objects] : [],
       self: isObject(object.self) ? object.self : undefined,
+      objectId: isSet(object.objectId) ? globalThis.String(object.objectId) : "",
+      objectVersion: isSet(object.objectVersion) ? BigInt(object.objectVersion) : BigInt("0"),
+      objectDigest: isSet(object.objectDigest) ? globalThis.String(object.objectDigest) : "",
       timestamp: isSet(object.timestamp) ? fromJsonTimestamp(object.timestamp) : undefined,
       slot: isSet(object.slot) ? BigInt(object.slot) : BigInt("0"),
     };
@@ -9871,6 +9957,15 @@ export const Data_SuiObject = {
     }
     if (message.self !== undefined) {
       obj.self = message.self;
+    }
+    if (message.objectId !== "") {
+      obj.objectId = message.objectId;
+    }
+    if (message.objectVersion !== BigInt("0")) {
+      obj.objectVersion = message.objectVersion.toString();
+    }
+    if (message.objectDigest !== "") {
+      obj.objectDigest = message.objectDigest;
     }
     if (message.timestamp !== undefined) {
       obj.timestamp = message.timestamp.toISOString();
@@ -9888,6 +9983,9 @@ export const Data_SuiObject = {
     const message = createBaseData_SuiObject();
     message.objects = object.objects?.map((e) => e) || [];
     message.self = object.self ?? undefined;
+    message.objectId = object.objectId ?? "";
+    message.objectVersion = object.objectVersion ?? BigInt("0");
+    message.objectDigest = object.objectDigest ?? "";
     message.timestamp = object.timestamp ?? undefined;
     message.slot = object.slot ?? BigInt("0");
     return message;

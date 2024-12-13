@@ -32,13 +32,15 @@ interface Handlers {
   aptosEventHandlers: ((event: Data_AptEvent) => Promise<ProcessResult>)[]
   aptosCallHandlers: ((func: Data_AptCall) => Promise<ProcessResult>)[]
   aptosResourceHandlers: ((resourceWithVersion: Data_AptResource) => Promise<ProcessResult>)[]
+  aptosTransactionIntervalHandlers: ((txn: Data_AptCall) => Promise<ProcessResult>)[]
 }
 export class AptosPlugin extends Plugin {
   name: string = 'AptosPlugin'
   handlers: Handlers = {
     aptosEventHandlers: [],
     aptosCallHandlers: [],
-    aptosResourceHandlers: []
+    aptosResourceHandlers: [],
+    aptosTransactionIntervalHandlers: []
   }
 
   async start(request: StartRequest) {
@@ -67,6 +69,7 @@ export class AptosPlugin extends Plugin {
 
   async configure(config: ProcessConfigResponse) {
     const handlers: Handlers = {
+      aptosTransactionIntervalHandlers: [],
       aptosEventHandlers: [],
       aptosCallHandlers: [],
       aptosResourceHandlers: []
@@ -117,6 +120,24 @@ export class AptosPlugin extends Plugin {
         contractConfig.moveCallConfigs.push(functionHandlerConfig)
       }
 
+      // 3. Prepare interval handlers
+      for (const handler of aptosProcessor.transactionIntervalHandlers) {
+        const handlerId = handlers.aptosTransactionIntervalHandlers.push(handler.handler) - 1
+        contractConfig.moveIntervalConfigs.push({
+          intervalConfig: {
+            handlerId: handlerId,
+            minutes: 0,
+            minutesInterval: handler.timeIntervalInMinutes,
+            slot: 0,
+            slotInterval: handler.versionInterval,
+            fetchConfig: undefined
+          },
+          ownerType: MoveOwnerType.ADDRESS,
+          fetchConfig: handler.fetchConfig,
+          resourceFetchConfig: undefined,
+          type: ''
+        })
+      }
       config.contractConfigs.push(contractConfig)
     }
 
@@ -127,7 +148,7 @@ export class AptosPlugin extends Plugin {
         chainId: aptosProcessor.getChainId(),
         startBlock: aptosProcessor.config.startVersion
       })
-      for (const handler of aptosProcessor.resourceHandlers) {
+      for (const handler of aptosProcessor.resourceChangeHandlers) {
         const handlerId = handlers.aptosResourceHandlers.push(handler.handler) - 1
         accountConfig.moveResourceChangeConfigs.push({
           handlerId: handlerId,
@@ -143,7 +164,7 @@ export class AptosPlugin extends Plugin {
         chainId: aptosProcessor.getChainId(),
         startBlock: aptosProcessor.config.startVersion
       })
-      for (const handler of aptosProcessor.resourcesHandlers) {
+      for (const handler of aptosProcessor.resourceIntervalHandlers) {
         const handlerId = handlers.aptosResourceHandlers.push(handler.handler) - 1
         if (handler.timeIntervalInMinutes || handler.versionInterval) {
           accountConfig.moveIntervalConfigs.push({
@@ -157,6 +178,7 @@ export class AptosPlugin extends Plugin {
             },
             type: handler.type || '',
             ownerType: MoveOwnerType.ADDRESS,
+            resourceFetchConfig: handler.fetchConfig,
             fetchConfig: undefined
           })
         } else if (handler.type) {

@@ -100,7 +100,8 @@ export abstract class SuiBaseObjectOrAddressProcessor<HandlerType> {
       handler: async function (data) {
         const ctx = new SuiObjectContext(
           processor.config.network,
-          processor.config.address,
+          data.objectId,
+          data.objectVersion,
           data.slot,
           data.timestamp || new Date(0),
           processor.config.baseLabels

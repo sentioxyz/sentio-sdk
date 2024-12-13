@@ -38,7 +38,7 @@ export class RichAptosClient extends Aptos {
 // - getModule(s)
 // - view/viewJson
 export class RichAptosClientWithContext extends RichAptosClient {
-  ctx: AptosBaseContext
+  protected ctx: AptosBaseContext
   constructor(ctx: AptosBaseContext, config: AptosConfig) {
     super(config)
     this.ctx = ctx

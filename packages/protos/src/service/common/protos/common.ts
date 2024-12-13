@@ -383,6 +383,7 @@ export interface Project {
   enableDisk: boolean;
   /** @deprecated */
   enableMaterializedView: boolean;
+  defaultTimerange: TimeRangeLite | undefined;
 }
 
 export enum Project_Visibility {
@@ -480,6 +481,7 @@ export interface ProjectInfo {
   enableDisk: boolean;
   /** @deprecated */
   enableMaterializedView: boolean;
+  defaultTimerange: TimeRangeLite | undefined;
 }
 
 export interface EventLogColumn {
@@ -1457,6 +1459,7 @@ export enum TabularData_ColumnType {
   BOOLEAN = 2,
   LIST = 3,
   TIME = 4,
+  MAP = 5,
   UNRECOGNIZED = -1,
 }
 
@@ -1477,6 +1480,9 @@ export function tabularData_ColumnTypeFromJSON(object: any): TabularData_ColumnT
     case 4:
     case "TIME":
       return TabularData_ColumnType.TIME;
+    case 5:
+    case "MAP":
+      return TabularData_ColumnType.MAP;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -1496,6 +1502,8 @@ export function tabularData_ColumnTypeToJSON(object: TabularData_ColumnType): st
       return "LIST";
     case TabularData_ColumnType.TIME:
       return "TIME";
+    case TabularData_ColumnType.MAP:
+      return "MAP";
     case TabularData_ColumnType.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
@@ -2739,6 +2747,7 @@ function createBaseProject(): Project {
     superset: undefined,
     enableDisk: false,
     enableMaterializedView: false,
+    defaultTimerange: undefined,
   };
 }
 
@@ -2806,6 +2815,9 @@ export const Project = {
     }
     if (message.enableMaterializedView !== false) {
       writer.uint32(160).bool(message.enableMaterializedView);
+    }
+    if (message.defaultTimerange !== undefined) {
+      TimeRangeLite.encode(message.defaultTimerange, writer.uint32(170).fork()).ldelim();
     }
     return writer;
   },
@@ -2950,6 +2962,13 @@ export const Project = {
 
           message.enableMaterializedView = reader.bool();
           continue;
+        case 21:
+          if (tag !== 170) {
+            break;
+          }
+
+          message.defaultTimerange = TimeRangeLite.decode(reader, reader.uint32());
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -2986,6 +3005,7 @@ export const Project = {
       enableMaterializedView: isSet(object.enableMaterializedView)
         ? globalThis.Boolean(object.enableMaterializedView)
         : false,
+      defaultTimerange: isSet(object.defaultTimerange) ? TimeRangeLite.fromJSON(object.defaultTimerange) : undefined,
     };
   },
 
@@ -3048,6 +3068,9 @@ export const Project = {
     if (message.enableMaterializedView !== false) {
       obj.enableMaterializedView = message.enableMaterializedView;
     }
+    if (message.defaultTimerange !== undefined) {
+      obj.defaultTimerange = TimeRangeLite.toJSON(message.defaultTimerange);
+    }
     return obj;
   },
 
@@ -3077,6 +3100,9 @@ export const Project = {
       : undefined;
     message.enableDisk = object.enableDisk ?? false;
     message.enableMaterializedView = object.enableMaterializedView ?? false;
+    message.defaultTimerange = (object.defaultTimerange !== undefined && object.defaultTimerange !== null)
+      ? TimeRangeLite.fromPartial(object.defaultTimerange)
+      : undefined;
     return message;
   },
 };
@@ -3171,6 +3197,7 @@ function createBaseProjectInfo(): ProjectInfo {
     superset: undefined,
     enableDisk: false,
     enableMaterializedView: false,
+    defaultTimerange: undefined,
   };
 }
 
@@ -3223,6 +3250,9 @@ export const ProjectInfo = {
     }
     if (message.enableMaterializedView !== false) {
       writer.uint32(160).bool(message.enableMaterializedView);
+    }
+    if (message.defaultTimerange !== undefined) {
+      TimeRangeLite.encode(message.defaultTimerange, writer.uint32(170).fork()).ldelim();
     }
     return writer;
   },
@@ -3332,6 +3362,13 @@ export const ProjectInfo = {
 
           message.enableMaterializedView = reader.bool();
           continue;
+        case 21:
+          if (tag !== 170) {
+            break;
+          }
+
+          message.defaultTimerange = TimeRangeLite.decode(reader, reader.uint32());
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -3359,6 +3396,7 @@ export const ProjectInfo = {
       enableMaterializedView: isSet(object.enableMaterializedView)
         ? globalThis.Boolean(object.enableMaterializedView)
         : false,
+      defaultTimerange: isSet(object.defaultTimerange) ? TimeRangeLite.fromJSON(object.defaultTimerange) : undefined,
     };
   },
 
@@ -3406,6 +3444,9 @@ export const ProjectInfo = {
     if (message.enableMaterializedView !== false) {
       obj.enableMaterializedView = message.enableMaterializedView;
     }
+    if (message.defaultTimerange !== undefined) {
+      obj.defaultTimerange = TimeRangeLite.toJSON(message.defaultTimerange);
+    }
     return obj;
   },
 
@@ -3430,6 +3471,9 @@ export const ProjectInfo = {
       : undefined;
     message.enableDisk = object.enableDisk ?? false;
     message.enableMaterializedView = object.enableMaterializedView ?? false;
+    message.defaultTimerange = (object.defaultTimerange !== undefined && object.defaultTimerange !== null)
+      ? TimeRangeLite.fromPartial(object.defaultTimerange)
+      : undefined;
     return message;
   },
 };

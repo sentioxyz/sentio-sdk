@@ -183,6 +183,7 @@ export class SuiObjectContext extends SuiAddressContext {
   constructor(
     network: SuiNetwork,
     objectId: string,
+    objectVersion: bigint,
     checkpoint: bigint,
     timestamp: Date,
     baseLabels: Labels | undefined

@@ -1,5 +1,12 @@
 // TODO extends ArgumentsFilter
-import { MoveFetchConfig, ProcessResult } from '@sentio/protos'
+import {
+  Data_AptCall,
+  Data_AptResource,
+  HandleInterval,
+  MoveAccountFetchConfig,
+  MoveFetchConfig,
+  ProcessResult
+} from '@sentio/protos'
 
 export interface EventFilter {
   type: string
@@ -45,4 +52,19 @@ export class ObjectChangeHandler<T> {
 export class ResourceChangeHandler<T> {
   handler: (call: T) => Promise<ProcessResult>
   type: string
+}
+
+export class ResourceIntervalHandler {
+  type?: string
+  versionInterval?: HandleInterval
+  timeIntervalInMinutes?: HandleInterval
+  handler: (resource: Data_AptResource) => Promise<ProcessResult>
+  fetchConfig: MoveAccountFetchConfig
+}
+
+export class TransactionIntervalHandler {
+  versionInterval?: HandleInterval
+  timeIntervalInMinutes?: HandleInterval
+  handler: (tx: Data_AptCall) => Promise<ProcessResult>
+  fetchConfig: MoveFetchConfig
 }

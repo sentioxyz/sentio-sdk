@@ -163,7 +163,8 @@ export class SuiPlugin extends Plugin {
           },
           type: handler.type || '',
           ownerType: processor.ownerType,
-          fetchConfig: handler.fetchConfig
+          resourceFetchConfig: handler.fetchConfig,
+          fetchConfig: undefined
         })
       }
 

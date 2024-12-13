@@ -9,13 +9,12 @@ import {
 } from '@aptos-labs/ts-sdk'
 
 import { AptosBindOptions, AptosNetwork } from './network.js'
-import { AptosContext, AptosResourcesContext } from './context.js'
+import { AptosContext, AptosResourcesContext, AptosTransactionContext } from './context.js'
 import { ListStateStorage, mergeProcessResults } from '@sentio/runtime'
 import {
   MoveFetchConfig,
   Data_AptResource,
   HandleInterval,
-  ProcessResult,
   Data_AptEvent,
   Data_AptCall,
   MoveAccountFetchConfig
@@ -28,11 +27,14 @@ import {
   EventHandler,
   FunctionNameAndCallFilter,
   parseMoveType,
-  ResourceChangeHandler
+  ResourceChangeHandler,
+  ResourceIntervalHandler,
+  TransactionIntervalHandler
 } from '../move/index.js'
 import { ALL_ADDRESS, Labels, PromiseOrVoid } from '../core/index.js'
 import { TypeDescriptor } from '@typemove/move'
 import { decodeResourceChange, ResourceChange } from '@typemove/aptos'
+import { GeneralTransactionResponse } from './models.js'
 
 const DEFAULT_FETCH_CONFIG: MoveFetchConfig = {
   resourceChanges: false,
@@ -54,24 +56,17 @@ type IndexConfigure = {
   // endSeqNumber?: Long
 }
 
-class ResourceHandlder {
-  type?: string
-  versionInterval?: HandleInterval
-  timeIntervalInMinutes?: HandleInterval
-  handler: (resource: Data_AptResource) => Promise<ProcessResult>
-  fetchConfig: MoveAccountFetchConfig
-}
-
-export class AptosProcessorState extends ListStateStorage<AptosBaseProcessor> {
+export class AptosProcessorState extends ListStateStorage<AptosTransactionProcessor<any, any>> {
   static INSTANCE = new AptosProcessorState()
 }
 
-export class AptosBaseProcessor {
+export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT extends AptosTransactionContext<T>> {
   readonly moduleName: string
   config: IndexConfigure
   eventHandlers: EventHandler<Data_AptEvent>[] = []
   callHandlers: CallHandler<Data_AptCall>[] = []
-  resourceHandlers: ResourceChangeHandler<Data_AptResource>[] = []
+  resourceChangeHandlers: ResourceChangeHandler<Data_AptResource>[] = []
+  transactionIntervalHandlers: TransactionIntervalHandler[] = []
   coder: MoveCoder
 
   constructor(moduleName: string, options: AptosBindOptions) {
@@ -238,7 +233,7 @@ export class AptosBaseProcessor {
     }
 
     const processor = this
-    this.resourceHandlers.push({
+    this.resourceChangeHandlers.push({
       handler: async function (data) {
         if (!data.resources || !data.version) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'resource is null')
@@ -260,12 +255,82 @@ export class AptosBaseProcessor {
     return this
   }
 
+  protected onInterval(
+    handler: (transaction: T, ctx: CT) => PromiseOrVoid,
+    timeInterval: HandleInterval | undefined,
+    versionInterval: HandleInterval | undefined,
+    fetchConfig: Partial<MoveFetchConfig> | undefined
+  ): this {
+    const processor = this
+    this.transactionIntervalHandlers.push({
+      handler: async function (data) {
+        const transaction = data.transaction as T
+        const timestampMicros = BigInt(transaction.timestamp)
+        if (timestampMicros > Number.MAX_SAFE_INTEGER) {
+          throw new ServerError(Status.INVALID_ARGUMENT, 'timestamp is too large')
+        }
+
+        const ctx = new AptosTransactionContext(
+          processor.moduleName,
+          processor.config.network,
+          processor.config.address,
+          BigInt(transaction.version),
+          transaction,
+          0,
+          processor.config.baseLabels
+        )
+        await handler(transaction, ctx as CT)
+        return ctx.stopAndGetResult()
+      },
+      timeIntervalInMinutes: timeInterval,
+      versionInterval: versionInterval,
+      fetchConfig: { ...DEFAULT_FETCH_CONFIG, ...fetchConfig }
+    })
+    return this
+  }
+
+  public onTimeInterval(
+    handler: (transaction: T, ctx: CT) => PromiseOrVoid,
+    timeIntervalInMinutes = 60,
+    backfillTimeIntervalInMinutes = 240,
+    fetchConfig?: Partial<MoveFetchConfig>
+  ): this {
+    return this.onInterval(
+      handler,
+      {
+        recentInterval: timeIntervalInMinutes,
+        backfillInterval: backfillTimeIntervalInMinutes
+      },
+      undefined,
+      fetchConfig
+    )
+  }
+
+  public onVersionInterval(
+    handler: (transaction: T, context: CT) => PromiseOrVoid,
+    versionInterval = 100000,
+    backfillVersionInterval = 400000,
+    fetchConfig?: Partial<MoveFetchConfig>
+  ): this {
+    return this.onInterval(
+      handler,
+      undefined,
+      { recentInterval: versionInterval, backfillInterval: backfillVersionInterval },
+      fetchConfig
+    )
+  }
+
   getChainId(): string {
     return this.config.network
   }
 }
 
-export class AptosModulesProcessor extends AptosBaseProcessor {
+export class AptosBaseProcessor extends AptosTransactionProcessor<UserTransactionResponse, AptosContext> {}
+
+export class AptosModulesProcessor extends AptosTransactionProcessor<
+  GeneralTransactionResponse,
+  AptosTransactionContext<GeneralTransactionResponse>
+> {
   private constructor(options: AptosBindOptions) {
     super(ALL_ADDRESS, options)
   }
@@ -278,7 +343,7 @@ export class AptosModulesProcessor extends AptosBaseProcessor {
 export class AptosGlobalProcessor {
   private baseProcessor
   private constructor(options: AptosBindOptions) {
-    this.baseProcessor = new AptosBaseProcessor('*', options)
+    this.baseProcessor = new AptosTransactionProcessor('*', options)
   }
 
   static bind(options: AptosBindOptions): AptosGlobalProcessor {
@@ -293,6 +358,32 @@ export class AptosGlobalProcessor {
     this.baseProcessor.onTransaction(handler, includedFailed, fetchConfig)
     return this
   }
+
+  public onTimeInterval(
+    handler: (
+      transaction: GeneralTransactionResponse,
+      ctx: AptosTransactionContext<GeneralTransactionResponse>
+    ) => PromiseOrVoid,
+    timeIntervalInMinutes = 60,
+    backfillTimeIntervalInMinutes = 240,
+    fetchConfig?: Partial<MoveFetchConfig>
+  ): this {
+    this.baseProcessor.onTimeInterval(handler, timeIntervalInMinutes, backfillTimeIntervalInMinutes, fetchConfig)
+    return this
+  }
+
+  public onVersionInterval(
+    handler: (
+      transaction: GeneralTransactionResponse,
+      ctx: AptosTransactionContext<GeneralTransactionResponse>
+    ) => PromiseOrVoid,
+    versionInterval = 100000,
+    backfillVersionInterval = 400000,
+    fetchConfig?: Partial<MoveFetchConfig>
+  ): this {
+    this.baseProcessor.onVersionInterval(handler, versionInterval, backfillVersionInterval, fetchConfig)
+    return this
+  }
 }
 
 export class AptosResourceProcessorState extends ListStateStorage<AptosResourcesProcessor> {
@@ -302,7 +393,7 @@ export class AptosResourceProcessorState extends ListStateStorage<AptosResources
 export class AptosResourcesProcessor {
   config: IndexConfigure
 
-  resourcesHandlers: ResourceHandlder[] = []
+  resourceIntervalHandlers: ResourceIntervalHandler[] = []
 
   static bind(options: AptosBindOptions): AptosResourcesProcessor {
     return new AptosResourcesProcessor(options)
@@ -325,7 +416,7 @@ export class AptosResourcesProcessor {
     fetchConfig: Partial<MoveAccountFetchConfig> | undefined
   ): this {
     const processor = this
-    this.resourcesHandlers.push({
+    this.resourceIntervalHandlers.push({
       handler: async function (data) {
         if (data.timestampMicros > Number.MAX_SAFE_INTEGER) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'timestamp is too large')
@@ -394,7 +485,7 @@ export class AptosResourcesProcessor {
     }
 
     const processor = this
-    this.resourcesHandlers.push({
+    this.resourceIntervalHandlers.push({
       fetchConfig: DEFAULT_RESOURCE_FETCH_CONFIG,
       handler: async function (data) {
         const timestamp = Number(data.timestampMicros)

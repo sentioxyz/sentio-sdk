@@ -1,6 +1,21 @@
-import { Event, MoveResource, EntryFunctionPayloadResponse } from '@aptos-labs/ts-sdk'
-
 import { DecodedStruct } from '@typemove/move'
+import {
+  Event,
+  MoveResource,
+  EntryFunctionPayloadResponse,
+  UserTransactionResponse,
+  BlockMetadataTransactionResponse,
+  StateCheckpointTransactionResponse,
+  ValidatorTransactionResponse,
+  BlockEpilogueTransactionResponse
+} from '@aptos-labs/ts-sdk'
+
+export type GeneralTransactionResponse =
+  | UserTransactionResponse
+  | BlockMetadataTransactionResponse
+  | StateCheckpointTransactionResponse
+  | ValidatorTransactionResponse
+  | BlockEpilogueTransactionResponse
 
 export type TypedEventInstance<T> = DecodedStruct<Event, T>
 export type TypedMoveResource<T> = DecodedStruct<MoveResource, T>
