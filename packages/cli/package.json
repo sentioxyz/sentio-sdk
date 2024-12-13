@@ -24,8 +24,8 @@
   "types": "module",
   "dependencies": {
     "@aptos-labs/ts-sdk": "~1.33.0",
-    "@mysten/sui": "~1.16.2",
-    "@sentio/chain": "^2.3.4",
+    "@mysten/sui": "~1.17.0",
+    "@sentio/chain": "~2.3.7",
     "@sentio/graph-cli": "^0.80.0-patch.1",
     "@types/node": "^22.8.6",
     "chalk": "^5.3.0",

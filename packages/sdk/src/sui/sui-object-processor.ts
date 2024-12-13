@@ -344,7 +344,7 @@ export class SuiObjectTypeProcessor<T> extends SuiBaseObjectOrAddressProcessor<
   }
 }
 
-export class SuiWrappedObjectProcessor extends SuiBaseObjectOrAddressProcessor<
+export class SuiWrappedObjectProcessor extends SuiBaseObjectOrAddressProcessorInternal<
   (dynamicFieldObjects: SuiMoveObject[], ctx: SuiObjectContext) => PromiseOrVoid
 > {
   static bind(options: SuiObjectBindOptions): SuiWrappedObjectProcessor {

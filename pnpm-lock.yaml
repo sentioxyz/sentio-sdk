@@ -218,12 +218,9 @@ importers:
       prettier:
         specifier: ^3.2.4
         version: 3.3.2
-      tslib:
-        specifier: ^2.6.2
-        version: 2.6.3
       typedoc:
-        specifier: ^0.26.0
-        version: 0.26.2(typescript@5.5.2)
+        specifier: ^0.27.0
+        version: 0.27.4(typescript@5.5.2)
 
   packages/cli:
     dependencies:
@@ -231,11 +228,11 @@ importers:
         specifier: ~1.33.0
         version: 1.33.0
       '@mysten/sui':
-        specifier: ~1.16.2
-        version: 1.16.2(typescript@5.5.2)
+        specifier: ~1.17.0
+        version: 1.17.0(typescript@5.5.2)
       '@sentio/chain':
-        specifier: ^2.3.4
-        version: 2.3.4
+        specifier: ~2.3.7
+        version: 2.3.7
       '@sentio/graph-cli':
         specifier: ^0.80.0-patch.1
         version: 0.80.0-patch.1(@types/node@22.8.6)(bufferutil@4.0.8)(encoding@0.1.13)(node-fetch@3.3.2)(typescript@5.5.2)(utf-8-validate@5.0.10)
@@ -522,8 +519,8 @@ importers:
         specifier: ^0.97.0
         version: 0.97.0(encoding@0.1.13)
       '@mysten/sui':
-        specifier: ~1.16.2
-        version: 1.16.2(typescript@5.5.2)
+        specifier: ~1.17.0
+        version: 1.17.0(typescript@5.5.2)
       '@prettier/sync':
         specifier: ^0.5.2
         version: 0.5.2(prettier@3.3.2)
@@ -537,8 +534,8 @@ importers:
         specifier: 9.1.1-patch.3
         version: 9.1.1-patch.3
       '@sentio/chain':
-        specifier: ^2.3.4
-        version: 2.3.4
+        specifier: ~2.3.7
+        version: 2.3.7
       '@sentio/ethers-v6':
         specifier: ^1.0.29
         version: 1.0.29(@sentio/ethers@6.13.1-patch.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typescript@5.5.2)
@@ -552,14 +549,14 @@ importers:
         specifier: 1.95.8
         version: 1.95.8(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
       '@typemove/aptos':
-        specifier: ~1.8.1
-        version: 1.8.1
+        specifier: ~1.8.2
+        version: 1.8.2
       '@typemove/move':
-        specifier: ~1.8.1
-        version: 1.8.1
+        specifier: ~1.8.2
+        version: 1.8.2
       '@typemove/sui':
-        specifier: ~1.8.1
-        version: 1.8.1(typescript@5.5.2)
+        specifier: ~1.8.2
+        version: 1.8.2(typescript@5.5.2)
       bs58:
         specifier: ^5.0.0
         version: 5.0.0
@@ -634,8 +631,8 @@ importers:
         specifier: ^3.2.4
         version: 3.3.2
       typedoc:
-        specifier: ^0.26.0
-        version: 0.26.2(typescript@5.5.2)
+        specifier: ^0.27.0
+        version: 0.27.4(typescript@5.5.2)
 
 packages:
 
@@ -1168,6 +1165,9 @@ packages:
   '@fuels/vm-asm@0.58.2':
     resolution: {integrity: sha512-1/5azTzKJP508BXbZvM6Y0V5bCCX5JgEnd/8mXdBFmFvNLOhiYbwb25yk26auqOokfBXvthSkdkrvipEFft6jQ==}
 
+  '@gerrit0/mini-shiki@1.24.3':
+    resolution: {integrity: sha512-odxt2MTJvlT5NUmGOPXz5OW4D8SFL2+KeXBkmjVtdOXfA5aRZX6jgP/17jp6wu2r3KdW0wx3Bk5HDehgeV1Yng==}
+
   '@gql.tada/cli-utils@1.6.3':
     resolution: {integrity: sha512-jFFSY8OxYeBxdKi58UzeMXG1tdm4FVjXa8WHIi66Gzu9JWtCE6mqom3a8xkmSw+mVaybFW5EN2WXf1WztJVNyQ==}
     peerDependencies:
@@ -1255,8 +1255,8 @@ packages:
   '@mysten/bcs@1.2.0':
     resolution: {integrity: sha512-LuKonrGdGW7dq/EM6U2L9/as7dFwnhZnsnINzB/vu08Xfrj0qzWwpLOiXagAa5yZOPLK7anRZydMonczFkUPzA==}
 
-  '@mysten/sui@1.16.2':
-    resolution: {integrity: sha512-1Nfm7iTs3IVsiCXFPrnci9Y7fP9ldtwNOTe7JRkaHTg58VRhSe/nhHOvt6UsYiswVPUBqlsSF73KER5MpirCvw==}
+  '@mysten/sui@1.17.0':
+    resolution: {integrity: sha512-vL6QrH3l10dTatimPmz/feqMbYfEjvh8MPf3Xwn5tjuwDwBCS0ha1kdN+4vUpu6t0aCFviK+Df/vanORS8cbGQ==}
     engines: {node: '>=18'}
 
   '@noble/curves@1.2.0':
@@ -1732,8 +1732,8 @@ packages:
   '@sentio/bigdecimal@9.1.1-patch.3':
     resolution: {integrity: sha512-O5w8XdyeatUcwI+ZbpSw60/cXFPJk3NbpIupwMHfYmW8fpxpXyRbyGESNJNufWWrB6CadsWGh1R3rd7owvrmlw==}
 
-  '@sentio/chain@2.3.4':
-    resolution: {integrity: sha512-0u4wmbdQftmd5xCz8hJNEWz3Z1veBWecYXjYl7YaVZ0dgDeQmYTr/NtVW0CYvvT2BvVsl6uKkjR8L0U7/3QWdQ==}
+  '@sentio/chain@2.3.7':
+    resolution: {integrity: sha512-bEo8rExNdCltrl6R1qJZHDdmWkWvHDxTnhGFkrww3ZuMuLweuIMWMqiXxDQ6FzOqMyK5a2/vrpgcaAvy2px0lQ==}
 
   '@sentio/ethers-v6@1.0.29':
     resolution: {integrity: sha512-/4jZZn+eM3EfI0bUMBAf5vu8muy8ABptu8ucFoMDTZLLTjxcSKRffLP3RL7w1JHGjyC2V6oEQfwS4cn9JEohHQ==}
@@ -1769,8 +1769,18 @@ packages:
       typescript:
         optional: true
 
-  '@shikijs/core@1.9.1':
-    resolution: {integrity: sha512-EmUful2MQtY8KgCF1OkBtOuMcvaZEvmdubhW0UHCGXi21O9dRLeADVCj+k6ZS+de7Mz9d2qixOXJ+GLhcK3pXg==}
+  '@shikijs/engine-oniguruma@1.24.2':
+    resolution: {integrity: sha512-ZN6k//aDNWRJs1uKB12pturKHh7GejKugowOFGAuG7TxDRLod1Bd5JhpOikOiFqPmKjKEPtEA6mRCf7q3ulDyQ==}
+
+  '@shikijs/types@1.24.2':
+    resolution: {integrity: sha512-bdeWZiDtajGLG9BudI0AHet0b6e7FbR0EsE4jpGaI0YwHm/XJunI9+3uZnzFtX65gsyJ6ngCIWUfA4NWRPnBkQ==}
+
+  '@shikijs/vscode-textmate@9.3.1':
+    resolution: {integrity: sha512-79QfK1393x9Ho60QFyLti+QfdJzRQCVLFb97kOIV7Eo9vQU/roINgk7m24uv0a7AUvN//RDH36FLjjK48v0s9g==}
+
+  '@simplewebauthn/typescript-types@7.4.0':
+    resolution: {integrity: sha512-8/ZjHeUPe210Bt5oyaOIGx4h8lHdsQs19BiOT44gi/jBEgK7uBGA0Fy7NRsyh777al3m6WM0mBf0UR7xd4R7WQ==}
+    deprecated: This package has been renamed to @simplewebauthn/types. Please install @simplewebauthn/types instead to ensure you receive future updates.
 
   '@sindresorhus/is@4.6.0':
     resolution: {integrity: sha512-t09vSN3MdfsyCHoFcTRCH/iUtG7OJ0CsjzB8cjAmKc/va/kIgeDI/TxsigdncE/4be734m0cvIYwNaV4i2XqAw==}
@@ -1816,15 +1826,15 @@ packages:
   '@tsconfig/node16@1.0.4':
     resolution: {integrity: sha512-vxhUy4J8lyeyinH7Azl1pdd43GJhZH/tP2weN8TntQblOY+A0XbT8DJk1/oCPuOOyg/Ja757rG0CgHcWC8OfMA==}
 
-  '@typemove/aptos@1.8.1':
-    resolution: {integrity: sha512-i+rx8D9LoPcBCKSp1ytN+ZNjgenPV9JsbIV/nkl3m2mcuIQzAY0QHXvZMUNKqsAYrISG0t6KtbGe50XP6isX5w==}
+  '@typemove/aptos@1.8.2':
+    resolution: {integrity: sha512-bEHkTqhVSlgrnqCyo6uPu/JWwAUjVwy4e8IUGCp7kTBOi4YVdKmfdE9nJWcLW4CS+U55eDRZlE2TtI2QMW7oaA==}
     hasBin: true
 
-  '@typemove/move@1.8.1':
-    resolution: {integrity: sha512-bORBIT4CQ8UdkJvEixkoZtYkU4OggHe8kBb26qAN63F+E+d899PIFjctnAqUuEjpzFZ1N5qQk8vzIXuVZun0yA==}
+  '@typemove/move@1.8.2':
+    resolution: {integrity: sha512-o/v61iaraK5XML6U3mzPx31DmOHI85f/h3bTHZHyZZUarjwHyp6WG1hvXJDaELOC+uTyT5BuP3idSN9gSBpVxw==}
 
-  '@typemove/sui@1.8.1':
-    resolution: {integrity: sha512-uUyhPwljWSYfqfuv3Av0/nnhItl6KyU+S69QByj/ltQc6jepBCkYXwUYLdq3nwUVyBPVx3M4cNa1NF0l2rMJzQ==}
+  '@typemove/sui@1.8.2':
+    resolution: {integrity: sha512-0uGR/30jxtFQ8OaAZVKGBFeDi9N83AYBBEzE9IKlMZzcUiqm5J6xS6xDKEZw27tqwbghryZydV8Sc7U45Dwdfg==}
     hasBin: true
 
   '@types/bn.js@5.1.5':
@@ -1877,6 +1887,9 @@ packages:
 
   '@types/google-protobuf@3.15.12':
     resolution: {integrity: sha512-40um9QqwHjRS92qnOaDpL7RmDK15NuZYo9HihiJRbYkMQZlWnuH8AdvbMy8/o6lgLmKbDUKa+OALCltHdbOTpQ==}
+
+  '@types/hast@3.0.4':
+    resolution: {integrity: sha512-WPs+bbQw5aCj+x6laNGWLH3wviHtoCv/P3+otBhbOhJgG8qtpdAMlTCxLtsTWA7LH1Oh/bFCHsBn0TPS5m30EQ==}
 
   '@types/http-cache-semantics@4.0.4':
     resolution: {integrity: sha512-1m0bIFVc7eJWyve9S0RnuRgcQqF/Xd5QsUZAZeQFr1Q3/p9JWoQQEqmVy+DPTNpGXwhgIetAoYF8JSc33q29QA==}
@@ -1958,6 +1971,9 @@ packages:
 
   '@types/triple-beam@1.3.5':
     resolution: {integrity: sha512-6WaYesThRMCl19iryMYP7/x2OVgCtbIVflDGFpWnb9irXI3UjYE4AzmYuiUKY1AJstGijoY+MgUszMgRxIYTYw==}
+
+  '@types/unist@3.0.3':
+    resolution: {integrity: sha512-ko/gIFJRv177XgZsZcBwnqJN5x/Gien8qNOn0D5bQU/zAzVf9Zt3BlcUiLqhV9y4ARk0GbT3tnUiPNgnTXzc/Q==}
 
   '@types/uuid@8.3.4':
     resolution: {integrity: sha512-c/I8ZRb51j+pYGAu5CrFMRxqZ2ke4y2grEBO5AUjgSkSk+qT2Ea+OdWElz/OiMf5MNpn2b17kuVBwZLQJXzihw==}
@@ -5592,9 +5608,6 @@ packages:
   shellac@0.8.0:
     resolution: {integrity: sha512-M3F2vzYIM7frKOs0+kgs/ITMlXhGpgtqs9HxDPciz3bckzAqqfd4LrBn+CCmSbICyJS+Jz5UDkmkR1jE+m+g+Q==}
 
-  shiki@1.9.1:
-    resolution: {integrity: sha512-8PDkgb5ja3nfujTjvC4VytL6wGOGCtFAClUb2r3QROevYXxcq+/shVJK5s6gy0HZnjaJgFxd6BpPqpRfqne5rA==}
-
   shimmer@1.2.1:
     resolution: {integrity: sha512-sQTKC1Re/rM6XyFM6fIAGHRPVGvyXfgzIDvzoq608vM+jeyVD0Tu1E6Np0Kc2zAIFWIj963V2800iF/9LPieQw==}
 
@@ -6115,12 +6128,12 @@ packages:
   typedarray@0.0.6:
     resolution: {integrity: sha512-/aCDEGatGvZ2BIk+HmLf4ifCJFwvKFNb9/JeZPMulfgFracn9QFcAf5GO8B/mweUjSoblS5In0cWhqpfs/5PQA==}
 
-  typedoc@0.26.2:
-    resolution: {integrity: sha512-q/t+M+PZqhN9gPWLBZ3CCvP+KT8O1tyYkSzEYbcQ6mo89avdIrMlBEl3vfo5BgSzwC6Lbmq0W64E8RkY+eVsLA==}
+  typedoc@0.27.4:
+    resolution: {integrity: sha512-wXPQs1AYC2Crk+1XFpNuutLIkNWleokZf1UNf/X8w9KsMnirkvT+LzxTXDvfF6ug3TSLf3Xu5ZXRKGfoXPX7IA==}
     engines: {node: '>= 18'}
     hasBin: true
     peerDependencies:
-      typescript: 4.6.x || 4.7.x || 4.8.x || 4.9.x || 5.0.x || 5.1.x || 5.2.x || 5.3.x || 5.4.x || 5.5.x
+      typescript: 5.0.x || 5.1.x || 5.2.x || 5.3.x || 5.4.x || 5.5.x || 5.6.x || 5.7.x
 
   typescript-eslint@8.0.0:
     resolution: {integrity: sha512-yQWBJutWL1PmpmDddIOl9/Mi6vZjqNCjqSGBMQ4vsc2Aiodk0SnbQQWPXbSy0HNuKCuGkw1+u4aQ2mO40TdhDQ==}
@@ -6386,6 +6399,11 @@ packages:
 
   yaml@2.4.5:
     resolution: {integrity: sha512-aBx2bnqDzVOyNKfsysjA2ms5ZlnjSAW2eG3/L5G/CSujfjLJTJsEw1bGw8kCf04KodQWk1pxlGnZ56CRxiawmg==}
+    engines: {node: '>= 14'}
+    hasBin: true
+
+  yaml@2.6.1:
+    resolution: {integrity: sha512-7r0XPzioN/Q9kXBro/XPnA6kznR73DHq+GXh5ON7ZozRO6aMjbmiBuKste2wslTFkC5d1dw0GooOCepZXJ2SAg==}
     engines: {node: '>= 14'}
     hasBin: true
 
@@ -7011,6 +7029,12 @@ snapshots:
 
   '@fuels/vm-asm@0.58.2': {}
 
+  '@gerrit0/mini-shiki@1.24.3':
+    dependencies:
+      '@shikijs/engine-oniguruma': 1.24.2
+      '@shikijs/types': 1.24.2
+      '@shikijs/vscode-textmate': 9.3.1
+
   '@gql.tada/cli-utils@1.6.3(@0no-co/graphqlsp@1.12.16(graphql@16.9.0)(typescript@5.5.2))(graphql@16.9.0)(typescript@5.5.2)':
     dependencies:
       '@0no-co/graphqlsp': 1.12.16(graphql@16.9.0)(typescript@5.5.2)
@@ -7097,7 +7121,7 @@ snapshots:
     dependencies:
       bs58: 6.0.0
 
-  '@mysten/sui@1.16.2(typescript@5.5.2)':
+  '@mysten/sui@1.17.0(typescript@5.5.2)':
     dependencies:
       '@graphql-typed-document-node/core': 3.2.0(graphql@16.9.0)
       '@mysten/bcs': 1.2.0
@@ -7105,6 +7129,7 @@ snapshots:
       '@noble/hashes': 1.5.0
       '@scure/bip32': 1.4.0
       '@scure/bip39': 1.3.0
+      '@simplewebauthn/typescript-types': 7.4.0
       '@suchipi/femver': 1.0.0
       bech32: 2.0.0
       gql.tada: 1.8.10(graphql@16.9.0)(typescript@5.5.2)
@@ -7744,7 +7769,7 @@ snapshots:
 
   '@sentio/bigdecimal@9.1.1-patch.3': {}
 
-  '@sentio/chain@2.3.4': {}
+  '@sentio/chain@2.3.7': {}
 
   '@sentio/ethers-v6@1.0.29(@sentio/ethers@6.13.1-patch.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typescript@5.5.2)':
     dependencies:
@@ -7833,7 +7858,19 @@ snapshots:
       - tsx
       - yaml
 
-  '@shikijs/core@1.9.1': {}
+  '@shikijs/engine-oniguruma@1.24.2':
+    dependencies:
+      '@shikijs/types': 1.24.2
+      '@shikijs/vscode-textmate': 9.3.1
+
+  '@shikijs/types@1.24.2':
+    dependencies:
+      '@shikijs/vscode-textmate': 9.3.1
+      '@types/hast': 3.0.4
+
+  '@shikijs/vscode-textmate@9.3.1': {}
+
+  '@simplewebauthn/typescript-types@7.4.0': {}
 
   '@sindresorhus/is@4.6.0': {}
 
@@ -7887,10 +7924,10 @@ snapshots:
 
   '@tsconfig/node16@1.0.4': {}
 
-  '@typemove/aptos@1.8.1':
+  '@typemove/aptos@1.8.2':
     dependencies:
       '@aptos-labs/ts-sdk': 1.33.0
-      '@typemove/move': 1.8.1
+      '@typemove/move': 1.8.2
       chalk: 5.3.0
       commander: 12.1.0
       prettier: 3.3.2
@@ -7898,14 +7935,14 @@ snapshots:
     transitivePeerDependencies:
       - debug
 
-  '@typemove/move@1.8.1':
+  '@typemove/move@1.8.2':
     dependencies:
       radash: 12.1.0
 
-  '@typemove/sui@1.8.1(typescript@5.5.2)':
+  '@typemove/sui@1.8.2(typescript@5.5.2)':
     dependencies:
-      '@mysten/sui': 1.16.2(typescript@5.5.2)
-      '@typemove/move': 1.8.1
+      '@mysten/sui': 1.17.0(typescript@5.5.2)
+      '@typemove/move': 1.8.2
       chalk: 5.3.0
       commander: 12.1.0
       prettier: 3.3.2
@@ -7984,6 +8021,10 @@ snapshots:
 
   '@types/google-protobuf@3.15.12': {}
 
+  '@types/hast@3.0.4':
+    dependencies:
+      '@types/unist': 3.0.3
+
   '@types/http-cache-semantics@4.0.4': {}
 
   '@types/http-errors@2.0.4': {}
@@ -8056,6 +8097,8 @@ snapshots:
   '@types/shimmer@1.2.0': {}
 
   '@types/triple-beam@1.3.5': {}
+
+  '@types/unist@3.0.3': {}
 
   '@types/uuid@8.3.4': {}
 
@@ -12176,10 +12219,6 @@ snapshots:
     dependencies:
       reghex: 1.0.2
 
-  shiki@1.9.1:
-    dependencies:
-      '@shikijs/core': 1.9.1
-
   shimmer@1.2.1: {}
 
   side-channel@1.0.6:
@@ -12774,14 +12813,14 @@ snapshots:
 
   typedarray@0.0.6: {}
 
-  typedoc@0.26.2(typescript@5.5.2):
+  typedoc@0.27.4(typescript@5.5.2):
     dependencies:
+      '@gerrit0/mini-shiki': 1.24.3
       lunr: 2.3.9
       markdown-it: 14.1.0
       minimatch: 9.0.5
-      shiki: 1.9.1
       typescript: 5.5.2
-      yaml: 2.4.5
+      yaml: 2.6.1
 
   typescript-eslint@8.0.0(eslint@9.6.0)(typescript@5.5.2):
     dependencies:
@@ -13026,6 +13065,8 @@ snapshots:
   yaml@1.10.2: {}
 
   yaml@2.4.5: {}
+
+  yaml@2.6.1: {}
 
   yargs-parser@20.2.9: {}
 
