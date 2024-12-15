@@ -45,7 +45,7 @@ export class RichAptosClientWithContext extends RichAptosClient {
   }
 
   private transformArgs<T extends { options?: LedgerVersionArg }>(args: T): T {
-    if (args.options?.ledgerVersion) {
+    if (!args.options?.ledgerVersion) {
       args.options = {
         ...args.options,
         ledgerVersion: this.ctx.version
