@@ -140,17 +140,18 @@ export class SuiPlugin extends Plugin {
         chainId: processor.getChainId(),
         startBlock: processor.config.startCheckpoint // TODO maybe use another field
       })
+
+      for (const handler of processor.objectChangeHandlers) {
+        const handlerId = handlers.suiObjectChangeHandlers.push(handler.handler) - 1
+        const objectChangeHandler: MoveResourceChangeConfig = {
+          type: handler.type,
+          handlerId
+        }
+        accountConfig.moveResourceChangeConfigs.push(objectChangeHandler)
+      }
+
       for (const handler of processor.objectHandlers) {
         const handlerId = handlers.suiObjectHandlers.push(handler.handler) - 1
-
-        for (const handler of processor.objectChangeHandlers) {
-          const handlerId = handlers.suiObjectChangeHandlers.push(handler.handler) - 1
-          const objectChangeHandler: MoveResourceChangeConfig = {
-            type: handler.type,
-            handlerId
-          }
-          accountConfig.moveResourceChangeConfigs.push(objectChangeHandler)
-        }
 
         accountConfig.moveIntervalConfigs.push({
           intervalConfig: {

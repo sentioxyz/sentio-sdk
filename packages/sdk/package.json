@@ -24,6 +24,7 @@
     "./aptos/builtin": "./lib/aptos/builtin/index.js",
     "./aptos/builtin/0x1": "./lib/aptos/builtin/0x1.js",
     "./aptos/builtin/0x3": "./lib/aptos/builtin/0x3.js",
+    "./aptos/builtin/0x4": "./lib/aptos/builtin/0x4.js",
     "./solana": "./lib/solana/index.js",
     "./solana/builtin": "./lib/solana/builtin/index.js",
     "./solana/codegen": "./lib/solana/codegen/index.js",

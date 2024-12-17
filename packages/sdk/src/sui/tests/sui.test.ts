@@ -23,27 +23,31 @@ describe('Test Sui Example', () => {
       ctx.meter.Gauge('size').record(objects.length)
     })
 
-    SuiObjectTypeProcessor.bind({ objectType: validator.Validator.type() }).onTimeInterval(
-      (self, objects, ctx) => {
-        ctx.meter
-          .Gauge('validator')
-          .record(self.data_decoded.voting_power, { address: self.data_decoded.metadata.primary_address })
-      },
-      60,
-      60,
-      { owned: false }
-    )
+    SuiObjectTypeProcessor.bind({ objectType: validator.Validator.type() })
+      .onTimeInterval(
+        (self, objects, ctx) => {
+          ctx.meter
+            .Gauge('validator')
+            .record(self.data_decoded.voting_power, { address: self.data_decoded.metadata.primary_address })
+        },
+        60,
+        60,
+        { owned: false }
+      )
+      .onObjectChange((self, ctx) => {})
   })
 
   before(async () => {
     await service.start({ templateInstances: [] })
   })
 
-  test('check configuration ', async () => {
+  test('check configuration', async () => {
     const config = await service.getConfig({})
     expect(config.contractConfigs).length(2)
     expect(config.accountConfigs).length(2)
     expect(config.accountConfigs[0].moveIntervalConfigs[0].ownerType).eq(MoveOwnerType.OBJECT)
+    expect(config.accountConfigs[1].moveIntervalConfigs[0].ownerType).eq(MoveOwnerType.TYPE)
+    expect(config.accountConfigs[1].moveResourceChangeConfigs[0].type).eq(validator.Validator.type().qname)
   })
 
   test('Check event dispatch', async () => {
