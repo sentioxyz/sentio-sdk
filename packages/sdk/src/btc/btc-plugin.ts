@@ -73,6 +73,7 @@ export class BTCPlugin extends Plugin {
           minutes: 0,
           minutesInterval: blockHandler.timeIntervalInMinutes,
           handlerId,
+          handlerName: blockHandler.handlerName,
           fetchConfig: {
             transaction: blockHandler.fetchConfig?.getTransactions ?? false,
             trace: false,

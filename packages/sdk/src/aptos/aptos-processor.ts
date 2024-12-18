@@ -35,6 +35,7 @@ import { ALL_ADDRESS, Labels, PromiseOrVoid } from '../core/index.js'
 import { TypeDescriptor } from '@typemove/move'
 import { decodeResourceChange, ResourceChange } from '@typemove/aptos'
 import { GeneralTransactionResponse } from './models.js'
+import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 
 const DEFAULT_FETCH_CONFIG: MoveFetchConfig = {
   resourceChanges: false,
@@ -263,6 +264,7 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
   ): this {
     const processor = this
     this.transactionIntervalHandlers.push({
+      handlerName: getHandlerName(),
       handler: async function (data) {
         const transaction = data.transaction as T
         const timestampMicros = BigInt(transaction.timestamp)
@@ -402,6 +404,8 @@ export class AptosResourcesProcessor {
   protected constructor(options: AptosBindOptions) {
     this.config = configure(options)
     AptosResourceProcessorState.INSTANCE.addValue(this)
+
+    return proxyProcessor(this)
   }
 
   getChainId(): string {
@@ -417,6 +421,7 @@ export class AptosResourcesProcessor {
   ): this {
     const processor = this
     this.resourceIntervalHandlers.push({
+      handlerName: getHandlerName(),
       handler: async function (data) {
         if (data.timestampMicros > Number.MAX_SAFE_INTEGER) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'timestamp is too large')
@@ -487,6 +492,7 @@ export class AptosResourcesProcessor {
     const processor = this
     this.resourceIntervalHandlers.push({
       fetchConfig: DEFAULT_RESOURCE_FETCH_CONFIG,
+      handlerName: getHandlerName(),
       handler: async function (data) {
         const timestamp = Number(data.timestampMicros)
 

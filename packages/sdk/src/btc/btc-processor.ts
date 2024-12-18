@@ -4,6 +4,7 @@ import { Data_BTCBlock, Data_BTCTransaction, HandleInterval, ProcessResult } fro
 import { TransactionFilters } from './filter.js'
 import { PromiseOrVoid } from '../core/index.js'
 import { ServerError, Status } from 'nice-grpc'
+import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 
 export class BTCProcessorState extends ListStateStorage<BTCProcessor> {
   static INSTANCE = new BTCProcessorState()
@@ -13,7 +14,9 @@ export class BTCProcessor {
   callHandlers: CallHandler<Data_BTCTransaction>[] = []
   blockHandlers: BlockHandler[] = []
 
-  constructor(readonly config: BTCProcessorConfig) {}
+  constructor(readonly config: BTCProcessorConfig) {
+    return proxyProcessor(this)
+  }
 
   static bind(config: BTCProcessorConfig): BTCProcessor {
     const processor = new BTCProcessor(config)
@@ -61,6 +64,7 @@ export class BTCProcessor {
     this.blockHandlers.push({
       blockInterval,
       timeIntervalInMinutes: timeInterval,
+      handlerName: getHandlerName(),
       handler: async function (data: Data_BTCBlock) {
         const header = data.block
         if (!header) {

@@ -18,6 +18,7 @@ import { CallHandler, TransactionFilter, accountTypeString, ObjectChangeHandler 
 import { ServerError, Status } from 'nice-grpc'
 import { TypeDescriptor } from '@typemove/move'
 import { TypedSuiMoveObject } from './models.js'
+import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 
 export interface SuiObjectBindOptions {
   objectId: string
@@ -39,6 +40,7 @@ interface ObjectHandler {
   timeIntervalInMinutes?: HandleInterval
   fetchConfig: MoveAccountFetchConfig
   handler: (resource: Data_SuiObject) => Promise<ProcessResult>
+  handlerName: string
 }
 
 export const DEFAULT_ACCOUNT_FETCH_CONFIG: MoveAccountFetchConfig = {
@@ -78,6 +80,8 @@ export abstract class SuiBaseObjectOrAddressProcessor<HandlerType> {
     }
     this.ownerType = options.ownerType
     SuiAccountProcessorState.INSTANCE.addValue(this)
+
+    return proxyProcessor(this)
   }
 
   getChainId(): string {
@@ -97,6 +101,7 @@ export abstract class SuiBaseObjectOrAddressProcessor<HandlerType> {
   ): this {
     const processor = this
     this.objectHandlers.push({
+      handlerName: getHandlerName(),
       handler: async function (data) {
         const ctx = new SuiObjectContext(
           processor.config.network,

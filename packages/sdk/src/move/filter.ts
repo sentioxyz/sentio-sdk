@@ -59,6 +59,7 @@ export class ResourceIntervalHandler {
   versionInterval?: HandleInterval
   timeIntervalInMinutes?: HandleInterval
   handler: (resource: Data_AptResource) => Promise<ProcessResult>
+  handlerName: string
   fetchConfig: MoveAccountFetchConfig
 }
 
@@ -66,5 +67,6 @@ export class TransactionIntervalHandler {
   versionInterval?: HandleInterval
   timeIntervalInMinutes?: HandleInterval
   handler: (tx: Data_AptCall) => Promise<ProcessResult>
+  handlerName: string
   fetchConfig: MoveFetchConfig
 }

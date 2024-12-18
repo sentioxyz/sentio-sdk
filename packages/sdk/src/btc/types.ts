@@ -124,6 +124,7 @@ export type BlockHandler = {
   blockInterval?: HandleInterval
   timeIntervalInMinutes?: HandleInterval
   handler: (block: Data_BTCBlock) => Promise<ProcessResult>
+  handlerName: string
   fetchConfig?: BTCOnIntervalFetchConfig
 }
 

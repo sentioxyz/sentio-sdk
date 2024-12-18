@@ -86,6 +86,7 @@ export class FuelPlugin extends Plugin {
           minutes: 0,
           minutesInterval: blockHandler.timeIntervalInMinutes,
           handlerId: handlerId,
+          handlerName: blockHandler.handlerName,
           fetchConfig: undefined
           // fetchConfig: blockHandler.fetchConfig
         })

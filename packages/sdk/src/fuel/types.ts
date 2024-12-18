@@ -34,6 +34,7 @@ export type BlockHandler = {
   blockInterval?: HandleInterval
   timeIntervalInMinutes?: HandleInterval
   handler: (block: Data_FuelBlock) => Promise<ProcessResult>
+  handlerName: string
   fetchConfig?: Partial<OnIntervalConfig>
 }
 

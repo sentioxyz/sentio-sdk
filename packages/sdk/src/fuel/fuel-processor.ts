@@ -15,6 +15,7 @@ import {
 import { mergeProcessResults } from '@sentio/runtime'
 import { PromiseOrVoid } from '../core/index.js'
 import { ServerError, Status } from 'nice-grpc'
+import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 
 export class FuelProcessor<TContract extends Contract> implements FuelBaseProcessor<FuelProcessorConfig> {
   callHandlers: CallHandler<Data_FuelCall>[] = []
@@ -29,7 +30,9 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
     return processor
   }
 
-  constructor(readonly config: FuelProcessorConfig) {}
+  constructor(readonly config: FuelProcessorConfig) {
+    return proxyProcessor(this)
+  }
 
   latestGasPrice: string | undefined
   async configure() {
@@ -229,6 +232,7 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
     this.blockHandlers.push({
       blockInterval,
       timeIntervalInMinutes: timeInterval,
+      handlerName: getHandlerName(),
       handler: async function (data: Data_FuelBlock) {
         const header = data.block
         if (!header) {

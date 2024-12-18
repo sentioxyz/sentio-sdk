@@ -49,6 +49,7 @@ export class TraceHandler {
 export class BlockHandler {
   blockInterval?: HandleInterval
   timeIntervalInMinutes?: HandleInterval
+  handlerName: string
   handler: (block: Data_EthBlock) => Promise<ProcessResult>
   preprocessHandler?: (event: Data_EthBlock, preprocessStore: { [k: string]: any }) => Promise<PreprocessResult>
   fetchConfig: EthFetchConfig
@@ -56,6 +57,7 @@ export class BlockHandler {
 
 export class TransactionHandler {
   handler: (block: Data_EthTransaction) => Promise<ProcessResult>
+  handlerName: string
   preprocessHandler?: (event: Data_EthTransaction, preprocessStore: { [k: string]: any }) => Promise<PreprocessResult>
   fetchConfig: EthFetchConfig
 }
@@ -173,6 +175,7 @@ export class GlobalProcessor {
 
     const processor = this
     this.blockHandlers.push({
+      handlerName: getHandlerName(),
       handler: async function (data: Data_EthBlock) {
         const { block } = formatEthData(data)
 
@@ -236,6 +239,7 @@ export class GlobalProcessor {
     const processor = this
 
     this.transactionHandler.push({
+      handlerName: getHandlerName(),
       handler: async function (data: Data_EthTransaction) {
         const { trace, block, transaction, transactionReceipt } = formatEthData(data)
 
@@ -606,6 +610,7 @@ export abstract class BaseProcessor<
     const contractName = this.config.name
 
     this.blockHandlers.push({
+      handlerName: getHandlerName(),
       handler: async function (data: Data_EthBlock, preparedData?: PreparedData) {
         const { block } = formatEthData(data)
 

@@ -608,6 +608,7 @@ export interface OnIntervalConfig {
   slot: number;
   slotInterval?: HandleInterval | undefined;
   fetchConfig: EthFetchConfig | undefined;
+  handlerName: string;
 }
 
 export interface AptosOnIntervalConfig {
@@ -664,6 +665,7 @@ export interface TraceHandlerConfig {
 export interface TransactionHandlerConfig {
   handlerId: number;
   fetchConfig: EthFetchConfig | undefined;
+  handlerName: string;
 }
 
 export interface LogHandlerConfig {
@@ -3318,6 +3320,7 @@ function createBaseOnIntervalConfig(): OnIntervalConfig {
     slot: 0,
     slotInterval: undefined,
     fetchConfig: undefined,
+    handlerName: "",
   };
 }
 
@@ -3340,6 +3343,9 @@ export const OnIntervalConfig = {
     }
     if (message.fetchConfig !== undefined) {
       EthFetchConfig.encode(message.fetchConfig, writer.uint32(50).fork()).ldelim();
+    }
+    if (message.handlerName !== "") {
+      writer.uint32(58).string(message.handlerName);
     }
     return writer;
   },
@@ -3393,6 +3399,13 @@ export const OnIntervalConfig = {
 
           message.fetchConfig = EthFetchConfig.decode(reader, reader.uint32());
           continue;
+        case 7:
+          if (tag !== 58) {
+            break;
+          }
+
+          message.handlerName = reader.string();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -3410,6 +3423,7 @@ export const OnIntervalConfig = {
       slot: isSet(object.slot) ? globalThis.Number(object.slot) : 0,
       slotInterval: isSet(object.slotInterval) ? HandleInterval.fromJSON(object.slotInterval) : undefined,
       fetchConfig: isSet(object.fetchConfig) ? EthFetchConfig.fromJSON(object.fetchConfig) : undefined,
+      handlerName: isSet(object.handlerName) ? globalThis.String(object.handlerName) : "",
     };
   },
 
@@ -3433,6 +3447,9 @@ export const OnIntervalConfig = {
     if (message.fetchConfig !== undefined) {
       obj.fetchConfig = EthFetchConfig.toJSON(message.fetchConfig);
     }
+    if (message.handlerName !== "") {
+      obj.handlerName = message.handlerName;
+    }
     return obj;
   },
 
@@ -3453,6 +3470,7 @@ export const OnIntervalConfig = {
     message.fetchConfig = (object.fetchConfig !== undefined && object.fetchConfig !== null)
       ? EthFetchConfig.fromPartial(object.fetchConfig)
       : undefined;
+    message.handlerName = object.handlerName ?? "";
     return message;
   },
 };
@@ -4237,7 +4255,7 @@ export const TraceHandlerConfig = {
 };
 
 function createBaseTransactionHandlerConfig(): TransactionHandlerConfig {
-  return { handlerId: 0, fetchConfig: undefined };
+  return { handlerId: 0, fetchConfig: undefined, handlerName: "" };
 }
 
 export const TransactionHandlerConfig = {
@@ -4247,6 +4265,9 @@ export const TransactionHandlerConfig = {
     }
     if (message.fetchConfig !== undefined) {
       EthFetchConfig.encode(message.fetchConfig, writer.uint32(26).fork()).ldelim();
+    }
+    if (message.handlerName !== "") {
+      writer.uint32(34).string(message.handlerName);
     }
     return writer;
   },
@@ -4272,6 +4293,13 @@ export const TransactionHandlerConfig = {
 
           message.fetchConfig = EthFetchConfig.decode(reader, reader.uint32());
           continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.handlerName = reader.string();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -4285,6 +4313,7 @@ export const TransactionHandlerConfig = {
     return {
       handlerId: isSet(object.handlerId) ? globalThis.Number(object.handlerId) : 0,
       fetchConfig: isSet(object.fetchConfig) ? EthFetchConfig.fromJSON(object.fetchConfig) : undefined,
+      handlerName: isSet(object.handlerName) ? globalThis.String(object.handlerName) : "",
     };
   },
 
@@ -4295,6 +4324,9 @@ export const TransactionHandlerConfig = {
     }
     if (message.fetchConfig !== undefined) {
       obj.fetchConfig = EthFetchConfig.toJSON(message.fetchConfig);
+    }
+    if (message.handlerName !== "") {
+      obj.handlerName = message.handlerName;
     }
     return obj;
   },
@@ -4308,6 +4340,7 @@ export const TransactionHandlerConfig = {
     message.fetchConfig = (object.fetchConfig !== undefined && object.fetchConfig !== null)
       ? EthFetchConfig.fromPartial(object.fetchConfig)
       : undefined;
+    message.handlerName = object.handlerName ?? "";
     return message;
   },
 };

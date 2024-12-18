@@ -156,6 +156,7 @@ export class SuiPlugin extends Plugin {
         accountConfig.moveIntervalConfigs.push({
           intervalConfig: {
             handlerId: handlerId,
+            handlerName: handler.handlerName,
             minutes: 0,
             minutesInterval: handler.timeIntervalInMinutes,
             slot: 0,

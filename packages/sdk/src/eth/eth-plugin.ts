@@ -103,6 +103,7 @@ export class EthPlugin extends Plugin {
           minutes: 0,
           minutesInterval: blockHandler.timeIntervalInMinutes,
           handlerId: handlerId,
+          handlerName: blockHandler.handlerName,
           fetchConfig: blockHandler.fetchConfig
         })
       }
@@ -187,6 +188,7 @@ export class EthPlugin extends Plugin {
           minutes: 0,
           minutesInterval: blockHandler.timeIntervalInMinutes,
           handlerId: handlerId,
+          handlerName: blockHandler.handlerName,
           fetchConfig: blockHandler.fetchConfig
         })
       }
@@ -196,6 +198,7 @@ export class EthPlugin extends Plugin {
         const handlerId = handlers.transactionHandlers.push(transactionHandler.handler) - 1
         contractConfig.transactionConfig.push({
           handlerId: handlerId,
+          handlerName: transactionHandler.handlerName,
           fetchConfig: transactionHandler.fetchConfig
         })
       }

@@ -237,6 +237,8 @@ message OnIntervalConfig {
 
   // eth fetch config
   EthFetchConfig fetch_config = 6;
+
+  string handler_name = 7;
 }
 
 message AptosOnIntervalConfig {
@@ -302,6 +304,7 @@ message TraceHandlerConfig {
 message TransactionHandlerConfig {
   int32 handler_id = 1;
   EthFetchConfig fetch_config = 3;
+  string handler_name = 4;
 }
 
 message LogHandlerConfig {
