@@ -124,12 +124,13 @@ export class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
     let perform = this.#performCache.get(tag)
     if (!perform) {
       miss_count.add(1)
+      const handler = metricsStorage.getStore()
       const queued: number = Date.now()
       perform = this.executor.add(() => {
         const started = Date.now()
         processMetrics.processor_rpc_queue_duration.record(started - queued, {
           chain_id: this._network.chainId.toString(),
-          handler: metricsStorage.getStore()
+          handler
         })
 
         let success = true
@@ -142,7 +143,7 @@ export class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
           .finally(() => {
             processMetrics.processor_rpc_duration.record(Date.now() - started, {
               chain_id: this._network.chainId.toString(),
-              handler: metricsStorage.getStore(),
+              handler,
               success
             })
           })
