@@ -32,7 +32,7 @@ import {
   TransactionIntervalHandler
 } from '../move/index.js'
 import { ALL_ADDRESS, Labels, PromiseOrVoid } from '../core/index.js'
-import { TypeDescriptor } from '@typemove/move'
+import { TypeDescriptor, matchType } from '@typemove/move'
 import { decodeResourceChange, ResourceChange } from '@typemove/aptos'
 import { GeneralTransactionResponse } from './models.js'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
@@ -233,6 +233,8 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
       typeDesc = parseMoveType(typeDesc)
     }
 
+    const hasAny = typeDesc.existAnyType()
+
     const processor = this
     this.resourceChangeHandlers.push({
       handler: async function (data) {
@@ -247,11 +249,21 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
           timestamp,
           processor.config.baseLabels
         )
-        const resources = await decodeResourceChange<T>(data.resources, ctx.coder)
-        await handler(resources, ctx)
+        let resources = await decodeResourceChange<T>(data.resources, ctx.coder)
+
+        if (hasAny) {
+          resources = resources.filter((r) => {
+            const rt = parseMoveType(r.type)
+            return matchType(typeDesc, rt)
+          })
+        }
+
+        if (resources.length > 0) {
+          await handler(resources, ctx)
+        }
         return ctx.stopAndGetResult()
       },
-      type: typeDesc.qname
+      type: hasAny ? typeDesc.qname : typeDesc.getNormalizedSignature()
     })
     return this
   }
@@ -489,6 +501,8 @@ export class AptosResourcesProcessor {
       typeDesc = parseMoveType(typeDesc)
     }
 
+    const hasAny = typeDesc.existAnyType()
+
     const processor = this
     this.resourceIntervalHandlers.push({
       fetchConfig: DEFAULT_RESOURCE_FETCH_CONFIG,
@@ -507,11 +521,21 @@ export class AptosResourcesProcessor {
           processor.config.baseLabels
         )
 
-        const resources = (await decodeResourceChange(data.resources, ctx.coder)) as ResourceChange<T>[]
-        await handler(resources, ctx)
+        let resources = (await decodeResourceChange(data.resources, ctx.coder)) as ResourceChange<T>[]
+
+        if (hasAny) {
+          resources = resources.filter((r) => {
+            const rt = parseMoveType(r.type)
+            return matchType(typeDesc, rt)
+          })
+        }
+
+        if (resources.length > 0) {
+          await handler(resources, ctx)
+        }
         return ctx.stopAndGetResult()
       },
-      type: typeDesc.qname
+      type: hasAny ? typeDesc.qname : typeDesc.getNormalizedSignature()
     })
     return this
   }
