@@ -120,25 +120,6 @@ export class AptosPlugin extends Plugin {
         contractConfig.moveCallConfigs.push(functionHandlerConfig)
       }
 
-      // 3. Prepare interval handlers
-      for (const handler of aptosProcessor.transactionIntervalHandlers) {
-        const handlerId = handlers.aptosTransactionIntervalHandlers.push(handler.handler) - 1
-        contractConfig.moveIntervalConfigs.push({
-          intervalConfig: {
-            handlerId: handlerId,
-            handlerName: handler.handlerName,
-            minutes: 0,
-            minutesInterval: handler.timeIntervalInMinutes,
-            slot: 0,
-            slotInterval: handler.versionInterval,
-            fetchConfig: undefined
-          },
-          ownerType: MoveOwnerType.ADDRESS,
-          fetchConfig: handler.fetchConfig,
-          resourceFetchConfig: undefined,
-          type: ''
-        })
-      }
       config.contractConfigs.push(contractConfig)
     }
 
@@ -156,6 +137,27 @@ export class AptosPlugin extends Plugin {
           type: handler.type
         })
       }
+
+      //  Prepare interval handlers
+      for (const handler of aptosProcessor.transactionIntervalHandlers) {
+        const handlerId = handlers.aptosTransactionIntervalHandlers.push(handler.handler) - 1
+        accountConfig.moveIntervalConfigs.push({
+          intervalConfig: {
+            handlerId: handlerId,
+            handlerName: handler.handlerName,
+            minutes: 0,
+            minutesInterval: handler.timeIntervalInMinutes,
+            slot: 0,
+            slotInterval: handler.versionInterval,
+            fetchConfig: undefined
+          },
+          ownerType: MoveOwnerType.ADDRESS,
+          fetchConfig: handler.fetchConfig,
+          resourceFetchConfig: undefined,
+          type: ''
+        })
+      }
+
       config.accountConfigs.push(accountConfig)
     }
 
