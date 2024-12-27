@@ -16,6 +16,21 @@ export interface Owner {
   name: String
 }
 
+interface TransactionConstructorInput {
+  id: ID
+  senderID?: ID
+  gas: BigInt
+  gasPrice: BigDecimal
+  isSuccess?: Boolean
+  raw?: Bytes
+  count?: Int
+  value?: Float
+  arrayValue: Array<String>
+  arrayValue2?: Array<String>
+  arrayOfArrayValue: Array<Array<String>>
+  dateValue?: Timestamp
+  receiptsIDs?: Array<ID>
+}
 @Entity('Transaction')
 export class Transaction extends AbstractEntity {
   @Required
@@ -68,11 +83,16 @@ export class Transaction extends AbstractEntity {
   receipts: Promise<Array<TransactionReceipt>>
 
   receiptsIDs: Array<ID | undefined>
-  constructor(data: Partial<Transaction>) {
+  constructor(data: TransactionConstructorInput) {
     super()
   }
 }
 
+interface TransactionReceiptConstructorInput {
+  id: ID
+  status?: TransactionStatus
+  transactionID?: ID
+}
 @Entity('TransactionReceipt')
 export class TransactionReceipt extends AbstractEntity {
   @Required
@@ -86,11 +106,17 @@ export class TransactionReceipt extends AbstractEntity {
   transaction: Promise<Transaction | undefined>
 
   transactionID: ID
-  constructor(data: Partial<TransactionReceipt>) {
+  constructor(data: TransactionReceiptConstructorInput) {
     super()
   }
 }
 
+interface UserConstructorInput {
+  id: ID
+  name: String
+  transactionsIDs?: Array<ID>
+  organizationsIDs?: Array<ID>
+}
 @Entity('User')
 export class User extends AbstractEntity implements Owner {
   @Required
@@ -112,11 +138,16 @@ export class User extends AbstractEntity implements Owner {
   organizations: Promise<Array<Organization>>
 
   organizationsIDs: Array<ID | undefined>
-  constructor(data: Partial<User>) {
+  constructor(data: UserConstructorInput) {
     super()
   }
 }
 
+interface OrganizationConstructorInput {
+  id: ID
+  name: String
+  membersIDs?: Array<ID>
+}
 @Entity('Organization')
 export class Organization extends AbstractEntity implements Owner {
   @Required
@@ -132,7 +163,7 @@ export class Organization extends AbstractEntity implements Owner {
   members: Promise<Array<User>>
 
   membersIDs: Array<ID | undefined>
-  constructor(data: Partial<Organization>) {
+  constructor(data: OrganizationConstructorInput) {
     super()
   }
 }
@@ -163,7 +194,7 @@ type TransactionReceipt @entity {
   transaction: Transaction
 }
 
-interface Owner  {
+interface Owner {
   id: ID!
   name: String!
 }
@@ -188,7 +219,8 @@ type NonEntity {
 enum TransactionStatus {
   SUCCESS
   FAILURE
-}`
+}
+`
 DatabaseSchema.register({
   source,
   entities: {

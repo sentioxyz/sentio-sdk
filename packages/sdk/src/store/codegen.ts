@@ -215,16 +215,32 @@ ${interfaces
   .join('\n')}
 
 ${classes
-  .map(
-    (c) => `
+  .map((c) => {
+    // Only generate constructor interface for Entity classes
+    const isEntity = c.annotations.some((a) => a.startsWith('@Entity'))
+    const constructorInterface = isEntity
+      ? `
+interface ${c.name}ConstructorInput {
+${c.fields
+  .filter((f) => !f.type.startsWith('Promise<')) // Filter out Promise fields
+  .map((f) => {
+    const isRequired = f.annotations.some((a) => a.includes('@Required'))
+    return `  ${f.name}${isRequired ? '' : '?'}: ${f.type.replace(' | undefined', '')};`
+  })
+  .join('\n')}
+}`
+      : ''
+
+    return `
+${constructorInterface}
 ${c.annotations.join('\n')}
 export class ${c.name} ${c.parent ? `extends ${c.parent}` : ''} ${c.interfaces.length > 0 ? `implements ${c.interfaces.join(', ')}` : ''} {
 ${c.fields
   .map((f) => `${f.annotations.map((a) => `\n\t${a}`).join('')}\n\t${f.name}${f.optional ? '?' : ''}: ${f.type}`)
   .join('\n')}
-  ${c.annotations.some((a) => a.startsWith('@Entity')) ? `constructor(data: Partial<${c.name}>) {super()}` : ''}
+  ${isEntity ? `constructor(data: ${c.name}ConstructorInput) {super()}` : ''}
 }`
-  )
+  })
   .join('\n')}
 `
 

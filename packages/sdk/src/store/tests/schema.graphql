@@ -20,7 +20,7 @@ type TransactionReceipt @entity {
   transaction: Transaction
 }
 
-interface Owner  {
+interface Owner {
   id: ID!
   name: String!
 }

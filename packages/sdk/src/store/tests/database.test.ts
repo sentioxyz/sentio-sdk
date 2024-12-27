@@ -111,7 +111,9 @@ describe('Test Database', () => {
       gas: 100n,
       count: 0,
       gasPrice: new BigDecimal('100.0'),
-      raw: new Uint8Array([1, 2, 3])
+      raw: new Uint8Array([1, 2, 3]),
+      arrayValue: [],
+      arrayOfArrayValue: []
     })
     await store.upsert(tx)
 
