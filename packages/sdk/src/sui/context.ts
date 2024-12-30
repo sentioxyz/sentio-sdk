@@ -179,6 +179,7 @@ export class SuiAddressContext extends MoveAccountContext<
 export class SuiObjectContext extends SuiAddressContext {
   contractName = 'object'
   objectId: string
+  objectVersion: bigint
 
   constructor(
     network: SuiNetwork,
@@ -190,5 +191,6 @@ export class SuiObjectContext extends SuiAddressContext {
   ) {
     super(network, objectId, checkpoint, timestamp, baseLabels)
     this.objectId = objectId
+    this.objectVersion = objectVersion
   }
 }

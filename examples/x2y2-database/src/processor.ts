@@ -36,15 +36,19 @@ ERC20Processor.bind({ address: '0x1e4ede388cbc9f4b5c79681b7f94d36a11abebc9' }).o
     tokenCounter.add(ctx, val)
     // exporter.emit(ctx, event)
     const from = new User({
+      name: 'from',
       id: event.args.from
     })
 
     await ctx.store.upsert(from)
     const to = new User({
+      name: 'to',
       id: event.args.to
     })
     await ctx.store.upsert(to)
     const transfer = new Transfer({
+      arrayValue: [],
+      bigIntValue: 0n,
       id: event.transactionHash,
       amount: val
     })
