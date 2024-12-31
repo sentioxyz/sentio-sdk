@@ -276,7 +276,7 @@ async function runGraphDeploy(argv: string[]) {
     }
   }
 
-  await uploadFile(zip, processorConfig, { 'api-key': apiKey })
+  await uploadFile(zip, processorConfig, { 'api-key': apiKey }, continueFrom)
 }
 
 async function bundleSourceMap() {
