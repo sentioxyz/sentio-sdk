@@ -1,7 +1,7 @@
 import { after, afterEach, describe, it } from 'node:test'
 import assert from 'assert'
 import { Store } from '../store.js'
-import { Transaction, User } from './generated/schema.js'
+import { Transaction, TransactionReceipt, User, TransactionStatus, Organization } from './generated/schema.js'
 import { MemoryDatabase } from './memory-database.js'
 import { StoreContext } from '../context.js'
 import { BigDecimal } from '@sentio/bigdecimal'
@@ -233,6 +233,346 @@ describe('Test Database', () => {
         value: ['']
       }
     ])
+  })
+
+  it('should allow accessing required TransactionReceipt[] through Transaction', async () => {
+    const store = new Store(storeContext)
+
+    const USER_ID = 'user-1'
+    const TX_ID = 'tx-1'
+    const RECEIPT_IDS = {
+      first: 'receipt-1',
+      second: 'receipt-2'
+    }
+
+    // Create a user first
+    const user = new User({
+      id: USER_ID,
+      name: 'test user',
+      transactionsIDs: [],
+      organizationsIDs: []
+    })
+    await store.upsert(user)
+
+    // Create the main transaction with senderID
+    const transaction = new Transaction({
+      id: TX_ID,
+      senderID: USER_ID,
+      gas: 100n,
+      gasPrice: new BigDecimal('1.5'),
+      arrayValue: [],
+      arrayOfArrayValue: [],
+      receiptsIDs: []
+    })
+
+    // Create transaction receipts with transactionID
+    const receipt1 = new TransactionReceipt({
+      id: RECEIPT_IDS.first,
+      status: TransactionStatus.SUCCESS,
+      transactionID: TX_ID
+    })
+
+    const receipt2 = new TransactionReceipt({
+      id: RECEIPT_IDS.second,
+      status: TransactionStatus.FAILURE,
+      transactionID: TX_ID
+    })
+
+    // Save everything to the database
+    await store.upsert(transaction)
+    await store.upsert([receipt1, receipt2])
+
+    // Retrieve the transaction and verify its receipts
+    const retrievedTx = await store.get(Transaction, TX_ID)
+    assert.ok(retrievedTx, 'Transaction should be retrieved')
+
+    const receipts = await retrievedTx.receipts
+    assert.equal(receipts.length, 2, 'Should have 2 receipts')
+    assert.ok(
+      receipts.some((r) => r.id === RECEIPT_IDS.first && r.status === TransactionStatus.SUCCESS),
+      'Should find receipt1'
+    )
+    assert.ok(
+      receipts.some((r) => r.id === RECEIPT_IDS.second && r.status === TransactionStatus.FAILURE),
+      'Should find receipt2'
+    )
+  })
+
+  it('should allow accessing optional Transaction from TransactionReceipt', async () => {
+    const store = new Store(storeContext)
+
+    const USER_ID = 'user-1'
+    const TX_ID = 'tx-1'
+    const RECEIPT_ID = 'receipt-1'
+
+    // Create a user
+    const user = new User({
+      id: USER_ID,
+      name: 'test user',
+      transactionsIDs: [],
+      organizationsIDs: []
+    })
+    await store.upsert(user)
+
+    // Create transaction
+    const transaction = new Transaction({
+      id: TX_ID,
+      senderID: USER_ID,
+      gas: 100n,
+      gasPrice: new BigDecimal('1.5'),
+      arrayValue: [],
+      arrayOfArrayValue: [],
+      receiptsIDs: []
+    })
+
+    // Create receipt with reference to transaction
+    const receipt = new TransactionReceipt({
+      id: RECEIPT_ID,
+      status: TransactionStatus.SUCCESS,
+      transactionID: TX_ID
+    })
+
+    // Save both to database
+    await store.upsert(transaction)
+    await store.upsert(receipt)
+
+    // Retrieve receipt and verify transaction reference
+    const retrievedReceipt = await store.get(TransactionReceipt, RECEIPT_ID)
+    assert.ok(retrievedReceipt, 'Receipt should be retrieved')
+
+    const linkedTransaction = await retrievedReceipt.transaction
+    assert.ok(linkedTransaction, 'Should be able to access linked transaction')
+    assert.equal(linkedTransaction.id, TX_ID, 'Should have correct transaction ID')
+
+    // Verify some transaction fields to ensure full object retrieval
+    assert.equal(linkedTransaction.gas, 100n, 'Should have correct gas value')
+    assert.equal(linkedTransaction.gasPrice.toString(), '1.5', 'Should have correct gasPrice')
+  })
+
+  it('should allow accessing User(Owner) through Transaction.sender', async () => {
+    const store = new Store(storeContext)
+
+    const USER_ID = 'user-1'
+    const TX_ID = 'tx-1'
+
+    // Create a user that implements Owner interface
+    const user = new User({
+      id: USER_ID,
+      name: 'test user',
+      transactionsIDs: [],
+      organizationsIDs: []
+    })
+    await store.upsert(user)
+
+    // Create transaction with reference to user as sender (Owner)
+    const transaction = new Transaction({
+      id: TX_ID,
+      senderID: USER_ID, // Reference to Owner (User in this case)
+      gas: 100n,
+      gasPrice: new BigDecimal('1.5'),
+      arrayValue: [],
+      arrayOfArrayValue: [],
+      receiptsIDs: []
+    })
+    await store.upsert(transaction)
+
+    // Retrieve transaction and verify sender (Owner) access
+    const retrievedTx = await store.get(Transaction, TX_ID)
+    assert.ok(retrievedTx, 'Transaction should be retrieved')
+
+    const sender = await retrievedTx.sender
+    assert.ok(sender, 'Should be able to access sender')
+    assert.equal(sender.id, USER_ID, 'Should have correct sender ID')
+    assert.equal(sender.name, 'test user', 'Should have correct sender name')
+
+    // Verify sender is instance of User implementing Owner interface
+    assert.ok(sender instanceof User, 'Sender should be instance of User')
+  })
+
+  it('should allow accessing User(Owner) through Transaction.sender', async () => {
+    const store = new Store(storeContext)
+
+    const USER_ID = 'user-1'
+    const TX_ID = 'tx-1'
+
+    // Create a user that implements Owner interface
+    const user = new User({
+      id: USER_ID,
+      name: 'test user',
+      transactionsIDs: [],
+      organizationsIDs: []
+    })
+    await store.upsert(user)
+
+    // Create transaction with reference to user as sender (Owner)
+    const transaction = new Transaction({
+      id: TX_ID,
+      senderID: USER_ID, // Reference to Owner (User in this case)
+      gas: 100n,
+      gasPrice: new BigDecimal('1.5'),
+      arrayValue: [],
+      arrayOfArrayValue: [],
+      receiptsIDs: []
+    })
+    await store.upsert(transaction)
+
+    // Retrieve transaction and verify sender (Owner) access
+    const retrievedTx = await store.get(Transaction, TX_ID)
+    assert.ok(retrievedTx, 'Transaction should be retrieved')
+
+    const sender = await retrievedTx.sender
+    assert.ok(sender, 'Should be able to access sender')
+    assert.equal(sender.id, USER_ID, 'Should have correct sender ID')
+    assert.equal(sender.name, 'test user', 'Should have correct sender name')
+
+    // Verify sender is instance of User implementing Owner interface
+    assert.ok(sender instanceof User, 'Sender should be instance of User')
+  })
+
+  it('should allow accessing Organization[] through User.organizations', async () => {
+    const store = new Store(storeContext)
+
+    const USER_ID = 'user-1'
+    const ORG_IDS = {
+      first: 'org-1',
+      second: 'org-2'
+    }
+
+    // Create a user first
+    const user = new User({
+      id: USER_ID,
+      name: 'test user',
+      transactionsIDs: [],
+      organizationsIDs: [] // Will be populated by relationship
+    })
+    await store.upsert(user)
+
+    // Create organizations with the user as a member
+    const org1 = new Organization({
+      id: ORG_IDS.first,
+      name: 'First Org',
+      membersIDs: [USER_ID]
+    })
+
+    const org2 = new Organization({
+      id: ORG_IDS.second,
+      name: 'Second Org',
+      membersIDs: [USER_ID]
+    })
+
+    await store.upsert([org1, org2])
+
+    // Retrieve user and verify organizations access
+    const retrievedUser = await store.get(User, USER_ID)
+    assert.ok(retrievedUser, 'User should be retrieved')
+
+    // Since organizations is @derivedFrom(field: "members"), we should be able to access them
+    const organizations = await retrievedUser.organizations
+    assert.equal(organizations.length, 2, 'Should have 2 organizations')
+
+    assert.ok(
+      organizations.some((org) => org.id === ORG_IDS.first && org.name === 'First Org'),
+      'Should find first organization'
+    )
+    assert.ok(
+      organizations.some((org) => org.id === ORG_IDS.second && org.name === 'Second Org'),
+      'Should find second organization'
+    )
+
+    // Verify the bidirectional relationship
+    const org = organizations[0]
+    const members = await org.members
+    assert.equal(members.length, 1, 'Organization should have 1 member')
+    assert.equal(members[0].id, USER_ID, 'Member should be our test user')
+  })
+
+  it('should handle nested relationships (Transaction -> Receipt -> Transaction -> Receipt)', async () => {
+    const store = new Store(storeContext)
+
+    const USER_ID = 'user-1'
+    const TX_IDS = {
+      first: 'tx-1',
+      second: 'tx-2'
+    }
+    const RECEIPT_IDS = {
+      first: 'receipt-1',
+      second: 'receipt-2'
+    }
+
+    // Create user
+    const user = new User({
+      id: USER_ID,
+      name: 'test user',
+      transactionsIDs: [],
+      organizationsIDs: []
+    })
+    await store.upsert(user)
+
+    // Create two transactions
+    const transaction1 = new Transaction({
+      id: TX_IDS.first,
+      senderID: USER_ID,
+      gas: 100n,
+      gasPrice: new BigDecimal('1.5'),
+      arrayValue: [],
+      arrayOfArrayValue: [],
+      receiptsIDs: []
+    })
+
+    const transaction2 = new Transaction({
+      id: TX_IDS.second,
+      senderID: USER_ID,
+      gas: 200n,
+      gasPrice: new BigDecimal('2.5'),
+      arrayValue: [],
+      arrayOfArrayValue: [],
+      receiptsIDs: []
+    })
+
+    // Create receipts linking to transactions
+    const receipt1 = new TransactionReceipt({
+      id: RECEIPT_IDS.first,
+      status: TransactionStatus.SUCCESS,
+      transactionID: TX_IDS.first
+    })
+
+    const receipt2 = new TransactionReceipt({
+      id: RECEIPT_IDS.second,
+      status: TransactionStatus.SUCCESS,
+      transactionID: TX_IDS.second
+    })
+
+    // Save everything to database
+    await store.upsert([transaction1, transaction2])
+    await store.upsert([receipt1, receipt2])
+
+    // Start traversing relationships
+    const startingTx = await store.get(Transaction, TX_IDS.first)
+    assert.ok(startingTx, 'Should retrieve starting transaction')
+
+    // Transaction -> Receipt
+    const receipts = await startingTx.receipts
+    assert.equal(receipts.length, 1, 'Should have one receipt')
+    const firstReceipt = receipts[0]
+    assert.equal(firstReceipt.id, RECEIPT_IDS.first, 'Should be first receipt')
+
+    // Receipt -> Transaction
+    const linkedTx = await firstReceipt.transaction
+    assert.ok(linkedTx, 'Should retrieve linked transaction')
+    assert.equal(linkedTx.id, TX_IDS.first, 'Should link back to first transaction')
+
+    // Transaction -> Receipt (second transaction)
+    const secondTx = await store.get(Transaction, TX_IDS.second)
+    assert.ok(secondTx, 'Should retrieve second transaction')
+    const secondReceipts = await secondTx.receipts
+    assert.equal(secondReceipts.length, 1, 'Should have one receipt')
+    assert.equal(secondReceipts[0].id, RECEIPT_IDS.second, 'Should be second receipt')
+
+    // Verify both transactions belong to same user
+    const firstTxSender = await startingTx.sender
+    const secondTxSender = await secondTx.sender
+    assert.equal(firstTxSender.id, USER_ID, 'First transaction should belong to user')
+    assert.equal(secondTxSender.id, USER_ID, 'Second transaction should belong to user')
   })
 
   afterEach(() => {
