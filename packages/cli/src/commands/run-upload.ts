@@ -246,7 +246,14 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth, continu
     console.log(chalk.blue(triedCount > 1 ? 'Retry uploading' : 'Uploading'))
 
     // get gcs upload url
-    const initUploadResRaw = await initUpload(options.host, auth, options.project, getSdkVersion(), 0)
+    const initUploadResRaw = await initUpload(
+      options.host,
+      auth,
+      options.project,
+      getSdkVersion(),
+      0,
+      'application/zip'
+    )
     if (!initUploadResRaw.ok) {
       // console.error(chalk.red('Failed to get upload url'))
       console.error(chalk.red(((await initUploadResRaw.json()) as { message: string }).message))
@@ -271,13 +278,14 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth, continu
     const uploadUrl = initUploadRes.url
 
     // do actual uploading
-    const file = fs.createReadStream(PROCESSOR_FILE)
+    const zip = new JSZip()
+    zip.file('lib.js', fs.readFileSync(PROCESSOR_FILE))
     const uploadResRaw = await fetch(uploadUrl, {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/octet-stream'
+        'Content-Type': 'application/zip'
       },
-      body: file
+      body: zip.generateNodeStream()
     })
     if (!uploadResRaw.ok) {
       console.error(chalk.red('Failed to upload'))
@@ -340,7 +348,14 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth, continu
   await tryUploading()
 }
 
-export async function initUpload(host: string, auth: Auth, projectSlug: string, sdkVersion: string, sequence: number) {
+export async function initUpload(
+  host: string,
+  auth: Auth,
+  projectSlug: string,
+  sdkVersion: string,
+  sequence: number,
+  contentType?: string
+) {
   const initUploadUrl = new URL(`/api/v1/processors/init_upload`, host)
   return fetch(initUploadUrl.href, {
     method: 'POST',
@@ -350,7 +365,8 @@ export async function initUpload(host: string, auth: Auth, projectSlug: string, 
     body: JSON.stringify({
       project_slug: projectSlug,
       sdk_version: sdkVersion,
-      sequence
+      sequence,
+      contentType
     })
   })
 }
