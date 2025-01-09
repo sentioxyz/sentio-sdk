@@ -100,6 +100,8 @@ export class GlobalProcessor {
     if (config.endBlock) {
       this.config.endBlock = BigInt(config.endBlock)
     }
+
+    return proxyProcessor(this)
   }
 
   public onBlockInterval(
