@@ -3,6 +3,7 @@ import { Contract, JsonAbi } from 'fuels'
 // import { FuelCall } from './context.js'
 import { FuelChainId } from '@sentio/chain'
 import { FuelLog } from './types.js'
+import { proxyProcessor } from '../utils/metrics.js'
 
 export abstract class FuelAbstractProcessor<TContract extends Contract> extends FuelProcessor<TContract> {
   protected constructor(abi: JsonAbi, config?: Omit<FuelProcessorConfig, 'abi'>) {
@@ -17,6 +18,7 @@ export abstract class FuelAbstractProcessor<TContract extends Contract> extends 
       abi
     })
     addFuelProcessor(config, this)
+    return proxyProcessor(this)
   }
 }
 

@@ -22,6 +22,7 @@ export class FuelProcessorState extends MapStateStorage<FuelBaseProcessor<any>> 
 }
 
 export type CallHandler<T> = {
+  handlerName: string
   handler: (call: T) => Promise<ProcessResult>
   fetchConfig?: Partial<FuelCallHandlerConfig>
   assetConfig?: Partial<FuelAssetHandlerConfig>

@@ -51,7 +51,8 @@ export class StarknetPlugin extends Plugin {
               address: processor.config.address,
               keys: [hash.getSelectorFromName(e)]
             })),
-            handlerId
+            handlerId,
+            handlerName: callHandler.handlerName
           })
         }
       }

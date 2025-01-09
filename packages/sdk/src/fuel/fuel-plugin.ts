@@ -49,15 +49,18 @@ export class FuelPlugin extends Plugin {
       })
       for (const callHandler of processor.callHandlers) {
         const handlerId = handlers.callHandlers.push(callHandler.handler) - 1
+        const handlerName = callHandler.handlerName
         if (processor instanceof FuelProcessor) {
           if (callHandler.logConfig?.logIds?.length) {
             contractConfig.fuelLogConfigs.push({
               logIds: callHandler.logConfig.logIds,
-              handlerId
+              handlerId,
+              handlerName
             })
           } else {
             const fetchConfig = {
               handlerId,
+              handlerName,
               filters: callHandler.fetchConfig?.filters || []
             }
             contractConfig.fuelCallConfigs.push(fetchConfig)
@@ -66,11 +69,13 @@ export class FuelPlugin extends Plugin {
           const assetConfig = callHandler.assetConfig
           contractConfig.assetConfigs.push({
             filters: assetConfig?.filters || [],
-            handlerId
+            handlerId,
+            handlerName
           })
         } else if (processor instanceof FuelGlobalProcessor) {
           const fetchConfig = {
             handlerId,
+            handlerName,
             filters: []
           }
           contractConfig.fuelCallConfigs.push(fetchConfig)

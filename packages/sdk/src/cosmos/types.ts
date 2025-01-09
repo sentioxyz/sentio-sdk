@@ -8,6 +8,7 @@ export class CosmosProcessorState extends ListStateStorage<CosmosProcessor> {
 }
 
 export type CallHandler<T> = {
+  handlerName: string
   handler: (call: T) => Promise<ProcessResult>
   logConfig?: {
     logFilters: string[]

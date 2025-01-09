@@ -45,6 +45,7 @@ export class CosmosPlugin extends Plugin {
 
         contractConfig.cosmosLogConfigs.push({
           handlerId,
+          handlerName: callHandler.handlerName,
           logFilters: callHandler.logConfig?.logFilters || []
         })
       }

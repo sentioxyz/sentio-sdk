@@ -47,11 +47,13 @@ export class BTCPlugin extends Plugin {
       })
       for (const callHandler of processor.callHandlers) {
         const handlerId = handlers.txHandlers.push(callHandler.handler) - 1
+        const handlerName = callHandler.handlerName
 
         if (callHandler.filter) {
           contractConfig.btcTransactionConfigs.push({
             filters: filters2Proto(callHandler.filter),
-            handlerId
+            handlerId,
+            handlerName
           })
         } else if (contractConfig.contract?.address != '*') {
           contractConfig.btcTransactionConfigs.push({
@@ -60,7 +62,8 @@ export class BTCPlugin extends Plugin {
                 script_address: processor.config.address
               }
             } as TransactionFilter),
-            handlerId
+            handlerId,
+            handlerName
           })
         }
       }

@@ -29,6 +29,7 @@ export class BTCProcessor {
     filter?: TransactionFilters
   ) {
     const callHandler = {
+      handlerName: getHandlerName(),
       handler: async (call: Data_BTCTransaction) => {
         const tx = call.transaction as Transaction
 
@@ -133,6 +134,7 @@ interface BTCProcessorConfig {
 }
 
 export type CallHandler<T> = {
+  handlerName: string
   handler: (call: T) => Promise<ProcessResult>
   filter?: TransactionFilters
 }

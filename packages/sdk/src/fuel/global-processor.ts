@@ -7,6 +7,7 @@ import { FuelContext } from './context.js'
 import { FuelProcessorConfig, getOptionsSignature } from './fuel-processor.js'
 import { mergeProcessResults } from '@sentio/runtime'
 import { ALL_ADDRESS } from '../core/index.js'
+import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 
 type GlobalFuelProcessorConfig = Omit<FuelProcessorConfig, 'address' | 'abi'>
 
@@ -28,7 +29,9 @@ export class FuelGlobalProcessor implements FuelBaseProcessor<GlobalFuelProcesso
     return processor
   }
 
-  constructor(readonly config: GlobalFuelProcessorConfig) {}
+  constructor(readonly config: GlobalFuelProcessorConfig) {
+    return proxyProcessor(this)
+  }
 
   async configure() {
     this.provider = await getProvider(this.config.chainId)
@@ -39,6 +42,7 @@ export class FuelGlobalProcessor implements FuelBaseProcessor<GlobalFuelProcesso
     config: FuelFetchConfig = DEFAULT_FUEL_FETCH_CONFIG
   ) {
     const callHandler = {
+      handlerName: getHandlerName(),
       handler: async (call: Data_FuelCall) => {
         let tx: FuelTransaction
         try {

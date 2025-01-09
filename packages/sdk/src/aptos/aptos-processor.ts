@@ -76,6 +76,8 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
     AptosProcessorState.INSTANCE.addValue(this)
     this.coder = defaultMoveCoder(this.config.network)
     // this.loadTypes(this.coder)
+
+    return proxyProcessor(this)
   }
 
   protected onMoveEvent(
@@ -98,6 +100,7 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
     const allEventType = new Set(_filters.map((f) => accountTypeString(processor.config.address) + '::' + f.type))
 
     this.eventHandlers.push({
+      handlerName: getHandlerName(),
       handler: async function (data) {
         if (!data.transaction) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'event is null')
@@ -156,6 +159,7 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
     const processor = this
 
     this.callHandlers.push({
+      handlerName: getHandlerName(),
       handler: async function (data) {
         if (!data.transaction) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'call is null')
@@ -197,6 +201,7 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
 
     const processor = this
     this.callHandlers.push({
+      handlerName: getHandlerName(),
       handler: async function (data) {
         if (!data.transaction) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'call is null')
@@ -237,6 +242,7 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
 
     const processor = this
     this.resourceChangeHandlers.push({
+      handlerName: getHandlerName(),
       handler: async function (data) {
         if (!data.resources || !data.version) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'resource is null')
@@ -347,6 +353,7 @@ export class AptosModulesProcessor extends AptosTransactionProcessor<
 > {
   private constructor(options: AptosBindOptions) {
     super(ALL_ADDRESS, options)
+    return proxyProcessor(this)
   }
 
   static bind(options: AptosBindOptions): AptosModulesProcessor {
@@ -358,6 +365,7 @@ export class AptosGlobalProcessor {
   private baseProcessor
   private constructor(options: AptosBindOptions) {
     this.baseProcessor = new AptosTransactionProcessor('*', options)
+    return proxyProcessor(this)
   }
 
   static bind(options: AptosBindOptions): AptosGlobalProcessor {

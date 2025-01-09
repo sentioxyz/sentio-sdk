@@ -6,6 +6,7 @@ import { StarknetEvent } from './event.js'
 import { ListStateStorage, mergeProcessResults } from '@sentio/runtime'
 import { StarknetProcessorConfig } from './types.js'
 import { StarknetContractView } from './contract.js'
+import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 
 export class StarknetProcessor {
   callHandlers: CallHandler<Data_StarknetEvent>[] = []
@@ -20,7 +21,9 @@ export class StarknetProcessor {
 
   classHash: string
 
-  constructor(readonly config: StarknetProcessorConfig) {}
+  constructor(readonly config: StarknetProcessorConfig) {
+    return proxyProcessor(this)
+  }
 
   async configure() {
     this.provider = new RpcProvider({
@@ -47,6 +50,7 @@ export class StarknetProcessor {
     }
     const abi = this.config.abi
     const callHandler = {
+      handlerName: getHandlerName(),
       handler: async (call: Data_StarknetEvent) => {
         try {
           const eventData = [call.result] as any[]
@@ -98,6 +102,7 @@ export class StarknetProcessor {
 }
 
 export type CallHandler<T> = {
+  handlerName: string
   handler: (call: T) => Promise<ProcessResult>
   eventFilter?: string[]
 }
@@ -123,6 +128,7 @@ export abstract class AbstractStarknetProcessor {
   ) {
     this.processor = new StarknetProcessor(config)
     StarknetProcessorState.INSTANCE.addValue(this.processor)
+    return proxyProcessor(this)
   }
 
   onEvent<T, C>(

@@ -34,22 +34,26 @@ export interface ArgumentsFilter {
 
 export class EventHandler<T> {
   filters: EventFilter[]
+  handlerName: string
   handler: (event: T) => Promise<ProcessResult>
   fetchConfig: MoveFetchConfig
 }
 
 export class CallHandler<T> {
   filters: FunctionNameAndCallFilter[]
+  handlerName: string
   handler: (call: T) => Promise<ProcessResult>
   fetchConfig: MoveFetchConfig
 }
 
 export class ObjectChangeHandler<T> {
+  handlerName: string
   handler: (call: T) => Promise<ProcessResult>
   type: string
 }
 
 export class ResourceChangeHandler<T> {
+  handlerName: string
   handler: (call: T) => Promise<ProcessResult>
   type: string
 }

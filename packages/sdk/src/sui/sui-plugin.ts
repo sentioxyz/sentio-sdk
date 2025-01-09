@@ -100,7 +100,8 @@ export class SuiPlugin extends Plugin {
             }
           }),
           fetchConfig: handler.fetchConfig,
-          handlerId
+          handlerId,
+          handlerName: handler.handlerName
         }
         contractConfig.moveEventConfigs.push(eventHandlerConfig)
       }
@@ -118,7 +119,8 @@ export class SuiPlugin extends Plugin {
             }
           }),
           fetchConfig: handler.fetchConfig,
-          handlerId
+          handlerId,
+          handlerName: handler.handlerName
         }
         contractConfig.moveCallConfigs.push(functionHandlerConfig)
       }
@@ -127,7 +129,8 @@ export class SuiPlugin extends Plugin {
         const handlerId = handlers.suiObjectChangeHandlers.push(handler.handler) - 1
         const objectChangeHandler: MoveResourceChangeConfig = {
           type: handler.type,
-          handlerId
+          handlerId,
+          handlerName: handler.handlerName
         }
         contractConfig.moveResourceChangeConfigs.push(objectChangeHandler)
       }
@@ -145,7 +148,8 @@ export class SuiPlugin extends Plugin {
         const handlerId = handlers.suiObjectChangeHandlers.push(handler.handler) - 1
         const objectChangeHandler: MoveResourceChangeConfig = {
           type: handler.type,
-          handlerId
+          handlerId,
+          handlerName: handler.handlerName
         }
         accountConfig.moveResourceChangeConfigs.push(objectChangeHandler)
       }
@@ -185,7 +189,8 @@ export class SuiPlugin extends Plugin {
               }
             }),
             fetchConfig: handler.fetchConfig,
-            handlerId
+            handlerId,
+            handlerName: handler.handlerName
           }
           accountConfig.moveCallConfigs.push(functionHandlerConfig)
         }

@@ -2,11 +2,14 @@ import { CallHandler, CosmosProcessorConfig, CosmosProcessorState } from './type
 import { Data_CosmosCall } from '@sentio/protos'
 import { CosmosContext } from './context.js'
 import { CosmosEvent, CosmosTransaction, CosmosTxLog } from './transaction.js'
+import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 
 export class CosmosProcessor {
   callHandlers: CallHandler<Data_CosmosCall>[] = []
 
-  constructor(readonly config: CosmosProcessorConfig) {}
+  constructor(readonly config: CosmosProcessorConfig) {
+    return proxyProcessor(this)
+  }
 
   static bind(config: CosmosProcessorConfig): CosmosProcessor {
     const processor = new CosmosProcessor(config)
@@ -20,6 +23,7 @@ export class CosmosProcessor {
   ) {
     const filter = Array.isArray(logFilters) ? logFilters : [logFilters]
     const callHandler = {
+      handlerName: getHandlerName(),
       handler: async (call: Data_CosmosCall) => {
         const transaction = call.transaction as CosmosTransaction
 

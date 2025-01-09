@@ -322,16 +322,19 @@ message FuelAssetHandlerConfig {
     optional string from_address = 2;
     optional string to_address = 3;
   }
+  string handler_name = 3;
 }
 
 message FuelLogHandlerConfig {
   repeated string log_ids = 1;
   int32 handler_id = 2;
+  string handler_name = 3;
 }
 
 message CosmosLogHandlerConfig {
   repeated string log_filters = 1;
   int32 handler_id = 2;
+  string handler_name = 3;
 }
 
 message LogFilter {
@@ -376,6 +379,7 @@ message MoveEventHandlerConfig {
   repeated MoveEventFilter filters = 1;
   int32 handler_id = 2;
   MoveFetchConfig fetch_config = 3;
+  string handler_name = 4;
 }
 
 message MoveEventFilter {
@@ -387,11 +391,13 @@ message MoveCallHandlerConfig {
   repeated MoveCallFilter filters = 1;
   int32 handler_id = 2;
   MoveFetchConfig fetch_config = 3;
+  string handler_name = 4;
 }
 
 message MoveResourceChangeConfig {
   string type = 1;
   int32 handler_id = 2;
+  string handler_name = 3;
 }
 
 message MoveCallFilter {
@@ -411,11 +417,13 @@ message MoveCallFilter {
 message StarknetEventHandlerConfig {
   repeated StarknetEventFilter filters = 1;
   int32 handler_id = 2;
+  string handler_name = 3;
 }
 
 message BTCTransactionHandlerConfig {
   repeated BTCTransactionFilter filters = 1;
   int32 handler_id = 2;
+  string handler_name = 3;
 }
 
 message BTCTransactionFilter {
@@ -473,6 +481,7 @@ message FuelCallFilter {
 message FuelCallHandlerConfig {
   repeated FuelCallFilter filters = 1;
   int32 handler_id = 2;
+  string handler_name = 3;
 }
 
 message Topic {

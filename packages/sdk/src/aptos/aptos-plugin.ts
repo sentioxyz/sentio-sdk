@@ -96,7 +96,8 @@ export class AptosPlugin extends Plugin {
             }
           }),
           fetchConfig: handler.fetchConfig,
-          handlerId
+          handlerId,
+          handlerName: handler.handlerName
         }
         contractConfig.moveEventConfigs.push(eventHandlerConfig)
       }
@@ -115,7 +116,8 @@ export class AptosPlugin extends Plugin {
             }
           }),
           fetchConfig: handler.fetchConfig,
-          handlerId
+          handlerId,
+          handlerName: handler.handlerName
         }
         contractConfig.moveCallConfigs.push(functionHandlerConfig)
       }
@@ -134,6 +136,7 @@ export class AptosPlugin extends Plugin {
         const handlerId = handlers.aptosResourceHandlers.push(handler.handler) - 1
         accountConfig.moveResourceChangeConfigs.push({
           handlerId: handlerId,
+          handlerName: handler.handlerName,
           type: handler.type
         })
       }
@@ -189,6 +192,7 @@ export class AptosPlugin extends Plugin {
           // on resource change
           accountConfig.moveResourceChangeConfigs.push({
             handlerId,
+            handlerName: handler.handlerName,
             type: handler.type
           })
         }

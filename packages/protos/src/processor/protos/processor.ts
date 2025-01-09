@@ -678,6 +678,7 @@ export interface LogHandlerConfig {
 export interface FuelAssetHandlerConfig {
   filters: FuelAssetHandlerConfig_AssetFilter[];
   handlerId: number;
+  handlerName: string;
 }
 
 export interface FuelAssetHandlerConfig_AssetFilter {
@@ -689,11 +690,13 @@ export interface FuelAssetHandlerConfig_AssetFilter {
 export interface FuelLogHandlerConfig {
   logIds: string[];
   handlerId: number;
+  handlerName: string;
 }
 
 export interface CosmosLogHandlerConfig {
   logFilters: string[];
   handlerId: number;
+  handlerName: string;
 }
 
 export interface LogFilter {
@@ -729,6 +732,7 @@ export interface MoveEventHandlerConfig {
   filters: MoveEventFilter[];
   handlerId: number;
   fetchConfig: MoveFetchConfig | undefined;
+  handlerName: string;
 }
 
 export interface MoveEventFilter {
@@ -740,11 +744,13 @@ export interface MoveCallHandlerConfig {
   filters: MoveCallFilter[];
   handlerId: number;
   fetchConfig: MoveFetchConfig | undefined;
+  handlerName: string;
 }
 
 export interface MoveResourceChangeConfig {
   type: string;
   handlerId: number;
+  handlerName: string;
 }
 
 export interface MoveCallFilter {
@@ -764,11 +770,13 @@ export interface MoveCallFilter_FromAndToAddress {
 export interface StarknetEventHandlerConfig {
   filters: StarknetEventFilter[];
   handlerId: number;
+  handlerName: string;
 }
 
 export interface BTCTransactionHandlerConfig {
   filters: BTCTransactionFilter[];
   handlerId: number;
+  handlerName: string;
 }
 
 export interface BTCTransactionFilter {
@@ -831,6 +839,7 @@ export interface FuelCallFilter {
 export interface FuelCallHandlerConfig {
   filters: FuelCallFilter[];
   handlerId: number;
+  handlerName: string;
 }
 
 export interface Topic {
@@ -4452,7 +4461,7 @@ export const LogHandlerConfig = {
 };
 
 function createBaseFuelAssetHandlerConfig(): FuelAssetHandlerConfig {
-  return { filters: [], handlerId: 0 };
+  return { filters: [], handlerId: 0, handlerName: "" };
 }
 
 export const FuelAssetHandlerConfig = {
@@ -4462,6 +4471,9 @@ export const FuelAssetHandlerConfig = {
     }
     if (message.handlerId !== 0) {
       writer.uint32(16).int32(message.handlerId);
+    }
+    if (message.handlerName !== "") {
+      writer.uint32(26).string(message.handlerName);
     }
     return writer;
   },
@@ -4487,6 +4499,13 @@ export const FuelAssetHandlerConfig = {
 
           message.handlerId = reader.int32();
           continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.handlerName = reader.string();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -4502,6 +4521,7 @@ export const FuelAssetHandlerConfig = {
         ? object.filters.map((e: any) => FuelAssetHandlerConfig_AssetFilter.fromJSON(e))
         : [],
       handlerId: isSet(object.handlerId) ? globalThis.Number(object.handlerId) : 0,
+      handlerName: isSet(object.handlerName) ? globalThis.String(object.handlerName) : "",
     };
   },
 
@@ -4513,6 +4533,9 @@ export const FuelAssetHandlerConfig = {
     if (message.handlerId !== 0) {
       obj.handlerId = Math.round(message.handlerId);
     }
+    if (message.handlerName !== "") {
+      obj.handlerName = message.handlerName;
+    }
     return obj;
   },
 
@@ -4523,6 +4546,7 @@ export const FuelAssetHandlerConfig = {
     const message = createBaseFuelAssetHandlerConfig();
     message.filters = object.filters?.map((e) => FuelAssetHandlerConfig_AssetFilter.fromPartial(e)) || [];
     message.handlerId = object.handlerId ?? 0;
+    message.handlerName = object.handlerName ?? "";
     return message;
   },
 };
@@ -4617,7 +4641,7 @@ export const FuelAssetHandlerConfig_AssetFilter = {
 };
 
 function createBaseFuelLogHandlerConfig(): FuelLogHandlerConfig {
-  return { logIds: [], handlerId: 0 };
+  return { logIds: [], handlerId: 0, handlerName: "" };
 }
 
 export const FuelLogHandlerConfig = {
@@ -4627,6 +4651,9 @@ export const FuelLogHandlerConfig = {
     }
     if (message.handlerId !== 0) {
       writer.uint32(16).int32(message.handlerId);
+    }
+    if (message.handlerName !== "") {
+      writer.uint32(26).string(message.handlerName);
     }
     return writer;
   },
@@ -4652,6 +4679,13 @@ export const FuelLogHandlerConfig = {
 
           message.handlerId = reader.int32();
           continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.handlerName = reader.string();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -4665,6 +4699,7 @@ export const FuelLogHandlerConfig = {
     return {
       logIds: globalThis.Array.isArray(object?.logIds) ? object.logIds.map((e: any) => globalThis.String(e)) : [],
       handlerId: isSet(object.handlerId) ? globalThis.Number(object.handlerId) : 0,
+      handlerName: isSet(object.handlerName) ? globalThis.String(object.handlerName) : "",
     };
   },
 
@@ -4676,6 +4711,9 @@ export const FuelLogHandlerConfig = {
     if (message.handlerId !== 0) {
       obj.handlerId = Math.round(message.handlerId);
     }
+    if (message.handlerName !== "") {
+      obj.handlerName = message.handlerName;
+    }
     return obj;
   },
 
@@ -4686,12 +4724,13 @@ export const FuelLogHandlerConfig = {
     const message = createBaseFuelLogHandlerConfig();
     message.logIds = object.logIds?.map((e) => e) || [];
     message.handlerId = object.handlerId ?? 0;
+    message.handlerName = object.handlerName ?? "";
     return message;
   },
 };
 
 function createBaseCosmosLogHandlerConfig(): CosmosLogHandlerConfig {
-  return { logFilters: [], handlerId: 0 };
+  return { logFilters: [], handlerId: 0, handlerName: "" };
 }
 
 export const CosmosLogHandlerConfig = {
@@ -4701,6 +4740,9 @@ export const CosmosLogHandlerConfig = {
     }
     if (message.handlerId !== 0) {
       writer.uint32(16).int32(message.handlerId);
+    }
+    if (message.handlerName !== "") {
+      writer.uint32(26).string(message.handlerName);
     }
     return writer;
   },
@@ -4726,6 +4768,13 @@ export const CosmosLogHandlerConfig = {
 
           message.handlerId = reader.int32();
           continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.handlerName = reader.string();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -4741,6 +4790,7 @@ export const CosmosLogHandlerConfig = {
         ? object.logFilters.map((e: any) => globalThis.String(e))
         : [],
       handlerId: isSet(object.handlerId) ? globalThis.Number(object.handlerId) : 0,
+      handlerName: isSet(object.handlerName) ? globalThis.String(object.handlerName) : "",
     };
   },
 
@@ -4752,6 +4802,9 @@ export const CosmosLogHandlerConfig = {
     if (message.handlerId !== 0) {
       obj.handlerId = Math.round(message.handlerId);
     }
+    if (message.handlerName !== "") {
+      obj.handlerName = message.handlerName;
+    }
     return obj;
   },
 
@@ -4762,6 +4815,7 @@ export const CosmosLogHandlerConfig = {
     const message = createBaseCosmosLogHandlerConfig();
     message.logFilters = object.logFilters?.map((e) => e) || [];
     message.handlerId = object.handlerId ?? 0;
+    message.handlerName = object.handlerName ?? "";
     return message;
   },
 };
@@ -5206,7 +5260,7 @@ export const MoveAccountFetchConfig = {
 };
 
 function createBaseMoveEventHandlerConfig(): MoveEventHandlerConfig {
-  return { filters: [], handlerId: 0, fetchConfig: undefined };
+  return { filters: [], handlerId: 0, fetchConfig: undefined, handlerName: "" };
 }
 
 export const MoveEventHandlerConfig = {
@@ -5219,6 +5273,9 @@ export const MoveEventHandlerConfig = {
     }
     if (message.fetchConfig !== undefined) {
       MoveFetchConfig.encode(message.fetchConfig, writer.uint32(26).fork()).ldelim();
+    }
+    if (message.handlerName !== "") {
+      writer.uint32(34).string(message.handlerName);
     }
     return writer;
   },
@@ -5251,6 +5308,13 @@ export const MoveEventHandlerConfig = {
 
           message.fetchConfig = MoveFetchConfig.decode(reader, reader.uint32());
           continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.handlerName = reader.string();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -5267,6 +5331,7 @@ export const MoveEventHandlerConfig = {
         : [],
       handlerId: isSet(object.handlerId) ? globalThis.Number(object.handlerId) : 0,
       fetchConfig: isSet(object.fetchConfig) ? MoveFetchConfig.fromJSON(object.fetchConfig) : undefined,
+      handlerName: isSet(object.handlerName) ? globalThis.String(object.handlerName) : "",
     };
   },
 
@@ -5281,6 +5346,9 @@ export const MoveEventHandlerConfig = {
     if (message.fetchConfig !== undefined) {
       obj.fetchConfig = MoveFetchConfig.toJSON(message.fetchConfig);
     }
+    if (message.handlerName !== "") {
+      obj.handlerName = message.handlerName;
+    }
     return obj;
   },
 
@@ -5294,6 +5362,7 @@ export const MoveEventHandlerConfig = {
     message.fetchConfig = (object.fetchConfig !== undefined && object.fetchConfig !== null)
       ? MoveFetchConfig.fromPartial(object.fetchConfig)
       : undefined;
+    message.handlerName = object.handlerName ?? "";
     return message;
   },
 };
@@ -5373,7 +5442,7 @@ export const MoveEventFilter = {
 };
 
 function createBaseMoveCallHandlerConfig(): MoveCallHandlerConfig {
-  return { filters: [], handlerId: 0, fetchConfig: undefined };
+  return { filters: [], handlerId: 0, fetchConfig: undefined, handlerName: "" };
 }
 
 export const MoveCallHandlerConfig = {
@@ -5386,6 +5455,9 @@ export const MoveCallHandlerConfig = {
     }
     if (message.fetchConfig !== undefined) {
       MoveFetchConfig.encode(message.fetchConfig, writer.uint32(26).fork()).ldelim();
+    }
+    if (message.handlerName !== "") {
+      writer.uint32(34).string(message.handlerName);
     }
     return writer;
   },
@@ -5418,6 +5490,13 @@ export const MoveCallHandlerConfig = {
 
           message.fetchConfig = MoveFetchConfig.decode(reader, reader.uint32());
           continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.handlerName = reader.string();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -5434,6 +5513,7 @@ export const MoveCallHandlerConfig = {
         : [],
       handlerId: isSet(object.handlerId) ? globalThis.Number(object.handlerId) : 0,
       fetchConfig: isSet(object.fetchConfig) ? MoveFetchConfig.fromJSON(object.fetchConfig) : undefined,
+      handlerName: isSet(object.handlerName) ? globalThis.String(object.handlerName) : "",
     };
   },
 
@@ -5448,6 +5528,9 @@ export const MoveCallHandlerConfig = {
     if (message.fetchConfig !== undefined) {
       obj.fetchConfig = MoveFetchConfig.toJSON(message.fetchConfig);
     }
+    if (message.handlerName !== "") {
+      obj.handlerName = message.handlerName;
+    }
     return obj;
   },
 
@@ -5461,12 +5544,13 @@ export const MoveCallHandlerConfig = {
     message.fetchConfig = (object.fetchConfig !== undefined && object.fetchConfig !== null)
       ? MoveFetchConfig.fromPartial(object.fetchConfig)
       : undefined;
+    message.handlerName = object.handlerName ?? "";
     return message;
   },
 };
 
 function createBaseMoveResourceChangeConfig(): MoveResourceChangeConfig {
-  return { type: "", handlerId: 0 };
+  return { type: "", handlerId: 0, handlerName: "" };
 }
 
 export const MoveResourceChangeConfig = {
@@ -5476,6 +5560,9 @@ export const MoveResourceChangeConfig = {
     }
     if (message.handlerId !== 0) {
       writer.uint32(16).int32(message.handlerId);
+    }
+    if (message.handlerName !== "") {
+      writer.uint32(26).string(message.handlerName);
     }
     return writer;
   },
@@ -5501,6 +5588,13 @@ export const MoveResourceChangeConfig = {
 
           message.handlerId = reader.int32();
           continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.handlerName = reader.string();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -5514,6 +5608,7 @@ export const MoveResourceChangeConfig = {
     return {
       type: isSet(object.type) ? globalThis.String(object.type) : "",
       handlerId: isSet(object.handlerId) ? globalThis.Number(object.handlerId) : 0,
+      handlerName: isSet(object.handlerName) ? globalThis.String(object.handlerName) : "",
     };
   },
 
@@ -5525,6 +5620,9 @@ export const MoveResourceChangeConfig = {
     if (message.handlerId !== 0) {
       obj.handlerId = Math.round(message.handlerId);
     }
+    if (message.handlerName !== "") {
+      obj.handlerName = message.handlerName;
+    }
     return obj;
   },
 
@@ -5535,6 +5633,7 @@ export const MoveResourceChangeConfig = {
     const message = createBaseMoveResourceChangeConfig();
     message.type = object.type ?? "";
     message.handlerId = object.handlerId ?? 0;
+    message.handlerName = object.handlerName ?? "";
     return message;
   },
 };
@@ -5761,7 +5860,7 @@ export const MoveCallFilter_FromAndToAddress = {
 };
 
 function createBaseStarknetEventHandlerConfig(): StarknetEventHandlerConfig {
-  return { filters: [], handlerId: 0 };
+  return { filters: [], handlerId: 0, handlerName: "" };
 }
 
 export const StarknetEventHandlerConfig = {
@@ -5771,6 +5870,9 @@ export const StarknetEventHandlerConfig = {
     }
     if (message.handlerId !== 0) {
       writer.uint32(16).int32(message.handlerId);
+    }
+    if (message.handlerName !== "") {
+      writer.uint32(26).string(message.handlerName);
     }
     return writer;
   },
@@ -5796,6 +5898,13 @@ export const StarknetEventHandlerConfig = {
 
           message.handlerId = reader.int32();
           continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.handlerName = reader.string();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -5811,6 +5920,7 @@ export const StarknetEventHandlerConfig = {
         ? object.filters.map((e: any) => StarknetEventFilter.fromJSON(e))
         : [],
       handlerId: isSet(object.handlerId) ? globalThis.Number(object.handlerId) : 0,
+      handlerName: isSet(object.handlerName) ? globalThis.String(object.handlerName) : "",
     };
   },
 
@@ -5822,6 +5932,9 @@ export const StarknetEventHandlerConfig = {
     if (message.handlerId !== 0) {
       obj.handlerId = Math.round(message.handlerId);
     }
+    if (message.handlerName !== "") {
+      obj.handlerName = message.handlerName;
+    }
     return obj;
   },
 
@@ -5832,12 +5945,13 @@ export const StarknetEventHandlerConfig = {
     const message = createBaseStarknetEventHandlerConfig();
     message.filters = object.filters?.map((e) => StarknetEventFilter.fromPartial(e)) || [];
     message.handlerId = object.handlerId ?? 0;
+    message.handlerName = object.handlerName ?? "";
     return message;
   },
 };
 
 function createBaseBTCTransactionHandlerConfig(): BTCTransactionHandlerConfig {
-  return { filters: [], handlerId: 0 };
+  return { filters: [], handlerId: 0, handlerName: "" };
 }
 
 export const BTCTransactionHandlerConfig = {
@@ -5847,6 +5961,9 @@ export const BTCTransactionHandlerConfig = {
     }
     if (message.handlerId !== 0) {
       writer.uint32(16).int32(message.handlerId);
+    }
+    if (message.handlerName !== "") {
+      writer.uint32(26).string(message.handlerName);
     }
     return writer;
   },
@@ -5872,6 +5989,13 @@ export const BTCTransactionHandlerConfig = {
 
           message.handlerId = reader.int32();
           continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.handlerName = reader.string();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -5887,6 +6011,7 @@ export const BTCTransactionHandlerConfig = {
         ? object.filters.map((e: any) => BTCTransactionFilter.fromJSON(e))
         : [],
       handlerId: isSet(object.handlerId) ? globalThis.Number(object.handlerId) : 0,
+      handlerName: isSet(object.handlerName) ? globalThis.String(object.handlerName) : "",
     };
   },
 
@@ -5898,6 +6023,9 @@ export const BTCTransactionHandlerConfig = {
     if (message.handlerId !== 0) {
       obj.handlerId = Math.round(message.handlerId);
     }
+    if (message.handlerName !== "") {
+      obj.handlerName = message.handlerName;
+    }
     return obj;
   },
 
@@ -5908,6 +6036,7 @@ export const BTCTransactionHandlerConfig = {
     const message = createBaseBTCTransactionHandlerConfig();
     message.filters = object.filters?.map((e) => BTCTransactionFilter.fromPartial(e)) || [];
     message.handlerId = object.handlerId ?? 0;
+    message.handlerName = object.handlerName ?? "";
     return message;
   },
 };
@@ -6823,7 +6952,7 @@ export const FuelCallFilter = {
 };
 
 function createBaseFuelCallHandlerConfig(): FuelCallHandlerConfig {
-  return { filters: [], handlerId: 0 };
+  return { filters: [], handlerId: 0, handlerName: "" };
 }
 
 export const FuelCallHandlerConfig = {
@@ -6833,6 +6962,9 @@ export const FuelCallHandlerConfig = {
     }
     if (message.handlerId !== 0) {
       writer.uint32(16).int32(message.handlerId);
+    }
+    if (message.handlerName !== "") {
+      writer.uint32(26).string(message.handlerName);
     }
     return writer;
   },
@@ -6858,6 +6990,13 @@ export const FuelCallHandlerConfig = {
 
           message.handlerId = reader.int32();
           continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.handlerName = reader.string();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -6873,6 +7012,7 @@ export const FuelCallHandlerConfig = {
         ? object.filters.map((e: any) => FuelCallFilter.fromJSON(e))
         : [],
       handlerId: isSet(object.handlerId) ? globalThis.Number(object.handlerId) : 0,
+      handlerName: isSet(object.handlerName) ? globalThis.String(object.handlerName) : "",
     };
   },
 
@@ -6884,6 +7024,9 @@ export const FuelCallHandlerConfig = {
     if (message.handlerId !== 0) {
       obj.handlerId = Math.round(message.handlerId);
     }
+    if (message.handlerName !== "") {
+      obj.handlerName = message.handlerName;
+    }
     return obj;
   },
 
@@ -6894,6 +7037,7 @@ export const FuelCallHandlerConfig = {
     const message = createBaseFuelCallHandlerConfig();
     message.filters = object.filters?.map((e) => FuelCallFilter.fromPartial(e)) || [];
     message.handlerId = object.handlerId ?? 0;
+    message.handlerName = object.handlerName ?? "";
     return message;
   },
 };

@@ -5,6 +5,7 @@ import { FuelContext } from './context.js'
 import { decodeFuelTransaction } from './transaction.js'
 import { Provider, InputType, OutputType } from 'fuels'
 import { getOptionsSignature } from './fuel-processor.js'
+import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 
 export class FuelAssetProcessor implements FuelBaseProcessor<FuelAssetProcessorConfig> {
   callHandlers: CallHandler<Data_FuelCall>[] = []
@@ -23,7 +24,9 @@ export class FuelAssetProcessor implements FuelBaseProcessor<FuelAssetProcessorC
     return processor
   }
 
-  constructor(readonly config: FuelAssetProcessorConfig) {}
+  constructor(readonly config: FuelAssetProcessorConfig) {
+    return proxyProcessor(this)
+  }
 
   async configure(): Promise<void> {
     this.provider = await getProvider(this.config.chainId)
@@ -49,6 +52,7 @@ export class FuelAssetProcessor implements FuelBaseProcessor<FuelAssetProcessorC
     }
 
     const callHandler = {
+      handlerName: getHandlerName(),
       handler: async (call: Data_FuelCall) => {
         const gqlTransaction = call.transaction
         const tx = decodeFuelTransaction(gqlTransaction, this.provider)

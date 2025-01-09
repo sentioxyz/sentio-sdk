@@ -55,6 +55,7 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
     config: FuelFetchConfig = DEFAULT_FUEL_FETCH_CONFIG
   ) {
     const callHandler = {
+      handlerName: getHandlerName(),
       handler: async (call: Data_FuelCall) => {
         const abiMap = this.config.abi
           ? {
@@ -113,6 +114,7 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
     }
 
     const callHandler = {
+      handlerName: getHandlerName(),
       handler: async (call: Data_FuelCall) => {
         try {
           // const contract = new Contract(this.config.address, abi, this.provider)
@@ -168,6 +170,7 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
     const logIds = new Set(Array.isArray(logIdFilter) ? logIdFilter : [logIdFilter])
 
     const callHandler = {
+      handlerName: getHandlerName(),
       handler: async (call: Data_FuelCall) => {
         try {
           const gqlTransaction = call.transaction

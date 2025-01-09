@@ -19,6 +19,7 @@ import { getMoveCalls } from './utils.js'
 import { defaultMoveCoder, MoveCoder } from './index.js'
 import { ALL_ADDRESS, Labels } from '../core/index.js'
 import { Required } from 'utility-types'
+import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 
 export const DEFAULT_FETCH_CONFIG: MoveFetchConfig = {
   resourceChanges: false,
@@ -63,6 +64,8 @@ export class SuiBaseProcessor {
     this.config = configure(options)
     SuiProcessorState.INSTANCE.addValue(this)
     this.coder = defaultMoveCoder(this.config.network)
+
+    return proxyProcessor(this)
   }
 
   getChainId(): string {
@@ -90,6 +93,7 @@ export class SuiBaseProcessor {
     const allEventType = new Set(_filters.map((f) => f.type))
 
     this.eventHandlers.push({
+      handlerName: getHandlerName(),
       handler: async function (data) {
         if (!data.transaction) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'event is null')
@@ -153,6 +157,7 @@ export class SuiBaseProcessor {
     const allFunctionType = new Set(_filters.map((f) => f.function))
 
     this.callHandlers.push({
+      handlerName: getHandlerName(),
       handler: async function (data) {
         if (!data.transaction) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'call is null')
@@ -214,6 +219,7 @@ export class SuiBaseProcessor {
     const processor = this
 
     this.callHandlers.push({
+      handlerName: getHandlerName(),
       handler: async function (data) {
         if (!data.transaction) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'transaction is null')
@@ -250,6 +256,7 @@ export class SuiBaseProcessor {
     }
     const processor = this
     this.objectChangeHandlers.push({
+      handlerName: getHandlerName(),
       handler: async function (data: Data_SuiObjectChange) {
         const ctx = new SuiObjectChangeContext(
           processor.config.network,

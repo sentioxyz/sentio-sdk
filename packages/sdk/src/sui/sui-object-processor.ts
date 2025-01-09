@@ -196,6 +196,7 @@ export class SuiAddressProcessor extends SuiBaseObjectOrAddressProcessorInternal
     const processor = this
 
     this.callHandlers.push({
+      handlerName: getHandlerName(),
       handler: async function (data) {
         if (!data.transaction) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'transaction is null')
@@ -290,6 +291,7 @@ export class SuiObjectTypeProcessor<T> extends SuiBaseObjectOrAddressProcessor<
     }
     const processor = this
     this.objectChangeHandlers.push({
+      handlerName: getHandlerName(),
       handler: async function (data: Data_SuiObjectChange) {
         const ctx = new SuiObjectChangeContext(
           processor.config.network,
