@@ -683,6 +683,15 @@ message Data {
     string tx_digest = 4;
     uint64 slot = 3;
   }
+  message FuelReceipt {
+    google.protobuf.Struct transaction = 1;
+    google.protobuf.Timestamp timestamp = 2;
+    int64 receipt_index = 3;
+  }
+  message FuelTransaction {
+    google.protobuf.Struct transaction = 1;
+    google.protobuf.Timestamp timestamp = 2;
+  }
   message FuelCall {
     google.protobuf.Struct transaction = 1;
     google.protobuf.Timestamp timestamp = 2;
@@ -724,7 +733,9 @@ message Data {
     SuiCall sui_call = 11;
     SuiObject sui_object = 12;
     SuiObjectChange sui_object_change = 13;
-    FuelCall fuel_call = 14;
+    FuelReceipt fuel_log = 20;
+    FuelCall fuel_call = 14 [deprecated = true];
+    FuelTransaction fuel_transaction = 21;
     FuelBlock fuel_block = 18;
     CosmosCall cosmos_call = 15;
     StarknetEvent starknet_events = 16;
@@ -826,7 +837,9 @@ enum HandlerType {
   SUI_CALL = 9;
   SUI_OBJECT = 10;
   SUI_OBJECT_CHANGE = 12;
-  FUEL_CALL = 13;
+  FUEL_CALL = 13; // deprecated
+  FUEL_RECEIPT = 19;
+  FUEL_TRANSACTION = 20;
   FUEL_BLOCK = 17;
   COSMOS_CALL = 14;
   STARKNET_EVENT = 15;

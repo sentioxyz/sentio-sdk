@@ -30,13 +30,13 @@ export class FuelFacet {
       for (const callConfig of config.fuelCallConfigs) {
         const binding = {
           data: {
-            fuelCall: {
+            fuelTransaction: {
               transaction,
               timestamp: new Date()
             }
           },
           handlerIds: [callConfig.handlerId],
-          handlerType: HandlerType.FUEL_CALL
+          handlerType: HandlerType.FUEL_TRANSACTION
         }
 
         const filter = callConfig.filters[0]?.function
@@ -55,13 +55,14 @@ export class FuelFacet {
       for (const logConfig of config.fuelLogConfigs) {
         const binding = {
           data: {
-            fuelCall: {
+            fuelLog: {
               transaction,
-              timestamp: new Date()
+              timestamp: new Date(),
+              receiptIndex: BigInt(transaction.status.receipts.findIndex((r: any) => r.rb == logConfig.logIds[0]))
             }
           },
           handlerIds: [logConfig.handlerId],
-          handlerType: HandlerType.FUEL_CALL
+          handlerType: HandlerType.FUEL_RECEIPT
         }
 
         const logIds = logConfig.logIds
@@ -76,13 +77,13 @@ export class FuelFacet {
       for (const assetConfig of config.assetConfigs) {
         const binding = {
           data: {
-            fuelCall: {
+            fuelTransaction: {
               transaction,
               timestamp: new Date()
             }
           },
           handlerIds: [assetConfig.handlerId],
-          handlerType: HandlerType.FUEL_CALL
+          handlerType: HandlerType.FUEL_TRANSACTION
         }
 
         res.push(binding)

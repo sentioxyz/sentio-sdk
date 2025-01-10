@@ -1,8 +1,21 @@
-import { Data_FuelBlock, Data_FuelCall, FuelCallFilter, HandleInterval, ProcessResult } from '@sentio/protos'
+import {
+  Data_FuelBlock,
+  Data_FuelCall,
+  Data_FuelReceipt,
+  FuelCallFilter,
+  HandleInterval,
+  ProcessResult
+} from '@sentio/protos'
 import { FuelCall, FuelContext, FuelContractContext } from './context.js'
 import { bn, Contract, Interface, JsonAbi, Provider } from 'fuels'
 import { FuelNetwork, getProvider } from './network.js'
-import { decodeFuelTransactionWithAbi, DEFAULT_FUEL_FETCH_CONFIG, FuelFetchConfig } from './transaction.js'
+import {
+  decodeFuelTransaction,
+  decodeFuelTransactionWithAbi,
+  decodeLog,
+  DEFAULT_FUEL_FETCH_CONFIG,
+  FuelFetchConfig
+} from './transaction.js'
 import {
   BlockHandler,
   CallHandler,
@@ -10,9 +23,9 @@ import {
   FuelBlock,
   FuelLog,
   FuelProcessorState,
-  FuelTransaction
+  FuelTransaction,
+  LogHandler
 } from './types.js'
-import { mergeProcessResults } from '@sentio/runtime'
 import { PromiseOrVoid } from '../core/index.js'
 import { ServerError, Status } from 'nice-grpc'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
@@ -20,6 +33,7 @@ import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 export class FuelProcessor<TContract extends Contract> implements FuelBaseProcessor<FuelProcessorConfig> {
   callHandlers: CallHandler<Data_FuelCall>[] = []
   blockHandlers: BlockHandler[] = []
+  logHandlers: LogHandler<Data_FuelReceipt>[] = []
 
   private provider: Provider
   private contract: TContract
@@ -35,6 +49,7 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
   }
 
   latestGasPrice: string | undefined
+
   async configure() {
     this.provider = await getProvider(this.config.chainId)
     this.provider.getLatestGasPrice = async () => {
@@ -169,52 +184,41 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
   ) {
     const logIds = new Set(Array.isArray(logIdFilter) ? logIdFilter : [logIdFilter])
 
-    const callHandler = {
+    const logHandler = {
       handlerName: getHandlerName(),
-      handler: async (call: Data_FuelCall) => {
+      handler: async ({ transaction, receiptIndex, timestamp }: Data_FuelReceipt) => {
         try {
-          const gqlTransaction = call.transaction
-          const tx = await decodeFuelTransactionWithAbi(
-            gqlTransaction,
-            { [this.config.address]: this.config.abi! },
-            this.provider
-          )
-
-          const results: ProcessResult[] = []
-          const logs = (tx.logs || []).filter((log) => logIds.has(log.logId))
-          for (const log of logs) {
+          const tx = decodeFuelTransaction(transaction, this.provider)
+          const index = Number(receiptIndex)
+          const receipt = tx.receipts[index]
+          const log = decodeLog(receipt, this.config.abi)
+          if (log) {
             const ctx = new FuelContractContext(
               this.config.chainId,
               this.contract,
               this.config.address,
               this.config.name ?? this.config.address,
-              call.timestamp || new Date(0),
+              timestamp || new Date(0),
               tx,
               null
             )
-            ctx.setLogIndex(log.receiptIndex)
-            await handler(log, ctx)
-            results.push(ctx.stopAndGetResult())
+            ctx.setLogIndex(index)
+            await handler({ receiptIndex: index, ...log }, ctx)
+            return ctx.stopAndGetResult()
+          } else {
+            console.error(`Log with receipt index ${receiptIndex} not found in tx`)
           }
-          return mergeProcessResults(results)
         } catch (e) {
           console.error(e)
-          return {
-            gauges: [],
-            counters: [],
-            events: [],
-            exports: [],
-            states: {
-              configUpdated: false
-            }
-          }
         }
+
+        return ProcessResult.fromPartial({})
       },
       logConfig: {
         logIds: Array.from(logIds)
       }
     }
-    this.callHandlers.push(callHandler)
+    this.logHandlers.push(logHandler)
     return this
   }
 

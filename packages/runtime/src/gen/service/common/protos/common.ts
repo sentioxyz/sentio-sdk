@@ -166,6 +166,45 @@ export function permissionToJSON(object: Permission): string {
   }
 }
 
+export enum PayMethod {
+  CREDIT_CARD = 0,
+  INVOICE_FIAT = 1,
+  INVOICE_CRYPTO = 2,
+  UNRECOGNIZED = -1,
+}
+
+export function payMethodFromJSON(object: any): PayMethod {
+  switch (object) {
+    case 0:
+    case "CREDIT_CARD":
+      return PayMethod.CREDIT_CARD;
+    case 1:
+    case "INVOICE_FIAT":
+      return PayMethod.INVOICE_FIAT;
+    case 2:
+    case "INVOICE_CRYPTO":
+      return PayMethod.INVOICE_CRYPTO;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return PayMethod.UNRECOGNIZED;
+  }
+}
+
+export function payMethodToJSON(object: PayMethod): string {
+  switch (object) {
+    case PayMethod.CREDIT_CARD:
+      return "CREDIT_CARD";
+    case PayMethod.INVOICE_FIAT:
+      return "INVOICE_FIAT";
+    case PayMethod.INVOICE_CRYPTO:
+      return "INVOICE_CRYPTO";
+    case PayMethod.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
 export enum NotificationType {
   GENERAL = 0,
   PROCESSOR_UPLOAD_FAILED = 101,
@@ -1523,7 +1562,8 @@ export interface Account {
   ownerId: string;
   owner: Owner | undefined;
   address: string;
-  paymentMethod: string;
+  paymentMethod: PayMethod;
+  usageOverCapLimit: string;
 }
 
 export interface ImportedProject {
@@ -1708,6 +1748,16 @@ export interface ComputeStats {
   computedBy: string;
   isCached: boolean;
   isRefreshing: boolean;
+  clickhouseStats: ComputeStats_ClickhouseStats | undefined;
+}
+
+export interface ComputeStats_ClickhouseStats {
+  readRows: bigint;
+  readBytes: bigint;
+  memoryUsage: bigint;
+  queryDurationMs: bigint;
+  resultRows: bigint;
+  resultBytes: bigint;
 }
 
 export interface ClickhouseStatus {
@@ -10055,7 +10105,8 @@ function createBaseAccount(): Account {
     ownerId: "",
     owner: undefined,
     address: "",
-    paymentMethod: "",
+    paymentMethod: 0,
+    usageOverCapLimit: "",
   };
 }
 
@@ -10082,8 +10133,11 @@ export const Account = {
     if (message.address !== "") {
       writer.uint32(74).string(message.address);
     }
-    if (message.paymentMethod !== "") {
-      writer.uint32(82).string(message.paymentMethod);
+    if (message.paymentMethod !== 0) {
+      writer.uint32(80).int32(message.paymentMethod);
+    }
+    if (message.usageOverCapLimit !== "") {
+      writer.uint32(90).string(message.usageOverCapLimit);
     }
     return writer;
   },
@@ -10145,11 +10199,18 @@ export const Account = {
           message.address = reader.string();
           continue;
         case 10:
-          if (tag !== 82) {
+          if (tag !== 80) {
             break;
           }
 
-          message.paymentMethod = reader.string();
+          message.paymentMethod = reader.int32() as any;
+          continue;
+        case 11:
+          if (tag !== 90) {
+            break;
+          }
+
+          message.usageOverCapLimit = reader.string();
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -10169,7 +10230,8 @@ export const Account = {
       ownerId: isSet(object.ownerId) ? globalThis.String(object.ownerId) : "",
       owner: isSet(object.owner) ? Owner.fromJSON(object.owner) : undefined,
       address: isSet(object.address) ? globalThis.String(object.address) : "",
-      paymentMethod: isSet(object.paymentMethod) ? globalThis.String(object.paymentMethod) : "",
+      paymentMethod: isSet(object.paymentMethod) ? payMethodFromJSON(object.paymentMethod) : 0,
+      usageOverCapLimit: isSet(object.usageOverCapLimit) ? globalThis.String(object.usageOverCapLimit) : "",
     };
   },
 
@@ -10196,8 +10258,11 @@ export const Account = {
     if (message.address !== "") {
       obj.address = message.address;
     }
-    if (message.paymentMethod !== "") {
-      obj.paymentMethod = message.paymentMethod;
+    if (message.paymentMethod !== 0) {
+      obj.paymentMethod = payMethodToJSON(message.paymentMethod);
+    }
+    if (message.usageOverCapLimit !== "") {
+      obj.usageOverCapLimit = message.usageOverCapLimit;
     }
     return obj;
   },
@@ -10214,7 +10279,8 @@ export const Account = {
     message.ownerId = object.ownerId ?? "";
     message.owner = (object.owner !== undefined && object.owner !== null) ? Owner.fromPartial(object.owner) : undefined;
     message.address = object.address ?? "";
-    message.paymentMethod = object.paymentMethod ?? "";
+    message.paymentMethod = object.paymentMethod ?? 0;
+    message.usageOverCapLimit = object.usageOverCapLimit ?? "";
     return message;
   },
 };
@@ -11249,6 +11315,7 @@ function createBaseComputeStats(): ComputeStats {
     computedBy: "",
     isCached: false,
     isRefreshing: false,
+    clickhouseStats: undefined,
   };
 }
 
@@ -11277,6 +11344,9 @@ export const ComputeStats = {
     }
     if (message.isRefreshing !== false) {
       writer.uint32(48).bool(message.isRefreshing);
+    }
+    if (message.clickhouseStats !== undefined) {
+      ComputeStats_ClickhouseStats.encode(message.clickhouseStats, writer.uint32(58).fork()).ldelim();
     }
     return writer;
   },
@@ -11330,6 +11400,13 @@ export const ComputeStats = {
 
           message.isRefreshing = reader.bool();
           continue;
+        case 7:
+          if (tag !== 58) {
+            break;
+          }
+
+          message.clickhouseStats = ComputeStats_ClickhouseStats.decode(reader, reader.uint32());
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -11347,6 +11424,9 @@ export const ComputeStats = {
       computedBy: isSet(object.computedBy) ? globalThis.String(object.computedBy) : "",
       isCached: isSet(object.isCached) ? globalThis.Boolean(object.isCached) : false,
       isRefreshing: isSet(object.isRefreshing) ? globalThis.Boolean(object.isRefreshing) : false,
+      clickhouseStats: isSet(object.clickhouseStats)
+        ? ComputeStats_ClickhouseStats.fromJSON(object.clickhouseStats)
+        : undefined,
     };
   },
 
@@ -11370,6 +11450,9 @@ export const ComputeStats = {
     if (message.isRefreshing !== false) {
       obj.isRefreshing = message.isRefreshing;
     }
+    if (message.clickhouseStats !== undefined) {
+      obj.clickhouseStats = ComputeStats_ClickhouseStats.toJSON(message.clickhouseStats);
+    }
     return obj;
   },
 
@@ -11384,6 +11467,168 @@ export const ComputeStats = {
     message.computedBy = object.computedBy ?? "";
     message.isCached = object.isCached ?? false;
     message.isRefreshing = object.isRefreshing ?? false;
+    message.clickhouseStats = (object.clickhouseStats !== undefined && object.clickhouseStats !== null)
+      ? ComputeStats_ClickhouseStats.fromPartial(object.clickhouseStats)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseComputeStats_ClickhouseStats(): ComputeStats_ClickhouseStats {
+  return {
+    readRows: BigInt("0"),
+    readBytes: BigInt("0"),
+    memoryUsage: BigInt("0"),
+    queryDurationMs: BigInt("0"),
+    resultRows: BigInt("0"),
+    resultBytes: BigInt("0"),
+  };
+}
+
+export const ComputeStats_ClickhouseStats = {
+  encode(message: ComputeStats_ClickhouseStats, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.readRows !== BigInt("0")) {
+      if (BigInt.asUintN(64, message.readRows) !== message.readRows) {
+        throw new globalThis.Error("value provided for field message.readRows of type uint64 too large");
+      }
+      writer.uint32(8).uint64(message.readRows.toString());
+    }
+    if (message.readBytes !== BigInt("0")) {
+      if (BigInt.asUintN(64, message.readBytes) !== message.readBytes) {
+        throw new globalThis.Error("value provided for field message.readBytes of type uint64 too large");
+      }
+      writer.uint32(16).uint64(message.readBytes.toString());
+    }
+    if (message.memoryUsage !== BigInt("0")) {
+      if (BigInt.asUintN(64, message.memoryUsage) !== message.memoryUsage) {
+        throw new globalThis.Error("value provided for field message.memoryUsage of type uint64 too large");
+      }
+      writer.uint32(24).uint64(message.memoryUsage.toString());
+    }
+    if (message.queryDurationMs !== BigInt("0")) {
+      if (BigInt.asUintN(64, message.queryDurationMs) !== message.queryDurationMs) {
+        throw new globalThis.Error("value provided for field message.queryDurationMs of type uint64 too large");
+      }
+      writer.uint32(32).uint64(message.queryDurationMs.toString());
+    }
+    if (message.resultRows !== BigInt("0")) {
+      if (BigInt.asUintN(64, message.resultRows) !== message.resultRows) {
+        throw new globalThis.Error("value provided for field message.resultRows of type uint64 too large");
+      }
+      writer.uint32(40).uint64(message.resultRows.toString());
+    }
+    if (message.resultBytes !== BigInt("0")) {
+      if (BigInt.asUintN(64, message.resultBytes) !== message.resultBytes) {
+        throw new globalThis.Error("value provided for field message.resultBytes of type uint64 too large");
+      }
+      writer.uint32(48).uint64(message.resultBytes.toString());
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ComputeStats_ClickhouseStats {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseComputeStats_ClickhouseStats();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 8) {
+            break;
+          }
+
+          message.readRows = longToBigint(reader.uint64() as Long);
+          continue;
+        case 2:
+          if (tag !== 16) {
+            break;
+          }
+
+          message.readBytes = longToBigint(reader.uint64() as Long);
+          continue;
+        case 3:
+          if (tag !== 24) {
+            break;
+          }
+
+          message.memoryUsage = longToBigint(reader.uint64() as Long);
+          continue;
+        case 4:
+          if (tag !== 32) {
+            break;
+          }
+
+          message.queryDurationMs = longToBigint(reader.uint64() as Long);
+          continue;
+        case 5:
+          if (tag !== 40) {
+            break;
+          }
+
+          message.resultRows = longToBigint(reader.uint64() as Long);
+          continue;
+        case 6:
+          if (tag !== 48) {
+            break;
+          }
+
+          message.resultBytes = longToBigint(reader.uint64() as Long);
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ComputeStats_ClickhouseStats {
+    return {
+      readRows: isSet(object.readRows) ? BigInt(object.readRows) : BigInt("0"),
+      readBytes: isSet(object.readBytes) ? BigInt(object.readBytes) : BigInt("0"),
+      memoryUsage: isSet(object.memoryUsage) ? BigInt(object.memoryUsage) : BigInt("0"),
+      queryDurationMs: isSet(object.queryDurationMs) ? BigInt(object.queryDurationMs) : BigInt("0"),
+      resultRows: isSet(object.resultRows) ? BigInt(object.resultRows) : BigInt("0"),
+      resultBytes: isSet(object.resultBytes) ? BigInt(object.resultBytes) : BigInt("0"),
+    };
+  },
+
+  toJSON(message: ComputeStats_ClickhouseStats): unknown {
+    const obj: any = {};
+    if (message.readRows !== BigInt("0")) {
+      obj.readRows = message.readRows.toString();
+    }
+    if (message.readBytes !== BigInt("0")) {
+      obj.readBytes = message.readBytes.toString();
+    }
+    if (message.memoryUsage !== BigInt("0")) {
+      obj.memoryUsage = message.memoryUsage.toString();
+    }
+    if (message.queryDurationMs !== BigInt("0")) {
+      obj.queryDurationMs = message.queryDurationMs.toString();
+    }
+    if (message.resultRows !== BigInt("0")) {
+      obj.resultRows = message.resultRows.toString();
+    }
+    if (message.resultBytes !== BigInt("0")) {
+      obj.resultBytes = message.resultBytes.toString();
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<ComputeStats_ClickhouseStats>): ComputeStats_ClickhouseStats {
+    return ComputeStats_ClickhouseStats.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ComputeStats_ClickhouseStats>): ComputeStats_ClickhouseStats {
+    const message = createBaseComputeStats_ClickhouseStats();
+    message.readRows = object.readRows ?? BigInt("0");
+    message.readBytes = object.readBytes ?? BigInt("0");
+    message.memoryUsage = object.memoryUsage ?? BigInt("0");
+    message.queryDurationMs = object.queryDurationMs ?? BigInt("0");
+    message.resultRows = object.resultRows ?? BigInt("0");
+    message.resultBytes = object.resultBytes ?? BigInt("0");
     return message;
   },
 };

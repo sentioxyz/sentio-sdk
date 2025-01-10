@@ -3,6 +3,7 @@ import {
   ContractConfig,
   Data_FuelBlock,
   Data_FuelCall,
+  Data_FuelReceipt,
   DataBinding,
   HandlerType,
   ProcessConfigResponse,
@@ -18,21 +19,24 @@ import { FuelProcessor } from './fuel-processor.js'
 import { FuelGlobalProcessor } from './global-processor.js'
 
 interface Handlers {
-  callHandlers: ((trace: Data_FuelCall) => Promise<ProcessResult>)[]
+  transactionHandlers: ((trace: Data_FuelCall) => Promise<ProcessResult>)[]
   blockHandlers: ((block: Data_FuelBlock) => Promise<ProcessResult>)[]
+  logHandlers: ((log: Data_FuelReceipt) => Promise<ProcessResult>)[]
 }
 
 export class FuelPlugin extends Plugin {
   name: string = 'FuelPlugin'
   handlers: Handlers = {
-    callHandlers: [],
-    blockHandlers: []
+    transactionHandlers: [],
+    blockHandlers: [],
+    logHandlers: []
   }
 
   async configure(config: ProcessConfigResponse) {
     const handlers: Handlers = {
-      callHandlers: [],
-      blockHandlers: []
+      transactionHandlers: [],
+      blockHandlers: [],
+      logHandlers: []
     }
 
     for (const processor of FuelProcessorState.INSTANCE.getValues()) {
@@ -48,23 +52,16 @@ export class FuelPlugin extends Plugin {
         endBlock: processor.config.endBlock
       })
       for (const callHandler of processor.callHandlers) {
-        const handlerId = handlers.callHandlers.push(callHandler.handler) - 1
+        const handlerId = handlers.transactionHandlers.push(callHandler.handler) - 1
         const handlerName = callHandler.handlerName
         if (processor instanceof FuelProcessor) {
-          if (callHandler.logConfig?.logIds?.length) {
-            contractConfig.fuelLogConfigs.push({
-              logIds: callHandler.logConfig.logIds,
-              handlerId,
-              handlerName
-            })
-          } else {
-            const fetchConfig = {
-              handlerId,
-              handlerName,
-              filters: callHandler.fetchConfig?.filters || []
-            }
-            contractConfig.fuelCallConfigs.push(fetchConfig)
+          // on transaction
+          const fetchConfig = {
+            handlerId,
+            handlerName,
+            filters: callHandler.fetchConfig?.filters || []
           }
+          contractConfig.fuelCallConfigs.push(fetchConfig)
         } else if (processor instanceof FuelAssetProcessor) {
           const assetConfig = callHandler.assetConfig
           contractConfig.assetConfigs.push({
@@ -83,6 +80,18 @@ export class FuelPlugin extends Plugin {
         }
       }
 
+      for (const logHandler of processor.logHandlers ?? []) {
+        const handlerId = handlers.logHandlers.push(logHandler.handler) - 1
+        const handlerName = logHandler.handlerName
+        if (processor instanceof FuelProcessor) {
+          contractConfig.fuelLogConfigs.push({
+            logIds: logHandler.logConfig?.logIds || [],
+            handlerId,
+            handlerName
+          })
+        }
+      }
+
       for (const blockHandler of processor.blockHandlers) {
         const handlerId = handlers.blockHandlers.push(blockHandler.handler) - 1
         contractConfig.intervalConfigs.push({
@@ -97,19 +106,25 @@ export class FuelPlugin extends Plugin {
         })
       }
 
-      // Finish up a contract
       config.contractConfigs.push(contractConfig)
     }
 
     this.handlers = handlers
   }
 
-  supportedHandlers = [HandlerType.FUEL_CALL, HandlerType.FUEL_BLOCK]
+  supportedHandlers = [
+    HandlerType.FUEL_TRANSACTION,
+    HandlerType.FUEL_RECEIPT,
+    HandlerType.FUEL_CALL,
+    HandlerType.FUEL_BLOCK
+  ]
 
   processBinding(request: DataBinding): Promise<ProcessResult> {
     switch (request.handlerType) {
-      case HandlerType.FUEL_CALL:
+      case HandlerType.FUEL_TRANSACTION:
         return this.processTransaction(request)
+      case HandlerType.FUEL_RECEIPT:
+        return this.processLog(request)
       case HandlerType.FUEL_BLOCK:
         return this.processBlock(request)
       default:
@@ -131,16 +146,38 @@ export class FuelPlugin extends Plugin {
     return TemplateInstanceState.INSTANCE.getValues().length !== config.templateInstances.length
   }
 
-  async processTransaction(binding: DataBinding): Promise<ProcessResult> {
-    if (!binding.data?.fuelCall?.transaction) {
+  async processLog(binding: DataBinding): Promise<ProcessResult> {
+    if (!binding.data?.fuelLog?.transaction) {
       throw new ServerError(Status.INVALID_ARGUMENT, "transaction can't be null")
     }
-    const fuelTransaction = binding.data.fuelCall
+    const log = binding.data.fuelLog
 
     const promises: Promise<ProcessResult>[] = []
 
     for (const handlerId of binding.handlerIds) {
-      const promise = this.handlers.callHandlers[handlerId](fuelTransaction).catch((e) => {
+      const promise = this.handlers.logHandlers[handlerId](log).catch((e) => {
+        throw new ServerError(
+          Status.INTERNAL,
+          'error processing transaction: ' + JSON.stringify(log) + '\n' + errorString(e)
+        )
+      })
+      if (GLOBAL_CONFIG.execution.sequential) {
+        await promise
+      }
+      promises.push(promise)
+    }
+    return mergeProcessResults(await Promise.all(promises))
+  }
+  async processTransaction(binding: DataBinding): Promise<ProcessResult> {
+    if (!binding.data?.fuelTransaction?.transaction) {
+      throw new ServerError(Status.INVALID_ARGUMENT, "transaction can't be null")
+    }
+    const fuelTransaction = binding.data.fuelTransaction
+
+    const promises: Promise<ProcessResult>[] = []
+
+    for (const handlerId of binding.handlerIds) {
+      const promise = this.handlers.transactionHandlers[handlerId](fuelTransaction).catch((e) => {
         throw new ServerError(
           Status.INTERNAL,
           'error processing transaction: ' + JSON.stringify(fuelTransaction.transaction) + '\n' + errorString(e)

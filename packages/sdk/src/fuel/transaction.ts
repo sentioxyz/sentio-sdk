@@ -7,6 +7,7 @@ import {
   Input,
   InputType,
   Interface,
+  JsonAbi,
   processGqlReceipt,
   Provider,
   ReceiptType,
@@ -65,6 +66,17 @@ export function decodeFuelTransaction(gqlTransaction: any, provider: Provider): 
   }
 }
 
+export function decodeLog(receipt: any | undefined, abi: JsonAbi) {
+  if (receipt && (receipt.type === ReceiptType.LogData || receipt.type === ReceiptType.Log)) {
+    const interfaceToUse = new Interface(abi)
+    const data = receipt.type === ReceiptType.Log ? new BigNumberCoder('u64').encode(receipt.val0) : receipt.data
+    const logId: string = receipt.val1.toString()
+    const [decodedLog] = interfaceToUse.decodeLog(data, logId)
+    return { logId, data: decodedLog }
+  }
+  return null
+}
+
 export async function decodeFuelTransactionWithAbi(
   gqlTransaction: any,
   abiMap: AbiMap,
@@ -92,16 +104,13 @@ export async function decodeFuelTransactionWithAbi(
   const abi = Object.values(abiMap)[0]
   const logs = [] as FuelLog<any>[]
   ;(receipts as any[]).forEach((receipt, idx) => {
-    if (receipt.type === ReceiptType.LogData || receipt.type === ReceiptType.Log) {
-      try {
-        const interfaceToUse = new Interface(abi)
-        const data = receipt.type === ReceiptType.Log ? new BigNumberCoder('u64').encode(receipt.val0) : receipt.data
-        const logId = receipt.val1.toString()
-        const [decodedLog] = interfaceToUse.decodeLog(data, logId)
-        logs.push({ logId, data: decodedLog, receiptIndex: idx })
-      } catch (e) {
-        console.warn('Failed to decode log', e)
+    try {
+      const log = decodeLog(receipt, abi)
+      if (log) {
+        logs.push({ ...log, receiptIndex: idx })
       }
+    } catch (e) {
+      console.warn('Failed to decode log', e)
     }
   })
 

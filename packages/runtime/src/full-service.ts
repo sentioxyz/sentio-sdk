@@ -1,19 +1,17 @@
 import { CallContext } from 'nice-grpc'
 import { createRequire } from 'module'
-const require = createRequire(import.meta.url)
-
 // Different than the simple one which
 import {
   DataBinding,
+  ExecutionConfig,
   HandlerType,
   PreprocessStreamRequest,
   ProcessBindingsRequest,
-  ProcessStreamRequest,
   ProcessConfigRequest,
   ProcessorServiceImplementation,
-  StartRequest,
   ProcessResult,
-  ExecutionConfig
+  ProcessStreamRequest,
+  StartRequest
 } from './gen/processor/protos/processor.js'
 
 import { Empty } from '@sentio/protos'
@@ -21,6 +19,8 @@ import fs from 'fs-extra'
 import path from 'path'
 import os from 'os'
 import { GLOBAL_CONFIG } from './global-config.js'
+
+const require = createRequire(import.meta.url)
 
 function locatePackageJson(pkgId: string) {
   const m = require.resolve(pkgId)
@@ -129,6 +129,23 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
       return
     }
     switch (dataBinding.handlerType) {
+      case HandlerType.FUEL_TRANSACTION:
+        if (this.sdkMinorVersion < 55) {
+          dataBinding.handlerType = HandlerType.FUEL_CALL
+          if (dataBinding.data) {
+            dataBinding.data.fuelCall = dataBinding.data?.fuelTransaction
+          }
+        }
+        break
+      case HandlerType.FUEL_RECEIPT:
+        if (this.sdkMinorVersion < 55) {
+          dataBinding.handlerType = HandlerType.FUEL_CALL
+          if (dataBinding.data) {
+            dataBinding.data.fuelCall = dataBinding.data?.fuelLog
+          }
+        }
+
+        break
       case HandlerType.APT_EVENT:
         if (dataBinding.data?.aptEvent) {
           if (dataBinding.data.aptEvent.rawTransaction && !dataBinding.data.aptEvent.transaction) {
