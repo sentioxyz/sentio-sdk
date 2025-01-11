@@ -3020,6 +3020,370 @@
       }
     }
   },
+  "uq64_64": {
+    "fileFormatVersion": 6,
+    "address": "0x1",
+    "name": "uq64_64",
+    "friends": [],
+    "structs": {
+      "UQ64_64": {
+        "abilities": {
+          "abilities": ["Copy", "Drop", "Store"]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "pos0",
+            "type": "U128"
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {
+      "add": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq64_64",
+              "name": "UQ64_64",
+              "typeArguments": []
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq64_64",
+              "name": "UQ64_64",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq64_64",
+              "name": "UQ64_64",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "div": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq64_64",
+              "name": "UQ64_64",
+              "typeArguments": []
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq64_64",
+              "name": "UQ64_64",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq64_64",
+              "name": "UQ64_64",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "from_int": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U64"],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq64_64",
+              "name": "UQ64_64",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "from_quotient": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U128", "U128"],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq64_64",
+              "name": "UQ64_64",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "from_raw": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U128"],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq64_64",
+              "name": "UQ64_64",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "ge": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq64_64",
+              "name": "UQ64_64",
+              "typeArguments": []
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq64_64",
+              "name": "UQ64_64",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": ["Bool"]
+      },
+      "gt": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq64_64",
+              "name": "UQ64_64",
+              "typeArguments": []
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq64_64",
+              "name": "UQ64_64",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": ["Bool"]
+      },
+      "int_div": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U128",
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq64_64",
+              "name": "UQ64_64",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": ["U128"]
+      },
+      "int_mul": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U128",
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq64_64",
+              "name": "UQ64_64",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": ["U128"]
+      },
+      "le": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq64_64",
+              "name": "UQ64_64",
+              "typeArguments": []
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq64_64",
+              "name": "UQ64_64",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": ["Bool"]
+      },
+      "lt": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq64_64",
+              "name": "UQ64_64",
+              "typeArguments": []
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq64_64",
+              "name": "UQ64_64",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": ["Bool"]
+      },
+      "mul": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq64_64",
+              "name": "UQ64_64",
+              "typeArguments": []
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq64_64",
+              "name": "UQ64_64",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq64_64",
+              "name": "UQ64_64",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "sub": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq64_64",
+              "name": "UQ64_64",
+              "typeArguments": []
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq64_64",
+              "name": "UQ64_64",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq64_64",
+              "name": "UQ64_64",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "to_int": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq64_64",
+              "name": "UQ64_64",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": ["U64"]
+      },
+      "to_raw": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "uq64_64",
+              "name": "UQ64_64",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": ["U128"]
+      }
+    }
+  },
   "vector": {
     "fileFormatVersion": 6,
     "address": "0x1",

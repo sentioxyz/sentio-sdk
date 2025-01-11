@@ -25,7 +25,7 @@ describe('Test ABI get', () => {
   })
 
   test('bsc', async () => {
-    const abi = await getABI(EthChainId.BINANCE, '0x2170Ed0880ac9A755fd29B2688956BD959F933F8', undefined)
+    const abi = await getABI(EthChainId.BSC, '0x2170Ed0880ac9A755fd29B2688956BD959F933F8', undefined)
     expect(abi.abi !== undefined).eq(true)
   })
 

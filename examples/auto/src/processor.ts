@@ -26,7 +26,7 @@ PythProcessor.bind({
 
 PythProcessor.bind({
   address: '0x4D7E825f80bDf85e913E0DD2A2D54927e9dE1594',
-  network: EthChainId.BINANCE
+  network: EthChainId.BSC
 }).onEvent((evt, ctx) => {
   ctx.meter.Counter('event_count').add(1, { name: evt.name })
   ctx.eventLogger.emit(evt.name, {

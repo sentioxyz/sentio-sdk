@@ -231,8 +231,8 @@ importers:
         specifier: ~1.17.0
         version: 1.17.0(typescript@5.5.2)
       '@sentio/chain':
-        specifier: ~2.3.7
-        version: 2.3.7
+        specifier: ~2.4.0
+        version: 2.4.0
       '@sentio/graph-cli':
         specifier: ^0.80.0-patch.1
         version: 0.80.0-patch.1(@types/node@22.8.6)(bufferutil@4.0.8)(encoding@0.1.13)(node-fetch@3.3.2)(typescript@5.5.2)(utf-8-validate@5.0.10)
@@ -534,8 +534,8 @@ importers:
         specifier: 9.1.1-patch.3
         version: 9.1.1-patch.3
       '@sentio/chain':
-        specifier: ~2.3.7
-        version: 2.3.7
+        specifier: ~2.4.0
+        version: 2.4.0
       '@sentio/ethers-v6':
         specifier: ^1.0.29
         version: 1.0.29(@sentio/ethers@6.13.1-patch.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typescript@5.5.2)
@@ -549,14 +549,14 @@ importers:
         specifier: 1.95.8
         version: 1.95.8(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
       '@typemove/aptos':
-        specifier: ~1.8.2
-        version: 1.8.2
+        specifier: ~1.8.3
+        version: 1.8.3
       '@typemove/move':
-        specifier: ~1.8.2
-        version: 1.8.2
+        specifier: ~1.8.3
+        version: 1.8.3
       '@typemove/sui':
-        specifier: ~1.8.2
-        version: 1.8.2(typescript@5.5.2)
+        specifier: ~1.8.3
+        version: 1.8.3(typescript@5.5.2)
       bs58:
         specifier: ^5.0.0
         version: 5.0.0
@@ -1732,8 +1732,8 @@ packages:
   '@sentio/bigdecimal@9.1.1-patch.3':
     resolution: {integrity: sha512-O5w8XdyeatUcwI+ZbpSw60/cXFPJk3NbpIupwMHfYmW8fpxpXyRbyGESNJNufWWrB6CadsWGh1R3rd7owvrmlw==}
 
-  '@sentio/chain@2.3.7':
-    resolution: {integrity: sha512-bEo8rExNdCltrl6R1qJZHDdmWkWvHDxTnhGFkrww3ZuMuLweuIMWMqiXxDQ6FzOqMyK5a2/vrpgcaAvy2px0lQ==}
+  '@sentio/chain@2.4.0':
+    resolution: {integrity: sha512-lKtIETx94jLo1ilwjlPhlwKnhpynOc6RWVBmGYGi5DSxF4b/fVNYuGBgLTWmme6RHwCGKfHyrZnch+kKnKBSyg==}
 
   '@sentio/ethers-v6@1.0.29':
     resolution: {integrity: sha512-/4jZZn+eM3EfI0bUMBAf5vu8muy8ABptu8ucFoMDTZLLTjxcSKRffLP3RL7w1JHGjyC2V6oEQfwS4cn9JEohHQ==}
@@ -1826,15 +1826,15 @@ packages:
   '@tsconfig/node16@1.0.4':
     resolution: {integrity: sha512-vxhUy4J8lyeyinH7Azl1pdd43GJhZH/tP2weN8TntQblOY+A0XbT8DJk1/oCPuOOyg/Ja757rG0CgHcWC8OfMA==}
 
-  '@typemove/aptos@1.8.2':
-    resolution: {integrity: sha512-bEHkTqhVSlgrnqCyo6uPu/JWwAUjVwy4e8IUGCp7kTBOi4YVdKmfdE9nJWcLW4CS+U55eDRZlE2TtI2QMW7oaA==}
+  '@typemove/aptos@1.8.3':
+    resolution: {integrity: sha512-p8dqWae23rgasqvdUp2w4brgBtA1ZwvkFIzTklvc4esqFSR/qu3mbyzTNnpPLgP0VDNOc3Gkxb9LaYmlO1Wvsw==}
     hasBin: true
 
-  '@typemove/move@1.8.2':
-    resolution: {integrity: sha512-o/v61iaraK5XML6U3mzPx31DmOHI85f/h3bTHZHyZZUarjwHyp6WG1hvXJDaELOC+uTyT5BuP3idSN9gSBpVxw==}
+  '@typemove/move@1.8.3':
+    resolution: {integrity: sha512-c+r527++o1WXDivoFAkWPX9rYpLD2agKO7YGEYyw+E8HpcZeQ8OHiyXIKqUbXyA/yNBl04bMGH+hA4uYid1/2w==}
 
-  '@typemove/sui@1.8.2':
-    resolution: {integrity: sha512-0uGR/30jxtFQ8OaAZVKGBFeDi9N83AYBBEzE9IKlMZzcUiqm5J6xS6xDKEZw27tqwbghryZydV8Sc7U45Dwdfg==}
+  '@typemove/sui@1.8.3':
+    resolution: {integrity: sha512-3rrI3palzchKT2tGev3YFXPO950UVyLVxwqbE6cUEBfsgOIo7R8C3OWpSYBz/ywdA4UvCVm1VdRlfb2v4Ew+aA==}
     hasBin: true
 
   '@types/bn.js@5.1.5':
@@ -7769,7 +7769,7 @@ snapshots:
 
   '@sentio/bigdecimal@9.1.1-patch.3': {}
 
-  '@sentio/chain@2.3.7': {}
+  '@sentio/chain@2.4.0': {}
 
   '@sentio/ethers-v6@1.0.29(@sentio/ethers@6.13.1-patch.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typescript@5.5.2)':
     dependencies:
@@ -7924,10 +7924,10 @@ snapshots:
 
   '@tsconfig/node16@1.0.4': {}
 
-  '@typemove/aptos@1.8.2':
+  '@typemove/aptos@1.8.3':
     dependencies:
       '@aptos-labs/ts-sdk': 1.33.0
-      '@typemove/move': 1.8.2
+      '@typemove/move': 1.8.3
       chalk: 5.3.0
       commander: 12.1.0
       prettier: 3.3.2
@@ -7935,14 +7935,14 @@ snapshots:
     transitivePeerDependencies:
       - debug
 
-  '@typemove/move@1.8.2':
+  '@typemove/move@1.8.3':
     dependencies:
       radash: 12.1.0
 
-  '@typemove/sui@1.8.2(typescript@5.5.2)':
+  '@typemove/sui@1.8.3(typescript@5.5.2)':
     dependencies:
       '@mysten/sui': 1.17.0(typescript@5.5.2)
-      '@typemove/move': 1.8.2
+      '@typemove/move': 1.8.3
       chalk: 5.3.0
       commander: 12.1.0
       prettier: 3.3.2
@@ -9493,7 +9493,7 @@ snapshots:
       debug: 4.3.5(supports-color@8.1.1)
       enhanced-resolve: 5.17.0
       eslint: 9.6.0
-      eslint-module-utils: 2.8.1(@typescript-eslint/parser@8.0.0(eslint@9.6.0)(typescript@5.5.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@8.0.0(eslint@9.6.0)(typescript@5.5.2))(eslint-plugin-import@2.29.1)(eslint@9.6.0))(eslint@9.6.0)
+      eslint-module-utils: 2.8.1(@typescript-eslint/parser@8.0.0(eslint@9.6.0)(typescript@5.5.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1)(eslint@9.6.0)
       eslint-plugin-import: 2.29.1(@typescript-eslint/parser@8.0.0(eslint@9.6.0)(typescript@5.5.2))(eslint-import-resolver-typescript@3.6.1)(eslint@9.6.0)
       fast-glob: 3.3.2
       get-tsconfig: 4.7.5
@@ -9505,7 +9505,7 @@ snapshots:
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-module-utils@2.8.1(@typescript-eslint/parser@8.0.0(eslint@9.6.0)(typescript@5.5.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@8.0.0(eslint@9.6.0)(typescript@5.5.2))(eslint-plugin-import@2.29.1)(eslint@9.6.0))(eslint@9.6.0):
+  eslint-module-utils@2.8.1(@typescript-eslint/parser@8.0.0(eslint@9.6.0)(typescript@5.5.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1)(eslint@9.6.0):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
@@ -9553,7 +9553,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 9.6.0
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.8.1(@typescript-eslint/parser@8.0.0(eslint@9.6.0)(typescript@5.5.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@8.0.0(eslint@9.6.0)(typescript@5.5.2))(eslint-plugin-import@2.29.1)(eslint@9.6.0))(eslint@9.6.0)
+      eslint-module-utils: 2.8.1(@typescript-eslint/parser@8.0.0(eslint@9.6.0)(typescript@5.5.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1)(eslint@9.6.0)
       hasown: 2.0.2
       is-core-module: 2.14.0
       is-glob: 4.0.3
