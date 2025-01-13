@@ -19,6 +19,7 @@ import fs from 'fs-extra'
 import path from 'path'
 import os from 'os'
 import { GLOBAL_CONFIG } from './global-config.js'
+import { compareSemver } from './utils.js'
 
 const require = createRequire(import.meta.url)
 
@@ -34,6 +35,7 @@ function locatePackageJson(pkgId: string) {
 }
 
 export class FullProcessorServiceImpl implements ProcessorServiceImplementation {
+  private sdkVersion: string
   constructor(instance: ProcessorServiceImplementation) {
     this.instance = instance
     const sdkPackageJson = locatePackageJson('@sentio/sdk')
@@ -43,12 +45,12 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
 
     const version = sdkPackageJson.version.split('.')
     this.sdkMinorVersion = parseInt(version[1])
-    this.patchVersion = version[2]
+    this.sdkVersion = sdkPackageJson.version
   }
 
   instance: ProcessorServiceImplementation
   sdkMinorVersion: number
-  patchVersion: string
+  semver: string
 
   async getConfig(request: ProcessConfigRequest, context: CallContext) {
     const config = await this.instance.getConfig(request, context)
@@ -132,7 +134,7 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
     }
     switch (dataBinding.handlerType) {
       case HandlerType.FUEL_TRANSACTION:
-        if (this.sdkMinorVersion <= 54 && this.patchVersion < 'rc.7') {
+        if (compareSemver(this.sdkVersion, '2.54.0-rc.7') < 0) {
           dataBinding.handlerType = HandlerType.FUEL_CALL
           if (dataBinding.data) {
             dataBinding.data.fuelCall = dataBinding.data?.fuelTransaction
@@ -140,7 +142,7 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
         }
         break
       case HandlerType.FUEL_RECEIPT:
-        if (this.sdkMinorVersion <= 54 && this.patchVersion < 'rc.7') {
+        if (compareSemver(this.sdkVersion, '2.54.0-rc.7') < 0) {
           dataBinding.handlerType = HandlerType.FUEL_CALL
           if (dataBinding.data) {
             dataBinding.data.fuelCall = dataBinding.data?.fuelLog

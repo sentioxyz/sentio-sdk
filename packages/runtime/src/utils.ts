@@ -36,3 +36,58 @@ export function makeEthCallKey(param: EthCallParam) {
   const { chainId, address, blockTag } = param.context
   return `${chainId}|${address}|${blockTag}|${param.calldata}`.toLowerCase()
 }
+
+export type Semver = {
+  semVer?: string
+  major: number
+  minor: number
+  patch: number
+  prerelease?: string
+  buildmetadata?: string
+}
+
+export function parseSemver(version: string): Semver {
+  const [semVer, major, minor, patch, prerelease, buildmetadata] =
+    version.match(
+      /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/
+    ) ?? []
+  return {
+    semVer,
+    major: parseInt(major),
+    minor: parseInt(minor),
+    patch: parseInt(patch),
+    prerelease,
+    buildmetadata
+  }
+}
+
+export function compareSemver(a: string, b: string) {
+  const { major: ma, minor: mia, patch: pa, prerelease: pra } = parseSemver(a)
+  const { major: mb, minor: mib, patch: pb, prerelease: prb } = parseSemver(b)
+
+  if (ma !== mb) {
+    return ma - mb
+  }
+  if (mia !== mib) {
+    return mia - mib
+  }
+
+  if (pa !== pb) {
+    return pa - pb
+  }
+  if (pra && prb) {
+    const [sa, va] = pra.split('.')
+    const [sb, vb] = prb.split('.')
+
+    if (sa !== sb) {
+      return sa.localeCompare(sb)
+    }
+
+    return parseInt(va) - parseInt(vb)
+  } else if (pra) {
+    return 1
+  } else if (prb) {
+    return -1
+  }
+  return 0
+}
