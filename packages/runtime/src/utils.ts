@@ -61,9 +61,9 @@ export function parseSemver(version: string): Semver {
   }
 }
 
-export function compareSemver(a: string, b: string) {
-  const { major: ma, minor: mia, patch: pa, prerelease: pra } = parseSemver(a)
-  const { major: mb, minor: mib, patch: pb, prerelease: prb } = parseSemver(b)
+export function compareSemver(a: Semver, b: Semver) {
+  const { major: ma, minor: mia, patch: pa, prerelease: pra } = a
+  const { major: mb, minor: mib, patch: pb, prerelease: prb } = b
 
   if (ma !== mb) {
     return ma - mb

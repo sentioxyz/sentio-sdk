@@ -19,7 +19,7 @@ import fs from 'fs-extra'
 import path from 'path'
 import os from 'os'
 import { GLOBAL_CONFIG } from './global-config.js'
-import { compareSemver } from './utils.js'
+import { compareSemver, parseSemver, Semver } from './utils.js'
 
 const require = createRequire(import.meta.url)
 
@@ -35,7 +35,6 @@ function locatePackageJson(pkgId: string) {
 }
 
 export class FullProcessorServiceImpl implements ProcessorServiceImplementation {
-  private sdkVersion: string
   constructor(instance: ProcessorServiceImplementation) {
     this.instance = instance
     const sdkPackageJson = locatePackageJson('@sentio/sdk')
@@ -43,14 +42,11 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
 
     console.log('Runtime version:', runtimePackageJson.version, 'SDK version:', sdkPackageJson.version)
 
-    const version = sdkPackageJson.version.split('.')
-    this.sdkMinorVersion = parseInt(version[1])
-    this.sdkVersion = sdkPackageJson.version
+    this.sdkVersion = parseSemver(sdkPackageJson.version)
   }
 
   instance: ProcessorServiceImplementation
-  sdkMinorVersion: number
-  semver: string
+  sdkVersion: Semver
 
   async getConfig(request: ProcessConfigRequest, context: CallContext) {
     const config = await this.instance.getConfig(request, context)
@@ -97,7 +93,7 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
       }
       return result
     } catch (e) {
-      if (this.sdkMinorVersion <= 16) {
+      if (this.sdkVersion.minor <= 16) {
         // Old sdk doesn't handle this well
         if (
           e.code === os.constants.errno.ECONNRESET ||
@@ -134,7 +130,7 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
     }
     switch (dataBinding.handlerType) {
       case HandlerType.FUEL_TRANSACTION:
-        if (compareSemver(this.sdkVersion, '2.54.0-rc.7') < 0) {
+        if (compareSemver(this.sdkVersion, fuelProtoUpdateVersion) < 0) {
           dataBinding.handlerType = HandlerType.FUEL_CALL
           if (dataBinding.data) {
             dataBinding.data.fuelCall = dataBinding.data?.fuelTransaction
@@ -142,7 +138,7 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
         }
         break
       case HandlerType.FUEL_RECEIPT:
-        if (compareSemver(this.sdkVersion, '2.54.0-rc.7') < 0) {
+        if (compareSemver(this.sdkVersion, fuelProtoUpdateVersion) < 0) {
           dataBinding.handlerType = HandlerType.FUEL_CALL
           if (dataBinding.data) {
             dataBinding.data.fuelCall = dataBinding.data?.fuelLog
@@ -218,3 +214,5 @@ function getSecondary(d: DataBinding) {
     d.data?.ethTrace?.trace?.transactionPosition
   )
 }
+
+const fuelProtoUpdateVersion = parseSemver('2.54.0-rc.7')

@@ -56,22 +56,22 @@ describe('semver parse tests', () => {
   })
 
   test('compareSemver should return 0 for equal versions', () => {
-    const a = '1.2.3'
-    const b = '1.2.3'
+    const a = parseSemver('1.2.3')
+    const b = parseSemver('1.2.3')
     const result = compareSemver(a, b)
     assert.equal(result, 0)
   })
 
   test('compareSemver should return negative for a < b', () => {
-    const a = '2.54.0-rc.7'
-    const b = '2.54.0-rc.10'
+    const a = parseSemver('2.54.0-rc.7')
+    const b = parseSemver('2.54.0-rc.10')
     const result = compareSemver(a, b)
     assert.isTrue(result < 0)
   })
 
   test('compareSemver should return positive for a > b', () => {
-    const a = '1.2.4-rc.2'
-    const b = '1.2.4'
+    const a = parseSemver('1.2.4-rc.2')
+    const b = parseSemver('1.2.4')
     const result = compareSemver(a, b)
     assert.isTrue(result > 0)
   })
