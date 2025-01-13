@@ -43,10 +43,12 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
 
     const version = sdkPackageJson.version.split('.')
     this.sdkMinorVersion = parseInt(version[1])
+    this.patchVersion = version[2]
   }
 
   instance: ProcessorServiceImplementation
   sdkMinorVersion: number
+  patchVersion: string
 
   async getConfig(request: ProcessConfigRequest, context: CallContext) {
     const config = await this.instance.getConfig(request, context)
@@ -130,7 +132,7 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
     }
     switch (dataBinding.handlerType) {
       case HandlerType.FUEL_TRANSACTION:
-        if (this.sdkMinorVersion < 55) {
+        if (this.sdkMinorVersion <= 54 && this.patchVersion < 'rc.7') {
           dataBinding.handlerType = HandlerType.FUEL_CALL
           if (dataBinding.data) {
             dataBinding.data.fuelCall = dataBinding.data?.fuelTransaction
@@ -138,7 +140,7 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
         }
         break
       case HandlerType.FUEL_RECEIPT:
-        if (this.sdkMinorVersion < 55) {
+        if (this.sdkMinorVersion <= 54 && this.patchVersion < 'rc.7') {
           dataBinding.handlerType = HandlerType.FUEL_CALL
           if (dataBinding.data) {
             dataBinding.data.fuelCall = dataBinding.data?.fuelLog
