@@ -34,7 +34,7 @@ export function Entity(entityName: string) {
     const target = BaseClass.prototype
     for (const [propertyKey, type] of Object.entries(meta)) {
       if (type.isRelation && type.relationName) {
-        const relationName = type.relationName
+        const relationName = type.relationName.endsWith('!') ? type.relationName.slice(0, -1) : type.relationName
         const idGetter = function (this: any) {
           return handleError(this.constructor.entityName, propertyKey, () => type!.to(this._data.fields[propertyKey]))
         }

@@ -71,6 +71,7 @@
     "gen:sui_test": "tsx src/sui/codegen/run.ts src/sui/tests/abis src/sui/tests/types",
     "test": "glob -c 'tsx --test' '**/*.test.ts'",
     "test:btc": "tsx --test src/btc/tests/processor.test.ts",
+    "test:db": "glob -c 'tsx --test' 'src/store/tests/database.test.ts'",
     "test:starknet": "tsx --test src/stark/tests/event.test.ts"
   },
   "dependencies": {

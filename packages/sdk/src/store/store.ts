@@ -6,7 +6,6 @@ import type { DBRequest, Entity as EntityStruct, RichValue } from '@sentio/proto
 import { DBRequest_DBOperator, DBResponse } from '@sentio/protos'
 import { PluginManager } from '@sentio/runtime'
 import { Cursor } from './cursor.js'
-import { LocalCache } from './cache.js'
 import { serializeRichValue } from './util.js'
 
 export interface EntityClass<T> {
@@ -30,16 +29,10 @@ export function getEntityName<T>(entity: EntityClass<T> | T | string): string {
 }
 
 export class Store {
-  private cache = new LocalCache()
-
   constructor(private readonly context: StoreContext) {}
 
   async get<T extends Entity>(entity: EntityClass<T> | string, id: ID): Promise<T | undefined> {
     const entityName = getEntityName(entity)
-    const cachedData = this.cache.get(entityName, id)
-    if (cachedData) {
-      return Promise.resolve(this.newEntity(entity, cachedData))
-    }
 
     const promise = this.context.sendRequest({
       get: {
@@ -68,19 +61,16 @@ export class Store {
         for (const i of id) {
           request.entity.push(entityName)
           request.id.push(i.toString())
-          this.cache.delete(entityName, i.toString())
         }
       } else {
         request.entity.push(entityName)
         request.id.push(id)
-        this.cache.delete(entityName, id)
       }
     } else {
       const entities = Array.isArray(entity) ? entity : [entity]
       for (const e of entities) {
         request.entity.push(entityName)
         request.id.push((e as Entity).id.toString())
-        this.cache.delete(entityName, id)
       }
     }
 
@@ -99,19 +89,7 @@ export class Store {
         entityData: entities.map((e: any) => e._data)
       }
     } as DBRequest
-    const promise = this.context.sendRequest(request)
-
-    return promise.then((_data) => {
-      request.upsert?.entity.forEach((entity, i) => {
-        this.cache.set({
-          entity: entity,
-          data: request.upsert?.entityData[i],
-          genBlockChain: '',
-          genBlockTime: undefined,
-          genBlockNumber: 0n
-        })
-      })
-    })
+    await this.context.sendRequest(request)
   }
 
   async *listIterator<T extends Entity, P extends keyof T, O extends Operators<T[P]>>(
@@ -191,10 +169,6 @@ export class Store {
       },
       3600
     )) as DBResponse
-
-    response.entityList?.entities?.forEach((entity) => {
-      this.cache.set(entity)
-    })
 
     return response
   }
