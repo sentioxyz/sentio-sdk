@@ -1,9 +1,9 @@
-import { StoreContext } from '../context.js'
+import { StoreContext } from '../store/context.js'
 import { DBRequest, ProcessStreamResponse } from '@sentio/protos'
 import { GraphQLField, GraphQLSchema, StringValueNode } from 'graphql/index.js'
-import { DatabaseSchemaState } from '../../core/database-schema.js'
+import { DatabaseSchemaState } from '../core/database-schema.js'
 import { parse } from 'graphql/index.js'
-import { buildSchema } from '../schema.js'
+import { buildSchema } from '../store/schema.js'
 import { GraphQLList, GraphQLNonNull, GraphQLObjectType, GraphQLOutputType } from 'graphql'
 import { PluginManager } from '@sentio/runtime'
 

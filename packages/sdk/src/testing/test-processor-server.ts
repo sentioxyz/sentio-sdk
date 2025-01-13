@@ -17,7 +17,7 @@ import {
   StartRequest
 } from '@sentio/protos'
 import { CallContext } from 'nice-grpc-common'
-import { Endpoints, ProcessorServiceImpl, State } from '@sentio/runtime'
+import { Endpoints, PluginManager, ProcessorServiceImpl, State, StoreContext } from '@sentio/runtime'
 import { CHAIN_MAP } from '@sentio/chain'
 
 import { AptosFacet } from './aptos-facet.js'
@@ -28,6 +28,8 @@ import { FuelFacet } from './fuel-facet.js'
 import { CosmosFacet } from './cosmos-facet.js'
 import { StarknetFacet } from './starknet-facet.js'
 import { BTCFacet } from './btc-facet.js'
+import { Subject } from 'rxjs'
+import { MemoryDatabase } from './memory-database.js'
 
 export const TEST_CONTEXT: CallContext = <CallContext>{}
 
@@ -39,6 +41,7 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
   service: ProcessorServiceImpl
   contractConfigs: ContractConfig[]
   accountConfigs: AccountConfig[]
+  storeContext: StoreContext
 
   aptos: AptosFacet
   eth: EthFacet
@@ -66,6 +69,12 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
       const http = httpEndpoints[k] || ''
       Endpoints.INSTANCE.chainServer.set(k, http)
     }
+
+    // start a memory database for testing
+    const subject = new Subject<DeepPartial<ProcessStreamResponse>>()
+    this.storeContext = new StoreContext(subject, 1)
+    const db = new MemoryDatabase(this.storeContext)
+    db.start()
   }
 
   async start(request: StartRequest = { templateInstances: [] }, context = TEST_CONTEXT): Promise<Empty> {
@@ -88,11 +97,15 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
     request: ProcessBindingsRequest,
     context: CallContext = TEST_CONTEXT
   ): Promise<ProcessBindingResponse> {
-    return this.service.processBindings(request, context)
+    return PluginManager.INSTANCE.dbContextLocalStorage.run(this.storeContext, () => {
+      return this.service.processBindings(request, context)
+    })
   }
 
   processBinding(request: DataBinding, context: CallContext = TEST_CONTEXT): Promise<ProcessBindingResponse> {
-    return this.service.processBindings({ bindings: [request] }, context)
+    return PluginManager.INSTANCE.dbContextLocalStorage.run(this.storeContext, () => {
+      return this.service.processBindings({ bindings: [request] }, context)
+    })
   }
 
   processBindingsStream(
