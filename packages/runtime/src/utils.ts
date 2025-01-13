@@ -85,9 +85,9 @@ export function compareSemver(a: Semver, b: Semver) {
 
     return parseInt(va) - parseInt(vb)
   } else if (pra) {
-    return 1
-  } else if (prb) {
     return -1
+  } else if (prb) {
+    return 1
   }
   return 0
 }

@@ -70,8 +70,8 @@ describe('semver parse tests', () => {
   })
 
   test('compareSemver should return positive for a > b', () => {
-    const a = parseSemver('1.2.4-rc.2')
-    const b = parseSemver('1.2.4')
+    const a = parseSemver('1.2.4')
+    const b = parseSemver('1.2.4-rc.2')
     const result = compareSemver(a, b)
     assert.isTrue(result > 0)
   })
