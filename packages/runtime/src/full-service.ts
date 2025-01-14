@@ -23,6 +23,9 @@ import { compareSemver, parseSemver, Semver } from './utils.js'
 
 const require = createRequire(import.meta.url)
 
+const FUEL_PROTO_UPDATE_VERSION = parseSemver('2.54.0-rc.7')
+const MOVE_USE_RAW_VERSION = parseSemver('2.55.0-rc.1')
+
 function locatePackageJson(pkgId: string) {
   const m = require.resolve(pkgId)
 
@@ -78,9 +81,9 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
   }
 
   async processBindings(request: ProcessBindingsRequest, options: CallContext) {
-    if (GLOBAL_CONFIG.execution.sequential) {
-      request.bindings = request.bindings.sort(dataCompare)
-    }
+    // if (GLOBAL_CONFIG.execution.sequential) {
+    //   request.bindings = request.bindings.sort(dataCompare)
+    // }
 
     for (const binding of request.bindings) {
       this.adjustDataBinding(binding)
@@ -125,12 +128,14 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
   private adjustResult(res: ProcessResult): void {}
 
   private adjustDataBinding(dataBinding?: DataBinding): void {
+    const isBeforeMoveUseRawVersion = compareSemver(this.sdkVersion, MOVE_USE_RAW_VERSION) < 0
+
     if (!dataBinding) {
       return
     }
     switch (dataBinding.handlerType) {
       case HandlerType.FUEL_TRANSACTION:
-        if (compareSemver(this.sdkVersion, fuelProtoUpdateVersion) < 0) {
+        if (compareSemver(this.sdkVersion, FUEL_PROTO_UPDATE_VERSION) < 0) {
           dataBinding.handlerType = HandlerType.FUEL_CALL
           if (dataBinding.data) {
             dataBinding.data.fuelCall = dataBinding.data?.fuelTransaction
@@ -138,7 +143,7 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
         }
         break
       case HandlerType.FUEL_RECEIPT:
-        if (compareSemver(this.sdkVersion, fuelProtoUpdateVersion) < 0) {
+        if (compareSemver(this.sdkVersion, FUEL_PROTO_UPDATE_VERSION) < 0) {
           dataBinding.handlerType = HandlerType.FUEL_CALL
           if (dataBinding.data) {
             dataBinding.data.fuelCall = dataBinding.data?.fuelLog
@@ -147,34 +152,80 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
 
         break
       case HandlerType.APT_EVENT:
-        if (dataBinding.data?.aptEvent) {
-          if (dataBinding.data.aptEvent.rawTransaction && !dataBinding.data.aptEvent.transaction) {
-            dataBinding.data.aptEvent.transaction = JSON.parse(dataBinding.data.aptEvent.rawTransaction)
+        const aptEvent = dataBinding.data?.aptEvent
+        if (aptEvent) {
+          if (isBeforeMoveUseRawVersion) {
+            aptEvent.transaction = JSON.parse(aptEvent.rawTransaction)
+            if (!aptEvent.transaction?.events?.length) {
+              // when fetch all is not true, then events is empty, we need to fill it to old format
+              aptEvent.transaction!.events = [JSON.parse(aptEvent.rawEvent)]
+            }
           }
         }
         break
       case HandlerType.APT_CALL:
-        if (dataBinding.data?.aptCall) {
-          if (dataBinding.data.aptCall.rawTransaction && !dataBinding.data.aptCall.transaction) {
-            dataBinding.data.aptCall.transaction = JSON.parse(dataBinding.data.aptCall.rawTransaction)
+        const aptCall = dataBinding.data?.aptCall
+        if (aptCall) {
+          if (isBeforeMoveUseRawVersion) {
+            aptCall.transaction = JSON.parse(aptCall.rawTransaction)
           }
         }
         break
       case HandlerType.APT_RESOURCE:
-        if (dataBinding.data?.aptResource?.resources) {
-          if (dataBinding.data.aptResource.rawResources && dataBinding.data.aptResource.rawResources.length > 0) {
-            dataBinding.data.aptResource.resources = dataBinding.data.aptResource.rawResources.map((e) => JSON.parse(e))
+        const aptResource = dataBinding.data?.aptResource
+        if (aptResource) {
+          if (isBeforeMoveUseRawVersion) {
+            aptResource.resources = aptResource.rawResources.map((e) => JSON.parse(e))
+          }
+        }
+        break
+      case HandlerType.SUI_EVENT:
+        const suiEvent = dataBinding.data?.suiEvent
+        if (suiEvent) {
+          if (isBeforeMoveUseRawVersion) {
+            suiEvent.transaction = JSON.parse(suiEvent.rawTransaction)
+            if (!suiEvent.transaction?.events?.length) {
+              // when fetch all is not true, then events is empty, we need to fill it to old format
+              suiEvent.transaction!.events = [JSON.parse(suiEvent.rawEvent)]
+            }
+          }
+        }
+        break
+      case HandlerType.SUI_CALL:
+        const suiCall = dataBinding.data?.suiCall
+        if (suiCall) {
+          if (isBeforeMoveUseRawVersion) {
+            suiCall.transaction = JSON.parse(suiCall.rawTransaction)
+          }
+        }
+        break
+      case HandlerType.SUI_OBJECT:
+        const suiObject = dataBinding.data?.suiObject
+        if (suiObject) {
+          if (isBeforeMoveUseRawVersion) {
+            if (suiObject.rawSelf) {
+              suiObject.self = JSON.parse(suiObject.rawSelf)
+            }
+            suiObject.objects = suiObject.rawObjects.map((e) => JSON.parse(e))
+          }
+        }
+        break
+      case HandlerType.SUI_OBJECT_CHANGE:
+        const suiObjectChange = dataBinding.data?.suiObjectChange
+        if (suiObjectChange) {
+          if (isBeforeMoveUseRawVersion) {
+            suiObjectChange.changes = suiObjectChange.rawChanges.map((e) => JSON.parse(e))
           }
         }
         break
       case HandlerType.UNKNOWN:
-        if (dataBinding.data?.ethBlock) {
-          if (dataBinding.data.raw.length === 0) {
-            // This is actually not needed in current system, just as initla test propose, move to test only
-            // when this is stable
-            dataBinding.data.raw = new TextEncoder().encode(JSON.stringify(dataBinding.data.ethBlock.block))
-          }
-        }
+        // if (dataBinding.data?.ethBlock) {
+        //   if (dataBinding.data.raw.length === 0) {
+        //     // This is actually not needed in current system, just as initla test propose, move to test only
+        //     // when this is stable
+        //     dataBinding.data.raw = new TextEncoder().encode(JSON.stringify(dataBinding.data.ethBlock.block))
+        //   }
+        // }
         break
       default:
         break
@@ -182,37 +233,35 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
   }
 }
 
-// TODO push the logic into sdk
-function dataCompare(a: DataBinding, b: DataBinding): number {
-  const timeA = getTimestamp(a) || new Date(0)
-  const timeB = getTimestamp(b) || new Date(0)
-  const timeCmp = timeA.getTime() - timeB.getTime()
-  if (timeCmp !== 0) {
-    return timeCmp
-  }
-  return getSecondary(a) - getSecondary(b)
-}
-
-function getTimestamp(d: DataBinding): Date | undefined {
-  return (
-    d.data?.ethLog?.timestamp ||
-    d.data?.ethTransaction?.timestamp ||
-    (d.data?.ethBlock?.block?.timestamp ? new Date(Number(d.data.ethBlock.block.timestamp) * 1000) : undefined) ||
-    d.data?.ethTrace?.timestamp ||
-    (d.data?.aptCall?.transaction ? new Date(Number(d.data.aptCall.transaction.timestamp) / 1000) : undefined) ||
-    (d.data?.aptEvent?.transaction ? new Date(Number(d.data.aptEvent.transaction.timestamp) / 1000) : undefined) ||
-    (d.data?.aptResource?.timestampMicros ? new Date(Number(d.data.aptResource.timestampMicros) / 1000) : undefined) ||
-    d.data?.fuelCall?.timestamp
-  )
-}
-
-function getSecondary(d: DataBinding) {
-  return (
-    d.data?.ethLog?.log?.logIndex ||
-    d.data?.ethTransaction?.transaction?.transactionIndex ||
-    d.data?.ethBlock?.block?.number ||
-    d.data?.ethTrace?.trace?.transactionPosition
-  )
-}
-
-const fuelProtoUpdateVersion = parseSemver('2.54.0-rc.7')
+// function dataCompare(a: DataBinding, b: DataBinding): number {
+//   const timeA = getTimestamp(a) || new Date(0)
+//   const timeB = getTimestamp(b) || new Date(0)
+//   const timeCmp = timeA.getTime() - timeB.getTime()
+//   if (timeCmp !== 0) {
+//     return timeCmp
+//   }
+//   return getSecondary(a) - getSecondary(b)
+// }
+//
+// function getTimestamp(d: DataBinding): Date | undefined {
+//   return (
+//     d.data?.ethLog?.timestamp ||
+//     d.data?.ethTransaction?.timestamp ||
+//     (d.data?.ethBlock?.block?.timestamp ? new Date(Number(d.data.ethBlock.block.timestamp) * 1000) : undefined) ||
+//     d.data?.ethTrace?.timestamp ||
+//     (d.data?.aptCall?.transaction ? new Date(Number(d.data.aptCall.transaction.timestamp) / 1000) : undefined) ||
+//     (d.data?.aptEvent?.transaction ? new Date(Number(d.data.aptEvent.transaction.timestamp) / 1000) : undefined) ||
+//     (d.data?.aptResource?.timestampMicros ? new Date(Number(d.data.aptResource.timestampMicros) / 1000) : undefined) ||
+//     d.data?.fuelCall?.timestamp
+//   )
+// }
+//
+// function getSecondary(d: DataBinding) {
+//   return (
+//     d.data?.ethLog?.log?.logIndex ||
+//     d.data?.ethTransaction?.transaction?.transactionIndex ||
+//     d.data?.ethBlock?.block?.number ||
+//     d.data?.ethTrace?.trace?.transactionPosition
+//   )
+// }
+//

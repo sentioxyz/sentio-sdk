@@ -10,7 +10,7 @@ import {
 
 import { AptosBindOptions, AptosNetwork } from './network.js'
 import { AptosContext, AptosResourcesContext, AptosTransactionContext } from './context.js'
-import { ListStateStorage, mergeProcessResults } from '@sentio/runtime'
+import { ListStateStorage } from '@sentio/runtime'
 import {
   MoveFetchConfig,
   Data_AptResource,
@@ -81,7 +81,7 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
   }
 
   protected onMoveEvent(
-    handler: (event: Event, ctx: AptosContext) => void,
+    handler: (event: Event, ctx: AptosContext) => PromiseOrVoid,
     filter: EventFilter | EventFilter[],
     fetchConfig?: Partial<MoveFetchConfig>
   ): this {
@@ -97,42 +97,34 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
     // const moduleName = this.moduleName
 
     const processor = this
-    const allEventType = new Set(_filters.map((f) => accountTypeString(processor.config.address) + '::' + f.type))
 
     this.eventHandlers.push({
       handlerName: getHandlerName(),
       handler: async function (data) {
-        if (!data.transaction) {
+        if (!data.rawTransaction) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'event is null')
         }
-        const txn = data.transaction as UserTransactionResponse
+        const txn = JSON.parse(data.rawTransaction) as UserTransactionResponse
         if (!txn.events.length) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'no event in the transactions')
         }
 
-        const processResults = []
-        for (const [idx, evt] of txn.events.entries()) {
-          const typeQname = parseMoveType(evt.type).qname
-          if (!allEventType.has(typeQname)) {
-            continue
-          }
+        const evt = JSON.parse(data.rawEvent)
 
-          const ctx = new AptosContext(
-            processor.moduleName,
-            processor.config.network,
-            processor.config.address,
-            BigInt(txn.version),
-            txn,
-            idx,
-            processor.config.baseLabels
-          )
+        const ctx = new AptosContext(
+          processor.moduleName,
+          processor.config.network,
+          processor.config.address,
+          BigInt(txn.version),
+          txn,
+          data.eventIndex,
+          processor.config.baseLabels
+        )
 
-          const decoded = await processor.coder.decodeEvent<any>(evt)
-          await handler(decoded || evt, ctx)
-          processResults.push(ctx.stopAndGetResult())
-        }
+        const decoded = await processor.coder.decodeEvent<any>(evt)
+        await handler(decoded || evt, ctx)
 
-        return mergeProcessResults(processResults)
+        return ctx.stopAndGetResult()
       },
       filters: _filters,
       fetchConfig: _fetchConfig
@@ -161,10 +153,10 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
     this.callHandlers.push({
       handlerName: getHandlerName(),
       handler: async function (data) {
-        if (!data.transaction) {
+        if (!data.rawTransaction) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'call is null')
         }
-        const tx = data.transaction as UserTransactionResponse
+        const tx = JSON.parse(data.rawTransaction) as UserTransactionResponse
 
         const ctx = new AptosContext(
           processor.moduleName,
@@ -203,15 +195,15 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
     this.callHandlers.push({
       handlerName: getHandlerName(),
       handler: async function (data) {
-        if (!data.transaction) {
+        if (!data.rawTransaction) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'call is null')
         }
-        const call = data.transaction as UserTransactionResponse
+        const call = JSON.parse(data.rawTransaction) as UserTransactionResponse
         const ctx = new AptosContext(
           processor.moduleName,
           processor.config.network,
           processor.config.address,
-          BigInt(data.transaction.version),
+          BigInt(call.version),
           call,
           0,
           processor.config.baseLabels
@@ -244,7 +236,7 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
     this.resourceChangeHandlers.push({
       handlerName: getHandlerName(),
       handler: async function (data) {
-        if (!data.resources || !data.version) {
+        if (!data.rawResources || !data.version) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'resource is null')
         }
         const timestamp = Number(data.timestampMicros)
@@ -255,7 +247,10 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
           timestamp,
           processor.config.baseLabels
         )
-        let resources = await decodeResourceChange<T>(data.resources, ctx.coder)
+        let resources = await decodeResourceChange<T>(
+          data.rawResources.map((r) => JSON.parse(r)),
+          ctx.coder
+        )
 
         if (hasAny) {
           resources = resources.filter((r) => {
@@ -284,7 +279,10 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
     this.transactionIntervalHandlers.push({
       handlerName: getHandlerName(),
       handler: async function (data) {
-        const transaction = data.transaction as T
+        if (!data.rawTransaction) {
+          throw new ServerError(Status.INVALID_ARGUMENT, 'call is null')
+        }
+        const transaction = JSON.parse(data.rawTransaction) as T
         const timestampMicros = BigInt(transaction.timestamp)
         if (timestampMicros > Number.MAX_SAFE_INTEGER) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'timestamp is too large')
@@ -455,7 +453,7 @@ export class AptosResourcesProcessor {
           timestamp,
           processor.config.baseLabels
         )
-        await handler(data.resources as MoveResource[], ctx)
+        await handler(data.rawResources.map((r) => JSON.parse(r)) as MoveResource[], ctx)
         return ctx.stopAndGetResult()
       },
       timeIntervalInMinutes: timeInterval,
@@ -518,7 +516,7 @@ export class AptosResourcesProcessor {
       handler: async function (data) {
         const timestamp = Number(data.timestampMicros)
 
-        if (!data.resources || !data.version) {
+        if (!data.rawResources || !data.version) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'resource is null')
         }
         const ctx = new AptosResourcesContext(
@@ -529,7 +527,10 @@ export class AptosResourcesProcessor {
           processor.config.baseLabels
         )
 
-        let resources = (await decodeResourceChange(data.resources, ctx.coder)) as ResourceChange<T>[]
+        let resources = (await decodeResourceChange(
+          data.rawResources.map((r) => JSON.parse(r)),
+          ctx.coder
+        )) as ResourceChange<T>[]
 
         if (hasAny) {
           resources = resources.filter((r) => {

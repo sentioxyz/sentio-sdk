@@ -50,7 +50,7 @@ export class SuiFacet {
               return {
                 data: {
                   suiCall: {
-                    transaction,
+                    rawTransaction: JSON.stringify(transaction),
                     timestamp: new Date(),
                     slot: 10000n
                   }
@@ -95,7 +95,7 @@ export class SuiFacet {
       handlerType: HandlerType.SUI_CALL,
       data: {
         suiCall: {
-          transaction,
+          rawTransaction: JSON.stringify(transaction),
           timestamp: transaction.timestampMs ? new Date(transaction.timestampMs) : new Date(),
           slot: BigInt(transaction.checkpoint || 0)
         }
@@ -124,7 +124,8 @@ export class SuiFacet {
               return {
                 data: {
                   suiEvent: {
-                    transaction,
+                    rawEvent: JSON.stringify(event),
+                    rawTransaction: JSON.stringify(transaction),
                     timestamp: new Date(transaction.timestampMs || 0),
                     slot: 10000n
                   }

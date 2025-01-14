@@ -43,8 +43,7 @@ export class AptosFacet {
             return {
               data: {
                 aptCall: {
-                  rawTransaction: '',
-                  transaction
+                  rawTransaction: JSON.stringify(transaction)
                 }
               },
               handlerIds: [callConfig.handlerId],
@@ -76,7 +75,7 @@ export class AptosFacet {
       }
       for (const eventConfig of config.moveEventConfigs) {
         for (const eventFilter of eventConfig.filters) {
-          for (const event of transaction.events) {
+          for (const [idx, event] of transaction.events.entries()) {
             if (
               accountTypeString(config.contract.address) + '::' + eventFilter.type ===
               parseMoveType(event.type).qname
@@ -84,8 +83,9 @@ export class AptosFacet {
               return {
                 data: {
                   aptEvent: {
-                    rawTransaction: '',
-                    transaction
+                    rawEvent: JSON.stringify(event),
+                    eventIndex: idx,
+                    rawTransaction: JSON.stringify(transaction)
                   }
                 },
                 handlerIds: [eventConfig.handlerId],

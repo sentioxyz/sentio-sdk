@@ -1053,8 +1053,6 @@ export interface DBRequest_DBFilter {
 }
 
 export interface Data {
-  /** @deprecated */
-  raw: Uint8Array;
   ethLog?: Data_EthLog | undefined;
   ethBlock?: Data_EthBlock | undefined;
   ethTransaction?: Data_EthTransaction | undefined;
@@ -1117,16 +1115,21 @@ export interface Data_SolInstruction {
 }
 
 export interface Data_AptEvent {
+  rawEvent: string;
+  eventIndex: number;
+  /** @deprecated */
   transaction: { [key: string]: any } | undefined;
   rawTransaction: string;
 }
 
 export interface Data_AptCall {
+  /** @deprecated */
   transaction: { [key: string]: any } | undefined;
   rawTransaction: string;
 }
 
 export interface Data_AptResource {
+  /** @deprecated */
   resources: { [key: string]: any }[];
   version: bigint;
   timestampMicros: bigint;
@@ -1134,20 +1137,29 @@ export interface Data_AptResource {
 }
 
 export interface Data_SuiEvent {
+  /** @deprecated */
   transaction: { [key: string]: any } | undefined;
+  rawEvent: string;
+  rawTransaction: string;
   timestamp: Date | undefined;
   slot: bigint;
 }
 
 export interface Data_SuiCall {
+  /** @deprecated */
   transaction: { [key: string]: any } | undefined;
+  rawTransaction: string;
   timestamp: Date | undefined;
   slot: bigint;
 }
 
 export interface Data_SuiObject {
+  /** @deprecated */
   objects: { [key: string]: any }[];
+  /** @deprecated */
   self?: { [key: string]: any } | undefined;
+  rawObjects: string[];
+  rawSelf?: string | undefined;
   objectId: string;
   objectVersion: bigint;
   objectDigest: string;
@@ -1156,7 +1168,9 @@ export interface Data_SuiObject {
 }
 
 export interface Data_SuiObjectChange {
+  /** @deprecated */
   changes: { [key: string]: any }[];
+  rawChanges: string[];
   timestamp: Date | undefined;
   txDigest: string;
   slot: bigint;
@@ -8651,7 +8665,6 @@ export const DBRequest_DBFilter = {
 
 function createBaseData(): Data {
   return {
-    raw: new Uint8Array(0),
     ethLog: undefined,
     ethBlock: undefined,
     ethTransaction: undefined,
@@ -8677,9 +8690,6 @@ function createBaseData(): Data {
 
 export const Data = {
   encode(message: Data, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.raw.length !== 0) {
-      writer.uint32(10).bytes(message.raw);
-    }
     if (message.ethLog !== undefined) {
       Data_EthLog.encode(message.ethLog, writer.uint32(18).fork()).ldelim();
     }
@@ -8750,13 +8760,6 @@ export const Data = {
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.raw = reader.bytes();
-          continue;
         case 2:
           if (tag !== 18) {
             break;
@@ -8908,7 +8911,6 @@ export const Data = {
 
   fromJSON(object: any): Data {
     return {
-      raw: isSet(object.raw) ? bytesFromBase64(object.raw) : new Uint8Array(0),
       ethLog: isSet(object.ethLog) ? Data_EthLog.fromJSON(object.ethLog) : undefined,
       ethBlock: isSet(object.ethBlock) ? Data_EthBlock.fromJSON(object.ethBlock) : undefined,
       ethTransaction: isSet(object.ethTransaction) ? Data_EthTransaction.fromJSON(object.ethTransaction) : undefined,
@@ -8938,9 +8940,6 @@ export const Data = {
 
   toJSON(message: Data): unknown {
     const obj: any = {};
-    if (message.raw.length !== 0) {
-      obj.raw = base64FromBytes(message.raw);
-    }
     if (message.ethLog !== undefined) {
       obj.ethLog = Data_EthLog.toJSON(message.ethLog);
     }
@@ -9009,7 +9008,6 @@ export const Data = {
   },
   fromPartial(object: DeepPartial<Data>): Data {
     const message = createBaseData();
-    message.raw = object.raw ?? new Uint8Array(0);
     message.ethLog = (object.ethLog !== undefined && object.ethLog !== null)
       ? Data_EthLog.fromPartial(object.ethLog)
       : undefined;
@@ -9629,11 +9627,17 @@ export const Data_SolInstruction = {
 };
 
 function createBaseData_AptEvent(): Data_AptEvent {
-  return { transaction: undefined, rawTransaction: "" };
+  return { rawEvent: "", eventIndex: 0, transaction: undefined, rawTransaction: "" };
 }
 
 export const Data_AptEvent = {
   encode(message: Data_AptEvent, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.rawEvent !== "") {
+      writer.uint32(10).string(message.rawEvent);
+    }
+    if (message.eventIndex !== 0) {
+      writer.uint32(32).int32(message.eventIndex);
+    }
     if (message.transaction !== undefined) {
       Struct.encode(Struct.wrap(message.transaction), writer.uint32(18).fork()).ldelim();
     }
@@ -9650,6 +9654,20 @@ export const Data_AptEvent = {
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.rawEvent = reader.string();
+          continue;
+        case 4:
+          if (tag !== 32) {
+            break;
+          }
+
+          message.eventIndex = reader.int32();
+          continue;
         case 2:
           if (tag !== 18) {
             break;
@@ -9675,6 +9693,8 @@ export const Data_AptEvent = {
 
   fromJSON(object: any): Data_AptEvent {
     return {
+      rawEvent: isSet(object.rawEvent) ? globalThis.String(object.rawEvent) : "",
+      eventIndex: isSet(object.eventIndex) ? globalThis.Number(object.eventIndex) : 0,
       transaction: isObject(object.transaction) ? object.transaction : undefined,
       rawTransaction: isSet(object.rawTransaction) ? globalThis.String(object.rawTransaction) : "",
     };
@@ -9682,6 +9702,12 @@ export const Data_AptEvent = {
 
   toJSON(message: Data_AptEvent): unknown {
     const obj: any = {};
+    if (message.rawEvent !== "") {
+      obj.rawEvent = message.rawEvent;
+    }
+    if (message.eventIndex !== 0) {
+      obj.eventIndex = Math.round(message.eventIndex);
+    }
     if (message.transaction !== undefined) {
       obj.transaction = message.transaction;
     }
@@ -9696,6 +9722,8 @@ export const Data_AptEvent = {
   },
   fromPartial(object: DeepPartial<Data_AptEvent>): Data_AptEvent {
     const message = createBaseData_AptEvent();
+    message.rawEvent = object.rawEvent ?? "";
+    message.eventIndex = object.eventIndex ?? 0;
     message.transaction = object.transaction ?? undefined;
     message.rawTransaction = object.rawTransaction ?? "";
     return message;
@@ -9889,13 +9917,19 @@ export const Data_AptResource = {
 };
 
 function createBaseData_SuiEvent(): Data_SuiEvent {
-  return { transaction: undefined, timestamp: undefined, slot: BigInt("0") };
+  return { transaction: undefined, rawEvent: "", rawTransaction: "", timestamp: undefined, slot: BigInt("0") };
 }
 
 export const Data_SuiEvent = {
   encode(message: Data_SuiEvent, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.transaction !== undefined) {
       Struct.encode(Struct.wrap(message.transaction), writer.uint32(10).fork()).ldelim();
+    }
+    if (message.rawEvent !== "") {
+      writer.uint32(34).string(message.rawEvent);
+    }
+    if (message.rawTransaction !== "") {
+      writer.uint32(42).string(message.rawTransaction);
     }
     if (message.timestamp !== undefined) {
       Timestamp.encode(toTimestamp(message.timestamp), writer.uint32(18).fork()).ldelim();
@@ -9923,6 +9957,20 @@ export const Data_SuiEvent = {
 
           message.transaction = Struct.unwrap(Struct.decode(reader, reader.uint32()));
           continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.rawEvent = reader.string();
+          continue;
+        case 5:
+          if (tag !== 42) {
+            break;
+          }
+
+          message.rawTransaction = reader.string();
+          continue;
         case 2:
           if (tag !== 18) {
             break;
@@ -9949,6 +9997,8 @@ export const Data_SuiEvent = {
   fromJSON(object: any): Data_SuiEvent {
     return {
       transaction: isObject(object.transaction) ? object.transaction : undefined,
+      rawEvent: isSet(object.rawEvent) ? globalThis.String(object.rawEvent) : "",
+      rawTransaction: isSet(object.rawTransaction) ? globalThis.String(object.rawTransaction) : "",
       timestamp: isSet(object.timestamp) ? fromJsonTimestamp(object.timestamp) : undefined,
       slot: isSet(object.slot) ? BigInt(object.slot) : BigInt("0"),
     };
@@ -9958,6 +10008,12 @@ export const Data_SuiEvent = {
     const obj: any = {};
     if (message.transaction !== undefined) {
       obj.transaction = message.transaction;
+    }
+    if (message.rawEvent !== "") {
+      obj.rawEvent = message.rawEvent;
+    }
+    if (message.rawTransaction !== "") {
+      obj.rawTransaction = message.rawTransaction;
     }
     if (message.timestamp !== undefined) {
       obj.timestamp = message.timestamp.toISOString();
@@ -9974,6 +10030,8 @@ export const Data_SuiEvent = {
   fromPartial(object: DeepPartial<Data_SuiEvent>): Data_SuiEvent {
     const message = createBaseData_SuiEvent();
     message.transaction = object.transaction ?? undefined;
+    message.rawEvent = object.rawEvent ?? "";
+    message.rawTransaction = object.rawTransaction ?? "";
     message.timestamp = object.timestamp ?? undefined;
     message.slot = object.slot ?? BigInt("0");
     return message;
@@ -9981,13 +10039,16 @@ export const Data_SuiEvent = {
 };
 
 function createBaseData_SuiCall(): Data_SuiCall {
-  return { transaction: undefined, timestamp: undefined, slot: BigInt("0") };
+  return { transaction: undefined, rawTransaction: "", timestamp: undefined, slot: BigInt("0") };
 }
 
 export const Data_SuiCall = {
   encode(message: Data_SuiCall, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.transaction !== undefined) {
       Struct.encode(Struct.wrap(message.transaction), writer.uint32(10).fork()).ldelim();
+    }
+    if (message.rawTransaction !== "") {
+      writer.uint32(34).string(message.rawTransaction);
     }
     if (message.timestamp !== undefined) {
       Timestamp.encode(toTimestamp(message.timestamp), writer.uint32(18).fork()).ldelim();
@@ -10015,6 +10076,13 @@ export const Data_SuiCall = {
 
           message.transaction = Struct.unwrap(Struct.decode(reader, reader.uint32()));
           continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.rawTransaction = reader.string();
+          continue;
         case 2:
           if (tag !== 18) {
             break;
@@ -10041,6 +10109,7 @@ export const Data_SuiCall = {
   fromJSON(object: any): Data_SuiCall {
     return {
       transaction: isObject(object.transaction) ? object.transaction : undefined,
+      rawTransaction: isSet(object.rawTransaction) ? globalThis.String(object.rawTransaction) : "",
       timestamp: isSet(object.timestamp) ? fromJsonTimestamp(object.timestamp) : undefined,
       slot: isSet(object.slot) ? BigInt(object.slot) : BigInt("0"),
     };
@@ -10050,6 +10119,9 @@ export const Data_SuiCall = {
     const obj: any = {};
     if (message.transaction !== undefined) {
       obj.transaction = message.transaction;
+    }
+    if (message.rawTransaction !== "") {
+      obj.rawTransaction = message.rawTransaction;
     }
     if (message.timestamp !== undefined) {
       obj.timestamp = message.timestamp.toISOString();
@@ -10066,6 +10138,7 @@ export const Data_SuiCall = {
   fromPartial(object: DeepPartial<Data_SuiCall>): Data_SuiCall {
     const message = createBaseData_SuiCall();
     message.transaction = object.transaction ?? undefined;
+    message.rawTransaction = object.rawTransaction ?? "";
     message.timestamp = object.timestamp ?? undefined;
     message.slot = object.slot ?? BigInt("0");
     return message;
@@ -10076,6 +10149,8 @@ function createBaseData_SuiObject(): Data_SuiObject {
   return {
     objects: [],
     self: undefined,
+    rawObjects: [],
+    rawSelf: undefined,
     objectId: "",
     objectVersion: BigInt("0"),
     objectDigest: "",
@@ -10091,6 +10166,12 @@ export const Data_SuiObject = {
     }
     if (message.self !== undefined) {
       Struct.encode(Struct.wrap(message.self), writer.uint32(34).fork()).ldelim();
+    }
+    for (const v of message.rawObjects) {
+      writer.uint32(82).string(v!);
+    }
+    if (message.rawSelf !== undefined) {
+      writer.uint32(74).string(message.rawSelf);
     }
     if (message.objectId !== "") {
       writer.uint32(42).string(message.objectId);
@@ -10136,6 +10217,20 @@ export const Data_SuiObject = {
           }
 
           message.self = Struct.unwrap(Struct.decode(reader, reader.uint32()));
+          continue;
+        case 10:
+          if (tag !== 82) {
+            break;
+          }
+
+          message.rawObjects.push(reader.string());
+          continue;
+        case 9:
+          if (tag !== 74) {
+            break;
+          }
+
+          message.rawSelf = reader.string();
           continue;
         case 5:
           if (tag !== 42) {
@@ -10185,6 +10280,10 @@ export const Data_SuiObject = {
     return {
       objects: globalThis.Array.isArray(object?.objects) ? [...object.objects] : [],
       self: isObject(object.self) ? object.self : undefined,
+      rawObjects: globalThis.Array.isArray(object?.rawObjects)
+        ? object.rawObjects.map((e: any) => globalThis.String(e))
+        : [],
+      rawSelf: isSet(object.rawSelf) ? globalThis.String(object.rawSelf) : undefined,
       objectId: isSet(object.objectId) ? globalThis.String(object.objectId) : "",
       objectVersion: isSet(object.objectVersion) ? BigInt(object.objectVersion) : BigInt("0"),
       objectDigest: isSet(object.objectDigest) ? globalThis.String(object.objectDigest) : "",
@@ -10200,6 +10299,12 @@ export const Data_SuiObject = {
     }
     if (message.self !== undefined) {
       obj.self = message.self;
+    }
+    if (message.rawObjects?.length) {
+      obj.rawObjects = message.rawObjects;
+    }
+    if (message.rawSelf !== undefined) {
+      obj.rawSelf = message.rawSelf;
     }
     if (message.objectId !== "") {
       obj.objectId = message.objectId;
@@ -10226,6 +10331,8 @@ export const Data_SuiObject = {
     const message = createBaseData_SuiObject();
     message.objects = object.objects?.map((e) => e) || [];
     message.self = object.self ?? undefined;
+    message.rawObjects = object.rawObjects?.map((e) => e) || [];
+    message.rawSelf = object.rawSelf ?? undefined;
     message.objectId = object.objectId ?? "";
     message.objectVersion = object.objectVersion ?? BigInt("0");
     message.objectDigest = object.objectDigest ?? "";
@@ -10236,13 +10343,16 @@ export const Data_SuiObject = {
 };
 
 function createBaseData_SuiObjectChange(): Data_SuiObjectChange {
-  return { changes: [], timestamp: undefined, txDigest: "", slot: BigInt("0") };
+  return { changes: [], rawChanges: [], timestamp: undefined, txDigest: "", slot: BigInt("0") };
 }
 
 export const Data_SuiObjectChange = {
   encode(message: Data_SuiObjectChange, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     for (const v of message.changes) {
       Struct.encode(Struct.wrap(v!), writer.uint32(10).fork()).ldelim();
+    }
+    for (const v of message.rawChanges) {
+      writer.uint32(42).string(v!);
     }
     if (message.timestamp !== undefined) {
       Timestamp.encode(toTimestamp(message.timestamp), writer.uint32(18).fork()).ldelim();
@@ -10272,6 +10382,13 @@ export const Data_SuiObjectChange = {
           }
 
           message.changes.push(Struct.unwrap(Struct.decode(reader, reader.uint32())));
+          continue;
+        case 5:
+          if (tag !== 42) {
+            break;
+          }
+
+          message.rawChanges.push(reader.string());
           continue;
         case 2:
           if (tag !== 18) {
@@ -10306,6 +10423,9 @@ export const Data_SuiObjectChange = {
   fromJSON(object: any): Data_SuiObjectChange {
     return {
       changes: globalThis.Array.isArray(object?.changes) ? [...object.changes] : [],
+      rawChanges: globalThis.Array.isArray(object?.rawChanges)
+        ? object.rawChanges.map((e: any) => globalThis.String(e))
+        : [],
       timestamp: isSet(object.timestamp) ? fromJsonTimestamp(object.timestamp) : undefined,
       txDigest: isSet(object.txDigest) ? globalThis.String(object.txDigest) : "",
       slot: isSet(object.slot) ? BigInt(object.slot) : BigInt("0"),
@@ -10316,6 +10436,9 @@ export const Data_SuiObjectChange = {
     const obj: any = {};
     if (message.changes?.length) {
       obj.changes = message.changes;
+    }
+    if (message.rawChanges?.length) {
+      obj.rawChanges = message.rawChanges;
     }
     if (message.timestamp !== undefined) {
       obj.timestamp = message.timestamp.toISOString();
@@ -10335,6 +10458,7 @@ export const Data_SuiObjectChange = {
   fromPartial(object: DeepPartial<Data_SuiObjectChange>): Data_SuiObjectChange {
     const message = createBaseData_SuiObjectChange();
     message.changes = object.changes?.map((e) => e) || [];
+    message.rawChanges = object.rawChanges?.map((e) => e) || [];
     message.timestamp = object.timestamp ?? undefined;
     message.txDigest = object.txDigest ?? "";
     message.slot = object.slot ?? BigInt("0");
@@ -12796,31 +12920,6 @@ export interface ProcessorClient<CallOptionsExt = {}> {
     request: AsyncIterable<DeepPartial<PreprocessStreamRequest>>,
     options?: CallOptions & CallOptionsExt,
   ): AsyncIterable<PreprocessStreamResponse>;
-}
-
-function bytesFromBase64(b64: string): Uint8Array {
-  if ((globalThis as any).Buffer) {
-    return Uint8Array.from(globalThis.Buffer.from(b64, "base64"));
-  } else {
-    const bin = globalThis.atob(b64);
-    const arr = new Uint8Array(bin.length);
-    for (let i = 0; i < bin.length; ++i) {
-      arr[i] = bin.charCodeAt(i);
-    }
-    return arr;
-  }
-}
-
-function base64FromBytes(arr: Uint8Array): string {
-  if ((globalThis as any).Buffer) {
-    return globalThis.Buffer.from(arr).toString("base64");
-  } else {
-    const bin: string[] = [];
-    arr.forEach((byte) => {
-      bin.push(globalThis.String.fromCharCode(byte));
-    });
-    return globalThis.btoa(bin.join(""));
-  }
 }
 
 type Builtin = Date | Function | Uint8Array | string | number | boolean | bigint | undefined;

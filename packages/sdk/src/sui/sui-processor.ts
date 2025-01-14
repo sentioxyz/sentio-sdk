@@ -1,5 +1,5 @@
 import { Data_SuiCall, Data_SuiEvent, Data_SuiObjectChange, MoveFetchConfig } from '@sentio/protos'
-import { ListStateStorage, mergeProcessResults } from '@sentio/runtime'
+import { ListStateStorage } from '@sentio/runtime'
 import { SuiNetwork } from './network.js'
 import { ServerError, Status } from 'nice-grpc'
 import { SuiContext, SuiObjectChangeContext } from './context.js'
@@ -11,13 +11,12 @@ import {
   EventHandler,
   FunctionNameAndCallFilter,
   ObjectChangeHandler,
-  parseMoveType,
   SPLITTER,
   TransactionFilter
 } from '../move/index.js'
 import { getMoveCalls } from './utils.js'
 import { defaultMoveCoder, MoveCoder } from './index.js'
-import { ALL_ADDRESS, Labels } from '../core/index.js'
+import { ALL_ADDRESS, Labels, PromiseOrVoid } from '../core/index.js'
 import { Required } from 'utility-types'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 
@@ -73,7 +72,7 @@ export class SuiBaseProcessor {
   }
 
   protected onMoveEvent(
-    handler: (event: SuiEvent, ctx: SuiContext) => void,
+    handler: (event: SuiEvent, ctx: SuiContext) => PromiseOrVoid,
     filter: EventFilter | EventFilter[],
     fetchConfig?: Partial<MoveFetchConfig>
   ): SuiBaseProcessor {
@@ -90,48 +89,36 @@ export class SuiBaseProcessor {
     // const moduleName = this.moduleName
 
     const processor = this
-    const allEventType = new Set(_filters.map((f) => f.type))
 
     this.eventHandlers.push({
       handlerName: getHandlerName(),
       handler: async function (data) {
-        if (!data.transaction) {
+        if (!data.rawTransaction) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'event is null')
         }
-        const txn = data.transaction as SuiTransactionBlockResponse
+        const txn = JSON.parse(data.rawTransaction) as SuiTransactionBlockResponse
         if (!txn.events || !txn.events.length) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'no event in the transactions')
         }
 
-        const processResults = []
-        for (const evt of txn.events) {
-          const idx = Number(evt.id.eventSeq) || 0
-          const [_, module, type] = parseMoveType(evt.type).qname.split(SPLITTER)
-          if (!allEventType.has([module, type].join(SPLITTER))) {
-            continue
-          }
+        const evt = JSON.parse(data.rawEvent) as SuiEvent
+        const idx = Number(evt.id.eventSeq) || 0
 
-          const ctx = new SuiContext(
-            processor.moduleName,
-            processor.config.network,
-            processor.config.address,
-            data.timestamp || new Date(0),
-            data.slot,
-            txn,
-            idx,
-            processor.config.baseLabels
-          )
+        const ctx = new SuiContext(
+          processor.moduleName,
+          processor.config.network,
+          processor.config.address,
+          data.timestamp || new Date(0),
+          data.slot,
+          txn,
+          idx,
+          processor.config.baseLabels
+        )
 
-          // const parts = typeQname.split(SPLITTER)
-          // if (evt.packageId && parts[0] != evt.packageId) {
-          //   evt.type = evt.type.replace(parts[0], evt.packageId)
-          // }
-          const decoded = await processor.coder.decodeEvent<any>(evt)
-          await handler(decoded || evt, ctx)
-          processResults.push(ctx.stopAndGetResult())
-        }
+        const decoded = await processor.coder.decodeEvent<any>(evt)
+        await handler(decoded || evt, ctx)
 
-        return mergeProcessResults(processResults)
+        return ctx.stopAndGetResult()
       },
       filters: _filters,
       fetchConfig: _fetchConfig
@@ -140,7 +127,7 @@ export class SuiBaseProcessor {
   }
 
   protected onEntryFunctionCall(
-    handler: (call: MoveCallSuiTransaction, ctx: SuiContext) => void,
+    handler: (call: MoveCallSuiTransaction, ctx: SuiContext) => PromiseOrVoid,
     filter: FunctionNameAndCallFilter | FunctionNameAndCallFilter[],
     fetchConfig?: Partial<MoveFetchConfig>
   ): SuiBaseProcessor {
@@ -159,10 +146,10 @@ export class SuiBaseProcessor {
     this.callHandlers.push({
       handlerName: getHandlerName(),
       handler: async function (data) {
-        if (!data.transaction) {
+        if (!data.rawTransaction) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'call is null')
         }
-        const tx = data.transaction as SuiTransactionBlockResponse
+        const tx = JSON.parse(data.rawTransaction) as SuiTransactionBlockResponse
 
         const ctx = new SuiContext(
           processor.moduleName,
@@ -210,7 +197,7 @@ export class SuiBaseProcessor {
   }
 
   onTransactionBlock(
-    handler: (transaction: SuiTransactionBlockResponse, ctx: SuiContext) => void,
+    handler: (transaction: SuiTransactionBlockResponse, ctx: SuiContext) => PromiseOrVoid,
     filter?: TransactionFilter,
     fetchConfig?: Partial<MoveFetchConfig>
   ): this {
@@ -221,10 +208,10 @@ export class SuiBaseProcessor {
     this.callHandlers.push({
       handlerName: getHandlerName(),
       handler: async function (data) {
-        if (!data.transaction) {
+        if (!data.rawTransaction) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'transaction is null')
         }
-        const tx = data.transaction as SuiTransactionBlockResponse
+        const tx = JSON.parse(data.rawTransaction) as SuiTransactionBlockResponse
 
         const ctx = new SuiContext(
           processor.moduleName,
@@ -248,7 +235,7 @@ export class SuiBaseProcessor {
   }
 
   protected onObjectChange(
-    handler: (changes: SuiObjectChange[], ctx: SuiObjectChangeContext) => void,
+    handler: (changes: SuiObjectChange[], ctx: SuiObjectChangeContext) => PromiseOrVoid,
     type: string
   ): this {
     if (this.config.network === SuiNetwork.TEST_NET) {
@@ -266,7 +253,7 @@ export class SuiBaseProcessor {
           data.txDigest,
           processor.config.baseLabels
         )
-        await handler(data.changes as SuiObjectChange[], ctx)
+        await handler(data.rawChanges.map((r) => JSON.parse(r)) as SuiObjectChange[], ctx)
         return ctx.stopAndGetResult()
       },
       type

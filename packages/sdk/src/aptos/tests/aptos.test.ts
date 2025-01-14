@@ -26,8 +26,7 @@ describe('Test Aptos Example', () => {
         {
           data: {
             aptCall: {
-              rawTransaction: '',
-              transaction: testData
+              rawTransaction: JSON.stringify(testData)
             }
           },
           handlerIds: [1],
@@ -75,15 +74,14 @@ describe('Test Aptos Example', () => {
         {
           data: {
             aptResource: {
-              rawResources: [],
               version: 12345n,
-              resources: [
-                {
+              rawResources: [
+                JSON.stringify({
                   type: '0x1::coin::SupplyConfig',
                   data: {
                     allow_upgrades: false
                   }
-                }
+                })
               ],
               timestampMicros: 1n
             }
@@ -103,8 +101,7 @@ describe('Test Aptos Example', () => {
         {
           data: {
             aptCall: {
-              rawTransaction: '',
-              transaction: dataCreate
+              rawTransaction: JSON.stringify(dataCreate)
             }
           },
           handlerIds: [3],

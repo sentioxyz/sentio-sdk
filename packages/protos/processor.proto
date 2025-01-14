@@ -644,33 +644,40 @@ message Data {
     optional google.protobuf.Struct parsed = 4;
   }
   message AptEvent {
-    //    google.protobuf.Struct event = 1;
-    google.protobuf.Struct transaction = 2;
-    string raw_transaction = 3;
+    string raw_event = 1;
+    int32 event_index = 4;
+    google.protobuf.Struct transaction = 2 [deprecated = true];
+    string raw_transaction = 3; // if fetch all event is true, raw_transaction.events = all events, otherwise empty
   }
   message AptCall {
-    google.protobuf.Struct transaction = 2;
+    google.protobuf.Struct transaction = 2 [deprecated = true];
     string raw_transaction = 3;
   }
   message AptResource {
-    repeated google.protobuf.Struct resources = 4;
+    repeated google.protobuf.Struct resources = 4 [deprecated = true];
     int64 version = 2;
     int64 timestampMicros = 5;
     repeated string raw_resources = 6;
   }
   message SuiEvent {
-    google.protobuf.Struct transaction = 1;
+    google.protobuf.Struct transaction = 1 [deprecated = true];
+    string raw_event = 4;
+    string raw_transaction = 5;
     google.protobuf.Timestamp timestamp = 2;
     uint64 slot = 3;
   }
   message SuiCall {
-    google.protobuf.Struct transaction = 1;
+    google.protobuf.Struct transaction = 1 [deprecated = true];
+    string raw_transaction = 4;
     google.protobuf.Timestamp timestamp = 2;
     uint64 slot = 3;
   }
   message SuiObject {
-    repeated google.protobuf.Struct objects = 1; // just details.content
-    optional google.protobuf.Struct self = 4;    // just details.content
+    repeated google.protobuf.Struct objects = 1 [deprecated = true]; // just details.content
+    optional google.protobuf.Struct self = 4 [deprecated = true];    // just details.content
+
+    repeated string raw_objects = 10;
+    optional string raw_self = 9;
     string object_id = 5;      // self object property
     uint64 object_version = 6; // self object property
     string object_digest = 7;  // self object property
@@ -678,7 +685,8 @@ message Data {
     uint64 slot = 3;                         // checkpoint number
   }
   message SuiObjectChange {
-    repeated google.protobuf.Struct changes = 1;
+    repeated google.protobuf.Struct changes = 1 [deprecated = true];
+    repeated string raw_changes = 5;
     google.protobuf.Timestamp timestamp = 2;
     string tx_digest = 4;
     uint64 slot = 3;
@@ -693,6 +701,7 @@ message Data {
     google.protobuf.Timestamp timestamp = 2;
   }
   message FuelCall {
+//    option deprecated = true; // need to fix code gen to fix this
     google.protobuf.Struct transaction = 1;
     google.protobuf.Timestamp timestamp = 2;
   }
@@ -719,7 +728,6 @@ message Data {
     google.protobuf.Timestamp timestamp = 2;
   }
 
-  bytes raw = 1 [deprecated = true]; // can be removed anytime
   oneof value {
     EthLog eth_log = 2;
     EthBlock eth_block = 3;
@@ -734,7 +742,7 @@ message Data {
     SuiObject sui_object = 12;
     SuiObjectChange sui_object_change = 13;
     FuelReceipt fuel_log = 20;
-    FuelCall fuel_call = 14 [deprecated = true];
+    FuelCall fuel_call = 14  [deprecated = true];
     FuelTransaction fuel_transaction = 21;
     FuelBlock fuel_block = 18;
     CosmosCall cosmos_call = 15;
@@ -837,7 +845,7 @@ enum HandlerType {
   SUI_CALL = 9;
   SUI_OBJECT = 10;
   SUI_OBJECT_CHANGE = 12;
-  FUEL_CALL = 13; // deprecated
+  FUEL_CALL = 13; // [deprecated = true] TODO
   FUEL_RECEIPT = 19;
   FUEL_TRANSACTION = 20;
   FUEL_BLOCK = 17;

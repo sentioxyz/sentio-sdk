@@ -34,7 +34,6 @@ describe('Test seq mode', () => {
   test('Check block dispatch in seq', async () => {
     const binding1: DataBinding = {
       data: {
-        raw: new Uint8Array(),
         ethBlock: {
           block: {
             number: '0x1',
@@ -48,7 +47,6 @@ describe('Test seq mode', () => {
 
     const binding2 = {
       data: {
-        raw: new Uint8Array(),
         ethBlock: {
           block: {
             number: '0x2',

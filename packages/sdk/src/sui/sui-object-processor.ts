@@ -176,11 +176,11 @@ export class SuiAddressProcessor extends SuiBaseObjectOrAddressProcessorInternal
     data: Data_SuiObject,
     ctx: SuiObjectContext
   ) {
-    return handler(data.objects as SuiMoveObject[], ctx)
+    return handler(data.rawObjects.map((o) => JSON.parse(o)) as SuiMoveObject[], ctx)
   }
 
   onTransactionBlock(
-    handler: (transaction: SuiTransactionBlockResponse, ctx: SuiContext) => void,
+    handler: (transaction: SuiTransactionBlockResponse, ctx: SuiContext) => PromiseOrVoid,
     filter?: TransactionFilter,
     fetchConfig?: Partial<MoveFetchConfig>
   ) {
@@ -198,10 +198,10 @@ export class SuiAddressProcessor extends SuiBaseObjectOrAddressProcessorInternal
     this.callHandlers.push({
       handlerName: getHandlerName(),
       handler: async function (data) {
-        if (!data.transaction) {
+        if (!data.rawTransaction) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'transaction is null')
         }
-        const tx = data.transaction as SuiTransactionBlockResponse
+        const tx = JSON.parse(data.rawTransaction) as SuiTransactionBlockResponse
 
         const ctx = new SuiContext(
           'object',
@@ -243,11 +243,15 @@ export class SuiObjectProcessor extends SuiBaseObjectOrAddressProcessorInternal<
     data: Data_SuiObject,
     ctx: SuiObjectContext
   ) {
-    if (!data.self) {
+    if (!data.rawSelf) {
       console.log(`Sui object not existed in ${ctx.checkpoint}, please specific a start time`)
       return
     }
-    return handler(data.self as SuiMoveObject, data.objects as SuiMoveObject[], ctx)
+    return handler(
+      JSON.parse(data.rawSelf) as SuiMoveObject,
+      data.rawObjects.map((o) => JSON.parse(o)) as SuiMoveObject[],
+      ctx
+    )
   }
 }
 
@@ -277,15 +281,15 @@ export class SuiObjectTypeProcessor<T> extends SuiBaseObjectOrAddressProcessor<
     data: Data_SuiObject,
     ctx: SuiObjectContext
   ) {
-    if (!data.self) {
+    if (!data.rawSelf) {
       console.log(`Sui object not existed in ${ctx.checkpoint}, please specific a start time`)
       return
     }
-    const object = await ctx.coder.filterAndDecodeObjects(this.objectType, [data.self as SuiMoveObject])
-    return handler(object[0], data.objects as SuiMoveObject[], ctx)
+    const object = await ctx.coder.filterAndDecodeObjects(this.objectType, [JSON.parse(data.rawSelf) as SuiMoveObject])
+    return handler(object[0], data.rawObjects.map((o) => JSON.parse(o)) as SuiMoveObject[], ctx)
   }
 
-  public onObjectChange(handler: (changes: SuiObjectChange[], ctx: SuiObjectChangeContext) => void): this {
+  public onObjectChange(handler: (changes: SuiObjectChange[], ctx: SuiObjectChangeContext) => PromiseOrVoid): this {
     if (this.config.network === SuiNetwork.TEST_NET) {
       throw new ServerError(Status.INVALID_ARGUMENT, 'object change not supported in testnet')
     }
@@ -301,7 +305,7 @@ export class SuiObjectTypeProcessor<T> extends SuiBaseObjectOrAddressProcessor<
           data.txDigest,
           processor.config.baseLabels
         )
-        await handler(data.changes as SuiObjectChange[], ctx)
+        await handler(data.rawChanges.map((r) => JSON.parse(r)) as SuiObjectChange[], ctx)
         return ctx.stopAndGetResult()
       },
       type: this.objectType.qname
@@ -370,6 +374,6 @@ export class SuiWrappedObjectProcessor extends SuiBaseObjectOrAddressProcessorIn
     data: Data_SuiObject,
     ctx: SuiObjectContext
   ) {
-    return handler(data.objects as SuiMoveObject[], ctx)
+    return handler(data.rawObjects.map((o) => JSON.parse(o)) as SuiMoveObject[], ctx)
   }
 }
