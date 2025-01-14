@@ -113,7 +113,7 @@ export async function runUpload(processorConfig: YamlProjectConfig, argv: string
     processorConfig.debug = true
   }
   if (options['silent-overwrite']) {
-    processorConfig.silientOverwrite = true
+    processorConfig.silentOverwrite = true
   }
   finalizeHost(processorConfig, options.host)
   FinalizeProjectName(processorConfig, options.owner, options.name)
@@ -266,7 +266,7 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth, continu
       return
     }
     const initUploadRes = (await initUploadResRaw.json()) as { url: string; warning?: string; replacingVersion: number }
-    if (initUploadRes.replacingVersion && !options.silientOverwrite) {
+    if (initUploadRes.replacingVersion && !options.silentOverwrite) {
       const confirmed = await confirm(`Overwrite the existing version ${initUploadRes.replacingVersion}?`)
       if (!confirmed) {
         process.exit(0)
