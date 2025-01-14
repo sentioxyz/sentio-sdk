@@ -4,9 +4,7 @@ write_source_files(
     name = "write_gen",
     files = {
         "packages/protos/processor.proto": "//processor/protos:proto_file",
-        # "packages/protos/src/chainquery/protos/chainquery.ts": "//chainquery/protos:chainquery_ts_proto",
         "packages/protos/src/processor/protos/processor.ts": "//processor/protos:processor_ts_proto_no_deprecate",
-        "packages/protos/src/service/price/protos/price.ts": "//service/price/protos:protos_ts_proto",
         "packages/protos/src/service/common/protos/common.ts": "//service/common/protos:protos_ts_proto",
         "packages/protos/src/google/protobuf/empty.ts": "//processor/protos:empty_ts_proto",
         "packages/protos/src/google/protobuf/struct.ts": "//processor/protos:struct_ts_proto",

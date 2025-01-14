@@ -1,6 +1,7 @@
 import { describe, test, mock } from 'node:test'
 import { getPriceByTypeOrSymbolInternal, getPriceClient } from './price.js'
-import { GetPriceRequest, GetPriceResponse } from '@sentio/protos/price'
+import { GetPriceRequest } from '@sentio/api'
+
 import { expect } from 'chai'
 
 describe('price client', () => {
@@ -9,12 +10,10 @@ describe('price client', () => {
   test('get price', async () => {
     let priceValue = 1
     mock.method(client, 'getPrice', (request: GetPriceRequest) => {
-      return Promise.resolve(
-        GetPriceResponse.create({
-          timestamp: new Date(),
-          price: priceValue++
-        })
-      )
+      return Promise.resolve({
+        timestamp: new Date(),
+        price: priceValue++
+      })
     })
 
     for (let i = 0; i < 1000; i++) {
