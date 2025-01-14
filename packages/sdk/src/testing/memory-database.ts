@@ -13,9 +13,11 @@ export class MemoryDatabase {
   schema: GraphQLSchema
 
   constructor(readonly dbContext: StoreContext) {
-    const source = DatabaseSchemaState.INSTANCE.getValues()[0].source
-    const doc = parse(source)
-    this.schema = buildSchema(doc)
+    if (DatabaseSchemaState.INSTANCE.getValues().length > 0) {
+      const source = DatabaseSchemaState.INSTANCE.getValues()[0].source
+      const doc = parse(source)
+      this.schema = buildSchema(doc)
+    }
   }
 
   start() {
@@ -106,6 +108,11 @@ export class MemoryDatabase {
   }
 
   private processRequest(request: ProcessStreamResponse) {
+    if (!this.schema) {
+      console.warn('No schema defined, please check if entity schema is defined and loaded')
+      return
+    }
+
     const req = request.dbRequest
     this.lastDbRequest = req
     if (req) {
