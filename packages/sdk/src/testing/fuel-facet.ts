@@ -27,7 +27,7 @@ export class FuelFacet {
       if (config.contract?.chainId !== network) {
         continue
       }
-      for (const callConfig of config.fuelCallConfigs) {
+      for (const callConfig of config.fuelTransactionConfigs) {
         const binding = {
           data: {
             fuelTransaction: {
@@ -39,17 +39,7 @@ export class FuelFacet {
           handlerType: HandlerType.FUEL_TRANSACTION
         }
 
-        const filter = callConfig.filters[0]?.function
-        if (filter) {
-          // filter out by tx receipt
-          for (const receipt of transaction.status.receipts || []) {
-            if (receipt.receiptType == 'CALL' && receipt.param1 == filter) {
-              res.push(binding)
-            }
-          }
-        } else {
-          res.push(binding)
-        }
+        res.push(binding)
       }
 
       for (const logConfig of config.fuelLogConfigs) {

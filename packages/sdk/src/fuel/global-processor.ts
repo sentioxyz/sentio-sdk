@@ -12,7 +12,7 @@ import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 type GlobalFuelProcessorConfig = Omit<FuelProcessorConfig, 'address' | 'abi'>
 
 export class FuelGlobalProcessor implements FuelBaseProcessor<GlobalFuelProcessorConfig> {
-  callHandlers: CallHandler<Data_FuelCall>[] = []
+  txHandlers: CallHandler<Data_FuelCall>[] = []
   blockHandlers = []
 
   private provider: Provider
@@ -67,7 +67,7 @@ export class FuelGlobalProcessor implements FuelBaseProcessor<GlobalFuelProcesso
         ...config
       }
     }
-    this.callHandlers.push(callHandler)
+    this.txHandlers.push(callHandler)
     return this
   }
 }

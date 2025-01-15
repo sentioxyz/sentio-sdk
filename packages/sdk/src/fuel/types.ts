@@ -1,8 +1,8 @@
 import { MapStateStorage } from '@sentio/runtime'
 import {
   Data_FuelBlock,
-  Data_FuelCall,
   Data_FuelReceipt,
+  Data_FuelTransaction,
   FuelAssetHandlerConfig,
   FuelCallHandlerConfig,
   HandleInterval,
@@ -14,7 +14,7 @@ import { Block, TransactionSummary } from 'fuels'
 export interface FuelBaseProcessor<T> {
   configure(): Promise<void>
   config: T
-  callHandlers: CallHandler<Data_FuelCall>[]
+  txHandlers: CallHandler<Data_FuelTransaction>[]
   blockHandlers: BlockHandler[]
   logHandlers?: LogHandler<Data_FuelReceipt>[]
 }

@@ -39,7 +39,7 @@ describe('fuel network tests', () => {
   test('check configuration ', async () => {
     const config = await service.getConfig({})
     assert.ok(config.contractConfigs.length > 0)
-    assert.ok(config.contractConfigs[0].fuelCallConfigs.length >= 1)
+    assert.ok(config.contractConfigs[0].fuelTransactionConfigs.length >= 1)
   })
 
   // skip for now until onCall is fixed

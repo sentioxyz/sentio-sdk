@@ -2,8 +2,8 @@ import { errorString, GLOBAL_CONFIG, mergeProcessResults, Plugin, PluginManager,
 import {
   ContractConfig,
   Data_FuelBlock,
-  Data_FuelCall,
   Data_FuelReceipt,
+  Data_FuelTransaction,
   DataBinding,
   HandlerType,
   ProcessConfigResponse,
@@ -19,7 +19,7 @@ import { FuelProcessor } from './fuel-processor.js'
 import { FuelGlobalProcessor } from './global-processor.js'
 
 interface Handlers {
-  transactionHandlers: ((trace: Data_FuelCall) => Promise<ProcessResult>)[]
+  transactionHandlers: ((trace: Data_FuelTransaction) => Promise<ProcessResult>)[]
   blockHandlers: ((block: Data_FuelBlock) => Promise<ProcessResult>)[]
   logHandlers: ((log: Data_FuelReceipt) => Promise<ProcessResult>)[]
 }
@@ -51,19 +51,18 @@ export class FuelPlugin extends Plugin {
         startBlock: processor.config.startBlock,
         endBlock: processor.config.endBlock
       })
-      for (const callHandler of processor.callHandlers) {
-        const handlerId = handlers.transactionHandlers.push(callHandler.handler) - 1
-        const handlerName = callHandler.handlerName
+      for (const txHandler of processor.txHandlers) {
+        const handlerId = handlers.transactionHandlers.push(txHandler.handler) - 1
+        const handlerName = txHandler.handlerName
         if (processor instanceof FuelProcessor) {
           // on transaction
           const fetchConfig = {
             handlerId,
-            handlerName,
-            filters: callHandler.fetchConfig?.filters || []
+            handlerName
           }
-          contractConfig.fuelCallConfigs.push(fetchConfig)
+          contractConfig.fuelTransactionConfigs.push(fetchConfig)
         } else if (processor instanceof FuelAssetProcessor) {
-          const assetConfig = callHandler.assetConfig
+          const assetConfig = txHandler.assetConfig
           contractConfig.assetConfigs.push({
             filters: assetConfig?.filters || [],
             handlerId,
@@ -75,7 +74,7 @@ export class FuelPlugin extends Plugin {
             handlerName,
             filters: []
           }
-          contractConfig.fuelCallConfigs.push(fetchConfig)
+          contractConfig.fuelTransactionConfigs.push(fetchConfig)
           contractConfig.contract!.address = '*'
         }
       }

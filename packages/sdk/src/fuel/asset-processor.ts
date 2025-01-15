@@ -8,7 +8,7 @@ import { getOptionsSignature } from './fuel-processor.js'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 
 export class FuelAssetProcessor implements FuelBaseProcessor<FuelAssetProcessorConfig> {
-  callHandlers: CallHandler<Data_FuelCall>[] = []
+  txHandlers: CallHandler<Data_FuelCall>[] = []
   blockHandlers = []
   private provider: Provider
 
@@ -99,7 +99,7 @@ export class FuelAssetProcessor implements FuelBaseProcessor<FuelAssetProcessorC
         filters
       }
     }
-    this.callHandlers.push(callHandler)
+    this.txHandlers.push(callHandler)
     return this
   }
 }

@@ -31,7 +31,7 @@ import { ServerError, Status } from 'nice-grpc'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 
 export class FuelProcessor<TContract extends Contract> implements FuelBaseProcessor<FuelProcessorConfig> {
-  callHandlers: CallHandler<Data_FuelCall>[] = []
+  txHandlers: CallHandler<Data_FuelCall>[] = []
   blockHandlers: BlockHandler[] = []
   logHandlers: LogHandler<Data_FuelReceipt>[] = []
 
@@ -96,7 +96,7 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
         ...config
       }
     }
-    this.callHandlers.push(callHandler)
+    this.txHandlers.push(callHandler)
     return this
   }
 
@@ -174,7 +174,7 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
         filters: Object.values(filters)
       }
     }
-    this.callHandlers.push(callHandler)
+    this.txHandlers.push(callHandler)
     return this
   }
 
