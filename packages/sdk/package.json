@@ -95,7 +95,7 @@
     "bs58": "^5.0.0",
     "chalk": "^5.3.0",
     "csv-parse": "^5.5.3",
-    "ethers": "npm:@sentio/ethers@6.13.1-patch.2",
+    "ethers": "npm:@sentio/ethers@6.13.1-patch.4",
     "fuels": "^0.97.0",
     "graphql": "^16.9.0",
     "js-sha3": "^0.9.3",

@@ -33,7 +33,7 @@
     "@sentio/protos": "workspace:*",
     "command-line-args": "^6.0.0",
     "command-line-usage": "^7.0.1",
-    "ethers": "npm:@sentio/ethers@6.13.1-patch.2",
+    "ethers": "npm:@sentio/ethers@6.13.1-patch.4",
     "fs-extra": "^11.2.0",
     "google-protobuf": "^3.21.2",
     "ix": "^7.0.0",
