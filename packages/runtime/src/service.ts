@@ -35,7 +35,8 @@ import { EthChainId } from '@sentio/chain'
 import { Provider } from 'ethers'
 import { decodeMulticallResult, encodeMulticallData, getMulticallAddress, Multicall3Call } from './multicall.js'
 
-import { processMetrics, providerMetrics, dbMetrics } from './metrics.js'
+import { dbMetrics, processMetrics, providerMetrics } from './metrics.js'
+
 const { process_binding_count, process_binding_time, process_binding_error } = processMetrics
 
 ;(BigInt.prototype as any).toJSON = function () {
@@ -418,6 +419,17 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         // console.debug('received request:', request)
         if (request.binding) {
           process_binding_count.add(1)
+
+          // Adjust binding will make some request become invalid by setting UNKNOWN HandlerType
+          // for older SDK version, so we just return empty result for them here
+          if (request.binding.handlerType === HandlerType.UNKNOWN) {
+            subject.next({
+              processId: request.processId,
+              result: ProcessResult.create()
+            })
+            continue
+          }
+
           const binding = request.binding
           const dbContext = contexts.new(request.processId, subject)
           const start = Date.now()
