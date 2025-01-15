@@ -6,7 +6,7 @@ settings:
 
 overrides:
   '@grpc/grpc-js': ^1.12.2
-  ethers: npm:@sentio/ethers@6.13.1-patch.2
+  ethers: npm:@sentio/ethers@6.13.1-patch.5
 
 patchedDependencies:
   '@coral-xyz/anchor@0.30.1':
@@ -446,8 +446,8 @@ importers:
         specifier: ^7.0.1
         version: 7.0.1
       ethers:
-        specifier: npm:@sentio/ethers@6.13.1-patch.2
-        version: '@sentio/ethers@6.13.1-patch.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)'
+        specifier: npm:@sentio/ethers@6.13.1-patch.5
+        version: '@sentio/ethers@6.13.1-patch.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)'
       fs-extra:
         specifier: ^11.2.0
         version: 11.2.0
@@ -538,7 +538,7 @@ importers:
         version: 2.4.0
       '@sentio/ethers-v6':
         specifier: ^1.0.29
-        version: 1.0.29(@sentio/ethers@6.13.1-patch.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typescript@5.5.2)
+        version: 1.0.29(@sentio/ethers@6.13.1-patch.5(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typescript@5.5.2)
       '@sentio/protos':
         specifier: workspace:*
         version: link:../protos
@@ -567,8 +567,8 @@ importers:
         specifier: ^5.5.3
         version: 5.5.6
       ethers:
-        specifier: npm:@sentio/ethers@6.13.1-patch.2
-        version: '@sentio/ethers@6.13.1-patch.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)'
+        specifier: npm:@sentio/ethers@6.13.1-patch.5
+        version: '@sentio/ethers@6.13.1-patch.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)'
       fuels:
         specifier: ^0.97.0
         version: 0.97.0(encoding@0.1.13)
@@ -1747,11 +1747,11 @@ packages:
   '@sentio/ethers-v6@1.0.29':
     resolution: {integrity: sha512-/4jZZn+eM3EfI0bUMBAf5vu8muy8ABptu8ucFoMDTZLLTjxcSKRffLP3RL7w1JHGjyC2V6oEQfwS4cn9JEohHQ==}
     peerDependencies:
-      ethers: npm:@sentio/ethers@6.13.1-patch.2
+      ethers: npm:@sentio/ethers@6.13.1-patch.5
       typescript: '>=4.3.0'
 
-  '@sentio/ethers@6.13.1-patch.2':
-    resolution: {integrity: sha512-I7Eg94bTMmFaCZX/TJ+VEUkI9hdxMhwRdf+kD6GmSvurJNdG+fSpP8cVexrrkYZ9nh+/gADfG8qoVaG+QHMs/g==}
+  '@sentio/ethers@6.13.1-patch.5':
+    resolution: {integrity: sha512-/C/VysQVUdT3eXXWZfpi6A+F/o9Js/3rFaqbplJ5es/5DIdA3cPcLwou7n4E/Mrco0xAQoJhY0cjD+gzSTlzFw==}
     engines: {node: '>=14.0.0'}
 
   '@sentio/graph-cli@0.80.0-patch.1':
@@ -7794,14 +7794,14 @@ snapshots:
 
   '@sentio/chain@2.4.0': {}
 
-  '@sentio/ethers-v6@1.0.29(@sentio/ethers@6.13.1-patch.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typescript@5.5.2)':
+  '@sentio/ethers-v6@1.0.29(@sentio/ethers@6.13.1-patch.5(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typescript@5.5.2)':
     dependencies:
-      ethers: '@sentio/ethers@6.13.1-patch.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)'
+      ethers: '@sentio/ethers@6.13.1-patch.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)'
       lodash: 4.17.21
       ts-essentials: 7.0.3(typescript@5.5.2)
       typescript: 5.5.2
 
-  '@sentio/ethers@6.13.1-patch.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@sentio/ethers@6.13.1-patch.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
       '@adraffy/ens-normalize': 1.10.1
       '@noble/curves': 1.2.0
@@ -9516,7 +9516,7 @@ snapshots:
       debug: 4.3.5(supports-color@8.1.1)
       enhanced-resolve: 5.17.0
       eslint: 9.6.0
-      eslint-module-utils: 2.8.1(@typescript-eslint/parser@8.0.0(eslint@9.6.0)(typescript@5.5.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1)(eslint@9.6.0)
+      eslint-module-utils: 2.8.1(@typescript-eslint/parser@8.0.0(eslint@9.6.0)(typescript@5.5.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@8.0.0(eslint@9.6.0)(typescript@5.5.2))(eslint-plugin-import@2.29.1)(eslint@9.6.0))(eslint@9.6.0)
       eslint-plugin-import: 2.29.1(@typescript-eslint/parser@8.0.0(eslint@9.6.0)(typescript@5.5.2))(eslint-import-resolver-typescript@3.6.1)(eslint@9.6.0)
       fast-glob: 3.3.2
       get-tsconfig: 4.7.5
@@ -9528,7 +9528,7 @@ snapshots:
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-module-utils@2.8.1(@typescript-eslint/parser@8.0.0(eslint@9.6.0)(typescript@5.5.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1)(eslint@9.6.0):
+  eslint-module-utils@2.8.1(@typescript-eslint/parser@8.0.0(eslint@9.6.0)(typescript@5.5.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@8.0.0(eslint@9.6.0)(typescript@5.5.2))(eslint-plugin-import@2.29.1)(eslint@9.6.0))(eslint@9.6.0):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
@@ -9576,7 +9576,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 9.6.0
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.8.1(@typescript-eslint/parser@8.0.0(eslint@9.6.0)(typescript@5.5.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1)(eslint@9.6.0)
+      eslint-module-utils: 2.8.1(@typescript-eslint/parser@8.0.0(eslint@9.6.0)(typescript@5.5.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@8.0.0(eslint@9.6.0)(typescript@5.5.2))(eslint-plugin-import@2.29.1)(eslint@9.6.0))(eslint@9.6.0)
       hasown: 2.0.2
       is-core-module: 2.14.0
       is-glob: 4.0.3

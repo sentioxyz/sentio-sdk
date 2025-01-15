@@ -9,7 +9,7 @@
   },
   "resolutions": {
     "@grpc/grpc-js": "^1.12.2",
-    "ethers": "npm:@sentio/ethers@6.13.1-patch.2"
+    "ethers": "npm:@sentio/ethers@6.13.1-patch.5"
   },
   "devDependencies": {
     "@eslint/compat": "^1.1.0",
