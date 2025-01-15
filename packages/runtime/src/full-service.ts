@@ -20,11 +20,18 @@ import path from 'path'
 import os from 'os'
 import { GLOBAL_CONFIG } from './global-config.js'
 import { compareSemver, parseSemver, Semver } from './utils.js'
+import { LRUCache } from 'lru-cache'
 
 const require = createRequire(import.meta.url)
 
 const FUEL_PROTO_UPDATE_VERSION = parseSemver('2.54.0-rc.7')
+
 const MOVE_USE_RAW_VERSION = parseSemver('2.55.0-rc.1')
+// new driver (after MOVE_USE_RAW_VERSION) will sent the same event multiple times when fetch all true
+// so we need to cache it, key will be tx-handler_id
+const PROCESSED_MOVE_EVENT_TX_HANDLER = new LRUCache<string, boolean>({
+  max: 10000
+})
 
 function locatePackageJson(pkgId: string) {
   const m = require.resolve(pkgId)
@@ -154,11 +161,20 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
       case HandlerType.APT_EVENT:
         const aptEvent = dataBinding.data?.aptEvent
         if (aptEvent) {
-          if (isBeforeMoveUseRawVersion) {
-            aptEvent.transaction = JSON.parse(aptEvent.rawTransaction)
-            if (!aptEvent.transaction?.events?.length) {
+          if (isBeforeMoveUseRawVersion && aptEvent.rawTransaction) {
+            const transaction = JSON.parse(aptEvent.rawTransaction)
+            const key = `${transaction.hash}-${dataBinding.handlerIds[0]}`
+            if (PROCESSED_MOVE_EVENT_TX_HANDLER.has(key)) {
+              console.debug('skip binding', key)
+              dataBinding.handlerType = HandlerType.UNKNOWN
+              return
+            }
+            PROCESSED_MOVE_EVENT_TX_HANDLER.set(key, true)
+
+            aptEvent.transaction = transaction
+            if (!transaction.events?.length) {
               // when fetch all is not true, then events is empty, we need to fill it to old format
-              aptEvent.transaction!.events = [JSON.parse(aptEvent.rawEvent)]
+              transaction.events = [JSON.parse(aptEvent.rawEvent)]
             }
           }
         }
@@ -166,7 +182,7 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
       case HandlerType.APT_CALL:
         const aptCall = dataBinding.data?.aptCall
         if (aptCall) {
-          if (isBeforeMoveUseRawVersion) {
+          if (isBeforeMoveUseRawVersion && aptCall.rawTransaction) {
             aptCall.transaction = JSON.parse(aptCall.rawTransaction)
           }
         }
@@ -174,7 +190,7 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
       case HandlerType.APT_RESOURCE:
         const aptResource = dataBinding.data?.aptResource
         if (aptResource) {
-          if (isBeforeMoveUseRawVersion) {
+          if (isBeforeMoveUseRawVersion && aptResource.rawResources) {
             aptResource.resources = aptResource.rawResources.map((e) => JSON.parse(e))
           }
         }
@@ -182,11 +198,20 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
       case HandlerType.SUI_EVENT:
         const suiEvent = dataBinding.data?.suiEvent
         if (suiEvent) {
-          if (isBeforeMoveUseRawVersion) {
-            suiEvent.transaction = JSON.parse(suiEvent.rawTransaction)
-            if (!suiEvent.transaction?.events?.length) {
+          if (isBeforeMoveUseRawVersion && suiEvent.rawTransaction) {
+            const transaction = JSON.parse(suiEvent.rawTransaction)
+            const key = `${transaction.digest}-${dataBinding.handlerIds[0]}`
+            if (PROCESSED_MOVE_EVENT_TX_HANDLER.has(key)) {
+              console.debug('skip binding', key)
+              dataBinding.handlerType = HandlerType.UNKNOWN
+              return
+            }
+            PROCESSED_MOVE_EVENT_TX_HANDLER.set(key, true)
+
+            suiEvent.transaction = transaction
+            if (!transaction.events?.length) {
               // when fetch all is not true, then events is empty, we need to fill it to old format
-              suiEvent.transaction!.events = [JSON.parse(suiEvent.rawEvent)]
+              transaction.events = [JSON.parse(suiEvent.rawEvent)]
             }
           }
         }
@@ -194,7 +219,7 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
       case HandlerType.SUI_CALL:
         const suiCall = dataBinding.data?.suiCall
         if (suiCall) {
-          if (isBeforeMoveUseRawVersion) {
+          if (isBeforeMoveUseRawVersion && suiCall.rawTransaction) {
             suiCall.transaction = JSON.parse(suiCall.rawTransaction)
           }
         }
@@ -202,7 +227,7 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
       case HandlerType.SUI_OBJECT:
         const suiObject = dataBinding.data?.suiObject
         if (suiObject) {
-          if (isBeforeMoveUseRawVersion) {
+          if (isBeforeMoveUseRawVersion && (suiObject.rawSelf || suiObject.rawObjects)) {
             if (suiObject.rawSelf) {
               suiObject.self = JSON.parse(suiObject.rawSelf)
             }
@@ -213,7 +238,7 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
       case HandlerType.SUI_OBJECT_CHANGE:
         const suiObjectChange = dataBinding.data?.suiObjectChange
         if (suiObjectChange) {
-          if (isBeforeMoveUseRawVersion) {
+          if (isBeforeMoveUseRawVersion && suiObjectChange.rawChanges) {
             suiObjectChange.changes = suiObjectChange.rawChanges.map((e) => JSON.parse(e))
           }
         }
