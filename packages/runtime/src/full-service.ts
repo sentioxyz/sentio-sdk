@@ -71,6 +71,7 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
           contract.fuelCallConfigs
         ) {
           contract.fuelTransactionConfigs = contract.fuelCallConfigs
+          contract.fuelCallConfigs = undefined
         }
 
         // @ts-ignore old fields
