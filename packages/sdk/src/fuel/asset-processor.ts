@@ -1,5 +1,5 @@
 import { CallHandler, FuelBaseProcessor, FuelProcessorState } from './types.js'
-import { Data_FuelCall, FuelAssetHandlerConfig_AssetFilter } from '@sentio/protos'
+import { Data_FuelTransaction, FuelAssetHandlerConfig_AssetFilter } from '@sentio/protos'
 import { FuelNetwork, getProvider } from './network.js'
 import { FuelContext } from './context.js'
 import { decodeFuelTransaction } from './transaction.js'
@@ -8,7 +8,7 @@ import { getOptionsSignature } from './fuel-processor.js'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 
 export class FuelAssetProcessor implements FuelBaseProcessor<FuelAssetProcessorConfig> {
-  txHandlers: CallHandler<Data_FuelCall>[] = []
+  txHandlers: CallHandler<Data_FuelTransaction>[] = []
   blockHandlers = []
   private provider: Provider
 
@@ -53,7 +53,7 @@ export class FuelAssetProcessor implements FuelBaseProcessor<FuelAssetProcessorC
 
     const callHandler = {
       handlerName: getHandlerName(),
-      handler: async (call: Data_FuelCall) => {
+      handler: async (call: Data_FuelTransaction) => {
         const gqlTransaction = call.transaction
         const tx = decodeFuelTransaction(gqlTransaction, this.provider)
 

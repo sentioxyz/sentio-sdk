@@ -1,5 +1,5 @@
 import { CallHandler, FuelBaseProcessor, FuelProcessorState, FuelTransaction } from './types.js'
-import { Data_FuelCall } from '@sentio/protos'
+import { Data_FuelTransaction } from '@sentio/protos'
 import { Provider } from 'fuels'
 import { getProvider } from './network.js'
 import { decodeFuelTransaction, DEFAULT_FUEL_FETCH_CONFIG, FuelFetchConfig } from './transaction.js'
@@ -12,7 +12,7 @@ import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 type GlobalFuelProcessorConfig = Omit<FuelProcessorConfig, 'address' | 'abi'>
 
 export class FuelGlobalProcessor implements FuelBaseProcessor<GlobalFuelProcessorConfig> {
-  txHandlers: CallHandler<Data_FuelCall>[] = []
+  txHandlers: CallHandler<Data_FuelTransaction>[] = []
   blockHandlers = []
 
   private provider: Provider
@@ -43,7 +43,7 @@ export class FuelGlobalProcessor implements FuelBaseProcessor<GlobalFuelProcesso
   ) {
     const callHandler = {
       handlerName: getHandlerName(),
-      handler: async (call: Data_FuelCall) => {
+      handler: async (call: Data_FuelTransaction) => {
         let tx: FuelTransaction
         try {
           tx = decodeFuelTransaction(call.transaction, this.provider)

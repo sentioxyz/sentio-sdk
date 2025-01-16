@@ -1194,6 +1194,7 @@ export interface Data_FuelTransaction {
   timestamp: Date | undefined;
 }
 
+/** @deprecated */
 export interface Data_FuelCall {
   transaction: { [key: string]: any } | undefined;
   timestamp: Date | undefined;

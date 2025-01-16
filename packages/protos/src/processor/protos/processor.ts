@@ -1166,11 +1166,6 @@ export interface Data_FuelTransaction {
   timestamp: Date | undefined;
 }
 
-export interface Data_FuelCall {
-  transaction: { [key: string]: any } | undefined;
-  timestamp: Date | undefined;
-}
-
 export interface Data_FuelBlock {
   block: { [key: string]: any } | undefined;
   timestamp: Date | undefined;
@@ -10490,80 +10485,6 @@ export const Data_FuelTransaction = {
   },
   fromPartial(object: DeepPartial<Data_FuelTransaction>): Data_FuelTransaction {
     const message = createBaseData_FuelTransaction();
-    message.transaction = object.transaction ?? undefined;
-    message.timestamp = object.timestamp ?? undefined;
-    return message;
-  },
-};
-
-function createBaseData_FuelCall(): Data_FuelCall {
-  return { transaction: undefined, timestamp: undefined };
-}
-
-export const Data_FuelCall = {
-  encode(message: Data_FuelCall, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.transaction !== undefined) {
-      Struct.encode(Struct.wrap(message.transaction), writer.uint32(10).fork()).ldelim();
-    }
-    if (message.timestamp !== undefined) {
-      Timestamp.encode(toTimestamp(message.timestamp), writer.uint32(18).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): Data_FuelCall {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseData_FuelCall();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.transaction = Struct.unwrap(Struct.decode(reader, reader.uint32()));
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.timestamp = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): Data_FuelCall {
-    return {
-      transaction: isObject(object.transaction) ? object.transaction : undefined,
-      timestamp: isSet(object.timestamp) ? fromJsonTimestamp(object.timestamp) : undefined,
-    };
-  },
-
-  toJSON(message: Data_FuelCall): unknown {
-    const obj: any = {};
-    if (message.transaction !== undefined) {
-      obj.transaction = message.transaction;
-    }
-    if (message.timestamp !== undefined) {
-      obj.timestamp = message.timestamp.toISOString();
-    }
-    return obj;
-  },
-
-  create(base?: DeepPartial<Data_FuelCall>): Data_FuelCall {
-    return Data_FuelCall.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<Data_FuelCall>): Data_FuelCall {
-    const message = createBaseData_FuelCall();
     message.transaction = object.transaction ?? undefined;
     message.timestamp = object.timestamp ?? undefined;
     return message;

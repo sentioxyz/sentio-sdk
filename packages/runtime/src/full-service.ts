@@ -25,6 +25,7 @@ import { LRUCache } from 'lru-cache'
 const require = createRequire(import.meta.url)
 
 const FUEL_PROTO_UPDATE_VERSION = parseSemver('2.54.0-rc.7')
+const FUEL_PROTO_NO_FUEL_TRANSACTION_AS_CALL_VERSION = parseSemver('2.55.0-rc.1')
 
 const MOVE_USE_RAW_VERSION = parseSemver('2.55.0-rc.1')
 // new driver (after MOVE_USE_RAW_VERSION) will sent the same event multiple times when fetch all true
@@ -64,6 +65,14 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
 
     if (config.contractConfigs) {
       for (const contract of config.contractConfigs) {
+        // for old fuel processor
+        if (
+          compareSemver(this.sdkVersion, FUEL_PROTO_NO_FUEL_TRANSACTION_AS_CALL_VERSION) < 0 &&
+          contract.fuelCallConfigs
+        ) {
+          contract.fuelTransactionConfigs = contract.fuelCallConfigs
+        }
+
         // @ts-ignore old fields
         if (contract.aptosCallConfigs) {
           // @ts-ignore old fields

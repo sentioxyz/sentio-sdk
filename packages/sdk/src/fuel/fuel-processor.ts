@@ -1,6 +1,6 @@
 import {
   Data_FuelBlock,
-  Data_FuelCall,
+  Data_FuelTransaction,
   Data_FuelReceipt,
   FuelCallFilter,
   HandleInterval,
@@ -31,7 +31,7 @@ import { ServerError, Status } from 'nice-grpc'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 
 export class FuelProcessor<TContract extends Contract> implements FuelBaseProcessor<FuelProcessorConfig> {
-  txHandlers: CallHandler<Data_FuelCall>[] = []
+  txHandlers: CallHandler<Data_FuelTransaction>[] = []
   blockHandlers: BlockHandler[] = []
   logHandlers: LogHandler<Data_FuelReceipt>[] = []
 
@@ -71,7 +71,7 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
   ) {
     const callHandler = {
       handlerName: getHandlerName(),
-      handler: async (call: Data_FuelCall) => {
+      handler: async (call: Data_FuelTransaction) => {
         const abiMap = this.config.abi
           ? {
               [this.config.address]: this.config.abi
@@ -130,7 +130,7 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
 
     const callHandler = {
       handlerName: getHandlerName(),
-      handler: async (call: Data_FuelCall) => {
+      handler: async (call: Data_FuelTransaction) => {
         try {
           // const contract = new Contract(this.config.address, abi, this.provider)
           const gqlTransaction = call.transaction

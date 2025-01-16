@@ -707,7 +707,7 @@ message Data {
     google.protobuf.Timestamp timestamp = 2;
   }
   message FuelCall {
-//    option deprecated = true; // need to fix code gen to fix this
+    option deprecated = true;
     google.protobuf.Struct transaction = 1;
     google.protobuf.Timestamp timestamp = 2;
   }
@@ -851,7 +851,7 @@ enum HandlerType {
   SUI_CALL = 9;
   SUI_OBJECT = 10;
   SUI_OBJECT_CHANGE = 12;
-  FUEL_CALL = 13; // [deprecated = true] TODO
+  FUEL_CALL = 13; // [deprecated = true] can't remove from ts codegen due to type conflict
   FUEL_RECEIPT = 19;
   FUEL_TRANSACTION = 20;
   FUEL_BLOCK = 17;
