@@ -56,7 +56,9 @@ export abstract class MapStateStorage<T> extends StateStorage<Map<string, T>> {
     const m = this.getOrRegister()
     const oldValue = m.get(key)
     if (oldValue) {
-      console.warn(key, 'has been registered twice, use the previous one')
+      if (oldValue !== value) {
+        console.warn(key, 'has been registered twice, use the previous one')
+      }
       return oldValue
     }
     m.set(key, value)

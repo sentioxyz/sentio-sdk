@@ -17,7 +17,6 @@ export abstract class FuelAbstractProcessor<TContract extends Contract> extends 
       ...config,
       abi
     })
-    addFuelProcessor(config, this)
     return proxyProcessor(this)
   }
 }
