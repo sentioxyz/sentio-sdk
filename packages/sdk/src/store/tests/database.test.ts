@@ -1,4 +1,4 @@
-import { after, afterEach, describe, it } from 'node:test'
+import { after, afterEach, before, describe, it } from 'node:test'
 import assert from 'assert'
 import { Store } from '../store.js'
 import { Transaction, TransactionReceipt, User, TransactionStatus, Organization } from './generated/schema.js'
@@ -64,52 +64,6 @@ describe('Test Database', () => {
       const u = await store.get(User, 'test-id-2')
       assert.ok(!u)
       assert.ok(!db.hasEntity('User', 'test-id-2'))
-    })
-  )
-
-  it(
-    'should list from database',
-    withStoreContext(storeContext, async () => {
-      const store = new Store(storeContext)
-
-      const user1 = new User({
-        id: 'test-id-1',
-        name: 'test',
-        transactionsIDs: [],
-        organizationsIDs: []
-      })
-
-      const user2 = new User({
-        id: 'test-id-2',
-        name: 'test',
-        transactionsIDs: [],
-        organizationsIDs: []
-      })
-
-      await store.upsert([user1, user2])
-      const list = []
-      for (const u of await store.list(User, [])) {
-        list.push(u)
-      }
-      expectListEntityEqual(list, [user1, user2])
-
-      await store.list(Transaction, [
-        {
-          field: 'arrayValue',
-          op: '=',
-          value: ['']
-        },
-        {
-          field: 'gas',
-          op: 'in',
-          value: [0n]
-        },
-        {
-          field: 'senderID',
-          op: 'like',
-          value: 'aaa%'
-        }
-      ])
     })
   )
 
@@ -601,6 +555,73 @@ describe('Test Database', () => {
       assert.equal(secondTxSender.id, USER_ID, 'Second transaction should belong to user')
     })
   )
+
+  it('should filter transactions with eq, gt, lt, in, hasAny, and like operators', async () => {
+    const store = new Store(storeContext)
+
+    const Transaction1 = new Transaction({
+      id: 'transaction-1',
+      gas: 100n,
+      count: 0,
+      gasPrice: new BigDecimal('100.0'),
+      raw: new Uint8Array([1, 2, 3]),
+      arrayValue: ['1', '2', '3'],
+      arrayOfArrayValue: []
+    })
+    const Transaction2 = new Transaction({
+      id: 'transaction-2',
+      gas: 200n,
+      count: 0,
+      gasPrice: new BigDecimal('200.0'),
+      raw: new Uint8Array([1, 2, 3]),
+      arrayValue: ['4', '5', '6'],
+      arrayOfArrayValue: []
+    })
+    const Transaction3 = new Transaction({
+      id: 'transaction-3',
+      gas: 300n,
+      count: 0,
+      gasPrice: new BigDecimal('300.0'),
+      raw: new Uint8Array([1, 2, 3]),
+      arrayValue: ['7', '8', '9'],
+      arrayOfArrayValue: []
+    })
+    await store.upsert([Transaction1, Transaction2, Transaction3])
+
+    const transactionsAll = await store.list(Transaction, [])
+    assert.equal(transactionsAll.length, 3)
+
+    const transactionsEq = await store.list(Transaction, [{ field: 'gas', op: '=', value: 100n }])
+    assert.equal(transactionsEq.length, 1)
+    assert.equal(transactionsEq[0].id, 'transaction-1')
+
+    const transactionsGt = await store.list(Transaction, [{ field: 'gas', op: '>', value: 100n }])
+    assert.equal(transactionsGt.length, 2)
+    assert.ok(transactionsGt.some((tx) => tx.id === 'transaction-2'))
+    assert.ok(transactionsGt.some((tx) => tx.id === 'transaction-3'))
+
+    const transactionsLt = await store.list(Transaction, [{ field: 'gas', op: '<', value: 300n }])
+    assert.equal(transactionsLt.length, 2)
+    assert.ok(transactionsLt.some((tx) => tx.id === 'transaction-1'))
+    assert.ok(transactionsLt.some((tx) => tx.id === 'transaction-2'))
+
+    const transactionsIn = await store.list(Transaction, [{ field: 'gas', op: 'in', value: [100n, 300n] }])
+    assert.equal(transactionsIn.length, 2)
+    assert.ok(transactionsIn.some((tx) => tx.id === 'transaction-1'))
+    assert.ok(transactionsIn.some((tx) => tx.id === 'transaction-3'))
+
+    const transactionsHasAny = await store.list(Transaction, [
+      {
+        field: 'arrayValue',
+        op: 'has any',
+        value: ['1', '4']
+      }
+    ])
+    assert.equal(transactionsHasAny.length, 2)
+
+    const transactionsLike = await store.list(Transaction, [{ field: 'id', op: 'like', value: 'transaction-%' }])
+    assert.equal(transactionsLike.length, 3)
+  })
 
   afterEach(() => {
     db.reset()

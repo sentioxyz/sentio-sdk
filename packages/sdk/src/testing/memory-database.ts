@@ -1,11 +1,20 @@
 import { StoreContext } from '../store/context.js'
-import { DBRequest, ProcessStreamResponse } from '@sentio/protos'
-import { GraphQLField, GraphQLSchema, StringValueNode } from 'graphql/index.js'
+import {
+  DBRequest,
+  DBRequest_DBFilter,
+  DBRequest_DBOperator,
+  ProcessStreamResponse,
+  RichStruct,
+  RichValue,
+  RichValueList
+} from '@sentio/protos'
+import { GraphQLField, GraphQLSchema, parse, StringValueNode } from 'graphql/index.js'
 import { DatabaseSchemaState } from '../core/database-schema.js'
-import { parse } from 'graphql/index.js'
 import { buildSchema } from '../store/schema.js'
 import { GraphQLList, GraphQLNonNull, GraphQLObjectType, GraphQLOutputType } from 'graphql'
 import { PluginManager } from '@sentio/runtime'
+import { BigDecimalConverter, BigIntConverter } from '../store/convert.js'
+import { BigDecimal } from '@sentio/bigdecimal'
 
 export class MemoryDatabase {
   db = new Map<string, Record<string, any>>()
@@ -151,8 +160,8 @@ export class MemoryDatabase {
         })
       }
       if (req.list) {
-        const { entity, cursor } = req.list
-        const list = this.listEntities(entity)
+        const { entity, cursor, filters } = req.list
+        const list = this.listEntities(entity, filters)
 
         if (cursor) {
           const idx = parseInt(cursor)
@@ -177,14 +186,119 @@ export class MemoryDatabase {
     this.db.clear()
   }
 
-  private listEntities(entity: string) {
+  private listEntities(entity: string, filters?: DBRequest_DBFilter[]) {
     const entityDB = this.db.get(entity)
-    return entityDB
+    const entities = entityDB
       ? Object.entries(entityDB)
           .sort((a, b) => a[0].localeCompare(b[0]))
           .map(([id, data]) => this.fillDerivedFromFields(entity, id, data))
       : []
+
+    if (!filters || filters.length === 0) {
+      return entities
+    }
+
+    let results = []
+    for (const f of filters ?? []) {
+      results = entities.filter((e) => filter(e, f))
+    }
+    return results
   }
+}
+
+function filter(entity: RichStruct, filter: DBRequest_DBFilter) {
+  const value = entity.fields[filter.field]
+
+  switch (filter.op) {
+    case DBRequest_DBOperator.EQ:
+      return equal(value, filter.value)
+    case DBRequest_DBOperator.NE:
+      return !equal(value, filter.value)
+    case DBRequest_DBOperator.GT:
+      return greaterThan(value, filter.value)
+    case DBRequest_DBOperator.LT:
+      return lessThan(value, filter.value)
+    case DBRequest_DBOperator.GE:
+      return greaterThan(value, filter.value) || equal(value, filter.value)
+    case DBRequest_DBOperator.LE:
+      return lessThan(value, filter.value) || equal(value, filter.value)
+    case DBRequest_DBOperator.IN:
+      return filter.value?.values.some((v) => equal(value, { values: [v] }))
+    case DBRequest_DBOperator.NOT_IN:
+      return !filter.value?.values.some((v) => equal(value, { values: [v] }))
+    case DBRequest_DBOperator.HAS_ALL:
+      return filter.value?.values.every((v) => equal(value, { values: [v] }))
+    case DBRequest_DBOperator.HAS_ANY:
+      for (const a of filter.value?.values ?? []) {
+        if ((value.listValue?.values ?? []).some((v) => equal(a, { values: [v] }))) {
+          return true
+        }
+      }
+      return false
+    case DBRequest_DBOperator.LIKE:
+      return like(value.stringValue, filter.value?.values[0]?.stringValue)
+    default:
+      return false
+  }
+}
+
+function equal(field: RichValue, value?: RichValueList): boolean {
+  if (field.stringValue !== undefined) {
+    return field.stringValue === value?.values[0]?.stringValue
+  }
+  if (field.listValue) {
+    return field.listValue.values.every((v, i) => {
+      const vv = value?.values[i]
+      return equal(v, vv ? { values: [vv] } : undefined)
+    })
+  }
+  const a = toNumber(field)
+  const b = toNumber(value?.values[0])
+  if (a !== undefined && b !== undefined) {
+    return new BigDecimal(a.toString()).eq(new BigDecimal(b.toString()))
+  }
+
+  return false
+}
+
+function greaterThan(field: RichValue, value?: RichValueList) {
+  const a = toNumber(field)
+  const b = toNumber(value?.values[0])
+  if (a !== undefined && b !== undefined) {
+    const sa = a.toString()
+    const sb = b.toString()
+    return new BigDecimal(sa).isGreaterThan(new BigDecimal(sb))
+  } else {
+    return false
+  }
+}
+
+function lessThan(field: RichValue, value: RichValueList | undefined) {
+  const a = toNumber(field)
+  const b = toNumber(value?.values[0])
+  if (a !== undefined && b !== undefined) {
+    const sa = a.toString()
+    const sb = b.toString()
+    return new BigDecimal(sa).isLessThan(new BigDecimal(sb))
+  } else {
+    return false
+  }
+}
+
+function toNumber(value?: RichValue) {
+  if (value?.intValue !== undefined) {
+    return value.intValue
+  }
+  if (value?.floatValue !== undefined) {
+    return value.floatValue
+  }
+  if (value?.bigintValue !== undefined) {
+    return BigIntConverter.to(value) as bigint
+  }
+  if (value?.bigdecimalValue !== undefined) {
+    return BigDecimalConverter.to(value) as BigDecimal
+  }
+  return undefined
 }
 
 function toEntity(data: any) {
@@ -195,6 +309,14 @@ function toEntity(data: any) {
     genBlockTime: new Date(),
     data: { fields: data.fields }
   }
+}
+
+function like(field?: string, value?: string) {
+  if (field === undefined || value === undefined) {
+    return false
+  }
+  const regex = new RegExp(value.replace(/%/g, '.*').replace(/_/g, '.'))
+  return regex.test(field)
 }
 
 function GetDerivedFrom(field: GraphQLField<any, any>): string {
