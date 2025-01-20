@@ -52,8 +52,8 @@ ERC20Processor.bind({ address: '0x1e4ede388cbc9f4b5c79681b7f94d36a11abebc9' }).o
       id: event.transactionHash,
       amount: val
     })
-    transfer.from = Promise.resolve(from)
-    transfer.to = Promise.resolve(to)
+    transfer.fromID = from.id
+    transfer.toID = to.id
     await ctx.store.upsert(transfer)
 
     const transfers = await ctx.store.list(Transfer, [

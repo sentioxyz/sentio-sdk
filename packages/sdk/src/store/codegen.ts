@@ -30,9 +30,17 @@ interface Field {
   annotations: string[]
 }
 
+interface Method {
+  name: string
+  returnType: string
+  body: string
+  annotations: string[]
+}
+
 interface Class {
   name: string
   fields: Field[]
+  methods?: Method[]
   annotations: string[]
   parent?: string
   interfaces: string[]
@@ -144,15 +152,22 @@ async function codegenInternal(schema: GraphQLSchema, source: string, target: st
     if (t instanceof GraphQLObjectType) {
       if (isEntity(t)) {
         const fields: Field[] = []
+        const methods: Method[] = []
         for (const f of Object.values(t.getFields())) {
           const type = genType(f.type)
           const annotations: string[] = []
           addTypeAnnotations(f.type, annotations)
           if (isRelationType(f.type)) {
             fields.push({
-              name: f.name,
+              name: '_' + f.name,
               type: `Promise<${type}>`,
               annotations
+            })
+            methods.push({
+              name: f.name,
+              returnType: `Promise<${type}>`,
+              body: `return this._${f.name}`,
+              annotations: []
             })
             const isMany = type.startsWith('Array')
             fields.push({
@@ -172,6 +187,7 @@ async function codegenInternal(schema: GraphQLSchema, source: string, target: st
         classes.push({
           name: t.name,
           fields,
+          methods,
           annotations: [`@Entity("${t.name}")`],
           parent: 'AbstractEntity',
           interfaces: t.getInterfaces().map((i) => i.name)
@@ -239,6 +255,16 @@ ${c.fields
   .map((f) => `${f.annotations.map((a) => `\n\t${a}`).join('')}\n\t${f.name}${f.optional ? '?' : ''}: ${f.type}`)
   .join('\n')}
   ${isEntity ? `constructor(data: ${c.name}ConstructorInput) {super()}` : ''}
+  ${
+    c.methods
+      ? c.methods
+          .map(
+            (m) =>
+              `${m.annotations.map((a) => `\n\t${a}`).join('')}\n\t${m.name}(): ${m.returnType} {\n\t\t${m.body}\n\t}`
+          )
+          .join('\n')
+      : ''
+  }
 }`
   })
   .join('\n')}
