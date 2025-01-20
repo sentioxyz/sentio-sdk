@@ -4,9 +4,7 @@
   "license": "Apache-2.0",
   "type": "module",
   "exports": {
-    ".": "./lib/index.js",
-    "./price": "./lib/service/price/protos/price.js",
-    "./chainquery": "./lib/chainquery/protos/chainquery.js"
+    ".": "./lib/index.js"
   },
   "files": [
     "{lib,src}"

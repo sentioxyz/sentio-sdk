@@ -37,7 +37,6 @@ const optionDefinitions = [
     type: String,
     defaultValue: 'chains-config.json'
   },
-  { name: 'chainquery-server', type: String, defaultValue: '' },
   { name: 'pricefeed-server', type: String, defaultValue: '' },
   { name: 'log-format', type: String, defaultValue: 'console' },
   { name: 'debug', type: Boolean, defaultValue: false },
@@ -67,7 +66,6 @@ const batchCountOverride = process.env['OVERRIDE_BATCH_COUNT']
 
 Endpoints.INSTANCE.concurrency = concurrencyOverride ?? options.concurrency
 Endpoints.INSTANCE.batchCount = batchCountOverride ?? options['batch-count']
-Endpoints.INSTANCE.chainQueryAPI = options['chainquery-server']
 Endpoints.INSTANCE.priceFeedAPI = options['pricefeed-server']
 
 for (const [id, config] of Object.entries(chainsConfig)) {
