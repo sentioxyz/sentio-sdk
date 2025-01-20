@@ -35,15 +35,14 @@ export function Entity(entityName: string) {
     for (const [propertyKey, type] of Object.entries(meta)) {
       if (type.isRelation && type.relationName) {
         const relationName = type.relationName.endsWith('!') ? type.relationName.slice(0, -1) : type.relationName
+        const key = propertyKey.startsWith('_') ? propertyKey.slice(1) : propertyKey
         const idGetter = function (this: any) {
-          return handleError(this.constructor.entityName, propertyKey, () => type!.to(this._data.fields[propertyKey]))
+          return handleError(this.constructor.entityName, key, () => type!.to(this._data.fields[key]))
         }
         const idSetter = function (this: any, value: any) {
-          this._data.fields[propertyKey] = handleError(this.constructor.entityName, propertyKey, () =>
-            type!.from(value)
-          )
+          this._data.fields[key] = handleError(this.constructor.entityName, key, () => type!.from(value))
         }
-        const idKey = type.isArray ? propertyKey + 'IDs' : propertyKey + 'ID'
+        const idKey = type.isArray ? key + 'IDs' : key + 'ID'
 
         Reflect.defineProperty(target, idKey, {
           get: idGetter,

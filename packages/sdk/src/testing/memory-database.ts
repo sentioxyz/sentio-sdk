@@ -95,7 +95,7 @@ export class MemoryDatabase {
                   if (deriveField?.stringValue === id) {
                     hasRelation = true
                   }
-                  if (deriveField.listValue) {
+                  if (deriveField?.listValue) {
                     hasRelation = deriveField.listValue.values.some((v: any) => v.stringValue === id)
                   }
                   if (hasRelation) {

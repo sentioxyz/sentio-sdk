@@ -1,4 +1,4 @@
-import { after, afterEach, before, describe, it } from 'node:test'
+import { after, afterEach, describe, it } from 'node:test'
 import assert from 'assert'
 import { Store } from '../store.js'
 import { Transaction, TransactionReceipt, User, TransactionStatus, Organization } from './generated/schema.js'
@@ -251,7 +251,7 @@ describe('Test Database', () => {
       const retrievedTx = await store.get(Transaction, TX_ID)
       assert.ok(retrievedTx, 'Transaction should be retrieved')
 
-      const receipts = await retrievedTx.receipts
+      const receipts = await retrievedTx.receipts()
       assert.equal(receipts.length, 2, 'Should have 2 receipts')
       assert.ok(
         receipts.some((r) => r.id === RECEIPT_IDS.first && r.status === TransactionStatus.SUCCESS),
@@ -308,7 +308,7 @@ describe('Test Database', () => {
       const retrievedReceipt = await store.get(TransactionReceipt, RECEIPT_ID)
       assert.ok(retrievedReceipt, 'Receipt should be retrieved')
 
-      const linkedTransaction = await retrievedReceipt.transaction
+      const linkedTransaction = await retrievedReceipt.transaction()
       assert.ok(linkedTransaction, 'Should be able to access linked transaction')
       assert.equal(linkedTransaction.id, TX_ID, 'Should have correct transaction ID')
 
@@ -351,7 +351,7 @@ describe('Test Database', () => {
       const retrievedTx = await store.get(Transaction, TX_ID)
       assert.ok(retrievedTx, 'Transaction should be retrieved')
 
-      const sender = await retrievedTx.sender
+      const sender = await retrievedTx.sender()
       assert.ok(sender, 'Should be able to access sender')
       assert.equal(sender.id, USER_ID, 'Should have correct sender ID')
       assert.equal(sender.name, 'test user', 'Should have correct sender name')
@@ -394,7 +394,7 @@ describe('Test Database', () => {
       const retrievedTx = await store.get(Transaction, TX_ID)
       assert.ok(retrievedTx, 'Transaction should be retrieved')
 
-      const sender = await retrievedTx.sender
+      const sender = await retrievedTx.sender()
       assert.ok(sender, 'Should be able to access sender')
       assert.equal(sender.id, USER_ID, 'Should have correct sender ID')
       assert.equal(sender.name, 'test user', 'Should have correct sender name')
@@ -444,7 +444,7 @@ describe('Test Database', () => {
       assert.ok(retrievedUser, 'User should be retrieved')
 
       // Since organizations is @derivedFrom(field: "members"), we should be able to access them
-      const organizations = await retrievedUser.organizations
+      const organizations = await retrievedUser.organizations()
       assert.equal(organizations.length, 2, 'Should have 2 organizations')
 
       assert.ok(
@@ -458,7 +458,7 @@ describe('Test Database', () => {
 
       // Verify the bidirectional relationship
       const org = organizations[0]
-      const members = await org.members
+      const members = await org.members()
       assert.equal(members.length, 1, 'Organization should have 1 member')
       assert.equal(members[0].id, USER_ID, 'Member should be our test user')
     })
@@ -531,26 +531,26 @@ describe('Test Database', () => {
       assert.ok(startingTx, 'Should retrieve starting transaction')
 
       // Transaction -> Receipt
-      const receipts = await startingTx.receipts
+      const receipts = await startingTx.receipts()
       assert.equal(receipts.length, 1, 'Should have one receipt')
       const firstReceipt = receipts[0]
       assert.equal(firstReceipt.id, RECEIPT_IDS.first, 'Should be first receipt')
 
       // Receipt -> Transaction
-      const linkedTx = await firstReceipt.transaction
+      const linkedTx = await firstReceipt.transaction()
       assert.ok(linkedTx, 'Should retrieve linked transaction')
       assert.equal(linkedTx.id, TX_IDS.first, 'Should link back to first transaction')
 
       // Transaction -> Receipt (second transaction)
       const secondTx = await store.get(Transaction, TX_IDS.second)
       assert.ok(secondTx, 'Should retrieve second transaction')
-      const secondReceipts = await secondTx.receipts
+      const secondReceipts = await secondTx.receipts()
       assert.equal(secondReceipts.length, 1, 'Should have one receipt')
       assert.equal(secondReceipts[0].id, RECEIPT_IDS.second, 'Should be second receipt')
 
       // Verify both transactions belong to same user
-      const firstTxSender = await startingTx.sender
-      const secondTxSender = await secondTx.sender
+      const firstTxSender = await startingTx.sender()
+      const secondTxSender = await secondTx.sender()
       assert.equal(firstTxSender.id, USER_ID, 'First transaction should belong to user')
       assert.equal(secondTxSender.id, USER_ID, 'Second transaction should belong to user')
     })

@@ -16,6 +16,8 @@ import path from 'path'
 import { mkdirpSync } from 'mkdirp'
 import { schemaFromFile } from './schema.js'
 import chalk from 'chalk'
+import { upperFirst } from '../fuel/codegen/utils.js'
+import { GraphQLField } from 'graphql/index.js'
 
 interface Import {
   module: string
@@ -28,11 +30,21 @@ interface Field {
   type: string
   optional?: boolean
   annotations: string[]
+  private?: boolean
+}
+
+interface Method {
+  name: string
+  returnType?: string
+  body: string
+  annotations: string[]
+  parameters?: string[]
 }
 
 interface Class {
   name: string
   fields: Field[]
+  methods?: Method[]
   annotations: string[]
   parent?: string
   interfaces: string[]
@@ -144,15 +156,23 @@ async function codegenInternal(schema: GraphQLSchema, source: string, target: st
     if (t instanceof GraphQLObjectType) {
       if (isEntity(t)) {
         const fields: Field[] = []
+        const methods: Method[] = []
         for (const f of Object.values(t.getFields())) {
           const type = genType(f.type)
           const annotations: string[] = []
           addTypeAnnotations(f.type, annotations)
           if (isRelationType(f.type)) {
             fields.push({
-              name: f.name,
+              name: '_' + f.name,
               type: `Promise<${type}>`,
-              annotations
+              annotations,
+              private: true
+            })
+            methods.push({
+              name: f.name,
+              returnType: `Promise<${type}>`,
+              body: `return this._${f.name}`,
+              annotations: []
             })
             const isMany = type.startsWith('Array')
             fields.push({
@@ -160,6 +180,26 @@ async function codegenInternal(schema: GraphQLSchema, source: string, target: st
               type: isMany ? `Array<ID | undefined>` : `ID`,
               annotations: []
             })
+            // should no setter for derived fields
+            if (!isDerived(f)) {
+              if (isMany) {
+                methods.push({
+                  name: `set${upperFirst(f.name)}`,
+                  parameters: [`${f.name}: ${type}`],
+                  returnType: ``,
+                  body: `if (${f.name}) this.${f.name}IDs = ${f.name}.map((e) => e.id)`,
+                  annotations: []
+                })
+              } else {
+                methods.push({
+                  name: `set${upperFirst(f.name)}`,
+                  parameters: [`${f.name}: ${type}`],
+                  returnType: ``,
+                  body: `if (${f.name}) this.${f.name}ID = ${f.name}.id`,
+                  annotations: []
+                })
+              }
+            }
           } else {
             fields.push({
               name: f.name,
@@ -172,6 +212,7 @@ async function codegenInternal(schema: GraphQLSchema, source: string, target: st
         classes.push({
           name: t.name,
           fields,
+          methods,
           annotations: [`@Entity("${t.name}")`],
           parent: 'AbstractEntity',
           interfaces: t.getInterfaces().map((i) => i.name)
@@ -225,12 +266,11 @@ ${c.fields
   .filter((f) => !f.type.startsWith('Promise<')) // Filter out Promise fields
   .map((f) => {
     const isRequired = f.annotations.some((a) => a.includes('@Required'))
-    return `  ${f.name}${isRequired ? '' : '?'}: ${f.type.replace(' | undefined', '')};`
+    return `  ${f.private ? 'private ' : ''}${f.name}${isRequired ? '' : '?'}: ${f.type.replace(' | undefined', '')};`
   })
   .join('\n')}
 }`
       : ''
-
     return `
 ${constructorInterface}
 ${c.annotations.join('\n')}
@@ -239,6 +279,7 @@ ${c.fields
   .map((f) => `${f.annotations.map((a) => `\n\t${a}`).join('')}\n\t${f.name}${f.optional ? '?' : ''}: ${f.type}`)
   .join('\n')}
   ${isEntity ? `constructor(data: ${c.name}ConstructorInput) {super()}` : ''}
+  ${(c.methods ?? []).map(genMethod).join('\n')}
 }`
   })
   .join('\n')}
@@ -276,6 +317,13 @@ function genType(type: GraphQLOutputType, required?: boolean): string {
   }
 }
 
+function genMethod(method: Method) {
+  return `${method.annotations.map((a) => `@${a}`).join('\n')}
+  ${method.name}(${method.parameters?.join(', ') ?? ''})${method.returnType ? `: ${method.returnType}` : ''} {
+    ${method.body}
+  }`
+}
+
 function isRelationType(type: GraphQLOutputType): boolean {
   if (type instanceof GraphQLNonNull) {
     return isRelationType(type.ofType)
@@ -290,4 +338,8 @@ function isRelationType(type: GraphQLOutputType): boolean {
 
 function isEntity(t: GraphQLObjectType) {
   return t.astNode?.directives?.some((d) => d.name.value == 'entity')
+}
+
+function isDerived(f: GraphQLField<any, any>) {
+  return f.astNode?.directives?.some((d) => d.name.value == 'derivedFrom')
 }
