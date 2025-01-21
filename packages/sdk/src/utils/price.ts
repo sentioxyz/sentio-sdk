@@ -32,7 +32,7 @@ export function getPriceClient(basePath = Endpoints.INSTANCE.priceFeedAPI) {
 
 const priceMap = new LRUCache<string, Promise<number | undefined>>({
   max: 100000,
-  ttl: 1000 * 60 * 60 // 1 hour
+  ttl: 1000 * 60 * 5 // 5 minutes
 })
 
 let priceClient: PriceApi
@@ -151,7 +151,7 @@ export async function getPriceBySymbol(
 }
 
 function dateString(date: Date) {
-  return [date.getUTCDate(), date.getUTCMonth() + 1, date.getUTCFullYear()].join('-')
+  return [date.getHours(), date.getUTCDate(), date.getUTCMonth() + 1, date.getUTCFullYear()].join('-')
 }
 
 /**

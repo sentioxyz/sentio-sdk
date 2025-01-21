@@ -1,4 +1,4 @@
-import { addFuelProcessor, FuelProcessor, FuelProcessorConfig } from './fuel-processor.js'
+import { FuelProcessor, FuelProcessorConfig } from './fuel-processor.js'
 import { Contract, JsonAbi } from 'fuels'
 // import { FuelCall } from './context.js'
 import { FuelChainId } from '@sentio/chain'
