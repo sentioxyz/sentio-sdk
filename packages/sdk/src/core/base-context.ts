@@ -76,7 +76,10 @@ export abstract class BaseContext {
 
   get store() {
     if (this._store == null) {
-      console.warn('Store is not set, please initialize the processor with your database schema first.')
+      this.initStore()
+      if (this._store == null) {
+        console.warn('Store is not set, please initialize the processor with your database schema first.')
+      }
     }
     return this._store
   }

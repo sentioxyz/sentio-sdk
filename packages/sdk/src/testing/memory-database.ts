@@ -15,6 +15,7 @@ import { GraphQLList, GraphQLNonNull, GraphQLObjectType, GraphQLOutputType } fro
 import { PluginManager } from '@sentio/runtime'
 import { BigDecimalConverter, BigIntConverter } from '../store/convert.js'
 import { BigDecimal } from '@sentio/bigdecimal'
+import { Store } from '../store/store.js'
 
 export class MemoryDatabase {
   db = new Map<string, Record<string, any>>()
@@ -27,6 +28,10 @@ export class MemoryDatabase {
       const doc = parse(source)
       this.schema = buildSchema(doc)
     }
+  }
+
+  get store() {
+    return new Store(this.dbContext)
   }
 
   start() {

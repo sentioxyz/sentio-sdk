@@ -319,7 +319,12 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         ]
       )
     }
-    const result = await PluginManager.INSTANCE.processBinding(request, preparedData)
+
+    const result = await PluginManager.INSTANCE.processBinding(
+      request,
+      preparedData,
+      PluginManager.INSTANCE.dbContextLocalStorage.getStore()
+    )
     recordRuntimeInfo(result, request.handlerType)
     return result
   }
