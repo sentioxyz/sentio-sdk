@@ -86,6 +86,11 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
         }
       }
     }
+
+    if (compareSemver(this.sdkVersion, MOVE_USE_RAW_VERSION) < 0) {
+      PROCESSED_MOVE_EVENT_TX_HANDLER.clear()
+    }
+
     return config
   }
 
