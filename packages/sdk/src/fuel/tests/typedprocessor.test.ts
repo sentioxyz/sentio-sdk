@@ -41,6 +41,7 @@ describe('typed fuel processor tests', () => {
   test('check configuration ', async () => {
     const config = await service.getConfig({})
     expect(config.contractConfigs.length).gte(1)
+    expect(config.contractConfigs[0].fuelReceiptConfigs.length).gte(1)
     // expect(config.contractConfigs[0].fuelCallConfigs.length).gte(1)
   })
 

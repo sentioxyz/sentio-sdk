@@ -7,7 +7,7 @@ import {
   ProcessResult
 } from '@sentio/protos'
 import { FuelCall, FuelContext, FuelContractContext } from './context.js'
-import { bn, Contract, Interface, JsonAbi, Provider } from 'fuels'
+import { bn, Contract, Interface, JsonAbi, Provider, ReceiptTransfer, ReceiptTransferOut } from 'fuels'
 import { FuelNetwork, getProvider } from './network.js'
 import {
   decodeFuelTransaction,
@@ -19,12 +19,13 @@ import {
 import {
   BlockHandler,
   CallHandler,
+  ContractTransferFilter,
   FuelBaseProcessor,
   FuelBlock,
   FuelLog,
   FuelProcessorState,
   FuelTransaction,
-  LogHandler
+  ReceiptHandler
 } from './types.js'
 import { PromiseOrVoid } from '../core/index.js'
 import { ServerError, Status } from 'nice-grpc'
@@ -33,7 +34,7 @@ import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 export class FuelProcessor<TContract extends Contract> implements FuelBaseProcessor<FuelProcessorConfig> {
   txHandlers: CallHandler<Data_FuelTransaction>[] = []
   blockHandlers: BlockHandler[] = []
-  logHandlers: LogHandler<Data_FuelReceipt>[] = []
+  receiptHandlers: ReceiptHandler[] = []
 
   private provider: Provider
   private contract: TContract
@@ -214,11 +215,57 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
 
         return ProcessResult.fromPartial({})
       },
-      logConfig: {
-        logIds: Array.from(logIds)
+      receiptConfig: {
+        log: {
+          logIds: Array.from(logIds)
+        }
       }
-    }
-    this.logHandlers.push(logHandler)
+    } as ReceiptHandler
+    this.receiptHandlers.push(logHandler)
+    return this
+  }
+
+  /*
+   * handle 'Transfer' and 'TransferOut' receipt for a specific contract id
+   */
+  public onTransfer(
+    filter: ContractTransferFilter,
+    handler: (transfer: ReceiptTransfer | ReceiptTransferOut, ctx: FuelContractContext<TContract>) => PromiseOrVoid
+  ) {
+    const { from, to, assetId } = filter
+    const h = {
+      handlerName: getHandlerName(),
+      handler: async ({ transaction, receiptIndex, timestamp }: Data_FuelReceipt) => {
+        try {
+          const tx = decodeFuelTransaction(transaction, this.provider)
+          const index = Number(receiptIndex)
+          const receipt = tx.receipts[index] as ReceiptTransfer | ReceiptTransferOut
+          const ctx = new FuelContractContext(
+            this.config.chainId,
+            this.contract,
+            this.config.address,
+            this.config.name ?? this.config.address,
+            timestamp || new Date(0),
+            tx,
+            null
+          )
+          ctx.setLogIndex(index)
+          await handler(receipt, ctx)
+        } catch (e) {
+          console.error(e)
+        }
+
+        return ProcessResult.fromPartial({})
+      },
+      receiptConfig: {
+        transfer: {
+          from,
+          to,
+          assetId
+        }
+      }
+    } as ReceiptHandler
+    this.receiptHandlers.push(h)
     return this
   }
 

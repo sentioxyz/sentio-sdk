@@ -439,7 +439,7 @@ export interface ContractConfig {
   moveResourceChangeConfigs: MoveResourceChangeConfig[];
   fuelTransactionConfigs: FuelTransactionHandlerConfig[];
   assetConfigs: FuelAssetHandlerConfig[];
-  fuelLogConfigs: FuelLogHandlerConfig[];
+  fuelReceiptConfigs: FuelReceiptHandlerConfig[];
   cosmosLogConfigs: CosmosLogHandlerConfig[];
   starknetEventConfigs: StarknetEventHandlerConfig[];
   btcTransactionConfigs: BTCTransactionHandlerConfig[];
@@ -703,6 +703,23 @@ export interface FuelLogHandlerConfig {
   logIds: string[];
   handlerId: number;
   handlerName: string;
+}
+
+export interface FuelReceiptHandlerConfig {
+  log?: FuelReceiptHandlerConfig_Log | undefined;
+  transfer?: FuelReceiptHandlerConfig_Transfer | undefined;
+  handlerId: number;
+  handlerName: string;
+}
+
+export interface FuelReceiptHandlerConfig_Transfer {
+  assetId: string;
+  from: string;
+  to: string;
+}
+
+export interface FuelReceiptHandlerConfig_Log {
+  logIds: string[];
 }
 
 export interface CosmosLogHandlerConfig {
@@ -1773,7 +1790,7 @@ function createBaseContractConfig(): ContractConfig {
     moveResourceChangeConfigs: [],
     fuelTransactionConfigs: [],
     assetConfigs: [],
-    fuelLogConfigs: [],
+    fuelReceiptConfigs: [],
     cosmosLogConfigs: [],
     starknetEventConfigs: [],
     btcTransactionConfigs: [],
@@ -1819,8 +1836,8 @@ export const ContractConfig = {
     for (const v of message.assetConfigs) {
       FuelAssetHandlerConfig.encode(v!, writer.uint32(114).fork()).ldelim();
     }
-    for (const v of message.fuelLogConfigs) {
-      FuelLogHandlerConfig.encode(v!, writer.uint32(122).fork()).ldelim();
+    for (const v of message.fuelReceiptConfigs) {
+      FuelReceiptHandlerConfig.encode(v!, writer.uint32(170).fork()).ldelim();
     }
     for (const v of message.cosmosLogConfigs) {
       CosmosLogHandlerConfig.encode(v!, writer.uint32(130).fork()).ldelim();
@@ -1936,12 +1953,12 @@ export const ContractConfig = {
 
           message.assetConfigs.push(FuelAssetHandlerConfig.decode(reader, reader.uint32()));
           continue;
-        case 15:
-          if (tag !== 122) {
+        case 21:
+          if (tag !== 170) {
             break;
           }
 
-          message.fuelLogConfigs.push(FuelLogHandlerConfig.decode(reader, reader.uint32()));
+          message.fuelReceiptConfigs.push(FuelReceiptHandlerConfig.decode(reader, reader.uint32()));
           continue;
         case 16:
           if (tag !== 130) {
@@ -2034,8 +2051,8 @@ export const ContractConfig = {
       assetConfigs: globalThis.Array.isArray(object?.assetConfigs)
         ? object.assetConfigs.map((e: any) => FuelAssetHandlerConfig.fromJSON(e))
         : [],
-      fuelLogConfigs: globalThis.Array.isArray(object?.fuelLogConfigs)
-        ? object.fuelLogConfigs.map((e: any) => FuelLogHandlerConfig.fromJSON(e))
+      fuelReceiptConfigs: globalThis.Array.isArray(object?.fuelReceiptConfigs)
+        ? object.fuelReceiptConfigs.map((e: any) => FuelReceiptHandlerConfig.fromJSON(e))
         : [],
       cosmosLogConfigs: globalThis.Array.isArray(object?.cosmosLogConfigs)
         ? object.cosmosLogConfigs.map((e: any) => CosmosLogHandlerConfig.fromJSON(e))
@@ -2090,8 +2107,8 @@ export const ContractConfig = {
     if (message.assetConfigs?.length) {
       obj.assetConfigs = message.assetConfigs.map((e) => FuelAssetHandlerConfig.toJSON(e));
     }
-    if (message.fuelLogConfigs?.length) {
-      obj.fuelLogConfigs = message.fuelLogConfigs.map((e) => FuelLogHandlerConfig.toJSON(e));
+    if (message.fuelReceiptConfigs?.length) {
+      obj.fuelReceiptConfigs = message.fuelReceiptConfigs.map((e) => FuelReceiptHandlerConfig.toJSON(e));
     }
     if (message.cosmosLogConfigs?.length) {
       obj.cosmosLogConfigs = message.cosmosLogConfigs.map((e) => CosmosLogHandlerConfig.toJSON(e));
@@ -2137,7 +2154,7 @@ export const ContractConfig = {
     message.fuelTransactionConfigs =
       object.fuelTransactionConfigs?.map((e) => FuelTransactionHandlerConfig.fromPartial(e)) || [];
     message.assetConfigs = object.assetConfigs?.map((e) => FuelAssetHandlerConfig.fromPartial(e)) || [];
-    message.fuelLogConfigs = object.fuelLogConfigs?.map((e) => FuelLogHandlerConfig.fromPartial(e)) || [];
+    message.fuelReceiptConfigs = object.fuelReceiptConfigs?.map((e) => FuelReceiptHandlerConfig.fromPartial(e)) || [];
     message.cosmosLogConfigs = object.cosmosLogConfigs?.map((e) => CosmosLogHandlerConfig.fromPartial(e)) || [];
     message.starknetEventConfigs = object.starknetEventConfigs?.map((e) => StarknetEventHandlerConfig.fromPartial(e)) ||
       [];
@@ -4750,6 +4767,262 @@ export const FuelLogHandlerConfig = {
     message.logIds = object.logIds?.map((e) => e) || [];
     message.handlerId = object.handlerId ?? 0;
     message.handlerName = object.handlerName ?? "";
+    return message;
+  },
+};
+
+function createBaseFuelReceiptHandlerConfig(): FuelReceiptHandlerConfig {
+  return { log: undefined, transfer: undefined, handlerId: 0, handlerName: "" };
+}
+
+export const FuelReceiptHandlerConfig = {
+  encode(message: FuelReceiptHandlerConfig, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.log !== undefined) {
+      FuelReceiptHandlerConfig_Log.encode(message.log, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.transfer !== undefined) {
+      FuelReceiptHandlerConfig_Transfer.encode(message.transfer, writer.uint32(18).fork()).ldelim();
+    }
+    if (message.handlerId !== 0) {
+      writer.uint32(24).int32(message.handlerId);
+    }
+    if (message.handlerName !== "") {
+      writer.uint32(34).string(message.handlerName);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): FuelReceiptHandlerConfig {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseFuelReceiptHandlerConfig();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.log = FuelReceiptHandlerConfig_Log.decode(reader, reader.uint32());
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.transfer = FuelReceiptHandlerConfig_Transfer.decode(reader, reader.uint32());
+          continue;
+        case 3:
+          if (tag !== 24) {
+            break;
+          }
+
+          message.handlerId = reader.int32();
+          continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.handlerName = reader.string();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): FuelReceiptHandlerConfig {
+    return {
+      log: isSet(object.log) ? FuelReceiptHandlerConfig_Log.fromJSON(object.log) : undefined,
+      transfer: isSet(object.transfer) ? FuelReceiptHandlerConfig_Transfer.fromJSON(object.transfer) : undefined,
+      handlerId: isSet(object.handlerId) ? globalThis.Number(object.handlerId) : 0,
+      handlerName: isSet(object.handlerName) ? globalThis.String(object.handlerName) : "",
+    };
+  },
+
+  toJSON(message: FuelReceiptHandlerConfig): unknown {
+    const obj: any = {};
+    if (message.log !== undefined) {
+      obj.log = FuelReceiptHandlerConfig_Log.toJSON(message.log);
+    }
+    if (message.transfer !== undefined) {
+      obj.transfer = FuelReceiptHandlerConfig_Transfer.toJSON(message.transfer);
+    }
+    if (message.handlerId !== 0) {
+      obj.handlerId = Math.round(message.handlerId);
+    }
+    if (message.handlerName !== "") {
+      obj.handlerName = message.handlerName;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<FuelReceiptHandlerConfig>): FuelReceiptHandlerConfig {
+    return FuelReceiptHandlerConfig.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<FuelReceiptHandlerConfig>): FuelReceiptHandlerConfig {
+    const message = createBaseFuelReceiptHandlerConfig();
+    message.log = (object.log !== undefined && object.log !== null)
+      ? FuelReceiptHandlerConfig_Log.fromPartial(object.log)
+      : undefined;
+    message.transfer = (object.transfer !== undefined && object.transfer !== null)
+      ? FuelReceiptHandlerConfig_Transfer.fromPartial(object.transfer)
+      : undefined;
+    message.handlerId = object.handlerId ?? 0;
+    message.handlerName = object.handlerName ?? "";
+    return message;
+  },
+};
+
+function createBaseFuelReceiptHandlerConfig_Transfer(): FuelReceiptHandlerConfig_Transfer {
+  return { assetId: "", from: "", to: "" };
+}
+
+export const FuelReceiptHandlerConfig_Transfer = {
+  encode(message: FuelReceiptHandlerConfig_Transfer, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.assetId !== "") {
+      writer.uint32(34).string(message.assetId);
+    }
+    if (message.from !== "") {
+      writer.uint32(10).string(message.from);
+    }
+    if (message.to !== "") {
+      writer.uint32(18).string(message.to);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): FuelReceiptHandlerConfig_Transfer {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseFuelReceiptHandlerConfig_Transfer();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.assetId = reader.string();
+          continue;
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.from = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.to = reader.string();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): FuelReceiptHandlerConfig_Transfer {
+    return {
+      assetId: isSet(object.assetId) ? globalThis.String(object.assetId) : "",
+      from: isSet(object.from) ? globalThis.String(object.from) : "",
+      to: isSet(object.to) ? globalThis.String(object.to) : "",
+    };
+  },
+
+  toJSON(message: FuelReceiptHandlerConfig_Transfer): unknown {
+    const obj: any = {};
+    if (message.assetId !== "") {
+      obj.assetId = message.assetId;
+    }
+    if (message.from !== "") {
+      obj.from = message.from;
+    }
+    if (message.to !== "") {
+      obj.to = message.to;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<FuelReceiptHandlerConfig_Transfer>): FuelReceiptHandlerConfig_Transfer {
+    return FuelReceiptHandlerConfig_Transfer.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<FuelReceiptHandlerConfig_Transfer>): FuelReceiptHandlerConfig_Transfer {
+    const message = createBaseFuelReceiptHandlerConfig_Transfer();
+    message.assetId = object.assetId ?? "";
+    message.from = object.from ?? "";
+    message.to = object.to ?? "";
+    return message;
+  },
+};
+
+function createBaseFuelReceiptHandlerConfig_Log(): FuelReceiptHandlerConfig_Log {
+  return { logIds: [] };
+}
+
+export const FuelReceiptHandlerConfig_Log = {
+  encode(message: FuelReceiptHandlerConfig_Log, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.logIds) {
+      writer.uint32(10).string(v!);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): FuelReceiptHandlerConfig_Log {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseFuelReceiptHandlerConfig_Log();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.logIds.push(reader.string());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): FuelReceiptHandlerConfig_Log {
+    return {
+      logIds: globalThis.Array.isArray(object?.logIds) ? object.logIds.map((e: any) => globalThis.String(e)) : [],
+    };
+  },
+
+  toJSON(message: FuelReceiptHandlerConfig_Log): unknown {
+    const obj: any = {};
+    if (message.logIds?.length) {
+      obj.logIds = message.logIds;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<FuelReceiptHandlerConfig_Log>): FuelReceiptHandlerConfig_Log {
+    return FuelReceiptHandlerConfig_Log.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<FuelReceiptHandlerConfig_Log>): FuelReceiptHandlerConfig_Log {
+    const message = createBaseFuelReceiptHandlerConfig_Log();
+    message.logIds = object.logIds?.map((e) => e) || [];
     return message;
   },
 };

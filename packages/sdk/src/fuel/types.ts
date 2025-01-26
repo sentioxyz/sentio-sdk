@@ -5,6 +5,7 @@ import {
   Data_FuelTransaction,
   FuelAssetHandlerConfig,
   FuelCallHandlerConfig,
+  FuelReceiptHandlerConfig,
   HandleInterval,
   OnIntervalConfig,
   ProcessResult
@@ -16,7 +17,7 @@ export interface FuelBaseProcessor<T> {
   config: T
   txHandlers: CallHandler<Data_FuelTransaction>[]
   blockHandlers: BlockHandler[]
-  logHandlers?: LogHandler<Data_FuelReceipt>[]
+  receiptHandlers?: ReceiptHandler[]
 }
 
 export class FuelProcessorState extends MapStateStorage<FuelBaseProcessor<any>> {
@@ -30,12 +31,10 @@ export type CallHandler<T> = {
   assetConfig?: Partial<FuelAssetHandlerConfig>
 }
 
-export type LogHandler<T> = {
+export type ReceiptHandler = {
   handlerName: string
-  handler: (call: T) => Promise<ProcessResult>
-  logConfig?: {
-    logIds: string[]
-  }
+  handler: (receipt: Data_FuelReceipt) => Promise<ProcessResult>
+  receiptConfig?: Partial<FuelReceiptHandlerConfig>
 }
 
 export type BlockHandler = {
@@ -59,3 +58,9 @@ export type FuelTransaction = TransactionSummary & {
 }
 
 export type FuelBlock = Omit<Block, 'transactionIds'>
+
+export type ContractTransferFilter = {
+  assetId?: string
+  from?: string
+  to?: string
+}

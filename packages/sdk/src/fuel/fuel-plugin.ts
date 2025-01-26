@@ -21,7 +21,7 @@ import { FuelGlobalProcessor } from './global-processor.js'
 interface Handlers {
   transactionHandlers: ((trace: Data_FuelTransaction) => Promise<ProcessResult>)[]
   blockHandlers: ((block: Data_FuelBlock) => Promise<ProcessResult>)[]
-  logHandlers: ((log: Data_FuelReceipt) => Promise<ProcessResult>)[]
+  receiptHandlers: ((log: Data_FuelReceipt) => Promise<ProcessResult>)[]
 }
 
 export class FuelPlugin extends Plugin {
@@ -29,27 +29,28 @@ export class FuelPlugin extends Plugin {
   handlers: Handlers = {
     transactionHandlers: [],
     blockHandlers: [],
-    logHandlers: []
+    receiptHandlers: []
   }
 
   async configure(config: ProcessConfigResponse) {
     const handlers: Handlers = {
       transactionHandlers: [],
       blockHandlers: [],
-      logHandlers: []
+      receiptHandlers: []
     }
 
     for (const processor of FuelProcessorState.INSTANCE.getValues()) {
+      const processorConfig = processor.config
       const contractConfig = ContractConfig.fromPartial({
         processorType: USER_PROCESSOR,
         contract: {
-          name: processor.config.name,
-          chainId: processor.config.chainId.toString(),
-          address: processor.config.address || '*',
+          name: processorConfig.name,
+          chainId: processorConfig.chainId.toString(),
+          address: processorConfig.address || '*',
           abi: ''
         },
-        startBlock: processor.config.startBlock,
-        endBlock: processor.config.endBlock
+        startBlock: processorConfig.startBlock,
+        endBlock: processorConfig.endBlock
       })
       for (const txHandler of processor.txHandlers) {
         const handlerId = handlers.transactionHandlers.push(txHandler.handler) - 1
@@ -79,12 +80,12 @@ export class FuelPlugin extends Plugin {
         }
       }
 
-      for (const logHandler of processor.logHandlers ?? []) {
-        const handlerId = handlers.logHandlers.push(logHandler.handler) - 1
-        const handlerName = logHandler.handlerName
+      for (const receiptHandler of processor.receiptHandlers ?? []) {
+        const handlerId = handlers.receiptHandlers.push(receiptHandler.handler) - 1
+        const handlerName = receiptHandler.handlerName
         if (processor instanceof FuelProcessor) {
-          contractConfig.fuelLogConfigs.push({
-            logIds: logHandler.logConfig?.logIds || [],
+          contractConfig.fuelReceiptConfigs.push({
+            ...receiptHandler.receiptConfig,
             handlerId,
             handlerName
           })
@@ -123,7 +124,7 @@ export class FuelPlugin extends Plugin {
       case HandlerType.FUEL_TRANSACTION:
         return this.processTransaction(request)
       case HandlerType.FUEL_RECEIPT:
-        return this.processLog(request)
+        return this.processReceipt(request)
       case HandlerType.FUEL_BLOCK:
         return this.processBlock(request)
       default:
@@ -145,19 +146,20 @@ export class FuelPlugin extends Plugin {
     return TemplateInstanceState.INSTANCE.getValues().length !== config.templateInstances.length
   }
 
-  async processLog(binding: DataBinding): Promise<ProcessResult> {
-    if (!binding.data?.fuelLog?.transaction) {
+  async processReceipt(binding: DataBinding): Promise<ProcessResult> {
+    const receipt = binding?.data?.fuelLog
+
+    if (!receipt?.transaction) {
       throw new ServerError(Status.INVALID_ARGUMENT, "transaction can't be null")
     }
-    const log = binding.data.fuelLog
 
     const promises: Promise<ProcessResult>[] = []
 
     for (const handlerId of binding.handlerIds) {
-      const promise = this.handlers.logHandlers[handlerId](log).catch((e) => {
+      const promise = this.handlers.receiptHandlers[handlerId](receipt).catch((e) => {
         throw new ServerError(
           Status.INTERNAL,
-          'error processing transaction: ' + JSON.stringify(log) + '\n' + errorString(e)
+          'error processing transaction: ' + JSON.stringify(receipt) + '\n' + errorString(e)
         )
       })
       if (GLOBAL_CONFIG.execution.sequential) {
@@ -167,6 +169,7 @@ export class FuelPlugin extends Plugin {
     }
     return mergeProcessResults(await Promise.all(promises))
   }
+
   async processTransaction(binding: DataBinding): Promise<ProcessResult> {
     if (!binding.data?.fuelTransaction?.transaction) {
       throw new ServerError(Status.INVALID_ARGUMENT, "transaction can't be null")

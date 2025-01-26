@@ -74,6 +74,17 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
           contract.fuelCallConfigs = undefined
         }
 
+        // @ts-ignore convert old fuelLogConfigs to fuelReceiptConfigs
+        if (contract.fuelLogConfigs) {
+          contract.fuelReceiptConfigs = contract.fuelLogConfigs.map((e) => ({
+            handlerId: e.handlerId,
+            handlerName: e.handlerName,
+            log: {
+              logIds: e.logIds
+            }
+          }))
+        }
+
         // @ts-ignore old fields
         if (contract.aptosCallConfigs) {
           // @ts-ignore old fields

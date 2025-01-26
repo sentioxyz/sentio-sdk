@@ -1,5 +1,5 @@
 import { CallHandler, FuelBaseProcessor, FuelProcessorState } from './types.js'
-import { Data_FuelTransaction, FuelAssetHandlerConfig_AssetFilter } from '@sentio/protos'
+import { Data_FuelReceipt, Data_FuelTransaction, FuelAssetHandlerConfig_AssetFilter } from '@sentio/protos'
 import { FuelNetwork, getProvider } from './network.js'
 import { FuelContext } from './context.js'
 import { decodeFuelTransaction } from './transaction.js'
@@ -8,7 +8,7 @@ import { getOptionsSignature } from './fuel-processor.js'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 
 export class FuelAssetProcessor implements FuelBaseProcessor<FuelAssetProcessorConfig> {
-  txHandlers: CallHandler<Data_FuelTransaction>[] = []
+  txHandlers: CallHandler<Data_FuelTransaction | Data_FuelReceipt>[] = []
   blockHandlers = []
   private provider: Provider
 
@@ -112,8 +112,11 @@ export type FuelAssetProcessorConfig = {
 }
 
 export type TransferFilter = {
+  // The  account address that is sending the asset
   from?: string | string[]
+  // The account address that is receiving the asset
   to?: string | string[]
+  // The asset id of the asset being transferred
   assetId?: string | string[]
 }
 

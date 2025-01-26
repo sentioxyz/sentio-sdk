@@ -77,7 +77,8 @@ message ContractConfig {
   repeated FuelCallHandlerConfig fuel_call_configs = 13 [deprecated = true];
   repeated FuelTransactionHandlerConfig fuel_transaction_configs = 20;
   repeated FuelAssetHandlerConfig asset_configs = 14;
-  repeated FuelLogHandlerConfig fuel_log_configs = 15;
+  repeated FuelLogHandlerConfig fuel_log_configs = 15 [deprecated = true];
+  repeated FuelReceiptHandlerConfig fuel_receipt_configs = 21;
   repeated CosmosLogHandlerConfig cosmos_log_configs = 16;
   repeated StarknetEventHandlerConfig starknet_event_configs = 17;
   repeated BTCTransactionHandlerConfig btc_transaction_configs = 18;
@@ -330,6 +331,23 @@ message FuelLogHandlerConfig {
   repeated string log_ids = 1;
   int32 handler_id = 2;
   string handler_name = 3;
+}
+
+message FuelReceiptHandlerConfig {
+  message Transfer {
+    string asset_id = 4;
+    string from = 1;
+    string to = 2;
+  }
+  message Log {
+    repeated string log_ids = 1;
+  }
+  oneof receipt_filter {
+    Log log = 1;
+    Transfer transfer = 2;
+  }
+  int32 handler_id = 3;
+  string handler_name = 4;
 }
 
 message CosmosLogHandlerConfig {
@@ -747,7 +765,7 @@ message Data {
     SuiCall sui_call = 11;
     SuiObject sui_object = 12;
     SuiObjectChange sui_object_change = 13;
-    FuelReceipt fuel_log = 20;
+    FuelReceipt fuel_log = 20; // should rename to fuel_receipt
     FuelCall fuel_call = 14  [deprecated = true];
     FuelTransaction fuel_transaction = 21;
     FuelBlock fuel_block = 18;

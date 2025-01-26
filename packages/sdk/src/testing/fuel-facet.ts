@@ -42,20 +42,20 @@ export class FuelFacet {
         res.push(binding)
       }
 
-      for (const logConfig of config.fuelLogConfigs) {
+      for (const logConfig of config.fuelReceiptConfigs) {
         const binding = {
           data: {
             fuelLog: {
               transaction,
               timestamp: new Date(),
-              receiptIndex: BigInt(transaction.status.receipts.findIndex((r: any) => r.rb == logConfig.logIds[0]))
+              receiptIndex: BigInt(transaction.status.receipts.findIndex((r: any) => r.rb == logConfig.log?.logIds[0]))
             }
           },
           handlerIds: [logConfig.handlerId],
           handlerType: HandlerType.FUEL_RECEIPT
         }
 
-        const logIds = logConfig.logIds
+        const logIds = logConfig.log?.logIds ?? []
         for (const receipt of transaction.status.receipts || []) {
           if ((receipt.receiptType == 'LOG' || receipt.receiptType == 'LOG_DATA') && logIds.includes(receipt.rb)) {
             res.push(binding)
