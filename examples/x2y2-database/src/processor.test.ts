@@ -1,5 +1,5 @@
 import assert from 'assert'
-import { before, describe, test } from 'node:test'
+import { before, beforeEach, describe, test } from 'node:test'
 import { TestProcessorServer } from '@sentio/sdk/testing'
 import { mockTransferLog } from '@sentio/sdk/eth/builtin/erc20'
 import { User } from './schema/schema.js'
@@ -9,6 +9,10 @@ describe('Test Processor', () => {
 
   before(async () => {
     await server.start()
+  })
+
+  beforeEach(() => {
+    server.db.reset()
   })
 
   test('has config', async () => {

@@ -1,4 +1,4 @@
-import { before, describe, test } from 'node:test'
+import { before, beforeEach, describe, test } from 'node:test'
 
 import { TestProcessorServer } from '../../testing/index.js'
 import { mockTransferLog } from '../../eth/builtin/erc20.js'
@@ -11,6 +11,10 @@ describe('test entity store for processor', () => {
 
   before(async () => {
     await service.start()
+  })
+
+  beforeEach(() => {
+    service.db.reset()
   })
 
   test('Check entity is stored', async () => {

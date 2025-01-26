@@ -20,14 +20,19 @@ import { Store } from '../store/store.js'
 export class MemoryDatabase {
   db = new Map<string, Record<string, any>>()
   public lastDbRequest: DBRequest | undefined
-  schema: GraphQLSchema
+  _schema: GraphQLSchema
 
-  constructor(readonly dbContext: StoreContext) {
-    if (DatabaseSchemaState.INSTANCE.getValues().length > 0) {
-      const source = DatabaseSchemaState.INSTANCE.getValues()[0].source
-      const doc = parse(source)
-      this.schema = buildSchema(doc)
+  constructor(readonly dbContext: StoreContext) {}
+
+  get schema() {
+    if (!this._schema) {
+      if (DatabaseSchemaState.INSTANCE.getValues().length > 0) {
+        const source = DatabaseSchemaState.INSTANCE.getValues()[0].source
+        const doc = parse(source)
+        this._schema = buildSchema(doc)
+      }
     }
+    return this._schema
   }
 
   get store() {

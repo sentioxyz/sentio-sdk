@@ -55,7 +55,7 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
   cosmos: CosmosFacet
   starknet: StarknetFacet
   btc: BTCFacet
-  db: MemoryDatabase
+  _db: MemoryDatabase
 
   constructor(loader: () => Promise<any>, httpEndpoints: Record<string, string> = {}) {
     cleanTest()
@@ -78,6 +78,7 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
     // start a memory database for testing
     const subject = new Subject<DeepPartial<ProcessStreamResponse>>()
     this.storeContext = new StoreContext(subject, 1)
+    this._db = new MemoryDatabase(this.storeContext)
   }
 
   async start(request: StartRequest = { templateInstances: [] }, context = TEST_CONTEXT): Promise<Empty> {
@@ -85,6 +86,7 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
     const config = await this.getConfig({})
     this.contractConfigs = config.contractConfigs
     this.accountConfigs = config.accountConfigs
+    this._db.start()
     return res
   }
 
@@ -100,14 +102,12 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
     request: ProcessBindingsRequest,
     context: CallContext = TEST_CONTEXT
   ): Promise<ProcessBindingResponse> {
-    this.initDb()
     return PluginManager.INSTANCE.dbContextLocalStorage.run(this.storeContext, () => {
       return this.service.processBindings(request, context)
     })
   }
 
   processBinding(request: DataBinding, context: CallContext = TEST_CONTEXT): Promise<ProcessBindingResponse> {
-    this.initDb()
     return PluginManager.INSTANCE.dbContextLocalStorage.run(this.storeContext, () => {
       return this.service.processBindings({ bindings: [request] }, context)
     })
@@ -130,14 +130,11 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
   // processBindingsStream(request: AsyncIterable<ProcessStreamRequest>, context: CallContext) {
   //   return this.service.processBindingsStream(request, context)
   // }
-  private initDb() {
-    if (this.db == null) {
-      this.db = new MemoryDatabase(this.storeContext)
-      this.db.start()
-    }
+  get db() {
+    return this._db
   }
 
   get store() {
-    return this.db.store
+    return this._db.store
   }
 }
