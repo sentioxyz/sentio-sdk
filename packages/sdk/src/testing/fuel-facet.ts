@@ -59,7 +59,7 @@ export class FuelFacet {
     }
 
     // keep receipts order
-    let receipts = transaction.status.receipts || []
+    const receipts = transaction.status.receipts || []
     for (let i = 0; i < receipts.length; i++) {
       const receipt = receipts[i]
       if (receipt.receiptType != 'LOG' && receipt.receiptType != 'LOG_DATA') {
