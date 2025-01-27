@@ -5,7 +5,8 @@ import {
   MoveResource,
   UserTransactionResponse,
   EntryFunctionPayloadResponse,
-  MultisigPayloadResponse
+  MultisigPayloadResponse,
+  WriteSetChangeWriteResource
 } from '@aptos-labs/ts-sdk'
 
 import { AptosBindOptions, AptosNetwork } from './network.js'
@@ -32,7 +33,7 @@ import {
   TransactionIntervalHandler
 } from '../move/index.js'
 import { ALL_ADDRESS, Labels, PromiseOrVoid } from '../core/index.js'
-import { TypeDescriptor, matchType } from '@typemove/move'
+import { TypeDescriptor, matchType, NestedDecodedStruct } from '@typemove/move'
 import { decodeResourceChange, ResourceChange } from '@typemove/aptos'
 import { GeneralTransactionResponse } from './models.js'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
@@ -530,11 +531,11 @@ export class AptosResourcesProcessor {
         let resources = (await decodeResourceChange(
           data.rawResources.map((r) => JSON.parse(r)),
           ctx.coder
-        )) as ResourceChange<T>[]
+        )) as NestedDecodedStruct<MoveResource, WriteSetChangeWriteResource, T>[]
 
         if (hasAny) {
           resources = resources.filter((r) => {
-            const rt = parseMoveType(r.type)
+            const rt = parseMoveType(r.data.type)
             return matchType(typeDesc, rt)
           })
         }
