@@ -60,7 +60,7 @@ describe('typed fuel processor tests', () => {
     const res = await service.fuel.testOnTransaction(testData, FuelChainId.FUEL_TESTNET)
 
     const events = res.result?.events
-    expect(events).length(1)
+    expect(events).length(2)
     expect(events?.[0]?.message).contains('log foo')
   })
 

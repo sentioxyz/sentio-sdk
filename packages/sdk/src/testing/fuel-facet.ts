@@ -42,28 +42,6 @@ export class FuelFacet {
         res.push(binding)
       }
 
-      for (const logConfig of config.fuelReceiptConfigs) {
-        const binding = {
-          data: {
-            fuelLog: {
-              transaction,
-              timestamp: new Date(),
-              receiptIndex: BigInt(transaction.status.receipts.findIndex((r: any) => r.rb == logConfig.log?.logIds[0]))
-            }
-          },
-          handlerIds: [logConfig.handlerId],
-          handlerType: HandlerType.FUEL_RECEIPT
-        }
-
-        const logIds = logConfig.log?.logIds ?? []
-        for (const receipt of transaction.status.receipts || []) {
-          if ((receipt.receiptType == 'LOG' || receipt.receiptType == 'LOG_DATA') && logIds.includes(receipt.rb)) {
-            res.push(binding)
-            break
-          }
-        }
-      }
-
       for (const assetConfig of config.assetConfigs) {
         const binding = {
           data: {
@@ -77,6 +55,35 @@ export class FuelFacet {
         }
 
         res.push(binding)
+      }
+    }
+
+    // keep receipts order
+    let receipts = transaction.status.receipts || []
+    for (let i = 0; i < receipts.length; i++) {
+      const receipt = receipts[i]
+      if (receipt.receiptType != 'LOG' && receipt.receiptType != 'LOG_DATA') {
+        continue
+      }
+
+      for (const config of this.server.contractConfigs) {
+        for (const logConfig of config.fuelReceiptConfigs) {
+          const logIds = logConfig.log?.logIds ?? []
+          if (logIds.includes(receipt.rb)) {
+            const binding = {
+              data: {
+                fuelLog: {
+                  transaction,
+                  timestamp: new Date(),
+                  receiptIndex: BigInt(i)
+                }
+              },
+              handlerIds: [logConfig.handlerId],
+              handlerType: HandlerType.FUEL_RECEIPT
+            }
+            res.push(binding)
+          }
+        }
       }
     }
 
