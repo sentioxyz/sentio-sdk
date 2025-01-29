@@ -8,6 +8,9 @@ export function getHandlerName() {
 export function proxyProcessor(cls: any) {
   return new Proxy(cls, {
     get: (target, prop, receiver) => {
+      if (prop.toString() == 'bind') {
+        return Reflect.get(target, prop, receiver)
+      }
       return metricsStorage.run(metricsStorage.getStore() || `${cls.constructor.name}.${prop.toString()}`, () => {
         const fn = (target as any)[prop]
         if (typeof fn == 'function') {
