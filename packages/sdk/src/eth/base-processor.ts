@@ -429,7 +429,8 @@ export abstract class BaseProcessor<
       event: TypedEvent,
       ctx: ContractContext<TContract, TBoundContractView>,
       preprocessStore: { [k: string]: any }
-    ) => Promise<PreprocessResult> = defaultPreprocessHandler
+    ) => Promise<PreprocessResult> = defaultPreprocessHandler,
+    handlerName = getHandlerName()
   ): this {
     const chainId = this.getChainId()
     let _filters: DeferredTopicFilter[] = []
@@ -445,7 +446,7 @@ export abstract class BaseProcessor<
     this.eventHandlers.push({
       filters: _filters,
       fetchConfig: EthFetchConfig.fromPartial(fetchConfig || {}),
-      handlerName: getHandlerName(),
+      handlerName,
       handler: async function (data: Data_EthLog, preparedData?: PreparedData) {
         const { log, block, transaction, transactionReceipt } = formatEthData(data)
         if (!log) {
@@ -605,14 +606,15 @@ export abstract class BaseProcessor<
       block: RichBlock,
       ctx: ContractContext<TContract, TBoundContractView>,
       preprocessStore: { [k: string]: any }
-    ) => Promise<PreprocessResult> = defaultPreprocessHandler
+    ) => Promise<PreprocessResult> = defaultPreprocessHandler,
+    handlerName = getHandlerName()
   ): this {
     const chainId = this.getChainId()
     const processor = this
     const contractName = this.config.name
 
     this.blockHandlers.push({
-      handlerName: getHandlerName(),
+      handlerName,
       handler: async function (data: Data_EthBlock, preparedData?: PreparedData) {
         const { block } = formatEthData(data)
 
@@ -676,7 +678,8 @@ export abstract class BaseProcessor<
       trace: TypedCallTrace,
       ctx: ContractContext<TContract, TBoundContractView>,
       preprocessStore: { [k: string]: any }
-    ) => Promise<PreprocessResult> = defaultPreprocessHandler
+    ) => Promise<PreprocessResult> = defaultPreprocessHandler,
+    handlerName = getHandlerName()
   ): this {
     const chainId = this.getChainId()
     const contractName = this.config.name
@@ -688,7 +691,7 @@ export abstract class BaseProcessor<
     this.traceHandlers.push({
       signatures,
       fetchConfig: EthFetchConfig.fromPartial(fetchConfig || {}),
-      handlerName: getHandlerName(),
+      handlerName,
       handler: async function (data: Data_EthTrace, preparedData?: PreparedData) {
         const contractView = processor.CreateBoundContractView()
         const contractInterface = contractView.rawContract.interface

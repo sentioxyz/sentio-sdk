@@ -9,7 +9,7 @@ import { BlockParams } from 'ethers/providers'
 import { DeferredTopicFilter } from 'ethers/contract'
 import { TypedEvent, TypedCallTrace } from './eth.js'
 import { TemplateInstanceState } from '../core/template.js'
-import { proxyProcessor } from '../utils/metrics.js'
+import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 
 export class ProcessorTemplateProcessorState extends ListStateStorage<
   BaseProcessorTemplate<BaseContract, BoundContractView<BaseContract, any>>
@@ -24,6 +24,7 @@ export abstract class BaseProcessorTemplate<
   id: number
   binds = new Set<string>()
   blockHandlers: {
+    handlerName: string
     handler: (block: BlockParams, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid
     preprocessHandler: (
       block: BlockParams,
@@ -36,6 +37,7 @@ export abstract class BaseProcessorTemplate<
   }[] = []
   traceHandlers: {
     signature: string
+    handlerName: string
     handler: (trace: TypedCallTrace, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid
     preprocessHandler: (
       trace: TypedCallTrace,
@@ -45,6 +47,7 @@ export abstract class BaseProcessorTemplate<
     fetchConfig?: EthFetchConfig
   }[] = []
   eventHandlers: {
+    handlerName: string
     handler: (event: TypedEvent, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid
     preprocessHandler: (
       event: TypedEvent,
@@ -81,14 +84,21 @@ export abstract class BaseProcessorTemplate<
 
     for (const eh of this.eventHandlers) {
       // @ts-ignore friendly
-      processor.onEthEvent(eh.handler, eh.filter, eh.fetchConfig, eh.preprocessHandler)
+      processor.onEthEvent(eh.handler, eh.filter, eh.fetchConfig, eh.preprocessHandler, eh.handlerName)
     }
     for (const th of this.traceHandlers) {
       // @ts-ignore friendly
-      processor.onEthTrace(th.signature, th.handler, th.fetchConfig, th.preprocessHandler)
+      processor.onEthTrace(th.signature, th.handler, th.fetchConfig, th.preprocessHandler, th.handlerName)
     }
     for (const bh of this.blockHandlers) {
-      processor.onInterval(bh.handler, bh.timeIntervalInMinutes, bh.blockInterval, bh.fetchConfig, bh.preprocessHandler)
+      processor.onInterval(
+        bh.handler,
+        bh.timeIntervalInMinutes,
+        bh.blockInterval,
+        bh.fetchConfig,
+        bh.preprocessHandler,
+        bh.handlerName
+      )
     }
 
     const instance: TemplateInstance = {
@@ -124,6 +134,7 @@ export abstract class BaseProcessorTemplate<
     ) => Promise<PreprocessResult> = defaultPreprocessHandler
   ) {
     this.eventHandlers.push({
+      handlerName: getHandlerName(),
       handler: handler,
       preprocessHandler,
       filter: filter,
@@ -187,6 +198,7 @@ export abstract class BaseProcessorTemplate<
     ) => Promise<PreprocessResult> = defaultPreprocessHandler
   ) {
     this.blockHandlers.push({
+      handlerName: getHandlerName(),
       handler,
       preprocessHandler,
       timeIntervalInMinutes: timeInterval,
@@ -208,6 +220,7 @@ export abstract class BaseProcessorTemplate<
   ) {
     this.traceHandlers.push({
       signature,
+      handlerName: getHandlerName(),
       handler,
       preprocessHandler,
       fetchConfig: EthFetchConfig.fromPartial(fetchConfig || {})

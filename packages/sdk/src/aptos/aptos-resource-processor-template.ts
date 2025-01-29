@@ -6,7 +6,7 @@ import { AptosResourcesProcessor, DEFAULT_RESOURCE_FETCH_CONFIG } from './aptos-
 import { HandleInterval, MoveAccountFetchConfig } from '@sentio/protos'
 import { MoveResource } from '@aptos-labs/ts-sdk'
 import { PromiseOrVoid } from '../core/index.js'
-import { proxyProcessor } from '../utils/metrics.js'
+import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 
 export class AptosResourceProcessorTemplateState extends ListStateStorage<AptosResourceProcessorTemplate> {
   static INSTANCE = new AptosResourceProcessorTemplateState()
@@ -16,6 +16,7 @@ class Handler {
   type?: string
   checkpointInterval?: HandleInterval
   timeIntervalInMinutes?: HandleInterval
+  handlerName: string
   handler: (resources: MoveResource[], ctx: AptosResourcesContext) => PromiseOrVoid
   fetchConfig: MoveAccountFetchConfig
 }
@@ -49,7 +50,14 @@ export class AptosResourceProcessorTemplate {
 
     const processor = this.createProcessor(options)
     for (const h of this.handlers) {
-      processor.onInterval(h.handler, h.timeIntervalInMinutes, h.checkpointInterval, h.type, h.fetchConfig)
+      processor.onInterval(
+        h.handler,
+        h.timeIntervalInMinutes,
+        h.checkpointInterval,
+        h.type,
+        h.fetchConfig,
+        h.handlerName
+      )
     }
     const config = processor.config
 
@@ -85,6 +93,7 @@ export class AptosResourceProcessorTemplate {
     fetchConfig: Partial<MoveAccountFetchConfig> | undefined
   ): this {
     this.handlers.push({
+      handlerName: getHandlerName(),
       handler: handler,
       timeIntervalInMinutes: timeInterval,
       checkpointInterval: checkpointInterval,

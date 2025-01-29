@@ -68,10 +68,11 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
 
   public onTransaction(
     handler: (transaction: FuelTransaction, ctx: FuelContractContext<TContract>) => PromiseOrVoid,
-    config: FuelFetchConfig = DEFAULT_FUEL_FETCH_CONFIG
+    config: FuelFetchConfig = DEFAULT_FUEL_FETCH_CONFIG,
+    handlerName = getHandlerName()
   ) {
     const callHandler = {
-      handlerName: getHandlerName(),
+      handlerName,
       handler: async (call: Data_FuelTransaction) => {
         const abiMap = this.config.abi
           ? {
@@ -181,12 +182,13 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
 
   public onLog<T>(
     logIdFilter: string | string[],
-    handler: (logs: FuelLog<T>, ctx: FuelContractContext<TContract>) => PromiseOrVoid
+    handler: (logs: FuelLog<T>, ctx: FuelContractContext<TContract>) => PromiseOrVoid,
+    handlerName = getHandlerName()
   ) {
     const logIds = new Set(Array.isArray(logIdFilter) ? logIdFilter : [logIdFilter])
 
     const logHandler = {
-      handlerName: getHandlerName(),
+      handlerName,
       handler: async ({ transaction, receiptIndex, timestamp }: Data_FuelReceipt) => {
         try {
           const tx = decodeFuelTransaction(transaction, this.provider)
@@ -272,7 +274,8 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
   public onInterval(
     handler: (block: FuelBlock, ctx: FuelContractContext<TContract>) => PromiseOrVoid,
     timeInterval: HandleInterval | undefined,
-    blockInterval: HandleInterval | undefined
+    blockInterval: HandleInterval | undefined,
+    handlerName = getHandlerName()
     // fetchConfig: Partial<FuelFetchConfig> | undefined
   ): this {
     if (timeInterval) {
@@ -286,7 +289,7 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
     this.blockHandlers.push({
       blockInterval,
       timeIntervalInMinutes: timeInterval,
-      handlerName: getHandlerName(),
+      handlerName,
       handler: async function (data: Data_FuelBlock) {
         const header = data.block
         if (!header) {

@@ -436,11 +436,12 @@ export class AptosResourcesProcessor {
     timeInterval: HandleInterval | undefined,
     versionInterval: HandleInterval | undefined,
     type: string | undefined,
-    fetchConfig: Partial<MoveAccountFetchConfig> | undefined
+    fetchConfig: Partial<MoveAccountFetchConfig> | undefined,
+    handlerName = getHandlerName()
   ): this {
     const processor = this
     this.resourceIntervalHandlers.push({
-      handlerName: getHandlerName(),
+      handlerName,
       handler: async function (data) {
         if (data.timestampMicros > Number.MAX_SAFE_INTEGER) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'timestamp is too large')

@@ -97,11 +97,12 @@ export abstract class SuiBaseObjectOrAddressProcessor<HandlerType> {
     timeInterval: HandleInterval | undefined,
     checkpointInterval: HandleInterval | undefined,
     type: string | undefined,
-    fetchConfig: Partial<MoveAccountFetchConfig> | undefined
+    fetchConfig: Partial<MoveAccountFetchConfig> | undefined,
+    handlerName = getHandlerName()
   ): this {
     const processor = this
     this.objectHandlers.push({
-      handlerName: getHandlerName(),
+      handlerName,
       handler: async function (data) {
         const ctx = new SuiObjectContext(
           processor.config.network,

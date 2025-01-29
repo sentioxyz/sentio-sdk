@@ -16,12 +16,13 @@ import { TemplateInstanceState } from '../core/template.js'
 import { SuiBindOptions } from './sui-processor.js'
 import { TransactionFilter, accountAddressString } from '../move/index.js'
 import { ServerError, Status } from 'nice-grpc'
-import { proxyProcessor } from '../utils/metrics.js'
+import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 
 class ObjectHandler<HandlerType> {
   type?: string
   checkpointInterval?: HandleInterval
   timeIntervalInMinutes?: HandleInterval
+  handlerName: string
   handler: HandlerType
   fetchConfig: MoveAccountFetchConfig
 }
@@ -68,7 +69,14 @@ export abstract class SuiObjectOrAddressProcessorTemplate<
 
     const processor = this.createProcessor(options)
     for (const h of this.objectHandlers) {
-      processor.onInterval(h.handler, h.timeIntervalInMinutes, h.checkpointInterval, h.type, h.fetchConfig)
+      processor.onInterval(
+        h.handler,
+        h.timeIntervalInMinutes,
+        h.checkpointInterval,
+        h.type,
+        h.fetchConfig,
+        h.handlerName
+      )
     }
     const config = processor.config
 
@@ -162,6 +170,7 @@ export abstract class SuiObjectOrAddressProcessorTemplate<
     fetchConfig: Partial<MoveAccountFetchConfig> | undefined
   ): this {
     this.objectHandlers.push({
+      handlerName: getHandlerName(),
       handler: handler,
       timeIntervalInMinutes: timeInterval,
       checkpointInterval: checkpointInterval,
