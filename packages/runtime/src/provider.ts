@@ -188,4 +188,8 @@ export class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
     }
     return result
   }
+
+  toString() {
+    return 'QueuedStaticJsonRpcProvider'
+  }
 }
