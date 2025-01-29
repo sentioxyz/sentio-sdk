@@ -16,6 +16,7 @@ import { TemplateInstanceState } from '../core/template.js'
 import { SuiBindOptions } from './sui-processor.js'
 import { TransactionFilter, accountAddressString } from '../move/index.js'
 import { ServerError, Status } from 'nice-grpc'
+import { proxyProcessor } from '../utils/metrics.js'
 
 class ObjectHandler<HandlerType> {
   type?: string
@@ -43,6 +44,7 @@ export abstract class SuiObjectOrAddressProcessorTemplate<
   constructor() {
     this.id = SuiAccountProcessorTemplateState.INSTANCE.getValues().length
     SuiAccountProcessorTemplateState.INSTANCE.addValue(this)
+    return proxyProcessor(this)
   }
 
   protected abstract createProcessor(options: SuiObjectBindOptions | SuiBindOptions): ProcessorType

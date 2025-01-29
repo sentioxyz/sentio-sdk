@@ -6,6 +6,7 @@ import { AptosResourcesProcessor, DEFAULT_RESOURCE_FETCH_CONFIG } from './aptos-
 import { HandleInterval, MoveAccountFetchConfig } from '@sentio/protos'
 import { MoveResource } from '@aptos-labs/ts-sdk'
 import { PromiseOrVoid } from '../core/index.js'
+import { proxyProcessor } from '../utils/metrics.js'
 
 export class AptosResourceProcessorTemplateState extends ListStateStorage<AptosResourceProcessorTemplate> {
   static INSTANCE = new AptosResourceProcessorTemplateState()
@@ -27,6 +28,7 @@ export class AptosResourceProcessorTemplate {
   constructor() {
     this.id = AptosResourceProcessorTemplateState.INSTANCE.getValues().length
     AptosResourceProcessorTemplateState.INSTANCE.addValue(this)
+    return proxyProcessor(this)
   }
 
   createProcessor(options: AptosBindOptions): AptosResourcesProcessor {

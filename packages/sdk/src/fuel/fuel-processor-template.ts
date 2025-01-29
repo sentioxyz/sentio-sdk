@@ -7,6 +7,7 @@ import { Contract } from 'fuels'
 import { FuelBlock, FuelLog, FuelTransaction } from './types.js'
 import { DEFAULT_FUEL_FETCH_CONFIG, FuelFetchConfig } from './transaction.js'
 import { FuelProcessor, FuelProcessorConfig, getOptionsSignature } from './fuel-processor.js'
+import { proxyProcessor } from '../utils/metrics.js'
 
 export class FuelProcessorTemplateProcessorState extends ListStateStorage<FuelBaseProcessorTemplate<Contract>> {
   static INSTANCE = new FuelProcessorTemplateProcessorState()
@@ -36,6 +37,7 @@ export abstract class FuelBaseProcessorTemplate<TContract extends Contract> {
   constructor() {
     this.id = FuelProcessorTemplateProcessorState.INSTANCE.getValues().length
     FuelProcessorTemplateProcessorState.INSTANCE.addValue(this)
+    return proxyProcessor(this)
   }
 
   /**

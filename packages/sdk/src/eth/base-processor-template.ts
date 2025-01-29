@@ -9,6 +9,7 @@ import { BlockParams } from 'ethers/providers'
 import { DeferredTopicFilter } from 'ethers/contract'
 import { TypedEvent, TypedCallTrace } from './eth.js'
 import { TemplateInstanceState } from '../core/template.js'
+import { proxyProcessor } from '../utils/metrics.js'
 
 export class ProcessorTemplateProcessorState extends ListStateStorage<
   BaseProcessorTemplate<BaseContract, BoundContractView<BaseContract, any>>
@@ -57,6 +58,7 @@ export abstract class BaseProcessorTemplate<
   constructor() {
     this.id = ProcessorTemplateProcessorState.INSTANCE.getValues().length
     ProcessorTemplateProcessorState.INSTANCE.addValue(this)
+    return proxyProcessor(this)
   }
 
   /**
