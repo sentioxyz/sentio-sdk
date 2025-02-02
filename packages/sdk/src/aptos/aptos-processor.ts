@@ -41,7 +41,7 @@ import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 const DEFAULT_FETCH_CONFIG: MoveFetchConfig = {
   resourceChanges: false,
   allEvents: true,
-  inputs: false,
+  inputs: true,
   // for backward compatibility
   supportMultisigFunc: true
 }

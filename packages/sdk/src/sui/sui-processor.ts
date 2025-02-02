@@ -22,8 +22,8 @@ import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 
 export const DEFAULT_FETCH_CONFIG: MoveFetchConfig = {
   resourceChanges: false,
-  allEvents: false,
-  inputs: false
+  allEvents: true,
+  inputs: true
 }
 
 export type IndexConfigure = Required<SuiBindOptions, 'startCheckpoint' | 'network'>

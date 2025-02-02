@@ -144,10 +144,14 @@ async function getCoinTokenInfo(client: RichAptosClient, type: MoveStructId): Pr
     throw Error('coin not existed: ' + type)
   }
 
-  const paired = await coin.view.pairedMetadata(client, { typeArguments: [type] })
   let faAddress
-  if (paired[0].vec[0]) {
-    faAddress = paired[0].vec[0] as `0x${string}`
+  try {
+    const paired = await coin.view.pairedMetadata(client, { typeArguments: [type] })
+    if (paired[0].vec[0]) {
+      faAddress = paired[0].vec[0] as `0x${string}`
+    }
+  } catch (e) {
+    console.debug("can't locate paired fa token for", type)
   }
 
   return {
