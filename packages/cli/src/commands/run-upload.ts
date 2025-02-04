@@ -239,6 +239,24 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth, continu
   hash.update(content)
   const digest = hash.digest('hex')
 
+  if (continueFrom) {
+    const res = await getProcessorStatus(options.host, auth, options.project)
+    const data = (await res.json()) as { processors: { version: number }[] }
+    const found = data?.processors.find((x) => x.version == continueFrom)
+    if (found) {
+      const confirmed = await confirm(`Continue from version ${continueFrom}`)
+      if (!confirmed) {
+        process.exit(0)
+      }
+    } else {
+      const latest = data.processors?.[0]?.version
+      console.error(
+        chalk.red(`Failed to find existed version ${continueFrom}` + (latest ? `, latest is ${latest}` : ''))
+      )
+      process.exit(0)
+    }
+  }
+
   let triedCount = 0
   const upload = async () => {
     const { commitSha, gitUrl } = getGitAttributes()
@@ -265,9 +283,16 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth, continu
       }
       return
     }
-    const initUploadRes = (await initUploadResRaw.json()) as { url: string; warning?: string; replacingVersion: number }
-    if (initUploadRes.replacingVersion && !options.silentOverwrite) {
-      const confirmed = await confirm(`Overwrite the existing version ${initUploadRes.replacingVersion}?`)
+    const initUploadRes = (await initUploadResRaw.json()) as {
+      url: string
+      warning?: string
+      replacingVersion: number
+      multiVersion: boolean
+    }
+    if (!continueFrom && initUploadRes.replacingVersion && !options.silentOverwrite) {
+      const confirmed = await confirm(
+        `Create new version and deactivate ${initUploadRes.multiVersion ? 'pending' : 'active'} version ${initUploadRes.replacingVersion}?`
+      )
       if (!confirmed) {
         process.exit(0)
       }
@@ -346,6 +371,15 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth, continu
   }
 
   await tryUploading()
+}
+
+async function getProcessorStatus(host: string, auth: Auth, projectSlug: string) {
+  const url = new URL(`/api/v1/processors/${projectSlug}/status`, host)
+  return fetch(url.href, {
+    headers: {
+      ...auth
+    }
+  })
 }
 
 export async function initUpload(
