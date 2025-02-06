@@ -97,8 +97,8 @@ export class SuiBaseProcessor {
           throw new ServerError(Status.INVALID_ARGUMENT, 'event is null')
         }
         const txn = JSON.parse(data.rawTransaction) as SuiTransactionBlockResponse
-        if (!txn.events || !txn.events.length) {
-          throw new ServerError(Status.INVALID_ARGUMENT, 'no event in the transactions')
+        if (txn.events == null) {
+          txn.events = []
         }
 
         const evt = JSON.parse(data.rawEvent) as SuiEvent

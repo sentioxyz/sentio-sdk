@@ -106,8 +106,8 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
           throw new ServerError(Status.INVALID_ARGUMENT, 'event is null')
         }
         const txn = JSON.parse(data.rawTransaction) as UserTransactionResponse
-        if (!txn.events.length) {
-          throw new ServerError(Status.INVALID_ARGUMENT, 'no event in the transactions')
+        if (txn.events == null) {
+          txn.events = []
         }
 
         const evt = JSON.parse(data.rawEvent)
