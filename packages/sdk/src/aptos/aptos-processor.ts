@@ -200,6 +200,9 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
           throw new ServerError(Status.INVALID_ARGUMENT, 'call is null')
         }
         const call = JSON.parse(data.rawTransaction) as UserTransactionResponse
+        if (call.events == null) {
+          call.events = []
+        }
         const ctx = new AptosContext(
           processor.moduleName,
           processor.config.network,
