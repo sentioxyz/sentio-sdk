@@ -8,7 +8,7 @@ import {
   EventTrackingResult,
   LogLevel
 } from '@sentio/protos'
-import { normalizeAttribute, normalizeLabels } from './normalization.js'
+import { normalizeAttribute, normalizeLabels, normalizeToRichStruct } from './normalization.js'
 import { MapStateStorage, processMetrics } from '@sentio/runtime'
 import { BN } from 'fuels'
 import { BigDecimal } from '@sentio/bigdecimal'
@@ -129,7 +129,7 @@ function emit<T>(ctx: BaseContext, eventName: string, event: Event<T>) {
     },
     runtimeInfo: undefined,
     noMetric: true,
-    attributes2: undefined
+    attributes2: normalizeToRichStruct(ctx.baseLabels, payload)
   }
   processMetrics.process_eventemit_count.add(1)
   ctx.update({ events: [res] })

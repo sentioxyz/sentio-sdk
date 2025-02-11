@@ -2,7 +2,8 @@ import { describe, test } from 'node:test'
 import { expect } from 'chai'
 import { Struct } from '@sentio/protos'
 import { BigDecimal } from './big-decimal.js'
-import { normalizeAttribute, normalizeKey, normalizeLabels } from './normalization.js'
+import { normalizeAttribute, normalizeKey, normalizeLabels, normalizeToRichStruct } from './normalization.js'
+import { toBigDecimal, toBigInteger } from './numberish.js'
 
 // TODO add test for type conversion
 describe('Normalization tests', () => {
@@ -16,7 +17,9 @@ describe('Normalization tests', () => {
     const w1 = Struct.encode(Struct.wrap(r1))
     const s2 = Struct.decode(w1.finish())
 
-    const t2 = { f: () => {} }
+    const t2 = {
+      f: () => {}
+    }
     const r2 = normalizeAttribute(t2)
     expect(r2.f).equals(undefined)
 
@@ -49,5 +52,16 @@ describe('Normalization tests', () => {
     const updated = normalizeLabels(labels)
 
     expect(updated['labels_']).eq('0')
+  })
+
+  test('normalize attributes to rich struct', async () => {
+    const t1 = { a: 'a', n: 123, n2: 1233333333300000000000n, n3: BigDecimal(10.01), nested: { date: new Date() } }
+    const r1 = normalizeToRichStruct(t1)
+    expect(r1.fields['n2']).deep.equals({
+      bigintValue: toBigInteger(1233333333300000000000n)
+    })
+    expect(r1.fields['n3'].bigdecimalValue).deep.equals(toBigDecimal(BigDecimal(10.01)))
+
+    expect(r1.fields['nested'].timestampValue instanceof Date)
   })
 })

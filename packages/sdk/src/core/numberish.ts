@@ -1,4 +1,4 @@
-import { BigInteger, MetricValue } from '@sentio/protos'
+import { BigDecimalRichValue, BigInteger, MetricValue } from '@sentio/protos'
 import { BigDecimal } from './big-decimal.js'
 
 export type Numberish = number | bigint | BigDecimal | string
@@ -13,29 +13,29 @@ export function toMetricValue(value: Numberish): MetricValue {
     }
     if (Number.isInteger(value) && !Number.isSafeInteger(value)) {
       return MetricValue.fromPartial({
-        bigInteger: toBigInteger(value),
+        bigInteger: toBigInteger(value)
       })
     }
 
     return MetricValue.fromPartial({
-      doubleValue: Number(value),
+      doubleValue: Number(value)
     })
   }
   if (typeof value === 'bigint') {
     return MetricValue.fromPartial({
-      bigInteger: toBigInteger(value),
+      bigInteger: toBigInteger(value)
     })
   }
   if (typeof value === 'string') {
     return MetricValue.fromPartial({
-      bigDecimal: value,
+      bigDecimal: value
     })
   }
   // if (value instanceof BigDecimal) {
   // Carefully consider the use case here
   if (value.isInteger()) {
     return MetricValue.fromPartial({
-      bigInteger: bigDecimalToBigInteger(value),
+      bigInteger: bigDecimalToBigInteger(value)
     })
   } else {
     if (value.isNaN()) {
@@ -46,7 +46,7 @@ export function toMetricValue(value: Numberish): MetricValue {
       throw new Error('Cannot record infinite value')
     }
     return MetricValue.fromPartial({
-      bigDecimal: value.toString(), // e.g. -7.350918e-428
+      bigDecimal: value.toString() // e.g. -7.350918e-428
     })
   }
   // }
@@ -103,6 +103,20 @@ function hexToBigInteger(hex: string, negative: boolean): BigInteger {
 
   return {
     negative: negative,
-    data: new Uint8Array(buffer),
+    data: new Uint8Array(buffer)
+  }
+}
+
+export function toBigDecimal(value: BigDecimal): BigDecimalRichValue {
+  const s = (value.c || [])
+    .map((v, idx) => {
+      return idx == 0 ? v.toString() : v.toString().padStart(14, '0')
+    })
+    .join('')
+  const exp = -(s.length - (value.e ?? 0) - 1)
+
+  return {
+    value: toBigInteger(BigInt(s) * BigInt(value.s ?? 1)),
+    exp: exp
   }
 }

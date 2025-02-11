@@ -1,6 +1,8 @@
 import { Labels } from './meter.js'
 import { BigDecimal } from './big-decimal.js'
 import { BN } from 'fuels'
+import { RichStruct, RichValue, RichValue_NullValue } from '@sentio/protos'
+import { toBigInteger, toBigDecimal } from './numberish.js'
 
 export const SENTIO_BIGINT_STRING_SUFFIX = ':sto_bi'
 export const SENTIO_BIGDECIMAL_STRING_SUFFIX = ':sto_bd'
@@ -101,4 +103,75 @@ function normalizeObject(obj: any, length: number, path?: string): any {
 
 export function normalizeAttribute(record: Record<string, any>): any {
   return normalizeObject(record, 1000)
+}
+
+function normalizeToRichValue(value: any): RichValue {
+  if (value == null) {
+    return { nullValue: RichValue_NullValue.NULL_VALUE }
+  }
+  switch (typeof value) {
+    case 'string':
+      return { stringValue: value }
+    case 'bigint':
+      const v = BigInt(value)
+      return { bigintValue: toBigInteger(v) }
+    case 'number':
+      if (Number.isInteger(value)) {
+        return { intValue: value }
+      }
+      return { floatValue: value }
+    case 'function':
+      return { nullValue: RichValue_NullValue.UNRECOGNIZED }
+    case 'symbol':
+      return { stringValue: String(value) }
+    case 'boolean':
+      return { boolValue: value }
+    default:
+      if (value instanceof Uint8Array) {
+        return { bytesValue: value }
+      }
+      if (value instanceof Date) {
+        return { timestampValue: value }
+      }
+      if (value instanceof BigDecimal) {
+        return { bigdecimalValue: toBigDecimal(value) }
+      }
+      if (BN.isBN(value)) {
+        const value1 = new BigDecimal(value.toString())
+        return { bigdecimalValue: toBigDecimal(value1) }
+      }
+      if (Array.isArray(value)) {
+        return {
+          listValue: {
+            values: value.map((v) => normalizeToRichValue(v))
+          }
+        }
+      }
+      if (value instanceof Promise) {
+        console.error('Cannot submit promise')
+        return { nullValue: RichValue_NullValue.UNRECOGNIZED }
+      }
+      if (typeof value === 'object') {
+        return {
+          structValue: normalizeToRichStruct(value)
+        }
+      }
+
+      // todo: support token value
+
+      console.warn('Cannot submit unsupported type ' + typeof value)
+      return { nullValue: RichValue_NullValue.UNRECOGNIZED }
+  }
+}
+
+export function normalizeToRichStruct(...objs: any[]): RichStruct {
+  const ret: RichStruct = {
+    fields: {}
+  }
+  for (const obj of objs) {
+    for (const [key, value] of Object.entries(obj)) {
+      ret.fields[key] = normalizeToRichValue(value)
+    }
+  }
+  return ret
 }

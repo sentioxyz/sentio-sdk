@@ -1,6 +1,7 @@
 import { RichValue, RichValue_NullValue } from '@sentio/protos'
 import type { String, Int, Float, ID, Bytes, Timestamp, Boolean } from './types.js'
 import { BigDecimal } from '@sentio/bigdecimal'
+import { toBigInteger, toBigDecimal } from '../core/numberish.js'
 
 export interface ValueConverter<T> {
   from: (value: T) => RichValue
@@ -232,19 +233,7 @@ export const BigDecimalConverter: ValueConverter<BigDecimal | undefined> = {
         nullValue: RichValue_NullValue.NULL_VALUE
       }
     }
-    const s = (value.c || [])
-      .map((v, idx) => {
-        return idx == 0 ? v.toString() : v.toString().padStart(14, '0')
-      })
-      .join('')
-    const exp = -(s.length - (value.e ?? 0) - 1)
-
-    return {
-      bigdecimalValue: {
-        value: toBigInteger(BigInt(s) * BigInt(value.s ?? 1)),
-        exp: exp
-      }
-    }
+    return { bigdecimalValue: toBigDecimal(value) }
   },
   to(v) {
     const d = v.bigdecimalValue
@@ -291,23 +280,6 @@ export function bytesToBigInt(bytes: Uint8Array) {
     intValue = intValue * BigInt(256) + BigInt(bytes[i])
   }
   return intValue
-}
-
-export function toBigInteger(a: bigint) {
-  const negative = a < 0
-  if (negative) {
-    a = -a
-  }
-  let hex = a.toString(16)
-  if (hex.length % 2 === 1) {
-    hex = '0' + hex
-  }
-  const buffer = Buffer.from(hex, 'hex')
-
-  return {
-    negative: negative,
-    data: new Uint8Array(buffer)
-  }
 }
 
 export const TypeConverters: Record<string, ValueConverter<any>> = {

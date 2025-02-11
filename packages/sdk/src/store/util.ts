@@ -1,5 +1,5 @@
 import type { RichValue } from '@sentio/protos'
-import { toBigInteger } from './convert.js'
+import { toBigInteger, toBigDecimal } from '../core/numberish.js'
 import { BigDecimal } from '@sentio/bigdecimal'
 
 export function serializeRichValue(v: any): RichValue {
@@ -48,6 +48,6 @@ export function serializeRichValue(v: any): RichValue {
 
 function serializeBigDecimal(v: BigDecimal): RichValue {
   return {
-    bigdecimalValue: undefined
+    bigdecimalValue: toBigDecimal(v)
   }
 }
