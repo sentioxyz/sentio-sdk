@@ -1,20 +1,16 @@
 import { createLogger, format, transports } from 'winston'
 
-function stringify(obj: any) {
-  let cache: any[] = []
-  const str = JSON.stringify(obj, function (key, value) {
+function stringify(obj: any): string {
+  const cache = new WeakSet()
+  return JSON.stringify(obj, function (key, value) {
     if (typeof value === 'object' && value !== null) {
-      if (cache.indexOf(value) !== -1) {
-        // Circular reference found, discard key
-        return
+      if (cache.has(value)) {
+        return '[Circular]'
       }
-      // Store value in our collection
-      cache.push(value)
+      cache.add(value)
     }
     return value
   })
-  cache = []
-  return str
 }
 
 export function setupLogger(json: boolean, enableDebug: boolean) {

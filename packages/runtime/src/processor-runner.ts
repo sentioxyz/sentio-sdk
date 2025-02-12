@@ -41,6 +41,7 @@ const optionDefinitions = [
   { name: 'pricefeed-server', type: String, defaultValue: '' },
   { name: 'log-format', type: String, defaultValue: 'console' },
   { name: 'debug', type: Boolean, defaultValue: false },
+  { name: 'otlp-debug', type: Boolean, defaultValue: false },
   { name: 'start-action-server', type: Boolean, defaultValue: false }
 ]
 
@@ -51,7 +52,7 @@ const logLevel = process.env['LOG_LEVEL']?.toUpperCase()
 setupLogger(options['log-format'] === 'json', logLevel === 'debug' ? true : options.debug)
 console.debug('Starting with', options.target)
 
-await setupOTLP(options.debug)
+await setupOTLP(options['otlp-debug'])
 
 Error.stackTraceLimit = 20
 
