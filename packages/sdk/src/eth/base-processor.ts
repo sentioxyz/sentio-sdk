@@ -20,7 +20,7 @@ import { fixEmptyKey, formatEthData, RichBlock, Trace, TypedCallTrace, TypedEven
 import sha3 from 'js-sha3'
 import { ListStateStorage } from '@sentio/runtime'
 import { EthChainId } from '@sentio/chain'
-import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
+import { getHandlerName, proxyHandlers, proxyProcessor } from '../utils/metrics.js'
 import { ALL_ADDRESS } from '../core/index.js'
 
 export interface AddressOrTypeEventFilter extends DeferredTopicFilter {
@@ -77,9 +77,9 @@ export class GlobalProcessorState extends ListStateStorage<GlobalProcessor> {
 
 export class GlobalProcessor {
   config: BindInternalOptions
-  blockHandlers: BlockHandler[] = []
-  transactionHandler: TransactionHandler[] = []
-  traceHandlers: TraceHandler[] = []
+  blockHandlers: BlockHandler[] = proxyHandlers([])
+  transactionHandler: TransactionHandler[] = proxyHandlers([])
+  traceHandlers: TraceHandler[] = proxyHandlers([])
 
   static bind(config: Omit<BindOptions, 'address'>): GlobalProcessor {
     const processor = new GlobalProcessor(config)
@@ -370,9 +370,9 @@ export abstract class BaseProcessor<
   TContract extends BaseContract,
   TBoundContractView extends BoundContractView<TContract, ContractView<TContract>>
 > {
-  blockHandlers: BlockHandler[] = []
-  eventHandlers: EventsHandler[] = []
-  traceHandlers: TraceHandler[] = []
+  blockHandlers: BlockHandler[] = proxyHandlers([])
+  eventHandlers: EventsHandler[] = proxyHandlers([])
+  traceHandlers: TraceHandler[] = proxyHandlers([])
 
   config: BindInternalOptions
 
