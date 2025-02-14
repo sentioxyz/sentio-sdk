@@ -31,34 +31,34 @@ export abstract class AbstractEntity {
 }
 
 function toJSValue(value: RichValue): any {
-  if (value.nullValue) {
+  if (value.nullValue != null) {
     return null
   }
-  if (value.bytesValue) {
+  if (value.bytesValue != null) {
     return value.bytesValue
   }
-  if (value.stringValue) {
+  if (value.stringValue != null) {
     return value.stringValue
   }
-  if (value.bigdecimalValue) {
+  if (value.bigdecimalValue != null) {
     return BigDecimalConverter.to(value)
   }
-  if (value.bigintValue) {
+  if (value.bigintValue != null) {
     return BigIntConverter.to(value)
   }
-  if (value.boolValue != undefined) {
+  if (value.boolValue != null) {
     return value.boolValue
   }
-  if (value.timestampValue) {
+  if (value.timestampValue != null) {
     return value.timestampValue
   }
-  if (value.floatValue) {
+  if (value.floatValue != null) {
     return value.floatValue
   }
-  if (value.intValue) {
+  if (value.intValue != null) {
     return value.intValue
   }
-  if (value.listValue) {
+  if (value.listValue != null) {
     return value.listValue.values.map(toJSValue)
   }
   throw new Error('Unknown value type:' + JSON.stringify(value))

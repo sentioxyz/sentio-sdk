@@ -119,6 +119,7 @@ describe('entity tests', () => {
       pets: Promise.resolve([p])
     })
 
+    console.log(t.id)
     assert.equal(t.id, 'test')
     assert.equal(t.intValue, 100)
     assert.deepEqual(t.bytesValue, new Uint8Array([1, 2, 3]))
@@ -138,7 +139,12 @@ describe('entity tests', () => {
     const t = new Person()
     t.intValue = 100
     assert.equal(t.intValue, 100)
+    assert.equal(t['intValue'], 100)
 
+    t.arrayInt = [1, 2, 3]
+    assert.deepEqual(t.arrayInt, [1, 2, 3])
+    t['arrayInt'] = [1, 2, 3, 4]
+    assert.deepEqual(t.arrayInt, [1, 2, 3, 4])
     // required value must be set
     assert.throws(() => {
       // @ts-ignore
