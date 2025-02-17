@@ -58,6 +58,7 @@ describe('typed fuel processor tests', () => {
 
   test('test onLog ', async () => {
     const res = await service.fuel.testOnTransaction(testData, FuelChainId.FUEL_TESTNET)
+    // const res = await service.fuel.testOnTransactionByID(FuelChainId.FUEL_TESTNET, "0xc6c75b1bd6896a596123ad3447725b5e84861bf5568852c4426a24f176121755")
 
     const events = res.result?.events
     expect(events).length(2)
