@@ -89,6 +89,7 @@ export function Entity(entityName: string) {
     return class extends BaseClass {
       readonly _data: RichStruct = { fields: {} }
       static entityName = entityName
+
       constructor(...args: any[]) {
         super()
         for (const key of Object.getOwnPropertyNames(this)) {
@@ -124,27 +125,20 @@ export function Column(type: string) {
 
 export function ListColumn(type: string = '') {
   return function (target: any, propertyKey: string) {
-    let required = false
-    if (type.endsWith('!')) {
-      required = true
-      type = type.slice(0, -1)
-    }
-
-    let typeConverter = TypeConverters[type]
-    if (!typeConverter) {
-      // support list of list
-      const meta = target.constructor.meta || {}
-      const type = meta[propertyKey]
-      if (type) {
-        typeConverter = type
-      } else {
-        throw new Error(`Can't find inner type convert`)
+    function getTypeConvert(type: string): ValueConverter<any> {
+      if (type.endsWith('!')) {
+        return required_(getTypeConvert(type.slice(0, -1)))
       }
+      if (type.startsWith('[') && type.endsWith(']')) {
+        return array_(getTypeConvert(type.slice(1, -1)))
+      }
+      if (TypeConverters[type]) {
+        return TypeConverters[type]
+      }
+      // support enum type
+      return StringConverter
     }
-    if (required) {
-      typeConverter = required_(typeConverter)
-    }
-    column(array_(typeConverter))(target, propertyKey)
+    column(array_(getTypeConvert(type)))(target, propertyKey)
   }
 }
 
