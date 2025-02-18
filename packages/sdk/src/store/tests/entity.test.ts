@@ -23,6 +23,11 @@ import { BigDecimal } from '@sentio/bigdecimal'
 
 /* eslint-disable */
 
+enum EnumA {
+  V1,
+  V2
+}
+
 @Entity('Person')
 class Person extends AbstractEntity {
   @Required
@@ -56,6 +61,12 @@ class Person extends AbstractEntity {
 
   @ListColumn('Int')
   arrayInt?: Array<Int | undefined>
+
+  @ListColumn('[Int!]')
+  twoDArrayInt?: Array<Array<Int>>
+
+  @ListColumn('EnumA')
+  enumArray?: Array<EnumA>
 
   @Many('Pet')
   pets: Promise<Array<Pet | undefined>>
@@ -116,7 +127,12 @@ describe('entity tests', () => {
       floatValue: 0.1,
       booleanValue: true,
       arrayInt: [1, 2, 3],
-      pets: Promise.resolve([p])
+      pets: Promise.resolve([p]),
+      twoDArrayInt: [
+        [1, 2],
+        [3, 4]
+      ],
+      enumArray: [EnumA.V1, EnumA.V2]
     })
 
     console.log(t.id)
@@ -130,6 +146,11 @@ describe('entity tests', () => {
     assert.equal(t.floatValue, 0.1)
     assert.equal(t.booleanValue, true)
     assert.deepEqual(t.arrayInt, [1, 2, 3])
+    assert.deepEqual(t.twoDArrayInt, [
+      [1, 2],
+      [3, 4]
+    ])
+    assert.deepEqual(t.enumArray, [EnumA.V1, EnumA.V2])
     await sleep(1)
     assert.ok(t.pets)
     assert.deepEqual(t.petsIDs, [p.id])
