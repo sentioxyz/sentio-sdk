@@ -242,7 +242,7 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth, continu
   if (continueFrom) {
     const res = await getProcessorStatus(options.host, auth, options.project)
     const data = (await res.json()) as { processors: { version: number }[] }
-    const found = data?.processors.find((x) => x.version == continueFrom)
+    const found = data?.processors?.find((x) => x.version == continueFrom)
     if (found) {
       const confirmed = await confirm(`Continue from version ${continueFrom}`)
       if (!confirmed) {
