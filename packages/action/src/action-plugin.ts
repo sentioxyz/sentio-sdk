@@ -5,6 +5,7 @@ import { ProcessConfigResponse } from '@sentio/protos'
 import { ActionProcessorState } from './action-processor.js'
 import { TypedActionProcessorState } from './typed-action-processor.js'
 import { toJsonSchema } from './schema.js'
+import { ActionRequest } from './types.js'
 
 interface RouteDoc {
   method: string | string[]
@@ -31,7 +32,7 @@ export class ActionPlugin extends Plugin {
           handler: async (request, reply) => {
             const context = {}
             reply.header('Action-Route', encodeURIComponent(route.url))
-            return route.handler(request, context)
+            return route.handler(request as ActionRequest, context)
           }
         })
         docs.push({
@@ -51,7 +52,7 @@ export class ActionPlugin extends Plugin {
           handler: async (request, reply) => {
             const context = {}
             reply.header('Action-Route', encodeURIComponent(route.url))
-            return route.handler(request, context)
+            return route.handler(request as ActionRequest, context)
           }
         })
         docs.push({

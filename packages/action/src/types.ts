@@ -1,6 +1,8 @@
 import type { FastifyRequest } from 'fastify'
 
-export type ActionRequest = FastifyRequest
+export type ActionRequest = Omit<FastifyRequest, 'params'> & {
+  params: Record<string, string>
+}
 
 export type ActionHandler<RESP> = (request: ActionRequest, context: any) => Promise<RESP>
 
