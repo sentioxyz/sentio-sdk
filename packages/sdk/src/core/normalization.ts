@@ -1,7 +1,7 @@
 import { Labels } from './meter.js'
 import { BigDecimal } from './big-decimal.js'
 import { BN } from 'fuels'
-import { RichStruct, RichValue, RichValue_NullValue } from '@sentio/protos'
+import { CoinID, RichStruct, RichValue, RichValue_NullValue, TokenAmount } from '@sentio/protos'
 import { toBigInteger, toBigDecimal } from './numberish.js'
 
 export const SENTIO_BIGINT_STRING_SUFFIX = ':sto_bi'
@@ -152,12 +152,15 @@ function normalizeToRichValue(value: any): RichValue {
         return { nullValue: RichValue_NullValue.UNRECOGNIZED }
       }
       if (typeof value === 'object') {
+        const tokenAmount = toTokenAmount(value)
+        if (tokenAmount) {
+          return { tokenValue: tokenAmount }
+        }
+
         return {
           structValue: normalizeToRichStruct(value)
         }
       }
-
-      // todo: support token value
 
       console.warn('Cannot submit unsupported type ' + typeof value)
       return { nullValue: RichValue_NullValue.UNRECOGNIZED }
@@ -173,5 +176,57 @@ export function normalizeToRichStruct(...objs: any[]): RichStruct {
       ret.fields[key] = normalizeToRichValue(value)
     }
   }
+  return ret
+}
+
+function toTokenAmount(value: any): TokenAmount | undefined {
+  const ret = TokenAmount.create()
+
+  for (const key of Object.getOwnPropertyNames(value)) {
+    switch (key) {
+      case 'token':
+        const token = toCoinID(value.token)
+        if (!token) {
+          return undefined
+        }
+        ret.token = token
+        break
+      case 'amount':
+        if (value.amount instanceof BigDecimal) {
+          ret.amount = toBigDecimal(value)
+        } else if (typeof value.amount == 'string' || typeof value.amount == 'number') {
+          ret.amount = toBigDecimal(new BigDecimal(value.amount))
+        } else {
+          return undefined
+        }
+        break
+      case 'specifiedAt':
+        if (value.specifiedAt instanceof Date) {
+          ret.specifiedAt = value.specifiedAt
+        } else {
+          return undefined
+        }
+        break
+      default:
+        return undefined
+    }
+  }
+
+  return ret.amount && ret.token ? ret : undefined
+}
+
+function toCoinID(coin: any): CoinID | undefined {
+  const ret = CoinID.create()
+  if (typeof coin.symbol === 'string') {
+    return (ret.symbol = coin.symbol)
+  } else if (coin.hasOwnProperty('address')) {
+    ret.address = {
+      address: coin.address.address,
+      chain: coin.address.chain
+    }
+  } else {
+    return undefined
+  }
+
   return ret
 }
