@@ -1,6 +1,6 @@
 import { describe, test } from 'node:test'
 import { expect } from 'chai'
-import { Struct } from '@sentio/protos'
+import { Struct, TokenAmount } from '@sentio/protos'
 import { BigDecimal } from './big-decimal.js'
 import { normalizeAttribute, normalizeKey, normalizeLabels, normalizeToRichStruct } from './normalization.js'
 import { toBigDecimal, toBigInteger } from './numberish.js'
@@ -63,5 +63,18 @@ describe('Normalization tests', () => {
     expect(r1.fields['n3'].bigdecimalValue).deep.equals(toBigDecimal(BigDecimal(10.01)))
 
     expect(r1.fields['nested'].timestampValue instanceof Date)
+  })
+
+  test('normalize token to rich struct', async () => {
+    const t1 = {
+      tokenA: { token: { symbol: 'ETH' }, amount: 100 },
+      tokenB: { token: { address: { chain: 'ETH', address: '0x1234' } }, amount: BigDecimal(10.01) },
+      nonToken: { token: { symbol: 'ETH' }, amount: 100, extraProp: 'extra' }
+    }
+    const r1 = normalizeToRichStruct(t1)
+    expect(r1.fields['tokenA'].tokenValue).not.undefined
+    expect(r1.fields['tokenB'].tokenValue).not.undefined
+    expect(r1.fields['nonToken'].tokenValue).undefined
+    expect(r1.fields['nonToken'].structValue).not.undefined
   })
 })
