@@ -5,6 +5,7 @@ import { getEntityName } from './store.js'
 export type ID = string | Uint8Array
 export type String = string
 export type Int = number
+export type Int8 = bigint
 export type Float = number
 export type Boolean = boolean
 export type Timestamp = Date
@@ -60,6 +61,9 @@ function toJSValue(value: RichValue): any {
   }
   if (value.listValue != null) {
     return value.listValue.values.map(toJSValue)
+  }
+  if (value.int64Value) {
+    return value.int64Value
   }
   throw new Error('Unknown value type:' + JSON.stringify(value))
 }

@@ -134,6 +134,22 @@ export const IntConverter: ValueConverter<Int | undefined> = {
   }
 }
 
+export const Int8Converter: ValueConverter<bigint | undefined> = {
+  from: (value?: bigint) => {
+    if (value == null) {
+      return {
+        nullValue: RichValue_NullValue.NULL_VALUE
+      }
+    }
+    return {
+      int64Value: BigInt(value)
+    }
+  },
+  to(v) {
+    return v.int64Value
+  }
+}
+
 export const FloatConverter: ValueConverter<Float | undefined> = {
   from: (value?: Float) => {
     if (value == null) {
@@ -291,6 +307,7 @@ export const TypeConverters: Record<string, ValueConverter<any>> = {
   ID: IDConverter,
   Bytes: BytesConverter,
   Int: IntConverter,
+  Int8: Int8Converter,
   Float: FloatConverter,
   Timestamp: TimestampConverter
 }
