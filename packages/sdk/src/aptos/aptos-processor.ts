@@ -187,12 +187,23 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
 
   public onTransaction(
     handler: (transaction: UserTransactionResponse, ctx: AptosContext) => PromiseOrVoid,
-    includedFailed = false,
+    transactionFilter?: {
+      includeFailed?: boolean
+      sender?: string
+    },
     fetchConfig?: Partial<MoveFetchConfig>
   ): this {
     const _fetchConfig = MoveFetchConfig.fromPartial({ ...DEFAULT_FETCH_CONFIG, ...fetchConfig })
 
     const processor = this
+    const filter: FunctionNameAndCallFilter = { function: '', includeFailed: transactionFilter?.includeFailed }
+    if (transactionFilter?.sender) {
+      filter.fromAndToAddress = {
+        from: transactionFilter.sender,
+        to: ''
+      }
+    }
+
     this.callHandlers.push({
       handlerName: getHandlerName(),
       handler: async function (data) {
@@ -215,7 +226,7 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
         await handler(call, ctx)
         return ctx.stopAndGetResult()
       },
-      filters: [{ function: '', includeFailed: includedFailed }],
+      filters: [filter],
       fetchConfig: _fetchConfig
     })
     return this
@@ -376,10 +387,13 @@ export class AptosGlobalProcessor {
 
   public onTransaction(
     handler: (transaction: UserTransactionResponse, ctx: AptosContext) => PromiseOrVoid,
-    includedFailed = false,
+    transactionFilter?: {
+      includeFailed?: boolean
+      sender?: string
+    },
     fetchConfig?: Partial<MoveFetchConfig>
   ): this {
-    this.baseProcessor.onTransaction(handler, includedFailed, fetchConfig)
+    this.baseProcessor.onTransaction(handler, transactionFilter, fetchConfig)
     return this
   }
 

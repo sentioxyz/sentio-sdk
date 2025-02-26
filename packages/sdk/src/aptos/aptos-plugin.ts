@@ -92,7 +92,8 @@ export class AptosPlugin extends Plugin {
           filters: handler.filters.map((f) => {
             return {
               type: f.type,
-              account: f.account || ''
+              account: f.account || '',
+              eventAccount: f.eventAccount || ''
             }
           }),
           fetchConfig: handler.fetchConfig,
@@ -112,7 +113,8 @@ export class AptosPlugin extends Plugin {
               typeArguments: filter.typeArguments || [],
               withTypeArguments: !!filter.typeArguments,
               includeFailed: filter.includeFailed || false,
-              publicKeyPrefix: filter.publicKeyPrefix || ''
+              publicKeyPrefix: filter.publicKeyPrefix || '',
+              fromAndToAddress: filter.fromAndToAddress
             }
           }),
           fetchConfig: handler.fetchConfig,

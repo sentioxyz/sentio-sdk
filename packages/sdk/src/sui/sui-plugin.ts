@@ -96,7 +96,8 @@ export class SuiPlugin extends Plugin {
           filters: handler.filters.map((f) => {
             return {
               type: f.type,
-              account: f.account || ''
+              account: f.account || '',
+              eventAccount: f.eventAccount || ''
             }
           }),
           fetchConfig: handler.fetchConfig,

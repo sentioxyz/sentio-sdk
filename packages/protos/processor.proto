@@ -402,8 +402,14 @@ message MoveEventHandlerConfig {
 }
 
 message MoveEventFilter {
+  // event type without address part
   string type = 1;
+  // account address for event type
   string account = 2;
+
+  // Event belong to the account,
+  // in case of multisig, it's the multisig account, otherwise it's the sender
+  string event_account = 3;
 }
 
 message MoveCallHandlerConfig {

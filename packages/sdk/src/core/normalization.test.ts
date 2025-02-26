@@ -1,6 +1,6 @@
 import { describe, test } from 'node:test'
-import { expect } from 'chai'
-import { Struct, TokenAmount } from '@sentio/protos'
+import assert from 'node:assert'
+import { Struct } from '@sentio/protos'
 import { BigDecimal } from './big-decimal.js'
 import { normalizeAttribute, normalizeKey, normalizeLabels, normalizeToRichStruct } from './normalization.js'
 import { toBigDecimal, toBigInteger } from './numberish.js'
@@ -10,9 +10,10 @@ describe('Normalization tests', () => {
   test('normalize attributes basic', async () => {
     const t1 = { a: 'a', n: 123, n2: 1233333333300000000000n, n3: BigDecimal(10.01), nested: { date: new Date() } }
     const r1 = normalizeAttribute(t1)
-    expect(r1.n2).equals('1233333333300000000000:sto_bi')
-    expect(r1.n3).equals('10.01:sto_bd')
-    expect(typeof r1.nested.date).equals('string')
+    assert.deepStrictEqual(r1.n2, '1233333333300000000000:sto_bi')
+    assert.deepStrictEqual(r1.n3, '10.01:sto_bd')
+
+    assert.strictEqual(typeof r1.nested.date, 'string')
 
     const w1 = Struct.encode(Struct.wrap(r1))
     const s2 = Struct.decode(w1.finish())
@@ -21,7 +22,7 @@ describe('Normalization tests', () => {
       f: () => {}
     }
     const r2 = normalizeAttribute(t2)
-    expect(r2.f).equals(undefined)
+    assert.strictEqual(r2.f, undefined)
 
     const t3 = {
       token0Symbol: null,
@@ -34,35 +35,35 @@ describe('Normalization tests', () => {
   })
 
   test('test key ', async () => {
-    expect(normalizeKey('abc')).eq('abc')
-    expect(normalizeKey('a-b-c')).eq('a_b_c')
-    expect(normalizeKey('_a-B-1.')).eq('_a_B_1_')
+    assert.strictEqual(normalizeKey('abc'), 'abc')
+    assert.strictEqual(normalizeKey('a-b-c'), 'a_b_c')
+    assert.strictEqual(normalizeKey('_a-B-1.'), '_a_B_1_')
 
-    expect(normalizeKey('a/b\\c\n')).eq('a_b_c_')
-    expect(normalizeKey('abc abc')).eq('abc_abc')
-    expect(normalizeKey('*&~')).eq('___')
+    assert.strictEqual(normalizeKey('a/b\\c\n'), 'a_b_c_')
+    assert.strictEqual(normalizeKey('abc abc'), 'abc_abc')
+    assert.strictEqual(normalizeKey('*&~'), '___')
 
-    expect(normalizeKey('vo total')).eq('vo_total')
+    assert.strictEqual(normalizeKey('vo total'), 'vo_total')
 
-    expect(normalizeKey('x'.repeat(200)).length).eq(128)
+    assert.strictEqual(normalizeKey('x'.repeat(200)).length, 128)
   })
 
   test('test  labels', async () => {
     const labels = { labels: '0' }
     const updated = normalizeLabels(labels)
 
-    expect(updated['labels_']).eq('0')
+    assert.strictEqual(updated['labels_'], '0')
   })
 
   test('normalize attributes to rich struct', async () => {
     const t1 = { a: 'a', n: 123, n2: 1233333333300000000000n, n3: BigDecimal(10.01), nested: { date: new Date() } }
     const r1 = normalizeToRichStruct(t1)
-    expect(r1.fields['n2']).deep.equals({
+    assert.deepStrictEqual(r1.fields['n2'], {
       bigintValue: toBigInteger(1233333333300000000000n)
     })
-    expect(r1.fields['n3'].bigdecimalValue).deep.equals(toBigDecimal(BigDecimal(10.01)))
+    assert.deepStrictEqual(r1.fields['n3'].bigdecimalValue, toBigDecimal(BigDecimal(10.01)))
 
-    expect(r1.fields['nested'].timestampValue instanceof Date)
+    assert.strictEqual(r1.fields['nested'].structValue?.fields['date'].timestampValue instanceof Date, true)
   })
 
   test('normalize token to rich struct', async () => {
@@ -72,9 +73,9 @@ describe('Normalization tests', () => {
       nonToken: { token: { symbol: 'ETH' }, amount: 100, extraProp: 'extra' }
     }
     const r1 = normalizeToRichStruct(t1)
-    expect(r1.fields['tokenA'].tokenValue).not.undefined
-    expect(r1.fields['tokenB'].tokenValue).not.undefined
-    expect(r1.fields['nonToken'].tokenValue).undefined
-    expect(r1.fields['nonToken'].structValue).not.undefined
+    assert.notStrictEqual(r1.fields['tokenA'].tokenValue, undefined)
+    assert.notStrictEqual(r1.fields['tokenB'].tokenValue, undefined)
+    assert.strictEqual(r1.fields['nonToken'].tokenValue, undefined)
+    assert.notStrictEqual(r1.fields['nonToken'].structValue, undefined)
   })
 })
