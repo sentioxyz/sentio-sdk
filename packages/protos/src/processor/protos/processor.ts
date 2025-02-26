@@ -767,6 +767,7 @@ export interface MoveEventHandlerConfig {
 export interface MoveEventFilter {
   type: string;
   account: string;
+  eventAccount: string;
 }
 
 export interface MoveCallHandlerConfig {
@@ -5666,7 +5667,7 @@ export const MoveEventHandlerConfig = {
 };
 
 function createBaseMoveEventFilter(): MoveEventFilter {
-  return { type: "", account: "" };
+  return { type: "", account: "", eventAccount: "" };
 }
 
 export const MoveEventFilter = {
@@ -5676,6 +5677,9 @@ export const MoveEventFilter = {
     }
     if (message.account !== "") {
       writer.uint32(18).string(message.account);
+    }
+    if (message.eventAccount !== "") {
+      writer.uint32(26).string(message.eventAccount);
     }
     return writer;
   },
@@ -5701,6 +5705,13 @@ export const MoveEventFilter = {
 
           message.account = reader.string();
           continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.eventAccount = reader.string();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -5714,6 +5725,7 @@ export const MoveEventFilter = {
     return {
       type: isSet(object.type) ? globalThis.String(object.type) : "",
       account: isSet(object.account) ? globalThis.String(object.account) : "",
+      eventAccount: isSet(object.eventAccount) ? globalThis.String(object.eventAccount) : "",
     };
   },
 
@@ -5725,6 +5737,9 @@ export const MoveEventFilter = {
     if (message.account !== "") {
       obj.account = message.account;
     }
+    if (message.eventAccount !== "") {
+      obj.eventAccount = message.eventAccount;
+    }
     return obj;
   },
 
@@ -5735,6 +5750,7 @@ export const MoveEventFilter = {
     const message = createBaseMoveEventFilter();
     message.type = object.type ?? "";
     message.account = object.account ?? "";
+    message.eventAccount = object.eventAccount ?? "";
     return message;
   },
 };

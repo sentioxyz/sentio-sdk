@@ -11,6 +11,7 @@ import {
 export interface EventFilter {
   type: string
   account?: string
+  eventAccount?: string
 }
 
 export interface FunctionNameAndCallFilter extends CallFilter {

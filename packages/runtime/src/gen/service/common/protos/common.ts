@@ -1499,6 +1499,9 @@ export enum TabularData_ColumnType {
   LIST = 3,
   TIME = 4,
   MAP = 5,
+  JSON = 6,
+  TOKEN = 7,
+  DYNAMIC = 8,
   UNRECOGNIZED = -1,
 }
 
@@ -1522,6 +1525,15 @@ export function tabularData_ColumnTypeFromJSON(object: any): TabularData_ColumnT
     case 5:
     case "MAP":
       return TabularData_ColumnType.MAP;
+    case 6:
+    case "JSON":
+      return TabularData_ColumnType.JSON;
+    case 7:
+    case "TOKEN":
+      return TabularData_ColumnType.TOKEN;
+    case 8:
+    case "DYNAMIC":
+      return TabularData_ColumnType.DYNAMIC;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -1543,6 +1555,12 @@ export function tabularData_ColumnTypeToJSON(object: TabularData_ColumnType): st
       return "TIME";
     case TabularData_ColumnType.MAP:
       return "MAP";
+    case TabularData_ColumnType.JSON:
+      return "JSON";
+    case TabularData_ColumnType.TOKEN:
+      return "TOKEN";
+    case TabularData_ColumnType.DYNAMIC:
+      return "DYNAMIC";
     case TabularData_ColumnType.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
@@ -1922,6 +1940,7 @@ export interface Notification_AttributesEntry {
 export interface RichValue {
   nullValue?: RichValue_NullValue | undefined;
   intValue?: number | undefined;
+  int64Value?: bigint | undefined;
   floatValue?: number | undefined;
   bytesValue?: Uint8Array | undefined;
   boolValue?: boolean | undefined;
@@ -1992,6 +2011,24 @@ export interface TokenAmount {
   token: CoinID | undefined;
   amount: BigDecimal | undefined;
   specifiedAt: Date | undefined;
+}
+
+export interface RequestLog {
+  requestId: string;
+  endpointId: string;
+  owner: string;
+  slug: string;
+  statusCode: number;
+  error: string;
+  requestBody: Uint8Array;
+  requestHeader: { [key: string]: any } | undefined;
+  responseBody: Uint8Array;
+  responseHeader: { [key: string]: any } | undefined;
+  createdAt: Date | undefined;
+  duration: bigint;
+  queryDuration: bigint;
+  method: string;
+  rpcNodeId: string;
 }
 
 function createBaseUsageTracker(): UsageTracker {
@@ -13214,6 +13251,7 @@ function createBaseRichValue(): RichValue {
   return {
     nullValue: undefined,
     intValue: undefined,
+    int64Value: undefined,
     floatValue: undefined,
     bytesValue: undefined,
     boolValue: undefined,
@@ -13234,6 +13272,12 @@ export const RichValue = {
     }
     if (message.intValue !== undefined) {
       writer.uint32(16).int32(message.intValue);
+    }
+    if (message.int64Value !== undefined) {
+      if (BigInt.asIntN(64, message.int64Value) !== message.int64Value) {
+        throw new globalThis.Error("value provided for field message.int64Value of type int64 too large");
+      }
+      writer.uint32(104).int64(message.int64Value.toString());
     }
     if (message.floatValue !== undefined) {
       writer.uint32(25).double(message.floatValue);
@@ -13288,6 +13332,13 @@ export const RichValue = {
           }
 
           message.intValue = reader.int32();
+          continue;
+        case 13:
+          if (tag !== 104) {
+            break;
+          }
+
+          message.int64Value = longToBigint(reader.int64() as Long);
           continue;
         case 3:
           if (tag !== 25) {
@@ -13372,6 +13423,7 @@ export const RichValue = {
     return {
       nullValue: isSet(object.nullValue) ? richValue_NullValueFromJSON(object.nullValue) : undefined,
       intValue: isSet(object.intValue) ? globalThis.Number(object.intValue) : undefined,
+      int64Value: isSet(object.int64Value) ? BigInt(object.int64Value) : undefined,
       floatValue: isSet(object.floatValue) ? globalThis.Number(object.floatValue) : undefined,
       bytesValue: isSet(object.bytesValue) ? bytesFromBase64(object.bytesValue) : undefined,
       boolValue: isSet(object.boolValue) ? globalThis.Boolean(object.boolValue) : undefined,
@@ -13392,6 +13444,9 @@ export const RichValue = {
     }
     if (message.intValue !== undefined) {
       obj.intValue = Math.round(message.intValue);
+    }
+    if (message.int64Value !== undefined) {
+      obj.int64Value = message.int64Value.toString();
     }
     if (message.floatValue !== undefined) {
       obj.floatValue = message.floatValue;
@@ -13433,6 +13488,7 @@ export const RichValue = {
     const message = createBaseRichValue();
     message.nullValue = object.nullValue ?? undefined;
     message.intValue = object.intValue ?? undefined;
+    message.int64Value = object.int64Value ?? undefined;
     message.floatValue = object.floatValue ?? undefined;
     message.bytesValue = object.bytesValue ?? undefined;
     message.boolValue = object.boolValue ?? undefined;
@@ -13970,6 +14026,297 @@ export const TokenAmount = {
       ? BigDecimal.fromPartial(object.amount)
       : undefined;
     message.specifiedAt = object.specifiedAt ?? undefined;
+    return message;
+  },
+};
+
+function createBaseRequestLog(): RequestLog {
+  return {
+    requestId: "",
+    endpointId: "",
+    owner: "",
+    slug: "",
+    statusCode: 0,
+    error: "",
+    requestBody: new Uint8Array(0),
+    requestHeader: undefined,
+    responseBody: new Uint8Array(0),
+    responseHeader: undefined,
+    createdAt: undefined,
+    duration: BigInt("0"),
+    queryDuration: BigInt("0"),
+    method: "",
+    rpcNodeId: "",
+  };
+}
+
+export const RequestLog = {
+  encode(message: RequestLog, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.requestId !== "") {
+      writer.uint32(10).string(message.requestId);
+    }
+    if (message.endpointId !== "") {
+      writer.uint32(18).string(message.endpointId);
+    }
+    if (message.owner !== "") {
+      writer.uint32(26).string(message.owner);
+    }
+    if (message.slug !== "") {
+      writer.uint32(34).string(message.slug);
+    }
+    if (message.statusCode !== 0) {
+      writer.uint32(40).uint32(message.statusCode);
+    }
+    if (message.error !== "") {
+      writer.uint32(50).string(message.error);
+    }
+    if (message.requestBody.length !== 0) {
+      writer.uint32(58).bytes(message.requestBody);
+    }
+    if (message.requestHeader !== undefined) {
+      Struct.encode(Struct.wrap(message.requestHeader), writer.uint32(66).fork()).ldelim();
+    }
+    if (message.responseBody.length !== 0) {
+      writer.uint32(74).bytes(message.responseBody);
+    }
+    if (message.responseHeader !== undefined) {
+      Struct.encode(Struct.wrap(message.responseHeader), writer.uint32(82).fork()).ldelim();
+    }
+    if (message.createdAt !== undefined) {
+      Timestamp.encode(toTimestamp(message.createdAt), writer.uint32(90).fork()).ldelim();
+    }
+    if (message.duration !== BigInt("0")) {
+      if (BigInt.asUintN(64, message.duration) !== message.duration) {
+        throw new globalThis.Error("value provided for field message.duration of type uint64 too large");
+      }
+      writer.uint32(96).uint64(message.duration.toString());
+    }
+    if (message.queryDuration !== BigInt("0")) {
+      if (BigInt.asUintN(64, message.queryDuration) !== message.queryDuration) {
+        throw new globalThis.Error("value provided for field message.queryDuration of type uint64 too large");
+      }
+      writer.uint32(104).uint64(message.queryDuration.toString());
+    }
+    if (message.method !== "") {
+      writer.uint32(114).string(message.method);
+    }
+    if (message.rpcNodeId !== "") {
+      writer.uint32(122).string(message.rpcNodeId);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): RequestLog {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRequestLog();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.requestId = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.endpointId = reader.string();
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.owner = reader.string();
+          continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.slug = reader.string();
+          continue;
+        case 5:
+          if (tag !== 40) {
+            break;
+          }
+
+          message.statusCode = reader.uint32();
+          continue;
+        case 6:
+          if (tag !== 50) {
+            break;
+          }
+
+          message.error = reader.string();
+          continue;
+        case 7:
+          if (tag !== 58) {
+            break;
+          }
+
+          message.requestBody = reader.bytes();
+          continue;
+        case 8:
+          if (tag !== 66) {
+            break;
+          }
+
+          message.requestHeader = Struct.unwrap(Struct.decode(reader, reader.uint32()));
+          continue;
+        case 9:
+          if (tag !== 74) {
+            break;
+          }
+
+          message.responseBody = reader.bytes();
+          continue;
+        case 10:
+          if (tag !== 82) {
+            break;
+          }
+
+          message.responseHeader = Struct.unwrap(Struct.decode(reader, reader.uint32()));
+          continue;
+        case 11:
+          if (tag !== 90) {
+            break;
+          }
+
+          message.createdAt = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+          continue;
+        case 12:
+          if (tag !== 96) {
+            break;
+          }
+
+          message.duration = longToBigint(reader.uint64() as Long);
+          continue;
+        case 13:
+          if (tag !== 104) {
+            break;
+          }
+
+          message.queryDuration = longToBigint(reader.uint64() as Long);
+          continue;
+        case 14:
+          if (tag !== 114) {
+            break;
+          }
+
+          message.method = reader.string();
+          continue;
+        case 15:
+          if (tag !== 122) {
+            break;
+          }
+
+          message.rpcNodeId = reader.string();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): RequestLog {
+    return {
+      requestId: isSet(object.requestId) ? globalThis.String(object.requestId) : "",
+      endpointId: isSet(object.endpointId) ? globalThis.String(object.endpointId) : "",
+      owner: isSet(object.owner) ? globalThis.String(object.owner) : "",
+      slug: isSet(object.slug) ? globalThis.String(object.slug) : "",
+      statusCode: isSet(object.statusCode) ? globalThis.Number(object.statusCode) : 0,
+      error: isSet(object.error) ? globalThis.String(object.error) : "",
+      requestBody: isSet(object.requestBody) ? bytesFromBase64(object.requestBody) : new Uint8Array(0),
+      requestHeader: isObject(object.requestHeader) ? object.requestHeader : undefined,
+      responseBody: isSet(object.responseBody) ? bytesFromBase64(object.responseBody) : new Uint8Array(0),
+      responseHeader: isObject(object.responseHeader) ? object.responseHeader : undefined,
+      createdAt: isSet(object.createdAt) ? fromJsonTimestamp(object.createdAt) : undefined,
+      duration: isSet(object.duration) ? BigInt(object.duration) : BigInt("0"),
+      queryDuration: isSet(object.queryDuration) ? BigInt(object.queryDuration) : BigInt("0"),
+      method: isSet(object.method) ? globalThis.String(object.method) : "",
+      rpcNodeId: isSet(object.rpcNodeId) ? globalThis.String(object.rpcNodeId) : "",
+    };
+  },
+
+  toJSON(message: RequestLog): unknown {
+    const obj: any = {};
+    if (message.requestId !== "") {
+      obj.requestId = message.requestId;
+    }
+    if (message.endpointId !== "") {
+      obj.endpointId = message.endpointId;
+    }
+    if (message.owner !== "") {
+      obj.owner = message.owner;
+    }
+    if (message.slug !== "") {
+      obj.slug = message.slug;
+    }
+    if (message.statusCode !== 0) {
+      obj.statusCode = Math.round(message.statusCode);
+    }
+    if (message.error !== "") {
+      obj.error = message.error;
+    }
+    if (message.requestBody.length !== 0) {
+      obj.requestBody = base64FromBytes(message.requestBody);
+    }
+    if (message.requestHeader !== undefined) {
+      obj.requestHeader = message.requestHeader;
+    }
+    if (message.responseBody.length !== 0) {
+      obj.responseBody = base64FromBytes(message.responseBody);
+    }
+    if (message.responseHeader !== undefined) {
+      obj.responseHeader = message.responseHeader;
+    }
+    if (message.createdAt !== undefined) {
+      obj.createdAt = message.createdAt.toISOString();
+    }
+    if (message.duration !== BigInt("0")) {
+      obj.duration = message.duration.toString();
+    }
+    if (message.queryDuration !== BigInt("0")) {
+      obj.queryDuration = message.queryDuration.toString();
+    }
+    if (message.method !== "") {
+      obj.method = message.method;
+    }
+    if (message.rpcNodeId !== "") {
+      obj.rpcNodeId = message.rpcNodeId;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<RequestLog>): RequestLog {
+    return RequestLog.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<RequestLog>): RequestLog {
+    const message = createBaseRequestLog();
+    message.requestId = object.requestId ?? "";
+    message.endpointId = object.endpointId ?? "";
+    message.owner = object.owner ?? "";
+    message.slug = object.slug ?? "";
+    message.statusCode = object.statusCode ?? 0;
+    message.error = object.error ?? "";
+    message.requestBody = object.requestBody ?? new Uint8Array(0);
+    message.requestHeader = object.requestHeader ?? undefined;
+    message.responseBody = object.responseBody ?? new Uint8Array(0);
+    message.responseHeader = object.responseHeader ?? undefined;
+    message.createdAt = object.createdAt ?? undefined;
+    message.duration = object.duration ?? BigInt("0");
+    message.queryDuration = object.queryDuration ?? BigInt("0");
+    message.method = object.method ?? "";
+    message.rpcNodeId = object.rpcNodeId ?? "";
     return message;
   },
 };
