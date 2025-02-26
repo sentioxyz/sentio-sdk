@@ -106,7 +106,7 @@ async function codegenInternal(schema: GraphQLSchema, source: string, target: st
   const imports: Import[] = [
     {
       module: '@sentio/sdk/store',
-      types: ['String', 'Int', 'BigInt', 'Float', 'ID', 'Bytes', 'Timestamp', 'Boolean'],
+      types: ['String', 'Int', 'BigInt', 'Float', 'ID', 'Bytes', 'Timestamp', 'Boolean', 'Int8'],
       importType: true
     },
     {

@@ -12,6 +12,7 @@ type Transaction @entity {
   arrayOfArrayValue: [[String]]!
   dateValue: Timestamp
   receipts: [TransactionReceipt!]! @derivedFrom(field: "transaction")
+  int8Value: Int8
 }
 
 type TransactionReceipt @entity {

@@ -14,9 +14,10 @@ import {
   Required,
   StringColumn,
   TimestampColumn,
-  ListColumn
+  ListColumn,
+  Int8Column
 } from '../decorators.js'
-import type { Boolean, Bytes, Float, ID, Int, String } from '../types.js'
+import type { Boolean, Bytes, Float, ID, Int, String, Int8 } from '../types.js'
 import { AbstractEntity } from '../types.js'
 
 import { BigDecimal } from '@sentio/bigdecimal'
@@ -36,6 +37,9 @@ class Person extends AbstractEntity {
 
   @IntColumn
   intValue?: Int
+
+  @Int8Column
+  int8Value?: Int8
 
   @BytesColumn
   bytesValue?: Bytes
@@ -119,6 +123,7 @@ describe('entity tests', () => {
     const t = new Person({
       id: 'test',
       intValue: 100,
+      int8Value: 9223372036854775807n,
       bytesValue: new Uint8Array([1, 2, 3]),
       bigDecimalValue: new BigDecimal('123.456'),
       stringValue: 'test',
@@ -138,6 +143,7 @@ describe('entity tests', () => {
     console.log(t.id)
     assert.equal(t.id, 'test')
     assert.equal(t.intValue, 100)
+    assert.equal(t.int8Value, 9223372036854775807n)
     assert.deepEqual(t.bytesValue, new Uint8Array([1, 2, 3]))
     assert.deepEqual(t.bigDecimalValue, new BigDecimal('123.456'))
     assert.equal(t.stringValue, 'test')

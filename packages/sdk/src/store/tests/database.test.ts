@@ -76,13 +76,15 @@ describe('Test Database', () => {
       gasPrice: new BigDecimal('100.0'),
       raw: new Uint8Array([1, 2, 3]),
       arrayValue: [],
-      arrayOfArrayValue: []
+      arrayOfArrayValue: [],
+      int8Value: 9223372036854775807n
     })
     await store.upsert(tx)
 
     const tx2 = await store.get(Transaction, 'test-id-1')
     assert.equal(tx2?.gas, tx.gas)
     assert.equal(tx2?.id, tx.id)
+    assert.equal(tx2?.int8Value, 9223372036854775807n)
     assert.deepEqual(tx2?.gasPrice, tx.gasPrice)
   })
 

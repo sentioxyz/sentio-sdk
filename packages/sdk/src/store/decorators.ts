@@ -7,6 +7,7 @@ import {
   BytesConverter,
   FloatConverter,
   IDConverter,
+  Int8Converter,
   IntConverter,
   objectId_,
   required_,
@@ -161,6 +162,7 @@ export function column(type?: ValueConverter<any>) {
 
 export const IDColumn = column(IDConverter)
 export const IntColumn = column(IntConverter)
+export const Int8Column = column(Int8Converter)
 export const FloatColumn = column(FloatConverter)
 export const BigDecimalColumn = column(BigDecimalConverter)
 export const BigIntColumn = column(BigIntConverter)

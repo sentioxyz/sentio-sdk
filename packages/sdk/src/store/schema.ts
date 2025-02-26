@@ -2,7 +2,7 @@ import { buildASTSchema, DocumentNode, extendSchema, GraphQLSchema, parse, valid
 import * as fs from 'node:fs'
 import { GraphQLObjectType, GraphQLOutputType, isListType, isNonNullType } from 'graphql'
 
-const customScalars = ['BigInt', 'BigDecimal', 'Timestamp', 'JSON', 'Bytes', 'ID']
+const customScalars = ['BigInt', 'BigDecimal', 'Timestamp', 'JSON', 'Bytes', 'ID', 'Int8']
 
 const baseSchema = buildASTSchema(
   parse(`
