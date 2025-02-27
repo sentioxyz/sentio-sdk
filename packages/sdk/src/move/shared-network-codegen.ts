@@ -113,8 +113,8 @@ export abstract class SharedNetworkCodegen<NetworkType, ModuleTypes, StructType>
     const source = `
 onEvent${struct.name}(func: (event: ${moduleName}.${normalizeToJSName(struct.name)}Instance, ctx: ${
       this.PREFIX
-    }Context) => void, fetchConfig?: Partial<MoveFetchConfig>): ${moduleName} {
-  this.onMoveEvent(func, { type: '${module.name}::${struct.name}' }, fetchConfig)
+    }Context) => void, fetchConfig?: Partial<MoveFetchConfig>, eventFilter?: Omit<EventFilter, "type"|"account">): ${moduleName} {
+  this.onMoveEvent(func, {...eventFilter ?? {}, type: '${module.name}::${struct.name}' }, fetchConfig)
   return this
 }`
     return source
@@ -122,7 +122,7 @@ onEvent${struct.name}(func: (event: ${moduleName}.${normalizeToJSName(struct.nam
 
   generateImports() {
     return `
-    import { CallFilter, MoveFetchConfig } from "@sentio/sdk/move"
+    import { CallFilter, MoveFetchConfig, EventFilter } from "@sentio/sdk/move"
     import {
       ${this.PREFIX}BindOptions, ${this.PREFIX}BaseProcessor,
       ${this.PREFIX}Network, TypedFunctionPayload,
