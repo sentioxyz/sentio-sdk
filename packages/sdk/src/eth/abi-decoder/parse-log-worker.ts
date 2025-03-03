@@ -1,6 +1,6 @@
 import { Interface, LogDescription, LogParams } from 'ethers'
 import { ServerError, Status } from 'nice-grpc'
-import Piscina from 'piscina'
+import { Piscina } from 'piscina'
 
 export interface ILogDescription {
   topic: string
