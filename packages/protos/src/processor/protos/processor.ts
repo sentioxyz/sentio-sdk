@@ -409,6 +409,7 @@ export interface ExecutionConfig {
   processBindingTimeout: number;
   skipStartBlockValidation: boolean;
   rpcRetryTimes: number;
+  ethAbiDecoderWorker?: number | undefined;
 }
 
 export interface ProcessConfigRequest {
@@ -1390,6 +1391,7 @@ function createBaseExecutionConfig(): ExecutionConfig {
     processBindingTimeout: 0,
     skipStartBlockValidation: false,
     rpcRetryTimes: 0,
+    ethAbiDecoderWorker: undefined,
   };
 }
 
@@ -1409,6 +1411,9 @@ export const ExecutionConfig = {
     }
     if (message.rpcRetryTimes !== 0) {
       writer.uint32(40).int32(message.rpcRetryTimes);
+    }
+    if (message.ethAbiDecoderWorker !== undefined) {
+      writer.uint32(48).int32(message.ethAbiDecoderWorker);
     }
     return writer;
   },
@@ -1455,6 +1460,13 @@ export const ExecutionConfig = {
 
           message.rpcRetryTimes = reader.int32();
           continue;
+        case 6:
+          if (tag !== 48) {
+            break;
+          }
+
+          message.ethAbiDecoderWorker = reader.int32();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -1473,6 +1485,9 @@ export const ExecutionConfig = {
         ? globalThis.Boolean(object.skipStartBlockValidation)
         : false,
       rpcRetryTimes: isSet(object.rpcRetryTimes) ? globalThis.Number(object.rpcRetryTimes) : 0,
+      ethAbiDecoderWorker: isSet(object.ethAbiDecoderWorker)
+        ? globalThis.Number(object.ethAbiDecoderWorker)
+        : undefined,
     };
   },
 
@@ -1493,6 +1508,9 @@ export const ExecutionConfig = {
     if (message.rpcRetryTimes !== 0) {
       obj.rpcRetryTimes = Math.round(message.rpcRetryTimes);
     }
+    if (message.ethAbiDecoderWorker !== undefined) {
+      obj.ethAbiDecoderWorker = Math.round(message.ethAbiDecoderWorker);
+    }
     return obj;
   },
 
@@ -1506,6 +1524,7 @@ export const ExecutionConfig = {
     message.processBindingTimeout = object.processBindingTimeout ?? 0;
     message.skipStartBlockValidation = object.skipStartBlockValidation ?? false;
     message.rpcRetryTimes = object.rpcRetryTimes ?? 0;
+    message.ethAbiDecoderWorker = object.ethAbiDecoderWorker ?? undefined;
     return message;
   },
 };

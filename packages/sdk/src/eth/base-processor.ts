@@ -22,6 +22,7 @@ import { ListStateStorage } from '@sentio/runtime'
 import { EthChainId } from '@sentio/chain'
 import { getHandlerName, proxyHandlers, proxyProcessor } from '../utils/metrics.js'
 import { ALL_ADDRESS } from '../core/index.js'
+import parseLog from './abi-decoder/parse-log.js'
 
 export interface AddressOrTypeEventFilter extends DeferredTopicFilter {
   addressType?: AddressType
@@ -463,24 +464,9 @@ export abstract class BaseProcessor<
           contractView.address = log.address
         }
 
-        const ctx = new ContractContext<TContract, TBoundContractView>(
-          contractName,
-          contractView,
-          chainId,
-          data.timestamp,
-          block,
-          log,
-          undefined,
-          transaction,
-          transactionReceipt,
-          processor.config.baseLabels,
-          preparedData
-        )
-        const logParam = log as any as { topics: Array<string>; data: string }
-
         let parsed: LogDescription | null = null
         try {
-          parsed = contractView.rawContract.interface.parseLog(logParam)
+          parsed = await parseLog(processor, log)
         } catch (e) {
           // RangeError data out-of-bounds
           if (e instanceof Error) {
@@ -492,6 +478,19 @@ export abstract class BaseProcessor<
           throw e
         }
         if (parsed) {
+          const ctx = new ContractContext<TContract, TBoundContractView>(
+            contractName,
+            contractView,
+            chainId,
+            data.timestamp,
+            block,
+            log,
+            undefined,
+            transaction,
+            transactionReceipt,
+            processor.config.baseLabels,
+            preparedData
+          )
           const event: TypedEvent = { ...log, name: parsed.name, args: fixEmptyKey(parsed) }
           await handler(event, ctx)
           return ctx.stopAndGetResult()
