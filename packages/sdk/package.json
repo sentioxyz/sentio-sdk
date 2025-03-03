@@ -108,7 +108,6 @@
     "nice-grpc-prometheus": "^0.2.2",
     "node-fetch": "^3.3.2",
     "p-queue": "^8.0.1",
-    "piscina": "5.0.0-alpha.0",
     "radash": "^12.0.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
