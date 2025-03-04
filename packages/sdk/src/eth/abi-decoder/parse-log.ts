@@ -1,4 +1,4 @@
-import Piscina from 'piscina'
+import { Piscina } from 'piscina'
 import { LogDescription, LogParams, Result } from 'ethers'
 import { GLOBAL_CONFIG } from '@sentio/runtime'
 import { parseLog } from './parse-log-worker.js'

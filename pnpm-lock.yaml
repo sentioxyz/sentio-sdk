@@ -478,9 +478,6 @@ importers:
       nice-grpc-prometheus:
         specifier: ^0.2.2
         version: 0.2.4
-      piscina:
-        specifier: 5.0.0-alpha.0
-        version: 5.0.0-alpha.0
       protobufjs:
         specifier: ^7.2.6
         version: 7.3.2
@@ -605,6 +602,9 @@ importers:
       p-queue:
         specifier: ^8.0.1
         version: 8.0.1
+      piscina:
+        specifier: 5.0.0-alpha.0
+        version: 5.0.0-alpha.0
       radash:
         specifier: ^12.0.0
         version: 12.1.0
