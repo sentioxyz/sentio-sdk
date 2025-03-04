@@ -16,7 +16,7 @@
     "./eth/builtin/erc1155": "./lib/eth/builtin/erc1155.js",
     "./eth/builtin/eacaggregatorproxy": "./lib/eth/builtin/eacaggregatorproxy.js",
     "./eth/builtin/weth9": "./lib/eth/builtin/weth9.js",
-    "./eth/abi-decoder/parse-log-worker": "./lib/eth/abi-decoder/parse-log-worker.js",
+    "./eth/abi-decoder/decode-worker": "./lib/eth/abi-decoder/decode-worker.js",
     "./move": "./lib/move/index.js",
     "./move/ext": "./lib/move/ext/index.js",
     "./aptos": "./lib/aptos/index.js",

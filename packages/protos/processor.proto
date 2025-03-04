@@ -42,7 +42,12 @@ message ExecutionConfig {
   // from user specified block
   bool skipStartBlockValidation = 4;
   int32 rpcRetryTimes = 5;
-  optional int32 ethAbiDecoderWorker = 6;  // disabled when undefined, 0 for auto
+  optional DecoderWorkerConfig ethAbiDecoderConfig = 6;
+  message DecoderWorkerConfig {
+    bool enabled = 1;
+    optional int32 worker_count = 2;
+    optional bool skip_when_decode_failed = 3;
+  }
 }
 
 message ProcessConfigRequest {

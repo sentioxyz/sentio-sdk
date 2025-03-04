@@ -22,7 +22,7 @@ import { ListStateStorage } from '@sentio/runtime'
 import { EthChainId } from '@sentio/chain'
 import { getHandlerName, proxyHandlers, proxyProcessor } from '../utils/metrics.js'
 import { ALL_ADDRESS } from '../core/index.js'
-import parseLog from './abi-decoder/parse-log.js'
+import { parseLog, decodeTrace } from './abi-decoder/index.js'
 
 export interface AddressOrTypeEventFilter extends DeferredTopicFilter {
   addressType?: AddressType
@@ -528,11 +528,10 @@ export abstract class BaseProcessor<
           transactionReceipt,
           processor.config.baseLabels
         )
-        const logParam = log as any as { topics: Array<string>; data: string }
 
         let parsed: LogDescription | null = null
         try {
-          parsed = contractView.rawContract.interface.parseLog(logParam)
+          parsed = await parseLog(processor, log)
         } catch (e) {
           // RangeError data out-of-bounds
           if (e instanceof Error) {
@@ -713,7 +712,8 @@ export abstract class BaseProcessor<
         }
         const traceData = '0x' + trace.action.input.slice(10)
         try {
-          typedTrace.args = contractInterface.getAbiCoder().decode(fragment.inputs, traceData, true)
+          typedTrace.args = await decodeTrace(processor, fragment.inputs, traceData)
+          // typedTrace.args = contractInterface.getAbiCoder().decode(fragment.inputs, traceData, true)
         } catch (e) {
           if (!trace.error) {
             throw e
@@ -758,7 +758,7 @@ export abstract class BaseProcessor<
         }
         const traceData = '0x' + trace.action.input.slice(10)
         try {
-          typedTrace.args = contractInterface.getAbiCoder().decode(fragment.inputs, traceData, true)
+          typedTrace.args = await decodeTrace(processor, fragment.inputs, traceData)
         } catch (e) {
           if (!trace.error) {
             throw e

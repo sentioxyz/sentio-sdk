@@ -62,7 +62,9 @@ describe('Test Error Capture', () => {
 describe('Test ParseLog workers', () => {
   const service = new TestProcessorServer(async () => {
     GLOBAL_CONFIG.execution = {
-      ethAbiDecoderWorker: 0
+      ethAbiDecoderConfig: {
+        enabled: true
+      }
     }
     ERC20Processor.bind({ address: '0x80009ff8154bd5653c6dda2fa5f5053e5a5c1a91' }).onEventTransfer(
       (evt: TransferEvent, ctx) => {

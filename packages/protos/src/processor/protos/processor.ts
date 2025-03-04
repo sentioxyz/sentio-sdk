@@ -409,7 +409,13 @@ export interface ExecutionConfig {
   processBindingTimeout: number;
   skipStartBlockValidation: boolean;
   rpcRetryTimes: number;
-  ethAbiDecoderWorker?: number | undefined;
+  ethAbiDecoderConfig?: ExecutionConfig_DecoderWorkerConfig | undefined;
+}
+
+export interface ExecutionConfig_DecoderWorkerConfig {
+  enabled: boolean;
+  workerCount?: number | undefined;
+  skipWhenDecodeFailed?: boolean | undefined;
 }
 
 export interface ProcessConfigRequest {
@@ -1391,7 +1397,7 @@ function createBaseExecutionConfig(): ExecutionConfig {
     processBindingTimeout: 0,
     skipStartBlockValidation: false,
     rpcRetryTimes: 0,
-    ethAbiDecoderWorker: undefined,
+    ethAbiDecoderConfig: undefined,
   };
 }
 
@@ -1412,8 +1418,8 @@ export const ExecutionConfig = {
     if (message.rpcRetryTimes !== 0) {
       writer.uint32(40).int32(message.rpcRetryTimes);
     }
-    if (message.ethAbiDecoderWorker !== undefined) {
-      writer.uint32(48).int32(message.ethAbiDecoderWorker);
+    if (message.ethAbiDecoderConfig !== undefined) {
+      ExecutionConfig_DecoderWorkerConfig.encode(message.ethAbiDecoderConfig, writer.uint32(50).fork()).ldelim();
     }
     return writer;
   },
@@ -1461,11 +1467,11 @@ export const ExecutionConfig = {
           message.rpcRetryTimes = reader.int32();
           continue;
         case 6:
-          if (tag !== 48) {
+          if (tag !== 50) {
             break;
           }
 
-          message.ethAbiDecoderWorker = reader.int32();
+          message.ethAbiDecoderConfig = ExecutionConfig_DecoderWorkerConfig.decode(reader, reader.uint32());
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -1485,8 +1491,8 @@ export const ExecutionConfig = {
         ? globalThis.Boolean(object.skipStartBlockValidation)
         : false,
       rpcRetryTimes: isSet(object.rpcRetryTimes) ? globalThis.Number(object.rpcRetryTimes) : 0,
-      ethAbiDecoderWorker: isSet(object.ethAbiDecoderWorker)
-        ? globalThis.Number(object.ethAbiDecoderWorker)
+      ethAbiDecoderConfig: isSet(object.ethAbiDecoderConfig)
+        ? ExecutionConfig_DecoderWorkerConfig.fromJSON(object.ethAbiDecoderConfig)
         : undefined,
     };
   },
@@ -1508,8 +1514,8 @@ export const ExecutionConfig = {
     if (message.rpcRetryTimes !== 0) {
       obj.rpcRetryTimes = Math.round(message.rpcRetryTimes);
     }
-    if (message.ethAbiDecoderWorker !== undefined) {
-      obj.ethAbiDecoderWorker = Math.round(message.ethAbiDecoderWorker);
+    if (message.ethAbiDecoderConfig !== undefined) {
+      obj.ethAbiDecoderConfig = ExecutionConfig_DecoderWorkerConfig.toJSON(message.ethAbiDecoderConfig);
     }
     return obj;
   },
@@ -1524,7 +1530,100 @@ export const ExecutionConfig = {
     message.processBindingTimeout = object.processBindingTimeout ?? 0;
     message.skipStartBlockValidation = object.skipStartBlockValidation ?? false;
     message.rpcRetryTimes = object.rpcRetryTimes ?? 0;
-    message.ethAbiDecoderWorker = object.ethAbiDecoderWorker ?? undefined;
+    message.ethAbiDecoderConfig = (object.ethAbiDecoderConfig !== undefined && object.ethAbiDecoderConfig !== null)
+      ? ExecutionConfig_DecoderWorkerConfig.fromPartial(object.ethAbiDecoderConfig)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseExecutionConfig_DecoderWorkerConfig(): ExecutionConfig_DecoderWorkerConfig {
+  return { enabled: false, workerCount: undefined, skipWhenDecodeFailed: undefined };
+}
+
+export const ExecutionConfig_DecoderWorkerConfig = {
+  encode(message: ExecutionConfig_DecoderWorkerConfig, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.enabled !== false) {
+      writer.uint32(8).bool(message.enabled);
+    }
+    if (message.workerCount !== undefined) {
+      writer.uint32(16).int32(message.workerCount);
+    }
+    if (message.skipWhenDecodeFailed !== undefined) {
+      writer.uint32(24).bool(message.skipWhenDecodeFailed);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ExecutionConfig_DecoderWorkerConfig {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseExecutionConfig_DecoderWorkerConfig();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 8) {
+            break;
+          }
+
+          message.enabled = reader.bool();
+          continue;
+        case 2:
+          if (tag !== 16) {
+            break;
+          }
+
+          message.workerCount = reader.int32();
+          continue;
+        case 3:
+          if (tag !== 24) {
+            break;
+          }
+
+          message.skipWhenDecodeFailed = reader.bool();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ExecutionConfig_DecoderWorkerConfig {
+    return {
+      enabled: isSet(object.enabled) ? globalThis.Boolean(object.enabled) : false,
+      workerCount: isSet(object.workerCount) ? globalThis.Number(object.workerCount) : undefined,
+      skipWhenDecodeFailed: isSet(object.skipWhenDecodeFailed)
+        ? globalThis.Boolean(object.skipWhenDecodeFailed)
+        : undefined,
+    };
+  },
+
+  toJSON(message: ExecutionConfig_DecoderWorkerConfig): unknown {
+    const obj: any = {};
+    if (message.enabled !== false) {
+      obj.enabled = message.enabled;
+    }
+    if (message.workerCount !== undefined) {
+      obj.workerCount = Math.round(message.workerCount);
+    }
+    if (message.skipWhenDecodeFailed !== undefined) {
+      obj.skipWhenDecodeFailed = message.skipWhenDecodeFailed;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<ExecutionConfig_DecoderWorkerConfig>): ExecutionConfig_DecoderWorkerConfig {
+    return ExecutionConfig_DecoderWorkerConfig.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ExecutionConfig_DecoderWorkerConfig>): ExecutionConfig_DecoderWorkerConfig {
+    const message = createBaseExecutionConfig_DecoderWorkerConfig();
+    message.enabled = object.enabled ?? false;
+    message.workerCount = object.workerCount ?? undefined;
+    message.skipWhenDecodeFailed = object.skipWhenDecodeFailed ?? undefined;
     return message;
   },
 };
