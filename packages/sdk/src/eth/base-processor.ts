@@ -712,7 +712,7 @@ export abstract class BaseProcessor<
         }
         const traceData = '0x' + trace.action.input.slice(10)
         try {
-          typedTrace.args = decodeTrace(processor, fragment.inputs, traceData)
+          typedTrace.args = await decodeTrace(processor, fragment.inputs, traceData)
           // typedTrace.args = contractInterface.getAbiCoder().decode(fragment.inputs, traceData, true)
         } catch (e) {
           if (!trace.error) {
@@ -758,7 +758,7 @@ export abstract class BaseProcessor<
         }
         const traceData = '0x' + trace.action.input.slice(10)
         try {
-          typedTrace.args = decodeTrace(processor, fragment.inputs, traceData)
+          typedTrace.args = await decodeTrace(processor, fragment.inputs, traceData)
         } catch (e) {
           if (!trace.error) {
             throw e

@@ -409,13 +409,13 @@ export interface ExecutionConfig {
   processBindingTimeout: number;
   skipStartBlockValidation: boolean;
   rpcRetryTimes: number;
-  ethAbiDecoderConfig: ExecutionConfig_DecoderWorkerConfig | undefined;
+  ethAbiDecoderConfig?: ExecutionConfig_DecoderWorkerConfig | undefined;
 }
 
 export interface ExecutionConfig_DecoderWorkerConfig {
   enabled: boolean;
-  workerCount: number;
-  skipWhenDecodeFailed: boolean;
+  workerCount?: number | undefined;
+  skipWhenDecodeFailed?: boolean | undefined;
 }
 
 export interface ProcessConfigRequest {
@@ -1587,7 +1587,7 @@ export const ExecutionConfig = {
 };
 
 function createBaseExecutionConfig_DecoderWorkerConfig(): ExecutionConfig_DecoderWorkerConfig {
-  return { enabled: false, workerCount: 0, skipWhenDecodeFailed: false };
+  return { enabled: false, workerCount: undefined, skipWhenDecodeFailed: undefined };
 }
 
 export const ExecutionConfig_DecoderWorkerConfig = {
@@ -1595,10 +1595,10 @@ export const ExecutionConfig_DecoderWorkerConfig = {
     if (message.enabled !== false) {
       writer.uint32(8).bool(message.enabled);
     }
-    if (message.workerCount !== 0) {
+    if (message.workerCount !== undefined) {
       writer.uint32(16).int32(message.workerCount);
     }
-    if (message.skipWhenDecodeFailed !== false) {
+    if (message.skipWhenDecodeFailed !== undefined) {
       writer.uint32(24).bool(message.skipWhenDecodeFailed);
     }
     return writer;
@@ -1644,10 +1644,10 @@ export const ExecutionConfig_DecoderWorkerConfig = {
   fromJSON(object: any): ExecutionConfig_DecoderWorkerConfig {
     return {
       enabled: isSet(object.enabled) ? globalThis.Boolean(object.enabled) : false,
-      workerCount: isSet(object.workerCount) ? globalThis.Number(object.workerCount) : 0,
+      workerCount: isSet(object.workerCount) ? globalThis.Number(object.workerCount) : undefined,
       skipWhenDecodeFailed: isSet(object.skipWhenDecodeFailed)
         ? globalThis.Boolean(object.skipWhenDecodeFailed)
-        : false,
+        : undefined,
     };
   },
 
@@ -1656,10 +1656,10 @@ export const ExecutionConfig_DecoderWorkerConfig = {
     if (message.enabled !== false) {
       obj.enabled = message.enabled;
     }
-    if (message.workerCount !== 0) {
+    if (message.workerCount !== undefined) {
       obj.workerCount = Math.round(message.workerCount);
     }
-    if (message.skipWhenDecodeFailed !== false) {
+    if (message.skipWhenDecodeFailed !== undefined) {
       obj.skipWhenDecodeFailed = message.skipWhenDecodeFailed;
     }
     return obj;
@@ -1671,8 +1671,8 @@ export const ExecutionConfig_DecoderWorkerConfig = {
   fromPartial(object: DeepPartial<ExecutionConfig_DecoderWorkerConfig>): ExecutionConfig_DecoderWorkerConfig {
     const message = createBaseExecutionConfig_DecoderWorkerConfig();
     message.enabled = object.enabled ?? false;
-    message.workerCount = object.workerCount ?? 0;
-    message.skipWhenDecodeFailed = object.skipWhenDecodeFailed ?? false;
+    message.workerCount = object.workerCount ?? undefined;
+    message.skipWhenDecodeFailed = object.skipWhenDecodeFailed ?? undefined;
     return message;
   },
 };
