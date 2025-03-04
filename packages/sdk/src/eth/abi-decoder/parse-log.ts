@@ -3,6 +3,22 @@ import { LogDescription, LogParams, Result } from 'ethers'
 import { GLOBAL_CONFIG } from '@sentio/runtime'
 import { parseLog } from './parse-log-worker.js'
 
+function findWorkFile() {
+  let baseUrl = import.meta.url
+  // find the base from @sentio/sdk
+  const index = baseUrl.indexOf('/@sentio/sdk/')
+  if (index > 0) {
+    baseUrl = baseUrl.substring(0, index + 13)
+  } else {
+    // dev environment, path is .../packages/sdk/src/eth/abi-decoder/parse-log-worker.ts
+    const index = baseUrl.indexOf('packages/sdk/')
+    if (index > 0) {
+      baseUrl = baseUrl.substring(0, index + 13)
+    }
+  }
+  return new URL('./lib/eth/abi-decoder/parse-log-worker.js', baseUrl).href
+}
+
 export default async (processor: any, log: LogParams) => {
   const workers = GLOBAL_CONFIG.execution.ethAbiDecoderWorker
   if (workers != null) {
@@ -12,8 +28,7 @@ export default async (processor: any, log: LogParams) => {
     if (!workerPool) {
       const fragments = contractViewInterface.fragments
       const options: any = {
-        // hack fix for node:test with tsx
-        filename: new URL('./parse-log-worker.js', import.meta.url).href.replaceAll('/src/eth', '/lib/eth'),
+        filename: findWorkFile(),
         workerData: fragments
       }
       if (workers > 0) {
