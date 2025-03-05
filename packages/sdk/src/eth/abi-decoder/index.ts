@@ -1,11 +1,13 @@
 import { LogDescription, LogParams, Result, ParamType } from 'ethers'
-import { GLOBAL_CONFIG } from '@sentio/runtime'
+import { GLOBAL_CONFIG, processMetrics } from '@sentio/runtime'
 import { Piscina } from 'piscina'
+
 import { decodeTraceInline, parseLogInline, IResult } from './decode-worker.js'
 
 function createOptions() {
   const options: any = {
-    filename: findWorkFile()
+    filename: findWorkFile(),
+    recordTiming: true
   }
   if (GLOBAL_CONFIG.execution.ethAbiDecoderConfig?.workerCount) {
     try {
@@ -35,7 +37,7 @@ function findWorkFile() {
 
 export async function parseLog(processor: any, log: LogParams) {
   if (GLOBAL_CONFIG.execution.ethAbiDecoderConfig?.enabled) {
-    let workerPool = processor._logWorkerPool
+    let workerPool = processor._logWorkerPool as Piscina
     const contractView = processor.CreateBoundContractView()
     const contractViewInterface = contractView.rawContract.interface
     if (!workerPool) {
@@ -61,6 +63,19 @@ export async function parseLog(processor: any, log: LogParams) {
       console.error(`parseLog worker failed, skip: ${!!skipWhenDecodeFailed}, the error is:`, e)
       if (!skipWhenDecodeFailed) {
         throw e
+      }
+    } finally {
+      if (workerPool.waitTime && workerPool.runTime) {
+        const labels = {
+          chain_id: processor.config?.network,
+          processor: processor.config?.name,
+          workerPool: 'parseLog'
+        }
+        processMetrics.processor_worker_wait_time.record(workerPool.waitTime.average, labels)
+        processMetrics.processor_worker_run_time.record(workerPool.runTime?.average, labels)
+        processMetrics.processor_worker_utilization.record(workerPool.utilization, labels)
+        processMetrics.processor_worker_queue_size.record(workerPool.queueSize, labels)
+        processMetrics.processor_worker_completed.record(workerPool.completed, labels)
       }
     }
     return null
@@ -94,6 +109,19 @@ export async function decodeTrace(processor: any, inputs: readonly ParamType[], 
       console.error(`decode trace worker failed, skip: ${!!skipWhenDecodeFailed}, the error is:`, e)
       if (!skipWhenDecodeFailed) {
         throw e
+      }
+    } finally {
+      if (workerPool.waitTime && workerPool.runTime) {
+        const labels = {
+          chain_id: processor.config?.network,
+          processor: processor.config?.name,
+          workerPool: 'parseLog'
+        }
+        processMetrics.processor_worker_wait_time.record(workerPool.waitTime.average, labels)
+        processMetrics.processor_worker_run_time.record(workerPool.runTime?.average, labels)
+        processMetrics.processor_worker_utilization.record(workerPool.utilization, labels)
+        processMetrics.processor_worker_queue_size.record(workerPool.queueSize, labels)
+        processMetrics.processor_worker_completed.record(workerPool.completed, labels)
       }
     }
     return null

@@ -172,6 +172,11 @@ export const processMetrics = {
   processor_rpc_duration: new H('processor_rpc_duration'),
   processor_rpc_queue_duration: new H('processor_rpc_queue_duration'),
   processor_template_instance_count: new C('process_template_instance_count'),
+  processor_worker_run_time: new G('processor_worker_run_time'),
+  processor_worker_wait_time: new G('processor_worker_wait_time'),
+  processor_worker_utilization: new G('processor_worker_utilization'),
+  processor_worker_queue_size: new G('processor_worker_queue_size'),
+  processor_worker_completed: new G('processor_worker_completed'),
   stats() {
     return {
       process_binding_count: this.process_binding_count.get(),
@@ -186,7 +191,12 @@ export const processMetrics = {
       processor_handler_duration: this.processor_handler_duration.get(),
       processor_rpc_duration: this.processor_rpc_duration.get(),
       processor_rpc_queue_duration: this.processor_rpc_queue_duration.get(),
-      processor_template_instance_count: this.processor_template_instance_count.get()
+      processor_template_instance_count: this.processor_template_instance_count.get(),
+      processor_worker_run_time: this.processor_worker_run_time.get(),
+      processor_worker_wait_time: this.processor_worker_wait_time.get(),
+      processor_worker_utilization: this.processor_worker_utilization.get(),
+      processor_worker_queue_size: this.processor_worker_queue_size.get(),
+      processor_worker_completed: this.processor_worker_completed.get()
     }
   }
 }
