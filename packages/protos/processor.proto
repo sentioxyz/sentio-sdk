@@ -47,6 +47,7 @@ message ExecutionConfig {
     bool enabled = 1;
     optional int32 worker_count = 2;
     optional bool skip_when_decode_failed = 3;
+    optional bool record_timing = 4;
   }
 }
 

@@ -7,7 +7,7 @@ import { decodeTraceInline, parseLogInline, IResult } from './decode-worker.js'
 function createOptions() {
   const options: any = {
     filename: findWorkFile(),
-    recordTiming: true
+    recordTiming: GLOBAL_CONFIG.execution.ethAbiDecoderConfig?.recordTiming
   }
   if (GLOBAL_CONFIG.execution.ethAbiDecoderConfig?.workerCount) {
     try {
@@ -65,7 +65,7 @@ export async function parseLog(processor: any, log: LogParams) {
         throw e
       }
     } finally {
-      if (workerPool.waitTime && workerPool.runTime) {
+      if (GLOBAL_CONFIG.execution.ethAbiDecoderConfig?.recordTiming && workerPool.waitTime && workerPool.runTime) {
         const labels = {
           chain_id: processor.config?.network,
           processor: processor.config?.name,
@@ -111,7 +111,7 @@ export async function decodeTrace(processor: any, inputs: readonly ParamType[], 
         throw e
       }
     } finally {
-      if (workerPool.waitTime && workerPool.runTime) {
+      if (GLOBAL_CONFIG.execution.ethAbiDecoderConfig?.recordTiming && workerPool.waitTime && workerPool.runTime) {
         const labels = {
           chain_id: processor.config?.network,
           processor: processor.config?.name,
