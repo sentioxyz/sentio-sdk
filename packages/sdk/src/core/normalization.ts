@@ -116,6 +116,9 @@ function normalizeToRichValue(value: any): RichValue {
       const v = BigInt(value)
       return { bigintValue: toBigInteger(v) }
     case 'number':
+      if (isNaN(value) || !isFinite(value)) {
+        throw new Error("can't submit NaN or Infinity value")
+      }
       if (Number.isInteger(value)) {
         return { intValue: value }
       }
@@ -138,6 +141,9 @@ function normalizeToRichValue(value: any): RichValue {
       }
       if (BN.isBN(value)) {
         const value1 = new BigDecimal(value.toString())
+        if (value1.isNaN() || !value1.isFinite()) {
+          throw new Error("can't submit NaN or Infinity value")
+        }
         return { bigdecimalValue: toBigDecimal(value1) }
       }
       if (Array.isArray(value)) {
@@ -173,7 +179,11 @@ export function normalizeToRichStruct(...objs: any[]): RichStruct {
   }
   for (const obj of objs) {
     for (const [key, value] of Object.entries(obj)) {
-      ret.fields[key] = normalizeToRichValue(value)
+      try {
+        ret.fields[key] = normalizeToRichValue(value)
+      } catch (e) {
+        throw new Error("error when converting data for key '" + key + "': " + e.message)
+      }
     }
   }
   return ret
