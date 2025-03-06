@@ -28,6 +28,7 @@ const FUEL_PROTO_UPDATE_VERSION = parseSemver('2.54.0-rc.7')
 const FUEL_PROTO_NO_FUEL_TRANSACTION_AS_CALL_VERSION = parseSemver('2.55.0-rc.1')
 
 const MOVE_USE_RAW_VERSION = parseSemver('2.55.0-rc.1')
+const ETH_USE_RAW_VERSION = parseSemver('2.57.9-rc.12')
 // new driver (after MOVE_USE_RAW_VERSION) will sent the same event multiple times when fetch all true
 // so we need to cache it, key will be tx-handler_id
 const PROCESSED_MOVE_EVENT_TX_HANDLER = new LRUCache<string, boolean>({
@@ -162,11 +163,31 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
 
   private adjustDataBinding(dataBinding?: DataBinding): void {
     const isBeforeMoveUseRawVersion = compareSemver(this.sdkVersion, MOVE_USE_RAW_VERSION) < 0
+    // const isBeforeEthUseRawVersion = compareSemver(this.sdkVersion,ETH_USE_RAW_VERSION) < 0
 
     if (!dataBinding) {
       return
     }
     switch (dataBinding.handlerType) {
+      case HandlerType.ETH_LOG:
+        const ethLog = dataBinding.data?.ethLog
+        if (ethLog?.log == null && ethLog?.rawLog) {
+          ethLog.log = JSON.parse(ethLog.rawLog)
+          ethLog.transaction = ethLog.rawTransaction ? JSON.parse(ethLog.rawTransaction) : undefined
+          ethLog.block = ethLog.rawBlock ? JSON.parse(ethLog.rawBlock) : undefined
+          ethLog.transactionReceipt = ethLog.rawTransactionReceipt
+            ? JSON.parse(ethLog.rawTransactionReceipt)
+            : undefined
+        }
+        break
+      case HandlerType.ETH_TRANSACTION:
+        const ethTx = dataBinding.data?.ethTransaction
+        if (ethTx?.transaction == null && ethTx?.rawTransaction) {
+          ethTx.transaction = JSON.parse(ethTx.rawTransaction)
+          ethTx.block = ethTx.rawBlock ? JSON.parse(ethTx.rawBlock) : undefined
+          ethTx.transactionReceipt = ethTx.rawTransactionReceipt ? JSON.parse(ethTx.rawTransactionReceipt) : undefined
+        }
+        break
       case HandlerType.FUEL_TRANSACTION:
         if (compareSemver(this.sdkVersion, FUEL_PROTO_UPDATE_VERSION) < 0) {
           dataBinding.handlerType = HandlerType.FUEL_CALL

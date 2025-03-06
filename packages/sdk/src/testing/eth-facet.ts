@@ -117,7 +117,7 @@ export class EthFacet {
           if (match) {
             return {
               data: {
-                ethLog: { log, timestamp: new Date() }
+                ethLog: { log, timestamp: new Date(), rawLog: JSON.stringify(log) }
               },
               handlerIds: [config.handlerId],
               handlerType: HandlerType.ETH_LOG
@@ -190,7 +190,7 @@ export class EthFacet {
           if (match) {
             return {
               data: {
-                ethLog: { log, timestamp: new Date() }
+                ethLog: { log, timestamp: new Date(), rawLog: JSON.stringify(log) }
               },
               handlerIds: [config.handlerId],
               handlerType: HandlerType.ETH_LOG
