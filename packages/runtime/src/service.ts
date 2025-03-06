@@ -418,7 +418,6 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     subject: Subject<DeepPartial<ProcessStreamResponse>>
   ) {
     const contexts = new Contexts()
-
     for await (const request of requests) {
       try {
         // console.debug('received request:', request)
