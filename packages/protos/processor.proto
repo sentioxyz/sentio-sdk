@@ -649,21 +649,29 @@ message DBRequest {
 message Data {
   // Every Handler type should have a data type
   message EthLog {
-    google.protobuf.Struct log = 3;
+    google.protobuf.Struct log = 3 ; // deprecated
     google.protobuf.Timestamp timestamp = 4;
-    optional google.protobuf.Struct transaction = 2;
-    optional google.protobuf.Struct transaction_receipt = 5;
-    optional google.protobuf.Struct block = 6;
+    optional google.protobuf.Struct transaction = 2 ; // deprecated
+    optional google.protobuf.Struct transaction_receipt = 5 ; // deprecated
+    optional google.protobuf.Struct block = 6 ; // deprecated
+    string raw_log = 7;
+    optional string raw_transaction = 8;
+    optional string raw_transaction_receipt = 9;
+    optional string raw_block = 10;
   }
   message EthBlock {
     google.protobuf.Struct block = 2;
   }
   message EthTransaction {
-    google.protobuf.Struct transaction = 4;
+    google.protobuf.Struct transaction = 4 ; // deprecated
     google.protobuf.Timestamp timestamp = 5;
-    optional google.protobuf.Struct transaction_receipt = 3;
-    optional google.protobuf.Struct block = 6;
-    optional google.protobuf.Struct trace = 7;
+    optional google.protobuf.Struct transaction_receipt = 3 ; // deprecated
+    optional google.protobuf.Struct block = 6 ; // deprecated
+    optional google.protobuf.Struct trace = 7 ; // deprecated
+    string raw_transaction = 8;
+    optional string raw_transaction_receipt = 9;
+    optional string raw_block = 10;
+    optional string raw_trace = 11;
   }
   message EthTrace {
     google.protobuf.Struct trace = 4;

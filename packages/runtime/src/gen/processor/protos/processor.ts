@@ -1118,6 +1118,10 @@ export interface Data_EthLog {
   transaction?: { [key: string]: any } | undefined;
   transactionReceipt?: { [key: string]: any } | undefined;
   block?: { [key: string]: any } | undefined;
+  rawLog: string;
+  rawTransaction?: string | undefined;
+  rawTransactionReceipt?: string | undefined;
+  rawBlock?: string | undefined;
 }
 
 export interface Data_EthBlock {
@@ -1130,6 +1134,10 @@ export interface Data_EthTransaction {
   transactionReceipt?: { [key: string]: any } | undefined;
   block?: { [key: string]: any } | undefined;
   trace?: { [key: string]: any } | undefined;
+  rawTransaction: string;
+  rawTransactionReceipt?: string | undefined;
+  rawBlock?: string | undefined;
+  rawTrace?: string | undefined;
 }
 
 export interface Data_EthTrace {
@@ -9607,6 +9615,10 @@ function createBaseData_EthLog(): Data_EthLog {
     transaction: undefined,
     transactionReceipt: undefined,
     block: undefined,
+    rawLog: "",
+    rawTransaction: undefined,
+    rawTransactionReceipt: undefined,
+    rawBlock: undefined,
   };
 }
 
@@ -9626,6 +9638,18 @@ export const Data_EthLog = {
     }
     if (message.block !== undefined) {
       Struct.encode(Struct.wrap(message.block), writer.uint32(50).fork()).ldelim();
+    }
+    if (message.rawLog !== "") {
+      writer.uint32(58).string(message.rawLog);
+    }
+    if (message.rawTransaction !== undefined) {
+      writer.uint32(66).string(message.rawTransaction);
+    }
+    if (message.rawTransactionReceipt !== undefined) {
+      writer.uint32(74).string(message.rawTransactionReceipt);
+    }
+    if (message.rawBlock !== undefined) {
+      writer.uint32(82).string(message.rawBlock);
     }
     return writer;
   },
@@ -9672,6 +9696,34 @@ export const Data_EthLog = {
 
           message.block = Struct.unwrap(Struct.decode(reader, reader.uint32()));
           continue;
+        case 7:
+          if (tag !== 58) {
+            break;
+          }
+
+          message.rawLog = reader.string();
+          continue;
+        case 8:
+          if (tag !== 66) {
+            break;
+          }
+
+          message.rawTransaction = reader.string();
+          continue;
+        case 9:
+          if (tag !== 74) {
+            break;
+          }
+
+          message.rawTransactionReceipt = reader.string();
+          continue;
+        case 10:
+          if (tag !== 82) {
+            break;
+          }
+
+          message.rawBlock = reader.string();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -9688,6 +9740,12 @@ export const Data_EthLog = {
       transaction: isObject(object.transaction) ? object.transaction : undefined,
       transactionReceipt: isObject(object.transactionReceipt) ? object.transactionReceipt : undefined,
       block: isObject(object.block) ? object.block : undefined,
+      rawLog: isSet(object.rawLog) ? globalThis.String(object.rawLog) : "",
+      rawTransaction: isSet(object.rawTransaction) ? globalThis.String(object.rawTransaction) : undefined,
+      rawTransactionReceipt: isSet(object.rawTransactionReceipt)
+        ? globalThis.String(object.rawTransactionReceipt)
+        : undefined,
+      rawBlock: isSet(object.rawBlock) ? globalThis.String(object.rawBlock) : undefined,
     };
   },
 
@@ -9708,6 +9766,18 @@ export const Data_EthLog = {
     if (message.block !== undefined) {
       obj.block = message.block;
     }
+    if (message.rawLog !== "") {
+      obj.rawLog = message.rawLog;
+    }
+    if (message.rawTransaction !== undefined) {
+      obj.rawTransaction = message.rawTransaction;
+    }
+    if (message.rawTransactionReceipt !== undefined) {
+      obj.rawTransactionReceipt = message.rawTransactionReceipt;
+    }
+    if (message.rawBlock !== undefined) {
+      obj.rawBlock = message.rawBlock;
+    }
     return obj;
   },
 
@@ -9721,6 +9791,10 @@ export const Data_EthLog = {
     message.transaction = object.transaction ?? undefined;
     message.transactionReceipt = object.transactionReceipt ?? undefined;
     message.block = object.block ?? undefined;
+    message.rawLog = object.rawLog ?? "";
+    message.rawTransaction = object.rawTransaction ?? undefined;
+    message.rawTransactionReceipt = object.rawTransactionReceipt ?? undefined;
+    message.rawBlock = object.rawBlock ?? undefined;
     return message;
   },
 };
@@ -9789,6 +9863,10 @@ function createBaseData_EthTransaction(): Data_EthTransaction {
     transactionReceipt: undefined,
     block: undefined,
     trace: undefined,
+    rawTransaction: "",
+    rawTransactionReceipt: undefined,
+    rawBlock: undefined,
+    rawTrace: undefined,
   };
 }
 
@@ -9808,6 +9886,18 @@ export const Data_EthTransaction = {
     }
     if (message.trace !== undefined) {
       Struct.encode(Struct.wrap(message.trace), writer.uint32(58).fork()).ldelim();
+    }
+    if (message.rawTransaction !== "") {
+      writer.uint32(66).string(message.rawTransaction);
+    }
+    if (message.rawTransactionReceipt !== undefined) {
+      writer.uint32(74).string(message.rawTransactionReceipt);
+    }
+    if (message.rawBlock !== undefined) {
+      writer.uint32(82).string(message.rawBlock);
+    }
+    if (message.rawTrace !== undefined) {
+      writer.uint32(90).string(message.rawTrace);
     }
     return writer;
   },
@@ -9854,6 +9944,34 @@ export const Data_EthTransaction = {
 
           message.trace = Struct.unwrap(Struct.decode(reader, reader.uint32()));
           continue;
+        case 8:
+          if (tag !== 66) {
+            break;
+          }
+
+          message.rawTransaction = reader.string();
+          continue;
+        case 9:
+          if (tag !== 74) {
+            break;
+          }
+
+          message.rawTransactionReceipt = reader.string();
+          continue;
+        case 10:
+          if (tag !== 82) {
+            break;
+          }
+
+          message.rawBlock = reader.string();
+          continue;
+        case 11:
+          if (tag !== 90) {
+            break;
+          }
+
+          message.rawTrace = reader.string();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -9870,6 +9988,12 @@ export const Data_EthTransaction = {
       transactionReceipt: isObject(object.transactionReceipt) ? object.transactionReceipt : undefined,
       block: isObject(object.block) ? object.block : undefined,
       trace: isObject(object.trace) ? object.trace : undefined,
+      rawTransaction: isSet(object.rawTransaction) ? globalThis.String(object.rawTransaction) : "",
+      rawTransactionReceipt: isSet(object.rawTransactionReceipt)
+        ? globalThis.String(object.rawTransactionReceipt)
+        : undefined,
+      rawBlock: isSet(object.rawBlock) ? globalThis.String(object.rawBlock) : undefined,
+      rawTrace: isSet(object.rawTrace) ? globalThis.String(object.rawTrace) : undefined,
     };
   },
 
@@ -9890,6 +10014,18 @@ export const Data_EthTransaction = {
     if (message.trace !== undefined) {
       obj.trace = message.trace;
     }
+    if (message.rawTransaction !== "") {
+      obj.rawTransaction = message.rawTransaction;
+    }
+    if (message.rawTransactionReceipt !== undefined) {
+      obj.rawTransactionReceipt = message.rawTransactionReceipt;
+    }
+    if (message.rawBlock !== undefined) {
+      obj.rawBlock = message.rawBlock;
+    }
+    if (message.rawTrace !== undefined) {
+      obj.rawTrace = message.rawTrace;
+    }
     return obj;
   },
 
@@ -9903,6 +10039,10 @@ export const Data_EthTransaction = {
     message.transactionReceipt = object.transactionReceipt ?? undefined;
     message.block = object.block ?? undefined;
     message.trace = object.trace ?? undefined;
+    message.rawTransaction = object.rawTransaction ?? "";
+    message.rawTransactionReceipt = object.rawTransactionReceipt ?? undefined;
+    message.rawBlock = object.rawBlock ?? undefined;
+    message.rawTrace = object.rawTrace ?? undefined;
     return message;
   },
 };
