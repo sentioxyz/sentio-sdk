@@ -112,7 +112,12 @@ jobs:
         if: steps.semantic.outputs.new_release_published == 'true'
         run: |
           BRANCH=${GITHUB_REF##*/}
-          pnpm build:bundle
+          if [[ $BRANCH == "release" ]]; then
+            pnpm build:bundle --minify
+          else
+            pnpm build:bundle
+          fi
+          
           pnpm json -I -f package.json -e "this.dependencies=Object.fromEntries(Object.entries(this.dependencies).filter((entry) => ['@sentio/chain', '@sentio/runtime', 'piscina'].includes(entry['0'])))"
           pnpm json -I -f package.json -e 'this.name="@sentio/sdk-bundle"; this.scripts={}; this.peerDependencies={}; this.devDependencies={}; this.files = ["{lib,assets}"]'
         working-directory: packages/sdk
