@@ -372,7 +372,7 @@ export abstract class BaseProcessor<
   TBoundContractView extends BoundContractView<TContract, ContractView<TContract>>
 > {
   blockHandlers: BlockHandler[] = proxyHandlers([])
-  eventHandlers: EventsHandler[] = []
+  eventHandlers: EventsHandler[] = proxyHandlers([])
   traceHandlers: TraceHandler[] = proxyHandlers([])
 
   config: BindInternalOptions

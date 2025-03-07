@@ -35,7 +35,7 @@ import { EthChainId } from '@sentio/chain'
 import { Provider } from 'ethers'
 import { decodeMulticallResult, encodeMulticallData, getMulticallAddress, Multicall3Call } from './multicall.js'
 
-import { dbMetrics, processMetrics, providerMetrics } from './metrics.js'
+import { processMetrics } from './metrics.js'
 
 const { process_binding_count, process_binding_time, process_binding_error } = processMetrics
 
@@ -454,11 +454,8 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
             })
             .finally(() => {
               const cost = Date.now() - start
-              console.debug('processBinding', request.processId, ' took', cost, 'ms')
               process_binding_time.add(cost)
               contexts.delete(request.processId)
-              console.debug('db stats', JSON.stringify(dbMetrics.stats()))
-              console.debug('provider stats', JSON.stringify(providerMetrics.stats()))
             })
         }
         if (request.dbResult) {
