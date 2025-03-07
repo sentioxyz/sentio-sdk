@@ -416,7 +416,6 @@ export interface ExecutionConfig_DecoderWorkerConfig {
   enabled: boolean;
   workerCount?: number | undefined;
   skipWhenDecodeFailed?: boolean | undefined;
-  recordTiming?: boolean | undefined;
 }
 
 export interface ProcessConfigRequest {
@@ -1596,7 +1595,7 @@ export const ExecutionConfig = {
 };
 
 function createBaseExecutionConfig_DecoderWorkerConfig(): ExecutionConfig_DecoderWorkerConfig {
-  return { enabled: false, workerCount: undefined, skipWhenDecodeFailed: undefined, recordTiming: undefined };
+  return { enabled: false, workerCount: undefined, skipWhenDecodeFailed: undefined };
 }
 
 export const ExecutionConfig_DecoderWorkerConfig = {
@@ -1609,9 +1608,6 @@ export const ExecutionConfig_DecoderWorkerConfig = {
     }
     if (message.skipWhenDecodeFailed !== undefined) {
       writer.uint32(24).bool(message.skipWhenDecodeFailed);
-    }
-    if (message.recordTiming !== undefined) {
-      writer.uint32(32).bool(message.recordTiming);
     }
     return writer;
   },
@@ -1644,13 +1640,6 @@ export const ExecutionConfig_DecoderWorkerConfig = {
 
           message.skipWhenDecodeFailed = reader.bool();
           continue;
-        case 4:
-          if (tag !== 32) {
-            break;
-          }
-
-          message.recordTiming = reader.bool();
-          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -1667,7 +1656,6 @@ export const ExecutionConfig_DecoderWorkerConfig = {
       skipWhenDecodeFailed: isSet(object.skipWhenDecodeFailed)
         ? globalThis.Boolean(object.skipWhenDecodeFailed)
         : undefined,
-      recordTiming: isSet(object.recordTiming) ? globalThis.Boolean(object.recordTiming) : undefined,
     };
   },
 
@@ -1682,9 +1670,6 @@ export const ExecutionConfig_DecoderWorkerConfig = {
     if (message.skipWhenDecodeFailed !== undefined) {
       obj.skipWhenDecodeFailed = message.skipWhenDecodeFailed;
     }
-    if (message.recordTiming !== undefined) {
-      obj.recordTiming = message.recordTiming;
-    }
     return obj;
   },
 
@@ -1696,7 +1681,6 @@ export const ExecutionConfig_DecoderWorkerConfig = {
     message.enabled = object.enabled ?? false;
     message.workerCount = object.workerCount ?? undefined;
     message.skipWhenDecodeFailed = object.skipWhenDecodeFailed ?? undefined;
-    message.recordTiming = object.recordTiming ?? undefined;
     return message;
   },
 };
