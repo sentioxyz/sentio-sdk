@@ -38,7 +38,9 @@ jobs:
       - name: Install
         run: pnpm install
       - name: Build SDK & CLI
-        run: pnpm --filter "./packages/*..." build
+        run:  |
+          export BRANCH=${GITHUB_REF##*/}
+          pnpm --filter "./packages/*..." build
       - name: SDK Semantic Release
         id: semantic
         uses: cycjimmy/semantic-release-action@v4
