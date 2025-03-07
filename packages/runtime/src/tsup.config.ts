@@ -8,7 +8,7 @@ export default defineConfig({
   },
   entry: ['src/index.ts', 'src/processor-runner.ts'],
   outDir: 'lib',
-  minify: true,
+  minify: false,
   sourcemap: true,
   clean: true,
   dts: true,
