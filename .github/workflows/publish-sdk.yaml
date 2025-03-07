@@ -111,7 +111,7 @@ jobs:
       - name: Prepare sdk-bundle
         if: steps.semantic.outputs.new_release_published == 'true'
         run: |
-          BRANCH=${GITHUB_REF##*/}
+          export BRANCH=${GITHUB_REF##*/}
           pnpm build:bundle
           pnpm json -I -f package.json -e "this.dependencies=Object.fromEntries(Object.entries(this.dependencies).filter((entry) => ['@sentio/chain', '@sentio/runtime', 'piscina'].includes(entry['0'])))"
           pnpm json -I -f package.json -e 'this.name="@sentio/sdk-bundle"; this.scripts={}; this.peerDependencies={}; this.devDependencies={}; this.files = ["{lib,assets}"]'
