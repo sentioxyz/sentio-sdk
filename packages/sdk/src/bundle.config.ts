@@ -14,7 +14,7 @@ export default defineConfig({
   },
   entry,
   outDir: 'lib',
-  minify: true,
+  minify: process.env['BRANCH'] === 'release',
   sourcemap: true,
   clean: true,
   // https://github.com/egoist/tsup/issues/920, use `tsc --emitDeclarationOnly --declaration` as a workaround
