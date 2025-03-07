@@ -101,8 +101,12 @@ export async function getABI(
 
   try {
     let apiKey = process.env['ETHERSCAN_API_KEY_' + chain]
-    if (chain === ChainId.ETHEREUM && !apiKey) {
-      apiKey = '1KQV22RY3KV1PX5IIB34TPAVVQG1ZMAU45'
+    if (!apiKey) {
+      const keys: Record<string, string> = {
+        [ChainId.ETHEREUM]: '1KQV22RY3KV1PX5IIB34TPAVVQG1ZMAU45',
+        [ChainId.BASE]: 'K7613MC26RFMACK414RGZUEAX1184TWYZU'
+      }
+      apiKey = keys[chain]
     }
     if (apiKey) {
       ethApi = `${ethApi}/api?apikey=${apiKey}&`
