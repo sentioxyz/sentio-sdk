@@ -169,7 +169,7 @@ async function getCoinTokenInfo(client: RichAptosClient, type: MoveStructId): Pr
 // token: address of the fungible asset, e.g. "0xa", or the coin type, e.g. "0x1::aptos::AptosCoin"
 export async function getTokenInfoWithFallback(token: string, network?: AptosNetwork): Promise<TokenInfo> {
   network = network || AptosNetwork.MAIN_NET
-  if (network === AptosNetwork.MOVEMENT_MAIN_NET) {
+  if (network === AptosNetwork.MAIN_NET) {
     const r = TOKEN_MAP.get(token)
     if (r) {
       return r
