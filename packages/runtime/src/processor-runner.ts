@@ -127,6 +127,31 @@ const httpServer = http
         //   const metrics = await mergedRegistry.metrics()
         //   res.write(metrics)
         //   break
+        case '/heap': {
+          try {
+            const file = '/tmp/' + Date.now() + '.heapsnapshot'
+            const session = new Session()
+
+            const fd = fs.openSync(file, 'w')
+            session.connect()
+            session.on('HeapProfiler.addHeapSnapshotChunk', (m) => {
+              fs.writeSync(fd, m.params.chunk)
+            })
+
+            await session.post('HeapProfiler.takeHeapSnapshot')
+            session.disconnect()
+            fs.closeSync(fd)
+            // send the file
+            const readStream = fs.createReadStream(file)
+            res.writeHead(200, { 'Content-Type': 'application/json' })
+            readStream.pipe(res)
+            res.end()
+          } catch {
+            res.writeHead(500)
+            res.end()
+          }
+          break
+        }
         case '/profile': {
           try {
             const profileTime = parseInt(queries.get('t') || '1000', 10) || 1000

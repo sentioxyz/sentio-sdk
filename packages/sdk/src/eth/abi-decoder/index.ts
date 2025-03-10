@@ -6,8 +6,7 @@ import { decodeTraceInline, parseLogInline, IResult } from './decode-worker.js'
 
 function createOptions() {
   const options: any = {
-    filename: findWorkFile(),
-    recordTiming: GLOBAL_CONFIG.execution.ethAbiDecoderConfig?.recordTiming
+    filename: findWorkFile()
   }
   if (GLOBAL_CONFIG.execution.ethAbiDecoderConfig?.workerCount) {
     try {
@@ -48,6 +47,7 @@ export async function parseLog(processor: any, log: LogParams) {
       workerPool = new Piscina(options)
       processor._logWorkerPool = workerPool
     }
+    const start = Date.now()
     try {
       const result = (await workerPool.run({ log }, { name: 'parseLog' })) as any
       if (result) {
@@ -65,18 +65,14 @@ export async function parseLog(processor: any, log: LogParams) {
         throw e
       }
     } finally {
-      if (GLOBAL_CONFIG.execution.ethAbiDecoderConfig?.recordTiming && workerPool.waitTime && workerPool.runTime) {
-        const labels = {
-          chain_id: processor.config?.network,
-          processor: processor.config?.name,
-          workerPool: 'parseLog'
-        }
-        processMetrics.processor_worker_wait_time.record(workerPool.waitTime.average, labels)
-        processMetrics.processor_worker_run_time.record(workerPool.runTime?.average, labels)
-        processMetrics.processor_worker_utilization.record(workerPool.utilization, labels)
-        processMetrics.processor_worker_queue_size.record(workerPool.queueSize, labels)
-        processMetrics.processor_worker_completed.record(workerPool.completed, labels)
+      const labels = {
+        chain_id: processor.config?.network,
+        processor: processor.config?.name,
+        workerPool: 'parseLog'
       }
+      processMetrics.processor_worker_run_time.add(Date.now() - start, labels)
+      processMetrics.processor_worker_completed.add(1, labels)
+      processMetrics.processor_worker_queue_size.record(workerPool.queueSize, labels)
     }
     return null
   } else {
@@ -99,6 +95,7 @@ export async function decodeTrace(processor: any, inputs: readonly ParamType[], 
       workerPool = new Piscina(options)
       processor._traceWorkerPool = workerPool
     }
+    const start = Date.now()
     try {
       const result = (await workerPool.run({ inputs, traceData }, { name: 'decodeTrace' })) as IResult
       if (result) {
@@ -111,18 +108,14 @@ export async function decodeTrace(processor: any, inputs: readonly ParamType[], 
         throw e
       }
     } finally {
-      if (GLOBAL_CONFIG.execution.ethAbiDecoderConfig?.recordTiming && workerPool.waitTime && workerPool.runTime) {
-        const labels = {
-          chain_id: processor.config?.network,
-          processor: processor.config?.name,
-          workerPool: 'parseLog'
-        }
-        processMetrics.processor_worker_wait_time.record(workerPool.waitTime.average, labels)
-        processMetrics.processor_worker_run_time.record(workerPool.runTime?.average, labels)
-        processMetrics.processor_worker_utilization.record(workerPool.utilization, labels)
-        processMetrics.processor_worker_queue_size.record(workerPool.queueSize, labels)
-        processMetrics.processor_worker_completed.record(workerPool.completed, labels)
+      const labels = {
+        chain_id: processor.config?.network,
+        processor: processor.config?.name,
+        workerPool: 'decodeTrace'
       }
+      processMetrics.processor_worker_run_time.add(Date.now() - start, labels)
+      processMetrics.processor_worker_completed.add(1, labels)
+      processMetrics.processor_worker_queue_size.record(workerPool.queueSize, labels)
     }
     return null
   } else {

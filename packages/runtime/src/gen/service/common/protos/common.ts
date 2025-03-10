@@ -667,6 +667,7 @@ export interface Query {
   labelSelector: { [key: string]: string };
   aggregate: Aggregate | undefined;
   functions: Function[];
+  color: string;
   disabled: boolean;
 }
 
@@ -873,6 +874,7 @@ export interface SegmentationQuery {
   groupBy: string[];
   limit: number;
   functions: Function[];
+  color: string;
   disabled: boolean;
 }
 
@@ -1481,6 +1483,7 @@ export interface PriceSegmentationQuery {
   id: string;
   alias: string;
   coinId: CoinID[];
+  color: string;
   disabled: boolean;
 }
 
@@ -5755,7 +5758,16 @@ export const Function = {
 };
 
 function createBaseQuery(): Query {
-  return { query: "", alias: "", id: "", labelSelector: {}, aggregate: undefined, functions: [], disabled: false };
+  return {
+    query: "",
+    alias: "",
+    id: "",
+    labelSelector: {},
+    aggregate: undefined,
+    functions: [],
+    color: "",
+    disabled: false,
+  };
 }
 
 export const Query = {
@@ -5777,6 +5789,9 @@ export const Query = {
     }
     for (const v of message.functions) {
       Function.encode(v!, writer.uint32(58).fork()).ldelim();
+    }
+    if (message.color !== "") {
+      writer.uint32(74).string(message.color);
     }
     if (message.disabled !== false) {
       writer.uint32(64).bool(message.disabled);
@@ -5836,6 +5851,13 @@ export const Query = {
 
           message.functions.push(Function.decode(reader, reader.uint32()));
           continue;
+        case 9:
+          if (tag !== 74) {
+            break;
+          }
+
+          message.color = reader.string();
+          continue;
         case 8:
           if (tag !== 64) {
             break;
@@ -5867,6 +5889,7 @@ export const Query = {
       functions: globalThis.Array.isArray(object?.functions)
         ? object.functions.map((e: any) => Function.fromJSON(e))
         : [],
+      color: isSet(object.color) ? globalThis.String(object.color) : "",
       disabled: isSet(object.disabled) ? globalThis.Boolean(object.disabled) : false,
     };
   },
@@ -5897,6 +5920,9 @@ export const Query = {
     if (message.functions?.length) {
       obj.functions = message.functions.map((e) => Function.toJSON(e));
     }
+    if (message.color !== "") {
+      obj.color = message.color;
+    }
     if (message.disabled !== false) {
       obj.disabled = message.disabled;
     }
@@ -5924,6 +5950,7 @@ export const Query = {
       ? Aggregate.fromPartial(object.aggregate)
       : undefined;
     message.functions = object.functions?.map((e) => Function.fromPartial(e)) || [];
+    message.color = object.color ?? "";
     message.disabled = object.disabled ?? false;
     return message;
   },
@@ -6510,6 +6537,7 @@ function createBaseSegmentationQuery(): SegmentationQuery {
     groupBy: [],
     limit: 0,
     functions: [],
+    color: "",
     disabled: false,
   };
 }
@@ -6539,6 +6567,9 @@ export const SegmentationQuery = {
     }
     for (const v of message.functions) {
       Function.encode(v!, writer.uint32(74).fork()).ldelim();
+    }
+    if (message.color !== "") {
+      writer.uint32(82).string(message.color);
     }
     if (message.disabled !== false) {
       writer.uint32(56).bool(message.disabled);
@@ -6609,6 +6640,13 @@ export const SegmentationQuery = {
 
           message.functions.push(Function.decode(reader, reader.uint32()));
           continue;
+        case 10:
+          if (tag !== 82) {
+            break;
+          }
+
+          message.color = reader.string();
+          continue;
         case 7:
           if (tag !== 56) {
             break;
@@ -6639,6 +6677,7 @@ export const SegmentationQuery = {
       functions: globalThis.Array.isArray(object?.functions)
         ? object.functions.map((e: any) => Function.fromJSON(e))
         : [],
+      color: isSet(object.color) ? globalThis.String(object.color) : "",
       disabled: isSet(object.disabled) ? globalThis.Boolean(object.disabled) : false,
     };
   },
@@ -6669,6 +6708,9 @@ export const SegmentationQuery = {
     if (message.functions?.length) {
       obj.functions = message.functions.map((e) => Function.toJSON(e));
     }
+    if (message.color !== "") {
+      obj.color = message.color;
+    }
     if (message.disabled !== false) {
       obj.disabled = message.disabled;
     }
@@ -6694,6 +6736,7 @@ export const SegmentationQuery = {
     message.groupBy = object.groupBy?.map((e) => e) || [];
     message.limit = object.limit ?? 0;
     message.functions = object.functions?.map((e) => Function.fromPartial(e)) || [];
+    message.color = object.color ?? "";
     message.disabled = object.disabled ?? false;
     return message;
   },
@@ -9815,7 +9858,7 @@ export const CoinID_AddressIdentifier = {
 };
 
 function createBasePriceSegmentationQuery(): PriceSegmentationQuery {
-  return { id: "", alias: "", coinId: [], disabled: false };
+  return { id: "", alias: "", coinId: [], color: "", disabled: false };
 }
 
 export const PriceSegmentationQuery = {
@@ -9828,6 +9871,9 @@ export const PriceSegmentationQuery = {
     }
     for (const v of message.coinId) {
       CoinID.encode(v!, writer.uint32(26).fork()).ldelim();
+    }
+    if (message.color !== "") {
+      writer.uint32(34).string(message.color);
     }
     if (message.disabled !== false) {
       writer.uint32(72).bool(message.disabled);
@@ -9863,6 +9909,13 @@ export const PriceSegmentationQuery = {
 
           message.coinId.push(CoinID.decode(reader, reader.uint32()));
           continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.color = reader.string();
+          continue;
         case 9:
           if (tag !== 72) {
             break;
@@ -9884,6 +9937,7 @@ export const PriceSegmentationQuery = {
       id: isSet(object.id) ? globalThis.String(object.id) : "",
       alias: isSet(object.alias) ? globalThis.String(object.alias) : "",
       coinId: globalThis.Array.isArray(object?.coinId) ? object.coinId.map((e: any) => CoinID.fromJSON(e)) : [],
+      color: isSet(object.color) ? globalThis.String(object.color) : "",
       disabled: isSet(object.disabled) ? globalThis.Boolean(object.disabled) : false,
     };
   },
@@ -9899,6 +9953,9 @@ export const PriceSegmentationQuery = {
     if (message.coinId?.length) {
       obj.coinId = message.coinId.map((e) => CoinID.toJSON(e));
     }
+    if (message.color !== "") {
+      obj.color = message.color;
+    }
     if (message.disabled !== false) {
       obj.disabled = message.disabled;
     }
@@ -9913,6 +9970,7 @@ export const PriceSegmentationQuery = {
     message.id = object.id ?? "";
     message.alias = object.alias ?? "";
     message.coinId = object.coinId?.map((e) => CoinID.fromPartial(e)) || [];
+    message.color = object.color ?? "";
     message.disabled = object.disabled ?? false;
     return message;
   },
