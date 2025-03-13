@@ -413,7 +413,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     yield* from(subject).pipe(withAbort(context.signal))
   }
 
-  private async handleRequests(
+  protected async handleRequests(
     requests: AsyncIterable<ProcessStreamRequest>,
     subject: Subject<DeepPartial<ProcessStreamResponse>>
   ) {
@@ -474,7 +474,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
   }
 }
 
-function recordRuntimeInfo(results: ProcessResult, handlerType: HandlerType) {
+export function recordRuntimeInfo(results: ProcessResult, handlerType: HandlerType) {
   for (const list of [results.gauges, results.counters, results.events, results.exports]) {
     list.forEach((e) => {
       e.runtimeInfo = {

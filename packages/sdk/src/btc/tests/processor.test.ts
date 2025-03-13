@@ -5,7 +5,7 @@ import { BTCChainId } from '@sentio/chain'
 import { State } from '@sentio/runtime'
 import { BTCProcessor } from '../btc-processor.js'
 import { BTCContext, Transaction } from '../types.js'
-import testData from './test-data.json'
+import testData from './test-data.json' with { type: 'json' }
 
 describe('btc processor tests', () => {
   const service = new TestProcessorServer(async () => {

@@ -2,7 +2,7 @@ import { before, after, describe, test } from 'node:test'
 import { TestProcessorServer } from '../../testing/index.js'
 import { expect } from 'chai'
 import { CosmosChainId } from '@sentio/chain'
-import testData from './test-data.json'
+import testData from './test-data.json' with { type: 'json' }
 import { State } from '@sentio/runtime'
 import { CosmosProcessor } from '../index.js'
 

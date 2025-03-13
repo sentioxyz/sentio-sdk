@@ -13,7 +13,7 @@ function stringify(obj: any): string {
   })
 }
 
-export function setupLogger(json: boolean, enableDebug: boolean) {
+export function setupLogger(json: boolean, enableDebug: boolean, workerId?: number) {
   const utilFormatter = {
     transform: (info: any) => {
       const stringRes = []
@@ -45,7 +45,8 @@ export function setupLogger(json: boolean, enableDebug: boolean) {
       format.timestamp({ format: 'YYYY-MM-DDTHH:mm:ss.SSSZ' }),
       utilFormatter,
       format.errors({ stack: true }),
-      json ? format.json() : format.simple()
+      json ? format.json() : format.simple(),
+      format.label({ label: workerId ? `worker #{workerId}` : '' })
     ),
     level: enableDebug ? 'debug' : 'info',
     transports: [new transports.Console()]

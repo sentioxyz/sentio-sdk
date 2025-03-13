@@ -2,9 +2,9 @@ import { describe, it } from 'node:test'
 import { hash, events, CallData } from 'starknet'
 import assert from 'assert'
 
-import sierra from './testsierra.json'
+import sierra from './testsierra.json' with { type: 'json' }
 
-import test_events_data from './events-data.json'
+import test_events_data from './events-data.json' with { type: 'json' }
 
 describe('Test Starknet event decode', () => {
   it('event name to keys', () => {
