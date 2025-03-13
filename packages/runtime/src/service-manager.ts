@@ -144,6 +144,7 @@ export class ServiceManager extends ProcessorServiceImpl {
     if (this.pool) {
       await this.pool.close()
     }
+    console.info('Initializing worker pool with worker count:', this.options.worker)
     this.pool = new Piscina({
       maxThreads: this.options.worker,
       minThreads: this.options.worker,

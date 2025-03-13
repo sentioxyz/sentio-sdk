@@ -24,6 +24,12 @@ import { ServiceManager } from './service-manager.js'
 
 // const mergedRegistry = Registry.merge([globalRegistry, niceGrpcRegistry])
 
+let workerNum = 1
+try {
+  workerNum = parseInt(process.env['PROCESSOR_WORKER']?.trim() ?? '1')
+} catch (e) {
+  console.error('Failed to parse worker number', e)
+}
 export const optionDefinitions = [
   { name: 'target', type: String, defaultOption: true },
   { name: 'port', alias: 'p', type: String, defaultValue: '4000' },
@@ -42,7 +48,7 @@ export const optionDefinitions = [
   { name: 'debug', type: Boolean, defaultValue: false },
   { name: 'otlp-debug', type: Boolean, defaultValue: false },
   { name: 'start-action-server', type: Boolean, defaultValue: false },
-  { name: 'worker', type: Number, defaultValue: process.env['PROCESSOR_WORKER'] ?? 1 }
+  { name: 'worker', type: Number, defaultValue: workerNum }
 ]
 
 const options = commandLineArgs(optionDefinitions, { partial: true })
