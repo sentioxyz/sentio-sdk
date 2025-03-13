@@ -17,7 +17,7 @@ export class CoinList implements MoveCoinList<TokenInfo, AptosNetwork> {
   }
 
   async getCoinInfo(type: string, network: AptosNetwork = AptosNetwork.MAIN_NET) {
-    return getTokenInfoWithFallback(type)
+    return getTokenInfoWithFallback(type, network)
   }
 
   whiteListed(type: string): boolean {
