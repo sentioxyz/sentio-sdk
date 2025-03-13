@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-import path from 'path'
 import fs from 'fs-extra'
 
 import { compressionAlgorithms } from '@grpc/grpc-js'
@@ -15,17 +14,17 @@ import { Session } from 'node:inspector/promises'
 
 import { ProcessorDefinition } from './gen/processor/protos/processor.js'
 import { ProcessorServiceImpl } from './service.js'
-import { Endpoints } from './endpoints.js'
+import { configureEndpoints } from './endpoints.js'
 import { FullProcessorServiceImpl } from './full-service.js'
-import { ChainConfig } from './chain-config.js'
 import { setupLogger } from './logger.js'
 
 import { setupOTLP } from './otlp.js'
 import { ActionServer } from './action-server.js'
+import { ServiceManager } from './service-manager.js'
 
 // const mergedRegistry = Registry.merge([globalRegistry, niceGrpcRegistry])
 
-const optionDefinitions = [
+export const optionDefinitions = [
   { name: 'target', type: String, defaultOption: true },
   { name: 'port', alias: 'p', type: String, defaultValue: '4000' },
   { name: 'concurrency', type: Number, defaultValue: 4 },
@@ -42,12 +41,13 @@ const optionDefinitions = [
   { name: 'log-format', type: String, defaultValue: 'console' },
   { name: 'debug', type: Boolean, defaultValue: false },
   { name: 'otlp-debug', type: Boolean, defaultValue: false },
-  { name: 'start-action-server', type: Boolean, defaultValue: false }
+  { name: 'start-action-server', type: Boolean, defaultValue: false },
+  { name: 'worker', type: Number, defaultValue: process.env['PROCESSOR_WORKER'] ?? 1 }
 ]
 
 const options = commandLineArgs(optionDefinitions, { partial: true })
 
-const logLevel = process.env['LOG_LEVEL']?.toUpperCase()
+const logLevel = process.env['LOG_LEVEL']?.toLowerCase()
 
 setupLogger(options['log-format'] === 'json', logLevel === 'debug' ? true : options.debug)
 console.debug('Starting with', options.target)
@@ -56,39 +56,12 @@ await setupOTLP(options['otlp-debug'])
 
 Error.stackTraceLimit = 20
 
-const fullPath = path.resolve(options['chains-config'])
-const chainsConfig = fs.readJsonSync(fullPath)
-
-const concurrencyOverride = process.env['OVERRIDE_CONCURRENCY']
-  ? parseInt(process.env['OVERRIDE_CONCURRENCY'])
-  : undefined
-const batchCountOverride = process.env['OVERRIDE_BATCH_COUNT']
-  ? parseInt(process.env['OVERRIDE_BATCH_COUNT'])
-  : undefined
-
-Endpoints.INSTANCE.concurrency = concurrencyOverride ?? options.concurrency
-Endpoints.INSTANCE.batchCount = batchCountOverride ?? options['batch-count']
-Endpoints.INSTANCE.chainQueryAPI = options['chainquery-server']
-Endpoints.INSTANCE.priceFeedAPI = options['pricefeed-server']
-
-for (const [id, config] of Object.entries(chainsConfig)) {
-  const chainConfig = config as ChainConfig
-  if (chainConfig.ChainServer) {
-    Endpoints.INSTANCE.chainServer.set(id, chainConfig.ChainServer)
-  } else {
-    const http = chainConfig.Https?.[0]
-    if (http) {
-      Endpoints.INSTANCE.chainServer.set(id, http)
-    } else {
-      console.error('not valid config for chain', id)
-    }
-  }
-}
+configureEndpoints(options)
 
 console.debug('Starting Server', options)
 
 let server: any
-let baseService: ProcessorServiceImpl
+let baseService: ProcessorServiceImpl | ServiceManager
 const loader = async () => {
   const m = await import(options.target)
   console.debug('Module loaded', m)
@@ -106,7 +79,13 @@ if (options['start-action-server']) {
     // .use(prometheusServerMiddleware())
     .use(openTelemetryServerMiddleware())
     .use(errorDetailsServerMiddleware)
-  baseService = new ProcessorServiceImpl(loader, server.shutdown)
+
+  if (options.worker > 1) {
+    baseService = new ServiceManager(options, loader, server.shutdown)
+  } else {
+    baseService = new ProcessorServiceImpl(loader, server.shutdown)
+  }
+
   const service = new FullProcessorServiceImpl(baseService)
 
   server.add(ProcessorDefinition, service)

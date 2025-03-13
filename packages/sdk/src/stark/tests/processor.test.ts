@@ -2,7 +2,7 @@ import { after, before, describe, test } from 'node:test'
 import { TestProcessorServer } from '../../testing/index.js'
 import { StarknetChainId } from '@sentio/chain'
 import { expect } from 'chai'
-import eventsData from './events-data.json'
+import eventsData from './events-data.json' with { type: 'json' }
 import { State } from '@sentio/runtime'
 import { VotingContractProcessor } from './types/VotingContract-processor.js'
 

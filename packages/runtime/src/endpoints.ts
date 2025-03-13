@@ -1,3 +1,7 @@
+import path from 'path'
+import fs from 'fs-extra'
+import { ChainConfig } from './chain-config.js'
+
 export class Endpoints {
   static INSTANCE: Endpoints = new Endpoints()
 
@@ -8,4 +12,35 @@ export class Endpoints {
   chainServer = new Map<string, string>()
 
   batchCount = 1
+}
+
+export function configureEndpoints(options: any) {
+  const fullPath = path.resolve(options['chains-config'])
+  const chainsConfig = fs.readJsonSync(fullPath)
+
+  const concurrencyOverride = process.env['OVERRIDE_CONCURRENCY']
+    ? parseInt(process.env['OVERRIDE_CONCURRENCY'])
+    : undefined
+  const batchCountOverride = process.env['OVERRIDE_BATCH_COUNT']
+    ? parseInt(process.env['OVERRIDE_BATCH_COUNT'])
+    : undefined
+
+  Endpoints.INSTANCE.concurrency = concurrencyOverride ?? options.concurrency
+  Endpoints.INSTANCE.batchCount = batchCountOverride ?? options['batch-count']
+  Endpoints.INSTANCE.chainQueryAPI = options['chainquery-server']
+  Endpoints.INSTANCE.priceFeedAPI = options['pricefeed-server']
+
+  for (const [id, config] of Object.entries(chainsConfig)) {
+    const chainConfig = config as ChainConfig
+    if (chainConfig.ChainServer) {
+      Endpoints.INSTANCE.chainServer.set(id, chainConfig.ChainServer)
+    } else {
+      const http = chainConfig.Https?.[0]
+      if (http) {
+        Endpoints.INSTANCE.chainServer.set(id, http)
+      } else {
+        console.error('not valid config for chain', id)
+      }
+    }
+  }
 }

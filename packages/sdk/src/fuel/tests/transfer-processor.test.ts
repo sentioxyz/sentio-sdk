@@ -4,7 +4,7 @@ import { FuelAssetProcessor } from '../asset-processor.js'
 import { FuelChainId } from '@sentio/chain'
 import { ZeroBytes32 as BaseAssetId } from '@fuel-ts/address/configs'
 import { expect } from 'chai'
-import testTransferData from './transfer-data.json'
+import testTransferData from './transfer-data.json' with { type: 'json' }
 import { State } from '@sentio/runtime'
 
 describe('fuel network transfer tests', () => {

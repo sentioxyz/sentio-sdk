@@ -1,10 +1,9 @@
-import { StoreContext } from './context.js'
 import { DatabaseSchema } from '../core/index.js'
 import { BigDecimal } from '@sentio/bigdecimal'
 import { AbstractEntity as Entity, Bytes, Float, ID, Int, Timestamp } from './types.js'
 import type { DBRequest, Entity as EntityStruct, RichValue } from '@sentio/protos'
 import { DBRequest_DBOperator, DBResponse } from '@sentio/protos'
-import { PluginManager } from '@sentio/runtime'
+import { IStoreContext, PluginManager } from '@sentio/runtime'
 import { Cursor } from './cursor.js'
 import { serializeRichValue } from './util.js'
 
@@ -29,7 +28,7 @@ export function getEntityName<T>(entity: EntityClass<T> | T | string): string {
 }
 
 export class Store {
-  constructor(private readonly context: StoreContext) {}
+  constructor(private readonly context: IStoreContext) {}
 
   async get<T extends Entity>(entity: EntityClass<T> | string, id: ID): Promise<T | undefined> {
     const entityName = getEntityName(entity)

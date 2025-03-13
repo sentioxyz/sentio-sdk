@@ -3,8 +3,8 @@ import assert from 'assert'
 import { TestProcessorServer } from '../../testing/index.js'
 import { FuelProcessor } from '../fuel-processor.js'
 import { FuelChainId } from '@sentio/chain'
-import abi from './abis/counter-contract-abi.json'
-import testData from './test-data.json'
+import abi from './abis/counter-contract-abi.json' with { type: 'json' }
+import testData from './test-data.json' with { type: 'json' }
 import { State } from '@sentio/runtime'
 import { bn, calculateVmTxMemory, Interface } from 'fuels'
 import { getProvider } from '../network.js'

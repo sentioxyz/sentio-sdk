@@ -2,7 +2,7 @@ import { before, after, describe, test } from 'node:test'
 import { TestProcessorServer } from '../../testing/index.js'
 import { FuelChainId } from '@sentio/chain'
 import { expect } from 'chai'
-import testData from './tx-data.json'
+import testData from './tx-data.json' with { type: 'json' }
 import { State } from '@sentio/runtime'
 import { FuelGlobalProcessor } from '../global-processor.js'
 

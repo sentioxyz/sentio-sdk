@@ -7,7 +7,7 @@ import {
   ProcessResult,
   StartRequest
 } from '@sentio/protos'
-import { StoreContext } from './db-context.js'
+import { IStoreContext, StoreContext } from './db-context.js'
 import { AsyncLocalStorage } from 'node:async_hooks'
 
 export abstract class Plugin {
@@ -48,7 +48,7 @@ export abstract class Plugin {
 export class PluginManager {
   static INSTANCE = new PluginManager()
 
-  dbContextLocalStorage = new AsyncLocalStorage<StoreContext | undefined>()
+  dbContextLocalStorage = new AsyncLocalStorage<IStoreContext | undefined>()
   plugins: Plugin[] = []
   typesToPlugin = new Map<HandlerType, Plugin>()
 
@@ -93,7 +93,7 @@ export class PluginManager {
   processBinding(
     request: DataBinding,
     preparedData: PreparedData | undefined,
-    dbContext?: StoreContext
+    dbContext?: IStoreContext
   ): Promise<ProcessResult> {
     const plugin = this.typesToPlugin.get(request.handlerType)
     if (!plugin) {

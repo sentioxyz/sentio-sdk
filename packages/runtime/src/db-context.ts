@@ -9,6 +9,7 @@ import {
 } from '@sentio/protos'
 import * as process from 'node:process'
 import { dbMetrics } from './metrics.js'
+
 const {
   request_errors,
   unsolved_requests,
@@ -27,19 +28,26 @@ type RequestType = keyof Request
 
 export const timeoutError = new Error('timeout')
 
-export class StoreContext {
+export interface IStoreContext {
+  sendRequest(request: DeepPartial<Request>, timeoutSecs?: number): Promise<DBResponse>
+
+  result(dbResult: DBResponse): void
+
+  error(processId: number, e: any): void
+
+  close(): void
+}
+
+export abstract class AbstractStoreContext implements IStoreContext {
   private static opCounter = 0n
-  private defers = new Map<
+  protected defers = new Map<
     bigint,
     { resolve: (value: any) => void; reject: (reason?: any) => void; requestType?: RequestType }
   >()
   private statsInterval: NodeJS.Timeout | undefined
   private pendings: Promise<unknown>[] = []
 
-  constructor(
-    readonly subject: Subject<DeepPartial<ProcessStreamResponse>>,
-    readonly processId: number
-  ) {}
+  constructor(readonly processId: number) {}
 
   newPromise<T>(opId: bigint, requestType?: RequestType) {
     return new Promise<T>((resolve, reject) => {
@@ -47,6 +55,8 @@ export class StoreContext {
       unsolved_requests.record(this.defers.size, { processId: this.processId })
     })
   }
+
+  abstract doSend(resp: DeepPartial<ProcessStreamResponse>): void
 
   sendRequest(request: DeepPartial<Request>, timeoutSecs?: number): Promise<DBResponse> {
     if (STORE_BATCH_IDLE > 0 && STORE_BATCH_SIZE > 1 && request.upsert) {
@@ -67,12 +77,11 @@ export class StoreContext {
       promises.push(timeoutPromise)
     }
 
-    this.subject.next({
+    this.doSend({
       dbRequest: {
         ...request,
         opId
-      },
-      processId: this.processId
+      }
     })
 
     send_counts[requestType]?.add(1)
@@ -80,7 +89,7 @@ export class StoreContext {
     if (requestType === 'upsert' && STORE_UPSERT_NO_WAIT) {
       this.pendings.push(promise)
       return Promise.resolve({
-        opId,
+        opId
       } as DBResponse)
     }
 
@@ -131,10 +140,7 @@ export class StoreContext {
         error: e?.toString()
       }
     })
-    this.subject.next({
-      result: errorResult,
-      processId
-    })
+    this.doSend({ result: errorResult, processId })
   }
 
   close() {
@@ -188,7 +194,7 @@ export class StoreContext {
         opId,
         request: req,
         promise,
-        timer: timeout,
+        timer: timeout
       }
 
       if (STORE_UPSERT_NO_WAIT) {
@@ -208,12 +214,11 @@ export class StoreContext {
       // console.debug('sending batch upsert', opId, 'batch size', request?.entity.length)
       clearTimeout(timer)
       this.upsertBatch = undefined
-      this.subject.next({
+      this.doSend({
         dbRequest: {
           upsert: request,
           opId
-        },
-        processId: this.processId
+        }
       })
       send_counts['upsert']?.add(1)
       batched_request_count.add(1)
@@ -223,5 +228,21 @@ export class StoreContext {
 
   async awaitPendings() {
     await Promise.all(this.pendings)
+  }
+}
+
+export class StoreContext extends AbstractStoreContext {
+  constructor(
+    readonly subject: Subject<DeepPartial<ProcessStreamResponse>>,
+    processId: number
+  ) {
+    super(processId)
+  }
+
+  doSend(resp: DeepPartial<ProcessStreamResponse>) {
+    this.subject.next({
+      ...resp,
+      processId: this.processId
+    })
   }
 }
