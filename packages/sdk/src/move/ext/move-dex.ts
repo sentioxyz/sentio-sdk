@@ -49,7 +49,7 @@ export class MoveDex<
   }
 
   async recordTradingVolume(
-    ctx: ContextType,
+    ctx: AccountContextType,
     coinx: string,
     coiny: string,
     coinXAmount: bigint,
@@ -63,12 +63,12 @@ export class MoveDex<
     if (!whitelistx && !whitelisty) {
       return result
     }
-    const coinXInfo = await this.coinList.getCoinInfo(coinx)
-    const coinYInfo = await this.coinList.getCoinInfo(coiny)
+    const coinXInfo = await this.coinList.getCoinInfo(coinx, ctx.network)
+    const coinYInfo = await this.coinList.getCoinInfo(coiny, ctx.network)
     const timestamp = ctx.getTimestamp()
     let resultX = BigDecimal(0)
     let resultY = BigDecimal(0)
-    const pair = await this.getPair(coinx, coiny)
+    const pair = await this.getPair(coinx, coiny, ctx)
     const baseLabels: Record<string, string> = extraLabels ? { ...extraLabels, pair } : { pair }
     if (whitelistx) {
       resultX = await this.coinList.calculateValueInUsd(coinXAmount, coinXInfo, timestamp, ctx.network)
@@ -130,12 +130,12 @@ export class MoveDex<
         continue
       }
 
-      const pair = await this.getPair(coinx, coiny)
+      const pair = await this.getPair(coinx, coiny, ctx)
       const extraLabels = this.poolAdaptor.getExtraPoolTags(pool)
       const baseLabels: Record<string, string> = { ...extraLabels, pair }
 
-      const coinXInfo = await this.coinList.getCoinInfo(coinx)
-      const coinYInfo = await this.coinList.getCoinInfo(coiny)
+      const coinXInfo = await this.coinList.getCoinInfo(coinx, ctx.network)
+      const coinYInfo = await this.coinList.getCoinInfo(coiny, ctx.network)
 
       const coinx_amount = this.poolAdaptor.getXReserve(pool.data_decoded)
       const coiny_amount = this.poolAdaptor.getYReserve(pool.data_decoded)
@@ -201,9 +201,9 @@ export class MoveDex<
     }
   }
 
-  async getPair(coinx: string, coiny: string): Promise<string> {
-    const coinXInfo = await this.coinList.getCoinInfo(coinx)
-    const coinYInfo = await this.coinList.getCoinInfo(coiny)
+  async getPair(coinx: string, coiny: string, ctx: AccountContextType): Promise<string> {
+    const coinXInfo = await this.coinList.getCoinInfo(coinx, ctx.network)
+    const coinYInfo = await this.coinList.getCoinInfo(coiny, ctx.network)
     if (coinXInfo.symbol.localeCompare(coinYInfo.symbol) > 0) {
       return `${coinYInfo.symbol}-${coinXInfo.symbol}`
     }
@@ -225,8 +225,8 @@ export async function moveGetPairValue<
 ): Promise<BigDecimal> {
   const whitelistx = coinList.whiteListed(coinx)
   const whitelisty = coinList.whiteListed(coiny)
-  const coinXInfo = await coinList.getCoinInfo(coinx)
-  const coinYInfo = await coinList.getCoinInfo(coiny)
+  const coinXInfo = await coinList.getCoinInfo(coinx, ctx.network)
+  const coinYInfo = await coinList.getCoinInfo(coiny, ctx.network)
   const timestamp = ctx.getTimestamp()
   let result = BigDecimal(0.0)
 
