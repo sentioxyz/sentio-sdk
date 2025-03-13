@@ -12,6 +12,6 @@ export interface BaseCoinInfo {
 export interface MoveCoinList<TokenType extends BaseCoinInfo, Network> {
   whiteListed(type: string): boolean
   whitelistCoins(): Map<string, TokenType>
-  getCoinInfo(type: string): Promise<TokenType>
+  getCoinInfo(type: string, network: Network): Promise<TokenType>
   calculateValueInUsd(amount: bigint, coinInfo: TokenType, timestamp: number, network: Network): Promise<BigDecimal>
 }

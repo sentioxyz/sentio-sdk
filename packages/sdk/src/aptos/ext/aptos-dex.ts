@@ -16,7 +16,7 @@ export class CoinList implements MoveCoinList<TokenInfo, AptosNetwork> {
     return tokenTokenValueInUsd(amount, coinInfo, timestamp, network)
   }
 
-  async getCoinInfo(type: string) {
+  async getCoinInfo(type: string, network: AptosNetwork = AptosNetwork.MAIN_NET) {
     return getTokenInfoWithFallback(type)
   }
 
