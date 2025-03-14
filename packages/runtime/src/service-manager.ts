@@ -108,7 +108,7 @@ export class ServiceManager extends ProcessorServiceImpl {
           const dbContext = this.contexts.new(request.processId, subject)
 
           const start = Date.now()
-          await this.process(binding, dbContext)
+          this.process(binding, dbContext)
             .then(async (result) => {
               subject.next({
                 result,

@@ -19,7 +19,7 @@ class TestPlugin extends Plugin {
       }
     })
   }
-  supportedHandlers = [HandlerType.UNKNOWN]
+  supportedHandlers = [HandlerType.UNKNOWN, HandlerType.ETH_LOG]
 }
 
 PluginManager.INSTANCE.plugins = []
