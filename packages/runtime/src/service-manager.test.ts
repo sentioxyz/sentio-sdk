@@ -58,6 +58,24 @@ describe('Test Service Manager with worker', () => {
     assert(opId >= 0, 'opId should be greater than 0')
   })
 
+  test('Check startup flow', async () => {
+    const subject = new Subject<DeepPartial<PreprocessStreamResponse>>()
+    let opId: bigint = -1n
+    subject.subscribe((req) => {
+      opId = req.dbRequest?.opId ?? -1n
+      // response something to unblock the processor
+      context.result({
+        opId
+      })
+    })
+    const context = new ChannelStoreContext(subject, 1)
+
+    await service.start({ templateInstances: [] }, TEST_CONTEXT)
+    await service.getConfig({}, TEST_CONTEXT)
+
+    assert(opId >= 0, 'opId should be greater than 0')
+  })
+
   after(async () => {
     await service.stop({}, TEST_CONTEXT)
   })
