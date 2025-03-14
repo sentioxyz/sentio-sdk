@@ -309,7 +309,7 @@ export class SuiObjectTypeProcessor<T> extends SuiBaseObjectOrAddressProcessor<
         await handler(data.rawChanges.map((r) => JSON.parse(r)) as SuiObjectChange[], ctx)
         return ctx.stopAndGetResult()
       },
-      type: this.objectType.qname
+      type: this.objectType.getSignature()
     })
 
     return this
