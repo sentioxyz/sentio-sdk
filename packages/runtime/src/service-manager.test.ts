@@ -140,7 +140,7 @@ describe('Test Service Manager with worker', () => {
           generator.push({
             processId: 1,
             dbResult: {
-              opId: resp.dbRequest?.opId!
+              opId: resp.dbRequest?.opId ?? -1n
             }
           })
         }
