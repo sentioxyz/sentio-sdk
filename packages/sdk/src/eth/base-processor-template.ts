@@ -169,7 +169,7 @@ export abstract class BaseProcessorTemplate<
   public onTimeInterval(
     handler: (block: BlockParams, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     timeIntervalInMinutes = 60,
-    backfillBlockInterval = 240,
+    backfillTimeIntervalInMinutes = 240,
     fetchConfig?: EthFetchConfig,
     preprocessHandler: (
       block: BlockParams,
@@ -179,7 +179,7 @@ export abstract class BaseProcessorTemplate<
   ) {
     return this.onInterval(
       handler,
-      { recentInterval: timeIntervalInMinutes, backfillInterval: backfillBlockInterval },
+      { recentInterval: timeIntervalInMinutes, backfillInterval: backfillTimeIntervalInMinutes },
       undefined,
       fetchConfig,
       preprocessHandler
