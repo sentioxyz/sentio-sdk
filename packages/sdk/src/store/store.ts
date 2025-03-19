@@ -1,6 +1,6 @@
 import { DatabaseSchema } from '../core/index.js'
 import { BigDecimal } from '@sentio/bigdecimal'
-import { AbstractEntity as Entity, Bytes, Float, ID, Int, Timestamp } from './types.js'
+import { AbstractEntity, AbstractEntity as Entity, Bytes, Float, ID, Int, Timestamp } from './types.js'
 import type { DBRequest, Entity as EntityStruct, RichValue } from '@sentio/protos'
 import { DBRequest_DBOperator, DBResponse } from '@sentio/protos'
 import { IStoreContext, PluginManager } from '@sentio/runtime'
@@ -25,6 +25,30 @@ export function getEntityName<T>(entity: EntityClass<T> | T | string): string {
     return (entity.constructor as any).entityName
   }
   throw new Error(`can't figure out entityName from ${typeof entity}`)
+}
+
+export function getEntityField<T>(entity: EntityClass<T> | T | string, field: string) {
+  const entityName = getEntityName(entity)
+  const entityClass = DatabaseSchema.findEntity(entityName) as unknown as AbstractEntity
+  if (!entityClass) {
+    throw new Error(`Entity ${entityName} not found`)
+  }
+  // @ts-ignore access prototype
+  const proto = Object.getPrototypeOf(entityClass.prototype)
+  const [fieldWithoutID, hasIDSuffix] = field.endsWith('IDs')
+    ? [field.slice(0, -3), true]
+    : field.endsWith('ID')
+      ? [field.slice(0, -2), true]
+      : [field, false]
+  if (
+    hasIDSuffix &&
+    Object.getOwnPropertyDescriptor(proto, fieldWithoutID) &&
+    Object.getOwnPropertyDescriptor(proto, field)
+  ) {
+    return fieldWithoutID
+  }
+
+  return field
 }
 
 export class Store {
@@ -155,9 +179,10 @@ export class Store {
                   //   = , != should set it to  [[]]
                   values = [serializeRichValue(f.value)]
               }
+              const field = getEntityField(entity, f.field as string)
 
               return {
-                field: f.field as string,
+                field,
                 op: ops[f.op],
                 value: {
                   values
