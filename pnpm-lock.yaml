@@ -143,6 +143,19 @@ importers:
         specifier: workspace:*
         version: link:../../packages/cli
 
+  examples/gr2:
+    dependencies:
+      '@graphprotocol/graph-ts':
+        specifier: 0.32.0
+        version: 0.32.0
+    devDependencies:
+      '@sentio/cli':
+        specifier: workspace:*
+        version: link:../../packages/cli
+      matchstick-as:
+        specifier: 0.5.0
+        version: 0.5.0
+
   examples/pyth-staking:
     dependencies:
       '@sentio/sdk':
@@ -531,8 +544,8 @@ importers:
         specifier: 2.2.2-1
         version: 2.2.2-1
       '@sentio/api':
-        specifier: 1.0.2-rc.11
-        version: 1.0.2-rc.11
+        specifier: 1.0.2
+        version: 1.0.2
       '@sentio/bigdecimal':
         specifier: 9.1.1-patch.3
         version: 9.1.1-patch.3
@@ -1197,6 +1210,12 @@ packages:
       graphql: ^15.5.0 || ^16.0.0 || ^17.0.0
       typescript: ^5.0.0
 
+  '@graphprotocol/graph-ts@0.27.0':
+    resolution: {integrity: sha512-r1SPDIZVQiGMxcY8rhFSM0y7d/xAbQf5vHMWUf59js1KgoyWpM6P3tczZqmQd7JTmeyNsDGIPzd9FeaxllsU4w==}
+
+  '@graphprotocol/graph-ts@0.32.0':
+    resolution: {integrity: sha512-YfKLT2w+ItXD/VPYQiAKtINQONVsAOkcqVFMHlhUy0fcEBVWuFBT53hJNI0/l5ujQa4TSxtzrKW/7EABAdgI8g==}
+
   '@graphql-typed-document-node/core@3.2.0':
     resolution: {integrity: sha512-mB9oAsNCm9aM3/SOv4YtBMqZbYj10R7dkq8byBqxGY/ncFwhf2oQzMV+LCRlWoDSEBJ3COiR1yeDvMtsoOsuFQ==}
     peerDependencies:
@@ -1210,6 +1229,9 @@ packages:
     resolution: {integrity: sha512-AiXO/bfe9bmxBjxxtYxFAXGZvMaN5s8kO+jBHAJCON8rJoB5YS/D6X7ZNc6XQkuHNmyl4CYaMI1fJ/Gn27RGGw==}
     engines: {node: '>=6'}
     hasBin: true
+
+  '@hey-api/client-fetch@0.8.3':
+    resolution: {integrity: sha512-EBVa8wwUMyBSeQ32PtCz6u5bFQZIMAufvwCT1ZtpjqT3caJQEza4NokbGU50q1ZVrMsM5Ot6GuDNJOF3TMo26Q==}
 
   '@humanwhocodes/module-importer@1.0.1':
     resolution: {integrity: sha512-bxveV4V8v5Yb4ncFTT3rPSgZBOpCkjfK0y4oVVVJwIuDVBRMDXrPyXRL988i5ap9m9bnyEEjWfm5WkBmtffLfA==}
@@ -1841,8 +1863,8 @@ packages:
     resolution: {integrity: sha512-GKJiyRwoSSkbenbWVsCbCJ4siSMKGhKUJgpoqjYYcS+CF1kZXIiH+KpS+1skh9hAY/Uk7QNH57SNlKE+0Af5Rg==}
     hasBin: true
 
-  '@sentio/api@1.0.2-rc.11':
-    resolution: {integrity: sha512-MxskMp2jlyzqvmgSPrSrP3MJxO+gPL2es9LiNM+YVNxkSD4gEfcfW1fITpPZZbuBpV4ucyU1UGJwE5DtI8+WIw==}
+  '@sentio/api@1.0.2':
+    resolution: {integrity: sha512-iKk0oMXfvNYQOFXH0jrdGze2wDuYt2GSEYz3uF4jrPeDXp0/es5JZJ4PG7mdET5MhCIWuMUqwQrY/NrL6xkF4Q==}
 
   '@sentio/bigdecimal@9.1.1-patch.3':
     resolution: {integrity: sha512-O5w8XdyeatUcwI+ZbpSw60/cXFPJk3NbpIupwMHfYmW8fpxpXyRbyGESNJNufWWrB6CadsWGh1R3rd7owvrmlw==}
@@ -2424,6 +2446,10 @@ packages:
     resolution: {integrity: sha512-FVnvrKJwpt9LP2lAMl8qZswRNm3T4q9CON+bxldk2iwk3FFpuwhx2FfinyitizWHsVYyaY+y5JzDR0rCMV5yTQ==}
     engines: {node: '>=12.0.0'}
 
+  assemblyscript@0.19.10:
+    resolution: {integrity: sha512-HavcUBXB3mBTRGJcpvaQjmnmaqKHBGREjSPNsIvnAk2f9dj78y4BkMaSSdvBQYWcDDzsHQjyUC8stICFkD1Odg==}
+    hasBin: true
+
   assemblyscript@0.19.23:
     resolution: {integrity: sha512-fwOQNZVTMga5KRsfY80g7cpOl4PsFQczMwHzdtgoqLXaYhkhavufKb0sB0l3T1DUxpAufA0KNhlbpuuhZUwxMA==}
     hasBin: true
@@ -2502,6 +2528,10 @@ packages:
   binary-install-raw@0.0.13:
     resolution: {integrity: sha512-v7ms6N/H7iciuk6QInon3/n2mu7oRX+6knJ9xFPsJ3rQePgAqcR3CRTwUheFd8SLbiq4LL7Z4G/44L9zscdt9A==}
     engines: {node: '>=10'}
+
+  binaryen@101.0.0-nightly.20210723:
+    resolution: {integrity: sha512-eioJNqhHlkguVSbblHOtLqlhtC882SOEPKmNFZaDuz1hzQjolxZ+eu3/kaS10n3sGPONsIZsO7R9fR00UyhEUA==}
+    hasBin: true
 
   binaryen@102.0.0-nightly.20211028:
     resolution: {integrity: sha512-GCJBVB5exbxzzvyt8MGDv/MeUjs6gkXDvf4xOIItRBptYl0Tz5sm1o/uG95YK0L0VeG5ajDu3hRtkBP2kzqC5w==}
@@ -4593,6 +4623,9 @@ packages:
     engines: {node: '>= 18'}
     hasBin: true
 
+  matchstick-as@0.5.0:
+    resolution: {integrity: sha512-4K619YDH+so129qt4RB4JCNxaFwJJYLXPc7drpG+/mIj86Cfzg6FKs/bA91cnajmS1CLHdhHl9vt6Kd6Oqvfkg==}
+
   md5.js@1.3.5:
     resolution: {integrity: sha512-xitP+WxNPcTTOgnTJcrhM0xvdPepipPSf3I8EIpGKeFLjt3PlJLIDG3u8EX53ZIubkb+5U2+3rELYpEhHhzdkg==}
 
@@ -6387,6 +6420,10 @@ packages:
     resolution: {integrity: sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==}
     engines: {node: '>= 0.8'}
 
+  wabt@1.0.24:
+    resolution: {integrity: sha512-8l7sIOd3i5GWfTWciPL0+ff/FK/deVK2Q6FN+MPz4vfUcD78i2M/49XJTwF6aml91uIiuXJEsLKWMB2cw/mtKg==}
+    hasBin: true
+
   wcwidth@1.0.1:
     resolution: {integrity: sha512-XHPEwS0q6TaxcvG85+8EYkbiCux2XtWG2mkc47Ng2A77BQu9+DqIOJldST4HgPkuea7dvKSj5VgX3P1d4rW8Tg==}
 
@@ -7164,6 +7201,14 @@ snapshots:
       graphql: 16.9.0
       typescript: 5.5.2
 
+  '@graphprotocol/graph-ts@0.27.0':
+    dependencies:
+      assemblyscript: 0.19.10
+
+  '@graphprotocol/graph-ts@0.32.0':
+    dependencies:
+      assemblyscript: 0.19.10
+
   '@graphql-typed-document-node/core@3.2.0(graphql@16.9.0)':
     dependencies:
       graphql: 16.9.0
@@ -7179,6 +7224,8 @@ snapshots:
       long: 5.2.3
       protobufjs: 7.3.2
       yargs: 17.7.2
+
+  '@hey-api/client-fetch@0.8.3': {}
 
   '@humanwhocodes/module-importer@1.0.1': {}
 
@@ -7962,7 +8009,9 @@ snapshots:
       fs-extra: 10.1.0
       yargs: 17.7.2
 
-  '@sentio/api@1.0.2-rc.11': {}
+  '@sentio/api@1.0.2':
+    dependencies:
+      '@hey-api/client-fetch': 0.8.3
 
   '@sentio/bigdecimal@9.1.1-patch.3': {}
 
@@ -8696,6 +8745,11 @@ snapshots:
       pvutils: 1.1.3
       tslib: 2.8.1
 
+  assemblyscript@0.19.10:
+    dependencies:
+      binaryen: 101.0.0-nightly.20210723
+      long: 4.0.0
+
   assemblyscript@0.19.23:
     dependencies:
       binaryen: 102.0.0-nightly.20211028
@@ -8772,6 +8826,8 @@ snapshots:
       tar: 6.2.1
     transitivePeerDependencies:
       - debug
+
+  binaryen@101.0.0-nightly.20210723: {}
 
   binaryen@102.0.0-nightly.20211028: {}
 
@@ -9690,7 +9746,7 @@ snapshots:
       debug: 4.3.5(supports-color@8.1.1)
       enhanced-resolve: 5.17.0
       eslint: 9.6.0
-      eslint-module-utils: 2.8.1(@typescript-eslint/parser@8.0.0(eslint@9.6.0)(typescript@5.5.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@8.0.0(eslint@9.6.0)(typescript@5.5.2))(eslint-plugin-import@2.29.1)(eslint@9.6.0))(eslint@9.6.0)
+      eslint-module-utils: 2.8.1(@typescript-eslint/parser@8.0.0(eslint@9.6.0)(typescript@5.5.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1)(eslint@9.6.0)
       eslint-plugin-import: 2.29.1(@typescript-eslint/parser@8.0.0(eslint@9.6.0)(typescript@5.5.2))(eslint-import-resolver-typescript@3.6.1)(eslint@9.6.0)
       fast-glob: 3.3.2
       get-tsconfig: 4.7.5
@@ -9702,7 +9758,7 @@ snapshots:
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-module-utils@2.8.1(@typescript-eslint/parser@8.0.0(eslint@9.6.0)(typescript@5.5.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@8.0.0(eslint@9.6.0)(typescript@5.5.2))(eslint-plugin-import@2.29.1)(eslint@9.6.0))(eslint@9.6.0):
+  eslint-module-utils@2.8.1(@typescript-eslint/parser@8.0.0(eslint@9.6.0)(typescript@5.5.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1)(eslint@9.6.0):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
@@ -9750,7 +9806,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 9.6.0
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.8.1(@typescript-eslint/parser@8.0.0(eslint@9.6.0)(typescript@5.5.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@8.0.0(eslint@9.6.0)(typescript@5.5.2))(eslint-plugin-import@2.29.1)(eslint@9.6.0))(eslint@9.6.0)
+      eslint-module-utils: 2.8.1(@typescript-eslint/parser@8.0.0(eslint@9.6.0)(typescript@5.5.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1)(eslint@9.6.0)
       hasown: 2.0.2
       is-core-module: 2.14.0
       is-glob: 4.0.3
@@ -11293,6 +11349,12 @@ snapshots:
       supports-hyperlinks: 3.0.0
 
   marked@12.0.2: {}
+
+  matchstick-as@0.5.0:
+    dependencies:
+      '@graphprotocol/graph-ts': 0.27.0
+      assemblyscript: 0.19.23
+      wabt: 1.0.24
 
   md5.js@1.3.5:
     dependencies:
@@ -13123,6 +13185,8 @@ snapshots:
   varint@6.0.0: {}
 
   vary@1.1.2: {}
+
+  wabt@1.0.24: {}
 
   wcwidth@1.0.1:
     dependencies:

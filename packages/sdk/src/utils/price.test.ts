@@ -1,26 +1,31 @@
-import { describe, test, mock } from 'node:test'
+import { describe, test, mock, TestContext } from 'node:test'
 import { getPriceByTypeOrSymbolInternal, getPriceClient } from './price.js'
-import { GetPriceRequest } from '@sentio/api'
-
-import { expect } from 'chai'
+import { GetPriceData } from '@sentio/api'
 
 describe('price client', () => {
   const client = getPriceClient()
 
-  test('get price', async () => {
+  test('get price', async (t) => {
     let priceValue = 1
-    mock.method(client, 'getPrice', (request: GetPriceRequest) => {
+    mock.method(client, 'getPrice', (request: GetPriceData) => {
       return Promise.resolve({
-        timestamp: new Date(),
-        price: priceValue++
+        data: {
+          timestamp: new Date(),
+          price: priceValue++
+        }
       })
     })
 
     for (let i = 0; i < 1000; i++) {
       const x = getPriceByTypeOrSymbolInternal(client, new Date(), { symbol: 'BTC' })
-      expect(await x).eq(i + 1)
+      t.assert.equal(await x, i + 1)
     }
     // const y =  getPriceByTypeOrSymbolInternal(client, new Date(), { symbol: "BTC" })
     // expect(await y).eq(2)
+  })
+
+  test('get price from server', async (t: TestContext) => {
+    const price = await getPriceByTypeOrSymbolInternal(client, new Date(), { symbol: 'ETH' })
+    t.assert.ok(price && price > 0)
   })
 })

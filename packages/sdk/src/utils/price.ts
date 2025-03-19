@@ -2,7 +2,7 @@ import { CoinID } from '@sentio/protos'
 import { Endpoints, processMetrics } from '@sentio/runtime'
 import { ChainId } from '@sentio/chain'
 import { LRUCache } from 'lru-cache'
-import { Configuration, PriceApi } from '@sentio/api'
+import { client, PriceService } from '@sentio/api'
 import path from 'path'
 import fs from 'fs'
 import os from 'os'
@@ -16,18 +16,17 @@ function getApiKey() {
 }
 
 export function getPriceClient(basePath = Endpoints.INSTANCE.priceFeedAPI) {
-  if (!basePath.startsWith('http')) {
+  if (basePath && !basePath.startsWith('http')) {
     basePath = 'http://' + basePath
   }
   if (basePath.endsWith('/')) {
     basePath = basePath.slice(0, -1)
   }
-  const config = new Configuration({
-    basePath,
-    apiKey: getApiKey()
+  client.setConfig({
+    baseUrl: basePath || 'https://app.sentio.xyz',
+    auth: getApiKey()
   })
-  const api = new PriceApi(config)
-  return api
+  return PriceService
 }
 
 const priceMap = new LRUCache<string, Promise<number | undefined>>({
@@ -35,6 +34,7 @@ const priceMap = new LRUCache<string, Promise<number | undefined>>({
   ttl: 1000 * 60 * 5 // 5 minutes
 })
 
+type PriceApi = typeof PriceService
 let priceClient: PriceApi
 
 interface PriceOptions {
@@ -69,20 +69,24 @@ export async function getPriceByTypeOrSymbolInternal(
 
   processMetrics.process_pricecall_count.add(1)
   const response = priceClient.getPrice({
-    timestamp: date,
-    coinIdSymbol: coinId.symbol,
-    coinIdAddressAddress: coinId.address?.address,
-    coinIdAddressChain: coinId.address?.chain
+    query: {
+      timestamp: date.toISOString(),
+      'coinId.symbol': coinId.symbol,
+      'coinId.address.address': coinId.address?.address,
+      'coinId.address.chain': coinId.address?.chain
+    }
   })
   price = response
     .then((res) => {
-      if (res.timestamp) {
-        const responseDateString = dateString(res.timestamp)
+      const { data } = res
+      if (data?.timestamp) {
+        const responseDate = new Date(data.timestamp)
+        const responseDateString = dateString(responseDate)
         if (responseDateString === todayDateString) {
           priceMap.delete(key)
         } else {
           // https://www.javatpoint.com/javascript-date-difference
-          const diff = Math.abs(res.timestamp.getTime() - date.getTime())
+          const diff = Math.abs(responseDate.getTime() - date.getTime())
           const daysDiff = diff / (1000 * 60 * 60 * 24)
           const tolerance = options?.toleranceInDays || 2
           if (daysDiff > tolerance) {
@@ -93,7 +97,7 @@ export async function getPriceByTypeOrSymbolInternal(
       } else {
         priceMap.delete(key)
       }
-      return res.price
+      return data?.price
     })
     .catch((e) => {
       setTimeout(() => {
@@ -162,15 +166,17 @@ export async function getCoinsThatHasPrice(chainId: ChainId) {
   if (!priceClient) {
     priceClient = getPriceClient()
   }
-  const response = await priceClient.priceListCoins({
-    chain: chainId,
-    limit: 1000
+  const { data } = await priceClient.priceListCoins({
+    query: {
+      chain: chainId,
+      limit: 1000
+    }
   })
 
-  if (!response.coinAddressesInChain) {
+  if (!data?.coinAddressesInChain) {
     return []
   }
-  return Object.entries(response.coinAddressesInChain).map(([symbol, coin]) => {
+  return Object.entries(data.coinAddressesInChain).map(([symbol, coin]) => {
     coin.symbol = symbol
     return coin
   })
