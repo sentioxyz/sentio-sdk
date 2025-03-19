@@ -625,6 +625,66 @@ describe('Test Database', () => {
     assert.equal(transactionsLike.length, 3)
   })
 
+  it('should allow filter with multiple filters', async () => {
+    const store = new Store(storeContext)
+
+    const Transaction1 = new Transaction({
+      id: 'transaction-1',
+      gas: 100n,
+      count: 0,
+      gasPrice: new BigDecimal('100.0'),
+      raw: new Uint8Array([1, 2, 3]),
+      arrayValue: ['1', '2', '3'],
+      arrayOfArrayValue: []
+    })
+    const Transaction2 = new Transaction({
+      id: 'transaction-2',
+      gas: 200n,
+      count: 0,
+      gasPrice: new BigDecimal('200.0'),
+      raw: new Uint8Array([1, 2, 3]),
+      arrayValue: ['4', '5', '6'],
+      arrayOfArrayValue: []
+    })
+    await store.upsert([Transaction1, Transaction2])
+
+    const filtered = await store.list(Transaction, [
+      { field: 'id', op: '=', value: 'transaction-1' },
+      { field: 'gas', op: '>=', value: 100n }
+    ])
+
+    assert.equal(filtered.length, 1)
+    assert.equal(filtered[0].id, Transaction1.id)
+  })
+
+  it('should allow filter with relation id field', async () => {
+    const store = new Store(storeContext)
+
+    const user1 = new User({
+      id: 'user-1',
+      name: 'test user',
+      transactionsIDs: ['transaction-1'],
+      organizationsIDs: []
+    })
+
+    const transaction1 = new Transaction({
+      id: 'transaction-1',
+      gas: 100n,
+      count: 0,
+      gasPrice: new BigDecimal('100.0'),
+      raw: new Uint8Array([1, 2, 3]),
+      arrayValue: ['1', '2', '3'],
+      arrayOfArrayValue: [],
+      senderID: user1.id
+    })
+
+    await store.upsert([user1, transaction1])
+
+    const filtered = await store.list(Transaction, [{ field: 'senderID', op: '=', value: user1.id }])
+
+    assert.equal(filtered.length, 1)
+  })
+
   afterEach(() => {
     db.reset()
   })

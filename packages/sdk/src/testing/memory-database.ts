@@ -208,16 +208,17 @@ export class MemoryDatabase {
       return entities
     }
 
-    let results = []
+    let results = entities
+    // filter combined with AND
     for (const f of filters ?? []) {
-      results = entities.filter((e) => filter(e, f))
+      results = results.filter((e) => filter(e, f))
     }
     return results
   }
 }
 
 function filter(entity: RichStruct, filter: DBRequest_DBFilter) {
-  const value = entity.fields[filter.field]
+  const value = getValue(entity, filter.field)
 
   switch (filter.op) {
     case DBRequest_DBOperator.EQ:
@@ -250,6 +251,10 @@ function filter(entity: RichStruct, filter: DBRequest_DBFilter) {
     default:
       return false
   }
+}
+
+function getValue(entity: RichStruct, field: string) {
+  return entity.fields[field]
 }
 
 function equal(field: RichValue, value?: RichValueList): boolean {
