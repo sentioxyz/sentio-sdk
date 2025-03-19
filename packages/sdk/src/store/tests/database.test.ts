@@ -33,9 +33,7 @@ describe('Test Database', () => {
 
       const user = new User({
         id: 'test-id-1',
-        name: 'test',
-        transactionsIDs: [],
-        organizationsIDs: []
+        name: 'test'
       })
 
       await store.upsert(user)
@@ -53,9 +51,7 @@ describe('Test Database', () => {
 
       const user = new User({
         id: 'test-id-2',
-        name: 'test',
-        transactionsIDs: [],
-        organizationsIDs: []
+        name: 'test'
       })
 
       await store.upsert(user)
@@ -215,9 +211,7 @@ describe('Test Database', () => {
       // Create a user first
       const user = new User({
         id: USER_ID,
-        name: 'test user',
-        transactionsIDs: [],
-        organizationsIDs: []
+        name: 'test user'
       })
       await store.upsert(user)
 
@@ -228,8 +222,7 @@ describe('Test Database', () => {
         gas: 100n,
         gasPrice: new BigDecimal('1.5'),
         arrayValue: [],
-        arrayOfArrayValue: [],
-        receiptsIDs: []
+        arrayOfArrayValue: []
       })
 
       // Create transaction receipts with transactionID
@@ -278,9 +271,7 @@ describe('Test Database', () => {
       // Create a user
       const user = new User({
         id: USER_ID,
-        name: 'test user',
-        transactionsIDs: [],
-        organizationsIDs: []
+        name: 'test user'
       })
       await store.upsert(user)
 
@@ -291,8 +282,7 @@ describe('Test Database', () => {
         gas: 100n,
         gasPrice: new BigDecimal('1.5'),
         arrayValue: [],
-        arrayOfArrayValue: [],
-        receiptsIDs: []
+        arrayOfArrayValue: []
       })
 
       // Create receipt with reference to transaction
@@ -331,9 +321,7 @@ describe('Test Database', () => {
       // Create a user that implements Owner interface
       const user = new User({
         id: USER_ID,
-        name: 'test user',
-        transactionsIDs: [],
-        organizationsIDs: []
+        name: 'test user'
       })
       await store.upsert(user)
 
@@ -344,8 +332,7 @@ describe('Test Database', () => {
         gas: 100n,
         gasPrice: new BigDecimal('1.5'),
         arrayValue: [],
-        arrayOfArrayValue: [],
-        receiptsIDs: []
+        arrayOfArrayValue: []
       })
       await store.upsert(transaction)
 
@@ -374,9 +361,7 @@ describe('Test Database', () => {
       // Create a user that implements Owner interface
       const user = new User({
         id: USER_ID,
-        name: 'test user',
-        transactionsIDs: [],
-        organizationsIDs: []
+        name: 'test user'
       })
       await store.upsert(user)
 
@@ -387,8 +372,7 @@ describe('Test Database', () => {
         gas: 100n,
         gasPrice: new BigDecimal('1.5'),
         arrayValue: [],
-        arrayOfArrayValue: [],
-        receiptsIDs: []
+        arrayOfArrayValue: []
       })
       await store.upsert(transaction)
 
@@ -420,9 +404,7 @@ describe('Test Database', () => {
       // Create a user first
       const user = new User({
         id: USER_ID,
-        name: 'test user',
-        transactionsIDs: [],
-        organizationsIDs: [] // Will be populated by relationship
+        name: 'test user'
       })
       await store.upsert(user)
 
@@ -484,9 +466,7 @@ describe('Test Database', () => {
       // Create user
       const user = new User({
         id: USER_ID,
-        name: 'test user',
-        transactionsIDs: [],
-        organizationsIDs: []
+        name: 'test user'
       })
       await store.upsert(user)
 
@@ -497,8 +477,7 @@ describe('Test Database', () => {
         gas: 100n,
         gasPrice: new BigDecimal('1.5'),
         arrayValue: [],
-        arrayOfArrayValue: [],
-        receiptsIDs: []
+        arrayOfArrayValue: []
       })
 
       const transaction2 = new Transaction({
@@ -507,8 +486,7 @@ describe('Test Database', () => {
         gas: 200n,
         gasPrice: new BigDecimal('2.5'),
         arrayValue: [],
-        arrayOfArrayValue: [],
-        receiptsIDs: []
+        arrayOfArrayValue: []
       })
 
       // Create receipts linking to transactions
@@ -558,72 +536,75 @@ describe('Test Database', () => {
     })
   )
 
-  it('should filter transactions with eq, gt, lt, in, hasAny, and like operators', async () => {
-    const store = new Store(storeContext)
+  it(
+    'should filter transactions with eq, gt, lt, in, hasAny, and like operators',
+    withStoreContext(storeContext, async () => {
+      const store = new Store(storeContext)
 
-    const Transaction1 = new Transaction({
-      id: 'transaction-1',
-      gas: 100n,
-      count: 0,
-      gasPrice: new BigDecimal('100.0'),
-      raw: new Uint8Array([1, 2, 3]),
-      arrayValue: ['1', '2', '3'],
-      arrayOfArrayValue: []
+      const Transaction1 = new Transaction({
+        id: 'transaction-1',
+        gas: 100n,
+        count: 0,
+        gasPrice: new BigDecimal('100.0'),
+        raw: new Uint8Array([1, 2, 3]),
+        arrayValue: ['1', '2', '3'],
+        arrayOfArrayValue: []
+      })
+      const Transaction2 = new Transaction({
+        id: 'transaction-2',
+        gas: 200n,
+        count: 0,
+        gasPrice: new BigDecimal('200.0'),
+        raw: new Uint8Array([1, 2, 3]),
+        arrayValue: ['4', '5', '6'],
+        arrayOfArrayValue: []
+      })
+      const Transaction3 = new Transaction({
+        id: 'transaction-3',
+        gas: 300n,
+        count: 0,
+        gasPrice: new BigDecimal('300.0'),
+        raw: new Uint8Array([1, 2, 3]),
+        arrayValue: ['7', '8', '9'],
+        arrayOfArrayValue: []
+      })
+      await store.upsert([Transaction1, Transaction2, Transaction3])
+
+      const transactionsAll = await store.list(Transaction, [])
+      assert.equal(transactionsAll.length, 3)
+
+      const transactionsEq = await store.list(Transaction, [{ field: 'gas', op: '=', value: 100n }])
+      assert.equal(transactionsEq.length, 1)
+      assert.equal(transactionsEq[0].id, 'transaction-1')
+
+      const transactionsGt = await store.list(Transaction, [{ field: 'gas', op: '>', value: 100n }])
+      assert.equal(transactionsGt.length, 2)
+      assert.ok(transactionsGt.some((tx) => tx.id === 'transaction-2'))
+      assert.ok(transactionsGt.some((tx) => tx.id === 'transaction-3'))
+
+      const transactionsLt = await store.list(Transaction, [{ field: 'gas', op: '<', value: 300n }])
+      assert.equal(transactionsLt.length, 2)
+      assert.ok(transactionsLt.some((tx) => tx.id === 'transaction-1'))
+      assert.ok(transactionsLt.some((tx) => tx.id === 'transaction-2'))
+
+      const transactionsIn = await store.list(Transaction, [{ field: 'gas', op: 'in', value: [100n, 300n] }])
+      assert.equal(transactionsIn.length, 2)
+      assert.ok(transactionsIn.some((tx) => tx.id === 'transaction-1'))
+      assert.ok(transactionsIn.some((tx) => tx.id === 'transaction-3'))
+
+      const transactionsHasAny = await store.list(Transaction, [
+        {
+          field: 'arrayValue',
+          op: 'has any',
+          value: ['1', '4']
+        }
+      ])
+      assert.equal(transactionsHasAny.length, 2)
+
+      const transactionsLike = await store.list(Transaction, [{ field: 'id', op: 'like', value: 'transaction-%' }])
+      assert.equal(transactionsLike.length, 3)
     })
-    const Transaction2 = new Transaction({
-      id: 'transaction-2',
-      gas: 200n,
-      count: 0,
-      gasPrice: new BigDecimal('200.0'),
-      raw: new Uint8Array([1, 2, 3]),
-      arrayValue: ['4', '5', '6'],
-      arrayOfArrayValue: []
-    })
-    const Transaction3 = new Transaction({
-      id: 'transaction-3',
-      gas: 300n,
-      count: 0,
-      gasPrice: new BigDecimal('300.0'),
-      raw: new Uint8Array([1, 2, 3]),
-      arrayValue: ['7', '8', '9'],
-      arrayOfArrayValue: []
-    })
-    await store.upsert([Transaction1, Transaction2, Transaction3])
-
-    const transactionsAll = await store.list(Transaction, [])
-    assert.equal(transactionsAll.length, 3)
-
-    const transactionsEq = await store.list(Transaction, [{ field: 'gas', op: '=', value: 100n }])
-    assert.equal(transactionsEq.length, 1)
-    assert.equal(transactionsEq[0].id, 'transaction-1')
-
-    const transactionsGt = await store.list(Transaction, [{ field: 'gas', op: '>', value: 100n }])
-    assert.equal(transactionsGt.length, 2)
-    assert.ok(transactionsGt.some((tx) => tx.id === 'transaction-2'))
-    assert.ok(transactionsGt.some((tx) => tx.id === 'transaction-3'))
-
-    const transactionsLt = await store.list(Transaction, [{ field: 'gas', op: '<', value: 300n }])
-    assert.equal(transactionsLt.length, 2)
-    assert.ok(transactionsLt.some((tx) => tx.id === 'transaction-1'))
-    assert.ok(transactionsLt.some((tx) => tx.id === 'transaction-2'))
-
-    const transactionsIn = await store.list(Transaction, [{ field: 'gas', op: 'in', value: [100n, 300n] }])
-    assert.equal(transactionsIn.length, 2)
-    assert.ok(transactionsIn.some((tx) => tx.id === 'transaction-1'))
-    assert.ok(transactionsIn.some((tx) => tx.id === 'transaction-3'))
-
-    const transactionsHasAny = await store.list(Transaction, [
-      {
-        field: 'arrayValue',
-        op: 'has any',
-        value: ['1', '4']
-      }
-    ])
-    assert.equal(transactionsHasAny.length, 2)
-
-    const transactionsLike = await store.list(Transaction, [{ field: 'id', op: 'like', value: 'transaction-%' }])
-    assert.equal(transactionsLike.length, 3)
-  })
+  )
 
   it('should allow filter with multiple filters', async () => {
     const store = new Store(storeContext)
@@ -657,33 +638,67 @@ describe('Test Database', () => {
     assert.equal(filtered[0].id, Transaction1.id)
   })
 
-  it('should allow filter with relation id field', async () => {
-    const store = new Store(storeContext)
+  it(
+    'should allow filter with relation id field',
+    withStoreContext(storeContext, async () => {
+      const store = new Store(storeContext)
 
-    const user1 = new User({
-      id: 'user-1',
-      name: 'test user',
-      transactionsIDs: ['transaction-1'],
-      organizationsIDs: []
+      const user1 = new User({
+        id: 'user-1',
+        name: 'test user'
+      })
+
+      const transaction1 = new Transaction({
+        id: 'transaction-1',
+        gas: 100n,
+        count: 0,
+        gasPrice: new BigDecimal('100.0'),
+        raw: new Uint8Array([1, 2, 3]),
+        arrayValue: ['1', '2', '3'],
+        arrayOfArrayValue: [],
+        senderID: user1.id
+      })
+
+      await store.upsert([user1, transaction1])
+
+      const filtered = await store.list(Transaction, [{ field: 'senderID', op: '=', value: user1.id }])
+
+      assert.equal(filtered.length, 1)
     })
+  )
 
-    const transaction1 = new Transaction({
-      id: 'transaction-1',
-      gas: 100n,
-      count: 0,
-      gasPrice: new BigDecimal('100.0'),
-      raw: new Uint8Array([1, 2, 3]),
-      arrayValue: ['1', '2', '3'],
-      arrayOfArrayValue: [],
-      senderID: user1.id
+  it(
+    'should return array when derived field is defined',
+    withStoreContext(storeContext, async () => {
+      const store = new Store(storeContext)
+
+      const user = new User({
+        id: 'user-1',
+        name: 'test user'
+      })
+
+      await store.upsert(user)
+      const transactions = await user.transactions()
+      assert.deepStrictEqual(transactions, [])
+
+      const userAfterGet = await store.get(User, 'user-1')
+      assert.deepStrictEqual(await userAfterGet?.transactions(), [])
+
+      const tx = new Transaction({
+        id: 'tx-1',
+        senderID: user.id,
+        gas: 100n,
+        gasPrice: new BigDecimal('100.0'),
+        raw: new Uint8Array([1, 2, 3]),
+        arrayValue: ['1', '2', '3'],
+        arrayOfArrayValue: []
+      })
+
+      await store.upsert(tx)
+      const transactions2 = await user.transactions()
+      assert.deepStrictEqual(transactions2, [tx])
     })
-
-    await store.upsert([user1, transaction1])
-
-    const filtered = await store.list(Transaction, [{ field: 'senderID', op: '=', value: user1.id }])
-
-    assert.equal(filtered.length, 1)
-  })
+  )
 
   afterEach(() => {
     db.reset()

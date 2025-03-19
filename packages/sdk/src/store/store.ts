@@ -282,7 +282,9 @@ type CompatibleValue<T, O extends Operators<T>> = O extends ArrayOperators
                     ? BigDecimal | number
                     : T extends Int
                       ? number
-                      : T)
+                      : T extends () => Promise<any>
+                        ? ID | string
+                        : T)
       | Nullable<O>
 
 type Nullable<O> = O extends '=' | '!=' ? null : never
