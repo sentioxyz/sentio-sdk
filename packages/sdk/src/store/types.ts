@@ -1,6 +1,7 @@
 import { RichStruct, RichValue } from '@sentio/protos'
 import { BigDecimalConverter, BigIntConverter } from './convert.js'
-import { getEntityName } from './store.js'
+import { getEntityName, Store } from './store.js'
+import { PluginManager } from '@sentio/runtime'
 
 export type ID = string | Uint8Array
 export type String = string
@@ -28,6 +29,14 @@ export abstract class AbstractEntity {
   toString() {
     const obj = this.toJSON()
     return `${getEntityName(this)} ${JSON.stringify(obj)}`
+  }
+
+  get store() {
+    const ctx = PluginManager.INSTANCE.dbContextLocalStorage.getStore()
+    if (!ctx) {
+      throw new Error('Store not found in context')
+    }
+    return new Store(ctx)
   }
 }
 

@@ -162,26 +162,43 @@ async function codegenInternal(schema: GraphQLSchema, source: string, target: st
           const annotations: string[] = []
           addTypeAnnotations(f.type, annotations)
           if (isRelationType(f.type)) {
-            fields.push({
-              name: '_' + f.name,
-              type: `Promise<${type}>`,
-              annotations,
-              private: true
-            })
-            methods.push({
-              name: f.name,
-              returnType: `Promise<${type}>`,
-              body: `return this._${f.name}`,
-              annotations: []
-            })
             const isMany = type.startsWith('Array')
-            fields.push({
-              name: f.name + 'ID' + (isMany ? 's' : ''),
-              type: isMany ? `Array<ID | undefined>` : `ID`,
-              annotations: []
-            })
-            // should no setter for derived fields
-            if (!isDerived(f)) {
+
+            if (isDerived(f)) {
+              const derivedField = getDerivedField(f)
+              if (isMany) {
+                methods.push({
+                  name: f.name,
+                  returnType: `Promise<${type}>`,
+                  body: `return this.store.list(${elemType(f.type)}, [{field: '${derivedField}', op: '=', value: this.id}])`,
+                  annotations: []
+                })
+              } else {
+                methods.push({
+                  name: f.name,
+                  returnType: `Promise<${type}>`,
+                  body: `return this.store.get(${elemType(f.type)}, [{field: '${derivedField}', op: '=', value: this.id}])?.[0]`,
+                  annotations: []
+                })
+              }
+            } else {
+              fields.push({
+                name: '_' + f.name,
+                type: `Promise<${type}>`,
+                annotations,
+                private: true
+              })
+              methods.push({
+                name: f.name,
+                returnType: `Promise<${type}>`,
+                body: `return this._${f.name}`,
+                annotations: []
+              })
+              fields.push({
+                name: f.name + 'ID' + (isMany ? 's' : ''),
+                type: isMany ? `Array<ID | undefined>` : `ID`,
+                annotations: []
+              })
               if (isMany) {
                 methods.push({
                   name: `set${upperFirst(f.name)}`,
@@ -317,6 +334,16 @@ function genType(type: GraphQLOutputType, required?: boolean): string {
   }
 }
 
+function elemType(type: GraphQLOutputType): GraphQLOutputType {
+  if (isNonNullType(type)) {
+    return elemType(type.ofType)
+  }
+  if (isListType(type)) {
+    return elemType(type.ofType)
+  }
+  return type
+}
+
 function genMethod(method: Method) {
   return `${method.annotations.map((a) => `@${a}`).join('\n')}
   ${method.name}(${method.parameters?.join(', ') ?? ''})${method.returnType ? `: ${method.returnType}` : ''} {
@@ -342,4 +369,13 @@ function isEntity(t: GraphQLObjectType) {
 
 function isDerived(f: GraphQLField<any, any>) {
   return f.astNode?.directives?.some((d) => d.name.value == 'derivedFrom')
+}
+
+function getDerivedField(f: GraphQLField<any, any>) {
+  return (
+    f.astNode?.directives
+      ?.find((d) => d.name.value == 'derivedFrom')
+      // @ts-ignore access astNode
+      ?.arguments?.find((a) => a.name.value == 'field')?.value?.value
+  )
 }
