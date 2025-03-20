@@ -156,6 +156,20 @@ async function createProject(options: YamlProjectConfig, auth: Auth, type?: stri
 }
 
 export async function createProjectPrompt(options: YamlProjectConfig, auth: Auth, type?: string): Promise<boolean> {
+  const create = async () => {
+    const res = await createProject(options, auth, type)
+    if (!res.ok) {
+      console.error(chalk.red('Create Project Failed'))
+      console.error(chalk.red(((await res.json()) as { message: string }).message))
+      return false
+    }
+    console.log(chalk.green('Project created'))
+    return true
+  }
+
+  if (options.silentOverwrite) {
+    return await create()
+  }
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
@@ -169,14 +183,7 @@ export async function createProjectPrompt(options: YamlProjectConfig, auth: Auth
     }
 
     rl.close()
-    const res = await createProject(options, auth, type)
-    if (!res.ok) {
-      console.error(chalk.red('Create Project Failed'))
-      console.error(chalk.red(((await res.json()) as { message: string }).message))
-      return false
-    }
-    console.log(chalk.green('Project created'))
-    return true
+    return await create()
   } else if (['n', 'no'].includes(answer.toLowerCase())) {
     rl.close()
     return false
@@ -276,7 +283,7 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth, continu
       // console.error(chalk.red('Failed to get upload url'))
       console.error(chalk.red(((await initUploadResRaw.json()) as { message: string }).message))
       if (initUploadResRaw.status === 404) {
-        const created = await createProjectPrompt(options, auth)
+        const created = await createProjectPrompt(options, auth, options.type)
         if (created) {
           await upload()
         }
