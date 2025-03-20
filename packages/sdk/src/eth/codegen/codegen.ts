@@ -23,7 +23,7 @@ async function codegenInternal(
   outDir: string,
   contractsToGenExample: YamlContractConfig[]
 ): Promise<number> {
-  const allFiles = fs.readdirSync(abisDir)
+  const allFiles = fs.readdirSync(abisDir, { recursive: true, encoding: 'utf8' })
   if (allFiles.length === 0) {
     return 0
   }
@@ -71,6 +71,7 @@ async function codegenInternal(
   filesGenerated += processOutput(services, config, await target.beforeRun())
 
   for (const fd of fileDescriptions) {
+    console.log('- fd', fd.path)
     // @ts-ignore - no types
     filesGenerated += processOutput(services, config, await target.transformFile(fd))
   }

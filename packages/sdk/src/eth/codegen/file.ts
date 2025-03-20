@@ -16,21 +16,33 @@ import {
   generateViewFunctions
 } from './function-calls.js'
 
-export function codeGenIndex(contract: Contract): string {
-  return ` 
-  export * from './internal/${contract.name.toLowerCase()}-processor.js'
-  export * from './internal/${contract.name.toLowerCase()}-test-utils.js'
-  export * from './internal/${contract.name}.js'
-  export * from './internal/factories/${contract.name}__factory.js'
-  `
+function getRelativePrefix(dir?: string) {
+  return dir
+    ? dir
+        .split('/')
+        .map((_) => '..')
+        .join('/')
+    : '.'
 }
 
-export function codeGenSentioFile(contract: Contract): string {
+export function codeGenIndex(contract: Contract, dir?: string): string {
+  const dirPath = dir ? dir + '/' : ''
+  const prefix = getRelativePrefix(dir)
+  return `
+export * from '${prefix}/internal/${dirPath}${contract.name.toLowerCase()}-processor.js'
+export * from '${prefix}/internal/${dirPath}${contract.name.toLowerCase()}-test-utils.js'
+export * from '${prefix}/internal/${dirPath}${contract.name}.js'
+export * from '${prefix}/internal/factories/${dirPath}${contract.name}__factory.js'
+`
+}
+
+export function codeGenSentioFile(contract: Contract, dir?: string): string {
+  const prefix = getRelativePrefix(dir)
   const source = `
   ${Object.values(contract.functions).map(codegenCallTraceTypes).join('\n')}
 
   const templateContract = ${contract.name}__factory.connect("0x0", DummyProvider)
-  
+
   export class ${contract.name}ContractView extends ContractView<${contract.name}> {
     constructor (contract: ${contract.name}) {
       super(contract);
@@ -41,7 +53,7 @@ export function codeGenSentioFile(contract: Contract): string {
       .filter((f) => !reservedKeywords.has(f[0].name))
       .flatMap((fs) => generateViewFunctions(true, fs))
       .join('\n')}
-    
+
     callStatic = {
       contract: this.contract,
       ${Object.values(contract.functions)
@@ -49,7 +61,7 @@ export function codeGenSentioFile(contract: Contract): string {
         .flatMap((fs) => generateViewFunctions(false, fs))
         .join(',\n')}
     }
-    
+
     encodeCall = {
       ${Object.values(contract.functions)
         .filter((f) => !reservedKeywords.has(f[0].name))
@@ -57,14 +69,14 @@ export function codeGenSentioFile(contract: Contract): string {
         .join(',\n')}
     }
   }
-  
-  export class ${contract.name}BoundContractView extends BoundContractView<${contract.name}, 
+
+  export class ${contract.name}BoundContractView extends BoundContractView<${contract.name},
     ${contract.name}ContractView> {
   ${Object.values(contract.functions)
     .filter((f) => !reservedKeywords.has(f[0].name))
     .flatMap((fs) => generateBoundViewFunctions(true, fs))
     .join('\n')}
-  
+
     callStatic = {
       view: this.view,
       context: this.context,
@@ -73,7 +85,7 @@ export function codeGenSentioFile(contract: Contract): string {
         .flatMap((fs) => generateBoundViewFunctions(false, fs))
         .join(',\n')}
     }
-    
+
     encodeCall = {
       view: this.view,
       context: this.context,
@@ -100,7 +112,7 @@ export function codeGenSentioFile(contract: Contract): string {
       .map((events) => generateEventFilters(events))
       .join(',')}
   }
-  
+
   protected CreateBoundContractView(): ${contract.name}BoundContractView {
     const view = get${contract.name}Contract(this.config.network, this.config.address)
     return new ${contract.name}BoundContractView(this.config.address, view)
@@ -137,7 +149,7 @@ export class ${contract.name}ProcessorTemplate extends BaseProcessorTemplate<${c
   ${Object.values(contract.events)
     .map((events) => generateEventHandlers(events, contract.name))
     .join('\n')}
-  
+
   ${Object.values(contract.functions)
     .map((functions) => {
       generateCallHandlers(functions, contract.name)
@@ -154,11 +166,11 @@ export class ${contract.name}ProcessorTemplate extends BaseProcessorTemplate<${c
     }
     return contract
   }
-  
-  export function get${contract.name}ContractOnContext(context: EthContext, address: string): 
+
+  export function get${contract.name}ContractOnContext(context: EthContext, address: string):
     ${contract.name}BoundContractView {
     const view = get${contract.name}Contract(context.getChainId(), address)
-    const boundView = new ${contract.name}BoundContractView(address, view) 
+    const boundView = new ${contract.name}BoundContractView(address, view)
     boundView.context = context;
     if (boundView.callStatic) {
       boundView.callStatic.context = context;
@@ -224,7 +236,7 @@ export class ${contract.name}ProcessorTemplate extends BaseProcessorTemplate<${c
       // '@sentio/protos': ['EthFetchConfig'],
       '@sentio/protos': ['EthCallParam', 'EthCallContext', 'PreparedData'],
       './common.js': ['PromiseOrValue'],
-      './index.js': [`${contract.name}__factory`],
+      [`${prefix}/index.js`]: [`${contract.name}__factory`],
       [`./${contract.name}.js`]: [`${contract.name}`, ...eventsImports, ...uniqueStructImports]
     },
     source

@@ -42,6 +42,7 @@ export default class EthersSentio extends Ethers.default {
     const jsonPath = relative(this.cfg.inputDir, shortenFullJsonFilePath(file.path, this.cfg.allFiles))
     const contract = parse(abi, jsonPath, documentation)
     const files = super.transformAbiOrFullJsonFile(file)
+    console.log('- json', jsonPath, contract.name, files[0].path, file.path, this.cfg.outDir)
     this.processedABIs.push(contract)
 
     if (files !== undefined) {
@@ -50,15 +51,17 @@ export default class EthersSentio extends Ethers.default {
       //   this.transformFilePath(file)
       // }
 
+      const subdir = dirname(jsonPath)
       return [
         ...files,
         {
           path: join(dirname(files[0].path), `${contract.name.toLowerCase()}-processor.ts`),
-          contents: codeGenSentioFile(contract)
+          contents: codeGenSentioFile(contract, subdir)
         },
         {
-          path: join(dirname(files[0].path), '..', `${contract.name.toLowerCase()}.ts`),
-          contents: codeGenIndex(contract)
+          // path: join(dirname(files[0].path), '..', `${contract.name.toLowerCase()}.ts`),
+          path: join(this.cfg.outDir, '..', dirname(jsonPath), `${contract.name.toLowerCase()}.ts`),
+          contents: codeGenIndex(contract, subdir)
         },
         {
           path: join(dirname(files[0].path), `${contract.name.toLowerCase()}-test-utils.ts`),
@@ -69,16 +72,33 @@ export default class EthersSentio extends Ethers.default {
   }
 
   override afterRun(): FileDescription[] {
+    // return []
     const commonPath = join('internal', 'common.ts')
     const files = super.afterRun()
     for (const [idx, file] of files.entries()) {
+      console.log('- after', idx, file.path)
+      if (file.path.endsWith('index.ts')) {
+        console.log('index', file.contents)
+      }
+      const relativePath = relative(
+        join(this.cfg.inputDir, '../../src/types/eth'),
+        file.path
+        // shortenFullJsonFilePath(file.path, this.cfg.allFiles)
+      )
+      console.log('- relative ', relativePath)
       if (file.path.endsWith('__factory.ts')) {
         file.contents =
           `// @ts-nocheck
-            import { newContract, newInterface } from '@sentio/sdk/eth'
-            ` + file.contents.replaceAll('new Contract', 'newContract').replaceAll('new Interface', 'newInterface') // those to reduce processor bundle code size
-      } else if (file.path.endsWith(join('factories', 'index.ts'))) {
-        file.contents = file.contents.replaceAll("__factory'", "__factory.js'")
+import { newContract, newInterface } from '@sentio/sdk/eth'
+` + file.contents.replaceAll('new Contract', 'newContract').replaceAll('new Interface', 'newInterface') // those to reduce processor bundle code size
+        // } else if (file.path.endsWith(join('factories', 'index.ts'))) {
+        //   file.contents = file.contents.replaceAll("__factory'", "__factory.js'")
+        // } else if (file.path.includes(join('internal', 'factories'))) {
+      } else if (
+        (relativePath.includes('factories') && relativePath.split('/').length > 3) ||
+        (!relativePath.includes('factories') && relativePath.split('/').length > 2)
+      ) {
+        file.contents = file.contents.replaceAll("';", ".js';")
       } else if (file.path.endsWith('_processor.ts')) {
       } else if (file.path.endsWith(commonPath)) {
         file.contents = COMMON_CONTENT
@@ -106,7 +126,7 @@ export default class EthersSentio extends Ethers.default {
     if (contractsToGenExample.length > 0) {
       const processors = this.processedABIs.map((abi) => `${abi.name}Processor`).join(',')
       let exampleContent = `
-      import { EthChainId } from '@sentio/sdk/eth' 
+      import { EthChainId } from '@sentio/sdk/eth'
       import { ${processors} } from './types/eth/index.js'`
 
       const ethChainIdValues = new Map<ChainId, string>()
