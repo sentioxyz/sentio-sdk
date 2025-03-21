@@ -10,15 +10,21 @@ import {
   IdlDefinedFields,
   IdlTypeDef
 } from '@coral-xyz/anchor/dist/esm/idl.js'
+import { recursiveCodegen } from '../../core/codegen.js'
 
 export function codegen(abisDir: string, targetPath = path.join('src', 'types', 'solana'), genExample = false) {
   if (!fs.existsSync(abisDir)) {
     return
   }
 
-  const abisFiles = fs.readdirSync(abisDir)
-  let numFiles = 0
+  const numFiles = recursiveCodegen(abisDir, targetPath, codegenInternal)
 
+  console.log(chalk.green(`Generated ${numFiles} for Solana`))
+}
+
+async function codegenInternal(abisDir: string, targetPath: string) {
+  let numFiles = 0
+  const abisFiles = fs.readdirSync(abisDir)
   for (const file of abisFiles) {
     if (path.extname(file) === '.json') {
       if (!fs.existsSync(targetPath)) {
@@ -33,8 +39,7 @@ export function codegen(abisDir: string, targetPath = path.join('src', 'types', 
       numFiles += 2
     }
   }
-
-  console.log(chalk.green(`Generated ${numFiles} for Solana`))
+  return numFiles
 }
 
 function codeGenSolanaIdlProcessor(idlObj: Idl): string {
