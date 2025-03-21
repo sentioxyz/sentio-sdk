@@ -14,7 +14,20 @@ export async function codegen(abisDir: string, outDir: string, contractsToGenExa
     return
   }
 
-  const numFiles = await codegenInternal(abisDir, outDir, contractsToGenExample)
+  let numFiles = await codegenInternal(abisDir, outDir, contractsToGenExample)
+
+  const items = fs.readdirSync(abisDir, { recursive: true, withFileTypes: true })
+  for (const item of items) {
+    if (item.isDirectory()) {
+      const relativePath = path.relative(abisDir, item.parentPath)
+      numFiles += await codegenInternal(
+        path.join(abisDir, relativePath, item.name),
+        path.join(outDir, relativePath, item.name),
+        contractsToGenExample
+      )
+    }
+  }
+
   console.log(chalk.green(`Generated ${numFiles} files for ETH`))
 }
 
