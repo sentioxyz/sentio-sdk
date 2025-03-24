@@ -6,6 +6,7 @@ import { InternalMoveModule, InternalMoveStruct } from '@typemove/move'
 import { AptosNetwork, getRpcEndpoint } from '../network.js'
 import { Event, MoveModuleBytecode, MoveResource } from '@aptos-labs/ts-sdk'
 import { SharedNetworkCodegen } from '../../move/shared-network-codegen.js'
+import { recursiveCodegen } from '../../core/codegen.js'
 
 export async function codegen(
   abisDir: string,
@@ -64,7 +65,7 @@ class AptosNetworkCodegen extends BaseAptosCodegen {
       import { TypeDescriptor, ANY_TYPE } from "@typemove/move"
       import {
         MoveCoder, TypedEventInstance } from "@typemove/${this.PREFIX.toLowerCase()}"
-      
+
       import { defaultMoveCoder, defaultMoveCoderForClient } from "${this.defaultCoderPackage()}"
       import { Aptos, Account as AptosAccount, MoveAddressType, PendingTransactionResponse, InputGenerateTransactionOptions, MoveStructId, InputViewFunctionData } from '@aptos-labs/ts-sdk'`
     )
@@ -81,18 +82,19 @@ const MOVEMENT_TESTNET_CODEGEN = new AptosNetworkCodegen(AptosNetwork.MOVEMENT_T
 
 class AptosCodegen {
   async generate(srcDir: string, outputDir: string, builtin = false): Promise<number> {
-    const num1 = await MAINNET_CODEGEN.generate(srcDir, outputDir, builtin)
-    const num2 = await TESTNET_CODEGEN.generate(path.join(srcDir, 'testnet'), path.join(outputDir, 'testnet'), builtin)
-    const num3 = await MOVEMENT_MAINNET_CODEGEN.generate(
-      path.join(srcDir, 'movement-mainnet'),
-      path.join(outputDir, 'movement-mainnet'),
-      builtin
-    )
-    const num5 = await MOVEMENT_TESTNET_CODEGEN.generate(
-      path.join(srcDir, 'movement-testnet'),
-      path.join(outputDir, 'movement-testnet'),
-      builtin
-    )
-    return num1 + num2 + num3 + num5
+    let numFiles = 0
+    const generators: [string, AptosNetworkCodegen][] = [
+      ['', MAINNET_CODEGEN],
+      ['testnet', TESTNET_CODEGEN],
+      ['movement-mainnet', MOVEMENT_MAINNET_CODEGEN],
+      ['movement-testnet', MOVEMENT_TESTNET_CODEGEN]
+    ]
+
+    for (const [network, gen] of generators) {
+      numFiles += await recursiveCodegen(path.join(srcDir, network), path.join(outputDir, network), (src, dst) =>
+        gen.generate(src, dst, builtin)
+      )
+    }
+    return numFiles
   }
 }

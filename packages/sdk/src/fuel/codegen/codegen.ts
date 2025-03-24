@@ -5,13 +5,14 @@ import { mkdirpSync } from 'mkdirp'
 import path from 'path'
 import { upperFirst } from './utils.js'
 import { versions as builtinVersions } from '@fuel-ts/versions'
+import { recursiveCodegen } from '../../core/codegen.js'
 
 export async function codegen(abisDir: string, outDir: string) {
   if (!fs.existsSync(abisDir)) {
     return
   }
 
-  const numFiles = await codegenInternal(abisDir, outDir)
+  const numFiles = await recursiveCodegen(abisDir, outDir, codegenInternal)
   console.log(chalk.green(`Generated ${numFiles} files for Fuel`))
 }
 
@@ -114,7 +115,7 @@ async function codegenInternal(abisDir: string, outDir: string): Promise<number>
 
 /* tslint:disable */
 /* eslint-disable */
-    
+
 import { FuelAbstractProcessor, FuelContractContext, FuelProcessorConfig, TypedCall, FuelFetchConfig, FuelCall, FuelLog, addFuelProcessor, getFuelProcessor, FuelBaseProcessorTemplate } from '@sentio/sdk/fuel'
 import {${abi.commonTypesInUse.join(',')}} from './common.js'
 import {${importedTypes.join(',')}, ${abi.capitalizedName}} from './${abi.capitalizedName}.js'
@@ -167,7 +168,7 @@ ${
   ''
   /* disable codegen for now
        abi.functions.map((f) => genOnCallFunction(name, f)).join('\n') */
-}   
+}
 
   ${Object.entries(logByTypes)
     .map((e) => genOnLogFunction(name, e))
@@ -209,7 +210,7 @@ function genCallType(f: IFunction) {
           ${Object.entries(argMap)
             .map(([k, v]) => `${k}: ${v}`)
             .join(', ')}
-      } 
+      }
       constructor(call: FuelCall) {
         super(call)
       }
@@ -261,7 +262,7 @@ function genOnLogFunction(contractName: string, [type, ids]: [string, string[]])
   const logIdFilterValues = ids.map((_, idx) => `Log${name}Id${idx}`)
 
   return `
-  onLog${name}(handler: (log: FuelLog<${type}>, ctx: FuelContractContext<${contractName}>) => void | Promise<void>, 
+  onLog${name}(handler: (log: FuelLog<${type}>, ctx: FuelContractContext<${contractName}>) => void | Promise<void>,
                logIdFilter?: LogIdFilter<${logIdFilterValues.map((d) => `typeof ${d}`).join(' | ')}> ) {
     return super.onLog<${type}>(logIdFilter ?? [${logIdFilterValues.join(', ')}], (log, ctx) => handler(log, ctx))
   }`

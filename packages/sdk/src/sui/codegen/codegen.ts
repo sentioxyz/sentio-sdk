@@ -7,6 +7,7 @@ import { SuiCodegen as BaseSuiCodegen } from '@typemove/sui/codegen'
 import path, { join } from 'path'
 import { SharedNetworkCodegen } from '../../move/shared-network-codegen.js'
 import { getRpcEndpoint, SuiNetwork } from '../network.js'
+import { recursiveCodegen } from '../../core/codegen.js'
 
 export async function codegen(
   abisDir: string,
@@ -97,8 +98,17 @@ const TESTNET_CODEGEN = new SuiNetworkCodegen(SuiNetwork.TEST_NET)
 
 class SuiCodegen {
   async generate(srcDir: string, outputDir: string, builtin = false): Promise<number> {
-    const num1 = await MAINNET_CODEGEN.generate(srcDir, outputDir, builtin)
-    const num2 = await TESTNET_CODEGEN.generate(path.join(srcDir, 'testnet'), path.join(outputDir, 'testnet'), builtin)
-    return num1 + num2
+    let numFiles = 0
+    const generators: [string, SuiNetworkCodegen][] = [
+      ['', MAINNET_CODEGEN],
+      ['testnet', TESTNET_CODEGEN]
+    ]
+
+    for (const [network, gen] of generators) {
+      numFiles += await recursiveCodegen(path.join(srcDir, network), path.join(outputDir, network), (src, dst) =>
+        gen.generate(src, dst, builtin)
+      )
+    }
+    return numFiles
   }
 }

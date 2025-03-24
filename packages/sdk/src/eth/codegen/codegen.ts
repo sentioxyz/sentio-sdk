@@ -8,13 +8,17 @@ import path from 'path'
 import { mkdirpSync } from 'mkdirp'
 import { YamlContractConfig } from '../../core/yaml-contract-config.js'
 import chalk from 'chalk'
+import { recursiveCodegen } from '../../core/codegen.js'
 
 export async function codegen(abisDir: string, outDir: string, contractsToGenExample: YamlContractConfig[] = []) {
   if (!fs.existsSync(abisDir)) {
     return
   }
 
-  const numFiles = await codegenInternal(abisDir, outDir, contractsToGenExample)
+  const numFiles = await recursiveCodegen(abisDir, outDir, (src, dst) =>
+    codegenInternal(src, dst, contractsToGenExample)
+  )
+
   console.log(chalk.green(`Generated ${numFiles} files for ETH`))
 }
 

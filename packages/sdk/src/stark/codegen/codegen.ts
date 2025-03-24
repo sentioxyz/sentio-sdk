@@ -5,13 +5,14 @@ import { mkdirpSync } from 'mkdirp'
 import { events } from 'starknet'
 import { StarknetChainId } from '@sentio/chain'
 import { Abi } from '@sentio/abi-wan-kanabi'
+import { recursiveCodegen } from '../../core/codegen.js'
 
 export async function codegen(abisDir: string, outDir: string) {
   if (!fs.existsSync(abisDir)) {
     return
   }
 
-  const numFiles = await codegenInternal(abisDir, outDir)
+  const numFiles = await recursiveCodegen(abisDir, outDir, codegenInternal)
   console.log(chalk.green(`Generated ${numFiles} files for Starknet`))
 }
 
