@@ -251,9 +251,11 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth, continu
     const data = (await res.json()) as { processors: { version: number }[] }
     const found = data?.processors?.find((x) => x.version == continueFrom)
     if (found) {
-      const confirmed = await confirm(`Continue from version ${continueFrom}`)
-      if (!confirmed) {
-        process.exit(0)
+      if (!options.silentOverwrite) {
+        const confirmed = await confirm(`Continue from version ${continueFrom}?`)
+        if (!confirmed) {
+          process.exit(0)
+        }
       }
     } else {
       const latest = data.processors?.[0]?.version
