@@ -136,7 +136,7 @@ export async function codegen(genExample: boolean) {
   const contractsForUsage = processorConfig.contracts || []
   let previousChain = ''
   for (const contract of contractsForUsage) {
-    const outputPath = getABIFilePath(contract.chain, contract.name, contract.address)
+    const outputPath = getABIFilePath(contract.chain, contract.name, contract.address, contract.folder)
     if (fs.existsSync(outputPath)) {
       continue
     }
@@ -152,85 +152,24 @@ export async function codegen(genExample: boolean) {
 
   const outputBase = path.resolve('src', 'types')
 
-  try {
-    // @ts-ignore dynamic import
-    const codegen = await import('@sentio/sdk/eth/codegen')
-    let input = path.resolve('abis', 'eth')
-    let output = path.resolve(outputBase, 'eth')
-    if (!fs.existsSync(input)) {
-      input = path.resolve('abis', 'evm')
-      output = path.resolve(outputBase, 'eth')
+  const generators = ['eth', 'solana', 'aptos', 'sui', 'fuel', 'starknet']
+
+  for (const gen of generators) {
+    try {
+      const codegen = await import(`@sentio/sdk/${gen}/codegen`)
+
+      const input = path.resolve('abis', gen)
+      const output = path.resolve(outputBase, gen)
+      await fs.remove(output)
+
+      if (gen == 'eth') {
+        await codegen.codegen(input, output, genExample ? contractsForUsage : [])
+      } else {
+        await codegen.codegen(input, output, genExample)
+      }
+    } catch (e) {
+      console.error('code gen error', e)
     }
-    fs.emptyDirSync(output)
-    // @ts-ignore dynamic import
-    await codegen.codegen(input, output, genExample ? contractsForUsage : [])
-  } catch (e) {
-    console.error('code gen error', e)
-  }
-
-  try {
-    // @ts-ignore dynamic import
-    const codegen = await import('@sentio/sdk/solana/codegen')
-
-    const output = path.resolve(outputBase, 'solana')
-    fs.emptyDirSync(output)
-
-    // @ts-ignore dynamic import
-    await codegen.codegen(path.resolve('abis', 'solana'), output, genExample)
-  } catch (e) {
-    console.error('code gen error', e)
-  }
-
-  try {
-    // @ts-ignore dynamic import
-    const codegen = await import('@sentio/sdk/aptos/codegen')
-
-    const output = path.resolve(outputBase, 'aptos')
-    fs.emptyDirSync(output)
-
-    // @ts-ignore dynamic import
-    await codegen.codegen(path.resolve('abis', 'aptos'), output, genExample)
-  } catch (e) {
-    console.error('code gen error', e)
-  }
-
-  try {
-    // @ts-ignore dynamic import
-    const codegen = await import('@sentio/sdk/sui/codegen')
-
-    const output = path.resolve(outputBase, 'sui')
-    fs.emptyDirSync(output)
-
-    // @ts-ignore dynamic import
-    await codegen.codegen(path.resolve('abis', 'sui'), output, genExample)
-  } catch (e) {
-    console.error('code gen error', e)
-  }
-
-  try {
-    // @ts-ignore dynamic import
-    const codegen = await import('@sentio/sdk/fuel/codegen')
-
-    const output = path.resolve(outputBase, 'fuel')
-    fs.emptyDirSync(output)
-
-    // @ts-ignore dynamic import
-    await codegen.codegen(path.resolve('abis', 'fuel'), output, genExample)
-  } catch (e) {
-    console.error('code gen error', e)
-  }
-
-  try {
-    // @ts-ignore dynamic import
-    const codegen = await import('@sentio/sdk/starknet/codegen')
-
-    const output = path.resolve(outputBase, 'starknet')
-    fs.emptyDirSync(output)
-
-    // @ts-ignore dynamic import
-    await codegen.codegen(path.resolve('abis', 'starknet'), output, genExample)
-  } catch (e) {
-    console.error('code gen error', e)
   }
 
   try {

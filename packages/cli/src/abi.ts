@@ -144,7 +144,7 @@ export async function getABI(
   }
 }
 
-export function getABIFilePath(chain: string, name: string, address?: string): string {
+export function getABIFilePath(chain: string, name: string, address?: string, folder?: string): string {
   let subpath
   let filename = name ?? address
   switch (chain) {
@@ -176,6 +176,19 @@ export function getABIFilePath(chain: string, name: string, address?: string): s
       break
     default:
       subpath = 'eth'
+  }
+
+  if (folder) {
+    if (folder.startsWith(subpath + '/')) {
+      subpath = folder
+    } else {
+      console.log(
+        chalk.red('ABI folder must be'),
+        chalk.blue(subpath),
+        chalk.red('or a folder inside', chalk.blue(subpath))
+      )
+      process.exit(1)
+    }
   }
 
   return path.join('abis', subpath, filename + '.json')
