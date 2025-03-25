@@ -57,6 +57,11 @@ export async function runAdd(argv: string[]) {
       type: String,
       defaultValue: '1',
       description: 'Chain ID, current supports the following:\n' + supportedChainMessage.join('\n,')
+    },
+    {
+      name: 'folder',
+      description: '(Optional) The folder to save the downloaded ABI file',
+      type: String
     }
   ]
 
@@ -81,6 +86,7 @@ export async function runAdd(argv: string[]) {
 
   const chain = options['chain'].toLowerCase() as ChainId
   const address: string = options.address
+  const folder: string = options.folder
   if (!address.startsWith('0x')) {
     console.error(chalk.red('Address must start with 0x'))
     console.log(usage)
@@ -90,7 +96,7 @@ export async function runAdd(argv: string[]) {
   const abiRes = await getABI(chain, address, options.name)
   const filename = abiRes.name || address
 
-  writeABIFile(abiRes.abi, getABIFilePath(chain, filename, ''))
+  writeABIFile(abiRes.abi, getABIFilePath(chain, filename, '', folder))
 
   // Write contract info to sentio.yaml
   const yamlDocument: yaml.Document = yaml.parseDocument(fs.readFileSync('sentio.yaml', 'utf8'))
@@ -113,6 +119,9 @@ export async function runAdd(argv: string[]) {
     newContract.set('address', address)
     if (address !== filename) {
       newContract.set('name', filename)
+    }
+    if (folder) {
+      newContract.set('folder', folder)
     }
     contracts.add(newContract)
     fs.writeFileSync('sentio.yaml', yamlDocument.toString(), 'utf8')

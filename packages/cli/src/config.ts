@@ -11,6 +11,7 @@ export interface YamlContractConfig {
   address: string
   chain: ChainId
   name: string
+  folder?: string
 }
 
 export interface YamlNetworkOverride {
