@@ -61,7 +61,7 @@ export class AccountProcessor {
     return this.onERC20(
       handler,
       tokensAddresses,
-      (address: string) => ERC721Processor.filters.Transfer(null, this.config.address),
+      (address: string) => ERC20Processor.filters.Transfer(null, this.config.address),
       fetchConfig,
       preprocessHandler
     )
