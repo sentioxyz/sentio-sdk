@@ -102,6 +102,7 @@ if (options['start-action-server']) {
 }
 
 const metricsPort = 4040
+
 const httpServer = http
   .createServer(async function (req, res) {
     if (req.url) {
@@ -115,17 +116,7 @@ const httpServer = http
         case '/heap': {
           try {
             const file = '/tmp/' + Date.now() + '.heapsnapshot'
-            const session = new Session()
-
-            const fd = fs.openSync(file, 'w')
-            session.connect()
-            session.on('HeapProfiler.addHeapSnapshotChunk', (m) => {
-              fs.writeSync(fd, m.params.chunk)
-            })
-
-            await session.post('HeapProfiler.takeHeapSnapshot')
-            session.disconnect()
-            fs.closeSync(fd)
+            await dumpHeap(file)
             // send the file
             const readStream = fs.createReadStream(file)
             res.writeHead(200, { 'Content-Type': 'application/json' })
@@ -191,6 +182,41 @@ process
     }
     // shutdownServers(1)
   })
+
+if (process.env['OOM_DUMP_MEMORY_SIZE_GB']) {
+  let dumping = false
+  const memorySize = parseInt(process.env['OOM_DUMP_MEMORY_SIZE_GB'], 10)
+  console.log('heap dumping is enabled, limit set to ', memorySize, 'gb')
+  setInterval(async () => {
+    const mem = process.memoryUsage()
+    // if memory usage is greater this size, dump heap and exit
+    if (mem.heapTotal > memorySize * 1024 * 1024 * 1024 && !dumping) {
+      const file = '/tmp/' + Date.now() + '.heapsnapshot'
+      dumping = true
+      await dumpHeap(file)
+      // force exit and keep pod running
+      process.exit(11)
+    }
+  }, 1000 * 60)
+}
+
+async function dumpHeap(file: string) {
+  console.log('Heap dumping to', file)
+  const session = new Session()
+  const fd = fs.openSync(file, 'w')
+  try {
+    session.connect()
+    session.on('HeapProfiler.addHeapSnapshotChunk', (m) => {
+      fs.writeSync(fd, m.params.chunk)
+    })
+
+    await session.post('HeapProfiler.takeHeapSnapshot')
+    console.log('Heap dumped to', file)
+  } finally {
+    session.disconnect()
+    fs.closeSync(fd)
+  }
+}
 
 function shutdownServers(exitCode: number) {
   server?.forceShutdown()
