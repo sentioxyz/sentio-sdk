@@ -21,6 +21,7 @@ import { setupLogger } from './logger.js'
 import { setupOTLP } from './otlp.js'
 import { ActionServer } from './action-server.js'
 import { ServiceManager } from './service-manager.js'
+import path from 'path'
 
 // const mergedRegistry = Registry.merge([globalRegistry, niceGrpcRegistry])
 
@@ -185,13 +186,15 @@ process
 
 if (process.env['OOM_DUMP_MEMORY_SIZE_GB']) {
   let dumping = false
-  const memorySize = parseInt(process.env['OOM_DUMP_MEMORY_SIZE_GB'], 10)
+  const memorySize = parseFloat(process.env['OOM_DUMP_MEMORY_SIZE_GB'])
   console.log('heap dumping is enabled, limit set to ', memorySize, 'gb')
+  const dir = process.env['OOM_DUMP_DIR'] || '/tmp'
   setInterval(async () => {
     const mem = process.memoryUsage()
+    console.log('Current Memory Usage', mem)
     // if memory usage is greater this size, dump heap and exit
     if (mem.heapTotal > memorySize * 1024 * 1024 * 1024 && !dumping) {
-      const file = '/tmp/' + Date.now() + '.heapsnapshot'
+      const file = path.join(dir, `${Date.now()}.heapsnapshot`)
       dumping = true
       await dumpHeap(file)
       // force exit and keep pod running
@@ -203,6 +206,7 @@ if (process.env['OOM_DUMP_MEMORY_SIZE_GB']) {
 async function dumpHeap(file: string) {
   console.log('Heap dumping to', file)
   const session = new Session()
+  fs.mkdirSync(path.dirname(file), { recursive: true })
   const fd = fs.openSync(file, 'w')
   try {
     session.connect()
