@@ -194,7 +194,7 @@ if (process.env['OOM_DUMP_MEMORY_SIZE_GB']) {
     console.log('Current Memory Usage', mem)
     // if memory usage is greater this size, dump heap and exit
     if (mem.heapTotal > memorySize * 1024 * 1024 * 1024 && !dumping) {
-      const file = path.join(dir, + Date.now() + '.heapsnapshot')
+      const file = path.join(dir, `${Date.now()}.heapsnapshot`)
       dumping = true
       await dumpHeap(file)
       // force exit and keep pod running
