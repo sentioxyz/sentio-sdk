@@ -87,7 +87,7 @@ export function transformEtherError(e: Error, ctx: ContractContext<any, any> | u
     }
   }
 
-  msg = 'other error during call error ${e.message}\n' + JSON.stringify(e) + '\n' + stack?.toString() + '\n' + checkPage
+  msg = `other error during call error ${e.message}\n` + JSON.stringify(e) + '\n' + stack?.toString() + '\n' + checkPage
   return new Error(msg)
 }
 
