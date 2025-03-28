@@ -204,15 +204,18 @@ async function dumpHeap(file: string) {
   console.log('Heap dumping to', file)
   const session = new Session()
   const fd = fs.openSync(file, 'w')
-  session.connect()
-  session.on('HeapProfiler.addHeapSnapshotChunk', (m) => {
-    fs.writeSync(fd, m.params.chunk)
-  })
+  try {
+    session.connect()
+    session.on('HeapProfiler.addHeapSnapshotChunk', (m) => {
+      fs.writeSync(fd, m.params.chunk)
+    })
 
-  await session.post('HeapProfiler.takeHeapSnapshot')
-  session.disconnect()
-  console.log('Heap dumped to', file)
-  fs.closeSync(fd)
+    await session.post('HeapProfiler.takeHeapSnapshot')
+    console.log('Heap dumped to', file)
+  } finally {
+    session.disconnect()
+    fs.closeSync(fd)
+  }
 }
 
 function shutdownServers(exitCode: number) {
