@@ -13,8 +13,12 @@ describe('block estimate', () => {
   const testIf = haveProviders ? test : test.skip
 
   testIf('get block number at mainnet', async () => {
-    const targetDate = new Date('2023-05-02T00:00:00Z')
-    const estimatedBlockNumber = await estimateBlockNumberAtDate(getProvider(), targetDate, 0)
+    let targetDate = new Date('2023-05-02T00:00:00Z')
+    let estimatedBlockNumber = await estimateBlockNumberAtDate(getProvider(), targetDate, 0)
     expect(estimatedBlockNumber).to.equal(17169395)
+
+    targetDate = new Date('1990-05-02T00:00:00Z')
+    estimatedBlockNumber = await estimateBlockNumberAtDate(getProvider(), targetDate, 0)
+    expect(estimatedBlockNumber).to.equal(0)
   })
 })
