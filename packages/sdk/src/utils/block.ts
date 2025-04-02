@@ -1,6 +1,6 @@
-import { Block, Provider } from 'ethers'
+import { Block, JsonRpcProvider, EthersError } from 'ethers'
 
-async function getBlockSafely(provider: Provider, blockNumber: number | string): Promise<Block> {
+async function getBlockSafely(provider: JsonRpcProvider, blockNumber: number | string): Promise<Block> {
   const block = await provider.getBlock(blockNumber)
   if (!block) {
     throw new Error(`Block ${blockNumber} not found.`)
@@ -9,7 +9,40 @@ async function getBlockSafely(provider: Provider, blockNumber: number | string):
 }
 
 export async function estimateBlockNumberAtDate(
-  provider: Provider,
+  provider: JsonRpcProvider,
+  targetDate: Date,
+  startBlock?: number
+): Promise<number> {
+  // Convert JS Date to Unix timestamp in hex
+  const timestampHex = '0x' + Math.floor(targetDate.getTime()).toString(16)
+
+  // You can customize these based on how your RPC expects it
+  // Ensure rangeStart is hex if defined, else default to "earliest"
+  const rangeStart = startBlock !== undefined ? '0x' + startBlock.toString(16) : 'earliest'
+
+  const rangeEnd = 'latest'
+  const strategy = 'LE' // or "GE", depending on your use case
+
+  let result
+  try {
+    result = await provider.send('sentio_estimateBlockNumberAtDate', [timestampHex, rangeStart, rangeEnd, strategy])
+  } catch (e) {
+    const serverError = e as EthersError
+    if (serverError.code === 'SERVER_ERROR') {
+      return await estimateBlockNumberAtDateSlow(provider, targetDate, startBlock)
+    }
+    throw e
+  }
+
+  if (result === null) {
+    throw Error("Block can't be located.")
+  }
+
+  return parseInt(result, 16)
+}
+
+export async function estimateBlockNumberAtDateSlow(
+  provider: JsonRpcProvider,
   targetDate: Date,
   startBlock?: number
 ): Promise<number> {

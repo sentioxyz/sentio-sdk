@@ -1,4 +1,4 @@
-import { JsonRpcProvider, Network, Provider } from 'ethers'
+import { JsonRpcProvider, Network } from 'ethers'
 
 import PQueue from 'p-queue'
 import { Endpoints } from './endpoints.js'
@@ -22,7 +22,7 @@ const providers = new Map<string, JsonRpcProvider>()
 //   return networkish
 // }
 
-export function getProvider(chainId?: EthChainId): Provider {
+export function getProvider(chainId?: EthChainId): JsonRpcProvider {
   // const network = getNetworkFromCtxOrNetworkish(networkish)
   if (!chainId) {
     chainId = EthChainId.ETHEREUM
