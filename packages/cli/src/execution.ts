@@ -38,6 +38,9 @@ export async function execPackageManager(args: string[], stepName: string, optio
   try {
     const packageManager = await getPackageManager()
     pm = packageManager.name
+    if (pm == 'npm') {
+      console.log(chalk.yellow('WARN: we recommend using yarn instead of npm'))
+    }
   } catch (e) {}
   return execStep([pm, ...args], stepName, options)
 }
