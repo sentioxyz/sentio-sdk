@@ -28,14 +28,18 @@ export async function estimateBlockNumberAtDate(
     result = await provider.send('sentio_estimateBlockNumberAtDate', [timestampHex, rangeStart, rangeEnd, strategy])
   } catch (e) {
     const serverError = e as EthersError
-    if (serverError.code === 'SERVER_ERROR') {
+    if (
+      serverError.code === 'SERVER_ERROR' ||
+      serverError.code === 'UNKNOWN_ERROR' ||
+      serverError.code === 'UNSUPPORTED_OPERATION'
+    ) {
       return await estimateBlockNumberAtDateSlow(provider, targetDate, startBlock)
     }
     throw e
   }
 
   if (result === null) {
-    throw Error("Block can't be located.")
+    return 0
   }
 
   return parseInt(result, 16)
@@ -71,7 +75,9 @@ export async function estimateBlockNumberAtDateSlow(
     }
   }
 
-  // If exact timestamp is not found, return the closest block number
+  // If exact timestamp is not found, return 0
+  if (high === -1) return 0
+
   const closestBlock = await getBlockSafely(provider, high)
   return closestBlock.number
 }
