@@ -4,11 +4,12 @@ import { getProvider, State } from '@sentio/runtime'
 import { loadTestProvidersFromEnv } from '@sentio/sdk/testing'
 
 import { expect } from 'chai'
+import { EthChainId } from '@sentio/chain'
 
 describe('block estimate', () => {
   State.reset()
 
-  const haveProviders = loadTestProvidersFromEnv(['1'])
+  const haveProviders = loadTestProvidersFromEnv(['1', '11155111'])
 
   const testIf = haveProviders ? test : test.skip
 
@@ -20,5 +21,8 @@ describe('block estimate', () => {
     targetDate = new Date('1990-05-02T00:00:00Z')
     estimatedBlockNumber = await estimateBlockNumberAtDate(getProvider(), targetDate, 0)
     expect(estimatedBlockNumber).to.equal(0)
+
+    estimatedBlockNumber = await estimateBlockNumberAtDate(getProvider(EthChainId.SEPOLIA), targetDate, 0)
+    expect(estimatedBlockNumber).to.equal(undefined)
   })
 })
