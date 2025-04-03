@@ -12,7 +12,7 @@ export async function estimateBlockNumberAtDate(
   provider: JsonRpcProvider,
   targetDate: Date,
   startBlock?: number
-): Promise<number> {
+): Promise<number | undefined> {
   // Convert JS Date to Unix timestamp in hex
   const timestampHex = '0x' + Math.floor(targetDate.getTime()).toString(16)
 
@@ -39,7 +39,7 @@ export async function estimateBlockNumberAtDate(
   }
 
   if (result === null) {
-    return 0
+    return undefined
   }
 
   return parseInt(result, 16)
@@ -49,7 +49,7 @@ export async function estimateBlockNumberAtDateSlow(
   provider: JsonRpcProvider,
   targetDate: Date,
   startBlock?: number
-): Promise<number> {
+): Promise<number | undefined> {
   // Convert the Date object to a Unix timestamp (in seconds)
   const targetTimestamp = Math.floor(targetDate.getTime() / 1000)
 
@@ -75,8 +75,8 @@ export async function estimateBlockNumberAtDateSlow(
     }
   }
 
-  // If exact timestamp is not found, return 0
-  if (high === -1) return 0
+  // If exact timestamp is not found, return undefined
+  if (high === -1) return undefined
 
   const closestBlock = await getBlockSafely(provider, high)
   return closestBlock.number
