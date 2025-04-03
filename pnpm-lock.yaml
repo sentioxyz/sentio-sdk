@@ -10,7 +10,7 @@ overrides:
 
 patchedDependencies:
   '@coral-xyz/anchor@0.30.1':
-    hash: 55308fdd8a6a002ddc9788b83fff3dff38beecb9ee576dd8ed3552a34ff670a5
+    hash: clsetxooki5gt3bqisxpc22mka
     path: patches/@coral-xyz__anchor@0.30.1.patch
 
 importers:
@@ -514,7 +514,7 @@ importers:
         version: 1.33.0
       '@coral-xyz/anchor':
         specifier: ^0.30.1
-        version: 0.30.1(patch_hash=55308fdd8a6a002ddc9788b83fff3dff38beecb9ee576dd8ed3552a34ff670a5)(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
+        version: 0.30.1(patch_hash=clsetxooki5gt3bqisxpc22mka)(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
       '@coral-xyz/borsh':
         specifier: ^0.30.1
         version: 0.30.1(@solana/web3.js@1.95.8(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10))
@@ -537,8 +537,8 @@ importers:
         specifier: 9.1.1-patch.3
         version: 9.1.1-patch.3
       '@sentio/chain':
-        specifier: ~3.0.5
-        version: 3.0.5
+        specifier: ~3.0.7
+        version: 3.0.7
       '@sentio/ethers-v6':
         specifier: ^1.0.29
         version: 1.0.29(@sentio/ethers@6.13.1-patch.5(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typescript@5.5.2)
@@ -1853,10 +1853,13 @@ packages:
   '@sentio/chain@3.0.5':
     resolution: {integrity: sha512-6xUxr5ZCXOpex1i8MeX9wu9ABYai1Auw3onQarWkbkDnv5rCLba9PdtRorYDYSdqgZlFfyQbxFGlkE/kDJWtDQ==}
 
+  '@sentio/chain@3.0.7':
+    resolution: {integrity: sha512-Z58upVHDk4/3RnbMc/y8FSrOxRVFg0dG8A0wQ7gitWmvy8axuNtK5NM+9foCR/ORX8RYJhuDmzfNKLHsYxpLmw==}
+
   '@sentio/ethers-v6@1.0.29':
     resolution: {integrity: sha512-/4jZZn+eM3EfI0bUMBAf5vu8muy8ABptu8ucFoMDTZLLTjxcSKRffLP3RL7w1JHGjyC2V6oEQfwS4cn9JEohHQ==}
     peerDependencies:
-      ethers: ^6.0.0
+      ethers: npm:@sentio/ethers@6.13.1-patch.5
       typescript: '>=4.3.0'
 
   '@sentio/ethers@6.13.1-patch.5':
@@ -6628,7 +6631,7 @@ snapshots:
 
   '@coral-xyz/anchor-errors@0.30.1': {}
 
-  '@coral-xyz/anchor@0.30.1(patch_hash=55308fdd8a6a002ddc9788b83fff3dff38beecb9ee576dd8ed3552a34ff670a5)(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)':
+  '@coral-xyz/anchor@0.30.1(patch_hash=clsetxooki5gt3bqisxpc22mka)(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)':
     dependencies:
       '@coral-xyz/anchor-errors': 0.30.1
       '@coral-xyz/borsh': 0.30.1(@solana/web3.js@1.95.8(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10))
@@ -7974,6 +7977,8 @@ snapshots:
   '@sentio/bigdecimal@9.1.1-patch.3': {}
 
   '@sentio/chain@3.0.5': {}
+
+  '@sentio/chain@3.0.7': {}
 
   '@sentio/ethers-v6@1.0.29(@sentio/ethers@6.13.1-patch.5(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typescript@5.5.2)':
     dependencies:
