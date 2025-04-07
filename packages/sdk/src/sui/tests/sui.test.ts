@@ -2,9 +2,11 @@ import { before, describe, test } from 'node:test'
 import { expect } from 'chai'
 import { TestProcessorServer } from '../../testing/index.js'
 import { SuiNetwork } from '../network.js'
+import { dynamic_field } from '../builtin/0x2.js'
 import { sui_system, validator } from '../builtin/0x3.js'
 import { SuiObjectProcessor, SuiObjectTypeProcessor } from '../sui-object-processor.js'
 import { MoveOwnerType } from '@sentio/protos'
+import { BUILTIN_TYPES } from '@typemove/move'
 
 describe('Test Sui Example', () => {
   const service = new TestProcessorServer(async () => {
@@ -23,12 +25,14 @@ describe('Test Sui Example', () => {
       ctx.meter.Gauge('size').record(objects.length)
     })
 
-    SuiObjectTypeProcessor.bind({ objectType: validator.Validator.type() })
+    SuiObjectTypeProcessor.bind({
+      objectType: dynamic_field.Field.type(BUILTIN_TYPES.U64_TYPE, validator.Validator.type())
+    })
       .onTimeInterval(
         (self, objects, ctx) => {
           ctx.meter
             .Gauge('validator')
-            .record(self.data_decoded.voting_power, { address: self.data_decoded.metadata.primary_address })
+            .record(self.data_decoded.value.voting_power, { address: self.data_decoded.value.metadata.primary_address })
         },
         60,
         60,
@@ -47,7 +51,9 @@ describe('Test Sui Example', () => {
     expect(config.accountConfigs).length(2)
     expect(config.accountConfigs[0].moveIntervalConfigs[0].ownerType).eq(MoveOwnerType.OBJECT)
     expect(config.accountConfigs[1].moveIntervalConfigs[0].ownerType).eq(MoveOwnerType.TYPE)
-    expect(config.accountConfigs[1].moveResourceChangeConfigs[0].type).eq(validator.Validator.type().qname)
+    expect(config.accountConfigs[1].moveResourceChangeConfigs[0].type).eq(
+      dynamic_field.Field.type(BUILTIN_TYPES.U64_TYPE, validator.Validator.type()).getSignature()
+    )
   })
 
   test('Check event dispatch', async () => {
