@@ -332,7 +332,7 @@ export class SuiObjectTypeProcessor<T> extends SuiBaseObjectOrAddressProcessor<
         backfillInterval: backfillTimeIntervalInMinutes
       },
       undefined,
-      this.objectType.qname,
+      this.objectType.getSignature(),
       fetchConfig
     )
   }
