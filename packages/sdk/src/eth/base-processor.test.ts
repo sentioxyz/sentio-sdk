@@ -3,7 +3,7 @@ import { setTimeout } from 'timers/promises'
 
 import { expect } from 'chai'
 
-import { GenericProcessor } from './index.js'
+import { GenericProcessor, GlobalProcessor } from './index.js'
 import { TestProcessorServer } from '../testing/index.js'
 import { processMetrics } from '@sentio/runtime'
 
@@ -63,4 +63,33 @@ describe('Test Base Processor', () => {
     transactionHash: '0x93355e0cb2c3490cb8a747029ff2dc8cdbde2407025b8391398436955afae303',
     logIndex: 428
   }
+})
+
+describe('Test Global Processor', () => {
+  const service = new TestProcessorServer(async () => {
+    GlobalProcessor.bind({}).onTransaction((tx, ctx) => {
+      ctx.meter.Counter('tx_num').add(1)
+    })
+  })
+
+  before(async () => {
+    await service.start()
+  })
+
+  test('test transaction', async () => {
+    const tx = {
+      blockNumber: 2,
+      index: 0,
+      hash: '0xcb8810a23315b5c2cb836883959bbf982f2158b7d9f7f8f4c5c0a8cf9d90f720',
+      from: '0x0000000000000000000000000000000000000000',
+      gasLimit: 1n,
+      value: 2n,
+      nonce: 123,
+      data: '0xa9059cbb00000000000000000000000070997970c51812dc3a010c7d01b50e0d17dc79c80000000000000000000000000000000000000000000000000000000000000002'
+    }
+    const res = await service.eth.testTransaction(tx)
+    const counters = res.result?.counters
+    expect(counters).length(1)
+    expect(counters?.[0].metadata?.transactionHash).equals(tx.hash)
+  })
 })

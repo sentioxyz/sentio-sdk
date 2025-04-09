@@ -50,6 +50,8 @@ export abstract class EthContext extends BaseContext {
     } else if (trace) {
       this.blockNumber = trace.blockNumber
       this.transactionHash = trace.transactionHash
+    } else if (transaction?.blockNumber) {
+      this.blockNumber = transaction.blockNumber
     }
   }
 
