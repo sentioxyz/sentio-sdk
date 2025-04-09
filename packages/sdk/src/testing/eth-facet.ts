@@ -1,7 +1,7 @@
 import { TestProcessorServer } from './test-processor-server.js'
 import { DataBinding, HandlerType, ProcessBindingResponse } from '@sentio/protos'
 import { Trace } from '../eth/eth.js'
-import { BlockParams, LogParams } from 'ethers/providers'
+import { BlockParams, LogParams, TransactionResponseParams } from 'ethers/providers'
 import { ChainId, EthChainId } from '@sentio/chain'
 import { ALL_ADDRESS } from '../index.js'
 
@@ -247,6 +247,49 @@ export class EthFacet {
       }
 
       for (const config of contract.intervalConfigs) {
+        binding.handlerIds.push(config.handlerId)
+      }
+    }
+    return binding
+  }
+
+  testTransaction(
+    transaction: Partial<TransactionResponseParams>,
+    network: EthChainId = EthChainId.ETHEREUM
+  ): Promise<ProcessBindingResponse> {
+    return this.testTransactions([transaction], network)
+  }
+
+  testTransactions(transactions: Partial<TransactionResponseParams>[], network: EthChainId = EthChainId.ETHEREUM) {
+    const bindings = []
+    for (const transaction of transactions) {
+      const binding = this.buildTransactionBinding(transaction, network)
+      if (!binding) {
+        throw Error('Invalid test transaction: ' + JSON.stringify(transaction))
+      }
+      bindings.push(binding)
+    }
+    return this.server.processBindings({
+      bindings: bindings
+    })
+  }
+
+  buildTransactionBinding(
+    transaction: Partial<TransactionResponseParams>,
+    network: EthChainId = EthChainId.ETHEREUM
+  ): DataBinding {
+    const binding: DataBinding = {
+      data: {
+        ethTransaction: { transaction, timestamp: new Date(), rawTransaction: JSON.stringify(transaction) }
+      },
+      handlerType: HandlerType.ETH_TRANSACTION,
+      handlerIds: []
+    }
+    for (const contract of this.server.contractConfigs) {
+      if (contract.contract?.chainId !== network) {
+        continue
+      }
+      for (const config of contract.transactionConfig) {
         binding.handlerIds.push(config.handlerId)
       }
     }
