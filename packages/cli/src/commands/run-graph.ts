@@ -108,8 +108,6 @@ async function runGraphCreate(argv: string[]) {
       'init',
       projectName,
       projectName,
-      '--product',
-      'subgraph-studio',
       '--protocol',
       'ethereum',
       '--network',
