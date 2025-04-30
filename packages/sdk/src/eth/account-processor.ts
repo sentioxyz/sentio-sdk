@@ -10,7 +10,7 @@ import { AccountContext } from './context.js'
 import { AddressOrTypeEventFilter, defaultPreprocessHandler, EventsHandler } from './base-processor.js'
 import { Block } from 'ethers'
 import { AccountProcessorState } from './account-processor-state.js'
-import { fixEmptyKey, formatEthData, TypedEvent } from './eth.js'
+import { fixEmptyKey, formatEthData, TypedEvent, validateAndNormalizeAddress } from './eth.js'
 import { EthChainId } from '@sentio/chain'
 import { ServerError, Status } from 'nice-grpc'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
@@ -31,6 +31,7 @@ export class AccountProcessor {
   protected constructor(config: PartiallyOptional<AccountBindOptions, 'network'>) {
     this.config = {
       ...config,
+      address: validateAndNormalizeAddress(config.address),
       network: config.network || EthChainId.ETHEREUM
     }
 
