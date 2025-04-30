@@ -7,7 +7,7 @@ import { PromiseOrVoid } from '../core/promises.js'
 import { ListStateStorage, processMetrics } from '@sentio/runtime'
 import { BlockParams } from 'ethers/providers'
 import { DeferredTopicFilter } from 'ethers/contract'
-import { TypedEvent, TypedCallTrace } from './eth.js'
+import { TypedEvent, TypedCallTrace, validateAndNormalizeAddress } from './eth.js'
 import { TemplateInstanceState } from '../core/template.js'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 
@@ -70,6 +70,8 @@ export abstract class BaseProcessorTemplate<
    * @param ctx
    */
   public bind(options: Omit<BindOptions, 'network'>, ctx: EthContext): void {
+    options = { ...options, address: validateAndNormalizeAddress(options.address) }
+
     const sig = getOptionsSignature({
       address: options.address,
       network: ctx.chainId

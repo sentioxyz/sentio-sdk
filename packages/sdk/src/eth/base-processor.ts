@@ -16,7 +16,15 @@ import {
 import { BindOptions } from './bind-options.js'
 import { PromiseOrVoid } from '../core/promises.js'
 import { ServerError, Status } from 'nice-grpc'
-import { fixEmptyKey, formatEthData, RichBlock, Trace, TypedCallTrace, TypedEvent } from './eth.js'
+import {
+  fixEmptyKey,
+  formatEthData,
+  RichBlock,
+  Trace,
+  TypedCallTrace,
+  TypedEvent,
+  validateAndNormalizeAddress
+} from './eth.js'
 import sha3 from 'js-sha3'
 import { ListStateStorage } from '@sentio/runtime'
 import { EthChainId } from '@sentio/chain'
@@ -379,7 +387,7 @@ export abstract class BaseProcessor<
 
   constructor(config: BindOptions) {
     this.config = {
-      address: config.address,
+      address: validateAndNormalizeAddress(config.address),
       name: config.name || '',
       network: config.network || EthChainId.ETHEREUM,
       startBlock: 0n,
