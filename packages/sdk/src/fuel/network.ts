@@ -16,11 +16,12 @@ export function getRpcEndpoint(network: FuelNetwork): string {
   return 'https://mainnet.fuel.network/v1/graphql'
 }
 
-export function getProvider(network: FuelNetwork): Promise<Provider> {
+export async function getProvider(network: FuelNetwork): Promise<Provider> {
   let chainServer = Endpoints.INSTANCE.chainServer.get(network)
   if (!chainServer) {
     chainServer = getRpcEndpoint(network)
     // throw new ServerError(Status.INTERNAL, 'RPC endpoint not provided')
   }
-  return Provider.create(chainServer)
+  return new Provider(chainServer)
+  // return Provider.create(chainServer)
 }

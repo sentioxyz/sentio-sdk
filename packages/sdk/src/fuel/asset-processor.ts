@@ -55,7 +55,7 @@ export class FuelAssetProcessor implements FuelBaseProcessor<FuelAssetProcessorC
       handlerName: getHandlerName(),
       handler: async (call: Data_FuelTransaction) => {
         const gqlTransaction = call.transaction
-        const tx = decodeFuelTransaction(gqlTransaction, this.provider)
+        const tx = await decodeFuelTransaction(gqlTransaction, this.provider)
 
         const transfer: FuelTransfer = {
           from: [],

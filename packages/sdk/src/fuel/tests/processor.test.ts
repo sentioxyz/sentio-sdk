@@ -73,7 +73,7 @@ describe('fuel network tests', () => {
     const receipt = testData.status.receipts[0]
     const param1 = receipt.param1
     const provider = await getProvider(FuelChainId.FUEL_TESTNET)
-    const chain = provider.getChain()
+    const chain = await provider.getChain()
     const maxInputs = chain.consensusParameters.txParameters.maxInputs
     const argsOffset = bn(param1)
       .sub(calculateVmTxMemory({ maxInputs: maxInputs.toNumber() }))

@@ -191,7 +191,7 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
       handlerName,
       handler: async ({ transaction, receiptIndex, timestamp }: Data_FuelReceipt) => {
         try {
-          const tx = decodeFuelTransaction(transaction, this.provider)
+          const tx = await decodeFuelTransaction(transaction, this.provider)
           const index = Number(receiptIndex)
           const receipt = tx.receipts[index]
           const log = decodeLog(receipt, this.config.abi)
@@ -239,7 +239,7 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
       handlerName: getHandlerName(),
       handler: async ({ transaction, receiptIndex, timestamp }: Data_FuelReceipt) => {
         try {
-          const tx = decodeFuelTransaction(transaction, this.provider)
+          const tx = await decodeFuelTransaction(transaction, this.provider)
           const index = Number(receiptIndex)
           const receipt = tx.receipts[index] as ReceiptTransfer | ReceiptTransferOut
           const ctx = new FuelContractContext(
