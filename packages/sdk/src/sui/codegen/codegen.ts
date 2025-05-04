@@ -105,8 +105,12 @@ class SuiCodegen {
     ]
 
     for (const [network, gen] of generators) {
-      numFiles += await recursiveCodegen(path.join(srcDir, network), path.join(outputDir, network), (src, dst) =>
-        gen.generate(src, dst, builtin)
+      const exclude = network ? [] : ['testnet']
+      numFiles += await recursiveCodegen(
+        path.join(srcDir, network),
+        path.join(outputDir, network),
+        (src, dst) => gen.generate(src, dst, builtin),
+        exclude
       )
     }
     return numFiles
