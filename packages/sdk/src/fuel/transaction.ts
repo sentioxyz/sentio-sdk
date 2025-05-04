@@ -8,7 +8,7 @@ import {
   InputType,
   Interface,
   JsonAbi,
-  processGqlReceipt,
+  deserializeReceipt,
   Provider,
   ReceiptType,
   TransactionCoder,
@@ -33,12 +33,12 @@ function findSenderFromInputs(inputs: Input[] | undefined, baseAssetId: string):
   return undefined
 }
 
-export function decodeFuelTransaction(gqlTransaction: any, provider: Provider): FuelTransaction {
+export async function decodeFuelTransaction(gqlTransaction: any, provider: Provider): Promise<FuelTransaction> {
   const rawPayload = arrayify(gqlTransaction.rawPayload)
-  const receipts = gqlTransaction?.status.receipts?.map(processGqlReceipt) || []
+  const receipts = gqlTransaction?.status.receipts?.map(deserializeReceipt) || []
 
   const [decodedTransaction] = new TransactionCoder().decode(rawPayload, 0)
-  const { gasCosts, feeParameters, txParameters, baseAssetId } = provider.getChain().consensusParameters
+  const { gasCosts, feeParameters, txParameters, baseAssetId } = (await provider.getChain()).consensusParameters
   const blockNumber = gqlTransaction.status?.block?.header?.height
   const { gasPriceFactor, gasPerByte } = feeParameters
   const { maxInputs, maxGasPerTx } = txParameters
@@ -70,7 +70,7 @@ export function decodeLog(receipt: any | undefined, abi: JsonAbi) {
   if (receipt && (receipt.type === ReceiptType.LogData || receipt.type === ReceiptType.Log)) {
     const interfaceToUse = new Interface(abi)
     const data = receipt.type === ReceiptType.Log ? new BigNumberCoder('u64').encode(receipt.val0) : receipt.data
-    const logId: string = receipt.val1.toString()
+    const logId: string = receipt.rb.toString()
     const [decodedLog] = interfaceToUse.decodeLog(data, logId)
     return { logId, data: decodedLog }
   }
@@ -85,7 +85,7 @@ export async function decodeFuelTransactionWithAbi(
   const rawPayload = arrayify(gqlTransaction.rawPayload)
   const [decodedTransaction] = new TransactionCoder().decode(rawPayload, 0)
 
-  const receipts = gqlTransaction?.status.receipts?.map(processGqlReceipt) || []
+  const receipts = gqlTransaction?.status.receipts?.map(deserializeReceipt) || []
 
   // const {
   //   consensusParameters: {
@@ -113,11 +113,15 @@ export async function decodeFuelTransactionWithAbi(
       console.warn('Failed to decode log', e)
     }
   })
-
-  const txResponse = new TransactionResponse(gqlTransaction.status.transactionId, provider, {
-    main: Object.values(abiMap)[0],
-    otherContractsAbis: {}
-  })
+  const txResponse = new TransactionResponse(
+    gqlTransaction.status.transactionId,
+    provider,
+    await provider.getChainId(),
+    {
+      main: Object.values(abiMap)[0],
+      otherContractsAbis: {}
+    }
+  )
 
   // @ts-ignore - hack
   txResponse.gqlTransaction = {
@@ -144,6 +148,6 @@ export async function decodeFuelTransactionWithAbi(
     ...summary,
     blockNumber,
     logs,
-    sender: findSenderFromInputs(decodedTransaction.inputs, provider.getChain().consensusParameters.baseAssetId)
+    sender: findSenderFromInputs(decodedTransaction.inputs, (await provider.getChain()).consensusParameters.baseAssetId)
   }
 }

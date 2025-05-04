@@ -46,7 +46,7 @@ export class FuelGlobalProcessor implements FuelBaseProcessor<GlobalFuelProcesso
       handler: async (call: Data_FuelTransaction) => {
         let tx: FuelTransaction
         try {
-          tx = decodeFuelTransaction(call.transaction, this.provider)
+          tx = await decodeFuelTransaction(call.transaction, this.provider)
         } catch (e) {
           console.error('error decoding transaction', e)
           return mergeProcessResults([])
