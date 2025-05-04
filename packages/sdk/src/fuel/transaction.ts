@@ -70,7 +70,7 @@ export function decodeLog(receipt: any | undefined, abi: JsonAbi) {
   if (receipt && (receipt.type === ReceiptType.LogData || receipt.type === ReceiptType.Log)) {
     const interfaceToUse = new Interface(abi)
     const data = receipt.type === ReceiptType.Log ? new BigNumberCoder('u64').encode(receipt.val0) : receipt.data
-    const logId: string = receipt.val1.toString()
+    const logId: string = receipt.rb.toString()
     const [decodedLog] = interfaceToUse.decodeLog(data, logId)
     return { logId, data: decodedLog }
   }
