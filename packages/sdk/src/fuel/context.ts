@@ -63,7 +63,7 @@ export class FuelContractContext<TContract extends Contract> extends FuelContext
     readonly transaction: FuelTransaction | null,
     readonly block: FuelBlock | null
   ) {
-    super(chainId, contractAddress, contractName, timestamp, transaction, block)
+    super(chainId, contract?.id?.toString() ?? contractAddress, contractName, timestamp, transaction, block)
   }
 
   get provider() {
