@@ -37,7 +37,6 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
   receiptHandlers: ReceiptHandler[] = []
 
   private provider: Provider
-  private contract: TContract
 
   static bind(config: FuelProcessorConfig): FuelProcessor<any> {
     const processor = new FuelProcessor(config)
@@ -62,8 +61,20 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
       this.latestGasPrice = latestGasPrice?.gasPrice
       return bn(latestGasPrice.gasPrice)
     }
+    if (this.config.address === '*') {
+      return
+    }
+  }
 
-    this.contract = new Contract(this.config.address, this.config.abi!, this.provider) as TContract
+  private getContract(tx?: FuelTransaction) {
+    let contract: undefined | TContract
+    const contractId = tx?.transaction?.inputContract?.contractID
+    if (contractId) {
+      contract = new Contract(contractId, this.config.abi, this.provider) as TContract
+    } else if (this.config.address != '*') {
+      contract = new Contract(this.config.address, this.config.abi!, this.provider) as TContract
+    }
+    return contract
   }
 
   public onTransaction(
@@ -83,7 +94,7 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
 
         const ctx = new FuelContractContext(
           this.config.chainId,
-          this.contract,
+          this.getContract(tx),
           this.config.address,
           this.config.name ?? this.config.address,
           call.timestamp || new Date(0),
@@ -149,7 +160,10 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
           for (const op of tx.operations) {
             for (const call of op.calls || []) {
               if (names.has(call.functionName)) {
-                const fn = this.contract.functions[call.functionName]
+                const fn = this.getContract(tx)?.functions[call.functionName]
+                if (!fn) {
+                  continue
+                }
                 const args = Object.values(call.argumentsProvided || {})
                 const scope = fn(...args)
                 const invocationResult = new FuelCall(scope, tx, false, call.argumentsProvided, tx.logs)
@@ -198,7 +212,7 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
           if (log) {
             const ctx = new FuelContractContext(
               this.config.chainId,
-              this.contract,
+              this.getContract(tx),
               this.config.address,
               this.config.name ?? this.config.address,
               timestamp || new Date(0),
@@ -244,7 +258,7 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
           const receipt = tx.receipts[index] as ReceiptTransfer | ReceiptTransferOut
           const ctx = new FuelContractContext(
             this.config.chainId,
-            this.contract,
+            this.getContract(tx),
             this.config.address,
             this.config.name ?? this.config.address,
             timestamp || new Date(0),
@@ -311,10 +325,10 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
             transactionsRoot: header.transactionsRoot
           }
         }
-
+        const contract = processor.getContract()
         const ctx = new FuelContractContext(
           processor.config.chainId,
-          processor.contract,
+          contract,
           processor.config.address,
           processor.config.name ?? processor.config.address,
           data.timestamp || new Date(0),

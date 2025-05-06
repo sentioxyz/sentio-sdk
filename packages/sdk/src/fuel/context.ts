@@ -56,7 +56,7 @@ export class FuelContext extends BaseContext {
 export class FuelContractContext<TContract extends Contract> extends FuelContext {
   constructor(
     readonly chainId: FuelChainId,
-    readonly contract: TContract,
+    readonly contract: TContract | undefined,
     readonly contractAddress: string,
     readonly contractName: string,
     readonly timestamp: Date,
@@ -67,6 +67,6 @@ export class FuelContractContext<TContract extends Contract> extends FuelContext
   }
 
   get provider() {
-    return this.contract.provider
+    return this.contract?.provider
   }
 }
