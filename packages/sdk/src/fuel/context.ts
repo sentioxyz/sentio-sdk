@@ -55,13 +55,13 @@ export class FuelContext extends BaseContext {
 
 export class FuelContractContext<TContract extends Contract> extends FuelContext {
   constructor(
-    readonly chainId: FuelChainId,
+    chainId: FuelChainId,
     readonly contract: TContract | undefined,
-    readonly contractAddress: string,
-    readonly contractName: string,
-    readonly timestamp: Date,
-    readonly transaction: FuelTransaction | null,
-    readonly block: FuelBlock | null
+    contractAddress: string,
+    contractName: string,
+    timestamp: Date,
+    transaction: FuelTransaction | null,
+    block: FuelBlock | null
   ) {
     super(chainId, contract?.id?.toString() ?? contractAddress, contractName, timestamp, transaction, block)
   }

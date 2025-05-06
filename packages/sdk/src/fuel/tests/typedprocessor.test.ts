@@ -7,11 +7,11 @@ import { State } from '@sentio/runtime'
 import { CounterContractProcessor } from './types/CounterContractProcessor.js'
 
 describe('typed fuel processor tests', () => {
-  const ADDRESS = '0xa50da2237febdd382512180b4a0dc6d4e358a8d13ad6e95c350f367a1ba68129'
+  const ADDRESS = '0xdB0d550935d601c45791bA18664f0A821C11745B1f938E87f10a79e21988e850'
 
   const service = new TestProcessorServer(async () => {
     CounterContractProcessor.bind({
-      address: ADDRESS,
+      address: '*',
       chainId: FuelChainId.FUEL_TESTNET
     })
       /*.onCallComplex(async (call, ctx) => {
@@ -63,6 +63,7 @@ describe('typed fuel processor tests', () => {
     const events = res.result?.events
     expect(events).length(2)
     expect(events?.[0]?.message).contains('log foo')
+    expect(events?.[0]?.metadata?.address).eq(ADDRESS)
   })
 
   after(async () => {
