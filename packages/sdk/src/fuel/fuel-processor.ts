@@ -7,7 +7,7 @@ import {
   ProcessResult
 } from '@sentio/protos'
 import { FuelCall, FuelContext, FuelContractContext } from './context.js'
-import { bn, Contract, Interface, JsonAbi, Provider, ReceiptTransfer, ReceiptTransferOut } from 'fuels'
+import { bn, Contract, InputType, Interface, JsonAbi, Provider, ReceiptTransfer, ReceiptTransferOut } from 'fuels'
 import { FuelNetwork, getProvider } from './network.js'
 import {
   decodeFuelTransaction,
@@ -68,7 +68,16 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
 
   private getContract(tx?: FuelTransaction) {
     let contract: undefined | TContract
-    const contractId = tx?.transaction?.inputContract?.contractID
+    let contractId = tx?.transaction?.inputContract?.contractID
+    if (!contractId) {
+      for (const input of tx?.transaction?.inputs ?? []) {
+        if (input.type == InputType.Contract) {
+          contractId = input.contractID
+          break
+        }
+      }
+    }
+
     if (contractId) {
       contract = new Contract(contractId, this.config.abi, this.provider) as TContract
     } else if (this.config.address != '*') {
