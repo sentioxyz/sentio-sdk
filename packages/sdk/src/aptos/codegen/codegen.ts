@@ -93,7 +93,7 @@ class InitiaAptosNetworkCodegen extends AptosNetworkCodegen {
     if (address.startsWith('0x')) {
       address = address.slice(2)
     }
-    return '0x' + address.padStart(64, '0')
+    return '0x' + address.padStart(ADDRESS_LENGTH, '0')
   }
 }
 
