@@ -75,6 +75,8 @@ class AptosNetworkCodegen extends BaseAptosCodegen {
   }
 }
 
+const ADDRESS_LENGTH = 64
+
 class InitiaAptosNetworkCodegen extends AptosNetworkCodegen {
   constructor(network: AptosNetwork) {
     super(network)
