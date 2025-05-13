@@ -75,11 +75,35 @@ class AptosNetworkCodegen extends BaseAptosCodegen {
   }
 }
 
+const ADDRESS_LENGTH = 64
+
+class InitiaAptosNetworkCodegen extends AptosNetworkCodegen {
+  constructor(network: AptosNetwork) {
+    super(network)
+
+    const oldFetchModules = this.chainAdapter.fetchModules
+    this.chainAdapter.fetchModules = async (address: string) => {
+      return oldFetchModules(this.padZero(address))
+    }
+    const oldFetchModule = this.chainAdapter.fetchModule
+    this.chainAdapter.fetchModule = async (address: string, moduleName: string) => {
+      return oldFetchModule(this.padZero(address), moduleName)
+    }
+  }
+
+  private padZero(address: string): string {
+    if (address.startsWith('0x')) {
+      address = address.slice(2)
+    }
+    return '0x' + address.padStart(ADDRESS_LENGTH, '0')
+  }
+}
+
 const MAINNET_CODEGEN = new AptosNetworkCodegen(AptosNetwork.MAIN_NET)
 const TESTNET_CODEGEN = new AptosNetworkCodegen(AptosNetwork.TEST_NET)
 const MOVEMENT_MAINNET_CODEGEN = new AptosNetworkCodegen(AptosNetwork.MOVEMENT_MAIN_NET)
 const MOVEMENT_TESTNET_CODEGEN = new AptosNetworkCodegen(AptosNetwork.MOVEMENT_TEST_NET)
-const ECHELON_CODEGEN = new AptosNetworkCodegen(AptosNetwork.INITIA_ECHELON)
+const ECHELON_CODEGEN = new InitiaAptosNetworkCodegen(AptosNetwork.INITIA_ECHELON)
 
 class AptosCodegen {
   async generate(srcDir: string, outputDir: string, builtin = false): Promise<number> {
