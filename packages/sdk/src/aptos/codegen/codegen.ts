@@ -83,11 +83,11 @@ class InitiaAptosNetworkCodegen extends AptosNetworkCodegen {
 
     const oldFetchModules = this.chainAdapter.fetchModules
     this.chainAdapter.fetchModules = async (address: string) => {
-      return oldFetchModules(this.padZero(address))
+      return await oldFetchModules(this.padZero(address))
     }
     const oldFetchModule = this.chainAdapter.fetchModule
     this.chainAdapter.fetchModule = async (address: string, moduleName: string) => {
-      return oldFetchModule(this.padZero(address), moduleName)
+      return await oldFetchModule(this.padZero(address), moduleName)
     }
   }
 
