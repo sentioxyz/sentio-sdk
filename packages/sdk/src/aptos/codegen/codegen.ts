@@ -79,6 +79,7 @@ const MAINNET_CODEGEN = new AptosNetworkCodegen(AptosNetwork.MAIN_NET)
 const TESTNET_CODEGEN = new AptosNetworkCodegen(AptosNetwork.TEST_NET)
 const MOVEMENT_MAINNET_CODEGEN = new AptosNetworkCodegen(AptosNetwork.MOVEMENT_MAIN_NET)
 const MOVEMENT_TESTNET_CODEGEN = new AptosNetworkCodegen(AptosNetwork.MOVEMENT_TEST_NET)
+const ECHELON_CODEGEN = new AptosNetworkCodegen(AptosNetwork.INITIA_ECHELON)
 
 class AptosCodegen {
   async generate(srcDir: string, outputDir: string, builtin = false): Promise<number> {
@@ -87,7 +88,8 @@ class AptosCodegen {
       ['', MAINNET_CODEGEN],
       ['testnet', TESTNET_CODEGEN],
       ['movement-mainnet', MOVEMENT_MAINNET_CODEGEN],
-      ['movement-testnet', MOVEMENT_TESTNET_CODEGEN]
+      ['movement-testnet', MOVEMENT_TESTNET_CODEGEN],
+      ['initia-echelon', ECHELON_CODEGEN]
     ]
 
     for (const [network, gen] of generators) {

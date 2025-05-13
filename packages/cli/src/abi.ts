@@ -39,6 +39,13 @@ export async function getABI(
         })
       )
       break
+    case AptosChainId.INITIA_ECHELON:
+      aptosClient = new Aptos(
+        new AptosConfig({
+          fullnode: 'https://rpc.sentio.xyz/initia-aptos/v1'
+        })
+      )
+      break
     case SuiChainId.SUI_MAINNET:
       suiClient = new SuiClient({ url: 'https://fullnode.mainnet.sui.io/' })
       break
@@ -160,6 +167,9 @@ export function getABIFilePath(chain: string, name: string, address?: string, fo
     case AptosChainId.APTOS_MOVEMENT_TESTNET:
       subpath = 'aptos/movement-testnet'
       break
+    case AptosChainId.INITIA_ECHELON:
+      subpath = 'aptos/initia-echelon'
+      break
     case SuiChainId.SUI_MAINNET:
       subpath = 'sui'
       break
@@ -168,11 +178,11 @@ export function getABIFilePath(chain: string, name: string, address?: string, fo
       break
     case StarknetChainId.STARKNET_MAINNET:
       subpath = 'starknet'
-      filename = name && address ? `${name}-${address}` : name ?? address
+      filename = name && address ? `${name}-${address}` : (name ?? address)
       break
     case StarknetChainId.STARKNET_SEPOLIA:
       subpath = 'starknet/sepolia'
-      filename = name && address ? `${name}-${address}` : name ?? address
+      filename = name && address ? `${name}-${address}` : (name ?? address)
       break
     default:
       subpath = 'eth'

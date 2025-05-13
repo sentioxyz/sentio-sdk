@@ -1,6 +1,6 @@
 import { describe, test } from 'node:test'
 import { getABI } from './abi.js'
-import { EthChainId, SuiChainId } from '@sentio/chain'
+import { AptosChainId, EthChainId, SuiChainId } from '@sentio/chain'
 import { expect } from 'chai'
 
 describe('Test ABI get', () => {
@@ -43,6 +43,15 @@ describe('Test ABI get', () => {
     const abi = await getABI(
       SuiChainId.SUI_TESTNET,
       '0xebaa2ad3eacc230f309cd933958cc52684df0a41ae7ac214d186b80f830867d2',
+      undefined
+    )
+    expect(abi.abi !== undefined).eq(true)
+  })
+
+  test('echelon', async () => {
+    const abi = await getABI(
+      AptosChainId.INITIA_ECHELON,
+      '0xedcdbb4c459064293924e0e96e01d5927faa11fd38d331111d99d23f14f6ed7d',
       undefined
     )
     expect(abi.abi !== undefined).eq(true)

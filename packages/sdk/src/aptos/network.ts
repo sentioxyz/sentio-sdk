@@ -11,7 +11,8 @@ export const AptosNetwork = <const>{
   TEST_NET: AptosChainId.APTOS_TESTNET,
 
   MOVEMENT_MAIN_NET: AptosChainId.APTOS_MOVEMENT_MAINNET,
-  MOVEMENT_TEST_NET: AptosChainId.APTOS_MOVEMENT_TESTNET
+  MOVEMENT_TEST_NET: AptosChainId.APTOS_MOVEMENT_TESTNET,
+  INITIA_ECHELON: AptosChainId.INITIA_ECHELON
 }
 
 export const MovementNetwork = <const>{
@@ -37,6 +38,8 @@ export function getRpcEndpoint(network: AptosNetwork): string {
       return 'https://mainnet.movementnetwork.xyz/v1'
     case AptosNetwork.MOVEMENT_TEST_NET:
       return 'https://aptos.testnet.bardock.movementlabs.xyz/v1'
+    case AptosNetwork.INITIA_ECHELON:
+      return 'https://rpc.sentio.xyz/initia-aptos/v1'
   }
 }
 
