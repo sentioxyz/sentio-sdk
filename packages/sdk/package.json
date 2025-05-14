@@ -76,10 +76,10 @@
     "test:starknet": "tsx --test src/stark/tests/event.test.ts"
   },
   "dependencies": {
-    "@aptos-labs/ts-sdk": "~1.33.0",
-    "@coral-xyz/anchor": "^0.30.1",
-    "@coral-xyz/borsh": "^0.30.1",
-    "@mysten/sui": "~1.20.0",
+    "@aptos-labs/ts-sdk": "~2.0.0",
+    "@coral-xyz/anchor": "^0.31.0",
+    "@coral-xyz/borsh": "^0.31.0",
+    "@mysten/sui": "~1.29.0",
     "@prettier/sync": "^0.5.2",
     "@sentio/abi-wan-kanabi": "2.2.2-1",
     "@sentio/api": "1.0.2",
@@ -88,11 +88,11 @@
     "@sentio/ethers-v6": "^1.0.29",
     "@sentio/protos": "workspace:*",
     "@sentio/runtime": "workspace:^",
-    "@solana/web3.js": "1.95.8",
+    "@solana/web3.js": "1.98.2",
     "@typemove/aptos": "~1.9.0",
     "@typemove/move": "~1.9.0",
     "@typemove/sui": "~1.9.0",
-    "bs58": "^5.0.0",
+    "bs58": "^6.0.0",
     "chalk": "^5.3.0",
     "csv-parse": "^5.5.3",
     "ethers": "npm:@sentio/ethers@6.13.1-patch.6",
@@ -107,7 +107,7 @@
     "nice-grpc-prometheus": "^0.2.2",
     "node-fetch": "^3.3.2",
     "p-queue": "^8.0.1",
-    "piscina": "5.0.0-alpha.0",
+    "piscina": "5.0.0",
     "radash": "^12.0.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
@@ -122,7 +122,7 @@
   "devDependencies": {
     "@types/google-protobuf": "^3.15.12",
     "prettier": "^3.2.4",
-    "typedoc": "^0.27.0"
+    "typedoc": "^0.28.0"
   },
   "engines": {
     "node": ">=20"
