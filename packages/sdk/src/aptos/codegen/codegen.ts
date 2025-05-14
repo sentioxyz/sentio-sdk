@@ -81,11 +81,11 @@ class InitiaAptosNetworkCodegen extends AptosNetworkCodegen {
   constructor(network: AptosNetwork) {
     super(network)
 
-    const oldFetchModules = this.chainAdapter.fetchModules
+    const oldFetchModules = this.chainAdapter.fetchModules.bind(this.chainAdapter)
     this.chainAdapter.fetchModules = async (address: string) => {
       return oldFetchModules(this.padZero(address))
     }
-    const oldFetchModule = this.chainAdapter.fetchModule
+    const oldFetchModule = this.chainAdapter.fetchModule.bind(this.chainAdapter)
     this.chainAdapter.fetchModule = async (address: string, moduleName: string) => {
       return oldFetchModule(this.padZero(address), moduleName)
     }
@@ -117,7 +117,7 @@ class AptosCodegen {
     ]
 
     for (const [network, gen] of generators) {
-      const exclude = network ? [] : ['testnet', 'movement-mainnet', 'movement-testnet']
+      const exclude = network ? [] : ['testnet', 'movement-mainnet', 'movement-testnet', 'initia-echelon']
       numFiles += await recursiveCodegen(
         path.join(srcDir, network),
         path.join(outputDir, network),
