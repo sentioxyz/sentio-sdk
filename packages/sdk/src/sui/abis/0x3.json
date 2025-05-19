@@ -4764,6 +4764,27 @@
         ],
         "return": []
       },
+      "store_execution_time_estimates": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "sui_system_state_inner",
+                "name": "SuiSystemStateInnerV2",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Vector": "U8"
+          }
+        ],
+        "return": []
+      },
       "system_state_version": {
         "visibility": "Friend",
         "isEntry": false,
@@ -8177,7 +8198,7 @@
       }
     },
     "exposedFunctions": {
-      "new_from_unverified": {
+      "into_verified": {
         "visibility": "Friend",
         "isEntry": false,
         "typeParameters": [],
@@ -8611,6 +8632,18 @@
             }
           }
         ]
+      },
+      "VotingPowerAdmissionStartEpochKey": {
+        "abilities": {
+          "abilities": ["Copy", "Drop", "Store"]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "dummy_field",
+            "type": "Bool"
+          }
+        ]
       }
     },
     "exposedFunctions": {
@@ -8742,8 +8775,6 @@
           },
           "U64",
           "U64",
-          "U64",
-          "U64",
           {
             "MutableReference": {
               "Struct": {
@@ -8784,6 +8815,26 @@
           }
         ],
         "return": []
+      },
+      "calculate_total_stakes": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Vector": {
+                "Struct": {
+                  "address": "0x3",
+                  "module": "validator",
+                  "name": "Validator",
+                  "typeArguments": []
+                }
+              }
+            }
+          }
+        ],
+        "return": ["U64"]
       },
       "convert_to_fungible_staked_sui": {
         "visibility": "Friend",
@@ -9089,7 +9140,45 @@
           }
         ]
       },
+      "is_active_validator": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "validator_set",
+                "name": "ValidatorSet",
+                "typeArguments": []
+              }
+            }
+          },
+          "Address"
+        ],
+        "return": ["Bool"]
+      },
       "is_active_validator_by_sui_address": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "validator_set",
+                "name": "ValidatorSet",
+                "typeArguments": []
+              }
+            }
+          },
+          "Address"
+        ],
+        "return": ["Bool"]
+      },
+      "is_at_risk_validator": {
         "visibility": "Friend",
         "isEntry": false,
         "typeParameters": [],
@@ -9411,7 +9500,6 @@
               }
             }
           },
-          "U64",
           {
             "Reference": {
               "Struct": {
@@ -10007,6 +10095,13 @@
       }
     },
     "exposedFunctions": {
+      "derive_raw_voting_power": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U64", "U64"],
+        "return": ["U64"]
+      },
       "quorum_threshold": {
         "visibility": "Public",
         "isEntry": false,
@@ -10030,7 +10125,8 @@
                 }
               }
             }
-          }
+          },
+          "U64"
         ],
         "return": []
       },
