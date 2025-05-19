@@ -552,11 +552,11 @@ importers:
         specifier: 1.95.8
         version: 1.95.8(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
       '@typemove/aptos':
-        specifier: ~1.9.0
-        version: 1.9.0
+        specifier: ~1.9.1-rc.3
+        version: 1.9.1-rc.3(axios@1.7.4)(got@11.8.6)
       '@typemove/move':
-        specifier: ~1.9.0
-        version: 1.9.0
+        specifier: ~1.9.1-rc.3
+        version: 1.9.1-rc.3
       '@typemove/sui':
         specifier: ~1.9.0
         version: 1.9.0(typescript@5.5.2)
@@ -672,9 +672,26 @@ packages:
     engines: {node: '>=15.10.0'}
     deprecated: <1.0.0 is no longer supported please upgrade to the latest version
 
+  '@aptos-labs/aptos-client@1.2.0':
+    resolution: {integrity: sha512-pBlIAT/W+Qa0TOr/318U8r0Gxw/jfyRLcvDGMEXgcVrPqO9Qhwsmozw6LPPIZ963FB7smwIaMeexWFDs3zijcg==}
+    engines: {node: '>=15.10.0'}
+    peerDependencies:
+      axios: ^1.8.4
+      got: ^11.8.6
+
+  '@aptos-labs/aptos-dynamic-transaction-composer@0.1.3':
+    resolution: {integrity: sha512-bJl+Zq5QbhpcPIJakAkl9tnT3T02mxCYhZThQDhUmjsOZ5wMRlKJ0P7aaq1dmlybSHkVj7vRgOy2t86/NDKKng==}
+
+  '@aptos-labs/script-composer-pack@0.0.9':
+    resolution: {integrity: sha512-Y3kA1rgF65HETgoTn2omDymsgO+fnZouPLrKJZ9sbxTGdOekIIHtGee3A2gk84eCqa02ZKBumZmP+IDCXRtU/g==}
+
   '@aptos-labs/ts-sdk@1.33.0':
     resolution: {integrity: sha512-svdlPH5r2dlSue2D9WXaaTslsmX18WLytAho6IRZJxQjEssglk64I6c1G9S8BTjRQj/ug6ahTwp6lx3eWuyd8Q==}
     engines: {node: '>=11.0.0'}
+
+  '@aptos-labs/ts-sdk@1.36.0':
+    resolution: {integrity: sha512-ViH6kuJCDtRtEl8p0cTIzU/RGH6qx7wJNdL4ZidLzRou8NnCSEkYBKamwVy6H1UHTIQM9wvMx+t4ADLPeloX/w==}
+    engines: {node: '>=20.0.0'}
 
   '@babel/code-frame@7.24.7':
     resolution: {integrity: sha512-BcYH1CVJBO9tvyIZ2jVeXgSIMvGZ2FDRvDdOIVQyuklNKSsx+eppDEBq/g47Ayw+RqNFE+URvOShmf+f/qwAlA==}
@@ -2431,12 +2448,15 @@ packages:
     resolution: {integrity: sha512-4BAffykYOgO+5nzBWYwE3W90sBgLJoUPRWWcL8wlyiM8IB8ipJz3UMJ9KXQd1RKQXpKp8Tutn80HZtWsu2u76w==}
     engines: {node: '>=10'}
 
-  '@typemove/aptos@1.9.0':
-    resolution: {integrity: sha512-2FWjpVKggbjhXZ9yN7ZOo5g3x7Bsxz+uLzR6BNueMDa5SwBv6+oXBqDrc312ECbu0hRvUl8Z380GaL7G2OXNBg==}
+  '@typemove/aptos@1.9.1-rc.3':
+    resolution: {integrity: sha512-E9LjhxN6+7XqBiRx5N6FIpUYSg/VH/JD8Va3UXyE/nH1sHmZVh5yTIXz44ikvrsB91OCHvQLDCNL6YRLsLCUVg==}
     hasBin: true
 
   '@typemove/move@1.9.0':
     resolution: {integrity: sha512-4XxTK4dtW5NkLE6wINCgQJoU239fF8KnJ7QCf08uXhwHxLtvhLcTQm61c/Kr0XcUdW8+BeCnIANYg1HbOm5eJw==}
+
+  '@typemove/move@1.9.1-rc.3':
+    resolution: {integrity: sha512-GRoYuCDOm80VvOJHj+tq1/35yA1x8Ygs3lWBxobY5bQL9NGZK6vEoO/AKP53En16GQdkz4MFGB/u/G+GrxYrAg==}
 
   '@typemove/sui@1.9.0':
     resolution: {integrity: sha512-9P1UlOjFFW9sYSULNZIZU1ULyPX85npZgUFHiY8b04vjI9mxHFJsO8uLjKzh85w2crAMvibE7o6inJaNo0g5xg==}
@@ -6985,6 +7005,17 @@ snapshots:
     transitivePeerDependencies:
       - debug
 
+  '@aptos-labs/aptos-client@1.2.0(axios@1.7.4)(got@11.8.6)':
+    dependencies:
+      axios: 1.7.4
+      got: 11.8.6
+
+  '@aptos-labs/aptos-dynamic-transaction-composer@0.1.3': {}
+
+  '@aptos-labs/script-composer-pack@0.0.9':
+    dependencies:
+      '@aptos-labs/aptos-dynamic-transaction-composer': 0.1.3
+
   '@aptos-labs/ts-sdk@1.33.0':
     dependencies:
       '@aptos-labs/aptos-cli': 1.0.2
@@ -7000,6 +7031,24 @@ snapshots:
       poseidon-lite: 0.2.0
     transitivePeerDependencies:
       - debug
+
+  '@aptos-labs/ts-sdk@1.36.0(axios@1.7.4)(got@11.8.6)':
+    dependencies:
+      '@aptos-labs/aptos-cli': 1.0.2
+      '@aptos-labs/aptos-client': 1.2.0(axios@1.7.4)(got@11.8.6)
+      '@aptos-labs/script-composer-pack': 0.0.9
+      '@noble/curves': 1.8.1
+      '@noble/hashes': 1.7.1
+      '@scure/bip32': 1.4.0
+      '@scure/bip39': 1.3.0
+      eventemitter3: 5.0.1
+      form-data: 4.0.0
+      js-base64: 3.7.7
+      jwt-decode: 4.0.0
+      poseidon-lite: 0.2.0
+    transitivePeerDependencies:
+      - axios
+      - got
 
   '@babel/code-frame@7.24.7':
     dependencies:
@@ -8739,18 +8788,23 @@ snapshots:
     dependencies:
       defer-to-connect: 2.0.1
 
-  '@typemove/aptos@1.9.0':
+  '@typemove/aptos@1.9.1-rc.3(axios@1.7.4)(got@11.8.6)':
     dependencies:
-      '@aptos-labs/ts-sdk': 1.33.0
-      '@typemove/move': 1.9.0
+      '@aptos-labs/ts-sdk': 1.36.0(axios@1.7.4)(got@11.8.6)
+      '@typemove/move': 1.9.1-rc.3
       chalk: 5.3.0
-      commander: 12.1.0
+      commander: 13.1.0
       prettier: 3.5.3
       radash: 12.1.0
     transitivePeerDependencies:
-      - debug
+      - axios
+      - got
 
   '@typemove/move@1.9.0':
+    dependencies:
+      radash: 12.1.0
+
+  '@typemove/move@1.9.1-rc.3':
     dependencies:
       radash: 12.1.0
 
