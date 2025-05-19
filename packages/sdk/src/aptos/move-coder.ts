@@ -9,7 +9,7 @@ export function defaultMoveCoder(network: AptosNetwork = AptosNetwork.MAIN_NET):
   let coder = CODERS.get(network)
   if (!coder) {
     const client = getClient(network)
-    coder = new MoveCoder(getClient(network))
+    coder = new MoveCoder(getClient(network) as any, network == AptosNetwork.INITIA_ECHELON)
     CODERS.set(network, coder)
     URL_CODERS.set(client.config.fullnode || '', coder)
   }
@@ -24,7 +24,7 @@ export function defaultMoveCoderForClient(client: Aptos): MoveCoder {
   }
   let coder = URL_CODERS.get(client.config.fullnode)
   if (!coder) {
-    coder = new MoveCoder(client)
+    coder = new MoveCoder(client as any)
     URL_CODERS.set(client.config.fullnode, coder)
   }
   return coder
