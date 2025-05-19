@@ -1070,6 +1070,24 @@
         ],
         "return": ["Bool"]
       },
+      "peel_enum_tag": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "bcs",
+                "name": "BCS",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": ["U32"]
+      },
       "peel_option_address": {
         "visibility": "Public",
         "isEntry": false,
@@ -13174,6 +13192,388 @@
       }
     }
   },
+  "nitro_attestation": {
+    "fileFormatVersion": 6,
+    "address": "0x2",
+    "name": "nitro_attestation",
+    "friends": [],
+    "structs": {
+      "NitroAttestationDocument": {
+        "abilities": {
+          "abilities": ["Drop"]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "module_id",
+            "type": {
+              "Vector": "U8"
+            }
+          },
+          {
+            "name": "timestamp",
+            "type": "U64"
+          },
+          {
+            "name": "digest",
+            "type": {
+              "Vector": "U8"
+            }
+          },
+          {
+            "name": "pcrs",
+            "type": {
+              "Vector": {
+                "Struct": {
+                  "address": "0x2",
+                  "module": "nitro_attestation",
+                  "name": "PCREntry",
+                  "typeArguments": []
+                }
+              }
+            }
+          },
+          {
+            "name": "public_key",
+            "type": {
+              "Struct": {
+                "address": "0x1",
+                "module": "option",
+                "name": "Option",
+                "typeArguments": [
+                  {
+                    "Vector": "U8"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "name": "user_data",
+            "type": {
+              "Struct": {
+                "address": "0x1",
+                "module": "option",
+                "name": "Option",
+                "typeArguments": [
+                  {
+                    "Vector": "U8"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "name": "nonce",
+            "type": {
+              "Struct": {
+                "address": "0x1",
+                "module": "option",
+                "name": "Option",
+                "typeArguments": [
+                  {
+                    "Vector": "U8"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "PCREntry": {
+        "abilities": {
+          "abilities": ["Drop"]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "index",
+            "type": "U8"
+          },
+          {
+            "name": "value",
+            "type": {
+              "Vector": "U8"
+            }
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {
+      "digest": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "nitro_attestation",
+                "name": "NitroAttestationDocument",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Reference": {
+              "Vector": "U8"
+            }
+          }
+        ]
+      },
+      "index": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "nitro_attestation",
+                "name": "PCREntry",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": ["U8"]
+      },
+      "load_nitro_attestation": {
+        "visibility": "Private",
+        "isEntry": true,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Vector": "U8"
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "clock",
+                "name": "Clock",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "nitro_attestation",
+              "name": "NitroAttestationDocument",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "module_id": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "nitro_attestation",
+                "name": "NitroAttestationDocument",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Reference": {
+              "Vector": "U8"
+            }
+          }
+        ]
+      },
+      "nonce": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "nitro_attestation",
+                "name": "NitroAttestationDocument",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x1",
+                "module": "option",
+                "name": "Option",
+                "typeArguments": [
+                  {
+                    "Vector": "U8"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "pcrs": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "nitro_attestation",
+                "name": "NitroAttestationDocument",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Reference": {
+              "Vector": {
+                "Struct": {
+                  "address": "0x2",
+                  "module": "nitro_attestation",
+                  "name": "PCREntry",
+                  "typeArguments": []
+                }
+              }
+            }
+          }
+        ]
+      },
+      "public_key": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "nitro_attestation",
+                "name": "NitroAttestationDocument",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x1",
+                "module": "option",
+                "name": "Option",
+                "typeArguments": [
+                  {
+                    "Vector": "U8"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "timestamp": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "nitro_attestation",
+                "name": "NitroAttestationDocument",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Reference": "U64"
+          }
+        ]
+      },
+      "user_data": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "nitro_attestation",
+                "name": "NitroAttestationDocument",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x1",
+                "module": "option",
+                "name": "Option",
+                "typeArguments": [
+                  {
+                    "Vector": "U8"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "value": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "nitro_attestation",
+                "name": "PCREntry",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Reference": {
+              "Vector": "U8"
+            }
+          }
+        ]
+      }
+    }
+  },
   "object": {
     "fileFormatVersion": 6,
     "address": "0x2",
@@ -20589,6 +20989,33 @@
           }
         ],
         "return": ["Address"]
+      },
+      "sponsor": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": ["Address"]
+            }
+          }
+        ]
       }
     }
   },

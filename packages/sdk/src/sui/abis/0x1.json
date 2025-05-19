@@ -648,6 +648,14 @@
       }
     }
   },
+  "bool": {
+    "fileFormatVersion": 6,
+    "address": "0x1",
+    "name": "bool",
+    "friends": [],
+    "structs": {},
+    "exposedFunctions": {}
+  },
   "debug": {
     "fileFormatVersion": 6,
     "address": "0x1",
