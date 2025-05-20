@@ -2,7 +2,7 @@ import * as fs from 'fs'
 import chalk from 'chalk'
 import path, { join } from 'path'
 import { AptosCodegen as BaseAptosCodegen } from '@typemove/aptos/codegen'
-import { InternalMoveModule, InternalMoveStruct } from '@typemove/move'
+import { InternalMoveFunction, InternalMoveModule, InternalMoveStruct } from '@typemove/move'
 import { AptosNetwork, getRpcEndpoint } from '../network.js'
 import { Event, MoveModuleBytecode, MoveResource } from '@aptos-labs/ts-sdk'
 import { SharedNetworkCodegen } from '../../move/shared-network-codegen.js'
@@ -26,9 +26,9 @@ class AptosNetworkCodegen extends BaseAptosCodegen {
   moduleGenerator: SharedNetworkCodegen<AptosNetwork, MoveModuleBytecode, Event | MoveResource>
   SYSTEM_PACKAGE = '@sentio/sdk/aptos'
 
-  constructor(network: AptosNetwork) {
+  constructor(network: AptosNetwork, useViewJson = false) {
     const endpoint = getRpcEndpoint(network)
-    super(endpoint)
+    super(endpoint, useViewJson)
     const generator = this
 
     this.moduleGenerator = new (class extends SharedNetworkCodegen<
@@ -54,6 +54,7 @@ class AptosNetworkCodegen extends BaseAptosCodegen {
   protected getGetDefaultCoder() {
     return `defaultMoveCoderForClient(client)`
   }
+
   generateModule(module: InternalMoveModule, allEventStructs: Map<string, InternalMoveStruct>) {
     return this.moduleGenerator.generateModule(module, allEventStructs)
   }
@@ -67,9 +68,10 @@ class AptosNetworkCodegen extends BaseAptosCodegen {
         MoveCoder, TypedEventInstance } from "@typemove/${this.PREFIX.toLowerCase()}"
 
       import { defaultMoveCoder, defaultMoveCoderForClient } from "${this.defaultCoderPackage()}"
-      import { Aptos, Account as AptosAccount, MoveAddressType, PendingTransactionResponse, InputGenerateTransactionOptions, MoveStructId, InputViewFunctionData } from '@aptos-labs/ts-sdk'`
+      import { Aptos, Account as AptosAccount, MoveAddressType, PendingTransactionResponse, InputGenerateTransactionOptions, MoveStructId, InputViewFunctionData, InputViewFunctionJsonData } from '@aptos-labs/ts-sdk'`
     )
   }
+
   generateLoadAll(isSystem: boolean): string {
     return this.moduleGenerator.generateLoadAll(isSystem)
   }
@@ -79,7 +81,7 @@ const ADDRESS_LENGTH = 64
 
 class InitiaAptosNetworkCodegen extends AptosNetworkCodegen {
   constructor(network: AptosNetwork) {
-    super(network)
+    super(network, true)
 
     const oldFetchModules = this.chainAdapter.fetchModules.bind(this.chainAdapter)
     this.chainAdapter.fetchModules = async (address: string) => {
