@@ -94,7 +94,7 @@ export abstract class SuiObjectOrAddressProcessorTemplate<
         abi: ''
       },
       startBlock: config.startCheckpoint,
-      endBlock: 0n,
+      endBlock: config.endCheckpoint || 0n,
       baseLabels: config.baseLabels
     })
     console.log(`successfully bind template ${sig}`)
