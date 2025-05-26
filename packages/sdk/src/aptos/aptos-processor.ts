@@ -54,6 +54,7 @@ type IndexConfigure = {
   address: string
   network: AptosNetwork
   startVersion: bigint
+  endVersion?: bigint
   baseLabels?: Labels
   // endSeqNumber?: Long
 }

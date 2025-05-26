@@ -41,6 +41,7 @@ export interface SuiBindOptions {
   address: string
   network?: SuiNetwork
   startCheckpoint?: bigint
+  endCheckpoint?: bigint
   baseLabels?: Labels
 }
 
