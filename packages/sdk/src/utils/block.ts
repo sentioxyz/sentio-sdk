@@ -1,3 +1,4 @@
+import { TimeOrBlock } from 'eth/bind-options.js'
 import { Block, JsonRpcProvider, EthersError } from 'ethers'
 
 async function getBlockSafely(provider: JsonRpcProvider, blockNumber: number | string): Promise<Block> {
@@ -80,4 +81,18 @@ export async function estimateBlockNumberAtDateSlow(
 
   const closestBlock = await getBlockSafely(provider, high)
   return closestBlock.number
+}
+
+export async function timeOrBlockToBlockNumber(provider: JsonRpcProvider, timeOrBlock: TimeOrBlock): Promise<bigint> {
+  if (timeOrBlock.block) {
+    return BigInt(timeOrBlock.block)
+  }
+  if (!timeOrBlock.time) {
+    return 0n
+  }
+  const block = await estimateBlockNumberAtDate(provider, timeOrBlock.time)
+  if (!block) {
+    throw new Error('Block not found')
+  }
+  return BigInt(block)
 }

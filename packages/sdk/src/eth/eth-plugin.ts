@@ -1,4 +1,12 @@
-import { errorString, mergeProcessResults, Plugin, PluginManager, USER_PROCESSOR, GLOBAL_CONFIG } from '@sentio/runtime'
+import {
+  errorString,
+  mergeProcessResults,
+  Plugin,
+  PluginManager,
+  USER_PROCESSOR,
+  GLOBAL_CONFIG,
+  getProvider
+} from '@sentio/runtime'
 import {
   AccountConfig,
   ContractConfig,
@@ -26,6 +34,7 @@ import { validateAndNormalizeAddress } from './eth.js'
 import { EthChainId } from '@sentio/chain'
 import { EthContext } from './context.js'
 import { TemplateInstanceState } from '../core/template.js'
+import { timeOrBlockToBlockNumber } from '@sentio/sdk/utils'
 
 interface Handlers {
   eventHandlers: ((event: Data_EthLog, preparedData?: PreparedData) => Promise<ProcessResult>)[]
@@ -79,6 +88,10 @@ export class EthPlugin extends Plugin {
       const chainId = processor.getChainId()
       // this.processorsByChainId.set(chainId, processor)
 
+      const provider = getProvider(chainId)
+      const startBlock = await timeOrBlockToBlockNumber(provider, processor.config.start)
+      const endBlock = processor.config.end ? await timeOrBlockToBlockNumber(provider, processor.config.end) : undefined
+
       const contractConfig = ContractConfig.fromPartial({
         processorType: USER_PROCESSOR,
         contract: {
@@ -87,8 +100,8 @@ export class EthPlugin extends Plugin {
           address: validateAndNormalizeAddress(processor.config.address),
           abi: ''
         },
-        startBlock: processor.config.startBlock,
-        endBlock: processor.config.endBlock
+        startBlock,
+        endBlock
       })
 
       // Step 1. Prepare all the block handlers
@@ -167,6 +180,10 @@ export class EthPlugin extends Plugin {
     for (const processor of GlobalProcessorState.INSTANCE.getValues()) {
       const chainId = processor.getChainId()
 
+      const provider = getProvider(chainId)
+      const startBlock = await timeOrBlockToBlockNumber(provider, processor.config.start)
+      const endBlock = processor.config.end ? await timeOrBlockToBlockNumber(provider, processor.config.end) : undefined
+
       const contractConfig = ContractConfig.fromPartial({
         processorType: USER_PROCESSOR,
         contract: {
@@ -175,8 +192,8 @@ export class EthPlugin extends Plugin {
           address: processor.config.address, // can only be *
           abi: ''
         },
-        startBlock: processor.config.startBlock,
-        endBlock: processor.config.endBlock
+        startBlock,
+        endBlock
       })
 
       for (const blockHandler of processor.blockHandlers) {

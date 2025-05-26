@@ -7,9 +7,16 @@ export class BindOptions {
   network?: EthChainId = EthChainId.ETHEREUM
   // Optional, override default contract name
   name?: string
+  start?: TimeOrBlock
+  end?: TimeOrBlock
   startBlock?: bigint | number
   endBlock?: bigint | number
   baseLabels?: { [key: string]: string }
+}
+
+export interface TimeOrBlock {
+  block?: bigint | number
+  time?: Date
 }
 
 export function getOptionsSignature(opts: BindOptions): string {
