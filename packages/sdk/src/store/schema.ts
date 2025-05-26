@@ -6,7 +6,7 @@ const customScalars = ['BigInt', 'BigDecimal', 'Timestamp', 'JSON', 'Bytes', 'ID
 
 const baseSchema = buildASTSchema(
   parse(`
-    directive @entity(immutable: Boolean! = false, sparse: Boolean! = false) on OBJECT
+    directive @entity(immutable: Boolean! = false, sparse: Boolean! = false, timeseries: Boolean! = false) on OBJECT
     directive @query on INTERFACE
     directive @derivedFrom(field: String!) on FIELD_DEFINITION
     directive @unique on FIELD_DEFINITION
@@ -16,6 +16,8 @@ const baseSchema = buildASTSchema(
     directive @byteWeight(value: Float!) on FIELD_DEFINITION
     directive @variant on OBJECT # legacy
     directive @jsonField on OBJECT # legacy
+    directive @aggregation(intervals: [String!]! = ["hour"], source: String!) on OBJECT
+    directive @aggregate(fn: String!, arg: String, cumulative: Boolean = false) on FIELD_DEFINITION
     ${customScalars.map((name) => 'scalar ' + name).join('\n')}
 `)
 )
