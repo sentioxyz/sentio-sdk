@@ -24,6 +24,7 @@ export interface SuiObjectBindOptions {
   objectId: string
   network?: SuiNetwork
   startCheckpoint?: bigint
+  endCheckpoint?: bigint
   baseLabels?: { [key: string]: string }
 }
 
@@ -31,6 +32,7 @@ export interface SuiObjectTypeBindOptions<T> {
   objectType: TypeDescriptor<T>
   network?: SuiNetwork
   startCheckpoint?: bigint
+  endCheckpoint?: bigint
   baseLabels?: { [key: string]: string }
 }
 
@@ -71,6 +73,7 @@ export abstract class SuiBaseObjectOrAddressProcessor<HandlerType> {
     if (options.ownerType === MoveOwnerType.TYPE) {
       this.config = {
         startCheckpoint: options.startCheckpoint || 0n,
+        endCheckpoint: options.endCheckpoint,
         address: options.address === '*' ? '*' : accountTypeString(options.address),
         network: options.network || SuiNetwork.MAIN_NET,
         baseLabels: options.baseLabels
@@ -234,6 +237,7 @@ export class SuiObjectProcessor extends SuiBaseObjectOrAddressProcessorInternal<
       address: options.objectId,
       network: options.network,
       startCheckpoint: options.startCheckpoint,
+      endCheckpoint: options.endCheckpoint,
       ownerType: MoveOwnerType.OBJECT,
       baseLabels: options.baseLabels
     })
@@ -266,6 +270,7 @@ export class SuiObjectTypeProcessor<T> extends SuiBaseObjectOrAddressProcessor<
       address: ALL_ADDRESS, // current only support on all address
       network: options.network,
       startCheckpoint: options.startCheckpoint,
+      endCheckpoint: options.endCheckpoint,
       ownerType: MoveOwnerType.TYPE,
       baseLabels: options.baseLabels
     })
@@ -365,6 +370,7 @@ export class SuiWrappedObjectProcessor extends SuiBaseObjectOrAddressProcessorIn
       address: options.objectId,
       network: options.network,
       startCheckpoint: options.startCheckpoint,
+      endCheckpoint: options.endCheckpoint,
       ownerType: MoveOwnerType.WRAPPED_OBJECT,
       baseLabels: options.baseLabels
     })

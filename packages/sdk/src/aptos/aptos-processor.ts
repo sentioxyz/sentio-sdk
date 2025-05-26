@@ -582,6 +582,7 @@ function configure(options: AptosBindOptions): IndexConfigure {
 
   return {
     startVersion: startVersion,
+    endVersion: options.endVersion ? BigInt(options.endVersion) : undefined,
     address: options.address === ALL_ADDRESS ? ALL_ADDRESS : accountTypeString(options.address), // aptos don't use address string in api, so only use type string
     network: options.network || AptosNetwork.MAIN_NET,
     baseLabels: options.baseLabels

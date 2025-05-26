@@ -31,6 +31,7 @@ export type IndexConfigure = Required<SuiBindOptions, 'startCheckpoint' | 'netwo
 export function configure(options: SuiBindOptions): IndexConfigure {
   return {
     startCheckpoint: options.startCheckpoint || 0n,
+    endCheckpoint: options.endCheckpoint,
     address: options.address === ALL_ADDRESS ? ALL_ADDRESS : accountAddressString(options.address),
     network: options.network || SuiNetwork.MAIN_NET,
     baseLabels: options.baseLabels
