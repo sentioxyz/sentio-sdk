@@ -28,6 +28,13 @@ export interface YamlProjectConfig {
   debug: boolean
   type?: string
   silentOverwrite?: boolean
+  variables?: Variable[]
+}
+
+export interface Variable {
+  key: string
+  value: string
+  isSecret: boolean
 }
 
 export function getFinalizedHost(host: string): string {
