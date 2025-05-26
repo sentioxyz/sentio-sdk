@@ -155,6 +155,20 @@ async function createProject(options: YamlProjectConfig, auth: Auth, type?: stri
   })
 }
 
+async function updateVariables(projectId: string, options: YamlProjectConfig, auth: Auth) {
+  const url = new URL(`/api/v1/projects/${projectId}/variables`, options.host)
+  return fetch(url.href, {
+    method: 'POST',
+    headers: {
+      ...auth
+    },
+    body: JSON.stringify({
+      projectId,
+      variables: options.variables
+    })
+  })
+}
+
 export async function createProjectPrompt(options: YamlProjectConfig, auth: Auth, type?: string): Promise<boolean> {
   const create = async () => {
     const res = await createProject(options, auth, type)
@@ -297,6 +311,7 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth, continu
       warning?: string
       replacingVersion: number
       multiVersion: boolean
+      projectId: string
     }
     if (!continueFrom && initUploadRes.replacingVersion && !options.silentOverwrite) {
       const confirmed = await confirm(
@@ -308,6 +323,14 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth, continu
     }
     if (initUploadRes.warning) {
       console.warn(chalk.yellow('Warning:', initUploadRes.warning))
+    }
+    if (options.variables && options.variables.length > 0) {
+      const ret = await updateVariables(initUploadRes.projectId, options, auth)
+      if (!ret.ok) {
+        console.error(chalk.red('Update variables failed'))
+        console.error(chalk.red(((await ret.json()) as { message: string }).message))
+        return
+      }
     }
     const uploadUrl = initUploadRes.url
 
