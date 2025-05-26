@@ -13,7 +13,7 @@ import {
   PreprocessResult,
   ProcessResult
 } from '@sentio/protos'
-import { BindOptions } from './bind-options.js'
+import { BindOptions, TimeOrBlock } from './bind-options.js'
 import { PromiseOrVoid } from '../core/promises.js'
 import { ServerError, Status } from 'nice-grpc'
 import {
@@ -75,8 +75,8 @@ class BindInternalOptions {
   address: string
   network: EthChainId
   name: string
-  startBlock: bigint
-  endBlock?: bigint
+  start: TimeOrBlock
+  end?: TimeOrBlock
   baseLabels?: { [key: string]: string }
 }
 
@@ -101,13 +101,20 @@ export class GlobalProcessor {
       address: ALL_ADDRESS,
       name: config.name || 'Global',
       network: config.network || EthChainId.ETHEREUM,
-      startBlock: 0n
+      start: config.start || {
+        block: 0
+      },
+      end: config.end
     }
     if (config.startBlock) {
-      this.config.startBlock = BigInt(config.startBlock)
+      this.config.start = {
+        block: config.startBlock
+      }
     }
     if (config.endBlock) {
-      this.config.endBlock = BigInt(config.endBlock)
+      this.config.end = {
+        block: config.endBlock
+      }
     }
 
     return proxyProcessor(this)
@@ -390,14 +397,21 @@ export abstract class BaseProcessor<
       address: validateAndNormalizeAddress(config.address),
       name: config.name || '',
       network: config.network || EthChainId.ETHEREUM,
-      startBlock: 0n,
+      start: config.start || {
+        block: 0
+      },
+      end: config.end,
       baseLabels: config.baseLabels
     }
     if (config.startBlock) {
-      this.config.startBlock = BigInt(config.startBlock)
+      this.config.start = {
+        block: config.startBlock
+      }
     }
     if (config.endBlock) {
-      this.config.endBlock = BigInt(config.endBlock)
+      this.config.end = {
+        block: config.endBlock
+      }
     }
 
     return proxyProcessor(this)
