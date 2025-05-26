@@ -64,6 +64,7 @@ export class SuiPlugin extends Plugin {
           objectId: instance.contract?.address || '',
           network: <SuiNetwork>instance.contract?.chainId || SuiNetwork.MAIN_NET,
           startCheckpoint: instance.startBlock || 0n,
+          endCheckpoint: instance.endBlock || 0n,
           baseLabels: instance.baseLabels
         },
         NoopContext
@@ -88,7 +89,8 @@ export class SuiPlugin extends Plugin {
           address: suiProcessor.config.address,
           abi: ''
         },
-        startBlock: suiProcessor.config.startCheckpoint
+        startBlock: suiProcessor.config.startCheckpoint,
+        endBlock: suiProcessor.config.endCheckpoint
       })
       for (const handler of suiProcessor.eventHandlers) {
         const handlerId = handlers.suiEventHandlers.push(handler.handler) - 1
@@ -131,7 +133,8 @@ export class SuiPlugin extends Plugin {
         const objectChangeHandler: MoveResourceChangeConfig = {
           type: handler.type,
           handlerId,
-          handlerName: handler.handlerName
+          handlerName: handler.handlerName,
+          includeDeleted: false
         }
         contractConfig.moveResourceChangeConfigs.push(objectChangeHandler)
       }
@@ -142,7 +145,8 @@ export class SuiPlugin extends Plugin {
       const accountConfig = AccountConfig.fromPartial({
         address: processor.config.address,
         chainId: processor.getChainId(),
-        startBlock: processor.config.startCheckpoint // TODO maybe use another field
+        startBlock: processor.config.startCheckpoint, // TODO maybe use another field
+        endBlock: processor.config.endCheckpoint
       })
 
       for (const handler of processor.objectChangeHandlers) {
@@ -150,7 +154,8 @@ export class SuiPlugin extends Plugin {
         const objectChangeHandler: MoveResourceChangeConfig = {
           type: handler.type,
           handlerId,
-          handlerName: handler.handlerName
+          handlerName: handler.handlerName,
+          includeDeleted: false
         }
         accountConfig.moveResourceChangeConfigs.push(objectChangeHandler)
       }

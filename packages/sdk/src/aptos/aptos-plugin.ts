@@ -60,6 +60,7 @@ export class AptosPlugin extends Plugin {
           address: instance.contract?.address || '',
           network: <AptosNetwork>instance.contract?.chainId || AptosNetwork.MAIN_NET,
           startVersion: instance.startBlock || 0n,
+          endVersion: instance.endBlock,
           baseLabels: instance.baseLabels
         },
         NoopContext
@@ -83,7 +84,8 @@ export class AptosPlugin extends Plugin {
           address: aptosProcessor.config.address,
           abi: ''
         },
-        startBlock: aptosProcessor.config.startVersion
+        startBlock: aptosProcessor.config.startVersion,
+        endBlock: aptosProcessor.config.endVersion
       })
       // 1. Prepare event handlers
       for (const handler of aptosProcessor.eventHandlers) {
@@ -132,14 +134,16 @@ export class AptosPlugin extends Plugin {
       const accountConfig = AccountConfig.fromPartial({
         address: aptosProcessor.config.address,
         chainId: aptosProcessor.getChainId(),
-        startBlock: aptosProcessor.config.startVersion
+        startBlock: aptosProcessor.config.startVersion,
+        endBlock: aptosProcessor.config.endVersion
       })
       for (const handler of aptosProcessor.resourceChangeHandlers) {
         const handlerId = handlers.aptosResourceHandlers.push(handler.handler) - 1
         accountConfig.moveResourceChangeConfigs.push({
           handlerId: handlerId,
           handlerName: handler.handlerName,
-          type: handler.type
+          type: handler.type,
+          includeDeleted: false
         })
       }
 
@@ -170,7 +174,8 @@ export class AptosPlugin extends Plugin {
       const accountConfig = AccountConfig.fromPartial({
         address: aptosProcessor.config.address,
         chainId: aptosProcessor.getChainId(),
-        startBlock: aptosProcessor.config.startVersion
+        startBlock: aptosProcessor.config.startVersion,
+        endBlock: aptosProcessor.config.endVersion
       })
       for (const handler of aptosProcessor.resourceIntervalHandlers) {
         const handlerId = handlers.aptosResourceHandlers.push(handler.handler) - 1
@@ -195,7 +200,8 @@ export class AptosPlugin extends Plugin {
           accountConfig.moveResourceChangeConfigs.push({
             handlerId,
             handlerName: handler.handlerName,
-            type: handler.type
+            type: handler.type,
+            includeDeleted: false
           })
         }
       }

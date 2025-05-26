@@ -608,6 +608,7 @@ export interface AccountConfig {
   chainId: string;
   address: string;
   startBlock: bigint;
+  endBlock: bigint;
   intervalConfigs: OnIntervalConfig[];
   moveIntervalConfigs: MoveOnIntervalConfig[];
   moveCallConfigs: MoveCallHandlerConfig[];
@@ -786,6 +787,7 @@ export interface MoveCallHandlerConfig {
 
 export interface MoveResourceChangeConfig {
   type: string;
+  includeDeleted: boolean;
   handlerId: number;
   handlerName: string;
 }
@@ -3234,6 +3236,7 @@ function createBaseAccountConfig(): AccountConfig {
     chainId: "",
     address: "",
     startBlock: BigInt("0"),
+    endBlock: BigInt("0"),
     intervalConfigs: [],
     moveIntervalConfigs: [],
     moveCallConfigs: [],
@@ -3255,6 +3258,12 @@ export const AccountConfig = {
         throw new globalThis.Error("value provided for field message.startBlock of type uint64 too large");
       }
       writer.uint32(24).uint64(message.startBlock.toString());
+    }
+    if (message.endBlock !== BigInt("0")) {
+      if (BigInt.asUintN(64, message.endBlock) !== message.endBlock) {
+        throw new globalThis.Error("value provided for field message.endBlock of type uint64 too large");
+      }
+      writer.uint32(80).uint64(message.endBlock.toString());
     }
     for (const v of message.intervalConfigs) {
       OnIntervalConfig.encode(v!, writer.uint32(34).fork()).ldelim();
@@ -3301,6 +3310,13 @@ export const AccountConfig = {
           }
 
           message.startBlock = longToBigint(reader.uint64() as Long);
+          continue;
+        case 10:
+          if (tag !== 80) {
+            break;
+          }
+
+          message.endBlock = longToBigint(reader.uint64() as Long);
           continue;
         case 4:
           if (tag !== 34) {
@@ -3351,6 +3367,7 @@ export const AccountConfig = {
       chainId: isSet(object.chainId) ? globalThis.String(object.chainId) : "",
       address: isSet(object.address) ? globalThis.String(object.address) : "",
       startBlock: isSet(object.startBlock) ? BigInt(object.startBlock) : BigInt("0"),
+      endBlock: isSet(object.endBlock) ? BigInt(object.endBlock) : BigInt("0"),
       intervalConfigs: globalThis.Array.isArray(object?.intervalConfigs)
         ? object.intervalConfigs.map((e: any) => OnIntervalConfig.fromJSON(e))
         : [],
@@ -3380,6 +3397,9 @@ export const AccountConfig = {
     if (message.startBlock !== BigInt("0")) {
       obj.startBlock = message.startBlock.toString();
     }
+    if (message.endBlock !== BigInt("0")) {
+      obj.endBlock = message.endBlock.toString();
+    }
     if (message.intervalConfigs?.length) {
       obj.intervalConfigs = message.intervalConfigs.map((e) => OnIntervalConfig.toJSON(e));
     }
@@ -3406,6 +3426,7 @@ export const AccountConfig = {
     message.chainId = object.chainId ?? "";
     message.address = object.address ?? "";
     message.startBlock = object.startBlock ?? BigInt("0");
+    message.endBlock = object.endBlock ?? BigInt("0");
     message.intervalConfigs = object.intervalConfigs?.map((e) => OnIntervalConfig.fromPartial(e)) || [];
     message.moveIntervalConfigs = object.moveIntervalConfigs?.map((e) => MoveOnIntervalConfig.fromPartial(e)) || [];
     message.moveCallConfigs = object.moveCallConfigs?.map((e) => MoveCallHandlerConfig.fromPartial(e)) || [];
@@ -5990,13 +6011,16 @@ export const MoveCallHandlerConfig = {
 };
 
 function createBaseMoveResourceChangeConfig(): MoveResourceChangeConfig {
-  return { type: "", handlerId: 0, handlerName: "" };
+  return { type: "", includeDeleted: false, handlerId: 0, handlerName: "" };
 }
 
 export const MoveResourceChangeConfig = {
   encode(message: MoveResourceChangeConfig, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.type !== "") {
       writer.uint32(10).string(message.type);
+    }
+    if (message.includeDeleted !== false) {
+      writer.uint32(32).bool(message.includeDeleted);
     }
     if (message.handlerId !== 0) {
       writer.uint32(16).int32(message.handlerId);
@@ -6020,6 +6044,13 @@ export const MoveResourceChangeConfig = {
           }
 
           message.type = reader.string();
+          continue;
+        case 4:
+          if (tag !== 32) {
+            break;
+          }
+
+          message.includeDeleted = reader.bool();
           continue;
         case 2:
           if (tag !== 16) {
@@ -6047,6 +6078,7 @@ export const MoveResourceChangeConfig = {
   fromJSON(object: any): MoveResourceChangeConfig {
     return {
       type: isSet(object.type) ? globalThis.String(object.type) : "",
+      includeDeleted: isSet(object.includeDeleted) ? globalThis.Boolean(object.includeDeleted) : false,
       handlerId: isSet(object.handlerId) ? globalThis.Number(object.handlerId) : 0,
       handlerName: isSet(object.handlerName) ? globalThis.String(object.handlerName) : "",
     };
@@ -6056,6 +6088,9 @@ export const MoveResourceChangeConfig = {
     const obj: any = {};
     if (message.type !== "") {
       obj.type = message.type;
+    }
+    if (message.includeDeleted !== false) {
+      obj.includeDeleted = message.includeDeleted;
     }
     if (message.handlerId !== 0) {
       obj.handlerId = Math.round(message.handlerId);
@@ -6072,6 +6107,7 @@ export const MoveResourceChangeConfig = {
   fromPartial(object: DeepPartial<MoveResourceChangeConfig>): MoveResourceChangeConfig {
     const message = createBaseMoveResourceChangeConfig();
     message.type = object.type ?? "";
+    message.includeDeleted = object.includeDeleted ?? false;
     message.handlerId = object.handlerId ?? 0;
     message.handlerName = object.handlerName ?? "";
     return message;

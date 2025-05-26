@@ -25,6 +25,7 @@ export class AptosBindOptions {
   network?: AptosNetwork = AptosNetwork.MAIN_NET
   client?: Aptos
   startVersion?: bigint | number
+  endVersion?: bigint | number
   baseLabels?: Labels
 }
 

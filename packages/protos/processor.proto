@@ -215,7 +215,7 @@ message AccountConfig {
   string chain_id = 1;
   string address = 2;
   uint64 start_block = 3;
-
+  uint64 end_block = 10;
   repeated OnIntervalConfig interval_configs = 4;
   repeated AptosOnIntervalConfig aptos_interval_configs = 5 [deprecated = true];
   // TODO migrate aptos_interval_configs to move_interval_configs
@@ -427,6 +427,7 @@ message MoveCallHandlerConfig {
 
 message MoveResourceChangeConfig {
   string type = 1;
+  bool include_deleted = 4;
   int32 handler_id = 2;
   string handler_name = 3;
 }

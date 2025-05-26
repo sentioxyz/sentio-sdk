@@ -423,6 +423,7 @@ export interface Project {
   /** @deprecated */
   enableMaterializedView: boolean;
   defaultTimerange: TimeRangeLite | undefined;
+  communityProject?: CommunityProject | undefined;
 }
 
 export enum Project_Visibility {
@@ -500,6 +501,11 @@ export function project_TypeToJSON(object: Project_Type): string {
 export interface Project_ProjectMember {
   user: UserInfo | undefined;
   role: string;
+}
+
+export interface CommunityProject {
+  dashAlias: string;
+  curated?: boolean | undefined;
 }
 
 export interface ProjectInfo {
@@ -645,6 +651,7 @@ export interface Formula {
   id: string;
   disabled: boolean;
   functions: Function[];
+  color: string;
 }
 
 export interface Argument {
@@ -2838,6 +2845,7 @@ function createBaseProject(): Project {
     enableDisk: false,
     enableMaterializedView: false,
     defaultTimerange: undefined,
+    communityProject: undefined,
   };
 }
 
@@ -2908,6 +2916,9 @@ export const Project = {
     }
     if (message.defaultTimerange !== undefined) {
       TimeRangeLite.encode(message.defaultTimerange, writer.uint32(170).fork()).ldelim();
+    }
+    if (message.communityProject !== undefined) {
+      CommunityProject.encode(message.communityProject, writer.uint32(178).fork()).ldelim();
     }
     return writer;
   },
@@ -3059,6 +3070,13 @@ export const Project = {
 
           message.defaultTimerange = TimeRangeLite.decode(reader, reader.uint32());
           continue;
+        case 22:
+          if (tag !== 178) {
+            break;
+          }
+
+          message.communityProject = CommunityProject.decode(reader, reader.uint32());
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -3096,6 +3114,7 @@ export const Project = {
         ? globalThis.Boolean(object.enableMaterializedView)
         : false,
       defaultTimerange: isSet(object.defaultTimerange) ? TimeRangeLite.fromJSON(object.defaultTimerange) : undefined,
+      communityProject: isSet(object.communityProject) ? CommunityProject.fromJSON(object.communityProject) : undefined,
     };
   },
 
@@ -3161,6 +3180,9 @@ export const Project = {
     if (message.defaultTimerange !== undefined) {
       obj.defaultTimerange = TimeRangeLite.toJSON(message.defaultTimerange);
     }
+    if (message.communityProject !== undefined) {
+      obj.communityProject = CommunityProject.toJSON(message.communityProject);
+    }
     return obj;
   },
 
@@ -3192,6 +3214,9 @@ export const Project = {
     message.enableMaterializedView = object.enableMaterializedView ?? false;
     message.defaultTimerange = (object.defaultTimerange !== undefined && object.defaultTimerange !== null)
       ? TimeRangeLite.fromPartial(object.defaultTimerange)
+      : undefined;
+    message.communityProject = (object.communityProject !== undefined && object.communityProject !== null)
+      ? CommunityProject.fromPartial(object.communityProject)
       : undefined;
     return message;
   },
@@ -3267,6 +3292,80 @@ export const Project_ProjectMember = {
     const message = createBaseProject_ProjectMember();
     message.user = (object.user !== undefined && object.user !== null) ? UserInfo.fromPartial(object.user) : undefined;
     message.role = object.role ?? "";
+    return message;
+  },
+};
+
+function createBaseCommunityProject(): CommunityProject {
+  return { dashAlias: "", curated: undefined };
+}
+
+export const CommunityProject = {
+  encode(message: CommunityProject, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.dashAlias !== "") {
+      writer.uint32(10).string(message.dashAlias);
+    }
+    if (message.curated !== undefined) {
+      writer.uint32(16).bool(message.curated);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): CommunityProject {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCommunityProject();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.dashAlias = reader.string();
+          continue;
+        case 2:
+          if (tag !== 16) {
+            break;
+          }
+
+          message.curated = reader.bool();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): CommunityProject {
+    return {
+      dashAlias: isSet(object.dashAlias) ? globalThis.String(object.dashAlias) : "",
+      curated: isSet(object.curated) ? globalThis.Boolean(object.curated) : undefined,
+    };
+  },
+
+  toJSON(message: CommunityProject): unknown {
+    const obj: any = {};
+    if (message.dashAlias !== "") {
+      obj.dashAlias = message.dashAlias;
+    }
+    if (message.curated !== undefined) {
+      obj.curated = message.curated;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<CommunityProject>): CommunityProject {
+    return CommunityProject.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<CommunityProject>): CommunityProject {
+    const message = createBaseCommunityProject();
+    message.dashAlias = object.dashAlias ?? "";
+    message.curated = object.curated ?? undefined;
     return message;
   },
 };
@@ -5434,7 +5533,7 @@ export const Duration = {
 };
 
 function createBaseFormula(): Formula {
-  return { expression: "", alias: "", id: "", disabled: false, functions: [] };
+  return { expression: "", alias: "", id: "", disabled: false, functions: [], color: "" };
 }
 
 export const Formula = {
@@ -5453,6 +5552,9 @@ export const Formula = {
     }
     for (const v of message.functions) {
       Function.encode(v!, writer.uint32(50).fork()).ldelim();
+    }
+    if (message.color !== "") {
+      writer.uint32(58).string(message.color);
     }
     return writer;
   },
@@ -5499,6 +5601,13 @@ export const Formula = {
 
           message.functions.push(Function.decode(reader, reader.uint32()));
           continue;
+        case 7:
+          if (tag !== 58) {
+            break;
+          }
+
+          message.color = reader.string();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -5517,6 +5626,7 @@ export const Formula = {
       functions: globalThis.Array.isArray(object?.functions)
         ? object.functions.map((e: any) => Function.fromJSON(e))
         : [],
+      color: isSet(object.color) ? globalThis.String(object.color) : "",
     };
   },
 
@@ -5537,6 +5647,9 @@ export const Formula = {
     if (message.functions?.length) {
       obj.functions = message.functions.map((e) => Function.toJSON(e));
     }
+    if (message.color !== "") {
+      obj.color = message.color;
+    }
     return obj;
   },
 
@@ -5550,6 +5663,7 @@ export const Formula = {
     message.id = object.id ?? "";
     message.disabled = object.disabled ?? false;
     message.functions = object.functions?.map((e) => Function.fromPartial(e)) || [];
+    message.color = object.color ?? "";
     return message;
   },
 };
