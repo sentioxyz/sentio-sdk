@@ -14,7 +14,7 @@ export type Bytes = Uint8Array
 export type BigInt = bigint
 
 export abstract class AbstractEntity {
-  abstract id: ID
+  abstract id: ID | Int8
   private readonly _data: RichStruct
 
   toJSON() {

@@ -48,6 +48,7 @@ interface Class {
   annotations: string[]
   parent?: string
   interfaces: string[]
+  timeseries?: boolean
 }
 
 interface Interface {
@@ -154,6 +155,18 @@ async function codegenInternal(schema: GraphQLSchema, source: string, target: st
     }
 
     if (t instanceof GraphQLObjectType) {
+      if (isTimeseries(t)) {
+        // check id is int8
+        const idField = t.getFields()['id']
+        if (!idField || !isNonNullType(idField.type) || idField.type.toString() !== 'Int8!') {
+          throw new Error(`Timeseries entity ${t.name} must have an id field of type Int8!`)
+        }
+        // check if it has a timestamp field
+        const timestampField = t.getFields()['timestamp']
+        if (!timestampField || !isNonNullType(timestampField.type) || timestampField.type.toString() !== 'Timestamp!') {
+          throw new Error(`Timeseries entity ${t.name} must have a timestamp field of type Timestamp!`)
+        }
+      }
       if (isEntity(t)) {
         const fields: Field[] = []
         const methods: Method[] = []
@@ -228,6 +241,7 @@ async function codegenInternal(schema: GraphQLSchema, source: string, target: st
         }
         classes.push({
           name: t.name,
+          timeseries: isTimeseries(t),
           fields,
           methods,
           annotations: [`@Entity("${t.name}")`],
@@ -365,6 +379,14 @@ function isRelationType(type: GraphQLOutputType): boolean {
 
 function isEntity(t: GraphQLObjectType) {
   return t.astNode?.directives?.some((d) => d.name.value == 'entity')
+}
+
+function isTimeseries(t: GraphQLObjectType) {
+  return t.astNode?.directives?.some(
+    (d) =>
+      d.name.value == 'entity' &&
+      d.arguments?.some((a) => a.name.value == 'timeseries' && a.value.kind == 'BooleanValue' && a.value.value == true)
+  )
 }
 
 function isDerived(f: GraphQLField<any, any>) {
