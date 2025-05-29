@@ -44,7 +44,7 @@
     "nice-grpc-error-details": "^0.2.4",
     "nice-grpc-opentelemetry": "^0.1.15",
     "nice-grpc-prometheus": "^0.2.2",
-    "piscina": "5.0.0-alpha.0",
+    "piscina": "5.0.0",
     "protobufjs": "^7.2.6",
     "rxjs": "^7.8.1",
     "utility-types": "^3.11.0",
