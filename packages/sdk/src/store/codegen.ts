@@ -296,6 +296,9 @@ interface ${c.name}ConstructorInput {
 ${c.fields
   .filter((f) => !f.type.startsWith('Promise<')) // Filter out Promise fields
   .map((f) => {
+    if (c.timeseries && f.name == 'timestamp') {
+      return `  timestamp?: Timestamp;`
+    }
     const isRequired = f.annotations.some((a) => a.includes('@Required'))
     return `  ${f.private ? 'private ' : ''}${f.name}${isRequired ? '' : '?'}: ${f.type.replace(' | undefined', '')};`
   })
