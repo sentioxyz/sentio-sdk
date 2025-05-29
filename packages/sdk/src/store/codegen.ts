@@ -190,7 +190,7 @@ async function codegenInternal(schema: GraphQLSchema, source: string, target: st
                 methods.push({
                   name: f.name,
                   returnType: `Promise<${type}>`,
-                  body: `return this.store.get(${elemType(f.type)}, [{field: '${derivedField}', op: '=', value: this.id}])?.[0]`,
+                  body: `return this.store.list(${elemType(f.type)}, [{field: '${derivedField}', op: '=', value: this.id}]).then((r) => r?.[0])`,
                   annotations: []
                 })
               }
