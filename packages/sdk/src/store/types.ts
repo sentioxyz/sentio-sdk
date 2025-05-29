@@ -3,7 +3,7 @@ import { BigDecimalConverter, BigIntConverter } from './convert.js'
 import { getEntityName, Store } from './store.js'
 import { PluginManager } from '@sentio/runtime'
 
-export type ID = string | Uint8Array
+export type ID = string | Uint8Array | Int8
 export type String = string
 export type Int = number
 export type Int8 = bigint
@@ -14,7 +14,7 @@ export type Bytes = Uint8Array
 export type BigInt = bigint
 
 export abstract class AbstractEntity {
-  abstract id: ID | Int8
+  abstract id: ID
   private readonly _data: RichStruct
 
   toJSON() {

@@ -250,7 +250,7 @@ export type Operators<T> =
         : T extends Bytes
           ? '=' | '!=' | 'in' | 'not in'
           : T extends ID
-            ? '=' | '!=' | 'like' | 'not like' | 'in' | 'not in'
+            ? '=' | '!=' | 'like' | 'not like' | 'in' | 'not in' | '<' | '<=' | '>' | '>='
             : T extends string
               ? '=' | '!=' | 'like' | 'not like' | 'in' | 'not in'
               : T extends Timestamp
