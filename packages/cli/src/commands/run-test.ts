@@ -1,4 +1,4 @@
-import { execSync } from 'child_process'
+import { execSync, spawnSync } from 'child_process'
 import path from 'path'
 import commandLineArgs from 'command-line-args'
 import commandLineUsage from 'command-line-usage'
@@ -11,9 +11,13 @@ const buildOptionDefinitions = [
     type: Boolean,
     description: 'Display this usage guide.'
   },
-  { name: 'test-only', description: "run tests with 'only' option set" },
-  { name: 'test-name-pattern', description: 'run tests whose name matches this regular expression' },
-  { name: 'test-skip-pattern', description: 'run tests whose name do not match this regular expression' }
+  { name: 'test-only', type: Boolean, description: "run tests with 'only' option set" },
+  { name: 'test-name-pattern=...', type: Boolean, description: 'run tests whose name matches this regular expression' },
+  {
+    name: 'test-skip-pattern=...',
+    type: Boolean,
+    description: 'run tests whose name do not match this regular expression'
+  }
 ]
 
 export function runTest(argv: string[]) {
@@ -43,5 +47,5 @@ export function runTest(argv: string[]) {
   // Run tsc to do check before test
   const tsc = path.resolve(getPackageRoot('typescript'), 'bin', 'tsc')
   execSync(`node ${tsc} --noEmit`, { stdio: 'inherit' })
-  execSync(`node ${tsx} --test ${argv.join(' ')}`, { stdio: 'inherit' })
+  spawnSync('node', [tsx, '--test', ...argv], { stdio: 'inherit' })
 }
