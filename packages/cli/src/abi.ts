@@ -6,7 +6,7 @@ import path from 'path'
 import fs from 'fs-extra'
 import fetch from 'node-fetch'
 import { AptosChainId, ChainId, StarknetChainId, SuiChainId, EthChainInfo, ExplorerApiType } from '@sentio/chain'
-import { RpcProvider as Starknet, constants } from 'starknet'
+import { RpcProvider as Starknet } from 'starknet'
 
 export async function getABI(
   chain: ChainId,
@@ -54,12 +54,12 @@ export async function getABI(
       break
     case StarknetChainId.STARKNET_MAINNET:
       starknetClient = new Starknet({
-        nodeUrl: constants.NetworkName.SN_MAIN
+        nodeUrl: 'https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_8/8sD5yitBslIYCPFzSq_Q1ObJHqPlZxFw'
       })
       break
     case StarknetChainId.STARKNET_SEPOLIA:
       starknetClient = new Starknet({
-        nodeUrl: constants.NetworkName.SN_SEPOLIA
+        nodeUrl: 'https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_8/8sD5yitBslIYCPFzSq_Q1ObJHqPlZxFw'
       })
       break
     default:
