@@ -1,6 +1,6 @@
 import { Data_StarknetEvent, ProcessResult } from '@sentio/protos'
 import { StarknetChainId } from '@sentio/chain'
-import { CallData, constants, events, ParsedEvent, RpcProvider } from 'starknet'
+import { CallData, events, ParsedEvent, RpcProvider } from 'starknet'
 import { StarknetContext } from './context.js'
 import { StarknetEvent } from './event.js'
 import { ListStateStorage, mergeProcessResults } from '@sentio/runtime'
@@ -110,9 +110,9 @@ export type CallHandler<T> = {
 function getRpcEndpoint(chainId: StarknetChainId | string) {
   switch (chainId) {
     case StarknetChainId.STARKNET_MAINNET:
-      return constants.NetworkName.SN_MAIN
+      return 'https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_8/8sD5yitBslIYCPFzSq_Q1ObJHqPlZxFw'
     default:
-      return constants.NetworkName.SN_SEPOLIA
+      return 'https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_8/8sD5yitBslIYCPFzSq_Q1ObJHqPlZxFw'
   }
 }
 
