@@ -947,10 +947,64 @@ export interface EntityList {
   entities: Entity[];
 }
 
+export interface EntityUpdateData {
+  fields: { [key: string]: EntityUpdateData_FieldValue };
+}
+
+export enum EntityUpdateData_Operator {
+  SET = 0,
+  ADD = 1,
+  MULTIPLY = 2,
+  UNRECOGNIZED = -1,
+}
+
+export function entityUpdateData_OperatorFromJSON(object: any): EntityUpdateData_Operator {
+  switch (object) {
+    case 0:
+    case "SET":
+      return EntityUpdateData_Operator.SET;
+    case 1:
+    case "ADD":
+      return EntityUpdateData_Operator.ADD;
+    case 2:
+    case "MULTIPLY":
+      return EntityUpdateData_Operator.MULTIPLY;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return EntityUpdateData_Operator.UNRECOGNIZED;
+  }
+}
+
+export function entityUpdateData_OperatorToJSON(object: EntityUpdateData_Operator): string {
+  switch (object) {
+    case EntityUpdateData_Operator.SET:
+      return "SET";
+    case EntityUpdateData_Operator.ADD:
+      return "ADD";
+    case EntityUpdateData_Operator.MULTIPLY:
+      return "MULTIPLY";
+    case EntityUpdateData_Operator.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
+export interface EntityUpdateData_FieldValue {
+  value: RichValue | undefined;
+  op: EntityUpdateData_Operator;
+}
+
+export interface EntityUpdateData_FieldsEntry {
+  key: string;
+  value: EntityUpdateData_FieldValue | undefined;
+}
+
 export interface DBRequest {
   opId: bigint;
   get?: DBRequest_DBGet | undefined;
   upsert?: DBRequest_DBUpsert | undefined;
+  update?: DBRequest_DBUpdate | undefined;
   delete?: DBRequest_DBDelete | undefined;
   list?: DBRequest_DBList | undefined;
 }
@@ -1065,6 +1119,12 @@ export interface DBRequest_DBUpsert {
   id: string[];
   data: { [key: string]: any }[];
   entityData: RichStruct[];
+}
+
+export interface DBRequest_DBUpdate {
+  entity: string[];
+  id: string[];
+  entityData: EntityUpdateData[];
 }
 
 export interface DBRequest_DBDelete {
@@ -8534,8 +8594,248 @@ export const EntityList = {
   },
 };
 
+function createBaseEntityUpdateData(): EntityUpdateData {
+  return { fields: {} };
+}
+
+export const EntityUpdateData = {
+  encode(message: EntityUpdateData, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    Object.entries(message.fields).forEach(([key, value]) => {
+      EntityUpdateData_FieldsEntry.encode({ key: key as any, value }, writer.uint32(10).fork()).ldelim();
+    });
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): EntityUpdateData {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseEntityUpdateData();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          const entry1 = EntityUpdateData_FieldsEntry.decode(reader, reader.uint32());
+          if (entry1.value !== undefined) {
+            message.fields[entry1.key] = entry1.value;
+          }
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): EntityUpdateData {
+    return {
+      fields: isObject(object.fields)
+        ? Object.entries(object.fields).reduce<{ [key: string]: EntityUpdateData_FieldValue }>((acc, [key, value]) => {
+          acc[key] = EntityUpdateData_FieldValue.fromJSON(value);
+          return acc;
+        }, {})
+        : {},
+    };
+  },
+
+  toJSON(message: EntityUpdateData): unknown {
+    const obj: any = {};
+    if (message.fields) {
+      const entries = Object.entries(message.fields);
+      if (entries.length > 0) {
+        obj.fields = {};
+        entries.forEach(([k, v]) => {
+          obj.fields[k] = EntityUpdateData_FieldValue.toJSON(v);
+        });
+      }
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<EntityUpdateData>): EntityUpdateData {
+    return EntityUpdateData.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<EntityUpdateData>): EntityUpdateData {
+    const message = createBaseEntityUpdateData();
+    message.fields = Object.entries(object.fields ?? {}).reduce<{ [key: string]: EntityUpdateData_FieldValue }>(
+      (acc, [key, value]) => {
+        if (value !== undefined) {
+          acc[key] = EntityUpdateData_FieldValue.fromPartial(value);
+        }
+        return acc;
+      },
+      {},
+    );
+    return message;
+  },
+};
+
+function createBaseEntityUpdateData_FieldValue(): EntityUpdateData_FieldValue {
+  return { value: undefined, op: 0 };
+}
+
+export const EntityUpdateData_FieldValue = {
+  encode(message: EntityUpdateData_FieldValue, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.value !== undefined) {
+      RichValue.encode(message.value, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.op !== 0) {
+      writer.uint32(16).int32(message.op);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): EntityUpdateData_FieldValue {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseEntityUpdateData_FieldValue();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.value = RichValue.decode(reader, reader.uint32());
+          continue;
+        case 2:
+          if (tag !== 16) {
+            break;
+          }
+
+          message.op = reader.int32() as any;
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): EntityUpdateData_FieldValue {
+    return {
+      value: isSet(object.value) ? RichValue.fromJSON(object.value) : undefined,
+      op: isSet(object.op) ? entityUpdateData_OperatorFromJSON(object.op) : 0,
+    };
+  },
+
+  toJSON(message: EntityUpdateData_FieldValue): unknown {
+    const obj: any = {};
+    if (message.value !== undefined) {
+      obj.value = RichValue.toJSON(message.value);
+    }
+    if (message.op !== 0) {
+      obj.op = entityUpdateData_OperatorToJSON(message.op);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<EntityUpdateData_FieldValue>): EntityUpdateData_FieldValue {
+    return EntityUpdateData_FieldValue.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<EntityUpdateData_FieldValue>): EntityUpdateData_FieldValue {
+    const message = createBaseEntityUpdateData_FieldValue();
+    message.value = (object.value !== undefined && object.value !== null)
+      ? RichValue.fromPartial(object.value)
+      : undefined;
+    message.op = object.op ?? 0;
+    return message;
+  },
+};
+
+function createBaseEntityUpdateData_FieldsEntry(): EntityUpdateData_FieldsEntry {
+  return { key: "", value: undefined };
+}
+
+export const EntityUpdateData_FieldsEntry = {
+  encode(message: EntityUpdateData_FieldsEntry, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.key !== "") {
+      writer.uint32(10).string(message.key);
+    }
+    if (message.value !== undefined) {
+      EntityUpdateData_FieldValue.encode(message.value, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): EntityUpdateData_FieldsEntry {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseEntityUpdateData_FieldsEntry();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.key = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.value = EntityUpdateData_FieldValue.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): EntityUpdateData_FieldsEntry {
+    return {
+      key: isSet(object.key) ? globalThis.String(object.key) : "",
+      value: isSet(object.value) ? EntityUpdateData_FieldValue.fromJSON(object.value) : undefined,
+    };
+  },
+
+  toJSON(message: EntityUpdateData_FieldsEntry): unknown {
+    const obj: any = {};
+    if (message.key !== "") {
+      obj.key = message.key;
+    }
+    if (message.value !== undefined) {
+      obj.value = EntityUpdateData_FieldValue.toJSON(message.value);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<EntityUpdateData_FieldsEntry>): EntityUpdateData_FieldsEntry {
+    return EntityUpdateData_FieldsEntry.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<EntityUpdateData_FieldsEntry>): EntityUpdateData_FieldsEntry {
+    const message = createBaseEntityUpdateData_FieldsEntry();
+    message.key = object.key ?? "";
+    message.value = (object.value !== undefined && object.value !== null)
+      ? EntityUpdateData_FieldValue.fromPartial(object.value)
+      : undefined;
+    return message;
+  },
+};
+
 function createBaseDBRequest(): DBRequest {
-  return { opId: BigInt("0"), get: undefined, upsert: undefined, delete: undefined, list: undefined };
+  return {
+    opId: BigInt("0"),
+    get: undefined,
+    upsert: undefined,
+    update: undefined,
+    delete: undefined,
+    list: undefined,
+  };
 }
 
 export const DBRequest = {
@@ -8551,6 +8851,9 @@ export const DBRequest = {
     }
     if (message.upsert !== undefined) {
       DBRequest_DBUpsert.encode(message.upsert, writer.uint32(26).fork()).ldelim();
+    }
+    if (message.update !== undefined) {
+      DBRequest_DBUpdate.encode(message.update, writer.uint32(50).fork()).ldelim();
     }
     if (message.delete !== undefined) {
       DBRequest_DBDelete.encode(message.delete, writer.uint32(34).fork()).ldelim();
@@ -8589,6 +8892,13 @@ export const DBRequest = {
 
           message.upsert = DBRequest_DBUpsert.decode(reader, reader.uint32());
           continue;
+        case 6:
+          if (tag !== 50) {
+            break;
+          }
+
+          message.update = DBRequest_DBUpdate.decode(reader, reader.uint32());
+          continue;
         case 4:
           if (tag !== 34) {
             break;
@@ -8617,6 +8927,7 @@ export const DBRequest = {
       opId: isSet(object.opId) ? BigInt(object.opId) : BigInt("0"),
       get: isSet(object.get) ? DBRequest_DBGet.fromJSON(object.get) : undefined,
       upsert: isSet(object.upsert) ? DBRequest_DBUpsert.fromJSON(object.upsert) : undefined,
+      update: isSet(object.update) ? DBRequest_DBUpdate.fromJSON(object.update) : undefined,
       delete: isSet(object.delete) ? DBRequest_DBDelete.fromJSON(object.delete) : undefined,
       list: isSet(object.list) ? DBRequest_DBList.fromJSON(object.list) : undefined,
     };
@@ -8632,6 +8943,9 @@ export const DBRequest = {
     }
     if (message.upsert !== undefined) {
       obj.upsert = DBRequest_DBUpsert.toJSON(message.upsert);
+    }
+    if (message.update !== undefined) {
+      obj.update = DBRequest_DBUpdate.toJSON(message.update);
     }
     if (message.delete !== undefined) {
       obj.delete = DBRequest_DBDelete.toJSON(message.delete);
@@ -8653,6 +8967,9 @@ export const DBRequest = {
       : undefined;
     message.upsert = (object.upsert !== undefined && object.upsert !== null)
       ? DBRequest_DBUpsert.fromPartial(object.upsert)
+      : undefined;
+    message.update = (object.update !== undefined && object.update !== null)
+      ? DBRequest_DBUpdate.fromPartial(object.update)
       : undefined;
     message.delete = (object.delete !== undefined && object.delete !== null)
       ? DBRequest_DBDelete.fromPartial(object.delete)
@@ -8946,6 +9263,97 @@ export const DBRequest_DBUpsert = {
     message.id = object.id?.map((e) => e) || [];
     message.data = object.data?.map((e) => e) || [];
     message.entityData = object.entityData?.map((e) => RichStruct.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseDBRequest_DBUpdate(): DBRequest_DBUpdate {
+  return { entity: [], id: [], entityData: [] };
+}
+
+export const DBRequest_DBUpdate = {
+  encode(message: DBRequest_DBUpdate, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.entity) {
+      writer.uint32(10).string(v!);
+    }
+    for (const v of message.id) {
+      writer.uint32(18).string(v!);
+    }
+    for (const v of message.entityData) {
+      EntityUpdateData.encode(v!, writer.uint32(26).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): DBRequest_DBUpdate {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDBRequest_DBUpdate();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.entity.push(reader.string());
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.id.push(reader.string());
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.entityData.push(EntityUpdateData.decode(reader, reader.uint32()));
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): DBRequest_DBUpdate {
+    return {
+      entity: globalThis.Array.isArray(object?.entity) ? object.entity.map((e: any) => globalThis.String(e)) : [],
+      id: globalThis.Array.isArray(object?.id) ? object.id.map((e: any) => globalThis.String(e)) : [],
+      entityData: globalThis.Array.isArray(object?.entityData)
+        ? object.entityData.map((e: any) => EntityUpdateData.fromJSON(e))
+        : [],
+    };
+  },
+
+  toJSON(message: DBRequest_DBUpdate): unknown {
+    const obj: any = {};
+    if (message.entity?.length) {
+      obj.entity = message.entity;
+    }
+    if (message.id?.length) {
+      obj.id = message.id;
+    }
+    if (message.entityData?.length) {
+      obj.entityData = message.entityData.map((e) => EntityUpdateData.toJSON(e));
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<DBRequest_DBUpdate>): DBRequest_DBUpdate {
+    return DBRequest_DBUpdate.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<DBRequest_DBUpdate>): DBRequest_DBUpdate {
+    const message = createBaseDBRequest_DBUpdate();
+    message.entity = object.entity?.map((e) => e) || [];
+    message.id = object.id?.map((e) => e) || [];
+    message.entityData = object.entityData?.map((e) => EntityUpdateData.fromPartial(e)) || [];
     return message;
   },
 };

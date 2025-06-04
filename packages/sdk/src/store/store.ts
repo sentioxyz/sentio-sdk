@@ -1,7 +1,24 @@
 import { DatabaseSchema } from '../core/index.js'
 import { BigDecimal } from '@sentio/bigdecimal'
-import { AbstractEntity, AbstractEntity as Entity, Bytes, Float, ID, Int, Timestamp } from './types.js'
-import type { DBRequest, Entity as EntityStruct, RichValue } from '@sentio/protos'
+import {
+  AbstractEntity,
+  AbstractEntity as Entity,
+  Bytes,
+  Float,
+  ID,
+  Int,
+  Timestamp,
+  AddOp,
+  MultiplyOp,
+  UpdateValues
+} from './types.js'
+import {
+  DBRequest,
+  DBRequest_DBUpdate,
+  Entity as EntityStruct,
+  EntityUpdateData_Operator,
+  RichValue
+} from '@sentio/protos'
 import { DBRequest_DBOperator, DBResponse } from '@sentio/protos'
 import { IStoreContext, PluginManager } from '@sentio/runtime'
 import { Cursor } from './cursor.js'
@@ -100,6 +117,42 @@ export class Store {
     await this.context.sendRequest({
       delete: request
     })
+  }
+
+  async update<T extends Entity>(entity: EntityClass<T>, values: UpdateValues<any>): Promise<void> {
+    if (values.id) {
+      const update: DBRequest_DBUpdate = {
+        entity: [getEntityName(entity)],
+        id: [values.id.toString()],
+        entityData: [{ fields: {} }]
+      }
+      for (const [key, value] of Object.entries(values)) {
+        if (key !== 'id') {
+          const field = getEntityField(entity, key)
+          if (value instanceof AddOp) {
+            update.entityData[0].fields[field] = {
+              op: EntityUpdateData_Operator.ADD,
+              value: serializeRichValue(value.value)
+            }
+          } else if (value instanceof MultiplyOp) {
+            update.entityData[0].fields[field] = {
+              op: EntityUpdateData_Operator.MULTIPLY,
+              value: serializeRichValue(value.value)
+            }
+          } else if (value !== undefined) {
+            update.entityData[0].fields[field] = {
+              op: EntityUpdateData_Operator.SET,
+              value: serializeRichValue(value)
+            }
+          }
+        }
+      }
+      await this.context.sendRequest({
+        update
+      })
+    } else {
+      throw new Error('Update must have id field')
+    }
   }
 
   async upsert<T extends Entity>(entity: T | T[]): Promise<void> {
@@ -321,5 +374,5 @@ export function getStore() {
   if (dbContext) {
     return new Store(dbContext)
   }
-  return undefined
+  throw new Error('Store not found in context, please ensure you are calling this in a handler function')
 }

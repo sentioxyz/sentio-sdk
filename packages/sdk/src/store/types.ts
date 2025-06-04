@@ -2,6 +2,7 @@ import { RichStruct, RichValue } from '@sentio/protos'
 import { BigDecimalConverter, BigIntConverter } from './convert.js'
 import { getEntityName, Store } from './store.js'
 import { PluginManager } from '@sentio/runtime'
+import { BigDecimal } from '@sentio/bigdecimal'
 
 export type ID = string | Uint8Array | Int8
 export type String = string
@@ -12,6 +13,34 @@ export type Boolean = boolean
 export type Timestamp = Date
 export type Bytes = Uint8Array
 export type BigInt = bigint
+
+export type ValueType = String | Int | Int8 | Float | Boolean | Timestamp | Bytes | BigInt | BigDecimal | null
+
+export abstract class UpdateOp<T> {}
+
+export class AddOp<T> extends UpdateOp<T> {
+  constructor(readonly value: T) {
+    super()
+  }
+}
+
+export class MultiplyOp<T> extends UpdateOp<T> {
+  constructor(readonly value: T) {
+    super()
+  }
+}
+
+export type UpdateValues<T> = {
+  [K in keyof T]?: T[K] | UpdateOp<T[K]>
+} & { id: ID }
+
+export function add<K extends ValueType>(value: K): UpdateOp<K> {
+  return new AddOp<K>(value)
+}
+
+export function multiply<K extends ValueType>(value: K): UpdateOp<K> {
+  return new MultiplyOp<K>(value)
+}
 
 export abstract class AbstractEntity {
   abstract id: ID

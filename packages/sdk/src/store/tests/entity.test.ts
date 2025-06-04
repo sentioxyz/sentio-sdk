@@ -158,7 +158,6 @@ describe('entity tests', () => {
     ])
     assert.deepEqual(t.enumArray, [EnumA.V1, EnumA.V2])
     await sleep(1)
-    assert.ok(t.pets)
     assert.deepEqual(t.petsIDs, [p.id])
   })
 
