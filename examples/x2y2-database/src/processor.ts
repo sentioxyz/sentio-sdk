@@ -1,23 +1,16 @@
-import { Counter, Gauge, BigDecimal } from '@sentio/sdk'
+import { Counter, BigDecimal } from '@sentio/sdk'
 import { ERC20Processor } from '@sentio/sdk/eth/builtin'
 import { X2y2Processor } from './types/eth/x2y2.js'
-import { Reward, Transfer, User } from './schema/schema.js'
-
-const rewardPerBlock = Gauge.register('reward_per_block', {
-  description: 'rewards for each block grouped by phase',
-  unit: 'x2y2'
-})
+import { Reward, Token, Transfer, User } from './schema/schema.js'
+import { add } from '@sentio/sdk/store'
 
 const tokenCounter = Counter.register('token')
 
 X2y2Processor.bind({ address: '0xB329e39Ebefd16f40d38f07643652cE17Ca5Bac1' }).onBlockInterval(async (block, ctx) => {
   const phase = (await ctx.contract.currentPhase()).toString()
   const reward = (await ctx.contract.rewardPerBlockForStaking()).scaleDown(18)
-  // ctx.logger.info(`reward ${reward.toFormat(6)} for block ${ctx.blockNumber}`, { phase })
-  rewardPerBlock.record(ctx, reward, { phase })
-  // exporter.emit(ctx, { reward, phase })
   const rewardEntity = new Reward({
-    id: block.number.toString(),
+    id: 0n,
     value: reward,
     phase
   })
@@ -34,6 +27,10 @@ ERC20Processor.bind({ address: '0x1e4ede388cbc9f4b5c79681b7f94d36a11abebc9' }).o
   async (event, ctx) => {
     const val = event.args.value.scaleDown(18)
     tokenCounter.add(ctx, val)
+    Token.update({
+      id: 1n,
+      value: add(val)
+    })
     // exporter.emit(ctx, event)
     const from = new User({
       name: 'from',

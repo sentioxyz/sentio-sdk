@@ -1,5 +1,6 @@
-type Reward @entity {
-  id: ID!
+type Reward @entity(timeseries: true) {
+  id: Int8!
+  timestamp: Timestamp!
   value: BigDecimal!
   phase: String
   owner: User!
@@ -25,3 +26,9 @@ type User @entity {
   name: String!
   rewards: [Reward!]! @derivedFrom(field: "owner")
 }
+
+type Token @entity {
+  id: ID!
+  value: BigDecimal!
+}
+
