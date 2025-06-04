@@ -77,25 +77,29 @@ export const dbMetrics = {
     get: new C('store_get_send'),
     upsert: new C('store_upsert_send'),
     list: new C('store_list_send'),
-    delete: new C('store_delete_send')
+    delete: new C('store_delete_send'),
+    update: new C('store_update_send')
   },
   recv_counts: {
     get: new C('store_get_recv'),
     upsert: new C('store_upsert_recv'),
     list: new C('store_list_recv'),
-    delete: new C('store_delete_recv')
+    delete: new C('store_delete_recv'),
+    update: new C('store_update_recv')
   },
   request_times: {
     get: new C('store_get_time'),
     upsert: new C('store_upsert_time'),
     list: new C('store_list_time'),
-    delete: new C('store_delete_time')
+    delete: new C('store_delete_time'),
+    update: new C('store_update_time')
   },
   request_errors: {
     get: new C('store_get_error'),
     upsert: new C('store_upsert_error'),
     list: new C('store_list_error'),
-    delete: new C('store_delete_error')
+    delete: new C('store_delete_error'),
+    update: new C('store_update_error')
   },
   batched_total_count: new C('batched_total_count'),
   batched_request_count: new C('batched_request_count'),

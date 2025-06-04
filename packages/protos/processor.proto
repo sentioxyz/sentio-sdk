@@ -592,11 +592,25 @@ message EntityList {
   repeated Entity entities = 1;
 }
 
+message EntityUpdateData {
+  enum Operator {
+    SET = 0; // set the value
+    ADD = 1; // add the value, only for numeric type
+    MULTIPLY = 2; // multiply the value, only for numeric type
+  }
+  message FieldValue {
+    common.RichValue value = 1;
+    Operator op = 2;
+  }
+  map<string, FieldValue> fields = 1;
+}
+
 message DBRequest {
   uint64 op_id = 1;
   oneof op {
     DBGet get = 2;
     DBUpsert upsert = 3;
+    DBUpdate update = 6;
     DBDelete delete = 4;
     DBList list = 5;
   }
@@ -617,7 +631,12 @@ message DBRequest {
     repeated string entity = 1;
     repeated string id = 2;
     repeated google.protobuf.Struct data = 3; // @deprecate
-    repeated common.RichStruct entity_data = 4;
+    repeated common.RichStruct entity_data = 4; // missing fields should use zero value
+  }
+  message DBUpdate {
+    repeated string entity = 1;
+    repeated string id = 2;
+    repeated EntityUpdateData entity_data = 3; // missing fields should use latest value
   }
 
 

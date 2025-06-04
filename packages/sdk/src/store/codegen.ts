@@ -112,7 +112,7 @@ async function codegenInternal(schema: GraphQLSchema, source: string, target: st
     },
     {
       module: '@sentio/sdk/store',
-      types: ['Entity', 'Required', 'One', 'Many', 'Column', 'ListColumn', 'AbstractEntity']
+      types: ['Entity', 'Required', 'One', 'Many', 'Column', 'ListColumn', 'AbstractEntity', 'getStore', 'UpdateValues']
     },
     {
       module: '@sentio/bigdecimal',
@@ -314,6 +314,14 @@ ${c.fields
   .join('\n')}
   ${isEntity ? `constructor(data: ${c.name}ConstructorInput) {super()}` : ''}
   ${(c.methods ?? []).map(genMethod).join('\n')}
+  
+  ${
+    isEntity
+      ? `static update(values: UpdateValues<${c.name}ConstructorInput>): Promise<void> {
+    return getStore().update(${c.name}, values)
+  }`
+      : ``
+  }
 }`
   })
   .join('\n')}
