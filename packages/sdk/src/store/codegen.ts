@@ -299,6 +299,9 @@ ${c.fields
     if (c.timeseries && f.name == 'timestamp') {
       return `  timestamp?: Timestamp;`
     }
+    if (c.timeseries && f.name == 'id') {
+      return `  id?: Int8;`
+    }
     const isRequired = f.annotations.some((a) => a.includes('@Required'))
     return `  ${f.private ? 'private ' : ''}${f.name}${isRequired ? '' : '?'}: ${f.type.replace(' | undefined', '')};`
   })
