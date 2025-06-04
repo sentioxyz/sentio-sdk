@@ -49,6 +49,7 @@ interface Class {
   parent?: string
   interfaces: string[]
   timeseries?: boolean
+  immutable?: boolean
 }
 
 interface Interface {
@@ -242,6 +243,7 @@ async function codegenInternal(schema: GraphQLSchema, source: string, target: st
         classes.push({
           name: t.name,
           timeseries: isTimeseries(t),
+          immutable: isImmutable(t),
           fields,
           methods,
           annotations: [`@Entity("${t.name}")`],
@@ -319,7 +321,7 @@ ${c.fields
   ${(c.methods ?? []).map(genMethod).join('\n')}
   
   ${
-    isEntity
+    isEntity && !c.immutable
       ? `static update(values: UpdateValues<${c.name}ConstructorInput>): Promise<void> {
     return getStore().update(${c.name}, values)
   }`
@@ -400,6 +402,16 @@ function isTimeseries(t: GraphQLObjectType) {
     (d) =>
       d.name.value == 'entity' &&
       d.arguments?.some((a) => a.name.value == 'timeseries' && a.value.kind == 'BooleanValue' && a.value.value == true)
+  )
+}
+
+function isImmutable(t: GraphQLObjectType) {
+  return (
+    t.astNode?.directives?.some(
+      (d) =>
+        d.name.value == 'entity' &&
+        d.arguments?.some((a) => a.name.value == 'immutable' && a.value.kind == 'BooleanValue' && a.value.value == true)
+    ) || isTimeseries(t)
   )
 }
 

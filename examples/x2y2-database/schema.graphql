@@ -27,9 +27,8 @@ type User @entity {
   rewards: [Reward!]! @derivedFrom(field: "owner")
 }
 
-type Token @entity(timeseries: true) {
-  id: Int8!
-  timestamp: Timestamp!
-  value: BigInt!
+type Token @entity {
+  id: ID!
+  value: BigDecimal!
 }
 

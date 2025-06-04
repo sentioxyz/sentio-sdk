@@ -1,4 +1,4 @@
-import { Counter, Gauge, BigDecimal } from '@sentio/sdk'
+import { Counter, BigDecimal } from '@sentio/sdk'
 import { ERC20Processor } from '@sentio/sdk/eth/builtin'
 import { X2y2Processor } from './types/eth/x2y2.js'
 import { Reward, Token, Transfer, User } from './schema/schema.js'
