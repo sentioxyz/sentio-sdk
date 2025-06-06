@@ -73,7 +73,7 @@ export class InitiaMoveCoder extends MoveCoder {
         return b.toString()
       case 'bool':
       case 'Bool':
-        return b.indexOf(0) >= 1
+        return b.readUInt8() !== 0
       case 'u8':
       case 'U8':
         return b.readUInt8()
