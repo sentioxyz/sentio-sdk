@@ -13,8 +13,8 @@ export function defaultMoveCoder(network: AptosNetwork = AptosNetwork.MAIN_NET):
 
     coder =
       network == AptosNetwork.INITIA_ECHELON
-        ? new InitiaMoveCoder(getClient(network))
-        : new MoveCoder(getClient(network))
+        ? new InitiaMoveCoder(client)
+        : new MoveCoder(client)
     CODERS.set(network, coder)
     URL_CODERS.set(client.config.fullnode || '', coder)
   }
