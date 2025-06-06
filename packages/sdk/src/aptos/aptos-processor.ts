@@ -113,6 +113,10 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
 
         const evt = JSON.parse(data.rawEvent)
 
+        if (txn.sender && processor.config.network === AptosNetwork.INITIA_ECHELON) {
+          txn.sender = convertToInitiaAddress(txn.sender)
+        }
+
         const ctx = new AptosContext(
           processor.moduleName,
           processor.config.network,
@@ -159,6 +163,10 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
           throw new ServerError(Status.INVALID_ARGUMENT, 'call is null')
         }
         const tx = JSON.parse(data.rawTransaction) as UserTransactionResponse
+
+        if (tx.sender && processor.config.network === AptosNetwork.INITIA_ECHELON) {
+          tx.sender = convertToInitiaAddress(tx.sender)
+        }
 
         const ctx = new AptosContext(
           processor.moduleName,
@@ -587,4 +595,10 @@ function configure(options: AptosBindOptions): IndexConfigure {
     network: options.network || AptosNetwork.MAIN_NET,
     baseLabels: options.baseLabels
   }
+}
+
+// Convert Aptos address to Initia address format
+function convertToInitiaAddress(address: string): string {
+  const base64Address = Buffer.from(address, 'hex').toString('base64')
+  return `init1${base64Address}`
 }
