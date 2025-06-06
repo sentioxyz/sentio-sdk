@@ -599,6 +599,11 @@ function configure(options: AptosBindOptions): IndexConfigure {
 
 // Convert Aptos address to Initia address format
 function convertToInitiaAddress(address: string): string {
+  if (address.startsWith('0x')) {
+    address = address.slice(2) // Remove '0x' prefix
+  }
+  // remove leading zeros
+  address = address.replace(/^0+/, '')
   const base64Address = Buffer.from(address, 'hex').toString('base64')
   return `init1${base64Address}`
 }
