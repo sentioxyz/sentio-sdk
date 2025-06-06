@@ -10,15 +10,11 @@ export function defaultMoveCoder(network: AptosNetwork = AptosNetwork.MAIN_NET):
   let coder = CODERS.get(network)
   if (!coder) {
     const client = getClient(network)
-
     coder =
       network == AptosNetwork.INITIA_ECHELON
         ? new InitiaMoveCoder(client)
         : new MoveCoder(client)
-    CODERS.set(network, coder)
-    URL_CODERS.set(client.config.fullnode || '', coder)
   }
-
   return coder
 }
 
@@ -73,7 +69,7 @@ export class InitiaMoveCoder extends MoveCoder {
         return b.toString()
       case 'bool':
       case 'Bool':
-        return b.readUInt8() !== 0
+        return b.indexOf(0) >= 1
       case 'u8':
       case 'U8':
         return b.readUInt8()
