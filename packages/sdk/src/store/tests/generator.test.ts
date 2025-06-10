@@ -63,15 +63,7 @@ describe('Test generators', () => {
     console.log('db returns ', result)
     const result2 = await db.get(2)
     console.log('db returns ', result2)
-    return {
-      counters: [],
-      events: [],
-      exports: [],
-      gauges: [],
-      states: {
-        configUpdated: false
-      }
-    }
+    return ProcessResult.fromPartial({})
   }
 
   function processBinding(binding: ProcessStreamRequest, context: AsyncContext) {

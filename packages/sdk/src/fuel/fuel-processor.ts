@@ -184,15 +184,7 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
           return ctx.stopAndGetResult()
         } catch (e) {
           console.error(e)
-          return {
-            gauges: [],
-            counters: [],
-            events: [],
-            exports: [],
-            states: {
-              configUpdated: false
-            }
-          }
+          return ProcessResult.fromPartial({})
         }
       },
       fetchConfig: {
