@@ -1,6 +1,6 @@
 import { ProcessResult, RecordMetaData } from '@sentio/protos'
 import { EventLoggerBinding, EventLoggerBindingNew } from './event-logger.js'
-import { Meter, Labels } from './meter.js'
+import { Meter, Labels, MeterNew } from './meter.js'
 import { ChainId } from '@sentio/chain'
 import { mergeProcessResults, PluginManager } from '@sentio/runtime'
 import { Required } from 'utility-types'
@@ -9,6 +9,7 @@ import { Store } from '../store/store.js'
 
 export abstract class BaseContext {
   meter: Meter
+  meterNew: MeterNew
   eventLogger: EventLoggerBinding
   eventLoggerNew: EventLoggerBindingNew
   private _store: Store
@@ -36,6 +37,7 @@ export abstract class BaseContext {
 
   protected constructor(baseLabels: Labels | undefined) {
     this.meter = new Meter(this)
+    this.meterNew = new MeterNew(this)
     this.eventLogger = new EventLoggerBinding(this)
     this.eventLoggerNew = new EventLoggerBindingNew(this)
     this.baseLabels = baseLabels || {}
