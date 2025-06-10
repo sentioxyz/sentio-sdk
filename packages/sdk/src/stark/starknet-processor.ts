@@ -83,15 +83,7 @@ export class StarknetProcessor {
           return mergeProcessResults(results)
         } catch (e) {
           console.error(e)
-          return {
-            gauges: [],
-            counters: [],
-            events: [],
-            exports: [],
-            states: {
-              configUpdated: false
-            }
-          }
+          return ProcessResult.fromPartial({})
         }
       },
       eventFilter

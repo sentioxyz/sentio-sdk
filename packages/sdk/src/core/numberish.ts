@@ -1,4 +1,4 @@
-import { BigDecimalRichValue, BigInteger, MetricValue } from '@sentio/protos'
+import { BigDecimalRichValue, BigInteger, MetricValue, RichStruct, RichValue_NullValue } from '@sentio/protos'
 import { BigDecimal } from './big-decimal.js'
 
 export type Numberish = number | bigint | BigDecimal | string
@@ -119,4 +119,37 @@ export function toBigDecimal(value: BigDecimal): BigDecimalRichValue {
     value: toBigInteger(BigInt(s) * BigInt(value.s ?? 1)),
     exp: exp
   }
+}
+
+export function toTimeSeriesData(value: Numberish, labels: Record<string, string>, neg: boolean) {
+  const mv = toMetricValue(value)
+  const data: RichStruct = {
+    fields: {
+      value: {}
+    }
+  }
+
+  for (const key in labels) {
+    if (labels[key] == null) {
+      data.fields[key] = { nullValue: RichValue_NullValue.NULL_VALUE }
+    } else {
+      data.fields[key] = { stringValue: labels[key] }
+    }
+  }
+
+  if (mv.bigInteger != null) {
+    mv.bigInteger.negative = neg ? !mv.bigInteger.negative : mv.bigInteger.negative
+    data.fields.value.bigintValue = mv.bigInteger
+  } else if (mv.bigDecimal != null) {
+    let v = new BigDecimal(mv.bigDecimal)
+    if (neg) {
+      v = v.negated()
+    }
+    data.fields.value.bigdecimalValue = toBigDecimal(v)
+  } else if (mv.doubleValue != null) {
+    data.fields.value.floatValue = neg ? -mv.doubleValue : mv.doubleValue
+  } else {
+    data.fields.value.nullValue = RichValue_NullValue.NULL_VALUE
+  }
+  return data
 }

@@ -6,7 +6,10 @@ import {
   EventLogConfig_Field,
   EventLogConfig_StructFieldType,
   EventTrackingResult,
-  LogLevel
+  LogLevel,
+  RichStruct,
+  TimeseriesResult,
+  TimeseriesResult_TimeseriesType
 } from '@sentio/protos'
 import { normalizeAttribute, normalizeLabels, normalizeToRichStruct } from './normalization.js'
 import { MapStateStorage, processMetrics } from '@sentio/runtime'
@@ -139,5 +142,46 @@ function checkEventName(eventName: string) {
   const entity = DatabaseSchema.findEntity(eventName)
   if (entity) {
     throw new Error(`Event name ${eventName} is already used in the database schema`)
+  }
+}
+
+function emitNew<T>(ctx: BaseContext, eventName: string, event: Event<T>) {
+  const { distinctId, severity, message, ...payload } = event
+
+  const data: RichStruct = {
+    fields: {
+      severity: {
+        stringValue: (severity || LogLevel.INFO).toString()
+      },
+      message: {
+        stringValue: message || ''
+      },
+      distinctEntityId: {
+        stringValue: distinctId || ''
+      },
+      ...normalizeToRichStruct(ctx.baseLabels, payload).fields
+    }
+  }
+  const res: TimeseriesResult = {
+    metadata: ctx.getMetaData(eventName, {}),
+    type: TimeseriesResult_TimeseriesType.EVENT,
+    data,
+    runtimeInfo: undefined
+  }
+
+  processMetrics.process_eventemit_count.add(1)
+  ctx.update({ timeseriesResult: [res] })
+}
+
+export class EventLoggerBindingNew {
+  private readonly ctx: BaseContext
+
+  constructor(ctx: BaseContext) {
+    this.ctx = ctx
+  }
+
+  emit<T>(eventName: string, event: Event<T>) {
+    checkEventName(eventName)
+    emitNew(this.ctx, eventName, event)
   }
 }

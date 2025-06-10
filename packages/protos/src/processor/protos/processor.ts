@@ -1303,6 +1303,7 @@ export interface ProcessResult {
   events: EventTrackingResult[];
   exports: ExportResult[];
   states: StateResult | undefined;
+  timeseriesResult: TimeseriesResult[];
 }
 
 export interface EthCallParam {
@@ -1378,6 +1379,52 @@ export interface EventTrackingResult {
   runtimeInfo: RuntimeInfo | undefined;
   attributes2: RichStruct | undefined;
   noMetric: boolean;
+}
+
+export interface TimeseriesResult {
+  metadata: RecordMetaData | undefined;
+  type: TimeseriesResult_TimeseriesType;
+  data: RichStruct | undefined;
+  runtimeInfo: RuntimeInfo | undefined;
+}
+
+export enum TimeseriesResult_TimeseriesType {
+  EVENT = 0,
+  GAUGE = 1,
+  COUNTER = 2,
+  UNRECOGNIZED = -1,
+}
+
+export function timeseriesResult_TimeseriesTypeFromJSON(object: any): TimeseriesResult_TimeseriesType {
+  switch (object) {
+    case 0:
+    case "EVENT":
+      return TimeseriesResult_TimeseriesType.EVENT;
+    case 1:
+    case "GAUGE":
+      return TimeseriesResult_TimeseriesType.GAUGE;
+    case 2:
+    case "COUNTER":
+      return TimeseriesResult_TimeseriesType.COUNTER;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return TimeseriesResult_TimeseriesType.UNRECOGNIZED;
+  }
+}
+
+export function timeseriesResult_TimeseriesTypeToJSON(object: TimeseriesResult_TimeseriesType): string {
+  switch (object) {
+    case TimeseriesResult_TimeseriesType.EVENT:
+      return "EVENT";
+    case TimeseriesResult_TimeseriesType.GAUGE:
+      return "GAUGE";
+    case TimeseriesResult_TimeseriesType.COUNTER:
+      return "COUNTER";
+    case TimeseriesResult_TimeseriesType.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
 }
 
 export interface ExportResult {
@@ -12030,7 +12077,7 @@ export const StateResult = {
 };
 
 function createBaseProcessResult(): ProcessResult {
-  return { gauges: [], counters: [], events: [], exports: [], states: undefined };
+  return { gauges: [], counters: [], events: [], exports: [], states: undefined, timeseriesResult: [] };
 }
 
 export const ProcessResult = {
@@ -12049,6 +12096,9 @@ export const ProcessResult = {
     }
     if (message.states !== undefined) {
       StateResult.encode(message.states, writer.uint32(50).fork()).ldelim();
+    }
+    for (const v of message.timeseriesResult) {
+      TimeseriesResult.encode(v!, writer.uint32(58).fork()).ldelim();
     }
     return writer;
   },
@@ -12095,6 +12145,13 @@ export const ProcessResult = {
 
           message.states = StateResult.decode(reader, reader.uint32());
           continue;
+        case 7:
+          if (tag !== 58) {
+            break;
+          }
+
+          message.timeseriesResult.push(TimeseriesResult.decode(reader, reader.uint32()));
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -12117,6 +12174,9 @@ export const ProcessResult = {
         ? object.exports.map((e: any) => ExportResult.fromJSON(e))
         : [],
       states: isSet(object.states) ? StateResult.fromJSON(object.states) : undefined,
+      timeseriesResult: globalThis.Array.isArray(object?.timeseriesResult)
+        ? object.timeseriesResult.map((e: any) => TimeseriesResult.fromJSON(e))
+        : [],
     };
   },
 
@@ -12137,6 +12197,9 @@ export const ProcessResult = {
     if (message.states !== undefined) {
       obj.states = StateResult.toJSON(message.states);
     }
+    if (message.timeseriesResult?.length) {
+      obj.timeseriesResult = message.timeseriesResult.map((e) => TimeseriesResult.toJSON(e));
+    }
     return obj;
   },
 
@@ -12152,6 +12215,7 @@ export const ProcessResult = {
     message.states = (object.states !== undefined && object.states !== null)
       ? StateResult.fromPartial(object.states)
       : undefined;
+    message.timeseriesResult = object.timeseriesResult?.map((e) => TimeseriesResult.fromPartial(e)) || [];
     return message;
   },
 };
@@ -13350,6 +13414,116 @@ export const EventTrackingResult = {
       ? RichStruct.fromPartial(object.attributes2)
       : undefined;
     message.noMetric = object.noMetric ?? false;
+    return message;
+  },
+};
+
+function createBaseTimeseriesResult(): TimeseriesResult {
+  return { metadata: undefined, type: 0, data: undefined, runtimeInfo: undefined };
+}
+
+export const TimeseriesResult = {
+  encode(message: TimeseriesResult, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.metadata !== undefined) {
+      RecordMetaData.encode(message.metadata, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.type !== 0) {
+      writer.uint32(16).int32(message.type);
+    }
+    if (message.data !== undefined) {
+      RichStruct.encode(message.data, writer.uint32(26).fork()).ldelim();
+    }
+    if (message.runtimeInfo !== undefined) {
+      RuntimeInfo.encode(message.runtimeInfo, writer.uint32(34).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): TimeseriesResult {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseTimeseriesResult();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.metadata = RecordMetaData.decode(reader, reader.uint32());
+          continue;
+        case 2:
+          if (tag !== 16) {
+            break;
+          }
+
+          message.type = reader.int32() as any;
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.data = RichStruct.decode(reader, reader.uint32());
+          continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.runtimeInfo = RuntimeInfo.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): TimeseriesResult {
+    return {
+      metadata: isSet(object.metadata) ? RecordMetaData.fromJSON(object.metadata) : undefined,
+      type: isSet(object.type) ? timeseriesResult_TimeseriesTypeFromJSON(object.type) : 0,
+      data: isSet(object.data) ? RichStruct.fromJSON(object.data) : undefined,
+      runtimeInfo: isSet(object.runtimeInfo) ? RuntimeInfo.fromJSON(object.runtimeInfo) : undefined,
+    };
+  },
+
+  toJSON(message: TimeseriesResult): unknown {
+    const obj: any = {};
+    if (message.metadata !== undefined) {
+      obj.metadata = RecordMetaData.toJSON(message.metadata);
+    }
+    if (message.type !== 0) {
+      obj.type = timeseriesResult_TimeseriesTypeToJSON(message.type);
+    }
+    if (message.data !== undefined) {
+      obj.data = RichStruct.toJSON(message.data);
+    }
+    if (message.runtimeInfo !== undefined) {
+      obj.runtimeInfo = RuntimeInfo.toJSON(message.runtimeInfo);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<TimeseriesResult>): TimeseriesResult {
+    return TimeseriesResult.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<TimeseriesResult>): TimeseriesResult {
+    const message = createBaseTimeseriesResult();
+    message.metadata = (object.metadata !== undefined && object.metadata !== null)
+      ? RecordMetaData.fromPartial(object.metadata)
+      : undefined;
+    message.type = object.type ?? 0;
+    message.data = (object.data !== undefined && object.data !== null)
+      ? RichStruct.fromPartial(object.data)
+      : undefined;
+    message.runtimeInfo = (object.runtimeInfo !== undefined && object.runtimeInfo !== null)
+      ? RuntimeInfo.fromPartial(object.runtimeInfo)
+      : undefined;
     return message;
   },
 };

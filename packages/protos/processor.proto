@@ -837,6 +837,7 @@ message ProcessResult {
   repeated EventTrackingResult events = 4;
   repeated ExportResult exports = 5;
   StateResult states = 6;
+  repeated TimeseriesResult timeseries_result = 7;
 }
 
 message EthCallParam {
@@ -967,6 +968,18 @@ message EventTrackingResult {
 
   // TODO remove this after driver don't use old event tracker
   bool no_metric = 3;
+}
+
+message TimeseriesResult {
+  RecordMetaData metadata = 1;
+  enum TimeseriesType {
+    EVENT = 0;
+    GAUGE = 1;
+    COUNTER = 2;
+  }
+  TimeseriesType type = 2;
+  common.RichStruct data = 3; // for metric data, it has to be a value field contains MetricValue, other fields are labels
+  RuntimeInfo runtime_info = 4;
 }
 
 message ExportResult {
