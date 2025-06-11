@@ -75,7 +75,7 @@ export class MetricState extends MapStateStorage<Metric> {
 }
 
 export class MetricStateNew extends MapStateStorage<Metric> {
-  static INSTANCE = new MetricState()
+  static INSTANCE = new MetricStateNew()
 
   getOrRegisterMetric(type: MetricType, name: string, option?: CounterOptions | MetricOptions): Metric {
     const metricMap = this.getOrRegister()
@@ -129,7 +129,7 @@ export class Counter extends Metric {
     this.record(ctx, value, labels, false)
   }
 
-  protected record(ctx: BaseContext, value: Numberish, labels: Labels, add: boolean) {
+  private record(ctx: BaseContext, value: Numberish, labels: Labels, add: boolean) {
     processMetrics.process_metricrecord_count.add(1)
     ctx.update({
       counters: [
@@ -229,12 +229,12 @@ export class MeterNew {
     this.ctx = ctx
   }
 
-  Counter(name: string, option?: CounterOptions): CounterNew {
-    return CounterNew.register(name, option)
+  Counter(name: string) {
+    return new CounterNewBinding(name, this.ctx)
   }
 
-  Gauge(name: string, option?: MetricOptions): GaugeNew {
-    return GaugeNew.register(name, option)
+  Gauge(name: string) {
+    return new GaugeNewBinding(name, this.ctx)
   }
 }
 
@@ -262,7 +262,15 @@ export class CounterNew extends Counter {
     )
   }
 
-  protected record(ctx: BaseContext, value: Numberish, labels: Labels, add: boolean) {
+  add(ctx: BaseContext, value: Numberish, labels: Labels = {}) {
+    this.recordNew(ctx, value, labels, true)
+  }
+
+  sub(ctx: BaseContext, value: Numberish, labels: Labels = {}) {
+    this.recordNew(ctx, value, labels, false)
+  }
+
+  private recordNew(ctx: BaseContext, value: Numberish, labels: Labels, add: boolean) {
     processMetrics.process_metricrecord_count.add(1)
     ctx.update({
       timeseriesResult: [
@@ -274,6 +282,38 @@ export class CounterNew extends Counter {
         }
       ]
     })
+  }
+}
+
+export class GaugeNewBinding {
+  private readonly gauge: GaugeNew
+  private readonly ctx: BaseContext
+
+  constructor(name: string, ctx: BaseContext) {
+    this.gauge = GaugeNew._create(name)
+    this.ctx = ctx
+  }
+
+  record(value: Numberish, labels: Labels = {}) {
+    this.gauge.record(this.ctx, value, labels)
+  }
+}
+
+export class CounterNewBinding {
+  private readonly counter: CounterNew
+  private readonly ctx: BaseContext
+
+  constructor(name: string, ctx: BaseContext) {
+    this.counter = CounterNew._create(name)
+    this.ctx = ctx
+  }
+
+  add(value: Numberish, labels: Labels = {}) {
+    this.counter.add(this.ctx, value, labels)
+  }
+
+  sub(value: Numberish, labels: Labels = {}) {
+    this.counter.sub(this.ctx, value, labels)
   }
 }
 
