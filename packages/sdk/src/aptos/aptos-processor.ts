@@ -28,7 +28,7 @@ import {
 import { ALL_ADDRESS, Labels, PromiseOrVoid } from '../core/index.js'
 import { TypeDescriptor, matchType, NestedDecodedStruct } from '@typemove/move'
 import { decodeResourceChange, ResourceChange } from '@typemove/aptos'
-import { GeneralTransactionResponse } from './models.js'
+import { GeneralTransactionResponse, HandlerOptions } from './models.js'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 import { AptEvent } from './data.js'
 
@@ -79,11 +79,10 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
   protected onMoveEvent(
     handler: (event: Event, ctx: AptosContext) => PromiseOrVoid,
     filter: EventFilter | EventFilter[],
-    fetchConfig?: Partial<MoveFetchConfig>,
-    partitionHandler?: (evt: Event) => Promise<string | undefined>
+    handlerOptions?: HandlerOptions<Event>
   ): this {
     let _filters: EventFilter[] = []
-    const _fetchConfig = MoveFetchConfig.fromPartial({ ...DEFAULT_FETCH_CONFIG, ...fetchConfig })
+    const _fetchConfig = MoveFetchConfig.fromPartial({ ...DEFAULT_FETCH_CONFIG, ...handlerOptions })
 
     if (Array.isArray(filter)) {
       _filters = filter
@@ -120,8 +119,13 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
       filters: _filters,
       fetchConfig: _fetchConfig,
       partitionHandler: async (data: AptEvent): Promise<string | undefined> => {
-        const decoded = await data.decodeEvent(processor.coder)
-        return partitionHandler ? await partitionHandler(decoded || data.event) : undefined
+        const p = handlerOptions?.partitionKey
+        if (!p) return undefined
+        if (typeof p === 'function') {
+          const decoded = await data.decodeEvent(processor.coder)
+          return p(decoded || data.event)
+        }
+        return p
       }
     })
     return this
@@ -226,8 +230,8 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
     return this
   }
 
-  public onEvent(handler: (event: Event, ctx: AptosContext) => void, fetchConfig?: Partial<MoveFetchConfig>): this {
-    this.onMoveEvent(handler, { type: '' }, fetchConfig)
+  public onEvent(handler: (event: Event, ctx: AptosContext) => void, handlerOptions?: HandlerOptions<Event>): this {
+    this.onMoveEvent(handler, { type: '' }, handlerOptions)
     return this
   }
 
