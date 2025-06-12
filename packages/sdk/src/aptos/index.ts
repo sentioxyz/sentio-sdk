@@ -20,4 +20,6 @@ export { MoveCoder } from '@typemove/aptos'
 
 export { BUILTIN_TYPES } from '@typemove/move'
 
+export { type HandlerOptions, type PartitionHandler } from './models.js'
+
 // export * from './utils.js'

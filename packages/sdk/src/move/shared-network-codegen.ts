@@ -126,6 +126,7 @@ onEvent${struct.name}(func: (event: ${moduleName}.${normalizeToJSName(struct.nam
     import {
       ${this.PREFIX}BindOptions, ${this.PREFIX}BaseProcessor,
       ${this.PREFIX}Network, TypedFunctionPayload,
+      HandlerOptions,
       ${this.PREFIX}Context } from "@sentio/sdk/${this.PREFIX.toLowerCase()}"
 `
   }

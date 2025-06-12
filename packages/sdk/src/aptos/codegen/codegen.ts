@@ -2,7 +2,7 @@ import * as fs from 'fs'
 import chalk from 'chalk'
 import path, { join } from 'path'
 import { AptosCodegen as BaseAptosCodegen } from '@typemove/aptos/codegen'
-import { InternalMoveModule, InternalMoveStruct } from '@typemove/move'
+import { InternalMoveModule, InternalMoveStruct, normalizeToJSName } from '@typemove/move'
 import { AptosNetwork, getRpcEndpoint } from '../network.js'
 import { Event, MoveModuleBytecode, MoveResource } from '@aptos-labs/ts-sdk'
 import { SharedNetworkCodegen } from '../../move/shared-network-codegen.js'
@@ -47,6 +47,18 @@ class AptosNetworkCodegen extends BaseAptosCodegen {
 
       generateStructs(module: InternalMoveModule, struct: InternalMoveStruct, events: Set<string>) {
         return generator.generateStructs(module, struct, events)
+      }
+
+      generateForOnEvents(module: InternalMoveModule, struct: InternalMoveStruct): string {
+        const moduleName = normalizeToJSName(module.name)
+        const source = `
+onEvent${struct.name}(func: (event: ${moduleName}.${normalizeToJSName(struct.name)}Instance, ctx: ${
+          this.PREFIX
+        }Context) => void, handlerOptions?: HandlerOptions<${moduleName}.${normalizeToJSName(struct.name)}Instance>, eventFilter?: Omit<EventFilter, "type"|"account">): ${moduleName} {
+  this.onMoveEvent(func, {...eventFilter ?? {}, type: '${module.name}::${struct.name}' }, handlerOptions)
+  return this
+}`
+        return source
       }
     })(network, this.chainAdapter)
   }
