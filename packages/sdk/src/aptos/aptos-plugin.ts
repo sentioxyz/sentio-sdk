@@ -3,7 +3,6 @@ import {
   AccountConfig,
   ContractConfig,
   Data_AptCall,
-  Data_AptEvent,
   Data_AptResource,
   DataBinding,
   HandlerType,
@@ -12,6 +11,9 @@ import {
   MoveOwnerType,
   ProcessConfigResponse,
   ProcessResult,
+  ProcessStreamResponse_Partitions,
+  ProcessStreamResponse_Partitions_Partition,
+  ProcessStreamResponse_Partitions_Partition_SysValue,
   StartRequest
 } from '@sentio/protos'
 
@@ -27,13 +29,15 @@ import {
   AptosResourceProcessorTemplateState
 } from './aptos-resource-processor-template.js'
 import { AptosNetwork } from './network.js'
+import { AptEvent } from './data.js'
 
 interface Handlers {
-  aptosEventHandlers: ((event: Data_AptEvent) => Promise<ProcessResult>)[]
+  aptosEventHandlers: ((event: AptEvent) => Promise<ProcessResult>)[]
   aptosCallHandlers: ((func: Data_AptCall) => Promise<ProcessResult>)[]
   aptosResourceHandlers: ((resourceWithVersion: Data_AptResource) => Promise<ProcessResult>)[]
   aptosTransactionIntervalHandlers: ((txn: Data_AptCall) => Promise<ProcessResult>)[]
 }
+
 export class AptosPlugin extends Plugin {
   name: string = 'AptosPlugin'
   handlers: Handlers = {
@@ -42,6 +46,8 @@ export class AptosPlugin extends Plugin {
     aptosResourceHandlers: [],
     aptosTransactionIntervalHandlers: []
   }
+
+  partitionHandlers: Record<number, (request: AptEvent) => Promise<string | undefined>> = {}
 
   async start(request: StartRequest) {
     await initTokenList()
@@ -90,6 +96,9 @@ export class AptosPlugin extends Plugin {
       // 1. Prepare event handlers
       for (const handler of aptosProcessor.eventHandlers) {
         const handlerId = handlers.aptosEventHandlers.push(handler.handler) - 1
+        if (handler.partitionHandler) {
+          this.partitionHandlers[handlerId] = handler.partitionHandler
+        }
         const eventHandlerConfig: MoveEventHandlerConfig = {
           filters: handler.filters.map((f) => {
             return {
@@ -225,12 +234,50 @@ export class AptosPlugin extends Plugin {
     }
   }
 
+  async partition(request: DataBinding): Promise<ProcessStreamResponse_Partitions> {
+    switch (request.handlerType) {
+      case HandlerType.APT_EVENT:
+        const result: Record<number, ProcessStreamResponse_Partitions_Partition> = {}
+        for (const handlerId of request.handlerIds) {
+          const partitionHandler = this.partitionHandlers[handlerId]
+          if (partitionHandler && request.data?.aptEvent) {
+            const partitionValue = await partitionHandler(new AptEvent(request.data.aptEvent))
+            result[handlerId] = {
+              userValue: partitionValue
+            }
+          } else {
+            result[handlerId] = {
+              sysValue: ProcessStreamResponse_Partitions_Partition_SysValue.UNRECOGNIZED
+            }
+          }
+        }
+        return {
+          partitions: result
+        }
+
+      case HandlerType.APT_RESOURCE:
+      case HandlerType.APT_CALL:
+        throw new ServerError(Status.INTERNAL, 'not implemented')
+    }
+    return {
+      partitions: request.handlerIds.reduce(
+        (acc, id) => ({
+          ...acc,
+          [id]: {
+            sysValue: ProcessStreamResponse_Partitions_Partition_SysValue.UNRECOGNIZED
+          }
+        }),
+        {}
+      )
+    }
+  }
+
   async processAptosEvent(binding: DataBinding): Promise<ProcessResult> {
     if (!binding.data?.aptEvent) {
       throw new ServerError(Status.INVALID_ARGUMENT, "Event can't be empty")
     }
     const promises: Promise<ProcessResult>[] = []
-    const event = binding.data.aptEvent
+    const event = new AptEvent(binding.data.aptEvent)
 
     for (const handlerId of binding.handlerIds) {
       const promise = this.handlers.aptosEventHandlers[handlerId](event).catch((e) => {

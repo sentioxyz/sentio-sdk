@@ -56,6 +56,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
   private readonly enablePreprocess: boolean
 
   private preparedData: PreparedData | undefined
+  readonly enablePartition: boolean
 
   constructor(loader: () => Promise<any>, shutdownHandler?: () => void) {
     this.loader = loader
@@ -64,6 +65,8 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     this.enablePreprocess = process.env['ENABLE_PREPROCESS']
       ? process.env['ENABLE_PREPROCESS'].toLowerCase() == 'true'
       : false
+
+    this.enablePartition = process.env['SENTIO_ENABLE_BINDING_DATA_PARTITION'] == 'true'
   }
 
   async getConfig(request: ProcessConfigRequest, context: CallContext): Promise<ProcessConfigResponse> {
@@ -418,6 +421,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     subject: Subject<DeepPartial<ProcessStreamResponse>>
   ) {
     const contexts = new Contexts()
+    let lastBinding: DataBinding | undefined = undefined
     for await (const request of requests) {
       try {
         // console.debug('received request:', request)
@@ -433,31 +437,26 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
             })
             continue
           }
+          lastBinding = request.binding
 
-          const binding = request.binding
-          const dbContext = contexts.new(request.processId, subject)
-          const start = Date.now()
-          PluginManager.INSTANCE.processBinding(binding, this.preparedData, dbContext)
-            .then(async (result) => {
-              // await all pending db requests
-              await dbContext.awaitPendings()
-              subject.next({
-                result,
-                processId: request.processId
-              })
-              recordRuntimeInfo(result, binding.handlerType)
+          if (this.enablePartition) {
+            const partitions = await PluginManager.INSTANCE.partition(request.binding)
+            subject.next({
+              processId: request.processId,
+              partitions
             })
-            .catch((e) => {
-              console.debug(e)
-              dbContext.error(request.processId, e)
-              process_binding_error.add(1)
-            })
-            .finally(() => {
-              const cost = Date.now() - start
-              process_binding_time.add(cost)
-              contexts.delete(request.processId)
-            })
+          } else {
+            this.startProcess(request.processId, request.binding, contexts, subject)
+          }
         }
+
+        if (request.start) {
+          if (!lastBinding) {
+            throw new ServerError(Status.INVALID_ARGUMENT, 'start request received without binding')
+          }
+          this.startProcess(request.processId, lastBinding, contexts, subject)
+        }
+
         if (request.dbResult) {
           const dbContext = contexts.get(request.processId)
           try {
@@ -471,6 +470,36 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         console.error('unexpect error during handle loop', e)
       }
     }
+  }
+
+  private startProcess(
+    processId: number,
+    binding: DataBinding,
+    contexts: Contexts,
+    subject: Subject<DeepPartial<ProcessStreamResponse>>
+  ) {
+    const dbContext = contexts.new(processId, subject)
+    const start = Date.now()
+    PluginManager.INSTANCE.processBinding(binding, this.preparedData, dbContext)
+      .then(async (result) => {
+        // await all pending db requests
+        await dbContext.awaitPendings()
+        subject.next({
+          result,
+          processId: processId
+        })
+        recordRuntimeInfo(result, binding.handlerType)
+      })
+      .catch((e) => {
+        console.debug(e)
+        dbContext.error(processId, e)
+        process_binding_error.add(1)
+      })
+      .finally(() => {
+        const cost = Date.now() - start
+        process_binding_time.add(cost)
+        contexts.delete(processId)
+      })
   }
 }
 

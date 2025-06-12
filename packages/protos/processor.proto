@@ -540,6 +540,7 @@ message ProcessStreamRequest {
   oneof value {
     DataBinding binding = 2; // start processor run
     DBResponse db_result = 3; // send db response back during processor run
+    bool start = 4;
   }
 }
 
@@ -548,6 +549,22 @@ message ProcessStreamResponse {
   oneof value {
     DBRequest db_request = 2;  // processor send db request during processor run
     ProcessResult result = 3;  // finish processor run
+    Partitions partitions = 4;
+  }
+
+  message Partitions {
+    message Partition {
+      enum SysValue {
+        BLOCK_NUMBER = 0;
+        SEQ_MODE = 1;
+        UNIQUE_VALUE = 2;
+      }
+      oneof value {
+        string user_value = 1;
+        SysValue sys_value = 2;
+      }
+    }
+    map<int32, Partition> partitions = 1; // key is handler id, because DataBinding.handler_ids is a array
   }
 }
 

@@ -902,12 +902,71 @@ export interface ProcessStreamRequest {
   processId: number;
   binding?: DataBinding | undefined;
   dbResult?: DBResponse | undefined;
+  start?: boolean | undefined;
 }
 
 export interface ProcessStreamResponse {
   processId: number;
   dbRequest?: DBRequest | undefined;
   result?: ProcessResult | undefined;
+  partitions?: ProcessStreamResponse_Partitions | undefined;
+}
+
+export interface ProcessStreamResponse_Partitions {
+  partitions: { [key: number]: ProcessStreamResponse_Partitions_Partition };
+}
+
+export interface ProcessStreamResponse_Partitions_Partition {
+  userValue?: string | undefined;
+  sysValue?: ProcessStreamResponse_Partitions_Partition_SysValue | undefined;
+}
+
+export enum ProcessStreamResponse_Partitions_Partition_SysValue {
+  BLOCK_NUMBER = 0,
+  SEQ_MODE = 1,
+  UNIQUE_VALUE = 2,
+  UNRECOGNIZED = -1,
+}
+
+export function processStreamResponse_Partitions_Partition_SysValueFromJSON(
+  object: any,
+): ProcessStreamResponse_Partitions_Partition_SysValue {
+  switch (object) {
+    case 0:
+    case "BLOCK_NUMBER":
+      return ProcessStreamResponse_Partitions_Partition_SysValue.BLOCK_NUMBER;
+    case 1:
+    case "SEQ_MODE":
+      return ProcessStreamResponse_Partitions_Partition_SysValue.SEQ_MODE;
+    case 2:
+    case "UNIQUE_VALUE":
+      return ProcessStreamResponse_Partitions_Partition_SysValue.UNIQUE_VALUE;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return ProcessStreamResponse_Partitions_Partition_SysValue.UNRECOGNIZED;
+  }
+}
+
+export function processStreamResponse_Partitions_Partition_SysValueToJSON(
+  object: ProcessStreamResponse_Partitions_Partition_SysValue,
+): string {
+  switch (object) {
+    case ProcessStreamResponse_Partitions_Partition_SysValue.BLOCK_NUMBER:
+      return "BLOCK_NUMBER";
+    case ProcessStreamResponse_Partitions_Partition_SysValue.SEQ_MODE:
+      return "SEQ_MODE";
+    case ProcessStreamResponse_Partitions_Partition_SysValue.UNIQUE_VALUE:
+      return "UNIQUE_VALUE";
+    case ProcessStreamResponse_Partitions_Partition_SysValue.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
+export interface ProcessStreamResponse_Partitions_PartitionsEntry {
+  key: number;
+  value: ProcessStreamResponse_Partitions_Partition | undefined;
 }
 
 export interface PreprocessStreamRequest {
@@ -7879,7 +7938,7 @@ export const ProcessBindingResponse = {
 };
 
 function createBaseProcessStreamRequest(): ProcessStreamRequest {
-  return { processId: 0, binding: undefined, dbResult: undefined };
+  return { processId: 0, binding: undefined, dbResult: undefined, start: undefined };
 }
 
 export const ProcessStreamRequest = {
@@ -7892,6 +7951,9 @@ export const ProcessStreamRequest = {
     }
     if (message.dbResult !== undefined) {
       DBResponse.encode(message.dbResult, writer.uint32(26).fork()).ldelim();
+    }
+    if (message.start !== undefined) {
+      writer.uint32(32).bool(message.start);
     }
     return writer;
   },
@@ -7924,6 +7986,13 @@ export const ProcessStreamRequest = {
 
           message.dbResult = DBResponse.decode(reader, reader.uint32());
           continue;
+        case 4:
+          if (tag !== 32) {
+            break;
+          }
+
+          message.start = reader.bool();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -7938,6 +8007,7 @@ export const ProcessStreamRequest = {
       processId: isSet(object.processId) ? globalThis.Number(object.processId) : 0,
       binding: isSet(object.binding) ? DataBinding.fromJSON(object.binding) : undefined,
       dbResult: isSet(object.dbResult) ? DBResponse.fromJSON(object.dbResult) : undefined,
+      start: isSet(object.start) ? globalThis.Boolean(object.start) : undefined,
     };
   },
 
@@ -7951,6 +8021,9 @@ export const ProcessStreamRequest = {
     }
     if (message.dbResult !== undefined) {
       obj.dbResult = DBResponse.toJSON(message.dbResult);
+    }
+    if (message.start !== undefined) {
+      obj.start = message.start;
     }
     return obj;
   },
@@ -7967,12 +8040,13 @@ export const ProcessStreamRequest = {
     message.dbResult = (object.dbResult !== undefined && object.dbResult !== null)
       ? DBResponse.fromPartial(object.dbResult)
       : undefined;
+    message.start = object.start ?? undefined;
     return message;
   },
 };
 
 function createBaseProcessStreamResponse(): ProcessStreamResponse {
-  return { processId: 0, dbRequest: undefined, result: undefined };
+  return { processId: 0, dbRequest: undefined, result: undefined, partitions: undefined };
 }
 
 export const ProcessStreamResponse = {
@@ -7985,6 +8059,9 @@ export const ProcessStreamResponse = {
     }
     if (message.result !== undefined) {
       ProcessResult.encode(message.result, writer.uint32(26).fork()).ldelim();
+    }
+    if (message.partitions !== undefined) {
+      ProcessStreamResponse_Partitions.encode(message.partitions, writer.uint32(34).fork()).ldelim();
     }
     return writer;
   },
@@ -8017,6 +8094,13 @@ export const ProcessStreamResponse = {
 
           message.result = ProcessResult.decode(reader, reader.uint32());
           continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.partitions = ProcessStreamResponse_Partitions.decode(reader, reader.uint32());
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -8031,6 +8115,7 @@ export const ProcessStreamResponse = {
       processId: isSet(object.processId) ? globalThis.Number(object.processId) : 0,
       dbRequest: isSet(object.dbRequest) ? DBRequest.fromJSON(object.dbRequest) : undefined,
       result: isSet(object.result) ? ProcessResult.fromJSON(object.result) : undefined,
+      partitions: isSet(object.partitions) ? ProcessStreamResponse_Partitions.fromJSON(object.partitions) : undefined,
     };
   },
 
@@ -8044,6 +8129,9 @@ export const ProcessStreamResponse = {
     }
     if (message.result !== undefined) {
       obj.result = ProcessResult.toJSON(message.result);
+    }
+    if (message.partitions !== undefined) {
+      obj.partitions = ProcessStreamResponse_Partitions.toJSON(message.partitions);
     }
     return obj;
   },
@@ -8059,6 +8147,254 @@ export const ProcessStreamResponse = {
       : undefined;
     message.result = (object.result !== undefined && object.result !== null)
       ? ProcessResult.fromPartial(object.result)
+      : undefined;
+    message.partitions = (object.partitions !== undefined && object.partitions !== null)
+      ? ProcessStreamResponse_Partitions.fromPartial(object.partitions)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseProcessStreamResponse_Partitions(): ProcessStreamResponse_Partitions {
+  return { partitions: {} };
+}
+
+export const ProcessStreamResponse_Partitions = {
+  encode(message: ProcessStreamResponse_Partitions, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    Object.entries(message.partitions).forEach(([key, value]) => {
+      ProcessStreamResponse_Partitions_PartitionsEntry.encode({ key: key as any, value }, writer.uint32(10).fork())
+        .ldelim();
+    });
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ProcessStreamResponse_Partitions {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseProcessStreamResponse_Partitions();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          const entry1 = ProcessStreamResponse_Partitions_PartitionsEntry.decode(reader, reader.uint32());
+          if (entry1.value !== undefined) {
+            message.partitions[entry1.key] = entry1.value;
+          }
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ProcessStreamResponse_Partitions {
+    return {
+      partitions: isObject(object.partitions)
+        ? Object.entries(object.partitions).reduce<{ [key: number]: ProcessStreamResponse_Partitions_Partition }>(
+          (acc, [key, value]) => {
+            acc[globalThis.Number(key)] = ProcessStreamResponse_Partitions_Partition.fromJSON(value);
+            return acc;
+          },
+          {},
+        )
+        : {},
+    };
+  },
+
+  toJSON(message: ProcessStreamResponse_Partitions): unknown {
+    const obj: any = {};
+    if (message.partitions) {
+      const entries = Object.entries(message.partitions);
+      if (entries.length > 0) {
+        obj.partitions = {};
+        entries.forEach(([k, v]) => {
+          obj.partitions[k] = ProcessStreamResponse_Partitions_Partition.toJSON(v);
+        });
+      }
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<ProcessStreamResponse_Partitions>): ProcessStreamResponse_Partitions {
+    return ProcessStreamResponse_Partitions.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ProcessStreamResponse_Partitions>): ProcessStreamResponse_Partitions {
+    const message = createBaseProcessStreamResponse_Partitions();
+    message.partitions = Object.entries(object.partitions ?? {}).reduce<
+      { [key: number]: ProcessStreamResponse_Partitions_Partition }
+    >((acc, [key, value]) => {
+      if (value !== undefined) {
+        acc[globalThis.Number(key)] = ProcessStreamResponse_Partitions_Partition.fromPartial(value);
+      }
+      return acc;
+    }, {});
+    return message;
+  },
+};
+
+function createBaseProcessStreamResponse_Partitions_Partition(): ProcessStreamResponse_Partitions_Partition {
+  return { userValue: undefined, sysValue: undefined };
+}
+
+export const ProcessStreamResponse_Partitions_Partition = {
+  encode(message: ProcessStreamResponse_Partitions_Partition, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.userValue !== undefined) {
+      writer.uint32(10).string(message.userValue);
+    }
+    if (message.sysValue !== undefined) {
+      writer.uint32(16).int32(message.sysValue);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ProcessStreamResponse_Partitions_Partition {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseProcessStreamResponse_Partitions_Partition();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.userValue = reader.string();
+          continue;
+        case 2:
+          if (tag !== 16) {
+            break;
+          }
+
+          message.sysValue = reader.int32() as any;
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ProcessStreamResponse_Partitions_Partition {
+    return {
+      userValue: isSet(object.userValue) ? globalThis.String(object.userValue) : undefined,
+      sysValue: isSet(object.sysValue)
+        ? processStreamResponse_Partitions_Partition_SysValueFromJSON(object.sysValue)
+        : undefined,
+    };
+  },
+
+  toJSON(message: ProcessStreamResponse_Partitions_Partition): unknown {
+    const obj: any = {};
+    if (message.userValue !== undefined) {
+      obj.userValue = message.userValue;
+    }
+    if (message.sysValue !== undefined) {
+      obj.sysValue = processStreamResponse_Partitions_Partition_SysValueToJSON(message.sysValue);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<ProcessStreamResponse_Partitions_Partition>): ProcessStreamResponse_Partitions_Partition {
+    return ProcessStreamResponse_Partitions_Partition.fromPartial(base ?? {});
+  },
+  fromPartial(
+    object: DeepPartial<ProcessStreamResponse_Partitions_Partition>,
+  ): ProcessStreamResponse_Partitions_Partition {
+    const message = createBaseProcessStreamResponse_Partitions_Partition();
+    message.userValue = object.userValue ?? undefined;
+    message.sysValue = object.sysValue ?? undefined;
+    return message;
+  },
+};
+
+function createBaseProcessStreamResponse_Partitions_PartitionsEntry(): ProcessStreamResponse_Partitions_PartitionsEntry {
+  return { key: 0, value: undefined };
+}
+
+export const ProcessStreamResponse_Partitions_PartitionsEntry = {
+  encode(
+    message: ProcessStreamResponse_Partitions_PartitionsEntry,
+    writer: _m0.Writer = _m0.Writer.create(),
+  ): _m0.Writer {
+    if (message.key !== 0) {
+      writer.uint32(8).int32(message.key);
+    }
+    if (message.value !== undefined) {
+      ProcessStreamResponse_Partitions_Partition.encode(message.value, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ProcessStreamResponse_Partitions_PartitionsEntry {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseProcessStreamResponse_Partitions_PartitionsEntry();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 8) {
+            break;
+          }
+
+          message.key = reader.int32();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.value = ProcessStreamResponse_Partitions_Partition.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ProcessStreamResponse_Partitions_PartitionsEntry {
+    return {
+      key: isSet(object.key) ? globalThis.Number(object.key) : 0,
+      value: isSet(object.value) ? ProcessStreamResponse_Partitions_Partition.fromJSON(object.value) : undefined,
+    };
+  },
+
+  toJSON(message: ProcessStreamResponse_Partitions_PartitionsEntry): unknown {
+    const obj: any = {};
+    if (message.key !== 0) {
+      obj.key = Math.round(message.key);
+    }
+    if (message.value !== undefined) {
+      obj.value = ProcessStreamResponse_Partitions_Partition.toJSON(message.value);
+    }
+    return obj;
+  },
+
+  create(
+    base?: DeepPartial<ProcessStreamResponse_Partitions_PartitionsEntry>,
+  ): ProcessStreamResponse_Partitions_PartitionsEntry {
+    return ProcessStreamResponse_Partitions_PartitionsEntry.fromPartial(base ?? {});
+  },
+  fromPartial(
+    object: DeepPartial<ProcessStreamResponse_Partitions_PartitionsEntry>,
+  ): ProcessStreamResponse_Partitions_PartitionsEntry {
+    const message = createBaseProcessStreamResponse_Partitions_PartitionsEntry();
+    message.key = object.key ?? 0;
+    message.value = (object.value !== undefined && object.value !== null)
+      ? ProcessStreamResponse_Partitions_Partition.fromPartial(object.value)
       : undefined;
     return message;
   },

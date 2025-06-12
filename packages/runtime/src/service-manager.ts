@@ -1,4 +1,4 @@
-import { CallContext } from 'nice-grpc'
+import { CallContext, ServerError, Status } from 'nice-grpc'
 import { Piscina } from 'piscina'
 import {
   DataBinding,
@@ -22,6 +22,7 @@ import { processMetrics } from './metrics.js'
 import { MessageChannel } from 'node:worker_threads'
 import { ProcessorServiceImpl } from './service.js'
 import { TemplateInstanceState } from './state.js'
+import { PluginManager } from './plugin.js'
 
 const { process_binding_count, process_binding_time, process_binding_error } = processMetrics
 
@@ -70,17 +71,6 @@ export class ServiceManager extends ProcessorServiceImpl {
     return await super.stop(request, context)
   }
 
-  async process(request: DataBinding, dbContext?: ChannelStoreContext): Promise<ProcessResult> {
-    if (!this.pool) {
-      await this.initPool()
-    }
-
-    return this.pool.run(
-      { request, workerPort: dbContext?.workerPort },
-      { transferList: dbContext?.workerPort ? [dbContext?.workerPort] : [] }
-    )
-  }
-
   private readonly contexts = new Contexts()
 
   protected async handleRequests(
@@ -88,6 +78,8 @@ export class ServiceManager extends ProcessorServiceImpl {
     subject: Subject<DeepPartial<ProcessStreamResponse>>
   ) {
     for await (const request of requests) {
+      let lastBinding: DataBinding | undefined = undefined
+
       try {
         // console.debug('received request:', request)
         if (request.binding) {
@@ -103,27 +95,22 @@ export class ServiceManager extends ProcessorServiceImpl {
             continue
           }
 
-          const binding = request.binding
-
-          const dbContext = this.contexts.new(request.processId, subject)
-
-          const start = Date.now()
-          this.process(binding, dbContext)
-            .then(async (result) => {
-              subject.next({
-                result,
-                processId: request.processId
-              })
+          if (this.enablePartition) {
+            const partitions = await PluginManager.INSTANCE.partition(request.binding)
+            subject.next({
+              processId: request.processId,
+              partitions
             })
-            .catch((e) => {
-              dbContext.error(request.processId, e)
-              process_binding_error.add(1)
-            })
-            .finally(() => {
-              const cost = Date.now() - start
-              process_binding_time.add(cost)
-              this.contexts.delete(request.processId)
-            })
+            lastBinding = request.binding
+          } else {
+            this.doProcess(request.processId, request.binding, subject)
+          }
+        }
+        if (request.start) {
+          if (!lastBinding) {
+            throw new ServerError(Status.INVALID_ARGUMENT, 'start request received without binding')
+          }
+          this.doProcess(request.processId, lastBinding, subject)
         }
         if (request.dbResult) {
           const dbContext = this.contexts.get(request.processId)
@@ -138,6 +125,39 @@ export class ServiceManager extends ProcessorServiceImpl {
         console.error('unexpect error during handle loop', e)
       }
     }
+  }
+
+  private doProcess(processId: number, binding: DataBinding, subject: Subject<DeepPartial<ProcessStreamResponse>>) {
+    const dbContext = this.contexts.new(processId, subject)
+
+    const start = Date.now()
+    this.process(binding, dbContext)
+      .then(async (result) => {
+        subject.next({
+          result,
+          processId: processId
+        })
+      })
+      .catch((e) => {
+        dbContext.error(processId, e)
+        process_binding_error.add(1)
+      })
+      .finally(() => {
+        const cost = Date.now() - start
+        process_binding_time.add(cost)
+        this.contexts.delete(processId)
+      })
+  }
+
+  async process(request: DataBinding, dbContext?: ChannelStoreContext): Promise<ProcessResult> {
+    if (!this.pool) {
+      await this.initPool()
+    }
+
+    return this.pool.run(
+      { request, workerPort: dbContext?.workerPort },
+      { transferList: dbContext?.workerPort ? [dbContext?.workerPort] : [] }
+    )
   }
 
   private async initPool() {
