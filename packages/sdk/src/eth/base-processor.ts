@@ -45,6 +45,7 @@ export class EventsHandler {
   handler: (event: Data_EthLog) => Promise<ProcessResult>
   preprocessHandler?: (event: Data_EthLog, preprocessStore: { [k: string]: any }) => Promise<PreprocessResult>
   fetchConfig: EthFetchConfig
+  partitionHandler?: (event: Data_EthLog) => string | undefined
 }
 
 export class TraceHandler {
@@ -53,6 +54,7 @@ export class TraceHandler {
   handler: (trace: Data_EthTrace) => Promise<ProcessResult>
   preprocessHandler?: (event: Data_EthTrace, preprocessStore: { [k: string]: any }) => Promise<PreprocessResult>
   fetchConfig: EthFetchConfig
+  partitionHandler?: (trace: Data_EthTrace) => string | undefined
 }
 
 export class BlockHandler {
@@ -62,13 +64,15 @@ export class BlockHandler {
   handler: (block: Data_EthBlock) => Promise<ProcessResult>
   preprocessHandler?: (event: Data_EthBlock, preprocessStore: { [k: string]: any }) => Promise<PreprocessResult>
   fetchConfig: EthFetchConfig
+  partitionHandler?: (block: Data_EthBlock) => string | undefined
 }
 
 export class TransactionHandler {
-  handler: (block: Data_EthTransaction) => Promise<ProcessResult>
+  handler: (tx: Data_EthTransaction) => Promise<ProcessResult>
   handlerName: string
   preprocessHandler?: (event: Data_EthTransaction, preprocessStore: { [k: string]: any }) => Promise<PreprocessResult>
   fetchConfig: EthFetchConfig
+  partitionHandler?: (tx: Data_EthTransaction) => string | undefined
 }
 
 class BindInternalOptions {
@@ -131,7 +135,8 @@ export class GlobalProcessor {
       preprocessStore: {
         [k: string]: any
       }
-    ) => Promise<PreprocessResult> = defaultPreprocessHandler
+    ) => Promise<PreprocessResult> = defaultPreprocessHandler,
+    partitionHandler?: (block: Data_EthBlock) => string | undefined
   ): this {
     return this.onInterval(
       handler,

@@ -12,14 +12,7 @@ import {
 import { AptosBindOptions, AptosNetwork } from './network.js'
 import { AptosContext, AptosResourcesContext, AptosTransactionContext } from './context.js'
 import { ListStateStorage } from '@sentio/runtime'
-import {
-  MoveFetchConfig,
-  Data_AptResource,
-  HandleInterval,
-  Data_AptEvent,
-  Data_AptCall,
-  MoveAccountFetchConfig
-} from '@sentio/protos'
+import { MoveFetchConfig, Data_AptResource, HandleInterval, Data_AptCall, MoveAccountFetchConfig } from '@sentio/protos'
 import { ServerError, Status } from 'nice-grpc'
 import {
   accountTypeString,
@@ -37,6 +30,7 @@ import { TypeDescriptor, matchType, NestedDecodedStruct } from '@typemove/move'
 import { decodeResourceChange, ResourceChange } from '@typemove/aptos'
 import { GeneralTransactionResponse } from './models.js'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
+import { AptEvent } from './data.js'
 
 const DEFAULT_FETCH_CONFIG: MoveFetchConfig = {
   resourceChanges: false,
@@ -66,7 +60,7 @@ export class AptosProcessorState extends ListStateStorage<AptosTransactionProces
 export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT extends AptosTransactionContext<T>> {
   readonly moduleName: string
   config: IndexConfigure
-  eventHandlers: EventHandler<Data_AptEvent>[] = []
+  eventHandlers: EventHandler<AptEvent>[] = []
   callHandlers: CallHandler<Data_AptCall>[] = []
   resourceChangeHandlers: ResourceChangeHandler<Data_AptResource>[] = []
   transactionIntervalHandlers: TransactionIntervalHandler[] = []
@@ -85,7 +79,8 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
   protected onMoveEvent(
     handler: (event: Event, ctx: AptosContext) => PromiseOrVoid,
     filter: EventFilter | EventFilter[],
-    fetchConfig?: Partial<MoveFetchConfig>
+    fetchConfig?: Partial<MoveFetchConfig>,
+    partitionHandler?: (evt: Event) => Promise<string | undefined>
   ): this {
     let _filters: EventFilter[] = []
     const _fetchConfig = MoveFetchConfig.fromPartial({ ...DEFAULT_FETCH_CONFIG, ...fetchConfig })
@@ -106,12 +101,7 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
         if (!data.rawTransaction) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'event is null')
         }
-        const txn = JSON.parse(data.rawTransaction) as UserTransactionResponse
-        if (txn.events == null) {
-          txn.events = []
-        }
-
-        const evt = JSON.parse(data.rawEvent)
+        const txn = data.transaction
 
         const ctx = new AptosContext(
           processor.moduleName,
@@ -123,13 +113,16 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
           processor.config.baseLabels
         )
 
-        const decoded = await processor.coder.decodeEvent<any>(evt)
-        await handler(decoded || evt, ctx)
-
+        const decoded = await data.decodeEvent(processor.coder)
+        await handler(decoded || data.event, ctx)
         return ctx.stopAndGetResult()
       },
       filters: _filters,
-      fetchConfig: _fetchConfig
+      fetchConfig: _fetchConfig,
+      partitionHandler: async (data: AptEvent): Promise<string | undefined> => {
+        const decoded = await data.decodeEvent(processor.coder)
+        return partitionHandler ? await partitionHandler(decoded || data.event) : undefined
+      }
     })
     return this
   }
@@ -377,6 +370,7 @@ export class AptosModulesProcessor extends AptosTransactionProcessor<
 
 export class AptosGlobalProcessor {
   private baseProcessor
+
   private constructor(options: AptosBindOptions) {
     this.baseProcessor = new AptosTransactionProcessor('*', options)
     return proxyProcessor(this)

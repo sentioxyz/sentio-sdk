@@ -38,6 +38,7 @@ export class EventHandler<T> {
   handlerName: string
   handler: (event: T) => Promise<ProcessResult>
   fetchConfig: MoveFetchConfig
+  partitionHandler?: (event: T) => Promise<string | undefined>
 }
 
 export class CallHandler<T> {

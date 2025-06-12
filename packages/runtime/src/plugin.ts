@@ -5,6 +5,8 @@ import {
   PreprocessResult,
   ProcessConfigResponse,
   ProcessResult,
+  ProcessStreamResponse_Partitions,
+  ProcessStreamResponse_Partitions_Partition_SysValue,
   StartRequest
 } from '@sentio/protos'
 import { IStoreContext, StoreContext } from './db-context.js'
@@ -31,6 +33,20 @@ export abstract class Plugin {
 
   async preprocessBinding(request: DataBinding, preprocessStore: { [k: string]: any }): Promise<PreprocessResult> {
     return PreprocessResult.create()
+  }
+
+  async partition(request: DataBinding): Promise<ProcessStreamResponse_Partitions> {
+    return {
+      partitions: request.handlerIds.reduce(
+        (acc, id) => ({
+          ...acc,
+          [id]: {
+            sysValue: ProcessStreamResponse_Partitions_Partition_SysValue.UNRECOGNIZED
+          }
+        }),
+        {}
+      )
+    }
   }
 
   /**
@@ -102,6 +118,14 @@ export class PluginManager {
     return this.dbContextLocalStorage.run(dbContext, () => {
       return plugin.processBinding(request, preparedData)
     })
+  }
+
+  async partition(request: DataBinding): Promise<ProcessStreamResponse_Partitions> {
+    const plugin = this.typesToPlugin.get(request.handlerType)
+    if (!plugin) {
+      throw new Error(`No plugin for ${request.handlerType}`)
+    }
+    return plugin.partition(request)
   }
 
   preprocessBinding(
