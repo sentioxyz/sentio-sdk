@@ -1,4 +1,5 @@
 import { errorString, GLOBAL_CONFIG, mergeProcessResults, Plugin, PluginManager, USER_PROCESSOR } from '@sentio/runtime'
+import { PartitionHandlerManager } from '../core/index.js'
 import {
   AccountConfig,
   ContractConfig,
@@ -11,8 +12,6 @@ import {
   ProcessConfigResponse,
   ProcessResult,
   ProcessStreamResponse_Partitions,
-  ProcessStreamResponse_Partitions_Partition,
-  ProcessStreamResponse_Partitions_Partition_SysValue,
   StartRequest
 } from '@sentio/protos'
 
@@ -46,7 +45,7 @@ export class AptosPlugin extends Plugin {
     aptosTransactionIntervalHandlers: []
   }
 
-  partitionHandlers: Record<number, (request: AptEvent) => Promise<string | undefined>> = {}
+  partitionManager = new PartitionHandlerManager()
 
   async start(request: StartRequest) {
     await initTokenList()
@@ -95,9 +94,7 @@ export class AptosPlugin extends Plugin {
       // 1. Prepare event handlers
       for (const handler of aptosProcessor.eventHandlers) {
         const handlerId = handlers.aptosEventHandlers.push(handler.handler) - 1
-        if (handler.partitionHandler) {
-          this.partitionHandlers[handlerId] = handler.partitionHandler
-        }
+        this.partitionManager.registerPartitionHandler(HandlerType.APT_EVENT, handlerId, handler.partitionHandler)
         const eventHandlerConfig: MoveEventHandlerConfig = {
           filters: handler.filters.map((f) => {
             return {
@@ -116,6 +113,7 @@ export class AptosPlugin extends Plugin {
       // 2. Prepare function handlers
       for (const handler of aptosProcessor.callHandlers) {
         const handlerId = handlers.aptosCallHandlers.push(handler.handler) - 1
+        this.partitionManager.registerPartitionHandler(HandlerType.APT_CALL, handlerId, handler.partitionHandler)
         const functionHandlerConfig: MoveCallHandlerConfig = {
           filters: handler.filters.map((filter) => {
             return {
@@ -147,6 +145,7 @@ export class AptosPlugin extends Plugin {
       })
       for (const handler of aptosProcessor.resourceChangeHandlers) {
         const handlerId = handlers.aptosResourceHandlers.push(handler.handler) - 1
+        this.partitionManager.registerPartitionHandler(HandlerType.APT_RESOURCE, handlerId, handler.partitionHandler)
         accountConfig.moveResourceChangeConfigs.push({
           handlerId: handlerId,
           handlerName: handler.handlerName,
@@ -158,6 +157,7 @@ export class AptosPlugin extends Plugin {
       //  Prepare interval handlers
       for (const handler of aptosProcessor.transactionIntervalHandlers) {
         const handlerId = handlers.aptosTransactionIntervalHandlers.push(handler.handler) - 1
+        this.partitionManager.registerPartitionHandler(HandlerType.APT_CALL, handlerId, handler.partitionHandler)
         accountConfig.moveIntervalConfigs.push({
           intervalConfig: {
             handlerId: handlerId,
@@ -187,6 +187,7 @@ export class AptosPlugin extends Plugin {
       })
       for (const handler of aptosProcessor.resourceIntervalHandlers) {
         const handlerId = handlers.aptosResourceHandlers.push(handler.handler) - 1
+        this.partitionManager.registerPartitionHandler(HandlerType.APT_RESOURCE, handlerId, handler.partitionHandler)
         if (handler.timeIntervalInMinutes || handler.versionInterval) {
           accountConfig.moveIntervalConfigs.push({
             intervalConfig: {
@@ -234,40 +235,36 @@ export class AptosPlugin extends Plugin {
   }
 
   async partition(request: DataBinding): Promise<ProcessStreamResponse_Partitions> {
+    let data: any
     switch (request.handlerType) {
       case HandlerType.APT_EVENT:
-        const result: Record<number, ProcessStreamResponse_Partitions_Partition> = {}
-        for (const handlerId of request.handlerIds) {
-          const partitionHandler = this.partitionHandlers[handlerId]
-          if (partitionHandler && request.data?.aptEvent) {
-            const partitionValue = await partitionHandler(new AptEvent(request.data.aptEvent))
-            result[handlerId] = {
-              userValue: partitionValue
-            }
-          } else {
-            result[handlerId] = {
-              sysValue: ProcessStreamResponse_Partitions_Partition_SysValue.UNRECOGNIZED
-            }
-          }
+        if (!request.data?.aptEvent) {
+          throw new ServerError(Status.INVALID_ARGUMENT, "aptEvent can't be empty")
         }
-        return {
-          partitions: result
-        }
-
-      case HandlerType.APT_RESOURCE:
+        data = new AptEvent(request.data.aptEvent)
+        break
       case HandlerType.APT_CALL:
-        throw new ServerError(Status.INTERNAL, 'not implemented')
+        if (!request.data?.aptCall) {
+          throw new ServerError(Status.INVALID_ARGUMENT, "aptCall can't be empty")
+        }
+        data = new AptCall(request.data.aptCall)
+        break
+      case HandlerType.APT_RESOURCE:
+        if (!request.data?.aptResource) {
+          throw new ServerError(Status.INVALID_ARGUMENT, "aptResource can't be empty")
+        }
+        data = new AptResource(request.data.aptResource)
+        break
+      default:
+        throw new ServerError(Status.INVALID_ARGUMENT, 'No handle type registered ' + request.handlerType)
     }
+    const partitions = await this.partitionManager.processPartitionForHandlerType(
+      request.handlerType,
+      request.handlerIds,
+      data
+    )
     return {
-      partitions: request.handlerIds.reduce(
-        (acc, id) => ({
-          ...acc,
-          [id]: {
-            sysValue: ProcessStreamResponse_Partitions_Partition_SysValue.UNRECOGNIZED
-          }
-        }),
-        {}
-      )
+      partitions
     }
   }
 

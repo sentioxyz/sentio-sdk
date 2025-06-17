@@ -23,3 +23,7 @@ export { CorePlugin } from './core-plugin.js'
 export { DatabaseSchema } from './database-schema.js'
 export * from './constants.js'
 export { type HandlerOptions, type PartitionHandler, mergeHandlerOptions } from './handler-options.js'
+export {
+  PartitionHandlerManager,
+  type PartitionHandler as PartitionHandlerFunction
+} from './partition-handler-manager.js'

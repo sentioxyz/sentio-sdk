@@ -13,10 +13,12 @@ import {
   MoveResourceChangeConfig,
   ProcessConfigResponse,
   ProcessResult,
+  ProcessStreamResponse_Partitions,
   StartRequest
 } from '@sentio/protos'
 
 import { ServerError, Status } from 'nice-grpc'
+import { PartitionHandlerManager } from '../core/index.js'
 
 import { SuiProcessorState } from './sui-processor.js'
 import { SuiAccountProcessorState, SuiAddressProcessor } from './sui-object-processor.js'
@@ -44,6 +46,8 @@ export class SuiPlugin extends Plugin {
     suiObjectHandlers: [],
     suiObjectChangeHandlers: []
   }
+
+  partitionManager = new PartitionHandlerManager()
   async start(request: StartRequest): Promise<void> {
     await initCoinList()
 
@@ -94,6 +98,7 @@ export class SuiPlugin extends Plugin {
       })
       for (const handler of suiProcessor.eventHandlers) {
         const handlerId = handlers.suiEventHandlers.push(handler.handler) - 1
+        this.partitionManager.registerPartitionHandler(HandlerType.SUI_EVENT, handlerId, handler.partitionHandler)
         const eventHandlerConfig: MoveEventHandlerConfig = {
           filters: handler.filters.map((f) => {
             return {
@@ -110,6 +115,7 @@ export class SuiPlugin extends Plugin {
       }
       for (const handler of suiProcessor.callHandlers) {
         const handlerId = handlers.suiCallHandlers.push(handler.handler) - 1
+        this.partitionManager.registerPartitionHandler(HandlerType.SUI_CALL, handlerId, handler.partitionHandler)
         const functionHandlerConfig: MoveCallHandlerConfig = {
           filters: handler.filters.map((filter) => {
             return {
@@ -207,6 +213,68 @@ export class SuiPlugin extends Plugin {
     this.handlers = handlers
   }
 
+  supportedHandlers = [
+    HandlerType.SUI_EVENT,
+    HandlerType.SUI_CALL,
+    HandlerType.SUI_OBJECT,
+    HandlerType.SUI_OBJECT_CHANGE
+  ]
+
+  processBinding(request: DataBinding): Promise<ProcessResult> {
+    switch (request.handlerType) {
+      case HandlerType.SUI_EVENT:
+        return this.processSuiEvent(request)
+      case HandlerType.SUI_CALL:
+        return this.processSuiFunctionCall(request)
+      case HandlerType.SUI_OBJECT:
+        return this.processSuiObject(request)
+      case HandlerType.SUI_OBJECT_CHANGE:
+        return this.processSuiObjectChange(request)
+      default:
+        throw new ServerError(Status.INVALID_ARGUMENT, 'No handle type registered ' + request.handlerType)
+    }
+  }
+
+  async partition(request: DataBinding): Promise<ProcessStreamResponse_Partitions> {
+    let data: any
+    switch (request.handlerType) {
+      case HandlerType.SUI_EVENT:
+        if (!request.data?.suiEvent) {
+          throw new ServerError(Status.INVALID_ARGUMENT, "suiEvent can't be empty")
+        }
+        data = request.data.suiEvent
+        break
+      case HandlerType.SUI_CALL:
+        if (!request.data?.suiCall) {
+          throw new ServerError(Status.INVALID_ARGUMENT, "suiCall can't be empty")
+        }
+        data = request.data.suiCall
+        break
+      case HandlerType.SUI_OBJECT:
+        if (!request.data?.suiObject) {
+          throw new ServerError(Status.INVALID_ARGUMENT, "suiObject can't be empty")
+        }
+        data = request.data.suiObject
+        break
+      case HandlerType.SUI_OBJECT_CHANGE:
+        if (!request.data?.suiObjectChange) {
+          throw new ServerError(Status.INVALID_ARGUMENT, "suiObjectChange can't be empty")
+        }
+        data = request.data.suiObjectChange
+        break
+      default:
+        throw new ServerError(Status.INVALID_ARGUMENT, 'No handle type registered ' + request.handlerType)
+    }
+    const partitions = await this.partitionManager.processPartitionForHandlerType(
+      request.handlerType,
+      request.handlerIds,
+      data
+    )
+    return {
+      partitions
+    }
+  }
+
   async processSuiEvent(binding: DataBinding): Promise<ProcessResult> {
     if (!binding.data?.suiEvent) {
       throw new ServerError(Status.INVALID_ARGUMENT, "Event can't be empty")
@@ -281,28 +349,6 @@ export class SuiPlugin extends Plugin {
       )
     }
     return mergeProcessResults(await Promise.all(promises))
-  }
-
-  supportedHandlers = [
-    HandlerType.SUI_EVENT,
-    HandlerType.SUI_CALL,
-    HandlerType.SUI_OBJECT,
-    HandlerType.SUI_OBJECT_CHANGE
-  ]
-
-  processBinding(request: DataBinding): Promise<ProcessResult> {
-    switch (request.handlerType) {
-      case HandlerType.SUI_EVENT:
-        return this.processSuiEvent(request)
-      case HandlerType.SUI_CALL:
-        return this.processSuiFunctionCall(request)
-      case HandlerType.SUI_OBJECT:
-        return this.processSuiObject(request)
-      case HandlerType.SUI_OBJECT_CHANGE:
-        return this.processSuiObjectChange(request)
-      default:
-        throw new ServerError(Status.INVALID_ARGUMENT, 'No handle type registered ' + request.handlerType)
-    }
   }
 }
 

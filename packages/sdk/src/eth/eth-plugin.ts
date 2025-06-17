@@ -1,12 +1,13 @@
 import {
   errorString,
+  getProvider,
+  GLOBAL_CONFIG,
   mergeProcessResults,
   Plugin,
   PluginManager,
-  USER_PROCESSOR,
-  GLOBAL_CONFIG,
-  getProvider
+  USER_PROCESSOR
 } from '@sentio/runtime'
+import { PartitionHandlerManager } from '../core/index.js'
 import {
   AccountConfig,
   ContractConfig,
@@ -22,6 +23,7 @@ import {
   PreprocessResult,
   ProcessConfigResponse,
   ProcessResult,
+  ProcessStreamResponse_Partitions,
   StartRequest
 } from '@sentio/protos'
 
@@ -68,6 +70,8 @@ export class EthPlugin extends Plugin {
     transactionHandlers: []
   }
 
+  partitionManager = new PartitionHandlerManager()
+
   async configure(config: ProcessConfigResponse) {
     const handlers: Handlers = {
       blockHandlers: [],
@@ -108,6 +112,7 @@ export class EthPlugin extends Plugin {
       for (const blockHandler of processor.blockHandlers) {
         preprocessHandlers.blockHandlers.push(blockHandler.preprocessHandler ?? defaultPreprocessHandler)
         const handlerId = handlers.blockHandlers.push(blockHandler.handler) - 1
+        this.partitionManager.registerPartitionHandler(HandlerType.ETH_BLOCK, handlerId, blockHandler.partitionHandler)
         // TODO wrap the block handler into one
 
         contractConfig.intervalConfigs.push({
@@ -125,6 +130,7 @@ export class EthPlugin extends Plugin {
       for (const traceHandler of processor.traceHandlers) {
         preprocessHandlers.traceHandlers.push(traceHandler.preprocessHandler ?? defaultPreprocessHandler)
         const handlerId = handlers.traceHandlers.push(traceHandler.handler) - 1
+        this.partitionManager.registerPartitionHandler(HandlerType.ETH_TRACE, handlerId, traceHandler.partitionHandler)
         for (const signature of traceHandler.signatures) {
           contractConfig.traceConfigs.push({
             signature: signature,
@@ -140,6 +146,7 @@ export class EthPlugin extends Plugin {
         // associate id with filter
         preprocessHandlers.eventHandlers.push(eventsHandler.preprocessHandler ?? defaultPreprocessHandler)
         const handlerId = handlers.eventHandlers.push(eventsHandler.handler) - 1
+        this.partitionManager.registerPartitionHandler(HandlerType.ETH_LOG, handlerId, eventsHandler.partitionHandler)
         const logConfig: LogHandlerConfig = {
           handlerId: handlerId,
           handlerName: eventsHandler.handlerName,
@@ -213,6 +220,11 @@ export class EthPlugin extends Plugin {
       for (const transactionHandler of processor.transactionHandler) {
         preprocessHandlers.transactionHandlers.push(transactionHandler.preprocessHandler ?? defaultPreprocessHandler)
         const handlerId = handlers.transactionHandlers.push(transactionHandler.handler) - 1
+        this.partitionManager.registerPartitionHandler(
+          HandlerType.ETH_TRANSACTION,
+          handlerId,
+          transactionHandler.partitionHandler
+        )
         contractConfig.transactionConfig.push({
           handlerId: handlerId,
           handlerName: transactionHandler.handlerName,
@@ -320,6 +332,46 @@ export class EthPlugin extends Plugin {
         return this.preprocessTransaction(request, preprocessStore)
       default:
         throw new ServerError(Status.INVALID_ARGUMENT, 'No handle type registered ' + request.handlerType)
+    }
+  }
+
+  async partition(request: DataBinding): Promise<ProcessStreamResponse_Partitions> {
+    let data: any
+    switch (request.handlerType) {
+      case HandlerType.ETH_LOG:
+        if (!request.data?.ethLog) {
+          throw new ServerError(Status.INVALID_ARGUMENT, "ethLog can't be empty")
+        }
+        data = request.data.ethLog
+        break
+      case HandlerType.ETH_TRACE:
+        if (!request.data?.ethTrace) {
+          throw new ServerError(Status.INVALID_ARGUMENT, "ethTrace can't be empty")
+        }
+        data = request.data.ethTrace
+        break
+      case HandlerType.ETH_BLOCK:
+        if (!request.data?.ethBlock) {
+          throw new ServerError(Status.INVALID_ARGUMENT, "ethBlock can't be empty")
+        }
+        data = request.data.ethBlock
+        break
+      case HandlerType.ETH_TRANSACTION:
+        if (!request.data?.ethTransaction) {
+          throw new ServerError(Status.INVALID_ARGUMENT, "ethTransaction can't be empty")
+        }
+        data = request.data.ethTransaction
+        break
+      default:
+        throw new ServerError(Status.INVALID_ARGUMENT, 'No handle type registered ' + request.handlerType)
+    }
+    const partitions = await this.partitionManager.processPartitionForHandlerType(
+      request.handlerType,
+      request.handlerIds,
+      data
+    )
+    return {
+      partitions
     }
   }
 

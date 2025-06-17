@@ -78,4 +78,5 @@ export class TransactionIntervalHandler {
   handler: (tx: Data_AptCall) => Promise<ProcessResult>
   handlerName: string
   fetchConfig: MoveFetchConfig
+  partitionHandler?: (tx: Data_AptCall) => Promise<string | undefined>
 }
