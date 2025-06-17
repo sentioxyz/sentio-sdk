@@ -7,6 +7,7 @@ import { ListStateStorage, mergeProcessResults } from '@sentio/runtime'
 import { StarknetProcessorConfig } from './types.js'
 import { StarknetContractView } from './contract.js'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
+import { HandlerOptions } from '../core/handler-options.js'
 
 export class StarknetProcessor {
   callHandlers: CallHandler<Data_StarknetEvent>[] = []
@@ -42,7 +43,8 @@ export class StarknetProcessor {
 
   public onEvent(
     event: string | string[],
-    handler: (events: StarknetEvent<ParsedEvent>, ctx: StarknetContext<StarknetContractView>) => void | Promise<void>
+    handler: (events: StarknetEvent<ParsedEvent>, ctx: StarknetContext<StarknetContractView>) => void | Promise<void>,
+    handlerOptions?: HandlerOptions<object, StarknetEvent<ParsedEvent>>
   ) {
     const eventFilter = Array.isArray(event) ? event : [event]
     if (!this.config.abi) {
@@ -86,7 +88,30 @@ export class StarknetProcessor {
           return ProcessResult.fromPartial({})
         }
       },
-      eventFilter
+      eventFilter,
+      partitionHandler: async (call: Data_StarknetEvent): Promise<string | undefined> => {
+        const p = handlerOptions?.partitionKey
+        if (!p) return undefined
+        if (typeof p === 'function') {
+          try {
+            const eventData = [call.result] as any[]
+            const abiEvents = events.getAbiEvents(abi)
+            const abiStructs = CallData.getAbiStruct(abi)
+            const abiEnums = CallData.getAbiEnum(abi)
+            const parsedEvents = events.parseEvents(eventData, abiEvents, abiStructs, abiEnums)
+            if (parsedEvents.length > 0) {
+              const { from_address, transaction_hash } = call.result!
+              const e = new StarknetEvent(from_address, transaction_hash, parsedEvents[0])
+              return p(e)
+            }
+            return undefined
+          } catch (e) {
+            console.error(e)
+            return undefined
+          }
+        }
+        return p
+      }
     }
     this.callHandlers.push(callHandler)
     return this
@@ -97,6 +122,7 @@ export type CallHandler<T> = {
   handlerName: string
   handler: (call: T) => Promise<ProcessResult>
   eventFilter?: string[]
+  partitionHandler?: (call: T) => Promise<string | undefined>
 }
 
 function getRpcEndpoint(chainId: StarknetChainId | string) {

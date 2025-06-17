@@ -119,7 +119,7 @@ async function codegenInternal(abisDir: string, outDir: string): Promise<number>
 import { FuelAbstractProcessor, FuelContractContext, FuelProcessorConfig, TypedCall, FuelFetchConfig, FuelCall, FuelLog, addFuelProcessor, getFuelProcessor, FuelBaseProcessorTemplate } from '@sentio/sdk/fuel'
 import {${abi.commonTypesInUse.join(',')}} from './common.js'
 import {${importedTypes.join(',')}, ${abi.capitalizedName}} from './${abi.capitalizedName}.js'
-
+import { HandlerOptions } from '@sentio/sdk'
 import type { BigNumberish, BN } from 'fuels';
 import type { BytesLike, Bytes, StdString, StrSlice, RawSlice, B256Address, ChecksumAddress, Address } from 'fuels';
 
@@ -221,8 +221,8 @@ function genCallType(f: IFunction) {
 function genOnCallFunction(contractName: string, f: IFunction) {
   const name = upperFirst(f.name)
   return `
-  onCall${name}(handler: (call: ${contractName}.${name}Call, ctx: FuelContractContext<${contractName}>) => void | Promise<void>, config?: FuelFetchConfig) {
-    return super.onCall('${f.name}', (call, ctx) => handler(new ${contractName}.${name}Call(call), ctx), config)
+  onCall${name}(handler: (call: ${contractName}.${name}Call, ctx: FuelContractContext<${contractName}>) => void | Promise<void>, handlerOptions?: HandlerOptions<FuelFetchConfig, ${contractName}.${name}Call>) {
+    return super.onCall('${f.name}', (call, ctx) => handler(new ${contractName}.${name}Call(call), ctx), handlerOptions)
   }`
 }
 
@@ -255,8 +255,8 @@ function genOnLogFunction(contractName: string, [type, ids]: [string, string[]])
 
   if (ids.length == 1) {
     return `
-  onLog${name}(handler: (log: FuelLog<${type}>, ctx: FuelContractContext<${contractName}>) => void | Promise<void>) {
-    return super.onLog<${type}>([Log${name}Id], (log, ctx) => handler(log, ctx))
+  onLog${name}(handler: (log: FuelLog<${type}>, ctx: FuelContractContext<${contractName}>) => void | Promise<void>,  handlerOptions?: HandlerOptions<object, FuelLog<${type}>>) {
+    return super.onLog<${type}>([Log${name}Id], (log, ctx) => handler(log, ctx), handlerOptions)
   }`
   }
   const logIdFilterValues = ids.map((_, idx) => `Log${name}Id${idx}`)

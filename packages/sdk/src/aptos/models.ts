@@ -9,7 +9,6 @@ import {
   ValidatorTransactionResponse,
   BlockEpilogueTransactionResponse
 } from '@aptos-labs/ts-sdk'
-import { MoveFetchConfig } from '@sentio/protos'
 
 export type GeneralTransactionResponse =
   | UserTransactionResponse
@@ -29,8 +28,4 @@ export type TypedFunctionPayload<T extends Array<any>> = EntryFunctionPayloadRes
   arguments_decoded: T
 }
 
-export type PartitionHandler<D> = (data: D) => string | Promise<string>
-
-export type HandlerOptions<D> = Partial<MoveFetchConfig> & {
-  partitionKey?: string | PartitionHandler<D>
-}
+export type { PartitionHandler, HandlerOptions } from '../core/index.js'

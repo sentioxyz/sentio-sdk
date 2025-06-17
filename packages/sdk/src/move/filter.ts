@@ -46,6 +46,7 @@ export class CallHandler<T> {
   handlerName: string
   handler: (call: T) => Promise<ProcessResult>
   fetchConfig: MoveFetchConfig
+  partitionHandler?: (call: T) => Promise<string | undefined>
 }
 
 export class ObjectChangeHandler<T> {
@@ -58,6 +59,7 @@ export class ResourceChangeHandler<T> {
   handlerName: string
   handler: (call: T) => Promise<ProcessResult>
   type: string
+  partitionHandler?: (call: T) => Promise<string | undefined>
 }
 
 export class ResourceIntervalHandler {
@@ -67,6 +69,7 @@ export class ResourceIntervalHandler {
   handler: (resource: Data_AptResource) => Promise<ProcessResult>
   handlerName: string
   fetchConfig: MoveAccountFetchConfig
+  partitionHandler?: (resource: Data_AptResource) => Promise<string | undefined>
 }
 
 export class TransactionIntervalHandler {

@@ -27,7 +27,7 @@ import {
   FuelTransaction,
   ReceiptHandler
 } from './types.js'
-import { PromiseOrVoid } from '../core/index.js'
+import { PromiseOrVoid, HandlerOptions } from '../core/index.js'
 import { ServerError, Status } from 'nice-grpc'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 
@@ -88,7 +88,7 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
 
   public onTransaction(
     handler: (transaction: FuelTransaction, ctx: FuelContractContext<TContract>) => PromiseOrVoid,
-    config: FuelFetchConfig = DEFAULT_FUEL_FETCH_CONFIG,
+    handlerOptions?: HandlerOptions<FuelFetchConfig, FuelTransaction>,
     handlerName = getHandlerName()
   ) {
     const callHandler = {
@@ -115,7 +115,21 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
       },
       fetchConfig: {
         filters: [],
-        ...config
+        ...handlerOptions
+      },
+      partitionHandler: async (call: Data_FuelTransaction): Promise<string | undefined> => {
+        const p = handlerOptions?.partitionKey
+        if (!p) return undefined
+        if (typeof p === 'function') {
+          const abiMap = this.config.abi
+            ? {
+                [this.config.address]: this.config.abi
+              }
+            : {}
+          const tx = await decodeFuelTransactionWithAbi(call.transaction, abiMap, this.provider)
+          return p(tx)
+        }
+        return p
       }
     }
     this.txHandlers.push(callHandler)
@@ -198,6 +212,7 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
   public onLog<T>(
     logIdFilter: string | string[],
     handler: (logs: FuelLog<T>, ctx: FuelContractContext<TContract>) => PromiseOrVoid,
+    handlerOptions?: HandlerOptions<object, FuelLog<T>>,
     handlerName = getHandlerName()
   ) {
     const logIds = new Set(Array.isArray(logIdFilter) ? logIdFilter : [logIdFilter])
@@ -236,6 +251,25 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
         log: {
           logIds: Array.from(logIds)
         }
+      },
+      partitionHandler: async (data: Data_FuelReceipt): Promise<string | undefined> => {
+        const p = handlerOptions?.partitionKey
+        if (!p) return undefined
+        if (typeof p === 'function') {
+          try {
+            const tx = await decodeFuelTransaction(data.transaction, this.provider)
+            const index = Number(data.receiptIndex)
+            const receipt = tx.receipts[index]
+            const log = decodeLog(receipt, this.config.abi)
+            if (log) {
+              return p({ receiptIndex: index, ...log })
+            }
+          } catch (e) {
+            console.error(e)
+          }
+          return undefined
+        }
+        return p
       }
     } as ReceiptHandler
     this.receiptHandlers.push(logHandler)
@@ -247,7 +281,8 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
    */
   public onTransfer(
     filter: ContractTransferFilter,
-    handler: (transfer: ReceiptTransfer | ReceiptTransferOut, ctx: FuelContractContext<TContract>) => PromiseOrVoid
+    handler: (transfer: ReceiptTransfer | ReceiptTransferOut, ctx: FuelContractContext<TContract>) => PromiseOrVoid,
+    handlerOptions?: HandlerOptions<object, ReceiptTransfer | ReceiptTransferOut>
   ) {
     const { from, to, assetId } = filter
     const h = {
@@ -280,6 +315,22 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
           to,
           assetId
         }
+      },
+      partitionHandler: async (data: Data_FuelReceipt): Promise<string | undefined> => {
+        const p = handlerOptions?.partitionKey
+        if (!p) return undefined
+        if (typeof p === 'function') {
+          try {
+            const tx = await decodeFuelTransaction(data.transaction, this.provider)
+            const index = Number(data.receiptIndex)
+            const receipt = tx.receipts[index] as ReceiptTransfer | ReceiptTransferOut
+            return p(receipt)
+          } catch (e) {
+            console.error(e)
+          }
+          return undefined
+        }
+        return p
       }
     } as ReceiptHandler
     this.receiptHandlers.push(h)
@@ -290,8 +341,8 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
     handler: (block: FuelBlock, ctx: FuelContractContext<TContract>) => PromiseOrVoid,
     timeInterval: HandleInterval | undefined,
     blockInterval: HandleInterval | undefined,
+    handlerOptions?: HandlerOptions<object, FuelBlock>,
     handlerName = getHandlerName()
-    // fetchConfig: Partial<FuelFetchConfig> | undefined
   ): this {
     if (timeInterval) {
       if (timeInterval.backfillInterval < timeInterval.recentInterval) {
@@ -338,6 +389,31 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
         )
         await handler(block, ctx)
         return ctx.stopAndGetResult()
+      },
+      partitionHandler: async (data: Data_FuelBlock): Promise<string | undefined> => {
+        const p = handlerOptions?.partitionKey
+        if (!p) return undefined
+        if (typeof p === 'function') {
+          const header = data.block
+          if (!header) return undefined
+          const block: FuelBlock = {
+            id: header.id,
+            height: bn(header.height),
+            time: header.time,
+            header: {
+              applicationHash: header.applicationHash,
+              daHeight: bn(header.daHeight),
+              eventInboxRoot: header.eventInboxRoot,
+              messageOutboxRoot: header.messageOutboxRoot,
+              prevRoot: header.prevRoot,
+              stateTransitionBytecodeVersion: header.stateTransitionBytecodeVersion,
+              transactionsCount: header.transactionsCount,
+              transactionsRoot: header.transactionsRoot
+            }
+          }
+          return p(block)
+        }
+        return p
       }
     })
     return this
@@ -346,8 +422,8 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
   public onBlockInterval(
     handler: (block: FuelBlock, ctx: FuelContractContext<TContract>) => PromiseOrVoid,
     blockInterval = 250,
-    backfillBlockInterval = 1000
-    // fetchConfig?: Partial<FuelFetchConfig>
+    backfillBlockInterval = 1000,
+    handlerOptions?: HandlerOptions<object, FuelBlock>
   ): this {
     return this.onInterval(
       handler,
@@ -355,22 +431,22 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
       {
         recentInterval: blockInterval,
         backfillInterval: backfillBlockInterval
-      }
-      // fetchConfig,
+      },
+      handlerOptions
     )
   }
 
   public onTimeInterval(
     handler: (block: FuelBlock, ctx: FuelContractContext<TContract>) => PromiseOrVoid,
     timeIntervalInMinutes = 60,
-    backfillTimeIntervalInMinutes = 240
-    // fetchConfig?: Partial<FuelFetchConfig>,
+    backfillTimeIntervalInMinutes = 240,
+    handlerOptions?: HandlerOptions<object, FuelBlock>
   ): this {
     return this.onInterval(
       handler,
       { recentInterval: timeIntervalInMinutes, backfillInterval: backfillTimeIntervalInMinutes },
-      undefined
-      // fetchConfig
+      undefined,
+      handlerOptions
     )
   }
 }

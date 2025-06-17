@@ -19,6 +19,7 @@ import { defaultMoveCoder, MoveCoder } from './index.js'
 import { ALL_ADDRESS, Labels, PromiseOrVoid } from '../core/index.js'
 import { Required } from 'utility-types'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
+import { HandlerOptions } from './models.js'
 
 export const DEFAULT_FETCH_CONFIG: MoveFetchConfig = {
   resourceChanges: false,
@@ -76,10 +77,10 @@ export class SuiBaseProcessor {
   protected onMoveEvent(
     handler: (event: SuiEvent, ctx: SuiContext) => PromiseOrVoid,
     filter: EventFilter | EventFilter[],
-    fetchConfig?: Partial<MoveFetchConfig>
+    handlerOptions?: HandlerOptions<MoveFetchConfig, SuiEvent>
   ): SuiBaseProcessor {
     let _filters: EventFilter[] = []
-    const _fetchConfig = MoveFetchConfig.fromPartial({ ...DEFAULT_FETCH_CONFIG, ...fetchConfig })
+    const _fetchConfig = MoveFetchConfig.fromPartial({ ...DEFAULT_FETCH_CONFIG, ...handlerOptions })
 
     if (Array.isArray(filter)) {
       _filters = filter
@@ -123,7 +124,17 @@ export class SuiBaseProcessor {
         return ctx.stopAndGetResult()
       },
       filters: _filters,
-      fetchConfig: _fetchConfig
+      fetchConfig: _fetchConfig,
+      partitionHandler: async (data: Data_SuiEvent): Promise<string | undefined> => {
+        const p = handlerOptions?.partitionKey
+        if (!p) return undefined
+        if (typeof p === 'function') {
+          const evt = JSON.parse(data.rawEvent) as SuiEvent
+          const decoded = await processor.coder.decodeEvent<any>(evt)
+          return p(decoded || evt)
+        }
+        return p
+      }
     })
     return this
   }
@@ -131,10 +142,10 @@ export class SuiBaseProcessor {
   protected onEntryFunctionCall(
     handler: (call: MoveCallSuiTransaction, ctx: SuiContext) => PromiseOrVoid,
     filter: FunctionNameAndCallFilter | FunctionNameAndCallFilter[],
-    fetchConfig?: Partial<MoveFetchConfig>
+    handlerOptions?: HandlerOptions<MoveFetchConfig, MoveCallSuiTransaction>
   ): SuiBaseProcessor {
     let _filters: FunctionNameAndCallFilter[] = []
-    const _fetchConfig = MoveFetchConfig.fromPartial({ ...DEFAULT_FETCH_CONFIG, ...fetchConfig })
+    const _fetchConfig = MoveFetchConfig.fromPartial({ ...DEFAULT_FETCH_CONFIG, ...handlerOptions })
 
     if (Array.isArray(filter)) {
       _filters = filter
@@ -188,22 +199,39 @@ export class SuiBaseProcessor {
         return ctx.stopAndGetResult()
       },
       filters: _filters,
-      fetchConfig: _fetchConfig
+      fetchConfig: _fetchConfig,
+      partitionHandler: async (data: Data_SuiCall): Promise<string | undefined> => {
+        const p = handlerOptions?.partitionKey
+        if (!p) return undefined
+        if (typeof p === 'function') {
+          const tx = JSON.parse(data.rawTransaction) as SuiTransactionBlockResponse
+          const calls: MoveCallSuiTransaction[] = getMoveCalls(tx)
+          // For simplicity, use the first call for partitioning
+          if (calls.length > 0) {
+            return p(calls[0])
+          }
+          return undefined
+        }
+        return p
+      }
     })
     return this
   }
 
-  onEvent(handler: (event: SuiEvent, ctx: SuiContext) => void, fetchConfig?: Partial<MoveFetchConfig>): this {
-    this.onMoveEvent(handler, { type: '' }, fetchConfig)
+  onEvent(
+    handler: (event: SuiEvent, ctx: SuiContext) => void,
+    handlerOptions?: HandlerOptions<MoveFetchConfig, SuiEvent>
+  ): this {
+    this.onMoveEvent(handler, { type: '' }, handlerOptions)
     return this
   }
 
   onTransactionBlock(
     handler: (transaction: SuiTransactionBlockResponse, ctx: SuiContext) => PromiseOrVoid,
     filter?: TransactionFilter,
-    fetchConfig?: Partial<MoveFetchConfig>
+    handlerOptions?: HandlerOptions<MoveFetchConfig, SuiTransactionBlockResponse>
   ): this {
-    const _fetchConfig = MoveFetchConfig.fromPartial({ ...DEFAULT_FETCH_CONFIG, ...fetchConfig })
+    const _fetchConfig = MoveFetchConfig.fromPartial({ ...DEFAULT_FETCH_CONFIG, ...handlerOptions })
 
     const processor = this
 
@@ -231,7 +259,16 @@ export class SuiBaseProcessor {
         return ctx.stopAndGetResult()
       },
       filters: [{ ...filter, function: '' }],
-      fetchConfig: _fetchConfig
+      fetchConfig: _fetchConfig,
+      partitionHandler: async (data: Data_SuiCall): Promise<string | undefined> => {
+        const p = handlerOptions?.partitionKey
+        if (!p) return undefined
+        if (typeof p === 'function') {
+          const tx = JSON.parse(data.rawTransaction) as SuiTransactionBlockResponse
+          return p(tx)
+        }
+        return p
+      }
     })
     return this
   }

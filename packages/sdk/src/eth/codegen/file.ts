@@ -196,6 +196,7 @@ export class ${contract.name}ProcessorTemplate extends BaseProcessorTemplate<${c
     {
       ethers: ['BigNumberish', 'Overrides', 'BytesLike', 'Interface'],
       // 'ethers/providers': ['Networkish'],
+      '@sentio/sdk': ['HandlerOptions'],
       '@sentio/sdk/eth': [
         'addContractByABI',
         'getContractByABI',

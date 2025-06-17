@@ -45,10 +45,10 @@ function generateCallHandler(fn: FunctionDeclaration, contractName: string, over
   return `
   onCall${upperFirst(overloadedName ?? fn.name)}(
     handler: (call: ${upperFirst(overloadedName ?? fn.name)}CallTrace, ctx: ${contractName}Context) => void,
-    fetchConfig?: Partial<EthFetchConfig>,
+    handlerOptions?: HandlerOptions<EthFetchConfig, ${upperFirst(overloadedName ?? fn.name)}CallTrace>,
     preprocessHandler?: (call: ${upperFirst(overloadedName ?? fn.name)}CallTrace, ctx: ${contractName}Context) => Promise<PreprocessResult>
   ): this {
-    return super.onEthTrace("${sighash}", handler as any, fetchConfig, preprocessHandler);
+    return super.onEthTrace("${sighash}", handler as any, handlerOptions, preprocessHandler);
   }
 `
 }

@@ -126,8 +126,9 @@ export type BlockHandler = {
   handler: (block: Data_BTCBlock) => Promise<ProcessResult>
   handlerName: string
   fetchConfig?: BTCOnIntervalFetchConfig
+  partitionHandler?: (block: Data_BTCBlock) => Promise<string | undefined>
 }
 
 export type BTCOnIntervalFetchConfig = {
-  getTransactions: boolean
+  getTransactions?: boolean
 }

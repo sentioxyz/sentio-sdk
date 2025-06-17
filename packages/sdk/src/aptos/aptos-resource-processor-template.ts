@@ -7,6 +7,7 @@ import { HandleInterval, MoveAccountFetchConfig } from '@sentio/protos'
 import { MoveResource } from '@aptos-labs/ts-sdk'
 import { PromiseOrVoid } from '../core/index.js'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
+import { HandlerOptions } from './models.js'
 
 export class AptosResourceProcessorTemplateState extends ListStateStorage<AptosResourceProcessorTemplate> {
   static INSTANCE = new AptosResourceProcessorTemplateState()
@@ -18,7 +19,7 @@ class Handler {
   timeIntervalInMinutes?: HandleInterval
   handlerName: string
   handler: (resources: MoveResource[], ctx: AptosResourcesContext) => PromiseOrVoid
-  fetchConfig: MoveAccountFetchConfig
+  handlerOptions: HandlerOptions<MoveAccountFetchConfig, MoveResource[]>
 }
 
 export class AptosResourceProcessorTemplate {
@@ -55,7 +56,7 @@ export class AptosResourceProcessorTemplate {
         h.timeIntervalInMinutes,
         h.checkpointInterval,
         h.type,
-        h.fetchConfig,
+        h.handlerOptions,
         h.handlerName
       )
     }
@@ -90,7 +91,7 @@ export class AptosResourceProcessorTemplate {
     timeInterval: HandleInterval | undefined,
     checkpointInterval: HandleInterval | undefined,
     type: string | undefined,
-    fetchConfig: Partial<MoveAccountFetchConfig> | undefined
+    handlerOptions?: HandlerOptions<MoveAccountFetchConfig, MoveResource[]>
   ): this {
     this.handlers.push({
       handlerName: getHandlerName(),
@@ -98,7 +99,7 @@ export class AptosResourceProcessorTemplate {
       timeIntervalInMinutes: timeInterval,
       checkpointInterval: checkpointInterval,
       type,
-      fetchConfig: { ...DEFAULT_RESOURCE_FETCH_CONFIG, ...fetchConfig }
+      handlerOptions: { ...DEFAULT_RESOURCE_FETCH_CONFIG, ...handlerOptions }
     })
     return this
   }
@@ -108,7 +109,7 @@ export class AptosResourceProcessorTemplate {
     timeIntervalInMinutes = 60,
     backfillTimeIntervalInMinutes = 240,
     type?: string,
-    fetchConfig?: Partial<MoveAccountFetchConfig>
+    handlerOptions?: HandlerOptions<MoveAccountFetchConfig, MoveResource[]>
   ): this {
     return this.onInterval(
       handler,
@@ -118,7 +119,7 @@ export class AptosResourceProcessorTemplate {
       },
       undefined,
       type,
-      fetchConfig
+      handlerOptions
     )
   }
 
@@ -127,14 +128,14 @@ export class AptosResourceProcessorTemplate {
     checkpointInterval = 100000,
     backfillCheckpointInterval = 400000,
     type?: string,
-    fetchConfig?: Partial<MoveAccountFetchConfig>
+    handlerOptions?: HandlerOptions<MoveAccountFetchConfig, MoveResource[]>
   ): this {
     return this.onInterval(
       handler,
       undefined,
       { recentInterval: checkpointInterval, backfillInterval: backfillCheckpointInterval },
       type,
-      fetchConfig
+      handlerOptions
     )
   }
 }

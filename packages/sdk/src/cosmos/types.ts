@@ -13,6 +13,7 @@ export type CallHandler<T> = {
   logConfig?: {
     logFilters: string[]
   }
+  partitionHandler?: (call: T) => Promise<string | undefined>
 }
 
 export type CosmosProcessorConfig = {
