@@ -1,6 +1,5 @@
 import type { SuiEvent, MoveCallSuiTransaction, SuiMoveObject } from '@mysten/sui/client'
 import { DecodedStruct } from '@typemove/move'
-import { MoveFetchConfig } from '@sentio/protos'
 
 export type TypedEventInstance<T> = DecodedStruct<SuiEvent, T>
 export type TypedSuiMoveObject<T> = DecodedStruct<SuiMoveObject, T>
@@ -12,8 +11,4 @@ export type TypedFunctionPayload<T extends Array<any>> = MoveCallSuiTransaction 
   arguments_decoded: T
 }
 
-export type PartitionHandler<D> = (data: D) => string | Promise<string>
-
-export type HandlerOptions<D> = Partial<MoveFetchConfig> & {
-  partitionKey?: string | PartitionHandler<D>
-}
+export type { PartitionHandler, HandlerOptions } from '../core/index.js'

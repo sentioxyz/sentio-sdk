@@ -8,6 +8,7 @@ import { FuelBlock, FuelLog, FuelTransaction } from './types.js'
 import { DEFAULT_FUEL_FETCH_CONFIG, FuelFetchConfig } from './transaction.js'
 import { FuelProcessor, FuelProcessorConfig, getOptionsSignature } from './fuel-processor.js'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
+import { HandlerOptions } from '../core/index.js'
 
 export class FuelProcessorTemplateProcessorState extends ListStateStorage<FuelBaseProcessorTemplate<Contract>> {
   static INSTANCE = new FuelProcessorTemplateProcessorState()
@@ -21,6 +22,7 @@ export abstract class FuelBaseProcessorTemplate<TContract extends Contract> {
     handler: (block: FuelBlock, ctx: FuelContractContext<TContract>) => PromiseOrVoid
     blockInterval?: HandleInterval
     timeIntervalInMinutes?: HandleInterval
+    handlerOptions?: HandlerOptions<object, FuelBlock>
     // fetchConfig?: FuelFetchConfig
   }[] = []
 
@@ -28,13 +30,14 @@ export abstract class FuelBaseProcessorTemplate<TContract extends Contract> {
     logIdFilter: string | string[]
     handlerName: string
     handler: (logs: FuelLog<any>, ctx: FuelContractContext<TContract>) => PromiseOrVoid
+    handlerOptions?: HandlerOptions<object, FuelLog<any>>
     // fetchConfig?: FuelFetchConfig
   }[] = []
 
   transactionHandlers: {
     handlerName: string
     handler: (transaction: FuelTransaction, ctx: FuelContractContext<TContract>) => PromiseOrVoid
-    fetchConfig: FuelFetchConfig
+    handlerOptions?: HandlerOptions<FuelFetchConfig, FuelTransaction>
   }[] = []
 
   constructor() {
@@ -62,13 +65,13 @@ export abstract class FuelBaseProcessorTemplate<TContract extends Contract> {
     const processor = this.bindInternal({ ...options, chainId: ctx.chainId })
 
     for (const eh of this.logHandlers) {
-      processor.onLog(eh.logIdFilter, eh.handler, eh.handlerName)
+      processor.onLog(eh.logIdFilter, eh.handler, eh.handlerOptions, eh.handlerName)
     }
     for (const bh of this.blockHandlers) {
-      processor.onInterval(bh.handler, bh.timeIntervalInMinutes, bh.blockInterval, bh.handlerName)
+      processor.onInterval(bh.handler, bh.timeIntervalInMinutes, bh.blockInterval, bh.handlerOptions, bh.handlerName)
     }
     for (const th of this.transactionHandlers) {
-      processor.onTransaction(th.handler, undefined, th.handlerName)
+      processor.onTransaction(th.handler, th.handlerOptions, th.handlerName)
     }
 
     const instance: TemplateInstance = {
@@ -94,13 +97,15 @@ export abstract class FuelBaseProcessorTemplate<TContract extends Contract> {
 
   protected onLog<T>(
     logIdFilter: string | string[],
-    handler: (logs: FuelLog<T>, ctx: FuelContractContext<TContract>) => PromiseOrVoid
+    handler: (logs: FuelLog<T>, ctx: FuelContractContext<TContract>) => PromiseOrVoid,
+    handlerOptions: HandlerOptions<object, FuelLog<T>> = {}
     // fetchConfig?: Partial<FuelFetchConfig>
   ) {
     this.logHandlers.push({
       logIdFilter,
       handlerName: getHandlerName(),
-      handler
+      handler,
+      handlerOptions
       // fetchConfig: { ...fetchConfig}
     })
     return this
@@ -140,14 +145,16 @@ export abstract class FuelBaseProcessorTemplate<TContract extends Contract> {
   public onInterval(
     handler: (block: FuelBlock, ctx: FuelContractContext<TContract>) => PromiseOrVoid,
     timeInterval: HandleInterval | undefined,
-    blockInterval: HandleInterval | undefined
+    blockInterval: HandleInterval | undefined,
+    handlerOptions: HandlerOptions<object, FuelBlock> = {}
     // fetchConfig?: FuelFetchConfig
   ) {
     this.blockHandlers.push({
       handlerName: getHandlerName(),
       handler,
       timeIntervalInMinutes: timeInterval,
-      blockInterval
+      blockInterval,
+      handlerOptions
       // fetchConfig: { ...fetchConfig }
     })
     return this
@@ -155,12 +162,12 @@ export abstract class FuelBaseProcessorTemplate<TContract extends Contract> {
 
   protected onTransaction(
     handler: (transaction: FuelTransaction, ctx: FuelContractContext<TContract>) => PromiseOrVoid,
-    config: FuelFetchConfig = DEFAULT_FUEL_FETCH_CONFIG
+    handlerOptions: HandlerOptions<FuelFetchConfig, FuelTransaction> = DEFAULT_FUEL_FETCH_CONFIG
   ) {
     this.transactionHandlers.push({
       handlerName: getHandlerName(),
       handler,
-      fetchConfig: config
+      handlerOptions
     })
     return this
   }

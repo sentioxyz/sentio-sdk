@@ -143,7 +143,13 @@ export function formatEthData(data: {
   trace?: any
   transaction?: any
   transactionReceipt?: any
+  __formattedEthData?: any
 }) {
+  // Return cached result if it exists
+  if (data.__formattedEthData) {
+    return data.__formattedEthData
+  }
+
   const log = data.log ? formatLog(data.log) : undefined
   if (data.block && !data.block.transactions) {
     data.block.transactions = []
@@ -160,13 +166,18 @@ export function formatEthData(data: {
     transaction = formatTransactionResponse(data.transaction)
   }
   const transactionReceipt = data.transactionReceipt ? formatTransactionReceipt(data.transactionReceipt) : undefined
-  return {
+
+  const result = {
     log,
     block,
     trace,
     transaction,
     transactionReceipt
   }
+
+  // Cache the result on the input data object
+  data.__formattedEthData = result
+  return result
 }
 
 export function formatRichBlock(block: RichBlock): RichBlock {

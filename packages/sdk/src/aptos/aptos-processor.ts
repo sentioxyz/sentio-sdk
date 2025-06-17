@@ -5,14 +5,13 @@ import {
   MoveResource,
   UserTransactionResponse,
   EntryFunctionPayloadResponse,
-  MultisigPayloadResponse,
   WriteSetChangeWriteResource
 } from '@aptos-labs/ts-sdk'
 
 import { AptosBindOptions, AptosNetwork } from './network.js'
 import { AptosContext, AptosResourcesContext, AptosTransactionContext } from './context.js'
 import { ListStateStorage } from '@sentio/runtime'
-import { MoveFetchConfig, Data_AptResource, HandleInterval, Data_AptCall, MoveAccountFetchConfig } from '@sentio/protos'
+import { MoveFetchConfig, Data_AptResource, HandleInterval, MoveAccountFetchConfig } from '@sentio/protos'
 import { ServerError, Status } from 'nice-grpc'
 import {
   accountTypeString,
@@ -27,10 +26,10 @@ import {
 } from '../move/index.js'
 import { ALL_ADDRESS, Labels, PromiseOrVoid } from '../core/index.js'
 import { TypeDescriptor, matchType, NestedDecodedStruct } from '@typemove/move'
-import { decodeResourceChange, ResourceChange } from '@typemove/aptos'
+import { ResourceChange } from '@typemove/aptos'
 import { GeneralTransactionResponse, HandlerOptions } from './models.js'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
-import { AptEvent } from './data.js'
+import { AptCall, AptEvent, AptResource } from './data.js'
 
 const DEFAULT_FETCH_CONFIG: MoveFetchConfig = {
   resourceChanges: false,
@@ -61,8 +60,8 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
   readonly moduleName: string
   config: IndexConfigure
   eventHandlers: EventHandler<AptEvent>[] = []
-  callHandlers: CallHandler<Data_AptCall>[] = []
-  resourceChangeHandlers: ResourceChangeHandler<Data_AptResource>[] = []
+  callHandlers: CallHandler<AptCall>[] = []
+  resourceChangeHandlers: ResourceChangeHandler<AptResource>[] = []
   transactionIntervalHandlers: TransactionIntervalHandler[] = []
   coder: MoveCoder
 
@@ -79,7 +78,7 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
   protected onMoveEvent(
     handler: (event: Event, ctx: AptosContext) => PromiseOrVoid,
     filter: EventFilter | EventFilter[],
-    handlerOptions?: HandlerOptions<Event>
+    handlerOptions?: HandlerOptions<MoveFetchConfig, Event>
   ): this {
     let _filters: EventFilter[] = []
     const _fetchConfig = MoveFetchConfig.fromPartial({ ...DEFAULT_FETCH_CONFIG, ...handlerOptions })
@@ -134,10 +133,10 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
   protected onEntryFunctionCall(
     handler: (call: EntryFunctionPayloadResponse, ctx: AptosContext) => PromiseOrVoid,
     filter: FunctionNameAndCallFilter | FunctionNameAndCallFilter[],
-    fetchConfig?: Partial<MoveFetchConfig>
+    handlerOptions?: HandlerOptions<MoveFetchConfig, EntryFunctionPayloadResponse>
   ): this {
     let _filters: FunctionNameAndCallFilter[] = []
-    const _fetchConfig = MoveFetchConfig.fromPartial({ ...DEFAULT_FETCH_CONFIG, ...fetchConfig })
+    const _fetchConfig = MoveFetchConfig.fromPartial({ ...DEFAULT_FETCH_CONFIG, ...handlerOptions })
 
     if (Array.isArray(filter)) {
       _filters = filter
@@ -155,7 +154,7 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
         if (!data.rawTransaction) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'call is null')
         }
-        const tx = JSON.parse(data.rawTransaction) as UserTransactionResponse
+        const tx = data.transaction
 
         const ctx = new AptosContext(
           processor.moduleName,
@@ -167,18 +166,22 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
           processor.config.baseLabels
         )
         if (tx) {
-          let payload = tx.payload
-          if (payload.type === 'multisig_payload') {
-            payload = (payload as MultisigPayloadResponse).transaction_payload ?? payload
-          }
-
-          const decoded = await processor.coder.decodeFunctionPayload(payload as EntryFunctionPayloadResponse)
+          const decoded = await data.decodeCall(processor.coder)
           await handler(decoded, ctx)
         }
         return ctx.stopAndGetResult()
       },
       filters: _filters,
-      fetchConfig: _fetchConfig
+      fetchConfig: _fetchConfig,
+      partitionHandler: async (data: AptCall): Promise<string | undefined> => {
+        const p = handlerOptions?.partitionKey
+        if (!p) return undefined
+        if (typeof p === 'function') {
+          const decoded = await data.decodeCall(processor.coder)
+          return p(decoded)
+        }
+        return p
+      }
     })
     return this
   }
@@ -189,9 +192,9 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
       includeFailed?: boolean
       sender?: string
     },
-    fetchConfig?: Partial<MoveFetchConfig>
+    handleOptions?: HandlerOptions<MoveFetchConfig, UserTransactionResponse>
   ): this {
-    const _fetchConfig = MoveFetchConfig.fromPartial({ ...DEFAULT_FETCH_CONFIG, ...fetchConfig })
+    const _fetchConfig = MoveFetchConfig.fromPartial({ ...DEFAULT_FETCH_CONFIG, ...handleOptions })
 
     const processor = this
     const filter: FunctionNameAndCallFilter = { function: '', includeFailed: transactionFilter?.includeFailed }
@@ -208,10 +211,7 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
         if (!data.rawTransaction) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'call is null')
         }
-        const call = JSON.parse(data.rawTransaction) as UserTransactionResponse
-        if (call.events == null) {
-          call.events = []
-        }
+        const call = data.transaction
         const ctx = new AptosContext(
           processor.moduleName,
           processor.config.network,
@@ -225,19 +225,31 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
         return ctx.stopAndGetResult()
       },
       filters: [filter],
-      fetchConfig: _fetchConfig
+      fetchConfig: _fetchConfig,
+      partitionHandler: async (data: AptCall): Promise<string | undefined> => {
+        const p = handleOptions?.partitionKey
+        if (!p) return undefined
+        if (typeof p === 'function') {
+          return p(data.transaction)
+        }
+        return p
+      }
     })
     return this
   }
 
-  public onEvent(handler: (event: Event, ctx: AptosContext) => void, handlerOptions?: HandlerOptions<Event>): this {
+  public onEvent(
+    handler: (event: Event, ctx: AptosContext) => void,
+    handlerOptions?: HandlerOptions<MoveFetchConfig, Event>
+  ): this {
     this.onMoveEvent(handler, { type: '' }, handlerOptions)
     return this
   }
 
   public onResourceChange<T>(
     handler: (changes: ResourceChange<T>[], ctx: AptosResourcesContext) => PromiseOrVoid,
-    typeDesc: TypeDescriptor<T> | string
+    typeDesc: TypeDescriptor<T> | string,
+    handlerOptions?: HandlerOptions<object, ResourceChange<T>[]>
   ): this {
     if (typeof typeDesc === 'string') {
       typeDesc = parseMoveType(typeDesc)
@@ -252,6 +264,7 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
         if (!data.rawResources || !data.version) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'resource is null')
         }
+        const aptResource = new AptResource(data)
         const timestamp = Number(data.timestampMicros)
         const ctx = new AptosResourcesContext(
           processor.config.network,
@@ -260,10 +273,7 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
           timestamp,
           processor.config.baseLabels
         )
-        let resources = await decodeResourceChange<T>(
-          data.rawResources.map((r) => JSON.parse(r)),
-          ctx.coder
-        )
+        let resources = await aptResource.decodeResources<T>(processor.coder)
 
         if (hasAny) {
           resources = resources.filter((r) => {
@@ -277,7 +287,16 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
         }
         return ctx.stopAndGetResult()
       },
-      type: hasAny ? typeDesc.qname : typeDesc.getNormalizedSignature()
+      type: hasAny ? typeDesc.qname : typeDesc.getNormalizedSignature(),
+      partitionHandler: async (data): Promise<string | undefined> => {
+        const p = handlerOptions?.partitionKey
+        if (!p) return undefined
+        if (typeof p === 'function') {
+          const resources = await data.decodeResources<T>(processor.coder)
+          return p(resources)
+        }
+        return p
+      }
     })
     return this
   }
@@ -286,7 +305,7 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
     handler: (transaction: T, ctx: CT) => PromiseOrVoid,
     timeInterval: HandleInterval | undefined,
     versionInterval: HandleInterval | undefined,
-    fetchConfig: Partial<MoveFetchConfig> | undefined
+    handlerOptions?: HandlerOptions<MoveFetchConfig, T>
   ): this {
     const processor = this
     this.transactionIntervalHandlers.push({
@@ -315,7 +334,7 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
       },
       timeIntervalInMinutes: timeInterval,
       versionInterval: versionInterval,
-      fetchConfig: { ...DEFAULT_FETCH_CONFIG, ...fetchConfig }
+      fetchConfig: { ...DEFAULT_FETCH_CONFIG, ...handlerOptions }
     })
     return this
   }
@@ -324,7 +343,7 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
     handler: (transaction: T, ctx: CT) => PromiseOrVoid,
     timeIntervalInMinutes = 60,
     backfillTimeIntervalInMinutes = 240,
-    fetchConfig?: Partial<MoveFetchConfig>
+    handlerOptions?: HandlerOptions<MoveFetchConfig, T>
   ): this {
     return this.onInterval(
       handler,
@@ -333,7 +352,7 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
         backfillInterval: backfillTimeIntervalInMinutes
       },
       undefined,
-      fetchConfig
+      handlerOptions
     )
   }
 
@@ -341,13 +360,13 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
     handler: (transaction: T, context: CT) => PromiseOrVoid,
     versionInterval = 100000,
     backfillVersionInterval = 400000,
-    fetchConfig?: Partial<MoveFetchConfig>
+    handlerOptions?: HandlerOptions<MoveFetchConfig, T>
   ): this {
     return this.onInterval(
       handler,
       undefined,
       { recentInterval: versionInterval, backfillInterval: backfillVersionInterval },
-      fetchConfig
+      handlerOptions
     )
   }
 
@@ -403,9 +422,9 @@ export class AptosGlobalProcessor {
     ) => PromiseOrVoid,
     timeIntervalInMinutes = 60,
     backfillTimeIntervalInMinutes = 240,
-    fetchConfig?: Partial<MoveFetchConfig>
+    handlerOptions?: HandlerOptions<MoveFetchConfig, GeneralTransactionResponse>
   ): this {
-    this.baseProcessor.onTimeInterval(handler, timeIntervalInMinutes, backfillTimeIntervalInMinutes, fetchConfig)
+    this.baseProcessor.onTimeInterval(handler, timeIntervalInMinutes, backfillTimeIntervalInMinutes, handlerOptions)
     return this
   }
 
@@ -416,9 +435,9 @@ export class AptosGlobalProcessor {
     ) => PromiseOrVoid,
     versionInterval = 100000,
     backfillVersionInterval = 400000,
-    fetchConfig?: Partial<MoveFetchConfig>
+    handlerOptions?: HandlerOptions<MoveFetchConfig, GeneralTransactionResponse>
   ): this {
-    this.baseProcessor.onVersionInterval(handler, versionInterval, backfillVersionInterval, fetchConfig)
+    this.baseProcessor.onVersionInterval(handler, versionInterval, backfillVersionInterval, handlerOptions)
     return this
   }
 }
@@ -452,7 +471,7 @@ export class AptosResourcesProcessor {
     timeInterval: HandleInterval | undefined,
     versionInterval: HandleInterval | undefined,
     type: string | undefined,
-    fetchConfig: Partial<MoveAccountFetchConfig> | undefined,
+    handlerOptions?: HandlerOptions<MoveAccountFetchConfig, MoveResource[]>,
     handlerName = getHandlerName()
   ): this {
     const processor = this
@@ -462,6 +481,7 @@ export class AptosResourcesProcessor {
         if (data.timestampMicros > Number.MAX_SAFE_INTEGER) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'timestamp is too large')
         }
+        const aptResource = new AptResource(data)
         const timestamp = Number(data.timestampMicros)
 
         const ctx = new AptosResourcesContext(
@@ -471,13 +491,22 @@ export class AptosResourcesProcessor {
           timestamp,
           processor.config.baseLabels
         )
-        await handler(data.rawResources.map((r) => JSON.parse(r)) as MoveResource[], ctx)
+        await handler(aptResource.resources, ctx)
         return ctx.stopAndGetResult()
       },
       timeIntervalInMinutes: timeInterval,
       versionInterval: versionInterval,
       type: type,
-      fetchConfig: { ...DEFAULT_RESOURCE_FETCH_CONFIG, ...fetchConfig }
+      fetchConfig: { ...DEFAULT_RESOURCE_FETCH_CONFIG, ...handlerOptions },
+      partitionHandler: async (data: Data_AptResource): Promise<string | undefined> => {
+        const p = handlerOptions?.partitionKey
+        if (!p) return undefined
+        if (typeof p === 'function') {
+          const aptResource = new AptResource(data)
+          return p(aptResource.resources)
+        }
+        return p
+      }
     })
     return this
   }
@@ -487,7 +516,7 @@ export class AptosResourcesProcessor {
     timeIntervalInMinutes = 60,
     backfillTimeIntervalInMinutes = 240,
     type?: string,
-    fetchConfig?: Partial<MoveAccountFetchConfig>
+    handlerOptions?: HandlerOptions<MoveAccountFetchConfig, MoveResource[]>
   ): this {
     return this.onInterval(
       handler,
@@ -497,7 +526,7 @@ export class AptosResourcesProcessor {
       },
       undefined,
       type,
-      fetchConfig
+      handlerOptions
     )
   }
 
@@ -506,14 +535,14 @@ export class AptosResourcesProcessor {
     versionInterval = 100000,
     backfillVersionInterval = 400000,
     typePrefix?: string,
-    fetchConfig?: Partial<MoveAccountFetchConfig>
+    handlerOptions?: HandlerOptions<MoveAccountFetchConfig, MoveResource[]>
   ): this {
     return this.onInterval(
       handler,
       undefined,
       { recentInterval: versionInterval, backfillInterval: backfillVersionInterval },
       typePrefix,
-      fetchConfig
+      handlerOptions
     )
   }
 
@@ -537,6 +566,7 @@ export class AptosResourcesProcessor {
         if (!data.rawResources || !data.version) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'resource is null')
         }
+        const aptResource = new AptResource(data)
         const ctx = new AptosResourcesContext(
           processor.config.network,
           processor.config.address,
@@ -545,10 +575,11 @@ export class AptosResourcesProcessor {
           processor.config.baseLabels
         )
 
-        let resources = (await decodeResourceChange(
-          data.rawResources.map((r) => JSON.parse(r)),
-          ctx.coder
-        )) as NestedDecodedStruct<MoveResource, WriteSetChangeWriteResource, T>[]
+        let resources = (await aptResource.decodeResources<T>(ctx.coder)) as NestedDecodedStruct<
+          MoveResource,
+          WriteSetChangeWriteResource,
+          T
+        >[]
 
         if (hasAny) {
           resources = resources.filter((r) => {

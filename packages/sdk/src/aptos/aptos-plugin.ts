@@ -3,7 +3,6 @@ import {
   AccountConfig,
   ContractConfig,
   Data_AptCall,
-  Data_AptResource,
   DataBinding,
   HandlerType,
   MoveCallHandlerConfig,
@@ -29,12 +28,12 @@ import {
   AptosResourceProcessorTemplateState
 } from './aptos-resource-processor-template.js'
 import { AptosNetwork } from './network.js'
-import { AptEvent } from './data.js'
+import { AptEvent, AptCall, AptResource } from './data.js'
 
 interface Handlers {
   aptosEventHandlers: ((event: AptEvent) => Promise<ProcessResult>)[]
-  aptosCallHandlers: ((func: Data_AptCall) => Promise<ProcessResult>)[]
-  aptosResourceHandlers: ((resourceWithVersion: Data_AptResource) => Promise<ProcessResult>)[]
+  aptosCallHandlers: ((func: AptCall) => Promise<ProcessResult>)[]
+  aptosResourceHandlers: ((resourceWithVersion: AptResource) => Promise<ProcessResult>)[]
   aptosTransactionIntervalHandlers: ((txn: Data_AptCall) => Promise<ProcessResult>)[]
 }
 
@@ -298,7 +297,7 @@ export class AptosPlugin extends Plugin {
     if (!binding.data?.aptResource) {
       throw new ServerError(Status.INVALID_ARGUMENT, "Resource can't be empty")
     }
-    const resource = binding.data.aptResource
+    const resource = new AptResource(binding.data.aptResource)
 
     const promises: Promise<ProcessResult>[] = []
     for (const handlerId of binding.handlerIds) {
@@ -320,7 +319,7 @@ export class AptosPlugin extends Plugin {
     if (!binding.data?.aptCall) {
       throw new ServerError(Status.INVALID_ARGUMENT, "Call can't be empty")
     }
-    const call = binding.data.aptCall
+    const call = new AptCall(binding.data.aptCall)
 
     const promises: Promise<ProcessResult>[] = []
     for (const handlerId of binding.handlerIds) {

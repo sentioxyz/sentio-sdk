@@ -29,7 +29,7 @@ import sha3 from 'js-sha3'
 import { ListStateStorage } from '@sentio/runtime'
 import { EthChainId } from '@sentio/chain'
 import { getHandlerName, proxyHandlers, proxyProcessor } from '../utils/metrics.js'
-import { ALL_ADDRESS } from '../core/index.js'
+import { ALL_ADDRESS, HandlerOptions } from '../core/index.js'
 import { parseLog, decodeTrace } from './abi-decoder/index.js'
 
 export interface AddressOrTypeEventFilter extends DeferredTopicFilter {
@@ -45,7 +45,7 @@ export class EventsHandler {
   handler: (event: Data_EthLog) => Promise<ProcessResult>
   preprocessHandler?: (event: Data_EthLog, preprocessStore: { [k: string]: any }) => Promise<PreprocessResult>
   fetchConfig: EthFetchConfig
-  partitionHandler?: (event: Data_EthLog) => string | undefined
+  partitionHandler?: (event: Data_EthLog) => Promise<string | undefined>
 }
 
 export class TraceHandler {
@@ -54,7 +54,7 @@ export class TraceHandler {
   handler: (trace: Data_EthTrace) => Promise<ProcessResult>
   preprocessHandler?: (event: Data_EthTrace, preprocessStore: { [k: string]: any }) => Promise<PreprocessResult>
   fetchConfig: EthFetchConfig
-  partitionHandler?: (trace: Data_EthTrace) => string | undefined
+  partitionHandler?: (trace: Data_EthTrace) => Promise<string | undefined>
 }
 
 export class BlockHandler {
@@ -64,7 +64,7 @@ export class BlockHandler {
   handler: (block: Data_EthBlock) => Promise<ProcessResult>
   preprocessHandler?: (event: Data_EthBlock, preprocessStore: { [k: string]: any }) => Promise<PreprocessResult>
   fetchConfig: EthFetchConfig
-  partitionHandler?: (block: Data_EthBlock) => string | undefined
+  partitionHandler?: (block: Data_EthBlock) => Promise<string | undefined>
 }
 
 export class TransactionHandler {
@@ -72,7 +72,7 @@ export class TransactionHandler {
   handlerName: string
   preprocessHandler?: (event: Data_EthTransaction, preprocessStore: { [k: string]: any }) => Promise<PreprocessResult>
   fetchConfig: EthFetchConfig
-  partitionHandler?: (tx: Data_EthTransaction) => string | undefined
+  partitionHandler?: (tx: Data_EthTransaction) => Promise<string | undefined>
 }
 
 class BindInternalOptions {
@@ -128,15 +128,14 @@ export class GlobalProcessor {
     handler: (block: RichBlock, ctx: GlobalContext) => PromiseOrVoid,
     blockInterval = 250,
     backfillBlockInterval = 1000,
-    fetchConfig?: Partial<EthFetchConfig>,
+    handlerOptions?: HandlerOptions<EthFetchConfig, RichBlock>,
     preprocessHandler: (
       block: RichBlock,
       ctx: GlobalContext,
       preprocessStore: {
         [k: string]: any
       }
-    ) => Promise<PreprocessResult> = defaultPreprocessHandler,
-    partitionHandler?: (block: Data_EthBlock) => string | undefined
+    ) => Promise<PreprocessResult> = defaultPreprocessHandler
   ): this {
     return this.onInterval(
       handler,
@@ -145,7 +144,7 @@ export class GlobalProcessor {
         recentInterval: blockInterval,
         backfillInterval: backfillBlockInterval
       },
-      fetchConfig,
+      handlerOptions,
       preprocessHandler
     )
   }
@@ -154,7 +153,7 @@ export class GlobalProcessor {
     handler: (block: RichBlock, ctx: GlobalContext) => PromiseOrVoid,
     timeIntervalInMinutes = 60,
     backfillTimeIntervalInMinutes = 240,
-    fetchConfig?: Partial<EthFetchConfig>,
+    handlerOptions?: HandlerOptions<EthFetchConfig, RichBlock>,
     preprocessHandler: (
       block: RichBlock,
       ctx: GlobalContext,
@@ -167,7 +166,7 @@ export class GlobalProcessor {
       handler,
       { recentInterval: timeIntervalInMinutes, backfillInterval: backfillTimeIntervalInMinutes },
       undefined,
-      fetchConfig,
+      handlerOptions,
       preprocessHandler
     )
   }
@@ -180,7 +179,7 @@ export class GlobalProcessor {
     handler: (block: RichBlock, ctx: GlobalContext) => PromiseOrVoid,
     timeInterval: HandleInterval | undefined,
     blockInterval: HandleInterval | undefined,
-    fetchConfig: Partial<EthFetchConfig> | undefined,
+    handlerOptions?: HandlerOptions<EthFetchConfig, RichBlock>,
     preprocessHandler: (
       block: RichBlock,
       ctx: GlobalContext,
@@ -242,14 +241,24 @@ export class GlobalProcessor {
       },
       timeIntervalInMinutes: timeInterval,
       blockInterval: blockInterval,
-      fetchConfig: EthFetchConfig.fromPartial(fetchConfig || {})
+      fetchConfig: EthFetchConfig.fromPartial(handlerOptions || {}),
+      partitionHandler: async (data: Data_EthBlock): Promise<string | undefined> => {
+        const p = handlerOptions?.partitionKey
+        if (!p) return undefined
+        if (typeof p === 'function') {
+          const { block } = formatEthData(data)
+          if (!block) return undefined
+          return p(block)
+        }
+        return p
+      }
     })
     return this
   }
 
   public onTransaction(
     handler: (transaction: TransactionResponseParams, ctx: GlobalContext) => PromiseOrVoid,
-    fetchConfig?: Partial<EthFetchConfig>,
+    handlerOptions?: HandlerOptions<EthFetchConfig, TransactionResponseParams>,
     preprocessHandler: (
       transaction: TransactionResponseParams,
       ctx: GlobalContext,
@@ -310,7 +319,16 @@ export class GlobalProcessor {
         )
         return preprocessHandler(transaction, ctx, preprocessStore)
       },
-      fetchConfig: EthFetchConfig.fromPartial(fetchConfig || {})
+      fetchConfig: EthFetchConfig.fromPartial(handlerOptions || {}),
+      partitionHandler: async (data: Data_EthTransaction): Promise<string | undefined> => {
+        const p = handlerOptions?.partitionKey
+        if (!p) return undefined
+        if (typeof p === 'function') {
+          const { transaction } = formatEthData(data)
+          return p(transaction)
+        }
+        return p
+      }
     })
     return this
   }
@@ -318,7 +336,7 @@ export class GlobalProcessor {
   public onTrace(
     signatures: string | string[],
     handler: (trace: Trace, ctx: GlobalContext) => PromiseOrVoid,
-    fetchConfig?: Partial<EthFetchConfig>,
+    handlerOptions?: HandlerOptions<EthFetchConfig, Trace>,
     preprocessHandler: (
       trace: Trace,
       ctx: GlobalContext,
@@ -341,7 +359,7 @@ export class GlobalProcessor {
 
     this.traceHandlers.push({
       signatures,
-      fetchConfig: EthFetchConfig.fromPartial(fetchConfig || {}),
+      fetchConfig: EthFetchConfig.fromPartial(handlerOptions || {}),
       handlerName: getHandlerName(),
       handler: async function (data: Data_EthTrace) {
         const { trace, block, transaction, transactionReceipt } = formatEthData(data)
@@ -381,6 +399,16 @@ export class GlobalProcessor {
           processor.config.baseLabels
         )
         return preprocessHandler(trace, ctx, preprocessStore)
+      },
+      partitionHandler: async (data: Data_EthTrace): Promise<string | undefined> => {
+        const p = handlerOptions?.partitionKey
+        if (!p) return undefined
+        if (typeof p === 'function') {
+          const { trace } = formatEthData(data)
+          if (!trace) return undefined
+          return p(trace)
+        }
+        return p
       }
     })
     return this
@@ -430,7 +458,7 @@ export abstract class BaseProcessor<
 
   public onEvent(
     handler: (event: TypedEvent, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
-    fetchConfig?: Partial<EthFetchConfig>,
+    handlerOptions?: HandlerOptions<EthFetchConfig, TypedEvent>,
     preprocessHandler: (
       event: TypedEvent,
       ctx: ContractContext<TContract, TBoundContractView>,
@@ -446,13 +474,13 @@ export abstract class BaseProcessor<
         _filters.push(filter())
       }
     }
-    return this.onEthEvent(handler, _filters, fetchConfig, preprocessHandler)
+    return this.onEthEvent(handler, _filters, handlerOptions, preprocessHandler)
   }
 
   protected onEthEvent(
     handler: (event: TypedEvent, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     filter: DeferredTopicFilter | DeferredTopicFilter[],
-    fetchConfig?: Partial<EthFetchConfig>,
+    handlerOptions?: HandlerOptions<EthFetchConfig, TypedEvent>,
     preprocessHandler: (
       event: TypedEvent,
       ctx: ContractContext<TContract, TBoundContractView>,
@@ -473,7 +501,7 @@ export abstract class BaseProcessor<
     const processor = this
     this.eventHandlers.push({
       filters: _filters,
-      fetchConfig: EthFetchConfig.fromPartial(fetchConfig || {}),
+      fetchConfig: EthFetchConfig.fromPartial(handlerOptions || {}),
       handlerName,
       handler: async function (data: Data_EthLog, preparedData?: PreparedData) {
         const { log, block, transaction, transactionReceipt } = formatEthData(data)
@@ -493,7 +521,7 @@ export abstract class BaseProcessor<
 
         let parsed: LogDescription | null = null
         try {
-          parsed = await parseLog(processor, log)
+          parsed = await getCachedParsedLog(data, processor, log)
         } catch (e) {
           // RangeError data out-of-bounds
           if (e instanceof Error) {
@@ -558,7 +586,7 @@ export abstract class BaseProcessor<
 
         let parsed: LogDescription | null = null
         try {
-          parsed = await parseLog(processor, log)
+          parsed = await getCachedParsedLog(data, processor, log)
         } catch (e) {
           // RangeError data out-of-bounds
           if (e instanceof Error) {
@@ -574,6 +602,26 @@ export abstract class BaseProcessor<
           return preprocessHandler(event, ctx, preprocessStore)
         }
         return PreprocessResult.fromPartial({})
+      },
+      partitionHandler: async (data: Data_EthLog): Promise<string | undefined> => {
+        const p = handlerOptions?.partitionKey
+        if (!p) return undefined
+        if (typeof p === 'function') {
+          const { log } = formatEthData(data)
+          if (!log) return undefined
+          let parsed: LogDescription | null = null
+          try {
+            parsed = await getCachedParsedLog(data, processor, log)
+          } catch (e) {
+            return undefined
+          }
+          if (parsed) {
+            const event: TypedEvent = { ...log, name: parsed.name, args: fixEmptyKey(parsed) }
+            return p(event)
+          }
+          return undefined
+        }
+        return p
       }
     })
     return this
@@ -583,7 +631,7 @@ export abstract class BaseProcessor<
     handler: (block: RichBlock, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     blockInterval = 250,
     backfillBlockInterval = 1000,
-    fetchConfig?: Partial<EthFetchConfig>,
+    handlerOptions?: HandlerOptions<EthFetchConfig, RichBlock>,
     preprocessHandler: (
       block: RichBlock,
       ctx: ContractContext<TContract, TBoundContractView>,
@@ -597,7 +645,7 @@ export abstract class BaseProcessor<
         recentInterval: blockInterval,
         backfillInterval: backfillBlockInterval
       },
-      fetchConfig,
+      handlerOptions,
       preprocessHandler
     )
   }
@@ -606,7 +654,7 @@ export abstract class BaseProcessor<
     handler: (block: RichBlock, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     timeIntervalInMinutes = 60,
     backfillTimeIntervalInMinutes = 240,
-    fetchConfig?: Partial<EthFetchConfig>,
+    handlerOptions?: HandlerOptions<EthFetchConfig, RichBlock>,
     preprocessHandler: (
       block: RichBlock,
       ctx: ContractContext<TContract, TBoundContractView>,
@@ -617,7 +665,7 @@ export abstract class BaseProcessor<
       handler,
       { recentInterval: timeIntervalInMinutes, backfillInterval: backfillTimeIntervalInMinutes },
       undefined,
-      fetchConfig,
+      handlerOptions,
       preprocessHandler
     )
   }
@@ -626,7 +674,7 @@ export abstract class BaseProcessor<
     handler: (block: RichBlock, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     timeInterval: HandleInterval | undefined,
     blockInterval: HandleInterval | undefined,
-    fetchConfig: Partial<EthFetchConfig> | undefined,
+    handlerOptions?: HandlerOptions<EthFetchConfig, RichBlock>,
     preprocessHandler: (
       block: RichBlock,
       ctx: ContractContext<TContract, TBoundContractView>,
@@ -690,7 +738,17 @@ export abstract class BaseProcessor<
       },
       timeIntervalInMinutes: timeInterval,
       blockInterval: blockInterval,
-      fetchConfig: EthFetchConfig.fromPartial(fetchConfig || {})
+      fetchConfig: EthFetchConfig.fromPartial(handlerOptions || {}),
+      partitionHandler: async (data: Data_EthBlock): Promise<string | undefined> => {
+        const p = handlerOptions?.partitionKey
+        if (!p) return undefined
+        if (typeof p === 'function') {
+          const { block } = formatEthData(data)
+          if (!block) return undefined
+          return p(block)
+        }
+        return p
+      }
     })
     return this
   }
@@ -698,7 +756,7 @@ export abstract class BaseProcessor<
   protected onEthTrace(
     signatures: string | string[],
     handler: (trace: TypedCallTrace, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
-    fetchConfig?: Partial<EthFetchConfig>,
+    handlerOptions?: HandlerOptions<EthFetchConfig, TypedCallTrace>,
     preprocessHandler: (
       trace: TypedCallTrace,
       ctx: ContractContext<TContract, TBoundContractView>,
@@ -715,7 +773,7 @@ export abstract class BaseProcessor<
 
     this.traceHandlers.push({
       signatures,
-      fetchConfig: EthFetchConfig.fromPartial(fetchConfig || {}),
+      fetchConfig: EthFetchConfig.fromPartial(handlerOptions || {}),
       handlerName,
       handler: async function (data: Data_EthTrace, preparedData?: PreparedData) {
         const contractView = processor.CreateBoundContractView()
@@ -805,6 +863,35 @@ export abstract class BaseProcessor<
           processor.config.baseLabels
         )
         return preprocessHandler(typedTrace, ctx, preprocessStore)
+      },
+      partitionHandler: async (data: Data_EthTrace): Promise<string | undefined> => {
+        const p = handlerOptions?.partitionKey
+        if (!p) return undefined
+        if (typeof p === 'function') {
+          const contractView = processor.CreateBoundContractView()
+          const contractInterface = contractView.rawContract.interface
+          const { trace } = formatEthData(data)
+          if (!trace) return undefined
+          const sighash = trace.action.input?.slice(0, 10)
+          if (!sighash) return undefined
+          const fragment = contractInterface.getFunction(sighash)
+          if (!fragment) return undefined
+          const typedTrace = trace as TypedCallTrace
+          typedTrace.name = fragment.name
+          typedTrace.functionSignature = fragment.format()
+          if (trace.action.input) {
+            const traceData = '0x' + trace.action.input.slice(10)
+            try {
+              typedTrace.args = await decodeTrace(processor, fragment.inputs, traceData)
+            } catch (e) {
+              if (!trace.error) {
+                throw e
+              }
+            }
+          }
+          return p(typedTrace)
+        }
+        return p
       }
     })
     return this
@@ -812,7 +899,7 @@ export abstract class BaseProcessor<
 
   public onTrace(
     handler: (event: TypedCallTrace, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
-    fetchConfig?: Partial<EthFetchConfig>,
+    handlerOptions?: HandlerOptions<EthFetchConfig, TypedCallTrace>,
     preprocessHandler: (
       trace: TypedCallTrace,
       ctx: ContractContext<TContract, TBoundContractView>,
@@ -830,6 +917,25 @@ export abstract class BaseProcessor<
         sighashes.push(sighash)
       }
     }
-    return this.onEthTrace(sighashes, handler, fetchConfig, preprocessHandler)
+    return this.onEthTrace(sighashes, handler, handlerOptions, preprocessHandler)
+  }
+}
+
+// Helper function to get cached or parse log data
+async function getCachedParsedLog(data: any, processor: any, log: any): Promise<LogDescription | null> {
+  // Check if parsed log is already cached on data object
+  if ((data as any).__parsedLog !== undefined) {
+    return (data as any).__parsedLog
+  }
+
+  try {
+    const parsed = await parseLog(processor, log)
+    // Cache the parsed result on the data object
+    ;(data as any).__parsedLog = parsed
+    return parsed
+  } catch (e) {
+    // Cache the null result to avoid retrying
+    ;(data as any).__parsedLog = null
+    throw e
   }
 }

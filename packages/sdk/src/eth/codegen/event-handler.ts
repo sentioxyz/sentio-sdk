@@ -11,13 +11,13 @@ export function generateEventHandler(event: EventDeclaration, contractName: stri
   onEvent${eventName}(
     handler: (event: ${eventNamePrefix}Event, ctx: ${contractName}Context) => void,
     filter?: ${eventNamePrefix}EventFilter | ${eventNamePrefix}EventFilter[],
-    fetchConfig?: Partial<EthFetchConfig>,
+    handlerOptions?: HandlerOptions<EthFetchConfig, ${eventNamePrefix}Event>,
     preprocessHandler?: (event: ${eventNamePrefix}Event, ctx: ${contractName}Context, preprocessStore: {[k: string]: any}) => Promise<PreprocessResult>
   ): this {
     if (!filter) {
       filter = templateContract.filters['${filterName}'](${event.inputs.map(() => 'null').join(',')})
     }
-    return super.onEthEvent(handler, filter!, fetchConfig, preprocessHandler)
+    return super.onEthEvent(handler, filter!, handlerOptions, preprocessHandler)
   }
   `
 }

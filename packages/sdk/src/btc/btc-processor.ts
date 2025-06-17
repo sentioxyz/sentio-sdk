@@ -2,7 +2,7 @@ import { ListStateStorage } from '@sentio/runtime'
 import { BlockHandler, BTCBlock, BTCBlockContext, BTCContext, BTCOnIntervalFetchConfig, Transaction } from './types.js'
 import { Data_BTCBlock, Data_BTCTransaction, HandleInterval, ProcessResult } from '@sentio/protos'
 import { TransactionFilters } from './filter.js'
-import { PromiseOrVoid } from '../core/index.js'
+import { HandlerOptions, PromiseOrVoid } from '../core/index.js'
 import { ServerError, Status } from 'nice-grpc'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 
@@ -26,7 +26,8 @@ export class BTCProcessor {
 
   public onTransaction(
     handler: (transaction: Transaction, ctx: BTCContext) => void | Promise<void>,
-    filter?: TransactionFilters
+    filter?: TransactionFilters,
+    handlerOptions?: HandlerOptions<object, Transaction>
   ) {
     const callHandler = {
       handlerName: getHandlerName(),
@@ -42,7 +43,16 @@ export class BTCProcessor {
         await handler(tx, ctx)
         return ctx.stopAndGetResult()
       },
-      filter
+      filter,
+      partitionHandler: async (call: Data_BTCTransaction): Promise<string | undefined> => {
+        const p = handlerOptions?.partitionKey
+        if (!p) return undefined
+        if (typeof p === 'function') {
+          const tx = call.transaction as Transaction
+          return p(tx)
+        }
+        return p
+      }
     }
     this.callHandlers.push(callHandler)
     return this
@@ -52,7 +62,7 @@ export class BTCProcessor {
     handler: (block: BTCBlock, ctx: BTCBlockContext) => PromiseOrVoid,
     timeInterval: HandleInterval | undefined,
     blockInterval: HandleInterval | undefined,
-    fetchConfig?: BTCOnIntervalFetchConfig
+    handlerOptions?: HandlerOptions<BTCOnIntervalFetchConfig, BTCBlock>
   ): this {
     if (timeInterval) {
       if (timeInterval.backfillInterval < timeInterval.recentInterval) {
@@ -75,7 +85,7 @@ export class BTCProcessor {
         const block = {
           ...header
         } as BTCBlock
-        if (fetchConfig?.getTransactions) {
+        if (handlerOptions?.getTransactions) {
           block.tx = header.rawtx?.map((tx: any) => tx as Transaction)
         }
 
@@ -88,7 +98,21 @@ export class BTCProcessor {
         await handler(block, ctx)
         return ctx.stopAndGetResult()
       },
-      fetchConfig
+      fetchConfig: handlerOptions,
+      partitionHandler: async (data: Data_BTCBlock): Promise<string | undefined> => {
+        const p = handlerOptions?.partitionKey
+        if (!p) return undefined
+        if (typeof p === 'function') {
+          const header = data.block
+          if (!header) return undefined
+          const block = { ...header } as BTCBlock
+          if (handlerOptions?.getTransactions) {
+            block.tx = header.rawtx?.map((tx: any) => tx as Transaction)
+          }
+          return p(block)
+        }
+        return p
+      }
     })
     return this
   }
@@ -97,7 +121,7 @@ export class BTCProcessor {
     handler: (block: BTCBlock, ctx: BTCBlockContext) => PromiseOrVoid,
     blockInterval = 250,
     backfillBlockInterval = 1000,
-    fetchConfig?: BTCOnIntervalFetchConfig
+    handlerOptions?: HandlerOptions<BTCOnIntervalFetchConfig, BTCBlock>
   ): this {
     return this.onInterval(
       handler,
@@ -106,7 +130,7 @@ export class BTCProcessor {
         recentInterval: blockInterval,
         backfillInterval: backfillBlockInterval
       },
-      fetchConfig
+      handlerOptions
     )
   }
 
@@ -114,13 +138,13 @@ export class BTCProcessor {
     handler: (block: BTCBlock, ctx: BTCBlockContext) => PromiseOrVoid,
     timeIntervalInMinutes = 60,
     backfillTimeIntervalInMinutes = 240,
-    fetchConfig?: BTCOnIntervalFetchConfig
+    handlerOptions?: HandlerOptions<BTCOnIntervalFetchConfig, BTCBlock>
   ): this {
     return this.onInterval(
       handler,
       { recentInterval: timeIntervalInMinutes, backfillInterval: backfillTimeIntervalInMinutes },
       undefined,
-      fetchConfig
+      handlerOptions
     )
   }
 }
@@ -137,4 +161,5 @@ export type CallHandler<T> = {
   handlerName: string
   handler: (call: T) => Promise<ProcessResult>
   filter?: TransactionFilters
+  partitionHandler?: (call: T) => Promise<string | undefined>
 }

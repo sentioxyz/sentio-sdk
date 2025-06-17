@@ -3,6 +3,7 @@ import { Data_CosmosCall } from '@sentio/protos'
 import { CosmosContext } from './context.js'
 import { CosmosEvent, CosmosTransaction, CosmosTxLog } from './transaction.js'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
+import { HandlerOptions } from '../core/handler-options.js'
 
 export class CosmosProcessor {
   callHandlers: CallHandler<Data_CosmosCall>[] = []
@@ -19,7 +20,8 @@ export class CosmosProcessor {
 
   public onLogEvent(
     logFilters: string[] | string,
-    handler: (log: CosmosTxLog, event: CosmosEvent, context: CosmosContext) => void | Promise<void>
+    handler: (log: CosmosTxLog, event: CosmosEvent, context: CosmosContext) => void | Promise<void>,
+    handlerOptions?: HandlerOptions<object, CosmosTransaction>
   ) {
     const filter = Array.isArray(logFilters) ? logFilters : [logFilters]
     const callHandler = {
@@ -39,6 +41,15 @@ export class CosmosProcessor {
       },
       logConfig: {
         logFilters: filter
+      },
+      partitionHandler: async (call: Data_CosmosCall): Promise<string | undefined> => {
+        const p = handlerOptions?.partitionKey
+        if (!p) return undefined
+        if (typeof p === 'function') {
+          const transaction = call.transaction as CosmosTransaction
+          return p(transaction)
+        }
+        return p
       }
     }
     this.callHandlers.push(callHandler)

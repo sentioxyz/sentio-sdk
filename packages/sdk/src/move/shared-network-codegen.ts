@@ -96,12 +96,12 @@ export abstract class SharedNetworkCodegen<NetworkType, ModuleTypes, StructType>
 
     const camelFuncName = upperFirst(camel(func.name))
     const source = `
-  onEntry${camelFuncName}(func: (call: ${moduleName}.${camelFuncName}Payload, ctx: ${this.PREFIX}Context) => void, filter?: CallFilter, fetchConfig?: Partial<MoveFetchConfig>): ${moduleName} {
+  onEntry${camelFuncName}(func: (call: ${moduleName}.${camelFuncName}Payload, ctx: ${this.PREFIX}Context) => void, filter?: CallFilter, handlerOptions?: HandlerOptions<MoveFetchConfig, ${moduleName}.${camelFuncName}Payload>): ${moduleName} {
     this.onEntryFunctionCall(func, {
       ...filter,
       function: '${module.name}::${func.name}'
     },
-    fetchConfig)
+    handlerOptions)
     return this
   }`
 
@@ -113,8 +113,8 @@ export abstract class SharedNetworkCodegen<NetworkType, ModuleTypes, StructType>
     const source = `
 onEvent${struct.name}(func: (event: ${moduleName}.${normalizeToJSName(struct.name)}Instance, ctx: ${
       this.PREFIX
-    }Context) => void, fetchConfig?: Partial<MoveFetchConfig>, eventFilter?: Omit<EventFilter, "type"|"account">): ${moduleName} {
-  this.onMoveEvent(func, {...eventFilter ?? {}, type: '${module.name}::${struct.name}' }, fetchConfig)
+    }Context) => void, handlerOptions?: HandlerOptions<MoveFetchConfig, ${moduleName}.${normalizeToJSName(struct.name)}Instance>, eventFilter?: Omit<EventFilter, "type"|"account">): ${moduleName} {
+  this.onMoveEvent(func, {...eventFilter ?? {}, type: '${module.name}::${struct.name}' }, handlerOptions)
   return this
 }`
     return source
@@ -123,10 +123,10 @@ onEvent${struct.name}(func: (event: ${moduleName}.${normalizeToJSName(struct.nam
   generateImports() {
     return `
     import { CallFilter, MoveFetchConfig, EventFilter } from "@sentio/sdk/move"
+    import { HandlerOptions } from "@sentio/sdk"
     import {
       ${this.PREFIX}BindOptions, ${this.PREFIX}BaseProcessor,
       ${this.PREFIX}Network, TypedFunctionPayload,
-      HandlerOptions,
       ${this.PREFIX}Context } from "@sentio/sdk/${this.PREFIX.toLowerCase()}"
 `
   }

@@ -29,12 +29,14 @@ export type CallHandler<T> = {
   handler: (call: T) => Promise<ProcessResult>
   fetchConfig?: Partial<FuelCallHandlerConfig>
   assetConfig?: Partial<FuelAssetHandlerConfig>
+  partitionHandler?: (call: T) => Promise<string | undefined>
 }
 
 export type ReceiptHandler = {
   handlerName: string
   handler: (receipt: Data_FuelReceipt) => Promise<ProcessResult>
   receiptConfig?: Partial<FuelReceiptHandlerConfig>
+  partitionHandler?: (receipt: Data_FuelReceipt) => Promise<string | undefined>
 }
 
 export type BlockHandler = {
@@ -43,6 +45,7 @@ export type BlockHandler = {
   handler: (block: Data_FuelBlock) => Promise<ProcessResult>
   handlerName: string
   fetchConfig?: Partial<OnIntervalConfig>
+  partitionHandler?: (block: Data_FuelBlock) => Promise<string | undefined>
 }
 
 export interface FuelLog<T> {

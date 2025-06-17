@@ -5,6 +5,7 @@ import { SolanaBindOptions } from './solana-options.js'
 import { ListStateStorage } from '@sentio/runtime'
 import { Labels } from '../core/index.js'
 import { SolanaChainId } from '@sentio/chain'
+import { HandlerOptions } from '../core/handler-options.js'
 
 type IndexConfigure = {
   startSlot: bigint
@@ -17,12 +18,17 @@ export interface InstructionCoder {
 
 export type SolanaInstructionHandler = (instruction: Instruction, ctx: SolanaContext, accounts?: string[]) => void
 
+export interface InstructionHandlerEntry {
+  handler: SolanaInstructionHandler
+  handlerOptions?: HandlerOptions<object, Instruction>
+}
+
 export class SolanaProcessorState extends ListStateStorage<SolanaBaseProcessor> {
   static INSTANCE: SolanaProcessorState = new SolanaProcessorState()
 }
 
 export class SolanaBaseProcessor {
-  public instructionHandlerMap: Map<string, SolanaInstructionHandler> = new Map()
+  public instructionHandlerMap: Map<string, InstructionHandlerEntry> = new Map()
   address: string
   endpoint: string
   contractName: string
@@ -61,8 +67,12 @@ export class SolanaBaseProcessor {
     SolanaProcessorState.INSTANCE.addValue(this)
   }
 
-  public onInstruction(instructionName: string, handler: SolanaInstructionHandler) {
-    this.instructionHandlerMap.set(instructionName, handler)
+  public onInstruction(
+    instructionName: string,
+    handler: SolanaInstructionHandler,
+    handlerOptions?: HandlerOptions<object, Instruction>
+  ) {
+    this.instructionHandlerMap.set(instructionName, { handler, handlerOptions })
     return this
   }
 
@@ -78,19 +88,31 @@ export class SolanaBaseProcessor {
     return null
   }
 
-  public getInstructionHandler(parsedInstruction: Instruction): SolanaInstructionHandler | undefined {
+  public getInstructionHandler(parsedInstruction: Instruction): InstructionHandlerEntry | undefined {
     return this.instructionHandlerMap.get(parsedInstruction.name)
   }
 
   public async handleInstruction(
     parsedInstruction: Instruction,
     accounts: string[],
-    handler: SolanaInstructionHandler,
+    handlerEntry: InstructionHandlerEntry,
     slot: bigint
   ): Promise<ProcessResult> {
     const ctx = new SolanaContext(this.contractName, this.network, this.address, slot, this.baseLabels)
-    await handler(parsedInstruction, ctx, accounts)
+    await handlerEntry.handler(parsedInstruction, ctx, accounts)
     return ctx.stopAndGetResult()
+  }
+
+  public async getPartitionKey(
+    parsedInstruction: Instruction,
+    handlerEntry: InstructionHandlerEntry
+  ): Promise<string | undefined> {
+    const p = handlerEntry.handlerOptions?.partitionKey
+    if (!p) return undefined
+    if (typeof p === 'function') {
+      return p(parsedInstruction)
+    }
+    return p
   }
 
   public startSlot(startSlot: bigint | number) {
