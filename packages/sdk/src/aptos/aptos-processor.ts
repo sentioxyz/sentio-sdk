@@ -1,17 +1,17 @@
 import { defaultMoveCoder, MoveCoder } from './index.js'
 
 import {
+  EntryFunctionPayloadResponse,
   Event,
   MoveResource,
   UserTransactionResponse,
-  EntryFunctionPayloadResponse,
   WriteSetChangeWriteResource
 } from '@aptos-labs/ts-sdk'
 
 import { AptosBindOptions, AptosNetwork } from './network.js'
 import { AptosContext, AptosResourcesContext, AptosTransactionContext } from './context.js'
 import { ListStateStorage } from '@sentio/runtime'
-import { MoveFetchConfig, Data_AptResource, HandleInterval, MoveAccountFetchConfig } from '@sentio/protos'
+import { Data_AptResource, HandleInterval, MoveAccountFetchConfig, MoveFetchConfig } from '@sentio/protos'
 import { ServerError, Status } from 'nice-grpc'
 import {
   accountTypeString,
@@ -25,7 +25,7 @@ import {
   TransactionIntervalHandler
 } from '../move/index.js'
 import { ALL_ADDRESS, Labels, PromiseOrVoid } from '../core/index.js'
-import { TypeDescriptor, matchType, NestedDecodedStruct } from '@typemove/move'
+import { matchType, NestedDecodedStruct, TypeDescriptor } from '@typemove/move'
 import { ResourceChange } from '@typemove/aptos'
 import { GeneralTransactionResponse, HandlerOptions } from './models.js'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
@@ -334,7 +334,16 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
       },
       timeIntervalInMinutes: timeInterval,
       versionInterval: versionInterval,
-      fetchConfig: { ...DEFAULT_FETCH_CONFIG, ...handlerOptions }
+      fetchConfig: { ...DEFAULT_FETCH_CONFIG, ...handlerOptions },
+      partitionHandler: async (data): Promise<string | undefined> => {
+        const p = handlerOptions?.partitionKey
+        if (!p) return undefined
+        if (typeof p === 'function') {
+          const transaction = JSON.parse(data.rawTransaction) as T
+          return p(transaction)
+        }
+        return p
+      }
     })
     return this
   }

@@ -1,4 +1,5 @@
 import { errorString, GLOBAL_CONFIG, mergeProcessResults, Plugin, PluginManager, USER_PROCESSOR } from '@sentio/runtime'
+import { PartitionHandlerManager } from '../core/index.js'
 import {
   ContractConfig,
   Data_FuelBlock,
@@ -8,6 +9,7 @@ import {
   HandlerType,
   ProcessConfigResponse,
   ProcessResult,
+  ProcessStreamResponse_Partitions,
   StartRequest
 } from '@sentio/protos'
 
@@ -32,6 +34,8 @@ export class FuelPlugin extends Plugin {
     receiptHandlers: []
   }
 
+  partitionManager = new PartitionHandlerManager()
+
   async configure(config: ProcessConfigResponse) {
     const handlers: Handlers = {
       transactionHandlers: [],
@@ -54,6 +58,11 @@ export class FuelPlugin extends Plugin {
       })
       for (const txHandler of processor.txHandlers) {
         const handlerId = handlers.transactionHandlers.push(txHandler.handler) - 1
+        this.partitionManager.registerPartitionHandler(
+          HandlerType.FUEL_TRANSACTION,
+          handlerId,
+          txHandler.partitionHandler
+        )
         const handlerName = txHandler.handlerName
         if (processor instanceof FuelProcessor) {
           // on transaction
@@ -82,6 +91,11 @@ export class FuelPlugin extends Plugin {
 
       for (const receiptHandler of processor.receiptHandlers ?? []) {
         const handlerId = handlers.receiptHandlers.push(receiptHandler.handler) - 1
+        this.partitionManager.registerPartitionHandler(
+          HandlerType.FUEL_RECEIPT,
+          handlerId,
+          receiptHandler.partitionHandler
+        )
         const handlerName = receiptHandler.handlerName
         if (processor instanceof FuelProcessor) {
           contractConfig.fuelReceiptConfigs.push({
@@ -94,6 +108,7 @@ export class FuelPlugin extends Plugin {
 
       for (const blockHandler of processor.blockHandlers) {
         const handlerId = handlers.blockHandlers.push(blockHandler.handler) - 1
+        this.partitionManager.registerPartitionHandler(HandlerType.FUEL_BLOCK, handlerId, blockHandler.partitionHandler)
         contractConfig.intervalConfigs.push({
           slot: 0,
           slotInterval: blockHandler.blockInterval,
@@ -129,6 +144,47 @@ export class FuelPlugin extends Plugin {
         return this.processBlock(request)
       default:
         throw new ServerError(Status.INVALID_ARGUMENT, 'No handle type registered ' + request.handlerType)
+    }
+  }
+
+  async partition(request: DataBinding): Promise<ProcessStreamResponse_Partitions> {
+    let data: any
+    switch (request.handlerType) {
+      case HandlerType.FUEL_TRANSACTION:
+        if (!request.data?.fuelTransaction) {
+          throw new ServerError(Status.INVALID_ARGUMENT, "fuelTransaction can't be empty")
+        }
+        data = request.data.fuelTransaction
+        break
+      case HandlerType.FUEL_RECEIPT:
+        if (!request.data?.fuelLog) {
+          throw new ServerError(Status.INVALID_ARGUMENT, "fuelReceipt can't be empty")
+        }
+        data = request.data.fuelLog
+        break
+      case HandlerType.FUEL_BLOCK:
+        if (!request.data?.fuelBlock) {
+          throw new ServerError(Status.INVALID_ARGUMENT, "fuelBlock can't be empty")
+        }
+        data = request.data.fuelBlock
+        break
+      case HandlerType.FUEL_CALL:
+        // FUEL_CALL uses the same data as FUEL_TRANSACTION
+        if (!request.data?.fuelTransaction) {
+          throw new ServerError(Status.INVALID_ARGUMENT, "fuelTransaction can't be empty for FUEL_CALL")
+        }
+        data = request.data.fuelTransaction
+        break
+      default:
+        throw new ServerError(Status.INVALID_ARGUMENT, 'No handle type registered ' + request.handlerType)
+    }
+    const partitions = await this.partitionManager.processPartitionForHandlerType(
+      request.handlerType,
+      request.handlerIds,
+      data
+    )
+    return {
+      partitions
     }
   }
 

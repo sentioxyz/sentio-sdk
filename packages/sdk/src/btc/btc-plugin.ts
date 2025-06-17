@@ -7,10 +7,12 @@ import {
   HandlerType,
   ProcessConfigResponse,
   ProcessResult,
+  ProcessStreamResponse_Partitions,
   StartRequest
 } from '@sentio/protos'
 
 import { ServerError, Status } from 'nice-grpc'
+import { PartitionHandlerManager } from '../core/index.js'
 import { TemplateInstanceState } from '../core/template.js'
 import { BTCProcessorState } from './btc-processor.js'
 import { filters2Proto, TransactionFilter } from './filter.js'
@@ -26,6 +28,8 @@ export class BTCPlugin extends Plugin {
     txHandlers: [],
     blockHandlers: []
   }
+
+  partitionManager = new PartitionHandlerManager()
 
   async configure(config: ProcessConfigResponse) {
     const handlers: Handlers = {
@@ -47,6 +51,11 @@ export class BTCPlugin extends Plugin {
       })
       for (const callHandler of processor.callHandlers) {
         const handlerId = handlers.txHandlers.push(callHandler.handler) - 1
+        this.partitionManager.registerPartitionHandler(
+          HandlerType.BTC_TRANSACTION,
+          handlerId,
+          callHandler.partitionHandler
+        )
         const handlerName = callHandler.handlerName
 
         if (callHandler.filter) {
@@ -70,6 +79,7 @@ export class BTCPlugin extends Plugin {
 
       for (const blockHandler of processor.blockHandlers) {
         const handlerId = handlers.blockHandlers.push(blockHandler.handler) - 1
+        this.partitionManager.registerPartitionHandler(HandlerType.BTC_BLOCK, handlerId, blockHandler.partitionHandler)
         contractConfig.intervalConfigs.push({
           slot: 0,
           slotInterval: blockHandler.blockInterval,
@@ -104,6 +114,34 @@ export class BTCPlugin extends Plugin {
         return this.processBlock(request)
       default:
         throw new ServerError(Status.INVALID_ARGUMENT, 'No handle type registered ' + request.handlerType)
+    }
+  }
+
+  async partition(request: DataBinding): Promise<ProcessStreamResponse_Partitions> {
+    let data: any
+    switch (request.handlerType) {
+      case HandlerType.BTC_TRANSACTION:
+        if (!request.data?.btcTransaction) {
+          throw new ServerError(Status.INVALID_ARGUMENT, "btcTransaction can't be empty")
+        }
+        data = request.data.btcTransaction
+        break
+      case HandlerType.BTC_BLOCK:
+        if (!request.data?.btcBlock) {
+          throw new ServerError(Status.INVALID_ARGUMENT, "btcBlock can't be empty")
+        }
+        data = request.data.btcBlock
+        break
+      default:
+        throw new ServerError(Status.INVALID_ARGUMENT, 'No handle type registered ' + request.handlerType)
+    }
+    const partitions = await this.partitionManager.processPartitionForHandlerType(
+      request.handlerType,
+      request.handlerIds,
+      data
+    )
+    return {
+      partitions
     }
   }
 
