@@ -3,10 +3,6 @@ import { BaseContract, DeferredTopicFilter, LogDescription, TransactionResponseP
 import { BoundContractView, ContractContext, ContractView, GlobalContext } from './context.js'
 import {
   AddressType,
-  Data_EthBlock,
-  Data_EthLog,
-  Data_EthTrace,
-  Data_EthTransaction,
   EthFetchConfig,
   HandleInterval,
   PreparedData,
@@ -27,6 +23,7 @@ import {
 } from './eth.js'
 import sha3 from 'js-sha3'
 import { ListStateStorage } from '@sentio/runtime'
+import { type Data_EthLog, type Data_EthTrace, type Data_EthTransaction, type Data_EthBlock } from '@sentio/runtime'
 import { EthChainId } from '@sentio/chain'
 import { getHandlerName, proxyHandlers, proxyProcessor } from '../utils/metrics.js'
 import { ALL_ADDRESS, HandlerOptions } from '../core/index.js'

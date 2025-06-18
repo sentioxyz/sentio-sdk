@@ -1,5 +1,6 @@
 import { TestProcessorServer } from './test-processor-server.js'
-import { DataBinding, HandlerType, ProcessBindingResponse } from '@sentio/protos'
+import { HandlerType, ProcessBindingResponse } from '@sentio/protos'
+import { DataBinding } from '@sentio/runtime'
 import { Trace } from '../eth/eth.js'
 import { BlockParams, LogParams, TransactionResponseParams } from 'ethers/providers'
 import { ChainId, EthChainId } from '@sentio/chain'
