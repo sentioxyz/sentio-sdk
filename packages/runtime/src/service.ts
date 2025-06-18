@@ -424,7 +424,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     let lastBinding: DataBinding | undefined = undefined
     for await (const request of requests) {
       try {
-        console.log('received request:', request, 'lastBinding:', lastBinding)
+        // console.log('received request:', request, 'lastBinding:', lastBinding)
         if (request.binding) {
           process_binding_count.add(1)
 
@@ -473,7 +473,6 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         console.error('unexpect error during handle loop', e)
       }
     }
-    console.info('process stream requests finished')
   }
 
   private startProcess(

@@ -1234,10 +1234,20 @@ export interface Data {
 }
 
 export interface Data_EthLog {
+  /** @deprecated */
   log: { [key: string]: any } | undefined;
-  timestamp: Date | undefined;
-  transaction?: { [key: string]: any } | undefined;
-  transactionReceipt?: { [key: string]: any } | undefined;
+  timestamp:
+    | Date
+    | undefined;
+  /** @deprecated */
+  transaction?:
+    | { [key: string]: any }
+    | undefined;
+  /** @deprecated */
+  transactionReceipt?:
+    | { [key: string]: any }
+    | undefined;
+  /** @deprecated */
   block?: { [key: string]: any } | undefined;
   rawLog: string;
   rawTransaction?: string | undefined;
@@ -1250,10 +1260,20 @@ export interface Data_EthBlock {
 }
 
 export interface Data_EthTransaction {
+  /** @deprecated */
   transaction: { [key: string]: any } | undefined;
-  timestamp: Date | undefined;
-  transactionReceipt?: { [key: string]: any } | undefined;
-  block?: { [key: string]: any } | undefined;
+  timestamp:
+    | Date
+    | undefined;
+  /** @deprecated */
+  transactionReceipt?:
+    | { [key: string]: any }
+    | undefined;
+  /** @deprecated */
+  block?:
+    | { [key: string]: any }
+    | undefined;
+  /** @deprecated */
   trace?: { [key: string]: any } | undefined;
   rawTransaction: string;
   rawTransactionReceipt?: string | undefined;

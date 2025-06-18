@@ -96,10 +96,11 @@ export class ServiceManager extends ProcessorServiceImpl {
           }
 
           if (this.enablePartition) {
-            const partitions = await PluginManager.INSTANCE.partition(request.binding)
-            subject.next({
-              processId: request.processId,
-              partitions
+            PluginManager.INSTANCE.partition(request.binding).then((partitions) => {
+              subject.next({
+                processId: request.processId,
+                partitions
+              })
             })
             lastBinding = request.binding
           } else {

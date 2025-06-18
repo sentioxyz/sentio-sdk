@@ -313,6 +313,59 @@ export interface UsageTracker {
   versionField: string;
 }
 
+export interface AuthChecker {
+  projectIdField: string;
+  projectSlugField: string;
+  projectOwnerField: string;
+  projectPermission: AuthChecker_Permission;
+  loaderName: string;
+}
+
+export enum AuthChecker_Permission {
+  NONE = 0,
+  READ = 1,
+  WRITE = 2,
+  ADMIN = 3,
+  UNRECOGNIZED = -1,
+}
+
+export function authChecker_PermissionFromJSON(object: any): AuthChecker_Permission {
+  switch (object) {
+    case 0:
+    case "NONE":
+      return AuthChecker_Permission.NONE;
+    case 1:
+    case "READ":
+      return AuthChecker_Permission.READ;
+    case 2:
+    case "WRITE":
+      return AuthChecker_Permission.WRITE;
+    case 3:
+    case "ADMIN":
+      return AuthChecker_Permission.ADMIN;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return AuthChecker_Permission.UNRECOGNIZED;
+  }
+}
+
+export function authChecker_PermissionToJSON(object: AuthChecker_Permission): string {
+  switch (object) {
+    case AuthChecker_Permission.NONE:
+      return "NONE";
+    case AuthChecker_Permission.READ:
+      return "READ";
+    case AuthChecker_Permission.WRITE:
+      return "WRITE";
+    case AuthChecker_Permission.ADMIN:
+      return "ADMIN";
+    case AuthChecker_Permission.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
 export interface AccessMeta {
   projectIdField: string;
   projectSlugField: string;
@@ -1592,6 +1645,7 @@ export interface Account {
   address: string;
   paymentMethod: PayMethod;
   usageOverCapLimit: string;
+  status: string;
 }
 
 export interface ImportedProject {
@@ -2178,6 +2232,125 @@ export const UsageTracker = {
     message.projectSlugField = object.projectSlugField ?? "";
     message.projectOwnerField = object.projectOwnerField ?? "";
     message.versionField = object.versionField ?? "";
+    return message;
+  },
+};
+
+function createBaseAuthChecker(): AuthChecker {
+  return { projectIdField: "", projectSlugField: "", projectOwnerField: "", projectPermission: 0, loaderName: "" };
+}
+
+export const AuthChecker = {
+  encode(message: AuthChecker, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.projectIdField !== "") {
+      writer.uint32(10).string(message.projectIdField);
+    }
+    if (message.projectSlugField !== "") {
+      writer.uint32(18).string(message.projectSlugField);
+    }
+    if (message.projectOwnerField !== "") {
+      writer.uint32(26).string(message.projectOwnerField);
+    }
+    if (message.projectPermission !== 0) {
+      writer.uint32(32).int32(message.projectPermission);
+    }
+    if (message.loaderName !== "") {
+      writer.uint32(42).string(message.loaderName);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): AuthChecker {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAuthChecker();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.projectIdField = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.projectSlugField = reader.string();
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.projectOwnerField = reader.string();
+          continue;
+        case 4:
+          if (tag !== 32) {
+            break;
+          }
+
+          message.projectPermission = reader.int32() as any;
+          continue;
+        case 5:
+          if (tag !== 42) {
+            break;
+          }
+
+          message.loaderName = reader.string();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): AuthChecker {
+    return {
+      projectIdField: isSet(object.projectIdField) ? globalThis.String(object.projectIdField) : "",
+      projectSlugField: isSet(object.projectSlugField) ? globalThis.String(object.projectSlugField) : "",
+      projectOwnerField: isSet(object.projectOwnerField) ? globalThis.String(object.projectOwnerField) : "",
+      projectPermission: isSet(object.projectPermission) ? authChecker_PermissionFromJSON(object.projectPermission) : 0,
+      loaderName: isSet(object.loaderName) ? globalThis.String(object.loaderName) : "",
+    };
+  },
+
+  toJSON(message: AuthChecker): unknown {
+    const obj: any = {};
+    if (message.projectIdField !== "") {
+      obj.projectIdField = message.projectIdField;
+    }
+    if (message.projectSlugField !== "") {
+      obj.projectSlugField = message.projectSlugField;
+    }
+    if (message.projectOwnerField !== "") {
+      obj.projectOwnerField = message.projectOwnerField;
+    }
+    if (message.projectPermission !== 0) {
+      obj.projectPermission = authChecker_PermissionToJSON(message.projectPermission);
+    }
+    if (message.loaderName !== "") {
+      obj.loaderName = message.loaderName;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<AuthChecker>): AuthChecker {
+    return AuthChecker.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AuthChecker>): AuthChecker {
+    const message = createBaseAuthChecker();
+    message.projectIdField = object.projectIdField ?? "";
+    message.projectSlugField = object.projectSlugField ?? "";
+    message.projectOwnerField = object.projectOwnerField ?? "";
+    message.projectPermission = object.projectPermission ?? 0;
+    message.loaderName = object.loaderName ?? "";
     return message;
   },
 };
@@ -10316,6 +10489,7 @@ function createBaseAccount(): Account {
     address: "",
     paymentMethod: 0,
     usageOverCapLimit: "",
+    status: "",
   };
 }
 
@@ -10347,6 +10521,9 @@ export const Account = {
     }
     if (message.usageOverCapLimit !== "") {
       writer.uint32(90).string(message.usageOverCapLimit);
+    }
+    if (message.status !== "") {
+      writer.uint32(98).string(message.status);
     }
     return writer;
   },
@@ -10421,6 +10598,13 @@ export const Account = {
 
           message.usageOverCapLimit = reader.string();
           continue;
+        case 12:
+          if (tag !== 98) {
+            break;
+          }
+
+          message.status = reader.string();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -10441,6 +10625,7 @@ export const Account = {
       address: isSet(object.address) ? globalThis.String(object.address) : "",
       paymentMethod: isSet(object.paymentMethod) ? payMethodFromJSON(object.paymentMethod) : 0,
       usageOverCapLimit: isSet(object.usageOverCapLimit) ? globalThis.String(object.usageOverCapLimit) : "",
+      status: isSet(object.status) ? globalThis.String(object.status) : "",
     };
   },
 
@@ -10473,6 +10658,9 @@ export const Account = {
     if (message.usageOverCapLimit !== "") {
       obj.usageOverCapLimit = message.usageOverCapLimit;
     }
+    if (message.status !== "") {
+      obj.status = message.status;
+    }
     return obj;
   },
 
@@ -10490,6 +10678,7 @@ export const Account = {
     message.address = object.address ?? "";
     message.paymentMethod = object.paymentMethod ?? 0;
     message.usageOverCapLimit = object.usageOverCapLimit ?? "";
+    message.status = object.status ?? "";
     return message;
   },
 };

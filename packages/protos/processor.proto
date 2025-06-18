@@ -686,11 +686,11 @@ message DBRequest {
 message Data {
   // Every Handler type should have a data type
   message EthLog {
-    google.protobuf.Struct log = 3 ; // deprecated
+    google.protobuf.Struct log = 3 [deprecated = true]; // deprecated
     google.protobuf.Timestamp timestamp = 4;
-    optional google.protobuf.Struct transaction = 2 ; // deprecated
-    optional google.protobuf.Struct transaction_receipt = 5 ; // deprecated
-    optional google.protobuf.Struct block = 6 ; // deprecated
+    optional google.protobuf.Struct transaction = 2 [deprecated = true]; // deprecated
+    optional google.protobuf.Struct transaction_receipt = 5 [deprecated = true]; // deprecated
+    optional google.protobuf.Struct block = 6 [deprecated = true]; // deprecated
     string raw_log = 7;
     optional string raw_transaction = 8;
     optional string raw_transaction_receipt = 9;
@@ -700,11 +700,11 @@ message Data {
     google.protobuf.Struct block = 2;
   }
   message EthTransaction {
-    google.protobuf.Struct transaction = 4 ; // deprecated
+    google.protobuf.Struct transaction = 4 [deprecated = true]; // deprecated
     google.protobuf.Timestamp timestamp = 5;
-    optional google.protobuf.Struct transaction_receipt = 3 ; // deprecated
-    optional google.protobuf.Struct block = 6 ; // deprecated
-    optional google.protobuf.Struct trace = 7 ; // deprecated
+    optional google.protobuf.Struct transaction_receipt = 3 [deprecated = true]; // deprecated
+    optional google.protobuf.Struct block = 6 [deprecated = true]; // deprecated
+    optional google.protobuf.Struct trace = 7 [deprecated = true]; // deprecated
     string raw_transaction = 8;
     optional string raw_transaction_receipt = 9;
     optional string raw_block = 10;
