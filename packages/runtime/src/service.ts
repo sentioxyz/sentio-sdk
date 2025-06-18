@@ -452,7 +452,9 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
 
         if (request.start) {
           if (!lastBinding) {
-            throw new ServerError(Status.INVALID_ARGUMENT, 'start request received without binding')
+            console.error('start request received without binding')
+            subject.error(new Error('start request received without binding'))
+            continue
           }
           this.startProcess(request.processId, lastBinding, contexts, subject)
         }
