@@ -440,10 +440,11 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
           lastBinding = request.binding
 
           if (this.enablePartition) {
-            const partitions = await PluginManager.INSTANCE.partition(request.binding)
-            subject.next({
-              processId: request.processId,
-              partitions
+            PluginManager.INSTANCE.partition(request.binding).then((partitions) => {
+              subject.next({
+                processId: request.processId,
+                partitions
+              })
             })
           } else {
             this.startProcess(request.processId, request.binding, contexts, subject)
