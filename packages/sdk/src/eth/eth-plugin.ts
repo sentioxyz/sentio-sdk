@@ -11,11 +11,6 @@ import { PartitionHandlerManager } from '../core/index.js'
 import {
   AccountConfig,
   ContractConfig,
-  Data_EthBlock,
-  Data_EthLog,
-  Data_EthTrace,
-  Data_EthTransaction,
-  DataBinding,
   HandlerType,
   LogFilter,
   LogHandlerConfig,
@@ -26,6 +21,8 @@ import {
   ProcessStreamResponse_Partitions,
   StartRequest
 } from '@sentio/protos'
+
+import { Data_EthBlock, Data_EthLog, Data_EthTrace, Data_EthTransaction, DataBinding } from '@sentio/runtime'
 
 import { ServerError, Status } from 'nice-grpc'
 import { EthProcessorState } from './binds.js'
