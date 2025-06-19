@@ -54,7 +54,7 @@ function getParsedData(rawData: string): any {
   }
 
   // Create a digest of the raw data for cache key
-  const digest = createHash('md5').update(rawData).digest('hex')
+  const digest = createHash('md5').update(rawData).digest('hex').substring(0, 8)
 
   // Check if we already have this data parsed
   let parsedData = PARSED_DATA_CACHE.get(digest)
