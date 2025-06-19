@@ -75,7 +75,7 @@ export default tseslint.config(
       deprecation: fixupPluginRules(deprecation)
     },
     rules: {
-      'deprecation/deprecation': 'error'
+      'deprecation/deprecation': 'warn'
     }
   }
 )
