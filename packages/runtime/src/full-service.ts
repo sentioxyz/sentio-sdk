@@ -21,6 +21,7 @@ import os from 'os'
 import { GLOBAL_CONFIG } from './global-config.js'
 import { compareSemver, parseSemver, Semver } from './utils.js'
 import { LRUCache } from 'lru-cache'
+import { createHash } from 'crypto'
 
 const require = createRequire(import.meta.url)
 
@@ -34,6 +35,37 @@ const ETH_USE_RAW_VERSION = parseSemver('2.57.9-rc.12')
 const PROCESSED_MOVE_EVENT_TX_HANDLER = new LRUCache<string, boolean>({
   max: 10000
 })
+
+const enableTxCache = process.env.ENABLE_PARSE_CACHE === 'true'
+
+// Cache for parsed JSON data
+const PARSED_DATA_CACHE = new LRUCache<string, any>({
+  max: enableTxCache ? 5000 : 1
+})
+
+/**
+ * Gets parsed JSON data from a string, using a cache to avoid repeated parsing
+ * @param rawData The raw string data to parse
+ * @returns The parsed JSON object
+ */
+function getParsedData(rawData: string): any {
+  if (!enableTxCache) {
+    return JSON.parse(rawData)
+  }
+
+  // Create a digest of the raw data for cache key
+  const digest = createHash('md5').update(rawData).digest('hex')
+
+  // Check if we already have this data parsed
+  let parsedData = PARSED_DATA_CACHE.get(digest)
+  if (!parsedData) {
+    // Parse and cache the data
+    parsedData = JSON.parse(rawData)
+    PARSED_DATA_CACHE.set(digest, parsedData)
+  }
+
+  return parsedData
+}
 
 function locatePackageJson(pkgId: string) {
   const m = require.resolve(pkgId)
@@ -173,19 +205,32 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
         const ethLog = dataBinding.data?.ethLog
         if (ethLog?.log == null && ethLog?.rawLog) {
           ethLog.log = JSON.parse(ethLog.rawLog)
-          ethLog.transaction = ethLog.rawTransaction ? JSON.parse(ethLog.rawTransaction) : undefined
-          ethLog.block = ethLog.rawBlock ? JSON.parse(ethLog.rawBlock) : undefined
-          ethLog.transactionReceipt = ethLog.rawTransactionReceipt
-            ? JSON.parse(ethLog.rawTransactionReceipt)
-            : undefined
+
+          if (ethLog.rawTransaction) {
+            ethLog.transaction = getParsedData(ethLog.rawTransaction)
+          }
+          if (ethLog.rawBlock) {
+            ethLog.block = getParsedData(ethLog.rawBlock)
+          }
+          if (ethLog.rawTransactionReceipt) {
+            ethLog.transactionReceipt = getParsedData(ethLog.rawTransactionReceipt)
+          }
         }
         break
       case HandlerType.ETH_TRANSACTION:
         const ethTx = dataBinding.data?.ethTransaction
         if (ethTx?.transaction == null && ethTx?.rawTransaction) {
-          ethTx.transaction = JSON.parse(ethTx.rawTransaction)
-          ethTx.block = ethTx.rawBlock ? JSON.parse(ethTx.rawBlock) : undefined
-          ethTx.transactionReceipt = ethTx.rawTransactionReceipt ? JSON.parse(ethTx.rawTransactionReceipt) : undefined
+          ethTx.transaction = getParsedData(ethTx.rawTransaction)
+          if (ethTx.rawBlock) {
+            ethTx.block = getParsedData(ethTx.rawBlock)
+          } else {
+            ethTx.block = undefined
+          }
+          if (ethTx.rawTransactionReceipt) {
+            ethTx.transactionReceipt = getParsedData(ethTx.rawTransactionReceipt)
+          } else {
+            ethTx.transactionReceipt = undefined
+          }
         }
         break
       case HandlerType.FUEL_TRANSACTION:
@@ -209,7 +254,8 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
         const aptEvent = dataBinding.data?.aptEvent
         if (aptEvent) {
           if (isBeforeMoveUseRawVersion && aptEvent.rawTransaction) {
-            const transaction = JSON.parse(aptEvent.rawTransaction)
+            const transaction = getParsedData(aptEvent.rawTransaction)
+
             const key = `${transaction.hash}-${dataBinding.handlerIds[0]}`
             if (PROCESSED_MOVE_EVENT_TX_HANDLER.has(key)) {
               console.debug('skip binding', key)
@@ -230,7 +276,7 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
         const aptCall = dataBinding.data?.aptCall
         if (aptCall) {
           if (isBeforeMoveUseRawVersion && aptCall.rawTransaction) {
-            aptCall.transaction = JSON.parse(aptCall.rawTransaction)
+            aptCall.transaction = getParsedData(aptCall.rawTransaction)
           }
         }
         break
@@ -246,7 +292,8 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
         const suiEvent = dataBinding.data?.suiEvent
         if (suiEvent) {
           if (isBeforeMoveUseRawVersion && suiEvent.rawTransaction) {
-            const transaction = JSON.parse(suiEvent.rawTransaction)
+            const transaction = getParsedData(suiEvent.rawTransaction)
+
             const key = `${transaction.digest}-${dataBinding.handlerIds[0]}`
             if (PROCESSED_MOVE_EVENT_TX_HANDLER.has(key)) {
               console.debug('skip binding', key)
@@ -267,7 +314,7 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
         const suiCall = dataBinding.data?.suiCall
         if (suiCall) {
           if (isBeforeMoveUseRawVersion && suiCall.rawTransaction) {
-            suiCall.transaction = JSON.parse(suiCall.rawTransaction)
+            suiCall.transaction = getParsedData(suiCall.rawTransaction)
           }
         }
         break
@@ -336,4 +383,3 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
 //     d.data?.ethTrace?.trace?.transactionPosition
 //   )
 // }
-//
