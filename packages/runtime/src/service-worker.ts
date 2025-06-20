@@ -5,7 +5,9 @@ import {
   Empty,
   ProcessConfigRequest,
   ProcessConfigResponse,
+  ProcessResult,
   ProcessStreamResponse,
+  ProcessStreamResponse_Partitions,
   StartRequest
 } from '@sentio/protos'
 import { CallContext, ServerError, Status } from 'nice-grpc'
@@ -85,11 +87,13 @@ async function start(request: StartRequest, options: any): Promise<Empty> {
 export default async function ({
   request,
   processId,
-  workerPort
+  workerPort,
+  partition
 }: {
   request: DataBinding
   processId: number
   workerPort?: MessagePort
+  partition?: boolean
 }) {
   const { startRequest, configRequest, options } = Piscina.workerData
   if (!started) {
@@ -100,12 +104,12 @@ export default async function ({
 
     if (startRequest) {
       await start(startRequest, options)
-      console.debug('worker started, template instance:', startRequest.templateInstances?.length, 'threadId:', threadId)
+      console.debug('worker', threadId, ' started, template instance:', startRequest.templateInstances?.length)
     }
 
     if (configRequest) {
       await getConfig(configRequest)
-      console.debug('worker configured')
+      console.debug('worker', threadId, ' configured')
     }
   }
 
@@ -125,16 +129,56 @@ export default async function ({
     )
   }
 
-  console.debug('Worker Processing request ', processId)
+  console.debug('Worker', threadId, 'starting request ', processId)
   const now = Date.now()
-  const result = await PluginManager.INSTANCE.processBinding(
-    request,
-    undefined,
-    workerPort ? new WorkerStoreContext(workerPort, processId) : undefined
-  )
-  console.debug('Worker processed request', processId, 'took', Date.now() - now)
-  recordRuntimeInfo(result, request.handlerType)
-  return result
+  const timeoutPromise = new Promise((resolve, reject) => {
+    setTimeout(
+      () => {
+        reject(
+          new RichServerError(
+            Status.DEADLINE_EXCEEDED,
+            `Request ${processId} timed out after ${options['request-timeout']} ms`
+          )
+        )
+      },
+      options['request-timeout'] ?? 60 * 1000
+    )
+  })
+  let resultPromise: Promise<ProcessResult | ProcessStreamResponse_Partitions>
+  if (partition) {
+    resultPromise = PluginManager.INSTANCE.partition(request)
+  } else {
+    resultPromise = PluginManager.INSTANCE.processBinding(
+      request,
+      undefined,
+      workerPort ? new WorkerStoreContext(workerPort, processId) : undefined
+    ).then((result) => {
+      recordRuntimeInfo(result, request.handlerType)
+      return result
+    })
+  }
+
+  try {
+    const result = await Promise.race([resultPromise, timeoutPromise])
+    console.debug('worker', threadId, 'finished request', processId, 'took', Date.now() - now)
+    return result
+  } catch (e) {
+    console.error('worker', threadId, 'failed request', processId, 'error:', e)
+    if (e instanceof RichServerError) {
+      throw e
+    } else {
+      throw new RichServerError(
+        Status.INTERNAL,
+        `Worker ${threadId} failed to process request ${processId}: ` + errorString(e),
+        [
+          DebugInfo.fromPartial({
+            detail: errorString(e),
+            stackEntries: e.stack?.split('\n')
+          })
+        ]
+      )
+    }
+  }
 }
 
 class WorkerStoreContext extends AbstractStoreContext {

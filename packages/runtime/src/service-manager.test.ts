@@ -81,6 +81,7 @@ describe('Test Service Manager with worker', () => {
         data: {},
         handlerIds: []
       },
+      1,
       undefined
     )
     assert.equal(result.states?.configUpdated, true)
@@ -104,6 +105,7 @@ describe('Test Service Manager with worker', () => {
         data: {},
         handlerIds: []
       },
+      1,
       context
     )
 
