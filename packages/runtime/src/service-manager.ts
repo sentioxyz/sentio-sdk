@@ -265,7 +265,8 @@ export class ChannelStoreContext implements IStoreContext {
   }
 
   error(processId: number, e: any): void {
-    console.error('process error', processId, e)
+    const stack = new Error().stack
+    console.error('process error', processId, e, stack)
     const errorResult = ProcessResult.create({
       states: {
         error: e?.toString()
