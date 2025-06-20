@@ -12,6 +12,7 @@ import {
   ProcessResult,
   ProcessStreamRequest,
   ProcessStreamResponse,
+  ProcessStreamResponse_Partitions,
   StartRequest
 } from '@sentio/protos'
 
@@ -119,22 +120,15 @@ export class ServiceManager extends ProcessorServiceImpl {
     }
   }
 
-  private async doPartition(
-    processId: number,
-    binding: DataBinding,
-    subject: Subject<DeepPartial<ProcessStreamResponse>>
-  ) {
-    if (!this.pool) {
-      await this.initPool()
-    }
+  private doPartition(processId: number, binding: DataBinding, subject: Subject<DeepPartial<ProcessStreamResponse>>) {
     const dbContext = this.contexts.new(processId, subject)
     const start = Date.now()
 
     this.process(binding, processId, dbContext, true)
-      .then(async (result) => {
+      .then(async (partitions) => {
         console.debug('partition', processId, 'finished, took:', Date.now() - start)
         subject.next({
-          result,
+          partitions: partitions as ProcessStreamResponse_Partitions,
           processId: processId
         })
       })
@@ -158,7 +152,7 @@ export class ServiceManager extends ProcessorServiceImpl {
       .then(async (result) => {
         console.debug('process', processId, 'finished, took:', Date.now() - start)
         subject.next({
-          result,
+          result: result as ProcessResult,
           processId: processId
         })
       })
@@ -179,7 +173,7 @@ export class ServiceManager extends ProcessorServiceImpl {
     processId: number,
     dbContext?: ChannelStoreContext,
     partition: boolean = false
-  ): Promise<ProcessResult> {
+  ): Promise<ProcessResult | ProcessStreamResponse_Partitions> {
     if (!this.pool) {
       await this.initPool()
     }
