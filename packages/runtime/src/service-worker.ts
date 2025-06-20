@@ -38,6 +38,9 @@ process
     unhandled = reason as Error
     // shutdownServers(1)
   })
+  .on('exit', () => {
+    console.info('Worker thread exiting, threadId:', threadId)
+  })
 
 async function getConfig(request: ProcessConfigRequest, context?: CallContext): Promise<ProcessConfigResponse> {
   if (!started) {
@@ -97,7 +100,7 @@ export default async function ({
 
     if (startRequest) {
       await start(startRequest, options)
-      console.debug('worker started, template instance:', startRequest.templateInstances?.length)
+      console.debug('worker started, template instance:', startRequest.templateInstances?.length, 'threadId:', threadId)
     }
 
     if (configRequest) {
@@ -109,6 +112,7 @@ export default async function ({
   if (unhandled) {
     const err = unhandled
     unhandled = undefined
+    console.error('Unhandled exception/rejection in previous request:', err)
     throw new RichServerError(
       Status.UNAVAILABLE,
       'Unhandled exception/rejection in previous request: ' + errorString(err),
@@ -121,11 +125,14 @@ export default async function ({
     )
   }
 
+  console.debug('Worker Processing request ', processId)
+  const now = Date.now()
   const result = await PluginManager.INSTANCE.processBinding(
     request,
     undefined,
     workerPort ? new WorkerStoreContext(workerPort, processId) : undefined
   )
+  console.debug('Worker processed request', processId, 'took', Date.now() - now)
   recordRuntimeInfo(result, request.handlerType)
   return result
 }
