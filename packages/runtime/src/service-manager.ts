@@ -77,9 +77,8 @@ export class ServiceManager extends ProcessorServiceImpl {
     requests: AsyncIterable<ProcessStreamRequest>,
     subject: Subject<DeepPartial<ProcessStreamResponse>>
   ) {
+    let lastBinding: DataBinding | undefined = undefined
     for await (const request of requests) {
-      let lastBinding: DataBinding | undefined = undefined
-
       try {
         // console.debug('received request:', request)
         if (request.binding) {
