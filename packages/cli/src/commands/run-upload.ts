@@ -262,8 +262,10 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth, continu
 
   if (continueFrom) {
     const res = await getProcessorStatus(options.host, auth, options.project)
-    const data = (await res.json()) as { processors: { version: number }[] }
-    const found = data?.processors?.find((x) => x.version == continueFrom)
+    const data = (await res.json()) as { processors: { version: number; versionState: string }[] }
+    const found = data?.processors?.find(
+      (x) => x.version == continueFrom && (x.versionState == 'RUNNING' || x.versionState == 'PENDING')
+    )
     if (found) {
       if (!options.silentOverwrite) {
         const confirmed = await confirm(`Continue from version ${continueFrom}?`)
@@ -406,7 +408,7 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth, continu
 }
 
 async function getProcessorStatus(host: string, auth: Auth, projectSlug: string) {
-  const url = new URL(`/api/v1/processors/${projectSlug}/status`, host)
+  const url = new URL(`/api/v1/processors/${projectSlug}/status?version=ALL`, host)
   return fetch(url.href, {
     headers: {
       ...auth
