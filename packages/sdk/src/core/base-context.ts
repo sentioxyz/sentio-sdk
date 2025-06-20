@@ -2,7 +2,7 @@ import { ProcessResult, RecordMetaData } from '@sentio/protos'
 import { EventLoggerBinding, EventLoggerBindingNew } from './event-logger.js'
 import { Meter, Labels, MeterNew } from './meter.js'
 import { ChainId } from '@sentio/chain'
-import { mergeProcessResults, PluginManager } from '@sentio/runtime'
+import { mergeProcessResultsInPlace, PluginManager } from '@sentio/runtime'
 import { Required } from 'utility-types'
 import { ServerError, Status } from 'nice-grpc'
 import { Store } from '../store/store.js'
@@ -29,7 +29,7 @@ export abstract class BaseContext {
 
   public update(res: Partial<ProcessResult>) {
     if (this.active) {
-      this._res = mergeProcessResults([this._res, ProcessResult.fromPartial(res)])
+      mergeProcessResultsInPlace(this._res, [ProcessResult.fromPartial(res)])
     } else {
       throw new ServerError(Status.INTERNAL, 'context not active, possible async function invoke without await')
     }
