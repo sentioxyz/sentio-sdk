@@ -2,7 +2,7 @@ import { after, before, describe, test } from 'node:test'
 import assert from 'assert'
 import { ChannelStoreContext, ServiceManager } from './service-manager.js'
 import { CallContext } from 'nice-grpc-common'
-import { DeepPartial, HandlerType, ProcessStreamRequest, ProcessStreamResponse } from '@sentio/protos'
+import { DeepPartial, HandlerType, ProcessResult, ProcessStreamRequest, ProcessStreamResponse } from '@sentio/protos'
 import { Subject } from 'rxjs'
 
 class AsyncPushGenerator<T> {
@@ -75,7 +75,7 @@ describe('Test Service Manager with worker', () => {
   })
 
   test('Check run processbinding in worker', async () => {
-    const result = await service.process(
+    const result = (await service.process(
       {
         handlerType: HandlerType.UNKNOWN,
         data: {},
@@ -83,7 +83,7 @@ describe('Test Service Manager with worker', () => {
       },
       1,
       undefined
-    )
+    )) as ProcessResult
     assert.equal(result.states?.configUpdated, true)
   })
 
