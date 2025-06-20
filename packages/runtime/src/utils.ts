@@ -19,16 +19,24 @@ export function mergeProcessResultsInPlace(
 ): Required<ProcessResult, 'states'> {
   res.states = res.states || StateResult.create()
   for (const r of results) {
-    res.counters.push(...r.counters)
-    res.gauges.push(...r.gauges)
-    res.events.push(...r.events)
-    res.exports.push(...r.exports)
-    res.timeseriesResult.push(...r.timeseriesResult)
+    // not using spread operator since it puts all element on the stack
+    // cause maximum call stack size exceeded error if it's a large array
+    mergeArrayInPlace(res.counters, r.counters)
+    mergeArrayInPlace(res.gauges, r.gauges)
+    mergeArrayInPlace(res.events, r.events)
+    mergeArrayInPlace(res.exports, r.exports)
+    mergeArrayInPlace(res.timeseriesResult, r.timeseriesResult)
     res.states = {
       configUpdated: res.states?.configUpdated || r.states?.configUpdated || false
     }
   }
   return res
+}
+
+function mergeArrayInPlace<T>(dst: T[], src: T[]) {
+  for (const r of src) {
+    dst.push(r)
+  }
 }
 
 export function errorString(e: Error): string {
