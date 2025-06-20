@@ -95,9 +95,6 @@ export abstract class AbstractStoreContext implements IStoreContext {
 
     return Promise.race(promises)
       .then((result: DBResponse) => {
-        if (timeoutSecs) {
-          console.debug('db request', requestType, 'op', opId, ' took', Date.now() - start, 'ms')
-        }
         request_times[requestType]?.add(Date.now() - start)
         return result
       })

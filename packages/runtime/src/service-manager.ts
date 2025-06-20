@@ -82,8 +82,8 @@ export class ServiceManager extends ProcessorServiceImpl {
       try {
         // console.debug('received request:', request)
         if (request.binding) {
+          lastBinding = request.binding
           process_binding_count.add(1)
-
           // Adjust binding will make some request become invalid by setting UNKNOWN HandlerType
           // for older SDK version, so we just return empty result for them here
           if (request.binding.handlerType === HandlerType.UNKNOWN) {
@@ -93,15 +93,8 @@ export class ServiceManager extends ProcessorServiceImpl {
             })
             continue
           }
-
           if (this.enablePartition) {
-            PluginManager.INSTANCE.partition(request.binding).then((partitions) => {
-              subject.next({
-                processId: request.processId,
-                partitions
-              })
-            })
-            lastBinding = request.binding
+            this.doPartition(request.processId, request.binding, subject)
           } else {
             this.doProcess(request.processId, request.binding, subject)
           }
@@ -127,12 +120,20 @@ export class ServiceManager extends ProcessorServiceImpl {
     }
   }
 
-  private doProcess(processId: number, binding: DataBinding, subject: Subject<DeepPartial<ProcessStreamResponse>>) {
+  private async doPartition(
+    processId: number,
+    binding: DataBinding,
+    subject: Subject<DeepPartial<ProcessStreamResponse>>
+  ) {
+    if (!this.pool) {
+      await this.initPool()
+    }
     const dbContext = this.contexts.new(processId, subject)
-
     const start = Date.now()
-    this.process(binding, dbContext)
+
+    this.process(binding, processId, dbContext, true)
       .then(async (result) => {
+        console.debug('partition', processId, 'finished, took:', Date.now() - start)
         subject.next({
           result,
           processId: processId
@@ -141,6 +142,7 @@ export class ServiceManager extends ProcessorServiceImpl {
       .catch((e) => {
         dbContext.error(processId, e)
         process_binding_error.add(1)
+        console.error('partition', processId, 'failed, took:', Date.now() - start)
       })
       .finally(() => {
         const cost = Date.now() - start
@@ -149,13 +151,42 @@ export class ServiceManager extends ProcessorServiceImpl {
       })
   }
 
-  async process(request: DataBinding, dbContext?: ChannelStoreContext): Promise<ProcessResult> {
+  private doProcess(processId: number, binding: DataBinding, subject: Subject<DeepPartial<ProcessStreamResponse>>) {
+    const dbContext = this.contexts.new(processId, subject)
+
+    const start = Date.now()
+    this.process(binding, processId, dbContext, false)
+      .then(async (result) => {
+        console.debug('process', processId, 'finished, took:', Date.now() - start)
+        subject.next({
+          result,
+          processId: processId
+        })
+      })
+      .catch((e) => {
+        dbContext.error(processId, e)
+        process_binding_error.add(1)
+        console.error('process', processId, 'failed, took:', Date.now() - start)
+      })
+      .finally(() => {
+        const cost = Date.now() - start
+        process_binding_time.add(cost)
+        this.contexts.delete(processId)
+      })
+  }
+
+  async process(
+    request: DataBinding,
+    processId: number,
+    dbContext?: ChannelStoreContext,
+    partition: boolean = false
+  ): Promise<ProcessResult> {
     if (!this.pool) {
       await this.initPool()
     }
 
     return this.pool.run(
-      { request, workerPort: dbContext?.workerPort },
+      { request, workerPort: dbContext?.workerPort, partition, processId },
       { transferList: dbContext?.workerPort ? [dbContext?.workerPort] : [] }
     )
   }
@@ -181,8 +212,6 @@ export class ServiceManager extends ProcessorServiceImpl {
   }
 }
 
-export type WorkerMessage = DBRequest & { processId: number }
-
 class Contexts {
   private contexts: Map<number, ChannelStoreContext> = new Map()
 
@@ -191,7 +220,11 @@ class Contexts {
   }
 
   new(processId: number, subject: Subject<DeepPartial<ProcessStreamResponse>>) {
-    const context = new ChannelStoreContext(subject, processId)
+    let context = this.get(processId)
+    if (context) {
+      return context
+    }
+    context = new ChannelStoreContext(subject, processId)
     this.contexts.set(processId, context)
     return context
   }
