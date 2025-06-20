@@ -141,7 +141,7 @@ export default async function ({
           )
         )
       },
-      options['request-timeout'] ?? 60 * 1000
+      (options['process-timeout'] ?? 60) * 1000
     )
   })
   let resultPromise: Promise<ProcessResult | ProcessStreamResponse_Partitions>
@@ -160,10 +160,17 @@ export default async function ({
 
   try {
     const result = await Promise.race([resultPromise, timeoutPromise])
-    console.debug('worker', threadId, 'finished request', processId, 'took', Date.now() - now)
+    console.debug(
+      'worker',
+      threadId,
+      `finished ${partition ? 'partition' : 'process'} request`,
+      processId,
+      'took',
+      Date.now() - now
+    )
     return result
   } catch (e) {
-    console.error('worker', threadId, 'failed request', processId, 'error:', e)
+    console.error('worker', threadId, `failed ${partition ? 'partition' : 'process'} request`, processId, 'error:', e)
     if (e instanceof RichServerError) {
       throw e
     } else {
