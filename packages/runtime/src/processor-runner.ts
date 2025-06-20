@@ -49,7 +49,8 @@ export const optionDefinitions = [
   { name: 'debug', type: Boolean, defaultValue: false },
   { name: 'otlp-debug', type: Boolean, defaultValue: false },
   { name: 'start-action-server', type: Boolean, defaultValue: false },
-  { name: 'worker', type: Number, defaultValue: workerNum }
+  { name: 'worker', type: Number, defaultValue: workerNum },
+  { name: 'process-timeout', type: Number, defaultValue: 60 } // 60 seconds
 ]
 
 const options = commandLineArgs(optionDefinitions, { partial: true })

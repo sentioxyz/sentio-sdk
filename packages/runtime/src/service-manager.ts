@@ -22,7 +22,6 @@ import { processMetrics } from './metrics.js'
 import { MessageChannel } from 'node:worker_threads'
 import { ProcessorServiceImpl } from './service.js'
 import { TemplateInstanceState } from './state.js'
-import { PluginManager } from './plugin.js'
 
 const { process_binding_count, process_binding_time, process_binding_error } = processMetrics
 
