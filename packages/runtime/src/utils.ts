@@ -10,13 +10,20 @@ export function mergeProcessResults(results: ProcessResult[]): Required<ProcessR
     ...ProcessResultFull.create(),
     states: StateResult.create()
   }
+  return mergeProcessResultsInPlace(res, results)
+}
 
+export function mergeProcessResultsInPlace(
+  res: ProcessResult,
+  results: ProcessResult[]
+): Required<ProcessResult, 'states'> {
+  res.states = res.states || StateResult.create()
   for (const r of results) {
-    res.counters = res.counters.concat(r.counters)
-    res.gauges = res.gauges.concat(r.gauges)
-    res.events = res.events.concat(r.events)
-    res.exports = res.exports.concat(r.exports)
-    res.timeseriesResult = res.timeseriesResult.concat(r.timeseriesResult)
+    res.counters.push(...r.counters)
+    res.gauges.push(...r.gauges)
+    res.events.push(...r.events)
+    res.exports.push(...r.exports)
+    res.timeseriesResult.push(...r.timeseriesResult)
     res.states = {
       configUpdated: res.states?.configUpdated || r.states?.configUpdated || false
     }
