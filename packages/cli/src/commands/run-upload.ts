@@ -264,7 +264,7 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth, continu
     const res = await getProcessorStatus(options.host, auth, options.project)
     const data = (await res.json()) as { processors: { version: number; versionState: string }[] }
     const found = data?.processors?.find(
-      (x) => x.version == continueFrom && (x.versionState == 'RUNNING' || x.versionState == 'PENDING')
+      (x) => x.version == continueFrom && (x.versionState == 'ACTIVE' || x.versionState == 'PENDING')
     )
     if (found) {
       if (!options.silentOverwrite) {
