@@ -1,6 +1,6 @@
 import { Plugin, PluginManager } from './plugin.js'
 import { DataBinding, HandlerType, ProcessResult } from './gen/processor/protos/processor.js'
-import { ProcessStreamResponse_Partitions, ProcessStreamResponse_Partitions_Partition_SysValue } from '@sentio/protos'
+import { ProcessStreamResponse_Partitions } from '@sentio/protos'
 
 class TestPlugin extends Plugin {
   async processBinding(request: DataBinding): Promise<ProcessResult> {

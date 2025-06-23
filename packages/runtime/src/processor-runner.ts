@@ -50,7 +50,13 @@ export const optionDefinitions = [
   { name: 'otlp-debug', type: Boolean, defaultValue: false },
   { name: 'start-action-server', type: Boolean, defaultValue: false },
   { name: 'worker', type: Number, defaultValue: workerNum },
-  { name: 'process-timeout', type: Number, defaultValue: 60 } // 60 seconds
+  { name: 'process-timeout', type: Number, defaultValue: 60 },
+  { name: 'worker-timeout', type: Number, defaultValue: 60 },
+  {
+    name: 'enable-partition',
+    type: Boolean,
+    defaultValue: process.env['SENTIO_ENABLE_BINDING_DATA_PARTITION'] === 'true'
+  }
 ]
 
 const options = commandLineArgs(optionDefinitions, { partial: true })
@@ -89,9 +95,9 @@ if (options['start-action-server']) {
     .use(errorDetailsServerMiddleware)
 
   if (options.worker > 1) {
-    baseService = new ServiceManager(options, loader, server.shutdown)
+    baseService = new ServiceManager(loader, options, server.shutdown)
   } else {
-    baseService = new ProcessorServiceImpl(loader, server.shutdown)
+    baseService = new ProcessorServiceImpl(loader, options, server.shutdown)
   }
 
   const service = new FullProcessorServiceImpl(baseService)

@@ -1,28 +1,20 @@
 import {
-  DataBinding,
-  DBResponse,
   DeepPartial,
   Empty,
   ProcessConfigRequest,
-  ProcessConfigResponse,
-  ProcessResult,
   ProcessStreamRequest,
   ProcessStreamResponse,
-  ProcessStreamResponse_Partitions,
   StartRequest
 } from '@sentio/protos'
 import { CallContext, ServerError, Status } from 'nice-grpc'
-import { PluginManager } from './plugin.js'
 import { errorString } from './utils.js'
 import { freezeGlobalConfig } from './global-config.js'
 import { DebugInfo, RichServerError } from 'nice-grpc-error-details'
-import { recordRuntimeInfo } from './service.js'
+import { ProcessorServiceImpl } from './service.js'
 import { BroadcastChannel, MessagePort, threadId } from 'worker_threads'
 import { Piscina } from 'piscina'
 import { configureEndpoints } from './endpoints.js'
 import { setupLogger } from './logger.js'
-import { AbstractStoreContext } from './db-context.js'
-import { ProcessorServiceImpl } from './service.js'
 import { Subject } from 'rxjs'
 
 let started = false
@@ -71,7 +63,7 @@ async function start(request: StartRequest, options: any): Promise<Empty> {
   freezeGlobalConfig()
 
   try {
-    service = new ProcessorServiceImpl(() => loader(options))
+    service = new ProcessorServiceImpl(() => loader(options), options)
   } catch (e) {
     throw new ServerError(Status.INVALID_ARGUMENT, 'Failed to load processor: ' + errorString(e))
   }
@@ -134,7 +126,7 @@ export default async function ({
         workerPort.close()
       }
     })
-    workerPort.on('message', async (msg: ProcessStreamRequest) => {
+    workerPort.on('message', (msg: ProcessStreamRequest) => {
       const request = msg as ProcessStreamRequest
       service?.handleRequest(request, firstRequest.binding, subject)
     })
