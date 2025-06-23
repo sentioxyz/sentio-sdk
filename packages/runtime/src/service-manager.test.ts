@@ -70,6 +70,7 @@ describe('Test Service Manager with worker without partition', () => {
     })
 
     await service.handleSingleRequest(request1, subject)
+    await new Promise((resolve) => setTimeout(resolve, 200)) // wait for async processing
     assert.strictEqual(i, 2, 'Should have processed two responses')
 
     assert.ok(result, 'Result should be present in the response')
@@ -153,7 +154,7 @@ describe('Test Service Manager with worker with partition', () => {
     })
 
     await service.handleSingleRequest(request1, subject)
-
+    await new Promise((resolve) => setTimeout(resolve, 200)) // wait for async processing
     assert.strictEqual(i, 3, 'Should have processed three responses')
   })
 })
