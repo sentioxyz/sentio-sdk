@@ -58,7 +58,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
   private preparedData: PreparedData | undefined
   readonly enablePartition: boolean
 
-  constructor(loader: () => Promise<any>, shutdownHandler?: () => void) {
+  constructor(loader: () => Promise<any>, options?: any, shutdownHandler?: () => void) {
     this.loader = loader
     this.shutdownHandler = shutdownHandler
 
@@ -66,7 +66,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       ? process.env['ENABLE_PREPROCESS'].toLowerCase() == 'true'
       : false
 
-    this.enablePartition = process.env['SENTIO_ENABLE_BINDING_DATA_PARTITION'] == 'true'
+    this.enablePartition = options?.['enable-partition'] == true
   }
 
   async getConfig(request: ProcessConfigRequest, context: CallContext): Promise<ProcessConfigResponse> {
@@ -416,58 +416,20 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     yield* from(subject).pipe(withAbort(context.signal))
   }
 
+  private dbContexts = new Contexts()
+
   protected async handleRequests(
     requests: AsyncIterable<ProcessStreamRequest>,
     subject: Subject<DeepPartial<ProcessStreamResponse>>
   ) {
-    const contexts = new Contexts()
     let lastBinding: DataBinding | undefined = undefined
     for await (const request of requests) {
       try {
         // console.log('received request:', request, 'lastBinding:', lastBinding)
         if (request.binding) {
-          process_binding_count.add(1)
-
-          // Adjust binding will make some request become invalid by setting UNKNOWN HandlerType
-          // for older SDK version, so we just return empty result for them here
-          if (request.binding.handlerType === HandlerType.UNKNOWN) {
-            subject.next({
-              processId: request.processId,
-              result: ProcessResult.create()
-            })
-            continue
-          }
           lastBinding = request.binding
-
-          if (this.enablePartition) {
-            PluginManager.INSTANCE.partition(request.binding).then((partitions) => {
-              subject.next({
-                processId: request.processId,
-                partitions
-              })
-            })
-          } else {
-            this.startProcess(request.processId, request.binding, contexts, subject)
-          }
         }
-
-        if (request.start) {
-          if (!lastBinding) {
-            console.error('start request received without binding')
-            subject.error(new Error('start request received without binding'))
-            continue
-          }
-          this.startProcess(request.processId, lastBinding, contexts, subject)
-        }
-
-        if (request.dbResult) {
-          const dbContext = contexts.get(request.processId)
-          try {
-            dbContext?.result(request.dbResult)
-          } catch (e) {
-            subject.error(new Error('db result error, process should stop'))
-          }
-        }
+        this.handleRequest(request, lastBinding, subject)
       } catch (e) {
         // should not happen
         console.error('unexpect error during handle loop', e)
@@ -475,13 +437,62 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     }
   }
 
-  private startProcess(
-    processId: number,
-    binding: DataBinding,
-    contexts: Contexts,
+  async handleRequest(
+    request: ProcessStreamRequest,
+    lastBinding: DataBinding | undefined,
     subject: Subject<DeepPartial<ProcessStreamResponse>>
   ) {
-    const dbContext = contexts.new(processId, subject)
+    if (request.binding) {
+      process_binding_count.add(1)
+
+      // Adjust binding will make some request become invalid by setting UNKNOWN HandlerType
+      // for older SDK version, so we just return empty result for them here
+      if (request.binding.handlerType === HandlerType.UNKNOWN) {
+        subject.next({
+          processId: request.processId,
+          result: ProcessResult.create()
+        })
+        return
+      }
+
+      if (this.enablePartition) {
+        try {
+          const partitions = await PluginManager.INSTANCE.partition(request.binding)
+          subject.next({
+            processId: request.processId,
+            partitions
+          })
+        } catch (e) {
+          console.error('Partition error:', e)
+          subject.error(new Error('Partition error: ' + errorString(e)))
+          return
+        }
+      } else {
+        this.startProcess(request.processId, request.binding, subject)
+      }
+    }
+
+    if (request.start) {
+      if (!lastBinding) {
+        console.error('start request received without binding')
+        subject.error(new Error('start request received without binding'))
+        return
+      }
+      this.startProcess(request.processId, lastBinding, subject)
+    }
+
+    if (request.dbResult) {
+      const dbContext = this.dbContexts.get(request.processId)
+      try {
+        dbContext?.result(request.dbResult)
+      } catch (e) {
+        subject.error(new Error('db result error, process should stop'))
+      }
+    }
+  }
+
+  private startProcess(processId: number, binding: DataBinding, subject: Subject<DeepPartial<ProcessStreamResponse>>) {
+    const dbContext = this.dbContexts.new(processId, subject)
     const start = Date.now()
     PluginManager.INSTANCE.processBinding(binding, this.preparedData, dbContext)
       .then(async (result) => {
@@ -501,7 +512,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       .finally(() => {
         const cost = Date.now() - start
         process_binding_time.add(cost)
-        contexts.delete(processId)
+        this.dbContexts.delete(processId)
       })
   }
 }

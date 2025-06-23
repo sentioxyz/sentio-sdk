@@ -22,7 +22,7 @@ describe('Test seq mode', () => {
   const baseService = new ProcessorServiceImpl(async () => {
     PluginManager.INSTANCE.plugins = []
     PluginManager.INSTANCE.register(new TestPlugin())
-  })
+  }, {})
   const service = new FullProcessorServiceImpl(baseService)
 
   before(async () => {

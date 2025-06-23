@@ -45,3 +45,4 @@ ignore:
   - packages/sdk/src/tests
   - packages/action/node_modules
   - packages/action/lib
+  - .claude

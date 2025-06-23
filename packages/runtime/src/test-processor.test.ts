@@ -1,5 +1,6 @@
 import { Plugin, PluginManager } from './plugin.js'
 import { DataBinding, HandlerType, ProcessResult } from './gen/processor/protos/processor.js'
+import { ProcessStreamResponse_Partitions } from '@sentio/protos'
 
 class TestPlugin extends Plugin {
   async processBinding(request: DataBinding): Promise<ProcessResult> {
@@ -20,6 +21,20 @@ class TestPlugin extends Plugin {
     })
   }
   supportedHandlers = [HandlerType.UNKNOWN, HandlerType.ETH_LOG]
+
+  async partition(request: DataBinding): Promise<ProcessStreamResponse_Partitions> {
+    return {
+      partitions: request.handlerIds.reduce(
+        (acc, id) => ({
+          ...acc,
+          [id]: {
+            userValue: 'test'
+          }
+        }),
+        {}
+      )
+    }
+  }
 }
 
 PluginManager.INSTANCE.plugins = []

@@ -1,26 +1,21 @@
 import {
-  DataBinding,
-  DBResponse,
   DeepPartial,
   Empty,
   ProcessConfigRequest,
-  ProcessConfigResponse,
-  ProcessResult,
+  ProcessStreamRequest,
   ProcessStreamResponse,
-  ProcessStreamResponse_Partitions,
   StartRequest
 } from '@sentio/protos'
 import { CallContext, ServerError, Status } from 'nice-grpc'
-import { PluginManager } from './plugin.js'
 import { errorString } from './utils.js'
 import { freezeGlobalConfig } from './global-config.js'
 import { DebugInfo, RichServerError } from 'nice-grpc-error-details'
-import { recordRuntimeInfo } from './service.js'
+import { ProcessorServiceImpl } from './service.js'
 import { BroadcastChannel, MessagePort, threadId } from 'worker_threads'
 import { Piscina } from 'piscina'
 import { configureEndpoints } from './endpoints.js'
 import { setupLogger } from './logger.js'
-import { AbstractStoreContext } from './db-context.js'
+import { Subject } from 'rxjs'
 
 let started = false
 
@@ -44,15 +39,7 @@ process
     console.info('Worker thread exiting, threadId:', threadId)
   })
 
-async function getConfig(request: ProcessConfigRequest, context?: CallContext): Promise<ProcessConfigResponse> {
-  if (!started) {
-    throw new ServerError(Status.UNAVAILABLE, 'Service Not started.')
-  }
-
-  const newConfig = ProcessConfigResponse.fromPartial({})
-  await PluginManager.INSTANCE.configure(newConfig)
-  return newConfig
-}
+let service: ProcessorServiceImpl | undefined
 
 const loader = async (options: any) => {
   if (options.target) {
@@ -64,8 +51,10 @@ const loader = async (options: any) => {
 
 const configureChannel = new BroadcastChannel('configure_channel')
 configureChannel.onmessage = (request: ProcessConfigRequest) => {
-  getConfig(request)
+  service?.getConfig(request, emptyCallContext)
 }
+
+const emptyCallContext = <CallContext>{}
 
 async function start(request: StartRequest, options: any): Promise<Empty> {
   if (started) {
@@ -74,26 +63,24 @@ async function start(request: StartRequest, options: any): Promise<Empty> {
   freezeGlobalConfig()
 
   try {
-    await loader(options)
+    service = new ProcessorServiceImpl(() => loader(options), options)
   } catch (e) {
     throw new ServerError(Status.INVALID_ARGUMENT, 'Failed to load processor: ' + errorString(e))
   }
 
-  await PluginManager.INSTANCE.start(request)
+  await service.start(request, emptyCallContext)
   started = true
   return {}
 }
 
 export default async function ({
-  request,
   processId,
-  workerPort,
-  partition
+  request: firstRequest,
+  workerPort
 }: {
-  request: DataBinding
   processId: number
-  workerPort?: MessagePort
-  partition?: boolean
+  request: ProcessStreamRequest
+  workerPort: MessagePort
 }) {
   const { startRequest, configRequest, options } = Piscina.workerData
   if (!started) {
@@ -108,7 +95,7 @@ export default async function ({
     }
 
     if (configRequest) {
-      await getConfig(configRequest)
+      await service?.getConfig(configRequest, emptyCallContext)
       console.debug('worker', threadId, ' configured')
     }
   }
@@ -129,80 +116,20 @@ export default async function ({
     )
   }
 
-  console.debug('Worker', threadId, 'starting request ', processId)
-  const now = Date.now()
-  const timeoutPromise = new Promise((resolve, reject) => {
-    setTimeout(
-      () => {
-        reject(
-          new RichServerError(
-            Status.DEADLINE_EXCEEDED,
-            `Request ${processId} timed out after ${options['request-timeout']} ms`
-          )
-        )
-      },
-      (options['process-timeout'] ?? 60) * 1000
-    )
+  await new Promise<void>((resolve) => {
+    const subject = new Subject<DeepPartial<ProcessStreamResponse>>()
+    subject.subscribe((resp: ProcessStreamResponse) => {
+      workerPort.postMessage(resp)
+      // receive the response from the processor , close and resolve the promise
+      if (resp.result) {
+        resolve()
+        workerPort.close()
+      }
+    })
+    workerPort.on('message', (msg: ProcessStreamRequest) => {
+      const request = msg as ProcessStreamRequest
+      service?.handleRequest(request, firstRequest.binding, subject)
+    })
+    service?.handleRequest(firstRequest, firstRequest.binding, subject)
   })
-  let resultPromise: Promise<ProcessResult | ProcessStreamResponse_Partitions>
-  if (partition) {
-    resultPromise = PluginManager.INSTANCE.partition(request)
-  } else {
-    resultPromise = PluginManager.INSTANCE.processBinding(
-      request,
-      undefined,
-      workerPort ? new WorkerStoreContext(workerPort, processId) : undefined
-    ).then((result) => {
-      recordRuntimeInfo(result, request.handlerType)
-      return result
-    })
-  }
-
-  try {
-    const result = await Promise.race([resultPromise, timeoutPromise])
-    console.debug(
-      'worker',
-      threadId,
-      `finished ${partition ? 'partition' : 'process'} request`,
-      processId,
-      'took',
-      Date.now() - now
-    )
-    return result
-  } catch (e) {
-    console.error('worker', threadId, `failed ${partition ? 'partition' : 'process'} request`, processId, 'error:', e)
-    if (e instanceof RichServerError) {
-      throw e
-    } else {
-      throw new RichServerError(
-        Status.INTERNAL,
-        `Worker ${threadId} failed to process request ${processId}: ` + errorString(e),
-        [
-          DebugInfo.fromPartial({
-            detail: errorString(e),
-            stackEntries: e.stack?.split('\n')
-          })
-        ]
-      )
-    }
-  }
-}
-
-class WorkerStoreContext extends AbstractStoreContext {
-  constructor(
-    readonly port: MessagePort,
-    processId: number
-  ) {
-    super(processId)
-    this.port.on('message', (resp: DBResponse) => {
-      this.result(resp)
-    })
-    this.port.on('close', () => {
-      this.close()
-    })
-  }
-
-  doSend(req: DeepPartial<ProcessStreamResponse>): void {
-    this.port.postMessage(req)
-  }
 }

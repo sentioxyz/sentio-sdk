@@ -1,12 +1,8 @@
-import { CallContext, ServerError, Status } from 'nice-grpc'
+import { CallContext } from 'nice-grpc'
 import { Piscina } from 'piscina'
 import {
-  DataBinding,
-  DBRequest,
-  DBResponse,
   DeepPartial,
   Empty,
-  HandlerType,
   ProcessConfigRequest,
   ProcessConfigResponse,
   ProcessResult,
@@ -15,17 +11,11 @@ import {
   ProcessStreamResponse_Partitions,
   StartRequest
 } from '@sentio/protos'
-
-import { IStoreContext } from './db-context.js'
 import { Subject } from 'rxjs'
 
-import { processMetrics } from './metrics.js'
 import { MessageChannel } from 'node:worker_threads'
 import { ProcessorServiceImpl } from './service.js'
 import { TemplateInstanceState } from './state.js'
-
-const { process_binding_count, process_binding_time, process_binding_error } = processMetrics
-
 ;(BigInt.prototype as any).toJSON = function () {
   return this.toString()
 }
@@ -35,11 +25,11 @@ export class ServiceManager extends ProcessorServiceImpl {
   private workerData: any = {}
 
   constructor(
-    readonly options: any,
     loader: () => Promise<any>,
+    readonly options: any,
     shutdownHandler?: () => void
   ) {
-    super(loader, shutdownHandler)
+    super(loader, options, shutdownHandler)
     this.workerData.options = options
   }
 
@@ -77,110 +67,47 @@ export class ServiceManager extends ProcessorServiceImpl {
     requests: AsyncIterable<ProcessStreamRequest>,
     subject: Subject<DeepPartial<ProcessStreamResponse>>
   ) {
-    let lastBinding: DataBinding | undefined = undefined
+    if (!this.pool) {
+      await this.initPool()
+    }
     for await (const request of requests) {
-      try {
-        // console.debug('received request:', request)
-        if (request.binding) {
-          lastBinding = request.binding
-          process_binding_count.add(1)
-          // Adjust binding will make some request become invalid by setting UNKNOWN HandlerType
-          // for older SDK version, so we just return empty result for them here
-          if (request.binding.handlerType === HandlerType.UNKNOWN) {
-            subject.next({
-              processId: request.processId,
-              result: ProcessResult.create()
-            })
-            continue
-          }
-          if (this.enablePartition) {
-            this.doPartition(request.processId, request.binding, subject)
-          } else {
-            this.doProcess(request.processId, request.binding, subject)
-          }
-        }
-        if (request.start) {
-          if (!lastBinding) {
-            throw new ServerError(Status.INVALID_ARGUMENT, 'start request received without binding')
-          }
-          this.doProcess(request.processId, lastBinding, subject)
-        }
-        if (request.dbResult) {
-          const dbContext = this.contexts.get(request.processId)
-          try {
-            dbContext?.result(request.dbResult)
-          } catch (e) {
-            subject.error(new Error('db result error, process should stop'))
-          }
-        }
-      } catch (e) {
-        // should not happen
-        console.error('unexpect error during handle loop', e)
-      }
+      this.handleSingleRequest(request, subject)
     }
   }
 
-  private doPartition(processId: number, binding: DataBinding, subject: Subject<DeepPartial<ProcessStreamResponse>>) {
-    const dbContext = this.contexts.new(processId, subject)
-    const start = Date.now()
-
-    this.process(binding, processId, dbContext, true)
-      .then(async (partitions) => {
-        console.debug('partition', processId, 'finished, took:', Date.now() - start)
-        subject.next({
-          partitions: partitions as ProcessStreamResponse_Partitions,
-          processId: processId
-        })
+  async handleSingleRequest(request: ProcessStreamRequest, subject: Subject<DeepPartial<ProcessStreamResponse>>) {
+    const processId = request.processId
+    if (request.binding) {
+      const context = this.contexts.new(processId)
+      context.mainPort.on('message', (resp: ProcessStreamResponse) => {
+        subject.next(resp)
+        if (resp.result) {
+          // last response
+          this.contexts.delete(processId)
+        }
       })
-      .catch((e) => {
-        dbContext.error(processId, e)
-        process_binding_error.add(1)
-        console.error('partition', processId, 'failed, took:', Date.now() - start)
-      })
-      .finally(() => {
-        const cost = Date.now() - start
-        process_binding_time.add(cost)
-        this.contexts.delete(processId)
-      })
+      await this.pool.run(
+        { request, workerPort: context.workerPort, processId },
+        { transferList: [context.workerPort] }
+      )
+    } else {
+      const context = this.contexts.get(processId)
+      if (!context) {
+        console.error('No context found for processId:', processId)
+        throw new Error(`No context found for processId: ${processId}`)
+      }
+      context.sendRequest(request)
+    }
   }
 
-  private doProcess(processId: number, binding: DataBinding, subject: Subject<DeepPartial<ProcessStreamResponse>>) {
-    const dbContext = this.contexts.new(processId, subject)
-
-    const start = Date.now()
-    this.process(binding, processId, dbContext, false)
-      .then(async (result) => {
-        console.debug('process', processId, 'finished, took:', Date.now() - start)
-        subject.next({
-          result: result as ProcessResult,
-          processId: processId
-        })
-      })
-      .catch((e) => {
-        dbContext.error(processId, e)
-        process_binding_error.add(1)
-        console.error('process', processId, 'failed, took:', Date.now() - start)
-      })
-      .finally(() => {
-        const cost = Date.now() - start
-        process_binding_time.add(cost)
-        this.contexts.delete(processId)
-      })
-  }
-
-  async process(
-    request: DataBinding,
-    processId: number,
-    dbContext?: ChannelStoreContext,
-    partition: boolean = false
-  ): Promise<ProcessResult | ProcessStreamResponse_Partitions> {
+  async process(processId: number, context: ChannelContext): Promise<ProcessResult | ProcessStreamResponse_Partitions> {
     if (!this.pool) {
       await this.initPool()
     }
 
     return this.pool.run(
-      { request, workerPort: dbContext?.workerPort, partition, processId },
-      { transferList: dbContext?.workerPort ? [dbContext?.workerPort] : [] }
+      { workerPort: context?.workerPort, processId },
+      { transferList: context?.workerPort ? [context?.workerPort] : [] }
     )
   }
 
@@ -206,18 +133,18 @@ export class ServiceManager extends ProcessorServiceImpl {
 }
 
 class Contexts {
-  private contexts: Map<number, ChannelStoreContext> = new Map()
+  private contexts: Map<number, ChannelContext> = new Map()
 
   get(processId: number) {
     return this.contexts.get(processId)
   }
 
-  new(processId: number, subject: Subject<DeepPartial<ProcessStreamResponse>>) {
+  new(processId: number) {
     let context = this.get(processId)
     if (context) {
       return context
     }
-    context = new ChannelStoreContext(subject, processId)
+    context = new ChannelContext(processId)
     this.contexts.set(processId, context)
     return context
   }
@@ -227,25 +154,19 @@ class Contexts {
     context?.close()
     this.contexts.delete(processId)
   }
+
+  has(processId: number) {
+    return this.contexts.has(processId)
+  }
 }
 
-export class ChannelStoreContext implements IStoreContext {
+export class ChannelContext {
   channel = new MessageChannel()
 
-  constructor(
-    readonly subject: Subject<DeepPartial<ProcessStreamResponse>>,
-    readonly processId: number
-  ) {
-    this.mainPort.on('message', (req: ProcessStreamRequest) => {
-      subject.next({
-        ...req,
-        processId: processId
-      })
-    })
-  }
+  constructor(readonly processId: number) {}
 
-  sendRequest(request: DeepPartial<Omit<DBRequest, 'opId'>>, timeoutSecs?: number): Promise<DBResponse> {
-    throw new Error('should not be used on main thread')
+  sendRequest(request: ProcessStreamRequest) {
+    this.mainPort.postMessage(request)
   }
 
   get workerPort() {
@@ -256,25 +177,7 @@ export class ChannelStoreContext implements IStoreContext {
     return this.channel.port1
   }
 
-  result(dbResult: DBResponse) {
-    this.mainPort.postMessage(dbResult)
-  }
-
   close(): void {
     this.mainPort.close()
-  }
-
-  error(processId: number, e: any): void {
-    const stack = new Error().stack
-    console.error('process error', processId, e, stack)
-    const errorResult = ProcessResult.create({
-      states: {
-        error: e?.toString()
-      }
-    })
-    this.subject.next({
-      result: errorResult,
-      processId
-    })
   }
 }
