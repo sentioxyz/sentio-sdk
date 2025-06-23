@@ -86,10 +86,15 @@ export class ServiceManager extends ProcessorServiceImpl {
           this.contexts.delete(processId)
         }
       })
-      await this.pool.run(
-        { request, workerPort: context.workerPort, processId },
-        { transferList: [context.workerPort] }
-      )
+      try {
+        await this.pool.run(
+          { request, workerPort: context.workerPort, processId },
+          { transferList: [context.workerPort] }
+        )
+      } catch (err) {
+        console.error('Error processing request:', err)
+        subject.error(err)
+      }
     } else {
       const context = this.contexts.get(processId)
       if (!context) {
