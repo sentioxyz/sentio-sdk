@@ -115,6 +115,17 @@ export class ServiceManager extends ProcessorServiceImpl {
     if (this.pool) {
       await this.pool.close()
     }
+
+    if (this.enablePartition) {
+      const concurrent = parseInt(process.env['PROCESS_CONCURRENCY'] || '0')
+      if (this.options.worker < concurrent) {
+        console.warn(
+          `When partition is enabled, the worker count must >= 'PROCESS_CONCURRENCY', will set worker count to ${concurrent})`
+        )
+        this.options.worker = concurrent
+      }
+    }
+
     console.info('Initializing worker pool with worker count:', this.options.worker)
     this.pool = new Piscina({
       maxThreads: this.options.worker,

@@ -1,17 +1,10 @@
-import {
-  DeepPartial,
-  Empty,
-  ProcessConfigRequest,
-  ProcessStreamRequest,
-  ProcessStreamResponse,
-  StartRequest
-} from '@sentio/protos'
+import { DeepPartial, Empty, ProcessStreamRequest, ProcessStreamResponse, StartRequest } from '@sentio/protos'
 import { CallContext, ServerError, Status } from 'nice-grpc'
 import { errorString } from './utils.js'
 import { freezeGlobalConfig } from './global-config.js'
 import { DebugInfo, RichServerError } from 'nice-grpc-error-details'
 import { ProcessorServiceImpl } from './service.js'
-import { BroadcastChannel, MessagePort, threadId } from 'worker_threads'
+import { MessagePort, threadId } from 'worker_threads'
 import { Piscina } from 'piscina'
 import { configureEndpoints } from './endpoints.js'
 import { setupLogger } from './logger.js'
@@ -47,11 +40,6 @@ const loader = async (options: any) => {
     console.debug('Module loaded, path:', options.target, 'module:', m)
     return m
   }
-}
-
-const configureChannel = new BroadcastChannel('configure_channel')
-configureChannel.onmessage = (request: ProcessConfigRequest) => {
-  service?.getConfig(request, emptyCallContext)
 }
 
 const emptyCallContext = <CallContext>{}
@@ -121,16 +109,18 @@ export default async function ({
     const subject = new Subject<DeepPartial<ProcessStreamResponse>>()
     let timeoutId: NodeJS.Timeout | undefined = undefined
     subject.subscribe((resp: ProcessStreamResponse) => {
+      console.debug('Worker', threadId, 'send response:', resp.result ? 'result' : 'dbResult')
       workerPort.postMessage(resp)
       // receive the response from the processor , close and resolve the promise
       if (resp.result) {
-        timeoutId && clearTimeout(timeoutId)
+        if (timeoutId) clearTimeout(timeoutId)
         resolve()
         workerPort.close()
       }
     })
     workerPort.on('message', (msg: ProcessStreamRequest) => {
       const request = msg as ProcessStreamRequest
+      console.debug('Worker', threadId, 'received request:', request.start ? 'start' : 'dbResult')
       service?.handleRequest(request, firstRequest.binding, subject)
       if (enablePartition && request.start && timeout > 0) {
         timeoutId = setTimeout(async () => {
@@ -138,6 +128,7 @@ export default async function ({
         }, timeout)
       }
     })
+    console.debug('Worker', threadId, 'handle request: binding')
     service?.handleRequest(firstRequest, firstRequest.binding, subject)
     if (!enablePartition && timeout > 0) {
       timeoutId = setTimeout(() => {
