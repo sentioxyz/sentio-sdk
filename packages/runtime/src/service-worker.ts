@@ -115,13 +115,16 @@ export default async function ({
       ]
     )
   }
-
-  await new Promise<void>((resolve) => {
+  const timeout = options['worker-timeout'] || 0
+  const enablePartition = options['enable-partition'] || false
+  await new Promise<void>((resolve, reject) => {
     const subject = new Subject<DeepPartial<ProcessStreamResponse>>()
+    let timeoutId: NodeJS.Timeout | undefined = undefined
     subject.subscribe((resp: ProcessStreamResponse) => {
       workerPort.postMessage(resp)
       // receive the response from the processor , close and resolve the promise
       if (resp.result) {
+        timeoutId && clearTimeout(timeoutId)
         resolve()
         workerPort.close()
       }
@@ -129,7 +132,17 @@ export default async function ({
     workerPort.on('message', (msg: ProcessStreamRequest) => {
       const request = msg as ProcessStreamRequest
       service?.handleRequest(request, firstRequest.binding, subject)
+      if (enablePartition && request.start && timeout > 0) {
+        timeoutId = setTimeout(async () => {
+          reject(new RichServerError(Status.DEADLINE_EXCEEDED, 'Worker timeout exceeded'))
+        }, timeout)
+      }
     })
     service?.handleRequest(firstRequest, firstRequest.binding, subject)
+    if (!enablePartition && timeout > 0) {
+      timeoutId = setTimeout(() => {
+        reject(new RichServerError(Status.DEADLINE_EXCEEDED, 'Worker timeout exceeded'))
+      }, timeout)
+    }
   })
 }
