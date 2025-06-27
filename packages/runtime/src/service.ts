@@ -505,7 +505,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         recordRuntimeInfo(result, binding.handlerType)
       })
       .catch((e) => {
-        console.error(e)
+        console.error(e, e.stack)
         dbContext.error(processId, e)
         process_binding_error.add(1)
       })
