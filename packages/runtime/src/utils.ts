@@ -21,11 +21,12 @@ export function mergeProcessResultsInPlace(
   for (const r of results) {
     // not using spread operator since it puts all element on the stack
     // cause maximum call stack size exceeded error if it's a large array
-    mergeArrayInPlace(res.counters, r.counters)
-    mergeArrayInPlace(res.gauges, r.gauges)
-    mergeArrayInPlace(res.events, r.events)
-    mergeArrayInPlace(res.exports, r.exports)
-    mergeArrayInPlace(res.timeseriesResult, r.timeseriesResult)
+
+    res.counters = mergeArrayInPlace(res.counters, r.counters)
+    res.gauges = mergeArrayInPlace(res.gauges, r.gauges)
+    res.events = mergeArrayInPlace(res.events, r.events)
+    res.exports = mergeArrayInPlace(res.exports, r.exports)
+    res.timeseriesResult = mergeArrayInPlace(res.timeseriesResult, r.timeseriesResult)
     res.states = {
       configUpdated: res.states?.configUpdated || r.states?.configUpdated || false
     }
@@ -33,10 +34,14 @@ export function mergeProcessResultsInPlace(
   return res
 }
 
-function mergeArrayInPlace<T>(dst: T[], src: T[]) {
-  for (const r of src) {
-    dst.push(r)
+function mergeArrayInPlace<T>(dst: T[], src: T[]): T[] {
+  const res = dst || []
+  if (Array.isArray(src)) {
+    for (const r of src) {
+      res.push(r)
+    }
   }
+  return res
 }
 
 export function errorString(e: Error): string {
