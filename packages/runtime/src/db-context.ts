@@ -131,11 +131,11 @@ export abstract class AbstractStoreContext implements IStoreContext {
   }
 
   error(processId: number, e: any) {
-    const stack = new Error().stack
+    const stack = e.stack
     console.error('process error', processId, e, stack)
     const errorResult = ProcessResult.create({
       states: {
-        error: e?.toString()
+        error: e?.toString() + (stack ? `\n${stack}` : '')
       }
     })
     this.doSend({ result: errorResult, processId })
