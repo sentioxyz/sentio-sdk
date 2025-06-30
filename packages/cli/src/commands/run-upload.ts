@@ -275,12 +275,11 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth, continu
         }
       }
     } else {
-      const latest = data.processors?.[0]?.version
+      const latest = Math.max(...data.processors?.map((x) => x?.version))
       console.error(
         chalk.red(
-          `Failed to find existed version ${continueFrom}` +
-            (latest ? `, latest is ${latest}` : '') +
-            ` in ${options.project}`
+          `Failed to find existed version ${continueFrom} in ${options.project}` +
+            (latest ? `, latest is ${latest}` : '')
         )
       )
       process.exit(0)
