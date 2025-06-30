@@ -13,6 +13,7 @@ import { CommonExecOptions, execFileSync } from 'child_process'
 import { errorOnUnknownOption, getCliVersion, getSdkVersion } from '../utils.js'
 import readline from 'readline'
 import JSZip from 'jszip'
+import { UserInfo } from '../../../protos/lib/service/common/protos/common.js'
 
 const uploadOptionDefinitions = [
   {
@@ -276,7 +277,11 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth, continu
     } else {
       const latest = data.processors?.[0]?.version
       console.error(
-        chalk.red(`Failed to find existed version ${continueFrom}` + (latest ? `, latest is ${latest}` : ''))
+        chalk.red(
+          `Failed to find existed version ${continueFrom}` +
+            (latest ? `, latest is ${latest}` : '') +
+            ` in ${options.project}`
+        )
       )
       process.exit(0)
     }
@@ -408,7 +413,21 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth, continu
 }
 
 async function getProcessorStatus(host: string, auth: Auth, projectSlug: string) {
+  if (!projectSlug.includes('/')) {
+    const res = await getMe(host, auth)
+    const me = (await res.json()) as UserInfo
+    projectSlug = `${me.username}/${projectSlug}`
+  }
   const url = new URL(`/api/v1/processors/${projectSlug}/status?version=ALL`, host)
+  return fetch(url.href, {
+    headers: {
+      ...auth
+    }
+  })
+}
+
+async function getMe(host: string, auth: Auth) {
+  const url = new URL(`/api/v1/users`, host)
   return fetch(url.href, {
     headers: {
       ...auth
