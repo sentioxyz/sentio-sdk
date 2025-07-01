@@ -331,6 +331,14 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth, continu
       console.warn(chalk.yellow('Warning:', initUploadRes.warning))
     }
     if (options.variables && options.variables.length > 0) {
+      for (const v of options.variables) {
+        if (v.key || '' == '') {
+          console.error("Variable key can't be empty")
+        }
+        if (v.value || '' == '') {
+          console.error("Variable value can't be empty")
+        }
+      }
       const ret = await updateVariables(initUploadRes.projectId, options, auth)
       if (!ret.ok) {
         console.error(chalk.red('Update variables failed'))
