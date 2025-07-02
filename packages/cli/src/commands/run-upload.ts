@@ -288,6 +288,18 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth, continu
 
   let triedCount = 0
   const upload = async () => {
+    options.variables = options.variables || []
+    for (const v of options.variables) {
+      if (v.key || '' == '') {
+        console.error(chalk.red("Variable key can't be empty"))
+        return
+      }
+      if (v.value || '' == '') {
+        console.error(chalk.red("Variable value can't be empty"))
+        return
+      }
+    }
+
     const { commitSha, gitUrl } = getGitAttributes()
     const sha256 = digest
     console.log(chalk.blue(triedCount > 1 ? 'Retry uploading' : 'Uploading'))
@@ -330,15 +342,7 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth, continu
     if (initUploadRes.warning) {
       console.warn(chalk.yellow('Warning:', initUploadRes.warning))
     }
-    if (options.variables && options.variables.length > 0) {
-      for (const v of options.variables) {
-        if (v.key || '' == '') {
-          console.error("Variable key can't be empty")
-        }
-        if (v.value || '' == '') {
-          console.error("Variable value can't be empty")
-        }
-      }
+    if (options.variables.length > 0) {
       const ret = await updateVariables(initUploadRes.projectId, options, auth)
       if (!ret.ok) {
         console.error(chalk.red('Update variables failed'))
