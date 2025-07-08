@@ -103,7 +103,7 @@ export default async function ({
       ]
     )
   }
-  const timeout = options['worker-timeout'] || 0
+  const timeout = (options['worker-timeout'] || 0) * 1000 // convert to milliseconds
   const enablePartition = options['enable-partition'] || false
   await new Promise<void>((resolve, reject) => {
     const subject = new Subject<DeepPartial<ProcessStreamResponse>>()

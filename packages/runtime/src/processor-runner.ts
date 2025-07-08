@@ -51,7 +51,7 @@ export const optionDefinitions = [
   { name: 'start-action-server', type: Boolean, defaultValue: false },
   { name: 'worker', type: Number, defaultValue: workerNum },
   { name: 'process-timeout', type: Number, defaultValue: 60 },
-  { name: 'worker-timeout', type: Number, defaultValue: 60 },
+  { name: 'worker-timeout', type: Number, defaultValue: parseInt(process.env['WORKER_TIMEOUT_SECONDS'] || '60') },
   {
     name: 'enable-partition',
     type: Boolean,
