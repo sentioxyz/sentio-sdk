@@ -355,12 +355,14 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth, continu
     // do actual uploading
     const zip = new JSZip()
     zip.file('lib.js', fs.readFileSync(PROCESSOR_FILE))
+    const data = await zip.generateAsync({ type: 'blob' })
     const uploadResRaw = await fetch(uploadUrl, {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/zip'
+        'Content-Type': 'application/zip',
+        'Content-Length': data.size.toString()
       },
-      body: zip.generateNodeStream()
+      body: data
     })
     if (!uploadResRaw.ok) {
       console.error(chalk.red('Failed to upload'))
@@ -535,13 +537,14 @@ async function uploadZip(
       }
     })
   }
-
+  const data = await zip.generateAsync({ type: 'blob' })
   const uploadResRaw = await fetch(uploadUrl, {
     method: 'PUT',
     headers: {
-      'Content-Type': 'application/octet-stream'
+      'Content-Type': 'application/octet-stream',
+      'Content-Length': data.size.toString()
     },
-    body: zip.generateNodeStream()
+    body: data
   })
   if (!uploadResRaw.ok) {
     console.error(chalk.red('Failed to upload'))
