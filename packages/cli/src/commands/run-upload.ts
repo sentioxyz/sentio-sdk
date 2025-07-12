@@ -314,9 +314,9 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth, continu
       'application/zip'
     )
     if (!initUploadResRaw.ok) {
-      // console.error(chalk.red('Failed to get upload url'))
-      console.error(chalk.red(((await initUploadResRaw.json()) as { message: string }).message))
-      if (initUploadResRaw.status === 404) {
+      const res = await initUploadResRaw.json()
+      console.error(chalk.red((res as { message: string }).message))
+      if ([404, 500].includes(initUploadResRaw.status)) {
         const created = await createProjectPrompt(options, auth, options.type)
         if (created) {
           await upload()
