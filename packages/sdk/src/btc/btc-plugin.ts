@@ -1,10 +1,9 @@
 import { errorString, GLOBAL_CONFIG, mergeProcessResults, Plugin, PluginManager, USER_PROCESSOR } from '@sentio/runtime'
 import {
   ContractConfig,
-  Data_BTCBlock,
-  Data_BTCTransaction,
   DataBinding,
   HandlerType,
+  InitResponse,
   ProcessConfigResponse,
   ProcessResult,
   ProcessStreamResponse_Partitions,
@@ -13,31 +12,31 @@ import {
 
 import { ServerError, Status } from 'nice-grpc'
 import { PartitionHandlerManager } from '../core/index.js'
+import { HandlerRegister } from '../core/handler-register.js'
 import { TemplateInstanceState } from '../core/template.js'
 import { BTCProcessorState } from './btc-processor.js'
 import { filters2Proto, TransactionFilter } from './filter.js'
 
-interface Handlers {
-  txHandlers: ((trace: Data_BTCTransaction) => Promise<ProcessResult>)[]
-  blockHandlers: ((trace: Data_BTCBlock) => Promise<ProcessResult>)[]
-}
-
 export class BTCPlugin extends Plugin {
   name: string = 'BTCPlugin'
-  handlers: Handlers = {
-    txHandlers: [],
-    blockHandlers: []
-  }
-
+  handlerRegister = new HandlerRegister()
   partitionManager = new PartitionHandlerManager()
 
-  async configure(config: ProcessConfigResponse) {
-    const handlers: Handlers = {
-      txHandlers: [],
-      blockHandlers: []
+  async init(config: InitResponse) {
+    for (const aptosProcessor of BTCProcessorState.INSTANCE.getValues()) {
+      const chainId = aptosProcessor.config.chainId
+      config.chainIds.push(chainId)
     }
+  }
+
+  async configure(config: ProcessConfigResponse, forChainId?: string) {
+    this.handlerRegister.clear(forChainId as any)
 
     for (const processor of BTCProcessorState.INSTANCE.getValues()) {
+      const chainId = processor.config.chainId
+      if (forChainId !== undefined && forChainId !== chainId.toString()) {
+        continue
+      }
       const contractConfig = ContractConfig.fromPartial({
         processorType: USER_PROCESSOR,
         contract: {
@@ -50,7 +49,7 @@ export class BTCPlugin extends Plugin {
         endBlock: processor.config.endBlock
       })
       for (const callHandler of processor.callHandlers) {
-        const handlerId = handlers.txHandlers.push(callHandler.handler) - 1
+        const handlerId = this.handlerRegister.register(callHandler.handler, chainId)
         this.partitionManager.registerPartitionHandler(
           HandlerType.BTC_TRANSACTION,
           handlerId,
@@ -78,7 +77,7 @@ export class BTCPlugin extends Plugin {
       }
 
       for (const blockHandler of processor.blockHandlers) {
-        const handlerId = handlers.blockHandlers.push(blockHandler.handler) - 1
+        const handlerId = this.handlerRegister.register(blockHandler.handler, chainId)
         this.partitionManager.registerPartitionHandler(HandlerType.BTC_BLOCK, handlerId, blockHandler.partitionHandler)
         contractConfig.intervalConfigs.push({
           slot: 0,
@@ -100,8 +99,6 @@ export class BTCPlugin extends Plugin {
       // Finish up a contract
       config.contractConfigs.push(contractConfig)
     }
-
-    this.handlers = handlers
   }
 
   supportedHandlers = [HandlerType.BTC_TRANSACTION, HandlerType.BTC_BLOCK]
@@ -161,12 +158,14 @@ export class BTCPlugin extends Plugin {
     const result = binding.data?.btcTransaction
 
     for (const handlerId of binding.handlerIds) {
-      const promise = this.handlers.txHandlers[handlerId](binding.data?.btcTransaction).catch((e) => {
-        throw new ServerError(
-          Status.INTERNAL,
-          'error processing transaction: ' + JSON.stringify(result) + '\n' + errorString(e)
-        )
-      })
+      const promise = this.handlerRegister
+        .getHandlerById(handlerId)(binding.data?.btcTransaction)
+        .catch((e: any) => {
+          throw new ServerError(
+            Status.INTERNAL,
+            'error processing transaction: ' + JSON.stringify(result) + '\n' + errorString(e)
+          )
+        })
       if (GLOBAL_CONFIG.execution.sequential) {
         await promise
       }
@@ -184,12 +183,14 @@ export class BTCPlugin extends Plugin {
 
     const promises: Promise<ProcessResult>[] = []
     for (const handlerId of request.handlerIds) {
-      const promise = this.handlers.blockHandlers[handlerId](block).catch((e) => {
-        throw new ServerError(
-          Status.INTERNAL,
-          'error processing block: ' + JSON.stringify(block) + '\n' + errorString(e)
-        )
-      })
+      const promise = this.handlerRegister
+        .getHandlerById(handlerId)(block)
+        .catch((e: any) => {
+          throw new ServerError(
+            Status.INTERNAL,
+            'error processing block: ' + JSON.stringify(block) + '\n' + errorString(e)
+          )
+        })
       if (GLOBAL_CONFIG.execution.sequential) {
         await promise
       }

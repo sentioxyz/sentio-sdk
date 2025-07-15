@@ -26,6 +26,19 @@ service Processor {
   rpc PreprocessBindingsStream(stream PreprocessStreamRequest) returns (stream PreprocessStreamResponse);
 }
 
+service ProcessorV2 {
+  // Initially call once to confirm which chains are available
+  rpc Init(google.protobuf.Empty) returns (InitResponse);
+
+  // It will be called multiple times to tell the specified chain which templates are there and return
+  // the handler configuration of this chain.
+  // There is a special requirement that different chains must have different handler id sequences,
+  // otherwise templates cannot be added midway. Whether it is a new template can also be determined by the driver.
+  rpc ConfigureHandlers(ConfigureHandlersRequest) returns (ProcessConfigResponse);
+
+  rpc ProcessBindingsStream(stream ProcessStreamRequest) returns (stream ProcessStreamResponseV2);
+}
+
 message ProjectConfig {
   string name = 1;
   string version = 3;
@@ -284,6 +297,16 @@ message TemplateInstance {
   uint64 end_block = 3;
   int32 template_id = 4;
   google.protobuf.Struct base_labels = 5;
+}
+
+message InitResponse {
+  repeated string chain_ids = 1;
+  DataBaseSchema db_schema = 2;
+}
+
+message ConfigureHandlersRequest {
+  string chain_id = 1;
+  repeated TemplateInstance template_instances = 2;
 }
 
 message StartRequest {
@@ -568,6 +591,19 @@ message ProcessStreamResponse {
   }
 }
 
+message ProcessStreamResponseV2 {
+  int32 process_id = 1; // used to identify the processor run
+  oneof value {
+    ProcessStreamResponse.Partitions partitions = 2; // will be followed by a start request
+    DBRequest db_request = 3;  // response a DBResponse
+    TSRequest ts_request = 4; // no response
+    TPLRequest tpl_request = 5; // no response
+    ProcessResult result = 6;  // finish the binding data, no response
+  }
+
+
+}
+
 message PreprocessStreamRequest {
   message DataBindings {
     repeated DataBinding bindings = 1;
@@ -620,6 +656,14 @@ message EntityUpdateData {
     Operator op = 2;
   }
   map<string, FieldValue> fields = 1;
+}
+
+message TPLRequest {
+  repeated TemplateInstance templates = 1;
+}
+
+message TSRequest {
+  repeated TimeseriesResult data = 1;
 }
 
 message DBRequest {

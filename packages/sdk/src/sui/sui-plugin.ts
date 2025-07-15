@@ -2,12 +2,9 @@ import { errorString, mergeProcessResults, Plugin, PluginManager, USER_PROCESSOR
 import {
   AccountConfig,
   ContractConfig,
-  Data_SuiCall,
-  Data_SuiEvent,
-  Data_SuiObject,
-  Data_SuiObjectChange,
   DataBinding,
   HandlerType,
+  InitResponse,
   MoveCallHandlerConfig,
   MoveEventHandlerConfig,
   MoveResourceChangeConfig,
@@ -19,6 +16,7 @@ import {
 
 import { ServerError, Status } from 'nice-grpc'
 import { PartitionHandlerManager } from '../core/index.js'
+import { HandlerRegister } from '../core/handler-register.js'
 
 import { SuiProcessorState } from './sui-processor.js'
 import { SuiAccountProcessorState, SuiAddressProcessor } from './sui-object-processor.js'
@@ -31,22 +29,9 @@ import {
 import { SuiNetwork } from './network.js'
 import { SuiContext } from './context.js'
 
-interface Handlers {
-  suiEventHandlers: ((event: Data_SuiEvent) => Promise<ProcessResult>)[]
-  suiCallHandlers: ((func: Data_SuiCall) => Promise<ProcessResult>)[]
-  suiObjectHandlers: ((object: Data_SuiObject) => Promise<ProcessResult>)[]
-  suiObjectChangeHandlers: ((object: Data_SuiObjectChange) => Promise<ProcessResult>)[]
-}
-
 export class SuiPlugin extends Plugin {
   name: string = 'SuiPlugin'
-  handlers: Handlers = {
-    suiCallHandlers: [],
-    suiEventHandlers: [],
-    suiObjectHandlers: [],
-    suiObjectChangeHandlers: []
-  }
-
+  handlerRegister = new HandlerRegister()
   partitionManager = new PartitionHandlerManager()
   async start(request: StartRequest): Promise<void> {
     await initCoinList()
@@ -76,14 +61,21 @@ export class SuiPlugin extends Plugin {
     }
   }
 
-  async configure(config: ProcessConfigResponse) {
-    const handlers: Handlers = {
-      suiCallHandlers: [],
-      suiEventHandlers: [],
-      suiObjectHandlers: [],
-      suiObjectChangeHandlers: []
+  async init(config: InitResponse) {
+    for (const state of [SuiProcessorState.INSTANCE, SuiAccountProcessorState.INSTANCE]) {
+      for (const suiProcessor of state.getValues()) {
+        config.chainIds.push(suiProcessor.config.network)
+      }
     }
+  }
+
+  async configure(config: ProcessConfigResponse, forChainId?: string) {
+    this.handlerRegister.clear(forChainId as any)
     for (const suiProcessor of SuiProcessorState.INSTANCE.getValues()) {
+      const chainId = suiProcessor.config.network
+      if (forChainId !== undefined && forChainId !== chainId.toString()) {
+        continue
+      }
       const contractConfig = ContractConfig.fromPartial({
         transactionConfig: [],
         processorType: USER_PROCESSOR,
@@ -97,7 +89,7 @@ export class SuiPlugin extends Plugin {
         endBlock: suiProcessor.config.endCheckpoint
       })
       for (const handler of suiProcessor.eventHandlers) {
-        const handlerId = handlers.suiEventHandlers.push(handler.handler) - 1
+        const handlerId = this.handlerRegister.register(handler.handler, chainId)
         this.partitionManager.registerPartitionHandler(HandlerType.SUI_EVENT, handlerId, handler.partitionHandler)
         const eventHandlerConfig: MoveEventHandlerConfig = {
           filters: handler.filters.map((f) => {
@@ -114,7 +106,7 @@ export class SuiPlugin extends Plugin {
         contractConfig.moveEventConfigs.push(eventHandlerConfig)
       }
       for (const handler of suiProcessor.callHandlers) {
-        const handlerId = handlers.suiCallHandlers.push(handler.handler) - 1
+        const handlerId = this.handlerRegister.register(handler.handler, chainId)
         this.partitionManager.registerPartitionHandler(HandlerType.SUI_CALL, handlerId, handler.partitionHandler)
         const functionHandlerConfig: MoveCallHandlerConfig = {
           filters: handler.filters.map((filter) => {
@@ -135,7 +127,7 @@ export class SuiPlugin extends Plugin {
       }
       // deprecated, use objectType processor instead
       for (const handler of suiProcessor.objectChangeHandlers) {
-        const handlerId = handlers.suiObjectChangeHandlers.push(handler.handler) - 1
+        const handlerId = this.handlerRegister.register(handler.handler, chainId)
         const objectChangeHandler: MoveResourceChangeConfig = {
           type: handler.type,
           handlerId,
@@ -148,6 +140,10 @@ export class SuiPlugin extends Plugin {
     }
 
     for (const processor of SuiAccountProcessorState.INSTANCE.getValues()) {
+      const chainId = processor.getChainId()
+      if (forChainId !== undefined && forChainId !== chainId.toString()) {
+        continue
+      }
       const accountConfig = AccountConfig.fromPartial({
         address: processor.config.address,
         chainId: processor.getChainId(),
@@ -156,7 +152,7 @@ export class SuiPlugin extends Plugin {
       })
 
       for (const handler of processor.objectChangeHandlers) {
-        const handlerId = handlers.suiObjectChangeHandlers.push(handler.handler) - 1
+        const handlerId = this.handlerRegister.register(handler.handler, chainId)
         const objectChangeHandler: MoveResourceChangeConfig = {
           type: handler.type,
           handlerId,
@@ -167,7 +163,7 @@ export class SuiPlugin extends Plugin {
       }
 
       for (const handler of processor.objectHandlers) {
-        const handlerId = handlers.suiObjectHandlers.push(handler.handler) - 1
+        const handlerId = this.handlerRegister.register(handler.handler, chainId)
 
         accountConfig.moveIntervalConfigs.push({
           intervalConfig: {
@@ -188,7 +184,7 @@ export class SuiPlugin extends Plugin {
 
       if (processor instanceof SuiAddressProcessor) {
         for (const handler of processor.callHandlers) {
-          const handlerId = handlers.suiCallHandlers.push(handler.handler) - 1
+          const handlerId = this.handlerRegister.register(handler.handler, chainId)
           const functionHandlerConfig: MoveCallHandlerConfig = {
             filters: handler.filters.map((filter) => {
               return {
@@ -210,7 +206,6 @@ export class SuiPlugin extends Plugin {
 
       config.accountConfigs.push(accountConfig)
     }
-    this.handlers = handlers
   }
 
   supportedHandlers = [
@@ -284,12 +279,14 @@ export class SuiPlugin extends Plugin {
 
     for (const handlerId of binding.handlerIds) {
       promises.push(
-        this.handlers.suiEventHandlers[handlerId](event).catch((e) => {
-          throw new ServerError(
-            Status.INTERNAL,
-            'error processing event: ' + JSON.stringify(event) + '\n' + errorString(e)
-          )
-        })
+        this.handlerRegister
+          .getHandlerById(handlerId)(event)
+          .catch((e: any) => {
+            throw new ServerError(
+              Status.INTERNAL,
+              'error processing event: ' + JSON.stringify(event) + '\n' + errorString(e)
+            )
+          })
       )
     }
     return mergeProcessResults(await Promise.all(promises))
@@ -303,9 +300,14 @@ export class SuiPlugin extends Plugin {
 
     const promises: Promise<ProcessResult>[] = []
     for (const handlerId of binding.handlerIds) {
-      const promise = this.handlers.suiCallHandlers[handlerId](call).catch((e) => {
-        throw new ServerError(Status.INTERNAL, 'error processing call: ' + JSON.stringify(call) + '\n' + errorString(e))
-      })
+      const promise = this.handlerRegister
+        .getHandlerById(handlerId)(call)
+        .catch((e: any) => {
+          throw new ServerError(
+            Status.INTERNAL,
+            'error processing call: ' + JSON.stringify(call) + '\n' + errorString(e)
+          )
+        })
       promises.push(promise)
     }
     return mergeProcessResults(await Promise.all(promises))
@@ -320,12 +322,14 @@ export class SuiPlugin extends Plugin {
     const promises: Promise<ProcessResult>[] = []
     for (const handlerId of binding.handlerIds) {
       promises.push(
-        this.handlers.suiObjectHandlers[handlerId](object).catch((e) => {
-          throw new ServerError(
-            Status.INTERNAL,
-            'error processing object: ' + JSON.stringify(object) + '\n' + errorString(e)
-          )
-        })
+        this.handlerRegister
+          .getHandlerById(handlerId)(object)
+          .catch((e: any) => {
+            throw new ServerError(
+              Status.INTERNAL,
+              'error processing object: ' + JSON.stringify(object) + '\n' + errorString(e)
+            )
+          })
       )
     }
     return mergeProcessResults(await Promise.all(promises))
@@ -340,12 +344,14 @@ export class SuiPlugin extends Plugin {
     const promises: Promise<ProcessResult>[] = []
     for (const handlerId of binding.handlerIds) {
       promises.push(
-        this.handlers.suiObjectChangeHandlers[handlerId](objectChange).catch((e) => {
-          throw new ServerError(
-            Status.INTERNAL,
-            'error processing object change: ' + JSON.stringify(objectChange) + '\n' + errorString(e)
-          )
-        })
+        this.handlerRegister
+          .getHandlerById(handlerId)(objectChange)
+          .catch((e: any) => {
+            throw new ServerError(
+              Status.INTERNAL,
+              'error processing object change: ' + JSON.stringify(objectChange) + '\n' + errorString(e)
+            )
+          })
       )
     }
     return mergeProcessResults(await Promise.all(promises))

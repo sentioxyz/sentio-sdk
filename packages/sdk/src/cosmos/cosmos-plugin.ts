@@ -1,33 +1,37 @@
 import { errorString, GLOBAL_CONFIG, mergeProcessResults, Plugin, PluginManager, USER_PROCESSOR } from '@sentio/runtime'
 import {
   ContractConfig,
-  Data_CosmosCall,
   DataBinding,
   HandlerType,
+  InitResponse,
   ProcessConfigResponse,
   ProcessResult,
   StartRequest
 } from '@sentio/protos'
 import { ServerError, Status } from 'nice-grpc'
 import { TemplateInstanceState } from '../core/template.js'
+import { HandlerRegister } from '../core/handler-register.js'
 import { CosmosProcessorState } from './types.js'
-
-interface Handlers {
-  callHandlers: ((trace: Data_CosmosCall) => Promise<ProcessResult>)[]
-}
 
 export class CosmosPlugin extends Plugin {
   name: string = 'CosmosPlugin'
-  handlers: Handlers = {
-    callHandlers: []
+  handlerRegister = new HandlerRegister()
+
+  async init(config: InitResponse) {
+    for (const aptosProcessor of CosmosProcessorState.INSTANCE.getValues()) {
+      const chainId = aptosProcessor.config.chainId
+      config.chainIds.push(chainId)
+    }
   }
 
-  async configure(config: ProcessConfigResponse) {
-    const handlers: Handlers = {
-      callHandlers: []
-    }
+  async configure(config: ProcessConfigResponse, forChainId?: string) {
+    this.handlerRegister.clear(forChainId as any)
 
     for (const processor of CosmosProcessorState.INSTANCE.getValues()) {
+      const chainId = processor.config.chainId
+      if (forChainId !== undefined && forChainId !== chainId.toString()) {
+        continue
+      }
       const contractConfig = ContractConfig.fromPartial({
         processorType: USER_PROCESSOR,
         contract: {
@@ -41,7 +45,7 @@ export class CosmosPlugin extends Plugin {
       })
 
       for (const callHandler of processor.callHandlers) {
-        const handlerId = handlers.callHandlers.push(callHandler.handler) - 1
+        const handlerId = this.handlerRegister.register(callHandler.handler, chainId)
 
         contractConfig.cosmosLogConfigs.push({
           handlerId,
@@ -53,8 +57,6 @@ export class CosmosPlugin extends Plugin {
       // Finish up a contract
       config.contractConfigs.push(contractConfig)
     }
-
-    this.handlers = handlers
   }
 
   supportedHandlers = [HandlerType.COSMOS_CALL]
@@ -83,12 +85,14 @@ export class CosmosPlugin extends Plugin {
     const promises: Promise<ProcessResult>[] = []
 
     for (const handlerId of binding.handlerIds) {
-      const promise = this.handlers.callHandlers[handlerId](call).catch((e) => {
-        throw new ServerError(
-          Status.INTERNAL,
-          'error processing transaction: ' + JSON.stringify(call.transaction) + '\n' + errorString(e)
-        )
-      })
+      const promise = this.handlerRegister
+        .getHandlerById(handlerId)(call)
+        .catch((e) => {
+          throw new ServerError(
+            Status.INTERNAL,
+            'error processing transaction: ' + JSON.stringify(call.transaction) + '\n' + errorString(e)
+          )
+        })
       if (GLOBAL_CONFIG.execution.sequential) {
         await promise
       }

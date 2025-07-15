@@ -659,6 +659,16 @@ export interface TemplateInstance {
   baseLabels: { [key: string]: any } | undefined;
 }
 
+export interface InitResponse {
+  chainIds: string[];
+  dbSchema: DataBaseSchema | undefined;
+}
+
+export interface ConfigureHandlersRequest {
+  chainId: string;
+  templateInstances: TemplateInstance[];
+}
+
 export interface StartRequest {
   templateInstances: TemplateInstance[];
 }
@@ -969,6 +979,15 @@ export interface ProcessStreamResponse_Partitions_PartitionsEntry {
   value: ProcessStreamResponse_Partitions_Partition | undefined;
 }
 
+export interface ProcessStreamResponseV2 {
+  processId: number;
+  partitions?: ProcessStreamResponse_Partitions | undefined;
+  dbRequest?: DBRequest | undefined;
+  tsRequest?: TSRequest | undefined;
+  tplRequest?: TPLRequest | undefined;
+  result?: ProcessResult | undefined;
+}
+
 export interface PreprocessStreamRequest {
   processId: number;
   bindings?: PreprocessStreamRequest_DataBindings | undefined;
@@ -1057,6 +1076,14 @@ export interface EntityUpdateData_FieldValue {
 export interface EntityUpdateData_FieldsEntry {
   key: string;
   value: EntityUpdateData_FieldValue | undefined;
+}
+
+export interface TPLRequest {
+  templates: TemplateInstance[];
+}
+
+export interface TSRequest {
+  data: TimeseriesResult[];
 }
 
 export interface DBRequest {
@@ -4270,6 +4297,158 @@ export const TemplateInstance = {
     message.endBlock = object.endBlock ?? BigInt("0");
     message.templateId = object.templateId ?? 0;
     message.baseLabels = object.baseLabels ?? undefined;
+    return message;
+  },
+};
+
+function createBaseInitResponse(): InitResponse {
+  return { chainIds: [], dbSchema: undefined };
+}
+
+export const InitResponse = {
+  encode(message: InitResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.chainIds) {
+      writer.uint32(10).string(v!);
+    }
+    if (message.dbSchema !== undefined) {
+      DataBaseSchema.encode(message.dbSchema, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): InitResponse {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseInitResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.chainIds.push(reader.string());
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.dbSchema = DataBaseSchema.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): InitResponse {
+    return {
+      chainIds: globalThis.Array.isArray(object?.chainIds) ? object.chainIds.map((e: any) => globalThis.String(e)) : [],
+      dbSchema: isSet(object.dbSchema) ? DataBaseSchema.fromJSON(object.dbSchema) : undefined,
+    };
+  },
+
+  toJSON(message: InitResponse): unknown {
+    const obj: any = {};
+    if (message.chainIds?.length) {
+      obj.chainIds = message.chainIds;
+    }
+    if (message.dbSchema !== undefined) {
+      obj.dbSchema = DataBaseSchema.toJSON(message.dbSchema);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<InitResponse>): InitResponse {
+    return InitResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<InitResponse>): InitResponse {
+    const message = createBaseInitResponse();
+    message.chainIds = object.chainIds?.map((e) => e) || [];
+    message.dbSchema = (object.dbSchema !== undefined && object.dbSchema !== null)
+      ? DataBaseSchema.fromPartial(object.dbSchema)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseConfigureHandlersRequest(): ConfigureHandlersRequest {
+  return { chainId: "", templateInstances: [] };
+}
+
+export const ConfigureHandlersRequest = {
+  encode(message: ConfigureHandlersRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.chainId !== "") {
+      writer.uint32(10).string(message.chainId);
+    }
+    for (const v of message.templateInstances) {
+      TemplateInstance.encode(v!, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ConfigureHandlersRequest {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseConfigureHandlersRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.chainId = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.templateInstances.push(TemplateInstance.decode(reader, reader.uint32()));
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ConfigureHandlersRequest {
+    return {
+      chainId: isSet(object.chainId) ? globalThis.String(object.chainId) : "",
+      templateInstances: globalThis.Array.isArray(object?.templateInstances)
+        ? object.templateInstances.map((e: any) => TemplateInstance.fromJSON(e))
+        : [],
+    };
+  },
+
+  toJSON(message: ConfigureHandlersRequest): unknown {
+    const obj: any = {};
+    if (message.chainId !== "") {
+      obj.chainId = message.chainId;
+    }
+    if (message.templateInstances?.length) {
+      obj.templateInstances = message.templateInstances.map((e) => TemplateInstance.toJSON(e));
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<ConfigureHandlersRequest>): ConfigureHandlersRequest {
+    return ConfigureHandlersRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ConfigureHandlersRequest>): ConfigureHandlersRequest {
+    const message = createBaseConfigureHandlersRequest();
+    message.chainId = object.chainId ?? "";
+    message.templateInstances = object.templateInstances?.map((e) => TemplateInstance.fromPartial(e)) || [];
     return message;
   },
 };
@@ -8400,6 +8579,157 @@ export const ProcessStreamResponse_Partitions_PartitionsEntry = {
   },
 };
 
+function createBaseProcessStreamResponseV2(): ProcessStreamResponseV2 {
+  return {
+    processId: 0,
+    partitions: undefined,
+    dbRequest: undefined,
+    tsRequest: undefined,
+    tplRequest: undefined,
+    result: undefined,
+  };
+}
+
+export const ProcessStreamResponseV2 = {
+  encode(message: ProcessStreamResponseV2, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.processId !== 0) {
+      writer.uint32(8).int32(message.processId);
+    }
+    if (message.partitions !== undefined) {
+      ProcessStreamResponse_Partitions.encode(message.partitions, writer.uint32(18).fork()).ldelim();
+    }
+    if (message.dbRequest !== undefined) {
+      DBRequest.encode(message.dbRequest, writer.uint32(26).fork()).ldelim();
+    }
+    if (message.tsRequest !== undefined) {
+      TSRequest.encode(message.tsRequest, writer.uint32(34).fork()).ldelim();
+    }
+    if (message.tplRequest !== undefined) {
+      TPLRequest.encode(message.tplRequest, writer.uint32(42).fork()).ldelim();
+    }
+    if (message.result !== undefined) {
+      ProcessResult.encode(message.result, writer.uint32(50).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ProcessStreamResponseV2 {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseProcessStreamResponseV2();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 8) {
+            break;
+          }
+
+          message.processId = reader.int32();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.partitions = ProcessStreamResponse_Partitions.decode(reader, reader.uint32());
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.dbRequest = DBRequest.decode(reader, reader.uint32());
+          continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.tsRequest = TSRequest.decode(reader, reader.uint32());
+          continue;
+        case 5:
+          if (tag !== 42) {
+            break;
+          }
+
+          message.tplRequest = TPLRequest.decode(reader, reader.uint32());
+          continue;
+        case 6:
+          if (tag !== 50) {
+            break;
+          }
+
+          message.result = ProcessResult.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ProcessStreamResponseV2 {
+    return {
+      processId: isSet(object.processId) ? globalThis.Number(object.processId) : 0,
+      partitions: isSet(object.partitions) ? ProcessStreamResponse_Partitions.fromJSON(object.partitions) : undefined,
+      dbRequest: isSet(object.dbRequest) ? DBRequest.fromJSON(object.dbRequest) : undefined,
+      tsRequest: isSet(object.tsRequest) ? TSRequest.fromJSON(object.tsRequest) : undefined,
+      tplRequest: isSet(object.tplRequest) ? TPLRequest.fromJSON(object.tplRequest) : undefined,
+      result: isSet(object.result) ? ProcessResult.fromJSON(object.result) : undefined,
+    };
+  },
+
+  toJSON(message: ProcessStreamResponseV2): unknown {
+    const obj: any = {};
+    if (message.processId !== 0) {
+      obj.processId = Math.round(message.processId);
+    }
+    if (message.partitions !== undefined) {
+      obj.partitions = ProcessStreamResponse_Partitions.toJSON(message.partitions);
+    }
+    if (message.dbRequest !== undefined) {
+      obj.dbRequest = DBRequest.toJSON(message.dbRequest);
+    }
+    if (message.tsRequest !== undefined) {
+      obj.tsRequest = TSRequest.toJSON(message.tsRequest);
+    }
+    if (message.tplRequest !== undefined) {
+      obj.tplRequest = TPLRequest.toJSON(message.tplRequest);
+    }
+    if (message.result !== undefined) {
+      obj.result = ProcessResult.toJSON(message.result);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<ProcessStreamResponseV2>): ProcessStreamResponseV2 {
+    return ProcessStreamResponseV2.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ProcessStreamResponseV2>): ProcessStreamResponseV2 {
+    const message = createBaseProcessStreamResponseV2();
+    message.processId = object.processId ?? 0;
+    message.partitions = (object.partitions !== undefined && object.partitions !== null)
+      ? ProcessStreamResponse_Partitions.fromPartial(object.partitions)
+      : undefined;
+    message.dbRequest = (object.dbRequest !== undefined && object.dbRequest !== null)
+      ? DBRequest.fromPartial(object.dbRequest)
+      : undefined;
+    message.tsRequest = (object.tsRequest !== undefined && object.tsRequest !== null)
+      ? TSRequest.fromPartial(object.tsRequest)
+      : undefined;
+    message.tplRequest = (object.tplRequest !== undefined && object.tplRequest !== null)
+      ? TPLRequest.fromPartial(object.tplRequest)
+      : undefined;
+    message.result = (object.result !== undefined && object.result !== null)
+      ? ProcessResult.fromPartial(object.result)
+      : undefined;
+    return message;
+  },
+};
+
 function createBasePreprocessStreamRequest(): PreprocessStreamRequest {
   return { processId: 0, bindings: undefined, dbResult: undefined };
 }
@@ -9206,6 +9536,126 @@ export const EntityUpdateData_FieldsEntry = {
     message.value = (object.value !== undefined && object.value !== null)
       ? EntityUpdateData_FieldValue.fromPartial(object.value)
       : undefined;
+    return message;
+  },
+};
+
+function createBaseTPLRequest(): TPLRequest {
+  return { templates: [] };
+}
+
+export const TPLRequest = {
+  encode(message: TPLRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.templates) {
+      TemplateInstance.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): TPLRequest {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseTPLRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.templates.push(TemplateInstance.decode(reader, reader.uint32()));
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): TPLRequest {
+    return {
+      templates: globalThis.Array.isArray(object?.templates)
+        ? object.templates.map((e: any) => TemplateInstance.fromJSON(e))
+        : [],
+    };
+  },
+
+  toJSON(message: TPLRequest): unknown {
+    const obj: any = {};
+    if (message.templates?.length) {
+      obj.templates = message.templates.map((e) => TemplateInstance.toJSON(e));
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<TPLRequest>): TPLRequest {
+    return TPLRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<TPLRequest>): TPLRequest {
+    const message = createBaseTPLRequest();
+    message.templates = object.templates?.map((e) => TemplateInstance.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseTSRequest(): TSRequest {
+  return { data: [] };
+}
+
+export const TSRequest = {
+  encode(message: TSRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.data) {
+      TimeseriesResult.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): TSRequest {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseTSRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.data.push(TimeseriesResult.decode(reader, reader.uint32()));
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): TSRequest {
+    return {
+      data: globalThis.Array.isArray(object?.data) ? object.data.map((e: any) => TimeseriesResult.fromJSON(e)) : [],
+    };
+  },
+
+  toJSON(message: TSRequest): unknown {
+    const obj: any = {};
+    if (message.data?.length) {
+      obj.data = message.data.map((e) => TimeseriesResult.toJSON(e));
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<TSRequest>): TSRequest {
+    return TSRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<TSRequest>): TSRequest {
+    const message = createBaseTSRequest();
+    message.data = object.data?.map((e) => TimeseriesResult.fromPartial(e)) || [];
     return message;
   },
 };
@@ -14053,6 +14503,62 @@ export interface ProcessorClient<CallOptionsExt = {}> {
     request: AsyncIterable<DeepPartial<PreprocessStreamRequest>>,
     options?: CallOptions & CallOptionsExt,
   ): AsyncIterable<PreprocessStreamResponse>;
+}
+
+export type ProcessorV2Definition = typeof ProcessorV2Definition;
+export const ProcessorV2Definition = {
+  name: "ProcessorV2",
+  fullName: "processor.ProcessorV2",
+  methods: {
+    init: {
+      name: "Init",
+      requestType: Empty,
+      requestStream: false,
+      responseType: InitResponse,
+      responseStream: false,
+      options: {},
+    },
+    configureHandlers: {
+      name: "ConfigureHandlers",
+      requestType: ConfigureHandlersRequest,
+      requestStream: false,
+      responseType: ProcessConfigResponse,
+      responseStream: false,
+      options: {},
+    },
+    processBindingsStream: {
+      name: "ProcessBindingsStream",
+      requestType: ProcessStreamRequest,
+      requestStream: true,
+      responseType: ProcessStreamResponseV2,
+      responseStream: true,
+      options: {},
+    },
+  },
+} as const;
+
+export interface ProcessorV2ServiceImplementation<CallContextExt = {}> {
+  init(request: Empty, context: CallContext & CallContextExt): Promise<DeepPartial<InitResponse>>;
+  configureHandlers(
+    request: ConfigureHandlersRequest,
+    context: CallContext & CallContextExt,
+  ): Promise<DeepPartial<ProcessConfigResponse>>;
+  processBindingsStream(
+    request: AsyncIterable<ProcessStreamRequest>,
+    context: CallContext & CallContextExt,
+  ): ServerStreamingMethodResult<DeepPartial<ProcessStreamResponseV2>>;
+}
+
+export interface ProcessorV2Client<CallOptionsExt = {}> {
+  init(request: DeepPartial<Empty>, options?: CallOptions & CallOptionsExt): Promise<InitResponse>;
+  configureHandlers(
+    request: DeepPartial<ConfigureHandlersRequest>,
+    options?: CallOptions & CallOptionsExt,
+  ): Promise<ProcessConfigResponse>;
+  processBindingsStream(
+    request: AsyncIterable<DeepPartial<ProcessStreamRequest>>,
+    options?: CallOptions & CallOptionsExt,
+  ): AsyncIterable<ProcessStreamResponseV2>;
 }
 
 type Builtin = Date | Function | Uint8Array | string | number | boolean | bigint | undefined;

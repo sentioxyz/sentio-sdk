@@ -1,9 +1,9 @@
 import { errorString, GLOBAL_CONFIG, mergeProcessResults, Plugin, PluginManager, USER_PROCESSOR } from '@sentio/runtime'
 import {
   ContractConfig,
-  Data_StarknetEvent,
   DataBinding,
   HandlerType,
+  InitResponse,
   ProcessConfigResponse,
   ProcessResult,
   StartRequest
@@ -11,25 +11,29 @@ import {
 
 import { ServerError, Status } from 'nice-grpc'
 import { TemplateInstanceState } from '../core/template.js'
+import { HandlerRegister } from '../core/handler-register.js'
 import { StarknetProcessorState } from './starknet-processor.js'
 import { hash } from 'starknet'
 
-interface Handlers {
-  callHandlers: ((trace: Data_StarknetEvent) => Promise<ProcessResult>)[]
-}
-
 export class StarknetPlugin extends Plugin {
   name: string = 'StarknetPlugin'
-  handlers: Handlers = {
-    callHandlers: []
+  handlerRegister = new HandlerRegister()
+
+  async init(config: InitResponse) {
+    for (const solanaProcessor of StarknetProcessorState.INSTANCE.getValues()) {
+      const chainId = solanaProcessor.config.chainId
+      config.chainIds.push(chainId)
+    }
   }
 
-  async configure(config: ProcessConfigResponse) {
-    const handlers: Handlers = {
-      callHandlers: []
-    }
+  async configure(config: ProcessConfigResponse, forChainId?: string) {
+    this.handlerRegister.clear(forChainId as any)
 
     for (const processor of StarknetProcessorState.INSTANCE.getValues()) {
+      const chainId = processor.config.chainId
+      if (forChainId !== undefined && forChainId !== chainId.toString()) {
+        continue
+      }
       await processor.configure()
       const contractConfig = ContractConfig.fromPartial({
         processorType: USER_PROCESSOR,
@@ -43,7 +47,7 @@ export class StarknetPlugin extends Plugin {
         endBlock: processor.config.endBlock
       })
       for (const callHandler of processor.callHandlers) {
-        const handlerId = handlers.callHandlers.push(callHandler.handler) - 1
+        const handlerId = this.handlerRegister.register(callHandler.handler, chainId)
 
         if (callHandler.eventFilter) {
           contractConfig.starknetEventConfigs.push({
@@ -60,8 +64,6 @@ export class StarknetPlugin extends Plugin {
       // Finish up a contract
       config.contractConfigs.push(contractConfig)
     }
-
-    this.handlers = handlers
   }
 
   supportedHandlers = [HandlerType.STARKNET_EVENT]
@@ -91,12 +93,14 @@ export class StarknetPlugin extends Plugin {
     const result = binding.data?.starknetEvents?.result
 
     for (const handlerId of binding.handlerIds) {
-      const promise = this.handlers.callHandlers[handlerId](binding.data?.starknetEvents).catch((e) => {
-        throw new ServerError(
-          Status.INTERNAL,
-          'error processing transaction: ' + JSON.stringify(result) + '\n' + errorString(e)
-        )
-      })
+      const promise = this.handlerRegister
+        .getHandlerById(handlerId)(binding.data?.starknetEvents)
+        .catch((e: any) => {
+          throw new ServerError(
+            Status.INTERNAL,
+            'error processing transaction: ' + JSON.stringify(result) + '\n' + errorString(e)
+          )
+        })
       if (GLOBAL_CONFIG.execution.sequential) {
         await promise
       }

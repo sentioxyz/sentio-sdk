@@ -1,5 +1,12 @@
 import { errorString, mergeProcessResults, Plugin, PluginManager, USER_PROCESSOR } from '@sentio/runtime'
-import { ContractConfig, DataBinding, HandlerType, ProcessConfigResponse, ProcessResult } from '@sentio/protos'
+import {
+  ContractConfig,
+  DataBinding,
+  HandlerType,
+  InitResponse,
+  ProcessConfigResponse,
+  ProcessResult
+} from '@sentio/protos'
 
 import { ServerError, Status } from 'nice-grpc'
 
@@ -9,9 +16,20 @@ import { Instruction as SolInstruction } from '@coral-xyz/anchor'
 export class SolanaPlugin extends Plugin {
   name: string = 'SolanaPlugin'
 
-  async configure(config: ProcessConfigResponse) {
+  async init(config: InitResponse) {
+    for (const solanaProcessor of SolanaProcessorState.INSTANCE.getValues()) {
+      const chainId = solanaProcessor.network
+      config.chainIds.push(chainId)
+    }
+  }
+
+  async configure(config: ProcessConfigResponse, forChainId?: string) {
     // Part 2, prepare solana constractors
     for (const solanaProcessor of SolanaProcessorState.INSTANCE.getValues()) {
+      const chainId = solanaProcessor.network
+      if (forChainId !== undefined && forChainId !== chainId.toString()) {
+        continue
+      }
       const contractConfig = ContractConfig.fromPartial({
         processorType: USER_PROCESSOR,
         contract: {
