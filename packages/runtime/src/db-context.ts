@@ -5,7 +5,10 @@ import {
   DBResponse,
   DeepPartial,
   ProcessResult,
-  ProcessStreamResponse
+  ProcessStreamResponse,
+  ProcessStreamResponseV2,
+  TemplateInstance,
+  TimeseriesResult
 } from '@sentio/protos'
 import * as process from 'node:process'
 import { dbMetrics } from './metrics.js'
@@ -36,6 +39,11 @@ export interface IStoreContext {
   error(processId: number, e: any): void
 
   close(): void
+}
+
+export interface IDataBindingContext extends IStoreContext {
+  sendTemplateRequest(templates: Array<TemplateInstance>): void
+  sendTimeseriesRequest(timeseries: Array<TimeseriesResult>): void
 }
 
 export abstract class AbstractStoreContext implements IStoreContext {
@@ -238,6 +246,40 @@ export class StoreContext extends AbstractStoreContext {
   }
 
   doSend(resp: DeepPartial<ProcessStreamResponse>) {
+    this.subject.next({
+      ...resp,
+      processId: this.processId
+    })
+  }
+}
+
+// for service v2
+export class DataBindingContext extends AbstractStoreContext implements IDataBindingContext {
+  constructor(
+    readonly processId: number,
+    readonly subject: Subject<DeepPartial<ProcessStreamResponseV2>>
+  ) {
+    super(processId)
+  }
+
+  sendTemplateRequest(templates: Array<TemplateInstance>) {
+    this.subject.next({
+      processId: this.processId,
+      tplRequest: {
+        templates
+      }
+    })
+  }
+  sendTimeseriesRequest(timeseries: Array<TimeseriesResult>) {
+    this.subject.next({
+      processId: this.processId,
+      tsRequest: {
+        data: timeseries
+      }
+    })
+  }
+
+  doSend(resp: DeepPartial<ProcessStreamResponseV2>) {
     this.subject.next({
       ...resp,
       processId: this.processId

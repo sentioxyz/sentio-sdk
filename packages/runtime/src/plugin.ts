@@ -1,6 +1,7 @@
 import {
   DataBinding,
   HandlerType,
+  InitResponse,
   PreparedData,
   PreprocessResult,
   ProcessConfigResponse,
@@ -16,7 +17,7 @@ export abstract class Plugin {
   name: string
   supportedHandlers: HandlerType[] = []
 
-  async configure(config: ProcessConfigResponse): Promise<void> {}
+  async configure(config: ProcessConfigResponse, forChainId?: string): Promise<void> {}
 
   async start(start: StartRequest): Promise<void> {}
 
@@ -59,6 +60,12 @@ export abstract class Plugin {
    * method used by action server only
    */
   shutdownServer() {}
+
+  /**
+   * Initialize the plugin, for service v2.
+   * @param config
+   */
+  async init(config: InitResponse): Promise<void> {}
 }
 
 export class PluginManager {
@@ -83,8 +90,8 @@ export class PluginManager {
     }
   }
 
-  configure(config: ProcessConfigResponse) {
-    return Promise.all(this.plugins.map((plugin) => plugin.configure(config)))
+  async configure(config: ProcessConfigResponse, forChainId?: string): Promise<void> {
+    await Promise.all(this.plugins.map((plugin) => plugin.configure(config, forChainId)))
   }
 
   start(start: StartRequest, actionServerPort?: number) {
@@ -140,5 +147,9 @@ export class PluginManager {
     return this.dbContextLocalStorage.run(dbContext, () => {
       return plugin.preprocessBinding(request, preprocessStore)
     })
+  }
+
+  async init(resp: InitResponse) {
+    return Promise.all(this.plugins.map((plugin) => plugin.init(resp)))
   }
 }

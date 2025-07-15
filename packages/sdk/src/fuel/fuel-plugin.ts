@@ -1,12 +1,11 @@
 import { errorString, GLOBAL_CONFIG, mergeProcessResults, Plugin, PluginManager, USER_PROCESSOR } from '@sentio/runtime'
 import { PartitionHandlerManager } from '../core/index.js'
+import { HandlerRegister } from '../core/handler-register.js'
 import {
   ContractConfig,
-  Data_FuelBlock,
-  Data_FuelReceipt,
-  Data_FuelTransaction,
   DataBinding,
   HandlerType,
+  InitResponse,
   ProcessConfigResponse,
   ProcessResult,
   ProcessStreamResponse_Partitions,
@@ -20,30 +19,26 @@ import { FuelProcessorState } from './types.js'
 import { FuelProcessor } from './fuel-processor.js'
 import { FuelGlobalProcessor } from './global-processor.js'
 
-interface Handlers {
-  transactionHandlers: ((trace: Data_FuelTransaction) => Promise<ProcessResult>)[]
-  blockHandlers: ((block: Data_FuelBlock) => Promise<ProcessResult>)[]
-  receiptHandlers: ((log: Data_FuelReceipt) => Promise<ProcessResult>)[]
-}
-
 export class FuelPlugin extends Plugin {
   name: string = 'FuelPlugin'
-  handlers: Handlers = {
-    transactionHandlers: [],
-    blockHandlers: [],
-    receiptHandlers: []
-  }
-
+  handlerRegister = new HandlerRegister()
   partitionManager = new PartitionHandlerManager()
 
-  async configure(config: ProcessConfigResponse) {
-    const handlers: Handlers = {
-      transactionHandlers: [],
-      blockHandlers: [],
-      receiptHandlers: []
+  async init(config: InitResponse) {
+    for (const fuelProcessor of FuelProcessorState.INSTANCE.getValues()) {
+      const chainId = fuelProcessor.config.chainId
+      config.chainIds.push(chainId)
     }
+  }
+
+  async configure(config: ProcessConfigResponse, forChainId?: string) {
+    this.handlerRegister.clear(forChainId as any)
 
     for (const processor of FuelProcessorState.INSTANCE.getValues()) {
+      const chainId = processor.config.chainId
+      if (forChainId !== undefined && forChainId !== chainId.toString()) {
+        continue
+      }
       const processorConfig = processor.config
       const contractConfig = ContractConfig.fromPartial({
         processorType: USER_PROCESSOR,
@@ -57,7 +52,7 @@ export class FuelPlugin extends Plugin {
         endBlock: processorConfig.endBlock
       })
       for (const txHandler of processor.txHandlers) {
-        const handlerId = handlers.transactionHandlers.push(txHandler.handler) - 1
+        const handlerId = this.handlerRegister.register(txHandler.handler, chainId)
         this.partitionManager.registerPartitionHandler(
           HandlerType.FUEL_TRANSACTION,
           handlerId,
@@ -90,7 +85,7 @@ export class FuelPlugin extends Plugin {
       }
 
       for (const receiptHandler of processor.receiptHandlers ?? []) {
-        const handlerId = handlers.receiptHandlers.push(receiptHandler.handler) - 1
+        const handlerId = this.handlerRegister.register(receiptHandler.handler, chainId)
         this.partitionManager.registerPartitionHandler(
           HandlerType.FUEL_RECEIPT,
           handlerId,
@@ -107,7 +102,7 @@ export class FuelPlugin extends Plugin {
       }
 
       for (const blockHandler of processor.blockHandlers) {
-        const handlerId = handlers.blockHandlers.push(blockHandler.handler) - 1
+        const handlerId = this.handlerRegister.register(blockHandler.handler, chainId)
         this.partitionManager.registerPartitionHandler(HandlerType.FUEL_BLOCK, handlerId, blockHandler.partitionHandler)
         contractConfig.intervalConfigs.push({
           slot: 0,
@@ -123,8 +118,6 @@ export class FuelPlugin extends Plugin {
 
       config.contractConfigs.push(contractConfig)
     }
-
-    this.handlers = handlers
   }
 
   supportedHandlers = [
@@ -212,12 +205,14 @@ export class FuelPlugin extends Plugin {
     const promises: Promise<ProcessResult>[] = []
 
     for (const handlerId of binding.handlerIds) {
-      const promise = this.handlers.receiptHandlers[handlerId](receipt).catch((e) => {
-        throw new ServerError(
-          Status.INTERNAL,
-          'error processing transaction: ' + JSON.stringify(receipt) + '\n' + errorString(e)
-        )
-      })
+      const promise = this.handlerRegister
+        .getHandlerById(handlerId)(receipt)
+        .catch((e: any) => {
+          throw new ServerError(
+            Status.INTERNAL,
+            'error processing transaction: ' + JSON.stringify(receipt) + '\n' + errorString(e)
+          )
+        })
       if (GLOBAL_CONFIG.execution.sequential) {
         await promise
       }
@@ -235,12 +230,14 @@ export class FuelPlugin extends Plugin {
     const promises: Promise<ProcessResult>[] = []
 
     for (const handlerId of binding.handlerIds) {
-      const promise = this.handlers.transactionHandlers[handlerId](fuelTransaction).catch((e) => {
-        throw new ServerError(
-          Status.INTERNAL,
-          'error processing transaction: ' + JSON.stringify(fuelTransaction.transaction) + '\n' + errorString(e)
-        )
-      })
+      const promise = this.handlerRegister
+        .getHandlerById(handlerId)(fuelTransaction)
+        .catch((e: any) => {
+          throw new ServerError(
+            Status.INTERNAL,
+            'error processing transaction: ' + JSON.stringify(fuelTransaction.transaction) + '\n' + errorString(e)
+          )
+        })
       if (GLOBAL_CONFIG.execution.sequential) {
         await promise
       }
@@ -257,13 +254,15 @@ export class FuelPlugin extends Plugin {
 
     const promises: Promise<ProcessResult>[] = []
     for (const handlerId of binding.handlerIds) {
-      const promise = this.handlers.blockHandlers[handlerId](ethBlock).catch((e) => {
-        console.error('error processing block: ', e)
-        throw new ServerError(
-          Status.INTERNAL,
-          'error processing block: ' + ethBlock.block?.height + '\n' + errorString(e)
-        )
-      })
+      const promise = this.handlerRegister
+        .getHandlerById(handlerId)(ethBlock)
+        .catch((e: any) => {
+          console.error('error processing block: ', e)
+          throw new ServerError(
+            Status.INTERNAL,
+            'error processing block: ' + ethBlock.block?.height + '\n' + errorString(e)
+          )
+        })
       if (GLOBAL_CONFIG.execution.sequential) {
         await promise
       }

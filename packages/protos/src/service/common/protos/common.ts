@@ -313,6 +313,17 @@ export interface UsageTracker {
   versionField: string;
 }
 
+export interface Auth {
+  permission: string[];
+  metadata: { [key: string]: string };
+  allowAnonymous: boolean;
+}
+
+export interface Auth_MetadataEntry {
+  key: string;
+  value: string;
+}
+
 export interface AccessMeta {
   projectIdField: string;
   projectSlugField: string;
@@ -2179,6 +2190,190 @@ export const UsageTracker = {
     message.projectSlugField = object.projectSlugField ?? "";
     message.projectOwnerField = object.projectOwnerField ?? "";
     message.versionField = object.versionField ?? "";
+    return message;
+  },
+};
+
+function createBaseAuth(): Auth {
+  return { permission: [], metadata: {}, allowAnonymous: false };
+}
+
+export const Auth = {
+  encode(message: Auth, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.permission) {
+      writer.uint32(10).string(v!);
+    }
+    Object.entries(message.metadata).forEach(([key, value]) => {
+      Auth_MetadataEntry.encode({ key: key as any, value }, writer.uint32(18).fork()).ldelim();
+    });
+    if (message.allowAnonymous !== false) {
+      writer.uint32(24).bool(message.allowAnonymous);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Auth {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAuth();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.permission.push(reader.string());
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          const entry2 = Auth_MetadataEntry.decode(reader, reader.uint32());
+          if (entry2.value !== undefined) {
+            message.metadata[entry2.key] = entry2.value;
+          }
+          continue;
+        case 3:
+          if (tag !== 24) {
+            break;
+          }
+
+          message.allowAnonymous = reader.bool();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Auth {
+    return {
+      permission: globalThis.Array.isArray(object?.permission)
+        ? object.permission.map((e: any) => globalThis.String(e))
+        : [],
+      metadata: isObject(object.metadata)
+        ? Object.entries(object.metadata).reduce<{ [key: string]: string }>((acc, [key, value]) => {
+          acc[key] = String(value);
+          return acc;
+        }, {})
+        : {},
+      allowAnonymous: isSet(object.allowAnonymous) ? globalThis.Boolean(object.allowAnonymous) : false,
+    };
+  },
+
+  toJSON(message: Auth): unknown {
+    const obj: any = {};
+    if (message.permission?.length) {
+      obj.permission = message.permission;
+    }
+    if (message.metadata) {
+      const entries = Object.entries(message.metadata);
+      if (entries.length > 0) {
+        obj.metadata = {};
+        entries.forEach(([k, v]) => {
+          obj.metadata[k] = v;
+        });
+      }
+    }
+    if (message.allowAnonymous !== false) {
+      obj.allowAnonymous = message.allowAnonymous;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<Auth>): Auth {
+    return Auth.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<Auth>): Auth {
+    const message = createBaseAuth();
+    message.permission = object.permission?.map((e) => e) || [];
+    message.metadata = Object.entries(object.metadata ?? {}).reduce<{ [key: string]: string }>((acc, [key, value]) => {
+      if (value !== undefined) {
+        acc[key] = globalThis.String(value);
+      }
+      return acc;
+    }, {});
+    message.allowAnonymous = object.allowAnonymous ?? false;
+    return message;
+  },
+};
+
+function createBaseAuth_MetadataEntry(): Auth_MetadataEntry {
+  return { key: "", value: "" };
+}
+
+export const Auth_MetadataEntry = {
+  encode(message: Auth_MetadataEntry, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.key !== "") {
+      writer.uint32(10).string(message.key);
+    }
+    if (message.value !== "") {
+      writer.uint32(18).string(message.value);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Auth_MetadataEntry {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAuth_MetadataEntry();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.key = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.value = reader.string();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Auth_MetadataEntry {
+    return {
+      key: isSet(object.key) ? globalThis.String(object.key) : "",
+      value: isSet(object.value) ? globalThis.String(object.value) : "",
+    };
+  },
+
+  toJSON(message: Auth_MetadataEntry): unknown {
+    const obj: any = {};
+    if (message.key !== "") {
+      obj.key = message.key;
+    }
+    if (message.value !== "") {
+      obj.value = message.value;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<Auth_MetadataEntry>): Auth_MetadataEntry {
+    return Auth_MetadataEntry.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<Auth_MetadataEntry>): Auth_MetadataEntry {
+    const message = createBaseAuth_MetadataEntry();
+    message.key = object.key ?? "";
+    message.value = object.value ?? "";
     return message;
   },
 };

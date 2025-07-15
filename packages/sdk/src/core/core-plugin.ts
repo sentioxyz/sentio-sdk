@@ -1,5 +1,5 @@
 import { Plugin, PluginManager } from '@sentio/runtime'
-import { ProcessConfigResponse } from '@sentio/protos'
+import { InitResponse, ProcessConfigResponse } from '@sentio/protos'
 
 import { MetricState, MetricStateNew } from './meter.js'
 import { ExporterState } from './exporter.js'
@@ -24,7 +24,6 @@ export class CorePlugin extends Plugin {
         ...metric.config
       })
     }
-
     for (const event of EventLoggerState.INSTANCE.getValues()) {
       config.eventLogConfigs.push({
         ...event.config
@@ -38,6 +37,16 @@ export class CorePlugin extends Plugin {
       })
     }
 
+    if (DatabaseSchemaState.INSTANCE.getValues().length > 0) {
+      config.dbSchema = {
+        gqlSchema: DatabaseSchemaState.INSTANCE.getValues()
+          .map((e) => e.source)
+          .join('\n\n')
+      }
+    }
+  }
+
+  async init(config: InitResponse): Promise<void> {
     if (DatabaseSchemaState.INSTANCE.getValues().length > 0) {
       config.dbSchema = {
         gqlSchema: DatabaseSchemaState.INSTANCE.getValues()

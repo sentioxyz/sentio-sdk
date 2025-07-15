@@ -21,6 +21,8 @@ describe('Test Aptos Example', () => {
   })
 
   test('Check souffl3 transaction dispatch', async () => {
+    const config = await service.getConfig({})
+    const handlerId = config.contractConfigs[0].moveCallConfigs[1].handlerId
     const request: ProcessBindingsRequest = {
       bindings: [
         {
@@ -29,7 +31,7 @@ describe('Test Aptos Example', () => {
               rawTransaction: JSON.stringify(testData)
             }
           },
-          handlerIds: [1],
+          handlerIds: [handlerId],
           handlerType: HandlerType.APT_CALL
         }
       ]
@@ -69,6 +71,8 @@ describe('Test Aptos Example', () => {
   })
 
   test('check on timer', async () => {
+    const config = await service.getConfig({})
+    const handlerId = config.accountConfigs[5].moveIntervalConfigs[0].intervalConfig?.handlerId ?? 0
     const request: ProcessBindingsRequest = {
       bindings: [
         {
@@ -86,7 +90,7 @@ describe('Test Aptos Example', () => {
               timestampMicros: 1n
             }
           },
-          handlerIds: [0],
+          handlerIds: [handlerId],
           handlerType: HandlerType.APT_RESOURCE
         }
       ]
@@ -96,6 +100,8 @@ describe('Test Aptos Example', () => {
   })
 
   test('Check aptos account transaction dispatch', async () => {
+    const config = await service.getConfig({})
+    const handlerId = config.contractConfigs[4].moveCallConfigs[0].handlerId
     const request: ProcessBindingsRequest = {
       bindings: [
         {
@@ -104,7 +110,7 @@ describe('Test Aptos Example', () => {
               rawTransaction: JSON.stringify(dataCreate)
             }
           },
-          handlerIds: [3],
+          handlerIds: [handlerId],
           handlerType: HandlerType.APT_CALL
         }
       ]
