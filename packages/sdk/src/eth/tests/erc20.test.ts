@@ -18,7 +18,6 @@ describe('Test Basic Examples', () => {
   before(async () => {
     await service.start()
   })
-
   test('check configuration', async () => {
     const config = await service.getConfig({})
     expect(config.contractConfigs).length(5)
@@ -85,7 +84,9 @@ describe('Test Basic Examples', () => {
 
   test('Check trace dispatch', async () => {
     // const res = (await service.eth.testTrace(traceData)).result
+    const config = await service.getConfig({})
 
+    const handlerId = config.contractConfigs?.[0].traceConfigs[0].handlerId
     const res = (
       await service.processBinding({
         data: {
@@ -108,7 +109,7 @@ describe('Test Basic Examples', () => {
             timestamp: new Date()
           }
         },
-        handlerIds: [0],
+        handlerIds: [handlerId],
         handlerType: HandlerType.ETH_TRACE
       })
     ).result
