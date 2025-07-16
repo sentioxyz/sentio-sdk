@@ -15,6 +15,13 @@ export type HandlerOptions<F, D> = Partial<F> & {
    * Can be a static string or a function that computes the key from the data.
    */
   partitionKey?: string | PartitionHandler<D>
+
+  /**
+   * Optional whether to skip decoding
+   * By default the processor will do decoding (e.g. replace string number to bigint, byte array to base64, etc),
+   * however in some case you might skip the decoding (meaning no data_decoded field) and only access the raw data field
+   */
+  skipDecoding?: boolean
 }
 
 /**

@@ -111,8 +111,12 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
           processor.config.baseLabels
         )
 
-        const decoded = await data.decodeEvent(processor.coder)
-        await handler(decoded || data.event, ctx)
+        if (!handlerOptions?.skipDecoding) {
+          const decoded = await data.decodeEvent(processor.coder)
+          await handler(decoded || data.event, ctx)
+        } else {
+          await handler(data.event, ctx)
+        }
         return ctx.stopAndGetResult()
       },
       filters: _filters,
@@ -242,7 +246,7 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
     handler: (event: Event, ctx: AptosContext) => void,
     handlerOptions?: HandlerOptions<MoveFetchConfig, Event>
   ): this {
-    this.onMoveEvent(handler, { type: '' }, handlerOptions)
+    this.onMoveEvent(handler, { type: '' }, { ...handlerOptions, skipDecoding: true })
     return this
   }
 
@@ -397,6 +401,14 @@ export class AptosModulesProcessor extends AptosTransactionProcessor<
 
   static bind(options: AptosBindOptions): AptosModulesProcessor {
     return new AptosModulesProcessor(options)
+  }
+
+  public onMoveEvent(
+    handler: (event: Event, ctx: AptosContext) => PromiseOrVoid,
+    filter: EventFilter | EventFilter[],
+    handlerOptions?: HandlerOptions<MoveFetchConfig, Event>
+  ) {
+    return super.onMoveEvent(handler, filter, handlerOptions)
   }
 }
 
