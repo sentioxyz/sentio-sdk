@@ -150,34 +150,39 @@ export function formatEthData(data: {
     return data.__formattedEthData
   }
 
-  const log = data.log ? formatLog(data.log) : undefined
-  if (data.block && !data.block.transactions) {
-    data.block.transactions = []
-  }
-  const block = data.block ? formatRichBlock(data.block) : undefined
-  const trace = data.trace ? (data.trace as Trace) : undefined
-  let transaction = undefined
-  if (data.transaction) {
-    if (!data.transaction.v) {
-      data.transaction.v = '0x1c'
-      data.transaction.r = '0x88ff6cf0fefd94db46111149ae4bfc179e9b94721fffd821d38d16464b3f71d0'
-      data.transaction.s = '0x45e0aff800961cfce805daef7016b9b675c137a6a41a548f7b60a3484c06a33a'
+  try {
+    const log = data.log ? formatLog(data.log) : undefined
+    if (data.block && !data.block.transactions) {
+      data.block.transactions = []
     }
-    transaction = formatTransactionResponse(data.transaction)
-  }
-  const transactionReceipt = data.transactionReceipt ? formatTransactionReceipt(data.transactionReceipt) : undefined
+    const block = data.block ? formatRichBlock(data.block) : undefined
+    const trace = data.trace ? (data.trace as Trace) : undefined
+    let transaction = undefined
+    if (data.transaction) {
+      if (!data.transaction.v) {
+        data.transaction.v = '0x1c'
+        data.transaction.r = '0x88ff6cf0fefd94db46111149ae4bfc179e9b94721fffd821d38d16464b3f71d0'
+        data.transaction.s = '0x45e0aff800961cfce805daef7016b9b675c137a6a41a548f7b60a3484c06a33a'
+      }
+      transaction = formatTransactionResponse(data.transaction)
+    }
+    const transactionReceipt = data.transactionReceipt ? formatTransactionReceipt(data.transactionReceipt) : undefined
 
-  const result = {
-    log,
-    block,
-    trace,
-    transaction,
-    transactionReceipt
-  }
+    const result = {
+      log,
+      block,
+      trace,
+      transaction,
+      transactionReceipt
+    }
 
-  // Cache the result on the input data object
-  data.__formattedEthData = result
-  return result
+    // Cache the result on the input data object
+    data.__formattedEthData = result
+    return result
+  } catch (e) {
+    console.error('Error formatting eth data', e)
+    return data
+  }
 }
 
 export function formatRichBlock(block: RichBlock): RichBlock {
