@@ -1,4 +1,32 @@
 {
+  "accumulator": {
+    "fileFormatVersion": 6,
+    "address": "0x2",
+    "name": "accumulator",
+    "friends": [],
+    "structs": {
+      "AccumulatorRoot": {
+        "abilities": {
+          "abilities": ["Key"]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "id",
+            "type": {
+              "Struct": {
+                "address": "0x2",
+                "module": "object",
+                "name": "UID",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {}
+  },
   "address": {
     "fileFormatVersion": 6,
     "address": "0x2",
@@ -13581,6 +13609,10 @@
     "friends": [
       {
         "address": "0x2",
+        "name": "accumulator"
+      },
+      {
+        "address": "0x2",
         "name": "authenticator_state"
       },
       {
@@ -13894,6 +13926,29 @@
         ]
       },
       "randomness_state": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "object",
+              "name": "UID",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "sui_accumulator_root_address": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [],
+        "return": ["Address"]
+      },
+      "sui_accumulator_root_object_id": {
         "visibility": "Friend",
         "isEntry": false,
         "typeParameters": [],
@@ -15439,6 +15494,131 @@
           }
         ],
         "return": ["U64"]
+      }
+    }
+  },
+  "party": {
+    "fileFormatVersion": 6,
+    "address": "0x2",
+    "name": "party",
+    "friends": [
+      {
+        "address": "0x2",
+        "name": "transfer"
+      }
+    ],
+    "structs": {
+      "Party": {
+        "abilities": {
+          "abilities": ["Copy", "Drop"]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "default",
+            "type": {
+              "Struct": {
+                "address": "0x2",
+                "module": "party",
+                "name": "Permissions",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "members",
+            "type": {
+              "Struct": {
+                "address": "0x2",
+                "module": "vec_map",
+                "name": "VecMap",
+                "typeArguments": [
+                  "Address",
+                  {
+                    "Struct": {
+                      "address": "0x2",
+                      "module": "party",
+                      "name": "Permissions",
+                      "typeArguments": []
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "Permissions": {
+        "abilities": {
+          "abilities": ["Copy", "Drop"]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "pos0",
+            "type": "U64"
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {
+      "into_native": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "party",
+              "name": "Party",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": [
+          "U64",
+          {
+            "Vector": "Address"
+          },
+          {
+            "Vector": "U64"
+          }
+        ]
+      },
+      "is_single_owner": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "party",
+                "name": "Party",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": ["Bool"]
+      },
+      "single_owner": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["Address"],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "party",
+              "name": "Party",
+              "typeArguments": []
+            }
+          }
+        ]
       }
     }
   },
@@ -19584,6 +19764,51 @@
         ],
         "return": []
       },
+      "party_transfer": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Key"]
+          }
+        ],
+        "parameters": [
+          {
+            "TypeParameter": 0
+          },
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "party",
+              "name": "Party",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": []
+      },
+      "party_transfer_impl": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Key"]
+          }
+        ],
+        "parameters": [
+          {
+            "TypeParameter": 0
+          },
+          "U64",
+          {
+            "Vector": "Address"
+          },
+          {
+            "Vector": "U64"
+          }
+        ],
+        "return": []
+      },
       "public_freeze_object": {
         "visibility": "Public",
         "isEntry": false,
@@ -19595,6 +19820,29 @@
         "parameters": [
           {
             "TypeParameter": 0
+          }
+        ],
+        "return": []
+      },
+      "public_party_transfer": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Store", "Key"]
+          }
+        ],
+        "parameters": [
+          {
+            "TypeParameter": 0
+          },
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "party",
+              "name": "Party",
+              "typeArguments": []
+            }
           }
         ],
         "return": []

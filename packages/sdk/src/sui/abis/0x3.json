@@ -709,6 +709,33 @@
         ],
         "return": []
       },
+      "activation_epoch": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "staking_pool",
+                "name": "StakingPool",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": ["U64"]
+            }
+          }
+        ]
+      },
       "convert_to_fungible_staked_sui": {
         "visibility": "Friend",
         "isEntry": false,
