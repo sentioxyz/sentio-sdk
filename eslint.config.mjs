@@ -29,7 +29,8 @@ export default tseslint.config(
       '**/types',
       '**/builtin',
       '**/templates',
-      'packages/protos'
+      'packages/protos',
+      'packages/sdk/sync-sui-to-iota.ts'
     ]
   },
 

@@ -1,0 +1,4 @@
+project: iota
+contracts:
+  - chain: iota_mainnet
+    address: '0x1b33a3cf7eb5dde04ed7ae571db1763006811ff6b7bb35b3d1c780de153af9dd'

@@ -1,0 +1,4924 @@
+{
+  "batch_price_attestation": {
+    "fileFormatVersion": 6,
+    "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+    "name": "batch_price_attestation",
+    "friends": [],
+    "structs": {
+      "BatchPriceAttestation": {
+        "abilities": {
+          "abilities": []
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "header",
+            "type": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "batch_price_attestation",
+                "name": "Header",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "attestation_size",
+            "type": "U64"
+          },
+          {
+            "name": "attestation_count",
+            "type": "U64"
+          },
+          {
+            "name": "price_infos",
+            "type": {
+              "Vector": {
+                "Struct": {
+                  "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                  "module": "price_info",
+                  "name": "PriceInfo",
+                  "typeArguments": []
+                }
+              }
+            }
+          }
+        ]
+      },
+      "Header": {
+        "abilities": {
+          "abilities": []
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "magic",
+            "type": "U64"
+          },
+          {
+            "name": "version_major",
+            "type": "U64"
+          },
+          {
+            "name": "version_minor",
+            "type": "U64"
+          },
+          {
+            "name": "header_size",
+            "type": "U64"
+          },
+          {
+            "name": "payload_id",
+            "type": "U8"
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {
+      "deserialize": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Vector": "U8"
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "clock",
+                "name": "Clock",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "batch_price_attestation",
+              "name": "BatchPriceAttestation",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "destroy": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "batch_price_attestation",
+              "name": "BatchPriceAttestation",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": [
+          {
+            "Vector": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "price_info",
+                "name": "PriceInfo",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      },
+      "get_attestation_count": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "batch_price_attestation",
+                "name": "BatchPriceAttestation",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": ["U64"]
+      },
+      "get_price_info": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "batch_price_attestation",
+                "name": "BatchPriceAttestation",
+                "typeArguments": []
+              }
+            }
+          },
+          "U64"
+        ],
+        "return": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "price_info",
+                "name": "PriceInfo",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "contract_upgrade": {
+    "fileFormatVersion": 6,
+    "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+    "name": "contract_upgrade",
+    "friends": [
+      {
+        "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+        "name": "migrate"
+      }
+    ],
+    "structs": {
+      "ContractUpgraded": {
+        "abilities": {
+          "abilities": ["Copy", "Drop"]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "old_contract",
+            "type": {
+              "Struct": {
+                "address": "0x2",
+                "module": "object",
+                "name": "ID",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "new_contract",
+            "type": {
+              "Struct": {
+                "address": "0x2",
+                "module": "object",
+                "name": "ID",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      },
+      "UpgradeContract": {
+        "abilities": {
+          "abilities": []
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "digest",
+            "type": {
+              "Struct": {
+                "address": "0x5306f64e312b581766351c07af79c72fcb1cd25147157fdc2f8ad76de9a3fb6a",
+                "module": "bytes32",
+                "name": "Bytes32",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {
+      "authorize_governance": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x5306f64e312b581766351c07af79c72fcb1cd25147157fdc2f8ad76de9a3fb6a",
+              "module": "governance_message",
+              "name": "DecreeTicket",
+              "typeArguments": [
+                {
+                  "Struct": {
+                    "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                    "module": "governance_witness",
+                    "name": "GovernanceWitness",
+                    "typeArguments": []
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "authorize_upgrade": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x5306f64e312b581766351c07af79c72fcb1cd25147157fdc2f8ad76de9a3fb6a",
+              "module": "governance_message",
+              "name": "DecreeReceipt",
+              "typeArguments": [
+                {
+                  "Struct": {
+                    "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                    "module": "governance_witness",
+                    "name": "GovernanceWitness",
+                    "typeArguments": []
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "package",
+              "name": "UpgradeTicket",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "commit_upgrade": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "package",
+              "name": "UpgradeReceipt",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": []
+      },
+      "take_digest": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Vector": "U8"
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x5306f64e312b581766351c07af79c72fcb1cd25147157fdc2f8ad76de9a3fb6a",
+              "module": "bytes32",
+              "name": "Bytes32",
+              "typeArguments": []
+            }
+          }
+        ]
+      }
+    }
+  },
+  "data_source": {
+    "fileFormatVersion": 6,
+    "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+    "name": "data_source",
+    "friends": [
+      {
+        "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+        "name": "pyth"
+      },
+      {
+        "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+        "name": "set_data_sources"
+      },
+      {
+        "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+        "name": "set_governance_data_source"
+      },
+      {
+        "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+        "name": "state"
+      }
+    ],
+    "structs": {
+      "DataSource": {
+        "abilities": {
+          "abilities": ["Copy", "Drop", "Store"]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "emitter_chain",
+            "type": "U64"
+          },
+          {
+            "name": "emitter_address",
+            "type": {
+              "Struct": {
+                "address": "0x5306f64e312b581766351c07af79c72fcb1cd25147157fdc2f8ad76de9a3fb6a",
+                "module": "external_address",
+                "name": "ExternalAddress",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {
+      "add": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "object",
+                "name": "UID",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "data_source",
+              "name": "DataSource",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": []
+      },
+      "contains": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "object",
+                "name": "UID",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "data_source",
+              "name": "DataSource",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": ["Bool"]
+      },
+      "emitter_address": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "data_source",
+                "name": "DataSource",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x5306f64e312b581766351c07af79c72fcb1cd25147157fdc2f8ad76de9a3fb6a",
+              "module": "external_address",
+              "name": "ExternalAddress",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "emitter_chain": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "data_source",
+                "name": "DataSource",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": ["U64"]
+      },
+      "empty": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "object",
+                "name": "UID",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": []
+      },
+      "new": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U64",
+          {
+            "Struct": {
+              "address": "0x5306f64e312b581766351c07af79c72fcb1cd25147157fdc2f8ad76de9a3fb6a",
+              "module": "external_address",
+              "name": "ExternalAddress",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "data_source",
+              "name": "DataSource",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "new_data_source_registry": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "object",
+                "name": "UID",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": []
+      }
+    }
+  },
+  "deserialize": {
+    "fileFormatVersion": 6,
+    "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+    "name": "deserialize",
+    "friends": [],
+    "structs": {},
+    "exposedFunctions": {
+      "deserialize_i32": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x5306f64e312b581766351c07af79c72fcb1cd25147157fdc2f8ad76de9a3fb6a",
+                "module": "cursor",
+                "name": "Cursor",
+                "typeArguments": ["U8"]
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "i64",
+              "name": "I64",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "deserialize_i64": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x5306f64e312b581766351c07af79c72fcb1cd25147157fdc2f8ad76de9a3fb6a",
+                "module": "cursor",
+                "name": "Cursor",
+                "typeArguments": ["U8"]
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "i64",
+              "name": "I64",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "deserialize_u16": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x5306f64e312b581766351c07af79c72fcb1cd25147157fdc2f8ad76de9a3fb6a",
+                "module": "cursor",
+                "name": "Cursor",
+                "typeArguments": ["U8"]
+              }
+            }
+          }
+        ],
+        "return": ["U16"]
+      },
+      "deserialize_u32": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x5306f64e312b581766351c07af79c72fcb1cd25147157fdc2f8ad76de9a3fb6a",
+                "module": "cursor",
+                "name": "Cursor",
+                "typeArguments": ["U8"]
+              }
+            }
+          }
+        ],
+        "return": ["U32"]
+      },
+      "deserialize_u64": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x5306f64e312b581766351c07af79c72fcb1cd25147157fdc2f8ad76de9a3fb6a",
+                "module": "cursor",
+                "name": "Cursor",
+                "typeArguments": ["U8"]
+              }
+            }
+          }
+        ],
+        "return": ["U64"]
+      },
+      "deserialize_u8": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x5306f64e312b581766351c07af79c72fcb1cd25147157fdc2f8ad76de9a3fb6a",
+                "module": "cursor",
+                "name": "Cursor",
+                "typeArguments": ["U8"]
+              }
+            }
+          }
+        ],
+        "return": ["U8"]
+      },
+      "deserialize_vector": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x5306f64e312b581766351c07af79c72fcb1cd25147157fdc2f8ad76de9a3fb6a",
+                "module": "cursor",
+                "name": "Cursor",
+                "typeArguments": ["U8"]
+              }
+            }
+          },
+          "U64"
+        ],
+        "return": [
+          {
+            "Vector": "U8"
+          }
+        ]
+      }
+    }
+  },
+  "event": {
+    "fileFormatVersion": 6,
+    "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+    "name": "event",
+    "friends": [
+      {
+        "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+        "name": "pyth"
+      },
+      {
+        "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+        "name": "state"
+      }
+    ],
+    "structs": {
+      "PriceFeedUpdateEvent": {
+        "abilities": {
+          "abilities": ["Copy", "Drop", "Store"]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "price_feed",
+            "type": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "price_feed",
+                "name": "PriceFeed",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "timestamp",
+            "type": "U64"
+          }
+        ]
+      },
+      "PythInitializationEvent": {
+        "abilities": {
+          "abilities": ["Copy", "Drop"]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "dummy_field",
+            "type": "Bool"
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {
+      "emit_price_feed_update": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "price_feed",
+              "name": "PriceFeed",
+              "typeArguments": []
+            }
+          },
+          "U64"
+        ],
+        "return": []
+      },
+      "emit_pyth_initialization_event": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [],
+        "return": []
+      }
+    }
+  },
+  "governance": {
+    "fileFormatVersion": 6,
+    "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+    "name": "governance",
+    "friends": [],
+    "structs": {},
+    "exposedFunctions": {
+      "execute_governance_instruction": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x5306f64e312b581766351c07af79c72fcb1cd25147157fdc2f8ad76de9a3fb6a",
+              "module": "governance_message",
+              "name": "DecreeReceipt",
+              "typeArguments": [
+                {
+                  "Struct": {
+                    "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                    "module": "governance_witness",
+                    "name": "GovernanceWitness",
+                    "typeArguments": []
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "return": []
+      }
+    }
+  },
+  "governance_action": {
+    "fileFormatVersion": 6,
+    "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+    "name": "governance_action",
+    "friends": [],
+    "structs": {
+      "GovernanceAction": {
+        "abilities": {
+          "abilities": ["Copy", "Drop"]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "value",
+            "type": "U8"
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {
+      "from_u8": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U8"],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "governance_action",
+              "name": "GovernanceAction",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "get_value": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "governance_action",
+              "name": "GovernanceAction",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": ["U8"]
+      },
+      "new_contract_upgrade": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "governance_action",
+              "name": "GovernanceAction",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "new_set_data_sources": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "governance_action",
+              "name": "GovernanceAction",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "new_set_fee_recipient": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "governance_action",
+              "name": "GovernanceAction",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "new_set_governance_data_source": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "governance_action",
+              "name": "GovernanceAction",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "new_set_stale_price_threshold": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "governance_action",
+              "name": "GovernanceAction",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "new_set_update_fee": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "governance_action",
+              "name": "GovernanceAction",
+              "typeArguments": []
+            }
+          }
+        ]
+      }
+    }
+  },
+  "governance_instruction": {
+    "fileFormatVersion": 6,
+    "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+    "name": "governance_instruction",
+    "friends": [],
+    "structs": {
+      "GovernanceInstruction": {
+        "abilities": {
+          "abilities": []
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "module_",
+            "type": "U8"
+          },
+          {
+            "name": "action",
+            "type": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "governance_action",
+                "name": "GovernanceAction",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "target_chain_id",
+            "type": "U64"
+          },
+          {
+            "name": "payload",
+            "type": {
+              "Vector": "U8"
+            }
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {
+      "destroy": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "governance_instruction",
+              "name": "GovernanceInstruction",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": [
+          {
+            "Vector": "U8"
+          }
+        ]
+      },
+      "from_byte_vec": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Vector": "U8"
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "governance_instruction",
+              "name": "GovernanceInstruction",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "get_action": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "governance_instruction",
+                "name": "GovernanceInstruction",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "governance_action",
+              "name": "GovernanceAction",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "get_module": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "governance_instruction",
+                "name": "GovernanceInstruction",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": ["U8"]
+      },
+      "get_target_chain_id": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "governance_instruction",
+                "name": "GovernanceInstruction",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": ["U64"]
+      }
+    }
+  },
+  "governance_witness": {
+    "fileFormatVersion": 6,
+    "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+    "name": "governance_witness",
+    "friends": [
+      {
+        "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+        "name": "contract_upgrade"
+      },
+      {
+        "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+        "name": "set_data_sources"
+      },
+      {
+        "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+        "name": "set_fee_recipient"
+      },
+      {
+        "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+        "name": "set_governance_data_source"
+      },
+      {
+        "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+        "name": "set_stale_price_threshold"
+      },
+      {
+        "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+        "name": "set_update_fee"
+      }
+    ],
+    "structs": {
+      "GovernanceWitness": {
+        "abilities": {
+          "abilities": ["Drop"]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "dummy_field",
+            "type": "Bool"
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {
+      "new_governance_witness": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "governance_witness",
+              "name": "GovernanceWitness",
+              "typeArguments": []
+            }
+          }
+        ]
+      }
+    }
+  },
+  "hot_potato_vector": {
+    "fileFormatVersion": 6,
+    "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+    "name": "hot_potato_vector",
+    "friends": [
+      {
+        "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+        "name": "pyth"
+      }
+    ],
+    "structs": {
+      "HotPotatoVector": {
+        "abilities": {
+          "abilities": []
+        },
+        "typeParameters": [
+          {
+            "constraints": {
+              "abilities": ["Copy", "Drop"]
+            },
+            "isPhantom": false
+          }
+        ],
+        "fields": [
+          {
+            "name": "contents",
+            "type": {
+              "Vector": {
+                "TypeParameter": 0
+              }
+            }
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {
+      "borrow": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Copy", "Drop"]
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "hot_potato_vector",
+                "name": "HotPotatoVector",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          },
+          "U64"
+        ],
+        "return": [
+          {
+            "Reference": {
+              "TypeParameter": 0
+            }
+          }
+        ]
+      },
+      "destroy": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Copy", "Drop"]
+          }
+        ],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "hot_potato_vector",
+              "name": "HotPotatoVector",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          }
+        ],
+        "return": []
+      },
+      "is_empty": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Copy", "Drop"]
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "hot_potato_vector",
+                "name": "HotPotatoVector",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": ["Bool"]
+      },
+      "length": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Copy", "Drop"]
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "hot_potato_vector",
+                "name": "HotPotatoVector",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": ["U64"]
+      },
+      "new": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Copy", "Drop"]
+          }
+        ],
+        "parameters": [
+          {
+            "Vector": {
+              "TypeParameter": 0
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "hot_potato_vector",
+              "name": "HotPotatoVector",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "pop_back": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Copy", "Drop"]
+          }
+        ],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "hot_potato_vector",
+              "name": "HotPotatoVector",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          }
+        ],
+        "return": [
+          {
+            "TypeParameter": 0
+          },
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "hot_potato_vector",
+              "name": "HotPotatoVector",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "i64": {
+    "fileFormatVersion": 6,
+    "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+    "name": "i64",
+    "friends": [],
+    "structs": {
+      "I64": {
+        "abilities": {
+          "abilities": ["Copy", "Drop", "Store"]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "negative",
+            "type": "Bool"
+          },
+          {
+            "name": "magnitude",
+            "type": "U64"
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {
+      "from_u64": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U64"],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "i64",
+              "name": "I64",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "get_is_negative": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "i64",
+                "name": "I64",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": ["Bool"]
+      },
+      "get_magnitude_if_negative": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "i64",
+                "name": "I64",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": ["U64"]
+      },
+      "get_magnitude_if_positive": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "i64",
+                "name": "I64",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": ["U64"]
+      },
+      "new": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U64", "Bool"],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "i64",
+              "name": "I64",
+              "typeArguments": []
+            }
+          }
+        ]
+      }
+    }
+  },
+  "migrate": {
+    "fileFormatVersion": 6,
+    "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+    "name": "migrate",
+    "friends": [],
+    "structs": {
+      "MigrateComplete": {
+        "abilities": {
+          "abilities": ["Copy", "Drop"]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "package",
+            "type": {
+              "Struct": {
+                "address": "0x2",
+                "module": "object",
+                "name": "ID",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {
+      "migrate": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x5306f64e312b581766351c07af79c72fcb1cd25147157fdc2f8ad76de9a3fb6a",
+              "module": "governance_message",
+              "name": "DecreeReceipt",
+              "typeArguments": [
+                {
+                  "Struct": {
+                    "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                    "module": "governance_witness",
+                    "name": "GovernanceWitness",
+                    "typeArguments": []
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "return": []
+      }
+    }
+  },
+  "price": {
+    "fileFormatVersion": 6,
+    "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+    "name": "price",
+    "friends": [],
+    "structs": {
+      "Price": {
+        "abilities": {
+          "abilities": ["Copy", "Drop", "Store"]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "price",
+            "type": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "i64",
+                "name": "I64",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "conf",
+            "type": "U64"
+          },
+          {
+            "name": "expo",
+            "type": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "i64",
+                "name": "I64",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "timestamp",
+            "type": "U64"
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {
+      "get_conf": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "price",
+                "name": "Price",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": ["U64"]
+      },
+      "get_expo": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "price",
+                "name": "Price",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "i64",
+              "name": "I64",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "get_price": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "price",
+                "name": "Price",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "i64",
+              "name": "I64",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "get_timestamp": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "price",
+                "name": "Price",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": ["U64"]
+      },
+      "new": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "i64",
+              "name": "I64",
+              "typeArguments": []
+            }
+          },
+          "U64",
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "i64",
+              "name": "I64",
+              "typeArguments": []
+            }
+          },
+          "U64"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "price",
+              "name": "Price",
+              "typeArguments": []
+            }
+          }
+        ]
+      }
+    }
+  },
+  "price_feed": {
+    "fileFormatVersion": 6,
+    "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+    "name": "price_feed",
+    "friends": [],
+    "structs": {
+      "PriceFeed": {
+        "abilities": {
+          "abilities": ["Copy", "Drop", "Store"]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "price_identifier",
+            "type": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "price_identifier",
+                "name": "PriceIdentifier",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "price",
+            "type": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "price",
+                "name": "Price",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "ema_price",
+            "type": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "price",
+                "name": "Price",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {
+      "from": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "price_feed",
+                "name": "PriceFeed",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "price_feed",
+              "name": "PriceFeed",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "get_ema_price": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "price_feed",
+                "name": "PriceFeed",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "price",
+              "name": "Price",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "get_price": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "price_feed",
+                "name": "PriceFeed",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "price",
+              "name": "Price",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "get_price_identifier": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "price_feed",
+                "name": "PriceFeed",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "price_identifier",
+              "name": "PriceIdentifier",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "new": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "price_identifier",
+              "name": "PriceIdentifier",
+              "typeArguments": []
+            }
+          },
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "price",
+              "name": "Price",
+              "typeArguments": []
+            }
+          },
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "price",
+              "name": "Price",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "price_feed",
+              "name": "PriceFeed",
+              "typeArguments": []
+            }
+          }
+        ]
+      }
+    }
+  },
+  "price_identifier": {
+    "fileFormatVersion": 6,
+    "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+    "name": "price_identifier",
+    "friends": [],
+    "structs": {
+      "PriceIdentifier": {
+        "abilities": {
+          "abilities": ["Copy", "Drop", "Store"]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "bytes",
+            "type": {
+              "Vector": "U8"
+            }
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {
+      "from_byte_vec": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Vector": "U8"
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "price_identifier",
+              "name": "PriceIdentifier",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "get_bytes": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "price_identifier",
+                "name": "PriceIdentifier",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Vector": "U8"
+          }
+        ]
+      }
+    }
+  },
+  "price_info": {
+    "fileFormatVersion": 6,
+    "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+    "name": "price_info",
+    "friends": [
+      {
+        "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+        "name": "pyth"
+      },
+      {
+        "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+        "name": "state"
+      }
+    ],
+    "structs": {
+      "PriceInfo": {
+        "abilities": {
+          "abilities": ["Copy", "Drop", "Store"]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "attestation_time",
+            "type": "U64"
+          },
+          {
+            "name": "arrival_time",
+            "type": "U64"
+          },
+          {
+            "name": "price_feed",
+            "type": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "price_feed",
+                "name": "PriceFeed",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      },
+      "PriceInfoObject": {
+        "abilities": {
+          "abilities": ["Store", "Key"]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "id",
+            "type": {
+              "Struct": {
+                "address": "0x2",
+                "module": "object",
+                "name": "UID",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "price_info",
+            "type": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "price_info",
+                "name": "PriceInfo",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {
+      "add": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "object",
+                "name": "UID",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "price_identifier",
+              "name": "PriceIdentifier",
+              "typeArguments": []
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "object",
+              "name": "ID",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": []
+      },
+      "contains": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "object",
+                "name": "UID",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "price_identifier",
+              "name": "PriceIdentifier",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": ["Bool"]
+      },
+      "get_arrival_time": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "price_info",
+                "name": "PriceInfo",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": ["U64"]
+      },
+      "get_attestation_time": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "price_info",
+                "name": "PriceInfo",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": ["U64"]
+      },
+      "get_id": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "object",
+                "name": "UID",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "price_identifier",
+              "name": "PriceIdentifier",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "object",
+              "name": "ID",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "get_id_bytes": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "object",
+                "name": "UID",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "price_identifier",
+              "name": "PriceIdentifier",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": [
+          {
+            "Vector": "U8"
+          }
+        ]
+      },
+      "get_price_feed": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "price_info",
+                "name": "PriceInfo",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "price_feed",
+                "name": "PriceFeed",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      },
+      "get_price_identifier": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "price_info",
+                "name": "PriceInfo",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "price_identifier",
+              "name": "PriceIdentifier",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "get_price_info_from_price_info_object": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "price_info",
+                "name": "PriceInfoObject",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "price_info",
+              "name": "PriceInfo",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "new_price_info": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U64",
+          "U64",
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "price_feed",
+              "name": "PriceFeed",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "price_info",
+              "name": "PriceInfo",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "new_price_info_object": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "price_info",
+              "name": "PriceInfo",
+              "typeArguments": []
+            }
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "price_info",
+              "name": "PriceInfoObject",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "new_price_info_registry": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "object",
+                "name": "UID",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": []
+      },
+      "uid_to_inner": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "price_info",
+                "name": "PriceInfoObject",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "object",
+              "name": "ID",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "update_price_info_object": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "price_info",
+                "name": "PriceInfoObject",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "price_info",
+                "name": "PriceInfo",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": []
+      }
+    }
+  },
+  "price_status": {
+    "fileFormatVersion": 6,
+    "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+    "name": "price_status",
+    "friends": [],
+    "structs": {
+      "PriceStatus": {
+        "abilities": {
+          "abilities": ["Copy", "Drop", "Store"]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "status",
+            "type": "U64"
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {
+      "from_u64": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U64"],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "price_status",
+              "name": "PriceStatus",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "get_status": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "price_status",
+                "name": "PriceStatus",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": ["U64"]
+      },
+      "new_trading": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "price_status",
+              "name": "PriceStatus",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "new_unknown": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "price_status",
+              "name": "PriceStatus",
+              "typeArguments": []
+            }
+          }
+        ]
+      }
+    }
+  },
+  "pyth": {
+    "fileFormatVersion": 6,
+    "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+    "name": "pyth",
+    "friends": [],
+    "structs": {},
+    "exposedFunctions": {
+      "create_price_feeds": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Vector": {
+              "Struct": {
+                "address": "0x5306f64e312b581766351c07af79c72fcb1cd25147157fdc2f8ad76de9a3fb6a",
+                "module": "vaa",
+                "name": "VAA",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "clock",
+                "name": "Clock",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": []
+      },
+      "create_price_infos_hot_potato": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Vector": {
+              "Struct": {
+                "address": "0x5306f64e312b581766351c07af79c72fcb1cd25147157fdc2f8ad76de9a3fb6a",
+                "module": "vaa",
+                "name": "VAA",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "clock",
+                "name": "Clock",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "hot_potato_vector",
+              "name": "HotPotatoVector",
+              "typeArguments": [
+                {
+                  "Struct": {
+                    "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                    "module": "price_info",
+                    "name": "PriceInfo",
+                    "typeArguments": []
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "get_price": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "price_info",
+                "name": "PriceInfoObject",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "clock",
+                "name": "Clock",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "price",
+              "name": "Price",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "get_price_no_older_than": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "price_info",
+                "name": "PriceInfoObject",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "clock",
+                "name": "Clock",
+                "typeArguments": []
+              }
+            }
+          },
+          "U64"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "price",
+              "name": "Price",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "get_price_unsafe": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "price_info",
+                "name": "PriceInfoObject",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "price",
+              "name": "Price",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "get_stale_price_threshold_secs": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": ["U64"]
+      },
+      "get_total_update_fee": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          },
+          "U64"
+        ],
+        "return": ["U64"]
+      },
+      "init_pyth": {
+        "visibility": "Public",
+        "isEntry": true,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "setup",
+              "name": "DeployerCap",
+              "typeArguments": []
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "package",
+              "name": "UpgradeCap",
+              "typeArguments": []
+            }
+          },
+          "U64",
+          "U64",
+          {
+            "Vector": "U8"
+          },
+          {
+            "Vector": "U64"
+          },
+          {
+            "Vector": {
+              "Vector": "U8"
+            }
+          },
+          "U64",
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": []
+      },
+      "price_feed_exists": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "price_identifier",
+              "name": "PriceIdentifier",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": ["Bool"]
+      },
+      "update_cache": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "state",
+              "name": "LatestOnly",
+              "typeArguments": []
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "price_info",
+                "name": "PriceInfo",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "price_info",
+                "name": "PriceInfoObject",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "clock",
+                "name": "Clock",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": []
+      },
+      "update_single_price_feed": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "hot_potato_vector",
+              "name": "HotPotatoVector",
+              "typeArguments": [
+                {
+                  "Struct": {
+                    "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                    "module": "price_info",
+                    "name": "PriceInfo",
+                    "typeArguments": []
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "price_info",
+                "name": "PriceInfoObject",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "coin",
+              "name": "Coin",
+              "typeArguments": [
+                {
+                  "Struct": {
+                    "address": "0x2",
+                    "module": "iota",
+                    "name": "IOTA",
+                    "typeArguments": []
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "clock",
+                "name": "Clock",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "hot_potato_vector",
+              "name": "HotPotatoVector",
+              "typeArguments": [
+                {
+                  "Struct": {
+                    "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                    "module": "price_info",
+                    "name": "PriceInfo",
+                    "typeArguments": []
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "set": {
+    "fileFormatVersion": 6,
+    "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+    "name": "set",
+    "friends": [],
+    "structs": {
+      "Set": {
+        "abilities": {
+          "abilities": ["Store"]
+        },
+        "typeParameters": [
+          {
+            "constraints": {
+              "abilities": ["Copy", "Drop", "Store"]
+            },
+            "isPhantom": false
+          }
+        ],
+        "fields": [
+          {
+            "name": "keys",
+            "type": {
+              "Vector": {
+                "TypeParameter": 0
+              }
+            }
+          },
+          {
+            "name": "elems",
+            "type": {
+              "Struct": {
+                "address": "0x2",
+                "module": "table",
+                "name": "Table",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  },
+                  {
+                    "Struct": {
+                      "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                      "module": "set",
+                      "name": "Unit",
+                      "typeArguments": []
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "Unit": {
+        "abilities": {
+          "abilities": ["Copy", "Drop", "Store"]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "dummy_field",
+            "type": "Bool"
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {
+      "add": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Copy", "Drop", "Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "set",
+                "name": "Set",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "TypeParameter": 0
+          }
+        ],
+        "return": []
+      },
+      "contains": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Copy", "Drop", "Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "set",
+                "name": "Set",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "TypeParameter": 0
+          }
+        ],
+        "return": ["Bool"]
+      },
+      "empty": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Copy", "Drop", "Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "set",
+                "name": "Set",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": []
+      },
+      "new": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Copy", "Drop", "Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "set",
+              "name": "Set",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "set_data_sources": {
+    "fileFormatVersion": 6,
+    "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+    "name": "set_data_sources",
+    "friends": [
+      {
+        "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+        "name": "governance"
+      }
+    ],
+    "structs": {
+      "DataSources": {
+        "abilities": {
+          "abilities": []
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "sources",
+            "type": {
+              "Vector": {
+                "Struct": {
+                  "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                  "module": "data_source",
+                  "name": "DataSource",
+                  "typeArguments": []
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {
+      "authorize_governance": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          },
+          "Bool"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x5306f64e312b581766351c07af79c72fcb1cd25147157fdc2f8ad76de9a3fb6a",
+              "module": "governance_message",
+              "name": "DecreeTicket",
+              "typeArguments": [
+                {
+                  "Struct": {
+                    "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                    "module": "governance_witness",
+                    "name": "GovernanceWitness",
+                    "typeArguments": []
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "execute": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "LatestOnly",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Vector": "U8"
+          }
+        ],
+        "return": []
+      }
+    }
+  },
+  "set_fee_recipient": {
+    "fileFormatVersion": 6,
+    "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+    "name": "set_fee_recipient",
+    "friends": [
+      {
+        "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+        "name": "governance"
+      }
+    ],
+    "structs": {
+      "PythFeeRecipient": {
+        "abilities": {
+          "abilities": []
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "recipient",
+            "type": "Address"
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {
+      "authorize_governance": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x5306f64e312b581766351c07af79c72fcb1cd25147157fdc2f8ad76de9a3fb6a",
+              "module": "governance_message",
+              "name": "DecreeTicket",
+              "typeArguments": [
+                {
+                  "Struct": {
+                    "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                    "module": "governance_witness",
+                    "name": "GovernanceWitness",
+                    "typeArguments": []
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "execute": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "LatestOnly",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Vector": "U8"
+          }
+        ],
+        "return": []
+      }
+    }
+  },
+  "set_governance_data_source": {
+    "fileFormatVersion": 6,
+    "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+    "name": "set_governance_data_source",
+    "friends": [
+      {
+        "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+        "name": "governance"
+      }
+    ],
+    "structs": {
+      "GovernanceDataSource": {
+        "abilities": {
+          "abilities": []
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "emitter_chain_id",
+            "type": "U64"
+          },
+          {
+            "name": "emitter_address",
+            "type": {
+              "Struct": {
+                "address": "0x5306f64e312b581766351c07af79c72fcb1cd25147157fdc2f8ad76de9a3fb6a",
+                "module": "external_address",
+                "name": "ExternalAddress",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "initial_sequence",
+            "type": "U64"
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {
+      "authorize_governance": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          },
+          "Bool"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x5306f64e312b581766351c07af79c72fcb1cd25147157fdc2f8ad76de9a3fb6a",
+              "module": "governance_message",
+              "name": "DecreeTicket",
+              "typeArguments": [
+                {
+                  "Struct": {
+                    "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                    "module": "governance_witness",
+                    "name": "GovernanceWitness",
+                    "typeArguments": []
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "execute": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "LatestOnly",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Vector": "U8"
+          }
+        ],
+        "return": []
+      }
+    }
+  },
+  "set_stale_price_threshold": {
+    "fileFormatVersion": 6,
+    "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+    "name": "set_stale_price_threshold",
+    "friends": [
+      {
+        "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+        "name": "governance"
+      }
+    ],
+    "structs": {
+      "StalePriceThreshold": {
+        "abilities": {
+          "abilities": []
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "threshold",
+            "type": "U64"
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {
+      "authorize_governance": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          },
+          "Bool"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x5306f64e312b581766351c07af79c72fcb1cd25147157fdc2f8ad76de9a3fb6a",
+              "module": "governance_message",
+              "name": "DecreeTicket",
+              "typeArguments": [
+                {
+                  "Struct": {
+                    "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                    "module": "governance_witness",
+                    "name": "GovernanceWitness",
+                    "typeArguments": []
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "execute": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "LatestOnly",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Vector": "U8"
+          }
+        ],
+        "return": []
+      }
+    }
+  },
+  "set_update_fee": {
+    "fileFormatVersion": 6,
+    "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+    "name": "set_update_fee",
+    "friends": [
+      {
+        "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+        "name": "governance"
+      }
+    ],
+    "structs": {
+      "UpdateFee": {
+        "abilities": {
+          "abilities": []
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "mantissa",
+            "type": "U64"
+          },
+          {
+            "name": "exponent",
+            "type": "U64"
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {
+      "authorize_governance": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          },
+          "Bool"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x5306f64e312b581766351c07af79c72fcb1cd25147157fdc2f8ad76de9a3fb6a",
+              "module": "governance_message",
+              "name": "DecreeTicket",
+              "typeArguments": [
+                {
+                  "Struct": {
+                    "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                    "module": "governance_witness",
+                    "name": "GovernanceWitness",
+                    "typeArguments": []
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "execute": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "LatestOnly",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Vector": "U8"
+          }
+        ],
+        "return": []
+      }
+    }
+  },
+  "setup": {
+    "fileFormatVersion": 6,
+    "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+    "name": "setup",
+    "friends": [
+      {
+        "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+        "name": "pyth"
+      }
+    ],
+    "structs": {
+      "DeployerCap": {
+        "abilities": {
+          "abilities": ["Store", "Key"]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "id",
+            "type": {
+              "Struct": {
+                "address": "0x2",
+                "module": "object",
+                "name": "UID",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {
+      "init_and_share_state": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "setup",
+              "name": "DeployerCap",
+              "typeArguments": []
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "package",
+              "name": "UpgradeCap",
+              "typeArguments": []
+            }
+          },
+          "U64",
+          "U64",
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "data_source",
+              "name": "DataSource",
+              "typeArguments": []
+            }
+          },
+          {
+            "Vector": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "data_source",
+                "name": "DataSource",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": []
+      }
+    }
+  },
+  "state": {
+    "fileFormatVersion": 6,
+    "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+    "name": "state",
+    "friends": [
+      {
+        "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+        "name": "contract_upgrade"
+      },
+      {
+        "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+        "name": "governance"
+      },
+      {
+        "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+        "name": "governance_action"
+      },
+      {
+        "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+        "name": "migrate"
+      },
+      {
+        "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+        "name": "pyth"
+      },
+      {
+        "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+        "name": "set_data_sources"
+      },
+      {
+        "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+        "name": "set_fee_recipient"
+      },
+      {
+        "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+        "name": "set_governance_data_source"
+      },
+      {
+        "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+        "name": "set_stale_price_threshold"
+      },
+      {
+        "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+        "name": "set_update_fee"
+      },
+      {
+        "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+        "name": "setup"
+      }
+    ],
+    "structs": {
+      "CurrentDigest": {
+        "abilities": {
+          "abilities": ["Copy", "Drop", "Store"]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "dummy_field",
+            "type": "Bool"
+          }
+        ]
+      },
+      "LatestOnly": {
+        "abilities": {
+          "abilities": ["Drop"]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "dummy_field",
+            "type": "Bool"
+          }
+        ]
+      },
+      "State": {
+        "abilities": {
+          "abilities": ["Store", "Key"]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "id",
+            "type": {
+              "Struct": {
+                "address": "0x2",
+                "module": "object",
+                "name": "UID",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "governance_data_source",
+            "type": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "data_source",
+                "name": "DataSource",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "stale_price_threshold",
+            "type": "U64"
+          },
+          {
+            "name": "base_update_fee",
+            "type": "U64"
+          },
+          {
+            "name": "fee_recipient_address",
+            "type": "Address"
+          },
+          {
+            "name": "last_executed_governance_sequence",
+            "type": "U64"
+          },
+          {
+            "name": "consumed_vaas",
+            "type": {
+              "Struct": {
+                "address": "0x5306f64e312b581766351c07af79c72fcb1cd25147157fdc2f8ad76de9a3fb6a",
+                "module": "consumed_vaas",
+                "name": "ConsumedVAAs",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "upgrade_cap",
+            "type": {
+              "Struct": {
+                "address": "0x2",
+                "module": "package",
+                "name": "UpgradeCap",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {
+      "assert_authorized_digest": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "LatestOnly",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x5306f64e312b581766351c07af79c72fcb1cd25147157fdc2f8ad76de9a3fb6a",
+              "module": "bytes32",
+              "name": "Bytes32",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": []
+      },
+      "assert_latest_only": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "state",
+              "name": "LatestOnly",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "authorize_upgrade": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x5306f64e312b581766351c07af79c72fcb1cd25147157fdc2f8ad76de9a3fb6a",
+              "module": "bytes32",
+              "name": "Bytes32",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "package",
+              "name": "UpgradeTicket",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "borrow_mut_consumed_vaas": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "LatestOnly",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x5306f64e312b581766351c07af79c72fcb1cd25147157fdc2f8ad76de9a3fb6a",
+                "module": "consumed_vaas",
+                "name": "ConsumedVAAs",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      },
+      "borrow_mut_consumed_vaas_unchecked": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x5306f64e312b581766351c07af79c72fcb1cd25147157fdc2f8ad76de9a3fb6a",
+                "module": "consumed_vaas",
+                "name": "ConsumedVAAs",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      },
+      "commit_upgrade": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "package",
+              "name": "UpgradeReceipt",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "object",
+              "name": "ID",
+              "typeArguments": []
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "object",
+              "name": "ID",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "current_package": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "LatestOnly",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "object",
+              "name": "ID",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "get_base_update_fee": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": ["U64"]
+      },
+      "get_fee_recipient": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": ["Address"]
+      },
+      "get_last_executed_governance_sequence": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": ["U64"]
+      },
+      "get_price_info_object_id": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Vector": "U8"
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "object",
+              "name": "ID",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "get_stale_price_threshold_secs": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": ["U64"]
+      },
+      "governance_chain": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": ["U16"]
+      },
+      "governance_contract": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x5306f64e312b581766351c07af79c72fcb1cd25147157fdc2f8ad76de9a3fb6a",
+              "module": "external_address",
+              "name": "ExternalAddress",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "governance_data_source": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "data_source",
+              "name": "DataSource",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "governance_module": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x5306f64e312b581766351c07af79c72fcb1cd25147157fdc2f8ad76de9a3fb6a",
+              "module": "bytes32",
+              "name": "Bytes32",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "is_valid_data_source": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "data_source",
+              "name": "DataSource",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": ["Bool"]
+      },
+      "is_valid_governance_data_source": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "data_source",
+              "name": "DataSource",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": ["Bool"]
+      },
+      "migrate__v__0_1_1": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": []
+      },
+      "migrate_version": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": []
+      },
+      "new": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "package",
+              "name": "UpgradeCap",
+              "typeArguments": []
+            }
+          },
+          {
+            "Vector": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "data_source",
+                "name": "DataSource",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "data_source",
+              "name": "DataSource",
+              "typeArguments": []
+            }
+          },
+          "U64",
+          "U64",
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "state",
+              "name": "State",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "price_feed_object_exists": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "price_identifier",
+              "name": "PriceIdentifier",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": ["Bool"]
+      },
+      "register_price_info_object": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "LatestOnly",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "price_identifier",
+              "name": "PriceIdentifier",
+              "typeArguments": []
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "object",
+              "name": "ID",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": []
+      },
+      "set_base_update_fee": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "LatestOnly",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          },
+          "U64"
+        ],
+        "return": []
+      },
+      "set_data_sources": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "LatestOnly",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Vector": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "data_source",
+                "name": "DataSource",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": []
+      },
+      "set_fee_recipient": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "LatestOnly",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          },
+          "Address"
+        ],
+        "return": []
+      },
+      "set_governance_data_source": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "LatestOnly",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "data_source",
+              "name": "DataSource",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": []
+      },
+      "set_last_executed_governance_sequence": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "LatestOnly",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          },
+          "U64"
+        ],
+        "return": []
+      },
+      "set_stale_price_threshold_secs": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "LatestOnly",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+                "module": "state",
+                "name": "State",
+                "typeArguments": []
+              }
+            }
+          },
+          "U64"
+        ],
+        "return": []
+      }
+    }
+  },
+  "version_control": {
+    "fileFormatVersion": 6,
+    "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+    "name": "version_control",
+    "friends": [
+      {
+        "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+        "name": "state"
+      }
+    ],
+    "structs": {
+      "V__0_1_1": {
+        "abilities": {
+          "abilities": ["Copy", "Drop", "Store"]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "dummy_field",
+            "type": "Bool"
+          }
+        ]
+      },
+      "V__DUMMY": {
+        "abilities": {
+          "abilities": ["Copy", "Drop", "Store"]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "dummy_field",
+            "type": "Bool"
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {
+      "current_version": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "version_control",
+              "name": "V__0_1_1",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "previous_version": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xb53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302",
+              "module": "version_control",
+              "name": "V__DUMMY",
+              "typeArguments": []
+            }
+          }
+        ]
+      }
+    }
+  }
+}

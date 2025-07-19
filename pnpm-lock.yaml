@@ -227,12 +227,15 @@ importers:
       '@aptos-labs/ts-sdk':
         specifier: ~1.39.0
         version: 1.39.0(axios@1.7.4)(got@14.4.7)
+      '@iota/iota-sdk':
+        specifier: ~1.4.0
+        version: 1.4.0(typescript@5.5.2)
       '@mysten/sui':
         specifier: ~1.24.0
         version: 1.24.0(typescript@5.5.2)
       '@sentio/chain':
-        specifier: ~3.1.0
-        version: 3.1.0
+        specifier: ~3.2.0
+        version: 3.2.0
       '@sentio/graph-cli':
         specifier: ^0.97.0
         version: 0.97.0(@types/node@22.8.6)(bufferutil@4.0.8)(typescript@5.5.2)(utf-8-validate@5.0.10)(zod@3.24.2)
@@ -340,6 +343,19 @@ importers:
         version: 5.5.2
 
   packages/cli/templates/fuel:
+    dependencies:
+      '@sentio/sdk':
+        specifier: workspace:*
+        version: link:../../../sdk
+    devDependencies:
+      '@sentio/cli':
+        specifier: workspace:*
+        version: link:../..
+      typescript:
+        specifier: ^5.5.2
+        version: 5.5.2
+
+  packages/cli/templates/iota:
     dependencies:
       '@sentio/sdk':
         specifier: workspace:*
@@ -518,6 +534,9 @@ importers:
       '@coral-xyz/borsh':
         specifier: ^0.30.1
         version: 0.30.1(@solana/web3.js@1.98.2(bufferutil@4.0.8)(encoding@0.1.13)(typescript@5.5.2)(utf-8-validate@5.0.10))
+      '@iota/iota-sdk':
+        specifier: ~1.4.0
+        version: 1.4.0(typescript@5.5.2)
       '@mysten/sui':
         specifier: ~1.24.0
         version: 1.24.0(typescript@5.5.2)
@@ -534,8 +553,8 @@ importers:
         specifier: 9.1.1-patch.3
         version: 9.1.1-patch.3
       '@sentio/chain':
-        specifier: ~3.1.0
-        version: 3.1.0
+        specifier: ~3.2.0
+        version: 3.2.0
       '@sentio/ethers-v6':
         specifier: ^1.0.29
         version: 1.0.29(@sentio/ethers@6.13.1-patch.6(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typescript@5.5.2)
@@ -552,13 +571,16 @@ importers:
         specifier: 1.98.2
         version: 1.98.2(bufferutil@4.0.8)(encoding@0.1.13)(typescript@5.5.2)(utf-8-validate@5.0.10)
       '@typemove/aptos':
-        specifier: 1.10.0
+        specifier: ~1.10.0
         version: 1.10.0(axios@1.7.4)(got@14.4.7)
+      '@typemove/iota':
+        specifier: ~1.10.0
+        version: 1.10.0(typescript@5.5.2)
       '@typemove/move':
-        specifier: 1.10.0
+        specifier: ~1.10.0
         version: 1.10.0
       '@typemove/sui':
-        specifier: 1.10.0
+        specifier: ~1.10.0
         version: 1.10.0(typescript@5.5.2)
       bs58:
         specifier: ^5.0.0
@@ -1602,6 +1624,13 @@ packages:
       '@types/node':
         optional: true
 
+  '@iota/bcs@1.1.0':
+    resolution: {integrity: sha512-KUDMbvLilv+AvGVjH9rktyBD2ttYFvx21qyiU5HHiJxX4duKngXjbb7XauICQrss5taz0YgPdK5RqIoHuwntYw==}
+
+  '@iota/iota-sdk@1.4.0':
+    resolution: {integrity: sha512-HcZEq1fJzkus7u+gA2l2/raxyr2736wi9iPw+KJUoieogPOG7p2qTg3HQIa4zJ+rJBuMZcxE7bLJG+TnWd3Q5w==}
+    engines: {node: '>=20'}
+
   '@ipld/dag-cbor@9.2.2':
     resolution: {integrity: sha512-uIEOuruCqKTP50OBWwgz4Js2+LhiBQaxc57cnP71f45b1mHEAo1OCR1Zn/TbvSW/mV1x+JqhacIktkKyaYqhCw==}
     engines: {node: '>=16.0.0', npm: '>=7.0.0'}
@@ -1659,6 +1688,7 @@ packages:
 
   '@ls-lint/ls-lint@2.2.3':
     resolution: {integrity: sha512-ekM12jNm/7O2I/hsRv9HvYkRdfrHpiV1epVuI2NP+eTIcEgdIdKkKCs9KgQydu/8R5YXTov9aHdOgplmCHLupw==}
+    cpu: [x64, arm64, s390x]
     os: [darwin, linux, win32]
     hasBin: true
 
@@ -2355,8 +2385,8 @@ packages:
   '@sentio/bigdecimal@9.1.1-patch.3':
     resolution: {integrity: sha512-O5w8XdyeatUcwI+ZbpSw60/cXFPJk3NbpIupwMHfYmW8fpxpXyRbyGESNJNufWWrB6CadsWGh1R3rd7owvrmlw==}
 
-  '@sentio/chain@3.1.0':
-    resolution: {integrity: sha512-KBQejrvd8qS2AUUuuRCl7gkEJqGE5Zex9VFK8A7/0KLz6w+4vMKH/8oPg0QJ9z5aE6iV6bnIEKG2wDKA9seM0Q==}
+  '@sentio/chain@3.2.0':
+    resolution: {integrity: sha512-M/dkVJ4x5jKMUIbS4Kkg4uBOji2tj4i43/ibRPIi/Tx2Jy2gvpLYLYbikl0YRS5hH1oCeFm4+r9aGwGMjUuafQ==}
 
   '@sentio/ethers-v6@1.0.29':
     resolution: {integrity: sha512-/4jZZn+eM3EfI0bUMBAf5vu8muy8ABptu8ucFoMDTZLLTjxcSKRffLP3RL7w1JHGjyC2V6oEQfwS4cn9JEohHQ==}
@@ -2446,6 +2476,9 @@ packages:
   '@starknet-io/types-js@0.7.7':
     resolution: {integrity: sha512-WLrpK7LIaIb8Ymxu6KF/6JkGW1sso988DweWu7p5QY/3y7waBIiPvzh27D9bX5KIJNRDyOoOVoHVEKYUYWZ/RQ==}
 
+  '@suchipi/femver@1.0.0':
+    resolution: {integrity: sha512-bprE8+K5V+DPX7q2e2K57ImqNBdfGHDIWaGI5xHxZoxbKOuQZn4wzPiUxOAHnsUr3w3xHrWXwN7gnG/iIuEMIg==}
+
   '@swc/helpers@0.5.15':
     resolution: {integrity: sha512-JQ5TuMi45Owi4/BIMAJBoSQoOJu12oOk/gADqlcUL9JEdHB8vyjUSsxqeNXnmXHjYKMi2WcYtezGEEhqUI/E2g==}
 
@@ -2455,6 +2488,10 @@ packages:
 
   '@typemove/aptos@1.10.0':
     resolution: {integrity: sha512-p6W8puE4spyaHbiDMip9LcHAZvmKjW5mjgWCw2ncXNquxSfjCEr/u0x4NJqSmUfkRv8R662EoRgzp8vNbKlFlg==}
+    hasBin: true
+
+  '@typemove/iota@1.10.0':
+    resolution: {integrity: sha512-uyXl1PVR5xLzrQjsATNjtZ1U8tWDIxHQprTuwgupIhVzZzL8cXi51KdSvpzWbVpgi6W+SrhynlZoeukX2pHlNA==}
     hasBin: true
 
   '@typemove/move@1.10.0':
@@ -2975,8 +3012,14 @@ packages:
   base-x@4.0.0:
     resolution: {integrity: sha512-FuwxlW4H5kh37X/oW59pwTzzTKRzfrrQwhmyspRM7swOEZcHtDZSCt45U6oKgtuFE+WYPblePMVIPR4RZrh/hw==}
 
+  base-x@5.0.1:
+    resolution: {integrity: sha512-M7uio8Zt++eg3jPj+rHMfCC+IuygQHHCOU+IYsVtik6FWjuYpVt/+MRKcgsAMHh8mMFAwnB+Bs+mTrFiXjMzKg==}
+
   base64-js@1.5.1:
     resolution: {integrity: sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==}
+
+  bech32@2.0.0:
+    resolution: {integrity: sha512-LcknSilhIGatDAsY1ak2I8VtGaHNhgMSYVxFrGLXv+xLHytaKZKcaUJJUE7qmBr7h33o5YQwP55pMI0xmkpJwg==}
 
   before-after-hook@3.0.2:
     resolution: {integrity: sha512-Nik3Sc0ncrMK4UUdXQmAnRtzmNQTAAXmXIopizwZ1W1t8QmfJj+zL4OA2I7XPTPW5z5TDqv4hRo/JzouDJnX3A==}
@@ -3026,6 +3069,9 @@ packages:
 
   bs58@5.0.0:
     resolution: {integrity: sha512-r+ihvQJvahgYT50JD05dyJNKlmmSlMoOGwn1lCcEzanPglg7TxYjioQUYehQ9mAR/+hOSd2jRc/Z2y5UxBymvQ==}
+
+  bs58@6.0.0:
+    resolution: {integrity: sha512-PD0wEnEYg6ijszw/u8s+iI3H17cTymlrwkKhDhPZq+Sokl3AU4htyBFTjAeNAlCCmg0f53g6ih3jATyCKftTfw==}
 
   buffer-from@1.1.2:
     resolution: {integrity: sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ==}
@@ -6465,6 +6511,9 @@ packages:
   tunnel-agent@0.6.0:
     resolution: {integrity: sha512-McnNiV1l8RYeY8tBgEpuodCC1mLUdbSN+CYBL7kJsJNInOP8UjDDEwdk6Mw60vdLLrr5NHKZhMAOSrR2NZuQ+w==}
 
+  tweetnacl@1.0.3:
+    resolution: {integrity: sha512-6rt+RN7aOi1nGMyC4Xa5DdYiukl2UWCbcJft7YhxReBGQD7OAM8Pbxw6YMo4r2diNEA8FEmu32YOn9rhaiE5yw==}
+
   type-check@0.4.0:
     resolution: {integrity: sha512-XleUoc9uwGXqjWwXaUTZAmzMcFZ5858QA2vvx1Ur5xIcixXIP+8LnFDgRplU30us6teqdlskFfu+ae4K79Ooew==}
     engines: {node: '>= 0.8.0'}
@@ -7738,6 +7787,29 @@ snapshots:
     optionalDependencies:
       '@types/node': 22.8.6
 
+  '@iota/bcs@1.1.0':
+    dependencies:
+      bs58: 6.0.0
+
+  '@iota/iota-sdk@1.4.0(typescript@5.5.2)':
+    dependencies:
+      '@graphql-typed-document-node/core': 3.2.0(graphql@16.10.0)
+      '@iota/bcs': 1.1.0
+      '@noble/curves': 1.8.1
+      '@noble/hashes': 1.7.1
+      '@scure/bip32': 1.4.0
+      '@scure/bip39': 1.3.0
+      '@suchipi/femver': 1.0.0
+      bech32: 2.0.0
+      gql.tada: 1.8.10(graphql@16.10.0)(typescript@5.5.2)
+      graphql: 16.10.0
+      tweetnacl: 1.0.3
+      valibot: 0.36.0
+    transitivePeerDependencies:
+      - '@gql.tada/svelte-support'
+      - '@gql.tada/vue-support'
+      - typescript
+
   '@ipld/dag-cbor@9.2.2':
     dependencies:
       cborg: 4.2.9
@@ -8579,7 +8651,7 @@ snapshots:
 
   '@sentio/bigdecimal@9.1.1-patch.3': {}
 
-  '@sentio/chain@3.1.0': {}
+  '@sentio/chain@3.2.0': {}
 
   '@sentio/ethers-v6@1.0.29(@sentio/ethers@6.13.1-patch.6(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typescript@5.5.2)':
     dependencies:
@@ -8730,6 +8802,8 @@ snapshots:
 
   '@starknet-io/types-js@0.7.7': {}
 
+  '@suchipi/femver@1.0.0': {}
+
   '@swc/helpers@0.5.15':
     dependencies:
       tslib: 2.8.1
@@ -8749,6 +8823,19 @@ snapshots:
     transitivePeerDependencies:
       - axios
       - got
+
+  '@typemove/iota@1.10.0(typescript@5.5.2)':
+    dependencies:
+      '@iota/iota-sdk': 1.4.0(typescript@5.5.2)
+      '@typemove/move': 1.10.0
+      chalk: 5.3.0
+      commander: 13.1.0
+      prettier: 3.5.3
+      radash: 12.1.0
+    transitivePeerDependencies:
+      - '@gql.tada/svelte-support'
+      - '@gql.tada/vue-support'
+      - typescript
 
   '@typemove/move@1.10.0':
     dependencies:
@@ -9347,7 +9434,11 @@ snapshots:
 
   base-x@4.0.0: {}
 
+  base-x@5.0.1: {}
+
   base64-js@1.5.1: {}
+
+  bech32@2.0.0: {}
 
   before-after-hook@3.0.2: {}
 
@@ -9410,6 +9501,10 @@ snapshots:
   bs58@5.0.0:
     dependencies:
       base-x: 4.0.0
+
+  bs58@6.0.0:
+    dependencies:
+      base-x: 5.0.1
 
   buffer-from@1.1.2: {}
 
@@ -13170,6 +13265,8 @@ snapshots:
   tunnel-agent@0.6.0:
     dependencies:
       safe-buffer: 5.2.1
+
+  tweetnacl@1.0.3: {}
 
   type-check@0.4.0:
     dependencies:

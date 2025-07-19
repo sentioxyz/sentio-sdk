@@ -31,6 +31,7 @@ import { BTCFacet } from './btc-facet.js'
 import { Subject } from 'rxjs'
 import { MemoryDatabase } from './memory-database.js'
 import { DatabaseSchemaState } from '../core/database-schema.js'
+import { IotaFacet } from './iota-facet.js'
 
 export const TEST_CONTEXT: CallContext = <CallContext>{}
 
@@ -51,6 +52,7 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
   eth: EthFacet
   solana: SolanaFacet
   sui: SuiFacet
+  iota: IotaFacet
   fuel: FuelFacet
   cosmos: CosmosFacet
   starknet: StarknetFacet
@@ -65,6 +67,7 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
     this.solana = new SolanaFacet(this)
     this.eth = new EthFacet(this)
     this.sui = new SuiFacet(this)
+    this.iota = new IotaFacet(this)
     this.fuel = new FuelFacet(this)
     this.cosmos = new CosmosFacet(this)
     this.starknet = new StarknetFacet(this)
