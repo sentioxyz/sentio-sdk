@@ -152,7 +152,7 @@ export async function codegen(genExample: boolean) {
 
   const outputBase = path.resolve('src', 'types')
 
-  const generators = ['eth', 'solana', 'aptos', 'sui', 'fuel', 'starknet']
+  const generators = ['eth', 'solana', 'aptos', 'sui', 'iota', 'fuel', 'starknet']
 
   for (const gen of generators) {
     try {

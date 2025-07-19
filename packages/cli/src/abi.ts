@@ -7,6 +7,7 @@ import fs from 'fs-extra'
 import fetch from 'node-fetch'
 import { AptosChainId, ChainId, StarknetChainId, SuiChainId, EthChainInfo, ExplorerApiType } from '@sentio/chain'
 import { RpcProvider as Starknet } from 'starknet'
+import { IotaClient } from '@iota/iota-sdk/client'
 
 export async function getABI(
   chain: ChainId,
@@ -16,6 +17,7 @@ export async function getABI(
   let ethApi
   let aptosClient: Aptos | undefined
   let suiClient: SuiClient | undefined
+  let iotaClient: IotaClient | undefined
   let starknetClient: Starknet | undefined
 
   switch (chain as string) {
@@ -51,6 +53,12 @@ export async function getABI(
       break
     case SuiChainId.SUI_TESTNET:
       suiClient = new SuiClient({ url: 'https://fullnode.testnet.sui.io/' })
+      break
+    case SuiChainId.IOTA_MAINNET:
+      iotaClient = new IotaClient({ url: 'https://api.mainnet.iota.cafe/' })
+      break
+    case SuiChainId.IOTA_TESTNET:
+      iotaClient = new IotaClient({ url: 'https://api.testnet.iota.cafe/' })
       break
     case StarknetChainId.STARKNET_MAINNET:
       starknetClient = new Starknet({
@@ -94,6 +102,17 @@ export async function getABI(
     try {
       return {
         abi: await suiClient.getNormalizedMoveModulesByPackage({ package: address }),
+        name
+      }
+    } catch (e) {
+      console.error(baseErrMsg, e)
+      process.exit(1)
+    }
+  }
+  if (iotaClient) {
+    try {
+      return {
+        abi: await iotaClient.getNormalizedMoveModulesByPackage({ package: address }),
         name
       }
     } catch (e) {
@@ -175,6 +194,12 @@ export function getABIFilePath(chain: string, name: string, address?: string, fo
       break
     case SuiChainId.SUI_TESTNET:
       subpath = 'sui/testnet'
+      break
+    case SuiChainId.IOTA_MAINNET:
+      subpath = 'iota'
+      break
+    case SuiChainId.IOTA_TESTNET:
+      subpath = 'iota/testnet'
       break
     case StarknetChainId.STARKNET_MAINNET:
       subpath = 'starknet'

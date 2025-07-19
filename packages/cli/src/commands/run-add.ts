@@ -16,8 +16,10 @@ const supportedChain: string[] = [
   AptosChainId.APTOS_MOVEMENT_TESTNET,
   AptosChainId.APTOS_MOVEMENT_MAINNET,
   AptosChainId.INITIA_ECHELON,
+  SuiChainId.SUI_MAINNET,
   SuiChainId.SUI_TESTNET,
-  SuiChainId.SUI_MAINNET
+  SuiChainId.IOTA_MAINNET,
+  SuiChainId.IOTA_TESTNET
 ]
 
 export async function runAdd(argv: string[]) {

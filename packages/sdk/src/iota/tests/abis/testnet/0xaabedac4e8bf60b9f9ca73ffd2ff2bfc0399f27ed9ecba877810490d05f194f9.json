@@ -1,0 +1,2122 @@
+[
+  {
+    "fileFormatVersion": 6,
+    "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+    "name": "linked_table",
+    "friends": [],
+    "structs": {
+      "LinkedTable": {
+        "abilities": {
+          "abilities": ["Store", "Key"]
+        },
+        "typeParameters": [
+          {
+            "constraints": {
+              "abilities": ["Copy", "Drop", "Store"]
+            },
+            "isPhantom": false
+          },
+          {
+            "constraints": {
+              "abilities": ["Store"]
+            },
+            "isPhantom": true
+          }
+        ],
+        "fields": [
+          {
+            "name": "id",
+            "type": {
+              "Struct": {
+                "address": "0x2",
+                "module": "object",
+                "name": "UID",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "head",
+            "type": {
+              "Struct": {
+                "address": "0x1",
+                "module": "option",
+                "name": "Option",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "name": "tail",
+            "type": {
+              "Struct": {
+                "address": "0x1",
+                "module": "option",
+                "name": "Option",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "name": "size",
+            "type": "U64"
+          }
+        ]
+      },
+      "Node": {
+        "abilities": {
+          "abilities": ["Store"]
+        },
+        "typeParameters": [
+          {
+            "constraints": {
+              "abilities": ["Copy", "Drop", "Store"]
+            },
+            "isPhantom": false
+          },
+          {
+            "constraints": {
+              "abilities": ["Store"]
+            },
+            "isPhantom": false
+          }
+        ],
+        "fields": [
+          {
+            "name": "prev",
+            "type": {
+              "Struct": {
+                "address": "0x1",
+                "module": "option",
+                "name": "Option",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "name": "next",
+            "type": {
+              "Struct": {
+                "address": "0x1",
+                "module": "option",
+                "name": "Option",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "name": "value",
+            "type": {
+              "TypeParameter": 1
+            }
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {
+      "borrow": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Copy", "Drop", "Store"]
+          },
+          {
+            "abilities": ["Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "linked_table",
+                "name": "LinkedTable",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  },
+                  {
+                    "TypeParameter": 1
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "TypeParameter": 0
+          }
+        ],
+        "return": [
+          {
+            "Reference": {
+              "TypeParameter": 1
+            }
+          }
+        ]
+      },
+      "borrow_mut": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Copy", "Drop", "Store"]
+          },
+          {
+            "abilities": ["Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "linked_table",
+                "name": "LinkedTable",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  },
+                  {
+                    "TypeParameter": 1
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "TypeParameter": 0
+          }
+        ],
+        "return": [
+          {
+            "MutableReference": {
+              "TypeParameter": 1
+            }
+          }
+        ]
+      },
+      "borrow_mut_node": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Copy", "Drop", "Store"]
+          },
+          {
+            "abilities": ["Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "linked_table",
+                "name": "LinkedTable",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  },
+                  {
+                    "TypeParameter": 1
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "TypeParameter": 0
+          }
+        ],
+        "return": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "linked_table",
+                "name": "Node",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  },
+                  {
+                    "TypeParameter": 1
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "borrow_mut_value": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Copy", "Drop", "Store"]
+          },
+          {
+            "abilities": ["Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "linked_table",
+                "name": "Node",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  },
+                  {
+                    "TypeParameter": 1
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "MutableReference": {
+              "TypeParameter": 1
+            }
+          }
+        ]
+      },
+      "borrow_node": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Copy", "Drop", "Store"]
+          },
+          {
+            "abilities": ["Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "linked_table",
+                "name": "LinkedTable",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  },
+                  {
+                    "TypeParameter": 1
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "TypeParameter": 0
+          }
+        ],
+        "return": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "linked_table",
+                "name": "Node",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  },
+                  {
+                    "TypeParameter": 1
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "borrow_value": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Copy", "Drop", "Store"]
+          },
+          {
+            "abilities": ["Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "linked_table",
+                "name": "Node",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  },
+                  {
+                    "TypeParameter": 1
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Reference": {
+              "TypeParameter": 1
+            }
+          }
+        ]
+      },
+      "contains": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Copy", "Drop", "Store"]
+          },
+          {
+            "abilities": ["Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "linked_table",
+                "name": "LinkedTable",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  },
+                  {
+                    "TypeParameter": 1
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "TypeParameter": 0
+          }
+        ],
+        "return": ["Bool"]
+      },
+      "destroy_empty": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Copy", "Drop", "Store"]
+          },
+          {
+            "abilities": ["Drop", "Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+              "module": "linked_table",
+              "name": "LinkedTable",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                },
+                {
+                  "TypeParameter": 1
+                }
+              ]
+            }
+          }
+        ],
+        "return": []
+      },
+      "drop": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Copy", "Drop", "Store"]
+          },
+          {
+            "abilities": ["Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+              "module": "linked_table",
+              "name": "LinkedTable",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                },
+                {
+                  "TypeParameter": 1
+                }
+              ]
+            }
+          }
+        ],
+        "return": []
+      },
+      "head": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Copy", "Drop", "Store"]
+          },
+          {
+            "abilities": ["Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "linked_table",
+                "name": "LinkedTable",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  },
+                  {
+                    "TypeParameter": 1
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "insert_after": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Copy", "Drop", "Store"]
+          },
+          {
+            "abilities": ["Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "linked_table",
+                "name": "LinkedTable",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  },
+                  {
+                    "TypeParameter": 1
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "TypeParameter": 0
+          },
+          {
+            "TypeParameter": 0
+          },
+          {
+            "TypeParameter": 1
+          }
+        ],
+        "return": []
+      },
+      "insert_before": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Copy", "Drop", "Store"]
+          },
+          {
+            "abilities": ["Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "linked_table",
+                "name": "LinkedTable",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  },
+                  {
+                    "TypeParameter": 1
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "TypeParameter": 0
+          },
+          {
+            "TypeParameter": 0
+          },
+          {
+            "TypeParameter": 1
+          }
+        ],
+        "return": []
+      },
+      "is_empty": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Copy", "Drop", "Store"]
+          },
+          {
+            "abilities": ["Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "linked_table",
+                "name": "LinkedTable",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  },
+                  {
+                    "TypeParameter": 1
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": ["Bool"]
+      },
+      "length": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Copy", "Drop", "Store"]
+          },
+          {
+            "abilities": ["Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "linked_table",
+                "name": "LinkedTable",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  },
+                  {
+                    "TypeParameter": 1
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": ["U64"]
+      },
+      "new": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Copy", "Drop", "Store"]
+          },
+          {
+            "abilities": ["Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+              "module": "linked_table",
+              "name": "LinkedTable",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                },
+                {
+                  "TypeParameter": 1
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "next": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Copy", "Drop", "Store"]
+          },
+          {
+            "abilities": ["Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "linked_table",
+                "name": "Node",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  },
+                  {
+                    "TypeParameter": 1
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "prev": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Copy", "Drop", "Store"]
+          },
+          {
+            "abilities": ["Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "linked_table",
+                "name": "Node",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  },
+                  {
+                    "TypeParameter": 1
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "push_back": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Copy", "Drop", "Store"]
+          },
+          {
+            "abilities": ["Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "linked_table",
+                "name": "LinkedTable",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  },
+                  {
+                    "TypeParameter": 1
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "TypeParameter": 0
+          },
+          {
+            "TypeParameter": 1
+          }
+        ],
+        "return": []
+      },
+      "push_front": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Copy", "Drop", "Store"]
+          },
+          {
+            "abilities": ["Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "linked_table",
+                "name": "LinkedTable",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  },
+                  {
+                    "TypeParameter": 1
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "TypeParameter": 0
+          },
+          {
+            "TypeParameter": 1
+          }
+        ],
+        "return": []
+      },
+      "remove": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Copy", "Drop", "Store"]
+          },
+          {
+            "abilities": ["Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "linked_table",
+                "name": "LinkedTable",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  },
+                  {
+                    "TypeParameter": 1
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "TypeParameter": 0
+          }
+        ],
+        "return": [
+          {
+            "TypeParameter": 1
+          }
+        ]
+      },
+      "tail": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Copy", "Drop", "Store"]
+          },
+          {
+            "abilities": ["Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "linked_table",
+                "name": "LinkedTable",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  },
+                  {
+                    "TypeParameter": 1
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "fileFormatVersion": 6,
+    "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+    "name": "option_u64",
+    "friends": [],
+    "structs": {
+      "OptionU64": {
+        "abilities": {
+          "abilities": ["Copy", "Drop", "Store"]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "is_none",
+            "type": "Bool"
+          },
+          {
+            "name": "v",
+            "type": "U64"
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {
+      "borrow": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "option_u64",
+                "name": "OptionU64",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": ["U64"]
+      },
+      "borrow_mut": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "option_u64",
+                "name": "OptionU64",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "MutableReference": "U64"
+          }
+        ]
+      },
+      "contains": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "option_u64",
+                "name": "OptionU64",
+                "typeArguments": []
+              }
+            }
+          },
+          "U64"
+        ],
+        "return": ["Bool"]
+      },
+      "is_none": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "option_u64",
+                "name": "OptionU64",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": ["Bool"]
+      },
+      "is_some": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "option_u64",
+                "name": "OptionU64",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": ["Bool"]
+      },
+      "is_some_and_lte": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "option_u64",
+                "name": "OptionU64",
+                "typeArguments": []
+              }
+            }
+          },
+          "U64"
+        ],
+        "return": ["Bool"]
+      },
+      "none": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+              "module": "option_u64",
+              "name": "OptionU64",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "some": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U64"],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+              "module": "option_u64",
+              "name": "OptionU64",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "swap_or_fill": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "option_u64",
+                "name": "OptionU64",
+                "typeArguments": []
+              }
+            }
+          },
+          "U64"
+        ],
+        "return": []
+      }
+    }
+  },
+  {
+    "fileFormatVersion": 6,
+    "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+    "name": "random",
+    "friends": [],
+    "structs": {
+      "Random": {
+        "abilities": {
+          "abilities": ["Copy", "Drop", "Store"]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "seed",
+            "type": "U64"
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {
+      "new": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U64"],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+              "module": "random",
+              "name": "Random",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "rand": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "random",
+                "name": "Random",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": ["U64"]
+      },
+      "rand_n": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "random",
+                "name": "Random",
+                "typeArguments": []
+              }
+            }
+          },
+          "U64"
+        ],
+        "return": ["U64"]
+      },
+      "seed": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "random",
+                "name": "Random",
+                "typeArguments": []
+              }
+            }
+          },
+          "U64"
+        ],
+        "return": []
+      },
+      "seed_rand": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "random",
+                "name": "Random",
+                "typeArguments": []
+              }
+            }
+          },
+          "U64"
+        ],
+        "return": ["U64"]
+      }
+    }
+  },
+  {
+    "fileFormatVersion": 6,
+    "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+    "name": "skip_list",
+    "friends": [],
+    "structs": {
+      "Item": {
+        "abilities": {
+          "abilities": ["Drop", "Store"]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "n",
+            "type": "U64"
+          },
+          {
+            "name": "score",
+            "type": "U64"
+          },
+          {
+            "name": "finded",
+            "type": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "option_u64",
+                "name": "OptionU64",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      },
+      "Node": {
+        "abilities": {
+          "abilities": ["Store"]
+        },
+        "typeParameters": [
+          {
+            "constraints": {
+              "abilities": ["Store"]
+            },
+            "isPhantom": false
+          }
+        ],
+        "fields": [
+          {
+            "name": "score",
+            "type": "U64"
+          },
+          {
+            "name": "nexts",
+            "type": {
+              "Vector": {
+                "Struct": {
+                  "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                  "module": "option_u64",
+                  "name": "OptionU64",
+                  "typeArguments": []
+                }
+              }
+            }
+          },
+          {
+            "name": "prev",
+            "type": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "option_u64",
+                "name": "OptionU64",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "value",
+            "type": {
+              "TypeParameter": 0
+            }
+          }
+        ]
+      },
+      "SkipList": {
+        "abilities": {
+          "abilities": ["Store", "Key"]
+        },
+        "typeParameters": [
+          {
+            "constraints": {
+              "abilities": ["Store"]
+            },
+            "isPhantom": true
+          }
+        ],
+        "fields": [
+          {
+            "name": "id",
+            "type": {
+              "Struct": {
+                "address": "0x2",
+                "module": "object",
+                "name": "UID",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "head",
+            "type": {
+              "Vector": {
+                "Struct": {
+                  "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                  "module": "option_u64",
+                  "name": "OptionU64",
+                  "typeArguments": []
+                }
+              }
+            }
+          },
+          {
+            "name": "tail",
+            "type": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "option_u64",
+                "name": "OptionU64",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "level",
+            "type": "U64"
+          },
+          {
+            "name": "max_level",
+            "type": "U64"
+          },
+          {
+            "name": "list_p",
+            "type": "U64"
+          },
+          {
+            "name": "size",
+            "type": "U64"
+          },
+          {
+            "name": "random",
+            "type": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "random",
+                "name": "Random",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {
+      "borrow": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "skip_list",
+                "name": "SkipList",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          },
+          "U64"
+        ],
+        "return": [
+          {
+            "Reference": {
+              "TypeParameter": 0
+            }
+          }
+        ]
+      },
+      "borrow_mut": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "skip_list",
+                "name": "SkipList",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          },
+          "U64"
+        ],
+        "return": [
+          {
+            "MutableReference": {
+              "TypeParameter": 0
+            }
+          }
+        ]
+      },
+      "borrow_mut_node": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "skip_list",
+                "name": "SkipList",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          },
+          "U64"
+        ],
+        "return": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "skip_list",
+                "name": "Node",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "borrow_mut_value": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "skip_list",
+                "name": "Node",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "MutableReference": {
+              "TypeParameter": 0
+            }
+          }
+        ]
+      },
+      "borrow_node": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "skip_list",
+                "name": "SkipList",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          },
+          "U64"
+        ],
+        "return": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "skip_list",
+                "name": "Node",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "borrow_value": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "skip_list",
+                "name": "Node",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Reference": {
+              "TypeParameter": 0
+            }
+          }
+        ]
+      },
+      "contains": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "skip_list",
+                "name": "SkipList",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          },
+          "U64"
+        ],
+        "return": ["Bool"]
+      },
+      "destroy_empty": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Drop", "Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+              "module": "skip_list",
+              "name": "SkipList",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          }
+        ],
+        "return": []
+      },
+      "find_next": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "skip_list",
+                "name": "SkipList",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          },
+          "U64",
+          "Bool"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+              "module": "option_u64",
+              "name": "OptionU64",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "find_prev": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "skip_list",
+                "name": "SkipList",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          },
+          "U64",
+          "Bool"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+              "module": "option_u64",
+              "name": "OptionU64",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "head": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "skip_list",
+                "name": "SkipList",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+              "module": "option_u64",
+              "name": "OptionU64",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "insert": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "skip_list",
+                "name": "SkipList",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          },
+          "U64",
+          {
+            "TypeParameter": 0
+          }
+        ],
+        "return": []
+      },
+      "is_empty": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "skip_list",
+                "name": "SkipList",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": ["Bool"]
+      },
+      "length": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "skip_list",
+                "name": "SkipList",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": ["U64"]
+      },
+      "metadata": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "skip_list",
+                "name": "SkipList",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Vector": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "option_u64",
+                "name": "OptionU64",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+              "module": "option_u64",
+              "name": "OptionU64",
+              "typeArguments": []
+            }
+          },
+          "U64",
+          "U64",
+          "U64",
+          "U64"
+        ]
+      },
+      "new": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Store"]
+          }
+        ],
+        "parameters": [
+          "U64",
+          "U64",
+          "U64",
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+              "module": "skip_list",
+              "name": "SkipList",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "next_score": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "skip_list",
+                "name": "Node",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+              "module": "option_u64",
+              "name": "OptionU64",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "prev_score": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "skip_list",
+                "name": "Node",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+              "module": "option_u64",
+              "name": "OptionU64",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "remove": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "skip_list",
+                "name": "SkipList",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          },
+          "U64"
+        ],
+        "return": [
+          {
+            "TypeParameter": 0
+          }
+        ]
+      },
+      "tail": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+                "module": "skip_list",
+                "name": "SkipList",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xaabedac4e8bf60b9f9ca73ffd2ff2bfc0399f27ed9ecba877810490d05f194f9",
+              "module": "option_u64",
+              "name": "OptionU64",
+              "typeArguments": []
+            }
+          }
+        ]
+      }
+    }
+  }
+]
