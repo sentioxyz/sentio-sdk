@@ -275,30 +275,36 @@ export class EthPlugin extends Plugin {
           filters: [],
           fetchConfig: eventsHandler.fetchConfig
         }
-
-        for (const filter of eventsHandler.filters) {
-          const topics = await filter.getTopicFilter()
-
-          let address = undefined
-          if (filter.address) {
-            address = filter.address.toString()
-          }
-          const logFilter: LogFilter = {
-            addressType: filter.addressType,
-            address: address && validateAndNormalizeAddress(address),
+        if (!eventsHandler.filters || eventsHandler.filters.length === 0) {
+          // if no filter, then we assume all logs
+          logConfig.filters.push({
             topics: []
-          }
+          })
+        } else {
+          for (const filter of eventsHandler.filters) {
+            const topics = await filter.getTopicFilter()
 
-          for (const ts of topics) {
-            let hashes: string[] = []
-            if (Array.isArray(ts)) {
-              hashes = hashes.concat(ts)
-            } else if (ts) {
-              hashes.push(ts)
+            let address = undefined
+            if (filter.address) {
+              address = filter.address.toString()
             }
-            logFilter.topics.push({ hashes: hashes })
+            const logFilter: LogFilter = {
+              addressType: filter.addressType,
+              address: address && validateAndNormalizeAddress(address),
+              topics: []
+            }
+
+            for (const ts of topics) {
+              let hashes: string[] = []
+              if (Array.isArray(ts)) {
+                hashes = hashes.concat(ts)
+              } else if (ts) {
+                hashes.push(ts)
+              }
+              logFilter.topics.push({ hashes: hashes })
+            }
+            logConfig.filters.push(logFilter)
           }
-          logConfig.filters.push(logFilter)
         }
         accountConfig.logConfigs.push(logConfig)
       }
