@@ -212,6 +212,46 @@ export class EthPlugin extends Plugin {
           })
         }
       }
+
+      for (const eventsHandler of processor.eventHandlers) {
+        // associate id with filter
+        const handlerId = this.handlerRegister.register(eventsHandler.handler, processor.getChainId())
+        const logConfig: LogHandlerConfig = {
+          handlerId: handlerId,
+          handlerName: eventsHandler.handlerName,
+          filters: [],
+          fetchConfig: eventsHandler.fetchConfig
+        }
+
+        for (const filter of eventsHandler.filters) {
+          const topics = await filter.getTopicFilter()
+          // if (!filter.topics) {
+          //   throw new ServerError(Status.INVALID_ARGUMENT, 'Topic should not be null')
+          // }
+          let address = undefined
+          if (filter.address) {
+            address = filter.address.toString()
+          }
+          const logFilter: LogFilter = {
+            addressType: filter.addressType,
+            address: address && validateAndNormalizeAddress(address),
+            topics: []
+          }
+
+          for (const ts of topics) {
+            let hashes: string[] = []
+            if (Array.isArray(ts)) {
+              hashes = hashes.concat(ts)
+            } else if (ts) {
+              hashes.push(ts)
+            }
+            logFilter.topics.push({ hashes: hashes })
+          }
+          logConfig.filters.push(logFilter)
+        }
+        contractConfig.logConfigs.push(logConfig)
+      }
+
       config.contractConfigs.push(contractConfig)
     }
 
@@ -238,9 +278,7 @@ export class EthPlugin extends Plugin {
 
         for (const filter of eventsHandler.filters) {
           const topics = await filter.getTopicFilter()
-          // if (!filter.topics) {
-          //   throw new ServerError(Status.INVALID_ARGUMENT, 'Topic should not be null')
-          // }
+
           let address = undefined
           if (filter.address) {
             address = filter.address.toString()

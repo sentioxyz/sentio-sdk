@@ -1,4 +1,4 @@
-import { BaseContract, DeferredTopicFilter, LogDescription, TransactionResponseParams } from 'ethers'
+import { BaseContract, DeferredTopicFilter, LogDescription, LogParams, TransactionResponseParams } from 'ethers'
 
 import { BoundContractView, ContractContext, ContractView, GlobalContext } from './context.js'
 import {
@@ -93,6 +93,7 @@ export class GlobalProcessor {
   blockHandlers: BlockHandler[] = proxyHandlers([])
   transactionHandler: TransactionHandler[] = proxyHandlers([])
   traceHandlers: TraceHandler[] = proxyHandlers([])
+  eventHandlers: EventsHandler[] = []
 
   static bind(config: Omit<BindOptions, 'address'>): GlobalProcessor {
     const processor = new GlobalProcessor(config)
@@ -328,6 +329,47 @@ export class GlobalProcessor {
           return p(transaction)
         }
         return p
+      }
+    })
+    return this
+  }
+
+  public onEvent(
+    handler: (rawLog: LogParams, ctx: GlobalContext) => PromiseOrVoid,
+    filter: AddressOrTypeEventFilter | AddressOrTypeEventFilter[],
+    handlerOptions?: HandlerOptions<EthFetchConfig, TypedEvent>
+  ): this {
+    let _filters: AddressOrTypeEventFilter[] = []
+
+    if (Array.isArray(filter)) {
+      _filters = filter
+    } else {
+      _filters.push(filter)
+    }
+    const chainId = this.getChainId()
+
+    this.eventHandlers.push({
+      filters: _filters,
+      fetchConfig: EthFetchConfig.fromPartial(handlerOptions || {}),
+      handlerName: getHandlerName(),
+      handler: async function (data) {
+        const { log, block, transaction, transactionReceipt } = formatEthData(data)
+        if (!log) {
+          throw new ServerError(Status.INVALID_ARGUMENT, 'Log is empty')
+        }
+        const ctx = new GlobalContext(
+          chainId,
+          transaction?.to || '*',
+          data.timestamp,
+          block,
+          log,
+          undefined,
+          transaction,
+          transactionReceipt
+        )
+
+        await handler(log, ctx)
+        return ctx.stopAndGetResult()
       }
     })
     return this
