@@ -336,14 +336,14 @@ export class GlobalProcessor {
 
   public onEvent(
     handler: (rawLog: LogParams, ctx: GlobalContext) => PromiseOrVoid,
-    filter: AddressOrTypeEventFilter | AddressOrTypeEventFilter[],
+    filter?: AddressOrTypeEventFilter | AddressOrTypeEventFilter[],
     handlerOptions?: HandlerOptions<EthFetchConfig, TypedEvent>
   ): this {
     let _filters: AddressOrTypeEventFilter[] = []
 
     if (Array.isArray(filter)) {
       _filters = filter
-    } else {
+    } else if (filter) {
       _filters.push(filter)
     }
     const chainId = this.getChainId()
