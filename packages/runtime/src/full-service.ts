@@ -81,6 +81,11 @@ function locatePackageJson(pkgId: string) {
   return JSON.parse(content)
 }
 
+/**
+ * The RuntimeServicePatcher class is responsible for providing backward compatibility
+ * patches for different SDK versions. It ensures that the runtime can adapt to changes
+ * in the SDK by applying necessary adjustments to data bindings and other configurations.
+ */
 export class RuntimeServicePatcher {
   sdkVersion: Semver
 
