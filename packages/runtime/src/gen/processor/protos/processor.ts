@@ -434,6 +434,11 @@ export interface ProcessConfigResponse {
   dbSchema: DataBaseSchema | undefined;
 }
 
+export interface ConfigureHandlersResponse {
+  contractConfigs: ContractConfig[];
+  accountConfigs: AccountConfig[];
+}
+
 export interface ContractConfig {
   contract: ContractInfo | undefined;
   intervalConfigs: OnIntervalConfig[];
@@ -668,6 +673,11 @@ export interface TemplateInstance {
 export interface InitResponse {
   chainIds: string[];
   dbSchema: DataBaseSchema | undefined;
+  config: ProjectConfig | undefined;
+  executionConfig: ExecutionConfig | undefined;
+  metricConfigs: MetricConfig[];
+  exportConfigs: ExportConfig[];
+  eventLogConfigs: EventLogConfig[];
 }
 
 export interface ConfigureHandlersRequest {
@@ -2144,6 +2154,84 @@ export const ProcessConfigResponse = {
     message.dbSchema = (object.dbSchema !== undefined && object.dbSchema !== null)
       ? DataBaseSchema.fromPartial(object.dbSchema)
       : undefined;
+    return message;
+  },
+};
+
+function createBaseConfigureHandlersResponse(): ConfigureHandlersResponse {
+  return { contractConfigs: [], accountConfigs: [] };
+}
+
+export const ConfigureHandlersResponse = {
+  encode(message: ConfigureHandlersResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.contractConfigs) {
+      ContractConfig.encode(v!, writer.uint32(18).fork()).ldelim();
+    }
+    for (const v of message.accountConfigs) {
+      AccountConfig.encode(v!, writer.uint32(34).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ConfigureHandlersResponse {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseConfigureHandlersResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.contractConfigs.push(ContractConfig.decode(reader, reader.uint32()));
+          continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.accountConfigs.push(AccountConfig.decode(reader, reader.uint32()));
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ConfigureHandlersResponse {
+    return {
+      contractConfigs: globalThis.Array.isArray(object?.contractConfigs)
+        ? object.contractConfigs.map((e: any) => ContractConfig.fromJSON(e))
+        : [],
+      accountConfigs: globalThis.Array.isArray(object?.accountConfigs)
+        ? object.accountConfigs.map((e: any) => AccountConfig.fromJSON(e))
+        : [],
+    };
+  },
+
+  toJSON(message: ConfigureHandlersResponse): unknown {
+    const obj: any = {};
+    if (message.contractConfigs?.length) {
+      obj.contractConfigs = message.contractConfigs.map((e) => ContractConfig.toJSON(e));
+    }
+    if (message.accountConfigs?.length) {
+      obj.accountConfigs = message.accountConfigs.map((e) => AccountConfig.toJSON(e));
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<ConfigureHandlersResponse>): ConfigureHandlersResponse {
+    return ConfigureHandlersResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ConfigureHandlersResponse>): ConfigureHandlersResponse {
+    const message = createBaseConfigureHandlersResponse();
+    message.contractConfigs = object.contractConfigs?.map((e) => ContractConfig.fromPartial(e)) || [];
+    message.accountConfigs = object.accountConfigs?.map((e) => AccountConfig.fromPartial(e)) || [];
     return message;
   },
 };
@@ -4405,7 +4493,15 @@ export const TemplateInstance = {
 };
 
 function createBaseInitResponse(): InitResponse {
-  return { chainIds: [], dbSchema: undefined };
+  return {
+    chainIds: [],
+    dbSchema: undefined,
+    config: undefined,
+    executionConfig: undefined,
+    metricConfigs: [],
+    exportConfigs: [],
+    eventLogConfigs: [],
+  };
 }
 
 export const InitResponse = {
@@ -4415,6 +4511,21 @@ export const InitResponse = {
     }
     if (message.dbSchema !== undefined) {
       DataBaseSchema.encode(message.dbSchema, writer.uint32(18).fork()).ldelim();
+    }
+    if (message.config !== undefined) {
+      ProjectConfig.encode(message.config, writer.uint32(26).fork()).ldelim();
+    }
+    if (message.executionConfig !== undefined) {
+      ExecutionConfig.encode(message.executionConfig, writer.uint32(34).fork()).ldelim();
+    }
+    for (const v of message.metricConfigs) {
+      MetricConfig.encode(v!, writer.uint32(42).fork()).ldelim();
+    }
+    for (const v of message.exportConfigs) {
+      ExportConfig.encode(v!, writer.uint32(50).fork()).ldelim();
+    }
+    for (const v of message.eventLogConfigs) {
+      EventLogConfig.encode(v!, writer.uint32(58).fork()).ldelim();
     }
     return writer;
   },
@@ -4440,6 +4551,41 @@ export const InitResponse = {
 
           message.dbSchema = DataBaseSchema.decode(reader, reader.uint32());
           continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.config = ProjectConfig.decode(reader, reader.uint32());
+          continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.executionConfig = ExecutionConfig.decode(reader, reader.uint32());
+          continue;
+        case 5:
+          if (tag !== 42) {
+            break;
+          }
+
+          message.metricConfigs.push(MetricConfig.decode(reader, reader.uint32()));
+          continue;
+        case 6:
+          if (tag !== 50) {
+            break;
+          }
+
+          message.exportConfigs.push(ExportConfig.decode(reader, reader.uint32()));
+          continue;
+        case 7:
+          if (tag !== 58) {
+            break;
+          }
+
+          message.eventLogConfigs.push(EventLogConfig.decode(reader, reader.uint32()));
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -4453,6 +4599,17 @@ export const InitResponse = {
     return {
       chainIds: globalThis.Array.isArray(object?.chainIds) ? object.chainIds.map((e: any) => globalThis.String(e)) : [],
       dbSchema: isSet(object.dbSchema) ? DataBaseSchema.fromJSON(object.dbSchema) : undefined,
+      config: isSet(object.config) ? ProjectConfig.fromJSON(object.config) : undefined,
+      executionConfig: isSet(object.executionConfig) ? ExecutionConfig.fromJSON(object.executionConfig) : undefined,
+      metricConfigs: globalThis.Array.isArray(object?.metricConfigs)
+        ? object.metricConfigs.map((e: any) => MetricConfig.fromJSON(e))
+        : [],
+      exportConfigs: globalThis.Array.isArray(object?.exportConfigs)
+        ? object.exportConfigs.map((e: any) => ExportConfig.fromJSON(e))
+        : [],
+      eventLogConfigs: globalThis.Array.isArray(object?.eventLogConfigs)
+        ? object.eventLogConfigs.map((e: any) => EventLogConfig.fromJSON(e))
+        : [],
     };
   },
 
@@ -4463,6 +4620,21 @@ export const InitResponse = {
     }
     if (message.dbSchema !== undefined) {
       obj.dbSchema = DataBaseSchema.toJSON(message.dbSchema);
+    }
+    if (message.config !== undefined) {
+      obj.config = ProjectConfig.toJSON(message.config);
+    }
+    if (message.executionConfig !== undefined) {
+      obj.executionConfig = ExecutionConfig.toJSON(message.executionConfig);
+    }
+    if (message.metricConfigs?.length) {
+      obj.metricConfigs = message.metricConfigs.map((e) => MetricConfig.toJSON(e));
+    }
+    if (message.exportConfigs?.length) {
+      obj.exportConfigs = message.exportConfigs.map((e) => ExportConfig.toJSON(e));
+    }
+    if (message.eventLogConfigs?.length) {
+      obj.eventLogConfigs = message.eventLogConfigs.map((e) => EventLogConfig.toJSON(e));
     }
     return obj;
   },
@@ -4476,6 +4648,15 @@ export const InitResponse = {
     message.dbSchema = (object.dbSchema !== undefined && object.dbSchema !== null)
       ? DataBaseSchema.fromPartial(object.dbSchema)
       : undefined;
+    message.config = (object.config !== undefined && object.config !== null)
+      ? ProjectConfig.fromPartial(object.config)
+      : undefined;
+    message.executionConfig = (object.executionConfig !== undefined && object.executionConfig !== null)
+      ? ExecutionConfig.fromPartial(object.executionConfig)
+      : undefined;
+    message.metricConfigs = object.metricConfigs?.map((e) => MetricConfig.fromPartial(e)) || [];
+    message.exportConfigs = object.exportConfigs?.map((e) => ExportConfig.fromPartial(e)) || [];
+    message.eventLogConfigs = object.eventLogConfigs?.map((e) => EventLogConfig.fromPartial(e)) || [];
     return message;
   },
 };
@@ -14994,10 +15175,10 @@ export interface ProcessorClient<CallOptionsExt = {}> {
   ): AsyncIterable<PreprocessStreamResponse>;
 }
 
-export type ProcessorV2Definition = typeof ProcessorV2Definition;
-export const ProcessorV2Definition = {
-  name: "ProcessorV2",
-  fullName: "processor.ProcessorV2",
+export type ProcessorV3Definition = typeof ProcessorV3Definition;
+export const ProcessorV3Definition = {
+  name: "ProcessorV3",
+  fullName: "processor.ProcessorV3",
   methods: {
     init: {
       name: "Init",
@@ -15011,7 +15192,7 @@ export const ProcessorV2Definition = {
       name: "ConfigureHandlers",
       requestType: ConfigureHandlersRequest,
       requestStream: false,
-      responseType: ProcessConfigResponse,
+      responseType: ConfigureHandlersResponse,
       responseStream: false,
       options: {},
     },
@@ -15026,24 +15207,24 @@ export const ProcessorV2Definition = {
   },
 } as const;
 
-export interface ProcessorV2ServiceImplementation<CallContextExt = {}> {
+export interface ProcessorV3ServiceImplementation<CallContextExt = {}> {
   init(request: Empty, context: CallContext & CallContextExt): Promise<DeepPartial<InitResponse>>;
   configureHandlers(
     request: ConfigureHandlersRequest,
     context: CallContext & CallContextExt,
-  ): Promise<DeepPartial<ProcessConfigResponse>>;
+  ): Promise<DeepPartial<ConfigureHandlersResponse>>;
   processBindingsStream(
     request: AsyncIterable<ProcessStreamRequest>,
     context: CallContext & CallContextExt,
   ): ServerStreamingMethodResult<DeepPartial<ProcessStreamResponseV2>>;
 }
 
-export interface ProcessorV2Client<CallOptionsExt = {}> {
+export interface ProcessorV3Client<CallOptionsExt = {}> {
   init(request: DeepPartial<Empty>, options?: CallOptions & CallOptionsExt): Promise<InitResponse>;
   configureHandlers(
     request: DeepPartial<ConfigureHandlersRequest>,
     options?: CallOptions & CallOptionsExt,
-  ): Promise<ProcessConfigResponse>;
+  ): Promise<ConfigureHandlersResponse>;
   processBindingsStream(
     request: AsyncIterable<DeepPartial<ProcessStreamRequest>>,
     options?: CallOptions & CallOptionsExt,

@@ -26,7 +26,7 @@ service Processor {
   rpc PreprocessBindingsStream(stream PreprocessStreamRequest) returns (stream PreprocessStreamResponse);
 }
 
-service ProcessorV2 {
+service ProcessorV3 {
   // Initially call once to confirm which chains are available
   rpc Init(google.protobuf.Empty) returns (InitResponse);
 
@@ -34,7 +34,7 @@ service ProcessorV2 {
   // the handler configuration of this chain.
   // There is a special requirement that different chains must have different handler id sequences,
   // otherwise templates cannot be added midway. Whether it is a new template can also be determined by the driver.
-  rpc ConfigureHandlers(ConfigureHandlersRequest) returns (ProcessConfigResponse);
+  rpc ConfigureHandlers(ConfigureHandlersRequest) returns (ConfigureHandlersResponse);
 
   rpc ProcessBindingsStream(stream ProcessStreamRequest) returns (stream ProcessStreamResponseV2);
 }
@@ -80,6 +80,11 @@ message ProcessConfigResponse {
   repeated EventLogConfig event_log_configs = 8;
 
   DataBaseSchema db_schema = 10;
+}
+
+message ConfigureHandlersResponse {
+  repeated ContractConfig contract_configs = 2;
+  repeated AccountConfig account_configs = 4;
 }
 
 message ContractConfig {
@@ -302,6 +307,13 @@ message TemplateInstance {
 message InitResponse {
   repeated string chain_ids = 1;
   DataBaseSchema db_schema = 2;
+
+  ProjectConfig config = 3;
+  ExecutionConfig execution_config = 4;
+
+  repeated MetricConfig metric_configs = 5;
+  repeated ExportConfig export_configs = 6;
+  repeated EventLogConfig event_log_configs = 7;
 }
 
 message ConfigureHandlersRequest {

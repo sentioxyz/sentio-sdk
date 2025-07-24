@@ -14,6 +14,14 @@ export class CorePlugin extends Plugin {
     // This syntax is to copy values instead of using references
     config.templateInstances = [...TemplateInstanceState.INSTANCE.getValues()]
 
+    this.initStartupConfig(config)
+  }
+
+  async init(config: InitResponse): Promise<void> {
+    this.initStartupConfig(config)
+  }
+
+  initStartupConfig(config: InitResponse | ProcessConfigResponse): void {
     for (const metric of MetricState.INSTANCE.getValues()) {
       config.metricConfigs.push({
         ...metric.config
@@ -44,9 +52,6 @@ export class CorePlugin extends Plugin {
           .join('\n\n')
       }
     }
-  }
-
-  async init(config: InitResponse): Promise<void> {
     if (DatabaseSchemaState.INSTANCE.getValues().length > 0) {
       config.dbSchema = {
         gqlSchema: DatabaseSchemaState.INSTANCE.getValues()

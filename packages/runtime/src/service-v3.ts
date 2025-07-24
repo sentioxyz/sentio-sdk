@@ -1,12 +1,13 @@
 import {
   ConfigureHandlersRequest,
+  ConfigureHandlersResponse,
   DataBinding,
   DeepPartial,
   Empty,
   HandlerType,
   InitResponse,
   ProcessConfigResponse,
-  ProcessorV2ServiceImplementation,
+  ProcessorV3ServiceImplementation,
   ProcessResult,
   ProcessStreamRequest,
   ProcessStreamResponseV2,
@@ -27,7 +28,7 @@ import { TemplateInstanceState } from './state.js'
 
 const { process_binding_count, process_binding_time, process_binding_error } = processMetrics
 
-export class ProcessorServiceImplV2 implements ProcessorV2ServiceImplementation {
+export class ProcessorServiceImplV3 implements ProcessorV3ServiceImplementation {
   readonly enablePartition: boolean
   private readonly loader: () => Promise<any>
   private readonly shutdownHandler?: () => void
@@ -173,7 +174,7 @@ export class ProcessorServiceImplV2 implements ProcessorV2ServiceImplementation 
   async configureHandlers(
     request: ConfigureHandlersRequest,
     context: CallContext
-  ): Promise<DeepPartial<ProcessConfigResponse>> {
+  ): Promise<DeepPartial<ConfigureHandlersResponse>> {
     await PluginManager.INSTANCE.start(
       StartRequest.fromPartial({
         templateInstances: request.templateInstances
@@ -182,7 +183,10 @@ export class ProcessorServiceImplV2 implements ProcessorV2ServiceImplementation 
 
     const newConfig = ProcessConfigResponse.fromPartial({})
     await PluginManager.INSTANCE.configure(newConfig, request.chainId)
-    return newConfig
+    return {
+      accountConfigs: newConfig.accountConfigs,
+      contractConfigs: newConfig.contractConfigs
+    }
   }
 }
 
