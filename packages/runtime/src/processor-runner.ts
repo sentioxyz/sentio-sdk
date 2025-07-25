@@ -15,13 +15,15 @@ import { Session } from 'node:inspector/promises'
 import { ProcessorDefinition } from './gen/processor/protos/processor.js'
 import { ProcessorServiceImpl } from './service.js'
 import { configureEndpoints } from './endpoints.js'
-import { FullProcessorServiceImpl } from './full-service.js'
+import { FullProcessorServiceImpl, FullProcessorServiceV3Impl } from './full-service.js'
 import { setupLogger } from './logger.js'
 
 import { setupOTLP } from './otlp.js'
 import { ActionServer } from './action-server.js'
 import { ServiceManager } from './service-manager.js'
 import path from 'path'
+import { ProcessorV3Definition } from '@sentio/protos'
+import { ProcessorServiceImplV3 } from './service-v3.js'
 
 // const mergedRegistry = Registry.merge([globalRegistry, niceGrpcRegistry])
 
@@ -103,7 +105,10 @@ if (options['start-action-server']) {
   const service = new FullProcessorServiceImpl(baseService)
 
   server.add(ProcessorDefinition, service)
-
+  server.add(
+    ProcessorV3Definition,
+    new FullProcessorServiceV3Impl(new ProcessorServiceImplV3(loader, options, server.shutdown))
+  )
   server.listen('0.0.0.0:' + options.port)
 
   console.log('Processor Server Started at:', options.port)

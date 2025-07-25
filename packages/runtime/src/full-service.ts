@@ -2,19 +2,22 @@ import { CallContext } from 'nice-grpc'
 import { createRequire } from 'module'
 // Different than the simple one which
 import {
+  ConfigureHandlersRequest,
   DataBinding,
   ExecutionConfig,
   HandlerType,
+  InitResponse,
   PreprocessStreamRequest,
   ProcessBindingsRequest,
   ProcessConfigRequest,
+  ProcessConfigResponse,
   ProcessorServiceImplementation,
   ProcessResult,
   ProcessStreamRequest,
   StartRequest
 } from './gen/processor/protos/processor.js'
 
-import { Empty } from '@sentio/protos'
+import { ConfigureHandlersResponse, DeepPartial, Empty, ProcessorV3ServiceImplementation } from '@sentio/protos'
 import fs from 'fs-extra'
 import path from 'path'
 import os from 'os'
@@ -78,9 +81,15 @@ function locatePackageJson(pkgId: string) {
   return JSON.parse(content)
 }
 
-export class FullProcessorServiceImpl implements ProcessorServiceImplementation {
-  constructor(instance: ProcessorServiceImplementation) {
-    this.instance = instance
+/**
+ * The RuntimeServicePatcher class is responsible for providing backward compatibility
+ * patches for different SDK versions. It ensures that the runtime can adapt to changes
+ * in the SDK by applying necessary adjustments to data bindings and other configurations.
+ */
+export class RuntimeServicePatcher {
+  sdkVersion: Semver
+
+  constructor() {
     const sdkPackageJson = locatePackageJson('@sentio/sdk')
     const runtimePackageJson = locatePackageJson('@sentio/runtime')
 
@@ -89,111 +98,7 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
     this.sdkVersion = parseSemver(sdkPackageJson.version)
   }
 
-  instance: ProcessorServiceImplementation
-  sdkVersion: Semver
-
-  async getConfig(request: ProcessConfigRequest, context: CallContext) {
-    const config = await this.instance.getConfig(request, context)
-    config.executionConfig = ExecutionConfig.fromPartial(GLOBAL_CONFIG.execution)
-
-    if (config.contractConfigs) {
-      for (const contract of config.contractConfigs) {
-        // for old fuel processor
-        if (
-          compareSemver(this.sdkVersion, FUEL_PROTO_NO_FUEL_TRANSACTION_AS_CALL_VERSION) < 0 &&
-          contract.fuelCallConfigs
-        ) {
-          contract.fuelTransactionConfigs = contract.fuelCallConfigs
-          contract.fuelCallConfigs = undefined
-        }
-
-        // @ts-ignore convert old fuelLogConfigs to fuelReceiptConfigs
-        if (contract.fuelLogConfigs) {
-          contract.fuelReceiptConfigs = contract.fuelLogConfigs.map((e) => ({
-            handlerId: e.handlerId,
-            handlerName: e.handlerName,
-            log: {
-              logIds: e.logIds
-            }
-          }))
-        }
-
-        // @ts-ignore old fields
-        if (contract.aptosCallConfigs) {
-          // @ts-ignore old fields
-          contract.moveCallConfigs = contract.aptosCallConfigs
-        }
-        // @ts-ignore old fields
-        if (contract.aptosEventConfigs) {
-          // @ts-ignore old fields
-          contract.moveEventConfigs = contract.aptosEventConfigs
-        }
-      }
-    }
-
-    if (compareSemver(this.sdkVersion, MOVE_USE_RAW_VERSION) < 0) {
-      PROCESSED_MOVE_EVENT_TX_HANDLER.clear()
-    }
-
-    return config
-  }
-
-  async start(request: StartRequest, context: CallContext) {
-    return await this.instance.start(request, context)
-  }
-
-  async stop(request: Empty, context: CallContext) {
-    return await this.instance.stop(request, context)
-  }
-
-  async processBindings(request: ProcessBindingsRequest, options: CallContext) {
-    // if (GLOBAL_CONFIG.execution.sequential) {
-    //   request.bindings = request.bindings.sort(dataCompare)
-    // }
-
-    for (const binding of request.bindings) {
-      this.adjustDataBinding(binding)
-    }
-    try {
-      const result = await this.instance.processBindings(request, options)
-      this.adjustResult(result.result as ProcessResult)
-      if (!result.configUpdated && result.result?.states?.configUpdated) {
-        result.configUpdated = result.result?.states?.configUpdated
-      }
-      return result
-    } catch (e) {
-      if (this.sdkVersion.minor <= 16) {
-        // Old sdk doesn't handle this well
-        if (
-          e.code === os.constants.errno.ECONNRESET ||
-          e.code === os.constants.errno.ECONNREFUSED ||
-          e.code === os.constants.errno.ECONNABORTED
-        ) {
-          process.exit(1)
-        }
-      }
-      throw e
-    }
-  }
-
-  async *adjustBindingsStream(requests: AsyncIterable<ProcessStreamRequest>): AsyncIterable<ProcessStreamRequest> {
-    for await (const request of requests) {
-      this.adjustDataBinding(request.binding)
-      yield request
-    }
-  }
-
-  async *processBindingsStream(requests: AsyncIterable<ProcessStreamRequest>, context: CallContext) {
-    yield* this.instance.processBindingsStream(this.adjustBindingsStream(requests), context)
-  }
-
-  async *preprocessBindingsStream(requests: AsyncIterable<PreprocessStreamRequest>, context: CallContext) {
-    yield* this.instance.preprocessBindingsStream(this.adjustBindingsStream(requests), context)
-  }
-
-  private adjustResult(res: ProcessResult): void {}
-
-  private adjustDataBinding(dataBinding?: DataBinding): void {
+  adjustDataBinding(dataBinding?: DataBinding): void {
     const isBeforeMoveUseRawVersion = compareSemver(this.sdkVersion, MOVE_USE_RAW_VERSION) < 0
     // const isBeforeEthUseRawVersion = compareSemver(this.sdkVersion,ETH_USE_RAW_VERSION) < 0
 
@@ -350,6 +255,127 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
         break
     }
   }
+
+  patchConfig(config: DeepPartial<ProcessConfigResponse>): void {
+    config.executionConfig = ExecutionConfig.fromPartial(GLOBAL_CONFIG.execution)
+
+    if (config.contractConfigs) {
+      for (const contract of config.contractConfigs) {
+        // for old fuel processor
+        if (
+          compareSemver(this.sdkVersion, FUEL_PROTO_NO_FUEL_TRANSACTION_AS_CALL_VERSION) < 0 &&
+          contract.fuelCallConfigs
+        ) {
+          contract.fuelTransactionConfigs = contract.fuelCallConfigs
+          contract.fuelCallConfigs = undefined
+        }
+
+        // @ts-ignore convert old fuelLogConfigs to fuelReceiptConfigs
+        if (contract.fuelLogConfigs) {
+          contract.fuelReceiptConfigs = contract.fuelLogConfigs.map((e) => ({
+            handlerId: e.handlerId,
+            handlerName: e.handlerName,
+            log: {
+              logIds: e.logIds
+            }
+          }))
+        }
+
+        // @ts-ignore old fields
+        if (contract.aptosCallConfigs) {
+          // @ts-ignore old fields
+          contract.moveCallConfigs = contract.aptosCallConfigs
+        }
+        // @ts-ignore old fields
+        if (contract.aptosEventConfigs) {
+          // @ts-ignore old fields
+          contract.moveEventConfigs = contract.aptosEventConfigs
+        }
+      }
+    }
+  }
+}
+
+export class FullProcessorServiceImpl implements ProcessorServiceImplementation {
+  constructor(instance: ProcessorServiceImplementation) {
+    this.instance = instance
+    const sdkPackageJson = locatePackageJson('@sentio/sdk')
+    const runtimePackageJson = locatePackageJson('@sentio/runtime')
+
+    console.log('Runtime version:', runtimePackageJson.version, 'SDK version:', sdkPackageJson.version)
+
+    this.sdkVersion = parseSemver(sdkPackageJson.version)
+  }
+
+  instance: ProcessorServiceImplementation
+  sdkVersion: Semver
+  patcher: RuntimeServicePatcher = new RuntimeServicePatcher()
+
+  async getConfig(request: ProcessConfigRequest, context: CallContext) {
+    const config = await this.instance.getConfig(request, context)
+    this.patcher.patchConfig(config)
+
+    if (compareSemver(this.sdkVersion, MOVE_USE_RAW_VERSION) < 0) {
+      PROCESSED_MOVE_EVENT_TX_HANDLER.clear()
+    }
+
+    return config
+  }
+
+  async start(request: StartRequest, context: CallContext) {
+    return await this.instance.start(request, context)
+  }
+
+  async stop(request: Empty, context: CallContext) {
+    return await this.instance.stop(request, context)
+  }
+
+  async processBindings(request: ProcessBindingsRequest, options: CallContext) {
+    // if (GLOBAL_CONFIG.execution.sequential) {
+    //   request.bindings = request.bindings.sort(dataCompare)
+    // }
+
+    for (const binding of request.bindings) {
+      this.patcher.adjustDataBinding(binding)
+    }
+    try {
+      const result = await this.instance.processBindings(request, options)
+      this.adjustResult(result.result as ProcessResult)
+      if (!result.configUpdated && result.result?.states?.configUpdated) {
+        result.configUpdated = result.result?.states?.configUpdated
+      }
+      return result
+    } catch (e) {
+      if (this.sdkVersion.minor <= 16) {
+        // Old sdk doesn't handle this well
+        if (
+          e.code === os.constants.errno.ECONNRESET ||
+          e.code === os.constants.errno.ECONNREFUSED ||
+          e.code === os.constants.errno.ECONNABORTED
+        ) {
+          process.exit(1)
+        }
+      }
+      throw e
+    }
+  }
+
+  async *adjustBindingsStream(requests: AsyncIterable<ProcessStreamRequest>): AsyncIterable<ProcessStreamRequest> {
+    for await (const request of requests) {
+      this.patcher.adjustDataBinding(request.binding)
+      yield request
+    }
+  }
+
+  async *processBindingsStream(requests: AsyncIterable<ProcessStreamRequest>, context: CallContext) {
+    yield* this.instance.processBindingsStream(this.adjustBindingsStream(requests), context)
+  }
+
+  async *preprocessBindingsStream(requests: AsyncIterable<PreprocessStreamRequest>, context: CallContext) {
+    yield* this.instance.preprocessBindingsStream(this.adjustBindingsStream(requests), context)
+  }
+
+  private adjustResult(res: ProcessResult): void {}
 }
 
 // function dataCompare(a: DataBinding, b: DataBinding): number {
@@ -383,3 +409,35 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
 //     d.data?.ethTrace?.trace?.transactionPosition
 //   )
 // }
+
+export class FullProcessorServiceV3Impl implements ProcessorV3ServiceImplementation {
+  patcher: RuntimeServicePatcher = new RuntimeServicePatcher()
+
+  constructor(readonly instance: ProcessorV3ServiceImplementation) {}
+
+  async init(request: Empty, context: CallContext): Promise<DeepPartial<InitResponse>> {
+    const resp = await this.instance.init(request, context)
+    resp.executionConfig = ExecutionConfig.fromPartial(GLOBAL_CONFIG.execution)
+    return resp
+  }
+
+  async configureHandlers(
+    request: ConfigureHandlersRequest,
+    context: CallContext
+  ): Promise<DeepPartial<ConfigureHandlersResponse>> {
+    const config = await this.instance.configureHandlers(request, context)
+    this.patcher.patchConfig(config)
+    return config
+  }
+
+  async *processBindingsStream(requests: AsyncIterable<ProcessStreamRequest>, context: CallContext) {
+    yield* this.instance.processBindingsStream(this.adjustBindingsStream(requests), context)
+  }
+
+  async *adjustBindingsStream(requests: AsyncIterable<ProcessStreamRequest>): AsyncIterable<ProcessStreamRequest> {
+    for await (const request of requests) {
+      this.patcher.adjustDataBinding(request.binding)
+      yield request
+    }
+  }
+}

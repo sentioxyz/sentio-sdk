@@ -62,7 +62,7 @@ export abstract class Plugin {
   shutdownServer() {}
 
   /**
-   * Initialize the plugin, for service v2.
+   * Initialize the plugin, for service v3.
    * @param config
    */
   async init(config: InitResponse): Promise<void> {}
