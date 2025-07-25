@@ -41,6 +41,7 @@ export class ProcessorServiceImplV3 implements ProcessorV3ServiceImplementation 
   }
 
   async init(request: Empty, context: CallContext): Promise<DeepPartial<InitResponse>> {
+    await this.loader()
     const resp = InitResponse.fromPartial({
       chainIds: []
     })
