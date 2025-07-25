@@ -140,6 +140,13 @@ export async function runUpload(processorConfig: YamlProjectConfig, argv: string
   if (processorConfig.build) {
     await buildProcessor(false, options)
   }
+
+  if (!processorConfig.project.includes('/')) {
+    const res = await getMe(processorConfig.host, uploadAuth)
+    const me = (await res.json()) as UserInfo
+    processorConfig.project = `${me.username}/${processorConfig.project}`
+  }
+
   const continueFrom = options['continue-from']
   return uploadFile(processorConfig, uploadAuth, continueFrom)
 }
@@ -315,7 +322,7 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth, continu
     )
     if (!initUploadResRaw.ok) {
       const res = await initUploadResRaw.json()
-      console.error(chalk.red((res as { message: string }).message))
+      console.error(chalk.red(initUploadResRaw.status, (res as { message: string }).message))
       if ([404, 500].includes(initUploadResRaw.status)) {
         const created = await createProjectPrompt(options, auth, options.type)
         if (created) {
@@ -426,11 +433,6 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth, continu
 }
 
 async function getProcessorStatus(host: string, auth: Auth, projectSlug: string) {
-  if (!projectSlug.includes('/')) {
-    const res = await getMe(host, auth)
-    const me = (await res.json()) as UserInfo
-    projectSlug = `${me.username}/${projectSlug}`
-  }
   const url = new URL(`/api/v1/processors/${projectSlug}/status?version=ALL`, host)
   return fetch(url.href, {
     headers: {
