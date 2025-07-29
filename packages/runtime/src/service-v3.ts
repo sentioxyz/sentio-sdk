@@ -10,6 +10,7 @@ import {
   ProcessorV3ServiceImplementation,
   ProcessResult,
   ProcessStreamRequest,
+  ProcessStreamResponse,
   ProcessStreamResponseV2,
   StartRequest
 } from '@sentio/protos'
@@ -52,6 +53,21 @@ export class ProcessorServiceImplV3 implements ProcessorV3ServiceImplementation 
 
   async *processBindingsStream(requests: AsyncIterable<ProcessStreamRequest>, context: CallContext) {
     const subject = new Subject<DeepPartial<ProcessStreamResponseV2>>()
+    this.handleRequests(requests, subject)
+      .then(() => {
+        subject.complete()
+      })
+      .catch((e) => {
+        console.error(e)
+        subject.error(e)
+      })
+    yield* from(subject).pipe(withAbort(context.signal))
+  }
+
+  protected async handleRequests(
+    requests: AsyncIterable<ProcessStreamRequest>,
+    subject: Subject<DeepPartial<ProcessStreamResponse>>
+  ) {
     let lastBinding: DataBinding | undefined = undefined
     for await (const request of requests) {
       try {
@@ -65,8 +81,8 @@ export class ProcessorServiceImplV3 implements ProcessorV3ServiceImplementation 
         console.error('unexpect error during handle loop', e)
       }
     }
-    yield* from(subject).pipe(withAbort(context.signal))
   }
+
   private contexts = new Contexts()
 
   async handleRequest(
@@ -87,7 +103,7 @@ export class ProcessorServiceImplV3 implements ProcessorV3ServiceImplementation 
 
       if (this.enablePartition) {
         try {
-          console.debug(`sending partition request for processId ${request.processId}`, request.binding)
+          console.debug('sending partition request', request.binding)
           const partitions = await PluginManager.INSTANCE.partition(request.binding)
           subject.next({
             processId: request.processId,
