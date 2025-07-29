@@ -280,6 +280,7 @@ export class DataBindingContext extends AbstractStoreContext implements IDataBin
   }
 
   doSend(resp: DeepPartial<ProcessStreamResponseV2>) {
+    console.debug('sending db request, processId ', this.processId, 'opId', resp.dbRequest?.opId)
     this.subject.next({
       ...resp,
       processId: this.processId

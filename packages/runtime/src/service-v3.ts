@@ -87,6 +87,7 @@ export class ProcessorServiceImplV3 implements ProcessorV3ServiceImplementation 
 
       if (this.enablePartition) {
         try {
+          console.debug(`sending partition request for processId ${request.processId}`, request.binding)
           const partitions = await PluginManager.INSTANCE.partition(request.binding)
           subject.next({
             processId: request.processId,
@@ -128,11 +129,13 @@ export class ProcessorServiceImplV3 implements ProcessorV3ServiceImplementation 
   ) {
     const context = this.contexts.new(processId, subject)
     const start = Date.now()
+    console.debug('process binding', processId)
     PluginManager.INSTANCE.processBinding(binding, undefined, context)
       .then(async (result) => {
-        // await all pending db requests
+        console.debug(`process binding ${processId} done`)
         await context.awaitPendings()
 
+        console.debug('sending ts data length:', result.timeseriesResult.length)
         for (const ts of result.timeseriesResult) {
           subject.next({
             processId,
@@ -143,6 +146,7 @@ export class ProcessorServiceImplV3 implements ProcessorV3ServiceImplementation 
         }
 
         if (result.states?.configUpdated) {
+          console.debug('sending tpl updates:')
           subject.next({
             processId,
             tplRequest: {
@@ -151,6 +155,7 @@ export class ProcessorServiceImplV3 implements ProcessorV3ServiceImplementation 
           })
         }
 
+        console.debug('sending binding result', processId)
         subject.next({
           result: {
             states: result.states,
@@ -169,6 +174,7 @@ export class ProcessorServiceImplV3 implements ProcessorV3ServiceImplementation 
         const cost = Date.now() - start
         process_binding_time.add(cost)
         this.contexts.delete(processId)
+        console.debug('process binding done', processId)
       })
   }
 
