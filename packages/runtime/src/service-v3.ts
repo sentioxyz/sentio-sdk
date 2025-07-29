@@ -87,7 +87,7 @@ export class ProcessorServiceImplV3 implements ProcessorV3ServiceImplementation 
 
       if (this.enablePartition) {
         try {
-          console.debug('sending partition request', request.binding)
+          console.debug(`sending partition request for processId ${request.processId}`, request.binding)
           const partitions = await PluginManager.INSTANCE.partition(request.binding)
           subject.next({
             processId: request.processId,
