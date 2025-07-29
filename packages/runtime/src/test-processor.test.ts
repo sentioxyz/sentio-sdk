@@ -1,8 +1,8 @@
 import { Plugin, PluginManager } from './plugin.js'
 import { DataBinding, HandlerType, ProcessResult } from './gen/processor/protos/processor.js'
-import { ProcessStreamResponse_Partitions } from '@sentio/protos'
+import { AccountConfig, InitResponse, ProcessConfigResponse, ProcessStreamResponse_Partitions } from '@sentio/protos'
 
-class TestPlugin extends Plugin {
+export class TestPlugin extends Plugin {
   async processBinding(request: DataBinding): Promise<ProcessResult> {
     const dbContext = PluginManager.INSTANCE.dbContextLocalStorage.getStore()
     if (dbContext) {
@@ -34,6 +34,19 @@ class TestPlugin extends Plugin {
         {}
       )
     }
+  }
+
+  async init(config: InitResponse): Promise<void> {
+    config.chainIds = ['1']
+  }
+
+  async configure(config: ProcessConfigResponse, forChainId?: string): Promise<void> {
+    config.accountConfigs = [
+      AccountConfig.fromPartial({
+        address: '0x',
+        chainId: '1'
+      })
+    ]
   }
 }
 

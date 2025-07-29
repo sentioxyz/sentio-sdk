@@ -348,6 +348,7 @@ export interface User {
   username: string;
   accountStatus: User_AccountStatus;
   tier: Tier;
+  isOrganization: boolean;
 }
 
 export enum User_AccountStatus {
@@ -517,6 +518,12 @@ export interface Project_ProjectMember {
 export interface CommunityProject {
   dashAlias: string;
   curated?: boolean | undefined;
+  chain: { [key: string]: StringList };
+}
+
+export interface CommunityProject_ChainEntry {
+  key: string;
+  value: StringList | undefined;
 }
 
 export interface ProjectInfo {
@@ -2535,6 +2542,7 @@ function createBaseUser(): User {
     username: "",
     accountStatus: 0,
     tier: 0,
+    isOrganization: false,
   };
 }
 
@@ -2587,6 +2595,9 @@ export const User = {
     }
     if (message.tier !== 0) {
       writer.uint32(120).int32(message.tier);
+    }
+    if (message.isOrganization !== false) {
+      writer.uint32(128).bool(message.isOrganization);
     }
     return writer;
   },
@@ -2696,6 +2707,13 @@ export const User = {
 
           message.tier = reader.int32() as any;
           continue;
+        case 16:
+          if (tag !== 128) {
+            break;
+          }
+
+          message.isOrganization = reader.bool();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -2721,6 +2739,7 @@ export const User = {
       username: isSet(object.username) ? globalThis.String(object.username) : "",
       accountStatus: isSet(object.accountStatus) ? user_AccountStatusFromJSON(object.accountStatus) : 0,
       tier: isSet(object.tier) ? tierFromJSON(object.tier) : 0,
+      isOrganization: isSet(object.isOrganization) ? globalThis.Boolean(object.isOrganization) : false,
     };
   },
 
@@ -2768,6 +2787,9 @@ export const User = {
     if (message.tier !== 0) {
       obj.tier = tierToJSON(message.tier);
     }
+    if (message.isOrganization !== false) {
+      obj.isOrganization = message.isOrganization;
+    }
     return obj;
   },
 
@@ -2790,6 +2812,7 @@ export const User = {
     message.username = object.username ?? "";
     message.accountStatus = object.accountStatus ?? 0;
     message.tier = object.tier ?? 0;
+    message.isOrganization = object.isOrganization ?? false;
     return message;
   },
 };
@@ -3493,7 +3516,7 @@ export const Project_ProjectMember = {
 };
 
 function createBaseCommunityProject(): CommunityProject {
-  return { dashAlias: "", curated: undefined };
+  return { dashAlias: "", curated: undefined, chain: {} };
 }
 
 export const CommunityProject = {
@@ -3504,6 +3527,9 @@ export const CommunityProject = {
     if (message.curated !== undefined) {
       writer.uint32(16).bool(message.curated);
     }
+    Object.entries(message.chain).forEach(([key, value]) => {
+      CommunityProject_ChainEntry.encode({ key: key as any, value }, writer.uint32(26).fork()).ldelim();
+    });
     return writer;
   },
 
@@ -3528,6 +3554,16 @@ export const CommunityProject = {
 
           message.curated = reader.bool();
           continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          const entry3 = CommunityProject_ChainEntry.decode(reader, reader.uint32());
+          if (entry3.value !== undefined) {
+            message.chain[entry3.key] = entry3.value;
+          }
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -3541,6 +3577,12 @@ export const CommunityProject = {
     return {
       dashAlias: isSet(object.dashAlias) ? globalThis.String(object.dashAlias) : "",
       curated: isSet(object.curated) ? globalThis.Boolean(object.curated) : undefined,
+      chain: isObject(object.chain)
+        ? Object.entries(object.chain).reduce<{ [key: string]: StringList }>((acc, [key, value]) => {
+          acc[key] = StringList.fromJSON(value);
+          return acc;
+        }, {})
+        : {},
     };
   },
 
@@ -3552,6 +3594,15 @@ export const CommunityProject = {
     if (message.curated !== undefined) {
       obj.curated = message.curated;
     }
+    if (message.chain) {
+      const entries = Object.entries(message.chain);
+      if (entries.length > 0) {
+        obj.chain = {};
+        entries.forEach(([k, v]) => {
+          obj.chain[k] = StringList.toJSON(v);
+        });
+      }
+    }
     return obj;
   },
 
@@ -3562,6 +3613,88 @@ export const CommunityProject = {
     const message = createBaseCommunityProject();
     message.dashAlias = object.dashAlias ?? "";
     message.curated = object.curated ?? undefined;
+    message.chain = Object.entries(object.chain ?? {}).reduce<{ [key: string]: StringList }>((acc, [key, value]) => {
+      if (value !== undefined) {
+        acc[key] = StringList.fromPartial(value);
+      }
+      return acc;
+    }, {});
+    return message;
+  },
+};
+
+function createBaseCommunityProject_ChainEntry(): CommunityProject_ChainEntry {
+  return { key: "", value: undefined };
+}
+
+export const CommunityProject_ChainEntry = {
+  encode(message: CommunityProject_ChainEntry, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.key !== "") {
+      writer.uint32(10).string(message.key);
+    }
+    if (message.value !== undefined) {
+      StringList.encode(message.value, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): CommunityProject_ChainEntry {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCommunityProject_ChainEntry();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.key = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.value = StringList.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): CommunityProject_ChainEntry {
+    return {
+      key: isSet(object.key) ? globalThis.String(object.key) : "",
+      value: isSet(object.value) ? StringList.fromJSON(object.value) : undefined,
+    };
+  },
+
+  toJSON(message: CommunityProject_ChainEntry): unknown {
+    const obj: any = {};
+    if (message.key !== "") {
+      obj.key = message.key;
+    }
+    if (message.value !== undefined) {
+      obj.value = StringList.toJSON(message.value);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<CommunityProject_ChainEntry>): CommunityProject_ChainEntry {
+    return CommunityProject_ChainEntry.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<CommunityProject_ChainEntry>): CommunityProject_ChainEntry {
+    const message = createBaseCommunityProject_ChainEntry();
+    message.key = object.key ?? "";
+    message.value = (object.value !== undefined && object.value !== null)
+      ? StringList.fromPartial(object.value)
+      : undefined;
     return message;
   },
 };
