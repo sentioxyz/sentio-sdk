@@ -1,128 +1,163 @@
-import { Aptos, AptosConfig } from '@aptos-labs/ts-sdk'
-import { SuiClient } from '@mysten/sui/client'
 import chalk from 'chalk'
 import process from 'process'
 import path from 'path'
 import fs from 'fs-extra'
 import fetch from 'node-fetch'
 import { AptosChainId, ChainId, StarknetChainId, SuiChainId, EthChainInfo, ExplorerApiType } from '@sentio/chain'
-import { RpcProvider as Starknet } from 'starknet'
-import { IotaClient } from '@iota/iota-sdk/client'
+
+import type { Aptos } from '@aptos-labs/ts-sdk'
+import type { IotaClient } from '@iota/iota-sdk/client'
+import type { SuiClient } from '@mysten/sui/client'
+import type { RpcProvider as Starknet } from 'starknet'
 
 export async function getABI(
   chain: ChainId,
   address: string,
   name: string | undefined
 ): Promise<{ name?: string; abi: object | string }> {
-  let ethApi
-  let aptosClient: Aptos | undefined
-  let suiClient: SuiClient | undefined
-  let iotaClient: IotaClient | undefined
-  let starknetClient: Starknet | undefined
-
-  switch (chain as string) {
-    case AptosChainId.APTOS_MAINNET:
-      aptosClient = new Aptos(new AptosConfig({ fullnode: 'https://mainnet.aptoslabs.com/v1' }))
-      break
-    case AptosChainId.APTOS_TESTNET:
-      aptosClient = new Aptos(new AptosConfig({ fullnode: 'https://testnet.aptoslabs.com/v1' }))
-      break
-    case AptosChainId.APTOS_MOVEMENT_TESTNET:
-      aptosClient = new Aptos(
-        new AptosConfig({
-          fullnode: 'https://aptos.testnet.bardock.movementlabs.xyz/v1'
-        })
-      )
-      break
-    case AptosChainId.APTOS_MOVEMENT_MAINNET:
-      aptosClient = new Aptos(
-        new AptosConfig({
-          fullnode: 'https://mainnet.movementnetwork.xyz/v1'
-        })
-      )
-      break
-    case AptosChainId.INITIA_ECHELON:
-      aptosClient = new Aptos(
-        new AptosConfig({
-          fullnode: 'https://rpc.sentio.xyz/initia-aptos/v1'
-        })
-      )
-      break
-    case SuiChainId.SUI_MAINNET:
-      suiClient = new SuiClient({ url: 'https://fullnode.mainnet.sui.io/' })
-      break
-    case SuiChainId.SUI_TESTNET:
-      suiClient = new SuiClient({ url: 'https://fullnode.testnet.sui.io/' })
-      break
-    case SuiChainId.IOTA_MAINNET:
-      iotaClient = new IotaClient({ url: 'https://api.mainnet.iota.cafe/' })
-      break
-    case SuiChainId.IOTA_TESTNET:
-      iotaClient = new IotaClient({ url: 'https://api.testnet.iota.cafe/' })
-      break
-    case StarknetChainId.STARKNET_MAINNET:
-      starknetClient = new Starknet({
-        nodeUrl: 'https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_8/8sD5yitBslIYCPFzSq_Q1ObJHqPlZxFw'
-      })
-      break
-    case StarknetChainId.STARKNET_SEPOLIA:
-      starknetClient = new Starknet({
-        nodeUrl: 'https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_8/8sD5yitBslIYCPFzSq_Q1ObJHqPlZxFw'
-      })
-      break
-    default:
-      const chainDetail = EthChainInfo[chain]
-      ethApi = chainDetail.explorerApi
-      if (
-        !ethApi ||
-        (chainDetail.explorerApiType !== ExplorerApiType.ETHERSCAN &&
-          chainDetail.explorerApiType !== ExplorerApiType.BLOCKSCOUT)
-      ) {
-        console.error(chalk.red(`chain ${chain} not supported for direct add, please download the ABI manually`))
-        process.exit(1)
-      }
-  }
-
   const baseErrMsg = chalk.red(
     `Failed to automatic download contract ${address} from ${chain}, please manually download abi and put it into abis/eth directory`
   )
 
-  if (aptosClient) {
-    try {
-      return {
-        abi: await aptosClient.getAccountModules({ accountAddress: address }),
-        name
-      }
-    } catch (e) {
-      console.error(baseErrMsg, e)
-      process.exit(1)
+  // SUI
+  try {
+    const SuiClient = (await import('@mysten/sui/client')).SuiClient
+    let suiClient: SuiClient | undefined
+    switch (chain) {
+      case SuiChainId.SUI_MAINNET:
+        suiClient = new SuiClient({ url: 'https://fullnode.mainnet.sui.io/' })
+        break
+      case SuiChainId.SUI_TESTNET:
+        suiClient = new SuiClient({ url: 'https://fullnode.testnet.sui.io/' })
+        break
     }
-  }
-  if (suiClient) {
-    try {
-      return {
-        abi: await suiClient.getNormalizedMoveModulesByPackage({ package: address }),
-        name
+    if (suiClient) {
+      try {
+        return {
+          abi: await suiClient.getNormalizedMoveModulesByPackage({ package: address }),
+          name
+        }
+      } catch (e) {
+        console.error(baseErrMsg, e)
+        process.exit(1)
       }
-    } catch (e) {
-      console.error(baseErrMsg, e)
-      process.exit(1)
     }
+  } catch (e) {
+    console.log('sui module not loaded')
   }
-  if (iotaClient) {
-    try {
-      return {
-        abi: await iotaClient.getNormalizedMoveModulesByPackage({ package: address }),
-        name
+
+  // Iota
+  try {
+    const IotaClient = (await import('@iota/iota-sdk/client')).IotaClient
+    let iotaClient: IotaClient | undefined
+    switch (chain) {
+      case SuiChainId.IOTA_MAINNET:
+        iotaClient = new IotaClient({ url: 'https://api.mainnet.iota.cafe/' })
+        break
+      case SuiChainId.IOTA_TESTNET:
+        iotaClient = new IotaClient({ url: 'https://api.testnet.iota.cafe/' })
+        break
+    }
+    if (iotaClient) {
+      try {
+        return {
+          abi: await iotaClient.getNormalizedMoveModulesByPackage({ package: address }),
+          name
+        }
+      } catch (e) {
+        console.error(baseErrMsg, e)
+        process.exit(1)
       }
-    } catch (e) {
-      console.error(baseErrMsg, e)
-      process.exit(1)
     }
+  } catch (e) {
+    console.log('iota module not loaded')
   }
-  if (starknetClient) {
-    const clazz = await starknetClient.getClassAt(address, 'latest')
-    return { abi: clazz.abi, name }
+
+  // aptos
+  try {
+    const Aptos = (await import('@aptos-labs/ts-sdk')).Aptos
+    const AptosConfig = (await import('@aptos-labs/ts-sdk')).AptosConfig
+
+    let aptosClient: Aptos | undefined
+    switch (chain) {
+      case AptosChainId.APTOS_MAINNET:
+        aptosClient = new Aptos(new AptosConfig({ fullnode: 'https://mainnet.aptoslabs.com/v1' }))
+        break
+      case AptosChainId.APTOS_TESTNET:
+        aptosClient = new Aptos(new AptosConfig({ fullnode: 'https://testnet.aptoslabs.com/v1' }))
+        break
+      case AptosChainId.APTOS_MOVEMENT_TESTNET:
+        aptosClient = new Aptos(
+          new AptosConfig({
+            fullnode: 'https://aptos.testnet.bardock.movementlabs.xyz/v1'
+          })
+        )
+        break
+      case AptosChainId.APTOS_MOVEMENT_MAINNET:
+        aptosClient = new Aptos(
+          new AptosConfig({
+            fullnode: 'https://mainnet.movementnetwork.xyz/v1'
+          })
+        )
+        break
+      case AptosChainId.INITIA_ECHELON:
+        aptosClient = new Aptos(
+          new AptosConfig({
+            fullnode: 'https://rpc.sentio.xyz/initia-aptos/v1'
+          })
+        )
+        break
+    }
+    if (aptosClient) {
+      try {
+        return {
+          abi: await aptosClient.getAccountModules({ accountAddress: address }),
+          name
+        }
+      } catch (e) {
+        console.error(baseErrMsg, e)
+        process.exit(1)
+      }
+    }
+  } catch (e) {
+    console.log('aptos module not loaded')
+  }
+
+  // starknet
+  try {
+    const Starknet = (await import('starknet')).RpcProvider
+    let starknetClient: Starknet | undefined
+
+    switch (chain) {
+      case StarknetChainId.STARKNET_MAINNET:
+        starknetClient = new Starknet({
+          nodeUrl: 'https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_8/8sD5yitBslIYCPFzSq_Q1ObJHqPlZxFw'
+        })
+        break
+      case StarknetChainId.STARKNET_SEPOLIA:
+        starknetClient = new Starknet({
+          nodeUrl: 'https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_8/8sD5yitBslIYCPFzSq_Q1ObJHqPlZxFw'
+        })
+        break
+    }
+    if (starknetClient) {
+      const clazz = await starknetClient.getClassAt(address, 'latest')
+      return { abi: clazz.abi, name }
+    }
+  } catch (e) {
+    console.log('starknet module not loaded')
+  }
+
+  // ethereum
+  const chainDetail = EthChainInfo[chain]
+  let ethApi = chainDetail.explorerApi
+  if (
+    !ethApi ||
+    (chainDetail.explorerApiType !== ExplorerApiType.ETHERSCAN &&
+      chainDetail.explorerApiType !== ExplorerApiType.BLOCKSCOUT)
+  ) {
+    console.error(chalk.red(`chain ${chain} not supported for direct add, please download the ABI manually`))
+    process.exit(1)
   }
 
   try {
