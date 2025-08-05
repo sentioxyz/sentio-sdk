@@ -158,17 +158,21 @@ export async function codegen(genExample: boolean) {
     try {
       const codegen = await import(`@sentio/sdk/${gen}/codegen`)
 
-      const input = path.resolve('abis', gen)
-      const output = path.resolve(outputBase, gen)
-      await fs.remove(output)
+      try {
+        const input = path.resolve('abis', gen)
+        const output = path.resolve(outputBase, gen)
+        fs.removeSync(output)
 
-      if (gen == 'eth') {
-        await codegen.codegen(input, output, genExample ? contractsForUsage : [])
-      } else {
-        await codegen.codegen(input, output, genExample)
+        if (gen == 'eth') {
+          await codegen.codegen(input, output, genExample ? contractsForUsage : [])
+        } else {
+          await codegen.codegen(input, output, genExample)
+        }
+      } catch (e) {
+        console.error('code gen error', e)
       }
     } catch (e) {
-      console.error('code gen error', e)
+      // ignore
     }
   }
 
