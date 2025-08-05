@@ -13,8 +13,26 @@ interface HandlerEntry {
 const chainToNumber: Map<string, number> = new Map()
 const numberToChain: Map<number, string> = new Map()
 
+const generateHash = (s: string) => {
+  let hash = 0
+  for (const char of s) {
+    hash = (hash << 5) - hash + char.charCodeAt(0)
+    hash |= 0 // Constrain to 32bit integer
+  }
+  return Math.abs(hash)
+}
+
 for (const chainId of Object.values(ChainId)) {
-  const num = chainToNumber.size + 1
+  let num = parseInt(chainId)
+  if (isNaN(num)) {
+    // If the chainId is not a number, generate a hash
+    num = generateHash(chainId)
+  }
+
+  if (numberToChain.has(num)) {
+    // If the number is already used for another chain, throw an error, this should not happen
+    throw new Error(`Chain ID ${chainId}'s number ${num} conflicts with existing chain ID ${numberToChain.get(num)}`)
+  }
   chainToNumber.set(chainId, num)
   numberToChain.set(num, chainId)
 }
@@ -34,7 +52,7 @@ export class HandlerRegister {
     const entries = this.handlerByChain.get(chainNum) || []
 
     const len = entries.length
-    const id = chainNum * MAX_HANDLER_PER_CHAIN + len + 1 // Use the first 32 bits for chain ID, next bits for index
+    const id = chainNum * MAX_HANDLER_PER_CHAIN + len + 1
 
     const entry: HandlerEntry = {
       id,
