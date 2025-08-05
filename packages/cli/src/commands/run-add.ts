@@ -24,7 +24,11 @@ const supportedChain: string[] = [
 
 export async function runAdd(argv: string[]) {
   for (const chain of Object.values(EthChainInfo)) {
-    if (chain.explorerApiType === ExplorerApiType.ETHERSCAN || chain.explorerApiType === ExplorerApiType.BLOCKSCOUT) {
+    if (
+      chain.explorerApiType === ExplorerApiType.ETHERSCAN ||
+      chain.explorerApiType === ExplorerApiType.BLOCKSCOUT ||
+      chain.explorerApiType === ExplorerApiType.ETHERSCAN_V2
+    ) {
       supportedChain.push(chain.chainId)
     }
   }
@@ -59,7 +63,9 @@ export async function runAdd(argv: string[]) {
       alias: 'c',
       type: String,
       defaultValue: '1',
-      description: 'Chain ID, current supports the following:\n' + supportedChainMessage.join('\n,')
+      description:
+        'Chain ID, current supports the following, otherwise you need manually download ABI to abis/*:\n' +
+        supportedChainMessage.join('\n,')
     },
     {
       name: 'folder',
