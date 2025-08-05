@@ -55,8 +55,8 @@ describe('Test Iota Template Example', () => {
     expect(config.contractConfigs).length(2)
     expect(config.accountConfigs).length(2)
     expect(config.templateInstances).length(2)
-    expect(config.accountConfigs[0].moveIntervalConfigs[0].intervalConfig?.handlerId).equals(72000003)
-    expect(config.accountConfigs[1].moveIntervalConfigs[0].intervalConfig?.handlerId).equals(72000004)
+    expect(config.accountConfigs[0].moveIntervalConfigs[0].intervalConfig?.handlerId).equals(71000003)
+    expect(config.accountConfigs[1].moveIntervalConfigs[0].intervalConfig?.handlerId).equals(71000004)
 
     round = 0
     res = await service.iota.testEntryFunctionCall(testData as any, IotaNetwork.TEST_NET)
@@ -64,7 +64,7 @@ describe('Test Iota Template Example', () => {
     expect(config.contractConfigs).length(2)
     expect(config.accountConfigs).length(1)
     expect(config.templateInstances).length(1)
-    expect(config.accountConfigs[0].moveIntervalConfigs[0].intervalConfig?.handlerId).equals(72000003)
+    expect(config.accountConfigs[0].moveIntervalConfigs[0].intervalConfig?.handlerId).equals(71000003)
 
     round = 1
     res = await service.iota.testEntryFunctionCall(testData as any, IotaNetwork.TEST_NET)

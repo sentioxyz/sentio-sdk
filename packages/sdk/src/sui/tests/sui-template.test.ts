@@ -55,8 +55,8 @@ describe('Test Sui Template Example', () => {
     expect(config.contractConfigs).length(2)
     expect(config.accountConfigs).length(2)
     expect(config.templateInstances).length(2)
-    expect(config.accountConfigs[0].moveIntervalConfigs[0].intervalConfig?.handlerId).equals(70000003)
-    expect(config.accountConfigs[1].moveIntervalConfigs[0].intervalConfig?.handlerId).equals(70000004)
+    expect(config.accountConfigs[0].moveIntervalConfigs[0].intervalConfig?.handlerId).equals(69000003)
+    expect(config.accountConfigs[1].moveIntervalConfigs[0].intervalConfig?.handlerId).equals(69000004)
 
     round = 0
     res = await service.sui.testEntryFunctionCall(testData as any, SuiNetwork.TEST_NET)
@@ -64,7 +64,7 @@ describe('Test Sui Template Example', () => {
     expect(config.contractConfigs).length(2)
     expect(config.accountConfigs).length(1)
     expect(config.templateInstances).length(1)
-    expect(config.accountConfigs[0].moveIntervalConfigs[0].intervalConfig?.handlerId).equals(70000003)
+    expect(config.accountConfigs[0].moveIntervalConfigs[0].intervalConfig?.handlerId).equals(69000003)
 
     round = 1
     res = await service.sui.testEntryFunctionCall(testData as any, SuiNetwork.TEST_NET)
