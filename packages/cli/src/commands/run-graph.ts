@@ -171,6 +171,11 @@ const deployOptionDefinitions = [
     name: 'dir',
     description: '(Optional) The location of subgraph project, default to the current directory',
     type: String
+  },
+  {
+    name: 'skip-gen',
+    type: Boolean,
+    description: 'Skip code generation.'
   }
 ]
 
@@ -216,8 +221,6 @@ async function runGraphDeploy(argv: string[]) {
     process.exit(0)
   }
 
-  errorOnUnknownOption(options)
-
   finalizeHost(processorConfig, options.host)
   FinalizeProjectName(processorConfig, options.owner, options.name)
   if (!/^[\w-]+\/[\w-]+$/.test(processorConfig.project)) {
@@ -239,7 +242,9 @@ async function runGraphDeploy(argv: string[]) {
   const execOptions = {
     cwd: options.dir
   }
-  await execStep(['node', graph, 'codegen'], 'Graph codegen', execOptions)
+  if (!options['skip-gen']) {
+    await execStep(['node', graph, 'codegen'], 'Graph codegen', execOptions)
+  }
   await execStep(
     [
       'node',
@@ -253,7 +258,8 @@ async function runGraphDeploy(argv: string[]) {
       versionLabel,
       '--deploy-key',
       apiKey,
-      processorConfig.project
+      processorConfig.project,
+      ...(options._unknown || [])
     ],
     'Graph deploy',
     execOptions
@@ -267,7 +273,7 @@ async function runGraphDeploy(argv: string[]) {
   let zip
   try {
     await bundleSourceMap()
-    zip = await genZip()
+    zip = await genZip(options._unknown)
   } finally {
     if (options.dir) {
       process.chdir(cwd)
@@ -306,7 +312,7 @@ async function bundleSourceMap() {
   )
 }
 
-async function genZip() {
+async function genZip(extra: string[] = []) {
   const zip = new JSZip()
   ;[
     'package.json',
@@ -314,7 +320,8 @@ async function genZip() {
     'sentio.yaml',
     'build/sentio-graph.wasm.map',
     'subgraph.yaml',
-    'schema.graphql'
+    'schema.graphql',
+    ...extra
   ].forEach((p) => {
     if (fs.existsSync(p)) {
       zip.file(p, fs.readFileSync(p))
