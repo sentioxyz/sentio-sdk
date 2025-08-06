@@ -116,7 +116,7 @@ export class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
   }
 
   async send(method: string, params: Array<any>): Promise<any> {
-    if (method !== 'eth_call') {
+    if (method !== 'eth_call' || params.length > 2) {
       return await this.executor.add(() => super.send(method, params))
     }
     const tag = getTag(method, params)
