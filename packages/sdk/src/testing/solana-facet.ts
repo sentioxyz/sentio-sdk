@@ -1,5 +1,6 @@
 import { TestProcessorServer } from './test-processor-server.js'
 import { Data_SolInstruction, HandlerType, ProcessBindingResponse } from '@sentio/protos'
+import { ChainId } from '@sentio/chain'
 
 export class SolanaFacet {
   server: TestProcessorServer
@@ -14,12 +15,13 @@ export class SolanaFacet {
         return {
           data: {
             raw: new Uint8Array(),
-            solInstruction: instruction,
+            solInstruction: instruction
           },
           handlerIds: [],
           handlerType: HandlerType.SOL_INSTRUCTION,
+          chainId: ChainId.SOLANA_MAINNET
         }
-      }),
+      })
     })
   }
 }

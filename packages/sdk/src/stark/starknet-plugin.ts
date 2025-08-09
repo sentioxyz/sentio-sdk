@@ -94,7 +94,10 @@ export class StarknetPlugin extends Plugin {
 
     for (const handlerId of binding.handlerIds) {
       const promise = this.handlerRegister
-        .getHandlerById(handlerId)(binding.data?.starknetEvents)
+        .getHandlerById(
+          binding.chainId,
+          handlerId
+        )(binding.data?.starknetEvents)
         .catch((e: any) => {
           throw new ServerError(
             Status.INTERNAL,

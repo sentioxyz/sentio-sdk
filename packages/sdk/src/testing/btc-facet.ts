@@ -35,7 +35,8 @@ export class BTCFacet {
             btcTransaction: data
           },
           handlerIds: [txConfig.handlerId],
-          handlerType: HandlerType.BTC_TRANSACTION
+          handlerType: HandlerType.BTC_TRANSACTION,
+          chainId: network
         } as DataBinding
         res.push(binding)
       }

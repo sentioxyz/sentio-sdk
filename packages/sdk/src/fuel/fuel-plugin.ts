@@ -206,7 +206,10 @@ export class FuelPlugin extends Plugin {
 
     for (const handlerId of binding.handlerIds) {
       const promise = this.handlerRegister
-        .getHandlerById(handlerId)(receipt)
+        .getHandlerById(
+          binding.chainId,
+          handlerId
+        )(receipt)
         .catch((e: any) => {
           throw new ServerError(
             Status.INTERNAL,
@@ -231,7 +234,10 @@ export class FuelPlugin extends Plugin {
 
     for (const handlerId of binding.handlerIds) {
       const promise = this.handlerRegister
-        .getHandlerById(handlerId)(fuelTransaction)
+        .getHandlerById(
+          binding.chainId,
+          handlerId
+        )(fuelTransaction)
         .catch((e: any) => {
           throw new ServerError(
             Status.INTERNAL,
@@ -255,7 +261,10 @@ export class FuelPlugin extends Plugin {
     const promises: Promise<ProcessResult>[] = []
     for (const handlerId of binding.handlerIds) {
       const promise = this.handlerRegister
-        .getHandlerById(handlerId)(ethBlock)
+        .getHandlerById(
+          binding.chainId,
+          handlerId
+        )(ethBlock)
         .catch((e: any) => {
           console.error('error processing block: ', e)
           throw new ServerError(

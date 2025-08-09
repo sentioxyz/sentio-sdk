@@ -159,7 +159,10 @@ export class BTCPlugin extends Plugin {
 
     for (const handlerId of binding.handlerIds) {
       const promise = this.handlerRegister
-        .getHandlerById(handlerId)(binding.data?.btcTransaction)
+        .getHandlerById(
+          binding.chainId,
+          handlerId
+        )(binding.data?.btcTransaction)
         .catch((e: any) => {
           throw new ServerError(
             Status.INTERNAL,
@@ -184,7 +187,10 @@ export class BTCPlugin extends Plugin {
     const promises: Promise<ProcessResult>[] = []
     for (const handlerId of request.handlerIds) {
       const promise = this.handlerRegister
-        .getHandlerById(handlerId)(block)
+        .getHandlerById(
+          request.chainId,
+          handlerId
+        )(block)
         .catch((e: any) => {
           throw new ServerError(
             Status.INTERNAL,

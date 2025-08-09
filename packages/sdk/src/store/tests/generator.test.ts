@@ -116,7 +116,8 @@ describe('Test generators', () => {
         binding: {
           handlerIds: [],
           handlerType: 0,
-          data: {}
+          data: {},
+          chainId: '1'
         }
       })
     }, 10)

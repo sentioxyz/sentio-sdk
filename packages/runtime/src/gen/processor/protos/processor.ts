@@ -1422,6 +1422,7 @@ export interface DataBinding {
   data: Data | undefined;
   handlerType: HandlerType;
   handlerIds: number[];
+  chainId: string;
 }
 
 export interface StateResult {
@@ -13203,7 +13204,7 @@ export const Data_BTCBlock = {
 };
 
 function createBaseDataBinding(): DataBinding {
-  return { data: undefined, handlerType: 0, handlerIds: [] };
+  return { data: undefined, handlerType: 0, handlerIds: [], chainId: "" };
 }
 
 export const DataBinding = {
@@ -13219,6 +13220,9 @@ export const DataBinding = {
       writer.int32(v);
     }
     writer.ldelim();
+    if (message.chainId !== "") {
+      writer.uint32(42).string(message.chainId);
+    }
     return writer;
   },
 
@@ -13260,6 +13264,13 @@ export const DataBinding = {
           }
 
           break;
+        case 5:
+          if (tag !== 42) {
+            break;
+          }
+
+          message.chainId = reader.string();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -13276,6 +13287,7 @@ export const DataBinding = {
       handlerIds: globalThis.Array.isArray(object?.handlerIds)
         ? object.handlerIds.map((e: any) => globalThis.Number(e))
         : [],
+      chainId: isSet(object.chainId) ? globalThis.String(object.chainId) : "",
     };
   },
 
@@ -13290,6 +13302,9 @@ export const DataBinding = {
     if (message.handlerIds?.length) {
       obj.handlerIds = message.handlerIds.map((e) => Math.round(e));
     }
+    if (message.chainId !== "") {
+      obj.chainId = message.chainId;
+    }
     return obj;
   },
 
@@ -13301,6 +13316,7 @@ export const DataBinding = {
     message.data = (object.data !== undefined && object.data !== null) ? Data.fromPartial(object.data) : undefined;
     message.handlerType = object.handlerType ?? 0;
     message.handlerIds = object.handlerIds?.map((e) => e) || [];
+    message.chainId = object.chainId ?? "";
     return message;
   },
 };

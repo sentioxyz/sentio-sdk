@@ -110,7 +110,8 @@ describe('Test Basic Examples', () => {
           }
         },
         handlerIds: [handlerId],
-        handlerType: HandlerType.ETH_TRACE
+        handlerType: HandlerType.ETH_TRACE,
+        chainId: EthChainId.ETHEREUM
       })
     ).result
 

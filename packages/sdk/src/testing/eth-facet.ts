@@ -56,7 +56,8 @@ export class EthFacet {
               }
             },
             handlerIds: [config.handlerId],
-            handlerType: HandlerType.ETH_TRACE
+            handlerType: HandlerType.ETH_TRACE,
+            chainId: network
           }
         }
       }
@@ -120,7 +121,8 @@ export class EthFacet {
                 ethLog: { log, timestamp: new Date(), rawLog: JSON.stringify(log) }
               },
               handlerIds: [config.handlerId],
-              handlerType: HandlerType.ETH_LOG
+              handlerType: HandlerType.ETH_LOG,
+              chainId: network
             }
           }
         }
@@ -193,7 +195,8 @@ export class EthFacet {
                 ethLog: { log, timestamp: new Date(), rawLog: JSON.stringify(log) }
               },
               handlerIds: [config.handlerId],
-              handlerType: HandlerType.ETH_LOG
+              handlerType: HandlerType.ETH_LOG,
+              chainId: network
             }
           }
         }
@@ -232,7 +235,8 @@ export class EthFacet {
         ethBlock: { block }
       },
       handlerType: HandlerType.ETH_BLOCK,
-      handlerIds: []
+      handlerIds: [],
+      chainId: network
     }
     for (const contract of this.server.contractConfigs) {
       if (contract.contract?.chainId !== network) {
@@ -283,7 +287,8 @@ export class EthFacet {
         ethTransaction: { transaction, timestamp: new Date(), rawTransaction: JSON.stringify(transaction) }
       },
       handlerType: HandlerType.ETH_TRANSACTION,
-      handlerIds: []
+      handlerIds: [],
+      chainId: network
     }
     for (const contract of this.server.contractConfigs) {
       if (contract.contract?.chainId !== network) {

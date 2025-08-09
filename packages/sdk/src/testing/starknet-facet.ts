@@ -38,7 +38,8 @@ export class StarknetFacet {
               }
             },
             handlerIds: [logConfig.handlerId],
-            handlerType: HandlerType.STARKNET_EVENT
+            handlerType: HandlerType.STARKNET_EVENT,
+            chainId: config.contract.chainId
           }
 
           const logFilters = logConfig.filters

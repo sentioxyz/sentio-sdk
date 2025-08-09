@@ -42,7 +42,8 @@ describe('Test seq mode', () => {
         }
       },
       handlerType: HandlerType.ETH_BLOCK,
-      handlerIds: [0]
+      handlerIds: [0],
+      chainId: '1'
     }
 
     const binding2 = {
@@ -55,7 +56,8 @@ describe('Test seq mode', () => {
         }
       },
       handlerType: HandlerType.ETH_BLOCK,
-      handlerIds: [0]
+      handlerIds: [0],
+      chainId: '1'
     }
 
     const binding3 = {
@@ -66,10 +68,12 @@ describe('Test seq mode', () => {
             number: '0x1',
             timestamp: '0x65ed3c46'
           }
-        }
+        },
+        chainId: '1'
       },
       handlerType: HandlerType.ETH_BLOCK,
-      handlerIds: [0]
+      handlerIds: [0],
+      chainId: '1'
     }
 
     await service.processBindings({ bindings: [binding2, binding1, binding3] }, TEST_CONTEXT)

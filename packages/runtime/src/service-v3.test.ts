@@ -56,7 +56,8 @@ describe('Test Service V3 with worker without partition', () => {
       binding: {
         handlerIds: [0],
         handlerType: HandlerType.ETH_LOG,
-        data: {}
+        data: {},
+        chainId: '1'
       }
     }
 

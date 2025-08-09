@@ -47,7 +47,8 @@ export class AptosFacet {
                 }
               },
               handlerIds: [callConfig.handlerId],
-              handlerType: HandlerType.APT_CALL
+              handlerType: HandlerType.APT_CALL,
+              chainId: network
             }
           }
         }
@@ -89,7 +90,8 @@ export class AptosFacet {
                   }
                 },
                 handlerIds: [eventConfig.handlerId],
-                handlerType: HandlerType.APT_EVENT
+                handlerType: HandlerType.APT_EVENT,
+                chainId: network
               }
             }
           }

@@ -3,6 +3,7 @@ import Long from "long";
 import _m0 from "protobufjs/minimal.js";
 import { Struct } from "../../../google/protobuf/struct.js";
 import { Timestamp } from "../../../google/protobuf/timestamp.js";
+import { Money } from "../../../google/type/money.js";
 
 export enum Tier {
   FREE = 0,
@@ -311,6 +312,62 @@ export interface UsageTracker {
   projectSlugField: string;
   projectOwnerField: string;
   versionField: string;
+  customSkus: UsageTracker_CustomSkus | undefined;
+}
+
+export interface UsageTracker_SkuWithFieldValue {
+  fieldValue: string[];
+  apiSku: string;
+  webuiSku: string;
+}
+
+export interface UsageTracker_SkusByField {
+  fieldName: string;
+  skus: UsageTracker_SkuWithFieldValue[];
+}
+
+export interface UsageTracker_CustomSkus {
+  skusByField: UsageTracker_SkusByField[];
+  multipleFieldSkusOp: UsageTracker_CustomSkus_SkuOp;
+}
+
+export enum UsageTracker_CustomSkus_SkuOp {
+  MIN = 0,
+  SUM = 1,
+  MAX = 2,
+  UNRECOGNIZED = -1,
+}
+
+export function usageTracker_CustomSkus_SkuOpFromJSON(object: any): UsageTracker_CustomSkus_SkuOp {
+  switch (object) {
+    case 0:
+    case "MIN":
+      return UsageTracker_CustomSkus_SkuOp.MIN;
+    case 1:
+    case "SUM":
+      return UsageTracker_CustomSkus_SkuOp.SUM;
+    case 2:
+    case "MAX":
+      return UsageTracker_CustomSkus_SkuOp.MAX;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return UsageTracker_CustomSkus_SkuOp.UNRECOGNIZED;
+  }
+}
+
+export function usageTracker_CustomSkus_SkuOpToJSON(object: UsageTracker_CustomSkus_SkuOp): string {
+  switch (object) {
+    case UsageTracker_CustomSkus_SkuOp.MIN:
+      return "MIN";
+    case UsageTracker_CustomSkus_SkuOp.SUM:
+      return "SUM";
+    case UsageTracker_CustomSkus_SkuOp.MAX:
+      return "MAX";
+    case UsageTracker_CustomSkus_SkuOp.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
 }
 
 export interface Auth {
@@ -1611,6 +1668,7 @@ export interface Account {
   paymentMethod: PayMethod;
   usageOverCapLimit: string;
   status: string;
+  prepaidBalance: Money | undefined;
 }
 
 export interface ImportedProject {
@@ -2068,6 +2126,7 @@ function createBaseUsageTracker(): UsageTracker {
     projectSlugField: "",
     projectOwnerField: "",
     versionField: "",
+    customSkus: undefined,
   };
 }
 
@@ -2090,6 +2149,9 @@ export const UsageTracker = {
     }
     if (message.versionField !== "") {
       writer.uint32(50).string(message.versionField);
+    }
+    if (message.customSkus !== undefined) {
+      UsageTracker_CustomSkus.encode(message.customSkus, writer.uint32(58).fork()).ldelim();
     }
     return writer;
   },
@@ -2143,6 +2205,13 @@ export const UsageTracker = {
 
           message.versionField = reader.string();
           continue;
+        case 7:
+          if (tag !== 58) {
+            break;
+          }
+
+          message.customSkus = UsageTracker_CustomSkus.decode(reader, reader.uint32());
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -2160,6 +2229,7 @@ export const UsageTracker = {
       projectSlugField: isSet(object.projectSlugField) ? globalThis.String(object.projectSlugField) : "",
       projectOwnerField: isSet(object.projectOwnerField) ? globalThis.String(object.projectOwnerField) : "",
       versionField: isSet(object.versionField) ? globalThis.String(object.versionField) : "",
+      customSkus: isSet(object.customSkus) ? UsageTracker_CustomSkus.fromJSON(object.customSkus) : undefined,
     };
   },
 
@@ -2183,6 +2253,9 @@ export const UsageTracker = {
     if (message.versionField !== "") {
       obj.versionField = message.versionField;
     }
+    if (message.customSkus !== undefined) {
+      obj.customSkus = UsageTracker_CustomSkus.toJSON(message.customSkus);
+    }
     return obj;
   },
 
@@ -2197,6 +2270,254 @@ export const UsageTracker = {
     message.projectSlugField = object.projectSlugField ?? "";
     message.projectOwnerField = object.projectOwnerField ?? "";
     message.versionField = object.versionField ?? "";
+    message.customSkus = (object.customSkus !== undefined && object.customSkus !== null)
+      ? UsageTracker_CustomSkus.fromPartial(object.customSkus)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseUsageTracker_SkuWithFieldValue(): UsageTracker_SkuWithFieldValue {
+  return { fieldValue: [], apiSku: "", webuiSku: "" };
+}
+
+export const UsageTracker_SkuWithFieldValue = {
+  encode(message: UsageTracker_SkuWithFieldValue, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.fieldValue) {
+      writer.uint32(10).string(v!);
+    }
+    if (message.apiSku !== "") {
+      writer.uint32(18).string(message.apiSku);
+    }
+    if (message.webuiSku !== "") {
+      writer.uint32(26).string(message.webuiSku);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): UsageTracker_SkuWithFieldValue {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUsageTracker_SkuWithFieldValue();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.fieldValue.push(reader.string());
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.apiSku = reader.string();
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.webuiSku = reader.string();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): UsageTracker_SkuWithFieldValue {
+    return {
+      fieldValue: globalThis.Array.isArray(object?.fieldValue)
+        ? object.fieldValue.map((e: any) => globalThis.String(e))
+        : [],
+      apiSku: isSet(object.apiSku) ? globalThis.String(object.apiSku) : "",
+      webuiSku: isSet(object.webuiSku) ? globalThis.String(object.webuiSku) : "",
+    };
+  },
+
+  toJSON(message: UsageTracker_SkuWithFieldValue): unknown {
+    const obj: any = {};
+    if (message.fieldValue?.length) {
+      obj.fieldValue = message.fieldValue;
+    }
+    if (message.apiSku !== "") {
+      obj.apiSku = message.apiSku;
+    }
+    if (message.webuiSku !== "") {
+      obj.webuiSku = message.webuiSku;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<UsageTracker_SkuWithFieldValue>): UsageTracker_SkuWithFieldValue {
+    return UsageTracker_SkuWithFieldValue.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<UsageTracker_SkuWithFieldValue>): UsageTracker_SkuWithFieldValue {
+    const message = createBaseUsageTracker_SkuWithFieldValue();
+    message.fieldValue = object.fieldValue?.map((e) => e) || [];
+    message.apiSku = object.apiSku ?? "";
+    message.webuiSku = object.webuiSku ?? "";
+    return message;
+  },
+};
+
+function createBaseUsageTracker_SkusByField(): UsageTracker_SkusByField {
+  return { fieldName: "", skus: [] };
+}
+
+export const UsageTracker_SkusByField = {
+  encode(message: UsageTracker_SkusByField, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.fieldName !== "") {
+      writer.uint32(10).string(message.fieldName);
+    }
+    for (const v of message.skus) {
+      UsageTracker_SkuWithFieldValue.encode(v!, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): UsageTracker_SkusByField {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUsageTracker_SkusByField();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.fieldName = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.skus.push(UsageTracker_SkuWithFieldValue.decode(reader, reader.uint32()));
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): UsageTracker_SkusByField {
+    return {
+      fieldName: isSet(object.fieldName) ? globalThis.String(object.fieldName) : "",
+      skus: globalThis.Array.isArray(object?.skus)
+        ? object.skus.map((e: any) => UsageTracker_SkuWithFieldValue.fromJSON(e))
+        : [],
+    };
+  },
+
+  toJSON(message: UsageTracker_SkusByField): unknown {
+    const obj: any = {};
+    if (message.fieldName !== "") {
+      obj.fieldName = message.fieldName;
+    }
+    if (message.skus?.length) {
+      obj.skus = message.skus.map((e) => UsageTracker_SkuWithFieldValue.toJSON(e));
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<UsageTracker_SkusByField>): UsageTracker_SkusByField {
+    return UsageTracker_SkusByField.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<UsageTracker_SkusByField>): UsageTracker_SkusByField {
+    const message = createBaseUsageTracker_SkusByField();
+    message.fieldName = object.fieldName ?? "";
+    message.skus = object.skus?.map((e) => UsageTracker_SkuWithFieldValue.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseUsageTracker_CustomSkus(): UsageTracker_CustomSkus {
+  return { skusByField: [], multipleFieldSkusOp: 0 };
+}
+
+export const UsageTracker_CustomSkus = {
+  encode(message: UsageTracker_CustomSkus, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.skusByField) {
+      UsageTracker_SkusByField.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.multipleFieldSkusOp !== 0) {
+      writer.uint32(16).int32(message.multipleFieldSkusOp);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): UsageTracker_CustomSkus {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUsageTracker_CustomSkus();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.skusByField.push(UsageTracker_SkusByField.decode(reader, reader.uint32()));
+          continue;
+        case 2:
+          if (tag !== 16) {
+            break;
+          }
+
+          message.multipleFieldSkusOp = reader.int32() as any;
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): UsageTracker_CustomSkus {
+    return {
+      skusByField: globalThis.Array.isArray(object?.skusByField)
+        ? object.skusByField.map((e: any) => UsageTracker_SkusByField.fromJSON(e))
+        : [],
+      multipleFieldSkusOp: isSet(object.multipleFieldSkusOp)
+        ? usageTracker_CustomSkus_SkuOpFromJSON(object.multipleFieldSkusOp)
+        : 0,
+    };
+  },
+
+  toJSON(message: UsageTracker_CustomSkus): unknown {
+    const obj: any = {};
+    if (message.skusByField?.length) {
+      obj.skusByField = message.skusByField.map((e) => UsageTracker_SkusByField.toJSON(e));
+    }
+    if (message.multipleFieldSkusOp !== 0) {
+      obj.multipleFieldSkusOp = usageTracker_CustomSkus_SkuOpToJSON(message.multipleFieldSkusOp);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<UsageTracker_CustomSkus>): UsageTracker_CustomSkus {
+    return UsageTracker_CustomSkus.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<UsageTracker_CustomSkus>): UsageTracker_CustomSkus {
+    const message = createBaseUsageTracker_CustomSkus();
+    message.skusByField = object.skusByField?.map((e) => UsageTracker_SkusByField.fromPartial(e)) || [];
+    message.multipleFieldSkusOp = object.multipleFieldSkusOp ?? 0;
     return message;
   },
 };
@@ -10646,6 +10967,7 @@ function createBaseAccount(): Account {
     paymentMethod: 0,
     usageOverCapLimit: "",
     status: "",
+    prepaidBalance: undefined,
   };
 }
 
@@ -10680,6 +11002,9 @@ export const Account = {
     }
     if (message.status !== "") {
       writer.uint32(98).string(message.status);
+    }
+    if (message.prepaidBalance !== undefined) {
+      Money.encode(message.prepaidBalance, writer.uint32(106).fork()).ldelim();
     }
     return writer;
   },
@@ -10761,6 +11086,13 @@ export const Account = {
 
           message.status = reader.string();
           continue;
+        case 13:
+          if (tag !== 106) {
+            break;
+          }
+
+          message.prepaidBalance = Money.decode(reader, reader.uint32());
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -10782,6 +11114,7 @@ export const Account = {
       paymentMethod: isSet(object.paymentMethod) ? payMethodFromJSON(object.paymentMethod) : 0,
       usageOverCapLimit: isSet(object.usageOverCapLimit) ? globalThis.String(object.usageOverCapLimit) : "",
       status: isSet(object.status) ? globalThis.String(object.status) : "",
+      prepaidBalance: isSet(object.prepaidBalance) ? Money.fromJSON(object.prepaidBalance) : undefined,
     };
   },
 
@@ -10817,6 +11150,9 @@ export const Account = {
     if (message.status !== "") {
       obj.status = message.status;
     }
+    if (message.prepaidBalance !== undefined) {
+      obj.prepaidBalance = Money.toJSON(message.prepaidBalance);
+    }
     return obj;
   },
 
@@ -10835,6 +11171,9 @@ export const Account = {
     message.paymentMethod = object.paymentMethod ?? 0;
     message.usageOverCapLimit = object.usageOverCapLimit ?? "";
     message.status = object.status ?? "";
+    message.prepaidBalance = (object.prepaidBalance !== undefined && object.prepaidBalance !== null)
+      ? Money.fromPartial(object.prepaidBalance)
+      : undefined;
     return message;
   },
 };

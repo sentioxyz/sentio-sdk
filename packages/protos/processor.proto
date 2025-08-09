@@ -893,6 +893,7 @@ message DataBinding {
   Data data = 1;
   HandlerType handler_type = 3;
   repeated int32 handler_ids = 4;
+  string chain_id = 5;
 }
 
 message StateResult {

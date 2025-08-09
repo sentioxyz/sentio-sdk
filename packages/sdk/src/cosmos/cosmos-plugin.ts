@@ -86,7 +86,10 @@ export class CosmosPlugin extends Plugin {
 
     for (const handlerId of binding.handlerIds) {
       const promise = this.handlerRegister
-        .getHandlerById(handlerId)(call)
+        .getHandlerById(
+          binding.chainId,
+          handlerId
+        )(call)
         .catch((e) => {
           throw new ServerError(
             Status.INTERNAL,

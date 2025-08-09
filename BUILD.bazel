@@ -9,11 +9,13 @@ write_source_files(
         "packages/protos/src/google/protobuf/empty.ts": "//processor/protos:empty_ts_proto",
         "packages/protos/src/google/protobuf/struct.ts": "//processor/protos:struct_ts_proto",
         "packages/protos/src/google/protobuf/timestamp.ts": "//processor/protos:timestamp_ts_proto",
+        "packages/protos/src/google/type/money.ts": "//processor/protos:money_ts_proto",
         "packages/runtime/src/gen/processor/protos/processor.ts": "//processor/protos:processor_ts_proto",
         "packages/runtime/src/gen/service/common/protos/common.ts": "//service/common/protos:protos_ts_proto",
         "packages/runtime/src/gen/google/protobuf/empty.ts": "//processor/protos:empty_ts_proto",
         "packages/runtime/src/gen/google/protobuf/struct.ts": "//processor/protos:struct_ts_proto",
         "packages/runtime/src/gen/google/protobuf/timestamp.ts": "//processor/protos:timestamp_ts_proto",
+        "packages/runtime/src/gen/google/type/money.ts": "//processor/protos:money_ts_proto",
     },
     tags = ["manual"],
 )
