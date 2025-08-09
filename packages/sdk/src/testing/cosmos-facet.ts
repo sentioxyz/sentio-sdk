@@ -36,7 +36,8 @@ export class CosmosFacet {
             }
           },
           handlerIds: [logConfig.handlerId],
-          handlerType: HandlerType.COSMOS_CALL
+          handlerType: HandlerType.COSMOS_CALL,
+          chainId: network
         }
 
         const logFilters = logConfig.logFilters

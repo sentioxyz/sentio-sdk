@@ -3,6 +3,7 @@ import { expect } from 'chai'
 import { HandlerType, ProcessBindingsRequest } from '@sentio/protos'
 
 import { firstCounterValue, firstGaugeValue, TestProcessorServer } from '../../testing/index.js'
+import { ChainId } from '@sentio/chain'
 
 describe('Test Aptos Example', () => {
   const service = new TestProcessorServer(async () => {
@@ -32,7 +33,8 @@ describe('Test Aptos Example', () => {
             }
           },
           handlerIds: [handlerId],
-          handlerType: HandlerType.APT_CALL
+          handlerType: HandlerType.APT_CALL,
+          chainId: ChainId.APTOS_MAINNET
         }
       ]
     }
@@ -91,7 +93,8 @@ describe('Test Aptos Example', () => {
             }
           },
           handlerIds: [handlerId],
-          handlerType: HandlerType.APT_RESOURCE
+          handlerType: HandlerType.APT_RESOURCE,
+          chainId: ChainId.APTOS_MAINNET
         }
       ]
     }
@@ -111,7 +114,8 @@ describe('Test Aptos Example', () => {
             }
           },
           handlerIds: [handlerId],
-          handlerType: HandlerType.APT_CALL
+          handlerType: HandlerType.APT_CALL,
+          chainId: ChainId.APTOS_MAINNET
         }
       ]
     }

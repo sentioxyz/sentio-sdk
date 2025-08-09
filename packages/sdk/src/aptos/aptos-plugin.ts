@@ -279,7 +279,10 @@ export class AptosPlugin extends Plugin {
 
     for (const handlerId of binding.handlerIds) {
       const promise = this.handlerRegister
-        .getHandlerById(handlerId)(event)
+        .getHandlerById(
+          binding.chainId,
+          handlerId
+        )(event)
         .catch((e: any) => {
           throw new ServerError(
             Status.INTERNAL,
@@ -303,7 +306,10 @@ export class AptosPlugin extends Plugin {
     const promises: Promise<ProcessResult>[] = []
     for (const handlerId of binding.handlerIds) {
       const promise = this.handlerRegister
-        .getHandlerById(handlerId)(resource)
+        .getHandlerById(
+          binding.chainId,
+          handlerId
+        )(resource)
         .catch((e: any) => {
           throw new ServerError(
             Status.INTERNAL,
@@ -328,7 +334,10 @@ export class AptosPlugin extends Plugin {
     for (const handlerId of binding.handlerIds) {
       // only support aptos call for now
       const promise = this.handlerRegister
-        .getHandlerById(handlerId)(call)
+        .getHandlerById(
+          binding.chainId,
+          handlerId
+        )(call)
         .catch((e: any) => {
           throw new ServerError(
             Status.INTERNAL,

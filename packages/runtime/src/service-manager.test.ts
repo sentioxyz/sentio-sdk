@@ -33,7 +33,8 @@ describe('Test Service Manager with worker without partition', () => {
       binding: {
         handlerIds: [0],
         handlerType: HandlerType.ETH_LOG,
-        data: {}
+        data: {},
+        chainId: '1'
       }
     }
 
@@ -105,7 +106,8 @@ describe('Test Service Manager with worker with partition', () => {
       binding: {
         handlerIds: [0],
         handlerType: HandlerType.ETH_LOG,
-        data: {}
+        data: {},
+        chainId: '1'
       }
     }
 

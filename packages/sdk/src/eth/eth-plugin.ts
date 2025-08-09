@@ -417,7 +417,7 @@ export class EthPlugin extends Plugin {
 
     const promises: Promise<ProcessResult>[] = []
     for (const handlerId of request.handlerIds) {
-      const handler = this.handlerRegister.getHandlerById(handlerId)
+      const handler = this.handlerRegister.getHandlerById(request.chainId, handlerId)
       const promise = handler(ethLog, preparedData).catch((e: any) => {
         console.error('error processing log: ', e)
         throw new ServerError(
@@ -443,7 +443,7 @@ export class EthPlugin extends Plugin {
 
     for (const handlerId of binding.handlerIds) {
       const promise = this.handlerRegister
-        .getHandlerById(handlerId)(ethTrace, preparedData)
+        .getHandlerById(binding.chainId, handlerId)(ethTrace, preparedData)
         .catch((e: any) => {
           console.error('error processing trace: ', e)
           throw new ServerError(
@@ -468,7 +468,7 @@ export class EthPlugin extends Plugin {
     const promises: Promise<ProcessResult>[] = []
     for (const handlerId of binding.handlerIds) {
       const promise = this.handlerRegister
-        .getHandlerById(handlerId)(ethBlock, preparedData)
+        .getHandlerById(binding.chainId, handlerId)(ethBlock, preparedData)
         .catch((e: any) => {
           console.error('error processing block: ', e)
           throw new ServerError(
@@ -494,7 +494,7 @@ export class EthPlugin extends Plugin {
 
     for (const handlerId of binding.handlerIds) {
       const promise = this.handlerRegister
-        .getHandlerById(handlerId)(ethTransaction, preparedData)
+        .getHandlerById(binding.chainId, handlerId)(ethTransaction, preparedData)
         .catch((e: any) => {
           throw new ServerError(
             Status.INTERNAL,

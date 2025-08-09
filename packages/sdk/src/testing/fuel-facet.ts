@@ -55,7 +55,8 @@ export class FuelFacet {
             }
           },
           handlerIds: [callConfig.handlerId],
-          handlerType: HandlerType.FUEL_TRANSACTION
+          handlerType: HandlerType.FUEL_TRANSACTION,
+          chainId: network
         }
 
         res.push(binding)
@@ -70,7 +71,8 @@ export class FuelFacet {
             }
           },
           handlerIds: [assetConfig.handlerId],
-          handlerType: HandlerType.FUEL_TRANSACTION
+          handlerType: HandlerType.FUEL_TRANSACTION,
+          chainId: network
         }
 
         res.push(binding)
@@ -98,7 +100,8 @@ export class FuelFacet {
                 }
               },
               handlerIds: [logConfig.handlerId],
-              handlerType: HandlerType.FUEL_RECEIPT
+              handlerType: HandlerType.FUEL_RECEIPT,
+              chainId: network
             }
             res.push(binding)
           }

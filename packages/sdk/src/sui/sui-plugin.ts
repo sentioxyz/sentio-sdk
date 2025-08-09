@@ -114,7 +114,10 @@ export class SuiPlugin extends Plugin {
     for (const handlerId of binding.handlerIds) {
       promises.push(
         this.handlerRegister
-          .getHandlerById(handlerId)(event)
+          .getHandlerById(
+            binding.chainId,
+            handlerId
+          )(event)
           .catch((e: any) => {
             throw new ServerError(
               Status.INTERNAL,
@@ -135,7 +138,10 @@ export class SuiPlugin extends Plugin {
     const promises: Promise<ProcessResult>[] = []
     for (const handlerId of binding.handlerIds) {
       const promise = this.handlerRegister
-        .getHandlerById(handlerId)(call)
+        .getHandlerById(
+          binding.chainId,
+          handlerId
+        )(call)
         .catch((e: any) => {
           throw new ServerError(
             Status.INTERNAL,
@@ -157,7 +163,10 @@ export class SuiPlugin extends Plugin {
     for (const handlerId of binding.handlerIds) {
       promises.push(
         this.handlerRegister
-          .getHandlerById(handlerId)(object)
+          .getHandlerById(
+            binding.chainId,
+            handlerId
+          )(object)
           .catch((e: any) => {
             throw new ServerError(
               Status.INTERNAL,
@@ -179,7 +188,10 @@ export class SuiPlugin extends Plugin {
     for (const handlerId of binding.handlerIds) {
       promises.push(
         this.handlerRegister
-          .getHandlerById(handlerId)(objectChange)
+          .getHandlerById(
+            binding.chainId,
+            handlerId
+          )(objectChange)
           .catch((e: any) => {
             throw new ServerError(
               Status.INTERNAL,

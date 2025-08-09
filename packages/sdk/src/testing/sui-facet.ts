@@ -56,7 +56,8 @@ export class SuiFacet {
                   }
                 },
                 handlerIds: [callConfig.handlerId],
-                handlerType: HandlerType.SUI_CALL
+                handlerType: HandlerType.SUI_CALL,
+                chainId: network
               }
             }
           }
@@ -99,7 +100,8 @@ export class SuiFacet {
           timestamp: transaction.timestampMs ? new Date(transaction.timestampMs) : new Date(),
           slot: BigInt(transaction.checkpoint || 0)
         }
-      }
+      },
+      chainId: network
     }
     return this.server.processBinding(binding)
   }
@@ -131,7 +133,8 @@ export class SuiFacet {
                   }
                 },
                 handlerIds: [eventConfig.handlerId],
-                handlerType: HandlerType.SUI_EVENT
+                handlerType: HandlerType.SUI_EVENT,
+                chainId: network
               }
             }
           }
