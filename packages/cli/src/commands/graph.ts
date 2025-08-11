@@ -8,10 +8,10 @@ import fs from 'fs'
 import { readdir, readFile, writeFile } from 'fs/promises'
 import JSZip from 'jszip'
 import chalk from 'chalk'
-import { Auth, initUpload, finishUpload, getGitAttributes, createProjectPrompt } from './run-upload.js'
+import { Auth, initUpload, finishUpload, getGitAttributes, createProjectPrompt } from './upload.js'
 import fetch from 'node-fetch'
 import process from 'process'
-import { supportedChainMessage } from './run-create.js'
+import { supportedChainMessage } from './create.js'
 import { EthChainInfo } from '@sentio/chain'
 import yaml from 'yaml'
 
@@ -114,7 +114,7 @@ async function createProjectIfMissing(options: YamlProjectConfig, apiKey: string
 }
 
 async function runGraphDeployInternal(options: any, extraArgs: string[] = []) {
-  let processorConfig: YamlProjectConfig = { host: '', project: '', build: true, debug: false, contracts: [] }
+  let processorConfig: YamlProjectConfig = { host: '', project: '', debug: false, contracts: [] }
   const yamlPath = path.join(process.cwd(), 'sentio.yaml')
   if (fs.existsSync(yamlPath)) {
     processorConfig = yaml.parse(fs.readFileSync('sentio.yaml', 'utf8')) as YamlProjectConfig

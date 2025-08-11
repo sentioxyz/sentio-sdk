@@ -6,7 +6,7 @@ import solc from 'solc'
 import { getFinalizedHost } from '../config.js'
 import { ReadKey } from '../key.js'
 import chalk from 'chalk'
-import { Auth } from './run-upload.js'
+import { Auth } from './upload.js'
 import { URL } from 'url'
 
 const SRC_ROOT = 'src'

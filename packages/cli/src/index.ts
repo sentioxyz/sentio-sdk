@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 
 import { Command } from 'commander'
-import { createLoginCommand } from './commands/run-login.js'
-import { createCreateCommand } from './commands/run-create.js'
-import { createVersionCommand } from './commands/run-version.js'
-import { createTestCommand } from './commands/run-test.js'
-import { createAddCommand } from './commands/run-add.js'
-import { createCompileCommand } from './commands/run-compile.js'
-import { createGraphCommand } from './commands/run-graph.js'
-import { createUploadCommand } from './commands/run-upload.js'
+import { createLoginCommand } from './commands/login.js'
+import { createCreateCommand } from './commands/create.js'
+import { createVersionCommand } from './commands/version.js'
+import { createTestCommand } from './commands/test.js'
+import { createAddCommand } from './commands/add.js'
+import { createCompileCommand } from './commands/compile.js'
+import { createGraphCommand } from './commands/graph.js'
+import { createUploadCommand } from './commands/upload.js'
 import { createBuildCommand, createGenCommand } from './commands/build.js'
 import { getCliVersion, printVersions } from './utils.js'
 
