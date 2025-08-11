@@ -408,6 +408,10 @@
     "friends": [
       {
         "address": "0x3",
+        "name": "sui_system"
+      },
+      {
+        "address": "0x3",
         "name": "validator"
       },
       {
@@ -735,6 +739,35 @@
             }
           }
         ]
+      },
+      "calculate_rewards": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "staking_pool",
+                "name": "StakingPool",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "staking_pool",
+                "name": "StakedSui",
+                "typeArguments": []
+              }
+            }
+          },
+          "U64"
+        ],
+        "return": ["U64"]
       },
       "convert_to_fungible_staked_sui": {
         "visibility": "Friend",
@@ -1883,6 +1916,44 @@
             "Vector": "Address"
           }
         ]
+      },
+      "calculate_rewards": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "sui_system",
+                "name": "SuiSystemState",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "staking_pool",
+                "name": "StakedSui",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": ["U64"]
       },
       "convert_to_fungible_staked_sui": {
         "visibility": "Public",
@@ -5561,6 +5632,64 @@
             }
           }
         ]
+      },
+      "validators": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "sui_system_state_inner",
+                "name": "SuiSystemStateInnerV2",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "validator_set",
+                "name": "ValidatorSet",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      },
+      "validators_mut": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "sui_system_state_inner",
+                "name": "SuiSystemStateInnerV2",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "validator_set",
+                "name": "ValidatorSet",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
       }
     }
   },
@@ -5572,6 +5701,10 @@
       {
         "address": "0x3",
         "name": "genesis"
+      },
+      {
+        "address": "0x3",
+        "name": "sui_system"
       },
       {
         "address": "0x3",
@@ -8337,6 +8470,10 @@
       },
       {
         "address": "0x3",
+        "name": "sui_system"
+      },
+      {
+        "address": "0x3",
         "name": "sui_system_state_inner"
       }
     ],
@@ -9824,6 +9961,45 @@
           }
         ],
         "return": ["Address"]
+      },
+      "validator_by_pool_id": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "validator_set",
+                "name": "ValidatorSet",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "object",
+                "name": "ID",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "validator",
+                "name": "Validator",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
       },
       "validator_stake_amount": {
         "visibility": "Public",
