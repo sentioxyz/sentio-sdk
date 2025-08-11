@@ -1,8 +1,7 @@
-import commandLineArgs from 'command-line-args'
-import commandLineUsage from 'command-line-usage'
+import { Command } from 'commander'
 import path from 'path'
 import { finalizeHost, FinalizeProjectName, YamlProjectConfig } from '../config.js'
-import { getSdkVersion, getPackageRoot, errorOnUnknownOption } from '../utils.js'
+import { getSdkVersion, getPackageRoot } from '../utils.js'
 import { execStep, execPackageManager } from '../execution.js'
 import { ReadKey } from '../key.js'
 import fs from 'fs'
@@ -19,21 +18,10 @@ import yaml from 'yaml'
 export async function runGraph(argv: string[]) {
   const [command, ...rest] = argv
   if (!['create', 'deploy'].includes(command)) {
-    const usage = commandLineUsage([
-      {
-        header: 'Sentio graph',
-        content: 'Create and deploy sentio subgraph processor'
-      },
-      {
-        header: 'Usage',
-        content: [
-          'sentio graph <subcommand> --help\t\tshow detail usage of specific subcommand',
-          'sentio graph create\t\t\t\tCreate a subgraph processor',
-          'sentio graph deploy\t\t\t\tDeploy subgraph processor to sentio'
-        ]
-      }
-    ])
-    console.log(usage)
+    console.log('Usage: sentio graph <create|deploy> [options]')
+    console.log('Commands:')
+    console.log('  create    Create a subgraph processor')
+    console.log('  deploy    Deploy subgraph processor to sentio')
     process.exit(0)
   }
 
@@ -45,57 +33,27 @@ export async function runGraph(argv: string[]) {
   }
 }
 
-const createOptionDefinitions = [
-  {
-    name: 'help',
-    alias: 'h',
-    type: Boolean,
-    description: 'Display this usage guide.'
-  },
-  {
-    name: 'name',
-    alias: 'n',
-    defaultOption: true,
-    type: String,
-    description: 'Project name'
-  },
-  // {
-  //   name: 'chain-type',
-  //   alias: 'c',
-  //   description:
-  //     'The type of project you want to create, can be \n,  eth \n,  aptos \n,  fuel\n,  solana\n,  sui\n,  raw (if you want to start from scratch and support multiple types of chains)',
-  //   type: String,
-  //   defaultValue: 'eth'
-  // },
-  {
-    name: 'chain-id',
-    type: String,
-    description: '(Optional) The chain id to use for eth. Supported: ' + supportedChainMessage.join('\n,'),
-    defaultValue: '1'
-  }
-]
-
 async function runGraphCreate(argv: string[]) {
-  const options = commandLineArgs(createOptionDefinitions, { argv, partial: true })
-  if (options.help || !options.name) {
-    const usage = commandLineUsage([
-      {
-        header: 'Create a subgraph template project',
-        content: 'sentio graph create <name>'
-      },
-      {
-        header: 'Options',
-        optionList: createOptionDefinitions
-      }
-    ])
-    console.log(usage)
+  const program = new Command()
+
+  program
+    .argument('<name>', 'Project name')
+    .option(
+      '--chain-id <id>',
+      '(Optional) The chain id to use for eth. Supported: ' + supportedChainMessage.join('\n,'),
+      '1'
+    )
+    .parse(argv, { from: 'user' })
+
+  const options = program.opts()
+  const projectName = program.args[0]
+
+  if (!projectName) {
+    program.help()
     process.exit(0)
   }
 
-  errorOnUnknownOption(options)
-
-  const projectName = options.name
-  const chainId: string = options['chain-id']
+  const chainId: string = options.chainId
   const chainInfo = EthChainInfo[chainId]
 
   const packageRoot = getPackageRoot('@sentio/cli')
@@ -133,52 +91,6 @@ async function runGraphCreate(argv: string[]) {
   await execPackageManager(['install'], 'install', { cwd: dstFolder })
 }
 
-const deployOptionDefinitions = [
-  {
-    name: 'help',
-    alias: 'h',
-    type: Boolean,
-    description: 'Display this usage guide.'
-  },
-  {
-    name: 'api-key',
-    type: String,
-    description:
-      '(Optional) Manually provide API key rather than use saved credential, if both api-key and jwt-token is provided, use api-key.'
-  },
-  {
-    name: 'host',
-    description: '(Optional) Override Sentio Host name',
-    type: String
-  },
-  {
-    name: 'owner',
-    description: '(Optional) Override Project owner',
-    type: String
-  },
-  {
-    name: 'name',
-    description: '(Optional) Override Project name',
-    type: String
-  },
-  {
-    name: 'continue-from',
-    description:
-      '(Optional) Continue processing data from the specific processor version which will keeping the old data from previous version and will STOP that version IMMEDIATELY.',
-    type: Number
-  },
-  {
-    name: 'dir',
-    description: '(Optional) The location of subgraph project, default to the current directory',
-    type: String
-  },
-  {
-    name: 'skip-gen',
-    type: Boolean,
-    description: 'Skip code generation.'
-  }
-]
-
 async function createProjectIfMissing(options: YamlProjectConfig, apiKey: string) {
   const [ownerName, slug] = options.project.split('/')
   const getProjectRes = await fetch(new URL(`/api/v1/project/${ownerName}/${slug}`, options.host), {
@@ -205,21 +117,24 @@ async function runGraphDeploy(argv: string[]) {
     }
   }
 
-  const options = commandLineArgs(deployOptionDefinitions, { argv, partial: true })
-  if (options.help) {
-    const usage = commandLineUsage([
-      {
-        header: 'Create a subgraph template project',
-        content: 'sentio graph create <name>'
-      },
-      {
-        header: 'Options',
-        optionList: deployOptionDefinitions
-      }
-    ])
-    console.log(usage)
-    process.exit(0)
-  }
+  const program = new Command()
+
+  program
+    .option('--api-key <key>', '(Optional) Manually provide API key rather than use saved credential')
+    .option('--host <host>', '(Optional) Override Sentio Host name')
+    .option('--owner <owner>', '(Optional) Override Project owner')
+    .option('--name <name>', '(Optional) Override Project name')
+    .option(
+      '--continue-from <version>',
+      '(Optional) Continue processing data from the specific processor version',
+      parseInt
+    )
+    .option('--dir <dir>', '(Optional) The location of subgraph project, default to the current directory')
+    .option('--skip-gen', 'Skip code generation.')
+    .allowUnknownOption()
+    .parse(argv, { from: 'user' })
+
+  const options = program.opts()
 
   finalizeHost(processorConfig, options.host)
   FinalizeProjectName(processorConfig, options.owner, options.name)
@@ -229,20 +144,20 @@ async function runGraphDeploy(argv: string[]) {
   }
 
   let apiKey = ReadKey(processorConfig.host) as string
-  if (options['api-key']) {
-    apiKey = options['api-key']
+  if (options.apiKey) {
+    apiKey = options.apiKey
   }
 
   await createProjectIfMissing(processorConfig, apiKey)
 
-  const continueFrom = options['continue-from']
+  const continueFrom = options.continueFrom
   const versionLabel = continueFrom ? `continue-from:${continueFrom}` : Date.now().toString()
 
   const graph = path.resolve(getPackageRoot('@sentio/graph-cli'), 'bin', 'run')
   const execOptions = {
     cwd: options.dir
   }
-  if (!options['skip-gen']) {
+  if (!options.skipGen) {
     await execStep(['node', graph, 'codegen'], 'Graph codegen', execOptions)
   }
   await execStep(
@@ -259,7 +174,7 @@ async function runGraphDeploy(argv: string[]) {
       '--deploy-key',
       apiKey,
       processorConfig.project,
-      ...(options._unknown || [])
+      ...(program.args || [])
     ],
     'Graph deploy',
     execOptions
@@ -273,7 +188,7 @@ async function runGraphDeploy(argv: string[]) {
   let zip
   try {
     await bundleSourceMap()
-    zip = await genZip(options._unknown)
+    zip = await genZip(program.args)
   } finally {
     if (options.dir) {
       process.chdir(cwd)

@@ -2,8 +2,7 @@ import chalk from 'chalk'
 import path from 'path'
 import fs from 'fs-extra'
 import { getPackageRoot } from '../utils.js'
-import commandLineArgs from 'command-line-args'
-import commandLineUsage from 'command-line-usage'
+import { Command } from 'commander'
 import yaml from 'yaml'
 import { YamlProjectConfig } from '../config.js'
 import { getABIFilePath, getABI, writeABIFile } from '../abi.js'
@@ -48,51 +47,33 @@ export const GenOptionDefinitions = [
 ]
 
 export async function buildProcessorWithArgs(argv: string[]) {
-  const options = commandLineArgs(buildOptionDefinitions, { argv, partial: true })
-  const usage = commandLineUsage([
-    {
-      header: 'Build project',
-      content: 'sentio build'
-    },
-    {
-      header: 'Options',
-      optionList: buildOptionDefinitions
-    }
-  ])
+  const program = new Command()
 
-  if (options.help) {
-    console.log(usage)
-    process.exit(0)
-  }
+  program
+    .option('--skip-gen', 'Skip code generation.')
+    .option('--skip-deps', 'Skip dependency enforce.')
+    .option('--example', 'Generate example usage of the processor.')
+    .parse(argv, { from: 'user' })
+
+  const options = program.opts()
   await buildProcessor(false, options)
 }
 
 export async function generate(argv: string[]) {
-  const options = commandLineArgs(GenOptionDefinitions, { argv, partial: true })
-  const usage = commandLineUsage([
-    {
-      header: 'Generate type binding',
-      content: 'sentio gen [--example]'
-    },
-    {
-      header: 'Options',
-      optionList: GenOptionDefinitions
-    }
-  ])
+  const program = new Command()
 
-  if (options.help) {
-    console.log(usage)
-    process.exit(0)
-  }
+  program.option('--example', 'Generate example usage of the processor.').parse(argv, { from: 'user' })
+
+  const options = program.opts()
   await buildProcessor(true, options)
 }
 
-export async function buildProcessor(onlyGen: boolean, options: commandLineArgs.CommandLineOptions) {
-  if (!options['skip-deps'] && !onlyGen) {
+export async function buildProcessor(onlyGen: boolean, options: any) {
+  if (!options.skipDeps && !onlyGen) {
     await installDeps()
   }
 
-  if (!options['skip-gen']) {
+  if (!options.skipGen) {
     await codegen(options.example || false)
   }
 
@@ -109,7 +90,6 @@ export async function buildProcessor(onlyGen: boolean, options: commandLineArgs.
     await execStep(['node', tsc, '--noEmit'], 'type checking')
 
     const tsup = path.resolve(getPackageRoot('tsup'), 'dist', 'cli-default.js')
-    // await execStep('yarn tsc -p .', 'Compile')
     await execStep(['node', tsup, '--config', tsupConfig], 'Packaging')
 
     const dir = fs.readdirSync(path.join(process.cwd(), 'dist'))

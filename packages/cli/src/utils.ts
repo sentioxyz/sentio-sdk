@@ -2,7 +2,6 @@ import fs from 'fs-extra'
 import path from 'path'
 import { createRequire } from 'module'
 import url from 'url'
-import { CommandLineOptions } from 'command-line-args'
 import chalk from 'chalk'
 import latestVersion from 'latest-version'
 
@@ -38,7 +37,7 @@ export function getSdkVersion() {
   }
 }
 
-export function errorOnUnknownOption(options: CommandLineOptions) {
+export function errorOnUnknownOption(options: any) {
   if (options._unknown?.length) {
     console.error(chalk.red('Unknown option:', options._unknown.join(' ')))
     process.exit(1)

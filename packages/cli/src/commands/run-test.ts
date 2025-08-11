@@ -1,50 +1,20 @@
 import { execSync, spawnSync } from 'child_process'
 import path from 'path'
-import commandLineArgs from 'command-line-args'
-import commandLineUsage from 'command-line-usage'
+import { Command } from 'commander'
 import { getPackageRoot } from '../utils.js'
 
-const buildOptionDefinitions = [
-  {
-    name: 'help',
-    alias: 'h',
-    type: Boolean,
-    description: 'Display this usage guide.'
-  },
-  { name: 'test-only', type: Boolean, description: "run tests with 'only' option set" },
-  { name: 'test-name-pattern=...', type: Boolean, description: 'run tests whose name matches this regular expression' },
-  {
-    name: 'test-skip-pattern=...',
-    type: Boolean,
-    description: 'run tests whose name do not match this regular expression'
-  }
-]
-
 export function runTest(argv: string[]) {
-  const options = commandLineArgs(buildOptionDefinitions, { argv, partial: true })
-  const usage = commandLineUsage([
-    {
-      header: 'Sentio test runner',
-      content: 'sentio test [options]'
-    },
-    {
-      header: 'Documentation',
-      content: 'All the options are piped to node test runner, see https://nodejs.org/api/test.html'
-    },
-    {
-      header: 'Options',
-      optionList: buildOptionDefinitions
-    }
-  ])
+  const program = new Command()
 
-  if (options.help) {
-    console.log(usage)
-    process.exit(0)
-  }
+  program
+    .option('--test-only', "run tests with 'only' option set")
+    .option('--test-name-pattern <pattern>', 'run tests whose name matches this regular expression')
+    .option('--test-skip-pattern <pattern>', 'run tests whose name do not match this regular expression')
+    .allowUnknownOption()
+    .parse(argv, { from: 'user' })
 
   const tsx = path.resolve(getPackageRoot('tsx'), 'dist', 'cli.mjs')
 
-  // Run tsc to do check before test
   const tsc = path.resolve(getPackageRoot('typescript'), 'bin', 'tsc')
   execSync(`node ${tsc} --noEmit`, { stdio: 'inherit' })
   spawnSync('node', [tsx, '--test', ...argv], { stdio: 'inherit' })

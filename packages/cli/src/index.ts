@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
-import commandLineArgs from 'command-line-args'
-import commandLineUsage from 'command-line-usage'
+import { Command } from 'commander'
 import fs from 'fs'
 import path from 'path'
 
@@ -19,43 +18,126 @@ import { runCompile } from './commands/run-compile.js'
 import { runGraph } from './commands/run-graph.js'
 import { printVersions } from './utils.js'
 
-const mainDefinitions = [{ name: 'command', defaultOption: true }]
-const mainOptions = commandLineArgs(mainDefinitions, {
-  stopAtFirstUnknown: true
-})
-const argv = mainOptions._unknown || []
+const program = new Command()
 
-if (!mainOptions.command) {
-  usage()
-  process.exit(0)
-}
+program.name('sentio').description('Login & Manage your project files to Sentio.').version('2.0.0')
 
 await printVersions()
 
-if (mainOptions.command === 'login') {
-  runLogin(argv)
-} else if (mainOptions.command === 'create') {
-  await runCreate(argv)
-} else if (mainOptions.command === 'version') {
-  runVersion(argv)
-} else if (mainOptions.command === 'test') {
-  runTest(argv)
-} else if (mainOptions.command === 'add') {
-  await runAdd(argv)
-} else if (mainOptions.command === 'compile') {
-  await runCompile(argv)
-} else if (mainOptions.command === 'graph') {
-  await runGraph(argv)
-} else {
-  // For all the commands that need read project configs
-  // TODO move them to their own modules
+program
+  .command('login')
+  .description('login to sentio')
+  .option('-h, --help', 'Display this usage guide.')
+  .option('--host <host>', '(Optional) Override Sentio Host name')
+  .option('--api-key <key>', '(Optional) Your API key')
+  .action((options) => {
+    runLogin(process.argv.slice(3))
+  })
 
-  // Process configs
+program
+  .command('create')
+  .description('create a template project')
+  .argument('<name>', 'Project name')
+  .option('-h, --help', 'Display this usage guide.')
+  .option(
+    '-p, --subproject',
+    'If this is a subproject in mono-repo setup, in this case sdk version is controlled in parent package.json.'
+  )
+  .option('-s, --sdk-version <version>', '(Optional) The version of @sentio/sdk to use, default latest')
+  .option(
+    '-d, --directory <dir>',
+    '(Optional) The root direct new project will be created, default current working dir'
+  )
+  .option(
+    '-c, --chain-type <type>',
+    'The type of project you want to create, can be eth, aptos, fuel, solana, sui, iota, starknet, raw',
+    'eth'
+  )
+  .option('--chain-id <id>', '(Optional) The chain id to use for eth', '1')
+  .action(async (name, options) => {
+    await runCreate(process.argv.slice(3))
+  })
+
+program
+  .command('version')
+  .description('current cli version')
+  .option('-h, --help', 'Display this usage guide.')
+  .action((options) => {
+    runVersion(process.argv.slice(3))
+  })
+
+program
+  .command('test')
+  .description('run tests')
+  .option('-h, --help', 'Display this usage guide.')
+  .option('--test-only', "run tests with 'only' option set")
+  .option('--test-name-pattern <pattern>', 'run tests whose name matches this regular expression')
+  .option('--test-skip-pattern <pattern>', 'run tests whose name do not match this regular expression')
+  .action((options) => {
+    runTest(process.argv.slice(3))
+  })
+
+program
+  .command('add')
+  .description('add contract ABI to the project')
+  .argument('<address>', 'Address of the contract')
+  .option('-h, --help', 'Display this usage guide.')
+  .option('-n, --name <name>', 'File name for the downloaded contract, if empty, use address as file name')
+  .option('-c, --chain <chain>', 'Chain ID', '1')
+  .option('--folder <folder>', '(Optional) The folder to save the downloaded ABI file')
+  .action(async (address, options) => {
+    await runAdd(process.argv.slice(3))
+  })
+
+program
+  .command('compile')
+  .description('compile and upload local contract')
+  .option('-h, --help', 'Display this usage guide.')
+  .option('--upload', '(Optional) Upload to sentio if compiled successfully')
+  .option('--project <project>', '(Optional) Project full name, required in uploading')
+  .option('--api-key <key>', '(Optional) Manually provide API key rather than use saved credential')
+  .option('--token <token>', '(Optional) Manually provide token rather than use saved credential')
+  .option('--host <host>', '(Optional) Sentio Host name')
+  .action(async (options) => {
+    await runCompile(process.argv.slice(3))
+  })
+
+const graphCommand = program.command('graph').description('build and upload subgraph processor to sentio')
+
+graphCommand
+  .command('create')
+  .description('Create a subgraph processor')
+  .argument('<name>', 'Project name')
+  .option('-h, --help', 'Display this usage guide.')
+  .option('--chain-id <id>', '(Optional) The chain id to use for eth', '1')
+  .action(async (name, options) => {
+    await runGraph(['create', ...process.argv.slice(4)])
+  })
+
+graphCommand
+  .command('deploy')
+  .description('Deploy subgraph processor to sentio')
+  .option('-h, --help', 'Display this usage guide.')
+  .option('--api-key <key>', '(Optional) Manually provide API key rather than use saved credential')
+  .option('--host <host>', '(Optional) Override Sentio Host name')
+  .option('--owner <owner>', '(Optional) Override Project owner')
+  .option('--name <name>', '(Optional) Override Project name')
+  .option(
+    '--continue-from <version>',
+    '(Optional) Continue processing data from the specific processor version',
+    parseInt
+  )
+  .option('--dir <dir>', '(Optional) The location of subgraph project, default to the current directory')
+  .option('--skip-gen', 'Skip code generation.')
+  .action(async (options) => {
+    await runGraph(['deploy', ...process.argv.slice(4)])
+  })
+
+async function loadProcessorConfig(): Promise<YamlProjectConfig> {
   let processorConfig: YamlProjectConfig = { host: '', project: '', build: true, debug: false, contracts: [] }
-  // Fist step, read from project yaml file
+
   try {
     console.log(chalk.blue('Loading Process config'))
-    // TODO correctly located sentio.yaml
     const pwd = process.cwd()
     const packageJson = path.join(pwd, 'package.json')
     if (!fs.existsSync(packageJson)) {
@@ -86,57 +168,57 @@ if (mainOptions.command === 'login') {
     if (processorConfig.debug === undefined) {
       processorConfig.debug = false
     }
-
-    // if (!processorConfig.source) {
-    //   processorConfig.source = 'src/processor.ts'
-    // }
-    // if (!processorConfig.targets) {
-    //   console.warn('targets is not defined, use EVM as the default target')
-    //   processorConfig.targets = []
-    // }
-    // if (processorConfig.targets.length === 0) {
-    //   // By default evm
-    //   processorConfig.targets.push({ chain: EVM })
-    // }
   } catch (e) {
     console.error(e)
     process.exit(1)
   }
 
-  if (mainOptions.command === 'upload') {
-    await runUpload(processorConfig, argv)
-  } else if (mainOptions.command === 'build') {
-    await buildProcessorWithArgs(argv)
-  } else if (mainOptions.command === 'gen') {
-    await generate(argv)
-  } else {
-    usage()
-  }
+  return processorConfig
 }
 
-function usage() {
-  const usage = commandLineUsage([
-    {
-      header: 'Sentio',
-      content: 'Login & Manage your project files to Sentio.'
-    },
-    {
-      header: 'Usage',
-      content: [
-        'sentio <command> --help\t\tshow detail usage of specific command',
-        'sentio login\t\t\t\tlogin to sentio',
-        'sentio create\t\t\t\tcreate a template project',
-        'sentio add\t\t\t\tadd contract ABI to the project',
-        'sentio upload\t\t\t\tbuild and upload processor to sentio',
-        'sentio graph\t\t\t\tbuild and upload subgraph processor to sentio',
-        'sentio gen\t\t\t\tgenerate abi',
-        'sentio build\t\t\t\tgenerate abi and build',
-        'sentio test\t\t\t\trun tests',
-        'sentio compile\t\t\tcompile and upload local contract',
-        'sentio version\t\t\tcurrent cli version'
-      ]
-    }
-  ])
-  console.log(usage)
-  process.exit(0)
-}
+program
+  .command('upload')
+  .description('build and upload processor to sentio')
+  .option('-h, --help', 'Display this usage guide.')
+  .option('--api-key <key>', '(Optional) Manually provide API key rather than use saved credential')
+  .option('--token <token>', '(Optional) Manually provide token rather than use saved credential')
+  .option('--host <host>', '(Optional) Override Sentio Host name')
+  .option('--owner <owner>', '(Optional) Override Project owner')
+  .option('--name <name>', '(Optional) Override Project name')
+  .option(
+    '--continue-from <version>',
+    '(Optional) Continue processing data from the specific processor version',
+    parseInt
+  )
+  .option('--nobuild', '(Optional) Skip build & pack file before uploading, default false')
+  .option('--debug', '(Optional) Run driver in debug mode, default false')
+  .option('--silent-overwrite', '(Optional) Overwrite exiting processor version without confirmation, default false')
+  .option('--skip-gen', 'Skip code generation.')
+  .option('--skip-deps', 'Skip dependency enforce.')
+  .option('--example', 'Generate example usage of the processor.')
+  .action(async (options) => {
+    const processorConfig = await loadProcessorConfig()
+    await runUpload(processorConfig, process.argv.slice(3))
+  })
+
+program
+  .command('build')
+  .description('generate abi and build')
+  .option('-h, --help', 'Display this usage guide.')
+  .option('--skip-gen', 'Skip code generation.')
+  .option('--skip-deps', 'Skip dependency enforce.')
+  .option('--example', 'Generate example usage of the processor.')
+  .action(async (options) => {
+    await buildProcessorWithArgs(process.argv.slice(3))
+  })
+
+program
+  .command('gen')
+  .description('generate abi')
+  .option('-h, --help', 'Display this usage guide.')
+  .option('--example', 'Generate example usage of the processor.')
+  .action(async (options) => {
+    await generate(process.argv.slice(3))
+  })
+
+program.parse()
