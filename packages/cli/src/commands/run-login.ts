@@ -10,15 +10,17 @@ import open from 'open'
 
 const port = 20000
 
-export function runLogin(argv: string[]) {
-  const program = new Command()
-
-  program
+export function createLoginCommand() {
+  return new Command('login')
+    .description('Login to Sentio')
     .option('--host <host>', '(Optional) Override Sentio Host name')
     .option('--api-key <key>', '(Optional) Your API key')
-    .parse(argv, { from: 'user' })
+    .action((options) => {
+      runLogin(options)
+    })
+}
 
-  const options = program.opts()
+function runLogin(options: any) {
   const host = getFinalizedHost(options.host)
 
   if (options.apiKey) {

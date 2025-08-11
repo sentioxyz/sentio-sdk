@@ -1,12 +1,13 @@
 import { Command } from 'commander'
 import { finalizeHost, FinalizeProjectName, YamlProjectConfig } from '../config.js'
+import yaml from 'yaml'
+import fs from 'fs'
 import { URL } from 'url'
 import fetch from 'node-fetch'
 import { buildProcessor } from './build.js'
 import chalk from 'chalk'
 import path from 'path'
 import { ReadKey } from '../key.js'
-import fs from 'fs'
 import { createHash } from 'crypto'
 import { CommonExecOptions, execFileSync } from 'child_process'
 import { getCliVersion, getSdkVersion } from '../utils.js'
@@ -14,10 +15,9 @@ import readline from 'readline'
 import JSZip from 'jszip'
 import { UserInfo } from '../../../protos/lib/service/common/protos/common.js'
 
-export async function runUpload(processorConfig: YamlProjectConfig, argv: string[]) {
-  const program = new Command()
-
-  program
+export function createUploadCommand() {
+  return new Command('upload')
+    .description('Upload processor to Sentio')
     .option('--api-key <key>', '(Optional) Manually provide API key rather than use saved credential')
     .option('--token <token>', '(Optional) Manually provide token rather than use saved credential')
     .option('--host <host>', '(Optional) Override Sentio Host name')
@@ -34,10 +34,18 @@ export async function runUpload(processorConfig: YamlProjectConfig, argv: string
     .option('--skip-gen', 'Skip code generation.')
     .option('--skip-deps', 'Skip dependency enforce.')
     .option('--example', 'Generate example usage of the processor.')
-    .parse(argv, { from: 'user' })
+    .action(async (options, command) => {
+      const processorConfig = loadProcessorConfig()
+      await runUploadInternal(processorConfig, options, command.args)
+    })
+}
 
-  const options = program.opts()
+function loadProcessorConfig(): YamlProjectConfig {
+  const yamlContent = fs.readFileSync('sentio.yaml', 'utf8')
+  return yaml.parse(yamlContent) as YamlProjectConfig
+}
 
+async function runUploadInternal(processorConfig: YamlProjectConfig, options: any, extraArgs: string[]) {
   if (options.nobuild) {
     processorConfig.build = false
   }

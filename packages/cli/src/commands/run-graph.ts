@@ -15,6 +15,44 @@ import { supportedChainMessage } from './run-create.js'
 import { EthChainInfo } from '@sentio/chain'
 import yaml from 'yaml'
 
+export function createGraphCommand() {
+  const graphCommand = new Command('graph').description('Graph related commands')
+
+  graphCommand
+    .command('create')
+    .description('Create a new graph')
+    .argument('<name>', 'Project name')
+    .option(
+      '--chain-id <id>',
+      '(Optional) The chain id to use for eth. Supported: ' + supportedChainMessage.join('\n,'),
+      '1'
+    )
+    .action(async (name, options) => {
+      await runGraphCreateInternal(name, options)
+    })
+
+  graphCommand
+    .command('deploy')
+    .description('Deploy the graph')
+    .option('--api-key <key>', '(Optional) Manually provide API key rather than use saved credential')
+    .option('--host <host>', '(Optional) Override Sentio Host name')
+    .option('--owner <owner>', '(Optional) Override Project owner')
+    .option('--name <name>', '(Optional) Override Project name')
+    .option(
+      '--continue-from <version>',
+      '(Optional) Continue processing data from the specific processor version',
+      parseInt
+    )
+    .option('--dir <dir>', '(Optional) The location of subgraph project, default to the current directory')
+    .option('--skip-gen', 'Skip code generation.')
+    .allowUnknownOption()
+    .action(async (options) => {
+      await runGraphDeployInternal(options, [])
+    })
+
+  return graphCommand
+}
+
 export async function runGraph(argv: string[]) {
   const [command, ...rest] = argv
   if (!['create', 'deploy'].includes(command)) {
@@ -47,10 +85,18 @@ async function runGraphCreate(argv: string[]) {
 
   const options = program.opts()
   const projectName = program.args[0]
-
   if (!projectName) {
-    program.help()
-    process.exit(0)
+    console.error('Project name is required')
+    process.exit(1)
+  }
+
+  return runGraphCreateInternal(projectName, options)
+}
+
+async function runGraphCreateInternal(projectName: string, options: any) {
+  if (!projectName) {
+    console.error('Project name is required')
+    process.exit(1)
   }
 
   const chainId: string = options.chainId
@@ -107,16 +153,6 @@ async function createProjectIfMissing(options: YamlProjectConfig, apiKey: string
 }
 
 async function runGraphDeploy(argv: string[]) {
-  let processorConfig: YamlProjectConfig = { host: '', project: '', build: true, debug: false, contracts: [] }
-  const yamlPath = path.join(process.cwd(), 'sentio.yaml')
-  if (fs.existsSync(yamlPath)) {
-    processorConfig = yaml.parse(fs.readFileSync('sentio.yaml', 'utf8')) as YamlProjectConfig
-    if (!processorConfig.project) {
-      console.error('Config yaml must contain a valid project identifier')
-      process.exit(1)
-    }
-  }
-
   const program = new Command()
 
   program
@@ -135,6 +171,20 @@ async function runGraphDeploy(argv: string[]) {
     .parse(argv, { from: 'user' })
 
   const options = program.opts()
+
+  await runGraphDeployInternal(options, program.args)
+}
+
+async function runGraphDeployInternal(options: any, extraArgs: string[] = []) {
+  let processorConfig: YamlProjectConfig = { host: '', project: '', build: true, debug: false, contracts: [] }
+  const yamlPath = path.join(process.cwd(), 'sentio.yaml')
+  if (fs.existsSync(yamlPath)) {
+    processorConfig = yaml.parse(fs.readFileSync('sentio.yaml', 'utf8')) as YamlProjectConfig
+    if (!processorConfig.project) {
+      console.error('Config yaml must contain a valid project identifier')
+      process.exit(1)
+    }
+  }
 
   finalizeHost(processorConfig, options.host)
   FinalizeProjectName(processorConfig, options.owner, options.name)
@@ -174,7 +224,7 @@ async function runGraphDeploy(argv: string[]) {
       '--deploy-key',
       apiKey,
       processorConfig.project,
-      ...(program.args || [])
+      ...extraArgs
     ],
     'Graph deploy',
     execOptions
@@ -188,7 +238,7 @@ async function runGraphDeploy(argv: string[]) {
   let zip
   try {
     await bundleSourceMap()
-    zip = await genZip(program.args)
+    zip = await genZip(extraArgs)
   } finally {
     if (options.dir) {
       process.chdir(cwd)

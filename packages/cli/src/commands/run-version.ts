@@ -1,6 +1,13 @@
+import { Command } from 'commander'
 import { getCliVersion, getSdkVersion } from '../utils.js'
 
-export function runVersion(argv: string[]) {
+export function createVersionCommand() {
+  return new Command('version').description('Show current version').action(() => {
+    runVersion()
+  })
+}
+
+function runVersion() {
   console.log('CLI Version: ', getCliVersion())
   const sdkVersion = getSdkVersion()
   if (sdkVersion) {

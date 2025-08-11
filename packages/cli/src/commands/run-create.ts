@@ -14,10 +14,9 @@ export const supportedChainMessage = [
   ...Object.values(EthChainInfo).map((info) => `  ${info.chainId} (${info.name})`)
 ]
 
-export async function runCreate(argv: string[]) {
-  const program = new Command()
-
-  program
+export function createCreateCommand() {
+  return new Command('create')
+    .description('Create a new Sentio project')
     .argument('<name>', 'Project name')
     .option(
       '-p, --subproject',
@@ -38,14 +37,15 @@ export async function runCreate(argv: string[]) {
       '(Optional) The chain id to use for eth. Supported: ' + supportedChainMessage.join('\n,'),
       '1'
     )
-    .parse(argv, { from: 'user' })
+    .action(async (name, options) => {
+      await runCreateInternal(name, options)
+    })
+}
 
-  const options = program.opts()
-  const name = program.args[0]
-
+async function runCreateInternal(name: string, options: any) {
   if (!name) {
-    program.help()
-    process.exit(0)
+    console.error('Project name is required')
+    process.exit(1)
   }
 
   const chainType: string = options.chainType.toLowerCase()

@@ -18,6 +18,19 @@ interface Metadata {
   settings: any
 }
 
+export function createCompileCommand() {
+  return new Command('compile')
+    .description('Compile the processor')
+    .option('--upload', '(Optional) Upload to sentio if compiled successfully')
+    .option('--project <project>', '(Optional) Project full name, required in uploading')
+    .option('--api-key <key>', '(Optional) Manually provide API key rather than use saved credential')
+    .option('--token <token>', '(Optional) Manually provide token rather than use saved credential')
+    .option('--host <host>', '(Optional) Sentio Host name')
+    .action(async (options) => {
+      await runCompileInternal(options)
+    })
+}
+
 export async function runCompile(argv: string[]) {
   const program = new Command()
 
@@ -31,6 +44,10 @@ export async function runCompile(argv: string[]) {
 
   const options = program.opts()
 
+  await runCompileInternal(options)
+}
+
+async function runCompileInternal(options: any) {
   let projectOwner, projectSlug
   const auth: Auth = {}
   if (options.upload) {

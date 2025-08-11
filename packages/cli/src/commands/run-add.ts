@@ -20,7 +20,7 @@ const supportedChain: string[] = [
   SuiChainId.IOTA_TESTNET
 ]
 
-export async function runAdd(argv: string[]) {
+export function createAddCommand() {
   for (const chain of Object.values(EthChainInfo)) {
     if (
       chain.explorerApiType === ExplorerApiType.ETHERSCAN ||
@@ -37,9 +37,8 @@ export async function runAdd(argv: string[]) {
     ...supportedChain.map((chainId, idx) => `  ${chainId} (${getChainName(chainId)})`)
   ]
 
-  const program = new Command()
-
-  program
+  return new Command('add')
+    .description('Add a contract to the project')
     .argument('<address>', 'Address of the contract')
     .option('-n, --name <name>', 'File name for the downloaded contract, if empty, use address as file name')
     .option(
@@ -49,14 +48,15 @@ export async function runAdd(argv: string[]) {
       '1'
     )
     .option('--folder <folder>', '(Optional) The folder to save the downloaded ABI file')
-    .parse(argv, { from: 'user' })
+    .action(async (address, options) => {
+      await runAddInternal(address, options)
+    })
+}
 
-  const options = program.opts()
-  const address = program.args[0]
-
+async function runAddInternal(address: string, options: any) {
   if (!address) {
-    program.help()
-    process.exit(0)
+    console.error('Address is required')
+    process.exit(1)
   }
 
   const chain = options.chain.toLowerCase() as ChainId

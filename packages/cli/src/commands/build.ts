@@ -46,25 +46,27 @@ export const GenOptionDefinitions = [
   }
 ]
 
-export async function buildProcessorWithArgs(argv: string[]) {
-  const program = new Command()
-
-  program
+export function createBuildCommand() {
+  return new Command('build')
+    .description('Build the processor')
     .option('--skip-gen', 'Skip code generation.')
     .option('--skip-deps', 'Skip dependency enforce.')
     .option('--example', 'Generate example usage of the processor.')
-    .parse(argv, { from: 'user' })
-
-  const options = program.opts()
-  await buildProcessor(false, options)
+    .action(async (options) => {
+      await buildProcessor(false, options)
+    })
 }
 
-export async function generate(argv: string[]) {
-  const program = new Command()
+export function createGenCommand() {
+  return new Command('gen')
+    .description('Generate ABI')
+    .option('--example', 'Generate example usage of the processor.')
+    .action(async (options) => {
+      await generate(options)
+    })
+}
 
-  program.option('--example', 'Generate example usage of the processor.').parse(argv, { from: 'user' })
-
-  const options = program.opts()
+export async function generate(options: any) {
   await buildProcessor(true, options)
 }
 
