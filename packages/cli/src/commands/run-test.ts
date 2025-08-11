@@ -10,7 +10,10 @@ export function createTestCommand() {
     .option('--test-name-pattern <pattern>', 'run tests whose name matches this regular expression')
     .option('--test-skip-pattern <pattern>', 'run tests whose name do not match this regular expression')
     .allowUnknownOption()
+    .allowExcessArguments()
     .action((options, command) => {
+      console.log(options)
+      console.log(command.args)
       runTestInternal(command.args)
     })
 }

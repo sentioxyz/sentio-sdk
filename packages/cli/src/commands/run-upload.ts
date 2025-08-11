@@ -1,5 +1,5 @@
 import { Command } from 'commander'
-import { finalizeHost, FinalizeProjectName, loadProcessorConfig, YamlProjectConfig } from '../config.js'
+import { loadProcessorConfig, overrideConfigWithOptions, YamlProjectConfig } from '../config.js'
 import fs from 'fs'
 import { URL } from 'url'
 import fetch from 'node-fetch'
@@ -38,22 +38,12 @@ export function createUploadCommand() {
     .option('--host <host>', '(Optional) Override Sentio Host name')
     .action(async (options, command) => {
       const processorConfig = loadProcessorConfig()
-      await runUploadInternal(processorConfig, options, command.args)
+      overrideConfigWithOptions(processorConfig, options)
+      await runUploadInternal(processorConfig, options)
     })
 }
 
-async function runUploadInternal(processorConfig: YamlProjectConfig, options: any, extraArgs: string[]) {
-  if (options.skipBuild) {
-    processorConfig.build = false
-  }
-  if (options.debug) {
-    processorConfig.debug = true
-  }
-  if (options.silentOverwrite) {
-    processorConfig.silentOverwrite = true
-  }
-  finalizeHost(processorConfig, options.host)
-  FinalizeProjectName(processorConfig, options.owner, options.name)
+async function runUploadInternal(processorConfig: YamlProjectConfig, options: any) {
   console.log(processorConfig)
 
   const uploadAuth: Auth = {}
