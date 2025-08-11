@@ -17,7 +17,9 @@
             }
           }
         ],
-        "return": ["Address"]
+        "return": [
+          "Address"
+        ]
       },
       "from_bytes": {
         "visibility": "Public",
@@ -28,34 +30,46 @@
             "Vector": "U8"
           }
         ],
-        "return": ["Address"]
+        "return": [
+          "Address"
+        ]
       },
       "from_u256": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U256"],
-        "return": ["Address"]
+        "parameters": [
+          "U256"
+        ],
+        "return": [
+          "Address"
+        ]
       },
       "length": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
         "parameters": [],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "max": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
         "parameters": [],
-        "return": ["U256"]
+        "return": [
+          "U256"
+        ]
       },
       "to_ascii_string": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["Address"],
+        "parameters": [
+          "Address"
+        ],
         "return": [
           {
             "Struct": {
@@ -71,7 +85,9 @@
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["Address"],
+        "parameters": [
+          "Address"
+        ],
         "return": [
           {
             "Vector": "U8"
@@ -82,7 +98,9 @@
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["Address"],
+        "parameters": [
+          "Address"
+        ],
         "return": [
           {
             "Struct": {
@@ -98,8 +116,12 @@
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["Address"],
-        "return": ["U256"]
+        "parameters": [
+          "Address"
+        ],
+        "return": [
+          "U256"
+        ]
       }
     }
   },
@@ -111,7 +133,11 @@
     "structs": {
       "ActiveJwk": {
         "abilities": {
-          "abilities": ["Copy", "Drop", "Store"]
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -145,7 +171,9 @@
       },
       "AuthenticatorState": {
         "abilities": {
-          "abilities": ["Key"]
+          "abilities": [
+            "Key"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -168,7 +196,9 @@
       },
       "AuthenticatorStateInner": {
         "abilities": {
-          "abilities": ["Store"]
+          "abilities": [
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -193,7 +223,11 @@
       },
       "JWK": {
         "abilities": {
-          "abilities": ["Copy", "Drop", "Store"]
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -245,7 +279,11 @@
       },
       "JwkId": {
         "abilities": {
-          "abilities": ["Copy", "Drop", "Store"]
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -284,7 +322,10 @@
     "structs": {
       "Bag": {
         "abilities": {
-          "abilities": ["Store", "Key"]
+          "abilities": [
+            "Store",
+            "Key"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -312,10 +353,16 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -343,10 +390,16 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -377,10 +430,16 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -411,7 +470,11 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -429,17 +492,25 @@
             "TypeParameter": 0
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "contains_with_type": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -457,7 +528,9 @@
             "TypeParameter": 0
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "destroy_empty": {
         "visibility": "Public",
@@ -491,7 +564,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "length": {
         "visibility": "Public",
@@ -509,7 +584,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "new": {
         "visibility": "Public",
@@ -543,10 +620,16 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -580,7 +663,9 @@
     "structs": {
       "Balance": {
         "abilities": {
-          "abilities": ["Store"]
+          "abilities": [
+            "Store"
+          ]
         },
         "typeParameters": [
           {
@@ -599,7 +684,9 @@
       },
       "Supply": {
         "abilities": {
-          "abilities": ["Store"]
+          "abilities": [
+            "Store"
+          ]
         },
         "typeParameters": [
           {
@@ -623,7 +710,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Drop"]
+            "abilities": [
+              "Drop"
+            ]
           }
         ],
         "parameters": [
@@ -682,7 +771,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "destroy_supply": {
         "visibility": "Friend",
@@ -706,7 +797,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "destroy_zero": {
         "visibility": "Public",
@@ -808,7 +901,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "split": {
         "visibility": "Public",
@@ -874,7 +969,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "value": {
         "visibility": "Public",
@@ -900,7 +997,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "withdraw_all": {
         "visibility": "Public",
@@ -975,7 +1074,11 @@
     "structs": {
       "BCS": {
         "abilities": {
-          "abilities": ["Copy", "Drop", "Store"]
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -1045,7 +1148,9 @@
             }
           }
         ],
-        "return": ["Address"]
+        "return": [
+          "Address"
+        ]
       },
       "peel_bool": {
         "visibility": "Public",
@@ -1063,7 +1168,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "peel_enum_tag": {
         "visibility": "Public",
@@ -1081,7 +1188,9 @@
             }
           }
         ],
-        "return": ["U32"]
+        "return": [
+          "U32"
+        ]
       },
       "peel_option_address": {
         "visibility": "Public",
@@ -1105,7 +1214,9 @@
               "address": "0x1",
               "module": "option",
               "name": "Option",
-              "typeArguments": ["Address"]
+              "typeArguments": [
+                "Address"
+              ]
             }
           }
         ]
@@ -1132,7 +1243,9 @@
               "address": "0x1",
               "module": "option",
               "name": "Option",
-              "typeArguments": ["Bool"]
+              "typeArguments": [
+                "Bool"
+              ]
             }
           }
         ]
@@ -1159,7 +1272,9 @@
               "address": "0x1",
               "module": "option",
               "name": "Option",
-              "typeArguments": ["U128"]
+              "typeArguments": [
+                "U128"
+              ]
             }
           }
         ]
@@ -1186,7 +1301,9 @@
               "address": "0x1",
               "module": "option",
               "name": "Option",
-              "typeArguments": ["U16"]
+              "typeArguments": [
+                "U16"
+              ]
             }
           }
         ]
@@ -1213,7 +1330,9 @@
               "address": "0x1",
               "module": "option",
               "name": "Option",
-              "typeArguments": ["U256"]
+              "typeArguments": [
+                "U256"
+              ]
             }
           }
         ]
@@ -1240,7 +1359,9 @@
               "address": "0x1",
               "module": "option",
               "name": "Option",
-              "typeArguments": ["U32"]
+              "typeArguments": [
+                "U32"
+              ]
             }
           }
         ]
@@ -1267,7 +1388,9 @@
               "address": "0x1",
               "module": "option",
               "name": "Option",
-              "typeArguments": ["U64"]
+              "typeArguments": [
+                "U64"
+              ]
             }
           }
         ]
@@ -1294,7 +1417,9 @@
               "address": "0x1",
               "module": "option",
               "name": "Option",
-              "typeArguments": ["U8"]
+              "typeArguments": [
+                "U8"
+              ]
             }
           }
         ]
@@ -1315,7 +1440,9 @@
             }
           }
         ],
-        "return": ["U128"]
+        "return": [
+          "U128"
+        ]
       },
       "peel_u16": {
         "visibility": "Public",
@@ -1333,7 +1460,9 @@
             }
           }
         ],
-        "return": ["U16"]
+        "return": [
+          "U16"
+        ]
       },
       "peel_u256": {
         "visibility": "Public",
@@ -1351,7 +1480,9 @@
             }
           }
         ],
-        "return": ["U256"]
+        "return": [
+          "U256"
+        ]
       },
       "peel_u32": {
         "visibility": "Public",
@@ -1369,7 +1500,9 @@
             }
           }
         ],
-        "return": ["U32"]
+        "return": [
+          "U32"
+        ]
       },
       "peel_u64": {
         "visibility": "Public",
@@ -1387,7 +1520,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "peel_u8": {
         "visibility": "Public",
@@ -1405,7 +1540,9 @@
             }
           }
         ],
-        "return": ["U8"]
+        "return": [
+          "U8"
+        ]
       },
       "peel_vec_address": {
         "visibility": "Public",
@@ -1467,7 +1604,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "peel_vec_u128": {
         "visibility": "Public",
@@ -1737,7 +1876,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "bls12381_min_sig_verify": {
         "visibility": "Public",
@@ -1760,7 +1901,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "g1_add": {
         "visibility": "Public",
@@ -3347,7 +3490,9 @@
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U64"],
+        "parameters": [
+          "U64"
+        ],
         "return": [
           {
             "Struct": {
@@ -3761,12 +3906,17 @@
       },
       "Referent": {
         "abilities": {
-          "abilities": ["Store"]
+          "abilities": [
+            "Store"
+          ]
         },
         "typeParameters": [
           {
             "constraints": {
-              "abilities": ["Store", "Key"]
+              "abilities": [
+                "Store",
+                "Key"
+              ]
             },
             "isPhantom": false
           }
@@ -3800,7 +3950,10 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -3838,7 +3991,10 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -3866,7 +4022,10 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -3904,7 +4063,10 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -3946,7 +4108,9 @@
     "structs": {
       "Clock": {
         "abilities": {
-          "abilities": ["Key"]
+          "abilities": [
+            "Key"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -3985,7 +4149,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       }
     }
   },
@@ -3997,7 +4163,10 @@
     "structs": {
       "Coin": {
         "abilities": {
-          "abilities": ["Store", "Key"]
+          "abilities": [
+            "Store",
+            "Key"
+          ]
         },
         "typeParameters": [
           {
@@ -4038,7 +4207,10 @@
       },
       "CoinMetadata": {
         "abilities": {
-          "abilities": ["Store", "Key"]
+          "abilities": [
+            "Store",
+            "Key"
+          ]
         },
         "typeParameters": [
           {
@@ -4121,7 +4293,10 @@
       },
       "DenyCapV1": {
         "abilities": {
-          "abilities": ["Store", "Key"]
+          "abilities": [
+            "Store",
+            "Key"
+          ]
         },
         "typeParameters": [
           {
@@ -4151,7 +4326,9 @@
       },
       "RegulatedCoinMetadata": {
         "abilities": {
-          "abilities": ["Key"]
+          "abilities": [
+            "Key"
+          ]
         },
         "typeParameters": [
           {
@@ -4199,7 +4376,10 @@
       },
       "TreasuryCap": {
         "abilities": {
-          "abilities": ["Store", "Key"]
+          "abilities": [
+            "Store",
+            "Key"
+          ]
         },
         "typeParameters": [
           {
@@ -4358,14 +4538,18 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "create_currency": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Drop"]
+            "abilities": [
+              "Drop"
+            ]
           }
         ],
         "parameters": [
@@ -4442,7 +4626,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Drop"]
+            "abilities": [
+              "Drop"
+            ]
           }
         ],
         "parameters": [
@@ -4605,7 +4791,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "deny_list_v1_contains_next_epoch": {
         "visibility": "Public",
@@ -4628,7 +4816,9 @@
           },
           "Address"
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "deny_list_v1_disable_global_pause": {
         "visibility": "Public",
@@ -4752,7 +4942,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "deny_list_v1_is_global_pause_enabled_next_epoch": {
         "visibility": "Public",
@@ -4774,7 +4966,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "deny_list_v1_remove": {
         "visibility": "Public",
@@ -4970,7 +5164,9 @@
             }
           }
         ],
-        "return": ["U8"]
+        "return": [
+          "U8"
+        ]
       },
       "get_description": {
         "visibility": "Public",
@@ -5568,7 +5764,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "treasury_into_supply": {
         "visibility": "Public",
@@ -5823,7 +6021,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "zero": {
         "visibility": "Public",
@@ -5870,7 +6070,10 @@
     "structs": {
       "CoinManaged": {
         "abilities": {
-          "abilities": ["Copy", "Drop"]
+          "abilities": [
+            "Copy",
+            "Drop"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -5889,7 +6092,10 @@
       },
       "CoinManager": {
         "abilities": {
-          "abilities": ["Store", "Key"]
+          "abilities": [
+            "Store",
+            "Key"
+          ]
         },
         "typeParameters": [
           {
@@ -5981,7 +6187,9 @@
                 "address": "0x1",
                 "module": "option",
                 "name": "Option",
-                "typeArguments": ["U64"]
+                "typeArguments": [
+                  "U64"
+                ]
               }
             }
           },
@@ -5997,7 +6205,10 @@
       },
       "CoinManagerMetadataCap": {
         "abilities": {
-          "abilities": ["Store", "Key"]
+          "abilities": [
+            "Store",
+            "Key"
+          ]
         },
         "typeParameters": [
           {
@@ -6023,7 +6234,10 @@
       },
       "CoinManagerTreasuryCap": {
         "abilities": {
-          "abilities": ["Store", "Key"]
+          "abilities": [
+            "Store",
+            "Key"
+          ]
         },
         "typeParameters": [
           {
@@ -6049,7 +6263,9 @@
       },
       "ImmutableCoinMetadata": {
         "abilities": {
-          "abilities": ["Store"]
+          "abilities": [
+            "Store"
+          ]
         },
         "typeParameters": [
           {
@@ -6121,7 +6337,10 @@
       },
       "MetadataOwnershipRenounced": {
         "abilities": {
-          "abilities": ["Copy", "Drop"]
+          "abilities": [
+            "Copy",
+            "Drop"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -6140,7 +6359,10 @@
       },
       "TreasuryOwnershipRenounced": {
         "abilities": {
-          "abilities": ["Copy", "Drop"]
+          "abilities": [
+            "Copy",
+            "Drop"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -6167,7 +6389,9 @@
             "abilities": []
           },
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -6213,7 +6437,9 @@
             "abilities": []
           },
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -6264,7 +6490,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "burn": {
         "visibility": "Public",
@@ -6316,14 +6544,18 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "create": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Drop"]
+            "abilities": [
+              "Drop"
+            ]
           }
         ],
         "parameters": [
@@ -6431,7 +6663,9 @@
             }
           }
         ],
-        "return": ["U8"]
+        "return": [
+          "U8"
+        ]
       },
       "description": {
         "visibility": "Public",
@@ -6517,7 +6751,9 @@
             "abilities": []
           },
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -6568,7 +6804,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "icon_url": {
         "visibility": "Public",
@@ -6679,7 +6917,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "metadata": {
         "visibility": "Public",
@@ -6746,7 +6986,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "mint": {
         "visibility": "Public",
@@ -7193,10 +7435,14 @@
             "abilities": []
           },
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -7303,7 +7549,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "symbol": {
         "visibility": "Public",
@@ -7364,7 +7612,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "update_description": {
         "visibility": "Public",
@@ -7573,7 +7823,9 @@
     "structs": {
       "Config": {
         "abilities": {
-          "abilities": ["Key"]
+          "abilities": [
+            "Key"
+          ]
         },
         "typeParameters": [
           {
@@ -7599,12 +7851,19 @@
       },
       "Setting": {
         "abilities": {
-          "abilities": ["Drop", "Store"]
+          "abilities": [
+            "Drop",
+            "Store"
+          ]
         },
         "typeParameters": [
           {
             "constraints": {
-              "abilities": ["Copy", "Drop", "Store"]
+              "abilities": [
+                "Copy",
+                "Drop",
+                "Store"
+              ]
             },
             "isPhantom": false
           }
@@ -7638,12 +7897,19 @@
       },
       "SettingData": {
         "abilities": {
-          "abilities": ["Drop", "Store"]
+          "abilities": [
+            "Drop",
+            "Store"
+          ]
         },
         "typeParameters": [
           {
             "constraints": {
-              "abilities": ["Copy", "Drop", "Store"]
+              "abilities": [
+                "Copy",
+                "Drop",
+                "Store"
+              ]
             },
             "isPhantom": false
           }
@@ -7695,10 +7961,18 @@
             "abilities": []
           },
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -7761,10 +8035,18 @@
             "abilities": []
           },
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -7817,10 +8099,18 @@
             "abilities": []
           },
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -7842,7 +8132,9 @@
             "TypeParameter": 1
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "exists_with_type_for_next_epoch": {
         "visibility": "Friend",
@@ -7852,10 +8144,18 @@
             "abilities": []
           },
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -7887,7 +8187,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "new": {
         "visibility": "Friend",
@@ -7934,10 +8236,18 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -7986,10 +8296,18 @@
             "abilities": []
           },
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -8034,10 +8352,18 @@
             "abilities": []
           },
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -8153,7 +8479,11 @@
     "structs": {
       "AddressKey": {
         "abilities": {
-          "abilities": ["Copy", "Drop", "Store"]
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -8165,7 +8495,11 @@
       },
       "ConfigKey": {
         "abilities": {
-          "abilities": ["Copy", "Drop", "Store"]
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -8183,7 +8517,9 @@
       },
       "ConfigWriteCap": {
         "abilities": {
-          "abilities": ["Drop"]
+          "abilities": [
+            "Drop"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -8195,7 +8531,9 @@
       },
       "DenyList": {
         "abilities": {
-          "abilities": ["Key"]
+          "abilities": [
+            "Key"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -8225,7 +8563,11 @@
       },
       "GlobalPauseKey": {
         "abilities": {
-          "abilities": ["Copy", "Drop", "Store"]
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -8237,7 +8579,11 @@
       },
       "PerTypeConfigCreated": {
         "abilities": {
-          "abilities": ["Copy", "Drop", "Store"]
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -8331,7 +8677,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "contains_next_epoch": {
         "visibility": "Friend",
@@ -8354,7 +8702,9 @@
           },
           "Address"
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "disable_global_pause": {
         "visibility": "Friend",
@@ -8450,7 +8800,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "is_global_pause_enabled_next_epoch": {
         "visibility": "Friend",
@@ -8472,7 +8824,9 @@
             "Vector": "U8"
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "remove": {
         "visibility": "Friend",
@@ -8517,12 +8871,17 @@
     "structs": {
       "Display": {
         "abilities": {
-          "abilities": ["Store", "Key"]
+          "abilities": [
+            "Store",
+            "Key"
+          ]
         },
         "typeParameters": [
           {
             "constraints": {
-              "abilities": ["Key"]
+              "abilities": [
+                "Key"
+              ]
             },
             "isPhantom": true
           }
@@ -8575,12 +8934,17 @@
       },
       "DisplayCreated": {
         "abilities": {
-          "abilities": ["Copy", "Drop"]
+          "abilities": [
+            "Copy",
+            "Drop"
+          ]
         },
         "typeParameters": [
           {
             "constraints": {
-              "abilities": ["Key"]
+              "abilities": [
+                "Key"
+              ]
             },
             "isPhantom": true
           }
@@ -8601,12 +8965,17 @@
       },
       "VersionUpdated": {
         "abilities": {
-          "abilities": ["Copy", "Drop"]
+          "abilities": [
+            "Copy",
+            "Drop"
+          ]
         },
         "typeParameters": [
           {
             "constraints": {
-              "abilities": ["Key"]
+              "abilities": [
+                "Key"
+              ]
             },
             "isPhantom": true
           }
@@ -8664,7 +9033,9 @@
         "isEntry": true,
         "typeParameters": [
           {
-            "abilities": ["Key"]
+            "abilities": [
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -8706,7 +9077,9 @@
         "isEntry": true,
         "typeParameters": [
           {
-            "abilities": ["Key"]
+            "abilities": [
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -8752,7 +9125,9 @@
         "isEntry": true,
         "typeParameters": [
           {
-            "abilities": ["Key"]
+            "abilities": [
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -8784,7 +9159,9 @@
         "isEntry": true,
         "typeParameters": [
           {
-            "abilities": ["Key"]
+            "abilities": [
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -8826,7 +9203,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Key"]
+            "abilities": [
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -8880,7 +9259,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Key"]
+            "abilities": [
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -8895,14 +9276,18 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "new": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Key"]
+            "abilities": [
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -8947,7 +9332,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Key"]
+            "abilities": [
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -9012,7 +9399,9 @@
         "isEntry": true,
         "typeParameters": [
           {
-            "abilities": ["Key"]
+            "abilities": [
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -9046,7 +9435,9 @@
         "isEntry": true,
         "typeParameters": [
           {
-            "abilities": ["Key"]
+            "abilities": [
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -9072,7 +9463,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Key"]
+            "abilities": [
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -9091,7 +9484,9 @@
             }
           }
         ],
-        "return": ["U16"]
+        "return": [
+          "U16"
+        ]
       }
     }
   },
@@ -9112,18 +9507,26 @@
     "structs": {
       "Field": {
         "abilities": {
-          "abilities": ["Key"]
+          "abilities": [
+            "Key"
+          ]
         },
         "typeParameters": [
           {
             "constraints": {
-              "abilities": ["Copy", "Drop", "Store"]
+              "abilities": [
+                "Copy",
+                "Drop",
+                "Store"
+              ]
             },
             "isPhantom": false
           },
           {
             "constraints": {
-              "abilities": ["Store"]
+              "abilities": [
+                "Store"
+              ]
             },
             "isPhantom": false
           }
@@ -9161,10 +9564,16 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -9192,7 +9601,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Key"]
+            "abilities": [
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -9208,10 +9619,16 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -9242,7 +9659,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Key"]
+            "abilities": [
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -9271,7 +9690,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Key"]
+            "abilities": [
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -9300,10 +9721,16 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -9334,7 +9761,11 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -9352,17 +9783,25 @@
             "TypeParameter": 0
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "exists_with_type": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -9380,14 +9819,20 @@
             "TypeParameter": 0
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "field_info": {
         "visibility": "Friend",
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -9424,7 +9869,11 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -9460,26 +9909,42 @@
         "visibility": "Friend",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["Address", "Address"],
-        "return": ["Bool"]
+        "parameters": [
+          "Address",
+          "Address"
+        ],
+        "return": [
+          "Bool"
+        ]
       },
       "has_child_object_with_ty": {
         "visibility": "Friend",
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Key"]
+            "abilities": [
+              "Key"
+            ]
           }
         ],
-        "parameters": ["Address", "Address"],
-        "return": ["Bool"]
+        "parameters": [
+          "Address",
+          "Address"
+        ],
+        "return": [
+          "Bool"
+        ]
       },
       "hash_type_and_key": {
         "visibility": "Friend",
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -9488,17 +9953,25 @@
             "TypeParameter": 0
           }
         ],
-        "return": ["Address"]
+        "return": [
+          "Address"
+        ]
       },
       "remove": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -9527,10 +10000,15 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Key"]
+            "abilities": [
+              "Key"
+            ]
           }
         ],
-        "parameters": ["Address", "Address"],
+        "parameters": [
+          "Address",
+          "Address"
+        ],
         "return": [
           {
             "TypeParameter": 0
@@ -9542,10 +10020,16 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -9593,7 +10077,11 @@
     "structs": {
       "Wrapper": {
         "abilities": {
-          "abilities": ["Copy", "Drop", "Store"]
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
         },
         "typeParameters": [
           {
@@ -9619,10 +10107,17 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -9650,10 +10145,17 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -9684,10 +10186,17 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -9718,7 +10227,11 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -9736,17 +10249,26 @@
             "TypeParameter": 0
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "exists_with_type": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -9764,14 +10286,20 @@
             "TypeParameter": 0
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "id": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -9814,10 +10342,16 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Key"]
+            "abilities": [
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -9845,10 +10379,16 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Key"]
+            "abilities": [
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -9879,10 +10419,16 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Key"]
+            "abilities": [
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -9913,10 +10459,16 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Key"]
+            "abilities": [
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -9934,17 +10486,25 @@
             "TypeParameter": 0
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "internal_remove": {
         "visibility": "Friend",
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Key"]
+            "abilities": [
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -9973,10 +10533,17 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -10071,7 +10638,9 @@
           },
           "U8"
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       }
     }
   },
@@ -10127,7 +10696,9 @@
           },
           "U8"
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       }
     }
   },
@@ -10164,7 +10735,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       }
     }
   },
@@ -10196,7 +10769,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       }
     }
   },
@@ -10212,7 +10787,10 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop"]
+            "abilities": [
+              "Copy",
+              "Drop"
+            ]
           }
         ],
         "parameters": [
@@ -10232,7 +10810,11 @@
     "structs": {
       "Curve": {
         "abilities": {
-          "abilities": ["Copy", "Drop", "Store"]
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -10244,7 +10826,11 @@
       },
       "PreparedVerifyingKey": {
         "abilities": {
-          "abilities": ["Copy", "Drop", "Store"]
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -10276,7 +10862,11 @@
       },
       "ProofPoints": {
         "abilities": {
-          "abilities": ["Copy", "Drop", "Store"]
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -10290,7 +10880,11 @@
       },
       "PublicProofInputs": {
         "abilities": {
-          "abilities": ["Copy", "Drop", "Store"]
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -10505,7 +11099,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       }
     }
   },
@@ -10522,7 +11118,11 @@
     "structs": {
       "Element": {
         "abilities": {
-          "abilities": ["Copy", "Drop", "Store"]
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
         },
         "typeParameters": [
           {
@@ -10768,7 +11368,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "from_bytes": {
         "visibility": "Friend",
@@ -11245,7 +11847,9 @@
     "structs": {
       "IOTA": {
         "abilities": {
-          "abilities": ["Drop"]
+          "abilities": [
+            "Drop"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -11257,7 +11861,9 @@
       },
       "IotaTreasuryCap": {
         "abilities": {
-          "abilities": ["Store"]
+          "abilities": [
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -11328,7 +11934,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "burn_balance": {
         "visibility": "Public",
@@ -11373,7 +11981,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "mint": {
         "visibility": "Public",
@@ -11485,7 +12095,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "transfer": {
         "visibility": "Public",
@@ -11558,7 +12170,11 @@
       },
       "Item": {
         "abilities": {
-          "abilities": ["Copy", "Drop", "Store"]
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -11577,12 +12193,18 @@
       },
       "ItemDelisted": {
         "abilities": {
-          "abilities": ["Copy", "Drop"]
+          "abilities": [
+            "Copy",
+            "Drop"
+          ]
         },
         "typeParameters": [
           {
             "constraints": {
-              "abilities": ["Store", "Key"]
+              "abilities": [
+                "Store",
+                "Key"
+              ]
             },
             "isPhantom": true
           }
@@ -11614,12 +12236,18 @@
       },
       "ItemListed": {
         "abilities": {
-          "abilities": ["Copy", "Drop"]
+          "abilities": [
+            "Copy",
+            "Drop"
+          ]
         },
         "typeParameters": [
           {
             "constraints": {
-              "abilities": ["Store", "Key"]
+              "abilities": [
+                "Store",
+                "Key"
+              ]
             },
             "isPhantom": true
           }
@@ -11655,12 +12283,18 @@
       },
       "ItemPurchased": {
         "abilities": {
-          "abilities": ["Copy", "Drop"]
+          "abilities": [
+            "Copy",
+            "Drop"
+          ]
         },
         "typeParameters": [
           {
             "constraints": {
-              "abilities": ["Store", "Key"]
+              "abilities": [
+                "Store",
+                "Key"
+              ]
             },
             "isPhantom": true
           }
@@ -11696,7 +12330,10 @@
       },
       "Kiosk": {
         "abilities": {
-          "abilities": ["Store", "Key"]
+          "abilities": [
+            "Store",
+            "Key"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -11743,7 +12380,10 @@
       },
       "KioskOwnerCap": {
         "abilities": {
-          "abilities": ["Store", "Key"]
+          "abilities": [
+            "Store",
+            "Key"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -11773,7 +12413,11 @@
       },
       "Listing": {
         "abilities": {
-          "abilities": ["Copy", "Drop", "Store"]
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -11796,7 +12440,11 @@
       },
       "Lock": {
         "abilities": {
-          "abilities": ["Copy", "Drop", "Store"]
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -11815,12 +12463,18 @@
       },
       "PurchaseCap": {
         "abilities": {
-          "abilities": ["Store", "Key"]
+          "abilities": [
+            "Store",
+            "Key"
+          ]
         },
         "typeParameters": [
           {
             "constraints": {
-              "abilities": ["Store", "Key"]
+              "abilities": [
+                "Store",
+                "Key"
+              ]
             },
             "isPhantom": true
           }
@@ -11872,7 +12526,10 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -11918,7 +12575,10 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -11964,7 +12624,10 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -12086,7 +12749,10 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -12147,7 +12813,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "has_item": {
         "visibility": "Public",
@@ -12173,14 +12841,19 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "has_item_with_type": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -12203,7 +12876,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "is_listed": {
         "visibility": "Public",
@@ -12229,7 +12904,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "is_listed_exclusively": {
         "visibility": "Public",
@@ -12255,7 +12932,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "is_locked": {
         "visibility": "Public",
@@ -12281,7 +12960,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "item_count": {
         "visibility": "Public",
@@ -12299,7 +12980,9 @@
             }
           }
         ],
-        "return": ["U32"]
+        "return": [
+          "U32"
+        ]
       },
       "kiosk_owner_cap_for": {
         "visibility": "Public",
@@ -12333,7 +13016,10 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -12374,7 +13060,10 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -12438,7 +13127,10 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -12487,7 +13179,10 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -12558,14 +13253,19 @@
             }
           }
         ],
-        "return": ["Address"]
+        "return": [
+          "Address"
+        ]
       },
       "place": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -12600,7 +13300,10 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -12636,7 +13339,10 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -12672,7 +13378,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "profits_mut": {
         "visibility": "Public",
@@ -12727,7 +13435,10 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -12790,7 +13501,10 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -12825,7 +13539,10 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -12860,7 +13577,10 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -12879,14 +13599,19 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "purchase_with_cap": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -12953,7 +13678,10 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -12987,7 +13715,10 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -13087,7 +13818,10 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -13253,7 +13987,9 @@
               "address": "0x1",
               "module": "option",
               "name": "Option",
-              "typeArguments": ["U64"]
+              "typeArguments": [
+                "U64"
+              ]
             }
           },
           {
@@ -13297,7 +14033,9 @@
     "structs": {
       "Extension": {
         "abilities": {
-          "abilities": ["Store"]
+          "abilities": [
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -13324,7 +14062,11 @@
       },
       "ExtensionKey": {
         "abilities": {
-          "abilities": ["Copy", "Drop", "Store"]
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
         },
         "typeParameters": [
           {
@@ -13348,7 +14090,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Drop"]
+            "abilities": [
+              "Drop"
+            ]
           }
         ],
         "parameters": [
@@ -13394,7 +14138,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Drop"]
+            "abilities": [
+              "Drop"
+            ]
           }
         ],
         "parameters": [
@@ -13409,14 +14155,18 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "can_place": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Drop"]
+            "abilities": [
+              "Drop"
+            ]
           }
         ],
         "parameters": [
@@ -13431,14 +14181,18 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "disable": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Drop"]
+            "abilities": [
+              "Drop"
+            ]
           }
         ],
         "parameters": [
@@ -13470,7 +14224,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Drop"]
+            "abilities": [
+              "Drop"
+            ]
           }
         ],
         "parameters": [
@@ -13502,7 +14258,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Drop"]
+            "abilities": [
+              "Drop"
+            ]
           }
         ],
         "parameters": [
@@ -13517,14 +14275,18 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "is_installed": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Drop"]
+            "abilities": [
+              "Drop"
+            ]
           }
         ],
         "parameters": [
@@ -13539,17 +14301,24 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "lock": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Drop"]
+            "abilities": [
+              "Drop"
+            ]
           },
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -13591,10 +14360,15 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Drop"]
+            "abilities": [
+              "Drop"
+            ]
           },
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -13636,7 +14410,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Drop"]
+            "abilities": [
+              "Drop"
+            ]
           }
         ],
         "parameters": [
@@ -13668,7 +14444,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Drop"]
+            "abilities": [
+              "Drop"
+            ]
           }
         ],
         "parameters": [
@@ -13704,7 +14482,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Drop"]
+            "abilities": [
+              "Drop"
+            ]
           }
         ],
         "parameters": [
@@ -13745,7 +14525,10 @@
     "structs": {
       "LabelerCap": {
         "abilities": {
-          "abilities": ["Store", "Key"]
+          "abilities": [
+            "Store",
+            "Key"
+          ]
         },
         "typeParameters": [
           {
@@ -13776,7 +14559,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Drop"]
+            "abilities": [
+              "Drop"
+            ]
           }
         ],
         "parameters": [
@@ -13843,18 +14628,27 @@
     "structs": {
       "LinkedTable": {
         "abilities": {
-          "abilities": ["Store", "Key"]
+          "abilities": [
+            "Store",
+            "Key"
+          ]
         },
         "typeParameters": [
           {
             "constraints": {
-              "abilities": ["Copy", "Drop", "Store"]
+              "abilities": [
+                "Copy",
+                "Drop",
+                "Store"
+              ]
             },
             "isPhantom": false
           },
           {
             "constraints": {
-              "abilities": ["Store"]
+              "abilities": [
+                "Store"
+              ]
             },
             "isPhantom": true
           }
@@ -13909,18 +14703,26 @@
       },
       "Node": {
         "abilities": {
-          "abilities": ["Store"]
+          "abilities": [
+            "Store"
+          ]
         },
         "typeParameters": [
           {
             "constraints": {
-              "abilities": ["Copy", "Drop", "Store"]
+              "abilities": [
+                "Copy",
+                "Drop",
+                "Store"
+              ]
             },
             "isPhantom": false
           },
           {
             "constraints": {
-              "abilities": ["Store"]
+              "abilities": [
+                "Store"
+              ]
             },
             "isPhantom": false
           }
@@ -13971,10 +14773,16 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -14018,10 +14826,16 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -14059,10 +14873,16 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -14100,10 +14920,16 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -14128,17 +14954,25 @@
             "TypeParameter": 0
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "destroy_empty": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -14165,10 +14999,17 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Drop", "Store"]
+            "abilities": [
+              "Drop",
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -14195,10 +15036,16 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -14242,10 +15089,16 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -14267,17 +15120,25 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "length": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -14299,17 +15160,25 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "new": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -14347,10 +15216,16 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -14397,10 +15272,16 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -14436,10 +15317,16 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -14475,10 +15362,16 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -14525,10 +15418,16 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -14563,10 +15462,16 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -14601,10 +15506,16 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -14666,7 +15577,11 @@
     "structs": {
       "ID": {
         "abilities": {
-          "abilities": ["Copy", "Drop", "Store"]
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -14678,7 +15593,9 @@
       },
       "UID": {
         "abilities": {
-          "abilities": ["Store"]
+          "abilities": [
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -14718,7 +15635,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Key"]
+            "abilities": [
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -14778,7 +15697,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Key"]
+            "abilities": [
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -14804,7 +15725,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Key"]
+            "abilities": [
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -14814,14 +15737,18 @@
             }
           }
         ],
-        "return": ["Address"]
+        "return": [
+          "Address"
+        ]
       },
       "id_bytes": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Key"]
+            "abilities": [
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -14841,7 +15768,9 @@
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["Address"],
+        "parameters": [
+          "Address"
+        ],
         "return": [
           {
             "Struct": {
@@ -14889,7 +15818,9 @@
             }
           }
         ],
-        "return": ["Address"]
+        "return": [
+          "Address"
+        ]
       },
       "id_to_bytes": {
         "visibility": "Public",
@@ -14960,7 +15891,9 @@
         "visibility": "Friend",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["Address"],
+        "parameters": [
+          "Address"
+        ],
         "return": [
           {
             "Struct": {
@@ -15033,7 +15966,9 @@
             }
           }
         ],
-        "return": ["Address"]
+        "return": [
+          "Address"
+        ]
       },
       "uid_to_bytes": {
         "visibility": "Public",
@@ -15094,7 +16029,10 @@
     "structs": {
       "ObjectBag": {
         "abilities": {
-          "abilities": ["Store", "Key"]
+          "abilities": [
+            "Store",
+            "Key"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -15122,10 +16060,17 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -15153,10 +16098,17 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -15187,10 +16139,17 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -15221,7 +16180,11 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -15239,17 +16202,26 @@
             "TypeParameter": 0
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "contains_with_type": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -15267,7 +16239,9 @@
             "TypeParameter": 0
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "destroy_empty": {
         "visibility": "Public",
@@ -15301,7 +16275,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "length": {
         "visibility": "Public",
@@ -15319,7 +16295,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "new": {
         "visibility": "Public",
@@ -15353,10 +16331,17 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -15385,7 +16370,11 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -15433,18 +16422,28 @@
     "structs": {
       "ObjectTable": {
         "abilities": {
-          "abilities": ["Store", "Key"]
+          "abilities": [
+            "Store",
+            "Key"
+          ]
         },
         "typeParameters": [
           {
             "constraints": {
-              "abilities": ["Copy", "Drop", "Store"]
+              "abilities": [
+                "Copy",
+                "Drop",
+                "Store"
+              ]
             },
             "isPhantom": true
           },
           {
             "constraints": {
-              "abilities": ["Store", "Key"]
+              "abilities": [
+                "Store",
+                "Key"
+              ]
             },
             "isPhantom": true
           }
@@ -15474,10 +16473,17 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -15512,10 +16518,17 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -15553,10 +16566,17 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -15594,10 +16614,17 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -15622,17 +16649,26 @@
             "TypeParameter": 0
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "destroy_empty": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -15659,10 +16695,17 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -15684,17 +16727,26 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "length": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -15716,17 +16768,26 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "new": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -15764,10 +16825,17 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -15803,10 +16871,17 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -15861,7 +16936,10 @@
     "structs": {
       "Publisher": {
         "abilities": {
-          "abilities": ["Store", "Key"]
+          "abilities": [
+            "Store",
+            "Key"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -15902,7 +16980,10 @@
       },
       "UpgradeCap": {
         "abilities": {
-          "abilities": ["Store", "Key"]
+          "abilities": [
+            "Store",
+            "Key"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -16015,7 +17096,9 @@
         "isEntry": false,
         "typeParameters": [],
         "parameters": [],
-        "return": ["U8"]
+        "return": [
+          "U8"
+        ]
       },
       "authorize_upgrade": {
         "visibility": "Public",
@@ -16069,7 +17152,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Drop"]
+            "abilities": [
+              "Drop"
+            ]
           }
         ],
         "parameters": [
@@ -16103,7 +17188,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Drop"]
+            "abilities": [
+              "Drop"
+            ]
           }
         ],
         "parameters": [
@@ -16154,14 +17241,18 @@
         "isEntry": false,
         "typeParameters": [],
         "parameters": [],
-        "return": ["U8"]
+        "return": [
+          "U8"
+        ]
       },
       "dep_only_policy": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
         "parameters": [],
-        "return": ["U8"]
+        "return": [
+          "U8"
+        ]
       },
       "from_module": {
         "visibility": "Public",
@@ -16183,7 +17274,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "from_package": {
         "visibility": "Public",
@@ -16205,7 +17298,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "make_immutable": {
         "visibility": "Public",
@@ -16438,7 +17533,9 @@
             }
           }
         ],
-        "return": ["U8"]
+        "return": [
+          "U8"
+        ]
       },
       "upgrade_package": {
         "visibility": "Public",
@@ -16483,7 +17580,9 @@
             }
           }
         ],
-        "return": ["U8"]
+        "return": [
+          "U8"
+        ]
       },
       "version": {
         "visibility": "Public",
@@ -16501,7 +17600,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       }
     }
   },
@@ -16784,7 +17885,9 @@
             }
           }
         ],
-        "return": ["U256"]
+        "return": [
+          "U256"
+        ]
       }
     }
   },
@@ -16796,12 +17899,17 @@
     "structs": {
       "Entry": {
         "abilities": {
-          "abilities": ["Drop", "Store"]
+          "abilities": [
+            "Drop",
+            "Store"
+          ]
         },
         "typeParameters": [
           {
             "constraints": {
-              "abilities": ["Drop"]
+              "abilities": [
+                "Drop"
+              ]
             },
             "isPhantom": false
           }
@@ -16821,12 +17929,17 @@
       },
       "PriorityQueue": {
         "abilities": {
-          "abilities": ["Drop", "Store"]
+          "abilities": [
+            "Drop",
+            "Store"
+          ]
         },
         "typeParameters": [
           {
             "constraints": {
-              "abilities": ["Drop"]
+              "abilities": [
+                "Drop"
+              ]
             },
             "isPhantom": false
           }
@@ -16858,7 +17971,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Drop"]
+            "abilities": [
+              "Drop"
+            ]
           }
         ],
         "parameters": [
@@ -16893,7 +18008,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Drop"]
+            "abilities": [
+              "Drop"
+            ]
           }
         ],
         "parameters": [
@@ -16923,7 +18040,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Drop"]
+            "abilities": [
+              "Drop"
+            ]
           }
         ],
         "parameters": [
@@ -16962,7 +18081,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Drop"]
+            "abilities": [
+              "Drop"
+            ]
           }
         ],
         "parameters": [
@@ -16991,7 +18112,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Drop"]
+            "abilities": [
+              "Drop"
+            ]
           }
         ],
         "parameters": [
@@ -17022,7 +18145,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Drop"]
+            "abilities": [
+              "Drop"
+            ]
           }
         ],
         "parameters": [
@@ -17065,7 +18190,9 @@
     "structs": {
       "Random": {
         "abilities": {
-          "abilities": ["Key"]
+          "abilities": [
+            "Key"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -17095,7 +18222,9 @@
       },
       "RandomGenerator": {
         "abilities": {
-          "abilities": ["Drop"]
+          "abilities": [
+            "Drop"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -17119,7 +18248,9 @@
       },
       "RandomInner": {
         "abilities": {
-          "abilities": ["Store"]
+          "abilities": [
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -17161,7 +18292,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "generate_bytes": {
         "visibility": "Public",
@@ -17202,7 +18335,9 @@
             }
           }
         ],
-        "return": ["U128"]
+        "return": [
+          "U128"
+        ]
       },
       "generate_u128_in_range": {
         "visibility": "Public",
@@ -17222,7 +18357,9 @@
           "U128",
           "U128"
         ],
-        "return": ["U128"]
+        "return": [
+          "U128"
+        ]
       },
       "generate_u16": {
         "visibility": "Public",
@@ -17240,7 +18377,9 @@
             }
           }
         ],
-        "return": ["U16"]
+        "return": [
+          "U16"
+        ]
       },
       "generate_u16_in_range": {
         "visibility": "Public",
@@ -17260,7 +18399,9 @@
           "U16",
           "U16"
         ],
-        "return": ["U16"]
+        "return": [
+          "U16"
+        ]
       },
       "generate_u256": {
         "visibility": "Public",
@@ -17278,7 +18419,9 @@
             }
           }
         ],
-        "return": ["U256"]
+        "return": [
+          "U256"
+        ]
       },
       "generate_u32": {
         "visibility": "Public",
@@ -17296,7 +18439,9 @@
             }
           }
         ],
-        "return": ["U32"]
+        "return": [
+          "U32"
+        ]
       },
       "generate_u32_in_range": {
         "visibility": "Public",
@@ -17316,7 +18461,9 @@
           "U32",
           "U32"
         ],
-        "return": ["U32"]
+        "return": [
+          "U32"
+        ]
       },
       "generate_u64": {
         "visibility": "Public",
@@ -17334,7 +18481,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "generate_u64_in_range": {
         "visibility": "Public",
@@ -17354,7 +18503,9 @@
           "U64",
           "U64"
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "generate_u8": {
         "visibility": "Public",
@@ -17372,7 +18523,9 @@
             }
           }
         ],
-        "return": ["U8"]
+        "return": [
+          "U8"
+        ]
       },
       "generate_u8_in_range": {
         "visibility": "Public",
@@ -17392,7 +18545,9 @@
           "U8",
           "U8"
         ],
-        "return": ["U8"]
+        "return": [
+          "U8"
+        ]
       },
       "new_generator": {
         "visibility": "Public",
@@ -17470,7 +18625,9 @@
     "structs": {
       "IotaSystemAdminCap": {
         "abilities": {
-          "abilities": ["Store"]
+          "abilities": [
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -17491,18 +18648,27 @@
     "structs": {
       "Table": {
         "abilities": {
-          "abilities": ["Store", "Key"]
+          "abilities": [
+            "Store",
+            "Key"
+          ]
         },
         "typeParameters": [
           {
             "constraints": {
-              "abilities": ["Copy", "Drop", "Store"]
+              "abilities": [
+                "Copy",
+                "Drop",
+                "Store"
+              ]
             },
             "isPhantom": true
           },
           {
             "constraints": {
-              "abilities": ["Store"]
+              "abilities": [
+                "Store"
+              ]
             },
             "isPhantom": true
           }
@@ -17532,10 +18698,16 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -17570,10 +18742,16 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -17611,10 +18789,16 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -17652,10 +18836,16 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -17680,17 +18870,25 @@
             "TypeParameter": 0
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "destroy_empty": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -17717,10 +18915,17 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Drop", "Store"]
+            "abilities": [
+              "Drop",
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -17747,10 +18952,16 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -17772,17 +18983,25 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "length": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -17804,17 +19023,25 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "new": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -17852,10 +19079,16 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop", "Store"]
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
           },
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -17896,12 +19129,16 @@
     "structs": {
       "TableVec": {
         "abilities": {
-          "abilities": ["Store"]
+          "abilities": [
+            "Store"
+          ]
         },
         "typeParameters": [
           {
             "constraints": {
-              "abilities": ["Store"]
+              "abilities": [
+                "Store"
+              ]
             },
             "isPhantom": true
           }
@@ -17932,7 +19169,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -17965,7 +19204,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -17998,7 +19239,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -18022,7 +19265,10 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Drop", "Store"]
+            "abilities": [
+              "Drop",
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -18046,7 +19292,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -18081,7 +19329,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -18100,14 +19350,18 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "length": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -18126,14 +19380,18 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "pop_back": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -18163,7 +19421,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -18192,7 +19452,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -18230,7 +19492,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -18258,7 +19522,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -18294,12 +19560,16 @@
     "structs": {
       "TimeLock": {
         "abilities": {
-          "abilities": ["Key"]
+          "abilities": [
+            "Key"
+          ]
         },
         "typeParameters": [
           {
             "constraints": {
-              "abilities": ["Store"]
+              "abilities": [
+                "Store"
+              ]
             },
             "isPhantom": false
           }
@@ -18355,7 +19625,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -18374,14 +19646,18 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "is_labeled_with": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           },
           {
             "abilities": []
@@ -18403,14 +19679,18 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "is_locked": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -18439,14 +19719,18 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "is_locked_with_clock": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -18475,7 +19759,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "join": {
         "visibility": "Public",
@@ -18596,7 +19882,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -18640,7 +19928,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -18679,7 +19969,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -18706,7 +19998,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           },
           {
             "abilities": []
@@ -18762,7 +20056,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           },
           {
             "abilities": []
@@ -18806,7 +20102,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -18838,7 +20136,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -18867,14 +20167,18 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "remaining_time_with_clock": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -18903,7 +20207,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "split": {
         "visibility": "Public",
@@ -19024,7 +20330,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -19090,7 +20398,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -19146,7 +20456,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -19200,7 +20512,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -19238,7 +20552,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -19318,7 +20634,9 @@
                 "address": "0x1",
                 "module": "option",
                 "name": "Option",
-                "typeArguments": ["Address"]
+                "typeArguments": [
+                  "Address"
+                ]
               }
             }
           },
@@ -19370,7 +20688,11 @@
       },
       "RuleKey": {
         "abilities": {
-          "abilities": ["Copy", "Drop", "Store"]
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
         },
         "typeParameters": [
           {
@@ -19389,7 +20711,9 @@
       },
       "Token": {
         "abilities": {
-          "abilities": ["Key"]
+          "abilities": [
+            "Key"
+          ]
         },
         "typeParameters": [
           {
@@ -19430,7 +20754,9 @@
       },
       "TokenPolicy": {
         "abilities": {
-          "abilities": ["Key"]
+          "abilities": [
+            "Key"
+          ]
         },
         "typeParameters": [
           {
@@ -19508,7 +20834,10 @@
       },
       "TokenPolicyCap": {
         "abilities": {
-          "abilities": ["Store", "Key"]
+          "abilities": [
+            "Store",
+            "Key"
+          ]
         },
         "typeParameters": [
           {
@@ -19545,7 +20874,10 @@
       },
       "TokenPolicyCreated": {
         "abilities": {
-          "abilities": ["Copy", "Drop"]
+          "abilities": [
+            "Copy",
+            "Drop"
+          ]
         },
         "typeParameters": [
           {
@@ -19618,7 +20950,9 @@
             "abilities": []
           },
           {
-            "abilities": ["Drop"]
+            "abilities": [
+              "Drop"
+            ]
           }
         ],
         "parameters": [
@@ -19660,10 +20994,14 @@
             "abilities": []
           },
           {
-            "abilities": ["Drop"]
+            "abilities": [
+              "Drop"
+            ]
           },
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -19722,7 +21060,9 @@
             "abilities": []
           },
           {
-            "abilities": ["Drop"]
+            "abilities": [
+              "Drop"
+            ]
           }
         ],
         "parameters": [
@@ -19857,7 +21197,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "approvals": {
         "visibility": "Public",
@@ -20003,7 +21345,9 @@
               "address": "0x1",
               "module": "option",
               "name": "Option",
-              "typeArguments": ["Address"]
+              "typeArguments": [
+                "Address"
+              ]
             }
           }
         ]
@@ -20070,7 +21414,9 @@
               "address": "0x1",
               "module": "option",
               "name": "Option",
-              "typeArguments": ["Address"]
+              "typeArguments": [
+                "Address"
+              ]
             }
           }
         ]
@@ -20137,7 +21483,9 @@
               "address": "0x1",
               "module": "option",
               "name": "Option",
-              "typeArguments": ["Address"]
+              "typeArguments": [
+                "Address"
+              ]
             }
           }
         ]
@@ -20204,7 +21552,9 @@
               "address": "0x1",
               "module": "option",
               "name": "Option",
-              "typeArguments": ["Address"]
+              "typeArguments": [
+                "Address"
+              ]
             }
           }
         ]
@@ -20339,7 +21689,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "from_coin": {
         "visibility": "Public",
@@ -20443,7 +21795,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "has_rule_config_with_type": {
         "visibility": "Public",
@@ -20456,7 +21810,9 @@
             "abilities": []
           },
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -20475,7 +21831,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "is_allowed": {
         "visibility": "Public",
@@ -20511,7 +21869,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "join": {
         "visibility": "Public",
@@ -20719,7 +22079,9 @@
               "address": "0x1",
               "module": "option",
               "name": "Option",
-              "typeArguments": ["Address"]
+              "typeArguments": [
+                "Address"
+              ]
             }
           },
           {
@@ -20799,7 +22161,9 @@
               "address": "0x1",
               "module": "option",
               "name": "Option",
-              "typeArguments": ["Address"]
+              "typeArguments": [
+                "Address"
+              ]
             }
           }
         ]
@@ -20815,7 +22179,9 @@
             "abilities": []
           },
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -20872,7 +22238,9 @@
             "abilities": []
           },
           {
-            "abilities": ["Drop"]
+            "abilities": [
+              "Drop"
+            ]
           }
         ],
         "parameters": [
@@ -20933,10 +22301,14 @@
             "abilities": []
           },
           {
-            "abilities": ["Drop"]
+            "abilities": [
+              "Drop"
+            ]
           },
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -20974,10 +22346,14 @@
             "abilities": []
           },
           {
-            "abilities": ["Drop"]
+            "abilities": [
+              "Drop"
+            ]
           },
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -21099,7 +22475,9 @@
             }
           }
         ],
-        "return": ["Address"]
+        "return": [
+          "Address"
+        ]
       },
       "share_policy": {
         "visibility": "Public",
@@ -21218,7 +22596,9 @@
               "address": "0x1",
               "module": "option",
               "name": "Option",
-              "typeArguments": ["U64"]
+              "typeArguments": [
+                "U64"
+              ]
             }
           }
         ]
@@ -21247,7 +22627,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "split": {
         "visibility": "Public",
@@ -21462,7 +22844,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "zero": {
         "visibility": "Public",
@@ -21509,12 +22893,16 @@
     "structs": {
       "Receiving": {
         "abilities": {
-          "abilities": ["Drop"]
+          "abilities": [
+            "Drop"
+          ]
         },
         "typeParameters": [
           {
             "constraints": {
-              "abilities": ["Key"]
+              "abilities": [
+                "Key"
+              ]
             },
             "isPhantom": true
           }
@@ -21544,7 +22932,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Key"]
+            "abilities": [
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -21559,7 +22949,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Key"]
+            "abilities": [
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -21574,7 +22966,10 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -21589,7 +22984,10 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -21627,7 +23025,10 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -21642,7 +23043,10 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store", "Key"]
+            "abilities": [
+              "Store",
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -21658,7 +23062,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Key"]
+            "abilities": [
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -21696,7 +23102,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Key"]
+            "abilities": [
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -21731,7 +23139,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Key"]
+            "abilities": [
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -21746,7 +23156,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Key"]
+            "abilities": [
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -21761,7 +23173,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Key"]
+            "abilities": [
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -21777,7 +23191,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Key"]
+            "abilities": [
+              "Key"
+            ]
           }
         ],
         "parameters": [
@@ -21798,12 +23214,18 @@
     "structs": {
       "RuleKey": {
         "abilities": {
-          "abilities": ["Copy", "Drop", "Store"]
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
         },
         "typeParameters": [
           {
             "constraints": {
-              "abilities": ["Drop"]
+              "abilities": [
+                "Drop"
+              ]
             },
             "isPhantom": true
           }
@@ -21817,7 +23239,10 @@
       },
       "TransferPolicy": {
         "abilities": {
-          "abilities": ["Store", "Key"]
+          "abilities": [
+            "Store",
+            "Key"
+          ]
         },
         "typeParameters": [
           {
@@ -21883,7 +23308,10 @@
       },
       "TransferPolicyCap": {
         "abilities": {
-          "abilities": ["Store", "Key"]
+          "abilities": [
+            "Store",
+            "Key"
+          ]
         },
         "typeParameters": [
           {
@@ -21920,7 +23348,10 @@
       },
       "TransferPolicyCreated": {
         "abilities": {
-          "abilities": ["Copy", "Drop"]
+          "abilities": [
+            "Copy",
+            "Drop"
+          ]
         },
         "typeParameters": [
           {
@@ -21946,7 +23377,10 @@
       },
       "TransferPolicyDestroyed": {
         "abilities": {
-          "abilities": ["Copy", "Drop"]
+          "abilities": [
+            "Copy",
+            "Drop"
+          ]
         },
         "typeParameters": [
           {
@@ -22041,7 +23475,9 @@
             "abilities": []
           },
           {
-            "abilities": ["Drop"]
+            "abilities": [
+              "Drop"
+            ]
           }
         ],
         "parameters": [
@@ -22073,10 +23509,15 @@
             "abilities": []
           },
           {
-            "abilities": ["Drop"]
+            "abilities": [
+              "Drop"
+            ]
           },
           {
-            "abilities": ["Drop", "Store"]
+            "abilities": [
+              "Drop",
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -22125,7 +23566,9 @@
             "abilities": []
           },
           {
-            "abilities": ["Drop"]
+            "abilities": [
+              "Drop"
+            ]
           }
         ],
         "parameters": [
@@ -22361,10 +23804,15 @@
             "abilities": []
           },
           {
-            "abilities": ["Drop"]
+            "abilities": [
+              "Drop"
+            ]
           },
           {
-            "abilities": ["Drop", "Store"]
+            "abilities": [
+              "Drop",
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -22402,7 +23850,9 @@
             "abilities": []
           },
           {
-            "abilities": ["Drop"]
+            "abilities": [
+              "Drop"
+            ]
           }
         ],
         "parameters": [
@@ -22421,7 +23871,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "item": {
         "visibility": "Public",
@@ -22581,7 +24033,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "remove_rule": {
         "visibility": "Public",
@@ -22591,10 +24045,15 @@
             "abilities": []
           },
           {
-            "abilities": ["Drop"]
+            "abilities": [
+              "Drop"
+            ]
           },
           {
-            "abilities": ["Drop", "Store"]
+            "abilities": [
+              "Drop",
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -22805,7 +24264,9 @@
               "address": "0x1",
               "module": "option",
               "name": "Option",
-              "typeArguments": ["U64"]
+              "typeArguments": [
+                "U64"
+              ]
             }
           },
           {
@@ -22849,7 +24310,9 @@
     "structs": {
       "TxContext": {
         "abilities": {
-          "abilities": ["Drop"]
+          "abilities": [
+            "Drop"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -22919,7 +24382,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "epoch_timestamp_ms": {
         "visibility": "Public",
@@ -22937,7 +24402,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "fresh_object_address": {
         "visibility": "Public",
@@ -22955,7 +24422,9 @@
             }
           }
         ],
-        "return": ["Address"]
+        "return": [
+          "Address"
+        ]
       },
       "sender": {
         "visibility": "Public",
@@ -22973,7 +24442,9 @@
             }
           }
         ],
-        "return": ["Address"]
+        "return": [
+          "Address"
+        ]
       }
     }
   },
@@ -22989,7 +24460,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Drop"]
+            "abilities": [
+              "Drop"
+            ]
           }
         ],
         "parameters": [
@@ -22999,7 +24472,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       }
     }
   },
@@ -23011,7 +24486,11 @@
     "structs": {
       "Url": {
         "abilities": {
-          "abilities": ["Copy", "Drop", "Store"]
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -23176,7 +24655,9 @@
           },
           "U64"
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       }
     }
   },
@@ -23188,12 +24669,18 @@
     "structs": {
       "Entry": {
         "abilities": {
-          "abilities": ["Copy", "Drop", "Store"]
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
         },
         "typeParameters": [
           {
             "constraints": {
-              "abilities": ["Copy"]
+              "abilities": [
+                "Copy"
+              ]
             },
             "isPhantom": false
           },
@@ -23221,12 +24708,18 @@
       },
       "VecMap": {
         "abilities": {
-          "abilities": ["Copy", "Drop", "Store"]
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
         },
         "typeParameters": [
           {
             "constraints": {
-              "abilities": ["Copy"]
+              "abilities": [
+                "Copy"
+              ]
             },
             "isPhantom": false
           },
@@ -23267,7 +24760,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy"]
+            "abilities": [
+              "Copy"
+            ]
           },
           {
             "abilities": []
@@ -23297,14 +24792,18 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "destroy_empty": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy"]
+            "abilities": [
+              "Copy"
+            ]
           },
           {
             "abilities": []
@@ -23334,7 +24833,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy"]
+            "abilities": [
+              "Copy"
+            ]
           },
           {
             "abilities": []
@@ -23364,7 +24865,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy"]
+            "abilities": [
+              "Copy"
+            ]
           },
           {
             "abilities": []
@@ -23405,7 +24908,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy"]
+            "abilities": [
+              "Copy"
+            ]
           },
           {
             "abilities": []
@@ -23448,7 +24953,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy"]
+            "abilities": [
+              "Copy"
+            ]
           },
           {
             "abilities": []
@@ -23492,7 +24999,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy"]
+            "abilities": [
+              "Copy"
+            ]
           },
           {
             "abilities": []
@@ -23536,7 +25045,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy"]
+            "abilities": [
+              "Copy"
+            ]
           },
           {
             "abilities": []
@@ -23566,14 +25077,18 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "get_idx_opt": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy"]
+            "abilities": [
+              "Copy"
+            ]
           },
           {
             "abilities": []
@@ -23609,7 +25124,9 @@
               "address": "0x1",
               "module": "option",
               "name": "Option",
-              "typeArguments": ["U64"]
+              "typeArguments": [
+                "U64"
+              ]
             }
           }
         ]
@@ -23619,7 +25136,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy"]
+            "abilities": [
+              "Copy"
+            ]
           },
           {
             "abilities": []
@@ -23662,7 +25181,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy"]
+            "abilities": [
+              "Copy"
+            ]
           },
           {
             "abilities": []
@@ -23700,7 +25221,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy"]
+            "abilities": [
+              "Copy"
+            ]
           },
           {
             "abilities": []
@@ -23741,7 +25264,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy"]
+            "abilities": [
+              "Copy"
+            ]
           },
           {
             "abilities": []
@@ -23766,14 +25291,18 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "keys": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy"]
+            "abilities": [
+              "Copy"
+            ]
           },
           {
             "abilities": []
@@ -23811,7 +25340,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy"]
+            "abilities": [
+              "Copy"
+            ]
           },
           {
             "abilities": []
@@ -23850,7 +25381,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy"]
+            "abilities": [
+              "Copy"
+            ]
           },
           {
             "abilities": []
@@ -23894,7 +25427,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy"]
+            "abilities": [
+              "Copy"
+            ]
           },
           {
             "abilities": []
@@ -23934,7 +25469,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy"]
+            "abilities": [
+              "Copy"
+            ]
           },
           {
             "abilities": []
@@ -23959,17 +25496,23 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "try_get": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy"]
+            "abilities": [
+              "Copy"
+            ]
           },
           {
-            "abilities": ["Copy"]
+            "abilities": [
+              "Copy"
+            ]
           }
         ],
         "parameters": [
@@ -24021,12 +25564,19 @@
     "structs": {
       "VecSet": {
         "abilities": {
-          "abilities": ["Copy", "Drop", "Store"]
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
         },
         "typeParameters": [
           {
             "constraints": {
-              "abilities": ["Copy", "Drop"]
+              "abilities": [
+                "Copy",
+                "Drop"
+              ]
             },
             "isPhantom": false
           }
@@ -24049,7 +25599,10 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop"]
+            "abilities": [
+              "Copy",
+              "Drop"
+            ]
           }
         ],
         "parameters": [
@@ -24073,14 +25626,19 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "empty": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop"]
+            "abilities": [
+              "Copy",
+              "Drop"
+            ]
           }
         ],
         "parameters": [],
@@ -24104,7 +25662,10 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop"]
+            "abilities": [
+              "Copy",
+              "Drop"
+            ]
           }
         ],
         "parameters": [
@@ -24134,7 +25695,10 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop"]
+            "abilities": [
+              "Copy",
+              "Drop"
+            ]
           }
         ],
         "parameters": [
@@ -24163,7 +25727,10 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop"]
+            "abilities": [
+              "Copy",
+              "Drop"
+            ]
           }
         ],
         "parameters": [
@@ -24193,7 +25760,10 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop"]
+            "abilities": [
+              "Copy",
+              "Drop"
+            ]
           }
         ],
         "parameters": [
@@ -24212,14 +25782,19 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "keys": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop"]
+            "abilities": [
+              "Copy",
+              "Drop"
+            ]
           }
         ],
         "parameters": [
@@ -24253,7 +25828,10 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop"]
+            "abilities": [
+              "Copy",
+              "Drop"
+            ]
           }
         ],
         "parameters": [
@@ -24284,7 +25862,10 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop"]
+            "abilities": [
+              "Copy",
+              "Drop"
+            ]
           }
         ],
         "parameters": [
@@ -24312,7 +25893,10 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop"]
+            "abilities": [
+              "Copy",
+              "Drop"
+            ]
           }
         ],
         "parameters": [
@@ -24331,7 +25915,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       }
     }
   },
@@ -24366,7 +25952,10 @@
       },
       "Versioned": {
         "abilities": {
-          "abilities": ["Store", "Key"]
+          "abilities": [
+            "Store",
+            "Key"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -24394,7 +25983,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -24429,7 +26020,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -24453,7 +26046,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -24481,7 +26076,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -24509,7 +26106,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -24543,7 +26142,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Store"]
+            "abilities": [
+              "Store"
+            ]
           }
         ],
         "parameters": [
@@ -24588,7 +26189,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       }
     }
   },
@@ -24600,7 +26203,9 @@
     "structs": {
       "VerifiedID": {
         "abilities": {
-          "abilities": ["Key"]
+          "abilities": [
+            "Key"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -24744,7 +26349,9 @@
           },
           "U256"
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "delete": {
         "visibility": "Public",
@@ -24865,7 +26472,9 @@
             }
           }
         ],
-        "return": ["Address"]
+        "return": [
+          "Address"
+        ]
       },
       "verify_zklogin_id": {
         "visibility": "Public",
@@ -24928,7 +26537,9 @@
     "structs": {
       "VerifiedIssuer": {
         "abilities": {
-          "abilities": ["Key"]
+          "abilities": [
+            "Key"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -24980,7 +26591,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "delete": {
         "visibility": "Public",
@@ -25043,7 +26656,9 @@
             }
           }
         ],
-        "return": ["Address"]
+        "return": [
+          "Address"
+        ]
       },
       "verify_zklogin_issuer": {
         "visibility": "Public",
