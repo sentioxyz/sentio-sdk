@@ -1,5 +1,5 @@
 {
   "package.json": ["prettier-package-json --write"],
-  "!(package).json": ["prettier --write"],
+  "!(package|**/abis/*).json": ["prettier --write"],
   "*.ts|*.tsx|*.js|*.jsx|*.yml|*.yaml": ["prettier --write"]
 }
