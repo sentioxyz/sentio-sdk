@@ -134,21 +134,15 @@ class InitiaAptosNetworkCodegen extends AptosNetworkCodegen {
   }
 }
 
-const MAINNET_CODEGEN = new AptosNetworkCodegen(AptosNetwork.MAIN_NET)
-const TESTNET_CODEGEN = new AptosNetworkCodegen(AptosNetwork.TEST_NET)
-const MOVEMENT_MAINNET_CODEGEN = new AptosNetworkCodegen(AptosNetwork.MOVEMENT_MAIN_NET)
-const MOVEMENT_TESTNET_CODEGEN = new AptosNetworkCodegen(AptosNetwork.MOVEMENT_TEST_NET)
-const ECHELON_CODEGEN = new InitiaAptosNetworkCodegen(AptosNetwork.INITIA_ECHELON)
-
 class AptosCodegen {
   async generate(srcDir: string, outputDir: string, builtin = false): Promise<number> {
     let numFiles = 0
     const generators: [string, AptosNetworkCodegen][] = [
-      ['', MAINNET_CODEGEN],
-      ['testnet', TESTNET_CODEGEN],
-      ['movement-mainnet', MOVEMENT_MAINNET_CODEGEN],
-      ['movement-testnet', MOVEMENT_TESTNET_CODEGEN],
-      ['initia-echelon', ECHELON_CODEGEN]
+      ['', new AptosNetworkCodegen(AptosNetwork.MAIN_NET)],
+      ['testnet', new AptosNetworkCodegen(AptosNetwork.TEST_NET)],
+      ['movement-mainnet', new AptosNetworkCodegen(AptosNetwork.MOVEMENT_MAIN_NET)],
+      ['movement-testnet', new AptosNetworkCodegen(AptosNetwork.MOVEMENT_TEST_NET)],
+      ['initia-echelon', new InitiaAptosNetworkCodegen(AptosNetwork.INITIA_ECHELON)]
     ]
 
     for (const [network, gen] of generators) {

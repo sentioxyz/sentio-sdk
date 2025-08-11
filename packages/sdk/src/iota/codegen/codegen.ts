@@ -92,16 +92,13 @@ class IotaNetworkCodegen extends BaseIotaCodegen {
     return this.moduleGenerator.generateLoadAll(isSystem)
   }
 }
-//
-const MAINNET_CODEGEN = new IotaNetworkCodegen(IotaNetwork.MAIN_NET)
-const TESTNET_CODEGEN = new IotaNetworkCodegen(IotaNetwork.TEST_NET)
 
 class IotaCodegen {
   async generate(srcDir: string, outputDir: string, builtin = false): Promise<number> {
     let numFiles = 0
     const generators: [string, IotaNetworkCodegen][] = [
-      ['', MAINNET_CODEGEN],
-      ['testnet', TESTNET_CODEGEN]
+      ['', new IotaNetworkCodegen(IotaNetwork.MAIN_NET)],
+      ['testnet', new IotaNetworkCodegen(IotaNetwork.TEST_NET)]
     ]
 
     for (const [network, gen] of generators) {

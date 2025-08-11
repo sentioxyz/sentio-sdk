@@ -146,7 +146,7 @@ async function runGraphDeployInternal(options: any, extraArgs: string[] = []) {
     cwd: options.dir
   }
   if (!options.skipGen) {
-    await execStep(['node', graph, 'codegen'], 'Graph codegen', execOptions)
+    await execStep(['node', graph, 'codegen'], 'Graph codegen', execOptions, '(can be skipped with --skip-deps)')
   }
   await execStep(
     [

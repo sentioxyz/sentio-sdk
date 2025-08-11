@@ -33,7 +33,10 @@ export async function buildProcessor(onlyGen: boolean, options: any) {
   }
 
   if (!options.skipGen) {
+    console.log(chalk.blue('Codegen Begin (can be skipped with --skip-gen)'))
     await codegen(options.example || false)
+    console.log(chalk.blue('Codegen finished'))
+    console.log()
   }
 
   if (!onlyGen) {
@@ -106,7 +109,7 @@ export async function codegen(genExample: boolean) {
           await codegen.codegen(input, output, genExample)
         }
       } catch (e) {
-        console.error('code gen error', e)
+        console.error('processor codegen error', e)
       }
     } catch (e) {
       // ignore
@@ -122,7 +125,7 @@ export async function codegen(genExample: boolean) {
     fs.emptyDirSync(output)
     await codegen.codegen(src, output)
   } catch (e) {
-    console.error('database schema gen failed', e)
+    console.error('schema codegen error', e)
   }
 }
 
