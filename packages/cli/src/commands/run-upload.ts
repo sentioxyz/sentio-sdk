@@ -29,7 +29,7 @@ export function createUploadCommand() {
       '-y --silent-overwrite',
       '(Optional) Overwrite exiting processor version without confirmation, default false'
     )
-    .option('--nobuild', '(Optional) Skip build & pack file before uploading, default false')
+    .option('--skip-build', 'Skip build & pack file before uploading, default false')
     .option('--skip-gen', 'Skip code generation.')
     .option('--skip-deps', 'Skip dependency enforce.')
     .option('--example', 'Generate example usage of the processor.')
@@ -43,7 +43,7 @@ export function createUploadCommand() {
 }
 
 async function runUploadInternal(processorConfig: YamlProjectConfig, options: any, extraArgs: string[]) {
-  if (options.nobuild) {
+  if (options.skipBuild) {
     processorConfig.build = false
   }
   if (options.debug) {
@@ -193,7 +193,7 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth, continu
   const PROCESSOR_FILE = path.join(process.cwd(), 'dist/lib.js')
 
   if (!fs.existsSync(PROCESSOR_FILE)) {
-    console.error(chalk.red('File not existed ', PROCESSOR_FILE, "don't use --nobuild"))
+    console.error(chalk.red('File not existed ', PROCESSOR_FILE, "don't use --skip-build"))
     process.exit(1)
   }
 
