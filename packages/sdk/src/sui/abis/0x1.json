@@ -3752,6 +3752,30 @@
           }
         ]
       },
+      "skip": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Drop"]
+          }
+        ],
+        "parameters": [
+          {
+            "Vector": {
+              "TypeParameter": 0
+            }
+          },
+          "U64"
+        ],
+        "return": [
+          {
+            "Vector": {
+              "TypeParameter": 0
+            }
+          }
+        ]
+      },
       "swap": {
         "visibility": "Public",
         "isEntry": false,
@@ -3794,6 +3818,30 @@
         "return": [
           {
             "TypeParameter": 0
+          }
+        ]
+      },
+      "take": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Drop"]
+          }
+        ],
+        "parameters": [
+          {
+            "Vector": {
+              "TypeParameter": 0
+            }
+          },
+          "U64"
+        ],
+        "return": [
+          {
+            "Vector": {
+              "TypeParameter": 0
+            }
           }
         ]
       }
