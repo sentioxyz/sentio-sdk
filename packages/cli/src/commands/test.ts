@@ -5,15 +5,16 @@ import { getPackageRoot } from '../utils.js'
 
 export function createTestCommand() {
   return new Command('test')
-    .description('Test the processor')
-    .option('--test-only', "run tests with 'only' option set")
-    .option('--test-name-pattern <pattern>', 'run tests whose name matches this regular expression')
-    .option('--test-skip-pattern <pattern>', 'run tests whose name do not match this regular expression')
+    .description(
+      `Test the processor, options are same as node test runner at https://nodejs.org/api/test.html#running-tests-from-the-command-line
+
+  --test-only\t\t\trun tests with 'only' option set
+  --test-name-pattern=...\trun tests whose name matches this regular expression
+  --test-skip-pattern=...\trun tests whose name do not match this regular expression`
+    )
     .allowUnknownOption()
     .allowExcessArguments()
     .action((options, command) => {
-      console.log(options)
-      console.log(command.args)
       runTestInternal(command.args)
     })
 }

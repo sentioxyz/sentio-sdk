@@ -16,11 +16,11 @@ export function createLoginCommand() {
     .option('--host <host>', '(Optional) Override Sentio Host name')
     .option('--api-key <key>', '(Optional) Your API key')
     .action((options) => {
-      runLogin(options)
+      login(options)
     })
 }
 
-function runLogin(options: any) {
+function login(options: any) {
   const host = getFinalizedHost(options.host)
 
   if (options.apiKey) {

@@ -26,7 +26,6 @@ export interface YamlNetworkOverride {
 export interface YamlProjectConfig {
   project: string
   host: string
-  build: boolean
   contracts?: YamlContractConfig[]
   networkOverrides?: YamlNetworkOverride[]
   debug: boolean
@@ -88,9 +87,6 @@ export function overrideConfigWithOptions(config: YamlProjectConfig, options: an
   finalizeProjectName(config, options.owner, options.name)
   finalizeHost(config, options.host)
 
-  if (options.skipBuild) {
-    config.build = false
-  }
   if (options.debug) {
     config.debug = true
   }
@@ -139,9 +135,5 @@ export function loadProcessorConfig(): YamlProjectConfig {
     console.error('sentio.yaml loading error, CLI is not running under Sentio project')
     process.exit(1)
   }
-  const config = yaml.parse(yamlContent) as YamlProjectConfig
-  if (!config.build) {
-    config.build = true
-  }
-  return config
+  return yaml.parse(yamlContent) as YamlProjectConfig
 }

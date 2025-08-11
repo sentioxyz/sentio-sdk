@@ -49,7 +49,7 @@ export async function printVersions() {
     fs.readFileSync(path.join(getPackageRoot('@sentio/cli'), 'package.json'), 'utf8')
   ).version
   if (cliVersion.endsWith('-development')) {
-    console.log('Using development versions\n.')
+    console.log('Using development versions\n')
     return
   }
   try {

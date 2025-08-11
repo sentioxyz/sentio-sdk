@@ -24,12 +24,9 @@ export function createUploadCommand() {
       '(Optional) Continue processing data from the specific processor version which will keeping the old data from previous version and will STOP that version IMMEDIATELY.',
       parseInt
     )
-    .option('--debug', '(Optional) Run driver in debug mode, default false')
-    .option(
-      '-y --silent-overwrite',
-      '(Optional) Overwrite exiting processor version without confirmation, default false'
-    )
-    .option('--skip-build', 'Skip build & pack file before uploading, default false')
+    .option('--debug', '(Optional) Run driver in debug mode')
+    .option('-y --silent-overwrite', '(Optional) Create project or upload new version without confirmation')
+    .option('--skip-build', 'Skip build & pack file before uploading')
     .option('--skip-gen', 'Skip code generation.')
     .option('--skip-deps', 'Skip dependency enforce.')
     .option('--example', 'Generate example usage of the processor.')
@@ -63,7 +60,7 @@ async function runUploadInternal(processorConfig: YamlProjectConfig, options: an
     process.exit(1)
   }
 
-  if (processorConfig.build) {
+  if (!options.skipBuild) {
     await buildProcessor(false, options)
   }
 
