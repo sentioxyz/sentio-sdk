@@ -92,16 +92,13 @@ class SuiNetworkCodegen extends BaseSuiCodegen {
     return this.moduleGenerator.generateLoadAll(isSystem)
   }
 }
-//
-const MAINNET_CODEGEN = new SuiNetworkCodegen(SuiNetwork.MAIN_NET)
-const TESTNET_CODEGEN = new SuiNetworkCodegen(SuiNetwork.TEST_NET)
 
 class SuiCodegen {
   async generate(srcDir: string, outputDir: string, builtin = false): Promise<number> {
     let numFiles = 0
     const generators: [string, SuiNetworkCodegen][] = [
-      ['', MAINNET_CODEGEN],
-      ['testnet', TESTNET_CODEGEN]
+      ['', new SuiNetworkCodegen(SuiNetwork.MAIN_NET)],
+      ['testnet', new SuiNetworkCodegen(SuiNetwork.TEST_NET)]
     ]
 
     for (const [network, gen] of generators) {
