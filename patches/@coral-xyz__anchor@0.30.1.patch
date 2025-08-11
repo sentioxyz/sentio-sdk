@@ -1,5 +1,5 @@
 diff --git a/dist/esm/index.js b/dist/esm/index.js
-index be1a18d642ea047746c66823ae48279fe408c203..130fb7de6179c05ac44d517e2478968cbe31d7f5 100644
+index be1a18d642ea047746c66823ae48279fe408c203..b30fa8f910957e80c7c970e62631cefbfdd50b1c 100644
 --- a/dist/esm/index.js
 +++ b/dist/esm/index.js
 @@ -8,8 +8,6 @@ export * from "./coder/index.js";
