@@ -84,11 +84,26 @@ export function getAuthConfig(host: string): {
   return { domain, clientId, audience, redirectUri }
 }
 
-export function finalizeHost(config: YamlProjectConfig, host?: string) {
+export function overrideConfigWithOptions(config: YamlProjectConfig, options: any) {
+  finalizeProjectName(config, options.owner, options.name)
+  finalizeHost(config, options.host)
+
+  if (options.skipBuild) {
+    config.build = false
+  }
+  if (options.debug) {
+    config.debug = true
+  }
+  if (options.silentOverwrite) {
+    config.silentOverwrite = true
+  }
+}
+
+function finalizeHost(config: YamlProjectConfig, host?: string) {
   config.host = getFinalizedHost(host || config.host)
 }
 
-export function FinalizeProjectName(config: YamlProjectConfig, owner: string | undefined, slug: string | undefined) {
+function finalizeProjectName(config: YamlProjectConfig, owner: string | undefined, slug: string | undefined) {
   if (owner || slug) {
     let name = config.project
     if (name.includes('/')) {
@@ -124,5 +139,9 @@ export function loadProcessorConfig(): YamlProjectConfig {
     console.error('sentio.yaml loading error, CLI is not running under Sentio project')
     process.exit(1)
   }
-  return yaml.parse(yamlContent) as YamlProjectConfig
+  const config = yaml.parse(yamlContent) as YamlProjectConfig
+  if (!config.build) {
+    config.build = true
+  }
+  return config
 }

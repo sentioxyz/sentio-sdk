@@ -1,6 +1,6 @@
 import { Command } from 'commander'
 import path from 'path'
-import { finalizeHost, FinalizeProjectName, YamlProjectConfig } from '../config.js'
+import { overrideConfigWithOptions, YamlProjectConfig } from '../config.js'
 import { getSdkVersion, getPackageRoot } from '../utils.js'
 import { execStep, execPackageManager } from '../execution.js'
 import { ReadKey } from '../key.js'
@@ -46,8 +46,9 @@ export function createGraphCommand() {
     .option('--dir <dir>', '(Optional) The location of subgraph project, default to the current directory')
     .option('--skip-gen', '(Optional) Skip code generation.')
     .allowUnknownOption()
-    .action(async (options) => {
-      await runGraphDeployInternal(options, [])
+    .allowExcessArguments()
+    .action(async (options, cmd) => {
+      await runGraphDeployInternal(options, cmd.args)
     })
 
   return graphCommand
@@ -123,8 +124,8 @@ async function runGraphDeployInternal(options: any, extraArgs: string[] = []) {
     }
   }
 
-  finalizeHost(processorConfig, options.host)
-  FinalizeProjectName(processorConfig, options.owner, options.name)
+  overrideConfigWithOptions(processorConfig, options)
+
   if (!/^[\w-]+\/[\w-]+$/.test(processorConfig.project)) {
     console.error('Must provide a valid project identifier: --owner <OWNER> --name <NAME> or specific in sentio.yaml')
     process.exit(1)
