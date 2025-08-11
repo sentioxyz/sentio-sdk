@@ -3,48 +3,9 @@ import path from 'path'
 import fs from 'fs-extra'
 import { getPackageRoot } from '../utils.js'
 import { Command } from 'commander'
-import yaml from 'yaml'
-import { YamlProjectConfig } from '../config.js'
+import { loadProcessorConfig } from '../config.js'
 import { getABIFilePath, getABI, writeABIFile } from '../abi.js'
 import { execStep, execPackageManager } from '../execution.js'
-
-export const buildOptionDefinitions = [
-  {
-    name: 'help',
-    alias: 'h',
-    type: Boolean,
-    description: 'Display this usage guide.'
-  },
-  {
-    name: 'skip-gen',
-    type: Boolean,
-    description: 'Skip code generation.'
-  },
-  {
-    name: 'skip-deps',
-    type: Boolean,
-    description: 'Skip dependency enforce.'
-  },
-  {
-    name: 'example',
-    type: Boolean,
-    description: 'Generate example usage of the processor.'
-  }
-]
-
-export const GenOptionDefinitions = [
-  {
-    name: 'help',
-    alias: 'h',
-    type: Boolean,
-    description: 'Display this usage guide.'
-  },
-  {
-    name: 'example',
-    type: Boolean,
-    description: 'Generate example usage of the processor.'
-  }
-]
 
 export function createBuildCommand() {
   return new Command('build')
@@ -114,7 +75,7 @@ import 'mine.js'
 }
 
 export async function codegen(genExample: boolean) {
-  const processorConfig = yaml.parse(fs.readFileSync('sentio.yaml', 'utf8')) as YamlProjectConfig
+  const processorConfig = loadProcessorConfig()
   const contractsForUsage = processorConfig.contracts || []
   let previousChain = ''
   for (const contract of contractsForUsage) {

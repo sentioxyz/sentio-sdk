@@ -34,63 +34,23 @@ export function createGraphCommand() {
   graphCommand
     .command('deploy')
     .description('Deploy the graph')
+    .option('--owner <owner>', 'Sentio Project owner, omit if specified in sentio.yaml')
+    .option('--name <name>', 'Sentio Project name, omit if specified in sentio.yaml')
     .option('--api-key <key>', '(Optional) Manually provide API key rather than use saved credential')
     .option('--host <host>', '(Optional) Override Sentio Host name')
-    .option('--owner <owner>', '(Optional) Override Project owner')
-    .option('--name <name>', '(Optional) Override Project name')
     .option(
       '--continue-from <version>',
-      '(Optional) Continue processing data from the specific processor version',
+      '(Optional) Continue processing data from the specific processor version, which will keeping the old data from previous version and will STOP that version IMMEDIATELY.',
       parseInt
     )
     .option('--dir <dir>', '(Optional) The location of subgraph project, default to the current directory')
-    .option('--skip-gen', 'Skip code generation.')
+    .option('--skip-gen', '(Optional) Skip code generation.')
     .allowUnknownOption()
     .action(async (options) => {
       await runGraphDeployInternal(options, [])
     })
 
   return graphCommand
-}
-
-export async function runGraph(argv: string[]) {
-  const [command, ...rest] = argv
-  if (!['create', 'deploy'].includes(command)) {
-    console.log('Usage: sentio graph <create|deploy> [options]')
-    console.log('Commands:')
-    console.log('  create    Create a subgraph processor')
-    console.log('  deploy    Deploy subgraph processor to sentio')
-    process.exit(0)
-  }
-
-  switch (command) {
-    case 'create':
-      return runGraphCreate(rest)
-    case 'deploy':
-      return runGraphDeploy(rest)
-  }
-}
-
-async function runGraphCreate(argv: string[]) {
-  const program = new Command()
-
-  program
-    .argument('<name>', 'Project name')
-    .option(
-      '--chain-id <id>',
-      '(Optional) The chain id to use for eth. Supported: ' + supportedChainMessage.join('\n,'),
-      '1'
-    )
-    .parse(argv, { from: 'user' })
-
-  const options = program.opts()
-  const projectName = program.args[0]
-  if (!projectName) {
-    console.error('Project name is required')
-    process.exit(1)
-  }
-
-  return runGraphCreateInternal(projectName, options)
 }
 
 async function runGraphCreateInternal(projectName: string, options: any) {
@@ -152,29 +112,6 @@ async function createProjectIfMissing(options: YamlProjectConfig, apiKey: string
   }
 }
 
-async function runGraphDeploy(argv: string[]) {
-  const program = new Command()
-
-  program
-    .option('--api-key <key>', '(Optional) Manually provide API key rather than use saved credential')
-    .option('--host <host>', '(Optional) Override Sentio Host name')
-    .option('--owner <owner>', '(Optional) Override Project owner')
-    .option('--name <name>', '(Optional) Override Project name')
-    .option(
-      '--continue-from <version>',
-      '(Optional) Continue processing data from the specific processor version',
-      parseInt
-    )
-    .option('--dir <dir>', '(Optional) The location of subgraph project, default to the current directory')
-    .option('--skip-gen', 'Skip code generation.')
-    .allowUnknownOption()
-    .parse(argv, { from: 'user' })
-
-  const options = program.opts()
-
-  await runGraphDeployInternal(options, program.args)
-}
-
 async function runGraphDeployInternal(options: any, extraArgs: string[] = []) {
   let processorConfig: YamlProjectConfig = { host: '', project: '', build: true, debug: false, contracts: [] }
   const yamlPath = path.join(process.cwd(), 'sentio.yaml')
@@ -189,7 +126,7 @@ async function runGraphDeployInternal(options: any, extraArgs: string[] = []) {
   finalizeHost(processorConfig, options.host)
   FinalizeProjectName(processorConfig, options.owner, options.name)
   if (!/^[\w-]+\/[\w-]+$/.test(processorConfig.project)) {
-    console.error('Must provide a valid project identifier: --owner OWNER --name NAME')
+    console.error('Must provide a valid project identifier: --owner <OWNER> --name <NAME> or specific in sentio.yaml')
     process.exit(1)
   }
 

@@ -49,6 +49,7 @@ export async function printVersions() {
     fs.readFileSync(path.join(getPackageRoot('@sentio/cli'), 'package.json'), 'utf8')
   ).version
   if (cliVersion.endsWith('-development')) {
+    console.log('Using development versions\n.')
     return
   }
   try {
@@ -60,6 +61,6 @@ export async function printVersions() {
     const sdkVersion = JSON.parse(
       fs.readFileSync(path.join(getPackageRoot('@sentio/sdk'), 'package.json'), 'utf8')
     ).version
-    console.log(`Using @sentio/sdk ${sdkVersion}, latest version is ${latestSdkVersion}`)
+    console.log(`Using @sentio/sdk ${sdkVersion}, latest version is ${latestSdkVersion}\n`)
   } catch (e) {}
 }

@@ -1,6 +1,5 @@
 import { Command } from 'commander'
-import { finalizeHost, FinalizeProjectName, YamlProjectConfig } from '../config.js'
-import yaml from 'yaml'
+import { finalizeHost, FinalizeProjectName, loadProcessorConfig, YamlProjectConfig } from '../config.js'
 import fs from 'fs'
 import { URL } from 'url'
 import fetch from 'node-fetch'
@@ -18,31 +17,29 @@ import { UserInfo } from '../../../protos/lib/service/common/protos/common.js'
 export function createUploadCommand() {
   return new Command('upload')
     .description('Upload processor to Sentio')
-    .option('--api-key <key>', '(Optional) Manually provide API key rather than use saved credential')
-    .option('--token <token>', '(Optional) Manually provide token rather than use saved credential')
-    .option('--host <host>', '(Optional) Override Sentio Host name')
     .option('--owner <owner>', '(Optional) Override Project owner')
     .option('--name <name>', '(Optional) Override Project name')
-    .option(
+    .option<number>(
       '--continue-from <version>',
-      '(Optional) Continue processing data from the specific processor version',
+      '(Optional) Continue processing data from the specific processor version which will keeping the old data from previous version and will STOP that version IMMEDIATELY.',
       parseInt
     )
-    .option('--nobuild', '(Optional) Skip build & pack file before uploading, default false')
     .option('--debug', '(Optional) Run driver in debug mode, default false')
-    .option('--silent-overwrite', '(Optional) Overwrite exiting processor version without confirmation, default false')
+    .option(
+      '-y --silent-overwrite',
+      '(Optional) Overwrite exiting processor version without confirmation, default false'
+    )
+    .option('--nobuild', '(Optional) Skip build & pack file before uploading, default false')
     .option('--skip-gen', 'Skip code generation.')
     .option('--skip-deps', 'Skip dependency enforce.')
     .option('--example', 'Generate example usage of the processor.')
+    .option('--api-key <key>', '(Optional) Manually provide API key rather than use saved credential')
+    .option('--token <token>', '(Optional) Manually provide token rather than use saved credential')
+    .option('--host <host>', '(Optional) Override Sentio Host name')
     .action(async (options, command) => {
       const processorConfig = loadProcessorConfig()
       await runUploadInternal(processorConfig, options, command.args)
     })
-}
-
-function loadProcessorConfig(): YamlProjectConfig {
-  const yamlContent = fs.readFileSync('sentio.yaml', 'utf8')
-  return yaml.parse(yamlContent) as YamlProjectConfig
 }
 
 async function runUploadInternal(processorConfig: YamlProjectConfig, options: any, extraArgs: string[]) {

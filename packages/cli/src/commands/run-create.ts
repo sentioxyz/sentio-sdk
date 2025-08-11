@@ -22,21 +22,14 @@ export function createCreateCommand() {
       '-p, --subproject',
       'If this is a subproject in mono-repo setup, in this case sdk version is controlled in parent package.json.'
     )
-    .option('-s, --sdk-version <version>', '(Optional) The version of @sentio/sdk to use, default latest')
-    .option(
-      '-d, --directory <dir>',
-      '(Optional) The root direct new project will be created, default current working dir'
-    )
+    .option('-s, --sdk-version <version>', 'The version of @sentio/sdk to use, default latest')
+    .option('-d, --directory <dir>', 'The root direct new project will be created, default current working dir')
     .option(
       '-c, --chain-type <type>',
       'The type of project you want to create, can be eth, aptos, fuel, solana, sui, iota, starknet, raw',
       'eth'
     )
-    .option(
-      '--chain-id <id>',
-      '(Optional) The chain id to use for eth. Supported: ' + supportedChainMessage.join('\n,'),
-      '1'
-    )
+    .option('--chain-id <id>', 'The chain id to use for eth. Supported: ' + supportedChainMessage.join('\n,'), '1')
     .action(async (name, options) => {
       await runCreateInternal(name, options)
     })
