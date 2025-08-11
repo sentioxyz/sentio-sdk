@@ -77,18 +77,24 @@ export async function getABI(
   try {
     const Aptos = (await import('@aptos-labs/ts-sdk')).Aptos
     const AptosConfig = (await import('@aptos-labs/ts-sdk')).AptosConfig
+    const Network = (await import('@aptos-labs/ts-sdk')).Network
 
     let aptosClient: Aptos | undefined
     switch (chain) {
       case AptosChainId.APTOS_MAINNET:
-        aptosClient = new Aptos(new AptosConfig({ fullnode: 'https://mainnet.aptoslabs.com/v1' }))
+        aptosClient = new Aptos(
+          new AptosConfig({ network: Network.MAINNET, fullnode: 'https://mainnet.aptoslabs.com/v1' })
+        )
         break
       case AptosChainId.APTOS_TESTNET:
-        aptosClient = new Aptos(new AptosConfig({ fullnode: 'https://testnet.aptoslabs.com/v1' }))
+        aptosClient = new Aptos(
+          new AptosConfig({ network: Network.TESTNET, fullnode: 'https://testnet.aptoslabs.com/v1' })
+        )
         break
       case AptosChainId.APTOS_MOVEMENT_TESTNET:
         aptosClient = new Aptos(
           new AptosConfig({
+            network: Network.CUSTOM,
             fullnode: 'https://aptos.testnet.bardock.movementlabs.xyz/v1'
           })
         )
@@ -96,6 +102,7 @@ export async function getABI(
       case AptosChainId.APTOS_MOVEMENT_MAINNET:
         aptosClient = new Aptos(
           new AptosConfig({
+            network: Network.CUSTOM,
             fullnode: 'https://mainnet.movementnetwork.xyz/v1'
           })
         )
@@ -103,6 +110,7 @@ export async function getABI(
       case AptosChainId.INITIA_ECHELON:
         aptosClient = new Aptos(
           new AptosConfig({
+            network: Network.CUSTOM,
             fullnode: 'https://rpc.sentio.xyz/initia-aptos/v1'
           })
         )

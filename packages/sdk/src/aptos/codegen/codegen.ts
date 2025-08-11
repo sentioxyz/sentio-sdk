@@ -3,7 +3,7 @@ import chalk from 'chalk'
 import path, { join } from 'path'
 import { AptosCodegen as BaseAptosCodegen } from '@typemove/aptos/codegen'
 import { InternalMoveModule, InternalMoveStruct, normalizeToJSName, camel, upperFirst } from '@typemove/move'
-import { AptosNetwork, getRpcEndpoint } from '../network.js'
+import { AptosNetwork, getRpcConfig } from '../network.js'
 import { Event, MoveModuleBytecode, MoveResource } from '@aptos-labs/ts-sdk'
 import { SharedNetworkCodegen } from '../../move/shared-network-codegen.js'
 import { recursiveCodegen } from '../../core/codegen.js'
@@ -27,7 +27,7 @@ class AptosNetworkCodegen extends BaseAptosCodegen {
   SYSTEM_PACKAGE = '@sentio/sdk/aptos'
 
   constructor(network: AptosNetwork, useViewJson = false) {
-    const endpoint = getRpcEndpoint(network)
+    const endpoint = getRpcConfig(network)
     super(endpoint, useViewJson)
     const generator = this
 

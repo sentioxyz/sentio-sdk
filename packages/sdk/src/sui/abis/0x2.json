@@ -3,7 +3,12 @@
     "fileFormatVersion": 6,
     "address": "0x2",
     "name": "accumulator",
-    "friends": [],
+    "friends": [
+      {
+        "address": "0x2",
+        "name": "balance"
+      }
+    ],
     "structs": {
       "AccumulatorRoot": {
         "abilities": {
@@ -23,9 +28,74 @@
             }
           }
         ]
+      },
+      "Key": {
+        "abilities": {
+          "abilities": ["Copy", "Drop", "Store"]
+        },
+        "typeParameters": [
+          {
+            "constraints": {
+              "abilities": []
+            },
+            "isPhantom": true
+          }
+        ],
+        "fields": [
+          {
+            "name": "address",
+            "type": "Address"
+          }
+        ]
+      },
+      "U128": {
+        "abilities": {
+          "abilities": ["Store"]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "value",
+            "type": "U128"
+          }
+        ]
       }
     },
-    "exposedFunctions": {}
+    "exposedFunctions": {
+      "accumulator_address": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": ["Address"],
+        "return": ["Address"]
+      },
+      "emit_deposit_event": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": ["Address", "Address", "U64"],
+        "return": []
+      },
+      "emit_withdraw_event": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": ["Address", "Address", "U64"],
+        "return": []
+      }
+    }
   },
   "address": {
     "fileFormatVersion": 6,
@@ -7939,6 +8009,10 @@
     "address": "0x2",
     "name": "dynamic_field",
     "friends": [
+      {
+        "address": "0x2",
+        "name": "accumulator"
+      },
       {
         "address": "0x2",
         "name": "config"
@@ -21219,6 +21293,42 @@
           }
         ],
         "return": ["Address"]
+      },
+      "gas_price": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": ["U64"]
+      },
+      "reference_gas_price": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": ["U64"]
       },
       "sender": {
         "visibility": "Public",

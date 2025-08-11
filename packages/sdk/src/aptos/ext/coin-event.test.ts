@@ -106,6 +106,7 @@ const tx: UserTransactionResponse = {
   state_change_hash: '0xc8e8d9cebaf525d1a330cd68bfcff596e364f67df37ccb50a4ad2f5ce7855e36',
   event_root_hash: '0x419261b51b786ac315ada03ec34be32cf2187c4f5e8604fa71d6896b1a371108',
   state_checkpoint_hash: '0x0',
+  replay_protection_nonce: '11',
   gas_used: '10974',
   success: true,
   vm_status: 'Executed successfully',
