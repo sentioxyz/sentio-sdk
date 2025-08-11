@@ -7,12 +7,15 @@ import process from 'process'
 import { execPackageManager } from '../execution.js'
 import { getPackageRoot } from '../utils.js'
 import { EthChainInfo } from '@sentio/chain'
+import { CHAIN_TYPES } from '../config.js'
 
 export const supportedChainMessage = [
   ',  <Chain ID> (<Chain Name>)',
   '  --------------------',
   ...Object.values(EthChainInfo).map((info) => `  ${info.chainId} (${info.name})`)
 ]
+
+const chainTypes = [...CHAIN_TYPES, 'raw']
 
 export function createCreateCommand() {
   return new Command('create')
@@ -24,11 +27,7 @@ export function createCreateCommand() {
     )
     .option('-s, --sdk-version <version>', 'The version of @sentio/sdk to use, default latest')
     .option('-d, --directory <dir>', 'The root direct new project will be created, default current working dir')
-    .option(
-      '-c, --chain-type <type>',
-      'The type of project you want to create, can be eth, aptos, fuel, solana, sui, iota, starknet, raw',
-      'eth'
-    )
+    .option('-c, --chain-type <type>', `The type of project you want to create, can be ${chainTypes.join(', ')}`, 'eth')
     .option('--chain-id <id>', 'The chain id to use for eth. Supported: ' + supportedChainMessage.join('\n,'), '1')
     .action(async (name, options) => {
       await runCreateInternal(name, options)
@@ -43,19 +42,10 @@ async function runCreateInternal(name: string, options: any) {
 
   const chainType: string = options.chainType.toLowerCase()
   const chainId: string = options.chainId
-  switch (chainType) {
-    case 'eth':
-    case 'aptos':
-    case 'raw':
-    case 'solana':
-    case 'iota':
-    case 'sui':
-    case 'fuel':
-    case 'starknet':
-      break
-    default:
-      console.error(chalk.red('non supported chain-type for template creation, use --help for more information.'))
-      process.exit(1)
+
+  if (!chainTypes.includes(chainType)) {
+    console.error(chalk.red('non supported chain-type for template creation, use --help for more information.'))
+    process.exit(1)
   }
 
   const packageRoot = getPackageRoot('@sentio/cli')

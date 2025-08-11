@@ -9,6 +9,8 @@ const HostMap: { [host: string]: string } = {
   prod: 'https://app.sentio.xyz'
 }
 
+export const CHAIN_TYPES = ['eth', 'solana', 'aptos', 'sui', 'iota', 'fuel', 'starknet']
+
 export interface YamlContractConfig {
   address: string
   chain: ChainId
@@ -119,7 +121,7 @@ export function loadProcessorConfig(): YamlProjectConfig {
   try {
     yamlContent = fs.readFileSync('sentio.yaml', 'utf8')
   } catch (e) {
-    console.error('sentio.yaml loading error, CLI not running under sentio project')
+    console.error('sentio.yaml loading error, CLI is not running under Sentio project')
     process.exit(1)
   }
   return yaml.parse(yamlContent) as YamlProjectConfig

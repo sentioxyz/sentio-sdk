@@ -3,7 +3,7 @@ import path from 'path'
 import fs from 'fs-extra'
 import { getPackageRoot } from '../utils.js'
 import { Command } from 'commander'
-import { loadProcessorConfig } from '../config.js'
+import { CHAIN_TYPES, loadProcessorConfig } from '../config.js'
 import { getABIFilePath, getABI, writeABIFile } from '../abi.js'
 import { execStep, execPackageManager } from '../execution.js'
 
@@ -23,12 +23,8 @@ export function createGenCommand() {
     .description('Generate ABI')
     .option('--example', 'Generate example usage of the processor.')
     .action(async (options) => {
-      await generate(options)
+      await buildProcessor(true, options)
     })
-}
-
-export async function generate(options: any) {
-  await buildProcessor(true, options)
 }
 
 export async function buildProcessor(onlyGen: boolean, options: any) {
@@ -95,9 +91,7 @@ export async function codegen(genExample: boolean) {
 
   const outputBase = path.resolve('src', 'types')
 
-  const generators = ['eth', 'solana', 'aptos', 'sui', 'iota', 'fuel', 'starknet']
-
-  for (const gen of generators) {
+  for (const gen of CHAIN_TYPES) {
     try {
       const codegen = await import(`@sentio/sdk/${gen}/codegen`)
 
