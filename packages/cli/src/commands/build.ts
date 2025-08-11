@@ -2,97 +2,37 @@ import chalk from 'chalk'
 import path from 'path'
 import fs from 'fs-extra'
 import { getPackageRoot } from '../utils.js'
-import commandLineArgs from 'command-line-args'
-import commandLineUsage from 'command-line-usage'
-import yaml from 'yaml'
-import { YamlProjectConfig } from '../config.js'
+import { Command } from 'commander'
+import { CHAIN_TYPES, loadProcessorConfig } from '../config.js'
 import { getABIFilePath, getABI, writeABIFile } from '../abi.js'
 import { execStep, execPackageManager } from '../execution.js'
 
-export const buildOptionDefinitions = [
-  {
-    name: 'help',
-    alias: 'h',
-    type: Boolean,
-    description: 'Display this usage guide.'
-  },
-  {
-    name: 'skip-gen',
-    type: Boolean,
-    description: 'Skip code generation.'
-  },
-  {
-    name: 'skip-deps',
-    type: Boolean,
-    description: 'Skip dependency enforce.'
-  },
-  {
-    name: 'example',
-    type: Boolean,
-    description: 'Generate example usage of the processor.'
-  }
-]
-
-export const GenOptionDefinitions = [
-  {
-    name: 'help',
-    alias: 'h',
-    type: Boolean,
-    description: 'Display this usage guide.'
-  },
-  {
-    name: 'example',
-    type: Boolean,
-    description: 'Generate example usage of the processor.'
-  }
-]
-
-export async function buildProcessorWithArgs(argv: string[]) {
-  const options = commandLineArgs(buildOptionDefinitions, { argv, partial: true })
-  const usage = commandLineUsage([
-    {
-      header: 'Build project',
-      content: 'sentio build'
-    },
-    {
-      header: 'Options',
-      optionList: buildOptionDefinitions
-    }
-  ])
-
-  if (options.help) {
-    console.log(usage)
-    process.exit(0)
-  }
-  await buildProcessor(false, options)
+export function createBuildCommand() {
+  return new Command('build')
+    .description('Build the processor')
+    .option('--skip-gen', 'Skip code generation.')
+    .option('--skip-deps', 'Skip dependency enforce.')
+    .option('--example', 'Generate example usage of the processor.')
+    .action(async (options) => {
+      await buildProcessor(false, options)
+    })
 }
 
-export async function generate(argv: string[]) {
-  const options = commandLineArgs(GenOptionDefinitions, { argv, partial: true })
-  const usage = commandLineUsage([
-    {
-      header: 'Generate type binding',
-      content: 'sentio gen [--example]'
-    },
-    {
-      header: 'Options',
-      optionList: GenOptionDefinitions
-    }
-  ])
-
-  if (options.help) {
-    console.log(usage)
-    process.exit(0)
-  }
-  await buildProcessor(true, options)
+export function createGenCommand() {
+  return new Command('gen')
+    .description('Generate ABI')
+    .option('--example', 'Generate example usage of the processor.')
+    .action(async (options) => {
+      await buildProcessor(true, options)
+    })
 }
 
-export async function buildProcessor(onlyGen: boolean, options: commandLineArgs.CommandLineOptions) {
-  if (!options['skip-deps'] && !onlyGen) {
+export async function buildProcessor(onlyGen: boolean, options: any) {
+  if (!options.skipDeps && !onlyGen) {
     await installDeps()
   }
 
-  if (!options['skip-gen']) {
+  if (!options.skipGen) {
     await codegen(options.example || false)
   }
 
@@ -109,7 +49,6 @@ export async function buildProcessor(onlyGen: boolean, options: commandLineArgs.
     await execStep(['node', tsc, '--noEmit'], 'type checking')
 
     const tsup = path.resolve(getPackageRoot('tsup'), 'dist', 'cli-default.js')
-    // await execStep('yarn tsc -p .', 'Compile')
     await execStep(['node', tsup, '--config', tsupConfig], 'Packaging')
 
     const dir = fs.readdirSync(path.join(process.cwd(), 'dist'))
@@ -132,7 +71,7 @@ import 'mine.js'
 }
 
 export async function codegen(genExample: boolean) {
-  const processorConfig = yaml.parse(fs.readFileSync('sentio.yaml', 'utf8')) as YamlProjectConfig
+  const processorConfig = loadProcessorConfig()
   const contractsForUsage = processorConfig.contracts || []
   let previousChain = ''
   for (const contract of contractsForUsage) {
@@ -152,9 +91,7 @@ export async function codegen(genExample: boolean) {
 
   const outputBase = path.resolve('src', 'types')
 
-  const generators = ['eth', 'solana', 'aptos', 'sui', 'iota', 'fuel', 'starknet']
-
-  for (const gen of generators) {
+  for (const gen of CHAIN_TYPES) {
     try {
       const codegen = await import(`@sentio/sdk/${gen}/codegen`)
 

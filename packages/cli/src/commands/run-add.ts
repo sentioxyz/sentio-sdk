@@ -1,5 +1,4 @@
-import commandLineArgs from 'command-line-args'
-import commandLineUsage from 'command-line-usage'
+import { Command } from 'commander'
 import fs from 'fs-extra'
 import chalk from 'chalk'
 
@@ -8,7 +7,6 @@ import { codegen } from './build.js'
 import yaml from 'yaml'
 import { getABIFilePath, getABI, writeABIFile } from '../abi.js'
 import { AptosChainId, ChainId, getChainName, SuiChainId, EthChainInfo, ExplorerApiType } from '@sentio/chain'
-import { errorOnUnknownOption } from '../utils.js'
 
 const supportedChain: string[] = [
   AptosChainId.APTOS_MAINNET,
@@ -22,7 +20,7 @@ const supportedChain: string[] = [
   SuiChainId.IOTA_TESTNET
 ]
 
-export async function runAdd(argv: string[]) {
+export function createAddCommand() {
   for (const chain of Object.values(EthChainInfo)) {
     if (
       chain.explorerApiType === ExplorerApiType.ETHERSCAN ||
@@ -39,66 +37,32 @@ export async function runAdd(argv: string[]) {
     ...supportedChain.map((chainId, idx) => `  ${chainId} (${getChainName(chainId)})`)
   ]
 
-  const optionDefinitions = [
-    {
-      name: 'help',
-      alias: 'h',
-      type: Boolean,
-      description: 'Display this usage guide.'
-    },
-    {
-      name: 'address',
-      defaultOption: true,
-      description: 'Address of the contract',
-      type: String
-    },
-    {
-      name: 'name',
-      alias: 'n',
-      description: 'File name for the downloaded contract, if empty, use address as file name',
-      type: String
-    },
-    {
-      name: 'chain',
-      alias: 'c',
-      type: String,
-      defaultValue: '1',
-      description:
-        'Chain ID, current supports the following, otherwise you need manually download ABI to abis/*:\n' +
-        supportedChainMessage.join('\n,')
-    },
-    {
-      name: 'folder',
-      description: '(Optional) The folder to save the downloaded ABI file',
-      type: String
-    }
-  ]
+  return new Command('add')
+    .description('Add a contract to the project')
+    .argument('<address>', 'Address of the contract')
+    .option('-n, --name <name>', 'File name for the downloaded contract, if empty, use address as file name')
+    .option(
+      '-c, --chain <chain>',
+      'Chain ID, current supports the following, otherwise you need manually download ABI to abis/*:\n' +
+        supportedChainMessage.join('\n,'),
+      '1'
+    )
+    .option('--folder <folder>', '(Optional) The folder to save the downloaded ABI file')
+    .action(async (address, options) => {
+      await runAddInternal(address, options)
+    })
+}
 
-  const options = commandLineArgs(optionDefinitions, { argv, partial: true })
-  const usage = commandLineUsage([
-    {
-      header: "Add contract's ABI to the project",
-      content: 'sentio add [--chain <chain> --name <name>] <address>'
-    },
-    {
-      header: 'Options',
-      optionList: optionDefinitions
-    }
-  ])
-
-  if (options.help || !options.address) {
-    console.log(usage)
-    process.exit(0)
+async function runAddInternal(address: string, options: any) {
+  if (!address) {
+    console.error('Address is required')
+    process.exit(1)
   }
 
-  errorOnUnknownOption(options)
-
-  const chain = options['chain'].toLowerCase() as ChainId
-  const address: string = options.address
+  const chain = options.chain.toLowerCase() as ChainId
   const folder: string = options.folder
   if (!address.startsWith('0x')) {
     console.error(chalk.red('Address must start with 0x'))
-    console.log(usage)
     process.exit(1)
   }
 
@@ -107,7 +71,6 @@ export async function runAdd(argv: string[]) {
 
   writeABIFile(abiRes.abi, getABIFilePath(chain, filename, '', folder))
 
-  // Write contract info to sentio.yaml
   const yamlDocument: yaml.Document = yaml.parseDocument(fs.readFileSync('sentio.yaml', 'utf8'))
   let contracts = yamlDocument.get('contracts') as yaml.YAMLSeq
   if (!contracts) {
@@ -136,6 +99,5 @@ export async function runAdd(argv: string[]) {
     fs.writeFileSync('sentio.yaml', yamlDocument.toString(), 'utf8')
   }
 
-  // Run gen
   await codegen(false)
 }

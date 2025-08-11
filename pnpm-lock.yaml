@@ -10,7 +10,7 @@ overrides:
 
 patchedDependencies:
   '@coral-xyz/anchor@0.30.1':
-    hash: 55308fdd8a6a002ddc9788b83fff3dff38beecb9ee576dd8ed3552a34ff670a5
+    hash: 93842655e94304625d490cdfb6e2ff9be8e91b436b2bde0079e678b9b4bdae88
     path: patches/@coral-xyz__anchor@0.30.1.patch
 
 importers:
@@ -248,12 +248,9 @@ importers:
       chalk:
         specifier: ^5.3.0
         version: 5.3.0
-      command-line-args:
-        specifier: ^5.2.1
-        version: 5.2.1
-      command-line-usage:
-        specifier: ^7.0.1
-        version: 7.0.1
+      commander:
+        specifier: ^14.0.0
+        version: 14.0.0
       dotenv:
         specifier: ^16.4.5
         version: 16.4.5
@@ -297,12 +294,6 @@ importers:
         specifier: ^2.3.4
         version: 2.7.1
     devDependencies:
-      '@types/command-line-args':
-        specifier: ^5.2.3
-        version: 5.2.3
-      '@types/command-line-usage':
-        specifier: ^5.0.4
-        version: 5.0.4
       '@types/express':
         specifier: ^5.0.0
         version: 5.0.0
@@ -530,7 +521,7 @@ importers:
         version: 4.0.0(got@14.4.7)
       '@coral-xyz/anchor':
         specifier: ^0.30.1
-        version: 0.30.1(patch_hash=55308fdd8a6a002ddc9788b83fff3dff38beecb9ee576dd8ed3552a34ff670a5)(bufferutil@4.0.8)(encoding@0.1.13)(typescript@5.5.2)(utf-8-validate@5.0.10)
+        version: 0.30.1(patch_hash=93842655e94304625d490cdfb6e2ff9be8e91b436b2bde0079e678b9b4bdae88)(bufferutil@4.0.8)(encoding@0.1.13)(typescript@5.5.2)(utf-8-validate@5.0.10)
       '@coral-xyz/borsh':
         specifier: ^0.30.1
         version: 0.30.1(@solana/web3.js@1.98.2(bufferutil@4.0.8)(encoding@0.1.13)(typescript@5.5.2)(utf-8-validate@5.0.10))
@@ -7072,7 +7063,7 @@ snapshots:
 
   '@coral-xyz/anchor-errors@0.30.1': {}
 
-  '@coral-xyz/anchor@0.30.1(patch_hash=55308fdd8a6a002ddc9788b83fff3dff38beecb9ee576dd8ed3552a34ff670a5)(bufferutil@4.0.8)(encoding@0.1.13)(typescript@5.5.2)(utf-8-validate@5.0.10)':
+  '@coral-xyz/anchor@0.30.1(patch_hash=93842655e94304625d490cdfb6e2ff9be8e91b436b2bde0079e678b9b4bdae88)(bufferutil@4.0.8)(encoding@0.1.13)(typescript@5.5.2)(utf-8-validate@5.0.10)':
     dependencies:
       '@coral-xyz/anchor-errors': 0.30.1
       '@coral-xyz/borsh': 0.30.1(@solana/web3.js@1.98.2(bufferutil@4.0.8)(encoding@0.1.13)(typescript@5.5.2)(utf-8-validate@5.0.10))

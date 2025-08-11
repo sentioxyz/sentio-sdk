@@ -1,5 +1,4 @@
-import commandLineArgs from 'command-line-args'
-import commandLineUsage from 'command-line-usage'
+import { Command } from 'commander'
 import path from 'path'
 import fs from 'fs'
 import { promisify } from 'util'
@@ -9,45 +8,8 @@ import { ReadKey } from '../key.js'
 import chalk from 'chalk'
 import { Auth } from './run-upload.js'
 import { URL } from 'url'
-import { errorOnUnknownOption } from '../utils.js'
 
 const SRC_ROOT = 'src'
-
-const optionDefinitions = [
-  {
-    name: 'help',
-    alias: 'h',
-    type: Boolean,
-    description: 'Display this usage guide.'
-  },
-  {
-    name: 'upload',
-    type: Boolean,
-    description: '(Optional) Upload to sentio if compiled successfully'
-  },
-  {
-    name: 'project',
-    description: '(Optional) Project full name, required in uploading',
-    type: String
-  },
-  {
-    name: 'api-key',
-    type: String,
-    description:
-      '(Optional) Manually provide API key rather than use saved credential, if both api-key and jwt-token is provided, use api-key.'
-  },
-  {
-    name: 'token',
-    type: String,
-    description:
-      '(Optional) Manually provide token rather than use saved credential, if both api-key and token is provided, use api-key.'
-  },
-  {
-    name: 'host',
-    description: '(Optional) Sentio Host name',
-    type: String
-  }
-]
 
 interface Metadata {
   solidityVersion: string
@@ -56,25 +18,42 @@ interface Metadata {
   settings: any
 }
 
-export async function runCompile(argv: string[]) {
-  const options = commandLineArgs(optionDefinitions, { argv, partial: true })
-  if (options.help) {
-    const usage = commandLineUsage([
-      {
-        header: 'Sentio compile',
-        content: 'sentio compile'
-      },
-      {
-        header: 'Options',
-        optionList: optionDefinitions
-      }
-    ])
-    console.log(usage)
-    process.exit(0)
-  }
+export function createCompileCommand() {
+  return new Command('compile')
+    .description('Compile the processor')
+    .option('--upload', '(Optional) Upload to sentio if compiled successfully')
+    .option('--project <project>', '(Optional) Project full name, required in uploading')
+    .option(
+      '--api-key <key>',
+      '(Optional) Manually provide API key rather than use saved credential, if both api-key and jwt-token is provided, use api-key.'
+    )
+    .option(
+      '--token <token>',
+      '(Optional) Manually provide token rather than use saved credential, if both api-key and token is provided, use api-key.'
+    )
+    .option('--host <host>', '(Optional) Sentio Host name')
+    .action(async (options) => {
+      await runCompileInternal(options)
+    })
+}
 
-  errorOnUnknownOption(options)
+// export async function runCompile(argv: string[]) {
+//   const program = new Command()
+//
+//   program
+//     .option('--upload', '(Optional) Upload to sentio if compiled successfully')
+//     .option('--project <project>', '(Optional) Project full name, required in uploading')
+//     .option('--api-key <key>', '(Optional) Manually provide API key rather than use saved credential')
+//     .option('--token <token>', '(Optional) Manually provide token rather than use saved credential')
+//     .option('--host <host>', '(Optional) Sentio Host name')
+//     .parse(argv, { from: 'user' })
+//
+//   const options = program.opts()
+//
+//   await runCompileInternal(options)
+// }
 
+async function runCompileInternal(options: any) {
   let projectOwner, projectSlug
   const auth: Auth = {}
   if (options.upload) {
@@ -88,13 +67,13 @@ export async function runCompile(argv: string[]) {
     options.host = getFinalizedHost(options.host)
 
     let apiKey = ReadKey(options.host)
-    if (options['api-key']) {
-      apiKey = options['api-key']
+    if (options.apiKey) {
+      apiKey = options.apiKey
     }
     if (apiKey) {
       auth['api-key'] = apiKey
-    } else if (options['token']) {
-      auth.authorization = 'Bearer ' + options['token']
+    } else if (options.token) {
+      auth.authorization = 'Bearer ' + options.token
     } else {
       const isProd = options.host === 'https://app.sentio.xyz'
       const cmd = isProd ? 'sentio login' : 'sentio login --host=' + options.host

@@ -1,4 +1,6 @@
 import { ChainId, EthChainId } from '@sentio/chain'
+import fs from 'fs-extra'
+import yaml from 'yaml'
 
 const HostMap: { [host: string]: string } = {
   local: 'http://localhost:10000',
@@ -6,6 +8,8 @@ const HostMap: { [host: string]: string } = {
   staging: 'https://staging.sentio.xyz',
   prod: 'https://app.sentio.xyz'
 }
+
+export const CHAIN_TYPES = ['eth', 'solana', 'aptos', 'sui', 'iota', 'fuel', 'starknet']
 
 export interface YamlContractConfig {
   address: string
@@ -111,3 +115,14 @@ export function FinalizeProjectName(config: YamlProjectConfig, owner: string | u
 // // Supported target chain, lower case
 // export const EVM = 'evm'
 // export const SOLANA = 'solana'
+
+export function loadProcessorConfig(): YamlProjectConfig {
+  let yamlContent
+  try {
+    yamlContent = fs.readFileSync('sentio.yaml', 'utf8')
+  } catch (e) {
+    console.error('sentio.yaml loading error, CLI is not running under Sentio project')
+    process.exit(1)
+  }
+  return yaml.parse(yamlContent) as YamlProjectConfig
+}

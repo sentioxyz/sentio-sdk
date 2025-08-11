@@ -1,5 +1,4 @@
-import commandLineArgs from 'command-line-args'
-import commandLineUsage from 'command-line-usage'
+import { Command } from 'commander'
 import { getAuthConfig, getFinalizedHost } from '../config.js'
 import { startServer } from './login-server.js'
 import url, { URL } from 'url'
@@ -8,52 +7,25 @@ import chalk from 'chalk'
 import { WriteKey } from '../key.js'
 import fetch from 'node-fetch'
 import open from 'open'
-import { errorOnUnknownOption } from '../utils.js'
 
 const port = 20000
 
-export function runLogin(argv: string[]) {
-  const optionDefinitions = [
-    {
-      name: 'help',
-      alias: 'h',
-      type: Boolean,
-      description: 'Display this usage guide.'
-    },
-    {
-      name: 'host',
-      description: '(Optional) Override Sentio Host name',
-      type: String
-    },
-    {
-      name: 'api-key',
-      type: String,
-      description: '(Optional) Your API key'
-    }
-  ]
-  const options = commandLineArgs(optionDefinitions, { argv, partial: true })
+export function createLoginCommand() {
+  return new Command('login')
+    .description('Login to Sentio')
+    .option('--host <host>', '(Optional) Override Sentio Host name')
+    .option('--api-key <key>', '(Optional) Your API key')
+    .action((options) => {
+      runLogin(options)
+    })
+}
 
+function runLogin(options: any) {
   const host = getFinalizedHost(options.host)
-  if (options.help) {
-    const usage = commandLineUsage([
-      {
-        header: 'Login to Sentio',
-        content: 'sentio login'
-      },
-      {
-        header: 'Options',
-        optionList: optionDefinitions
-      }
-    ])
-    console.log(usage)
-    process.exit(0)
-  }
 
-  errorOnUnknownOption(options)
-
-  if (options['api-key']) {
+  if (options.apiKey) {
     console.log(chalk.blue('login to ' + host))
-    const apiKey = options['api-key']
+    const apiKey = options.apiKey
     checkKey(host, apiKey).then(async (res) => {
       if (res.status == 200) {
         WriteKey(host, apiKey)
@@ -64,7 +36,6 @@ export function runLogin(argv: string[]) {
       }
     })
   } else {
-    // https://auth0.com/docs/get-started/authentication-and-authorization-flow/call-your-api-using-the-authorization-code-flow-with-pkce
     const verifier = base64URLEncode(crypto.randomBytes(32))
     const challenge = base64URLEncode(sha256(verifier))
 

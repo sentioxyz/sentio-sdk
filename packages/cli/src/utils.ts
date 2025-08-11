@@ -2,7 +2,6 @@ import fs from 'fs-extra'
 import path from 'path'
 import { createRequire } from 'module'
 import url from 'url'
-import { CommandLineOptions } from 'command-line-args'
 import chalk from 'chalk'
 import latestVersion from 'latest-version'
 
@@ -38,7 +37,7 @@ export function getSdkVersion() {
   }
 }
 
-export function errorOnUnknownOption(options: CommandLineOptions) {
+export function errorOnUnknownOption(options: any) {
   if (options._unknown?.length) {
     console.error(chalk.red('Unknown option:', options._unknown.join(' ')))
     process.exit(1)
@@ -50,6 +49,7 @@ export async function printVersions() {
     fs.readFileSync(path.join(getPackageRoot('@sentio/cli'), 'package.json'), 'utf8')
   ).version
   if (cliVersion.endsWith('-development')) {
+    console.log('Using development versions\n.')
     return
   }
   try {
@@ -61,6 +61,6 @@ export async function printVersions() {
     const sdkVersion = JSON.parse(
       fs.readFileSync(path.join(getPackageRoot('@sentio/sdk'), 'package.json'), 'utf8')
     ).version
-    console.log(`Using @sentio/sdk ${sdkVersion}, latest version is ${latestSdkVersion}`)
+    console.log(`Using @sentio/sdk ${sdkVersion}, latest version is ${latestSdkVersion}\n`)
   } catch (e) {}
 }
