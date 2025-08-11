@@ -28,7 +28,7 @@ export function createCreateCommand() {
     .option('-s, --sdk-version <version>', 'The version of @sentio/sdk to use, default latest')
     .option('-d, --directory <dir>', 'The root direct new project will be created, default current working dir')
     .option('-c, --chain-type <type>', `The type of project you want to create, can be ${chainTypes.join(', ')}`, 'eth')
-    .option('--chain-id <id>', 'The chain id to use for eth. Supported: ' + supportedChainMessage.join('\n,'), '1')
+    .option('--chain-id <id>', 'The chain ID to use for eth. Supported: ' + supportedChainMessage.join('\n,'), '1')
     .action(async (name, options) => {
       await runCreateInternal(name, options)
     })
