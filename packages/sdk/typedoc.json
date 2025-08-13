@@ -13,6 +13,8 @@
     "./src/solana/builtin/index.ts",
     "./src/sui/index.ts",
     "./src/sui/builtin/index.ts",
+    "./src/iota/index.ts",
+    "./src/iota/builtin/index.ts",
     "./src/testing/index.ts",
     "./src/utils/index.ts"
   ]
