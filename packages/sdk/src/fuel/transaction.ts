@@ -36,8 +36,15 @@ function findSenderFromInputs(inputs: Input[] | undefined, baseAssetId: string):
 export async function decodeFuelTransaction(gqlTransaction: any, provider: Provider): Promise<FuelTransaction> {
   const rawPayload = arrayify(gqlTransaction.rawPayload)
   const receipts = gqlTransaction?.status.receipts?.map(deserializeReceipt) || []
-
-  const [decodedTransaction] = new TransactionCoder().decode(rawPayload, 0)
+  let decodedTransaction: any
+  try {
+    let [d] = new TransactionCoder().decode(rawPayload, 0)
+    decodedTransaction = d
+  } catch (e) {
+    // If the transaction cannot be decoded, we log the payload in hex and rethrow it
+    console.error('Failed to decode transaction payload:', e, 'payload', Buffer.from(rawPayload).toString('hex'))
+    throw e
+  }
   const { gasCosts, feeParameters, txParameters, baseAssetId } = (await provider.getChain()).consensusParameters
   const blockNumber = gqlTransaction.status?.block?.header?.height
   const { gasPriceFactor, gasPerByte } = feeParameters
@@ -67,14 +74,28 @@ export async function decodeFuelTransaction(gqlTransaction: any, provider: Provi
 }
 
 export function decodeLog(receipt: any | undefined, abi: JsonAbi) {
-  if (receipt && (receipt.type === ReceiptType.LogData || receipt.type === ReceiptType.Log)) {
-    const interfaceToUse = new Interface(abi)
-    const data = receipt.type === ReceiptType.Log ? new BigNumberCoder('u64').encode(receipt.val0) : receipt.data
-    const logId: string = receipt.rb.toString()
-    const [decodedLog] = interfaceToUse.decodeLog(data, logId)
-    return { logId, data: decodedLog }
+  try {
+    if (receipt && (receipt.type === ReceiptType.LogData || receipt.type === ReceiptType.Log)) {
+      const interfaceToUse = new Interface(abi)
+      const data = receipt.type === ReceiptType.Log ? new BigNumberCoder('u64').encode(receipt.val0) : receipt.data
+      const logId: string = receipt.rb.toString()
+      const [decodedLog] = interfaceToUse.decodeLog(data, logId)
+      return { logId, data: decodedLog }
+    }
+    return null
+  } catch (e) {
+    console.error(
+      'Failed to decode log',
+      e,
+      'Please make sure you provide the correct abi.',
+      e,
+      'receipt',
+      receipt,
+      'abi',
+      abi
+    )
+    throw e
   }
-  return null
 }
 
 export async function decodeFuelTransactionWithAbi(
