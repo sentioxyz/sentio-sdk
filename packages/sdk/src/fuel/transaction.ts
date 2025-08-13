@@ -38,7 +38,7 @@ export async function decodeFuelTransaction(gqlTransaction: any, provider: Provi
   const receipts = gqlTransaction?.status.receipts?.map(deserializeReceipt) || []
   let decodedTransaction: any
   try {
-    let [d] = new TransactionCoder().decode(rawPayload, 0)
+    const [d] = new TransactionCoder().decode(rawPayload, 0)
     decodedTransaction = d
   } catch (e) {
     // If the transaction cannot be decoded, we log the payload in hex and rethrow it
