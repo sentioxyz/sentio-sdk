@@ -108,7 +108,7 @@
     "chalk": "^5.3.0",
     "csv-parse": "^5.5.3",
     "ethers": "npm:@sentio/ethers@6.13.1-patch.6",
-    "fuels": "^0.100.4",
+    "fuels": "^0.101.3",
     "got": "^14.4.7",
     "graphql": "^16.9.0",
     "js-sha3": "^0.9.3",
