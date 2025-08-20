@@ -66,7 +66,7 @@ async function generateProcessor(options: {
 }) {
   try {
     // Get API credentials
-    const host = getFinalizedHost(options.host || 'app')
+    const host = getFinalizedHost(options.host || 'prod')
     const apiKey = ReadKey(host)
 
     if (!apiKey) {
@@ -157,7 +157,7 @@ async function pollAndDisplayMessages(
   let cursorPosition = initialCursorPosition
   let isComplete = false
   let spinner = createSpinner('Starting AI processor generation')
-  let allMessages: string[] = []
+  const allMessages: string[] = []
 
   const displayMessage = (text: string, isLatest: boolean = true) => {
     if (verbose) {
