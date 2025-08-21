@@ -5,7 +5,7 @@ import { MetricState, MetricStateNew } from './meter.js'
 import { ExporterState } from './exporter.js'
 import { TemplateInstanceState } from './template.js'
 import { EventLoggerState } from './event-logger.js'
-import { DatabaseSchemaState } from './database-schema.js'
+import { DatabaseSchemaState, mergeSchemas } from './database-schema.js'
 
 export class CorePlugin extends Plugin {
   name: string = 'CorePlugin'
@@ -46,17 +46,10 @@ export class CorePlugin extends Plugin {
     }
 
     if (DatabaseSchemaState.INSTANCE.getValues().length > 0) {
+      const schemas = DatabaseSchemaState.INSTANCE.getValues()
+      const mergedSources = mergeSchemas(schemas)
       config.dbSchema = {
-        gqlSchema: DatabaseSchemaState.INSTANCE.getValues()
-          .map((e) => e.source)
-          .join('\n\n')
-      }
-    }
-    if (DatabaseSchemaState.INSTANCE.getValues().length > 0) {
-      config.dbSchema = {
-        gqlSchema: DatabaseSchemaState.INSTANCE.getValues()
-          .map((e) => e.source)
-          .join('\n\n')
+        gqlSchema: mergedSources
       }
     }
   }
