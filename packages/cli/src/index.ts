@@ -10,6 +10,7 @@ import { createCompileCommand } from './commands/compile.js'
 import { createGraphCommand } from './commands/graph.js'
 import { createUploadCommand } from './commands/upload.js'
 import { createBuildCommand, createGenCommand } from './commands/build.js'
+import { createAiCommand } from './commands/ai.js'
 import { getCliVersion, printVersions } from './utils.js'
 
 const program = new Command()
@@ -28,5 +29,6 @@ program.addCommand(createGraphCommand())
 program.addCommand(createUploadCommand())
 program.addCommand(createBuildCommand())
 program.addCommand(createGenCommand())
+program.addCommand(createAiCommand())
 
 program.parse()
