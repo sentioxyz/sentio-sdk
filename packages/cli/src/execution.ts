@@ -5,7 +5,7 @@ import { getPackageManager } from 'package-manager-manager'
 
 export async function execStep(cmds: string[], stepName: string, options?: ExecFileOptions, extraBeginMsg?: string) {
   // https://nodejs.org/api/child_process.html#child_process_spawning_bat_and_cmd_files_on_windows
-  const child = process.platform === 'win32' ? exec(cmds.join(' ')) : execFile(cmds[0], cmds.slice(1), options || {})
+  const child = process.platform === 'win32' ? exec(cmds.join(' ')) : execFile(cmds[0], cmds.slice(1), options)
 
   console.log(chalk.blue(stepName, 'begin', extraBeginMsg))
 
