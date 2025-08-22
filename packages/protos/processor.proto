@@ -27,16 +27,20 @@ service Processor {
 }
 
 service ProcessorV3 {
-  // Initially call once to confirm which chains are available
-  rpc Init(google.protobuf.Empty) returns (InitResponse);
+  // Start the processor, need to be called before any other RPC calls
+  rpc Start(StartRequest) returns (google.protobuf.Empty);
+
+  // Get configs of processor, it will be updated automatically if new contracts is added
+  // during log processing
+  rpc GetConfig(ProcessConfigRequest) returns (ProcessConfigResponse);
 
   // It will be called multiple times to tell the specified chain which templates are there and return
   // the handler configuration of this chain.
   // There is a special requirement that different chains must have different handler id sequences,
   // otherwise templates cannot be added midway. Whether it is a new template can also be determined by the driver.
-  rpc ConfigureHandlers(ConfigureHandlersRequest) returns (ConfigureHandlersResponse);
+  rpc UpdateTemplates(UpdateTemplatesRequest) returns (google.protobuf.Empty);
 
-  rpc ProcessBindingsStream(stream ProcessStreamRequest) returns (stream ProcessStreamResponseV2);
+  rpc ProcessBindingsStream(stream ProcessStreamRequest) returns (stream ProcessStreamResponseV3);
 }
 
 message ProjectConfig {
@@ -316,7 +320,7 @@ message InitResponse {
   repeated EventLogConfig event_log_configs = 7;
 }
 
-message ConfigureHandlersRequest {
+message UpdateTemplatesRequest {
   string chain_id = 1;
   repeated TemplateInstance template_instances = 2;
 }
@@ -603,7 +607,7 @@ message ProcessStreamResponse {
   }
 }
 
-message ProcessStreamResponseV2 {
+message ProcessStreamResponseV3 {
   int32 process_id = 1; // used to identify the processor run
   oneof value {
     ProcessStreamResponse.Partitions partitions = 2; // will be followed by a start request
@@ -612,8 +616,6 @@ message ProcessStreamResponseV2 {
     TPLRequest tpl_request = 5; // no response
     ProcessResult result = 6;  // finish the binding data, no response
   }
-
-
 }
 
 message PreprocessStreamRequest {

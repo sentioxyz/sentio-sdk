@@ -1,14 +1,14 @@
 import {
   DataBinding,
   HandlerType,
-  InitResponse,
   PreparedData,
   PreprocessResult,
   ProcessConfigResponse,
   ProcessResult,
   ProcessStreamResponse_Partitions,
   ProcessStreamResponse_Partitions_Partition_SysValue,
-  StartRequest
+  StartRequest,
+  UpdateTemplatesRequest
 } from '@sentio/protos'
 import { IStoreContext, StoreContext } from './db-context.js'
 import { AsyncLocalStorage } from 'node:async_hooks'
@@ -60,12 +60,6 @@ export abstract class Plugin {
    * method used by action server only
    */
   shutdownServer() {}
-
-  /**
-   * Initialize the plugin, for service v3.
-   * @param config
-   */
-  async init(config: InitResponse): Promise<void> {}
 }
 
 export class PluginManager {
@@ -90,8 +84,10 @@ export class PluginManager {
     }
   }
 
-  async configure(config: ProcessConfigResponse, forChainId?: string): Promise<void> {
-    await Promise.all(this.plugins.map((plugin) => plugin.configure(config, forChainId)))
+  async configure(config: ProcessConfigResponse): Promise<void> {
+    for (const plugin of this.plugins) {
+      await plugin.configure(config)
+    }
   }
 
   start(start: StartRequest, actionServerPort?: number) {
@@ -149,7 +145,11 @@ export class PluginManager {
     })
   }
 
-  async init(resp: InitResponse) {
-    return Promise.all(this.plugins.map((plugin) => plugin.init(resp)))
+  async updateTemplates(request: UpdateTemplatesRequest) {
+    for (const plugin of this.plugins) {
+      await plugin.start({
+        templateInstances: request.templateInstances
+      })
+    }
   }
 }
