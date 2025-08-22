@@ -674,7 +674,7 @@ export interface InitResponse {
   eventLogConfigs: EventLogConfig[];
 }
 
-export interface ConfigureHandlersRequest {
+export interface UpdateTemplatesRequest {
   chainId: string;
   templateInstances: TemplateInstance[];
 }
@@ -989,7 +989,7 @@ export interface ProcessStreamResponse_Partitions_PartitionsEntry {
   value: ProcessStreamResponse_Partitions_Partition | undefined;
 }
 
-export interface ProcessStreamResponseV2 {
+export interface ProcessStreamResponseV3 {
   processId: number;
   partitions?: ProcessStreamResponse_Partitions | undefined;
   dbRequest?: DBRequest | undefined;
@@ -4559,12 +4559,12 @@ export const InitResponse = {
   },
 };
 
-function createBaseConfigureHandlersRequest(): ConfigureHandlersRequest {
+function createBaseUpdateTemplatesRequest(): UpdateTemplatesRequest {
   return { chainId: "", templateInstances: [] };
 }
 
-export const ConfigureHandlersRequest = {
-  encode(message: ConfigureHandlersRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const UpdateTemplatesRequest = {
+  encode(message: UpdateTemplatesRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.chainId !== "") {
       writer.uint32(10).string(message.chainId);
     }
@@ -4574,10 +4574,10 @@ export const ConfigureHandlersRequest = {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): ConfigureHandlersRequest {
+  decode(input: _m0.Reader | Uint8Array, length?: number): UpdateTemplatesRequest {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseConfigureHandlersRequest();
+    const message = createBaseUpdateTemplatesRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -4604,7 +4604,7 @@ export const ConfigureHandlersRequest = {
     return message;
   },
 
-  fromJSON(object: any): ConfigureHandlersRequest {
+  fromJSON(object: any): UpdateTemplatesRequest {
     return {
       chainId: isSet(object.chainId) ? globalThis.String(object.chainId) : "",
       templateInstances: globalThis.Array.isArray(object?.templateInstances)
@@ -4613,7 +4613,7 @@ export const ConfigureHandlersRequest = {
     };
   },
 
-  toJSON(message: ConfigureHandlersRequest): unknown {
+  toJSON(message: UpdateTemplatesRequest): unknown {
     const obj: any = {};
     if (message.chainId !== "") {
       obj.chainId = message.chainId;
@@ -4624,11 +4624,11 @@ export const ConfigureHandlersRequest = {
     return obj;
   },
 
-  create(base?: DeepPartial<ConfigureHandlersRequest>): ConfigureHandlersRequest {
-    return ConfigureHandlersRequest.fromPartial(base ?? {});
+  create(base?: DeepPartial<UpdateTemplatesRequest>): UpdateTemplatesRequest {
+    return UpdateTemplatesRequest.fromPartial(base ?? {});
   },
-  fromPartial(object: DeepPartial<ConfigureHandlersRequest>): ConfigureHandlersRequest {
-    const message = createBaseConfigureHandlersRequest();
+  fromPartial(object: DeepPartial<UpdateTemplatesRequest>): UpdateTemplatesRequest {
+    const message = createBaseUpdateTemplatesRequest();
     message.chainId = object.chainId ?? "";
     message.templateInstances = object.templateInstances?.map((e) => TemplateInstance.fromPartial(e)) || [];
     return message;
@@ -8761,7 +8761,7 @@ export const ProcessStreamResponse_Partitions_PartitionsEntry = {
   },
 };
 
-function createBaseProcessStreamResponseV2(): ProcessStreamResponseV2 {
+function createBaseProcessStreamResponseV3(): ProcessStreamResponseV3 {
   return {
     processId: 0,
     partitions: undefined,
@@ -8772,8 +8772,8 @@ function createBaseProcessStreamResponseV2(): ProcessStreamResponseV2 {
   };
 }
 
-export const ProcessStreamResponseV2 = {
-  encode(message: ProcessStreamResponseV2, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const ProcessStreamResponseV3 = {
+  encode(message: ProcessStreamResponseV3, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.processId !== 0) {
       writer.uint32(8).int32(message.processId);
     }
@@ -8795,10 +8795,10 @@ export const ProcessStreamResponseV2 = {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): ProcessStreamResponseV2 {
+  decode(input: _m0.Reader | Uint8Array, length?: number): ProcessStreamResponseV3 {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseProcessStreamResponseV2();
+    const message = createBaseProcessStreamResponseV3();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -8853,7 +8853,7 @@ export const ProcessStreamResponseV2 = {
     return message;
   },
 
-  fromJSON(object: any): ProcessStreamResponseV2 {
+  fromJSON(object: any): ProcessStreamResponseV3 {
     return {
       processId: isSet(object.processId) ? globalThis.Number(object.processId) : 0,
       partitions: isSet(object.partitions) ? ProcessStreamResponse_Partitions.fromJSON(object.partitions) : undefined,
@@ -8864,7 +8864,7 @@ export const ProcessStreamResponseV2 = {
     };
   },
 
-  toJSON(message: ProcessStreamResponseV2): unknown {
+  toJSON(message: ProcessStreamResponseV3): unknown {
     const obj: any = {};
     if (message.processId !== 0) {
       obj.processId = Math.round(message.processId);
@@ -8887,11 +8887,11 @@ export const ProcessStreamResponseV2 = {
     return obj;
   },
 
-  create(base?: DeepPartial<ProcessStreamResponseV2>): ProcessStreamResponseV2 {
-    return ProcessStreamResponseV2.fromPartial(base ?? {});
+  create(base?: DeepPartial<ProcessStreamResponseV3>): ProcessStreamResponseV3 {
+    return ProcessStreamResponseV3.fromPartial(base ?? {});
   },
-  fromPartial(object: DeepPartial<ProcessStreamResponseV2>): ProcessStreamResponseV2 {
-    const message = createBaseProcessStreamResponseV2();
+  fromPartial(object: DeepPartial<ProcessStreamResponseV3>): ProcessStreamResponseV3 {
+    const message = createBaseProcessStreamResponseV3();
     message.processId = object.processId ?? 0;
     message.partitions = (object.partitions !== undefined && object.partitions !== null)
       ? ProcessStreamResponse_Partitions.fromPartial(object.partitions)
@@ -14707,19 +14707,27 @@ export const ProcessorV3Definition = {
   name: "ProcessorV3",
   fullName: "processor.ProcessorV3",
   methods: {
-    init: {
-      name: "Init",
-      requestType: Empty,
+    start: {
+      name: "Start",
+      requestType: StartRequest,
       requestStream: false,
-      responseType: InitResponse,
+      responseType: Empty,
       responseStream: false,
       options: {},
     },
-    configureHandlers: {
-      name: "ConfigureHandlers",
-      requestType: ConfigureHandlersRequest,
+    getConfig: {
+      name: "GetConfig",
+      requestType: ProcessConfigRequest,
       requestStream: false,
-      responseType: ConfigureHandlersResponse,
+      responseType: ProcessConfigResponse,
+      responseStream: false,
+      options: {},
+    },
+    updateTemplates: {
+      name: "UpdateTemplates",
+      requestType: UpdateTemplatesRequest,
+      requestStream: false,
+      responseType: Empty,
       responseStream: false,
       options: {},
     },
@@ -14727,7 +14735,7 @@ export const ProcessorV3Definition = {
       name: "ProcessBindingsStream",
       requestType: ProcessStreamRequest,
       requestStream: true,
-      responseType: ProcessStreamResponseV2,
+      responseType: ProcessStreamResponseV3,
       responseStream: true,
       options: {},
     },
@@ -14735,27 +14743,29 @@ export const ProcessorV3Definition = {
 } as const;
 
 export interface ProcessorV3ServiceImplementation<CallContextExt = {}> {
-  init(request: Empty, context: CallContext & CallContextExt): Promise<DeepPartial<InitResponse>>;
-  configureHandlers(
-    request: ConfigureHandlersRequest,
+  start(request: StartRequest, context: CallContext & CallContextExt): Promise<DeepPartial<Empty>>;
+  getConfig(
+    request: ProcessConfigRequest,
     context: CallContext & CallContextExt,
-  ): Promise<DeepPartial<ConfigureHandlersResponse>>;
+  ): Promise<DeepPartial<ProcessConfigResponse>>;
+  updateTemplates(request: UpdateTemplatesRequest, context: CallContext & CallContextExt): Promise<DeepPartial<Empty>>;
   processBindingsStream(
     request: AsyncIterable<ProcessStreamRequest>,
     context: CallContext & CallContextExt,
-  ): ServerStreamingMethodResult<DeepPartial<ProcessStreamResponseV2>>;
+  ): ServerStreamingMethodResult<DeepPartial<ProcessStreamResponseV3>>;
 }
 
 export interface ProcessorV3Client<CallOptionsExt = {}> {
-  init(request: DeepPartial<Empty>, options?: CallOptions & CallOptionsExt): Promise<InitResponse>;
-  configureHandlers(
-    request: DeepPartial<ConfigureHandlersRequest>,
+  start(request: DeepPartial<StartRequest>, options?: CallOptions & CallOptionsExt): Promise<Empty>;
+  getConfig(
+    request: DeepPartial<ProcessConfigRequest>,
     options?: CallOptions & CallOptionsExt,
-  ): Promise<ConfigureHandlersResponse>;
+  ): Promise<ProcessConfigResponse>;
+  updateTemplates(request: DeepPartial<UpdateTemplatesRequest>, options?: CallOptions & CallOptionsExt): Promise<Empty>;
   processBindingsStream(
     request: AsyncIterable<DeepPartial<ProcessStreamRequest>>,
     options?: CallOptions & CallOptionsExt,
-  ): AsyncIterable<ProcessStreamResponseV2>;
+  ): AsyncIterable<ProcessStreamResponseV3>;
 }
 
 type Builtin = Date | Function | Uint8Array | string | number | boolean | bigint | undefined;

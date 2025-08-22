@@ -6,7 +6,7 @@ import {
   DeepPartial,
   ProcessResult,
   ProcessStreamResponse,
-  ProcessStreamResponseV2,
+  ProcessStreamResponseV3,
   TemplateInstance,
   TimeseriesResult
 } from '@sentio/protos'
@@ -257,7 +257,7 @@ export class StoreContext extends AbstractStoreContext {
 export class DataBindingContext extends AbstractStoreContext implements IDataBindingContext {
   constructor(
     readonly processId: number,
-    readonly subject: Subject<DeepPartial<ProcessStreamResponseV2>>
+    readonly subject: Subject<DeepPartial<ProcessStreamResponseV3>>
   ) {
     super(processId)
   }
@@ -279,7 +279,7 @@ export class DataBindingContext extends AbstractStoreContext implements IDataBin
     })
   }
 
-  doSend(resp: DeepPartial<ProcessStreamResponseV2>) {
+  doSend(resp: DeepPartial<ProcessStreamResponseV3>) {
     console.debug('sending db request, processId ', this.processId, 'opId', resp.dbRequest?.opId)
     this.subject.next({
       ...resp,

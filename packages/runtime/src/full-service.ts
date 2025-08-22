@@ -2,11 +2,9 @@ import { CallContext } from 'nice-grpc'
 import { createRequire } from 'module'
 // Different than the simple one which
 import {
-  ConfigureHandlersRequest,
   DataBinding,
   ExecutionConfig,
   HandlerType,
-  InitResponse,
   PreprocessStreamRequest,
   ProcessBindingsRequest,
   ProcessConfigRequest,
@@ -17,7 +15,7 @@ import {
   StartRequest
 } from './gen/processor/protos/processor.js'
 
-import { ConfigureHandlersResponse, DeepPartial, Empty, ProcessorV3ServiceImplementation } from '@sentio/protos'
+import { DeepPartial, Empty, ProcessorV3ServiceImplementation, UpdateTemplatesRequest } from '@sentio/protos'
 import fs from 'fs-extra'
 import path from 'path'
 import os from 'os'
@@ -415,17 +413,12 @@ export class FullProcessorServiceV3Impl implements ProcessorV3ServiceImplementat
 
   constructor(readonly instance: ProcessorV3ServiceImplementation) {}
 
-  async init(request: Empty, context: CallContext): Promise<DeepPartial<InitResponse>> {
-    const resp = await this.instance.init(request, context)
-    resp.executionConfig = ExecutionConfig.fromPartial(GLOBAL_CONFIG.execution)
-    return resp
+  async start(request: StartRequest, context: CallContext): Promise<DeepPartial<Empty>> {
+    return this.instance.start(request, context)
   }
 
-  async configureHandlers(
-    request: ConfigureHandlersRequest,
-    context: CallContext
-  ): Promise<DeepPartial<ConfigureHandlersResponse>> {
-    const config = await this.instance.configureHandlers(request, context)
+  async getConfig(request: ProcessConfigRequest, context: CallContext): Promise<DeepPartial<ProcessConfigResponse>> {
+    const config = await this.instance.getConfig(request, context)
     this.patcher.patchConfig(config)
     return config
   }
@@ -439,5 +432,9 @@ export class FullProcessorServiceV3Impl implements ProcessorV3ServiceImplementat
       this.patcher.adjustDataBinding(request.binding)
       yield request
     }
+  }
+
+  async updateTemplates(request: UpdateTemplatesRequest, context: CallContext): Promise<DeepPartial<Empty>> {
+    return this.instance.updateTemplates(request, context)
   }
 }

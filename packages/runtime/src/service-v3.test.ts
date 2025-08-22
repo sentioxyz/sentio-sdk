@@ -2,13 +2,11 @@ import { before, describe, test } from 'node:test'
 import assert from 'assert'
 import { CallContext } from 'nice-grpc-common'
 import {
-  ConfigureHandlersRequest,
   DeepPartial,
-  Empty,
   HandlerType,
-  InitResponse,
+  ProcessConfigRequest,
   ProcessConfigResponse,
-  ProcessStreamResponseV2
+  ProcessStreamResponseV3
 } from '@sentio/protos'
 import { Subject } from 'rxjs'
 import { ProcessorServiceImplV3 } from './service-v3.js'
@@ -30,23 +28,18 @@ describe('Test Service V3 with worker without partition', () => {
     }
   )
 
-  let initResponse: DeepPartial<InitResponse> = InitResponse.fromPartial({})
   let processConfigResponse: DeepPartial<ProcessConfigResponse> = ProcessConfigResponse.fromPartial({})
 
   before(async () => {
     try {
-      initResponse = await service.init(Empty, TEST_CONTEXT)
-      processConfigResponse = await service.configureHandlers(ConfigureHandlersRequest.fromPartial({}), TEST_CONTEXT)
+      await service.start({ templateInstances: [] }, TEST_CONTEXT)
+      processConfigResponse = await service.getConfig(ProcessConfigRequest.fromPartial({}), TEST_CONTEXT)
     } catch (e) {
       console.error('Error during initialization:', e)
     }
   })
 
   test('should initialize with correct chain IDs', () => {
-    assert.ok(initResponse.chainIds, 'Chain IDs should be present in the response')
-    assert.strictEqual(initResponse.chainIds.length, 1, 'Should have one chain ID')
-    assert.strictEqual(initResponse.chainIds[0], '1', 'Chain ID should be "1"')
-
     assert.ok(processConfigResponse.accountConfigs, 'Account configs should be present in the response')
   })
 
@@ -68,10 +61,10 @@ describe('Test Service V3 with worker without partition', () => {
       }
     }
 
-    const subject = new Subject<DeepPartial<ProcessStreamResponseV2>>()
+    const subject = new Subject<DeepPartial<ProcessStreamResponseV3>>()
     let i = 0
     let result: any = undefined
-    subject.subscribe((resp: ProcessStreamResponseV2) => {
+    subject.subscribe((resp: ProcessStreamResponseV3) => {
       if (resp.dbRequest) {
         assert.ok(resp.dbRequest, 'db request should be present in the response')
         assert.deepEqual(

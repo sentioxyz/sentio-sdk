@@ -2116,6 +2116,9 @@ export interface RequestLog {
   queryDuration: bigint;
   method: string;
   rpcNodeId: string;
+  originUrl: string;
+  endpointType: string;
+  chainId: string;
 }
 
 function createBaseUsageTracker(): UsageTracker {
@@ -14903,6 +14906,9 @@ function createBaseRequestLog(): RequestLog {
     queryDuration: BigInt("0"),
     method: "",
     rpcNodeId: "",
+    originUrl: "",
+    endpointType: "",
+    chainId: "",
   };
 }
 
@@ -14958,6 +14964,15 @@ export const RequestLog = {
     }
     if (message.rpcNodeId !== "") {
       writer.uint32(122).string(message.rpcNodeId);
+    }
+    if (message.originUrl !== "") {
+      writer.uint32(130).string(message.originUrl);
+    }
+    if (message.endpointType !== "") {
+      writer.uint32(138).string(message.endpointType);
+    }
+    if (message.chainId !== "") {
+      writer.uint32(146).string(message.chainId);
     }
     return writer;
   },
@@ -15074,6 +15089,27 @@ export const RequestLog = {
 
           message.rpcNodeId = reader.string();
           continue;
+        case 16:
+          if (tag !== 130) {
+            break;
+          }
+
+          message.originUrl = reader.string();
+          continue;
+        case 17:
+          if (tag !== 138) {
+            break;
+          }
+
+          message.endpointType = reader.string();
+          continue;
+        case 18:
+          if (tag !== 146) {
+            break;
+          }
+
+          message.chainId = reader.string();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -15100,6 +15136,9 @@ export const RequestLog = {
       queryDuration: isSet(object.queryDuration) ? BigInt(object.queryDuration) : BigInt("0"),
       method: isSet(object.method) ? globalThis.String(object.method) : "",
       rpcNodeId: isSet(object.rpcNodeId) ? globalThis.String(object.rpcNodeId) : "",
+      originUrl: isSet(object.originUrl) ? globalThis.String(object.originUrl) : "",
+      endpointType: isSet(object.endpointType) ? globalThis.String(object.endpointType) : "",
+      chainId: isSet(object.chainId) ? globalThis.String(object.chainId) : "",
     };
   },
 
@@ -15150,6 +15189,15 @@ export const RequestLog = {
     if (message.rpcNodeId !== "") {
       obj.rpcNodeId = message.rpcNodeId;
     }
+    if (message.originUrl !== "") {
+      obj.originUrl = message.originUrl;
+    }
+    if (message.endpointType !== "") {
+      obj.endpointType = message.endpointType;
+    }
+    if (message.chainId !== "") {
+      obj.chainId = message.chainId;
+    }
     return obj;
   },
 
@@ -15173,6 +15221,9 @@ export const RequestLog = {
     message.queryDuration = object.queryDuration ?? BigInt("0");
     message.method = object.method ?? "";
     message.rpcNodeId = object.rpcNodeId ?? "";
+    message.originUrl = object.originUrl ?? "";
+    message.endpointType = object.endpointType ?? "";
+    message.chainId = object.chainId ?? "";
     return message;
   },
 };

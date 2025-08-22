@@ -9,7 +9,11 @@ import { CoinMetadata } from '@mysten/sui/client'
 
 const WHITELISTED_COINS = new Map<string, BaseCoinInfo>()
 
+let initiated = false
 export async function initCoinList() {
+  if (initiated) {
+    return
+  }
   let list = DEFAULT_LIST.coinlist
   try {
     const resp = await fetch('https://raw.githubusercontent.com/solflare-wallet/sui-coinlist/master/sui-coinlist.json')
@@ -19,6 +23,7 @@ export async function initCoinList() {
   }
 
   setCoinList(list)
+  initiated = true
 }
 
 export interface SuiCoinInfo {

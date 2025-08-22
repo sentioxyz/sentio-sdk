@@ -1,20 +1,19 @@
 import {
-  ConfigureHandlersRequest,
-  ConfigureHandlersResponse,
   DataBinding,
   DeepPartial,
   Empty,
   HandlerType,
-  InitResponse,
+  ProcessConfigRequest,
   ProcessConfigResponse,
   ProcessorV3ServiceImplementation,
   ProcessResult,
   ProcessStreamRequest,
   ProcessStreamResponse,
-  ProcessStreamResponseV2,
-  StartRequest
+  ProcessStreamResponseV3,
+  StartRequest,
+  UpdateTemplatesRequest
 } from '@sentio/protos'
-import { CallContext } from 'nice-grpc'
+import { CallContext, ServerError, Status } from 'nice-grpc'
 import { AsyncIterable } from 'ix'
 import { PluginManager } from './plugin.js'
 import { Subject } from 'rxjs'
@@ -26,6 +25,7 @@ import { processMetrics } from './metrics.js'
 import { recordRuntimeInfo } from './service.js'
 import { DataBindingContext } from './db-context.js'
 import { TemplateInstanceState } from './state.js'
+import { freezeGlobalConfig } from './global-config.js'
 
 const { process_binding_count, process_binding_time, process_binding_error } = processMetrics
 
@@ -33,6 +33,7 @@ export class ProcessorServiceImplV3 implements ProcessorV3ServiceImplementation 
   readonly enablePartition: boolean
   private readonly loader: () => Promise<any>
   private readonly shutdownHandler?: () => void
+  private started = false
 
   constructor(loader: () => Promise<any>, options?: any, shutdownHandler?: () => void) {
     this.loader = loader
@@ -41,18 +42,37 @@ export class ProcessorServiceImplV3 implements ProcessorV3ServiceImplementation 
     this.enablePartition = options?.['enable-partition'] == true
   }
 
-  async init(request: Empty, context: CallContext): Promise<DeepPartial<InitResponse>> {
-    await this.loader()
-    const resp = InitResponse.fromPartial({
-      chainIds: []
-    })
-    await PluginManager.INSTANCE.init(resp)
-    resp.chainIds = Array.from(new Set(resp.chainIds))
-    return resp
+  async start(request: StartRequest, context: CallContext): Promise<Empty> {
+    if (this.started) {
+      return {}
+    }
+
+    freezeGlobalConfig()
+
+    try {
+      await this.loader()
+    } catch (e) {
+      throw new ServerError(Status.INVALID_ARGUMENT, 'Failed to load processor: ' + errorString(e))
+    }
+
+    await PluginManager.INSTANCE.start(request)
+
+    this.started = true
+    return {}
+  }
+
+  async getConfig(request: ProcessConfigRequest, context: CallContext): Promise<ProcessConfigResponse> {
+    if (!this.started) {
+      throw new ServerError(Status.UNAVAILABLE, 'Service Not started.')
+    }
+
+    const newConfig = ProcessConfigResponse.fromPartial({})
+    await PluginManager.INSTANCE.configure(newConfig)
+    return newConfig
   }
 
   async *processBindingsStream(requests: AsyncIterable<ProcessStreamRequest>, context: CallContext) {
-    const subject = new Subject<DeepPartial<ProcessStreamResponseV2>>()
+    const subject = new Subject<DeepPartial<ProcessStreamResponseV3>>()
     this.handleRequests(requests, subject)
       .then(() => {
         subject.complete()
@@ -88,7 +108,7 @@ export class ProcessorServiceImplV3 implements ProcessorV3ServiceImplementation 
   async handleRequest(
     request: ProcessStreamRequest,
     lastBinding: DataBinding | undefined,
-    subject: Subject<DeepPartial<ProcessStreamResponseV2>>
+    subject: Subject<DeepPartial<ProcessStreamResponseV3>>
   ) {
     if (request.binding) {
       process_binding_count.add(1)
@@ -141,7 +161,7 @@ export class ProcessorServiceImplV3 implements ProcessorV3ServiceImplementation 
   private startProcess(
     processId: number,
     binding: DataBinding,
-    subject: Subject<DeepPartial<ProcessStreamResponseV2>>
+    subject: Subject<DeepPartial<ProcessStreamResponseV3>>
   ) {
     const context = this.contexts.new(processId, subject)
     const start = Date.now()
@@ -194,22 +214,9 @@ export class ProcessorServiceImplV3 implements ProcessorV3ServiceImplementation 
       })
   }
 
-  async configureHandlers(
-    request: ConfigureHandlersRequest,
-    context: CallContext
-  ): Promise<DeepPartial<ConfigureHandlersResponse>> {
-    await PluginManager.INSTANCE.start(
-      StartRequest.fromPartial({
-        templateInstances: request.templateInstances
-      })
-    )
-
-    const newConfig = ProcessConfigResponse.fromPartial({})
-    await PluginManager.INSTANCE.configure(newConfig, request.chainId)
-    return {
-      accountConfigs: newConfig.accountConfigs,
-      contractConfigs: newConfig.contractConfigs
-    }
+  async updateTemplates(request: UpdateTemplatesRequest, context: CallContext): Promise<DeepPartial<Empty>> {
+    await PluginManager.INSTANCE.updateTemplates(request)
+    return {}
   }
 }
 
@@ -220,7 +227,7 @@ class Contexts {
     return this.contexts.get(processId)
   }
 
-  new(processId: number, subject: Subject<DeepPartial<ProcessStreamResponseV2>>) {
+  new(processId: number, subject: Subject<DeepPartial<ProcessStreamResponseV3>>) {
     const context = new DataBindingContext(processId, subject)
     this.contexts.set(processId, context)
     return context
