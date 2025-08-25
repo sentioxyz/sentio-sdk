@@ -89,6 +89,7 @@
     "@aptos-labs/ts-sdk": "~4.0.0",
     "@coral-xyz/anchor": "^0.30.1",
     "@coral-xyz/borsh": "^0.30.1",
+    "@graphql-tools/utils": "^10.9.1",
     "@iota/iota-sdk": "~1.5.0",
     "@mysten/sui": "~1.37.1",
     "@prettier/sync": "^0.5.2",
