@@ -1,7 +1,9 @@
 import { ListStateStorage } from '@sentio/runtime'
 import { EntityClass } from '../store/index.js'
-import { isInterfaceType, isObjectType, isScalarType, parse, printType } from 'graphql/index.js'
+import { isInterfaceType, isObjectType, isScalarType, parse } from 'graphql/index.js'
 import { buildSchema } from '../store/schema.js'
+import { printSchemaWithDirectives } from '@graphql-tools/utils'
+import { GraphQLSchema } from 'graphql'
 
 type Schema = {
   source: string
@@ -29,28 +31,29 @@ export class DatabaseSchema {
 }
 
 export function mergeSchemas(schemas: Schema[]) {
-  let ret = ''
-  const types: Record<string, any> = {}
+  const allTypes: Record<string, any> = {}
+  let mergedSchema = new GraphQLSchema({})
   for (const schema of schemas) {
     const gqlSchema = buildSchema(parse(schema.source))
     for (const type of Object.values(gqlSchema.getTypeMap())) {
       if (isScalarType(type) || type.name.startsWith('__')) {
+        // types.push(type)
         continue
       }
-      if (types[type.name]) {
+      if (allTypes[type.name]) {
         console.warn(`Type ${type.name} is already registered, you have duplicate definitions in multiple schemas.`)
       } else if (isObjectType(type) || isInterfaceType(type)) {
-        types[type.name] = type
-        type.description = null
-        for (const field of Object.values(type.getFields())) {
-          field.description = null
-        }
-        ret += printType(type) + '\n'
+        allTypes[type.name] = type
       } else {
-        types[type.name] = type
-        ret += printType(type) + '\n'
+        allTypes[type.name] = type
       }
     }
+    mergedSchema = new GraphQLSchema({
+      types: [...Object.values(allTypes)]
+    })
   }
-  return ret
+  return printSchemaWithDirectives(mergedSchema, {
+    commentDescriptions: false,
+    assumeValid: true
+  })
 }
