@@ -111,7 +111,7 @@
     "ethers": "npm:@sentio/ethers@6.13.1-patch.6",
     "fuels": "^0.101.3",
     "got": "^14.4.7",
-    "graphql": "^16.9.0",
+    "graphql": "^16.11.0",
     "js-sha3": "^0.9.3",
     "lru-cache": "^11.0.0",
     "mkdirp": "^3.0.1",

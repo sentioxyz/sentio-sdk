@@ -9,7 +9,8 @@
   },
   "resolutions": {
     "@grpc/grpc-js": "^1.12.2",
-    "ethers": "npm:@sentio/ethers@6.13.1-patch.6"
+    "ethers": "npm:@sentio/ethers@6.13.1-patch.6",
+    "graphql": "^16.11.0"
   },
   "devDependencies": {
     "@eslint/compat": "^1.1.0",
