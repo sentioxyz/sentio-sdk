@@ -113,7 +113,7 @@ jobs:
         run: |
           export BRANCH=${GITHUB_REF##*/}
           pnpm build:bundle
-          pnpm json -I -f package.json -e "this.dependencies=Object.fromEntries(Object.entries(this.dependencies).filter((entry) => ['@sentio/chain', '@sentio/runtime', 'piscina'].includes(entry['0'])))"
+          pnpm json -I -f package.json -e "this.dependencies=Object.fromEntries(Object.entries(this.dependencies).filter((entry) => ['@sentio/chain', '@sentio/runtime', 'piscina','graphql'].includes(entry['0'])))"
           pnpm json -I -f package.json -e 'this.name="@sentio/sdk-bundle"; this.scripts={}; this.peerDependencies={}; this.devDependencies={}; this.files = ["{lib,assets}"]'
         working-directory: packages/sdk
       - name: sdk-bundle NPM Publish
