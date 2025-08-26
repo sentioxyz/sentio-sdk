@@ -21,5 +21,5 @@ export default defineConfig({
   // dts: true,
   format: 'esm',
   keepNames: true,
-  external: [...external, /^@sentio\/(chain|runtime).*$/, /^piscina.*$/]
+  external: [...external, /^@sentio\/(chain|runtime).*$/, /^piscina.*$/, /^graphql.*$/]
 })
