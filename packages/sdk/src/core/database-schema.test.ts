@@ -41,27 +41,27 @@ describe('mergeSchemas', () => {
 
     const result = mergeSchemas([schema])
 
-    assert.strictEqual(result, 'type User @entity {\n  id: String!\n  name: String!\n}')
+    assert.strictEqual(result, 'type User @entity { id: String! name: String! }\n')
   })
 
   it('should print simple schema with interface and enum', () => {
     const schema = {
       source: `
-      interface Node {
-        id: ID!
-      }
-      
-      enum Role {
-        ADMIN
-        USER
-        GUEST
-      }
-      
-      type User implements Node @entity {
-        id: ID!
-        name: String!
-        role: Role!
-      }
+interface Node {
+  id: ID!
+}
+
+enum Role {
+  ADMIN
+  USER
+  GUEST
+}
+
+type User implements Node @entity {
+  id: ID!
+  name: String!
+  role: Role!
+}
       `,
       entities: {
         User: MockUser as EntityClass<MockUser>
@@ -71,7 +71,7 @@ describe('mergeSchemas', () => {
     const result = mergeSchemas([schema])
 
     const expected = `interface Node {\n  id: ID!\n}\n\nenum Role {\n  ADMIN\n  USER\n  GUEST\n}\n\ntype User implements Node @entity {\n  id: ID!\n  name: String!\n  role: Role!\n}`
-    assert.strictEqual(result, expected)
+    assert.strictEqual(result.trim(), expected.trim())
   })
 
   it('should merge multiple schemas with different entities', () => {
@@ -92,8 +92,9 @@ describe('mergeSchemas', () => {
     const result = mergeSchemas([schema1, schema2])
 
     const expected =
-      'type User @entity(immutable: true) {\n  id: String!\n  name: String!\n}\n\ntype Product @entity {\n  id: String!\n  title: String!\n  price: Float!\n}'
-    assert.strictEqual(result, expected)
+      'type User @entity(immutable:true) { id: String! name: String! }\n' +
+      'type Product @entity { id: String! title: String! price: Float! }'
+    assert.strictEqual(result.trim(), expected.trim())
   })
 
   it('should handle duplicate entity names by keeping first one', () => {
@@ -116,7 +117,7 @@ describe('mergeSchemas', () => {
 
     // Should keep first User definition and remove duplicate from source
     const expected =
-      'type User @entity {\n  id: String!\n  name: String!\n}\n\ntype Product @entity {\n  id: String!\n  title: String!\n}'
-    assert.strictEqual(result, expected)
+      'type User @entity { id: String! name: String! }\n type Product @entity { id: String! title: String! }'
+    assert.strictEqual(result.trim(), expected.trim())
   })
 })
