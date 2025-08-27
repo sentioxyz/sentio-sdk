@@ -5599,6 +5599,76 @@
           }
         ],
         "return": []
+      },
+      "unlock": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0x3",
+              "module": "timelocked_staking",
+              "name": "TimelockedStakedIota",
+              "typeArguments": []
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x3",
+              "module": "staking_pool",
+              "name": "StakedIota",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "unlock_with_clock": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0x3",
+              "module": "timelocked_staking",
+              "name": "TimelockedStakedIota",
+              "typeArguments": []
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "clock",
+                "name": "Clock",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x3",
+              "module": "staking_pool",
+              "name": "StakedIota",
+              "typeArguments": []
+            }
+          }
+        ]
       }
     }
   },

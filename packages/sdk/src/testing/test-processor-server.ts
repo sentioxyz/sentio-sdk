@@ -18,7 +18,6 @@ import {
 } from '@sentio/protos'
 import { CallContext } from 'nice-grpc-common'
 import { Endpoints, PluginManager, ProcessorServiceImpl, State, StoreContext } from '@sentio/runtime'
-import { CHAIN_MAP } from '@sentio/chain'
 
 import { AptosFacet } from './aptos-facet.js'
 import { SolanaFacet } from './solana-facet.js'
@@ -32,6 +31,7 @@ import { Subject } from 'rxjs'
 import { MemoryDatabase } from './memory-database.js'
 import { DatabaseSchemaState } from '../core/database-schema.js'
 import { IotaFacet } from './iota-facet.js'
+import { ChainInfo } from '@sentio/chain'
 
 export const TEST_CONTEXT: CallContext = <CallContext>{}
 
@@ -73,7 +73,7 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
     this.starknet = new StarknetFacet(this)
     this.btc = new BTCFacet(this)
 
-    for (const k in CHAIN_MAP) {
+    for (const k of Object.keys(ChainInfo)) {
       const http = httpEndpoints[k] || ''
       Endpoints.INSTANCE.chainServer.set(k, http)
     }
