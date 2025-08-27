@@ -8,7 +8,7 @@ export function loadTestProvidersFromEnv(requiredChainIds: string[] | string): b
     requiredChainIds = [requiredChainIds]
   }
 
-  for (const k of Object.keys(ChainId)) {
+  for (const k of Object.keys(ChainInfo)) {
     const envKey = 'TEST_ENDPOINT_' + k
     const http = process.env[envKey]
     if (!http) {

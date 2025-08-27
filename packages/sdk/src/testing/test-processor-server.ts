@@ -73,7 +73,7 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
     this.starknet = new StarknetFacet(this)
     this.btc = new BTCFacet(this)
 
-    for (const k in Object.keys(ChainInfo)) {
+    for (const k of Object.keys(ChainInfo)) {
       const http = httpEndpoints[k] || ''
       Endpoints.INSTANCE.chainServer.set(k, http)
     }
