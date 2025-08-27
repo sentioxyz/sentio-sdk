@@ -298,17 +298,34 @@ function createSpinner(text: string) {
   const frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏']
   let currentFrame = 0
   let isRunning = true
+  let lastLineCount = 0
 
   const interval = setInterval(() => {
     if (!isRunning) return
 
-    // Clear the entire line completely using terminal width
-    const terminalWidth = process.stdout.columns || 100
-    process.stdout.write('\r' + ' '.repeat(terminalWidth) + '\r')
+    // Clear previous lines
+    if (lastLineCount > 0) {
+      // Move cursor up and clear each line
+      for (let i = 0; i < lastLineCount; i++) {
+        process.stdout.write('\r\x1b[K') // Clear current line
+        if (i < lastLineCount - 1) {
+          process.stdout.write('\x1b[1A') // Move cursor up one line
+        }
+      }
+    }
+
+    // Replace newlines with spaces for spinner display and truncate if too long
+    const singleLineText = text.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim()
+    const maxLength = Math.min(80, (process.stdout.columns || 100) - 10)
+    const truncatedText =
+      singleLineText.length > maxLength ? singleLineText.substring(0, maxLength - 3) + '...' : singleLineText
 
     // Write the new line
-    const line = `${chalk.cyan(frames[currentFrame])} ${text}`
+    const line = `${chalk.cyan(frames[currentFrame])} ${truncatedText}`
     process.stdout.write(line)
+
+    // Always count as 1 line since we convert newlines to spaces
+    lastLineCount = 1
     currentFrame = (currentFrame + 1) % frames.length
   }, 100)
 
@@ -316,9 +333,15 @@ function createSpinner(text: string) {
     stop: () => {
       isRunning = false
       clearInterval(interval)
-      // Clear the line completely when stopping
-      const terminalWidth = process.stdout.columns || 100
-      process.stdout.write('\r' + ' '.repeat(terminalWidth) + '\r')
+      // Clear all lines when stopping
+      if (lastLineCount > 0) {
+        for (let i = 0; i < lastLineCount; i++) {
+          process.stdout.write('\r\x1b[K') // Clear current line
+          if (i < lastLineCount - 1) {
+            process.stdout.write('\x1b[1A') // Move cursor up one line
+          }
+        }
+      }
     }
   }
 }
