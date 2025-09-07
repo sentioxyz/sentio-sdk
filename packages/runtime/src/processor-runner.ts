@@ -55,11 +55,11 @@ const program = new Command()
 
 program
   .allowUnknownOption()
-  .allowExcessArguments()
+  // .allowExcessArguments()
   .name('processor-runner')
   .description('Sentio Processor Runtime')
   .version(packageJson.version)
-  .option('--target <path>', 'Path to the processor module to load')
+  .argument('<target>', 'Path to the processor module to load')
   .option('-p, --port <port>', 'Port to listen on', '4000')
   .option('--concurrency <number>', 'Number of concurrent workers', myParseInt, 4)
   .option('--batch-count <number>', 'Batch count for processing', myParseInt, 1)
@@ -83,170 +83,162 @@ program
     'Enable binding data partition',
     process.env['SENTIO_ENABLE_BINDING_DATA_PARTITION'] === 'true'
   )
-  .action(async (options: any) => {
-    try {
-      await startServer(options)
-    } catch (error) {
-      console.error('Failed to start server:', error)
-      process.exit(1)
+  .parse()
+
+const options = program.opts()
+options.target = program.processedArgs[0]
+
+const logLevel = process.env['LOG_LEVEL']?.toLowerCase()
+
+setupLogger(options.logFormat === 'json', logLevel === 'debug' ? true : options.debug)
+console.debug('Starting with', options.target)
+
+await setupOTLP(options.otlpDebug)
+
+Error.stackTraceLimit = 20
+
+configureEndpoints(options)
+
+console.debug('Starting Server', options)
+
+let server: any
+let baseService: ProcessorServiceImpl | ServiceManager
+const loader = async () => {
+  const m = await import(options.target)
+  console.debug('Module loaded', m)
+  return m
+}
+if (options.startActionServer) {
+  server = new ActionServer(loader)
+  server.listen(options.port)
+} else {
+  server = createServer({
+    'grpc.max_send_message_length': 768 * 1024 * 1024,
+    'grpc.max_receive_message_length': 768 * 1024 * 1024,
+    'grpc.default_compression_algorithm': compressionAlgorithms.gzip
+  })
+    // .use(prometheusServerMiddleware())
+    .use(openTelemetryServerMiddleware())
+    .use(errorDetailsServerMiddleware)
+
+  if (options.worker > 1) {
+    baseService = new ServiceManager(loader, options, server.shutdown)
+  } else {
+    baseService = new ProcessorServiceImpl(loader, options, server.shutdown)
+  }
+
+  const service = new FullProcessorServiceImpl(baseService)
+
+  server.add(ProcessorDefinition, service)
+  server.add(
+    ProcessorV3Definition,
+    new FullProcessorServiceV3Impl(new ProcessorServiceImplV3(loader, options, server.shutdown))
+  )
+
+  server.listen('0.0.0.0:' + options.port)
+  console.log('Processor Server Started at:', options.port)
+}
+const metricsPort = 4040
+
+const httpServer = http
+  .createServer(async function (req, res) {
+    if (req.url) {
+      const reqUrl = new URL(req.url, `http://${req.headers.host}`)
+      const queries = reqUrl.searchParams
+      switch (reqUrl.pathname) {
+        // case '/metrics':
+        //   const metrics = await mergedRegistry.metrics()
+        //   res.write(metrics)
+        //   break
+        case '/heap': {
+          try {
+            const file = '/tmp/' + Date.now() + '.heapsnapshot'
+            await dumpHeap(file)
+            // send the file
+            const readStream = fs.createReadStream(file)
+            res.writeHead(200, { 'Content-Type': 'application/json' })
+            readStream.pipe(res)
+            res.end()
+          } catch {
+            res.writeHead(500)
+            res.end()
+          }
+          break
+        }
+        case '/profile': {
+          try {
+            const profileTime = parseInt(queries.get('t') || '1000', 10) || 1000
+            const session = new Session()
+            session.connect()
+
+            await session.post('Profiler.enable')
+            await session.post('Profiler.start')
+
+            await new Promise((resolve) => setTimeout(resolve, profileTime))
+            const { profile } = await session.post('Profiler.stop')
+
+            res.writeHead(200, { 'Content-Type': 'application/json' })
+            res.write(JSON.stringify(profile))
+            session.disconnect()
+          } catch {
+            res.writeHead(500)
+          }
+          break
+        }
+        default:
+          res.writeHead(404)
+      }
+    } else {
+      res.writeHead(404)
     }
+    res.end()
+  })
+  .listen(metricsPort)
+
+console.log('Metric Server Started at:', metricsPort)
+
+process
+  .on('SIGINT', function () {
+    shutdownServers(0)
+  })
+  .on('uncaughtException', (err) => {
+    console.error('Uncaught Exception, please checking if await is properly used', err)
+    if (baseService) {
+      baseService.unhandled = err
+    }
+    // shutdownServers(1)
+  })
+  .on('unhandledRejection', (reason, p) => {
+    // @ts-ignore ignore invalid ens error
+    if (reason?.message.startsWith('invalid ENS name (disallowed character: "*"')) {
+      return
+    }
+    console.error('Unhandled Rejection, please checking if await is properly', reason)
+    if (baseService) {
+      baseService.unhandled = reason as Error
+    }
+    // shutdownServers(1)
   })
 
-// Parse arguments
-program.parse()
-
-async function startServer(options: any): Promise<void> {
-  const logLevel = process.env['LOG_LEVEL']?.toLowerCase()
-
-  setupLogger(options.logFormat === 'json', logLevel === 'debug' ? true : options.debug)
-  console.debug('Starting with', options.target)
-
-  await setupOTLP(options.otlpDebug)
-
-  Error.stackTraceLimit = 20
-
-  configureEndpoints(options)
-
-  console.debug('Starting Server', options)
-
-  let server: any
-  let baseService: ProcessorServiceImpl | ServiceManager
-  const loader = async () => {
-    const m = await import(options.target)
-    console.debug('Module loaded', m)
-    return m
-  }
-  if (options.startActionServer) {
-    server = new ActionServer(loader)
-    server.listen(options.port)
-  } else {
-    server = createServer({
-      'grpc.max_send_message_length': 768 * 1024 * 1024,
-      'grpc.max_receive_message_length': 768 * 1024 * 1024,
-      'grpc.default_compression_algorithm': compressionAlgorithms.gzip
-    })
-      // .use(prometheusServerMiddleware())
-      .use(openTelemetryServerMiddleware())
-      .use(errorDetailsServerMiddleware)
-
-    if (options.worker > 1) {
-      baseService = new ServiceManager(loader, options, server.shutdown)
-    } else {
-      baseService = new ProcessorServiceImpl(loader, options, server.shutdown)
+if (process.env['OOM_DUMP_MEMORY_SIZE_GB']) {
+  let dumping = false
+  const memorySize = parseFloat(process.env['OOM_DUMP_MEMORY_SIZE_GB']!)
+  console.log('heap dumping is enabled, limit set to ', memorySize, 'gb')
+  const dir = process.env['OOM_DUMP_DIR'] || '/tmp'
+  setInterval(async () => {
+    const mem = process.memoryUsage()
+    console.log('Current Memory Usage', mem)
+    // if memory usage is greater this size, dump heap and exit
+    if (mem.heapTotal > memorySize * 1024 * 1024 * 1024 && !dumping) {
+      const file = path.join(dir, `${Date.now()}.heapsnapshot`)
+      dumping = true
+      await dumpHeap(file)
+      // force exit and keep pod running
+      process.exit(11)
     }
-
-    const service = new FullProcessorServiceImpl(baseService)
-
-    server.add(ProcessorDefinition, service)
-    server.add(
-      ProcessorV3Definition,
-      new FullProcessorServiceV3Impl(new ProcessorServiceImplV3(loader, options, server.shutdown))
-    )
-
-    server.listen('0.0.0.0:' + options.port)
-    console.log('Processor Server Started at:', options.port)
-  }
-  const metricsPort = 4040
-
-  const httpServer = http
-    .createServer(async function (req, res) {
-      if (req.url) {
-        const reqUrl = new URL(req.url, `http://${req.headers.host}`)
-        const queries = reqUrl.searchParams
-        switch (reqUrl.pathname) {
-          // case '/metrics':
-          //   const metrics = await mergedRegistry.metrics()
-          //   res.write(metrics)
-          //   break
-          case '/heap': {
-            try {
-              const file = '/tmp/' + Date.now() + '.heapsnapshot'
-              await dumpHeap(file)
-              // send the file
-              const readStream = fs.createReadStream(file)
-              res.writeHead(200, { 'Content-Type': 'application/json' })
-              readStream.pipe(res)
-              res.end()
-            } catch {
-              res.writeHead(500)
-              res.end()
-            }
-            break
-          }
-          case '/profile': {
-            try {
-              const profileTime = parseInt(queries.get('t') || '1000', 10) || 1000
-              const session = new Session()
-              session.connect()
-
-              await session.post('Profiler.enable')
-              await session.post('Profiler.start')
-
-              await new Promise((resolve) => setTimeout(resolve, profileTime))
-              const { profile } = await session.post('Profiler.stop')
-
-              res.writeHead(200, { 'Content-Type': 'application/json' })
-              res.write(JSON.stringify(profile))
-              session.disconnect()
-            } catch {
-              res.writeHead(500)
-            }
-            break
-          }
-          default:
-            res.writeHead(404)
-        }
-      } else {
-        res.writeHead(404)
-      }
-      res.end()
-    })
-    .listen(metricsPort)
-
-  console.log('Metric Server Started at:', metricsPort)
-
-  process
-    .on('SIGINT', function () {
-      shutdownServers(server, httpServer, 0)
-    })
-    .on('uncaughtException', (err) => {
-      console.error('Uncaught Exception, please checking if await is properly used', err)
-      if (baseService) {
-        baseService.unhandled = err
-      }
-      // shutdownServers(1)
-    })
-    .on('unhandledRejection', (reason, p) => {
-      // @ts-ignore ignore invalid ens error
-      if (reason?.message.startsWith('invalid ENS name (disallowed character: "*"')) {
-        return
-      }
-      console.error('Unhandled Rejection, please checking if await is properly', reason)
-      if (baseService) {
-        baseService.unhandled = reason as Error
-      }
-      // shutdownServers(1)
-    })
-
-  if (process.env['OOM_DUMP_MEMORY_SIZE_GB']) {
-    let dumping = false
-    const memorySize = parseFloat(process.env['OOM_DUMP_MEMORY_SIZE_GB']!)
-    console.log('heap dumping is enabled, limit set to ', memorySize, 'gb')
-    const dir = process.env['OOM_DUMP_DIR'] || '/tmp'
-    setInterval(async () => {
-      const mem = process.memoryUsage()
-      console.log('Current Memory Usage', mem)
-      // if memory usage is greater this size, dump heap and exit
-      if (mem.heapTotal > memorySize * 1024 * 1024 * 1024 && !dumping) {
-        const file = path.join(dir, `${Date.now()}.heapsnapshot`)
-        dumping = true
-        await dumpHeap(file)
-        // force exit and keep pod running
-        process.exit(11)
-      }
-    }, 1000 * 60)
-  }
+  }, 1000 * 60)
 }
+// }
 
 async function dumpHeap(file: string): Promise<void> {
   console.log('Heap dumping to', file)
@@ -267,8 +259,8 @@ async function dumpHeap(file: string): Promise<void> {
   }
 }
 
-function shutdownServers(server: any, httpServer: any, exitCode: number): void {
-  server?.forceShutdown()
+function shutdownServers(exitCode: number): void {
+  server.forceShutdown()
   console.log('RPC server shut down')
 
   httpServer.close(function () {
