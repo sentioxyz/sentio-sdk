@@ -22,7 +22,6 @@ import { setupLogger } from './logger.js'
 import { setupOTLP } from './otlp.js'
 import { ActionServer } from './action-server.js'
 import { ServiceManager } from './service-manager.js'
-import path from 'path'
 import { ProcessorV3Definition } from '@sentio/protos'
 import { ProcessorServiceImplV3 } from './service-v3.js'
 import { readFileSync } from 'fs'
@@ -231,7 +230,7 @@ if (process.env['OOM_DUMP_MEMORY_SIZE_GB']) {
     console.log('Current Memory Usage', mem)
     // if memory usage is greater this size, dump heap and exit
     if (mem.heapTotal > memorySize * 1024 * 1024 * 1024 && !dumping) {
-      const file = path.join(dir, `${Date.now()}.heapsnapshot`)
+      const file = join(dir, `${Date.now()}.heapsnapshot`)
       dumping = true
       await dumpHeap(file)
       // force exit and keep pod running
@@ -244,7 +243,7 @@ if (process.env['OOM_DUMP_MEMORY_SIZE_GB']) {
 async function dumpHeap(file: string): Promise<void> {
   console.log('Heap dumping to', file)
   const session = new Session()
-  fs.mkdirSync(path.dirname(file), { recursive: true })
+  fs.mkdirSync(dirname(file), { recursive: true })
   const fd = fs.openSync(file, 'w')
   try {
     session.connect()

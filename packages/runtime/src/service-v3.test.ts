@@ -23,8 +23,8 @@ describe('Test Service V3 with worker without partition', () => {
       PluginManager.INSTANCE.register(new TestPlugin())
     },
     {
-      ['chains-config']: 'chains-config.json',
-      ['enable-partition']: false
+      // chainsConfig: 'chains-config.json',
+      enablePartition: false
     }
   )
 
