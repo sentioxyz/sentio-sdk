@@ -15,7 +15,7 @@ export class Endpoints {
 }
 
 export function configureEndpoints(options: any) {
-  const fullPath = path.resolve(options['chains-config'])
+  const fullPath = path.resolve(options.chainsConfig)
   const chainsConfig = fs.readJsonSync(fullPath)
 
   const concurrencyOverride = process.env['OVERRIDE_CONCURRENCY']
@@ -26,9 +26,9 @@ export function configureEndpoints(options: any) {
     : undefined
 
   Endpoints.INSTANCE.concurrency = concurrencyOverride ?? options.concurrency
-  Endpoints.INSTANCE.batchCount = batchCountOverride ?? options['batch-count']
-  Endpoints.INSTANCE.chainQueryAPI = options['chainquery-server']
-  Endpoints.INSTANCE.priceFeedAPI = options['pricefeed-server']
+  Endpoints.INSTANCE.batchCount = batchCountOverride ?? options.batchCount
+  Endpoints.INSTANCE.chainQueryAPI = options.chainqueryServer
+  Endpoints.INSTANCE.priceFeedAPI = options.pricefeedServer
 
   for (const [id, config] of Object.entries(chainsConfig)) {
     const chainConfig = config as ChainConfig

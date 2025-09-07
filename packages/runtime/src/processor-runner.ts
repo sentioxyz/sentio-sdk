@@ -98,10 +98,10 @@ program.parse()
 async function startServer(options: any): Promise<void> {
   const logLevel = process.env['LOG_LEVEL']?.toLowerCase()
 
-  setupLogger(options['log-format'] === 'json', logLevel === 'debug' ? true : options.debug)
+  setupLogger(options.logFormat === 'json', logLevel === 'debug' ? true : options.debug)
   console.debug('Starting with', options.target)
 
-  await setupOTLP(options['otlp-debug'])
+  await setupOTLP(options.otlpDebug)
 
   Error.stackTraceLimit = 20
 
@@ -116,7 +116,7 @@ async function startServer(options: any): Promise<void> {
     console.debug('Module loaded', m)
     return m
   }
-  if (options['start-action-server']) {
+  if (options.startActionServer) {
     server = new ActionServer(loader)
     server.listen(options.port)
   } else {
