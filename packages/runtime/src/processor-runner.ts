@@ -42,7 +42,7 @@ try {
   console.error('Failed to parse worker number', e)
 }
 
-function myParseInt(value: string, dummyPrevious: unknown): number {
+function myParseInt(value: string, dummyPrevious: number): number {
   // parseInt takes a string and a radix
   const parsedValue = parseInt(value, 10)
   if (isNaN(parsedValue)) {
@@ -122,7 +122,7 @@ if (options.startActionServer) {
     .use(openTelemetryServerMiddleware())
     .use(errorDetailsServerMiddleware)
 
-  if ((options.worker as number) > 1) {
+  if (options.worker > 1) {
     baseService = new ServiceManager(loader, options, server.shutdown)
   } else {
     baseService = new ProcessorServiceImpl(loader, options, server.shutdown)

@@ -35,11 +35,11 @@ export class ProcessorServiceImplV3 implements ProcessorV3ServiceImplementation 
   private readonly shutdownHandler?: () => void
   private started = false
 
-  constructor(loader: () => Promise<any>, options?: any, shutdownHandler?: () => void) {
+  constructor(loader: () => Promise<any>, options?: { enablePartition?: boolean }, shutdownHandler?: () => void) {
     this.loader = loader
     this.shutdownHandler = shutdownHandler
 
-    this.enablePartition = options?.['enable-partition'] == true
+    this.enablePartition = options?.enablePartition == true
   }
 
   async start(request: StartRequest, context: CallContext): Promise<Empty> {

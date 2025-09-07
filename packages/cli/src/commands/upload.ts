@@ -1,4 +1,4 @@
-import { Command } from '@commander-js/extra-typings'
+import { Command, InvalidArgumentError } from '@commander-js/extra-typings'
 import { loadProcessorConfig, overrideConfigWithOptions, YamlProjectConfig } from '../config.js'
 import fs from 'fs'
 import { URL } from 'url'
@@ -15,6 +15,15 @@ import JSZip from 'jszip'
 import { UserInfo } from '../../../protos/lib/service/common/protos/common.js'
 import { CommandOptionsType } from './types.js'
 
+function myParseInt(value: string, dummyPrevious: number): number {
+  // parseInt takes a string and a radix
+  const parsedValue = parseInt(value, 10)
+  if (isNaN(parsedValue)) {
+    throw new InvalidArgumentError('Not a number.')
+  }
+  return parsedValue
+}
+
 export function createUploadCommand() {
   return new Command('upload')
     .description('Upload processor to Sentio')
@@ -22,7 +31,8 @@ export function createUploadCommand() {
     .option('--name <name>', '(Optional) Override Project name')
     .option(
       '--continue-from <version>',
-      '(Optional) Continue processing data from the specific processor version which will keeping the old data from previous version and will STOP that version IMMEDIATELY.'
+      '(Optional) Continue processing data from the specific processor version which will keeping the old data from previous version and will STOP that version IMMEDIATELY.',
+      myParseInt
     )
     .option('--debug', '(Optional) Run driver in debug mode')
     .option('-y --silent-overwrite', '(Optional) Create project or upload new version without confirmation')
@@ -73,7 +83,7 @@ async function runUploadInternal(
     processorConfig.project = `${me.username}/${processorConfig.project}`
   }
 
-  const continueFrom = options.continueFrom ? parseInt(options.continueFrom, 10) : undefined
+  const continueFrom = options.continueFrom
   return uploadFile(processorConfig, uploadAuth, continueFrom)
 }
 

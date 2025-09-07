@@ -58,7 +58,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
   private preparedData: PreparedData | undefined
   readonly enablePartition: boolean
 
-  constructor(loader: () => Promise<any>, options?: any, shutdownHandler?: () => void) {
+  constructor(loader: () => Promise<any>, options?: { enablePartition?: boolean }, shutdownHandler?: () => void) {
     this.loader = loader
     this.shutdownHandler = shutdownHandler
 
@@ -66,7 +66,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       ? process.env['ENABLE_PREPROCESS'].toLowerCase() == 'true'
       : false
 
-    this.enablePartition = options?.['enable-partition'] == true
+    this.enablePartition = options?.enablePartition == true
   }
 
   async getConfig(request: ProcessConfigRequest, context: CallContext): Promise<ProcessConfigResponse> {

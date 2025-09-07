@@ -14,6 +14,14 @@ let started = false
 
 let unhandled: Error | undefined
 
+type ServiceWorkerOptions = {
+  target: string
+  logFormat: string
+  debug: boolean
+  workerTimeout: number
+  enablePartition: boolean
+}
+
 process
   .on('uncaughtException', (err) => {
     console.error('Uncaught Exception, please checking if await is properly used', err)
@@ -34,7 +42,7 @@ process
 
 let service: ProcessorServiceImpl | undefined
 
-const loader = async (options: any) => {
+const loader = async (options: ServiceWorkerOptions) => {
   if (options.target) {
     const m = await import(options.target)
     console.debug('Module loaded, path:', options.target, 'module:', m)
@@ -44,7 +52,7 @@ const loader = async (options: any) => {
 
 const emptyCallContext = <CallContext>{}
 
-async function start(request: StartRequest, options: any): Promise<Empty> {
+async function start(request: StartRequest, options: ServiceWorkerOptions): Promise<Empty> {
   if (started) {
     return {}
   }
