@@ -41,7 +41,7 @@ program
   .name('processor-runner')
   .description('Sentio Processor Runtime')
   .version('2.0.0-development')
-  .argument('<target>', 'Path to the processor module to load')
+  .option('-t, --target <path>', 'Path to the processor module to load')
   .option('-p, --port <port>', 'Port to listen on', '4000')
   .option('-c, --concurrency <number>', 'Number of concurrent workers', '4')
   .option('--batch-count <number>', 'Batch count for processing', '1')
@@ -60,9 +60,9 @@ program
     'Enable binding data partition',
     process.env['SENTIO_ENABLE_BINDING_DATA_PARTITION'] === 'true'
   )
-  .action(async (target: string, options: any) => {
+  .action(async (options: any) => {
     try {
-      await startServer(target, options)
+      await startServer(options.target, options)
     } catch (error) {
       console.error('Failed to start server:', error)
       process.exit(1)
