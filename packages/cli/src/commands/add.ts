@@ -48,7 +48,7 @@ export function createAddCommand() {
         supportedChainMessage.join('\n,'),
       '1'
     )
-    .option('--folder <folder>', '(Optional) The folder to save the downloaded ABI file')
+    .requiredOption('--folder <folder>', '(Optional) The folder to save the downloaded ABI file', '')
     .action(async (address, options) => {
       await runAddInternal(address, options)
     })
@@ -61,7 +61,7 @@ async function runAddInternal(address: string, options: CommandOptionsType<typeo
   }
 
   const chain = options.chain.toLowerCase() as ChainId
-  const folder: string = options.folder || ''
+  const folder: string = options.folder
   if (!address.startsWith('0x')) {
     console.error(chalk.red('Address must start with 0x'))
     process.exit(1)
