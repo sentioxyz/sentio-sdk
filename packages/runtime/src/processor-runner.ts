@@ -113,10 +113,12 @@ async function startServer(target: string, options: any): Promise<void> {
     }
 
     const service = new FullProcessorServiceImpl(baseService)
-    const serviceV3 = new FullProcessorServiceV3Impl(new ProcessorServiceImplV3(loader, options, server.shutdown))
 
     server.add(ProcessorDefinition, service)
-    server.add(ProcessorV3Definition, serviceV3)
+    server.add(
+      ProcessorV3Definition,
+      new FullProcessorServiceV3Impl(new ProcessorServiceImplV3(loader, options, server.shutdown))
+    )
 
     server.listen('0.0.0.0:' + options.port)
     console.log('Processor Server Started at:', options.port)
@@ -129,10 +131,15 @@ async function startServer(target: string, options: any): Promise<void> {
           const reqUrl = new URL(req.url, `http://${req.headers.host}`)
           const queries = reqUrl.searchParams
           switch (reqUrl.pathname) {
+            // case '/metrics':
+            //   const metrics = await mergedRegistry.metrics()
+            //   res.write(metrics)
+            //   break
             case '/heap': {
               try {
                 const file = '/tmp/' + Date.now() + '.heapsnapshot'
                 await dumpHeap(file)
+                // send the file
                 const readStream = fs.createReadStream(file)
                 res.writeHead(200, { 'Content-Type': 'application/json' })
                 readStream.pipe(res)
@@ -184,6 +191,7 @@ async function startServer(target: string, options: any): Promise<void> {
         if (baseService) {
           baseService.unhandled = err
         }
+        // shutdownServers(1)
       })
       .on('unhandledRejection', (reason, p) => {
         // @ts-ignore ignore invalid ens error
@@ -194,6 +202,7 @@ async function startServer(target: string, options: any): Promise<void> {
         if (baseService) {
           baseService.unhandled = reason as Error
         }
+        // shutdownServers(1)
       })
 
     if (process.env['OOM_DUMP_MEMORY_SIZE_GB']) {
@@ -208,6 +217,7 @@ async function startServer(target: string, options: any): Promise<void> {
           const file = path.join(dir, `${Date.now()}.heapsnapshot`)
           dumping = true
           await dumpHeap(file)
+          // force exit and keep pod running
           process.exit(11)
         }
       }, 1000 * 60)
