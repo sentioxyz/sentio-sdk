@@ -24,6 +24,13 @@ import { ServiceManager } from './service-manager.js'
 import path from 'path'
 import { ProcessorV3Definition } from '@sentio/protos'
 import { ProcessorServiceImplV3 } from './service-v3.js'
+import { readFileSync } from 'fs'
+import { fileURLToPath } from 'url'
+import { dirname, join } from 'path'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
+const packageJson = JSON.parse(readFileSync(join(__dirname, '../package.json'), 'utf8'))
 
 // const mergedRegistry = Registry.merge([globalRegistry, niceGrpcRegistry])
 
@@ -47,9 +54,11 @@ function myParseInt(value: string, dummyPrevious: unknown): number {
 const program = new Command()
 
 program
+  .allowUnknownOption()
+  .allowExcessArguments()
   .name('processor-runner')
   .description('Sentio Processor Runtime')
-  .version('2.0.0-development')
+  .version(packageJson.version)
   .option('--target <path>', 'Path to the processor module to load')
   .option('-p, --port <port>', 'Port to listen on', '4000')
   .option('--concurrency <number>', 'Number of concurrent workers', myParseInt, 4)
