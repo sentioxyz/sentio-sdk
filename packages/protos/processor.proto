@@ -30,14 +30,10 @@ service ProcessorV3 {
   // Start the processor, need to be called before any other RPC calls
   rpc Start(StartRequest) returns (google.protobuf.Empty);
 
-  // Get configs of processor, it will be updated automatically if new contracts is added
-  // during log processing
+  // Get configs of processor
   rpc GetConfig(ProcessConfigRequest) returns (ProcessConfigResponse);
 
-  // It will be called multiple times to tell the specified chain which templates are there and return
-  // the handler configuration of this chain.
-  // There is a special requirement that different chains must have different handler id sequences,
-  // otherwise templates cannot be added midway. Whether it is a new template can also be determined by the driver.
+  // It will be called multiple times to tell the specified chain which templates are there
   rpc UpdateTemplates(UpdateTemplatesRequest) returns (google.protobuf.Empty);
 
   rpc ProcessBindingsStream(stream ProcessStreamRequest) returns (stream ProcessStreamResponseV3);
@@ -49,10 +45,17 @@ message ProjectConfig {
 }
 
 message ExecutionConfig {
+  enum HandlerOrderInsideTransaction {
+    // By default, the handler is executed purely by log index within transaction
+    BY_LOG_INDEX = 0;
+    // Optional, the handler is executed by processor first, for each processor, the handler is executed by log index
+    BY_PROCESSOR_AND_LOG_INDEX = 1;
+  }
   // By default, the processor will run handlers  in parallel, but in some cases, we want to process the data
   // sequentially, e.g. read the data from the database, then process the data, then write the data back to the database
   bool sequential = 1;
   bool forceExactBlockTime = 2;
+  HandlerOrderInsideTransaction handler_order_inside_transaction = 7;
   int32 processBindingTimeout = 3;
   // By default, the processor will try to locate the start block of the contract even user provided one,
   // but in case that nodes are pruned so it can't be correctly located, this flag will force the processor to start
@@ -79,7 +82,6 @@ message ProcessConfigResponse {
   repeated AccountConfig account_configs = 4;
 
   repeated MetricConfig metric_configs = 5;
-  repeated EventTrackingConfig event_tracking_configs = 6;
   repeated ExportConfig export_configs = 7;
   repeated EventLogConfig event_log_configs = 8;
 
@@ -135,14 +137,6 @@ message RetentionConfig {
   int32 days = 3;
 }
 
-message EventTrackingConfig {
-  string event_name = 1;
-  bool total_by_day = 2;
-  bool unique = 3;
-  TotalPerEntityAggregation total_per_entity = 4;
-  repeated int32 distinct_aggregation_by_days = 5;
-  RetentionConfig retention_config = 6;
-}
 
 message ExportConfig {
   string name = 1;
@@ -909,7 +903,6 @@ message StateResult {
 message ProcessResult {
   repeated GaugeResult gauges = 1;
   repeated CounterResult counters = 2;
-  repeated LogResult logs = 3 [deprecated = true];
   repeated EventTrackingResult events = 4;
   repeated ExportResult exports = 5;
   StateResult states = 6;
@@ -1020,17 +1013,6 @@ enum LogLevel {
   WARNING = 2;
   ERROR = 3;
   CRITICAL = 4;
-}
-
-message LogResult {
-  option deprecated = true;
-  RecordMetaData metadata = 1;
-  LogLevel level = 2;
-  string message = 3;
-  // JSON payload
-  string attributes = 6 [deprecated = true];
-  google.protobuf.Struct attributes2 = 7;
-  RuntimeInfo runtime_info = 4;
 }
 
 message EventTrackingResult {

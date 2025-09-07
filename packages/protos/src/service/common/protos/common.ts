@@ -220,6 +220,7 @@ export enum NotificationType {
   BILLING_INVOICE = 301,
   BILLING_PAYMENT = 302,
   BILLING_SUBSCRIPTION = 303,
+  BILLING_USAGE = 304,
   UNRECOGNIZED = -1,
 }
 
@@ -264,6 +265,9 @@ export function notificationTypeFromJSON(object: any): NotificationType {
     case 303:
     case "BILLING_SUBSCRIPTION":
       return NotificationType.BILLING_SUBSCRIPTION;
+    case 304:
+    case "BILLING_USAGE":
+      return NotificationType.BILLING_USAGE;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -299,6 +303,8 @@ export function notificationTypeToJSON(object: NotificationType): string {
       return "BILLING_PAYMENT";
     case NotificationType.BILLING_SUBSCRIPTION:
       return "BILLING_SUBSCRIPTION";
+    case NotificationType.BILLING_USAGE:
+      return "BILLING_USAGE";
     case NotificationType.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
