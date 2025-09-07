@@ -2,11 +2,13 @@ import unusedImports from 'eslint-plugin-unused-imports'
 import { configs } from 'typescript-eslint'
 import { defineConfig } from "eslint/config";
 import { importX } from 'eslint-plugin-import-x'
+import eslintConfigPrettier from "eslint-config-prettier/flat";
 
 export default defineConfig([
   ...configs.recommended,
   importX.flatConfigs.recommended,
   importX.flatConfigs.typescript,
+  eslintConfigPrettier,
   {
     ignores: [
       '**/,.*',
