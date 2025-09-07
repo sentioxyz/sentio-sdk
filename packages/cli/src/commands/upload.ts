@@ -1,4 +1,4 @@
-import { Command } from 'commander'
+import { Command } from '@commander-js/extra-typings'
 import { loadProcessorConfig, overrideConfigWithOptions, YamlProjectConfig } from '../config.js'
 import fs from 'fs'
 import { URL } from 'url'

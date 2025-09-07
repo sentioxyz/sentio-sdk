@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { Command } from 'commander'
+import { Command } from '@commander-js/extra-typings'
 import { createLoginCommand } from './commands/login.js'
 import { createCreateCommand } from './commands/create.js'
 import { createVersionCommand } from './commands/version.js'

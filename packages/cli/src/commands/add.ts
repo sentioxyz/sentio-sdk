@@ -1,4 +1,4 @@
-import { Command } from 'commander'
+import { Command } from '@commander-js/extra-typings'
 import fs from 'fs-extra'
 import chalk from 'chalk'
 

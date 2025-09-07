@@ -1,5 +1,5 @@
 import chalk from 'chalk'
-import { Command } from 'commander'
+import { Command } from '@commander-js/extra-typings'
 import { loadProcessorConfig, getFinalizedHost } from '../config.js'
 import { ReadKey } from '../key.js'
 import fetch from 'node-fetch'

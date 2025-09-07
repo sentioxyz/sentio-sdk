@@ -1,4 +1,4 @@
-import { Command } from 'commander'
+import { Command } from '@commander-js/extra-typings'
 import path from 'path'
 import { overrideConfigWithOptions, YamlProjectConfig } from '../config.js'
 import { getSdkVersion, getPackageRoot } from '../utils.js'

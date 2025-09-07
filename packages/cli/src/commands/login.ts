@@ -1,4 +1,4 @@
-import { Command } from 'commander'
+import { Command } from '@commander-js/extra-typings'
 import { getAuthConfig, getFinalizedHost } from '../config.js'
 import { startServer } from './login-server.js'
 import url, { URL } from 'url'
