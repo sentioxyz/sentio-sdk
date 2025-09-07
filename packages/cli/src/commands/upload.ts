@@ -40,9 +40,10 @@ export function createUploadCommand() {
     })
 }
 
-type UploadCommandOptions = CommandOptionsType<typeof createUploadCommand>
-
-async function runUploadInternal(processorConfig: YamlProjectConfig, options: UploadCommandOptions) {
+async function runUploadInternal(
+  processorConfig: YamlProjectConfig,
+  options: CommandOptionsType<typeof createUploadCommand>
+) {
   console.log(processorConfig)
 
   const uploadAuth: Auth = {}

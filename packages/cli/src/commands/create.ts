@@ -43,9 +43,7 @@ export function createCreateCommand() {
     })
 }
 
-type CreateCommandOptions = CommandOptionsType<typeof createCreateCommand>
-
-async function runCreateInternal(name: string, options: CreateCommandOptions) {
+async function runCreateInternal(name: string, options: CommandOptionsType<typeof createCreateCommand>) {
   if (!name) {
     console.error('Project name is required')
     process.exit(1)

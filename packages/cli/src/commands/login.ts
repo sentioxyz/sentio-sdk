@@ -21,9 +21,7 @@ export function createLoginCommand() {
     })
 }
 
-type LoginCommandOptions = CommandOptionsType<typeof createLoginCommand>
-
-function login(options: LoginCommandOptions) {
+function login(options: CommandOptionsType<typeof createLoginCommand>) {
   const host = getFinalizedHost(options.host)
 
   if (options.apiKey) {

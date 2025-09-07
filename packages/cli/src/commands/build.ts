@@ -19,8 +19,6 @@ export function createBuildCommand() {
     })
 }
 
-type BuildCommandOptions = CommandOptionsType<typeof createBuildCommand>
-
 export function createGenCommand() {
   return new Command('gen')
     .description('Generate ABI')
@@ -30,7 +28,7 @@ export function createGenCommand() {
     })
 }
 
-export async function buildProcessor(onlyGen: boolean, options: BuildCommandOptions) {
+export async function buildProcessor(onlyGen: boolean, options: CommandOptionsType<typeof createBuildCommand>) {
   if (!options.skipDeps && !onlyGen) {
     await installDeps()
   }

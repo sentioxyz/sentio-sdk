@@ -54,9 +54,7 @@ export function createAddCommand() {
     })
 }
 
-type AddCommandOptions = CommandOptionsType<typeof createAddCommand>
-
-async function runAddInternal(address: string, options: AddCommandOptions) {
+async function runAddInternal(address: string, options: CommandOptionsType<typeof createAddCommand>) {
   if (!address) {
     console.error('Address is required')
     process.exit(1)

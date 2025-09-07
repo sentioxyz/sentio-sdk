@@ -56,9 +56,7 @@ export function createAiCommand() {
     })
 }
 
-type AiCommandOptions = CommandOptionsType<typeof createAiCommand>
-
-async function generateProcessor(options: AiCommandOptions) {
+async function generateProcessor(options: CommandOptionsType<typeof createAiCommand>) {
   try {
     // Get API credentials
     const host = getFinalizedHost(options.host || 'prod')

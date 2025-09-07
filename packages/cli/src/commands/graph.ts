@@ -60,10 +60,10 @@ export function createGraphCommand() {
   return graphCommand
 }
 
-type GraphCreateCommandOptions = CommandOptionsType<typeof createGraphCreateCommand>
-type GraphDeployCommandOptions = CommandOptionsType<typeof createGraphDeployCommand>
-
-async function runGraphCreateInternal(projectName: string, options: GraphCreateCommandOptions) {
+async function runGraphCreateInternal(
+  projectName: string,
+  options: CommandOptionsType<typeof createGraphCreateCommand>
+) {
   if (!projectName) {
     console.error('Project name is required')
     process.exit(1)
@@ -122,7 +122,10 @@ async function createProjectIfMissing(options: YamlProjectConfig, apiKey: string
   }
 }
 
-async function runGraphDeployInternal(options: GraphDeployCommandOptions, extraArgs: string[] = []) {
+async function runGraphDeployInternal(
+  options: CommandOptionsType<typeof createGraphDeployCommand>,
+  extraArgs: string[] = []
+) {
   let processorConfig: YamlProjectConfig = { host: '', project: '', debug: false, contracts: [] }
   const yamlPath = path.join(process.cwd(), 'sentio.yaml')
   if (fs.existsSync(yamlPath)) {

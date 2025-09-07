@@ -38,8 +38,6 @@ export function createCompileCommand() {
     })
 }
 
-type CompileCommandOptions = CommandOptionsType<typeof createCompileCommand>
-
 // export async function runCompile(argv: string[]) {
 //   const program = new Command()
 //
@@ -56,7 +54,7 @@ type CompileCommandOptions = CommandOptionsType<typeof createCompileCommand>
 //   await runCompileInternal(options)
 // }
 
-async function runCompileInternal(options: CompileCommandOptions) {
+async function runCompileInternal(options: CommandOptionsType<typeof createCompileCommand>) {
   let projectOwner, projectSlug
   const auth: Auth = {}
   if (options.upload) {
