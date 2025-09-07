@@ -406,10 +406,48 @@ export interface ProjectConfig {
 export interface ExecutionConfig {
   sequential: boolean;
   forceExactBlockTime: boolean;
+  handlerOrderInsideTransaction: ExecutionConfig_HandlerOrderInsideTransaction;
   processBindingTimeout: number;
   skipStartBlockValidation: boolean;
   rpcRetryTimes: number;
   ethAbiDecoderConfig?: ExecutionConfig_DecoderWorkerConfig | undefined;
+}
+
+export enum ExecutionConfig_HandlerOrderInsideTransaction {
+  BY_LOG_INDEX = 0,
+  BY_PROCESSOR_AND_LOG_INDEX = 1,
+  UNRECOGNIZED = -1,
+}
+
+export function executionConfig_HandlerOrderInsideTransactionFromJSON(
+  object: any,
+): ExecutionConfig_HandlerOrderInsideTransaction {
+  switch (object) {
+    case 0:
+    case "BY_LOG_INDEX":
+      return ExecutionConfig_HandlerOrderInsideTransaction.BY_LOG_INDEX;
+    case 1:
+    case "BY_PROCESSOR_AND_LOG_INDEX":
+      return ExecutionConfig_HandlerOrderInsideTransaction.BY_PROCESSOR_AND_LOG_INDEX;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return ExecutionConfig_HandlerOrderInsideTransaction.UNRECOGNIZED;
+  }
+}
+
+export function executionConfig_HandlerOrderInsideTransactionToJSON(
+  object: ExecutionConfig_HandlerOrderInsideTransaction,
+): string {
+  switch (object) {
+    case ExecutionConfig_HandlerOrderInsideTransaction.BY_LOG_INDEX:
+      return "BY_LOG_INDEX";
+    case ExecutionConfig_HandlerOrderInsideTransaction.BY_PROCESSOR_AND_LOG_INDEX:
+      return "BY_PROCESSOR_AND_LOG_INDEX";
+    case ExecutionConfig_HandlerOrderInsideTransaction.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
 }
 
 export interface ExecutionConfig_DecoderWorkerConfig {
@@ -428,7 +466,6 @@ export interface ProcessConfigResponse {
   templateInstances: TemplateInstance[];
   accountConfigs: AccountConfig[];
   metricConfigs: MetricConfig[];
-  eventTrackingConfigs: EventTrackingConfig[];
   exportConfigs: ExportConfig[];
   eventLogConfigs: EventLogConfig[];
   dbSchema: DataBaseSchema | undefined;
@@ -504,15 +541,6 @@ export function totalPerEntityAggregation_TypeToJSON(object: TotalPerEntityAggre
 export interface RetentionConfig {
   retentionEventName: string;
   days: number;
-}
-
-export interface EventTrackingConfig {
-  eventName: string;
-  totalByDay: boolean;
-  unique: boolean;
-  totalPerEntity: TotalPerEntityAggregation | undefined;
-  distinctAggregationByDays: number[];
-  retentionConfig: RetentionConfig | undefined;
 }
 
 export interface ExportConfig {
@@ -1608,6 +1636,7 @@ function createBaseExecutionConfig(): ExecutionConfig {
   return {
     sequential: false,
     forceExactBlockTime: false,
+    handlerOrderInsideTransaction: 0,
     processBindingTimeout: 0,
     skipStartBlockValidation: false,
     rpcRetryTimes: 0,
@@ -1622,6 +1651,9 @@ export const ExecutionConfig = {
     }
     if (message.forceExactBlockTime !== false) {
       writer.uint32(16).bool(message.forceExactBlockTime);
+    }
+    if (message.handlerOrderInsideTransaction !== 0) {
+      writer.uint32(56).int32(message.handlerOrderInsideTransaction);
     }
     if (message.processBindingTimeout !== 0) {
       writer.uint32(24).int32(message.processBindingTimeout);
@@ -1658,6 +1690,13 @@ export const ExecutionConfig = {
           }
 
           message.forceExactBlockTime = reader.bool();
+          continue;
+        case 7:
+          if (tag !== 56) {
+            break;
+          }
+
+          message.handlerOrderInsideTransaction = reader.int32() as any;
           continue;
         case 3:
           if (tag !== 24) {
@@ -1700,6 +1739,9 @@ export const ExecutionConfig = {
     return {
       sequential: isSet(object.sequential) ? globalThis.Boolean(object.sequential) : false,
       forceExactBlockTime: isSet(object.forceExactBlockTime) ? globalThis.Boolean(object.forceExactBlockTime) : false,
+      handlerOrderInsideTransaction: isSet(object.handlerOrderInsideTransaction)
+        ? executionConfig_HandlerOrderInsideTransactionFromJSON(object.handlerOrderInsideTransaction)
+        : 0,
       processBindingTimeout: isSet(object.processBindingTimeout) ? globalThis.Number(object.processBindingTimeout) : 0,
       skipStartBlockValidation: isSet(object.skipStartBlockValidation)
         ? globalThis.Boolean(object.skipStartBlockValidation)
@@ -1718,6 +1760,11 @@ export const ExecutionConfig = {
     }
     if (message.forceExactBlockTime !== false) {
       obj.forceExactBlockTime = message.forceExactBlockTime;
+    }
+    if (message.handlerOrderInsideTransaction !== 0) {
+      obj.handlerOrderInsideTransaction = executionConfig_HandlerOrderInsideTransactionToJSON(
+        message.handlerOrderInsideTransaction,
+      );
     }
     if (message.processBindingTimeout !== 0) {
       obj.processBindingTimeout = Math.round(message.processBindingTimeout);
@@ -1741,6 +1788,7 @@ export const ExecutionConfig = {
     const message = createBaseExecutionConfig();
     message.sequential = object.sequential ?? false;
     message.forceExactBlockTime = object.forceExactBlockTime ?? false;
+    message.handlerOrderInsideTransaction = object.handlerOrderInsideTransaction ?? 0;
     message.processBindingTimeout = object.processBindingTimeout ?? 0;
     message.skipStartBlockValidation = object.skipStartBlockValidation ?? false;
     message.rpcRetryTimes = object.rpcRetryTimes ?? 0;
@@ -1893,7 +1941,6 @@ function createBaseProcessConfigResponse(): ProcessConfigResponse {
     templateInstances: [],
     accountConfigs: [],
     metricConfigs: [],
-    eventTrackingConfigs: [],
     exportConfigs: [],
     eventLogConfigs: [],
     dbSchema: undefined,
@@ -1919,9 +1966,6 @@ export const ProcessConfigResponse = {
     }
     for (const v of message.metricConfigs) {
       MetricConfig.encode(v!, writer.uint32(42).fork()).ldelim();
-    }
-    for (const v of message.eventTrackingConfigs) {
-      EventTrackingConfig.encode(v!, writer.uint32(50).fork()).ldelim();
     }
     for (const v of message.exportConfigs) {
       ExportConfig.encode(v!, writer.uint32(58).fork()).ldelim();
@@ -1984,13 +2028,6 @@ export const ProcessConfigResponse = {
 
           message.metricConfigs.push(MetricConfig.decode(reader, reader.uint32()));
           continue;
-        case 6:
-          if (tag !== 50) {
-            break;
-          }
-
-          message.eventTrackingConfigs.push(EventTrackingConfig.decode(reader, reader.uint32()));
-          continue;
         case 7:
           if (tag !== 58) {
             break;
@@ -2037,9 +2074,6 @@ export const ProcessConfigResponse = {
       metricConfigs: globalThis.Array.isArray(object?.metricConfigs)
         ? object.metricConfigs.map((e: any) => MetricConfig.fromJSON(e))
         : [],
-      eventTrackingConfigs: globalThis.Array.isArray(object?.eventTrackingConfigs)
-        ? object.eventTrackingConfigs.map((e: any) => EventTrackingConfig.fromJSON(e))
-        : [],
       exportConfigs: globalThis.Array.isArray(object?.exportConfigs)
         ? object.exportConfigs.map((e: any) => ExportConfig.fromJSON(e))
         : [],
@@ -2070,9 +2104,6 @@ export const ProcessConfigResponse = {
     if (message.metricConfigs?.length) {
       obj.metricConfigs = message.metricConfigs.map((e) => MetricConfig.toJSON(e));
     }
-    if (message.eventTrackingConfigs?.length) {
-      obj.eventTrackingConfigs = message.eventTrackingConfigs.map((e) => EventTrackingConfig.toJSON(e));
-    }
     if (message.exportConfigs?.length) {
       obj.exportConfigs = message.exportConfigs.map((e) => ExportConfig.toJSON(e));
     }
@@ -2100,7 +2131,6 @@ export const ProcessConfigResponse = {
     message.templateInstances = object.templateInstances?.map((e) => TemplateInstance.fromPartial(e)) || [];
     message.accountConfigs = object.accountConfigs?.map((e) => AccountConfig.fromPartial(e)) || [];
     message.metricConfigs = object.metricConfigs?.map((e) => MetricConfig.fromPartial(e)) || [];
-    message.eventTrackingConfigs = object.eventTrackingConfigs?.map((e) => EventTrackingConfig.fromPartial(e)) || [];
     message.exportConfigs = object.exportConfigs?.map((e) => ExportConfig.fromPartial(e)) || [];
     message.eventLogConfigs = object.eventLogConfigs?.map((e) => EventLogConfig.fromPartial(e)) || [];
     message.dbSchema = (object.dbSchema !== undefined && object.dbSchema !== null)
@@ -2751,167 +2781,6 @@ export const RetentionConfig = {
     const message = createBaseRetentionConfig();
     message.retentionEventName = object.retentionEventName ?? "";
     message.days = object.days ?? 0;
-    return message;
-  },
-};
-
-function createBaseEventTrackingConfig(): EventTrackingConfig {
-  return {
-    eventName: "",
-    totalByDay: false,
-    unique: false,
-    totalPerEntity: undefined,
-    distinctAggregationByDays: [],
-    retentionConfig: undefined,
-  };
-}
-
-export const EventTrackingConfig = {
-  encode(message: EventTrackingConfig, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.eventName !== "") {
-      writer.uint32(10).string(message.eventName);
-    }
-    if (message.totalByDay !== false) {
-      writer.uint32(16).bool(message.totalByDay);
-    }
-    if (message.unique !== false) {
-      writer.uint32(24).bool(message.unique);
-    }
-    if (message.totalPerEntity !== undefined) {
-      TotalPerEntityAggregation.encode(message.totalPerEntity, writer.uint32(34).fork()).ldelim();
-    }
-    writer.uint32(42).fork();
-    for (const v of message.distinctAggregationByDays) {
-      writer.int32(v);
-    }
-    writer.ldelim();
-    if (message.retentionConfig !== undefined) {
-      RetentionConfig.encode(message.retentionConfig, writer.uint32(50).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): EventTrackingConfig {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseEventTrackingConfig();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.eventName = reader.string();
-          continue;
-        case 2:
-          if (tag !== 16) {
-            break;
-          }
-
-          message.totalByDay = reader.bool();
-          continue;
-        case 3:
-          if (tag !== 24) {
-            break;
-          }
-
-          message.unique = reader.bool();
-          continue;
-        case 4:
-          if (tag !== 34) {
-            break;
-          }
-
-          message.totalPerEntity = TotalPerEntityAggregation.decode(reader, reader.uint32());
-          continue;
-        case 5:
-          if (tag === 40) {
-            message.distinctAggregationByDays.push(reader.int32());
-
-            continue;
-          }
-
-          if (tag === 42) {
-            const end2 = reader.uint32() + reader.pos;
-            while (reader.pos < end2) {
-              message.distinctAggregationByDays.push(reader.int32());
-            }
-
-            continue;
-          }
-
-          break;
-        case 6:
-          if (tag !== 50) {
-            break;
-          }
-
-          message.retentionConfig = RetentionConfig.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): EventTrackingConfig {
-    return {
-      eventName: isSet(object.eventName) ? globalThis.String(object.eventName) : "",
-      totalByDay: isSet(object.totalByDay) ? globalThis.Boolean(object.totalByDay) : false,
-      unique: isSet(object.unique) ? globalThis.Boolean(object.unique) : false,
-      totalPerEntity: isSet(object.totalPerEntity)
-        ? TotalPerEntityAggregation.fromJSON(object.totalPerEntity)
-        : undefined,
-      distinctAggregationByDays: globalThis.Array.isArray(object?.distinctAggregationByDays)
-        ? object.distinctAggregationByDays.map((e: any) => globalThis.Number(e))
-        : [],
-      retentionConfig: isSet(object.retentionConfig) ? RetentionConfig.fromJSON(object.retentionConfig) : undefined,
-    };
-  },
-
-  toJSON(message: EventTrackingConfig): unknown {
-    const obj: any = {};
-    if (message.eventName !== "") {
-      obj.eventName = message.eventName;
-    }
-    if (message.totalByDay !== false) {
-      obj.totalByDay = message.totalByDay;
-    }
-    if (message.unique !== false) {
-      obj.unique = message.unique;
-    }
-    if (message.totalPerEntity !== undefined) {
-      obj.totalPerEntity = TotalPerEntityAggregation.toJSON(message.totalPerEntity);
-    }
-    if (message.distinctAggregationByDays?.length) {
-      obj.distinctAggregationByDays = message.distinctAggregationByDays.map((e) => Math.round(e));
-    }
-    if (message.retentionConfig !== undefined) {
-      obj.retentionConfig = RetentionConfig.toJSON(message.retentionConfig);
-    }
-    return obj;
-  },
-
-  create(base?: DeepPartial<EventTrackingConfig>): EventTrackingConfig {
-    return EventTrackingConfig.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<EventTrackingConfig>): EventTrackingConfig {
-    const message = createBaseEventTrackingConfig();
-    message.eventName = object.eventName ?? "";
-    message.totalByDay = object.totalByDay ?? false;
-    message.unique = object.unique ?? false;
-    message.totalPerEntity = (object.totalPerEntity !== undefined && object.totalPerEntity !== null)
-      ? TotalPerEntityAggregation.fromPartial(object.totalPerEntity)
-      : undefined;
-    message.distinctAggregationByDays = object.distinctAggregationByDays?.map((e) => e) || [];
-    message.retentionConfig = (object.retentionConfig !== undefined && object.retentionConfig !== null)
-      ? RetentionConfig.fromPartial(object.retentionConfig)
-      : undefined;
     return message;
   },
 };
