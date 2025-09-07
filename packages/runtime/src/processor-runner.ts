@@ -66,7 +66,7 @@ if (options.startActionServer) {
     .use(openTelemetryServerMiddleware())
     .use(errorDetailsServerMiddleware)
 
-  if (options.worker! > 1) {
+  if (options.worker > 1) {
     baseService = new ServiceManager(loader, options, server.shutdown)
   } else {
     baseService = new ProcessorServiceImpl(loader, options, server.shutdown)

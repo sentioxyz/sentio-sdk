@@ -4,16 +4,19 @@ import { ServiceManager } from './service-manager.js'
 import { CallContext } from 'nice-grpc-common'
 import { DeepPartial, HandlerType, ProcessStreamResponse } from '@sentio/protos'
 import { Subject } from 'rxjs'
+import { getTestConfig } from './processor-runner-program.js'
 
 export const TEST_CONTEXT: CallContext = <CallContext>{}
 
 describe('Test Service Manager with worker without partition', () => {
-  const service = new ServiceManager(async () => {}, {
-    worker: 1,
-    target: './test-processor.test.js',
-    chainsConfig: 'chains-config.json',
-    enablePartition: false
-  })
+  const service = new ServiceManager(
+    async () => {},
+    getTestConfig({
+      worker: 1,
+      chainsConfig: 'chains-config.json',
+      enablePartition: false
+    })
+  )
 
   before(async () => {
     await service.start({ templateInstances: [] }, TEST_CONTEXT)
@@ -81,12 +84,14 @@ describe('Test Service Manager with worker without partition', () => {
 })
 
 describe('Test Service Manager with worker with partition', () => {
-  const service = new ServiceManager(async () => {}, {
-    worker: 1,
-    target: './test-processor.test.js',
-    chainsConfig: 'chains-config.json',
-    enablePartition: true
-  })
+  const service = new ServiceManager(
+    async () => {},
+    getTestConfig({
+      worker: 1,
+      chainsConfig: 'chains-config.json',
+      enablePartition: true
+    })
+  )
 
   before(async () => {
     await service.start({ templateInstances: [] }, TEST_CONTEXT)

@@ -9,18 +9,11 @@ import { Piscina } from 'piscina'
 import { configureEndpoints } from './endpoints.js'
 import { setupLogger } from './logger.js'
 import { Subject } from 'rxjs'
+import { ProcessorRuntimeOptions } from 'processor-runner-program.js'
 
 let started = false
 
 let unhandled: Error | undefined
-
-type ServiceWorkerOptions = {
-  target: string
-  logFormat: string
-  debug: boolean
-  workerTimeout: number
-  enablePartition: boolean
-}
 
 process
   .on('uncaughtException', (err) => {
@@ -42,7 +35,7 @@ process
 
 let service: ProcessorServiceImpl | undefined
 
-const loader = async (options: ServiceWorkerOptions) => {
+const loader = async (options: ProcessorRuntimeOptions) => {
   if (options.target) {
     const m = await import(options.target)
     console.debug('Module loaded, path:', options.target, 'module:', m)
@@ -52,7 +45,7 @@ const loader = async (options: ServiceWorkerOptions) => {
 
 const emptyCallContext = <CallContext>{}
 
-async function start(request: StartRequest, options: ServiceWorkerOptions): Promise<Empty> {
+async function start(request: StartRequest, options: ProcessorRuntimeOptions): Promise<Empty> {
   if (started) {
     return {}
   }

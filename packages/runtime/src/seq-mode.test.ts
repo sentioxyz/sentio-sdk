@@ -6,6 +6,8 @@ import { DataBinding, HandlerType, ProcessResult } from './gen/processor/protos/
 import { Plugin, PluginManager } from './plugin.js'
 import { assert } from 'chai'
 import { GLOBAL_CONFIG } from './global-config.js'
+import { getTestConfig } from './processor-runner-program.js'
+
 export const TEST_CONTEXT: CallContext = <CallContext>{}
 
 let testRequest: DataBinding
@@ -19,15 +21,10 @@ class TestPlugin extends Plugin {
 }
 
 describe('Test seq mode', () => {
-  const baseService = new ProcessorServiceImpl(
-    async () => {
-      PluginManager.INSTANCE.plugins = []
-      PluginManager.INSTANCE.register(new TestPlugin())
-    },
-    {
-      target: './test-processor.test.js'
-    }
-  )
+  const baseService = new ProcessorServiceImpl(async () => {
+    PluginManager.INSTANCE.plugins = []
+    PluginManager.INSTANCE.register(new TestPlugin())
+  }, getTestConfig())
   const service = new FullProcessorServiceImpl(baseService)
 
   before(async () => {
