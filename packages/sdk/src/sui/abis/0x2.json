@@ -6,6 +6,14 @@
     "friends": [
       {
         "address": "0x2",
+        "name": "accumulator_metadata"
+      },
+      {
+        "address": "0x2",
+        "name": "accumulator_settlement"
+      },
+      {
+        "address": "0x2",
         "name": "balance"
       }
     ],
@@ -73,6 +81,62 @@
         "parameters": ["Address"],
         "return": ["Address"]
       },
+      "accumulator_key": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": ["Address"],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "accumulator",
+              "name": "Key",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "create_u128": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": ["U128"],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "accumulator",
+              "name": "U128",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "destroy_u128": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "accumulator",
+              "name": "U128",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": []
+      },
       "emit_deposit_event": {
         "visibility": "Friend",
         "isEntry": false,
@@ -94,8 +158,424 @@
         ],
         "parameters": ["Address", "Address", "U64"],
         "return": []
+      },
+      "is_zero_u128": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "accumulator",
+                "name": "U128",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": ["Bool"]
+      },
+      "root_add_accumulator": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          },
+          {
+            "abilities": ["Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "accumulator",
+                "name": "AccumulatorRoot",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "accumulator",
+              "name": "Key",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          },
+          {
+            "TypeParameter": 1
+          }
+        ],
+        "return": []
+      },
+      "root_borrow_accumulator_mut": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          },
+          {
+            "abilities": ["Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "accumulator",
+                "name": "AccumulatorRoot",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "accumulator",
+              "name": "Key",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          }
+        ],
+        "return": [
+          {
+            "MutableReference": {
+              "TypeParameter": 1
+            }
+          }
+        ]
+      },
+      "root_has_accumulator": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          },
+          {
+            "abilities": ["Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "accumulator",
+                "name": "AccumulatorRoot",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "accumulator",
+              "name": "Key",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          }
+        ],
+        "return": ["Bool"]
+      },
+      "root_id": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "accumulator",
+                "name": "AccumulatorRoot",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "object",
+                "name": "UID",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      },
+      "root_id_mut": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "accumulator",
+                "name": "AccumulatorRoot",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "object",
+                "name": "UID",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      },
+      "root_remove_accumulator": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          },
+          {
+            "abilities": ["Store"]
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "accumulator",
+                "name": "AccumulatorRoot",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "accumulator",
+              "name": "Key",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          }
+        ],
+        "return": [
+          {
+            "TypeParameter": 1
+          }
+        ]
+      },
+      "update_u128": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "accumulator",
+                "name": "U128",
+                "typeArguments": []
+              }
+            }
+          },
+          "U128",
+          "U128"
+        ],
+        "return": []
       }
     }
+  },
+  "accumulator_metadata": {
+    "fileFormatVersion": 6,
+    "address": "0x2",
+    "name": "accumulator_metadata",
+    "friends": [
+      {
+        "address": "0x2",
+        "name": "accumulator_settlement"
+      }
+    ],
+    "structs": {
+      "Metadata": {
+        "abilities": {
+          "abilities": ["Store"]
+        },
+        "typeParameters": [
+          {
+            "constraints": {
+              "abilities": []
+            },
+            "isPhantom": true
+          }
+        ],
+        "fields": [
+          {
+            "name": "fields",
+            "type": {
+              "Struct": {
+                "address": "0x2",
+                "module": "bag",
+                "name": "Bag",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      },
+      "MetadataKey": {
+        "abilities": {
+          "abilities": ["Copy", "Drop", "Store"]
+        },
+        "typeParameters": [
+          {
+            "constraints": {
+              "abilities": []
+            },
+            "isPhantom": true
+          }
+        ],
+        "fields": [
+          {
+            "name": "dummy_field",
+            "type": "Bool"
+          }
+        ]
+      },
+      "Owner": {
+        "abilities": {
+          "abilities": ["Store"]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "balances",
+            "type": {
+              "Struct": {
+                "address": "0x2",
+                "module": "bag",
+                "name": "Bag",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "owner",
+            "type": "Address"
+          }
+        ]
+      },
+      "OwnerKey": {
+        "abilities": {
+          "abilities": ["Copy", "Drop", "Store"]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "owner",
+            "type": "Address"
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {
+      "create_accumulator_metadata": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "accumulator",
+                "name": "AccumulatorRoot",
+                "typeArguments": []
+              }
+            }
+          },
+          "Address",
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": []
+      },
+      "remove_accumulator_metadata": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "accumulator",
+                "name": "AccumulatorRoot",
+                "typeArguments": []
+              }
+            }
+          },
+          "Address"
+        ],
+        "return": []
+      }
+    }
+  },
+  "accumulator_settlement": {
+    "fileFormatVersion": 6,
+    "address": "0x2",
+    "name": "accumulator_settlement",
+    "friends": [],
+    "structs": {},
+    "exposedFunctions": {}
   },
   "address": {
     "fileFormatVersion": 6,

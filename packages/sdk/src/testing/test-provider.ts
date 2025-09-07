@@ -1,5 +1,5 @@
 import { Endpoints } from '@sentio/runtime'
-import { CHAIN_MAP } from '@sentio/chain'
+import { ChainInfo } from '@sentio/chain'
 
 export function loadTestProvidersFromEnv(requiredChainIds: string[] | string): boolean {
   const found: string[] = []
@@ -8,7 +8,7 @@ export function loadTestProvidersFromEnv(requiredChainIds: string[] | string): b
     requiredChainIds = [requiredChainIds]
   }
 
-  for (const k of Object.keys(CHAIN_MAP)) {
+  for (const k of Object.keys(ChainInfo)) {
     const envKey = 'TEST_ENDPOINT_' + k
     const http = process.env[envKey]
     if (!http) {

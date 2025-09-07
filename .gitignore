@@ -1,5 +1,6 @@
 **/schema.ts
 builtin
+!packages/sdk/src/solana/builtin
 debug
 
 node_modules
