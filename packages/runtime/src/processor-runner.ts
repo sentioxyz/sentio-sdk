@@ -3,7 +3,8 @@
 import fs from 'fs-extra'
 
 import { compressionAlgorithms } from '@grpc/grpc-js'
-import { Command, InvalidArgumentError } from 'commander'
+import { Command, InvalidArgumentError } from '@commander-js/extra-typings'
+
 import { createServer } from 'nice-grpc'
 import { errorDetailsServerMiddleware } from 'nice-grpc-error-details'
 // import { registry as niceGrpcRegistry } from 'nice-grpc-prometheus'
@@ -52,10 +53,8 @@ function myParseInt(value: string, dummyPrevious: unknown): number {
 
 // Create Commander.js program
 const program = new Command()
-
-program
   .allowUnknownOption()
-  // .allowExcessArguments()
+  .allowExcessArguments()
   .name('processor-runner')
   .description('Sentio Processor Runtime')
   .version(packageJson.version)
@@ -85,8 +84,10 @@ program
   )
   .parse()
 
-const options = program.opts()
-options.target = program.processedArgs[0]
+const options = {
+  ...program.opts(),
+  target: program.args[program.args.length - 1]
+}
 
 const logLevel = process.env['LOG_LEVEL']?.toLowerCase()
 
