@@ -1,21 +1,14 @@
-import { fixupConfigRules, fixupPluginRules } from '@eslint/compat'
 import unusedImports from 'eslint-plugin-unused-imports'
-import tseslint from 'typescript-eslint'
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
-import js from '@eslint/js'
-import { FlatCompat } from '@eslint/eslintrc'
-import deprecation from 'eslint-plugin-deprecation'
+import { configs } from 'typescript-eslint'
+import { defineConfig } from "eslint/config";
+import { importX } from 'eslint-plugin-import-x'
+import eslintConfigPrettier from "eslint-config-prettier/flat";
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-  recommendedConfig: js.configs.recommended,
-  allConfig: js.configs.all
-})
-
-export default tseslint.config(
+export default defineConfig([
+  ...configs.recommended,
+  importX.flatConfigs.recommended,
+  importX.flatConfigs.typescript,
+  eslintConfigPrettier,
   {
     ignores: [
       '**/,.*',
@@ -33,11 +26,6 @@ export default tseslint.config(
       'packages/sdk/sync-sui-to-iota.ts'
     ]
   },
-
-  ...tseslint.configs.recommended,
-
-  ...fixupConfigRules(compat.extends('plugin:import-x/recommended', 'plugin:import-x/typescript', 'prettier')),
-
   {
     plugins: {
       'unused-imports': unusedImports
@@ -47,7 +35,9 @@ export default tseslint.config(
         projectService: {
           allowDefaultProject: ['*.mjs', '*.js', 'packages/cli-alias/index.js']
         }
-      }
+      },
+      ecmaVersion: 'latest',
+      sourceType: 'module'
     },
     rules: {
       '@typescript-eslint/no-inferrable-types': ['off'],
@@ -65,6 +55,7 @@ export default tseslint.config(
       ],
 
       'import-x/no-named-as-default': ['off'],
+      'import-x/no-named-as-default-member': ['off'],
       'import-x/no-unresolved': ['off'],
       'unused-imports/no-unused-imports': 'error'
     }
@@ -72,11 +63,8 @@ export default tseslint.config(
 
   {
     files: ['packages/sdk/**/*.ts'],
-    plugins: {
-      deprecation: fixupPluginRules(deprecation)
-    },
     rules: {
-      'deprecation/deprecation': 'warn'
+      '@typescript-eslint/no-deprecated': 'warn'
     }
   }
-)
+])

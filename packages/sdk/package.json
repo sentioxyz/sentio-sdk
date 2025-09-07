@@ -91,7 +91,7 @@
     "@coral-xyz/borsh": "^0.31.1",
     "@iota/iota-sdk": "~1.6.0",
     "@mysten/sui": "~1.37.4",
-    "@prettier/sync": "^0.5.2",
+    "@prettier/sync": "^0.6.0",
     "@sentio/abi-wan-kanabi": "2.2.2-1",
     "@sentio/api": "1.0.2",
     "@sentio/bigdecimal": "9.1.1-patch.3",
@@ -133,7 +133,6 @@
     "@sentio/tsup": "^8.3.5-rc.1"
   },
   "devDependencies": {
-    "@types/google-protobuf": "^3.15.12",
     "prettier": "^3.2.4",
     "typedoc": "^0.28.0"
   },
