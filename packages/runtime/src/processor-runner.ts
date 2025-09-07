@@ -3,7 +3,6 @@
 import fs from 'fs-extra'
 
 import { compressionAlgorithms } from '@grpc/grpc-js'
-import { Command, InvalidArgumentError } from '@commander-js/extra-typings'
 
 import { createServer } from 'nice-grpc'
 import { errorDetailsServerMiddleware } from 'nice-grpc-error-details'
@@ -24,73 +23,19 @@ import { ActionServer } from './action-server.js'
 import { ServiceManager } from './service-manager.js'
 import { ProcessorV3Definition } from '@sentio/protos'
 import { ProcessorServiceImplV3 } from './service-v3.js'
-import { readFileSync } from 'fs'
-import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
+import { program, ProcessorRuntimeOptions } from 'processor-runner-program.js'
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = dirname(__filename)
-const packageJson = JSON.parse(readFileSync(join(__dirname, '../package.json'), 'utf8'))
+program.parse()
 
-// const mergedRegistry = Registry.merge([globalRegistry, niceGrpcRegistry])
-
-let workerNum = 1
-try {
-  workerNum = parseInt(process.env['PROCESSOR_WORKER']?.trim() ?? '1')
-} catch (e) {
-  console.error('Failed to parse worker number', e)
-}
-
-function myParseInt(value: string, dummyPrevious: number): number {
-  // parseInt takes a string and a radix
-  const parsedValue = parseInt(value, 10)
-  if (isNaN(parsedValue)) {
-    throw new InvalidArgumentError('Not a number.')
-  }
-  return parsedValue
-}
-
-// Create Commander.js program
-const program = new Command()
-  .allowUnknownOption()
-  .allowExcessArguments()
-  .name('processor-runner')
-  .description('Sentio Processor Runtime')
-  .version(packageJson.version)
-  .argument('<target>', 'Path to the processor module to load')
-  .requiredOption('-p, --port <port>', 'Port to listen on', '4000')
-  .requiredOption('--concurrency <number>', 'Number of concurrent workers', myParseInt, 4)
-  .requiredOption('--batch-count <number>', 'Batch count for processing', myParseInt, 1)
-  .requiredOption('-c, --chains-config <path>', 'Path to chains configuration file', 'chains-config.json')
-  .option('--chainquery-server <url>', 'Chain query server URL', '')
-  .option('--pricefeed-server <url>', 'Price feed server URL', '')
-  .requiredOption('--log-format <format>', 'Log format (console|json)', 'console')
-  .requiredOption('--debug', 'Enable debug mode', false)
-  .requiredOption('--otlp-debug', 'Enable OTLP debug mode', false)
-  .requiredOption('--start-action-server', 'Start action server instead of processor server', false)
-  .requiredOption('--worker <number>', 'Number of worker threads', myParseInt, workerNum)
-  .requiredOption('--process-timeout <seconds>', 'Process timeout in seconds', myParseInt, 60)
-  .requiredOption(
-    '--worker-timeout <seconds>',
-    'Worker timeout in seconds',
-    myParseInt,
-    parseInt(process.env['WORKER_TIMEOUT_SECONDS'] || '60')
-  )
-  .requiredOption(
-    '--enable-partition',
-    'Enable binding data partition',
-    process.env['SENTIO_ENABLE_BINDING_DATA_PARTITION'] === 'true'
-  )
-  .parse()
-
-const options = {
+const options: ProcessorRuntimeOptions = {
   ...program.opts(),
   target: program.args[program.args.length - 1]
 }
 
 const logLevel = process.env['LOG_LEVEL']?.toLowerCase()
 
-setupLogger(options.logFormat === 'json', logLevel === 'debug' ? true : options.debug)
+setupLogger(options.logFormat === 'json', logLevel === 'debug' ? true : options.debug!)
 console.debug('Starting with', options.target)
 
 await setupOTLP(options.otlpDebug)
@@ -121,7 +66,7 @@ if (options.startActionServer) {
     .use(openTelemetryServerMiddleware())
     .use(errorDetailsServerMiddleware)
 
-  if (options.worker > 1) {
+  if (options.worker! > 1) {
     baseService = new ServiceManager(loader, options, server.shutdown)
   } else {
     baseService = new ProcessorServiceImpl(loader, options, server.shutdown)

@@ -16,6 +16,7 @@ import { Subject } from 'rxjs'
 import { MessageChannel } from 'node:worker_threads'
 import { ProcessorServiceImpl } from './service.js'
 import { TemplateInstanceState } from './state.js'
+import { ProcessorRuntimeOptions } from 'processor-runner-program.js'
 ;(BigInt.prototype as any).toJSON = function () {
   return this.toString()
 }
@@ -26,7 +27,7 @@ export class ServiceManager extends ProcessorServiceImpl {
 
   constructor(
     loader: () => Promise<any>,
-    readonly options: any,
+    readonly options: ProcessorRuntimeOptions,
     shutdownHandler?: () => void
   ) {
     super(loader, options, shutdownHandler)
@@ -123,7 +124,7 @@ export class ServiceManager extends ProcessorServiceImpl {
 
     if (this.enablePartition) {
       const concurrent = parseInt(process.env['PROCESS_CONCURRENCY'] || '0')
-      if (this.options.worker < concurrent) {
+      if (this.options.worker! < concurrent) {
         console.warn(
           `When partition is enabled, the worker count must >= 'PROCESS_CONCURRENCY', will set worker count to ${concurrent})`
         )

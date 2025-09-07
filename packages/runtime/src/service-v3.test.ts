@@ -23,8 +23,9 @@ describe('Test Service V3 with worker without partition', () => {
       PluginManager.INSTANCE.register(new TestPlugin())
     },
     {
-      // chainsConfig: 'chains-config.json',
-      enablePartition: false
+      chainsConfig: 'chains-config.json',
+      enablePartition: false,
+      target: './test-processor.test.js'
     }
   )
 
