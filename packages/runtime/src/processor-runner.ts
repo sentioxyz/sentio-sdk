@@ -62,7 +62,7 @@ program
   )
   .action(async (options: any) => {
     try {
-      await startServer(options.target, options)
+      await startServer(options)
     } catch (error) {
       console.error('Failed to start server:', error)
       process.exit(1)
@@ -72,11 +72,11 @@ program
 // Parse arguments
 program.parse()
 
-async function startServer(target: string, options: any): Promise<void> {
-const logLevel = process.env['LOG_LEVEL']?.toLowerCase()
+async function startServer(options: any): Promise<void> {
+  const logLevel = process.env['LOG_LEVEL']?.toLowerCase()
 
-setupLogger(options['log-format'] === 'json', logLevel === 'debug' ? true : options.debug)
-console.debug('Starting with', target)
+  setupLogger(options['log-format'] === 'json', logLevel === 'debug' ? true : options.debug)
+  console.debug('Starting with', options.target)
 
 await setupOTLP(options['otlp-debug'])
 
@@ -89,7 +89,7 @@ console.debug('Starting Server', options)
 let server: any
 let baseService: ProcessorServiceImpl | ServiceManager
 const loader = async () => {
-  const m = await import(target)
+  const m = await import(options.target)
   console.debug('Module loaded', m)
   return m
 }
