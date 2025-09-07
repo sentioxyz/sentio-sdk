@@ -73,7 +73,7 @@ export default async function ({
   const { startRequest, configRequest, options } = Piscina.workerData
   if (!started) {
     const logLevel = process.env['LOG_LEVEL']?.toUpperCase()
-    setupLogger(options['log-format'] === 'json', logLevel === 'debug' ? true : options.debug, threadId)
+    setupLogger(options.logFormat === 'json', logLevel === 'debug' ? true : options.debug, threadId)
 
     configureEndpoints(options)
 
@@ -103,8 +103,8 @@ export default async function ({
       ]
     )
   }
-  const timeout = (options['worker-timeout'] || 0) * 1000 // convert to milliseconds
-  const enablePartition = options['enable-partition'] || false
+  const timeout = (options.workerTimeout || 0) * 1000 // convert to milliseconds
+  const enablePartition = options.enablePartition || false
   await new Promise<void>((resolve, reject) => {
     const subject = new Subject<DeepPartial<ProcessStreamResponse>>()
     let timeoutId: NodeJS.Timeout | undefined = undefined
