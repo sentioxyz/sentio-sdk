@@ -36,6 +36,7 @@ import { Provider } from 'ethers'
 import { decodeMulticallResult, encodeMulticallData, getMulticallAddress, Multicall3Call } from './multicall.js'
 
 import { processMetrics } from './metrics.js'
+import { ProcessorRuntimeOptions } from 'processor-runner-program.js'
 
 const { process_binding_count, process_binding_time, process_binding_error } = processMetrics
 
@@ -58,7 +59,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
   private preparedData: PreparedData | undefined
   readonly enablePartition: boolean
 
-  constructor(loader: () => Promise<any>, options?: any, shutdownHandler?: () => void) {
+  constructor(loader: () => Promise<any>, options?: ProcessorRuntimeOptions, shutdownHandler?: () => void) {
     this.loader = loader
     this.shutdownHandler = shutdownHandler
 
@@ -66,7 +67,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       ? process.env['ENABLE_PREPROCESS'].toLowerCase() == 'true'
       : false
 
-    this.enablePartition = options?.['enable-partition'] == true
+    this.enablePartition = options?.enablePartition == true
   }
 
   async getConfig(request: ProcessConfigRequest, context: CallContext): Promise<ProcessConfigResponse> {

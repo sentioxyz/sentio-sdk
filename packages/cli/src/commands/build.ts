@@ -2,10 +2,11 @@ import chalk from 'chalk'
 import path from 'path'
 import fs from 'fs-extra'
 import { getPackageRoot } from '../utils.js'
-import { Command } from 'commander'
+import { Command } from '@commander-js/extra-typings'
 import { CHAIN_TYPES, loadProcessorConfig } from '../config.js'
 import { getABIFilePath, getABI, writeABIFile } from '../abi.js'
 import { execStep, execPackageManager } from '../execution.js'
+import { CommandOptionsType } from './types.js'
 
 export function createBuildCommand() {
   return new Command('build')
@@ -27,7 +28,7 @@ export function createGenCommand() {
     })
 }
 
-export async function buildProcessor(onlyGen: boolean, options: any) {
+export async function buildProcessor(onlyGen: boolean, options: CommandOptionsType<typeof createBuildCommand>) {
   if (!options.skipDeps && !onlyGen) {
     await installDeps()
   }

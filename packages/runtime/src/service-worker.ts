@@ -9,6 +9,7 @@ import { Piscina } from 'piscina'
 import { configureEndpoints } from './endpoints.js'
 import { setupLogger } from './logger.js'
 import { Subject } from 'rxjs'
+import { ProcessorRuntimeOptions } from 'processor-runner-program.js'
 
 let started = false
 
@@ -34,7 +35,7 @@ process
 
 let service: ProcessorServiceImpl | undefined
 
-const loader = async (options: any) => {
+const loader = async (options: ProcessorRuntimeOptions) => {
   if (options.target) {
     const m = await import(options.target)
     console.debug('Module loaded, path:', options.target, 'module:', m)
@@ -44,7 +45,7 @@ const loader = async (options: any) => {
 
 const emptyCallContext = <CallContext>{}
 
-async function start(request: StartRequest, options: any): Promise<Empty> {
+async function start(request: StartRequest, options: ProcessorRuntimeOptions): Promise<Empty> {
   if (started) {
     return {}
   }

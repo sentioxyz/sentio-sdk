@@ -3,7 +3,7 @@
 import fs from 'fs-extra'
 
 import { compressionAlgorithms } from '@grpc/grpc-js'
-import { Command, InvalidArgumentError } from 'commander'
+
 import { createServer } from 'nice-grpc'
 import { errorDetailsServerMiddleware } from 'nice-grpc-error-details'
 // import { registry as niceGrpcRegistry } from 'nice-grpc-prometheus'
@@ -21,76 +21,21 @@ import { setupLogger } from './logger.js'
 import { setupOTLP } from './otlp.js'
 import { ActionServer } from './action-server.js'
 import { ServiceManager } from './service-manager.js'
-import path from 'path'
 import { ProcessorV3Definition } from '@sentio/protos'
 import { ProcessorServiceImplV3 } from './service-v3.js'
-import { readFileSync } from 'fs'
-import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
+import { program, ProcessorRuntimeOptions } from 'processor-runner-program.js'
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = dirname(__filename)
-const packageJson = JSON.parse(readFileSync(join(__dirname, '../package.json'), 'utf8'))
+program.parse()
 
-// const mergedRegistry = Registry.merge([globalRegistry, niceGrpcRegistry])
-
-let workerNum = 1
-try {
-  workerNum = parseInt(process.env['PROCESSOR_WORKER']?.trim() ?? '1')
-} catch (e) {
-  console.error('Failed to parse worker number', e)
+const options: ProcessorRuntimeOptions = {
+  ...program.opts(),
+  target: program.args[program.args.length - 1]
 }
-
-function myParseInt(value: string, dummyPrevious: unknown): number {
-  // parseInt takes a string and a radix
-  const parsedValue = parseInt(value, 10)
-  if (isNaN(parsedValue)) {
-    throw new InvalidArgumentError('Not a number.')
-  }
-  return parsedValue
-}
-
-// Create Commander.js program
-const program = new Command()
-
-program
-  .allowUnknownOption()
-  // .allowExcessArguments()
-  .name('processor-runner')
-  .description('Sentio Processor Runtime')
-  .version(packageJson.version)
-  .argument('<target>', 'Path to the processor module to load')
-  .option('-p, --port <port>', 'Port to listen on', '4000')
-  .option('--concurrency <number>', 'Number of concurrent workers', myParseInt, 4)
-  .option('--batch-count <number>', 'Batch count for processing', myParseInt, 1)
-  .option('-c, --chains-config <path>', 'Path to chains configuration file', 'chains-config.json')
-  .option('--chainquery-server <url>', 'Chain query server URL', '')
-  .option('--pricefeed-server <url>', 'Price feed server URL', '')
-  .option('--log-format <format>', 'Log format (console|json)', 'console')
-  .option('--debug', 'Enable debug mode', false)
-  .option('--otlp-debug', 'Enable OTLP debug mode', false)
-  .option('--start-action-server', 'Start action server instead of processor server', false)
-  .option('--worker <number>', 'Number of worker threads', myParseInt, workerNum)
-  .option('--process-timeout <seconds>', 'Process timeout in seconds', myParseInt, 60)
-  .option(
-    '--worker-timeout <seconds>',
-    'Worker timeout in seconds',
-    myParseInt,
-    parseInt(process.env['WORKER_TIMEOUT_SECONDS'] || '60')
-  )
-  .option(
-    '--enable-partition',
-    'Enable binding data partition',
-    process.env['SENTIO_ENABLE_BINDING_DATA_PARTITION'] === 'true'
-  )
-  .parse()
-
-const options = program.opts()
-options.target = program.processedArgs[0]
 
 const logLevel = process.env['LOG_LEVEL']?.toLowerCase()
 
-setupLogger(options.logFormat === 'json', logLevel === 'debug' ? true : options.debug)
+setupLogger(options.logFormat === 'json', logLevel === 'debug' ? true : options.debug!)
 console.debug('Starting with', options.target)
 
 await setupOTLP(options.otlpDebug)
@@ -230,7 +175,7 @@ if (process.env['OOM_DUMP_MEMORY_SIZE_GB']) {
     console.log('Current Memory Usage', mem)
     // if memory usage is greater this size, dump heap and exit
     if (mem.heapTotal > memorySize * 1024 * 1024 * 1024 && !dumping) {
-      const file = path.join(dir, `${Date.now()}.heapsnapshot`)
+      const file = join(dir, `${Date.now()}.heapsnapshot`)
       dumping = true
       await dumpHeap(file)
       // force exit and keep pod running
@@ -243,11 +188,11 @@ if (process.env['OOM_DUMP_MEMORY_SIZE_GB']) {
 async function dumpHeap(file: string): Promise<void> {
   console.log('Heap dumping to', file)
   const session = new Session()
-  fs.mkdirSync(path.dirname(file), { recursive: true })
+  fs.mkdirSync(dirname(file), { recursive: true })
   const fd = fs.openSync(file, 'w')
   try {
     session.connect()
-    session.on('HeapProfiler.addHeapSnapshotChunk', (m) => {
+    session.on('HeapProfiler.addHeapSnapshotChunk', (m: any) => {
       fs.writeSync(fd, m.params.chunk)
     })
 

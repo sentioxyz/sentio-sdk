@@ -4,16 +4,19 @@ import { ServiceManager } from './service-manager.js'
 import { CallContext } from 'nice-grpc-common'
 import { DeepPartial, HandlerType, ProcessStreamResponse } from '@sentio/protos'
 import { Subject } from 'rxjs'
+import { getTestConfig } from './processor-runner-program.js'
 
 export const TEST_CONTEXT: CallContext = <CallContext>{}
 
 describe('Test Service Manager with worker without partition', () => {
-  const service = new ServiceManager(async () => {}, {
-    worker: 1,
-    target: './test-processor.test.js',
-    ['chains-config']: 'chains-config.json',
-    ['enable-partition']: false
-  })
+  const service = new ServiceManager(
+    async () => {},
+    getTestConfig({
+      worker: 1,
+      chainsConfig: 'chains-config.json',
+      enablePartition: false
+    })
+  )
 
   before(async () => {
     await service.start({ templateInstances: [] }, TEST_CONTEXT)
@@ -23,8 +26,8 @@ describe('Test Service Manager with worker without partition', () => {
   test('should initialize worker pool with correct options', async () => {
     // The pool should be initialized after start and getConfig
     assert.ok(service['pool'], 'Worker pool should be initialized')
-    assert.strictEqual(service['options'].worker, 1, 'Worker count should match options')
-    assert.strictEqual(service['options']['enable-partition'], false, 'Partitioning should be disabled')
+    assert.strictEqual(service.options.worker, 1, 'Worker count should match options')
+    assert.strictEqual(service.options.enablePartition, false, 'Partitioning should be disabled')
   })
 
   test('should handle process stream requests', async () => {
@@ -81,12 +84,14 @@ describe('Test Service Manager with worker without partition', () => {
 })
 
 describe('Test Service Manager with worker with partition', () => {
-  const service = new ServiceManager(async () => {}, {
-    worker: 1,
-    target: './test-processor.test.js',
-    ['chains-config']: 'chains-config.json',
-    ['enable-partition']: true
-  })
+  const service = new ServiceManager(
+    async () => {},
+    getTestConfig({
+      worker: 1,
+      chainsConfig: 'chains-config.json',
+      enablePartition: true
+    })
+  )
 
   before(async () => {
     await service.start({ templateInstances: [] }, TEST_CONTEXT)
@@ -96,8 +101,8 @@ describe('Test Service Manager with worker with partition', () => {
   test('should initialize worker pool with correct options', async () => {
     // The pool should be initialized after start and getConfig
     assert.ok(service['pool'], 'Worker pool should be initialized')
-    assert.strictEqual(service['options'].worker, 1, 'Worker count should match options')
-    assert.strictEqual(service['options']['enable-partition'], true, 'Partitioning should be enabled')
+    assert.strictEqual(service.options.worker, 1, 'Worker count should match options')
+    assert.strictEqual(service.options.enablePartition, true, 'Partitioning should be enabled')
   })
 
   test('should handle process stream requests', async () => {

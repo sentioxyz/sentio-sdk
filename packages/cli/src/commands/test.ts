@@ -1,6 +1,6 @@
 import { execSync, spawnSync } from 'child_process'
 import path from 'path'
-import { Command } from 'commander'
+import { Command } from '@commander-js/extra-typings'
 import { getPackageRoot } from '../utils.js'
 
 export function createTestCommand() {

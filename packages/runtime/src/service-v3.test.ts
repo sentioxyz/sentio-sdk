@@ -12,6 +12,7 @@ import { Subject } from 'rxjs'
 import { ProcessorServiceImplV3 } from './service-v3.js'
 import { PluginManager } from './plugin.js'
 import { TestPlugin } from './test-processor.test.js'
+import { getTestConfig } from './processor-runner-program.js'
 
 export const TEST_CONTEXT: CallContext = <CallContext>{}
 
@@ -22,10 +23,9 @@ describe('Test Service V3 with worker without partition', () => {
       PluginManager.INSTANCE.typesToPlugin.clear()
       PluginManager.INSTANCE.register(new TestPlugin())
     },
-    {
-      ['chains-config']: 'chains-config.json',
-      ['enable-partition']: false
-    }
+    getTestConfig({
+      enablePartition: false
+    })
   )
 
   let processConfigResponse: DeepPartial<ProcessConfigResponse> = ProcessConfigResponse.fromPartial({})

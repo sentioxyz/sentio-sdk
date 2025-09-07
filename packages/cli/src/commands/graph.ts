@@ -1,4 +1,4 @@
-import { Command } from 'commander'
+import { Command } from '@commander-js/extra-typings'
 import path from 'path'
 import { overrideConfigWithOptions, YamlProjectConfig } from '../config.js'
 import { getSdkVersion, getPackageRoot } from '../utils.js'
@@ -14,15 +14,13 @@ import process from 'process'
 import { supportedChainMessage } from './create.js'
 import { EthChainInfo } from '@sentio/chain'
 import yaml from 'yaml'
+import { CommandOptionsType } from './types.js'
 
-export function createGraphCommand() {
-  const graphCommand = new Command('graph').description('Graph related commands')
-
-  graphCommand
-    .command('create')
+function createGraphCreateCommand() {
+  return new Command('create')
     .description('Create a new graph')
     .argument('<name>', 'Project name')
-    .option(
+    .requiredOption(
       '--chain-id <id>',
       '(Optional) The chain id to use for eth. Supported: ' + supportedChainMessage.join('\n,'),
       '1'
@@ -30,9 +28,10 @@ export function createGraphCommand() {
     .action(async (name, options) => {
       await runGraphCreateInternal(name, options)
     })
+}
 
-  graphCommand
-    .command('deploy')
+function createGraphDeployCommand() {
+  return new Command('deploy')
     .description('Deploy the graph')
     .option('--owner <owner>', 'Sentio Project owner, omit if specified in sentio.yaml')
     .option('--name <name>', 'Sentio Project name, omit if specified in sentio.yaml')
@@ -50,11 +49,21 @@ export function createGraphCommand() {
     .action(async (options, cmd) => {
       await runGraphDeployInternal(options, cmd.args)
     })
+}
+
+export function createGraphCommand() {
+  const graphCommand = new Command('graph').description('Graph related commands')
+
+  graphCommand.addCommand(createGraphCreateCommand())
+  graphCommand.addCommand(createGraphDeployCommand())
 
   return graphCommand
 }
 
-async function runGraphCreateInternal(projectName: string, options: any) {
+async function runGraphCreateInternal(
+  projectName: string,
+  options: CommandOptionsType<typeof createGraphCreateCommand>
+) {
   if (!projectName) {
     console.error('Project name is required')
     process.exit(1)
@@ -113,7 +122,10 @@ async function createProjectIfMissing(options: YamlProjectConfig, apiKey: string
   }
 }
 
-async function runGraphDeployInternal(options: any, extraArgs: string[] = []) {
+async function runGraphDeployInternal(
+  options: CommandOptionsType<typeof createGraphDeployCommand>,
+  extraArgs: string[] = []
+) {
   let processorConfig: YamlProjectConfig = { host: '', project: '', debug: false, contracts: [] }
   const yamlPath = path.join(process.cwd(), 'sentio.yaml')
   if (fs.existsSync(yamlPath)) {

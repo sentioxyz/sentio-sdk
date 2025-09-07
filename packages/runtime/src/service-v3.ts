@@ -26,6 +26,7 @@ import { recordRuntimeInfo } from './service.js'
 import { DataBindingContext } from './db-context.js'
 import { TemplateInstanceState } from './state.js'
 import { freezeGlobalConfig } from './global-config.js'
+import { ProcessorRuntimeOptions } from 'processor-runner-program.js'
 
 const { process_binding_count, process_binding_time, process_binding_error } = processMetrics
 
@@ -35,11 +36,11 @@ export class ProcessorServiceImplV3 implements ProcessorV3ServiceImplementation 
   private readonly shutdownHandler?: () => void
   private started = false
 
-  constructor(loader: () => Promise<any>, options?: any, shutdownHandler?: () => void) {
+  constructor(loader: () => Promise<any>, options?: ProcessorRuntimeOptions, shutdownHandler?: () => void) {
     this.loader = loader
     this.shutdownHandler = shutdownHandler
 
-    this.enablePartition = options?.['enable-partition'] == true
+    this.enablePartition = options?.enablePartition == true
   }
 
   async start(request: StartRequest, context: CallContext): Promise<Empty> {

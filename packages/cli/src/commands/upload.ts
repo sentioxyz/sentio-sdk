@@ -1,4 +1,4 @@
-import { Command } from 'commander'
+import { Command, InvalidArgumentError } from '@commander-js/extra-typings'
 import { loadProcessorConfig, overrideConfigWithOptions, YamlProjectConfig } from '../config.js'
 import fs from 'fs'
 import { URL } from 'url'
@@ -13,16 +13,26 @@ import { getCliVersion, getSdkVersion } from '../utils.js'
 import readline from 'readline'
 import JSZip from 'jszip'
 import { UserInfo } from '../../../protos/lib/service/common/protos/common.js'
+import { CommandOptionsType } from './types.js'
+
+function myParseInt(value: string, dummyPrevious: number): number {
+  // parseInt takes a string and a radix
+  const parsedValue = parseInt(value, 10)
+  if (isNaN(parsedValue)) {
+    throw new InvalidArgumentError('Not a number.')
+  }
+  return parsedValue
+}
 
 export function createUploadCommand() {
   return new Command('upload')
     .description('Upload processor to Sentio')
     .option('--owner <owner>', '(Optional) Override Project owner')
     .option('--name <name>', '(Optional) Override Project name')
-    .option<number>(
+    .option(
       '--continue-from <version>',
       '(Optional) Continue processing data from the specific processor version which will keeping the old data from previous version and will STOP that version IMMEDIATELY.',
-      parseInt
+      myParseInt
     )
     .option('--debug', '(Optional) Run driver in debug mode')
     .option('-y --silent-overwrite', '(Optional) Create project or upload new version without confirmation')
@@ -33,14 +43,17 @@ export function createUploadCommand() {
     .option('--api-key <key>', '(Optional) Manually provide API key rather than use saved credential')
     .option('--token <token>', '(Optional) Manually provide token rather than use saved credential')
     .option('--host <host>', '(Optional) Override Sentio Host name')
-    .action(async (options, command) => {
+    .action(async (options) => {
       const processorConfig = loadProcessorConfig()
       overrideConfigWithOptions(processorConfig, options)
       await runUploadInternal(processorConfig, options)
     })
 }
 
-async function runUploadInternal(processorConfig: YamlProjectConfig, options: any) {
+async function runUploadInternal(
+  processorConfig: YamlProjectConfig,
+  options: CommandOptionsType<typeof createUploadCommand>
+) {
   console.log(processorConfig)
 
   const uploadAuth: Auth = {}

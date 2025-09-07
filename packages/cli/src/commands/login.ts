@@ -1,4 +1,4 @@
-import { Command } from 'commander'
+import { Command } from '@commander-js/extra-typings'
 import { getAuthConfig, getFinalizedHost } from '../config.js'
 import { startServer } from './login-server.js'
 import url, { URL } from 'url'
@@ -7,6 +7,7 @@ import chalk from 'chalk'
 import { WriteKey } from '../key.js'
 import fetch from 'node-fetch'
 import open from 'open'
+import { CommandOptionsType } from './types.js'
 
 const port = 20000
 
@@ -20,7 +21,7 @@ export function createLoginCommand() {
     })
 }
 
-function login(options: any) {
+function login(options: CommandOptionsType<typeof createLoginCommand>) {
   const host = getFinalizedHost(options.host)
 
   if (options.apiKey) {
@@ -64,7 +65,7 @@ function login(options: any) {
 
     startServer({
       serverPort: port,
-      sentioHost: options.host,
+      sentioHost: options.host || '',
       codeVerifier: verifier
     })
   }

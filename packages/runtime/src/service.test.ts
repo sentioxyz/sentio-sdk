@@ -4,6 +4,7 @@ import { FullProcessorServiceImpl } from './full-service.js'
 import { CallContext } from 'nice-grpc-common'
 import { DataBinding, HandlerType, ProcessResult } from './gen/processor/protos/processor.js'
 import { Plugin, PluginManager } from './plugin.js'
+import { getTestConfig } from './processor-runner-program.js'
 
 export const TEST_CONTEXT: CallContext = <CallContext>{}
 
@@ -22,7 +23,7 @@ describe('Test Service Compatibility', () => {
   const baseService = new ProcessorServiceImpl(async () => {
     PluginManager.INSTANCE.plugins = []
     PluginManager.INSTANCE.register(new TestPlugin())
-  }, {})
+  }, getTestConfig())
   const service = new FullProcessorServiceImpl(baseService)
 
   before(async () => {

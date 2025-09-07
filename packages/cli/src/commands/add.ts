@@ -1,4 +1,4 @@
-import { Command } from 'commander'
+import { Command } from '@commander-js/extra-typings'
 import fs from 'fs-extra'
 import chalk from 'chalk'
 
@@ -7,6 +7,7 @@ import { codegen } from './build.js'
 import yaml from 'yaml'
 import { getABIFilePath, getABI, writeABIFile } from '../abi.js'
 import { AptosChainId, ChainId, getChainName, SuiChainId, EthChainInfo, ExplorerApiType } from '@sentio/chain'
+import { CommandOptionsType } from './types.js'
 
 const supportedChain: string[] = [
   AptosChainId.APTOS_MAINNET,
@@ -41,19 +42,19 @@ export function createAddCommand() {
     .description('Add a contract to the project')
     .argument('<address>', 'Address of the contract')
     .option('-n, --name <name>', 'File name for the downloaded contract, if empty, use address as file name')
-    .option(
+    .requiredOption(
       '-c, --chain <chain>',
       'Chain ID, current supports the following, otherwise you need manually download ABI to abis/*:\n' +
         supportedChainMessage.join('\n,'),
       '1'
     )
-    .option('--folder <folder>', '(Optional) The folder to save the downloaded ABI file')
+    .requiredOption('--folder <folder>', '(Optional) The folder to save the downloaded ABI file', '')
     .action(async (address, options) => {
       await runAddInternal(address, options)
     })
 }
 
-async function runAddInternal(address: string, options: any) {
+async function runAddInternal(address: string, options: CommandOptionsType<typeof createAddCommand>) {
   if (!address) {
     console.error('Address is required')
     process.exit(1)

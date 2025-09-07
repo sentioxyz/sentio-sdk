@@ -1,4 +1,4 @@
-import { Command } from 'commander'
+import { Command } from '@commander-js/extra-typings'
 import path from 'path'
 import fs from 'fs'
 import { promisify } from 'util'
@@ -8,6 +8,7 @@ import { ReadKey } from '../key.js'
 import chalk from 'chalk'
 import { Auth } from './upload.js'
 import { URL } from 'url'
+import { CommandOptionsType } from './types.js'
 
 const SRC_ROOT = 'src'
 
@@ -53,7 +54,7 @@ export function createCompileCommand() {
 //   await runCompileInternal(options)
 // }
 
-async function runCompileInternal(options: any) {
+async function runCompileInternal(options: CommandOptionsType<typeof createCompileCommand>) {
   let projectOwner, projectSlug
   const auth: Auth = {}
   if (options.upload) {
@@ -113,9 +114,9 @@ async function runCompileInternal(options: any) {
 
   if (options.upload) {
     await upload({
-      host: options.host,
+      host: options.host!,
       projectOwner,
-      projectSlug,
+      projectSlug: projectSlug!,
       auth,
       metadata
     })

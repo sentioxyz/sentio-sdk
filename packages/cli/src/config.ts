@@ -40,7 +40,7 @@ export interface Variable {
   isSecret: boolean
 }
 
-export function getFinalizedHost(host: string): string {
+export function getFinalizedHost(host: string | undefined): string {
   if (host === undefined || host === '') {
     host = 'prod'
   }

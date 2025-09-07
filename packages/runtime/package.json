@@ -22,7 +22,7 @@
     "run": "tsx src/processor-runner.ts --log-format=json",
     "run-benchmark": "tsx src/decode-benchmark.ts",
     "start_js": "tsx ./lib/processor-runner.js $PWD/../../debug/dist/lib.js",
-    "start_ts": "tsx src/processor-runner.ts --log-format=json $PWD/../../examples/x2y2/src/processor.ts",
+    "start_ts": "tsx src/processor-runner.ts --debug --chains-config chains-config.json $PWD/../../examples/x2y2/src/processor.ts",
     "test": "glob -c 'tsx --test' '**/*.test.ts'"
   },
   "dependencies": {
@@ -50,6 +50,7 @@
     "winston": "^3.11.0"
   },
   "devDependencies": {
+    "@commander-js/extra-typings": "^14.0.0",
     "@types/fs-extra": "^11.0.4"
   },
   "engines": {

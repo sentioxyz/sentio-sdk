@@ -1,10 +1,11 @@
 import chalk from 'chalk'
-import { Command } from 'commander'
+import { Command } from '@commander-js/extra-typings'
 import { loadProcessorConfig, getFinalizedHost } from '../config.js'
 import { ReadKey } from '../key.js'
 import fetch from 'node-fetch'
 import fs from 'fs-extra'
 import path from 'path'
+import { CommandOptionsType } from './types.js'
 
 interface StartGenerationRequest {
   chain_id: string
@@ -55,15 +56,7 @@ export function createAiCommand() {
     })
 }
 
-async function generateProcessor(options: {
-  prompt: string
-  chainId?: string
-  contract?: string
-  projectName?: string
-  verbose?: boolean
-  save?: boolean
-  host?: string
-}) {
+async function generateProcessor(options: CommandOptionsType<typeof createAiCommand>) {
   try {
     // Get API credentials
     const host = getFinalizedHost(options.host || 'prod')

@@ -1,4 +1,4 @@
-import { Command } from 'commander'
+import { Command } from '@commander-js/extra-typings'
 import { getCliVersion, getSdkVersion } from '../utils.js'
 
 export function createVersionCommand() {
