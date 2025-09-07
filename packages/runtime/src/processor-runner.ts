@@ -132,14 +132,14 @@ async function startServer(target: string, options: any): Promise<void> {
     console.log('Processor Server Started at:', options.port)
 
     // Start metrics server
-    await startMetricsServer()
+    const httpServer = await startMetricsServer()
 
     // Setup process handlers
-    setupProcessHandlers(baseService, server)
+    setupProcessHandlers(baseService, server, httpServer)
   }
 }
 
-async function startMetricsServer(): Promise<void> {
+async function startMetricsServer(): Promise<any> {
   const metricsPort = 4040
 
   const httpServer = http
@@ -194,12 +194,14 @@ async function startMetricsServer(): Promise<void> {
     .listen(metricsPort)
 
   console.log('Metric Server Started at:', metricsPort)
+  
+  return httpServer
 }
 
-function setupProcessHandlers(baseService: ProcessorServiceImpl | ServiceManager, server: any): void {
+function setupProcessHandlers(baseService: ProcessorServiceImpl | ServiceManager, server: any, httpServer: any): void {
   process
     .on('SIGINT', function () {
-      shutdownServers(server, 0)
+      shutdownServers(server, httpServer, 0)
     })
     .on('uncaughtException', (err) => {
       console.error('Uncaught Exception, please checking if await is properly used', err)
@@ -234,6 +236,7 @@ function setupOOMMonitoring(): void {
     const mem = process.memoryUsage()
     console.log('Current Memory Usage', mem)
 
+    // if memory usage is greater this size, dump heap and exit
     if (mem.heapTotal > memorySize * 1024 * 1024 * 1024 && !dumping) {
       const file = path.join(dir, `${Date.now()}.heapsnapshot`)
       dumping = true
@@ -263,8 +266,12 @@ async function dumpHeap(file: string): Promise<void> {
   }
 }
 
-function shutdownServers(server: any, exitCode: number): void {
+function shutdownServers(server: any, httpServer: any, exitCode: number): void {
   server?.forceShutdown()
   console.log('RPC server shut down')
-  process.exit(exitCode)
+
+  httpServer.close(function () {
+    console.log('Http server shut down')
+    process.exit(exitCode)
+  })
 }
