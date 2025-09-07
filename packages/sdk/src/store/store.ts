@@ -17,9 +17,10 @@ import {
   DBRequest_DBUpdate,
   Entity as EntityStruct,
   EntityUpdateData_Operator,
-  RichValue
+  RichValue,
+  DBRequest_DBOperator,
+  DBResponse
 } from '@sentio/protos'
-import { DBRequest_DBOperator, DBResponse } from '@sentio/protos'
 import { IStoreContext, PluginManager } from '@sentio/runtime'
 import { Cursor } from './cursor.js'
 import { serializeRichValue } from './util.js'
