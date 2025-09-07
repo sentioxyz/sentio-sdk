@@ -7,13 +7,19 @@ import { CHAIN_TYPES, loadProcessorConfig } from '../config.js'
 import { getABIFilePath, getABI, writeABIFile } from '../abi.js'
 import { execStep, execPackageManager } from '../execution.js'
 
+interface BuildCommandOptions {
+  skipGen?: boolean
+  skipDeps?: boolean
+  example?: boolean
+}
+
 export function createBuildCommand() {
   return new Command('build')
     .description('Build the processor')
     .option('--skip-gen', 'Skip code generation.')
     .option('--skip-deps', 'Skip dependency enforce.')
     .option('--example', 'Generate example usage of the processor.')
-    .action(async (options) => {
+    .action(async (options: BuildCommandOptions) => {
       await buildProcessor(false, options)
     })
 }
@@ -22,12 +28,12 @@ export function createGenCommand() {
   return new Command('gen')
     .description('Generate ABI')
     .option('--example', 'Generate example usage of the processor.')
-    .action(async (options) => {
+    .action(async (options: BuildCommandOptions) => {
       await buildProcessor(true, options)
     })
 }
 
-export async function buildProcessor(onlyGen: boolean, options: any) {
+export async function buildProcessor(onlyGen: boolean, options: BuildCommandOptions) {
   if (!options.skipDeps && !onlyGen) {
     await installDeps()
   }

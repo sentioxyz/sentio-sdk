@@ -8,6 +8,11 @@ import { WriteKey } from '../key.js'
 import fetch from 'node-fetch'
 import open from 'open'
 
+interface LoginCommandOptions {
+  host?: string
+  apiKey?: string
+}
+
 const port = 20000
 
 export function createLoginCommand() {
@@ -15,12 +20,12 @@ export function createLoginCommand() {
     .description('Login to Sentio')
     .option('--host <host>', '(Optional) Override Sentio Host name')
     .option('--api-key <key>', '(Optional) Your API key')
-    .action((options) => {
+    .action((options: LoginCommandOptions) => {
       login(options)
     })
 }
 
-function login(options: any) {
+function login(options: LoginCommandOptions) {
   const host = getFinalizedHost(options.host)
 
   if (options.apiKey) {
@@ -64,7 +69,7 @@ function login(options: any) {
 
     startServer({
       serverPort: port,
-      sentioHost: options.host,
+      sentioHost: options.host || '',
       codeVerifier: verifier
     })
   }

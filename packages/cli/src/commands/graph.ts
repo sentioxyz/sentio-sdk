@@ -15,6 +15,20 @@ import { supportedChainMessage } from './create.js'
 import { EthChainInfo } from '@sentio/chain'
 import yaml from 'yaml'
 
+interface GraphCreateCommandOptions {
+  chainId: string
+}
+
+interface GraphDeployCommandOptions {
+  owner?: string
+  name?: string
+  apiKey?: string
+  host?: string
+  continueFrom?: number
+  dir?: string
+  skipGen?: boolean
+}
+
 export function createGraphCommand() {
   const graphCommand = new Command('graph').description('Graph related commands')
 
@@ -22,12 +36,12 @@ export function createGraphCommand() {
     .command('create')
     .description('Create a new graph')
     .argument('<name>', 'Project name')
-    .option(
+    .requiredOption(
       '--chain-id <id>',
       '(Optional) The chain id to use for eth. Supported: ' + supportedChainMessage.join('\n,'),
       '1'
     )
-    .action(async (name, options) => {
+    .action(async (name, options: GraphCreateCommandOptions) => {
       await runGraphCreateInternal(name, options)
     })
 
@@ -47,14 +61,14 @@ export function createGraphCommand() {
     .option('--skip-gen', '(Optional) Skip code generation.')
     .allowUnknownOption()
     .allowExcessArguments()
-    .action(async (options, cmd) => {
+    .action(async (options: GraphDeployCommandOptions, cmd) => {
       await runGraphDeployInternal(options, cmd.args)
     })
 
   return graphCommand
 }
 
-async function runGraphCreateInternal(projectName: string, options: any) {
+async function runGraphCreateInternal(projectName: string, options: GraphCreateCommandOptions) {
   if (!projectName) {
     console.error('Project name is required')
     process.exit(1)
@@ -113,7 +127,7 @@ async function createProjectIfMissing(options: YamlProjectConfig, apiKey: string
   }
 }
 
-async function runGraphDeployInternal(options: any, extraArgs: string[] = []) {
+async function runGraphDeployInternal(options: GraphDeployCommandOptions, extraArgs: string[] = []) {
   let processorConfig: YamlProjectConfig = { host: '', project: '', debug: false, contracts: [] }
   const yamlPath = path.join(process.cwd(), 'sentio.yaml')
   if (fs.existsSync(yamlPath)) {

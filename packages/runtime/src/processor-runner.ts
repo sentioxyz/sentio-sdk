@@ -59,25 +59,25 @@ const program = new Command()
   .description('Sentio Processor Runtime')
   .version(packageJson.version)
   .argument('<target>', 'Path to the processor module to load')
-  .option('-p, --port <port>', 'Port to listen on', '4000')
-  .option('--concurrency <number>', 'Number of concurrent workers', myParseInt, 4)
-  .option('--batch-count <number>', 'Batch count for processing', myParseInt, 1)
-  .option('-c, --chains-config <path>', 'Path to chains configuration file', 'chains-config.json')
+  .requiredOption('-p, --port <port>', 'Port to listen on', '4000')
+  .requiredOption('--concurrency <number>', 'Number of concurrent workers', myParseInt, 4)
+  .requiredOption('--batch-count <number>', 'Batch count for processing', myParseInt, 1)
+  .requiredOption('-c, --chains-config <path>', 'Path to chains configuration file', 'chains-config.json')
   .option('--chainquery-server <url>', 'Chain query server URL', '')
   .option('--pricefeed-server <url>', 'Price feed server URL', '')
-  .option('--log-format <format>', 'Log format (console|json)', 'console')
-  .option('--debug', 'Enable debug mode', false)
-  .option('--otlp-debug', 'Enable OTLP debug mode', false)
-  .option('--start-action-server', 'Start action server instead of processor server', false)
-  .option('--worker <number>', 'Number of worker threads', myParseInt, workerNum)
-  .option('--process-timeout <seconds>', 'Process timeout in seconds', myParseInt, 60)
-  .option(
+  .requiredOption('--log-format <format>', 'Log format (console|json)', 'console')
+  .requiredOption('--debug', 'Enable debug mode', false)
+  .requiredOption('--otlp-debug', 'Enable OTLP debug mode', false)
+  .requiredOption('--start-action-server', 'Start action server instead of processor server', false)
+  .requiredOption('--worker <number>', 'Number of worker threads', myParseInt, workerNum)
+  .requiredOption('--process-timeout <seconds>', 'Process timeout in seconds', myParseInt, 60)
+  .requiredOption(
     '--worker-timeout <seconds>',
     'Worker timeout in seconds',
     myParseInt,
     parseInt(process.env['WORKER_TIMEOUT_SECONDS'] || '60')
   )
-  .option(
+  .requiredOption(
     '--enable-partition',
     'Enable binding data partition',
     process.env['SENTIO_ENABLE_BINDING_DATA_PARTITION'] === 'true'
@@ -122,7 +122,7 @@ if (options.startActionServer) {
     .use(openTelemetryServerMiddleware())
     .use(errorDetailsServerMiddleware)
 
-  if (options.worker > 1) {
+  if ((options.worker as number) > 1) {
     baseService = new ServiceManager(loader, options, server.shutdown)
   } else {
     baseService = new ProcessorServiceImpl(loader, options, server.shutdown)
@@ -248,7 +248,7 @@ async function dumpHeap(file: string): Promise<void> {
   const fd = fs.openSync(file, 'w')
   try {
     session.connect()
-    session.on('HeapProfiler.addHeapSnapshotChunk', (m) => {
+    session.on('HeapProfiler.addHeapSnapshotChunk', (m: any) => {
       fs.writeSync(fd, m.params.chunk)
     })
 

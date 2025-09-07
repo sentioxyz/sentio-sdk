@@ -8,6 +8,12 @@ import yaml from 'yaml'
 import { getABIFilePath, getABI, writeABIFile } from '../abi.js'
 import { AptosChainId, ChainId, getChainName, SuiChainId, EthChainInfo, ExplorerApiType } from '@sentio/chain'
 
+interface AddCommandOptions {
+  name?: string
+  chain: string
+  folder?: string
+}
+
 const supportedChain: string[] = [
   AptosChainId.APTOS_MAINNET,
   AptosChainId.APTOS_TESTNET,
@@ -41,26 +47,26 @@ export function createAddCommand() {
     .description('Add a contract to the project')
     .argument('<address>', 'Address of the contract')
     .option('-n, --name <name>', 'File name for the downloaded contract, if empty, use address as file name')
-    .option(
+    .requiredOption(
       '-c, --chain <chain>',
       'Chain ID, current supports the following, otherwise you need manually download ABI to abis/*:\n' +
         supportedChainMessage.join('\n,'),
       '1'
     )
     .option('--folder <folder>', '(Optional) The folder to save the downloaded ABI file')
-    .action(async (address, options) => {
+    .action(async (address, options: AddCommandOptions) => {
       await runAddInternal(address, options)
     })
 }
 
-async function runAddInternal(address: string, options: any) {
+async function runAddInternal(address: string, options: AddCommandOptions) {
   if (!address) {
     console.error('Address is required')
     process.exit(1)
   }
 
   const chain = options.chain.toLowerCase() as ChainId
-  const folder: string = options.folder
+  const folder: string = options.folder || ''
   if (!address.startsWith('0x')) {
     console.error(chalk.red('Address must start with 0x'))
     process.exit(1)

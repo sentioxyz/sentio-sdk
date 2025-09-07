@@ -9,6 +9,14 @@ import { getPackageRoot } from '../utils.js'
 import { EthChainInfo } from '@sentio/chain'
 import { CHAIN_TYPES } from '../config.js'
 
+interface CreateCommandOptions {
+  subproject?: boolean
+  sdkVersion?: string
+  directory?: string
+  chainType: string
+  chainId: string
+}
+
 export const supportedChainMessage = [
   ',  <Chain ID> (<Chain Name>)',
   '  --------------------',
@@ -27,14 +35,22 @@ export function createCreateCommand() {
     )
     .option('-s, --sdk-version <version>', 'The version of @sentio/sdk to use, default latest')
     .option('-d, --directory <dir>', 'The root direct new project will be created, default current working dir')
-    .option('-c, --chain-type <type>', `The type of project you want to create, can be ${chainTypes.join(', ')}`, 'eth')
-    .option('--chain-id <id>', 'The chain ID to use for eth. Supported: ' + supportedChainMessage.join('\n,'), '1')
-    .action(async (name, options) => {
+    .requiredOption(
+      '-c, --chain-type <type>',
+      `The type of project you want to create, can be ${chainTypes.join(', ')}`,
+      'eth'
+    )
+    .requiredOption(
+      '--chain-id <id>',
+      'The chain ID to use for eth. Supported: ' + supportedChainMessage.join('\n,'),
+      '1'
+    )
+    .action(async (name, options: CreateCommandOptions) => {
       await runCreateInternal(name, options)
     })
 }
 
-async function runCreateInternal(name: string, options: any) {
+async function runCreateInternal(name: string, options: CreateCommandOptions) {
   if (!name) {
     console.error('Project name is required')
     process.exit(1)
