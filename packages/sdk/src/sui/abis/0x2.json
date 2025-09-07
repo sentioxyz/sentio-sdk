@@ -22686,6 +22686,38 @@
           }
         ]
       },
+      "length": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Copy"]
+          },
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "vec_map",
+                "name": "VecMap",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  },
+                  {
+                    "TypeParameter": 1
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": ["U64"]
+      },
       "pop": {
         "visibility": "Public",
         "isEntry": false,
@@ -23127,6 +23159,32 @@
             }
           }
         ]
+      },
+      "length": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": ["Copy", "Drop"]
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "vec_set",
+                "name": "VecSet",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": ["U64"]
       },
       "remove": {
         "visibility": "Public",
