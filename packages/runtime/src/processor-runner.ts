@@ -225,16 +225,6 @@ if (process.env['OOM_DUMP_MEMORY_SIZE_GB']) {
 
 }
 
-function shutdownServers(server: any, httpServer: any, exitCode: number): void {
-  server?.forceShutdown()
-  console.log('RPC server shut down')
-
-  httpServer.close(function () {
-    console.log('Http server shut down')
-    process.exit(exitCode)
-  })
-}
-
 async function dumpHeap(file: string): Promise<void> {
   console.log('Heap dumping to', file)
   const session = new Session()
@@ -262,4 +252,14 @@ async function dumpHeap(file: string): Promise<void> {
 
   session.disconnect()
   fs.closeSync(fd)
+}
+
+function shutdownServers(server: any, httpServer: any, exitCode: number): void {
+  server?.forceShutdown()
+  console.log('RPC server shut down')
+
+  httpServer.close(function () {
+    console.log('Http server shut down')
+    process.exit(exitCode)
+  })
 }
