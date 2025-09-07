@@ -3,7 +3,7 @@ import { configs } from 'typescript-eslint'
 import { defineConfig } from "eslint/config";
 import { importX } from 'eslint-plugin-import-x'
 
-export default [
+export default defineConfig([
   ...configs.recommended,
   importX.flatConfigs.recommended,
   importX.flatConfigs.typescript,
@@ -65,4 +65,4 @@ export default [
       '@typescript-eslint/no-deprecated': 'warn'
     }
   }
-]
+])
