@@ -213,6 +213,7 @@ if (process.env['OOM_DUMP_MEMORY_SIZE_GB']) {
   setInterval(async () => {
     const mem = process.memoryUsage()
     console.log('Current Memory Usage', mem)
+    // if memory usage is greater this size, dump heap and exit
     if (mem.heapTotal > memorySize * 1024 * 1024 * 1024 && !dumping) {
       const file = path.join(dir, `${Date.now()}.heapsnapshot`)
       dumping = true
@@ -230,28 +231,18 @@ async function dumpHeap(file: string): Promise<void> {
   const session = new Session()
   fs.mkdirSync(path.dirname(file), { recursive: true })
   const fd = fs.openSync(file, 'w')
-
-  session.connect()
-
-  await session.post('HeapProfiler.enable')
-  await session.post('HeapProfiler.startSampling')
-
-  await new Promise<void>((resolve, reject) => {
-    session.on('HeapProfiler.addHeapSnapshotChunk', (m: any) => {
+  try {
+    session.connect()
+    session.on('HeapProfiler.addHeapSnapshotChunk', (m) => {
       fs.writeSync(fd, m.params.chunk)
     })
-    session
-      .post('HeapProfiler.takeHeapSnapshot', undefined)
-      .then(() => {
-        resolve()
-      })
-      .catch((err: any) => {
-        reject(err)
-      })
-  })
 
-  session.disconnect()
-  fs.closeSync(fd)
+    await session.post('HeapProfiler.takeHeapSnapshot')
+    console.log('Heap dumped to', file)
+  } finally {
+    session.disconnect()
+    fs.closeSync(fd)
+  }
 }
 
 function shutdownServers(server: any, httpServer: any, exitCode: number): void {
