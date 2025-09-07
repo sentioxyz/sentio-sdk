@@ -1,4 +1,4 @@
-import { envDetector } from '@opentelemetry/resources'
+import { detectResources } from '@opentelemetry/resources'
 import { MeterProvider, PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics'
 import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc'
 import { PrometheusExporter } from '@opentelemetry/exporter-prometheus'
@@ -12,7 +12,7 @@ export async function setupOTLP(debug?: boolean) {
     diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG)
   }
 
-  const resource = await envDetector.detect()
+  const resource = await detectResources()
 
   const meterProvider = new MeterProvider({
     resource,
@@ -28,12 +28,11 @@ export async function setupOTLP(debug?: boolean) {
   })
 
   const traceProvider = new NodeTracerProvider({
-    resource: resource
+    resource,
+    spanProcessors: [new BatchSpanProcessor(new OTLPTraceExporter())]
   })
-  const exporter = new OTLPTraceExporter() // new ConsoleSpanExporter();
-  const processor = new BatchSpanProcessor(exporter)
-  traceProvider.addSpanProcessor(processor)
 
+  traceProvider.register()
   metrics.setGlobalMeterProvider(meterProvider)
   trace.setGlobalTracerProvider(traceProvider)
   ;['SIGINT', 'SIGTERM'].forEach((signal) => {

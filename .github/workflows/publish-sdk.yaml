@@ -57,7 +57,7 @@ jobs:
       - name: Clean runtime dependencies
         run: |
           # Dependencies are bundled.
-          pnpm json -I -f package.json -e "this.dependencies={ \"piscina\": \"5.0.0-alpha.0\" }"
+          pnpm json -I -f package.json -e "this.dependencies={ \"piscina\": \"5.1.3\" }"
         working-directory: packages/runtime
       - name: SDK NPM Publish
         if: steps.semantic.outputs.new_release_published == 'true'
