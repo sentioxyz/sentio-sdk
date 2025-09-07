@@ -132,118 +132,104 @@ async function startServer(target: string, options: any): Promise<void> {
     console.log('Processor Server Started at:', options.port)
 
     // Start metrics server
-    const httpServer = await startMetricsServer()
+    const metricsPort = 4040
+
+    const httpServer = http
+      .createServer(async function (req, res) {
+        if (req.url) {
+          const reqUrl = new URL(req.url, `http://${req.headers.host}`)
+          const queries = reqUrl.searchParams
+
+          switch (reqUrl.pathname) {
+            case '/heap': {
+              try {
+                const file = '/tmp/' + Date.now() + '.heapsnapshot'
+                await dumpHeap(file)
+                const readStream = fs.createReadStream(file)
+                res.writeHead(200, { 'Content-Type': 'application/json' })
+                readStream.pipe(res)
+                res.end()
+              } catch {
+                res.writeHead(500)
+                res.end()
+              }
+              break
+            }
+            case '/profile': {
+              try {
+                const profileTime = parseInt(queries.get('t') || '1000', 10) || 1000
+                const session = new Session()
+                session.connect()
+
+                await session.post('Profiler.enable')
+                await session.post('Profiler.start')
+
+                await new Promise((resolve) => setTimeout(resolve, profileTime))
+                const { profile } = await session.post('Profiler.stop')
+
+                res.writeHead(200, { 'Content-Type': 'application/json' })
+                res.write(JSON.stringify(profile))
+                session.disconnect()
+              } catch {
+                res.writeHead(500)
+              }
+              break
+            }
+            default:
+              res.writeHead(404)
+          }
+        } else {
+          res.writeHead(404)
+        }
+        res.end()
+      })
+      .listen(metricsPort)
+
+    console.log('Metric Server Started at:', metricsPort)
 
     // Setup process handlers
-    setupProcessHandlers(baseService, server, httpServer)
-  }
-}
-
-async function startMetricsServer(): Promise<any> {
-  const metricsPort = 4040
-
-  const httpServer = http
-    .createServer(async function (req, res) {
-      if (req.url) {
-        const reqUrl = new URL(req.url, `http://${req.headers.host}`)
-        const queries = reqUrl.searchParams
-
-        switch (reqUrl.pathname) {
-          case '/heap': {
-            try {
-              const file = '/tmp/' + Date.now() + '.heapsnapshot'
-              await dumpHeap(file)
-              const readStream = fs.createReadStream(file)
-              res.writeHead(200, { 'Content-Type': 'application/json' })
-              readStream.pipe(res)
-              res.end()
-            } catch {
-              res.writeHead(500)
-              res.end()
-            }
-            break
-          }
-          case '/profile': {
-            try {
-              const profileTime = parseInt(queries.get('t') || '1000', 10) || 1000
-              const session = new Session()
-              session.connect()
-
-              await session.post('Profiler.enable')
-              await session.post('Profiler.start')
-
-              await new Promise((resolve) => setTimeout(resolve, profileTime))
-              const { profile } = await session.post('Profiler.stop')
-
-              res.writeHead(200, { 'Content-Type': 'application/json' })
-              res.write(JSON.stringify(profile))
-              session.disconnect()
-            } catch {
-              res.writeHead(500)
-            }
-            break
-          }
-          default:
-            res.writeHead(404)
+    process
+      .on('SIGINT', function () {
+        shutdownServers(server, httpServer, 0)
+      })
+      .on('uncaughtException', (err) => {
+        console.error('Uncaught Exception, please checking if await is properly used', err)
+        if (baseService) {
+          baseService.unhandled = err
         }
-      } else {
-        res.writeHead(404)
-      }
-      res.end()
-    })
-    .listen(metricsPort)
+      })
+      .on('unhandledRejection', (reason, p) => {
+        // @ts-ignore ignore invalid ens error
+        if (reason?.message.startsWith('invalid ENS name (disallowed character: "*"')) {
+          return
+        }
+        console.error('Unhandled Rejection, please checking if await is properly', reason)
+        if (baseService) {
+          baseService.unhandled = reason as Error
+        }
+      })
 
-  console.log('Metric Server Started at:', metricsPort)
-  
-  return httpServer
-}
+    // Setup OOM monitoring if enabled
+    if (process.env['OOM_DUMP_MEMORY_SIZE_GB']) {
+      let dumping = false
+      const memorySize = parseFloat(process.env['OOM_DUMP_MEMORY_SIZE_GB']!)
+      console.log('heap dumping is enabled, limit set to ', memorySize, 'gb')
+      const dir = process.env['OOM_DUMP_DIR'] || '/tmp'
 
-function setupProcessHandlers(baseService: ProcessorServiceImpl | ServiceManager, server: any, httpServer: any): void {
-  process
-    .on('SIGINT', function () {
-      shutdownServers(server, httpServer, 0)
-    })
-    .on('uncaughtException', (err) => {
-      console.error('Uncaught Exception, please checking if await is properly used', err)
-      if (baseService) {
-        baseService.unhandled = err
-      }
-    })
-    .on('unhandledRejection', (reason, p) => {
-      // @ts-ignore ignore invalid ens error
-      if (reason?.message.startsWith('invalid ENS name (disallowed character: "*"')) {
-        return
-      }
-      console.error('Unhandled Rejection, please checking if await is properly', reason)
-      if (baseService) {
-        baseService.unhandled = reason as Error
-      }
-    })
+      setInterval(async () => {
+        const mem = process.memoryUsage()
+        console.log('Current Memory Usage', mem)
 
-  // Setup OOM monitoring if enabled
-  if (process.env['OOM_DUMP_MEMORY_SIZE_GB']) {
-    setupOOMMonitoring()
-  }
-}
-
-function setupOOMMonitoring(): void {
-  let dumping = false
-  const memorySize = parseFloat(process.env['OOM_DUMP_MEMORY_SIZE_GB']!)
-  console.log('heap dumping is enabled, limit set to ', memorySize, 'gb')
-  const dir = process.env['OOM_DUMP_DIR'] || '/tmp'
-
-  setInterval(async () => {
-    const mem = process.memoryUsage()
-    console.log('Current Memory Usage', mem)
-
-    // if memory usage is greater this size, dump heap and exit
-    if (mem.heapTotal > memorySize * 1024 * 1024 * 1024 && !dumping) {
-      const file = path.join(dir, `${Date.now()}.heapsnapshot`)
-      dumping = true
-      await dumpHeap(file)
-      process.exit(11)
+        // if memory usage is greater this size, dump heap and exit
+        if (mem.heapTotal > memorySize * 1024 * 1024 * 1024 && !dumping) {
+          const file = path.join(dir, `${Date.now()}.heapsnapshot`)
+          dumping = true
+          await dumpHeap(file)
+          process.exit(11)
+        }
+      }, 1000 * 60)
     }
-  }, 1000 * 60)
+  }
 }
 
 async function dumpHeap(file: string): Promise<void> {
