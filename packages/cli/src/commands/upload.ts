@@ -13,21 +13,7 @@ import { getCliVersion, getSdkVersion } from '../utils.js'
 import readline from 'readline'
 import JSZip from 'jszip'
 import { UserInfo } from '../../../protos/lib/service/common/protos/common.js'
-
-interface UploadCommandOptions {
-  owner?: string
-  name?: string
-  continueFrom?: string
-  debug?: boolean
-  silentOverwrite?: boolean
-  skipBuild?: boolean
-  skipGen?: boolean
-  skipDeps?: boolean
-  example?: boolean
-  apiKey?: string
-  token?: string
-  host?: string
-}
+import { CommandOptionsType } from './types.js'
 
 export function createUploadCommand() {
   return new Command('upload')
@@ -47,12 +33,14 @@ export function createUploadCommand() {
     .option('--api-key <key>', '(Optional) Manually provide API key rather than use saved credential')
     .option('--token <token>', '(Optional) Manually provide token rather than use saved credential')
     .option('--host <host>', '(Optional) Override Sentio Host name')
-    .action(async (options: UploadCommandOptions) => {
+    .action(async (options) => {
       const processorConfig = loadProcessorConfig()
       overrideConfigWithOptions(processorConfig, options)
       await runUploadInternal(processorConfig, options)
     })
 }
+
+type UploadCommandOptions = CommandOptionsType<typeof createUploadCommand>
 
 async function runUploadInternal(processorConfig: YamlProjectConfig, options: UploadCommandOptions) {
   console.log(processorConfig)

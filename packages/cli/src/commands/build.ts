@@ -6,12 +6,7 @@ import { Command } from '@commander-js/extra-typings'
 import { CHAIN_TYPES, loadProcessorConfig } from '../config.js'
 import { getABIFilePath, getABI, writeABIFile } from '../abi.js'
 import { execStep, execPackageManager } from '../execution.js'
-
-interface BuildCommandOptions {
-  skipGen?: boolean
-  skipDeps?: boolean
-  example?: boolean
-}
+import { CommandOptionsType } from './types.js'
 
 export function createBuildCommand() {
   return new Command('build')
@@ -19,16 +14,18 @@ export function createBuildCommand() {
     .option('--skip-gen', 'Skip code generation.')
     .option('--skip-deps', 'Skip dependency enforce.')
     .option('--example', 'Generate example usage of the processor.')
-    .action(async (options: BuildCommandOptions) => {
+    .action(async (options) => {
       await buildProcessor(false, options)
     })
 }
+
+type BuildCommandOptions = CommandOptionsType<typeof createBuildCommand>
 
 export function createGenCommand() {
   return new Command('gen')
     .description('Generate ABI')
     .option('--example', 'Generate example usage of the processor.')
-    .action(async (options: BuildCommandOptions) => {
+    .action(async (options) => {
       await buildProcessor(true, options)
     })
 }

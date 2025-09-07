@@ -7,11 +7,7 @@ import chalk from 'chalk'
 import { WriteKey } from '../key.js'
 import fetch from 'node-fetch'
 import open from 'open'
-
-interface LoginCommandOptions {
-  host?: string
-  apiKey?: string
-}
+import { CommandOptionsType } from './types.js'
 
 const port = 20000
 
@@ -20,10 +16,12 @@ export function createLoginCommand() {
     .description('Login to Sentio')
     .option('--host <host>', '(Optional) Override Sentio Host name')
     .option('--api-key <key>', '(Optional) Your API key')
-    .action((options: LoginCommandOptions) => {
+    .action((options) => {
       login(options)
     })
 }
+
+type LoginCommandOptions = CommandOptionsType<typeof createLoginCommand>
 
 function login(options: LoginCommandOptions) {
   const host = getFinalizedHost(options.host)

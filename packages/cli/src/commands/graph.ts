@@ -14,26 +14,10 @@ import process from 'process'
 import { supportedChainMessage } from './create.js'
 import { EthChainInfo } from '@sentio/chain'
 import yaml from 'yaml'
+import { CommandOptionsType } from './types.js'
 
-interface GraphCreateCommandOptions {
-  chainId: string
-}
-
-interface GraphDeployCommandOptions {
-  owner?: string
-  name?: string
-  apiKey?: string
-  host?: string
-  continueFrom?: number
-  dir?: string
-  skipGen?: boolean
-}
-
-export function createGraphCommand() {
-  const graphCommand = new Command('graph').description('Graph related commands')
-
-  graphCommand
-    .command('create')
+function createGraphCreateCommand() {
+  return new Command('create')
     .description('Create a new graph')
     .argument('<name>', 'Project name')
     .requiredOption(
@@ -41,12 +25,13 @@ export function createGraphCommand() {
       '(Optional) The chain id to use for eth. Supported: ' + supportedChainMessage.join('\n,'),
       '1'
     )
-    .action(async (name, options: GraphCreateCommandOptions) => {
+    .action(async (name, options) => {
       await runGraphCreateInternal(name, options)
     })
+}
 
-  graphCommand
-    .command('deploy')
+function createGraphDeployCommand() {
+  return new Command('deploy')
     .description('Deploy the graph')
     .option('--owner <owner>', 'Sentio Project owner, omit if specified in sentio.yaml')
     .option('--name <name>', 'Sentio Project name, omit if specified in sentio.yaml')
@@ -61,12 +46,22 @@ export function createGraphCommand() {
     .option('--skip-gen', '(Optional) Skip code generation.')
     .allowUnknownOption()
     .allowExcessArguments()
-    .action(async (options: GraphDeployCommandOptions, cmd) => {
+    .action(async (options, cmd) => {
       await runGraphDeployInternal(options, cmd.args)
     })
+}
+
+export function createGraphCommand() {
+  const graphCommand = new Command('graph').description('Graph related commands')
+
+  graphCommand.addCommand(createGraphCreateCommand())
+  graphCommand.addCommand(createGraphDeployCommand())
 
   return graphCommand
 }
+
+type GraphCreateCommandOptions = CommandOptionsType<typeof createGraphCreateCommand>
+type GraphDeployCommandOptions = CommandOptionsType<typeof createGraphDeployCommand>
 
 async function runGraphCreateInternal(projectName: string, options: GraphCreateCommandOptions) {
   if (!projectName) {

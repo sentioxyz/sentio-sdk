@@ -7,12 +7,7 @@ import { codegen } from './build.js'
 import yaml from 'yaml'
 import { getABIFilePath, getABI, writeABIFile } from '../abi.js'
 import { AptosChainId, ChainId, getChainName, SuiChainId, EthChainInfo, ExplorerApiType } from '@sentio/chain'
-
-interface AddCommandOptions {
-  name?: string
-  chain: string
-  folder?: string
-}
+import { CommandOptionsType } from './types.js'
 
 const supportedChain: string[] = [
   AptosChainId.APTOS_MAINNET,
@@ -54,10 +49,12 @@ export function createAddCommand() {
       '1'
     )
     .option('--folder <folder>', '(Optional) The folder to save the downloaded ABI file')
-    .action(async (address, options: AddCommandOptions) => {
+    .action(async (address, options) => {
       await runAddInternal(address, options)
     })
 }
+
+type AddCommandOptions = CommandOptionsType<typeof createAddCommand>
 
 async function runAddInternal(address: string, options: AddCommandOptions) {
   if (!address) {

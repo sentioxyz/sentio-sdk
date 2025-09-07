@@ -8,6 +8,7 @@ import { ReadKey } from '../key.js'
 import chalk from 'chalk'
 import { Auth } from './upload.js'
 import { URL } from 'url'
+import { CommandOptionsType } from './types.js'
 
 const SRC_ROOT = 'src'
 
@@ -16,14 +17,6 @@ interface Metadata {
   contractName: string
   constructorArgs: string
   settings: any
-}
-
-interface CompileCommandOptions {
-  upload?: boolean
-  project?: string
-  apiKey?: string
-  token?: string
-  host?: string
 }
 
 export function createCompileCommand() {
@@ -40,10 +33,12 @@ export function createCompileCommand() {
       '(Optional) Manually provide token rather than use saved credential, if both api-key and token is provided, use api-key.'
     )
     .option('--host <host>', '(Optional) Sentio Host name')
-    .action(async (options: CompileCommandOptions) => {
+    .action(async (options) => {
       await runCompileInternal(options)
     })
 }
+
+type CompileCommandOptions = CommandOptionsType<typeof createCompileCommand>
 
 // export async function runCompile(argv: string[]) {
 //   const program = new Command()

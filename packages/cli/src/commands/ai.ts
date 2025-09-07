@@ -5,6 +5,7 @@ import { ReadKey } from '../key.js'
 import fetch from 'node-fetch'
 import fs from 'fs-extra'
 import path from 'path'
+import { CommandOptionsType } from './types.js'
 
 interface StartGenerationRequest {
   chain_id: string
@@ -37,16 +38,6 @@ interface ChatResponse {
   messages: ChatMessage[]
 }
 
-interface AiCommandOptions {
-  prompt: string
-  chainId?: string
-  contract?: string
-  projectName?: string
-  verbose?: boolean
-  save?: boolean
-  host?: string
-}
-
 // API_BASE_URL will be determined from host configuration
 
 export function createAiCommand() {
@@ -60,10 +51,12 @@ export function createAiCommand() {
     .option('--verbose', 'Show all AI messages instead of just the latest')
     .option('--save', 'Automatically save generated code to src/ directory')
     .option('--host <host>', 'Override Sentio host (optional)')
-    .action(async (options: AiCommandOptions) => {
+    .action(async (options) => {
       await generateProcessor(options)
     })
 }
+
+type AiCommandOptions = CommandOptionsType<typeof createAiCommand>
 
 async function generateProcessor(options: AiCommandOptions) {
   try {

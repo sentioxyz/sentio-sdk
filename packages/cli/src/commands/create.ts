@@ -8,14 +8,7 @@ import { execPackageManager } from '../execution.js'
 import { getPackageRoot } from '../utils.js'
 import { EthChainInfo } from '@sentio/chain'
 import { CHAIN_TYPES } from '../config.js'
-
-interface CreateCommandOptions {
-  subproject?: boolean
-  sdkVersion?: string
-  directory?: string
-  chainType: string
-  chainId: string
-}
+import { CommandOptionsType } from './types.js'
 
 export const supportedChainMessage = [
   ',  <Chain ID> (<Chain Name>)',
@@ -45,10 +38,12 @@ export function createCreateCommand() {
       'The chain ID to use for eth. Supported: ' + supportedChainMessage.join('\n,'),
       '1'
     )
-    .action(async (name, options: CreateCommandOptions) => {
+    .action(async (name, options) => {
       await runCreateInternal(name, options)
     })
 }
+
+type CreateCommandOptions = CommandOptionsType<typeof createCreateCommand>
 
 async function runCreateInternal(name: string, options: CreateCommandOptions) {
   if (!name) {
