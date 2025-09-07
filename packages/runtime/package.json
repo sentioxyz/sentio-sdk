@@ -50,8 +50,6 @@
     "winston": "^3.11.0"
   },
   "devDependencies": {
-    "@types/command-line-args": "^5.2.3",
-    "@types/command-line-usage": "^5.0.4",
     "@types/fs-extra": "^11.0.4"
   },
   "engines": {
