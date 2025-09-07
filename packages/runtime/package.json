@@ -57,6 +57,6 @@
     "@types/google-protobuf": "^3.15.12"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   }
 }
