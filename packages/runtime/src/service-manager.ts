@@ -139,7 +139,8 @@ export class ServiceManager extends ProcessorServiceImpl {
       argv: process.argv,
       workerData: this.workerData
     })
-    this.pool.on('message', (msg) => {
+    // @ts-ignore - Piscina message handling for template instance sync
+    this.pool.on('message', (msg: any) => {
       if (msg.event == 'add_template_instance') {
         // sync the template state from worker to the main thread
         TemplateInstanceState.INSTANCE.addValue(msg.value)
