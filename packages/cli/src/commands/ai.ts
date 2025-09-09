@@ -199,7 +199,7 @@ async function pollAndDisplayMessages(
               console.log(chalk.green('✓ Generation complete!'))
               displayFinalSummary()
 
-              // Handle resources (generated code)
+              // Handle resources (generated code and zip files)
               if (message.resources && message.resources.length > 0) {
                 console.log()
                 console.log(chalk.blue('Generated files:'))
@@ -207,43 +207,54 @@ async function pollAndDisplayMessages(
                   const description = resource.description || 'Generated file'
                   console.log(chalk.gray(`  • ${resource.name}: ${description}`))
 
-                  // Check both text and content fields for the generated code
-                  const codeContent = resource.text || resource.content
-                  if (codeContent) {
-                    // Always create a temporary file first
-                    const tempFileName = `${resource.name}.generated`
-                    const tempFilePath = path.resolve(tempFileName)
+                  // Handle zip files
+                  if (resource.mimeType === 'application/zip' && resource.uri) {
+                    console.log(chalk.cyan(`📦 Zip file: ${resource.name}`))
+                    console.log(chalk.gray(`   Download URL: ${resource.uri}`))
+                    console.log()
+                    console.log(chalk.cyan('💡 To download and use the zip file:'))
+                    console.log(chalk.gray(`   Download: curl -o ${resource.name} "${resource.uri}"`))
+                    console.log(chalk.gray(`   Extract:  unzip ${resource.name}`))
+                    console.log(chalk.gray(`   Review:   unzip -l ${resource.name}  # list contents`))
+                  } else {
+                    // Handle text/code content
+                    const codeContent = resource.text || resource.content
+                    if (codeContent) {
+                      // Always create a temporary file first
+                      const tempFileName = `${resource.name}.generated`
+                      const tempFilePath = path.resolve(tempFileName)
 
-                    try {
-                      fs.writeFileSync(tempFilePath, codeContent)
-                      console.log(chalk.cyan(`📄 Generated ${tempFilePath} (${codeContent.length} chars)`))
+                      try {
+                        fs.writeFileSync(tempFilePath, codeContent)
+                        console.log(chalk.cyan(`📄 Generated ${tempFilePath} (${codeContent.length} chars)`))
 
-                      if (autoSave) {
-                        // Also save to src/ directory
-                        const srcDir = path.resolve('src')
-                        fs.ensureDirSync(srcDir)
-                        const finalPath = path.join(srcDir, resource.name)
-                        fs.writeFileSync(finalPath, codeContent)
-                        console.log(chalk.green(`✅ Saved to ${finalPath}`))
-                      } else {
-                        // Show instructions for manual move
+                        if (autoSave) {
+                          // Also save to src/ directory
+                          const srcDir = path.resolve('src')
+                          fs.ensureDirSync(srcDir)
+                          const finalPath = path.join(srcDir, resource.name)
+                          fs.writeFileSync(finalPath, codeContent)
+                          console.log(chalk.green(`✅ Saved to ${finalPath}`))
+                        } else {
+                          // Show instructions for manual move
+                          console.log()
+                          console.log(chalk.cyan('💡 To use the generated code:'))
+                          console.log(chalk.gray(`   Review: cat ${tempFileName}`))
+                          console.log(chalk.gray(`   Use:    mv ${tempFileName} src/${resource.name}`))
+                          console.log(chalk.gray(`   Or:     sentio gen-processor --save --prompt "..." (auto-save)`))
+                        }
+                      } catch (error) {
+                        console.error(
+                          chalk.red(`Failed to write ${tempFileName}:`),
+                          error instanceof Error ? error.message : error
+                        )
+                        // Fallback to showing truncated preview
                         console.log()
-                        console.log(chalk.cyan('💡 To use the generated code:'))
-                        console.log(chalk.gray(`   Review: cat ${tempFileName}`))
-                        console.log(chalk.gray(`   Use:    mv ${tempFileName} src/${resource.name}`))
-                        console.log(chalk.gray(`   Or:     sentio gen-processor --save --prompt "..." (auto-save)`))
+                        console.log(chalk.yellow('Generated code preview:'))
+                        console.log(chalk.gray('─'.repeat(50)))
+                        console.log(codeContent.substring(0, 800) + (codeContent.length > 800 ? '\n...' : ''))
+                        console.log(chalk.gray('─'.repeat(50)))
                       }
-                    } catch (error) {
-                      console.error(
-                        chalk.red(`Failed to write ${tempFileName}:`),
-                        error instanceof Error ? error.message : error
-                      )
-                      // Fallback to showing truncated preview
-                      console.log()
-                      console.log(chalk.yellow('Generated code preview:'))
-                      console.log(chalk.gray('─'.repeat(50)))
-                      console.log(codeContent.substring(0, 800) + (codeContent.length > 800 ? '\n...' : ''))
-                      console.log(chalk.gray('─'.repeat(50)))
                     }
                   }
                 }
