@@ -170,9 +170,9 @@ export class ProcessorServiceImplV3 implements ProcessorV3ServiceImplementation 
       .then(async (result) => {
         console.debug(`process binding ${processId} done`)
         await context.awaitPendings()
-
+        const { timeseriesResult, ...otherResults } = result
         console.debug('sending ts data length:', result.timeseriesResult.length)
-        for (const ts of result.timeseriesResult) {
+        for (const ts of timeseriesResult) {
           subject.next({
             processId,
             tsRequest: {
@@ -193,10 +193,7 @@ export class ProcessorServiceImplV3 implements ProcessorV3ServiceImplementation 
 
         console.debug('sending binding result', processId)
         subject.next({
-          result: {
-            states: result.states,
-            exports: result.exports
-          },
+          result: otherResults,
           processId: processId
         })
         recordRuntimeInfo(result, binding.handlerType)
