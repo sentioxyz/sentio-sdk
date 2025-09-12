@@ -72,13 +72,16 @@ export class FuelAssetProcessor implements FuelBaseProcessor<FuelAssetProcessorC
         }
 
         for (const output of tx.transaction.outputs || []) {
-          if (output.type == OutputType.Coin) {
-            const value = output.amount.toString(10)
-            transfer.to.push({
-              address: output.to,
-              amount: BigInt(value),
-              assetId: output.assetId
-            })
+          switch (output.type) {
+            case OutputType.Change:
+            case OutputType.Coin:
+            case OutputType.Variable:
+              const value = output.amount.toString(10)
+              transfer.to.push({
+                address: output.to,
+                amount: BigInt(value),
+                assetId: output.assetId
+              })
           }
         }
 
