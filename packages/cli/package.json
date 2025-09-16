@@ -25,7 +25,7 @@
   "dependencies": {
     "@aptos-labs/ts-sdk": "~4.0.0",
     "@iota/iota-sdk": "~1.6.1",
-    "@mysten/sui": "~1.37.6",
+    "@mysten/sui": "~1.38.0",
     "@sentio/chain": "~3.4.7",
     "@sentio/graph-cli": "^0.97.0",
     "@types/node": "^22.8.6",

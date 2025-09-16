@@ -1,22 +1,19 @@
-import { detectResources } from '@opentelemetry/resources'
-import { MeterProvider, PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics'
+import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics'
 import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc'
 import { PrometheusExporter } from '@opentelemetry/exporter-prometheus'
-import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node'
+import { NodeSDK } from '@opentelemetry/sdk-node'
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc'
-import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-base'
-import { diag, DiagConsoleLogger, DiagLogLevel, metrics, trace, ProxyTracerProvider } from '@opentelemetry/api'
+import { diag, DiagConsoleLogger, DiagLogLevel, metrics } from '@opentelemetry/api'
 
 export async function setupOTLP(debug?: boolean) {
   if (debug) {
     diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG)
   }
 
-  const resource = await detectResources()
-
-  const meterProvider = new MeterProvider({
-    resource,
-    readers: [
+  const sdk = new NodeSDK({
+    autoDetectResources: true,
+    traceExporter: new OTLPTraceExporter(),
+    metricReaders: [
       new PeriodicExportingMetricReader({
         exporter: new OTLPMetricExporter()
       }),
@@ -27,32 +24,10 @@ export async function setupOTLP(debug?: boolean) {
     ]
   })
 
-  const traceProvider = new NodeTracerProvider({
-    resource,
-    spanProcessors: [new BatchSpanProcessor(new OTLPTraceExporter())]
-  })
-
-  traceProvider.register()
-  metrics.setGlobalMeterProvider(meterProvider)
-  trace.setGlobalTracerProvider(traceProvider)
+  sdk.start()
   ;['SIGINT', 'SIGTERM'].forEach((signal) => {
-    process.on(signal as any, () => shutdownProvider())
+    process.on(signal as any, () => sdk.shutdown().catch(console.error))
   })
 
   metrics.getMeter('processor').createGauge('up').record(1)
-}
-
-export async function shutdownProvider() {
-  const traceProvider = trace.getTracerProvider()
-
-  if (traceProvider instanceof ProxyTracerProvider) {
-    const delegate = traceProvider.getDelegate()
-    if (delegate instanceof NodeTracerProvider) {
-      delegate.shutdown().catch(console.error)
-    }
-  }
-  const meterProvider = metrics.getMeterProvider()
-  if (meterProvider instanceof MeterProvider) {
-    meterProvider.shutdown().catch(console.error)
-  }
 }
