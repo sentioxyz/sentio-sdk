@@ -1,7 +1,14 @@
 import { RecordMetaData } from '@sentio/protos'
 import { type Labels, normalizeLabels } from '../index.js'
 import { MoveCoder, RichAptosClientWithContext } from './index.js'
-import { Event, MoveResource, UserTransactionResponse, MoveModuleBytecode, AptosConfig } from '@aptos-labs/ts-sdk'
+import {
+  Event,
+  MoveResource,
+  UserTransactionResponse,
+  MoveModuleBytecode,
+  AptosConfig,
+  Network
+} from '@aptos-labs/ts-sdk'
 import { defaultMoveCoder } from './move-coder.js'
 import { AptosNetwork } from './network.js'
 import { Endpoints } from '@sentio/runtime'
@@ -21,12 +28,29 @@ export abstract class AptosBaseContext extends MoveContext<AptosNetwork, MoveMod
   }
 
   getClient(): RichAptosClientWithContext {
-    let chainServer = Endpoints.INSTANCE.chainServer.get(this.network)
+    const chainServer = Endpoints.INSTANCE.chainServer.get(this.network)
     if (!chainServer) {
       throw new ServerError(Status.INTERNAL, 'RPC endpoint not provided')
     }
-    chainServer = chainServer + '/v1'
-    return new RichAptosClientWithContext(this, new AptosConfig({ fullnode: chainServer }))
+    const fullnode = chainServer + '/v1'
+
+    let network = Network.CUSTOM
+    switch (this.network) {
+      case AptosNetwork.MAIN_NET:
+        network = Network.MAINNET
+        break
+      case AptosNetwork.TEST_NET:
+        network = Network.TESTNET
+        break
+    }
+
+    return new RichAptosClientWithContext(
+      this,
+      new AptosConfig({
+        network,
+        fullnode
+      })
+    )
   }
 }
 
