@@ -2,8 +2,6 @@
 
 import fs from 'fs-extra'
 
-import { compressionAlgorithms } from '@grpc/grpc-js'
-
 import { createServer } from 'nice-grpc'
 import { errorDetailsServerMiddleware } from 'nice-grpc-error-details'
 // import { registry as niceGrpcRegistry } from 'nice-grpc-prometheus'
@@ -59,8 +57,8 @@ if (options.startActionServer) {
 } else {
   server = createServer({
     'grpc.max_send_message_length': 768 * 1024 * 1024,
-    'grpc.max_receive_message_length': 768 * 1024 * 1024,
-    'grpc.default_compression_algorithm': compressionAlgorithms.gzip
+    'grpc.max_receive_message_length': 768 * 1024 * 1024
+    // 'grpc.default_compression_algorithm': compressionAlgorithms.gzip
   })
     // .use(prometheusServerMiddleware())
     .use(openTelemetryServerMiddleware())

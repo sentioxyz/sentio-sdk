@@ -26,10 +26,10 @@
     "test": "glob -c 'tsx --test' '**/*.test.ts'"
   },
   "dependencies": {
-    "@grpc/grpc-js": "^1.13.1",
-    "@opentelemetry/exporter-metrics-otlp-grpc": "^0.204.0",
-    "@opentelemetry/exporter-prometheus": "^0.204.0",
-    "@opentelemetry/sdk-node": "^0.204.0",
+    "@opentelemetry/exporter-metrics-otlp-grpc": "^0.205.0",
+    "@opentelemetry/exporter-prometheus": "^0.205.0",
+    "@opentelemetry/exporter-trace-otlp-grpc": "^0.205.0",
+    "@opentelemetry/sdk-node": "^0.205.0",
     "@sentio/protos": "workspace:*",
     "commander": "^14.0.0",
     "ethers": "npm:@sentio/ethers@6.13.1-patch.6",
