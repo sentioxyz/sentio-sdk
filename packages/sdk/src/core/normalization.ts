@@ -120,7 +120,7 @@ function normalizeToRichValue(value: any): RichValue {
         throw new Error("can't submit NaN or Infinity value")
       }
       if (Number.isInteger(value)) {
-        return { intValue: value }
+        return { int64Value: BigInt(value) }
       }
       return { floatValue: value }
     case 'function':
