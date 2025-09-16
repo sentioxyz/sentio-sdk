@@ -3,7 +3,7 @@ import process from 'process'
 import path from 'path'
 import fs from 'fs-extra'
 import fetch from 'node-fetch'
-import { AptosChainId, ChainId, StarknetChainId, SuiChainId, EthChainInfo, ExplorerApiType } from '@sentio/chain'
+import { AptosChainId, ChainId, StarknetChainId, SuiChainId } from '@sentio/chain'
 
 import type { Aptos } from '@aptos-labs/ts-sdk'
 import type { IotaClient } from '@iota/iota-sdk/client'
@@ -157,57 +157,21 @@ export async function getABI(
   }
 
   // ethereum
-  const chainDetail = EthChainInfo[chain]
-  let ethApi = chainDetail.explorerApi
-  if (
-    !ethApi ||
-    (chainDetail.explorerApiType !== ExplorerApiType.ETHERSCAN &&
-      chainDetail.explorerApiType !== ExplorerApiType.ETHERSCAN_V2 &&
-      chainDetail.explorerApiType !== ExplorerApiType.BLOCKSCOUT)
-  ) {
-    console.error(chalk.red(`chain ${chain} not supported for direct add, please download the ABI manually`))
-    process.exit(1)
-  }
-
   try {
-    let apiKey = process.env['ETHERSCAN_API_KEY_' + chain]
-    if (!apiKey) {
-      // const keys: Record<string, string> = {
-      //   [ChainId.ETHEREUM]: '1KQV22RY3KV1PX5IIB34TPAVVQG1ZMAU45',
-      //   [ChainId.BASE]: 'K7613MC26RFMACK414RGZUEAX1184TWYZU'
-      // }
-      apiKey = '1KQV22RY3KV1PX5IIB34TPAVVQG1ZMAU45'
-    }
-
-    if (chainDetail.explorerApiType === ExplorerApiType.ETHERSCAN_V2) {
-      ethApi = `${ethApi}/api?chainid=${chain}&apikey=${apiKey}&`
-    } else {
-      ethApi = `${ethApi}/api?`
-    }
-
-    let resp = (await (await fetch(`${ethApi}module=contract&action=getabi&address=${address}`)).json()) as any
-    if (resp.status !== '1') {
-      if (resp.result?.startsWith('Contract source code not verified')) {
-        throw Error(resp.result + "(API can't retrieve ABI based on similar contract)")
+    const url = `https://app.sentio.xyz/api/v1/solidity/etherscan_abi?chainSpec.chainId=${chain}&address=${address}`
+    const resp = (await (await fetch(url)).json()) as any
+    if (!resp.abi) {
+      if (resp.message?.startsWith('contract source code not verified')) {
+        throw Error(resp.message + "(API can't retrieve ABI based on similar contract)")
+      }
+      if (resp.message?.includes('unsupported')) {
+        throw Error(`chain ${chain} not supported for direct add, please download the ABI manually`)
       }
       throw Error(resp.message)
     }
-    const abi = resp.result
-
-    if (!name) {
-      await new Promise((resolve) => setTimeout(resolve, 10000))
-      resp = (await (await fetch(`${ethApi}module=contract&action=getsourcecode&address=${address}`)).json()) as any
-      if (resp.status !== '1') {
-        throw Error(resp.message)
-      }
-      const contractName = resp.result[0].ContractName
-      if (contractName) {
-        name = contractName
-      }
-    }
     return {
-      name,
-      abi
+      abi: resp.abi,
+      name: name ?? resp.contractName
     }
   } catch (e) {
     console.error(baseErrMsg, e)

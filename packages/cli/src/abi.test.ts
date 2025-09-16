@@ -11,7 +11,7 @@ describe('Test ABI get', () => {
 
   test('ethereum', async () => {
     const abi = await getABI(EthChainId.ETHEREUM, '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', undefined)
-    expect(abi.abi !== undefined).eq(true)
+    expect(abi.abi !== undefined && abi.name == 'WETH9').eq(true)
   })
 
   test('cronos', async () => {
