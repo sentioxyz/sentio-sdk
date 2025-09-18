@@ -111,7 +111,6 @@ message ContractConfig {
   repeated FuelReceiptHandlerConfig fuel_receipt_configs = 21;
   repeated CosmosLogHandlerConfig cosmos_log_configs = 16;
   repeated StarknetEventHandlerConfig starknet_event_configs = 17;
-  repeated BTCTransactionHandlerConfig btc_transaction_configs = 18;
 
   InstructionHandlerConfig instruction_config = 6;
   uint64 start_block = 4;
@@ -485,54 +484,6 @@ message StarknetEventHandlerConfig {
   string handler_name = 3;
 }
 
-message BTCTransactionHandlerConfig {
-  repeated BTCTransactionFilter filters = 1;
-  int32 handler_id = 2;
-  string handler_name = 3;
-}
-
-message BTCTransactionFilter {
-  VinFilter inputFilter = 1;
-  VOutFilter outputFilter = 2;
-  repeated Filter filter = 3;
-
-  message Condition {
-    optional common.RichValue eq = 1;
-    optional common.RichValue gt = 2;
-    optional common.RichValue gte = 3;
-    optional common.RichValue lt = 4;
-    optional common.RichValue lte = 5;
-    optional common.RichValue ne = 6;
-    optional string prefix = 7;
-    optional string contains = 8;
-    optional string not_contains = 9;
-    optional int32 length_eq = 10;
-    optional int32 length_gt = 11;
-    optional int32 length_lt = 12;
-    optional common.RichValueList has_any = 13;
-    optional common.RichValueList has_all = 14;
-    optional common.RichValueList in = 15;
-  }
-
-  message Filter {
-    map<string, Condition> conditions = 1;
-  }
-
-  message Filters {
-    repeated Filter filters = 1;
-  }
-
-  message VinFilter {
-    Filters filters = 1;
-    Filter preVOut = 2;
-    BTCTransactionFilter preTransaction = 3;
-  }
-
-  message VOutFilter {
-    Filters filters = 1;
-  }
-}
-
 message StarknetEventFilter {
   string address = 1;
   repeated string keys = 2;
@@ -851,15 +802,6 @@ message Data {
     google.protobuf.Timestamp timestamp = 2;
   }
 
-  message BTCTransaction {
-    google.protobuf.Struct transaction = 4;
-    google.protobuf.Timestamp timestamp = 5;
-  }
-
-  message BTCBlock {
-    google.protobuf.Struct block = 1;
-    google.protobuf.Timestamp timestamp = 2;
-  }
 
   oneof value {
     EthLog eth_log = 2;
@@ -880,8 +822,6 @@ message Data {
     FuelBlock fuel_block = 18;
     CosmosCall cosmos_call = 15;
     StarknetEvent starknet_events = 16;
-    BTCTransaction btc_transaction = 17;
-    BTCBlock btc_block = 19;
   }
 }
 
@@ -985,8 +925,6 @@ enum HandlerType {
   FUEL_BLOCK = 17;
   COSMOS_CALL = 14;
   STARKNET_EVENT = 15;
-  BTC_TRANSACTION = 16;
-  BTC_BLOCK = 18;
 }
 
 message RuntimeInfo {
