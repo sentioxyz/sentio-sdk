@@ -119,6 +119,11 @@ function normalizeToRichValue(value: any): RichValue {
       if (isNaN(value) || !isFinite(value)) {
         throw new Error("can't submit NaN or Infinity value")
       }
+      if (Number.isSafeInteger(value)) {
+        return { int64Value: BigInt(value) }
+      } else if (Number.isInteger(value)) {
+        throw new Error('This value is outside of safe integer range, please use BigDecimal or BigInt instead')
+      }
       return { floatValue: value }
     case 'function':
       return { nullValue: RichValue_NullValue.UNRECOGNIZED }
