@@ -10,6 +10,7 @@ import type { IotaClient } from '@iota/iota-sdk/client'
 import type { SuiClient } from '@mysten/sui/client'
 import { ReadKey } from './key.js'
 import { Auth } from './commands/upload.js'
+import { getApiUrl } from './utils.js'
 
 export async function getABI(
   chain: ChainId,
@@ -144,7 +145,7 @@ export async function getABI(
       console.error(chalk.red('No Credential found for', host, '. Please run `' + cmd + '`.'))
       process.exit(1)
     }
-    const url = `${host}/api/v1/solidity/etherscan_abi?chainSpec.chainId=${chain}&address=${address}`
+    const url = getApiUrl(`/api/v1/solidity/etherscan_abi?chainSpec.chainId=${chain}&address=${address}`, host)
     const resp = (await (
       await fetch(url, {
         headers: {

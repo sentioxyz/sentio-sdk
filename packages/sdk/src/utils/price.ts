@@ -23,7 +23,7 @@ export function getPriceClient(basePath = Endpoints.INSTANCE.priceFeedAPI) {
     basePath = basePath.slice(0, -1)
   }
   client.setConfig({
-    baseUrl: basePath || 'https://app.sentio.xyz',
+    baseUrl: basePath || 'https://api.sentio.xyz',
     auth: getApiKey()
   })
   return PriceService

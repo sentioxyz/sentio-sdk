@@ -7,8 +7,8 @@ import { getFinalizedHost } from '../config.js'
 import { ReadKey } from '../key.js'
 import chalk from 'chalk'
 import { Auth } from './upload.js'
-import { URL } from 'url'
 import { CommandOptionsType } from './types.js'
+import { getApiUrl } from '../utils.js'
 
 const SRC_ROOT = 'src'
 
@@ -150,7 +150,7 @@ async function upload(args: {
     }
   }
 
-  const uploadURL = new URL('/api/v1/solidity/user_compilation', host)
+  const uploadURL = getApiUrl('/api/v1/solidity/user_compilation', host)
   await fetch(uploadURL.href, {
     method: 'POST',
     headers: {
