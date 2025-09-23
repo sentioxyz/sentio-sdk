@@ -74,28 +74,6 @@ export class MetricState extends MapStateStorage<Metric> {
   }
 }
 
-export class MetricStateNew extends MapStateStorage<Metric> {
-  static INSTANCE = new MetricStateNew()
-
-  getOrRegisterMetric(type: MetricType, name: string, option?: CounterOptions | MetricOptions): Metric {
-    const metricMap = this.getOrRegister()
-    let metric = metricMap.get(name)
-    if (metric && metric.config.type !== type) {
-      throw Error(`redefine ${name} of metric type ${type} that is previously ${metric.config.type}`)
-    }
-
-    if (!metric) {
-      if (type === MetricType.COUNTER) {
-        metric = CounterNew._create(name, option)
-      } else {
-        metric = GaugeNew._create(name, option)
-      }
-    }
-    metricMap.set(name, metric)
-    return metric
-  }
-}
-
 export class Counter extends Metric {
   static register(name: string, option?: CounterOptions): Counter {
     return MetricState.INSTANCE.getOrRegisterMetric(MetricType.COUNTER, name, option) as Counter
@@ -132,11 +110,20 @@ export class Counter extends Metric {
   private record(ctx: BaseContext, value: Numberish, labels: Labels, add: boolean) {
     processMetrics.process_metricrecord_count.add(1)
     ctx.update({
+      // legacy support, deprecating
       counters: [
         {
           metadata: ctx.getMetaData(this.name, labels),
           metricValue: toMetricValue(value),
           add: add,
+          runtimeInfo: undefined
+        }
+      ],
+      timeseriesResult: [
+        {
+          metadata: ctx.getMetaData(this.name, labels),
+          type: TimeseriesResult_TimeseriesType.COUNTER,
+          data: toTimeSeriesData(value, labels, !add),
           runtimeInfo: undefined
         }
       ]
@@ -181,10 +168,19 @@ export class Gauge extends Metric {
   record(ctx: BaseContext, value: Numberish, labels: Labels = {}) {
     processMetrics.process_metricrecord_count.add(1)
     ctx.update({
+      // legacy support, deprecating
       gauges: [
         {
           metadata: ctx.getMetaData(this.config.name, labels),
           metricValue: toMetricValue(value),
+          runtimeInfo: undefined
+        }
+      ],
+      timeseriesResult: [
+        {
+          metadata: ctx.getMetaData(this.name, labels),
+          type: TimeseriesResult_TimeseriesType.GAUGE,
+          data: toTimeSeriesData(value, labels, false),
           runtimeInfo: undefined
         }
       ]
@@ -219,131 +215,5 @@ export class Meter {
 
   Gauge(name: string): GaugeBinding {
     return new GaugeBinding(name, this.ctx)
-  }
-}
-
-export class MeterNew {
-  private readonly ctx: BaseContext
-
-  constructor(ctx: BaseContext) {
-    this.ctx = ctx
-  }
-
-  Counter(name: string) {
-    return new CounterNewBinding(name, this.ctx)
-  }
-
-  Gauge(name: string) {
-    return new GaugeNewBinding(name, this.ctx)
-  }
-}
-
-export class CounterNew extends Counter {
-  static register(name: string, option?: CounterOptions): CounterNew {
-    return MetricStateNew.INSTANCE.getOrRegisterMetric(MetricType.COUNTER, name, option) as CounterNew
-  }
-
-  /**
-   * internal use only, to create a metric use {@link register} instead
-   */
-  static _create(name: string, option?: CounterOptions): CounterNew {
-    return new CounterNew(name, option)
-  }
-
-  private constructor(name: string, option?: CounterOptions) {
-    super(
-      name,
-      MetricConfig.fromPartial({
-        ...option,
-        aggregationConfig: {
-          intervalInMinutes: option?.resolutionConfig ? [option?.resolutionConfig?.intervalInMinutes] : []
-        }
-      })
-    )
-  }
-
-  add(ctx: BaseContext, value: Numberish, labels: Labels = {}) {
-    this.recordNew(ctx, value, labels, true)
-  }
-
-  sub(ctx: BaseContext, value: Numberish, labels: Labels = {}) {
-    this.recordNew(ctx, value, labels, false)
-  }
-
-  private recordNew(ctx: BaseContext, value: Numberish, labels: Labels, add: boolean) {
-    processMetrics.process_metricrecord_count.add(1)
-    ctx.update({
-      timeseriesResult: [
-        {
-          metadata: ctx.getMetaData(this.name, labels),
-          type: TimeseriesResult_TimeseriesType.COUNTER,
-          data: toTimeSeriesData(value, labels, !add),
-          runtimeInfo: undefined
-        }
-      ]
-    })
-  }
-}
-
-export class GaugeNewBinding {
-  private readonly gauge: GaugeNew
-  private readonly ctx: BaseContext
-
-  constructor(name: string, ctx: BaseContext) {
-    this.gauge = GaugeNew._create(name)
-    this.ctx = ctx
-  }
-
-  record(value: Numberish, labels: Labels = {}) {
-    this.gauge.record(this.ctx, value, labels)
-  }
-}
-
-export class CounterNewBinding {
-  private readonly counter: CounterNew
-  private readonly ctx: BaseContext
-
-  constructor(name: string, ctx: BaseContext) {
-    this.counter = CounterNew._create(name)
-    this.ctx = ctx
-  }
-
-  add(value: Numberish, labels: Labels = {}) {
-    this.counter.add(this.ctx, value, labels)
-  }
-
-  sub(value: Numberish, labels: Labels = {}) {
-    this.counter.sub(this.ctx, value, labels)
-  }
-}
-
-export class GaugeNew extends Gauge {
-  static register(name: string, option?: MetricOptions): Gauge {
-    return MetricStateNew.INSTANCE.getOrRegisterMetric(MetricType.GAUGE, name, option) as Gauge
-  }
-
-  /**
-   * internal use only, to create a metric use {@link register} instead
-   */
-  static _create(name: string, option?: MetricOptions): GaugeNew {
-    return new GaugeNew(name, option)
-  }
-
-  private constructor(name: string, option?: MetricOptions) {
-    super(name, MetricConfig.fromPartial({ ...option }))
-  }
-
-  record(ctx: BaseContext, value: Numberish, labels: Labels = {}) {
-    processMetrics.process_metricrecord_count.add(1)
-    ctx.update({
-      timeseriesResult: [
-        {
-          metadata: ctx.getMetaData(this.name, labels),
-          type: TimeseriesResult_TimeseriesType.GAUGE,
-          data: toTimeSeriesData(value, labels, false),
-          runtimeInfo: undefined
-        }
-      ]
-    })
   }
 }
