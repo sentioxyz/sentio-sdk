@@ -1,7 +1,7 @@
 import { Plugin, PluginManager } from '@sentio/runtime'
 import { InitResponse, ProcessConfigResponse } from '@sentio/protos'
 
-import { MetricState, MetricStateNew } from './meter.js'
+import { MetricState } from './meter.js'
 import { ExporterState } from './exporter.js'
 import { TemplateInstanceState } from './template.js'
 import { EventLoggerState } from './event-logger.js'
@@ -23,11 +23,6 @@ export class CorePlugin extends Plugin {
 
   initStartupConfig(config: InitResponse | ProcessConfigResponse): void {
     for (const metric of MetricState.INSTANCE.getValues()) {
-      config.metricConfigs.push({
-        ...metric.config
-      })
-    }
-    for (const metric of MetricStateNew.INSTANCE.getValues()) {
       config.metricConfigs.push({
         ...metric.config
       })
