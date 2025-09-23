@@ -6,6 +6,7 @@ import fetch from 'node-fetch'
 import fs from 'fs-extra'
 import path from 'path'
 import { CommandOptionsType } from './types.js'
+import { getApiUrl } from '../utils.js'
 
 interface StartGenerationRequest {
   chain_id: string
@@ -68,9 +69,6 @@ async function generateProcessor(options: CommandOptionsType<typeof createAiComm
       process.exit(1)
     }
 
-    // Construct API base URL from host
-    const apiBaseUrl = `${host}/api/v1`
-
     // Load configuration and extract defaults
     const config = loadProcessorConfig()
     const firstContract = config.contracts?.[0]
@@ -102,7 +100,7 @@ async function generateProcessor(options: CommandOptionsType<typeof createAiComm
         user_prompt: options.prompt,
         project_name: projectName
       },
-      apiBaseUrl
+      host
     )
 
     console.log(chalk.green(`✓ Generation session started: ${session.sessionId}`))
@@ -114,7 +112,7 @@ async function generateProcessor(options: CommandOptionsType<typeof createAiComm
       session.currentCursorPosition,
       options.verbose || false,
       options.save || false,
-      apiBaseUrl,
+      host,
       apiKey
     )
   } catch (error) {
@@ -123,8 +121,8 @@ async function generateProcessor(options: CommandOptionsType<typeof createAiComm
   }
 }
 
-async function startGeneration(request: StartGenerationRequest, apiBaseUrl: string): Promise<StartGenerationResponse> {
-  const response = await fetch(`${apiBaseUrl}/ai/processor/generate/start`, {
+async function startGeneration(request: StartGenerationRequest, host: string): Promise<StartGenerationResponse> {
+  const response = await fetch(getApiUrl(`/api/v1/ai/processor/generate/start`, host), {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -144,7 +142,7 @@ async function pollAndDisplayMessages(
   initialCursorPosition: number,
   verbose: boolean,
   autoSave: boolean,
-  apiBaseUrl: string,
+  host: string,
   apiKey: string
 ) {
   let cursorPosition = initialCursorPosition
@@ -169,7 +167,7 @@ async function pollAndDisplayMessages(
 
   while (!isComplete) {
     try {
-      const response = await fetch(`${apiBaseUrl}/ai/chat/${sessionId}?cursorPosition=${cursorPosition}`, {
+      const response = await fetch(getApiUrl(`/api/v1/ai/chat/${sessionId}?cursorPosition=${cursorPosition}`, host), {
         headers: {
           'api-key': apiKey
         }

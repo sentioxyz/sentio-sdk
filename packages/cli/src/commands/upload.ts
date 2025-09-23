@@ -1,7 +1,6 @@
 import { Command, InvalidArgumentError } from '@commander-js/extra-typings'
 import { loadProcessorConfig, overrideConfigWithOptions, YamlProjectConfig } from '../config.js'
 import fs from 'fs'
-import { URL } from 'url'
 import fetch from 'node-fetch'
 import { buildProcessor } from './build.js'
 import chalk from 'chalk'
@@ -9,7 +8,7 @@ import path from 'path'
 import { ReadKey } from '../key.js'
 import { createHash } from 'crypto'
 import { CommonExecOptions, execFileSync } from 'child_process'
-import { getCliVersion, getSdkVersion } from '../utils.js'
+import { getApiUrl, getCliVersion, getSdkVersion } from '../utils.js'
 import readline from 'readline'
 import JSZip from 'jszip'
 import { UserInfo } from '../../../protos/lib/service/common/protos/common.js'
@@ -88,7 +87,7 @@ async function runUploadInternal(
 }
 
 async function createProject(options: YamlProjectConfig, auth: Auth, type?: string) {
-  const url = new URL('/api/v1/projects', options.host)
+  const url = getApiUrl('/api/v1/projects', options.host)
   const [ownerName, slug] = options.project.includes('/') ? options.project.split('/') : [undefined, options.project]
   return fetch(url.href, {
     method: 'POST',
@@ -100,7 +99,7 @@ async function createProject(options: YamlProjectConfig, auth: Auth, type?: stri
 }
 
 async function updateVariables(projectId: string, options: YamlProjectConfig, auth: Auth) {
-  const url = new URL(`/api/v1/projects/${projectId}/variables`, options.host)
+  const url = getApiUrl(`/api/v1/projects/${projectId}/variables`, options.host)
   return fetch(url.href, {
     method: 'POST',
     headers: {
@@ -369,7 +368,7 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth, continu
 }
 
 async function getProcessorStatus(host: string, auth: Auth, projectSlug: string) {
-  const url = new URL(`/api/v1/processors/${projectSlug}/status?version=ALL`, host)
+  const url = getApiUrl(`/api/v1/processors/${projectSlug}/status?version=ALL`, host)
   return fetch(url.href, {
     headers: {
       ...auth
@@ -378,7 +377,7 @@ async function getProcessorStatus(host: string, auth: Auth, projectSlug: string)
 }
 
 async function getMe(host: string, auth: Auth) {
-  const url = new URL(`/api/v1/users`, host)
+  const url = getApiUrl(`/api/v1/users`, host)
   return fetch(url.href, {
     headers: {
       ...auth
@@ -394,7 +393,7 @@ export async function initUpload(
   sequence: number,
   contentType?: string
 ) {
-  const initUploadUrl = new URL(`/api/v1/processors/init_upload`, host)
+  const initUploadUrl = getApiUrl(`/api/v1/processors/init_upload`, host)
   return fetch(initUploadUrl.href, {
     method: 'POST',
     headers: {
@@ -419,7 +418,7 @@ export async function finishUpload(
   sequence = 1,
   warnings?: string[]
 ) {
-  const finishUploadUrl = new URL(`/api/v1/processors/finish_upload`, options.host)
+  const finishUploadUrl = getApiUrl(`/api/v1/processors/finish_upload`, options.host)
   return fetch(finishUploadUrl.href, {
     method: 'POST',
     headers: {

@@ -1,8 +1,8 @@
 import express from 'express'
 import { getAuthConfig, getFinalizedHost } from '../config.js'
-import url, { URL } from 'url'
+import url from 'url'
 import fetch from 'node-fetch'
-import { getCliVersion } from '../utils.js'
+import { getApiUrl, getCliVersion } from '../utils.js'
 import { WriteKey } from '../key.js'
 import chalk from 'chalk'
 import http from 'http'
@@ -101,7 +101,7 @@ async function getToken(host: string, code: string) {
 }
 
 async function createApiKey(host: string, name: string, source: string, accessToken: string) {
-  const createApiKeyUrl = new URL('/api/v1/keys', host)
+  const createApiKeyUrl = getApiUrl('/api/v1/keys', host)
   return fetch(createApiKeyUrl.href, {
     method: 'POST',
     headers: {
@@ -117,7 +117,7 @@ async function createApiKey(host: string, name: string, source: string, accessTo
 }
 
 async function getUser(host: string, accessToken: string) {
-  const getUserUrl = new URL('/api/v1/users', host)
+  const getUserUrl = getApiUrl('/api/v1/users', host)
   return fetch(getUserUrl.href, {
     method: 'GET',
     headers: {

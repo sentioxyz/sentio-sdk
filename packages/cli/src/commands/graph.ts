@@ -1,7 +1,7 @@
 import { Command } from '@commander-js/extra-typings'
 import path from 'path'
 import { overrideConfigWithOptions, YamlProjectConfig } from '../config.js'
-import { getSdkVersion, getPackageRoot } from '../utils.js'
+import { getSdkVersion, getPackageRoot, getApiUrl } from '../utils.js'
 import { execStep, execPackageManager } from '../execution.js'
 import { ReadKey } from '../key.js'
 import fs from 'fs'
@@ -109,7 +109,7 @@ async function runGraphCreateInternal(
 
 async function createProjectIfMissing(options: YamlProjectConfig, apiKey: string) {
   const [ownerName, slug] = options.project.split('/')
-  const getProjectRes = await fetch(new URL(`/api/v1/project/${ownerName}/${slug}`, options.host), {
+  const getProjectRes = await fetch(getApiUrl(`/api/v1/project/${ownerName}/${slug}`, options.host), {
     headers: { 'api-key': apiKey }
   })
   const projectData = (await getProjectRes.json()) as any
@@ -166,9 +166,9 @@ async function runGraphDeployInternal(
       graph,
       'deploy',
       '--node',
-      new URL('/api/v1/graph-node', processorConfig.host).toString(),
+      getApiUrl('/api/v1/graph-node', processorConfig.host).toString(),
       '--ipfs',
-      new URL('/api/v1/ipfs', processorConfig.host).toString(),
+      getApiUrl('/api/v1/ipfs', processorConfig.host).toString(),
       '--version-label',
       versionLabel,
       '--deploy-key',

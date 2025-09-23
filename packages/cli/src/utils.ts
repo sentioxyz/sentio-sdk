@@ -64,3 +64,16 @@ export async function printVersions() {
     console.log(`Using @sentio/sdk ${sdkVersion}, latest version is ${latestSdkVersion}\n`)
   } catch (e) {}
 }
+
+export function getApiUrl(apiPath: string, host: string) {
+  if (host == 'https://app.sentio.xyz') {
+    if (apiPath.startsWith('/api/')) {
+      apiPath = apiPath.slice(4)
+    }
+    return new URL(apiPath, 'https://api.sentio.xyz')
+  }
+  if (!apiPath.startsWith('/api/')) {
+    apiPath = '/api' + apiPath
+  }
+  return new URL(apiPath, host)
+}
