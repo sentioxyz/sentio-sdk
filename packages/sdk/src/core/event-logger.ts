@@ -118,26 +118,6 @@ export class EventLogger {
   }
 }
 
-function emit<T>(ctx: BaseContext, eventName: string, event: Event<T>) {
-  const { distinctId, severity, message, ...payload } = event
-
-  const res: EventTrackingResult = {
-    metadata: ctx.getMetaData(eventName, {}),
-    severity: severity || LogLevel.INFO,
-    message: message || '',
-    distinctEntityId: distinctId || '',
-    attributes: {
-      ...normalizeLabels(ctx.baseLabels), // TODO avoid dup label in metadata
-      ...normalizeAttribute(payload)
-    },
-    runtimeInfo: undefined,
-    noMetric: true,
-    attributes2: normalizeToRichStruct(ctx.baseLabels, payload)
-  }
-  processMetrics.process_eventemit_count.add(1)
-  ctx.update({ events: [res] })
-}
-
 function checkEventName(eventName: string) {
   const entity = DatabaseSchema.findEntity(eventName)
   if (entity) {
@@ -145,7 +125,7 @@ function checkEventName(eventName: string) {
   }
 }
 
-function emitNew<T>(ctx: BaseContext, eventName: string, event: Event<T>) {
+function emit<T>(ctx: BaseContext, eventName: string, event: Event<T>) {
   const { distinctId, severity, message, ...payload } = event
 
   const data: RichStruct = {
@@ -162,6 +142,22 @@ function emitNew<T>(ctx: BaseContext, eventName: string, event: Event<T>) {
       ...normalizeToRichStruct(ctx.baseLabels, payload).fields
     }
   }
+
+  // legacy v2 events, deprecating
+  const eventRes: EventTrackingResult = {
+    metadata: ctx.getMetaData(eventName, {}),
+    severity: severity || LogLevel.INFO,
+    message: message || '',
+    distinctEntityId: distinctId || '',
+    attributes: {
+      ...normalizeLabels(ctx.baseLabels), // TODO avoid dup label in metadata
+      ...normalizeAttribute(payload)
+    },
+    runtimeInfo: undefined,
+    noMetric: true,
+    attributes2: normalizeToRichStruct(ctx.baseLabels, payload)
+  }
+
   const res: TimeseriesResult = {
     metadata: ctx.getMetaData(eventName, {}),
     type: TimeseriesResult_TimeseriesType.EVENT,
@@ -170,18 +166,5 @@ function emitNew<T>(ctx: BaseContext, eventName: string, event: Event<T>) {
   }
 
   processMetrics.process_eventemit_count.add(1)
-  ctx.update({ timeseriesResult: [res] })
-}
-
-export class EventLoggerBindingNew {
-  private readonly ctx: BaseContext
-
-  constructor(ctx: BaseContext) {
-    this.ctx = ctx
-  }
-
-  emit<T>(eventName: string, event: Event<T>) {
-    checkEventName(eventName)
-    emitNew(this.ctx, eventName, event)
-  }
+  ctx.update({ timeseriesResult: [res], events: [eventRes] })
 }
