@@ -9,7 +9,6 @@ import type { Aptos } from '@aptos-labs/ts-sdk'
 import type { IotaClient } from '@iota/iota-sdk/client'
 import type { SuiClient } from '@mysten/sui/client'
 import { ReadKey } from './key.js'
-import { loadProcessorConfig } from './config.js'
 import { Auth } from './commands/upload.js'
 
 export async function getABI(
@@ -135,18 +134,17 @@ export async function getABI(
 
   // ethereum
   try {
-    const processorConfig = loadProcessorConfig()
     const uploadAuth: Auth = {}
-    const apiKey = ReadKey(processorConfig.host)
+    const host = 'https://app.sentio.xyz'
+    const apiKey = ReadKey(host)
     if (apiKey) {
       uploadAuth['api-key'] = apiKey
     } else {
-      const isProd = processorConfig.host === 'https://app.sentio.xyz'
-      const cmd = isProd ? 'sentio login' : 'sentio login --host=' + processorConfig.host
-      console.error(chalk.red('No Credential found for', processorConfig.host, '. Please run `' + cmd + '`.'))
+      const cmd = 'sentio login'
+      console.error(chalk.red('No Credential found for', host, '. Please run `' + cmd + '`.'))
       process.exit(1)
     }
-    const url = `https://app.sentio.xyz/api/v1/solidity/etherscan_abi?chainSpec.chainId=${chain}&address=${address}`
+    const url = `${host}/api/v1/solidity/etherscan_abi?chainSpec.chainId=${chain}&address=${address}`
     const resp = (await (
       await fetch(url, {
         headers: {
