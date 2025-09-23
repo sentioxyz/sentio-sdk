@@ -13,11 +13,17 @@
           "is_view": true,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["0x1::object::Object<T0>"],
-          "return": ["u64"]
+          "params": [
+            "0x1::object::Object<T0>"
+          ],
+          "return": [
+            "u64"
+          ]
         },
         {
           "name": "create",
@@ -33,7 +39,9 @@
             "0x1::option::Option<0x4::royalty::Royalty>",
             "0x1::string::String"
           ],
-          "return": ["0x1::object::ConstructorRef"]
+          "return": [
+            "0x1::object::ConstructorRef"
+          ]
         },
         {
           "name": "burn",
@@ -41,7 +49,9 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["0x4::token::BurnRef"],
+          "params": [
+            "0x4::token::BurnRef"
+          ],
           "return": []
         },
         {
@@ -51,11 +61,17 @@
           "is_view": true,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["0x1::object::Object<T0>"],
-          "return": ["address"]
+          "params": [
+            "0x1::object::Object<T0>"
+          ],
+          "return": [
+            "address"
+          ]
         },
         {
           "name": "name",
@@ -64,11 +80,17 @@
           "is_view": true,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["0x1::object::Object<T0>"],
-          "return": ["0x1::string::String"]
+          "params": [
+            "0x1::object::Object<T0>"
+          ],
+          "return": [
+            "0x1::string::String"
+          ]
         },
         {
           "name": "generate_burn_ref",
@@ -76,8 +98,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x1::object::ConstructorRef"],
-          "return": ["0x4::token::BurnRef"]
+          "params": [
+            "&0x1::object::ConstructorRef"
+          ],
+          "return": [
+            "0x4::token::BurnRef"
+          ]
         },
         {
           "name": "royalty",
@@ -86,11 +112,17 @@
           "is_view": true,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["0x1::object::Object<T0>"],
-          "return": ["0x1::option::Option<0x4::royalty::Royalty>"]
+          "params": [
+            "0x1::object::Object<T0>"
+          ],
+          "return": [
+            "0x1::option::Option<0x4::royalty::Royalty>"
+          ]
         },
         {
           "name": "generate_mutator_ref",
@@ -98,8 +130,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x1::object::ConstructorRef"],
-          "return": ["0x4::token::MutatorRef"]
+          "params": [
+            "&0x1::object::ConstructorRef"
+          ],
+          "return": [
+            "0x4::token::MutatorRef"
+          ]
         },
         {
           "name": "description",
@@ -108,11 +144,17 @@
           "is_view": true,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["0x1::object::Object<T0>"],
-          "return": ["0x1::string::String"]
+          "params": [
+            "0x1::object::Object<T0>"
+          ],
+          "return": [
+            "0x1::string::String"
+          ]
         },
         {
           "name": "uri",
@@ -121,11 +163,17 @@
           "is_view": true,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["0x1::object::Object<T0>"],
-          "return": ["0x1::string::String"]
+          "params": [
+            "0x1::object::Object<T0>"
+          ],
+          "return": [
+            "0x1::string::String"
+          ]
         },
         {
           "name": "set_description",
@@ -133,7 +181,10 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x4::token::MutatorRef", "0x1::string::String"],
+          "params": [
+            "&0x4::token::MutatorRef",
+            "0x1::string::String"
+          ],
           "return": []
         },
         {
@@ -142,7 +193,10 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x4::token::MutatorRef", "0x1::string::String"],
+          "params": [
+            "&0x4::token::MutatorRef",
+            "0x1::string::String"
+          ],
           "return": []
         },
         {
@@ -151,7 +205,10 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x4::token::MutatorRef", "0x1::string::String"],
+          "params": [
+            "&0x4::token::MutatorRef",
+            "0x1::string::String"
+          ],
           "return": []
         },
         {
@@ -160,8 +217,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x4::token::BurnRef"],
-          "return": ["address"]
+          "params": [
+            "&0x4::token::BurnRef"
+          ],
+          "return": [
+            "address"
+          ]
         },
         {
           "name": "collection_name",
@@ -170,11 +231,17 @@
           "is_view": true,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["0x1::object::Object<T0>"],
-          "return": ["0x1::string::String"]
+          "params": [
+            "0x1::object::Object<T0>"
+          ],
+          "return": [
+            "0x1::string::String"
+          ]
         },
         {
           "name": "collection_object",
@@ -183,11 +250,17 @@
           "is_view": true,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["0x1::object::Object<T0>"],
-          "return": ["0x1::object::Object<0x4::collection::Collection>"]
+          "params": [
+            "0x1::object::Object<T0>"
+          ],
+          "return": [
+            "0x1::object::Object<0x4::collection::Collection>"
+          ]
         },
         {
           "name": "create_from_account",
@@ -203,7 +276,9 @@
             "0x1::option::Option<0x4::royalty::Royalty>",
             "0x1::string::String"
           ],
-          "return": ["0x1::object::ConstructorRef"]
+          "return": [
+            "0x1::object::ConstructorRef"
+          ]
         },
         {
           "name": "create_named_token",
@@ -219,7 +294,9 @@
             "0x1::option::Option<0x4::royalty::Royalty>",
             "0x1::string::String"
           ],
-          "return": ["0x1::object::ConstructorRef"]
+          "return": [
+            "0x1::object::ConstructorRef"
+          ]
         },
         {
           "name": "create_named_token_as_collection_owner",
@@ -235,7 +312,9 @@
             "0x1::option::Option<0x4::royalty::Royalty>",
             "0x1::string::String"
           ],
-          "return": ["0x1::object::ConstructorRef"]
+          "return": [
+            "0x1::object::ConstructorRef"
+          ]
         },
         {
           "name": "create_named_token_from_seed",
@@ -252,7 +331,9 @@
             "0x1::option::Option<0x4::royalty::Royalty>",
             "0x1::string::String"
           ],
-          "return": ["0x1::object::ConstructorRef"]
+          "return": [
+            "0x1::object::ConstructorRef"
+          ]
         },
         {
           "name": "create_named_token_from_seed_as_collection_owner",
@@ -269,7 +350,9 @@
             "0x1::option::Option<0x4::royalty::Royalty>",
             "0x1::string::String"
           ],
-          "return": ["0x1::object::ConstructorRef"]
+          "return": [
+            "0x1::object::ConstructorRef"
+          ]
         },
         {
           "name": "create_named_token_object",
@@ -285,7 +368,9 @@
             "0x1::option::Option<0x4::royalty::Royalty>",
             "0x1::string::String"
           ],
-          "return": ["0x1::object::ConstructorRef"]
+          "return": [
+            "0x1::object::ConstructorRef"
+          ]
         },
         {
           "name": "create_numbered_token",
@@ -302,7 +387,9 @@
             "0x1::option::Option<0x4::royalty::Royalty>",
             "0x1::string::String"
           ],
-          "return": ["0x1::object::ConstructorRef"]
+          "return": [
+            "0x1::object::ConstructorRef"
+          ]
         },
         {
           "name": "create_numbered_token_as_collection_owner",
@@ -319,7 +406,9 @@
             "0x1::option::Option<0x4::royalty::Royalty>",
             "0x1::string::String"
           ],
-          "return": ["0x1::object::ConstructorRef"]
+          "return": [
+            "0x1::object::ConstructorRef"
+          ]
         },
         {
           "name": "create_numbered_token_object",
@@ -336,7 +425,9 @@
             "0x1::option::Option<0x4::royalty::Royalty>",
             "0x1::string::String"
           ],
-          "return": ["0x1::object::ConstructorRef"]
+          "return": [
+            "0x1::object::ConstructorRef"
+          ]
         },
         {
           "name": "create_token",
@@ -352,7 +443,9 @@
             "0x1::option::Option<0x4::royalty::Royalty>",
             "0x1::string::String"
           ],
-          "return": ["0x1::object::ConstructorRef"]
+          "return": [
+            "0x1::object::ConstructorRef"
+          ]
         },
         {
           "name": "create_token_address",
@@ -360,8 +453,14 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&address", "&0x1::string::String", "&0x1::string::String"],
-          "return": ["address"]
+          "params": [
+            "&address",
+            "&0x1::string::String",
+            "&0x1::string::String"
+          ],
+          "return": [
+            "address"
+          ]
         },
         {
           "name": "create_token_address_with_seed",
@@ -369,8 +468,15 @@
           "is_entry": false,
           "is_view": true,
           "generic_type_params": [],
-          "params": ["address", "0x1::string::String", "0x1::string::String", "0x1::string::String"],
-          "return": ["address"]
+          "params": [
+            "address",
+            "0x1::string::String",
+            "0x1::string::String",
+            "0x1::string::String"
+          ],
+          "return": [
+            "address"
+          ]
         },
         {
           "name": "create_token_as_collection_owner",
@@ -386,7 +492,9 @@
             "0x1::option::Option<0x4::royalty::Royalty>",
             "0x1::string::String"
           ],
-          "return": ["0x1::object::ConstructorRef"]
+          "return": [
+            "0x1::object::ConstructorRef"
+          ]
         },
         {
           "name": "create_token_name_with_seed",
@@ -394,8 +502,14 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x1::string::String", "&0x1::string::String", "&0x1::string::String"],
-          "return": ["vector<u8>"]
+          "params": [
+            "&0x1::string::String",
+            "&0x1::string::String",
+            "&0x1::string::String"
+          ],
+          "return": [
+            "vector<u8>"
+          ]
         },
         {
           "name": "create_token_seed",
@@ -403,8 +517,13 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x1::string::String", "&0x1::string::String"],
-          "return": ["vector<u8>"]
+          "params": [
+            "&0x1::string::String",
+            "&0x1::string::String"
+          ],
+          "return": [
+            "vector<u8>"
+          ]
         }
       ],
       "structs": [
@@ -412,7 +531,10 @@
           "name": "BurnRef",
           "is_native": false,
           "is_event": false,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -429,7 +551,10 @@
           "name": "MutatorRef",
           "is_native": false,
           "is_event": false,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -442,7 +567,10 @@
           "name": "Mutation",
           "is_native": false,
           "is_event": true,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -467,7 +595,10 @@
           "name": "MutationEvent",
           "is_native": false,
           "is_event": false,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -488,7 +619,9 @@
           "name": "ConcurrentTokenIdentifiers",
           "is_native": false,
           "is_event": false,
-          "abilities": ["key"],
+          "abilities": [
+            "key"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -505,7 +638,9 @@
           "name": "Token",
           "is_native": false,
           "is_event": false,
-          "abilities": ["key"],
+          "abilities": [
+            "key"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -538,7 +673,9 @@
           "name": "TokenIdentifiers",
           "is_native": false,
           "is_event": false,
-          "abilities": ["key"],
+          "abilities": [
+            "key"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -559,7 +696,9 @@
     "abi": {
       "address": "0x4",
       "name": "royalty",
-      "friends": ["0x4::token"],
+      "friends": [
+        "0x4::token"
+      ],
       "exposed_functions": [
         {
           "name": "update",
@@ -567,7 +706,10 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x4::royalty::MutatorRef", "0x4::royalty::Royalty"],
+          "params": [
+            "&0x4::royalty::MutatorRef",
+            "0x4::royalty::Royalty"
+          ],
           "return": []
         },
         {
@@ -576,7 +718,10 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x1::object::ConstructorRef", "0x4::royalty::Royalty"],
+          "params": [
+            "&0x1::object::ConstructorRef",
+            "0x4::royalty::Royalty"
+          ],
           "return": []
         },
         {
@@ -585,8 +730,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x4::royalty::Royalty"],
-          "return": ["u64"]
+          "params": [
+            "&0x4::royalty::Royalty"
+          ],
+          "return": [
+            "u64"
+          ]
         },
         {
           "name": "denominator",
@@ -594,8 +743,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x4::royalty::Royalty"],
-          "return": ["u64"]
+          "params": [
+            "&0x4::royalty::Royalty"
+          ],
+          "return": [
+            "u64"
+          ]
         },
         {
           "name": "get",
@@ -604,11 +757,17 @@
           "is_view": false,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["0x1::object::Object<T0>"],
-          "return": ["0x1::option::Option<0x4::royalty::Royalty>"]
+          "params": [
+            "0x1::object::Object<T0>"
+          ],
+          "return": [
+            "0x1::option::Option<0x4::royalty::Royalty>"
+          ]
         },
         {
           "name": "create",
@@ -616,8 +775,14 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["u64", "u64", "address"],
-          "return": ["0x4::royalty::Royalty"]
+          "params": [
+            "u64",
+            "u64",
+            "address"
+          ],
+          "return": [
+            "0x4::royalty::Royalty"
+          ]
         },
         {
           "name": "exists_at",
@@ -625,8 +790,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["address"],
-          "return": ["bool"]
+          "params": [
+            "address"
+          ],
+          "return": [
+            "bool"
+          ]
         },
         {
           "name": "delete",
@@ -634,7 +803,9 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["address"],
+          "params": [
+            "address"
+          ],
           "return": []
         },
         {
@@ -643,8 +814,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x4::royalty::Royalty"],
-          "return": ["address"]
+          "params": [
+            "&0x4::royalty::Royalty"
+          ],
+          "return": [
+            "address"
+          ]
         },
         {
           "name": "generate_mutator_ref",
@@ -652,8 +827,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["0x1::object::ExtendRef"],
-          "return": ["0x4::royalty::MutatorRef"]
+          "params": [
+            "0x1::object::ExtendRef"
+          ],
+          "return": [
+            "0x4::royalty::MutatorRef"
+          ]
         }
       ],
       "structs": [
@@ -661,7 +840,10 @@
           "name": "MutatorRef",
           "is_native": false,
           "is_event": false,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -674,7 +856,11 @@
           "name": "Royalty",
           "is_native": false,
           "is_event": false,
-          "abilities": ["copy", "drop", "key"],
+          "abilities": [
+            "copy",
+            "drop",
+            "key"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -699,7 +885,9 @@
     "abi": {
       "address": "0x4",
       "name": "collection",
-      "friends": ["0x4::token"],
+      "friends": [
+        "0x4::token"
+      ],
       "exposed_functions": [
         {
           "name": "count",
@@ -708,11 +896,17 @@
           "is_view": true,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["0x1::object::Object<T0>"],
-          "return": ["0x1::option::Option<u64>"]
+          "params": [
+            "0x1::object::Object<T0>"
+          ],
+          "return": [
+            "0x1::option::Option<u64>"
+          ]
         },
         {
           "name": "creator",
@@ -721,11 +915,17 @@
           "is_view": true,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["0x1::object::Object<T0>"],
-          "return": ["address"]
+          "params": [
+            "0x1::object::Object<T0>"
+          ],
+          "return": [
+            "address"
+          ]
         },
         {
           "name": "name",
@@ -734,11 +934,17 @@
           "is_view": true,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["0x1::object::Object<T0>"],
-          "return": ["0x1::string::String"]
+          "params": [
+            "0x1::object::Object<T0>"
+          ],
+          "return": [
+            "0x1::string::String"
+          ]
         },
         {
           "name": "upgrade_to_concurrent",
@@ -746,7 +952,9 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x1::object::ExtendRef"],
+          "params": [
+            "&0x1::object::ExtendRef"
+          ],
           "return": []
         },
         {
@@ -755,8 +963,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x1::object::ConstructorRef"],
-          "return": ["0x4::collection::MutatorRef"]
+          "params": [
+            "&0x1::object::ConstructorRef"
+          ],
+          "return": [
+            "0x4::collection::MutatorRef"
+          ]
         },
         {
           "name": "create_collection_address",
@@ -764,8 +976,13 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&address", "&0x1::string::String"],
-          "return": ["address"]
+          "params": [
+            "&address",
+            "&0x1::string::String"
+          ],
+          "return": [
+            "address"
+          ]
         },
         {
           "name": "description",
@@ -774,11 +991,17 @@
           "is_view": true,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["0x1::object::Object<T0>"],
-          "return": ["0x1::string::String"]
+          "params": [
+            "0x1::object::Object<T0>"
+          ],
+          "return": [
+            "0x1::string::String"
+          ]
         },
         {
           "name": "uri",
@@ -787,11 +1010,17 @@
           "is_view": true,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["0x1::object::Object<T0>"],
-          "return": ["0x1::string::String"]
+          "params": [
+            "0x1::object::Object<T0>"
+          ],
+          "return": [
+            "0x1::string::String"
+          ]
         },
         {
           "name": "create_collection_seed",
@@ -799,8 +1028,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x1::string::String"],
-          "return": ["vector<u8>"]
+          "params": [
+            "&0x1::string::String"
+          ],
+          "return": [
+            "vector<u8>"
+          ]
         },
         {
           "name": "create_fixed_collection",
@@ -816,7 +1049,9 @@
             "0x1::option::Option<0x4::royalty::Royalty>",
             "0x1::string::String"
           ],
-          "return": ["0x1::object::ConstructorRef"]
+          "return": [
+            "0x1::object::ConstructorRef"
+          ]
         },
         {
           "name": "create_fixed_collection_as_owner",
@@ -832,7 +1067,9 @@
             "0x1::option::Option<0x4::royalty::Royalty>",
             "0x1::string::String"
           ],
-          "return": ["0x1::object::ConstructorRef"]
+          "return": [
+            "0x1::object::ConstructorRef"
+          ]
         },
         {
           "name": "create_unlimited_collection",
@@ -847,7 +1084,9 @@
             "0x1::option::Option<0x4::royalty::Royalty>",
             "0x1::string::String"
           ],
-          "return": ["0x1::object::ConstructorRef"]
+          "return": [
+            "0x1::object::ConstructorRef"
+          ]
         },
         {
           "name": "create_unlimited_collection_as_owner",
@@ -862,7 +1101,9 @@
             "0x1::option::Option<0x4::royalty::Royalty>",
             "0x1::string::String"
           ],
-          "return": ["0x1::object::ConstructorRef"]
+          "return": [
+            "0x1::object::ConstructorRef"
+          ]
         },
         {
           "name": "decrement_supply",
@@ -884,8 +1125,13 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x1::object::Object<0x4::collection::Collection>", "address"],
-          "return": ["0x1::option::Option<0x1::aggregator_v2::AggregatorSnapshot<u64>>"]
+          "params": [
+            "&0x1::object::Object<0x4::collection::Collection>",
+            "address"
+          ],
+          "return": [
+            "0x1::option::Option<0x1::aggregator_v2::AggregatorSnapshot<u64>>"
+          ]
         },
         {
           "name": "set_description",
@@ -893,7 +1139,10 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x4::collection::MutatorRef", "0x1::string::String"],
+          "params": [
+            "&0x4::collection::MutatorRef",
+            "0x1::string::String"
+          ],
           "return": []
         },
         {
@@ -902,7 +1151,10 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x4::collection::MutatorRef", "u64"],
+          "params": [
+            "&0x4::collection::MutatorRef",
+            "u64"
+          ],
           "return": []
         },
         {
@@ -911,7 +1163,10 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x4::collection::MutatorRef", "0x1::string::String"],
+          "params": [
+            "&0x4::collection::MutatorRef",
+            "0x1::string::String"
+          ],
           "return": []
         },
         {
@@ -920,7 +1175,10 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x4::collection::MutatorRef", "0x1::string::String"],
+          "params": [
+            "&0x4::collection::MutatorRef",
+            "0x1::string::String"
+          ],
           "return": []
         }
       ],
@@ -929,7 +1187,9 @@
           "name": "ConcurrentSupply",
           "is_native": false,
           "is_event": false,
-          "abilities": ["key"],
+          "abilities": [
+            "key"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -946,7 +1206,10 @@
           "name": "MutatorRef",
           "is_native": false,
           "is_event": false,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -959,7 +1222,10 @@
           "name": "Burn",
           "is_native": false,
           "is_event": true,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -984,7 +1250,10 @@
           "name": "BurnEvent",
           "is_native": false,
           "is_event": false,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -1001,7 +1270,9 @@
           "name": "Collection",
           "is_native": false,
           "is_event": false,
-          "abilities": ["key"],
+          "abilities": [
+            "key"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -1030,7 +1301,10 @@
           "name": "ConcurrentBurnEvent",
           "is_native": false,
           "is_event": true,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -1051,7 +1325,10 @@
           "name": "ConcurrentMintEvent",
           "is_native": false,
           "is_event": true,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -1072,7 +1349,9 @@
           "name": "FixedSupply",
           "is_native": false,
           "is_event": false,
-          "abilities": ["key"],
+          "abilities": [
+            "key"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -1101,7 +1380,10 @@
           "name": "Mint",
           "is_native": false,
           "is_event": true,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -1122,7 +1404,10 @@
           "name": "MintEvent",
           "is_native": false,
           "is_event": false,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -1139,7 +1424,10 @@
           "name": "Mutation",
           "is_native": false,
           "is_event": true,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -1164,7 +1452,10 @@
           "name": "MutationEvent",
           "is_native": false,
           "is_event": false,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -1177,7 +1468,10 @@
           "name": "SetMaxSupply",
           "is_native": false,
           "is_event": true,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -1198,7 +1492,9 @@
           "name": "UnlimitedSupply",
           "is_native": false,
           "is_event": false,
-          "abilities": ["key"],
+          "abilities": [
+            "key"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -1236,10 +1532,15 @@
           "is_view": false,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["&signer", "0x1::object::Object<T0>"],
+          "params": [
+            "&signer",
+            "0x1::object::Object<T0>"
+          ],
           "return": []
         },
         {
@@ -1267,10 +1568,16 @@
           "is_view": false,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["&signer", "0x1::object::Object<T0>", "0x1::string::String"],
+          "params": [
+            "&signer",
+            "0x1::object::Object<T0>",
+            "0x1::string::String"
+          ],
           "return": []
         },
         {
@@ -1280,10 +1587,16 @@
           "is_view": false,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["&signer", "0x1::object::Object<T0>", "0x1::string::String"],
+          "params": [
+            "&signer",
+            "0x1::object::Object<T0>",
+            "0x1::string::String"
+          ],
           "return": []
         },
         {
@@ -1293,10 +1606,16 @@
           "is_view": false,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["&signer", "0x1::object::Object<T0>", "0x1::string::String"],
+          "params": [
+            "&signer",
+            "0x1::object::Object<T0>",
+            "0x1::string::String"
+          ],
           "return": []
         },
         {
@@ -1306,10 +1625,18 @@
           "is_view": false,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["&signer", "0x1::object::Object<T0>", "0x1::string::String", "0x1::string::String", "vector<u8>"],
+          "params": [
+            "&signer",
+            "0x1::object::Object<T0>",
+            "0x1::string::String",
+            "0x1::string::String",
+            "vector<u8>"
+          ],
           "return": []
         },
         {
@@ -1319,13 +1646,22 @@
           "is_view": false,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             },
             {
-              "constraints": ["drop"]
+              "constraints": [
+                "drop"
+              ]
             }
           ],
-          "params": ["&signer", "0x1::object::Object<T0>", "0x1::string::String", "T1"],
+          "params": [
+            "&signer",
+            "0x1::object::Object<T0>",
+            "0x1::string::String",
+            "T1"
+          ],
           "return": []
         },
         {
@@ -1335,11 +1671,17 @@
           "is_view": false,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["0x1::object::Object<T0>"],
-          "return": ["bool"]
+          "params": [
+            "0x1::object::Object<T0>"
+          ],
+          "return": [
+            "bool"
+          ]
         },
         {
           "name": "are_collection_tokens_freezable",
@@ -1348,11 +1690,17 @@
           "is_view": false,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["0x1::object::Object<T0>"],
-          "return": ["bool"]
+          "params": [
+            "0x1::object::Object<T0>"
+          ],
+          "return": [
+            "bool"
+          ]
         },
         {
           "name": "are_properties_mutable",
@@ -1361,11 +1709,17 @@
           "is_view": true,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["0x1::object::Object<T0>"],
-          "return": ["bool"]
+          "params": [
+            "0x1::object::Object<T0>"
+          ],
+          "return": [
+            "bool"
+          ]
         },
         {
           "name": "create_collection",
@@ -1417,7 +1771,9 @@
             "u64",
             "u64"
           ],
-          "return": ["0x1::object::Object<0x4::aptos_token::AptosCollection>"]
+          "return": [
+            "0x1::object::Object<0x4::aptos_token::AptosCollection>"
+          ]
         },
         {
           "name": "freeze_transfer",
@@ -1426,10 +1782,15 @@
           "is_view": false,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["&signer", "0x1::object::Object<T0>"],
+          "params": [
+            "&signer",
+            "0x1::object::Object<T0>"
+          ],
           "return": []
         },
         {
@@ -1439,11 +1800,17 @@
           "is_view": true,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["0x1::object::Object<T0>"],
-          "return": ["bool"]
+          "params": [
+            "0x1::object::Object<T0>"
+          ],
+          "return": [
+            "bool"
+          ]
         },
         {
           "name": "is_freezable_by_creator",
@@ -1452,11 +1819,17 @@
           "is_view": true,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["0x1::object::Object<T0>"],
-          "return": ["bool"]
+          "params": [
+            "0x1::object::Object<T0>"
+          ],
+          "return": [
+            "bool"
+          ]
         },
         {
           "name": "is_mutable_collection_description",
@@ -1465,11 +1838,17 @@
           "is_view": false,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["0x1::object::Object<T0>"],
-          "return": ["bool"]
+          "params": [
+            "0x1::object::Object<T0>"
+          ],
+          "return": [
+            "bool"
+          ]
         },
         {
           "name": "is_mutable_collection_royalty",
@@ -1478,11 +1857,17 @@
           "is_view": false,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["0x1::object::Object<T0>"],
-          "return": ["bool"]
+          "params": [
+            "0x1::object::Object<T0>"
+          ],
+          "return": [
+            "bool"
+          ]
         },
         {
           "name": "is_mutable_collection_token_description",
@@ -1491,11 +1876,17 @@
           "is_view": false,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["0x1::object::Object<T0>"],
-          "return": ["bool"]
+          "params": [
+            "0x1::object::Object<T0>"
+          ],
+          "return": [
+            "bool"
+          ]
         },
         {
           "name": "is_mutable_collection_token_name",
@@ -1504,11 +1895,17 @@
           "is_view": false,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["0x1::object::Object<T0>"],
-          "return": ["bool"]
+          "params": [
+            "0x1::object::Object<T0>"
+          ],
+          "return": [
+            "bool"
+          ]
         },
         {
           "name": "is_mutable_collection_token_properties",
@@ -1517,11 +1914,17 @@
           "is_view": false,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["0x1::object::Object<T0>"],
-          "return": ["bool"]
+          "params": [
+            "0x1::object::Object<T0>"
+          ],
+          "return": [
+            "bool"
+          ]
         },
         {
           "name": "is_mutable_collection_token_uri",
@@ -1530,11 +1933,17 @@
           "is_view": false,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["0x1::object::Object<T0>"],
-          "return": ["bool"]
+          "params": [
+            "0x1::object::Object<T0>"
+          ],
+          "return": [
+            "bool"
+          ]
         },
         {
           "name": "is_mutable_collection_uri",
@@ -1543,11 +1952,17 @@
           "is_view": false,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["0x1::object::Object<T0>"],
-          "return": ["bool"]
+          "params": [
+            "0x1::object::Object<T0>"
+          ],
+          "return": [
+            "bool"
+          ]
         },
         {
           "name": "is_mutable_description",
@@ -1556,11 +1971,17 @@
           "is_view": true,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["0x1::object::Object<T0>"],
-          "return": ["bool"]
+          "params": [
+            "0x1::object::Object<T0>"
+          ],
+          "return": [
+            "bool"
+          ]
         },
         {
           "name": "is_mutable_name",
@@ -1569,11 +1990,17 @@
           "is_view": true,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["0x1::object::Object<T0>"],
-          "return": ["bool"]
+          "params": [
+            "0x1::object::Object<T0>"
+          ],
+          "return": [
+            "bool"
+          ]
         },
         {
           "name": "is_mutable_uri",
@@ -1582,11 +2009,17 @@
           "is_view": true,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["0x1::object::Object<T0>"],
-          "return": ["bool"]
+          "params": [
+            "0x1::object::Object<T0>"
+          ],
+          "return": [
+            "bool"
+          ]
         },
         {
           "name": "mint_soul_bound",
@@ -1624,7 +2057,9 @@
             "vector<vector<u8>>",
             "address"
           ],
-          "return": ["0x1::object::Object<0x4::aptos_token::AptosToken>"]
+          "return": [
+            "0x1::object::Object<0x4::aptos_token::AptosToken>"
+          ]
         },
         {
           "name": "mint_token_object",
@@ -1642,7 +2077,9 @@
             "vector<0x1::string::String>",
             "vector<vector<u8>>"
           ],
-          "return": ["0x1::object::Object<0x4::aptos_token::AptosToken>"]
+          "return": [
+            "0x1::object::Object<0x4::aptos_token::AptosToken>"
+          ]
         },
         {
           "name": "remove_property",
@@ -1651,10 +2088,16 @@
           "is_view": false,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["&signer", "0x1::object::Object<T0>", "0x1::string::String"],
+          "params": [
+            "&signer",
+            "0x1::object::Object<T0>",
+            "0x1::string::String"
+          ],
           "return": []
         },
         {
@@ -1664,10 +2107,16 @@
           "is_view": false,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["&signer", "0x1::object::Object<T0>", "0x1::string::String"],
+          "params": [
+            "&signer",
+            "0x1::object::Object<T0>",
+            "0x1::string::String"
+          ],
           "return": []
         },
         {
@@ -1677,10 +2126,16 @@
           "is_view": false,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["&signer", "0x1::object::Object<T0>", "0x4::royalty::Royalty"],
+          "params": [
+            "&signer",
+            "0x1::object::Object<T0>",
+            "0x4::royalty::Royalty"
+          ],
           "return": []
         },
         {
@@ -1690,10 +2145,18 @@
           "is_view": false,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["&signer", "0x1::object::Object<T0>", "u64", "u64", "address"],
+          "params": [
+            "&signer",
+            "0x1::object::Object<T0>",
+            "u64",
+            "u64",
+            "address"
+          ],
           "return": []
         },
         {
@@ -1703,10 +2166,16 @@
           "is_view": false,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["&signer", "0x1::object::Object<T0>", "0x1::string::String"],
+          "params": [
+            "&signer",
+            "0x1::object::Object<T0>",
+            "0x1::string::String"
+          ],
           "return": []
         },
         {
@@ -1716,10 +2185,15 @@
           "is_view": false,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["&signer", "0x1::object::Object<T0>"],
+          "params": [
+            "&signer",
+            "0x1::object::Object<T0>"
+          ],
           "return": []
         },
         {
@@ -1729,10 +2203,18 @@
           "is_view": false,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["&signer", "0x1::object::Object<T0>", "0x1::string::String", "0x1::string::String", "vector<u8>"],
+          "params": [
+            "&signer",
+            "0x1::object::Object<T0>",
+            "0x1::string::String",
+            "0x1::string::String",
+            "vector<u8>"
+          ],
           "return": []
         },
         {
@@ -1742,13 +2224,22 @@
           "is_view": false,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             },
             {
-              "constraints": ["drop"]
+              "constraints": [
+                "drop"
+              ]
             }
           ],
-          "params": ["&signer", "0x1::object::Object<T0>", "0x1::string::String", "T1"],
+          "params": [
+            "&signer",
+            "0x1::object::Object<T0>",
+            "0x1::string::String",
+            "T1"
+          ],
           "return": []
         }
       ],
@@ -1757,7 +2248,9 @@
           "name": "AptosCollection",
           "is_native": false,
           "is_event": false,
-          "abilities": ["key"],
+          "abilities": [
+            "key"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -1806,7 +2299,9 @@
           "name": "AptosToken",
           "is_native": false,
           "is_event": false,
-          "abilities": ["key"],
+          "abilities": [
+            "key"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -1843,7 +2338,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x4::property_map::MutatorRef", "&0x1::string::String", "0x1::string::String", "vector<u8>"],
+          "params": [
+            "&0x4::property_map::MutatorRef",
+            "&0x1::string::String",
+            "0x1::string::String",
+            "vector<u8>"
+          ],
           "return": []
         },
         {
@@ -1852,7 +2352,10 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x1::object::ConstructorRef", "0x4::property_map::PropertyMap"],
+          "params": [
+            "&0x1::object::ConstructorRef",
+            "0x4::property_map::PropertyMap"
+          ],
           "return": []
         },
         {
@@ -1862,11 +2365,17 @@
           "is_view": false,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["&0x1::object::Object<T0>"],
-          "return": ["u64"]
+          "params": [
+            "&0x1::object::Object<T0>"
+          ],
+          "return": [
+            "u64"
+          ]
         },
         {
           "name": "remove",
@@ -1874,7 +2383,10 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x4::property_map::MutatorRef", "&0x1::string::String"],
+          "params": [
+            "&0x4::property_map::MutatorRef",
+            "&0x1::string::String"
+          ],
           "return": []
         },
         {
@@ -1883,7 +2395,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x4::property_map::MutatorRef", "0x1::string::String", "0x1::string::String", "vector<u8>"],
+          "params": [
+            "&0x4::property_map::MutatorRef",
+            "0x1::string::String",
+            "0x1::string::String",
+            "vector<u8>"
+          ],
           "return": []
         },
         {
@@ -1892,7 +2409,9 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["0x4::property_map::MutatorRef"],
+          "params": [
+            "0x4::property_map::MutatorRef"
+          ],
           "return": []
         },
         {
@@ -1902,11 +2421,19 @@
           "is_view": false,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["&0x1::object::Object<T0>", "&0x1::string::String"],
-          "return": ["0x1::string::String", "vector<u8>"]
+          "params": [
+            "&0x1::object::Object<T0>",
+            "&0x1::string::String"
+          ],
+          "return": [
+            "0x1::string::String",
+            "vector<u8>"
+          ]
         },
         {
           "name": "contains_key",
@@ -1915,11 +2442,18 @@
           "is_view": false,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["&0x1::object::Object<T0>", "&0x1::string::String"],
-          "return": ["bool"]
+          "params": [
+            "&0x1::object::Object<T0>",
+            "&0x1::string::String"
+          ],
+          "return": [
+            "bool"
+          ]
         },
         {
           "name": "generate_mutator_ref",
@@ -1927,8 +2461,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x1::object::ConstructorRef"],
-          "return": ["0x4::property_map::MutatorRef"]
+          "params": [
+            "&0x1::object::ConstructorRef"
+          ],
+          "return": [
+            "0x4::property_map::MutatorRef"
+          ]
         },
         {
           "name": "add_typed",
@@ -1937,10 +2475,16 @@
           "is_view": false,
           "generic_type_params": [
             {
-              "constraints": ["drop"]
+              "constraints": [
+                "drop"
+              ]
             }
           ],
-          "params": ["&0x4::property_map::MutatorRef", "0x1::string::String", "T0"],
+          "params": [
+            "&0x4::property_map::MutatorRef",
+            "0x1::string::String",
+            "T0"
+          ],
           "return": []
         },
         {
@@ -1949,7 +2493,10 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x1::object::ExtendRef", "0x4::property_map::PropertyMap"],
+          "params": [
+            "&0x1::object::ExtendRef",
+            "0x4::property_map::PropertyMap"
+          ],
           "return": []
         },
         {
@@ -1958,8 +2505,14 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["vector<0x1::string::String>", "vector<0x1::string::String>", "vector<vector<u8>>"],
-          "return": ["0x4::property_map::PropertyMap"]
+          "params": [
+            "vector<0x1::string::String>",
+            "vector<0x1::string::String>",
+            "vector<vector<u8>>"
+          ],
+          "return": [
+            "0x4::property_map::PropertyMap"
+          ]
         },
         {
           "name": "read_address",
@@ -1968,11 +2521,18 @@
           "is_view": false,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["&0x1::object::Object<T0>", "&0x1::string::String"],
-          "return": ["address"]
+          "params": [
+            "&0x1::object::Object<T0>",
+            "&0x1::string::String"
+          ],
+          "return": [
+            "address"
+          ]
         },
         {
           "name": "read_bool",
@@ -1981,11 +2541,18 @@
           "is_view": false,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["&0x1::object::Object<T0>", "&0x1::string::String"],
-          "return": ["bool"]
+          "params": [
+            "&0x1::object::Object<T0>",
+            "&0x1::string::String"
+          ],
+          "return": [
+            "bool"
+          ]
         },
         {
           "name": "read_bytes",
@@ -1994,11 +2561,18 @@
           "is_view": false,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["&0x1::object::Object<T0>", "&0x1::string::String"],
-          "return": ["vector<u8>"]
+          "params": [
+            "&0x1::object::Object<T0>",
+            "&0x1::string::String"
+          ],
+          "return": [
+            "vector<u8>"
+          ]
         },
         {
           "name": "read_string",
@@ -2007,11 +2581,18 @@
           "is_view": false,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["&0x1::object::Object<T0>", "&0x1::string::String"],
-          "return": ["0x1::string::String"]
+          "params": [
+            "&0x1::object::Object<T0>",
+            "&0x1::string::String"
+          ],
+          "return": [
+            "0x1::string::String"
+          ]
         },
         {
           "name": "read_u128",
@@ -2020,11 +2601,18 @@
           "is_view": false,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["&0x1::object::Object<T0>", "&0x1::string::String"],
-          "return": ["u128"]
+          "params": [
+            "&0x1::object::Object<T0>",
+            "&0x1::string::String"
+          ],
+          "return": [
+            "u128"
+          ]
         },
         {
           "name": "read_u16",
@@ -2033,11 +2621,18 @@
           "is_view": false,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["&0x1::object::Object<T0>", "&0x1::string::String"],
-          "return": ["u16"]
+          "params": [
+            "&0x1::object::Object<T0>",
+            "&0x1::string::String"
+          ],
+          "return": [
+            "u16"
+          ]
         },
         {
           "name": "read_u256",
@@ -2046,11 +2641,18 @@
           "is_view": false,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["&0x1::object::Object<T0>", "&0x1::string::String"],
-          "return": ["u256"]
+          "params": [
+            "&0x1::object::Object<T0>",
+            "&0x1::string::String"
+          ],
+          "return": [
+            "u256"
+          ]
         },
         {
           "name": "read_u32",
@@ -2059,11 +2661,18 @@
           "is_view": false,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["&0x1::object::Object<T0>", "&0x1::string::String"],
-          "return": ["u32"]
+          "params": [
+            "&0x1::object::Object<T0>",
+            "&0x1::string::String"
+          ],
+          "return": [
+            "u32"
+          ]
         },
         {
           "name": "read_u64",
@@ -2072,11 +2681,18 @@
           "is_view": false,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["&0x1::object::Object<T0>", "&0x1::string::String"],
-          "return": ["u64"]
+          "params": [
+            "&0x1::object::Object<T0>",
+            "&0x1::string::String"
+          ],
+          "return": [
+            "u64"
+          ]
         },
         {
           "name": "read_u8",
@@ -2085,11 +2701,18 @@
           "is_view": false,
           "generic_type_params": [
             {
-              "constraints": ["key"]
+              "constraints": [
+                "key"
+              ]
             }
           ],
-          "params": ["&0x1::object::Object<T0>", "&0x1::string::String"],
-          "return": ["u8"]
+          "params": [
+            "&0x1::object::Object<T0>",
+            "&0x1::string::String"
+          ],
+          "return": [
+            "u8"
+          ]
         },
         {
           "name": "update_typed",
@@ -2098,10 +2721,16 @@
           "is_view": false,
           "generic_type_params": [
             {
-              "constraints": ["drop"]
+              "constraints": [
+                "drop"
+              ]
             }
           ],
-          "params": ["&0x4::property_map::MutatorRef", "&0x1::string::String", "T0"],
+          "params": [
+            "&0x4::property_map::MutatorRef",
+            "&0x1::string::String",
+            "T0"
+          ],
           "return": []
         }
       ],
@@ -2110,7 +2739,10 @@
           "name": "MutatorRef",
           "is_native": false,
           "is_event": false,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -2123,7 +2755,10 @@
           "name": "PropertyMap",
           "is_native": false,
           "is_event": false,
-          "abilities": ["drop", "key"],
+          "abilities": [
+            "drop",
+            "key"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -2136,7 +2771,10 @@
           "name": "PropertyValue",
           "is_native": false,
           "is_event": false,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {

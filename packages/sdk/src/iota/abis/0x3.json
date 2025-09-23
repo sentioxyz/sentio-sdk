@@ -7,7 +7,10 @@
     "structs": {
       "GenesisChainParameters": {
         "abilities": {
-          "abilities": ["Copy", "Drop"]
+          "abilities": [
+            "Copy",
+            "Drop"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -47,7 +50,10 @@
       },
       "GenesisValidatorMetadata": {
         "abilities": {
-          "abilities": ["Copy", "Drop"]
+          "abilities": [
+            "Copy",
+            "Drop"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -152,7 +158,9 @@
                 "address": "0x1",
                 "module": "option",
                 "name": "Option",
-                "typeArguments": ["Address"]
+                "typeArguments": [
+                  "Address"
+                ]
               }
             }
           },
@@ -163,7 +171,9 @@
                 "address": "0x1",
                 "module": "option",
                 "name": "Option",
-                "typeArguments": ["U64"]
+                "typeArguments": [
+                  "U64"
+                ]
               }
             }
           }
@@ -214,7 +224,9 @@
     "structs": {
       "IotaSystemState": {
         "abilities": {
-          "abilities": ["Key"]
+          "abilities": [
+            "Key"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -376,7 +388,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "load_iota_system_admin_cap": {
         "visibility": "Friend",
@@ -570,7 +584,9 @@
               "address": "0x1",
               "module": "option",
               "name": "Option",
-              "typeArguments": ["U64"]
+              "typeArguments": [
+                "U64"
+              ]
             }
           },
           "Address",
@@ -1580,7 +1596,9 @@
             }
           }
         ],
-        "return": ["Address"]
+        "return": [
+          "Address"
+        ]
       }
     }
   },
@@ -1601,7 +1619,9 @@
     "structs": {
       "IotaSystemStateV1": {
         "abilities": {
-          "abilities": ["Store"]
+          "abilities": [
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -1690,7 +1710,9 @@
                       "address": "0x2",
                       "module": "vec_set",
                       "name": "VecSet",
-                      "typeArguments": ["Address"]
+                      "typeArguments": [
+                        "Address"
+                      ]
                     }
                   }
                 ]
@@ -1768,7 +1790,9 @@
       },
       "IotaSystemStateV2": {
         "abilities": {
-          "abilities": ["Store"]
+          "abilities": [
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -1857,7 +1881,9 @@
                       "address": "0x2",
                       "module": "vec_set",
                       "name": "VecSet",
-                      "typeArguments": ["Address"]
+                      "typeArguments": [
+                        "Address"
+                      ]
                     }
                   }
                 ]
@@ -1939,7 +1965,10 @@
       },
       "SystemEpochInfoEventV1": {
         "abilities": {
-          "abilities": ["Copy", "Drop"]
+          "abilities": [
+            "Copy",
+            "Drop"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -1991,7 +2020,10 @@
       },
       "SystemEpochInfoEventV2": {
         "abilities": {
-          "abilities": ["Copy", "Drop"]
+          "abilities": [
+            "Copy",
+            "Drop"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -2043,7 +2075,9 @@
       },
       "SystemParametersV1": {
         "abilities": {
-          "abilities": ["Store"]
+          "abilities": [
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -2245,7 +2279,10 @@
               "address": "0x2",
               "module": "vec_map",
               "name": "VecMap",
-              "typeArguments": ["Address", "U64"]
+              "typeArguments": [
+                "Address",
+                "U64"
+              ]
             }
           }
         ]
@@ -2379,7 +2416,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "epoch_start_timestamp_ms": {
         "visibility": "Friend",
@@ -2397,14 +2436,18 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "genesis_system_state_version": {
         "visibility": "Friend",
         "isEntry": false,
         "typeParameters": [],
         "parameters": [],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "get_reporters_of": {
         "visibility": "Friend",
@@ -2429,7 +2472,9 @@
               "address": "0x2",
               "module": "vec_set",
               "name": "VecSet",
-              "typeArguments": ["Address"]
+              "typeArguments": [
+                "Address"
+              ]
             }
           }
         ]
@@ -2450,7 +2495,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "get_storage_fund_total_balance": {
         "visibility": "Friend",
@@ -2468,7 +2515,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "get_total_iota_supply": {
         "visibility": "Friend",
@@ -2486,7 +2535,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "iota_system_admin_cap": {
         "visibility": "Friend",
@@ -2582,7 +2633,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "report_validator": {
         "visibility": "Friend",
@@ -2707,7 +2760,9 @@
               "address": "0x1",
               "module": "option",
               "name": "Option",
-              "typeArguments": ["U64"]
+              "typeArguments": [
+                "U64"
+              ]
             }
           },
           "Address",
@@ -3036,7 +3091,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "undo_report_validator": {
         "visibility": "Friend",
@@ -3620,7 +3677,9 @@
             }
           }
         ],
-        "return": ["Address"]
+        "return": [
+          "Address"
+        ]
       },
       "validator_stake_amount": {
         "visibility": "Friend",
@@ -3639,7 +3698,9 @@
           },
           "Address"
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "validator_staking_pool_id": {
         "visibility": "Friend",
@@ -3727,7 +3788,11 @@
     "structs": {
       "PoolTokenExchangeRate": {
         "abilities": {
-          "abilities": ["Copy", "Drop", "Store"]
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -3743,7 +3808,10 @@
       },
       "StakedIota": {
         "abilities": {
-          "abilities": ["Store", "Key"]
+          "abilities": [
+            "Store",
+            "Key"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -3797,7 +3865,10 @@
       },
       "StakingPoolV1": {
         "abilities": {
-          "abilities": ["Store", "Key"]
+          "abilities": [
+            "Store",
+            "Key"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -3819,7 +3890,9 @@
                 "address": "0x1",
                 "module": "option",
                 "name": "Option",
-                "typeArguments": ["U64"]
+                "typeArguments": [
+                  "U64"
+                ]
               }
             }
           },
@@ -3830,7 +3903,9 @@
                 "address": "0x1",
                 "module": "option",
                 "name": "Option",
-                "typeArguments": ["U64"]
+                "typeArguments": [
+                  "U64"
+                ]
               }
             }
           },
@@ -4038,7 +4113,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "iota_balance": {
         "visibility": "Public",
@@ -4056,7 +4133,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "is_equal_staking_metadata": {
         "visibility": "Public",
@@ -4084,7 +4163,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "is_inactive": {
         "visibility": "Public",
@@ -4102,7 +4183,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "is_preactive": {
         "visibility": "Public",
@@ -4120,7 +4203,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "join_staked_iota": {
         "visibility": "Public",
@@ -4191,7 +4276,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "pending_stake_withdraw_amount": {
         "visibility": "Public",
@@ -4209,7 +4296,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "pool_id": {
         "visibility": "Public",
@@ -4254,7 +4343,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "pool_token_exchange_rate_at_epoch": {
         "visibility": "Public",
@@ -4540,7 +4631,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "staked_iota_amount": {
         "visibility": "Public",
@@ -4558,7 +4651,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "withdraw_from_principal": {
         "visibility": "Friend",
@@ -4620,7 +4715,9 @@
     "structs": {
       "StorageFundV1": {
         "abilities": {
-          "abilities": ["Store"]
+          "abilities": [
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -4773,7 +4870,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "total_object_storage_rebates": {
         "visibility": "Public",
@@ -4791,7 +4890,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       }
     }
   },
@@ -4808,7 +4909,9 @@
     "structs": {
       "TimelockedStakedIota": {
         "abilities": {
-          "abilities": ["Key"]
+          "abilities": [
+            "Key"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -4878,7 +4981,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "is_equal_staking_metadata": {
         "visibility": "Public",
@@ -4906,7 +5011,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "is_labeled_with": {
         "visibility": "Public",
@@ -4928,7 +5035,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "join_staked_iota": {
         "visibility": "Public",
@@ -5526,7 +5635,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "staked_iota_amount": {
         "visibility": "Public",
@@ -5544,7 +5655,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "transfer_to_sender": {
         "visibility": "Public",
@@ -5701,7 +5814,10 @@
     "structs": {
       "StakingRequestEvent": {
         "abilities": {
-          "abilities": ["Copy", "Drop"]
+          "abilities": [
+            "Copy",
+            "Drop"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -5736,7 +5852,10 @@
       },
       "UnstakingRequestEvent": {
         "abilities": {
-          "abilities": ["Copy", "Drop"]
+          "abilities": [
+            "Copy",
+            "Drop"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -5779,7 +5898,9 @@
       },
       "ValidatorMetadataV1": {
         "abilities": {
-          "abilities": ["Store"]
+          "abilities": [
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -6023,7 +6144,9 @@
       },
       "ValidatorV1": {
         "abilities": {
-          "abilities": ["Store"]
+          "abilities": [
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -6176,7 +6299,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "deactivate": {
         "visibility": "Friend",
@@ -6295,7 +6420,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "get_staking_pool_ref": {
         "visibility": "Friend",
@@ -6371,7 +6498,9 @@
             }
           }
         ],
-        "return": ["Address"]
+        "return": [
+          "Address"
+        ]
       },
       "is_duplicate": {
         "visibility": "Public",
@@ -6399,7 +6528,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "is_preactive": {
         "visibility": "Public",
@@ -6417,7 +6548,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "metadata": {
         "visibility": "Public",
@@ -6764,7 +6897,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "next_epoch_network_address": {
         "visibility": "Public",
@@ -6995,7 +7130,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "operation_cap_id": {
         "visibility": "Public",
@@ -7071,7 +7208,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "pending_stake_withdraw_amount": {
         "visibility": "Public",
@@ -7089,7 +7228,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "pool_token_exchange_rate_at_epoch": {
         "visibility": "Public",
@@ -7545,7 +7686,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "stake_amount": {
         "visibility": "Public",
@@ -7563,7 +7706,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "staking_pool_id": {
         "visibility": "Public",
@@ -7608,7 +7753,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "total_stake_amount": {
         "visibility": "Public",
@@ -7626,7 +7773,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "update_candidate_authority_pubkey": {
         "visibility": "Friend",
@@ -8015,7 +8164,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       }
     }
   },
@@ -8040,7 +8191,10 @@
     "structs": {
       "UnverifiedValidatorOperationCap": {
         "abilities": {
-          "abilities": ["Store", "Key"]
+          "abilities": [
+            "Store",
+            "Key"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -8063,7 +8217,9 @@
       },
       "ValidatorOperationCap": {
         "abilities": {
-          "abilities": ["Drop"]
+          "abilities": [
+            "Drop"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -8193,7 +8349,10 @@
     "structs": {
       "CommitteeValidatorJoinEvent": {
         "abilities": {
-          "abilities": ["Copy", "Drop"]
+          "abilities": [
+            "Copy",
+            "Drop"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -8220,7 +8379,10 @@
       },
       "CommitteeValidatorLeaveEvent": {
         "abilities": {
-          "abilities": ["Copy", "Drop"]
+          "abilities": [
+            "Copy",
+            "Drop"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -8247,7 +8409,10 @@
       },
       "ValidatorEpochInfoEventV1": {
         "abilities": {
-          "abilities": ["Copy", "Drop"]
+          "abilities": [
+            "Copy",
+            "Drop"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -8304,7 +8469,10 @@
       },
       "ValidatorJoinEvent": {
         "abilities": {
-          "abilities": ["Copy", "Drop"]
+          "abilities": [
+            "Copy",
+            "Drop"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -8331,7 +8499,10 @@
       },
       "ValidatorLeaveEvent": {
         "abilities": {
-          "abilities": ["Copy", "Drop"]
+          "abilities": [
+            "Copy",
+            "Drop"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -8362,7 +8533,9 @@
       },
       "ValidatorSetV1": {
         "abilities": {
-          "abilities": ["Store"]
+          "abilities": [
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -8486,7 +8659,10 @@
                 "address": "0x2",
                 "module": "vec_map",
                 "name": "VecMap",
-                "typeArguments": ["Address", "U64"]
+                "typeArguments": [
+                  "Address",
+                  "U64"
+                ]
               }
             }
           },
@@ -8505,7 +8681,9 @@
       },
       "ValidatorSetV2": {
         "abilities": {
-          "abilities": ["Store"]
+          "abilities": [
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -8635,7 +8813,10 @@
                 "address": "0x2",
                 "module": "vec_map",
                 "name": "VecMap",
-                "typeArguments": ["Address", "U64"]
+                "typeArguments": [
+                  "Address",
+                  "U64"
+                ]
               }
             }
           },
@@ -8785,7 +8966,9 @@
                       "address": "0x2",
                       "module": "vec_set",
                       "name": "VecSet",
-                      "typeArguments": ["Address"]
+                      "typeArguments": [
+                        "Address"
+                      ]
                     }
                   }
                 ]
@@ -8876,7 +9059,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "get_active_or_pending_or_candidate_validator_ref": {
         "visibility": "Friend",
@@ -9226,7 +9411,9 @@
           },
           "Address"
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "is_committee_validator_by_iota_address": {
         "visibility": "Friend",
@@ -9245,7 +9432,9 @@
           },
           "Address"
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "is_duplicate_validator": {
         "visibility": "Friend",
@@ -9275,7 +9464,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "is_inactive_validator": {
         "visibility": "Public",
@@ -9301,7 +9492,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "is_inactive_validator_inner": {
         "visibility": "Friend",
@@ -9327,7 +9520,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "is_validator_candidate": {
         "visibility": "Public",
@@ -9346,7 +9541,9 @@
           },
           "Address"
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "is_validator_candidate_inner": {
         "visibility": "Friend",
@@ -9365,7 +9562,9 @@
           },
           "Address"
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "new_v1": {
         "visibility": "Friend",
@@ -9420,7 +9619,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "pool_exchange_rates": {
         "visibility": "Friend",
@@ -9884,7 +10085,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "sum_voting_power_by_addresses": {
         "visibility": "Public",
@@ -9909,7 +10112,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "total_stake": {
         "visibility": "Public",
@@ -9927,7 +10132,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "total_stake_inner": {
         "visibility": "Friend",
@@ -9945,7 +10152,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "v1_to_v2": {
         "visibility": "Friend",
@@ -9998,7 +10207,9 @@
             }
           }
         ],
-        "return": ["Address"]
+        "return": [
+          "Address"
+        ]
       },
       "validator_stake_amount": {
         "visibility": "Public",
@@ -10017,7 +10228,9 @@
           },
           "Address"
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "validator_stake_amount_inner": {
         "visibility": "Friend",
@@ -10036,7 +10249,9 @@
           },
           "Address"
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "validator_staking_pool_id": {
         "visibility": "Public",
@@ -10111,7 +10326,9 @@
           },
           "Address"
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "validator_total_stake_amount_inner": {
         "visibility": "Friend",
@@ -10130,7 +10347,9 @@
           },
           "Address"
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "validator_voting_power": {
         "visibility": "Public",
@@ -10149,7 +10368,9 @@
           },
           "Address"
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "validator_voting_power_inner": {
         "visibility": "Friend",
@@ -10168,7 +10389,9 @@
           },
           "Address"
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "verify_cap": {
         "visibility": "Friend",
@@ -10223,7 +10446,9 @@
     "structs": {
       "Validator": {
         "abilities": {
-          "abilities": ["Store"]
+          "abilities": [
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -10346,7 +10571,9 @@
     "structs": {
       "VotingPowerInfoV1": {
         "abilities": {
-          "abilities": ["Drop"]
+          "abilities": [
+            "Drop"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -10371,7 +10598,9 @@
         "isEntry": false,
         "typeParameters": [],
         "parameters": [],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "set_voting_power": {
         "visibility": "Friend",
@@ -10421,14 +10650,18 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "total_voting_power": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
         "parameters": [],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       }
     }
   }

@@ -523,17 +523,17 @@ importers:
         specifier: ^1.98.3
         version: 1.98.3(bufferutil@4.0.8)(encoding@0.1.13)(typescript@5.9.2)(utf-8-validate@5.0.10)
       '@typemove/aptos':
-        specifier: ~1.13.2
-        version: 1.13.2(got@14.4.7)
+        specifier: ~1.13.3
+        version: 1.13.3(got@14.4.7)
       '@typemove/iota':
-        specifier: ~1.13.2
-        version: 1.13.2(typescript@5.9.2)
+        specifier: ~1.13.3
+        version: 1.13.3(typescript@5.9.2)
       '@typemove/move':
-        specifier: ~1.13.2
-        version: 1.13.2
+        specifier: ~1.13.3
+        version: 1.13.3
       '@typemove/sui':
-        specifier: ~1.13.2
-        version: 1.13.2(typescript@5.9.2)
+        specifier: ~1.13.3
+        version: 1.13.3(typescript@5.9.2)
       bs58:
         specifier: ^6.0.0
         version: 6.0.0
@@ -639,10 +639,6 @@ packages:
     engines: {node: '>=20.0.0'}
     peerDependencies:
       got: ^11.8.6
-
-  '@aptos-labs/ts-sdk@4.0.0':
-    resolution: {integrity: sha512-bRB9fT0t86btGyL/b5I4c3K1gZvldSvFv2KkV+1kEHt+yDbDrWI43wsfHLv0fFAVatCrH610NpLONMCnQSqQhA==}
-    engines: {node: '>=20.0.0'}
 
   '@aptos-labs/ts-sdk@5.1.0':
     resolution: {integrity: sha512-rhlOFbK+5/XACkIEBc7jBjGZ4QIQVIxTD2GGlf906n5Ljq5f7jAV6Fer+0y2pRaP3JgyNmE4czizA55C2lAONg==}
@@ -2499,19 +2495,19 @@ packages:
   '@tybys/wasm-util@0.10.0':
     resolution: {integrity: sha512-VyyPYFlOMNylG45GoAe0xDoLwWuowvf92F9kySqzYh8vmYm7D2u4iUJKa1tOUpS70Ku13ASrOkS4ScXFsTaCNQ==}
 
-  '@typemove/aptos@1.13.2':
-    resolution: {integrity: sha512-J/55/P7jJyvLbYZmIQKJYuPWdeMmcdtATtPLbccL4g5xrxL33aNA0bffK0U4q6l97M8EYIMC8rwx68qbDUFvBw==}
+  '@typemove/aptos@1.13.3':
+    resolution: {integrity: sha512-/cuPzHbC3lpd1RrFcr6CKhvPY+VJe1Xaw2EkT49ontc/eMKy/MSl+1RcrV8pn/aC36uyaVFIm0R81YI6mNLedw==}
     hasBin: true
 
-  '@typemove/iota@1.13.2':
-    resolution: {integrity: sha512-gR6yY/uX8dUNF/qjvm5gJB9qAKLiif3NBn7vv1HnmEKN/655zQpDAwTNo7fdmp4q5ImeAm/5vQ0RQiJI3pfxAw==}
+  '@typemove/iota@1.13.3':
+    resolution: {integrity: sha512-vffvcxgVOvfTDD5fBrVw5VkybdmNMZDC1gyZp6fH0eMTp4ycTPsibdMc9UAlE+HIhoklAYk7YENEzYGwLo9lqw==}
     hasBin: true
 
-  '@typemove/move@1.13.2':
-    resolution: {integrity: sha512-9UGejRQhRmIYwXYCjDX632GKeG6OgHRC/DOtkM2FKPKa/bifEqhFMIwQYFNW3SFW9shSuFYMW6LRS3Lh5OA1Hg==}
+  '@typemove/move@1.13.3':
+    resolution: {integrity: sha512-OePynkSvoH6JTBu52HGzh4ogtvS3jF95p64eBdZc+QOa+UgFP/cGxar1M68ZrSPsrPeK24ist2RF5WC3o1n4VQ==}
 
-  '@typemove/sui@1.13.2':
-    resolution: {integrity: sha512-jIDuJUYzud9SqgURVRaH5HMPze2QS8SM/ykjVCaFGCTnV0e08dk3OVbTzy80OI3l9JQS++yG1lOi2vH6jHFXyw==}
+  '@typemove/sui@1.13.3':
+    resolution: {integrity: sha512-v1psMgZzHGfZYnVrIhVyLik29jTLVWFeosYNBKgCmvSW0OUBOJ+Zk+GnrhR6XRJ3IfH1a3gAKTFcizyGeN5e/g==}
     hasBin: true
 
   '@types/bn.js@5.1.6':
@@ -3184,10 +3180,6 @@ packages:
 
   chalk@5.3.0:
     resolution: {integrity: sha512-dLitG79d+GV1Nb/VYcCDFivJeK1hiukt9QjRNVOsUtTy1rR1YJsmpGGTZ3qJos+uw7WmWF4wUwBd9jxjocFC2w==}
-    engines: {node: ^12.17.0 || ^14.13 || >=16.0.0}
-
-  chalk@5.4.1:
-    resolution: {integrity: sha512-zgVZuo2WcZgfUEmsn6eO3kINexW8RAE4maiQ8QNs8CtpPCSyMiYsULR3HQYkm3w8FIA3SberyMJMSldGsW+U3w==}
     engines: {node: ^12.17.0 || ^14.13 || >=16.0.0}
 
   chalk@5.6.0:
@@ -6943,22 +6935,6 @@ snapshots:
     dependencies:
       got: 14.4.7
 
-  '@aptos-labs/ts-sdk@4.0.0(got@14.4.7)':
-    dependencies:
-      '@aptos-labs/aptos-cli': 1.0.2
-      '@aptos-labs/aptos-client': 2.0.0(got@14.4.7)
-      '@noble/curves': 1.9.6
-      '@noble/hashes': 1.8.0
-      '@scure/bip32': 1.7.0
-      '@scure/bip39': 1.6.0
-      eventemitter3: 5.0.1
-      form-data: 4.0.0
-      js-base64: 3.7.7
-      jwt-decode: 4.0.0
-      poseidon-lite: 0.2.1
-    transitivePeerDependencies:
-      - got
-
   '@aptos-labs/ts-sdk@5.1.0(got@14.4.7)':
     dependencies:
       '@aptos-labs/aptos-cli': 1.0.2
@@ -8829,10 +8805,10 @@ snapshots:
       tslib: 2.8.1
     optional: true
 
-  '@typemove/aptos@1.13.2(got@14.4.7)':
+  '@typemove/aptos@1.13.3(got@14.4.7)':
     dependencies:
-      '@aptos-labs/ts-sdk': 4.0.0(got@14.4.7)
-      '@typemove/move': 1.13.2
+      '@aptos-labs/ts-sdk': 5.1.0(got@14.4.7)
+      '@typemove/move': 1.13.3
       chalk: 5.6.0
       commander: 14.0.0
       prettier: 3.5.3
@@ -8840,10 +8816,10 @@ snapshots:
     transitivePeerDependencies:
       - got
 
-  '@typemove/iota@1.13.2(typescript@5.9.2)':
+  '@typemove/iota@1.13.3(typescript@5.9.2)':
     dependencies:
       '@iota/iota-sdk': 1.6.1(typescript@5.9.2)
-      '@typemove/move': 1.13.2
+      '@typemove/move': 1.13.3
       chalk: 5.6.0
       commander: 14.0.0
       prettier: 3.5.3
@@ -8853,14 +8829,14 @@ snapshots:
       - '@gql.tada/vue-support'
       - typescript
 
-  '@typemove/move@1.13.2':
+  '@typemove/move@1.13.3':
     dependencies:
       radash: 12.1.0
 
-  '@typemove/sui@1.13.2(typescript@5.9.2)':
+  '@typemove/sui@1.13.3(typescript@5.9.2)':
     dependencies:
       '@mysten/sui': 1.38.0(typescript@5.9.2)
-      '@typemove/move': 1.13.2
+      '@typemove/move': 1.13.3
       chalk: 5.6.0
       commander: 14.0.0
       prettier: 3.5.3
@@ -9558,8 +9534,6 @@ snapshots:
       supports-color: 7.2.0
 
   chalk@5.3.0: {}
-
-  chalk@5.4.1: {}
 
   chalk@5.6.0: {}
 
@@ -11666,7 +11640,7 @@ snapshots:
   marked-terminal@7.1.0(marked@12.0.2):
     dependencies:
       ansi-escapes: 7.0.0
-      chalk: 5.4.1
+      chalk: 5.6.0
       cli-highlight: 2.1.11
       cli-table3: 0.6.5
       marked: 12.0.2

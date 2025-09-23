@@ -7,7 +7,10 @@
     "structs": {
       "GenesisChainParameters": {
         "abilities": {
-          "abilities": ["Copy", "Drop"]
+          "abilities": [
+            "Copy",
+            "Drop"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -63,7 +66,10 @@
       },
       "GenesisValidatorMetadata": {
         "abilities": {
-          "abilities": ["Copy", "Drop"]
+          "abilities": [
+            "Copy",
+            "Drop"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -174,7 +180,9 @@
                 "address": "0x1",
                 "module": "option",
                 "name": "Option",
-                "typeArguments": ["Address"]
+                "typeArguments": [
+                  "Address"
+                ]
               }
             }
           }
@@ -225,7 +233,9 @@
     "structs": {
       "StakeSubsidy": {
         "abilities": {
-          "abilities": ["Store"]
+          "abilities": [
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -379,7 +389,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "get_distribution_counter": {
         "visibility": "Friend",
@@ -397,7 +409,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       }
     }
   },
@@ -422,7 +436,10 @@
     "structs": {
       "FungibleStakedSui": {
         "abilities": {
-          "abilities": ["Store", "Key"]
+          "abilities": [
+            "Store",
+            "Key"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -456,7 +473,10 @@
       },
       "FungibleStakedSuiData": {
         "abilities": {
-          "abilities": ["Store", "Key"]
+          "abilities": [
+            "Store",
+            "Key"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -499,7 +519,11 @@
       },
       "FungibleStakedSuiDataKey": {
         "abilities": {
-          "abilities": ["Copy", "Drop", "Store"]
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -511,7 +535,11 @@
       },
       "PoolTokenExchangeRate": {
         "abilities": {
-          "abilities": ["Copy", "Drop", "Store"]
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -527,7 +555,10 @@
       },
       "StakedSui": {
         "abilities": {
-          "abilities": ["Store", "Key"]
+          "abilities": [
+            "Store",
+            "Key"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -581,7 +612,10 @@
       },
       "StakingPool": {
         "abilities": {
-          "abilities": ["Store", "Key"]
+          "abilities": [
+            "Store",
+            "Key"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -603,7 +637,9 @@
                 "address": "0x1",
                 "module": "option",
                 "name": "Option",
-                "typeArguments": ["U64"]
+                "typeArguments": [
+                  "U64"
+                ]
               }
             }
           },
@@ -614,7 +650,9 @@
                 "address": "0x1",
                 "module": "option",
                 "name": "Option",
-                "typeArguments": ["U64"]
+                "typeArguments": [
+                  "U64"
+                ]
               }
             }
           },
@@ -691,6 +729,22 @@
             }
           }
         ]
+      },
+      "UnderflowSuiBalance": {
+        "abilities": {
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "dummy_field",
+            "type": "Bool"
+          }
+        ]
       }
     },
     "exposedFunctions": {
@@ -735,7 +789,9 @@
               "address": "0x1",
               "module": "option",
               "name": "Option",
-              "typeArguments": ["U64"]
+              "typeArguments": [
+                "U64"
+              ]
             }
           }
         ]
@@ -767,7 +823,9 @@
           },
           "U64"
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "convert_to_fungible_staked_sui": {
         "visibility": "Friend",
@@ -950,7 +1008,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "is_equal_staking_metadata": {
         "visibility": "Public",
@@ -978,7 +1038,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "is_inactive": {
         "visibility": "Public",
@@ -996,7 +1058,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "is_preactive": {
         "visibility": "Public",
@@ -1014,7 +1078,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "join_fungible_staked_sui": {
         "visibility": "Public",
@@ -1111,7 +1177,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "pending_stake_withdraw_amount": {
         "visibility": "Public",
@@ -1129,7 +1197,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "pool_id": {
         "visibility": "Public",
@@ -1174,7 +1244,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "pool_token_exchange_rate_at_epoch": {
         "visibility": "Public",
@@ -1534,7 +1606,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "staked_sui_amount": {
         "visibility": "Public",
@@ -1552,7 +1626,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "sui_amount": {
         "visibility": "Public",
@@ -1570,7 +1646,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "sui_balance": {
         "visibility": "Public",
@@ -1588,7 +1666,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "withdraw_from_principal": {
         "visibility": "Friend",
@@ -1650,7 +1730,9 @@
     "structs": {
       "StorageFund": {
         "abilities": {
-          "abilities": ["Store"]
+          "abilities": [
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -1837,7 +1919,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "total_object_storage_rebates": {
         "visibility": "Public",
@@ -1855,7 +1939,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       }
     }
   },
@@ -1872,7 +1958,9 @@
     "structs": {
       "SuiSystemState": {
         "abilities": {
-          "abilities": ["Key"]
+          "abilities": [
+            "Key"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -1961,7 +2049,10 @@
               "address": "0x2",
               "module": "vec_map",
               "name": "VecMap",
-              "typeArguments": ["Address", "U64"]
+              "typeArguments": [
+                "Address",
+                "U64"
+              ]
             }
           }
         ]
@@ -2002,7 +2093,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "convert_to_fungible_staked_sui": {
         "visibility": "Public",
@@ -2337,7 +2430,9 @@
               "address": "0x1",
               "module": "option",
               "name": "Option",
-              "typeArguments": ["U64"]
+              "typeArguments": [
+                "U64"
+              ]
             }
           },
           "Address",
@@ -3412,7 +3507,9 @@
             }
           }
         ],
-        "return": ["Address"]
+        "return": [
+          "Address"
+        ]
       }
     }
   },
@@ -3433,7 +3530,9 @@
     "structs": {
       "SuiSystemStateInner": {
         "abilities": {
-          "abilities": ["Store"]
+          "abilities": [
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -3500,7 +3599,9 @@
                       "address": "0x2",
                       "module": "vec_set",
                       "name": "VecSet",
-                      "typeArguments": ["Address"]
+                      "typeArguments": [
+                        "Address"
+                      ]
                     }
                   }
                 ]
@@ -3589,7 +3690,9 @@
       },
       "SuiSystemStateInnerV2": {
         "abilities": {
-          "abilities": ["Store"]
+          "abilities": [
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -3656,7 +3759,9 @@
                       "address": "0x2",
                       "module": "vec_set",
                       "name": "VecSet",
-                      "typeArguments": ["Address"]
+                      "typeArguments": [
+                        "Address"
+                      ]
                     }
                   }
                 ]
@@ -3745,7 +3850,10 @@
       },
       "SystemEpochInfoEvent": {
         "abilities": {
-          "abilities": ["Copy", "Drop"]
+          "abilities": [
+            "Copy",
+            "Drop"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -3801,7 +3909,9 @@
       },
       "SystemParameters": {
         "abilities": {
-          "abilities": ["Store"]
+          "abilities": [
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -3848,7 +3958,9 @@
       },
       "SystemParametersV2": {
         "abilities": {
-          "abilities": ["Store"]
+          "abilities": [
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -3943,7 +4055,10 @@
               "address": "0x2",
               "module": "vec_map",
               "name": "VecMap",
-              "typeArguments": ["Address", "U64"]
+              "typeArguments": [
+                "Address",
+                "U64"
+              ]
             }
           }
         ]
@@ -4202,7 +4317,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "epoch_start_timestamp_ms": {
         "visibility": "Friend",
@@ -4220,14 +4337,18 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "genesis_system_state_version": {
         "visibility": "Friend",
         "isEntry": false,
         "typeParameters": [],
         "parameters": [],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "get_reporters_of": {
         "visibility": "Friend",
@@ -4252,7 +4373,9 @@
               "address": "0x2",
               "module": "vec_set",
               "name": "VecSet",
-              "typeArguments": ["Address"]
+              "typeArguments": [
+                "Address"
+              ]
             }
           }
         ]
@@ -4273,7 +4396,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "get_storage_fund_total_balance": {
         "visibility": "Friend",
@@ -4291,7 +4416,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "pool_exchange_rates": {
         "visibility": "Friend",
@@ -4358,7 +4485,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "redeem_fungible_staked_sui": {
         "visibility": "Friend",
@@ -4537,7 +4666,9 @@
               "address": "0x1",
               "module": "option",
               "name": "Option",
-              "typeArguments": ["U64"]
+              "typeArguments": [
+                "U64"
+              ]
             }
           },
           "Address",
@@ -4948,7 +5079,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "undo_report_validator": {
         "visibility": "Friend",
@@ -5594,7 +5727,9 @@
             }
           }
         ],
-        "return": ["Address"]
+        "return": [
+          "Address"
+        ]
       },
       "validator_stake_amount": {
         "visibility": "Friend",
@@ -5613,7 +5748,9 @@
           },
           "Address"
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "validator_staking_pool_id": {
         "visibility": "Friend",
@@ -5771,7 +5908,10 @@
     "structs": {
       "ConvertingToFungibleStakedSuiEvent": {
         "abilities": {
-          "abilities": ["Copy", "Drop"]
+          "abilities": [
+            "Copy",
+            "Drop"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -5802,7 +5942,10 @@
       },
       "RedeemingFungibleStakedSuiEvent": {
         "abilities": {
-          "abilities": ["Copy", "Drop"]
+          "abilities": [
+            "Copy",
+            "Drop"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -5829,7 +5972,10 @@
       },
       "StakingRequestEvent": {
         "abilities": {
-          "abilities": ["Copy", "Drop"]
+          "abilities": [
+            "Copy",
+            "Drop"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -5864,7 +6010,10 @@
       },
       "UnstakingRequestEvent": {
         "abilities": {
-          "abilities": ["Copy", "Drop"]
+          "abilities": [
+            "Copy",
+            "Drop"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -5907,7 +6056,9 @@
       },
       "Validator": {
         "abilities": {
-          "abilities": ["Store"]
+          "abilities": [
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -5983,7 +6134,9 @@
       },
       "ValidatorMetadata": {
         "abilities": {
-          "abilities": ["Store"]
+          "abilities": [
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -6311,7 +6464,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "convert_to_fungible_staked_sui": {
         "visibility": "Friend",
@@ -6475,7 +6630,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "get_staking_pool_ref": {
         "visibility": "Friend",
@@ -6561,7 +6718,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "is_preactive": {
         "visibility": "Public",
@@ -6579,7 +6738,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "metadata": {
         "visibility": "Public",
@@ -6904,7 +7065,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "next_epoch_network_address": {
         "visibility": "Public",
@@ -7264,7 +7427,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "pending_stake_withdraw_amount": {
         "visibility": "Public",
@@ -7282,7 +7447,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "pool_token_exchange_rate_at_epoch": {
         "visibility": "Public",
@@ -7782,7 +7949,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "staking_pool_id": {
         "visibility": "Public",
@@ -7827,7 +7996,9 @@
             }
           }
         ],
-        "return": ["Address"]
+        "return": [
+          "Address"
+        ]
       },
       "total_stake": {
         "visibility": "Public",
@@ -7845,7 +8016,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "total_stake_amount": {
         "visibility": "Public",
@@ -7863,7 +8036,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "update_candidate_network_address": {
         "visibility": "Friend",
@@ -8294,7 +8469,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "worker_address": {
         "visibility": "Public",
@@ -8372,7 +8549,10 @@
     "structs": {
       "UnverifiedValidatorOperationCap": {
         "abilities": {
-          "abilities": ["Store", "Key"]
+          "abilities": [
+            "Store",
+            "Key"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -8395,7 +8575,9 @@
       },
       "ValidatorOperationCap": {
         "abilities": {
-          "abilities": ["Drop"]
+          "abilities": [
+            "Drop"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -8529,7 +8711,10 @@
     "structs": {
       "ValidatorEpochInfoEvent": {
         "abilities": {
-          "abilities": ["Copy", "Drop"]
+          "abilities": [
+            "Copy",
+            "Drop"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -8586,7 +8771,10 @@
       },
       "ValidatorEpochInfoEventV2": {
         "abilities": {
-          "abilities": ["Copy", "Drop"]
+          "abilities": [
+            "Copy",
+            "Drop"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -8647,7 +8835,10 @@
       },
       "ValidatorJoinEvent": {
         "abilities": {
-          "abilities": ["Copy", "Drop"]
+          "abilities": [
+            "Copy",
+            "Drop"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -8674,7 +8865,10 @@
       },
       "ValidatorLeaveEvent": {
         "abilities": {
-          "abilities": ["Copy", "Drop"]
+          "abilities": [
+            "Copy",
+            "Drop"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -8705,7 +8899,9 @@
       },
       "ValidatorSet": {
         "abilities": {
-          "abilities": ["Store"]
+          "abilities": [
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -8829,7 +9025,10 @@
                 "address": "0x2",
                 "module": "vec_map",
                 "name": "VecMap",
-                "typeArguments": ["Address", "U64"]
+                "typeArguments": [
+                  "Address",
+                  "U64"
+                ]
               }
             }
           },
@@ -8848,7 +9047,11 @@
       },
       "VotingPowerAdmissionStartEpochKey": {
         "abilities": {
-          "abilities": ["Copy", "Drop", "Store"]
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -8979,7 +9182,9 @@
                       "address": "0x2",
                       "module": "vec_set",
                       "name": "VecSet",
-                      "typeArguments": ["Address"]
+                      "typeArguments": [
+                        "Address"
+                      ]
                     }
                   }
                 ]
@@ -9047,7 +9252,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "convert_to_fungible_staked_sui": {
         "visibility": "Friend",
@@ -9110,7 +9317,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "get_active_or_pending_or_candidate_validator_ref": {
         "visibility": "Friend",
@@ -9370,7 +9579,9 @@
           },
           "Address"
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "is_active_validator_by_sui_address": {
         "visibility": "Friend",
@@ -9389,7 +9600,9 @@
           },
           "Address"
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "is_at_risk_validator": {
         "visibility": "Friend",
@@ -9408,7 +9621,9 @@
           },
           "Address"
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "is_duplicate_validator": {
         "visibility": "Friend",
@@ -9438,7 +9653,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "is_inactive_validator": {
         "visibility": "Public",
@@ -9464,7 +9681,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "is_validator_candidate": {
         "visibility": "Public",
@@ -9483,7 +9702,9 @@
           },
           "Address"
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "new": {
         "visibility": "Friend",
@@ -9538,7 +9759,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "pool_exchange_rates": {
         "visibility": "Friend",
@@ -9963,7 +10186,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "total_stake": {
         "visibility": "Public",
@@ -9981,7 +10206,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "validator_address_by_pool_id": {
         "visibility": "Public",
@@ -10009,7 +10236,9 @@
             }
           }
         ],
-        "return": ["Address"]
+        "return": [
+          "Address"
+        ]
       },
       "validator_by_pool_id": {
         "visibility": "Friend",
@@ -10067,7 +10296,9 @@
           },
           "Address"
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "validator_staking_pool_id": {
         "visibility": "Public",
@@ -10114,7 +10345,9 @@
           },
           "Address"
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "validator_voting_power": {
         "visibility": "Public",
@@ -10133,7 +10366,9 @@
           },
           "Address"
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "verify_cap": {
         "visibility": "Friend",
@@ -10188,7 +10423,9 @@
     "structs": {
       "ValidatorWrapper": {
         "abilities": {
-          "abilities": ["Store"]
+          "abilities": [
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -10311,7 +10548,9 @@
     "structs": {
       "VotingPowerInfo": {
         "abilities": {
-          "abilities": ["Drop"]
+          "abilities": [
+            "Drop"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -10327,7 +10566,9 @@
       },
       "VotingPowerInfoV2": {
         "abilities": {
-          "abilities": ["Drop"]
+          "abilities": [
+            "Drop"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -10351,15 +10592,22 @@
         "visibility": "Friend",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U64", "U64"],
-        "return": ["U64"]
+        "parameters": [
+          "U64",
+          "U64"
+        ],
+        "return": [
+          "U64"
+        ]
       },
       "quorum_threshold": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
         "parameters": [],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "set_voting_power": {
         "visibility": "Friend",
@@ -10387,7 +10635,9 @@
         "isEntry": false,
         "typeParameters": [],
         "parameters": [],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       }
     }
   }
