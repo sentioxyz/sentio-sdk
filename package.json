@@ -39,7 +39,7 @@
   "engines": {
     "node": ">=22"
   },
-  "packageManager": "pnpm@10.15.1",
+  "packageManager": "pnpm@10.17.1",
   "pnpm": {
     "patchedDependencies": {
       "@coral-xyz/anchor@0.31.1": "patches/@coral-xyz__anchor@0.30.1.patch"

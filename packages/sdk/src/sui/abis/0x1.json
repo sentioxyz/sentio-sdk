@@ -11,7 +11,9 @@
         "isEntry": false,
         "typeParameters": [],
         "parameters": [],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       }
     }
   },
@@ -23,7 +25,11 @@
     "structs": {
       "Char": {
         "abilities": {
-          "abilities": ["Copy", "Drop", "Store"]
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -35,7 +41,11 @@
       },
       "String": {
         "abilities": {
-          "abilities": ["Copy", "Drop", "Store"]
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -65,7 +75,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "append": {
         "visibility": "Public",
@@ -131,13 +143,17 @@
             }
           }
         ],
-        "return": ["U8"]
+        "return": [
+          "U8"
+        ]
       },
       "char": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U8"],
+        "parameters": [
+          "U8"
+        ],
         "return": [
           {
             "Struct": {
@@ -175,7 +191,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "insert": {
         "visibility": "Public",
@@ -240,21 +258,31 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "is_printable_char": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U8"],
-        "return": ["Bool"]
+        "parameters": [
+          "U8"
+        ],
+        "return": [
+          "Bool"
+        ]
       },
       "is_valid_char": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U8"],
-        "return": ["Bool"]
+        "parameters": [
+          "U8"
+        ],
+        "return": [
+          "Bool"
+        ]
       },
       "length": {
         "visibility": "Public",
@@ -272,7 +300,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "pop_char": {
         "visibility": "Public",
@@ -499,7 +529,11 @@
     "structs": {
       "BitVector": {
         "abilities": {
-          "abilities": ["Copy", "Drop", "Store"]
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -534,7 +568,9 @@
           },
           "U64"
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "length": {
         "visibility": "Public",
@@ -552,7 +588,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "longest_set_sequence_starting_at": {
         "visibility": "Public",
@@ -571,13 +609,17 @@
           },
           "U64"
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "new": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U64"],
+        "parameters": [
+          "U64"
+        ],
         "return": [
           {
             "Struct": {
@@ -697,7 +739,11 @@
     "structs": {
       "FixedPoint32": {
         "abilities": {
-          "abilities": ["Copy", "Drop", "Store"]
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -713,7 +759,10 @@
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U64", "U64"],
+        "parameters": [
+          "U64",
+          "U64"
+        ],
         "return": [
           {
             "Struct": {
@@ -729,7 +778,9 @@
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U64"],
+        "parameters": [
+          "U64"
+        ],
         "return": [
           {
             "Struct": {
@@ -756,7 +807,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "get_raw_value": {
         "visibility": "Public",
@@ -772,7 +825,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "is_zero": {
         "visibility": "Public",
@@ -788,7 +843,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "multiply_u64": {
         "visibility": "Public",
@@ -805,7 +862,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       }
     }
   },
@@ -864,7 +923,11 @@
     "structs": {
       "Option": {
         "abilities": {
-          "abilities": ["Copy", "Drop", "Store"]
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
         },
         "typeParameters": [
           {
@@ -1017,7 +1080,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "destroy_none": {
         "visibility": "Public",
@@ -1076,7 +1141,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Drop"]
+            "abilities": [
+              "Drop"
+            ]
           }
         ],
         "parameters": [
@@ -1166,7 +1233,10 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Copy", "Drop"]
+            "abilities": [
+              "Copy",
+              "Drop"
+            ]
           }
         ],
         "parameters": [
@@ -1218,7 +1288,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "is_some": {
         "visibility": "Public",
@@ -1244,7 +1316,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "none": {
         "visibility": "Public",
@@ -1413,7 +1487,11 @@
     "structs": {
       "String": {
         "abilities": {
-          "abilities": ["Copy", "Drop", "Store"]
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -1573,7 +1651,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "insert": {
         "visibility": "Public",
@@ -1638,7 +1718,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "length": {
         "visibility": "Public",
@@ -1656,7 +1738,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "sub_string": {
         "visibility": "Public",
@@ -1800,7 +1884,11 @@
     "structs": {
       "TypeName": {
         "abilities": {
-          "abilities": ["Copy", "Drop", "Store"]
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -1902,6 +1990,19 @@
               }
             }
           }
+        ]
+      },
+      "defining_id": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [],
+        "return": [
+          "Address"
         ]
       },
       "get": {
@@ -2039,7 +2140,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "module_string": {
         "visibility": "Public",
@@ -2066,6 +2169,19 @@
               "typeArguments": []
             }
           }
+        ]
+      },
+      "original_id": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [],
+        "return": [
+          "Address"
         ]
       },
       "with_defining_ids": {
@@ -2121,56 +2237,91 @@
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U128"],
-        "return": ["U128"]
+        "parameters": [
+          "U128"
+        ],
+        "return": [
+          "U128"
+        ]
       },
       "diff": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U128", "U128"],
-        "return": ["U128"]
+        "parameters": [
+          "U128",
+          "U128"
+        ],
+        "return": [
+          "U128"
+        ]
       },
       "divide_and_round_up": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U128", "U128"],
-        "return": ["U128"]
+        "parameters": [
+          "U128",
+          "U128"
+        ],
+        "return": [
+          "U128"
+        ]
       },
       "max": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U128", "U128"],
-        "return": ["U128"]
+        "parameters": [
+          "U128",
+          "U128"
+        ],
+        "return": [
+          "U128"
+        ]
       },
       "min": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U128", "U128"],
-        "return": ["U128"]
+        "parameters": [
+          "U128",
+          "U128"
+        ],
+        "return": [
+          "U128"
+        ]
       },
       "pow": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U128", "U8"],
-        "return": ["U128"]
+        "parameters": [
+          "U128",
+          "U8"
+        ],
+        "return": [
+          "U128"
+        ]
       },
       "sqrt": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U128"],
-        "return": ["U128"]
+        "parameters": [
+          "U128"
+        ],
+        "return": [
+          "U128"
+        ]
       },
       "to_string": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U128"],
+        "parameters": [
+          "U128"
+        ],
         "return": [
           {
             "Struct": {
@@ -2186,14 +2337,18 @@
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U128"],
+        "parameters": [
+          "U128"
+        ],
         "return": [
           {
             "Struct": {
               "address": "0x1",
               "module": "option",
               "name": "Option",
-              "typeArguments": ["U16"]
+              "typeArguments": [
+                "U16"
+              ]
             }
           }
         ]
@@ -2202,14 +2357,18 @@
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U128"],
+        "parameters": [
+          "U128"
+        ],
         "return": [
           {
             "Struct": {
               "address": "0x1",
               "module": "option",
               "name": "Option",
-              "typeArguments": ["U32"]
+              "typeArguments": [
+                "U32"
+              ]
             }
           }
         ]
@@ -2218,14 +2377,18 @@
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U128"],
+        "parameters": [
+          "U128"
+        ],
         "return": [
           {
             "Struct": {
               "address": "0x1",
               "module": "option",
               "name": "Option",
-              "typeArguments": ["U64"]
+              "typeArguments": [
+                "U64"
+              ]
             }
           }
         ]
@@ -2234,14 +2397,18 @@
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U128"],
+        "parameters": [
+          "U128"
+        ],
         "return": [
           {
             "Struct": {
               "address": "0x1",
               "module": "option",
               "name": "Option",
-              "typeArguments": ["U8"]
+              "typeArguments": [
+                "U8"
+              ]
             }
           }
         ]
@@ -2259,56 +2426,91 @@
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U16"],
-        "return": ["U16"]
+        "parameters": [
+          "U16"
+        ],
+        "return": [
+          "U16"
+        ]
       },
       "diff": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U16", "U16"],
-        "return": ["U16"]
+        "parameters": [
+          "U16",
+          "U16"
+        ],
+        "return": [
+          "U16"
+        ]
       },
       "divide_and_round_up": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U16", "U16"],
-        "return": ["U16"]
+        "parameters": [
+          "U16",
+          "U16"
+        ],
+        "return": [
+          "U16"
+        ]
       },
       "max": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U16", "U16"],
-        "return": ["U16"]
+        "parameters": [
+          "U16",
+          "U16"
+        ],
+        "return": [
+          "U16"
+        ]
       },
       "min": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U16", "U16"],
-        "return": ["U16"]
+        "parameters": [
+          "U16",
+          "U16"
+        ],
+        "return": [
+          "U16"
+        ]
       },
       "pow": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U16", "U8"],
-        "return": ["U16"]
+        "parameters": [
+          "U16",
+          "U8"
+        ],
+        "return": [
+          "U16"
+        ]
       },
       "sqrt": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U16"],
-        "return": ["U16"]
+        "parameters": [
+          "U16"
+        ],
+        "return": [
+          "U16"
+        ]
       },
       "to_string": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U16"],
+        "parameters": [
+          "U16"
+        ],
         "return": [
           {
             "Struct": {
@@ -2324,14 +2526,18 @@
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U16"],
+        "parameters": [
+          "U16"
+        ],
         "return": [
           {
             "Struct": {
               "address": "0x1",
               "module": "option",
               "name": "Option",
-              "typeArguments": ["U8"]
+              "typeArguments": [
+                "U8"
+              ]
             }
           }
         ]
@@ -2349,49 +2555,80 @@
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U256"],
-        "return": ["U256"]
+        "parameters": [
+          "U256"
+        ],
+        "return": [
+          "U256"
+        ]
       },
       "diff": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U256", "U256"],
-        "return": ["U256"]
+        "parameters": [
+          "U256",
+          "U256"
+        ],
+        "return": [
+          "U256"
+        ]
       },
       "divide_and_round_up": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U256", "U256"],
-        "return": ["U256"]
+        "parameters": [
+          "U256",
+          "U256"
+        ],
+        "return": [
+          "U256"
+        ]
       },
       "max": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U256", "U256"],
-        "return": ["U256"]
+        "parameters": [
+          "U256",
+          "U256"
+        ],
+        "return": [
+          "U256"
+        ]
       },
       "min": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U256", "U256"],
-        "return": ["U256"]
+        "parameters": [
+          "U256",
+          "U256"
+        ],
+        "return": [
+          "U256"
+        ]
       },
       "pow": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U256", "U8"],
-        "return": ["U256"]
+        "parameters": [
+          "U256",
+          "U8"
+        ],
+        "return": [
+          "U256"
+        ]
       },
       "to_string": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U256"],
+        "parameters": [
+          "U256"
+        ],
         "return": [
           {
             "Struct": {
@@ -2407,14 +2644,18 @@
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U256"],
+        "parameters": [
+          "U256"
+        ],
         "return": [
           {
             "Struct": {
               "address": "0x1",
               "module": "option",
               "name": "Option",
-              "typeArguments": ["U128"]
+              "typeArguments": [
+                "U128"
+              ]
             }
           }
         ]
@@ -2423,14 +2664,18 @@
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U256"],
+        "parameters": [
+          "U256"
+        ],
         "return": [
           {
             "Struct": {
               "address": "0x1",
               "module": "option",
               "name": "Option",
-              "typeArguments": ["U16"]
+              "typeArguments": [
+                "U16"
+              ]
             }
           }
         ]
@@ -2439,14 +2684,18 @@
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U256"],
+        "parameters": [
+          "U256"
+        ],
         "return": [
           {
             "Struct": {
               "address": "0x1",
               "module": "option",
               "name": "Option",
-              "typeArguments": ["U32"]
+              "typeArguments": [
+                "U32"
+              ]
             }
           }
         ]
@@ -2455,14 +2704,18 @@
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U256"],
+        "parameters": [
+          "U256"
+        ],
         "return": [
           {
             "Struct": {
               "address": "0x1",
               "module": "option",
               "name": "Option",
-              "typeArguments": ["U64"]
+              "typeArguments": [
+                "U64"
+              ]
             }
           }
         ]
@@ -2471,14 +2724,18 @@
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U256"],
+        "parameters": [
+          "U256"
+        ],
         "return": [
           {
             "Struct": {
               "address": "0x1",
               "module": "option",
               "name": "Option",
-              "typeArguments": ["U8"]
+              "typeArguments": [
+                "U8"
+              ]
             }
           }
         ]
@@ -2496,56 +2753,91 @@
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U32"],
-        "return": ["U32"]
+        "parameters": [
+          "U32"
+        ],
+        "return": [
+          "U32"
+        ]
       },
       "diff": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U32", "U32"],
-        "return": ["U32"]
+        "parameters": [
+          "U32",
+          "U32"
+        ],
+        "return": [
+          "U32"
+        ]
       },
       "divide_and_round_up": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U32", "U32"],
-        "return": ["U32"]
+        "parameters": [
+          "U32",
+          "U32"
+        ],
+        "return": [
+          "U32"
+        ]
       },
       "max": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U32", "U32"],
-        "return": ["U32"]
+        "parameters": [
+          "U32",
+          "U32"
+        ],
+        "return": [
+          "U32"
+        ]
       },
       "min": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U32", "U32"],
-        "return": ["U32"]
+        "parameters": [
+          "U32",
+          "U32"
+        ],
+        "return": [
+          "U32"
+        ]
       },
       "pow": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U32", "U8"],
-        "return": ["U32"]
+        "parameters": [
+          "U32",
+          "U8"
+        ],
+        "return": [
+          "U32"
+        ]
       },
       "sqrt": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U32"],
-        "return": ["U32"]
+        "parameters": [
+          "U32"
+        ],
+        "return": [
+          "U32"
+        ]
       },
       "to_string": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U32"],
+        "parameters": [
+          "U32"
+        ],
         "return": [
           {
             "Struct": {
@@ -2561,14 +2853,18 @@
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U32"],
+        "parameters": [
+          "U32"
+        ],
         "return": [
           {
             "Struct": {
               "address": "0x1",
               "module": "option",
               "name": "Option",
-              "typeArguments": ["U16"]
+              "typeArguments": [
+                "U16"
+              ]
             }
           }
         ]
@@ -2577,14 +2873,18 @@
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U32"],
+        "parameters": [
+          "U32"
+        ],
         "return": [
           {
             "Struct": {
               "address": "0x1",
               "module": "option",
               "name": "Option",
-              "typeArguments": ["U8"]
+              "typeArguments": [
+                "U8"
+              ]
             }
           }
         ]
@@ -2602,56 +2902,91 @@
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U64"],
-        "return": ["U64"]
+        "parameters": [
+          "U64"
+        ],
+        "return": [
+          "U64"
+        ]
       },
       "diff": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U64", "U64"],
-        "return": ["U64"]
+        "parameters": [
+          "U64",
+          "U64"
+        ],
+        "return": [
+          "U64"
+        ]
       },
       "divide_and_round_up": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U64", "U64"],
-        "return": ["U64"]
+        "parameters": [
+          "U64",
+          "U64"
+        ],
+        "return": [
+          "U64"
+        ]
       },
       "max": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U64", "U64"],
-        "return": ["U64"]
+        "parameters": [
+          "U64",
+          "U64"
+        ],
+        "return": [
+          "U64"
+        ]
       },
       "min": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U64", "U64"],
-        "return": ["U64"]
+        "parameters": [
+          "U64",
+          "U64"
+        ],
+        "return": [
+          "U64"
+        ]
       },
       "pow": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U64", "U8"],
-        "return": ["U64"]
+        "parameters": [
+          "U64",
+          "U8"
+        ],
+        "return": [
+          "U64"
+        ]
       },
       "sqrt": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U64"],
-        "return": ["U64"]
+        "parameters": [
+          "U64"
+        ],
+        "return": [
+          "U64"
+        ]
       },
       "to_string": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U64"],
+        "parameters": [
+          "U64"
+        ],
         "return": [
           {
             "Struct": {
@@ -2667,14 +3002,18 @@
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U64"],
+        "parameters": [
+          "U64"
+        ],
         "return": [
           {
             "Struct": {
               "address": "0x1",
               "module": "option",
               "name": "Option",
-              "typeArguments": ["U16"]
+              "typeArguments": [
+                "U16"
+              ]
             }
           }
         ]
@@ -2683,14 +3022,18 @@
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U64"],
+        "parameters": [
+          "U64"
+        ],
         "return": [
           {
             "Struct": {
               "address": "0x1",
               "module": "option",
               "name": "Option",
-              "typeArguments": ["U32"]
+              "typeArguments": [
+                "U32"
+              ]
             }
           }
         ]
@@ -2699,14 +3042,18 @@
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U64"],
+        "parameters": [
+          "U64"
+        ],
         "return": [
           {
             "Struct": {
               "address": "0x1",
               "module": "option",
               "name": "Option",
-              "typeArguments": ["U8"]
+              "typeArguments": [
+                "U8"
+              ]
             }
           }
         ]
@@ -2724,56 +3071,91 @@
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U8"],
-        "return": ["U8"]
+        "parameters": [
+          "U8"
+        ],
+        "return": [
+          "U8"
+        ]
       },
       "diff": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U8", "U8"],
-        "return": ["U8"]
+        "parameters": [
+          "U8",
+          "U8"
+        ],
+        "return": [
+          "U8"
+        ]
       },
       "divide_and_round_up": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U8", "U8"],
-        "return": ["U8"]
+        "parameters": [
+          "U8",
+          "U8"
+        ],
+        "return": [
+          "U8"
+        ]
       },
       "max": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U8", "U8"],
-        "return": ["U8"]
+        "parameters": [
+          "U8",
+          "U8"
+        ],
+        "return": [
+          "U8"
+        ]
       },
       "min": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U8", "U8"],
-        "return": ["U8"]
+        "parameters": [
+          "U8",
+          "U8"
+        ],
+        "return": [
+          "U8"
+        ]
       },
       "pow": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U8", "U8"],
-        "return": ["U8"]
+        "parameters": [
+          "U8",
+          "U8"
+        ],
+        "return": [
+          "U8"
+        ]
       },
       "sqrt": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U8"],
-        "return": ["U8"]
+        "parameters": [
+          "U8"
+        ],
+        "return": [
+          "U8"
+        ]
       },
       "to_string": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U8"],
+        "parameters": [
+          "U8"
+        ],
         "return": [
           {
             "Struct": {
@@ -2795,7 +3177,11 @@
     "structs": {
       "UQ32_32": {
         "abilities": {
-          "abilities": ["Copy", "Drop", "Store"]
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -2877,7 +3263,9 @@
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U32"],
+        "parameters": [
+          "U32"
+        ],
         "return": [
           {
             "Struct": {
@@ -2893,7 +3281,10 @@
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U64", "U64"],
+        "parameters": [
+          "U64",
+          "U64"
+        ],
         "return": [
           {
             "Struct": {
@@ -2909,7 +3300,9 @@
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U64"],
+        "parameters": [
+          "U64"
+        ],
         "return": [
           {
             "Struct": {
@@ -2943,7 +3336,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "gt": {
         "visibility": "Public",
@@ -2967,7 +3362,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "int_div": {
         "visibility": "Public",
@@ -2984,7 +3381,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "int_mul": {
         "visibility": "Public",
@@ -3001,7 +3400,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "le": {
         "visibility": "Public",
@@ -3025,7 +3426,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "lt": {
         "visibility": "Public",
@@ -3049,7 +3452,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "mul": {
         "visibility": "Public",
@@ -3131,7 +3536,9 @@
             }
           }
         ],
-        "return": ["U32"]
+        "return": [
+          "U32"
+        ]
       },
       "to_raw": {
         "visibility": "Public",
@@ -3147,7 +3554,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       }
     }
   },
@@ -3159,7 +3568,11 @@
     "structs": {
       "UQ64_64": {
         "abilities": {
-          "abilities": ["Copy", "Drop", "Store"]
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
         },
         "typeParameters": [],
         "fields": [
@@ -3241,7 +3654,9 @@
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U64"],
+        "parameters": [
+          "U64"
+        ],
         "return": [
           {
             "Struct": {
@@ -3257,7 +3672,10 @@
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U128", "U128"],
+        "parameters": [
+          "U128",
+          "U128"
+        ],
         "return": [
           {
             "Struct": {
@@ -3273,7 +3691,9 @@
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],
-        "parameters": ["U128"],
+        "parameters": [
+          "U128"
+        ],
         "return": [
           {
             "Struct": {
@@ -3307,7 +3727,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "gt": {
         "visibility": "Public",
@@ -3331,7 +3753,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "int_div": {
         "visibility": "Public",
@@ -3348,7 +3772,9 @@
             }
           }
         ],
-        "return": ["U128"]
+        "return": [
+          "U128"
+        ]
       },
       "int_mul": {
         "visibility": "Public",
@@ -3365,7 +3791,9 @@
             }
           }
         ],
-        "return": ["U128"]
+        "return": [
+          "U128"
+        ]
       },
       "le": {
         "visibility": "Public",
@@ -3389,7 +3817,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "lt": {
         "visibility": "Public",
@@ -3413,7 +3843,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "mul": {
         "visibility": "Public",
@@ -3495,7 +3927,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "to_raw": {
         "visibility": "Public",
@@ -3511,7 +3945,9 @@
             }
           }
         ],
-        "return": ["U128"]
+        "return": [
+          "U128"
+        ]
       }
     }
   },
@@ -3620,7 +4056,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "destroy_empty": {
         "visibility": "Public",
@@ -3703,7 +4141,10 @@
             }
           }
         ],
-        "return": ["Bool", "U64"]
+        "return": [
+          "Bool",
+          "U64"
+        ]
       },
       "insert": {
         "visibility": "Public",
@@ -3745,7 +4186,9 @@
             }
           }
         ],
-        "return": ["Bool"]
+        "return": [
+          "Bool"
+        ]
       },
       "length": {
         "visibility": "Public",
@@ -3764,7 +4207,9 @@
             }
           }
         ],
-        "return": ["U64"]
+        "return": [
+          "U64"
+        ]
       },
       "pop_back": {
         "visibility": "Public",
@@ -3880,7 +4325,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Drop"]
+            "abilities": [
+              "Drop"
+            ]
           }
         ],
         "parameters": [
@@ -3949,7 +4396,9 @@
         "isEntry": false,
         "typeParameters": [
           {
-            "abilities": ["Drop"]
+            "abilities": [
+              "Drop"
+            ]
           }
         ],
         "parameters": [

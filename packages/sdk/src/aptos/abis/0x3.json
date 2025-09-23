@@ -12,7 +12,10 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&mut 0x3::token::Token", "0x3::token::Token"],
+          "params": [
+            "&mut 0x3::token::Token",
+            "0x3::token::Token"
+          ],
           "return": []
         },
         {
@@ -21,7 +24,14 @@
           "is_entry": true,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&signer", "address", "0x1::string::String", "0x1::string::String", "u64", "u64"],
+          "params": [
+            "&signer",
+            "address",
+            "0x1::string::String",
+            "0x1::string::String",
+            "u64",
+            "u64"
+          ],
           "return": []
         },
         {
@@ -30,7 +40,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&signer", "0x3::token::TokenId", "address", "u64"],
+          "params": [
+            "&signer",
+            "0x3::token::TokenId",
+            "address",
+            "u64"
+          ],
           "return": []
         },
         {
@@ -39,8 +54,13 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["address", "0x3::token::TokenId"],
-          "return": ["u64"]
+          "params": [
+            "address",
+            "0x3::token::TokenId"
+          ],
+          "return": [
+            "u64"
+          ]
         },
         {
           "name": "burn_by_creator",
@@ -48,7 +68,14 @@
           "is_entry": true,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&signer", "address", "0x1::string::String", "0x1::string::String", "u64", "u64"],
+          "params": [
+            "&signer",
+            "address",
+            "0x1::string::String",
+            "0x1::string::String",
+            "u64",
+            "u64"
+          ],
           "return": []
         },
         {
@@ -57,8 +84,13 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["address", "0x1::string::String"],
-          "return": ["bool"]
+          "params": [
+            "address",
+            "0x1::string::String"
+          ],
+          "return": [
+            "bool"
+          ]
         },
         {
           "name": "check_tokendata_exists",
@@ -66,8 +98,14 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["address", "0x1::string::String", "0x1::string::String"],
-          "return": ["bool"]
+          "params": [
+            "address",
+            "0x1::string::String",
+            "0x1::string::String"
+          ],
+          "return": [
+            "bool"
+          ]
         },
         {
           "name": "create_collection",
@@ -91,8 +129,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&vector<bool>"],
-          "return": ["0x3::token::CollectionMutabilityConfig"]
+          "params": [
+            "&vector<bool>"
+          ],
+          "return": [
+            "0x3::token::CollectionMutabilityConfig"
+          ]
         },
         {
           "name": "create_collection_script",
@@ -116,8 +158,14 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["u64", "u64", "address"],
-          "return": ["0x3::token::Royalty"]
+          "params": [
+            "u64",
+            "u64",
+            "address"
+          ],
+          "return": [
+            "0x3::token::Royalty"
+          ]
         },
         {
           "name": "create_token_data_id",
@@ -125,8 +173,14 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["address", "0x1::string::String", "0x1::string::String"],
-          "return": ["0x3::token::TokenDataId"]
+          "params": [
+            "address",
+            "0x1::string::String",
+            "0x1::string::String"
+          ],
+          "return": [
+            "0x3::token::TokenDataId"
+          ]
         },
         {
           "name": "create_token_id",
@@ -134,8 +188,13 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["0x3::token::TokenDataId", "u64"],
-          "return": ["0x3::token::TokenId"]
+          "params": [
+            "0x3::token::TokenDataId",
+            "u64"
+          ],
+          "return": [
+            "0x3::token::TokenId"
+          ]
         },
         {
           "name": "create_token_id_raw",
@@ -143,8 +202,15 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["address", "0x1::string::String", "0x1::string::String", "u64"],
-          "return": ["0x3::token::TokenId"]
+          "params": [
+            "address",
+            "0x1::string::String",
+            "0x1::string::String",
+            "u64"
+          ],
+          "return": [
+            "0x3::token::TokenId"
+          ]
         },
         {
           "name": "create_token_mutability_config",
@@ -152,8 +218,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&vector<bool>"],
-          "return": ["0x3::token::TokenMutabilityConfig"]
+          "params": [
+            "&vector<bool>"
+          ],
+          "return": [
+            "0x3::token::TokenMutabilityConfig"
+          ]
         },
         {
           "name": "create_token_script",
@@ -200,7 +270,9 @@
             "vector<vector<u8>>",
             "vector<0x1::string::String>"
           ],
-          "return": ["0x3::token::TokenDataId"]
+          "return": [
+            "0x3::token::TokenDataId"
+          ]
         },
         {
           "name": "create_withdraw_capability",
@@ -208,8 +280,15 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&signer", "0x3::token::TokenId", "u64", "u64"],
-          "return": ["0x3::token::WithdrawCapability"]
+          "params": [
+            "&signer",
+            "0x3::token::TokenId",
+            "u64",
+            "u64"
+          ],
+          "return": [
+            "0x3::token::WithdrawCapability"
+          ]
         },
         {
           "name": "token_id",
@@ -217,8 +296,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x3::token::Token"],
-          "return": ["&0x3::token::TokenId"]
+          "params": [
+            "&0x3::token::Token"
+          ],
+          "return": [
+            "&0x3::token::TokenId"
+          ]
         },
         {
           "name": "deposit_token",
@@ -226,7 +309,10 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&signer", "0x3::token::Token"],
+          "params": [
+            "&signer",
+            "0x3::token::Token"
+          ],
           "return": []
         },
         {
@@ -235,7 +321,10 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["address", "0x3::token::Token"],
+          "params": [
+            "address",
+            "0x3::token::Token"
+          ],
           "return": []
         },
         {
@@ -244,7 +333,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&signer", "&signer", "0x3::token::TokenId", "u64"],
+          "params": [
+            "&signer",
+            "&signer",
+            "0x3::token::TokenId",
+            "u64"
+          ],
           "return": []
         },
         {
@@ -253,7 +347,15 @@
           "is_entry": true,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&signer", "&signer", "address", "0x1::string::String", "0x1::string::String", "u64", "u64"],
+          "params": [
+            "&signer",
+            "&signer",
+            "address",
+            "0x1::string::String",
+            "0x1::string::String",
+            "u64",
+            "u64"
+          ],
           "return": []
         },
         {
@@ -262,8 +364,13 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["address", "0x1::string::String"],
-          "return": ["0x1::string::String"]
+          "params": [
+            "address",
+            "0x1::string::String"
+          ],
+          "return": [
+            "0x1::string::String"
+          ]
         },
         {
           "name": "get_collection_maximum",
@@ -271,8 +378,13 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["address", "0x1::string::String"],
-          "return": ["u64"]
+          "params": [
+            "address",
+            "0x1::string::String"
+          ],
+          "return": [
+            "u64"
+          ]
         },
         {
           "name": "get_collection_mutability_config",
@@ -280,8 +392,13 @@
           "is_entry": false,
           "is_view": true,
           "generic_type_params": [],
-          "params": ["address", "0x1::string::String"],
-          "return": ["0x3::token::CollectionMutabilityConfig"]
+          "params": [
+            "address",
+            "0x1::string::String"
+          ],
+          "return": [
+            "0x3::token::CollectionMutabilityConfig"
+          ]
         },
         {
           "name": "get_collection_mutability_description",
@@ -289,8 +406,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x3::token::CollectionMutabilityConfig"],
-          "return": ["bool"]
+          "params": [
+            "&0x3::token::CollectionMutabilityConfig"
+          ],
+          "return": [
+            "bool"
+          ]
         },
         {
           "name": "get_collection_mutability_maximum",
@@ -298,8 +419,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x3::token::CollectionMutabilityConfig"],
-          "return": ["bool"]
+          "params": [
+            "&0x3::token::CollectionMutabilityConfig"
+          ],
+          "return": [
+            "bool"
+          ]
         },
         {
           "name": "get_collection_mutability_uri",
@@ -307,8 +432,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x3::token::CollectionMutabilityConfig"],
-          "return": ["bool"]
+          "params": [
+            "&0x3::token::CollectionMutabilityConfig"
+          ],
+          "return": [
+            "bool"
+          ]
         },
         {
           "name": "get_collection_supply",
@@ -316,8 +445,13 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["address", "0x1::string::String"],
-          "return": ["0x1::option::Option<u64>"]
+          "params": [
+            "address",
+            "0x1::string::String"
+          ],
+          "return": [
+            "0x1::option::Option<u64>"
+          ]
         },
         {
           "name": "get_collection_uri",
@@ -325,8 +459,13 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["address", "0x1::string::String"],
-          "return": ["0x1::string::String"]
+          "params": [
+            "address",
+            "0x1::string::String"
+          ],
+          "return": [
+            "0x1::string::String"
+          ]
         },
         {
           "name": "get_direct_transfer",
@@ -334,8 +473,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["address"],
-          "return": ["bool"]
+          "params": [
+            "address"
+          ],
+          "return": [
+            "bool"
+          ]
         },
         {
           "name": "get_property_map",
@@ -343,8 +486,13 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["address", "0x3::token::TokenId"],
-          "return": ["0x3::property_map::PropertyMap"]
+          "params": [
+            "address",
+            "0x3::token::TokenId"
+          ],
+          "return": [
+            "0x3::property_map::PropertyMap"
+          ]
         },
         {
           "name": "get_royalty",
@@ -352,8 +500,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["0x3::token::TokenId"],
-          "return": ["0x3::token::Royalty"]
+          "params": [
+            "0x3::token::TokenId"
+          ],
+          "return": [
+            "0x3::token::Royalty"
+          ]
         },
         {
           "name": "get_royalty_denominator",
@@ -361,8 +513,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x3::token::Royalty"],
-          "return": ["u64"]
+          "params": [
+            "&0x3::token::Royalty"
+          ],
+          "return": [
+            "u64"
+          ]
         },
         {
           "name": "get_royalty_numerator",
@@ -370,8 +526,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x3::token::Royalty"],
-          "return": ["u64"]
+          "params": [
+            "&0x3::token::Royalty"
+          ],
+          "return": [
+            "u64"
+          ]
         },
         {
           "name": "get_royalty_payee",
@@ -379,8 +539,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x3::token::Royalty"],
-          "return": ["address"]
+          "params": [
+            "&0x3::token::Royalty"
+          ],
+          "return": [
+            "address"
+          ]
         },
         {
           "name": "get_token_amount",
@@ -388,8 +552,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x3::token::Token"],
-          "return": ["u64"]
+          "params": [
+            "&0x3::token::Token"
+          ],
+          "return": [
+            "u64"
+          ]
         },
         {
           "name": "get_token_data_id_fields",
@@ -397,8 +565,14 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x3::token::TokenDataId"],
-          "return": ["address", "0x1::string::String", "0x1::string::String"]
+          "params": [
+            "&0x3::token::TokenDataId"
+          ],
+          "return": [
+            "address",
+            "0x1::string::String",
+            "0x1::string::String"
+          ]
         },
         {
           "name": "get_token_id",
@@ -406,8 +580,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x3::token::Token"],
-          "return": ["0x3::token::TokenId"]
+          "params": [
+            "&0x3::token::Token"
+          ],
+          "return": [
+            "0x3::token::TokenId"
+          ]
         },
         {
           "name": "get_token_id_fields",
@@ -415,8 +593,15 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x3::token::TokenId"],
-          "return": ["address", "0x1::string::String", "0x1::string::String", "u64"]
+          "params": [
+            "&0x3::token::TokenId"
+          ],
+          "return": [
+            "address",
+            "0x1::string::String",
+            "0x1::string::String",
+            "u64"
+          ]
         },
         {
           "name": "get_token_mutability_default_properties",
@@ -424,8 +609,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x3::token::TokenMutabilityConfig"],
-          "return": ["bool"]
+          "params": [
+            "&0x3::token::TokenMutabilityConfig"
+          ],
+          "return": [
+            "bool"
+          ]
         },
         {
           "name": "get_token_mutability_description",
@@ -433,8 +622,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x3::token::TokenMutabilityConfig"],
-          "return": ["bool"]
+          "params": [
+            "&0x3::token::TokenMutabilityConfig"
+          ],
+          "return": [
+            "bool"
+          ]
         },
         {
           "name": "get_token_mutability_maximum",
@@ -442,8 +635,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x3::token::TokenMutabilityConfig"],
-          "return": ["bool"]
+          "params": [
+            "&0x3::token::TokenMutabilityConfig"
+          ],
+          "return": [
+            "bool"
+          ]
         },
         {
           "name": "get_token_mutability_royalty",
@@ -451,8 +648,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x3::token::TokenMutabilityConfig"],
-          "return": ["bool"]
+          "params": [
+            "&0x3::token::TokenMutabilityConfig"
+          ],
+          "return": [
+            "bool"
+          ]
         },
         {
           "name": "get_token_mutability_uri",
@@ -460,8 +661,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x3::token::TokenMutabilityConfig"],
-          "return": ["bool"]
+          "params": [
+            "&0x3::token::TokenMutabilityConfig"
+          ],
+          "return": [
+            "bool"
+          ]
         },
         {
           "name": "get_token_supply",
@@ -469,8 +674,13 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["address", "0x3::token::TokenDataId"],
-          "return": ["0x1::option::Option<u64>"]
+          "params": [
+            "address",
+            "0x3::token::TokenDataId"
+          ],
+          "return": [
+            "0x1::option::Option<u64>"
+          ]
         },
         {
           "name": "get_tokendata_description",
@@ -478,8 +688,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["0x3::token::TokenDataId"],
-          "return": ["0x1::string::String"]
+          "params": [
+            "0x3::token::TokenDataId"
+          ],
+          "return": [
+            "0x1::string::String"
+          ]
         },
         {
           "name": "get_tokendata_id",
@@ -487,8 +701,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["0x3::token::TokenId"],
-          "return": ["0x3::token::TokenDataId"]
+          "params": [
+            "0x3::token::TokenId"
+          ],
+          "return": [
+            "0x3::token::TokenDataId"
+          ]
         },
         {
           "name": "get_tokendata_largest_property_version",
@@ -496,8 +714,13 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["address", "0x3::token::TokenDataId"],
-          "return": ["u64"]
+          "params": [
+            "address",
+            "0x3::token::TokenDataId"
+          ],
+          "return": [
+            "u64"
+          ]
         },
         {
           "name": "get_tokendata_maximum",
@@ -505,8 +728,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["0x3::token::TokenDataId"],
-          "return": ["u64"]
+          "params": [
+            "0x3::token::TokenDataId"
+          ],
+          "return": [
+            "u64"
+          ]
         },
         {
           "name": "get_tokendata_mutability_config",
@@ -514,8 +741,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["0x3::token::TokenDataId"],
-          "return": ["0x3::token::TokenMutabilityConfig"]
+          "params": [
+            "0x3::token::TokenDataId"
+          ],
+          "return": [
+            "0x3::token::TokenMutabilityConfig"
+          ]
         },
         {
           "name": "get_tokendata_royalty",
@@ -523,8 +754,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["0x3::token::TokenDataId"],
-          "return": ["0x3::token::Royalty"]
+          "params": [
+            "0x3::token::TokenDataId"
+          ],
+          "return": [
+            "0x3::token::Royalty"
+          ]
         },
         {
           "name": "get_tokendata_uri",
@@ -532,8 +767,13 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["address", "0x3::token::TokenDataId"],
-          "return": ["0x1::string::String"]
+          "params": [
+            "address",
+            "0x3::token::TokenDataId"
+          ],
+          "return": [
+            "0x1::string::String"
+          ]
         },
         {
           "name": "has_token_store",
@@ -541,8 +781,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["address"],
-          "return": ["bool"]
+          "params": [
+            "address"
+          ],
+          "return": [
+            "bool"
+          ]
         },
         {
           "name": "initialize_token",
@@ -550,7 +794,10 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&signer", "0x3::token::TokenId"],
+          "params": [
+            "&signer",
+            "0x3::token::TokenId"
+          ],
           "return": []
         },
         {
@@ -559,7 +806,9 @@
           "is_entry": true,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&signer"],
+          "params": [
+            "&signer"
+          ],
           "return": []
         },
         {
@@ -568,7 +817,9 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&signer"],
+          "params": [
+            "&signer"
+          ],
           "return": []
         },
         {
@@ -577,7 +828,13 @@
           "is_entry": true,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&signer", "address", "0x1::string::String", "0x1::string::String", "u64"],
+          "params": [
+            "&signer",
+            "address",
+            "0x1::string::String",
+            "0x1::string::String",
+            "u64"
+          ],
           "return": []
         },
         {
@@ -586,8 +843,14 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&signer", "0x3::token::TokenDataId", "u64"],
-          "return": ["0x3::token::TokenId"]
+          "params": [
+            "&signer",
+            "0x3::token::TokenDataId",
+            "u64"
+          ],
+          "return": [
+            "0x3::token::TokenId"
+          ]
         },
         {
           "name": "mint_token_to",
@@ -595,7 +858,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&signer", "address", "0x3::token::TokenDataId", "u64"],
+          "params": [
+            "&signer",
+            "address",
+            "0x3::token::TokenDataId",
+            "u64"
+          ],
           "return": []
         },
         {
@@ -604,7 +872,11 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&signer", "0x1::string::String", "0x1::string::String"],
+          "params": [
+            "&signer",
+            "0x1::string::String",
+            "0x1::string::String"
+          ],
           "return": []
         },
         {
@@ -613,7 +885,11 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&signer", "0x1::string::String", "u64"],
+          "params": [
+            "&signer",
+            "0x1::string::String",
+            "u64"
+          ],
           "return": []
         },
         {
@@ -622,7 +898,11 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&signer", "0x1::string::String", "0x1::string::String"],
+          "params": [
+            "&signer",
+            "0x1::string::String",
+            "0x1::string::String"
+          ],
           "return": []
         },
         {
@@ -639,7 +919,9 @@
             "vector<vector<u8>>",
             "vector<0x1::string::String>"
           ],
-          "return": ["0x3::token::TokenId"]
+          "return": [
+            "0x3::token::TokenId"
+          ]
         },
         {
           "name": "mutate_token_properties",
@@ -667,7 +949,11 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&signer", "0x3::token::TokenDataId", "0x1::string::String"],
+          "params": [
+            "&signer",
+            "0x3::token::TokenDataId",
+            "0x1::string::String"
+          ],
           "return": []
         },
         {
@@ -676,7 +962,11 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&signer", "0x3::token::TokenDataId", "u64"],
+          "params": [
+            "&signer",
+            "0x3::token::TokenDataId",
+            "u64"
+          ],
           "return": []
         },
         {
@@ -700,7 +990,11 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&signer", "0x3::token::TokenDataId", "0x3::token::Royalty"],
+          "params": [
+            "&signer",
+            "0x3::token::TokenDataId",
+            "0x3::token::Royalty"
+          ],
           "return": []
         },
         {
@@ -709,7 +1003,11 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&signer", "0x3::token::TokenDataId", "0x1::string::String"],
+          "params": [
+            "&signer",
+            "0x3::token::TokenDataId",
+            "0x1::string::String"
+          ],
           "return": []
         },
         {
@@ -718,7 +1016,10 @@
           "is_entry": true,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&signer", "bool"],
+          "params": [
+            "&signer",
+            "bool"
+          ],
           "return": []
         },
         {
@@ -727,8 +1028,14 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["0x3::token::WithdrawCapability", "u64"],
-          "return": ["0x3::token::Token", "0x1::option::Option<0x3::token::WithdrawCapability>"]
+          "params": [
+            "0x3::token::WithdrawCapability",
+            "u64"
+          ],
+          "return": [
+            "0x3::token::Token",
+            "0x1::option::Option<0x3::token::WithdrawCapability>"
+          ]
         },
         {
           "name": "split",
@@ -736,8 +1043,13 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&mut 0x3::token::Token", "u64"],
-          "return": ["0x3::token::Token"]
+          "params": [
+            "&mut 0x3::token::Token",
+            "u64"
+          ],
+          "return": [
+            "0x3::token::Token"
+          ]
         },
         {
           "name": "transfer_with_opt_in",
@@ -745,7 +1057,15 @@
           "is_entry": true,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&signer", "address", "0x1::string::String", "0x1::string::String", "u64", "address", "u64"],
+          "params": [
+            "&signer",
+            "address",
+            "0x1::string::String",
+            "0x1::string::String",
+            "u64",
+            "address",
+            "u64"
+          ],
           "return": []
         },
         {
@@ -754,8 +1074,14 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&signer", "0x3::token::TokenId", "u64"],
-          "return": ["0x3::token::Token"]
+          "params": [
+            "&signer",
+            "0x3::token::TokenId",
+            "u64"
+          ],
+          "return": [
+            "0x3::token::Token"
+          ]
         },
         {
           "name": "withdraw_with_capability",
@@ -763,8 +1089,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["0x3::token::WithdrawCapability"],
-          "return": ["0x3::token::Token"]
+          "params": [
+            "0x3::token::WithdrawCapability"
+          ],
+          "return": [
+            "0x3::token::Token"
+          ]
         }
       ],
       "structs": [
@@ -772,7 +1102,10 @@
           "name": "Deposit",
           "is_native": false,
           "is_event": true,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -789,7 +1122,10 @@
           "name": "DepositEvent",
           "is_native": false,
           "is_event": false,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -806,7 +1142,10 @@
           "name": "Withdraw",
           "is_native": false,
           "is_event": true,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -823,7 +1162,10 @@
           "name": "WithdrawEvent",
           "is_native": false,
           "is_event": false,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -840,7 +1182,10 @@
           "name": "Burn",
           "is_native": false,
           "is_event": true,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -861,7 +1206,10 @@
           "name": "BurnToken",
           "is_native": false,
           "is_event": true,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -878,7 +1226,10 @@
           "name": "BurnTokenEvent",
           "is_native": false,
           "is_event": false,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -895,7 +1246,9 @@
           "name": "CollectionData",
           "is_native": false,
           "is_event": false,
-          "abilities": ["store"],
+          "abilities": [
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -928,7 +1281,11 @@
           "name": "CollectionMutabilityConfig",
           "is_native": false,
           "is_event": false,
-          "abilities": ["copy", "drop", "store"],
+          "abilities": [
+            "copy",
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -949,7 +1306,9 @@
           "name": "Collections",
           "is_native": false,
           "is_event": false,
-          "abilities": ["key"],
+          "abilities": [
+            "key"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -978,7 +1337,10 @@
           "name": "CreateCollection",
           "is_native": false,
           "is_event": true,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -1007,7 +1369,10 @@
           "name": "CreateCollectionEvent",
           "is_native": false,
           "is_event": false,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -1036,7 +1401,10 @@
           "name": "CreateTokenData",
           "is_native": false,
           "is_event": true,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -1093,7 +1461,10 @@
           "name": "CreateTokenDataEvent",
           "is_native": false,
           "is_event": false,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -1150,7 +1521,10 @@
           "name": "Mint",
           "is_native": false,
           "is_event": true,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -1171,7 +1545,10 @@
           "name": "MintToken",
           "is_native": false,
           "is_event": true,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -1188,7 +1565,10 @@
           "name": "MintTokenEvent",
           "is_native": false,
           "is_event": false,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -1205,7 +1585,10 @@
           "name": "MutatePropertyMap",
           "is_native": false,
           "is_event": true,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -1238,7 +1621,10 @@
           "name": "MutateTokenPropertyMap",
           "is_native": false,
           "is_event": true,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -1267,7 +1653,10 @@
           "name": "MutateTokenPropertyMapEvent",
           "is_native": false,
           "is_event": false,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -1296,7 +1685,11 @@
           "name": "Royalty",
           "is_native": false,
           "is_event": false,
-          "abilities": ["copy", "drop", "store"],
+          "abilities": [
+            "copy",
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -1317,7 +1710,9 @@
           "name": "Token",
           "is_native": false,
           "is_event": false,
-          "abilities": ["store"],
+          "abilities": [
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -1338,7 +1733,9 @@
           "name": "TokenData",
           "is_native": false,
           "is_event": false,
-          "abilities": ["store"],
+          "abilities": [
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -1383,7 +1780,10 @@
           "name": "TokenDataCreation",
           "is_native": false,
           "is_event": true,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -1444,7 +1844,11 @@
           "name": "TokenDataId",
           "is_native": false,
           "is_event": false,
-          "abilities": ["copy", "drop", "store"],
+          "abilities": [
+            "copy",
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -1465,7 +1869,10 @@
           "name": "TokenDeposit",
           "is_native": false,
           "is_event": true,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -1486,7 +1893,11 @@
           "name": "TokenId",
           "is_native": false,
           "is_event": false,
-          "abilities": ["copy", "drop", "store"],
+          "abilities": [
+            "copy",
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -1503,7 +1914,11 @@
           "name": "TokenMutabilityConfig",
           "is_native": false,
           "is_event": false,
-          "abilities": ["copy", "drop", "store"],
+          "abilities": [
+            "copy",
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -1532,7 +1947,9 @@
           "name": "TokenStore",
           "is_native": false,
           "is_event": false,
-          "abilities": ["key"],
+          "abilities": [
+            "key"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -1565,7 +1982,10 @@
           "name": "TokenWithdraw",
           "is_native": false,
           "is_event": true,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -1586,7 +2006,10 @@
           "name": "WithdrawCapability",
           "is_native": false,
           "is_event": false,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -1623,8 +2046,14 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["vector<0x1::string::String>", "vector<vector<u8>>", "vector<0x1::string::String>"],
-          "return": ["0x3::property_map::PropertyMap"]
+          "params": [
+            "vector<0x1::string::String>",
+            "vector<vector<u8>>",
+            "vector<0x1::string::String>"
+          ],
+          "return": [
+            "0x3::property_map::PropertyMap"
+          ]
         },
         {
           "name": "borrow",
@@ -1632,8 +2061,13 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x3::property_map::PropertyMap", "&0x1::string::String"],
-          "return": ["&0x3::property_map::PropertyValue"]
+          "params": [
+            "&0x3::property_map::PropertyMap",
+            "&0x1::string::String"
+          ],
+          "return": [
+            "&0x3::property_map::PropertyValue"
+          ]
         },
         {
           "name": "empty",
@@ -1642,7 +2076,9 @@
           "is_view": false,
           "generic_type_params": [],
           "params": [],
-          "return": ["0x3::property_map::PropertyMap"]
+          "return": [
+            "0x3::property_map::PropertyMap"
+          ]
         },
         {
           "name": "length",
@@ -1650,8 +2086,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x3::property_map::PropertyMap"],
-          "return": ["u64"]
+          "params": [
+            "&0x3::property_map::PropertyMap"
+          ],
+          "return": [
+            "u64"
+          ]
         },
         {
           "name": "remove",
@@ -1659,8 +2099,14 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&mut 0x3::property_map::PropertyMap", "&0x1::string::String"],
-          "return": ["0x1::string::String", "0x3::property_map::PropertyValue"]
+          "params": [
+            "&mut 0x3::property_map::PropertyMap",
+            "&0x1::string::String"
+          ],
+          "return": [
+            "0x1::string::String",
+            "0x3::property_map::PropertyValue"
+          ]
         },
         {
           "name": "add",
@@ -1668,7 +2114,11 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&mut 0x3::property_map::PropertyMap", "0x1::string::String", "0x3::property_map::PropertyValue"],
+          "params": [
+            "&mut 0x3::property_map::PropertyMap",
+            "0x1::string::String",
+            "0x3::property_map::PropertyValue"
+          ],
           "return": []
         },
         {
@@ -1677,8 +2127,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x3::property_map::PropertyMap"],
-          "return": ["vector<0x1::string::String>"]
+          "params": [
+            "&0x3::property_map::PropertyMap"
+          ],
+          "return": [
+            "vector<0x1::string::String>"
+          ]
         },
         {
           "name": "values",
@@ -1686,8 +2140,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x3::property_map::PropertyMap"],
-          "return": ["vector<vector<u8>>"]
+          "params": [
+            "&0x3::property_map::PropertyMap"
+          ],
+          "return": [
+            "vector<vector<u8>>"
+          ]
         },
         {
           "name": "contains_key",
@@ -1695,8 +2153,13 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x3::property_map::PropertyMap", "&0x1::string::String"],
-          "return": ["bool"]
+          "params": [
+            "&0x3::property_map::PropertyMap",
+            "&0x1::string::String"
+          ],
+          "return": [
+            "bool"
+          ]
         },
         {
           "name": "borrow_type",
@@ -1704,8 +2167,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x3::property_map::PropertyValue"],
-          "return": ["0x1::string::String"]
+          "params": [
+            "&0x3::property_map::PropertyValue"
+          ],
+          "return": [
+            "0x1::string::String"
+          ]
         },
         {
           "name": "borrow_value",
@@ -1713,8 +2180,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x3::property_map::PropertyValue"],
-          "return": ["vector<u8>"]
+          "params": [
+            "&0x3::property_map::PropertyValue"
+          ],
+          "return": [
+            "vector<u8>"
+          ]
         },
         {
           "name": "create_property_value",
@@ -1723,11 +2194,17 @@
           "is_view": false,
           "generic_type_params": [
             {
-              "constraints": ["copy"]
+              "constraints": [
+                "copy"
+              ]
             }
           ],
-          "params": ["&T0"],
-          "return": ["0x3::property_map::PropertyValue"]
+          "params": [
+            "&T0"
+          ],
+          "return": [
+            "0x3::property_map::PropertyValue"
+          ]
         },
         {
           "name": "create_property_value_raw",
@@ -1735,8 +2212,13 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["vector<u8>", "0x1::string::String"],
-          "return": ["0x3::property_map::PropertyValue"]
+          "params": [
+            "vector<u8>",
+            "0x1::string::String"
+          ],
+          "return": [
+            "0x3::property_map::PropertyValue"
+          ]
         },
         {
           "name": "types",
@@ -1744,8 +2226,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x3::property_map::PropertyMap"],
-          "return": ["vector<0x1::string::String>"]
+          "params": [
+            "&0x3::property_map::PropertyMap"
+          ],
+          "return": [
+            "vector<0x1::string::String>"
+          ]
         },
         {
           "name": "new_with_key_and_property_value",
@@ -1753,8 +2239,13 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["vector<0x1::string::String>", "vector<0x3::property_map::PropertyValue>"],
-          "return": ["0x3::property_map::PropertyMap"]
+          "params": [
+            "vector<0x1::string::String>",
+            "vector<0x3::property_map::PropertyValue>"
+          ],
+          "return": [
+            "0x3::property_map::PropertyMap"
+          ]
         },
         {
           "name": "read_address",
@@ -1762,8 +2253,13 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x3::property_map::PropertyMap", "&0x1::string::String"],
-          "return": ["address"]
+          "params": [
+            "&0x3::property_map::PropertyMap",
+            "&0x1::string::String"
+          ],
+          "return": [
+            "address"
+          ]
         },
         {
           "name": "read_bool",
@@ -1771,8 +2267,13 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x3::property_map::PropertyMap", "&0x1::string::String"],
-          "return": ["bool"]
+          "params": [
+            "&0x3::property_map::PropertyMap",
+            "&0x1::string::String"
+          ],
+          "return": [
+            "bool"
+          ]
         },
         {
           "name": "read_string",
@@ -1780,8 +2281,13 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x3::property_map::PropertyMap", "&0x1::string::String"],
-          "return": ["0x1::string::String"]
+          "params": [
+            "&0x3::property_map::PropertyMap",
+            "&0x1::string::String"
+          ],
+          "return": [
+            "0x1::string::String"
+          ]
         },
         {
           "name": "read_u128",
@@ -1789,8 +2295,13 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x3::property_map::PropertyMap", "&0x1::string::String"],
-          "return": ["u128"]
+          "params": [
+            "&0x3::property_map::PropertyMap",
+            "&0x1::string::String"
+          ],
+          "return": [
+            "u128"
+          ]
         },
         {
           "name": "read_u64",
@@ -1798,8 +2309,13 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x3::property_map::PropertyMap", "&0x1::string::String"],
-          "return": ["u64"]
+          "params": [
+            "&0x3::property_map::PropertyMap",
+            "&0x1::string::String"
+          ],
+          "return": [
+            "u64"
+          ]
         },
         {
           "name": "read_u8",
@@ -1807,8 +2323,13 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&0x3::property_map::PropertyMap", "&0x1::string::String"],
-          "return": ["u8"]
+          "params": [
+            "&0x3::property_map::PropertyMap",
+            "&0x1::string::String"
+          ],
+          "return": [
+            "u8"
+          ]
         },
         {
           "name": "update_property_map",
@@ -1830,7 +2351,11 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&mut 0x3::property_map::PropertyMap", "&0x1::string::String", "0x3::property_map::PropertyValue"],
+          "params": [
+            "&mut 0x3::property_map::PropertyMap",
+            "&0x1::string::String",
+            "0x3::property_map::PropertyValue"
+          ],
           "return": []
         }
       ],
@@ -1839,7 +2364,11 @@
           "name": "PropertyMap",
           "is_native": false,
           "is_event": false,
-          "abilities": ["copy", "drop", "store"],
+          "abilities": [
+            "copy",
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -1852,7 +2381,11 @@
           "name": "PropertyValue",
           "is_native": false,
           "is_event": false,
-          "abilities": ["copy", "drop", "store"],
+          "abilities": [
+            "copy",
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -1885,7 +2418,11 @@
               "constraints": []
             }
           ],
-          "params": ["&signer", "0x3::token::TokenId", "u64"],
+          "params": [
+            "&signer",
+            "0x3::token::TokenId",
+            "u64"
+          ],
           "return": []
         },
         {
@@ -1894,7 +2431,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&signer", "0x3::token::TokenId", "0x3::token::Token", "u64"],
+          "params": [
+            "&signer",
+            "0x3::token::TokenId",
+            "0x3::token::Token",
+            "u64"
+          ],
           "return": []
         },
         {
@@ -1907,8 +2449,13 @@
               "constraints": []
             }
           ],
-          "params": ["address", "0x3::token::TokenId"],
-          "return": ["bool"]
+          "params": [
+            "address",
+            "0x3::token::TokenId"
+          ],
+          "return": [
+            "bool"
+          ]
         },
         {
           "name": "exchange_coin_for_token",
@@ -1942,7 +2489,16 @@
               "constraints": []
             }
           ],
-          "params": ["&signer", "address", "0x1::string::String", "0x1::string::String", "u64", "u64", "u64", "u64"],
+          "params": [
+            "&signer",
+            "address",
+            "0x1::string::String",
+            "0x1::string::String",
+            "u64",
+            "u64",
+            "u64",
+            "u64"
+          ],
           "return": []
         },
         {
@@ -1951,8 +2507,14 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&signer", "0x3::token::TokenId", "u64"],
-          "return": ["0x3::token::Token"]
+          "params": [
+            "&signer",
+            "0x3::token::TokenId",
+            "u64"
+          ],
+          "return": [
+            "0x3::token::Token"
+          ]
         }
       ],
       "structs": [
@@ -1960,7 +2522,10 @@
           "name": "TokenCoinSwap",
           "is_native": false,
           "is_event": false,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [
             {
               "constraints": []
@@ -1981,7 +2546,9 @@
           "name": "TokenEscrow",
           "is_native": false,
           "is_event": false,
-          "abilities": ["store"],
+          "abilities": [
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -1998,7 +2565,10 @@
           "name": "TokenListingEvent",
           "is_native": false,
           "is_event": false,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -2027,7 +2597,9 @@
           "name": "TokenListings",
           "is_native": false,
           "is_event": false,
-          "abilities": ["key"],
+          "abilities": [
+            "key"
+          ],
           "generic_type_params": [
             {
               "constraints": []
@@ -2052,7 +2624,9 @@
           "name": "TokenStoreEscrow",
           "is_native": false,
           "is_event": false,
-          "abilities": ["key"],
+          "abilities": [
+            "key"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -2065,7 +2639,10 @@
           "name": "TokenSwapEvent",
           "is_native": false,
           "is_event": false,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -2106,7 +2683,11 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&signer", "address", "0x3::token::TokenId"],
+          "params": [
+            "&signer",
+            "address",
+            "0x3::token::TokenId"
+          ],
           "return": []
         },
         {
@@ -2115,7 +2696,14 @@
           "is_entry": true,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["signer", "address", "address", "0x1::string::String", "0x1::string::String", "u64"],
+          "params": [
+            "signer",
+            "address",
+            "address",
+            "0x1::string::String",
+            "0x1::string::String",
+            "u64"
+          ],
           "return": []
         },
         {
@@ -2124,7 +2712,11 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&signer", "address", "0x3::token::TokenId"],
+          "params": [
+            "&signer",
+            "address",
+            "0x3::token::TokenId"
+          ],
           "return": []
         },
         {
@@ -2133,7 +2725,14 @@
           "is_entry": true,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["signer", "address", "address", "0x1::string::String", "0x1::string::String", "u64"],
+          "params": [
+            "signer",
+            "address",
+            "address",
+            "0x1::string::String",
+            "0x1::string::String",
+            "u64"
+          ],
           "return": []
         },
         {
@@ -2142,7 +2741,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&signer", "address", "0x3::token::TokenId", "u64"],
+          "params": [
+            "&signer",
+            "address",
+            "0x3::token::TokenId",
+            "u64"
+          ],
           "return": []
         },
         {
@@ -2151,7 +2755,15 @@
           "is_entry": true,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["signer", "address", "address", "0x1::string::String", "0x1::string::String", "u64", "u64"],
+          "params": [
+            "signer",
+            "address",
+            "address",
+            "0x1::string::String",
+            "0x1::string::String",
+            "u64",
+            "u64"
+          ],
           "return": []
         }
       ],
@@ -2160,7 +2772,10 @@
           "name": "CancelOffer",
           "is_native": false,
           "is_event": true,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -2185,7 +2800,10 @@
           "name": "Claim",
           "is_native": false,
           "is_event": true,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -2210,7 +2828,10 @@
           "name": "Offer",
           "is_native": false,
           "is_event": true,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -2235,7 +2856,9 @@
           "name": "PendingClaims",
           "is_native": false,
           "is_event": false,
-          "abilities": ["key"],
+          "abilities": [
+            "key"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -2260,7 +2883,10 @@
           "name": "TokenCancelOffer",
           "is_native": false,
           "is_event": true,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -2281,7 +2907,10 @@
           "name": "TokenCancelOfferEvent",
           "is_native": false,
           "is_event": true,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -2302,7 +2931,10 @@
           "name": "TokenClaim",
           "is_native": false,
           "is_event": true,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -2323,7 +2955,10 @@
           "name": "TokenClaimEvent",
           "is_native": false,
           "is_event": true,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -2344,7 +2979,10 @@
           "name": "TokenOffer",
           "is_native": false,
           "is_event": true,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -2365,7 +3003,10 @@
           "name": "TokenOfferEvent",
           "is_native": false,
           "is_event": true,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -2386,7 +3027,11 @@
           "name": "TokenOfferId",
           "is_native": false,
           "is_event": true,
-          "abilities": ["copy", "drop", "store"],
+          "abilities": [
+            "copy",
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -2407,7 +3052,9 @@
     "abi": {
       "address": "0x3",
       "name": "token_event_store",
-      "friends": ["0x3::token"],
+      "friends": [
+        "0x3::token"
+      ],
       "exposed_functions": [
         {
           "name": "emit_collection_description_mutate_event",
@@ -2415,7 +3062,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&signer", "0x1::string::String", "0x1::string::String", "0x1::string::String"],
+          "params": [
+            "&signer",
+            "0x1::string::String",
+            "0x1::string::String",
+            "0x1::string::String"
+          ],
           "return": []
         },
         {
@@ -2424,7 +3076,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&signer", "0x1::string::String", "u64", "u64"],
+          "params": [
+            "&signer",
+            "0x1::string::String",
+            "u64",
+            "u64"
+          ],
           "return": []
         },
         {
@@ -2433,7 +3090,12 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&signer", "0x1::string::String", "0x1::string::String", "0x1::string::String"],
+          "params": [
+            "&signer",
+            "0x1::string::String",
+            "0x1::string::String",
+            "0x1::string::String"
+          ],
           "return": []
         },
         {
@@ -2473,7 +3135,13 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&signer", "0x1::string::String", "0x1::string::String", "u64", "u64"],
+          "params": [
+            "&signer",
+            "0x1::string::String",
+            "0x1::string::String",
+            "u64",
+            "u64"
+          ],
           "return": []
         },
         {
@@ -2482,7 +3150,10 @@
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [],
-          "params": ["&signer", "bool"],
+          "params": [
+            "&signer",
+            "bool"
+          ],
           "return": []
         },
         {
@@ -2525,7 +3196,10 @@
           "name": "CollectionDescriptionMutate",
           "is_native": false,
           "is_event": true,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -2550,7 +3224,10 @@
           "name": "CollectionDescriptionMutateEvent",
           "is_native": false,
           "is_event": false,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -2575,7 +3252,10 @@
           "name": "CollectionMaximumMutate",
           "is_native": false,
           "is_event": true,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -2600,7 +3280,10 @@
           "name": "CollectionMaxiumMutate",
           "is_native": false,
           "is_event": true,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -2625,7 +3308,10 @@
           "name": "CollectionMaxiumMutateEvent",
           "is_native": false,
           "is_event": false,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -2650,7 +3336,10 @@
           "name": "CollectionUriMutate",
           "is_native": false,
           "is_event": true,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -2675,7 +3364,10 @@
           "name": "CollectionUriMutateEvent",
           "is_native": false,
           "is_event": false,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -2700,7 +3392,10 @@
           "name": "DefaultPropertyMutate",
           "is_native": false,
           "is_event": true,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -2733,7 +3428,10 @@
           "name": "DefaultPropertyMutateEvent",
           "is_native": false,
           "is_event": false,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -2766,7 +3464,10 @@
           "name": "DescriptionMutate",
           "is_native": false,
           "is_event": true,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -2795,7 +3496,10 @@
           "name": "DescriptionMutateEvent",
           "is_native": false,
           "is_event": false,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -2824,7 +3528,10 @@
           "name": "MaximumMutate",
           "is_native": false,
           "is_event": true,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -2853,7 +3560,10 @@
           "name": "MaxiumMutateEvent",
           "is_native": false,
           "is_event": false,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -2882,7 +3592,10 @@
           "name": "OptInTransfer",
           "is_native": false,
           "is_event": true,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -2899,7 +3612,10 @@
           "name": "OptInTransferEvent",
           "is_native": false,
           "is_event": false,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -2912,7 +3628,10 @@
           "name": "RoyaltyMutate",
           "is_native": false,
           "is_event": true,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -2957,7 +3676,10 @@
           "name": "RoyaltyMutateEvent",
           "is_native": false,
           "is_event": false,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -3002,7 +3724,9 @@
           "name": "TokenEventStoreV1",
           "is_native": false,
           "is_event": false,
-          "abilities": ["key"],
+          "abilities": [
+            "key"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -3051,7 +3775,10 @@
           "name": "UriMutation",
           "is_native": false,
           "is_event": true,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
@@ -3080,7 +3807,10 @@
           "name": "UriMutationEvent",
           "is_native": false,
           "is_event": false,
-          "abilities": ["drop", "store"],
+          "abilities": [
+            "drop",
+            "store"
+          ],
           "generic_type_params": [],
           "fields": [
             {
