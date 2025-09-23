@@ -1,6 +1,6 @@
 export default {
   // extends: "semantic-release-monorepo",
-  branches: ['release', 'v1', { name: 'main', prerelease: 'rc' }],
+  branches: ['release', { name: 'main', prerelease: 'rc' }, { name: "v3", prerelease: 'rc' }],
   plugins: [
     [
       '@semantic-release/commit-analyzer',
