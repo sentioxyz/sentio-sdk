@@ -5,7 +5,7 @@ on:
     branches:
       - main
       - release
-      - v1
+      - next
 jobs:
   release:
     runs-on: ubuntu-latest
