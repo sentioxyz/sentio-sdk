@@ -66,14 +66,9 @@ export async function printVersions() {
 }
 
 export function getApiUrl(apiPath: string, host: string) {
-  if (host == 'https://app.sentio.xyz') {
-    if (apiPath.startsWith('/api/')) {
-      apiPath = apiPath.slice(4)
-    }
-    return new URL(apiPath, 'https://api.sentio.xyz')
+  const apiHost = host.replace('test', 'api-test').replace('staging', 'api-staging').replace('app', 'api')
+  if (apiPath.startsWith('/api/')) {
+    apiPath = apiPath.slice(4)
   }
-  if (!apiPath.startsWith('/api/')) {
-    apiPath = '/api' + apiPath
-  }
-  return new URL(apiPath, host)
+  return new URL(apiPath, apiHost)
 }
