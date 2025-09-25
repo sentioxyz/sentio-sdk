@@ -61,6 +61,7 @@ export class FuelAssetProcessor implements FuelBaseProcessor<FuelAssetProcessorC
           from: [],
           to: []
         }
+        let assetId = ''
         for (const input of tx.transaction.inputs || []) {
           if (input.type == InputType.Coin) {
             transfer.from.push({
@@ -68,6 +69,7 @@ export class FuelAssetProcessor implements FuelBaseProcessor<FuelAssetProcessorC
               assetId: input.assetId,
               amount: BigInt(input.amount.toString(10))
             })
+            assetId = input.assetId
           }
         }
 
@@ -82,10 +84,11 @@ export class FuelAssetProcessor implements FuelBaseProcessor<FuelAssetProcessorC
                 amount: BigInt(value),
                 assetId: output.assetId
               })
+              if (assetId == '') {
+                assetId = output.assetId
+              }
           }
         }
-
-        const assetId = transfer.from[0].assetId || ''
 
         const ctx = new FuelContext(
           this.config.chainId,
