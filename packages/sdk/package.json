@@ -63,7 +63,7 @@
     "bundle": "tsup --config src/bundle.config.ts",
     "bundle:dts": "tsc --emitDeclarationOnly --declaration",
     "compile": "tsc && cp src/tsup.config.ts lib",
-    "gen": "pnpm gen:eth && pnpm gen:aptos && pnpm gen:sui && pnpm gen:iota && pnpm gen:solana && pnpm gen:fuel && pnpm gen:store",
+    "gen": "pnpm gen:eth && pnpm gen:aptos && pnpm gen:sui && pnpm gen:iota && pnpm gen:solana && pnpm gen:fuel && pnpm gen:starknet && pnpm gen:store",
     "gen:aptos": "cp ../../node_modules/@typemove/aptos/src/abis/*.json src/aptos/abis && tsx src/aptos/codegen/run.ts src/aptos/abis src/aptos/builtin && pnpm gen:aptos_test",
     "gen:aptos_test": "tsx src/aptos/codegen/run.ts src/aptos/tests/abis src/aptos/tests/types",
     "gen:docs": "typedoc --options typedoc.json",
@@ -74,12 +74,15 @@
     "gen:iota": "cp ../../node_modules/@typemove/iota/src/abis/*.json src/iota/abis && tsx src/iota/codegen/run.ts src/iota/abis src/iota/builtin && pnpm gen:iota_test",
     "gen:iota_test": "tsx src/iota/codegen/run.ts src/iota/tests/abis src/iota/tests/types",
     "gen:solana": "tsx src/solana/codegen/run.ts src/solana/tests/abis src/solana/tests/types",
+    "gen:starknet": "tsx src/stark/codegen/run.ts src/stark/abis src/stark/builtin && pnpm gen:starknet_test",
+    "gen:starknet_test": "tsx src/stark/codegen/run.ts src/stark/tests/abis src/stark/tests/types",
     "gen:store": "tsx src/store/run.ts src/store/tests src/store/tests/generated",
     "gen:sui": "cp ../../node_modules/@typemove/sui/src/abis/*.json src/sui/abis && tsx src/sui/codegen/run.ts src/sui/abis src/sui/builtin && pnpm gen:sui_test",
     "gen:sui_test": "tsx src/sui/codegen/run.ts src/sui/tests/abis src/sui/tests/types",
     "sync_sui_to_iota": "tsx sync-sui-to-iota.ts",
     "test": "glob -c 'tsx --test' '**/*.test.ts'",
-    "test:db": "glob -c 'tsx --test' 'src/store/tests/database.test.ts'"
+    "test:db": "glob -c 'tsx --test' 'src/store/tests/database.test.ts'",
+    "test:starknet": "tsx --test src/stark/tests/event.test.ts"
   },
   "dependencies": {
     "@aptos-labs/ts-sdk": "~5.1.0",
@@ -120,6 +123,7 @@
     "radash": "^12.0.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
+    "starknet": "^6.11.0",
     "typechain": "^8.3.2",
     "utility-types": "^3.11.0",
     "yaml": "^2.3.4"

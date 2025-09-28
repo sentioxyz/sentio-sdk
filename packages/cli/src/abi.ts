@@ -11,6 +11,7 @@ import type { SuiClient } from '@mysten/sui/client'
 import { ReadKey } from './key.js'
 import { Auth } from './commands/upload.js'
 import { getApiUrl } from './utils.js'
+import type { RpcProvider as Starknet } from 'starknet'
 
 export async function getABI(
   chain: ChainId,
@@ -131,6 +132,31 @@ export async function getABI(
     }
   } catch (e) {
     console.log('aptos module not loaded')
+  }
+
+  // starknet
+  try {
+    const Starknet = (await import('starknet')).RpcProvider
+    let starknetClient: Starknet | undefined
+
+    switch (chain) {
+      case StarknetChainId.STARKNET_MAINNET:
+        starknetClient = new Starknet({
+          nodeUrl: 'https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_8/8sD5yitBslIYCPFzSq_Q1ObJHqPlZxFw'
+        })
+        break
+      case StarknetChainId.STARKNET_SEPOLIA:
+        starknetClient = new Starknet({
+          nodeUrl: 'https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_8/8sD5yitBslIYCPFzSq_Q1ObJHqPlZxFw'
+        })
+        break
+    }
+    if (starknetClient) {
+      const clazz = await starknetClient.getClassAt(address, 'latest')
+      return { abi: clazz.abi, name }
+    }
+  } catch (e) {
+    console.log('starknet module not loaded')
   }
 
   // ethereum
