@@ -25,6 +25,7 @@ import { EthFacet } from './eth-facet.js'
 import { SuiFacet } from './sui-facet.js'
 import { FuelFacet } from './fuel-facet.js'
 import { CosmosFacet } from './cosmos-facet.js'
+import { StarknetFacet } from './starknet-facet.js'
 import { Subject } from 'rxjs'
 import { MemoryDatabase } from './memory-database.js'
 import { DatabaseSchemaState } from '../core/database-schema.js'
@@ -53,6 +54,7 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
   iota: IotaFacet
   fuel: FuelFacet
   cosmos: CosmosFacet
+  starknet: StarknetFacet
   _db: MemoryDatabase
 
   constructor(loader: () => Promise<any>, httpEndpoints: Record<string, string> = {}) {
@@ -66,6 +68,7 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
     this.iota = new IotaFacet(this)
     this.fuel = new FuelFacet(this)
     this.cosmos = new CosmosFacet(this)
+    this.starknet = new StarknetFacet(this)
 
     for (const k of Object.keys(ChainInfo)) {
       const http = httpEndpoints[k] || ''
