@@ -1,6 +1,7 @@
 import { ChainId, EthChainId } from '@sentio/chain'
 import fs from 'fs-extra'
 import yaml from 'yaml'
+import path from 'path'
 
 const HostMap: { [host: string]: string } = {
   local: 'http://localhost:10000',
@@ -127,10 +128,10 @@ function finalizeProjectName(config: YamlProjectConfig, owner: string | undefine
 // export const EVM = 'evm'
 // export const SOLANA = 'solana'
 
-export function loadProcessorConfig(): YamlProjectConfig {
+export function loadProcessorConfig(p = ''): YamlProjectConfig {
   let yamlContent
   try {
-    yamlContent = fs.readFileSync('sentio.yaml', 'utf8')
+    yamlContent = fs.readFileSync(path.join(p, `sentio.yaml`), 'utf8')
   } catch (e) {
     console.error('sentio.yaml loading error, CLI is not running under Sentio project')
     process.exit(1)
