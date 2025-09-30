@@ -1,0 +1,19 @@
+{
+  "private": true,
+  "name": "template-starknet",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "sentio build",
+    "gen": "sentio gen",
+    "test": "sentio test",
+    "upload": "sentio upload"
+  },
+  "dependencies": {
+    "@sentio/sdk": "workspace:*"
+  },
+  "devDependencies": {
+    "@sentio/cli": "workspace:*",
+    "typescript": "^5.5.2"
+  }
+}

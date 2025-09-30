@@ -1,0 +1,6 @@
+project: starknet-example
+host: local
+contracts:
+  - name: VoteContract
+    address: '0x00cf88f7ecf1bf36e9262333879e2937611cd81758db64a169776a2710464391'
+    chain: starknet_sepolia

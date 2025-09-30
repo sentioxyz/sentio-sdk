@@ -8,6 +8,10 @@ import { AptosChainId, ChainId, StarknetChainId, SuiChainId } from '@sentio/chai
 import type { Aptos } from '@aptos-labs/ts-sdk'
 import type { IotaClient } from '@iota/iota-sdk/client'
 import type { SuiClient } from '@mysten/sui/client'
+import { ReadKey } from './key.js'
+import { Auth } from './commands/upload.js'
+import { getApiUrl } from './utils.js'
+import type { RpcProvider as Starknet } from 'starknet'
 
 export async function getABI(
   chain: ChainId,
@@ -130,10 +134,51 @@ export async function getABI(
     console.log('aptos module not loaded')
   }
 
+  // starknet
+  try {
+    const Starknet = (await import('starknet')).RpcProvider
+    let starknetClient: Starknet | undefined
+
+    switch (chain) {
+      case StarknetChainId.STARKNET_MAINNET:
+        starknetClient = new Starknet({
+          nodeUrl: 'https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_8/8sD5yitBslIYCPFzSq_Q1ObJHqPlZxFw'
+        })
+        break
+      case StarknetChainId.STARKNET_SEPOLIA:
+        starknetClient = new Starknet({
+          nodeUrl: 'https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_8/8sD5yitBslIYCPFzSq_Q1ObJHqPlZxFw'
+        })
+        break
+    }
+    if (starknetClient) {
+      const clazz = await starknetClient.getClassAt(address, 'latest')
+      return { abi: clazz.abi, name }
+    }
+  } catch (e) {
+    console.log('starknet module not loaded')
+  }
+
   // ethereum
   try {
-    const url = `https://app.sentio.xyz/api/v1/solidity/etherscan_abi?chainSpec.chainId=${chain}&address=${address}`
-    const resp = (await (await fetch(url)).json()) as any
+    const uploadAuth: Auth = {}
+    const host = 'https://app.sentio.xyz'
+    const apiKey = ReadKey(host)
+    if (apiKey) {
+      uploadAuth['api-key'] = apiKey
+    } else {
+      const cmd = 'sentio login'
+      console.error(chalk.red('No Credential found for', host, '. Please run `' + cmd + '`.'))
+      process.exit(1)
+    }
+    const url = getApiUrl(`/api/v1/solidity/etherscan_abi?chainSpec.chainId=${chain}&address=${address}`, host)
+    const resp = (await (
+      await fetch(url, {
+        headers: {
+          ...uploadAuth
+        }
+      })
+    ).json()) as any
     if (!resp.abi) {
       if (resp.message?.startsWith('contract source code not verified')) {
         throw Error(resp.message + "(API can't retrieve ABI based on similar contract)")
