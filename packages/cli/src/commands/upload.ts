@@ -8,11 +8,13 @@ import path from 'path'
 import { ReadKey } from '../key.js'
 import { createHash } from 'crypto'
 import { CommonExecOptions, execFileSync } from 'child_process'
-import { getApiUrl, getCliVersion, getSdkVersion } from '../utils.js'
+import { getApiUrl, getSdkVersion } from '../utils.js'
 import readline from 'readline'
 import JSZip from 'jszip'
 import { UserInfo } from '../../../protos/lib/service/common/protos/common.js'
 import { CommandOptionsType } from './types.js'
+import { Auth, DefaultBatchUploader, WalrusBatchUploader } from '../uploader.js'
+export { type Auth } from '../uploader.js'
 
 function myParseInt(value: string, dummyPrevious: number): number {
   // parseInt takes a string and a radix
@@ -39,12 +41,17 @@ export function createUploadCommand() {
     .option('--skip-gen', 'Skip code generation.')
     .option('--skip-deps', 'Skip dependency enforce.')
     .option('--example', 'Generate example usage of the processor.')
+    .option('--walrus', 'Store file in walrus')
+    .option('--path <path>', 'override project path, default to current directory')
     .option('--api-key <key>', '(Optional) Manually provide API key rather than use saved credential')
     .option('--token <token>', '(Optional) Manually provide token rather than use saved credential')
     .option('--host <host>', '(Optional) Override Sentio Host name')
     .action(async (options) => {
-      const processorConfig = loadProcessorConfig()
+      const processorConfig = loadProcessorConfig(options.path)
       overrideConfigWithOptions(processorConfig, options)
+      if (options.path) {
+        process.chdir(options.path)
+      }
       await runUploadInternal(processorConfig, options)
     })
 }
@@ -82,8 +89,7 @@ async function runUploadInternal(
     processorConfig.project = `${me.username}/${processorConfig.project}`
   }
 
-  const continueFrom = options.continueFrom
-  return uploadFile(processorConfig, uploadAuth, continueFrom)
+  return uploadFile(processorConfig, uploadAuth, options)
 }
 
 async function createProject(options: YamlProjectConfig, auth: Auth, type?: string) {
@@ -112,16 +118,20 @@ async function updateVariables(projectId: string, options: YamlProjectConfig, au
   })
 }
 
-export async function createProjectPrompt(options: YamlProjectConfig, auth: Auth, type?: string): Promise<boolean> {
+export async function createProjectPrompt(
+  options: YamlProjectConfig,
+  auth: Auth,
+  type?: string
+): Promise<string | undefined> {
   const create = async () => {
     const res = await createProject(options, auth, type)
     if (!res.ok) {
       console.error(chalk.red('Create Project Failed'))
       console.error(chalk.red(((await res.json()) as { message: string }).message))
-      return false
+      return undefined
     }
     console.log(chalk.green('Project created'))
-    return true
+    return ((await res.json()) as any).id
   }
 
   if (options.silentOverwrite) {
@@ -143,7 +153,7 @@ export async function createProjectPrompt(options: YamlProjectConfig, auth: Auth
     return await create()
   } else if (['n', 'no'].includes(answer.toLowerCase())) {
     rl.close()
-    return false
+    return undefined
   } else {
     rl.close()
     return createProjectPrompt(options, auth, type)
@@ -168,11 +178,6 @@ export async function confirm(question: string): Promise<boolean> {
   }
 }
 
-export interface Auth {
-  'api-key'?: string
-  authorization?: string
-}
-
 export function getGitAttributes() {
   let commitSha = ''
   let gitUrl = ''
@@ -186,25 +191,54 @@ export function getGitAttributes() {
   return { commitSha, gitUrl }
 }
 
-export async function uploadFile(options: YamlProjectConfig, auth: Auth, continueFrom: number | undefined) {
-  console.log(chalk.blue('Prepare to upload'))
+async function checkOrCreateProject(options: YamlProjectConfig, auth: Auth) {
+  const [owner, slug] = options.project.split('/')
+  const url = getApiUrl(`/api/v1/project/${owner}/${slug}`, options.host)
 
-  const PROCESSOR_FILE = path.join(process.cwd(), 'dist/lib.js')
+  const response = await fetch(url.href, {
+    method: 'GET',
+    headers: {
+      ...auth
+    }
+  })
 
-  if (!fs.existsSync(PROCESSOR_FILE)) {
-    console.error(chalk.red('File not existed ', PROCESSOR_FILE, "don't use --skip-build"))
+  if (response.status === 404) {
+    const projectId = await createProjectPrompt(options, auth, options.type)
+    if (!projectId) {
+      console.error(chalk.red('Project creation cancelled'))
+      process.exit(1)
+    }
+    return projectId
+  } else if (!response.ok) {
+    console.error(chalk.red(`Failed to check project: ${response.status} ${response.statusText}`))
     process.exit(1)
   }
 
-  const stat = fs.statSync(PROCESSOR_FILE)
+  return ((await response.json()) as any)?.project?.id
+}
+
+export async function uploadFile(
+  config: YamlProjectConfig,
+  auth: Auth,
+  options: CommandOptionsType<typeof createUploadCommand>
+) {
+  console.log(chalk.blue('Prepare to upload'))
+  const continueFrom = options.continueFrom
+
+  const processorFile = path.join(process.cwd(), 'dist/lib.js')
+
+  if (!fs.existsSync(processorFile)) {
+    console.error(chalk.red('File not existed ', processorFile, "don't use --skip-build"))
+    process.exit(1)
+  }
+
+  const projectId = await checkOrCreateProject(config, auth)
+
+  const stat = fs.statSync(processorFile)
   console.log('Packed processor file size', Math.floor(stat.size / 1024) + 'K, last modified', stat.mtime)
-  const content = fs.readFileSync(PROCESSOR_FILE)
-  const hash = createHash('sha256')
-  hash.update(content)
-  const digest = hash.digest('hex')
 
   if (continueFrom) {
-    const res = await getProcessorStatus(options.host, auth, options.project)
+    const res = await getProcessorStatus(config.host, auth, config.project)
     const data = (await res.json()) as { processors: { version: number; versionState: string; sdkVersion: string }[] }
     const found = data?.processors?.find(
       (x) => x.version == continueFrom && (x.versionState == 'ACTIVE' || x.versionState == 'PENDING')
@@ -220,7 +254,7 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth, continu
         process.exit(0)
       }
 
-      if (!options.silentOverwrite) {
+      if (!config.silentOverwrite) {
         const confirmed = await confirm(`Continue from version ${continueFrom}?`)
         if (!confirmed) {
           process.exit(0)
@@ -230,7 +264,7 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth, continu
       const latest = Math.max(...data.processors?.map((x) => x?.version))
       console.error(
         chalk.red(
-          `Failed to find existed version ${continueFrom} in ${options.project}` +
+          `Failed to find existed version ${continueFrom} in ${config.project}` +
             (latest ? `, latest is ${latest}` : '')
         )
       )
@@ -240,8 +274,8 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth, continu
 
   let triedCount = 0
   const upload = async () => {
-    options.variables = options.variables || []
-    for (const v of options.variables) {
+    config.variables = config.variables || []
+    for (const v of config.variables) {
       if (v.key || '' == '') {
         console.error(chalk.red("Variable key can't be empty"))
         return
@@ -253,106 +287,51 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth, continu
     }
 
     const { commitSha, gitUrl } = getGitAttributes()
-    const sha256 = digest
     console.log(chalk.blue(triedCount > 1 ? 'Retry uploading' : 'Uploading'))
 
-    // get gcs upload url
-    const initUploadResRaw = await initUpload(
-      options.host,
-      auth,
-      options.project,
-      getSdkVersion(),
-      0,
-      'application/zip'
-    )
-    if (!initUploadResRaw.ok) {
-      const res = await initUploadResRaw.json()
-      console.error(chalk.red(initUploadResRaw.status, (res as { message: string }).message))
-      if ([404, 500].includes(initUploadResRaw.status)) {
-        const created = await createProjectPrompt(options, auth, options.type)
-        if (created) {
-          await upload()
+    try {
+      const sourceBuffer = await createSourceZip()
+      // Read processor file
+      const codeBuffer = fs.readFileSync(processorFile)
+
+      // Create uploader
+      const uploader = options.walrus ? new WalrusBatchUploader(config, auth) : new DefaultBatchUploader(config, auth)
+
+      // Handle variables update if needed
+      if (config.variables && config.variables.length > 0) {
+        const ret = await updateVariables(projectId, config, auth)
+        if (!ret.ok) {
+          console.error(chalk.red('Update variables failed'))
+          console.error(chalk.red(((await ret.json()) as { message: string }).message))
+          return
         }
       }
-      return
-    }
-    const initUploadRes = (await initUploadResRaw.json()) as {
-      url: string
-      warning?: string
-      replacingVersion: number
-      multiVersion: boolean
-      projectId: string
-    }
-    if (!continueFrom && initUploadRes.replacingVersion && !options.silentOverwrite) {
-      const confirmed = await confirm(
-        `Create new version and deactivate ${initUploadRes.multiVersion ? 'pending' : 'active'} version ${initUploadRes.replacingVersion}?`
+
+      // Upload files
+      const result = await uploader.upload(
+        { source: sourceBuffer, code: codeBuffer },
+        commitSha,
+        gitUrl,
+        config.debug || options.debug,
+        continueFrom,
+        config.networkOverrides
       )
-      if (!confirmed) {
-        process.exit(0)
+
+      console.log(chalk.green('Upload success: '))
+      const codeHash = createHash('sha256').update(codeBuffer).digest('hex')
+      console.log('\t', chalk.blue('sha256:'), codeHash)
+      if (commitSha) {
+        console.log('\t', chalk.blue('Git commit SHA:'), commitSha)
       }
+      console.log(
+        '\t',
+        chalk.blue('Check status:'),
+        `${config.host}/${result.projectFullSlug}/datasource/${result.processorId}`
+      )
+      console.log('\t', chalk.blue('Version:'), result.version)
+    } catch (e) {
+      throw e
     }
-    if (initUploadRes.warning) {
-      console.warn(chalk.yellow('Warning:', initUploadRes.warning))
-    }
-    if (options.variables.length > 0) {
-      const ret = await updateVariables(initUploadRes.projectId, options, auth)
-      if (!ret.ok) {
-        console.error(chalk.red('Update variables failed'))
-        console.error(chalk.red(((await ret.json()) as { message: string }).message))
-        return
-      }
-    }
-    const uploadUrl = initUploadRes.url
-
-    // do actual uploading
-    const zip = new JSZip()
-    zip.file('lib.js', fs.readFileSync(PROCESSOR_FILE))
-    const data = await zip.generateAsync({ type: 'blob' })
-    const uploadResRaw = await fetch(uploadUrl, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/zip',
-        'Content-Length': data.size.toString()
-      },
-      body: data
-    })
-    if (!uploadResRaw.ok) {
-      console.error(chalk.red('Failed to upload'))
-      console.error(chalk.red(await uploadResRaw.text()))
-      return
-    }
-
-    await uploadZip(options.host, auth, options.project, getSdkVersion(), continueFrom)
-
-    // finish uploading
-    const finishUploadResRaw = await finishUpload(
-      options,
-      auth,
-      sha256,
-      commitSha,
-      gitUrl,
-      continueFrom,
-      1,
-      initUploadRes.warning ? [initUploadRes.warning] : undefined
-    )
-    if (!finishUploadResRaw.ok) {
-      console.error(chalk.red('Failed to finish uploading'))
-      console.error(chalk.red(await finishUploadResRaw.text()))
-      return
-    }
-
-    console.log(chalk.green('Upload success: '))
-    console.log('\t', chalk.blue('sha256:'), digest)
-    if (commitSha) {
-      console.log('\t', chalk.blue('Git commit SHA:'), commitSha)
-    }
-    const { projectFullSlug, processorId, version } = (await finishUploadResRaw.json()) as {
-      projectFullSlug: string
-      processorId: string
-      version: string
-    }
-    console.log('\t', chalk.blue('Check status:'), `${options.host}/${projectFullSlug}/datasource/${processorId}`)
-    console.log('\t', chalk.blue('Version:'), version)
   }
 
   let error: Error
@@ -395,72 +374,7 @@ async function getMe(host: string, auth: Auth) {
   })
 }
 
-export async function initUpload(
-  host: string,
-  auth: Auth,
-  projectSlug: string,
-  sdkVersion: string,
-  sequence: number,
-  contentType?: string
-) {
-  const initUploadUrl = getApiUrl(`/api/v1/processors/init_upload`, host)
-  return fetch(initUploadUrl.href, {
-    method: 'POST',
-    headers: {
-      ...auth
-    },
-    body: JSON.stringify({
-      project_slug: projectSlug,
-      sdk_version: sdkVersion,
-      sequence,
-      contentType
-    })
-  })
-}
-
-export async function finishUpload(
-  options: YamlProjectConfig,
-  auth: Auth,
-  sha256: string,
-  commitSha: string,
-  gitUrl: string,
-  continueFrom: number | undefined,
-  sequence = 1,
-  warnings?: string[]
-) {
-  const finishUploadUrl = getApiUrl(`/api/v1/processors/finish_upload`, options.host)
-  return fetch(finishUploadUrl.href, {
-    method: 'POST',
-    headers: {
-      ...auth
-    },
-    body: JSON.stringify({
-      project_slug: options.project,
-      cli_version: getCliVersion(),
-      sdk_version: getSdkVersion(),
-      sha256: sha256,
-      commit_sha: commitSha,
-      git_url: gitUrl,
-      debug: options.debug,
-      sequence,
-      continueFrom,
-      networkOverrides: options.networkOverrides,
-      warnings
-    })
-  })
-}
-
-async function uploadZip(
-  host: string,
-  auth: Auth,
-  projectSlug: string,
-  sdkVersion: string,
-  continueFrom: number | undefined
-) {
-  const initUploadResRaw = await initUpload(host, auth, projectSlug, sdkVersion, 1)
-  const initUploadRes = (await initUploadResRaw.json()) as { url: string }
-  const uploadUrl = initUploadRes.url
-
+async function createSourceZip() {
   const zip = new JSZip()
   fs.readdirSync('.').forEach((p) => {
     if (
@@ -484,17 +398,5 @@ async function uploadZip(
       }
     })
   }
-  const data = await zip.generateAsync({ type: 'blob' })
-  const uploadResRaw = await fetch(uploadUrl, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/octet-stream',
-      'Content-Length': data.size.toString()
-    },
-    body: data
-  })
-  if (!uploadResRaw.ok) {
-    console.error(chalk.red('Failed to upload'))
-    throw uploadResRaw.text()
-  }
+  return await zip.generateAsync({ type: 'nodebuffer' })
 }
