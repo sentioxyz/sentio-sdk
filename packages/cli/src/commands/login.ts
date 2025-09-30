@@ -8,6 +8,7 @@ import { WriteKey } from '../key.js'
 import fetch from 'node-fetch'
 import open from 'open'
 import { CommandOptionsType } from './types.js'
+import { getApiUrl } from '../utils.js'
 
 const port = 20000
 
@@ -80,7 +81,7 @@ function sha256(str: string) {
 }
 
 async function checkKey(host: string, apiKey: string) {
-  const checkApiKeyUrl = new URL('/api/v1/processors/check_key', host)
+  const checkApiKeyUrl = getApiUrl('/api/v1/processors/check_key', host)
   return fetch(checkApiKeyUrl.href, {
     method: 'GET',
     headers: {
