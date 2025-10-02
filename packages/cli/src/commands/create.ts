@@ -6,7 +6,7 @@ import latestVersion from 'latest-version'
 import process from 'process'
 import { execPackageManager } from '../execution.js'
 import { getPackageRoot } from '../utils.js'
-import { EthChainInfo } from '@sentio/chain'
+import { EthChainInfo, EthChainId } from '@sentio/chain'
 import { CHAIN_TYPES } from '../config.js'
 import { CommandOptionsType } from './types.js'
 
@@ -119,6 +119,12 @@ async function runCreateInternal(name: string, options: CommandOptionsType<typeo
 
     fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2))
   }
+
+  const chainIdValues = new Map<EthChainId, string>()
+  for (const [key, value] of Object.entries(EthChainId)) {
+    chainIdValues.set(value, key)
+  }
+
   const chainInfo = EthChainInfo[chainId]
   if (chainType == 'eth') {
     fs.readdirSync(dstFolder, { recursive: true }).forEach((p) => {
@@ -127,7 +133,9 @@ async function runCreateInternal(name: string, options: CommandOptionsType<typeo
       }
       const item = path.join(dstFolder, p)
       const template = fs.readFileSync(item, 'utf8')
-      const content = template.replaceAll('0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', chainInfo.wrappedTokenAddress)
+      const content = template
+        .replaceAll('0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', chainInfo.wrappedTokenAddress)
+        .replaceAll('EthChainId.ETHEREUM', `EthChainId.${chainIdValues.get(chainId as EthChainId)}`)
       fs.writeFileSync(item, content)
     })
   }
