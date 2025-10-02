@@ -220,8 +220,8 @@ importers:
         specifier: ~1.38.0
         version: 1.38.0(typescript@5.9.2)
       '@sentio/chain':
-        specifier: ~3.4.8
-        version: 3.4.8
+        specifier: ~3.4.9
+        version: 3.4.9
       '@sentio/graph-cli':
         specifier: ^0.97.0
         version: 0.97.0(@types/node@22.8.6)(bufferutil@4.0.8)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.24.2)
@@ -2419,9 +2419,6 @@ packages:
 
   '@sentio/bigdecimal@9.1.1-patch.3':
     resolution: {integrity: sha512-O5w8XdyeatUcwI+ZbpSw60/cXFPJk3NbpIupwMHfYmW8fpxpXyRbyGESNJNufWWrB6CadsWGh1R3rd7owvrmlw==}
-
-  '@sentio/chain@3.4.8':
-    resolution: {integrity: sha512-lxbWMsHYpiAJTEl9cG1jVAsSky0VL5ynmvDWoVjb9XO4w5v6WAo8GO4AEJNtiBuoiqFCRzFPoBgJHpgQrXILrw==}
 
   '@sentio/chain@3.4.9':
     resolution: {integrity: sha512-JhWAX2YFc65ojsRdbXN8s7q4l3Z/eeS+f1zzT6BXvl/Fj8g7KTtUR52c7iDcTSBRClzLIncUoPjc67UJAMv4Hw==}
@@ -8745,8 +8742,6 @@ snapshots:
       '@hey-api/client-fetch': 0.8.3
 
   '@sentio/bigdecimal@9.1.1-patch.3': {}
-
-  '@sentio/chain@3.4.8': {}
 
   '@sentio/chain@3.4.9': {}
 
