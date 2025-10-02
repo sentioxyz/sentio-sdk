@@ -119,16 +119,6 @@ importers:
         specifier: workspace:*
         version: link:../../packages/cli
 
-  examples/btc:
-    dependencies:
-      '@sentio/sdk':
-        specifier: workspace:*
-        version: link:../../packages/sdk
-    devDependencies:
-      '@sentio/cli':
-        specifier: workspace:*
-        version: link:../../packages/cli
-
   examples/fuel-counter:
     dependencies:
       '@sentio/sdk':
@@ -230,8 +220,8 @@ importers:
         specifier: ~1.38.0
         version: 1.38.0(typescript@5.9.2)
       '@sentio/chain':
-        specifier: ~3.4.7
-        version: 3.4.7
+        specifier: ~3.4.8
+        version: 3.4.8
       '@sentio/graph-cli':
         specifier: ^0.97.0
         version: 0.97.0(@types/node@22.8.6)(bufferutil@4.0.8)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.24.2)
@@ -531,8 +521,8 @@ importers:
         specifier: 9.1.1-patch.3
         version: 9.1.1-patch.3
       '@sentio/chain':
-        specifier: ~3.4.7
-        version: 3.4.7
+        specifier: ~3.4.8
+        version: 3.4.8
       '@sentio/ethers-v6':
         specifier: ^1.0.29
         version: 1.0.29(@sentio/ethers@6.13.1-patch.6(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typescript@5.9.2)
@@ -606,8 +596,8 @@ importers:
         specifier: ^3.3.2
         version: 3.3.2
       p-queue:
-        specifier: ^8.0.1
-        version: 8.0.1
+        specifier: ^9.0.0
+        version: 9.0.0
       piscina:
         specifier: ^5.1.3
         version: 5.1.3
@@ -2430,8 +2420,8 @@ packages:
   '@sentio/bigdecimal@9.1.1-patch.3':
     resolution: {integrity: sha512-O5w8XdyeatUcwI+ZbpSw60/cXFPJk3NbpIupwMHfYmW8fpxpXyRbyGESNJNufWWrB6CadsWGh1R3rd7owvrmlw==}
 
-  '@sentio/chain@3.4.7':
-    resolution: {integrity: sha512-/hu3gRJfUkA+ytLvIPlYVB7ApYxx6K3QpVBrnXE8ZdxfmdGQ1N4HBm1Swfq/jDOVqvcCeRytYCUsveokhXex/w==}
+  '@sentio/chain@3.4.8':
+    resolution: {integrity: sha512-lxbWMsHYpiAJTEl9cG1jVAsSky0VL5ynmvDWoVjb9XO4w5v6WAo8GO4AEJNtiBuoiqFCRzFPoBgJHpgQrXILrw==}
 
   '@sentio/ethers-v6@1.0.29':
     resolution: {integrity: sha512-/4jZZn+eM3EfI0bUMBAf5vu8muy8ABptu8ucFoMDTZLLTjxcSKRffLP3RL7w1JHGjyC2V6oEQfwS4cn9JEohHQ==}
@@ -5507,6 +5497,10 @@ packages:
     resolution: {integrity: sha512-NXzu9aQJTAzbBqOt2hwsR63ea7yvxJc0PwN/zobNAudYfb1B7R08SzB4TsLeSbUCuG467NhnoT0oO6w1qRO+BA==}
     engines: {node: '>=18'}
 
+  p-queue@9.0.0:
+    resolution: {integrity: sha512-KO1RyxstL9g1mK76530TExamZC/S2Glm080Nx8PE5sTd7nlduDQsAfEl4uXX+qZjLiwvDauvzXavufy3+rJ9zQ==}
+    engines: {node: '>=20'}
+
   p-reduce@3.0.0:
     resolution: {integrity: sha512-xsrIUgI0Kn6iyDYm9StOpOeK29XM1aboGji26+QEortiFST1hGZaUQOLhtEbqHErPpGW/aSz6allwK2qcptp0Q==}
     engines: {node: '>=12'}
@@ -5514,6 +5508,10 @@ packages:
   p-timeout@6.1.2:
     resolution: {integrity: sha512-UbD77BuZ9Bc9aABo74gfXhNvzC9Tx7SxtHSh1fxvx3jTLLYvmVhiQZZrJzqqU0jKbN32kb5VOKiLEQI/3bIjgQ==}
     engines: {node: '>=14.16'}
+
+  p-timeout@7.0.0:
+    resolution: {integrity: sha512-DhZ7ydOE3JXtXzDf2wz/KEamkKAD7Il5So09I2tOz4i+9pLcdghDKKmODkkoHKJ0TyczmhcHNxyTeTrsENT81A==}
+    engines: {node: '>=20'}
 
   p-try@1.0.0:
     resolution: {integrity: sha512-U1etNYuMJoIz3ZXSrrySFjsXQTWOx2/jdi86L+2pRvph/qMKL6sbcCYdH23fqsbm8TH2Gn0OybpT4eSFlCVHww==}
@@ -8745,7 +8743,7 @@ snapshots:
 
   '@sentio/bigdecimal@9.1.1-patch.3': {}
 
-  '@sentio/chain@3.4.7': {}
+  '@sentio/chain@3.4.8': {}
 
   '@sentio/ethers-v6@1.0.29(@sentio/ethers@6.13.1-patch.6(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typescript@5.9.2)':
     dependencies:
@@ -12129,9 +12127,16 @@ snapshots:
       eventemitter3: 5.0.1
       p-timeout: 6.1.2
 
+  p-queue@9.0.0:
+    dependencies:
+      eventemitter3: 5.0.1
+      p-timeout: 7.0.0
+
   p-reduce@3.0.0: {}
 
   p-timeout@6.1.2: {}
+
+  p-timeout@7.0.0: {}
 
   p-try@1.0.0: {}
 
