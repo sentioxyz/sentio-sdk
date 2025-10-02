@@ -94,7 +94,7 @@
     "@sentio/abi-wan-kanabi": "2.2.2-1",
     "@sentio/api": "1.0.2",
     "@sentio/bigdecimal": "9.1.1-patch.3",
-    "@sentio/chain": "~3.4.8",
+    "@sentio/chain": "~3.4.9",
     "@sentio/ethers-v6": "^1.0.29",
     "@sentio/protos": "workspace:*",
     "@sentio/runtime": "workspace:^",
