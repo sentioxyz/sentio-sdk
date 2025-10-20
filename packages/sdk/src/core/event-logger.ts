@@ -136,7 +136,8 @@ function emit<T>(ctx: BaseContext, eventName: string, event: Event<T>) {
       message: {
         stringValue: message || ''
       },
-      distinctEntityId: {
+      // don't rename to distinctEntityId in new events.
+      distinctId: {
         stringValue: distinctId || ''
       },
       ...normalizeToRichStruct(ctx.baseLabels, payload).fields
