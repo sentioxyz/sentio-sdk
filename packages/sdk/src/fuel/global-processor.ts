@@ -1,6 +1,6 @@
-import { CallHandler, FuelBaseProcessor, FuelProcessorState, FuelTransaction } from './types.js'
+import { CallHandler, FuelBaseProcessor, FuelBlock, FuelProcessorState, FuelTransaction } from './types.js'
 import { Data_FuelTransaction } from '@sentio/protos'
-import { Provider } from 'fuels'
+import { Provider, bn } from 'fuels'
 import { getProvider } from './network.js'
 import { decodeFuelTransaction, DEFAULT_FUEL_FETCH_CONFIG, FuelFetchConfig } from './transaction.js'
 import { FuelContext } from './context.js'
@@ -51,13 +51,20 @@ export class FuelGlobalProcessor implements FuelBaseProcessor<GlobalFuelProcesso
           console.error('error decoding transaction', e)
           return mergeProcessResults([])
         }
+        const header = call.transaction?.status.block.header
         const ctx = new FuelContext(
           this.config.chainId,
           ALL_ADDRESS,
           this.config.name ?? '*',
           call.timestamp || new Date(0),
           tx,
-          null
+          header
+            ? ({
+                header: {
+                  daHeight: bn(header.daHeight)
+                }
+              } as FuelBlock)
+            : null
         )
         await handler(tx, ctx)
         return ctx.stopAndGetResult()
