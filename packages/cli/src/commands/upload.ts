@@ -205,11 +205,21 @@ export async function uploadFile(options: YamlProjectConfig, auth: Auth, continu
 
   if (continueFrom) {
     const res = await getProcessorStatus(options.host, auth, options.project)
-    const data = (await res.json()) as { processors: { version: number; versionState: string }[] }
+    const data = (await res.json()) as { processors: { version: number; versionState: string; sdkVersion: string }[] }
     const found = data?.processors?.find(
       (x) => x.version == continueFrom && (x.versionState == 'ACTIVE' || x.versionState == 'PENDING')
     )
     if (found) {
+      const currentSdkVersion = getSdkVersion()
+      if (found.sdkVersion.split('.')[0] != currentSdkVersion.split('.')[0]) {
+        console.error(
+          chalk.red(
+            `Failed to continue from version ${continueFrom}, because it is running on SDK v${found.sdkVersion}, but current SDK is v${currentSdkVersion}`
+          )
+        )
+        process.exit(0)
+      }
+
       if (!options.silentOverwrite) {
         const confirmed = await confirm(`Continue from version ${continueFrom}?`)
         if (!confirmed) {
