@@ -239,7 +239,7 @@ export async function uploadFile(
 
   if (continueFrom) {
     const res = await getProcessorStatus(config.host, auth, config.project)
-    const data = (await res.json()) as { processors: { version: number; versionState: string }[] }
+    const data = (await res.json()) as { processors: { version: number; versionState: string; sdkVersion: string }[] }
     const found = data?.processors?.find(
       (x) => x.version == continueFrom && (x.versionState == 'ACTIVE' || x.versionState == 'PENDING')
     )
