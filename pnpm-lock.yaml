@@ -9,7 +9,7 @@ overrides:
 
 patchedDependencies:
   '@coral-xyz/anchor@0.31.1':
-    hash: dxap427n76hiegxt5jz5rlgj5a
+    hash: 93842655e94304625d490cdfb6e2ff9be8e91b436b2bde0079e678b9b4bdae88
     path: patches/@coral-xyz__anchor@0.30.1.patch
 
 importers:
@@ -498,7 +498,7 @@ importers:
         version: 5.1.0(got@14.4.7)
       '@coral-xyz/anchor':
         specifier: ^0.31.1
-        version: 0.31.1(patch_hash=dxap427n76hiegxt5jz5rlgj5a)(bufferutil@4.0.8)(encoding@0.1.13)(typescript@5.9.2)(utf-8-validate@5.0.10)
+        version: 0.31.1(patch_hash=93842655e94304625d490cdfb6e2ff9be8e91b436b2bde0079e678b9b4bdae88)(bufferutil@4.0.8)(encoding@0.1.13)(typescript@5.9.2)(utf-8-validate@5.0.10)
       '@coral-xyz/borsh':
         specifier: ^0.31.1
         version: 0.31.1(@solana/web3.js@1.98.3(bufferutil@4.0.8)(encoding@0.1.13)(typescript@5.9.2)(utf-8-validate@5.0.10))
@@ -1688,6 +1688,7 @@ packages:
 
   '@ls-lint/ls-lint@2.3.1':
     resolution: {integrity: sha512-vPe6IDByQnQRTxcAYjTxrmga/tSIui50VBFTB5KIJWY3OOFmxE2VtymjeSEfQfiMbhZV/ZPAqYy2lt8pZFQ0Rw==}
+    cpu: [x64, arm64, s390x, ppc64le]
     os: [darwin, linux, win32]
     hasBin: true
 
@@ -2425,7 +2426,7 @@ packages:
   '@sentio/ethers-v6@1.0.29':
     resolution: {integrity: sha512-/4jZZn+eM3EfI0bUMBAf5vu8muy8ABptu8ucFoMDTZLLTjxcSKRffLP3RL7w1JHGjyC2V6oEQfwS4cn9JEohHQ==}
     peerDependencies:
-      ethers: npm:@sentio/ethers@6.13.1-patch.6
+      ethers: ^6.0.0
       typescript: '>=4.3.0'
 
   '@sentio/ethers@6.13.1-patch.6':
@@ -7080,7 +7081,7 @@ snapshots:
 
   '@coral-xyz/anchor-errors@0.31.1': {}
 
-  '@coral-xyz/anchor@0.31.1(patch_hash=dxap427n76hiegxt5jz5rlgj5a)(bufferutil@4.0.8)(encoding@0.1.13)(typescript@5.9.2)(utf-8-validate@5.0.10)':
+  '@coral-xyz/anchor@0.31.1(patch_hash=93842655e94304625d490cdfb6e2ff9be8e91b436b2bde0079e678b9b4bdae88)(bufferutil@4.0.8)(encoding@0.1.13)(typescript@5.9.2)(utf-8-validate@5.0.10)':
     dependencies:
       '@coral-xyz/anchor-errors': 0.31.1
       '@coral-xyz/borsh': 0.31.1(@solana/web3.js@1.98.3(bufferutil@4.0.8)(encoding@0.1.13)(typescript@5.9.2)(utf-8-validate@5.0.10))
