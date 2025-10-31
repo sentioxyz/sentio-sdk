@@ -8,7 +8,7 @@ import path from 'path'
 import { ReadKey } from '../key.js'
 import { createHash } from 'crypto'
 import { CommonExecOptions, execFileSync } from 'child_process'
-import { getApiUrl } from '../utils.js'
+import { getApiUrl, getSdkVersion } from '../utils.js'
 import readline from 'readline'
 import JSZip from 'jszip'
 import { UserInfo } from '../../../protos/lib/service/common/protos/common.js'
@@ -244,6 +244,16 @@ export async function uploadFile(
       (x) => x.version == continueFrom && (x.versionState == 'ACTIVE' || x.versionState == 'PENDING')
     )
     if (found) {
+      const currentSdkVersion = getSdkVersion()
+      if (found.sdkVersion.split('.')[0] != currentSdkVersion.split('.')[0]) {
+        console.error(
+          chalk.red(
+            `Failed to continue from version ${continueFrom}, because it is running on SDK v${found.sdkVersion}, but current SDK is v${currentSdkVersion}`
+          )
+        )
+        process.exit(0)
+      }
+
       if (!config.silentOverwrite) {
         const confirmed = await confirm(`Continue from version ${continueFrom}?`)
         if (!confirmed) {
