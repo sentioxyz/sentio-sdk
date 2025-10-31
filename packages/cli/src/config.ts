@@ -67,7 +67,7 @@ export function getAuthConfig(host: string): {
     case HostMap['prod']:
       domain = 'https://auth.sentio.xyz'
       clientId = '66oqMrep54LVI9ckH97cw8C4GBA1cpKW'
-      audience = 'https://api.sentio.xyz/v1'
+      audience = 'https://app.sentio.xyz/api/v1'
       redirectUri = 'https://app.sentio.xyz/redirect/sdk'
       break
     case HostMap['test']:
