@@ -158,9 +158,16 @@ export class EthPlugin extends Plugin {
       if (forChainId !== undefined && forChainId !== chainId.toString()) {
         continue
       }
-      const provider = getProvider(chainId)
-      const startBlock = await timeOrBlockToBlockNumber(provider, processor.config.start)
-      const endBlock = processor.config.end ? await timeOrBlockToBlockNumber(provider, processor.config.end) : undefined
+      let startBlock, endBlock: bigint | undefined
+      try {
+        const provider = getProvider(chainId)
+        startBlock = await timeOrBlockToBlockNumber(provider, processor.config.start)
+        endBlock = processor.config.end ? await timeOrBlockToBlockNumber(provider, processor.config.end) : undefined
+      } catch (e) {
+        console.error('failed to get start/end block', e)
+        startBlock = processor.config.start?.block != undefined ? BigInt(processor.config.start.block) : undefined
+        endBlock = processor.config.end?.block != undefined ? BigInt(processor.config.end.block) : undefined
+      }
 
       const contractConfig = ContractConfig.fromPartial({
         processorType: USER_PROCESSOR,
