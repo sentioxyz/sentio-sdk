@@ -35,6 +35,10 @@ export function createUploadCommand() {
       '(Optional) Continue processing data from the specific processor version which will keeping the old data from previous version and will STOP that version IMMEDIATELY.',
       myParseInt
     )
+    .option(
+      '--checkpoint <checkpoint...>',
+      '(Optional) Checkpoint(s) to rollback to, only available with --continue-from. Format: "chain_id:block_number" or "block_number" (uses default chain). Can specify multiple checkpoints.'
+    )
     .option('--debug', '(Optional) Run driver in debug mode')
     .option('-y --silent-overwrite', '(Optional) Create project or upload new version without confirmation')
     .option('--skip-build', 'Skip build & pack file before uploading')
@@ -54,6 +58,64 @@ export function createUploadCommand() {
       }
       await runUploadInternal(processorConfig, options)
     })
+}
+
+function parseCheckpoints(
+  checkpoints: string[] | undefined,
+  continueFrom: number | undefined,
+  defaultChainId?: string
+): Record<string, number> | undefined {
+  // Validate that checkpoint is only used with continue-from
+  if (checkpoints && checkpoints.length > 0 && !continueFrom) {
+    console.error(chalk.red('Error: --checkpoint can only be used with --continue-from'))
+    process.exit(1)
+  }
+
+  if (!checkpoints || checkpoints.length === 0) {
+    return undefined
+  }
+
+  const rollbackMap: Record<string, number> = {}
+
+  for (const checkpoint of checkpoints) {
+    const parts = checkpoint.split(':')
+
+    if (parts.length === 1) {
+      // Format: "block_number" - use default chain
+      if (!defaultChainId) {
+        console.error(
+          chalk.red(
+            `Error: Checkpoint "${checkpoint}" does not specify chain_id, and no default chain found in configuration`
+          )
+        )
+        process.exit(1)
+      }
+      const blockNumber = parseInt(parts[0], 10)
+      if (isNaN(blockNumber)) {
+        console.error(chalk.red(`Error: Invalid block number in checkpoint "${checkpoint}"`))
+        process.exit(1)
+      }
+      rollbackMap[defaultChainId] = blockNumber
+    } else if (parts.length === 2) {
+      // Format: "chain_id:block_number"
+      const [chainId, blockStr] = parts
+      const blockNumber = parseInt(blockStr, 10)
+      if (isNaN(blockNumber)) {
+        console.error(chalk.red(`Error: Invalid block number in checkpoint "${checkpoint}"`))
+        process.exit(1)
+      }
+      rollbackMap[chainId] = blockNumber
+    } else {
+      console.error(
+        chalk.red(
+          `Error: Invalid checkpoint format "${checkpoint}". Expected "chain_id:block_number" or "block_number"`
+        )
+      )
+      process.exit(1)
+    }
+  }
+
+  return rollbackMap
 }
 
 async function runUploadInternal(
@@ -225,6 +287,12 @@ export async function uploadFile(
   console.log(chalk.blue('Prepare to upload'))
   const continueFrom = options.continueFrom
 
+  // Get default chain ID from the first contract if available
+  const defaultChainId = config.contracts && config.contracts.length > 0 ? String(config.contracts[0].chain) : undefined
+
+  // Parse checkpoint arguments into rollback map
+  const rollbackMap = parseCheckpoints(options.checkpoint, continueFrom, defaultChainId)
+
   const processorFile = path.join(process.cwd(), 'dist/lib.js')
 
   if (!fs.existsSync(processorFile)) {
@@ -239,7 +307,13 @@ export async function uploadFile(
 
   if (continueFrom) {
     const res = await getProcessorStatus(config.host, auth, config.project)
-    const data = (await res.json()) as { processors: { version: number; versionState: string; sdkVersion: string }[] }
+    const data = (await res.json()) as {
+      processors: {
+        version: number
+        versionState: string
+        sdkVersion: string
+      }[]
+    }
     const found = data?.processors?.find(
       (x) => x.version == continueFrom && (x.versionState == 'ACTIVE' || x.versionState == 'PENDING')
     )
@@ -314,7 +388,8 @@ export async function uploadFile(
         gitUrl,
         config.debug || options.debug,
         continueFrom,
-        config.networkOverrides
+        config.networkOverrides,
+        rollbackMap
       )
 
       console.log(chalk.green('Upload success: '))
