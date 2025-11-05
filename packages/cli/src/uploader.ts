@@ -78,7 +78,15 @@ export abstract class BatchUploader {
     this.projectOwner = projectOwner
   }
 
-  abstract upload(files: Files): Promise<FinishBatchUploadResponse>
+  abstract upload(
+    files: Files,
+    commitSha?: string,
+    gitUrl?: string,
+    debug?: boolean,
+    continueFrom?: number,
+    networkOverrides?: NetworkOverride[],
+    rollback?: Record<string, number>
+  ): Promise<FinishBatchUploadResponse>
 
   async initUpload(fileTypes?: Record<string, FileType>): Promise<InitBatchUploadResponse> {
     const initUploadUrl = getApiUrl(`/api/v1/processors/init_batch_upload`, this.options.host)
@@ -113,7 +121,8 @@ export abstract class BatchUploader {
     gitUrl?: string,
     debug?: boolean,
     continueFrom?: number,
-    networkOverrides?: NetworkOverride[]
+    networkOverrides?: NetworkOverride[],
+    rollback?: Record<string, number>
   ): Promise<FinishBatchUploadResponse> {
     const finishUploadUrl = getApiUrl(`/api/v1/processors/finish_batch_upload`, this.options.host)
 
@@ -142,7 +151,8 @@ export abstract class BatchUploader {
         cli_version: getCliVersion(),
         network_overrides: networkOverrides || [],
         engine: this.engine,
-        payloads: payloads
+        payloads: payloads,
+        rollback: rollback
       })
     })
 
@@ -165,7 +175,8 @@ export class DefaultBatchUploader extends BatchUploader {
     gitUrl?: string,
     debug?: boolean,
     continueFrom?: number,
-    networkOverrides?: NetworkOverride[]
+    networkOverrides?: NetworkOverride[],
+    rollback?: Record<string, number>
   ): Promise<FinishBatchUploadResponse> {
     // Step 1: Initialize upload with file types
     const fileTypes: Record<string, FileType> = {
@@ -200,7 +211,16 @@ export class DefaultBatchUploader extends BatchUploader {
     }
 
     // Step 4: Finish upload with SHA256 map and payloads
-    return this.finishUpload(files, initResponse.payloads, commitSha, gitUrl, debug, continueFrom, networkOverrides)
+    return this.finishUpload(
+      files,
+      initResponse.payloads,
+      commitSha,
+      gitUrl,
+      debug,
+      continueFrom,
+      networkOverrides,
+      rollback
+    )
   }
 }
 
@@ -239,7 +259,8 @@ export class WalrusBatchUploader extends BatchUploader {
     gitUrl?: string,
     debug?: boolean,
     continueFrom?: number,
-    networkOverrides?: NetworkOverride[]
+    networkOverrides?: NetworkOverride[],
+    rollback?: Record<string, number>
   ): Promise<FinishBatchUploadResponse> {
     // Step 1: Initialize upload with file types
     const fileTypes: Record<string, FileType> = {
@@ -312,7 +333,7 @@ export class WalrusBatchUploader extends BatchUploader {
     }
 
     // Step 5: Finish upload with SHA256 map and updated payloads
-    return this.finishUpload(files, updatedPayloads, commitSha, gitUrl, debug, continueFrom, networkOverrides)
+    return this.finishUpload(files, updatedPayloads, commitSha, gitUrl, debug, continueFrom, networkOverrides, rollback)
   }
 }
 
