@@ -45,6 +45,8 @@ export interface TypedEvent<TArgsArray extends Array<any> = any, TArgsObject = a
   name: string
 }
 
+export type RawEvent = Record<string, any>
+
 export type TypedEventFilter<_TEvent extends TypedEvent> = DeferredTopicFilter
 
 export interface RichBlock extends BlockParams {
