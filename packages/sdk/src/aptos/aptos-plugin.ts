@@ -127,10 +127,31 @@ export class AptosPlugin extends Plugin {
         contractConfig.moveCallConfigs.push(functionHandlerConfig)
       }
 
+      // 3. Prepare onInterval handlers
+      for (const handler of aptosProcessor.transactionIntervalHandlers) {
+        const handlerId = this.handlerRegister.register(handler.handler, chainId)
+        this.partitionManager.registerPartitionHandler(HandlerType.APT_CALL, handlerId, handler.partitionHandler)
+        contractConfig.moveIntervalConfigs.push({
+          intervalConfig: {
+            handlerId: handlerId,
+            handlerName: handler.handlerName,
+            minutes: 0,
+            minutesInterval: handler.timeIntervalInMinutes,
+            slot: 0,
+            slotInterval: handler.versionInterval,
+            fetchConfig: undefined
+          },
+          ownerType: MoveOwnerType.ADDRESS,
+          fetchConfig: handler.fetchConfig,
+          resourceFetchConfig: undefined,
+          type: ''
+        })
+      }
+
       config.contractConfigs.push(contractConfig)
     }
 
-    // Prepare resource handlers
+    // Prepare resource change handlers
     for (const aptosProcessor of AptosProcessorState.INSTANCE.getValues()) {
       const chainId = aptosProcessor.getChainId()
       if (forChainId !== undefined && forChainId !== chainId.toString()) {
@@ -150,27 +171,6 @@ export class AptosPlugin extends Plugin {
           handlerName: handler.handlerName,
           type: handler.type,
           includeDeleted: false
-        })
-      }
-
-      //  Prepare interval handlers
-      for (const handler of aptosProcessor.transactionIntervalHandlers) {
-        const handlerId = this.handlerRegister.register(handler.handler, chainId)
-        this.partitionManager.registerPartitionHandler(HandlerType.APT_CALL, handlerId, handler.partitionHandler)
-        accountConfig.moveIntervalConfigs.push({
-          intervalConfig: {
-            handlerId: handlerId,
-            handlerName: handler.handlerName,
-            minutes: 0,
-            minutesInterval: handler.timeIntervalInMinutes,
-            slot: 0,
-            slotInterval: handler.versionInterval,
-            fetchConfig: undefined
-          },
-          ownerType: MoveOwnerType.ADDRESS,
-          fetchConfig: handler.fetchConfig,
-          resourceFetchConfig: undefined,
-          type: ''
         })
       }
 
