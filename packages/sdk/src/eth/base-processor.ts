@@ -19,6 +19,7 @@ import { ServerError, Status } from 'nice-grpc'
 import {
   fixEmptyKey,
   formatEthData,
+  RawEvent,
   RichBlock,
   Trace,
   TypedCallTrace,
@@ -520,7 +521,7 @@ export abstract class BaseProcessor<
   }
 
   protected onEthEvent(
-    handler: (event: TypedEvent, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
+    handler: (event: TypedEvent | RawEvent, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     filter: DeferredTopicFilter | DeferredTopicFilter[],
     handlerOptions?: HandlerOptions<EthFetchConfig, TypedEvent>,
     preprocessHandler: (
@@ -560,7 +561,23 @@ export abstract class BaseProcessor<
         if (processor.config.address === '*') {
           contractView.address = log.address
         }
-
+        const ctx = new ContractContext<TContract, TBoundContractView>(
+          contractName,
+          contractView,
+          chainId,
+          data.timestamp,
+          block,
+          log,
+          undefined,
+          transaction,
+          transactionReceipt,
+          processor.config.baseLabels,
+          preparedData
+        )
+        if (handlerOptions?.skipDecoding) {
+          await handler(log, ctx)
+          return ctx.stopAndGetResult()
+        }
         let parsed: LogDescription | null = null
         try {
           parsed = await getCachedParsedLog(data, processor, log)
@@ -575,19 +592,6 @@ export abstract class BaseProcessor<
           throw e
         }
         if (parsed) {
-          const ctx = new ContractContext<TContract, TBoundContractView>(
-            contractName,
-            contractView,
-            chainId,
-            data.timestamp,
-            block,
-            log,
-            undefined,
-            transaction,
-            transactionReceipt,
-            processor.config.baseLabels,
-            preparedData
-          )
           const event: TypedEvent = { ...log, name: parsed.name, args: fixEmptyKey(parsed) }
           await handler(event, ctx)
           return ctx.stopAndGetResult()

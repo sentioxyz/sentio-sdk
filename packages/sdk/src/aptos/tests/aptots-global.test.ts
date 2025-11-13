@@ -17,7 +17,6 @@ describe('Test Global Aptos Prcessor', () => {
     const config = await service.getConfig({})
     expect(config.contractConfigs).length(1)
 
-    expect(config.accountConfigs).length(1)
-    expect(config.accountConfigs[0].moveIntervalConfigs).length(1)
+    expect(config.contractConfigs[0].moveIntervalConfigs).length(1)
   })
 })
