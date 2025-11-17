@@ -13,7 +13,6 @@ import {
 } from '@sentio/protos'
 
 import { ServerError, Status } from 'nice-grpc'
-import { TemplateInstanceState } from '../core/template.js'
 import { FuelAssetProcessor } from './asset-processor.js'
 import { FuelProcessorState } from './types.js'
 import { FuelProcessor } from './fuel-processor.js'
@@ -189,10 +188,6 @@ export class FuelPlugin extends Plugin {
     } catch (e) {
       throw new ServerError(Status.INTERNAL, 'error starting FuelPlugin: ' + errorString(e))
     }
-  }
-
-  stateDiff(config: ProcessConfigResponse): boolean {
-    return TemplateInstanceState.INSTANCE.getValues().length !== config.templateInstances.length
   }
 
   async processReceipt(binding: DataBinding): Promise<ProcessResult> {

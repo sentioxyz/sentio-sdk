@@ -55,7 +55,7 @@ export class AptosPlugin extends Plugin {
       const template: AptosResourceProcessorTemplate =
         AptosResourceProcessorTemplateState.INSTANCE.getValues()[instance.templateId]
 
-      template.bind(
+      template.startInstance(
         {
           address: instance.contract?.address || '',
           network: <AptosNetwork>instance.contract?.chainId || AptosNetwork.MAIN_NET,

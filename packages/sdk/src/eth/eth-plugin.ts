@@ -32,7 +32,6 @@ import { GlobalProcessorState } from './base-processor.js'
 import { validateAndNormalizeAddress } from './eth.js'
 import { EthChainId } from '@sentio/chain'
 import { EthContext } from './context.js'
-import { TemplateInstanceState } from '../core/template.js'
 import { timeOrBlockToBlockNumber } from '@sentio/sdk/utils'
 import { HandlerRegister } from '../core/handler-register.js'
 
@@ -399,7 +398,7 @@ export class EthPlugin extends Plugin {
         throw new ServerError(Status.INVALID_ARGUMENT, 'Contract Empty from:' + instance)
       }
       const ctx = new NoopContext(instance.contract.chainId as EthChainId)
-      template.bind(
+      template.startInstance(
         {
           name: instance.contract.name,
           address: validateAndNormalizeAddress(instance.contract.address),
@@ -410,10 +409,6 @@ export class EthPlugin extends Plugin {
         ctx
       )
     }
-  }
-
-  stateDiff(config: ProcessConfigResponse): boolean {
-    return TemplateInstanceState.INSTANCE.getValues().length !== config.templateInstances.length
   }
 
   async processLog(request: DataBinding, preparedData: PreparedData | undefined): Promise<ProcessResult> {

@@ -15,7 +15,6 @@ import { Subject } from 'rxjs'
 
 import { MessageChannel } from 'node:worker_threads'
 import { ProcessorServiceImpl } from './service.js'
-import { TemplateInstanceState } from './state.js'
 import { ProcessorRuntimeOptions } from 'processor-runner-program.js'
 ;(BigInt.prototype as any).toJSON = function () {
   return this.toString()
@@ -139,13 +138,6 @@ export class ServiceManager extends ProcessorServiceImpl {
       filename: new URL('./service-worker.js', import.meta.url).href.replaceAll('runtime/src', 'runtime/lib'),
       argv: process.argv,
       workerData: this.workerData
-    })
-    // @ts-ignore - Piscina message handling for template instance sync
-    this.pool.on('message', (msg: any) => {
-      if (msg.event == 'add_template_instance') {
-        // sync the template state from worker to the main thread
-        TemplateInstanceState.INSTANCE.addValue(msg.value)
-      }
     })
   }
 }

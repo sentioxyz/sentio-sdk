@@ -10,7 +10,6 @@ import {
 } from '@sentio/protos'
 
 import { ServerError, Status } from 'nice-grpc'
-import { TemplateInstanceState } from '../core/template.js'
 import { HandlerRegister } from '../core/handler-register.js'
 import { StarknetProcessorState } from './starknet-processor.js'
 import { hash } from 'starknet'
@@ -78,10 +77,6 @@ export class StarknetPlugin extends Plugin {
   }
 
   async start(request: StartRequest) {}
-
-  stateDiff(config: ProcessConfigResponse): boolean {
-    return TemplateInstanceState.INSTANCE.getValues().length !== config.templateInstances.length
-  }
 
   async processEvent(binding: DataBinding): Promise<ProcessResult> {
     if (!binding.data?.starknetEvents?.result) {

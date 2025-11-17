@@ -3,7 +3,6 @@ import { InitResponse, ProcessConfigResponse } from '@sentio/protos'
 
 import { MetricState } from './meter.js'
 import { ExporterState } from './exporter.js'
-import { TemplateInstanceState } from './template.js'
 import { EventLoggerState } from './event-logger.js'
 import { DatabaseSchemaState, mergeSchemas } from './database-schema.js'
 
@@ -11,9 +10,6 @@ export class CorePlugin extends Plugin {
   name: string = 'CorePlugin'
 
   async configure(config: ProcessConfigResponse): Promise<void> {
-    // This syntax is to copy values instead of using references
-    config.templateInstances = [...TemplateInstanceState.INSTANCE.getValues()]
-
     this.initStartupConfig(config)
   }
 

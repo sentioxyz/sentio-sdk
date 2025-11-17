@@ -8,7 +8,6 @@ import {
   ProcessStreamResponse_Partitions,
   ProcessStreamResponse_Partitions_Partition_SysValue,
   StartRequest,
-  TemplateInstance,
   UpdateTemplatesRequest
 } from '@sentio/protos'
 import { IDataBindingContext, IStoreContext } from './db-context.js'
@@ -151,16 +150,6 @@ export class PluginManager {
       await plugin.start({
         templateInstances: request.templateInstances
       })
-    }
-  }
-
-  sendTemplateInstance(instance: TemplateInstance) {
-    // send template instance within the current db context
-    // this is only work in user handlers, when dbContextLocalStorage is set
-    // plugin.Configure does not have db context
-    const store = this.dbContextLocalStorage.getStore()
-    if (store && 'sendTemplateRequest' in store) {
-      store?.sendTemplateRequest([instance])
     }
   }
 }

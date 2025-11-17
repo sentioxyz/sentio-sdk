@@ -45,7 +45,7 @@ export class SuiPluginPart {
       const template: SuiObjectOrAddressProcessorTemplate<any, any, any> =
         SuiAccountProcessorTemplateState.INSTANCE.getValues()[instance.templateId]
 
-      template.bind(
+      template.startInstance(
         {
           address: instance.contract?.address || '',
           objectId: instance.contract?.address || '',
