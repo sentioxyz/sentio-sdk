@@ -1,7 +1,3 @@
-import { TemplateInstance } from '@sentio/protos'
-import { isMainThread, parentPort, threadId } from 'node:worker_threads'
-import { PluginManager } from './plugin.js'
-
 export class State {
   stateMap = new Map<string, any>()
 

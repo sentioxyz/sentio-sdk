@@ -1052,6 +1052,7 @@ export interface EntityUpdateData_FieldsEntry {
 
 export interface TPLRequest {
   templates: TemplateInstance[];
+  remove: boolean;
 }
 
 export interface TSRequest {
@@ -8642,13 +8643,16 @@ export const EntityUpdateData_FieldsEntry = {
 };
 
 function createBaseTPLRequest(): TPLRequest {
-  return { templates: [] };
+  return { templates: [], remove: false };
 }
 
 export const TPLRequest = {
   encode(message: TPLRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     for (const v of message.templates) {
       TemplateInstance.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.remove !== false) {
+      writer.uint32(16).bool(message.remove);
     }
     return writer;
   },
@@ -8667,6 +8671,13 @@ export const TPLRequest = {
 
           message.templates.push(TemplateInstance.decode(reader, reader.uint32()));
           continue;
+        case 2:
+          if (tag !== 16) {
+            break;
+          }
+
+          message.remove = reader.bool();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -8681,6 +8692,7 @@ export const TPLRequest = {
       templates: globalThis.Array.isArray(object?.templates)
         ? object.templates.map((e: any) => TemplateInstance.fromJSON(e))
         : [],
+      remove: isSet(object.remove) ? globalThis.Boolean(object.remove) : false,
     };
   },
 
@@ -8688,6 +8700,9 @@ export const TPLRequest = {
     const obj: any = {};
     if (message.templates?.length) {
       obj.templates = message.templates.map((e) => TemplateInstance.toJSON(e));
+    }
+    if (message.remove !== false) {
+      obj.remove = message.remove;
     }
     return obj;
   },
@@ -8698,6 +8713,7 @@ export const TPLRequest = {
   fromPartial(object: DeepPartial<TPLRequest>): TPLRequest {
     const message = createBaseTPLRequest();
     message.templates = object.templates?.map((e) => TemplateInstance.fromPartial(e)) || [];
+    message.remove = object.remove ?? false;
     return message;
   },
 };

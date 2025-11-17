@@ -1,5 +1,5 @@
 import { HandleInterval, MoveAccountFetchConfig, MoveFetchConfig, TemplateInstance } from '@sentio/protos'
-import { ListStateStorage, PluginManager, processMetrics } from '@sentio/runtime'
+import { ListStateStorage, processMetrics } from '@sentio/runtime'
 import { IotaAddressContext, IotaContext, IotaObjectContext } from './context.js'
 import { IotaMoveObject, IotaTransactionBlockResponse } from '@iota/iota-sdk/client'
 import { PromiseOrVoid } from '../core/index.js'
@@ -160,6 +160,21 @@ export abstract class IotaObjectOrAddressProcessorTemplate<
         configUpdated: true
       }
     })
+    ctx.sendTemplateInstance(
+      {
+        templateId: this.id,
+        contract: {
+          name: '',
+          chainId: options.network,
+          address: id,
+          abi: ''
+        },
+        startBlock: options.startCheckpoint || 0n,
+        endBlock: options.endCheckpoint || 0n,
+        baseLabels: options.baseLabels
+      },
+      true
+    )
   }
 
   protected onInterval(

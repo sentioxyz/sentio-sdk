@@ -93,10 +93,10 @@ export abstract class BaseContext {
     }
   }
 
-  sendTemplateInstance(instance: TemplateInstance) {
+  sendTemplateInstance(instance: TemplateInstance, unbind: boolean = false) {
     const store = PluginManager.INSTANCE.dbContextLocalStorage.getStore()
     if (store && 'sendTemplateRequest' in store) {
-      store?.sendTemplateRequest([instance])
+      store?.sendTemplateRequest([instance], unbind)
     }
   }
 }

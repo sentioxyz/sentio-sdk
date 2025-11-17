@@ -1,7 +1,7 @@
 import { FuelContext, FuelContractContext } from './context.js'
 import { HandleInterval, TemplateInstance } from '@sentio/protos'
 import { PromiseOrVoid } from '../core/promises.js'
-import { ListStateStorage, PluginManager, processMetrics } from '@sentio/runtime'
+import { ListStateStorage, processMetrics } from '@sentio/runtime'
 import { Contract } from 'fuels'
 import { FuelBlock, FuelLog, FuelTransaction } from './types.js'
 import { DEFAULT_FUEL_FETCH_CONFIG, FuelFetchConfig } from './transaction.js'

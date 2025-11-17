@@ -1,5 +1,5 @@
 import { HandleInterval, MoveAccountFetchConfig, MoveFetchConfig, TemplateInstance } from '@sentio/protos'
-import { ListStateStorage, PluginManager, processMetrics } from '@sentio/runtime'
+import { ListStateStorage, processMetrics } from '@sentio/runtime'
 import { SuiAddressContext, SuiContext, SuiObjectContext } from './context.js'
 import { SuiMoveObject, SuiTransactionBlockResponse } from '@mysten/sui/client'
 import { PromiseOrVoid } from '../core/index.js'
@@ -13,7 +13,7 @@ import {
   SuiWrappedObjectProcessor
 } from './sui-object-processor.js'
 import { SuiBindOptions } from './sui-processor.js'
-import { TransactionFilter, accountAddressString } from '../move/index.js'
+import { accountAddressString, TransactionFilter } from '../move/index.js'
 import { ServerError, Status } from 'nice-grpc'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 
@@ -160,6 +160,22 @@ export abstract class SuiObjectOrAddressProcessorTemplate<
         configUpdated: true
       }
     })
+
+    ctx.sendTemplateInstance(
+      {
+        templateId: this.id,
+        contract: {
+          name: '',
+          chainId: options.network,
+          address: id,
+          abi: ''
+        },
+        startBlock: options.startCheckpoint || 0n,
+        endBlock: options.endCheckpoint || 0n,
+        baseLabels: options.baseLabels
+      },
+      true
+    )
   }
 
   protected onInterval(

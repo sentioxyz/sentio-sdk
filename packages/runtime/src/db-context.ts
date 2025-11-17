@@ -42,7 +42,7 @@ export interface IStoreContext {
 }
 
 export interface IDataBindingContext extends IStoreContext {
-  sendTemplateRequest(templates: Array<TemplateInstance>): void
+  sendTemplateRequest(templates: Array<TemplateInstance>, unbind: boolean): void
   sendTimeseriesRequest(timeseries: Array<TimeseriesResult>): void
 }
 
@@ -262,11 +262,12 @@ export class DataBindingContext extends AbstractStoreContext implements IDataBin
     super(processId)
   }
 
-  sendTemplateRequest(templates: Array<TemplateInstance>) {
+  sendTemplateRequest(templates: Array<TemplateInstance>, unbind: boolean) {
     this.subject.next({
       processId: this.processId,
       tplRequest: {
-        templates
+        templates,
+        remove: unbind
       }
     })
   }

@@ -4,7 +4,7 @@ import { BaseProcessor, defaultPreprocessHandler } from './base-processor.js'
 import { BindOptions, getOptionsSignature } from './bind-options.js'
 import { EthFetchConfig, HandleInterval, TemplateInstance, PreprocessResult } from '@sentio/protos'
 import { PromiseOrVoid } from '../core/promises.js'
-import { ListStateStorage, PluginManager, processMetrics } from '@sentio/runtime'
+import { ListStateStorage, processMetrics } from '@sentio/runtime'
 import { BlockParams } from 'ethers/providers'
 import { DeferredTopicFilter } from 'ethers/contract'
 import { TypedEvent, TypedCallTrace, validateAndNormalizeAddress } from './eth.js'
@@ -97,6 +97,7 @@ export abstract class BaseProcessorTemplate<
   }
 
   public startInstance(options: Omit<BindOptions, 'network'>, ctx: EthContext) {
+    options = { ...options, address: validateAndNormalizeAddress(options.address) }
     const sig = getOptionsSignature({
       address: options.address,
       network: ctx.chainId

@@ -1,4 +1,4 @@
-import { ListStateStorage, PluginManager, processMetrics } from '@sentio/runtime'
+import { ListStateStorage, processMetrics } from '@sentio/runtime'
 import { AptosResourcesContext } from './context.js'
 import { AptosBindOptions } from './network.js'
 import { AptosResourcesProcessor, DEFAULT_RESOURCE_FETCH_CONFIG } from './aptos-processor.js'

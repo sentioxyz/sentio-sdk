@@ -1,7 +1,7 @@
 /* eslint-disable */
 import Long from "long";
 import _m0 from "protobufjs/minimal.js";
-import { Struct } from "../../../google/protobuf/struct.js";
+import { ListValue, Struct } from "../../../google/protobuf/struct.js";
 import { Timestamp } from "../../../google/protobuf/timestamp.js";
 import { Money } from "../../../google/type/money.js";
 
@@ -311,6 +311,45 @@ export function notificationTypeToJSON(object: NotificationType): string {
   }
 }
 
+export enum ChatType {
+  CHAT_TYPE_UNSPECIFIED = 0,
+  CHAT_TYPE_CHAT = 1,
+  CHAT_TYPE_ACTION = 2,
+  UNRECOGNIZED = -1,
+}
+
+export function chatTypeFromJSON(object: any): ChatType {
+  switch (object) {
+    case 0:
+    case "CHAT_TYPE_UNSPECIFIED":
+      return ChatType.CHAT_TYPE_UNSPECIFIED;
+    case 1:
+    case "CHAT_TYPE_CHAT":
+      return ChatType.CHAT_TYPE_CHAT;
+    case 2:
+    case "CHAT_TYPE_ACTION":
+      return ChatType.CHAT_TYPE_ACTION;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return ChatType.UNRECOGNIZED;
+  }
+}
+
+export function chatTypeToJSON(object: ChatType): string {
+  switch (object) {
+    case ChatType.CHAT_TYPE_UNSPECIFIED:
+      return "CHAT_TYPE_UNSPECIFIED";
+    case ChatType.CHAT_TYPE_CHAT:
+      return "CHAT_TYPE_CHAT";
+    case ChatType.CHAT_TYPE_ACTION:
+      return "CHAT_TYPE_ACTION";
+    case ChatType.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
 export interface UsageTracker {
   apiSku: string;
   webuiSku: string;
@@ -412,6 +451,8 @@ export interface User {
   accountStatus: User_AccountStatus;
   tier: Tier;
   isOrganization: boolean;
+  walletAddress: string;
+  identities: string[];
 }
 
 export enum User_AccountStatus {
@@ -2050,6 +2091,23 @@ export interface RequestLog {
   chainId: string;
 }
 
+export interface HistoryChat {
+  id: string;
+  title: string;
+  messages: Array<any> | undefined;
+  type: ChatType;
+  meta: { [key: string]: any } | undefined;
+  createdAt: Date | undefined;
+  updatedAt: Date | undefined;
+  projectOwner?: string | undefined;
+  projectSlug?: string | undefined;
+}
+
+export interface ProjectOwnerAndSlug {
+  ownerName: string;
+  slug: string;
+}
+
 function createBaseUsageTracker(): UsageTracker {
   return {
     apiSku: "",
@@ -2796,6 +2854,8 @@ function createBaseUser(): User {
     accountStatus: 0,
     tier: 0,
     isOrganization: false,
+    walletAddress: "",
+    identities: [],
   };
 }
 
@@ -2851,6 +2911,12 @@ export const User = {
     }
     if (message.isOrganization !== false) {
       writer.uint32(128).bool(message.isOrganization);
+    }
+    if (message.walletAddress !== "") {
+      writer.uint32(138).string(message.walletAddress);
+    }
+    for (const v of message.identities) {
+      writer.uint32(146).string(v!);
     }
     return writer;
   },
@@ -2967,6 +3033,20 @@ export const User = {
 
           message.isOrganization = reader.bool();
           continue;
+        case 17:
+          if (tag !== 138) {
+            break;
+          }
+
+          message.walletAddress = reader.string();
+          continue;
+        case 18:
+          if (tag !== 146) {
+            break;
+          }
+
+          message.identities.push(reader.string());
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -2993,6 +3073,10 @@ export const User = {
       accountStatus: isSet(object.accountStatus) ? user_AccountStatusFromJSON(object.accountStatus) : 0,
       tier: isSet(object.tier) ? tierFromJSON(object.tier) : 0,
       isOrganization: isSet(object.isOrganization) ? globalThis.Boolean(object.isOrganization) : false,
+      walletAddress: isSet(object.walletAddress) ? globalThis.String(object.walletAddress) : "",
+      identities: globalThis.Array.isArray(object?.identities)
+        ? object.identities.map((e: any) => globalThis.String(e))
+        : [],
     };
   },
 
@@ -3043,6 +3127,12 @@ export const User = {
     if (message.isOrganization !== false) {
       obj.isOrganization = message.isOrganization;
     }
+    if (message.walletAddress !== "") {
+      obj.walletAddress = message.walletAddress;
+    }
+    if (message.identities?.length) {
+      obj.identities = message.identities;
+    }
     return obj;
   },
 
@@ -3066,6 +3156,8 @@ export const User = {
     message.accountStatus = object.accountStatus ?? 0;
     message.tier = object.tier ?? 0;
     message.isOrganization = object.isOrganization ?? false;
+    message.walletAddress = object.walletAddress ?? "";
+    message.identities = object.identities?.map((e) => e) || [];
     return message;
   },
 };
@@ -14691,6 +14783,269 @@ export const RequestLog = {
     message.originUrl = object.originUrl ?? "";
     message.endpointType = object.endpointType ?? "";
     message.chainId = object.chainId ?? "";
+    return message;
+  },
+};
+
+function createBaseHistoryChat(): HistoryChat {
+  return {
+    id: "",
+    title: "",
+    messages: undefined,
+    type: 0,
+    meta: undefined,
+    createdAt: undefined,
+    updatedAt: undefined,
+    projectOwner: undefined,
+    projectSlug: undefined,
+  };
+}
+
+export const HistoryChat = {
+  encode(message: HistoryChat, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    if (message.title !== "") {
+      writer.uint32(18).string(message.title);
+    }
+    if (message.messages !== undefined) {
+      ListValue.encode(ListValue.wrap(message.messages), writer.uint32(34).fork()).ldelim();
+    }
+    if (message.type !== 0) {
+      writer.uint32(40).int32(message.type);
+    }
+    if (message.meta !== undefined) {
+      Struct.encode(Struct.wrap(message.meta), writer.uint32(50).fork()).ldelim();
+    }
+    if (message.createdAt !== undefined) {
+      Timestamp.encode(toTimestamp(message.createdAt), writer.uint32(58).fork()).ldelim();
+    }
+    if (message.updatedAt !== undefined) {
+      Timestamp.encode(toTimestamp(message.updatedAt), writer.uint32(66).fork()).ldelim();
+    }
+    if (message.projectOwner !== undefined) {
+      writer.uint32(74).string(message.projectOwner);
+    }
+    if (message.projectSlug !== undefined) {
+      writer.uint32(82).string(message.projectSlug);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): HistoryChat {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseHistoryChat();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.title = reader.string();
+          continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.messages = ListValue.unwrap(ListValue.decode(reader, reader.uint32()));
+          continue;
+        case 5:
+          if (tag !== 40) {
+            break;
+          }
+
+          message.type = reader.int32() as any;
+          continue;
+        case 6:
+          if (tag !== 50) {
+            break;
+          }
+
+          message.meta = Struct.unwrap(Struct.decode(reader, reader.uint32()));
+          continue;
+        case 7:
+          if (tag !== 58) {
+            break;
+          }
+
+          message.createdAt = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+          continue;
+        case 8:
+          if (tag !== 66) {
+            break;
+          }
+
+          message.updatedAt = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+          continue;
+        case 9:
+          if (tag !== 74) {
+            break;
+          }
+
+          message.projectOwner = reader.string();
+          continue;
+        case 10:
+          if (tag !== 82) {
+            break;
+          }
+
+          message.projectSlug = reader.string();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): HistoryChat {
+    return {
+      id: isSet(object.id) ? globalThis.String(object.id) : "",
+      title: isSet(object.title) ? globalThis.String(object.title) : "",
+      messages: globalThis.Array.isArray(object.messages) ? [...object.messages] : undefined,
+      type: isSet(object.type) ? chatTypeFromJSON(object.type) : 0,
+      meta: isObject(object.meta) ? object.meta : undefined,
+      createdAt: isSet(object.createdAt) ? fromJsonTimestamp(object.createdAt) : undefined,
+      updatedAt: isSet(object.updatedAt) ? fromJsonTimestamp(object.updatedAt) : undefined,
+      projectOwner: isSet(object.projectOwner) ? globalThis.String(object.projectOwner) : undefined,
+      projectSlug: isSet(object.projectSlug) ? globalThis.String(object.projectSlug) : undefined,
+    };
+  },
+
+  toJSON(message: HistoryChat): unknown {
+    const obj: any = {};
+    if (message.id !== "") {
+      obj.id = message.id;
+    }
+    if (message.title !== "") {
+      obj.title = message.title;
+    }
+    if (message.messages !== undefined) {
+      obj.messages = message.messages;
+    }
+    if (message.type !== 0) {
+      obj.type = chatTypeToJSON(message.type);
+    }
+    if (message.meta !== undefined) {
+      obj.meta = message.meta;
+    }
+    if (message.createdAt !== undefined) {
+      obj.createdAt = message.createdAt.toISOString();
+    }
+    if (message.updatedAt !== undefined) {
+      obj.updatedAt = message.updatedAt.toISOString();
+    }
+    if (message.projectOwner !== undefined) {
+      obj.projectOwner = message.projectOwner;
+    }
+    if (message.projectSlug !== undefined) {
+      obj.projectSlug = message.projectSlug;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<HistoryChat>): HistoryChat {
+    return HistoryChat.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<HistoryChat>): HistoryChat {
+    const message = createBaseHistoryChat();
+    message.id = object.id ?? "";
+    message.title = object.title ?? "";
+    message.messages = object.messages ?? undefined;
+    message.type = object.type ?? 0;
+    message.meta = object.meta ?? undefined;
+    message.createdAt = object.createdAt ?? undefined;
+    message.updatedAt = object.updatedAt ?? undefined;
+    message.projectOwner = object.projectOwner ?? undefined;
+    message.projectSlug = object.projectSlug ?? undefined;
+    return message;
+  },
+};
+
+function createBaseProjectOwnerAndSlug(): ProjectOwnerAndSlug {
+  return { ownerName: "", slug: "" };
+}
+
+export const ProjectOwnerAndSlug = {
+  encode(message: ProjectOwnerAndSlug, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.ownerName !== "") {
+      writer.uint32(10).string(message.ownerName);
+    }
+    if (message.slug !== "") {
+      writer.uint32(18).string(message.slug);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ProjectOwnerAndSlug {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseProjectOwnerAndSlug();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.ownerName = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.slug = reader.string();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ProjectOwnerAndSlug {
+    return {
+      ownerName: isSet(object.ownerName) ? globalThis.String(object.ownerName) : "",
+      slug: isSet(object.slug) ? globalThis.String(object.slug) : "",
+    };
+  },
+
+  toJSON(message: ProjectOwnerAndSlug): unknown {
+    const obj: any = {};
+    if (message.ownerName !== "") {
+      obj.ownerName = message.ownerName;
+    }
+    if (message.slug !== "") {
+      obj.slug = message.slug;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<ProjectOwnerAndSlug>): ProjectOwnerAndSlug {
+    return ProjectOwnerAndSlug.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ProjectOwnerAndSlug>): ProjectOwnerAndSlug {
+    const message = createBaseProjectOwnerAndSlug();
+    message.ownerName = object.ownerName ?? "";
+    message.slug = object.slug ?? "";
     return message;
   },
 };
