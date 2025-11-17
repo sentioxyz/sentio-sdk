@@ -8,9 +8,10 @@ import {
   ProcessStreamResponse_Partitions,
   ProcessStreamResponse_Partitions_Partition_SysValue,
   StartRequest,
+  TemplateInstance,
   UpdateTemplatesRequest
 } from '@sentio/protos'
-import { IStoreContext, StoreContext } from './db-context.js'
+import { IDataBindingContext, IStoreContext } from './db-context.js'
 import { AsyncLocalStorage } from 'node:async_hooks'
 
 export abstract class Plugin {
@@ -65,7 +66,7 @@ export abstract class Plugin {
 export class PluginManager {
   static INSTANCE = new PluginManager()
 
-  dbContextLocalStorage = new AsyncLocalStorage<IStoreContext | undefined>()
+  dbContextLocalStorage = new AsyncLocalStorage<IDataBindingContext | IStoreContext | undefined>()
   plugins: Plugin[] = []
   typesToPlugin = new Map<HandlerType, Plugin>()
 
@@ -112,7 +113,7 @@ export class PluginManager {
   processBinding(
     request: DataBinding,
     preparedData: PreparedData | undefined,
-    dbContext?: IStoreContext
+    dbContext?: IDataBindingContext | IStoreContext
   ): Promise<ProcessResult> {
     const plugin = this.typesToPlugin.get(request.handlerType)
     if (!plugin) {
@@ -134,7 +135,7 @@ export class PluginManager {
   preprocessBinding(
     request: DataBinding,
     preprocessStore: { [k: string]: any },
-    dbContext?: StoreContext
+    dbContext?: IDataBindingContext | IStoreContext
   ): Promise<PreprocessResult> {
     const plugin = this.typesToPlugin.get(request.handlerType)
     if (!plugin) {
@@ -150,6 +151,16 @@ export class PluginManager {
       await plugin.start({
         templateInstances: request.templateInstances
       })
+    }
+  }
+
+  sendTemplateInstance(instance: TemplateInstance) {
+    // send template instance within the current db context
+    // this is only work in user handlers, when dbContextLocalStorage is set
+    // plugin.Configure does not have db context
+    const store = this.dbContextLocalStorage.getStore()
+    if (store && 'sendTemplateRequest' in store) {
+      store?.sendTemplateRequest([instance])
     }
   }
 }

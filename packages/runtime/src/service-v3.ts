@@ -182,7 +182,7 @@ export class ProcessorServiceImplV3 implements ProcessorV3ServiceImplementation 
           })
         }
 
-        if (result.states?.configUpdated) {
+        /* if (result.states?.configUpdated) {
           console.debug('sending tpl updates:')
           subject.next({
             processId,
@@ -190,7 +190,7 @@ export class ProcessorServiceImplV3 implements ProcessorV3ServiceImplementation 
               templates: TemplateInstanceState.INSTANCE.getValues()
             }
           })
-        }
+        }*/
 
         console.debug('sending binding result', processId)
         subject.next({

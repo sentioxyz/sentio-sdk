@@ -94,7 +94,7 @@ describe('Test Service V3 with worker without partition', () => {
 
     await service.handleRequest(request1, undefined, subject)
     await new Promise((resolve) => setTimeout(resolve, 200)) // wait for async processing
-    assert.strictEqual(i, 3, 'Should have processed two responses')
+    assert.strictEqual(i, 2, 'Should have processed two responses')
 
     assert.ok(result, 'Result should be present in the response')
     assert.ok(result?.states, 'States should be present in the result')
