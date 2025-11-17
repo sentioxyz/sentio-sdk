@@ -253,7 +253,7 @@ export class StoreContext extends AbstractStoreContext {
   }
 }
 
-// for service v2
+// for service v3
 export class DataBindingContext extends AbstractStoreContext implements IDataBindingContext {
   constructor(
     readonly processId: number,
