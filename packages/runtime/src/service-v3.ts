@@ -24,7 +24,6 @@ import { errorString } from './utils.js'
 import { processMetrics } from './metrics.js'
 import { recordRuntimeInfo } from './service.js'
 import { DataBindingContext } from './db-context.js'
-import { TemplateInstanceState } from './state.js'
 import { freezeGlobalConfig } from './global-config.js'
 import { ProcessorRuntimeOptions } from 'processor-runner-program.js'
 
