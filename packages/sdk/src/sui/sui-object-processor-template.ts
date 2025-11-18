@@ -1,5 +1,5 @@
-import { HandleInterval, MoveAccountFetchConfig, MoveFetchConfig } from '@sentio/protos'
-import { ListStateStorage } from '@sentio/runtime'
+import { HandleInterval, MoveAccountFetchConfig, MoveFetchConfig, TemplateInstance } from '@sentio/protos'
+import { ListStateStorage, processMetrics } from '@sentio/runtime'
 import { SuiAddressContext, SuiContext, SuiObjectContext } from './context.js'
 import { SuiMoveObject, SuiTransactionBlockResponse } from '@mysten/sui/client'
 import { PromiseOrVoid } from '../core/index.js'
@@ -12,9 +12,8 @@ import {
   SuiObjectProcessor,
   SuiWrappedObjectProcessor
 } from './sui-object-processor.js'
-import { TemplateInstanceState } from '../core/template.js'
 import { SuiBindOptions } from './sui-processor.js'
-import { TransactionFilter, accountAddressString } from '../move/index.js'
+import { accountAddressString, TransactionFilter } from '../move/index.js'
 import { ServerError, Status } from 'nice-grpc'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 
@@ -40,7 +39,7 @@ export abstract class SuiObjectOrAddressProcessorTemplate<
 > {
   id: number
   objectHandlers: ObjectHandler<HandlerType>[] = []
-  binds = new Set<string>()
+  instances = new Set<string>()
 
   constructor() {
     this.id = SuiAccountProcessorTemplateState.INSTANCE.getValues().length
@@ -60,12 +59,49 @@ export abstract class SuiObjectOrAddressProcessorTemplate<
     }
     id = accountAddressString(id)
 
+    const instance: TemplateInstance = {
+      templateId: this.id,
+      contract: {
+        name: '',
+        chainId: options.network,
+        address: id,
+        abi: ''
+      },
+      startBlock: options.startCheckpoint || 0n,
+      endBlock: options.endCheckpoint || 0n,
+      baseLabels: options.baseLabels
+    }
+
+    ctx.sendTemplateInstance(instance)
+
+    ctx.update({
+      states: {
+        configUpdated: true
+      }
+    })
+
+    processMetrics.processor_template_instance_count.add(1, {
+      chain_id: options.network,
+      template: this.constructor.name
+    })
+  }
+
+  startInstance(options: OptionType, ctx: SuiContext): void {
+    options.network = options.network || ctx.network
+    options.startCheckpoint = options.startCheckpoint || ctx.checkpoint
+    let id = (options as SuiObjectBindOptions).objectId || (options as SuiBindOptions).address
+
+    if (id === '*') {
+      throw new ServerError(Status.INVALID_ARGUMENT, "can't bind template instance with *")
+    }
+    id = accountAddressString(id)
+
     const sig = [options.network, id].join('_')
-    if (this.binds.has(sig)) {
-      console.log(`Same object id can be bind to one template only once, ignore duplicate bind: ${sig}`)
+    if (this.instances.has(sig)) {
+      console.debug(`Same object id can be bind to one template only once, ignore duplicate bind: ${sig}`)
       return
     }
-    this.binds.add(sig)
+    this.instances.add(sig)
 
     const processor = this.createProcessor(options)
     for (const h of this.objectHandlers) {
@@ -78,25 +114,6 @@ export abstract class SuiObjectOrAddressProcessorTemplate<
         h.handlerName
       )
     }
-    const config = processor.config
-
-    ctx.update({
-      states: {
-        configUpdated: true
-      }
-    })
-    TemplateInstanceState.INSTANCE.addValue({
-      templateId: this.id,
-      contract: {
-        name: '',
-        chainId: config.network,
-        address: config.address,
-        abi: ''
-      },
-      startBlock: config.startCheckpoint,
-      endBlock: config.endCheckpoint || 0n,
-      baseLabels: config.baseLabels
-    })
     console.log(`successfully bind template ${sig}`)
   }
 
@@ -111,31 +128,14 @@ export abstract class SuiObjectOrAddressProcessorTemplate<
     id = accountAddressString(id)
 
     const sig = [options.network, id].join('_')
-    if (!this.binds.has(sig)) {
+    if (!this.instances.has(sig)) {
       console.log(`the template instance ${sig} not existed or already unbind`)
       return
     }
-    this.binds.delete(sig)
-
-    let deleted = 0
-    const oldTemplateInstances = TemplateInstanceState.INSTANCE.unregister()
-    for (const templateInstance of oldTemplateInstances) {
-      if (templateInstance.contract?.chainId === options.network && templateInstance.contract.address == id) {
-        deleted++
-        continue
-      }
-      TemplateInstanceState.INSTANCE.addValue(templateInstance)
-    }
-
-    if (deleted !== 1) {
-      throw new ServerError(
-        Status.INVALID_ARGUMENT,
-        `Failed to delete template instance ${sig}, deleted ${deleted} times`
-      )
-    }
+    this.instances.delete(sig)
 
     const oldProcessors = SuiAccountProcessorState.INSTANCE.unregister()
-    deleted = 0
+    let deleted = 0
     for (const processor of oldProcessors) {
       if (processor.templateId === this.id) {
         if (processor.config.network == options.network && processor.config.address === id) {
@@ -160,6 +160,22 @@ export abstract class SuiObjectOrAddressProcessorTemplate<
         configUpdated: true
       }
     })
+
+    ctx.sendTemplateInstance(
+      {
+        templateId: this.id,
+        contract: {
+          name: '',
+          chainId: options.network,
+          address: id,
+          abi: ''
+        },
+        startBlock: options.startCheckpoint || 0n,
+        endBlock: options.endCheckpoint || 0n,
+        baseLabels: options.baseLabels
+      },
+      true
+    )
   }
 
   protected onInterval(

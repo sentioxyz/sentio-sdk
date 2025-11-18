@@ -8,7 +8,6 @@ import { ListStateStorage, processMetrics } from '@sentio/runtime'
 import { BlockParams } from 'ethers/providers'
 import { DeferredTopicFilter } from 'ethers/contract'
 import { TypedEvent, TypedCallTrace, validateAndNormalizeAddress } from './eth.js'
-import { TemplateInstanceState } from '../core/template.js'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 
 export class ProcessorTemplateProcessorState extends ListStateStorage<
@@ -22,7 +21,6 @@ export abstract class BaseProcessorTemplate<
   TBoundContractView extends BoundContractView<TContract, ContractView<TContract>>
 > {
   id: number
-  binds = new Set<string>()
   blockHandlers: {
     handlerName: string
     handler: (block: BlockParams, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid
@@ -58,6 +56,8 @@ export abstract class BaseProcessorTemplate<
     fetchConfig?: EthFetchConfig
   }[] = []
 
+  instances = new Set<string>()
+
   constructor() {
     this.id = ProcessorTemplateProcessorState.INSTANCE.getValues().length
     ProcessorTemplateProcessorState.INSTANCE.addValue(this)
@@ -72,18 +72,43 @@ export abstract class BaseProcessorTemplate<
   public bind(options: Omit<BindOptions, 'network'>, ctx: EthContext): void {
     options = { ...options, address: validateAndNormalizeAddress(options.address) }
 
+    const instance: TemplateInstance = {
+      templateId: this.id,
+      contract: {
+        address: options.address,
+        name: options.name || '',
+        chainId: ctx.chainId,
+        abi: ''
+      },
+      startBlock: BigInt(options.startBlock || 0),
+      endBlock: BigInt(options.endBlock || 0),
+      baseLabels: options.baseLabels
+    }
+
+    ctx.sendTemplateInstance(instance)
+
+    ctx.update({
+      states: {
+        configUpdated: true
+      }
+    })
+
+    processMetrics.processor_template_instance_count.add(1, { chain_id: ctx.chainId, template: this.constructor.name })
+  }
+
+  public startInstance(options: Omit<BindOptions, 'network'>, ctx: EthContext) {
+    options = { ...options, address: validateAndNormalizeAddress(options.address) }
     const sig = getOptionsSignature({
       address: options.address,
       network: ctx.chainId
     })
-    if (this.binds.has(sig)) {
-      console.log(`Same address can be bind to one template only once, ignore duplicate bind: ${sig}`)
+
+    if (this.instances.has(sig)) {
+      console.debug(`Same address can be bind to one template only once, ignore duplicate bind: ${sig}`)
       return
     }
-    this.binds.add(sig)
 
     const processor = this.bindInternal({ ...options, network: ctx.chainId })
-
     for (const eh of this.eventHandlers) {
       // @ts-ignore friendly
       processor.onEthEvent(eh.handler, eh.filter, eh.fetchConfig, eh.preprocessHandler, eh.handlerName)
@@ -102,27 +127,7 @@ export abstract class BaseProcessorTemplate<
         bh.handlerName
       )
     }
-
-    const instance: TemplateInstance = {
-      templateId: this.id,
-      contract: {
-        address: options.address,
-        name: options.name || '',
-        chainId: ctx.chainId,
-        abi: ''
-      },
-      startBlock: BigInt(options.startBlock || 0),
-      endBlock: BigInt(options.endBlock || 0),
-      baseLabels: options.baseLabels
-    }
-    TemplateInstanceState.INSTANCE.addValue(instance)
-    ctx.update({
-      states: {
-        configUpdated: true
-      }
-    })
-
-    processMetrics.processor_template_instance_count.add(1, { chain_id: ctx.chainId, template: this.constructor.name })
+    this.instances.add(sig)
   }
 
   protected onEthEvent(

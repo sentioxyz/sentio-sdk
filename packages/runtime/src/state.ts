@@ -1,7 +1,3 @@
-import { TemplateInstance } from '@sentio/protos'
-import { isMainThread, parentPort, threadId } from 'node:worker_threads'
-import { PluginManager } from './plugin.js'
-
 export class State {
   stateMap = new Map<string, any>()
 
@@ -83,23 +79,5 @@ export abstract class ListStateStorage<T> extends StateStorage<T[]> {
     const m = this.getOrRegister()
     m.push(value)
     return value
-  }
-}
-
-export class TemplateInstanceState extends ListStateStorage<TemplateInstance> {
-  static INSTANCE = new TemplateInstanceState()
-
-  constructor() {
-    super()
-  }
-
-  override addValue(value: TemplateInstance): TemplateInstance {
-    if (!isMainThread) {
-      // I'm worker thread, should notice the main thread
-      parentPort?.postMessage({ event: 'add_template_instance', value, from: threadId })
-    }
-    const ret = super.addValue(value)
-    PluginManager.INSTANCE.sendTemplateInstance(ret)
-    return ret
   }
 }

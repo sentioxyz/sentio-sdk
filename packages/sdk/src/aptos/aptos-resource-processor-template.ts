@@ -1,9 +1,8 @@
 import { ListStateStorage, processMetrics } from '@sentio/runtime'
-import { TemplateInstanceState } from '../core/template.js'
 import { AptosResourcesContext } from './context.js'
 import { AptosBindOptions } from './network.js'
 import { AptosResourcesProcessor, DEFAULT_RESOURCE_FETCH_CONFIG } from './aptos-processor.js'
-import { HandleInterval, MoveAccountFetchConfig } from '@sentio/protos'
+import { HandleInterval, MoveAccountFetchConfig, TemplateInstance } from '@sentio/protos'
 import { MoveResource } from '@aptos-labs/ts-sdk'
 import { PromiseOrVoid } from '../core/index.js'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
@@ -24,8 +23,8 @@ class Handler {
 
 export class AptosResourceProcessorTemplate {
   id: number
-  binds = new Set<string>()
   handlers: Handler[] = []
+  instances = new Set<string>()
 
   constructor() {
     this.id = AptosResourceProcessorTemplateState.INSTANCE.getValues().length
@@ -40,14 +39,45 @@ export class AptosResourceProcessorTemplate {
   bind(options: AptosBindOptions, ctx: AptosResourcesContext): void {
     options.network = options.network || ctx.network
     options.startVersion = options.startVersion || ctx.version
+
+    const instance: TemplateInstance = {
+      templateId: this.id,
+      contract: {
+        name: '',
+        chainId: options.network,
+        address: options.address,
+        abi: ''
+      },
+      startBlock: options.startVersion ? BigInt(options.startVersion) : 0n,
+      endBlock: options.endVersion ? BigInt(options.endVersion) : 0n,
+      baseLabels: options.baseLabels
+    }
+
+    ctx.sendTemplateInstance(instance)
+
+    ctx.update({
+      states: {
+        configUpdated: true
+      }
+    })
+
+    processMetrics.processor_template_instance_count.add(1, {
+      chain_id: options.network,
+      template: this.constructor.name
+    })
+  }
+
+  startInstance(options: AptosBindOptions, ctx: AptosResourcesContext): void {
+    options.network = options.network || ctx.network
+    options.startVersion = options.startVersion || ctx.version
     const id = options.address
 
     const sig = [options.network, id].join('_')
-    if (this.binds.has(sig)) {
-      console.log(`Same object id can be bind to one template only once, ignore duplicate bind: ${sig}`)
+    if (this.instances.has(sig)) {
+      console.debug(`Same object id can be bind to one template only once, ignore duplicate bind: ${sig}`)
       return
     }
-    this.binds.add(sig)
+    this.instances.add(sig)
 
     const processor = this.createProcessor(options)
     for (const h of this.handlers) {
@@ -60,30 +90,6 @@ export class AptosResourceProcessorTemplate {
         h.handlerName
       )
     }
-    const config = processor.config
-
-    ctx.update({
-      states: {
-        configUpdated: true
-      }
-    })
-    TemplateInstanceState.INSTANCE.addValue({
-      templateId: this.id,
-      contract: {
-        name: '',
-        chainId: config.network,
-        address: config.address,
-        abi: ''
-      },
-      startBlock: config.startVersion,
-      endBlock: 0n,
-      baseLabels: config.baseLabels
-    })
-
-    processMetrics.processor_template_instance_count.add(1, {
-      chain_id: options.network,
-      template: this.constructor.name
-    })
   }
 
   protected onInterval(

@@ -1,4 +1,4 @@
-import { ProcessResult, RecordMetaData } from '@sentio/protos'
+import { ProcessResult, RecordMetaData, TemplateInstance } from '@sentio/protos'
 import { EventLoggerBinding } from './event-logger.js'
 import { Meter, Labels } from './meter.js'
 import { ChainId } from '@sentio/chain'
@@ -90,6 +90,13 @@ export abstract class BaseContext {
     const dbContext = PluginManager.INSTANCE.dbContextLocalStorage.getStore()
     if (dbContext) {
       this._store = new Store(dbContext)
+    }
+  }
+
+  sendTemplateInstance(instance: TemplateInstance, unbind: boolean = false) {
+    const store = PluginManager.INSTANCE.dbContextLocalStorage.getStore()
+    if (store && 'sendTemplateRequest' in store) {
+      store?.sendTemplateRequest([instance], unbind)
     }
   }
 }

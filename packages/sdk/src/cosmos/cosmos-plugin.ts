@@ -9,7 +9,6 @@ import {
   StartRequest
 } from '@sentio/protos'
 import { ServerError, Status } from 'nice-grpc'
-import { TemplateInstanceState } from '../core/template.js'
 import { HandlerRegister } from '../core/handler-register.js'
 import { CosmosProcessorState } from './types.js'
 
@@ -71,10 +70,6 @@ export class CosmosPlugin extends Plugin {
   }
 
   async start(request: StartRequest) {}
-
-  stateDiff(config: ProcessConfigResponse): boolean {
-    return TemplateInstanceState.INSTANCE.getValues().length !== config.templateInstances.length
-  }
 
   async processTransaction(binding: DataBinding): Promise<ProcessResult> {
     if (!binding.data?.cosmosCall?.transaction) {

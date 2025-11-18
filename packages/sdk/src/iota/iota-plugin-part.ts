@@ -45,7 +45,7 @@ export class IotaPluginPart {
       const template: IotaObjectOrAddressProcessorTemplate<any, any, any> =
         IotaAccountProcessorTemplateState.INSTANCE.getValues()[instance.templateId]
 
-      template.bind(
+      template.startInstance(
         {
           address: instance.contract?.address || '',
           objectId: instance.contract?.address || '',

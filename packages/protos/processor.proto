@@ -619,6 +619,7 @@ message EntityUpdateData {
 
 message TPLRequest {
   repeated TemplateInstance templates = 1;
+  bool remove = 2;
 }
 
 message TSRequest {
