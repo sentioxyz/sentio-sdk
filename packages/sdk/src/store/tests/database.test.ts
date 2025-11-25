@@ -122,21 +122,21 @@ describe('Test Database', () => {
     }
     await store.upsert(tx1)*/
 
-    store.list(Transaction, [
+    await store.list(Transaction, [
       {
         field: 'arrayValue',
         op: '=',
         value: null
       }
     ])
-    store.list(Transaction, [
+    await store.list(Transaction, [
       {
         field: 'arrayValue',
         op: '=',
         value: ['s']
       }
     ])
-    store.list(Transaction, [
+    await store.list(Transaction, [
       {
         field: 'gas',
         op: '>',
@@ -151,28 +151,28 @@ describe('Test Database', () => {
         value: null
       }
     ])*/
-    store.list(Transaction, [
+    await store.list(Transaction, [
       {
         field: 'gas',
         op: '=',
         value: null
       }
     ])
-    store.list(Transaction, [
+    await store.list(Transaction, [
       {
         field: 'gas',
         op: 'in',
         value: [1n, 2n]
       }
     ])
-    store.list(Transaction, [
+    await store.list(Transaction, [
       {
         field: 'gasPrice',
         op: '>',
         value: 0.0
       }
     ])
-    store.list(Transaction, [
+    await store.list(Transaction, [
       {
         field: 'gasPrice',
         op: '>',
@@ -187,7 +187,7 @@ describe('Test Database', () => {
         value: ""
       }
     ])*/
-    store.list(Transaction, [
+    await store.list(Transaction, [
       {
         field: 'arrayValue',
         op: 'has all',
