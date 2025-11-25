@@ -22,7 +22,7 @@ export function serializeRichValue(v: any): RichValue {
     }
   }
 
-  if (v instanceof BigDecimal) {
+  if ('isBigNumber' in v && v.isBigNumber()) {
     return serializeBigDecimal(v)
   }
 
@@ -41,9 +41,7 @@ export function serializeRichValue(v: any): RichValue {
       listValue: { values: v.map((v) => serializeRichValue(v)) }
     }
   }
-  return {
-    nullValue: 0
-  }
+  throw new Error('Unsupported type for serialization: ' + typeof v)
 }
 
 function serializeBigDecimal(v: BigDecimal): RichValue {
