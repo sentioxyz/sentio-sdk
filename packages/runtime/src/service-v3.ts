@@ -29,6 +29,9 @@ import { ProcessorRuntimeOptions } from 'processor-runner-program.js'
 
 const { process_binding_count, process_binding_time, process_binding_error } = processMetrics
 
+const WRITE_V2_EVENT_LOGS = process.env.WRITE_V2_EVENT_LOGS !== 'false'
+const TIME_SERIES_RESULT_BATCH_SIZE = 1000
+
 export class ProcessorServiceImplV3 implements ProcessorV3ServiceImplementation {
   readonly enablePartition: boolean
   private readonly loader: () => Promise<any>
@@ -172,28 +175,23 @@ export class ProcessorServiceImplV3 implements ProcessorV3ServiceImplementation 
         await context.awaitPendings()
         const { timeseriesResult, ...otherResults } = result
         console.debug('sending ts data length:', result.timeseriesResult.length)
-        for (const ts of timeseriesResult) {
+        for (let i = 0; i < timeseriesResult.length; i += TIME_SERIES_RESULT_BATCH_SIZE) {
+          const batch = timeseriesResult.slice(i, i + TIME_SERIES_RESULT_BATCH_SIZE)
           subject.next({
             processId,
             tsRequest: {
-              data: [ts]
+              data: batch
             }
           })
         }
 
-        /* if (result.states?.configUpdated) {
-          console.debug('sending tpl updates:')
-          subject.next({
-            processId,
-            tplRequest: {
-              templates: TemplateInstanceState.INSTANCE.getValues()
-            }
-          })
-        }*/
-
         console.debug('sending binding result', processId)
         subject.next({
-          result: otherResults,
+          result: WRITE_V2_EVENT_LOGS
+            ? otherResults
+            : {
+                states: otherResults.states
+              },
           processId: processId
         })
         recordRuntimeInfo(result, binding.handlerType)
