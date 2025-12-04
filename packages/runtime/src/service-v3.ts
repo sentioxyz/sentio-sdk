@@ -168,13 +168,10 @@ export class ProcessorServiceImplV3 implements ProcessorV3ServiceImplementation 
   ) {
     const context = this.contexts.new(processId, subject)
     const start = Date.now()
-    console.debug('process binding', processId)
     PluginManager.INSTANCE.processBinding(binding, undefined, context)
       .then(async (result) => {
-        console.debug(`process binding ${processId} done`)
         await context.awaitPendings()
         const { timeseriesResult, ...otherResults } = result
-        console.debug('sending ts data length:', result.timeseriesResult.length)
         for (let i = 0; i < timeseriesResult.length; i += TIME_SERIES_RESULT_BATCH_SIZE) {
           const batch = timeseriesResult.slice(i, i + TIME_SERIES_RESULT_BATCH_SIZE)
           subject.next({
@@ -185,7 +182,6 @@ export class ProcessorServiceImplV3 implements ProcessorV3ServiceImplementation 
           })
         }
 
-        console.debug('sending binding result', processId)
         subject.next({
           result: WRITE_V2_EVENT_LOGS
             ? otherResults
@@ -205,7 +201,6 @@ export class ProcessorServiceImplV3 implements ProcessorV3ServiceImplementation 
         const cost = Date.now() - start
         process_binding_time.add(cost)
         this.contexts.delete(processId)
-        console.debug('process binding done', processId)
       })
   }
 
