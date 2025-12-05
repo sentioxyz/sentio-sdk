@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import fs from 'fs-extra'
-import { compressionAlgorithms } from '@grpc/grpc-js'
+// import { compressionAlgorithms } from '@grpc/grpc-js'
 import { createServer } from 'nice-grpc'
 import { errorDetailsServerMiddleware } from 'nice-grpc-error-details'
 // import { registry as niceGrpcRegistry } from 'nice-grpc-prometheus'
