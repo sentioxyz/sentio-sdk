@@ -24,7 +24,7 @@ export async function setupOTLP(debug?: boolean) {
     ]
   })
 
-  sdk.start()
+  // sdk.start()
   ;['SIGINT', 'SIGTERM'].forEach((signal) => {
     process.on(signal as any, () => sdk.shutdown().catch(console.error))
   })
