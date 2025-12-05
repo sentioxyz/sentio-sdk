@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import fs from 'fs-extra'
-
+//import { compressionAlgorithms } from '@grpc/grpc-js'
 import { createServer } from 'nice-grpc'
 import { errorDetailsServerMiddleware } from 'nice-grpc-error-details'
 // import { registry as niceGrpcRegistry } from 'nice-grpc-prometheus'
@@ -61,7 +61,7 @@ if (options.startActionServer) {
     // 'grpc.default_compression_algorithm': compressionAlgorithms.gzip
   })
     // .use(prometheusServerMiddleware())
-    .use(openTelemetryServerMiddleware())
+    // .use(openTelemetryServerMiddleware())
     .use(errorDetailsServerMiddleware)
 
   if (options.worker > 1) {
