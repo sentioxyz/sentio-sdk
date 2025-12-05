@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
 import fs from 'fs-extra'
-//import { compressionAlgorithms } from '@grpc/grpc-js'
+// import { compressionAlgorithms } from '@grpc/grpc-js'
 import { createServer } from 'nice-grpc'
 import { errorDetailsServerMiddleware } from 'nice-grpc-error-details'
 // import { registry as niceGrpcRegistry } from 'nice-grpc-prometheus'
-import { openTelemetryServerMiddleware } from 'nice-grpc-opentelemetry'
+// import { openTelemetryServerMiddleware } from 'nice-grpc-opentelemetry'
 import http from 'http'
 // @ts-ignore inspector promises is not included in @type/node
 import { Session } from 'node:inspector/promises'
