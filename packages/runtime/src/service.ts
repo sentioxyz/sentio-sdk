@@ -334,9 +334,9 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
   }
 
   async *processBindingsStream(requests: AsyncIterable<ProcessStreamRequest>, context: CallContext) {
-    if (!this.started) {
-      throw new ServerError(Status.UNAVAILABLE, 'Service Not started.')
-    }
+    // if (!this.started) {
+    //   throw new ServerError(Status.UNAVAILABLE, 'Service Not started.')
+    // }
 
     const subject = new Subject<DeepPartial<ProcessStreamResponse>>()
     this.handleRequests(requests, subject)
@@ -423,19 +423,48 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     requests: AsyncIterable<ProcessStreamRequest>,
     subject: Subject<DeepPartial<ProcessStreamResponse>>
   ) {
+    let total = 0
+    let count = 0
     let lastBinding: DataBinding | undefined = undefined
     for await (const request of requests) {
       try {
         // console.log('received request:', request, 'lastBinding:', lastBinding)
         if (request.binding) {
-          lastBinding = request.binding
+          const sendTime = request.binding?.data?.ethLog?.timestamp
+          if (sendTime) {
+            const cost = Date.now() - sendTime.getTime()
+            total += cost
+            count += 1
+            subject.next({
+              dbRequest: {
+                upsert: {
+                  data: [
+                    {
+                      upsert_start: Date.now(),
+                      databind_cost: cost
+                    }
+                  ]
+                }
+              }
+            })
+          }
         }
-        this.handleRequest(request, lastBinding, subject)
+        if (request.dbResult) {
+          // send result to finish this binding
+          subject.next({
+            processId: request.processId,
+            result: {}
+          })
+        }
+
+        // this.handleRequest(request, lastBinding, subject)
       } catch (e) {
         // should not happen
         console.error('unexpect error during handle loop', e)
       }
     }
+
+    console.log('average binding delay:', total / count)
   }
 
   async handleRequest(
