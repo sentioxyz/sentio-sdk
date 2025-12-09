@@ -592,7 +592,7 @@ export abstract class BaseProcessor<
           throw e
         }
         if (parsed) {
-          const event: TypedEvent = { ...log, name: parsed.name, args: fixEmptyKey(parsed) }
+          const event: TypedEvent = new TypedEvent(log, parsed.name, fixEmptyKey(parsed))
           await handler(event, ctx)
           return ctx.stopAndGetResult()
         }
@@ -644,7 +644,7 @@ export abstract class BaseProcessor<
           throw e
         }
         if (parsed) {
-          const event: TypedEvent = { ...log, name: parsed.name, args: fixEmptyKey(parsed) }
+          const event: TypedEvent = new TypedEvent(log, parsed.name, fixEmptyKey(parsed))
           return preprocessHandler(event, ctx, preprocessStore)
         }
         return PreprocessResult.fromPartial({})
@@ -662,7 +662,7 @@ export abstract class BaseProcessor<
             return undefined
           }
           if (parsed) {
-            const event: TypedEvent = { ...log, name: parsed.name, args: fixEmptyKey(parsed) }
+            const event: TypedEvent = new TypedEvent(log, parsed.name, fixEmptyKey(parsed))
             return p(event)
           }
           return undefined
