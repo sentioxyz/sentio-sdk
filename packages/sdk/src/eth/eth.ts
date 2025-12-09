@@ -1,31 +1,19 @@
+import { arrayOf, formatBlock, formatTransactionResponse, LogParams, TransactionReceiptParams } from 'ethers/providers'
 import {
-  LogParams,
-  formatBlock,
-  formatLog,
-  TransactionReceiptParams,
-  formatTransactionResponse,
-  allowNull,
-  arrayOf,
-  formatHash,
-  formatReceiptLog,
-  object,
-  formatData
-} from 'ethers/providers'
-import {
-  CallExceptionError,
-  LogDescription,
-  Result,
-  DeferredTopicFilter,
-  BlockParams,
-  Interface,
-  Contract,
   Addressable,
+  BlockParams,
+  CallExceptionError,
+  Contract,
+  ContractRunner,
+  DeferredTopicFilter,
+  Interface,
   InterfaceAbi,
-  ContractRunner
+  LogDescription,
+  Result
 } from 'ethers'
 import { ContractContext } from './context.js'
 import { getAddress } from 'ethers/address'
-import { getBigInt, getNumber, hexlify } from 'ethers/utils'
+import { getBigInt } from 'ethers/utils'
 import { EthCallContext, EthCallParam } from '@sentio/protos'
 import { ALL_ADDRESS } from '../core/index.js'
 
@@ -38,11 +26,6 @@ export interface IResult {
    *  Returns the Result as an Object with each name-value pair.
    */
   toObject(): Record<string, any>
-}
-
-export interface TypedEvent<TArgsArray extends Array<any> = any, TArgsObject = any> extends LogParams {
-  args: TArgsObject & IResult
-  name: string
 }
 
 export type RawEvent = Record<string, any>
@@ -106,37 +89,184 @@ export function fixEmptyKey(result: LogDescription): Result {
   return Result.fromItems(Array.from(result.args.values()), keys)
 }
 
-const _formatTransactionReceipt = object(
-  {
-    to: allowNull(getAddress, null),
-    from: allowNull(getAddress, null),
-    contractAddress: allowNull(getAddress, null),
-    // should be allowNull(hash), but broken-EIP-658 support is handled in receipt
-    index: getNumber,
-    root: allowNull(hexlify),
-    gasUsed: getBigInt,
-    logsBloom: allowNull(formatData),
-    blockHash: formatHash,
-    hash: formatHash,
-    logs: allowNull(arrayOf(formatReceiptLog)), // Only thing that different
-    blockNumber: getNumber,
-    //confirmations: allowNull(getNumber, null),
-    cumulativeGasUsed: getBigInt,
-    effectiveGasPrice: allowNull(getBigInt),
-    gasPrice: allowNull(getBigInt),
-    l1Fee: allowNull(getBigInt),
-    status: allowNull(getNumber),
-    type: allowNull(getNumber, 0)
-  },
-  {
-    // effectiveGasPrice: ['gasPrice'],
-    hash: ['transactionHash'],
-    index: ['transactionIndex']
-  }
-)
-
 function formatTransactionReceipt(value: any): TransactionReceiptParams {
-  return _formatTransactionReceipt(value)
+  return new TransactionReceipt(value)
+}
+
+class TransactionReceipt implements TransactionReceiptParams {
+  constructor(readonly data: any) {}
+
+  private toChecksumAddress<T>(originData: string | null, converted: T): T {
+    if (converted) {
+      return converted
+    }
+    if (originData === null) {
+      return null as T
+    }
+    return getAddress(originData) as T
+  }
+
+  _to: string | null
+  get to(): string | null {
+    this._to = this.toChecksumAddress(this.data.to, this._to)
+    return this._to
+  }
+  _from: string
+  get from() {
+    this._from = this.toChecksumAddress(this.data.from, this._from)
+    return this._from
+  }
+  _contractAddress: string | null
+  get contractAddress(): string | null {
+    this._contractAddress = this.toChecksumAddress(this.data.contractAddress, this._contractAddress)
+    return this._contractAddress
+  }
+
+  get hash(): string {
+    return this.data.transactionHash
+  }
+  get index(): number {
+    return this.data.transactionIndex
+  }
+
+  get blockHash(): string {
+    return this.data.blockHash
+  }
+  get blockNumber(): number {
+    return this.data.blockNumber
+  }
+  get logsBloom(): string {
+    return this.data.logsBloom
+  }
+  _logs: LogParams[]
+  get logs(): readonly LogParams[] {
+    if (this._logs) {
+      return this._logs
+    }
+    this._logs = arrayOf(formatLog)(this.data.logs)
+    return this._logs
+  }
+  _gasUsed: bigint
+  get gasUsed(): bigint {
+    if (this._gasUsed != null) {
+      return this._gasUsed
+    }
+    this._gasUsed = getBigInt(this.data.gasUsed)
+    return this._gasUsed
+  }
+
+  _blobGasUsed?: bigint | null | undefined
+  get blobGasUsed(): bigint | null | undefined {
+    if (this._blobGasUsed !== undefined) {
+      return this._blobGasUsed
+    }
+    this._blobGasUsed = getBigInt(this.data.blobGasUsed)
+    return this._blobGasUsed
+  }
+  _cumulativeGasUsed: bigint
+  get cumulativeGasUsed(): bigint {
+    if (this._cumulativeGasUsed != null) {
+      return this._cumulativeGasUsed
+    }
+    this._cumulativeGasUsed = getBigInt(this.data.cumulativeGasUsed)
+    return this._cumulativeGasUsed
+  }
+  _gasPrice?: bigint | null | undefined
+  get gasPrice(): bigint | null | undefined {
+    if (this._gasPrice !== undefined) {
+      return this._gasPrice
+    }
+    this._gasPrice = getBigInt(this.data.gasPrice)
+    return this._gasPrice
+  }
+  _blobGasPrice?: bigint | null | undefined
+  get blobGasPrice(): bigint | null | undefined {
+    if (this._blobGasPrice !== undefined) {
+      return this._blobGasPrice
+    }
+    this._blobGasPrice = getBigInt(this.data.blobGasPrice)
+    return this._blobGasPrice
+  }
+  _effectiveGasPrice?: bigint | null | undefined
+  get effectiveGasPrice(): bigint | null | undefined {
+    if (this._effectiveGasPrice !== undefined) {
+      return this._effectiveGasPrice
+    }
+    this._effectiveGasPrice = getBigInt(this.data.effectiveGasPrice)
+    return this._effectiveGasPrice
+  }
+  _l1Fee?: bigint | null | undefined
+  get l1Fee(): bigint | null | undefined {
+    if (this._l1Fee !== undefined) {
+      return this._l1Fee
+    }
+    this._l1Fee = getBigInt(this.data.l1Fee)
+    return this._l1Fee
+  }
+  get type(): number {
+    return this.data.type
+  }
+  get status(): number | null {
+    return this.data.status
+  }
+  get root(): string | null {
+    return this.data.root
+  }
+}
+
+export class FormattedLog implements LogParams {
+  constructor(readonly raw: any) {}
+  get transactionHash(): string {
+    return this.raw.transactionHash
+  }
+  get blockHash(): string {
+    return this.raw.blockHash
+  }
+  get blockNumber(): number {
+    return this.raw.blockNumber
+  }
+  get removed(): boolean {
+    return this.raw.removed
+  }
+
+  _address: string
+  get address(): string {
+    if (this._address) {
+      return this._address
+    }
+    this._address = getAddress(this.raw.address)
+    return this._address
+  }
+
+  get topics(): readonly string[] {
+    return this.raw.topics
+  }
+
+  get transactionIndex(): number {
+    return this.raw.transactionIndex
+  }
+
+  get index(): number {
+    return this.raw.logIndex
+  }
+
+  get data(): string {
+    return this.raw.data
+  }
+}
+
+export class TypedEvent<TArgsArray extends Array<any> = any, TArgsObject = any> extends FormattedLog {
+  constructor(
+    readonly log: FormattedLog,
+    readonly name: string,
+    readonly args: TArgsObject & IResult
+  ) {
+    super(log.raw)
+  }
+}
+
+function formatLog(log: any): LogParams {
+  return new FormattedLog(log)
 }
 
 export function formatEthData(data: {

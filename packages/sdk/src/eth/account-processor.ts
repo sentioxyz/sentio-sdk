@@ -317,7 +317,7 @@ export class AccountProcessor {
         const logParam = log as any as { topics: Array<string>; data: string }
         const parsed = ERC20_INTERFACE.parseLog(logParam)
         if (parsed) {
-          const event: TypedEvent = { ...log, name: parsed.name, args: fixEmptyKey(parsed) }
+          const event: TypedEvent = new TypedEvent(log, parsed.name, fixEmptyKey(parsed))
           await handler(event, ctx)
           return ctx.stopAndGetResult()
         }
@@ -343,7 +343,7 @@ export class AccountProcessor {
         const logParam = log as any as { topics: Array<string>; data: string }
         const parsed = ERC20_INTERFACE.parseLog(logParam)
         if (parsed) {
-          const event: TypedEvent = { ...log, name: parsed.name, args: fixEmptyKey(parsed) }
+          const event: TypedEvent = new TypedEvent(log, parsed.name, fixEmptyKey(parsed))
           return preprocessHandler(event, ctx, preprocessStore)
         }
         return PreprocessResult.fromPartial({})
