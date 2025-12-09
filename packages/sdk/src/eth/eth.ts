@@ -1,5 +1,13 @@
-import { arrayOf, formatBlock, formatTransactionResponse, LogParams, TransactionReceiptParams } from 'ethers/providers'
 import {
+  allowNull,
+  arrayOf,
+  formatBlock,
+  LogParams,
+  TransactionReceiptParams,
+  TransactionResponseParams
+} from 'ethers/providers'
+import {
+  accessListify,
   Addressable,
   BlockParams,
   CallExceptionError,
@@ -9,8 +17,10 @@ import {
   Interface,
   InterfaceAbi,
   LogDescription,
-  Result
+  Result,
+  Signature
 } from 'ethers'
+import type { AccessList } from 'ethers/transaction'
 import { ContractContext } from './context.js'
 import { getAddress } from 'ethers/address'
 import { getBigInt } from 'ethers/utils'
@@ -90,36 +100,25 @@ export function fixEmptyKey(result: LogDescription): Result {
 }
 
 function formatTransactionReceipt(value: any): TransactionReceiptParams {
-  return new TransactionReceipt(value)
+  return new FormattedTransactionReceipt(value)
 }
 
-class TransactionReceipt implements TransactionReceiptParams {
+class FormattedTransactionReceipt implements TransactionReceiptParams {
   constructor(readonly data: any) {}
 
-  private toChecksumAddress<T>(originData: string | null, converted: T): T {
-    if (converted) {
-      return converted
-    }
-    if (originData === null) {
-      return null as T
-    }
-    return getAddress(originData) as T
-  }
-
-  _to: string | null
+  _to: string | null | undefined
   get to(): string | null {
-    this._to = this.toChecksumAddress(this.data.to, this._to)
-    return this._to
+    return this._to !== undefined ? this._to : (this._to = allowNull(getAddress)(this._to))
   }
   _from: string
   get from() {
-    this._from = this.toChecksumAddress(this.data.from, this._from)
-    return this._from
+    return this._from ?? (this._from = getAddress(this.data.from))
   }
-  _contractAddress: string | null
+  _contractAddress: string | null | undefined
   get contractAddress(): string | null {
-    this._contractAddress = this.toChecksumAddress(this.data.contractAddress, this._contractAddress)
-    return this._contractAddress
+    return this._contractAddress !== undefined
+      ? this._contractAddress
+      : (this._contractAddress = allowNull(getAddress)(this.data.contractAddress))
   }
 
   get hash(): string {
@@ -140,68 +139,42 @@ class TransactionReceipt implements TransactionReceiptParams {
   }
   _logs: LogParams[]
   get logs(): readonly LogParams[] {
-    if (this._logs) {
-      return this._logs
-    }
-    this._logs = arrayOf(formatLog)(this.data.logs)
-    return this._logs
+    return this._logs ?? (this._logs = arrayOf(formatLog)(this.data.logs))
   }
   _gasUsed: bigint
   get gasUsed(): bigint {
-    if (this._gasUsed != null) {
-      return this._gasUsed
-    }
-    this._gasUsed = getBigInt(this.data.gasUsed)
-    return this._gasUsed
+    return this._gasUsed ?? (this._gasUsed = getBigInt(this.data.gasUsed))
   }
 
   _blobGasUsed?: bigint | null | undefined
   get blobGasUsed(): bigint | null | undefined {
-    if (this._blobGasUsed !== undefined) {
-      return this._blobGasUsed
-    }
-    this._blobGasUsed = getBigInt(this.data.blobGasUsed)
-    return this._blobGasUsed
+    return this._blobGasUsed !== undefined
+      ? this._blobGasUsed
+      : (this._blobGasUsed = allowNull(getBigInt)(this.data.blobGasUsed))
   }
   _cumulativeGasUsed: bigint
   get cumulativeGasUsed(): bigint {
-    if (this._cumulativeGasUsed != null) {
-      return this._cumulativeGasUsed
-    }
-    this._cumulativeGasUsed = getBigInt(this.data.cumulativeGasUsed)
-    return this._cumulativeGasUsed
+    return this._cumulativeGasUsed ?? (this._cumulativeGasUsed = getBigInt(this.data.cumulativeGasUsed))
   }
   _gasPrice?: bigint | null | undefined
   get gasPrice(): bigint | null | undefined {
-    if (this._gasPrice !== undefined) {
-      return this._gasPrice
-    }
-    this._gasPrice = getBigInt(this.data.gasPrice)
-    return this._gasPrice
+    return this._gasPrice !== undefined ? this._gasPrice : (this._gasPrice = allowNull(getBigInt)(this.data.gasPrice))
   }
   _blobGasPrice?: bigint | null | undefined
   get blobGasPrice(): bigint | null | undefined {
-    if (this._blobGasPrice !== undefined) {
-      return this._blobGasPrice
-    }
-    this._blobGasPrice = getBigInt(this.data.blobGasPrice)
-    return this._blobGasPrice
+    return this._blobGasPrice !== undefined
+      ? this._blobGasPrice
+      : (this._blobGasPrice = allowNull(getBigInt)(this.data.blobGasPrice))
   }
   _effectiveGasPrice?: bigint | null | undefined
   get effectiveGasPrice(): bigint | null | undefined {
-    if (this._effectiveGasPrice !== undefined) {
-      return this._effectiveGasPrice
-    }
-    this._effectiveGasPrice = getBigInt(this.data.effectiveGasPrice)
-    return this._effectiveGasPrice
+    return this._effectiveGasPrice !== undefined
+      ? this._effectiveGasPrice
+      : (this._effectiveGasPrice = allowNull(getBigInt)(this.data.effectiveGasPrice))
   }
   _l1Fee?: bigint | null | undefined
   get l1Fee(): bigint | null | undefined {
-    if (this._l1Fee !== undefined) {
-      return this._l1Fee
-    }
-    this._l1Fee = getBigInt(this.data.l1Fee)
-    return this._l1Fee
+    return this._l1Fee !== undefined ? this._l1Fee : (this._l1Fee = allowNull(getBigInt)(this.data.l1Fee))
   }
   get type(): number {
     return this.data.type
@@ -231,11 +204,7 @@ export class FormattedLog implements LogParams {
 
   _address: string
   get address(): string {
-    if (this._address) {
-      return this._address
-    }
-    this._address = getAddress(this.raw.address)
-    return this._address
+    return this._address ?? (this._address = getAddress(this.raw.address))
   }
 
   get topics(): readonly string[] {
@@ -315,6 +284,127 @@ export function formatEthData(data: {
     console.error('Error formatting eth data', e)
     return data
   }
+}
+
+class FormattedTransactionResponse implements TransactionResponseParams {
+  constructor(readonly raw: any) {}
+
+  get blockNumber(): number | null {
+    return this.raw.blockNumber
+  }
+  _blockHash: string | undefined | null
+  get blockHash(): string | null {
+    if (this._blockHash !== undefined) {
+      return this._blockHash
+    }
+    if (this.raw.blockHash && getBigInt(this.raw.blockHash) === 0n) {
+      this._blockHash = null
+    } else {
+      this._blockHash = this.raw.blockHash
+    }
+    return this._blockHash as string | null
+  }
+  get hash(): string {
+    return this.raw.hash
+  }
+  get index(): number {
+    return this.raw.transactionIndex
+  }
+  get type(): number {
+    if (this.raw.type === '0x' || this.raw.type == null) {
+      return 0
+    }
+    return this.raw.type
+  }
+  _to: string | null
+  get to(): string | null {
+    if (this._to != null) {
+      return this._to
+    }
+    if (this.raw.to && getBigInt(this.raw.to) === 0n) {
+      return (this._to = '0x0000000000000000000000000000000000000000')
+    }
+    return (this._to = allowNull(getAddress)(this.raw.to))
+  }
+  _from: string
+  get from(): string {
+    return this._from ?? (this._from = getAddress(this.raw.from))
+  }
+  get nonce(): number {
+    return this.raw.nonce
+  }
+  _gasLimit: bigint
+  get gasLimit(): bigint {
+    return this._gasLimit ?? (this._gasLimit = getBigInt(this.raw.gasLimit ?? this.raw.gas))
+  }
+  get gas(): bigint | null {
+    return this.gasLimit
+  }
+  _gasPrice: bigint
+  get gasPrice(): bigint {
+    return this._gasPrice ?? (this._gasPrice = getBigInt(this.raw.gasPrice))
+  }
+  _maxPriorityFeePerGas?: bigint | null | undefined
+  get maxPriorityFeePerGas(): bigint | null {
+    return this._maxPriorityFeePerGas !== undefined
+      ? this._maxPriorityFeePerGas
+      : (this._maxPriorityFeePerGas = allowNull(getBigInt)(this.raw.maxPriorityFeePerGas))
+  }
+  _maxFeePerGas?: bigint | null | undefined
+  get maxFeePerGas(): bigint | null {
+    return this._maxFeePerGas !== undefined
+      ? this._maxFeePerGas
+      : (this._maxFeePerGas = allowNull(getBigInt)(this.raw.maxFeePerGas))
+  }
+  _maxFeePerBlobGas?: bigint | null | undefined
+  get maxFeePerBlobGas(): bigint | null | undefined {
+    return this._maxFeePerBlobGas !== undefined
+      ? this._maxFeePerBlobGas
+      : (this._maxFeePerBlobGas = allowNull(getBigInt)(this.raw.maxFeePerBlobGas))
+  }
+  get data(): string {
+    return this.raw.data ?? this.raw.input
+  }
+  _value: bigint
+  get value(): bigint {
+    return this._value ?? (this._value = getBigInt(this.raw.value))
+  }
+  _chainId?: bigint | null | undefined
+  get chainId(): bigint {
+    if (this._chainId != null) {
+      return this._chainId
+    }
+    this._chainId = allowNull(getBigInt)(this.raw.chainId)
+    if (this._chainId == null && this.signature) {
+      const legacyChainId = this.signature.legacyChainId
+      if (legacyChainId != null) {
+        this._chainId = legacyChainId
+      }
+    }
+    return this._chainId ?? 0n
+  }
+  _signature: Signature
+  get signature(): Signature {
+    if (this._signature) {
+      return this._signature
+    }
+    if (this.raw.signature) {
+      this._signature = Signature.from(this.raw.signature)
+    } else {
+      this._signature = Signature.from(this.raw)
+    }
+    return this._signature
+  }
+  get accessList(): AccessList | null {
+    return this.raw.accessList ? accessListify(this.raw.accessList) : null
+  }
+  get blobVersionedHashes(): string[] | null | undefined {
+    return this.raw.blobVersionedHashes ?? null
+  }
+}
+
+export function formatTransactionResponse(value: any): TransactionResponseParams {
+  return new FormattedTransactionResponse(value)
 }
 
 export function formatRichBlock(block: RichBlock): RichBlock {
