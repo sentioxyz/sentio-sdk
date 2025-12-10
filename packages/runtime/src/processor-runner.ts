@@ -9,6 +9,8 @@ import { errorDetailsServerMiddleware } from 'nice-grpc-error-details'
 import http from 'http'
 // @ts-ignore inspector promises is not included in @type/node
 import { Session } from 'node:inspector/promises'
+import { fork, ChildProcess } from 'child_process'
+import { fileURLToPath } from 'url'
 
 import { ProcessorDefinition } from './gen/processor/protos/processor.js'
 import { ProcessorServiceImpl } from './service.js'
@@ -44,16 +46,66 @@ configureEndpoints(options)
 
 console.debug('Starting Server', options)
 
+// Check if this is a child process spawned for multi-server mode
+const isChildProcess = process.env['SENTIO_MULTI_SERVER_CHILD'] === 'true'
+const childServerPort = process.env['SENTIO_CHILD_SERVER_PORT']
+
+// Multi-server mode: spawn child processes for additional servers
+if (options.multiServer > 1 && !isChildProcess) {
+  const childProcesses: ChildProcess[] = []
+  const basePort = parseInt(options.port)
+
+  // Spawn child processes for ports basePort+1 to basePort+(multiServer-1)
+  for (let i = 1; i < options.multiServer; i++) {
+    const childPort = basePort + i
+    const child = fork(fileURLToPath(import.meta.url), process.argv.slice(2), {
+      env: {
+        ...process.env,
+        SENTIO_MULTI_SERVER_CHILD: 'true',
+        SENTIO_CHILD_SERVER_PORT: String(childPort)
+      },
+      stdio: 'inherit'
+    })
+
+    child.on('error', (err) => {
+      console.error(`Child process on port ${childPort} error:`, err)
+    })
+
+    child.on('exit', (code) => {
+      console.log(`Child process on port ${childPort} exited with code ${code}`)
+    })
+
+    childProcesses.push(child)
+    console.log(`Spawned child server process for port ${childPort}`)
+  }
+
+  // Handle parent process shutdown - kill all children
+  const shutdownChildren = () => {
+    for (const child of childProcesses) {
+      child.kill('SIGINT')
+    }
+  }
+
+  process.on('SIGINT', shutdownChildren)
+  process.on('SIGTERM', shutdownChildren)
+}
+
+// Determine the actual port for this process
+const actualPort = isChildProcess && childServerPort ? childServerPort : options.port
+
 let server: any
 let baseService: ProcessorServiceImpl | ServiceManager
+let httpServer: http.Server | undefined
+
 const loader = async () => {
   const m = await import(options.target)
   console.debug('Module loaded', m)
   return m
 }
+
 if (options.startActionServer) {
   server = new ActionServer(loader)
-  server.listen(options.port)
+  server.listen(actualPort)
 } else {
   server = createServer({
     'grpc.max_send_message_length': 768 * 1024 * 1024,
@@ -64,6 +116,7 @@ if (options.startActionServer) {
     // .use(openTelemetryServerMiddleware())
     .use(errorDetailsServerMiddleware)
 
+  // for  V2
   if (options.worker > 1) {
     baseService = new ServiceManager(loader, options, server.shutdown)
   } else {
@@ -73,73 +126,99 @@ if (options.startActionServer) {
   const service = new FullProcessorServiceImpl(baseService)
 
   server.add(ProcessorDefinition, service)
+
+  // for V3
   server.add(
     ProcessorV3Definition,
     new FullProcessorServiceV3Impl(new ProcessorServiceImplV3(loader, options, server.shutdown))
   )
 
-  server.listen('0.0.0.0:' + options.port)
-  console.log('Processor Server Started at:', options.port)
+  server.listen('0.0.0.0:' + actualPort)
+  console.log('Processor Server Started at:', actualPort)
 }
-const metricsPort = 4040
 
-const httpServer = http
-  .createServer(async function (req, res) {
-    if (req.url) {
-      const reqUrl = new URL(req.url, `http://${req.headers.host}`)
-      const queries = reqUrl.searchParams
-      switch (reqUrl.pathname) {
-        // case '/metrics':
-        //   const metrics = await mergedRegistry.metrics()
-        //   res.write(metrics)
-        //   break
-        case '/heap': {
-          try {
-            const file = '/tmp/' + Date.now() + '.heapsnapshot'
-            await dumpHeap(file)
-            // send the file
-            const readStream = fs.createReadStream(file)
-            res.writeHead(200, { 'Content-Type': 'application/json' })
-            readStream.pipe(res)
-            res.end()
-          } catch {
-            res.writeHead(500)
-            res.end()
+// Only start metrics server on the main process (not child processes)
+if (!isChildProcess) {
+  const metricsPort = 4040
+
+  httpServer = http
+    .createServer(async function (req, res) {
+      if (req.url) {
+        const reqUrl = new URL(req.url, `http://${req.headers.host}`)
+        const queries = reqUrl.searchParams
+        switch (reqUrl.pathname) {
+          // case '/metrics':
+          //   const metrics = await mergedRegistry.metrics()
+          //   res.write(metrics)
+          //   break
+          case '/heap': {
+            try {
+              const file = '/tmp/' + Date.now() + '.heapsnapshot'
+              await dumpHeap(file)
+              // send the file
+              const readStream = fs.createReadStream(file)
+              res.writeHead(200, { 'Content-Type': 'application/json' })
+              readStream.pipe(res)
+              res.end()
+            } catch {
+              res.writeHead(500)
+              res.end()
+            }
+            break
           }
-          break
-        }
-        case '/profile': {
-          try {
-            const profileTime = parseInt(queries.get('t') || '1000', 10) || 1000
-            const session = new Session()
-            session.connect()
+          case '/profile': {
+            try {
+              const profileTime = parseInt(queries.get('t') || '1000', 10) || 1000
+              const session = new Session()
+              session.connect()
 
-            await session.post('Profiler.enable')
-            await session.post('Profiler.start')
+              await session.post('Profiler.enable')
+              await session.post('Profiler.start')
 
-            await new Promise((resolve) => setTimeout(resolve, profileTime))
-            const { profile } = await session.post('Profiler.stop')
+              await new Promise((resolve) => setTimeout(resolve, profileTime))
+              const { profile } = await session.post('Profiler.stop')
 
-            res.writeHead(200, { 'Content-Type': 'application/json' })
-            res.write(JSON.stringify(profile))
-            session.disconnect()
-          } catch {
-            res.writeHead(500)
+              res.writeHead(200, { 'Content-Type': 'application/json' })
+              res.write(JSON.stringify(profile))
+              session.disconnect()
+            } catch {
+              res.writeHead(500)
+            }
+            break
           }
-          break
+          default:
+            res.writeHead(404)
         }
-        default:
-          res.writeHead(404)
+      } else {
+        res.writeHead(404)
       }
-    } else {
-      res.writeHead(404)
-    }
-    res.end()
-  })
-  .listen(metricsPort)
+      res.end()
+    })
+    .listen(metricsPort)
 
-console.log('Metric Server Started at:', metricsPort)
+  console.log('Metric Server Started at:', metricsPort)
 
+  if (process.env['OOM_DUMP_MEMORY_SIZE_GB']) {
+    let dumping = false
+    const memorySize = parseFloat(process.env['OOM_DUMP_MEMORY_SIZE_GB']!)
+    console.log('heap dumping is enabled, limit set to ', memorySize, 'gb')
+    const dir = process.env['OOM_DUMP_DIR'] || '/tmp'
+    setInterval(async () => {
+      const mem = process.memoryUsage()
+      console.log('Current Memory Usage', mem)
+      // if memory usage is greater this size, dump heap and exit
+      if (mem.heapTotal > memorySize * 1024 * 1024 * 1024 && !dumping) {
+        const file = join(dir, `${Date.now()}.heapsnapshot`)
+        dumping = true
+        await dumpHeap(file)
+        // force exit and keep pod running
+        process.exit(11)
+      }
+    }, 1000 * 60)
+  }
+}
+
+// Process event handlers
 process
   .on('SIGINT', function () {
     shutdownServers(0)
@@ -151,7 +230,7 @@ process
     }
     // shutdownServers(1)
   })
-  .on('unhandledRejection', (reason, p) => {
+  .on('unhandledRejection', (reason, _p) => {
     // @ts-ignore ignore invalid ens error
     if (reason?.message.startsWith('invalid ENS name (disallowed character: "*"')) {
       return
@@ -162,26 +241,6 @@ process
     }
     // shutdownServers(1)
   })
-
-if (process.env['OOM_DUMP_MEMORY_SIZE_GB']) {
-  let dumping = false
-  const memorySize = parseFloat(process.env['OOM_DUMP_MEMORY_SIZE_GB']!)
-  console.log('heap dumping is enabled, limit set to ', memorySize, 'gb')
-  const dir = process.env['OOM_DUMP_DIR'] || '/tmp'
-  setInterval(async () => {
-    const mem = process.memoryUsage()
-    console.log('Current Memory Usage', mem)
-    // if memory usage is greater this size, dump heap and exit
-    if (mem.heapTotal > memorySize * 1024 * 1024 * 1024 && !dumping) {
-      const file = join(dir, `${Date.now()}.heapsnapshot`)
-      dumping = true
-      await dumpHeap(file)
-      // force exit and keep pod running
-      process.exit(11)
-    }
-  }, 1000 * 60)
-}
-// }
 
 async function dumpHeap(file: string): Promise<void> {
   console.log('Heap dumping to', file)
@@ -206,8 +265,12 @@ function shutdownServers(exitCode: number): void {
   server.forceShutdown()
   console.log('RPC server shut down')
 
-  httpServer.close(function () {
-    console.log('Http server shut down')
+  if (httpServer) {
+    httpServer.close(function () {
+      console.log('Http server shut down')
+      process.exit(exitCode)
+    })
+  } else {
     process.exit(exitCode)
-  })
+  }
 }
