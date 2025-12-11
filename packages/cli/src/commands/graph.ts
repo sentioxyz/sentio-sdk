@@ -261,7 +261,13 @@ async function genZip(extra: string[] = []) {
   return zip
 }
 
-async function uploadFile(zip: JSZip, options: YamlProjectConfig, auth: Auth, continueFrom?: number) {
+async function uploadFile(
+  zip: JSZip,
+  options: YamlProjectConfig,
+  auth: Auth,
+  continueFrom?: number,
+  numWorkers?: number
+) {
   const sdkVersion = getSdkVersion()
   const sequence = 2
   const initUploadResRaw = await initUpload(options.host, auth, options.project, sdkVersion, sequence)
@@ -283,7 +289,16 @@ async function uploadFile(zip: JSZip, options: YamlProjectConfig, auth: Auth, co
   const sha256 = ''
   const { commitSha, gitUrl } = getGitAttributes()
   // finish uploading
-  const finishUploadResRaw = await finishUpload(options, auth, sha256, commitSha, gitUrl, continueFrom, sequence)
+  const finishUploadResRaw = await finishUpload(
+    options,
+    auth,
+    sha256,
+    commitSha,
+    gitUrl,
+    continueFrom,
+    sequence,
+    numWorkers
+  )
   if (!finishUploadResRaw.ok) {
     console.error(chalk.red('Failed to finish uploading'))
     console.error(chalk.red(await finishUploadResRaw.text()))

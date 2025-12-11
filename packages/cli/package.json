@@ -38,7 +38,7 @@
     "jszip": "^3.10.1",
     "latest-version": "^9.0.0",
     "node-fetch": "^3.3.2",
-    "open": "^10.0.3",
+    "open": "^11.0.0",
     "package-manager-manager": "^0.2.0",
     "solc": "^0.8.25",
     "starknet": "^6.11.0",

@@ -372,6 +372,7 @@ export async function finishUpload(
   gitUrl: string,
   continueFrom: number | undefined,
   sequence = 1,
+  numWorkers?: number,
   warnings?: string[]
 ) {
   const finishUploadUrl = getApiUrl(`/api/v1/processors/finish_upload`, options.host)
@@ -391,6 +392,7 @@ export async function finishUpload(
       sequence,
       continueFrom,
       networkOverrides: options.networkOverrides,
+      numWorkers,
       warnings
     })
   })
