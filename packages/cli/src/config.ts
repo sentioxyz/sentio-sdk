@@ -33,6 +33,7 @@ export interface YamlProjectConfig {
   type?: string
   silentOverwrite?: boolean
   variables?: Variable[]
+  numWorkers?: number // Number of processor worker to start, default to 1
 }
 
 export interface Variable {
@@ -93,6 +94,9 @@ export function overrideConfigWithOptions(config: YamlProjectConfig, options: an
   }
   if (options.silentOverwrite) {
     config.silentOverwrite = true
+  }
+  if (options.numWorkers !== undefined) {
+    config.numWorkers = options.numWorkers
   }
 }
 

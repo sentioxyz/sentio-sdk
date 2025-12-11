@@ -20,7 +20,6 @@ import { setupLogger } from './logger.js'
 
 import { setupOTLP } from './otlp.js'
 import { ActionServer } from './action-server.js'
-import { ServiceManager } from './service-manager.js'
 import { ProcessorV3Definition } from '@sentio/protos'
 import { ProcessorServiceImplV3 } from './service-v3.js'
 import { dirname, join } from 'path'
@@ -50,13 +49,13 @@ console.debug('Starting Server', options)
 const isChildProcess = process.env['SENTIO_MULTI_SERVER_CHILD'] === 'true'
 const childServerPort = process.env['SENTIO_CHILD_SERVER_PORT']
 
-// Multi-server mode: spawn child processes for additional servers
-if (options.multiServer > 1 && !isChildProcess) {
+// Multi-worker mode: spawn child processes for additional servers
+if (options.worker > 1 && !isChildProcess) {
   const childProcesses: ChildProcess[] = []
   const basePort = parseInt(options.port)
 
   // Spawn child processes for ports basePort+1 to basePort+(multiServer-1)
-  for (let i = 1; i < options.multiServer; i++) {
+  for (let i = 1; i < options.worker; i++) {
     const childPort = basePort + i
     const child = fork(fileURLToPath(import.meta.url), process.argv.slice(2), {
       env: {
@@ -94,7 +93,7 @@ if (options.multiServer > 1 && !isChildProcess) {
 const actualPort = isChildProcess && childServerPort ? childServerPort : options.port
 
 let server: any
-let baseService: ProcessorServiceImpl | ServiceManager
+let baseService: ProcessorServiceImpl
 let httpServer: http.Server | undefined
 
 const loader = async () => {
@@ -116,13 +115,8 @@ if (options.startActionServer) {
     // .use(openTelemetryServerMiddleware())
     .use(errorDetailsServerMiddleware)
 
-  // for  V2
-  if (options.worker > 1) {
-    baseService = new ServiceManager(loader, options, server.shutdown)
-  } else {
-    baseService = new ProcessorServiceImpl(loader, options, server.shutdown)
-  }
-
+  // for V2
+  baseService = new ProcessorServiceImpl(loader, options, server.shutdown)
   const service = new FullProcessorServiceImpl(baseService)
 
   server.add(ProcessorDefinition, service)

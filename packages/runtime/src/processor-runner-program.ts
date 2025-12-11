@@ -7,12 +7,6 @@ try {
   console.error('Failed to parse worker number', e)
 }
 
-let serverNum = 1
-
-if (process.env['PROCESSOR_SERVER_NUM']) {
-  serverNum = parseInt(process.env['PROCESSOR_SERVER_NUM']!.trim())
-}
-
 function myParseInt(value: string, dummyPrevious: number): number {
   // parseInt takes a string and a radix
   const parsedValue = parseInt(value, 10)
@@ -38,7 +32,7 @@ export const program = new Command('processor-runner')
   .option('--debug', 'Enable debug mode')
   .option('--otlp-debug', 'Enable OTLP debug mode')
   .option('--start-action-server', 'Start action server instead of processor server')
-  .option('--worker <number>', 'Number of worker threads(V2 only, deprecated) ', myParseInt, workerNum)
+  .option('--worker <number>', 'Number of processor worker threads ', myParseInt, workerNum)
   .option('--process-timeout <seconds>', 'Process timeout in seconds', myParseInt, 60)
   .option(
     '--worker-timeout <seconds>',
@@ -51,7 +45,6 @@ export const program = new Command('processor-runner')
     'Enable binding data partition',
     process.env['SENTIO_ENABLE_BINDING_DATA_PARTITION'] === 'true'
   )
-  .option('--multi-server <number>', 'Enable multi-server mode for processor runtime', myParseInt, serverNum)
 
 export type ProcessorRuntimeOptions = ReturnType<typeof program.opts> & { target: string }
 

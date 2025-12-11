@@ -70,7 +70,7 @@ export abstract class BatchUploader {
 
   protected constructor(
     private readonly engine: StorageEngine,
-    private readonly options: YamlProjectConfig,
+    protected readonly options: YamlProjectConfig,
     private readonly auth: Auth
   ) {
     const [projectOwner, projectSlug] = options.project.split('/')
@@ -122,7 +122,8 @@ export abstract class BatchUploader {
     debug?: boolean,
     continueFrom?: number,
     networkOverrides?: NetworkOverride[],
-    rollback?: Record<string, number>
+    rollback?: Record<string, number>,
+    numWorkers?: number
   ): Promise<FinishBatchUploadResponse> {
     const finishUploadUrl = getApiUrl(`/api/v1/processors/finish_batch_upload`, this.options.host)
 
@@ -151,8 +152,9 @@ export abstract class BatchUploader {
         cli_version: getCliVersion(),
         network_overrides: networkOverrides || [],
         engine: this.engine,
-        payloads: payloads,
-        rollback: rollback
+        payloads,
+        rollback,
+        numWorkers
       })
     })
 
@@ -219,7 +221,8 @@ export class DefaultBatchUploader extends BatchUploader {
       debug,
       continueFrom,
       networkOverrides,
-      rollback
+      rollback,
+      this.options?.numWorkers
     )
   }
 }
