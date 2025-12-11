@@ -50,6 +50,8 @@ export function getRpcConfig(network: AptosNetwork, fullnode?: string | undefine
         network: Network.CUSTOM,
         fullnode: fullnode ?? 'https://rpc.sentio.xyz/initia-aptos/v1'
       })
+    default:
+      throw new Error(`Unsupported Aptos network: ${network}`)
   }
 }
 

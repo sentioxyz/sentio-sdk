@@ -50,6 +50,7 @@ export function createUploadCommand() {
     .option('--api-key <key>', '(Optional) Manually provide API key rather than use saved credential')
     .option('--token <token>', '(Optional) Manually provide token rather than use saved credential')
     .option('--host <host>', '(Optional) Override Sentio Host name')
+    .option('--num-workers <count>', '(Optional) Number of processor workers to start', myParseInt)
     .action(async (options) => {
       const processorConfig = loadProcessorConfig(options.path)
       overrideConfigWithOptions(processorConfig, options)
