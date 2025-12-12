@@ -1,9 +1,12 @@
 import { EthCallParam, ProcessResult } from '@sentio/protos'
+import { createRequire } from 'module'
 
 // TODO better handling this, because old proto doesn't have this
 import { StateResult, ProcessResult as ProcessResultFull } from './gen/processor/protos/processor.js'
 
 import { Required } from 'utility-types'
+import path from 'path'
+import fs from 'fs'
 
 export function mergeProcessResults(results: ProcessResult[]): Required<ProcessResult, 'states'> {
   const res = {
@@ -111,4 +114,17 @@ export function compareSemver(a: Semver, b: Semver) {
     return 1
   }
   return 0
+}
+
+const require = createRequire(import.meta.url)
+
+export function locatePackageJson(pkgId: string) {
+  const m = require.resolve(pkgId)
+
+  let dir = path.dirname(m)
+  while (!fs.existsSync(path.join(dir, 'package.json'))) {
+    dir = path.dirname(dir)
+  }
+  const content = fs.readFileSync(path.join(dir, 'package.json'), 'utf-8')
+  return JSON.parse(content)
 }

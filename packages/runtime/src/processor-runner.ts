@@ -24,6 +24,7 @@ import { ProcessorV3Definition } from '@sentio/protos'
 import { ProcessorServiceImplV3 } from './service-v3.js'
 import { dirname, join } from 'path'
 import { program, ProcessorRuntimeOptions } from 'processor-runner-program.js'
+import { locatePackageJson } from './utils.js'
 
 program.parse()
 
@@ -46,51 +47,13 @@ configureEndpoints(options)
 console.debug('Starting Server', options)
 
 // Check if this is a child process spawned for multi-server mode
-const isChildProcess = process.env['SENTIO_MULTI_SERVER_CHILD'] === 'true'
-const childServerPort = process.env['SENTIO_CHILD_SERVER_PORT']
+const isChildProcess = process.env['IS_CHILD'] === 'true'
 
-// Multi-worker mode: spawn child processes for additional servers
-if (options.worker > 1 && !isChildProcess) {
-  const childProcesses: ChildProcess[] = []
-  const basePort = parseInt(options.port)
-
-  // Spawn child processes for ports basePort+1 to basePort+(multiServer-1)
-  for (let i = 1; i < options.worker; i++) {
-    const childPort = basePort + i
-    const child = fork(fileURLToPath(import.meta.url), process.argv.slice(2), {
-      env: {
-        ...process.env,
-        SENTIO_MULTI_SERVER_CHILD: 'true',
-        SENTIO_CHILD_SERVER_PORT: String(childPort)
-      },
-      stdio: 'inherit'
-    })
-
-    child.on('error', (err) => {
-      console.error(`Child process on port ${childPort} error:`, err)
-    })
-
-    child.on('exit', (code) => {
-      console.log(`Child process on port ${childPort} exited with code ${code}`)
-    })
-
-    childProcesses.push(child)
-    console.log(`Spawned child server process for port ${childPort}`)
-  }
-
-  // Handle parent process shutdown - kill all children
-  const shutdownChildren = () => {
-    for (const child of childProcesses) {
-      child.kill('SIGINT')
-    }
-  }
-
-  process.on('SIGINT', shutdownChildren)
-  process.on('SIGTERM', shutdownChildren)
+if (!isChildProcess) {
+  const sdkPackageJson = locatePackageJson('@sentio/sdk')
+  const runtimePackageJson = locatePackageJson('@sentio/runtime')
+  console.log('Runtime version:', runtimePackageJson.version, 'SDK version:', sdkPackageJson.version)
 }
-
-// Determine the actual port for this process
-const actualPort = isChildProcess && childServerPort ? childServerPort : options.port
 
 let server: any
 let baseService: ProcessorServiceImpl
@@ -104,7 +67,7 @@ const loader = async () => {
 
 if (options.startActionServer) {
   server = new ActionServer(loader)
-  server.listen(actualPort)
+  server.listen(options.port)
 } else {
   server = createServer({
     'grpc.max_send_message_length': 768 * 1024 * 1024,
@@ -127,8 +90,8 @@ if (options.startActionServer) {
     new FullProcessorServiceV3Impl(new ProcessorServiceImplV3(loader, options, server.shutdown))
   )
 
-  server.listen('0.0.0.0:' + actualPort)
-  console.log('Processor Server Started at:', actualPort)
+  server.listen('0.0.0.0:' + options.port)
+  console.log('Processor Server Started at:', options.port)
 }
 
 // Only start metrics server on the main process (not child processes)
@@ -267,4 +230,59 @@ function shutdownServers(exitCode: number): void {
   } else {
     process.exit(exitCode)
   }
+}
+
+// Multi-worker mode: spawn child processes for additional servers
+if (options.worker > 1 && !isChildProcess) {
+  const childProcesses: ChildProcess[] = []
+  const basePort = parseInt(options.port)
+
+  // Spawn child processes for ports basePort+1 to basePort+(worker-1)
+  for (let i = 1; i < options.worker; i++) {
+    const childPort = basePort + i
+    const args = process.argv.slice(2)
+    const childArgs: string[] = ['--port=' + String(childPort)]
+    // Ignore port argument for child process
+    // handle both '-p 4000' and '--port=4000' styles
+    // ignore '--inspect=0.0.0.0:9229'
+    for (let j = 0; j < args.length; j++) {
+      const arg = args[j]
+      if (arg === '-p' || arg === '--port') {
+        j++ // skip next arg
+        continue
+      } else if (arg.startsWith('--port=') || arg.startsWith('--inspect=')) {
+        continue
+      }
+
+      childArgs.push(arg)
+    }
+    const child = fork(fileURLToPath(import.meta.url), childArgs, {
+      env: {
+        ...process.env,
+        IS_CHILD: 'true'
+      },
+      stdio: 'inherit'
+    })
+
+    child.on('error', (err) => {
+      console.error(`Child process on port ${childPort} error:`, err)
+    })
+
+    child.on('exit', (code) => {
+      console.log(`Child process on port ${childPort} exited with code ${code}`)
+    })
+
+    childProcesses.push(child)
+    console.log(`Spawned child server process for port ${childPort}`)
+  }
+
+  // Handle parent process shutdown - kill all children
+  const shutdownChildren = () => {
+    for (const child of childProcesses) {
+      child.kill('SIGINT')
+    }
+  }
+
+  process.on('SIGINT', shutdownChildren)
+  process.on('SIGTERM', shutdownChildren)
 }

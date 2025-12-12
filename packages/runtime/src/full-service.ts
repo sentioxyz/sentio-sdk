@@ -1,5 +1,4 @@
 import { CallContext } from 'nice-grpc'
-import { createRequire } from 'module'
 // Different than the simple one which
 import {
   DataBinding,
@@ -16,15 +15,11 @@ import {
 } from './gen/processor/protos/processor.js'
 
 import { DeepPartial, Empty, ProcessorV3ServiceImplementation, UpdateTemplatesRequest } from '@sentio/protos'
-import fs from 'fs-extra'
-import path from 'path'
 import os from 'os'
 import { GLOBAL_CONFIG } from './global-config.js'
-import { compareSemver, parseSemver, Semver } from './utils.js'
+import { compareSemver, locatePackageJson, parseSemver, Semver } from './utils.js'
 import { LRUCache } from 'lru-cache'
 import { createHash } from 'crypto'
-
-const require = createRequire(import.meta.url)
 
 const FUEL_PROTO_UPDATE_VERSION = parseSemver('2.54.0-rc.7')
 const FUEL_PROTO_NO_FUEL_TRANSACTION_AS_CALL_VERSION = parseSemver('2.55.0-rc.1')
@@ -68,17 +63,6 @@ function getParsedData(rawData: string): any {
   return parsedData
 }
 
-function locatePackageJson(pkgId: string) {
-  const m = require.resolve(pkgId)
-
-  let dir = path.dirname(m)
-  while (!fs.existsSync(path.join(dir, 'package.json'))) {
-    dir = path.dirname(dir)
-  }
-  const content = fs.readFileSync(path.join(dir, 'package.json'), 'utf-8')
-  return JSON.parse(content)
-}
-
 /**
  * The RuntimeServicePatcher class is responsible for providing backward compatibility
  * patches for different SDK versions. It ensures that the runtime can adapt to changes
@@ -89,10 +73,6 @@ export class RuntimeServicePatcher {
 
   constructor() {
     const sdkPackageJson = locatePackageJson('@sentio/sdk')
-    const runtimePackageJson = locatePackageJson('@sentio/runtime')
-
-    console.log('Runtime version:', runtimePackageJson.version, 'SDK version:', sdkPackageJson.version)
-
     this.sdkVersion = parseSemver(sdkPackageJson.version)
   }
 
@@ -298,10 +278,6 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
   constructor(instance: ProcessorServiceImplementation) {
     this.instance = instance
     const sdkPackageJson = locatePackageJson('@sentio/sdk')
-    const runtimePackageJson = locatePackageJson('@sentio/runtime')
-
-    console.log('Runtime version:', runtimePackageJson.version, 'SDK version:', sdkPackageJson.version)
-
     this.sdkVersion = parseSemver(sdkPackageJson.version)
   }
 
