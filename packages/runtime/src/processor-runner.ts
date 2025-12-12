@@ -237,7 +237,7 @@ if (options.worker > 1 && !isChildProcess) {
   const childProcesses: ChildProcess[] = []
   const basePort = parseInt(options.port)
 
-  // Spawn child processes for ports basePort+1 to basePort+(multiServer-1)
+  // Spawn child processes for ports basePort+1 to basePort+(worker-1)
   for (let i = 1; i < options.worker; i++) {
     const childPort = basePort + i
     const args = process.argv.slice(2)
