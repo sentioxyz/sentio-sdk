@@ -30,7 +30,7 @@
     "prettier": "^3.2.5",
     "prettier-package-json": "^2.8.0",
     "prettier-plugin-sh": "^0.18.0",
-    "semantic-release": "^24.0.0",
+    "semantic-release": "^25.0.0",
     "semantic-release-monorepo": "^8.0.2",
     "tsx": "^4.15.2",
     "typescript": "^5.9.2",
