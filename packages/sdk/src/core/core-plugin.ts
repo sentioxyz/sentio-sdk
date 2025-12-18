@@ -42,7 +42,7 @@ export class CorePlugin extends Plugin {
     // Append MemoryCacheItem schema when cache is enabled
     if (GLOBAL_CONFIG.cache?.enabled) {
       mergedSources += `
-type MemoryCacheItem @entity @cache(sizeMB: ${GLOBAL_CONFIG.cache.size || 100}) {
+type MemoryCacheItem @cache(sizeMB: ${GLOBAL_CONFIG.cache.size || 100}) {
   id: ID!
   value: String!
 }
