@@ -6,11 +6,13 @@ import { mergeProcessResultsInPlace, PluginManager } from '@sentio/runtime'
 import { Required } from 'utility-types'
 import { ServerError, Status } from 'nice-grpc'
 import { Store } from '../store/store.js'
+import { MemoryCache } from '../store/cache.js'
 
 export abstract class BaseContext {
   meter: Meter
   eventLogger: EventLoggerBinding
   private _store: Store
+  private _cache: MemoryCache
   baseLabels: Labels
   private active: boolean
 
@@ -83,6 +85,37 @@ export abstract class BaseContext {
       }
     }
     return this._store
+  }
+
+  /**
+   * Access the in-memory key-value cache.
+   *
+   * The cache allows storing and retrieving JSON-serializable values that persist
+   * across handler invocations. Useful for caching computed results, tracking
+   * cumulative state, or storing intermediate processing data.
+   *
+   * @returns The MemoryCache instance, or undefined if cache is not available
+   *
+   * @example
+   * ```typescript
+   * // Store and retrieve values
+   * await ctx.cache.set('totalVolume', volume)
+   * const cached = await ctx.cache.get<number>('totalVolume')
+   *
+   * // Block-scoped values (isolated per block)
+   * await ctx.cache.setInBlock('blockCount', count)
+   * ```
+   *
+   * @see {@link MemoryCache} for full API documentation
+   */
+  get cache() {
+    if (!this._cache) {
+      const dbContext = PluginManager.INSTANCE.dbContextLocalStorage.getStore()
+      if (dbContext) {
+        this._cache = new MemoryCache(dbContext, this)
+      }
+    }
+    return this._cache
   }
 
   // this method must be called within the dbContextLocalStorage scope

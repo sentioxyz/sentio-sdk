@@ -17,6 +17,9 @@ import { BigDecimalConverter, BigIntConverter } from '../store/convert.js'
 import { BigDecimal } from '@sentio/bigdecimal'
 import { Store } from '../store/store.js'
 
+// Internal entity name used by MemoryCache - bypasses schema validation
+const MEMORY_CACHE_ITEM_ENTITY = 'MemoryCacheItem'
+
 export class MemoryDatabase {
   db = new Map<string, Record<string, any>>()
   public lastDbRequest: DBRequest | undefined
@@ -57,6 +60,10 @@ export class MemoryDatabase {
     const entityDB = this.db.get(entity) ?? {}
     entityDB[id] = { entity, fields: data.fields }
     this.db.set(entity, entityDB)
+    // Skip interface handling for MemoryCacheItem (no schema required)
+    if (entity === MEMORY_CACHE_ITEM_ENTITY || !this.schema) {
+      return
+    }
     const entityClass = this.schema.getType(entity)
     if (entityClass && entityClass instanceof GraphQLObjectType) {
       for (const intf of entityClass.getInterfaces()) {
@@ -86,6 +93,10 @@ export class MemoryDatabase {
 
   // a quick and dirty way to mimic how derivedFrom fields are filled in the real database
   private fillDerivedFromFields(entity: string, id: string, result: any) {
+    // Skip derived fields processing for MemoryCacheItem (no schema required)
+    if (entity === MEMORY_CACHE_ITEM_ENTITY || !this.schema) {
+      return result
+    }
     const entityClass = this.schema.getType(entity)
     if (entityClass && entityClass instanceof GraphQLObjectType) {
       for (const field of Object.values(entityClass.getFields())) {
@@ -127,12 +138,15 @@ export class MemoryDatabase {
   }
 
   private processRequest(request: ProcessStreamResponse) {
-    if (!this.schema) {
+    const req = request.dbRequest
+
+    // Check if schema is required for this request
+    const requiresSchema = this.requestRequiresSchema(req)
+    if (requiresSchema && !this.schema) {
       console.warn('No schema defined, please check if entity schema is defined and loaded')
       return
     }
 
-    const req = request.dbRequest
     this.lastDbRequest = req
     if (req) {
       if (req.upsert) {
@@ -194,6 +208,26 @@ export class MemoryDatabase {
 
   reset() {
     this.db.clear()
+  }
+
+  // Check if the request involves only MemoryCacheItem entity, which doesn't require schema
+  private requestRequiresSchema(req: DBRequest | undefined): boolean {
+    if (!req) return false
+
+    // Check if all entities in the request are MemoryCacheItem
+    if (req.upsert) {
+      return !req.upsert.entity.every((e) => e === MEMORY_CACHE_ITEM_ENTITY)
+    }
+    if (req.delete) {
+      return !req.delete.entity.every((e) => e === MEMORY_CACHE_ITEM_ENTITY)
+    }
+    if (req.get) {
+      return req.get.entity !== MEMORY_CACHE_ITEM_ENTITY
+    }
+    if (req.list) {
+      return req.list.entity !== MEMORY_CACHE_ITEM_ENTITY
+    }
+    return false
   }
 
   private listEntities(entity: string, filters?: DBRequest_DBFilter[]) {

@@ -1,4 +1,4 @@
-import { Plugin, PluginManager } from '@sentio/runtime'
+import { GLOBAL_CONFIG, Plugin, PluginManager } from '@sentio/runtime'
 import { InitResponse, ProcessConfigResponse } from '@sentio/protos'
 
 import { MetricState } from './meter.js'
@@ -36,9 +36,20 @@ export class CorePlugin extends Plugin {
       })
     }
 
-    if (DatabaseSchemaState.INSTANCE.getValues().length > 0) {
-      const schemas = DatabaseSchemaState.INSTANCE.getValues()
-      const mergedSources = mergeSchemas(schemas)
+    const schemas = DatabaseSchemaState.INSTANCE.getValues()
+    let mergedSources = mergeSchemas(schemas)
+
+    // Append MemoryCacheItem schema when cache is enabled
+    if (GLOBAL_CONFIG.cache?.enabled) {
+      mergedSources += `
+type MemoryCacheItem @entity @cache(sizeMB: ${GLOBAL_CONFIG.cache.size || 100}) {
+  id: ID!
+  value: String!
+}
+`
+    }
+
+    if (mergedSources.trim().length > 0) {
       config.dbSchema = {
         gqlSchema: mergedSources
       }
