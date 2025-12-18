@@ -19,6 +19,7 @@ const baseSchema = buildASTSchema(
     directive @jsonField on OBJECT # legacy
     directive @aggregation(intervals: [String!]! = ["hour"], source: String!) on OBJECT
     directive @aggregate(fn: String!, arg: String, cumulative: Boolean = false) on FIELD_DEFINITION
+    directive @cache(sizeMB: Int!) on OBJECT
     ${customScalars.map((name) => 'scalar ' + name).join('\n')}
 `)
 )
