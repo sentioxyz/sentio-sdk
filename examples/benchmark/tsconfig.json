@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "importHelpers": true,
+    "alwaysStrict": true,
+    "sourceMap": true,
+    "target": "esnext",
+    "esModuleInterop": true,
+    "noImplicitReturns": true,
+    "noImplicitAny": true,
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "strictNullChecks": true,
+    "stripInternal": true,
+    "noFallthroughCasesInSwitch": true,
+    "noEmitOnError": false,
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "skipLibCheck": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
+  },
+  "exclude": ["dist"]
+}

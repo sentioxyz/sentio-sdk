@@ -119,6 +119,19 @@ importers:
         specifier: workspace:*
         version: link:../../packages/cli
 
+  examples/benchmark:
+    dependencies:
+      '@sentio/sdk':
+        specifier: workspace:*
+        version: link:../../packages/sdk
+    devDependencies:
+      '@sentio/cli':
+        specifier: workspace:*
+        version: link:../../packages/cli
+      typescript:
+        specifier: ^5.5.2
+        version: 5.9.2
+
   examples/fuel-counter:
     dependencies:
       '@sentio/sdk':
