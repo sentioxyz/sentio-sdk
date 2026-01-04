@@ -34,6 +34,8 @@ export interface YamlProjectConfig {
   silentOverwrite?: boolean
   variables?: Variable[]
   numWorkers?: number // Number of processor worker to start, default to 1
+  sentioNetwork?: string // Sentio network to connect to, can be testnet or mainnet
+  requiredChainIds?: string[]
 }
 
 export interface Variable {
@@ -97,6 +99,13 @@ export function overrideConfigWithOptions(config: YamlProjectConfig, options: an
   }
   if (options.numWorkers !== undefined) {
     config.numWorkers = options.numWorkers
+  }
+  if (options.sentioNetwork) {
+    if (!['mainnet', 'testnet'].includes(options.sentioNetwork)) {
+      console.error(`Invalid sentio network: ${options.sentioNetwork}, only mainnet or testnet is allowed`)
+      process.exit(1)
+    }
+    config.sentioNetwork = options.sentioNetwork
   }
 }
 

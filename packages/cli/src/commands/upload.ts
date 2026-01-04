@@ -51,13 +51,18 @@ export function createUploadCommand() {
     .option('--token <token>', '(Optional) Manually provide token rather than use saved credential')
     .option('--host <host>', '(Optional) Override Sentio Host name')
     .option('--num-workers <count>', '(Optional) Number of processor workers to start', myParseInt)
-    .action(async (options) => {
+    .option('--sentio-network <network>', '(Optional) Sentio network to connect to, can be testnet or mainnet')
+    .option(
+      '--required-chain-id <chain_id...>',
+      '(Optional) Specify chain IDs required for the Sentio network. This option is only available when --sentio-network is used. If omitted, all chain IDs from the project configuration (contracts or network overrides) will be used.'
+    )
+    .action(async (options, command) => {
       const processorConfig = loadProcessorConfig(options.path)
       overrideConfigWithOptions(processorConfig, options)
       if (options.path) {
         process.chdir(options.path)
       }
-      await runUploadInternal(processorConfig, options)
+      await runUploadInternal(processorConfig, options, command)
     })
 }
 
@@ -121,7 +126,8 @@ function parseCheckpoints(
 
 async function runUploadInternal(
   processorConfig: YamlProjectConfig,
-  options: CommandOptionsType<typeof createUploadCommand>
+  options: CommandOptionsType<typeof createUploadCommand>,
+  command?: Command
 ) {
   console.log(processorConfig)
 
@@ -140,6 +146,37 @@ async function runUploadInternal(
     const cmd = isProd ? 'sentio login' : 'sentio login --host=' + processorConfig.host
     console.error(chalk.red('No Credential found for', processorConfig.host, '. Please run `' + cmd + '`.'))
     process.exit(1)
+  }
+
+  if (options.requiredChainId && options.requiredChainId.length > 0) {
+    if (!options.sentioNetwork) {
+      console.error(chalk.red('Error: --required-chain-id can only be used with --sentio-network'))
+      command?.outputHelp()
+      process.exit(1)
+    }
+    processorConfig.requiredChainIds = options.requiredChainId
+  } else if (options.sentioNetwork) {
+    const chainIds = new Set<string>()
+    if (processorConfig.contracts) {
+      for (const contract of processorConfig.contracts) {
+        chainIds.add(String(contract.chain))
+      }
+    }
+    if (processorConfig.networkOverrides) {
+      for (const override of processorConfig.networkOverrides) {
+        chainIds.add(String(override.chain))
+      }
+    }
+    if (chainIds.size === 0) {
+      console.error(
+        chalk.red(
+          'Error: No chain IDs found for Sentio Network deployment. When using --sentio-network, you must either specify chain IDs using --required-chain-id or define them in your sentio.yaml file under `requiredChainIds`.'
+        )
+      )
+      command?.outputHelp()
+      process.exit(1)
+    }
+    processorConfig.requiredChainIds = Array.from(chainIds)
   }
 
   if (!options.skipBuild) {
@@ -163,7 +200,7 @@ async function createProject(options: YamlProjectConfig, auth: Auth, type?: stri
     headers: {
       ...auth
     },
-    body: JSON.stringify({ slug, ownerName, visibility: 'PRIVATE', type })
+    body: JSON.stringify({ slug, ownerName, visibility: 'PRIVATE', type, sentioNetwork: !!options.sentioNetwork })
   })
 }
 
@@ -277,7 +314,15 @@ async function checkOrCreateProject(options: YamlProjectConfig, auth: Auth) {
     process.exit(1)
   }
 
-  return ((await response.json()) as any)?.project?.id
+  const project = ((await response.json()) as any)?.project
+
+  if (options.sentioNetwork && project.sentioNetwork !== true) {
+    console.error(
+      chalk.red(`Project ${project?.slug} is not enabled for Sentio Network. Please create a Sentio Network Project.`)
+    )
+    process.exit(1)
+  }
+  return project?.id
 }
 
 export async function uploadFile(

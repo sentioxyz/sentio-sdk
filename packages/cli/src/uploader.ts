@@ -154,7 +154,9 @@ export abstract class BatchUploader {
         engine: this.engine,
         payloads,
         rollback,
-        numWorkers
+        numWorkers,
+        sentio_network: this.options.sentioNetwork,
+        required_chain_ids: this.options.requiredChainIds
       })
     })
 
