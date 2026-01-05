@@ -101,11 +101,21 @@ export function overrideConfigWithOptions(config: YamlProjectConfig, options: an
     config.numWorkers = options.numWorkers
   }
   if (options.sentioNetwork) {
-    if (!['mainnet', 'testnet'].includes(options.sentioNetwork)) {
-      console.error(`Invalid sentio network: ${options.sentioNetwork}, only mainnet or testnet is allowed`)
-      process.exit(1)
+    switch (options.sentioNetwork) {
+      case 'mainnet':
+        config.sentioNetwork = '789210'
+        break
+      case 'testnet':
+        config.sentioNetwork = '7892101'
+        break
+      case '7892101':
+      case '789210':
+        config.sentioNetwork = options.sentioNetwork
+        break
+      default:
+        console.error(`Invalid sentio network: ${options.sentioNetwork}, only mainnet or testnet is allowed`)
+        process.exit(1)
     }
-    config.sentioNetwork = options.sentioNetwork
   }
 }
 
