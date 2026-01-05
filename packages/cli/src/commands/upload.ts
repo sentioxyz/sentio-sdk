@@ -13,7 +13,7 @@ import readline from 'readline'
 import JSZip from 'jszip'
 import { UserInfo } from '../../../protos/lib/service/common/protos/common.js'
 import { CommandOptionsType } from './types.js'
-import { Auth, DefaultBatchUploader, WalrusBatchUploader } from '../uploader.js'
+import { Auth, DefaultBatchUploader, IPFSBatchUploader, WalrusBatchUploader } from '../uploader.js'
 export { type Auth } from '../uploader.js'
 
 function myParseInt(value: string, dummyPrevious: number): number {
@@ -415,7 +415,11 @@ export async function uploadFile(
       const codeBuffer = fs.readFileSync(processorFile)
 
       // Create uploader
-      const uploader = options.walrus ? new WalrusBatchUploader(config, auth) : new DefaultBatchUploader(config, auth)
+      const uploader = options.walrus
+        ? new WalrusBatchUploader(config, auth)
+        : options.sentioNetwork
+          ? new IPFSBatchUploader(config, auth)
+          : new DefaultBatchUploader(config, auth)
 
       // Handle variables update if needed
       if (config.variables && config.variables.length > 0) {
