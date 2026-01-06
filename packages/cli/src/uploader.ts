@@ -36,6 +36,10 @@ export interface UploadPayload {
     blobId: string
     quiltPatchId: string
   }
+  ipfs?: {
+    cid: string
+    putUrl: string
+  }
   file_type: FileType
 }
 
@@ -251,7 +255,8 @@ export class IPFSBatchUploader extends BatchUploader {
     const initResponse = await this.initUpload(fileTypes)
 
     for (const [fileKey, payload] of Object.entries(initResponse.payloads)) {
-      if (!payload?.object?.putUrl) {
+      const putUrl = payload.object?.putUrl || payload.ipfs?.putUrl
+      if (!putUrl) {
         throw new Error(`No IPFS put URL found for file: ${fileKey}`)
       }
       const fileContent = files[fileKey as keyof Files]
@@ -263,7 +268,7 @@ export class IPFSBatchUploader extends BatchUploader {
       const blob = new Blob([fileContent], { type: 'application/octet-stream' })
       formData.append('file', blob, fileKey) // 'file' is a common field name for single file uploads
 
-      const uploadResponse = await fetch(payload.object.putUrl, {
+      const uploadResponse = await fetch(putUrl, {
         method: 'POST',
         body: formData
       })
@@ -272,10 +277,13 @@ export class IPFSBatchUploader extends BatchUploader {
         throw new Error(
           `Failed to upload file ${fileKey} to IPFS: ${uploadResponse.status} ${uploadResponse.statusText}`
         )
+      } else {
+        const resp: any = await uploadResponse.json()
+        const cid = resp.Hash
+        payload.ipfs = { cid, putUrl }
       }
     }
 
-    // Step 4: Finish upload with SHA256 map and payloads
     return this.finishUpload(
       files,
       initResponse.payloads,
