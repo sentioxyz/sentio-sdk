@@ -1,0 +1,21 @@
+{
+  "private": true,
+  "name": "lbtc",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "benchmark": "tsx $PWD/../../packages/runtime/lib/processor-runner.js --chains-config $PWD/../../packages/runtime/chains-config.json $PWD/dist/lib.js",
+    "build": "sentio build",
+    "gen": "sentio gen",
+    "postinstall": "sentio gen",
+    "test": "sentio test",
+    "upload": "sentio upload"
+  },
+  "dependencies": {
+    "@sentio/sdk": "workspace:*"
+  },
+  "devDependencies": {
+    "@sentio/cli": "workspace:*",
+    "typescript": "^5.5.2"
+  }
+}

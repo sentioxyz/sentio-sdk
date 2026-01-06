@@ -1,0 +1,8 @@
+type Bench @entity {
+  id: ID!
+  data: String!
+  dataStart: BigInt!
+  handlerStart: BigInt!
+  upsertStart: BigInt!
+}
+
