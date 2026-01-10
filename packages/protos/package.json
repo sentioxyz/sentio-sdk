@@ -20,7 +20,7 @@
     "long": "^5.2.3",
     "nice-grpc": "^2.1.12",
     "nice-grpc-common": "^2.0.2",
-    "protobufjs": "^7.5.4"
+    "protobufjs": "^8.0.0"
   },
   "engines": {
     "node": ">=20"
