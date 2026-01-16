@@ -31,13 +31,6 @@ export class SolanaPlugin extends Plugin {
       if (forChainId !== undefined && forChainId !== chainId.toString()) {
         continue
       }
-      let fetchTx = false
-      for (const fetchConfig of solanaProcessor.instructionHandlerMap.values()) {
-        if (fetchConfig.handlerOptions?.fetchTx) {
-          fetchTx = true
-          break
-        }
-      }
 
       const contractConfig = ContractConfig.fromPartial({
         processorType: USER_PROCESSOR,
@@ -47,14 +40,23 @@ export class SolanaPlugin extends Plugin {
           address: solanaProcessor.address,
           abi: ''
         },
-        startBlock: solanaProcessor.config.startSlot,
-        instructionConfig: {
+        startBlock: solanaProcessor.config.startSlot
+      })
+      if (solanaProcessor.address && solanaProcessor.address != '*') {
+        let fetchTx = false
+        for (const fetchConfig of solanaProcessor.instructionHandlerMap.values()) {
+          if (fetchConfig.handlerOptions?.fetchTx) {
+            fetchTx = true
+            break
+          }
+        }
+        contractConfig.instructionConfig = {
           innerInstruction: solanaProcessor.processInnerInstruction,
           parsedInstruction: solanaProcessor.fromParsedInstruction !== null,
           rawDataInstruction: solanaProcessor.decodeInstruction !== null,
           fetchTx: fetchTx
         }
-      })
+      }
 
       for (const [idx, handler] of solanaProcessor.blockHandlers.entries()) {
         contractConfig.intervalConfigs.push(
