@@ -220,6 +220,7 @@ export enum HandlerType {
   FUEL_BLOCK = 17,
   COSMOS_CALL = 14,
   STARKNET_EVENT = 15,
+  SOL_BLOCK = 21,
   UNRECOGNIZED = -1,
 }
 
@@ -282,6 +283,9 @@ export function handlerTypeFromJSON(object: any): HandlerType {
     case 15:
     case "STARKNET_EVENT":
       return HandlerType.STARKNET_EVENT;
+    case 21:
+    case "SOL_BLOCK":
+      return HandlerType.SOL_BLOCK;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -329,6 +333,8 @@ export function handlerTypeToJSON(object: HandlerType): string {
       return "COSMOS_CALL";
     case HandlerType.STARKNET_EVENT:
       return "STARKNET_EVENT";
+    case HandlerType.SOL_BLOCK:
+      return "SOL_BLOCK";
     case HandlerType.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
@@ -787,6 +793,7 @@ export interface InstructionHandlerConfig {
   innerInstruction: boolean;
   parsedInstruction: boolean;
   rawDataInstruction: boolean;
+  fetchTx: boolean;
 }
 
 export interface ResourceConfig {
@@ -1229,6 +1236,7 @@ export interface Data {
   fuelBlock?: Data_FuelBlock | undefined;
   cosmosCall?: Data_CosmosCall | undefined;
   starknetEvents?: Data_StarknetEvent | undefined;
+  solBlock?: Data_SolBlock | undefined;
 }
 
 export interface Data_EthLog {
@@ -1273,6 +1281,13 @@ export interface Data_SolInstruction {
   programAccountId: string;
   accounts: string[];
   parsed?: { [key: string]: any } | undefined;
+  rawTransaction?: string | undefined;
+}
+
+export interface Data_SolBlock {
+  rawBlock: string;
+  timestamp: Date | undefined;
+  slot: bigint;
 }
 
 export interface Data_AptEvent {
@@ -5746,7 +5761,7 @@ export const LogFilter = {
 };
 
 function createBaseInstructionHandlerConfig(): InstructionHandlerConfig {
-  return { innerInstruction: false, parsedInstruction: false, rawDataInstruction: false };
+  return { innerInstruction: false, parsedInstruction: false, rawDataInstruction: false, fetchTx: false };
 }
 
 export const InstructionHandlerConfig = {
@@ -5759,6 +5774,9 @@ export const InstructionHandlerConfig = {
     }
     if (message.rawDataInstruction !== false) {
       writer.uint32(24).bool(message.rawDataInstruction);
+    }
+    if (message.fetchTx !== false) {
+      writer.uint32(32).bool(message.fetchTx);
     }
     return writer;
   },
@@ -5791,6 +5809,13 @@ export const InstructionHandlerConfig = {
 
           message.rawDataInstruction = reader.bool();
           continue;
+        case 4:
+          if (tag !== 32) {
+            break;
+          }
+
+          message.fetchTx = reader.bool();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -5805,6 +5830,7 @@ export const InstructionHandlerConfig = {
       innerInstruction: isSet(object.innerInstruction) ? globalThis.Boolean(object.innerInstruction) : false,
       parsedInstruction: isSet(object.parsedInstruction) ? globalThis.Boolean(object.parsedInstruction) : false,
       rawDataInstruction: isSet(object.rawDataInstruction) ? globalThis.Boolean(object.rawDataInstruction) : false,
+      fetchTx: isSet(object.fetchTx) ? globalThis.Boolean(object.fetchTx) : false,
     };
   },
 
@@ -5819,6 +5845,9 @@ export const InstructionHandlerConfig = {
     if (message.rawDataInstruction !== false) {
       obj.rawDataInstruction = message.rawDataInstruction;
     }
+    if (message.fetchTx !== false) {
+      obj.fetchTx = message.fetchTx;
+    }
     return obj;
   },
 
@@ -5830,6 +5859,7 @@ export const InstructionHandlerConfig = {
     message.innerInstruction = object.innerInstruction ?? false;
     message.parsedInstruction = object.parsedInstruction ?? false;
     message.rawDataInstruction = object.rawDataInstruction ?? false;
+    message.fetchTx = object.fetchTx ?? false;
     return message;
   },
 };
@@ -9600,6 +9630,7 @@ function createBaseData(): Data {
     fuelBlock: undefined,
     cosmosCall: undefined,
     starknetEvents: undefined,
+    solBlock: undefined,
   };
 }
 
@@ -9658,6 +9689,9 @@ export const Data = {
     }
     if (message.starknetEvents !== undefined) {
       Data_StarknetEvent.encode(message.starknetEvents, writer.uint32(130).fork()).ldelim();
+    }
+    if (message.solBlock !== undefined) {
+      Data_SolBlock.encode(message.solBlock, writer.uint32(178).fork()).ldelim();
     }
     return writer;
   },
@@ -9795,6 +9829,13 @@ export const Data = {
 
           message.starknetEvents = Data_StarknetEvent.decode(reader, reader.uint32());
           continue;
+        case 22:
+          if (tag !== 178) {
+            break;
+          }
+
+          message.solBlock = Data_SolBlock.decode(reader, reader.uint32());
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -9828,6 +9869,7 @@ export const Data = {
       fuelBlock: isSet(object.fuelBlock) ? Data_FuelBlock.fromJSON(object.fuelBlock) : undefined,
       cosmosCall: isSet(object.cosmosCall) ? Data_CosmosCall.fromJSON(object.cosmosCall) : undefined,
       starknetEvents: isSet(object.starknetEvents) ? Data_StarknetEvent.fromJSON(object.starknetEvents) : undefined,
+      solBlock: isSet(object.solBlock) ? Data_SolBlock.fromJSON(object.solBlock) : undefined,
     };
   },
 
@@ -9886,6 +9928,9 @@ export const Data = {
     }
     if (message.starknetEvents !== undefined) {
       obj.starknetEvents = Data_StarknetEvent.toJSON(message.starknetEvents);
+    }
+    if (message.solBlock !== undefined) {
+      obj.solBlock = Data_SolBlock.toJSON(message.solBlock);
     }
     return obj;
   },
@@ -9948,6 +9993,9 @@ export const Data = {
       : undefined;
     message.starknetEvents = (object.starknetEvents !== undefined && object.starknetEvents !== null)
       ? Data_StarknetEvent.fromPartial(object.starknetEvents)
+      : undefined;
+    message.solBlock = (object.solBlock !== undefined && object.solBlock !== null)
+      ? Data_SolBlock.fromPartial(object.solBlock)
       : undefined;
     return message;
   },
@@ -10518,7 +10566,14 @@ export const Data_EthTrace = {
 };
 
 function createBaseData_SolInstruction(): Data_SolInstruction {
-  return { instructionData: "", slot: BigInt("0"), programAccountId: "", accounts: [], parsed: undefined };
+  return {
+    instructionData: "",
+    slot: BigInt("0"),
+    programAccountId: "",
+    accounts: [],
+    parsed: undefined,
+    rawTransaction: undefined,
+  };
 }
 
 export const Data_SolInstruction = {
@@ -10540,6 +10595,9 @@ export const Data_SolInstruction = {
     }
     if (message.parsed !== undefined) {
       Struct.encode(Struct.wrap(message.parsed), writer.uint32(34).fork()).ldelim();
+    }
+    if (message.rawTransaction !== undefined) {
+      writer.uint32(50).string(message.rawTransaction);
     }
     return writer;
   },
@@ -10586,6 +10644,13 @@ export const Data_SolInstruction = {
 
           message.parsed = Struct.unwrap(Struct.decode(reader, reader.uint32()));
           continue;
+        case 6:
+          if (tag !== 50) {
+            break;
+          }
+
+          message.rawTransaction = reader.string();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -10602,6 +10667,7 @@ export const Data_SolInstruction = {
       programAccountId: isSet(object.programAccountId) ? globalThis.String(object.programAccountId) : "",
       accounts: globalThis.Array.isArray(object?.accounts) ? object.accounts.map((e: any) => globalThis.String(e)) : [],
       parsed: isObject(object.parsed) ? object.parsed : undefined,
+      rawTransaction: isSet(object.rawTransaction) ? globalThis.String(object.rawTransaction) : undefined,
     };
   },
 
@@ -10622,6 +10688,9 @@ export const Data_SolInstruction = {
     if (message.parsed !== undefined) {
       obj.parsed = message.parsed;
     }
+    if (message.rawTransaction !== undefined) {
+      obj.rawTransaction = message.rawTransaction;
+    }
     return obj;
   },
 
@@ -10635,6 +10704,99 @@ export const Data_SolInstruction = {
     message.programAccountId = object.programAccountId ?? "";
     message.accounts = object.accounts?.map((e) => e) || [];
     message.parsed = object.parsed ?? undefined;
+    message.rawTransaction = object.rawTransaction ?? undefined;
+    return message;
+  },
+};
+
+function createBaseData_SolBlock(): Data_SolBlock {
+  return { rawBlock: "", timestamp: undefined, slot: BigInt("0") };
+}
+
+export const Data_SolBlock = {
+  encode(message: Data_SolBlock, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.rawBlock !== "") {
+      writer.uint32(10).string(message.rawBlock);
+    }
+    if (message.timestamp !== undefined) {
+      Timestamp.encode(toTimestamp(message.timestamp), writer.uint32(18).fork()).ldelim();
+    }
+    if (message.slot !== BigInt("0")) {
+      if (BigInt.asUintN(64, message.slot) !== message.slot) {
+        throw new globalThis.Error("value provided for field message.slot of type uint64 too large");
+      }
+      writer.uint32(24).uint64(message.slot.toString());
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Data_SolBlock {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseData_SolBlock();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.rawBlock = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.timestamp = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+          continue;
+        case 3:
+          if (tag !== 24) {
+            break;
+          }
+
+          message.slot = longToBigint(reader.uint64() as Long);
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Data_SolBlock {
+    return {
+      rawBlock: isSet(object.rawBlock) ? globalThis.String(object.rawBlock) : "",
+      timestamp: isSet(object.timestamp) ? fromJsonTimestamp(object.timestamp) : undefined,
+      slot: isSet(object.slot) ? BigInt(object.slot) : BigInt("0"),
+    };
+  },
+
+  toJSON(message: Data_SolBlock): unknown {
+    const obj: any = {};
+    if (message.rawBlock !== "") {
+      obj.rawBlock = message.rawBlock;
+    }
+    if (message.timestamp !== undefined) {
+      obj.timestamp = message.timestamp.toISOString();
+    }
+    if (message.slot !== BigInt("0")) {
+      obj.slot = message.slot.toString();
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<Data_SolBlock>): Data_SolBlock {
+    return Data_SolBlock.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<Data_SolBlock>): Data_SolBlock {
+    const message = createBaseData_SolBlock();
+    message.rawBlock = object.rawBlock ?? "";
+    message.timestamp = object.timestamp ?? undefined;
+    message.slot = object.slot ?? BigInt("0");
     return message;
   },
 };
