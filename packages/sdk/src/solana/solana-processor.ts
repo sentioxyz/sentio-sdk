@@ -89,7 +89,7 @@ export class SolanaBaseProcessor {
   }
 
   public onTimeInterval(
-    handler: SolanaBlockHandler<Data_SolBlock>,
+    handler: SolanaBlockHandler<BlockResponse>,
     timeIntervalInMinutes = 60,
     backfillTimeIntervalInMinutes = 240
   ): this {
@@ -101,7 +101,7 @@ export class SolanaBaseProcessor {
   }
 
   public onBlockInterval(
-    handler: SolanaBlockHandler<Data_SolBlock>,
+    handler: SolanaBlockHandler<BlockResponse>,
     blockInterval = 1000,
     backfillBlockInterval = 4000
   ): this {
