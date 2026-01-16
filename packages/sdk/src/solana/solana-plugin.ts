@@ -4,6 +4,7 @@ import {
   DataBinding,
   HandlerType,
   InitResponse,
+  OnIntervalConfig,
   ProcessConfigResponse,
   ProcessResult
 } from '@sentio/protos'
@@ -30,6 +31,14 @@ export class SolanaPlugin extends Plugin {
       if (forChainId !== undefined && forChainId !== chainId.toString()) {
         continue
       }
+      let fetchTx = false
+      for (const fetchConfig of solanaProcessor.instructionHandlerMap.values()) {
+        if (fetchConfig.handlerOptions?.fetchTx) {
+          fetchTx = true
+          break
+        }
+      }
+
       const contractConfig = ContractConfig.fromPartial({
         processorType: USER_PROCESSOR,
         contract: {
@@ -42,19 +51,34 @@ export class SolanaPlugin extends Plugin {
         instructionConfig: {
           innerInstruction: solanaProcessor.processInnerInstruction,
           parsedInstruction: solanaProcessor.fromParsedInstruction !== null,
-          rawDataInstruction: solanaProcessor.decodeInstruction !== null
+          rawDataInstruction: solanaProcessor.decodeInstruction !== null,
+          fetchTx: fetchTx
         }
       })
+
+      for (const [idx, handler] of solanaProcessor.blockHandlers.entries()) {
+        contractConfig.intervalConfigs.push(
+          OnIntervalConfig.fromPartial({
+            handlerId: idx,
+            minutesInterval: handler.timeIntervalInMinutes,
+            slotInterval: handler.slotInterval,
+            handlerName: handler.handlerName
+          })
+        )
+      }
+
       config.contractConfigs.push(contractConfig)
     }
   }
 
-  supportedHandlers = [HandlerType.SOL_INSTRUCTION]
+  supportedHandlers = [HandlerType.SOL_INSTRUCTION, HandlerType.SOL_BLOCK]
 
   processBinding(request: DataBinding): Promise<ProcessResult> {
     switch (request.handlerType) {
       case HandlerType.SOL_INSTRUCTION:
         return this.processSolInstruction(request)
+      case HandlerType.SOL_BLOCK:
+        return this.processSolBlock(request)
       default:
         throw new ServerError(Status.INVALID_ARGUMENT, 'No handle type registered ' + request.handlerType)
     }
@@ -73,7 +97,7 @@ export class SolanaPlugin extends Plugin {
 
     // Only have instruction handlers for solana processors
     for (const processor of SolanaProcessorState.INSTANCE.getValues()) {
-      if (processor.address === instruction.programAccountId) {
+      if (processor.address === instruction.programAccountId || processor.address === '*') {
         let parsedInstruction: SolInstruction | null = null
 
         try {
@@ -96,7 +120,7 @@ export class SolanaPlugin extends Plugin {
           continue
         }
         const res = processor
-          .handleInstruction(parsedInstruction, instruction.accounts, insHandler, instruction.slot)
+          .handleInstruction(parsedInstruction, instruction.accounts, insHandler, instruction)
           .catch((e) => {
             throw new ServerError(
               Status.INTERNAL,
@@ -105,6 +129,23 @@ export class SolanaPlugin extends Plugin {
           })
 
         promises.push(res)
+      }
+    }
+    return mergeProcessResults(await Promise.all(promises))
+  }
+
+  async processSolBlock(request: DataBinding): Promise<ProcessResult> {
+    if (!request.data?.solBlock) {
+      throw new ServerError(Status.INVALID_ARGUMENT, 'block data cannot be empty')
+    }
+    const block = request.data.solBlock
+    const promises: Promise<ProcessResult>[] = []
+    for (const processor of SolanaProcessorState.INSTANCE.getValues()) {
+      for (const handlerId of request.handlerIds) {
+        const handler = processor.blockHandlers[handlerId]
+        if (handler) {
+          promises.push(processor.handleBlock(block, handler))
+        }
       }
     }
     return mergeProcessResults(await Promise.all(promises))

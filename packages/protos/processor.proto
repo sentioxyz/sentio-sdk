@@ -413,6 +413,7 @@ message InstructionHandlerConfig {
   bool inner_instruction = 1;
   bool parsed_instruction = 2;
   bool raw_data_instruction = 3;
+  bool fetch_tx = 4;
 }
 
 message ResourceConfig {
@@ -727,6 +728,12 @@ message Data {
     string program_account_id = 3;
     repeated string accounts = 5;
     optional google.protobuf.Struct parsed = 4;
+    optional string raw_transaction = 6;
+  }
+  message SolBlock {
+    string raw_block = 1;
+    google.protobuf.Timestamp timestamp = 2;
+    uint64 slot = 3;
   }
   message AptEvent {
     string raw_event = 1;
@@ -823,6 +830,7 @@ message Data {
     FuelBlock fuel_block = 18;
     CosmosCall cosmos_call = 15;
     StarknetEvent starknet_events = 16;
+    SolBlock sol_block = 22;
   }
 }
 
@@ -926,6 +934,7 @@ enum HandlerType {
   FUEL_BLOCK = 17;
   COSMOS_CALL = 14;
   STARKNET_EVENT = 15;
+  SOL_BLOCK = 21;
 }
 
 message RuntimeInfo {

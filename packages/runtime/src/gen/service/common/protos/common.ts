@@ -540,6 +540,7 @@ export interface Project {
   enableMaterializedView: boolean;
   defaultTimerange: TimeRangeLite | undefined;
   communityProject?: CommunityProject | undefined;
+  sentioNetwork: boolean;
 }
 
 export enum Project_Visibility {
@@ -1729,6 +1730,7 @@ export interface Account {
   usageOverCapLimit: string;
   status: string;
   prepaidBalance: Money | undefined;
+  walletAddress: string;
 }
 
 export interface ImportedProject {
@@ -3410,6 +3412,7 @@ function createBaseProject(): Project {
     enableMaterializedView: false,
     defaultTimerange: undefined,
     communityProject: undefined,
+    sentioNetwork: false,
   };
 }
 
@@ -3483,6 +3486,9 @@ export const Project = {
     }
     if (message.communityProject !== undefined) {
       CommunityProject.encode(message.communityProject, writer.uint32(178).fork()).ldelim();
+    }
+    if (message.sentioNetwork !== false) {
+      writer.uint32(184).bool(message.sentioNetwork);
     }
     return writer;
   },
@@ -3641,6 +3647,13 @@ export const Project = {
 
           message.communityProject = CommunityProject.decode(reader, reader.uint32());
           continue;
+        case 23:
+          if (tag !== 184) {
+            break;
+          }
+
+          message.sentioNetwork = reader.bool();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -3679,6 +3692,7 @@ export const Project = {
         : false,
       defaultTimerange: isSet(object.defaultTimerange) ? TimeRangeLite.fromJSON(object.defaultTimerange) : undefined,
       communityProject: isSet(object.communityProject) ? CommunityProject.fromJSON(object.communityProject) : undefined,
+      sentioNetwork: isSet(object.sentioNetwork) ? globalThis.Boolean(object.sentioNetwork) : false,
     };
   },
 
@@ -3747,6 +3761,9 @@ export const Project = {
     if (message.communityProject !== undefined) {
       obj.communityProject = CommunityProject.toJSON(message.communityProject);
     }
+    if (message.sentioNetwork !== false) {
+      obj.sentioNetwork = message.sentioNetwork;
+    }
     return obj;
   },
 
@@ -3782,6 +3799,7 @@ export const Project = {
     message.communityProject = (object.communityProject !== undefined && object.communityProject !== null)
       ? CommunityProject.fromPartial(object.communityProject)
       : undefined;
+    message.sentioNetwork = object.sentioNetwork ?? false;
     return message;
   },
 };
@@ -10992,6 +11010,7 @@ function createBaseAccount(): Account {
     usageOverCapLimit: "",
     status: "",
     prepaidBalance: undefined,
+    walletAddress: "",
   };
 }
 
@@ -11029,6 +11048,9 @@ export const Account = {
     }
     if (message.prepaidBalance !== undefined) {
       Money.encode(message.prepaidBalance, writer.uint32(106).fork()).ldelim();
+    }
+    if (message.walletAddress !== "") {
+      writer.uint32(114).string(message.walletAddress);
     }
     return writer;
   },
@@ -11117,6 +11139,13 @@ export const Account = {
 
           message.prepaidBalance = Money.decode(reader, reader.uint32());
           continue;
+        case 14:
+          if (tag !== 114) {
+            break;
+          }
+
+          message.walletAddress = reader.string();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -11139,6 +11168,7 @@ export const Account = {
       usageOverCapLimit: isSet(object.usageOverCapLimit) ? globalThis.String(object.usageOverCapLimit) : "",
       status: isSet(object.status) ? globalThis.String(object.status) : "",
       prepaidBalance: isSet(object.prepaidBalance) ? Money.fromJSON(object.prepaidBalance) : undefined,
+      walletAddress: isSet(object.walletAddress) ? globalThis.String(object.walletAddress) : "",
     };
   },
 
@@ -11177,6 +11207,9 @@ export const Account = {
     if (message.prepaidBalance !== undefined) {
       obj.prepaidBalance = Money.toJSON(message.prepaidBalance);
     }
+    if (message.walletAddress !== "") {
+      obj.walletAddress = message.walletAddress;
+    }
     return obj;
   },
 
@@ -11198,6 +11231,7 @@ export const Account = {
     message.prepaidBalance = (object.prepaidBalance !== undefined && object.prepaidBalance !== null)
       ? Money.fromPartial(object.prepaidBalance)
       : undefined;
+    message.walletAddress = object.walletAddress ?? "";
     return message;
   },
 };

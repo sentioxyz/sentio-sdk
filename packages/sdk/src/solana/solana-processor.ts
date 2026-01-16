@@ -1,11 +1,13 @@
-import { ProcessResult } from '@sentio/protos'
+import { Data_SolBlock, Data_SolInstruction, HandleInterval, ProcessResult } from '@sentio/protos'
 import { SolanaContext } from './solana-context.js'
 import { Instruction } from '@coral-xyz/anchor'
-import { SolanaBindOptions } from './solana-options.js'
+import { SolanaBindOptions, SolanaFetchConfig } from './solana-options.js'
 import { ListStateStorage } from '@sentio/runtime'
-import { Labels } from '../core/index.js'
+import { ALL_ADDRESS, Labels, PromiseOrVoid } from '../core/index.js'
 import { SolanaChainId } from '@sentio/chain'
 import { HandlerOptions } from '../core/handler-options.js'
+import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
+import { TransactionResponse, BlockResponse } from '@solana/web3.js'
 
 type IndexConfigure = {
   startSlot: bigint
@@ -20,7 +22,16 @@ export type SolanaInstructionHandler = (instruction: Instruction, ctx: SolanaCon
 
 export interface InstructionHandlerEntry {
   handler: SolanaInstructionHandler
-  handlerOptions?: HandlerOptions<object, Instruction>
+  handlerOptions?: HandlerOptions<SolanaFetchConfig, Instruction>
+}
+
+export type SolanaBlockHandler<T> = (block: T, ctx: SolanaContext) => PromiseOrVoid
+
+export interface SolanaBlockHandlerEntry<T> {
+  handler: SolanaBlockHandler<T>
+  timeIntervalInMinutes?: HandleInterval
+  slotInterval?: HandleInterval
+  handlerName: string
 }
 
 export class SolanaProcessorState extends ListStateStorage<SolanaBaseProcessor> {
@@ -29,6 +40,7 @@ export class SolanaProcessorState extends ListStateStorage<SolanaBaseProcessor> 
 
 export class SolanaBaseProcessor {
   public instructionHandlerMap: Map<string, InstructionHandlerEntry> = new Map()
+  public blockHandlers: SolanaBlockHandlerEntry<any>[] = []
   address: string
   endpoint: string
   contractName: string
@@ -70,9 +82,46 @@ export class SolanaBaseProcessor {
   public onInstruction(
     instructionName: string,
     handler: SolanaInstructionHandler,
-    handlerOptions?: HandlerOptions<object, Instruction>
+    handlerOptions?: HandlerOptions<SolanaFetchConfig, Instruction>
   ) {
     this.instructionHandlerMap.set(instructionName, { handler, handlerOptions })
+    return this
+  }
+
+  public onTimeInterval(
+    handler: SolanaBlockHandler<Data_SolBlock>,
+    timeIntervalInMinutes = 60,
+    backfillTimeIntervalInMinutes = 240
+  ): this {
+    return this.onInterval(
+      handler,
+      { recentInterval: timeIntervalInMinutes, backfillInterval: backfillTimeIntervalInMinutes },
+      undefined
+    )
+  }
+
+  public onBlockInterval(
+    handler: SolanaBlockHandler<Data_SolBlock>,
+    blockInterval = 1000,
+    backfillBlockInterval = 4000
+  ): this {
+    return this.onInterval(handler, undefined, {
+      recentInterval: blockInterval,
+      backfillInterval: backfillBlockInterval
+    })
+  }
+
+  public onInterval<T>(
+    handler: SolanaBlockHandler<T>,
+    timeInterval: HandleInterval | undefined,
+    slotInterval: HandleInterval | undefined
+  ): this {
+    this.blockHandlers.push({
+      handler: handler,
+      timeIntervalInMinutes: timeInterval,
+      slotInterval: slotInterval,
+      handlerName: getHandlerName()
+    })
     return this
   }
 
@@ -96,10 +145,32 @@ export class SolanaBaseProcessor {
     parsedInstruction: Instruction,
     accounts: string[],
     handlerEntry: InstructionHandlerEntry,
-    slot: bigint
+    data: Data_SolInstruction
   ): Promise<ProcessResult> {
-    const ctx = new SolanaContext(this.contractName, this.network, this.address, slot, this.baseLabels)
+    let transaction: TransactionResponse | undefined = undefined
+    if (data.rawTransaction) {
+      transaction = JSON.parse(data.rawTransaction) as TransactionResponse
+    }
+
+    const ctx = new SolanaContext(
+      this.contractName,
+      this.network,
+      this.address,
+      data.slot,
+      this.baseLabels,
+      transaction
+    )
     await handlerEntry.handler(parsedInstruction, ctx, accounts)
+    return ctx.stopAndGetResult()
+  }
+
+  public async handleBlock(
+    rawBlock: Data_SolBlock,
+    handlerEntry: SolanaBlockHandlerEntry<BlockResponse>
+  ): Promise<ProcessResult> {
+    const ctx = new SolanaContext(this.contractName, this.network, this.address, rawBlock.slot, this.baseLabels)
+    const block = JSON.parse(rawBlock.rawBlock) as BlockResponse
+    await handlerEntry.handler(block, ctx)
     return ctx.stopAndGetResult()
   }
 
@@ -123,5 +194,16 @@ export class SolanaBaseProcessor {
   public endBlock(endBlock: bigint | number) {
     this.config.endSlot = BigInt(endBlock)
     return this
+  }
+}
+
+export class SolanaGlobalProcessor extends SolanaBaseProcessor {
+  static bind(options: Omit<SolanaBindOptions, 'address'>): SolanaGlobalProcessor {
+    return new SolanaGlobalProcessor({ ...options, address: ALL_ADDRESS })
+  }
+
+  constructor(options: SolanaBindOptions) {
+    super(options)
+    return proxyProcessor(this)
   }
 }

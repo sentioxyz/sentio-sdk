@@ -12,3 +12,7 @@ export class SolanaBindOptions {
   instructionCoder?: InstructionCoder
   baseLabels?: Labels
 }
+
+export class SolanaFetchConfig {
+  fetchTx?: boolean
+}
