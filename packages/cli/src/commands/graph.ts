@@ -271,6 +271,10 @@ async function uploadFile(
   const sdkVersion = getSdkVersion()
   const sequence = 2
   const initUploadResRaw = await initUpload(options.host, auth, options.project, sdkVersion, sequence)
+  if (!initUploadResRaw.ok) {
+    console.error(chalk.red('Failed to init upload', initUploadResRaw.status, initUploadResRaw.statusText))
+    return
+  }
   const initUploadRes = (await initUploadResRaw.json()) as { url: string }
   const uploadUrl = initUploadRes.url
 
@@ -282,7 +286,7 @@ async function uploadFile(
     body: zip.generateNodeStream()
   })
   if (!uploadResRaw.ok) {
-    console.error(chalk.red('Failed to upload'))
+    console.error(chalk.red('Failed to upload', uploadResRaw.status, uploadResRaw.statusText))
     throw uploadResRaw.text()
   }
 

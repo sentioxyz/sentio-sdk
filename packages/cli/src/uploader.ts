@@ -420,7 +420,7 @@ export async function initUpload(
   sequence: number,
   contentType?: string
 ) {
-  const initUploadUrl = getApiUrl(`packages/cli/src/uploader.ts`, host)
+  const initUploadUrl = getApiUrl(`/v1/processors/init_upload`, host)
   return fetch(initUploadUrl.href, {
     method: 'POST',
     headers: {
