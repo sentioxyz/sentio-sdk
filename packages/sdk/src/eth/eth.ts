@@ -139,7 +139,7 @@ class FormattedTransactionReceipt implements TransactionReceiptParams {
   }
   _logs: LogParams[]
   get logs(): readonly LogParams[] {
-    return this._logs ?? (this._logs = arrayOf(formatLog)(this.data.logs))
+    return this._logs ?? (this._logs = arrayOf(formatLog, true)(this.data.logs))
   }
   _gasUsed: bigint
   get gasUsed(): bigint {
