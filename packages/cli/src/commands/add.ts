@@ -49,6 +49,14 @@ export function createAddCommand() {
       '1'
     )
     .requiredOption('--folder <folder>', '(Optional) The folder to save the downloaded ABI file', '')
+    .option(
+      '--api-key <key>',
+      '(Optional) Manually provide API key rather than use saved credential, if both api-key and token is provided, use api-key.'
+    )
+    .option(
+      '--token <token>',
+      '(Optional) Manually provide token rather than use saved credential, if both api-key and token is provided, use api-key.'
+    )
     .action(async (address, options) => {
       await runAddInternal(address, options)
     })
@@ -67,7 +75,7 @@ async function runAddInternal(address: string, options: CommandOptionsType<typeo
     process.exit(1)
   }
 
-  const abiRes = await getABI(chain, address, options.name)
+  const abiRes = await getABI(chain, address, options.name, { apiKey: options.apiKey, token: options.token })
   const filename = abiRes.name || address
 
   writeABIFile(abiRes.abi, getABIFilePath(chain, filename, '', folder))

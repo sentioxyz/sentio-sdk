@@ -16,7 +16,8 @@ import type { RpcProvider as Starknet } from 'starknet'
 export async function getABI(
   chain: ChainId,
   address: string,
-  name: string | undefined
+  name: string | undefined,
+  credentials?: { apiKey?: string; token?: string }
 ): Promise<{ name?: string; abi: object | string }> {
   const baseErrMsg = chalk.red(
     `Failed to automatic download contract ${address} from ${chain}, please manually download abi and put it into abis/eth directory`
@@ -163,9 +164,14 @@ export async function getABI(
   try {
     const uploadAuth: Auth = {}
     const host = 'https://app.sentio.xyz'
-    const apiKey = ReadKey(host)
+    let apiKey = ReadKey(host)
+    if (credentials?.apiKey) {
+      apiKey = credentials.apiKey
+    }
     if (apiKey) {
       uploadAuth['api-key'] = apiKey
+    } else if (credentials?.token) {
+      uploadAuth.authorization = 'Bearer ' + credentials.token
     } else {
       const cmd = 'sentio login'
       console.error(chalk.red('No Credential found for', host, '. Please run `' + cmd + '`.'))
