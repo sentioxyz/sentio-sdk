@@ -8,6 +8,7 @@ import yaml from 'yaml'
 import { getABIFilePath, getABI, writeABIFile } from '../abi.js'
 import { AptosChainId, ChainId, getChainName, SuiChainId, EthChainInfo, ExplorerApiType } from '@sentio/chain'
 import { CommandOptionsType } from './types.js'
+import { getFinalizedHost } from '../config.js'
 
 const supportedChain: string[] = [
   AptosChainId.APTOS_MAINNET,
@@ -57,6 +58,7 @@ export function createAddCommand() {
       '--token <token>',
       '(Optional) Manually provide token rather than use saved credential, if both api-key and token is provided, use api-key.'
     )
+    .option('--host <host>', '(Optional) Sentio Host name')
     .action(async (address, options) => {
       await runAddInternal(address, options)
     })
@@ -75,7 +77,8 @@ async function runAddInternal(address: string, options: CommandOptionsType<typeo
     process.exit(1)
   }
 
-  const abiRes = await getABI(chain, address, options.name, { apiKey: options.apiKey, token: options.token })
+  const host = options.host ? getFinalizedHost(options.host) : undefined
+  const abiRes = await getABI(chain, address, options.name, { apiKey: options.apiKey, token: options.token, host })
   const filename = abiRes.name || address
 
   writeABIFile(abiRes.abi, getABIFilePath(chain, filename, '', folder))

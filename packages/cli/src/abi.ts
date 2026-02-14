@@ -17,7 +17,7 @@ export async function getABI(
   chain: ChainId,
   address: string,
   name: string | undefined,
-  credentials?: { apiKey?: string; token?: string }
+  credentials?: { apiKey?: string; token?: string; host?: string }
 ): Promise<{ name?: string; abi: object | string }> {
   const baseErrMsg = chalk.red(
     `Failed to automatic download contract ${address} from ${chain}, please manually download abi and put it into abis/eth directory`
@@ -163,7 +163,7 @@ export async function getABI(
   // ethereum
   try {
     const uploadAuth: Auth = {}
-    const host = 'https://app.sentio.xyz'
+    const host = credentials?.host || 'https://app.sentio.xyz'
     let apiKey = ReadKey(host)
     if (credentials?.apiKey) {
       apiKey = credentials.apiKey
