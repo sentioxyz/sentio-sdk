@@ -3,7 +3,7 @@ import {
   MoveCallSuiTransaction,
   ProgrammableTransaction,
   SuiTransaction
-} from '@mysten/sui/client'
+} from '@mysten/sui/jsonRpc'
 import { accountTypeString } from '@typemove/move'
 
 export function getMoveCalls(txBlock: SuiTransactionBlockResponse) {

@@ -907,11 +907,99 @@
       }
     }
   },
+  "internal": {
+    "fileFormatVersion": 6,
+    "address": "0x1",
+    "name": "internal",
+    "friends": [],
+    "structs": {
+      "Permit": {
+        "abilities": {
+          "abilities": [
+            "Drop"
+          ]
+        },
+        "typeParameters": [
+          {
+            "constraints": {
+              "abilities": []
+            },
+            "isPhantom": true
+          }
+        ],
+        "fields": [
+          {
+            "name": "dummy_field",
+            "type": "Bool"
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {
+      "permit": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "internal",
+              "name": "Permit",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
   "macros": {
     "fileFormatVersion": 6,
     "address": "0x1",
     "name": "macros",
-    "friends": [],
+    "friends": [
+      {
+        "address": "0x1",
+        "name": "u128"
+      },
+      {
+        "address": "0x1",
+        "name": "u16"
+      },
+      {
+        "address": "0x1",
+        "name": "u256"
+      },
+      {
+        "address": "0x1",
+        "name": "u32"
+      },
+      {
+        "address": "0x1",
+        "name": "u64"
+      },
+      {
+        "address": "0x1",
+        "name": "u8"
+      },
+      {
+        "address": "0x1",
+        "name": "uq32_32"
+      },
+      {
+        "address": "0x1",
+        "name": "uq64_64"
+      }
+    ],
     "structs": {},
     "exposedFunctions": {}
   },
@@ -1992,6 +2080,33 @@
           }
         ]
       },
+      "datatype_string": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x1",
+                "module": "type_name",
+                "name": "TypeName",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "ascii",
+              "name": "String",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
       "defining_id": {
         "visibility": "Public",
         "isEntry": false,
@@ -2244,6 +2359,132 @@
           "U128"
         ]
       },
+      "checked_add": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U128",
+          "U128"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U128"
+              ]
+            }
+          }
+        ]
+      },
+      "checked_div": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U128",
+          "U128"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U128"
+              ]
+            }
+          }
+        ]
+      },
+      "checked_mul": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U128",
+          "U128"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U128"
+              ]
+            }
+          }
+        ]
+      },
+      "checked_shl": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U128",
+          "U8"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U128"
+              ]
+            }
+          }
+        ]
+      },
+      "checked_shr": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U128",
+          "U8"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U128"
+              ]
+            }
+          }
+        ]
+      },
+      "checked_sub": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U128",
+          "U128"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U128"
+              ]
+            }
+          }
+        ]
+      },
       "diff": {
         "visibility": "Public",
         "isEntry": false,
@@ -2266,6 +2507,69 @@
         ],
         "return": [
           "U128"
+        ]
+      },
+      "lossless_div": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U128",
+          "U128"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U128"
+              ]
+            }
+          }
+        ]
+      },
+      "lossless_shl": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U128",
+          "U8"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U128"
+              ]
+            }
+          }
+        ]
+      },
+      "lossless_shr": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U128",
+          "U8"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U128"
+              ]
+            }
+          }
         ]
       },
       "max": {
@@ -2299,6 +2603,42 @@
         "parameters": [
           "U128",
           "U8"
+        ],
+        "return": [
+          "U128"
+        ]
+      },
+      "saturating_add": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U128",
+          "U128"
+        ],
+        "return": [
+          "U128"
+        ]
+      },
+      "saturating_mul": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U128",
+          "U128"
+        ],
+        "return": [
+          "U128"
+        ]
+      },
+      "saturating_sub": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U128",
+          "U128"
         ],
         "return": [
           "U128"
@@ -2433,6 +2773,132 @@
           "U16"
         ]
       },
+      "checked_add": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U16",
+          "U16"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U16"
+              ]
+            }
+          }
+        ]
+      },
+      "checked_div": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U16",
+          "U16"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U16"
+              ]
+            }
+          }
+        ]
+      },
+      "checked_mul": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U16",
+          "U16"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U16"
+              ]
+            }
+          }
+        ]
+      },
+      "checked_shl": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U16",
+          "U8"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U16"
+              ]
+            }
+          }
+        ]
+      },
+      "checked_shr": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U16",
+          "U8"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U16"
+              ]
+            }
+          }
+        ]
+      },
+      "checked_sub": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U16",
+          "U16"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U16"
+              ]
+            }
+          }
+        ]
+      },
       "diff": {
         "visibility": "Public",
         "isEntry": false,
@@ -2455,6 +2921,69 @@
         ],
         "return": [
           "U16"
+        ]
+      },
+      "lossless_div": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U16",
+          "U16"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U16"
+              ]
+            }
+          }
+        ]
+      },
+      "lossless_shl": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U16",
+          "U8"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U16"
+              ]
+            }
+          }
+        ]
+      },
+      "lossless_shr": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U16",
+          "U8"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U16"
+              ]
+            }
+          }
         ]
       },
       "max": {
@@ -2488,6 +3017,42 @@
         "parameters": [
           "U16",
           "U8"
+        ],
+        "return": [
+          "U16"
+        ]
+      },
+      "saturating_add": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U16",
+          "U16"
+        ],
+        "return": [
+          "U16"
+        ]
+      },
+      "saturating_mul": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U16",
+          "U16"
+        ],
+        "return": [
+          "U16"
+        ]
+      },
+      "saturating_sub": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U16",
+          "U16"
         ],
         "return": [
           "U16"
@@ -2562,6 +3127,90 @@
           "U256"
         ]
       },
+      "checked_add": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U256",
+          "U256"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U256"
+              ]
+            }
+          }
+        ]
+      },
+      "checked_div": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U256",
+          "U256"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U256"
+              ]
+            }
+          }
+        ]
+      },
+      "checked_mul": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U256",
+          "U256"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U256"
+              ]
+            }
+          }
+        ]
+      },
+      "checked_sub": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U256",
+          "U256"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U256"
+              ]
+            }
+          }
+        ]
+      },
       "diff": {
         "visibility": "Public",
         "isEntry": false,
@@ -2584,6 +3233,69 @@
         ],
         "return": [
           "U256"
+        ]
+      },
+      "lossless_div": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U256",
+          "U256"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U256"
+              ]
+            }
+          }
+        ]
+      },
+      "lossless_shl": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U256",
+          "U8"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U256"
+              ]
+            }
+          }
+        ]
+      },
+      "lossless_shr": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U256",
+          "U8"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U256"
+              ]
+            }
+          }
         ]
       },
       "max": {
@@ -2617,6 +3329,42 @@
         "parameters": [
           "U256",
           "U8"
+        ],
+        "return": [
+          "U256"
+        ]
+      },
+      "saturating_add": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U256",
+          "U256"
+        ],
+        "return": [
+          "U256"
+        ]
+      },
+      "saturating_mul": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U256",
+          "U256"
+        ],
+        "return": [
+          "U256"
+        ]
+      },
+      "saturating_sub": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U256",
+          "U256"
         ],
         "return": [
           "U256"
@@ -2760,6 +3508,132 @@
           "U32"
         ]
       },
+      "checked_add": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U32",
+          "U32"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U32"
+              ]
+            }
+          }
+        ]
+      },
+      "checked_div": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U32",
+          "U32"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U32"
+              ]
+            }
+          }
+        ]
+      },
+      "checked_mul": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U32",
+          "U32"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U32"
+              ]
+            }
+          }
+        ]
+      },
+      "checked_shl": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U32",
+          "U8"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U32"
+              ]
+            }
+          }
+        ]
+      },
+      "checked_shr": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U32",
+          "U8"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U32"
+              ]
+            }
+          }
+        ]
+      },
+      "checked_sub": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U32",
+          "U32"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U32"
+              ]
+            }
+          }
+        ]
+      },
       "diff": {
         "visibility": "Public",
         "isEntry": false,
@@ -2782,6 +3656,69 @@
         ],
         "return": [
           "U32"
+        ]
+      },
+      "lossless_div": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U32",
+          "U32"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U32"
+              ]
+            }
+          }
+        ]
+      },
+      "lossless_shl": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U32",
+          "U8"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U32"
+              ]
+            }
+          }
+        ]
+      },
+      "lossless_shr": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U32",
+          "U8"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U32"
+              ]
+            }
+          }
         ]
       },
       "max": {
@@ -2815,6 +3752,42 @@
         "parameters": [
           "U32",
           "U8"
+        ],
+        "return": [
+          "U32"
+        ]
+      },
+      "saturating_add": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U32",
+          "U32"
+        ],
+        "return": [
+          "U32"
+        ]
+      },
+      "saturating_mul": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U32",
+          "U32"
+        ],
+        "return": [
+          "U32"
+        ]
+      },
+      "saturating_sub": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U32",
+          "U32"
         ],
         "return": [
           "U32"
@@ -2909,6 +3882,132 @@
           "U64"
         ]
       },
+      "checked_add": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U64",
+          "U64"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U64"
+              ]
+            }
+          }
+        ]
+      },
+      "checked_div": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U64",
+          "U64"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U64"
+              ]
+            }
+          }
+        ]
+      },
+      "checked_mul": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U64",
+          "U64"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U64"
+              ]
+            }
+          }
+        ]
+      },
+      "checked_shl": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U64",
+          "U8"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U64"
+              ]
+            }
+          }
+        ]
+      },
+      "checked_shr": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U64",
+          "U8"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U64"
+              ]
+            }
+          }
+        ]
+      },
+      "checked_sub": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U64",
+          "U64"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U64"
+              ]
+            }
+          }
+        ]
+      },
       "diff": {
         "visibility": "Public",
         "isEntry": false,
@@ -2931,6 +4030,69 @@
         ],
         "return": [
           "U64"
+        ]
+      },
+      "lossless_div": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U64",
+          "U64"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U64"
+              ]
+            }
+          }
+        ]
+      },
+      "lossless_shl": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U64",
+          "U8"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U64"
+              ]
+            }
+          }
+        ]
+      },
+      "lossless_shr": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U64",
+          "U8"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U64"
+              ]
+            }
+          }
         ]
       },
       "max": {
@@ -2964,6 +4126,42 @@
         "parameters": [
           "U64",
           "U8"
+        ],
+        "return": [
+          "U64"
+        ]
+      },
+      "saturating_add": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U64",
+          "U64"
+        ],
+        "return": [
+          "U64"
+        ]
+      },
+      "saturating_mul": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U64",
+          "U64"
+        ],
+        "return": [
+          "U64"
+        ]
+      },
+      "saturating_sub": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U64",
+          "U64"
         ],
         "return": [
           "U64"
@@ -3078,6 +4276,132 @@
           "U8"
         ]
       },
+      "checked_add": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U8",
+          "U8"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U8"
+              ]
+            }
+          }
+        ]
+      },
+      "checked_div": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U8",
+          "U8"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U8"
+              ]
+            }
+          }
+        ]
+      },
+      "checked_mul": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U8",
+          "U8"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U8"
+              ]
+            }
+          }
+        ]
+      },
+      "checked_shl": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U8",
+          "U8"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U8"
+              ]
+            }
+          }
+        ]
+      },
+      "checked_shr": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U8",
+          "U8"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U8"
+              ]
+            }
+          }
+        ]
+      },
+      "checked_sub": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U8",
+          "U8"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U8"
+              ]
+            }
+          }
+        ]
+      },
       "diff": {
         "visibility": "Public",
         "isEntry": false,
@@ -3100,6 +4424,69 @@
         ],
         "return": [
           "U8"
+        ]
+      },
+      "lossless_div": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U8",
+          "U8"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U8"
+              ]
+            }
+          }
+        ]
+      },
+      "lossless_shl": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U8",
+          "U8"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U8"
+              ]
+            }
+          }
+        ]
+      },
+      "lossless_shr": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U8",
+          "U8"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U8"
+              ]
+            }
+          }
         ]
       },
       "max": {
@@ -3127,6 +4514,42 @@
         ]
       },
       "pow": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U8",
+          "U8"
+        ],
+        "return": [
+          "U8"
+        ]
+      },
+      "saturating_add": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U8",
+          "U8"
+        ],
+        "return": [
+          "U8"
+        ]
+      },
+      "saturating_mul": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U8",
+          "U8"
+        ],
+        "return": [
+          "U8"
+        ]
+      },
+      "saturating_sub": {
         "visibility": "Public",
         "isEntry": false,
         "typeParameters": [],

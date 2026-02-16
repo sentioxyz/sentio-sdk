@@ -2205,6 +2205,13 @@
           "U64",
           "U64",
           {
+            "Vector": "U64"
+          },
+          {
+            "Vector": "U64"
+          },
+          "Bool",
+          {
             "MutableReference": {
               "Struct": {
                 "address": "0x2",
@@ -8981,6 +8988,13 @@
           "U64",
           "U64",
           {
+            "Vector": "U64"
+          },
+          {
+            "Vector": "U64"
+          },
+          "Bool",
+          {
             "MutableReference": {
               "Struct": {
                 "address": "0x2",
@@ -9692,6 +9706,12 @@
             "Vector": "Address"
           },
           {
+            "Vector": "Address"
+          },
+          {
+            "Vector": "U64"
+          },
+          {
             "Reference": {
               "Struct": {
                 "address": "0x2",
@@ -9963,7 +9983,7 @@
           }
         ]
       },
-      "select_committee_members_top_n_stakers": {
+      "select_committee_members_from_eligible": {
         "visibility": "Friend",
         "isEntry": false,
         "typeParameters": [],
@@ -9978,7 +9998,10 @@
               }
             }
           },
-          "U64"
+          "U64",
+          {
+            "Vector": "U64"
+          }
         ],
         "return": [
           {

@@ -11,12 +11,12 @@
     "ethers": "npm:@sentio/ethers@6.13.1-patch.6"
   },
   "devDependencies": {
-    "@eslint/compat": "^1.3.2",
+    "@eslint/compat": "^2.0.0",
     "@eslint/eslintrc": "^3.3.1",
     "@eslint/js": "^9.35.0",
     "@ls-lint/ls-lint": "^2.3.0",
     "@types/chai": "^5.2.2",
-    "@types/node": "^22.18.0",
+    "@types/node": "^24.0.0",
     "chai": "^6.0.0",
     "conventional-changelog-conventionalcommits": "^9.0.0",
     "eslint": "^9.35.0",
@@ -37,9 +37,9 @@
     "typescript-eslint": "^8.42.0"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=24"
   },
-  "packageManager": "pnpm@10.17.1",
+  "packageManager": "pnpm@10.29.3",
   "pnpm": {
     "patchedDependencies": {
       "@coral-xyz/anchor@0.31.1": "patches/@coral-xyz__anchor@0.30.1.patch"

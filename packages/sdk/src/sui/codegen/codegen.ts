@@ -1,4 +1,4 @@
-import { SuiMoveNormalizedModule, SuiEvent, SuiMoveObject } from '@mysten/sui/client'
+import { SuiMoveNormalizedModule, SuiEvent, SuiMoveObject } from '@mysten/sui/jsonRpc'
 
 import * as fs from 'fs'
 import chalk from 'chalk'

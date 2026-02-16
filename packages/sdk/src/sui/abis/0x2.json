@@ -15,6 +15,14 @@
       {
         "address": "0x2",
         "name": "balance"
+      },
+      {
+        "address": "0x2",
+        "name": "event"
+      },
+      {
+        "address": "0x2",
+        "name": "funds_accumulator"
       }
     ],
     "structs": {
@@ -117,6 +125,56 @@
               ]
             }
           }
+        ]
+      },
+      "accumulator_u128_exists": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "accumulator",
+                "name": "AccumulatorRoot",
+                "typeArguments": []
+              }
+            }
+          },
+          "Address"
+        ],
+        "return": [
+          "Bool"
+        ]
+      },
+      "accumulator_u128_read": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "accumulator",
+                "name": "AccumulatorRoot",
+                "typeArguments": []
+              }
+            }
+          },
+          "Address"
+        ],
+        "return": [
+          "U128"
         ]
       },
       "create_u128": {
@@ -244,6 +302,51 @@
           }
         ],
         "return": []
+      },
+      "root_borrow_accumulator": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          },
+          {
+            "abilities": [
+              "Store"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "accumulator",
+                "name": "AccumulatorRoot",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "accumulator",
+              "name": "Key",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          }
+        ],
+        "return": [
+          {
+            "Reference": {
+              "TypeParameter": 1
+            }
+          }
+        ]
       },
       "root_borrow_accumulator_mut": {
         "visibility": "Friend",
@@ -458,13 +561,24 @@
     "fileFormatVersion": 6,
     "address": "0x2",
     "name": "accumulator_metadata",
-    "friends": [
-      {
-        "address": "0x2",
-        "name": "accumulator_settlement"
-      }
-    ],
+    "friends": [],
     "structs": {
+      "AccumulatorObjectCountKey": {
+        "abilities": {
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "dummy_field",
+            "type": "Bool"
+          }
+        ]
+      },
       "Metadata": {
         "abilities": {
           "abilities": [
@@ -558,71 +672,39 @@
         ]
       }
     },
-    "exposedFunctions": {
-      "create_accumulator_metadata": {
-        "visibility": "Friend",
-        "isEntry": false,
-        "typeParameters": [
-          {
-            "abilities": []
-          }
-        ],
-        "parameters": [
-          {
-            "MutableReference": {
-              "Struct": {
-                "address": "0x2",
-                "module": "accumulator",
-                "name": "AccumulatorRoot",
-                "typeArguments": []
-              }
-            }
-          },
-          "Address",
-          {
-            "MutableReference": {
-              "Struct": {
-                "address": "0x2",
-                "module": "tx_context",
-                "name": "TxContext",
-                "typeArguments": []
-              }
-            }
-          }
-        ],
-        "return": []
-      },
-      "remove_accumulator_metadata": {
-        "visibility": "Friend",
-        "isEntry": false,
-        "typeParameters": [
-          {
-            "abilities": []
-          }
-        ],
-        "parameters": [
-          {
-            "MutableReference": {
-              "Struct": {
-                "address": "0x2",
-                "module": "accumulator",
-                "name": "AccumulatorRoot",
-                "typeArguments": []
-              }
-            }
-          },
-          "Address"
-        ],
-        "return": []
-      }
-    }
+    "exposedFunctions": {}
   },
   "accumulator_settlement": {
     "fileFormatVersion": 6,
     "address": "0x2",
     "name": "accumulator_settlement",
     "friends": [],
-    "structs": {},
+    "structs": {
+      "EventStreamHead": {
+        "abilities": {
+          "abilities": [
+            "Store"
+          ]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "mmr",
+            "type": {
+              "Vector": "U256"
+            }
+          },
+          {
+            "name": "checkpoint_seq",
+            "type": "U64"
+          },
+          {
+            "name": "num_events",
+            "type": "U64"
+          }
+        ]
+      }
+    },
     "exposedFunctions": {}
   },
   "address": {
@@ -748,6 +830,178 @@
         "return": [
           "U256"
         ]
+      }
+    }
+  },
+  "address_alias": {
+    "fileFormatVersion": 6,
+    "address": "0x2",
+    "name": "address_alias",
+    "friends": [],
+    "structs": {
+      "AddressAliasState": {
+        "abilities": {
+          "abilities": [
+            "Key"
+          ]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "id",
+            "type": {
+              "Struct": {
+                "address": "0x2",
+                "module": "object",
+                "name": "UID",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "version",
+            "type": "U64"
+          }
+        ]
+      },
+      "AddressAliases": {
+        "abilities": {
+          "abilities": [
+            "Key"
+          ]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "id",
+            "type": {
+              "Struct": {
+                "address": "0x2",
+                "module": "object",
+                "name": "UID",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "aliases",
+            "type": {
+              "Struct": {
+                "address": "0x2",
+                "module": "vec_set",
+                "name": "VecSet",
+                "typeArguments": [
+                  "Address"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "AliasKey": {
+        "abilities": {
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "pos0",
+            "type": "Address"
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {
+      "add": {
+        "visibility": "Private",
+        "isEntry": true,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "address_alias",
+                "name": "AddressAliases",
+                "typeArguments": []
+              }
+            }
+          },
+          "Address"
+        ],
+        "return": []
+      },
+      "enable": {
+        "visibility": "Private",
+        "isEntry": true,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "address_alias",
+                "name": "AddressAliasState",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": []
+      },
+      "remove": {
+        "visibility": "Private",
+        "isEntry": true,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "address_alias",
+                "name": "AddressAliases",
+                "typeArguments": []
+              }
+            }
+          },
+          "Address"
+        ],
+        "return": []
+      },
+      "replace_all": {
+        "visibility": "Private",
+        "isEntry": true,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "address_alias",
+                "name": "AddressAliases",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Vector": "Address"
+          }
+        ],
+        "return": []
       }
     }
   },
@@ -1288,6 +1542,10 @@
     "friends": [
       {
         "address": "0x2",
+        "name": "coin"
+      },
+      {
+        "address": "0x2",
         "name": "sui"
       }
     ],
@@ -1351,6 +1609,30 @@
             "TypeParameter": 0
           }
         ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "balance",
+              "name": "Supply",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "create_supply_internal": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [],
         "return": [
           {
             "Struct": {
@@ -1536,6 +1818,102 @@
           "U64"
         ]
       },
+      "redeem_funds": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "funds_accumulator",
+              "name": "Withdrawal",
+              "typeArguments": [
+                {
+                  "Struct": {
+                    "address": "0x2",
+                    "module": "balance",
+                    "name": "Balance",
+                    "typeArguments": [
+                      {
+                        "TypeParameter": 0
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "balance",
+              "name": "Balance",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "send_funds": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "balance",
+              "name": "Balance",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          },
+          "Address"
+        ],
+        "return": []
+      },
+      "settled_funds_value": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "accumulator",
+                "name": "AccumulatorRoot",
+                "typeArguments": []
+              }
+            }
+          },
+          "Address"
+        ],
+        "return": [
+          "U64"
+        ]
+      },
       "split": {
         "visibility": "Public",
         "isEntry": false,
@@ -1665,6 +2043,51 @@
               "typeArguments": [
                 {
                   "TypeParameter": 0
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "withdraw_funds_from_object": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "object",
+                "name": "UID",
+                "typeArguments": []
+              }
+            }
+          },
+          "U64"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "funds_accumulator",
+              "name": "Withdrawal",
+              "typeArguments": [
+                {
+                  "Struct": {
+                    "address": "0x2",
+                    "module": "balance",
+                    "name": "Balance",
+                    "typeArguments": [
+                      {
+                        "TypeParameter": 0
+                      }
+                    ]
+                  }
                 }
               ]
             }
@@ -4790,7 +5213,12 @@
     "fileFormatVersion": 6,
     "address": "0x2",
     "name": "coin",
-    "friends": [],
+    "friends": [
+      {
+        "address": "0x2",
+        "name": "coin_registry"
+      }
+    ],
     "structs": {
       "Coin": {
         "abilities": {
@@ -5102,6 +5530,34 @@
       }
     },
     "exposedFunctions": {
+      "allow_global_pause": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin",
+                "name": "DenyCapV2",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": [
+          "Bool"
+        ]
+      },
       "balance": {
         "visibility": "Public",
         "isEntry": false,
@@ -5482,6 +5938,41 @@
                   "TypeParameter": 0
                 }
               ]
+            }
+          }
+        ]
+      },
+      "deny_cap_id": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin",
+                "name": "RegulatedCoinMetadata",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "object",
+              "name": "ID",
+              "typeArguments": []
             }
           }
         ]
@@ -5904,6 +6395,30 @@
                 "name": "TxContext",
                 "typeArguments": []
               }
+            }
+          }
+        ],
+        "return": []
+      },
+      "destroy_metadata": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "coin",
+              "name": "CoinMetadata",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
             }
           }
         ],
@@ -6470,6 +6985,145 @@
           }
         ]
       },
+      "new_coin_metadata": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          "U8",
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "string",
+              "name": "String",
+              "typeArguments": []
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "ascii",
+              "name": "String",
+              "typeArguments": []
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "string",
+              "name": "String",
+              "typeArguments": []
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "ascii",
+              "name": "String",
+              "typeArguments": []
+            }
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "coin",
+              "name": "CoinMetadata",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "new_deny_cap_v2": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          "Bool",
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "coin",
+              "name": "DenyCapV2",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "new_treasury_cap": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "coin",
+              "name": "TreasuryCap",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          }
+        ]
+      },
       "put": {
         "visibility": "Public",
         "isEntry": false,
@@ -6505,6 +7159,87 @@
               ]
             }
           }
+        ],
+        "return": []
+      },
+      "redeem_funds": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "funds_accumulator",
+              "name": "Withdrawal",
+              "typeArguments": [
+                {
+                  "Struct": {
+                    "address": "0x2",
+                    "module": "balance",
+                    "name": "Balance",
+                    "typeArguments": [
+                      {
+                        "TypeParameter": 0
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "coin",
+              "name": "Coin",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "send_funds": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "coin",
+              "name": "Coin",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          },
+          "Address"
         ],
         "return": []
       },
@@ -6796,6 +7531,64 @@
           }
         ]
       },
+      "update_coin_metadata": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin",
+                "name": "CoinMetadata",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "string",
+              "name": "String",
+              "typeArguments": []
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "ascii",
+              "name": "String",
+              "typeArguments": []
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "string",
+              "name": "String",
+              "typeArguments": []
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "ascii",
+              "name": "String",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": []
+      },
       "update_description": {
         "visibility": "Public",
         "isEntry": true,
@@ -7050,6 +7843,2206 @@
             }
           }
         ]
+      }
+    }
+  },
+  "coin_registry": {
+    "fileFormatVersion": 7,
+    "address": "0x2",
+    "name": "coin_registry",
+    "friends": [],
+    "structs": {
+      "Borrow": {
+        "abilities": {
+          "abilities": []
+        },
+        "typeParameters": [
+          {
+            "constraints": {
+              "abilities": []
+            },
+            "isPhantom": true
+          }
+        ],
+        "fields": [
+          {
+            "name": "dummy_field",
+            "type": "Bool"
+          }
+        ]
+      },
+      "CoinRegistry": {
+        "abilities": {
+          "abilities": [
+            "Key"
+          ]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "id",
+            "type": {
+              "Struct": {
+                "address": "0x2",
+                "module": "object",
+                "name": "UID",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      },
+      "Currency": {
+        "abilities": {
+          "abilities": [
+            "Key"
+          ]
+        },
+        "typeParameters": [
+          {
+            "constraints": {
+              "abilities": []
+            },
+            "isPhantom": true
+          }
+        ],
+        "fields": [
+          {
+            "name": "id",
+            "type": {
+              "Struct": {
+                "address": "0x2",
+                "module": "object",
+                "name": "UID",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "decimals",
+            "type": "U8"
+          },
+          {
+            "name": "name",
+            "type": {
+              "Struct": {
+                "address": "0x1",
+                "module": "string",
+                "name": "String",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "symbol",
+            "type": {
+              "Struct": {
+                "address": "0x1",
+                "module": "string",
+                "name": "String",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "description",
+            "type": {
+              "Struct": {
+                "address": "0x1",
+                "module": "string",
+                "name": "String",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "icon_url",
+            "type": {
+              "Struct": {
+                "address": "0x1",
+                "module": "string",
+                "name": "String",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "supply",
+            "type": {
+              "Struct": {
+                "address": "0x1",
+                "module": "option",
+                "name": "Option",
+                "typeArguments": [
+                  {
+                    "Struct": {
+                      "address": "0x2",
+                      "module": "coin_registry",
+                      "name": "SupplyState",
+                      "typeArguments": [
+                        {
+                          "TypeParameter": 0
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "name": "regulated",
+            "type": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin_registry",
+                "name": "RegulatedState",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "treasury_cap_id",
+            "type": {
+              "Struct": {
+                "address": "0x1",
+                "module": "option",
+                "name": "Option",
+                "typeArguments": [
+                  {
+                    "Struct": {
+                      "address": "0x2",
+                      "module": "object",
+                      "name": "ID",
+                      "typeArguments": []
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "name": "metadata_cap_id",
+            "type": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin_registry",
+                "name": "MetadataCapState",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "extra_fields",
+            "type": {
+              "Struct": {
+                "address": "0x2",
+                "module": "vec_map",
+                "name": "VecMap",
+                "typeArguments": [
+                  {
+                    "Struct": {
+                      "address": "0x1",
+                      "module": "string",
+                      "name": "String",
+                      "typeArguments": []
+                    }
+                  },
+                  {
+                    "Struct": {
+                      "address": "0x2",
+                      "module": "coin_registry",
+                      "name": "ExtraField",
+                      "typeArguments": []
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "CurrencyInitializer": {
+        "abilities": {
+          "abilities": []
+        },
+        "typeParameters": [
+          {
+            "constraints": {
+              "abilities": []
+            },
+            "isPhantom": true
+          }
+        ],
+        "fields": [
+          {
+            "name": "currency",
+            "type": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin_registry",
+                "name": "Currency",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "name": "extra_fields",
+            "type": {
+              "Struct": {
+                "address": "0x2",
+                "module": "bag",
+                "name": "Bag",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "is_otw",
+            "type": "Bool"
+          }
+        ]
+      },
+      "CurrencyKey": {
+        "abilities": {
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
+        },
+        "typeParameters": [
+          {
+            "constraints": {
+              "abilities": []
+            },
+            "isPhantom": true
+          }
+        ],
+        "fields": [
+          {
+            "name": "dummy_field",
+            "type": "Bool"
+          }
+        ]
+      },
+      "ExtraField": {
+        "abilities": {
+          "abilities": [
+            "Store"
+          ]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "pos0",
+            "type": {
+              "Struct": {
+                "address": "0x1",
+                "module": "type_name",
+                "name": "TypeName",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "pos1",
+            "type": {
+              "Vector": "U8"
+            }
+          }
+        ]
+      },
+      "LegacyMetadataKey": {
+        "abilities": {
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "dummy_field",
+            "type": "Bool"
+          }
+        ]
+      },
+      "MetadataCap": {
+        "abilities": {
+          "abilities": [
+            "Store",
+            "Key"
+          ]
+        },
+        "typeParameters": [
+          {
+            "constraints": {
+              "abilities": []
+            },
+            "isPhantom": true
+          }
+        ],
+        "fields": [
+          {
+            "name": "id",
+            "type": {
+              "Struct": {
+                "address": "0x2",
+                "module": "object",
+                "name": "UID",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      }
+    },
+    "enums": {
+      "MetadataCapState": {
+        "abilities": {
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
+        },
+        "typeParameters": [],
+        "variants": {
+          "Claimed": [
+            {
+              "name": "pos0",
+              "type": {
+                "Struct": {
+                  "address": "0x2",
+                  "module": "object",
+                  "name": "ID",
+                  "typeArguments": []
+                }
+              }
+            }
+          ],
+          "Deleted": [],
+          "Unclaimed": []
+        },
+        "variantDeclarationOrder": [
+          "Claimed",
+          "Unclaimed",
+          "Deleted"
+        ]
+      },
+      "RegulatedState": {
+        "abilities": {
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
+        },
+        "typeParameters": [],
+        "variants": {
+          "Regulated": [
+            {
+              "name": "cap",
+              "type": {
+                "Struct": {
+                  "address": "0x2",
+                  "module": "object",
+                  "name": "ID",
+                  "typeArguments": []
+                }
+              }
+            },
+            {
+              "name": "allow_global_pause",
+              "type": {
+                "Struct": {
+                  "address": "0x1",
+                  "module": "option",
+                  "name": "Option",
+                  "typeArguments": [
+                    "Bool"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "variant",
+              "type": "U8"
+            }
+          ],
+          "Unknown": [],
+          "Unregulated": []
+        },
+        "variantDeclarationOrder": [
+          "Regulated",
+          "Unregulated",
+          "Unknown"
+        ]
+      },
+      "SupplyState": {
+        "abilities": {
+          "abilities": [
+            "Store"
+          ]
+        },
+        "typeParameters": [
+          {
+            "constraints": {
+              "abilities": []
+            },
+            "isPhantom": true
+          }
+        ],
+        "variants": {
+          "BurnOnly": [
+            {
+              "name": "pos0",
+              "type": {
+                "Struct": {
+                  "address": "0x2",
+                  "module": "balance",
+                  "name": "Supply",
+                  "typeArguments": [
+                    {
+                      "TypeParameter": 0
+                    }
+                  ]
+                }
+              }
+            }
+          ],
+          "Fixed": [
+            {
+              "name": "pos0",
+              "type": {
+                "Struct": {
+                  "address": "0x2",
+                  "module": "balance",
+                  "name": "Supply",
+                  "typeArguments": [
+                    {
+                      "TypeParameter": 0
+                    }
+                  ]
+                }
+              }
+            }
+          ],
+          "Unknown": []
+        },
+        "variantDeclarationOrder": [
+          "Fixed",
+          "BurnOnly",
+          "Unknown"
+        ]
+      }
+    },
+    "exposedFunctions": {
+      "borrow_legacy_metadata": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin_registry",
+                "name": "Currency",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "coin",
+              "name": "CoinMetadata",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "coin_registry",
+              "name": "Borrow",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "burn": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin_registry",
+                "name": "Currency",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "coin",
+              "name": "Coin",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          }
+        ],
+        "return": []
+      },
+      "burn_balance": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin_registry",
+                "name": "Currency",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "balance",
+              "name": "Balance",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          }
+        ],
+        "return": []
+      },
+      "claim_metadata_cap": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin_registry",
+                "name": "Currency",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin",
+                "name": "TreasuryCap",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "coin_registry",
+              "name": "MetadataCap",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "decimals": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin_registry",
+                "name": "Currency",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": [
+          "U8"
+        ]
+      },
+      "delete_metadata_cap": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin_registry",
+                "name": "Currency",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "coin_registry",
+              "name": "MetadataCap",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          }
+        ],
+        "return": []
+      },
+      "delete_migrated_legacy_metadata": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin_registry",
+                "name": "Currency",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "coin",
+              "name": "CoinMetadata",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          }
+        ],
+        "return": []
+      },
+      "deny_cap_id": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin_registry",
+                "name": "Currency",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                {
+                  "Struct": {
+                    "address": "0x2",
+                    "module": "object",
+                    "name": "ID",
+                    "typeArguments": []
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "description": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin_registry",
+                "name": "Currency",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "string",
+              "name": "String",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "exists": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin_registry",
+                "name": "CoinRegistry",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          "Bool"
+        ]
+      },
+      "finalize": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "coin_registry",
+              "name": "CurrencyInitializer",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "coin_registry",
+              "name": "MetadataCap",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "finalize_and_delete_metadata_cap": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "coin_registry",
+              "name": "CurrencyInitializer",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": []
+      },
+      "finalize_registration": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin_registry",
+                "name": "CoinRegistry",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "transfer",
+              "name": "Receiving",
+              "typeArguments": [
+                {
+                  "Struct": {
+                    "address": "0x2",
+                    "module": "coin_registry",
+                    "name": "Currency",
+                    "typeArguments": [
+                      {
+                        "TypeParameter": 0
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": []
+      },
+      "icon_url": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin_registry",
+                "name": "Currency",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "string",
+              "name": "String",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "is_metadata_cap_claimed": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin_registry",
+                "name": "Currency",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": [
+          "Bool"
+        ]
+      },
+      "is_metadata_cap_deleted": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin_registry",
+                "name": "Currency",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": [
+          "Bool"
+        ]
+      },
+      "is_regulated": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin_registry",
+                "name": "Currency",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": [
+          "Bool"
+        ]
+      },
+      "is_supply_burn_only": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin_registry",
+                "name": "Currency",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": [
+          "Bool"
+        ]
+      },
+      "is_supply_fixed": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin_registry",
+                "name": "Currency",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": [
+          "Bool"
+        ]
+      },
+      "make_regulated": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin_registry",
+                "name": "CurrencyInitializer",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          },
+          "Bool",
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "coin",
+              "name": "DenyCapV2",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "make_supply_burn_only": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin_registry",
+                "name": "Currency",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "coin",
+              "name": "TreasuryCap",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          }
+        ],
+        "return": []
+      },
+      "make_supply_burn_only_init": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin_registry",
+                "name": "CurrencyInitializer",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "coin",
+              "name": "TreasuryCap",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          }
+        ],
+        "return": []
+      },
+      "make_supply_fixed": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin_registry",
+                "name": "Currency",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "coin",
+              "name": "TreasuryCap",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          }
+        ],
+        "return": []
+      },
+      "make_supply_fixed_init": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin_registry",
+                "name": "CurrencyInitializer",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "coin",
+              "name": "TreasuryCap",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          }
+        ],
+        "return": []
+      },
+      "metadata_cap_id": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin_registry",
+                "name": "Currency",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                {
+                  "Struct": {
+                    "address": "0x2",
+                    "module": "object",
+                    "name": "ID",
+                    "typeArguments": []
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "migrate_legacy_metadata": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin_registry",
+                "name": "CoinRegistry",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin",
+                "name": "CoinMetadata",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": []
+      },
+      "migrate_regulated_state_by_cap": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin_registry",
+                "name": "Currency",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin",
+                "name": "DenyCapV2",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": []
+      },
+      "migrate_regulated_state_by_metadata": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin_registry",
+                "name": "Currency",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin",
+                "name": "RegulatedCoinMetadata",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": []
+      },
+      "name": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin_registry",
+                "name": "Currency",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "string",
+              "name": "String",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "new_currency": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": [
+              "Key"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin_registry",
+                "name": "CoinRegistry",
+                "typeArguments": []
+              }
+            }
+          },
+          "U8",
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "string",
+              "name": "String",
+              "typeArguments": []
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "string",
+              "name": "String",
+              "typeArguments": []
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "string",
+              "name": "String",
+              "typeArguments": []
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "string",
+              "name": "String",
+              "typeArguments": []
+            }
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "coin_registry",
+              "name": "CurrencyInitializer",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "coin",
+              "name": "TreasuryCap",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "new_currency_with_otw": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": [
+              "Drop"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "TypeParameter": 0
+          },
+          "U8",
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "string",
+              "name": "String",
+              "typeArguments": []
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "string",
+              "name": "String",
+              "typeArguments": []
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "string",
+              "name": "String",
+              "typeArguments": []
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "string",
+              "name": "String",
+              "typeArguments": []
+            }
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "coin_registry",
+              "name": "CurrencyInitializer",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "coin",
+              "name": "TreasuryCap",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "return_borrowed_legacy_metadata": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin_registry",
+                "name": "Currency",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "coin",
+              "name": "CoinMetadata",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "coin_registry",
+              "name": "Borrow",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": []
+      },
+      "set_description": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin_registry",
+                "name": "Currency",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin_registry",
+                "name": "MetadataCap",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "string",
+              "name": "String",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": []
+      },
+      "set_icon_url": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin_registry",
+                "name": "Currency",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin_registry",
+                "name": "MetadataCap",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "string",
+              "name": "String",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": []
+      },
+      "set_name": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin_registry",
+                "name": "Currency",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin_registry",
+                "name": "MetadataCap",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "string",
+              "name": "String",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": []
+      },
+      "set_treasury_cap_id": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin_registry",
+                "name": "Currency",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin",
+                "name": "TreasuryCap",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": []
+      },
+      "symbol": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin_registry",
+                "name": "Currency",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "string",
+              "name": "String",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "total_supply": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin_registry",
+                "name": "Currency",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "U64"
+              ]
+            }
+          }
+        ]
+      },
+      "treasury_cap_id": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin_registry",
+                "name": "Currency",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                {
+                  "Struct": {
+                    "address": "0x2",
+                    "module": "object",
+                    "name": "ID",
+                    "typeArguments": []
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "update_from_legacy_metadata": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin_registry",
+                "name": "Currency",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin",
+                "name": "CoinMetadata",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": []
       }
     }
   },
@@ -10390,6 +13383,335 @@
           }
         ],
         "return": []
+      },
+      "emit_authenticated": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": [
+              "Copy",
+              "Drop"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "TypeParameter": 0
+          }
+        ],
+        "return": []
+      }
+    }
+  },
+  "funds_accumulator": {
+    "fileFormatVersion": 6,
+    "address": "0x2",
+    "name": "funds_accumulator",
+    "friends": [
+      {
+        "address": "0x2",
+        "name": "balance"
+      }
+    ],
+    "structs": {
+      "Withdrawal": {
+        "abilities": {
+          "abilities": [
+            "Drop"
+          ]
+        },
+        "typeParameters": [
+          {
+            "constraints": {
+              "abilities": [
+                "Store"
+              ]
+            },
+            "isPhantom": true
+          }
+        ],
+        "fields": [
+          {
+            "name": "owner",
+            "type": "Address"
+          },
+          {
+            "name": "limit",
+            "type": "U256"
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {
+      "add_impl": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": [
+              "Store"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "TypeParameter": 0
+          },
+          "Address"
+        ],
+        "return": []
+      },
+      "create_withdrawal": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": [
+              "Store"
+            ]
+          }
+        ],
+        "parameters": [
+          "Address",
+          "U256"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "funds_accumulator",
+              "name": "Withdrawal",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "redeem": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": [
+              "Store"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "funds_accumulator",
+              "name": "Withdrawal",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "internal",
+              "name": "Permit",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          }
+        ],
+        "return": [
+          {
+            "TypeParameter": 0
+          }
+        ]
+      },
+      "withdraw_from_object": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": [
+              "Store"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "object",
+                "name": "UID",
+                "typeArguments": []
+              }
+            }
+          },
+          "U256"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "funds_accumulator",
+              "name": "Withdrawal",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "withdrawal_join": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": [
+              "Store"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "funds_accumulator",
+                "name": "Withdrawal",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "funds_accumulator",
+              "name": "Withdrawal",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          }
+        ],
+        "return": []
+      },
+      "withdrawal_limit": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": [
+              "Store"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "funds_accumulator",
+                "name": "Withdrawal",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": [
+          "U256"
+        ]
+      },
+      "withdrawal_owner": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": [
+              "Store"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "funds_accumulator",
+                "name": "Withdrawal",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": [
+          "Address"
+        ]
+      },
+      "withdrawal_split": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": [
+              "Store"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "funds_accumulator",
+                "name": "Withdrawal",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          },
+          "U256"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "funds_accumulator",
+              "name": "Withdrawal",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          }
+        ]
       }
     }
   },
@@ -10974,9 +14296,7 @@
         "parameters": [
           "U8",
           {
-            "Reference": {
-              "Vector": "U8"
-            }
+            "Vector": "U8"
           },
           "Bool"
         ],
@@ -15300,11 +18620,19 @@
       },
       {
         "address": "0x2",
+        "name": "address_alias"
+      },
+      {
+        "address": "0x2",
         "name": "authenticator_state"
       },
       {
         "address": "0x2",
         "name": "clock"
+      },
+      {
+        "address": "0x2",
+        "name": "coin_registry"
       },
       {
         "address": "0x2",
@@ -15363,6 +18691,22 @@
       }
     },
     "exposedFunctions": {
+      "address_alias_state": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "object",
+              "name": "UID",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
       "authenticator_state": {
         "visibility": "Friend",
         "isEntry": false,
@@ -15664,6 +19008,31 @@
         ]
       },
       "sui_accumulator_root_object_id": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "object",
+              "name": "UID",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "sui_coin_registry_address": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [],
+        "return": [
+          "Address"
+        ]
+      },
+      "sui_coin_registry_object_id": {
         "visibility": "Friend",
         "isEntry": false,
         "typeParameters": [],
@@ -18117,6 +21486,33 @@
           {
             "Vector": "U64"
           }
+        ]
+      }
+    }
+  },
+  "protocol_config": {
+    "fileFormatVersion": 6,
+    "address": "0x2",
+    "name": "protocol_config",
+    "friends": [
+      {
+        "address": "0x2",
+        "name": "funds_accumulator"
+      }
+    ],
+    "structs": {},
+    "exposedFunctions": {
+      "is_feature_enabled": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Vector": "U8"
+          }
+        ],
+        "return": [
+          "Bool"
         ]
       }
     }

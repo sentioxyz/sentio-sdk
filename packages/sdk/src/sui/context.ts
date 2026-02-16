@@ -6,8 +6,8 @@ import {
   SuiEvent,
   SuiMoveNormalizedModule,
   SuiMoveObject,
-  SuiClient
-} from '@mysten/sui/client'
+  SuiJsonRpcClient
+} from '@mysten/sui/jsonRpc'
 import { MoveCoder } from './index.js'
 import { defaultMoveCoder } from './move-coder.js'
 import { MoveAccountContext, MoveContext } from '../move/index.js'
@@ -65,7 +65,7 @@ export class SuiContext extends MoveContext<SuiNetwork, SuiMoveNormalizedModule,
     }
   }
 
-  get client(): SuiClient {
+  get client(): SuiJsonRpcClient {
     return getClient(this.network)
   }
 }
@@ -115,7 +115,7 @@ export class SuiObjectChangeContext extends MoveContext<SuiNetwork, SuiMoveNorma
     }
   }
 
-  get client(): SuiClient {
+  get client(): SuiJsonRpcClient {
     return getClient(this.network)
   }
 }
@@ -167,7 +167,7 @@ export class SuiAddressContext extends MoveAccountContext<
     }
   }
 
-  get client(): SuiClient {
+  get client(): SuiJsonRpcClient {
     return getClient(this.network)
   }
 

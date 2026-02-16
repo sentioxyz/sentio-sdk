@@ -7,7 +7,7 @@ import { AptosChainId, ChainId, StarknetChainId, SuiChainId } from '@sentio/chai
 
 import type { Aptos } from '@aptos-labs/ts-sdk'
 import type { IotaClient } from '@iota/iota-sdk/client'
-import type { SuiClient } from '@mysten/sui/client'
+import type { SuiJsonRpcClient } from '@mysten/sui/jsonRpc'
 import { ReadKey } from './key.js'
 import { Auth } from './commands/upload.js'
 import { getApiUrl } from './utils.js'
@@ -25,14 +25,14 @@ export async function getABI(
 
   // SUI
   try {
-    const SuiClient = (await import('@mysten/sui/client')).SuiClient
-    let suiClient: SuiClient | undefined
+    const SuiJsonRpcClient = (await import('@mysten/sui/jsonRpc')).SuiJsonRpcClient
+    let suiClient: SuiJsonRpcClient | undefined
     switch (chain) {
       case SuiChainId.SUI_MAINNET:
-        suiClient = new SuiClient({ url: 'https://fullnode.mainnet.sui.io/' })
+        suiClient = new SuiJsonRpcClient({ url: 'https://fullnode.mainnet.sui.io/', network: 'mainnet' })
         break
       case SuiChainId.SUI_TESTNET:
-        suiClient = new SuiClient({ url: 'https://fullnode.testnet.sui.io/' })
+        suiClient = new SuiJsonRpcClient({ url: 'https://fullnode.testnet.sui.io/', network: 'testnet' })
         break
     }
     if (suiClient) {

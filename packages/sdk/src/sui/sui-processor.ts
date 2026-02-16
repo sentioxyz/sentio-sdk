@@ -3,7 +3,7 @@ import { ListStateStorage } from '@sentio/runtime'
 import { SuiNetwork } from './network.js'
 import { ServerError, Status } from 'nice-grpc'
 import { SuiContext, SuiObjectChangeContext } from './context.js'
-import { MoveCallSuiTransaction, SuiEvent, SuiTransactionBlockResponse, SuiObjectChange } from '@mysten/sui/client'
+import { MoveCallSuiTransaction, SuiEvent, SuiTransactionBlockResponse, SuiObjectChange } from '@mysten/sui/jsonRpc'
 import {
   accountAddressString,
   CallHandler,

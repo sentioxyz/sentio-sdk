@@ -1956,6 +1956,22 @@
       }
     ],
     "structs": {
+      "AccumulatorStorageCostKey": {
+        "abilities": {
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "dummy_field",
+            "type": "Bool"
+          }
+        ]
+      },
       "SuiSystemState": {
         "abilities": {
           "abilities": [
@@ -3528,6 +3544,22 @@
       }
     ],
     "structs": {
+      "ExecutionTimeObservationChunkKey": {
+        "abilities": {
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "chunk_index",
+            "type": "U64"
+          }
+        ]
+      },
       "SuiSystemStateInner": {
         "abilities": {
           "abilities": [
@@ -4119,6 +4151,7 @@
           "U64",
           "U64",
           "U64",
+          "U64",
           {
             "MutableReference": {
               "Struct": {
@@ -4339,6 +4372,64 @@
         ],
         "return": [
           "U64"
+        ]
+      },
+      "extra_fields": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "sui_system_state_inner",
+                "name": "SuiSystemStateInnerV2",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "bag",
+                "name": "Bag",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      },
+      "extra_fields_mut": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "sui_system_state_inner",
+                "name": "SuiSystemStateInnerV2",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "bag",
+                "name": "Bag",
+                "typeArguments": []
+              }
+            }
+          }
         ]
       },
       "genesis_system_state_version": {
@@ -5059,6 +5150,29 @@
           },
           {
             "Vector": "U8"
+          }
+        ],
+        "return": []
+      },
+      "store_execution_time_estimates_v2": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "sui_system_state_inner",
+                "name": "SuiSystemStateInnerV2",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Vector": {
+              "Vector": "U8"
+            }
           }
         ],
         "return": []

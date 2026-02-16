@@ -85,11 +85,11 @@
     "test:starknet": "tsx --test src/stark/tests/event.test.ts"
   },
   "dependencies": {
-    "@aptos-labs/ts-sdk": "~5.1.0",
+    "@aptos-labs/ts-sdk": "~6.0.0",
     "@coral-xyz/anchor": "^0.31.1",
     "@coral-xyz/borsh": "^0.31.1",
-    "@iota/iota-sdk": "~1.6.1",
-    "@mysten/sui": "~1.38.0",
+    "@iota/iota-sdk": "~1.10.0",
+    "@mysten/sui": "~2.4.0",
     "@prettier/sync": "^0.6.0",
     "@sentio/abi-wan-kanabi": "2.2.2-1",
     "@sentio/api": "1.0.2",
@@ -99,10 +99,10 @@
     "@sentio/protos": "workspace:*",
     "@sentio/runtime": "workspace:^",
     "@solana/web3.js": "^1.98.3",
-    "@typemove/aptos": "~1.13.3",
-    "@typemove/iota": "~1.13.3",
-    "@typemove/move": "~1.13.3",
-    "@typemove/sui": "~1.13.3",
+    "@typemove/aptos": "~1.13.4",
+    "@typemove/iota": "~1.13.4",
+    "@typemove/move": "~1.13.4",
+    "@typemove/sui": "~1.13.4",
     "bs58": "^6.0.0",
     "chalk": "^5.3.0",
     "csv-parse": "^6.0.0",
@@ -136,6 +136,6 @@
     "typedoc": "^0.28.0"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=24"
   }
 }

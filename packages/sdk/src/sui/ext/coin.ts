@@ -5,7 +5,7 @@ import { getPriceByType } from '../../utils/index.js'
 import { SuiChainId } from '@sentio/chain'
 // import { validateAndNormalizeAddress } from '../utils.js'
 import { getClient, SuiNetwork } from '../network.js'
-import { CoinMetadata } from '@mysten/sui/client'
+import { CoinMetadata } from '@mysten/sui/jsonRpc'
 
 const WHITELISTED_COINS = new Map<string, BaseCoinInfo>()
 

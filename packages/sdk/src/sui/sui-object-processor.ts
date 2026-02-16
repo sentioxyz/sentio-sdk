@@ -11,7 +11,7 @@ import {
 import { ListStateStorage } from '@sentio/runtime'
 import { SuiNetwork } from './network.js'
 import { SuiAddressContext, SuiContext, SuiObjectChangeContext, SuiObjectContext } from './context.js'
-import { SuiMoveObject, SuiObjectChange, SuiTransactionBlockResponse } from '@mysten/sui/client'
+import { SuiMoveObject, SuiObjectChange, SuiTransactionBlockResponse } from '@mysten/sui/jsonRpc'
 import { ALL_ADDRESS, PromiseOrVoid } from '../core/index.js'
 import { configure, DEFAULT_FETCH_CONFIG, IndexConfigure, SuiBindOptions } from './sui-processor.js'
 import { CallHandler, TransactionFilter, accountTypeString, ObjectChangeHandler } from '../move/index.js'
