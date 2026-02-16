@@ -2,6 +2,29 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Important: Pull Request Workflow
+
+**ALWAYS submit changes via pull requests (PRs) - never commit directly to main.**
+
+### Git Shortcuts (defined in `.github/.gitconfig`)
+
+This repository has custom git aliases configured:
+- **`git dev <branch-name>`** - Create and switch to `dev/$user/$branch-name`, auto-synced with origin/main
+- **`git sync`** - Rebase current branch with origin/main
+- **`git pr <number>`** - Checkout a PR locally to `pr/$number`
+- **`git dev-clean`** - Clean up your dev/* branches (except current)
+- **`git pr-clean`** - Clean up all pr/* branches
+
+### Recommended Workflow
+
+1. Create a dev branch: `git dev my-feature`
+2. Make your changes and commit: `git commit -m "description"`
+3. Push: `git push` (auto-setup remote is enabled)
+4. Create a pull request on GitHub using the printed URL
+5. Wait for review and approval before merging
+
+Direct commits to main are not allowed and may be rejected by branch protection rules.
+
 ## Architecture Overview
 
 Sentio SDK is a TypeScript-based blockchain data indexing and analytics platform that supports multiple blockchain ecosystems. The codebase is organized as a monorepo using pnpm workspaces with the following key components:
