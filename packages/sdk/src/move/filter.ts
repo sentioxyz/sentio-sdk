@@ -63,7 +63,7 @@ export class ResourceChangeHandler<T> {
 }
 
 export class ResourceIntervalHandler {
-  type?: string
+  type?: string | string[]
   versionInterval?: HandleInterval
   timeIntervalInMinutes?: HandleInterval
   handler: (resource: Data_AptResource) => Promise<ProcessResult>

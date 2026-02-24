@@ -569,13 +569,22 @@ export class AptosResourcesProcessor {
 
   public onResourceChange<T>(
     handler: (changes: ResourceChange<T>[], ctx: AptosResourcesContext) => PromiseOrVoid,
-    typeDesc: TypeDescriptor<T> | string
+    typeDesc: TypeDescriptor<T> | TypeDescriptor<T>[] | string | string[]
   ): this {
+    let hasAny = false
+    let typeDescArr: TypeDescriptor<T>[] = []
     if (typeof typeDesc === 'string') {
-      typeDesc = parseMoveType(typeDesc)
+      typeDescArr = [parseMoveType(typeDesc)]
+    } else if (Array.isArray(typeDesc)) {
+      if (typeof typeDesc[0] === 'string') {
+        typeDescArr = typeDesc.map((t) => parseMoveType(t as string))
+      } else {
+        typeDescArr = typeDesc as TypeDescriptor<T>[]
+      }
+    } else {
+      typeDescArr = [typeDesc]
+      hasAny = typeDesc.existAnyType()
     }
-
-    const hasAny = typeDesc.existAnyType()
 
     const processor = this
     this.resourceIntervalHandlers.push({
@@ -605,7 +614,7 @@ export class AptosResourcesProcessor {
         if (hasAny) {
           resources = resources.filter((r) => {
             const rt = parseMoveType(r.data.type)
-            return matchType(typeDesc, rt)
+            return typeDescArr.find((t) => matchType(t, rt)) != undefined
           })
         }
 
@@ -614,7 +623,7 @@ export class AptosResourcesProcessor {
         }
         return ctx.stopAndGetResult()
       },
-      type: hasAny ? typeDesc.qname : typeDesc.getNormalizedSignature()
+      type: hasAny ? typeDescArr.map((t) => t.qname) : typeDescArr.map((t) => t.getNormalizedSignature())
     })
     return this
   }
