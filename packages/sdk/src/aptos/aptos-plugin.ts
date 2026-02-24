@@ -202,7 +202,7 @@ export class AptosPlugin extends Plugin {
               slotInterval: handler.versionInterval,
               fetchConfig: undefined
             },
-            type: handler.type || '',
+            type: (Array.isArray(handler.type) ? handler.type[0] : handler.type) || '',
             ownerType: MoveOwnerType.ADDRESS,
             resourceFetchConfig: handler.fetchConfig,
             fetchConfig: undefined
