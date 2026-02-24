@@ -314,7 +314,7 @@ export class IotaObjectTypeProcessor<T> extends IotaBaseObjectOrAddressProcessor
         await handler(data.rawChanges.map((r) => JSON.parse(r)) as IotaObjectChange[], ctx)
         return ctx.stopAndGetResult()
       },
-      type: this.objectType.getSignature()
+      type: [this.objectType.getSignature()]
     })
 
     return this

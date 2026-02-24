@@ -7,7 +7,7 @@ import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 import "service/common/protos/common.proto";
 
-option go_package = "sentioxyz/sentio/processor/protos";
+option go_package = "sentioxyz/sentio-core/processor/protos";
 
 service Processor {
   // Start the processor, need to be called before any other RPC calls
@@ -459,7 +459,8 @@ message MoveCallHandlerConfig {
 }
 
 message MoveResourceChangeConfig {
-  string type = 1;
+  string type = 1 [deprecated = true];
+  repeated string types = 5;
   bool include_deleted = 4;
   int32 handler_id = 2;
   string handler_name = 3;

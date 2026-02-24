@@ -51,7 +51,7 @@ describe('Test Sui Example', () => {
     expect(config.accountConfigs).length(2)
     expect(config.accountConfigs[0].moveIntervalConfigs[0].ownerType).eq(MoveOwnerType.OBJECT)
     expect(config.accountConfigs[1].moveIntervalConfigs[0].ownerType).eq(MoveOwnerType.TYPE)
-    expect(config.accountConfigs[1].moveResourceChangeConfigs[0].type).eq(
+    expect(config.accountConfigs[1].moveResourceChangeConfigs[0].types[0]).eq(
       dynamic_field.Field.type(BUILTIN_TYPES.U64_TYPE, validator.Validator.type()).getSignature()
     )
   })
