@@ -169,7 +169,7 @@ export class AptosPlugin extends Plugin {
         accountConfig.moveResourceChangeConfigs.push({
           handlerId: handlerId,
           handlerName: handler.handlerName,
-          type: handler.type,
+          types: typeof handler.type === 'string' ? [handler.type] : handler.type,
           includeDeleted: false
         })
       }
@@ -212,7 +212,7 @@ export class AptosPlugin extends Plugin {
           accountConfig.moveResourceChangeConfigs.push({
             handlerId,
             handlerName: handler.handlerName,
-            type: handler.type,
+            types: [handler.type],
             includeDeleted: false
           })
         }

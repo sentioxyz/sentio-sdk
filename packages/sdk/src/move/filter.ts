@@ -52,13 +52,13 @@ export class CallHandler<T> {
 export class ObjectChangeHandler<T> {
   handlerName: string
   handler: (call: T) => Promise<ProcessResult>
-  type: string
+  type: string | string[]
 }
 
 export class ResourceChangeHandler<T> {
   handlerName: string
   handler: (call: T) => Promise<ProcessResult>
-  type: string
+  type: string | string[]
   partitionHandler?: (call: T) => Promise<string | undefined>
 }
 

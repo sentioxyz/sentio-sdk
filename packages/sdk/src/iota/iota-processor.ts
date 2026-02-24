@@ -280,7 +280,7 @@ export class IotaBaseProcessor {
 
   protected onObjectChange(
     handler: (changes: IotaObjectChange[], ctx: IotaObjectChangeContext) => PromiseOrVoid,
-    type: string
+    type: string | string[]
   ): this {
     if (this.config.network === IotaNetwork.TEST_NET) {
       throw new ServerError(Status.INVALID_ARGUMENT, 'object change not supported in testnet')
@@ -332,7 +332,7 @@ export class IotaGlobalProcessor extends IotaBaseProcessor {
   // deprecated,, use object type processor
   public onObjectChange(
     handler: (changes: IotaObjectChange[], ctx: IotaObjectChangeContext) => void,
-    type: string
+    type: string | string[]
   ): this {
     return super.onObjectChange(handler, type)
   }

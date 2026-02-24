@@ -828,7 +828,7 @@ export interface MoveCallHandlerConfig {
 }
 
 export interface MoveResourceChangeConfig {
-  type: string;
+  types: string[];
   includeDeleted: boolean;
   handlerId: number;
   handlerName: string;
@@ -6341,13 +6341,13 @@ export const MoveCallHandlerConfig = {
 };
 
 function createBaseMoveResourceChangeConfig(): MoveResourceChangeConfig {
-  return { type: "", includeDeleted: false, handlerId: 0, handlerName: "" };
+  return { types: [], includeDeleted: false, handlerId: 0, handlerName: "" };
 }
 
 export const MoveResourceChangeConfig = {
   encode(message: MoveResourceChangeConfig, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.type !== "") {
-      writer.uint32(10).string(message.type);
+    for (const v of message.types) {
+      writer.uint32(42).string(v!);
     }
     if (message.includeDeleted !== false) {
       writer.uint32(32).bool(message.includeDeleted);
@@ -6368,12 +6368,12 @@ export const MoveResourceChangeConfig = {
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
+        case 5:
+          if (tag !== 42) {
             break;
           }
 
-          message.type = reader.string();
+          message.types.push(reader.string());
           continue;
         case 4:
           if (tag !== 32) {
@@ -6407,7 +6407,7 @@ export const MoveResourceChangeConfig = {
 
   fromJSON(object: any): MoveResourceChangeConfig {
     return {
-      type: isSet(object.type) ? globalThis.String(object.type) : "",
+      types: globalThis.Array.isArray(object?.types) ? object.types.map((e: any) => globalThis.String(e)) : [],
       includeDeleted: isSet(object.includeDeleted) ? globalThis.Boolean(object.includeDeleted) : false,
       handlerId: isSet(object.handlerId) ? globalThis.Number(object.handlerId) : 0,
       handlerName: isSet(object.handlerName) ? globalThis.String(object.handlerName) : "",
@@ -6416,8 +6416,8 @@ export const MoveResourceChangeConfig = {
 
   toJSON(message: MoveResourceChangeConfig): unknown {
     const obj: any = {};
-    if (message.type !== "") {
-      obj.type = message.type;
+    if (message.types?.length) {
+      obj.types = message.types;
     }
     if (message.includeDeleted !== false) {
       obj.includeDeleted = message.includeDeleted;
@@ -6436,7 +6436,7 @@ export const MoveResourceChangeConfig = {
   },
   fromPartial(object: DeepPartial<MoveResourceChangeConfig>): MoveResourceChangeConfig {
     const message = createBaseMoveResourceChangeConfig();
-    message.type = object.type ?? "";
+    message.types = object.types?.map((e) => e) || [];
     message.includeDeleted = object.includeDeleted ?? false;
     message.handlerId = object.handlerId ?? 0;
     message.handlerName = object.handlerName ?? "";
