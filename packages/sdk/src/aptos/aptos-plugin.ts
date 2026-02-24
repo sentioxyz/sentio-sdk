@@ -202,7 +202,7 @@ export class AptosPlugin extends Plugin {
               slotInterval: handler.versionInterval,
               fetchConfig: undefined
             },
-            type: handler.type || '',
+            type: (Array.isArray(handler.type) ? handler.type[0] : handler.type) || '',
             ownerType: MoveOwnerType.ADDRESS,
             resourceFetchConfig: handler.fetchConfig,
             fetchConfig: undefined
@@ -212,7 +212,7 @@ export class AptosPlugin extends Plugin {
           accountConfig.moveResourceChangeConfigs.push({
             handlerId,
             handlerName: handler.handlerName,
-            types: [handler.type],
+            types: typeof handler.type == 'string' ? [handler.type] : handler.type,
             includeDeleted: false
           })
         }
