@@ -27,6 +27,9 @@ import {
 import { ALL_ADDRESS, Labels, PromiseOrVoid } from '../core/index.js'
 import { matchType, NestedDecodedStruct, TypeDescriptor } from '@typemove/move'
 import { ResourceChange } from '@typemove/aptos'
+
+/** Extracts the data type T from a TypeDescriptor<T>; falls back to `unknown` for raw strings. */
+type ExtractDescriptorType<D> = D extends TypeDescriptor<infer T> ? T : unknown
 import { GeneralTransactionResponse, HandlerOptions } from './models.js'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 import { AptCall, AptEvent, AptResource } from './data.js'
@@ -252,20 +255,29 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
 
   public onResourceChange<T>(
     handler: (changes: ResourceChange<T>[], ctx: AptosResourcesContext) => PromiseOrVoid,
-    typeDesc: TypeDescriptor<T> | TypeDescriptor<T>[] | string | string[],
+    typeDesc: TypeDescriptor<T> | string,
     handlerOptions?: HandlerOptions<object, ResourceChange<T>[]>
+  ): this
+  public onResourceChange<Descs extends readonly (TypeDescriptor<any> | string)[]>(
+    handler: (
+      changes: ResourceChange<ExtractDescriptorType<Descs[number]>>[],
+      ctx: AptosResourcesContext
+    ) => PromiseOrVoid,
+    typeDesc: [...Descs],
+    handlerOptions?: HandlerOptions<object, ResourceChange<ExtractDescriptorType<Descs[number]>>[]>
+  ): this
+  public onResourceChange(
+    handler: (changes: ResourceChange<any>[], ctx: AptosResourcesContext) => PromiseOrVoid,
+    typeDesc: TypeDescriptor<any> | string | readonly (TypeDescriptor<any> | string)[],
+    handlerOptions?: HandlerOptions<object, ResourceChange<any>[]>
   ): this {
-    let typeDescArr: TypeDescriptor<T>[] = []
+    let typeDescArr: TypeDescriptor<any>[] = []
     if (typeof typeDesc === 'string') {
       typeDescArr = [parseMoveType(typeDesc)]
     } else if (Array.isArray(typeDesc)) {
-      if (typeof typeDesc[0] === 'string') {
-        typeDescArr = typeDesc.map((t) => parseMoveType(t as string))
-      } else {
-        typeDescArr = typeDesc as TypeDescriptor<T>[]
-      }
+      typeDescArr = typeDesc.map((t: TypeDescriptor<any> | string) => (typeof t === 'string' ? parseMoveType(t) : t))
     } else {
-      typeDescArr = [typeDesc]
+      typeDescArr = [typeDesc as TypeDescriptor<any>]
     }
 
     const hasAny = typeDescArr.some((t) => t.existAnyType())
@@ -578,19 +590,26 @@ export class AptosResourcesProcessor {
 
   public onResourceChange<T>(
     handler: (changes: ResourceChange<T>[], ctx: AptosResourcesContext) => PromiseOrVoid,
-    typeDesc: TypeDescriptor<T> | TypeDescriptor<T>[] | string | string[]
+    typeDesc: TypeDescriptor<T> | string
+  ): this
+  public onResourceChange<Descs extends readonly (TypeDescriptor<any> | string)[]>(
+    handler: (
+      changes: ResourceChange<ExtractDescriptorType<Descs[number]>>[],
+      ctx: AptosResourcesContext
+    ) => PromiseOrVoid,
+    typeDesc: [...Descs]
+  ): this
+  public onResourceChange(
+    handler: (changes: ResourceChange<any>[], ctx: AptosResourcesContext) => PromiseOrVoid,
+    typeDesc: TypeDescriptor<any> | string | readonly (TypeDescriptor<any> | string)[]
   ): this {
-    let typeDescArr: TypeDescriptor<T>[] = []
+    let typeDescArr: TypeDescriptor<any>[] = []
     if (typeof typeDesc === 'string') {
       typeDescArr = [parseMoveType(typeDesc)]
     } else if (Array.isArray(typeDesc)) {
-      if (typeof typeDesc[0] === 'string') {
-        typeDescArr = typeDesc.map((t) => parseMoveType(t as string))
-      } else {
-        typeDescArr = typeDesc as TypeDescriptor<T>[]
-      }
+      typeDescArr = typeDesc.map((t: TypeDescriptor<any> | string) => (typeof t === 'string' ? parseMoveType(t) : t))
     } else {
-      typeDescArr = [typeDesc]
+      typeDescArr = [typeDesc as TypeDescriptor<any>]
     }
 
     const hasAny = typeDescArr.some((t) => t.existAnyType())
@@ -614,10 +633,10 @@ export class AptosResourcesProcessor {
           processor.config.baseLabels
         )
 
-        let resources = (await aptResource.decodeResources<T>(ctx.coder)) as NestedDecodedStruct<
+        let resources = (await aptResource.decodeResources<any>(ctx.coder)) as NestedDecodedStruct<
           MoveResource,
           WriteSetChangeWriteResource,
-          T
+          any
         >[]
 
         if (hasAny) {
