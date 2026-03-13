@@ -11,13 +11,26 @@ import { createGraphCommand } from './commands/graph.js'
 import { createUploadCommand } from './commands/upload.js'
 import { createBuildCommand, createGenCommand } from './commands/build.js'
 import { createAiCommand } from './commands/ai.js'
-import { getCliVersion, printVersions } from './utils.js'
+import { createDataCommand } from './commands/data.js'
+import { createProjectCommand } from './commands/project.js'
+import { createProcessorCommand } from './commands/processor.js'
+import { createAlertCommand } from './commands/alert.js'
+import { createPriceCommand } from './commands/price.js'
+import { createSimulationCommand } from './commands/simulation.js'
+import { createEndpointCommand } from './commands/endpoint.js'
+import { enableApiDebug } from './api.js'
+import { printVersions } from './utils.js'
 
 const program = new Command()
 
-program.name('sentio').description('Login & Manage your project files to Sentio.').version(getCliVersion())
+program.name('sentio').description('Login & Manage your project files to Sentio.')
+program.option('--debug', 'Print API requests for debugging')
 
 await printVersions()
+
+if (process.argv.includes('--debug')) {
+  enableApiDebug()
+}
 
 program.addCommand(createLoginCommand())
 program.addCommand(createCreateCommand())
@@ -30,5 +43,12 @@ program.addCommand(createUploadCommand())
 program.addCommand(createBuildCommand())
 program.addCommand(createGenCommand())
 program.addCommand(createAiCommand())
+program.addCommand(createDataCommand())
+program.addCommand(createProjectCommand())
+program.addCommand(createProcessorCommand())
+program.addCommand(createAlertCommand())
+program.addCommand(createPriceCommand())
+program.addCommand(createSimulationCommand())
+program.addCommand(createEndpointCommand())
 
 program.parse()
