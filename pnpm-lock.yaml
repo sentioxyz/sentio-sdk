@@ -219,6 +219,9 @@ importers:
       '@mysten/sui':
         specifier: ~2.4.0
         version: 2.4.0(typescript@5.9.2)
+      '@sentio/api':
+        specifier: 1.0.4
+        version: 1.0.4
       '@sentio/chain':
         specifier: ~3.4.22
         version: 3.4.22
@@ -2487,6 +2490,9 @@ packages:
 
   '@sentio/api@1.0.2':
     resolution: {integrity: sha512-iKk0oMXfvNYQOFXH0jrdGze2wDuYt2GSEYz3uF4jrPeDXp0/es5JZJ4PG7mdET5MhCIWuMUqwQrY/NrL6xkF4Q==}
+
+  '@sentio/api@1.0.4':
+    resolution: {integrity: sha512-ai9HI1z1/w0KCinT9VT2JLzvyrG03ujd3dfTq+ksj4JxIlhzZb/86v0db1Grq4NNp9n2jG88aBgf7gf13g2kuQ==}
 
   '@sentio/bigdecimal@9.1.1-patch.3':
     resolution: {integrity: sha512-O5w8XdyeatUcwI+ZbpSw60/cXFPJk3NbpIupwMHfYmW8fpxpXyRbyGESNJNufWWrB6CadsWGh1R3rd7owvrmlw==}
@@ -7120,14 +7126,8 @@ snapshots:
 
   '@0no-co/graphqlsp@1.12.16(graphql@16.11.0)(typescript@5.9.2)':
     dependencies:
-      '@gql.tada/internal': 1.0.8(graphql@16.11.0)(typescript@5.9.2)
-      graphql: 16.11.0
-      typescript: 5.9.2
-
-  '@0no-co/graphqlsp@1.12.16(graphql@16.12.0)(typescript@5.9.2)':
-    dependencies:
       '@gql.tada/internal': 1.0.8(graphql@16.12.0)(typescript@5.9.2)
-      graphql: 16.12.0
+      graphql: 16.11.0
       typescript: 5.9.2
 
   '@adraffy/ens-normalize@1.10.1': {}
@@ -7794,7 +7794,7 @@ snapshots:
       '@shikijs/types': 3.11.0
       '@shikijs/vscode-textmate': 10.0.2
 
-  '@gql.tada/cli-utils@1.7.1(@0no-co/graphqlsp@1.12.16(graphql@16.11.0)(typescript@5.9.2))(graphql@16.11.0)(typescript@5.9.2)':
+  '@gql.tada/cli-utils@1.7.1(@0no-co/graphqlsp@1.12.16(graphql@16.12.0)(typescript@5.9.2))(graphql@16.11.0)(typescript@5.9.2)':
     dependencies:
       '@0no-co/graphqlsp': 1.12.16(graphql@16.11.0)(typescript@5.9.2)
       '@gql.tada/internal': 1.0.8(graphql@16.11.0)(typescript@5.9.2)
@@ -7803,14 +7803,14 @@ snapshots:
 
   '@gql.tada/cli-utils@1.7.2(@0no-co/graphqlsp@1.12.16(graphql@16.12.0)(typescript@5.9.2))(graphql@16.12.0)(typescript@5.9.2)':
     dependencies:
-      '@0no-co/graphqlsp': 1.12.16(graphql@16.12.0)(typescript@5.9.2)
+      '@0no-co/graphqlsp': 1.12.16(graphql@16.11.0)(typescript@5.9.2)
       '@gql.tada/internal': 1.0.8(graphql@16.12.0)(typescript@5.9.2)
       graphql: 16.12.0
       typescript: 5.9.2
 
   '@gql.tada/internal@1.0.8(graphql@16.11.0)(typescript@5.9.2)':
     dependencies:
-      '@0no-co/graphql.web': 1.0.7(graphql@16.11.0)
+      '@0no-co/graphql.web': 1.0.7(graphql@16.12.0)
       graphql: 16.11.0
       typescript: 5.9.2
 
@@ -8903,6 +8903,10 @@ snapshots:
       yargs: 17.7.2
 
   '@sentio/api@1.0.2':
+    dependencies:
+      '@hey-api/client-fetch': 0.8.3
+
+  '@sentio/api@1.0.4':
     dependencies:
       '@hey-api/client-fetch': 0.8.3
 
@@ -11177,7 +11181,7 @@ snapshots:
     dependencies:
       '@0no-co/graphql.web': 1.0.7(graphql@16.11.0)
       '@0no-co/graphqlsp': 1.12.16(graphql@16.11.0)(typescript@5.9.2)
-      '@gql.tada/cli-utils': 1.7.1(@0no-co/graphqlsp@1.12.16(graphql@16.11.0)(typescript@5.9.2))(graphql@16.11.0)(typescript@5.9.2)
+      '@gql.tada/cli-utils': 1.7.1(@0no-co/graphqlsp@1.12.16(graphql@16.12.0)(typescript@5.9.2))(graphql@16.11.0)(typescript@5.9.2)
       '@gql.tada/internal': 1.0.8(graphql@16.11.0)(typescript@5.9.2)
       typescript: 5.9.2
     transitivePeerDependencies:
@@ -11188,7 +11192,7 @@ snapshots:
   gql.tada@1.9.0(graphql@16.12.0)(typescript@5.9.2):
     dependencies:
       '@0no-co/graphql.web': 1.0.7(graphql@16.12.0)
-      '@0no-co/graphqlsp': 1.12.16(graphql@16.12.0)(typescript@5.9.2)
+      '@0no-co/graphqlsp': 1.12.16(graphql@16.11.0)(typescript@5.9.2)
       '@gql.tada/cli-utils': 1.7.2(@0no-co/graphqlsp@1.12.16(graphql@16.12.0)(typescript@5.9.2))(graphql@16.12.0)(typescript@5.9.2)
       '@gql.tada/internal': 1.0.8(graphql@16.12.0)(typescript@5.9.2)
       typescript: 5.9.2
