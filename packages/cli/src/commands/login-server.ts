@@ -49,49 +49,14 @@ app.get('/callback', async (req, res) => {
     return
   }
 
-  // exchange token
-  const tokenResRaw = await getToken(host, code as string)
-  if (!tokenResRaw.ok) {
-    fail(`Failed to get access token: ${tokenResRaw.status} ${tokenResRaw.statusText}, ${await tokenResRaw.text()}`)
+  try {
+    const username = await exchangeCodeAndSave(host, code as string, authParams.codeVerifier)
+    res.end('Login success, please go back to CLI to continue')
+    console.log(chalk.green(`Login success with ${username}`))
+  } catch (e) {
+    fail((e as Error).message)
     return
   }
-  const tokenRes = (await tokenResRaw.json()) as { access_token: string }
-  const accessToken = tokenRes.access_token
-
-  // check if the account is ready
-  const userResRaw = await getUser(host, accessToken)
-  if (!userResRaw.ok) {
-    if (userResRaw.status == 401) {
-      fail('The account does not exist, please sign up on sentio first')
-    } else {
-      fail(`Failed to get user info: ${userResRaw.status} ${userResRaw.statusText}`)
-    }
-    return
-  }
-  const userRes = (await userResRaw.json()) as { emailVerified: boolean }
-  if (!userRes.emailVerified) {
-    fail('Your account is not verified, please verify your email first')
-    return
-  }
-
-  // create API key
-  const apiKeyName = `${os.hostname()}-${crypto.randomBytes(4).toString('hex')}`
-  const createApiKeyResRaw = await createApiKey(host, apiKeyName, 'sdk_generated', accessToken)
-  if (!createApiKeyResRaw.ok) {
-    fail(`Failed to create API key: ${createApiKeyResRaw.status} ${createApiKeyResRaw.statusText}`)
-    return
-  }
-  const { key, username } = (await createApiKeyResRaw.json()) as { key: string; username: string }
-  WriteKey(host, key)
-
-  // store access token with expiry for commands that require admin permissions
-  const expiresAt = decodeJwtExpiry(accessToken)
-  if (expiresAt !== undefined) {
-    WriteAccessToken(host, accessToken, expiresAt)
-  }
-
-  res.end('Login success, please go back to CLI to continue')
-  console.log(chalk.green(`Login success with ${username}, new API key: ${key}`))
 
   server.close()
   server.closeAllConnections()
@@ -102,12 +67,59 @@ app.get('/callback', async (req, res) => {
   }
 })
 
-async function getToken(host: string, code: string) {
+/**
+ * Exchanges an OAuth authorization code for an access token, verifies the account,
+ * creates an API key, and saves everything to local config.
+ * Returns the username on success, throws on failure.
+ */
+export async function exchangeCodeAndSave(host: string, code: string, codeVerifier: string): Promise<string> {
+  // exchange token
+  const tokenResRaw = await getToken(host, code, codeVerifier)
+  if (!tokenResRaw.ok) {
+    throw new Error(
+      `Failed to get access token: ${tokenResRaw.status} ${tokenResRaw.statusText}, ${await tokenResRaw.text()}`
+    )
+  }
+  const tokenRes = (await tokenResRaw.json()) as { access_token: string }
+  const accessToken = tokenRes.access_token
+
+  // check if the account is ready
+  const userResRaw = await getUser(host, accessToken)
+  if (!userResRaw.ok) {
+    if (userResRaw.status == 401) {
+      throw new Error('The account does not exist, please sign up on sentio first')
+    }
+    throw new Error(`Failed to get user info: ${userResRaw.status} ${userResRaw.statusText}`)
+  }
+  const userRes = (await userResRaw.json()) as { emailVerified: boolean }
+  if (!userRes.emailVerified) {
+    throw new Error('Your account is not verified, please verify your email first')
+  }
+
+  // create API key
+  const apiKeyName = `${os.hostname()}-${crypto.randomBytes(4).toString('hex')}`
+  const createApiKeyResRaw = await createApiKey(host, apiKeyName, 'sdk_generated', accessToken)
+  if (!createApiKeyResRaw.ok) {
+    throw new Error(`Failed to create API key: ${createApiKeyResRaw.status} ${createApiKeyResRaw.statusText}`)
+  }
+  const { key, username } = (await createApiKeyResRaw.json()) as { key: string; username: string }
+  WriteKey(host, key)
+
+  // store access token with expiry for commands that require admin permissions
+  const expiresAt = decodeJwtExpiry(accessToken)
+  if (expiresAt !== undefined) {
+    WriteAccessToken(host, accessToken, expiresAt)
+  }
+
+  return username
+}
+
+async function getToken(host: string, code: string, codeVerifier: string) {
   const authConf = getAuthConfig(host)
   const params = new url.URLSearchParams({
     grant_type: 'authorization_code',
     client_id: authConf.clientId,
-    code_verifier: authParams.codeVerifier,
+    code_verifier: codeVerifier,
     code: code,
     redirect_uri: authConf.redirectUri
   })
