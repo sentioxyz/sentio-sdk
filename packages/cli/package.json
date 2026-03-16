@@ -26,7 +26,7 @@
     "@aptos-labs/ts-sdk": "~6.0.0",
     "@iota/iota-sdk": "~1.10.0",
     "@mysten/sui": "~2.4.0",
-    "@sentio/api": "1.0.4",
+    "@sentio/api": "~1.0.4",
     "@sentio/chain": "~3.4.22",
     "@sentio/graph-cli": "^0.97.0",
     "@types/node": "^24.0.0",
