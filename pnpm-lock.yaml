@@ -220,7 +220,7 @@ importers:
         specifier: ~2.4.0
         version: 2.4.0(typescript@5.9.2)
       '@sentio/api':
-        specifier: 1.0.4
+        specifier: ~1.0.4
         version: 1.0.4
       '@sentio/chain':
         specifier: ~3.4.22
@@ -7139,7 +7139,7 @@ snapshots:
 
   '@0no-co/graphqlsp@1.12.16(graphql@16.11.0)(typescript@5.9.2)':
     dependencies:
-      '@gql.tada/internal': 1.0.8(graphql@16.11.0)(typescript@5.9.2)
+      '@gql.tada/internal': 1.0.8(graphql@16.12.0)(typescript@5.9.2)
       graphql: 16.11.0
       typescript: 5.9.2
 
@@ -7815,7 +7815,7 @@ snapshots:
 
   '@gql.tada/cli-utils@1.7.1(@0no-co/graphqlsp@1.12.16(graphql@16.11.0)(typescript@5.9.2))(graphql@16.11.0)(typescript@5.9.2)':
     dependencies:
-      '@0no-co/graphqlsp': 1.12.16(graphql@16.11.0)(typescript@5.9.2)
+      '@0no-co/graphqlsp': 1.12.16(graphql@16.12.0)(typescript@5.9.2)
       '@gql.tada/internal': 1.0.8(graphql@16.11.0)(typescript@5.9.2)
       graphql: 16.11.0
       typescript: 5.9.2
@@ -7829,7 +7829,7 @@ snapshots:
 
   '@gql.tada/internal@1.0.8(graphql@16.11.0)(typescript@5.9.2)':
     dependencies:
-      '@0no-co/graphql.web': 1.0.7(graphql@16.11.0)
+      '@0no-co/graphql.web': 1.0.7(graphql@16.12.0)
       graphql: 16.11.0
       typescript: 5.9.2
 
@@ -13739,7 +13739,7 @@ snapshots:
   vite-node@3.0.9(@types/node@24.10.13)(tsx@4.15.7)(yaml@2.7.1):
     dependencies:
       cac: 6.7.14
-      debug: 4.4.1(supports-color@8.1.1)
+      debug: 4.4.3
       es-module-lexer: 1.7.0
       pathe: 2.0.3
       vite: 6.3.5(@types/node@24.10.13)(tsx@4.15.7)(yaml@2.7.1)
@@ -13781,7 +13781,7 @@ snapshots:
       '@vitest/spy': 3.0.9
       '@vitest/utils': 3.0.9
       chai: 5.3.3
-      debug: 4.4.1(supports-color@8.1.1)
+      debug: 4.4.3
       expect-type: 1.2.2
       magic-string: 0.30.18
       pathe: 2.0.3
