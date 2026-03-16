@@ -1,10 +1,11 @@
 import { Command } from '@commander-js/extra-typings'
 import { getAuthConfig, getFinalizedHost } from '../config.js'
-import { startServer } from './login-server.js'
+import { startServer, exchangeCodeAndSave } from './login-server.js'
+import readline from 'readline'
 import url, { URL } from 'url'
 import * as crypto from 'crypto'
 import chalk from 'chalk'
-import { WriteKey } from '../key.js'
+import { WriteKey, ReadKey, ReadAccessToken, isAccessTokenExpired } from '../key.js'
 import fetch from 'node-fetch'
 import open from 'open'
 import { CommandOptionsType } from './types.js'
@@ -17,9 +18,49 @@ export function createLoginCommand() {
     .description('Login to Sentio')
     .option('--host <host>', '(Optional) Override Sentio Host name')
     .option('--api-key <key>', '(Optional) Your API key')
+    .option('--status', 'Show current login status')
+    .option('--no-browser', 'Print the auth URL and accept the authorization code manually (for headless environments)')
     .action((options) => {
-      login(options)
+      if (options.status) {
+        loginStatus(options)
+      } else {
+        login(options)
+      }
     })
+}
+
+async function loginStatus(options: CommandOptionsType<typeof createLoginCommand>) {
+  const host = getFinalizedHost(options.host)
+  console.log(chalk.blue('Host: ') + host)
+
+  const apiKey = ReadKey(host)
+  if (!apiKey) {
+    console.log(chalk.red('Not logged in') + ' (no API key stored for this host)')
+    return
+  }
+
+  console.log(chalk.green('API key: ') + apiKey.slice(0, 8) + '...')
+
+  const tokenInfo = ReadAccessToken(host)
+  if (tokenInfo) {
+    const expired = isAccessTokenExpired(tokenInfo.expiresAt)
+    const expiresDate = new Date(tokenInfo.expiresAt * 1000).toLocaleString()
+    if (expired) {
+      console.log(chalk.yellow('Access token: ') + `expired (${expiresDate})`)
+    } else {
+      console.log(chalk.green('Access token: ') + `valid until ${expiresDate}`)
+    }
+  } else {
+    console.log(chalk.yellow('Access token: ') + 'none stored')
+  }
+
+  const res = await checkKey(host, apiKey)
+  if (res.status === 200) {
+    const { username } = (await res.json()) as { username: string }
+    console.log(chalk.green('Logged in as: ') + username)
+  } else {
+    console.log(chalk.red('API key validation failed: ') + `${res.status} ${res.statusText}`)
+  }
 }
 
 function login(options: CommandOptionsType<typeof createLoginCommand>) {
@@ -48,10 +89,16 @@ function login(options: CommandOptionsType<typeof createLoginCommand>) {
     }
     const authURL = buildAuthURL(conf, challenge)
 
+    if (options.browser === false) {
+      loginNoBrowser(host, authURL.toString(), verifier)
+      return
+    }
+
     console.log('Continue your authorization in the browser')
     open(authURL.toString()).catch((reason) => {
-      console.error(chalk.red('Unable to open browser: ' + reason))
-      console.error(chalk.red('Open this url in your browser: ' + authURL.toString()))
+      console.error(chalk.yellow('Unable to open browser: ' + reason))
+      console.error(chalk.yellow('Falling back to manual login...'))
+      loginNoBrowser(host, authURL.toString(), verifier)
     })
 
     startServer({
@@ -92,6 +139,30 @@ export function loginInteractiveAndWait(host: string): Promise<void> {
       onSuccess: resolve,
       onFailure: reject
     })
+  })
+}
+
+function loginNoBrowser(host: string, authURL: string, codeVerifier: string) {
+  console.log(chalk.blue('\nOpen the following URL in your browser to complete login:'))
+  console.log(chalk.cyan(authURL))
+  console.log(chalk.blue('\nAfter completing login, copy the authorization code from the redirect URL'))
+  console.log(chalk.blue('(it is the value of the `code` query parameter) and paste it below.\n'))
+
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
+  rl.question('Authorization code: ', async (input) => {
+    rl.close()
+    const code = input.trim()
+    if (!code) {
+      console.error(chalk.red('No code provided, login aborted.'))
+      process.exit(1)
+    }
+    try {
+      const username = await exchangeCodeAndSave(host, code, codeVerifier)
+      console.log(chalk.green(`Login success with ${username}`))
+    } catch (e) {
+      console.error(chalk.red('Login failed: ' + (e as Error).message))
+      process.exit(1)
+    }
   })
 }
 

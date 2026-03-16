@@ -11,6 +11,7 @@
   },
   "files": [
     "{lib,src,templates}",
+    "!lib/**/*.map",
     "!{lib,src}/**/*.test.{js,ts}"
   ],
   "scripts": {
