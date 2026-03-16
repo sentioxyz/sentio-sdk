@@ -1,0 +1,327 @@
+import { ProcessorExtService, ProcessorService } from '@sentio/api'
+import { Command, InvalidArgumentError } from '@commander-js/extra-typings'
+import process from 'process'
+import yaml from 'yaml'
+import { CliError, createApiContext, handleCommandError, resolveProjectRef, unwrapApiResult } from '../api.js'
+
+interface ProcessorOptions {
+  host?: string
+  apiKey?: string
+  token?: string
+  project?: string
+  owner?: string
+  name?: string
+  projectId?: string
+  json?: boolean
+  yaml?: boolean
+}
+
+interface ProcessorStatusOptions extends ProcessorOptions {
+  version?: string
+}
+
+interface ProcessorSourceOptions extends ProcessorOptions {
+  version?: number
+  path?: string
+}
+
+export function createProcessorCommand() {
+  const processorCommand = new Command('processor').description('Manage Sentio processor versions')
+  processorCommand.addCommand(createProcessorStatusCommand())
+  processorCommand.addCommand(createProcessorSourceCommand())
+  processorCommand.addCommand(createProcessorActivatePendingCommand())
+  return processorCommand
+}
+
+function createProcessorStatusCommand() {
+  return withOutputOptions(
+    withSharedProjectOptions(withAuthOptions(new Command('status').description('Get processor status')))
+  )
+    .showHelpAfterError()
+    .option('--version <selector>', 'Version selector: active, pending, or all')
+    .action(async (options, command) => {
+      try {
+        await runProcessorStatus(options)
+      } catch (error) {
+        handleProcessorCommandError(error, command)
+      }
+    })
+}
+
+function createProcessorSourceCommand() {
+  return withOutputOptions(
+    withSharedProjectOptions(withAuthOptions(new Command('source').description('Get processor source files')))
+  )
+    .showHelpAfterError()
+    .option('--version <version>', 'Processor version', parseInteger)
+    .option('--path <path>', 'Show only one source file by path')
+    .action(async (options, command) => {
+      try {
+        await runProcessorSource(options)
+      } catch (error) {
+        handleProcessorCommandError(error, command)
+      }
+    })
+}
+
+function createProcessorActivatePendingCommand() {
+  return withOutputOptions(
+    withSharedProjectOptions(
+      withAuthOptions(new Command('activate-pending').description('Activate the pending version'))
+    )
+  )
+    .showHelpAfterError()
+    .action(async (options, command) => {
+      try {
+        await runActivatePending(options)
+      } catch (error) {
+        handleProcessorCommandError(error, command)
+      }
+    })
+}
+
+async function runProcessorStatus(options: ProcessorStatusOptions) {
+  const context = createApiContext(options)
+  const project = await resolveProjectRef(options, context, { ownerSlug: true })
+  const requestedVersion = normalizeVersionSelector(options.version)
+  const response = await ProcessorService.getProcessorStatusV2({
+    path: {
+      owner: project.owner,
+      slug: project.slug
+    },
+    query: {
+      version: requestedVersion ?? 'ALL'
+    },
+    headers: context.headers
+  })
+  const data = unwrapApiResult(response)
+  if (!options.json) {
+    printOutput(options, shapeProcessorStatusOutput(data, requestedVersion))
+    return
+  }
+  printOutput(options, data)
+}
+
+async function runProcessorSource(options: ProcessorSourceOptions) {
+  const context = createApiContext(options)
+  const project = await resolveProjectRef(options, context, { ownerSlug: true })
+  const response = await ProcessorExtService.getProcessorSourceFiles({
+    path: {
+      owner: project.owner,
+      slug: project.slug
+    },
+    query: {
+      version: options.version
+    },
+    headers: context.headers
+  })
+  const data = unwrapApiResult(response)
+  if (options.path && Array.isArray(data.sourceFiles)) {
+    const sourceFile = data.sourceFiles.find((entry) => entry.path === options.path)
+    if (!sourceFile) {
+      throw new CliError(`Source file not found: ${options.path}`)
+    }
+    printOutput(options, sourceFile)
+    return
+  }
+  printOutput(options, data)
+}
+
+async function runActivatePending(options: ProcessorOptions) {
+  const context = createApiContext(options)
+  const project = await resolveProjectRef(options, context, { ownerSlug: true })
+  const response = await ProcessorService.activatePendingVersion({
+    path: {
+      owner: project.owner,
+      slug: project.slug
+    },
+    headers: context.headers
+  })
+  printOutput(options, {
+    project: `${project.owner}/${project.slug}`,
+    ...(unwrapApiResult(response) as Record<string, unknown>)
+  })
+}
+
+function withAuthOptions<T extends Command<any, any, any>>(command: T) {
+  return command
+    .option('--host <host>', 'Override Sentio host')
+    .option('--api-key <key>', 'Use an explicit API key instead of saved credentials')
+    .option('--token <token>', 'Use an explicit bearer token instead of saved credentials')
+}
+
+function withSharedProjectOptions<T extends Command<any, any, any>>(command: T) {
+  return command
+    .option('--project <owner/slug>', 'Sentio project in <owner>/<slug> format')
+    .option('--owner <owner>', 'Sentio project owner')
+    .option('--name <name>', 'Sentio project name')
+    .option('--project-id <id>', 'Sentio project id')
+}
+
+function withOutputOptions<T extends Command<any, any, any>>(command: T) {
+  return command.option('--json', 'Print raw JSON response').option('--yaml', 'Print raw YAML response')
+}
+
+function handleProcessorCommandError(error: unknown, command?: Command) {
+  if (
+    error instanceof CliError &&
+    (error.message.startsWith('Project is required.') ||
+      error.message.startsWith('Invalid project ') ||
+      error.message.startsWith('Invalid version selector ') ||
+      error.message.startsWith('Source file not found:'))
+  ) {
+    console.error(error.message)
+    if (command) {
+      console.error()
+      command.outputHelp()
+    }
+    process.exit(1)
+  }
+  handleCommandError(error)
+}
+
+function printOutput(options: ProcessorOptions, data: unknown) {
+  if (options.json && options.yaml) {
+    throw new CliError('Choose only one structured output format: --json or --yaml.')
+  }
+  if (options.json) {
+    console.log(JSON.stringify(data, null, 2))
+    return
+  }
+  if (options.yaml) {
+    console.log(yaml.stringify(data).trimEnd())
+    return
+  }
+  console.log(formatOutput(data))
+}
+
+function formatOutput(data: unknown) {
+  if (data && typeof data === 'object' && Array.isArray((data as { processors?: unknown[] }).processors)) {
+    const processors = (data as { processors: Array<Record<string, unknown>> }).processors
+    const lines = [`Processor versions (${processors.length})`]
+    const groupedProcessors = groupProcessorsByVersionState(processors)
+    for (const group of groupedProcessors) {
+      lines.push(`${group.versionState} (${group.processors.length})`)
+      for (const processor of group.processors) {
+        const version = asNumber(processor.version)
+        const statusState =
+          asString((processor.processorStatus as Record<string, unknown> | undefined)?.state) ?? 'UNKNOWN'
+        const uploadedAt = asString(processor.uploadedAt)
+        lines.push(`- v${version ?? '?'} status=${statusState}${uploadedAt ? ` uploaded=${uploadedAt}` : ''}`)
+        if (asString(processor.processorId)) {
+          lines.push(`  processorId: ${asString(processor.processorId)}`)
+        }
+        const states = Array.isArray(processor.states) ? processor.states : []
+        for (const stateEntry of states.slice(0, 5)) {
+          const state = stateEntry as Record<string, unknown>
+          const chainId = asString(state.chainId) ?? '?'
+          const chainState = asString((state.status as Record<string, unknown> | undefined)?.state) ?? 'UNKNOWN'
+          const block = asString(state.processedBlockNumber) ?? '?'
+          lines.push(`  chain ${chainId}: ${chainState} block=${block}`)
+        }
+        if (states.length > 5) {
+          lines.push(`  ... ${states.length - 5} more chains`)
+        }
+      }
+    }
+    return lines.join('\n')
+  }
+
+  if (data && typeof data === 'object' && Array.isArray((data as { sourceFiles?: unknown[] }).sourceFiles)) {
+    const sourceFiles = (data as { sourceFiles: Array<Record<string, unknown>> }).sourceFiles
+    const lines = [`Source files (${sourceFiles.length})`]
+    for (const file of sourceFiles) {
+      lines.push(`- ${asString(file.path) ?? '<unknown>'}`)
+    }
+    return lines.join('\n')
+  }
+
+  if (data && typeof data === 'object' && 'path' in (data as Record<string, unknown>)) {
+    const file = data as Record<string, unknown>
+    return [`File: ${asString(file.path) ?? '<unknown>'}`, '', asString(file.content) ?? ''].join('\n')
+  }
+
+  if (data && typeof data === 'object' && 'project' in (data as Record<string, unknown>)) {
+    const objectData = data as Record<string, unknown>
+    return `Pending processor version activated for ${asString(objectData.project) ?? '<project>'}.`
+  }
+
+  return JSON.stringify(data, null, 2)
+}
+
+function normalizeVersionSelector(value?: string): 'ACTIVE' | 'PENDING' | 'ALL' | undefined {
+  if (!value) {
+    return undefined
+  }
+  const normalized = value.toUpperCase()
+  if (normalized === 'ACTIVE' || normalized === 'PENDING' || normalized === 'ALL') {
+    return normalized
+  }
+  throw new CliError(`Invalid version selector "${value}". Use active, pending, or all.`)
+}
+
+function parseInteger(value: string) {
+  const parsedValue = Number.parseInt(value, 10)
+  if (Number.isNaN(parsedValue)) {
+    throw new InvalidArgumentError('Not a number.')
+  }
+  return parsedValue
+}
+
+function asString(value: unknown) {
+  return typeof value === 'string' ? value : undefined
+}
+
+function asNumber(value: unknown) {
+  return typeof value === 'number' ? value : undefined
+}
+
+function shapeProcessorStatusOutput(
+  data: { processors?: Array<Record<string, unknown>> },
+  versionSelector?: 'ACTIVE' | 'PENDING' | 'ALL'
+) {
+  const processors = Array.isArray(data.processors) ? data.processors : []
+  if (versionSelector === 'ALL') {
+    return { ...data, processors }
+  }
+  if (versionSelector === 'ACTIVE' || versionSelector === 'PENDING') {
+    return {
+      ...data,
+      processors: processors.filter((processor) => asString(processor.versionState) === versionSelector)
+    }
+  }
+  return {
+    ...data,
+    processors: processors.filter((processor) => {
+      const versionState = asString(processor.versionState)
+      return versionState === 'ACTIVE' || versionState === 'PENDING'
+    })
+  }
+}
+
+function groupProcessorsByVersionState(processors: Array<Record<string, unknown>>) {
+  const grouped = new Map<string, Array<Record<string, unknown>>>()
+  for (const processor of processors) {
+    const versionState = asString(processor.versionState) ?? 'UNKNOWN'
+    const existing = grouped.get(versionState)
+    if (existing) {
+      existing.push(processor)
+      continue
+    }
+    grouped.set(versionState, [processor])
+  }
+
+  const order = ['ACTIVE', 'PENDING', 'OBSOLETE', 'UNKNOWN']
+  return Array.from(grouped.entries())
+    .sort((left, right) => {
+      const leftIndex = order.indexOf(left[0])
+      const rightIndex = order.indexOf(right[0])
+      return (leftIndex === -1 ? order.length : leftIndex) - (rightIndex === -1 ? order.length : rightIndex)
+    })
+    .map(([versionState, groupedProcessors]) => ({
+      versionState,
+      processors: [...groupedProcessors].sort(
+        (left, right) => (asNumber(right.version) ?? 0) - (asNumber(left.version) ?? 0)
+      )
+    }))
+}

@@ -46,17 +46,7 @@ function login(options: CommandOptionsType<typeof createLoginCommand>) {
       console.error(chalk.red('invalid host, try login with an API key if it is a dev env'))
       return
     }
-    const authURL = new URL(conf.domain + `/authorize?`)
-    const params = new url.URLSearchParams({
-      response_type: 'code',
-      code_challenge: challenge,
-      code_challenge_method: 'S256',
-      client_id: conf.clientId,
-      redirect_uri: conf.redirectUri,
-      audience: conf.audience,
-      prompt: 'login'
-    })
-    authURL.search = params.toString()
+    const authURL = buildAuthURL(conf, challenge)
 
     console.log('Continue your authorization in the browser')
     open(authURL.toString()).catch((reason) => {
@@ -70,6 +60,57 @@ function login(options: CommandOptionsType<typeof createLoginCommand>) {
       codeVerifier: verifier
     })
   }
+}
+
+/**
+ * Launches the interactive browser-based OAuth login flow and waits for it to complete.
+ * Stores the API key and access token in the local config upon success.
+ * Throws if login fails or the host has no auth config (e.g. local dev environments).
+ */
+export function loginInteractiveAndWait(host: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const conf = getAuthConfig(host)
+    if (conf.domain === '') {
+      reject(new Error('No auth config for this host. Use --api-key for local/dev environments.'))
+      return
+    }
+
+    const verifier = base64URLEncode(crypto.randomBytes(32))
+    const challenge = base64URLEncode(sha256(verifier))
+    const authURL = buildAuthURL(conf, challenge)
+
+    console.log(chalk.blue('Opening browser for login...'))
+    open(authURL.toString()).catch((reason) => {
+      console.error(chalk.yellow('Unable to open browser automatically.'))
+      console.error(chalk.yellow('Open this URL in your browser: ' + authURL.toString()))
+    })
+
+    startServer({
+      serverPort: port,
+      sentioHost: host,
+      codeVerifier: verifier,
+      onSuccess: resolve,
+      onFailure: reject
+    })
+  })
+}
+
+function buildAuthURL(
+  conf: { domain: string; clientId: string; audience: string; redirectUri: string },
+  challenge: string
+): URL {
+  const authURL = new URL(conf.domain + `/authorize?`)
+  const params = new url.URLSearchParams({
+    response_type: 'code',
+    code_challenge: challenge,
+    code_challenge_method: 'S256',
+    client_id: conf.clientId,
+    redirect_uri: conf.redirectUri,
+    audience: conf.audience,
+    prompt: 'login'
+  })
+  authURL.search = params.toString()
+  return authURL
 }
 
 function base64URLEncode(str: Buffer) {
