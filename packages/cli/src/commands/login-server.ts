@@ -3,7 +3,7 @@ import { getAuthConfig, getFinalizedHost } from '../config.js'
 import url from 'url'
 import fetch from 'node-fetch'
 import { getApiUrl, getCliVersion } from '../utils.js'
-import { WriteKey } from '../key.js'
+import { WriteKey, WriteAccessToken } from '../key.js'
 import chalk from 'chalk'
 import http from 'http'
 import os from 'os'
@@ -13,6 +13,10 @@ interface AuthParams {
   serverPort: number
   sentioHost: string
   codeVerifier: string
+  /** Called on successful login instead of process.exit() when provided. */
+  onSuccess?: () => void
+  /** Called on login failure instead of process.exit() when provided. */
+  onFailure?: (err: Error) => void
 }
 
 const app = express()
@@ -26,11 +30,16 @@ export function startServer(params: AuthParams) {
 }
 
 app.get('/callback', async (req, res) => {
-  const fail = function (...args: any[]) {
-    console.error(chalk.red(args))
-    res.end(args.toString())
+  const fail = function (message: string) {
+    console.error(chalk.red(message))
+    res.end(message)
     server.close()
-    setTimeout(() => process.exit(), 1000)
+    server.closeAllConnections()
+    if (authParams.onFailure) {
+      authParams.onFailure(new Error(message))
+    } else {
+      setTimeout(() => process.exit(), 1000)
+    }
   }
 
   const host = getFinalizedHost(authParams.sentioHost)
@@ -75,11 +84,22 @@ app.get('/callback', async (req, res) => {
   const { key, username } = (await createApiKeyResRaw.json()) as { key: string; username: string }
   WriteKey(host, key)
 
+  // store access token with expiry for commands that require admin permissions
+  const expiresAt = decodeJwtExpiry(accessToken)
+  if (expiresAt !== undefined) {
+    WriteAccessToken(host, accessToken, expiresAt)
+  }
+
   res.end('Login success, please go back to CLI to continue')
   console.log(chalk.green(`Login success with ${username}, new API key: ${key}`))
 
   server.close()
-  setTimeout(() => process.exit(), 1000)
+  server.closeAllConnections()
+  if (authParams.onSuccess) {
+    authParams.onSuccess()
+  } else {
+    setTimeout(() => process.exit(), 1000)
+  }
 })
 
 async function getToken(host: string, code: string) {
@@ -125,4 +145,14 @@ async function getUser(host: string, accessToken: string) {
       version: getCliVersion()
     }
   })
+}
+
+function decodeJwtExpiry(token: string): number | undefined {
+  try {
+    const b64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')
+    const payload = JSON.parse(Buffer.from(b64, 'base64').toString()) as { exp?: unknown }
+    return typeof payload.exp === 'number' ? payload.exp : undefined
+  } catch {
+    return undefined
+  }
 }

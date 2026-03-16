@@ -1,14 +1,20 @@
 import { Command } from '@commander-js/extra-typings'
 import process from 'process'
+import readline from 'readline'
 import yaml from 'yaml'
+import chalk from 'chalk'
 import {
   CliError,
   createApiContext,
   fetchApiJson,
   handleCommandError,
   postApiJson,
+  resolveProjectRef,
   resolveProjectSlugInput
 } from '../api.js'
+import { getApiUrl, getCliVersion } from '../utils.js'
+import { ReadAccessToken, isAccessTokenExpired } from '../key.js'
+import { loginInteractiveAndWait } from './login.js'
 
 interface ProjectAuthOptions {
   host?: string
@@ -40,6 +46,10 @@ interface ProjectCreateOptions extends ProjectLookupOptions {
   sentioNetwork?: boolean
 }
 
+interface ProjectDeleteOptions extends ProjectLookupOptions {
+  yes?: boolean
+}
+
 interface ProjectSummary {
   id?: string
   slug?: string
@@ -59,6 +69,7 @@ export function createProjectCommand() {
   projectCommand.addCommand(createProjectListCommand())
   projectCommand.addCommand(createProjectGetCommand())
   projectCommand.addCommand(createProjectCreateCommand())
+  projectCommand.addCommand(createProjectDeleteCommand())
   return projectCommand
 }
 
@@ -114,6 +125,26 @@ function createProjectCreateCommand() {
     })
 }
 
+function createProjectDeleteCommand() {
+  return withOutputOptions(
+    withSharedProjectOptions(
+      withAuthOptions(new Command('delete').description('Delete a project').argument('[project]'))
+    )
+  )
+    .showHelpAfterError()
+    .option('-y, --yes', 'Skip confirmation prompt (requires a valid login session — will not open browser)')
+    .action(async (projectArg, options, command) => {
+      try {
+        if (projectArg) {
+          options.project = projectArg
+        }
+        await runProjectDelete(options)
+      } catch (error) {
+        handleProjectCommandError(error, command)
+      }
+    })
+}
+
 async function runProjectList(options: ProjectListOptions) {
   const context = createApiContext(options)
   const ownerFilter = options.owner
@@ -155,6 +186,82 @@ async function runProjectCreate(options: ProjectCreateOptions) {
   })
 }
 
+async function runProjectDelete(options: ProjectDeleteOptions) {
+  const context = createApiContext(options)
+  const project = await resolveProjectRef(options, context, { ownerSlug: true, projectId: true })
+
+  // Project deletion requires admin permission — must use access token (Bearer), not api-key.
+  // With -y: error if token missing/expired (no browser). Without -y: open browser if needed.
+  const accessToken = await requireAccessToken(context.host, { strict: options.yes ?? false })
+
+  if (!options.yes) {
+    const confirmed = await confirmDelete(`${project.owner}/${project.slug}`)
+    if (!confirmed) {
+      console.log('Delete cancelled.')
+      return
+    }
+  }
+
+  const url = getApiUrl(`/api/v1/projects/${project.projectId}`, context.host)
+  const response = await fetch(url.href, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      version: getCliVersion()
+    }
+  })
+  if (!response.ok) {
+    const text = await response.text()
+    throw new CliError(
+      `Failed to delete project ${project.owner}/${project.slug}: ${response.status} ${response.statusText}${text ? ` - ${text}` : ''}`
+    )
+  }
+  printOutput(options, { message: `Project deleted: ${project.owner}/${project.slug}` })
+}
+
+async function requireAccessToken(host: string, { strict }: { strict: boolean }): Promise<string> {
+  const stored = ReadAccessToken(host)
+  if (stored && !isAccessTokenExpired(stored.expiresAt)) {
+    return stored.token
+  }
+
+  if (strict) {
+    // -y was passed: do not open browser, just fail fast
+    throw new CliError(
+      'Deleting a project requires admin permission, but your login session is missing or expired.\n' +
+        'Run `sentio login` to refresh your session, then retry.'
+    )
+  }
+
+  // Interactive: launch browser login to obtain a fresh token
+  console.log(
+    chalk.yellow(
+      'Deleting a project requires admin permission, but your login session is missing or expired.\n' +
+        'Opening the browser to log you in...'
+    )
+  )
+  await loginInteractiveAndWait(host)
+
+  const refreshed = ReadAccessToken(host)
+  if (!refreshed) {
+    throw new CliError('Login succeeded but no access token was saved. Please try again.')
+  }
+  return refreshed.token
+}
+
+async function confirmDelete(projectSlug: string): Promise<boolean> {
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
+  return new Promise((resolve) => {
+    rl.question(
+      chalk.yellow(`Are you sure you want to delete project "${projectSlug}"? This cannot be undone. [y/N] `),
+      (answer) => {
+        rl.close()
+        resolve(answer.trim().toLowerCase() === 'y')
+      }
+    )
+  })
+}
+
 async function fetchProjectBySlug(options: ProjectLookupOptions, context: ReturnType<typeof createApiContext>) {
   const project = resolveProjectSlugInput(options)
   return fetchApiJson<{ project?: ProjectSummary }>(`/api/v1/project/${project.owner}/${project.slug}`, context)
@@ -184,7 +291,8 @@ function handleProjectCommandError(error: unknown, command?: Command) {
     error instanceof CliError &&
     (error.message.startsWith('Project is required.') ||
       error.message.startsWith('Invalid project ') ||
-      error.message.startsWith('Owner not found:'))
+      error.message.startsWith('Owner not found:') ||
+      error.message.startsWith('Failed to delete project '))
   ) {
     console.error(error.message)
     if (command) {
@@ -238,6 +346,10 @@ function formatOutput(data: unknown) {
       }
     }
     return lines.join('\n')
+  }
+
+  if (data && typeof data === 'object' && 'message' in (data as Record<string, unknown>)) {
+    return String((data as { message?: string }).message ?? '')
   }
 
   const project = ((data as { project?: ProjectSummary })?.project ?? data) as ProjectSummary
