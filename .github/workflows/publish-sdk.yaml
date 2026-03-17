@@ -99,8 +99,8 @@ jobs:
       - name: CLI NPM Publish
         if: steps.semantic_cli.outputs.new_release_published == 'true'
         run: |
-          ./scripts/update-version.sh sentio-cli... ${{ steps.semantic_cli.outputs.new_release_version }}
-          pnpm publish --filter "sentio-cli..." --no-git-checks --tag ${{ steps.npm.outputs.dist_tag }}
+          ./scripts/update-version.sh @sentio/cli ${{ steps.semantic_cli.outputs.new_release_version }}
+          pnpm publish --filter "@sentio/cli" --no-git-checks --tag ${{ steps.npm.outputs.dist_tag }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: report error
