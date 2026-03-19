@@ -420,6 +420,37 @@ export async function postApiJson<T>(
   return (await response.json()) as T
 }
 
+export async function putApiJson<T>(
+  apiPath: string,
+  context: ApiContext,
+  body?: unknown,
+  query?: Record<string, string | number | boolean | undefined>
+): Promise<T> {
+  const url = getApiUrl(apiPath, context.host)
+  if (query) {
+    for (const [key, value] of Object.entries(query)) {
+      if (value !== undefined) {
+        url.searchParams.set(key, String(value))
+      }
+    }
+  }
+  const response = await fetch(url.href, {
+    method: 'PUT',
+    headers: {
+      ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}),
+      ...context.headers
+    },
+    body: body !== undefined ? JSON.stringify(body) : undefined
+  })
+  if (!response.ok) {
+    const text = await response.text()
+    throw new CliError(
+      `Sentio API request failed: ${response.status} ${response.statusText}${text ? ` - ${text}` : ''}`
+    )
+  }
+  return (await response.json()) as T
+}
+
 function parseStructuredInput(content: string, source: string, filename?: string) {
   if (!content.trim()) {
     throw new CliError(`Expected JSON or YAML in ${source}, but it was empty.`)
