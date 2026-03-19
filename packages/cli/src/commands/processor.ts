@@ -2,7 +2,16 @@ import { ProcessorExtService, ProcessorService } from '@sentio/api'
 import { Command, InvalidArgumentError } from '@commander-js/extra-typings'
 import process from 'process'
 import yaml from 'yaml'
-import { CliError, createApiContext, handleCommandError, resolveProjectRef, unwrapApiResult } from '../api.js'
+import {
+  CliError,
+  createApiContext,
+  handleCommandError,
+  resolveProjectRef,
+  unwrapApiResult,
+  postApiJson,
+  putApiJson
+} from '../api.js'
+import { confirm } from './upload.js'
 
 interface ProcessorOptions {
   host?: string
@@ -30,6 +39,9 @@ export function createProcessorCommand() {
   processorCommand.addCommand(createProcessorStatusCommand())
   processorCommand.addCommand(createProcessorSourceCommand())
   processorCommand.addCommand(createProcessorActivatePendingCommand())
+  processorCommand.addCommand(createProcessorPauseCommand())
+  processorCommand.addCommand(createProcessorResumeCommand())
+  processorCommand.addCommand(createProcessorStopCommand())
   return processorCommand
 }
 
@@ -71,9 +83,59 @@ function createProcessorActivatePendingCommand() {
     )
   )
     .showHelpAfterError()
+    .option('-y, --yes', 'Bypass confirmation')
     .action(async (options, command) => {
       try {
         await runActivatePending(options)
+      } catch (error) {
+        handleProcessorCommandError(error, command)
+      }
+    })
+}
+
+function createProcessorPauseCommand() {
+  return withOutputOptions(
+    withSharedProjectOptions(withAuthOptions(new Command('pause').description('Pause a processor')))
+  )
+    .showHelpAfterError()
+    .argument('[processorId]', 'ID of the processor')
+    .option('--reason <reason>', 'Reason for pausing')
+    .option('-y, --yes', 'Bypass confirmation')
+    .action(async (processorId, options, command) => {
+      try {
+        await runProcessorPause(processorId, options)
+      } catch (error) {
+        handleProcessorCommandError(error, command)
+      }
+    })
+}
+
+function createProcessorResumeCommand() {
+  return withOutputOptions(
+    withSharedProjectOptions(withAuthOptions(new Command('resume').description('Resume a processor')))
+  )
+    .showHelpAfterError()
+    .argument('[processorId]', 'ID of the processor')
+    .option('-y, --yes', 'Bypass confirmation')
+    .action(async (processorId, options, command) => {
+      try {
+        await runProcessorResume(processorId, options)
+      } catch (error) {
+        handleProcessorCommandError(error, command)
+      }
+    })
+}
+
+function createProcessorStopCommand() {
+  return withOutputOptions(
+    withSharedProjectOptions(withAuthOptions(new Command('stop').description('Stop a processor')))
+  )
+    .showHelpAfterError()
+    .argument('[processorId]', 'ID of the processor')
+    .option('-y, --yes', 'Bypass confirmation')
+    .action(async (processorId, options, command) => {
+      try {
+        await runProcessorStop(processorId, options)
       } catch (error) {
         handleProcessorCommandError(error, command)
       }
@@ -127,9 +189,41 @@ async function runProcessorSource(options: ProcessorSourceOptions) {
   printOutput(options, data)
 }
 
-async function runActivatePending(options: ProcessorOptions) {
+async function runActivatePending(options: ProcessorOptions & { yes?: boolean }) {
   const context = createApiContext(options)
   const project = await resolveProjectRef(options, context, { ownerSlug: true })
+
+  const statusResponse = await ProcessorService.getProcessorStatusV2({
+    path: {
+      owner: project.owner,
+      slug: project.slug
+    },
+    query: { version: 'ALL' },
+    headers: context.headers
+  })
+  const data = unwrapApiResult(statusResponse)
+  const processors = Array.isArray(data.processors) ? data.processors : []
+
+  const activeProcessor = processors.find((p) => asString(p.versionState) === 'ACTIVE')
+  const pendingProcessor = processors.find((p) => asString(p.versionState) === 'PENDING')
+
+  if (!pendingProcessor) {
+    throw new CliError(`No pending version found for project ${project.owner}/${project.slug}.`)
+  }
+
+  if (!options.yes) {
+    let message = `Activate the pending version ${asNumber(pendingProcessor.version)}. Are you sure you want to proceed?`
+    if (activeProcessor) {
+      message = `Activate the pending version ${asNumber(pendingProcessor.version)} may obsolete the active version ${asNumber(activeProcessor.version)}. Are you sure you want to proceed?`
+    }
+
+    const isConfirmed = await confirm(message)
+    if (!isConfirmed) {
+      console.log('Activation cancelled.')
+      return
+    }
+  }
+
   const response = await ProcessorService.activatePendingVersion({
     path: {
       owner: project.owner,
@@ -140,6 +234,88 @@ async function runActivatePending(options: ProcessorOptions) {
   printOutput(options, {
     project: `${project.owner}/${project.slug}`,
     ...(unwrapApiResult(response) as Record<string, unknown>)
+  })
+}
+
+async function resolveAndConfirmProcessor(
+  actionName: string,
+  processorId: string | undefined,
+  options: ProcessorOptions & { yes?: boolean }
+): Promise<string | undefined> {
+  const context = createApiContext(options)
+  let resolvedProcessorId = processorId
+  let versionToConfirm = ''
+
+  if (!resolvedProcessorId) {
+    const project = await resolveProjectRef(options, context, { ownerSlug: true })
+    const statusResponse = await ProcessorService.getProcessorStatusV2({
+      path: {
+        owner: project.owner,
+        slug: project.slug
+      },
+      query: { version: 'ACTIVE' },
+      headers: context.headers
+    })
+    const data = unwrapApiResult(statusResponse)
+    const processors = Array.isArray(data.processors) ? data.processors : []
+    const activeProcessor = processors.find((p) => asString(p.versionState) === 'ACTIVE')
+
+    if (!activeProcessor || !activeProcessor.processorId) {
+      throw new CliError(
+        `No active processor found for project ${project.owner}/${project.slug}. Please specify a processorId.`
+      )
+    }
+    resolvedProcessorId = asString(activeProcessor.processorId)!
+    versionToConfirm = `version ${asNumber(activeProcessor.version)} of project ${project.owner}/${project.slug}`
+  } else {
+    versionToConfirm = `processor ${resolvedProcessorId}`
+  }
+
+  if (!options.yes) {
+    const isConfirmed = await confirm(`Are you sure you want to ${actionName} ${versionToConfirm}?`)
+    if (!isConfirmed) {
+      console.log(`${actionName.charAt(0).toUpperCase() + actionName.slice(1)} cancelled.`)
+      return undefined
+    }
+  }
+
+  return resolvedProcessorId
+}
+
+async function runProcessorPause(
+  processorId: string | undefined,
+  options: ProcessorOptions & { reason?: string; yes?: boolean }
+) {
+  const resolvedProcessorId = await resolveAndConfirmProcessor('pause', processorId, options)
+  if (!resolvedProcessorId) return
+  const context = createApiContext(options)
+  const response = await putApiJson(`/api/v1/processors/${resolvedProcessorId}/pause`, context, {
+    reason: options.reason
+  })
+  printOutput(options, { processorId: resolvedProcessorId, action: 'paused', ...(response as Record<string, unknown>) })
+}
+
+async function runProcessorResume(processorId: string | undefined, options: ProcessorOptions & { yes?: boolean }) {
+  const resolvedProcessorId = await resolveAndConfirmProcessor('resume', processorId, options)
+  if (!resolvedProcessorId) return
+  const context = createApiContext(options)
+  const response = await putApiJson(`/api/v1/processors/${resolvedProcessorId}/resume`, context)
+  printOutput(options, {
+    processorId: resolvedProcessorId,
+    action: 'resumed',
+    ...(response as Record<string, unknown>)
+  })
+}
+
+async function runProcessorStop(processorId: string | undefined, options: ProcessorOptions & { yes?: boolean }) {
+  const resolvedProcessorId = await resolveAndConfirmProcessor('stop', processorId, options)
+  if (!resolvedProcessorId) return
+  const context = createApiContext(options)
+  const response = await postApiJson(`/api/v1/processors/stop`, context, { processorId: resolvedProcessorId })
+  printOutput(options, {
+    processorId: resolvedProcessorId,
+    action: 'stopped',
+    ...(response as Record<string, unknown>)
   })
 }
 
@@ -244,6 +420,16 @@ function formatOutput(data: unknown) {
   if (data && typeof data === 'object' && 'project' in (data as Record<string, unknown>)) {
     const objectData = data as Record<string, unknown>
     return `Pending processor version activated for ${asString(objectData.project) ?? '<project>'}.`
+  }
+
+  if (
+    data &&
+    typeof data === 'object' &&
+    'action' in (data as Record<string, unknown>) &&
+    'processorId' in (data as Record<string, unknown>)
+  ) {
+    const objectData = data as Record<string, unknown>
+    return `Processor ${asString(objectData.processorId)} successfully ${asString(objectData.action)}.`
   }
 
   return JSON.stringify(data, null, 2)
