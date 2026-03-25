@@ -299,8 +299,7 @@ if (options.worker > 1 && !isChildProcess) {
       childProcesses.delete(childPort)
       console.log(`Child process on port ${childPort} exited with code ${code}, signal ${signal ?? 'none'}`)
 
-      const isNormalShutdown = signal === null && code === 0
-      if (isParentShuttingDown || isNormalShutdown) {
+      if (isParentShuttingDown) {
         return
       }
 
