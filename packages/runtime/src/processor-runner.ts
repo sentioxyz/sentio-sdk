@@ -35,6 +35,11 @@ const options: ProcessorRuntimeOptions = {
 
 const logLevel = process.env['LOG_LEVEL']?.toLowerCase()
 
+// Track parent shutdown so worker restarts do not happen during intentional exits.
+let isParentShuttingDown = false
+let areChildrenShuttingDown = false
+let shutdownChildren = () => {}
+
 setupLogger(options.logFormat === 'json', logLevel === 'debug' ? true : options.debug!)
 console.debug('Starting with', options.target)
 
@@ -48,6 +53,14 @@ console.debug('Starting Server', options)
 
 // Check if this is a child process spawned for multi-server mode
 const isChildProcess = process.env['IS_CHILD'] === 'true'
+
+function exitProcess(exitCode: number): never {
+  if (!isChildProcess) {
+    isParentShuttingDown = true
+    shutdownChildren()
+  }
+  process.exit(exitCode)
+}
 
 if (!isChildProcess) {
   const sdkPackageJson = locatePackageJson('@sentio/sdk')
@@ -177,7 +190,20 @@ if (!isChildProcess) {
 
 // Process event handlers
 process
-  .on('SIGINT', function () {
+  .once('SIGINT', function () {
+    if (isParentShuttingDown) {
+      return
+    }
+    isParentShuttingDown = true
+    shutdownChildren()
+    shutdownServers(0)
+  })
+  .once('SIGTERM', function () {
+    if (isParentShuttingDown) {
+      return
+    }
+    isParentShuttingDown = true
+    shutdownChildren()
     shutdownServers(0)
   })
   .on('uncaughtException', (err) => {
@@ -225,21 +251,21 @@ function shutdownServers(exitCode: number): void {
   if (httpServer) {
     httpServer.close(function () {
       console.log('Http server shut down')
-      process.exit(exitCode)
+      exitProcess(exitCode)
     })
   } else {
-    process.exit(exitCode)
+    exitProcess(exitCode)
   }
 }
 
 // Multi-worker mode: spawn child processes for additional servers
 if (options.worker > 1 && !isChildProcess) {
-  const childProcesses: ChildProcess[] = []
+  const childProcesses = new Map<number, ChildProcess>()
+  const restartTimers = new Map<number, NodeJS.Timeout>()
   const basePort = parseInt(options.port)
+  const restartDelayMs = 1000
 
-  // Spawn child processes for ports basePort+1 to basePort+(worker-1)
-  for (let i = 1; i < options.worker; i++) {
-    const childPort = basePort + i
+  const spawnChild = (childPort: number): void => {
     const args = process.argv.slice(2)
     const childArgs: string[] = ['--port=' + String(childPort)]
     // Ignore port argument for child process
@@ -256,6 +282,7 @@ if (options.worker > 1 && !isChildProcess) {
 
       childArgs.push(arg)
     }
+
     const child = fork(fileURLToPath(import.meta.url), childArgs, {
       env: {
         ...process.env,
@@ -268,21 +295,54 @@ if (options.worker > 1 && !isChildProcess) {
       console.error(`Child process on port ${childPort} error:`, err)
     })
 
-    child.on('exit', (code) => {
-      console.log(`Child process on port ${childPort} exited with code ${code}`)
+    child.on('exit', (code, signal) => {
+      childProcesses.delete(childPort)
+      console.log(`Child process on port ${childPort} exited with code ${code}, signal ${signal ?? 'none'}`)
+
+      const isNormalShutdown = signal === null && code === 0
+      if (isParentShuttingDown || isNormalShutdown) {
+        return
+      }
+
+      if (restartTimers.has(childPort)) {
+        return
+      }
+
+      console.log(`Scheduling restart for child process on port ${childPort} in ${restartDelayMs}ms`)
+      const timer = setTimeout(() => {
+        restartTimers.delete(childPort)
+        if (isParentShuttingDown) {
+          return
+        }
+        console.log(`Restarting child process on port ${childPort}`)
+        spawnChild(childPort)
+      }, restartDelayMs)
+      restartTimers.set(childPort, timer)
     })
 
-    childProcesses.push(child)
-    console.log(`Spawned child server process for port ${childPort}`)
+    childProcesses.set(childPort, child)
+    console.log(`Spawned child server process for port ${childPort} (pid: ${child.pid})`)
+  }
+
+  // Spawn child processes for ports basePort+1 to basePort+(worker-1)
+  for (let i = 1; i < options.worker; i++) {
+    const childPort = basePort + i
+    spawnChild(childPort)
   }
 
   // Handle parent process shutdown - kill all children
-  const shutdownChildren = () => {
-    for (const child of childProcesses) {
+  shutdownChildren = () => {
+    if (areChildrenShuttingDown) {
+      return
+    }
+    areChildrenShuttingDown = true
+    isParentShuttingDown = true
+    for (const timer of restartTimers.values()) {
+      clearTimeout(timer)
+    }
+    restartTimers.clear()
+    for (const child of childProcesses.values()) {
       child.kill('SIGINT')
     }
   }
-
-  process.on('SIGINT', shutdownChildren)
-  process.on('SIGTERM', shutdownChildren)
 }
