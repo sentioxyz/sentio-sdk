@@ -1,5 +1,6 @@
 import { ProcessorExtService, ProcessorService } from '@sentio/api'
 import { Command, InvalidArgumentError } from '@commander-js/extra-typings'
+import chalk from 'chalk'
 import process from 'process'
 import yaml from 'yaml'
 import {
@@ -34,6 +35,14 @@ interface ProcessorSourceOptions extends ProcessorOptions {
   path?: string
 }
 
+interface ProcessorLogsOptions extends ProcessorOptions {
+  limit?: number
+  follow?: boolean
+  logType?: string
+  level?: string
+  query?: string
+}
+
 export function createProcessorCommand() {
   const processorCommand = new Command('processor').description('Manage Sentio processor versions')
   processorCommand.addCommand(createProcessorStatusCommand())
@@ -42,6 +51,7 @@ export function createProcessorCommand() {
   processorCommand.addCommand(createProcessorPauseCommand())
   processorCommand.addCommand(createProcessorResumeCommand())
   processorCommand.addCommand(createProcessorStopCommand())
+  processorCommand.addCommand(createProcessorLogsCommand())
   return processorCommand
 }
 
@@ -136,6 +146,26 @@ function createProcessorStopCommand() {
     .action(async (processorId, options, command) => {
       try {
         await runProcessorStop(processorId, options)
+      } catch (error) {
+        handleProcessorCommandError(error, command)
+      }
+    })
+}
+
+function createProcessorLogsCommand() {
+  return withOutputOptions(
+    withSharedProjectOptions(withAuthOptions(new Command('logs').description('View processor logs')))
+  )
+    .showHelpAfterError()
+    .argument('[processorId]', 'ID of the processor (defaults to active processor)')
+    .option('--limit <count>', 'Maximum number of log entries to fetch', parseInteger, 100)
+    .option('-f, --follow', 'Poll for new log entries continuously')
+    .option('--log-type <type>', 'Filter by log type (e.g. execution, system)')
+    .option('--level <level>', 'Filter by log level: DEBUG, INFO, WARNING, ERROR')
+    .option('--query <query>', 'Free-text filter query')
+    .action(async (processorId, options, command) => {
+      try {
+        await runProcessorLogs(processorId, options)
       } catch (error) {
         handleProcessorCommandError(error, command)
       }
@@ -319,6 +349,134 @@ async function runProcessorStop(processorId: string | undefined, options: Proces
   })
 }
 
+async function resolveProcessorId(processorId: string | undefined, options: ProcessorOptions): Promise<string> {
+  if (processorId) return processorId
+  const context = createApiContext(options)
+  const project = await resolveProjectRef(options, context, { ownerSlug: true })
+  const statusResponse = await ProcessorService.getProcessorStatusV2({
+    path: { owner: project.owner, slug: project.slug },
+    query: { version: 'ACTIVE' },
+    headers: context.headers
+  })
+  const data = unwrapApiResult(statusResponse)
+  const processors = Array.isArray(data.processors) ? data.processors : []
+  const activeProcessor = processors.find((p) => asString(p.versionState) === 'ACTIVE')
+  if (!activeProcessor || !activeProcessor.processorId) {
+    throw new CliError(
+      `No active processor found for project ${project.owner}/${project.slug}. Please specify a processorId.`
+    )
+  }
+  return asString(activeProcessor.processorId)!
+}
+
+async function runProcessorLogs(processorId: string | undefined, options: ProcessorLogsOptions) {
+  const resolvedProcessorId = await resolveProcessorId(processorId, options)
+  const context = createApiContext(options)
+
+  if (options.follow && !options.json && !options.yaml) {
+    await followProcessorLogs(resolvedProcessorId, context, options)
+    return
+  }
+
+  const response = await postApiJson<ProcessorLogsResponse>(
+    `/api/v1/processors/${resolvedProcessorId}/logs`,
+    context,
+    buildLogsRequestBody(resolvedProcessorId, options)
+  )
+  printOutput(options, response)
+}
+
+async function followProcessorLogs(
+  processorId: string,
+  context: ReturnType<typeof createApiContext>,
+  options: ProcessorLogsOptions
+) {
+  let until: unknown[] | undefined
+  let running = true
+  const seenIds = new Set<string>()
+
+  process.on('SIGINT', () => {
+    running = false
+  })
+
+  while (running) {
+    try {
+      const body = { ...buildLogsRequestBody(processorId, options), until }
+      const response = await postApiJson<ProcessorLogsResponse>(`/api/v1/processors/${processorId}/logs`, context, body)
+      const entries = Array.isArray(response.logs) ? response.logs : []
+      for (const entry of entries) {
+        const e = entry as ProcessorLog
+        const id = e.id ?? ''
+        if (id && seenIds.has(id)) continue
+        if (id) seenIds.add(id)
+        process.stdout.write(formatLogEntry(e) + '\n')
+      }
+      if (response.until) {
+        until = response.until
+      }
+    } catch {
+      // Ignore transient fetch errors during follow mode
+    }
+    await new Promise((resolve) => setTimeout(resolve, 2000))
+  }
+}
+
+function buildLogsRequestBody(processorId: string, options: ProcessorLogsOptions): Record<string, unknown> {
+  const body: Record<string, unknown> = { processorId, limit: options.limit }
+  if (options.logType) {
+    body.logTypeFilters = [options.logType]
+  }
+  if (options.level || options.query) {
+    const parts: string[] = []
+    if (options.level) parts.push(options.level.toUpperCase())
+    if (options.query) parts.push(options.query)
+    body.query = parts.join(' ')
+  }
+  return body
+}
+
+interface ProcessorLog {
+  id?: string
+  message?: string
+  timestamp?: string
+  attributes?: Record<string, unknown>
+  logType?: string
+  level?: string
+  highlightedMessage?: string
+  chainId?: string
+}
+
+interface ProcessorLogsResponse {
+  logs?: ProcessorLog[]
+  until?: unknown[]
+  total?: string
+}
+
+function formatLogEntry(entry: ProcessorLog): string {
+  const formattedTime = entry.timestamp ? chalk.gray(entry.timestamp.replace('T', ' ').replace('Z', '')) : ''
+  const level = (entry.level ?? 'INFO').toUpperCase()
+  const logType = entry.logType ? chalk.gray(`[${entry.logType}]`) : ''
+  const coloredLevel = colorSeverity(level)
+  const message = entry.message ?? ''
+  const chain = entry.chainId ? chalk.gray(`(chain=${entry.chainId})`) : ''
+
+  return [formattedTime, coloredLevel, logType, message, chain].filter(Boolean).join(' ')
+}
+
+function colorSeverity(severity: string): string {
+  switch (severity) {
+    case 'ERROR':
+      return chalk.red(`[${severity}]`)
+    case 'WARNING':
+    case 'WARN':
+      return chalk.yellow(`[${severity}]`)
+    case 'DEBUG':
+      return chalk.gray(`[${severity}]`)
+    default:
+      return chalk.cyan(`[${severity}]`)
+  }
+}
+
 function withAuthOptions<T extends Command<any, any, any>>(command: T) {
   return command
     .option('--host <host>', 'Override Sentio host')
@@ -380,8 +538,8 @@ function formatOutput(data: unknown) {
       lines.push(`${group.versionState} (${group.processors.length})`)
       for (const processor of group.processors) {
         const version = asNumber(processor.version)
-        const statusState =
-          asString((processor.processorStatus as Record<string, unknown> | undefined)?.state) ?? 'UNKNOWN'
+        const processorStatus = processor.processorStatus as Record<string, unknown> | undefined
+        const statusState = asString(processorStatus?.state) ?? 'UNKNOWN'
         const uploadedAt = asString(processor.uploadedAt)
         lines.push(`- v${version ?? '?'} status=${statusState}${uploadedAt ? ` uploaded=${uploadedAt}` : ''}`)
         if (asString(processor.processorId)) {
@@ -391,9 +549,17 @@ function formatOutput(data: unknown) {
         for (const stateEntry of states.slice(0, 5)) {
           const state = stateEntry as Record<string, unknown>
           const chainId = asString(state.chainId) ?? '?'
-          const chainState = asString((state.status as Record<string, unknown> | undefined)?.state) ?? 'UNKNOWN'
+          const stateStatus = state.status as Record<string, unknown> | undefined
+          const chainState = asString(stateStatus?.state) ?? 'UNKNOWN'
           const block = asString(state.processedBlockNumber) ?? '?'
           lines.push(`  chain ${chainId}: ${chainState} block=${block}`)
+          const errorRecord = stateStatus?.errorRecord as Record<string, unknown> | undefined
+          const chainError = asString(errorRecord?.message)
+          if (chainError) {
+            const createdAt = asString(errorRecord?.createdAt)
+            const prefix = createdAt ? `[${createdAt}] ` : ''
+            lines.push(`  error: ${prefix}${chainError}`)
+          }
         }
         if (states.length > 5) {
           lines.push(`  ... ${states.length - 5} more chains`)
@@ -430,6 +596,15 @@ function formatOutput(data: unknown) {
   ) {
     const objectData = data as Record<string, unknown>
     return `Processor ${asString(objectData.processorId)} successfully ${asString(objectData.action)}.`
+  }
+
+  if (data && typeof data === 'object' && 'logs' in (data as Record<string, unknown>)) {
+    const logsData = data as ProcessorLogsResponse
+    const entries = Array.isArray(logsData.logs) ? logsData.logs : []
+    if (entries.length === 0) {
+      return 'No logs found.'
+    }
+    return entries.map((entry) => formatLogEntry(entry)).join('\n')
   }
 
   return JSON.stringify(data, null, 2)
