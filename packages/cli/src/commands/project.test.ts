@@ -29,7 +29,7 @@ describe('project command', () => {
         })
       }
 
-      if (url === 'https://api.sentio.xyz/v1/projects') {
+      if (url === 'https://api.sentio.xyz/v1/projects?owner=resolv') {
         return jsonResponse({
           projects: [],
           sharedProjects: [],
@@ -41,13 +41,6 @@ describe('project command', () => {
               type: 'SENTIO',
               visibility: 'PRIVATE',
               updatedAt: '2025-08-05T08:35:25.845Z'
-            },
-            {
-              id: 'p-2',
-              ownerName: 'other',
-              slug: 'ignore-me',
-              type: 'SENTIO',
-              visibility: 'PRIVATE'
             }
           ]
         })

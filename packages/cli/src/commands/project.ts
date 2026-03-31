@@ -491,12 +491,8 @@ async function getProjectsByOwner(ownerName: string, context: ReturnType<typeof 
     }>('/api/v1/organizations', context, { orgIdOrName: ownerName })
     const organization = organizationResponse.organizations?.find((entry) => entry.name === ownerName)
     if (organization) {
-      if (organization.projects && organization.projects.length > 0) {
-        return organization.projects
-      }
-
-      const data = await fetchApiJson<unknown>('/api/v1/projects', context)
-      return normalizeProjectList(data).filter((project) => getOwnerName(project) === ownerName)
+      const data = await fetchApiJson<unknown>('/api/v1/projects', context, { owner: ownerName })
+      return normalizeProjectList(data)
     }
   } catch {}
   try {
@@ -504,7 +500,7 @@ async function getProjectsByOwner(ownerName: string, context: ReturnType<typeof 
       userName: ownerName
     })
     if (userInfo.id) {
-      const data = await fetchApiJson<unknown>('/api/v1/projects', context, { userId: userInfo.id })
+      const data = await fetchApiJson<unknown>('/api/v1/projects', context, { owner: ownerName })
       return normalizeProjectList(data)
     }
   } catch {}
