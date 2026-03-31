@@ -327,7 +327,7 @@ function formatOutput(data: unknown) {
       for (const project of [...projects].sort((left, right) => (left.slug ?? '').localeCompare(right.slug ?? ''))) {
         const owner = getOwnerName(project) ?? '<owner>'
         const slug = project.slug ?? '<slug>'
-        const attrs = [project.type, project.visibility].filter(Boolean).join(', ')
+        const attrs = formatProjectListAttrs(project)
         const updatedAt = formatTimestamp(project.updatedAt)
         lines.push(`- ${owner}/${slug}${attrs ? ` [${attrs}]` : ''}${updatedAt ? ` updated ${updatedAt}` : ''}`)
       }
@@ -340,7 +340,7 @@ function formatOutput(data: unknown) {
       lines.push(`${group.owner} (${group.projects.length})`)
       for (const project of group.projects) {
         const slug = project.slug ?? '<slug>'
-        const attrs = [project.type, project.visibility].filter(Boolean).join(', ')
+        const attrs = formatProjectListAttrs(project)
         const updatedAt = formatTimestamp(project.updatedAt)
         lines.push(`- ${slug}${attrs ? ` [${attrs}]` : ''}${updatedAt ? ` updated ${updatedAt}` : ''}`)
       }
@@ -381,6 +381,11 @@ function formatOutput(data: unknown) {
     lines.push(`Updated: ${formatTimestamp(project.updatedAt)}`)
   }
   return lines.join('\n')
+}
+
+function formatProjectListAttrs(project: ProjectSummary) {
+  const attrs = [project.type === 'SENTIO' ? undefined : project.type, project.visibility].filter(Boolean)
+  return attrs.join(', ')
 }
 
 function normalizeProjectList(data: unknown): ProjectSummary[] {
@@ -486,7 +491,12 @@ async function getProjectsByOwner(ownerName: string, context: ReturnType<typeof 
     }>('/api/v1/organizations', context, { orgIdOrName: ownerName })
     const organization = organizationResponse.organizations?.find((entry) => entry.name === ownerName)
     if (organization) {
-      return organization.projects ?? []
+      if (organization.projects && organization.projects.length > 0) {
+        return organization.projects
+      }
+
+      const data = await fetchApiJson<unknown>('/api/v1/projects', context)
+      return normalizeProjectList(data).filter((project) => getOwnerName(project) === ownerName)
     }
   } catch {}
   try {
