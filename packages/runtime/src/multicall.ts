@@ -1486,11 +1486,6 @@ const DEPLOYMENTS = [
     url: 'https://explorer.re.al/address/0xcA11bde05977b3631167028862bE2a173976CA11?tab=contract'
   },
   {
-    name: 'Merlin Testnet',
-    chainId: 686868,
-    url: 'https://testnet-scan.merlinchain.io/address/0xcA11bde05977b3631167028862bE2a173976CA11'
-  },
-  {
     name: 'IOTA EVM',
     chainId: 8822,
     url: 'https://iota-evm.blockscout.com/address/0xcA11bde05977b3631167028862bE2a173976CA11?tab=contract'
