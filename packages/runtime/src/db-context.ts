@@ -172,16 +172,16 @@ export abstract class AbstractStoreContext implements IStoreContext {
   private async sendUpsertInBatch(req: DBRequest_DBUpsert): Promise<DBResponse> {
     if (this.upsertBatch) {
       // merge the upserts
-      const { request, promise } = this.upsertBatch
-      request.entity = this.upsertBatch.request.entity.concat(req.entity)
-      request.entityData = this.upsertBatch.request.entityData.concat(req.entityData)
-      request.id = this.upsertBatch.request.id.concat(req.id)
+      const { request, promise, opId } = this.upsertBatch
+      request.entity = request.entity.concat(req.entity)
+      request.entityData = request.entityData.concat(req.entityData)
+      request.id = request.id.concat(req.id)
       if (request.entity.length >= STORE_BATCH_SIZE) {
         this.sendBatch()
       }
       if (STORE_UPSERT_NO_WAIT) {
         return {
-          opId: this.upsertBatch.opId
+          opId
         }
       }
 
