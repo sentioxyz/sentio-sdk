@@ -10,20 +10,30 @@ import { CoinMetadata } from '@mysten/sui/jsonRpc'
 const WHITELISTED_COINS = new Map<string, BaseCoinInfo>()
 
 let initiated = false
+let initPromise: Promise<void> | null = null
+
 export async function initCoinList() {
   if (initiated) {
     return
   }
-  let list = DEFAULT_LIST.coinlist
-  try {
-    const resp = await fetch('https://raw.githubusercontent.com/solflare-wallet/sui-coinlist/master/sui-coinlist.json')
-    list = ((await resp.json()) as any).coinlist
-  } catch (e) {
-    console.warn("Can't not fetch newest coin list, use default list")
+  if (initPromise) {
+    return initPromise
   }
+  initPromise = (async () => {
+    let list = DEFAULT_LIST.coinlist
+    try {
+      const resp = await fetch('https://raw.githubusercontent.com/solflare-wallet/sui-coinlist/master/sui-coinlist.json', {
+        signal: AbortSignal.timeout(30_000)
+      })
+      list = ((await resp.json()) as any).coinlist
+    } catch (e) {
+      console.warn("Can't not fetch newest coin list, use default list")
+    }
 
-  setCoinList(list)
-  initiated = true
+    setCoinList(list)
+    initiated = true
+  })()
+  return initPromise
 }
 
 export interface SuiCoinInfo {
