@@ -9,16 +9,32 @@ import { CoinMetadata } from '@iota/iota-sdk/client'
 
 const WHITELISTED_COINS = new Map<string, BaseCoinInfo>()
 
-export async function initCoinList() {
-  let list = DEFAULT_LIST.coinlist
-  try {
-    const resp = await fetch('https://raw.githubusercontent.com/solflare-wallet/iota-coinlist/master/sui-coinlist.json')
-    list = ((await resp.json()) as any).coinlist
-  } catch (e) {
-    console.warn("Can't not fetch newest coin list, use default list")
-  }
+let initiated = false
+let initPromise: Promise<void> | null = null
 
-  setCoinList(list)
+export async function initCoinList() {
+  if (initiated) {
+    return
+  }
+  if (initPromise) {
+    return initPromise
+  }
+  initPromise = (async () => {
+    let list = DEFAULT_LIST.coinlist
+    try {
+      const resp = await fetch(
+        'https://raw.githubusercontent.com/solflare-wallet/iota-coinlist/master/sui-coinlist.json',
+        { signal: AbortSignal.timeout(30_000) }
+      )
+      list = ((await resp.json()) as any).coinlist
+    } catch (e) {
+      console.warn("Can't not fetch newest coin list, use default list")
+    }
+
+    setCoinList(list)
+    initiated = true
+  })()
+  return initPromise
 }
 
 export interface IotaCoinInfo {
