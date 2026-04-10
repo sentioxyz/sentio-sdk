@@ -160,7 +160,7 @@ export abstract class BatchUploader {
         rollback,
         numWorkers,
         sentio_network: this.options.sentioNetwork,
-        required_chain_ids: this.options.requiredChainIds
+        required_chains: this.options.requiredChainIds
       })
     })
 
