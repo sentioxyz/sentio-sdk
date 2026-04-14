@@ -89,7 +89,8 @@ export abstract class BatchUploader {
     debug?: boolean,
     continueFrom?: number,
     networkOverrides?: NetworkOverride[],
-    rollback?: Record<string, number>
+    rollback?: Record<string, number>,
+    initResponse?: InitBatchUploadResponse
   ): Promise<FinishBatchUploadResponse>
 
   async initUpload(fileTypes?: Record<string, FileType>): Promise<InitBatchUploadResponse> {
@@ -184,15 +185,17 @@ export class DefaultBatchUploader extends BatchUploader {
     debug?: boolean,
     continueFrom?: number,
     networkOverrides?: NetworkOverride[],
-    rollback?: Record<string, number>
+    rollback?: Record<string, number>,
+    initResponse?: InitBatchUploadResponse
   ): Promise<FinishBatchUploadResponse> {
-    // Step 1: Initialize upload with file types
-    const fileTypes: Record<string, FileType> = {
-      source: FileType.SOURCE,
-      code: FileType.PROCESSOR
+    // Step 1: Initialize upload with file types (if not already done)
+    if (!initResponse) {
+      const fileTypes: Record<string, FileType> = {
+        source: FileType.SOURCE,
+        code: FileType.PROCESSOR
+      }
+      initResponse = await this.initUpload(fileTypes)
     }
-
-    const initResponse = await this.initUpload(fileTypes)
 
     // Step 3: Upload files to S3 using presigned URLs
     for (const [fileKey, payload] of Object.entries(initResponse.payloads)) {
@@ -235,7 +238,7 @@ export class DefaultBatchUploader extends BatchUploader {
 
 export class IPFSBatchUploader extends BatchUploader {
   constructor(options: YamlProjectConfig, auth: Auth) {
-    super(StorageEngine.DEFAULT, options, auth)
+    super(StorageEngine.IPFS, options, auth)
   }
 
   async upload(
@@ -245,14 +248,16 @@ export class IPFSBatchUploader extends BatchUploader {
     debug?: boolean,
     continueFrom?: number,
     networkOverrides?: NetworkOverride[],
-    rollback?: Record<string, number>
+    rollback?: Record<string, number>,
+    initResponse?: InitBatchUploadResponse
   ): Promise<FinishBatchUploadResponse> {
-    const fileTypes: Record<string, FileType> = {
-      source: FileType.SOURCE,
-      code: FileType.PROCESSOR
+    if (!initResponse) {
+      const fileTypes: Record<string, FileType> = {
+        source: FileType.SOURCE,
+        code: FileType.PROCESSOR
+      }
+      initResponse = await this.initUpload(fileTypes)
     }
-
-    const initResponse = await this.initUpload(fileTypes)
 
     for (const [fileKey, payload] of Object.entries(initResponse.payloads)) {
       const putUrl = payload.object?.putUrl || payload.ipfs?.putUrl
@@ -334,15 +339,17 @@ export class WalrusBatchUploader extends BatchUploader {
     debug?: boolean,
     continueFrom?: number,
     networkOverrides?: NetworkOverride[],
-    rollback?: Record<string, number>
+    rollback?: Record<string, number>,
+    initResponse?: InitBatchUploadResponse
   ): Promise<FinishBatchUploadResponse> {
-    // Step 1: Initialize upload with file types
-    const fileTypes: Record<string, FileType> = {
-      source: FileType.SOURCE,
-      code: FileType.PROCESSOR
+    // Step 1: Initialize upload with file types (if not already done)
+    if (!initResponse) {
+      const fileTypes: Record<string, FileType> = {
+        source: FileType.SOURCE,
+        code: FileType.PROCESSOR
+      }
+      initResponse = await this.initUpload(fileTypes)
     }
-
-    const initResponse = await this.initUpload(fileTypes)
 
     // Step 2: Create quilt multipart form data for all files
     const formData = this.createQuiltMultipartFormData(files)
