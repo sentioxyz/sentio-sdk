@@ -13,6 +13,18 @@ import readline from 'readline'
 import JSZip from 'jszip'
 import { UserInfo } from '../../../protos/lib/service/common/protos/common.js'
 import { CommandOptionsType } from './types.js'
+import {
+  getSentioNetworkConfig,
+  resolveNetworkAddresses,
+  getWalletFromPrivateKey,
+  requirePrivateKey,
+  checkSTBalance,
+  checkBillingBalance,
+  uploadToIPFS,
+  createProcessorOnChain,
+  startProcessorOnChain,
+  confirmNoPlatformUpload
+} from '../network.js'
 import { Auth, DefaultBatchUploader, FileType, IPFSBatchUploader, WalrusBatchUploader } from '../uploader.js'
 export { type Auth } from '../uploader.js'
 
@@ -56,14 +68,124 @@ export function createUploadCommand() {
       '--required-chain-id <chain_id...>',
       '(Optional) Specify chain IDs required for the Sentio network. This option is only available when --sentio-network is used. If omitted, all chain IDs from the project configuration (contracts or network overrides) will be used.'
     )
+    .option(
+      '--no-platform',
+      'Upload processor directly to Sentio Network without platform support. Requires $PRIVATE_KEY env var. Only testnet is supported.'
+    )
+    .option(
+      '--ipfs-put-url <url>',
+      'IPFS upload endpoint (used with --no-platform)',
+      'https://api.sentio.xyz/v1/ipfs/add'
+    )
     .action(async (options, command) => {
       const processorConfig = loadProcessorConfig(options.path)
       overrideConfigWithOptions(processorConfig, options)
       if (options.path) {
         process.chdir(options.path)
       }
-      await runUploadInternal(processorConfig, options, command)
+      if (options.platform === false) {
+        await runNoPlatformUpload(processorConfig, options)
+      } else {
+        await runUploadInternal(processorConfig, options, command)
+      }
     })
+}
+
+async function runNoPlatformUpload(
+  processorConfig: YamlProjectConfig,
+  options: CommandOptionsType<typeof createUploadCommand>
+) {
+  // Determine network - default to testnet for --no-platform
+  const network = options.sentioNetwork || 'testnet'
+  const networkConfig = getSentioNetworkConfig(network)
+
+  // Step 1: Require PRIVATE_KEY
+  const privateKey = requirePrivateKey()
+  const wallet = getWalletFromPrivateKey(privateKey)
+  const walletAddress = wallet.address
+
+  // Step 2: Resolve contract addresses via AddressBook
+  console.log(chalk.blue('Resolving contract addresses from AddressBook...'))
+  const addresses = await resolveNetworkAddresses(networkConfig)
+
+  // Step 3: Check ST balance and Billing balance, then confirm
+  const [stBalance, billingBalance] = await Promise.all([
+    checkSTBalance(networkConfig, addresses, walletAddress),
+    checkBillingBalance(networkConfig, addresses, walletAddress)
+  ])
+  const confirmed = await confirmNoPlatformUpload(walletAddress, stBalance, billingBalance, addresses, networkConfig)
+  if (!confirmed) {
+    console.log('Upload cancelled.')
+    process.exit(0)
+  }
+
+  // Step 4: Build processor
+  if (!options.skipBuild) {
+    await buildProcessor(false, options)
+  }
+
+  const processorFile = path.join(process.cwd(), 'dist/lib.js')
+  if (!fs.existsSync(processorFile)) {
+    console.error(chalk.red('File not found:', processorFile, "- don't use --skip-build"))
+    process.exit(1)
+  }
+
+  const codeBuffer = fs.readFileSync(processorFile)
+  const stat = fs.statSync(processorFile)
+  console.log('Packed processor file size', Math.floor(stat.size / 1024) + 'K, last modified', stat.mtime)
+
+  // Step 5: Upload to IPFS
+  const ipfsPutUrl = options.ipfsPutUrl || 'https://api.sentio.xyz/v1/ipfs/add'
+  console.log(chalk.blue(`Uploading processor to IPFS (${ipfsPutUrl})...`))
+  const cid = await uploadToIPFS(codeBuffer, ipfsPutUrl)
+  console.log(chalk.green(`IPFS upload complete.`))
+  console.log('\t', chalk.blue('CID:'), cid)
+
+  // Step 6: Collect required chain IDs
+  let requiredChainIds = processorConfig.requiredChainIds || []
+  if (requiredChainIds.length === 0 && options.requiredChainId) {
+    requiredChainIds = options.requiredChainId
+  }
+  if (requiredChainIds.length === 0) {
+    const chainIds = new Set<string>()
+    if (processorConfig.contracts) {
+      for (const contract of processorConfig.contracts) {
+        chainIds.add(String(contract.chain))
+      }
+    }
+    if (processorConfig.networkOverrides) {
+      for (const override of processorConfig.networkOverrides) {
+        chainIds.add(String(override.chain))
+      }
+    }
+    requiredChainIds = Array.from(chainIds)
+  }
+  if (requiredChainIds.length === 0) {
+    console.error(
+      chalk.red(
+        'Error: No chain IDs found. Specify --required-chain-id or define contracts/networkOverrides in sentio.yaml.'
+      )
+    )
+    process.exit(1)
+  }
+
+  // Step 7: Derive processor ID from project name
+  const processorId = processorConfig.project.replace('/', '_')
+  const sdkVersion = getSdkVersion() || 'unknown'
+
+  // Step 8: Create processor on-chain
+  await createProcessorOnChain(networkConfig, addresses, wallet, processorId, cid, requiredChainIds, sdkVersion)
+
+  // Step 9: Start processor on-chain
+  await startProcessorOnChain(networkConfig, addresses, wallet, processorId)
+
+  console.log()
+  console.log(chalk.green('=== Upload Complete ==='))
+  console.log('\t', chalk.blue('Processor ID:'), processorId)
+  console.log('\t', chalk.blue('IPFS CID:'), cid)
+  console.log('\t', chalk.blue('Network:'), network)
+  const codeHash = createHash('sha256').update(codeBuffer).digest('hex')
+  console.log('\t', chalk.blue('sha256:'), codeHash)
 }
 
 function parseCheckpoints(

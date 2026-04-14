@@ -243,6 +243,9 @@ importers:
       dotenv:
         specifier: ^17.0.0
         version: 17.2.2
+      ethers:
+        specifier: npm:@sentio/ethers@6.13.1-patch.6
+        version: '@sentio/ethers@6.13.1-patch.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)'
       express:
         specifier: ^5.0.0
         version: 5.2.1

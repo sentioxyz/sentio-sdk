@@ -19,6 +19,7 @@ import { createPriceCommand } from './commands/price.js'
 import { createSimulationCommand } from './commands/simulation.js'
 import { createEndpointCommand } from './commands/endpoint.js'
 import { createDashboardCommand } from './commands/dashboard.js'
+import { createStopProcessorCommand } from './commands/stop-processor.js'
 import { enableApiDebug } from './api.js'
 import { printVersions } from './utils.js'
 
@@ -52,5 +53,6 @@ program.addCommand(createPriceCommand())
 program.addCommand(createSimulationCommand())
 program.addCommand(createEndpointCommand())
 program.addCommand(createDashboardCommand())
+program.addCommand(createStopProcessorCommand())
 
 program.parse()

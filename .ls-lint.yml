@@ -46,3 +46,4 @@ ignore:
   - packages/action/node_modules
   - packages/action/lib
   - .claude
+  - .pnpm-store

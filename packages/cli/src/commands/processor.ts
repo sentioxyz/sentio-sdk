@@ -337,7 +337,7 @@ async function runProcessorResume(processorId: string | undefined, options: Proc
   })
 }
 
-async function runProcessorStop(processorId: string | undefined, options: ProcessorOptions & { yes?: boolean }) {
+export async function runProcessorStop(processorId: string | undefined, options: ProcessorOptions & { yes?: boolean }) {
   const resolvedProcessorId = await resolveAndConfirmProcessor('stop', processorId, options)
   if (!resolvedProcessorId) return
   const context = createApiContext(options)
