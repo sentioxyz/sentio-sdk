@@ -3,7 +3,7 @@ import process from 'process'
 import path from 'path'
 import fs from 'fs-extra'
 import fetch from 'node-fetch'
-import { AptosChainId, ChainId, StarknetChainId, SuiChainId } from '@sentio/chain'
+import { AptosChainId, ChainId, SuiChainId } from '@sentio/chain'
 
 import type { Aptos } from '@aptos-labs/ts-sdk'
 import type { IotaClient } from '@iota/iota-sdk/client'
@@ -11,7 +11,6 @@ import type { SuiJsonRpcClient } from '@mysten/sui/jsonRpc'
 import { ReadKey } from './key.js'
 import { Auth } from './commands/upload.js'
 import { getApiUrl } from './utils.js'
-import type { RpcProvider as Starknet } from 'starknet'
 
 export async function getABI(
   chain: ChainId,
@@ -135,30 +134,6 @@ export async function getABI(
     console.log('aptos module not loaded')
   }
 
-  // starknet
-  try {
-    const Starknet = (await import('starknet')).RpcProvider
-    let starknetClient: Starknet | undefined
-
-    switch (chain) {
-      case StarknetChainId.STARKNET_MAINNET:
-        starknetClient = new Starknet({
-          nodeUrl: 'https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_8/8sD5yitBslIYCPFzSq_Q1ObJHqPlZxFw'
-        })
-        break
-      case StarknetChainId.STARKNET_SEPOLIA:
-        starknetClient = new Starknet({
-          nodeUrl: 'https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_8/8sD5yitBslIYCPFzSq_Q1ObJHqPlZxFw'
-        })
-        break
-    }
-    if (starknetClient) {
-      const clazz = await starknetClient.getClassAt(address, 'latest')
-      return { abi: clazz.abi, name }
-    }
-  } catch (e) {
-    console.log('starknet module not loaded')
-  }
 
   // ethereum
   try {
@@ -206,7 +181,7 @@ export async function getABI(
 
 export function getABIFilePath(chain: string, name: string, address?: string, folder?: string): string {
   let subpath
-  let filename = name ?? address
+  const filename = name ?? address
   switch (chain) {
     case AptosChainId.APTOS_MAINNET:
       subpath = 'aptos'
@@ -234,14 +209,6 @@ export function getABIFilePath(chain: string, name: string, address?: string, fo
       break
     case SuiChainId.IOTA_TESTNET:
       subpath = 'iota/testnet'
-      break
-    case StarknetChainId.STARKNET_MAINNET:
-      subpath = 'starknet'
-      filename = name && address ? `${name}-${address}` : (name ?? address)
-      break
-    case StarknetChainId.STARKNET_SEPOLIA:
-      subpath = 'starknet/sepolia'
-      filename = name && address ? `${name}-${address}` : (name ?? address)
       break
     default:
       subpath = 'eth'
