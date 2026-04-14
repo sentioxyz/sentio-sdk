@@ -137,7 +137,7 @@ export function getWalletFromPrivateKey(privateKey: string): ethers.Wallet {
 export function requirePrivateKey(): string {
   const pk = process.env.PRIVATE_KEY
   if (!pk) {
-    console.error(chalk.red('Error: $PRIVATE_KEY environment variable is required for --no-platform mode.'))
+    console.error(chalk.red('Error: $PRIVATE_KEY environment variable is required for Sentio Network direct transactions.'))
     console.error(chalk.red('Set it with: export PRIVATE_KEY=0x...'))
     process.exit(1)
   }
