@@ -13,7 +13,7 @@ import readline from 'readline'
 import JSZip from 'jszip'
 import { UserInfo } from '../../../protos/lib/service/common/protos/common.js'
 import { CommandOptionsType } from './types.js'
-import { Auth, DefaultBatchUploader, IPFSBatchUploader, WalrusBatchUploader } from '../uploader.js'
+import { Auth, DefaultBatchUploader, FileType, IPFSBatchUploader, WalrusBatchUploader } from '../uploader.js'
 export { type Auth } from '../uploader.js'
 
 function myParseInt(value: string, dummyPrevious: number): number {
@@ -322,6 +322,15 @@ async function checkOrCreateProject(options: YamlProjectConfig, auth: Auth) {
     )
     process.exit(1)
   }
+  if (!options.sentioNetwork && project.sentioNetwork === true) {
+    console.error(
+      chalk.red(
+        `Project ${project?.slug} is a Sentio Network project. Please add the --sentio-network flag when uploading.\n` +
+          `Example: sentio upload --sentio-network testnet`
+      )
+    )
+    process.exit(1)
+  }
   return project?.id
 }
 
@@ -421,6 +430,26 @@ export async function uploadFile(
           ? new IPFSBatchUploader(config, auth)
           : new DefaultBatchUploader(config, auth)
 
+      // Initialize upload and handle confirmation
+      const fileTypes: Record<string, number> = {
+        source: FileType.SOURCE,
+        code: FileType.PROCESSOR
+      }
+      const initResponse = await uploader.initUpload(fileTypes)
+
+      if (initResponse.warning) {
+        console.log(chalk.yellow(initResponse.warning))
+      }
+
+      if (initResponse.replacing_version && !config.silentOverwrite) {
+        const confirmed = await confirm(
+          `This will replace processor version ${initResponse.replacing_version}. Continue?`
+        )
+        if (!confirmed) {
+          process.exit(0)
+        }
+      }
+
       // Handle variables update if needed
       if (config.variables && config.variables.length > 0) {
         const ret = await updateVariables(projectId, config, auth)
@@ -439,7 +468,8 @@ export async function uploadFile(
         config.debug || options.debug,
         continueFrom,
         config.networkOverrides,
-        rollbackMap
+        rollbackMap,
+        initResponse
       )
 
       console.log(chalk.green('Upload success: '))
