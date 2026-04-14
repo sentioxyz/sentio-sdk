@@ -142,10 +142,7 @@ async function runNoPlatformUpload(
   console.log('\t', chalk.blue('CID:'), cid)
 
   // Step 6: Collect required chain IDs
-  let requiredChainIds = processorConfig.requiredChainIds || []
-  if (requiredChainIds.length === 0 && options.requiredChainId) {
-    requiredChainIds = options.requiredChainId
-  }
+  let requiredChainIds = options.requiredChainId || processorConfig.requiredChainIds || []
   if (requiredChainIds.length === 0) {
     const chainIds = new Set<string>()
     if (processorConfig.contracts) {
