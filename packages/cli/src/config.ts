@@ -10,7 +10,7 @@ const HostMap: { [host: string]: string } = {
   prod: 'https://app.sentio.xyz'
 }
 
-export const CHAIN_TYPES = ['eth', 'solana', 'aptos', 'sui', 'iota', 'fuel', 'starknet']
+export const CHAIN_TYPES = ['eth', 'solana', 'aptos', 'sui', 'iota', 'fuel']
 
 export interface YamlContractConfig {
   address: string

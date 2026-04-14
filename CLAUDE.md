@@ -43,7 +43,6 @@ The SDK supports multiple blockchain ecosystems through dedicated modules in `pa
 - **Sui (`sui/`)**: Move-based blockchain with object and transaction processing
 - **IOTA (`iota/`)**: Move-based blockchain similar to Sui
 - **Solana (`solana/`)**: Solana blockchain with program and instruction processing
-- **Starknet (`stark/`)**: Cairo-based blockchain with event and transaction processing
 - **Bitcoin (`btc/`)**: Bitcoin blockchain with transaction and UTXO processing
 - **Cosmos (`cosmos/`)**: Cosmos SDK-based chains with transaction processing
 - **Fuel (`fuel/`)**: Fuel VM blockchain with asset and transaction processing
