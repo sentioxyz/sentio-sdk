@@ -23,7 +23,10 @@ import {
   uploadToIPFS,
   createProcessorOnChain,
   startProcessorOnChain,
-  confirmNoPlatformUpload
+  stopProcessorOnChain,
+  confirmNoPlatformUpload,
+  getProcessorOnChain,
+  deleteProcessorOnChain
 } from '../network.js'
 import { Auth, DefaultBatchUploader, FileType, IPFSBatchUploader, WalrusBatchUploader } from '../uploader.js'
 export { type Auth } from '../uploader.js'
@@ -167,8 +170,49 @@ async function runNoPlatformUpload(
   }
 
   // Step 7: Derive processor ID from project name
-  const processorId = processorConfig.project.replace('/', '_')
+  let processorId = processorConfig.project.replace('/', '_')
   const sdkVersion = getSdkVersion() || 'unknown'
+
+  // Step 7.5: Check if processor already exists on-chain
+  console.log(chalk.blue('Checking if processor already exists on-chain...'))
+  const existingProcessor = await getProcessorOnChain(networkConfig, addresses, processorId)
+
+  if (existingProcessor) {
+    const existingOwner = existingProcessor.owner.toLowerCase()
+    const currentWallet = wallet.address.toLowerCase()
+
+    if (existingOwner === currentWallet) {
+      // Same owner — prompt to replace
+      console.log(chalk.yellow(`Processor "${processorId}" already exists (owned by you).`))
+      const shouldReplace = await confirm(`Replace existing processor "${processorId}"?`)
+      if (!shouldReplace) {
+        console.log('Upload cancelled.')
+        process.exit(0)
+      }
+      // Stop and delete existing processor before re-creating
+      await stopProcessorOnChain(networkConfig, addresses, wallet, processorId)
+      await deleteProcessorOnChain(networkConfig, addresses, wallet, processorId)
+    } else {
+      // Different owner — prompt to rename
+      console.log(
+        chalk.yellow(
+          `Processor "${processorId}" already exists and is owned by ${existingProcessor.owner} (not your wallet ${wallet.address}).`
+        )
+      )
+      const randomSuffix = Math.random().toString(36).substring(2, 8)
+      const defaultNewId = `${processorId}-${randomSuffix}`
+
+      const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
+      const newId: string = await new Promise((resolve) =>
+        rl.question(`Enter a new processor ID [${defaultNewId}]: `, (answer) => {
+          rl.close()
+          resolve(answer.trim() || defaultNewId)
+        })
+      )
+      processorId = newId
+      console.log(chalk.blue(`Using processor ID: ${processorId}`))
+    }
+  }
 
   // Step 8: Create processor on-chain
   await createProcessorOnChain(networkConfig, addresses, wallet, processorId, cid, requiredChainIds, sdkVersion)

@@ -40,7 +40,7 @@ const ADDRESS_BOOK_ABI = [
   'function getAddress(bytes32 id) view returns (address)'
 ]
 
-// ProcessorRegistry: createProcessor
+// ProcessorRegistry: createProcessor, getProcessor, deleteProcessor
 const PROCESSOR_REGISTRY_ABI = [
   `function createProcessor(
     string id,
@@ -49,7 +49,20 @@ const PROCESSOR_REGISTRY_ABI = [
     string sdkVersion
   ) returns (string)`,
   'event ProcessorCreated(string indexed processorId)',
-  'function getAllocations(string processorId) view returns (tuple(uint256 indexerId, uint256 timestamp, bool indexerReady)[])'
+  'function getAllocations(string processorId) view returns (tuple(uint256 indexerId, uint256 timestamp, bool indexerReady)[])',
+  `function getProcessor(string processorId) view returns (
+    tuple(
+      string id,
+      bool active,
+      uint256 createdAt,
+      address owner,
+      string sdkVersion,
+      tuple(string chainId, bool enableRpc, bool enableTrace)[] requireChains,
+      tuple(uint8 sourceType, string ipfsCid) source,
+      tuple(uint256 indexerId, uint256 timestamp, bool indexerReady)[] allocations
+    )
+  )`,
+  'function deleteProcessor(string processorId)'
 ]
 
 // Controller: startProcessor / stopProcessor
@@ -137,7 +150,9 @@ export function getWalletFromPrivateKey(privateKey: string): ethers.Wallet {
 export function requirePrivateKey(): string {
   const pk = process.env.PRIVATE_KEY
   if (!pk) {
-    console.error(chalk.red('Error: $PRIVATE_KEY environment variable is required for Sentio Network direct transactions.'))
+    console.error(
+      chalk.red('Error: $PRIVATE_KEY environment variable is required for Sentio Network direct transactions.')
+    )
     console.error(chalk.red('Set it with: export PRIVATE_KEY=0x...'))
     process.exit(1)
   }
@@ -193,6 +208,70 @@ export async function uploadToIPFS(fileBuffer: Buffer, ipfsUrl: string): Promise
 }
 
 // --- Contract Interactions ---
+
+export interface OnChainProcessor {
+  id: string
+  active: boolean
+  createdAt: bigint
+  owner: string
+  sdkVersion: string
+}
+
+/**
+ * Fetch processor info from on-chain registry. Returns null if the processor does not exist.
+ */
+export async function getProcessorOnChain(
+  config: SentioNetworkConfig,
+  addresses: ResolvedAddresses,
+  processorId: string
+): Promise<OnChainProcessor | null> {
+  const provider = new ethers.JsonRpcProvider(config.rpcUrl)
+  const registry = new ethers.Contract(addresses.processorRegistry, PROCESSOR_REGISTRY_ABI, provider)
+
+  try {
+    const result = await registry.getProcessor(processorId)
+    // result is a tuple: (id, active, createdAt, owner, sdkVersion, requireChains, source, allocations)
+    const id: string = result[0]
+    if (!id || id === '') {
+      return null
+    }
+    return {
+      id,
+      active: result[1],
+      createdAt: result[2],
+      owner: result[3],
+      sdkVersion: result[4]
+    }
+  } catch {
+    // Contract reverts if processor doesn't exist
+    return null
+  }
+}
+
+export async function deleteProcessorOnChain(
+  config: SentioNetworkConfig,
+  addresses: ResolvedAddresses,
+  wallet: ethers.Wallet,
+  processorId: string
+): Promise<string> {
+  const provider = new ethers.JsonRpcProvider(config.rpcUrl)
+  const signer = wallet.connect(provider)
+
+  const registry = new ethers.Contract(addresses.processorRegistry, PROCESSOR_REGISTRY_ABI, signer)
+
+  console.log(chalk.blue('Deleting existing processor on-chain...'))
+  const tx = await registry.deleteProcessor(processorId)
+  console.log(chalk.gray(`  Tx hash: ${tx.hash}`))
+  console.log(chalk.blue('Waiting for confirmation...'))
+
+  const receipt = await tx.wait()
+  if (receipt.status === 0) {
+    throw new Error(`deleteProcessor transaction failed. Tx: ${config.explorerUrl}/tx/${tx.hash}`)
+  }
+
+  console.log(chalk.green(`Processor deleted. Tx: ${config.explorerUrl}/tx/${tx.hash}`))
+  return tx.hash
+}
 
 export async function createProcessorOnChain(
   config: SentioNetworkConfig,
