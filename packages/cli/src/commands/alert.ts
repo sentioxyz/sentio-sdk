@@ -136,7 +136,10 @@ function createAlertCreateCommand() {
     .option('--type <type>', 'Alert type: METRIC, LOG, or SQL')
     .option('--subject <text>', 'Alert subject/title')
     .option('--message <text>', 'Optional alert message template')
-    .option('--query <text>', 'Inline log query or SQL when not using --file/--stdin')
+    .option(
+      '--query <text>',
+      'Inline query. LOG: Elasticsearch query-string syntax (e.g. amount:>1000, status:error). SQL: full SQL statement.'
+    )
     .option('--event <name>', 'Inline event query for METRIC alerts')
     .option('--metric <name>', 'Inline metric query for METRIC alerts')
     .option('--alias <alias>', 'Alias for the inline METRIC query')
@@ -161,7 +164,7 @@ function createAlertCreateCommand() {
       `
 
 Examples:
-  $ sentio alert create --project sentio/coinbase --type LOG --subject "Large transfer logs" --query 'amount > 1000' --op '>' --threshold 0
+  $ sentio alert create --project sentio/coinbase --type LOG --subject "Large transfer logs" --query 'amount:>1000' --op '>' --threshold 0
   $ sentio alert create --project sentio/coinbase --type SQL --subject "Large transfer(SQL demo)" --query 'select timestamp, amount from transfer where amount > 1000' --time-column timestamp --value-column amount --sql-aggr MAX --op '>' --threshold 1000
   $ sentio alert create --project sentio/coinbase --type METRIC --subject "Burn spike" --metric burn --filter meta.chain=1 --aggr avg --group-by meta.address --op '>' --threshold 100
   $ sentio alert create --project sentio/coinbase --type METRIC --subject "Transfer anomaly" --event Transfer --filter amount>0 --aggr total --func 'delta(1m)' --op '>' --threshold 100
@@ -916,11 +919,14 @@ Metric alert example:
             disabled: false
 
 Log alert example:
+  NOTE: logCondition.query uses Elasticsearch query-string syntax.
+  Ranges MUST use field:>value form — C-style "field > value" is rejected at evaluation time.
+  Examples: amount:>1000000  timestamp:>=2024-01-01  amount:[1000 TO 9999]  status:error
   rule:
     alertType: LOG
     subject: large transfer logs
     logCondition:
-      query: amount > 1000
+      query: amount:>1000
       comparisonOp: ">"
       threshold: 0
 
