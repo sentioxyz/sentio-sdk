@@ -7,6 +7,7 @@ import {
   createApiContext,
   handleCommandError,
   loadJsonInput,
+  postApiJson,
   resolveProjectRef,
   unwrapApiResult
 } from '../api.js'
@@ -30,6 +31,12 @@ interface DashboardImportOptions extends DashboardOptions {
   overrideLayouts?: boolean
 }
 
+interface DashboardCreateOptions extends DashboardOptions {
+  title?: string
+  file?: string
+  stdin?: boolean
+}
+
 interface AddPanelOptions extends DashboardOptions {
   panelName?: string
   type?: string
@@ -48,6 +55,7 @@ interface AddPanelOptions extends DashboardOptions {
 export function createDashboardCommand() {
   const dashboardCommand = new Command('dashboard').description('Manage Sentio dashboards')
   dashboardCommand.addCommand(createDashboardListCommand())
+  dashboardCommand.addCommand(createDashboardCreateCommand())
   dashboardCommand.addCommand(createDashboardExportCommand())
   dashboardCommand.addCommand(createDashboardImportCommand())
   dashboardCommand.addCommand(createDashboardAddPanelCommand())
@@ -62,6 +70,23 @@ function createDashboardListCommand() {
     .action(async (options, command) => {
       try {
         await runDashboardList(options)
+      } catch (error) {
+        handleDashboardCommandError(error, command)
+      }
+    })
+}
+
+function createDashboardCreateCommand() {
+  return withOutputOptions(
+    withSharedProjectOptions(withAuthOptions(new Command('create').description('Create a dashboard for a project')))
+  )
+    .showHelpAfterError()
+    .requiredOption('--title <name>', 'Dashboard title')
+    .option('--file <path>', 'Read initial dashboard JSON or YAML from file')
+    .option('--stdin', 'Read initial dashboard JSON or YAML from stdin')
+    .action(async (options, command) => {
+      try {
+        await runDashboardCreate(options)
       } catch (error) {
         handleDashboardCommandError(error, command)
       }
@@ -197,6 +222,18 @@ async function runDashboardList(options: DashboardOptions) {
   printOutput(options, data)
 }
 
+async function runDashboardCreate(options: DashboardCreateOptions) {
+  const context = createApiContext(options)
+  const project = await resolveProjectRef(options, context, { ownerSlug: true })
+  const body = buildDashboardCreateBody(options, project)
+  const data = await postApiJson<{ dashboard?: Record<string, unknown> }>('/v1/dashboards', context, body)
+
+  printOutput(options, {
+    message: `Dashboard "${options.title}" created`,
+    dashboard: data.dashboard ?? data
+  })
+}
+
 async function runDashboardExport(dashboardId: string, options: DashboardOptions) {
   const context = createApiContext(options)
   const response = await WebService.exportDashboard({
@@ -227,6 +264,47 @@ async function runDashboardImport(dashboardId: string, options: DashboardImportO
   })
   const data = unwrapApiResult(response)
   printOutput(options, { message: `Dashboard imported into ${dashboardId}`, dashboard: data.dashboard })
+}
+
+function buildDashboardCreateBody(options: DashboardCreateOptions, project: { owner: string; slug: string }) {
+  const input = loadJsonInput(options)
+  const initialDashboard = normalizeDashboardInit(input)
+
+  return {
+    name: options.title,
+    projectOwner: project.owner,
+    projectSlug: project.slug,
+    ...initialDashboard
+  }
+}
+
+function normalizeDashboardInit(input: unknown) {
+  if (input === undefined) {
+    return {
+      panels: {},
+      layouts: {
+        responsiveLayouts: {
+          lg: { layouts: [] }
+        }
+      }
+    }
+  }
+
+  if (!input || typeof input !== 'object' || Array.isArray(input)) {
+    throw new CliError('Dashboard initialization data must be a JSON or YAML object.')
+  }
+
+  const dashboard = input as Record<string, unknown>
+  return {
+    panels: isRecord(dashboard.panels) ? dashboard.panels : {},
+    layouts: isRecord(dashboard.layouts)
+      ? dashboard.layouts
+      : {
+          responsiveLayouts: {
+            lg: { layouts: [] }
+          }
+        }
+  }
 }
 
 async function runDashboardAddPanel(dashboardId: string, options: AddPanelOptions) {
@@ -378,6 +456,10 @@ function collectOption(value: string, previous: string[] = []) {
   return previous
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value)
+}
+
 function withAuthOptions<T extends Command<any, any, any>>(command: T) {
   return command
     .option('--host <host>', 'Override Sentio host')
@@ -404,6 +486,10 @@ function handleDashboardCommandError(error: unknown, command?: Command) {
       error.message.startsWith('Invalid project ') ||
       error.message.startsWith('Dashboard ') ||
       error.message.startsWith('Provide --file or --stdin') ||
+      error.message.startsWith('Use either --file or --stdin') ||
+      error.message.startsWith('Expected JSON or YAML') ||
+      error.message.startsWith('Invalid JSON or YAML') ||
+      error.message.startsWith('Dashboard initialization data') ||
       error.message.startsWith('Provide exactly one data source') ||
       error.message.startsWith('Use exactly one of --sql') ||
       error.message.startsWith('Invalid chart type') ||
