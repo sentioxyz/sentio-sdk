@@ -46,7 +46,10 @@ describe('dashboard command', () => {
       panels: {},
       layouts: {
         responsiveLayouts: {
-          lg: { layouts: [] }
+          lg: { layouts: [] },
+          md: { layouts: [] },
+          sm: { layouts: [] },
+          xs: { layouts: [] }
         }
       }
     })

@@ -50,6 +50,9 @@ interface AddPanelOptions extends DashboardOptions {
   groupBy?: string[]
   aggr?: string
   func?: string[]
+  timeRangeStart?: string
+  timeRangeEnd?: string
+  timeRangeStep?: string
 }
 
 export function createDashboardCommand() {
@@ -162,6 +165,15 @@ function createDashboardAddPanelCommand() {
     .option('--group-by <field>', 'Group by event property or metric label', collectOption, [])
     .option('--aggr <aggregation>', 'Event: total|unique|AAU|DAU|WAU|MAU. Metric: avg|sum|min|max|count')
     .option('--func <function>', 'Function like topk(1), bottomk(1)', collectOption, [])
+    .option(
+      '--time-range-start <value>',
+      'Panel time range start: relative (e.g. -24h, -7d, -30m) or ISO date (e.g. 2024-01-01T00:00:00Z)'
+    )
+    .option(
+      '--time-range-end <value>',
+      'Panel time range end: relative (e.g. now, -1h) or ISO date. Defaults to now when --time-range-start is set.'
+    )
+    .option('--time-range-step <seconds>', 'Panel time range step in seconds (e.g. 3600)')
     .addHelpText(
       'after',
       `
@@ -199,7 +211,17 @@ Metric insights panel examples:
       --metric burn --filter meta.chain=1 --aggr avg --group-by meta.address
   $ sentio dashboard add-panel abc123 --project owner/slug \\
       --panel-name "Burn Rate Delta" --type LINE \\
-      --metric burn --aggr sum 
+      --metric burn --aggr sum
+
+Panel time range override examples:
+  $ sentio dashboard add-panel abc123 --project owner/slug \\
+      --panel-name "Last 24h Transfers" --type LINE \\
+      --event Transfer --aggr total \\
+      --time-range-start -24h --time-range-end now --time-range-step 3600
+  $ sentio dashboard add-panel abc123 --project owner/slug \\
+      --panel-name "Jan 2024 Volume" --type BAR \\
+      --sql "SELECT date, sum(amount) FROM Transfer GROUP BY date" \\
+      --time-range-start 2024-01-01T00:00:00Z --time-range-end 2024-02-01T00:00:00Z
 `
     )
     .action(async (dashboardId, options, command) => {
@@ -279,14 +301,19 @@ function buildDashboardCreateBody(options: DashboardCreateOptions, project: { ow
 }
 
 function normalizeDashboardInit(input: unknown) {
+  const emptyLayouts = {
+    responsiveLayouts: {
+      lg: { layouts: [] },
+      md: { layouts: [] },
+      sm: { layouts: [] },
+      xs: { layouts: [] }
+    }
+  }
+
   if (input === undefined) {
     return {
       panels: {},
-      layouts: {
-        responsiveLayouts: {
-          lg: { layouts: [] }
-        }
-      }
+      layouts: emptyLayouts
     }
   }
 
@@ -297,13 +324,7 @@ function normalizeDashboardInit(input: unknown) {
   const dashboard = input as Record<string, unknown>
   return {
     panels: isRecord(dashboard.panels) ? dashboard.panels : {},
-    layouts: isRecord(dashboard.layouts)
-      ? dashboard.layouts
-      : {
-          responsiveLayouts: {
-            lg: { layouts: [] }
-          }
-        }
+    layouts: isRecord(dashboard.layouts) ? dashboard.layouts : emptyLayouts
   }
 }
 
@@ -335,11 +356,13 @@ async function runDashboardAddPanel(dashboardId: string, options: AddPanelOption
   const panelId = generatePanelId()
   const chart = buildPanelChart(chartType, options)
 
-  const newPanel = {
+  const timeRangeOverride = buildTimeRangeOverride(options)
+  const newPanel: Record<string, unknown> = {
     id: panelId,
     name: options.panelName,
     dashboardId,
-    chart
+    chart,
+    ...(timeRangeOverride ? { timeRangeOverride } : {})
   }
 
   // 3. Compute layout position: place below all existing panels
@@ -364,16 +387,18 @@ async function runDashboardAddPanel(dashboardId: string, options: AddPanelOption
   const panels = { ...(dashboard.panels ?? {}) }
   panels[panelId] = newPanel as never
 
-  const updatedLayouts = [...existingLayouts, newLayout]
+  const existingResponsive = dashboard.layouts?.responsiveLayouts ?? {}
+  const updatedResponsive: Record<string, unknown> = { ...existingResponsive }
+  for (const bp of ['lg', 'md', 'sm', 'xs'] as const) {
+    const existing = (existingResponsive as Record<string, { layouts?: unknown[] } | undefined>)[bp]?.layouts ?? []
+    updatedResponsive[bp] = { layouts: [...existing, newLayout] }
+  }
 
   const dashboardJson: Record<string, unknown> = {
     ...dashboard,
     panels,
     layouts: {
-      responsiveLayouts: {
-        ...(dashboard.layouts?.responsiveLayouts ?? {}),
-        lg: { layouts: updatedLayouts }
-      }
+      responsiveLayouts: updatedResponsive
     }
   }
 
@@ -391,6 +416,43 @@ async function runDashboardAddPanel(dashboardId: string, options: AddPanelOption
     panelId,
     dashboard: importData.dashboard
   })
+}
+
+function buildTimeRangeLike(value: string): Record<string, unknown> {
+  const relMatch = value.match(/^(-?\d+)\s*([smhdwMy])$/)
+  if (relMatch) {
+    return { relativeTime: { unit: relMatch[2], value: Number(relMatch[1]) } }
+  }
+  if (value === 'now' || value === '0') {
+    return { relativeTime: { unit: 'h', value: 0 } }
+  }
+  const ts = Date.parse(value)
+  if (!Number.isNaN(ts)) {
+    return { absoluteTime: String(ts) }
+  }
+  throw new CliError(
+    `Invalid time range value "${value}". Use a relative offset (e.g. -24h, -7d, -30m, now) or an ISO date string.`
+  )
+}
+
+function buildTimeRangeOverride(options: AddPanelOptions): Record<string, unknown> | undefined {
+  if (!options.timeRangeStart && !options.timeRangeEnd) {
+    return undefined
+  }
+  const timeRange: Record<string, unknown> = {}
+  if (options.timeRangeStart) {
+    timeRange.start = buildTimeRangeLike(options.timeRangeStart)
+  }
+  if (options.timeRangeEnd) {
+    timeRange.end = buildTimeRangeLike(options.timeRangeEnd)
+  } else {
+    // default end to "now" when start is provided
+    timeRange.end = { relativeTime: { unit: 'h', value: 0 } }
+  }
+  if (options.timeRangeStep) {
+    timeRange.step = options.timeRangeStep
+  }
+  return { enabled: true, timeRange }
 }
 
 function buildPanelChart(chartType: string, options: AddPanelOptions) {
@@ -496,7 +558,8 @@ function handleDashboardCommandError(error: unknown, command?: Command) {
       error.message.startsWith('Invalid aggregation') ||
       error.message.startsWith('Invalid metric aggregation') ||
       error.message.startsWith('Invalid filter') ||
-      error.message.startsWith('Invalid metric selector'))
+      error.message.startsWith('Invalid metric selector') ||
+      error.message.startsWith('Invalid time range value'))
   ) {
     console.error(error.message)
     if (command) {
