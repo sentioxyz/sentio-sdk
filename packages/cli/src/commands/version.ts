@@ -7,7 +7,7 @@ export function createVersionCommand() {
   })
 }
 
-function version() {
+export function version() {
   console.log('CLI Version: ', getCliVersion())
   const sdkVersion = getSdkVersion()
   if (sdkVersion) {
