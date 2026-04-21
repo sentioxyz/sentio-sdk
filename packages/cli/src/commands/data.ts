@@ -16,6 +16,62 @@ import {
 } from '../api.js'
 
 const DEFAULT_RANGE_STEP = 3600
+
+// Valid function names sourced from sentio/app/lib/functions.ts
+const VALID_METRIC_FUNCTIONS: ReadonlySet<string> = new Set([
+  // Math
+  'abs',
+  'ceil',
+  'floor',
+  'round',
+  'log2',
+  'log10',
+  'ln',
+  // Rollup
+  'rollup_avg',
+  'rollup_count',
+  'rollup_last',
+  'rollup_max',
+  'rollup_min',
+  'rollup_sum',
+  'rollup_delta',
+  // Aggregate Over Time
+  'avg_over_time',
+  'count_over_time',
+  'last_over_time',
+  'max_over_time',
+  'min_over_time',
+  'sum_over_time',
+  'delta_over_time',
+  // Rate
+  'rate',
+  'irate',
+  'delta',
+  'moving_delta',
+  // Rank
+  'topk',
+  'bottomk',
+  // Time
+  'timestamp',
+  'day_of_year',
+  'day_of_month',
+  'day_of_week',
+  'year',
+  'month',
+  'hour',
+  'minute',
+  // TimeShift
+  'before',
+  'after'
+])
+
+const VALID_EVENT_FUNCTIONS: ReadonlySet<string> = new Set([
+  // Rank
+  'topk',
+  'bottomk',
+  // Delta
+  'delta'
+])
 interface CommonDataOptions {
   host?: string
   apiKey?: string
@@ -113,7 +169,7 @@ export function buildEventsInsightQueryBody(
           aggregation: buildEventAggregation(options.aggr),
           selectorExpr: buildSelectorExpr(options.filter),
           groupBy: normalizeListOption(options.groupBy),
-          functions: buildFunctions(options.func),
+          functions: buildFunctions(options.func, VALID_EVENT_FUNCTIONS),
           disabled: false
         }
       }
@@ -148,7 +204,7 @@ export function buildMetricsInsightQueryBody(
           query,
           labelSelector: buildMetricLabelSelector(options.filter),
           aggregate: buildMetricAggregate(options.aggr, options.groupBy),
-          functions: buildFunctions(options.func),
+          functions: buildFunctions(options.func, VALID_METRIC_FUNCTIONS),
           disabled: false
         }
       }
@@ -584,7 +640,8 @@ function shouldShowHelpForDataCommandError(error: CliError) {
     error.message.startsWith('Provide --query, --result, --file, or --stdin.') ||
     error.message.startsWith('Use only one of --query or --result.') ||
     error.message.startsWith('--async only works with --query.') ||
-    error.message.startsWith('Execution id is required.')
+    error.message.startsWith('Execution id is required.') ||
+    error.message.startsWith('Unknown function "')
   )
 }
 
@@ -730,8 +787,14 @@ function parseAnyValue(rawValue: string) {
   return { stringValue: unquotedValue }
 }
 
-function buildFunctions(functions?: string[]) {
-  return normalizeListOption(functions).map(parseFunctionCall)
+function buildFunctions(functions?: string[], validNames?: ReadonlySet<string>) {
+  return normalizeListOption(functions).map((f) => {
+    const parsed = parseFunctionCall(f)
+    if (validNames && !validNames.has(parsed.name)) {
+      throw new CliError(`Unknown function "${parsed.name}". Valid functions: ${[...validNames].sort().join(', ')}.`)
+    }
+    return parsed
+  })
 }
 
 function parseFunctionCall(value: string) {
