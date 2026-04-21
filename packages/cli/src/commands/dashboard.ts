@@ -559,7 +559,8 @@ function handleDashboardCommandError(error: unknown, command?: Command) {
       error.message.startsWith('Invalid metric aggregation') ||
       error.message.startsWith('Invalid filter') ||
       error.message.startsWith('Invalid metric selector') ||
-      error.message.startsWith('Invalid time range value'))
+      error.message.startsWith('Invalid time range value') ||
+      error.message.startsWith('Unknown function "'))
   ) {
     console.error(error.message)
     if (command) {

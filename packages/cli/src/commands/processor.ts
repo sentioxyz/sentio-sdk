@@ -27,7 +27,7 @@ interface ProcessorOptions {
 }
 
 interface ProcessorStatusOptions extends ProcessorOptions {
-  version?: string
+  version?: string | number
 }
 
 interface ProcessorSourceOptions extends ProcessorOptions {
@@ -60,7 +60,11 @@ function createProcessorStatusCommand() {
     withSharedProjectOptions(withAuthOptions(new Command('status').description('Get processor status')))
   )
     .showHelpAfterError()
-    .option('--version <selector>', 'Version selector: active, pending, or all')
+    .option(
+      '--version <selector>',
+      'Version selector: active, pending, all, or a numeric version number',
+      parseVersionSelector
+    )
     .action(async (options, command) => {
       try {
         await runProcessorStatus(options)
@@ -176,22 +180,19 @@ async function runProcessorStatus(options: ProcessorStatusOptions) {
   const context = createApiContext(options)
   const project = await resolveProjectRef(options, context, { ownerSlug: true })
   const requestedVersion = normalizeVersionSelector(options.version)
+  const apiVersion = typeof requestedVersion === 'number' ? 'ALL' : (requestedVersion ?? 'ALL')
   const response = await ProcessorService.getProcessorStatusV2({
     path: {
       owner: project.owner,
       slug: project.slug
     },
     query: {
-      version: requestedVersion ?? 'ALL'
+      version: apiVersion
     },
     headers: context.headers
   })
   const data = unwrapApiResult(response)
-  if (!options.json) {
-    printOutput(options, shapeProcessorStatusOutput(data, requestedVersion))
-    return
-  }
-  printOutput(options, data)
+  printOutput(options, shapeProcessorStatusOutput(data, requestedVersion))
 }
 
 async function runProcessorSource(options: ProcessorSourceOptions) {
@@ -501,7 +502,7 @@ function handleProcessorCommandError(error: unknown, command?: Command) {
     error instanceof CliError &&
     (error.message.startsWith('Project is required.') ||
       error.message.startsWith('Invalid project ') ||
-      error.message.startsWith('Invalid version selector ') ||
+      error.message.startsWith('Invalid version selector') ||
       error.message.startsWith('Source file not found:'))
   ) {
     console.error(error.message)
@@ -610,15 +611,26 @@ function formatOutput(data: unknown) {
   return JSON.stringify(data, null, 2)
 }
 
-function normalizeVersionSelector(value?: string): 'ACTIVE' | 'PENDING' | 'ALL' | undefined {
-  if (!value) {
+function normalizeVersionSelector(value?: string | number): 'ACTIVE' | 'PENDING' | 'ALL' | number | undefined {
+  if (value === undefined) {
     return undefined
+  }
+  if (typeof value === 'number') {
+    return value
   }
   const normalized = value.toUpperCase()
   if (normalized === 'ACTIVE' || normalized === 'PENDING' || normalized === 'ALL') {
     return normalized
   }
-  throw new CliError(`Invalid version selector "${value}". Use active, pending, or all.`)
+  throw new CliError(`Invalid version selector "${value}". Use active, pending, all, or a version number.`)
+}
+
+function parseVersionSelector(value: string): string | number {
+  const num = Number.parseInt(value, 10)
+  if (!Number.isNaN(num) && String(num) === value) {
+    return num
+  }
+  return value
 }
 
 function parseInteger(value: string) {
@@ -639,7 +651,7 @@ function asNumber(value: unknown) {
 
 function shapeProcessorStatusOutput(
   data: { processors?: Array<Record<string, unknown>> },
-  versionSelector?: 'ACTIVE' | 'PENDING' | 'ALL'
+  versionSelector?: 'ACTIVE' | 'PENDING' | 'ALL' | number
 ) {
   const processors = Array.isArray(data.processors) ? data.processors : []
   if (versionSelector === 'ALL') {
@@ -649,6 +661,12 @@ function shapeProcessorStatusOutput(
     return {
       ...data,
       processors: processors.filter((processor) => asString(processor.versionState) === versionSelector)
+    }
+  }
+  if (typeof versionSelector === 'number') {
+    return {
+      ...data,
+      processors: processors.filter((processor) => asNumber(processor.version) === versionSelector)
     }
   }
   return {

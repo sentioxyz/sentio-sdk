@@ -3,7 +3,7 @@
 import { Command } from '@commander-js/extra-typings'
 import { createLoginCommand } from './commands/login.js'
 import { createCreateCommand } from './commands/create.js'
-import { createVersionCommand } from './commands/version.js'
+import { createVersionCommand, version } from './commands/version.js'
 import { createTestCommand } from './commands/test.js'
 import { createAddCommand } from './commands/add.js'
 import { createCompileCommand } from './commands/compile.js'
@@ -32,6 +32,11 @@ await printVersions()
 
 if (process.argv.includes('--debug')) {
   enableApiDebug()
+}
+
+if (process.argv.length === 3 && process.argv[2] === '--version') {
+  version()
+  process.exit(0)
 }
 
 program.addCommand(createLoginCommand())
