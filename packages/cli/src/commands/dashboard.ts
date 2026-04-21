@@ -246,7 +246,7 @@ async function runDashboardList(options: DashboardOptions) {
 
 async function runDashboardCreate(options: DashboardCreateOptions) {
   const context = createApiContext(options)
-  const project = await resolveProjectRef(options, context, { ownerSlug: true })
+  const project = await resolveProjectRef(options, context, { projectId: true })
   const body = buildDashboardCreateBody(options, project)
   const data = await postApiJson<{ dashboard?: Record<string, unknown> }>('/v1/dashboards', context, body)
 
@@ -288,14 +288,13 @@ async function runDashboardImport(dashboardId: string, options: DashboardImportO
   printOutput(options, { message: `Dashboard imported into ${dashboardId}`, dashboard: data.dashboard })
 }
 
-function buildDashboardCreateBody(options: DashboardCreateOptions, project: { owner: string; slug: string }) {
+function buildDashboardCreateBody(options: DashboardCreateOptions, project: { projectId?: string }) {
   const input = loadJsonInput(options)
   const initialDashboard = normalizeDashboardInit(input)
 
   return {
     name: options.title,
-    projectOwner: project.owner,
-    projectSlug: project.slug,
+    projectId: project.projectId,
     ...initialDashboard
   }
 }

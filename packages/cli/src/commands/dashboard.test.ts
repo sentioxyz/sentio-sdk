@@ -36,13 +36,13 @@ describe('dashboard command', () => {
       from: 'user'
     })
 
-    expect(requests).length(1)
-    expect(requests[0].url).equals('https://api.sentio.xyz/v1/dashboards')
-    expect(requests[0].init?.method).equals('POST')
-    expect(requests[0].body).deep.equals({
+    expect(requests).length(2)
+    expect(requests[0].url).equals('https://api.sentio.xyz/v1/project/sentio/demo')
+    expect(requests[1].url).equals('https://api.sentio.xyz/v1/dashboards')
+    expect(requests[1].init?.method).equals('POST')
+    expect(requests[1].body).deep.equals({
       name: 'Operations',
-      projectOwner: 'sentio',
-      projectSlug: 'demo',
+      projectId: 'project-demo-id',
       panels: {},
       layouts: {
         responsiveLayouts: {
@@ -86,10 +86,9 @@ describe('dashboard command', () => {
       { from: 'user' }
     )
 
-    expect(requests[0].body).deep.equals({
+    expect(requests[1].body).deep.equals({
       name: 'Operations',
-      projectOwner: 'sentio',
-      projectSlug: 'demo',
+      projectId: 'project-demo-id',
       panels: {
         panel_a: {
           id: 'panel_a',
@@ -141,10 +140,9 @@ describe('dashboard command', () => {
       { from: 'user' }
     )
 
-    expect(requests[0].body).deep.equals({
+    expect(requests[1].body).deep.equals({
       name: 'Operations',
-      projectOwner: 'sentio',
-      projectSlug: 'demo',
+      projectId: 'project-demo-id',
       panels: {
         panel_b: {
           id: 'panel_b',
@@ -168,6 +166,10 @@ function mockDashboardCreateFetch(requests: Array<{ url: string; init?: RequestI
     const url = typeof input === 'string' || input instanceof URL ? String(input) : input.url
     const body = init?.body ? JSON.parse(String(init.body)) : undefined
     requests.push({ url, init, body })
+
+    if (url === 'https://api.sentio.xyz/v1/project/sentio/demo') {
+      return jsonResponse({ project: { id: 'project-demo-id', owner: 'sentio', slug: 'demo' } })
+    }
 
     if (url === 'https://api.sentio.xyz/v1/dashboards' && init?.method === 'POST') {
       return jsonResponse({
