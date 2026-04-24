@@ -18,7 +18,8 @@ export class ProcessorTemplateProcessorState extends ListStateStorage<
 
 export abstract class BaseProcessorTemplate<
   TContract extends BaseContract,
-  TBoundContractView extends BoundContractView<TContract, ContractView<TContract>>
+  TBoundContractView extends BoundContractView<TContract, ContractView<TContract>>,
+  TProcessor extends BaseProcessor<TContract, TBoundContractView> = BaseProcessor<TContract, TBoundContractView>
 > {
   id: number
   blockHandlers: {
@@ -57,6 +58,7 @@ export abstract class BaseProcessorTemplate<
   }[] = []
 
   instances = new Set<string>()
+  private handlerFactory?: (instance: TProcessor, baseLabels: { [key: string]: string } | undefined) => void
 
   constructor() {
     this.id = ProcessorTemplateProcessorState.INSTANCE.getValues().length
@@ -109,6 +111,7 @@ export abstract class BaseProcessorTemplate<
     }
 
     const processor = this.bindInternal({ ...options, network: ctx.chainId })
+    this.handlerFactory?.(processor, options.baseLabels)
     for (const eh of this.eventHandlers) {
       // @ts-ignore friendly
       processor.onEthEvent(eh.handler, eh.filter, eh.fetchConfig, eh.preprocessHandler, eh.handlerName)
@@ -235,5 +238,11 @@ export abstract class BaseProcessorTemplate<
     return this
   }
 
-  protected abstract bindInternal(options: BindOptions): BaseProcessor<TContract, TBoundContractView>
+  protected abstract bindInternal(options: BindOptions): TProcessor
+
+  public configureHandlerFactory(
+    factory: (instance: TProcessor, baseLabels: { [key: string]: string } | undefined) => void
+  ) {
+    this.handlerFactory = factory
+  }
 }
