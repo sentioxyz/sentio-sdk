@@ -121,7 +121,7 @@ export function codeGenSentioFile(contract: Contract): string {
 
 export class ${contract.name}ProcessorTemplate extends BaseProcessorTemplate<${contract.name}, ${
     contract.name
-  }BoundContractView> {
+  }BoundContractView, ${contract.name}Processor> {
   bindInternal(options: BindOptions) {
     if (!options.name) {
       options.name = "${contract.name}"
