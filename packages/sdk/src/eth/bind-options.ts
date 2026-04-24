@@ -33,6 +33,9 @@ export function getOptionsSignature(opts: BindOptions): string {
   if (opts.endBlock) {
     sig.push(opts.endBlock.toString())
   }
+  if (opts.baseLabels && Object.keys(opts.baseLabels).length > 0) {
+    sig.push(JSON.stringify(Object.fromEntries(Object.entries(opts.baseLabels).sort())))
+  }
   return sig.join('_')
 }
 

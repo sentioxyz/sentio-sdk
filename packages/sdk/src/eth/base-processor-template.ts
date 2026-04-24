@@ -102,7 +102,8 @@ export abstract class BaseProcessorTemplate<
     options = { ...options, address: validateAndNormalizeAddress(options.address) }
     const sig = getOptionsSignature({
       address: options.address,
-      network: ctx.chainId
+      network: ctx.chainId,
+      baseLabels: options.baseLabels
     })
 
     if (this.instances.has(sig)) {

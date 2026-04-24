@@ -2,6 +2,7 @@ import { before, describe, test } from 'node:test'
 import { expect } from 'chai'
 
 import { StartRequest } from '@sentio/protos'
+import { PluginManager } from '@sentio/runtime'
 import { TestProcessorServer } from '../../testing/index.js'
 import { cleanTest } from '../../testing/test-processor-server.js'
 import { ERC20Processor, ERC20ProcessorTemplate } from '../builtin/erc20.js'
@@ -136,8 +137,32 @@ describe('Test Template handlerFactory', () => {
     expect(fromTopic.toLowerCase()).equals('0x000000000000000000000000' + FROM_ADDRESS.slice(2))
   })
 
-  test('handlerFactory is not called again for duplicate address', async () => {
+  test('same address with same labels is deduplicated', async () => {
     await service.start({ templateInstances })
     expect(factoryCallCount).equals(1)
+  })
+
+  test('same address with different labels creates a separate instance', async () => {
+    const OTHER_ADDRESS = '0x1111111111111111111111111111111111111111'
+    const templateId = templateInstances[0].templateId
+    await PluginManager.INSTANCE.updateTemplates({
+      chainId: '1',
+      templateInstances: [
+        {
+          contract: {
+            address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+            name: 'usdc',
+            chainId: '1',
+            abi: ''
+          },
+          startBlock: 0n,
+          endBlock: 0n,
+          templateId,
+          baseLabels: { address: OTHER_ADDRESS }
+        }
+      ]
+    })
+    expect(factoryCallCount).equals(2)
+    expect(factoryReceivedLabels).deep.equals({ address: OTHER_ADDRESS })
   })
 })
