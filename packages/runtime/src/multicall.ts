@@ -476,11 +476,6 @@ const DEPLOYMENTS = [
     url: 'https://sepolia.etherscan.io/address/0xcA11bde05977b3631167028862bE2a173976CA11#code'
   },
   {
-    name: 'Holesky',
-    chainId: 17000,
-    url: 'https://holesky.etherscan.io/address/0xcA11bde05977b3631167028862bE2a173976CA11#code'
-  },
-  {
     name: 'Xterio Chain',
     chainId: 112358,
     url: 'https://xterscan.io/address/0xcA11bde05977b3631167028862bE2a173976CA11?tab=contract'
