@@ -15,9 +15,9 @@ interface SentioNetworkConfig {
 
 const TESTNET_CONFIG: SentioNetworkConfig = {
   chainId: 7892101,
-  rpcUrl: 'https://testnet.sentio.xyz',
+  rpcUrl: 'https://sentio-testnet.rpc.sentio.xyz',
   explorerUrl: 'https://testnet-explorer.sentio.xyz',
-  addressBookAddress: '0x17d5aF5Ed9C2558B802bEfcCc5a94C36dE95BB0B'
+  addressBookAddress: '0x11cDDF46f16925aa630Af9D5158028E56309868f'
 }
 
 export function getSentioNetworkConfig(network: string): SentioNetworkConfig {
