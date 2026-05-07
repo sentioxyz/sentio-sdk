@@ -49,7 +49,6 @@ const PROCESSOR_REGISTRY_ABI = [
     string sdkVersion
   ) returns (string)`,
   'event ProcessorCreated(string indexed processorId)',
-  'function getAllocations(string processorId) view returns (tuple(uint256 indexerId, uint256 timestamp, bool indexerReady)[])',
   `function getProcessor(string processorId) view returns (
     tuple(
       string id,
@@ -59,14 +58,21 @@ const PROCESSOR_REGISTRY_ABI = [
       string sdkVersion,
       tuple(string chainId, bool enableRpc, bool enableTrace)[] requireChains,
       tuple(uint8 sourceType, string ipfsCid) source,
-      tuple(uint256 indexerId, uint256 timestamp, bool indexerReady)[] allocations
+      tuple(uint256 indexerId, uint256 allocationTime, bool indexerReady, uint256 replicaIndex)[] allocations
     )
   )`,
   'function deleteProcessor(string processorId)'
 ]
 
-// Controller: startProcessor / stopProcessor
-const CONTROLLER_ABI = ['function startProcessor(string processorId)', 'function stopProcessor(string processorId)']
+// Controller: startProcessor / stopProcessor / getAllocations
+const CONTROLLER_ABI = [
+  'function startProcessor(string processorId)',
+  'function stopProcessor(string processorId)',
+  'function getAllocations(string processorId) view returns (tuple(uint256 indexerId, uint256 allocationTime, bool indexerReady, uint256 replicaIndex)[])'
+]
+
+// Databases:  getProcessorDatabases
+const DATABASES_ABI = ['function getProcessorDatabases(string processorId) view returns (string[])']
 
 // ERC20: balanceOf + approve
 const ERC20_ABI = [
@@ -84,7 +90,8 @@ const ADDRESS_BOOK_KEYS = {
   processorRegistry: 'processor_registry',
   controller: 'controller',
   token: 'sentio_token',
-  billing: 'billing'
+  billing: 'billing',
+  databases: 'databases'
 } as const
 
 interface ResolvedAddresses {
@@ -93,6 +100,7 @@ interface ResolvedAddresses {
   controller: string
   token: string
   billing: string
+  databases: string
 }
 
 let cachedAddresses: ResolvedAddresses | undefined
@@ -122,19 +130,21 @@ export async function resolveNetworkAddresses(config: SentioNetworkConfig): Prom
     }
   }
 
-  const [processorRegistry, controller, token, billing] = await Promise.all([
+  const [processorRegistry, controller, token, billing, databases] = await Promise.all([
     resolveAddress(ADDRESS_BOOK_KEYS.processorRegistry),
     resolveAddress(ADDRESS_BOOK_KEYS.controller),
     resolveAddress(ADDRESS_BOOK_KEYS.token),
-    resolveAddress(ADDRESS_BOOK_KEYS.billing)
+    resolveAddress(ADDRESS_BOOK_KEYS.billing),
+    resolveAddress(ADDRESS_BOOK_KEYS.databases)
   ])
 
   console.log(chalk.gray(`ProcessorRegistry: ${processorRegistry}`))
   console.log(chalk.gray(`Controller:        ${controller}`))
   console.log(chalk.gray(`ST Token:          ${token}`))
   console.log(chalk.gray(`Billing:           ${billing}`))
+  console.log(chalk.gray(`Databases:         ${databases}`))
 
-  cachedAddresses = { addressBook: addressBookAddr, processorRegistry, controller, token, billing }
+  cachedAddresses = { addressBook: addressBookAddr, processorRegistry, controller, token, billing, databases }
   return cachedAddresses
 }
 
@@ -207,6 +217,37 @@ export async function uploadToIPFS(fileBuffer: Buffer, ipfsUrl: string): Promise
   return result.Hash
 }
 
+// --- Tx Helpers ---
+
+async function submitAndWait(
+  explorerUrl: string,
+  label: string,
+  txPromise: Promise<ethers.TransactionResponse>
+): Promise<ethers.TransactionResponse> {
+  let tx: ethers.TransactionResponse
+  try {
+    tx = await txPromise
+  } catch (err: any) {
+    throw new Error(`${label} failed to submit: ${err.shortMessage ?? err.message}`)
+  }
+
+  console.log(chalk.gray(`  Tx hash: ${explorerUrl}/tx/${tx.hash}`))
+  console.log(chalk.blue('Waiting for confirmation...'))
+
+  let receipt: ethers.TransactionReceipt | null
+  try {
+    receipt = await tx.wait()
+  } catch (err: any) {
+    throw new Error(`${label} failed: ${err.shortMessage ?? err.message}. Tx: ${explorerUrl}/tx/${tx.hash}`)
+  }
+
+  if (!receipt || receipt.status === 0) {
+    throw new Error(`${label} transaction reverted. Tx: ${explorerUrl}/tx/${tx.hash}`)
+  }
+
+  return tx
+}
+
 // --- Contract Interactions ---
 
 export interface OnChainProcessor {
@@ -260,17 +301,45 @@ export async function deleteProcessorOnChain(
   const registry = new ethers.Contract(addresses.processorRegistry, PROCESSOR_REGISTRY_ABI, signer)
 
   console.log(chalk.blue('Deleting existing processor on-chain...'))
-  const tx = await registry.deleteProcessor(processorId)
-  console.log(chalk.gray(`  Tx hash: ${tx.hash}`))
-  console.log(chalk.blue('Waiting for confirmation...'))
+  const tx = await submitAndWait(config.explorerUrl, 'deleteProcessor', registry.deleteProcessor(processorId))
+  console.log(chalk.green(`Processor deleted. Tx: ${config.explorerUrl}/tx/${tx.hash}`))
+  await waitForProcessorDatabaseCleanup(addresses, processorId, provider)
 
-  const receipt = await tx.wait()
-  if (receipt.status === 0) {
-    throw new Error(`deleteProcessor transaction failed. Tx: ${config.explorerUrl}/tx/${tx.hash}`)
+  return tx.hash
+}
+
+async function waitForProcessorDatabaseCleanup(
+  addresses: ResolvedAddresses,
+  processorId: string,
+  provider: ethers.JsonRpcProvider,
+  timeoutMs = 120_000,
+  pollIntervalMs = 5_000
+): Promise<void> {
+  const databases = new ethers.Contract(addresses.databases, DATABASES_ABI, provider)
+
+  // getProcessorDatabases has no active check — returns all db IDs still in storage.
+  // Only when this returns empty is it safe to recreate databases with the same IDs.
+  const dbIds: string[] = await databases.getProcessorDatabases(processorId)
+  if (dbIds.length === 0) {
+    return
   }
 
-  console.log(chalk.green(`Processor deleted. Tx: ${config.explorerUrl}/tx/${tx.hash}`))
-  return tx.hash
+  console.log(chalk.blue(`Waiting for ${dbIds.length} replica database(s) to be cleaned up...`))
+
+  const deadline = Date.now() + timeoutMs
+  while (Date.now() < deadline) {
+    await new Promise((resolve) => setTimeout(resolve, pollIntervalMs))
+
+    const remaining: string[] = await databases.getProcessorDatabases(processorId)
+    if (remaining.length === 0) {
+      console.log(chalk.green('All replica databases cleaned up.'))
+      return
+    }
+
+    console.log(chalk.gray(`  ${remaining.length} replica database(s) still pending cleanup...`))
+  }
+
+  throw new Error(`Timeout: processor databases not cleaned up within ${timeoutMs / 1000}s`)
 }
 
 export async function createProcessorOnChain(
@@ -304,15 +373,11 @@ export async function createProcessorOnChain(
   console.log(chalk.gray(`  Chains:        ${requiredChainIds.join(', ')}`))
   console.log(chalk.gray(`  SDK Version:   ${sdkVersion}`))
 
-  const tx = await registry.createProcessor(processorId, source, requireChains, sdkVersion)
-  console.log(chalk.gray(`  Tx hash: ${tx.hash}`))
-  console.log(chalk.blue('Waiting for confirmation...'))
-
-  const receipt = await tx.wait()
-  if (receipt.status === 0) {
-    throw new Error(`createProcessor transaction failed. Tx: ${config.explorerUrl}/tx/${tx.hash}`)
-  }
-
+  const tx = await submitAndWait(
+    config.explorerUrl,
+    'createProcessor',
+    registry.createProcessor(processorId, source, requireChains, sdkVersion)
+  )
   console.log(chalk.green(`Processor created. Tx: ${config.explorerUrl}/tx/${tx.hash}`))
   return tx.hash
 }
@@ -329,15 +394,7 @@ export async function startProcessorOnChain(
   const controller = new ethers.Contract(addresses.controller, CONTROLLER_ABI, signer)
 
   console.log(chalk.blue('Starting processor on-chain...'))
-  const tx = await controller.startProcessor(processorId)
-  console.log(chalk.gray(`  Tx hash: ${tx.hash}`))
-  console.log(chalk.blue('Waiting for confirmation...'))
-
-  const receipt = await tx.wait()
-  if (receipt.status === 0) {
-    throw new Error(`startProcessor transaction failed. Tx: ${config.explorerUrl}/tx/${tx.hash}`)
-  }
-
+  const tx = await submitAndWait(config.explorerUrl, 'startProcessor', controller.startProcessor(processorId))
   console.log(chalk.green(`Processor started. Tx: ${config.explorerUrl}/tx/${tx.hash}`))
   return tx.hash
 }
@@ -353,16 +410,15 @@ export async function stopProcessorOnChain(
 
   const controller = new ethers.Contract(addresses.controller, CONTROLLER_ABI, signer)
 
-  console.log(chalk.blue('Stopping processor on-chain...'))
-  const tx = await controller.stopProcessor(processorId)
-  console.log(chalk.gray(`  Tx hash: ${tx.hash}`))
-  console.log(chalk.blue('Waiting for confirmation...'))
-
-  const receipt = await tx.wait()
-  if (receipt.status === 0) {
-    throw new Error(`stopProcessor transaction failed. Tx: ${config.explorerUrl}/tx/${tx.hash}`)
+  // stopProcessor reverts with ProcessorNotAllocated if the processor has no active allocations
+  const allocations: unknown[] = await controller.getAllocations(processorId)
+  if (allocations.length === 0) {
+    console.log(chalk.gray('Processor has no allocations, skipping stopProcessor.'))
+    return ''
   }
 
+  console.log(chalk.blue('Stopping processor on-chain...'))
+  const tx = await submitAndWait(config.explorerUrl, 'stopProcessor', controller.stopProcessor(processorId))
   console.log(chalk.green(`Processor stopped. Tx: ${config.explorerUrl}/tx/${tx.hash}`))
   return tx.hash
 }
@@ -390,8 +446,10 @@ export async function confirmNoPlatformUpload(
       chalk.yellow(
         '  ⚠ Your Billing balance is 0. Indexing fees are charged from the Billing contract.\n' +
           '    You must deposit ST tokens into the Billing contract before your processor can run.\n' +
-          `    Use: cast send ${addresses.token} "approve(address,uint256)" ${addresses.billing} <amount> --rpc-url ${networkConfig.rpcUrl} --private-key $PRIVATE_KEY\n` +
-          `         cast send ${addresses.billing} "deposit(uint256)" <amount> --rpc-url ${networkConfig.rpcUrl} --private-key $PRIVATE_KEY`
+          '    Example (replace 100 with your desired ST amount):\n' +
+          `    export AMOUNT=$(cast to-wei 100 ether)\n` +
+          `    cast send ${addresses.token} "approve(address,uint256)" ${addresses.billing} $AMOUNT --rpc-url ${networkConfig.rpcUrl} --private-key $PRIVATE_KEY\n` +
+          `    cast send ${addresses.billing} "deposit(uint256)" $AMOUNT --rpc-url ${networkConfig.rpcUrl} --private-key $PRIVATE_KEY`
       )
     )
   }
