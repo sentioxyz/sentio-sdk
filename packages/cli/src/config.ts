@@ -88,7 +88,14 @@ export function getAuthConfig(host: string): {
 }
 
 export function overrideConfigWithOptions(config: YamlProjectConfig, options: any) {
-  finalizeProjectName(config, options.owner, options.name)
+  // In `--no-platform` (Sentio Network) mode, `--owner` is a 0x-prefixed
+  // Ethereum address identifying the on-chain processor owner — completely
+  // orthogonal to the platform's "<username>/<slug>" project namespace.
+  // Don't let it rewrite `config.project`, since that field is the source
+  // of the on-chain processor id and a 42-char address would always
+  // overflow `ProcessorRegistry.MAX_PROCESSOR_ID_LENGTH` (32).
+  const projectOwner = options.platform === false ? undefined : options.owner
+  finalizeProjectName(config, projectOwner, options.name)
   finalizeHost(config, options.host)
 
   if (options.debug) {
