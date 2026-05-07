@@ -217,6 +217,37 @@ export async function uploadToIPFS(fileBuffer: Buffer, ipfsUrl: string): Promise
   return result.Hash
 }
 
+// --- Tx Helpers ---
+
+async function submitAndWait(
+  explorerUrl: string,
+  label: string,
+  txPromise: Promise<ethers.TransactionResponse>
+): Promise<ethers.TransactionResponse> {
+  let tx: ethers.TransactionResponse
+  try {
+    tx = await txPromise
+  } catch (err: any) {
+    throw new Error(`${label} failed to submit: ${err.shortMessage ?? err.message}`)
+  }
+
+  console.log(chalk.gray(`  Tx hash: ${explorerUrl}/tx/${tx.hash}`))
+  console.log(chalk.blue('Waiting for confirmation...'))
+
+  let receipt: ethers.TransactionReceipt | null
+  try {
+    receipt = await tx.wait()
+  } catch (err: any) {
+    throw new Error(`${label} failed: ${err.shortMessage ?? err.message}. Tx: ${explorerUrl}/tx/${tx.hash}`)
+  }
+
+  if (!receipt || receipt.status === 0) {
+    throw new Error(`${label} transaction reverted. Tx: ${explorerUrl}/tx/${tx.hash}`)
+  }
+
+  return tx
+}
+
 // --- Contract Interactions ---
 
 export interface OnChainProcessor {
@@ -270,15 +301,7 @@ export async function deleteProcessorOnChain(
   const registry = new ethers.Contract(addresses.processorRegistry, PROCESSOR_REGISTRY_ABI, signer)
 
   console.log(chalk.blue('Deleting existing processor on-chain...'))
-  const tx = await registry.deleteProcessor(processorId)
-  console.log(chalk.gray(`  Tx hash: ${tx.hash}`))
-  console.log(chalk.blue('Waiting for confirmation...'))
-
-  const receipt = await tx.wait()
-  if (receipt.status === 0) {
-    throw new Error(`deleteProcessor transaction failed. Tx: ${config.explorerUrl}/tx/${tx.hash}`)
-  }
-
+  const tx = await submitAndWait(config.explorerUrl, 'deleteProcessor', registry.deleteProcessor(processorId))
   console.log(chalk.green(`Processor deleted. Tx: ${config.explorerUrl}/tx/${tx.hash}`))
   await waitForProcessorDatabaseCleanup(addresses, processorId, provider)
 
@@ -350,15 +373,11 @@ export async function createProcessorOnChain(
   console.log(chalk.gray(`  Chains:        ${requiredChainIds.join(', ')}`))
   console.log(chalk.gray(`  SDK Version:   ${sdkVersion}`))
 
-  const tx = await registry.createProcessor(processorId, source, requireChains, sdkVersion)
-  console.log(chalk.gray(`  Tx hash: ${tx.hash}`))
-  console.log(chalk.blue('Waiting for confirmation...'))
-
-  const receipt = await tx.wait()
-  if (receipt.status === 0) {
-    throw new Error(`createProcessor transaction failed. Tx: ${config.explorerUrl}/tx/${tx.hash}`)
-  }
-
+  const tx = await submitAndWait(
+    config.explorerUrl,
+    'createProcessor',
+    registry.createProcessor(processorId, source, requireChains, sdkVersion)
+  )
   console.log(chalk.green(`Processor created. Tx: ${config.explorerUrl}/tx/${tx.hash}`))
   return tx.hash
 }
@@ -375,15 +394,7 @@ export async function startProcessorOnChain(
   const controller = new ethers.Contract(addresses.controller, CONTROLLER_ABI, signer)
 
   console.log(chalk.blue('Starting processor on-chain...'))
-  const tx = await controller.startProcessor(processorId)
-  console.log(chalk.gray(`  Tx hash: ${tx.hash}`))
-  console.log(chalk.blue('Waiting for confirmation...'))
-
-  const receipt = await tx.wait()
-  if (receipt.status === 0) {
-    throw new Error(`startProcessor transaction failed. Tx: ${config.explorerUrl}/tx/${tx.hash}`)
-  }
-
+  const tx = await submitAndWait(config.explorerUrl, 'startProcessor', controller.startProcessor(processorId))
   console.log(chalk.green(`Processor started. Tx: ${config.explorerUrl}/tx/${tx.hash}`))
   return tx.hash
 }
@@ -407,15 +418,7 @@ export async function stopProcessorOnChain(
   }
 
   console.log(chalk.blue('Stopping processor on-chain...'))
-  const tx = await controller.stopProcessor(processorId)
-  console.log(chalk.gray(`  Tx hash: ${tx.hash}`))
-  console.log(chalk.blue('Waiting for confirmation...'))
-
-  const receipt = await tx.wait()
-  if (receipt.status === 0) {
-    throw new Error(`stopProcessor transaction failed. Tx: ${config.explorerUrl}/tx/${tx.hash}`)
-  }
-
+  const tx = await submitAndWait(config.explorerUrl, 'stopProcessor', controller.stopProcessor(processorId))
   console.log(chalk.green(`Processor stopped. Tx: ${config.explorerUrl}/tx/${tx.hash}`))
   return tx.hash
 }
