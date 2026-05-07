@@ -40,9 +40,16 @@ const ADDRESS_BOOK_ABI = [
   'function getAddress(bytes32 id) view returns (address)'
 ]
 
-// ProcessorRegistry: createProcessor, getProcessor, deleteProcessor
+// ProcessorRegistry: createProcessor (self + operator overloads), getProcessor, deleteProcessor
 const PROCESSOR_REGISTRY_ABI = [
   `function createProcessor(
+    string id,
+    tuple(uint8 sourceType, string ipfsCid) source,
+    tuple(string chainId, bool enableRpc, bool enableTrace)[] requireChains,
+    string sdkVersion
+  ) returns (string)`,
+  `function createProcessor(
+    address owner,
     string id,
     tuple(uint8 sourceType, string ipfsCid) source,
     tuple(string chainId, bool enableRpc, bool enableTrace)[] requireChains,
@@ -74,6 +81,9 @@ const CONTROLLER_ABI = [
 // Databases:  getProcessorDatabases
 const DATABASES_ABI = ['function getProcessorDatabases(string processorId) view returns (string[])']
 
+// Permissions: isOperator (used to pre-check operator delegation before submitting tx)
+const PERMISSIONS_ABI = ['function isOperator(address account, address operator) view returns (bool)']
+
 // ERC20: balanceOf + approve
 const ERC20_ABI = [
   'function balanceOf(address account) view returns (uint256)',
@@ -91,7 +101,8 @@ const ADDRESS_BOOK_KEYS = {
   controller: 'controller',
   token: 'sentio_token',
   billing: 'billing',
-  databases: 'databases'
+  databases: 'databases',
+  permissions: 'permissions'
 } as const
 
 interface ResolvedAddresses {
@@ -101,6 +112,7 @@ interface ResolvedAddresses {
   token: string
   billing: string
   databases: string
+  permissions: string
 }
 
 let cachedAddresses: ResolvedAddresses | undefined
@@ -130,12 +142,13 @@ export async function resolveNetworkAddresses(config: SentioNetworkConfig): Prom
     }
   }
 
-  const [processorRegistry, controller, token, billing, databases] = await Promise.all([
+  const [processorRegistry, controller, token, billing, databases, permissions] = await Promise.all([
     resolveAddress(ADDRESS_BOOK_KEYS.processorRegistry),
     resolveAddress(ADDRESS_BOOK_KEYS.controller),
     resolveAddress(ADDRESS_BOOK_KEYS.token),
     resolveAddress(ADDRESS_BOOK_KEYS.billing),
-    resolveAddress(ADDRESS_BOOK_KEYS.databases)
+    resolveAddress(ADDRESS_BOOK_KEYS.databases),
+    resolveAddress(ADDRESS_BOOK_KEYS.permissions)
   ])
 
   console.log(chalk.gray(`ProcessorRegistry: ${processorRegistry}`))
@@ -143,8 +156,17 @@ export async function resolveNetworkAddresses(config: SentioNetworkConfig): Prom
   console.log(chalk.gray(`ST Token:          ${token}`))
   console.log(chalk.gray(`Billing:           ${billing}`))
   console.log(chalk.gray(`Databases:         ${databases}`))
+  console.log(chalk.gray(`Permissions:       ${permissions}`))
 
-  cachedAddresses = { addressBook: addressBookAddr, processorRegistry, controller, token, billing, databases }
+  cachedAddresses = {
+    addressBook: addressBookAddr,
+    processorRegistry,
+    controller,
+    token,
+    billing,
+    databases,
+    permissions
+  }
   return cachedAddresses
 }
 
@@ -194,6 +216,17 @@ export async function checkBillingBalance(
     // Billing contract may revert for accounts that have never deposited
     return 0n
   }
+}
+
+export async function isOperatorOnChain(
+  config: SentioNetworkConfig,
+  addresses: ResolvedAddresses,
+  owner: string,
+  operator: string
+): Promise<boolean> {
+  const provider = new ethers.JsonRpcProvider(config.rpcUrl)
+  const permissions = new ethers.Contract(addresses.permissions, PERMISSIONS_ABI, provider)
+  return await permissions.isOperator(owner, operator)
 }
 
 // --- IPFS Upload ---
@@ -349,7 +382,8 @@ export async function createProcessorOnChain(
   processorId: string,
   ipfsCid: string,
   requiredChainIds: string[],
-  sdkVersion: string
+  sdkVersion: string,
+  ownerOverride?: string
 ): Promise<string> {
   const provider = new ethers.JsonRpcProvider(config.rpcUrl)
   const signer = wallet.connect(provider)
@@ -372,12 +406,26 @@ export async function createProcessorOnChain(
   console.log(chalk.gray(`  IPFS CID:     ${ipfsCid}`))
   console.log(chalk.gray(`  Chains:        ${requiredChainIds.join(', ')}`))
   console.log(chalk.gray(`  SDK Version:   ${sdkVersion}`))
+  if (ownerOverride) {
+    console.log(chalk.gray(`  Owner:         ${ownerOverride} (operator: ${wallet.address})`))
+  }
 
-  const tx = await submitAndWait(
-    config.explorerUrl,
-    'createProcessor',
-    registry.createProcessor(processorId, source, requireChains, sdkVersion)
-  )
+  // ethers v6 disambiguates overloads by full signature when both are present.
+  const txPromise: Promise<ethers.TransactionResponse> = ownerOverride
+    ? registry['createProcessor(address,string,(uint8,string),(string,bool,bool)[],string)'](
+        ownerOverride,
+        processorId,
+        source,
+        requireChains,
+        sdkVersion
+      )
+    : registry['createProcessor(string,(uint8,string),(string,bool,bool)[],string)'](
+        processorId,
+        source,
+        requireChains,
+        sdkVersion
+      )
+  const tx = await submitAndWait(config.explorerUrl, 'createProcessor', txPromise)
   console.log(chalk.green(`Processor created. Tx: ${config.explorerUrl}/tx/${tx.hash}`))
   return tx.hash
 }
@@ -430,26 +478,34 @@ export async function confirmNoPlatformUpload(
   stBalance: bigint,
   billingBalance: bigint,
   addresses: ResolvedAddresses,
-  networkConfig: SentioNetworkConfig
+  networkConfig: SentioNetworkConfig,
+  ownerOverride?: string
 ): Promise<boolean> {
   const formattedST = ethers.formatEther(stBalance)
   const formattedBilling = ethers.formatEther(billingBalance)
   console.log()
   console.log(chalk.blue('=== Sentio Network Direct Upload (No Platform) ==='))
-  console.log(chalk.white(`  Address:         ${walletAddress}`))
+  if (ownerOverride) {
+    console.log(chalk.white(`  Owner:           ${ownerOverride}`))
+    console.log(chalk.white(`  Operator:        ${walletAddress}`))
+  } else {
+    console.log(chalk.white(`  Address:         ${walletAddress}`))
+  }
   console.log(chalk.white(`  ST Balance:      ${formattedST} ST`))
   console.log(chalk.white(`  Billing Balance: ${formattedBilling} ST`))
 
   if (billingBalance === 0n) {
+    const who = ownerOverride ? `the owner (${ownerOverride})` : 'you'
+    const keyHint = ownerOverride ? "<owner's private key>" : '$PRIVATE_KEY'
     console.log()
     console.log(
       chalk.yellow(
-        '  ⚠ Your Billing balance is 0. Indexing fees are charged from the Billing contract.\n' +
-          '    You must deposit ST tokens into the Billing contract before your processor can run.\n' +
-          '    Example (replace 100 with your desired ST amount):\n' +
+        `  ⚠ ${ownerOverride ? "Owner's" : 'Your'} Billing balance is 0. Indexing fees are charged from the Billing contract.\n` +
+          `    ${who} must deposit ST tokens into the Billing contract before the processor can run.\n` +
+          `    Example (replace 100 with your desired ST amount):\n` +
           `    export AMOUNT=$(cast to-wei 100 ether)\n` +
-          `    cast send ${addresses.token} "approve(address,uint256)" ${addresses.billing} $AMOUNT --rpc-url ${networkConfig.rpcUrl} --private-key $PRIVATE_KEY\n` +
-          `    cast send ${addresses.billing} "deposit(uint256)" $AMOUNT --rpc-url ${networkConfig.rpcUrl} --private-key $PRIVATE_KEY`
+          `    cast send ${addresses.token} "approve(address,uint256)" ${addresses.billing} $AMOUNT --rpc-url ${networkConfig.rpcUrl} --private-key ${keyHint}\n` +
+          `    cast send ${addresses.billing} "deposit(uint256)" $AMOUNT --rpc-url ${networkConfig.rpcUrl} --private-key ${keyHint}`
       )
     )
   }
