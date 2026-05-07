@@ -20,6 +20,7 @@ import {
   requirePrivateKey,
   checkSTBalance,
   checkBillingBalance,
+  isOperatorOnChain,
   uploadToIPFS,
   createProcessorOnChain,
   startProcessorOnChain,
@@ -28,6 +29,7 @@ import {
   getProcessorOnChain,
   deleteProcessorOnChain
 } from '../network.js'
+import { ethers } from 'ethers'
 import { Auth, DefaultBatchUploader, FileType, IPFSBatchUploader, WalrusBatchUploader } from '../uploader.js'
 export { type Auth } from '../uploader.js'
 
@@ -43,7 +45,10 @@ function myParseInt(value: string, dummyPrevious: number): number {
 export function createUploadCommand() {
   return new Command('upload')
     .description('Upload processor to Sentio')
-    .option('--owner <owner>', '(Optional) Override Project owner')
+    .option(
+      '--owner <owner>',
+      "(Optional) Project owner. Platform mode: project owner username. --no-platform mode: on-chain owner address (0x...) — $PRIVATE_KEY then signs as an operator on the owner's behalf, requires Permissions.addOperator beforehand."
+    )
     .option('--name <name>', '(Optional) Override Project name')
     .option(
       '--continue-from <version>',
@@ -102,21 +107,53 @@ async function runNoPlatformUpload(
   const network = options.sentioNetwork || 'testnet'
   const networkConfig = getSentioNetworkConfig(network)
 
-  // Step 1: Require PRIVATE_KEY
+  // Step 1: Require PRIVATE_KEY (operator key when --owner is set, otherwise the owner's own key)
   const privateKey = requirePrivateKey()
   const wallet = getWalletFromPrivateKey(privateKey)
   const walletAddress = wallet.address
+
+  // Operator mode: --owner is the on-chain owner address; PRIVATE_KEY signs as operator on its behalf.
+  let ownerOverride: string | undefined
+  if (options.owner) {
+    if (!ethers.isAddress(options.owner)) {
+      console.error(chalk.red(`Invalid --owner: "${options.owner}" is not a valid 0x-prefixed Ethereum address.`))
+      process.exit(1)
+    }
+    ownerOverride = ethers.getAddress(options.owner)
+  }
+  const effectiveOwner = ownerOverride ?? walletAddress
 
   // Step 2: Resolve contract addresses via AddressBook
   console.log(chalk.blue('Resolving contract addresses from AddressBook...'))
   const addresses = await resolveNetworkAddresses(networkConfig)
 
-  // Step 3: Check ST balance and Billing balance, then confirm
+  // Step 2.5: Pre-flight check that operator is registered for this owner.
+  if (ownerOverride) {
+    const isOp = await isOperatorOnChain(networkConfig, addresses, ownerOverride, walletAddress)
+    if (!isOp) {
+      console.error(
+        chalk.red(
+          `Operator ${walletAddress} is not authorized for owner ${ownerOverride}.\n` +
+            `The owner must call Permissions.addOperator(${walletAddress}) first.`
+        )
+      )
+      process.exit(1)
+    }
+  }
+
+  // Step 3: Check ST balance and Billing balance (always against the owner — operator just submits txs)
   const [stBalance, billingBalance] = await Promise.all([
-    checkSTBalance(networkConfig, addresses, walletAddress),
-    checkBillingBalance(networkConfig, addresses, walletAddress)
+    checkSTBalance(networkConfig, addresses, effectiveOwner),
+    checkBillingBalance(networkConfig, addresses, effectiveOwner)
   ])
-  const confirmed = await confirmNoPlatformUpload(walletAddress, stBalance, billingBalance, addresses, networkConfig)
+  const confirmed = await confirmNoPlatformUpload(
+    walletAddress,
+    stBalance,
+    billingBalance,
+    addresses,
+    networkConfig,
+    ownerOverride
+  )
   if (!confirmed) {
     console.log('Upload cancelled.')
     process.exit(0)
@@ -179,11 +216,13 @@ async function runNoPlatformUpload(
 
   if (existingProcessor) {
     const existingOwner = existingProcessor.owner.toLowerCase()
-    const currentWallet = wallet.address.toLowerCase()
+    const expectedOwner = effectiveOwner.toLowerCase()
 
-    if (existingOwner === currentWallet) {
-      // Same owner — prompt to replace
-      console.log(chalk.yellow(`Processor "${processorId}" already exists (owned by you).`))
+    if (existingOwner === expectedOwner) {
+      // Same owner — prompt to replace. In operator mode the operator is allowed to
+      // stop+delete via the contract's isProcessorAdmin check.
+      const ownedBy = ownerOverride ? `owned by ${ownerOverride}` : 'owned by you'
+      console.log(chalk.yellow(`Processor "${processorId}" already exists (${ownedBy}).`))
       const shouldReplace = await confirm(`Replace existing processor "${processorId}"?`)
       if (!shouldReplace) {
         console.log('Upload cancelled.')
@@ -194,9 +233,10 @@ async function runNoPlatformUpload(
       await deleteProcessorOnChain(networkConfig, addresses, wallet, processorId)
     } else {
       // Different owner — prompt to rename
+      const expectedLabel = ownerOverride ? `expected owner ${ownerOverride}` : `your wallet ${wallet.address}`
       console.log(
         chalk.yellow(
-          `Processor "${processorId}" already exists and is owned by ${existingProcessor.owner} (not your wallet ${wallet.address}).`
+          `Processor "${processorId}" already exists and is owned by ${existingProcessor.owner} (not ${expectedLabel}).`
         )
       )
       const randomSuffix = Math.random().toString(36).substring(2, 8)
@@ -215,7 +255,16 @@ async function runNoPlatformUpload(
   }
 
   // Step 8: Create processor on-chain
-  await createProcessorOnChain(networkConfig, addresses, wallet, processorId, cid, requiredChainIds, sdkVersion)
+  await createProcessorOnChain(
+    networkConfig,
+    addresses,
+    wallet,
+    processorId,
+    cid,
+    requiredChainIds,
+    sdkVersion,
+    ownerOverride
+  )
 
   // Step 9: Start processor on-chain
   await startProcessorOnChain(networkConfig, addresses, wallet, processorId)
