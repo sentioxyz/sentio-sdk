@@ -115,12 +115,16 @@ export function overrideConfigWithOptions(config: YamlProjectConfig, options: an
       case 'testnet':
         config.sentioNetwork = '7892101'
         break
+      case 'devnet':
+        config.sentioNetwork = '7892201'
+        break
       case '7892101':
+      case '7892201':
       case '789210':
         config.sentioNetwork = options.sentioNetwork
         break
       default:
-        console.error(`Invalid sentio network: ${options.sentioNetwork}, only mainnet or testnet is allowed`)
+        console.error(`Invalid sentio network: ${options.sentioNetwork}, only mainnet, testnet or devnet is allowed`)
         process.exit(1)
     }
   }

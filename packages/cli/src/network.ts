@@ -20,15 +20,26 @@ const TESTNET_CONFIG: SentioNetworkConfig = {
   addressBookAddress: '0x94579F0e7873097279B48d7b15043698c522e47c'
 }
 
+const DEVNET_CONFIG: SentioNetworkConfig = {
+  chainId: 7892201,
+  rpcUrl: 'https://sentio-devnet.rpc.sentio.xyz',
+  explorerUrl: 'https://devnet-explorer.sentio.xyz',
+  // TODO: replace with actual AddressBook address once deployed on devnet
+  addressBookAddress: '0x0000000000000000000000000000000000000000'
+}
+
 export function getSentioNetworkConfig(network: string): SentioNetworkConfig {
   if (network === 'testnet' || network === '7892101') {
     return TESTNET_CONFIG
+  }
+  if (network === 'devnet' || network === '7892201') {
+    return DEVNET_CONFIG
   }
   if (network === 'mainnet' || network === '789210') {
     console.error(chalk.red('Sentio Network mainnet is not yet supported. Only testnet is available.'))
     process.exit(1)
   }
-  console.error(chalk.red(`Invalid sentio network: ${network}. Only "testnet" is supported.`))
+  console.error(chalk.red(`Invalid sentio network: ${network}. Only "testnet" or "devnet" is supported.`))
   process.exit(1)
 }
 
