@@ -8,7 +8,8 @@ import {
   resolveNetworkAddresses,
   getWalletFromPrivateKey,
   requirePrivateKey,
-  stopProcessorOnChain
+  stopProcessorOnChain,
+  deleteProcessorOnChain
 } from '../network.js'
 
 export function createStopProcessorCommand() {
@@ -23,6 +24,7 @@ export function createStopProcessorCommand() {
     .option('--owner <owner>', 'Sentio project owner')
     .option('--name <name>', 'Sentio project name')
     .option('-y, --yes', 'Bypass confirmation')
+    .option('--no-delete', 'Skip deleting the processor after stopping')
     .showHelpAfterError()
     .action(async (processorId, options) => {
       try {
@@ -37,7 +39,10 @@ export function createStopProcessorCommand() {
     })
 }
 
-async function runStopProcessorOnChain(processorId: string, options: { sentioNetwork?: string; yes?: boolean }) {
+async function runStopProcessorOnChain(
+  processorId: string,
+  options: { sentioNetwork?: string; yes?: boolean; delete?: boolean }
+) {
   const network = options.sentioNetwork!
   const networkConfig = getSentioNetworkConfig(network)
 
@@ -48,16 +53,23 @@ async function runStopProcessorOnChain(processorId: string, options: { sentioNet
   console.log(chalk.blue('Resolving contract addresses from AddressBook...'))
   const addresses = await resolveNetworkAddresses(networkConfig)
 
+  const willDelete = options.delete !== false
+
   if (!options.yes) {
-    const confirmed = await confirm(`Stop processor "${processorId}" on Sentio Network ${network}?`)
+    const action = willDelete ? 'Stop and delete' : 'Stop'
+    const confirmed = await confirm(`${action} processor "${processorId}" on Sentio Network ${network}?`)
     if (!confirmed) {
-      console.log('Stop cancelled.')
+      console.log('Cancelled.')
       return
     }
   }
 
   await stopProcessorOnChain(networkConfig, addresses, wallet, processorId)
-
-  console.log()
   console.log(chalk.green(`Processor "${processorId}" stopped on Sentio Network ${network}.`))
+
+  if (willDelete) {
+    console.log()
+    await deleteProcessorOnChain(networkConfig, addresses, wallet, processorId)
+    console.log(chalk.green(`Processor "${processorId}" deleted on Sentio Network ${network}.`))
+  }
 }

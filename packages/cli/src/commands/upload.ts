@@ -33,6 +33,20 @@ import { ethers } from 'ethers'
 import { Auth, DefaultBatchUploader, FileType, IPFSBatchUploader, WalrusBatchUploader } from '../uploader.js'
 export { type Auth } from '../uploader.js'
 
+const PROCESSOR_ID_RE = /^[a-zA-Z0-9_-]+$/
+
+function validateProcessorId(id: string): void {
+  if (id.length === 0) {
+    throw new Error('Processor ID must not be empty.')
+  }
+  if (id.length >= 32) {
+    throw new Error(`Processor ID "${id}" is too long (${id.length} chars). Maximum length is 31 characters.`)
+  }
+  if (!PROCESSOR_ID_RE.test(id)) {
+    throw new Error(`Processor ID "${id}" contains invalid characters. Only alphanumeric, "-", and "_" are allowed.`)
+  }
+}
+
 function myParseInt(value: string, dummyPrevious: number): number {
   // parseInt takes a string and a radix
   const parsedValue = parseInt(value, 10)
@@ -208,6 +222,7 @@ async function runNoPlatformUpload(
 
   // Step 7: Derive processor ID from project name
   let processorId = processorConfig.project.replace('/', '_')
+  validateProcessorId(processorId)
   const sdkVersion = getSdkVersion() || 'unknown'
 
   // Step 7.5: Check if processor already exists on-chain
@@ -242,13 +257,22 @@ async function runNoPlatformUpload(
       const randomSuffix = Math.random().toString(36).substring(2, 8)
       const defaultNewId = `${processorId}-${randomSuffix}`
 
-      const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
-      const newId: string = await new Promise((resolve) =>
-        rl.question(`Enter a new processor ID [${defaultNewId}]: `, (answer) => {
-          rl.close()
-          resolve(answer.trim() || defaultNewId)
-        })
-      )
+      let newId: string
+      for (;;) {
+        const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
+        newId = await new Promise((resolve) =>
+          rl.question(`Enter a new processor ID [${defaultNewId}]: `, (answer) => {
+            rl.close()
+            resolve(answer.trim() || defaultNewId)
+          })
+        )
+        try {
+          validateProcessorId(newId)
+          break
+        } catch (e: any) {
+          console.log(chalk.red(e.message))
+        }
+      }
       processorId = newId
       console.log(chalk.blue(`Using processor ID: ${processorId}`))
     }
