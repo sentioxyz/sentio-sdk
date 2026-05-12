@@ -22,10 +22,9 @@ const TESTNET_CONFIG: SentioNetworkConfig = {
 
 const DEVNET_CONFIG: SentioNetworkConfig = {
   chainId: 7892201,
-  rpcUrl: 'https://sentio-devnet.rpc.sentio.xyz',
+  rpcUrl: 'https://sentio-devnet.test-rpc.sentio.xyz',
   explorerUrl: 'https://devnet-explorer.sentio.xyz',
-  // TODO: replace with actual AddressBook address once deployed on devnet
-  addressBookAddress: '0x0000000000000000000000000000000000000000'
+  addressBookAddress: '0xCfCE965429602b02b453477Cd8Bc7FEd5E8ffc14'
 }
 
 export function getSentioNetworkConfig(network: string): SentioNetworkConfig {
