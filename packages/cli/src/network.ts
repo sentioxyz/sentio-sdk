@@ -17,7 +17,7 @@ const TESTNET_CONFIG: SentioNetworkConfig = {
   chainId: 7892101,
   rpcUrl: 'https://sentio-testnet.rpc.sentio.xyz',
   explorerUrl: 'https://testnet-explorer.sentio.xyz',
-  addressBookAddress: '0x94579F0e7873097279B48d7b15043698c522e47c'
+  addressBookAddress: '0x092d795d42e23ecba5cc66927972be5c9980effb'
 }
 
 const DEVNET_CONFIG: SentioNetworkConfig = {
