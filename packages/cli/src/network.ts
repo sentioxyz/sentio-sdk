@@ -2,6 +2,7 @@ import { ethers } from 'ethers'
 import chalk from 'chalk'
 import fetch from 'node-fetch'
 import readline from 'readline'
+import { executeSponsored } from './sponsored.js'
 
 // --- Network Configuration ---
 
@@ -112,7 +113,10 @@ const ADDRESS_BOOK_KEYS = {
   token: 'sentio_token',
   billing: 'billing',
   databases: 'databases',
-  permissions: 'permissions'
+  permissions: 'permissions',
+  forwarder: 'forwarder',
+  relayFeeRegistry: 'relay_fee_registry',
+  indexerRegistry: 'indexer_registry'
 } as const
 
 interface ResolvedAddresses {
@@ -123,6 +127,9 @@ interface ResolvedAddresses {
   billing: string
   databases: string
   permissions: string
+  forwarder: string
+  relayFeeRegistry: string
+  indexerRegistry: string
 }
 
 let cachedAddresses: ResolvedAddresses | undefined
@@ -152,13 +159,26 @@ export async function resolveNetworkAddresses(config: SentioNetworkConfig): Prom
     }
   }
 
-  const [processorRegistry, controller, token, billing, databases, permissions] = await Promise.all([
+  const [
+    processorRegistry,
+    controller,
+    token,
+    billing,
+    databases,
+    permissions,
+    forwarder,
+    relayFeeRegistry,
+    indexerRegistry
+  ] = await Promise.all([
     resolveAddress(ADDRESS_BOOK_KEYS.processorRegistry),
     resolveAddress(ADDRESS_BOOK_KEYS.controller),
     resolveAddress(ADDRESS_BOOK_KEYS.token),
     resolveAddress(ADDRESS_BOOK_KEYS.billing),
     resolveAddress(ADDRESS_BOOK_KEYS.databases),
-    resolveAddress(ADDRESS_BOOK_KEYS.permissions)
+    resolveAddress(ADDRESS_BOOK_KEYS.permissions),
+    resolveAddress(ADDRESS_BOOK_KEYS.forwarder),
+    resolveAddress(ADDRESS_BOOK_KEYS.relayFeeRegistry),
+    resolveAddress(ADDRESS_BOOK_KEYS.indexerRegistry)
   ])
 
   console.log(chalk.gray(`ProcessorRegistry: ${processorRegistry}`))
@@ -167,6 +187,9 @@ export async function resolveNetworkAddresses(config: SentioNetworkConfig): Prom
   console.log(chalk.gray(`Billing:           ${billing}`))
   console.log(chalk.gray(`Databases:         ${databases}`))
   console.log(chalk.gray(`Permissions:       ${permissions}`))
+  console.log(chalk.gray(`Forwarder:         ${forwarder}`))
+  console.log(chalk.gray(`RelayFeeRegistry:  ${relayFeeRegistry}`))
+  console.log(chalk.gray(`IndexerRegistry:   ${indexerRegistry}`))
 
   cachedAddresses = {
     addressBook: addressBookAddr,
@@ -175,7 +198,10 @@ export async function resolveNetworkAddresses(config: SentioNetworkConfig): Prom
     token,
     billing,
     databases,
-    permissions
+    permissions,
+    forwarder,
+    relayFeeRegistry,
+    indexerRegistry
   }
   return cachedAddresses
 }
@@ -336,19 +362,44 @@ export async function deleteProcessorOnChain(
   config: SentioNetworkConfig,
   addresses: ResolvedAddresses,
   wallet: ethers.Wallet,
-  processorId: string
+  processorId: string,
+  ownerOverride?: string,
+  sponsored: boolean = true
 ): Promise<string> {
   const provider = new ethers.JsonRpcProvider(config.rpcUrl)
-  const signer = wallet.connect(provider)
-
-  const registry = new ethers.Contract(addresses.processorRegistry, PROCESSOR_REGISTRY_ABI, signer)
 
   console.log(chalk.blue('Deleting existing processor on-chain...'))
-  const tx = await submitAndWait(config.explorerUrl, 'deleteProcessor', registry.deleteProcessor(processorId))
-  console.log(chalk.green(`Processor deleted. Tx: ${config.explorerUrl}/tx/${tx.hash}`))
+
+  let txHash: string
+  if (sponsored) {
+    const iface = new ethers.Interface(PROCESSOR_REGISTRY_ABI)
+    const data = iface.encodeFunctionData('deleteProcessor(string)', [processorId])
+    const { chainId } = await provider.getNetwork()
+    const resp = await executeSponsored({
+      wallet,
+      provider,
+      chainId,
+      forwarderAddress: addresses.forwarder,
+      relayFeeRegistryAddress: addresses.relayFeeRegistry,
+      indexerRegistryAddress: addresses.indexerRegistry,
+      target: addresses.processorRegistry,
+      data,
+      owner: ownerOverride,
+      nonceKey: 0n
+    })
+    txHash = resp.txHash
+    console.log(chalk.green(`Processor deleted. Tx: ${config.explorerUrl}/tx/${txHash}`))
+  } else {
+    const signer = wallet.connect(provider)
+    const registry = new ethers.Contract(addresses.processorRegistry, PROCESSOR_REGISTRY_ABI, signer)
+    const tx = await submitAndWait(config.explorerUrl, 'deleteProcessor', registry.deleteProcessor(processorId))
+    txHash = tx.hash
+    console.log(chalk.green(`Processor deleted. Tx: ${config.explorerUrl}/tx/${txHash}`))
+  }
+
   await waitForProcessorDatabaseCleanup(addresses, processorId, provider)
 
-  return tx.hash
+  return txHash
 }
 
 async function waitForProcessorDatabaseCleanup(
@@ -393,12 +444,10 @@ export async function createProcessorOnChain(
   ipfsCid: string,
   requiredChainIds: string[],
   sdkVersion: string,
-  ownerOverride?: string
+  ownerOverride?: string,
+  sponsored: boolean = true
 ): Promise<string> {
   const provider = new ethers.JsonRpcProvider(config.rpcUrl)
-  const signer = wallet.connect(provider)
-
-  const registry = new ethers.Contract(addresses.processorRegistry, PROCESSOR_REGISTRY_ABI, signer)
 
   const source = {
     sourceType: 0, // IPFS
@@ -419,6 +468,43 @@ export async function createProcessorOnChain(
   if (ownerOverride) {
     console.log(chalk.gray(`  Owner:         ${ownerOverride} (operator: ${wallet.address})`))
   }
+
+  if (sponsored) {
+    const iface = new ethers.Interface(PROCESSOR_REGISTRY_ABI)
+    const data = ownerOverride
+      ? iface.encodeFunctionData('createProcessor(address,string,(uint8,string),(string,bool,bool)[],string)', [
+          ownerOverride,
+          processorId,
+          source,
+          requireChains,
+          sdkVersion
+        ])
+      : iface.encodeFunctionData('createProcessor(string,(uint8,string),(string,bool,bool)[],string)', [
+          processorId,
+          source,
+          requireChains,
+          sdkVersion
+        ])
+
+    const { chainId } = await provider.getNetwork()
+    const resp = await executeSponsored({
+      wallet,
+      provider,
+      chainId,
+      forwarderAddress: addresses.forwarder,
+      relayFeeRegistryAddress: addresses.relayFeeRegistry,
+      indexerRegistryAddress: addresses.indexerRegistry,
+      target: addresses.processorRegistry,
+      data,
+      owner: ownerOverride,
+      nonceKey: 0n
+    })
+    console.log(chalk.green(`Processor created. Tx: ${config.explorerUrl}/tx/${resp.txHash}`))
+    return resp.txHash
+  }
+
+  const signer = wallet.connect(provider)
+  const registry = new ethers.Contract(addresses.processorRegistry, PROCESSOR_REGISTRY_ABI, signer)
 
   // ethers v6 disambiguates overloads by full signature when both are present.
   const txPromise: Promise<ethers.TransactionResponse> = ownerOverride
@@ -444,14 +530,36 @@ export async function startProcessorOnChain(
   config: SentioNetworkConfig,
   addresses: ResolvedAddresses,
   wallet: ethers.Wallet,
-  processorId: string
+  processorId: string,
+  ownerOverride?: string,
+  sponsored: boolean = true
 ): Promise<string> {
   const provider = new ethers.JsonRpcProvider(config.rpcUrl)
-  const signer = wallet.connect(provider)
-
-  const controller = new ethers.Contract(addresses.controller, CONTROLLER_ABI, signer)
 
   console.log(chalk.blue('Starting processor on-chain...'))
+
+  if (sponsored) {
+    const iface = new ethers.Interface(CONTROLLER_ABI)
+    const data = iface.encodeFunctionData('startProcessor(string)', [processorId])
+    const { chainId } = await provider.getNetwork()
+    const resp = await executeSponsored({
+      wallet,
+      provider,
+      chainId,
+      forwarderAddress: addresses.forwarder,
+      relayFeeRegistryAddress: addresses.relayFeeRegistry,
+      indexerRegistryAddress: addresses.indexerRegistry,
+      target: addresses.controller,
+      data,
+      owner: ownerOverride,
+      nonceKey: 0n
+    })
+    console.log(chalk.green(`Processor started. Tx: ${config.explorerUrl}/tx/${resp.txHash}`))
+    return resp.txHash
+  }
+
+  const signer = wallet.connect(provider)
+  const controller = new ethers.Contract(addresses.controller, CONTROLLER_ABI, signer)
   const tx = await submitAndWait(config.explorerUrl, 'startProcessor', controller.startProcessor(processorId))
   console.log(chalk.green(`Processor started. Tx: ${config.explorerUrl}/tx/${tx.hash}`))
   return tx.hash
@@ -461,21 +569,44 @@ export async function stopProcessorOnChain(
   config: SentioNetworkConfig,
   addresses: ResolvedAddresses,
   wallet: ethers.Wallet,
-  processorId: string
+  processorId: string,
+  ownerOverride?: string,
+  sponsored: boolean = true
 ): Promise<string> {
   const provider = new ethers.JsonRpcProvider(config.rpcUrl)
-  const signer = wallet.connect(provider)
-
-  const controller = new ethers.Contract(addresses.controller, CONTROLLER_ABI, signer)
 
   // stopProcessor reverts with ProcessorNotAllocated if the processor has no active allocations
-  const allocations: unknown[] = await controller.getAllocations(processorId)
+  const controllerView = new ethers.Contract(addresses.controller, CONTROLLER_ABI, provider)
+  const allocations: unknown[] = await controllerView.getAllocations(processorId)
   if (allocations.length === 0) {
     console.log(chalk.gray('Processor has no allocations, skipping stopProcessor.'))
     return ''
   }
 
   console.log(chalk.blue('Stopping processor on-chain...'))
+
+  if (sponsored) {
+    const iface = new ethers.Interface(CONTROLLER_ABI)
+    const data = iface.encodeFunctionData('stopProcessor(string)', [processorId])
+    const { chainId } = await provider.getNetwork()
+    const resp = await executeSponsored({
+      wallet,
+      provider,
+      chainId,
+      forwarderAddress: addresses.forwarder,
+      relayFeeRegistryAddress: addresses.relayFeeRegistry,
+      indexerRegistryAddress: addresses.indexerRegistry,
+      target: addresses.controller,
+      data,
+      owner: ownerOverride,
+      nonceKey: 0n
+    })
+    console.log(chalk.green(`Processor stopped. Tx: ${config.explorerUrl}/tx/${resp.txHash}`))
+    return resp.txHash
+  }
+
+  const signer = wallet.connect(provider)
+  const controller = new ethers.Contract(addresses.controller, CONTROLLER_ABI, signer)
   const tx = await submitAndWait(config.explorerUrl, 'stopProcessor', controller.stopProcessor(processorId))
   console.log(chalk.green(`Processor stopped. Tx: ${config.explorerUrl}/tx/${tx.hash}`))
   return tx.hash

@@ -134,7 +134,6 @@ export async function getABI(
     console.log('aptos module not loaded')
   }
 
-
   // ethereum
   try {
     const uploadAuth: Auth = {}
@@ -240,3 +239,23 @@ export function writeABIFile(obj: string | object, output: string) {
   fs.writeFileSync(output, data)
   console.log(chalk.green('ABI has been downloaded to', output))
 }
+
+export const FORWARDER_ABI = [
+  'function nonceOf(address user, uint192 key) view returns (uint64)',
+  'function hashForwardRequest((address from,address payer,address target,uint256 gas,uint192 nonceKey,uint64 nonceValue,uint48 deadline,uint256 maxFee,bytes data) req) view returns (bytes32)',
+  'function DOMAIN_SEPARATOR() view returns (bytes32)',
+  'function execute((address from,address payer,address target,uint256 gas,uint192 nonceKey,uint64 nonceValue,uint48 deadline,uint256 maxFee,bytes data) req, bytes sig) returns (bytes)',
+  'function executeBatch((address from,address payer,address target,uint256 gas,uint192 nonceKey,uint64 nonceValue,uint48 deadline,uint256 maxFee,bytes data)[] reqs, bytes[] sigs) returns (bytes[])',
+  'event ForwardExecuted(address indexed from, address indexed payer, address indexed target, bytes4 selector, uint192 nonceKey, uint64 nonceValue)',
+  'error Expired(uint48 deadline)',
+  'error BadNonce(uint192 key, uint64 expected, uint64 got)',
+  'error BadSig()',
+  'error NotIndexer(address relayer)',
+  'error LengthMismatch()'
+]
+
+export const RELAY_FEE_REGISTRY_ABI = ['function feeOf(address target, bytes4 selector) view returns (uint256)']
+
+export const INDEXER_REGISTRY_ABI = [
+  'function getFreshIndexers() view returns (tuple(uint256 id, bool active, address signer, string url, string name, uint16 computeNodeRpcPort, uint16 storageNodeRpcPort, uint16 clickhouseProxyPort, uint256 lastHeartbeatTimestamp, tuple(string chainId, bool enableRpc, bool enableTrace)[] supportedChains, uint256 commissionRate, uint256 exchangeRateSU, tuple(string[] skuIds, uint256[] skuUnitPrices) votingParams)[] freshIndexers)'
+]
