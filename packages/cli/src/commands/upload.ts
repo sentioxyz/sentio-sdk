@@ -99,6 +99,12 @@ export function createUploadCommand() {
       'IPFS upload endpoint (used with --no-platform)',
       'https://api.sentio.xyz/v1/ipfs/add'
     )
+    .option(
+      '--sponsored',
+      '(Optional, default true) Submit on-chain operations via Forwarder using ST billing balance',
+      true
+    )
+    .option('--no-sponsored', '(Optional) Bypass Forwarder; sign and pay native gas directly')
     .action(async (options, command) => {
       const processorConfig = loadProcessorConfig(options.path)
       overrideConfigWithOptions(processorConfig, options)
@@ -244,8 +250,8 @@ async function runNoPlatformUpload(
         process.exit(0)
       }
       // Stop and delete existing processor before re-creating
-      await stopProcessorOnChain(networkConfig, addresses, wallet, processorId)
-      await deleteProcessorOnChain(networkConfig, addresses, wallet, processorId)
+      await stopProcessorOnChain(networkConfig, addresses, wallet, processorId, ownerOverride, options.sponsored)
+      await deleteProcessorOnChain(networkConfig, addresses, wallet, processorId, ownerOverride, options.sponsored)
     } else {
       // Different owner — prompt to rename
       const expectedLabel = ownerOverride ? `expected owner ${ownerOverride}` : `your wallet ${wallet.address}`
@@ -287,11 +293,12 @@ async function runNoPlatformUpload(
     cid,
     requiredChainIds,
     sdkVersion,
-    ownerOverride
+    ownerOverride,
+    options.sponsored
   )
 
   // Step 9: Start processor on-chain
-  await startProcessorOnChain(networkConfig, addresses, wallet, processorId)
+  await startProcessorOnChain(networkConfig, addresses, wallet, processorId, ownerOverride, options.sponsored)
 
   console.log()
   console.log(chalk.green('=== Upload Complete ==='))
