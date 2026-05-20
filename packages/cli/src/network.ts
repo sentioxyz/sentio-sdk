@@ -27,19 +27,30 @@ const DEVNET_CONFIG: SentioNetworkConfig = {
   addressBookAddress: '0xCfCE965429602b02b453477Cd8Bc7FEd5E8ffc14'
 }
 
-export function getSentioNetworkConfig(network: string): SentioNetworkConfig {
+export function getSentioNetworkConfig(network: string, addressBookOverride?: string): SentioNetworkConfig {
+  let config: SentioNetworkConfig
   if (network === 'testnet' || network === '7892101') {
-    return TESTNET_CONFIG
-  }
-  if (network === 'devnet' || network === '7892201') {
-    return DEVNET_CONFIG
-  }
-  if (network === 'mainnet' || network === '789210') {
+    config = TESTNET_CONFIG
+  } else if (network === 'devnet' || network === '7892201') {
+    config = DEVNET_CONFIG
+  } else if (network === 'mainnet' || network === '789210') {
     console.error(chalk.red('Sentio Network mainnet is not yet supported. Only testnet is available.'))
     process.exit(1)
+  } else {
+    console.error(chalk.red(`Invalid sentio network: ${network}. Only "testnet" or "devnet" is supported.`))
+    process.exit(1)
   }
-  console.error(chalk.red(`Invalid sentio network: ${network}. Only "testnet" or "devnet" is supported.`))
-  process.exit(1)
+
+  if (addressBookOverride) {
+    if (!ethers.isAddress(addressBookOverride)) {
+      console.error(
+        chalk.red(`Invalid --address-book: "${addressBookOverride}" is not a valid 0x-prefixed Ethereum address.`)
+      )
+      process.exit(1)
+    }
+    return { ...config, addressBookAddress: ethers.getAddress(addressBookOverride) }
+  }
+  return config
 }
 
 // --- Contract ABIs ---
