@@ -99,6 +99,10 @@ export function createUploadCommand() {
       'IPFS upload endpoint (used with --no-platform)',
       'https://api.sentio.xyz/v1/ipfs/add'
     )
+    .option(
+      '--address-book <address>',
+      '(Optional) Override the default AddressBook contract address used to resolve on-chain contracts (used with --no-platform).'
+    )
     .action(async (options, command) => {
       const processorConfig = loadProcessorConfig(options.path)
       overrideConfigWithOptions(processorConfig, options)
@@ -119,7 +123,7 @@ async function runNoPlatformUpload(
 ) {
   // Determine network - default to testnet for --no-platform
   const network = options.sentioNetwork || 'testnet'
-  const networkConfig = getSentioNetworkConfig(network)
+  const networkConfig = getSentioNetworkConfig(network, options.addressBook)
 
   // Step 1: Require PRIVATE_KEY (operator key when --owner is set, otherwise the owner's own key)
   const privateKey = requirePrivateKey()

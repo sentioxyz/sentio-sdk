@@ -25,6 +25,10 @@ export function createStopProcessorCommand() {
     .option('--name <name>', 'Sentio project name')
     .option('-y, --yes', 'Bypass confirmation')
     .option('--no-delete', 'Skip deleting the processor after stopping')
+    .option(
+      '--address-book <address>',
+      '(Optional) Override the default AddressBook contract address used to resolve on-chain contracts (used with --sentio-network).'
+    )
     .showHelpAfterError()
     .action(async (processorId, options) => {
       try {
@@ -41,10 +45,10 @@ export function createStopProcessorCommand() {
 
 async function runStopProcessorOnChain(
   processorId: string,
-  options: { sentioNetwork?: string; yes?: boolean; delete?: boolean }
+  options: { sentioNetwork?: string; yes?: boolean; delete?: boolean; addressBook?: string }
 ) {
   const network = options.sentioNetwork!
-  const networkConfig = getSentioNetworkConfig(network)
+  const networkConfig = getSentioNetworkConfig(network, options.addressBook)
 
   const privateKey = requirePrivateKey()
   const wallet = getWalletFromPrivateKey(privateKey)
