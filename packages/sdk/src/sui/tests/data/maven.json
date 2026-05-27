@@ -12,13 +12,15 @@
               "kind": 3,
               "objectId": "0x8a71b853431af3967e37c0ca7ce5338bfa79e5f8d7a1373eee8f9e5d0f0b5771",
               "version": "82",
-              "mutable": false
+              "mutable": false,
+              "mutability": 1
             },
             {
               "kind": 3,
               "objectId": "0x47ef4daea46bf96475b209ea5e53377632819b119eaf98eb7886de40de818edc",
               "version": "1878636",
-              "mutable": true
+              "mutable": true,
+              "mutability": 2
             },
             {
               "kind": 1,
@@ -30,9 +32,6 @@
               "command": {
                 "oneofKind": "moveCall",
                 "moveCall": {
-                  "package": "0xae5e7c832b4a97f2473fcf80fdf2e7ef72bb9d23552bd05d7dd8d428dbb879b9",
-                  "module": "maven",
-                  "function": "vote_approve",
                   "typeArguments": [],
                   "arguments": [
                     {
@@ -47,7 +46,10 @@
                       "kind": 2,
                       "input": 2
                     }
-                  ]
+                  ],
+                  "package": "0xae5e7c832b4a97f2473fcf80fdf2e7ef72bb9d23552bd05d7dd8d428dbb879b9",
+                  "module": "maven",
+                  "function": "vote_approve"
                 }
               }
             },
@@ -55,10 +57,7 @@
               "command": {
                 "oneofKind": "moveCall",
                 "moveCall": {
-                  "package": "0xae5e7c832b4a97f2473fcf80fdf2e7ef72bb9d23552bd05d7dd8d428dbb879b9",
-                  "module": "maven",
-                  "function": "execute_coin_operation",
-                  "typeArguments": ["0x2::sui::SUI"],
+                  "typeArguments": ["0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI"],
                   "arguments": [
                     {
                       "kind": 2,
@@ -68,13 +67,17 @@
                       "kind": 2,
                       "input": 1
                     }
-                  ]
+                  ],
+                  "package": "0xae5e7c832b4a97f2473fcf80fdf2e7ef72bb9d23552bd05d7dd8d428dbb879b9",
+                  "module": "maven",
+                  "function": "execute_coin_operation"
                 }
               }
             }
           ]
         }
-      }
+      },
+      "kind": 1
     }
   },
   "events": {
@@ -85,22 +88,22 @@
         "sender": "0xb84bc37cd42381a71169826993b345b4c3f8b5b9da1ffeaf940edf48fcc9d3af",
         "eventType": "0xae5e7c832b4a97f2473fcf80fdf2e7ef72bb9d23552bd05d7dd8d428dbb879b9::maven::VoteProposalEvent",
         "json": {
+          "approve": true,
           "maven": "0x47ef4daea46bf96475b209ea5e53377632819b119eaf98eb7886de40de818edc",
           "sn": "1",
-          "voter": "0xb84bc37cd42381a71169826993b345b4c3f8b5b9da1ffeaf940edf48fcc9d3af",
-          "approve": true
+          "voter": "0xb84bc37cd42381a71169826993b345b4c3f8b5b9da1ffeaf940edf48fcc9d3af"
         }
       },
       {
         "packageId": "0xae5e7c832b4a97f2473fcf80fdf2e7ef72bb9d23552bd05d7dd8d428dbb879b9",
         "module": "maven",
         "sender": "0xb84bc37cd42381a71169826993b345b4c3f8b5b9da1ffeaf940edf48fcc9d3af",
-        "eventType": "0xae5e7c832b4a97f2473fcf80fdf2e7ef72bb9d23552bd05d7dd8d428dbb879b9::vault::TransferCoinEvent<0x2::coin::Coin<0x2::sui::SUI>>",
+        "eventType": "0xae5e7c832b4a97f2473fcf80fdf2e7ef72bb9d23552bd05d7dd8d428dbb879b9::vault::TransferCoinEvent<0x0000000000000000000000000000000000000000000000000000000000000002::coin::Coin<0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI>>",
         "json": {
+          "amount": "1000000000",
           "asset_key": "0000000000000000000000000000000000000000000000000000000000000002::sui::SUI",
           "to": "0xfd4a47836383301331181afc475b23add822f928a96392ee697b8a55d9d063a5",
-          "vault": "0x0e1b79607e4e86722a1b73d29caab209f101b7fbbd7c0e484e05151020af0f46",
-          "amount": "1000000000"
+          "vault": "0x0e1b79607e4e86722a1b73d29caab209f101b7fbbd7c0e484e05151020af0f46"
         }
       },
       {
@@ -109,10 +112,10 @@
         "sender": "0xb84bc37cd42381a71169826993b345b4c3f8b5b9da1ffeaf940edf48fcc9d3af",
         "eventType": "0xae5e7c832b4a97f2473fcf80fdf2e7ef72bb9d23552bd05d7dd8d428dbb879b9::maven::ExecuteProposalEvent",
         "json": {
-          "sn": "1",
-          "success": true,
           "error_codes": ["0"],
-          "maven": "0x47ef4daea46bf96475b209ea5e53377632819b119eaf98eb7886de40de818edc"
+          "maven": "0x47ef4daea46bf96475b209ea5e53377632819b119eaf98eb7886de40de818edc",
+          "sn": "1",
+          "success": true
         }
       }
     ]
