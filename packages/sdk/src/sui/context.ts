@@ -1,8 +1,7 @@
 import { RecordMetaData } from '@sentio/protos'
 import { type Labels, normalizeLabels } from '../index.js'
 import { getClient, SuiNetwork } from './network.js'
-import { SuiJsonRpcClient } from '@mysten/sui/jsonRpc'
-import type { GrpcTypes } from '@mysten/sui/grpc'
+import type { GrpcTypes, SuiGrpcClient } from '@mysten/sui/grpc'
 import type { ModuleWithAddress, SuiEventInput, SuiMoveObjectInput } from '@typemove/sui'
 import { MoveCoder } from './index.js'
 import { defaultMoveCoder } from './move-coder.js'
@@ -61,7 +60,7 @@ export class SuiContext extends MoveContext<SuiNetwork, ModuleWithAddress, SuiEv
     }
   }
 
-  get client(): SuiJsonRpcClient {
+  get client(): SuiGrpcClient {
     return getClient(this.network)
   }
 }
@@ -115,7 +114,7 @@ export class SuiObjectChangeContext extends MoveContext<
     }
   }
 
-  get client(): SuiJsonRpcClient {
+  get client(): SuiGrpcClient {
     return getClient(this.network)
   }
 }
@@ -167,7 +166,7 @@ export class SuiAddressContext extends MoveAccountContext<
     }
   }
 
-  get client(): SuiJsonRpcClient {
+  get client(): SuiGrpcClient {
     return getClient(this.network)
   }
 

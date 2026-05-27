@@ -1,7 +1,5 @@
 import { SuiChainId } from '@sentio/chain'
 import { Endpoints } from '@sentio/runtime'
-// import { ServerError, Status } from 'nice-grpc'
-import { SuiJsonRpcClient } from '@mysten/sui/jsonRpc'
 import { SuiGrpcClient } from '@mysten/sui/grpc'
 
 export type SuiNetwork = SuiChainId
@@ -22,16 +20,9 @@ function endpointFor(network: SuiNetwork): string {
   return Endpoints.INSTANCE.chainServer.get(network) ?? getRpcEndpoint(network)
 }
 
-// Public client exposed to processor handlers via `ctx.client`. Stays
-// JSON-RPC so existing Sui processors keep working unchanged.
-export function getClient(network: SuiNetwork): SuiJsonRpcClient {
-  const chainServer = endpointFor(network)
-  return new SuiJsonRpcClient({ url: chainServer, network: inferNetworkFromUrl(chainServer) })
-}
-
-// gRPC client used internally for the MoveCoder and generated view
-// functions — @typemove/sui v2 is gRPC-only.
-export function getGrpcClient(network: SuiNetwork): SuiGrpcClient {
+// gRPC client used for the MoveCoder, generated view functions, and exposed to
+// processor handlers via `ctx.client`. @typemove/sui v2 is gRPC-only.
+export function getClient(network: SuiNetwork): SuiGrpcClient {
   const chainServer = endpointFor(network)
   return new SuiGrpcClient({ network: inferNetworkFromUrl(chainServer) as any, baseUrl: chainServer })
 }
