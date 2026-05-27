@@ -6,7 +6,7 @@ import { single_collateral } from './types/sui/testnet/0xebaa2ad3eacc230f309cd93
 
 validator.bind({ network: SuiNetwork.TEST_NET }).onEventStakingRequestEvent(
   (evt, ctx) => {
-    const amount_original = BigInt((evt.parsedJson as any).amount)
+    const amount_original = BigInt((evt.json as any).amount)
     const amount = evt.data_decoded.amount
     ctx.meter.Counter('amount').add(amount, { pool: evt.data_decoded.pool_id })
   },
