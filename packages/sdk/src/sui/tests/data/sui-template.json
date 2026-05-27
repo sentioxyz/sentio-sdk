@@ -1,0 +1,83 @@
+{
+  "digest": "1Jo5RUSfLknKiGkZUxVxkWhTbX7CD3Jm3fQzaCEV3JM",
+  "transaction": {
+    "digest": "1Jo5RUSfLknKiGkZUxVxkWhTbX7CD3Jm3fQzaCEV3JM",
+    "sender": "0x4928b3478f47a5f845096fbe08cbaaa1e9122f8a3a3634c8454e2bafc46b7ad8",
+    "kind": {
+      "data": {
+        "oneofKind": "programmableTransaction",
+        "programmableTransaction": {
+          "inputs": [
+            {
+              "kind": 1,
+              "pure": [192, 65, 103, 60, 0, 0, 0, 0]
+            },
+            {
+              "kind": 3,
+              "objectId": "0x0000000000000000000000000000000000000000000000000000000000000005",
+              "version": "1",
+              "mutable": true
+            },
+            {
+              "kind": 1,
+              "pure": [
+                109, 170, 168, 73, 130, 232, 74, 240, 93, 177, 147, 244, 138, 253, 151, 153, 144, 175, 45, 42, 122, 166,
+                91, 57, 140, 57, 141, 185, 167, 155, 96, 63
+              ]
+            }
+          ],
+          "commands": [
+            {
+              "command": {
+                "oneofKind": "splitCoins"
+              }
+            },
+            {
+              "command": {
+                "oneofKind": "moveCall",
+                "moveCall": {
+                  "package": "0x0000000000000000000000000000000000000000000000000000000000000003",
+                  "module": "sui_system",
+                  "function": "request_add_stake",
+                  "typeArguments": [],
+                  "arguments": [
+                    {
+                      "kind": 2,
+                      "input": 1
+                    },
+                    {
+                      "kind": 3,
+                      "result": 0
+                    },
+                    {
+                      "kind": 2,
+                      "input": 2
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  },
+  "events": {
+    "events": [
+      {
+        "packageId": "0x0000000000000000000000000000000000000000000000000000000000000003",
+        "module": "sui_system",
+        "sender": "0x4928b3478f47a5f845096fbe08cbaaa1e9122f8a3a3634c8454e2bafc46b7ad8",
+        "eventType": "0x3::validator::StakingRequestEvent",
+        "json": {
+          "amount": "1013400000",
+          "epoch": "744",
+          "pool_id": "0x8f3c1872502008904d027ca7d2935434ad1c030174a77eabd8d4e0b6a1b38d77",
+          "staker_address": "0x4928b3478f47a5f845096fbe08cbaaa1e9122f8a3a3634c8454e2bafc46b7ad8",
+          "validator_address": "0x6daaa84982e84af05db193f48afd979990af2d2a7aa65b398c398db9a79b603f"
+        }
+      }
+    ]
+  },
+  "checkpoint": "233041"
+}

@@ -1,0 +1,35 @@
+[
+  {
+    "type": "0x2::dynamic_field::Field<address, bool>",
+    "objectId": "0x0002645c0afc5c5c298bea19f3a6a4dc72f763e0fe022e61cd5fed80bfcffccf",
+    "json": {
+      "id": {
+        "id": "0x0002645c0afc5c5c298bea19f3a6a4dc72f763e0fe022e61cd5fed80bfcffccf"
+      },
+      "name": "0x489b404f8b41dd2b182ef591c7b1558ac3414e1b70b875d802ede77af4f6e602",
+      "value": true
+    }
+  },
+  {
+    "type": "0x2::dynamic_field::Field<address, bool>",
+    "objectId": "0x0002cd71bdbcd593ac8558cb9ae5ddd7df08861671ce8a50656a5380ce200094",
+    "json": {
+      "id": {
+        "id": "0x0002cd71bdbcd593ac8558cb9ae5ddd7df08861671ce8a50656a5380ce200094"
+      },
+      "name": "0x641a3ae10ac6df38503ddf28f41ef7ed2cf90c8a9ec3db156de4f7b36f9876eb",
+      "value": true
+    }
+  },
+  {
+    "type": "0x2::dynamic_field::Field<address, bool>",
+    "objectId": "0x001030edc1453fd6a81af482c881d328890c0544b5756c989f17f326595161dc",
+    "json": {
+      "id": {
+        "id": "0x001030edc1453fd6a81af482c881d328890c0544b5756c989f17f326595161dc"
+      },
+      "name": "0x1ca3775163688720ba837ea455a05c70b9e15d4c8f3aaa512c8211fb029f1bde",
+      "value": true
+    }
+  }
+]
