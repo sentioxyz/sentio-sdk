@@ -9,14 +9,17 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           persist-credentials: false
           ref: ${{ github.event.inputs.commit }}
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v6
         with:
           node-version: 24
@@ -41,7 +44,7 @@ jobs:
           pnpm --filter "./packages/*..." build
       - name: SDK Semantic Release
         id: semantic
-        uses: cycjimmy/semantic-release-action@v4
+        uses: cycjimmy/semantic-release-action@v6
         with:
           semantic_version: 24.0.0
         env:
@@ -64,8 +67,6 @@ jobs:
         run: |
           ./scripts/update-version.sh @sentio/sdk... ${{ steps.semantic.outputs.new_release_version }}
           pnpm publish --filter "@sentio/sdk..." --no-git-checks --tag ${{ steps.npm.outputs.dist_tag }}
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: report error
         if: steps.semantic.outputs.new_release_published == 'false'
         run: |
@@ -82,7 +83,7 @@ jobs:
         working-directory: packages/cli
       - name: CLI Semantic Release
         id: semantic_cli
-        uses: cycjimmy/semantic-release-action@v4
+        uses: cycjimmy/semantic-release-action@v6
         with:
           working_directory: packages/cli
           semantic_version: 24
@@ -101,8 +102,6 @@ jobs:
         run: |
           ./scripts/update-version.sh @sentio/cli ${{ steps.semantic_cli.outputs.new_release_version }}
           pnpm publish --filter "@sentio/cli" --no-git-checks --tag ${{ steps.npm.outputs.dist_tag }}
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: report error
         if: steps.semantic_cli.outputs.new_release_published == 'false'
         run: |
@@ -120,15 +119,11 @@ jobs:
         if: steps.semantic.outputs.new_release_published == 'true'
         run: |
           pnpm publish --filter "@sentio/sdk-bundle" --no-git-checks --tag ${{ steps.npm.outputs.dist_tag }} --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: action NPM Publish
         if: steps.semantic.outputs.new_release_published == 'true'
         run: |
           ./scripts/update-version.sh @sentio/action ${{ steps.semantic.outputs.new_release_version }}
           pnpm publish --filter "@sentio/action" --no-git-checks --tag ${{ steps.npm.outputs.dist_tag }}
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Clean Github Release for RC
         if: ${{ contains(steps.semantic.outputs.new_release_version, '-rc.') == false }}
         run:  ./scripts/clean-rc-releases.sh

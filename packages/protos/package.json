@@ -2,6 +2,11 @@
   "name": "@sentio/protos",
   "version": "3.0.0-development",
   "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sentioxyz/sentio-sdk.git",
+    "directory": "packages/protos"
+  },
   "type": "module",
   "exports": {
     ".": "./lib/index.js",
@@ -9,7 +14,8 @@
     "./chainquery": "./lib/chainquery/protos/chainquery.js"
   },
   "files": [
-    "{lib,src}"
+    "lib",
+    "src"
   ],
   "scripts": {
     "build": "pnpm compile",

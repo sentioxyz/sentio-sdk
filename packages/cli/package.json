@@ -2,6 +2,11 @@
   "name": "@sentio/cli",
   "version": "3.0.0-development",
   "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sentioxyz/sentio-sdk.git",
+    "directory": "packages/cli"
+  },
   "type": "module",
   "exports": {
     ".": "./lib/index.js"
@@ -10,9 +15,11 @@
     "sentio": "./lib/index.js"
   },
   "files": [
-    "{lib,src,templates}",
-    "!lib/**/*.map",
-    "!{lib,src}/**/*.test.{js,ts}"
+    "lib",
+    "src",
+    "templates",
+    "!**/*.test.*",
+    "!lib/**/*.map"
   ],
   "scripts": {
     "build": "pnpm tsc --noEmit && pnpm bundle",

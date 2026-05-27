@@ -2,6 +2,11 @@
   "name": "@sentio/runtime",
   "version": "3.0.0-development",
   "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sentioxyz/sentio-sdk.git",
+    "directory": "packages/runtime"
+  },
   "type": "module",
   "exports": {
     ".": "./lib/index.js"
@@ -10,9 +15,10 @@
     "processor-runner": "./lib/processor-runner.js"
   },
   "files": [
-    "{lib,src}",
-    "!**/*.test.{js,ts}",
-    "!{lib,src}/tests"
+    "lib",
+    "src",
+    "!**/*.test.*",
+    "!**/tests"
   ],
   "scripts": {
     "build": "pnpm tsc --noEmit && pnpm bundle",
