@@ -1,7 +1,8 @@
 import { HandleInterval, MoveAccountFetchConfig, MoveFetchConfig, TemplateInstance } from '@sentio/protos'
 import { ListStateStorage, processMetrics } from '@sentio/runtime'
 import { SuiAddressContext, SuiContext, SuiObjectContext } from './context.js'
-import { SuiMoveObject, SuiTransactionBlockResponse } from '@mysten/sui/jsonRpc'
+import type { GrpcTypes } from '@mysten/sui/grpc'
+import type { SuiMoveObjectInput } from '@typemove/sui'
 import { PromiseOrVoid } from '../core/index.js'
 import {
   DEFAULT_ACCOUNT_FETCH_CONFIG,
@@ -233,13 +234,13 @@ export abstract class SuiObjectOrAddressProcessorTemplate<
 }
 
 class AddressTransactionHandler {
-  handler: (transaction: SuiTransactionBlockResponse, ctx: SuiContext) => void
+  handler: (transaction: GrpcTypes.ExecutedTransaction, ctx: SuiContext) => void
   filter?: TransactionFilter
   fetchConfig?: Partial<MoveFetchConfig>
 }
 
 export class SuiAddressProcessorTemplate extends SuiObjectOrAddressProcessorTemplate<
-  (objects: SuiMoveObject[], ctx: SuiAddressContext) => PromiseOrVoid,
+  (objects: SuiMoveObjectInput[], ctx: SuiAddressContext) => PromiseOrVoid,
   SuiBindOptions,
   SuiAddressProcessor
 > {
@@ -255,7 +256,7 @@ export class SuiAddressProcessorTemplate extends SuiObjectOrAddressProcessorTemp
   }
 
   onTransactionBlock(
-    handler: (transaction: SuiTransactionBlockResponse, ctx: SuiContext) => void,
+    handler: (transaction: GrpcTypes.ExecutedTransaction, ctx: SuiContext) => void,
     filter?: TransactionFilter,
     fetchConfig?: Partial<MoveFetchConfig>
   ): this {
@@ -269,7 +270,7 @@ export class SuiAddressProcessorTemplate extends SuiObjectOrAddressProcessorTemp
 }
 
 export class SuiObjectProcessorTemplate extends SuiObjectOrAddressProcessorTemplate<
-  (self: SuiMoveObject, dynamicFieldObjects: SuiMoveObject[], ctx: SuiObjectContext) => PromiseOrVoid,
+  (self: SuiMoveObjectInput, dynamicFieldObjects: SuiMoveObjectInput[], ctx: SuiObjectContext) => PromiseOrVoid,
   SuiObjectBindOptions,
   SuiObjectProcessor
 > {
@@ -281,7 +282,7 @@ export class SuiObjectProcessorTemplate extends SuiObjectOrAddressProcessorTempl
 }
 
 export class SuiWrappedObjectProcessorTemplate extends SuiObjectOrAddressProcessorTemplate<
-  (dynamicFieldObjects: SuiMoveObject[], ctx: SuiObjectContext) => PromiseOrVoid,
+  (dynamicFieldObjects: SuiMoveObjectInput[], ctx: SuiObjectContext) => PromiseOrVoid,
   SuiObjectBindOptions,
   SuiWrappedObjectProcessor
 > {

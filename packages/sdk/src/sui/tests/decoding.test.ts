@@ -1,5 +1,6 @@
 import { describe, test } from 'node:test'
 import { defaultMoveCoder } from '../move-coder.js'
+import { flattenSuiFields, toGrpcObject } from './grpc-fixture.js'
 
 import { coin, dynamic_field, loadAllTypes } from '../builtin/0x2.js'
 import { expect } from 'chai'
@@ -39,7 +40,7 @@ describe('Test Sui Example', () => {
       }
     }
     const res = await coder.decodeType(
-      data,
+      flattenSuiFields(data),
       parseMoveType('0xebaa2ad3eacc230f309cd933958cc52684df0a41ae7ac214d186b80f830867d2::single_collateral::Info')
     )
     expect(res.delivery_info.price).equals(603716059n)
@@ -106,13 +107,13 @@ describe('Test Sui Example', () => {
         }
       }
     }
-    const res = await coder.decodeType(data, parseMoveType(data.type))
+    const res = await coder.decodeType(flattenSuiFields(data), parseMoveType(data.type))
     expect(res.performance_fee_sub_vault.balance).equals(0n)
     // console.log(res)
   })
 
   test('decode dynamic fields', async () => {
-    const objects = data.map((d) => d.data.content) as any
+    const objects = data.map((d) => toGrpcObject(d.data.content)) as any
     const res = (await coder.filterAndDecodeObjects(
       parseMoveType('0x2::dynamic_field::Field<address, bool>'),
       objects
@@ -128,7 +129,7 @@ describe('Test Sui Example', () => {
   })
 
   test('decode dynamic fields 2', async () => {
-    const objects = data2.map((d) => d.data.content) as any
+    const objects = data2.map((d) => toGrpcObject(d.data.content)) as any
     const res: TypedSuiMoveObject<dynamic_field.Field<any, any>>[] = await coder.filterAndDecodeObjects(
       dynamic_field.Field.type(),
       objects
@@ -145,7 +146,7 @@ describe('Test Sui Example', () => {
   })
 
   test('decode dynamic fields 3', async () => {
-    const objects = data3.objects as any
+    const objects = data3.objects.map(toGrpcObject) as any
     const coder = defaultMoveCoder(SuiNetwork.MAIN_NET)
 
     const res: TypedSuiMoveObject<dynamic_field.Field<any, any>>[] = await coder.filterAndDecodeObjects(

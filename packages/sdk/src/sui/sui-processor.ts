@@ -3,7 +3,9 @@ import { ListStateStorage } from '@sentio/runtime'
 import { SuiNetwork } from './network.js'
 import { ServerError, Status } from 'nice-grpc'
 import { SuiContext, SuiObjectChangeContext } from './context.js'
-import { MoveCallSuiTransaction, SuiEvent, SuiTransactionBlockResponse, SuiObjectChange } from '@mysten/sui/jsonRpc'
+import type { SuiObjectChange } from '@mysten/sui/jsonRpc'
+import type { GrpcTypes } from '@mysten/sui/grpc'
+import type { SuiEventInput } from '@typemove/sui'
 import {
   accountAddressString,
   CallHandler,
@@ -14,7 +16,7 @@ import {
   SPLITTER,
   TransactionFilter
 } from '../move/index.js'
-import { getMoveCalls } from './utils.js'
+import { getMoveCalls, getProgrammableTransaction } from './utils.js'
 import { defaultMoveCoder, MoveCoder } from './index.js'
 import { ALL_ADDRESS, Labels, PromiseOrVoid } from '../core/index.js'
 import { Required } from 'utility-types'
@@ -75,9 +77,9 @@ export class SuiBaseProcessor {
   }
 
   protected onMoveEvent(
-    handler: (event: SuiEvent, ctx: SuiContext) => PromiseOrVoid,
+    handler: (event: SuiEventInput, ctx: SuiContext) => PromiseOrVoid,
     filter: EventFilter | EventFilter[],
-    handlerOptions?: HandlerOptions<MoveFetchConfig, SuiEvent>
+    handlerOptions?: HandlerOptions<MoveFetchConfig, SuiEventInput>
   ): SuiBaseProcessor {
     let _filters: EventFilter[] = []
     const _fetchConfig = MoveFetchConfig.fromPartial({ ...DEFAULT_FETCH_CONFIG, ...handlerOptions })
@@ -99,13 +101,11 @@ export class SuiBaseProcessor {
         if (!data.rawTransaction) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'event is null')
         }
-        const txn = JSON.parse(data.rawTransaction) as SuiTransactionBlockResponse
-        if (txn.events == null) {
-          txn.events = []
-        }
+        const txn = JSON.parse(data.rawTransaction) as GrpcTypes.ExecutedTransaction
 
-        const evt = JSON.parse(data.rawEvent) as SuiEvent
-        const idx = Number(evt.id.eventSeq) || 0
+        const evt = JSON.parse(data.rawEvent) as SuiEventInput
+        // gRPC events carry no sequence; index is resolved by the runtime.
+        const idx = 0
 
         const ctx = new SuiContext(
           processor.moduleName,
@@ -129,7 +129,7 @@ export class SuiBaseProcessor {
         const p = handlerOptions?.partitionKey
         if (!p) return undefined
         if (typeof p === 'function') {
-          const evt = JSON.parse(data.rawEvent) as SuiEvent
+          const evt = JSON.parse(data.rawEvent) as SuiEventInput
           const decoded = await processor.coder.decodeEvent<any>(evt)
           return p(decoded || evt)
         }
@@ -140,9 +140,9 @@ export class SuiBaseProcessor {
   }
 
   protected onEntryFunctionCall(
-    handler: (call: MoveCallSuiTransaction, ctx: SuiContext) => PromiseOrVoid,
+    handler: (call: GrpcTypes.MoveCall, ctx: SuiContext) => PromiseOrVoid,
     filter: FunctionNameAndCallFilter | FunctionNameAndCallFilter[],
-    handlerOptions?: HandlerOptions<MoveFetchConfig, MoveCallSuiTransaction>
+    handlerOptions?: HandlerOptions<MoveFetchConfig, GrpcTypes.MoveCall>
   ): SuiBaseProcessor {
     let _filters: FunctionNameAndCallFilter[] = []
     const _fetchConfig = MoveFetchConfig.fromPartial({ ...DEFAULT_FETCH_CONFIG, ...handlerOptions })
@@ -162,7 +162,7 @@ export class SuiBaseProcessor {
         if (!data.rawTransaction) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'call is null')
         }
-        const tx = JSON.parse(data.rawTransaction) as SuiTransactionBlockResponse
+        const tx = JSON.parse(data.rawTransaction) as GrpcTypes.ExecutedTransaction
 
         const ctx = new SuiContext(
           processor.moduleName,
@@ -175,14 +175,11 @@ export class SuiBaseProcessor {
           processor.config.baseLabels
         )
         if (tx) {
-          const calls: MoveCallSuiTransaction[] = getMoveCalls(tx)
-          const txKind = tx.transaction?.data?.transaction
-          if (!txKind) {
+          const calls = getMoveCalls(tx)
+          const programmableTx = getProgrammableTransaction(tx)
+          if (!programmableTx) {
             throw new ServerError(Status.INVALID_ARGUMENT, 'Unexpected getTransactionKind get empty')
           }
-
-          // getProgrammableTransaction(txKind)
-          const programmableTx = txKind.kind === 'ProgrammableTransaction' ? txKind : undefined
 
           // TODO potential pass index
           for (const call of calls) {
@@ -192,7 +189,7 @@ export class SuiBaseProcessor {
             }
 
             // TODO maybe do in parallel
-            const decoded = await processor.coder.decodeFunctionPayload(call, programmableTx?.inputs || [])
+            const decoded = await processor.coder.decodeFunctionPayload(call, programmableTx.inputs)
             await handler(decoded, ctx)
           }
         }
@@ -204,8 +201,8 @@ export class SuiBaseProcessor {
         const p = handlerOptions?.partitionKey
         if (!p) return undefined
         if (typeof p === 'function') {
-          const tx = JSON.parse(data.rawTransaction) as SuiTransactionBlockResponse
-          const calls: MoveCallSuiTransaction[] = getMoveCalls(tx)
+          const tx = JSON.parse(data.rawTransaction) as GrpcTypes.ExecutedTransaction
+          const calls = getMoveCalls(tx)
           // For simplicity, use the first call for partitioning
           if (calls.length > 0) {
             return p(calls[0])
@@ -219,17 +216,17 @@ export class SuiBaseProcessor {
   }
 
   onEvent(
-    handler: (event: SuiEvent, ctx: SuiContext) => void,
-    handlerOptions?: HandlerOptions<MoveFetchConfig, SuiEvent>
+    handler: (event: SuiEventInput, ctx: SuiContext) => void,
+    handlerOptions?: HandlerOptions<MoveFetchConfig, SuiEventInput>
   ): this {
     this.onMoveEvent(handler, { type: '' }, handlerOptions)
     return this
   }
 
   onTransactionBlock(
-    handler: (transaction: SuiTransactionBlockResponse, ctx: SuiContext) => PromiseOrVoid,
+    handler: (transaction: GrpcTypes.ExecutedTransaction, ctx: SuiContext) => PromiseOrVoid,
     filter?: TransactionFilter,
-    handlerOptions?: HandlerOptions<MoveFetchConfig, SuiTransactionBlockResponse>
+    handlerOptions?: HandlerOptions<MoveFetchConfig, GrpcTypes.ExecutedTransaction>
   ): this {
     const _fetchConfig = MoveFetchConfig.fromPartial({ ...DEFAULT_FETCH_CONFIG, ...handlerOptions })
 
@@ -241,7 +238,7 @@ export class SuiBaseProcessor {
         if (!data.rawTransaction) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'transaction is null')
         }
-        const tx = JSON.parse(data.rawTransaction) as SuiTransactionBlockResponse
+        const tx = JSON.parse(data.rawTransaction) as GrpcTypes.ExecutedTransaction
 
         const ctx = new SuiContext(
           processor.moduleName,
@@ -264,7 +261,7 @@ export class SuiBaseProcessor {
         const p = handlerOptions?.partitionKey
         if (!p) return undefined
         if (typeof p === 'function') {
-          const tx = JSON.parse(data.rawTransaction) as SuiTransactionBlockResponse
+          const tx = JSON.parse(data.rawTransaction) as GrpcTypes.ExecutedTransaction
           return p(tx)
         }
         return p
@@ -313,7 +310,7 @@ export class SuiGlobalProcessor extends SuiBaseProcessor {
     return new SuiGlobalProcessor(ALL_ADDRESS, { ...options, address: ALL_ADDRESS })
   }
   onTransactionBlock(
-    handler: (transaction: SuiTransactionBlockResponse, ctx: SuiContext) => void,
+    handler: (transaction: GrpcTypes.ExecutedTransaction, ctx: SuiContext) => void,
     filter: TransactionFilter,
     fetchConfig?: Partial<MoveFetchConfig>
   ): this {

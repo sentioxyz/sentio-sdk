@@ -1,10 +1,11 @@
-import type { SuiEvent, MoveCallSuiTransaction, SuiMoveObject } from '@mysten/sui/jsonRpc'
+import type { GrpcTypes } from '@mysten/sui/grpc'
+import type { SuiEventInput, SuiMoveObjectInput } from '@typemove/sui'
 import { DecodedStruct } from '@typemove/move'
 
-export type TypedEventInstance<T> = DecodedStruct<SuiEvent, T>
-export type TypedSuiMoveObject<T> = DecodedStruct<SuiMoveObject, T>
+export type TypedEventInstance<T> = DecodedStruct<SuiEventInput, T>
+export type TypedSuiMoveObject<T> = DecodedStruct<SuiMoveObjectInput, T>
 
-export type TypedFunctionPayload<T extends Array<any>> = MoveCallSuiTransaction & {
+export type TypedFunctionPayload<T extends Array<any>> = GrpcTypes.MoveCall & {
   /**
    * decoded argument data using ABI, undefined if there is decoding error, usually because the ABI/data mismatch
    */

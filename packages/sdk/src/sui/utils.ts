@@ -1,26 +1,23 @@
-import {
-  SuiTransactionBlockResponse,
-  MoveCallSuiTransaction,
-  ProgrammableTransaction,
-  SuiTransaction
-} from '@mysten/sui/jsonRpc'
+import type { GrpcTypes } from '@mysten/sui/grpc'
 import { accountTypeString } from '@typemove/move'
 
-export function getMoveCalls(txBlock: SuiTransactionBlockResponse) {
-  const txKind = txBlock.transaction?.data.transaction
-  if (!txKind) {
-    return []
-  }
-  const programmableTx: ProgrammableTransaction | undefined =
-    txKind.kind === 'ProgrammableTransaction' ? txKind : undefined
+export function getProgrammableTransaction(
+  txBlock: GrpcTypes.ExecutedTransaction
+): GrpcTypes.ProgrammableTransaction | undefined {
+  const data = txBlock.transaction?.kind?.data
+  return data?.oneofKind === 'programmableTransaction' ? data.programmableTransaction : undefined
+}
+
+export function getMoveCalls(txBlock: GrpcTypes.ExecutedTransaction): GrpcTypes.MoveCall[] {
+  const programmableTx = getProgrammableTransaction(txBlock)
   if (!programmableTx) {
     return []
   }
 
-  return programmableTx.transactions.flatMap((tx: SuiTransaction) => {
-    if ('MoveCall' in tx) {
-      const call = tx.MoveCall as MoveCallSuiTransaction
-      call.package = accountTypeString(call.package)
+  return programmableTx.commands.flatMap((cmd) => {
+    if (cmd.command.oneofKind === 'moveCall') {
+      const call = cmd.command.moveCall
+      call.package = accountTypeString(call.package ?? '')
 
       return [call]
     }

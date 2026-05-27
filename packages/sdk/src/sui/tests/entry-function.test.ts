@@ -1,4 +1,5 @@
 import { before, describe, test } from 'node:test'
+import { toGrpcExecutedTransaction } from './grpc-fixture.js'
 import { expect } from 'chai'
 import { TestProcessorServer } from '../../testing/index.js'
 import { router } from './types/testnet/wisp.js'
@@ -21,7 +22,10 @@ describe('Test entry call decoding', () => {
   })
 
   test('Check call dispatch', async () => {
-    const res = await service.sui.testEntryFunctionCall(testData.result as any, SuiChainId.SUI_TESTNET)
+    const res = await service.sui.testEntryFunctionCall(
+      toGrpcExecutedTransaction(testData.result) as any,
+      SuiChainId.SUI_TESTNET
+    )
     expect(res.result?.counters).length(1)
   })
 })

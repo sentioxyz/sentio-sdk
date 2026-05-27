@@ -1,4 +1,5 @@
 import { before, describe, test } from 'node:test'
+import { toGrpcExecutedTransaction } from './grpc-fixture.js'
 import { expect } from 'chai'
 import { TestProcessorServer } from '../../testing/index.js'
 import { SuiNetwork } from '../network.js'
@@ -32,14 +33,14 @@ describe('Test Sui Template Example', () => {
 
   test('Check template changes', async () => {
     // single round test
-    let res = await service.sui.testEvent(testData as any, SuiNetwork.TEST_NET)
+    let res = await service.sui.testEvent(toGrpcExecutedTransaction(testData) as any, SuiNetwork.TEST_NET)
     let config = await service.getConfig({})
     expect(res.result?.states?.configUpdated).equals(true)
     expect(config.contractConfigs).length(2)
     expect(config.accountConfigs).length(1)
     expect(config.templateInstances).length(1)
 
-    res = await service.sui.testEntryFunctionCall(testData as any, SuiNetwork.TEST_NET)
+    res = await service.sui.testEntryFunctionCall(toGrpcExecutedTransaction(testData) as any, SuiNetwork.TEST_NET)
     config = await service.getConfig({})
     expect(res.result?.states?.configUpdated).equals(true)
     expect(config.contractConfigs).length(2)
@@ -47,10 +48,10 @@ describe('Test Sui Template Example', () => {
     expect(config.templateInstances).length(0)
 
     // multi round test
-    await service.sui.testEvent(testData as any, SuiNetwork.TEST_NET)
+    await service.sui.testEvent(toGrpcExecutedTransaction(testData) as any, SuiNetwork.TEST_NET)
 
     round = 1
-    await service.sui.testEvent(testData as any, SuiNetwork.TEST_NET)
+    await service.sui.testEvent(toGrpcExecutedTransaction(testData) as any, SuiNetwork.TEST_NET)
     config = await service.getConfig({})
     expect(config.contractConfigs).length(2)
     expect(config.accountConfigs).length(2)
@@ -59,7 +60,7 @@ describe('Test Sui Template Example', () => {
     expect(config.accountConfigs[1].moveIntervalConfigs[0].intervalConfig?.handlerId).equals(3)
 
     round = 0
-    res = await service.sui.testEntryFunctionCall(testData as any, SuiNetwork.TEST_NET)
+    res = await service.sui.testEntryFunctionCall(toGrpcExecutedTransaction(testData) as any, SuiNetwork.TEST_NET)
     config = await service.getConfig({})
     expect(config.contractConfigs).length(2)
     expect(config.accountConfigs).length(1)
@@ -67,7 +68,7 @@ describe('Test Sui Template Example', () => {
     expect(config.accountConfigs[0].moveIntervalConfigs[0].intervalConfig?.handlerId).equals(2)
 
     round = 1
-    res = await service.sui.testEntryFunctionCall(testData as any, SuiNetwork.TEST_NET)
+    res = await service.sui.testEntryFunctionCall(toGrpcExecutedTransaction(testData) as any, SuiNetwork.TEST_NET)
     config = await service.getConfig({})
     expect(config.contractConfigs).length(2)
     expect(config.accountConfigs).length(0)
@@ -75,9 +76,9 @@ describe('Test Sui Template Example', () => {
 
     // make sure extra unbind won't crash server
     round = 1
-    await service.sui.testEntryFunctionCall(testData as any, SuiNetwork.TEST_NET)
+    await service.sui.testEntryFunctionCall(toGrpcExecutedTransaction(testData) as any, SuiNetwork.TEST_NET)
     round = 0
-    await service.sui.testEntryFunctionCall(testData as any, SuiNetwork.TEST_NET)
+    await service.sui.testEntryFunctionCall(toGrpcExecutedTransaction(testData) as any, SuiNetwork.TEST_NET)
   })
 })
 

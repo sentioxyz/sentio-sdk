@@ -11,7 +11,9 @@ import {
 import { ListStateStorage } from '@sentio/runtime'
 import { SuiNetwork } from './network.js'
 import { SuiAddressContext, SuiContext, SuiObjectChangeContext, SuiObjectContext } from './context.js'
-import { SuiMoveObject, SuiObjectChange, SuiTransactionBlockResponse } from '@mysten/sui/jsonRpc'
+import type { SuiObjectChange } from '@mysten/sui/jsonRpc'
+import type { GrpcTypes } from '@mysten/sui/grpc'
+import type { SuiMoveObjectInput } from '@typemove/sui'
 import { ALL_ADDRESS, PromiseOrVoid } from '../core/index.js'
 import { configure, DEFAULT_FETCH_CONFIG, IndexConfigure, SuiBindOptions } from './sui-processor.js'
 import { CallHandler, TransactionFilter, accountTypeString, ObjectChangeHandler } from '../move/index.js'
@@ -91,12 +93,12 @@ export abstract class SuiBaseObjectOrAddressProcessor<HandlerType> {
     return this.config.network
   }
 
-  // protected abstract transformObjects(objects: SuiMoveObject[]): SuiMoveObject[]
+  // protected abstract transformObjects(objects: SuiMoveObjectInput[]): SuiMoveObjectInput[]
 
   protected abstract doHandle(handler: HandlerType, data: Data_SuiObject, ctx: SuiObjectContext): Promise<any>
 
   public onInterval(
-    handler: HandlerType, //(resources: SuiMoveObject[], ctx: SuiObjectsContext) => PromiseOrVoid,
+    handler: HandlerType, //(resources: SuiMoveObjectInput[], ctx: SuiObjectsContext) => PromiseOrVoid,
     timeInterval: HandleInterval | undefined,
     checkpointInterval: HandleInterval | undefined,
     type: string | undefined,
@@ -167,7 +169,7 @@ abstract class SuiBaseObjectOrAddressProcessorInternal<
 }
 
 export class SuiAddressProcessor extends SuiBaseObjectOrAddressProcessorInternal<
-  (objects: SuiMoveObject[], ctx: SuiAddressContext) => PromiseOrVoid
+  (objects: SuiMoveObjectInput[], ctx: SuiAddressContext) => PromiseOrVoid
 > {
   callHandlers: CallHandler<Data_SuiCall>[] = []
 
@@ -176,15 +178,15 @@ export class SuiAddressProcessor extends SuiBaseObjectOrAddressProcessorInternal
   }
 
   protected async doHandle(
-    handler: (objects: SuiMoveObject[], ctx: SuiObjectContext) => PromiseOrVoid,
+    handler: (objects: SuiMoveObjectInput[], ctx: SuiObjectContext) => PromiseOrVoid,
     data: Data_SuiObject,
     ctx: SuiObjectContext
   ) {
-    return handler(data.rawObjects.map((o) => JSON.parse(o)) as SuiMoveObject[], ctx)
+    return handler(data.rawObjects.map((o) => JSON.parse(o)) as SuiMoveObjectInput[], ctx)
   }
 
   onTransactionBlock(
-    handler: (transaction: SuiTransactionBlockResponse, ctx: SuiContext) => PromiseOrVoid,
+    handler: (transaction: GrpcTypes.ExecutedTransaction, ctx: SuiContext) => PromiseOrVoid,
     filter?: TransactionFilter,
     fetchConfig?: Partial<MoveFetchConfig>
   ) {
@@ -205,7 +207,7 @@ export class SuiAddressProcessor extends SuiBaseObjectOrAddressProcessorInternal
         if (!data.rawTransaction) {
           throw new ServerError(Status.INVALID_ARGUMENT, 'transaction is null')
         }
-        const tx = JSON.parse(data.rawTransaction) as SuiTransactionBlockResponse
+        const tx = JSON.parse(data.rawTransaction) as GrpcTypes.ExecutedTransaction
 
         const ctx = new SuiContext(
           'object',
@@ -230,7 +232,7 @@ export class SuiAddressProcessor extends SuiBaseObjectOrAddressProcessorInternal
 }
 
 export class SuiObjectProcessor extends SuiBaseObjectOrAddressProcessorInternal<
-  (self: SuiMoveObject, dynamicFieldObjects: SuiMoveObject[], ctx: SuiObjectContext) => PromiseOrVoid
+  (self: SuiMoveObjectInput, dynamicFieldObjects: SuiMoveObjectInput[], ctx: SuiObjectContext) => PromiseOrVoid
 > {
   static bind(options: SuiObjectBindOptions): SuiObjectProcessor {
     return new SuiObjectProcessor({
@@ -244,7 +246,11 @@ export class SuiObjectProcessor extends SuiBaseObjectOrAddressProcessorInternal<
   }
 
   protected async doHandle(
-    handler: (self: SuiMoveObject, dynamicFieldObjects: SuiMoveObject[], ctx: SuiObjectContext) => PromiseOrVoid,
+    handler: (
+      self: SuiMoveObjectInput,
+      dynamicFieldObjects: SuiMoveObjectInput[],
+      ctx: SuiObjectContext
+    ) => PromiseOrVoid,
     data: Data_SuiObject,
     ctx: SuiObjectContext
   ) {
@@ -253,15 +259,15 @@ export class SuiObjectProcessor extends SuiBaseObjectOrAddressProcessorInternal<
       return
     }
     return handler(
-      JSON.parse(data.rawSelf) as SuiMoveObject,
-      data.rawObjects.map((o) => JSON.parse(o)) as SuiMoveObject[],
+      JSON.parse(data.rawSelf) as SuiMoveObjectInput,
+      data.rawObjects.map((o) => JSON.parse(o)) as SuiMoveObjectInput[],
       ctx
     )
   }
 }
 
 export class SuiObjectTypeProcessor<T> extends SuiBaseObjectOrAddressProcessor<
-  (self: TypedSuiMoveObject<T>, dynamicFieldObjects: SuiMoveObject[], ctx: SuiObjectContext) => PromiseOrVoid
+  (self: TypedSuiMoveObject<T>, dynamicFieldObjects: SuiMoveObjectInput[], ctx: SuiObjectContext) => PromiseOrVoid
 > {
   objectType: TypeDescriptor<T>
 
@@ -281,7 +287,7 @@ export class SuiObjectTypeProcessor<T> extends SuiBaseObjectOrAddressProcessor<
   protected async doHandle(
     handler: (
       self: TypedSuiMoveObject<T>,
-      dynamicFieldObjects: SuiMoveObject[],
+      dynamicFieldObjects: SuiMoveObjectInput[],
       ctx: SuiObjectContext
     ) => PromiseOrVoid,
     data: Data_SuiObject,
@@ -291,8 +297,10 @@ export class SuiObjectTypeProcessor<T> extends SuiBaseObjectOrAddressProcessor<
       console.log(`Sui object not existed in ${ctx.checkpoint}, please specific a start time`)
       return
     }
-    const object = await ctx.coder.filterAndDecodeObjects(this.objectType, [JSON.parse(data.rawSelf) as SuiMoveObject])
-    return handler(object[0], data.rawObjects.map((o) => JSON.parse(o)) as SuiMoveObject[], ctx)
+    const object = await ctx.coder.filterAndDecodeObjects(this.objectType, [
+      JSON.parse(data.rawSelf) as SuiMoveObjectInput
+    ])
+    return handler(object[0], data.rawObjects.map((o) => JSON.parse(o)) as SuiMoveObjectInput[], ctx)
   }
 
   public onObjectChange(handler: (changes: SuiObjectChange[], ctx: SuiObjectChangeContext) => PromiseOrVoid): this {
@@ -323,7 +331,7 @@ export class SuiObjectTypeProcessor<T> extends SuiBaseObjectOrAddressProcessor<
   public onTimeInterval(
     handler: (
       self: TypedSuiMoveObject<T>,
-      dynamicFieldObjects: SuiMoveObject[],
+      dynamicFieldObjects: SuiMoveObjectInput[],
       ctx: SuiObjectContext
     ) => PromiseOrVoid,
     timeIntervalInMinutes = 60,
@@ -345,7 +353,7 @@ export class SuiObjectTypeProcessor<T> extends SuiBaseObjectOrAddressProcessor<
   public onCheckpointInterval(
     handler: (
       self: TypedSuiMoveObject<T>,
-      dynamicFieldObjects: SuiMoveObject[],
+      dynamicFieldObjects: SuiMoveObjectInput[],
       ctx: SuiObjectContext
     ) => PromiseOrVoid,
     checkpointInterval = 100000,
@@ -363,7 +371,7 @@ export class SuiObjectTypeProcessor<T> extends SuiBaseObjectOrAddressProcessor<
 }
 
 export class SuiWrappedObjectProcessor extends SuiBaseObjectOrAddressProcessorInternal<
-  (dynamicFieldObjects: SuiMoveObject[], ctx: SuiObjectContext) => PromiseOrVoid
+  (dynamicFieldObjects: SuiMoveObjectInput[], ctx: SuiObjectContext) => PromiseOrVoid
 > {
   static bind(options: SuiObjectBindOptions): SuiWrappedObjectProcessor {
     return new SuiWrappedObjectProcessor({
@@ -377,10 +385,10 @@ export class SuiWrappedObjectProcessor extends SuiBaseObjectOrAddressProcessorIn
   }
 
   protected async doHandle(
-    handler: (dynamicFieldObjects: SuiMoveObject[], ctx: SuiObjectContext) => PromiseOrVoid,
+    handler: (dynamicFieldObjects: SuiMoveObjectInput[], ctx: SuiObjectContext) => PromiseOrVoid,
     data: Data_SuiObject,
     ctx: SuiObjectContext
   ) {
-    return handler(data.rawObjects.map((o) => JSON.parse(o)) as SuiMoveObject[], ctx)
+    return handler(data.rawObjects.map((o) => JSON.parse(o)) as SuiMoveObjectInput[], ctx)
   }
 }

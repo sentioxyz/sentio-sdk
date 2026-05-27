@@ -1,2429 +1,3113 @@
-{
-  "jsonrpc": "2.0",
-  "result": {
-    "comparator": {
-      "fileFormatVersion": 6,
-      "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
+[
+  {
+    "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
+    "module": {
       "name": "comparator",
-      "friends": [],
-      "structs": {
-        "Result": {
-          "abilities": {
-            "abilities": ["Drop"]
-          },
+      "datatypes": [
+        {
+          "name": "Result",
+          "kind": 1,
+          "abilities": [
+            2
+          ],
           "typeParameters": [],
           "fields": [
             {
               "name": "inner",
-              "type": "U8"
+              "position": 0,
+              "type": {
+                "type": 3,
+                "typeParameterInstantiation": []
+              }
             }
-          ]
+          ],
+          "variants": []
         }
-      },
-      "exposedFunctions": {
-        "compare": {
-          "visibility": "Public",
+      ],
+      "functions": [
+        {
+          "name": "compare",
+          "visibility": 2,
           "isEntry": false,
           "typeParameters": [
             {
-              "abilities": []
+              "constraints": []
             }
           ],
           "parameters": [
             {
-              "Reference": {
-                "TypeParameter": 0
+              "reference": 1,
+              "body": {
+                "type": 11,
+                "typeParameter": 0,
+                "typeParameterInstantiation": []
               }
             },
             {
-              "Reference": {
-                "TypeParameter": 0
+              "reference": 1,
+              "body": {
+                "type": 11,
+                "typeParameter": 0,
+                "typeParameterInstantiation": []
               }
             }
           ],
-          "return": [
+          "returns": [
             {
-              "Struct": {
-                "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
-                "module": "comparator",
-                "name": "Result",
-                "typeArguments": []
+              "body": {
+                "type": 10,
+                "typeName": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a::comparator::Result",
+                "typeParameterInstantiation": []
               }
             }
           ]
         },
-        "compare_u8_vector": {
-          "visibility": "Public",
+        {
+          "name": "compare_u8_vector",
+          "visibility": 2,
           "isEntry": false,
           "typeParameters": [],
           "parameters": [
             {
-              "Vector": "U8"
+              "body": {
+                "type": 9,
+                "typeParameterInstantiation": [
+                  {
+                    "type": 3,
+                    "typeParameterInstantiation": []
+                  }
+                ]
+              }
             },
             {
-              "Vector": "U8"
+              "body": {
+                "type": 9,
+                "typeParameterInstantiation": [
+                  {
+                    "type": 3,
+                    "typeParameterInstantiation": []
+                  }
+                ]
+              }
             }
           ],
-          "return": [
+          "returns": [
             {
-              "Struct": {
-                "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
-                "module": "comparator",
-                "name": "Result",
-                "typeArguments": []
+              "body": {
+                "type": 10,
+                "typeName": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a::comparator::Result",
+                "typeParameterInstantiation": []
               }
             }
           ]
         },
-        "is_equal": {
-          "visibility": "Public",
+        {
+          "name": "is_equal",
+          "visibility": 2,
           "isEntry": false,
           "typeParameters": [],
           "parameters": [
             {
-              "Reference": {
-                "Struct": {
-                  "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
-                  "module": "comparator",
-                  "name": "Result",
-                  "typeArguments": []
-                }
+              "reference": 1,
+              "body": {
+                "type": 10,
+                "typeName": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a::comparator::Result",
+                "typeParameterInstantiation": []
               }
             }
           ],
-          "return": ["Bool"]
+          "returns": [
+            {
+              "body": {
+                "type": 2,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
         },
-        "is_greater_than": {
-          "visibility": "Public",
+        {
+          "name": "is_greater_than",
+          "visibility": 2,
           "isEntry": false,
           "typeParameters": [],
           "parameters": [
             {
-              "Reference": {
-                "Struct": {
-                  "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
-                  "module": "comparator",
-                  "name": "Result",
-                  "typeArguments": []
-                }
+              "reference": 1,
+              "body": {
+                "type": 10,
+                "typeName": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a::comparator::Result",
+                "typeParameterInstantiation": []
               }
             }
           ],
-          "return": ["Bool"]
+          "returns": [
+            {
+              "body": {
+                "type": 2,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
         },
-        "is_smaller_than": {
-          "visibility": "Public",
+        {
+          "name": "is_smaller_than",
+          "visibility": 2,
           "isEntry": false,
           "typeParameters": [],
           "parameters": [
             {
-              "Reference": {
-                "Struct": {
-                  "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
-                  "module": "comparator",
-                  "name": "Result",
-                  "typeArguments": []
-                }
+              "reference": 1,
+              "body": {
+                "type": 10,
+                "typeName": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a::comparator::Result",
+                "typeParameterInstantiation": []
               }
             }
           ],
-          "return": ["Bool"]
+          "returns": [
+            {
+              "body": {
+                "type": 2,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
         }
-      }
-    },
-    "math_utils": {
-      "fileFormatVersion": 6,
-      "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
+      ]
+    }
+  },
+  {
+    "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
+    "module": {
       "name": "math_utils",
-      "friends": [],
-      "structs": {},
-      "exposedFunctions": {
-        "max": {
-          "visibility": "Public",
+      "datatypes": [],
+      "functions": [
+        {
+          "name": "max",
+          "visibility": 2,
           "isEntry": false,
           "typeParameters": [],
-          "parameters": ["U128", "U128"],
-          "return": ["U128"]
+          "parameters": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
         },
-        "max_u64": {
-          "visibility": "Public",
+        {
+          "name": "max_u64",
+          "visibility": 2,
           "isEntry": false,
           "typeParameters": [],
-          "parameters": ["U64", "U64"],
-          "return": ["U64"]
+          "parameters": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
         },
-        "min": {
-          "visibility": "Public",
+        {
+          "name": "min",
+          "visibility": 2,
           "isEntry": false,
           "typeParameters": [],
-          "parameters": ["U128", "U128"],
-          "return": ["U128"]
+          "parameters": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
         },
-        "pow": {
-          "visibility": "Public",
+        {
+          "name": "pow",
+          "visibility": 2,
           "isEntry": false,
           "typeParameters": [],
-          "parameters": ["U128", "U8"],
-          "return": ["U128"]
+          "parameters": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 3,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
         },
-        "sqrt": {
-          "visibility": "Public",
+        {
+          "name": "sqrt",
+          "visibility": 2,
           "isEntry": false,
           "typeParameters": [],
-          "parameters": ["U128"],
-          "return": ["U128"]
+          "parameters": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
         },
-        "sqrt_u256": {
-          "visibility": "Public",
+        {
+          "name": "sqrt_u256",
+          "visibility": 2,
           "isEntry": false,
           "typeParameters": [],
-          "parameters": ["U256"],
-          "return": ["U256"]
+          "parameters": [
+            {
+              "body": {
+                "type": 8,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 8,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
         }
-      }
-    },
-    "pool": {
-      "fileFormatVersion": 6,
-      "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
+      ]
+    }
+  },
+  {
+    "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
+    "module": {
       "name": "pool",
-      "friends": [],
-      "structs": {
-        "ControllerCap": {
-          "abilities": {
-            "abilities": ["Store", "Key"]
-          },
+      "datatypes": [
+        {
+          "name": "ControllerCap",
+          "kind": 1,
+          "abilities": [
+            3,
+            4
+          ],
           "typeParameters": [],
           "fields": [
             {
               "name": "id",
+              "position": 0,
               "type": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "object",
-                  "name": "UID",
-                  "typeArguments": []
-                }
+                "type": 10,
+                "typeName": "0x2::object::UID",
+                "typeParameterInstantiation": []
               }
             }
-          ]
+          ],
+          "variants": []
         },
-        "FeeToSet": {
-          "abilities": {
-            "abilities": ["Copy", "Drop"]
-          },
+        {
+          "name": "FeeToSet",
+          "kind": 1,
+          "abilities": [
+            1,
+            2
+          ],
           "typeParameters": [],
           "fields": [
             {
               "name": "fee_to",
-              "type": "Address"
+              "position": 0,
+              "type": {
+                "type": 1,
+                "typeParameterInstantiation": []
+              }
             },
             {
               "name": "caller",
-              "type": "Address"
+              "position": 1,
+              "type": {
+                "type": 1,
+                "typeParameterInstantiation": []
+              }
             }
-          ]
+          ],
+          "variants": []
         },
-        "LiquidityAdded": {
-          "abilities": {
-            "abilities": ["Copy", "Drop"]
-          },
+        {
+          "name": "LiquidityAdded",
+          "kind": 1,
+          "abilities": [
+            1,
+            2
+          ],
           "typeParameters": [
             {
-              "constraints": {
-                "abilities": []
-              },
-              "isPhantom": true
+              "constraints": []
             },
             {
-              "constraints": {
-                "abilities": []
-              },
-              "isPhantom": true
+              "constraints": []
             }
           ],
           "fields": [
             {
               "name": "user",
-              "type": "Address"
+              "position": 0,
+              "type": {
+                "type": 1,
+                "typeParameterInstantiation": []
+              }
             },
             {
               "name": "first_amount",
-              "type": "U64"
+              "position": 1,
+              "type": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
             },
             {
               "name": "second_amount",
-              "type": "U64"
+              "position": 2,
+              "type": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
             },
             {
               "name": "first_reserve",
-              "type": "U64"
+              "position": 3,
+              "type": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
             },
             {
               "name": "second_reserve",
-              "type": "U64"
+              "position": 4,
+              "type": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
             },
             {
               "name": "wisp_lp_amount",
-              "type": "U64"
+              "position": 5,
+              "type": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
             },
             {
               "name": "fee_amount",
-              "type": "U64"
+              "position": 6,
+              "type": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
             }
-          ]
+          ],
+          "variants": []
         },
-        "LiquidityRemoved": {
-          "abilities": {
-            "abilities": ["Copy", "Drop"]
-          },
+        {
+          "name": "LiquidityRemoved",
+          "kind": 1,
+          "abilities": [
+            1,
+            2
+          ],
           "typeParameters": [
             {
-              "constraints": {
-                "abilities": []
-              },
-              "isPhantom": true
+              "constraints": []
             },
             {
-              "constraints": {
-                "abilities": []
-              },
-              "isPhantom": true
+              "constraints": []
             }
           ],
           "fields": [
             {
               "name": "user",
-              "type": "Address"
+              "position": 0,
+              "type": {
+                "type": 1,
+                "typeParameterInstantiation": []
+              }
             },
             {
               "name": "first_amount",
-              "type": "U64"
+              "position": 1,
+              "type": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
             },
             {
               "name": "second_amount",
-              "type": "U64"
+              "position": 2,
+              "type": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
             },
             {
               "name": "first_reserve",
-              "type": "U64"
+              "position": 3,
+              "type": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
             },
             {
               "name": "second_reserve",
-              "type": "U64"
+              "position": 4,
+              "type": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
             },
             {
               "name": "wisp_lp_amount",
-              "type": "U64"
+              "position": 5,
+              "type": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
             },
             {
               "name": "fee_amount",
-              "type": "U64"
+              "position": 6,
+              "type": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
             }
-          ]
+          ],
+          "variants": []
         },
-        "Pool": {
-          "abilities": {
-            "abilities": ["Store", "Key"]
-          },
+        {
+          "name": "Pool",
+          "kind": 1,
+          "abilities": [
+            3,
+            4
+          ],
           "typeParameters": [
             {
-              "constraints": {
-                "abilities": []
-              },
-              "isPhantom": true
+              "constraints": []
             },
             {
-              "constraints": {
-                "abilities": []
-              },
-              "isPhantom": true
+              "constraints": []
             }
           ],
           "fields": [
             {
               "name": "id",
+              "position": 0,
               "type": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "object",
-                  "name": "UID",
-                  "typeArguments": []
-                }
+                "type": 10,
+                "typeName": "0x2::object::UID",
+                "typeParameterInstantiation": []
               }
             },
             {
               "name": "first_token",
+              "position": 1,
               "type": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "balance",
-                  "name": "Balance",
-                  "typeArguments": [
-                    {
-                      "TypeParameter": 0
-                    }
-                  ]
-                }
+                "type": 10,
+                "typeName": "0x2::balance::Balance",
+                "typeParameterInstantiation": [
+                  {
+                    "type": 11,
+                    "typeParameter": 0,
+                    "typeParameterInstantiation": []
+                  }
+                ]
               }
             },
             {
               "name": "second_token",
+              "position": 2,
               "type": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "balance",
-                  "name": "Balance",
-                  "typeArguments": [
-                    {
-                      "TypeParameter": 1
-                    }
-                  ]
-                }
+                "type": 10,
+                "typeName": "0x2::balance::Balance",
+                "typeParameterInstantiation": [
+                  {
+                    "type": 11,
+                    "typeParameter": 1,
+                    "typeParameterInstantiation": []
+                  }
+                ]
               }
             },
             {
               "name": "wisp_lp_supply",
+              "position": 3,
               "type": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "balance",
-                  "name": "Supply",
-                  "typeArguments": [
-                    {
-                      "Struct": {
-                        "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
-                        "module": "pool",
-                        "name": "WISPLP",
-                        "typeArguments": [
-                          {
-                            "TypeParameter": 0
-                          },
-                          {
-                            "TypeParameter": 1
-                          }
-                        ]
+                "type": 10,
+                "typeName": "0x2::balance::Supply",
+                "typeParameterInstantiation": [
+                  {
+                    "type": 10,
+                    "typeName": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a::pool::WISPLP",
+                    "typeParameterInstantiation": [
+                      {
+                        "type": 11,
+                        "typeParameter": 0,
+                        "typeParameterInstantiation": []
+                      },
+                      {
+                        "type": 11,
+                        "typeParameter": 1,
+                        "typeParameterInstantiation": []
                       }
-                    }
-                  ]
-                }
+                    ]
+                  }
+                ]
               }
             },
             {
               "name": "k_last",
-              "type": "U128"
+              "position": 4,
+              "type": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
             }
-          ]
+          ],
+          "variants": []
         },
-        "PoolCreated": {
-          "abilities": {
-            "abilities": ["Copy", "Drop"]
-          },
+        {
+          "name": "PoolCreated",
+          "kind": 1,
+          "abilities": [
+            1,
+            2
+          ],
           "typeParameters": [
             {
-              "constraints": {
-                "abilities": []
-              },
-              "isPhantom": true
+              "constraints": []
             },
             {
-              "constraints": {
-                "abilities": []
-              },
-              "isPhantom": true
+              "constraints": []
             }
           ],
           "fields": [
             {
               "name": "pool",
-              "type": "Address"
+              "position": 0,
+              "type": {
+                "type": 1,
+                "typeParameterInstantiation": []
+              }
             },
             {
               "name": "first_amount",
-              "type": "U64"
+              "position": 1,
+              "type": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
             },
             {
               "name": "second_amount",
-              "type": "U64"
+              "position": 2,
+              "type": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
             },
             {
               "name": "wisp_lp_amount",
-              "type": "U64"
+              "position": 3,
+              "type": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
             }
-          ]
+          ],
+          "variants": []
         },
-        "PoolName": {
-          "abilities": {
-            "abilities": ["Copy", "Drop", "Store"]
-          },
+        {
+          "name": "PoolName",
+          "kind": 1,
+          "abilities": [
+            1,
+            2,
+            3
+          ],
           "typeParameters": [],
           "fields": [
             {
               "name": "first_type",
+              "position": 0,
               "type": {
-                "Struct": {
-                  "address": "0x1",
-                  "module": "type_name",
-                  "name": "TypeName",
-                  "typeArguments": []
-                }
+                "type": 10,
+                "typeName": "0x1::type_name::TypeName",
+                "typeParameterInstantiation": []
               }
             },
             {
               "name": "second_type",
+              "position": 1,
               "type": {
-                "Struct": {
-                  "address": "0x1",
-                  "module": "type_name",
-                  "name": "TypeName",
-                  "typeArguments": []
-                }
+                "type": 10,
+                "typeName": "0x1::type_name::TypeName",
+                "typeParameterInstantiation": []
               }
             }
-          ]
+          ],
+          "variants": []
         },
-        "PoolRegistry": {
-          "abilities": {
-            "abilities": ["Key"]
-          },
+        {
+          "name": "PoolRegistry",
+          "kind": 1,
+          "abilities": [
+            4
+          ],
           "typeParameters": [],
           "fields": [
             {
               "name": "id",
+              "position": 0,
               "type": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "object",
-                  "name": "UID",
-                  "typeArguments": []
-                }
+                "type": 10,
+                "typeName": "0x2::object::UID",
+                "typeParameterInstantiation": []
               }
             },
             {
               "name": "fee_to",
-              "type": "Address"
+              "position": 1,
+              "type": {
+                "type": 1,
+                "typeParameterInstantiation": []
+              }
             },
             {
               "name": "pools",
+              "position": 2,
               "type": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "object_bag",
-                  "name": "ObjectBag",
-                  "typeArguments": []
-                }
+                "type": 10,
+                "typeName": "0x2::object_bag::ObjectBag",
+                "typeParameterInstantiation": []
               }
             }
-          ]
+          ],
+          "variants": []
         },
-        "TokenSwapped": {
-          "abilities": {
-            "abilities": ["Copy", "Drop"]
-          },
+        {
+          "name": "TokenSwapped",
+          "kind": 1,
+          "abilities": [
+            1,
+            2
+          ],
           "typeParameters": [
             {
-              "constraints": {
-                "abilities": []
-              },
-              "isPhantom": true
+              "constraints": []
             },
             {
-              "constraints": {
-                "abilities": []
-              },
-              "isPhantom": true
+              "constraints": []
             }
           ],
           "fields": [
             {
               "name": "user",
-              "type": "Address"
+              "position": 0,
+              "type": {
+                "type": 1,
+                "typeParameterInstantiation": []
+              }
             },
             {
               "name": "first_amount_in",
-              "type": "U64"
+              "position": 1,
+              "type": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
             },
             {
               "name": "second_amount_in",
-              "type": "U64"
+              "position": 2,
+              "type": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
             },
             {
               "name": "first_amount_out",
-              "type": "U64"
+              "position": 3,
+              "type": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
             },
             {
               "name": "second_amount_out",
-              "type": "U64"
+              "position": 4,
+              "type": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
             },
             {
               "name": "first_reserve",
-              "type": "U64"
+              "position": 5,
+              "type": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
             },
             {
               "name": "second_reserve",
-              "type": "U64"
+              "position": 6,
+              "type": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
             }
-          ]
+          ],
+          "variants": []
         },
-        "WISPLP": {
-          "abilities": {
-            "abilities": ["Drop"]
-          },
+        {
+          "name": "WISPLP",
+          "kind": 1,
+          "abilities": [
+            2
+          ],
           "typeParameters": [
             {
-              "constraints": {
-                "abilities": []
-              },
-              "isPhantom": true
+              "constraints": []
             },
             {
-              "constraints": {
-                "abilities": []
-              },
-              "isPhantom": true
+              "constraints": []
             }
           ],
           "fields": [
             {
               "name": "dummy_field",
-              "type": "Bool"
+              "position": 0,
+              "type": {
+                "type": 2,
+                "typeParameterInstantiation": []
+              }
             }
-          ]
+          ],
+          "variants": []
         }
-      },
-      "exposedFunctions": {
-        "add_liquidity": {
-          "visibility": "Public",
+      ],
+      "functions": [
+        {
+          "name": "add_liquidity",
+          "visibility": 2,
           "isEntry": false,
           "typeParameters": [
             {
-              "abilities": []
+              "constraints": []
             },
             {
-              "abilities": []
+              "constraints": []
             }
           ],
           "parameters": [
             {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
-                  "module": "pool",
-                  "name": "PoolRegistry",
-                  "typeArguments": []
-                }
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a::pool::PoolRegistry",
+                "typeParameterInstantiation": []
               }
             },
             {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "coin",
-                  "name": "Coin",
-                  "typeArguments": [
-                    {
-                      "TypeParameter": 0
-                    }
-                  ]
-                }
-              }
-            },
-            {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "coin",
-                  "name": "Coin",
-                  "typeArguments": [
-                    {
-                      "TypeParameter": 1
-                    }
-                  ]
-                }
-              }
-            },
-            "U64",
-            "U64",
-            "U64",
-            "U64",
-            {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "tx_context",
-                  "name": "TxContext",
-                  "typeArguments": []
-                }
-              }
-            }
-          ],
-          "return": [
-            {
-              "Struct": {
-                "address": "0x2",
-                "module": "coin",
-                "name": "Coin",
-                "typeArguments": [
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x2::coin::Coin",
+                "typeParameterInstantiation": [
                   {
-                    "Struct": {
-                      "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
-                      "module": "pool",
-                      "name": "WISPLP",
-                      "typeArguments": [
-                        {
-                          "TypeParameter": 0
-                        },
-                        {
-                          "TypeParameter": 1
-                        }
-                      ]
-                    }
+                    "type": 11,
+                    "typeParameter": 0,
+                    "typeParameterInstantiation": []
                   }
                 ]
               }
-            }
-          ]
-        },
-        "borrow_mut_pool": {
-          "visibility": "Public",
-          "isEntry": false,
-          "typeParameters": [
-            {
-              "abilities": []
             },
             {
-              "abilities": []
-            }
-          ],
-          "parameters": [
-            {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
-                  "module": "pool",
-                  "name": "PoolRegistry",
-                  "typeArguments": []
-                }
-              }
-            }
-          ],
-          "return": [
-            {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
-                  "module": "pool",
-                  "name": "Pool",
-                  "typeArguments": [
-                    {
-                      "TypeParameter": 0
-                    },
-                    {
-                      "TypeParameter": 1
-                    }
-                  ]
-                }
-              }
-            }
-          ]
-        },
-        "borrow_pool": {
-          "visibility": "Public",
-          "isEntry": false,
-          "typeParameters": [
-            {
-              "abilities": []
-            },
-            {
-              "abilities": []
-            }
-          ],
-          "parameters": [
-            {
-              "Reference": {
-                "Struct": {
-                  "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
-                  "module": "pool",
-                  "name": "PoolRegistry",
-                  "typeArguments": []
-                }
-              }
-            }
-          ],
-          "return": [
-            {
-              "Reference": {
-                "Struct": {
-                  "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
-                  "module": "pool",
-                  "name": "Pool",
-                  "typeArguments": [
-                    {
-                      "TypeParameter": 0
-                    },
-                    {
-                      "TypeParameter": 1
-                    }
-                  ]
-                }
-              }
-            }
-          ]
-        },
-        "create_pool": {
-          "visibility": "Public",
-          "isEntry": false,
-          "typeParameters": [
-            {
-              "abilities": []
-            },
-            {
-              "abilities": []
-            }
-          ],
-          "parameters": [
-            {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
-                  "module": "pool",
-                  "name": "PoolRegistry",
-                  "typeArguments": []
-                }
-              }
-            },
-            {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "coin",
-                  "name": "Coin",
-                  "typeArguments": [
-                    {
-                      "TypeParameter": 0
-                    }
-                  ]
-                }
-              }
-            },
-            {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "coin",
-                  "name": "Coin",
-                  "typeArguments": [
-                    {
-                      "TypeParameter": 1
-                    }
-                  ]
-                }
-              }
-            },
-            "U64",
-            "U64",
-            {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "tx_context",
-                  "name": "TxContext",
-                  "typeArguments": []
-                }
-              }
-            }
-          ],
-          "return": [
-            {
-              "Struct": {
-                "address": "0x2",
-                "module": "coin",
-                "name": "Coin",
-                "typeArguments": [
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x2::coin::Coin",
+                "typeParameterInstantiation": [
                   {
-                    "Struct": {
-                      "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
-                      "module": "pool",
-                      "name": "WISPLP",
-                      "typeArguments": [
-                        {
-                          "TypeParameter": 0
-                        },
-                        {
-                          "TypeParameter": 1
-                        }
-                      ]
-                    }
+                    "type": 11,
+                    "typeParameter": 1,
+                    "typeParameterInstantiation": []
                   }
                 ]
               }
-            }
-          ]
-        },
-        "create_pool_name": {
-          "visibility": "Public",
-          "isEntry": false,
-          "typeParameters": [],
-          "parameters": [
+            },
             {
-              "Struct": {
-                "address": "0x1",
-                "module": "type_name",
-                "name": "TypeName",
-                "typeArguments": []
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
               }
             },
             {
-              "Struct": {
-                "address": "0x1",
-                "module": "type_name",
-                "name": "TypeName",
-                "typeArguments": []
-              }
-            }
-          ],
-          "return": [
-            {
-              "Struct": {
-                "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
-                "module": "pool",
-                "name": "PoolName",
-                "typeArguments": []
-              }
-            }
-          ]
-        },
-        "get_amounts": {
-          "visibility": "Public",
-          "isEntry": false,
-          "typeParameters": [
-            {
-              "abilities": []
-            },
-            {
-              "abilities": []
-            }
-          ],
-          "parameters": [
-            {
-              "Reference": {
-                "Struct": {
-                  "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
-                  "module": "pool",
-                  "name": "Pool",
-                  "typeArguments": [
-                    {
-                      "TypeParameter": 0
-                    },
-                    {
-                      "TypeParameter": 1
-                    }
-                  ]
-                }
-              }
-            }
-          ],
-          "return": ["U64", "U64", "U64"]
-        },
-        "get_input_amount": {
-          "visibility": "Public",
-          "isEntry": false,
-          "typeParameters": [
-            {
-              "abilities": []
-            },
-            {
-              "abilities": []
-            }
-          ],
-          "parameters": [
-            {
-              "Reference": {
-                "Struct": {
-                  "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
-                  "module": "pool",
-                  "name": "Pool",
-                  "typeArguments": [
-                    {
-                      "TypeParameter": 0
-                    },
-                    {
-                      "TypeParameter": 1
-                    }
-                  ]
-                }
-              }
-            },
-            "U64",
-            "Bool"
-          ],
-          "return": ["U64"]
-        },
-        "get_output_amount": {
-          "visibility": "Public",
-          "isEntry": false,
-          "typeParameters": [
-            {
-              "abilities": []
-            },
-            {
-              "abilities": []
-            }
-          ],
-          "parameters": [
-            {
-              "Reference": {
-                "Struct": {
-                  "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
-                  "module": "pool",
-                  "name": "Pool",
-                  "typeArguments": [
-                    {
-                      "TypeParameter": 0
-                    },
-                    {
-                      "TypeParameter": 1
-                    }
-                  ]
-                }
-              }
-            },
-            "U64",
-            "Bool"
-          ],
-          "return": ["U64"]
-        },
-        "get_pool_data": {
-          "visibility": "Public",
-          "isEntry": false,
-          "typeParameters": [
-            {
-              "abilities": []
-            },
-            {
-              "abilities": []
-            }
-          ],
-          "parameters": [
-            {
-              "Reference": {
-                "Struct": {
-                  "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
-                  "module": "pool",
-                  "name": "Pool",
-                  "typeArguments": [
-                    {
-                      "TypeParameter": 0
-                    },
-                    {
-                      "TypeParameter": 1
-                    }
-                  ]
-                }
-              }
-            }
-          ],
-          "return": ["U64", "U64", "U64", "U64", "U128"]
-        },
-        "is_pool_created": {
-          "visibility": "Public",
-          "isEntry": false,
-          "typeParameters": [
-            {
-              "abilities": []
-            },
-            {
-              "abilities": []
-            }
-          ],
-          "parameters": [
-            {
-              "Reference": {
-                "Struct": {
-                  "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
-                  "module": "pool",
-                  "name": "PoolRegistry",
-                  "typeArguments": []
-                }
-              }
-            }
-          ],
-          "return": ["Bool"]
-        },
-        "is_pool_created_sorted": {
-          "visibility": "Public",
-          "isEntry": false,
-          "typeParameters": [
-            {
-              "abilities": []
-            },
-            {
-              "abilities": []
-            }
-          ],
-          "parameters": [
-            {
-              "Reference": {
-                "Struct": {
-                  "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
-                  "module": "pool",
-                  "name": "PoolRegistry",
-                  "typeArguments": []
-                }
-              }
-            }
-          ],
-          "return": ["Bool"]
-        },
-        "process_swap_exact_input": {
-          "visibility": "Public",
-          "isEntry": false,
-          "typeParameters": [
-            {
-              "abilities": []
-            },
-            {
-              "abilities": []
-            }
-          ],
-          "parameters": [
-            {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
-                  "module": "pool",
-                  "name": "Pool",
-                  "typeArguments": [
-                    {
-                      "TypeParameter": 0
-                    },
-                    {
-                      "TypeParameter": 1
-                    }
-                  ]
-                }
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
               }
             },
             {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "coin",
-                  "name": "Coin",
-                  "typeArguments": [
-                    {
-                      "TypeParameter": 0
-                    }
-                  ]
-                }
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
               }
             },
             {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "coin",
-                  "name": "Coin",
-                  "typeArguments": [
-                    {
-                      "TypeParameter": 1
-                    }
-                  ]
-                }
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
               }
             },
-            "U64",
-            "Bool",
             {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "tx_context",
-                  "name": "TxContext",
-                  "typeArguments": []
-                }
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x2::tx_context::TxContext",
+                "typeParameterInstantiation": []
               }
             }
           ],
-          "return": []
-        },
-        "process_swap_exact_output": {
-          "visibility": "Public",
-          "isEntry": false,
-          "typeParameters": [
+          "returns": [
             {
-              "abilities": []
-            },
-            {
-              "abilities": []
-            }
-          ],
-          "parameters": [
-            {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
-                  "module": "pool",
-                  "name": "Pool",
-                  "typeArguments": [
-                    {
-                      "TypeParameter": 0
-                    },
-                    {
-                      "TypeParameter": 1
-                    }
-                  ]
-                }
-              }
-            },
-            {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "coin",
-                  "name": "Coin",
-                  "typeArguments": [
-                    {
-                      "TypeParameter": 0
-                    }
-                  ]
-                }
-              }
-            },
-            {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "coin",
-                  "name": "Coin",
-                  "typeArguments": [
-                    {
-                      "TypeParameter": 1
-                    }
-                  ]
-                }
-              }
-            },
-            "U64",
-            "Bool",
-            {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "tx_context",
-                  "name": "TxContext",
-                  "typeArguments": []
-                }
-              }
-            }
-          ],
-          "return": []
-        },
-        "remove_liquidity": {
-          "visibility": "Public",
-          "isEntry": false,
-          "typeParameters": [
-            {
-              "abilities": []
-            },
-            {
-              "abilities": []
-            }
-          ],
-          "parameters": [
-            {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
-                  "module": "pool",
-                  "name": "PoolRegistry",
-                  "typeArguments": []
-                }
-              }
-            },
-            {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "coin",
-                  "name": "Coin",
-                  "typeArguments": [
-                    {
-                      "Struct": {
-                        "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
-                        "module": "pool",
-                        "name": "WISPLP",
-                        "typeArguments": [
-                          {
-                            "TypeParameter": 0
-                          },
-                          {
-                            "TypeParameter": 1
-                          }
-                        ]
+              "body": {
+                "type": 10,
+                "typeName": "0x2::coin::Coin",
+                "typeParameterInstantiation": [
+                  {
+                    "type": 10,
+                    "typeName": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a::pool::WISPLP",
+                    "typeParameterInstantiation": [
+                      {
+                        "type": 11,
+                        "typeParameter": 0,
+                        "typeParameterInstantiation": []
+                      },
+                      {
+                        "type": 11,
+                        "typeParameter": 1,
+                        "typeParameterInstantiation": []
                       }
-                    }
-                  ]
-                }
-              }
-            },
-            "U64",
-            "U64",
-            "U64",
-            {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "tx_context",
-                  "name": "TxContext",
-                  "typeArguments": []
-                }
-              }
-            }
-          ],
-          "return": [
-            {
-              "Struct": {
-                "address": "0x2",
-                "module": "coin",
-                "name": "Coin",
-                "typeArguments": [
-                  {
-                    "TypeParameter": 0
-                  }
-                ]
-              }
-            },
-            {
-              "Struct": {
-                "address": "0x2",
-                "module": "coin",
-                "name": "Coin",
-                "typeArguments": [
-                  {
-                    "TypeParameter": 1
+                    ]
                   }
                 ]
               }
             }
           ]
         },
-        "set_fee_to_": {
-          "visibility": "Public",
-          "isEntry": true,
-          "typeParameters": [],
-          "parameters": [
-            {
-              "Reference": {
-                "Struct": {
-                  "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
-                  "module": "pool",
-                  "name": "ControllerCap",
-                  "typeArguments": []
-                }
-              }
-            },
-            {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
-                  "module": "pool",
-                  "name": "PoolRegistry",
-                  "typeArguments": []
-                }
-              }
-            },
-            "Address",
-            {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "tx_context",
-                  "name": "TxContext",
-                  "typeArguments": []
-                }
-              }
-            }
-          ],
-          "return": []
-        },
-        "swap_exact_first_to_second": {
-          "visibility": "Public",
+        {
+          "name": "borrow_mut_pool",
+          "visibility": 2,
           "isEntry": false,
           "typeParameters": [
             {
-              "abilities": []
+              "constraints": []
             },
             {
-              "abilities": []
+              "constraints": []
             }
           ],
           "parameters": [
             {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
-                  "module": "pool",
-                  "name": "PoolRegistry",
-                  "typeArguments": []
-                }
-              }
-            },
-            {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "coin",
-                  "name": "Coin",
-                  "typeArguments": [
-                    {
-                      "TypeParameter": 0
-                    }
-                  ]
-                }
-              }
-            },
-            "U64",
-            "U64",
-            {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "tx_context",
-                  "name": "TxContext",
-                  "typeArguments": []
-                }
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a::pool::PoolRegistry",
+                "typeParameterInstantiation": []
               }
             }
           ],
-          "return": [
+          "returns": [
             {
-              "Struct": {
-                "address": "0x2",
-                "module": "coin",
-                "name": "Coin",
-                "typeArguments": [
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a::pool::Pool",
+                "typeParameterInstantiation": [
                   {
-                    "TypeParameter": 1
+                    "type": 11,
+                    "typeParameter": 0,
+                    "typeParameterInstantiation": []
+                  },
+                  {
+                    "type": 11,
+                    "typeParameter": 1,
+                    "typeParameterInstantiation": []
                   }
                 ]
               }
             }
           ]
         },
-        "swap_exact_second_to_first": {
-          "visibility": "Public",
+        {
+          "name": "borrow_pool",
+          "visibility": 2,
           "isEntry": false,
           "typeParameters": [
             {
-              "abilities": []
+              "constraints": []
             },
             {
-              "abilities": []
+              "constraints": []
             }
           ],
           "parameters": [
             {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
-                  "module": "pool",
-                  "name": "PoolRegistry",
-                  "typeArguments": []
-                }
-              }
-            },
-            {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "coin",
-                  "name": "Coin",
-                  "typeArguments": [
-                    {
-                      "TypeParameter": 1
-                    }
-                  ]
-                }
-              }
-            },
-            "U64",
-            "U64",
-            {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "tx_context",
-                  "name": "TxContext",
-                  "typeArguments": []
-                }
+              "reference": 1,
+              "body": {
+                "type": 10,
+                "typeName": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a::pool::PoolRegistry",
+                "typeParameterInstantiation": []
               }
             }
           ],
-          "return": [
+          "returns": [
             {
-              "Struct": {
-                "address": "0x2",
-                "module": "coin",
-                "name": "Coin",
-                "typeArguments": [
+              "reference": 1,
+              "body": {
+                "type": 10,
+                "typeName": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a::pool::Pool",
+                "typeParameterInstantiation": [
                   {
-                    "TypeParameter": 0
+                    "type": 11,
+                    "typeParameter": 0,
+                    "typeParameterInstantiation": []
+                  },
+                  {
+                    "type": 11,
+                    "typeParameter": 1,
+                    "typeParameterInstantiation": []
                   }
                 ]
               }
             }
           ]
         },
-        "swap_first_to_exact_second": {
-          "visibility": "Public",
+        {
+          "name": "create_pool",
+          "visibility": 2,
           "isEntry": false,
           "typeParameters": [
             {
-              "abilities": []
+              "constraints": []
             },
             {
-              "abilities": []
+              "constraints": []
             }
           ],
           "parameters": [
             {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
-                  "module": "pool",
-                  "name": "PoolRegistry",
-                  "typeArguments": []
-                }
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a::pool::PoolRegistry",
+                "typeParameterInstantiation": []
               }
             },
             {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "coin",
-                  "name": "Coin",
-                  "typeArguments": [
-                    {
-                      "TypeParameter": 0
-                    }
-                  ]
-                }
-              }
-            },
-            "U64",
-            "U64",
-            {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "tx_context",
-                  "name": "TxContext",
-                  "typeArguments": []
-                }
-              }
-            }
-          ],
-          "return": [
-            {
-              "Struct": {
-                "address": "0x2",
-                "module": "coin",
-                "name": "Coin",
-                "typeArguments": [
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x2::coin::Coin",
+                "typeParameterInstantiation": [
                   {
-                    "TypeParameter": 1
-                  }
-                ]
-              }
-            }
-          ]
-        },
-        "swap_second_to_exact_first": {
-          "visibility": "Public",
-          "isEntry": false,
-          "typeParameters": [
-            {
-              "abilities": []
-            },
-            {
-              "abilities": []
-            }
-          ],
-          "parameters": [
-            {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
-                  "module": "pool",
-                  "name": "PoolRegistry",
-                  "typeArguments": []
-                }
-              }
-            },
-            {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "coin",
-                  "name": "Coin",
-                  "typeArguments": [
-                    {
-                      "TypeParameter": 1
-                    }
-                  ]
-                }
-              }
-            },
-            "U64",
-            "U64",
-            {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "tx_context",
-                  "name": "TxContext",
-                  "typeArguments": []
-                }
-              }
-            }
-          ],
-          "return": [
-            {
-              "Struct": {
-                "address": "0x2",
-                "module": "coin",
-                "name": "Coin",
-                "typeArguments": [
-                  {
-                    "TypeParameter": 0
-                  }
-                ]
-              }
-            }
-          ]
-        },
-        "zap_in_first": {
-          "visibility": "Public",
-          "isEntry": false,
-          "typeParameters": [
-            {
-              "abilities": []
-            },
-            {
-              "abilities": []
-            }
-          ],
-          "parameters": [
-            {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
-                  "module": "pool",
-                  "name": "PoolRegistry",
-                  "typeArguments": []
-                }
-              }
-            },
-            {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "coin",
-                  "name": "Coin",
-                  "typeArguments": [
-                    {
-                      "TypeParameter": 0
-                    }
-                  ]
-                }
-              }
-            },
-            "U64",
-            {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "tx_context",
-                  "name": "TxContext",
-                  "typeArguments": []
-                }
-              }
-            }
-          ],
-          "return": [
-            {
-              "Struct": {
-                "address": "0x2",
-                "module": "coin",
-                "name": "Coin",
-                "typeArguments": [
-                  {
-                    "Struct": {
-                      "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
-                      "module": "pool",
-                      "name": "WISPLP",
-                      "typeArguments": [
-                        {
-                          "TypeParameter": 0
-                        },
-                        {
-                          "TypeParameter": 1
-                        }
-                      ]
-                    }
+                    "type": 11,
+                    "typeParameter": 0,
+                    "typeParameterInstantiation": []
                   }
                 ]
               }
             },
             {
-              "Struct": {
-                "address": "0x2",
-                "module": "coin",
-                "name": "Coin",
-                "typeArguments": [
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x2::coin::Coin",
+                "typeParameterInstantiation": [
                   {
-                    "TypeParameter": 1
-                  }
-                ]
-              }
-            }
-          ]
-        },
-        "zap_in_second": {
-          "visibility": "Public",
-          "isEntry": false,
-          "typeParameters": [
-            {
-              "abilities": []
-            },
-            {
-              "abilities": []
-            }
-          ],
-          "parameters": [
-            {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
-                  "module": "pool",
-                  "name": "PoolRegistry",
-                  "typeArguments": []
-                }
-              }
-            },
-            {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "coin",
-                  "name": "Coin",
-                  "typeArguments": [
-                    {
-                      "TypeParameter": 1
-                    }
-                  ]
-                }
-              }
-            },
-            "U64",
-            {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "tx_context",
-                  "name": "TxContext",
-                  "typeArguments": []
-                }
-              }
-            }
-          ],
-          "return": [
-            {
-              "Struct": {
-                "address": "0x2",
-                "module": "coin",
-                "name": "Coin",
-                "typeArguments": [
-                  {
-                    "Struct": {
-                      "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
-                      "module": "pool",
-                      "name": "WISPLP",
-                      "typeArguments": [
-                        {
-                          "TypeParameter": 0
-                        },
-                        {
-                          "TypeParameter": 1
-                        }
-                      ]
-                    }
+                    "type": 11,
+                    "typeParameter": 1,
+                    "typeParameterInstantiation": []
                   }
                 ]
               }
             },
             {
-              "Struct": {
-                "address": "0x2",
-                "module": "coin",
-                "name": "Coin",
-                "typeArguments": [
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x2::tx_context::TxContext",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x2::coin::Coin",
+                "typeParameterInstantiation": [
                   {
-                    "TypeParameter": 0
-                  }
-                ]
-              }
-            }
-          ]
-        }
-      }
-    },
-    "pool_utils": {
-      "fileFormatVersion": 6,
-      "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
-      "name": "pool_utils",
-      "friends": [],
-      "structs": {},
-      "exposedFunctions": {
-        "execute_return_token": {
-          "visibility": "Public",
-          "isEntry": false,
-          "typeParameters": [
-            {
-              "abilities": []
-            }
-          ],
-          "parameters": [
-            {
-              "Struct": {
-                "address": "0x2",
-                "module": "coin",
-                "name": "Coin",
-                "typeArguments": [
-                  {
-                    "TypeParameter": 0
-                  }
-                ]
-              }
-            },
-            {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "tx_context",
-                  "name": "TxContext",
-                  "typeArguments": []
-                }
-              }
-            }
-          ],
-          "return": []
-        },
-        "get_input_price": {
-          "visibility": "Public",
-          "isEntry": false,
-          "typeParameters": [],
-          "parameters": ["U64", "U64", "U64", "U64"],
-          "return": ["U64"]
-        },
-        "get_optimal_zap_in_amount": {
-          "visibility": "Public",
-          "isEntry": false,
-          "typeParameters": [],
-          "parameters": ["U64", "U64"],
-          "return": ["U64"]
-        },
-        "get_output_price": {
-          "visibility": "Public",
-          "isEntry": false,
-          "typeParameters": [],
-          "parameters": ["U64", "U64", "U64", "U64"],
-          "return": ["U64"]
-        },
-        "get_triple_type": {
-          "visibility": "Public",
-          "isEntry": false,
-          "typeParameters": [
-            {
-              "abilities": []
-            },
-            {
-              "abilities": []
-            },
-            {
-              "abilities": []
-            }
-          ],
-          "parameters": [],
-          "return": [
-            {
-              "Struct": {
-                "address": "0x1",
-                "module": "type_name",
-                "name": "TypeName",
-                "typeArguments": []
-              }
-            },
-            {
-              "Struct": {
-                "address": "0x1",
-                "module": "type_name",
-                "name": "TypeName",
-                "typeArguments": []
-              }
-            },
-            {
-              "Struct": {
-                "address": "0x1",
-                "module": "type_name",
-                "name": "TypeName",
-                "typeArguments": []
-              }
-            }
-          ]
-        },
-        "get_type": {
-          "visibility": "Public",
-          "isEntry": false,
-          "typeParameters": [
-            {
-              "abilities": []
-            },
-            {
-              "abilities": []
-            }
-          ],
-          "parameters": [],
-          "return": [
-            {
-              "Struct": {
-                "address": "0x1",
-                "module": "type_name",
-                "name": "TypeName",
-                "typeArguments": []
-              }
-            },
-            {
-              "Struct": {
-                "address": "0x1",
-                "module": "type_name",
-                "name": "TypeName",
-                "typeArguments": []
-              }
-            }
-          ]
-        },
-        "quote": {
-          "visibility": "Public",
-          "isEntry": false,
-          "typeParameters": [],
-          "parameters": ["U64", "U64", "U64"],
-          "return": ["U64"]
-        },
-        "sort_token_type": {
-          "visibility": "Public",
-          "isEntry": false,
-          "typeParameters": [],
-          "parameters": [
-            {
-              "Reference": {
-                "Struct": {
-                  "address": "0x1",
-                  "module": "type_name",
-                  "name": "TypeName",
-                  "typeArguments": []
-                }
-              }
-            },
-            {
-              "Reference": {
-                "Struct": {
-                  "address": "0x1",
-                  "module": "type_name",
-                  "name": "TypeName",
-                  "typeArguments": []
-                }
-              }
-            }
-          ],
-          "return": [
-            {
-              "Struct": {
-                "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
-                "module": "comparator",
-                "name": "Result",
-                "typeArguments": []
-              }
-            }
-          ]
-        }
-      }
-    },
-    "router": {
-      "fileFormatVersion": 6,
-      "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
-      "name": "router",
-      "friends": [],
-      "structs": {},
-      "exposedFunctions": {
-        "add_liquidity_": {
-          "visibility": "Public",
-          "isEntry": true,
-          "typeParameters": [
-            {
-              "abilities": []
-            },
-            {
-              "abilities": []
-            }
-          ],
-          "parameters": [
-            {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
-                  "module": "pool",
-                  "name": "PoolRegistry",
-                  "typeArguments": []
-                }
-              }
-            },
-            {
-              "Vector": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "coin",
-                  "name": "Coin",
-                  "typeArguments": [
-                    {
-                      "TypeParameter": 0
-                    }
-                  ]
-                }
-              }
-            },
-            {
-              "Vector": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "coin",
-                  "name": "Coin",
-                  "typeArguments": [
-                    {
-                      "TypeParameter": 1
-                    }
-                  ]
-                }
-              }
-            },
-            "U64",
-            "U64",
-            "U64",
-            "U64",
-            {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "tx_context",
-                  "name": "TxContext",
-                  "typeArguments": []
-                }
-              }
-            }
-          ],
-          "return": []
-        },
-        "create_pool_": {
-          "visibility": "Public",
-          "isEntry": true,
-          "typeParameters": [
-            {
-              "abilities": []
-            },
-            {
-              "abilities": []
-            }
-          ],
-          "parameters": [
-            {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
-                  "module": "pool",
-                  "name": "PoolRegistry",
-                  "typeArguments": []
-                }
-              }
-            },
-            {
-              "Vector": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "coin",
-                  "name": "Coin",
-                  "typeArguments": [
-                    {
-                      "TypeParameter": 0
-                    }
-                  ]
-                }
-              }
-            },
-            {
-              "Vector": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "coin",
-                  "name": "Coin",
-                  "typeArguments": [
-                    {
-                      "TypeParameter": 1
-                    }
-                  ]
-                }
-              }
-            },
-            "U64",
-            "U64",
-            {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "tx_context",
-                  "name": "TxContext",
-                  "typeArguments": []
-                }
-              }
-            }
-          ],
-          "return": []
-        },
-        "remove_liquidity_": {
-          "visibility": "Public",
-          "isEntry": true,
-          "typeParameters": [
-            {
-              "abilities": []
-            },
-            {
-              "abilities": []
-            }
-          ],
-          "parameters": [
-            {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
-                  "module": "pool",
-                  "name": "PoolRegistry",
-                  "typeArguments": []
-                }
-              }
-            },
-            {
-              "Vector": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "coin",
-                  "name": "Coin",
-                  "typeArguments": [
-                    {
-                      "Struct": {
-                        "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
-                        "module": "pool",
-                        "name": "WISPLP",
-                        "typeArguments": [
-                          {
-                            "TypeParameter": 0
-                          },
-                          {
-                            "TypeParameter": 1
-                          }
-                        ]
+                    "type": 10,
+                    "typeName": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a::pool::WISPLP",
+                    "typeParameterInstantiation": [
+                      {
+                        "type": 11,
+                        "typeParameter": 0,
+                        "typeParameterInstantiation": []
+                      },
+                      {
+                        "type": 11,
+                        "typeParameter": 1,
+                        "typeParameterInstantiation": []
                       }
-                    }
-                  ]
-                }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "create_pool_name",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x1::type_name::TypeName",
+                "typeParameterInstantiation": []
               }
             },
-            "U64",
-            "U64",
-            "U64",
             {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "tx_context",
-                  "name": "TxContext",
-                  "typeArguments": []
-                }
+              "body": {
+                "type": 10,
+                "typeName": "0x1::type_name::TypeName",
+                "typeParameterInstantiation": []
               }
             }
           ],
-          "return": []
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a::pool::PoolName",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
         },
-        "swap_exact_input_": {
-          "visibility": "Public",
-          "isEntry": true,
+        {
+          "name": "get_amounts",
+          "visibility": 2,
+          "isEntry": false,
           "typeParameters": [
             {
-              "abilities": []
+              "constraints": []
             },
             {
-              "abilities": []
+              "constraints": []
             }
           ],
           "parameters": [
             {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
-                  "module": "pool",
-                  "name": "PoolRegistry",
-                  "typeArguments": []
-                }
-              }
-            },
-            {
-              "Vector": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "coin",
-                  "name": "Coin",
-                  "typeArguments": [
-                    {
-                      "TypeParameter": 0
-                    }
-                  ]
-                }
-              }
-            },
-            "U64",
-            "U64",
-            {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "tx_context",
-                  "name": "TxContext",
-                  "typeArguments": []
-                }
+              "reference": 1,
+              "body": {
+                "type": 10,
+                "typeName": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a::pool::Pool",
+                "typeParameterInstantiation": [
+                  {
+                    "type": 11,
+                    "typeParameter": 0,
+                    "typeParameterInstantiation": []
+                  },
+                  {
+                    "type": 11,
+                    "typeParameter": 1,
+                    "typeParameterInstantiation": []
+                  }
+                ]
               }
             }
           ],
-          "return": []
+          "returns": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
         },
-        "swap_exact_input_doublehop_": {
-          "visibility": "Public",
-          "isEntry": true,
+        {
+          "name": "get_input_amount",
+          "visibility": 2,
+          "isEntry": false,
           "typeParameters": [
             {
-              "abilities": []
+              "constraints": []
             },
             {
-              "abilities": []
-            },
-            {
-              "abilities": []
+              "constraints": []
             }
           ],
           "parameters": [
             {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
-                  "module": "pool",
-                  "name": "PoolRegistry",
-                  "typeArguments": []
-                }
+              "reference": 1,
+              "body": {
+                "type": 10,
+                "typeName": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a::pool::Pool",
+                "typeParameterInstantiation": [
+                  {
+                    "type": 11,
+                    "typeParameter": 0,
+                    "typeParameterInstantiation": []
+                  },
+                  {
+                    "type": 11,
+                    "typeParameter": 1,
+                    "typeParameterInstantiation": []
+                  }
+                ]
               }
             },
             {
-              "Vector": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "coin",
-                  "name": "Coin",
-                  "typeArguments": [
-                    {
-                      "TypeParameter": 0
-                    }
-                  ]
-                }
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
               }
             },
-            "U64",
-            "U64",
             {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "tx_context",
-                  "name": "TxContext",
-                  "typeArguments": []
-                }
+              "body": {
+                "type": 2,
+                "typeParameterInstantiation": []
               }
             }
           ],
-          "return": []
+          "returns": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
         },
-        "swap_exact_output_": {
-          "visibility": "Public",
-          "isEntry": true,
+        {
+          "name": "get_output_amount",
+          "visibility": 2,
+          "isEntry": false,
           "typeParameters": [
             {
-              "abilities": []
+              "constraints": []
             },
             {
-              "abilities": []
+              "constraints": []
             }
           ],
           "parameters": [
             {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
-                  "module": "pool",
-                  "name": "PoolRegistry",
-                  "typeArguments": []
-                }
+              "reference": 1,
+              "body": {
+                "type": 10,
+                "typeName": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a::pool::Pool",
+                "typeParameterInstantiation": [
+                  {
+                    "type": 11,
+                    "typeParameter": 0,
+                    "typeParameterInstantiation": []
+                  },
+                  {
+                    "type": 11,
+                    "typeParameter": 1,
+                    "typeParameterInstantiation": []
+                  }
+                ]
               }
             },
             {
-              "Vector": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "coin",
-                  "name": "Coin",
-                  "typeArguments": [
-                    {
-                      "TypeParameter": 0
-                    }
-                  ]
-                }
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
               }
             },
-            "U64",
-            "U64",
             {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "tx_context",
-                  "name": "TxContext",
-                  "typeArguments": []
-                }
+              "body": {
+                "type": 2,
+                "typeParameterInstantiation": []
               }
             }
           ],
-          "return": []
+          "returns": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
         },
-        "swap_exact_output_doublehop_": {
-          "visibility": "Public",
-          "isEntry": true,
+        {
+          "name": "get_pool_data",
+          "visibility": 2,
+          "isEntry": false,
           "typeParameters": [
             {
-              "abilities": []
+              "constraints": []
             },
             {
-              "abilities": []
-            },
-            {
-              "abilities": []
+              "constraints": []
             }
           ],
           "parameters": [
             {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
-                  "module": "pool",
-                  "name": "PoolRegistry",
-                  "typeArguments": []
-                }
-              }
-            },
-            {
-              "Vector": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "coin",
-                  "name": "Coin",
-                  "typeArguments": [
-                    {
-                      "TypeParameter": 0
-                    }
-                  ]
-                }
-              }
-            },
-            "U64",
-            "U64",
-            {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "tx_context",
-                  "name": "TxContext",
-                  "typeArguments": []
-                }
+              "reference": 1,
+              "body": {
+                "type": 10,
+                "typeName": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a::pool::Pool",
+                "typeParameterInstantiation": [
+                  {
+                    "type": 11,
+                    "typeParameter": 0,
+                    "typeParameterInstantiation": []
+                  },
+                  {
+                    "type": 11,
+                    "typeParameter": 1,
+                    "typeParameterInstantiation": []
+                  }
+                ]
               }
             }
           ],
-          "return": []
-        },
-        "zap_in_": {
-          "visibility": "Public",
-          "isEntry": true,
-          "typeParameters": [
+          "returns": [
             {
-              "abilities": []
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
             },
             {
-              "abilities": []
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "is_pool_created",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [
+            {
+              "constraints": []
+            },
+            {
+              "constraints": []
             }
           ],
           "parameters": [
             {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
-                  "module": "pool",
-                  "name": "PoolRegistry",
-                  "typeArguments": []
-                }
-              }
-            },
-            {
-              "Vector": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "coin",
-                  "name": "Coin",
-                  "typeArguments": [
-                    {
-                      "TypeParameter": 0
-                    }
-                  ]
-                }
-              }
-            },
-            "U64",
-            {
-              "MutableReference": {
-                "Struct": {
-                  "address": "0x2",
-                  "module": "tx_context",
-                  "name": "TxContext",
-                  "typeArguments": []
-                }
+              "reference": 1,
+              "body": {
+                "type": 10,
+                "typeName": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a::pool::PoolRegistry",
+                "typeParameterInstantiation": []
               }
             }
           ],
-          "return": []
+          "returns": [
+            {
+              "body": {
+                "type": 2,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "is_pool_created_sorted",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [
+            {
+              "constraints": []
+            },
+            {
+              "constraints": []
+            }
+          ],
+          "parameters": [
+            {
+              "reference": 1,
+              "body": {
+                "type": 10,
+                "typeName": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a::pool::PoolRegistry",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 2,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "process_swap_exact_input",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [
+            {
+              "constraints": []
+            },
+            {
+              "constraints": []
+            }
+          ],
+          "parameters": [
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a::pool::Pool",
+                "typeParameterInstantiation": [
+                  {
+                    "type": 11,
+                    "typeParameter": 0,
+                    "typeParameterInstantiation": []
+                  },
+                  {
+                    "type": 11,
+                    "typeParameter": 1,
+                    "typeParameterInstantiation": []
+                  }
+                ]
+              }
+            },
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x2::coin::Coin",
+                "typeParameterInstantiation": [
+                  {
+                    "type": 11,
+                    "typeParameter": 0,
+                    "typeParameterInstantiation": []
+                  }
+                ]
+              }
+            },
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x2::coin::Coin",
+                "typeParameterInstantiation": [
+                  {
+                    "type": 11,
+                    "typeParameter": 1,
+                    "typeParameterInstantiation": []
+                  }
+                ]
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 2,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x2::tx_context::TxContext",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": []
+        },
+        {
+          "name": "process_swap_exact_output",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [
+            {
+              "constraints": []
+            },
+            {
+              "constraints": []
+            }
+          ],
+          "parameters": [
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a::pool::Pool",
+                "typeParameterInstantiation": [
+                  {
+                    "type": 11,
+                    "typeParameter": 0,
+                    "typeParameterInstantiation": []
+                  },
+                  {
+                    "type": 11,
+                    "typeParameter": 1,
+                    "typeParameterInstantiation": []
+                  }
+                ]
+              }
+            },
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x2::coin::Coin",
+                "typeParameterInstantiation": [
+                  {
+                    "type": 11,
+                    "typeParameter": 0,
+                    "typeParameterInstantiation": []
+                  }
+                ]
+              }
+            },
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x2::coin::Coin",
+                "typeParameterInstantiation": [
+                  {
+                    "type": 11,
+                    "typeParameter": 1,
+                    "typeParameterInstantiation": []
+                  }
+                ]
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 2,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x2::tx_context::TxContext",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": []
+        },
+        {
+          "name": "remove_liquidity",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [
+            {
+              "constraints": []
+            },
+            {
+              "constraints": []
+            }
+          ],
+          "parameters": [
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a::pool::PoolRegistry",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x2::coin::Coin",
+                "typeParameterInstantiation": [
+                  {
+                    "type": 10,
+                    "typeName": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a::pool::WISPLP",
+                    "typeParameterInstantiation": [
+                      {
+                        "type": 11,
+                        "typeParameter": 0,
+                        "typeParameterInstantiation": []
+                      },
+                      {
+                        "type": 11,
+                        "typeParameter": 1,
+                        "typeParameterInstantiation": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x2::tx_context::TxContext",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x2::coin::Coin",
+                "typeParameterInstantiation": [
+                  {
+                    "type": 11,
+                    "typeParameter": 0,
+                    "typeParameterInstantiation": []
+                  }
+                ]
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x2::coin::Coin",
+                "typeParameterInstantiation": [
+                  {
+                    "type": 11,
+                    "typeParameter": 1,
+                    "typeParameterInstantiation": []
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "set_fee_to_",
+          "visibility": 2,
+          "isEntry": true,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "reference": 1,
+              "body": {
+                "type": 10,
+                "typeName": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a::pool::ControllerCap",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a::pool::PoolRegistry",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 1,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x2::tx_context::TxContext",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": []
+        },
+        {
+          "name": "swap_exact_first_to_second",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [
+            {
+              "constraints": []
+            },
+            {
+              "constraints": []
+            }
+          ],
+          "parameters": [
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a::pool::PoolRegistry",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x2::coin::Coin",
+                "typeParameterInstantiation": [
+                  {
+                    "type": 11,
+                    "typeParameter": 0,
+                    "typeParameterInstantiation": []
+                  }
+                ]
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x2::tx_context::TxContext",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x2::coin::Coin",
+                "typeParameterInstantiation": [
+                  {
+                    "type": 11,
+                    "typeParameter": 1,
+                    "typeParameterInstantiation": []
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "swap_exact_second_to_first",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [
+            {
+              "constraints": []
+            },
+            {
+              "constraints": []
+            }
+          ],
+          "parameters": [
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a::pool::PoolRegistry",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x2::coin::Coin",
+                "typeParameterInstantiation": [
+                  {
+                    "type": 11,
+                    "typeParameter": 1,
+                    "typeParameterInstantiation": []
+                  }
+                ]
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x2::tx_context::TxContext",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x2::coin::Coin",
+                "typeParameterInstantiation": [
+                  {
+                    "type": 11,
+                    "typeParameter": 0,
+                    "typeParameterInstantiation": []
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "swap_first_to_exact_second",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [
+            {
+              "constraints": []
+            },
+            {
+              "constraints": []
+            }
+          ],
+          "parameters": [
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a::pool::PoolRegistry",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x2::coin::Coin",
+                "typeParameterInstantiation": [
+                  {
+                    "type": 11,
+                    "typeParameter": 0,
+                    "typeParameterInstantiation": []
+                  }
+                ]
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x2::tx_context::TxContext",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x2::coin::Coin",
+                "typeParameterInstantiation": [
+                  {
+                    "type": 11,
+                    "typeParameter": 1,
+                    "typeParameterInstantiation": []
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "swap_second_to_exact_first",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [
+            {
+              "constraints": []
+            },
+            {
+              "constraints": []
+            }
+          ],
+          "parameters": [
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a::pool::PoolRegistry",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x2::coin::Coin",
+                "typeParameterInstantiation": [
+                  {
+                    "type": 11,
+                    "typeParameter": 1,
+                    "typeParameterInstantiation": []
+                  }
+                ]
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x2::tx_context::TxContext",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x2::coin::Coin",
+                "typeParameterInstantiation": [
+                  {
+                    "type": 11,
+                    "typeParameter": 0,
+                    "typeParameterInstantiation": []
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "zap_in_first",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [
+            {
+              "constraints": []
+            },
+            {
+              "constraints": []
+            }
+          ],
+          "parameters": [
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a::pool::PoolRegistry",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x2::coin::Coin",
+                "typeParameterInstantiation": [
+                  {
+                    "type": 11,
+                    "typeParameter": 0,
+                    "typeParameterInstantiation": []
+                  }
+                ]
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x2::tx_context::TxContext",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x2::coin::Coin",
+                "typeParameterInstantiation": [
+                  {
+                    "type": 10,
+                    "typeName": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a::pool::WISPLP",
+                    "typeParameterInstantiation": [
+                      {
+                        "type": 11,
+                        "typeParameter": 0,
+                        "typeParameterInstantiation": []
+                      },
+                      {
+                        "type": 11,
+                        "typeParameter": 1,
+                        "typeParameterInstantiation": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x2::coin::Coin",
+                "typeParameterInstantiation": [
+                  {
+                    "type": 11,
+                    "typeParameter": 1,
+                    "typeParameterInstantiation": []
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "zap_in_second",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [
+            {
+              "constraints": []
+            },
+            {
+              "constraints": []
+            }
+          ],
+          "parameters": [
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a::pool::PoolRegistry",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x2::coin::Coin",
+                "typeParameterInstantiation": [
+                  {
+                    "type": 11,
+                    "typeParameter": 1,
+                    "typeParameterInstantiation": []
+                  }
+                ]
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x2::tx_context::TxContext",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x2::coin::Coin",
+                "typeParameterInstantiation": [
+                  {
+                    "type": 10,
+                    "typeName": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a::pool::WISPLP",
+                    "typeParameterInstantiation": [
+                      {
+                        "type": 11,
+                        "typeParameter": 0,
+                        "typeParameterInstantiation": []
+                      },
+                      {
+                        "type": 11,
+                        "typeParameter": 1,
+                        "typeParameterInstantiation": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x2::coin::Coin",
+                "typeParameterInstantiation": [
+                  {
+                    "type": 11,
+                    "typeParameter": 0,
+                    "typeParameterInstantiation": []
+                  }
+                ]
+              }
+            }
+          ]
         }
-      }
+      ]
     }
   },
-  "id": 1
-}
+  {
+    "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
+    "module": {
+      "name": "pool_utils",
+      "datatypes": [],
+      "functions": [
+        {
+          "name": "execute_return_token",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [
+            {
+              "constraints": []
+            }
+          ],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x2::coin::Coin",
+                "typeParameterInstantiation": [
+                  {
+                    "type": 11,
+                    "typeParameter": 0,
+                    "typeParameterInstantiation": []
+                  }
+                ]
+              }
+            },
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x2::tx_context::TxContext",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": []
+        },
+        {
+          "name": "get_input_price",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "get_optimal_zap_in_amount",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "get_output_price",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "get_triple_type",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [
+            {
+              "constraints": []
+            },
+            {
+              "constraints": []
+            },
+            {
+              "constraints": []
+            }
+          ],
+          "parameters": [],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x1::type_name::TypeName",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x1::type_name::TypeName",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x1::type_name::TypeName",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "get_type",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [
+            {
+              "constraints": []
+            },
+            {
+              "constraints": []
+            }
+          ],
+          "parameters": [],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x1::type_name::TypeName",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x1::type_name::TypeName",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "quote",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "sort_token_type",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "reference": 1,
+              "body": {
+                "type": 10,
+                "typeName": "0x1::type_name::TypeName",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "reference": 1,
+              "body": {
+                "type": 10,
+                "typeName": "0x1::type_name::TypeName",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a::comparator::Result",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "address": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a",
+    "module": {
+      "name": "router",
+      "datatypes": [],
+      "functions": [
+        {
+          "name": "add_liquidity_",
+          "visibility": 2,
+          "isEntry": true,
+          "typeParameters": [
+            {
+              "constraints": []
+            },
+            {
+              "constraints": []
+            }
+          ],
+          "parameters": [
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a::pool::PoolRegistry",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 9,
+                "typeParameterInstantiation": [
+                  {
+                    "type": 10,
+                    "typeName": "0x2::coin::Coin",
+                    "typeParameterInstantiation": [
+                      {
+                        "type": 11,
+                        "typeParameter": 0,
+                        "typeParameterInstantiation": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "body": {
+                "type": 9,
+                "typeParameterInstantiation": [
+                  {
+                    "type": 10,
+                    "typeName": "0x2::coin::Coin",
+                    "typeParameterInstantiation": [
+                      {
+                        "type": 11,
+                        "typeParameter": 1,
+                        "typeParameterInstantiation": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x2::tx_context::TxContext",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": []
+        },
+        {
+          "name": "create_pool_",
+          "visibility": 2,
+          "isEntry": true,
+          "typeParameters": [
+            {
+              "constraints": []
+            },
+            {
+              "constraints": []
+            }
+          ],
+          "parameters": [
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a::pool::PoolRegistry",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 9,
+                "typeParameterInstantiation": [
+                  {
+                    "type": 10,
+                    "typeName": "0x2::coin::Coin",
+                    "typeParameterInstantiation": [
+                      {
+                        "type": 11,
+                        "typeParameter": 0,
+                        "typeParameterInstantiation": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "body": {
+                "type": 9,
+                "typeParameterInstantiation": [
+                  {
+                    "type": 10,
+                    "typeName": "0x2::coin::Coin",
+                    "typeParameterInstantiation": [
+                      {
+                        "type": 11,
+                        "typeParameter": 1,
+                        "typeParameterInstantiation": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x2::tx_context::TxContext",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": []
+        },
+        {
+          "name": "remove_liquidity_",
+          "visibility": 2,
+          "isEntry": true,
+          "typeParameters": [
+            {
+              "constraints": []
+            },
+            {
+              "constraints": []
+            }
+          ],
+          "parameters": [
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a::pool::PoolRegistry",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 9,
+                "typeParameterInstantiation": [
+                  {
+                    "type": 10,
+                    "typeName": "0x2::coin::Coin",
+                    "typeParameterInstantiation": [
+                      {
+                        "type": 10,
+                        "typeName": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a::pool::WISPLP",
+                        "typeParameterInstantiation": [
+                          {
+                            "type": 11,
+                            "typeParameter": 0,
+                            "typeParameterInstantiation": []
+                          },
+                          {
+                            "type": 11,
+                            "typeParameter": 1,
+                            "typeParameterInstantiation": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x2::tx_context::TxContext",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": []
+        },
+        {
+          "name": "swap_exact_input_",
+          "visibility": 2,
+          "isEntry": true,
+          "typeParameters": [
+            {
+              "constraints": []
+            },
+            {
+              "constraints": []
+            }
+          ],
+          "parameters": [
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a::pool::PoolRegistry",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 9,
+                "typeParameterInstantiation": [
+                  {
+                    "type": 10,
+                    "typeName": "0x2::coin::Coin",
+                    "typeParameterInstantiation": [
+                      {
+                        "type": 11,
+                        "typeParameter": 0,
+                        "typeParameterInstantiation": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x2::tx_context::TxContext",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": []
+        },
+        {
+          "name": "swap_exact_input_doublehop_",
+          "visibility": 2,
+          "isEntry": true,
+          "typeParameters": [
+            {
+              "constraints": []
+            },
+            {
+              "constraints": []
+            },
+            {
+              "constraints": []
+            }
+          ],
+          "parameters": [
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a::pool::PoolRegistry",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 9,
+                "typeParameterInstantiation": [
+                  {
+                    "type": 10,
+                    "typeName": "0x2::coin::Coin",
+                    "typeParameterInstantiation": [
+                      {
+                        "type": 11,
+                        "typeParameter": 0,
+                        "typeParameterInstantiation": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x2::tx_context::TxContext",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": []
+        },
+        {
+          "name": "swap_exact_output_",
+          "visibility": 2,
+          "isEntry": true,
+          "typeParameters": [
+            {
+              "constraints": []
+            },
+            {
+              "constraints": []
+            }
+          ],
+          "parameters": [
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a::pool::PoolRegistry",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 9,
+                "typeParameterInstantiation": [
+                  {
+                    "type": 10,
+                    "typeName": "0x2::coin::Coin",
+                    "typeParameterInstantiation": [
+                      {
+                        "type": 11,
+                        "typeParameter": 0,
+                        "typeParameterInstantiation": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x2::tx_context::TxContext",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": []
+        },
+        {
+          "name": "swap_exact_output_doublehop_",
+          "visibility": 2,
+          "isEntry": true,
+          "typeParameters": [
+            {
+              "constraints": []
+            },
+            {
+              "constraints": []
+            },
+            {
+              "constraints": []
+            }
+          ],
+          "parameters": [
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a::pool::PoolRegistry",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 9,
+                "typeParameterInstantiation": [
+                  {
+                    "type": 10,
+                    "typeName": "0x2::coin::Coin",
+                    "typeParameterInstantiation": [
+                      {
+                        "type": 11,
+                        "typeParameter": 0,
+                        "typeParameterInstantiation": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x2::tx_context::TxContext",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": []
+        },
+        {
+          "name": "zap_in_",
+          "visibility": 2,
+          "isEntry": true,
+          "typeParameters": [
+            {
+              "constraints": []
+            },
+            {
+              "constraints": []
+            }
+          ],
+          "parameters": [
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x6c4a21e3e7e6b6d51c4604021633e1d97e24e37a696f8c082cd48f37503e602a::pool::PoolRegistry",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 9,
+                "typeParameterInstantiation": [
+                  {
+                    "type": 10,
+                    "typeName": "0x2::coin::Coin",
+                    "typeParameterInstantiation": [
+                      {
+                        "type": 11,
+                        "typeParameter": 0,
+                        "typeParameterInstantiation": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x2::tx_context::TxContext",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": []
+        }
+      ]
+    }
+  }
+]
