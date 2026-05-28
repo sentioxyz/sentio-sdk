@@ -134,15 +134,15 @@ export async function decodeFuelTransactionWithAbi(
       console.warn('Failed to decode log', e)
     }
   })
-  const txResponse = new TransactionResponse(
-    gqlTransaction.status.transactionId,
+  const txResponse = new TransactionResponse({
+    transactionRequestOrId: gqlTransaction.status.transactionId,
     provider,
-    await provider.getChainId(),
-    {
+    chainId: await provider.getChainId(),
+    abis: {
       main: Object.values(abiMap)[0],
       otherContractsAbis: {}
     }
-  )
+  })
 
   // @ts-ignore - hack
   txResponse.gqlTransaction = {
