@@ -1,5 +1,5 @@
 import { SolanaBaseProcessor, SolanaContext, SolanaBindOptions, SolanaFetchConfig } from "../index.js"
-import { Instruction } from '@coral-xyz/anchor'
+import { Instruction } from '@anchor-lang/core'
 import { AmountToUiAmount, Approve, ApproveChecked, Burn, BurnChecked, CloseAccount, CreateNativeMint, DefaultAccountStateExtension, FreezeAccount, GetAccountDataSize, InitializeAccount, InitializeAccount2, InitializeAccount3, InitializeImmutableOwner, InitializeMint, InitializeMintCloseAuthority, InitializeMultisig, MemoTransferExtension, MintTo, MintToChecked, Reallocate, Revoke, SyncNative, ThawAccount, Transfer, TransferChecked, TransferFeeExtension, UiAmountToAmount } from './types.js';
 import { HandlerOptions } from '../../core/handler-options.js'
 
@@ -27,7 +27,7 @@ export class SPLTokenProcessor extends SolanaBaseProcessor {
   public onInitializeMint(
     handler: (data: InitializeMint, ctx: SolanaContext) => void,
     handlerOptions?: HandlerOptions<SolanaFetchConfig, Instruction>
-  ): SPLTokenProcessor {
+  ): this {
     this.onInstruction('initializeMint', (ins: Instruction, ctx) => {
       if (ins) {
         handler(ins.data as InitializeMint, ctx)
@@ -39,7 +39,7 @@ export class SPLTokenProcessor extends SolanaBaseProcessor {
   public onInitializeAccount(
     handler: (data: InitializeAccount, ctx: SolanaContext) => void,
     handlerOptions?: HandlerOptions<SolanaFetchConfig, Instruction>
-  ): SPLTokenProcessor {
+  ): this {
     this.onInstruction('initializeAccount', (ins: Instruction, ctx) => {
       if (ins) {
         handler(ins.data as InitializeAccount, ctx)
@@ -51,7 +51,7 @@ export class SPLTokenProcessor extends SolanaBaseProcessor {
   public onInitializeAccount2(
     handler: (data: InitializeAccount2, ctx: SolanaContext) => void,
     handlerOptions?: HandlerOptions<SolanaFetchConfig, Instruction>
-  ): SPLTokenProcessor {
+  ): this {
     this.onInstruction('initializeAccount2', (ins: Instruction, ctx) => {
       if (ins) {
         handler(ins.data as InitializeAccount2, ctx)
@@ -63,7 +63,7 @@ export class SPLTokenProcessor extends SolanaBaseProcessor {
   public onInitializeAccount3(
     handler: (data: InitializeAccount3, ctx: SolanaContext) => void,
     handlerOptions?: HandlerOptions<SolanaFetchConfig, Instruction>
-  ): SPLTokenProcessor {
+  ): this {
     this.onInstruction('initializeAccount3', (ins: Instruction, ctx) => {
       if (ins) {
         handler(ins.data as InitializeAccount3, ctx)
@@ -75,7 +75,7 @@ export class SPLTokenProcessor extends SolanaBaseProcessor {
   public onInitializeMultisig(
     handler: (data: InitializeMultisig, ctx: SolanaContext) => void,
     handlerOptions?: HandlerOptions<SolanaFetchConfig, Instruction>
-  ): SPLTokenProcessor {
+  ): this {
     this.onInstruction('initializeMultisig', (ins: Instruction, ctx) => {
       if (ins) {
         handler(ins.data as InitializeMultisig, ctx)
@@ -87,7 +87,7 @@ export class SPLTokenProcessor extends SolanaBaseProcessor {
   public onTransfer(
     handler: (data: Transfer, ctx: SolanaContext) => void,
     handlerOptions?: HandlerOptions<SolanaFetchConfig, Instruction>
-  ): SPLTokenProcessor {
+  ): this {
     this.onInstruction('transfer', (ins: Instruction, ctx) => {
       if (ins) {
         handler(ins.data as Transfer, ctx)
@@ -99,7 +99,7 @@ export class SPLTokenProcessor extends SolanaBaseProcessor {
   public onApprove(
     handler: (data: Approve, ctx: SolanaContext) => void,
     handlerOptions?: HandlerOptions<SolanaFetchConfig, Instruction>
-  ): SPLTokenProcessor {
+  ): this {
     this.onInstruction('approve', (ins: Instruction, ctx) => {
       if (ins) {
         handler(ins.data as Approve, ctx)
@@ -111,7 +111,7 @@ export class SPLTokenProcessor extends SolanaBaseProcessor {
   public onRevoke(
     handler: (data: Revoke, ctx: SolanaContext) => void,
     handlerOptions?: HandlerOptions<SolanaFetchConfig, Instruction>
-  ): SPLTokenProcessor {
+  ): this {
     this.onInstruction('revoke', (ins: Instruction, ctx) => {
       if (ins) {
         handler(ins.data as Revoke, ctx)
@@ -123,7 +123,7 @@ export class SPLTokenProcessor extends SolanaBaseProcessor {
   public onSetAuthority(
     handler: (data: any, ctx: SolanaContext) => void,
     handlerOptions?: HandlerOptions<SolanaFetchConfig, Instruction>
-  ): SPLTokenProcessor {
+  ): this {
     this.onInstruction('setAuthority', (ins: Instruction, ctx) => {
       if (ins) {
         handler(ins.data as any, ctx)
@@ -135,7 +135,7 @@ export class SPLTokenProcessor extends SolanaBaseProcessor {
   public onMintTo(
     handler: (data: MintTo, ctx: SolanaContext) => void,
     handlerOptions?: HandlerOptions<SolanaFetchConfig, Instruction>
-  ): SPLTokenProcessor {
+  ): this {
     this.onInstruction('mintTo', (ins: Instruction, ctx) => {
       if (ins) {
         handler(ins.data as MintTo, ctx)
@@ -147,7 +147,7 @@ export class SPLTokenProcessor extends SolanaBaseProcessor {
   public onBurn(
     handler: (data: Burn, ctx: SolanaContext) => void,
     handlerOptions?: HandlerOptions<SolanaFetchConfig, Instruction>
-  ): SPLTokenProcessor {
+  ): this {
     this.onInstruction('burn', (ins: Instruction, ctx) => {
       if (ins) {
         handler(ins.data as Burn, ctx)
@@ -159,7 +159,7 @@ export class SPLTokenProcessor extends SolanaBaseProcessor {
   public onCloseAccount(
     handler: (data: CloseAccount, ctx: SolanaContext) => void,
     handlerOptions?: HandlerOptions<SolanaFetchConfig, Instruction>
-  ): SPLTokenProcessor {
+  ): this {
     this.onInstruction('closeAccount', (ins: Instruction, ctx) => {
       if (ins) {
         handler(ins.data as CloseAccount, ctx)
@@ -171,7 +171,7 @@ export class SPLTokenProcessor extends SolanaBaseProcessor {
   public onFreezeAccount(
     handler: (data: FreezeAccount, ctx: SolanaContext) => void,
     handlerOptions?: HandlerOptions<SolanaFetchConfig, Instruction>
-  ): SPLTokenProcessor {
+  ): this {
     this.onInstruction('freezeAccount', (ins: Instruction, ctx) => {
       if (ins) {
         handler(ins.data as FreezeAccount, ctx)
@@ -183,7 +183,7 @@ export class SPLTokenProcessor extends SolanaBaseProcessor {
   public onThawAccount(
     handler: (data: ThawAccount, ctx: SolanaContext) => void,
     handlerOptions?: HandlerOptions<SolanaFetchConfig, Instruction>
-  ): SPLTokenProcessor {
+  ): this {
     this.onInstruction('thawAccount', (ins: Instruction, ctx) => {
       if (ins) {
         handler(ins.data as ThawAccount, ctx)
@@ -195,7 +195,7 @@ export class SPLTokenProcessor extends SolanaBaseProcessor {
   public onTransferChecked(
     handler: (data: TransferChecked, ctx: SolanaContext) => void,
     handlerOptions?: HandlerOptions<SolanaFetchConfig, Instruction>
-  ): SPLTokenProcessor {
+  ): this {
     this.onInstruction('transferChecked', (ins: Instruction, ctx) => {
       if (ins) {
         handler(ins.data as TransferChecked, ctx)
@@ -207,7 +207,7 @@ export class SPLTokenProcessor extends SolanaBaseProcessor {
   public onApproveChecked(
     handler: (data: ApproveChecked, ctx: SolanaContext) => void,
     handlerOptions?: HandlerOptions<SolanaFetchConfig, Instruction>
-  ): SPLTokenProcessor {
+  ): this {
     this.onInstruction('approveChecked', (ins: Instruction, ctx) => {
       if (ins) {
         handler(ins.data as ApproveChecked, ctx)
@@ -219,7 +219,7 @@ export class SPLTokenProcessor extends SolanaBaseProcessor {
   public onMintToChecked(
     handler: (data: MintToChecked, ctx: SolanaContext) => void,
     handlerOptions?: HandlerOptions<SolanaFetchConfig, Instruction>
-  ): SPLTokenProcessor {
+  ): this {
     this.onInstruction('mintToChecked', (ins: Instruction, ctx) => {
       if (ins) {
         handler(ins.data as MintToChecked, ctx)
@@ -231,7 +231,7 @@ export class SPLTokenProcessor extends SolanaBaseProcessor {
   public onBurnChecked(
     handler: (data: BurnChecked, ctx: SolanaContext) => void,
     handlerOptions?: HandlerOptions<SolanaFetchConfig, Instruction>
-  ): SPLTokenProcessor {
+  ): this {
     this.onInstruction('burnChecked', (ins: Instruction, ctx) => {
       if (ins) {
         handler(ins.data as BurnChecked, ctx)
@@ -243,7 +243,7 @@ export class SPLTokenProcessor extends SolanaBaseProcessor {
   public onSyncNative(
     handler: (data: SyncNative, ctx: SolanaContext) => void,
     handlerOptions?: HandlerOptions<SolanaFetchConfig, Instruction>
-  ): SPLTokenProcessor {
+  ): this {
     this.onInstruction('syncNative', (ins: Instruction, ctx) => {
       if (ins) {
         handler(ins.data as SyncNative, ctx)
@@ -255,7 +255,7 @@ export class SPLTokenProcessor extends SolanaBaseProcessor {
   public onGetAccountDataSize(
     handler: (data: GetAccountDataSize, ctx: SolanaContext) => void,
     handlerOptions?: HandlerOptions<SolanaFetchConfig, Instruction>
-  ): SPLTokenProcessor {
+  ): this {
     this.onInstruction('getAccountDataSize', (ins: Instruction, ctx) => {
       if (ins) {
         handler(ins.data as GetAccountDataSize, ctx)
@@ -267,7 +267,7 @@ export class SPLTokenProcessor extends SolanaBaseProcessor {
   public onInitializeImmutableOwner(
     handler: (data: InitializeImmutableOwner, ctx: SolanaContext) => void,
     handlerOptions?: HandlerOptions<SolanaFetchConfig, Instruction>
-  ): SPLTokenProcessor {
+  ): this {
     this.onInstruction('initializeImmutableOwner', (ins: Instruction, ctx) => {
       if (ins) {
         handler(ins.data as InitializeImmutableOwner, ctx)
@@ -279,7 +279,7 @@ export class SPLTokenProcessor extends SolanaBaseProcessor {
   public onAmountToUiAmount(
     handler: (data: AmountToUiAmount, ctx: SolanaContext) => void,
     handlerOptions?: HandlerOptions<SolanaFetchConfig, Instruction>
-  ): SPLTokenProcessor {
+  ): this {
     this.onInstruction('amountToUiAmount', (ins: Instruction, ctx) => {
       if (ins) {
         handler(ins.data as AmountToUiAmount, ctx)
@@ -291,7 +291,7 @@ export class SPLTokenProcessor extends SolanaBaseProcessor {
   public onUiAmountToAmount(
     handler: (data: UiAmountToAmount, ctx: SolanaContext) => void,
     handlerOptions?: HandlerOptions<SolanaFetchConfig, Instruction>
-  ): SPLTokenProcessor {
+  ): this {
     this.onInstruction('uiAmountToAmount', (ins: Instruction, ctx) => {
       if (ins) {
         handler(ins.data as UiAmountToAmount, ctx)
@@ -303,7 +303,7 @@ export class SPLTokenProcessor extends SolanaBaseProcessor {
   public onInitializeMintCloseAuthority(
     handler: (data: InitializeMintCloseAuthority, ctx: SolanaContext) => void,
     handlerOptions?: HandlerOptions<SolanaFetchConfig, Instruction>
-  ): SPLTokenProcessor {
+  ): this {
     this.onInstruction('initializeMintCloseAuthority', (ins: Instruction, ctx) => {
       if (ins) {
         handler(ins.data as InitializeMintCloseAuthority, ctx)
@@ -315,7 +315,7 @@ export class SPLTokenProcessor extends SolanaBaseProcessor {
   public onTransferFeeExtension(
     handler: (data: TransferFeeExtension, ctx: SolanaContext) => void,
     handlerOptions?: HandlerOptions<SolanaFetchConfig, Instruction>
-  ): SPLTokenProcessor {
+  ): this {
     this.onInstruction('transferFeeExtension', (ins: Instruction, ctx) => {
       if (ins) {
         handler(ins.data as TransferFeeExtension, ctx)
@@ -327,7 +327,7 @@ export class SPLTokenProcessor extends SolanaBaseProcessor {
   public onDefaultAccountStateExtension(
     handler: (data: DefaultAccountStateExtension, ctx: SolanaContext) => void,
     handlerOptions?: HandlerOptions<SolanaFetchConfig, Instruction>
-  ): SPLTokenProcessor {
+  ): this {
     this.onInstruction('defaultAccountStateExtension', (ins: Instruction, ctx) => {
       if (ins) {
         handler(ins.data as DefaultAccountStateExtension, ctx)
@@ -339,7 +339,7 @@ export class SPLTokenProcessor extends SolanaBaseProcessor {
   public onReallocate(
     handler: (data: Reallocate, ctx: SolanaContext) => void,
     handlerOptions?: HandlerOptions<SolanaFetchConfig, Instruction>
-  ): SPLTokenProcessor {
+  ): this {
     this.onInstruction('reallocate', (ins: Instruction, ctx) => {
       if (ins) {
         handler(ins.data as Reallocate, ctx)
@@ -351,7 +351,7 @@ export class SPLTokenProcessor extends SolanaBaseProcessor {
   public onMemoTransferExtension(
     handler: (data: MemoTransferExtension, ctx: SolanaContext) => void,
     handlerOptions?: HandlerOptions<SolanaFetchConfig, Instruction>
-  ): SPLTokenProcessor {
+  ): this {
     this.onInstruction('memoTransferExtension', (ins: Instruction, ctx) => {
       if (ins) {
         handler(ins.data as MemoTransferExtension, ctx)
@@ -363,7 +363,7 @@ export class SPLTokenProcessor extends SolanaBaseProcessor {
   public onCreateNativeMint(
     handler: (data: CreateNativeMint, ctx: SolanaContext) => void,
     handlerOptions?: HandlerOptions<SolanaFetchConfig, Instruction>
-  ): SPLTokenProcessor {
+  ): this {
     this.onInstruction('createNativeMint', (ins: Instruction, ctx) => {
       if (ins) {
         handler(ins.data as CreateNativeMint, ctx)

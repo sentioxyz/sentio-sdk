@@ -26,4 +26,4 @@ minimumReleaseAge: 0
 # deps verification (auto-install with frozen-lockfile) on that intentional drift.
 verifyDepsBeforeRun: false
 patchedDependencies:
-  '@coral-xyz/anchor@0.31.1': patches/@coral-xyz__anchor@0.30.1.patch
+  '@anchor-lang/core@1.0.2': patches/@anchor-lang__core@1.0.2.patch

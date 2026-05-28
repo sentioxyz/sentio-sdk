@@ -1,13 +1,13 @@
 import { Data_SolBlock, Data_SolInstruction, HandleInterval, ProcessResult } from '@sentio/protos'
 import { SolanaContext } from './solana-context.js'
-import { Instruction } from '@coral-xyz/anchor'
+import { Instruction } from '@anchor-lang/core'
 import { SolanaBindOptions, SolanaFetchConfig } from './solana-options.js'
 import { ListStateStorage } from '@sentio/runtime'
 import { ALL_ADDRESS, Labels, PromiseOrVoid } from '../core/index.js'
 import { SolanaChainId } from '@sentio/chain'
 import { HandlerOptions } from '../core/handler-options.js'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
-import { TransactionResponse, BlockResponse } from '@solana/web3.js'
+import type { TransactionResponse, BlockResponse } from './solana-rpc-types.js'
 
 type IndexConfigure = {
   startSlot: bigint
