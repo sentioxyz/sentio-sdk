@@ -1,0 +1,18 @@
+{
+  "enabledPlugins": {
+    "claude-md-management@claude-plugins-official": true,
+    "typescript-lsp@claude-plugins-official": true
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "CHANGED=$(git status --porcelain 2>/dev/null | awk '{print $NF}'); if echo \"$CHANGED\" | grep -qE '(^|/)(package\\.json|pnpm-workspace\\.yaml|tsconfig\\.json)$|^scripts/|^\\.github/workflows/' && ! echo \"$CHANGED\" | grep -q '^CLAUDE\\.md$'; then printf '{\"systemMessage\":\"Project config files changed but CLAUDE.md was not updated. Consider running /claude-md-management:claude-md-improver to keep it current.\"}\\n'; fi"
+          }
+        ]
+      }
+    ]
+  }
+}

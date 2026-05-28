@@ -126,3 +126,7 @@ sdk/src/tests/types/
 sdk/src/fuel/tests/types/
 
 **.generated
+
+# Personal Claude Code settings (project-shared config lives in .claude/settings.json)
+.claude/settings.local.json
+.claude/worktrees/
