@@ -1,15 +1,15 @@
 import path from 'path'
 import fs from 'fs'
 import chalk from 'chalk'
-import { Idl } from '@coral-xyz/anchor'
 import {
+  Idl,
+  IdlDefinedFields,
   IdlField,
   IdlInstruction,
-  IdlType,
   IdlInstructionAccountItem,
-  IdlDefinedFields,
+  IdlType,
   IdlTypeDef
-} from '@coral-xyz/anchor/dist/esm/idl.js'
+} from '@anchor-lang/core'
 import { recursiveCodegen } from '../../core/codegen.js'
 
 export function codegen(abisDir: string, targetPath = path.join('src', 'types', 'solana'), genExample = false) {
@@ -49,7 +49,7 @@ function codeGenSolanaIdlProcessor(idlObj: Idl): string {
   return `import { BorshInstructionCoder, Instruction, Idl } from '@sentio/sdk/solana'
 import { SolanaBaseProcessor, SolanaContext, SolanaBindOptions } from "@sentio/sdk/solana"
 import { ${idlName}_idl } from "./${idlName}.js"
-import { PublicKey } from '@solana/web3.js'
+import type { Address } from '@solana/kit'
 
 ${idlObj.types?.map((def) => codeGenType(def)).join('')}
 
@@ -180,7 +180,7 @@ function mapType(tpe: IdlType): string {
   }
   switch (tpe) {
     case 'pubkey':
-      return 'PublicKey'
+      return 'Address'
     case 'bool':
       return 'boolean'
     case 'string':

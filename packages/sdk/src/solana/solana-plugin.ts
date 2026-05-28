@@ -12,7 +12,7 @@ import {
 import { ServerError, Status } from 'nice-grpc'
 
 import { SolanaProcessorState } from './solana-processor.js'
-import { Instruction as SolInstruction } from '@coral-xyz/anchor'
+import { Instruction as SolInstruction } from '@anchor-lang/core'
 
 export class SolanaPlugin extends Plugin {
   name: string = 'SolanaPlugin'

@@ -87,9 +87,9 @@
     "test:db": "glob -c 'tsx --test' 'src/store/tests/database.test.ts'"
   },
   "dependencies": {
+    "@anchor-lang/borsh": "^1.0.2",
+    "@anchor-lang/core": "^1.0.2",
     "@aptos-labs/ts-sdk": "~7.1.0",
-    "@coral-xyz/anchor": "^0.31.1",
-    "@coral-xyz/borsh": "^0.31.1",
     "@iota/iota-sdk": "~1.13.0",
     "@mysten/sui": "~2.17.0",
     "@prettier/sync": "^0.6.0",
@@ -99,7 +99,7 @@
     "@sentio/ethers-v6": "^1.0.29",
     "@sentio/protos": "workspace:*",
     "@sentio/runtime": "workspace:^",
-    "@solana/web3.js": "^1.98.3",
+    "@solana/kit": "^6.9.0",
     "@typemove/aptos": "2.0.2",
     "@typemove/iota": "2.0.2",
     "@typemove/move": "2.0.2",

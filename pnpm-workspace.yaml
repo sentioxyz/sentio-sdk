@@ -5,13 +5,17 @@ packages:
   # if required, exclude some directories
   # - '!**/test/**'
 # pnpm 11 reads these from the workspace file (no longer from .npmrc / package.json "pnpm").
-# Approve native build scripts that pnpm 11 otherwise blocks.
+# Every native install/postinstall script pnpm encounters MUST be enumerated here as
+# true or false, otherwise pnpm reprompts on every install. `onlyBuiltDependencies` /
+# `neverBuiltDependencies` are no longer honored as suppression in pnpm 11.
+#   - bufferutil / utf-8-validate: optional native acceleration for `ws`; JS fallback works.
+#   - protobufjs: postinstall is just a versionScheme warning, not load-bearing.
 allowBuilds:
-  bufferutil: true
-  esbuild: true
-  protobufjs: true
-  unrs-resolver: true
-  utf-8-validate: true
+  bufferutil: false
+  esbuild: true # downloads platform binary; tsup bundle requires it
+  protobufjs: false
+  unrs-resolver: true # napi platform binary for ESLint TS resolver
+  utf-8-validate: false
 # Keep hoisting so transitive deps (e.g. @fuel-ts/*, superstruct, ix, tslib) resolve.
 shamefullyHoist: true
 # Enforce engines field (was in .npmrc as `engine-strict=true`; pnpm 11 no longer
@@ -25,5 +29,14 @@ minimumReleaseAge: 0
 # scripts/update-version.sh's `pnpm exec` would otherwise trip the post-11.3
 # deps verification (auto-install with frozen-lockfile) on that intentional drift.
 verifyDepsBeforeRun: false
+# @anchor-lang/core's ESM build (dist/esm/index.js) contains a CJS-only block
+# `if (!isBrowser) { exports.workspace = require(...); exports.Wallet = require(...); }`
+# which crashes with "exports is not defined in ES module scope" when executed
+# in a pure ESM context. At runtime via plain `import` Node falls back to the
+# CJS "main" build (no "exports" field), so this is not hit. But our tsup bundle
+# (`pnpm --filter "@sentio/sdk" build:bundle`) emits ESM and copies these lines
+# verbatim into the chunk, breaking any downstream test that loads the bundled
+# SDK (e.g. packages/cli/templates/solana/src/processor.test.ts in CI's
+# sdk-bundle job). Patch rewrites the block to valid ESM re-exports.
 patchedDependencies:
-  '@coral-xyz/anchor@0.31.1': patches/@coral-xyz__anchor@0.30.1.patch
+  '@anchor-lang/core@1.0.2': patches/@anchor-lang__core@1.0.2.patch

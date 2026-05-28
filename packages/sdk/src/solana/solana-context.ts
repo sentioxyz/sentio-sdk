@@ -1,6 +1,6 @@
 import { normalizeLabels, Labels, BaseContext, RecordMetaData } from '../index.js'
 import { SolanaChainId } from '@sentio/chain'
-import { TransactionResponse } from '@solana/web3.js'
+import type { TransactionResponse } from './solana-rpc-types.js'
 
 export class SolanaContext extends BaseContext {
   network: SolanaChainId
