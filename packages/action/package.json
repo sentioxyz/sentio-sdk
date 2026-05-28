@@ -23,7 +23,7 @@
     "build:bundle": "pnpm gen && pnpm bundle && pnpm bundle:dts",
     "compile": "tsc && cp src/tsup.config.ts lib",
     "gen": "echo",
-    "test": "glob -c 'tsx --test' '**/*.test.ts'"
+    "test": "tsx --test 'src/**/*.test.ts'"
   },
   "dependencies": {
     "@sentio/protos": "workspace:*",

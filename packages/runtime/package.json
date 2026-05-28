@@ -29,7 +29,7 @@
     "run-benchmark": "tsx src/decode-benchmark.ts",
     "start_js": "tsx ./lib/processor-runner.js $PWD/../../debug/dist/lib.js",
     "start_ts": "tsx src/processor-runner.ts --debug --worker 3 --port 4000 --chains-config chains-config.json $PWD/../../examples/x2y2/src/processor.ts",
-    "test": "glob -c 'tsx --test' '**/*.test.ts'"
+    "test": "tsx --test 'src/**/*.test.ts'"
   },
   "dependencies": {
     "@opentelemetry/exporter-metrics-otlp-grpc": "^0.205.0",

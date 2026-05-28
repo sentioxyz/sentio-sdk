@@ -27,7 +27,7 @@
     "bundle": "esbuild --platform=node --format=esm --bundle src/index.ts --outfile=lib/index.js --sourcemap --inject:src/cjs-shim.ts --external:@sentio/sdk",
     "cli": "tsx src/index.ts",
     "compile": "tsc",
-    "test": "glob -c 'tsx --test' 'src/**/*.test.ts'"
+    "test": "tsx --test 'src/**/*.test.ts'"
   },
   "types": "module",
   "dependencies": {
