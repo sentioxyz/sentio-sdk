@@ -25,7 +25,9 @@ function handleError(entity: string, key: string, fn: () => any) {
   try {
     return fn()
   } catch (e) {
-    throw new Error(`Get property "${key}" from Entity "${entity}" failed: ${e.message}`)
+    throw new Error(
+      `Get property "${key}" from Entity "${entity}" failed: ${e instanceof Error ? e.message : String(e)}`
+    )
   }
 }
 

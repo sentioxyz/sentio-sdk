@@ -21,7 +21,6 @@
     "strictNullChecks": true,
     "strictFunctionTypes": false,
     "strictPropertyInitialization": false,
-    "useUnknownInCatchVariables": false,
     "stripInternal": true,
     "noFallthroughCasesInSwitch": true,
     "noEmitOnError": false,

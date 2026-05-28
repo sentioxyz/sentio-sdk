@@ -8,8 +8,8 @@ import { SimpleEthersError } from '../eth/index.js'
 export async function ignoreEthCallException<Res>(promise: Promise<Res>, logError = false): Promise<Res | undefined> {
   try {
     return await promise
-  } catch (err) {
-    if (err instanceof SimpleEthersError || err.code === 'CALL_EXCEPTION' || err.code === 'BAD_DATA') {
+  } catch (err: any) {
+    if (err instanceof SimpleEthersError || err?.code === 'CALL_EXCEPTION' || err?.code === 'BAD_DATA') {
       if (logError) {
         console.error('eth call exception, return undefined', err)
       }

@@ -179,7 +179,9 @@ export function normalizeToRichStruct(...objs: any[]): RichStruct {
       try {
         ret.fields[key] = normalizeToRichValue(value)
       } catch (e) {
-        throw new Error("error when converting data for key '" + key + "': " + e.message)
+        throw new Error(
+          "error when converting data for key '" + key + "': " + (e instanceof Error ? e.message : String(e))
+        )
       }
     }
   }

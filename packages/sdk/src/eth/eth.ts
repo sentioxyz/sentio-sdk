@@ -60,21 +60,21 @@ export class SimpleEthersError extends Error {
   }
 }
 
-export function transformEtherError(e: Error, ctx: ContractContext<any, any> | undefined, stack?: string): Error {
+export function transformEtherError(e: unknown, ctx: ContractContext<any, any> | undefined, stack?: string): Error {
   if (e instanceof SimpleEthersError) {
     return e
   }
 
   const checkPage = 'Check here for possible cause and fix: https://docs.sentio.xyz/docs/handling-errors#ethers-error'
 
-  let msg = ''
   const err = e as CallExceptionError
-  if (err.code === 'CALL_EXCEPTION' || err.code === 'BAD_DATA') {
+  let msg = ''
+  if (err?.code === 'CALL_EXCEPTION' || err?.code === 'BAD_DATA') {
     if (err.data === '0x') {
       if (ctx) {
-        msg = `jsonrpc eth_call return '0x' (likely contract not existed) at chain ${ctx.chainId}, ${checkPage}:\n${e.message}`
+        msg = `jsonrpc eth_call return '0x' (likely contract not existed) at chain ${ctx.chainId}, ${checkPage}:\n${err.message}`
       } else {
-        msg = `jsonrpc eth_call return '0x' (likely contract not existed), ${checkPage}:\n${e.message}`
+        msg = `jsonrpc eth_call return '0x' (likely contract not existed), ${checkPage}:\n${err.message}`
       }
       return new SimpleEthersError(msg, err, stack)
     } else {
@@ -82,7 +82,8 @@ export function transformEtherError(e: Error, ctx: ContractContext<any, any> | u
     }
   }
 
-  msg = `other error during call error ${e.message}\n` + JSON.stringify(e) + '\n' + stack?.toString() + '\n' + checkPage
+  msg =
+    `other error during call error ${err?.message}\n` + JSON.stringify(e) + '\n' + stack?.toString() + '\n' + checkPage
   return new Error(msg)
 }
 

@@ -139,7 +139,7 @@ class DexPrice {
           ' at chain ' +
           this.chainId +
           '. Details: ' +
-          e.toString()
+          String(e)
       }
     }
   }
