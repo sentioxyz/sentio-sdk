@@ -14,6 +14,9 @@ allowBuilds:
   utf-8-validate: true
 # Keep hoisting so transitive deps (e.g. @fuel-ts/*, superstruct, ix, tslib) resolve.
 shamefullyHoist: true
+# Enforce engines field (was in .npmrc as `engine-strict=true`; pnpm 11 no longer
+# reads it from there).
+engineStrict: true
 # pnpm 11's default ~24h minimumReleaseAge blocks installing our own same-day
 # @typemove/* releases; disable it for this repo.
 minimumReleaseAge: 0
