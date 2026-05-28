@@ -23,7 +23,7 @@ import { ActionServer } from './action-server.js'
 import { ProcessorV3Definition } from '@sentio/protos'
 import { ProcessorServiceImplV3 } from './service-v3.js'
 import { dirname, join } from 'path'
-import { program, ProcessorRuntimeOptions } from 'processor-runner-program.js'
+import { program, ProcessorRuntimeOptions } from './processor-runner-program.js'
 import { locatePackageJson } from './utils.js'
 
 program.parse()

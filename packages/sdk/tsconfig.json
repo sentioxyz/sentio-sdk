@@ -2,10 +2,9 @@
   "compilerOptions": {
     //    "inlineSources": true,
     "rootDir": "./src",
-    "baseUrl": "./src",
     "outDir": "lib",
     "paths": {
-      "@sentio/sdk/*": ["./*/index.js"]
+      "@sentio/sdk/*": ["./src/*/index.js"]
     }
   },
   "exclude": ["lib", "src/bundle.config.ts", "src/tsup.config.ts", "sync-sui-to-iota.ts"],

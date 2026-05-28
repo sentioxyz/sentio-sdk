@@ -74,14 +74,16 @@ export abstract class AbstractStoreContext implements IStoreContext {
 
     const requestType = Object.keys(request)[0] as RequestType
     const opId = StoreContext.opCounter++
-    const promise = this.newPromise(opId, requestType)
+    const promise = this.newPromise<DBResponse>(opId, requestType)
 
     const start = Date.now()
     const promises = [promise]
     // console.debug('sending db request ', opId, request)
     let timer: NodeJS.Timeout | undefined
     if (timeoutSecs) {
-      const timeoutPromise = new Promise((_r, rej) => (timer = setTimeout(rej, timeoutSecs * 1000, timeoutError)))
+      const timeoutPromise = new Promise<DBResponse>(
+        (_r, rej) => (timer = setTimeout(rej, timeoutSecs * 1000, timeoutError))
+      )
       promises.push(timeoutPromise)
     }
 

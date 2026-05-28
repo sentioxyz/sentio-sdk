@@ -2,9 +2,9 @@ import assert from 'assert'
 import { describe, test, mock } from 'node:test'
 import { JsonRpcProvider } from 'ethers'
 import { getProvider } from './provider.js'
-import { Endpoints } from 'endpoints.js'
+import { Endpoints } from './endpoints.js'
 import { EthChainId } from '@sentio/chain'
-import { GLOBAL_CONFIG } from 'global-config.js'
+import { GLOBAL_CONFIG } from './global-config.js'
 
 Endpoints.INSTANCE.concurrency = 1
 Endpoints.INSTANCE.batchCount = 1

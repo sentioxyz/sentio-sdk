@@ -64,7 +64,7 @@ describe('Test Service V3 with worker without partition', () => {
     const subject = new Subject<DeepPartial<ProcessStreamResponseV3>>()
     let i = 0
     let result: any = undefined
-    subject.subscribe((resp: ProcessStreamResponseV3) => {
+    subject.subscribe((resp: DeepPartial<ProcessStreamResponseV3>) => {
       if (resp.dbRequest) {
         assert.ok(resp.dbRequest, 'db request should be present in the response')
         assert.deepEqual(
