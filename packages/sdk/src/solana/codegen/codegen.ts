@@ -1,13 +1,13 @@
 import path from 'path'
 import fs from 'fs'
 import chalk from 'chalk'
-import { Idl } from '@anchor-lang/core'
 import {
+  Idl,
+  IdlDefinedFields,
   IdlField,
   IdlInstruction,
-  IdlType,
   IdlInstructionAccountItem,
-  IdlDefinedFields,
+  IdlType,
   IdlTypeDef
 } from '@anchor-lang/core'
 import { recursiveCodegen } from '../../core/codegen.js'
