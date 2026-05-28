@@ -1,4 +1,4 @@
-import { TimeOrBlock } from 'eth/bind-options.js'
+import { TimeOrBlock } from '../eth/bind-options.js'
 import { Block, JsonRpcProvider, EthersError } from 'ethers'
 
 async function getBlockSafely(provider: JsonRpcProvider, blockNumber: number | string): Promise<Block> {

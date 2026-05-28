@@ -17,7 +17,8 @@
     "outDir": "./dist",
     "skipLibCheck": true,
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "strictFunctionTypes": false
   },
   "exclude": ["dist"]
 }

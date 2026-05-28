@@ -25,7 +25,7 @@ import { processMetrics } from './metrics.js'
 import { recordRuntimeInfo } from './service.js'
 import { DataBindingContext } from './db-context.js'
 import { freezeGlobalConfig } from './global-config.js'
-import { ProcessorRuntimeOptions } from 'processor-runner-program.js'
+import { ProcessorRuntimeOptions } from './processor-runner-program.js'
 
 const { process_binding_count, process_binding_time, process_binding_error } = processMetrics
 

@@ -83,8 +83,8 @@
     "gen:sui": "cp node_modules/@typemove/sui/src/abis/*.json src/sui/abis && tsx src/sui/codegen/run.ts src/sui/abis src/sui/builtin && pnpm gen:sui_test",
     "gen:sui_test": "tsx src/sui/codegen/run.ts src/sui/tests/abis src/sui/tests/types",
     "sync_sui_to_iota": "tsx sync-sui-to-iota.ts",
-    "test": "glob -c 'tsx --test' '**/*.test.ts'",
-    "test:db": "glob -c 'tsx --test' 'src/store/tests/database.test.ts'"
+    "test": "tsx --test 'src/**/*.test.ts'",
+    "test:db": "tsx --test 'src/store/tests/database.test.ts'"
   },
   "dependencies": {
     "@anchor-lang/borsh": "^1.0.2",
