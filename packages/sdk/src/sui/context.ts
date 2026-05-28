@@ -1,22 +1,17 @@
 import { RecordMetaData } from '@sentio/protos'
 import { type Labels, normalizeLabels } from '../index.js'
 import { getClient, SuiNetwork } from './network.js'
-import {
-  SuiTransactionBlockResponse,
-  SuiEvent,
-  SuiMoveNormalizedModule,
-  SuiMoveObject,
-  SuiJsonRpcClient
-} from '@mysten/sui/jsonRpc'
+import type { GrpcTypes, SuiGrpcClient } from '@mysten/sui/grpc'
+import type { ModuleWithAddress, SuiEventInput, SuiMoveObjectInput } from '@typemove/sui'
 import { MoveCoder } from './index.js'
 import { defaultMoveCoder } from './move-coder.js'
 import { MoveAccountContext, MoveContext } from '../move/index.js'
 
-export class SuiContext extends MoveContext<SuiNetwork, SuiMoveNormalizedModule, SuiEvent | SuiMoveObject> {
+export class SuiContext extends MoveContext<SuiNetwork, ModuleWithAddress, SuiEventInput | SuiMoveObjectInput> {
   moduleName: string
   timestamp: Date
   checkpoint: bigint
-  transaction: SuiTransactionBlockResponse
+  transaction: GrpcTypes.ExecutedTransaction
   eventIndex: number
   coder: MoveCoder
 
@@ -26,7 +21,7 @@ export class SuiContext extends MoveContext<SuiNetwork, SuiMoveNormalizedModule,
     address: string,
     timestamp: Date,
     checkpoint: bigint,
-    transaction: SuiTransactionBlockResponse,
+    transaction: GrpcTypes.ExecutedTransaction,
     eventIndex: number,
     baseLabels: Labels | undefined
   ) {
@@ -65,12 +60,16 @@ export class SuiContext extends MoveContext<SuiNetwork, SuiMoveNormalizedModule,
     }
   }
 
-  get client(): SuiJsonRpcClient {
+  get client(): SuiGrpcClient {
     return getClient(this.network)
   }
 }
 
-export class SuiObjectChangeContext extends MoveContext<SuiNetwork, SuiMoveNormalizedModule, SuiEvent | SuiMoveObject> {
+export class SuiObjectChangeContext extends MoveContext<
+  SuiNetwork,
+  ModuleWithAddress,
+  SuiEventInput | SuiMoveObjectInput
+> {
   timestamp: Date
   checkpoint: bigint
   coder: MoveCoder
@@ -115,7 +114,7 @@ export class SuiObjectChangeContext extends MoveContext<SuiNetwork, SuiMoveNorma
     }
   }
 
-  get client(): SuiJsonRpcClient {
+  get client(): SuiGrpcClient {
     return getClient(this.network)
   }
 }
@@ -123,8 +122,8 @@ export class SuiObjectChangeContext extends MoveContext<SuiNetwork, SuiMoveNorma
 // TODO address handler should use this context
 export class SuiAddressContext extends MoveAccountContext<
   SuiNetwork,
-  SuiMoveNormalizedModule,
-  SuiEvent | SuiMoveObject
+  ModuleWithAddress,
+  SuiEventInput | SuiMoveObjectInput
 > {
   address: string
   network: SuiNetwork
@@ -167,7 +166,7 @@ export class SuiAddressContext extends MoveAccountContext<
     }
   }
 
-  get client(): SuiJsonRpcClient {
+  get client(): SuiGrpcClient {
     return getClient(this.network)
   }
 

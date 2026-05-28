@@ -4,3 +4,18 @@ packages:
   - 'examples/*'
   # if required, exclude some directories
   # - '!**/test/**'
+# pnpm 11 reads these from the workspace file (no longer from .npmrc / package.json "pnpm").
+# Approve native build scripts that pnpm 11 otherwise blocks.
+allowBuilds:
+  bufferutil: true
+  esbuild: true
+  protobufjs: true
+  unrs-resolver: true
+  utf-8-validate: true
+# Keep hoisting so transitive deps (e.g. @fuel-ts/*, superstruct, ix, tslib) resolve.
+shamefullyHoist: true
+# pnpm 11's default ~24h minimumReleaseAge blocks installing our own same-day
+# @typemove/* releases; disable it for this repo.
+minimumReleaseAge: 0
+patchedDependencies:
+  '@coral-xyz/anchor@0.31.1': patches/@coral-xyz__anchor@0.30.1.patch

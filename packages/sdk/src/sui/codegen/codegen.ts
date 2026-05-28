@@ -1,9 +1,8 @@
-import { SuiMoveNormalizedModule, SuiEvent, SuiMoveObject } from '@mysten/sui/jsonRpc'
-
 import * as fs from 'fs'
 import chalk from 'chalk'
 import { InternalMoveModule, InternalMoveStruct, structQname } from '@typemove/move'
 import { SuiCodegen as BaseSuiCodegen } from '@typemove/sui/codegen'
+import type { ModuleWithAddress, SuiEventInput, SuiMoveObjectInput } from '@typemove/sui'
 import path, { join } from 'path'
 import { SharedNetworkCodegen } from '../../move/shared-network-codegen.js'
 import { getRpcEndpoint, SuiNetwork } from '../network.js'
@@ -24,7 +23,7 @@ export async function codegen(
 }
 
 class SuiNetworkCodegen extends BaseSuiCodegen {
-  moduleGenerator: SharedNetworkCodegen<SuiNetwork, SuiMoveNormalizedModule, SuiEvent | SuiMoveObject>
+  moduleGenerator: SharedNetworkCodegen<SuiNetwork, ModuleWithAddress, SuiEventInput | SuiMoveObjectInput>
   SYSTEM_PACKAGE = '@sentio/sdk/sui'
 
   constructor(network: SuiNetwork) {
@@ -33,8 +32,8 @@ class SuiNetworkCodegen extends BaseSuiCodegen {
     const generator = this
     this.moduleGenerator = new (class extends SharedNetworkCodegen<
       SuiNetwork,
-      SuiMoveNormalizedModule,
-      SuiEvent | SuiMoveObject
+      ModuleWithAddress,
+      SuiEventInput | SuiMoveObjectInput
     > {
       ADDRESS_TYPE = 'string'
       PREFIX = 'Sui'

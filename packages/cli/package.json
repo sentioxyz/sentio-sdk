@@ -2,6 +2,11 @@
   "name": "@sentio/cli",
   "version": "3.0.0-development",
   "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sentioxyz/sentio-sdk.git",
+    "directory": "packages/cli"
+  },
   "type": "module",
   "exports": {
     ".": "./lib/index.js"
@@ -10,9 +15,11 @@
     "sentio": "./lib/index.js"
   },
   "files": [
-    "{lib,src,templates}",
-    "!lib/**/*.map",
-    "!{lib,src}/**/*.test.{js,ts}"
+    "lib",
+    "src",
+    "templates",
+    "!**/*.test.*",
+    "!lib/**/*.map"
   ],
   "scripts": {
     "build": "pnpm tsc --noEmit && pnpm bundle",
@@ -24,9 +31,9 @@
   },
   "types": "module",
   "dependencies": {
-    "@aptos-labs/ts-sdk": "~6.0.0",
-    "@iota/iota-sdk": "~1.10.0",
-    "@mysten/sui": "~2.4.0",
+    "@aptos-labs/ts-sdk": "~7.1.0",
+    "@iota/iota-sdk": "~1.13.0",
+    "@mysten/sui": "~2.17.0",
     "@sentio/api": "~1.0.4",
     "@sentio/chain": "~3.4.22",
     "@sentio/graph-cli": "^0.97.0",

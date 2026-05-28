@@ -1,265 +1,341 @@
 [
   {
-    "fileFormatVersion": 6,
     "address": "0x1e2b124f746a339b3cf99b9f969393a96594519aafb1d06517aacfeeae20e7a5",
-    "name": "oracle",
-    "friends": [],
-    "structs": {
-      "Key": {
-        "abilities": {
-          "abilities": ["Key"]
-        },
-        "typeParameters": [
-          {
-            "constraints": {
-              "abilities": []
+    "module": {
+      "name": "oracle",
+      "datatypes": [
+        {
+          "name": "Key",
+          "kind": 1,
+          "abilities": [
+            4
+          ],
+          "typeParameters": [
+            {
+              "constraints": []
+            }
+          ],
+          "fields": [
+            {
+              "name": "id",
+              "position": 0,
+              "type": {
+                "type": 10,
+                "typeName": "0x2::object::UID",
+                "typeParameterInstantiation": []
+              }
             },
-            "isPhantom": true
-          }
-        ],
-        "fields": [
-          {
-            "name": "id",
-            "type": {
-              "Struct": {
-                "address": "0x2",
-                "module": "object",
-                "name": "UID",
-                "typeArguments": []
+            {
+              "name": "for",
+              "position": 1,
+              "type": {
+                "type": 10,
+                "typeName": "0x2::object::ID",
+                "typeParameterInstantiation": []
               }
             }
-          },
-          {
-            "name": "for",
-            "type": {
-              "Struct": {
-                "address": "0x2",
-                "module": "object",
-                "name": "ID",
-                "typeArguments": []
-              }
-            }
-          }
-        ]
-      },
-      "Oracle": {
-        "abilities": {
-          "abilities": ["Key"]
+          ],
+          "variants": []
         },
-        "typeParameters": [
-          {
-            "constraints": {
-              "abilities": []
+        {
+          "name": "Oracle",
+          "kind": 1,
+          "abilities": [
+            4
+          ],
+          "typeParameters": [
+            {
+              "constraints": []
+            }
+          ],
+          "fields": [
+            {
+              "name": "id",
+              "position": 0,
+              "type": {
+                "type": 10,
+                "typeName": "0x2::object::UID",
+                "typeParameterInstantiation": []
+              }
             },
-            "isPhantom": true
-          }
-        ],
-        "fields": [
-          {
-            "name": "id",
-            "type": {
-              "Struct": {
-                "address": "0x2",
-                "module": "object",
-                "name": "UID",
-                "typeArguments": []
+            {
+              "name": "decimal",
+              "position": 1,
+              "type": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "name": "price",
+              "position": 2,
+              "type": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "name": "twap_price_1h",
+              "position": 3,
+              "type": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "name": "ts_ms",
+              "position": 4,
+              "type": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "name": "epoch",
+              "position": 5,
+              "type": {
+                "type": 6,
+                "typeParameterInstantiation": []
               }
             }
-          },
-          {
-            "name": "decimal",
-            "type": "U64"
-          },
-          {
-            "name": "price",
-            "type": "U64"
-          },
-          {
-            "name": "twap_price_1h",
-            "type": "U64"
-          },
-          {
-            "name": "ts_ms",
-            "type": "U64"
-          },
-          {
-            "name": "epoch",
-            "type": "U64"
-          }
-        ]
-      },
-      "PriceEvent": {
-        "abilities": {
-          "abilities": ["Copy", "Drop"]
+          ],
+          "variants": []
         },
-        "typeParameters": [],
-        "fields": [
-          {
-            "name": "token",
-            "type": {
-              "Struct": {
-                "address": "0x1",
-                "module": "ascii",
-                "name": "String",
-                "typeArguments": []
+        {
+          "name": "PriceEvent",
+          "kind": 1,
+          "abilities": [
+            1,
+            2
+          ],
+          "typeParameters": [],
+          "fields": [
+            {
+              "name": "token",
+              "position": 0,
+              "type": {
+                "type": 10,
+                "typeName": "0x1::ascii::String",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "name": "price",
+              "position": 1,
+              "type": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "name": "ts_ms",
+              "position": 2,
+              "type": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "name": "epoch",
+              "position": 3,
+              "type": {
+                "type": 6,
+                "typeParameterInstantiation": []
               }
             }
-          },
-          {
-            "name": "price",
-            "type": "U64"
-          },
-          {
-            "name": "ts_ms",
-            "type": "U64"
-          },
-          {
-            "name": "epoch",
-            "type": "U64"
-          }
-        ]
-      }
-    },
-    "exposedFunctions": {
-      "copy_key": {
-        "visibility": "Public",
-        "isEntry": true,
-        "typeParameters": [
-          {
-            "abilities": []
-          }
-        ],
-        "parameters": [
-          {
-            "Reference": {
-              "Struct": {
-                "address": "0x1e2b124f746a339b3cf99b9f969393a96594519aafb1d06517aacfeeae20e7a5",
-                "module": "oracle",
-                "name": "Key",
-                "typeArguments": [
+          ],
+          "variants": []
+        }
+      ],
+      "functions": [
+        {
+          "name": "copy_key",
+          "visibility": 2,
+          "isEntry": true,
+          "typeParameters": [
+            {
+              "constraints": []
+            }
+          ],
+          "parameters": [
+            {
+              "reference": 1,
+              "body": {
+                "type": 10,
+                "typeName": "0x1e2b124f746a339b3cf99b9f969393a96594519aafb1d06517aacfeeae20e7a5::oracle::Key",
+                "typeParameterInstantiation": [
                   {
-                    "TypeParameter": 0
+                    "type": 11,
+                    "typeParameter": 0,
+                    "typeParameterInstantiation": []
+                  }
+                ]
+              }
+            },
+            {
+              "body": {
+                "type": 1,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x2::tx_context::TxContext",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": []
+        },
+        {
+          "name": "get_oracle",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [
+            {
+              "constraints": []
+            }
+          ],
+          "parameters": [
+            {
+              "reference": 1,
+              "body": {
+                "type": 10,
+                "typeName": "0x1e2b124f746a339b3cf99b9f969393a96594519aafb1d06517aacfeeae20e7a5::oracle::Oracle",
+                "typeParameterInstantiation": [
+                  {
+                    "type": 11,
+                    "typeParameter": 0,
+                    "typeParameterInstantiation": []
                   }
                 ]
               }
             }
-          },
-          "Address",
-          {
-            "MutableReference": {
-              "Struct": {
-                "address": "0x2",
-                "module": "tx_context",
-                "name": "TxContext",
-                "typeArguments": []
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
               }
             }
-          }
-        ],
-        "return": []
-      },
-      "get_oracle": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [
-          {
-            "abilities": []
-          }
-        ],
-        "parameters": [
-          {
-            "Reference": {
-              "Struct": {
-                "address": "0x1e2b124f746a339b3cf99b9f969393a96594519aafb1d06517aacfeeae20e7a5",
-                "module": "oracle",
-                "name": "Oracle",
-                "typeArguments": [
+          ]
+        },
+        {
+          "name": "new_oracle",
+          "visibility": 2,
+          "isEntry": true,
+          "typeParameters": [
+            {
+              "constraints": []
+            }
+          ],
+          "parameters": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x2::tx_context::TxContext",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": []
+        },
+        {
+          "name": "update",
+          "visibility": 2,
+          "isEntry": true,
+          "typeParameters": [
+            {
+              "constraints": []
+            }
+          ],
+          "parameters": [
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x1e2b124f746a339b3cf99b9f969393a96594519aafb1d06517aacfeeae20e7a5::oracle::Oracle",
+                "typeParameterInstantiation": [
                   {
-                    "TypeParameter": 0
+                    "type": 11,
+                    "typeParameter": 0,
+                    "typeParameterInstantiation": []
                   }
                 ]
               }
-            }
-          }
-        ],
-        "return": ["U64", "U64", "U64", "U64"]
-      },
-      "new_oracle": {
-        "visibility": "Public",
-        "isEntry": true,
-        "typeParameters": [
-          {
-            "abilities": []
-          }
-        ],
-        "parameters": [
-          "U64",
-          {
-            "MutableReference": {
-              "Struct": {
-                "address": "0x2",
-                "module": "tx_context",
-                "name": "TxContext",
-                "typeArguments": []
-              }
-            }
-          }
-        ],
-        "return": []
-      },
-      "update": {
-        "visibility": "Public",
-        "isEntry": true,
-        "typeParameters": [
-          {
-            "abilities": []
-          }
-        ],
-        "parameters": [
-          {
-            "MutableReference": {
-              "Struct": {
-                "address": "0x1e2b124f746a339b3cf99b9f969393a96594519aafb1d06517aacfeeae20e7a5",
-                "module": "oracle",
-                "name": "Oracle",
-                "typeArguments": [
+            },
+            {
+              "reference": 1,
+              "body": {
+                "type": 10,
+                "typeName": "0x1e2b124f746a339b3cf99b9f969393a96594519aafb1d06517aacfeeae20e7a5::oracle::Key",
+                "typeParameterInstantiation": [
                   {
-                    "TypeParameter": 0
+                    "type": 11,
+                    "typeParameter": 0,
+                    "typeParameterInstantiation": []
                   }
                 ]
               }
-            }
-          },
-          {
-            "Reference": {
-              "Struct": {
-                "address": "0x1e2b124f746a339b3cf99b9f969393a96594519aafb1d06517aacfeeae20e7a5",
-                "module": "oracle",
-                "name": "Key",
-                "typeArguments": [
-                  {
-                    "TypeParameter": 0
-                  }
-                ]
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "reference": 2,
+              "body": {
+                "type": 10,
+                "typeName": "0x2::tx_context::TxContext",
+                "typeParameterInstantiation": []
               }
             }
-          },
-          "U64",
-          "U64",
-          "U64",
-          {
-            "MutableReference": {
-              "Struct": {
-                "address": "0x2",
-                "module": "tx_context",
-                "name": "TxContext",
-                "typeArguments": []
-              }
-            }
-          }
-        ],
-        "return": []
-      }
+          ],
+          "returns": []
+        }
+      ]
     }
   }
 ]

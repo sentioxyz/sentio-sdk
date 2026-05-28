@@ -1,4 +1,4 @@
-import { MoveCallSuiTransaction, SuiTransactionBlockResponse } from '@mysten/sui/jsonRpc'
+import type { GrpcTypes } from '@mysten/sui/grpc'
 import { DataBinding, HandlerType } from '@sentio/protos'
 import { TestProcessorServer } from './test-processor-server.js'
 import { accountTypeString, parseMoveType, SPLITTER } from '../move/index.js'
@@ -11,11 +11,11 @@ export class SuiFacet {
     this.server = server
   }
 
-  testEntryFunctionCall(transaction: SuiTransactionBlockResponse, network: SuiNetwork = SuiNetwork.MAIN_NET) {
+  testEntryFunctionCall(transaction: GrpcTypes.ExecutedTransaction, network: SuiNetwork = SuiNetwork.MAIN_NET) {
     return this.testEntryFunctionCalls([transaction], network)
   }
 
-  testEntryFunctionCalls(transactions: SuiTransactionBlockResponse[], network: SuiNetwork = SuiNetwork.MAIN_NET) {
+  testEntryFunctionCalls(transactions: GrpcTypes.ExecutedTransaction[], network: SuiNetwork = SuiNetwork.MAIN_NET) {
     const bindings = []
     for (const trans of transactions) {
       const binding = this.buildEntryFunctionCallBinding(trans, network)
@@ -30,15 +30,15 @@ export class SuiFacet {
   }
 
   private buildEntryFunctionCallBinding(
-    transaction: SuiTransactionBlockResponse,
+    transaction: GrpcTypes.ExecutedTransaction,
     network: SuiNetwork = SuiNetwork.MAIN_NET
   ): DataBinding | undefined {
-    const calls: MoveCallSuiTransaction[] = getMoveCalls(transaction)
+    const calls: GrpcTypes.MoveCall[] = getMoveCalls(transaction)
     // if (calls.length !== 1) {
     //   throw Error('Transaction has more than one calls')
     // }
     for (const call of calls) {
-      const functionType = [accountTypeString(call.package), call.module, call.function].join(SPLITTER)
+      const functionType = [accountTypeString(call.package ?? ''), call.module, call.function].join(SPLITTER)
 
       for (const config of this.server.contractConfigs) {
         if (config.contract?.chainId !== network) {
@@ -67,7 +67,7 @@ export class SuiFacet {
     return undefined
   }
 
-  testEvent(transaction: SuiTransactionBlockResponse, network: SuiNetwork = SuiNetwork.MAIN_NET) {
+  testEvent(transaction: GrpcTypes.ExecutedTransaction, network: SuiNetwork = SuiNetwork.MAIN_NET) {
     const binding = this.buildEventBinding(transaction, network)
     if (!binding) {
       throw Error('Invalid test event: ' + JSON.stringify(transaction))
@@ -76,7 +76,7 @@ export class SuiFacet {
   }
 
   // limitation, can't really do filter logic
-  testGlobalTransaction(transaction: SuiTransactionBlockResponse, network: SuiNetwork = SuiNetwork.MAIN_NET) {
+  testGlobalTransaction(transaction: GrpcTypes.ExecutedTransaction, network: SuiNetwork = SuiNetwork.MAIN_NET) {
     const handlerIds = []
     for (const config of this.server.contractConfigs) {
       if (config.contract?.address === '*') {
@@ -97,7 +97,7 @@ export class SuiFacet {
       data: {
         suiCall: {
           rawTransaction: JSON.stringify(transaction),
-          timestamp: transaction.timestampMs ? new Date(transaction.timestampMs) : new Date(),
+          timestamp: new Date(),
           slot: BigInt(transaction.checkpoint || 0)
         }
       },
@@ -107,7 +107,7 @@ export class SuiFacet {
   }
 
   private buildEventBinding(
-    transaction: SuiTransactionBlockResponse,
+    transaction: GrpcTypes.ExecutedTransaction,
     network: SuiNetwork = SuiNetwork.MAIN_NET
   ): DataBinding | undefined {
     // const allEvents = new Set(transaction.events.map(e => e.type))
@@ -118,17 +118,17 @@ export class SuiFacet {
       }
       for (const eventConfig of config.moveEventConfigs) {
         for (const eventFilter of eventConfig.filters) {
-          for (const event of transaction.events || []) {
+          for (const event of transaction.events?.events || []) {
             if (
               accountTypeString(config.contract.address) + '::' + eventFilter.type ===
-              parseMoveType(event.type).qname
+              parseMoveType(event.eventType ?? '').qname
             ) {
               return {
                 data: {
                   suiEvent: {
                     rawEvent: JSON.stringify(event),
                     rawTransaction: JSON.stringify(transaction),
-                    timestamp: new Date(transaction.timestampMs || 0),
+                    timestamp: new Date(),
                     slot: 10000n
                   }
                 },

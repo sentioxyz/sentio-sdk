@@ -539,6 +539,50 @@
           }
         ]
       },
+      "intent_tx_data_bytes": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "auth_context",
+                "name": "AuthContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Vector": "U8"
+          }
+        ]
+      },
+      "signing_digest": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "auth_context",
+                "name": "AuthContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Vector": "U8"
+          }
+        ]
+      },
       "tx_commands": {
         "visibility": "Public",
         "isEntry": false,
@@ -566,6 +610,30 @@
                   "typeArguments": []
                 }
               }
+            }
+          }
+        ]
+      },
+      "tx_data_bytes": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "auth_context",
+                "name": "AuthContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Reference": {
+              "Vector": "U8"
             }
           }
         ]
@@ -12587,6 +12655,291 @@
       }
     }
   },
+  "intent": {
+    "fileFormatVersion": 6,
+    "address": "0x2",
+    "name": "intent",
+    "friends": [],
+    "structs": {
+      "Intent": {
+        "abilities": {
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "scope",
+            "type": "U8"
+          },
+          {
+            "name": "version",
+            "type": "U8"
+          },
+          {
+            "name": "app_id",
+            "type": "U8"
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {
+      "app_id": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "intent",
+                "name": "Intent",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          "U8"
+        ]
+      },
+      "app_id_consensus": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [],
+        "return": [
+          "U8"
+        ]
+      },
+      "app_id_iota": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [],
+        "return": [
+          "U8"
+        ]
+      },
+      "iota_personal_message": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "intent",
+              "name": "Intent",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "iota_transaction": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "intent",
+              "name": "Intent",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "new": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U8",
+          "U8",
+          "U8"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "intent",
+              "name": "Intent",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "scope": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "intent",
+                "name": "Intent",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          "U8"
+        ]
+      },
+      "scope_authority_capabilities": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [],
+        "return": [
+          "U8"
+        ]
+      },
+      "scope_bridge_event_deprecated": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [],
+        "return": [
+          "U8"
+        ]
+      },
+      "scope_checkpoint_summary": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [],
+        "return": [
+          "U8"
+        ]
+      },
+      "scope_consensus_block": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [],
+        "return": [
+          "U8"
+        ]
+      },
+      "scope_discovery_peers": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [],
+        "return": [
+          "U8"
+        ]
+      },
+      "scope_personal_message": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [],
+        "return": [
+          "U8"
+        ]
+      },
+      "scope_proof_of_possession": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [],
+        "return": [
+          "U8"
+        ]
+      },
+      "scope_sender_signed_transaction": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [],
+        "return": [
+          "U8"
+        ]
+      },
+      "scope_transaction_data": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [],
+        "return": [
+          "U8"
+        ]
+      },
+      "scope_transaction_effects": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [],
+        "return": [
+          "U8"
+        ]
+      },
+      "to_bytes": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "intent",
+                "name": "Intent",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Vector": "U8"
+          }
+        ]
+      },
+      "version": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "intent",
+                "name": "Intent",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          "U8"
+        ]
+      },
+      "version_v0": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [],
+        "return": [
+          "U8"
+        ]
+      }
+    }
+  },
   "iota": {
     "fileFormatVersion": 6,
     "address": "0x2",
@@ -16303,10 +16656,6 @@
     "friends": [
       {
         "address": "0x2",
-        "name": "authenticator_state"
-      },
-      {
-        "address": "0x2",
         "name": "clock"
       },
       {
@@ -19349,6 +19698,28 @@
           {
             "Vector": "U64"
           }
+        ]
+      }
+    }
+  },
+  "protocol_config": {
+    "fileFormatVersion": 6,
+    "address": "0x2",
+    "name": "protocol_config",
+    "friends": [],
+    "structs": {},
+    "exposedFunctions": {
+      "is_feature_enabled": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Vector": "U8"
+          }
+        ],
+        "return": [
+          "Bool"
         ]
       }
     }
@@ -27897,6 +28268,66 @@
           "Address"
         ]
       },
+      "gas_budget": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          "U64"
+        ]
+      },
+      "gas_price": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          "U64"
+        ]
+      },
+      "reference_gas_price": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          "U64"
+        ]
+      },
       "sender": {
         "visibility": "Public",
         "isEntry": false,
@@ -27915,6 +28346,35 @@
         ],
         "return": [
           "Address"
+        ]
+      },
+      "sponsor": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                "Address"
+              ]
+            }
+          }
         ]
       }
     }

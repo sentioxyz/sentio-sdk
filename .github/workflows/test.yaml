@@ -15,7 +15,7 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
           ref: ${{ github.event.inputs.commit }}
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v6
         with:
           node-version: 24

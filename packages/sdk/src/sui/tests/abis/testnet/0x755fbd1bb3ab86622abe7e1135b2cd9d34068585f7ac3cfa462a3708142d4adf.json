@@ -1,2439 +1,3664 @@
 [
   {
-    "fileFormatVersion": 6,
     "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-    "name": "full_math_u128",
-    "friends": [],
-    "structs": {},
-    "exposedFunctions": {
-      "full_mul": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U128", "U128"],
-        "return": ["U256"]
-      },
-      "mul_div_ceil": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U128", "U128", "U128"],
-        "return": ["U128"]
-      },
-      "mul_div_floor": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U128", "U128", "U128"],
-        "return": ["U128"]
-      },
-      "mul_div_round": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U128", "U128", "U128"],
-        "return": ["U128"]
-      },
-      "mul_shl": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U128", "U128", "U8"],
-        "return": ["U128"]
-      },
-      "mul_shr": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U128", "U128", "U8"],
-        "return": ["U128"]
-      }
-    }
-  },
-  {
-    "fileFormatVersion": 6,
-    "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-    "name": "full_math_u64",
-    "friends": [],
-    "structs": {},
-    "exposedFunctions": {
-      "full_mul": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U64", "U64"],
-        "return": ["U128"]
-      },
-      "mul_div_ceil": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U64", "U64", "U64"],
-        "return": ["U64"]
-      },
-      "mul_div_floor": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U64", "U64", "U64"],
-        "return": ["U64"]
-      },
-      "mul_div_round": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U64", "U64", "U64"],
-        "return": ["U64"]
-      },
-      "mul_shl": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U64", "U64", "U8"],
-        "return": ["U64"]
-      },
-      "mul_shr": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U64", "U64", "U8"],
-        "return": ["U64"]
-      }
-    }
-  },
-  {
-    "fileFormatVersion": 6,
-    "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-    "name": "i128",
-    "friends": [],
-    "structs": {
-      "I128": {
-        "abilities": {
-          "abilities": ["Copy", "Drop", "Store"]
+    "module": {
+      "name": "full_math_u128",
+      "datatypes": [],
+      "functions": [
+        {
+          "name": "full_mul",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 8,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
         },
-        "typeParameters": [],
-        "fields": [
-          {
-            "name": "bits",
-            "type": "U128"
-          }
-        ]
-      }
-    },
-    "exposedFunctions": {
-      "abs": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
+        {
+          "name": "mul_div_ceil",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
             }
-          }
-        ],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
             }
-          }
-        ]
-      },
-      "abs_u128": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": ["U128"]
-      },
-      "add": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          },
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          }
-        ]
-      },
-      "and": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          },
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          }
-        ]
-      },
-      "as_i32": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          }
-        ]
-      },
-      "as_i64": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
-            }
-          }
-        ]
-      },
-      "as_u128": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": ["U128"]
-      },
-      "cmp": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          },
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": ["U8"]
-      },
-      "div": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          },
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          }
-        ]
-      },
-      "eq": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          },
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": ["Bool"]
-      },
-      "from": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U128"],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          }
-        ]
-      },
-      "gt": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          },
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": ["Bool"]
-      },
-      "gte": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          },
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": ["Bool"]
-      },
-      "is_neg": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": ["Bool"]
-      },
-      "lt": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          },
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": ["Bool"]
-      },
-      "lte": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          },
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": ["Bool"]
-      },
-      "mul": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          },
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          }
-        ]
-      },
-      "neg": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          }
-        ]
-      },
-      "neg_from": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U128"],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          }
-        ]
-      },
-      "or": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          },
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          }
-        ]
-      },
-      "overflowing_add": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          },
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          },
-          "Bool"
-        ]
-      },
-      "overflowing_sub": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          },
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          },
-          "Bool"
-        ]
-      },
-      "shl": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          },
-          "U8"
-        ],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          }
-        ]
-      },
-      "shr": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          },
-          "U8"
-        ],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          }
-        ]
-      },
-      "sign": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": ["U8"]
-      },
-      "sub": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          },
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          }
-        ]
-      },
-      "wrapping_add": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          },
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          }
-        ]
-      },
-      "wrapping_sub": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          },
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          }
-        ]
-      },
-      "zero": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i128",
-              "name": "I128",
-              "typeArguments": []
-            }
-          }
-        ]
-      }
-    }
-  },
-  {
-    "fileFormatVersion": 6,
-    "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-    "name": "i32",
-    "friends": [],
-    "structs": {
-      "I32": {
-        "abilities": {
-          "abilities": ["Copy", "Drop", "Store"]
+          ]
         },
-        "typeParameters": [],
-        "fields": [
-          {
-            "name": "bits",
-            "type": "U32"
-          }
-        ]
-      }
-    },
-    "exposedFunctions": {
-      "abs": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
+        {
+          "name": "mul_div_floor",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
             }
-          }
-        ],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
             }
-          }
-        ]
-      },
-      "abs_u32": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": ["U32"]
-      },
-      "add": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          },
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          }
-        ]
-      },
-      "and": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          },
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          }
-        ]
-      },
-      "as_u32": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": ["U32"]
-      },
-      "cmp": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          },
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": ["U8"]
-      },
-      "div": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          },
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          }
-        ]
-      },
-      "eq": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          },
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": ["Bool"]
-      },
-      "from": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U32"],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          }
-        ]
-      },
-      "from_u32": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U32"],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          }
-        ]
-      },
-      "gt": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          },
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": ["Bool"]
-      },
-      "gte": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          },
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": ["Bool"]
-      },
-      "is_neg": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": ["Bool"]
-      },
-      "lt": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          },
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": ["Bool"]
-      },
-      "lte": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          },
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": ["Bool"]
-      },
-      "mod": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          },
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          }
-        ]
-      },
-      "mul": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          },
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          }
-        ]
-      },
-      "neg_from": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U32"],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          }
-        ]
-      },
-      "or": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          },
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          }
-        ]
-      },
-      "shl": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          },
-          "U8"
-        ],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          }
-        ]
-      },
-      "shr": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          },
-          "U8"
-        ],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          }
-        ]
-      },
-      "sign": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": ["U8"]
-      },
-      "sub": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          },
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          }
-        ]
-      },
-      "wrapping_add": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          },
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          }
-        ]
-      },
-      "wrapping_sub": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          },
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          }
-        ]
-      },
-      "zero": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i32",
-              "name": "I32",
-              "typeArguments": []
-            }
-          }
-        ]
-      }
-    }
-  },
-  {
-    "fileFormatVersion": 6,
-    "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-    "name": "i64",
-    "friends": [],
-    "structs": {
-      "I64": {
-        "abilities": {
-          "abilities": ["Copy", "Drop", "Store"]
+          ]
         },
-        "typeParameters": [],
-        "fields": [
-          {
-            "name": "bits",
-            "type": "U64"
-          }
-        ]
-      }
-    },
-    "exposedFunctions": {
-      "abs": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
+        {
+          "name": "mul_div_round",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
             }
-          }
-        ],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
             }
-          }
-        ]
-      },
-      "abs_u64": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
+          ]
+        },
+        {
+          "name": "mul_shl",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 3,
+                "typeParameterInstantiation": []
+              }
             }
-          }
-        ],
-        "return": ["U64"]
-      },
-      "add": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
             }
-          },
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
+          ]
+        },
+        {
+          "name": "mul_shr",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 3,
+                "typeParameterInstantiation": []
+              }
             }
-          }
-        ],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
             }
-          }
-        ]
-      },
-      "and": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
-            }
-          },
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
-            }
-          }
-        ]
-      },
-      "as_u64": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": ["U64"]
-      },
-      "cmp": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
-            }
-          },
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": ["U8"]
-      },
-      "div": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
-            }
-          },
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
-            }
-          }
-        ]
-      },
-      "eq": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
-            }
-          },
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": ["Bool"]
-      },
-      "from": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U64"],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
-            }
-          }
-        ]
-      },
-      "from_u64": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U64"],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
-            }
-          }
-        ]
-      },
-      "gt": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
-            }
-          },
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": ["Bool"]
-      },
-      "gte": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
-            }
-          },
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": ["Bool"]
-      },
-      "is_neg": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": ["Bool"]
-      },
-      "lt": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
-            }
-          },
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": ["Bool"]
-      },
-      "lte": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
-            }
-          },
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": ["Bool"]
-      },
-      "mod": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
-            }
-          },
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
-            }
-          }
-        ]
-      },
-      "mul": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
-            }
-          },
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
-            }
-          }
-        ]
-      },
-      "neg_from": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U64"],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
-            }
-          }
-        ]
-      },
-      "or": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
-            }
-          },
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
-            }
-          }
-        ]
-      },
-      "shl": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
-            }
-          },
-          "U8"
-        ],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
-            }
-          }
-        ]
-      },
-      "shr": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
-            }
-          },
-          "U8"
-        ],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
-            }
-          }
-        ]
-      },
-      "sign": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": ["U8"]
-      },
-      "sub": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
-            }
-          },
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
-            }
-          }
-        ]
-      },
-      "wrapping_add": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
-            }
-          },
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
-            }
-          }
-        ]
-      },
-      "wrapping_sub": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
-            }
-          },
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
-            }
-          }
-        ],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
-            }
-          }
-        ]
-      },
-      "zero": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [],
-        "return": [
-          {
-            "Struct": {
-              "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-              "module": "i64",
-              "name": "I64",
-              "typeArguments": []
-            }
-          }
-        ]
-      }
+          ]
+        }
+      ]
     }
   },
   {
-    "fileFormatVersion": 6,
     "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-    "name": "math_u128",
-    "friends": [],
-    "structs": {},
-    "exposedFunctions": {
-      "add_check": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U128", "U128"],
-        "return": ["Bool"]
-      },
-      "checked_div_round": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U128", "U128", "Bool"],
-        "return": ["U128"]
-      },
-      "from_lo_hi": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U64", "U64"],
-        "return": ["U128"]
-      },
-      "full_mul": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U128", "U128"],
-        "return": ["U128", "U128"]
-      },
-      "hi": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U128"],
-        "return": ["U64"]
-      },
-      "hi_u128": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U128"],
-        "return": ["U128"]
-      },
-      "lo": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U128"],
-        "return": ["U64"]
-      },
-      "lo_u128": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U128"],
-        "return": ["U128"]
-      },
-      "max": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U128", "U128"],
-        "return": ["U128"]
-      },
-      "min": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U128", "U128"],
-        "return": ["U128"]
-      },
-      "overflowing_add": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U128", "U128"],
-        "return": ["U128", "Bool"]
-      },
-      "overflowing_mul": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U128", "U128"],
-        "return": ["U128", "Bool"]
-      },
-      "overflowing_sub": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U128", "U128"],
-        "return": ["U128", "Bool"]
-      },
-      "wrapping_add": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U128", "U128"],
-        "return": ["U128"]
-      },
-      "wrapping_mul": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U128", "U128"],
-        "return": ["U128"]
-      },
-      "wrapping_sub": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U128", "U128"],
-        "return": ["U128"]
-      }
+    "module": {
+      "name": "full_math_u64",
+      "datatypes": [],
+      "functions": [
+        {
+          "name": "full_mul",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "mul_div_ceil",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "mul_div_floor",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "mul_div_round",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "mul_shl",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 3,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "mul_shr",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 3,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        }
+      ]
     }
   },
   {
-    "fileFormatVersion": 6,
     "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-    "name": "math_u256",
-    "friends": [],
-    "structs": {},
-    "exposedFunctions": {
-      "add_check": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U256", "U256"],
-        "return": ["Bool"]
-      },
-      "checked_shlw": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U256"],
-        "return": ["U256", "Bool"]
-      },
-      "div_mod": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U256", "U256"],
-        "return": ["U256", "U256"]
-      },
-      "div_round": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U256", "U256", "Bool"],
-        "return": ["U256"]
-      },
-      "shlw": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U256"],
-        "return": ["U256"]
-      },
-      "shrw": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U256"],
-        "return": ["U256"]
-      }
+    "module": {
+      "name": "i128",
+      "datatypes": [
+        {
+          "name": "I128",
+          "kind": 1,
+          "abilities": [
+            1,
+            2,
+            3
+          ],
+          "typeParameters": [],
+          "fields": [
+            {
+              "name": "bits",
+              "position": 0,
+              "type": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "variants": []
+        }
+      ],
+      "functions": [
+        {
+          "name": "abs",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "abs_u128",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "add",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "and",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "as_i32",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "as_i64",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "as_u128",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "cmp",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 3,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "div",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "eq",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 2,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "from",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "gt",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 2,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "gte",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 2,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "is_neg",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 2,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "lt",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 2,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "lte",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 2,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "mul",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "neg",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "neg_from",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "or",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "overflowing_add",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 2,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "overflowing_sub",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 2,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "shl",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 3,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "shr",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 3,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "sign",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 3,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "sub",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "wrapping_add",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "wrapping_sub",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "zero",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i128::I128",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        }
+      ]
     }
   },
   {
-    "fileFormatVersion": 6,
     "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
-    "name": "math_u64",
-    "friends": [],
-    "structs": {},
-    "exposedFunctions": {
-      "add_check": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U64", "U64"],
-        "return": ["Bool"]
-      },
-      "carry_add": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U64", "U64", "U64"],
-        "return": ["U64", "U64"]
-      },
-      "overflowing_add": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U64", "U64"],
-        "return": ["U64", "Bool"]
-      },
-      "overflowing_mul": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U64", "U64"],
-        "return": ["U64", "Bool"]
-      },
-      "overflowing_sub": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U64", "U64"],
-        "return": ["U64", "Bool"]
-      },
-      "wrapping_add": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U64", "U64"],
-        "return": ["U64"]
-      },
-      "wrapping_mul": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U64", "U64"],
-        "return": ["U64"]
-      },
-      "wrapping_sub": {
-        "visibility": "Public",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": ["U64", "U64"],
-        "return": ["U64"]
-      }
+    "module": {
+      "name": "i32",
+      "datatypes": [
+        {
+          "name": "I32",
+          "kind": 1,
+          "abilities": [
+            1,
+            2,
+            3
+          ],
+          "typeParameters": [],
+          "fields": [
+            {
+              "name": "bits",
+              "position": 0,
+              "type": {
+                "type": 5,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "variants": []
+        }
+      ],
+      "functions": [
+        {
+          "name": "abs",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "abs_u32",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 5,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "add",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "and",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "as_u32",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 5,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "cmp",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 3,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "div",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "eq",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 2,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "from",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 5,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "from_u32",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 5,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "gt",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 2,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "gte",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 2,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "is_neg",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 2,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "lt",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 2,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "lte",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 2,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "mod",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "mul",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "neg_from",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 5,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "or",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "shl",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 3,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "shr",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 3,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "sign",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 3,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "sub",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "wrapping_add",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "wrapping_sub",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "zero",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i32::I32",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
+    "module": {
+      "name": "i64",
+      "datatypes": [
+        {
+          "name": "I64",
+          "kind": 1,
+          "abilities": [
+            1,
+            2,
+            3
+          ],
+          "typeParameters": [],
+          "fields": [
+            {
+              "name": "bits",
+              "position": 0,
+              "type": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "variants": []
+        }
+      ],
+      "functions": [
+        {
+          "name": "abs",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "abs_u64",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "add",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "and",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "as_u64",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "cmp",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 3,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "div",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "eq",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 2,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "from",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "from_u64",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "gt",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 2,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "gte",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 2,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "is_neg",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 2,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "lt",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 2,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "lte",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 2,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "mod",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "mul",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "neg_from",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "or",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "shl",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 3,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "shr",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 3,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "sign",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 3,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "sub",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "wrapping_add",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "wrapping_sub",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "zero",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [],
+          "returns": [
+            {
+              "body": {
+                "type": 10,
+                "typeName": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf::i64::I64",
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
+    "module": {
+      "name": "math_u128",
+      "datatypes": [],
+      "functions": [
+        {
+          "name": "add_check",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 2,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "checked_div_round",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 2,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "from_lo_hi",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "full_mul",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "hi",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "hi_u128",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "lo",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "lo_u128",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "max",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "min",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "overflowing_add",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 2,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "overflowing_mul",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 2,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "overflowing_sub",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 2,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "wrapping_add",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "wrapping_mul",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "wrapping_sub",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 7,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
+    "module": {
+      "name": "math_u256",
+      "datatypes": [],
+      "functions": [
+        {
+          "name": "add_check",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 8,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 8,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 2,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "checked_shlw",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 8,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 8,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 2,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "div_mod",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 8,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 8,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 8,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 8,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "div_round",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 8,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 8,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 2,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 8,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "shlw",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 8,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 8,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "shrw",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 8,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 8,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "address": "0x755fbd1bb3ab86622abe7e1135b2cd9d34068585f7ac3cfa462a3708142d4adf",
+    "module": {
+      "name": "math_u64",
+      "datatypes": [],
+      "functions": [
+        {
+          "name": "add_check",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 2,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "carry_add",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "overflowing_add",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 2,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "overflowing_mul",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 2,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "overflowing_sub",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 2,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "wrapping_add",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "wrapping_mul",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "wrapping_sub",
+          "visibility": 2,
+          "isEntry": false,
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            },
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "type": 6,
+                "typeParameterInstantiation": []
+              }
+            }
+          ]
+        }
+      ]
     }
   }
 ]

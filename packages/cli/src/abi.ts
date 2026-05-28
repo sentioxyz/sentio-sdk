@@ -12,6 +12,140 @@ import { ReadKey } from './key.js'
 import { Auth } from './commands/upload.js'
 import { getApiUrl } from './utils.js'
 
+// @typemove/sui v2 codegen consumes the gRPC ABI shape
+// (`[{ address, module: { datatypes, functions } }]`). The JSON-RPC
+// `getNormalizedMoveModulesByPackage` returns the legacy shape
+// (`{ structs, exposedFunctions }`); convert it so downloaded Sui/Iota ABIs
+// feed the codegen directly.
+const MOVE_DATATYPE_KIND_STRUCT = 1
+const MOVE_DATATYPE_KIND_ENUM = 2
+const MOVE_VIS: Record<string, number> = { Private: 1, Public: 2, Friend: 3 }
+const MOVE_TYPE = {
+  Address: 1,
+  Bool: 2,
+  U8: 3,
+  U16: 4,
+  U32: 5,
+  U64: 6,
+  U128: 7,
+  U256: 8,
+  Vector: 9,
+  Datatype: 10,
+  TypeParam: 11
+}
+const MOVE_ABILITY: Record<string, number> = { Copy: 1, Drop: 2, Store: 3, Key: 4 }
+
+function normalizedTypeToBody(t: any): any {
+  if (typeof t === 'string') {
+    const m: Record<string, number> = {
+      Address: MOVE_TYPE.Address,
+      Bool: MOVE_TYPE.Bool,
+      U8: MOVE_TYPE.U8,
+      U16: MOVE_TYPE.U16,
+      U32: MOVE_TYPE.U32,
+      U64: MOVE_TYPE.U64,
+      U128: MOVE_TYPE.U128,
+      U256: MOVE_TYPE.U256
+    }
+    if (m[t]) return { type: m[t], typeParameterInstantiation: [] }
+    if (t.toLowerCase() === 'signer')
+      return { type: MOVE_TYPE.Datatype, typeName: '0x0::signer::Signer', typeParameterInstantiation: [] }
+    throw Error('unknown primitive type ' + t)
+  }
+  if ('Vector' in t) return { type: MOVE_TYPE.Vector, typeParameterInstantiation: [normalizedTypeToBody(t.Vector)] }
+  if ('Struct' in t) {
+    const s = t.Struct
+    return {
+      type: MOVE_TYPE.Datatype,
+      typeName: `${s.address}::${s.module}::${s.name}`,
+      typeParameterInstantiation: (s.typeArguments ?? []).map(normalizedTypeToBody)
+    }
+  }
+  if ('TypeParameter' in t)
+    return { type: MOVE_TYPE.TypeParam, typeParameter: t.TypeParameter, typeParameterInstantiation: [] }
+  if ('Reference' in t || 'MutableReference' in t) return normalizedTypeToBody(t.Reference ?? t.MutableReference)
+  throw Error('unknown type ' + JSON.stringify(t))
+}
+
+function normalizedParam(t: any): any {
+  if (t && typeof t === 'object' && 'Reference' in t) return { reference: 1, body: normalizedTypeToBody(t.Reference) }
+  if (t && typeof t === 'object' && 'MutableReference' in t)
+    return { reference: 2, body: normalizedTypeToBody(t.MutableReference) }
+  return { body: normalizedTypeToBody(t) }
+}
+
+function normalizedAbilities(s: any): number[] {
+  return (Array.isArray(s) ? s : (s?.abilities ?? [])).map((a: string) => MOVE_ABILITY[a])
+}
+
+function normalizedTypeParameters(params: any[]): any[] {
+  return (params ?? []).map((p: any) => ({ constraints: normalizedAbilities(p.constraints ?? p.abilities ?? p) }))
+}
+
+function normalizedStruct(name: string, s: any): any {
+  return {
+    name,
+    kind: MOVE_DATATYPE_KIND_STRUCT,
+    abilities: normalizedAbilities(s.abilities),
+    typeParameters: normalizedTypeParameters(s.typeParameters),
+    fields: (s.fields ?? []).map((f: any, i: number) => ({
+      name: f.name,
+      position: i,
+      type: normalizedTypeToBody(f.type)
+    })),
+    variants: []
+  }
+}
+
+function normalizedEnum(name: string, e: any): any {
+  return {
+    name,
+    kind: MOVE_DATATYPE_KIND_ENUM,
+    abilities: normalizedAbilities(e.abilities),
+    typeParameters: normalizedTypeParameters(e.typeParameters),
+    fields: [],
+    variants: Object.entries(e.variants ?? {}).map(([vn, fl]: [string, any], i) => ({
+      name: vn,
+      position: i,
+      fields: (fl as any[]).map((f, fi) => ({ name: f.name, position: fi, type: normalizedTypeToBody(f.type) }))
+    }))
+  }
+}
+
+function normalizedFunction(name: string, f: any): any {
+  return {
+    name,
+    visibility: MOVE_VIS[f.visibility],
+    isEntry: f.isEntry ?? false,
+    typeParameters: (f.typeParameters ?? []).map((p: any) => ({
+      constraints: normalizedAbilities(p.abilities ?? p.constraints ?? p)
+    })),
+    parameters: (f.parameters ?? []).map(normalizedParam),
+    returns: (f.return ?? []).map(normalizedParam)
+  }
+}
+
+function normalizedModule(name: string, m: any): any {
+  return {
+    name: m.name ?? name,
+    datatypes: [
+      ...Object.entries(m.structs ?? {}).map(([k, s]) => normalizedStruct(k, s)),
+      ...Object.entries(m.enums ?? {}).map(([k, e]) => normalizedEnum(k, e))
+    ],
+    functions: Object.entries(m.exposedFunctions ?? {}).map(([k, f]) => normalizedFunction(k, f))
+  }
+}
+
+// Convert the JSON-RPC normalized-modules shape (a `{ name: module }` map or an
+// array of modules) into the gRPC ABI array consumed by the v2 codegen.
+export function normalizedModulesToAbi(modules: any): Array<{ address: string; module: any }> {
+  const map = modules?.result ?? modules
+  const entries: Array<[string, any]> = Array.isArray(map)
+    ? map.map((m: any) => [m.name, m])
+    : Object.entries(map ?? {})
+  return entries.map(([n, m]) => ({ address: m.address, module: normalizedModule(n, m) }))
+}
+
 export async function getABI(
   chain: ChainId,
   address: string,
@@ -37,7 +171,7 @@ export async function getABI(
     if (suiClient) {
       try {
         return {
-          abi: await suiClient.getNormalizedMoveModulesByPackage({ package: address }),
+          abi: normalizedModulesToAbi(await suiClient.getNormalizedMoveModulesByPackage({ package: address })),
           name
         }
       } catch (e) {
@@ -133,7 +267,6 @@ export async function getABI(
   } catch (e) {
     console.log('aptos module not loaded')
   }
-
 
   // ethereum
   try {

@@ -5,7 +5,9 @@ import { getPriceByType } from '../../utils/index.js'
 import { SuiChainId } from '@sentio/chain'
 // import { validateAndNormalizeAddress } from '../utils.js'
 import { getClient, SuiNetwork } from '../network.js'
-import { CoinMetadata } from '@mysten/sui/jsonRpc'
+import type { SuiClientTypes } from '@mysten/sui/client'
+
+type CoinMetadata = SuiClientTypes.CoinMetadata
 
 const WHITELISTED_COINS = new Map<string, BaseCoinInfo>()
 
@@ -96,7 +98,7 @@ export async function getCoinInfoWithFallback(type: string, network?: SuiNetwork
     let promise = COIN_METADATA_CACHE.get(key)
     if (!promise) {
       const client = getClient(network)
-      promise = client.getCoinMetadata({ coinType: type })
+      promise = client.getCoinMetadata({ coinType: type }).then((r) => r.coinMetadata)
       COIN_METADATA_CACHE.set(key, promise)
     }
     const meta = await promise
