@@ -17,5 +17,10 @@ shamefullyHoist: true
 # pnpm 11's default ~24h minimumReleaseAge blocks installing our own same-day
 # @typemove/* releases; disable it for this repo.
 minimumReleaseAge: 0
+# The publish-sdk workflow rewrites packages/{runtime,cli,sdk}/package.json
+# between install and publish to drop bundled deps from the npm artifact;
+# scripts/update-version.sh's `pnpm exec` would otherwise trip the post-11.3
+# deps verification (auto-install with frozen-lockfile) on that intentional drift.
+verifyDepsBeforeRun: false
 patchedDependencies:
   '@coral-xyz/anchor@0.31.1': patches/@coral-xyz__anchor@0.30.1.patch
