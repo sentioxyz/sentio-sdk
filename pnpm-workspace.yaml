@@ -25,5 +25,14 @@ minimumReleaseAge: 0
 # scripts/update-version.sh's `pnpm exec` would otherwise trip the post-11.3
 # deps verification (auto-install with frozen-lockfile) on that intentional drift.
 verifyDepsBeforeRun: false
+# @anchor-lang/core's ESM build (dist/esm/index.js) contains a CJS-only block
+# `if (!isBrowser) { exports.workspace = require(...); exports.Wallet = require(...); }`
+# which crashes with "exports is not defined in ES module scope" when executed
+# in a pure ESM context. At runtime via plain `import` Node falls back to the
+# CJS "main" build (no "exports" field), so this is not hit. But our tsup bundle
+# (`pnpm --filter "@sentio/sdk" build:bundle`) emits ESM and copies these lines
+# verbatim into the chunk, breaking any downstream test that loads the bundled
+# SDK (e.g. packages/cli/templates/solana/src/processor.test.ts in CI's
+# sdk-bundle job). Patch rewrites the block to valid ESM re-exports.
 patchedDependencies:
   '@anchor-lang/core@1.0.2': patches/@anchor-lang__core@1.0.2.patch
