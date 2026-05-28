@@ -7,7 +7,7 @@ export { getProvider, DummyProvider } from '@sentio/runtime'
 
 export { EthContext } from './context.js'
 export * from './eth.js'
-export { BindOptions, AccountBindOptions } from './bind-options.js'
+export type { BindOptions, AccountBindOptions } from './bind-options.js'
 export { getProcessor, addProcessor, getContractByABI, addContractByABI } from './binds.js'
 export { AccountContext, ContractContext, GlobalContext, ContractView, BoundContractView } from './context.js'
 
