@@ -53,7 +53,7 @@
     "protobufjs": "^7.5.4",
     "rxjs": "^7.8.1",
     "utility-types": "^3.11.0",
-    "winston": "^3.11.0"
+    "winston": "^3.19.0"
   },
   "devDependencies": {
     "@commander-js/extra-typings": "^14.0.0",

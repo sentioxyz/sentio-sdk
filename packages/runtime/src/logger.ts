@@ -52,9 +52,9 @@ export function setupLogger(json: boolean, enableDebug: boolean, workerId?: numb
     transports: [new transports.Console()]
   })
 
-  console.log = (...args: any[]) => logger.info.call(logger, ...(args as [any]))
-  console.info = (...args: any[]) => logger.info.call(logger, ...(args as [any]))
-  console.warn = (...args: any[]) => logger.warn.call(logger, ...(args as [any]))
-  console.error = (...args: any[]) => logger.error.call(logger, ...(args as [any]))
-  console.debug = (...args: any[]) => logger.debug.call(logger, ...(args as [any]))
+  console.log = (...args: any[]) => logger.info.call(logger, ...args)
+  console.info = (...args: any[]) => logger.info.call(logger, ...args)
+  console.warn = (...args: any[]) => logger.warn.call(logger, ...args)
+  console.error = (...args: any[]) => logger.error.call(logger, ...args)
+  console.debug = (...args: any[]) => logger.debug.call(logger, ...args)
 }

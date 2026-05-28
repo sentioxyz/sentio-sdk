@@ -5,8 +5,8 @@
     "declarationMap": true,
     "alwaysStrict": true,
     "sourceMap": true,
-    "target": "es2022",
-    "lib": ["ES2022"],
+    "target": "esnext",
+    "lib": ["ESNext"],
     "types": ["node"],
     // Required for @sentio/tsup's dts plugin which forces baseUrl in its compilerOptions
     "ignoreDeprecations": "6.0",
