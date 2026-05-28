@@ -25,3 +25,5 @@ minimumReleaseAge: 0
 # scripts/update-version.sh's `pnpm exec` would otherwise trip the post-11.3
 # deps verification (auto-install with frozen-lockfile) on that intentional drift.
 verifyDepsBeforeRun: false
+patchedDependencies:
+  '@anchor-lang/core@1.0.2': patches/@anchor-lang__core@1.0.2.patch
