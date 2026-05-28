@@ -47,8 +47,11 @@ function mergeArrayInPlace<T>(dst: T[], src: T[]): T[] {
   return res
 }
 
-export function errorString(e: Error): string {
-  return e.message + '\n' + e.stack
+export function errorString(e: unknown): string {
+  if (e instanceof Error) {
+    return e.message + '\n' + e.stack
+  }
+  return String(e)
 }
 
 export const USER_PROCESSOR = 'user_processor'

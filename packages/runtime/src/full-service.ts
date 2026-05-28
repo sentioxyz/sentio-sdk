@@ -319,7 +319,7 @@ export class FullProcessorServiceImpl implements ProcessorServiceImplementation 
         result.configUpdated = result.result?.states?.configUpdated
       }
       return result
-    } catch (e) {
+    } catch (e: any) {
       if (this.sdkVersion.minor <= 16) {
         // Old sdk doesn't handle this well
         if (

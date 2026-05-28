@@ -158,7 +158,9 @@ export async function resolveNetworkAddresses(config: SentioNetworkConfig): Prom
         const id = ethers.id(name)
         return await addressBook['getAddress(bytes32)'](id)
       } catch (e) {
-        throw new Error(`Failed to resolve "${name}" from AddressBook (${addressBookAddr}): ${e.message}`)
+        throw new Error(
+          `Failed to resolve "${name}" from AddressBook (${addressBookAddr}): ${e instanceof Error ? e.message : String(e)}`
+        )
       }
     }
   }

@@ -56,7 +56,10 @@ export class PartitionHandlerManager {
           }
         } catch (error) {
           // If partition handler fails, fall back to unrecognized
-          throw new ServerError(Status.INVALID_ARGUMENT, 'compute partition key failed, error:' + error.message)
+          throw new ServerError(
+            Status.INVALID_ARGUMENT,
+            'compute partition key failed, error:' + (error instanceof Error ? error.message : String(error))
+          )
         }
       } else {
         result[handlerId] = {

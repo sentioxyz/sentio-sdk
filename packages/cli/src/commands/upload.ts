@@ -737,8 +737,8 @@ export async function uploadFile(
     }
     try {
       await upload()
-    } catch (e) {
-      if (e.constructor.name === 'FetchError' && e.type === 'system' && e.code === 'EPIPE') {
+    } catch (e: any) {
+      if (e?.constructor.name === 'FetchError' && e.type === 'system' && e.code === 'EPIPE') {
         error = e
         await new Promise((resolve) => setTimeout(resolve, 1000))
         await tryUploading()

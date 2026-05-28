@@ -42,7 +42,7 @@ describe('Test Error Capture', () => {
         })
       )
     } catch (e) {
-      err = e
+      err = e as Error
     }
     assert(err?.message.includes('Cannot record infinite value'))
   })
@@ -58,7 +58,7 @@ describe('Test Error Capture', () => {
         })
       )
     } catch (e) {
-      err = e
+      err = e as Error
     }
     assert(err?.message.includes('NaN'))
   })
@@ -73,7 +73,7 @@ describe('Test Error Capture', () => {
         })
       )
     } catch (e) {
-      err = e
+      err = e as Error
     }
     // should be convert to bigint if it's unsafe int
     assert(!err)

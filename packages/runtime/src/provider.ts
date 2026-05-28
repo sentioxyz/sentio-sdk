@@ -169,7 +169,7 @@ export class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
     let result
     try {
       result = await perform
-    } catch (e) {
+    } catch (e: any) {
       this.#performCache.delete(tag)
       if (e.code === 'TIMEOUT') {
         let retryCount = this.#retryCache.get(tag)
