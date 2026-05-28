@@ -5,11 +5,11 @@ packages:
   # if required, exclude some directories
   # - '!**/test/**'
 # pnpm 11 reads these from the workspace file (no longer from .npmrc / package.json "pnpm").
-# Decide which native install/postinstall scripts pnpm 11 may run.
-# `false` is set explicitly for packages we've intentionally opted out of so pnpm
-# doesn't reprompt on every install:
-# - bufferutil / utf-8-validate: optional native acceleration for `ws`; JS fallback works.
-# - protobufjs: postinstall is just a versionScheme warning, not load-bearing.
+# Every native install/postinstall script pnpm encounters MUST be enumerated here as
+# true or false, otherwise pnpm reprompts on every install. `onlyBuiltDependencies` /
+# `neverBuiltDependencies` are no longer honored as suppression in pnpm 11.
+#   - bufferutil / utf-8-validate: optional native acceleration for `ws`; JS fallback works.
+#   - protobufjs: postinstall is just a versionScheme warning, not load-bearing.
 allowBuilds:
   bufferutil: false
   esbuild: true # downloads platform binary; tsup bundle requires it
