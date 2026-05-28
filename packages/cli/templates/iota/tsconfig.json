@@ -18,9 +18,7 @@
     "skipLibCheck": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "strictFunctionTypes": false,
-    "strictPropertyInitialization": false,
-    "useUnknownInCatchVariables": false
+    "strictFunctionTypes": false
   },
   "exclude": ["dist"]
 }
