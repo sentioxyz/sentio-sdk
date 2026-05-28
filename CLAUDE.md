@@ -182,9 +182,10 @@ Tests require building the project first. Use `./scripts/test-all.sh` to build a
 
 ## Development Notes
 
-- **Node.js**: Requires Node.js 20+
-- **Package Manager**: Uses pnpm exclusively (enforced by preinstall script)
+- **Node.js**: Requires Node.js 24+ (`engines.node: ">=24"` in `package.json`; CI runs Node 24)
+- **Package Manager**: Uses pnpm exclusively, pinned via `packageManager: pnpm@11.3.0` (enforced by preinstall script)
 - **Monorepo**: Uses pnpm workspaces for dependency management
+- **`ethers` is patched**: The root `package.json` `resolutions` field redirects `ethers` to `@sentio/ethers` (a Sentio fork). Do not assume upstream `ethers` behavior — check the fork before relying on edge-case semantics.
 - **TypeScript**: Full TypeScript codebase with strict type checking
 - **ESLint**: Code quality enforcement with custom rules
 - **Git Hooks**: Automated formatting and linting on commit
