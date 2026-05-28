@@ -2,12 +2,11 @@ import { SPLTokenProcessor } from '../builtin/index.js'
 import { TokenBridgeProcessor } from './types/token_bridge_processor.js'
 
 import { token_bridge_idl } from './types/token_bridge.js'
-import { Idl, Instruction } from '@anchor-lang/core'
+import { Idl, IdlField, Instruction } from '@anchor-lang/core'
 import bs58 from 'bs58'
 import { camel } from 'radash'
 // @ts-ignore no type definition
 import { Layout } from 'buffer-layout'
-import { IdlField } from '@anchor-lang/core/dist/esm/idl.js'
 import * as borsh from '@anchor-lang/borsh'
 import { IdlCoder } from '@anchor-lang/core/dist/esm/coder/borsh/idl.js'
 
