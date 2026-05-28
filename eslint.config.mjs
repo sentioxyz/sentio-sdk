@@ -19,6 +19,7 @@ export default defineConfig([
       '**/lib',
       '**/docs',
       '**/gen',
+      '**/generated',
       '**/types',
       '**/builtin',
       '**/templates',
