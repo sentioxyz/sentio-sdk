@@ -5,13 +5,17 @@ packages:
   # if required, exclude some directories
   # - '!**/test/**'
 # pnpm 11 reads these from the workspace file (no longer from .npmrc / package.json "pnpm").
-# Approve native build scripts that pnpm 11 otherwise blocks.
+# Decide which native install/postinstall scripts pnpm 11 may run.
+# `false` is set explicitly for packages we've intentionally opted out of so pnpm
+# doesn't reprompt on every install:
+# - bufferutil / utf-8-validate: optional native acceleration for `ws`; JS fallback works.
+# - protobufjs: postinstall is just a versionScheme warning, not load-bearing.
 allowBuilds:
-  bufferutil: true
-  esbuild: true
-  protobufjs: true
-  unrs-resolver: true
-  utf-8-validate: true
+  bufferutil: false
+  esbuild: true # downloads platform binary; tsup bundle requires it
+  protobufjs: false
+  unrs-resolver: true # napi platform binary for ESLint TS resolver
+  utf-8-validate: false
 # Keep hoisting so transitive deps (e.g. @fuel-ts/*, superstruct, ix, tslib) resolve.
 shamefullyHoist: true
 # Enforce engines field (was in .npmrc as `engine-strict=true`; pnpm 11 no longer
