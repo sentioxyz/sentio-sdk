@@ -76,10 +76,10 @@ export class SuiBaseProcessor {
     return this.config.network
   }
 
-  protected onMoveEvent(
-    handler: (event: SuiEventInput, ctx: SuiContext) => PromiseOrVoid,
+  protected onMoveEvent<T extends SuiEventInput = SuiEventInput>(
+    handler: (event: T, ctx: SuiContext) => PromiseOrVoid,
     filter: EventFilter | EventFilter[],
-    handlerOptions?: HandlerOptions<MoveFetchConfig, SuiEventInput>
+    handlerOptions?: HandlerOptions<MoveFetchConfig, T>
   ): SuiBaseProcessor {
     let _filters: EventFilter[] = []
     const _fetchConfig = MoveFetchConfig.fromPartial({ ...DEFAULT_FETCH_CONFIG, ...handlerOptions })
@@ -118,8 +118,8 @@ export class SuiBaseProcessor {
           processor.config.baseLabels
         )
 
-        const decoded = await processor.coder.decodeEvent<any>(evt)
-        await handler(decoded || evt, ctx)
+        const decoded = await processor.coder.decodeEvent<T>(evt)
+        await handler((decoded || evt) as T, ctx)
 
         return ctx.stopAndGetResult()
       },
@@ -131,7 +131,7 @@ export class SuiBaseProcessor {
         if (typeof p === 'function') {
           const evt = JSON.parse(data.rawEvent) as SuiEventInput
           const decoded = await processor.coder.decodeEvent<any>(evt)
-          return p(decoded || evt)
+          return p((decoded || evt) as T)
         }
         return p
       }
@@ -139,10 +139,10 @@ export class SuiBaseProcessor {
     return this
   }
 
-  protected onEntryFunctionCall(
-    handler: (call: GrpcTypes.MoveCall, ctx: SuiContext) => PromiseOrVoid,
+  protected onEntryFunctionCall<T extends GrpcTypes.MoveCall = GrpcTypes.MoveCall>(
+    handler: (call: T, ctx: SuiContext) => PromiseOrVoid,
     filter: FunctionNameAndCallFilter | FunctionNameAndCallFilter[],
-    handlerOptions?: HandlerOptions<MoveFetchConfig, GrpcTypes.MoveCall>
+    handlerOptions?: HandlerOptions<MoveFetchConfig, T>
   ): SuiBaseProcessor {
     let _filters: FunctionNameAndCallFilter[] = []
     const _fetchConfig = MoveFetchConfig.fromPartial({ ...DEFAULT_FETCH_CONFIG, ...handlerOptions })
@@ -205,7 +205,7 @@ export class SuiBaseProcessor {
           const calls = getMoveCalls(tx)
           // For simplicity, use the first call for partitioning
           if (calls.length > 0) {
-            return p(calls[0])
+            return p(calls[0] as T)
           }
           return undefined
         }

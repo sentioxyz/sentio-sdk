@@ -19,7 +19,6 @@
     "moduleResolution": "nodenext",
     "isolatedModules": true,
     "strictNullChecks": true,
-    "strictFunctionTypes": false,
     "strictPropertyInitialization": false,
     "stripInternal": true,
     "noFallthroughCasesInSwitch": true,

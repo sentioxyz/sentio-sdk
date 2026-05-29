@@ -96,7 +96,7 @@ export class Store {
       entity: [] as string[],
       id: [] as string[]
     }
-    const entityName = getEntityName(entity)
+    const entityName = getEntityName(entity as EntityClass<T> | T)
     if (id) {
       if (Array.isArray(id)) {
         for (const i of id) {

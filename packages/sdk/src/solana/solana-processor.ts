@@ -18,7 +18,11 @@ export interface InstructionCoder {
   decode(ix: Buffer | string, encoding?: 'hex' | 'base58'): Instruction | null
 }
 
-export type SolanaInstructionHandler = (instruction: Instruction, ctx: SolanaContext, accounts?: string[]) => void
+export type SolanaInstructionHandler<T extends Instruction = Instruction> = (
+  instruction: T,
+  ctx: SolanaContext,
+  accounts: string[]
+) => void
 
 export interface InstructionHandlerEntry {
   handler: SolanaInstructionHandler
@@ -79,12 +83,12 @@ export class SolanaBaseProcessor {
     SolanaProcessorState.INSTANCE.addValue(this)
   }
 
-  public onInstruction(
+  public onInstruction<T extends Instruction = Instruction>(
     instructionName: string,
-    handler: SolanaInstructionHandler,
-    handlerOptions?: HandlerOptions<SolanaFetchConfig, Instruction>
+    handler: SolanaInstructionHandler<T>,
+    handlerOptions?: HandlerOptions<SolanaFetchConfig, T>
   ) {
-    this.instructionHandlerMap.set(instructionName, { handler, handlerOptions })
+    this.instructionHandlerMap.set(instructionName, { handler, handlerOptions } as InstructionHandlerEntry)
     return this
   }
 

@@ -62,7 +62,11 @@ export abstract class BaseProcessorTemplate<
 
   constructor() {
     this.id = ProcessorTemplateProcessorState.INSTANCE.getValues().length
-    ProcessorTemplateProcessorState.INSTANCE.addValue(this)
+    // Stored type-erased as the base instantiation; the concrete type parameters only appear in
+    // handler parameter positions, which `strictFunctionTypes` checks contravariantly.
+    ProcessorTemplateProcessorState.INSTANCE.addValue(
+      this as unknown as BaseProcessorTemplate<BaseContract, BoundContractView<BaseContract, any>>
+    )
     return proxyProcessor(this)
   }
 

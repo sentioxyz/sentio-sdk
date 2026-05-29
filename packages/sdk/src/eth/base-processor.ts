@@ -499,11 +499,11 @@ export abstract class BaseProcessor<
     return this.config.network
   }
 
-  public onEvent(
-    handler: (event: TypedEvent, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
-    handlerOptions?: HandlerOptions<EthFetchConfig, TypedEvent>,
+  public onEvent<T extends TypedEvent = TypedEvent>(
+    handler: (event: T, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
+    handlerOptions?: HandlerOptions<EthFetchConfig, T>,
     preprocessHandler: (
-      event: TypedEvent,
+      event: T,
       ctx: ContractContext<TContract, TBoundContractView>,
       preprocessStore: { [k: string]: any }
     ) => Promise<PreprocessResult> = defaultPreprocessHandler
@@ -520,12 +520,12 @@ export abstract class BaseProcessor<
     return this.onEthEvent(handler, _filters, handlerOptions, preprocessHandler)
   }
 
-  protected onEthEvent(
-    handler: (event: TypedEvent | RawEvent, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
+  protected onEthEvent<T extends TypedEvent | RawEvent = TypedEvent | RawEvent>(
+    handler: (event: T, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     filter: DeferredTopicFilter | DeferredTopicFilter[],
-    handlerOptions?: HandlerOptions<EthFetchConfig, TypedEvent>,
+    handlerOptions?: HandlerOptions<EthFetchConfig, T>,
     preprocessHandler: (
-      event: TypedEvent,
+      event: T,
       ctx: ContractContext<TContract, TBoundContractView>,
       preprocessStore: { [k: string]: any }
     ) => Promise<PreprocessResult> = defaultPreprocessHandler,
@@ -593,7 +593,7 @@ export abstract class BaseProcessor<
         }
         if (parsed) {
           const event: TypedEvent = new TypedEvent(log, parsed.name, fixEmptyKey(parsed))
-          await handler(event, ctx)
+          await handler(event as T, ctx)
           return ctx.stopAndGetResult()
         }
         return ProcessResult.fromPartial({})
@@ -645,7 +645,7 @@ export abstract class BaseProcessor<
         }
         if (parsed) {
           const event: TypedEvent = new TypedEvent(log, parsed.name, fixEmptyKey(parsed))
-          return preprocessHandler(event, ctx, preprocessStore)
+          return preprocessHandler(event as T, ctx, preprocessStore)
         }
         return PreprocessResult.fromPartial({})
       },
@@ -663,7 +663,7 @@ export abstract class BaseProcessor<
           }
           if (parsed) {
             const event: TypedEvent = new TypedEvent(log, parsed.name, fixEmptyKey(parsed))
-            return p(event)
+            return p(event as T)
           }
           return undefined
         }

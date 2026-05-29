@@ -79,10 +79,10 @@ export class IotaBaseProcessor {
     return this.config.network
   }
 
-  protected onMoveEvent(
-    handler: (event: IotaEvent, ctx: IotaContext) => PromiseOrVoid,
+  protected onMoveEvent<T extends IotaEvent = IotaEvent>(
+    handler: (event: T, ctx: IotaContext) => PromiseOrVoid,
     filter: EventFilter | EventFilter[],
-    handlerOptions?: HandlerOptions<MoveFetchConfig, IotaEvent>
+    handlerOptions?: HandlerOptions<MoveFetchConfig, T>
   ): IotaBaseProcessor {
     let _filters: EventFilter[] = []
     const _fetchConfig = MoveFetchConfig.fromPartial({ ...DEFAULT_FETCH_CONFIG, ...handlerOptions })
@@ -124,7 +124,7 @@ export class IotaBaseProcessor {
         )
 
         const decoded = await processor.coder.decodeEvent<any>(evt)
-        await handler(decoded || evt, ctx)
+        await handler((decoded || evt) as T, ctx)
 
         return ctx.stopAndGetResult()
       },
@@ -136,7 +136,7 @@ export class IotaBaseProcessor {
         if (typeof p === 'function') {
           const evt = JSON.parse(data.rawEvent) as IotaEvent
           const decoded = await processor.coder.decodeEvent<any>(evt)
-          return p(decoded || evt)
+          return p((decoded || evt) as T)
         }
         return p
       }
@@ -144,10 +144,10 @@ export class IotaBaseProcessor {
     return this
   }
 
-  protected onEntryFunctionCall(
-    handler: (call: MoveCallIotaTransaction, ctx: IotaContext) => PromiseOrVoid,
+  protected onEntryFunctionCall<T extends MoveCallIotaTransaction = MoveCallIotaTransaction>(
+    handler: (call: T, ctx: IotaContext) => PromiseOrVoid,
     filter: FunctionNameAndCallFilter | FunctionNameAndCallFilter[],
-    handlerOptions?: HandlerOptions<MoveFetchConfig, MoveCallIotaTransaction>
+    handlerOptions?: HandlerOptions<MoveFetchConfig, T>
   ): IotaBaseProcessor {
     let _filters: FunctionNameAndCallFilter[] = []
     const _fetchConfig = MoveFetchConfig.fromPartial({ ...DEFAULT_FETCH_CONFIG, ...handlerOptions })
@@ -198,7 +198,7 @@ export class IotaBaseProcessor {
 
             // TODO maybe do in parallel
             const decoded = await processor.coder.decodeFunctionPayload(call, programmableTx?.inputs || [])
-            await handler(decoded, ctx)
+            await handler(decoded as T, ctx)
           }
         }
         return ctx.stopAndGetResult()
@@ -213,7 +213,7 @@ export class IotaBaseProcessor {
           const calls: MoveCallIotaTransaction[] = getMoveCalls(tx)
           // For simplicity, use the first call for partitioning
           if (calls.length > 0) {
-            return p(calls[0])
+            return p(calls[0] as T)
           }
           return undefined
         }

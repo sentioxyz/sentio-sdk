@@ -78,10 +78,10 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
     return proxyProcessor(this)
   }
 
-  protected onMoveEvent(
-    handler: (event: Event, ctx: AptosContext) => PromiseOrVoid,
+  protected onMoveEvent<T extends Event = Event>(
+    handler: (event: T, ctx: AptosContext) => PromiseOrVoid,
     filter: EventFilter | EventFilter[],
-    handlerOptions?: HandlerOptions<MoveFetchConfig, Event>
+    handlerOptions?: HandlerOptions<MoveFetchConfig, T>
   ): this {
     let _filters: EventFilter[] = []
     const _fetchConfig = MoveFetchConfig.fromPartial({ ...DEFAULT_FETCH_CONFIG, ...handlerOptions })
@@ -137,10 +137,10 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
     return this
   }
 
-  protected onEntryFunctionCall(
-    handler: (call: EntryFunctionPayloadResponse, ctx: AptosContext) => PromiseOrVoid,
+  protected onEntryFunctionCall<T extends EntryFunctionPayloadResponse = EntryFunctionPayloadResponse>(
+    handler: (call: T, ctx: AptosContext) => PromiseOrVoid,
     filter: FunctionNameAndCallFilter | FunctionNameAndCallFilter[],
-    handlerOptions?: HandlerOptions<MoveFetchConfig, EntryFunctionPayloadResponse>
+    handlerOptions?: HandlerOptions<MoveFetchConfig, T>
   ): this {
     let _filters: FunctionNameAndCallFilter[] = []
     const _fetchConfig = MoveFetchConfig.fromPartial({ ...DEFAULT_FETCH_CONFIG, ...handlerOptions })
@@ -424,10 +424,10 @@ export class AptosModulesProcessor extends AptosTransactionProcessor<
     return new AptosModulesProcessor(options)
   }
 
-  public onMoveEvent(
-    handler: (event: Event, ctx: AptosContext) => PromiseOrVoid,
+  public onMoveEvent<T extends Event = Event>(
+    handler: (event: T, ctx: AptosContext) => PromiseOrVoid,
     filter: EventFilter | EventFilter[],
-    handlerOptions?: HandlerOptions<MoveFetchConfig, Event>
+    handlerOptions?: HandlerOptions<MoveFetchConfig, T>
   ) {
     return super.onMoveEvent(handler, filter, handlerOptions)
   }

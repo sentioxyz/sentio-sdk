@@ -41,7 +41,9 @@ export abstract class FuelBaseProcessorTemplate<TContract extends Contract> {
 
   constructor() {
     this.id = FuelProcessorTemplateProcessorState.INSTANCE.getValues().length
-    FuelProcessorTemplateProcessorState.INSTANCE.addValue(this)
+    // Stored type-erased as the base instantiation; the concrete type parameter only appears in
+    // handler parameter positions, which `strictFunctionTypes` checks contravariantly.
+    FuelProcessorTemplateProcessorState.INSTANCE.addValue(this as unknown as FuelBaseProcessorTemplate<Contract>)
     return proxyProcessor(this)
   }
 

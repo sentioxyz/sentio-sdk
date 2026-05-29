@@ -43,7 +43,10 @@ export class MemoryDatabase {
   }
 
   start() {
-    this.dbContext.subject.subscribe(this.processRequest.bind(this))
+    // The subject is typed `DeepPartial<ProcessStreamResponse>`, but at runtime it always carries a
+    // full response. Match the subscriber's parameter type and narrow inside (a bound method with the
+    // narrower `ProcessStreamResponse` parameter is rejected under `strictFunctionTypes`).
+    this.dbContext.subject.subscribe((request) => this.processRequest(request as ProcessStreamResponse))
   }
 
   stop() {
