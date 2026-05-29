@@ -52,9 +52,17 @@ export function setupLogger(json: boolean, enableDebug: boolean, workerId?: numb
     transports: [new transports.Console()]
   })
 
-  console.log = (...args: any[]) => logger.info.call(logger, ...args)
-  console.info = (...args: any[]) => logger.info.call(logger, ...args)
-  console.warn = (...args: any[]) => logger.warn.call(logger, ...args)
-  console.error = (...args: any[]) => logger.error.call(logger, ...args)
-  console.debug = (...args: any[]) => logger.debug.call(logger, ...args)
+  // Forward console output to winston, preserving `this` binding to the logger. The methods are
+  // typed through `(...args: any[]) => unknown` so the variadic args can be applied without tripping
+  // strict overload resolution on `Function.prototype.call`.
+  const forward =
+    (method: (...args: any[]) => unknown) =>
+    (...args: any[]) => {
+      method.apply(logger, args)
+    }
+  console.log = forward(logger.info)
+  console.info = forward(logger.info)
+  console.warn = forward(logger.warn)
+  console.error = forward(logger.error)
+  console.debug = forward(logger.debug)
 }

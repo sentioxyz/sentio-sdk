@@ -478,14 +478,14 @@ function colorSeverity(severity: string): string {
   }
 }
 
-function withAuthOptions<T extends Command<any, any, any>>(command: T) {
+function withAuthOptions<Args extends any[]>(command: Command<Args, any, any>) {
   return command
     .option('--host <host>', 'Override Sentio host')
     .option('--api-key <key>', 'Use an explicit API key instead of saved credentials')
     .option('--token <token>', 'Use an explicit bearer token instead of saved credentials')
 }
 
-function withSharedProjectOptions<T extends Command<any, any, any>>(command: T) {
+function withSharedProjectOptions<Args extends any[]>(command: Command<Args, any, any>) {
   return command
     .option('--project <owner/slug>', 'Sentio project in <owner>/<slug> format')
     .option('--owner <owner>', 'Sentio project owner')
@@ -493,11 +493,11 @@ function withSharedProjectOptions<T extends Command<any, any, any>>(command: T) 
     .option('--project-id <id>', 'Sentio project id')
 }
 
-function withOutputOptions<T extends Command<any, any, any>>(command: T) {
+function withOutputOptions<Args extends any[]>(command: Command<Args, any, any>) {
   return command.option('--json', 'Print raw JSON response').option('--yaml', 'Print raw YAML response')
 }
 
-function handleProcessorCommandError(error: unknown, command?: Command) {
+function handleProcessorCommandError(error: unknown, command?: Command<any[], any, any>) {
   if (
     error instanceof CliError &&
     (error.message.startsWith('Project is required.') ||

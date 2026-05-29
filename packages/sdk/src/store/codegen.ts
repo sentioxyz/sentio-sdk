@@ -210,7 +210,7 @@ async function codegenInternal(schema: GraphQLSchema, source: string, target: st
               })
               fields.push({
                 name: f.name + 'ID' + (isMany ? 's' : ''),
-                type: isMany ? `Array<ID | undefined>` : `ID`,
+                type: isMany ? `Array<ID>` : `ID`,
                 annotations: []
               })
               if (isMany) {
@@ -317,7 +317,7 @@ export class ${c.name} ${c.parent ? `extends ${c.parent}` : ''} ${c.interfaces.l
 ${c.fields
   .map((f) => `${f.annotations.map((a) => `\n\t${a}`).join('')}\n\t${f.name}${f.optional ? '?' : ''}: ${f.type}`)
   .join('\n')}
-  ${isEntity ? `constructor(data: ${c.name}ConstructorInput) {super()}` : ''}
+  ${isEntity ? `constructor(data: Partial<${c.name}ConstructorInput>) {super()}` : ''}
   ${(c.methods ?? []).map(genMethod).join('\n')}
   
   ${

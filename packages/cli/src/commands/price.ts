@@ -185,24 +185,24 @@ async function runPriceCheckLatest(options: PriceOptions) {
   printOutput(options, unwrapApiResult(response))
 }
 
-function withAuthOptions<T extends Command<any, any, any>>(command: T) {
+function withAuthOptions<Args extends any[]>(command: Command<Args, any, any>) {
   return command
     .option('--host <host>', 'Override Sentio host')
     .option('--api-key <key>', 'Use an explicit API key instead of saved credentials')
     .option('--token <token>', 'Use an explicit bearer token instead of saved credentials')
 }
 
-function withJsonInputOptions<T extends Command<any, any, any>>(command: T) {
+function withJsonInputOptions<Args extends any[]>(command: Command<Args, any, any>) {
   return command
     .option('--file <path>', 'Read request JSON or YAML from file')
     .option('--stdin', 'Read request JSON or YAML from stdin')
 }
 
-function withOutputOptions<T extends Command<any, any, any>>(command: T) {
+function withOutputOptions<Args extends any[]>(command: Command<Args, any, any>) {
   return command.option('--json', 'Print raw JSON response').option('--yaml', 'Print raw YAML response')
 }
 
-function handlePriceCommandError(error: unknown, command?: Command) {
+function handlePriceCommandError(error: unknown, command?: Command<any[], any, any>) {
   if (
     error instanceof CliError &&
     (error.message.startsWith('Provide exactly one coin identifier.') ||

@@ -360,14 +360,14 @@ async function injectProjectId(
   }
 }
 
-function withAuthOptions<T extends Command<any, any, any>>(command: T) {
+function withAuthOptions<Args extends any[]>(command: Command<Args, any, any>) {
   return command
     .option('--host <host>', 'Override Sentio host')
     .option('--api-key <key>', 'Use an explicit API key instead of saved credentials')
     .option('--token <token>', 'Use an explicit bearer token instead of saved credentials')
 }
 
-function withSharedProjectOptions<T extends Command<any, any, any>>(command: T) {
+function withSharedProjectOptions<Args extends any[]>(command: Command<Args, any, any>) {
   return command
     .option('--project <project>', 'Sentio project as <owner>/<slug> or <slug>')
     .option('--owner <owner>', 'Sentio project owner')
@@ -375,17 +375,17 @@ function withSharedProjectOptions<T extends Command<any, any, any>>(command: T) 
     .option('--project-id <id>', 'Sentio project id')
 }
 
-function withJsonInputOptions<T extends Command<any, any, any>>(command: T) {
+function withJsonInputOptions<Args extends any[]>(command: Command<Args, any, any>) {
   return command
     .option('--file <path>', 'Read request JSON or YAML from file')
     .option('--stdin', 'Read request JSON or YAML from stdin')
 }
 
-function withOutputOptions<T extends Command<any, any, any>>(command: T) {
+function withOutputOptions<Args extends any[]>(command: Command<Args, any, any>) {
   return command.option('--json', 'Print raw JSON response').option('--yaml', 'Print raw YAML response')
 }
 
-function handleAlertCommandError(error: unknown, command?: Command) {
+function handleAlertCommandError(error: unknown, command?: Command<any[], any, any>) {
   if (
     error instanceof CliError &&
     (error.message.startsWith('Project is required.') ||
