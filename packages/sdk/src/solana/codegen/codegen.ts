@@ -12,12 +12,12 @@ import {
 } from '@anchor-lang/core'
 import { recursiveCodegen } from '../../core/codegen.js'
 
-export function codegen(abisDir: string, targetPath = path.join('src', 'types', 'solana'), genExample = false) {
+export async function codegen(abisDir: string, targetPath = path.join('src', 'types', 'solana'), genExample = false) {
   if (!fs.existsSync(abisDir)) {
     return
   }
 
-  const numFiles = recursiveCodegen(abisDir, targetPath, codegenInternal)
+  const numFiles = await recursiveCodegen(abisDir, targetPath, codegenInternal)
 
   console.log(chalk.green(`Generated ${numFiles} for Solana`))
 }
