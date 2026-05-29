@@ -1,10 +1,14 @@
 import unusedImports from 'eslint-plugin-unused-imports'
 import { configs } from 'typescript-eslint'
-import { defineConfig } from "eslint/config";
+import { defineConfig, includeIgnoreFile } from "eslint/config";
 import { importX } from 'eslint-plugin-import-x'
 import eslintConfigPrettier from "eslint-config-prettier/flat";
+import { fileURLToPath } from 'node:url'
+
+const gitignorePath = fileURLToPath(new URL('.gitignore', import.meta.url))
 
 export default defineConfig([
+  includeIgnoreFile(gitignorePath, { gitignoreResolution: true }),
   ...configs.recommended,
   importX.flatConfigs.recommended,
   importX.flatConfigs.typescript,
