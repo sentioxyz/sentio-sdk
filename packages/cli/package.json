@@ -32,7 +32,7 @@
   "types": "module",
   "dependencies": {
     "@aptos-labs/ts-sdk": "~7.1.0",
-    "@iota/iota-sdk": "~1.13.0",
+    "@iota/iota-sdk": "~1.14.0",
     "@mysten/sui": "~2.17.0",
     "@sentio/api": "~1.0.4",
     "@sentio/chain": "~3.4.22",

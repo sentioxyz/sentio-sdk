@@ -10,8 +10,7 @@
   "type": "module",
   "exports": {
     ".": "./lib/index.js",
-    "./price": "./lib/service/price/protos/price.js",
-    "./chainquery": "./lib/chainquery/protos/chainquery.js"
+    "./price": "./lib/service/price/protos/price.js"
   },
   "files": [
     "lib",
@@ -26,8 +25,7 @@
     "@bufbuild/protobuf": "^2.12.0",
     "long": "^5.2.3",
     "nice-grpc": "^2.1.16",
-    "nice-grpc-common": "^2.0.3",
-    "protobufjs": "^7.5.4"
+    "nice-grpc-common": "^2.0.3"
   },
   "engines": {
     "node": ">=20"
