@@ -6,7 +6,6 @@ export class Endpoints {
   static INSTANCE: Endpoints = new Endpoints()
 
   concurrency = 8
-  chainQueryAPI = ''
   priceFeedAPI = ''
 
   chainServer = new Map<string, string>()
@@ -27,7 +26,6 @@ export function configureEndpoints(options: any) {
 
   Endpoints.INSTANCE.concurrency = concurrencyOverride ?? options.concurrency
   Endpoints.INSTANCE.batchCount = batchCountOverride ?? options.batchCount
-  Endpoints.INSTANCE.chainQueryAPI = options.chainqueryServer
   Endpoints.INSTANCE.priceFeedAPI = options.pricefeedServer
 
   for (const [id, config] of Object.entries(chainsConfig)) {
