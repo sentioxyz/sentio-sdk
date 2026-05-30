@@ -32,6 +32,7 @@
     "test": "tsx --test 'src/**/*.test.ts'"
   },
   "dependencies": {
+    "@bufbuild/protobuf": "^2.12.0",
     "@opentelemetry/exporter-metrics-otlp-grpc": "^0.205.0",
     "@opentelemetry/exporter-prometheus": "^0.205.0",
     "@opentelemetry/exporter-trace-otlp-grpc": "^0.205.0",
