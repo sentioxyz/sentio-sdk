@@ -186,6 +186,7 @@ Tests require building the project first. Use `./scripts/test-all.sh` to build a
 - **Package Manager**: Uses pnpm exclusively, pinned via `packageManager: pnpm@11.3.0` (enforced by preinstall script)
 - **Monorepo**: Uses pnpm workspaces for dependency management
 - **`ethers` is patched**: The root `package.json` `resolutions` field redirects `ethers` to `@sentio/ethers` (a Sentio fork). Do not assume upstream `ethers` behavior — check the fork before relying on edge-case semantics.
+- **Upgrading `@typemove/*` requires aligning the paired chain SDK**: Each `@typemove/*` package depends on a chain SDK via a tilde range (`@typemove/iota`↔`@iota/iota-sdk`, `@typemove/sui`↔`@mysten/sui`, `@typemove/aptos`↔`@aptos-labs/ts-sdk`). When bumping a `@typemove/*` dep, also bump the paired chain SDK pin in `packages/sdk/package.json` to the range the new typemove requires (check with `npm view @typemove/<x>@<ver> dependencies`). A mismatch resolves two copies of the chain SDK and fails the build with incompatible-type errors (e.g. duplicate `IotaClient` — `TS2345`).
 - **TypeScript**: Full TypeScript codebase with strict type checking
 - **ESLint**: Code quality enforcement with custom rules
 - **Git Hooks**: Automated formatting and linting on commit
