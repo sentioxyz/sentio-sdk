@@ -412,7 +412,7 @@ export class EthPlugin extends Plugin {
   }
 
   async processLog(request: DataBinding, preparedData: PreparedData | undefined): Promise<ProcessResult> {
-    if (!request.data?.ethLog?.log) {
+    if (!request.data?.ethLog?.rawLog) {
       throw new ServerError(Status.INVALID_ARGUMENT, "Log can't be null")
     }
     const ethLog = request.data.ethLog
@@ -422,10 +422,7 @@ export class EthPlugin extends Plugin {
       const handler = this.handlerRegister.getHandlerById(request.chainId, handlerId)
       const promise = handler(ethLog, preparedData).catch((e: any) => {
         console.error('error processing log: ', e)
-        throw new ServerError(
-          Status.INTERNAL,
-          'error processing log: ' + JSON.stringify(ethLog.log) + '\n' + errorString(e)
-        )
+        throw new ServerError(Status.INTERNAL, 'error processing log: ' + ethLog.rawLog + '\n' + errorString(e))
       })
       if (GLOBAL_CONFIG.execution.sequential) {
         await promise
@@ -436,7 +433,7 @@ export class EthPlugin extends Plugin {
   }
 
   async processTrace(binding: DataBinding, preparedData: PreparedData | undefined): Promise<ProcessResult> {
-    if (!binding.data?.ethTrace?.trace) {
+    if (!binding.data?.ethTrace?.rawTrace) {
       throw new ServerError(Status.INVALID_ARGUMENT, "Trace can't be null")
     }
     const ethTrace = binding.data.ethTrace
@@ -448,10 +445,7 @@ export class EthPlugin extends Plugin {
         .getHandlerById(binding.chainId, handlerId)(ethTrace, preparedData)
         .catch((e: any) => {
           console.error('error processing trace: ', e)
-          throw new ServerError(
-            Status.INTERNAL,
-            'error processing trace: ' + JSON.stringify(ethTrace.trace) + '\n' + errorString(e)
-          )
+          throw new ServerError(Status.INTERNAL, 'error processing trace: ' + ethTrace.rawTrace + '\n' + errorString(e))
         })
       if (GLOBAL_CONFIG.execution.sequential) {
         await promise
@@ -462,7 +456,7 @@ export class EthPlugin extends Plugin {
   }
 
   async processBlock(binding: DataBinding, preparedData: PreparedData | undefined): Promise<ProcessResult> {
-    if (!binding.data?.ethBlock?.block) {
+    if (!binding.data?.ethBlock?.rawBlock) {
       throw new ServerError(Status.INVALID_ARGUMENT, "Block can't be empty")
     }
     const ethBlock = binding.data.ethBlock
@@ -473,10 +467,7 @@ export class EthPlugin extends Plugin {
         .getHandlerById(binding.chainId, handlerId)(ethBlock, preparedData)
         .catch((e: any) => {
           console.error('error processing block: ', e)
-          throw new ServerError(
-            Status.INTERNAL,
-            'error processing block: ' + ethBlock.block?.number + '\n' + errorString(e)
-          )
+          throw new ServerError(Status.INTERNAL, 'error processing block: ' + errorString(e))
         })
       if (GLOBAL_CONFIG.execution.sequential) {
         await promise
@@ -487,7 +478,7 @@ export class EthPlugin extends Plugin {
   }
 
   async processTransaction(binding: DataBinding, preparedData: PreparedData | undefined): Promise<ProcessResult> {
-    if (!binding.data?.ethTransaction?.transaction) {
+    if (!binding.data?.ethTransaction?.rawTransaction) {
       throw new ServerError(Status.INVALID_ARGUMENT, "transaction can't be null")
     }
     const ethTransaction = binding.data.ethTransaction
@@ -500,7 +491,7 @@ export class EthPlugin extends Plugin {
         .catch((e: any) => {
           throw new ServerError(
             Status.INTERNAL,
-            'error processing transaction: ' + JSON.stringify(ethTransaction.transaction) + '\n' + errorString(e)
+            'error processing transaction: ' + ethTransaction.rawTransaction + '\n' + errorString(e)
           )
         })
       if (GLOBAL_CONFIG.execution.sequential) {

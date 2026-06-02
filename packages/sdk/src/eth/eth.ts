@@ -240,11 +240,12 @@ function formatLog(log: any): LogParams {
 }
 
 export function formatEthData(data: {
-  log?: any
-  block?: any
-  trace?: any
-  transaction?: any
-  transactionReceipt?: any
+  // raw_* JSON payloads sent by the driver
+  rawLog?: string
+  rawBlock?: string
+  rawTrace?: string
+  rawTransaction?: string
+  rawTransactionReceipt?: string
   __formattedEthData?: any
 }) {
   // Return cached result if it exists
@@ -253,22 +254,29 @@ export function formatEthData(data: {
   }
 
   try {
-    const log = data.log ? formatLog(data.log) : undefined
-    if (data.block && !data.block.transactions) {
-      data.block.transactions = []
+    // All Eth* data is delivered as raw_* JSON payloads; parse them here.
+    const logObj = data.rawLog ? JSON.parse(data.rawLog) : undefined
+    const blockObj = data.rawBlock ? JSON.parse(data.rawBlock) : undefined
+    const traceObj = data.rawTrace ? JSON.parse(data.rawTrace) : undefined
+    const transactionObj = data.rawTransaction ? JSON.parse(data.rawTransaction) : undefined
+    const transactionReceiptObj = data.rawTransactionReceipt ? JSON.parse(data.rawTransactionReceipt) : undefined
+
+    const log = logObj ? formatLog(logObj) : undefined
+    if (blockObj && !blockObj.transactions) {
+      blockObj.transactions = []
     }
-    const block = data.block ? formatRichBlock(data.block) : undefined
-    const trace = data.trace ? (data.trace as Trace) : undefined
+    const block = blockObj ? formatRichBlock(blockObj) : undefined
+    const trace = traceObj ? (traceObj as Trace) : undefined
     let transaction = undefined
-    if (data.transaction) {
-      if (!data.transaction.v) {
-        data.transaction.v = '0x1c'
-        data.transaction.r = '0x88ff6cf0fefd94db46111149ae4bfc179e9b94721fffd821d38d16464b3f71d0'
-        data.transaction.s = '0x45e0aff800961cfce805daef7016b9b675c137a6a41a548f7b60a3484c06a33a'
+    if (transactionObj) {
+      if (!transactionObj.v) {
+        transactionObj.v = '0x1c'
+        transactionObj.r = '0x88ff6cf0fefd94db46111149ae4bfc179e9b94721fffd821d38d16464b3f71d0'
+        transactionObj.s = '0x45e0aff800961cfce805daef7016b9b675c137a6a41a548f7b60a3484c06a33a'
       }
-      transaction = formatTransactionResponse(data.transaction)
+      transaction = formatTransactionResponse(transactionObj)
     }
-    const transactionReceipt = data.transactionReceipt ? formatTransactionReceipt(data.transactionReceipt) : undefined
+    const transactionReceipt = transactionReceiptObj ? formatTransactionReceipt(transactionReceiptObj) : undefined
 
     const result = {
       log,

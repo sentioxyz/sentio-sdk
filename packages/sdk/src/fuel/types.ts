@@ -4,13 +4,19 @@ import {
   Data_FuelReceipt,
   Data_FuelTransaction,
   FuelAssetHandlerConfig,
-  FuelCallHandlerConfig,
   FuelReceiptHandlerConfig,
   HandleInterval,
   OnIntervalConfig,
   ProcessResult
 } from '@sentio/protos'
 import { Block, TransactionSummary } from 'fuels'
+
+// Client-side only filter for `onCall`. Fuel calls are delivered as FUEL_TRANSACTION
+// data and filtered in-handler, so this never reaches the backend.
+export interface FuelCallFilter {
+  function: string
+  includeFailed: boolean
+}
 
 export interface FuelBaseProcessor<T> {
   configure(): Promise<void>
@@ -27,7 +33,7 @@ export class FuelProcessorState extends MapStateStorage<FuelBaseProcessor<any>> 
 export type CallHandler<T> = {
   handlerName: string
   handler: (call: T) => Promise<ProcessResult>
-  fetchConfig?: Partial<FuelCallHandlerConfig>
+  fetchConfig?: { filters: FuelCallFilter[] }
   assetConfig?: Partial<FuelAssetHandlerConfig>
   partitionHandler?: (call: T) => Promise<string | undefined>
 }
