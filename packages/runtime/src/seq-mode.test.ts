@@ -40,7 +40,8 @@ describe('Test seq mode', () => {
           block: {
             number: '0x1',
             timestamp: '0x65ed3a46'
-          }
+          },
+          rawBlock: ''
         }
       },
       handlerType: HandlerType.ETH_BLOCK,
@@ -54,7 +55,8 @@ describe('Test seq mode', () => {
           block: {
             number: '0x2',
             timestamp: '0x65ed3b46'
-          }
+          },
+          rawBlock: ''
         }
       },
       handlerType: HandlerType.ETH_BLOCK,
@@ -69,7 +71,8 @@ describe('Test seq mode', () => {
           block: {
             number: '0x1',
             timestamp: '0x65ed3c46'
-          }
+          },
+          rawBlock: ''
         },
         chainId: '1'
       },

@@ -106,7 +106,8 @@ describe('Test Basic Examples', () => {
               type: '0x0',
               cumulativeGasUsed: '0x8b56b3'
             },
-            timestamp: new Date()
+            timestamp: new Date(),
+            rawTrace: ''
           }
         },
         handlerIds: [handlerId],
