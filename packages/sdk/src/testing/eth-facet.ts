@@ -52,7 +52,8 @@ export class EthFacet {
             data: {
               ethTrace: {
                 trace,
-                timestamp: new Date()
+                timestamp: new Date(),
+                rawTrace: ''
               }
             },
             handlerIds: [config.handlerId],
@@ -232,7 +233,7 @@ export class EthFacet {
   ): DataBinding {
     const binding: DataBinding = {
       data: {
-        ethBlock: { block }
+        ethBlock: { block, rawBlock: '' }
       },
       handlerType: HandlerType.ETH_BLOCK,
       handlerIds: [],

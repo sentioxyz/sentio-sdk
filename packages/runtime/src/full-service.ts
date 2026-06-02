@@ -116,6 +116,28 @@ export class RuntimeServicePatcher {
           }
         }
         break
+      case HandlerType.ETH_BLOCK:
+        const ethBlock = dataBinding.data?.ethBlock
+        if (ethBlock?.block == null && ethBlock?.rawBlock) {
+          ethBlock.block = getParsedData(ethBlock.rawBlock)
+        }
+        break
+      case HandlerType.ETH_TRACE:
+        const ethTrace = dataBinding.data?.ethTrace
+        if (ethTrace?.trace == null && ethTrace?.rawTrace) {
+          ethTrace.trace = getParsedData(ethTrace.rawTrace)
+
+          if (ethTrace.rawTransaction) {
+            ethTrace.transaction = getParsedData(ethTrace.rawTransaction)
+          }
+          if (ethTrace.rawBlock) {
+            ethTrace.block = getParsedData(ethTrace.rawBlock)
+          }
+          if (ethTrace.rawTransactionReceipt) {
+            ethTrace.transactionReceipt = getParsedData(ethTrace.rawTransactionReceipt)
+          }
+        }
+        break
       case HandlerType.FUEL_TRANSACTION:
         if (compareSemver(this.sdkVersion, FUEL_PROTO_UPDATE_VERSION) < 0) {
           dataBinding.handlerType = HandlerType.FUEL_CALL

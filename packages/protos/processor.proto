@@ -704,6 +704,7 @@ message Data {
   }
   message EthBlock {
     google.protobuf.Struct block = 2;
+    string raw_block = 1;
   }
   message EthTransaction {
     google.protobuf.Struct transaction = 4; // deprecated
@@ -722,6 +723,10 @@ message Data {
     optional google.protobuf.Struct transaction = 2;
     optional google.protobuf.Struct transaction_receipt = 3;
     optional google.protobuf.Struct block = 6;
+    string raw_trace = 7;
+    optional string raw_transaction = 8;
+    optional string raw_transaction_receipt = 9;
+    optional string raw_block = 10;
   }
   message SolInstruction {
     string instruction_data = 1;
