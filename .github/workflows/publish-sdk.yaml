@@ -6,6 +6,7 @@ on:
       - main
       - release
       - next
+      - develop/v3
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -28,10 +29,12 @@ jobs:
       - name: Set NPM variables
         id: npm
         run: |
-          BRANCH=${GITHUB_REF##*/}
+          BRANCH=${GITHUB_REF#refs/heads/}
           DIST_TAG=rc
           if [[ $BRANCH == "release" ]]; then
             DIST_TAG=latest
+          elif [[ $BRANCH == "develop/v3" ]]; then
+            DIST_TAG=rc3
           fi
           echo "dist_tag=${DIST_TAG}" >> $GITHUB_OUTPUT
 
@@ -125,7 +128,7 @@ jobs:
           ./scripts/update-version.sh @sentio/action ${{ steps.semantic.outputs.new_release_version }}
           pnpm publish --filter "@sentio/action" --no-git-checks --tag ${{ steps.npm.outputs.dist_tag }}
       - name: Clean Github Release for RC
-        if: ${{ contains(steps.semantic.outputs.new_release_version, '-rc.') == false }}
+        if: ${{ contains(steps.semantic.outputs.new_release_version, '-') == false }}
         run:  ./scripts/clean-rc-releases.sh
         env:
           GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
