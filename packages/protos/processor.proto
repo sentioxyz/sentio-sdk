@@ -88,11 +88,6 @@ message ProcessConfigResponse {
   DataBaseSchema db_schema = 10;
 }
 
-message ConfigureHandlersResponse {
-  repeated ContractConfig contract_configs = 2;
-  repeated AccountConfig account_configs = 4;
-}
-
 message ContractConfig {
   ContractInfo contract = 1;
   repeated OnIntervalConfig interval_configs = 11;
@@ -104,10 +99,8 @@ message ContractConfig {
   repeated MoveEventHandlerConfig move_event_configs = 9;
   repeated MoveCallHandlerConfig move_call_configs = 10;
   repeated MoveResourceChangeConfig move_resource_change_configs = 12;
-  repeated FuelCallHandlerConfig fuel_call_configs = 13 [deprecated = true];
   repeated FuelTransactionHandlerConfig fuel_transaction_configs = 20;
   repeated FuelAssetHandlerConfig asset_configs = 14;
-  repeated FuelLogHandlerConfig fuel_log_configs = 15 [deprecated = true];
   repeated FuelReceiptHandlerConfig fuel_receipt_configs = 21;
   repeated CosmosLogHandlerConfig cosmos_log_configs = 16;
   repeated StarknetEventHandlerConfig starknet_event_configs = 17;
@@ -121,19 +114,6 @@ message ContractConfig {
 
 message DataBaseSchema {
   string gql_schema = 1;
-}
-
-message TotalPerEntityAggregation {
-  enum Type {
-    AVG = 0;
-    MEDIAN = 1;
-    // add more
-  }
-}
-
-message RetentionConfig {
-  string retention_event_name = 2;
-  int32 days = 3;
 }
 
 
@@ -232,8 +212,6 @@ message AccountConfig {
   uint64 start_block = 3;
   uint64 end_block = 10;
   repeated OnIntervalConfig interval_configs = 4;
-  repeated AptosOnIntervalConfig aptos_interval_configs = 5 [deprecated = true];
-  // TODO migrate aptos_interval_configs to move_interval_configs
   repeated MoveOnIntervalConfig move_interval_configs = 7;
   repeated MoveCallHandlerConfig move_call_configs = 8;
   repeated MoveResourceChangeConfig move_resource_change_configs = 9;
@@ -262,11 +240,6 @@ message OnIntervalConfig {
   EthFetchConfig fetch_config = 6;
 
   string handler_name = 7;
-}
-
-message AptosOnIntervalConfig {
-  OnIntervalConfig interval_config = 1;
-  string type = 2;
 }
 
 enum MoveOwnerType {
@@ -322,10 +295,6 @@ message StartRequest {
   repeated TemplateInstance template_instances = 1;
 }
 
-message BlockHandlerConfig {
-  int32 handler_id = 1;
-}
-
 message EthFetchConfig {
   bool transaction = 1;
   bool transaction_receipt = 2;
@@ -362,12 +331,6 @@ message FuelAssetHandlerConfig {
     optional string from_address = 2;
     optional string to_address = 3;
   }
-  string handler_name = 3;
-}
-
-message FuelLogHandlerConfig {
-  repeated string log_ids = 1;
-  int32 handler_id = 2;
   string handler_name = 3;
 }
 
@@ -459,7 +422,6 @@ message MoveCallHandlerConfig {
 }
 
 message MoveResourceChangeConfig {
-  string type = 1 [deprecated = true];
   repeated string types = 5;
   bool include_deleted = 4;
   int32 handler_id = 2;
@@ -491,17 +453,6 @@ message StarknetEventFilter {
   repeated string keys = 2;
 }
 
-message FuelCallFilter {
-  string function = 1; // "" means all transaction
-  bool include_failed = 2;
-}
-
-message FuelCallHandlerConfig {
-  repeated FuelCallFilter filters = 1;
-  int32 handler_id = 2;
-  string handler_name = 3;
-}
-
 message FuelTransactionHandlerConfig {
   int32 handler_id = 1;
   string handler_name = 2;
@@ -517,8 +468,6 @@ message ProcessBindingsRequest {
 
 message ProcessBindingResponse {
   ProcessResult result = 1;
-
-  bool config_updated = 4 [deprecated = true];
 }
 
 message ProcessStreamRequest {
@@ -644,8 +593,6 @@ message DBRequest {
   }
   message DBList {
     string entity = 1;
-    //    uint32 limit = 2; deprecated
-    //    uint32 offset = 3; deprecated
     repeated DBFilter filters = 4;
     string cursor = 5;
     optional uint32 page_size = 6;
@@ -692,36 +639,28 @@ message DBRequest {
 message Data {
   // Every Handler type should have a data type
   message EthLog {
-    google.protobuf.Struct log = 3; // deprecated
     google.protobuf.Timestamp timestamp = 4;
-    optional google.protobuf.Struct transaction = 2; // deprecated
-    optional google.protobuf.Struct transaction_receipt = 5; // deprecated
-    optional google.protobuf.Struct block = 6; // deprecated
     string raw_log = 7;
     optional string raw_transaction = 8;
     optional string raw_transaction_receipt = 9;
     optional string raw_block = 10;
   }
   message EthBlock {
-    google.protobuf.Struct block = 2;
+    string raw_block = 1;
   }
   message EthTransaction {
-    google.protobuf.Struct transaction = 4; // deprecated
     google.protobuf.Timestamp timestamp = 5;
-    optional google.protobuf.Struct transaction_receipt = 3; // deprecated
-    optional google.protobuf.Struct block = 6; // deprecated
-    optional google.protobuf.Struct trace = 7; // deprecated
     string raw_transaction = 8;
     optional string raw_transaction_receipt = 9;
     optional string raw_block = 10;
     optional string raw_trace = 11;
   }
   message EthTrace {
-    google.protobuf.Struct trace = 4;
     google.protobuf.Timestamp timestamp = 5;
-    optional google.protobuf.Struct transaction = 2;
-    optional google.protobuf.Struct transaction_receipt = 3;
-    optional google.protobuf.Struct block = 6;
+    string raw_trace = 7;
+    optional string raw_transaction = 8;
+    optional string raw_transaction_receipt = 9;
+    optional string raw_block = 10;
   }
   message SolInstruction {
     string instruction_data = 1;
@@ -739,36 +678,28 @@ message Data {
   message AptEvent {
     string raw_event = 1;
     int32 event_index = 4;
-    google.protobuf.Struct transaction = 2 [deprecated = true];
     string raw_transaction = 3; // if fetch all event is true, raw_transaction.events = all events, otherwise empty
   }
   message AptCall {
-    google.protobuf.Struct transaction = 2 [deprecated = true];
     string raw_transaction = 3;
   }
   message AptResource {
-    repeated google.protobuf.Struct resources = 4 [deprecated = true];
     int64 version = 2;
     int64 timestampMicros = 5;
     repeated string raw_resources = 6;
   }
   message SuiEvent {
-    google.protobuf.Struct transaction = 1 [deprecated = true];
     string raw_event = 4;
     string raw_transaction = 5;
     google.protobuf.Timestamp timestamp = 2;
     uint64 slot = 3;
   }
   message SuiCall {
-    google.protobuf.Struct transaction = 1 [deprecated = true];
     string raw_transaction = 4;
     google.protobuf.Timestamp timestamp = 2;
     uint64 slot = 3;
   }
   message SuiObject {
-    repeated google.protobuf.Struct objects = 1 [deprecated = true]; // just details.content
-    optional google.protobuf.Struct self = 4 [deprecated = true];    // just details.content
-
     repeated string raw_objects = 10;
     optional string raw_self = 9;
     string object_id = 5;      // self object property
@@ -778,7 +709,6 @@ message Data {
     uint64 slot = 3;                         // checkpoint number
   }
   message SuiObjectChange {
-    repeated google.protobuf.Struct changes = 1 [deprecated = true];
     repeated string raw_changes = 5;
     google.protobuf.Timestamp timestamp = 2;
     string tx_digest = 4;
@@ -790,11 +720,6 @@ message Data {
     int64 receipt_index = 3;
   }
   message FuelTransaction {
-    google.protobuf.Struct transaction = 1;
-    google.protobuf.Timestamp timestamp = 2;
-  }
-  message FuelCall {
-    option deprecated = true;
     google.protobuf.Struct transaction = 1;
     google.protobuf.Timestamp timestamp = 2;
   }
@@ -826,7 +751,6 @@ message Data {
     SuiObject sui_object = 12;
     SuiObjectChange sui_object_change = 13;
     FuelReceipt fuel_log = 20; // should rename to fuel_receipt
-    FuelCall fuel_call = 14  [deprecated = true];
     FuelTransaction fuel_transaction = 21;
     FuelBlock fuel_block = 18;
     CosmosCall cosmos_call = 15;
@@ -929,7 +853,6 @@ enum HandlerType {
   SUI_CALL = 9;
   SUI_OBJECT = 10;
   SUI_OBJECT_CHANGE = 12;
-  FUEL_CALL = 13; // [deprecated = true] can't remove from ts codegen due to type conflict
   FUEL_RECEIPT = 19;
   FUEL_TRANSACTION = 20;
   FUEL_BLOCK = 17;

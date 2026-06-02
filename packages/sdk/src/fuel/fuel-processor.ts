@@ -1,11 +1,4 @@
-import {
-  Data_FuelBlock,
-  Data_FuelTransaction,
-  Data_FuelReceipt,
-  FuelCallFilter,
-  HandleInterval,
-  ProcessResult
-} from '@sentio/protos'
+import { Data_FuelBlock, Data_FuelTransaction, Data_FuelReceipt, HandleInterval, ProcessResult } from '@sentio/protos'
 import { FuelCall, FuelContext, FuelContractContext } from './context.js'
 import { bn, Contract, InputType, Interface, JsonAbi, Provider, ReceiptTransfer, ReceiptTransferOut } from 'fuels'
 import { FuelNetwork, getProvider } from './network.js'
@@ -22,6 +15,7 @@ import {
   ContractTransferFilter,
   FuelBaseProcessor,
   FuelBlock,
+  FuelCallFilter,
   FuelLog,
   FuelProcessorState,
   FuelTransaction,

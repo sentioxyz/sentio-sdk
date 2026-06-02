@@ -37,10 +37,10 @@ describe('Test seq mode', () => {
     const binding1: DataBinding = {
       data: {
         ethBlock: {
-          block: {
+          rawBlock: JSON.stringify({
             number: '0x1',
             timestamp: '0x65ed3a46'
-          }
+          })
         }
       },
       handlerType: HandlerType.ETH_BLOCK,
@@ -51,10 +51,10 @@ describe('Test seq mode', () => {
     const binding2 = {
       data: {
         ethBlock: {
-          block: {
+          rawBlock: JSON.stringify({
             number: '0x2',
             timestamp: '0x65ed3b46'
-          }
+          })
         }
       },
       handlerType: HandlerType.ETH_BLOCK,
@@ -66,10 +66,10 @@ describe('Test seq mode', () => {
       data: {
         raw: new Uint8Array(),
         ethBlock: {
-          block: {
+          rawBlock: JSON.stringify({
             number: '0x1',
             timestamp: '0x65ed3c46'
-          }
+          })
         },
         chainId: '1'
       },

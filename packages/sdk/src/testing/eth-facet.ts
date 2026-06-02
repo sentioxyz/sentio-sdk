@@ -51,7 +51,7 @@ export class EthFacet {
           return {
             data: {
               ethTrace: {
-                trace,
+                rawTrace: JSON.stringify(trace),
                 timestamp: new Date()
               }
             },
@@ -118,7 +118,7 @@ export class EthFacet {
           if (match) {
             return {
               data: {
-                ethLog: { log, timestamp: new Date(), rawLog: JSON.stringify(log) }
+                ethLog: { timestamp: new Date(), rawLog: JSON.stringify(log) }
               },
               handlerIds: [config.handlerId],
               handlerType: HandlerType.ETH_LOG,
@@ -192,7 +192,7 @@ export class EthFacet {
           if (match) {
             return {
               data: {
-                ethLog: { log, timestamp: new Date(), rawLog: JSON.stringify(log) }
+                ethLog: { timestamp: new Date(), rawLog: JSON.stringify(log) }
               },
               handlerIds: [config.handlerId],
               handlerType: HandlerType.ETH_LOG,
@@ -232,7 +232,7 @@ export class EthFacet {
   ): DataBinding {
     const binding: DataBinding = {
       data: {
-        ethBlock: { block }
+        ethBlock: { rawBlock: JSON.stringify(block) }
       },
       handlerType: HandlerType.ETH_BLOCK,
       handlerIds: [],
@@ -284,7 +284,7 @@ export class EthFacet {
   ): DataBinding {
     const binding: DataBinding = {
       data: {
-        ethTransaction: { transaction, timestamp: new Date(), rawTransaction: JSON.stringify(transaction) }
+        ethTransaction: { timestamp: new Date(), rawTransaction: JSON.stringify(transaction) }
       },
       handlerType: HandlerType.ETH_TRANSACTION,
       handlerIds: [],

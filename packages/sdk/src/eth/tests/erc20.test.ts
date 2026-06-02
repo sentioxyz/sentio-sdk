@@ -91,9 +91,8 @@ describe('Test Basic Examples', () => {
       await service.processBinding({
         data: {
           ethTrace: {
-            trace: traceData,
-            transaction: undefined,
-            transactionReceipt: {
+            rawTrace: JSON.stringify(traceData),
+            rawTransactionReceipt: JSON.stringify({
               transactionHash: '0xcb8810a23315b5c2cb836883959bbf982f2158b7d9f7f8f4c5c0a8cf9d90f720',
               gasUsed: '0x4cf12',
               blockHash: '0x74f3c24a0f27a3a6afa8878a2072d62f661b03d04ead2b99c7f6c33acff2e7c2',
@@ -105,7 +104,7 @@ describe('Test Basic Examples', () => {
               blockNumber: '0xb8ba23',
               type: '0x0',
               cumulativeGasUsed: '0x8b56b3'
-            },
+            }),
             timestamp: new Date()
           }
         },

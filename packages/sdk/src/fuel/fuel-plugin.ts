@@ -119,12 +119,7 @@ export class FuelPlugin extends Plugin {
     }
   }
 
-  supportedHandlers = [
-    HandlerType.FUEL_TRANSACTION,
-    HandlerType.FUEL_RECEIPT,
-    HandlerType.FUEL_CALL,
-    HandlerType.FUEL_BLOCK
-  ]
+  supportedHandlers = [HandlerType.FUEL_TRANSACTION, HandlerType.FUEL_RECEIPT, HandlerType.FUEL_BLOCK]
 
   processBinding(request: DataBinding): Promise<ProcessResult> {
     switch (request.handlerType) {
@@ -159,13 +154,6 @@ export class FuelPlugin extends Plugin {
           throw new ServerError(Status.INVALID_ARGUMENT, "fuelBlock can't be empty")
         }
         data = request.data.fuelBlock
-        break
-      case HandlerType.FUEL_CALL:
-        // FUEL_CALL uses the same data as FUEL_TRANSACTION
-        if (!request.data?.fuelTransaction) {
-          throw new ServerError(Status.INVALID_ARGUMENT, "fuelTransaction can't be empty for FUEL_CALL")
-        }
-        data = request.data.fuelTransaction
         break
       default:
         throw new ServerError(Status.INVALID_ARGUMENT, 'No handle type registered ' + request.handlerType)
