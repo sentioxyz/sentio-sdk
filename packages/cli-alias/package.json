@@ -1,6 +1,11 @@
 {
   "name": "sentio-cli",
   "version": "2.0.0-development",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sentioxyz/sentio-sdk.git",
+    "directory": "packages/cli-alias"
+  },
   "type": "module",
   "bin": {
     "sentio": "./index.js"
