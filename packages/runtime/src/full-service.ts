@@ -158,6 +158,12 @@ export class RuntimeServicePatcher {
           }
         }
         break
+      case HandlerType.SOL_INSTRUCTION:
+        const solInstruction = dataBinding.data?.solInstruction
+        if (solInstruction?.parsed == null && solInstruction?.rawParsed) {
+          solInstruction.parsed = getParsedData(solInstruction.rawParsed)
+        }
+        break
       case HandlerType.FUEL_TRANSACTION:
         if (compareSemver(this.sdkVersion, FUEL_PROTO_UPDATE_VERSION) < 0) {
           dataBinding.handlerType = HandlerType.FUEL_CALL

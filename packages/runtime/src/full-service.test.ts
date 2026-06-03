@@ -89,3 +89,53 @@ describe('RuntimeServicePatcher eth raw_* compatibility', () => {
     assert.deepEqual(binding.data?.ethTrace?.trace, trace)
   })
 })
+
+// Verifies the back-compat path for the SolInstruction structpb -> raw_parsed
+// migration: once a new driver stops sending the deprecated structpb `parsed`
+// field and only sends `raw_parsed`, the patcher must reconstruct the structpb
+// view from the raw JSON so existing instruction handlers keep working.
+describe('RuntimeServicePatcher solana raw_* compatibility', () => {
+  const patcher = new RuntimeServicePatcher()
+
+  test('SOL_INSTRUCTION: reconstructs parsed from rawParsed', () => {
+    const parsed = { type: 'transfer', info: { lamports: 1 } }
+    const binding: DataBinding = {
+      data: {
+        solInstruction: {
+          instructionData: '',
+          slot: BigInt(0),
+          programAccountId: 'prog',
+          accounts: [],
+          parsed: undefined,
+          rawParsed: JSON.stringify(parsed)
+        }
+      },
+      handlerType: HandlerType.SOL_INSTRUCTION,
+      handlerIds: [0],
+      chainId: 'sol-mainnet'
+    }
+    patcher.adjustDataBinding(binding)
+    assert.deepEqual(binding.data?.solInstruction?.parsed, parsed)
+  })
+
+  test('SOL_INSTRUCTION: leaves an already-populated parsed untouched', () => {
+    const parsed = { type: 'transfer' }
+    const binding: DataBinding = {
+      data: {
+        solInstruction: {
+          instructionData: '',
+          slot: BigInt(0),
+          programAccountId: 'prog',
+          accounts: [],
+          parsed,
+          rawParsed: JSON.stringify({ type: 'bad' })
+        }
+      },
+      handlerType: HandlerType.SOL_INSTRUCTION,
+      handlerIds: [0],
+      chainId: 'sol-mainnet'
+    }
+    patcher.adjustDataBinding(binding)
+    assert.deepEqual(binding.data?.solInstruction?.parsed, parsed)
+  })
+})

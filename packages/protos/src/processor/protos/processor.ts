@@ -1263,6 +1263,7 @@ export interface Data_SolInstruction {
   programAccountId: string;
   accounts: string[];
   parsed?: { [key: string]: any } | undefined;
+  rawParsed?: string | undefined;
 }
 
 export interface Data_AptEvent {
@@ -10465,7 +10466,14 @@ export const Data_EthTrace = {
 };
 
 function createBaseData_SolInstruction(): Data_SolInstruction {
-  return { instructionData: "", slot: BigInt("0"), programAccountId: "", accounts: [], parsed: undefined };
+  return {
+    instructionData: "",
+    slot: BigInt("0"),
+    programAccountId: "",
+    accounts: [],
+    parsed: undefined,
+    rawParsed: undefined,
+  };
 }
 
 export const Data_SolInstruction = {
@@ -10487,6 +10495,9 @@ export const Data_SolInstruction = {
     }
     if (message.parsed !== undefined) {
       Struct.encode(Struct.wrap(message.parsed), writer.uint32(34).fork()).ldelim();
+    }
+    if (message.rawParsed !== undefined) {
+      writer.uint32(58).string(message.rawParsed);
     }
     return writer;
   },
@@ -10533,6 +10544,13 @@ export const Data_SolInstruction = {
 
           message.parsed = Struct.unwrap(Struct.decode(reader, reader.uint32()));
           continue;
+        case 7:
+          if (tag !== 58) {
+            break;
+          }
+
+          message.rawParsed = reader.string();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -10549,6 +10567,7 @@ export const Data_SolInstruction = {
       programAccountId: isSet(object.programAccountId) ? globalThis.String(object.programAccountId) : "",
       accounts: globalThis.Array.isArray(object?.accounts) ? object.accounts.map((e: any) => globalThis.String(e)) : [],
       parsed: isObject(object.parsed) ? object.parsed : undefined,
+      rawParsed: isSet(object.rawParsed) ? globalThis.String(object.rawParsed) : undefined,
     };
   },
 
@@ -10569,6 +10588,9 @@ export const Data_SolInstruction = {
     if (message.parsed !== undefined) {
       obj.parsed = message.parsed;
     }
+    if (message.rawParsed !== undefined) {
+      obj.rawParsed = message.rawParsed;
+    }
     return obj;
   },
 
@@ -10582,6 +10604,7 @@ export const Data_SolInstruction = {
     message.programAccountId = object.programAccountId ?? "";
     message.accounts = object.accounts?.map((e) => e) || [];
     message.parsed = object.parsed ?? undefined;
+    message.rawParsed = object.rawParsed ?? undefined;
     return message;
   },
 };
