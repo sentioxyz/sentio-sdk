@@ -1288,6 +1288,7 @@ export interface Data_SolInstruction {
   programAccountId: string;
   accounts: string[];
   parsed?: { [key: string]: any } | undefined;
+  rawParsed?: string | undefined;
   rawTransaction?: string | undefined;
 }
 
@@ -10677,6 +10678,7 @@ function createBaseData_SolInstruction(): Data_SolInstruction {
     programAccountId: "",
     accounts: [],
     parsed: undefined,
+    rawParsed: undefined,
     rawTransaction: undefined,
   };
 }
@@ -10700,6 +10702,9 @@ export const Data_SolInstruction = {
     }
     if (message.parsed !== undefined) {
       Struct.encode(Struct.wrap(message.parsed), writer.uint32(34).fork()).ldelim();
+    }
+    if (message.rawParsed !== undefined) {
+      writer.uint32(58).string(message.rawParsed);
     }
     if (message.rawTransaction !== undefined) {
       writer.uint32(50).string(message.rawTransaction);
@@ -10749,6 +10754,13 @@ export const Data_SolInstruction = {
 
           message.parsed = Struct.unwrap(Struct.decode(reader, reader.uint32()));
           continue;
+        case 7:
+          if (tag !== 58) {
+            break;
+          }
+
+          message.rawParsed = reader.string();
+          continue;
         case 6:
           if (tag !== 50) {
             break;
@@ -10772,6 +10784,7 @@ export const Data_SolInstruction = {
       programAccountId: isSet(object.programAccountId) ? globalThis.String(object.programAccountId) : "",
       accounts: globalThis.Array.isArray(object?.accounts) ? object.accounts.map((e: any) => globalThis.String(e)) : [],
       parsed: isObject(object.parsed) ? object.parsed : undefined,
+      rawParsed: isSet(object.rawParsed) ? globalThis.String(object.rawParsed) : undefined,
       rawTransaction: isSet(object.rawTransaction) ? globalThis.String(object.rawTransaction) : undefined,
     };
   },
@@ -10793,6 +10806,9 @@ export const Data_SolInstruction = {
     if (message.parsed !== undefined) {
       obj.parsed = message.parsed;
     }
+    if (message.rawParsed !== undefined) {
+      obj.rawParsed = message.rawParsed;
+    }
     if (message.rawTransaction !== undefined) {
       obj.rawTransaction = message.rawTransaction;
     }
@@ -10809,6 +10825,7 @@ export const Data_SolInstruction = {
     message.programAccountId = object.programAccountId ?? "";
     message.accounts = object.accounts?.map((e) => e) || [];
     message.parsed = object.parsed ?? undefined;
+    message.rawParsed = object.rawParsed ?? undefined;
     message.rawTransaction = object.rawTransaction ?? undefined;
     return message;
   },
