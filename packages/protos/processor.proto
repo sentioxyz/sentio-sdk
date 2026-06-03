@@ -733,7 +733,8 @@ message Data {
     uint64 slot = 2;
     string program_account_id = 3;
     repeated string accounts = 5;
-    optional google.protobuf.Struct parsed = 4;
+    optional google.protobuf.Struct parsed = 4; // deprecated
+    optional string raw_parsed = 7;
     optional string raw_transaction = 6;
   }
   message SolBlock {
