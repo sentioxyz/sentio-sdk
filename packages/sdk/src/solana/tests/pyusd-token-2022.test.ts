@@ -28,7 +28,7 @@ describe('Test SPL Token 2022 Example', () => {
         instructionData: '',
         slot: 100n,
         programAccountId: SPL_TOKEN_2022_PROGRAM_ID,
-        parsed: {
+        rawParsed: JSON.stringify({
           type: 'mintTo',
           info: {
             account: '2SDN4vEJdCdW3pGyhx2km9gB3LeHzMGLrG2j4uVNZfrx',
@@ -36,7 +36,7 @@ describe('Test SPL Token 2022 Example', () => {
             mint: PYUSD_MINT,
             mintAuthority: 'BCD75RNBHrJJpW4dXVagL5mPjzRLnVZq4YirJdjEYMV7'
           }
-        },
+        }),
         accounts: []
       }
     ]
@@ -52,7 +52,7 @@ describe('Test SPL Token 2022 Example', () => {
         instructionData: '',
         slot: 101n,
         programAccountId: SPL_TOKEN_2022_PROGRAM_ID,
-        parsed: {
+        rawParsed: JSON.stringify({
           type: 'transferChecked',
           info: {
             source: '11111111111111111111111111111111',
@@ -65,7 +65,7 @@ describe('Test SPL Token 2022 Example', () => {
               uiAmountString: '2.0'
             }
           }
-        },
+        }),
         accounts: []
       }
     ]
@@ -81,7 +81,7 @@ describe('Test SPL Token 2022 Example', () => {
         instructionData: '',
         slot: 102n,
         programAccountId: SPL_TOKEN_2022_PROGRAM_ID,
-        parsed: {
+        rawParsed: JSON.stringify({
           type: 'mintTo',
           info: {
             account: '2SDN4vEJdCdW3pGyhx2km9gB3LeHzMGLrG2j4uVNZfrx',
@@ -89,7 +89,7 @@ describe('Test SPL Token 2022 Example', () => {
             mint: OTHER_MINT,
             mintAuthority: 'BCD75RNBHrJJpW4dXVagL5mPjzRLnVZq4YirJdjEYMV7'
           }
-        },
+        }),
         accounts: []
       }
     ]

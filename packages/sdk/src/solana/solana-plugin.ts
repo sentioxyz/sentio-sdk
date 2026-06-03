@@ -103,8 +103,10 @@ export class SolanaPlugin extends Plugin {
         let parsedInstruction: SolInstruction | null = null
 
         try {
-          if (instruction.parsed) {
-            parsedInstruction = processor.getParsedInstruction(instruction.parsed as { type: string; info: any })
+          if (instruction.rawParsed) {
+            parsedInstruction = processor.getParsedInstruction(
+              JSON.parse(instruction.rawParsed) as { type: string; info: any }
+            )
           } else if (instruction.instructionData) {
             parsedInstruction = processor.getParsedInstruction(instruction.instructionData)
           }
