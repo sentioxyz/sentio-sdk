@@ -1,7 +1,8 @@
 import { describe, test } from 'node:test'
 import assert from 'node:assert'
 import { RuntimeServicePatcher } from './full-service.js'
-import { DataBinding, HandlerType } from './gen/processor/protos/processor.js'
+import { DataBinding, HandlerType, ProcessConfigResponse } from './gen/processor/protos/processor.js'
+import { DeepPartial } from '@sentio/protos'
 
 // Verifies the back-compat path for the EthBlock/EthTrace structpb -> raw_*
 // migration: once a new driver stops sending the deprecated structpb `block` /
@@ -137,5 +138,40 @@ describe('RuntimeServicePatcher solana raw_* compatibility', () => {
     }
     patcher.adjustDataBinding(binding)
     assert.deepEqual(binding.data?.solInstruction?.parsed, parsed)
+  })
+})
+
+// Verifies the config-direction back-compat for move resource/object change handlers:
+// SDKs before the plural `types` field (< 3.4.1) only set the deprecated singular
+// `type`. The latest driver reads `types` only, so patchConfig must back-fill it.
+describe('RuntimeServicePatcher move resource change type -> types compatibility', () => {
+  const patcher = new RuntimeServicePatcher()
+
+  test('contractConfigs: back-fills types from the deprecated singular type', () => {
+    const config: DeepPartial<ProcessConfigResponse> = {
+      contractConfigs: [{ moveResourceChangeConfigs: [{ type: '0x2::coin::Coin', handlerId: 0, handlerName: 'h' }] }]
+    }
+    patcher.patchConfig(config)
+    assert.deepEqual(config.contractConfigs?.[0]?.moveResourceChangeConfigs?.[0]?.types, ['0x2::coin::Coin'])
+  })
+
+  test('accountConfigs: back-fills types from the deprecated singular type', () => {
+    const config: DeepPartial<ProcessConfigResponse> = {
+      accountConfigs: [
+        { moveResourceChangeConfigs: [{ type: '0x1::aptos_coin::AptosCoin', handlerId: 0, handlerName: 'h' }] }
+      ]
+    }
+    patcher.patchConfig(config)
+    assert.deepEqual(config.accountConfigs?.[0]?.moveResourceChangeConfigs?.[0]?.types, ['0x1::aptos_coin::AptosCoin'])
+  })
+
+  test('leaves already-populated types untouched', () => {
+    const config: DeepPartial<ProcessConfigResponse> = {
+      contractConfigs: [
+        { moveResourceChangeConfigs: [{ type: 'old', types: ['new'], handlerId: 0, handlerName: 'h' }] }
+      ]
+    }
+    patcher.patchConfig(config)
+    assert.deepEqual(config.contractConfigs?.[0]?.moveResourceChangeConfigs?.[0]?.types, ['new'])
   })
 })
