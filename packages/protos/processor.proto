@@ -459,6 +459,7 @@ message MoveCallHandlerConfig {
 
 message MoveResourceChangeConfig {
   string type = 1;
+  repeated string types = 5;
   bool include_deleted = 4;
   int32 handler_id = 2;
   string handler_name = 3;

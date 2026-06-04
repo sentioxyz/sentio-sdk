@@ -54,6 +54,9 @@ describe('Test Iota Example', () => {
     expect(config.accountConfigs[1].moveResourceChangeConfigs[0].type).eq(
       dynamic_field.Field.type(BUILTIN_TYPES.U64_TYPE, validator.ValidatorV1.type()).getSignature()
     )
+    expect(config.accountConfigs[1].moveResourceChangeConfigs[0].types).deep.eq([
+      dynamic_field.Field.type(BUILTIN_TYPES.U64_TYPE, validator.ValidatorV1.type()).getSignature()
+    ])
   })
 
   test('Check event dispatch', async () => {

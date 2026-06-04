@@ -149,6 +149,7 @@ export class AptosPlugin extends Plugin {
           handlerId: handlerId,
           handlerName: handler.handlerName,
           type: handler.type,
+          types: [handler.type],
           includeDeleted: false
         })
       }
@@ -213,6 +214,7 @@ export class AptosPlugin extends Plugin {
             handlerId,
             handlerName: handler.handlerName,
             type: handler.type,
+            types: [handler.type],
             includeDeleted: false
           })
         }
