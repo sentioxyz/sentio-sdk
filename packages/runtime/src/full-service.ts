@@ -265,6 +265,17 @@ export class RuntimeServicePatcher {
   patchConfig(config: DeepPartial<ProcessConfigResponse>): void {
     config.executionConfig = ExecutionConfig.fromPartial(GLOBAL_CONFIG.execution)
 
+    // Move resource/object change handlers before the plural `types` field (SDK < 3.4.1)
+    // only set the deprecated singular `type`. The latest driver reads `types` only, so
+    // back-fill it here. Resource change configs live under both contract and account configs.
+    for (const cfg of [...(config.contractConfigs ?? []), ...(config.accountConfigs ?? [])]) {
+      for (const rc of cfg.moveResourceChangeConfigs ?? []) {
+        if (!rc.types?.length && rc.type) {
+          rc.types = [rc.type]
+        }
+      }
+    }
+
     if (config.contractConfigs) {
       for (const contract of config.contractConfigs) {
         // for old fuel processor
