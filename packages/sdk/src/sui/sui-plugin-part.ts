@@ -129,6 +129,7 @@ export class SuiPluginPart {
         const handlerId = this.handlerRegister.register(handler.handler, chainId)
         const objectChangeHandler: MoveResourceChangeConfig = {
           type: handler.type,
+          types: [handler.type],
           handlerId,
           handlerName: handler.handlerName,
           includeDeleted: false
@@ -154,6 +155,7 @@ export class SuiPluginPart {
         const handlerId = this.handlerRegister.register(handler.handler, chainId)
         const objectChangeHandler: MoveResourceChangeConfig = {
           type: handler.type,
+          types: [handler.type],
           handlerId,
           handlerName: handler.handlerName,
           includeDeleted: false
