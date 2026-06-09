@@ -26,6 +26,7 @@
     "test": "tsx --test 'src/**/*.test.ts'"
   },
   "dependencies": {
+    "@bufbuild/protobuf": "^2.12.0",
     "@sentio/protos": "workspace:*",
     "@sentio/runtime": "workspace:^",
     "fastify": "^5.1.0"

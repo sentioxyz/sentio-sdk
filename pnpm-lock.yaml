@@ -180,6 +180,9 @@ importers:
 
   packages/action:
     dependencies:
+      '@bufbuild/protobuf':
+        specifier: ^2.12.0
+        version: 2.12.0
       '@sentio/protos':
         specifier: workspace:*
         version: link:../protos
