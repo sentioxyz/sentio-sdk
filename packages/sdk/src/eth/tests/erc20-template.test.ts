@@ -118,7 +118,12 @@ describe('Test Template handlerFactory', () => {
     factoryCallCount = 0
     factoryReceivedLabels = undefined
     cleanTest()
-    await service.start(create(StartRequestSchema, { templateInstances }))
+    // The loader (run during start) registers the template and populates
+    // `templateInstances`. With protobuf-es value semantics the StartRequest
+    // copies its array eagerly, so instantiate the now-populated instances via
+    // updateTemplates after the loader has run.
+    await service.start()
+    await PluginManager.INSTANCE.updateTemplates(create(UpdateTemplatesRequestSchema, { templateInstances }))
   })
 
   test('handlerFactory is called on template instantiation', () => {
@@ -147,7 +152,7 @@ describe('Test Template handlerFactory', () => {
   })
 
   test('same address with same labels is deduplicated', async () => {
-    await service.start(create(StartRequestSchema, { templateInstances }))
+    await PluginManager.INSTANCE.updateTemplates(create(UpdateTemplatesRequestSchema, { templateInstances }))
     expect(factoryCallCount).equals(1)
   })
 

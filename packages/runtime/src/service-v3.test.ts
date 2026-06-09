@@ -79,17 +79,12 @@ describe('Test Service V3 with worker without partition', () => {
       if (resp.value?.case === 'dbRequest') {
         const dbRequest = resp.value.value
         assert.ok(dbRequest, 'db request should be present in the response')
-        assert.deepEqual(
-          dbRequest,
-          {
-            get: {
-              entity: 'Test',
-              id: '1'
-            },
-            opId: 0n
-          },
-          'DB request should match expected value'
-        )
+        assert.strictEqual(dbRequest.opId, 0n, 'opId should match')
+        assert.strictEqual(dbRequest.op?.case, 'get', 'op should be a get request')
+        if (dbRequest.op?.case === 'get') {
+          assert.strictEqual(dbRequest.op.value.entity, 'Test', 'entity should match')
+          assert.strictEqual(dbRequest.op.value.id, '1', 'id should match')
+        }
         service.handleRequest(request2, undefined, subject)
       }
       if (resp.value?.case === 'tplRequest') {

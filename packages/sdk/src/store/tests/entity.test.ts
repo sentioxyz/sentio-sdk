@@ -148,7 +148,9 @@ describe('entity tests', () => {
     assert.deepEqual(t.bigDecimalValue, new BigDecimal('123.456'))
     assert.equal(t.stringValue, 'test')
     assert.equal(t.bigIntValue, 1000n)
-    assert.equal(t.dateValue, now)
+    // dateValue round-trips through a protobuf-es Timestamp, so it is a distinct
+    // Date object with the same value — compare by value, not reference.
+    assert.deepEqual(t.dateValue, now)
     assert.equal(t.floatValue, 0.1)
     assert.equal(t.booleanValue, true)
     assert.deepEqual(t.arrayInt, [1, 2, 3])

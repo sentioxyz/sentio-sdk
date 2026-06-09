@@ -103,7 +103,9 @@ export class IotaFacet {
           case: 'suiCall',
           value: {
             rawTransaction: JSON.stringify(transaction),
-            timestamp: transaction.timestampMs ? timestampFromDate(new Date(transaction.timestampMs)) : timestampNow(),
+            timestamp: transaction.timestampMs
+              ? timestampFromDate(new Date(Number(transaction.timestampMs)))
+              : timestampNow(),
             slot: BigInt(transaction.checkpoint || 0)
           }
         }
@@ -137,7 +139,7 @@ export class IotaFacet {
                     value: {
                       rawEvent: JSON.stringify(event),
                       rawTransaction: JSON.stringify(transaction),
-                      timestamp: timestampFromDate(new Date(transaction.timestampMs || 0)),
+                      timestamp: timestampFromDate(new Date(Number(transaction.timestampMs || 0))),
                       slot: 10000n
                     }
                   }
