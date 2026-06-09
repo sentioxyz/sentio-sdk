@@ -8,16 +8,9 @@
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
 import type { CallContext, CallOptions } from "nice-grpc-common";
 import { Empty } from "../../google/protobuf/empty.js";
-import { ListValue, Struct } from "../../google/protobuf/struct.js";
+import { Struct } from "../../google/protobuf/struct.js";
 import { Timestamp } from "../../google/protobuf/timestamp.js";
-import {
-  BigInteger,
-  CoinID,
-  RichStruct,
-  RichStructList,
-  RichValue,
-  RichValueList,
-} from "../../service/common/protos/common.js";
+import { BigInteger, CoinID, RichStruct, RichValue, RichValueList } from "../../service/common/protos/common.js";
 
 export enum MetricType {
   UNKNOWN_TYPE = 0,
@@ -911,10 +904,7 @@ export interface PreprocessStreamResponse {
 
 export interface DBResponse {
   opId: bigint;
-  data?: { [key: string]: any } | undefined;
-  list?: Array<any> | undefined;
   error?: string | undefined;
-  entities?: RichStructList | undefined;
   entityList?: EntityList | undefined;
   nextCursor?: string | undefined;
 }
@@ -8112,15 +8102,7 @@ export const PreprocessStreamResponse: MessageFns<PreprocessStreamResponse> = {
 };
 
 function createBaseDBResponse(): DBResponse {
-  return {
-    opId: 0n,
-    data: undefined,
-    list: undefined,
-    error: undefined,
-    entities: undefined,
-    entityList: undefined,
-    nextCursor: undefined,
-  };
+  return { opId: 0n, error: undefined, entityList: undefined, nextCursor: undefined };
 }
 
 export const DBResponse: MessageFns<DBResponse> = {
@@ -8131,17 +8113,8 @@ export const DBResponse: MessageFns<DBResponse> = {
       }
       writer.uint32(8).uint64(message.opId);
     }
-    if (message.data !== undefined) {
-      Struct.encode(Struct.wrap(message.data), writer.uint32(18).fork()).join();
-    }
-    if (message.list !== undefined) {
-      ListValue.encode(ListValue.wrap(message.list), writer.uint32(34).fork()).join();
-    }
     if (message.error !== undefined) {
       writer.uint32(26).string(message.error);
-    }
-    if (message.entities !== undefined) {
-      RichStructList.encode(message.entities, writer.uint32(50).fork()).join();
     }
     if (message.entityList !== undefined) {
       EntityList.encode(message.entityList, writer.uint32(58).fork()).join();
@@ -8167,36 +8140,12 @@ export const DBResponse: MessageFns<DBResponse> = {
           message.opId = reader.uint64() as bigint;
           continue;
         }
-        case 2: {
-          if (tag !== 18) {
-            break;
-          }
-
-          message.data = Struct.unwrap(Struct.decode(reader, reader.uint32()));
-          continue;
-        }
-        case 4: {
-          if (tag !== 34) {
-            break;
-          }
-
-          message.list = ListValue.unwrap(ListValue.decode(reader, reader.uint32()));
-          continue;
-        }
         case 3: {
           if (tag !== 26) {
             break;
           }
 
           message.error = reader.string();
-          continue;
-        }
-        case 6: {
-          if (tag !== 50) {
-            break;
-          }
-
-          message.entities = RichStructList.decode(reader, reader.uint32());
           continue;
         }
         case 7: {
@@ -8227,10 +8176,7 @@ export const DBResponse: MessageFns<DBResponse> = {
   fromJSON(object: any): DBResponse {
     return {
       opId: isSet(object.opId) ? BigInt(object.opId) : isSet(object.op_id) ? BigInt(object.op_id) : 0n,
-      data: isObject(object.data) ? object.data : undefined,
-      list: globalThis.Array.isArray(object.list) ? [...object.list] : undefined,
       error: isSet(object.error) ? globalThis.String(object.error) : undefined,
-      entities: isSet(object.entities) ? RichStructList.fromJSON(object.entities) : undefined,
       entityList: isSet(object.entityList)
         ? EntityList.fromJSON(object.entityList)
         : isSet(object.entity_list)
@@ -8249,17 +8195,8 @@ export const DBResponse: MessageFns<DBResponse> = {
     if (message.opId !== 0n) {
       obj.opId = message.opId.toString();
     }
-    if (message.data !== undefined) {
-      obj.data = message.data;
-    }
-    if (message.list !== undefined) {
-      obj.list = message.list;
-    }
     if (message.error !== undefined) {
       obj.error = message.error;
-    }
-    if (message.entities !== undefined) {
-      obj.entities = RichStructList.toJSON(message.entities);
     }
     if (message.entityList !== undefined) {
       obj.entityList = EntityList.toJSON(message.entityList);
@@ -8276,12 +8213,7 @@ export const DBResponse: MessageFns<DBResponse> = {
   fromPartial(object: DeepPartial<DBResponse>): DBResponse {
     const message = createBaseDBResponse();
     message.opId = object.opId ?? 0n;
-    message.data = object.data ?? undefined;
-    message.list = object.list ?? undefined;
     message.error = object.error ?? undefined;
-    message.entities = (object.entities !== undefined && object.entities !== null)
-      ? RichStructList.fromPartial(object.entities)
-      : undefined;
     message.entityList = (object.entityList !== undefined && object.entityList !== null)
       ? EntityList.fromPartial(object.entityList)
       : undefined;

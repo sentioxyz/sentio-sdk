@@ -534,10 +534,7 @@ message PreprocessStreamResponse {
 message DBResponse {
   uint64 op_id = 1;
   oneof value {
-    google.protobuf.Struct data = 2; // @deprecate
-    google.protobuf.ListValue list = 4; // @deprecate
     string error = 3;
-    common.RichStructList entities = 6; // @deprecate
     EntityList entity_list = 7;
   }
   optional string next_cursor = 5;
