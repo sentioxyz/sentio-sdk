@@ -1,5 +1,6 @@
 import { UserTransactionResponse, EntryFunctionPayloadResponse } from '@aptos-labs/ts-sdk'
-import { DataBinding, HandlerType } from '@sentio/protos'
+import { type DataBinding, DataBindingSchema, HandlerType } from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
 import { TestProcessorServer } from './test-processor-server.js'
 import { AptosNetwork } from '../aptos/index.js'
 import { parseMoveType, accountTypeString } from '../move/index.js'
@@ -40,16 +41,19 @@ export class AptosFacet {
       for (const callConfig of config.moveCallConfigs) {
         for (const callFilter of callConfig.filters) {
           if (accountTypeString(config.contract.address) + '::' + callFilter.function === payload.function) {
-            return {
+            return create(DataBindingSchema, {
               data: {
-                aptCall: {
-                  rawTransaction: JSON.stringify(transaction)
+                value: {
+                  case: 'aptCall',
+                  value: {
+                    rawTransaction: JSON.stringify(transaction)
+                  }
                 }
               },
               handlerIds: [callConfig.handlerId],
               handlerType: HandlerType.APT_CALL,
               chainId: network
-            }
+            })
           }
         }
       }
@@ -81,18 +85,21 @@ export class AptosFacet {
               accountTypeString(config.contract.address) + '::' + eventFilter.type ===
               parseMoveType(event.type).qname
             ) {
-              return {
+              return create(DataBindingSchema, {
                 data: {
-                  aptEvent: {
-                    rawEvent: JSON.stringify(event),
-                    eventIndex: idx,
-                    rawTransaction: JSON.stringify(transaction)
+                  value: {
+                    case: 'aptEvent',
+                    value: {
+                      rawEvent: JSON.stringify(event),
+                      eventIndex: idx,
+                      rawTransaction: JSON.stringify(transaction)
+                    }
                   }
                 },
                 handlerIds: [eventConfig.handlerId],
                 handlerType: HandlerType.APT_EVENT,
                 chainId: network
-              }
+              })
             }
           }
         }

@@ -1,13 +1,18 @@
 import {
-  Data_SuiCall,
-  Data_SuiObject,
-  Data_SuiObjectChange,
-  HandleInterval,
-  MoveAccountFetchConfig,
-  MoveFetchConfig,
+  type Data_SuiCall,
+  type Data_SuiObject,
+  type Data_SuiObjectChange,
+  type HandleInterval,
+  HandleIntervalSchema,
+  type MoveAccountFetchConfig,
+  MoveAccountFetchConfigSchema,
+  type MoveFetchConfig,
+  MoveFetchConfigSchema,
   MoveOwnerType,
-  ProcessResult
+  type ProcessResult,
+  timestampDate
 } from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
 import { ListStateStorage } from '@sentio/runtime'
 import { SuiNetwork } from './network.js'
 import { SuiAddressContext, SuiContext, SuiObjectChangeContext, SuiObjectContext } from './context.js'
@@ -17,7 +22,7 @@ import type { SuiMoveObjectInput } from '@typemove/sui'
 import { ALL_ADDRESS, PromiseOrVoid } from '../core/index.js'
 import { configure, DEFAULT_FETCH_CONFIG, IndexConfigure, SuiBindOptions } from './sui-processor.js'
 import { CallHandler, TransactionFilter, accountTypeString, ObjectChangeHandler } from '../move/index.js'
-import { ServerError, Status } from 'nice-grpc'
+import { ConnectError, Code } from '@connectrpc/connect'
 import { TypeDescriptor } from '@typemove/move'
 import { TypedSuiMoveObject } from './models.js'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
@@ -47,9 +52,9 @@ interface ObjectHandler {
   handlerName: string
 }
 
-export const DEFAULT_ACCOUNT_FETCH_CONFIG: MoveAccountFetchConfig = {
+export const DEFAULT_ACCOUNT_FETCH_CONFIG: MoveAccountFetchConfig = create(MoveAccountFetchConfigSchema, {
   owned: false
-}
+})
 
 export class SuiAccountProcessorState extends ListStateStorage<SuiBaseObjectOrAddressProcessor<any>> {
   static INSTANCE = new SuiAccountProcessorState()
@@ -114,7 +119,7 @@ export abstract class SuiBaseObjectOrAddressProcessor<HandlerType> {
           data.objectId,
           data.objectVersion,
           data.slot,
-          data.timestamp || new Date(0),
+          data.timestamp ? timestampDate(data.timestamp) : new Date(0),
           processor.config.baseLabels
         )
         await processor.doHandle(handler, data, ctx)
@@ -141,10 +146,10 @@ abstract class SuiBaseObjectOrAddressProcessorInternal<
   ): this {
     return this.onInterval(
       handler,
-      {
+      create(HandleIntervalSchema, {
         recentInterval: timeIntervalInMinutes,
         backfillInterval: backfillTimeIntervalInMinutes
-      },
+      }),
       undefined,
       type,
       fetchConfig
@@ -161,7 +166,10 @@ abstract class SuiBaseObjectOrAddressProcessorInternal<
     return this.onInterval(
       handler,
       undefined,
-      { recentInterval: checkpointInterval, backfillInterval: backfillCheckpointInterval },
+      create(HandleIntervalSchema, {
+        recentInterval: checkpointInterval,
+        backfillInterval: backfillCheckpointInterval
+      }),
       type,
       fetchConfig
     )
@@ -190,7 +198,7 @@ export class SuiAddressProcessor extends SuiBaseObjectOrAddressProcessorInternal
     filter?: TransactionFilter,
     fetchConfig?: Partial<MoveFetchConfig>
   ) {
-    const _fetchConfig = MoveFetchConfig.fromPartial({ ...DEFAULT_FETCH_CONFIG, ...fetchConfig })
+    const _fetchConfig = create(MoveFetchConfigSchema, { ...DEFAULT_FETCH_CONFIG, ...fetchConfig })
     const _filter: TransactionFilter = {
       fromAndToAddress: {
         from: '',
@@ -205,7 +213,7 @@ export class SuiAddressProcessor extends SuiBaseObjectOrAddressProcessorInternal
       handlerName: getHandlerName(),
       handler: async function (data) {
         if (!data.rawTransaction) {
-          throw new ServerError(Status.INVALID_ARGUMENT, 'transaction is null')
+          throw new ConnectError('transaction is null', Code.InvalidArgument)
         }
         const tx = JSON.parse(data.rawTransaction) as GrpcTypes.ExecutedTransaction
 
@@ -213,7 +221,7 @@ export class SuiAddressProcessor extends SuiBaseObjectOrAddressProcessorInternal
           'object',
           processor.config.network,
           processor.config.address,
-          data.timestamp || new Date(0),
+          data.timestamp ? timestampDate(data.timestamp) : new Date(0),
           data.slot,
           tx,
           0,
@@ -305,7 +313,7 @@ export class SuiObjectTypeProcessor<T> extends SuiBaseObjectOrAddressProcessor<
 
   public onObjectChange(handler: (changes: SuiObjectChange[], ctx: SuiObjectChangeContext) => PromiseOrVoid): this {
     if (this.config.network === SuiNetwork.TEST_NET) {
-      throw new ServerError(Status.INVALID_ARGUMENT, 'object change not supported in testnet')
+      throw new ConnectError('object change not supported in testnet', Code.InvalidArgument)
     }
     const processor = this
     this.objectChangeHandlers.push({
@@ -314,7 +322,7 @@ export class SuiObjectTypeProcessor<T> extends SuiBaseObjectOrAddressProcessor<
         const ctx = new SuiObjectChangeContext(
           processor.config.network,
           processor.config.address,
-          data.timestamp || new Date(0),
+          data.timestamp ? timestampDate(data.timestamp) : new Date(0),
           data.slot,
           data.txDigest,
           processor.config.baseLabels
@@ -340,10 +348,10 @@ export class SuiObjectTypeProcessor<T> extends SuiBaseObjectOrAddressProcessor<
   ): this {
     return this.onInterval(
       handler,
-      {
+      create(HandleIntervalSchema, {
         recentInterval: timeIntervalInMinutes,
         backfillInterval: backfillTimeIntervalInMinutes
-      },
+      }),
       undefined,
       this.objectType.getSignature(),
       fetchConfig
@@ -363,7 +371,10 @@ export class SuiObjectTypeProcessor<T> extends SuiBaseObjectOrAddressProcessor<
     return this.onInterval(
       handler,
       undefined,
-      { recentInterval: checkpointInterval, backfillInterval: backfillCheckpointInterval },
+      create(HandleIntervalSchema, {
+        recentInterval: checkpointInterval,
+        backfillInterval: backfillCheckpointInterval
+      }),
       this.objectType.qname,
       fetchConfig
     )

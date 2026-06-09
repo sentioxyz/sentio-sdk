@@ -9,22 +9,28 @@ import {
 } from '@sentio/runtime'
 import { PartitionHandlerManager } from '../core/index.js'
 import {
-  AccountConfig,
-  ContractConfig,
+  AccountConfigSchema,
+  ContractConfigSchema,
   DataBinding,
   HandlerType,
   InitResponse,
-  LogFilter,
-  LogHandlerConfig,
+  LogFilterSchema,
+  LogHandlerConfigSchema,
+  OnIntervalConfigSchema,
   PreparedData,
   PreprocessResult,
+  PreprocessResultSchema,
   ProcessConfigResponse,
   ProcessResult,
   ProcessStreamResponse_Partitions,
-  StartRequest
+  ProcessStreamResponse_PartitionsSchema,
+  StartRequest,
+  TopicSchema,
+  TraceHandlerConfigSchema,
+  TransactionHandlerConfigSchema
 } from '@sentio/protos'
-
-import { ServerError, Status } from 'nice-grpc'
+import { create } from '@bufbuild/protobuf'
+import { ConnectError, Code } from '@connectrpc/connect'
 import { EthProcessorState } from './binds.js'
 import { AccountProcessorState } from './account-processor-state.js'
 import { ProcessorTemplateProcessorState } from './base-processor-template.js'
@@ -65,7 +71,7 @@ export class EthPlugin extends Plugin {
       const startBlock = await timeOrBlockToBlockNumber(provider, processor.config.start)
       const endBlock = processor.config.end ? await timeOrBlockToBlockNumber(provider, processor.config.end) : undefined
 
-      const contractConfig = ContractConfig.fromPartial({
+      const contractConfig = create(ContractConfigSchema, {
         processorType: USER_PROCESSOR,
         contract: {
           name: processor.config.name,
@@ -84,15 +90,17 @@ export class EthPlugin extends Plugin {
         this.partitionManager.registerPartitionHandler(HandlerType.ETH_BLOCK, handlerId, blockHandler.partitionHandler)
         // TODO wrap the block handler into one
 
-        contractConfig.intervalConfigs.push({
-          slot: 0,
-          slotInterval: blockHandler.blockInterval,
-          minutes: 0,
-          minutesInterval: blockHandler.timeIntervalInMinutes,
-          handlerId: handlerId,
-          handlerName: blockHandler.handlerName,
-          fetchConfig: blockHandler.fetchConfig
-        })
+        contractConfig.intervalConfigs.push(
+          create(OnIntervalConfigSchema, {
+            slot: 0,
+            slotInterval: blockHandler.blockInterval,
+            minutes: 0,
+            minutesInterval: blockHandler.timeIntervalInMinutes,
+            handlerId: handlerId,
+            handlerName: blockHandler.handlerName,
+            fetchConfig: blockHandler.fetchConfig
+          })
+        )
       }
 
       // Step 2. Prepare all trace handlers
@@ -101,12 +109,14 @@ export class EthPlugin extends Plugin {
 
         this.partitionManager.registerPartitionHandler(HandlerType.ETH_TRACE, handlerId, traceHandler.partitionHandler)
         for (const signature of traceHandler.signatures) {
-          contractConfig.traceConfigs.push({
-            signature: signature,
-            handlerId: handlerId,
-            handlerName: traceHandler.handlerName,
-            fetchConfig: traceHandler.fetchConfig
-          })
+          contractConfig.traceConfigs.push(
+            create(TraceHandlerConfigSchema, {
+              signature: signature,
+              handlerId: handlerId,
+              handlerName: traceHandler.handlerName,
+              fetchConfig: traceHandler.fetchConfig
+            })
+          )
         }
       }
 
@@ -115,24 +125,25 @@ export class EthPlugin extends Plugin {
         // associate id with filter
         const handlerId = this.handlerRegister.register(eventsHandler.handler, chainId)
         this.partitionManager.registerPartitionHandler(HandlerType.ETH_LOG, handlerId, eventsHandler.partitionHandler)
-        const logConfig: LogHandlerConfig = {
+        const logConfig = create(LogHandlerConfigSchema, {
           handlerId: handlerId,
           handlerName: eventsHandler.handlerName,
           filters: [],
           fetchConfig: eventsHandler.fetchConfig
-        }
+        })
 
         for (const filter of eventsHandler.filters) {
           const topics = await filter.getTopicFilter()
 
           // if (!filter.topics) {
-          //   throw new ServerError(Status.INVALID_ARGUMENT, 'Topic should not be null')
+          //   throw new ConnectError('Topic should not be null', Code.InvalidArgument)
           // }
-          const logFilter: LogFilter = {
-            addressType: undefined,
-            address: contractConfig.contract?.address && validateAndNormalizeAddress(contractConfig.contract.address),
+          const logFilter = create(LogFilterSchema, {
+            addressOrType: contractConfig.contract?.address
+              ? { case: 'address', value: validateAndNormalizeAddress(contractConfig.contract.address) }
+              : undefined,
             topics: []
-          }
+          })
 
           for (const ts of topics) {
             let hashes: string[] = []
@@ -141,7 +152,7 @@ export class EthPlugin extends Plugin {
             } else if (ts) {
               hashes.push(ts)
             }
-            logFilter.topics.push({ hashes: hashes })
+            logFilter.topics.push(create(TopicSchema, { hashes: hashes }))
           }
           logConfig.filters.push(logFilter)
         }
@@ -168,7 +179,7 @@ export class EthPlugin extends Plugin {
         endBlock = processor.config.end?.block != undefined ? BigInt(processor.config.end.block) : undefined
       }
 
-      const contractConfig = ContractConfig.fromPartial({
+      const contractConfig = create(ContractConfigSchema, {
         processorType: USER_PROCESSOR,
         contract: {
           name: processor.config.name,
@@ -182,15 +193,17 @@ export class EthPlugin extends Plugin {
 
       for (const blockHandler of processor.blockHandlers) {
         const handlerId = this.handlerRegister.register(blockHandler.handler, chainId)
-        contractConfig.intervalConfigs.push({
-          slot: 0,
-          slotInterval: blockHandler.blockInterval,
-          minutes: 0,
-          minutesInterval: blockHandler.timeIntervalInMinutes,
-          handlerId: handlerId,
-          handlerName: blockHandler.handlerName,
-          fetchConfig: blockHandler.fetchConfig
-        })
+        contractConfig.intervalConfigs.push(
+          create(OnIntervalConfigSchema, {
+            slot: 0,
+            slotInterval: blockHandler.blockInterval,
+            minutes: 0,
+            minutesInterval: blockHandler.timeIntervalInMinutes,
+            handlerId: handlerId,
+            handlerName: blockHandler.handlerName,
+            fetchConfig: blockHandler.fetchConfig
+          })
+        )
       }
 
       for (const transactionHandler of processor.transactionHandler) {
@@ -200,55 +213,65 @@ export class EthPlugin extends Plugin {
           handlerId,
           transactionHandler.partitionHandler
         )
-        contractConfig.transactionConfig.push({
-          handlerId: handlerId,
-          handlerName: transactionHandler.handlerName,
-          fetchConfig: transactionHandler.fetchConfig
-        })
+        contractConfig.transactionConfig.push(
+          create(TransactionHandlerConfigSchema, {
+            handlerId: handlerId,
+            handlerName: transactionHandler.handlerName,
+            fetchConfig: transactionHandler.fetchConfig
+          })
+        )
       }
 
       for (const traceHandler of processor.traceHandlers) {
         const handlerId = this.handlerRegister.register(traceHandler.handler, chainId)
         for (const signature of traceHandler.signatures) {
-          contractConfig.traceConfigs.push({
-            signature: signature,
-            handlerId: handlerId,
-            handlerName: traceHandler.handlerName,
-            fetchConfig: traceHandler.fetchConfig
-          })
+          contractConfig.traceConfigs.push(
+            create(TraceHandlerConfigSchema, {
+              signature: signature,
+              handlerId: handlerId,
+              handlerName: traceHandler.handlerName,
+              fetchConfig: traceHandler.fetchConfig
+            })
+          )
         }
       }
 
       for (const eventsHandler of processor.eventHandlers) {
         // associate id with filter
         const handlerId = this.handlerRegister.register(eventsHandler.handler, processor.getChainId())
-        const logConfig: LogHandlerConfig = {
+        const logConfig = create(LogHandlerConfigSchema, {
           handlerId: handlerId,
           handlerName: eventsHandler.handlerName,
           filters: [],
           fetchConfig: eventsHandler.fetchConfig
-        }
+        })
 
         if (!eventsHandler.filters || eventsHandler.filters.length === 0) {
           // if no filter, then we assume all logs
-          logConfig.filters.push({
-            topics: []
-          })
+          logConfig.filters.push(
+            create(LogFilterSchema, {
+              topics: []
+            })
+          )
         } else {
           for (const filter of eventsHandler.filters) {
             const topics = await filter.getTopicFilter()
             // if (!filter.topics) {
-            //   throw new ServerError(Status.INVALID_ARGUMENT, 'Topic should not be null')
+            //   throw new ConnectError('Topic should not be null', Code.InvalidArgument)
             // }
             let address = undefined
             if (filter.address) {
               address = filter.address.toString()
             }
-            const logFilter: LogFilter = {
-              addressType: filter.addressType,
-              address: address && validateAndNormalizeAddress(address),
+            const logFilter = create(LogFilterSchema, {
+              addressOrType:
+                filter.addressType != undefined
+                  ? { case: 'addressType', value: filter.addressType }
+                  : address
+                    ? { case: 'address', value: validateAndNormalizeAddress(address) }
+                    : undefined,
               topics: []
-            }
+            })
 
             for (const ts of topics) {
               let hashes: string[] = []
@@ -257,7 +280,7 @@ export class EthPlugin extends Plugin {
               } else if (ts) {
                 hashes.push(ts)
               }
-              logFilter.topics.push({ hashes: hashes })
+              logFilter.topics.push(create(TopicSchema, { hashes: hashes }))
             }
             logConfig.filters.push(logFilter)
           }
@@ -273,7 +296,7 @@ export class EthPlugin extends Plugin {
       if (forChainId !== undefined && forChainId !== processor.getChainId().toString()) {
         continue
       }
-      const accountConfig = AccountConfig.fromPartial({
+      const accountConfig = create(AccountConfigSchema, {
         address: validateAndNormalizeAddress(processor.config.address),
         chainId: processor.getChainId().toString(),
         startBlock: processor.config.startBlock ? BigInt(processor.config.startBlock) : 0n
@@ -282,12 +305,12 @@ export class EthPlugin extends Plugin {
       for (const eventsHandler of processor.eventHandlers) {
         // associate id with filter
         const handlerId = this.handlerRegister.register(eventsHandler.handler, processor.getChainId())
-        const logConfig: LogHandlerConfig = {
+        const logConfig = create(LogHandlerConfigSchema, {
           handlerId: handlerId,
           handlerName: eventsHandler.handlerName,
           filters: [],
           fetchConfig: eventsHandler.fetchConfig
-        }
+        })
 
         for (const filter of eventsHandler.filters) {
           const topics = await filter.getTopicFilter()
@@ -296,11 +319,14 @@ export class EthPlugin extends Plugin {
           if (filter.address) {
             address = filter.address.toString()
           }
-          const logFilter: LogFilter = {
-            addressType: filter.addressType,
-            address: address && validateAndNormalizeAddress(address),
+          const logFilter = create(LogFilterSchema, {
+            addressOrType: filter.addressType
+              ? { case: 'addressType', value: filter.addressType }
+              : address
+                ? { case: 'address', value: validateAndNormalizeAddress(address) }
+                : undefined,
             topics: []
-          }
+          })
 
           for (const ts of topics) {
             let hashes: string[] = []
@@ -309,7 +335,7 @@ export class EthPlugin extends Plugin {
             } else if (ts) {
               hashes.push(ts)
             }
-            logFilter.topics.push({ hashes: hashes })
+            logFilter.topics.push(create(TopicSchema, { hashes: hashes }))
           }
           logConfig.filters.push(logFilter)
         }
@@ -338,7 +364,7 @@ export class EthPlugin extends Plugin {
       case HandlerType.ETH_TRANSACTION:
         return this.processTransaction(request, preparedData)
       default:
-        throw new ServerError(Status.INVALID_ARGUMENT, 'No handle type registered ' + request.handlerType)
+        throw new ConnectError('No handle type registered ' + request.handlerType, Code.InvalidArgument)
     }
   }
 
@@ -346,40 +372,40 @@ export class EthPlugin extends Plugin {
     let data: any
     switch (request.handlerType) {
       case HandlerType.ETH_LOG:
-        if (!request.data?.ethLog) {
-          throw new ServerError(Status.INVALID_ARGUMENT, "ethLog can't be empty")
+        if (request.data?.value.case !== 'ethLog' || !request.data.value.value) {
+          throw new ConnectError("ethLog can't be empty", Code.InvalidArgument)
         }
-        data = request.data.ethLog
+        data = request.data.value.value
         break
       case HandlerType.ETH_TRACE:
-        if (!request.data?.ethTrace) {
-          throw new ServerError(Status.INVALID_ARGUMENT, "ethTrace can't be empty")
+        if (request.data?.value.case !== 'ethTrace' || !request.data.value.value) {
+          throw new ConnectError("ethTrace can't be empty", Code.InvalidArgument)
         }
-        data = request.data.ethTrace
+        data = request.data.value.value
         break
       case HandlerType.ETH_BLOCK:
-        if (!request.data?.ethBlock) {
-          throw new ServerError(Status.INVALID_ARGUMENT, "ethBlock can't be empty")
+        if (request.data?.value.case !== 'ethBlock' || !request.data.value.value) {
+          throw new ConnectError("ethBlock can't be empty", Code.InvalidArgument)
         }
-        data = request.data.ethBlock
+        data = request.data.value.value
         break
       case HandlerType.ETH_TRANSACTION:
-        if (!request.data?.ethTransaction) {
-          throw new ServerError(Status.INVALID_ARGUMENT, "ethTransaction can't be empty")
+        if (request.data?.value.case !== 'ethTransaction' || !request.data.value.value) {
+          throw new ConnectError("ethTransaction can't be empty", Code.InvalidArgument)
         }
-        data = request.data.ethTransaction
+        data = request.data.value.value
         break
       default:
-        throw new ServerError(Status.INVALID_ARGUMENT, 'No handle type registered ' + request.handlerType)
+        throw new ConnectError('No handle type registered ' + request.handlerType, Code.InvalidArgument)
     }
     const partitions = await this.partitionManager.processPartitionForHandlerType(
       request.handlerType,
       request.handlerIds,
       data
     )
-    return {
+    return create(ProcessStreamResponse_PartitionsSchema, {
       partitions
-    }
+    })
   }
 
   async start(request: StartRequest) {
@@ -392,10 +418,10 @@ export class EthPlugin extends Plugin {
 
       const template = ProcessorTemplateProcessorState.INSTANCE.getValues()[instance.templateId]
       if (!template) {
-        throw new ServerError(Status.INVALID_ARGUMENT, 'Invalid template contract:' + instance)
+        throw new ConnectError('Invalid template contract:' + instance, Code.InvalidArgument)
       }
       if (!instance.contract) {
-        throw new ServerError(Status.INVALID_ARGUMENT, 'Contract Empty from:' + instance)
+        throw new ConnectError('Contract Empty from:' + instance, Code.InvalidArgument)
       }
       const ctx = new NoopContext(instance.contract.chainId as EthChainId)
       template.startInstance(
@@ -404,7 +430,7 @@ export class EthPlugin extends Plugin {
           address: validateAndNormalizeAddress(instance.contract.address),
           startBlock: instance.startBlock,
           endBlock: instance.endBlock,
-          baseLabels: instance.baseLabels
+          baseLabels: instance.baseLabels as { [key: string]: string } | undefined
         },
         ctx
       )
@@ -412,17 +438,17 @@ export class EthPlugin extends Plugin {
   }
 
   async processLog(request: DataBinding, preparedData: PreparedData | undefined): Promise<ProcessResult> {
-    if (!request.data?.ethLog?.rawLog) {
-      throw new ServerError(Status.INVALID_ARGUMENT, "Log can't be null")
+    if (request.data?.value.case !== 'ethLog' || !request.data.value.value.rawLog) {
+      throw new ConnectError("Log can't be null", Code.InvalidArgument)
     }
-    const ethLog = request.data.ethLog
+    const ethLog = request.data.value.value
 
     const promises: Promise<ProcessResult>[] = []
     for (const handlerId of request.handlerIds) {
       const handler = this.handlerRegister.getHandlerById(request.chainId, handlerId)
       const promise = handler(ethLog, preparedData).catch((e: any) => {
         console.error('error processing log: ', e)
-        throw new ServerError(Status.INTERNAL, 'error processing log: ' + ethLog.rawLog + '\n' + errorString(e))
+        throw new ConnectError('error processing log: ' + ethLog.rawLog + '\n' + errorString(e), Code.Internal)
       })
       if (GLOBAL_CONFIG.execution.sequential) {
         await promise
@@ -433,10 +459,10 @@ export class EthPlugin extends Plugin {
   }
 
   async processTrace(binding: DataBinding, preparedData: PreparedData | undefined): Promise<ProcessResult> {
-    if (!binding.data?.ethTrace?.rawTrace) {
-      throw new ServerError(Status.INVALID_ARGUMENT, "Trace can't be null")
+    if (binding.data?.value.case !== 'ethTrace' || !binding.data.value.value.rawTrace) {
+      throw new ConnectError("Trace can't be null", Code.InvalidArgument)
     }
-    const ethTrace = binding.data.ethTrace
+    const ethTrace = binding.data.value.value
 
     const promises: Promise<ProcessResult>[] = []
 
@@ -445,7 +471,7 @@ export class EthPlugin extends Plugin {
         .getHandlerById(binding.chainId, handlerId)(ethTrace, preparedData)
         .catch((e: any) => {
           console.error('error processing trace: ', e)
-          throw new ServerError(Status.INTERNAL, 'error processing trace: ' + ethTrace.rawTrace + '\n' + errorString(e))
+          throw new ConnectError('error processing trace: ' + ethTrace.rawTrace + '\n' + errorString(e), Code.Internal)
         })
       if (GLOBAL_CONFIG.execution.sequential) {
         await promise
@@ -456,10 +482,10 @@ export class EthPlugin extends Plugin {
   }
 
   async processBlock(binding: DataBinding, preparedData: PreparedData | undefined): Promise<ProcessResult> {
-    if (!binding.data?.ethBlock?.rawBlock) {
-      throw new ServerError(Status.INVALID_ARGUMENT, "Block can't be empty")
+    if (binding.data?.value.case !== 'ethBlock' || !binding.data.value.value.rawBlock) {
+      throw new ConnectError("Block can't be empty", Code.InvalidArgument)
     }
-    const ethBlock = binding.data.ethBlock
+    const ethBlock = binding.data.value.value
 
     const promises: Promise<ProcessResult>[] = []
     for (const handlerId of binding.handlerIds) {
@@ -467,7 +493,7 @@ export class EthPlugin extends Plugin {
         .getHandlerById(binding.chainId, handlerId)(ethBlock, preparedData)
         .catch((e: any) => {
           console.error('error processing block: ', e)
-          throw new ServerError(Status.INTERNAL, 'error processing block: ' + errorString(e))
+          throw new ConnectError('error processing block: ' + errorString(e), Code.Internal)
         })
       if (GLOBAL_CONFIG.execution.sequential) {
         await promise
@@ -478,10 +504,10 @@ export class EthPlugin extends Plugin {
   }
 
   async processTransaction(binding: DataBinding, preparedData: PreparedData | undefined): Promise<ProcessResult> {
-    if (!binding.data?.ethTransaction?.rawTransaction) {
-      throw new ServerError(Status.INVALID_ARGUMENT, "transaction can't be null")
+    if (binding.data?.value.case !== 'ethTransaction' || !binding.data.value.value.rawTransaction) {
+      throw new ConnectError("transaction can't be null", Code.InvalidArgument)
     }
-    const ethTransaction = binding.data.ethTransaction
+    const ethTransaction = binding.data.value.value
 
     const promises: Promise<ProcessResult>[] = []
 
@@ -489,9 +515,9 @@ export class EthPlugin extends Plugin {
       const promise = this.handlerRegister
         .getHandlerById(binding.chainId, handlerId)(ethTransaction, preparedData)
         .catch((e: any) => {
-          throw new ServerError(
-            Status.INTERNAL,
-            'error processing transaction: ' + ethTransaction.rawTransaction + '\n' + errorString(e)
+          throw new ConnectError(
+            'error processing transaction: ' + ethTransaction.rawTransaction + '\n' + errorString(e),
+            Code.Internal
           )
         })
       if (GLOBAL_CONFIG.execution.sequential) {
@@ -516,7 +542,7 @@ class NoopContext extends EthContext {
 }
 
 function mergePreprocessResults(results: PreprocessResult[]): PreprocessResult {
-  const res: PreprocessResult = { ethCallParams: [] }
+  const res = create(PreprocessResultSchema, { ethCallParams: [] })
   for (const r of results) {
     res.ethCallParams = res.ethCallParams.concat(r.ethCallParams)
   }

@@ -1,10 +1,17 @@
-import { ProcessResult, RecordMetaData, TemplateInstance } from '@sentio/protos'
+import {
+  type ProcessResult,
+  ProcessResultSchema,
+  type RecordMetaData,
+  RecordMetaDataSchema,
+  type TemplateInstance
+} from '@sentio/protos'
+import { create, type MessageInitShape } from '@bufbuild/protobuf'
 import { EventLoggerBinding } from './event-logger.js'
 import { Meter, Labels } from './meter.js'
 import { ChainId } from '@sentio/chain'
 import { mergeProcessResultsInPlace, PluginManager } from '@sentio/runtime'
 import { Required } from 'utility-types'
-import { ServerError, Status } from 'nice-grpc'
+import { ConnectError, Code } from '@connectrpc/connect'
 import { Store } from '../store/store.js'
 import { MemoryCache } from '../store/cache.js'
 
@@ -16,7 +23,7 @@ export abstract class BaseContext {
   baseLabels: Labels
   private active: boolean
 
-  private _res: Required<ProcessResult, 'states'> = {
+  private _res: Required<ProcessResult, 'states'> = create(ProcessResultSchema, {
     counters: [],
     events: [],
     exports: [],
@@ -25,13 +32,13 @@ export abstract class BaseContext {
       configUpdated: false
     },
     timeseriesResult: []
-  }
+  }) as Required<ProcessResult, 'states'>
 
-  public update(res: Partial<ProcessResult>) {
+  public update(res: MessageInitShape<typeof ProcessResultSchema>) {
     if (this.active) {
-      mergeProcessResultsInPlace(this._res, [ProcessResult.fromPartial(res)])
+      mergeProcessResultsInPlace(this._res, [create(ProcessResultSchema, res)])
     } else {
-      throw new ServerError(Status.INTERNAL, 'context not active, possible async function invoke without await')
+      throw new ConnectError('context not active, possible async function invoke without await', Code.Internal)
     }
   }
 
@@ -48,7 +55,7 @@ export abstract class BaseContext {
       this.active = false
       return this._res
     } else {
-      throw new ServerError(Status.INTERNAL, "Can't get result from same context twice")
+      throw new ConnectError("Can't get result from same context twice", Code.Internal)
     }
   }
 
@@ -58,19 +65,19 @@ export abstract class BaseContext {
     if (Object.keys(labels).length === 0) {
       let metadata = this.metadataCache.get(name)
       if (!metadata) {
-        metadata = {
+        metadata = create(RecordMetaDataSchema, {
           ...this.baseLabels,
           ...this.getMetaDataInternal(name, labels)
-        }
+        })
         this.metadataCache.set(name, metadata)
       }
       return metadata
     }
 
-    return {
+    return create(RecordMetaDataSchema, {
       ...this.baseLabels,
       ...this.getMetaDataInternal(name, labels)
-    }
+    })
   }
 
   protected abstract getMetaDataInternal(name: string, labels: Labels): RecordMetaData

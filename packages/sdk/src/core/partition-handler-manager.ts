@@ -1,9 +1,11 @@
 import {
   HandlerType,
-  ProcessStreamResponse_Partitions_Partition,
+  type ProcessStreamResponse_Partitions_Partition,
+  ProcessStreamResponse_Partitions_PartitionSchema,
   ProcessStreamResponse_Partitions_Partition_SysValue
 } from '@sentio/protos'
-import { ServerError, Status } from 'nice-grpc'
+import { create } from '@bufbuild/protobuf'
+import { ConnectError, Code } from '@connectrpc/connect'
 
 /**
  * Type for partition handler functions that can process any data type
@@ -51,20 +53,20 @@ export class PartitionHandlerManager {
       if (partitionHandler && data) {
         try {
           const partitionValue = await partitionHandler(data)
-          result[handlerId] = {
-            userValue: partitionValue
-          }
+          result[handlerId] = create(ProcessStreamResponse_Partitions_PartitionSchema, {
+            value: { case: 'userValue', value: partitionValue ?? '' }
+          })
         } catch (error) {
           // If partition handler fails, fall back to unrecognized
-          throw new ServerError(
-            Status.INVALID_ARGUMENT,
-            'compute partition key failed, error:' + (error instanceof Error ? error.message : String(error))
+          throw new ConnectError(
+            'compute partition key failed, error:' + (error instanceof Error ? error.message : String(error)),
+            Code.InvalidArgument
           )
         }
       } else {
-        result[handlerId] = {
-          sysValue: ProcessStreamResponse_Partitions_Partition_SysValue.UNRECOGNIZED
-        }
+        result[handlerId] = create(ProcessStreamResponse_Partitions_PartitionSchema, {
+          value: { case: 'sysValue', value: ProcessStreamResponse_Partitions_Partition_SysValue.BLOCK_NUMBER }
+        })
       }
     }
 

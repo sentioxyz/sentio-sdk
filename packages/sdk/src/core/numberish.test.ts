@@ -3,7 +3,8 @@ import { expect } from 'chai'
 import { toBigInteger, toMetricValue } from './numberish.js'
 import { webcrypto } from 'crypto'
 import { performance } from 'perf_hooks'
-import { BigInteger } from '@sentio/protos'
+import { type BigInteger, BigIntegerSchema } from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
 import { BigDecimal } from './big-decimal.js'
 import { bytesToBigInt } from '../utils/conversion.js'
 import { normalizeAttribute } from './normalization.js'
@@ -54,14 +55,15 @@ describe('Numberish tests', () => {
 
   test('metric values', async () => {
     const longDec = '12.00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002'
-    expect(toMetricValue(new BigDecimal(longDec)).bigDecimal == longDec)
+    const mv1 = toMetricValue(new BigDecimal(longDec))
+    expect((mv1.value.case === 'bigDecimal' ? mv1.value.value : undefined) == longDec)
 
     const complexDec = '-7.350918e-428'
-    expect(toMetricValue(new BigDecimal(complexDec)).bigDecimal == complexDec)
+    const mv2 = toMetricValue(new BigDecimal(complexDec))
+    expect((mv2.value.case === 'bigDecimal' ? mv2.value.value : undefined) == complexDec)
 
-    expect(
-      BigIntegerToBigInt(toMetricValue(new BigDecimal('100000')).bigInteger || BigInteger.fromPartial({})) === 100000n
-    )
+    const mv3 = toMetricValue(new BigDecimal('100000'))
+    expect(BigIntegerToBigInt(mv3.value.case === 'bigInteger' ? mv3.value.value : create(BigIntegerSchema)) === 100000n)
   })
 
   test('invalid value', async () => {

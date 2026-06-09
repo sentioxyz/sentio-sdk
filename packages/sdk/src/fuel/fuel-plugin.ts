@@ -2,17 +2,22 @@ import { errorString, GLOBAL_CONFIG, mergeProcessResults, Plugin, PluginManager,
 import { PartitionHandlerManager } from '../core/index.js'
 import { HandlerRegister } from '../core/handler-register.js'
 import {
-  ContractConfig,
+  ContractConfigSchema,
   DataBinding,
+  FuelAssetHandlerConfigSchema,
+  FuelReceiptHandlerConfigSchema,
+  FuelTransactionHandlerConfigSchema,
   HandlerType,
   InitResponse,
+  OnIntervalConfigSchema,
   ProcessConfigResponse,
   ProcessResult,
   ProcessStreamResponse_Partitions,
+  ProcessStreamResponse_PartitionsSchema,
   StartRequest
 } from '@sentio/protos'
-
-import { ServerError, Status } from 'nice-grpc'
+import { create } from '@bufbuild/protobuf'
+import { ConnectError, Code } from '@connectrpc/connect'
 import { FuelAssetProcessor } from './asset-processor.js'
 import { FuelProcessorState } from './types.js'
 import { FuelProcessor } from './fuel-processor.js'
@@ -39,7 +44,7 @@ export class FuelPlugin extends Plugin {
         continue
       }
       const processorConfig = processor.config
-      const contractConfig = ContractConfig.fromPartial({
+      const contractConfig = create(ContractConfigSchema, {
         processorType: USER_PROCESSOR,
         contract: {
           name: processorConfig.name,
@@ -60,24 +65,25 @@ export class FuelPlugin extends Plugin {
         const handlerName = txHandler.handlerName
         if (processor instanceof FuelProcessor) {
           // on transaction
-          const fetchConfig = {
-            handlerId,
-            handlerName
-          }
-          contractConfig.fuelTransactionConfigs.push(fetchConfig)
-        } else if (processor instanceof FuelAssetProcessor) {
-          const assetConfig = txHandler.assetConfig
-          contractConfig.assetConfigs.push({
-            filters: assetConfig?.filters || [],
+          const fetchConfig = create(FuelTransactionHandlerConfigSchema, {
             handlerId,
             handlerName
           })
+          contractConfig.fuelTransactionConfigs.push(fetchConfig)
+        } else if (processor instanceof FuelAssetProcessor) {
+          const assetConfig = txHandler.assetConfig
+          contractConfig.assetConfigs.push(
+            create(FuelAssetHandlerConfigSchema, {
+              filters: assetConfig?.filters || [],
+              handlerId,
+              handlerName
+            })
+          )
         } else if (processor instanceof FuelGlobalProcessor) {
-          const fetchConfig = {
+          const fetchConfig = create(FuelTransactionHandlerConfigSchema, {
             handlerId,
-            handlerName,
-            filters: []
-          }
+            handlerName
+          })
           contractConfig.fuelTransactionConfigs.push(fetchConfig)
           contractConfig.contract!.address = '*'
         }
@@ -92,27 +98,31 @@ export class FuelPlugin extends Plugin {
         )
         const handlerName = receiptHandler.handlerName
         if (processor instanceof FuelProcessor) {
-          contractConfig.fuelReceiptConfigs.push({
-            ...receiptHandler.receiptConfig,
-            handlerId,
-            handlerName
-          })
+          contractConfig.fuelReceiptConfigs.push(
+            create(FuelReceiptHandlerConfigSchema, {
+              ...receiptHandler.receiptConfig,
+              handlerId,
+              handlerName
+            })
+          )
         }
       }
 
       for (const blockHandler of processor.blockHandlers) {
         const handlerId = this.handlerRegister.register(blockHandler.handler, chainId)
         this.partitionManager.registerPartitionHandler(HandlerType.FUEL_BLOCK, handlerId, blockHandler.partitionHandler)
-        contractConfig.intervalConfigs.push({
-          slot: 0,
-          slotInterval: blockHandler.blockInterval,
-          minutes: 0,
-          minutesInterval: blockHandler.timeIntervalInMinutes,
-          handlerId: handlerId,
-          handlerName: blockHandler.handlerName,
-          fetchConfig: undefined
-          // fetchConfig: blockHandler.fetchConfig
-        })
+        contractConfig.intervalConfigs.push(
+          create(OnIntervalConfigSchema, {
+            slot: 0,
+            slotInterval: blockHandler.blockInterval,
+            minutes: 0,
+            minutesInterval: blockHandler.timeIntervalInMinutes,
+            handlerId: handlerId,
+            handlerName: blockHandler.handlerName,
+            fetchConfig: undefined
+            // fetchConfig: blockHandler.fetchConfig
+          })
+        )
       }
 
       config.contractConfigs.push(contractConfig)
@@ -130,7 +140,7 @@ export class FuelPlugin extends Plugin {
       case HandlerType.FUEL_BLOCK:
         return this.processBlock(request)
       default:
-        throw new ServerError(Status.INVALID_ARGUMENT, 'No handle type registered ' + request.handlerType)
+        throw new ConnectError('No handle type registered ' + request.handlerType, Code.InvalidArgument)
     }
   }
 
@@ -138,34 +148,34 @@ export class FuelPlugin extends Plugin {
     let data: any
     switch (request.handlerType) {
       case HandlerType.FUEL_TRANSACTION:
-        if (!request.data?.fuelTransaction) {
-          throw new ServerError(Status.INVALID_ARGUMENT, "fuelTransaction can't be empty")
+        if (request.data?.value.case !== 'fuelTransaction') {
+          throw new ConnectError("fuelTransaction can't be empty", Code.InvalidArgument)
         }
-        data = request.data.fuelTransaction
+        data = request.data.value.value
         break
       case HandlerType.FUEL_RECEIPT:
-        if (!request.data?.fuelLog) {
-          throw new ServerError(Status.INVALID_ARGUMENT, "fuelReceipt can't be empty")
+        if (request.data?.value.case !== 'fuelLog') {
+          throw new ConnectError("fuelReceipt can't be empty", Code.InvalidArgument)
         }
-        data = request.data.fuelLog
+        data = request.data.value.value
         break
       case HandlerType.FUEL_BLOCK:
-        if (!request.data?.fuelBlock) {
-          throw new ServerError(Status.INVALID_ARGUMENT, "fuelBlock can't be empty")
+        if (request.data?.value.case !== 'fuelBlock') {
+          throw new ConnectError("fuelBlock can't be empty", Code.InvalidArgument)
         }
-        data = request.data.fuelBlock
+        data = request.data.value.value
         break
       default:
-        throw new ServerError(Status.INVALID_ARGUMENT, 'No handle type registered ' + request.handlerType)
+        throw new ConnectError('No handle type registered ' + request.handlerType, Code.InvalidArgument)
     }
     const partitions = await this.partitionManager.processPartitionForHandlerType(
       request.handlerType,
       request.handlerIds,
       data
     )
-    return {
+    return create(ProcessStreamResponse_PartitionsSchema, {
       partitions
-    }
+    })
   }
 
   async start(request: StartRequest) {
@@ -174,15 +184,15 @@ export class FuelPlugin extends Plugin {
         await processor.configure()
       }
     } catch (e) {
-      throw new ServerError(Status.INTERNAL, 'error starting FuelPlugin: ' + errorString(e))
+      throw new ConnectError('error starting FuelPlugin: ' + errorString(e), Code.Internal)
     }
   }
 
   async processReceipt(binding: DataBinding): Promise<ProcessResult> {
-    const receipt = binding?.data?.fuelLog
+    const receipt = binding?.data?.value.case === 'fuelLog' ? binding.data.value.value : undefined
 
     if (!receipt?.transaction) {
-      throw new ServerError(Status.INVALID_ARGUMENT, "transaction can't be null")
+      throw new ConnectError("transaction can't be null", Code.InvalidArgument)
     }
 
     const promises: Promise<ProcessResult>[] = []
@@ -194,9 +204,9 @@ export class FuelPlugin extends Plugin {
           handlerId
         )(receipt)
         .catch((e: any) => {
-          throw new ServerError(
-            Status.INTERNAL,
-            'error processing transaction: ' + JSON.stringify(receipt) + '\n' + errorString(e)
+          throw new ConnectError(
+            'error processing transaction: ' + JSON.stringify(receipt) + '\n' + errorString(e),
+            Code.Internal
           )
         })
       if (GLOBAL_CONFIG.execution.sequential) {
@@ -208,10 +218,10 @@ export class FuelPlugin extends Plugin {
   }
 
   async processTransaction(binding: DataBinding): Promise<ProcessResult> {
-    if (!binding.data?.fuelTransaction?.transaction) {
-      throw new ServerError(Status.INVALID_ARGUMENT, "transaction can't be null")
+    if (binding.data?.value.case !== 'fuelTransaction' || !binding.data.value.value.transaction) {
+      throw new ConnectError("transaction can't be null", Code.InvalidArgument)
     }
-    const fuelTransaction = binding.data.fuelTransaction
+    const fuelTransaction = binding.data.value.value
 
     const promises: Promise<ProcessResult>[] = []
 
@@ -222,9 +232,9 @@ export class FuelPlugin extends Plugin {
           handlerId
         )(fuelTransaction)
         .catch((e: any) => {
-          throw new ServerError(
-            Status.INTERNAL,
-            'error processing transaction: ' + JSON.stringify(fuelTransaction.transaction) + '\n' + errorString(e)
+          throw new ConnectError(
+            'error processing transaction: ' + JSON.stringify(fuelTransaction.transaction) + '\n' + errorString(e),
+            Code.Internal
           )
         })
       if (GLOBAL_CONFIG.execution.sequential) {
@@ -236,10 +246,10 @@ export class FuelPlugin extends Plugin {
   }
 
   async processBlock(binding: DataBinding): Promise<ProcessResult> {
-    if (!binding.data?.fuelBlock?.block) {
-      throw new ServerError(Status.INVALID_ARGUMENT, "Block can't be empty")
+    if (binding.data?.value.case !== 'fuelBlock' || !binding.data.value.value.block) {
+      throw new ConnectError("Block can't be empty", Code.InvalidArgument)
     }
-    const ethBlock = binding.data.fuelBlock
+    const ethBlock = binding.data.value.value
 
     const promises: Promise<ProcessResult>[] = []
     for (const handlerId of binding.handlerIds) {
@@ -250,9 +260,9 @@ export class FuelPlugin extends Plugin {
         )(ethBlock)
         .catch((e: any) => {
           console.error('error processing block: ', e)
-          throw new ServerError(
-            Status.INTERNAL,
-            'error processing block: ' + ethBlock.block?.height + '\n' + errorString(e)
+          throw new ConnectError(
+            'error processing block: ' + (ethBlock.block as any)?.height + '\n' + errorString(e),
+            Code.Internal
           )
         })
       if (GLOBAL_CONFIG.execution.sequential) {

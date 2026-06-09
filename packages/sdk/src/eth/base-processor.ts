@@ -3,19 +3,25 @@ import { BaseContract, DeferredTopicFilter, LogDescription, LogParams, Transacti
 import { BoundContractView, ContractContext, ContractView, GlobalContext } from './context.js'
 import {
   AddressType,
-  Data_EthBlock,
-  Data_EthLog,
-  Data_EthTrace,
-  Data_EthTransaction,
-  EthFetchConfig,
-  HandleInterval,
-  PreparedData,
-  PreprocessResult,
-  ProcessResult
+  type Data_EthBlock,
+  type Data_EthLog,
+  type Data_EthTrace,
+  type Data_EthTransaction,
+  type EthFetchConfig,
+  EthFetchConfigSchema,
+  type HandleInterval,
+  HandleIntervalSchema,
+  type PreparedData,
+  type PreprocessResult,
+  PreprocessResultSchema,
+  type ProcessResult,
+  ProcessResultSchema,
+  timestampDate
 } from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
+import { ConnectError, Code } from '@connectrpc/connect'
 import { BindOptions, TimeOrBlock } from './bind-options.js'
 import { PromiseOrVoid } from '../core/promises.js'
-import { ServerError, Status } from 'nice-grpc'
 import {
   fixEmptyKey,
   formatEthData,
@@ -38,7 +44,7 @@ export interface AddressOrTypeEventFilter extends DeferredTopicFilter {
   address?: string
 }
 
-export const defaultPreprocessHandler = () => (<PreprocessResult>{ ethCallParams: [] }) as any
+export const defaultPreprocessHandler = () => create(PreprocessResultSchema, { ethCallParams: [] }) as any
 
 export class EventsHandler {
   filters: AddressOrTypeEventFilter[]
@@ -142,10 +148,10 @@ export class GlobalProcessor {
     return this.onInterval(
       handler,
       undefined,
-      {
+      create(HandleIntervalSchema, {
         recentInterval: blockInterval,
         backfillInterval: backfillBlockInterval
-      },
+      }),
       handlerOptions,
       preprocessHandler
     )
@@ -166,7 +172,10 @@ export class GlobalProcessor {
   ): this {
     return this.onInterval(
       handler,
-      { recentInterval: timeIntervalInMinutes, backfillInterval: backfillTimeIntervalInMinutes },
+      create(HandleIntervalSchema, {
+        recentInterval: timeIntervalInMinutes,
+        backfillInterval: backfillTimeIntervalInMinutes
+      }),
       undefined,
       handlerOptions,
       preprocessHandler
@@ -204,7 +213,7 @@ export class GlobalProcessor {
         const { block } = formatEthData(data)
 
         if (!block) {
-          throw new ServerError(Status.INVALID_ARGUMENT, 'Block is empty')
+          throw new ConnectError('Block is empty', Code.InvalidArgument)
         }
 
         const ctx = new GlobalContext(
@@ -225,7 +234,7 @@ export class GlobalProcessor {
         const { block } = formatEthData(data)
 
         if (!block) {
-          throw new ServerError(Status.INVALID_ARGUMENT, 'Block is empty')
+          throw new ConnectError('Block is empty', Code.InvalidArgument)
         }
 
         const ctx = new GlobalContext(
@@ -243,7 +252,7 @@ export class GlobalProcessor {
       },
       timeIntervalInMinutes: timeInterval,
       blockInterval: blockInterval,
-      fetchConfig: EthFetchConfig.fromPartial(handlerOptions || {}),
+      fetchConfig: create(EthFetchConfigSchema, handlerOptions || {}),
       partitionHandler: async (data: Data_EthBlock): Promise<string | undefined> => {
         const p = handlerOptions?.partitionKey
         if (!p) return undefined
@@ -278,7 +287,7 @@ export class GlobalProcessor {
         const { trace, block, transaction, transactionReceipt } = formatEthData(data)
 
         if (!transaction) {
-          throw new ServerError(Status.INVALID_ARGUMENT, 'transaction is empty')
+          throw new ConnectError('transaction is empty', Code.InvalidArgument)
         }
         let to = transaction.to
         if (to === trace?.action.from) {
@@ -287,7 +296,7 @@ export class GlobalProcessor {
         const ctx = new GlobalContext(
           chainId,
           to || '*',
-          data.timestamp,
+          data.timestamp ? timestampDate(data.timestamp) : undefined,
           block,
           undefined,
           trace,
@@ -302,7 +311,7 @@ export class GlobalProcessor {
         const { trace, block, transaction, transactionReceipt } = formatEthData(data)
 
         if (!transaction) {
-          throw new ServerError(Status.INVALID_ARGUMENT, 'transaction is empty')
+          throw new ConnectError('transaction is empty', Code.InvalidArgument)
         }
         let to = transaction.to
         if (to === trace?.action.from) {
@@ -311,7 +320,7 @@ export class GlobalProcessor {
         const ctx = new GlobalContext(
           chainId,
           to || '*',
-          data.timestamp,
+          data.timestamp ? timestampDate(data.timestamp) : undefined,
           block,
           undefined,
           trace,
@@ -321,7 +330,7 @@ export class GlobalProcessor {
         )
         return preprocessHandler(transaction, ctx, preprocessStore)
       },
-      fetchConfig: EthFetchConfig.fromPartial(handlerOptions || {}),
+      fetchConfig: create(EthFetchConfigSchema, handlerOptions || {}),
       partitionHandler: async (data: Data_EthTransaction): Promise<string | undefined> => {
         const p = handlerOptions?.partitionKey
         if (!p) return undefined
@@ -351,17 +360,17 @@ export class GlobalProcessor {
 
     this.eventHandlers.push({
       filters: _filters,
-      fetchConfig: EthFetchConfig.fromPartial(handlerOptions || {}),
+      fetchConfig: create(EthFetchConfigSchema, handlerOptions || {}),
       handlerName: getHandlerName(),
       handler: async function (data) {
         const { log, block, transaction, transactionReceipt } = formatEthData(data)
         if (!log) {
-          throw new ServerError(Status.INVALID_ARGUMENT, 'Log is empty')
+          throw new ConnectError('Log is empty', Code.InvalidArgument)
         }
         const ctx = new GlobalContext(
           chainId,
           transaction?.to || '*',
-          data.timestamp,
+          data.timestamp ? timestampDate(data.timestamp) : undefined,
           block,
           log,
           undefined,
@@ -402,18 +411,18 @@ export class GlobalProcessor {
 
     this.traceHandlers.push({
       signatures,
-      fetchConfig: EthFetchConfig.fromPartial(handlerOptions || {}),
+      fetchConfig: create(EthFetchConfigSchema, handlerOptions || {}),
       handlerName: getHandlerName(),
       handler: async function (data: Data_EthTrace) {
         const { trace, block, transaction, transactionReceipt } = formatEthData(data)
 
         if (!trace) {
-          throw new ServerError(Status.INVALID_ARGUMENT, 'trace is null')
+          throw new ConnectError('trace is null', Code.InvalidArgument)
         }
         const ctx = new GlobalContext(
           chainId,
           trace.action.to || '*',
-          data.timestamp,
+          data.timestamp ? timestampDate(data.timestamp) : undefined,
           block,
           undefined,
           trace,
@@ -428,12 +437,12 @@ export class GlobalProcessor {
         const { trace, block, transaction, transactionReceipt } = formatEthData(data)
 
         if (!trace) {
-          throw new ServerError(Status.INVALID_ARGUMENT, 'trace is null')
+          throw new ConnectError('trace is null', Code.InvalidArgument)
         }
         const ctx = new GlobalContext(
           chainId,
           trace.action.to || '*',
-          data.timestamp,
+          data.timestamp ? timestampDate(data.timestamp) : undefined,
           block,
           undefined,
           trace,
@@ -544,12 +553,12 @@ export abstract class BaseProcessor<
     const processor = this
     this.eventHandlers.push({
       filters: _filters,
-      fetchConfig: EthFetchConfig.fromPartial(handlerOptions || {}),
+      fetchConfig: create(EthFetchConfigSchema, handlerOptions || {}),
       handlerName,
       handler: async function (data: Data_EthLog, preparedData?: PreparedData) {
         const { log, block, transaction, transactionReceipt } = formatEthData(data)
         if (!log) {
-          throw new ServerError(Status.INVALID_ARGUMENT, 'Log is empty')
+          throw new ConnectError('Log is empty', Code.InvalidArgument)
         }
         let contractView
         try {
@@ -565,7 +574,7 @@ export abstract class BaseProcessor<
           contractName,
           contractView,
           chainId,
-          data.timestamp,
+          data.timestamp ? timestampDate(data.timestamp) : undefined,
           block,
           log,
           undefined,
@@ -586,7 +595,7 @@ export abstract class BaseProcessor<
           if (e instanceof Error) {
             if (e.message.includes('data out-of-bounds')) {
               console.error("Can't decode", log, 'may because of incompatible ABIs, e.g. string vs indexed string', e)
-              return ProcessResult.fromPartial({})
+              return create(ProcessResultSchema)
             }
           }
           throw e
@@ -596,7 +605,7 @@ export abstract class BaseProcessor<
           await handler(event as T, ctx)
           return ctx.stopAndGetResult()
         }
-        return ProcessResult.fromPartial({})
+        return create(ProcessResultSchema)
       },
       preprocessHandler: async function (
         data: Data_EthLog,
@@ -604,7 +613,7 @@ export abstract class BaseProcessor<
       ): Promise<PreprocessResult> {
         const { log, block, transaction, transactionReceipt } = formatEthData(data)
         if (!log) {
-          throw new ServerError(Status.INVALID_ARGUMENT, 'Log is empty')
+          throw new ConnectError('Log is empty', Code.InvalidArgument)
         }
         let contractView
         try {
@@ -621,7 +630,7 @@ export abstract class BaseProcessor<
           contractName,
           contractView,
           chainId,
-          data.timestamp,
+          data.timestamp ? timestampDate(data.timestamp) : undefined,
           block,
           log,
           undefined,
@@ -638,7 +647,7 @@ export abstract class BaseProcessor<
           if (e instanceof Error) {
             if (e.message.includes('data out-of-bounds')) {
               console.error("Can't decode", log, 'may because of incompatible ABIs, e.g. string vs indexed string', e)
-              return PreprocessResult.fromPartial({})
+              return create(PreprocessResultSchema)
             }
           }
           throw e
@@ -647,7 +656,7 @@ export abstract class BaseProcessor<
           const event: TypedEvent = new TypedEvent(log, parsed.name, fixEmptyKey(parsed))
           return preprocessHandler(event as T, ctx, preprocessStore)
         }
-        return PreprocessResult.fromPartial({})
+        return create(PreprocessResultSchema)
       },
       partitionHandler: async (data: Data_EthLog): Promise<string | undefined> => {
         const p = handlerOptions?.partitionKey
@@ -687,10 +696,10 @@ export abstract class BaseProcessor<
     return this.onInterval(
       handler,
       undefined,
-      {
+      create(HandleIntervalSchema, {
         recentInterval: blockInterval,
         backfillInterval: backfillBlockInterval
-      },
+      }),
       handlerOptions,
       preprocessHandler
     )
@@ -709,7 +718,10 @@ export abstract class BaseProcessor<
   ): this {
     return this.onInterval(
       handler,
-      { recentInterval: timeIntervalInMinutes, backfillInterval: backfillTimeIntervalInMinutes },
+      create(HandleIntervalSchema, {
+        recentInterval: timeIntervalInMinutes,
+        backfillInterval: backfillTimeIntervalInMinutes
+      }),
       undefined,
       handlerOptions,
       preprocessHandler
@@ -738,7 +750,7 @@ export abstract class BaseProcessor<
         const { block } = formatEthData(data)
 
         if (!block) {
-          throw new ServerError(Status.INVALID_ARGUMENT, 'Block is empty')
+          throw new ConnectError('Block is empty', Code.InvalidArgument)
         }
 
         const contractView = processor.CreateBoundContractView()
@@ -763,7 +775,7 @@ export abstract class BaseProcessor<
         const { block } = formatEthData(data)
 
         if (!block) {
-          throw new ServerError(Status.INVALID_ARGUMENT, 'Block is empty')
+          throw new ConnectError('Block is empty', Code.InvalidArgument)
         }
 
         const contractView = processor.CreateBoundContractView()
@@ -784,7 +796,7 @@ export abstract class BaseProcessor<
       },
       timeIntervalInMinutes: timeInterval,
       blockInterval: blockInterval,
-      fetchConfig: EthFetchConfig.fromPartial(handlerOptions || {}),
+      fetchConfig: create(EthFetchConfigSchema, handlerOptions || {}),
       partitionHandler: async (data: Data_EthBlock): Promise<string | undefined> => {
         const p = handlerOptions?.partitionKey
         if (!p) return undefined
@@ -819,7 +831,7 @@ export abstract class BaseProcessor<
 
     this.traceHandlers.push({
       signatures,
-      fetchConfig: EthFetchConfig.fromPartial(handlerOptions || {}),
+      fetchConfig: create(EthFetchConfigSchema, handlerOptions || {}),
       handlerName,
       handler: async function (data: Data_EthTrace, preparedData?: PreparedData) {
         const contractView = processor.CreateBoundContractView()
@@ -827,19 +839,19 @@ export abstract class BaseProcessor<
         const { trace, block, transaction, transactionReceipt } = formatEthData(data)
         const sighash = trace?.action.input?.slice(0, 10)
         if (!sighash) {
-          throw new ServerError(Status.INVALID_ARGUMENT, 'trace has no sighash')
+          throw new ConnectError('trace has no sighash', Code.InvalidArgument)
         }
         const fragment = contractInterface.getFunction(sighash)
 
         if (!trace || !fragment) {
-          throw new ServerError(Status.INVALID_ARGUMENT, 'trace is null')
+          throw new ConnectError('trace is null', Code.InvalidArgument)
         }
         const typedTrace = trace as TypedCallTrace
         typedTrace.name = fragment.name
         typedTrace.functionSignature = fragment.format()
         // const trace = data.trace as Trace
         if (!trace?.action.input) {
-          return ProcessResult.fromPartial({})
+          return create(ProcessResultSchema)
         }
         const traceData = '0x' + trace.action.input.slice(10)
         try {
@@ -855,7 +867,7 @@ export abstract class BaseProcessor<
           contractName,
           contractView,
           chainId,
-          data.timestamp,
+          data.timestamp ? timestampDate(data.timestamp) : undefined,
           block,
           undefined,
           trace,
@@ -873,19 +885,19 @@ export abstract class BaseProcessor<
         const { trace, block, transaction, transactionReceipt } = formatEthData(data)
         const sighash = trace?.action.input?.slice(0, 10)
         if (!sighash) {
-          throw new ServerError(Status.INVALID_ARGUMENT, 'trace has no sighash')
+          throw new ConnectError('trace has no sighash', Code.InvalidArgument)
         }
         const fragment = contractInterface.getFunction(sighash)
 
         if (!trace || !fragment) {
-          throw new ServerError(Status.INVALID_ARGUMENT, 'trace is null')
+          throw new ConnectError('trace is null', Code.InvalidArgument)
         }
         const typedTrace = trace as TypedCallTrace
         typedTrace.name = fragment.name
         typedTrace.functionSignature = fragment.format()
         // const trace = data.trace as Trace
         if (!trace?.action.input) {
-          return PreprocessResult.fromPartial({})
+          return create(PreprocessResultSchema)
         }
         const traceData = '0x' + trace.action.input.slice(10)
         try {
@@ -900,7 +912,7 @@ export abstract class BaseProcessor<
           contractName,
           contractView,
           chainId,
-          data.timestamp,
+          data.timestamp ? timestampDate(data.timestamp) : undefined,
           block,
           undefined,
           trace,

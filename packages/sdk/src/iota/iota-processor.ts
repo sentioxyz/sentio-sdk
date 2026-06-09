@@ -1,7 +1,15 @@
-import { Data_SuiCall, Data_SuiEvent, Data_SuiObjectChange, MoveFetchConfig } from '@sentio/protos'
+import {
+  type Data_SuiCall,
+  type Data_SuiEvent,
+  type Data_SuiObjectChange,
+  type MoveFetchConfig,
+  MoveFetchConfigSchema,
+  timestampDate
+} from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
 import { ListStateStorage } from '@sentio/runtime'
 import { IotaNetwork } from './network.js'
-import { ServerError, Status } from 'nice-grpc'
+import { ConnectError, Code } from '@connectrpc/connect'
 import { IotaContext, IotaObjectChangeContext } from './context.js'
 import {
   MoveCallIotaTransaction,
@@ -26,11 +34,11 @@ import { Required } from 'utility-types'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 import { HandlerOptions } from './models.js'
 
-export const DEFAULT_FETCH_CONFIG: MoveFetchConfig = {
+export const DEFAULT_FETCH_CONFIG: MoveFetchConfig = create(MoveFetchConfigSchema, {
   resourceChanges: false,
   allEvents: true,
   inputs: true
-}
+})
 
 export type IndexConfigure = Required<IotaBindOptions, 'startCheckpoint' | 'network'>
 
@@ -85,7 +93,7 @@ export class IotaBaseProcessor {
     handlerOptions?: HandlerOptions<MoveFetchConfig, T>
   ): IotaBaseProcessor {
     let _filters: EventFilter[] = []
-    const _fetchConfig = MoveFetchConfig.fromPartial({ ...DEFAULT_FETCH_CONFIG, ...handlerOptions })
+    const _fetchConfig = create(MoveFetchConfigSchema, { ...DEFAULT_FETCH_CONFIG, ...handlerOptions })
 
     if (Array.isArray(filter)) {
       _filters = filter
@@ -102,7 +110,7 @@ export class IotaBaseProcessor {
       handlerName: getHandlerName(),
       handler: async function (data) {
         if (!data.rawTransaction) {
-          throw new ServerError(Status.INVALID_ARGUMENT, 'event is null')
+          throw new ConnectError('event is null', Code.InvalidArgument)
         }
         const txn = JSON.parse(data.rawTransaction) as IotaTransactionBlockResponse
         if (txn.events == null) {
@@ -116,7 +124,7 @@ export class IotaBaseProcessor {
           processor.moduleName,
           processor.config.network,
           processor.config.address,
-          data.timestamp || new Date(0),
+          data.timestamp ? timestampDate(data.timestamp) : new Date(0),
           data.slot,
           txn,
           idx,
@@ -150,7 +158,7 @@ export class IotaBaseProcessor {
     handlerOptions?: HandlerOptions<MoveFetchConfig, T>
   ): IotaBaseProcessor {
     let _filters: FunctionNameAndCallFilter[] = []
-    const _fetchConfig = MoveFetchConfig.fromPartial({ ...DEFAULT_FETCH_CONFIG, ...handlerOptions })
+    const _fetchConfig = create(MoveFetchConfigSchema, { ...DEFAULT_FETCH_CONFIG, ...handlerOptions })
 
     if (Array.isArray(filter)) {
       _filters = filter
@@ -165,7 +173,7 @@ export class IotaBaseProcessor {
       handlerName: getHandlerName(),
       handler: async function (data) {
         if (!data.rawTransaction) {
-          throw new ServerError(Status.INVALID_ARGUMENT, 'call is null')
+          throw new ConnectError('call is null', Code.InvalidArgument)
         }
         const tx = JSON.parse(data.rawTransaction) as IotaTransactionBlockResponse
 
@@ -173,7 +181,7 @@ export class IotaBaseProcessor {
           processor.moduleName,
           processor.config.network,
           processor.config.address,
-          data.timestamp || new Date(0),
+          data.timestamp ? timestampDate(data.timestamp) : new Date(0),
           data.slot,
           tx,
           0,
@@ -183,7 +191,7 @@ export class IotaBaseProcessor {
           const calls: MoveCallIotaTransaction[] = getMoveCalls(tx)
           const txKind = tx.transaction?.data?.transaction
           if (!txKind) {
-            throw new ServerError(Status.INVALID_ARGUMENT, 'Unexpected getTransactionKind get empty')
+            throw new ConnectError('Unexpected getTransactionKind get empty', Code.InvalidArgument)
           }
 
           // getProgrammableTransaction(txKind)
@@ -236,7 +244,7 @@ export class IotaBaseProcessor {
     filter?: TransactionFilter,
     handlerOptions?: HandlerOptions<MoveFetchConfig, IotaTransactionBlockResponse>
   ): this {
-    const _fetchConfig = MoveFetchConfig.fromPartial({ ...DEFAULT_FETCH_CONFIG, ...handlerOptions })
+    const _fetchConfig = create(MoveFetchConfigSchema, { ...DEFAULT_FETCH_CONFIG, ...handlerOptions })
 
     const processor = this
 
@@ -244,7 +252,7 @@ export class IotaBaseProcessor {
       handlerName: getHandlerName(),
       handler: async function (data) {
         if (!data.rawTransaction) {
-          throw new ServerError(Status.INVALID_ARGUMENT, 'transaction is null')
+          throw new ConnectError('transaction is null', Code.InvalidArgument)
         }
         const tx = JSON.parse(data.rawTransaction) as IotaTransactionBlockResponse
 
@@ -252,7 +260,7 @@ export class IotaBaseProcessor {
           processor.moduleName,
           processor.config.network,
           processor.config.address,
-          data.timestamp || new Date(0),
+          data.timestamp ? timestampDate(data.timestamp) : new Date(0),
           data.slot,
           tx,
           0,
@@ -283,7 +291,7 @@ export class IotaBaseProcessor {
     type: string | string[]
   ): this {
     if (this.config.network === IotaNetwork.TEST_NET) {
-      throw new ServerError(Status.INVALID_ARGUMENT, 'object change not supported in testnet')
+      throw new ConnectError('object change not supported in testnet', Code.InvalidArgument)
     }
     const processor = this
     this.objectChangeHandlers.push({
@@ -292,7 +300,7 @@ export class IotaBaseProcessor {
         const ctx = new IotaObjectChangeContext(
           processor.config.network,
           processor.config.address,
-          data.timestamp || new Date(0),
+          data.timestamp ? timestampDate(data.timestamp) : new Date(0),
           data.slot,
           data.txDigest,
           processor.config.baseLabels
@@ -324,7 +332,7 @@ export class IotaGlobalProcessor extends IotaBaseProcessor {
   ): this {
     // TODO enable more strict check
     // if (!filter.publicKeyPrefix || filter.publicKeyPrefix.length < 2) {
-    //   throw new ServerError(Status.INVALID_ARGUMENT, 'restriction too low for global processor')
+    //   throw new ConnectError('restriction too low for global processor', Code.InvalidArgument)
     // }
     return super.onTransactionBlock(handler, filter, fetchConfig)
   }

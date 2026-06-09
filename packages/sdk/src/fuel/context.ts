@@ -1,6 +1,7 @@
 import { BaseContext, Labels, normalizeLabels } from '../core/index.js'
 import { FuelChainId } from '@sentio/chain'
-import { RecordMetaData } from '@sentio/protos'
+import { RecordMetaData, RecordMetaDataSchema } from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
 import type { CallResult, Contract } from 'fuels'
 import { InvocationScopeLike } from 'fuels'
 import { FuelBlock, FuelLog, FuelTransaction } from './types.js'
@@ -39,7 +40,7 @@ export class FuelContext extends BaseContext {
   }
 
   protected getMetaDataInternal(name: string, labels: Labels): RecordMetaData {
-    return {
+    return create(RecordMetaDataSchema, {
       address: this.contractAddress,
       contractName: this.contractName,
       blockNumber: BigInt(this.block?.height?.toString() ?? (this.transaction?.blockNumber || 0)),
@@ -49,7 +50,7 @@ export class FuelContext extends BaseContext {
       name: name,
       logIndex: this.logIndex,
       labels: normalizeLabels(labels)
-    }
+    })
   }
 }
 

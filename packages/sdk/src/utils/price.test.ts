@@ -1,6 +1,8 @@
 import { describe, test, mock, TestContext } from 'node:test'
 import { getPriceByTypeOrSymbolInternal, getPriceClient } from './price.js'
 import { GetPriceData } from '@sentio/api'
+import { CoinIDSchema } from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
 
 describe('price client', () => {
   const client = getPriceClient()
@@ -17,7 +19,11 @@ describe('price client', () => {
     })
 
     for (let i = 0; i < 1000; i++) {
-      const x = getPriceByTypeOrSymbolInternal(client, new Date(), { symbol: 'BTC' })
+      const x = getPriceByTypeOrSymbolInternal(
+        client,
+        new Date(),
+        create(CoinIDSchema, { id: { case: 'symbol', value: 'BTC' } })
+      )
       t.assert.equal(await x, i + 1)
     }
     // const y =  getPriceByTypeOrSymbolInternal(client, new Date(), { symbol: "BTC" })
@@ -25,7 +31,11 @@ describe('price client', () => {
   })
 
   test('get price from server', async (t: TestContext) => {
-    const price = await getPriceByTypeOrSymbolInternal(client, new Date(), { symbol: 'ETH' })
+    const price = await getPriceByTypeOrSymbolInternal(
+      client,
+      new Date(),
+      create(CoinIDSchema, { id: { case: 'symbol', value: 'ETH' } })
+    )
     t.assert.ok(price && price > 0)
   })
 })

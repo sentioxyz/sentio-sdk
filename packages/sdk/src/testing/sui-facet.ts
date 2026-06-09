@@ -1,5 +1,6 @@
 import type { GrpcTypes } from '@mysten/sui/grpc'
-import { DataBinding, HandlerType } from '@sentio/protos'
+import { type DataBinding, DataBindingSchema, HandlerType, timestampNow } from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
 import { TestProcessorServer } from './test-processor-server.js'
 import { accountTypeString, parseMoveType, SPLITTER } from '../move/index.js'
 import { SuiNetwork } from '../sui/index.js'
@@ -47,18 +48,21 @@ export class SuiFacet {
         for (const callConfig of config.moveCallConfigs) {
           for (const callFilter of callConfig.filters) {
             if (accountTypeString(config.contract.address) + '::' + callFilter.function === functionType) {
-              return {
+              return create(DataBindingSchema, {
                 data: {
-                  suiCall: {
-                    rawTransaction: JSON.stringify(transaction),
-                    timestamp: new Date(),
-                    slot: 10000n
+                  value: {
+                    case: 'suiCall',
+                    value: {
+                      rawTransaction: JSON.stringify(transaction),
+                      timestamp: timestampNow(),
+                      slot: 10000n
+                    }
                   }
                 },
                 handlerIds: [callConfig.handlerId],
                 handlerType: HandlerType.SUI_CALL,
                 chainId: network
-              }
+              })
             }
           }
         }
@@ -91,18 +95,21 @@ export class SuiFacet {
       throw Error('Invalid test global transaction: ' + JSON.stringify(transaction))
     }
 
-    const binding: DataBinding = {
+    const binding: DataBinding = create(DataBindingSchema, {
       handlerIds,
       handlerType: HandlerType.SUI_CALL,
       data: {
-        suiCall: {
-          rawTransaction: JSON.stringify(transaction),
-          timestamp: new Date(),
-          slot: BigInt(transaction.checkpoint || 0)
+        value: {
+          case: 'suiCall',
+          value: {
+            rawTransaction: JSON.stringify(transaction),
+            timestamp: timestampNow(),
+            slot: BigInt(transaction.checkpoint || 0)
+          }
         }
       },
       chainId: network
-    }
+    })
     return this.server.processBinding(binding)
   }
 
@@ -123,19 +130,22 @@ export class SuiFacet {
               accountTypeString(config.contract.address) + '::' + eventFilter.type ===
               parseMoveType(event.eventType ?? '').qname
             ) {
-              return {
+              return create(DataBindingSchema, {
                 data: {
-                  suiEvent: {
-                    rawEvent: JSON.stringify(event),
-                    rawTransaction: JSON.stringify(transaction),
-                    timestamp: new Date(),
-                    slot: 10000n
+                  value: {
+                    case: 'suiEvent',
+                    value: {
+                      rawEvent: JSON.stringify(event),
+                      rawTransaction: JSON.stringify(transaction),
+                      timestamp: timestampNow(),
+                      slot: 10000n
+                    }
                   }
                 },
                 handlerIds: [eventConfig.handlerId],
                 handlerType: HandlerType.SUI_EVENT,
                 chainId: network
-              }
+              })
             }
           }
         }

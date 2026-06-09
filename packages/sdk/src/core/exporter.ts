@@ -1,7 +1,8 @@
 import { BaseContext } from './base-context.js'
-import { ExportResult } from '@sentio/protos'
+import { ExportResult, ExportResultSchema } from '@sentio/protos'
 import { NamedResultDescriptor } from './metadata.js'
 import { MapStateStorage } from '@sentio/runtime'
+import { create } from '@bufbuild/protobuf'
 
 export type Export = Record<string, any>
 
@@ -22,11 +23,11 @@ export class Exporter extends NamedResultDescriptor {
   }
 
   emit(ctx: BaseContext, data: Export) {
-    const res: ExportResult = {
+    const res: ExportResult = create(ExportResultSchema, {
       metadata: ctx.getMetaData(this.name, {}),
       payload: JSON.stringify(data),
-      runtimeInfo: undefined,
-    }
+      runtimeInfo: undefined
+    })
     ctx.update({ exports: [res] })
   }
 }

@@ -190,6 +190,7 @@ Tests require building the project first. Use `./scripts/test-all.sh` to build a
 - **TypeScript**: Full TypeScript codebase with strict type checking
 - **ESLint**: Code quality enforcement with custom rules
 - **Git Hooks**: Automated formatting and linting on commit
+- **Protocol Buffers & RPC**: The SDK uses **protobuf-es** (`@bufbuild/protobuf`) and **connect-es** (`@connectrpc/connect`, `@connectrpc/connect-node`) for proto codegen and service communication, replacing ts-proto + nice-grpc. Generated proto code is `*_pb.ts` (e.g. `processor_pb.ts`), produced by the `es_proto` Bazel rule in sentio-core and checked in via `bazel run //sentio-sdk:write_gen`. Key API differences from ts-proto: messages are type-only with a companion `FooSchema` descriptor — construct with `create(FooSchema, init)` (not `Foo.fromPartial`); serialize with `toBinary`/`fromBinary`/`toJson`/`fromJson(FooSchema, ...)`; `oneof` fields are a discriminated union (`x.value = { case, value }`) rather than flat optional fields; `google.protobuf.Timestamp` is the WKT message (use `timestampDate`/`timestampFromDate`), not a JS `Date`; well-known types (Empty/Struct/Timestamp) come from `@bufbuild/protobuf/wkt` (re-exported from `@sentio/protos`). The runtime gRPC server uses connect-es `connectNodeAdapter` over HTTP/2 (h2c), and errors use `ConnectError`/`Code` (not `ServerError`/`Status`).
 
 ## Chain-Specific Development
 

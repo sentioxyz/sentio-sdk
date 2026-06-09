@@ -1,4 +1,5 @@
-import { RecordMetaData } from '@sentio/protos'
+import { type RecordMetaData, RecordMetaDataSchema } from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
 import { type Labels, normalizeLabels } from '../index.js'
 import { getClient, SuiNetwork } from './network.js'
 import type { GrpcTypes, SuiGrpcClient } from '@mysten/sui/grpc'
@@ -47,7 +48,7 @@ export class SuiContext extends MoveContext<SuiNetwork, ModuleWithAddress, SuiEv
   }
 
   getMetaDataInternal(name: string, labels: Labels): RecordMetaData {
-    return {
+    return create(RecordMetaDataSchema, {
       address: this.address,
       contractName: this.moduleName,
       blockNumber: this.checkpoint,
@@ -57,7 +58,7 @@ export class SuiContext extends MoveContext<SuiNetwork, ModuleWithAddress, SuiEv
       chainId: this.getChainId(),
       name: name,
       labels: normalizeLabels(labels)
-    }
+    })
   }
 
   get client(): SuiGrpcClient {
@@ -101,7 +102,7 @@ export class SuiObjectChangeContext extends MoveContext<
   }
 
   getMetaDataInternal(name: string, labels: Labels): RecordMetaData {
-    return {
+    return create(RecordMetaDataSchema, {
       address: this.address,
       contractName: '*',
       blockNumber: this.checkpoint,
@@ -111,7 +112,7 @@ export class SuiObjectChangeContext extends MoveContext<
       chainId: this.getChainId(),
       name: name,
       labels: normalizeLabels(labels)
-    }
+    })
   }
 
   get client(): SuiGrpcClient {
@@ -153,7 +154,7 @@ export class SuiAddressContext extends MoveAccountContext<
   }
 
   getMetaDataInternal(name: string, labels: Labels): RecordMetaData {
-    return {
+    return create(RecordMetaDataSchema, {
       address: this.address,
       contractName: this.contractName,
       blockNumber: this.checkpoint,
@@ -163,7 +164,7 @@ export class SuiAddressContext extends MoveAccountContext<
       chainId: this.getChainId(),
       name: name,
       labels: normalizeLabels(labels)
-    }
+    })
   }
 
   get client(): SuiGrpcClient {

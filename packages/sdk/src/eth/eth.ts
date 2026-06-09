@@ -24,7 +24,8 @@ import type { AccessList } from 'ethers/transaction'
 import { ContractContext } from './context.js'
 import { getAddress } from 'ethers/address'
 import { getBigInt } from 'ethers/utils'
-import { EthCallContext, EthCallParam } from '@sentio/protos'
+import { type EthCallContext, type EthCallParam, EthCallParamSchema } from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
 import { ALL_ADDRESS } from '../core/index.js'
 
 export interface IResult {
@@ -536,10 +537,10 @@ export function encodeCallData(
   try {
     const iface = new Interface([funcABI])
     const calldata = iface.encodeFunctionData(name, values)
-    return {
+    return create(EthCallParamSchema, {
       context,
       calldata
-    }
+    })
   } catch (e) {
     const stack = new Error().stack
     throw transformEtherError(e, undefined, stack)

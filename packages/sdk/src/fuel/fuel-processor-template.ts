@@ -1,5 +1,6 @@
 import { FuelContext, FuelContractContext } from './context.js'
-import { HandleInterval, TemplateInstance } from '@sentio/protos'
+import { HandleInterval, HandleIntervalSchema, TemplateInstance, TemplateInstanceSchema } from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
 import { PromiseOrVoid } from '../core/promises.js'
 import { ListStateStorage, processMetrics } from '@sentio/runtime'
 import { Contract } from 'fuels'
@@ -53,7 +54,7 @@ export abstract class FuelBaseProcessorTemplate<TContract extends Contract> {
    * @param ctx
    */
   public bind(options: Omit<Omit<FuelProcessorConfig, 'chainId'>, 'abi'>, ctx: FuelContext): void {
-    const instance: TemplateInstance = {
+    const instance: TemplateInstance = create(TemplateInstanceSchema, {
       templateId: this.id,
       contract: {
         address: options.address,
@@ -65,7 +66,7 @@ export abstract class FuelBaseProcessorTemplate<TContract extends Contract> {
       endBlock: BigInt(options.endBlock || 0),
       baseLabels: {}
       // baseLabels: options.baseLabels
-    }
+    })
 
     ctx.sendTemplateInstance(instance)
 
@@ -130,10 +131,10 @@ export abstract class FuelBaseProcessorTemplate<TContract extends Contract> {
     return this.onInterval(
       handler,
       undefined,
-      {
+      create(HandleIntervalSchema, {
         recentInterval: blockInterval,
         backfillInterval: backfillBlockInterval
-      }
+      })
       // fetchConfig
     )
   }
@@ -146,7 +147,7 @@ export abstract class FuelBaseProcessorTemplate<TContract extends Contract> {
   ) {
     return this.onInterval(
       handler,
-      { recentInterval: timeIntervalInMinutes, backfillInterval: backfillBlockInterval },
+      create(HandleIntervalSchema, { recentInterval: timeIntervalInMinutes, backfillInterval: backfillBlockInterval }),
       undefined
       // fetchConfig
     )

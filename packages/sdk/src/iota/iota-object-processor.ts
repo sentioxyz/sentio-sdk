@@ -1,13 +1,18 @@
 import {
-  Data_SuiCall,
-  Data_SuiObject,
-  Data_SuiObjectChange,
-  HandleInterval,
-  MoveAccountFetchConfig,
-  MoveFetchConfig,
+  type Data_SuiCall,
+  type Data_SuiObject,
+  type Data_SuiObjectChange,
+  type HandleInterval,
+  HandleIntervalSchema,
+  type MoveAccountFetchConfig,
+  MoveAccountFetchConfigSchema,
+  type MoveFetchConfig,
+  MoveFetchConfigSchema,
   MoveOwnerType,
-  ProcessResult
+  type ProcessResult,
+  timestampDate
 } from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
 import { ListStateStorage } from '@sentio/runtime'
 import { IotaNetwork } from './network.js'
 import { IotaAddressContext, IotaContext, IotaObjectChangeContext, IotaObjectContext } from './context.js'
@@ -15,7 +20,7 @@ import { IotaMoveObject, IotaObjectChange, IotaTransactionBlockResponse } from '
 import { ALL_ADDRESS, PromiseOrVoid } from '../core/index.js'
 import { configure, DEFAULT_FETCH_CONFIG, IndexConfigure, IotaBindOptions } from './iota-processor.js'
 import { CallHandler, TransactionFilter, accountTypeString, ObjectChangeHandler } from '../move/index.js'
-import { ServerError, Status } from 'nice-grpc'
+import { ConnectError, Code } from '@connectrpc/connect'
 import { TypeDescriptor } from '@typemove/move'
 import { TypedIotaMoveObject } from './models.js'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
@@ -45,9 +50,9 @@ interface ObjectHandler {
   handlerName: string
 }
 
-export const DEFAULT_ACCOUNT_FETCH_CONFIG: MoveAccountFetchConfig = {
+export const DEFAULT_ACCOUNT_FETCH_CONFIG: MoveAccountFetchConfig = create(MoveAccountFetchConfigSchema, {
   owned: false
-}
+})
 
 export class IotaAccountProcessorState extends ListStateStorage<IotaBaseObjectOrAddressProcessor<any>> {
   static INSTANCE = new IotaAccountProcessorState()
@@ -112,7 +117,7 @@ export abstract class IotaBaseObjectOrAddressProcessor<HandlerType> {
           data.objectId,
           data.objectVersion,
           data.slot,
-          data.timestamp || new Date(0),
+          data.timestamp ? timestampDate(data.timestamp) : new Date(0),
           processor.config.baseLabels
         )
         await processor.doHandle(handler, data, ctx)
@@ -139,10 +144,10 @@ abstract class IotaBaseObjectOrAddressProcessorInternal<
   ): this {
     return this.onInterval(
       handler,
-      {
+      create(HandleIntervalSchema, {
         recentInterval: timeIntervalInMinutes,
         backfillInterval: backfillTimeIntervalInMinutes
-      },
+      }),
       undefined,
       type,
       fetchConfig
@@ -159,7 +164,10 @@ abstract class IotaBaseObjectOrAddressProcessorInternal<
     return this.onInterval(
       handler,
       undefined,
-      { recentInterval: checkpointInterval, backfillInterval: backfillCheckpointInterval },
+      create(HandleIntervalSchema, {
+        recentInterval: checkpointInterval,
+        backfillInterval: backfillCheckpointInterval
+      }),
       type,
       fetchConfig
     )
@@ -188,7 +196,7 @@ export class IotaAddressProcessor extends IotaBaseObjectOrAddressProcessorIntern
     filter?: TransactionFilter,
     fetchConfig?: Partial<MoveFetchConfig>
   ) {
-    const _fetchConfig = MoveFetchConfig.fromPartial({ ...DEFAULT_FETCH_CONFIG, ...fetchConfig })
+    const _fetchConfig = create(MoveFetchConfigSchema, { ...DEFAULT_FETCH_CONFIG, ...fetchConfig })
     const _filter: TransactionFilter = {
       fromAndToAddress: {
         from: '',
@@ -203,7 +211,7 @@ export class IotaAddressProcessor extends IotaBaseObjectOrAddressProcessorIntern
       handlerName: getHandlerName(),
       handler: async function (data) {
         if (!data.rawTransaction) {
-          throw new ServerError(Status.INVALID_ARGUMENT, 'transaction is null')
+          throw new ConnectError('transaction is null', Code.InvalidArgument)
         }
         const tx = JSON.parse(data.rawTransaction) as IotaTransactionBlockResponse
 
@@ -211,7 +219,7 @@ export class IotaAddressProcessor extends IotaBaseObjectOrAddressProcessorIntern
           'object',
           processor.config.network,
           processor.config.address,
-          data.timestamp || new Date(0),
+          data.timestamp ? timestampDate(data.timestamp) : new Date(0),
           data.slot,
           tx,
           0,
@@ -297,7 +305,7 @@ export class IotaObjectTypeProcessor<T> extends IotaBaseObjectOrAddressProcessor
 
   public onObjectChange(handler: (changes: IotaObjectChange[], ctx: IotaObjectChangeContext) => PromiseOrVoid): this {
     if (this.config.network === IotaNetwork.TEST_NET) {
-      throw new ServerError(Status.INVALID_ARGUMENT, 'object change not supported in testnet')
+      throw new ConnectError('object change not supported in testnet', Code.InvalidArgument)
     }
     const processor = this
     this.objectChangeHandlers.push({
@@ -306,7 +314,7 @@ export class IotaObjectTypeProcessor<T> extends IotaBaseObjectOrAddressProcessor
         const ctx = new IotaObjectChangeContext(
           processor.config.network,
           processor.config.address,
-          data.timestamp || new Date(0),
+          data.timestamp ? timestampDate(data.timestamp) : new Date(0),
           data.slot,
           data.txDigest,
           processor.config.baseLabels
@@ -332,10 +340,10 @@ export class IotaObjectTypeProcessor<T> extends IotaBaseObjectOrAddressProcessor
   ): this {
     return this.onInterval(
       handler,
-      {
+      create(HandleIntervalSchema, {
         recentInterval: timeIntervalInMinutes,
         backfillInterval: backfillTimeIntervalInMinutes
-      },
+      }),
       undefined,
       this.objectType.getSignature(),
       fetchConfig
@@ -355,7 +363,10 @@ export class IotaObjectTypeProcessor<T> extends IotaBaseObjectOrAddressProcessor
     return this.onInterval(
       handler,
       undefined,
-      { recentInterval: checkpointInterval, backfillInterval: backfillCheckpointInterval },
+      create(HandleIntervalSchema, {
+        recentInterval: checkpointInterval,
+        backfillInterval: backfillCheckpointInterval
+      }),
       this.objectType.qname,
       fetchConfig
     )

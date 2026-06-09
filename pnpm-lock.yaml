@@ -457,6 +457,12 @@ importers:
       '@aptos-labs/ts-sdk':
         specifier: ~7.1.0
         version: 7.1.0
+      '@bufbuild/protobuf':
+        specifier: ^2.12.0
+        version: 2.12.0
+      '@connectrpc/connect':
+        specifier: ^2.0.0
+        version: 2.1.1(@bufbuild/protobuf@2.12.0)
       '@iota/iota-sdk':
         specifier: ~1.14.0
         version: 1.14.0(typescript@6.0.3)
@@ -532,18 +538,6 @@ importers:
       mkdirp:
         specifier: ^3.0.1
         version: 3.0.1
-      nice-grpc:
-        specifier: ^2.1.16
-        version: 2.1.16
-      nice-grpc-client-middleware-retry:
-        specifier: ^3.1.15
-        version: 3.1.15
-      nice-grpc-common:
-        specifier: ^2.0.3
-        version: 2.0.3
-      nice-grpc-prometheus:
-        specifier: ^0.2.11
-        version: 0.2.11
       node-fetch:
         specifier: ^3.3.2
         version: 3.3.2
@@ -3451,9 +3445,6 @@ packages:
       zod:
         optional: true
 
-  abort-controller-x@0.5.0:
-    resolution: {integrity: sha512-yTt9CI0x+nRfX6BFMenEGP8ooPvErGH6AbFz20C2IeOLIlDsrw/VHpgne3GsCEuTA410IiFiaLVFKmgM4bKEPQ==}
-
   abstract-logging@2.0.1:
     resolution: {integrity: sha512-2BjRTZxTPvheOvGbBslFSYOUkr+SjPtOnrLP33f+VIWLzezQpZcqVg7ja3L4dBXmzzgwT+a029jRx5PCi3JuiA==}
 
@@ -3668,9 +3659,6 @@ packages:
   binaryen@102.0.0-nightly.20211028:
     resolution: {integrity: sha512-GCJBVB5exbxzzvyt8MGDv/MeUjs6gkXDvf4xOIItRBptYl0Tz5sm1o/uG95YK0L0VeG5ajDu3hRtkBP2kzqC5w==}
     hasBin: true
-
-  bintrees@1.0.2:
-    resolution: {integrity: sha512-VOMgTMwjAaUG580SXn3LacVgjurrbMme7ZZNYGSSV7mmtY6QQRh0Eg3pwIcntQ77DErK1L0NxkbetjcoXzVwKw==}
 
   blob-to-it@2.0.8:
     resolution: {integrity: sha512-1MKnG2ul1DtSgrxFHqhdJgIJODJbNj7alOLSJRD7O9S2iCJ72ZWU6j8+CVpjIdLueqwpWhy4ouvpanYlFLqkRw==}
@@ -5846,18 +5834,6 @@ packages:
   nerf-dart@1.0.0:
     resolution: {integrity: sha512-EZSPZB70jiVsivaBLYDCyntd5eH8NTSMOn3rB+HxwdmKThGELLdYv8qVIMWvZEFy9w8ZZpW9h9OB32l1rGtj7g==}
 
-  nice-grpc-client-middleware-retry@3.1.15:
-    resolution: {integrity: sha512-fXfNNdtjCQzc3O/w3WsK1AOU+xdE1V7FCm4FEQWS/UUVsV1616S2oryvWqsZAF8aOvuMir8lFtNmgH3DeP+PBg==}
-
-  nice-grpc-common@2.0.3:
-    resolution: {integrity: sha512-MEhnD3JMah0mgyivpb9hpRDbOBuXBxI/TVO+OK1h6rC97WM42HsPMR+zzRNQ0C5BqYJTw1nyWiQRD0DucO+pjQ==}
-
-  nice-grpc-prometheus@0.2.11:
-    resolution: {integrity: sha512-CQvYxSiYaVBbV9ZCn906l3xrymj5iJyw7WEvmbF7RbEZMJ34H4L00jhkn0aU0+gFySyPw5j/+bLOgH21s3IOlg==}
-
-  nice-grpc@2.1.16:
-    resolution: {integrity: sha512-Cl3Pn00212Hl8/U6bpgMxmhZj5lyv3nWoJov4cd3FjWarktrMHP4DNvSjCnDwkMWYx4W1tyscEia4JX6Y4GVCQ==}
-
   node-domexception@1.0.0:
     resolution: {integrity: sha512-/jKZoMpw0F8GRwl4/eLROPA3cfcXtLApP0QzLmUT/HuPCZWyB7IY9ZrMeKw2O/nFIqPQB3PVM9aYm0F312AXDQ==}
     engines: {node: '>=10.5.0'}
@@ -6386,10 +6362,6 @@ packages:
 
   progress-events@1.0.1:
     resolution: {integrity: sha512-MOzLIwhpt64KIVN64h1MwdKWiyKFNc/S6BoYKPIVUHFg0/eIEyBulhWCgn678v/4c0ri3FdGuzXymNCv02MUIw==}
-
-  prom-client@15.1.2:
-    resolution: {integrity: sha512-on3h1iXb04QFLLThrmVYg1SChBQ9N1c+nKAjebBjokBqipddH3uxmOUcEkTnzmJ8Jh/5TSUnUqS40i2QB2dJHQ==}
-    engines: {node: ^16 || ^18 || >=20}
 
   property-expr@2.0.6:
     resolution: {integrity: sha512-SVtmxhRE/CGkn3eZY1T6pC8Nln6Fr/lu1mKSgRud0eC73whjGfoAogbn78LkD8aFL0zz3bAFerKSnOl7NlErBA==}
@@ -6993,9 +6965,6 @@ packages:
     resolution: {integrity: sha512-yEFYrVhod+hdNyx7g5Bnkkb0G6si8HJurOoOEgC8B/O0uXLHlaey/65KRv6cuWBNhBgHKAROVpc7QyYqE5gFng==}
     engines: {node: '>=20'}
 
-  tdigest@0.1.2:
-    resolution: {integrity: sha512-+G0LLgjjo9BZX2MfdvPfH+MKLCrxlXSYec5DaPYP1fe6Iyhf0/fSmJ0bFiZ1F8BT6cGXl2LpltQptzjXKWEkKA==}
-
   temp-dir@2.0.0:
     resolution: {integrity: sha512-aoBAniQmmwtcKp/7BzsH8Cxzv8OL736p7v1ihGb5e9DJ9kTwGWHrQrVB5+lfVDzfGrdRzXch+ig7LHaY1JTOrg==}
     engines: {node: '>=8'}
@@ -7126,9 +7095,6 @@ packages:
   ts-command-line-args@2.5.1:
     resolution: {integrity: sha512-H69ZwTw3rFHb5WYpQya40YAX2/w7Ut75uUECbgBIsLmM+BNuYnxsltfyyLMxy6sEeKxgijLTnQtLd0nKd6+IYw==}
     hasBin: true
-
-  ts-error@1.0.6:
-    resolution: {integrity: sha512-tLJxacIQUM82IR7JO1UUkKlYuUTmoY9HBJAmNWFzheSlDS5SPMcNIepejHJa4BpPQLAcbRhRf3GDJzyj6rbKvA==}
 
   ts-essentials@7.0.3:
     resolution: {integrity: sha512-8+gr5+lqO3G84KdiTSMRLtuyJ+nTBVRKuCrK4lidMPdVeEp0uqC875uE5NMcaA7YYMN7XsNiFQuMvasF8HT/xQ==}
@@ -10590,8 +10556,6 @@ snapshots:
     optionalDependencies:
       zod: 3.24.2
 
-  abort-controller-x@0.5.0: {}
-
   abstract-logging@2.0.1: {}
 
   accepts@2.0.0:
@@ -10780,8 +10744,6 @@ snapshots:
   binary-extensions@2.3.0: {}
 
   binaryen@102.0.0-nightly.20211028: {}
-
-  bintrees@1.0.2: {}
 
   blob-to-it@2.0.8:
     dependencies:
@@ -13223,27 +13185,6 @@ snapshots:
 
   nerf-dart@1.0.0: {}
 
-  nice-grpc-client-middleware-retry@3.1.15:
-    dependencies:
-      abort-controller-x: 0.5.0
-      nice-grpc-common: 2.0.3
-
-  nice-grpc-common@2.0.3:
-    dependencies:
-      ts-error: 1.0.6
-
-  nice-grpc-prometheus@0.2.11:
-    dependencies:
-      abort-controller-x: 0.5.0
-      nice-grpc-common: 2.0.3
-      prom-client: 15.1.2
-
-  nice-grpc@2.1.16:
-    dependencies:
-      '@grpc/grpc-js': 1.14.4
-      abort-controller-x: 0.5.0
-      nice-grpc-common: 2.0.3
-
   node-domexception@1.0.0: {}
 
   node-emoji@2.2.0:
@@ -13670,11 +13611,6 @@ snapshots:
   process-warning@4.0.0: {}
 
   progress-events@1.0.1: {}
-
-  prom-client@15.1.2:
-    dependencies:
-      '@opentelemetry/api': 1.9.0
-      tdigest: 0.1.2
 
   property-expr@2.0.6: {}
 
@@ -14409,10 +14345,6 @@ snapshots:
 
   tagged-tag@1.0.0: {}
 
-  tdigest@0.1.2:
-    dependencies:
-      bintrees: 1.0.2
-
   temp-dir@2.0.0: {}
 
   temp-dir@3.0.0: {}
@@ -14531,8 +14463,6 @@ snapshots:
       command-line-args: 5.2.1
       command-line-usage: 6.1.3
       string-format: 2.0.0
-
-  ts-error@1.0.6: {}
 
   ts-essentials@7.0.3(typescript@6.0.3):
     dependencies:

@@ -1,6 +1,6 @@
 import { Interface, LogDescription, LogParams, ParamType, Result } from 'ethers'
 import { Piscina } from 'piscina'
-import { ServerError, Status } from 'nice-grpc'
+import { ConnectError, Code } from '@connectrpc/connect'
 import { FormattedLog } from '../eth.js'
 
 export interface IResult {
@@ -41,7 +41,7 @@ export interface ILogDescription {
 
 export function parseLogInline(contractViewInterface: any, log: LogParams): LogDescription | null {
   if (!log) {
-    throw new ServerError(Status.INVALID_ARGUMENT, 'Log is empty')
+    throw new ConnectError('Log is empty', Code.InvalidArgument)
   }
   const topics = log.topics
   const data = log.data

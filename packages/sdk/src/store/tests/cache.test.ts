@@ -4,7 +4,8 @@ import { MemoryCache } from '../cache.js'
 import { MemoryDatabase } from '../../testing/memory-database.js'
 import { StoreContext } from '../context.js'
 import { Subject } from 'rxjs'
-import { DeepPartial, ProcessStreamResponse, RecordMetaData } from '@sentio/protos'
+import { type RecordMetaData, RecordMetaDataSchema, ProcessStreamResponseSchema } from '@sentio/protos'
+import { create, type MessageInitShape } from '@bufbuild/protobuf'
 import { BaseContext } from '../../core/base-context.js'
 import { ChainId } from '@sentio/chain'
 import { Labels } from '../../core/meter.js'
@@ -23,7 +24,7 @@ class MockBaseContext extends BaseContext {
   }
 
   protected getMetaDataInternal(name: string, labels: Labels): RecordMetaData {
-    return {
+    return create(RecordMetaDataSchema, {
       address: '',
       contractName: '',
       labels: {},
@@ -33,7 +34,7 @@ class MockBaseContext extends BaseContext {
       logIndex: 0,
       chainId: ChainId.ETHEREUM,
       name
-    }
+    })
   }
 
   getChainId(): ChainId {
@@ -42,7 +43,7 @@ class MockBaseContext extends BaseContext {
 }
 
 describe('Test MemoryCache', () => {
-  const subject = new Subject<DeepPartial<ProcessStreamResponse>>()
+  const subject = new Subject<MessageInitShape<typeof ProcessStreamResponseSchema>>()
   const storeContext = new StoreContext(subject, 1)
   const db = new MemoryDatabase(storeContext)
   const mockContext = new MockBaseContext()

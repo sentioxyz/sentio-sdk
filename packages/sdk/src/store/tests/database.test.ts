@@ -6,10 +6,11 @@ import { MemoryDatabase, withStoreContext } from '../../testing/memory-database.
 import { StoreContext } from '../context.js'
 import { BigDecimal } from '@sentio/bigdecimal'
 import { Subject } from 'rxjs'
-import { DeepPartial, ProcessStreamResponse } from '@sentio/protos'
+import { ProcessStreamResponseSchema } from '@sentio/protos'
+import { type MessageInitShape } from '@bufbuild/protobuf'
 
 describe('Test Database', () => {
-  const subject = new Subject<DeepPartial<ProcessStreamResponse>>()
+  const subject = new Subject<MessageInitShape<typeof ProcessStreamResponseSchema>>()
 
   const storeContext = new StoreContext(subject, 1)
   const db = new MemoryDatabase(storeContext)
@@ -93,21 +94,16 @@ describe('Test Database', () => {
         value: []
       }
     ])
-    assert.deepEqual(db.lastDbRequest?.list?.filters, [
-      {
-        field: 'arrayValue',
-        op: 1,
-        value: {
-          values: [
-            {
-              listValue: {
-                values: []
-              }
-            }
-          ]
-        }
-      }
-    ])
+    const lastReq = db.lastDbRequest
+    const filters = lastReq?.op.case === 'list' ? lastReq.op.value.filters : undefined
+    assert.equal(filters?.length, 1)
+    assert.equal(filters?.[0].field, 'arrayValue')
+    assert.equal(filters?.[0].op, 1)
+    const filterValues = filters?.[0].value?.values
+    assert.equal(filterValues?.length, 1)
+    const inner = filterValues?.[0].value
+    assert.equal(inner?.case, 'listValue')
+    assert.deepEqual(inner?.case === 'listValue' ? inner.value.values : undefined, [])
   })
 
   it('filter constraints', async () => {

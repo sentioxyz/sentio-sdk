@@ -34,14 +34,14 @@ export type CallHandler<T> = {
   handlerName: string
   handler: (call: T) => Promise<ProcessResult>
   fetchConfig?: { filters: FuelCallFilter[] }
-  assetConfig?: Partial<FuelAssetHandlerConfig>
+  assetConfig?: Omit<Partial<FuelAssetHandlerConfig>, '$typeName' | '$unknown'>
   partitionHandler?: (call: T) => Promise<string | undefined>
 }
 
 export type ReceiptHandler = {
   handlerName: string
   handler: (receipt: Data_FuelReceipt) => Promise<ProcessResult>
-  receiptConfig?: Partial<FuelReceiptHandlerConfig>
+  receiptConfig?: Omit<Partial<FuelReceiptHandlerConfig>, '$typeName' | '$unknown'>
   partitionHandler?: (receipt: Data_FuelReceipt) => Promise<string | undefined>
 }
 

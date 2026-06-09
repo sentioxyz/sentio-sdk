@@ -1,7 +1,20 @@
 import { Labels } from './meter.js'
 import { BigDecimal } from './big-decimal.js'
 import { BN } from 'fuels'
-import { CoinID, RichStruct, RichValue, RichValue_NullValue, TokenAmount } from '@sentio/protos'
+import {
+  type CoinID,
+  CoinIDSchema,
+  CoinID_AddressIdentifierSchema,
+  type RichStruct,
+  RichStructSchema,
+  type RichValue,
+  RichValueSchema,
+  RichValue_NullValue,
+  type TokenAmount,
+  TokenAmountSchema,
+  timestampFromDate
+} from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
 import { toBigInteger, toBigDecimal } from './numberish.js'
 
 export const SENTIO_BIGINT_STRING_SUFFIX = ':sto_bi'
@@ -107,73 +120,78 @@ export function normalizeAttribute(record: Record<string, any>): any {
 
 function normalizeToRichValue(value: any): RichValue {
   if (value == null) {
-    return { nullValue: RichValue_NullValue.NULL_VALUE }
+    return create(RichValueSchema, { value: { case: 'nullValue', value: RichValue_NullValue.NULL_VALUE } })
   }
   switch (typeof value) {
     case 'string':
-      return { stringValue: value }
+      return create(RichValueSchema, { value: { case: 'stringValue', value } })
     case 'bigint':
       const v = BigInt(value)
-      return { bigintValue: toBigInteger(v) }
+      return create(RichValueSchema, { value: { case: 'bigintValue', value: toBigInteger(v) } })
     case 'number':
       if (isNaN(value) || !isFinite(value)) {
         throw new Error("can't submit NaN or Infinity value")
       }
-      return { bigdecimalValue: toBigDecimal(new BigDecimal(value)) }
+      return create(RichValueSchema, {
+        value: { case: 'bigdecimalValue', value: toBigDecimal(new BigDecimal(value)) }
+      })
     case 'function':
-      return { nullValue: RichValue_NullValue.UNRECOGNIZED }
+      return create(RichValueSchema, { value: { case: 'nullValue', value: RichValue_NullValue.NULL_VALUE } })
     case 'symbol':
-      return { stringValue: String(value) }
+      return create(RichValueSchema, { value: { case: 'stringValue', value: String(value) } })
     case 'boolean':
-      return { boolValue: value }
+      return create(RichValueSchema, { value: { case: 'boolValue', value } })
     default:
       if (value instanceof Uint8Array) {
-        return { bytesValue: value }
+        return create(RichValueSchema, { value: { case: 'bytesValue', value } })
       }
       if (value instanceof Date) {
-        return { timestampValue: value }
+        return create(RichValueSchema, { value: { case: 'timestampValue', value: timestampFromDate(value) } })
       }
       if (value instanceof BigDecimal) {
-        return { bigdecimalValue: toBigDecimal(value) }
+        return create(RichValueSchema, { value: { case: 'bigdecimalValue', value: toBigDecimal(value) } })
       }
       if (BN.isBN(value)) {
         const value1 = new BigDecimal(value.toString())
         if (value1.isNaN() || !value1.isFinite()) {
           throw new Error("can't submit NaN or Infinity value")
         }
-        return { bigdecimalValue: toBigDecimal(value1) }
+        return create(RichValueSchema, { value: { case: 'bigdecimalValue', value: toBigDecimal(value1) } })
       }
       if (Array.isArray(value)) {
-        return {
-          listValue: {
-            values: value.map((v) => normalizeToRichValue(v))
+        return create(RichValueSchema, {
+          value: {
+            case: 'listValue',
+            value: {
+              values: value.map((v) => normalizeToRichValue(v))
+            }
           }
-        }
+        })
       }
       if (value instanceof Promise) {
         console.error('Cannot submit promise')
-        return { nullValue: RichValue_NullValue.UNRECOGNIZED }
+        return create(RichValueSchema, { value: { case: 'nullValue', value: RichValue_NullValue.NULL_VALUE } })
       }
       if (typeof value === 'object') {
         const tokenAmount = toTokenAmount(value)
         if (tokenAmount) {
-          return { tokenValue: tokenAmount }
+          return create(RichValueSchema, { value: { case: 'tokenValue', value: tokenAmount } })
         }
 
-        return {
-          structValue: normalizeToRichStruct(value)
-        }
+        return create(RichValueSchema, {
+          value: { case: 'structValue', value: normalizeToRichStruct(value) }
+        })
       }
 
       console.warn('Cannot submit unsupported type ' + typeof value)
-      return { nullValue: RichValue_NullValue.UNRECOGNIZED }
+      return create(RichValueSchema, { value: { case: 'nullValue', value: RichValue_NullValue.NULL_VALUE } })
   }
 }
 
 export function normalizeToRichStruct(...objs: any[]): RichStruct {
-  const ret: RichStruct = {
+  const ret: RichStruct = create(RichStructSchema, {
     fields: {}
-  }
+  })
   for (const obj of objs) {
     for (const [key, value] of Object.entries(obj)) {
       try {
@@ -189,7 +207,7 @@ export function normalizeToRichStruct(...objs: any[]): RichStruct {
 }
 
 function toTokenAmount(value: any): TokenAmount | undefined {
-  const ret = TokenAmount.create()
+  const ret = create(TokenAmountSchema)
 
   for (const key of Object.getOwnPropertyNames(value)) {
     switch (key) {
@@ -211,7 +229,7 @@ function toTokenAmount(value: any): TokenAmount | undefined {
         break
       case 'specifiedAt':
         if (value.specifiedAt instanceof Date) {
-          ret.specifiedAt = value.specifiedAt
+          ret.specifiedAt = timestampFromDate(value.specifiedAt)
         } else {
           return undefined
         }
@@ -225,13 +243,17 @@ function toTokenAmount(value: any): TokenAmount | undefined {
 }
 
 function toCoinID(coin: any): CoinID | undefined {
-  const ret = CoinID.create()
+  const ret = create(CoinIDSchema)
   if (typeof coin.symbol === 'string') {
-    return (ret.symbol = coin.symbol)
+    ret.id = { case: 'symbol', value: coin.symbol }
+    return ret
   } else if (coin.hasOwnProperty('address')) {
-    ret.address = {
-      address: coin.address.address,
-      chain: coin.address.chain
+    ret.id = {
+      case: 'address',
+      value: create(CoinID_AddressIdentifierSchema, {
+        address: coin.address.address,
+        chain: coin.address.chain
+      })
     }
   } else {
     return undefined

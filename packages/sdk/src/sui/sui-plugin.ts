@@ -1,15 +1,17 @@
 import { errorString, mergeProcessResults, Plugin, PluginManager } from '@sentio/runtime'
 import {
-  DataBinding,
+  type DataBinding,
   HandlerType,
-  InitResponse,
-  ProcessConfigResponse,
-  ProcessResult,
-  ProcessStreamResponse_Partitions,
-  StartRequest
+  type InitResponse,
+  type ProcessConfigResponse,
+  type ProcessResult,
+  type ProcessStreamResponse_Partitions,
+  ProcessStreamResponse_PartitionsSchema,
+  type StartRequest
 } from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
 
-import { ServerError, Status } from 'nice-grpc'
+import { ConnectError, Code } from '@connectrpc/connect'
 import { PartitionHandlerManager } from '../core/index.js'
 import { HandlerRegister } from '../core/handler-register.js'
 
@@ -60,7 +62,7 @@ export class SuiPlugin extends Plugin {
       case HandlerType.SUI_OBJECT_CHANGE:
         return this.processSuiObjectChange(request)
       default:
-        throw new ServerError(Status.INVALID_ARGUMENT, 'No handle type registered ' + request.handlerType)
+        throw new ConnectError('No handle type registered ' + request.handlerType, Code.InvalidArgument)
     }
   }
 
@@ -68,48 +70,48 @@ export class SuiPlugin extends Plugin {
     let data: any
     switch (request.handlerType) {
       case HandlerType.SUI_EVENT:
-        if (!request.data?.suiEvent) {
-          throw new ServerError(Status.INVALID_ARGUMENT, "suiEvent can't be empty")
+        if (request.data?.value.case !== 'suiEvent') {
+          throw new ConnectError("suiEvent can't be empty", Code.InvalidArgument)
         }
-        data = request.data.suiEvent
+        data = request.data.value.value
         break
       case HandlerType.SUI_CALL:
-        if (!request.data?.suiCall) {
-          throw new ServerError(Status.INVALID_ARGUMENT, "suiCall can't be empty")
+        if (request.data?.value.case !== 'suiCall') {
+          throw new ConnectError("suiCall can't be empty", Code.InvalidArgument)
         }
-        data = request.data.suiCall
+        data = request.data.value.value
         break
       case HandlerType.SUI_OBJECT:
-        if (!request.data?.suiObject) {
-          throw new ServerError(Status.INVALID_ARGUMENT, "suiObject can't be empty")
+        if (request.data?.value.case !== 'suiObject') {
+          throw new ConnectError("suiObject can't be empty", Code.InvalidArgument)
         }
-        data = request.data.suiObject
+        data = request.data.value.value
         break
       case HandlerType.SUI_OBJECT_CHANGE:
-        if (!request.data?.suiObjectChange) {
-          throw new ServerError(Status.INVALID_ARGUMENT, "suiObjectChange can't be empty")
+        if (request.data?.value.case !== 'suiObjectChange') {
+          throw new ConnectError("suiObjectChange can't be empty", Code.InvalidArgument)
         }
-        data = request.data.suiObjectChange
+        data = request.data.value.value
         break
       default:
-        throw new ServerError(Status.INVALID_ARGUMENT, 'No handle type registered ' + request.handlerType)
+        throw new ConnectError('No handle type registered ' + request.handlerType, Code.InvalidArgument)
     }
     const partitions = await this.partitionManager.processPartitionForHandlerType(
       request.handlerType,
       request.handlerIds,
       data
     )
-    return {
+    return create(ProcessStreamResponse_PartitionsSchema, {
       partitions
-    }
+    })
   }
 
   async processSuiEvent(binding: DataBinding): Promise<ProcessResult> {
-    if (!binding.data?.suiEvent) {
-      throw new ServerError(Status.INVALID_ARGUMENT, "Event can't be empty")
+    if (binding.data?.value.case !== 'suiEvent') {
+      throw new ConnectError("Event can't be empty", Code.InvalidArgument)
     }
     const promises: Promise<ProcessResult>[] = []
-    const event = binding.data.suiEvent
+    const event = binding.data.value.value
 
     for (const handlerId of binding.handlerIds) {
       promises.push(
@@ -119,9 +121,9 @@ export class SuiPlugin extends Plugin {
             handlerId
           )(event)
           .catch((e: any) => {
-            throw new ServerError(
-              Status.INTERNAL,
-              'error processing event: ' + JSON.stringify(event) + '\n' + errorString(e)
+            throw new ConnectError(
+              'error processing event: ' + JSON.stringify(event) + '\n' + errorString(e),
+              Code.Internal
             )
           })
       )
@@ -130,10 +132,10 @@ export class SuiPlugin extends Plugin {
   }
 
   async processSuiFunctionCall(binding: DataBinding): Promise<ProcessResult> {
-    if (!binding.data?.suiCall) {
-      throw new ServerError(Status.INVALID_ARGUMENT, "Call can't be empty")
+    if (binding.data?.value.case !== 'suiCall') {
+      throw new ConnectError("Call can't be empty", Code.InvalidArgument)
     }
-    const call = binding.data.suiCall
+    const call = binding.data.value.value
 
     const promises: Promise<ProcessResult>[] = []
     for (const handlerId of binding.handlerIds) {
@@ -143,9 +145,9 @@ export class SuiPlugin extends Plugin {
           handlerId
         )(call)
         .catch((e: any) => {
-          throw new ServerError(
-            Status.INTERNAL,
-            'error processing call: ' + JSON.stringify(call) + '\n' + errorString(e)
+          throw new ConnectError(
+            'error processing call: ' + JSON.stringify(call) + '\n' + errorString(e),
+            Code.Internal
           )
         })
       promises.push(promise)
@@ -154,10 +156,10 @@ export class SuiPlugin extends Plugin {
   }
 
   async processSuiObject(binding: DataBinding): Promise<ProcessResult> {
-    if (!binding.data?.suiObject) {
-      throw new ServerError(Status.INVALID_ARGUMENT, "Object can't be empty")
+    if (binding.data?.value.case !== 'suiObject') {
+      throw new ConnectError("Object can't be empty", Code.InvalidArgument)
     }
-    const object = binding.data.suiObject
+    const object = binding.data.value.value
 
     const promises: Promise<ProcessResult>[] = []
     for (const handlerId of binding.handlerIds) {
@@ -168,9 +170,9 @@ export class SuiPlugin extends Plugin {
             handlerId
           )(object)
           .catch((e: any) => {
-            throw new ServerError(
-              Status.INTERNAL,
-              'error processing object: ' + JSON.stringify(object) + '\n' + errorString(e)
+            throw new ConnectError(
+              'error processing object: ' + JSON.stringify(object) + '\n' + errorString(e),
+              Code.Internal
             )
           })
       )
@@ -179,10 +181,10 @@ export class SuiPlugin extends Plugin {
   }
 
   async processSuiObjectChange(binding: DataBinding): Promise<ProcessResult> {
-    if (!binding.data?.suiObjectChange) {
-      throw new ServerError(Status.INVALID_ARGUMENT, "Object change can't be empty")
+    if (binding.data?.value.case !== 'suiObjectChange') {
+      throw new ConnectError("Object change can't be empty", Code.InvalidArgument)
     }
-    const objectChange = binding.data.suiObjectChange
+    const objectChange = binding.data.value.value
 
     const promises: Promise<ProcessResult>[] = []
     for (const handlerId of binding.handlerIds) {
@@ -193,9 +195,9 @@ export class SuiPlugin extends Plugin {
             handlerId
           )(objectChange)
           .catch((e: any) => {
-            throw new ServerError(
-              Status.INTERNAL,
-              'error processing object change: ' + JSON.stringify(objectChange) + '\n' + errorString(e)
+            throw new ConnectError(
+              'error processing object change: ' + JSON.stringify(objectChange) + '\n' + errorString(e),
+              Code.Internal
             )
           })
       )

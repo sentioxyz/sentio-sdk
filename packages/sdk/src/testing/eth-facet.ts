@@ -1,5 +1,12 @@
 import { TestProcessorServer } from './test-processor-server.js'
-import { DataBinding, HandlerType, ProcessBindingResponse } from '@sentio/protos'
+import {
+  type DataBinding,
+  DataBindingSchema,
+  HandlerType,
+  type ProcessBindingResponse,
+  timestampNow
+} from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
 import { Trace } from '../eth/eth.js'
 import { BlockParams, LogParams, TransactionResponseParams } from 'ethers/providers'
 import { ChainId, EthChainId } from '@sentio/chain'
@@ -48,17 +55,20 @@ export class EthFacet {
       }
       for (const config of contract.traceConfigs) {
         if (config.signature == signature) {
-          return {
+          return create(DataBindingSchema, {
             data: {
-              ethTrace: {
-                rawTrace: JSON.stringify(trace),
-                timestamp: new Date()
+              value: {
+                case: 'ethTrace',
+                value: {
+                  rawTrace: JSON.stringify(trace),
+                  timestamp: timestampNow()
+                }
               }
             },
             handlerIds: [config.handlerId],
             handlerType: HandlerType.ETH_TRACE,
             chainId: network
-          }
+          })
         }
       }
     }
@@ -116,14 +126,17 @@ export class EthFacet {
             break
           }
           if (match) {
-            return {
+            return create(DataBindingSchema, {
               data: {
-                ethLog: { timestamp: new Date(), rawLog: JSON.stringify(log) }
+                value: {
+                  case: 'ethLog',
+                  value: { timestamp: timestampNow(), rawLog: JSON.stringify(log) }
+                }
               },
               handlerIds: [config.handlerId],
               handlerType: HandlerType.ETH_LOG,
               chainId: network
-            }
+            })
           }
         }
       }
@@ -190,14 +203,17 @@ export class EthFacet {
             break
           }
           if (match) {
-            return {
+            return create(DataBindingSchema, {
               data: {
-                ethLog: { timestamp: new Date(), rawLog: JSON.stringify(log) }
+                value: {
+                  case: 'ethLog',
+                  value: { timestamp: timestampNow(), rawLog: JSON.stringify(log) }
+                }
               },
               handlerIds: [config.handlerId],
               handlerType: HandlerType.ETH_LOG,
               chainId: network
-            }
+            })
           }
         }
       }
@@ -230,14 +246,17 @@ export class EthFacet {
     block: Partial<BlockParams> & { number: number },
     network: EthChainId = EthChainId.ETHEREUM
   ): DataBinding {
-    const binding: DataBinding = {
+    const binding: DataBinding = create(DataBindingSchema, {
       data: {
-        ethBlock: { rawBlock: JSON.stringify(block) }
+        value: {
+          case: 'ethBlock',
+          value: { rawBlock: JSON.stringify(block) }
+        }
       },
       handlerType: HandlerType.ETH_BLOCK,
       handlerIds: [],
       chainId: network
-    }
+    })
     for (const contract of this.server.contractConfigs) {
       if (contract.contract?.chainId !== network) {
         continue
@@ -282,14 +301,17 @@ export class EthFacet {
     transaction: Partial<TransactionResponseParams>,
     network: EthChainId = EthChainId.ETHEREUM
   ): DataBinding {
-    const binding: DataBinding = {
+    const binding: DataBinding = create(DataBindingSchema, {
       data: {
-        ethTransaction: { timestamp: new Date(), rawTransaction: JSON.stringify(transaction) }
+        value: {
+          case: 'ethTransaction',
+          value: { timestamp: timestampNow(), rawTransaction: JSON.stringify(transaction) }
+        }
       },
       handlerType: HandlerType.ETH_TRANSACTION,
       handlerIds: [],
       chainId: network
-    }
+    })
     for (const contract of this.server.contractConfigs) {
       if (contract.contract?.chainId !== network) {
         continue

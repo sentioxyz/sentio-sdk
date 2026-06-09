@@ -1,6 +1,6 @@
 import { SuiChainId } from '@sentio/chain'
 import { Endpoints } from '@sentio/runtime'
-// import { ServerError, Status } from 'nice-grpc'
+// import { ConnectError, Code } from '@connectrpc/connect'
 import { IotaClient } from '@iota/iota-sdk/client'
 
 export type IotaNetwork = SuiChainId
@@ -13,7 +13,7 @@ export function getClient(network: IotaNetwork): IotaClient {
   let chainServer = Endpoints.INSTANCE.chainServer.get(network)
   if (!chainServer) {
     chainServer = getRpcEndpoint(network)
-    // throw new ServerError(Status.INTERNAL, 'RPC endpoint not provided')
+    // throw new ConnectError('RPC endpoint not provided', Code.Internal)
   }
   return new IotaClient({ url: chainServer })
 }

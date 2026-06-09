@@ -1,7 +1,15 @@
-import { Data_SuiCall, Data_SuiEvent, Data_SuiObjectChange, MoveFetchConfig } from '@sentio/protos'
+import {
+  type Data_SuiCall,
+  type Data_SuiEvent,
+  type Data_SuiObjectChange,
+  type MoveFetchConfig,
+  MoveFetchConfigSchema,
+  timestampDate
+} from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
 import { ListStateStorage } from '@sentio/runtime'
 import { SuiNetwork } from './network.js'
-import { ServerError, Status } from 'nice-grpc'
+import { ConnectError, Code } from '@connectrpc/connect'
 import { SuiContext, SuiObjectChangeContext } from './context.js'
 import type { SuiObjectChange } from '@mysten/sui/jsonRpc'
 import type { GrpcTypes } from '@mysten/sui/grpc'
@@ -23,11 +31,11 @@ import { Required } from 'utility-types'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 import { HandlerOptions } from './models.js'
 
-export const DEFAULT_FETCH_CONFIG: MoveFetchConfig = {
+export const DEFAULT_FETCH_CONFIG: MoveFetchConfig = create(MoveFetchConfigSchema, {
   resourceChanges: false,
   allEvents: true,
   inputs: true
-}
+})
 
 export type IndexConfigure = Required<SuiBindOptions, 'startCheckpoint' | 'network'>
 
@@ -82,7 +90,7 @@ export class SuiBaseProcessor {
     handlerOptions?: HandlerOptions<MoveFetchConfig, T>
   ): SuiBaseProcessor {
     let _filters: EventFilter[] = []
-    const _fetchConfig = MoveFetchConfig.fromPartial({ ...DEFAULT_FETCH_CONFIG, ...handlerOptions })
+    const _fetchConfig = create(MoveFetchConfigSchema, { ...DEFAULT_FETCH_CONFIG, ...handlerOptions })
 
     if (Array.isArray(filter)) {
       _filters = filter
@@ -99,7 +107,7 @@ export class SuiBaseProcessor {
       handlerName: getHandlerName(),
       handler: async function (data) {
         if (!data.rawTransaction) {
-          throw new ServerError(Status.INVALID_ARGUMENT, 'event is null')
+          throw new ConnectError('event is null', Code.InvalidArgument)
         }
         const txn = JSON.parse(data.rawTransaction) as GrpcTypes.ExecutedTransaction
 
@@ -111,7 +119,7 @@ export class SuiBaseProcessor {
           processor.moduleName,
           processor.config.network,
           processor.config.address,
-          data.timestamp || new Date(0),
+          data.timestamp ? timestampDate(data.timestamp) : new Date(0),
           data.slot,
           txn,
           idx,
@@ -145,7 +153,7 @@ export class SuiBaseProcessor {
     handlerOptions?: HandlerOptions<MoveFetchConfig, T>
   ): SuiBaseProcessor {
     let _filters: FunctionNameAndCallFilter[] = []
-    const _fetchConfig = MoveFetchConfig.fromPartial({ ...DEFAULT_FETCH_CONFIG, ...handlerOptions })
+    const _fetchConfig = create(MoveFetchConfigSchema, { ...DEFAULT_FETCH_CONFIG, ...handlerOptions })
 
     if (Array.isArray(filter)) {
       _filters = filter
@@ -160,7 +168,7 @@ export class SuiBaseProcessor {
       handlerName: getHandlerName(),
       handler: async function (data) {
         if (!data.rawTransaction) {
-          throw new ServerError(Status.INVALID_ARGUMENT, 'call is null')
+          throw new ConnectError('call is null', Code.InvalidArgument)
         }
         const tx = JSON.parse(data.rawTransaction) as GrpcTypes.ExecutedTransaction
 
@@ -168,7 +176,7 @@ export class SuiBaseProcessor {
           processor.moduleName,
           processor.config.network,
           processor.config.address,
-          data.timestamp || new Date(0),
+          data.timestamp ? timestampDate(data.timestamp) : new Date(0),
           data.slot,
           tx,
           0,
@@ -178,7 +186,7 @@ export class SuiBaseProcessor {
           const calls = getMoveCalls(tx)
           const programmableTx = getProgrammableTransaction(tx)
           if (!programmableTx) {
-            throw new ServerError(Status.INVALID_ARGUMENT, 'Unexpected getTransactionKind get empty')
+            throw new ConnectError('Unexpected getTransactionKind get empty', Code.InvalidArgument)
           }
 
           // TODO potential pass index
@@ -228,7 +236,7 @@ export class SuiBaseProcessor {
     filter?: TransactionFilter,
     handlerOptions?: HandlerOptions<MoveFetchConfig, GrpcTypes.ExecutedTransaction>
   ): this {
-    const _fetchConfig = MoveFetchConfig.fromPartial({ ...DEFAULT_FETCH_CONFIG, ...handlerOptions })
+    const _fetchConfig = create(MoveFetchConfigSchema, { ...DEFAULT_FETCH_CONFIG, ...handlerOptions })
 
     const processor = this
 
@@ -236,7 +244,7 @@ export class SuiBaseProcessor {
       handlerName: getHandlerName(),
       handler: async function (data) {
         if (!data.rawTransaction) {
-          throw new ServerError(Status.INVALID_ARGUMENT, 'transaction is null')
+          throw new ConnectError('transaction is null', Code.InvalidArgument)
         }
         const tx = JSON.parse(data.rawTransaction) as GrpcTypes.ExecutedTransaction
 
@@ -244,7 +252,7 @@ export class SuiBaseProcessor {
           processor.moduleName,
           processor.config.network,
           processor.config.address,
-          data.timestamp || new Date(0),
+          data.timestamp ? timestampDate(data.timestamp) : new Date(0),
           data.slot,
           tx,
           0,
@@ -275,7 +283,7 @@ export class SuiBaseProcessor {
     type: string | string[]
   ): this {
     if (this.config.network === SuiNetwork.TEST_NET) {
-      throw new ServerError(Status.INVALID_ARGUMENT, 'object change not supported in testnet')
+      throw new ConnectError('object change not supported in testnet', Code.InvalidArgument)
     }
     const processor = this
     this.objectChangeHandlers.push({
@@ -284,7 +292,7 @@ export class SuiBaseProcessor {
         const ctx = new SuiObjectChangeContext(
           processor.config.network,
           processor.config.address,
-          data.timestamp || new Date(0),
+          data.timestamp ? timestampDate(data.timestamp) : new Date(0),
           data.slot,
           data.txDigest,
           processor.config.baseLabels
@@ -316,7 +324,7 @@ export class SuiGlobalProcessor extends SuiBaseProcessor {
   ): this {
     // TODO enable more strict check
     // if (!filter.publicKeyPrefix || filter.publicKeyPrefix.length < 2) {
-    //   throw new ServerError(Status.INVALID_ARGUMENT, 'restriction too low for global processor')
+    //   throw new ConnectError('restriction too low for global processor', Code.InvalidArgument)
     // }
     return super.onTransactionBlock(handler, filter, fetchConfig)
   }

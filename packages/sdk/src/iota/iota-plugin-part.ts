@@ -1,15 +1,20 @@
 import { USER_PROCESSOR } from '@sentio/runtime'
 import {
-  AccountConfig,
-  ContractConfig,
+  AccountConfigSchema,
+  ContractConfigSchema,
   HandlerType,
-  InitResponse,
-  MoveCallHandlerConfig,
-  MoveEventHandlerConfig,
-  MoveResourceChangeConfig,
-  ProcessConfigResponse,
-  StartRequest
+  type InitResponse,
+  type MoveCallHandlerConfig,
+  MoveCallHandlerConfigSchema,
+  type MoveEventHandlerConfig,
+  MoveEventHandlerConfigSchema,
+  MoveOnIntervalConfigSchema,
+  type MoveResourceChangeConfig,
+  MoveResourceChangeConfigSchema,
+  type ProcessConfigResponse,
+  type StartRequest
 } from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
 
 import { PartitionHandlerManager } from '../core/index.js'
 import { HandlerRegister } from '../core/handler-register.js'
@@ -75,7 +80,7 @@ export class IotaPluginPart {
       if (forChainId !== undefined && forChainId !== chainId.toString()) {
         continue
       }
-      const contractConfig = ContractConfig.fromPartial({
+      const contractConfig = create(ContractConfigSchema, {
         transactionConfig: [],
         processorType: USER_PROCESSOR,
         contract: {
@@ -90,7 +95,7 @@ export class IotaPluginPart {
       for (const handler of suiProcessor.eventHandlers) {
         const handlerId = this.handlerRegister.register(handler.handler, chainId)
         this.partitionManager.registerPartitionHandler(HandlerType.SUI_EVENT, handlerId, handler.partitionHandler)
-        const eventHandlerConfig: MoveEventHandlerConfig = {
+        const eventHandlerConfig: MoveEventHandlerConfig = create(MoveEventHandlerConfigSchema, {
           filters: handler.filters.map((f) => {
             return {
               type: f.type,
@@ -101,13 +106,13 @@ export class IotaPluginPart {
           fetchConfig: handler.fetchConfig,
           handlerId,
           handlerName: handler.handlerName
-        }
+        })
         contractConfig.moveEventConfigs.push(eventHandlerConfig)
       }
       for (const handler of suiProcessor.callHandlers) {
         const handlerId = this.handlerRegister.register(handler.handler, chainId)
         this.partitionManager.registerPartitionHandler(HandlerType.SUI_CALL, handlerId, handler.partitionHandler)
-        const functionHandlerConfig: MoveCallHandlerConfig = {
+        const functionHandlerConfig: MoveCallHandlerConfig = create(MoveCallHandlerConfigSchema, {
           filters: handler.filters.map((filter) => {
             return {
               function: filter.function,
@@ -121,18 +126,18 @@ export class IotaPluginPart {
           fetchConfig: handler.fetchConfig,
           handlerId,
           handlerName: handler.handlerName
-        }
+        })
         contractConfig.moveCallConfigs.push(functionHandlerConfig)
       }
       // deprecated, use objectType processor instead
       for (const handler of suiProcessor.objectChangeHandlers) {
         const handlerId = this.handlerRegister.register(handler.handler, chainId)
-        const objectChangeHandler: MoveResourceChangeConfig = {
+        const objectChangeHandler: MoveResourceChangeConfig = create(MoveResourceChangeConfigSchema, {
           types: typeof handler.type === 'string' ? [handler.type] : handler.type,
           handlerId,
           handlerName: handler.handlerName,
           includeDeleted: false
-        }
+        })
         contractConfig.moveResourceChangeConfigs.push(objectChangeHandler)
       }
       config.contractConfigs.push(contractConfig)
@@ -143,7 +148,7 @@ export class IotaPluginPart {
       if (forChainId !== undefined && forChainId !== chainId.toString()) {
         continue
       }
-      const accountConfig = AccountConfig.fromPartial({
+      const accountConfig = create(AccountConfigSchema, {
         address: processor.config.address,
         chainId: processor.getChainId(),
         startBlock: processor.config.startCheckpoint, // TODO maybe use another field
@@ -152,39 +157,41 @@ export class IotaPluginPart {
 
       for (const handler of processor.objectChangeHandlers) {
         const handlerId = this.handlerRegister.register(handler.handler, chainId)
-        const objectChangeHandler: MoveResourceChangeConfig = {
+        const objectChangeHandler: MoveResourceChangeConfig = create(MoveResourceChangeConfigSchema, {
           types: typeof handler.type === 'string' ? [handler.type] : handler.type,
           handlerId,
           handlerName: handler.handlerName,
           includeDeleted: false
-        }
+        })
         accountConfig.moveResourceChangeConfigs.push(objectChangeHandler)
       }
 
       for (const handler of processor.objectHandlers) {
         const handlerId = this.handlerRegister.register(handler.handler, chainId)
 
-        accountConfig.moveIntervalConfigs.push({
-          intervalConfig: {
-            handlerId: handlerId,
-            handlerName: handler.handlerName,
-            minutes: 0,
-            minutesInterval: handler.timeIntervalInMinutes,
-            slot: 0,
-            slotInterval: handler.checkPointInterval,
+        accountConfig.moveIntervalConfigs.push(
+          create(MoveOnIntervalConfigSchema, {
+            intervalConfig: {
+              handlerId: handlerId,
+              handlerName: handler.handlerName,
+              minutes: 0,
+              minutesInterval: handler.timeIntervalInMinutes,
+              slot: 0,
+              slotInterval: handler.checkPointInterval,
+              fetchConfig: undefined
+            },
+            type: handler.type || '',
+            ownerType: processor.ownerType,
+            resourceFetchConfig: handler.fetchConfig,
             fetchConfig: undefined
-          },
-          type: handler.type || '',
-          ownerType: processor.ownerType,
-          resourceFetchConfig: handler.fetchConfig,
-          fetchConfig: undefined
-        })
+          })
+        )
       }
 
       if (processor instanceof IotaAddressProcessor) {
         for (const handler of processor.callHandlers) {
           const handlerId = this.handlerRegister.register(handler.handler, chainId)
-          const functionHandlerConfig: MoveCallHandlerConfig = {
+          const functionHandlerConfig: MoveCallHandlerConfig = create(MoveCallHandlerConfigSchema, {
             filters: handler.filters.map((filter) => {
               return {
                 function: filter.function,
@@ -198,7 +205,7 @@ export class IotaPluginPart {
             fetchConfig: handler.fetchConfig,
             handlerId,
             handlerName: handler.handlerName
-          }
+          })
           accountConfig.moveCallConfigs.push(functionHandlerConfig)
         }
       }

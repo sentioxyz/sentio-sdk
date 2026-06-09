@@ -2,7 +2,13 @@ import { ListStateStorage, processMetrics } from '@sentio/runtime'
 import { AptosResourcesContext } from './context.js'
 import { AptosBindOptions } from './network.js'
 import { AptosResourcesProcessor, DEFAULT_RESOURCE_FETCH_CONFIG } from './aptos-processor.js'
-import { HandleInterval, MoveAccountFetchConfig, TemplateInstance } from '@sentio/protos'
+import {
+  type HandleInterval,
+  HandleIntervalSchema,
+  type MoveAccountFetchConfig,
+  TemplateInstanceSchema
+} from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
 import { MoveResource } from '@aptos-labs/ts-sdk'
 import { PromiseOrVoid } from '../core/index.js'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
@@ -40,7 +46,7 @@ export class AptosResourceProcessorTemplate {
     options.network = options.network || ctx.network
     options.startVersion = options.startVersion || ctx.version
 
-    const instance: TemplateInstance = {
+    const instance = create(TemplateInstanceSchema, {
       templateId: this.id,
       contract: {
         name: '',
@@ -51,7 +57,7 @@ export class AptosResourceProcessorTemplate {
       startBlock: options.startVersion ? BigInt(options.startVersion) : 0n,
       endBlock: options.endVersion ? BigInt(options.endVersion) : 0n,
       baseLabels: options.baseLabels
-    }
+    })
 
     ctx.sendTemplateInstance(instance)
 
@@ -119,10 +125,10 @@ export class AptosResourceProcessorTemplate {
   ): this {
     return this.onInterval(
       handler,
-      {
+      create(HandleIntervalSchema, {
         recentInterval: timeIntervalInMinutes,
         backfillInterval: backfillTimeIntervalInMinutes
-      },
+      }),
       undefined,
       type,
       handlerOptions
@@ -139,7 +145,10 @@ export class AptosResourceProcessorTemplate {
     return this.onInterval(
       handler,
       undefined,
-      { recentInterval: checkpointInterval, backfillInterval: backfillCheckpointInterval },
+      create(HandleIntervalSchema, {
+        recentInterval: checkpointInterval,
+        backfillInterval: backfillCheckpointInterval
+      }),
       type,
       handlerOptions
     )

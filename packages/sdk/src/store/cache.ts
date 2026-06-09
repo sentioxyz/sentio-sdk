@@ -1,5 +1,6 @@
 import { IStoreContext } from '@sentio/runtime'
-import { DBRequest, DBResponse, RichStruct, RichValue } from '@sentio/protos'
+import { type DBResponse, type RichStruct, RichStructSchema } from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
 import { BaseContext } from '../core/index.js'
 
 /** Internal entity name used for cache storage */
@@ -64,17 +65,20 @@ export class MemoryCache {
    */
   public async get<T>(key: string): Promise<T | null> {
     const promise = this.storeContext.sendRequest({
-      get: {
+      case: 'get',
+      value: {
         entity: CacheItemEntityName,
         id: key
       }
     })
 
     const data = (await promise) as DBResponse
-    if (data.entityList?.entities[0]) {
-      const entityData = data.entityList?.entities[0]?.data as RichStruct
-      const value = entityData.fields['value'] as RichValue
-      return JSON.parse(value.stringValue!) as T
+    if (data.value.case === 'entityList' && data.value.value.entities[0]) {
+      const entityData = data.value.value.entities[0]?.data
+      const value = entityData?.fields['value']
+      if (value?.value.case === 'stringValue') {
+        return JSON.parse(value.value.value) as T
+      }
     }
 
     return null
@@ -94,24 +98,24 @@ export class MemoryCache {
    * ```
    */
   public async set<T>(key: string, value: T): Promise<void> {
-    const entityData: RichStruct = {
+    const entityData: RichStruct = create(RichStructSchema, {
       fields: {
         id: {
-          stringValue: key
+          value: { case: 'stringValue', value: key }
         },
         value: {
-          stringValue: JSON.stringify(value)
+          value: { case: 'stringValue', value: JSON.stringify(value) }
         }
       }
-    }
-    const request = {
-      upsert: {
+    })
+    await this.storeContext.sendRequest({
+      case: 'upsert',
+      value: {
         entity: [CacheItemEntityName],
         id: [key],
         entityData: [entityData]
       }
-    } as DBRequest
-    await this.storeContext.sendRequest(request)
+    })
   }
 
   /**
@@ -125,13 +129,13 @@ export class MemoryCache {
    * ```
    */
   public async delete(key: string): Promise<void> {
-    const request = {
-      delete: {
+    await this.storeContext.sendRequest({
+      case: 'delete',
+      value: {
         entity: [CacheItemEntityName],
         id: [key]
       }
-    } as DBRequest
-    await this.storeContext.sendRequest(request)
+    })
   }
 
   /**

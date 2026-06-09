@@ -55,7 +55,7 @@ describe('Test Error Capture', () => {
     )
     const events = res.result?.events?.[0]
     expect(events?.message).eq('transferred 0')
-    expect(events?.attributes?.from.toLowerCase()).eq('0x80009ff8154bd5653c6dda2fa5f5053e5a5c1a91')
+    expect((events?.attributes?.from as string)?.toLowerCase()).eq('0x80009ff8154bd5653c6dda2fa5f5053e5a5c1a91')
   })
 })
 
@@ -94,6 +94,6 @@ describe('Test ParseLog workers', () => {
     )
     const events = res.result?.events?.[0]
     expect(events?.message).eq('transferred 0')
-    expect(events?.attributes?.from.toLowerCase()).eq('0x80009ff8154bd5653c6dda2fa5f5053e5a5c1a91')
+    expect((events?.attributes?.from as string)?.toLowerCase()).eq('0x80009ff8154bd5653c6dda2fa5f5053e5a5c1a91')
   })
 })

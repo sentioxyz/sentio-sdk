@@ -1,7 +1,14 @@
 import { before, describe, test } from 'node:test'
 import { expect } from 'chai'
 
-import { StartRequest } from '@sentio/protos'
+import {
+  type StartRequest,
+  StartRequestSchema,
+  type TemplateInstance,
+  TemplateInstanceSchema,
+  UpdateTemplatesRequestSchema
+} from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
 import { PluginManager } from '@sentio/runtime'
 import { TestProcessorServer } from '../../testing/index.js'
 import { cleanTest } from '../../testing/test-processor-server.js'
@@ -39,7 +46,7 @@ describe('Test Template', () => {
   })
 
   before(async () => {
-    const request: StartRequest = {
+    const request: StartRequest = create(StartRequestSchema, {
       templateInstances: [
         {
           contract: {
@@ -54,7 +61,7 @@ describe('Test Template', () => {
           baseLabels: {}
         }
       ]
-    }
+    })
     await service.start(request)
   })
 
@@ -76,7 +83,7 @@ describe('Test Template handlerFactory', () => {
   let factoryCallCount = 0
   let factoryReceivedLabels: { [key: string]: string } | undefined
 
-  const templateInstances: StartRequest['templateInstances'] = []
+  const templateInstances: TemplateInstance[] = []
 
   const service = new TestProcessorServer(async () => {
     const template = new ERC20ProcessorTemplate()
@@ -91,25 +98,27 @@ describe('Test Template handlerFactory', () => {
 
     template.onEventApproval(async (_event, _ctx) => {})
 
-    templateInstances.push({
-      contract: {
-        address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
-        name: 'usdc',
-        chainId: '1',
-        abi: ''
-      },
-      startBlock: 0n,
-      endBlock: 0n,
-      templateId: template.id,
-      baseLabels: { address: FROM_ADDRESS }
-    })
+    templateInstances.push(
+      create(TemplateInstanceSchema, {
+        contract: {
+          address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+          name: 'usdc',
+          chainId: '1',
+          abi: ''
+        },
+        startBlock: 0n,
+        endBlock: 0n,
+        templateId: template.id,
+        baseLabels: { address: FROM_ADDRESS }
+      })
+    )
   })
 
   before(async () => {
     factoryCallCount = 0
     factoryReceivedLabels = undefined
     cleanTest()
-    await service.start({ templateInstances })
+    await service.start(create(StartRequestSchema, { templateInstances }))
   })
 
   test('handlerFactory is called on template instantiation', () => {
@@ -138,30 +147,32 @@ describe('Test Template handlerFactory', () => {
   })
 
   test('same address with same labels is deduplicated', async () => {
-    await service.start({ templateInstances })
+    await service.start(create(StartRequestSchema, { templateInstances }))
     expect(factoryCallCount).equals(1)
   })
 
   test('same address with different labels creates a separate instance', async () => {
     const OTHER_ADDRESS = '0x1111111111111111111111111111111111111111'
     const templateId = templateInstances[0].templateId
-    await PluginManager.INSTANCE.updateTemplates({
-      chainId: '1',
-      templateInstances: [
-        {
-          contract: {
-            address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
-            name: 'usdc',
-            chainId: '1',
-            abi: ''
-          },
-          startBlock: 0n,
-          endBlock: 0n,
-          templateId,
-          baseLabels: { address: OTHER_ADDRESS }
-        }
-      ]
-    })
+    await PluginManager.INSTANCE.updateTemplates(
+      create(UpdateTemplatesRequestSchema, {
+        chainId: '1',
+        templateInstances: [
+          create(TemplateInstanceSchema, {
+            contract: {
+              address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+              name: 'usdc',
+              chainId: '1',
+              abi: ''
+            },
+            startBlock: 0n,
+            endBlock: 0n,
+            templateId,
+            baseLabels: { address: OTHER_ADDRESS }
+          })
+        ]
+      })
+    )
     expect(factoryCallCount).equals(2)
     expect(factoryReceivedLabels).deep.equals({ address: OTHER_ADDRESS })
   })

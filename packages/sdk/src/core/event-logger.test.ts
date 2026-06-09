@@ -1,6 +1,8 @@
 import { describe, test } from 'node:test'
 import assert from 'assert'
 import { BasicFieldType, Fields, fieldsToProtos } from './event-logger.js'
+import { CoinIDSchema, EventLogConfig_FieldSchema, EventLogConfig_StructFieldTypeSchema } from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
 
 describe('event logger tests', () => {
   test('basic type', async () => {
@@ -12,24 +14,18 @@ describe('event logger tests', () => {
 
     const fieldsProto = fieldsToProtos(fields)
     assert.deepEqual(fieldsProto, [
-      {
+      create(EventLogConfig_FieldSchema, {
         name: 'phase',
-        basicType: BasicFieldType.STRING,
-        coinType: undefined,
-        structType: undefined
-      },
-      {
+        type: { case: 'basicType', value: BasicFieldType.STRING }
+      }),
+      create(EventLogConfig_FieldSchema, {
         name: 'reward',
-        basicType: BasicFieldType.DOUBLE,
-        coinType: undefined,
-        structType: undefined
-      },
-      {
+        type: { case: 'basicType', value: BasicFieldType.DOUBLE }
+      }),
+      create(EventLogConfig_FieldSchema, {
         name: 'isX2',
-        basicType: BasicFieldType.BOOL,
-        coinType: undefined,
-        structType: undefined
-      }
+        type: { case: 'basicType', value: BasicFieldType.BOOL }
+      })
     ])
   })
 
@@ -43,27 +39,24 @@ describe('event logger tests', () => {
 
     const fieldsProto = fieldsToProtos(fields)
     assert.deepEqual(fieldsProto, [
-      {
+      create(EventLogConfig_FieldSchema, {
         name: 'phase',
-        basicType: BasicFieldType.STRING,
-        coinType: undefined,
-        structType: undefined
-      },
-      {
+        type: { case: 'basicType', value: BasicFieldType.STRING }
+      }),
+      create(EventLogConfig_FieldSchema, {
         name: 'xx',
-        basicType: undefined,
-        coinType: undefined,
-        structType: {
-          fields: [
-            {
-              name: 'aaa',
-              basicType: BasicFieldType.BOOL,
-              coinType: undefined,
-              structType: undefined
-            }
-          ]
+        type: {
+          case: 'structType',
+          value: create(EventLogConfig_StructFieldTypeSchema, {
+            fields: [
+              create(EventLogConfig_FieldSchema, {
+                name: 'aaa',
+                type: { case: 'basicType', value: BasicFieldType.BOOL }
+              })
+            ]
+          })
         }
-      }
+      })
     ])
   })
 
@@ -75,14 +68,13 @@ describe('event logger tests', () => {
     }
     const fieldsProto = fieldsToProtos(fields)
     assert.deepEqual(fieldsProto, [
-      {
+      create(EventLogConfig_FieldSchema, {
         name: 'coin',
-        coinType: {
-          symbol: 'WETH'
-        },
-        basicType: undefined,
-        structType: undefined
-      }
+        type: {
+          case: 'coinType',
+          value: create(CoinIDSchema, { id: { case: 'symbol', value: 'WETH' } })
+        }
+      })
     ])
   })
 })

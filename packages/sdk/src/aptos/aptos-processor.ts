@@ -11,8 +11,17 @@ import {
 import { AptosBindOptions, AptosNetwork } from './network.js'
 import { AptosContext, AptosResourcesContext, AptosTransactionContext } from './context.js'
 import { ListStateStorage } from '@sentio/runtime'
-import { Data_AptResource, HandleInterval, MoveAccountFetchConfig, MoveFetchConfig } from '@sentio/protos'
-import { ServerError, Status } from 'nice-grpc'
+import {
+  type Data_AptResource,
+  type HandleInterval,
+  HandleIntervalSchema,
+  type MoveAccountFetchConfig,
+  MoveAccountFetchConfigSchema,
+  type MoveFetchConfig,
+  MoveFetchConfigSchema
+} from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
+import { ConnectError, Code } from '@connectrpc/connect'
 import {
   accountTypeString,
   CallHandler,
@@ -34,17 +43,17 @@ import { GeneralTransactionResponse, HandlerOptions } from './models.js'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 import { AptCall, AptEvent, AptResource } from './data.js'
 
-const DEFAULT_FETCH_CONFIG: MoveFetchConfig = {
+const DEFAULT_FETCH_CONFIG: MoveFetchConfig = create(MoveFetchConfigSchema, {
   resourceChanges: false,
   allEvents: true,
   inputs: true,
   // for backward compatibility
   supportMultisigFunc: true
-}
+})
 
-export const DEFAULT_RESOURCE_FETCH_CONFIG: MoveAccountFetchConfig = {
+export const DEFAULT_RESOURCE_FETCH_CONFIG: MoveAccountFetchConfig = create(MoveAccountFetchConfigSchema, {
   owned: true
-}
+})
 
 type IndexConfigure = {
   address: string
@@ -84,7 +93,7 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
     handlerOptions?: HandlerOptions<MoveFetchConfig, T>
   ): this {
     let _filters: EventFilter[] = []
-    const _fetchConfig = MoveFetchConfig.fromPartial({ ...DEFAULT_FETCH_CONFIG, ...handlerOptions })
+    const _fetchConfig = create(MoveFetchConfigSchema, { ...DEFAULT_FETCH_CONFIG, ...handlerOptions })
 
     if (Array.isArray(filter)) {
       _filters = filter
@@ -100,7 +109,7 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
       handlerName: getHandlerName(),
       handler: async function (data) {
         if (!data.rawTransaction) {
-          throw new ServerError(Status.INVALID_ARGUMENT, 'event is null')
+          throw new ConnectError('event is null', Code.InvalidArgument)
         }
         const txn = data.transaction
 
@@ -143,7 +152,7 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
     handlerOptions?: HandlerOptions<MoveFetchConfig, T>
   ): this {
     let _filters: FunctionNameAndCallFilter[] = []
-    const _fetchConfig = MoveFetchConfig.fromPartial({ ...DEFAULT_FETCH_CONFIG, ...handlerOptions })
+    const _fetchConfig = create(MoveFetchConfigSchema, { ...DEFAULT_FETCH_CONFIG, ...handlerOptions })
 
     if (Array.isArray(filter)) {
       _filters = filter
@@ -159,7 +168,7 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
       handlerName: getHandlerName(),
       handler: async function (data) {
         if (!data.rawTransaction) {
-          throw new ServerError(Status.INVALID_ARGUMENT, 'call is null')
+          throw new ConnectError('call is null', Code.InvalidArgument)
         }
         const tx = data.transaction
 
@@ -201,7 +210,7 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
     },
     handleOptions?: HandlerOptions<MoveFetchConfig, UserTransactionResponse>
   ): this {
-    const _fetchConfig = MoveFetchConfig.fromPartial({ ...DEFAULT_FETCH_CONFIG, ...handleOptions })
+    const _fetchConfig = create(MoveFetchConfigSchema, { ...DEFAULT_FETCH_CONFIG, ...handleOptions })
 
     const processor = this
     const filter: FunctionNameAndCallFilter = { function: '', includeFailed: transactionFilter?.includeFailed }
@@ -216,7 +225,7 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
       handlerName: getHandlerName(),
       handler: async function (data) {
         if (!data.rawTransaction) {
-          throw new ServerError(Status.INVALID_ARGUMENT, 'call is null')
+          throw new ConnectError('call is null', Code.InvalidArgument)
         }
         const call = data.transaction
         const ctx = new AptosContext(
@@ -287,9 +296,8 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
       handlerName: getHandlerName(),
       handler: async function (data) {
         if (!data.rawResources || !data.version) {
-          throw new ServerError(Status.INVALID_ARGUMENT, 'resource is null')
+          throw new ConnectError('resource is null', Code.InvalidArgument)
         }
-        const aptResource = new AptResource(data)
         const timestamp = Number(data.timestampMicros)
         const ctx = new AptosResourcesContext(
           processor.config.network,
@@ -298,7 +306,7 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
           timestamp,
           processor.config.baseLabels
         )
-        let resources = await aptResource.decodeResources<T>(processor.coder)
+        let resources = await data.decodeResources<T>(processor.coder)
 
         if (hasAny) {
           resources = resources.filter((r) => {
@@ -337,12 +345,12 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
       handlerName: getHandlerName(),
       handler: async function (data) {
         if (!data.rawTransaction) {
-          throw new ServerError(Status.INVALID_ARGUMENT, 'call is null')
+          throw new ConnectError('call is null', Code.InvalidArgument)
         }
         const transaction = JSON.parse(data.rawTransaction) as T
         const timestampMicros = BigInt(transaction.timestamp)
         if (timestampMicros > Number.MAX_SAFE_INTEGER) {
-          throw new ServerError(Status.INVALID_ARGUMENT, 'timestamp is too large')
+          throw new ConnectError('timestamp is too large', Code.InvalidArgument)
         }
 
         const ctx = new AptosTransactionContext(
@@ -381,10 +389,10 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
   ): this {
     return this.onInterval(
       handler,
-      {
+      create(HandleIntervalSchema, {
         recentInterval: timeIntervalInMinutes,
         backfillInterval: backfillTimeIntervalInMinutes
-      },
+      }),
       undefined,
       handlerOptions
     )
@@ -399,7 +407,7 @@ export class AptosTransactionProcessor<T extends GeneralTransactionResponse, CT 
     return this.onInterval(
       handler,
       undefined,
-      { recentInterval: versionInterval, backfillInterval: backfillVersionInterval },
+      create(HandleIntervalSchema, { recentInterval: versionInterval, backfillInterval: backfillVersionInterval }),
       handlerOptions
     )
   }
@@ -521,7 +529,7 @@ export class AptosResourcesProcessor {
       handlerName,
       handler: async function (data) {
         if (data.timestampMicros > Number.MAX_SAFE_INTEGER) {
-          throw new ServerError(Status.INVALID_ARGUMENT, 'timestamp is too large')
+          throw new ConnectError('timestamp is too large', Code.InvalidArgument)
         }
         const aptResource = new AptResource(data)
         const timestamp = Number(data.timestampMicros)
@@ -562,10 +570,10 @@ export class AptosResourcesProcessor {
   ): this {
     return this.onInterval(
       handler,
-      {
+      create(HandleIntervalSchema, {
         recentInterval: timeIntervalInMinutes,
         backfillInterval: backfillTimeIntervalInMinutes
-      },
+      }),
       undefined,
       type,
       handlerOptions
@@ -582,7 +590,7 @@ export class AptosResourcesProcessor {
     return this.onInterval(
       handler,
       undefined,
-      { recentInterval: versionInterval, backfillInterval: backfillVersionInterval },
+      create(HandleIntervalSchema, { recentInterval: versionInterval, backfillInterval: backfillVersionInterval }),
       typePrefix,
       handlerOptions
     )
@@ -622,7 +630,7 @@ export class AptosResourcesProcessor {
         const timestamp = Number(data.timestampMicros)
 
         if (!data.rawResources || !data.version) {
-          throw new ServerError(Status.INVALID_ARGUMENT, 'resource is null')
+          throw new ConnectError('resource is null', Code.InvalidArgument)
         }
         const aptResource = new AptResource(data)
         const ctx = new AptosResourcesContext(

@@ -1,16 +1,24 @@
 import { BaseContext } from './base-context.js'
 import {
-  CoinID,
-  EventLogConfig,
+  type CoinID,
+  CoinIDSchema,
+  CoinID_AddressIdentifierSchema,
+  type EventLogConfig,
+  EventLogConfigSchema,
   EventLogConfig_BasicFieldType,
-  EventLogConfig_Field,
-  EventLogConfig_StructFieldType,
-  EventTrackingResult,
+  type EventLogConfig_Field,
+  EventLogConfig_FieldSchema,
+  EventLogConfig_StructFieldTypeSchema,
+  type EventTrackingResult,
+  EventTrackingResultSchema,
   LogLevel,
-  RichStruct,
-  TimeseriesResult,
+  type RichStruct,
+  RichStructSchema,
+  type TimeseriesResult,
+  TimeseriesResultSchema,
   TimeseriesResult_TimeseriesType
 } from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
 import { normalizeAttribute, normalizeLabels, normalizeToRichStruct } from './normalization.js'
 import { MapStateStorage, processMetrics } from '@sentio/runtime'
 import { BN } from 'fuels'
@@ -53,7 +61,10 @@ export class EventLoggerBinding {
 export type BasicFieldType = EventLogConfig_BasicFieldType
 export const BasicFieldType = EventLogConfig_BasicFieldType
 
-export type FieldType = CoinID | BasicFieldType | Fields
+// User-facing coin descriptor (plain shape, matching the legacy CoinID surface).
+export type CoinFieldType = { symbol: string } | { address: { address: string; chain: string } }
+
+export type FieldType = CoinFieldType | BasicFieldType | Fields
 
 export type Fields = { [key: string]: FieldType }
 
@@ -61,30 +72,48 @@ export interface EventLogOptions {
   fields: Fields
 }
 
+function toCoinIDField(value: CoinFieldType): CoinID {
+  if ('symbol' in value && value.symbol) {
+    return create(CoinIDSchema, { id: { case: 'symbol', value: value.symbol } })
+  }
+  const address = (value as { address: { address: string; chain: string } }).address
+  return create(CoinIDSchema, {
+    id: {
+      case: 'address',
+      value: create(CoinID_AddressIdentifierSchema, {
+        address: address.address,
+        chain: address.chain
+      })
+    }
+  })
+}
+
 export function fieldsToProtos(fields: Fields): EventLogConfig_Field[] {
   const fieldsProto: EventLogConfig_Field[] = []
   for (const [key, value] of Object.entries(fields)) {
-    let basicType: BasicFieldType | undefined
-    let coinType: CoinID | undefined
-    let structType: EventLogConfig_StructFieldType | undefined
+    let type: EventLogConfig_Field['type']
 
     if (typeof value === 'number') {
-      basicType = value
+      type = { case: 'basicType', value }
     } else {
-      if (value.address || value.symbol) {
-        coinType = value
+      const coin = value as CoinFieldType
+      if (('address' in coin && coin.address) || ('symbol' in coin && coin.symbol)) {
+        type = { case: 'coinType', value: toCoinIDField(coin) }
       } else {
-        structType = EventLogConfig_StructFieldType.create({
-          fields: fieldsToProtos(value as Fields)
-        })
+        type = {
+          case: 'structType',
+          value: create(EventLogConfig_StructFieldTypeSchema, {
+            fields: fieldsToProtos(value as Fields)
+          })
+        }
       }
     }
-    fieldsProto.push({
-      name: key,
-      basicType,
-      coinType,
-      structType
-    })
+    fieldsProto.push(
+      create(EventLogConfig_FieldSchema, {
+        name: key,
+        type
+      })
+    )
   }
   return fieldsProto
 }
@@ -100,10 +129,10 @@ export class EventLogger {
 
   static register(eventName: string, options?: EventLogOptions): EventLogger {
     checkEventName(eventName)
-    let config = EventLogConfig.create()
+    let config = create(EventLogConfigSchema)
 
     if (options?.fields) {
-      config = EventLogConfig.create({
+      config = create(EventLogConfigSchema, {
         name: eventName,
         fields: fieldsToProtos(options.fields)
       })
@@ -128,24 +157,24 @@ function checkEventName(eventName: string) {
 function emit<T>(ctx: BaseContext, eventName: string, event: Event<T>) {
   const { distinctId, severity, message, ...payload } = event
 
-  const data: RichStruct = {
+  const data: RichStruct = create(RichStructSchema, {
     fields: {
       severity: {
-        stringValue: (severity || LogLevel.INFO).toString()
+        value: { case: 'stringValue', value: (severity || LogLevel.INFO).toString() }
       },
       message: {
-        stringValue: message || ''
+        value: { case: 'stringValue', value: message || '' }
       },
       // don't rename to distinctEntityId in new events.
       distinctId: {
-        stringValue: distinctId || ''
+        value: { case: 'stringValue', value: distinctId || '' }
       },
       ...normalizeToRichStruct(ctx.baseLabels, payload).fields
     }
-  }
+  })
 
   // legacy v2 events, deprecating
-  const eventRes: EventTrackingResult = {
+  const eventRes: EventTrackingResult = create(EventTrackingResultSchema, {
     metadata: ctx.getMetaData(eventName, {}),
     severity: severity || LogLevel.INFO,
     message: message || '',
@@ -157,14 +186,14 @@ function emit<T>(ctx: BaseContext, eventName: string, event: Event<T>) {
     runtimeInfo: undefined,
     noMetric: true,
     attributes2: normalizeToRichStruct(ctx.baseLabels, payload)
-  }
+  })
 
-  const res: TimeseriesResult = {
+  const res: TimeseriesResult = create(TimeseriesResultSchema, {
     metadata: ctx.getMetaData(eventName, {}),
     type: TimeseriesResult_TimeseriesType.EVENT,
     data,
     runtimeInfo: undefined
-  }
+  })
 
   processMetrics.process_eventemit_count.add(1)
   ctx.update({ timeseriesResult: [res], events: [eventRes] })

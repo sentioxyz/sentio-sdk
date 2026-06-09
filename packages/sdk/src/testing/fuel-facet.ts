@@ -1,6 +1,7 @@
 import { TestProcessorServer } from './test-processor-server.js'
 import { FuelChainId } from '@sentio/chain'
-import { DataBinding, HandlerType } from '@sentio/protos'
+import { type DataBinding, DataBindingSchema, HandlerType, timestampNow } from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
 import { FuelNetwork } from '../fuel/index.js'
 import { getRpcEndpoint } from '../fuel/network.js'
 
@@ -47,33 +48,39 @@ export class FuelFacet {
         continue
       }
       for (const callConfig of config.fuelTransactionConfigs) {
-        const binding = {
+        const binding = create(DataBindingSchema, {
           data: {
-            fuelTransaction: {
-              transaction,
-              timestamp: new Date()
+            value: {
+              case: 'fuelTransaction',
+              value: {
+                transaction,
+                timestamp: timestampNow()
+              }
             }
           },
           handlerIds: [callConfig.handlerId],
           handlerType: HandlerType.FUEL_TRANSACTION,
           chainId: network
-        }
+        })
 
         res.push(binding)
       }
 
       for (const assetConfig of config.assetConfigs) {
-        const binding = {
+        const binding = create(DataBindingSchema, {
           data: {
-            fuelTransaction: {
-              transaction,
-              timestamp: new Date()
+            value: {
+              case: 'fuelTransaction',
+              value: {
+                transaction,
+                timestamp: timestampNow()
+              }
             }
           },
           handlerIds: [assetConfig.handlerId],
           handlerType: HandlerType.FUEL_TRANSACTION,
           chainId: network
-        }
+        })
 
         res.push(binding)
       }
@@ -89,20 +96,23 @@ export class FuelFacet {
 
       for (const config of this.server.contractConfigs) {
         for (const logConfig of config.fuelReceiptConfigs) {
-          const logIds = logConfig.log?.logIds ?? []
+          const logIds = logConfig.receiptFilter?.case === 'log' ? logConfig.receiptFilter.value.logIds : []
           if (logIds.includes(receipt.rb)) {
-            const binding = {
+            const binding = create(DataBindingSchema, {
               data: {
-                fuelLog: {
-                  transaction,
-                  timestamp: new Date(),
-                  receiptIndex: BigInt(i)
+                value: {
+                  case: 'fuelLog',
+                  value: {
+                    transaction,
+                    timestamp: timestampNow(),
+                    receiptIndex: BigInt(i)
+                  }
                 }
               },
               handlerIds: [logConfig.handlerId],
               handlerType: HandlerType.FUEL_RECEIPT,
               chainId: network
-            }
+            })
             res.push(binding)
           }
         }

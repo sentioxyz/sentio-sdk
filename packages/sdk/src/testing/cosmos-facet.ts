@@ -1,5 +1,6 @@
 import { TestProcessorServer } from './test-processor-server.js'
-import { DataBinding, HandlerType } from '@sentio/protos'
+import { type DataBinding, DataBindingSchema, HandlerType, timestampNow } from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
 import { CosmosNetwork } from '../cosmos/network.js'
 
 export class CosmosFacet {
@@ -28,17 +29,20 @@ export class CosmosFacet {
       }
 
       for (const logConfig of config.cosmosLogConfigs) {
-        const binding = {
+        const binding = create(DataBindingSchema, {
           data: {
-            cosmosCall: {
-              transaction,
-              timestamp: new Date()
+            value: {
+              case: 'cosmosCall',
+              value: {
+                transaction,
+                timestamp: timestampNow()
+              }
             }
           },
           handlerIds: [logConfig.handlerId],
           handlerType: HandlerType.COSMOS_CALL,
           chainId: network
-        }
+        })
 
         const logFilters = logConfig.logFilters
         for (const log of transaction.logs || []) {
