@@ -1,18 +1,15 @@
 #!/usr/bin/env node
 
 import fs from 'fs-extra'
-// import { compressionAlgorithms } from '@grpc/grpc-js'
-import { createServer } from 'nice-grpc'
-import { errorDetailsServerMiddleware } from 'nice-grpc-error-details'
-// import { registry as niceGrpcRegistry } from 'nice-grpc-prometheus'
-// import { openTelemetryServerMiddleware } from 'nice-grpc-opentelemetry'
+import { type ConnectRouter } from '@connectrpc/connect'
+import { connectNodeAdapter } from '@connectrpc/connect-node'
 import http from 'http'
+import http2 from 'node:http2'
 // @ts-ignore inspector promises is not included in @type/node
 import { Session } from 'node:inspector/promises'
 import { fork, ChildProcess } from 'child_process'
 import { fileURLToPath } from 'url'
 
-import { ProcessorDefinition } from './gen/processor/protos/processor.js'
 import { ProcessorServiceImpl } from './service.js'
 import { configureEndpoints } from './endpoints.js'
 import { FullProcessorServiceImpl, FullProcessorServiceV3Impl } from './full-service.js'
@@ -20,7 +17,7 @@ import { setupLogger } from './logger.js'
 
 import { setupOTLP } from './otlp.js'
 import { ActionServer } from './action-server.js'
-import { ProcessorV3Definition } from '@sentio/protos'
+import { Processor, ProcessorV3 } from '@sentio/protos'
 import { ProcessorServiceImplV3 } from './service-v3.js'
 import { dirname, join } from 'path'
 import { program, ProcessorRuntimeOptions } from './processor-runner-program.js'
@@ -69,6 +66,7 @@ if (!isChildProcess) {
 }
 
 let server: any
+let processorHttp2Server: http2.Http2Server | undefined
 let baseService: ProcessorServiceImpl
 let httpServer: http.Server | undefined
 
@@ -82,28 +80,30 @@ if (options.startActionServer) {
   server = new ActionServer(loader)
   server.listen(options.port)
 } else {
-  server = createServer({
-    'grpc.max_send_message_length': 768 * 1024 * 1024,
-    'grpc.max_receive_message_length': 768 * 1024 * 1024
-    // 'grpc.default_compression_algorithm': compressionAlgorithms.gzip
-  })
-    // .use(prometheusServerMiddleware())
-    // .use(openTelemetryServerMiddleware())
-    .use(errorDetailsServerMiddleware)
+  const shutdown = () => processorHttp2Server?.close()
 
   // for V2
-  baseService = new ProcessorServiceImpl(loader, options, server.shutdown)
-  const service = new FullProcessorServiceImpl(baseService)
-
-  server.add(ProcessorDefinition, service)
+  baseService = new ProcessorServiceImpl(loader, options, shutdown)
+  const serviceV2 = new FullProcessorServiceImpl(baseService)
 
   // for V3
-  server.add(
-    ProcessorV3Definition,
-    new FullProcessorServiceV3Impl(new ProcessorServiceImplV3(loader, options, server.shutdown))
-  )
+  const serviceV3 = new FullProcessorServiceV3Impl(new ProcessorServiceImplV3(loader, options, shutdown))
 
-  server.listen('0.0.0.0:' + options.port)
+  const routes = (router: ConnectRouter) => {
+    router.service(Processor, serviceV2)
+    router.service(ProcessorV3, serviceV3)
+  }
+
+  const adapter = connectNodeAdapter({
+    routes,
+    readMaxBytes: 768 * 1024 * 1024,
+    writeMaxBytes: 768 * 1024 * 1024
+  })
+
+  // h2c (cleartext HTTP/2) gRPC server — connect-node serves grpc + grpc-web + connect
+  // on the same port, so the Go launcher's gRPC client is unaffected.
+  processorHttp2Server = http2.createServer(adapter)
+  processorHttp2Server.listen(Number(options.port))
   console.log('Processor Server Started at:', options.port)
 }
 
@@ -245,7 +245,11 @@ async function dumpHeap(file: string): Promise<void> {
 }
 
 function shutdownServers(exitCode: number): void {
-  server.forceShutdown()
+  if (processorHttp2Server) {
+    processorHttp2Server.close()
+  } else if (server?.forceShutdown) {
+    server.forceShutdown()
+  }
   console.log('RPC server shut down')
 
   if (httpServer) {

@@ -1,5 +1,6 @@
 import { PluginManager } from './plugin.js'
-import { ProcessConfigResponse } from '@sentio/protos'
+import { ProcessConfigResponseSchema } from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
 
 export class ActionServer {
   constructor(readonly loader: () => Promise<void>) {}
@@ -7,7 +8,7 @@ export class ActionServer {
   async listen(port: number) {
     const pluginManager = PluginManager.INSTANCE
     await this.loader()
-    await pluginManager.configure(ProcessConfigResponse.create())
+    await pluginManager.configure(create(ProcessConfigResponseSchema))
     console.log('Starting Action Server at:', port)
     await pluginManager.startServer(port)
   }

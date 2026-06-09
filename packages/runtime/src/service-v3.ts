@@ -1,20 +1,18 @@
 import {
-  DataBinding,
-  DeepPartial,
-  Empty,
+  type DataBinding,
+  EmptySchema,
   HandlerType,
-  ProcessConfigRequest,
-  ProcessConfigResponse,
-  ProcessorV3ServiceImplementation,
-  ProcessResult,
-  ProcessStreamRequest,
-  ProcessStreamResponse,
-  ProcessStreamResponseV3,
-  StartRequest,
-  UpdateTemplatesRequest
+  type ProcessConfigRequest,
+  ProcessConfigResponseSchema,
+  ProcessorV3,
+  ProcessResultSchema,
+  type ProcessStreamRequest,
+  ProcessStreamResponseV3Schema,
+  type StartRequest,
+  type UpdateTemplatesRequest
 } from '@sentio/protos'
-import { CallContext, ServerError, Status } from 'nice-grpc'
-import { AsyncIterable } from 'ix'
+import { clone, create, type MessageInitShape } from '@bufbuild/protobuf'
+import { ConnectError, Code, type HandlerContext, type ServiceImpl } from '@connectrpc/connect'
 import { PluginManager } from './plugin.js'
 import { Subject } from 'rxjs'
 import { from } from 'ix/asynciterable'
@@ -27,12 +25,14 @@ import { DataBindingContext } from './db-context.js'
 import { freezeGlobalConfig } from './global-config.js'
 import { ProcessorRuntimeOptions } from './processor-runner-program.js'
 
+type ProcessStreamResponseV3Init = MessageInitShape<typeof ProcessStreamResponseV3Schema>
+
 const { process_binding_count, process_binding_time, process_binding_error } = processMetrics
 
 const WRITE_V2_EVENT_LOGS = process.env.WRITE_V2_EVENT_LOGS !== 'false'
 const TIME_SERIES_RESULT_BATCH_SIZE = 1000
 
-export class ProcessorServiceImplV3 implements ProcessorV3ServiceImplementation {
+export class ProcessorServiceImplV3 implements ServiceImpl<typeof ProcessorV3> {
   readonly enablePartition: boolean
   private readonly loader: () => Promise<any>
   private readonly shutdownHandler?: () => void
@@ -45,9 +45,9 @@ export class ProcessorServiceImplV3 implements ProcessorV3ServiceImplementation 
     this.enablePartition = options?.enablePartition == true
   }
 
-  async start(request: StartRequest, context: CallContext): Promise<Empty> {
+  async start(request: StartRequest, context: HandlerContext) {
     if (this.started) {
-      return {}
+      return create(EmptySchema)
     }
 
     freezeGlobalConfig()
@@ -55,27 +55,27 @@ export class ProcessorServiceImplV3 implements ProcessorV3ServiceImplementation 
     try {
       await this.loader()
     } catch (e) {
-      throw new ServerError(Status.INVALID_ARGUMENT, 'Failed to load processor: ' + errorString(e))
+      throw new ConnectError('Failed to load processor: ' + errorString(e), Code.InvalidArgument)
     }
 
     await PluginManager.INSTANCE.start(request)
 
     this.started = true
-    return {}
+    return create(EmptySchema)
   }
 
-  async getConfig(request: ProcessConfigRequest, context: CallContext): Promise<ProcessConfigResponse> {
+  async getConfig(request: ProcessConfigRequest, context: HandlerContext) {
     if (!this.started) {
-      throw new ServerError(Status.UNAVAILABLE, 'Service Not started.')
+      throw new ConnectError('Service Not started.', Code.Unavailable)
     }
 
-    const newConfig = ProcessConfigResponse.fromPartial({})
+    const newConfig = create(ProcessConfigResponseSchema, {})
     await PluginManager.INSTANCE.configure(newConfig)
     return newConfig
   }
 
-  async *processBindingsStream(requests: AsyncIterable<ProcessStreamRequest>, context: CallContext) {
-    const subject = new Subject<DeepPartial<ProcessStreamResponseV3>>()
+  async *processBindingsStream(requests: AsyncIterable<ProcessStreamRequest>, context: HandlerContext) {
+    const subject = new Subject<ProcessStreamResponseV3Init>()
     this.handleRequests(requests, subject)
       .then(() => {
         subject.complete()
@@ -89,14 +89,14 @@ export class ProcessorServiceImplV3 implements ProcessorV3ServiceImplementation 
 
   protected async handleRequests(
     requests: AsyncIterable<ProcessStreamRequest>,
-    subject: Subject<DeepPartial<ProcessStreamResponse>>
+    subject: Subject<ProcessStreamResponseV3Init>
   ) {
     let lastBinding: DataBinding | undefined = undefined
     for await (const request of requests) {
       try {
         // console.log('received request:', request, 'lastBinding:', lastBinding)
-        if (request.binding) {
-          lastBinding = request.binding
+        if (request.value.case === 'binding') {
+          lastBinding = request.value.value
         }
         this.handleRequest(request, lastBinding, subject)
       } catch (e) {
@@ -111,26 +111,27 @@ export class ProcessorServiceImplV3 implements ProcessorV3ServiceImplementation 
   async handleRequest(
     request: ProcessStreamRequest,
     lastBinding: DataBinding | undefined,
-    subject: Subject<DeepPartial<ProcessStreamResponseV3>>
+    subject: Subject<ProcessStreamResponseV3Init>
   ) {
-    if (request.binding) {
+    const binding = request.value.case === 'binding' ? request.value.value : undefined
+    if (binding) {
       process_binding_count.add(1)
 
-      if (request.binding.handlerType === HandlerType.UNKNOWN) {
+      if (binding.handlerType === HandlerType.UNKNOWN) {
         subject.next({
           processId: request.processId,
-          result: ProcessResult.create()
+          value: { case: 'result', value: create(ProcessResultSchema) }
         })
         return
       }
 
       if (this.enablePartition) {
         try {
-          console.debug('sending partition request', request.binding)
-          const partitions = await PluginManager.INSTANCE.partition(request.binding)
+          console.debug('sending partition request', binding)
+          const partitions = await PluginManager.INSTANCE.partition(binding)
           subject.next({
             processId: request.processId,
-            partitions
+            value: { case: 'partitions', value: partitions }
           })
         } catch (e) {
           console.error('Partition error:', e)
@@ -138,11 +139,11 @@ export class ProcessorServiceImplV3 implements ProcessorV3ServiceImplementation 
           return
         }
       } else {
-        this.startProcess(request.processId, request.binding, subject)
+        this.startProcess(request.processId, binding, subject)
       }
     }
 
-    if (request.start) {
+    if (request.value.case === 'start') {
       if (!lastBinding) {
         console.error('start request received without binding')
         subject.error(new Error('start request received without binding'))
@@ -151,44 +152,41 @@ export class ProcessorServiceImplV3 implements ProcessorV3ServiceImplementation 
       this.startProcess(request.processId, lastBinding, subject)
     }
 
-    if (request.dbResult) {
+    if (request.value.case === 'dbResult') {
       const context = this.contexts.get(request.processId)
       try {
-        context?.result(request.dbResult)
+        context?.result(request.value.value)
       } catch (e) {
         subject.error(new Error('db result error, process should stop'))
       }
     }
   }
 
-  private startProcess(
-    processId: number,
-    binding: DataBinding,
-    subject: Subject<DeepPartial<ProcessStreamResponseV3>>
-  ) {
+  private startProcess(processId: number, binding: DataBinding, subject: Subject<ProcessStreamResponseV3Init>) {
     const context = this.contexts.new(processId, subject)
     const start = Date.now()
     PluginManager.INSTANCE.processBinding(binding, undefined, context)
       .then(async (result) => {
         await context.awaitPendings()
-        const { timeseriesResult, ...otherResults } = result
+        const timeseriesResult = result.timeseriesResult
         for (let i = 0; i < timeseriesResult.length; i += TIME_SERIES_RESULT_BATCH_SIZE) {
           const batch = timeseriesResult.slice(i, i + TIME_SERIES_RESULT_BATCH_SIZE)
           subject.next({
             processId,
-            tsRequest: {
-              data: batch
-            }
+            value: { case: 'tsRequest', value: { data: batch } }
           })
         }
 
+        // Send everything except the (already-batched) timeseries result back.
+        const otherResults = clone(ProcessResultSchema, result)
+        otherResults.timeseriesResult = []
+
         subject.next({
-          result: WRITE_V2_EVENT_LOGS
-            ? otherResults
-            : {
-                states: otherResults.states
-              },
-          processId: processId
+          processId,
+          value: {
+            case: 'result',
+            value: WRITE_V2_EVENT_LOGS ? otherResults : create(ProcessResultSchema, { states: result.states })
+          }
         })
         recordRuntimeInfo(result, binding.handlerType)
       })
@@ -204,9 +202,9 @@ export class ProcessorServiceImplV3 implements ProcessorV3ServiceImplementation 
       })
   }
 
-  async updateTemplates(request: UpdateTemplatesRequest, context: CallContext): Promise<DeepPartial<Empty>> {
+  async updateTemplates(request: UpdateTemplatesRequest, context: HandlerContext) {
     await PluginManager.INSTANCE.updateTemplates(request)
-    return {}
+    return create(EmptySchema)
   }
 }
 
@@ -217,7 +215,7 @@ class Contexts {
     return this.contexts.get(processId)
   }
 
-  new(processId: number, subject: Subject<DeepPartial<ProcessStreamResponseV3>>) {
+  new(processId: number, subject: Subject<ProcessStreamResponseV3Init>) {
     const context = new DataBindingContext(processId, subject)
     this.contexts.set(processId, context)
     return context

@@ -1,18 +1,15 @@
-import { EthCallParam, ProcessResult } from '@sentio/protos'
+import { type EthCallParam, type ProcessResult, ProcessResultSchema, StateResultSchema } from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
 import { createRequire } from 'module'
-
-// TODO better handling this, because old proto doesn't have this
-import { StateResult, ProcessResult as ProcessResultFull } from './gen/processor/protos/processor.js'
 
 import { Required } from 'utility-types'
 import path from 'path'
 import fs from 'fs'
 
 export function mergeProcessResults(results: ProcessResult[]): Required<ProcessResult, 'states'> {
-  const res = {
-    ...ProcessResultFull.create(),
-    states: StateResult.create()
-  }
+  const res = create(ProcessResultSchema, {
+    states: create(StateResultSchema)
+  })
   return mergeProcessResultsInPlace(res, results)
 }
 
@@ -20,7 +17,7 @@ export function mergeProcessResultsInPlace(
   res: ProcessResult,
   results: ProcessResult[]
 ): Required<ProcessResult, 'states'> {
-  res.states = res.states || StateResult.create()
+  res.states = res.states || create(StateResultSchema)
   for (const r of results) {
     // not using spread operator since it puts all element on the stack
     // cause maximum call stack size exceeded error if it's a large array
@@ -30,11 +27,11 @@ export function mergeProcessResultsInPlace(
     res.events = mergeArrayInPlace(res.events, r.events)
     res.exports = mergeArrayInPlace(res.exports, r.exports)
     res.timeseriesResult = mergeArrayInPlace(res.timeseriesResult, r.timeseriesResult)
-    res.states = {
+    res.states = create(StateResultSchema, {
       configUpdated: res.states?.configUpdated || r.states?.configUpdated || false
-    }
+    })
   }
-  return res
+  return res as Required<ProcessResult, 'states'>
 }
 
 function mergeArrayInPlace<T>(dst: T[], src: T[]): T[] {
