@@ -8,7 +8,6 @@ import {
   type ProcessBindingResponse,
   ProcessBindingResponseSchema,
   ProcessBindingsRequestSchema,
-  type ProcessConfigRequest,
   ProcessConfigRequestSchema,
   type ProcessConfigResponse,
   type ProcessStreamRequest,

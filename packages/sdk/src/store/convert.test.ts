@@ -20,7 +20,7 @@ describe('RichStruct converter tests', () => {
     const struct = BigIntConverter.from(s)
     expect(struct.value.case).eq('bigintValue')
     const struct2 = BigIntConverter.from(-s)
-    expect(struct2.value.case === 'bigintValue' ? struct2.value.value.negative : undefined).true
+    expect(struct2.value.case === 'bigintValue' ? struct2.value.value.negative : undefined).eq(true)
     const s1 = BigIntConverter.to(struct)
     expect(s1).eq(s)
   })

@@ -2,18 +2,35 @@ export * from './builtin.js'
 
 export * from './processor/protos/processor_pb.js'
 
-// Re-export the full common_pb surface so nested types (e.g. CoinID_AddressIdentifier)
-// are nameable through @sentio/protos — required for portable .d.ts emit of consumers.
-export * from './service/common/protos/common_pb.js'
-
-// processor.proto and common.proto both declare an EventLogConfig; disambiguate the
-// star-export collision in favour of processor's (matches the historical surface).
-export type { EventLogConfig } from './processor/protos/processor_pb.js'
-export { EventLogConfigSchema } from './processor/protos/processor_pb.js'
-
-// Historical alias: common's BigDecimal was exported as BigDecimalRichValue.
-export type { BigDecimal as BigDecimalRichValue } from './service/common/protos/common_pb.js'
-export { BigDecimalSchema as BigDecimalRichValueSchema } from './service/common/protos/common_pb.js'
+// Re-export the common_pb types consumers use, plus the types transitively
+// referenced by their oneofs so consumer .d.ts emit stays portable. NOTE: the
+// proto `BigDecimal` message is deliberately NOT re-exported under its bare name
+// (only as `BigDecimalRichValue`) so it does not collide with the @sentio/bigdecimal
+// `BigDecimal` that @sentio/sdk re-exports.
+export type {
+  CoinID,
+  CoinID_AddressIdentifier,
+  RichStruct,
+  RichValue,
+  RichValueList,
+  RichStructList,
+  BigInteger,
+  TokenAmount,
+  BigDecimal as BigDecimalRichValue
+} from './service/common/protos/common_pb.js'
+export {
+  CoinIDSchema,
+  CoinID_AddressIdentifierSchema,
+  RichStructSchema,
+  RichValueSchema,
+  RichValueListSchema,
+  RichStructListSchema,
+  RichValue_NullValue,
+  RichValue_NullValueSchema,
+  BigIntegerSchema,
+  TokenAmountSchema,
+  BigDecimalSchema as BigDecimalRichValueSchema
+} from './service/common/protos/common_pb.js'
 
 // Well-known types are no longer generated locally — protobuf-es provides them.
 // The message types are type-only; only the *Schema descriptors and the
