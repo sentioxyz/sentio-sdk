@@ -4,18 +4,20 @@ write_source_files(
     name = "write_gen",
     files = {
         "packages/protos/processor.proto": "//processor/protos:proto_file",
-        "packages/protos/src/processor/protos/processor.ts": "//processor/protos:processor_ts_proto_no_deprecate",
-        "packages/protos/src/service/common/protos/common.ts": "//service/common/protos:common_protos_ts_proto",
-        "packages/protos/src/google/protobuf/empty.ts": "//processor/protos:empty_ts_proto",
-        "packages/protos/src/google/protobuf/struct.ts": "//processor/protos:struct_ts_proto",
-        "packages/protos/src/google/protobuf/timestamp.ts": "//processor/protos:timestamp_ts_proto",
-        "packages/protos/src/google/type/money.ts": "//processor/protos:money_ts_proto",
-        "packages/runtime/src/gen/processor/protos/processor.ts": "//processor/protos:processor_ts_proto",
-        "packages/runtime/src/gen/service/common/protos/common.ts": "//service/common/protos:common_protos_ts_proto",
-        "packages/runtime/src/gen/google/protobuf/empty.ts": "//processor/protos:empty_ts_proto",
-        "packages/runtime/src/gen/google/protobuf/struct.ts": "//processor/protos:struct_ts_proto",
-        "packages/runtime/src/gen/google/protobuf/timestamp.ts": "//processor/protos:timestamp_ts_proto",
-        "packages/runtime/src/gen/google/type/money.ts": "//processor/protos:money_ts_proto",
+        # protobuf-es (protoc-gen-es) generated output. The published @sentio/protos
+        # copy uses the no-deprecate processor; well-known types (empty/struct/
+        # timestamp) are NOT generated here — protobuf-es imports them from
+        # @bufbuild/protobuf/wkt. google.type.Money is not a WKT, so it is still
+        # generated. common.proto's grpc-gateway openapiv2 option dependency is
+        # stripped from common_pb.ts by scripts/sdk-sync.sh after generation (the
+        # SDK never reads those custom options).
+        "packages/protos/src/processor/protos/processor_pb.ts": "//processor/protos:processor_es_no_deprecate",
+        "packages/protos/src/service/common/protos/common_pb.ts": "//service/common/protos:common_protos_es_proto",
+        "packages/protos/src/google/type/money_pb.ts": "//processor/protos:money_es_proto",
+        # The runtime copy keeps deprecated fields (full processor_es_proto).
+        "packages/runtime/src/gen/processor/protos/processor_pb.ts": "//processor/protos:processor_es_proto",
+        "packages/runtime/src/gen/service/common/protos/common_pb.ts": "//service/common/protos:common_protos_es_proto",
+        "packages/runtime/src/gen/google/type/money_pb.ts": "//processor/protos:money_es_proto",
     },
     tags = ["manual"],
 )
