@@ -1,11 +1,41 @@
 export * from './builtin.js'
 
-export * from './processor/protos/processor.js'
+export * from './processor/protos/processor_pb.js'
 
-export * from './google/protobuf/empty.js'
+// Well-known types are no longer generated locally — protobuf-es provides them.
+// The message types are type-only; only the *Schema descriptors and the
+// timestamp helpers are runtime values.
+export type { Empty, Timestamp, Struct, Value, ListValue } from '@bufbuild/protobuf/wkt'
+export {
+  EmptySchema,
+  TimestampSchema,
+  StructSchema,
+  ValueSchema,
+  ListValueSchema,
+  timestampDate,
+  timestampFromDate,
+  timestampNow,
+} from '@bufbuild/protobuf/wkt'
 
-export * from './google/protobuf/timestamp.js'
-
-export * from './google/protobuf/struct.js'
-
-export { CoinID, RichStruct, RichValue, RichValueList, RichStructList, RichValue_NullValue, BigInteger, BigDecimal as BigDecimalRichValue, TokenAmount } from "./service/common/protos/common.js"
+export type {
+  CoinID,
+  RichStruct,
+  RichValue,
+  RichValueList,
+  RichStructList,
+  BigInteger,
+  BigDecimal as BigDecimalRichValue,
+  TokenAmount,
+} from './service/common/protos/common_pb.js'
+export {
+  CoinIDSchema,
+  RichStructSchema,
+  RichValueSchema,
+  RichValueListSchema,
+  RichStructListSchema,
+  RichValue_NullValue,
+  RichValue_NullValueSchema,
+  BigIntegerSchema,
+  BigDecimalSchema as BigDecimalRichValueSchema,
+  TokenAmountSchema,
+} from './service/common/protos/common_pb.js'
