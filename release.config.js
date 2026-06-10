@@ -5,11 +5,14 @@ export default {
     [
       '@semantic-release/commit-analyzer',
       {
-        preset: 'angular',
+        preset: 'conventionalcommits',
         releaseRules: [
           { type: 'release', "scope": 'major',  release: 'major' },
           { type: 'release', "scope": 'minor',  release: 'minor' },
           { type: 'release', "scope": 'patch',  release: 'patch' },
+          // '!'/BREAKING CHANGE markers are capped at minor: major releases are
+          // only ever cut explicitly via a release(major) commit.
+          { breaking: true, release: 'minor' },
           { type: 'chore', release: 'patch' },
           { type: 'refactor', release: 'patch' },
         ],
