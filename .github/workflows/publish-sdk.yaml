@@ -128,7 +128,7 @@ jobs:
           ./scripts/update-version.sh @sentio/action ${{ steps.semantic.outputs.new_release_version }}
           pnpm publish --filter "@sentio/action" --no-git-checks --tag ${{ steps.npm.outputs.dist_tag }}
       - name: Clean Github Release for RC
-        if: ${{ contains(steps.semantic.outputs.new_release_version, '-') == false }}
+        if: ${{ steps.semantic.outputs.new_release_published == 'true' && contains(steps.semantic.outputs.new_release_version, '-') == false }}
         run:  ./scripts/clean-rc-releases.sh
         env:
           GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
