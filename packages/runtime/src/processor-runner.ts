@@ -10,14 +10,13 @@ import { Session } from 'node:inspector/promises'
 import { fork, ChildProcess } from 'child_process'
 import { fileURLToPath } from 'url'
 
-import { ProcessorServiceImpl } from './service.js'
 import { configureEndpoints } from './endpoints.js'
-import { FullProcessorServiceImpl, FullProcessorServiceV3Impl } from './full-service.js'
+import { FullProcessorServiceV3Impl } from './full-service.js'
 import { setupLogger } from './logger.js'
 
 import { setupOTLP } from './otlp.js'
 import { ActionServer } from './action-server.js'
-import { Processor, ProcessorV3 } from '@sentio/protos'
+import { ProcessorV3 } from '@sentio/protos'
 import { ProcessorServiceImplV3 } from './service-v3.js'
 import { dirname, join } from 'path'
 import { program, ProcessorRuntimeOptions } from './processor-runner-program.js'
@@ -67,7 +66,6 @@ if (!isChildProcess) {
 
 let server: any
 let processorHttp2Server: http2.Http2Server | undefined
-let baseService: ProcessorServiceImpl
 let httpServer: http.Server | undefined
 
 const loader = async () => {
@@ -82,15 +80,9 @@ if (options.startActionServer) {
 } else {
   const shutdown = () => processorHttp2Server?.close()
 
-  // for V2
-  baseService = new ProcessorServiceImpl(loader, options, shutdown)
-  const serviceV2 = new FullProcessorServiceImpl(baseService)
-
-  // for V3
   const serviceV3 = new FullProcessorServiceV3Impl(new ProcessorServiceImplV3(loader, options, shutdown))
 
   const routes = (router: ConnectRouter) => {
-    router.service(Processor, serviceV2)
     router.service(ProcessorV3, serviceV3)
   }
 
@@ -208,9 +200,6 @@ process
   })
   .on('uncaughtException', (err) => {
     console.error('Uncaught Exception, please checking if await is properly used', err)
-    if (baseService) {
-      baseService.unhandled = err
-    }
     // shutdownServers(1)
   })
   .on('unhandledRejection', (reason, _p) => {
@@ -219,9 +208,6 @@ process
       return
     }
     console.error('Unhandled Rejection, please checking if await is properly', reason)
-    if (baseService) {
-      baseService.unhandled = reason as Error
-    }
     // shutdownServers(1)
   })
 

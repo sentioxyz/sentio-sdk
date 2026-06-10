@@ -2,30 +2,35 @@ import {
   type AccountConfig,
   type ContractConfig,
   type DataBinding,
+  type DBResponse,
   type Empty,
   EmptySchema,
-  type PreprocessStreamRequest,
   type ProcessBindingResponse,
   ProcessBindingResponseSchema,
   ProcessBindingsRequestSchema,
   ProcessConfigRequestSchema,
   type ProcessConfigResponse,
+  type ProcessResult,
+  ProcessResultSchema,
   type ProcessStreamRequest,
-  ProcessStreamResponseSchema,
+  ProcessStreamRequestSchema,
+  ProcessStreamResponseV3Schema,
   StartRequestSchema,
   type TemplateInstance,
+  TemplateInstanceSchema,
   type TimeseriesResult,
   UpdateTemplatesRequestSchema
 } from '@sentio/protos'
 import { create, type MessageInitShape } from '@bufbuild/protobuf'
 import { type HandlerContext } from '@connectrpc/connect'
 import {
+  DataBindingContext,
   Endpoints,
   IDataBindingContext,
+  mergeProcessResults,
   PluginManager,
-  ProcessorServiceImpl,
   State,
-  StoreContext
+  ProcessorServiceImplV3
 } from '@sentio/runtime'
 
 import { AptosFacet } from './aptos-facet.js'
@@ -40,7 +45,7 @@ import { DatabaseSchemaState } from '../core/database-schema.js'
 import { IotaFacet } from './iota-facet.js'
 import { ChainInfo } from '@sentio/chain'
 
-type ProcessStreamResponseInit = MessageInitShape<typeof ProcessStreamResponseSchema>
+type ProcessStreamResponseV3Init = MessageInitShape<typeof ProcessStreamResponseV3Schema>
 
 export const TEST_CONTEXT = {} as HandlerContext
 
@@ -52,10 +57,11 @@ export function cleanTest() {
 }
 
 export class TestProcessorServer {
-  service: ProcessorServiceImpl
+  service: ProcessorServiceImplV3
   contractConfigs: ContractConfig[]
   accountConfigs: AccountConfig[]
   storeContext: TestStoreContext
+  private nextProcessId = 1
 
   aptos: AptosFacet
   eth: EthFacet
@@ -69,7 +75,7 @@ export class TestProcessorServer {
   constructor(loader: () => Promise<any>, httpEndpoints: Record<string, string> = {}) {
     cleanTest()
 
-    this.service = new ProcessorServiceImpl(loader)
+    this.service = new ProcessorServiceImplV3(loader)
     this.aptos = new AptosFacet(this)
     this.solana = new SolanaFacet(this)
     this.eth = new EthFacet(this)
@@ -84,8 +90,8 @@ export class TestProcessorServer {
     }
 
     // start a memory database for testing
-    const subject = new Subject<ProcessStreamResponseInit>()
-    this.storeContext = new TestStoreContext(subject, 1)
+    const subject = new Subject<ProcessStreamResponseV3Init>()
+    this.storeContext = new TestStoreContext(subject, 1, this.service)
     this._db = new MemoryDatabase(this.storeContext)
   }
 
@@ -104,7 +110,8 @@ export class TestProcessorServer {
   }
 
   stop(request: Empty = create(EmptySchema), context = TEST_CONTEXT) {
-    return this.service.stop(request, context)
+    this._db.stop()
+    return request
   }
 
   async getConfig(
@@ -121,43 +128,84 @@ export class TestProcessorServer {
     context: HandlerContext = TEST_CONTEXT
   ): Promise<ProcessBindingResponse> {
     const req = create(ProcessBindingsRequestSchema, request)
-    return PluginManager.INSTANCE.dbContextLocalStorage.run(this.storeContext, async () => {
-      const ret = await this.service.processBindings(req, context)
-      if (ret.result?.states?.configUpdated) {
-        // template may changed
+    return this.processBindingList(req.bindings, context)
+  }
+
+  async processBinding(request: DataBinding, context: HandlerContext = TEST_CONTEXT): Promise<ProcessBindingResponse> {
+    return this.processBindingList([request], context)
+  }
+
+  private async processBindingList(
+    bindings: DataBinding[],
+    context: HandlerContext = TEST_CONTEXT
+  ): Promise<ProcessBindingResponse> {
+    const results: ProcessResult[] = []
+    for (const binding of bindings) {
+      const result = await this.processBindingV3(binding, context)
+      results.push(result)
+
+      if (result.states?.configUpdated) {
         await PluginManager.INSTANCE.updateTemplates(
           create(UpdateTemplatesRequestSchema, {
-            chainId: req.bindings[0].chainId,
+            chainId: binding.chainId,
             templateInstances: this.storeContext.templateInstances
           })
         )
       }
-      return create(ProcessBindingResponseSchema, ret)
-    })
-  }
-
-  async processBinding(request: DataBinding, context: HandlerContext = TEST_CONTEXT): Promise<ProcessBindingResponse> {
-    const ret = await PluginManager.INSTANCE.dbContextLocalStorage.run(this.storeContext, () => {
-      return this.service.processBindings(create(ProcessBindingsRequestSchema, { bindings: [request] }), context)
-    })
-    if (ret.result?.states?.configUpdated) {
-      // template may changed
-      await PluginManager.INSTANCE.updateTemplates(
-        create(UpdateTemplatesRequestSchema, {
-          chainId: request.chainId,
-          templateInstances: this.storeContext.templateInstances
-        })
-      )
     }
-    return create(ProcessBindingResponseSchema, ret)
+    return create(ProcessBindingResponseSchema, {
+      result: mergeProcessResults(results)
+    })
   }
 
-  processBindingsStream(requests: AsyncIterable<ProcessStreamRequest>, context: HandlerContext): never {
-    throw new Error('Method not implemented.')
+  private processBindingV3(request: DataBinding, context: HandlerContext): Promise<ProcessResult> {
+    const processId = this.nextProcessId++
+    const subject = this.storeContext.subject
+
+    return new Promise((resolve, reject) => {
+      const subscription = subject.subscribe({
+        next: (response) => {
+          if (response.processId !== processId) {
+            return
+          }
+          if (response.value?.case === 'tplRequest') {
+            this.storeContext.applyTemplateRequest(
+              (response.value.value.templates ?? []).map((template) => create(TemplateInstanceSchema, template)),
+              response.value.value.remove ?? false
+            )
+          }
+          if (response.value?.case === 'result') {
+            subscription.unsubscribe()
+            resolve(create(ProcessResultSchema, response.value.value))
+          }
+        },
+        error: (e) => {
+          subscription.unsubscribe()
+          reject(e)
+        }
+      })
+
+      this.service
+        .handleRequest(
+          create(ProcessStreamRequestSchema, {
+            processId,
+            value: {
+              case: 'binding',
+              value: request
+            }
+          }),
+          undefined,
+          subject
+        )
+        .catch((e) => {
+          subscription.unsubscribe()
+          reject(e)
+        })
+    })
   }
 
-  preprocessBindingsStream(requests: AsyncIterable<PreprocessStreamRequest>, context: HandlerContext): never {
-    throw new Error('Method not implemented.')
+  processBindingsStream(requests: AsyncIterable<ProcessStreamRequest>, context: HandlerContext) {
+    return this.service.processBindingsStream(requests, context)
   }
 
   // processBindingsStream(request: AsyncIterable<ProcessStreamRequest>, context: HandlerContext) {
@@ -172,17 +220,32 @@ export class TestProcessorServer {
   }
 }
 
-class TestStoreContext extends StoreContext implements IDataBindingContext {
+class TestStoreContext extends DataBindingContext implements IDataBindingContext {
   constructor(
-    readonly subject: Subject<ProcessStreamResponseInit>,
-    processId: number
+    subject: Subject<ProcessStreamResponseV3Init>,
+    processId: number,
+    private readonly service: ProcessorServiceImplV3
   ) {
-    super(subject, processId)
+    super(processId, subject)
   }
 
   templateInstances: TemplateInstance[] = []
 
-  sendTemplateRequest(templates: Array<TemplateInstance>, remove: boolean): void {
+  result(dbResult: DBResponse, processId = this.processId): void {
+    void this.service.handleRequest(
+      create(ProcessStreamRequestSchema, {
+        processId,
+        value: {
+          case: 'dbResult',
+          value: dbResult
+        }
+      }),
+      undefined,
+      this.subject
+    )
+  }
+
+  applyTemplateRequest(templates: Array<TemplateInstance>, remove: boolean): void {
     if (remove) {
       this.templateInstances = this.templateInstances.filter(
         (i) => !templates.find((t) => t.templateId === i.templateId && t.contract?.address === i.contract?.address)
@@ -191,7 +254,12 @@ class TestStoreContext extends StoreContext implements IDataBindingContext {
       this.templateInstances.push(...templates)
     }
   }
+
+  sendTemplateRequest(templates: Array<TemplateInstance>, remove: boolean): void {
+    this.applyTemplateRequest(templates, remove)
+  }
+
   sendTimeseriesRequest(timeseries: Array<TimeseriesResult>): void {
-    throw new Error('Method not implemented.')
+    // Test helpers currently expose metric/event/export results through ProcessResult.
   }
 }
