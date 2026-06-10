@@ -123,7 +123,7 @@ export function generateBoundFunctionCallEncoder(fn: FunctionDeclaration, includ
   })}overrides?: Overrides): EthCallParam {   
     return this.view.encodeCall.${declName}(${
       fn.inputs.length > 0 ? fn.inputs.map((input, index) => input.name || `arg${index}`).join(',') + ',' : ''
-    }{chainId: this.context.chainId.toString(), address: this.context.address, blockTag: this.context.getBlockTag(overrides)})
+    }create(EthCallContextSchema, {chainId: this.context.chainId.toString(), address: this.context.address, blockTag: this.context.getBlockTag(overrides)}))
   }
   `
   ]

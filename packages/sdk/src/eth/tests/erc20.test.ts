@@ -5,7 +5,8 @@ import { expect } from 'chai'
 
 import { firstCounterValue, firstGaugeValue, TestProcessorServer } from '../../testing/index.js'
 import { mockTransferLog } from '../builtin/erc20.js'
-import { HandlerType } from '@sentio/protos'
+import { DataBindingSchema, HandlerType, timestampFromDate } from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
 import { SENTIO_BIGINT_STRING_SUFFIX } from '../../core/normalization.js'
 import { RichBlock } from '../eth.js'
 import { EthChainId } from '@sentio/chain'
@@ -56,7 +57,7 @@ describe('Test Basic Examples', () => {
     expect(counters).length(1)
     expect(firstCounterValue(res.result, 'c1')).equals(1)
     const event = res.result?.events[0]
-    expect(event?.attributes?.value.endsWith(SENTIO_BIGINT_STRING_SUFFIX)).equals(true)
+    expect((event?.attributes?.value as string)?.endsWith(SENTIO_BIGINT_STRING_SUFFIX)).equals(true)
     expect(event?.attributes?.project).equals('a')
 
     expect(counters?.[0].metadata?.chainId).equals('1')
@@ -88,30 +89,35 @@ describe('Test Basic Examples', () => {
 
     const handlerId = config.contractConfigs?.[0].traceConfigs[0].handlerId
     const res = (
-      await service.processBinding({
-        data: {
-          ethTrace: {
-            rawTrace: JSON.stringify(traceData),
-            rawTransactionReceipt: JSON.stringify({
-              transactionHash: '0xcb8810a23315b5c2cb836883959bbf982f2158b7d9f7f8f4c5c0a8cf9d90f720',
-              gasUsed: '0x4cf12',
-              blockHash: '0x74f3c24a0f27a3a6afa8878a2072d62f661b03d04ead2b99c7f6c33acff2e7c2',
-              status: '0x1',
-              logsBloom:
-                '0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
-              transactionIndex: '0x50',
-              contractAddress: '0x0000000000000000000000000000000000000000',
-              blockNumber: '0xb8ba23',
-              type: '0x0',
-              cumulativeGasUsed: '0x8b56b3'
-            }),
-            timestamp: new Date()
-          }
-        },
-        handlerIds: [handlerId],
-        handlerType: HandlerType.ETH_TRACE,
-        chainId: EthChainId.ETHEREUM
-      })
+      await service.processBinding(
+        create(DataBindingSchema, {
+          data: {
+            value: {
+              case: 'ethTrace',
+              value: {
+                rawTrace: JSON.stringify(traceData),
+                rawTransactionReceipt: JSON.stringify({
+                  transactionHash: '0xcb8810a23315b5c2cb836883959bbf982f2158b7d9f7f8f4c5c0a8cf9d90f720',
+                  gasUsed: '0x4cf12',
+                  blockHash: '0x74f3c24a0f27a3a6afa8878a2072d62f661b03d04ead2b99c7f6c33acff2e7c2',
+                  status: '0x1',
+                  logsBloom:
+                    '0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
+                  transactionIndex: '0x50',
+                  contractAddress: '0x0000000000000000000000000000000000000000',
+                  blockNumber: '0xb8ba23',
+                  type: '0x0',
+                  cumulativeGasUsed: '0x8b56b3'
+                }),
+                timestamp: timestampFromDate(new Date())
+              }
+            }
+          },
+          handlerIds: handlerId != undefined ? [handlerId] : [],
+          handlerType: HandlerType.ETH_TRACE,
+          chainId: EthChainId.ETHEREUM
+        })
+      )
     ).result
 
     expect(res?.counters).length(1)

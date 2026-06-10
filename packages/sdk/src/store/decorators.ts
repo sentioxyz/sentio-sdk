@@ -16,7 +16,8 @@ import {
   TypeConverters,
   ValueConverter
 } from './convert.js'
-import { RichStruct } from '@sentio/protos'
+import { type RichStruct, RichStructSchema } from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
 import { getStore } from './store.js'
 
 type Constructor = { new (...args: any[]): any }
@@ -90,7 +91,7 @@ export function Entity(entityName: string) {
     }
 
     return class extends BaseClass {
-      readonly _data: RichStruct = { fields: {} }
+      readonly _data: RichStruct = create(RichStructSchema, { fields: {} })
       static entityName = entityName
 
       constructor(...args: any[]) {

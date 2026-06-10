@@ -1,24 +1,24 @@
 import {
-  AccountConfig,
-  ContractConfig,
-  DataBinding,
-  DeepPartial,
-  Empty,
-  PreprocessStreamRequest,
-  PreprocessStreamResponse,
-  ProcessBindingResponse,
-  ProcessBindingsRequest,
-  ProcessConfigRequest,
-  ProcessConfigResponse,
-  ProcessorServiceImplementation,
-  ProcessStreamRequest,
-  ProcessStreamResponse,
-  ServerStreamingMethodResult,
-  StartRequest,
-  TemplateInstance,
-  TimeseriesResult
+  type AccountConfig,
+  type ContractConfig,
+  type DataBinding,
+  type Empty,
+  EmptySchema,
+  type PreprocessStreamRequest,
+  type ProcessBindingResponse,
+  ProcessBindingResponseSchema,
+  ProcessBindingsRequestSchema,
+  ProcessConfigRequestSchema,
+  type ProcessConfigResponse,
+  type ProcessStreamRequest,
+  ProcessStreamResponseSchema,
+  StartRequestSchema,
+  type TemplateInstance,
+  type TimeseriesResult,
+  UpdateTemplatesRequestSchema
 } from '@sentio/protos'
-import { CallContext } from 'nice-grpc-common'
+import { create, type MessageInitShape } from '@bufbuild/protobuf'
+import { type HandlerContext } from '@connectrpc/connect'
 import {
   Endpoints,
   IDataBindingContext,
@@ -40,7 +40,9 @@ import { DatabaseSchemaState } from '../core/database-schema.js'
 import { IotaFacet } from './iota-facet.js'
 import { ChainInfo } from '@sentio/chain'
 
-export const TEST_CONTEXT: CallContext = <CallContext>{}
+type ProcessStreamResponseInit = MessageInitShape<typeof ProcessStreamResponseSchema>
+
+export const TEST_CONTEXT = {} as HandlerContext
 
 export function cleanTest() {
   // retain the DatabaseSchemaState
@@ -49,7 +51,7 @@ export function cleanTest() {
   State.INSTANCE.stateMap.set(DatabaseSchemaState.INSTANCE.key(), state)
 }
 
-export class TestProcessorServer implements ProcessorServiceImplementation {
+export class TestProcessorServer {
   service: ProcessorServiceImpl
   contractConfigs: ContractConfig[]
   accountConfigs: AccountConfig[]
@@ -82,79 +84,83 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
     }
 
     // start a memory database for testing
-    const subject = new Subject<DeepPartial<ProcessStreamResponse>>()
+    const subject = new Subject<ProcessStreamResponseInit>()
     this.storeContext = new TestStoreContext(subject, 1)
     this._db = new MemoryDatabase(this.storeContext)
   }
 
-  async start(request: StartRequest = { templateInstances: [] }, context = TEST_CONTEXT): Promise<Empty> {
-    const res = await this.service.start(request, context)
-    const config = await this.getConfig({})
+  async start(
+    request: MessageInitShape<typeof StartRequestSchema> = { templateInstances: [] },
+    context = TEST_CONTEXT
+  ) {
+    const req = create(StartRequestSchema, request)
+    const res = await this.service.start(req, context)
+    const config = await this.getConfig(create(ProcessConfigRequestSchema, {}))
     this.contractConfigs = config.contractConfigs
     this.accountConfigs = config.accountConfigs
     this._db.start()
-    this.storeContext.templateInstances = request.templateInstances
+    this.storeContext.templateInstances = req.templateInstances
     return res
   }
 
-  stop(request: Empty, context = TEST_CONTEXT): Promise<Empty> {
+  stop(request: Empty = create(EmptySchema), context = TEST_CONTEXT) {
     return this.service.stop(request, context)
   }
 
-  async getConfig(request: ProcessConfigRequest, context = TEST_CONTEXT): Promise<ProcessConfigResponse> {
-    const config = await this.service.getConfig(request, context)
-    return {
-      ...config,
-      templateInstances: this.storeContext.templateInstances
-    }
+  async getConfig(
+    request: MessageInitShape<typeof ProcessConfigRequestSchema> = {},
+    context = TEST_CONTEXT
+  ): Promise<ProcessConfigResponse> {
+    const config = await this.service.getConfig(create(ProcessConfigRequestSchema, request), context)
+    config.templateInstances = this.storeContext.templateInstances
+    return config
   }
 
   processBindings(
-    request: ProcessBindingsRequest,
-    context: CallContext = TEST_CONTEXT
+    request: MessageInitShape<typeof ProcessBindingsRequestSchema>,
+    context: HandlerContext = TEST_CONTEXT
   ): Promise<ProcessBindingResponse> {
+    const req = create(ProcessBindingsRequestSchema, request)
     return PluginManager.INSTANCE.dbContextLocalStorage.run(this.storeContext, async () => {
-      const ret = await this.service.processBindings(request, context)
+      const ret = await this.service.processBindings(req, context)
       if (ret.result?.states?.configUpdated) {
         // template may changed
-        await PluginManager.INSTANCE.updateTemplates({
-          chainId: request.bindings[0].chainId,
-          templateInstances: this.storeContext.templateInstances
-        })
+        await PluginManager.INSTANCE.updateTemplates(
+          create(UpdateTemplatesRequestSchema, {
+            chainId: req.bindings[0].chainId,
+            templateInstances: this.storeContext.templateInstances
+          })
+        )
       }
-      return ret
+      return create(ProcessBindingResponseSchema, ret)
     })
   }
 
-  async processBinding(request: DataBinding, context: CallContext = TEST_CONTEXT): Promise<ProcessBindingResponse> {
+  async processBinding(request: DataBinding, context: HandlerContext = TEST_CONTEXT): Promise<ProcessBindingResponse> {
     const ret = await PluginManager.INSTANCE.dbContextLocalStorage.run(this.storeContext, () => {
-      return this.service.processBindings({ bindings: [request] }, context)
+      return this.service.processBindings(create(ProcessBindingsRequestSchema, { bindings: [request] }), context)
     })
     if (ret.result?.states?.configUpdated) {
       // template may changed
-      await PluginManager.INSTANCE.updateTemplates({
-        chainId: request.chainId,
-        templateInstances: this.storeContext.templateInstances
-      })
+      await PluginManager.INSTANCE.updateTemplates(
+        create(UpdateTemplatesRequestSchema, {
+          chainId: request.chainId,
+          templateInstances: this.storeContext.templateInstances
+        })
+      )
     }
-    return ret
+    return create(ProcessBindingResponseSchema, ret)
   }
 
-  processBindingsStream(
-    requests: AsyncIterable<ProcessStreamRequest>,
-    context: CallContext
-  ): ServerStreamingMethodResult<DeepPartial<ProcessStreamResponse>> {
+  processBindingsStream(requests: AsyncIterable<ProcessStreamRequest>, context: HandlerContext): never {
     throw new Error('Method not implemented.')
   }
 
-  preprocessBindingsStream(
-    requests: AsyncIterable<PreprocessStreamRequest>,
-    context: CallContext
-  ): ServerStreamingMethodResult<DeepPartial<PreprocessStreamResponse>> {
+  preprocessBindingsStream(requests: AsyncIterable<PreprocessStreamRequest>, context: HandlerContext): never {
     throw new Error('Method not implemented.')
   }
 
-  // processBindingsStream(request: AsyncIterable<ProcessStreamRequest>, context: CallContext) {
+  // processBindingsStream(request: AsyncIterable<ProcessStreamRequest>, context: HandlerContext) {
   //   return this.service.processBindingsStream(request, context)
   // }
   get db() {
@@ -168,7 +174,7 @@ export class TestProcessorServer implements ProcessorServiceImplementation {
 
 class TestStoreContext extends StoreContext implements IDataBindingContext {
   constructor(
-    readonly subject: Subject<DeepPartial<ProcessStreamResponse>>,
+    readonly subject: Subject<ProcessStreamResponseInit>,
     processId: number
   ) {
     super(subject, processId)

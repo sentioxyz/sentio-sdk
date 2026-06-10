@@ -1,6 +1,7 @@
 import { BaseContext, Labels, normalizeLabels } from '../core/index.js'
 import { ChainId, CosmosChainId } from '@sentio/chain'
-import { RecordMetaData } from '@sentio/protos'
+import { RecordMetaData, RecordMetaDataSchema } from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
 import { CosmosTransaction } from './transaction.js'
 
 export class CosmosContext extends BaseContext {
@@ -23,7 +24,7 @@ export class CosmosContext extends BaseContext {
   }
 
   protected getMetaDataInternal(name: string, labels: Labels): RecordMetaData {
-    return {
+    return create(RecordMetaDataSchema, {
       address: this.contractAddress,
       contractName: labels['name'] || '',
       blockNumber: BigInt(this.transaction?.height || 0),
@@ -33,6 +34,6 @@ export class CosmosContext extends BaseContext {
       name: name,
       logIndex: this.logIndex,
       labels: normalizeLabels(labels)
-    }
+    })
   }
 }

@@ -1,5 +1,6 @@
 import { GLOBAL_CONFIG, Plugin, PluginManager } from '@sentio/runtime'
-import { InitResponse, ProcessConfigResponse } from '@sentio/protos'
+import { DataBaseSchemaSchema, ExportConfigSchema, InitResponse, ProcessConfigResponse } from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
 
 import { MetricState } from './meter.js'
 import { ExporterState } from './exporter.js'
@@ -30,10 +31,12 @@ export class CorePlugin extends Plugin {
     }
 
     for (const exporter of ExporterState.INSTANCE.getValues()) {
-      config.exportConfigs.push({
-        name: exporter.name,
-        channel: exporter.channel
-      })
+      config.exportConfigs.push(
+        create(ExportConfigSchema, {
+          name: exporter.name,
+          channel: exporter.channel
+        })
+      )
     }
 
     const schemas = DatabaseSchemaState.INSTANCE.getValues()
@@ -50,9 +53,9 @@ type MemoryCacheItem @cache(sizeMB: ${GLOBAL_CONFIG.cache.size || 100}) {
     }
 
     if (mergedSources.trim().length > 0) {
-      config.dbSchema = {
+      config.dbSchema = create(DataBaseSchemaSchema, {
         gqlSchema: mergedSources
-      }
+      })
     }
   }
 }

@@ -22,10 +22,7 @@
     "compile": "tsc"
   },
   "dependencies": {
-    "@bufbuild/protobuf": "^2.12.0",
-    "long": "^5.2.3",
-    "nice-grpc": "^2.1.16",
-    "nice-grpc-common": "^2.0.3"
+    "@bufbuild/protobuf": "^2.12.0"
   },
   "engines": {
     "node": ">=20"

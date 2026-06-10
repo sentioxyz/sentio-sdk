@@ -1,5 +1,6 @@
-import { normalizeLabels, Labels, BaseContext, RecordMetaData } from '../index.js'
+import { normalizeLabels, Labels, BaseContext, RecordMetaData, RecordMetaDataSchema } from '../index.js'
 import { SolanaChainId } from '@sentio/chain'
+import { create } from '@bufbuild/protobuf'
 import type { TransactionResponse } from './solana-rpc-types.js'
 
 export class SolanaContext extends BaseContext {
@@ -30,7 +31,7 @@ export class SolanaContext extends BaseContext {
   }
 
   getMetaDataInternal(name: string, labels: Labels): RecordMetaData {
-    return {
+    return create(RecordMetaDataSchema, {
       address: this.address,
       contractName: this.programName,
       blockNumber: this.blockNumber,
@@ -40,6 +41,6 @@ export class SolanaContext extends BaseContext {
       chainId: this.getChainId(),
       name: name,
       labels: normalizeLabels(labels)
-    }
+    })
   }
 }

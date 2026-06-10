@@ -1,5 +1,6 @@
 import { TestProcessorServer } from './test-processor-server.js'
-import { Data_SolInstruction, HandlerType, ProcessBindingResponse } from '@sentio/protos'
+import { Data_SolInstructionSchema, DataBindingSchema, HandlerType, type ProcessBindingResponse } from '@sentio/protos'
+import { create, type MessageInitShape } from '@bufbuild/protobuf'
 import { ChainId } from '@sentio/chain'
 
 export class SolanaFacet {
@@ -9,18 +10,22 @@ export class SolanaFacet {
     this.server = server
   }
 
-  testInstructions(instructions: Data_SolInstruction[]): Promise<ProcessBindingResponse> {
+  testInstructions(
+    instructions: MessageInitShape<typeof Data_SolInstructionSchema>[]
+  ): Promise<ProcessBindingResponse> {
     return this.server.processBindings({
       bindings: instructions.map((instruction) => {
-        return {
+        return create(DataBindingSchema, {
           data: {
-            raw: new Uint8Array(),
-            solInstruction: instruction
+            value: {
+              case: 'solInstruction',
+              value: instruction
+            }
           },
           handlerIds: [],
           handlerType: HandlerType.SOL_INSTRUCTION,
           chainId: ChainId.SOLANA_MAINNET
-        }
+        })
       })
     })
   }

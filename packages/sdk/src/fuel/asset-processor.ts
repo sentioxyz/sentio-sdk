@@ -1,5 +1,11 @@
 import { CallHandler, FuelBaseProcessor, FuelProcessorState } from './types.js'
-import { Data_FuelReceipt, Data_FuelTransaction, FuelAssetHandlerConfig_AssetFilter } from '@sentio/protos'
+import {
+  Data_FuelTransaction,
+  FuelAssetHandlerConfig_AssetFilter,
+  FuelAssetHandlerConfig_AssetFilterSchema,
+  timestampDate
+} from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
 import { FuelNetwork, getProvider } from './network.js'
 import { FuelContext } from './context.js'
 import { decodeFuelTransaction } from './transaction.js'
@@ -8,7 +14,7 @@ import { getOptionsSignature } from './fuel-processor.js'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 
 export class FuelAssetProcessor implements FuelBaseProcessor<FuelAssetProcessorConfig> {
-  txHandlers: CallHandler<Data_FuelTransaction | Data_FuelReceipt>[] = []
+  txHandlers: CallHandler<Data_FuelTransaction>[] = []
   blockHandlers = []
   private provider: Provider
 
@@ -42,11 +48,13 @@ export class FuelAssetProcessor implements FuelBaseProcessor<FuelAssetProcessorC
     for (const assetId of assetIds) {
       for (const from of froms) {
         for (const to of tos) {
-          filters.push({
-            assetId: assetId,
-            fromAddress: from,
-            toAddress: to
-          })
+          filters.push(
+            create(FuelAssetHandlerConfig_AssetFilterSchema, {
+              assetId: assetId,
+              fromAddress: from,
+              toAddress: to
+            })
+          )
         }
       }
     }
@@ -94,7 +102,7 @@ export class FuelAssetProcessor implements FuelBaseProcessor<FuelAssetProcessorC
           this.config.chainId,
           assetId,
           this.config.name ?? '',
-          call.timestamp || new Date(0),
+          call.timestamp ? timestampDate(call.timestamp) : new Date(0),
           tx,
           null
         )

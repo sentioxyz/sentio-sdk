@@ -1,5 +1,5 @@
 // TODO extends ArgumentsFilter
-import {
+import type {
   Data_AptCall,
   Data_AptResource,
   HandleInterval,

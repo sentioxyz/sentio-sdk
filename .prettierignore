@@ -9,3 +9,6 @@ types
 builtin
 pnpm-*.yaml
 abis
+
+# Generated protobuf-es output (written verbatim by scripts/sdk-sync.sh in sentio-core)
+**/*_pb.ts

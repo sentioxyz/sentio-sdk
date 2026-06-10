@@ -1,20 +1,25 @@
 import { before, describe, test } from 'node:test'
 import assert from 'assert'
-import { CallContext } from 'nice-grpc-common'
+import { type HandlerContext } from '@connectrpc/connect'
 import {
-  DeepPartial,
   HandlerType,
-  ProcessConfigRequest,
-  ProcessConfigResponse,
-  ProcessStreamResponseV3
+  ProcessConfigRequestSchema,
+  type ProcessConfigResponse,
+  ProcessConfigResponseSchema,
+  ProcessStreamRequestSchema,
+  ProcessStreamResponseV3Schema,
+  StartRequestSchema
 } from '@sentio/protos'
+import { create, type MessageInitShape } from '@bufbuild/protobuf'
 import { Subject } from 'rxjs'
 import { ProcessorServiceImplV3 } from './service-v3.js'
 import { PluginManager } from './plugin.js'
 import { TestPlugin } from './test-processor.test.js'
 import { getTestConfig } from './processor-runner-program.js'
 
-export const TEST_CONTEXT: CallContext = <CallContext>{}
+type ProcessStreamResponseV3Init = MessageInitShape<typeof ProcessStreamResponseV3Schema>
+
+export const TEST_CONTEXT = {} as HandlerContext
 
 describe('Test Service V3 with worker without partition', () => {
   const service = new ProcessorServiceImplV3(
@@ -28,12 +33,12 @@ describe('Test Service V3 with worker without partition', () => {
     })
   )
 
-  let processConfigResponse: DeepPartial<ProcessConfigResponse> = ProcessConfigResponse.fromPartial({})
+  let processConfigResponse: ProcessConfigResponse = create(ProcessConfigResponseSchema, {})
 
   before(async () => {
     try {
-      await service.start({ templateInstances: [] }, TEST_CONTEXT)
-      processConfigResponse = await service.getConfig(ProcessConfigRequest.fromPartial({}), TEST_CONTEXT)
+      await service.start(create(StartRequestSchema, { templateInstances: [] }), TEST_CONTEXT)
+      processConfigResponse = await service.getConfig(create(ProcessConfigRequestSchema, {}), TEST_CONTEXT)
     } catch (e) {
       console.error('Error during initialization:', e)
     }
@@ -44,49 +49,51 @@ describe('Test Service V3 with worker without partition', () => {
   })
 
   test('should handle process stream requests', async () => {
-    const request1 = {
+    const request1 = create(ProcessStreamRequestSchema, {
       processId: 1,
-      binding: {
-        handlerIds: [0],
-        handlerType: HandlerType.ETH_LOG,
-        data: {},
-        chainId: '1'
+      value: {
+        case: 'binding',
+        value: {
+          handlerIds: [0],
+          handlerType: HandlerType.ETH_LOG,
+          data: {},
+          chainId: '1'
+        }
       }
-    }
+    })
 
-    const request2 = {
+    const request2 = create(ProcessStreamRequestSchema, {
       processId: 1,
-      dbResult: {
-        opId: 0n
+      value: {
+        case: 'dbResult',
+        value: {
+          opId: 0n
+        }
       }
-    }
+    })
 
-    const subject = new Subject<DeepPartial<ProcessStreamResponseV3>>()
+    const subject = new Subject<ProcessStreamResponseV3Init>()
     let i = 0
     let result: any = undefined
-    subject.subscribe((resp: DeepPartial<ProcessStreamResponseV3>) => {
-      if (resp.dbRequest) {
-        assert.ok(resp.dbRequest, 'db request should be present in the response')
-        assert.deepEqual(
-          resp.dbRequest,
-          {
-            get: {
-              entity: 'Test',
-              id: '1'
-            },
-            opId: 0n
-          },
-          'DB request should match expected value'
-        )
+    subject.subscribe((resp: ProcessStreamResponseV3Init) => {
+      if (resp.value?.case === 'dbRequest') {
+        const dbRequest = resp.value.value
+        assert.ok(dbRequest, 'db request should be present in the response')
+        assert.strictEqual(dbRequest.opId, 0n, 'opId should match')
+        assert.strictEqual(dbRequest.op?.case, 'get', 'op should be a get request')
+        if (dbRequest.op?.case === 'get') {
+          assert.strictEqual(dbRequest.op.value.entity, 'Test', 'entity should match')
+          assert.strictEqual(dbRequest.op.value.id, '1', 'id should match')
+        }
         service.handleRequest(request2, undefined, subject)
       }
-      if (resp.tplRequest) {
+      if (resp.value?.case === 'tplRequest') {
         // ignore
       }
-      if (resp.tsRequest) {
+      if (resp.value?.case === 'tsRequest') {
       }
-      if (resp.result) {
-        result = resp.result
+      if (resp.value?.case === 'result') {
+        result = resp.value.value
       }
 
       i++

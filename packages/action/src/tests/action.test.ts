@@ -3,7 +3,8 @@ import { TypedActionProcessor } from '../typed-action-processor.js'
 import { before, describe, test } from 'node:test'
 import { expect } from 'chai'
 import { ActionPlugin } from '../action-plugin.js'
-import { ProcessConfigResponse } from '@sentio/protos'
+import { ProcessConfigResponseSchema } from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
 
 describe('Test Action Example', () => {
   const plugin = new ActionPlugin()
@@ -36,7 +37,7 @@ describe('Test Action Example', () => {
     })
 
   before(async () => {
-    await plugin.configure(ProcessConfigResponse.fromPartial({}))
+    await plugin.configure(create(ProcessConfigResponseSchema, {}))
   })
 
   test('test post echo ', async () => {

@@ -1,28 +1,32 @@
-import { CallContext, ServerError, Status } from 'nice-grpc'
-import { DebugInfo, RichServerError } from 'nice-grpc-error-details'
+import { ConnectError, Code, type HandlerContext, type ServiceImpl } from '@connectrpc/connect'
 import { from } from 'ix/Ix.asynciterable'
 import { withAbort } from 'ix/Ix.asynciterable.operators'
 
 import {
-  DataBinding,
-  DeepPartial,
-  Empty,
-  EthCallParam,
+  type DataBinding,
+  type Empty,
+  EmptySchema,
+  type EthCallParam,
   HandlerType,
-  PreparedData,
-  PreprocessResult,
-  PreprocessStreamRequest,
-  PreprocessStreamResponse,
-  ProcessBindingResponse,
-  ProcessBindingsRequest,
-  ProcessConfigRequest,
-  ProcessConfigResponse,
-  ProcessorServiceImplementation,
-  ProcessResult,
-  ProcessStreamRequest,
-  ProcessStreamResponse,
-  StartRequest
+  type PreparedData,
+  PreparedDataSchema,
+  type PreprocessResult,
+  type PreprocessStreamRequest,
+  ProcessBindingResponseSchema,
+  type ProcessBindingsRequest,
+  type ProcessConfigRequest,
+  type ProcessConfigResponse,
+  ProcessConfigResponseSchema,
+  Processor,
+  type ProcessResult,
+  ProcessResultSchema,
+  RuntimeInfoSchema,
+  type ProcessStreamRequest,
+  ProcessStreamResponseSchema,
+  PreprocessStreamResponseSchema,
+  type StartRequest
 } from '@sentio/protos'
+import { create, type MessageInitShape } from '@bufbuild/protobuf'
 
 import { PluginManager } from './plugin.js'
 import { errorString, makeEthCallKey, mergeProcessResults } from './utils.js'
@@ -44,7 +48,13 @@ const { process_binding_count, process_binding_time, process_binding_error } = p
   return this.toString()
 }
 
-export class ProcessorServiceImpl implements ProcessorServiceImplementation {
+// Init-shapes carried over the rxjs Subject before being yielded by connect.
+// connect accepts MessageInitShape for streaming outputs, so the oneof discriminated
+// union must be filled in (e.g. { value: { case: 'result', value: ... } }).
+export type ProcessStreamResponseInit = MessageInitShape<typeof ProcessStreamResponseSchema>
+export type PreprocessStreamResponseInit = MessageInitShape<typeof PreprocessStreamResponseSchema>
+
+export class ProcessorServiceImpl implements ServiceImpl<typeof Processor> {
   private started = false
   // When there is unhandled error, stop process and return unavailable error
   unhandled: Error
@@ -70,16 +80,16 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     this.enablePartition = options?.enablePartition == true
   }
 
-  async getConfig(request: ProcessConfigRequest, context: CallContext): Promise<ProcessConfigResponse> {
+  async getConfig(request: ProcessConfigRequest, context: HandlerContext): Promise<ProcessConfigResponse> {
     if (!this.started) {
-      throw new ServerError(Status.UNAVAILABLE, 'Service Not started.')
+      throw new ConnectError('Service Not started.', Code.Unavailable)
     }
     // if (!this.processorConfig) {
-    //   throw new ServerError(Status.INTERNAL, 'Process config empty.')
+    //   throw new ConnectError('Process config empty.', Code.Internal)
     // }
 
     // Don't use .create to keep compatiblity
-    const newConfig = ProcessConfigResponse.fromPartial({})
+    const newConfig = create(ProcessConfigResponseSchema, {})
     await PluginManager.INSTANCE.configure(newConfig)
     return newConfig
   }
@@ -90,7 +100,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
   //   await PluginManager.INSTANCE.configure(this.processorConfig)
   // }
 
-  async start(request: StartRequest, context: CallContext): Promise<Empty> {
+  async start(request: StartRequest, context: HandlerContext): Promise<MessageInitShape<typeof EmptySchema>> {
     if (this.started) {
       return {}
     }
@@ -114,7 +124,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
 
       await this.loader()
     } catch (e) {
-      throw new ServerError(Status.INVALID_ARGUMENT, 'Failed to load processor: ' + errorString(e))
+      throw new ConnectError('Failed to load processor: ' + errorString(e), Code.InvalidArgument)
     }
 
     await PluginManager.INSTANCE.start(request)
@@ -122,13 +132,13 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     // try {
     //   await this.configure()
     // } catch (e) {
-    //   throw new ServerError(Status.INTERNAL, 'Failed to start processor : ' + errorString(e))
+    //   throw new ConnectError('Failed to start processor : ' + errorString(e), Code.Internal)
     // }
     this.started = true
     return {}
   }
 
-  async stop(request: Empty, context: CallContext): Promise<Empty> {
+  async stop(request: Empty, context: HandlerContext): Promise<MessageInitShape<typeof EmptySchema>> {
     console.log('Server Shutting down in 5 seconds')
     if (this.shutdownHandler) {
       setTimeout(this.shutdownHandler, 5000)
@@ -136,10 +146,13 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     return {}
   }
 
-  async processBindings(request: ProcessBindingsRequest, options?: CallContext): Promise<ProcessBindingResponse> {
+  async processBindings(
+    request: ProcessBindingsRequest,
+    context?: HandlerContext
+  ): Promise<MessageInitShape<typeof ProcessBindingResponseSchema>> {
     const preparedData = this.enablePreprocess
-      ? await this.preprocessBindings(request.bindings, {}, undefined, options)
-      : { ethCallResults: {} }
+      ? await this.preprocessBindings(request.bindings, {}, undefined, context)
+      : create(PreparedDataSchema, { ethCallResults: {} })
 
     const promises = []
     for (const binding of request.bindings) {
@@ -174,7 +187,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     bindings: DataBinding[],
     preprocessStore: { [k: string]: any },
     dbContext?: StoreContext,
-    options?: CallContext
+    options?: HandlerContext
   ): Promise<PreparedData> {
     // console.debug(`preprocessBindings start, bindings: ${bindings.length}`)
     const promises = []
@@ -274,30 +287,24 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     // console.debug(
     //   `${Object.keys(results).length} calls finished, actual calls: ${callPromises.length + multicallPromises.length}, elapsed: ${Date.now() - start}ms`
     // )
-    return {
+    return create(PreparedDataSchema, {
       ethCallResults: results
-    }
+    })
   }
 
   async preprocessBinding(
     request: DataBinding,
     preprocessStore: { [k: string]: any },
     dbContext?: StoreContext,
-    options?: CallContext
+    options?: HandlerContext
   ): Promise<PreprocessResult> {
     if (!this.started) {
-      throw new ServerError(Status.UNAVAILABLE, 'Service Not started.')
+      throw new ConnectError('Service Not started.', Code.Unavailable)
     }
     if (this.unhandled) {
-      throw new RichServerError(
-        Status.UNAVAILABLE,
+      throw new ConnectError(
         'Unhandled exception/rejection in previous request: ' + errorString(this.unhandled),
-        [
-          DebugInfo.fromPartial({
-            detail: this.unhandled.message,
-            stackEntries: this.unhandled.stack?.split('\n')
-          })
-        ]
+        Code.Unavailable
       )
     }
     return await PluginManager.INSTANCE.preprocessBinding(request, preprocessStore, dbContext)
@@ -306,21 +313,15 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
   async processBinding(
     request: DataBinding,
     preparedData: PreparedData | undefined,
-    options?: CallContext
+    options?: HandlerContext
   ): Promise<ProcessResult> {
     if (!this.started) {
-      throw new ServerError(Status.UNAVAILABLE, 'Service Not started.')
+      throw new ConnectError('Service Not started.', Code.Unavailable)
     }
     if (this.unhandled) {
-      throw new RichServerError(
-        Status.UNAVAILABLE,
+      throw new ConnectError(
         'Unhandled exception/rejection in previous request: ' + errorString(this.unhandled),
-        [
-          DebugInfo.fromPartial({
-            detail: this.unhandled.message,
-            stackEntries: this.unhandled.stack?.split('\n')
-          })
-        ]
+        Code.Unavailable
       )
     }
 
@@ -333,16 +334,16 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     return result
   }
 
-  async *processBindingsStream(requests: AsyncIterable<ProcessStreamRequest>, context: CallContext) {
+  async *processBindingsStream(requests: AsyncIterable<ProcessStreamRequest>, context: HandlerContext) {
     if (!this.started) {
-      throw new ServerError(Status.UNAVAILABLE, 'Service Not started.')
+      throw new ConnectError('Service Not started.', Code.Unavailable)
     }
 
-    const subject = new Subject<DeepPartial<ProcessStreamResponse>>()
+    const subject = new Subject<ProcessStreamResponseInit>()
     this.handleRequests(requests, subject)
       .then(() => {
         if (this.preparedData) {
-          this.preparedData = { ethCallResults: {} }
+          this.preparedData = create(PreparedDataSchema, { ethCallResults: {} })
         }
         subject.complete()
       })
@@ -355,26 +356,31 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
 
   async handlePreprocessRequests(
     requests: AsyncIterable<PreprocessStreamRequest>,
-    subject: Subject<DeepPartial<PreprocessStreamResponse>>
+    subject: Subject<PreprocessStreamResponseInit>
   ) {
     const contexts = new Contexts()
     const preprocessStore: { [k: string]: any } = {}
 
     for await (const request of requests) {
       try {
-        if (request.bindings) {
-          const bindings = request.bindings.bindings
-          const dbContext = contexts.new(request.processId, subject)
+        if (request.value.case === 'bindings') {
+          const bindings = request.value.value.bindings
+          // NOTE: StoreContext/Contexts are typed for the V2 ProcessStreamResponse stream, but the
+          // preprocess flow reuses them only to drive DB request/response plumbing. The preprocess
+          // stream message (flat `dbRequest`) differs from the V2 oneof shape, so we hand the
+          // preprocess subject in via a cast. db-context.ts owns the actual emit shape; integrator
+          // should confirm StoreContext.doSend stays compatible with both stream message types.
+          const dbContext = contexts.new(request.processId, subject as unknown as Subject<ProcessStreamResponseInit>)
           const start = Date.now()
           this.preprocessBindings(bindings, preprocessStore, dbContext, undefined)
             .then((preparedData) => {
               // TODO maybe not proper to pass data in this way
-              this.preparedData = {
+              this.preparedData = create(PreparedDataSchema, {
                 ethCallResults: {
                   ...this.preparedData?.ethCallResults,
                   ...preparedData.ethCallResults
                 }
-              }
+              })
               subject.next({
                 processId: request.processId
               })
@@ -389,9 +395,9 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
               contexts.delete(request.processId)
             })
         }
-        if (request.dbResult) {
+        if (request.value.case === 'dbResult') {
           const dbContext = contexts.get(request.processId)
-          dbContext?.result(request.dbResult)
+          dbContext?.result(request.value.value)
         }
       } catch (e) {
         // should not happen
@@ -400,12 +406,12 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
     }
   }
 
-  async *preprocessBindingsStream(requests: AsyncIterable<PreprocessStreamRequest>, context: CallContext) {
+  async *preprocessBindingsStream(requests: AsyncIterable<PreprocessStreamRequest>, context: HandlerContext) {
     if (!this.started) {
-      throw new ServerError(Status.UNAVAILABLE, 'Service Not started.')
+      throw new ConnectError('Service Not started.', Code.Unavailable)
     }
 
-    const subject = new Subject<DeepPartial<PreprocessStreamResponse>>()
+    const subject = new Subject<PreprocessStreamResponseInit>()
     this.handlePreprocessRequests(requests, subject)
       .then(() => {
         subject.complete()
@@ -421,14 +427,14 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
 
   protected async handleRequests(
     requests: AsyncIterable<ProcessStreamRequest>,
-    subject: Subject<DeepPartial<ProcessStreamResponse>>
+    subject: Subject<ProcessStreamResponseInit>
   ) {
     let lastBinding: DataBinding | undefined = undefined
     for await (const request of requests) {
       try {
         // console.log('received request:', request, 'lastBinding:', lastBinding)
-        if (request.binding) {
-          lastBinding = request.binding
+        if (request.value.case === 'binding') {
+          lastBinding = request.value.value
         }
         this.handleRequest(request, lastBinding, subject)
       } catch (e) {
@@ -441,27 +447,28 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
   async handleRequest(
     request: ProcessStreamRequest,
     lastBinding: DataBinding | undefined,
-    subject: Subject<DeepPartial<ProcessStreamResponse>>
+    subject: Subject<ProcessStreamResponseInit>
   ) {
-    if (request.binding) {
+    if (request.value.case === 'binding') {
+      const binding = request.value.value
       process_binding_count.add(1)
 
       // Adjust binding will make some request become invalid by setting UNKNOWN HandlerType
       // for older SDK version, so we just return empty result for them here
-      if (request.binding.handlerType === HandlerType.UNKNOWN) {
+      if (binding.handlerType === HandlerType.UNKNOWN) {
         subject.next({
           processId: request.processId,
-          result: ProcessResult.create()
+          value: { case: 'result', value: create(ProcessResultSchema) }
         })
         return
       }
 
       if (this.enablePartition) {
         try {
-          const partitions = await PluginManager.INSTANCE.partition(request.binding)
+          const partitions = await PluginManager.INSTANCE.partition(binding)
           subject.next({
             processId: request.processId,
-            partitions
+            value: { case: 'partitions', value: partitions }
           })
         } catch (e) {
           console.error('Partition error:', e)
@@ -469,11 +476,11 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
           return
         }
       } else {
-        this.startProcess(request.processId, request.binding, subject)
+        this.startProcess(request.processId, binding, subject)
       }
     }
 
-    if (request.start) {
+    if (request.value.case === 'start') {
       if (!lastBinding) {
         console.error('start request received without binding')
         subject.error(new Error('start request received without binding'))
@@ -482,17 +489,17 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
       this.startProcess(request.processId, lastBinding, subject)
     }
 
-    if (request.dbResult) {
+    if (request.value.case === 'dbResult') {
       const dbContext = this.dbContexts.get(request.processId)
       try {
-        dbContext?.result(request.dbResult)
+        dbContext?.result(request.value.value)
       } catch (e) {
         subject.error(new Error('db result error, process should stop'))
       }
     }
   }
 
-  private startProcess(processId: number, binding: DataBinding, subject: Subject<DeepPartial<ProcessStreamResponse>>) {
+  private startProcess(processId: number, binding: DataBinding, subject: Subject<ProcessStreamResponseInit>) {
     const dbContext = this.dbContexts.new(processId, subject)
     const start = Date.now()
     PluginManager.INSTANCE.processBinding(binding, this.preparedData, dbContext)
@@ -500,7 +507,7 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
         // await all pending db requests
         await dbContext.awaitPendings()
         subject.next({
-          result,
+          value: { case: 'result', value: result },
           processId: processId
         })
         recordRuntimeInfo(result, binding.handlerType)
@@ -521,9 +528,9 @@ export class ProcessorServiceImpl implements ProcessorServiceImplementation {
 export function recordRuntimeInfo(results: ProcessResult, handlerType: HandlerType) {
   for (const list of [results.gauges, results.counters, results.events, results.exports]) {
     list.forEach((e) => {
-      e.runtimeInfo = {
+      e.runtimeInfo = create(RuntimeInfoSchema, {
         from: handlerType
-      }
+      })
     })
   }
 }
@@ -535,7 +542,7 @@ class Contexts {
     return this.contexts.get(processId)
   }
 
-  new(processId: number, subject: Subject<DeepPartial<ProcessStreamResponse>>) {
+  new(processId: number, subject: Subject<ProcessStreamResponseInit>) {
     const context = new StoreContext(subject, processId)
     this.contexts.set(processId, context)
     return context

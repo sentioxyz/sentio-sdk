@@ -12,7 +12,7 @@ ls:
   .json: kebab-case | regex:.[a-z0-9]+ | regex:tsconfig[a-z0-9.]*
   .js: kebab-case
   .config.js: kebab-case
-  .ts: kebab-case | regex:_[a-z0-9]+ | regex:[a-z0-9]+.config
+  .ts: kebab-case | regex:_[a-z0-9]+ | regex:[a-z0-9]+.config | regex:[a-z0-9]+_pb
   .tsx: kebab-case | regex:_[a-z0-9]+ | regex:[[a-z0-9]+]
   .test.ts: kebab-case
   .test.tsx: kebab-case

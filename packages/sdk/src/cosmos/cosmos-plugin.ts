@@ -1,6 +1,7 @@
 import { errorString, GLOBAL_CONFIG, mergeProcessResults, Plugin, PluginManager, USER_PROCESSOR } from '@sentio/runtime'
 import {
-  ContractConfig,
+  ContractConfigSchema,
+  CosmosLogHandlerConfigSchema,
   DataBinding,
   HandlerType,
   InitResponse,
@@ -8,7 +9,8 @@ import {
   ProcessResult,
   StartRequest
 } from '@sentio/protos'
-import { ServerError, Status } from 'nice-grpc'
+import { create } from '@bufbuild/protobuf'
+import { ConnectError, Code } from '@connectrpc/connect'
 import { HandlerRegister } from '../core/handler-register.js'
 import { CosmosProcessorState } from './types.js'
 
@@ -31,7 +33,7 @@ export class CosmosPlugin extends Plugin {
       if (forChainId !== undefined && forChainId !== chainId.toString()) {
         continue
       }
-      const contractConfig = ContractConfig.fromPartial({
+      const contractConfig = create(ContractConfigSchema, {
         processorType: USER_PROCESSOR,
         contract: {
           name: processor.config.name,
@@ -46,11 +48,13 @@ export class CosmosPlugin extends Plugin {
       for (const callHandler of processor.callHandlers) {
         const handlerId = this.handlerRegister.register(callHandler.handler, chainId)
 
-        contractConfig.cosmosLogConfigs.push({
-          handlerId,
-          handlerName: callHandler.handlerName,
-          logFilters: callHandler.logConfig?.logFilters || []
-        })
+        contractConfig.cosmosLogConfigs.push(
+          create(CosmosLogHandlerConfigSchema, {
+            handlerId,
+            handlerName: callHandler.handlerName,
+            logFilters: callHandler.logConfig?.logFilters || []
+          })
+        )
       }
 
       // Finish up a contract
@@ -65,17 +69,17 @@ export class CosmosPlugin extends Plugin {
       case HandlerType.COSMOS_CALL:
         return this.processTransaction(request)
       default:
-        throw new ServerError(Status.INVALID_ARGUMENT, 'No handle type registered ' + request.handlerType)
+        throw new ConnectError('No handle type registered ' + request.handlerType, Code.InvalidArgument)
     }
   }
 
   async start(request: StartRequest) {}
 
   async processTransaction(binding: DataBinding): Promise<ProcessResult> {
-    if (!binding.data?.cosmosCall?.transaction) {
-      throw new ServerError(Status.INVALID_ARGUMENT, "transaction can't be null")
+    if (binding.data?.value.case !== 'cosmosCall' || !binding.data.value.value.transaction) {
+      throw new ConnectError("transaction can't be null", Code.InvalidArgument)
     }
-    const call = binding.data.cosmosCall
+    const call = binding.data.value.value
 
     const promises: Promise<ProcessResult>[] = []
 
@@ -86,9 +90,9 @@ export class CosmosPlugin extends Plugin {
           handlerId
         )(call)
         .catch((e) => {
-          throw new ServerError(
-            Status.INTERNAL,
-            'error processing transaction: ' + JSON.stringify(call.transaction) + '\n' + errorString(e)
+          throw new ConnectError(
+            'error processing transaction: ' + JSON.stringify(call.transaction) + '\n' + errorString(e),
+            Code.Internal
           )
         })
       if (GLOBAL_CONFIG.execution.sequential) {

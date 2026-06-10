@@ -1,6 +1,7 @@
 import { before, describe, test } from 'node:test'
 import { expect } from 'chai'
-import { HandlerType, ProcessBindingsRequest } from '@sentio/protos'
+import { HandlerType, ProcessBindingsRequestSchema } from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
 
 import { firstCounterValue, firstGaugeValue, TestProcessorServer } from '../../testing/index.js'
 import { ChainId } from '@sentio/chain'
@@ -24,12 +25,15 @@ describe('Test Aptos Example', () => {
   test('Check souffl3 transaction dispatch', async () => {
     const config = await service.getConfig({})
     const handlerId = config.contractConfigs[0].moveCallConfigs[1].handlerId
-    const request: ProcessBindingsRequest = {
+    const request = create(ProcessBindingsRequestSchema, {
       bindings: [
         {
           data: {
-            aptCall: {
-              rawTransaction: JSON.stringify(testData)
+            value: {
+              case: 'aptCall',
+              value: {
+                rawTransaction: JSON.stringify(testData)
+              }
             }
           },
           handlerIds: [handlerId],
@@ -37,7 +41,7 @@ describe('Test Aptos Example', () => {
           chainId: ChainId.APTOS_MAINNET
         }
       ]
-    }
+    })
     const res = await service.processBindings(request)
     expect(res.result?.counters).length(1)
     expect(res.result?.gauges).length(0)
@@ -75,21 +79,24 @@ describe('Test Aptos Example', () => {
   test('check on timer', async () => {
     const config = await service.getConfig({})
     const handlerId = config.accountConfigs[5].moveIntervalConfigs[0].intervalConfig?.handlerId ?? 0
-    const request: ProcessBindingsRequest = {
+    const request = create(ProcessBindingsRequestSchema, {
       bindings: [
         {
           data: {
-            aptResource: {
-              version: 12345n,
-              rawResources: [
-                JSON.stringify({
-                  type: '0x1::coin::SupplyConfig',
-                  data: {
-                    allow_upgrades: false
-                  }
-                })
-              ],
-              timestampMicros: 1n
+            value: {
+              case: 'aptResource',
+              value: {
+                version: 12345n,
+                rawResources: [
+                  JSON.stringify({
+                    type: '0x1::coin::SupplyConfig',
+                    data: {
+                      allow_upgrades: false
+                    }
+                  })
+                ],
+                timestampMicros: 1n
+              }
             }
           },
           handlerIds: [handlerId],
@@ -97,7 +104,7 @@ describe('Test Aptos Example', () => {
           chainId: ChainId.APTOS_MAINNET
         }
       ]
-    }
+    })
     const res = await service.processBindings(request)
     expect(firstCounterValue(res.result, 'onTimer')).equal(1)
   })
@@ -105,12 +112,15 @@ describe('Test Aptos Example', () => {
   test('Check aptos account transaction dispatch', async () => {
     const config = await service.getConfig({})
     const handlerId = config.contractConfigs[4].moveCallConfigs[0].handlerId
-    const request: ProcessBindingsRequest = {
+    const request = create(ProcessBindingsRequestSchema, {
       bindings: [
         {
           data: {
-            aptCall: {
-              rawTransaction: JSON.stringify(dataCreate)
+            value: {
+              case: 'aptCall',
+              value: {
+                rawTransaction: JSON.stringify(dataCreate)
+              }
             }
           },
           handlerIds: [handlerId],
@@ -118,7 +128,7 @@ describe('Test Aptos Example', () => {
           chainId: ChainId.APTOS_MAINNET
         }
       ]
-    }
+    })
     const res = await service.processBindings(request)
     expect(res.result?.counters).length(1)
   })

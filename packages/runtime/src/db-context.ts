@@ -1,15 +1,16 @@
 import { Subject } from 'rxjs'
 import {
-  DBRequest,
-  DBRequest_DBUpsert,
-  DBResponse,
-  DeepPartial,
-  ProcessResult,
-  ProcessStreamResponse,
-  ProcessStreamResponseV3,
-  TemplateInstance,
-  TimeseriesResult
+  DBRequestSchema,
+  type DBRequest_DBUpsert,
+  type DBResponse,
+  DBResponseSchema,
+  ProcessResultSchema,
+  ProcessStreamResponseSchema,
+  ProcessStreamResponseV3Schema,
+  type TemplateInstance,
+  type TimeseriesResult
 } from '@sentio/protos'
+import { create, type MessageInitShape } from '@bufbuild/protobuf'
 import * as process from 'node:process'
 import { dbMetrics } from './metrics.js'
 
@@ -26,13 +27,19 @@ const STORE_BATCH_IDLE = process.env['STORE_BATCH_MAX_IDLE'] ? parseInt(process.
 const STORE_BATCH_SIZE = process.env['STORE_BATCH_SIZE'] ? parseInt(process.env['STORE_BATCH_SIZE']) : 10
 const STORE_UPSERT_NO_WAIT = process.env['STORE_UPSERT_NO_WAIT'] === 'true'
 
-type Request = Omit<DBRequest, 'opId'>
-type RequestType = keyof Request
+// Init-shapes carried over the rxjs Subject before being yielded by connect.
+type ProcessStreamResponseInit = MessageInitShape<typeof ProcessStreamResponseSchema>
+type ProcessStreamResponseV3Init = MessageInitShape<typeof ProcessStreamResponseV3Schema>
+
+// The DBRequest oneof selection (without the op_id), e.g. { case: 'upsert', value: {...} }.
+// protobuf-es moved the per-op flat fields under the `op` oneof.
+type Request = NonNullable<MessageInitShape<typeof DBRequestSchema>['op']>
+type RequestType = NonNullable<Request['case']>
 
 export const timeoutError = new Error('timeout')
 
 export interface IStoreContext {
-  sendRequest(request: DeepPartial<Request>, timeoutSecs?: number): Promise<DBResponse>
+  sendRequest(request: Request, timeoutSecs?: number): Promise<DBResponse>
 
   result(dbResult: DBResponse): void
 
@@ -64,15 +71,15 @@ export abstract class AbstractStoreContext implements IStoreContext {
     })
   }
 
-  abstract doSend(resp: DeepPartial<ProcessStreamResponse>): void
+  abstract doSend(resp: ProcessStreamResponseInit | ProcessStreamResponseV3Init): void
 
-  sendRequest(request: DeepPartial<Request>, timeoutSecs?: number): Promise<DBResponse> {
-    if (STORE_BATCH_IDLE > 0 && STORE_BATCH_SIZE > 1 && request.upsert) {
+  sendRequest(request: Request, timeoutSecs?: number): Promise<DBResponse> {
+    if (STORE_BATCH_IDLE > 0 && STORE_BATCH_SIZE > 1 && request.case === 'upsert') {
       // batch upsert if possible
-      return this.sendUpsertInBatch(request.upsert as DBRequest_DBUpsert)
+      return this.sendUpsertInBatch(request.value as DBRequest_DBUpsert)
     }
 
-    const requestType = Object.keys(request)[0] as RequestType
+    const requestType = request.case as RequestType
     const opId = StoreContext.opCounter++
     const promise = this.newPromise<DBResponse>(opId, requestType)
 
@@ -88,9 +95,12 @@ export abstract class AbstractStoreContext implements IStoreContext {
     }
 
     this.doSend({
-      dbRequest: {
-        ...request,
-        opId
+      value: {
+        case: 'dbRequest',
+        value: {
+          op: request,
+          opId
+        }
       }
     })
 
@@ -98,9 +108,7 @@ export abstract class AbstractStoreContext implements IStoreContext {
 
     if (requestType === 'upsert' && STORE_UPSERT_NO_WAIT) {
       this.pendings.push(promise)
-      return Promise.resolve({
-        opId
-      } as DBResponse)
+      return Promise.resolve(create(DBResponseSchema, { opId }))
     }
 
     return Promise.race(promises)
@@ -130,8 +138,8 @@ export abstract class AbstractStoreContext implements IStoreContext {
       if (defer.requestType) {
         recv_counts[defer.requestType]?.add(1)
       }
-      if (dbResult.error) {
-        defer.reject(new Error(dbResult.error))
+      if (dbResult.value.case === 'error') {
+        defer.reject(new Error(dbResult.value.value))
       } else {
         defer.resolve(dbResult)
       }
@@ -143,12 +151,12 @@ export abstract class AbstractStoreContext implements IStoreContext {
   error(processId: number, e: any) {
     const stack = e.stack
     console.error('process error', processId, e, stack)
-    const errorResult = ProcessResult.create({
+    const errorResult = create(ProcessResultSchema, {
       states: {
         error: e?.toString() + (stack ? `\n${stack}` : '')
       }
     })
-    this.doSend({ result: errorResult, processId })
+    this.doSend({ value: { case: 'result', value: errorResult }, processId })
   }
 
   close() {
@@ -182,9 +190,7 @@ export abstract class AbstractStoreContext implements IStoreContext {
         this.sendBatch()
       }
       if (STORE_UPSERT_NO_WAIT) {
-        return {
-          opId
-        }
+        return create(DBResponseSchema, { opId })
       }
 
       return promise
@@ -207,9 +213,7 @@ export abstract class AbstractStoreContext implements IStoreContext {
 
       if (STORE_UPSERT_NO_WAIT) {
         this.pendings.push(promise)
-        return {
-          opId: this.upsertBatch.opId
-        }
+        return create(DBResponseSchema, { opId: this.upsertBatch.opId })
       } else {
         return promise
       }
@@ -223,9 +227,12 @@ export abstract class AbstractStoreContext implements IStoreContext {
       clearTimeout(timer)
       this.upsertBatch = undefined
       this.doSend({
-        dbRequest: {
-          upsert: request,
-          opId
+        value: {
+          case: 'dbRequest',
+          value: {
+            op: { case: 'upsert', value: request },
+            opId
+          }
         }
       })
       send_counts['upsert']?.add(1)
@@ -241,13 +248,13 @@ export abstract class AbstractStoreContext implements IStoreContext {
 
 export class StoreContext extends AbstractStoreContext {
   constructor(
-    readonly subject: Subject<DeepPartial<ProcessStreamResponse>>,
+    readonly subject: Subject<ProcessStreamResponseInit>,
     processId: number
   ) {
     super(processId)
   }
 
-  doSend(resp: DeepPartial<ProcessStreamResponse>) {
+  doSend(resp: ProcessStreamResponseInit) {
     this.subject.next({
       ...resp,
       processId: this.processId
@@ -259,7 +266,7 @@ export class StoreContext extends AbstractStoreContext {
 export class DataBindingContext extends AbstractStoreContext implements IDataBindingContext {
   constructor(
     readonly processId: number,
-    readonly subject: Subject<DeepPartial<ProcessStreamResponseV3>>
+    readonly subject: Subject<ProcessStreamResponseV3Init>
   ) {
     super(processId)
   }
@@ -267,22 +274,28 @@ export class DataBindingContext extends AbstractStoreContext implements IDataBin
   sendTemplateRequest(templates: Array<TemplateInstance>, unbind: boolean) {
     this.subject.next({
       processId: this.processId,
-      tplRequest: {
-        templates,
-        remove: unbind
+      value: {
+        case: 'tplRequest',
+        value: {
+          templates,
+          remove: unbind
+        }
       }
     })
   }
   sendTimeseriesRequest(timeseries: Array<TimeseriesResult>) {
     this.subject.next({
       processId: this.processId,
-      tsRequest: {
-        data: timeseries
+      value: {
+        case: 'tsRequest',
+        value: {
+          data: timeseries
+        }
       }
     })
   }
 
-  doSend(resp: DeepPartial<ProcessStreamResponseV3>) {
+  doSend(resp: ProcessStreamResponseV3Init) {
     this.subject.next({
       ...resp,
       processId: this.processId

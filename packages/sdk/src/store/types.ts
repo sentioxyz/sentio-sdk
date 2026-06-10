@@ -1,4 +1,4 @@
-import { RichStruct, RichValue } from '@sentio/protos'
+import { type RichStruct, type RichValue, timestampDate } from '@sentio/protos'
 import { BigDecimalConverter, BigIntConverter } from './convert.js'
 import { getEntityName, Store } from './store.js'
 import { PluginManager } from '@sentio/runtime'
@@ -70,38 +70,29 @@ export abstract class AbstractEntity {
 }
 
 function toJSValue(value: RichValue): any {
-  if (value.nullValue != null) {
-    return null
-  }
-  if (value.bytesValue != null) {
-    return value.bytesValue
-  }
-  if (value.stringValue != null) {
-    return value.stringValue
-  }
-  if (value.bigdecimalValue != null) {
-    return BigDecimalConverter.to(value)
-  }
-  if (value.bigintValue != null) {
-    return BigIntConverter.to(value)
-  }
-  if (value.boolValue != null) {
-    return value.boolValue
-  }
-  if (value.timestampValue != null) {
-    return value.timestampValue
-  }
-  if (value.floatValue != null) {
-    return value.floatValue
-  }
-  if (value.intValue != null) {
-    return value.intValue
-  }
-  if (value.listValue != null) {
-    return value.listValue.values.map(toJSValue)
-  }
-  if (value.int64Value) {
-    return value.int64Value
+  switch (value.value.case) {
+    case 'nullValue':
+      return null
+    case 'bytesValue':
+      return value.value.value
+    case 'stringValue':
+      return value.value.value
+    case 'bigdecimalValue':
+      return BigDecimalConverter.to(value)
+    case 'bigintValue':
+      return BigIntConverter.to(value)
+    case 'boolValue':
+      return value.value.value
+    case 'timestampValue':
+      return timestampDate(value.value.value)
+    case 'floatValue':
+      return value.value.value
+    case 'intValue':
+      return value.value.value
+    case 'listValue':
+      return value.value.value.values.map(toJSValue)
+    case 'int64Value':
+      return value.value.value
   }
   throw new Error('Unknown value type:' + JSON.stringify(value))
 }

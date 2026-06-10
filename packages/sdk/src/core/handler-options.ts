@@ -9,7 +9,7 @@ export type PartitionHandler<D> = (data: D) => string | Promise<string>
  * @template F The fetch configuration type (e.g., EthFetchConfig, MoveFetchConfig)
  * @template D The data type that will be processed (e.g., Event, Transaction, Block)
  */
-export type HandlerOptions<F, D> = Partial<F> & {
+export type HandlerOptions<F, D> = Omit<Partial<F>, '$typeName' | '$unknown'> & {
   /**
    * Optional partition key for data partitioning.
    * Can be a static string or a function that computes the key from the data.

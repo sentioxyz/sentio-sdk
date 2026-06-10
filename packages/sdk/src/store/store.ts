@@ -13,14 +13,14 @@ import {
   UpdateValues
 } from './types.js'
 import {
-  DBRequest,
-  DBRequest_DBUpdate,
-  Entity as EntityStruct,
+  DBRequest_DBUpdateSchema,
+  type Entity as EntityStruct,
   EntityUpdateData_Operator,
-  RichValue,
+  type RichValue,
   DBRequest_DBOperator,
-  DBResponse
+  type DBResponse
 } from '@sentio/protos'
+import { type MessageInitShape } from '@bufbuild/protobuf'
 import { IStoreContext, PluginManager } from '@sentio/runtime'
 import { Cursor } from './cursor.js'
 import { serializeRichValue } from './util.js'
@@ -76,15 +76,16 @@ export class Store {
     const entityName = getEntityName(entity)
 
     const promise = this.context.sendRequest({
-      get: {
+      case: 'get',
+      value: {
         entity: entityName,
         id: id.toString()
       }
     })
 
     const data = (await promise) as DBResponse
-    if (data.entityList?.entities[0]) {
-      const entityData = data.entityList?.entities[0]
+    if (data.value.case === 'entityList' && data.value.value.entities[0]) {
+      const entityData = data.value.value.entities[0]
       return this.newEntity(entity, entityData)
     }
 
@@ -116,32 +117,34 @@ export class Store {
     }
 
     await this.context.sendRequest({
-      delete: request
+      case: 'delete',
+      value: request
     })
   }
 
   async update<T extends Entity>(entity: EntityClass<T>, values: UpdateValues<any>): Promise<void> {
     if (values.id) {
-      const update: DBRequest_DBUpdate = {
+      const update: MessageInitShape<typeof DBRequest_DBUpdateSchema> = {
         entity: [getEntityName(entity)],
         id: [values.id.toString()],
         entityData: [{ fields: {} }]
       }
+      const fields = update.entityData![0].fields!
       for (const [key, value] of Object.entries(values)) {
         if (key !== 'id') {
           const field = getEntityField(entity, key)
           if (value instanceof AddOp) {
-            update.entityData[0].fields[field] = {
+            fields[field] = {
               op: EntityUpdateData_Operator.ADD,
               value: serializeRichValue(value.value)
             }
           } else if (value instanceof MultiplyOp) {
-            update.entityData[0].fields[field] = {
+            fields[field] = {
               op: EntityUpdateData_Operator.MULTIPLY,
               value: serializeRichValue(value.value)
             }
           } else if (value !== undefined) {
-            update.entityData[0].fields[field] = {
+            fields[field] = {
               op: EntityUpdateData_Operator.SET,
               value: serializeRichValue(value)
             }
@@ -149,7 +152,8 @@ export class Store {
         }
       }
       await this.context.sendRequest({
-        update
+        case: 'update',
+        value: update
       })
     } else {
       throw new Error('Update must have id field')
@@ -158,15 +162,15 @@ export class Store {
 
   async upsert<T extends Entity>(entity: T | T[]): Promise<void> {
     const entities = Array.isArray(entity) ? entity : [entity]
-    const request = {
-      upsert: {
+    await this.context.sendRequest({
+      case: 'upsert',
+      value: {
         entity: entities.map((e) => getEntityName(e)),
         // data: entities.map((e) => serialize(e.data)),
         id: entities.map((e) => e.id.toString()),
         entityData: entities.map((e: any) => e._data)
       }
-    } as DBRequest
-    await this.context.sendRequest(request)
+    })
   }
 
   async *listIterator<T extends Entity, P extends keyof T, O extends Operators<T[P]>>(
@@ -177,7 +181,8 @@ export class Store {
 
     while (true) {
       const response: DBResponse = await this.listRequest(entity, filters || [], cursor)
-      for (const data of response.entityList?.entities || []) {
+      const entities = response.value.case === 'entityList' ? response.value.value.entities : []
+      for (const data of entities) {
         yield this.newEntity(entity, data)
       }
       if (!response.nextCursor) {
@@ -196,7 +201,8 @@ export class Store {
 
     while (true) {
       const response: DBResponse = await this.listRequest(entity, filters || [], cursor, batchSize)
-      const entities = (response.entityList?.entities || []).map((data) => this.newEntity(entity, data))
+      const list = response.value.case === 'entityList' ? response.value.value.entities : []
+      const entities = list.map((data) => this.newEntity(entity, data))
       yield entities
       if (!response.nextCursor) {
         break
@@ -213,7 +219,8 @@ export class Store {
   ): Promise<DBResponse> {
     const response = (await this.context.sendRequest(
       {
-        list: {
+        case: 'list',
+        value: {
           entity: getEntityName(entity),
           cursor,
           pageSize,
@@ -259,7 +266,8 @@ export class Store {
     if (cursor) {
       const response = await this.listRequest(entity, filters || [], cursor.cursor, cursor.pageSize)
       cursor.cursor = response.nextCursor
-      return response.entityList?.entities.map((data) => this.newEntity(entity, data)) || []
+      const list = response.value.case === 'entityList' ? response.value.value.entities : []
+      return list.map((data) => this.newEntity(entity, data))
     }
     // TODO Array.fromAsync when upgrade to node 22
     return this.fromAsync(this.listIterator(entity, filters ?? []))

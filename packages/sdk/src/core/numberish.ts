@@ -1,4 +1,16 @@
-import { BigDecimalRichValue, BigInteger, MetricValue, RichStruct, RichValue_NullValue } from '@sentio/protos'
+import {
+  type BigDecimalRichValue,
+  BigDecimalRichValueSchema,
+  type BigInteger,
+  BigIntegerSchema,
+  type MetricValue,
+  MetricValueSchema,
+  type RichStruct,
+  RichStructSchema,
+  RichValueSchema,
+  RichValue_NullValue
+} from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
 import { BigDecimal } from './big-decimal.js'
 
 export type Numberish = number | bigint | BigDecimal | string
@@ -12,30 +24,30 @@ export function toMetricValue(value: Numberish): MetricValue {
       throw new Error('Cannot record infinite value')
     }
     if (Number.isInteger(value) && !Number.isSafeInteger(value)) {
-      return MetricValue.fromPartial({
-        bigInteger: toBigInteger(value)
+      return create(MetricValueSchema, {
+        value: { case: 'bigInteger', value: toBigInteger(value) }
       })
     }
 
-    return MetricValue.fromPartial({
-      doubleValue: Number(value)
+    return create(MetricValueSchema, {
+      value: { case: 'doubleValue', value: Number(value) }
     })
   }
   if (typeof value === 'bigint') {
-    return MetricValue.fromPartial({
-      bigInteger: toBigInteger(value)
+    return create(MetricValueSchema, {
+      value: { case: 'bigInteger', value: toBigInteger(value) }
     })
   }
   if (typeof value === 'string') {
-    return MetricValue.fromPartial({
-      bigDecimal: value
+    return create(MetricValueSchema, {
+      value: { case: 'bigDecimal', value: value }
     })
   }
   // if (value instanceof BigDecimal) {
   // Carefully consider the use case here
   if (value.isInteger()) {
-    return MetricValue.fromPartial({
-      bigInteger: bigDecimalToBigInteger(value)
+    return create(MetricValueSchema, {
+      value: { case: 'bigInteger', value: bigDecimalToBigInteger(value) }
     })
   } else {
     if (value.isNaN()) {
@@ -45,8 +57,8 @@ export function toMetricValue(value: Numberish): MetricValue {
       // NaN also not finite
       throw new Error('Cannot record infinite value')
     }
-    return MetricValue.fromPartial({
-      bigDecimal: value.toString() // e.g. -7.350918e-428
+    return create(MetricValueSchema, {
+      value: { case: 'bigDecimal', value: value.toString() } // e.g. -7.350918e-428
     })
   }
   // }
@@ -101,10 +113,10 @@ function hexToBigInteger(hex: string, negative: boolean): BigInteger {
   }
   const buffer = Buffer.from(hex, 'hex')
 
-  return {
+  return create(BigIntegerSchema, {
     negative: negative,
     data: new Uint8Array(buffer)
-  }
+  })
 }
 
 export function toBigDecimal(value: BigDecimal): BigDecimalRichValue {
@@ -115,41 +127,45 @@ export function toBigDecimal(value: BigDecimal): BigDecimalRichValue {
     .join('')
   const exp = -(s.length - (value.e ?? 0) - 1)
 
-  return {
+  return create(BigDecimalRichValueSchema, {
     value: toBigInteger(BigInt(s) * BigInt(value.s ?? 1)),
     exp: exp
-  }
+  })
 }
 
 export function toTimeSeriesData(value: Numberish, labels: Record<string, string>, neg: boolean) {
   const mv = toMetricValue(value)
-  const data: RichStruct = {
+  const data: RichStruct = create(RichStructSchema, {
     fields: {
       value: {}
     }
-  }
+  })
 
   for (const key in labels) {
     if (labels[key] == null) {
-      data.fields[key] = { nullValue: RichValue_NullValue.NULL_VALUE }
+      data.fields[key] = create(RichValueSchema, {
+        value: { case: 'nullValue', value: RichValue_NullValue.NULL_VALUE }
+      })
     } else {
-      data.fields[key] = { stringValue: labels[key] }
+      data.fields[key] = create(RichValueSchema, { value: { case: 'stringValue', value: labels[key] } })
     }
   }
 
-  if (mv.bigInteger != null) {
-    mv.bigInteger.negative = neg ? !mv.bigInteger.negative : mv.bigInteger.negative
-    data.fields.value.bigintValue = mv.bigInteger
-  } else if (mv.bigDecimal != null) {
-    let v = new BigDecimal(mv.bigDecimal)
+  if (mv.value.case === 'bigInteger') {
+    const bigInteger = mv.value.value
+    bigInteger.negative = neg ? !bigInteger.negative : bigInteger.negative
+    data.fields.value.value = { case: 'bigintValue', value: bigInteger }
+  } else if (mv.value.case === 'bigDecimal') {
+    let v = new BigDecimal(mv.value.value)
     if (neg) {
       v = v.negated()
     }
-    data.fields.value.bigdecimalValue = toBigDecimal(v)
-  } else if (mv.doubleValue != null) {
-    data.fields.value.floatValue = neg ? -mv.doubleValue : mv.doubleValue
+    data.fields.value.value = { case: 'bigdecimalValue', value: toBigDecimal(v) }
+  } else if (mv.value.case === 'doubleValue') {
+    const doubleValue = mv.value.value
+    data.fields.value.value = { case: 'floatValue', value: neg ? -doubleValue : doubleValue }
   } else {
-    data.fields.value.nullValue = RichValue_NullValue.NULL_VALUE
+    data.fields.value.value = { case: 'nullValue', value: RichValue_NullValue.NULL_VALUE }
   }
   return data
 }

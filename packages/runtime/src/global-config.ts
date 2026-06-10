@@ -1,4 +1,5 @@
-import { ExecutionConfig } from './gen/processor/protos/processor.js'
+import { ExecutionConfigSchema } from '@sentio/protos'
+import { type MessageInitShape } from '@bufbuild/protobuf'
 
 /**
  * Configuration for the in-memory cache feature.
@@ -33,7 +34,7 @@ export interface GlobalConfig {
    * Execution configuration controlling how handlers are processed.
    * Includes settings for sequential vs parallel execution, block time handling, etc.
    */
-  execution: Partial<ExecutionConfig>
+  execution: MessageInitShape<typeof ExecutionConfigSchema>
 
   /**
    * Optional cache configuration for enabling in-memory key-value storage.

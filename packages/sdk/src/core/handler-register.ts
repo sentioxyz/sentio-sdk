@@ -1,6 +1,6 @@
-import { ServerError, Status } from 'nice-grpc'
+import { ConnectError, Code } from '@connectrpc/connect'
 import { ChainId } from '@sentio/chain'
-import { ProcessResult } from '@sentio/protos'
+import { type ProcessResult } from '@sentio/protos'
 
 export type HandlerFunction = (...args: any[]) => Promise<ProcessResult>
 
@@ -37,7 +37,7 @@ export class HandlerRegister {
   getHandlerById(chainId: ChainId | string, id: number): HandlerFunction {
     const entries = this.handlerByChain.get(chainId)
     if (!entries || id < 0 || id >= entries.length) {
-      throw new ServerError(Status.INTERNAL, `Handler with ID ${id} not found.`)
+      throw new ConnectError(`Handler with ID ${id} not found.`, Code.Internal)
     }
     return entries[id].handler
   }

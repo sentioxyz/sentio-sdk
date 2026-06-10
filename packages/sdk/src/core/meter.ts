@@ -2,12 +2,14 @@ import { BaseContext } from './base-context.js'
 import { Numberish, toMetricValue, toTimeSeriesData } from './numberish.js'
 import { NamedResultDescriptor } from './metadata.js'
 import {
-  AggregationConfig,
+  AggregationConfigSchema,
   AggregationType,
-  MetricConfig,
+  type MetricConfig,
+  MetricConfigSchema,
   MetricType,
   TimeseriesResult_TimeseriesType
 } from '@sentio/protos'
+import { create, type MessageInitShape } from '@bufbuild/protobuf'
 import { MapStateStorage, processMetrics } from '@sentio/runtime'
 
 export type Labels = { [key: string]: string }
@@ -17,7 +19,7 @@ export class MetricOptions {
   description?: string
   sparse?: boolean
   // persistentBetweenVersion?: boolean
-  aggregationConfig?: Partial<AggregationConfig>
+  aggregationConfig?: MessageInitShape<typeof AggregationConfigSchema>
 }
 
 export class CounterOptions {
@@ -37,9 +39,9 @@ export class CounterOptions {
 export class Metric extends NamedResultDescriptor {
   config: MetricConfig
 
-  constructor(type: MetricType, name: string, option?: MetricConfig) {
+  constructor(type: MetricType, name: string, option?: MessageInitShape<typeof MetricConfigSchema>) {
     super(name)
-    this.config = MetricConfig.fromPartial({ ...option, name: this.name, type })
+    this.config = create(MetricConfigSchema, { ...option, name: this.name, type })
     const aggregationConfig = this.config.aggregationConfig
     if (aggregationConfig && aggregationConfig.intervalInMinutes.length) {
       if (aggregationConfig.intervalInMinutes.length > 1) {
@@ -90,7 +92,7 @@ export class Counter extends Metric {
     super(
       MetricType.COUNTER,
       name,
-      MetricConfig.fromPartial({
+      create(MetricConfigSchema, {
         ...option,
         aggregationConfig: {
           intervalInMinutes: option?.resolutionConfig ? [option?.resolutionConfig?.intervalInMinutes] : []
@@ -162,7 +164,7 @@ export class Gauge extends Metric {
   }
 
   protected constructor(name: string, option?: MetricOptions) {
-    super(MetricType.GAUGE, name, MetricConfig.fromPartial({ ...option }))
+    super(MetricType.GAUGE, name, create(MetricConfigSchema, { ...option }))
   }
 
   record(ctx: BaseContext, value: Numberish, labels: Labels = {}) {

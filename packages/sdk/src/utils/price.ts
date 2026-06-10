@@ -1,4 +1,5 @@
-import { CoinID } from '@sentio/protos'
+import { type CoinID, CoinIDSchema } from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
 import { Endpoints, processMetrics } from '@sentio/runtime'
 import { ChainId } from '@sentio/chain'
 import { LRUCache } from 'lru-cache'
@@ -56,11 +57,14 @@ export async function getPriceByTypeOrSymbolInternal(
   const dateStr = dateString(date)
   const todayDateString = dateString(new Date())
 
+  const symbol = coinId.id.case === 'symbol' ? coinId.id.value : undefined
+  const address = coinId.id.case === 'address' ? coinId.id.value : undefined
+
   let key: string
-  if (coinId.symbol) {
-    key = `${coinId.symbol}-${dateStr}`
+  if (symbol) {
+    key = `${symbol}-${dateStr}`
   } else {
-    key = `${coinId.address?.address}-${coinId.address?.chain}-${dateStr}`
+    key = `${address?.address}-${address?.chain}-${dateStr}`
   }
   let price = priceMap.get(key)
   if (price) {
@@ -71,9 +75,9 @@ export async function getPriceByTypeOrSymbolInternal(
   const response = priceClient.getPrice({
     query: {
       timestamp: date.toISOString(),
-      'coinId.symbol': coinId.symbol,
-      'coinId.address.address': coinId.address?.address,
-      'coinId.address.chain': coinId.address?.chain
+      'coinId.symbol': symbol,
+      'coinId.address.address': address?.address,
+      'coinId.address.chain': address?.chain
     }
   })
   price = response
@@ -131,12 +135,15 @@ export async function getPriceByType(
 ): Promise<number | undefined> {
   return getPriceByTypeOrSymbol(
     date,
-    {
-      address: {
-        chain: chainId,
-        address: coinType
+    create(CoinIDSchema, {
+      id: {
+        case: 'address',
+        value: {
+          chain: chainId,
+          address: coinType
+        }
       }
-    },
+    }),
     options
   )
 }
@@ -151,7 +158,7 @@ export async function getPriceBySymbol(
   date: Date,
   options?: PriceOptions
 ): Promise<number | undefined> {
-  return getPriceByTypeOrSymbol(date, { symbol }, options)
+  return getPriceByTypeOrSymbol(date, create(CoinIDSchema, { id: { case: 'symbol', value: symbol } }), options)
 }
 
 function dateString(date: Date) {

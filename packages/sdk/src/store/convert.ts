@@ -1,4 +1,5 @@
-import { RichValue, RichValue_NullValue } from '@sentio/protos'
+import { type RichValue, RichValueSchema, RichValue_NullValue, timestampDate, timestampFromDate } from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
 import type { String, Int, Float, ID, Bytes, Timestamp, Boolean } from './types.js'
 import { BigDecimal } from '@sentio/bigdecimal'
 import { toBigInteger, toBigDecimal } from '../core/numberish.js'
@@ -14,6 +15,10 @@ export interface ValueConverter<T> {
 
 export const ValueRequiredError = new Error('Value is required but received null or undefined')
 
+function nullRichValue(): RichValue {
+  return create(RichValueSchema, { value: { case: 'nullValue', value: RichValue_NullValue.NULL_VALUE } })
+}
+
 export function required_<T>(converter: ValueConverter<T | undefined>): ValueConverter<T> {
   const { from, to, ...rest } = converter
   return {
@@ -24,7 +29,7 @@ export function required_<T>(converter: ValueConverter<T | undefined>): ValueCon
       return from(value)
     },
     to: (value: RichValue) => {
-      if (value == null || value.nullValue) {
+      if (value == null || value.value.case === 'nullValue') {
         throw ValueRequiredError
       }
       return to(value)!
@@ -37,14 +42,17 @@ export function required_<T>(converter: ValueConverter<T | undefined>): ValueCon
 export function array_<T>(converter: ValueConverter<T>): ValueConverter<T[]> {
   return {
     from: (value: T[]) => {
-      return {
-        listValue: {
-          values: value.map(converter.from)
+      return create(RichValueSchema, {
+        value: {
+          case: 'listValue',
+          value: {
+            values: value.map(converter.from)
+          }
         }
-      }
+      })
     },
     to: (value: RichValue) => {
-      return value.listValue?.values.map(converter.to) || []
+      return value.value.case === 'listValue' ? value.value.value.values.map(converter.to) : []
     },
     isArray: true,
     isRelation: converter.isRelation,
@@ -56,16 +64,14 @@ export function enumerate_<T extends string | number>(values: Record<T, string>)
   return {
     from: (value?: T) => {
       if (value == null) {
-        return {
-          nullValue: RichValue_NullValue.NULL_VALUE
-        }
+        return nullRichValue()
       }
-      return {
-        stringValue: values[value]
-      }
+      return create(RichValueSchema, {
+        value: { case: 'stringValue', value: values[value] }
+      })
     },
     to(v: RichValue): T {
-      return v.stringValue as T
+      return (v.value.case === 'stringValue' ? v.value.value : undefined) as T
     }
   }
 }
@@ -74,28 +80,24 @@ export function objectId_<T>(entityName: string): ValueConverter<T | ID> {
   return {
     from: (value: T | ID) => {
       if (typeof value == 'string') {
-        return {
-          stringValue: value
-        }
+        return create(RichValueSchema, { value: { case: 'stringValue', value } })
       }
       if (value instanceof Uint8Array) {
-        return {
-          stringValue: `0x${Buffer.from(value).toString('hex')}`
-        }
+        return create(RichValueSchema, {
+          value: { case: 'stringValue', value: `0x${Buffer.from(value).toString('hex')}` }
+        })
       }
 
       if (typeof value == 'object') {
         const entity = value as any
-        return {
-          stringValue: entity.id.toString()
-        }
+        return create(RichValueSchema, {
+          value: { case: 'stringValue', value: entity.id.toString() }
+        })
       }
-      return {
-        nullValue: RichValue_NullValue.NULL_VALUE
-      }
+      return nullRichValue()
     },
     to(v) {
-      return v.stringValue as T | ID
+      return (v.value.case === 'stringValue' ? v.value.value : undefined) as T | ID
     },
     isRelation: true,
     relationName: entityName
@@ -105,137 +107,105 @@ export function objectId_<T>(entityName: string): ValueConverter<T | ID> {
 export const StringConverter: ValueConverter<String | undefined> = {
   from: (value?: String) => {
     if (value == null) {
-      return {
-        nullValue: RichValue_NullValue.NULL_VALUE
-      }
+      return nullRichValue()
     }
-    return {
-      stringValue: value
-    }
+    return create(RichValueSchema, { value: { case: 'stringValue', value } })
   },
   to(v) {
-    return v.stringValue
+    return v.value.case === 'stringValue' ? v.value.value : undefined
   }
 }
 
 export const IntConverter: ValueConverter<Int | undefined> = {
   from: (value?: Int) => {
     if (value == null) {
-      return {
-        nullValue: RichValue_NullValue.NULL_VALUE
-      }
+      return nullRichValue()
     }
-    return {
-      intValue: Math.floor(value)
-    }
+    return create(RichValueSchema, { value: { case: 'intValue', value: Math.floor(value) } })
   },
   to(v) {
-    return v.intValue as Int
+    return (v.value.case === 'intValue' ? v.value.value : undefined) as Int
   }
 }
 
 export const Int8Converter: ValueConverter<bigint | undefined> = {
   from: (value?: bigint) => {
     if (value == null) {
-      return {
-        nullValue: RichValue_NullValue.NULL_VALUE
-      }
+      return nullRichValue()
     }
-    return {
-      int64Value: BigInt(value)
-    }
+    return create(RichValueSchema, { value: { case: 'int64Value', value: BigInt(value) } })
   },
   to(v) {
-    return v.int64Value
+    return v.value.case === 'int64Value' ? v.value.value : undefined
   }
 }
 
 export const FloatConverter: ValueConverter<Float | undefined> = {
   from: (value?: Float) => {
     if (value == null) {
-      return {
-        nullValue: RichValue_NullValue.NULL_VALUE
-      }
+      return nullRichValue()
     }
-    return {
-      floatValue: value
-    }
+    return create(RichValueSchema, { value: { case: 'floatValue', value } })
   },
   to(v) {
-    return v.floatValue
+    return v.value.case === 'floatValue' ? v.value.value : undefined
   }
 }
 
 export const BooleanConverter: ValueConverter<Boolean | undefined> = {
   from: (value?: Boolean) => {
     if (value == null) {
-      return {
-        nullValue: RichValue_NullValue.NULL_VALUE
-      }
+      return nullRichValue()
     }
-    return {
-      boolValue: value
-    }
+    return create(RichValueSchema, { value: { case: 'boolValue', value } })
   },
   to(v) {
-    return v.boolValue
+    return v.value.case === 'boolValue' ? v.value.value : undefined
   }
 }
 
 export const TimestampConverter: ValueConverter<Timestamp | undefined> = {
   from: (value: Timestamp | undefined) => {
     if (value == null) {
-      return {
-        nullValue: RichValue_NullValue.NULL_VALUE
-      }
+      return nullRichValue()
     }
-    return {
-      timestampValue: value
-    }
+    return create(RichValueSchema, { value: { case: 'timestampValue', value: timestampFromDate(value) } })
   },
   to(v) {
-    return v.timestampValue
+    return v.value.case === 'timestampValue' ? timestampDate(v.value.value) : undefined
   }
 }
 
 export const BytesConverter: ValueConverter<Bytes | undefined> = {
   from: (value?: Bytes) => {
     if (value == null) {
-      return {
-        nullValue: RichValue_NullValue.NULL_VALUE
-      }
+      return nullRichValue()
     }
-    return {
-      bytesValue: value
-    }
+    return create(RichValueSchema, { value: { case: 'bytesValue', value } })
   },
   to(v) {
-    return v.bytesValue
+    return v.value.case === 'bytesValue' ? v.value.value : undefined
   }
 }
 
 export const IDConverter: ValueConverter<ID | undefined> = {
   from(value: ID | undefined): RichValue {
     if (typeof value == 'string') {
-      return {
-        stringValue: value
-      }
+      return create(RichValueSchema, { value: { case: 'stringValue', value } })
     }
     if (value instanceof Uint8Array) {
-      return {
-        stringValue: `0x${Buffer.from(value).toString('hex')}`
-      }
+      return create(RichValueSchema, {
+        value: { case: 'stringValue', value: `0x${Buffer.from(value).toString('hex')}` }
+      })
     }
-    return {
-      nullValue: RichValue_NullValue.NULL_VALUE
-    }
+    return nullRichValue()
   },
   to(value: RichValue): ID | undefined {
-    if (value.stringValue) {
-      return value.stringValue as ID
+    if (value.value.case === 'stringValue' && value.value.value) {
+      return value.value.value as ID
     }
-    if (value.bytesValue) {
-      const v = `0x${Buffer.from(value.bytesValue).toString('hex')}`
+    if (value.value.case === 'bytesValue' && value.value.value) {
+      const v = `0x${Buffer.from(value.value.value).toString('hex')}`
       return v as ID
     }
     return undefined
@@ -245,15 +215,13 @@ export const IDConverter: ValueConverter<ID | undefined> = {
 export const BigDecimalConverter: ValueConverter<BigDecimal | undefined> = {
   from: (value?: BigDecimal): RichValue => {
     if (value == null) {
-      return {
-        nullValue: RichValue_NullValue.NULL_VALUE
-      }
+      return nullRichValue()
     }
-    return { bigdecimalValue: toBigDecimal(value) }
+    return create(RichValueSchema, { value: { case: 'bigdecimalValue', value: toBigDecimal(value) } })
   },
   to(v) {
-    const d = v.bigdecimalValue
-    if (d) {
+    if (v.value.case === 'bigdecimalValue') {
+      const d = v.value.value
       const i = bytesToBigInt(d.value!.data)
       let ret = new BigDecimal(i.toString())
       if (d.exp < 0) {
@@ -270,18 +238,14 @@ export const BigDecimalConverter: ValueConverter<BigDecimal | undefined> = {
 export const BigIntConverter: ValueConverter<bigint | undefined> = {
   from: (value?: bigint) => {
     if (value == null) {
-      return {
-        nullValue: RichValue_NullValue.NULL_VALUE
-      }
+      return nullRichValue()
     }
-    return {
-      bigintValue: toBigInteger(value)
-    }
+    return create(RichValueSchema, { value: { case: 'bigintValue', value: toBigInteger(value) } })
   },
   to(v) {
-    if (v.bigintValue) {
-      let res = bytesToBigInt(v.bigintValue?.data)
-      if (v.bigintValue.negative) {
+    if (v.value.case === 'bigintValue') {
+      let res = bytesToBigInt(v.value.value.data)
+      if (v.value.value.negative) {
         res = -res
       }
       return res

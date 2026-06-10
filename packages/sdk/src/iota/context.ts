@@ -1,4 +1,5 @@
-import { RecordMetaData } from '@sentio/protos'
+import { type RecordMetaData, RecordMetaDataSchema } from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
 import { type Labels, normalizeLabels } from '../index.js'
 import { getClient, IotaNetwork } from './network.js'
 import {
@@ -52,7 +53,7 @@ export class IotaContext extends MoveContext<IotaNetwork, IotaMoveNormalizedModu
   }
 
   getMetaDataInternal(name: string, labels: Labels): RecordMetaData {
-    return {
+    return create(RecordMetaDataSchema, {
       address: this.address,
       contractName: this.moduleName,
       blockNumber: this.checkpoint,
@@ -62,7 +63,7 @@ export class IotaContext extends MoveContext<IotaNetwork, IotaMoveNormalizedModu
       chainId: this.getChainId(),
       name: name,
       labels: normalizeLabels(labels)
-    }
+    })
   }
 
   get client(): IotaClient {
@@ -106,7 +107,7 @@ export class IotaObjectChangeContext extends MoveContext<
   }
 
   getMetaDataInternal(name: string, labels: Labels): RecordMetaData {
-    return {
+    return create(RecordMetaDataSchema, {
       address: this.address,
       contractName: '*',
       blockNumber: this.checkpoint,
@@ -116,7 +117,7 @@ export class IotaObjectChangeContext extends MoveContext<
       chainId: this.getChainId(),
       name: name,
       labels: normalizeLabels(labels)
-    }
+    })
   }
 
   get client(): IotaClient {
@@ -158,7 +159,7 @@ export class IotaAddressContext extends MoveAccountContext<
   }
 
   getMetaDataInternal(name: string, labels: Labels): RecordMetaData {
-    return {
+    return create(RecordMetaDataSchema, {
       address: this.address,
       contractName: this.contractName,
       blockNumber: this.checkpoint,
@@ -168,7 +169,7 @@ export class IotaAddressContext extends MoveAccountContext<
       chainId: this.getChainId(),
       name: name,
       labels: normalizeLabels(labels)
-    }
+    })
   }
 
   get client(): IotaClient {

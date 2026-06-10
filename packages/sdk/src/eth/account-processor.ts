@@ -1,5 +1,15 @@
 import { ERC20__factory, ERC721__factory } from './builtin/internal/index.js'
-import { AddressType, EthFetchConfig, PreprocessResult, ProcessResult } from '@sentio/protos'
+import {
+  AddressType,
+  type EthFetchConfig,
+  EthFetchConfigSchema,
+  type PreprocessResult,
+  PreprocessResultSchema,
+  ProcessResultSchema,
+  timestampDate
+} from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
+import { ConnectError, Code } from '@connectrpc/connect'
 
 import { PartiallyOptional, PromiseOrVoid } from '../core/index.js'
 
@@ -12,7 +22,6 @@ import { Block } from 'ethers'
 import { AccountProcessorState } from './account-processor-state.js'
 import { fixEmptyKey, formatEthData, TypedEvent, validateAndNormalizeAddress } from './eth.js'
 import { EthChainId } from '@sentio/chain'
-import { ServerError, Status } from 'nice-grpc'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 
 const ERC20_INTERFACE = ERC20__factory.createInterface()
@@ -258,7 +267,7 @@ export class AccountProcessor {
   protected onEvent(
     handler: (event: TypedEvent, ctx: AccountContext) => PromiseOrVoid,
     filter: AddressOrTypeEventFilter | AddressOrTypeEventFilter[],
-    fetchConfig?: Partial<EthFetchConfig>,
+    fetchConfig?: Omit<Partial<EthFetchConfig>, '$typeName' | '$unknown'>,
     preprocessHandler: (
       event: TypedEvent,
       ctx: AccountContext,
@@ -295,18 +304,18 @@ export class AccountProcessor {
 
     this.eventHandlers.push({
       filters: _filters,
-      fetchConfig: EthFetchConfig.fromPartial(fetchConfig || {}),
+      fetchConfig: create(EthFetchConfigSchema, fetchConfig || {}),
       handlerName: getHandlerName(),
       handler: async function (data) {
         const { log, block, transaction, transactionReceipt } = formatEthData(data)
         if (!log) {
-          throw new ServerError(Status.INVALID_ARGUMENT, 'Log is empty')
+          throw new ConnectError('Log is empty', Code.InvalidArgument)
         }
         // const log = data.log as { topics: Array<string>; data: string }
         const ctx = new AccountContext(
           chainId,
           config.address,
-          data.timestamp,
+          data.timestamp ? timestampDate(data.timestamp) : undefined,
           block as Block,
           log,
           undefined,
@@ -321,18 +330,18 @@ export class AccountProcessor {
           await handler(event, ctx)
           return ctx.stopAndGetResult()
         }
-        return ProcessResult.fromPartial({})
+        return create(ProcessResultSchema)
       },
       preprocessHandler: async function (data, preprocessStore: { [k: string]: any }) {
         const { log, block, transaction, transactionReceipt } = formatEthData(data)
         if (!log) {
-          throw new ServerError(Status.INVALID_ARGUMENT, 'Log is empty')
+          throw new ConnectError('Log is empty', Code.InvalidArgument)
         }
         // const log = data.log as { topics: Array<string>; data: string }
         const ctx = new AccountContext(
           chainId,
           config.address,
-          data.timestamp,
+          data.timestamp ? timestampDate(data.timestamp) : undefined,
           block as Block,
           log,
           undefined,
@@ -346,7 +355,7 @@ export class AccountProcessor {
           const event: TypedEvent = new TypedEvent(log, parsed.name, fixEmptyKey(parsed))
           return preprocessHandler(event, ctx, preprocessStore)
         }
-        return PreprocessResult.fromPartial({})
+        return create(PreprocessResultSchema)
       }
     })
 

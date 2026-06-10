@@ -1,4 +1,5 @@
-import { Data_SolBlock, Data_SolInstruction, HandleInterval, ProcessResult } from '@sentio/protos'
+import { Data_SolBlock, Data_SolInstruction, HandleInterval, HandleIntervalSchema, ProcessResult } from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
 import { SolanaContext } from './solana-context.js'
 import { Instruction } from '@anchor-lang/core'
 import { SolanaBindOptions, SolanaFetchConfig } from './solana-options.js'
@@ -99,7 +100,10 @@ export class SolanaBaseProcessor {
   ): this {
     return this.onInterval(
       handler,
-      { recentInterval: timeIntervalInMinutes, backfillInterval: backfillTimeIntervalInMinutes },
+      create(HandleIntervalSchema, {
+        recentInterval: timeIntervalInMinutes,
+        backfillInterval: backfillTimeIntervalInMinutes
+      }),
       undefined
     )
   }
@@ -109,10 +113,14 @@ export class SolanaBaseProcessor {
     blockInterval = 1000,
     backfillBlockInterval = 4000
   ): this {
-    return this.onInterval(handler, undefined, {
-      recentInterval: blockInterval,
-      backfillInterval: backfillBlockInterval
-    })
+    return this.onInterval(
+      handler,
+      undefined,
+      create(HandleIntervalSchema, {
+        recentInterval: blockInterval,
+        backfillInterval: backfillBlockInterval
+      })
+    )
   }
 
   public onInterval<T>(

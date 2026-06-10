@@ -2,7 +2,16 @@ import { BoundContractView, ContractContext, ContractView, EthContext } from './
 import { BaseContract } from 'ethers'
 import { BaseProcessor, defaultPreprocessHandler } from './base-processor.js'
 import { BindOptions, getOptionsSignature } from './bind-options.js'
-import { EthFetchConfig, HandleInterval, TemplateInstance, PreprocessResult } from '@sentio/protos'
+import {
+  type EthFetchConfig,
+  EthFetchConfigSchema,
+  type HandleInterval,
+  HandleIntervalSchema,
+  type TemplateInstance,
+  TemplateInstanceSchema,
+  type PreprocessResult
+} from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
 import { PromiseOrVoid } from '../core/promises.js'
 import { ListStateStorage, processMetrics } from '@sentio/runtime'
 import { BlockParams } from 'ethers/providers'
@@ -78,7 +87,7 @@ export abstract class BaseProcessorTemplate<
   public bind(options: Omit<BindOptions, 'network'>, ctx: EthContext): void {
     options = { ...options, address: validateAndNormalizeAddress(options.address) }
 
-    const instance: TemplateInstance = {
+    const instance: TemplateInstance = create(TemplateInstanceSchema, {
       templateId: this.id,
       contract: {
         address: options.address,
@@ -89,7 +98,7 @@ export abstract class BaseProcessorTemplate<
       startBlock: BigInt(options.startBlock || 0),
       endBlock: BigInt(options.endBlock || 0),
       baseLabels: options.baseLabels
-    }
+    })
 
     ctx.sendTemplateInstance(instance)
 
@@ -141,7 +150,7 @@ export abstract class BaseProcessorTemplate<
   protected onEthEvent(
     handler: (event: TypedEvent, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
     filter: DeferredTopicFilter | DeferredTopicFilter[],
-    fetchConfig?: Partial<EthFetchConfig>,
+    fetchConfig?: Omit<Partial<EthFetchConfig>, '$typeName' | '$unknown'>,
     preprocessHandler: (
       event: TypedEvent,
       ctx: ContractContext<TContract, TBoundContractView>,
@@ -153,7 +162,7 @@ export abstract class BaseProcessorTemplate<
       handler: handler,
       preprocessHandler,
       filter: filter,
-      fetchConfig: EthFetchConfig.fromPartial(fetchConfig || {})
+      fetchConfig: create(EthFetchConfigSchema, fetchConfig || {})
     })
     return this
   }
@@ -172,10 +181,10 @@ export abstract class BaseProcessorTemplate<
     return this.onInterval(
       handler,
       undefined,
-      {
+      create(HandleIntervalSchema, {
         recentInterval: blockInterval,
         backfillInterval: backfillBlockInterval
-      },
+      }),
       fetchConfig,
       preprocessHandler
     )
@@ -194,7 +203,10 @@ export abstract class BaseProcessorTemplate<
   ) {
     return this.onInterval(
       handler,
-      { recentInterval: timeIntervalInMinutes, backfillInterval: backfillTimeIntervalInMinutes },
+      create(HandleIntervalSchema, {
+        recentInterval: timeIntervalInMinutes,
+        backfillInterval: backfillTimeIntervalInMinutes
+      }),
       undefined,
       fetchConfig,
       preprocessHandler
@@ -226,7 +238,7 @@ export abstract class BaseProcessorTemplate<
   public onTrace(
     signature: string,
     handler: (trace: TypedCallTrace, ctx: ContractContext<TContract, TBoundContractView>) => PromiseOrVoid,
-    fetchConfig?: Partial<EthFetchConfig>,
+    fetchConfig?: Omit<Partial<EthFetchConfig>, '$typeName' | '$unknown'>,
     preprocessHandler: (
       trace: TypedCallTrace,
       ctx: ContractContext<TContract, TBoundContractView>,
@@ -238,7 +250,7 @@ export abstract class BaseProcessorTemplate<
       handlerName: getHandlerName(),
       handler,
       preprocessHandler,
-      fetchConfig: EthFetchConfig.fromPartial(fetchConfig || {})
+      fetchConfig: create(EthFetchConfigSchema, fetchConfig || {})
     })
     return this
   }

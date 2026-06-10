@@ -1,4 +1,4 @@
-import { Data_AptEvent, Data_AptCall, Data_AptResource } from '@sentio/protos'
+import { type Data_AptEvent, type Data_AptCall, type Data_AptResource } from '@sentio/protos'
 import { UserTransactionResponse, MoveResource } from '@aptos-labs/ts-sdk'
 import { MoveCoder, decodeResourceChange, ResourceChange } from '@typemove/aptos'
 
@@ -18,7 +18,7 @@ type Data_AptResource_Ext = Data_AptResource & {
   _decodedResources?: ResourceChange<any>[]
 }
 
-export class AptEvent implements Data_AptEvent {
+export class AptEvent {
   constructor(readonly data: Data_AptEvent_Ext) {}
 
   get rawEvent(): string {
@@ -57,7 +57,7 @@ export class AptEvent implements Data_AptEvent {
   }
 }
 
-export class AptCall implements Data_AptCall {
+export class AptCall {
   constructor(readonly data: Data_AptCall_Ext) {}
 
   get rawTransaction(): string {
@@ -88,7 +88,7 @@ export class AptCall implements Data_AptCall {
   }
 }
 
-export class AptResource implements Data_AptResource {
+export class AptResource {
   constructor(readonly data: Data_AptResource_Ext) {}
 
   get version(): bigint {

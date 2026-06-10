@@ -180,6 +180,9 @@ importers:
 
   packages/action:
     dependencies:
+      '@bufbuild/protobuf':
+        specifier: ^2.12.0
+        version: 2.12.0
       '@sentio/protos':
         specifier: workspace:*
         version: link:../protos
@@ -384,21 +387,18 @@ importers:
       '@bufbuild/protobuf':
         specifier: ^2.12.0
         version: 2.12.0
-      long:
-        specifier: ^5.2.3
-        version: 5.2.3
-      nice-grpc:
-        specifier: ^2.1.16
-        version: 2.1.16
-      nice-grpc-common:
-        specifier: ^2.0.3
-        version: 2.0.3
 
   packages/runtime:
     dependencies:
       '@bufbuild/protobuf':
         specifier: ^2.12.0
         version: 2.12.0
+      '@connectrpc/connect':
+        specifier: ^2.0.0
+        version: 2.1.1(@bufbuild/protobuf@2.12.0)
+      '@connectrpc/connect-node':
+        specifier: ^2.0.0
+        version: 2.1.1(@bufbuild/protobuf@2.12.0)(@connectrpc/connect@2.1.1(@bufbuild/protobuf@2.12.0))
       '@opentelemetry/exporter-metrics-otlp-grpc':
         specifier: ^0.218.0
         version: 0.218.0(@opentelemetry/api@1.9.0)
@@ -426,30 +426,9 @@ importers:
       ix:
         specifier: ^7.0.0
         version: 7.0.0
-      long:
-        specifier: ^5.2.3
-        version: 5.2.3
       lru-cache:
         specifier: ^11.1.1
         version: 11.2.1
-      nice-grpc:
-        specifier: ^2.1.16
-        version: 2.1.16
-      nice-grpc-client-middleware-retry:
-        specifier: ^3.1.15
-        version: 3.1.15
-      nice-grpc-common:
-        specifier: ^2.0.3
-        version: 2.0.3
-      nice-grpc-error-details:
-        specifier: ^0.2.14
-        version: 0.2.14
-      nice-grpc-opentelemetry:
-        specifier: ^0.1.22
-        version: 0.1.22
-      nice-grpc-prometheus:
-        specifier: ^0.2.11
-        version: 0.2.11
       piscina:
         specifier: 5.1.3
         version: 5.1.3
@@ -481,6 +460,12 @@ importers:
       '@aptos-labs/ts-sdk':
         specifier: ~7.1.0
         version: 7.1.0
+      '@bufbuild/protobuf':
+        specifier: ^2.12.0
+        version: 2.12.0
+      '@connectrpc/connect':
+        specifier: ^2.0.0
+        version: 2.1.1(@bufbuild/protobuf@2.12.0)
       '@iota/iota-sdk':
         specifier: ~1.14.0
         version: 1.14.0(typescript@6.0.3)
@@ -556,18 +541,6 @@ importers:
       mkdirp:
         specifier: ^3.0.1
         version: 3.0.1
-      nice-grpc:
-        specifier: ^2.1.16
-        version: 2.1.16
-      nice-grpc-client-middleware-retry:
-        specifier: ^3.1.15
-        version: 3.1.15
-      nice-grpc-common:
-        specifier: ^2.0.3
-        version: 2.0.3
-      nice-grpc-prometheus:
-        specifier: ^0.2.11
-        version: 0.2.11
       node-fetch:
         specifier: ^3.3.2
         version: 3.3.2
@@ -708,6 +681,18 @@ packages:
     resolution: {integrity: sha512-hIn0ncNaJRLkZrxBIp5AsW/eXEHNKYQBh0aPdoUqNgD+Io3NIykQqpKFyKcuasZhicGaEZJX/JBSIkZ4e5x8Dg==}
     peerDependencies:
       commander: ~14.0.0
+
+  '@connectrpc/connect-node@2.1.1':
+    resolution: {integrity: sha512-s3TfsI1XF+n+1z6MBS9rTnFsxxR4Rw5wmdEnkQINli81ESGxcsfaEet8duzq8LVuuCupmhUsgpRo0Nv9pZkufg==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      '@bufbuild/protobuf': ^2.7.0
+      '@connectrpc/connect': 2.1.1
+
+  '@connectrpc/connect@2.1.1':
+    resolution: {integrity: sha512-JzhkaTvM73m2K1URT6tv53k2RwngSmCXLZJgK580qNQOXRzZRR/BCMfZw3h+90JpnG6XksP5bYT+cz0rpUzUWQ==}
+    peerDependencies:
+      '@bufbuild/protobuf': ^2.7.0
 
   '@dabh/diagnostics@2.0.8':
     resolution: {integrity: sha512-R4MSXTVnuMzGD7bzHdW2ZhhdPC/igELENcq5IjEverBvq5hn1SXCWcsi6eSsdWP0/Ur+SItRRjAktmdoX/8R/Q==}
@@ -3463,9 +3448,6 @@ packages:
       zod:
         optional: true
 
-  abort-controller-x@0.5.0:
-    resolution: {integrity: sha512-yTt9CI0x+nRfX6BFMenEGP8ooPvErGH6AbFz20C2IeOLIlDsrw/VHpgne3GsCEuTA410IiFiaLVFKmgM4bKEPQ==}
-
   abstract-logging@2.0.1:
     resolution: {integrity: sha512-2BjRTZxTPvheOvGbBslFSYOUkr+SjPtOnrLP33f+VIWLzezQpZcqVg7ja3L4dBXmzzgwT+a029jRx5PCi3JuiA==}
 
@@ -3680,9 +3662,6 @@ packages:
   binaryen@102.0.0-nightly.20211028:
     resolution: {integrity: sha512-GCJBVB5exbxzzvyt8MGDv/MeUjs6gkXDvf4xOIItRBptYl0Tz5sm1o/uG95YK0L0VeG5ajDu3hRtkBP2kzqC5w==}
     hasBin: true
-
-  bintrees@1.0.2:
-    resolution: {integrity: sha512-VOMgTMwjAaUG580SXn3LacVgjurrbMme7ZZNYGSSV7mmtY6QQRh0Eg3pwIcntQ77DErK1L0NxkbetjcoXzVwKw==}
 
   blob-to-it@2.0.8:
     resolution: {integrity: sha512-1MKnG2ul1DtSgrxFHqhdJgIJODJbNj7alOLSJRD7O9S2iCJ72ZWU6j8+CVpjIdLueqwpWhy4ouvpanYlFLqkRw==}
@@ -5138,10 +5117,6 @@ packages:
     resolution: {integrity: sha512-0KI/607xoxSToH7GjN1FfSbLoU0+btTicjsQSWQlh/hZykN8KpmMf7uYwPW3R+akZ6R/w18ZlXSHBYXiYUPO3g==}
     engines: {node: '>= 0.10'}
 
-  ipaddr.js@2.2.0:
-    resolution: {integrity: sha512-Ag3wB2o37wslZS19hZqorUnrnzSkpOVy+IiiDEiTqNubEYpYuHWIf6K4psgN2ZWKExS4xhVCrRVfb/wfW8fWJA==}
-    engines: {node: '>= 10'}
-
   ipfs-unixfs@11.2.1:
     resolution: {integrity: sha512-gUeeX63EFgiaMgcs0cUs2ZUPvlOeEZ38okjK8twdWGZX2jYd2rCk8k/TJ3DSRIDZ2t/aZMv6I23guxHaofZE3w==}
 
@@ -5862,24 +5837,6 @@ packages:
   nerf-dart@1.0.0:
     resolution: {integrity: sha512-EZSPZB70jiVsivaBLYDCyntd5eH8NTSMOn3rB+HxwdmKThGELLdYv8qVIMWvZEFy9w8ZZpW9h9OB32l1rGtj7g==}
 
-  nice-grpc-client-middleware-retry@3.1.15:
-    resolution: {integrity: sha512-fXfNNdtjCQzc3O/w3WsK1AOU+xdE1V7FCm4FEQWS/UUVsV1616S2oryvWqsZAF8aOvuMir8lFtNmgH3DeP+PBg==}
-
-  nice-grpc-common@2.0.3:
-    resolution: {integrity: sha512-MEhnD3JMah0mgyivpb9hpRDbOBuXBxI/TVO+OK1h6rC97WM42HsPMR+zzRNQ0C5BqYJTw1nyWiQRD0DucO+pjQ==}
-
-  nice-grpc-error-details@0.2.14:
-    resolution: {integrity: sha512-G0ZLRxgQ4/xazQtZkWGBQ5Vxoayq4LwuS0z4Mui/g7DRfAuQhi9YAPW+vp9pXHwPQ98HNt3glUYzOF9JtUlpiw==}
-
-  nice-grpc-opentelemetry@0.1.22:
-    resolution: {integrity: sha512-Azmn6JhkDeenXk6jag5tq7cRrp7UqIOsNVjtchmXjZp3BaSMI3E8FVk1DSaT+QjO59ftU0tqOofeE/5MixiZKw==}
-
-  nice-grpc-prometheus@0.2.11:
-    resolution: {integrity: sha512-CQvYxSiYaVBbV9ZCn906l3xrymj5iJyw7WEvmbF7RbEZMJ34H4L00jhkn0aU0+gFySyPw5j/+bLOgH21s3IOlg==}
-
-  nice-grpc@2.1.16:
-    resolution: {integrity: sha512-Cl3Pn00212Hl8/U6bpgMxmhZj5lyv3nWoJov4cd3FjWarktrMHP4DNvSjCnDwkMWYx4W1tyscEia4JX6Y4GVCQ==}
-
   node-domexception@1.0.0:
     resolution: {integrity: sha512-/jKZoMpw0F8GRwl4/eLROPA3cfcXtLApP0QzLmUT/HuPCZWyB7IY9ZrMeKw2O/nFIqPQB3PVM9aYm0F312AXDQ==}
     engines: {node: '>=10.5.0'}
@@ -6409,10 +6366,6 @@ packages:
   progress-events@1.0.1:
     resolution: {integrity: sha512-MOzLIwhpt64KIVN64h1MwdKWiyKFNc/S6BoYKPIVUHFg0/eIEyBulhWCgn678v/4c0ri3FdGuzXymNCv02MUIw==}
 
-  prom-client@15.1.2:
-    resolution: {integrity: sha512-on3h1iXb04QFLLThrmVYg1SChBQ9N1c+nKAjebBjokBqipddH3uxmOUcEkTnzmJ8Jh/5TSUnUqS40i2QB2dJHQ==}
-    engines: {node: ^16 || ^18 || >=20}
-
   property-expr@2.0.6:
     resolution: {integrity: sha512-SVtmxhRE/CGkn3eZY1T6pC8Nln6Fr/lu1mKSgRud0eC73whjGfoAogbn78LkD8aFL0zz3bAFerKSnOl7NlErBA==}
 
@@ -6421,10 +6374,6 @@ packages:
 
   protobufjs@7.6.1:
     resolution: {integrity: sha512-4K0myLaWL5EteuSAro91EGFgcfVgxb64Jx+7oDAY6GOkXD4M69yuSEljNcInGVCA5sOPxmZ/EqDLj2x0Q0+Ygg==}
-    engines: {node: '>=12.0.0'}
-
-  protobufjs@8.5.0:
-    resolution: {integrity: sha512-df1jWDPA5VIBNRtuAHjqr09f2qN5D4Vke1wYqOQg1XJ7ZDpA7BD6L7E4tyChgGRLB5hqk2m79Zsy0WHwV9a84A==}
     engines: {node: '>=12.0.0'}
 
   protons-runtime@5.5.0:
@@ -7019,9 +6968,6 @@ packages:
     resolution: {integrity: sha512-yEFYrVhod+hdNyx7g5Bnkkb0G6si8HJurOoOEgC8B/O0uXLHlaey/65KRv6cuWBNhBgHKAROVpc7QyYqE5gFng==}
     engines: {node: '>=20'}
 
-  tdigest@0.1.2:
-    resolution: {integrity: sha512-+G0LLgjjo9BZX2MfdvPfH+MKLCrxlXSYec5DaPYP1fe6Iyhf0/fSmJ0bFiZ1F8BT6cGXl2LpltQptzjXKWEkKA==}
-
   temp-dir@2.0.0:
     resolution: {integrity: sha512-aoBAniQmmwtcKp/7BzsH8Cxzv8OL736p7v1ihGb5e9DJ9kTwGWHrQrVB5+lfVDzfGrdRzXch+ig7LHaY1JTOrg==}
     engines: {node: '>=8'}
@@ -7152,9 +7098,6 @@ packages:
   ts-command-line-args@2.5.1:
     resolution: {integrity: sha512-H69ZwTw3rFHb5WYpQya40YAX2/w7Ut75uUECbgBIsLmM+BNuYnxsltfyyLMxy6sEeKxgijLTnQtLd0nKd6+IYw==}
     hasBin: true
-
-  ts-error@1.0.6:
-    resolution: {integrity: sha512-tLJxacIQUM82IR7JO1UUkKlYuUTmoY9HBJAmNWFzheSlDS5SPMcNIepejHJa4BpPQLAcbRhRf3GDJzyj6rbKvA==}
 
   ts-essentials@7.0.3:
     resolution: {integrity: sha512-8+gr5+lqO3G84KdiTSMRLtuyJ+nTBVRKuCrK4lidMPdVeEp0uqC875uE5NMcaA7YYMN7XsNiFQuMvasF8HT/xQ==}
@@ -7689,19 +7632,9 @@ packages:
 
 snapshots:
 
-  '@0no-co/graphql.web@1.0.7(graphql@16.11.0)':
-    optionalDependencies:
-      graphql: 16.11.0
-
   '@0no-co/graphql.web@1.0.7(graphql@16.12.0)':
     optionalDependencies:
       graphql: 16.12.0
-
-  '@0no-co/graphqlsp@1.12.16(graphql@16.11.0)(typescript@6.0.3)':
-    dependencies:
-      '@gql.tada/internal': 1.0.8(graphql@16.11.0)(typescript@6.0.3)
-      graphql: 16.11.0
-      typescript: 6.0.3
 
   '@0no-co/graphqlsp@1.12.16(graphql@16.12.0)(typescript@6.0.3)':
     dependencies:
@@ -7819,6 +7752,15 @@ snapshots:
   '@commander-js/extra-typings@14.0.0(commander@14.0.0)':
     dependencies:
       commander: 14.0.0
+
+  '@connectrpc/connect-node@2.1.1(@bufbuild/protobuf@2.12.0)(@connectrpc/connect@2.1.1(@bufbuild/protobuf@2.12.0))':
+    dependencies:
+      '@bufbuild/protobuf': 2.12.0
+      '@connectrpc/connect': 2.1.1(@bufbuild/protobuf@2.12.0)
+
+  '@connectrpc/connect@2.1.1(@bufbuild/protobuf@2.12.0)':
+    dependencies:
+      '@bufbuild/protobuf': 2.12.0
 
   '@dabh/diagnostics@2.0.8':
     dependencies:
@@ -8469,17 +8411,11 @@ snapshots:
       '@shikijs/types': 3.11.0
       '@shikijs/vscode-textmate': 10.0.2
 
-  '@gql.tada/cli-utils@1.7.2(@0no-co/graphqlsp@1.12.16(graphql@16.11.0)(typescript@6.0.3))(graphql@16.12.0)(typescript@6.0.3)':
+  '@gql.tada/cli-utils@1.7.2(@0no-co/graphqlsp@1.12.16(graphql@16.12.0)(typescript@6.0.3))(graphql@16.12.0)(typescript@6.0.3)':
     dependencies:
-      '@0no-co/graphqlsp': 1.12.16(graphql@16.11.0)(typescript@6.0.3)
+      '@0no-co/graphqlsp': 1.12.16(graphql@16.12.0)(typescript@6.0.3)
       '@gql.tada/internal': 1.0.8(graphql@16.12.0)(typescript@6.0.3)
       graphql: 16.12.0
-      typescript: 6.0.3
-
-  '@gql.tada/internal@1.0.8(graphql@16.11.0)(typescript@6.0.3)':
-    dependencies:
-      '@0no-co/graphql.web': 1.0.7(graphql@16.11.0)
-      graphql: 16.11.0
       typescript: 6.0.3
 
   '@gql.tada/internal@1.0.8(graphql@16.12.0)(typescript@6.0.3)':
@@ -10623,8 +10559,6 @@ snapshots:
     optionalDependencies:
       zod: 3.24.2
 
-  abort-controller-x@0.5.0: {}
-
   abstract-logging@2.0.1: {}
 
   accepts@2.0.0:
@@ -10813,8 +10747,6 @@ snapshots:
   binary-extensions@2.3.0: {}
 
   binaryen@102.0.0-nightly.20211028: {}
-
-  bintrees@1.0.2: {}
 
   blob-to-it@2.0.8:
     dependencies:
@@ -12372,7 +12304,7 @@ snapshots:
     dependencies:
       '@0no-co/graphql.web': 1.0.7(graphql@16.12.0)
       '@0no-co/graphqlsp': 1.12.16(graphql@16.12.0)(typescript@6.0.3)
-      '@gql.tada/cli-utils': 1.7.2(@0no-co/graphqlsp@1.12.16(graphql@16.11.0)(typescript@6.0.3))(graphql@16.12.0)(typescript@6.0.3)
+      '@gql.tada/cli-utils': 1.7.2(@0no-co/graphqlsp@1.12.16(graphql@16.12.0)(typescript@6.0.3))(graphql@16.12.0)(typescript@6.0.3)
       '@gql.tada/internal': 1.0.8(graphql@16.12.0)(typescript@6.0.3)
       typescript: 6.0.3
     transitivePeerDependencies:
@@ -12582,8 +12514,6 @@ snapshots:
       side-channel: 1.0.6
 
   ipaddr.js@1.9.1: {}
-
-  ipaddr.js@2.2.0: {}
 
   ipfs-unixfs@11.2.1:
     dependencies:
@@ -13258,42 +13188,6 @@ snapshots:
 
   nerf-dart@1.0.0: {}
 
-  nice-grpc-client-middleware-retry@3.1.15:
-    dependencies:
-      abort-controller-x: 0.5.0
-      nice-grpc-common: 2.0.3
-
-  nice-grpc-common@2.0.3:
-    dependencies:
-      ts-error: 1.0.6
-
-  nice-grpc-error-details@0.2.14:
-    dependencies:
-      '@bufbuild/protobuf': 2.12.0
-      long: 5.3.2
-      nice-grpc-common: 2.0.3
-      protobufjs: 8.5.0
-
-  nice-grpc-opentelemetry@0.1.22:
-    dependencies:
-      '@opentelemetry/api': 1.9.0
-      '@opentelemetry/semantic-conventions': 1.37.0
-      abort-controller-x: 0.5.0
-      ipaddr.js: 2.2.0
-      nice-grpc-common: 2.0.3
-
-  nice-grpc-prometheus@0.2.11:
-    dependencies:
-      abort-controller-x: 0.5.0
-      nice-grpc-common: 2.0.3
-      prom-client: 15.1.2
-
-  nice-grpc@2.1.16:
-    dependencies:
-      '@grpc/grpc-js': 1.14.4
-      abort-controller-x: 0.5.0
-      nice-grpc-common: 2.0.3
-
   node-domexception@1.0.0: {}
 
   node-emoji@2.2.0:
@@ -13721,11 +13615,6 @@ snapshots:
 
   progress-events@1.0.1: {}
 
-  prom-client@15.1.2:
-    dependencies:
-      '@opentelemetry/api': 1.9.0
-      tdigest: 0.1.2
-
   property-expr@2.0.6: {}
 
   proto-list@1.2.4: {}
@@ -13743,10 +13632,6 @@ snapshots:
       '@protobufjs/pool': 1.1.0
       '@protobufjs/utf8': 1.1.1
       '@types/node': 24.10.13
-      long: 5.3.2
-
-  protobufjs@8.5.0:
-    dependencies:
       long: 5.3.2
 
   protons-runtime@5.5.0:
@@ -14463,10 +14348,6 @@ snapshots:
 
   tagged-tag@1.0.0: {}
 
-  tdigest@0.1.2:
-    dependencies:
-      bintrees: 1.0.2
-
   temp-dir@2.0.0: {}
 
   temp-dir@3.0.0: {}
@@ -14585,8 +14466,6 @@ snapshots:
       command-line-args: 5.2.1
       command-line-usage: 6.1.3
       string-format: 2.0.0
-
-  ts-error@1.0.6: {}
 
   ts-essentials@7.0.3(typescript@6.0.3):
     dependencies:

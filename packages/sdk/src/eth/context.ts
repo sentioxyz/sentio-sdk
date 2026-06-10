@@ -1,7 +1,14 @@
 import { BaseContract, Overrides } from 'ethers'
 import { LogParams, BlockParams, TransactionReceiptParams, TransactionResponseParams } from 'ethers/providers'
 
-import { EthCallContext, PreparedData, RecordMetaData } from '@sentio/protos'
+import {
+  type EthCallContext,
+  EthCallContextSchema,
+  type PreparedData,
+  type RecordMetaData,
+  RecordMetaDataSchema
+} from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
 import { Trace } from './eth.js'
 import { Labels, normalizeLabels } from '../core/index.js'
 import { BaseContext } from '../core/base-context.js'
@@ -63,7 +70,7 @@ export abstract class EthContext extends BaseContext {
 
   getMetaDataInternal(name: string, labels: Labels): RecordMetaData {
     if (this.log) {
-      return {
+      return create(RecordMetaDataSchema, {
         address: this.address,
         contractName: this.getContractName(),
         blockNumber: BigInt(this.blockNumber),
@@ -73,10 +80,10 @@ export abstract class EthContext extends BaseContext {
         chainId: this.chainId,
         name: name,
         labels: normalizeLabels(labels)
-      }
+      })
     }
     if (this.trace) {
-      return {
+      return create(RecordMetaDataSchema, {
         address: this.address,
         contractName: this.getContractName(),
         blockNumber: BigInt(this.blockNumber),
@@ -86,10 +93,10 @@ export abstract class EthContext extends BaseContext {
         chainId: this.chainId.toString(),
         name: name,
         labels: normalizeLabels(labels)
-      }
+      })
     }
     if (this.transaction) {
-      return {
+      return create(RecordMetaDataSchema, {
         address: this.address,
         contractName: this.getContractName(),
         blockNumber: BigInt(this.blockNumber),
@@ -99,10 +106,10 @@ export abstract class EthContext extends BaseContext {
         chainId: this.chainId.toString(),
         name: name,
         labels: normalizeLabels(labels)
-      }
+      })
     }
     if (this.block) {
-      return {
+      return create(RecordMetaDataSchema, {
         address: this.address,
         contractName: this.getContractName(),
         blockNumber: BigInt(this.blockNumber),
@@ -112,7 +119,7 @@ export abstract class EthContext extends BaseContext {
         chainId: this.chainId.toString(),
         name: name,
         labels: normalizeLabels(labels)
-      }
+      })
     }
     throw new Error("Invaid ctx argument can't happen")
   }
@@ -127,11 +134,11 @@ export abstract class EthContext extends BaseContext {
   }
 
   getEthCallContext(): EthCallContext {
-    return {
+    return create(EthCallContextSchema, {
       chainId: this.chainId,
       blockTag: '0x' + this.blockNumber.toString(16),
       address: this.address
-    }
+    })
   }
 }
 

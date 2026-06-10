@@ -2,21 +2,27 @@ import { errorString, GLOBAL_CONFIG, mergeProcessResults, Plugin, PluginManager,
 import { PartitionHandlerManager } from '../core/index.js'
 import { HandlerRegister } from '../core/handler-register.js'
 import {
-  AccountConfig,
-  ContractConfig,
-  DataBinding,
+  AccountConfigSchema,
+  ContractConfigSchema,
+  type DataBinding,
   HandlerType,
-  InitResponse,
-  MoveCallHandlerConfig,
-  MoveEventHandlerConfig,
+  type InitResponse,
+  type MoveCallHandlerConfig,
+  MoveCallHandlerConfigSchema,
+  type MoveEventHandlerConfig,
+  MoveEventHandlerConfigSchema,
+  MoveOnIntervalConfigSchema,
   MoveOwnerType,
-  ProcessConfigResponse,
-  ProcessResult,
-  ProcessStreamResponse_Partitions,
-  StartRequest
+  MoveResourceChangeConfigSchema,
+  type ProcessConfigResponse,
+  type ProcessResult,
+  type ProcessStreamResponse_Partitions,
+  ProcessStreamResponse_PartitionsSchema,
+  type StartRequest
 } from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
 
-import { ServerError, Status } from 'nice-grpc'
+import { ConnectError, Code } from '@connectrpc/connect'
 
 import { AptosProcessorState, AptosResourceProcessorState } from './aptos-processor.js'
 
@@ -61,7 +67,7 @@ export class AptosPlugin extends Plugin {
           network: <AptosNetwork>instance.contract?.chainId || AptosNetwork.MAIN_NET,
           startVersion: instance.startBlock || 0n,
           endVersion: instance.endBlock,
-          baseLabels: instance.baseLabels
+          baseLabels: instance.baseLabels as { [key: string]: string } | undefined
         },
         NoopContext
       )
@@ -75,7 +81,7 @@ export class AptosPlugin extends Plugin {
       if (forChainId !== undefined && forChainId !== chainId.toString()) {
         continue
       }
-      const contractConfig = ContractConfig.fromPartial({
+      const contractConfig = create(ContractConfigSchema, {
         processorType: USER_PROCESSOR,
         contract: {
           name: aptosProcessor.moduleName,
@@ -90,7 +96,7 @@ export class AptosPlugin extends Plugin {
       for (const handler of aptosProcessor.eventHandlers) {
         const handlerId = this.handlerRegister.register(handler.handler, chainId)
         this.partitionManager.registerPartitionHandler(HandlerType.APT_EVENT, handlerId, handler.partitionHandler)
-        const eventHandlerConfig: MoveEventHandlerConfig = {
+        const eventHandlerConfig: MoveEventHandlerConfig = create(MoveEventHandlerConfigSchema, {
           filters: handler.filters.map((f) => {
             return {
               type: f.type,
@@ -101,7 +107,7 @@ export class AptosPlugin extends Plugin {
           fetchConfig: handler.fetchConfig,
           handlerId,
           handlerName: handler.handlerName
-        }
+        })
         contractConfig.moveEventConfigs.push(eventHandlerConfig)
       }
 
@@ -109,7 +115,7 @@ export class AptosPlugin extends Plugin {
       for (const handler of aptosProcessor.callHandlers) {
         const handlerId = this.handlerRegister.register(handler.handler, chainId)
         this.partitionManager.registerPartitionHandler(HandlerType.APT_CALL, handlerId, handler.partitionHandler)
-        const functionHandlerConfig: MoveCallHandlerConfig = {
+        const functionHandlerConfig: MoveCallHandlerConfig = create(MoveCallHandlerConfigSchema, {
           filters: handler.filters.map((filter) => {
             return {
               function: filter.function,
@@ -123,7 +129,7 @@ export class AptosPlugin extends Plugin {
           fetchConfig: handler.fetchConfig,
           handlerId,
           handlerName: handler.handlerName
-        }
+        })
         contractConfig.moveCallConfigs.push(functionHandlerConfig)
       }
 
@@ -131,21 +137,23 @@ export class AptosPlugin extends Plugin {
       for (const handler of aptosProcessor.transactionIntervalHandlers) {
         const handlerId = this.handlerRegister.register(handler.handler, chainId)
         this.partitionManager.registerPartitionHandler(HandlerType.APT_CALL, handlerId, handler.partitionHandler)
-        contractConfig.moveIntervalConfigs.push({
-          intervalConfig: {
-            handlerId: handlerId,
-            handlerName: handler.handlerName,
-            minutes: 0,
-            minutesInterval: handler.timeIntervalInMinutes,
-            slot: 0,
-            slotInterval: handler.versionInterval,
-            fetchConfig: undefined
-          },
-          ownerType: MoveOwnerType.ADDRESS,
-          fetchConfig: handler.fetchConfig,
-          resourceFetchConfig: undefined,
-          type: ''
-        })
+        contractConfig.moveIntervalConfigs.push(
+          create(MoveOnIntervalConfigSchema, {
+            intervalConfig: {
+              handlerId: handlerId,
+              handlerName: handler.handlerName,
+              minutes: 0,
+              minutesInterval: handler.timeIntervalInMinutes,
+              slot: 0,
+              slotInterval: handler.versionInterval,
+              fetchConfig: undefined
+            },
+            ownerType: MoveOwnerType.ADDRESS,
+            fetchConfig: handler.fetchConfig,
+            resourceFetchConfig: undefined,
+            type: ''
+          })
+        )
       }
 
       config.contractConfigs.push(contractConfig)
@@ -157,7 +165,7 @@ export class AptosPlugin extends Plugin {
       if (forChainId !== undefined && forChainId !== chainId.toString()) {
         continue
       }
-      const accountConfig = AccountConfig.fromPartial({
+      const accountConfig = create(AccountConfigSchema, {
         address: aptosProcessor.config.address,
         chainId: aptosProcessor.getChainId(),
         startBlock: aptosProcessor.config.startVersion,
@@ -166,12 +174,14 @@ export class AptosPlugin extends Plugin {
       for (const handler of aptosProcessor.resourceChangeHandlers) {
         const handlerId = this.handlerRegister.register(handler.handler, chainId)
         this.partitionManager.registerPartitionHandler(HandlerType.APT_RESOURCE, handlerId, handler.partitionHandler)
-        accountConfig.moveResourceChangeConfigs.push({
-          handlerId: handlerId,
-          handlerName: handler.handlerName,
-          types: typeof handler.type === 'string' ? [handler.type] : handler.type,
-          includeDeleted: false
-        })
+        accountConfig.moveResourceChangeConfigs.push(
+          create(MoveResourceChangeConfigSchema, {
+            handlerId: handlerId,
+            handlerName: handler.handlerName,
+            types: typeof handler.type === 'string' ? [handler.type] : handler.type,
+            includeDeleted: false
+          })
+        )
       }
 
       config.accountConfigs.push(accountConfig)
@@ -182,7 +192,7 @@ export class AptosPlugin extends Plugin {
       if (forChainId !== undefined && forChainId !== chainId.toString()) {
         continue
       }
-      const accountConfig = AccountConfig.fromPartial({
+      const accountConfig = create(AccountConfigSchema, {
         address: aptosProcessor.config.address,
         chainId: aptosProcessor.getChainId(),
         startBlock: aptosProcessor.config.startVersion,
@@ -192,29 +202,33 @@ export class AptosPlugin extends Plugin {
         const handlerId = this.handlerRegister.register(handler.handler, chainId)
         this.partitionManager.registerPartitionHandler(HandlerType.APT_RESOURCE, handlerId, handler.partitionHandler)
         if (handler.timeIntervalInMinutes || handler.versionInterval) {
-          accountConfig.moveIntervalConfigs.push({
-            intervalConfig: {
-              handlerId: handlerId,
-              handlerName: handler.handlerName,
-              minutes: 0,
-              minutesInterval: handler.timeIntervalInMinutes,
-              slot: 0,
-              slotInterval: handler.versionInterval,
+          accountConfig.moveIntervalConfigs.push(
+            create(MoveOnIntervalConfigSchema, {
+              intervalConfig: {
+                handlerId: handlerId,
+                handlerName: handler.handlerName,
+                minutes: 0,
+                minutesInterval: handler.timeIntervalInMinutes,
+                slot: 0,
+                slotInterval: handler.versionInterval,
+                fetchConfig: undefined
+              },
+              type: (Array.isArray(handler.type) ? handler.type[0] : handler.type) || '',
+              ownerType: MoveOwnerType.ADDRESS,
+              resourceFetchConfig: handler.fetchConfig,
               fetchConfig: undefined
-            },
-            type: (Array.isArray(handler.type) ? handler.type[0] : handler.type) || '',
-            ownerType: MoveOwnerType.ADDRESS,
-            resourceFetchConfig: handler.fetchConfig,
-            fetchConfig: undefined
-          })
+            })
+          )
         } else if (handler.type) {
           // on resource change
-          accountConfig.moveResourceChangeConfigs.push({
-            handlerId,
-            handlerName: handler.handlerName,
-            types: typeof handler.type == 'string' ? [handler.type] : handler.type,
-            includeDeleted: false
-          })
+          accountConfig.moveResourceChangeConfigs.push(
+            create(MoveResourceChangeConfigSchema, {
+              handlerId,
+              handlerName: handler.handlerName,
+              types: typeof handler.type == 'string' ? [handler.type] : handler.type,
+              includeDeleted: false
+            })
+          )
         }
       }
       config.accountConfigs.push(accountConfig)
@@ -232,7 +246,7 @@ export class AptosPlugin extends Plugin {
       case HandlerType.APT_RESOURCE:
         return this.processAptosResource(request)
       default:
-        throw new ServerError(Status.INVALID_ARGUMENT, 'No handle type registered ' + request.handlerType)
+        throw new ConnectError('No handle type registered ' + request.handlerType, Code.InvalidArgument)
     }
   }
 
@@ -240,42 +254,42 @@ export class AptosPlugin extends Plugin {
     let data: any
     switch (request.handlerType) {
       case HandlerType.APT_EVENT:
-        if (!request.data?.aptEvent) {
-          throw new ServerError(Status.INVALID_ARGUMENT, "aptEvent can't be empty")
+        if (request.data?.value.case !== 'aptEvent') {
+          throw new ConnectError("aptEvent can't be empty", Code.InvalidArgument)
         }
-        data = new AptEvent(request.data.aptEvent)
+        data = new AptEvent(request.data.value.value)
         break
       case HandlerType.APT_CALL:
-        if (!request.data?.aptCall) {
-          throw new ServerError(Status.INVALID_ARGUMENT, "aptCall can't be empty")
+        if (request.data?.value.case !== 'aptCall') {
+          throw new ConnectError("aptCall can't be empty", Code.InvalidArgument)
         }
-        data = new AptCall(request.data.aptCall)
+        data = new AptCall(request.data.value.value)
         break
       case HandlerType.APT_RESOURCE:
-        if (!request.data?.aptResource) {
-          throw new ServerError(Status.INVALID_ARGUMENT, "aptResource can't be empty")
+        if (request.data?.value.case !== 'aptResource') {
+          throw new ConnectError("aptResource can't be empty", Code.InvalidArgument)
         }
-        data = new AptResource(request.data.aptResource)
+        data = new AptResource(request.data.value.value)
         break
       default:
-        throw new ServerError(Status.INVALID_ARGUMENT, 'No handle type registered ' + request.handlerType)
+        throw new ConnectError('No handle type registered ' + request.handlerType, Code.InvalidArgument)
     }
     const partitions = await this.partitionManager.processPartitionForHandlerType(
       request.handlerType,
       request.handlerIds,
       data
     )
-    return {
+    return create(ProcessStreamResponse_PartitionsSchema, {
       partitions
-    }
+    })
   }
 
   async processAptosEvent(binding: DataBinding): Promise<ProcessResult> {
-    if (!binding.data?.aptEvent) {
-      throw new ServerError(Status.INVALID_ARGUMENT, "Event can't be empty")
+    if (binding.data?.value.case !== 'aptEvent') {
+      throw new ConnectError("Event can't be empty", Code.InvalidArgument)
     }
     const promises: Promise<ProcessResult>[] = []
-    const event = new AptEvent(binding.data.aptEvent)
+    const event = new AptEvent(binding.data.value.value)
 
     for (const handlerId of binding.handlerIds) {
       const promise = this.handlerRegister
@@ -284,9 +298,9 @@ export class AptosPlugin extends Plugin {
           handlerId
         )(event)
         .catch((e: any) => {
-          throw new ServerError(
-            Status.INTERNAL,
-            'error processing event: ' + JSON.stringify(event) + '\n' + errorString(e)
+          throw new ConnectError(
+            'error processing event: ' + JSON.stringify(event) + '\n' + errorString(e),
+            Code.Internal
           )
         })
       if (GLOBAL_CONFIG.execution.sequential) {
@@ -298,10 +312,10 @@ export class AptosPlugin extends Plugin {
   }
 
   async processAptosResource(binding: DataBinding): Promise<ProcessResult> {
-    if (!binding.data?.aptResource) {
-      throw new ServerError(Status.INVALID_ARGUMENT, "Resource can't be empty")
+    if (binding.data?.value.case !== 'aptResource') {
+      throw new ConnectError("Resource can't be empty", Code.InvalidArgument)
     }
-    const resource = new AptResource(binding.data.aptResource)
+    const resource = new AptResource(binding.data.value.value)
 
     const promises: Promise<ProcessResult>[] = []
     for (const handlerId of binding.handlerIds) {
@@ -311,9 +325,9 @@ export class AptosPlugin extends Plugin {
           handlerId
         )(resource)
         .catch((e: any) => {
-          throw new ServerError(
-            Status.INTERNAL,
-            'error processing resource: ' + JSON.stringify(resource) + '\n' + errorString(e)
+          throw new ConnectError(
+            'error processing resource: ' + JSON.stringify(resource) + '\n' + errorString(e),
+            Code.Internal
           )
         })
       if (GLOBAL_CONFIG.execution.sequential) {
@@ -325,10 +339,10 @@ export class AptosPlugin extends Plugin {
   }
 
   async processAptosFunctionCall(binding: DataBinding): Promise<ProcessResult> {
-    if (!binding.data?.aptCall) {
-      throw new ServerError(Status.INVALID_ARGUMENT, "Call can't be empty")
+    if (binding.data?.value.case !== 'aptCall') {
+      throw new ConnectError("Call can't be empty", Code.InvalidArgument)
     }
-    const call = new AptCall(binding.data.aptCall)
+    const call = new AptCall(binding.data.value.value)
 
     const promises: Promise<ProcessResult>[] = []
     for (const handlerId of binding.handlerIds) {
@@ -339,9 +353,9 @@ export class AptosPlugin extends Plugin {
           handlerId
         )(call)
         .catch((e: any) => {
-          throw new ServerError(
-            Status.INTERNAL,
-            'error processing call: ' + JSON.stringify(call) + '\n' + errorString(e)
+          throw new ConnectError(
+            'error processing call: ' + JSON.stringify(call) + '\n' + errorString(e),
+            Code.Internal
           )
         })
       if (GLOBAL_CONFIG.execution.sequential) {

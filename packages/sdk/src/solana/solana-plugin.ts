@@ -1,15 +1,16 @@
 import { errorString, mergeProcessResults, Plugin, PluginManager, USER_PROCESSOR } from '@sentio/runtime'
 import {
-  ContractConfig,
+  ContractConfigSchema,
   DataBinding,
   HandlerType,
   InitResponse,
-  OnIntervalConfig,
+  InstructionHandlerConfigSchema,
+  OnIntervalConfigSchema,
   ProcessConfigResponse,
   ProcessResult
 } from '@sentio/protos'
-
-import { ServerError, Status } from 'nice-grpc'
+import { create } from '@bufbuild/protobuf'
+import { ConnectError, Code } from '@connectrpc/connect'
 
 import { SolanaProcessorState } from './solana-processor.js'
 import { Instruction as SolInstruction } from '@anchor-lang/core'
@@ -32,7 +33,7 @@ export class SolanaPlugin extends Plugin {
         continue
       }
 
-      const contractConfig = ContractConfig.fromPartial({
+      const contractConfig = create(ContractConfigSchema, {
         processorType: USER_PROCESSOR,
         contract: {
           name: solanaProcessor.contractName,
@@ -50,17 +51,17 @@ export class SolanaPlugin extends Plugin {
             break
           }
         }
-        contractConfig.instructionConfig = {
+        contractConfig.instructionConfig = create(InstructionHandlerConfigSchema, {
           innerInstruction: solanaProcessor.processInnerInstruction,
           parsedInstruction: solanaProcessor.fromParsedInstruction !== null,
           rawDataInstruction: solanaProcessor.decodeInstruction !== null,
           fetchTx: fetchTx
-        }
+        })
       }
 
       for (const [idx, handler] of solanaProcessor.blockHandlers.entries()) {
         contractConfig.intervalConfigs.push(
-          OnIntervalConfig.fromPartial({
+          create(OnIntervalConfigSchema, {
             handlerId: idx,
             minutesInterval: handler.timeIntervalInMinutes,
             slotInterval: handler.slotInterval,
@@ -82,19 +83,19 @@ export class SolanaPlugin extends Plugin {
       case HandlerType.SOL_BLOCK:
         return this.processSolBlock(request)
       default:
-        throw new ServerError(Status.INVALID_ARGUMENT, 'No handle type registered ' + request.handlerType)
+        throw new ConnectError('No handle type registered ' + request.handlerType, Code.InvalidArgument)
     }
   }
 
   async processSolInstruction(request: DataBinding): Promise<ProcessResult> {
     if (!request.data) {
-      throw new ServerError(Status.INVALID_ARGUMENT, 'instruction data cannot be empty')
+      throw new ConnectError('instruction data cannot be empty', Code.InvalidArgument)
     }
-    if (!request.data.solInstruction) {
-      throw new ServerError(Status.INVALID_ARGUMENT, 'instruction data cannot be empty')
+    if (request.data.value.case !== 'solInstruction') {
+      throw new ConnectError('instruction data cannot be empty', Code.InvalidArgument)
     }
 
-    const instruction = request.data.solInstruction
+    const instruction = request.data.value.value
     const promises: Promise<ProcessResult>[] = []
 
     // Only have instruction handlers for solana processors
@@ -111,9 +112,9 @@ export class SolanaPlugin extends Plugin {
             parsedInstruction = processor.getParsedInstruction(instruction.instructionData)
           }
         } catch (e) {
-          throw new ServerError(
-            Status.INTERNAL,
-            'Failed to decode instruction: ' + JSON.stringify(instruction) + errorString(e)
+          throw new ConnectError(
+            'Failed to decode instruction: ' + JSON.stringify(instruction) + errorString(e),
+            Code.Internal
           )
         }
         if (parsedInstruction == null) {
@@ -126,9 +127,9 @@ export class SolanaPlugin extends Plugin {
         const res = processor
           .handleInstruction(parsedInstruction, instruction.accounts, insHandler, instruction)
           .catch((e) => {
-            throw new ServerError(
-              Status.INTERNAL,
-              'Error processing instruction: ' + JSON.stringify(instruction) + '\n' + errorString(e)
+            throw new ConnectError(
+              'Error processing instruction: ' + JSON.stringify(instruction) + '\n' + errorString(e),
+              Code.Internal
             )
           })
 
@@ -139,10 +140,10 @@ export class SolanaPlugin extends Plugin {
   }
 
   async processSolBlock(request: DataBinding): Promise<ProcessResult> {
-    if (!request.data?.solBlock) {
-      throw new ServerError(Status.INVALID_ARGUMENT, 'block data cannot be empty')
+    if (request.data?.value.case !== 'solBlock') {
+      throw new ConnectError('block data cannot be empty', Code.InvalidArgument)
     }
-    const block = request.data.solBlock
+    const block = request.data.value.value
     const promises: Promise<ProcessResult>[] = []
     for (const processor of SolanaProcessorState.INSTANCE.getValues()) {
       for (const handlerId of request.handlerIds) {

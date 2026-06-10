@@ -1,4 +1,11 @@
-import { HandleInterval, MoveAccountFetchConfig, MoveFetchConfig, TemplateInstance } from '@sentio/protos'
+import {
+  type HandleInterval,
+  HandleIntervalSchema,
+  type MoveAccountFetchConfig,
+  type MoveFetchConfig,
+  TemplateInstanceSchema
+} from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
 import { ListStateStorage, processMetrics } from '@sentio/runtime'
 import { IotaAddressContext, IotaContext, IotaObjectContext } from './context.js'
 import { IotaMoveObject, IotaTransactionBlockResponse } from '@iota/iota-sdk/client'
@@ -14,7 +21,7 @@ import {
 } from './iota-object-processor.js'
 import { IotaBindOptions } from './iota-processor.js'
 import { TransactionFilter, accountAddressString } from '../move/index.js'
-import { ServerError, Status } from 'nice-grpc'
+import { ConnectError, Code } from '@connectrpc/connect'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 
 class ObjectHandler<HandlerType> {
@@ -55,11 +62,11 @@ export abstract class IotaObjectOrAddressProcessorTemplate<
     let id = (options as IotaObjectBindOptions).objectId || (options as IotaBindOptions).address
 
     if (id === '*') {
-      throw new ServerError(Status.INVALID_ARGUMENT, "can't bind template instance with *")
+      throw new ConnectError("can't bind template instance with *", Code.InvalidArgument)
     }
     id = accountAddressString(id)
 
-    const instance: TemplateInstance = {
+    const instance = create(TemplateInstanceSchema, {
       templateId: this.id,
       contract: {
         name: '',
@@ -70,7 +77,7 @@ export abstract class IotaObjectOrAddressProcessorTemplate<
       startBlock: options.startCheckpoint || 0n,
       endBlock: options.endCheckpoint || 0n,
       baseLabels: options.baseLabels
-    }
+    })
 
     ctx.sendTemplateInstance(instance)
 
@@ -92,7 +99,7 @@ export abstract class IotaObjectOrAddressProcessorTemplate<
     let id = (options as IotaObjectBindOptions).objectId || (options as IotaBindOptions).address
 
     if (id === '*') {
-      throw new ServerError(Status.INVALID_ARGUMENT, "can't bind template instance with *")
+      throw new ConnectError("can't bind template instance with *", Code.InvalidArgument)
     }
     id = accountAddressString(id)
 
@@ -123,7 +130,7 @@ export abstract class IotaObjectOrAddressProcessorTemplate<
     let id = (options as IotaObjectBindOptions).objectId || (options as IotaBindOptions).address
 
     if (id === '*') {
-      throw new ServerError(Status.INVALID_ARGUMENT, "can't delete template instance bind with *")
+      throw new ConnectError("can't delete template instance bind with *", Code.InvalidArgument)
     }
     id = accountAddressString(id)
 
@@ -147,9 +154,9 @@ export abstract class IotaObjectOrAddressProcessorTemplate<
     }
 
     if (deleted !== 1) {
-      throw new ServerError(
-        Status.INVALID_ARGUMENT,
-        `Failed to delete processor for template ${this.id}, ${sig}. deleted ${deleted} times`
+      throw new ConnectError(
+        `Failed to delete processor for template ${this.id}, ${sig}. deleted ${deleted} times`,
+        Code.InvalidArgument
       )
     }
 
@@ -161,7 +168,7 @@ export abstract class IotaObjectOrAddressProcessorTemplate<
       }
     })
     ctx.sendTemplateInstance(
-      {
+      create(TemplateInstanceSchema, {
         templateId: this.id,
         contract: {
           name: '',
@@ -172,7 +179,7 @@ export abstract class IotaObjectOrAddressProcessorTemplate<
         startBlock: options.startCheckpoint || 0n,
         endBlock: options.endCheckpoint || 0n,
         baseLabels: options.baseLabels
-      },
+      }),
       true
     )
   }
@@ -204,10 +211,10 @@ export abstract class IotaObjectOrAddressProcessorTemplate<
   ): this {
     return this.onInterval(
       handler,
-      {
+      create(HandleIntervalSchema, {
         recentInterval: timeIntervalInMinutes,
         backfillInterval: backfillTimeIntervalInMinutes
-      },
+      }),
       undefined,
       type,
       fetchConfig
@@ -224,7 +231,10 @@ export abstract class IotaObjectOrAddressProcessorTemplate<
     return this.onInterval(
       handler,
       undefined,
-      { recentInterval: checkpointInterval, backfillInterval: backfillCheckpointInterval },
+      create(HandleIntervalSchema, {
+        recentInterval: checkpointInterval,
+        backfillInterval: backfillCheckpointInterval
+      }),
       type,
       fetchConfig
     )

@@ -27,7 +27,7 @@ export class CosmosProcessor {
     const callHandler = {
       handlerName: getHandlerName(),
       handler: async (call: Data_CosmosCall) => {
-        const transaction = call.transaction as CosmosTransaction
+        const transaction = call.transaction as unknown as CosmosTransaction
 
         const ctx = new CosmosContext(this.config.chainId, this.config.address, transaction)
 
@@ -46,7 +46,7 @@ export class CosmosProcessor {
         const p = handlerOptions?.partitionKey
         if (!p) return undefined
         if (typeof p === 'function') {
-          const transaction = call.transaction as CosmosTransaction
+          const transaction = call.transaction as unknown as CosmosTransaction
           return p(transaction)
         }
         return p

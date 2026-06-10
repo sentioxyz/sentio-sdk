@@ -13,7 +13,7 @@ export { AccountContext, ContractContext, GlobalContext, ContractView, BoundCont
 
 export { EthPlugin } from './eth-plugin.js'
 
-export { EthFetchConfig, PreprocessResult } from '@sentio/protos'
+export type { EthFetchConfig, PreprocessResult } from '@sentio/protos'
 
 export { EthChainId } from '@sentio/chain'
 

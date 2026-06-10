@@ -32,7 +32,8 @@ describe(' erc20 account transfer Examples', () => {
     expect(config.accountConfigs).length(1)
 
     expect(config.accountConfigs[0].address).equals(ADDRESS)
-    expect(config.accountConfigs[0].logConfigs[1].filters[0].address).equals(
+    const addressOrType = config.accountConfigs[0].logConfigs[1].filters[0].addressOrType
+    expect(addressOrType?.case === 'address' ? addressOrType.value : undefined).equals(
       '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'.toLowerCase()
     )
   })

@@ -1,4 +1,5 @@
-import { RecordMetaData } from '@sentio/protos'
+import { type RecordMetaData, RecordMetaDataSchema } from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
 import { type Labels, normalizeLabels } from '../index.js'
 import { MoveCoder, RichAptosClientWithContext } from './index.js'
 import {
@@ -12,7 +13,7 @@ import {
 import { defaultMoveCoder } from './move-coder.js'
 import { AptosNetwork } from './network.js'
 import { Endpoints } from '@sentio/runtime'
-import { ServerError, Status } from 'nice-grpc'
+import { ConnectError, Code } from '@connectrpc/connect'
 import { MoveContext } from '../move/index.js'
 import { GeneralTransactionResponse } from './models.js'
 
@@ -30,7 +31,7 @@ export abstract class AptosBaseContext extends MoveContext<AptosNetwork, MoveMod
   getClient(): RichAptosClientWithContext {
     const chainServer = Endpoints.INSTANCE.chainServer.get(this.network)
     if (!chainServer) {
-      throw new ServerError(Status.INTERNAL, 'RPC endpoint not provided')
+      throw new ConnectError('RPC endpoint not provided', Code.Internal)
     }
     const fullnode = chainServer + '/v1'
 
@@ -86,7 +87,7 @@ export class AptosTransactionContext<T extends GeneralTransactionResponse> exten
   }
 
   getMetaDataInternal(name: string, labels: Labels): RecordMetaData {
-    return {
+    return create(RecordMetaDataSchema, {
       address: this.address,
       contractName: this.moduleName,
       blockNumber: this.version,
@@ -96,7 +97,7 @@ export class AptosTransactionContext<T extends GeneralTransactionResponse> exten
       chainId: this.getChainId(),
       name: name,
       labels: normalizeLabels(labels)
-    }
+    })
   }
 }
 
@@ -120,7 +121,7 @@ export class AptosResourcesContext extends AptosBaseContext {
   }
 
   getMetaDataInternal(name: string, labels: Labels): RecordMetaData {
-    return {
+    return create(RecordMetaDataSchema, {
       address: this.address,
       contractName: 'resources',
       blockNumber: this.version,
@@ -130,6 +131,6 @@ export class AptosResourcesContext extends AptosBaseContext {
       chainId: this.getChainId(),
       name: name,
       labels: normalizeLabels(labels)
-    }
+    })
   }
 }

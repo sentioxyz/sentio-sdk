@@ -1,15 +1,20 @@
 import {
-  DataBinding,
+  type DataBinding,
   HandlerType,
-  PreparedData,
-  PreprocessResult,
-  ProcessConfigResponse,
-  ProcessResult,
-  ProcessStreamResponse_Partitions,
+  type PreparedData,
+  type PreprocessResult,
+  PreprocessResultSchema,
+  type ProcessConfigResponse,
+  type ProcessResult,
+  ProcessResultSchema,
+  type StartRequest,
+  StartRequestSchema,
+  type ProcessStreamResponse_Partitions,
+  ProcessStreamResponse_PartitionsSchema,
   ProcessStreamResponse_Partitions_Partition_SysValue,
-  StartRequest,
-  UpdateTemplatesRequest
+  type UpdateTemplatesRequest
 } from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
 import { IDataBindingContext, IStoreContext } from './db-context.js'
 import { AsyncLocalStorage } from 'node:async_hooks'
 
@@ -29,25 +34,28 @@ export abstract class Plugin {
   }
 
   async processBinding(request: DataBinding, preparedData: PreparedData | undefined): Promise<ProcessResult> {
-    return ProcessResult.create()
+    return create(ProcessResultSchema)
   }
 
   async preprocessBinding(request: DataBinding, preprocessStore: { [k: string]: any }): Promise<PreprocessResult> {
-    return PreprocessResult.create()
+    return create(PreprocessResultSchema)
   }
 
   async partition(request: DataBinding): Promise<ProcessStreamResponse_Partitions> {
-    return {
+    return create(ProcessStreamResponse_PartitionsSchema, {
       partitions: request.handlerIds.reduce(
         (acc, id) => ({
           ...acc,
           [id]: {
-            sysValue: ProcessStreamResponse_Partitions_Partition_SysValue.UNRECOGNIZED
+            value: {
+              case: 'sysValue',
+              value: ProcessStreamResponse_Partitions_Partition_SysValue.BLOCK_NUMBER
+            }
           }
         }),
         {}
       )
-    }
+    })
   }
 
   /**
@@ -147,9 +155,11 @@ export class PluginManager {
 
   async updateTemplates(request: UpdateTemplatesRequest) {
     for (const plugin of this.plugins) {
-      await plugin.start({
-        templateInstances: request.templateInstances
-      })
+      await plugin.start(
+        create(StartRequestSchema, {
+          templateInstances: request.templateInstances
+        })
+      )
     }
   }
 }

@@ -1,9 +1,10 @@
 import { describe, test } from 'node:test'
 import assert from 'node:assert'
-import { Struct } from '@sentio/protos'
+import { StructSchema } from '@sentio/protos'
+import { fromJson, toBinary, fromBinary, toJson } from '@bufbuild/protobuf'
 import { BigDecimal } from './big-decimal.js'
 import { normalizeAttribute, normalizeKey, normalizeLabels, normalizeToRichStruct } from './normalization.js'
-import { toBigDecimal, toBigInteger } from './numberish.js'
+import { toBigInteger, toBigDecimal } from './numberish.js'
 
 // TODO add test for type conversion
 describe('Normalization tests', () => {
@@ -15,8 +16,11 @@ describe('Normalization tests', () => {
 
     assert.strictEqual(typeof r1.nested.date, 'string')
 
-    const w1 = Struct.encode(Struct.wrap(r1))
-    const s2 = Struct.decode(w1.finish())
+    // google.protobuf.Struct is a plain JS object now; round-trip via the WKT codec.
+    const struct1 = fromJson(StructSchema, r1)
+    const bytes1 = toBinary(StructSchema, struct1)
+    const decoded1 = fromBinary(StructSchema, bytes1)
+    assert.deepStrictEqual(toJson(StructSchema, decoded1), r1)
 
     const t2 = {
       f: () => {}
@@ -29,8 +33,9 @@ describe('Normalization tests', () => {
       token1Symbol: 't2'
     }
     const r3 = normalizeAttribute(t3)
-    const w3 = Struct.encode(Struct.wrap(r3))
-    const s3 = Struct.decode(w3.finish())
+    const struct3 = fromJson(StructSchema, r3)
+    const decoded3 = fromBinary(StructSchema, toBinary(StructSchema, struct3))
+    assert.deepStrictEqual(toJson(StructSchema, decoded3), r3)
     console.log(r3)
   })
 
@@ -58,12 +63,18 @@ describe('Normalization tests', () => {
   test('normalize attributes to rich struct', async () => {
     const t1 = { a: 'a', n: 123, n2: 1233333333300000000000n, n3: BigDecimal(10.01), nested: { date: new Date() } }
     const r1 = normalizeToRichStruct(t1)
-    assert.deepStrictEqual(r1.fields['n2'], {
-      bigintValue: toBigInteger(1233333333300000000000n)
+    assert.deepStrictEqual(r1.fields['n2'].value, {
+      case: 'bigintValue',
+      value: toBigInteger(1233333333300000000000n)
     })
-    assert.deepStrictEqual(r1.fields['n3'].bigdecimalValue, toBigDecimal(BigDecimal(10.01)))
+    const n3 = r1.fields['n3'].value
+    assert.strictEqual(n3.case, 'bigdecimalValue')
+    assert.deepStrictEqual(n3.case === 'bigdecimalValue' ? n3.value : undefined, toBigDecimal(BigDecimal(10.01)))
 
-    assert.strictEqual(r1.fields['nested'].structValue?.fields['date'].timestampValue instanceof Date, true)
+    const nested = r1.fields['nested'].value
+    assert.strictEqual(nested.case, 'structValue')
+    const dateField = nested.case === 'structValue' ? nested.value.fields['date'].value : undefined
+    assert.strictEqual(dateField?.case, 'timestampValue')
   })
 
   test('normalize token to rich struct', async () => {
@@ -73,9 +84,9 @@ describe('Normalization tests', () => {
       nonToken: { token: { symbol: 'ETH' }, amount: 100, extraProp: 'extra' }
     }
     const r1 = normalizeToRichStruct(t1)
-    assert.notStrictEqual(r1.fields['tokenA'].tokenValue, undefined)
-    assert.notStrictEqual(r1.fields['tokenB'].tokenValue, undefined)
-    assert.strictEqual(r1.fields['nonToken'].tokenValue, undefined)
-    assert.notStrictEqual(r1.fields['nonToken'].structValue, undefined)
+    assert.strictEqual(r1.fields['tokenA'].value.case, 'tokenValue')
+    assert.strictEqual(r1.fields['tokenB'].value.case, 'tokenValue')
+    assert.notStrictEqual(r1.fields['nonToken'].value.case, 'tokenValue')
+    assert.strictEqual(r1.fields['nonToken'].value.case, 'structValue')
   })
 })

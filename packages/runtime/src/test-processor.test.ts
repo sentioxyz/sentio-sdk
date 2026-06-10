@@ -1,20 +1,31 @@
 import { Plugin, PluginManager } from './plugin.js'
-import { DataBinding, HandlerType, ProcessResult } from './gen/processor/protos/processor.js'
-import { AccountConfig, InitResponse, ProcessConfigResponse, ProcessStreamResponse_Partitions } from '@sentio/protos'
+import {
+  AccountConfigSchema,
+  type DataBinding,
+  HandlerType,
+  type InitResponse,
+  type ProcessConfigResponse,
+  type ProcessResult,
+  ProcessResultSchema,
+  type ProcessStreamResponse_Partitions,
+  ProcessStreamResponse_PartitionsSchema
+} from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
 
 export class TestPlugin extends Plugin {
   async processBinding(request: DataBinding): Promise<ProcessResult> {
     const dbContext = PluginManager.INSTANCE.dbContextLocalStorage.getStore()
     if (dbContext) {
       await dbContext.sendRequest({
-        get: {
+        case: 'get',
+        value: {
           entity: 'Test',
           id: '1'
         }
       })
     }
 
-    return ProcessResult.fromPartial({
+    return create(ProcessResultSchema, {
       states: {
         configUpdated: true
       }
@@ -23,17 +34,17 @@ export class TestPlugin extends Plugin {
   supportedHandlers = [HandlerType.UNKNOWN, HandlerType.ETH_LOG]
 
   async partition(request: DataBinding): Promise<ProcessStreamResponse_Partitions> {
-    return {
-      partitions: request.handlerIds.reduce(
+    return create(ProcessStreamResponse_PartitionsSchema, {
+      partitions: request.handlerIds.reduce<Record<number, { value: { case: 'userValue'; value: string } }>>(
         (acc, id) => ({
           ...acc,
           [id]: {
-            userValue: 'test'
+            value: { case: 'userValue', value: 'test' }
           }
         }),
         {}
       )
-    }
+    })
   }
 
   async init(config: InitResponse): Promise<void> {
@@ -42,7 +53,7 @@ export class TestPlugin extends Plugin {
 
   async configure(config: ProcessConfigResponse, forChainId?: string): Promise<void> {
     config.accountConfigs = [
-      AccountConfig.fromPartial({
+      create(AccountConfigSchema, {
         address: '0x',
         chainId: '1'
       })

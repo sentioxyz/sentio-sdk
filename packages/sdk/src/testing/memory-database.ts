@@ -1,13 +1,18 @@
 import { StoreContext } from '../store/context.js'
 import {
-  DBRequest,
-  DBRequest_DBFilter,
+  type DBRequest,
+  type DBRequest_DBFilter,
   DBRequest_DBOperator,
-  ProcessStreamResponse,
-  RichStruct,
-  RichValue,
-  RichValueList
+  DBResponseSchema,
+  type ProcessStreamResponse,
+  type RichStruct,
+  type RichValue,
+  RichValueSchema,
+  type RichValueList,
+  RichValueListSchema,
+  timestampNow
 } from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
 import { GraphQLField, GraphQLSchema, parse, StringValueNode } from 'graphql/index.js'
 import { DatabaseSchemaState } from '../core/database-schema.js'
 import { buildSchema } from '../store/schema.js'
@@ -43,10 +48,9 @@ export class MemoryDatabase {
   }
 
   start() {
-    // The subject is typed `DeepPartial<ProcessStreamResponse>`, but at runtime it always carries a
-    // full response. Match the subscriber's parameter type and narrow inside (a bound method with the
-    // narrower `ProcessStreamResponse` parameter is rejected under `strictFunctionTypes`).
-    this.dbContext.subject.subscribe((request) => this.processRequest(request as ProcessStreamResponse))
+    // The subject is typed as the `ProcessStreamResponse` init-shape, but at runtime it always carries a
+    // full response (the store context emits the complete oneof). Treat it as a full message and narrow inside.
+    this.dbContext.subject.subscribe((request) => this.processRequest(request as unknown as ProcessStreamResponse))
   }
 
   stop() {
@@ -114,20 +118,25 @@ export class MemoryDatabase {
               if (elemDb) {
                 for (const elemID of Object.keys(elemDb)) {
                   const value = elemDb[elemID]
-                  const deriveField = value.fields[derivedFrom]
+                  const deriveField: RichValue | undefined = value.fields[derivedFrom]
                   let hasRelation = false
-                  if (deriveField?.stringValue === id) {
+                  if (deriveField?.value.case === 'stringValue' && deriveField.value.value === id) {
                     hasRelation = true
                   }
-                  if (deriveField?.listValue) {
-                    hasRelation = deriveField.listValue.values.some((v: any) => v.stringValue === id)
+                  if (deriveField?.value.case === 'listValue') {
+                    hasRelation = deriveField.value.value.values.some(
+                      (v) => v.value.case === 'stringValue' && v.value.value === id
+                    )
                   }
                   if (hasRelation) {
-                    const arr = result.fields[field.name]
-                    if (arr) {
-                      arr.listValue.values.push({ stringValue: elemID })
+                    const arr: RichValue | undefined = result.fields[field.name]
+                    const elem = create(RichValueSchema, { value: { case: 'stringValue', value: elemID } })
+                    if (arr && arr.value.case === 'listValue') {
+                      arr.value.value.values.push(elem)
                     } else {
-                      result.fields[field.name] = { listValue: { values: [{ stringValue: elemID }] } }
+                      result.fields[field.name] = create(RichValueSchema, {
+                        value: { case: 'listValue', value: { values: [elem] } }
+                      })
                     }
                   }
                 }
@@ -141,7 +150,7 @@ export class MemoryDatabase {
   }
 
   private processRequest(request: ProcessStreamResponse) {
-    const req = request.dbRequest
+    const req = request.value.case === 'dbRequest' ? request.value.value : undefined
 
     // Check if schema is required for this request
     const requiresSchema = this.requestRequiresSchema(req)
@@ -152,58 +161,63 @@ export class MemoryDatabase {
 
     this.lastDbRequest = req
     if (req) {
-      if (req.upsert) {
-        const { entityData, entity } = req.upsert
+      if (req.op.case === 'upsert') {
+        const { entityData, entity } = req.op.value
         entityData.forEach((d, i) => {
-          const id = d.fields['id'].stringValue!
+          const idField = d.fields['id']
+          const id = idField?.value.case === 'stringValue' ? idField.value.value : ''
           const entityName = entity[i]
           this.upsert(entityName, id, d)
         })
 
-        this.dbContext.result({
-          opId: req.opId
-        })
+        this.dbContext.result(create(DBResponseSchema, { opId: req.opId }))
       }
-      if (req.delete) {
-        const { id, entity } = req.delete
+      if (req.op.case === 'delete') {
+        const { id, entity } = req.op.value
         id.forEach((i, idx) => {
           const entityName = entity[idx]
           this.delete(entityName, i)
         })
-        this.dbContext.result({
-          opId: req.opId
-        })
+        this.dbContext.result(create(DBResponseSchema, { opId: req.opId }))
       }
 
-      if (req.get) {
-        const { entity, id } = req.get
+      if (req.op.case === 'get') {
+        const { entity, id } = req.op.value
         const data = this.getById(entity, id)
-        this.dbContext.result({
-          opId: req.opId,
-          // entities: { entities: data ? [data] : [] },
-          entityList: {
-            entities: data ? [toEntity(data)] : []
-          }
-        })
+        this.dbContext.result(
+          create(DBResponseSchema, {
+            opId: req.opId,
+            value: {
+              case: 'entityList',
+              value: {
+                entities: data ? [toEntity(data)] : []
+              }
+            }
+          })
+        )
       }
-      if (req.list) {
-        const { entity, cursor, filters } = req.list
+      if (req.op.case === 'list') {
+        const { entity, cursor, filters } = req.op.value
         const list = this.listEntities(entity, filters)
 
         if (cursor) {
           const idx = parseInt(cursor)
 
-          this.dbContext.result({
-            opId: req.opId,
-            entityList: { entities: list.slice(idx, idx + 1).map((d) => toEntity(d)) },
-            nextCursor: idx + 1 < list.length ? `${idx + 1}` : undefined
-          })
+          this.dbContext.result(
+            create(DBResponseSchema, {
+              opId: req.opId,
+              value: { case: 'entityList', value: { entities: list.slice(idx, idx + 1).map((d) => toEntity(d)) } },
+              nextCursor: idx + 1 < list.length ? `${idx + 1}` : undefined
+            })
+          )
         } else {
-          this.dbContext.result({
-            opId: req.opId,
-            entityList: { entities: list.length ? [toEntity(list[0])] : [] },
-            nextCursor: '1'
-          })
+          this.dbContext.result(
+            create(DBResponseSchema, {
+              opId: req.opId,
+              value: { case: 'entityList', value: { entities: list.length ? [toEntity(list[0])] : [] } },
+              nextCursor: '1'
+            })
+          )
         }
       }
     }
@@ -218,19 +232,18 @@ export class MemoryDatabase {
     if (!req) return false
 
     // Check if all entities in the request are MemoryCacheItem
-    if (req.upsert) {
-      return !req.upsert.entity.every((e) => e === MEMORY_CACHE_ITEM_ENTITY)
+    switch (req.op.case) {
+      case 'upsert':
+        return !req.op.value.entity.every((e) => e === MEMORY_CACHE_ITEM_ENTITY)
+      case 'delete':
+        return !req.op.value.entity.every((e) => e === MEMORY_CACHE_ITEM_ENTITY)
+      case 'get':
+        return req.op.value.entity !== MEMORY_CACHE_ITEM_ENTITY
+      case 'list':
+        return req.op.value.entity !== MEMORY_CACHE_ITEM_ENTITY
+      default:
+        return false
     }
-    if (req.delete) {
-      return !req.delete.entity.every((e) => e === MEMORY_CACHE_ITEM_ENTITY)
-    }
-    if (req.get) {
-      return req.get.entity !== MEMORY_CACHE_ITEM_ENTITY
-    }
-    if (req.list) {
-      return req.list.entity !== MEMORY_CACHE_ITEM_ENTITY
-    }
-    return false
   }
 
   private listEntities(entity: string, filters?: DBRequest_DBFilter[]) {
@@ -271,23 +284,32 @@ function filter(entity: RichStruct, filter: DBRequest_DBFilter) {
     case DBRequest_DBOperator.LE:
       return lessThan(value, filter.value) || equal(value, filter.value)
     case DBRequest_DBOperator.IN:
-      return filter.value?.values.some((v) => equal(value, { values: [v] }))
+      return filter.value?.values.some((v) => equal(value, singleList(v)))
     case DBRequest_DBOperator.NOT_IN:
-      return !filter.value?.values.some((v) => equal(value, { values: [v] }))
+      return !filter.value?.values.some((v) => equal(value, singleList(v)))
     case DBRequest_DBOperator.HAS_ALL:
-      return filter.value?.values.every((v) => equal(value, { values: [v] }))
+      return filter.value?.values.every((v) => equal(value, singleList(v)))
     case DBRequest_DBOperator.HAS_ANY:
       for (const a of filter.value?.values ?? []) {
-        if ((value.listValue?.values ?? []).some((v) => equal(a, { values: [v] }))) {
+        const listValues = value.value.case === 'listValue' ? value.value.value.values : []
+        if (listValues.some((v) => equal(a, singleList(v)))) {
           return true
         }
       }
       return false
     case DBRequest_DBOperator.LIKE:
-      return like(value.stringValue, filter.value?.values[0]?.stringValue)
+      return like(richString(value), filter.value?.values[0] ? richString(filter.value.values[0]) : undefined)
     default:
       return false
   }
+}
+
+function singleList(v: RichValue): RichValueList {
+  return create(RichValueListSchema, { values: [v] })
+}
+
+function richString(v?: RichValue): string | undefined {
+  return v?.value.case === 'stringValue' ? v.value.value : undefined
 }
 
 function getValue(entity: RichStruct, field: string) {
@@ -295,13 +317,13 @@ function getValue(entity: RichStruct, field: string) {
 }
 
 function equal(field: RichValue, value?: RichValueList): boolean {
-  if (field.stringValue !== undefined) {
-    return field.stringValue === value?.values[0]?.stringValue
+  if (field.value.case === 'stringValue') {
+    return field.value.value === richString(value?.values[0])
   }
-  if (field.listValue) {
-    return field.listValue.values.every((v, i) => {
+  if (field.value.case === 'listValue') {
+    return field.value.value.values.every((v, i) => {
       const vv = value?.values[i]
-      return equal(v, vv ? { values: [vv] } : undefined)
+      return equal(v, vv ? singleList(vv) : undefined)
     })
   }
   const a = toNumber(field)
@@ -338,19 +360,21 @@ function lessThan(field: RichValue, value: RichValueList | undefined) {
 }
 
 function toNumber(value?: RichValue) {
-  if (value?.intValue !== undefined) {
-    return value.intValue
+  if (value === undefined) {
+    return undefined
   }
-  if (value?.floatValue !== undefined) {
-    return value.floatValue
+  switch (value.value.case) {
+    case 'intValue':
+      return value.value.value
+    case 'floatValue':
+      return value.value.value
+    case 'bigintValue':
+      return BigIntConverter.to(value) as bigint
+    case 'bigdecimalValue':
+      return BigDecimalConverter.to(value) as BigDecimal
+    default:
+      return undefined
   }
-  if (value?.bigintValue !== undefined) {
-    return BigIntConverter.to(value) as bigint
-  }
-  if (value?.bigdecimalValue !== undefined) {
-    return BigDecimalConverter.to(value) as BigDecimal
-  }
-  return undefined
 }
 
 function toEntity(data: any) {
@@ -358,7 +382,7 @@ function toEntity(data: any) {
     entity: data.entity,
     genBlockChain: '',
     genBlockNumber: 0n,
-    genBlockTime: new Date(),
+    genBlockTime: timestampNow(),
     data: { fields: data.fields }
   }
 }

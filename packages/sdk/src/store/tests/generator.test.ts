@@ -2,19 +2,21 @@ import { describe, it } from 'node:test'
 import { Subject } from 'rxjs'
 import { from } from 'ix/asynciterable'
 import {
-  DBRequest,
-  DBResponse,
-  DeepPartial,
-  ProcessResult,
-  ProcessStreamRequest,
-  ProcessStreamResponse
+  type DBResponse,
+  ProcessResultSchema,
+  ProcessStreamRequestSchema,
+  ProcessStreamResponseSchema
 } from '@sentio/protos'
+import { create, type MessageInitShape } from '@bufbuild/protobuf'
 import { withAbort } from 'ix/Ix.asynciterable.operators'
+
+type ProcessStreamRequestInit = MessageInitShape<typeof ProcessStreamRequestSchema>
+type ProcessStreamResponseInit = MessageInitShape<typeof ProcessStreamResponseSchema>
 
 class AsyncContext {
   private defers = new Map<bigint, { resolve: (value: any) => void; reject: (reason?: any) => void }>()
 
-  subject = new Subject<DeepPartial<ProcessStreamResponse>>()
+  subject = new Subject<ProcessStreamResponseInit>()
 
   newPromise(opId: bigint) {
     return new Promise((resolve, reject) => {
@@ -26,10 +28,10 @@ class AsyncContext {
     const opId = dbResult.opId
     const defer = this.defers.get(opId)
     if (defer) {
-      if (dbResult.error) {
-        defer.reject(dbResult.error)
+      if (dbResult.value.case === 'error') {
+        defer.reject(dbResult.value.value)
       } else {
-        defer.resolve(dbResult.data)
+        defer.resolve(dbResult.value.case === 'entityList' ? dbResult.value.value : undefined)
       }
       this.defers.delete(opId)
     }
@@ -44,11 +46,17 @@ class DB {
   async get(id: number): Promise<any> {
     const opId = this.opCounter++
     this.context.subject.next({
-      dbRequest: {
-        opId,
-        get: {
-          entity: 'test',
-          id: id + ''
+      value: {
+        case: 'dbRequest',
+        value: {
+          opId,
+          op: {
+            case: 'get',
+            value: {
+              entity: 'test',
+              id: id + ''
+            }
+          }
         }
       }
     })
@@ -58,34 +66,34 @@ class DB {
 }
 
 describe('Test generators', () => {
-  async function userFunction(db: DB): Promise<ProcessResult> {
+  async function userFunction(db: DB) {
     const result = await db.get(1)
     console.log('db returns ', result)
     const result2 = await db.get(2)
     console.log('db returns ', result2)
-    return ProcessResult.fromPartial({})
+    return create(ProcessResultSchema, {})
   }
 
-  function processBinding(binding: ProcessStreamRequest, context: AsyncContext) {
+  function processBinding(binding: { processId: number }, context: AsyncContext) {
     const db = new DB(context)
     userFunction(db).then((result) => {
       db.context.subject.next({
-        result,
+        value: { case: 'result', value: result },
         processId: binding.processId
       })
       db.context.subject.complete()
     })
   }
 
-  async function* processBindingsStream(requests: AsyncIterable<ProcessStreamRequest>, signal: AbortSignal) {
+  async function* processBindingsStream(requests: AsyncIterable<ProcessStreamRequestInit>, signal: AbortSignal) {
     const dbContext = new AsyncContext()
     new Promise(async (resolve, reject) => {
       for await (const request of requests) {
-        if (request.binding) {
-          processBinding(request, dbContext)
+        if (request.value?.case === 'binding') {
+          processBinding({ processId: request.processId ?? 0 }, dbContext)
         }
-        if (request.dbResult) {
-          dbContext.result(request.dbResult)
+        if (request.value?.case === 'dbResult') {
+          dbContext.result(request.value.value as DBResponse)
         }
       }
       resolve(null)
@@ -95,13 +103,25 @@ describe('Test generators', () => {
     yield* from(dbContext.subject).pipe(withAbort(signal))
   }
 
-  function dbServer(request: DeepPartial<DBRequest>): DBResponse {
-    if (request.get) {
+  function dbServer(request: {
+    opId: bigint
+    op: { case?: string; value?: any }
+  }): MessageInitShape<typeof ProcessStreamRequestSchema>['value'] {
+    if (request.op.case === 'get') {
       return {
-        opId: request.opId!,
-        data: {
-          id: request.get.id,
-          name: request.get.entity
+        case: 'dbResult',
+        value: {
+          opId: request.opId,
+          value: {
+            case: 'entityList',
+            value: {
+              entities: [
+                {
+                  entity: request.op.value.entity
+                }
+              ]
+            }
+          }
         }
       }
     }
@@ -109,30 +129,31 @@ describe('Test generators', () => {
   }
 
   it('should generate values', async () => {
-    const requests = new Subject<ProcessStreamRequest>()
+    const requests = new Subject<ProcessStreamRequestInit>()
     setTimeout(() => {
       requests.next({
         processId: 0,
-        binding: {
-          handlerIds: [],
-          handlerType: 0,
-          data: {},
-          chainId: '1'
+        value: {
+          case: 'binding',
+          value: {
+            handlerIds: [],
+            handlerType: 0,
+            data: {},
+            chainId: '1'
+          }
         }
       })
     }, 10)
     for await (const v of processBindingsStream(from(requests), new AbortController().signal)) {
-      if (v.dbRequest) {
-        console.log('db request', v.dbRequest)
-        if (v.dbRequest) {
-          requests.next({
-            processId: v.processId!,
-            dbResult: dbServer(v.dbRequest)
-          })
-        }
+      if (v.value?.case === 'dbRequest') {
+        console.log('db request', v.value.value)
+        requests.next({
+          processId: v.processId ?? 0,
+          value: dbServer(v.value.value as { opId: bigint; op: { case?: string; value?: any } })
+        })
       }
-      if (v.result) {
-        console.log('result', v.result)
+      if (v.value?.case === 'result') {
+        console.log('result', v.value.value)
       }
     }
   })

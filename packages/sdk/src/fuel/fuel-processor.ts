@@ -1,4 +1,13 @@
-import { Data_FuelBlock, Data_FuelTransaction, Data_FuelReceipt, HandleInterval, ProcessResult } from '@sentio/protos'
+import {
+  Data_FuelBlock,
+  Data_FuelTransaction,
+  Data_FuelReceipt,
+  HandleInterval,
+  HandleIntervalSchema,
+  ProcessResultSchema,
+  timestampDate
+} from '@sentio/protos'
+import { create } from '@bufbuild/protobuf'
 import { FuelCall, FuelContext, FuelContractContext } from './context.js'
 import { bn, Contract, InputType, Interface, JsonAbi, Provider, ReceiptTransfer, ReceiptTransferOut } from 'fuels'
 import { FuelNetwork, getProvider } from './network.js'
@@ -22,7 +31,7 @@ import {
   ReceiptHandler
 } from './types.js'
 import { PromiseOrVoid, HandlerOptions } from '../core/index.js'
-import { ServerError, Status } from 'nice-grpc'
+import { ConnectError, Code } from '@connectrpc/connect'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 
 export class FuelProcessor<TContract extends Contract> implements FuelBaseProcessor<FuelProcessorConfig> {
@@ -100,7 +109,7 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
           this.getContract(tx),
           this.config.address,
           this.config.name ?? this.config.address,
-          call.timestamp || new Date(0),
+          call.timestamp ? timestampDate(call.timestamp) : new Date(0),
           tx,
           null
         )
@@ -170,7 +179,7 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
             this.config.chainId,
             this.config.address,
             this.config.name ?? this.config.address,
-            call.timestamp || new Date(0),
+            call.timestamp ? timestampDate(call.timestamp) : new Date(0),
             tx,
             null
           )
@@ -192,7 +201,7 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
           return ctx.stopAndGetResult()
         } catch (e) {
           console.error(e)
-          return ProcessResult.fromPartial({})
+          return create(ProcessResultSchema)
         }
       },
       fetchConfig: {
@@ -225,7 +234,7 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
               this.getContract(tx),
               this.config.address,
               this.config.name ?? this.config.address,
-              timestamp || new Date(0),
+              timestamp ? timestampDate(timestamp) : new Date(0),
               tx,
               null
             )
@@ -239,11 +248,14 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
           console.error(e)
         }
 
-        return ProcessResult.fromPartial({})
+        return create(ProcessResultSchema)
       },
       receiptConfig: {
-        log: {
-          logIds: Array.from(logIds)
+        receiptFilter: {
+          case: 'log',
+          value: {
+            logIds: Array.from(logIds)
+          }
         }
       },
       partitionHandler: async (data: Data_FuelReceipt): Promise<string | undefined> => {
@@ -291,7 +303,7 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
             this.getContract(tx),
             this.config.address,
             this.config.name ?? this.config.address,
-            timestamp || new Date(0),
+            timestamp ? timestampDate(timestamp) : new Date(0),
             tx,
             null
           )
@@ -301,13 +313,16 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
           console.error(e)
         }
 
-        return ProcessResult.fromPartial({})
+        return create(ProcessResultSchema)
       },
       receiptConfig: {
-        transfer: {
-          from,
-          to,
-          assetId
+        receiptFilter: {
+          case: 'transfer',
+          value: {
+            from,
+            to,
+            assetId
+          }
         }
       },
       partitionHandler: async (data: Data_FuelReceipt): Promise<string | undefined> => {
@@ -351,9 +366,9 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
       timeIntervalInMinutes: timeInterval,
       handlerName,
       handler: async function (data: Data_FuelBlock) {
-        const header = data.block
+        const header = data.block as any
         if (!header) {
-          throw new ServerError(Status.INVALID_ARGUMENT, 'Block is empty')
+          throw new ConnectError('Block is empty', Code.InvalidArgument)
         }
 
         const block: FuelBlock = {
@@ -377,7 +392,7 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
           contract,
           processor.config.address,
           processor.config.name ?? processor.config.address,
-          data.timestamp || new Date(0),
+          data.timestamp ? timestampDate(data.timestamp) : new Date(0),
           null,
           block
         )
@@ -388,7 +403,7 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
         const p = handlerOptions?.partitionKey
         if (!p) return undefined
         if (typeof p === 'function') {
-          const header = data.block
+          const header = data.block as any
           if (!header) return undefined
           const block: FuelBlock = {
             id: header.id,
@@ -422,10 +437,10 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
     return this.onInterval(
       handler,
       undefined,
-      {
+      create(HandleIntervalSchema, {
         recentInterval: blockInterval,
         backfillInterval: backfillBlockInterval
-      },
+      }),
       handlerOptions
     )
   }
@@ -438,7 +453,10 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
   ): this {
     return this.onInterval(
       handler,
-      { recentInterval: timeIntervalInMinutes, backfillInterval: backfillTimeIntervalInMinutes },
+      create(HandleIntervalSchema, {
+        recentInterval: timeIntervalInMinutes,
+        backfillInterval: backfillTimeIntervalInMinutes
+      }),
       undefined,
       handlerOptions
     )
