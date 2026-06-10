@@ -1,10 +1,20 @@
-import { type EthCallParam, type ProcessResult, ProcessResultSchema, StateResultSchema } from '@sentio/protos'
+import {
+  type EthCallParam,
+  HandlerType,
+  type ProcessResult,
+  ProcessResultSchema,
+  RuntimeInfoSchema,
+  StateResultSchema
+} from '@sentio/protos'
 import { create } from '@bufbuild/protobuf'
 import { createRequire } from 'module'
 
 import { Required } from 'utility-types'
 import path from 'path'
 import fs from 'fs'
+;(BigInt.prototype as any).toJSON = function () {
+  return this.toString()
+}
 
 export function mergeProcessResults(results: ProcessResult[]): Required<ProcessResult, 'states'> {
   const res = create(ProcessResultSchema, {
@@ -32,6 +42,16 @@ export function mergeProcessResultsInPlace(
     })
   }
   return res as Required<ProcessResult, 'states'>
+}
+
+export function recordRuntimeInfo(results: ProcessResult, handlerType: HandlerType) {
+  for (const list of [results.gauges, results.counters, results.events, results.exports]) {
+    list.forEach((e) => {
+      e.runtimeInfo = create(RuntimeInfoSchema, {
+        from: handlerType
+      })
+    })
+  }
 }
 
 function mergeArrayInPlace<T>(dst: T[], src: T[]): T[] {
