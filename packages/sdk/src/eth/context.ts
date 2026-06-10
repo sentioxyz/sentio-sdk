@@ -1,5 +1,12 @@
 import { BaseContract, Overrides } from 'ethers'
-import { LogParams, BlockParams, TransactionReceiptParams, TransactionResponseParams } from 'ethers/providers'
+import {
+  allowNull,
+  LogParams,
+  BlockParams,
+  TransactionReceiptParams,
+  TransactionResponseParams
+} from 'ethers/providers'
+import { getNumber } from 'ethers/utils'
 
 import {
   type EthCallContext,
@@ -87,7 +94,9 @@ export abstract class EthContext extends BaseContext {
         address: this.address,
         contractName: this.getContractName(),
         blockNumber: BigInt(this.blockNumber),
-        transactionIndex: this.trace.transactionPosition,
+        // Traces are used as a raw `as Trace` cast (no Formatted wrapper), so transactionPosition
+        // may be a hex string from raw RPC; coerce for the int32 field (default 0 when absent).
+        transactionIndex: allowNull(getNumber, 0)(this.trace.transactionPosition),
         transactionHash: this.transactionHash || '',
         logIndex: -1,
         chainId: this.chainId.toString(),
