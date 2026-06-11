@@ -17,10 +17,9 @@ import { PluginManager } from './plugin.js'
 import { Subject } from 'rxjs'
 import { from } from 'ix/asynciterable'
 import { withAbort } from 'ix/asynciterable/operators'
-import { errorString } from './utils.js'
+import { errorString, recordRuntimeInfo } from './utils.js'
 
 import { processMetrics } from './metrics.js'
-import { recordRuntimeInfo } from './service.js'
 import { DataBindingContext } from './db-context.js'
 import { freezeGlobalConfig } from './global-config.js'
 import { ProcessorRuntimeOptions } from './processor-runner-program.js'
@@ -168,6 +167,8 @@ export class ProcessorServiceImplV3 implements ServiceImpl<typeof ProcessorV3> {
     PluginManager.INSTANCE.processBinding(binding, undefined, context)
       .then(async (result) => {
         await context.awaitPendings()
+        recordRuntimeInfo(result, binding.handlerType)
+
         const timeseriesResult = result.timeseriesResult
         for (let i = 0; i < timeseriesResult.length; i += TIME_SERIES_RESULT_BATCH_SIZE) {
           const batch = timeseriesResult.slice(i, i + TIME_SERIES_RESULT_BATCH_SIZE)
@@ -188,7 +189,6 @@ export class ProcessorServiceImplV3 implements ServiceImpl<typeof ProcessorV3> {
             value: WRITE_V2_EVENT_LOGS ? otherResults : create(ProcessResultSchema, { states: result.states })
           }
         })
-        recordRuntimeInfo(result, binding.handlerType)
       })
       .catch((e) => {
         console.error(e, e.stack)

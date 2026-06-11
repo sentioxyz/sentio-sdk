@@ -23,7 +23,7 @@ import {
 import type { AccessList } from 'ethers/transaction'
 import { ContractContext } from './context.js'
 import { getAddress } from 'ethers/address'
-import { getBigInt } from 'ethers/utils'
+import { getBigInt, getNumber } from 'ethers/utils'
 import { type EthCallContext, type EthCallParam, EthCallParamSchema } from '@sentio/protos'
 import { create } from '@bufbuild/protobuf'
 import { ALL_ADDRESS } from '../core/index.js'
@@ -127,14 +127,14 @@ class FormattedTransactionReceipt implements TransactionReceiptParams {
     return this.data.transactionHash
   }
   get index(): number {
-    return this.data.transactionIndex
+    return getNumber(this.data.transactionIndex)
   }
 
   get blockHash(): string {
     return this.data.blockHash
   }
   get blockNumber(): number {
-    return this.data.blockNumber
+    return getNumber(this.data.blockNumber)
   }
   get logsBloom(): string {
     return this.data.logsBloom
@@ -179,10 +179,10 @@ class FormattedTransactionReceipt implements TransactionReceiptParams {
     return this._l1Fee !== undefined ? this._l1Fee : (this._l1Fee = allowNull(getBigInt)(this.data.l1Fee))
   }
   get type(): number {
-    return this.data.type
+    return allowNull(getNumber, 0)(this.data.type)
   }
   get status(): number | null {
-    return this.data.status
+    return allowNull(getNumber)(this.data.status)
   }
   get root(): string | null {
     return this.data.root
@@ -198,7 +198,7 @@ export class FormattedLog implements LogParams {
     return this.raw.blockHash
   }
   get blockNumber(): number {
-    return this.raw.blockNumber
+    return getNumber(this.raw.blockNumber)
   }
   get removed(): boolean {
     return this.raw.removed
@@ -214,11 +214,14 @@ export class FormattedLog implements LogParams {
   }
 
   get transactionIndex(): number {
-    return this.raw.transactionIndex
+    // Raw RPC logs carry these as hex strings (e.g. "0xf3"); coerce so the value honors the
+    // declared `number` type and is valid for the int32 RecordMetaData fields it feeds.
+    // (Restores the getNumber coercion that ethers' formatLog applied before #1411.)
+    return getNumber(this.raw.transactionIndex)
   }
 
   get index(): number {
-    return this.raw.logIndex
+    return getNumber(this.raw.logIndex)
   }
 
   get data(): string {
@@ -300,7 +303,7 @@ class FormattedTransactionResponse implements TransactionResponseParams {
   constructor(readonly raw: any) {}
 
   get blockNumber(): number | null {
-    return this.raw.blockNumber
+    return allowNull(getNumber)(this.raw.blockNumber)
   }
   _blockHash: string | undefined | null
   get blockHash(): string | null {
@@ -318,13 +321,15 @@ class FormattedTransactionResponse implements TransactionResponseParams {
     return this.raw.hash
   }
   get index(): number {
-    return this.raw.transactionIndex
+    // transactionIndex is absent for pending/partial txs; default to 0 (matches the prior
+    // `this.transaction.index || 0` handling) while still coercing hex strings when present.
+    return allowNull(getNumber, 0)(this.raw.transactionIndex)
   }
   get type(): number {
     if (this.raw.type === '0x' || this.raw.type == null) {
       return 0
     }
-    return this.raw.type
+    return getNumber(this.raw.type)
   }
   _to: string | null
   get to(): string | null {
@@ -341,7 +346,7 @@ class FormattedTransactionResponse implements TransactionResponseParams {
     return this._from ?? (this._from = getAddress(this.raw.from))
   }
   get nonce(): number {
-    return this.raw.nonce
+    return getNumber(this.raw.nonce)
   }
   _gasLimit: bigint
   get gasLimit(): bigint {
