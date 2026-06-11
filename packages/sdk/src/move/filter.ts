@@ -33,7 +33,7 @@ export interface ArgumentsFilter {
   arguments?: string[]
 }
 
-export class EventHandler<T> {
+export interface EventHandler<T> {
   filters: EventFilter[]
   handlerName: string
   handler: (event: T) => Promise<ProcessResult>
@@ -41,7 +41,7 @@ export class EventHandler<T> {
   partitionHandler?: (event: T) => Promise<string | undefined>
 }
 
-export class CallHandler<T> {
+export interface CallHandler<T> {
   filters: FunctionNameAndCallFilter[]
   handlerName: string
   handler: (call: T) => Promise<ProcessResult>
@@ -49,20 +49,20 @@ export class CallHandler<T> {
   partitionHandler?: (call: T) => Promise<string | undefined>
 }
 
-export class ObjectChangeHandler<T> {
+export interface ObjectChangeHandler<T> {
   handlerName: string
   handler: (call: T) => Promise<ProcessResult>
   type: string | string[]
 }
 
-export class ResourceChangeHandler<T> {
+export interface ResourceChangeHandler<T> {
   handlerName: string
   handler: (call: T) => Promise<ProcessResult>
   type: string | string[]
   partitionHandler?: (call: T) => Promise<string | undefined>
 }
 
-export class ResourceIntervalHandler {
+export interface ResourceIntervalHandler {
   type?: string | string[]
   versionInterval?: HandleInterval
   timeIntervalInMinutes?: HandleInterval
@@ -72,7 +72,7 @@ export class ResourceIntervalHandler {
   partitionHandler?: (resource: Data_AptResource) => Promise<string | undefined>
 }
 
-export class TransactionIntervalHandler {
+export interface TransactionIntervalHandler {
   versionInterval?: HandleInterval
   timeIntervalInMinutes?: HandleInterval
   handler: (tx: Data_AptCall) => Promise<ProcessResult>

@@ -20,9 +20,9 @@ export const MovementNetwork = <const>{
   TEST_NET: AptosChainId.APTOS_MOVEMENT_TESTNET
 }
 
-export class AptosBindOptions {
+export interface AptosBindOptions {
   address: string
-  network?: AptosNetwork = AptosNetwork.MAIN_NET
+  network?: AptosNetwork
   client?: Aptos
   startVersion?: bigint | number
   endVersion?: bigint | number

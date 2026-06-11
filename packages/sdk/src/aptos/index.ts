@@ -8,7 +8,7 @@ export {
 } from './aptos-processor.js'
 export { AptosResourceProcessorTemplate } from './aptos-resource-processor-template.js'
 export { AptosContext, AptosResourcesContext } from './context.js'
-export { AptosBindOptions, AptosNetwork, MovementNetwork } from './network.js'
+export { type AptosBindOptions, AptosNetwork, MovementNetwork } from './network.js'
 export { type ResourceChange } from '@typemove/aptos'
 export * from './api.js'
 

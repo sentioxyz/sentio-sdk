@@ -53,6 +53,7 @@ export class SimpleEthersError extends Error {
 
   constructor(message: string, e: Error, stack?: string) {
     super(message)
+    this.e = e
     this.stack = stack
   }
 
@@ -112,7 +113,7 @@ class FormattedTransactionReceipt implements TransactionReceiptParams {
   get to(): string | null {
     return this._to !== undefined ? this._to : (this._to = allowNull(getAddress)(this._to))
   }
-  _from: string
+  _from?: string
   get from() {
     return this._from ?? (this._from = getAddress(this.data.from))
   }
@@ -139,11 +140,11 @@ class FormattedTransactionReceipt implements TransactionReceiptParams {
   get logsBloom(): string {
     return this.data.logsBloom
   }
-  _logs: LogParams[]
+  _logs?: LogParams[]
   get logs(): readonly LogParams[] {
     return this._logs ?? (this._logs = arrayOf(formatLog, true)(this.data.logs))
   }
-  _gasUsed: bigint
+  _gasUsed?: bigint
   get gasUsed(): bigint {
     return this._gasUsed ?? (this._gasUsed = getBigInt(this.data.gasUsed))
   }
@@ -154,7 +155,7 @@ class FormattedTransactionReceipt implements TransactionReceiptParams {
       ? this._blobGasUsed
       : (this._blobGasUsed = allowNull(getBigInt)(this.data.blobGasUsed))
   }
-  _cumulativeGasUsed: bigint
+  _cumulativeGasUsed?: bigint
   get cumulativeGasUsed(): bigint {
     return this._cumulativeGasUsed ?? (this._cumulativeGasUsed = getBigInt(this.data.cumulativeGasUsed))
   }
@@ -204,7 +205,7 @@ export class FormattedLog implements LogParams {
     return this.raw.removed
   }
 
-  _address: string
+  _address?: string
   get address(): string {
     return this._address ?? (this._address = getAddress(this.raw.address))
   }
@@ -331,7 +332,7 @@ class FormattedTransactionResponse implements TransactionResponseParams {
     }
     return getNumber(this.raw.type)
   }
-  _to: string | null
+  _to?: string | null
   get to(): string | null {
     if (this._to != null) {
       return this._to
@@ -341,21 +342,21 @@ class FormattedTransactionResponse implements TransactionResponseParams {
     }
     return (this._to = allowNull(getAddress)(this.raw.to))
   }
-  _from: string
+  _from?: string
   get from(): string {
     return this._from ?? (this._from = getAddress(this.raw.from))
   }
   get nonce(): number {
     return getNumber(this.raw.nonce)
   }
-  _gasLimit: bigint
+  _gasLimit?: bigint
   get gasLimit(): bigint {
     return this._gasLimit ?? (this._gasLimit = getBigInt(this.raw.gasLimit ?? this.raw.gas))
   }
   get gas(): bigint | null {
     return this.gasLimit
   }
-  _gasPrice: bigint
+  _gasPrice?: bigint
   get gasPrice(): bigint {
     return this._gasPrice ?? (this._gasPrice = getBigInt(this.raw.gasPrice))
   }
@@ -380,7 +381,7 @@ class FormattedTransactionResponse implements TransactionResponseParams {
   get data(): string {
     return this.raw.data ?? this.raw.input
   }
-  _value: bigint
+  _value?: bigint
   get value(): bigint {
     return this._value ?? (this._value = getBigInt(this.raw.value))
   }
@@ -398,7 +399,7 @@ class FormattedTransactionResponse implements TransactionResponseParams {
     }
     return this._chainId ?? 0n
   }
-  _signature: Signature
+  _signature?: Signature
   get signature(): Signature {
     if (this._signature) {
       return this._signature

@@ -25,7 +25,7 @@ import { accountAddressString, TransactionFilter } from '../move/index.js'
 import { ConnectError, Code } from '@connectrpc/connect'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 
-class ObjectHandler<HandlerType> {
+interface ObjectHandler<HandlerType> {
   type?: string
   checkpointInterval?: HandleInterval
   timeIntervalInMinutes?: HandleInterval
@@ -243,7 +243,7 @@ export abstract class SuiObjectOrAddressProcessorTemplate<
   }
 }
 
-class AddressTransactionHandler {
+interface AddressTransactionHandler {
   handler: (transaction: GrpcTypes.ExecutedTransaction, ctx: SuiContext) => void
   filter?: TransactionFilter
   fetchConfig?: Partial<MoveFetchConfig>
