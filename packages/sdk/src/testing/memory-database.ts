@@ -3,8 +3,9 @@ import {
   type DBRequest,
   type DBRequest_DBFilter,
   DBRequest_DBOperator,
+  type DBResponse,
   DBResponseSchema,
-  type ProcessStreamResponse,
+  type ProcessStreamResponseV3,
   type RichStruct,
   type RichValue,
   RichValueSchema,
@@ -17,20 +18,26 @@ import { GraphQLField, GraphQLSchema, parse, StringValueNode } from 'graphql/ind
 import { DatabaseSchemaState } from '../core/database-schema.js'
 import { buildSchema } from '../store/schema.js'
 import { GraphQLList, GraphQLNonNull, GraphQLObjectType, GraphQLOutputType } from 'graphql'
-import { PluginManager } from '@sentio/runtime'
+import { type IStoreContext, PluginManager } from '@sentio/runtime'
 import { BigDecimalConverter, BigIntConverter } from '../store/convert.js'
 import { BigDecimal } from '@sentio/bigdecimal'
 import { Store } from '../store/store.js'
+import { Subject } from 'rxjs'
 
 // Internal entity name used by MemoryCache - bypasses schema validation
 const MEMORY_CACHE_ITEM_ENTITY = 'MemoryCacheItem'
+
+type MemoryDatabaseContext = IStoreContext & {
+  subject: Subject<any>
+  result(dbResult: DBResponse, processId?: number): void
+}
 
 export class MemoryDatabase {
   db = new Map<string, Record<string, any>>()
   public lastDbRequest: DBRequest | undefined
   _schema: GraphQLSchema
 
-  constructor(readonly dbContext: StoreContext) {}
+  constructor(readonly dbContext: MemoryDatabaseContext) {}
 
   get schema() {
     if (!this._schema) {
@@ -48,9 +55,9 @@ export class MemoryDatabase {
   }
 
   start() {
-    // The subject is typed as the `ProcessStreamResponse` init-shape, but at runtime it always carries a
+    // The subject is typed as the `ProcessStreamResponseV3` init-shape, but at runtime it always carries a
     // full response (the store context emits the complete oneof). Treat it as a full message and narrow inside.
-    this.dbContext.subject.subscribe((request) => this.processRequest(request as unknown as ProcessStreamResponse))
+    this.dbContext.subject.subscribe((request) => this.processRequest(request as unknown as ProcessStreamResponseV3))
   }
 
   stop() {
@@ -149,7 +156,7 @@ export class MemoryDatabase {
     return result
   }
 
-  private processRequest(request: ProcessStreamResponse) {
+  private processRequest(request: ProcessStreamResponseV3) {
     const req = request.value.case === 'dbRequest' ? request.value.value : undefined
 
     // Check if schema is required for this request
@@ -170,7 +177,7 @@ export class MemoryDatabase {
           this.upsert(entityName, id, d)
         })
 
-        this.dbContext.result(create(DBResponseSchema, { opId: req.opId }))
+        this.sendResult(request, create(DBResponseSchema, { opId: req.opId }))
       }
       if (req.op.case === 'delete') {
         const { id, entity } = req.op.value
@@ -178,13 +185,14 @@ export class MemoryDatabase {
           const entityName = entity[idx]
           this.delete(entityName, i)
         })
-        this.dbContext.result(create(DBResponseSchema, { opId: req.opId }))
+        this.sendResult(request, create(DBResponseSchema, { opId: req.opId }))
       }
 
       if (req.op.case === 'get') {
         const { entity, id } = req.op.value
         const data = this.getById(entity, id)
-        this.dbContext.result(
+        this.sendResult(
+          request,
           create(DBResponseSchema, {
             opId: req.opId,
             value: {
@@ -203,7 +211,8 @@ export class MemoryDatabase {
         if (cursor) {
           const idx = parseInt(cursor)
 
-          this.dbContext.result(
+          this.sendResult(
+            request,
             create(DBResponseSchema, {
               opId: req.opId,
               value: { case: 'entityList', value: { entities: list.slice(idx, idx + 1).map((d) => toEntity(d)) } },
@@ -211,7 +220,8 @@ export class MemoryDatabase {
             })
           )
         } else {
-          this.dbContext.result(
+          this.sendResult(
+            request,
             create(DBResponseSchema, {
               opId: req.opId,
               value: { case: 'entityList', value: { entities: list.length ? [toEntity(list[0])] : [] } },
@@ -221,6 +231,10 @@ export class MemoryDatabase {
         }
       }
     }
+  }
+
+  private sendResult(request: ProcessStreamResponseV3, response: DBResponse) {
+    this.dbContext.result(response, request.processId)
   }
 
   reset() {
