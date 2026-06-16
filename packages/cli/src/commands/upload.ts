@@ -738,7 +738,12 @@ export async function uploadFile(
     try {
       await upload()
     } catch (e: any) {
-      if (e?.constructor.name === 'FetchError' && e.type === 'system' && e.code === 'EPIPE') {
+      // Transient network errors while PUT-ing the packed processor to the signed
+      // storage URL: node-fetch surfaces these as `FetchError` with `type: 'system'`
+      // and the underlying socket errno in `code`. Retry all of them, not just EPIPE
+      // (ECONNRESET / "socket hang up" is the most common one against GCS).
+      const RETRYABLE_CODES = ['EPIPE', 'ECONNRESET', 'ETIMEDOUT', 'ECONNREFUSED', 'EAI_AGAIN']
+      if (e?.constructor.name === 'FetchError' && e.type === 'system' && RETRYABLE_CODES.includes(e.code)) {
         error = e
         await new Promise((resolve) => setTimeout(resolve, 1000))
         await tryUploading()
