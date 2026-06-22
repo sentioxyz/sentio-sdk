@@ -30,6 +30,7 @@ import { ALL_ADDRESS, Labels, PromiseOrVoid } from '../core/index.js'
 import { Required } from 'utility-types'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 import { HandlerOptions } from './models.js'
+import { toSuiClientEvent } from './to-client-types.js'
 
 export const DEFAULT_FETCH_CONFIG: MoveFetchConfig = create(MoveFetchConfigSchema, {
   resourceChanges: false,
@@ -111,7 +112,7 @@ export class SuiBaseProcessor {
         }
         const txn = JSON.parse(data.rawTransaction) as GrpcTypes.ExecutedTransaction
 
-        const evt = JSON.parse(data.rawEvent) as SuiEventInput
+        const evt = toSuiClientEvent(JSON.parse(data.rawEvent))
         // gRPC events carry no sequence; index is resolved by the runtime.
         const idx = 0
 
@@ -137,7 +138,7 @@ export class SuiBaseProcessor {
         const p = handlerOptions?.partitionKey
         if (!p) return undefined
         if (typeof p === 'function') {
-          const evt = JSON.parse(data.rawEvent) as SuiEventInput
+          const evt = toSuiClientEvent(JSON.parse(data.rawEvent))
           const decoded = await processor.coder.decodeEvent<any>(evt)
           return p((decoded || evt) as T)
         }

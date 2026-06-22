@@ -25,6 +25,7 @@ import { CallHandler, TransactionFilter, accountTypeString, ObjectChangeHandler 
 import { ConnectError, Code } from '@connectrpc/connect'
 import { TypeDescriptor } from '@typemove/move'
 import { TypedSuiMoveObject } from './models.js'
+import { toSuiClientObject } from './to-client-types.js'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 
 export interface SuiObjectBindOptions {
@@ -190,7 +191,10 @@ export class SuiAddressProcessor extends SuiBaseObjectOrAddressProcessorInternal
     data: Data_SuiObject,
     ctx: SuiObjectContext
   ) {
-    return handler(data.rawObjects.map((o) => JSON.parse(o)) as SuiMoveObjectInput[], ctx)
+    return handler(
+      data.rawObjects.map((o) => toSuiClientObject(JSON.parse(o))),
+      ctx
+    )
   }
 
   onTransactionBlock(
@@ -267,8 +271,8 @@ export class SuiObjectProcessor extends SuiBaseObjectOrAddressProcessorInternal<
       return
     }
     return handler(
-      JSON.parse(data.rawSelf) as SuiMoveObjectInput,
-      data.rawObjects.map((o) => JSON.parse(o)) as SuiMoveObjectInput[],
+      toSuiClientObject(JSON.parse(data.rawSelf)),
+      data.rawObjects.map((o) => toSuiClientObject(JSON.parse(o))),
       ctx
     )
   }
@@ -306,9 +310,13 @@ export class SuiObjectTypeProcessor<T> extends SuiBaseObjectOrAddressProcessor<
       return
     }
     const object = await ctx.coder.filterAndDecodeObjects(this.objectType, [
-      JSON.parse(data.rawSelf) as SuiMoveObjectInput
+      toSuiClientObject(JSON.parse(data.rawSelf))
     ])
-    return handler(object[0], data.rawObjects.map((o) => JSON.parse(o)) as SuiMoveObjectInput[], ctx)
+    return handler(
+      object[0],
+      data.rawObjects.map((o) => toSuiClientObject(JSON.parse(o))),
+      ctx
+    )
   }
 
   public onObjectChange(handler: (changes: SuiObjectChange[], ctx: SuiObjectChangeContext) => PromiseOrVoid): this {
@@ -400,6 +408,9 @@ export class SuiWrappedObjectProcessor extends SuiBaseObjectOrAddressProcessorIn
     data: Data_SuiObject,
     ctx: SuiObjectContext
   ) {
-    return handler(data.rawObjects.map((o) => JSON.parse(o)) as SuiMoveObjectInput[], ctx)
+    return handler(
+      data.rawObjects.map((o) => toSuiClientObject(JSON.parse(o))),
+      ctx
+    )
   }
 }
