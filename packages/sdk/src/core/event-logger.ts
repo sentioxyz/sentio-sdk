@@ -184,7 +184,6 @@ function emit<T>(ctx: BaseContext, eventName: string, event: Event<T>) {
       ...normalizeAttribute(payload)
     },
     runtimeInfo: undefined,
-    noMetric: true,
     attributes2: normalizeToRichStruct(ctx.baseLabels, payload)
   })
 

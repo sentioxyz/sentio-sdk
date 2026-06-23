@@ -154,7 +154,7 @@ export class FuelPlugin extends Plugin {
         data = request.data.value.value
         break
       case HandlerType.FUEL_RECEIPT:
-        if (request.data?.value.case !== 'fuelLog') {
+        if (request.data?.value.case !== 'fuelReceipt') {
           throw new ConnectError("fuelReceipt can't be empty", Code.InvalidArgument)
         }
         data = request.data.value.value
@@ -189,7 +189,7 @@ export class FuelPlugin extends Plugin {
   }
 
   async processReceipt(binding: DataBinding): Promise<ProcessResult> {
-    const receipt = binding?.data?.value.case === 'fuelLog' ? binding.data.value.value : undefined
+    const receipt = binding?.data?.value.case === 'fuelReceipt' ? binding.data.value.value : undefined
 
     if (!receipt?.transaction) {
       throw new ConnectError("transaction can't be null", Code.InvalidArgument)
