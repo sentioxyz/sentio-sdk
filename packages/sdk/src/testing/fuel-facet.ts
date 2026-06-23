@@ -101,7 +101,7 @@ export class FuelFacet {
             const binding = create(DataBindingSchema, {
               data: {
                 value: {
-                  case: 'fuelLog',
+                  case: 'fuelReceipt',
                   value: {
                     transaction,
                     timestamp: timestampNow(),
