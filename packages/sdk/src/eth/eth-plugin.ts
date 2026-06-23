@@ -1,12 +1,5 @@
-import {
-  errorString,
-  getProvider,
-  GLOBAL_CONFIG,
-  mergeProcessResults,
-  Plugin,
-  PluginManager,
-  USER_PROCESSOR
-} from '@sentio/runtime'
+import { errorString, GLOBAL_CONFIG, mergeProcessResults, Plugin, PluginManager, USER_PROCESSOR } from '@sentio/runtime'
+import { getProvider } from './provider.js'
 import { PartitionHandlerManager } from '../core/index.js'
 import {
   AccountConfigSchema,

@@ -1,6 +1,7 @@
 import { describe, test } from 'node:test'
 import { estimateBlockNumberAtDate } from './block.js'
-import { getProvider, State } from '@sentio/runtime'
+import { State } from '@sentio/runtime'
+import { getProvider } from '../eth/provider.js'
 import { loadTestProvidersFromEnv } from '@sentio/sdk/testing'
 
 import { expect } from 'chai'

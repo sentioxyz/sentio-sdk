@@ -1,11 +1,9 @@
 import { JsonRpcProvider, Network } from 'ethers'
 
 import PQueue from 'p-queue'
-import { Endpoints } from './endpoints.js'
 import { EthChainId } from '@sentio/chain'
 import { LRUCache } from 'lru-cache'
-import { providerMetrics, processMetrics, metricsStorage } from './metrics.js'
-import { GLOBAL_CONFIG } from './global-config.js'
+import { Endpoints, providerMetrics, processMetrics, metricsStorage, GLOBAL_CONFIG } from '@sentio/runtime'
 const { miss_count, hit_count, queue_size } = providerMetrics
 
 export const DummyProvider = new JsonRpcProvider('', Network.from(1))
