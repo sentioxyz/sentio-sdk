@@ -30,7 +30,7 @@ export function getClient(network: SuiNetwork): SuiGrpcClient {
 export function getRpcEndpoint(network: SuiNetwork): string {
   switch (network) {
     case SuiNetwork.TEST_NET:
-      return 'https://fullnode.testnet.sui.io/'
+      return 'https://fullnode.testnet.sui.io:443'
   }
-  return 'https://fullnode.mainnet.sui.io/'
+  return 'https://fullnode.mainnet.sui.io:443'
 }
