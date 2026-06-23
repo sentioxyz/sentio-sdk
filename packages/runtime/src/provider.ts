@@ -30,7 +30,7 @@ export function getProvider(chainId?: EthChainId): JsonRpcProvider {
   const network = Network.from(parseInt(chainId))
   // TODO check if other key needed
 
-  const address = Endpoints.INSTANCE.chainServer.get(chainId)
+  const address = Endpoints.INSTANCE.getChainRpcUrl(chainId)
   const key = network.chainId.toString() + '-' + address
 
   // console.debug(`init provider for ${chainId}, address: ${address}`)
@@ -45,7 +45,7 @@ export function getProvider(chainId?: EthChainId): JsonRpcProvider {
       'Provider not found for chain ' +
         network.chainId +
         ', configured chains: ' +
-        [...Endpoints.INSTANCE.chainServer.keys()].join(' ')
+        [...Endpoints.INSTANCE.chainRpc.keys()].join(' ')
     )
   }
   // console.log(

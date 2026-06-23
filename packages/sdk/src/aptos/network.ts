@@ -56,7 +56,7 @@ export function getRpcConfig(network: AptosNetwork, fullnode?: string | undefine
 }
 
 export function getClient(network: AptosNetwork): RichAptosClient {
-  let fullnode = Endpoints.INSTANCE.chainServer.get(network)
+  let fullnode = Endpoints.INSTANCE.getChainRpcUrl(network)
   if (fullnode) {
     if (!fullnode.endsWith('/v1')) {
       fullnode = fullnode + '/v1'

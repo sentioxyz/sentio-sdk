@@ -10,12 +10,12 @@ export const IotaNetwork = <const>{
 }
 
 export function getClient(network: IotaNetwork): IotaClient {
-  let chainServer = Endpoints.INSTANCE.chainServer.get(network)
-  if (!chainServer) {
-    chainServer = getRpcEndpoint(network)
+  let rpcUrl = Endpoints.INSTANCE.getChainRpcUrl(network)
+  if (!rpcUrl) {
+    rpcUrl = getRpcEndpoint(network)
     // throw new ConnectError('RPC endpoint not provided', Code.Internal)
   }
-  return new IotaClient({ url: chainServer })
+  return new IotaClient({ url: rpcUrl })
 }
 
 export function getRpcEndpoint(network: IotaNetwork): string {

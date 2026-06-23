@@ -1,5 +1,5 @@
 import { SuiChainId } from '@sentio/chain'
-import { Endpoints } from '@sentio/runtime'
+import { ChainRpc, Endpoints } from '@sentio/runtime'
 import { SuiGrpcClient } from '@mysten/sui/grpc'
 
 export type SuiNetwork = SuiChainId
@@ -16,15 +16,20 @@ function inferNetworkFromUrl(url: string): string {
   return 'custom'
 }
 
-function endpointFor(network: SuiNetwork): string {
-  return Endpoints.INSTANCE.chainServer.get(network) ?? getRpcEndpoint(network)
+function rpcFor(network: SuiNetwork): ChainRpc {
+  return Endpoints.INSTANCE.chainRpc.get(network) ?? { url: getRpcEndpoint(network) }
 }
 
 // gRPC client used for the MoveCoder, generated view functions, and exposed to
 // processor handlers via `ctx.client`. @typemove/sui v2 is gRPC-only.
 export function getClient(network: SuiNetwork): SuiGrpcClient {
-  const chainServer = endpointFor(network)
-  return new SuiGrpcClient({ network: inferNetworkFromUrl(chainServer) as any, baseUrl: chainServer })
+  const { url, meta } = rpcFor(network)
+  return new SuiGrpcClient({
+    network: inferNetworkFromUrl(url) as any,
+    baseUrl: url,
+    // Metadata from the chain config (e.g. the authority routing key) is sent on every gRPC-web request.
+    meta
+  })
 }
 
 export function getRpcEndpoint(network: SuiNetwork): string {

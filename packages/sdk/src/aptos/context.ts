@@ -29,11 +29,11 @@ export abstract class AptosBaseContext extends MoveContext<AptosNetwork, MoveMod
   }
 
   getClient(): RichAptosClientWithContext {
-    const chainServer = Endpoints.INSTANCE.chainServer.get(this.network)
-    if (!chainServer) {
+    const rpcUrl = Endpoints.INSTANCE.getChainRpcUrl(this.network)
+    if (!rpcUrl) {
       throw new ConnectError('RPC endpoint not provided', Code.Internal)
     }
-    const fullnode = chainServer + '/v1'
+    const fullnode = rpcUrl + '/v1'
 
     let network = Network.CUSTOM
     switch (this.network) {

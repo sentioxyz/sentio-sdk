@@ -8,7 +8,7 @@ import { GLOBAL_CONFIG } from './global-config.js'
 
 Endpoints.INSTANCE.concurrency = 1
 Endpoints.INSTANCE.batchCount = 1
-Endpoints.INSTANCE.chainServer.set(EthChainId.ETHEREUM, 'http://localhost:12345')
+Endpoints.INSTANCE.chainRpc.set(EthChainId.ETHEREUM, { url: 'http://localhost:12345' })
 
 describe('QueuedStaticJsonRpcProvider', () => {
   test('manual retry should work', async () => {
