@@ -85,7 +85,7 @@ export class TestProcessorServer {
 
     for (const k of Object.keys(ChainInfo)) {
       const http = httpEndpoints[k] || ''
-      Endpoints.INSTANCE.chainServer.set(k, http)
+      Endpoints.INSTANCE.chainRpc.set(k, { url: http })
     }
 
     // start a memory database for testing

@@ -15,7 +15,7 @@ export function loadTestProvidersFromEnv(requiredChainIds: string[] | string): b
       continue
     }
     found.push(k)
-    Endpoints.INSTANCE.chainServer.set(k, http)
+    Endpoints.INSTANCE.chainRpc.set(k, { url: http })
   }
 
   for (const id of requiredChainIds) {

@@ -2,15 +2,30 @@ import path from 'path'
 import fs from 'fs-extra'
 import { ChainConfig } from './chain-config.js'
 
+/**
+ * Resolved RPC endpoint for a chain: the base URL plus optional gRPC metadata
+ * (key-value pairs) attached to every request, e.g. the `authority` routing key
+ * for the Sui gRPC client talking to the Sentio rpc-node.
+ */
+export interface ChainRpc {
+  url: string
+  meta?: Record<string, string>
+}
+
 export class Endpoints {
   static INSTANCE: Endpoints = new Endpoints()
 
   concurrency = 8
   priceFeedAPI = ''
 
-  chainServer = new Map<string, string>()
+  chainRpc = new Map<string, ChainRpc>()
 
   batchCount = 1
+
+  /** Convenience accessor for callers that only need the endpoint URL. */
+  getChainRpcUrl(chainId: string): string | undefined {
+    return this.chainRpc.get(chainId)?.url
+  }
 }
 
 export function configureEndpoints(options: any) {
@@ -30,12 +45,15 @@ export function configureEndpoints(options: any) {
 
   for (const [id, config] of Object.entries(chainsConfig)) {
     const chainConfig = config as ChainConfig
-    if (chainConfig.ChainServer) {
-      Endpoints.INSTANCE.chainServer.set(id, chainConfig.ChainServer)
+    if (chainConfig.Rpc?.Url) {
+      Endpoints.INSTANCE.chainRpc.set(id, {
+        url: chainConfig.Rpc.Url,
+        meta: chainConfig.Rpc.Meta
+      })
     } else {
       const http = chainConfig.Https?.[0]
       if (http) {
-        Endpoints.INSTANCE.chainServer.set(id, http)
+        Endpoints.INSTANCE.chainRpc.set(id, { url: http })
       } else {
         console.error('not valid config for chain', id)
       }

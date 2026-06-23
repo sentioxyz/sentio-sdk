@@ -1,5 +1,10 @@
+export interface RpcConfig {
+  Url: string
+  Meta?: Record<string, string>
+}
+
 export interface ChainConfig {
   ChainID: string
   Https?: string[]
-  ChainServer?: string
+  Rpc?: RpcConfig
 }
