@@ -3,7 +3,7 @@ export { GenericProcessor } from './generic-processor.js'
 export { BaseProcessorTemplate } from './base-processor-template.js'
 export { AccountProcessor } from './account-processor.js'
 
-export { getProvider, DummyProvider } from '@sentio/runtime'
+export { getProvider, DummyProvider } from './provider.js'
 
 export { EthContext } from './context.js'
 export * from './eth.js'
