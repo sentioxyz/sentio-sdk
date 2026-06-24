@@ -11,8 +11,8 @@ import { ListStateStorage } from '@sentio/runtime'
 import { SuiNetwork } from './network.js'
 import { ConnectError, Code } from '@connectrpc/connect'
 import { SuiContext, SuiObjectChangeContext } from './context.js'
-import type { SuiObjectChange } from '@mysten/sui/jsonRpc'
 import type { GrpcTypes } from '@mysten/sui/grpc'
+import type { SuiClientTypes } from '@mysten/sui/client'
 import type { SuiEventInput } from '@typemove/sui'
 import {
   accountAddressString,
@@ -30,7 +30,7 @@ import { ALL_ADDRESS, Labels, PromiseOrVoid } from '../core/index.js'
 import { Required } from 'utility-types'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 import { HandlerOptions } from './models.js'
-import { toSuiClientEvent } from './to-client-types.js'
+import { toSuiClientChangedObject, toSuiClientEvent } from './to-client-types.js'
 
 export const DEFAULT_FETCH_CONFIG: MoveFetchConfig = create(MoveFetchConfigSchema, {
   resourceChanges: false,
@@ -281,7 +281,7 @@ export class SuiBaseProcessor {
   }
 
   protected onObjectChange(
-    handler: (changes: SuiObjectChange[], ctx: SuiObjectChangeContext) => PromiseOrVoid,
+    handler: (changes: SuiClientTypes.ChangedObject[], ctx: SuiObjectChangeContext) => PromiseOrVoid,
     type: string | string[]
   ): this {
     if (this.config.network === SuiNetwork.TEST_NET) {
@@ -299,7 +299,10 @@ export class SuiBaseProcessor {
           data.txDigest,
           processor.config.baseLabels
         )
-        await handler(data.rawChanges.map((r) => JSON.parse(r)) as SuiObjectChange[], ctx)
+        await handler(
+          data.rawChanges.map((r) => toSuiClientChangedObject(JSON.parse(r))),
+          ctx
+        )
         return ctx.stopAndGetResult()
       },
       type
@@ -333,7 +336,7 @@ export class SuiGlobalProcessor extends SuiBaseProcessor {
 
   // deprecated,, use object type processor
   public onObjectChange(
-    handler: (changes: SuiObjectChange[], ctx: SuiObjectChangeContext) => void,
+    handler: (changes: SuiClientTypes.ChangedObject[], ctx: SuiObjectChangeContext) => void,
     type: string | string[]
   ): this {
     return super.onObjectChange(handler, type)

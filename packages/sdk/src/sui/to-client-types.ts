@@ -17,6 +17,7 @@ function base64ToBytes(b64: string): Uint8Array {
 
 // Mirrors mapOwner in @mysten/sui's grpc core. protojson serializes the
 // Owner.OwnerKind enum to its proto value name and uint64 `version` to a string.
+// Source: https://github.com/MystenLabs/ts-sdks/blob/8588da38e0a813f87b345c348e63486a7a766a61/packages/sui/src/grpc/core.ts#L821
 function mapOwner(owner: any): SuiClientTypes.ObjectOwner | null {
   if (!owner) {
     return null
@@ -45,6 +46,7 @@ function mapOwner(owner: any): SuiClientTypes.ObjectOwner | null {
 // `.json` are read with the gRPC names falling back to the unified ones. With
 // `Include = { json: true }` every field except objectId/version/digest/owner/
 // type/json is typed `undefined`, so we deliberately leave them unset.
+// Source: https://github.com/MystenLabs/ts-sdks/blob/8588da38e0a813f87b345c348e63486a7a766a61/packages/sui/src/grpc/core.ts#L176
 export function toSuiClientObject(o: any): SuiMoveObjectInput {
   return {
     objectId: o.objectId,
@@ -60,9 +62,78 @@ export function toSuiClientObject(o: any): SuiMoveObjectInput {
   } as SuiMoveObjectInput
 }
 
+// Enum mapping mirrors @mysten/sui's grpc core (parseTransactionEffects), but
+// reads protojson enum *value names* (the Sentio driver delivers protojson, so
+// enums arrive as their proto names, not protobuf-es numeric values). Absent
+// fields map to 'Unknown' to honor the non-nullable `SuiClientTypes.ChangedObject`
+// state types.
+// Source: https://github.com/MystenLabs/ts-sdks/blob/8588da38e0a813f87b345c348e63486a7a766a61/packages/sui/src/grpc/core.ts#L1065
+function mapInputObjectState(state: any): SuiClientTypes.ChangedObject['inputState'] {
+  switch (state) {
+    case 'INPUT_OBJECT_STATE_EXISTS':
+      return 'Exists'
+    case 'INPUT_OBJECT_STATE_DOES_NOT_EXIST':
+      return 'DoesNotExist'
+    default:
+      return 'Unknown'
+  }
+}
+
+// Source: https://github.com/MystenLabs/ts-sdks/blob/8588da38e0a813f87b345c348e63486a7a766a61/packages/sui/src/grpc/core.ts#L1084
+function mapOutputObjectState(state: any): SuiClientTypes.ChangedObject['outputState'] {
+  switch (state) {
+    case 'OUTPUT_OBJECT_STATE_OBJECT_WRITE':
+      return 'ObjectWrite'
+    case 'OUTPUT_OBJECT_STATE_PACKAGE_WRITE':
+      return 'PackageWrite'
+    case 'OUTPUT_OBJECT_STATE_DOES_NOT_EXIST':
+      return 'DoesNotExist'
+    case 'OUTPUT_OBJECT_STATE_ACCUMULATOR_WRITE':
+      return 'AccumulatorWriteV1'
+    default:
+      return 'Unknown'
+  }
+}
+
+// Source: https://github.com/MystenLabs/ts-sdks/blob/8588da38e0a813f87b345c348e63486a7a766a61/packages/sui/src/grpc/core.ts#L1045
+function mapIdOperation(operation: any): SuiClientTypes.ChangedObject['idOperation'] {
+  switch (operation) {
+    case 'CREATED':
+      return 'Created'
+    case 'DELETED':
+      return 'Deleted'
+    case 'NONE':
+    case 'ID_OPERATION_UNKNOWN':
+      return 'None'
+    default:
+      return 'Unknown'
+  }
+}
+
+// protojson `sui.rpc.v2.ChangedObject` -> unified `SuiClientTypes.ChangedObject`.
+// Mirrors the per-change mapping in @mysten/sui's grpc core so handlers see the
+// same shape `SuiGrpcClient.core` would produce. `objectType`/`accumulatorWrite`
+// exist on the gRPC message but not the unified type, so they are dropped.
+// Source: https://github.com/MystenLabs/ts-sdks/blob/8588da38e0a813f87b345c348e63486a7a766a61/packages/sui/src/grpc/core.ts#L1141
+export function toSuiClientChangedObject(c: any): SuiClientTypes.ChangedObject {
+  return {
+    objectId: c.objectId,
+    inputState: mapInputObjectState(c.inputState),
+    inputVersion: c.inputVersion ?? null,
+    inputDigest: c.inputDigest ?? null,
+    inputOwner: mapOwner(c.inputOwner),
+    outputState: mapOutputObjectState(c.outputState),
+    outputVersion: c.outputVersion ?? null,
+    outputDigest: c.outputDigest ?? null,
+    outputOwner: mapOwner(c.outputOwner),
+    idOperation: mapIdOperation(c.idOperation)
+  }
+}
+
 // protojson `sui.rpc.v2.Event` -> unified `SuiClientTypes.Event`. The
 // discriminating fields (`eventType`, `json`) already share names; only the
 // BCS payload is renamed (`contents` -> `bcs`).
+// Source: https://github.com/MystenLabs/ts-sdks/blob/8588da38e0a813f87b345c348e63486a7a766a61/packages/sui/src/grpc/core.ts#L1279
 export function toSuiClientEvent(e: any): SuiEventInput {
   return {
     packageId: e.packageId,
