@@ -690,6 +690,10 @@ message Data {
     string raw_transaction = 5;
     google.protobuf.Timestamp timestamp = 2;
     uint64 slot = 3;
+    // event_seq is the event's index within its transaction. grpc sui events
+    // carry no intrinsic sequence (unlike json-rpc's id.eventSeq), so the driver
+    // sets it here for the SDK to populate meta.log_index.
+    int32 event_seq = 6;
   }
   message SuiCall {
     string raw_transaction = 4;
