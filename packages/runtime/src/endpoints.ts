@@ -3,13 +3,13 @@ import fs from 'fs-extra'
 import { ChainConfig } from './chain-config.js'
 
 /**
- * Resolved RPC endpoint for a chain: the base URL plus optional gRPC metadata
- * (key-value pairs) attached to every request, e.g. the `authority` routing key
- * for the Sui gRPC client talking to the Sentio rpc-node.
+ * Resolved RPC endpoint for a chain: the base URL plus optional HTTP headers
+ * attached to every request, e.g. the `X-Forwarded-Host` routing key for the Sui
+ * gRPC client talking to the Sentio rpc-node.
  */
 export interface ChainRpc {
   url: string
-  meta?: Record<string, string>
+  headers?: Record<string, string>
 }
 
 export class Endpoints {
@@ -48,7 +48,7 @@ export function configureEndpoints(options: any) {
     if (chainConfig.Rpc?.Url) {
       Endpoints.INSTANCE.chainRpc.set(id, {
         url: chainConfig.Rpc.Url,
-        meta: chainConfig.Rpc.Meta
+        headers: chainConfig.Rpc.Headers
       })
     } else {
       const http = chainConfig.Https?.[0]

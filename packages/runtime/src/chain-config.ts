@@ -1,6 +1,6 @@
 export interface RpcConfig {
   Url: string
-  Meta?: Record<string, string>
+  Headers?: Record<string, string>
 }
 
 export interface ChainConfig {

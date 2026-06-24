@@ -1,6 +1,7 @@
 import { SuiChainId } from '@sentio/chain'
 import { ChainRpc, Endpoints } from '@sentio/runtime'
 import { SuiGrpcClient } from '@mysten/sui/grpc'
+import { GrpcWebFetchTransport } from '@protobuf-ts/grpcweb-transport'
 
 export type SuiNetwork = SuiChainId
 export const SuiNetwork = <const>{
@@ -23,13 +24,19 @@ function rpcFor(network: SuiNetwork): ChainRpc {
 // gRPC client used for the MoveCoder, generated view functions, and exposed to
 // processor handlers via `ctx.client`. @typemove/sui v2 is gRPC-only.
 export function getClient(network: SuiNetwork): SuiGrpcClient {
-  const { url, meta } = rpcFor(network)
-  return new SuiGrpcClient({
-    network: inferNetworkFromUrl(url) as any,
+  const { url, headers } = rpcFor(network)
+  // Chain-config headers (e.g. the X-Forwarded-Host routing key the rpc-node
+  // proxy reads) must be sent on every request. SuiGrpcClient drops its `meta`
+  // option and its `fetchInit` can't carry headers, so we build the transport
+  // ourselves.
+  const transport = new GrpcWebFetchTransport({
     baseUrl: url,
-    // Metadata from the chain config (e.g. the authority routing key) is sent on every gRPC-web request.
-    meta
+    // GrpcWebFetchTransport has no `headers` option: gRPC models per-request
+    // headers as `meta` (metadata), which the grpc-web transport then serializes
+    // as HTTP request headers on the wire. So our HTTP headers go in `meta`.
+    meta: headers
   })
+  return new SuiGrpcClient({ network: inferNetworkFromUrl(url) as any, transport })
 }
 
 export function getRpcEndpoint(network: SuiNetwork): string {
