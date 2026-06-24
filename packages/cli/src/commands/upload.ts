@@ -85,7 +85,10 @@ export function createUploadCommand() {
     .option('--token <token>', '(Optional) Manually provide token rather than use saved credential')
     .option('--host <host>', '(Optional) Override Sentio Host name')
     .option('--num-workers <count>', '(Optional) Number of processor workers to start', myParseInt)
-    .option('--sentio-network <network>', '(Optional) Sentio network to connect to, can be testnet, devnet or mainnet')
+    .option(
+      '--sentio-network <network>',
+      '(Optional) Sentio network to connect to, can be testnet, testnet-v2, devnet or mainnet'
+    )
     .option(
       '--required-chain-id <chain_id...>',
       '(Optional) Specify chain IDs required for the Sentio network. This option is only available when --sentio-network is used. If omitted, all chain IDs from the project configuration (contracts or network overrides) will be used.'
@@ -566,7 +569,7 @@ async function checkOrCreateProject(options: YamlProjectConfig, auth: Auth) {
     console.error(
       chalk.red(
         `Project ${project?.slug} is a Sentio Network project. Please add the --sentio-network flag when uploading.\n` +
-          `Example: sentio upload --sentio-network testnet|devnet`
+          `Example: sentio upload --sentio-network testnet|testnet-v2|devnet`
       )
     )
     process.exit(1)
