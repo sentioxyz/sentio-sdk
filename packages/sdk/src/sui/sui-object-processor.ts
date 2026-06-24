@@ -16,8 +16,8 @@ import { create } from '@bufbuild/protobuf'
 import { ListStateStorage } from '@sentio/runtime'
 import { SuiNetwork } from './network.js'
 import { SuiAddressContext, SuiContext, SuiObjectChangeContext, SuiObjectContext } from './context.js'
-import type { SuiObjectChange } from '@mysten/sui/jsonRpc'
 import type { GrpcTypes } from '@mysten/sui/grpc'
+import type { SuiClientTypes } from '@mysten/sui/client'
 import type { SuiMoveObjectInput } from '@typemove/sui'
 import { ALL_ADDRESS, PromiseOrVoid } from '../core/index.js'
 import { configure, DEFAULT_FETCH_CONFIG, IndexConfigure, SuiBindOptions } from './sui-processor.js'
@@ -25,7 +25,7 @@ import { CallHandler, TransactionFilter, accountTypeString, ObjectChangeHandler 
 import { ConnectError, Code } from '@connectrpc/connect'
 import { TypeDescriptor } from '@typemove/move'
 import { TypedSuiMoveObject } from './models.js'
-import { toSuiClientObject } from './to-client-types.js'
+import { toSuiClientChangedObject, toSuiClientObject } from './to-client-types.js'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 
 export interface SuiObjectBindOptions {
@@ -319,7 +319,9 @@ export class SuiObjectTypeProcessor<T> extends SuiBaseObjectOrAddressProcessor<
     )
   }
 
-  public onObjectChange(handler: (changes: SuiObjectChange[], ctx: SuiObjectChangeContext) => PromiseOrVoid): this {
+  public onObjectChange(
+    handler: (changes: SuiClientTypes.ChangedObject[], ctx: SuiObjectChangeContext) => PromiseOrVoid
+  ): this {
     if (this.config.network === SuiNetwork.TEST_NET) {
       throw new ConnectError('object change not supported in testnet', Code.InvalidArgument)
     }
@@ -335,7 +337,10 @@ export class SuiObjectTypeProcessor<T> extends SuiBaseObjectOrAddressProcessor<
           data.txDigest,
           processor.config.baseLabels
         )
-        await handler(data.rawChanges.map((r) => JSON.parse(r)) as SuiObjectChange[], ctx)
+        await handler(
+          data.rawChanges.map((r) => toSuiClientChangedObject(JSON.parse(r))),
+          ctx
+        )
         return ctx.stopAndGetResult()
       },
       type: [this.objectType.getSignature()]

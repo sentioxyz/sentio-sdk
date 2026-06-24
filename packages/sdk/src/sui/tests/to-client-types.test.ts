@@ -4,7 +4,7 @@ import { defaultMoveCoder } from '../move-coder.js'
 import { loadAllTypes } from '../builtin/0x2.js'
 import { SuiNetwork } from '../network.js'
 import { parseMoveType } from '../../move/index.js'
-import { toSuiClientObject } from '../to-client-types.js'
+import { toSuiClientChangedObject, toSuiClientObject } from '../to-client-types.js'
 
 // Raw protojson of a `sui.rpc.v2.Object` exactly as the Sentio driver emits it
 // (BatchGetObjects -> protojson.Marshal): note `objectType` / `owner.kind` /
@@ -67,5 +67,60 @@ describe('toSuiClientObject', () => {
     expect(d.id.id).equals(grpcObject.json.id)
     expect(d.name.name).equals(grpcObject.json.name.name) // Wrapper<address>{ name }
     expect(d.value).equals(grpcObject.json.value) // ID -> string
+  })
+})
+
+// Raw protojson of a `sui.rpc.v2.ChangedObject` as the Sentio driver emits it
+// from transaction effects: proto enum *value names* (`OUTPUT_OBJECT_STATE_*`,
+// `CREATED`), uint64 versions as strings, and `Owner` in its gRPC `{kind}` shape.
+const grpcMutatedChange = {
+  objectId: '0xc061d544681939544136efac81d212de377e2ff13eb07ef9079404ebd57cad5d',
+  inputState: 'INPUT_OBJECT_STATE_EXISTS',
+  inputVersion: '309855313',
+  inputDigest: 'AAA',
+  inputOwner: { kind: 'ADDRESS', address: '0x1' },
+  outputState: 'OUTPUT_OBJECT_STATE_OBJECT_WRITE',
+  outputVersion: '309855314',
+  outputDigest: 'BBB',
+  outputOwner: { kind: 'SHARED', version: '7' },
+  idOperation: 'NONE',
+  objectType: '0x2::coin::Coin<0x2::sui::SUI>' // present on gRPC, absent on unified
+}
+
+describe('toSuiClientChangedObject', () => {
+  test('maps gRPC protojson ChangedObject to unified SuiClientTypes shape', () => {
+    const c = toSuiClientChangedObject(grpcMutatedChange) as any
+    expect(c.objectId).equals(grpcMutatedChange.objectId)
+    expect(c.inputState).equals('Exists')
+    expect(c.outputState).equals('ObjectWrite')
+    expect(c.idOperation).equals('None')
+    expect(c.inputVersion).equals('309855313') // uint64 string preserved
+    expect(c.outputVersion).equals('309855314')
+    expect(c.inputDigest).equals('AAA')
+    expect(c.outputDigest).equals('BBB')
+    expect(c.inputOwner).deep.equals({ $kind: 'AddressOwner', AddressOwner: '0x1' })
+    expect(c.outputOwner).deep.equals({ $kind: 'Shared', Shared: { initialSharedVersion: '7' } })
+    expect('objectType' in c).equals(false) // dropped: not on the unified type
+  })
+
+  test('all enum value names map to the unified literals', () => {
+    const states = (s: any) => toSuiClientChangedObject(s) as any
+    expect(states({ inputState: 'INPUT_OBJECT_STATE_DOES_NOT_EXIST' }).inputState).equals('DoesNotExist')
+    expect(states({ outputState: 'OUTPUT_OBJECT_STATE_PACKAGE_WRITE' }).outputState).equals('PackageWrite')
+    expect(states({ outputState: 'OUTPUT_OBJECT_STATE_DOES_NOT_EXIST' }).outputState).equals('DoesNotExist')
+    expect(states({ outputState: 'OUTPUT_OBJECT_STATE_ACCUMULATOR_WRITE' }).outputState).equals('AccumulatorWriteV1')
+    expect(states({ idOperation: 'CREATED' }).idOperation).equals('Created')
+    expect(states({ idOperation: 'DELETED' }).idOperation).equals('Deleted')
+    expect(states({ idOperation: 'ID_OPERATION_UNKNOWN' }).idOperation).equals('None')
+  })
+
+  test('absent enum/owner fields fall back to Unknown / null', () => {
+    const c = toSuiClientChangedObject({ objectId: '0x9' }) as any
+    expect(c.inputState).equals('Unknown')
+    expect(c.outputState).equals('Unknown')
+    expect(c.idOperation).equals('Unknown')
+    expect(c.inputVersion).equals(null)
+    expect(c.inputOwner).equals(null)
+    expect(c.outputOwner).equals(null)
   })
 })
