@@ -25,11 +25,17 @@ function rpcFor(network: SuiNetwork): ChainRpc {
 // processor handlers via `ctx.client`. @typemove/sui v2 is gRPC-only.
 export function getClient(network: SuiNetwork): SuiGrpcClient {
   const { url, headers } = rpcFor(network)
-  // Headers from the chain config (e.g. the X-Forwarded-Host routing key the
-  // rpc-node proxy reads) must be sent on every gRPC-web request. SuiGrpcClient
-  // drops its `meta` option and its `fetchInit` can't carry headers, so build the
-  // transport ourselves with default `meta` (grpc-web sends it as request headers).
-  const transport = new GrpcWebFetchTransport({ baseUrl: url, meta: headers })
+  // Chain-config headers (e.g. the X-Forwarded-Host routing key the rpc-node
+  // proxy reads) must be sent on every request. SuiGrpcClient drops its `meta`
+  // option and its `fetchInit` can't carry headers, so we build the transport
+  // ourselves.
+  const transport = new GrpcWebFetchTransport({
+    baseUrl: url,
+    // GrpcWebFetchTransport has no `headers` option: gRPC models per-request
+    // headers as `meta` (metadata), which the grpc-web transport then serializes
+    // as HTTP request headers on the wire. So our HTTP headers go in `meta`.
+    meta: headers
+  })
   return new SuiGrpcClient({ network: inferNetworkFromUrl(url) as any, transport })
 }
 
