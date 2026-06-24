@@ -20,6 +20,13 @@ const TESTNET_CONFIG: SentioNetworkConfig = {
   addressBookAddress: '0x092d795d42e23ecba5cc66927972be5c9980effb'
 }
 
+const TESTNET_V2_CONFIG: SentioNetworkConfig = {
+  chainId: 7892102,
+  rpcUrl: 'https://sentio-testnet-v2.rpc.sentio.xyz',
+  explorerUrl: 'https://testnet-v2-explorer.sentio.xyz',
+  addressBookAddress: '0xb7e9E56DFC27bcfA63698F2F5890e186426A0123'
+}
+
 const DEVNET_CONFIG: SentioNetworkConfig = {
   chainId: 7892201,
   rpcUrl: 'https://sentio-devnet.test-rpc.sentio.xyz',
@@ -33,11 +40,17 @@ export function getSentioNetworkConfig(network: string, addressBookOverride?: st
     config = TESTNET_CONFIG
   } else if (network === 'devnet' || network === '7892201') {
     config = DEVNET_CONFIG
+  } else if (network === 'testnet-v2' || network === '7892102') {
+    config = TESTNET_V2_CONFIG
   } else if (network === 'mainnet' || network === '789210') {
-    console.error(chalk.red('Sentio Network mainnet is not yet supported. Only testnet is available.'))
+    console.error(
+      chalk.red('Sentio Network mainnet is not yet supported. Only testnet, testnet-v2 and devnet are available.')
+    )
     process.exit(1)
   } else {
-    console.error(chalk.red(`Invalid sentio network: ${network}. Only "testnet" or "devnet" is supported.`))
+    console.error(
+      chalk.red(`Invalid sentio network: ${network}. Only "testnet", "testnet-v2" or "devnet" is supported.`)
+    )
     process.exit(1)
   }
 
