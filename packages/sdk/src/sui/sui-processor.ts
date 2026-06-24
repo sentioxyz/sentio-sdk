@@ -113,8 +113,9 @@ export class SuiBaseProcessor {
         const txn = JSON.parse(data.rawTransaction) as GrpcTypes.ExecutedTransaction
 
         const evt = toSuiClientEvent(JSON.parse(data.rawEvent))
-        // gRPC events carry no sequence; index is resolved by the runtime.
-        const idx = 0
+        // gRPC events carry no on-chain sequence; the driver supplies the event's
+        // index within the tx via the eventSeq field (mirrors json-rpc's id.eventSeq).
+        const idx = data.eventSeq
 
         const ctx = new SuiContext(
           processor.moduleName,
