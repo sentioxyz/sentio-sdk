@@ -31,6 +31,11 @@ export function getClient(network: SuiNetwork): SuiGrpcClient {
   // ourselves.
   const transport = new GrpcWebFetchTransport({
     baseUrl: url,
+    // GrpcWebFetchTransport defaults to the grpc-web-text (base64) format, which
+    // our rpc-node/super-node proxy rejects with 415. We run under Node, whose
+    // fetch handles binary streams fine, so use the binary format
+    // (application/grpc-web+proto) the proxy supports.
+    format: 'binary',
     // GrpcWebFetchTransport has no `headers` option: gRPC models per-request
     // headers as `meta` (metadata), which the grpc-web transport then serializes
     // as HTTP request headers on the wire. So our HTTP headers go in `meta`.
