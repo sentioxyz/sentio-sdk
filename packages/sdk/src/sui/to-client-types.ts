@@ -1,4 +1,5 @@
 import type { SuiClientTypes } from '@mysten/sui/client'
+import { GrpcCoreClient, GrpcTypes } from '@mysten/sui/grpc'
 import type { SuiEventInput, SuiMoveObjectInput } from '@typemove/sui'
 
 // The Sentio driver delivers Sui objects/events as protojson of the gRPC
@@ -62,72 +63,34 @@ export function toSuiClientObject(o: any): SuiMoveObjectInput {
   } as SuiMoveObjectInput
 }
 
-// Enum mapping mirrors @mysten/sui's grpc core (parseTransactionEffects), but
-// reads protojson enum *value names* (the Sentio driver delivers protojson, so
-// enums arrive as their proto names, not protobuf-es numeric values). Absent
-// fields map to 'Unknown' to honor the non-nullable `SuiClientTypes.ChangedObject`
-// state types.
-// Source: https://github.com/MystenLabs/ts-sdks/blob/8588da38e0a813f87b345c348e63486a7a766a61/packages/sui/src/grpc/core.ts#L1065
-function mapInputObjectState(state: any): SuiClientTypes.ChangedObject['inputState'] {
-  switch (state) {
-    case 'INPUT_OBJECT_STATE_EXISTS':
-      return 'Exists'
-    case 'INPUT_OBJECT_STATE_DOES_NOT_EXIST':
-      return 'DoesNotExist'
-    default:
-      return 'Unknown'
+// protojson `sui.rpc.v2.ChangedObject[]` -> unified `SuiClientTypes.ChangedObject[]`.
+//
+// Rather than mirror @mysten/sui's enum/owner mapping by hand, we reuse its own
+// `parseTransactionEffects` so SDK upgrades pick up upstream changes (new enum
+// values, owner kinds, bug fixes) automatically instead of silently drifting.
+// That function isn't exported, so we reach it through its only public caller,
+// `GrpcCoreClient.getTransaction`, fed by an in-memory fake transport that hands
+// back our changes as a protobuf-ts `TransactionEffects` message.
+//
+// Two upstream-internal details this depends on (both asserted by
+// to-client-types.test.ts, which fails loudly if an upgrade changes them):
+//   1. `parseTransactionEffects` dereferences `effects.status.error` unguarded on
+//      the non-success path, so a minimal `status: { success: true }` is required.
+//   2. `getTransaction` returns a `{ $kind: 'Transaction', Transaction }` union.
+// See https://github.com/MystenLabs/ts-sdks/blob/8588da38e0a813f87b345c348e63486a7a766a61/packages/sui/src/grpc/core.ts#L1132
+export async function toSuiClientChangedObjects(rawChanges: any[]): Promise<SuiClientTypes.ChangedObject[]> {
+  if (rawChanges.length === 0) {
+    return []
   }
-}
-
-// Source: https://github.com/MystenLabs/ts-sdks/blob/8588da38e0a813f87b345c348e63486a7a766a61/packages/sui/src/grpc/core.ts#L1084
-function mapOutputObjectState(state: any): SuiClientTypes.ChangedObject['outputState'] {
-  switch (state) {
-    case 'OUTPUT_OBJECT_STATE_OBJECT_WRITE':
-      return 'ObjectWrite'
-    case 'OUTPUT_OBJECT_STATE_PACKAGE_WRITE':
-      return 'PackageWrite'
-    case 'OUTPUT_OBJECT_STATE_DOES_NOT_EXIST':
-      return 'DoesNotExist'
-    case 'OUTPUT_OBJECT_STATE_ACCUMULATOR_WRITE':
-      return 'AccumulatorWriteV1'
-    default:
-      return 'Unknown'
-  }
-}
-
-// Source: https://github.com/MystenLabs/ts-sdks/blob/8588da38e0a813f87b345c348e63486a7a766a61/packages/sui/src/grpc/core.ts#L1045
-function mapIdOperation(operation: any): SuiClientTypes.ChangedObject['idOperation'] {
-  switch (operation) {
-    case 'CREATED':
-      return 'Created'
-    case 'DELETED':
-      return 'Deleted'
-    case 'NONE':
-    case 'ID_OPERATION_UNKNOWN':
-      return 'None'
-    default:
-      return 'Unknown'
-  }
-}
-
-// protojson `sui.rpc.v2.ChangedObject` -> unified `SuiClientTypes.ChangedObject`.
-// Mirrors the per-change mapping in @mysten/sui's grpc core so handlers see the
-// same shape `SuiGrpcClient.core` would produce. `objectType`/`accumulatorWrite`
-// exist on the gRPC message but not the unified type, so they are dropped.
-// Source: https://github.com/MystenLabs/ts-sdks/blob/8588da38e0a813f87b345c348e63486a7a766a61/packages/sui/src/grpc/core.ts#L1141
-export function toSuiClientChangedObject(c: any): SuiClientTypes.ChangedObject {
-  return {
-    objectId: c.objectId,
-    inputState: mapInputObjectState(c.inputState),
-    inputVersion: c.inputVersion ?? null,
-    inputDigest: c.inputDigest ?? null,
-    inputOwner: mapOwner(c.inputOwner),
-    outputState: mapOutputObjectState(c.outputState),
-    outputVersion: c.outputVersion ?? null,
-    outputDigest: c.outputDigest ?? null,
-    outputOwner: mapOwner(c.outputOwner),
-    idOperation: mapIdOperation(c.idOperation)
-  }
+  const effects = GrpcTypes.TransactionEffects.fromJson(
+    { status: { success: true }, changedObjects: rawChanges },
+    { ignoreUnknownFields: true }
+  )
+  const core = new GrpcCoreClient({
+    client: { ledgerService: { getTransaction: async () => ({ response: { transaction: { digest: '', effects } } }) } }
+  } as any)
+  const res: any = await core.getTransaction({ digest: '', include: { effects: true } })
+  return (res.Transaction ?? res).effects.changedObjects
 }
 
 // protojson `sui.rpc.v2.Event` -> unified `SuiClientTypes.Event`. The

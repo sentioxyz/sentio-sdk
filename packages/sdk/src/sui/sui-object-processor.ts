@@ -25,7 +25,7 @@ import { CallHandler, TransactionFilter, accountTypeString, ObjectChangeHandler 
 import { ConnectError, Code } from '@connectrpc/connect'
 import { TypeDescriptor } from '@typemove/move'
 import { TypedSuiMoveObject } from './models.js'
-import { toSuiClientChangedObject, toSuiClientObject } from './to-client-types.js'
+import { toSuiClientChangedObjects, toSuiClientObject } from './to-client-types.js'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 
 export interface SuiObjectBindOptions {
@@ -337,10 +337,7 @@ export class SuiObjectTypeProcessor<T> extends SuiBaseObjectOrAddressProcessor<
           data.txDigest,
           processor.config.baseLabels
         )
-        await handler(
-          data.rawChanges.map((r) => toSuiClientChangedObject(JSON.parse(r))),
-          ctx
-        )
+        await handler(await toSuiClientChangedObjects(data.rawChanges.map((r) => JSON.parse(r))), ctx)
         return ctx.stopAndGetResult()
       },
       type: [this.objectType.getSignature()]

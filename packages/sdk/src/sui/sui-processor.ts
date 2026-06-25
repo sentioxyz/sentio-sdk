@@ -30,7 +30,7 @@ import { ALL_ADDRESS, Labels, PromiseOrVoid } from '../core/index.js'
 import { Required } from 'utility-types'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 import { HandlerOptions } from './models.js'
-import { toSuiClientChangedObject, toSuiClientEvent } from './to-client-types.js'
+import { toSuiClientChangedObjects, toSuiClientEvent } from './to-client-types.js'
 
 export const DEFAULT_FETCH_CONFIG: MoveFetchConfig = create(MoveFetchConfigSchema, {
   resourceChanges: false,
@@ -299,10 +299,7 @@ export class SuiBaseProcessor {
           data.txDigest,
           processor.config.baseLabels
         )
-        await handler(
-          data.rawChanges.map((r) => toSuiClientChangedObject(JSON.parse(r))),
-          ctx
-        )
+        await handler(await toSuiClientChangedObjects(data.rawChanges.map((r) => JSON.parse(r))), ctx)
         return ctx.stopAndGetResult()
       },
       type

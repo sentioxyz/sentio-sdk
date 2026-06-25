@@ -4,7 +4,7 @@ import { defaultMoveCoder } from '../move-coder.js'
 import { loadAllTypes } from '../builtin/0x2.js'
 import { SuiNetwork } from '../network.js'
 import { parseMoveType } from '../../move/index.js'
-import { toSuiClientChangedObject, toSuiClientObject } from '../to-client-types.js'
+import { toSuiClientChangedObjects, toSuiClientObject } from '../to-client-types.js'
 
 // Raw protojson of a `sui.rpc.v2.Object` exactly as the Sentio driver emits it
 // (BatchGetObjects -> protojson.Marshal): note `objectType` / `owner.kind` /
@@ -87,9 +87,13 @@ const grpcMutatedChange = {
   objectType: '0x2::coin::Coin<0x2::sui::SUI>' // present on gRPC, absent on unified
 }
 
-describe('toSuiClientChangedObject', () => {
-  test('maps gRPC protojson ChangedObject to unified SuiClientTypes shape', () => {
-    const c = toSuiClientChangedObject(grpcMutatedChange) as any
+// These run the real @mysten/sui `parseTransactionEffects` (via the fake-client
+// in `toSuiClientChangedObjects`), so they double as a conformance guard: an
+// upgrade that changes the upstream mapping — or the internals the fake-client
+// leans on (`status.error` deref, the `{ $kind }` return union) — fails here.
+describe('toSuiClientChangedObjects', () => {
+  test('maps gRPC protojson ChangedObject to unified SuiClientTypes shape', async () => {
+    const [c] = (await toSuiClientChangedObjects([grpcMutatedChange])) as any[]
     expect(c.objectId).equals(grpcMutatedChange.objectId)
     expect(c.inputState).equals('Exists')
     expect(c.outputState).equals('ObjectWrite')
@@ -103,24 +107,29 @@ describe('toSuiClientChangedObject', () => {
     expect('objectType' in c).equals(false) // dropped: not on the unified type
   })
 
-  test('all enum value names map to the unified literals', () => {
-    const states = (s: any) => toSuiClientChangedObject(s) as any
-    expect(states({ inputState: 'INPUT_OBJECT_STATE_DOES_NOT_EXIST' }).inputState).equals('DoesNotExist')
-    expect(states({ outputState: 'OUTPUT_OBJECT_STATE_PACKAGE_WRITE' }).outputState).equals('PackageWrite')
-    expect(states({ outputState: 'OUTPUT_OBJECT_STATE_DOES_NOT_EXIST' }).outputState).equals('DoesNotExist')
-    expect(states({ outputState: 'OUTPUT_OBJECT_STATE_ACCUMULATOR_WRITE' }).outputState).equals('AccumulatorWriteV1')
-    expect(states({ idOperation: 'CREATED' }).idOperation).equals('Created')
-    expect(states({ idOperation: 'DELETED' }).idOperation).equals('Deleted')
-    expect(states({ idOperation: 'ID_OPERATION_UNKNOWN' }).idOperation).equals('None')
+  test('all enum value names map to the unified literals', async () => {
+    const one = async (s: any) => ((await toSuiClientChangedObjects([s])) as any[])[0]
+    expect((await one({ inputState: 'INPUT_OBJECT_STATE_DOES_NOT_EXIST' })).inputState).equals('DoesNotExist')
+    expect((await one({ outputState: 'OUTPUT_OBJECT_STATE_PACKAGE_WRITE' })).outputState).equals('PackageWrite')
+    expect((await one({ outputState: 'OUTPUT_OBJECT_STATE_DOES_NOT_EXIST' })).outputState).equals('DoesNotExist')
+    expect((await one({ outputState: 'OUTPUT_OBJECT_STATE_ACCUMULATOR_WRITE' })).outputState).equals(
+      'AccumulatorWriteV1'
+    )
+    expect((await one({ idOperation: 'CREATED' })).idOperation).equals('Created')
+    expect((await one({ idOperation: 'DELETED' })).idOperation).equals('Deleted')
+    expect((await one({ idOperation: 'ID_OPERATION_UNKNOWN' })).idOperation).equals('None')
   })
 
-  test('absent enum/owner fields fall back to Unknown / null', () => {
-    const c = toSuiClientChangedObject({ objectId: '0x9' }) as any
-    expect(c.inputState).equals('Unknown')
-    expect(c.outputState).equals('Unknown')
-    expect(c.idOperation).equals('Unknown')
+  // Upstream maps absent enum/owner fields to null (not 'Unknown'); the empty
+  // input short-circuits before constructing the fake client.
+  test('absent enum/owner fields become null; empty input yields []', async () => {
+    const [c] = (await toSuiClientChangedObjects([{ objectId: '0x9' }])) as any[]
+    expect(c.inputState).equals(null)
+    expect(c.outputState).equals(null)
+    expect(c.idOperation).equals(null)
     expect(c.inputVersion).equals(null)
     expect(c.inputOwner).equals(null)
     expect(c.outputOwner).equals(null)
+    expect(await toSuiClientChangedObjects([])).deep.equals([])
   })
 })
