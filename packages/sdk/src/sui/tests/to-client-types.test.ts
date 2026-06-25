@@ -4,7 +4,7 @@ import { defaultMoveCoder } from '../move-coder.js'
 import { loadAllTypes } from '../builtin/0x2.js'
 import { SuiNetwork } from '../network.js'
 import { parseMoveType } from '../../move/index.js'
-import { toSuiClientChangedObject, toSuiClientObject } from '../to-client-types.js'
+import { toSuiClientChangedObjects, toSuiClientObjects } from '../to-client-types.js'
 
 // Raw protojson of a `sui.rpc.v2.Object` exactly as the Sentio driver emits it
 // (BatchGetObjects -> protojson.Marshal): note `objectType` / `owner.kind` /
@@ -25,10 +25,14 @@ const grpcObject = {
   }
 }
 
-describe('toSuiClientObject', () => {
-  test('maps gRPC protojson Object to unified SuiClientTypes shape', () => {
-    const o = toSuiClientObject(grpcObject) as any
-    expect(o.type).equals(grpcObject.objectType) // objectType -> type
+// Runs the real @mysten/sui `getObjects` mapping via the fake-client, so it also
+// guards the object/owner mapping against upstream drift.
+describe('toSuiClientObjects', () => {
+  const one = async (o: any) => ((await toSuiClientObjects([o])) as any[])[0]
+
+  test('maps gRPC protojson Object to unified SuiClientTypes shape', async () => {
+    const o = await one(grpcObject)
+    expect(o.type).equals(grpcObject.objectType) // objectType -> type (already normalized)
     expect(o.objectId).equals(grpcObject.objectId)
     expect(o.version).equals(grpcObject.version)
     expect(o.owner.$kind).equals('ObjectOwner') // {kind:'OBJECT'} -> ObjectOwner
@@ -36,16 +40,16 @@ describe('toSuiClientObject', () => {
     expect(o.json).deep.equals(grpcObject.json)
   })
 
-  test('owner kinds map to the unified union', () => {
-    expect((toSuiClientObject({ owner: { kind: 'ADDRESS', address: '0x1' } }) as any).owner).deep.equals({
+  test('owner kinds map to the unified union', async () => {
+    expect((await one({ objectId: '0x1', owner: { kind: 'ADDRESS', address: '0x1' } })).owner).deep.equals({
       $kind: 'AddressOwner',
       AddressOwner: '0x1'
     })
-    expect((toSuiClientObject({ owner: { kind: 'IMMUTABLE' } }) as any).owner).deep.equals({
+    expect((await one({ objectId: '0x2', owner: { kind: 'IMMUTABLE' } })).owner).deep.equals({
       $kind: 'Immutable',
       Immutable: true
     })
-    expect((toSuiClientObject({ owner: { kind: 'SHARED', version: '7' } }) as any).owner).deep.equals({
+    expect((await one({ objectId: '0x3', owner: { kind: 'SHARED', version: '7' } })).owner).deep.equals({
       $kind: 'Shared',
       Shared: { initialSharedVersion: '7' }
     })
@@ -61,7 +65,7 @@ describe('toSuiClientObject', () => {
     expect(rawDecoded.length).equals(0)
 
     // After normalization it matches and decodes the Move struct content.
-    const decoded = await coder.filterAndDecodeObjects(matcher, [toSuiClientObject(grpcObject)])
+    const decoded = await coder.filterAndDecodeObjects(matcher, await toSuiClientObjects([grpcObject]))
     expect(decoded.length).equals(1)
     const d = decoded[0].data_decoded as any
     expect(d.id.id).equals(grpcObject.json.id)
@@ -87,9 +91,13 @@ const grpcMutatedChange = {
   objectType: '0x2::coin::Coin<0x2::sui::SUI>' // present on gRPC, absent on unified
 }
 
-describe('toSuiClientChangedObject', () => {
-  test('maps gRPC protojson ChangedObject to unified SuiClientTypes shape', () => {
-    const c = toSuiClientChangedObject(grpcMutatedChange) as any
+// These run the real @mysten/sui `parseTransactionEffects` (via the fake-client
+// in `toSuiClientChangedObjects`), so they double as a conformance guard: an
+// upgrade that changes the upstream mapping — or the internals the fake-client
+// leans on (`status.error` deref, the `{ $kind }` return union) — fails here.
+describe('toSuiClientChangedObjects', () => {
+  test('maps gRPC protojson ChangedObject to unified SuiClientTypes shape', async () => {
+    const [c] = (await toSuiClientChangedObjects([grpcMutatedChange])) as any[]
     expect(c.objectId).equals(grpcMutatedChange.objectId)
     expect(c.inputState).equals('Exists')
     expect(c.outputState).equals('ObjectWrite')
@@ -103,24 +111,29 @@ describe('toSuiClientChangedObject', () => {
     expect('objectType' in c).equals(false) // dropped: not on the unified type
   })
 
-  test('all enum value names map to the unified literals', () => {
-    const states = (s: any) => toSuiClientChangedObject(s) as any
-    expect(states({ inputState: 'INPUT_OBJECT_STATE_DOES_NOT_EXIST' }).inputState).equals('DoesNotExist')
-    expect(states({ outputState: 'OUTPUT_OBJECT_STATE_PACKAGE_WRITE' }).outputState).equals('PackageWrite')
-    expect(states({ outputState: 'OUTPUT_OBJECT_STATE_DOES_NOT_EXIST' }).outputState).equals('DoesNotExist')
-    expect(states({ outputState: 'OUTPUT_OBJECT_STATE_ACCUMULATOR_WRITE' }).outputState).equals('AccumulatorWriteV1')
-    expect(states({ idOperation: 'CREATED' }).idOperation).equals('Created')
-    expect(states({ idOperation: 'DELETED' }).idOperation).equals('Deleted')
-    expect(states({ idOperation: 'ID_OPERATION_UNKNOWN' }).idOperation).equals('None')
+  test('all enum value names map to the unified literals', async () => {
+    const one = async (s: any) => ((await toSuiClientChangedObjects([s])) as any[])[0]
+    expect((await one({ inputState: 'INPUT_OBJECT_STATE_DOES_NOT_EXIST' })).inputState).equals('DoesNotExist')
+    expect((await one({ outputState: 'OUTPUT_OBJECT_STATE_PACKAGE_WRITE' })).outputState).equals('PackageWrite')
+    expect((await one({ outputState: 'OUTPUT_OBJECT_STATE_DOES_NOT_EXIST' })).outputState).equals('DoesNotExist')
+    expect((await one({ outputState: 'OUTPUT_OBJECT_STATE_ACCUMULATOR_WRITE' })).outputState).equals(
+      'AccumulatorWriteV1'
+    )
+    expect((await one({ idOperation: 'CREATED' })).idOperation).equals('Created')
+    expect((await one({ idOperation: 'DELETED' })).idOperation).equals('Deleted')
+    expect((await one({ idOperation: 'ID_OPERATION_UNKNOWN' })).idOperation).equals('None')
   })
 
-  test('absent enum/owner fields fall back to Unknown / null', () => {
-    const c = toSuiClientChangedObject({ objectId: '0x9' }) as any
-    expect(c.inputState).equals('Unknown')
-    expect(c.outputState).equals('Unknown')
-    expect(c.idOperation).equals('Unknown')
+  // Upstream maps absent enum/owner fields to null (not 'Unknown'); the empty
+  // input short-circuits before constructing the fake client.
+  test('absent enum/owner fields become null; empty input yields []', async () => {
+    const [c] = (await toSuiClientChangedObjects([{ objectId: '0x9' }])) as any[]
+    expect(c.inputState).equals(null)
+    expect(c.outputState).equals(null)
+    expect(c.idOperation).equals(null)
     expect(c.inputVersion).equals(null)
     expect(c.inputOwner).equals(null)
     expect(c.outputOwner).equals(null)
+    expect(await toSuiClientChangedObjects([])).deep.equals([])
   })
 })
