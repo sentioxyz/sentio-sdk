@@ -25,7 +25,7 @@ import { CallHandler, TransactionFilter, accountTypeString, ObjectChangeHandler 
 import { ConnectError, Code } from '@connectrpc/connect'
 import { TypeDescriptor } from '@typemove/move'
 import { TypedSuiMoveObject } from './models.js'
-import { toSuiClientChangedObjects, toSuiClientObject } from './to-client-types.js'
+import { toSuiClientChangedObjects, toSuiClientObjects } from './to-client-types.js'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 
 export interface SuiObjectBindOptions {
@@ -191,10 +191,7 @@ export class SuiAddressProcessor extends SuiBaseObjectOrAddressProcessorInternal
     data: Data_SuiObject,
     ctx: SuiObjectContext
   ) {
-    return handler(
-      data.rawObjects.map((o) => toSuiClientObject(JSON.parse(o))),
-      ctx
-    )
+    return handler(await toSuiClientObjects(data.rawObjects.map((o) => JSON.parse(o))), ctx)
   }
 
   onTransactionBlock(
@@ -271,8 +268,8 @@ export class SuiObjectProcessor extends SuiBaseObjectOrAddressProcessorInternal<
       return
     }
     return handler(
-      toSuiClientObject(JSON.parse(data.rawSelf)),
-      data.rawObjects.map((o) => toSuiClientObject(JSON.parse(o))),
+      (await toSuiClientObjects([JSON.parse(data.rawSelf)]))[0],
+      await toSuiClientObjects(data.rawObjects.map((o) => JSON.parse(o))),
       ctx
     )
   }
@@ -310,13 +307,9 @@ export class SuiObjectTypeProcessor<T> extends SuiBaseObjectOrAddressProcessor<
       return
     }
     const object = await ctx.coder.filterAndDecodeObjects(this.objectType, [
-      toSuiClientObject(JSON.parse(data.rawSelf))
+      (await toSuiClientObjects([JSON.parse(data.rawSelf)]))[0]
     ])
-    return handler(
-      object[0],
-      data.rawObjects.map((o) => toSuiClientObject(JSON.parse(o))),
-      ctx
-    )
+    return handler(object[0], await toSuiClientObjects(data.rawObjects.map((o) => JSON.parse(o))), ctx)
   }
 
   public onObjectChange(
@@ -410,9 +403,6 @@ export class SuiWrappedObjectProcessor extends SuiBaseObjectOrAddressProcessorIn
     data: Data_SuiObject,
     ctx: SuiObjectContext
   ) {
-    return handler(
-      data.rawObjects.map((o) => toSuiClientObject(JSON.parse(o))),
-      ctx
-    )
+    return handler(await toSuiClientObjects(data.rawObjects.map((o) => JSON.parse(o))), ctx)
   }
 }

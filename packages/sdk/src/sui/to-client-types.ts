@@ -16,51 +16,35 @@ function base64ToBytes(b64: string): Uint8Array {
   return new Uint8Array(Buffer.from(b64, 'base64'))
 }
 
-// Mirrors mapOwner in @mysten/sui's grpc core. protojson serializes the
-// Owner.OwnerKind enum to its proto value name and uint64 `version` to a string.
-// Source: https://github.com/MystenLabs/ts-sdks/blob/8588da38e0a813f87b345c348e63486a7a766a61/packages/sui/src/grpc/core.ts#L821
-function mapOwner(owner: any): SuiClientTypes.ObjectOwner | null {
-  if (!owner) {
-    return null
+// protojson `sui.rpc.v2.Object[]` -> unified `SuiClientTypes.Object<{ json: true }>[]`.
+//
+// Same reuse strategy as `toSuiClientChangedObjects`: instead of mirroring the
+// object/owner mapping by hand, drive @mysten/sui's own `getObjects` mapping
+// (which also normalizes the struct tag and owner) through a fake transport, so
+// SDK upgrades stay in lockstep. `getObjects` chunks ids by 50 and calls
+// `ledgerService.batchGetObjects` per chunk reading `{ result: { oneofKind } }`
+// per request, so the fake returns objects keyed by the requested id.
+// `include: { json: true }` leaves content/objectBcs/previousTransaction/display
+// unset, matching the old hand-rolled output.
+// See https://github.com/MystenLabs/ts-sdks/blob/8588da38e0a813f87b345c348e63486a7a766a61/packages/sui/src/grpc/core.ts#L176
+export async function toSuiClientObjects(rawObjects: any[]): Promise<SuiMoveObjectInput[]> {
+  if (rawObjects.length === 0) {
+    return []
   }
-  switch (owner.kind) {
-    case 'IMMUTABLE':
-      return { $kind: 'Immutable', Immutable: true }
-    case 'ADDRESS':
-      return { $kind: 'AddressOwner', AddressOwner: owner.address }
-    case 'OBJECT':
-      return { $kind: 'ObjectOwner', ObjectOwner: owner.address }
-    case 'SHARED':
-      return { $kind: 'Shared', Shared: { initialSharedVersion: String(owner.version) } }
-    case 'CONSENSUS_ADDRESS':
-      return {
-        $kind: 'ConsensusAddressOwner',
-        ConsensusAddressOwner: { startVersion: String(owner.version), owner: owner.address }
+  const byId = new Map(rawObjects.map((o) => [o.objectId, GrpcTypes.Object.fromJson(o, { ignoreUnknownFields: true })]))
+  const core = new GrpcCoreClient({
+    client: {
+      ledgerService: {
+        batchGetObjects: async ({ requests }: any) => ({
+          response: {
+            objects: requests.map((r: any) => ({ result: { oneofKind: 'object', object: byId.get(r.objectId) } }))
+          }
+        })
       }
-    default:
-      return { $kind: 'Unknown' }
-  }
-}
-
-// protojson `sui.rpc.v2.Object` -> unified `SuiClientTypes.Object<{ json: true }>`.
-// Already-unified inputs (from `SuiGrpcClient.core`) pass through: `.type` and
-// `.json` are read with the gRPC names falling back to the unified ones. With
-// `Include = { json: true }` every field except objectId/version/digest/owner/
-// type/json is typed `undefined`, so we deliberately leave them unset.
-// Source: https://github.com/MystenLabs/ts-sdks/blob/8588da38e0a813f87b345c348e63486a7a766a61/packages/sui/src/grpc/core.ts#L176
-export function toSuiClientObject(o: any): SuiMoveObjectInput {
-  return {
-    objectId: o.objectId,
-    version: o.version,
-    digest: o.digest,
-    owner: mapOwner(o.owner)!,
-    type: o.objectType ?? o.type ?? '',
-    content: undefined,
-    previousTransaction: undefined,
-    objectBcs: undefined,
-    json: o.json ?? null,
-    display: undefined
-  } as SuiMoveObjectInput
+    }
+  } as any)
+  const res: any = await core.getObjects({ objectIds: rawObjects.map((o) => o.objectId), include: { json: true } })
+  return res.objects as SuiMoveObjectInput[]
 }
 
 // protojson `sui.rpc.v2.ChangedObject[]` -> unified `SuiClientTypes.ChangedObject[]`.
