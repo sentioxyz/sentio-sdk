@@ -9,22 +9,22 @@
   },
   "type": "module",
   "exports": {
-    ".": "./lib/index.js"
+    ".": "./dist/index.js"
   },
   "bin": {
-    "sentio": "./lib/index.js"
+    "sentio": "./dist/index.js"
   },
   "files": [
-    "lib",
+    "dist",
     "src",
     "templates",
     "!**/*.test.*",
-    "!lib/**/*.map"
+    "!dist/**/*.map"
   ],
   "scripts": {
     "build": "pnpm tsc --noEmit && pnpm bundle",
     "postbuild": "pnpm install",
-    "bundle": "esbuild --platform=node --format=esm --bundle src/index.ts --outfile=lib/index.js --sourcemap --inject:src/cjs-shim.ts --external:@sentio/sdk",
+    "bundle": "esbuild --platform=node --format=esm --bundle src/index.ts --outfile=dist/index.js --sourcemap --inject:src/cjs-shim.ts --external:@sentio/sdk",
     "cli": "tsx src/index.ts",
     "compile": "tsc",
     "test": "tsx --test 'src/**/*.test.ts'"
@@ -51,7 +51,7 @@
     "open": "^11.0.0",
     "package-manager-manager": "^0.2.0",
     "solc": "^0.8.25",
-    "tsup": "npm:@sentio/tsup@^8.3.5-rc.1",
+    "tsdown": "^0.22.3",
     "tsx": "^4.15.2",
     "yaml": "^2.3.4"
   },
@@ -64,6 +64,6 @@
     "@types/fs-extra": "^11.0.4"
   },
   "engines": {
-    "node": ">=24"
+    "node": ">=24.11.0"
   }
 }

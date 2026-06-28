@@ -41,19 +41,19 @@ export async function buildProcessor(onlyGen: boolean, options: CommandOptionsTy
   }
 
   if (!onlyGen) {
-    let tsupConfig: string
+    let tsdownConfig: string
     try {
-      tsupConfig = path.resolve(getPackageRoot('@sentio/sdk'), 'lib', 'tsup.config.ts')
+      tsdownConfig = path.resolve(getPackageRoot('@sentio/sdk'), 'dist', 'tsdown.config.ts')
     } catch (e) {
-      console.error(chalk.red("Wrong CLI version for sdk, can't find tsup.config.ts"))
+      console.error(chalk.red("Wrong CLI version for sdk, can't find tsdown.config.ts"))
       process.exit(1)
     }
 
     const tsc = path.resolve(getPackageRoot('typescript'), 'bin', 'tsc')
     await execStep(['node', tsc, '--noEmit'], 'type checking')
 
-    const tsup = path.resolve(getPackageRoot('tsup'), 'dist', 'cli-default.js')
-    await execStep(['node', tsup, '--config', tsupConfig], 'Packaging')
+    const tsdown = path.resolve(getPackageRoot('tsdown'), 'dist', 'run.mjs')
+    await execStep(['node', tsdown, '--config', tsdownConfig], 'Packaging')
 
     const dir = fs.readdirSync(path.join(process.cwd(), 'dist'))
     const generated = dir.filter((d) => d.endsWith('.js')).length

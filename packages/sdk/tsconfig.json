@@ -2,11 +2,11 @@
   "compilerOptions": {
     //    "inlineSources": true,
     "rootDir": "./src",
-    "outDir": "lib",
+    "outDir": "dist",
     "paths": {
       "@sentio/sdk/*": ["./src/*/index.js"]
     }
   },
-  "exclude": ["lib", "src/bundle.config.ts", "src/tsup.config.ts", "sync-sui-to-iota.ts"],
+  "exclude": ["dist", "src/bundle.config.ts", "src/tsdown.config.ts", "sync-sui-to-iota.ts"],
   "extends": "../../tsconfig.json"
 }

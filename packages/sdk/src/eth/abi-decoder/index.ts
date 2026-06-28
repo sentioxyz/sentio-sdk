@@ -31,7 +31,7 @@ function findWorkFile() {
       baseUrl = baseUrl.substring(0, index + 13)
     }
   }
-  return new URL('./lib/eth/abi-decoder/decode-worker.js', baseUrl).href
+  return new URL('./dist/eth/abi-decoder/decode-worker.js', baseUrl).href
 }
 
 export async function parseLog(processor: any, log: LogParams) {

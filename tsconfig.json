@@ -8,7 +8,7 @@
     "target": "esnext",
     "lib": ["ESNext"],
     "types": ["node"],
-    // Required for @sentio/tsup's dts plugin which forces baseUrl in its compilerOptions
+    // Suppress TS6.0 deprecation errors (e.g. baseUrl) surfaced by dts tooling
     "ignoreDeprecations": "6.0",
     "esModuleInterop": true,
     "noImplicitReturns": true,
