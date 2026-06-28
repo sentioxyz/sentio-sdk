@@ -51,8 +51,7 @@
     "./fuel": "./dist/fuel/index.js",
     "./fuel/codegen": "./dist/fuel/codegen/index.js",
     "./store": "./dist/store/index.js",
-    "./store/codegen": "./dist/store/codegen.js",
-    "./btc": "./dist/btc/index.js"
+    "./store/codegen": "./dist/store/codegen.js"
   },
   "files": [
     "assets",

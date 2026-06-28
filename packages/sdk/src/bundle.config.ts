@@ -1,22 +1,14 @@
 import { defineConfig } from 'tsdown'
-import fs from 'node:fs'
 import packageJson from '../package.json' with { type: 'json' }
 
-// Map each published export to an object entry so the bundled output preserves the
-// dist/<subpath>.js layout (array entries would collide on the many nested index.ts).
-// Skip exports whose source is missing (e.g. phantom ./btc) — tsup tolerated these.
-const entry = Object.fromEntries(
-  Object.values(packageJson.exports)
-    .filter((p) => !p.includes('codegen'))
-    .map((p) => {
-      const rel = p.replace(/^\.\/dist\//, '').replace(/\.js$/, '')
-      return [rel, `./src/${rel}.ts`]
-    })
-    .filter(([, src]) => fs.existsSync(src))
-)
+// Bundle exactly the published entry points. tsdown preserves the nested src/
+// structure via the common-ancestor root, so output matches the dist/<subpath>.js
+// export layout.
+const entry = Object.values(packageJson.exports)
+  .filter((p) => !p.includes('codegen'))
+  .map((p) => p.replace(/^\.\/dist\//, 'src/').replace(/\.js$/, '.ts'))
 
 export default defineConfig({
-  // tsdown sets cwd to the config file's dir; pin to the actual working directory.
   cwd: process.cwd(),
   entry,
   outDir: 'dist',
@@ -28,7 +20,7 @@ export default defineConfig({
   sourcemap: true,
   clean: true,
   // dts handled separately via `tsc --emitDeclarationOnly --declaration` (bundle:dts);
-  // disable the auto-dts tsdown would otherwise enable from tsconfig `declaration: true`.
+  // disable the auto-dts tsdown would enable from tsconfig `declaration: true`.
   dts: false,
   deps: {
     alwaysBundle: [/.*/],

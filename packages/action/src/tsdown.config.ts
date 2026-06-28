@@ -1,7 +1,5 @@
 import { defineConfig } from 'tsdown'
 
-export const external = []
-
 // Force-keep every source module so tree-shaking never drops a self-registering
 // handler (see packages/sdk/src/tsdown.config.ts for rationale).
 function sentioRegistrationGuard() {
@@ -37,7 +35,7 @@ export default defineConfig({
   plugins: [sentioRegistrationGuard()],
   deps: {
     alwaysBundle: [/.*/],
-    neverBundle: [...external, /^@sentio\/(sdk|runtime|ethers).*$/],
+    neverBundle: [/^@sentio\/(sdk|runtime|ethers).*$/],
     onlyBundle: false
   },
   outputOptions: {
