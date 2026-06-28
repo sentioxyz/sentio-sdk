@@ -2392,6 +2392,18 @@
           "return": []
         },
         {
+          "name": "remove",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [
+            "&0x4::property_map::MutatorRef",
+            "&0x1::string::String"
+          ],
+          "return": []
+        },
+        {
           "name": "init",
           "visibility": "public",
           "is_entry": false,
@@ -2421,18 +2433,6 @@
           "return": [
             "u64"
           ]
-        },
-        {
-          "name": "remove",
-          "visibility": "public",
-          "is_entry": false,
-          "is_view": false,
-          "generic_type_params": [],
-          "params": [
-            "&0x4::property_map::MutatorRef",
-            "&0x1::string::String"
-          ],
-          "return": []
         },
         {
           "name": "add",
