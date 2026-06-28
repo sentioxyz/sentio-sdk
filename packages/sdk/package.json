@@ -108,7 +108,7 @@
     "@typemove/sui": "2.0.4",
     "bs58": "^6.0.0",
     "chalk": "^5.3.0",
-    "ethers": "npm:@sentio/ethers@6.13.1-patch.6",
+    "ethers": "^6.17.0",
     "fuels": "^0.103.0",
     "got": "^14.4.7",
     "graphql": "^16.11.0",

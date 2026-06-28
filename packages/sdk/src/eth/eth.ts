@@ -1,11 +1,5 @@
-import {
-  allowNull,
-  arrayOf,
-  formatBlock,
-  LogParams,
-  TransactionReceiptParams,
-  TransactionResponseParams
-} from 'ethers/providers'
+import { LogParams, TransactionReceiptParams, TransactionResponseParams } from 'ethers/providers'
+import { allowNull, arrayOf, formatBlock } from './ethers-format.js'
 import {
   accessListify,
   Addressable,
@@ -20,7 +14,7 @@ import {
   Result,
   Signature
 } from 'ethers'
-import type { AccessList } from 'ethers/transaction'
+import type { AccessList, Authorization } from 'ethers/transaction'
 import { ContractContext } from './context.js'
 import { getAddress } from 'ethers/address'
 import { getBigInt, getNumber } from 'ethers/utils'
@@ -416,6 +410,9 @@ class FormattedTransactionResponse implements TransactionResponseParams {
   get blobVersionedHashes(): string[] | null | undefined {
     return this.raw.blobVersionedHashes ?? null
   }
+  get authorizationList(): null | Array<Authorization> {
+    return this.raw.authorizationList ?? null
+  }
 }
 
 export function formatTransactionResponse(value: any): TransactionResponseParams {
@@ -557,9 +554,51 @@ export function newContract(
   abi: Interface | InterfaceAbi,
   runner?: ContractRunner | null | undefined
 ) {
-  return new Contract(target, abi, runner)
+  return new Contract(target, abi instanceof Interface ? abi : sanitizeAbi(abi), runner)
 }
 
 export function newInterface(fragments: InterfaceAbi) {
-  return new Interface(fragments)
+  return new Interface(sanitizeAbi(fragments))
+}
+
+/**
+ * Recursively drop `indexed: false` from ABI fragment objects.
+ *
+ * Upstream ethers' `ParamType.from` throws "parameter cannot be indexed" when a
+ * non-event parameter (function/error/constructor input) carries an explicit
+ * `indexed: false` — some real-world ABIs do. The retired @sentio/ethers fork
+ * tolerated this; we replicate it here by stripping the redundant flag before the
+ * ABI reaches ethers. Dropping `indexed: false` is safe: it is the default for
+ * event params (non-indexed) and meaningless elsewhere; `indexed: true` is kept.
+ */
+export function sanitizeAbi(abi: InterfaceAbi): InterfaceAbi {
+  if (typeof abi === 'string') {
+    try {
+      return dropFalseIndexed(JSON.parse(abi))
+    } catch {
+      // human-readable single fragment (not JSON) — nothing to sanitize
+      return abi
+    }
+  }
+  if (Array.isArray(abi)) {
+    return dropFalseIndexed(abi)
+  }
+  return abi
+}
+
+function dropFalseIndexed(node: any): any {
+  if (Array.isArray(node)) {
+    return node.map(dropFalseIndexed)
+  }
+  if (node && typeof node === 'object') {
+    const out: Record<string, any> = {}
+    for (const [key, value] of Object.entries(node)) {
+      if (key === 'indexed' && value === false) {
+        continue
+      }
+      out[key] = dropFalseIndexed(value)
+    }
+    return out
+  }
+  return node
 }
