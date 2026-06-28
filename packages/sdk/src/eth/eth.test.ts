@@ -3,7 +3,7 @@ import { assert, expect } from 'chai'
 import { Interface } from 'ethers'
 
 import { fixEmptyKey } from './index.js'
-import { newInterface, sanitizeAbi } from './eth.js'
+import { newInterface, sanitizeAbi, formatRichBlock } from './eth.js'
 import { GLOBAL_CONFIG } from '@sentio/runtime'
 
 GLOBAL_CONFIG.execution = {
@@ -77,6 +77,35 @@ describe('eth test', () => {
     // ... newInterface() strips the redundant flag first so the function survives.
     const iface = newInterface(abi as any)
     assert(iface.getFunction('deposit'))
+  })
+
+  test('formatRichBlock lazily coerces raw fields and transactions', () => {
+    const raw: any = {
+      hash: '0x2b9b7cce1f17f3b7e1f3c2472cc806a07bee3f0baca07d021350950d81d73a42',
+      parentHash: '0x2b9b7cce1f17f3b7e1f3c2472cc806a07bee3f0baca07d021350950d81d73a41',
+      number: '0xff', // hex -> number
+      timestamp: '0x6231a2c5',
+      gasUsed: '0x5208', // hex -> bigint
+      gasLimit: '0x1c9c380',
+      difficulty: '0x1',
+      miner: '0xbb7b8287f3f0a933474a79eae42cbca977791171',
+      mixHash: '0x000000000000000000000000000000000000000000000000000000000000beef', // -> prevRandao
+      baseFeePerGas: null,
+      extraData: '0x',
+      nonce: '0x689056015818adbe',
+      transactions: ['0xc05c37b34e13380d0b7e0475b27a0c77fda826f82c603f9c45922e952d63b7a5', { hash: '0xdeadbeef' }]
+    }
+
+    const block = formatRichBlock(raw)
+    expect(block.number).equals(255)
+    expect(typeof block.number).equals('number')
+    expect(block.gasUsed).equals(21000n)
+    expect(block.baseFeePerGas).equals(null)
+    // mixHash is surfaced as prevRandao
+    expect(block.prevRandao).equals('0x000000000000000000000000000000000000000000000000000000000000beef')
+    // string tx hashes pass through; object txs are lazily wrapped
+    expect(block.transactions[0]).equals('0xc05c37b34e13380d0b7e0475b27a0c77fda826f82c603f9c45922e952d63b7a5')
+    expect((block.transactions[1] as any).hash).equals('0xdeadbeef')
   })
 
   test('sanitizeAbi drops indexed:false but keeps indexed:true', () => {

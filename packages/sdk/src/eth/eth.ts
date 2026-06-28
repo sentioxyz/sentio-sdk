@@ -1,5 +1,5 @@
 import { LogParams, TransactionReceiptParams, TransactionResponseParams } from 'ethers/providers'
-import { allowNull, arrayOf, formatBlock } from './ethers-format.js'
+import { allowNull, arrayOf } from './ethers-format.js'
 import {
   accessListify,
   Addressable,
@@ -419,12 +419,99 @@ export function formatTransactionResponse(value: any): TransactionResponseParams
   return new FormattedTransactionResponse(value)
 }
 
-export function formatRichBlock(block: RichBlock): RichBlock {
-  block = { ...block, ...formatBlock(block) }
-  if (block.transactionReceipts) {
-    block.transactionReceipts = block.transactionReceipts.map((t) => formatTransactionReceipt(t))
+class FormattedBlock implements RichBlock {
+  constructor(readonly raw: any) {}
+
+  get hash(): string | null {
+    return this.raw.hash ?? null
   }
-  return block
+  get number(): number {
+    return getNumber(this.raw.number)
+  }
+  get timestamp(): number {
+    return getNumber(this.raw.timestamp)
+  }
+  get parentHash(): string {
+    return this.raw.parentHash
+  }
+  get parentBeaconBlockRoot(): string | null {
+    return this.raw.parentBeaconBlockRoot ?? null
+  }
+  get nonce(): string {
+    return this.raw.nonce
+  }
+  _difficulty?: bigint
+  get difficulty(): bigint {
+    return this._difficulty ?? (this._difficulty = getBigInt(this.raw.difficulty))
+  }
+  _gasLimit?: bigint
+  get gasLimit(): bigint {
+    return this._gasLimit ?? (this._gasLimit = getBigInt(this.raw.gasLimit))
+  }
+  _gasUsed?: bigint
+  get gasUsed(): bigint {
+    return this._gasUsed ?? (this._gasUsed = getBigInt(this.raw.gasUsed))
+  }
+  get blobGasUsed(): bigint | null {
+    return allowNull(getBigInt, null)(this.raw.blobGasUsed)
+  }
+  get excessBlobGas(): bigint | null {
+    return allowNull(getBigInt, null)(this.raw.excessBlobGas)
+  }
+  _miner?: string
+  get miner(): string {
+    return this._miner ?? (this._miner = allowNull(getAddress)(this.raw.miner) as string)
+  }
+  get prevRandao(): string | null {
+    return this.raw.prevRandao ?? this.raw.mixHash ?? null
+  }
+  get extraData(): string {
+    return this.raw.extraData
+  }
+  _baseFeePerGas?: bigint | null
+  get baseFeePerGas(): bigint | null {
+    return this._baseFeePerGas !== undefined
+      ? this._baseFeePerGas
+      : (this._baseFeePerGas = allowNull(getBigInt, null)(this.raw.baseFeePerGas))
+  }
+  get stateRoot(): string | null {
+    return this.raw.stateRoot ?? null
+  }
+  get receiptsRoot(): string | null {
+    return this.raw.receiptsRoot ?? null
+  }
+  get transactionsRoot(): string | null {
+    return this.raw.transactionsRoot ?? null
+  }
+
+  _transactions?: ReadonlyArray<string | TransactionResponseParams>
+  get transactions(): ReadonlyArray<string | TransactionResponseParams> {
+    return (
+      this._transactions ??
+      (this._transactions = (this.raw.transactions ?? []).map((tx: any) =>
+        typeof tx === 'string' ? tx : formatTransactionResponse(tx)
+      ))
+    )
+  }
+
+  // RichBlock extras
+  get traces(): Trace[] | undefined {
+    return this.raw.traces
+  }
+  _transactionReceipts?: TransactionReceiptParams[]
+  get transactionReceipts(): TransactionReceiptParams[] | undefined {
+    if (this._transactionReceipts !== undefined) {
+      return this._transactionReceipts
+    }
+    if (!this.raw.transactionReceipts) {
+      return undefined
+    }
+    return (this._transactionReceipts = this.raw.transactionReceipts.map((t: any) => formatTransactionReceipt(t)))
+  }
+}
+
+export function formatRichBlock(block: RichBlock): RichBlock {
+  return new FormattedBlock(block)
 }
 
 export interface TypedCallTrace<TArgsArray extends Array<any> = any, TArgsObject = any> extends Trace {
