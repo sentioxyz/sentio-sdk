@@ -78,7 +78,7 @@ jobs:
       - name: Clean peerDependencies & templates' node_modules
         run: |
           # Dependencies are bundled.
-          pnpm json -I -f package.json -e "this.dependencies=Object.fromEntries(Object.entries(this.dependencies).filter((entry) => ['@sentio/graph-cli', 'dotenv', 'tsup', 'tsx'].includes(entry['0'])))"
+          pnpm json -I -f package.json -e "this.dependencies=Object.fromEntries(Object.entries(this.dependencies).filter((entry) => ['@sentio/graph-cli', 'dotenv', 'tsdown', 'tsx'].includes(entry['0'])))"
           # PeerDeps only for development with pnpm
           # templates' node_modules shouldn't go into registry
           pnpm json -I -f package.json -e "this.peerDependencies={}"
@@ -116,7 +116,7 @@ jobs:
           export BRANCH=${GITHUB_REF##*/}
           pnpm build:bundle
           pnpm json -I -f package.json -e "this.dependencies=Object.fromEntries(Object.entries(this.dependencies).filter((entry) => ['@sentio/chain', '@sentio/runtime', 'piscina','graphql'].includes(entry['0'])))"
-          pnpm json -I -f package.json -e 'this.name="@sentio/sdk-bundle"; this.scripts={}; this.peerDependencies={}; this.devDependencies={}; this.files = ["lib", "assets"]'
+          pnpm json -I -f package.json -e 'this.name="@sentio/sdk-bundle"; this.scripts={}; this.peerDependencies={}; this.devDependencies={}; this.files = ["dist", "assets"]'
         working-directory: packages/sdk
       - name: sdk-bundle NPM Publish
         if: steps.semantic.outputs.new_release_published == 'true'

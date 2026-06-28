@@ -9,13 +9,13 @@
   },
   "type": "module",
   "exports": {
-    ".": "./lib/index.js"
+    ".": "./dist/index.js"
   },
   "bin": {
-    "processor-runner": "./lib/processor-runner.js"
+    "processor-runner": "./dist/processor-runner.js"
   },
   "files": [
-    "lib",
+    "dist",
     "src",
     "!**/*.test.*",
     "!**/tests"
@@ -23,11 +23,11 @@
   "scripts": {
     "build": "pnpm tsc --noEmit && pnpm bundle",
     "build:all": "pnpm --filter=$(node -p \"require('./package.json').name\")... build",
-    "bundle": "tsup --config src/tsup.config.ts",
+    "bundle": "tsdown --config src/tsdown.config.ts",
     "compile": "tsc",
     "run": "tsx src/processor-runner.ts --log-format=json",
     "run-benchmark": "tsx src/decode-benchmark.ts",
-    "start_js": "tsx ./lib/processor-runner.js $PWD/../../debug/dist/lib.js",
+    "start_js": "tsx ./dist/processor-runner.js $PWD/../../debug/dist/lib.js",
     "start_ts": "tsx src/processor-runner.ts --debug --worker 3 --port 4000 --chains-config chains-config.json $PWD/../../examples/x2y2/src/processor.ts",
     "test": "tsx --test 'src/**/*.test.ts'"
   },
@@ -50,9 +50,10 @@
   },
   "devDependencies": {
     "@commander-js/extra-typings": "^14.0.0",
-    "@types/fs-extra": "^11.0.4"
+    "@types/fs-extra": "^11.0.4",
+    "tsdown": "^0.22.3"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=24.11.0"
   }
 }

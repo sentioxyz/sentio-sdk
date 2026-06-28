@@ -2,8 +2,8 @@
   "compilerOptions": {
     //    "inlineSources": true,
     "rootDir": "./src",
-    "outDir": "lib"
+    "outDir": "dist"
   },
-  "exclude": ["lib", "templates"],
+  "exclude": ["dist", "templates", "src/bundle.config.ts"],
   "extends": "../../tsconfig.json"
 }

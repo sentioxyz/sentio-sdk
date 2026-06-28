@@ -9,10 +9,10 @@
   },
   "type": "module",
   "exports": {
-    ".": "./lib/index.js"
+    ".": "./dist/index.js"
   },
   "files": [
-    "lib",
+    "dist",
     "src",
     "!**/*.test.*",
     "!**/tests"
@@ -21,7 +21,7 @@
     "build": "pnpm gen && pnpm compile",
     "build:all": "pnpm --filter=$(node -p \"require('./package.json').name\")... build",
     "build:bundle": "pnpm gen && pnpm bundle && pnpm bundle:dts",
-    "compile": "tsc && cp src/tsup.config.ts lib",
+    "compile": "tsc && cp src/tsdown.config.ts dist",
     "gen": "echo",
     "test": "tsx --test 'src/**/*.test.ts'"
   },
@@ -36,6 +36,6 @@
     "typedoc": "^0.28.0"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=24.11.0"
   }
 }

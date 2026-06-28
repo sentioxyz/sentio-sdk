@@ -12,7 +12,7 @@ packages:
 #   - protobufjs: postinstall is just a versionScheme warning, not load-bearing.
 allowBuilds:
   bufferutil: false
-  esbuild: true # downloads platform binary; tsup bundle requires it
+  esbuild: true # downloads platform binary; required transitively by tsx
   protobufjs: false
   unrs-resolver: true # napi platform binary for ESLint TS resolver
   utf-8-validate: false

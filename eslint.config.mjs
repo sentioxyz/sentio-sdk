@@ -31,7 +31,7 @@ export default defineConfig([
     languageOptions: {
       parserOptions: {
         projectService: {
-          allowDefaultProject: ['*.mjs', '*.js', 'packages/cli-alias/index.js']
+          allowDefaultProject: ['*.mjs', '*.js', 'packages/cli/bin.mjs']
         }
       },
       ecmaVersion: 'latest',

@@ -25,25 +25,25 @@ ignore:
   - docs
   - debug
   - node_modules
-  - packages/cli/lib
+  - packages/cli/dist
   - packages/cli/node_modules
   - packages/cli/templates
   - packages/sdk/src/eth/abis
   - packages/sdk/src/eth/builtin/internal
   - packages/sdk/docs
-  - packages/sdk/lib
+  - packages/sdk/dist
   - packages/sdk/node_modules
   - examples
   - packages/sdk/src/eth/tests
   - packages/protos/lib
   - packages/protos/node_modules
-  - packages/runtime/lib
+  - packages/runtime/dist
   - packages/runtime/node_modules
   - packages/sdk/src/solana/tests
   - packages/sdk/src/fuel/tests
   - packages/sdk/src/stark/tests
   - packages/sdk/src/tests
   - packages/action/node_modules
-  - packages/action/lib
+  - packages/action/dist
   - .claude
   - .pnpm-store
