@@ -1,4 +1,5 @@
-import { JsonRpcProvider, Network } from 'ethers'
+import { JsonRpcProvider, Network, hexlify } from 'ethers'
+import type { JsonRpcError, JsonRpcPayload, JsonRpcResult } from 'ethers'
 
 import PQueue from 'p-queue'
 import { EthChainId } from '@sentio/chain'
@@ -185,6 +186,87 @@ export class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
       throw Error('Unexpected null response')
     }
     return result
+  }
+
+  // Overrides the low-level JSON-RPC transport to replicate behaviors that used to
+  // live in the @sentio/ethers fork, so the SDK can run on upstream ethers:
+  //   1. Treat an empty `0x` eth_call result as an RPC error — the Sentio rpc-node
+  //      answers 200/`0x` (instead of a JSON-RPC error) with `sentio-*` headers when
+  //      a call cannot be served, and we want that to throw rather than silently
+  //      return empty data.
+  //   2. Forward `sentio-*` response headers onto error results so they surface in
+  //      getRpcError().info for diagnostics.
+  //   3. Attach the request payload to TIMEOUT errors (previously the fork's
+  //      geturl.ts patch) for diagnostics.
+  override async _send(payload: JsonRpcPayload | Array<JsonRpcPayload>): Promise<Array<JsonRpcResult>> {
+    const request = this._getConnection()
+    request.body = JSON.stringify(payload)
+    request.setHeader('content-type', 'application/json')
+
+    let response
+    try {
+      response = await request.send()
+    } catch (e: any) {
+      if (e?.code === 'TIMEOUT') {
+        e.payload = payload
+      }
+      throw e
+    }
+    response.assertOk()
+
+    let resp = response.bodyJson
+    if (!Array.isArray(resp)) {
+      resp = [resp]
+    }
+
+    const sentioHeaders: Record<string, string> = {}
+    for (const [key, value] of Object.entries(response.headers)) {
+      if (key.toLowerCase().includes('sentio')) {
+        sentioHeaders[key] = value as string
+      }
+    }
+    const hasSentioHeaders = Object.keys(sentioHeaders).length > 0
+
+    const methodById = new Map<number, string>()
+    for (const p of Array.isArray(payload) ? payload : [payload]) {
+      methodById.set(p.id, p.method)
+    }
+
+    for (const res of resp as any[]) {
+      let isError = 'error' in res
+      if (!isError && methodById.get(res.id) === 'eth_call') {
+        try {
+          if (hexlify(res.result) === '0x') {
+            res.error = { code: 3, message: 'empty response (0x) from eth_call' }
+            isError = true
+          }
+        } catch {
+          // result is not hex-like; leave it as a normal result
+        }
+      }
+      if (isError && hasSentioHeaders) {
+        res.headers = sentioHeaders
+      }
+    }
+
+    return resp
+  }
+
+  override getRpcError(payload: JsonRpcPayload, error: JsonRpcError): Error {
+    const e = super.getRpcError(payload, error)
+    const headers = (error as any)?.headers
+    if (headers) {
+      ;(e as any).info = { ...((e as any).info ?? {}), headers }
+    }
+    // Annotate eth_call errors with the queried block tag (previously the fork's
+    // contract.ts blockNumber patch).
+    if (payload?.method === 'eth_call' && Array.isArray((payload as any).params)) {
+      const blockTag = (payload as any).params[1]
+      if (blockTag != null) {
+        ;(e as any).blockNumber = blockTag
+      }
+    }
+    return e
   }
 
   toString() {

@@ -233,8 +233,8 @@ importers:
         specifier: ^17.0.0
         version: 17.2.2
       ethers:
-        specifier: npm:@sentio/ethers@6.13.1-patch.6
-        version: '@sentio/ethers@6.13.1-patch.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)'
+        specifier: ^6.17.0
+        version: 6.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       express:
         specifier: ^5.0.0
         version: 5.2.1
@@ -477,7 +477,7 @@ importers:
         version: 3.4.29
       '@sentio/ethers-v6':
         specifier: ^1.0.29
-        version: 1.0.29(@sentio/ethers@6.13.1-patch.6(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typescript@6.0.3)
+        version: 1.0.29(ethers@6.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typescript@6.0.3)
       '@sentio/protos':
         specifier: workspace:*
         version: link:../protos
@@ -506,8 +506,8 @@ importers:
         specifier: ^5.3.0
         version: 5.3.0
       ethers:
-        specifier: npm:@sentio/ethers@6.13.1-patch.6
-        version: '@sentio/ethers@6.13.1-patch.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)'
+        specifier: ^6.17.0
+        version: 6.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       fuels:
         specifier: ^0.103.0
         version: 0.103.0(encoding@0.1.13)(vitest@3.0.9(@types/node@24.10.13)(tsx@4.22.3)(yaml@2.7.1))
@@ -606,8 +606,8 @@ packages:
   '@actions/io@3.0.2':
     resolution: {integrity: sha512-nRBchcMM+QK1pdjO7/idu86rbJI5YHUKCvKs0KxnSYbVe3F51UfGxuZX4Qy/fWlp6l7gWFwIkrOzN+oUK03kfw==}
 
-  '@adraffy/ens-normalize@1.10.1':
-    resolution: {integrity: sha512-96Z2IP3mYmF1Xg2cDm8f1gWGf/HUVedQ3FMifV4kG/PQ4yEP51xDtRAEfhVNt5f/uzpNkZHwWQuUcu6D6K+Ekw==}
+  '@adraffy/ens-normalize@1.11.1':
+    resolution: {integrity: sha512-nhCBV3quEgesuf7c7KYfperqSS14T8bYuvJ8PcLJp6znkZpFc0AuW4qBtr8eKVyPPe/8RSr7sglCWPU5eaxwKQ==}
 
   '@anchor-lang/borsh@1.0.2':
     resolution: {integrity: sha512-QQYhe6vaUwdLYndjFpbmmskRVoj49RoXsxRPrYtpkviuKFfWfii7bb3ziVi1bMBfl0rVMRFSVnJPKSo+EHWrmg==}
@@ -2545,10 +2545,6 @@ packages:
       ethers: ^6.0.0
       typescript: '>=4.3.0'
 
-  '@sentio/ethers@6.13.1-patch.6':
-    resolution: {integrity: sha512-lWdwnGmkPH0APC7w7EjsphPfiuRVWSGx96bffU0g4YnkuSMdr5+mvHB+WjYfTIy7aV8gfPKRuHBswmWj5LOoyg==}
-    engines: {node: '>=14.0.0'}
-
   '@sentio/graph-cli@0.97.0':
     resolution: {integrity: sha512-QML91/CV8mYBbsUTAsOZbGpXCm7uQJiwNgq3cod9/KWAwDs68CzEqO6k6kJlHKWekJXXGoCrCfV+pNAf3BWZnw==}
     engines: {node: '>=20.18.1'}
@@ -3084,8 +3080,8 @@ packages:
   '@types/node@12.20.55':
     resolution: {integrity: sha512-J8xLz7q2OFulZ2cyGTLE1TbbZcjpno7FaN6zdJNrgAdrJ+DZzh/uFR6YrTb4C+nXakvud8Q4+rbhoIWlYQbUFQ==}
 
-  '@types/node@18.15.13':
-    resolution: {integrity: sha512-N+0kuo9KgrUQ1Sn/ifDXsvg0TTleP7rIy4zOBGECxAljqvqfqpTfzx0Q1NUedOixRMBfe2Whhb056a42cWs26Q==}
+  '@types/node@22.7.5':
+    resolution: {integrity: sha512-jML7s2NAzMWc//QSJ1a3prpk78cOPchGvXJsC3C6R6PSMoooztvRVQEz89gmBTBY1SPMaqo5teB4uNHPdetShQ==}
 
   '@types/node@24.10.13':
     resolution: {integrity: sha512-oH72nZRfDv9lADUBSo104Aq7gPHpQZc4BTx38r9xf9pg5LfP6EzSyH2n7qFmmxRQXh7YlUXODcYsg6PuTDSxGg==}
@@ -4431,6 +4427,10 @@ packages:
 
   ethereum-cryptography@2.2.1:
     resolution: {integrity: sha512-r/W8lkHSiTLxUxW8Rf3u4HGB0xQweG2RyETjywylKZSzLWoWAijRz8WCuOtJ6wah+avllXBqZuk29HCCvhEIRg==}
+
+  ethers@6.17.0:
+    resolution: {integrity: sha512-BpyrpIPJ3ydEVow8zGaz1DuPS7YU8DcWxuBnY9a0UA/lvAPwrMr+EPXsfrul628SRaekPNeIM4UFh/91GWZang==}
+    engines: {node: '>=14.0.0'}
 
   eventemitter3@4.0.7:
     resolution: {integrity: sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw==}
@@ -7057,11 +7057,11 @@ packages:
       unrun:
         optional: true
 
-  tslib@2.4.0:
-    resolution: {integrity: sha512-d6xOpEDfsi2CZVlPQzGeux8XMwLT9hssAsaPYExaQMuYskwb+x1x7J371tWlbBdWHroy99KnVB6qIkUbs5X3UQ==}
-
   tslib@2.6.3:
     resolution: {integrity: sha512-xNvxJEOUiWPGhUuUdQgAJPKOOJfGnIyKySOc09XkKsgdUV/3E2zvwZYdejjmRgPCgcym1juLH3226yA7sEFJKQ==}
+
+  tslib@2.7.0:
+    resolution: {integrity: sha512-gLXCKdN1/j47AiHiOkJN69hJmcbGTHI0ImLmbYLHykhgeN0jVGola9yVjFgzCUklsZQMW55o+dW7IXv3RCXDzA==}
 
   tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
@@ -7202,6 +7202,9 @@ packages:
 
   unconfig-core@7.5.0:
     resolution: {integrity: sha512-Su3FauozOGP44ZmKdHy2oE6LPjk51M/TRRjHv2HNCWiDvfvCoxC2lno6jevMA91MYAdCdwP05QnWdWpSbncX/w==}
+
+  undici-types@6.19.8:
+    resolution: {integrity: sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw==}
 
   undici-types@7.16.0:
     resolution: {integrity: sha512-Zz+aZWSj8LE6zoxD+xrjh4VfkIG8Ya6LvYkZqtUQGJPZjYl53ypCaUwWqo7eI0x66KBGeRo+mlBEkMSeSZ38Nw==}
@@ -7490,18 +7493,6 @@ packages:
       utf-8-validate:
         optional: true
 
-  ws@8.17.1:
-    resolution: {integrity: sha512-6XQFvXTkbfUOZOKKILFG1PDK2NDQs4azKQl26T0YS5CxqWLgXajbPZ+h4gZekJyRqFU8pvnbAbbs/3TgRPy+GQ==}
-    engines: {node: '>=10.0.0'}
-    peerDependencies:
-      bufferutil: ^4.0.1
-      utf-8-validate: '>=5.0.2'
-    peerDependenciesMeta:
-      bufferutil:
-        optional: true
-      utf-8-validate:
-        optional: true
-
   ws@8.21.0:
     resolution: {integrity: sha512-Vsp28b7DRcimFQvrqu2Wek3z1iYxDCWqHYB8Qsnk/S4RfaCQzPGPyBNuVjJV3cd6UiKtUtp6sNM77gWvzcCH+g==}
     engines: {node: '>=10.0.0'}
@@ -7623,7 +7614,7 @@ snapshots:
 
   '@actions/io@3.0.2': {}
 
-  '@adraffy/ens-normalize@1.10.1': {}
+  '@adraffy/ens-normalize@1.11.1': {}
 
   '@anchor-lang/borsh@1.0.2(@solana/web3.js@1.98.4(bufferutil@4.0.8)(encoding@0.1.13)(typescript@6.0.3)(utf-8-validate@5.0.10))':
     dependencies:
@@ -9483,25 +9474,12 @@ snapshots:
 
   '@sentio/chain@3.4.29': {}
 
-  '@sentio/ethers-v6@1.0.29(@sentio/ethers@6.13.1-patch.6(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typescript@6.0.3)':
+  '@sentio/ethers-v6@1.0.29(ethers@6.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typescript@6.0.3)':
     dependencies:
-      ethers: '@sentio/ethers@6.13.1-patch.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)'
+      ethers: 6.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       lodash: 4.17.21
       ts-essentials: 7.0.3(typescript@6.0.3)
       typescript: 6.0.3
-
-  '@sentio/ethers@6.13.1-patch.6(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
-    dependencies:
-      '@adraffy/ens-normalize': 1.10.1
-      '@noble/curves': 1.2.0
-      '@noble/hashes': 1.3.2
-      '@types/node': 18.15.13
-      aes-js: 4.0.0-beta.5
-      tslib: 2.4.0
-      ws: 8.17.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-    transitivePeerDependencies:
-      - bufferutil
-      - utf-8-validate
 
   '@sentio/graph-cli@0.97.0(@types/node@24.10.13)(bufferutil@4.0.8)(typescript@6.0.3)(utf-8-validate@5.0.10)(zod@3.24.2)':
     dependencies:
@@ -10210,7 +10188,9 @@ snapshots:
 
   '@types/node@12.20.55': {}
 
-  '@types/node@18.15.13': {}
+  '@types/node@22.7.5':
+    dependencies:
+      undici-types: 6.19.8
 
   '@types/node@24.10.13':
     dependencies:
@@ -11652,6 +11632,19 @@ snapshots:
       '@noble/hashes': 1.4.0
       '@scure/bip32': 1.4.0
       '@scure/bip39': 1.3.0
+
+  ethers@6.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10):
+    dependencies:
+      '@adraffy/ens-normalize': 1.11.1
+      '@noble/curves': 1.2.0
+      '@noble/hashes': 1.3.2
+      '@types/node': 22.7.5
+      aes-js: 4.0.0-beta.5
+      tslib: 2.7.0
+      ws: 8.21.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
 
   eventemitter3@4.0.7: {}
 
@@ -13816,7 +13809,7 @@ snapshots:
       buffer: 6.0.3
       eventemitter3: 5.0.4
       uuid: 8.3.2
-      ws: 8.17.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      ws: 8.21.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
     optionalDependencies:
       bufferutil: 4.0.8
       utf-8-validate: 5.0.10
@@ -14424,9 +14417,9 @@ snapshots:
       - oxc-resolver
       - vue-tsc
 
-  tslib@2.4.0: {}
-
   tslib@2.6.3: {}
+
+  tslib@2.7.0: {}
 
   tslib@2.8.1: {}
 
@@ -14590,6 +14583,8 @@ snapshots:
     dependencies:
       '@quansync/fs': 1.0.0
       quansync: 1.0.0
+
+  undici-types@6.19.8: {}
 
   undici-types@7.16.0: {}
 
@@ -14900,11 +14895,6 @@ snapshots:
   wrappy@1.0.2: {}
 
   ws@7.5.10(bufferutil@4.0.8)(utf-8-validate@5.0.10):
-    optionalDependencies:
-      bufferutil: 4.0.8
-      utf-8-validate: 5.0.10
-
-  ws@8.17.1(bufferutil@4.0.8)(utf-8-validate@5.0.10):
     optionalDependencies:
       bufferutil: 4.0.8
       utf-8-validate: 5.0.10

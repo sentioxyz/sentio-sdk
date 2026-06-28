@@ -7,9 +7,6 @@
     "postinstall": "git config --local include.path ../.github/.gitconfig && git config core.hooksPath .github/.githooks",
     "lint": "ls-lint && eslint ."
   },
-  "resolutions": {
-    "ethers": "npm:@sentio/ethers@6.13.1-patch.6"
-  },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.5",
     "@eslint/js": "^10.0.1",

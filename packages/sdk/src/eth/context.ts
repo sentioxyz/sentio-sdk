@@ -1,11 +1,6 @@
 import { BaseContract, Overrides } from 'ethers'
-import {
-  allowNull,
-  LogParams,
-  BlockParams,
-  TransactionReceiptParams,
-  TransactionResponseParams
-} from 'ethers/providers'
+import { LogParams, BlockParams, TransactionReceiptParams, TransactionResponseParams } from 'ethers/providers'
+import { allowNull } from './ethers-format.js'
 import { getNumber } from 'ethers/utils'
 
 import {
