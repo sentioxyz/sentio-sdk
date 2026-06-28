@@ -12,9 +12,10 @@
     ".": "./dist/index.js"
   },
   "bin": {
-    "sentio": "./dist/index.js"
+    "sentio": "./bin.mjs"
   },
   "files": [
+    "bin.mjs",
     "dist",
     "src",
     "templates",

@@ -285,12 +285,6 @@ importers:
         specifier: ^11.0.4
         version: 11.0.4
 
-  packages/cli-alias:
-    dependencies:
-      '@sentio/cli':
-        specifier: workspace:*
-        version: link:../cli
-
   packages/cli/templates/aptos:
     dependencies:
       '@sentio/sdk':
@@ -14603,11 +14597,11 @@ snapshots:
   vite@6.3.5(@types/node@24.10.13)(tsx@4.22.3)(yaml@2.7.1):
     dependencies:
       esbuild: 0.25.9
-      fdir: 6.5.0(picomatch@4.0.3)
-      picomatch: 4.0.3
+      fdir: 6.5.0(picomatch@4.0.4)
+      picomatch: 4.0.4
       postcss: 8.5.6
       rollup: 4.50.1
-      tinyglobby: 0.2.15
+      tinyglobby: 0.2.17
     optionalDependencies:
       '@types/node': 24.10.13
       fsevents: 2.3.3
