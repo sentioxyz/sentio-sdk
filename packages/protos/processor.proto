@@ -597,7 +597,7 @@ message DBRequest {
   message DBUpsert {
     repeated string entity = 1;
     repeated string id = 2;
-    repeated google.protobuf.Struct data = 3; // @deprecate
+    // field 3 (google.protobuf.Struct data) removed in v4; superseded by entity_data
     repeated common.RichStruct entity_data = 4; // missing fields should use zero value
   }
   message DBUpdate {
