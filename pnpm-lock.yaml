@@ -4,9 +4,6 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-patchedDependencies:
-  '@anchor-lang/core@1.0.2': 93842655e94304625d490cdfb6e2ff9be8e91b436b2bde0079e678b9b4bdae88
-
 importers:
 
   .:
@@ -447,7 +444,7 @@ importers:
         version: 1.0.2(@solana/web3.js@1.98.4(bufferutil@4.0.8)(encoding@0.1.13)(typescript@6.0.3)(utf-8-validate@5.0.10))
       '@anchor-lang/core':
         specifier: ^1.0.2
-        version: 1.0.2(patch_hash=93842655e94304625d490cdfb6e2ff9be8e91b436b2bde0079e678b9b4bdae88)(bufferutil@4.0.8)(encoding@0.1.13)(typescript@6.0.3)(utf-8-validate@5.0.10)
+        version: 1.0.2(bufferutil@4.0.8)(encoding@0.1.13)(typescript@6.0.3)(utf-8-validate@5.0.10)
       '@aptos-labs/ts-sdk':
         specifier: ~7.1.0
         version: 7.1.0
@@ -7565,7 +7562,7 @@ snapshots:
       bn.js: 5.2.1
       buffer-layout: 1.2.2
 
-  '@anchor-lang/core@1.0.2(patch_hash=93842655e94304625d490cdfb6e2ff9be8e91b436b2bde0079e678b9b4bdae88)(bufferutil@4.0.8)(encoding@0.1.13)(typescript@6.0.3)(utf-8-validate@5.0.10)':
+  '@anchor-lang/core@1.0.2(bufferutil@4.0.8)(encoding@0.1.13)(typescript@6.0.3)(utf-8-validate@5.0.10)':
     dependencies:
       '@anchor-lang/borsh': 1.0.2(@solana/web3.js@1.98.4(bufferutil@4.0.8)(encoding@0.1.13)(typescript@6.0.3)(utf-8-validate@5.0.10))
       '@anchor-lang/errors': 1.0.2
