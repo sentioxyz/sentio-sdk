@@ -43,7 +43,6 @@ The SDK supports multiple blockchain ecosystems through dedicated modules in `pa
 - **Sui (`sui/`)**: Move-based blockchain with object and transaction processing
 - **IOTA (`iota/`)**: Move-based blockchain similar to Sui
 - **Solana (`solana/`)**: Solana blockchain with program and instruction processing
-- **Bitcoin (`btc/`)**: Bitcoin blockchain with transaction and UTXO processing
 - **Cosmos (`cosmos/`)**: Cosmos SDK-based chains with transaction processing
 - **Fuel (`fuel/`)**: Fuel VM blockchain with asset and transaction processing
 
@@ -158,7 +157,7 @@ sentio graph
 
 ### Example Projects
 The `examples/` directory contains reference implementations for each supported blockchain:
-- `examples/eth/`: Ethereum processor example
+- `examples/x2y2/`: Ethereum processor example
 - `examples/aptos/`: Aptos processor example  
 - `examples/sui/`: Sui processor example
 - And more for each supported chain
@@ -182,7 +181,8 @@ Tests require building the project first. Use `./scripts/test-all.sh` to build a
 
 ## Development Notes
 
-- **Node.js**: Requires Node.js 24+ (`engines.node: ">=24"` in `package.json`; CI runs Node 24)
+- **Node.js**: Requires Node.js **>=24.11.0** (`engines.node` in every package; CI runs Node 24). The 24.11 floor is tsdown's minimum supported Node 24.
+- **Build & bundling (tsdown)**: Packages and user processors bundle with **tsdown** (rolldown/oxc) — not tsup/esbuild — and the build output dir is `dist/` (not `lib/`). tsdown configs live at `packages/*/src/*.config.ts`; the sdk/action `src/tsdown.config.ts` are copied to `dist/` and run by `sentio build` in the user's project. Non-obvious gotchas: configs set `cwd: process.cwd()` because tsdown resolves entries relative to the **config file's** dir; `fixedExtension: false` emits `.js`/`.d.ts` per package `type`; `outputOptions.codeSplitting: false` keeps the single-entry processor build to exactly one `dist/lib.js`; a `sentio-registration-guard` plugin marks every `src/**/*.ts` `moduleSideEffects: 'no-treeshake'` so self-registering handlers survive tree-shaking; `deps.alwaysBundle: [/.*/]` inlines the user's deps into the self-contained bundle. The `sentio` bin is a committed `packages/cli/bin.mjs` launcher because the built `dist/index.js` doesn't exist at `pnpm install` time (pnpm can't link a bin whose target is absent).
 - **Package Manager**: Uses pnpm exclusively, pinned via `packageManager: pnpm@11.3.0` (enforced by preinstall script)
 - **Monorepo**: Uses pnpm workspaces for dependency management
 - **`ethers` is patched**: The root `package.json` `resolutions` field redirects `ethers` to `@sentio/ethers` (a Sentio fork). Do not assume upstream `ethers` behavior — check the fork before relying on edge-case semantics.
