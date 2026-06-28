@@ -25,7 +25,7 @@
   "scripts": {
     "build": "pnpm tsc --noEmit && pnpm bundle",
     "postbuild": "pnpm install",
-    "bundle": "esbuild --platform=node --format=esm --bundle src/index.ts --outfile=dist/index.js --sourcemap --inject:src/cjs-shim.ts --external:@sentio/sdk",
+    "bundle": "tsdown --config src/bundle.config.ts",
     "cli": "tsx src/index.ts",
     "compile": "tsc",
     "test": "tsx --test 'src/**/*.test.ts'"

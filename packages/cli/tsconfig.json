@@ -4,6 +4,6 @@
     "rootDir": "./src",
     "outDir": "dist"
   },
-  "exclude": ["dist", "templates"],
+  "exclude": ["dist", "templates", "src/bundle.config.ts"],
   "extends": "../../tsconfig.json"
 }
