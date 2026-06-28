@@ -1,22 +1,22 @@
 //
-// Vendored from ethers v6.17.0 `src.ts/providers/format.ts`.
+// Vendored (trimmed) from ethers v6.17.0 `src.ts/providers/format.ts`.
 //
-// These are ethers' internal response formatters (`allowNull`, `arrayOf`,
-// `formatBlock`, ...). They are NOT part of ethers' public API; the retired
-// `@sentio/ethers` fork exposed them via an extra `export * from "./format.js"`
-// in `providers/index.ts`, and `eth.ts` / `context.ts` imported them from
-// `ethers/providers`. Upstream ethers keeps them private, so we vendor the file
-// here verbatim (only the import paths are rewritten to ethers' public subpath
-// exports) to drop the fork dependency. Keep in sync with upstream if bumping
-// ethers across a release that changes block/transaction formatting.
+// ethers' internal response formatters are NOT part of its public API. The
+// retired `@sentio/ethers` fork exposed them via an extra
+// `export * from "./format.js"` in `providers/index.ts`, and `eth.ts` /
+// `context.ts` imported `allowNull` / `arrayOf` / `formatBlock` from
+// `ethers/providers`. Upstream keeps them private, so we vendor just the subset
+// the SDK actually uses (reachable from those three functions); the import paths
+// are rewritten to ethers' public subpath exports. Keep in sync with upstream if
+// bumping ethers across a release that changes block/transaction formatting.
 //
 import { getAddress, getCreateAddress } from 'ethers/address'
 import { Signature } from 'ethers/crypto'
 import { accessListify } from 'ethers/transaction'
-import { getBigInt, getNumber, hexlify, isHexString, zeroPadValue, assert, assertArgument } from 'ethers/utils'
+import { getBigInt, getNumber, isHexString, assert, assertArgument } from 'ethers/utils'
 
 import type { SignatureLike } from 'ethers/crypto'
-import type { BlockParams, LogParams, TransactionReceiptParams, TransactionResponseParams } from 'ethers/providers'
+import type { BlockParams, TransactionResponseParams } from 'ethers/providers'
 
 const BN_0 = BigInt(0)
 
@@ -46,7 +46,7 @@ export function arrayOf(format: FormatFunc, allowNull?: boolean): FormatFunc {
 // Requires an object which matches a fleet of other formatters
 // Any FormatFunc may return `undefined` to have the value omitted
 // from the result object. Calls preserve `this`.
-export function object(format: Record<string, FormatFunc>, altNames?: Record<string, Array<string>>): FormatFunc {
+function object(format: Record<string, FormatFunc>, altNames?: Record<string, Array<string>>): FormatFunc {
   return (value: any) => {
     const result: any = {}
     for (const key in format) {
@@ -74,54 +74,14 @@ export function object(format: Record<string, FormatFunc>, altNames?: Record<str
   }
 }
 
-export function formatBoolean(value: any): boolean {
-  switch (value) {
-    case true:
-    case 'true':
-      return true
-    case false:
-    case 'false':
-      return false
-  }
-  assertArgument(false, `invalid boolean; ${JSON.stringify(value)}`, 'value', value)
-}
-
-export function formatData(value: string): string {
+function formatData(value: string): string {
   assertArgument(isHexString(value, true), 'invalid data', 'value', value)
   return value
 }
 
-export function formatHash(value: any): string {
+function formatHash(value: any): string {
   assertArgument(isHexString(value, 32), 'invalid hash', 'value', value)
   return value
-}
-
-export function formatUint256(value: any): string {
-  if (!isHexString(value)) {
-    throw new Error('invalid uint256')
-  }
-  return zeroPadValue(value, 32)
-}
-
-const _formatLog = object(
-  {
-    address: getAddress,
-    blockHash: formatHash,
-    blockNumber: getNumber,
-    data: formatData,
-    index: getNumber,
-    removed: allowNull(formatBoolean, false),
-    topics: arrayOf(formatHash),
-    transactionHash: formatHash,
-    transactionIndex: getNumber
-  },
-  {
-    index: ['logIndex']
-  }
-)
-
-export function formatLog(value: any): LogParams {
-  return _formatLog(value)
 }
 
 const _formatBlock = object(
@@ -168,60 +128,7 @@ export function formatBlock(value: any): BlockParams {
   return result
 }
 
-const _formatReceiptLog = object(
-  {
-    transactionIndex: getNumber,
-    blockNumber: getNumber,
-    transactionHash: formatHash,
-    address: getAddress,
-    topics: arrayOf(formatHash),
-    data: formatData,
-    index: getNumber,
-    blockHash: formatHash
-  },
-  {
-    index: ['logIndex']
-  }
-)
-
-export function formatReceiptLog(value: any): LogParams {
-  return _formatReceiptLog(value)
-}
-
-const _formatTransactionReceipt = object(
-  {
-    to: allowNull(getAddress, null),
-    from: allowNull(getAddress, null),
-    contractAddress: allowNull(getAddress, null),
-    // should be allowNull(hash), but broken-EIP-658 support is handled in receipt
-    index: getNumber,
-    root: allowNull(hexlify),
-    gasUsed: getBigInt,
-    blobGasUsed: allowNull(getBigInt, null),
-    logsBloom: allowNull(formatData),
-    blockHash: formatHash,
-    hash: formatHash,
-    logs: arrayOf(formatReceiptLog),
-    blockNumber: getNumber,
-    //confirmations: allowNull(getNumber, null),
-    cumulativeGasUsed: getBigInt,
-    effectiveGasPrice: allowNull(getBigInt),
-    blobGasPrice: allowNull(getBigInt, null),
-    status: allowNull(getNumber),
-    type: allowNull(getNumber, 0)
-  },
-  {
-    effectiveGasPrice: ['gasPrice'],
-    hash: ['transactionHash'],
-    index: ['transactionIndex']
-  }
-)
-
-export function formatTransactionReceipt(value: any): TransactionReceiptParams {
-  return _formatTransactionReceipt(value)
-}
-
-export function formatTransactionResponse(value: any): TransactionResponseParams {
+function formatTransactionResponse(value: any): TransactionResponseParams {
   // Some clients (TestRPC) do strange things like return 0x0 for the
   // 0 address; correct this to be a real address
   if (value.to && getBigInt(value.to) === BN_0) {
