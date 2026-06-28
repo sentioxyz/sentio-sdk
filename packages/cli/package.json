@@ -34,13 +34,13 @@
   "dependencies": {
     "@aptos-labs/ts-sdk": "~7.1.0",
     "@iota/iota-sdk": "~1.14.0",
-    "@mysten/sui": "~2.17.0",
+    "@mysten/sui": "~2.20.0",
     "@sentio/api": "~1.0.4",
     "@sentio/chain": "~3.4.22",
     "@sentio/graph-cli": "^0.97.0",
     "@types/node": "^24.0.0",
     "chalk": "^5.3.0",
-    "commander": "^14.0.0",
+    "commander": "^15.0.0",
     "dotenv": "^17.0.0",
     "ethers": "npm:@sentio/ethers@6.13.1-patch.6",
     "express": "^5.0.0",
@@ -60,7 +60,7 @@
     "@sentio/sdk": "workspace:^"
   },
   "devDependencies": {
-    "@commander-js/extra-typings": "^14.0.0",
+    "@commander-js/extra-typings": "^15.0.0",
     "@types/express": "^5.0.0",
     "@types/fs-extra": "^11.0.4"
   },
