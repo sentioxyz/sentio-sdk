@@ -1,18 +1,13 @@
 import { getEACAggregatorProxyContract } from '../eth/builtin/eacaggregatorproxy.js'
 import fs from 'fs'
-import { parse } from 'csv-parse/sync'
 import { BlockTag } from 'ethers/providers'
 import { scaleDown } from '../core/big-decimal.js'
 import { EthChainId } from '@sentio/chain'
 import { createRequire } from 'module'
 import path from 'path'
 
-type OralceRecord = {
-  Pair: string
-  Asset: string
-  Type: string
-  Address: string
-}
+// Maps an oracle pair (e.g. "ETH / USD") to its EACAggregatorProxy address.
+type OracleMap = Record<string, string>
 
 export enum PriceUnit {
   USD = 0,
@@ -46,24 +41,19 @@ class DexPrice {
 
   readonly chainId: EthChainId
 
-  constructor(csvFileName: string, chainId: EthChainId) {
+  constructor(jsonFileName: string, chainId: EthChainId) {
     this.chainId = chainId
     const packageRoot = getPackageRoot('@sentio/sdk')
-    const csvFilePath = path.join(packageRoot, 'assets', csvFileName)
-    const fileContent = fs.readFileSync(csvFilePath, { encoding: 'utf-8' })
-    const headers = ['Pair', 'Asset', 'Type', 'Address']
+    const jsonFilePath = path.join(packageRoot, 'assets', jsonFileName)
+    const fileContent = fs.readFileSync(jsonFilePath, { encoding: 'utf-8' })
 
-    const records: OralceRecord[] = parse(fileContent, {
-      delimiter: ',',
-      columns: headers,
-      skip_empty_lines: true
-    })
+    const oracles: OracleMap = JSON.parse(fileContent)
 
-    for (const record of records) {
-      const pair = record.Pair.split('/')
+    for (const [rawPair, rawAddress] of Object.entries(oracles)) {
+      const pair = rawPair.split('/')
       const asset = pair[0].trim().toLowerCase()
       const target = pair[1].trim().toLowerCase()
-      const address = record.Address.toLowerCase()
+      const address = rawAddress.toLowerCase()
       if (target === 'usd') {
         this.USD_ORACLE_MAP.set(asset, address)
       } else if (target === 'eth') {
@@ -71,10 +61,8 @@ class DexPrice {
       } else if (target == 'btc') {
         this.BTC_ORACLE_MAP.set(asset, address)
       } else {
-        console.error('wrong asset record:' + JSON.stringify(record))
+        console.error('wrong asset record: ' + JSON.stringify({ [rawPair]: rawAddress }))
       }
-
-      // console.log(asset, target, address)
     }
   }
 
@@ -145,5 +133,5 @@ class DexPrice {
   }
 }
 
-export const EthereumDexPrice = new DexPrice('chainlink-oracles.csv', EthChainId.ETHEREUM)
-export const SepoliaDexPrice = new DexPrice('chainlink-oracles-sepolia.csv', EthChainId.SEPOLIA)
+export const EthereumDexPrice = new DexPrice('chainlink-oracles.json', EthChainId.ETHEREUM)
+export const SepoliaDexPrice = new DexPrice('chainlink-oracles-sepolia.json', EthChainId.SEPOLIA)
