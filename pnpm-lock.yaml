@@ -494,17 +494,17 @@ importers:
         specifier: ^6.9.0
         version: 6.9.0(bufferutil@4.0.8)(typescript@6.0.3)(utf-8-validate@5.0.10)
       '@typemove/aptos':
-        specifier: 2.0.4
-        version: 2.0.4
+        specifier: 2.0.5
+        version: 2.0.5
       '@typemove/iota':
-        specifier: 2.0.4
-        version: 2.0.4(typescript@6.0.3)
+        specifier: 2.0.5
+        version: 2.0.5(typescript@6.0.3)
       '@typemove/move':
-        specifier: 2.0.4
-        version: 2.0.4
+        specifier: 2.0.5
+        version: 2.0.5
       '@typemove/sui':
-        specifier: 2.0.4
-        version: 2.0.4(typescript@6.0.3)
+        specifier: 2.0.5
+        version: 2.0.5(typescript@6.0.3)
       bs58:
         specifier: ^6.0.0
         version: 6.0.0
@@ -3017,19 +3017,19 @@ packages:
   '@tybys/wasm-util@0.10.3':
     resolution: {integrity: sha512-F3fo1MYrRJYL3zER0OUOmkutjr1Vp23m7OsSgp7nq4SP6OqX6C/56XFIPAl5bt3zaBRjmW7SGz3u/6LwFpYcOg==}
 
-  '@typemove/aptos@2.0.4':
-    resolution: {integrity: sha512-cSl8AJgLoZZNbV3RFYt45wVoid70Wr45d1JPV795Re0qwZR+e3o+s67leGt5TToZaxSCT1LUa3PWCr2m71kXFQ==}
+  '@typemove/aptos@2.0.5':
+    resolution: {integrity: sha512-4KvYsV0SnhAaVgmDlqRDhLWbmIQy8IEhQkIbVbbvFlPyRAeJCAjqsX+LaS7+WOwBCrTcFWsi574Zvfb0Mf1Rpg==}
     hasBin: true
 
-  '@typemove/iota@2.0.4':
-    resolution: {integrity: sha512-tDEGx3gBqby14CAz74wT3tMx2GuYWishuOPzU2eFTE+0pfkhl/tTlkMyZgBM8gPNTrBOJ34C4yTEvLt/PFuZpg==}
+  '@typemove/iota@2.0.5':
+    resolution: {integrity: sha512-8uqdwLJaoYP27ODh+UGWY6/reI4HB9UTkk7LvVgSUDcM4RT+lLNEr9R7XnbbELuWwBeva1//6u/HorpPC4j4Dg==}
     hasBin: true
 
-  '@typemove/move@2.0.4':
-    resolution: {integrity: sha512-k/ogZHvMvTVkVda88jTfb8rANODeqNInw/2kIDzDSVbCNynT72Y8KSllSn/hAXNaS1XIb/VtBK2zFCNekyPNdQ==}
+  '@typemove/move@2.0.5':
+    resolution: {integrity: sha512-h/EvZj1V18MfZrR1OWjMKWjEeOIwd+mhFBsX+IJJIhskxprjUYLBgYpc8pT+9b1cwXs68k9AD2TI97kmny9N+A==}
 
-  '@typemove/sui@2.0.4':
-    resolution: {integrity: sha512-4S+Q4qwIco9dgtkX0LCqc/w6JMnCRdiHwkV6kJq6yVsQGWvjzaIYoPGV/3YODjKoB+pQcCh+k9GNNIWEaaES7g==}
+  '@typemove/sui@2.0.5':
+    resolution: {integrity: sha512-EfWlbqYKMudUQ8mq468ieTFYfqgp+mTY4Y3TJDQoRexbIrrMdB/1ITaCP6w6nOt2KUrzAVTo2r5Adp1k8FJn5A==}
     hasBin: true
 
   '@types/bn.js@5.1.6':
@@ -10098,19 +10098,19 @@ snapshots:
       tslib: 2.8.1
     optional: true
 
-  '@typemove/aptos@2.0.4':
+  '@typemove/aptos@2.0.5':
     dependencies:
       '@aptos-labs/ts-sdk': 7.1.0
-      '@typemove/move': 2.0.4
+      '@typemove/move': 2.0.5
       chalk: 5.6.2
       commander: 15.0.0
       prettier: 3.8.3
       radash: 12.1.1
 
-  '@typemove/iota@2.0.4(typescript@6.0.3)':
+  '@typemove/iota@2.0.5(typescript@6.0.3)':
     dependencies:
       '@iota/iota-sdk': 1.14.0(typescript@6.0.3)
-      '@typemove/move': 2.0.4
+      '@typemove/move': 2.0.5
       chalk: 5.6.2
       commander: 15.0.0
       prettier: 3.8.3
@@ -10120,14 +10120,14 @@ snapshots:
       - '@gql.tada/vue-support'
       - typescript
 
-  '@typemove/move@2.0.4':
+  '@typemove/move@2.0.5':
     dependencies:
       radash: 12.1.1
 
-  '@typemove/sui@2.0.4(typescript@6.0.3)':
+  '@typemove/sui@2.0.5(typescript@6.0.3)':
     dependencies:
       '@mysten/sui': 2.20.1(typescript@6.0.3)
-      '@typemove/move': 2.0.4
+      '@typemove/move': 2.0.5
       chalk: 5.6.2
       commander: 15.0.0
       prettier: 3.8.3
