@@ -1,7 +1,7 @@
 import { before, describe, test } from 'node:test'
 import { readFileSync } from 'node:fs'
 import { expect } from 'chai'
-import { TestProcessorServer } from '../../testing/index.js'
+import { TestProcessorServer, countersOf } from '../../testing/index.js'
 import { router } from './types/testnet/wisp.js'
 import { SuiChainId } from '@sentio/chain'
 
@@ -23,7 +23,7 @@ describe('Test entry call decoding', () => {
 
   test('Check call dispatch', async () => {
     const res = await service.sui.testEntryFunctionCall(testData as any, SuiChainId.SUI_TESTNET)
-    expect(res.result?.counters).length(1)
+    expect(countersOf(res.result)).length(1)
   })
 })
 

@@ -1,7 +1,7 @@
 import { before, describe, test } from 'node:test'
 import { assert, expect } from 'chai'
 
-import { TestProcessorServer } from '../../testing/index.js'
+import { TestProcessorServer, eventsOf, eventField } from '../../testing/index.js'
 import { ERC20Processor, mockApprovalLog, mockTransferLog, TransferEvent } from '../builtin/erc20.js'
 import { LogLevel } from '@sentio/protos'
 import { GLOBAL_CONFIG } from '@sentio/runtime'
@@ -42,7 +42,7 @@ describe('Test Error Capture', () => {
         value: 0n
       })
     )
-    assert(res.result?.events?.[0].message.includes('approve '))
+    assert(eventField(eventsOf(res.result)[0], 'message')?.includes('approve '))
   })
 
   test('Check transfer', async () => {
@@ -53,9 +53,9 @@ describe('Test Error Capture', () => {
         value: 0n
       })
     )
-    const events = res.result?.events?.[0]
-    expect(events?.message).eq('transferred 0')
-    expect((events?.attributes?.from as string)?.toLowerCase()).eq('0x80009ff8154bd5653c6dda2fa5f5053e5a5c1a91')
+    const event = eventsOf(res.result)[0]
+    expect(eventField(event, 'message')).eq('transferred 0')
+    expect(eventField(event, 'from')?.toLowerCase()).eq('0x80009ff8154bd5653c6dda2fa5f5053e5a5c1a91')
   })
 })
 
@@ -92,8 +92,8 @@ describe('Test ParseLog workers', () => {
         value: 0n
       })
     )
-    const events = res.result?.events?.[0]
-    expect(events?.message).eq('transferred 0')
-    expect((events?.attributes?.from as string)?.toLowerCase()).eq('0x80009ff8154bd5653c6dda2fa5f5053e5a5c1a91')
+    const event = eventsOf(res.result)[0]
+    expect(eventField(event, 'message')).eq('transferred 0')
+    expect(eventField(event, 'from')?.toLowerCase()).eq('0x80009ff8154bd5653c6dda2fa5f5053e5a5c1a91')
   })
 })

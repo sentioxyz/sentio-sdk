@@ -1,6 +1,6 @@
 import { before, describe, test } from 'node:test'
 import { expect } from 'chai'
-import { TestProcessorServer } from '../../testing/index.js'
+import { TestProcessorServer, countersOf, gaugesOf } from '../../testing/index.js'
 import { IotaNetwork } from '../network.js'
 import { dynamic_field } from '../builtin/0x2.js'
 import { iota_system, validator } from '../builtin/0x3.js'
@@ -58,14 +58,14 @@ describe('Test Iota Example', () => {
 
   test('Check event dispatch', async () => {
     const res = await service.iota.testEvent(testData as any, IotaNetwork.TEST_NET)
-    expect(res.result?.counters).length(1)
-    expect(res.result?.gauges).length(0)
+    expect(countersOf(res.result)).length(1)
+    expect(gaugesOf(res.result)).length(0)
   })
 
   test('Check call dispatch', async () => {
     const res = await service.iota.testEntryFunctionCall(testData as any, IotaNetwork.TEST_NET)
-    expect(res.result?.counters).length(0)
-    expect(res.result?.gauges).length(1)
+    expect(countersOf(res.result)).length(0)
+    expect(gaugesOf(res.result)).length(1)
   })
 })
 

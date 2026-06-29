@@ -17,9 +17,6 @@ import {
 import { create } from '@bufbuild/protobuf'
 import { toBigInteger, toBigDecimal } from './numberish.js'
 
-export const SENTIO_BIGINT_STRING_SUFFIX = ':sto_bi'
-export const SENTIO_BIGDECIMAL_STRING_SUFFIX = ':sto_bd'
-
 function normalizeName(name: string): string {
   return name.slice(0, 128).replace(/[^_a-zA-Z0-9]/g, '_')
 }
@@ -54,68 +51,6 @@ export function normalizeLabels(labels: Labels): Labels {
     }
   }
   return normLabels
-}
-
-function normalizeObject(obj: any, length: number, path?: string): any {
-  let ret: any
-
-  const typeString = typeof obj
-  switch (typeString) {
-    case 'string':
-      return obj.slice(0, length)
-    case 'bigint':
-      return obj.toString() + SENTIO_BIGINT_STRING_SUFFIX
-    // return Number(obj)
-    case 'number':
-      return obj
-    case 'function':
-      return null
-    case 'symbol':
-      return null
-  }
-  if (Array.isArray(obj)) {
-    console.warn(
-      `Array type inside log/event payload is not currently supported and will be ignored. Path: ${path ?? ''}`
-    )
-    return null
-    // ret = []
-    // for (const val of obj) {
-    //   ret.push(normalizeObject(val, length))
-    // }
-  } else if (obj === Object(obj)) {
-    if (obj instanceof Date) {
-      return obj.toISOString()
-    }
-    if (obj instanceof BigDecimal) {
-      if (obj.isNaN() || !obj.isFinite()) {
-        console.error("can't submit NaN or Infinity value, will store as 0")
-        return 0
-      }
-      return obj.toString() + SENTIO_BIGDECIMAL_STRING_SUFFIX
-      // return obj.toNumber()
-    }
-    if (BN.isBN(obj)) {
-      return obj.toString(10) + SENTIO_BIGINT_STRING_SUFFIX
-    }
-    if (obj instanceof Promise) {
-      console.error('Cannot submit promise')
-      return null
-    }
-    ret = {}
-    for (const [key, value] of Object.entries(obj)) {
-      const normValue = normalizeObject(value, length, `${path ?? ''}.${key}`)
-      if (normValue != null) {
-        ret[key] = normValue
-      }
-    }
-  } else {
-    ret = obj
-  }
-  return ret
-}
-
-export function normalizeAttribute(record: Record<string, any>): any {
-  return normalizeObject(record, 1000)
 }
 
 function normalizeToRichValue(value: any): RichValue {

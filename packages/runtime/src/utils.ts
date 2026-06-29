@@ -32,9 +32,6 @@ export function mergeProcessResultsInPlace(
     // not using spread operator since it puts all element on the stack
     // cause maximum call stack size exceeded error if it's a large array
 
-    res.counters = mergeArrayInPlace(res.counters, r.counters)
-    res.gauges = mergeArrayInPlace(res.gauges, r.gauges)
-    res.events = mergeArrayInPlace(res.events, r.events)
     res.exports = mergeArrayInPlace(res.exports, r.exports)
     res.timeseriesResult = mergeArrayInPlace(res.timeseriesResult, r.timeseriesResult)
     res.states = create(StateResultSchema, {
@@ -45,7 +42,7 @@ export function mergeProcessResultsInPlace(
 }
 
 export function recordRuntimeInfo(results: ProcessResult, handlerType: HandlerType) {
-  for (const list of [results.gauges, results.counters, results.events, results.exports]) {
+  for (const list of [results.timeseriesResult, results.exports]) {
     list.forEach((e) => {
       e.runtimeInfo = create(RuntimeInfoSchema, {
         from: handlerType

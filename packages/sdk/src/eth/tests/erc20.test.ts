@@ -3,11 +3,19 @@ import { before, describe, test } from 'node:test'
 
 import { expect } from 'chai'
 
-import { firstCounterValue, firstGaugeValue, TestProcessorServer } from '../../testing/index.js'
+import {
+  firstCounterValue,
+  firstGaugeValue,
+  TestProcessorServer,
+  countersOf,
+  gaugesOf,
+  eventsOf,
+  eventField,
+  eventFieldValue
+} from '../../testing/index.js'
 import { mockTransferLog } from '../builtin/erc20.js'
 import { DataBindingSchema, HandlerType, timestampFromDate } from '@sentio/protos'
 import { create } from '@bufbuild/protobuf'
-import { SENTIO_BIGINT_STRING_SUFFIX } from '../../core/normalization.js'
 import { RichBlock } from '../eth.js'
 import { EthChainId } from '@sentio/chain'
 
@@ -30,18 +38,18 @@ describe('Test Basic Examples', () => {
 
   test('Check block dispatch', async () => {
     const res = (await service.eth.testBlock(blockData)).result
-    expect(res?.counters).length(0)
-    expect(res?.gauges).length(1)
+    expect(countersOf(res)).length(0)
+    expect(gaugesOf(res)).length(1)
     expect(firstGaugeValue(res, 'g1')).equals(10)
-    expect(res?.gauges[0].metadata?.contractName).equals('x2y2')
+    expect(gaugesOf(res)[0].metadata?.contractName).equals('x2y2')
 
-    const gauge = res?.gauges?.[0]
+    const gauge = gaugesOf(res)[0]
     expect(gauge?.metadata?.blockNumber?.toString()).equals('14373295')
     expect(gauge?.runtimeInfo?.from).equals(HandlerType.ETH_BLOCK)
 
     const res2 = (await service.eth.testBlock(blockData, EthChainId.BSC)).result
-    expect(res2?.counters).length(0)
-    expect(res2?.gauges).length(1)
+    expect(countersOf(res2)).length(0)
+    expect(gaugesOf(res2)).length(1)
     expect(firstGaugeValue(res2, 'g2')).equals(20)
   })
 
@@ -53,12 +61,12 @@ describe('Test Basic Examples', () => {
     })
     let res = await service.eth.testLog(logData)
 
-    const counters = res.result?.counters
+    const counters = countersOf(res.result)
     expect(counters).length(1)
     expect(firstCounterValue(res.result, 'c1')).equals(1)
-    const event = res.result?.events[0]
-    expect((event?.attributes?.value as string)?.endsWith(SENTIO_BIGINT_STRING_SUFFIX)).equals(true)
-    expect(event?.attributes?.project).equals('a')
+    const event = eventsOf(res.result)[0]
+    expect(eventFieldValue(event, 'value')).equals(BigInt('0x9a71db64810aaa0000'))
+    expect(eventField(event, 'project')).equals('a')
 
     expect(counters?.[0].metadata?.chainId).equals('1')
     expect(counters?.[0].runtimeInfo?.from).equals(HandlerType.ETH_LOG)
@@ -69,9 +77,9 @@ describe('Test Basic Examples', () => {
     res = await service.eth.testLog(logData2, EthChainId.BSC)
 
     expect(firstCounterValue(res.result, 'c2')).equals(2)
-    expect(res.result?.counters[0].metadata?.chainId).equals('56')
+    expect(countersOf(res.result)[0].metadata?.chainId).equals('56')
 
-    expect(res.result?.gauges).length(0)
+    expect(gaugesOf(res.result)).length(0)
 
     const config = await service.getConfig({})
     expect(config.contractConfigs).length(6) //config increased
@@ -120,7 +128,7 @@ describe('Test Basic Examples', () => {
       )
     ).result
 
-    expect(res?.counters).length(1)
+    expect(countersOf(res)).length(1)
   })
 
   const traceData = {

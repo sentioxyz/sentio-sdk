@@ -9,11 +9,11 @@
   },
   "type": "module",
   "exports": {
-    ".": "./lib/index.js",
-    "./price": "./lib/service/price/protos/price.js"
+    ".": "./dist/index.js",
+    "./price": "./dist/service/price/protos/price.js"
   },
   "files": [
-    "lib",
+    "dist",
     "src"
   ],
   "scripts": {

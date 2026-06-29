@@ -9,7 +9,11 @@ import "service/common/protos/common.proto";
 
 option go_package = "sentioxyz/sentio-core/processor/protos";
 
+// Deprecated: superseded by ProcessorV3. Kept for backward compatibility with
+// older runtimes; new code should use ProcessorV3.
 service Processor {
+  option deprecated = true;
+
   // Start the processor, need to be called before any other RPC calls
   rpc Start(StartRequest) returns (google.protobuf.Empty);
   // Stop the processor
@@ -776,9 +780,12 @@ message StateResult {
 }
 
 message ProcessResult {
-  repeated GaugeResult gauges = 1;
-  repeated CounterResult counters = 2;
-  repeated EventTrackingResult events = 4;
+  // Deprecated: legacy metric results, superseded by timeseries_result.
+  repeated GaugeResult gauges = 1 [deprecated = true];
+  // Deprecated: legacy metric results, superseded by timeseries_result.
+  repeated CounterResult counters = 2 [deprecated = true];
+  // Deprecated: legacy event-tracking results, superseded by timeseries_result.
+  repeated EventTrackingResult events = 4 [deprecated = true];
   repeated ExportResult exports = 5;
   StateResult states = 6;
   repeated TimeseriesResult timeseries_result = 7;
@@ -866,13 +873,19 @@ message RuntimeInfo {
   HandlerType from = 1;
 }
 
+// Deprecated: legacy metric result, superseded by TimeseriesResult.
 message GaugeResult {
+  option deprecated = true;
+
   RecordMetaData metadata = 1;
   MetricValue metric_value = 2;
   RuntimeInfo runtime_info = 3;
 }
 
+// Deprecated: legacy metric result, superseded by TimeseriesResult.
 message CounterResult {
+  option deprecated = true;
+
   RecordMetaData metadata = 1;
   MetricValue metric_value = 2;
   // True to increase or False to decrease
@@ -888,7 +901,10 @@ enum LogLevel {
   CRITICAL = 4;
 }
 
+// Deprecated: legacy event-tracking result, superseded by TimeseriesResult.
 message EventTrackingResult {
+  option deprecated = true;
+
   RecordMetaData metadata = 1;
   string distinct_entity_id = 2;
   google.protobuf.Struct attributes = 6;

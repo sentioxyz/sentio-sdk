@@ -3,7 +3,14 @@ import { expect } from 'chai'
 import { HandlerType, ProcessBindingsRequestSchema } from '@sentio/protos'
 import { create } from '@bufbuild/protobuf'
 
-import { firstCounterValue, firstGaugeValue, TestProcessorServer } from '../../testing/index.js'
+import {
+  firstCounterValue,
+  firstGaugeValue,
+  TestProcessorServer,
+  countersOf,
+  gaugesOf,
+  eventsOf
+} from '../../testing/index.js'
 import { ChainId } from '@sentio/chain'
 
 describe('Test Aptos Example', () => {
@@ -43,24 +50,24 @@ describe('Test Aptos Example', () => {
       ]
     })
     const res = await service.processBindings(request)
-    expect(res.result?.counters).length(1)
-    expect(res.result?.gauges).length(0)
-    expect(res.result?.counters[0].metadata?.blockNumber).equal(18483034n)
+    expect(countersOf(res.result)).length(1)
+    expect(gaugesOf(res.result)).length(0)
+    expect(countersOf(res.result)[0].metadata?.blockNumber).equal(18483034n)
   })
 
   test('Check souffl3 function call dispatch', async () => {
     const res = await service.aptos.testEntryFunctionCall(testData as any)
-    expect(res.result?.counters).length(2)
-    expect(res.result?.gauges).length(0)
-    expect(res.result?.counters[0].metadata?.blockNumber).equal(18483034n)
+    expect(countersOf(res.result)).length(2)
+    expect(gaugesOf(res.result)).length(0)
+    expect(countersOf(res.result)[0].metadata?.blockNumber).equal(18483034n)
   })
 
   test('Check souffl3 event dispatch', async () => {
     const res = await service.aptos.testEvent(testData as any)
-    expect(res.result?.counters).length(1)
-    expect(res.result?.gauges).length(0)
-    expect(res.result?.counters[0].metadata?.blockNumber).equal(18483034n)
-    expect(res.result?.events).length(1)
+    expect(countersOf(res.result)).length(1)
+    expect(gaugesOf(res.result)).length(0)
+    expect(countersOf(res.result)[0].metadata?.blockNumber).equal(18483034n)
+    expect(eventsOf(res.result)).length(1)
   })
 
   test('Check token deposit event dispatch', async () => {
@@ -130,7 +137,7 @@ describe('Test Aptos Example', () => {
       ]
     })
     const res = await service.processBindings(request)
-    expect(res.result?.counters).length(1)
+    expect(countersOf(res.result)).length(1)
   })
 })
 

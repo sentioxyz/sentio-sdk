@@ -162,6 +162,10 @@ export class TestProcessorServer {
     const subject = this.storeContext.subject
 
     return new Promise((resolve, reject) => {
+      // The V3 service streams timeseries separately as `tsRequest` batches and clears
+      // `timeseriesResult` from the final `result` message. Collect the batches here and fold
+      // them back in so test helpers can read metrics/events off `result.timeseriesResult`.
+      const collectedTimeseries: TimeseriesResult[] = []
       const subscription = subject.subscribe({
         next: (response) => {
           if (response.processId !== processId) {
@@ -172,6 +176,9 @@ export class TestProcessorServer {
               (response.value.value.templates ?? []).map((template) => create(TemplateInstanceSchema, template)),
               response.value.value.remove ?? false
             )
+          }
+          if (response.value?.case === 'tsRequest') {
+            collectedTimeseries.push(...((response.value.value.data ?? []) as TimeseriesResult[]))
           }
           if (response.value?.case === 'result') {
             subscription.unsubscribe()
@@ -186,6 +193,7 @@ export class TestProcessorServer {
             if (result.states?.error) {
               reject(new Error(result.states.error))
             } else {
+              result.timeseriesResult = collectedTimeseries
               resolve(result)
             }
           }

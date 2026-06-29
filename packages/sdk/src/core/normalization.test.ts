@@ -1,44 +1,11 @@
 import { describe, test } from 'node:test'
 import assert from 'node:assert'
-import { StructSchema } from '@sentio/protos'
-import { fromJson, toBinary, fromBinary, toJson } from '@bufbuild/protobuf'
 import { BigDecimal } from './big-decimal.js'
-import { normalizeAttribute, normalizeKey, normalizeLabels, normalizeToRichStruct } from './normalization.js'
+import { normalizeKey, normalizeLabels, normalizeToRichStruct } from './normalization.js'
 import { toBigInteger, toBigDecimal } from './numberish.js'
 
 // TODO add test for type conversion
 describe('Normalization tests', () => {
-  test('normalize attributes basic', async () => {
-    const t1 = { a: 'a', n: 123, n2: 1233333333300000000000n, n3: BigDecimal(10.01), nested: { date: new Date() } }
-    const r1 = normalizeAttribute(t1)
-    assert.deepStrictEqual(r1.n2, '1233333333300000000000:sto_bi')
-    assert.deepStrictEqual(r1.n3, '10.01:sto_bd')
-
-    assert.strictEqual(typeof r1.nested.date, 'string')
-
-    // google.protobuf.Struct is a plain JS object now; round-trip via the WKT codec.
-    const struct1 = fromJson(StructSchema, r1)
-    const bytes1 = toBinary(StructSchema, struct1)
-    const decoded1 = fromBinary(StructSchema, bytes1)
-    assert.deepStrictEqual(toJson(StructSchema, decoded1), r1)
-
-    const t2 = {
-      f: () => {}
-    }
-    const r2 = normalizeAttribute(t2)
-    assert.strictEqual(r2.f, undefined)
-
-    const t3 = {
-      token0Symbol: null,
-      token1Symbol: 't2'
-    }
-    const r3 = normalizeAttribute(t3)
-    const struct3 = fromJson(StructSchema, r3)
-    const decoded3 = fromBinary(StructSchema, toBinary(StructSchema, struct3))
-    assert.deepStrictEqual(toJson(StructSchema, decoded3), r3)
-    console.log(r3)
-  })
-
   test('test key ', async () => {
     assert.strictEqual(normalizeKey('abc'), 'abc')
     assert.strictEqual(normalizeKey('a-b-c'), 'a_b_c')

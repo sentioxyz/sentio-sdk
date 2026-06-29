@@ -2,7 +2,7 @@ import { before, describe, test } from 'node:test'
 import { expect } from 'chai'
 
 import { HandlerType } from '../../index.js'
-import { TestProcessorServer, firstCounterValue } from '../../testing/index.js'
+import { TestProcessorServer, firstCounterValue, countersOf, gaugesOf } from '../../testing/index.js'
 
 const SPL_TOKEN_2022_PROGRAM_ID = 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb'
 const PYUSD_MINT = '2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo'
@@ -41,9 +41,9 @@ describe('Test SPL Token 2022 Example', () => {
       }
     ]
     const res = await service.solana.testInstructions(instructions)
-    expect(res.result?.counters).length(1)
+    expect(countersOf(res.result)).length(1)
     expect(firstCounterValue(res.result, 'pyusd_supply')?.toString()).equal('1500000000')
-    expect(res.result?.counters[0].runtimeInfo?.from).equals(HandlerType.SOL_INSTRUCTION)
+    expect(countersOf(res.result)[0].runtimeInfo?.from).equals(HandlerType.SOL_INSTRUCTION)
   })
 
   test('transferChecked for PYUSD increments volume and count', async () => {
@@ -70,7 +70,7 @@ describe('Test SPL Token 2022 Example', () => {
       }
     ]
     const res = await service.solana.testInstructions(instructions)
-    expect(res.result?.counters).length(2)
+    expect(countersOf(res.result)).length(2)
     expect(firstCounterValue(res.result, 'pyusd_transfer_volume')?.toString()).equal('2000000')
     expect(firstCounterValue(res.result, 'pyusd_transfer_count')?.toString()).equal('1')
   })
@@ -94,7 +94,7 @@ describe('Test SPL Token 2022 Example', () => {
       }
     ]
     const res = await service.solana.testInstructions(instructions)
-    expect(res.result?.counters).length(0)
-    expect(res.result?.gauges).length(0)
+    expect(countersOf(res.result)).length(0)
+    expect(gaugesOf(res.result)).length(0)
   })
 })

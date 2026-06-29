@@ -11,7 +11,7 @@ import { CommonExecOptions, execFileSync } from 'child_process'
 import { getApiUrl, getSdkVersion } from '../utils.js'
 import readline from 'readline'
 import JSZip from 'jszip'
-import type { UserInfo } from '../../../protos/lib/service/common/protos/common_pb.js'
+import type { UserInfo } from '../../../protos/dist/service/common/protos/common_pb.js'
 import { CommandOptionsType } from './types.js'
 import {
   getSentioNetworkConfig,
