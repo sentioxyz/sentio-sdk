@@ -105,6 +105,5 @@ describe('Test Service V3 with worker without partition', () => {
 
     assert.ok(result, 'Result should be present in the response')
     assert.ok(result?.states, 'States should be present in the result')
-    assert.ok(result?.states.configUpdated, 'Config should be updated')
   })
 })

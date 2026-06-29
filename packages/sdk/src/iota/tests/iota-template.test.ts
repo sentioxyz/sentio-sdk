@@ -34,14 +34,12 @@ describe('Test Iota Template Example', () => {
     // single round test
     let res = await service.iota.testEvent(testData as any, IotaNetwork.TEST_NET)
     let config = await service.getConfig({})
-    expect(res.result?.states?.configUpdated).equals(true)
     expect(config.contractConfigs).length(2)
     expect(config.accountConfigs).length(1)
     expect(config.templateInstances).length(1)
 
     res = await service.iota.testEntryFunctionCall(testData as any, IotaNetwork.TEST_NET)
     config = await service.getConfig({})
-    expect(res.result?.states?.configUpdated).equals(true)
     expect(config.contractConfigs).length(2)
     expect(config.accountConfigs).length(0)
     expect(config.templateInstances).length(0)

@@ -61,12 +61,6 @@ export class AptosResourceProcessorTemplate {
 
     ctx.sendTemplateInstance(instance)
 
-    ctx.update({
-      states: {
-        configUpdated: true
-      }
-    })
-
     processMetrics.processor_template_instance_count.add(1, {
       chain_id: options.network,
       template: this.constructor.name

@@ -25,9 +25,7 @@ export abstract class BaseContext {
 
   private _res: Required<ProcessResult, 'states'> = create(ProcessResultSchema, {
     exports: [],
-    states: {
-      configUpdated: false
-    },
+    states: {},
     timeseriesResult: []
   }) as Required<ProcessResult, 'states'>
 

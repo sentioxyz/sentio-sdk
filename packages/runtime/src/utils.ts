@@ -35,7 +35,7 @@ export function mergeProcessResultsInPlace(
     res.exports = mergeArrayInPlace(res.exports, r.exports)
     res.timeseriesResult = mergeArrayInPlace(res.timeseriesResult, r.timeseriesResult)
     res.states = create(StateResultSchema, {
-      configUpdated: res.states?.configUpdated || r.states?.configUpdated || false
+      error: res.states?.error ?? r.states?.error
     })
   }
   return res as Required<ProcessResult, 'states'>

@@ -140,10 +140,11 @@ export class TestProcessorServer {
   ): Promise<ProcessBindingResponse> {
     const results: ProcessResult[] = []
     for (const binding of bindings) {
+      this.storeContext.templatesUpdated = false
       const result = await this.processBindingV3(binding, context)
       results.push(result)
 
-      if (result.states?.configUpdated) {
+      if (this.storeContext.templatesUpdated) {
         await PluginManager.INSTANCE.updateTemplates(
           create(UpdateTemplatesRequestSchema, {
             chainId: binding.chainId,
@@ -249,6 +250,10 @@ class TestStoreContext extends DataBindingContext implements IDataBindingContext
   }
 
   templateInstances: TemplateInstance[] = []
+  // Set whenever a tplRequest is applied while processing a binding. The unary test path
+  // uses it to trigger updateTemplates, since the v4 SDK no longer emits the V2-only
+  // StateResult.config_updated flag (dynamic templates travel via the tplRequest stream).
+  templatesUpdated = false
 
   result(dbResult: DBResponse, processId = this.processId): void {
     // Resolve a request issued directly from this context (e.g. `service.store.get(...)` in a test,
@@ -270,6 +275,7 @@ class TestStoreContext extends DataBindingContext implements IDataBindingContext
   }
 
   applyTemplateRequest(templates: Array<TemplateInstance>, remove: boolean): void {
+    this.templatesUpdated = true
     if (remove) {
       this.templateInstances = this.templateInstances.filter(
         (i) => !templates.find((t) => t.templateId === i.templateId && t.contract?.address === i.contract?.address)
