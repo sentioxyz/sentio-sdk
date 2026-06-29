@@ -1,5 +1,5 @@
 import { before, after, describe, test } from 'node:test'
-import { TestProcessorServer } from '../../testing/index.js'
+import { TestProcessorServer, eventsOf, eventField } from '../../testing/index.js'
 import { FuelChainId } from '@sentio/chain'
 import { expect } from 'chai'
 import testData from './test-data.json' with { type: 'json' }
@@ -49,20 +49,20 @@ describe('typed fuel processor tests', () => {
   test.skip('test onCall ', async () => {
     const res = await service.fuel.testOnTransaction(testData, FuelChainId.FUEL_TESTNET)
 
-    const events = res.result?.events
+    const events = eventsOf(res.result)
     expect(events).length(3)
-    expect(events?.[0]?.message).contains('complex call')
+    expect(eventField(events?.[0], 'message')).contains('complex call')
 
-    expect(events?.[1]?.message).contains('foo')
+    expect(eventField(events?.[1], 'message')).contains('foo')
   })
 
   test('test onLog ', async () => {
     const res = await service.fuel.testOnTransaction(testData, FuelChainId.FUEL_TESTNET)
     // const res = await service.fuel.testOnTransactionByID(FuelChainId.FUEL_TESTNET, "0xc6c75b1bd6896a596123ad3447725b5e84861bf5568852c4426a24f176121755")
 
-    const events = res.result?.events
+    const events = eventsOf(res.result)
     expect(events).length(2)
-    expect(events?.[0]?.message).contains('log foo')
+    expect(eventField(events?.[0], 'message')).contains('log foo')
     expect(events?.[0]?.metadata?.address).eq(ADDRESS)
   })
 

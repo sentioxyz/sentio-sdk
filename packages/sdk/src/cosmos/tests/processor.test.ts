@@ -1,5 +1,5 @@
 import { before, after, describe, test } from 'node:test'
-import { TestProcessorServer } from '../../testing/index.js'
+import { TestProcessorServer, eventsOf, eventField } from '../../testing/index.js'
 import { expect } from 'chai'
 import { CosmosChainId } from '@sentio/chain'
 import testData from './test-data.json' with { type: 'json' }
@@ -36,9 +36,9 @@ describe('cosmos network tests', () => {
   test('test onLog ', async () => {
     const res = await service.cosmos.testOnTransaction(testData, CosmosChainId.INJECTIVE_MAINNET)
 
-    const events = res.result?.events
+    const events = eventsOf(res.result)
     expect(events).length(1)
-    expect(events?.[0]?.message).contains('message')
+    expect(eventField(events?.[0], 'message')).contains('message')
   })
 
   after(async () => {

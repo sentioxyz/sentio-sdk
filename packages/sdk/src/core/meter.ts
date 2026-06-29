@@ -1,5 +1,5 @@
 import { BaseContext } from './base-context.js'
-import { Numberish, toMetricValue, toTimeSeriesData } from './numberish.js'
+import { Numberish, toTimeSeriesData } from './numberish.js'
 import { NamedResultDescriptor } from './metadata.js'
 import {
   AggregationConfigSchema,
@@ -112,15 +112,6 @@ export class Counter extends Metric {
   private record(ctx: BaseContext, value: Numberish, labels: Labels, add: boolean) {
     processMetrics.process_metricrecord_count.add(1)
     ctx.update({
-      // legacy support, deprecating
-      counters: [
-        {
-          metadata: ctx.getMetaData(this.name, labels),
-          metricValue: toMetricValue(value),
-          add: add,
-          runtimeInfo: undefined
-        }
-      ],
       timeseriesResult: [
         {
           metadata: ctx.getMetaData(this.name, labels),
@@ -170,14 +161,6 @@ export class Gauge extends Metric {
   record(ctx: BaseContext, value: Numberish, labels: Labels = {}) {
     processMetrics.process_metricrecord_count.add(1)
     ctx.update({
-      // legacy support, deprecating
-      gauges: [
-        {
-          metadata: ctx.getMetaData(this.config.name, labels),
-          metricValue: toMetricValue(value),
-          runtimeInfo: undefined
-        }
-      ],
       timeseriesResult: [
         {
           metadata: ctx.getMetaData(this.name, labels),

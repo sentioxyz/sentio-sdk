@@ -24,10 +24,7 @@ export abstract class BaseContext {
   private active: boolean
 
   private _res: Required<ProcessResult, 'states'> = create(ProcessResultSchema, {
-    counters: [],
-    events: [],
     exports: [],
-    gauges: [],
     states: {
       configUpdated: false
     },

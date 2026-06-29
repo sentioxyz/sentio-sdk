@@ -1,7 +1,7 @@
 import { before, describe, test } from 'node:test'
 import { readFileSync } from 'node:fs'
 import { expect } from 'chai'
-import { TestProcessorServer } from '../../testing/index.js'
+import { TestProcessorServer, countersOf } from '../../testing/index.js'
 import { event } from './types/0x00b53b0f4174108627fbee72e2498b58d6a2714cded53fac537034c220d26302.js'
 
 describe('Test leading zero', () => {
@@ -29,7 +29,7 @@ describe('Test leading zero', () => {
 
   test('Check call dispatch', async () => {
     const res = await service.sui.testEvent(testData as any)
-    expect(res.result?.counters).length(1)
+    expect(countersOf(res.result)).length(1)
   })
 })
 

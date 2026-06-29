@@ -5,7 +5,7 @@ import { expect } from 'chai'
 
 import { HandlerType } from '../../index.js'
 
-import { TestProcessorServer, firstCounterValue } from '../../testing/index.js'
+import { TestProcessorServer, firstCounterValue, countersOf, gaugesOf } from '../../testing/index.js'
 
 describe('Test Solana Example', () => {
   const service = new TestProcessorServer(async () => {
@@ -38,12 +38,12 @@ describe('Test Solana Example', () => {
     ]
 
     const res = await service.solana.testInstructions(instructions)
-    expect(res.result?.counters).length(4)
-    expect(res.result?.gauges).length(0)
-    expect(res.result?.counters[0].metadata?.blockNumber).equal(12345n)
+    expect(countersOf(res.result)).length(4)
+    expect(gaugesOf(res.result)).length(0)
+    expect(countersOf(res.result)[0].metadata?.blockNumber).equal(12345n)
     expect(firstCounterValue(res.result, 'total_transfer_amount')).equal(1000000n)
     expect(firstCounterValue(res.result, 'worm')).equal(1000000n)
-    expect(res.result?.counters[0].runtimeInfo?.from).equals(HandlerType.SOL_INSTRUCTION)
+    expect(countersOf(res.result)[0].runtimeInfo?.from).equals(HandlerType.SOL_INSTRUCTION)
   })
 
   test('Check SPLToken parsed instruction dispatch', async () => {
@@ -66,10 +66,10 @@ describe('Test Solana Example', () => {
       }
     ]
     const res = await service.solana.testInstructions(instructions)
-    expect(res.result?.counters).length(1)
-    expect(res.result?.gauges).length(0)
-    expect(res.result?.counters[0].metadata?.blockNumber).equal(0n)
+    expect(countersOf(res.result)).length(1)
+    expect(gaugesOf(res.result)).length(0)
+    expect(countersOf(res.result)[0].metadata?.blockNumber).equal(0n)
     expect(firstCounterValue(res.result, 'totalWeth_supply')?.toString()).equal('12000000000000')
-    expect(res.result?.counters[0].runtimeInfo?.from).equals(HandlerType.SOL_INSTRUCTION)
+    expect(countersOf(res.result)[0].runtimeInfo?.from).equals(HandlerType.SOL_INSTRUCTION)
   })
 })

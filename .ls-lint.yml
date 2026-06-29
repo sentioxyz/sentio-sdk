@@ -35,7 +35,7 @@ ignore:
   - packages/sdk/node_modules
   - examples
   - packages/sdk/src/eth/tests
-  - packages/protos/lib
+  - packages/protos/dist
   - packages/protos/node_modules
   - packages/runtime/dist
   - packages/runtime/node_modules

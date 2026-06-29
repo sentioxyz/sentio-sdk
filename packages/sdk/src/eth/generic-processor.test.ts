@@ -6,7 +6,7 @@ import { expect } from 'chai'
 import { HandlerType } from '@sentio/protos'
 
 import { GenericProcessor } from './index.js'
-import { TestProcessorServer, firstCounterValue } from '../testing/index.js'
+import { TestProcessorServer, firstCounterValue, countersOf } from '../testing/index.js'
 
 describe('Test Generic Processor', () => {
   const service = new TestProcessorServer(async () => {
@@ -51,7 +51,7 @@ describe('Test Generic Processor', () => {
 
   test('Check log dispatch', async () => {
     const res = await service.eth.testLogs([logData, logData])
-    const counters = res.result?.counters
+    const counters = countersOf(res.result)
     expect(counters).length(2)
     expect(firstCounterValue(res.result, 'event_num')).equals(1)
     expect(counters?.[0].runtimeInfo?.from).equals(HandlerType.ETH_LOG)

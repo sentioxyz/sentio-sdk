@@ -1,5 +1,5 @@
 import { before, after, describe, test } from 'node:test'
-import { TestProcessorServer } from '../../testing/index.js'
+import { TestProcessorServer, eventsOf, eventField, eventFieldValue } from '../../testing/index.js'
 import { FuelChainId } from '@sentio/chain'
 import { expect } from 'chai'
 import testData from './tx-data.json' with { type: 'json' }
@@ -31,15 +31,13 @@ describe('fuel network tx tests', () => {
   test.skip('test onTx ', async () => {
     const res = await service.fuel.testOnTransaction(testData, FuelChainId.FUEL_TESTNET)
 
-    const events = res.result?.events
+    const events = eventsOf(res.result)
     expect(events).length(1)
-    expect(events?.[0]?.message).contains('transfered')
-    expect(events?.[0]?.attributes).to.deep.equal({
-      attributes: {
-        amount: '1000000',
-        from: '0xd914531010bb159182a20429f04a438eff268cad1c288df23b92dfb388cb5a24',
-        to: '0xd3fe20c8ff68a4054d8587ac170c40db7d1e200208a575780542bd9a7e3eec08'
-      }
+    expect(eventField(events?.[0], 'message')).contains('transfered')
+    expect(eventFieldValue(events?.[0], 'attributes')).to.deep.equal({
+      amount: '1000000',
+      from: '0xd914531010bb159182a20429f04a438eff268cad1c288df23b92dfb388cb5a24',
+      to: '0xd3fe20c8ff68a4054d8587ac170c40db7d1e200208a575780542bd9a7e3eec08'
     })
   })
 

@@ -4,7 +4,7 @@ import { setTimeout } from 'timers/promises'
 import { expect } from 'chai'
 
 import { GenericProcessor, GlobalProcessor } from './index.js'
-import { TestProcessorServer } from '../testing/index.js'
+import { TestProcessorServer, countersOf } from '../testing/index.js'
 import { processMetrics } from '@sentio/runtime'
 
 describe('Test Base Processor', () => {
@@ -88,7 +88,7 @@ describe('Test Global Processor', () => {
       data: '0xa9059cbb00000000000000000000000070997970c51812dc3a010c7d01b50e0d17dc79c80000000000000000000000000000000000000000000000000000000000000002'
     }
     const res = await service.eth.testTransaction(tx)
-    const counters = res.result?.counters
+    const counters = countersOf(res.result)
     expect(counters).length(1)
     expect(counters?.[0].metadata?.transactionHash).equals(tx.hash)
   })

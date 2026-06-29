@@ -3,7 +3,7 @@ import { before, describe, test } from 'node:test'
 
 import { expect } from 'chai'
 
-import { firstCounterValue, TestProcessorServer } from '../../testing/index.js'
+import { firstCounterValue, TestProcessorServer, countersOf } from '../../testing/index.js'
 import { ERC20Processor, mockTransferLog } from '../builtin/erc20.js'
 import { ALL_ADDRESS } from '@sentio/sdk'
 
@@ -46,7 +46,7 @@ describe('Test star Examples', () => {
     })
     const res = await service.eth.testLog(logData)
 
-    const counters = res.result?.counters
+    const counters = countersOf(res.result)
     expect(counters).length(1)
     expect(firstCounterValue(res.result, 'c1')).equals(1)
   })

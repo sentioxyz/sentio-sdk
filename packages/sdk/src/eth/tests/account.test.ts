@@ -1,7 +1,7 @@
 import { before, describe, test } from 'node:test'
 import { assert, expect } from 'chai'
 
-import { firstCounterValue, TestProcessorServer } from '../../testing/index.js'
+import { firstCounterValue, TestProcessorServer, countersOf } from '../../testing/index.js'
 import { mockTransferLog } from '../builtin/erc20.js'
 import { AccountProcessor } from '../account-processor.js'
 
@@ -52,7 +52,7 @@ describe(' erc20 account transfer Examples', () => {
       })
     ])
 
-    const counters = res.result?.counters
+    const counters = countersOf(res.result)
     expect(counters).length(2)
     expect(firstCounterValue(res.result, 'out')).equals(100n)
     expect(firstCounterValue(res.result, 'in')).equals(200n)

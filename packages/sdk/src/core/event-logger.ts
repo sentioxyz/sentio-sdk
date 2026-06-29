@@ -9,8 +9,6 @@ import {
   type EventLogConfig_Field,
   EventLogConfig_FieldSchema,
   EventLogConfig_StructFieldTypeSchema,
-  type EventTrackingResult,
-  EventTrackingResultSchema,
   LogLevel,
   type RichStruct,
   RichStructSchema,
@@ -19,7 +17,7 @@ import {
   TimeseriesResult_TimeseriesType
 } from '@sentio/protos'
 import { create } from '@bufbuild/protobuf'
-import { normalizeAttribute, normalizeLabels, normalizeToRichStruct } from './normalization.js'
+import { normalizeToRichStruct } from './normalization.js'
 import { MapStateStorage, processMetrics } from '@sentio/runtime'
 import { BN } from 'fuels'
 import { BigDecimal } from '@sentio/bigdecimal'
@@ -173,20 +171,6 @@ function emit<T>(ctx: BaseContext, eventName: string, event: Event<T>) {
     }
   })
 
-  // legacy v2 events, deprecating
-  const eventRes: EventTrackingResult = create(EventTrackingResultSchema, {
-    metadata: ctx.getMetaData(eventName, {}),
-    severity: severity || LogLevel.INFO,
-    message: message || '',
-    distinctEntityId: distinctId || '',
-    attributes: {
-      ...normalizeLabels(ctx.baseLabels), // TODO avoid dup label in metadata
-      ...normalizeAttribute(payload)
-    },
-    runtimeInfo: undefined,
-    attributes2: normalizeToRichStruct(ctx.baseLabels, payload)
-  })
-
   const res: TimeseriesResult = create(TimeseriesResultSchema, {
     metadata: ctx.getMetaData(eventName, {}),
     type: TimeseriesResult_TimeseriesType.EVENT,
@@ -195,5 +179,5 @@ function emit<T>(ctx: BaseContext, eventName: string, event: Event<T>) {
   })
 
   processMetrics.process_eventemit_count.add(1)
-  ctx.update({ timeseriesResult: [res], events: [eventRes] })
+  ctx.update({ timeseriesResult: [res] })
 }

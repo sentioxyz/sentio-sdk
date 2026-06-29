@@ -7,7 +7,6 @@ import { type BigInteger, BigIntegerSchema } from '@sentio/protos'
 import { create } from '@bufbuild/protobuf'
 import { BigDecimal } from './big-decimal.js'
 import { bytesToBigInt } from '../utils/conversion.js'
-import { normalizeAttribute } from './normalization.js'
 
 // TODO add test for type conversion
 describe('Numberish tests', () => {
@@ -64,12 +63,6 @@ describe('Numberish tests', () => {
 
     const mv3 = toMetricValue(new BigDecimal('100000'))
     expect(BigIntegerToBigInt(mv3.value.case === 'bigInteger' ? mv3.value.value : create(BigIntegerSchema)) === 100000n)
-  })
-
-  test('invalid value', async () => {
-    const t1 = { a: BigDecimal(1).dividedBy(0) }
-    const r1 = normalizeAttribute(t1)
-    expect(r1.a).equals(0)
   })
 })
 

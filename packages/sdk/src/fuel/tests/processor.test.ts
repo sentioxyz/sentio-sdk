@@ -1,6 +1,6 @@
 import { before, after, describe, test } from 'node:test'
 import assert from 'assert'
-import { TestProcessorServer } from '../../testing/index.js'
+import { TestProcessorServer, eventsOf, eventField } from '../../testing/index.js'
 import { FuelProcessor } from '../fuel-processor.js'
 import { FuelChainId } from '@sentio/chain'
 import abi from './abis/counter-contract-abi.json' with { type: 'json' }
@@ -46,18 +46,18 @@ describe('fuel network tests', () => {
   test.skip('test onTransaction ', async () => {
     const res = await service.fuel.testOnTransaction(testData, FuelChainId.FUEL_TESTNET)
 
-    const events = res.result?.events
+    const events = eventsOf(res.result)
     assert.equal(events?.length, 2)
-    assert.equal(events?.[0]?.message, 'status is success')
+    assert.equal(eventField(events?.[0], 'message'), 'status is success')
   })
 
   // skip for now until onCall is fixed
   test.skip('test onCall ', async () => {
     const res = await service.fuel.testOnTransaction(testData, FuelChainId.FUEL_TESTNET)
 
-    const events = res.result?.events
+    const events = eventsOf(res.result)
     assert.equal(events?.length, 2)
-    assert.ok(events?.[1]?.message.includes('complex call'))
+    assert.ok(eventField(events?.[1], 'message')?.includes('complex call'))
   })
 
   test('tx decode', async () => {
