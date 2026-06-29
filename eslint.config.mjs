@@ -15,7 +15,7 @@ export default defineConfig([
   eslintConfigPrettier,
   {
     ignores: [
-      '**/*.config.{ts,cjs}',
+      '**/*.config.{ts,cjs,js}',
       '**/gen',
       '**/generated',
       '**/builtin',

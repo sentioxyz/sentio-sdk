@@ -1,3 +1,10 @@
+// NOTE: This config is intentionally plain JavaScript (not TypeScript). It is
+// copied verbatim to @sentio/sdk/dist and loaded by `sentio build` from the
+// user's node_modules. Node refuses to strip types from .ts files under
+// node_modules ("Stripping types is currently unsupported for files under
+// node_modules"), so a .ts config fails to load there. A .js config has no types
+// to strip and loads natively on every Node version and package manager. Keep it
+// .js — do not rename to .ts.
 import { defineConfig } from 'tsdown'
 
 let env
@@ -17,7 +24,7 @@ function sentioRegistrationGuard() {
       // Set the flag only (no code change) so the module is force-kept without
       // counting as a transform (avoids a spurious broken-sourcemap warning).
       handler() {
-        return { moduleSideEffects: 'no-treeshake' as const }
+        return { moduleSideEffects: 'no-treeshake' }
       }
     }
   }
