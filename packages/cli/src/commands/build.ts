@@ -1,7 +1,7 @@
 import chalk from 'chalk'
 import path from 'path'
 import fs from 'fs-extra'
-import { getPackageRoot } from '../utils.js'
+import { checkSdkCompatibility, getPackageRoot } from '../utils.js'
 import { Command } from '@commander-js/extra-typings'
 import { CHAIN_TYPES, loadProcessorConfig } from '../config.js'
 import { getABIFilePath, getABI, writeABIFile } from '../abi.js'
@@ -29,8 +29,14 @@ export function createGenCommand() {
 }
 
 export async function buildProcessor(onlyGen: boolean, options: CommandOptionsType<typeof createBuildCommand>) {
+  // Fail fast with a clear message if an incompatible (older-major) @sentio/sdk is
+  // already installed, instead of crashing later with a cryptic packaging error.
+  checkSdkCompatibility()
+
   if (!options.skipDeps && !onlyGen) {
     await installDeps()
+    // Re-check after install in case it resolved an older-major @sentio/sdk.
+    checkSdkCompatibility()
   }
 
   if (!options.skipGen) {
@@ -41,11 +47,22 @@ export async function buildProcessor(onlyGen: boolean, options: CommandOptionsTy
   }
 
   if (!onlyGen) {
+    // The SDK ships its tsdown config as plain JS (dist/tsdown.config.js) so Node
+    // can load it natively from node_modules — a .ts config fails there because
+    // Node refuses to strip types for files under node_modules.
     let tsdownConfig: string
     try {
-      tsdownConfig = path.resolve(getPackageRoot('@sentio/sdk'), 'dist', 'tsdown.config.ts')
+      tsdownConfig = path.resolve(getPackageRoot('@sentio/sdk'), 'dist', 'tsdown.config.js')
     } catch (e) {
-      console.error(chalk.red("Wrong CLI version for sdk, can't find tsdown.config.ts"))
+      console.error(chalk.red('@sentio/sdk is not installed. Run an install (or drop --skip-deps) and try again.'))
+      process.exit(1)
+    }
+    if (!fs.existsSync(tsdownConfig)) {
+      console.error(
+        chalk.red(
+          "Incompatible @sentio/sdk: missing dist/tsdown.config.js. Please upgrade @sentio/sdk to match this CLI's version."
+        )
+      )
       process.exit(1)
     }
 

@@ -65,6 +65,56 @@ export async function printVersions() {
   } catch (e) {}
 }
 
+function majorVersion(version: string): number | undefined {
+  const major = Number.parseInt(version.split('.')[0], 10)
+  return Number.isNaN(major) ? undefined : major
+}
+
+/**
+ * Whether the installed @sentio/sdk is compatible with the given @sentio/cli.
+ * @sentio/cli, @sentio/sdk and @sentio/runtime are released in lockstep, so they
+ * are only compatible when their major versions match — the CLI drives the SDK's
+ * build tooling (it runs the SDK's `dist/tsdown.config.js`), which changes across
+ * majors. Development builds and unparseable versions are treated as compatible so
+ * the local workspace and test flows are never blocked.
+ */
+export function isSdkVersionCompatible(cliVersion: string, sdkVersion: string): boolean {
+  if (cliVersion.endsWith('-development') || sdkVersion.endsWith('-development')) {
+    return true
+  }
+  const cliMajor = majorVersion(cliVersion)
+  const sdkMajor = majorVersion(sdkVersion)
+  if (cliMajor === undefined || sdkMajor === undefined) {
+    return true
+  }
+  return sdkMajor === cliMajor
+}
+
+/**
+ * Fail fast with a clear message when the installed @sentio/sdk is too old for this
+ * CLI, instead of letting the build crash later with a cryptic packaging error.
+ */
+export function checkSdkCompatibility() {
+  const cliVersion = getCliVersion()
+  const sdkVersion = getSdkVersion()
+  // SDK is not installed (e.g. `sentio create` in a fresh dir): nothing to validate.
+  if (!sdkVersion) {
+    return
+  }
+  if (!isSdkVersionCompatible(cliVersion, sdkVersion)) {
+    const cliMajor = majorVersion(cliVersion)
+    const sdkMajor = majorVersion(sdkVersion)
+    console.error(
+      chalk.red(
+        `Version mismatch: @sentio/cli ${cliVersion} (v${cliMajor}) and @sentio/sdk ${sdkVersion} (v${sdkMajor}) ` +
+          `must share the same major version.\n` +
+          `Please align them, e.g. install @sentio/sdk@^${cliMajor} (or switch to @sentio/cli@^${sdkMajor} to match the installed SDK).`
+      )
+    )
+    process.exit(1)
+  }
+}
+
 export function getApiUrl(apiPath: string, host: string) {
   let apiHost = host
   if (host.includes('sentio.xyz')) {
