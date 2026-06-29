@@ -1,17 +1,29 @@
-import { DataService } from '@sentio/api'
+import { AnalyticService, InsightsService, ObservabilityService } from '@sentio/api'
+import {
+  QuerySQLResultRequestSchema,
+  QuerySQLResultResponseSchema,
+  SQLRequestSchema,
+  SyncExecuteSQLResponseSchema,
+  AsyncExecuteSQLResponseSchema
+} from '@sentio/api/gen/service/analytic/protos/analytic_service_pb.js'
+import { QueryRequestSchema, QueryResponseSchema } from '@sentio/api/gen/service/insights/protos/insights_service_pb.js'
+import {
+  GetMetricsRequestSchema,
+  GetMetricsResponseSchema
+} from '@sentio/api/gen/service/observability/protos/observability_service_pb.js'
+import { fromJson, toJson } from '@bufbuild/protobuf'
 import { Command, InvalidArgumentError } from '@commander-js/extra-typings'
 import chalk from 'chalk'
 import process from 'process'
 import yaml from 'yaml'
 import {
   ApiContext,
-  ApiResult,
   CliError,
   createApiContext,
   fetchApiJson,
+  getServiceClient,
   handleCommandError,
   loadJsonInput,
-  unwrapApiResult,
   resolveProjectRef
 } from '../api.js'
 
@@ -458,32 +470,30 @@ async function runDataQuery(options: DataQueryOptions) {
     throw new CliError('Provide --file, --stdin, or exactly one of --event, --metric, or --price for data query.')
   }
 
-  const response = await DataService.query({
-    path: {
-      owner: project.owner,
-      slug: project.slug
-    },
-    body: body as never,
-    headers: context.headers
-  })
-  const data = unwrapApiResult(response)
-  printOutput(options, data)
+  const client = getServiceClient(InsightsService, context)
+  const res = await client.query(
+    fromJson(QueryRequestSchema, {
+      ...(body as object),
+      projectOwner: project.owner,
+      projectSlug: project.slug
+    })
+  )
+  printOutput(options, toJson(QueryResponseSchema, res))
 }
 
 async function runMetricsList(options: CommonDataOptions & { metric?: string; version?: number }) {
   const context = createApiContext(options)
   const project = await resolveProjectRef(options, context, { ownerSlug: false, projectId: true })
-  const response = await DataService.getMetrics({
-    query: {
-      projectId: project.projectId,
-      name: options.metric,
-      version: options.version
-    },
-    headers: context.headers
-  })
-  const data = unwrapApiResult(response)
+  const client = getServiceClient(ObservabilityService, context)
+  const res = await client.getMetrics(
+    fromJson(GetMetricsRequestSchema, {
+      projectId: project.projectId!,
+      ...(options.metric !== undefined ? { name: options.metric } : {}),
+      ...(options.version !== undefined ? { version: options.version } : {})
+    })
+  )
 
-  printOutput(options, data)
+  printOutput(options, toJson(GetMetricsResponseSchema, res))
 }
 
 async function runSql(options: SqlCommandOptions) {
@@ -506,55 +516,43 @@ async function runSql(options: SqlCommandOptions) {
     throw new CliError('Provide --query, --result, --file, or --stdin.')
   }
 
+  const request = fromJson(SQLRequestSchema, {
+    ...(body as object),
+    projectOwner: project.owner,
+    projectSlug: project.slug
+  })
+
   if (options.async) {
-    const response = await DataService.executeSqlAsync({
-      path: {
-        owner: project.owner,
-        slug: project.slug
-      },
-      body: body as never,
-      headers: context.headers
-    })
-    const data = unwrapApiResult(response)
-    printOutput(options, data)
+    const client = getServiceClient(AnalyticService, context)
+    const res = await client.executeSQLAsync(request)
+    printOutput(options, toJson(AsyncExecuteSQLResponseSchema, res))
     return
   }
 
-  const response = await DataService.executeSql({
-    path: {
-      owner: project.owner,
-      slug: project.slug
-    },
-    body: body as never,
-    headers: context.headers
-  })
-  const data = unwrapApiResult(response)
-  printOutput(options, data)
+  const client = getServiceClient(AnalyticService, context)
+  const res = await client.executeSQL(request)
+  printOutput(options, toJson(SyncExecuteSQLResponseSchema, res))
 }
 
 async function runSqlResult(executionId: string, options: CommonDataOptions & { projectId?: string }) {
-  await runSqlExecutionRead(executionId, options, (project, context) =>
-    DataService.querySqlResult({
-      path: {
-        owner: project.owner,
-        slug: project.slug,
-        executionId
-      },
-      query: {
-        projectId: project.projectId
-      },
-      headers: context.headers
-    })
-  )
+  await runSqlExecutionRead(executionId, options, async (project, context) => {
+    const client = getServiceClient(AnalyticService, context)
+    const res = await client.querySQLResult(
+      fromJson(QuerySQLResultRequestSchema, {
+        projectOwner: project.owner,
+        projectSlug: project.slug,
+        executionId,
+        ...(project.projectId !== undefined ? { projectId: project.projectId } : {})
+      })
+    )
+    return toJson(QuerySQLResultResponseSchema, res)
+  })
 }
 
 async function runSqlExecutionRead(
   executionId: string,
   options: CommonDataOptions & { projectId?: string },
-  operation: (
-    project: Awaited<ReturnType<typeof resolveProjectRef>>,
-    context: ApiContext
-  ) => Promise<ApiResult<unknown>>
+  operation: (project: Awaited<ReturnType<typeof resolveProjectRef>>, context: ApiContext) => Promise<unknown>
 ) {
   if (!executionId) {
     throw new CliError('Execution id is required.')
@@ -562,7 +560,7 @@ async function runSqlExecutionRead(
 
   const context = createApiContext(options)
   const project = await resolveProjectRef(options, context, { ownerSlug: true })
-  const data = unwrapApiResult(await operation(project, context))
+  const data = await operation(project, context)
   printOutput(options, data)
 }
 

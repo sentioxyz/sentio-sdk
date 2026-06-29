@@ -1,14 +1,30 @@
 import { Command, InvalidArgumentError } from '@commander-js/extra-typings'
 import process from 'process'
 import yaml from 'yaml'
-import { DebugAndSimulationService } from '@sentio/api'
+import { SolidityAPIService } from '@sentio/api'
+import {
+  GetSimulationBundleInProjectRequestSchema,
+  GetSimulationInProjectRequestSchema,
+  GetSimulationsInProjectRequestSchema,
+  SimulateTransactionBundleInProjectRequestSchema,
+  SimulateTransactionInProjectRequestSchema
+} from '@sentio/api/gen/service/solidity/protos/solidity_api_service_pb.js'
+import {
+  GetSimulationBundleResponseSchema,
+  GetSimulationResponseSchema,
+  GetSimulationsResponseSchema,
+  SimulateTransactionBundleResponseSchema,
+  SimulateTransactionResponseSchema
+} from '@sentio/api/gen/service/solidity/protos/solidity_service_pb.js'
+import { fromJson, toJson } from '@bufbuild/protobuf'
 import {
   CliError,
   createApiContext,
+  fetchApiJson,
+  getServiceClient,
   handleCommandError,
   loadJsonInput,
-  resolveProjectRef,
-  unwrapApiResult
+  resolveProjectRef
 } from '../api.js'
 
 interface SimulationOptions {
@@ -213,47 +229,45 @@ function createSimulationTraceByTxCommand() {
 async function runSimulationList(options: SimulationListOptions) {
   const context = createApiContext(options)
   const project = await resolveProjectRef(options, context, { ownerSlug: true })
-  const response = await DebugAndSimulationService.getSimulations({
-    path: {
-      owner: project.owner,
-      slug: project.slug
-    },
-    query: {
-      labelContains: options.labelContains,
-      page: options.page,
-      pageSize: options.pageSize
-    },
-    headers: context.headers
-  })
-  printOutput(options, unwrapApiResult(response))
+  const client = getServiceClient(SolidityAPIService, context)
+  const res = await client.getSimulations(
+    fromJson(GetSimulationsInProjectRequestSchema, {
+      projectOwner: project.owner,
+      projectSlug: project.slug,
+      ...(options.labelContains !== undefined ? { labelContains: options.labelContains } : {}),
+      ...(options.page !== undefined ? { page: options.page } : {}),
+      ...(options.pageSize !== undefined ? { pageSize: options.pageSize } : {})
+    })
+  )
+  printOutput(options, toJson(GetSimulationsResponseSchema, res))
 }
 
 async function runSimulationGet(simulationId: string, options: SimulationOptions) {
   const context = createApiContext(options)
   const project = await resolveProjectRef(options, context, { ownerSlug: true })
-  const response = await DebugAndSimulationService.getSimulation({
-    path: {
-      owner: project.owner,
-      slug: project.slug,
+  const client = getServiceClient(SolidityAPIService, context)
+  const res = await client.getSimulation(
+    fromJson(GetSimulationInProjectRequestSchema, {
+      projectOwner: project.owner,
+      projectSlug: project.slug,
       simulationId
-    },
-    headers: context.headers
-  })
-  printOutput(options, unwrapApiResult(response))
+    })
+  )
+  printOutput(options, toJson(GetSimulationResponseSchema, res))
 }
 
 async function runSimulationBundleGet(bundleId: string, options: SimulationOptions) {
   const context = createApiContext(options)
   const project = await resolveProjectRef(options, context, { ownerSlug: true })
-  const response = await DebugAndSimulationService.getSimulationBundleInProject({
-    path: {
-      owner: project.owner,
-      slug: project.slug,
+  const client = getServiceClient(SolidityAPIService, context)
+  const res = await client.getSimulationBundleInProject(
+    fromJson(GetSimulationBundleInProjectRequestSchema, {
+      projectOwner: project.owner,
+      projectSlug: project.slug,
       bundleId
-    },
-    headers: context.headers
-  })
-  printOutput(options, unwrapApiResult(response))
+    })
+  )
+  printOutput(options, toJson(GetSimulationBundleResponseSchema, res))
 }
 
 async function runSimulation(options: SimulationRunOptions) {
@@ -266,16 +280,22 @@ async function runSimulation(options: SimulationRunOptions) {
   }
   const context = createApiContext(options)
   const project = await resolveProjectRef(options, context, { ownerSlug: true })
-  const response = await DebugAndSimulationService.simulateTransaction({
-    path: {
-      owner: project.owner,
-      slug: project.slug,
-      chainId: options.chainId
-    },
-    body: body as never,
-    headers: context.headers
-  })
-  printOutput(options, unwrapApiResult(response))
+  const client = getServiceClient(SolidityAPIService, context)
+  // 1.x body was { simulation: Simulation } and chainId rode in the URL path; in
+  // 2.x both live on the request message and chainId is a field of the simulation.
+  const bodyJson = body as Record<string, unknown>
+  const simulation = {
+    chainId: options.chainId,
+    ...((bodyJson.simulation as Record<string, unknown> | undefined) ?? {})
+  }
+  const res = await client.simulateTransaction(
+    fromJson(SimulateTransactionInProjectRequestSchema, {
+      projectOwner: project.owner,
+      projectSlug: project.slug,
+      simulation
+    })
+  )
+  printOutput(options, toJson(SimulateTransactionResponseSchema, res))
 }
 
 async function runSimulationBundle(options: SimulationRunOptions) {
@@ -286,86 +306,66 @@ async function runSimulationBundle(options: SimulationRunOptions) {
   if (!options.chainId) {
     throw new CliError('Chain id is required. Use --chain-id <id>.')
   }
+  const chainId = options.chainId
   const context = createApiContext(options)
   const project = await resolveProjectRef(options, context, { ownerSlug: true })
-  const response = await DebugAndSimulationService.simulateTransactionBundle({
-    path: {
-      owner: project.owner,
-      slug: project.slug,
-      chainId: options.chainId
-    },
-    body: body as never,
-    headers: context.headers
-  })
-  printOutput(options, unwrapApiResult(response))
+  const client = getServiceClient(SolidityAPIService, context)
+  // 1.x body was { simulations: Simulation[] } and chainId rode in the URL path;
+  // in 2.x both live on the request message and chainId is a field of each simulation.
+  const bodyJson = body as Record<string, unknown>
+  const inputSimulations = Array.isArray(bodyJson.simulations)
+    ? (bodyJson.simulations as Array<Record<string, unknown>>)
+    : []
+  const simulations = inputSimulations.map((simulation) => ({
+    chainId,
+    ...simulation
+  }))
+  const res = await client.simulateTransactionBundle(
+    fromJson(SimulateTransactionBundleInProjectRequestSchema, {
+      projectOwner: project.owner,
+      projectSlug: project.slug,
+      simulations
+    })
+  )
+  printOutput(options, toJson(SimulateTransactionBundleResponseSchema, res))
 }
 
 async function runTraceBySimulation(simulationId: string, options: SimulationTraceOptions) {
-  await runTrace(options, (project, context) =>
-    DebugAndSimulationService.getCallTraceBySimulation({
-      path: {
-        owner: project.owner,
-        slug: project.slug,
-        chainId: options.chainId!,
-        simulationId
-      },
-      query: buildTraceQuery(options),
-      headers: context.headers
-    })
-  )
+  await runTrace('simulation', simulationId, options)
 }
 
 async function runTraceByBundle(bundleId: string, options: SimulationTraceOptions) {
-  await runTrace(options, (project, context) =>
-    DebugAndSimulationService.getCallTraceByBundle({
-      path: {
-        owner: project.owner,
-        slug: project.slug,
-        chainId: options.chainId!,
-        bundleId
-      },
-      query: buildTraceQuery(options),
-      headers: context.headers
-    })
-  )
+  await runTrace('bundle', bundleId, options)
 }
 
 async function runTraceByTransaction(txHash: string, options: SimulationTraceOptions) {
-  await runTrace(options, (project, context) =>
-    DebugAndSimulationService.getCallTraceByTransaction({
-      path: {
-        owner: project.owner,
-        slug: project.slug,
-        chainId: options.chainId!,
-        txHash
-      },
-      query: buildTraceQuery(options),
-      headers: context.headers
-    })
-  )
+  await runTrace('transaction', txHash, options)
 }
 
+// The call-trace-by-id endpoints are keyed by chainId + the simulation/bundle/tx
+// id, but the 2.x public proto (GetCallTraceInProjectRequest) does not carry those
+// fields. Call the REST gateway route directly — the same dialect the connect
+// client speaks — so the id and chainId can still be forwarded.
 async function runTrace(
-  options: SimulationTraceOptions,
-  operation: (
-    project: Awaited<ReturnType<typeof resolveProjectRef>>,
-    context: ReturnType<typeof createApiContext>
-  ) => Promise<unknown>
+  resource: 'simulation' | 'bundle' | 'transaction',
+  id: string,
+  options: SimulationTraceOptions
 ) {
   if (!options.chainId) {
     throw new CliError('Chain id is required. Use --chain-id <id>.')
   }
   const context = createApiContext(options)
   const project = await resolveProjectRef(options, context, { ownerSlug: true })
-  const data = unwrapApiResult((await operation(project, context)) as never)
+  const path = `/api/v1/solidity/${project.owner}/${project.slug}/${options.chainId}/${resource}/${encodeURIComponent(id)}/call_trace`
+  const data = await fetchApiJson<unknown>(path, context, buildTraceQuery(options))
   printOutput(options, data)
 }
 
 function buildTraceQuery(options: SimulationTraceOptions) {
   return {
-    withInternalCalls: options.withInternalCalls,
-    disableOptimizer: options.disableOptimizer,
-    ignoreGasCost: options.ignoreGasCost
+    ...(options.withInternalCalls !== undefined ? { withInternalCalls: options.withInternalCalls } : {}),
+    ...(options.disableOptimizer !== undefined ? { disableOptimizer: options.disableOptimizer } : {}),
+    ...(options.ignoreGasCost !== undefined ? { ignoreGasCost: options.ignoreGasCost } : {})
   }
 }
 

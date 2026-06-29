@@ -1,14 +1,20 @@
-import { AlertsService } from '@sentio/api'
+import { AlertService } from '@sentio/api'
+import {
+  GetAlertResponseSchema,
+  GetAlertRulesResponseSchema,
+  SaveAlertRuleRequestSchema
+} from '@sentio/api/gen/service/alert/protos/alert_service_pb.js'
+import { fromJson, toJson } from '@bufbuild/protobuf'
 import { Command, InvalidArgumentError } from '@commander-js/extra-typings'
 import process from 'process'
 import yaml from 'yaml'
 import {
   CliError,
   createApiContext,
+  getServiceClient,
   handleCommandError,
   loadJsonInput,
-  resolveProjectRef,
-  unwrapApiResult
+  resolveProjectRef
 } from '../api.js'
 import { buildEventsInsightQueryBody, buildMetricsInsightQueryBody } from './data.js'
 
@@ -213,13 +219,11 @@ function createAlertDeleteCommand() {
 async function runAlertList(options: AlertListOptions) {
   const context = createApiContext(options)
   const project = await resolveProjectRef(options, context, { projectId: true })
-  const response = await AlertsService.getAlertRules({
-    path: {
-      projectId: project.projectId!
-    },
-    headers: context.headers
+  const client = getServiceClient(AlertService, context)
+  const response = await client.getAlertRules({
+    projectId: project.projectId!
   })
-  const data = unwrapApiResult(response)
+  const data = toJson(GetAlertRulesResponseSchema, response)
   const rules = Array.isArray(data.rules) ? data.rules : []
   const recentCount = options.recent ?? 3
   const alertsByRule = Object.fromEntries(
@@ -229,16 +233,12 @@ async function runAlertList(options: AlertListOptions) {
         if (!ruleId || recentCount <= 0) {
           return [ruleId ?? '', []]
         }
-        const detail = unwrapApiResult(
-          await AlertsService.getAlert({
-            path: {
-              ruleId
-            },
-            query: {
-              page: 1,
-              pageSize: recentCount
-            },
-            headers: context.headers
+        const detail = toJson(
+          GetAlertResponseSchema,
+          await client.getAlert({
+            ruleId,
+            page: 1,
+            pageSize: recentCount
           })
         )
         return [ruleId, Array.isArray(detail.alerts) ? detail.alerts : []]
@@ -254,17 +254,13 @@ async function runAlertList(options: AlertListOptions) {
 
 async function runAlertGet(ruleId: string, options: AlertGetOptions) {
   const context = createApiContext(options)
-  const response = await AlertsService.getAlert({
-    path: {
-      ruleId
-    },
-    query: {
-      page: options.page,
-      pageSize: options.pageSize
-    },
-    headers: context.headers
+  const client = getServiceClient(AlertService, context)
+  const response = await client.getAlert({
+    ruleId,
+    page: options.page,
+    pageSize: options.pageSize
   })
-  printOutput(options, unwrapApiResult(response))
+  printOutput(options, toJson(GetAlertResponseSchema, response))
 }
 
 async function runAlertCreate(options: AlertCreateOptions) {
@@ -282,13 +278,10 @@ async function runAlertCreate(options: AlertCreateOptions) {
       'Provide --file, --stdin, or inline alert flags like --type, --subject, and query options for alert create.'
     )
   }
-  const response = await AlertsService.saveAlertRule({
-    body: body as never,
-    headers: context.headers
-  })
+  const client = getServiceClient(AlertService, context)
+  await client.saveAlertRule(fromJson(SaveAlertRuleRequestSchema, body as never))
   printOutput(options, {
-    message: 'Alert rule created',
-    ...(unwrapApiResult(response) as Record<string, unknown>)
+    message: 'Alert rule created'
   })
 }
 
@@ -298,30 +291,28 @@ async function runAlertUpdate(ruleId: string, options: AlertOptions) {
   if (!body) {
     throw new CliError('Provide --file or --stdin for alert update.')
   }
-  const response = await AlertsService.saveAlertRule2({
-    path: {
+  // The grpc-gateway update route carried the rule id in the path; in the unified
+  // SaveAlertRule RPC it lives on rule.id, so merge the path id into the nested rule.
+  const requestJson = {
+    ...body,
+    rule: {
+      ...body.rule,
       id: ruleId
-    },
-    body: body as never,
-    headers: context.headers
-  })
+    }
+  }
+  const client = getServiceClient(AlertService, context)
+  await client.saveAlertRule(fromJson(SaveAlertRuleRequestSchema, requestJson))
   printOutput(options, {
-    message: `Alert rule updated: ${ruleId}`,
-    ...(unwrapApiResult(response) as Record<string, unknown>)
+    message: `Alert rule updated: ${ruleId}`
   })
 }
 
 async function runAlertDelete(ruleId: string, options: AlertOptions) {
   const context = createApiContext(options)
-  const response = await AlertsService.deleteAlertRule({
-    path: {
-      id: ruleId
-    },
-    headers: context.headers
-  })
+  const client = getServiceClient(AlertService, context)
+  await client.deleteAlertRule({ id: ruleId })
   printOutput(options, {
-    message: `Alert rule deleted: ${ruleId}`,
-    ...(unwrapApiResult(response) as Record<string, unknown>)
+    message: `Alert rule deleted: ${ruleId}`
   })
 }
 
