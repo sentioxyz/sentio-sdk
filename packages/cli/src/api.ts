@@ -1,4 +1,6 @@
-import { client } from '@sentio/api'
+import { type Client, createSentioClient } from '@sentio/api'
+import type { DescService } from '@bufbuild/protobuf'
+import { ConnectError } from '@connectrpc/connect'
 import chalk from 'chalk'
 import fs from 'fs'
 import path from 'path'
@@ -36,15 +38,6 @@ export interface ApiContext {
   headers: Record<string, string>
 }
 
-export interface ApiResult<T> {
-  data?: T
-  error?: unknown
-  response?: {
-    status?: number
-    statusText?: string
-  }
-}
-
 export interface ProjectRef {
   owner: string
   slug: string
@@ -70,7 +63,12 @@ interface ProjectByIdResponse {
   slug?: string
 }
 
-export function getApiBaseUrl(host: string) {
+/**
+ * Maps an app host to the `api-*` REST origin that serves the `/v1/...` surface
+ * (app.sentio.xyz→api.sentio.xyz, test→api-test, staging→api-staging). Non
+ * sentio.xyz hosts (e.g. localhost) are returned unchanged.
+ */
+function getApiBaseUrl(host: string) {
   let apiHost = host
   if (host.includes('sentio.xyz')) {
     apiHost = host.replace('test', 'api-test').replace('staging', 'api-staging').replace('app', 'api')
@@ -117,9 +115,6 @@ export function enableApiDebug() {
 
 export function createApiContext(options: ApiAuthOptions): ApiContext {
   const host = getFinalizedHost(options.host)
-  client.setConfig({
-    baseUrl: getApiBaseUrl(host)
-  } as never)
 
   let apiKey = ReadKey(host)
   if (options.apiKey) {
@@ -148,6 +143,20 @@ export function createApiContext(options: ApiAuthOptions): ApiContext {
 
   const loginCommand = host === 'https://app.sentio.xyz' ? 'sentio login' : `sentio login --host=${host}`
   throw new CliError(`No credential found for ${host}. Please run \`${loginCommand}\`.`)
+}
+
+/**
+ * Build a connect client for one Sentio service. @sentio/api 2.0.3 targets the
+ * `api-*` REST origin and strips the generated bindings' historical `/api`
+ * prefix internally (`/api/v1/...`→`/v1/...`), so we hand it the same api-base
+ * host the raw `fetchApiJson` helpers reach via `getApiUrl`. Auth rides on the
+ * context headers (api-key / bearer token + version).
+ */
+export function getServiceClient<T extends DescService>(service: T, context: ApiContext): Client<T> {
+  return createSentioClient(service, {
+    baseUrl: getApiBaseUrl(context.host),
+    headers: context.headers
+  })
 }
 
 export function loadJsonInput(options: JsonInputOptions): unknown | undefined {
@@ -327,6 +336,11 @@ export function handleCommandError(error: unknown): never {
     process.exit(1)
   }
 
+  if (error instanceof ConnectError) {
+    console.error(chalk.red(`Sentio API request failed: ${error.message}`))
+    process.exit(1)
+  }
+
   const response = (error as { response?: { status?: number; statusText?: string } })?.response
   if (response) {
     const status = response.status ?? 'unknown'
@@ -345,22 +359,6 @@ export function handleCommandError(error: unknown): never {
 
   console.error(error)
   process.exit(1)
-}
-
-export function unwrapApiResult<T>(result: ApiResult<T>): T {
-  if (result.error) {
-    const errorDetail = formatApiError(result.error)
-    const statusDetail = result.response?.status
-      ? `${result.response.status} ${result.response.statusText ?? ''}`.trim()
-      : undefined
-    throw new CliError(
-      `Sentio API returned an error${statusDetail ? ` (${statusDetail})` : ''}: ${errorDetail || 'unknown error'}`
-    )
-  }
-  if (result.data === undefined) {
-    throw new CliError('Sentio API returned no data.')
-  }
-  return result.data
 }
 
 export async function fetchApiJson<T>(
@@ -496,23 +494,6 @@ export async function getProjectById(projectId: string, context: ApiContext): Pr
     throw new CliError(`Failed to resolve project ${projectId}: ${response.status} ${response.statusText}`)
   }
   return (await response.json()) as ProjectByIdResponse
-}
-
-function formatApiError(error: unknown) {
-  if (typeof error === 'string') {
-    return error
-  }
-  if (error && typeof error === 'object') {
-    const maybeMessage = (error as { message?: string }).message
-    if (maybeMessage) {
-      return maybeMessage
-    }
-    try {
-      const serialized = JSON.stringify(error)
-      return serialized === '{}' ? '' : serialized
-    } catch {}
-  }
-  return String(error)
 }
 
 function formatDebugBody(body: any) {

@@ -1,8 +1,17 @@
 import { PriceService } from '@sentio/api'
+import {
+  BatchGetPricesRequestSchema,
+  BatchGetPricesResponseSchema,
+  CheckLatestPriceResponseSchema,
+  GetPriceResponseSchema,
+  ListCoinsResponseSchema
+} from '@sentio/api/gen/service/price/protos/price_pb.js'
+import { fromJson, toJson } from '@bufbuild/protobuf'
+import { timestampFromDate } from '@bufbuild/protobuf/wkt'
 import { Command, InvalidArgumentError } from '@commander-js/extra-typings'
 import process from 'process'
 import yaml from 'yaml'
-import { CliError, createApiContext, handleCommandError, loadJsonInput, unwrapApiResult } from '../api.js'
+import { CliError, createApiContext, getServiceClient, handleCommandError, loadJsonInput } from '../api.js'
 
 interface PriceOptions {
   host?: string
@@ -133,20 +142,23 @@ function createPriceCheckLatestCommand() {
 async function runPriceGet(options: PriceGetOptions) {
   const context = createApiContext(options)
   const coin = normalizeCoinInput(options)
-  const response = await PriceService.getPrice({
-    query: {
-      timestamp: options.timestamp,
-      'coinId.symbol': coin.symbol,
-      'coinId.address.address': coin.address?.address,
-      'coinId.address.chain': coin.address?.chain,
-      source: options.source,
-      'experimentalFlag.enablePythSource': options.enablePythSource
+  const client = getServiceClient(PriceService, context)
+  const res = await client.getPrice({
+    timestamp: options.timestamp ? timestampFromDate(new Date(options.timestamp)) : undefined,
+    coinId: {
+      id: coin.symbol
+        ? { case: 'symbol', value: coin.symbol }
+        : {
+            case: 'address',
+            value: { address: coin.address?.address ?? '', chain: coin.address?.chain ?? '' }
+          }
     },
-    headers: context.headers
+    source: options.source,
+    experimentalFlag: options.enablePythSource ? { enablePythSource: options.enablePythSource } : undefined
   })
   printOutput(options, {
     coinId: coin,
-    ...(unwrapApiResult(response) as Record<string, unknown>)
+    ...(toJson(GetPriceResponseSchema, res) as Record<string, unknown>)
   })
 }
 
@@ -156,33 +168,28 @@ async function runPriceBatch(options: PriceBatchOptions) {
   if (!body) {
     throw new CliError('Provide --file or --stdin for price batch.')
   }
-  const response = await PriceService.batchGetPrices({
-    body: body as never,
-    headers: context.headers
-  })
-  printOutput(options, unwrapApiResult(response))
+  const client = getServiceClient(PriceService, context)
+  const res = await client.batchGetPrices(fromJson(BatchGetPricesRequestSchema, body as never))
+  printOutput(options, toJson(BatchGetPricesResponseSchema, res))
 }
 
 async function runPriceCoins(options: PriceCoinsOptions) {
   const context = createApiContext(options)
-  const response = await PriceService.priceListCoins({
-    query: {
-      limit: options.limit,
-      offset: options.offset,
-      searchQuery: options.searchQuery,
-      chain: options.chain
-    },
-    headers: context.headers
+  const client = getServiceClient(PriceService, context)
+  const res = await client.listCoins({
+    limit: options.limit,
+    offset: options.offset,
+    searchQuery: options.searchQuery,
+    chain: options.chain
   })
-  printOutput(options, unwrapApiResult(response))
+  printOutput(options, toJson(ListCoinsResponseSchema, res))
 }
 
 async function runPriceCheckLatest(options: PriceOptions) {
   const context = createApiContext(options)
-  const response = await PriceService.checkLatestPrice({
-    headers: context.headers
-  })
-  printOutput(options, unwrapApiResult(response))
+  const client = getServiceClient(PriceService, context)
+  const res = await client.checkLatestPrice({})
+  printOutput(options, toJson(CheckLatestPriceResponseSchema, res))
 }
 
 function withAuthOptions<Args extends any[]>(command: Command<Args, any, any>) {

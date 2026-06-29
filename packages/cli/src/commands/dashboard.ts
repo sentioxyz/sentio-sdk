@@ -1,15 +1,22 @@
 import { WebService } from '@sentio/api'
+import {
+  ExportDashboardResponseSchema,
+  GetDashboardResponseSchema,
+  ImportDashboardRequestSchema,
+  ImportDashboardResponseSchema
+} from '@sentio/api/gen/service/web/protos/web_service_pb.js'
+import { fromJson, toJson } from '@bufbuild/protobuf'
 import { Command } from '@commander-js/extra-typings'
 import process from 'process'
 import yaml from 'yaml'
 import {
   CliError,
   createApiContext,
+  getServiceClient,
   handleCommandError,
   loadJsonInput,
   postApiJson,
-  resolveProjectRef,
-  unwrapApiResult
+  resolveProjectRef
 } from '../api.js'
 import { buildEventsInsightQueryBody, buildMetricsInsightQueryBody } from './data.js'
 
@@ -236,12 +243,12 @@ Panel time range override examples:
 async function runDashboardList(options: DashboardOptions) {
   const context = createApiContext(options)
   const project = await resolveProjectRef(options, context, { ownerSlug: true })
-  const response = await WebService.listDashboards2({
-    path: { owner: project.owner, slug: project.slug },
-    headers: context.headers
+  const client = getServiceClient(WebService, context)
+  const res = await client.listDashboards({
+    ownerName: project.owner,
+    slug: project.slug
   })
-  const data = unwrapApiResult(response)
-  printOutput(options, data)
+  printOutput(options, toJson(GetDashboardResponseSchema, res))
 }
 
 async function runDashboardCreate(options: DashboardCreateOptions) {
@@ -258,11 +265,9 @@ async function runDashboardCreate(options: DashboardCreateOptions) {
 
 async function runDashboardExport(dashboardId: string, options: DashboardOptions) {
   const context = createApiContext(options)
-  const response = await WebService.exportDashboard({
-    path: { dashboardId },
-    headers: context.headers
-  })
-  const data = unwrapApiResult(response)
+  const client = getServiceClient(WebService, context)
+  const res = await client.exportDashboard({ dashboardId })
+  const data = toJson(ExportDashboardResponseSchema, res)
   // Export always outputs JSON regardless of --yaml flag, since the exported data is meant to be re-imported
   console.log(JSON.stringify(data.dashboardJson ?? data, null, 2))
 }
@@ -276,15 +281,14 @@ async function runDashboardImport(dashboardId: string, options: DashboardImportO
 
   const dashboardJson = typeof input === 'object' ? (input as Record<string, unknown>) : {}
 
-  const response = await WebService.importDashboard({
-    body: {
-      dashboardId,
-      dashboardJson,
-      overrideLayouts: options.overrideLayouts
-    },
-    headers: context.headers
-  })
-  const data = unwrapApiResult(response)
+  const client = getServiceClient(WebService, context)
+  const request = fromJson(ImportDashboardRequestSchema, {
+    dashboardId,
+    dashboardJson,
+    overrideLayouts: options.overrideLayouts
+  } as never)
+  const res = await client.importDashboard(request)
+  const data = toJson(ImportDashboardResponseSchema, res)
   printOutput(options, { message: `Dashboard imported into ${dashboardId}`, dashboard: data.dashboard })
 }
 
@@ -340,11 +344,9 @@ async function runDashboardAddPanel(dashboardId: string, options: AddPanelOption
   }
 
   // 1. Fetch current dashboard to determine layout positions
-  const getResponse = await WebService.getDashboard({
-    path: { dashboardId },
-    headers: context.headers
-  })
-  const dashboardData = unwrapApiResult(getResponse)
+  const client = getServiceClient(WebService, context)
+  const getResponse = await client.getDashboard({ dashboardId })
+  const dashboardData = toJson(GetDashboardResponseSchema, getResponse)
   const dashboard = dashboardData.dashboards?.[0]
   if (!dashboard) {
     throw new CliError(`Dashboard ${dashboardId} not found.`)
@@ -401,15 +403,13 @@ async function runDashboardAddPanel(dashboardId: string, options: AddPanelOption
     }
   }
 
-  const importResponse = await WebService.importDashboard({
-    body: {
-      dashboardId,
-      dashboardJson,
-      overrideLayouts: true
-    },
-    headers: context.headers
-  })
-  const importData = unwrapApiResult(importResponse)
+  const importRequest = fromJson(ImportDashboardRequestSchema, {
+    dashboardId,
+    dashboardJson,
+    overrideLayouts: true
+  } as never)
+  const importResponse = await client.importDashboard(importRequest)
+  const importData = toJson(ImportDashboardResponseSchema, importResponse)
   printOutput(options, {
     message: `Panel "${options.panelName}" added to dashboard ${dashboardId}`,
     panelId,

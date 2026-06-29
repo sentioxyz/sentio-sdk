@@ -1,9 +1,11 @@
 import { type CoinID, CoinIDSchema } from '@sentio/protos'
 import { create } from '@bufbuild/protobuf'
+import { timestampDate, timestampFromDate } from '@bufbuild/protobuf/wkt'
 import { Endpoints, processMetrics } from '@sentio/runtime'
 import { ChainId } from '@sentio/chain'
 import { LRUCache } from 'lru-cache'
-import { client, PriceService } from '@sentio/api'
+import { type Client, createSentioClient, PriceService } from '@sentio/api'
+import { Code, ConnectError } from '@connectrpc/connect'
 import path from 'path'
 import fs from 'fs'
 import os from 'os'
@@ -16,18 +18,17 @@ function getApiKey() {
   } catch (e) {}
 }
 
-export function getPriceClient(basePath = Endpoints.INSTANCE.priceFeedAPI) {
+export function getPriceClient(basePath = Endpoints.INSTANCE.priceFeedAPI): PriceApi {
   if (basePath && !basePath.startsWith('http')) {
     basePath = 'http://' + basePath
   }
   if (basePath.endsWith('/')) {
     basePath = basePath.slice(0, -1)
   }
-  client.setConfig({
+  return createSentioClient(PriceService, {
     baseUrl: basePath || 'https://api.sentio.xyz',
-    auth: getApiKey()
+    apiKey: getApiKey()
   })
-  return PriceService
 }
 
 const priceMap = new LRUCache<string, Promise<number | undefined>>({
@@ -35,7 +36,7 @@ const priceMap = new LRUCache<string, Promise<number | undefined>>({
   ttl: 1000 * 60 * 5 // 5 minutes
 })
 
-type PriceApi = typeof PriceService
+type PriceApi = Client<typeof PriceService>
 let priceClient: PriceApi
 
 interface PriceOptions {
@@ -73,18 +74,17 @@ export async function getPriceByTypeOrSymbolInternal(
 
   processMetrics.process_pricecall_count.add(1)
   const response = priceClient.getPrice({
-    query: {
-      timestamp: date.toISOString(),
-      'coinId.symbol': symbol,
-      'coinId.address.address': address?.address,
-      'coinId.address.chain': address?.chain
+    timestamp: timestampFromDate(date),
+    coinId: {
+      id: symbol
+        ? { case: 'symbol', value: symbol }
+        : { case: 'address', value: { address: address?.address ?? '', chain: address?.chain ?? '' } }
     }
   })
   price = response
     .then((res) => {
-      const { data } = res
-      if (data?.timestamp) {
-        const responseDate = new Date(data.timestamp)
+      if (res.timestamp) {
+        const responseDate = timestampDate(res.timestamp)
         const responseDateString = dateString(responseDate)
         if (responseDateString === todayDateString) {
           priceMap.delete(key)
@@ -101,14 +101,14 @@ export async function getPriceByTypeOrSymbolInternal(
       } else {
         priceMap.delete(key)
       }
-      return data?.price
+      return res.price
     })
     .catch((e) => {
       setTimeout(() => {
         priceMap.delete(key)
       }, 1000)
 
-      if (e.response?.status === 404) {
+      if (e instanceof ConnectError && e.code === Code.NotFound) {
         console.error('price not found for ', JSON.stringify(coinId), ' at ', dateStr)
         return undefined
       }
@@ -166,25 +166,18 @@ function dateString(date: Date) {
 }
 
 /**
- * get coins that has price, return results are list of coin id with both symbol and address field set
+ * get coins that has price, return results as a list of `{ symbol, coin }`
+ * pairs where `coin` is the address-keyed CoinID for that symbol on the chain
  * @param chainId
  */
 export async function getCoinsThatHasPrice(chainId: ChainId) {
   if (!priceClient) {
     priceClient = getPriceClient()
   }
-  const { data } = await priceClient.priceListCoins({
-    query: {
-      chain: chainId,
-      limit: 1000
-    }
+  const res = await priceClient.listCoins({
+    chain: chainId,
+    limit: 1000
   })
 
-  if (!data?.coinAddressesInChain) {
-    return []
-  }
-  return Object.entries(data.coinAddressesInChain).map(([symbol, coin]) => {
-    coin.symbol = symbol
-    return coin
-  })
+  return Object.entries(res.coinAddressesInChain).map(([symbol, coin]) => ({ symbol, coin }))
 }

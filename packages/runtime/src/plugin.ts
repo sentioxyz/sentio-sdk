@@ -26,13 +26,6 @@ export abstract class Plugin {
 
   async start(start: StartRequest): Promise<void> {}
 
-  /**
-   * @deprecated The method should not be used, use ctx.states instead
-   */
-  stateDiff(config: ProcessConfigResponse): boolean {
-    return false
-  }
-
   async processBinding(request: DataBinding, preparedData: PreparedData | undefined): Promise<ProcessResult> {
     return create(ProcessResultSchema)
   }
@@ -108,13 +101,6 @@ export class PluginManager {
 
   shutdown() {
     this.plugins.forEach((plugin) => plugin.shutdownServer())
-  }
-
-  /**
-   * @deprecated The method should not be used, use ctx.states instead
-   */
-  stateDiff(config: ProcessConfigResponse): boolean {
-    return this.plugins.some((plugin) => plugin.stateDiff(config))
   }
 
   processBinding(

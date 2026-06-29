@@ -1,4 +1,15 @@
-import { ProcessorExtService, ProcessorService } from '@sentio/api'
+import { ProcessorService, ProcessorServiceExt } from '@sentio/api'
+import {
+  ActivatePendingRequestSchema,
+  GetProcessorStatusRequestV2Schema,
+  GetProcessorStatusResponseSchema
+} from '@sentio/api/gen/service/processor/protos/processor_service_pb.js'
+import {
+  GetProcessorSourceFilesRequestSchema,
+  GetProcessorSourceFilesResponseSchema
+} from '@sentio/api/gen/service/processor/ext_protos/processor_service_ext_pb.js'
+import { fromJson, toJson } from '@bufbuild/protobuf'
+import { EmptySchema } from '@bufbuild/protobuf/wkt'
 import { Command, InvalidArgumentError } from '@commander-js/extra-typings'
 import chalk from 'chalk'
 import process from 'process'
@@ -6,9 +17,9 @@ import yaml from 'yaml'
 import {
   CliError,
   createApiContext,
+  getServiceClient,
   handleCommandError,
   resolveProjectRef,
-  unwrapApiResult,
   postApiJson,
   putApiJson
 } from '../api.js'
@@ -181,34 +192,30 @@ async function runProcessorStatus(options: ProcessorStatusOptions) {
   const project = await resolveProjectRef(options, context, { ownerSlug: true })
   const requestedVersion = normalizeVersionSelector(options.version)
   const apiVersion = typeof requestedVersion === 'number' ? 'ALL' : (requestedVersion ?? 'ALL')
-  const response = await ProcessorService.getProcessorStatusV2({
-    path: {
-      owner: project.owner,
-      slug: project.slug
-    },
-    query: {
+  const client = getServiceClient(ProcessorService, context)
+  const res = await client.getProcessorStatusV2(
+    fromJson(GetProcessorStatusRequestV2Schema, {
+      projectOwner: project.owner,
+      projectSlug: project.slug,
       version: apiVersion
-    },
-    headers: context.headers
-  })
-  const data = unwrapApiResult(response)
+    })
+  )
+  const data = toJson(GetProcessorStatusResponseSchema, res)
   printOutput(options, shapeProcessorStatusOutput(data, requestedVersion))
 }
 
 async function runProcessorSource(options: ProcessorSourceOptions) {
   const context = createApiContext(options)
   const project = await resolveProjectRef(options, context, { ownerSlug: true })
-  const response = await ProcessorExtService.getProcessorSourceFiles({
-    path: {
-      owner: project.owner,
-      slug: project.slug
-    },
-    query: {
-      version: options.version
-    },
-    headers: context.headers
-  })
-  const data = unwrapApiResult(response)
+  const client = getServiceClient(ProcessorServiceExt, context)
+  const res = await client.getProcessorSourceFiles(
+    fromJson(GetProcessorSourceFilesRequestSchema, {
+      projectOwner: project.owner,
+      projectSlug: project.slug,
+      ...(options.version !== undefined ? { version: options.version } : {})
+    })
+  )
+  const data = toJson(GetProcessorSourceFilesResponseSchema, res)
   if (options.path && Array.isArray(data.sourceFiles)) {
     const sourceFile = data.sourceFiles.find((entry) => entry.path === options.path)
     if (!sourceFile) {
@@ -224,15 +231,15 @@ async function runActivatePending(options: ProcessorOptions & { yes?: boolean })
   const context = createApiContext(options)
   const project = await resolveProjectRef(options, context, { ownerSlug: true })
 
-  const statusResponse = await ProcessorService.getProcessorStatusV2({
-    path: {
-      owner: project.owner,
-      slug: project.slug
-    },
-    query: { version: 'ALL' },
-    headers: context.headers
-  })
-  const data = unwrapApiResult(statusResponse)
+  const client = getServiceClient(ProcessorService, context)
+  const statusResponse = await client.getProcessorStatusV2(
+    fromJson(GetProcessorStatusRequestV2Schema, {
+      projectOwner: project.owner,
+      projectSlug: project.slug,
+      version: 'ALL'
+    })
+  )
+  const data = toJson(GetProcessorStatusResponseSchema, statusResponse)
   const processors = Array.isArray(data.processors) ? data.processors : []
 
   const activeProcessor = processors.find((p) => asString(p.versionState) === 'ACTIVE')
@@ -255,16 +262,15 @@ async function runActivatePending(options: ProcessorOptions & { yes?: boolean })
     }
   }
 
-  const response = await ProcessorService.activatePendingVersion({
-    path: {
-      owner: project.owner,
-      slug: project.slug
-    },
-    headers: context.headers
-  })
+  const response = await client.activatePendingVersion(
+    fromJson(ActivatePendingRequestSchema, {
+      projectOwner: project.owner,
+      projectSlug: project.slug
+    })
+  )
   printOutput(options, {
     project: `${project.owner}/${project.slug}`,
-    ...(unwrapApiResult(response) as Record<string, unknown>)
+    ...(toJson(EmptySchema, response) as Record<string, unknown>)
   })
 }
 
@@ -279,15 +285,15 @@ async function resolveAndConfirmProcessor(
 
   if (!resolvedProcessorId) {
     const project = await resolveProjectRef(options, context, { ownerSlug: true })
-    const statusResponse = await ProcessorService.getProcessorStatusV2({
-      path: {
-        owner: project.owner,
-        slug: project.slug
-      },
-      query: { version: 'ACTIVE' },
-      headers: context.headers
-    })
-    const data = unwrapApiResult(statusResponse)
+    const client = getServiceClient(ProcessorService, context)
+    const statusResponse = await client.getProcessorStatusV2(
+      fromJson(GetProcessorStatusRequestV2Schema, {
+        projectOwner: project.owner,
+        projectSlug: project.slug,
+        version: 'ACTIVE'
+      })
+    )
+    const data = toJson(GetProcessorStatusResponseSchema, statusResponse)
     const processors = Array.isArray(data.processors) ? data.processors : []
     const activeProcessor = processors.find((p) => asString(p.versionState) === 'ACTIVE')
 
@@ -354,12 +360,15 @@ async function resolveProcessorId(processorId: string | undefined, options: Proc
   if (processorId) return processorId
   const context = createApiContext(options)
   const project = await resolveProjectRef(options, context, { ownerSlug: true })
-  const statusResponse = await ProcessorService.getProcessorStatusV2({
-    path: { owner: project.owner, slug: project.slug },
-    query: { version: 'ACTIVE' },
-    headers: context.headers
-  })
-  const data = unwrapApiResult(statusResponse)
+  const client = getServiceClient(ProcessorService, context)
+  const statusResponse = await client.getProcessorStatusV2(
+    fromJson(GetProcessorStatusRequestV2Schema, {
+      projectOwner: project.owner,
+      projectSlug: project.slug,
+      version: 'ACTIVE'
+    })
+  )
+  const data = toJson(GetProcessorStatusResponseSchema, statusResponse)
   const processors = Array.isArray(data.processors) ? data.processors : []
   const activeProcessor = processors.find((p) => asString(p.versionState) === 'ACTIVE')
   if (!activeProcessor || !activeProcessor.processorId) {
