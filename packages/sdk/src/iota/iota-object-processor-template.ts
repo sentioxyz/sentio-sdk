@@ -81,12 +81,6 @@ export abstract class IotaObjectOrAddressProcessorTemplate<
 
     ctx.sendTemplateInstance(instance)
 
-    ctx.update({
-      states: {
-        configUpdated: true
-      }
-    })
-
     processMetrics.processor_template_instance_count.add(1, {
       chain_id: options.network,
       template: this.constructor.name
@@ -161,12 +155,6 @@ export abstract class IotaObjectOrAddressProcessorTemplate<
     }
 
     console.log(`successfully unbind template ${sig}`)
-
-    ctx.update({
-      states: {
-        configUpdated: true
-      }
-    })
     ctx.sendTemplateInstance(
       create(TemplateInstanceSchema, {
         templateId: this.id,

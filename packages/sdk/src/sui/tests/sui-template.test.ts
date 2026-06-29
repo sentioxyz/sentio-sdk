@@ -35,14 +35,12 @@ describe('Test Sui Template Example', () => {
     // single round test
     let res = await service.sui.testEvent(testData as any, SuiNetwork.TEST_NET)
     let config = await service.getConfig({})
-    expect(res.result?.states?.configUpdated).equals(true)
     expect(config.contractConfigs).length(2)
     expect(config.accountConfigs).length(1)
     expect(config.templateInstances).length(1)
 
     res = await service.sui.testEntryFunctionCall(testData as any, SuiNetwork.TEST_NET)
     config = await service.getConfig({})
-    expect(res.result?.states?.configUpdated).equals(true)
     expect(config.contractConfigs).length(2)
     expect(config.accountConfigs).length(0)
     expect(config.templateInstances).length(0)

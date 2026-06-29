@@ -26,9 +26,7 @@ export class TestPlugin extends Plugin {
     }
 
     return create(ProcessResultSchema, {
-      states: {
-        configUpdated: true
-      }
+      states: {}
     })
   }
   supportedHandlers = [HandlerType.UNKNOWN, HandlerType.ETH_LOG]

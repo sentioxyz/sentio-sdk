@@ -70,12 +70,6 @@ export abstract class FuelBaseProcessorTemplate<TContract extends Contract> {
 
     ctx.sendTemplateInstance(instance)
 
-    ctx.update({
-      states: {
-        configUpdated: true
-      }
-    })
-
     processMetrics.processor_template_instance_count.add(1, {
       chain_id: ctx.chainId,
       template: this.constructor.name

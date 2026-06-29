@@ -772,9 +772,10 @@ message DataBinding {
 }
 
 message StateResult {
-  // Whether config update because of dynamic contract processor creation
-  // Currently only support log handler in ethereum
-  bool config_updated = 1;
+  // Deprecated: dynamic contract processor creation is signaled over the V3
+  // tplRequest stream (TemplateInstanceRequest); the v4 SDK no longer emits this
+  // V2-only flag. The legacy V2 backend still reads it from v3-line processors.
+  bool config_updated = 1 [deprecated = true];
   // whether the processor run is failed
   optional string error = 2;
 }
