@@ -1,5 +1,13 @@
 import { describe, it } from 'node:test'
-import { BigDecimalConverter, BigIntConverter, BytesConverter, StringConverter, ValueConverter } from './convert.js'
+import {
+  BigDecimalConverter,
+  BigIntConverter,
+  BytesConverter,
+  Int8Converter,
+  IntConverter,
+  StringConverter,
+  ValueConverter
+} from './convert.js'
 import { expect } from 'chai'
 import { BigDecimal } from '@sentio/bigdecimal'
 import { RichStructSchema } from '@sentio/protos'
@@ -23,6 +31,33 @@ describe('RichStruct converter tests', () => {
     expect(struct2.value.case === 'bigintValue' ? struct2.value.value.negative : undefined).eq(true)
     const s1 = BigIntConverter.to(struct)
     expect(s1).eq(s)
+  })
+
+  it('int converter', () => {
+    const struct = IntConverter.from(100)
+    expect(struct.value.case).eq('intValue')
+    expect(IntConverter.to(struct)).eq(100)
+    // floors non-integers
+    expect(IntConverter.to(IntConverter.from(1.9))).eq(1)
+  })
+
+  it('int converter rejects out-of-int32-range values', () => {
+    // 168131880000 overflows int32 and would otherwise fail later in the runtime
+    // with a cryptic "cannot encode field ...: invalid int32" serialize error.
+    expect(() => IntConverter.from(168131880000)).to.throw(/out of the int32 range/)
+    expect(() => IntConverter.from(2147483648)).to.throw(/out of the int32 range/)
+    expect(() => IntConverter.from(-2147483649)).to.throw(/out of the int32 range/)
+    // boundary values are accepted
+    expect(IntConverter.to(IntConverter.from(2147483647))).eq(2147483647)
+    expect(IntConverter.to(IntConverter.from(-2147483648))).eq(-2147483648)
+  })
+
+  it('int8 converter rejects out-of-int64-range values', () => {
+    expect(() => Int8Converter.from(9223372036854775808n)).to.throw(/out of the int64 range/)
+    expect(() => Int8Converter.from(-9223372036854775809n)).to.throw(/out of the int64 range/)
+    // boundary values are accepted
+    expect(Int8Converter.to(Int8Converter.from(9223372036854775807n))).eq(9223372036854775807n)
+    expect(Int8Converter.to(Int8Converter.from(-9223372036854775808n))).eq(-9223372036854775808n)
   })
 
   it('bigDecimal converter', () => {
