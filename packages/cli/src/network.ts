@@ -13,43 +13,30 @@ interface SentioNetworkConfig {
   addressBookAddress: string
 }
 
+// Sentio Network testnet — chain id 7892102 (formerly exposed as `testnet-v2`).
+// The legacy testnet (7892101) and devnet have been removed; `testnet` is this
+// network. `testnet-v2` is still accepted as an alias.
 const TESTNET_CONFIG: SentioNetworkConfig = {
-  chainId: 7892101,
-  rpcUrl: 'https://sentio-testnet.rpc.sentio.xyz',
-  explorerUrl: 'https://testnet-explorer.sentio.xyz',
-  addressBookAddress: '0x092d795d42e23ecba5cc66927972be5c9980effb'
-}
-
-const TESTNET_V2_CONFIG: SentioNetworkConfig = {
   chainId: 7892102,
+  // v2 is the primary testnet: it owns the canonical testnet-explorer.sentio.xyz
+  // (v1 → testnet-v1-explorer). The chain RPC keeps its -v2 host for now.
   rpcUrl: 'https://sentio-testnet-v2.rpc.sentio.xyz',
-  explorerUrl: 'https://testnet-v2-explorer.sentio.xyz',
+  explorerUrl: 'https://testnet-explorer.sentio.xyz',
   addressBookAddress: '0xb7e9E56DFC27bcfA63698F2F5890e186426A0123'
-}
-
-const DEVNET_CONFIG: SentioNetworkConfig = {
-  chainId: 7892201,
-  rpcUrl: 'https://sentio-devnet.test-rpc.sentio.xyz',
-  explorerUrl: 'https://devnet-explorer.sentio.xyz',
-  addressBookAddress: '0xCfCE965429602b02b453477Cd8Bc7FEd5E8ffc14'
 }
 
 export function getSentioNetworkConfig(network: string, addressBookOverride?: string): SentioNetworkConfig {
   let config: SentioNetworkConfig
-  if (network === 'testnet' || network === '7892101') {
+  if (network === 'testnet' || network === 'testnet-v2' || network === '7892102') {
     config = TESTNET_CONFIG
-  } else if (network === 'devnet' || network === '7892201') {
-    config = DEVNET_CONFIG
-  } else if (network === 'testnet-v2' || network === '7892102') {
-    config = TESTNET_V2_CONFIG
   } else if (network === 'mainnet' || network === '789210') {
     console.error(
-      chalk.red('Sentio Network mainnet is not yet supported. Only testnet, testnet-v2 and devnet are available.')
+      chalk.red('Sentio Network mainnet is not yet supported. Only testnet is available.')
     )
     process.exit(1)
   } else {
     console.error(
-      chalk.red(`Invalid sentio network: ${network}. Only "testnet", "testnet-v2" or "devnet" is supported.`)
+      chalk.red(`Invalid sentio network: ${network}. Only "testnet" is supported.`)
     )
     process.exit(1)
   }

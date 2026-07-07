@@ -87,7 +87,7 @@ export function createUploadCommand() {
     .option('--num-workers <count>', '(Optional) Number of processor workers to start', myParseInt)
     .option(
       '--sentio-network <network>',
-      '(Optional) Sentio network to connect to, can be testnet, testnet-v2, devnet or mainnet'
+      '(Optional) Sentio network to connect to, can be testnet or mainnet'
     )
     .option(
       '--required-chain-id <chain_id...>',
@@ -95,7 +95,7 @@ export function createUploadCommand() {
     )
     .option(
       '--no-platform',
-      'Upload processor directly to Sentio Network without platform support. Requires $PRIVATE_KEY env var. Only testnet and devnet are supported.'
+      'Upload processor directly to Sentio Network without platform support. Requires $PRIVATE_KEY env var. Only testnet is supported.'
     )
     .option(
       '--ipfs-put-url <url>',
@@ -569,7 +569,7 @@ async function checkOrCreateProject(options: YamlProjectConfig, auth: Auth) {
     console.error(
       chalk.red(
         `Project ${project?.slug} is a Sentio Network project. Please add the --sentio-network flag when uploading.\n` +
-          `Example: sentio upload --sentio-network testnet|testnet-v2|devnet`
+          `Example: sentio upload --sentio-network testnet`
       )
     )
     process.exit(1)
