@@ -16,7 +16,7 @@ export function createStopProcessorCommand() {
   return new Command('stop')
     .description('Stop a processor. Uses Sentio Network contract when --sentio-network is specified.')
     .argument('<processorId>', 'ID of the processor to stop')
-    .option('--sentio-network <network>', 'Stop via Sentio Network contract (testnet, testnet-v2 or devnet)')
+    .option('--sentio-network <network>', 'Stop via Sentio Network contract (testnet)')
     .option('--host <host>', 'Override Sentio host')
     .option('--api-key <key>', 'Use an explicit API key instead of saved credentials')
     .option('--token <token>', 'Use an explicit bearer token instead of saved credentials')
