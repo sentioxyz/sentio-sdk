@@ -19,6 +19,15 @@ function nullRichValue(): RichValue {
   return create(RichValueSchema, { value: { case: 'nullValue', value: RichValue_NullValue.NULL_VALUE } })
 }
 
+// RichValue.int_value is an int32 and RichValue.int64_value is an int64 on the wire.
+// Values outside these ranges encode fine in memory but fail later in the runtime with a
+// cryptic "cannot encode field ...: invalid int32/int64" error during binary serialization.
+// Guard at the conversion site so the failure points at the offending field/value instead.
+const INT32_MIN = -2147483648
+const INT32_MAX = 2147483647
+const INT64_MIN = -9223372036854775808n
+const INT64_MAX = 9223372036854775807n
+
 export function required_<T>(converter: ValueConverter<T | undefined>): ValueConverter<T> {
   const { from, to, ...rest } = converter
   return {
@@ -121,7 +130,14 @@ export const IntConverter: ValueConverter<Int | undefined> = {
     if (value == null) {
       return nullRichValue()
     }
-    return create(RichValueSchema, { value: { case: 'intValue', value: Math.floor(value) } })
+    const i = Math.floor(value)
+    if (i < INT32_MIN || i > INT32_MAX) {
+      throw new Error(
+        `Int value ${i} is out of the int32 range [${INT32_MIN}, ${INT32_MAX}]. ` +
+          `Use BigInt (arbitrary precision) or Int8 (int64) for this field in your schema.`
+      )
+    }
+    return create(RichValueSchema, { value: { case: 'intValue', value: i } })
   },
   to(v) {
     return (v.value.case === 'intValue' ? v.value.value : undefined) as Int
@@ -133,7 +149,14 @@ export const Int8Converter: ValueConverter<bigint | undefined> = {
     if (value == null) {
       return nullRichValue()
     }
-    return create(RichValueSchema, { value: { case: 'int64Value', value: BigInt(value) } })
+    const i = BigInt(value)
+    if (i < INT64_MIN || i > INT64_MAX) {
+      throw new Error(
+        `Int8 value ${i} is out of the int64 range [${INT64_MIN}, ${INT64_MAX}]. ` +
+          `Use BigInt (arbitrary precision) for this field in your schema.`
+      )
+    }
+    return create(RichValueSchema, { value: { case: 'int64Value', value: i } })
   },
   to(v) {
     return v.value.case === 'int64Value' ? v.value.value : undefined
