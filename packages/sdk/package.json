@@ -97,7 +97,7 @@
     "@protobuf-ts/grpcweb-transport": "^2.11.1",
     "@sentio/api": "~2.0.3",
     "@sentio/bigdecimal": "9.1.1-patch.3",
-    "@sentio/chain": "~3.4.29",
+    "@sentio/chain": "~3.4.33",
     "@sentio/ethers-v6": "^1.0.29",
     "@sentio/protos": "workspace:*",
     "@sentio/runtime": "workspace:^",

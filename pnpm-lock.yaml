@@ -218,8 +218,8 @@ importers:
         specifier: ~2.0.3
         version: 2.0.3
       '@sentio/chain':
-        specifier: ~3.4.29
-        version: 3.4.29
+        specifier: ~3.4.33
+        version: 3.4.33
       '@sentio/graph-cli':
         specifier: ^0.97.0
         version: 0.97.0(@types/node@24.10.13)(bufferutil@4.0.8)(typescript@6.0.3)(utf-8-validate@5.0.10)(zod@3.24.2)
@@ -479,8 +479,8 @@ importers:
         specifier: 9.1.1-patch.3
         version: 9.1.1-patch.3
       '@sentio/chain':
-        specifier: ~3.4.29
-        version: 3.4.29
+        specifier: ~3.4.33
+        version: 3.4.33
       '@sentio/ethers-v6':
         specifier: ^1.0.29
         version: 1.0.29(ethers@6.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typescript@6.0.3)
@@ -2541,8 +2541,8 @@ packages:
   '@sentio/bigdecimal@9.1.1-patch.3':
     resolution: {integrity: sha512-O5w8XdyeatUcwI+ZbpSw60/cXFPJk3NbpIupwMHfYmW8fpxpXyRbyGESNJNufWWrB6CadsWGh1R3rd7owvrmlw==}
 
-  '@sentio/chain@3.4.29':
-    resolution: {integrity: sha512-P9ddVrv7KHLSZA01qyz/OMf5aaf8G9cvisGs97Pa+ughEUZrpDMkQS6+QqrTncjMzoM/m54RCycQ9VY0NqN3Nw==}
+  '@sentio/chain@3.4.33':
+    resolution: {integrity: sha512-FzfVUr5NJEVy3dv1nFNcyLlA0RdAJ5Zllque85LGTPEF4Z2Vt0HD/glppUYwTMh2lAL93iz02572fDTXERTkOg==}
 
   '@sentio/connect-gateway-es@1.0.0':
     resolution: {integrity: sha512-232yOipLgnGVgfvEGJrNOetkgoDlPvEXMAWCae305+E9YYnQBb7+OCLCnkHJjICFgf49obnoQWgt3uNjP9C7JA==}
@@ -9484,7 +9484,7 @@ snapshots:
 
   '@sentio/bigdecimal@9.1.1-patch.3': {}
 
-  '@sentio/chain@3.4.29': {}
+  '@sentio/chain@3.4.33': {}
 
   '@sentio/connect-gateway-es@1.0.0(@bufbuild/protobuf@2.12.0)(@connectrpc/connect@2.1.2(@bufbuild/protobuf@2.12.0))':
     dependencies:
