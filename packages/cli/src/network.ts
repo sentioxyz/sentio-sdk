@@ -18,9 +18,10 @@ interface SentioNetworkConfig {
 // network. `testnet-v2` is still accepted as an alias.
 const TESTNET_CONFIG: SentioNetworkConfig = {
   chainId: 7892102,
-  // v2 is the primary testnet: it owns the canonical testnet-explorer.sentio.xyz
-  // (v1 → testnet-v1-explorer). The chain RPC keeps its -v2 host for now.
-  rpcUrl: 'https://sentio-testnet-v2.rpc.sentio.xyz',
+  // v2 is the primary testnet: it owns the canonical hosts — testnet-explorer.sentio.xyz
+  // and sentio-testnet.rpc.sentio.xyz (v1 → the -v1 hosts). The old
+  // sentio-testnet-v2.rpc.sentio.xyz has been retired (edge-gateway no longer routes it).
+  rpcUrl: 'https://sentio-testnet.rpc.sentio.xyz',
   explorerUrl: 'https://testnet-explorer.sentio.xyz',
   addressBookAddress: '0xb7e9E56DFC27bcfA63698F2F5890e186426A0123'
 }
