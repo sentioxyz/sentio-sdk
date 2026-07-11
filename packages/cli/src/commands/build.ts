@@ -4,7 +4,7 @@ import fs from 'fs-extra'
 import { checkSdkCompatibility, getPackageRoot } from '../utils.js'
 import { Command } from '@commander-js/extra-typings'
 import { CHAIN_TYPES, loadProcessorConfig } from '../config.js'
-import { getABIFilePath, getABI, writeABIFile } from '../abi.js'
+import { getABIFilePath, getABI, writeABIFile, redownloadLegacySuiAbis } from '../abi.js'
 import { execStep, execPackageManager } from '../execution.js'
 import { CommandOptionsType } from './types.js'
 
@@ -111,6 +111,12 @@ export async function codegen(genExample: boolean) {
   }
 
   const outputBase = path.resolve('src', 'types')
+
+  // Re-download any Sui ABIs saved by an older CLI in the legacy JSON-RPC map
+  // shape; the current codegen only reads the gRPC array shape, so a stale file
+  // left in abis/sui would otherwise make the Sui codegen throw for the whole
+  // project.
+  await redownloadLegacySuiAbis(path.resolve('abis', 'sui'))
 
   for (const gen of CHAIN_TYPES) {
     try {

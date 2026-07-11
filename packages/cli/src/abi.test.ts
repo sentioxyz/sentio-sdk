@@ -1,5 +1,8 @@
 import { describe, test } from 'node:test'
-import { getABI } from './abi.js'
+import fs from 'fs-extra'
+import os from 'os'
+import path from 'path'
+import { getABI, collectLegacySuiAbis } from './abi.js'
 import { AptosChainId, EthChainId, SuiChainId } from '@sentio/chain'
 import { expect } from 'chai'
 
@@ -46,5 +49,87 @@ describe('Test ABI get', () => {
       undefined
     )
     expect(abi.abi !== undefined).eq(true)
+  })
+})
+
+describe('Test legacy Sui ABI collection', () => {
+  const legacyModuleMap = {
+    m1: {
+      fileFormatVersion: 6,
+      address: '0xpkg',
+      name: 'm1',
+      friends: [],
+      structs: {
+        S: { abilities: { abilities: ['Copy', 'Drop'] }, typeParameters: [], fields: [{ name: 'x', type: 'U64' }] }
+      },
+      exposedFunctions: {
+        f: { visibility: 'Public', isEntry: false, typeParameters: [], parameters: ['U64'], return: [] }
+      }
+    }
+  }
+  const newShapeAbi = [{ address: '0x111', module: { name: 'n', datatypes: [], functions: [] } }]
+
+  function makeDir() {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'sentio-sui-abi-'))
+    fs.mkdirSync(path.join(dir, 'testnet'), { recursive: true })
+    return dir
+  }
+
+  test('collects a legacy mainnet ABI with the address taken from its file name', () => {
+    const dir = makeDir()
+    try {
+      const file = path.join(dir, '0xabc.json')
+      fs.writeFileSync(file, JSON.stringify(legacyModuleMap))
+
+      const legacy = collectLegacySuiAbis(dir)
+
+      expect(legacy).length(1)
+      expect(legacy[0].file).eq(file)
+      expect(legacy[0].address).eq('0xabc')
+      expect(legacy[0].chain).eq(SuiChainId.SUI_MAINNET)
+    } finally {
+      fs.removeSync(dir)
+    }
+  })
+
+  test('marks files under testnet/ as SUI_TESTNET', () => {
+    const dir = makeDir()
+    try {
+      const file = path.join(dir, 'testnet', '0xdef.json')
+      fs.writeFileSync(file, JSON.stringify(legacyModuleMap))
+
+      const legacy = collectLegacySuiAbis(dir)
+
+      expect(legacy).length(1)
+      expect(legacy[0].chain).eq(SuiChainId.SUI_TESTNET)
+    } finally {
+      fs.removeSync(dir)
+    }
+  })
+
+  test('falls back to the module address for files saved under a custom name', () => {
+    const dir = makeDir()
+    try {
+      const file = path.join(dir, 'my-package.json')
+      fs.writeFileSync(file, JSON.stringify(legacyModuleMap))
+
+      const legacy = collectLegacySuiAbis(dir)
+
+      expect(legacy).length(1)
+      expect(legacy[0].address).eq('0xpkg')
+    } finally {
+      fs.removeSync(dir)
+    }
+  })
+
+  test('ignores already-migrated gRPC-shape files', () => {
+    const dir = makeDir()
+    try {
+      fs.writeFileSync(path.join(dir, '0x111.json'), JSON.stringify(newShapeAbi))
+
+      expect(collectLegacySuiAbis(dir)).length(0)
+    } finally {
+      fs.removeSync(dir)
+    }
   })
 })

@@ -146,6 +146,120 @@ export function normalizedModulesToAbi(modules: any): Array<{ address: string; m
   return entries.map(([n, m]) => ({ address: m.address, module: normalizedModule(n, m) }))
 }
 
+// A Sui ABI downloaded by an older CLI is the raw JSON-RPC
+// `getNormalizedMoveModulesByPackage` result: a `{ moduleName: { structs,
+// exposedFunctions, ... } }` map. The v2 codegen (see comment at top of file)
+// instead consumes the gRPC array shape produced by `normalizedModulesToAbi`.
+// Feeding a legacy-shaped file straight to codegen throws
+// (`modules.map is not a function`), so `sentio add`/`build`/`gen` fail whenever
+// a stale Sui ABI is already sitting in `abis/sui`. Detect that legacy shape.
+function isLegacyNormalizedModules(parsed: any): boolean {
+  // The gRPC shape is an array; the legacy JSON-RPC shape is a plain object map.
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    return false
+  }
+  const map = parsed.result ?? parsed
+  if (!map || typeof map !== 'object' || Array.isArray(map)) {
+    return false
+  }
+  return Object.values(map).some((m: any) => m && typeof m === 'object' && ('exposedFunctions' in m || 'structs' in m))
+}
+
+// A legacy-shaped Sui ABI file on disk, together with the package address and
+// network recovered from its name/content so it can be re-downloaded.
+export interface LegacySuiAbi {
+  file: string
+  address: string
+  chain: SuiChainId.SUI_MAINNET | SuiChainId.SUI_TESTNET
+}
+
+// Recover the package address of a legacy Sui ABI: prefer the 0x-prefixed file
+// name (what `sentio add` uses by default), otherwise fall back to the `address`
+// carried by the normalized modules (covers files saved under a custom --name).
+function legacySuiPackageAddress(file: string, parsed: any): string | undefined {
+  const base = path.basename(file, '.json')
+  if (base.startsWith('0x')) {
+    return base
+  }
+  const map = parsed?.result ?? parsed
+  for (const module of Object.values(map ?? {})) {
+    const address = (module as any)?.address
+    if (typeof address === 'string' && address.startsWith('0x')) {
+      return address
+    }
+  }
+  return undefined
+}
+
+// Recursively collect every legacy-shaped Sui ABI under `baseDir`, resolving the
+// package address and network (testnet ABIs live under `<baseDir>/testnet`, see
+// getABIFilePath) for each. Pure/offline — the download happens in
+// `redownloadLegacySuiAbis`. Iota still consumes the legacy shape, so this must
+// only ever be pointed at the Sui directory.
+export function collectLegacySuiAbis(baseDir: string): LegacySuiAbi[] {
+  const result: LegacySuiAbi[] = []
+  const walk = (dir: string) => {
+    if (!fs.existsSync(dir)) {
+      return
+    }
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const fullPath = path.join(dir, entry.name)
+      if (entry.isDirectory()) {
+        walk(fullPath)
+        continue
+      }
+      if (!entry.name.endsWith('.json')) {
+        continue
+      }
+      let parsed: any
+      try {
+        parsed = JSON.parse(fs.readFileSync(fullPath, 'utf8'))
+      } catch {
+        continue
+      }
+      if (!isLegacyNormalizedModules(parsed)) {
+        continue
+      }
+      const address = legacySuiPackageAddress(fullPath, parsed)
+      if (!address) {
+        console.log(
+          chalk.yellow(`Skipping legacy Sui ABI ${fullPath}: cannot resolve package address, re-download it manually`)
+        )
+        continue
+      }
+      const isTestnet = path.relative(baseDir, fullPath).split(path.sep).includes('testnet')
+      result.push({ file: fullPath, address, chain: isTestnet ? SuiChainId.SUI_TESTNET : SuiChainId.SUI_MAINNET })
+    }
+  }
+  walk(baseDir)
+  return result
+}
+
+// Sui ABIs downloaded by an older CLI are stored in the legacy JSON-RPC map
+// shape, which the current gRPC codegen can't read (`modules.map is not a
+// function`), so a stale Sui ABI left in `abis/sui` makes `sentio add`/`build`/
+// `gen` fail for the whole project. Collect every such file, then re-download it
+// through getABI so it lands in the current shape with fresh on-chain data.
+// Fetched sequentially with a delay between same-network requests to stay under
+// Sui public-RPC rate limits, matching the "download missing ABI" loop.
+export async function redownloadLegacySuiAbis(baseDir = path.resolve('abis', 'sui')): Promise<void> {
+  const legacy = collectLegacySuiAbis(baseDir)
+  if (legacy.length === 0) {
+    return
+  }
+  console.log(chalk.yellow(`Found ${legacy.length} legacy Sui ABI file(s), re-downloading in the current format`))
+  let previousChain = ''
+  for (const { file, chain, address } of legacy) {
+    if (chain === previousChain) {
+      await new Promise((resolve) => setTimeout(resolve, 5000))
+    } else {
+      previousChain = chain
+    }
+    const res = await getABI(chain, address, path.basename(file, '.json'))
+    writeABIFile(res.abi, file)
+  }
+}
+
 export async function getABI(
   chain: ChainId,
   address: string,
