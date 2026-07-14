@@ -105,5 +105,7 @@ describe('Test Service V3 with worker without partition', () => {
 
     assert.ok(result, 'Result should be present in the response')
     assert.ok(result?.states, 'States should be present in the result')
+    assert.strictEqual(result?.exports?.length, 1, 'Exports should be forwarded in the result')
+    assert.strictEqual(result?.exports?.[0]?.payload, '{"test":1}', 'Export payload should be preserved')
   })
 })
