@@ -28,7 +28,6 @@ type ProcessStreamResponseV3Init = MessageInitShape<typeof ProcessStreamResponse
 
 const { process_binding_count, process_binding_time, process_binding_error } = processMetrics
 
-const WRITE_V2_EVENT_LOGS = process.env.WRITE_V2_EVENT_LOGS !== 'false'
 const TIME_SERIES_RESULT_BATCH_SIZE = 1000
 
 export class ProcessorServiceImplV3 implements ServiceImpl<typeof ProcessorV3> {
@@ -186,7 +185,7 @@ export class ProcessorServiceImplV3 implements ServiceImpl<typeof ProcessorV3> {
           processId,
           value: {
             case: 'result',
-            value: WRITE_V2_EVENT_LOGS ? otherResults : create(ProcessResultSchema, { states: result.states })
+            value: otherResults
           }
         })
       })
