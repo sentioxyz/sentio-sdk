@@ -22,8 +22,8 @@ export abstract class FuelAbstractProcessor<TContract extends Contract> extends 
 }
 
 export class TypedCall<T extends Array<any>, R> {
-  args: T
-  returnValue: R
+  args!: T
+  returnValue!: R
   argsObject?: Record<string, any>
   logs?: FuelLog<unknown>[]
 

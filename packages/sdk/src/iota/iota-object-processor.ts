@@ -271,7 +271,7 @@ export class IotaObjectProcessor extends IotaBaseObjectOrAddressProcessorInterna
 export class IotaObjectTypeProcessor<T> extends IotaBaseObjectOrAddressProcessor<
   (self: TypedIotaMoveObject<T>, dynamicFieldObjects: IotaMoveObject[], ctx: IotaObjectContext) => PromiseOrVoid
 > {
-  objectType: TypeDescriptor<T>
+  objectType!: TypeDescriptor<T>
 
   static bind<T>(options: IotaObjectTypeBindOptions<T>): IotaObjectTypeProcessor<T> {
     const processor = new IotaObjectTypeProcessor<T>({
