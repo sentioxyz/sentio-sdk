@@ -29037,10 +29037,93 @@
                     "typeParameterInstantiation": [
                       {
                         "typeParameterInstantiation": [],
+                        "type": 10,
+                        "typeName": "0x0000000000000000000000000000000000000000000000000000000000000002::ristretto255::G"
+                      }
+                    ],
+                    "type": 10,
+                    "typeName": "0x0000000000000000000000000000000000000000000000000000000000000002::group_ops::Element"
+                  }
+                ],
+                "type": 9
+              }
+            },
+            {
+              "reference": 1,
+              "body": {
+                "typeParameterInstantiation": [
+                  {
+                    "typeParameterInstantiation": [],
+                    "type": 3
+                  }
+                ],
+                "type": 9
+              }
+            },
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 3
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 2
+              }
+            }
+          ],
+          "name": "verify_bulletproofs_with_dst_ristretto255",
+          "visibility": 2,
+          "isEntry": false
+        },
+        {
+          "typeParameters": [],
+          "parameters": [
+            {
+              "reference": 1,
+              "body": {
+                "typeParameterInstantiation": [
+                  {
+                    "typeParameterInstantiation": [],
+                    "type": 3
+                  }
+                ],
+                "type": 9
+              }
+            },
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 3
+              }
+            },
+            {
+              "reference": 1,
+              "body": {
+                "typeParameterInstantiation": [
+                  {
+                    "typeParameterInstantiation": [
+                      {
+                        "typeParameterInstantiation": [],
                         "type": 3
                       }
                     ],
                     "type": 9
+                  }
+                ],
+                "type": 9
+              }
+            },
+            {
+              "reference": 1,
+              "body": {
+                "typeParameterInstantiation": [
+                  {
+                    "typeParameterInstantiation": [],
+                    "type": 3
                   }
                 ],
                 "type": 9
@@ -29055,7 +29138,7 @@
               }
             }
           ],
-          "name": "verify_bulletproofs_ristretto255_internal",
+          "name": "verify_bulletproofs_with_dst_ristretto255_internal",
           "visibility": 1,
           "isEntry": false
         }

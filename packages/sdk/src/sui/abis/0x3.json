@@ -11668,28 +11668,6 @@
             {
               "reference": 2,
               "body": {
-                "typeParameterInstantiation": [
-                  {
-                    "typeParameterInstantiation": [],
-                    "type": 10,
-                    "typeName": "0x0000000000000000000000000000000000000000000000000000000000000003::validator::Validator"
-                  }
-                ],
-                "type": 9
-              }
-            }
-          ],
-          "returns": [],
-          "name": "adjust_stake_and_gas_price",
-          "visibility": 1,
-          "isEntry": false
-        },
-        {
-          "typeParameters": [],
-          "parameters": [
-            {
-              "reference": 2,
-              "body": {
                 "typeParameterInstantiation": [],
                 "type": 10,
                 "typeName": "0x0000000000000000000000000000000000000000000000000000000000000003::validator_set::ValidatorSet"
@@ -12408,81 +12386,6 @@
             {
               "reference": 1,
               "body": {
-                "typeParameterInstantiation": [
-                  {
-                    "typeParameterInstantiation": [],
-                    "type": 10,
-                    "typeName": "0x0000000000000000000000000000000000000000000000000000000000000003::validator::Validator"
-                  }
-                ],
-                "type": 10,
-                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000002::table_vec::TableVec"
-              }
-            },
-            {
-              "reference": 1,
-              "body": {
-                "typeParameterInstantiation": [],
-                "type": 10,
-                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000003::validator::Validator"
-              }
-            }
-          ],
-          "returns": [
-            {
-              "body": {
-                "typeParameterInstantiation": [],
-                "type": 6
-              }
-            }
-          ],
-          "name": "count_duplicates_tablevec",
-          "visibility": 1,
-          "isEntry": false
-        },
-        {
-          "typeParameters": [],
-          "parameters": [
-            {
-              "reference": 1,
-              "body": {
-                "typeParameterInstantiation": [
-                  {
-                    "typeParameterInstantiation": [],
-                    "type": 10,
-                    "typeName": "0x0000000000000000000000000000000000000000000000000000000000000003::validator::Validator"
-                  }
-                ],
-                "type": 9
-              }
-            },
-            {
-              "reference": 1,
-              "body": {
-                "typeParameterInstantiation": [],
-                "type": 10,
-                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000003::validator::Validator"
-              }
-            }
-          ],
-          "returns": [
-            {
-              "body": {
-                "typeParameterInstantiation": [],
-                "type": 6
-              }
-            }
-          ],
-          "name": "count_duplicates_vec",
-          "visibility": 1,
-          "isEntry": false
-        },
-        {
-          "typeParameters": [],
-          "parameters": [
-            {
-              "reference": 1,
-              "body": {
                 "typeParameterInstantiation": [],
                 "type": 10,
                 "typeName": "0x0000000000000000000000000000000000000000000000000000000000000003::validator_set::ValidatorSet"
@@ -12580,23 +12483,6 @@
           ],
           "returns": [],
           "name": "distribute_reward",
-          "visibility": 1,
-          "isEntry": false
-        },
-        {
-          "typeParameters": [],
-          "parameters": [
-            {
-              "reference": 2,
-              "body": {
-                "typeParameterInstantiation": [],
-                "type": 10,
-                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000003::validator_set::ValidatorSet"
-              }
-            }
-          ],
-          "returns": [],
-          "name": "effectuate_staged_metadata",
           "visibility": 1,
           "isEntry": false
         },
@@ -13127,43 +13013,6 @@
             {
               "reference": 1,
               "body": {
-                "typeParameterInstantiation": [
-                  {
-                    "typeParameterInstantiation": [],
-                    "type": 10,
-                    "typeName": "0x0000000000000000000000000000000000000000000000000000000000000003::validator::Validator"
-                  }
-                ],
-                "type": 9
-              }
-            },
-            {
-              "reference": 1,
-              "body": {
-                "typeParameterInstantiation": [],
-                "type": 10,
-                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000003::validator::Validator"
-              }
-            }
-          ],
-          "returns": [
-            {
-              "body": {
-                "typeParameterInstantiation": [],
-                "type": 2
-              }
-            }
-          ],
-          "name": "is_duplicate_validator",
-          "visibility": 3,
-          "isEntry": false
-        },
-        {
-          "typeParameters": [],
-          "parameters": [
-            {
-              "reference": 1,
-              "body": {
                 "typeParameterInstantiation": [],
                 "type": 10,
                 "typeName": "0x0000000000000000000000000000000000000000000000000000000000000003::validator_set::ValidatorSet"
@@ -13505,36 +13354,6 @@
             {
               "reference": 2,
               "body": {
-                "typeParameterInstantiation": [
-                  {
-                    "typeParameterInstantiation": [],
-                    "type": 10,
-                    "typeName": "0x0000000000000000000000000000000000000000000000000000000000000003::validator::Validator"
-                  }
-                ],
-                "type": 9
-              }
-            },
-            {
-              "reference": 1,
-              "body": {
-                "typeParameterInstantiation": [],
-                "type": 10,
-                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000002::tx_context::TxContext"
-              }
-            }
-          ],
-          "returns": [],
-          "name": "process_pending_stakes_and_withdraws",
-          "visibility": 1,
-          "isEntry": false
-        },
-        {
-          "typeParameters": [],
-          "parameters": [
-            {
-              "reference": 2,
-              "body": {
                 "typeParameterInstantiation": [],
                 "type": 10,
                 "typeName": "0x0000000000000000000000000000000000000000000000000000000000000003::validator_set::ValidatorSet"
@@ -13846,27 +13665,6 @@
           ],
           "name": "request_withdraw_stake",
           "visibility": 3,
-          "isEntry": false
-        },
-        {
-          "typeParameters": [],
-          "parameters": [
-            {
-              "reference": 2,
-              "body": {
-                "typeParameterInstantiation": [
-                  {
-                    "typeParameterInstantiation": [],
-                    "type": 6
-                  }
-                ],
-                "type": 9
-              }
-            }
-          ],
-          "returns": [],
-          "name": "sort_removal_list",
-          "visibility": 1,
           "isEntry": false
         },
         {

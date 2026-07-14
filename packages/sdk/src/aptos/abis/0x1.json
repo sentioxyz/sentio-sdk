@@ -9189,6 +9189,7 @@
       "friends": [
         "0x1::coin",
         "0x1::aptos_account",
+        "0x1::keyless_account",
         "0x1::transaction_validation",
         "0x1::genesis",
         "0x1::multisig_account",
@@ -9334,6 +9335,19 @@
           ]
         },
         {
+          "name": "encrypted_dk_exists",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": true,
+          "generic_type_params": [],
+          "params": [
+            "address"
+          ],
+          "return": [
+            "bool"
+          ]
+        },
+        {
           "name": "exists_at",
           "visibility": "public",
           "is_entry": false,
@@ -9357,6 +9371,19 @@
           ],
           "return": [
             "vector<u8>"
+          ]
+        },
+        {
+          "name": "get_encrypted_dk",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": true,
+          "generic_type_params": [],
+          "params": [
+            "address"
+          ],
+          "return": [
+            "0x1::account::EncryptedDK"
           ]
         },
         {
@@ -9670,6 +9697,21 @@
           "return": []
         },
         {
+          "name": "upsert_ed25519_backup_key_and_encrypt_dk",
+          "visibility": "private",
+          "is_entry": true,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [
+            "&signer",
+            "vector<u8>",
+            "vector<u8>",
+            "vector<u8>",
+            "vector<u8>"
+          ],
+          "return": []
+        },
+        {
           "name": "upsert_ed25519_backup_key_on_keyless_account",
           "visibility": "private",
           "is_entry": true,
@@ -9679,6 +9721,18 @@
             "&signer",
             "vector<u8>",
             "vector<u8>",
+            "vector<u8>"
+          ],
+          "return": []
+        },
+        {
+          "name": "upsert_encrypted_dk",
+          "visibility": "friend",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [
+            "&signer",
             "vector<u8>"
           ],
           "return": []
@@ -9831,6 +9885,31 @@
             }
           ],
           "variants": []
+        },
+        {
+          "name": "EncryptedDK",
+          "is_native": false,
+          "is_event": false,
+          "is_enum": true,
+          "abilities": [
+            "copy",
+            "drop",
+            "store",
+            "key"
+          ],
+          "generic_type_params": [],
+          "fields": [],
+          "variants": [
+            {
+              "name": "V1",
+              "fields": [
+                {
+                  "name": "ciphertext",
+                  "type": "vector<u8>"
+                }
+              ]
+            }
+          ]
         },
         {
           "name": "KeyRotation",
@@ -13489,6 +13568,17 @@
           ]
         },
         {
+          "name": "get_multisig_timelock_feature",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [],
+          "return": [
+            "u64"
+          ]
+        },
+        {
           "name": "get_multisig_v2_enhancement_feature",
           "visibility": "public",
           "is_entry": false,
@@ -13855,6 +13945,17 @@
         },
         {
           "name": "is_monotonically_increasing_counter_enabled",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [],
+          "return": [
+            "bool"
+          ]
+        },
+        {
+          "name": "is_multisig_timelock_enabled",
           "visibility": "public",
           "is_entry": false,
           "is_view": false,
@@ -17900,6 +18001,19 @@
           "generic_type_params": [],
           "params": [
             "&mut 0x1::bcs_stream::BCSStream"
+          ],
+          "return": [
+            "0x1::single_key::AnyPublicKey"
+          ]
+        },
+        {
+          "name": "from_ed25519_public_key",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [
+            "0x1::ed25519::ValidatedPublicKey"
           ],
           "return": [
             "0x1::single_key::AnyPublicKey"
@@ -30167,6 +30281,24 @@
           ]
         },
         {
+          "name": "register_ek_and_encrypt_dk",
+          "visibility": "private",
+          "is_entry": true,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [
+            "&signer",
+            "vector<u8>",
+            "vector<u8>",
+            "0x1::object::Object<0x1::fungible_asset::Metadata>",
+            "vector<u8>",
+            "vector<vector<u8>>",
+            "vector<vector<u8>>",
+            "vector<u8>"
+          ],
+          "return": []
+        },
+        {
           "name": "remove_all_override_auds",
           "visibility": "public",
           "is_entry": false,
@@ -32207,6 +32339,36 @@
           "return": []
         },
         {
+          "name": "create_with_owners_and_timelock",
+          "visibility": "public",
+          "is_entry": true,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [
+            "&signer",
+            "vector<address>",
+            "u64",
+            "vector<0x1::string::String>",
+            "vector<vector<u8>>",
+            "0x1::option::Option<u64>",
+            "0x1::option::Option<u64>"
+          ],
+          "return": []
+        },
+        {
+          "name": "timelock_period",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": true,
+          "generic_type_params": [],
+          "params": [
+            "address"
+          ],
+          "return": [
+            "u64"
+          ]
+        },
+        {
           "name": "create_with_owners_then_remove_bootstrapper",
           "visibility": "public",
           "is_entry": true,
@@ -32364,6 +32526,17 @@
           "return": []
         },
         {
+          "name": "remove_timelock",
+          "visibility": "private",
+          "is_entry": true,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [
+            "&signer"
+          ],
+          "return": []
+        },
+        {
           "name": "swap_owner",
           "visibility": "private",
           "is_entry": true,
@@ -32404,6 +32577,19 @@
           "return": []
         },
         {
+          "name": "timelock_override_threshold",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": true,
+          "generic_type_params": [],
+          "params": [
+            "address"
+          ],
+          "return": [
+            "0x1::option::Option<u64>"
+          ]
+        },
+        {
           "name": "update_metadata",
           "visibility": "private",
           "is_entry": true,
@@ -32425,6 +32611,19 @@
           "params": [
             "&signer",
             "u64"
+          ],
+          "return": []
+        },
+        {
+          "name": "upsert_timelock",
+          "visibility": "private",
+          "is_entry": true,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [
+            "&signer",
+            "u64",
+            "0x1::option::Option<u64>"
           ],
           "return": []
         },
@@ -32902,6 +33101,33 @@
           "variants": []
         },
         {
+          "name": "MultisigAccountTimeLock",
+          "is_native": false,
+          "is_event": false,
+          "is_enum": true,
+          "abilities": [
+            "drop",
+            "key"
+          ],
+          "generic_type_params": [],
+          "fields": [],
+          "variants": [
+            {
+              "name": "V1",
+              "fields": [
+                {
+                  "name": "timelock_period",
+                  "type": "u64"
+                },
+                {
+                  "name": "override_threshold",
+                  "type": "0x1::option::Option<u64>"
+                }
+              ]
+            }
+          ]
+        },
+        {
           "name": "MultisigTransaction",
           "is_native": false,
           "is_event": false,
@@ -32972,6 +33198,50 @@
             {
               "name": "owners_removed",
               "type": "vector<address>"
+            }
+          ],
+          "variants": []
+        },
+        {
+          "name": "TimelockRemoved",
+          "is_native": false,
+          "is_event": true,
+          "is_enum": false,
+          "abilities": [
+            "drop",
+            "store"
+          ],
+          "generic_type_params": [],
+          "fields": [
+            {
+              "name": "multisig_account",
+              "type": "address"
+            }
+          ],
+          "variants": []
+        },
+        {
+          "name": "TimelockUpdated",
+          "is_native": false,
+          "is_event": true,
+          "is_enum": false,
+          "abilities": [
+            "drop",
+            "store"
+          ],
+          "generic_type_params": [],
+          "fields": [
+            {
+              "name": "multisig_account",
+              "type": "address"
+            },
+            {
+              "name": "timelock_period",
+              "type": "u64"
+            },
+            {
+              "name": "override_threshold",
+              "type": "0x1::option::Option<u64>"
             }
           ],
           "variants": []
@@ -38868,8 +39138,8 @@
       "address": "0x1",
       "name": "confidential_balance",
       "friends": [
-        "0x1::confidential_amount",
         "0x1::sigma_protocol_withdraw",
+        "0x1::confidential_amount",
         "0x1::sigma_protocol_transfer",
         "0x1::sigma_protocol_registration",
         "0x1::sigma_protocol_key_rotation",
@@ -40105,11 +40375,11 @@
       "address": "0x1",
       "name": "sigma_protocol_utils",
       "friends": [
-        "0x1::confidential_balance",
-        "0x1::confidential_amount",
         "0x1::sigma_protocol_proof",
         "0x1::sigma_protocol",
+        "0x1::confidential_balance",
         "0x1::sigma_protocol_withdraw",
+        "0x1::confidential_amount",
         "0x1::sigma_protocol_transfer",
         "0x1::sigma_protocol_registration",
         "0x1::sigma_protocol_key_rotation",

@@ -32,7 +32,7 @@
     "test": "tsx --test 'src/**/*.test.ts'"
   },
   "dependencies": {
-    "@bufbuild/protobuf": "^2.12.0",
+    "@bufbuild/protobuf": "^2.12.1",
     "@connectrpc/connect": "^2.0.0",
     "@connectrpc/connect-node": "^2.0.0",
     "@opentelemetry/exporter-metrics-otlp-grpc": "^0.218.0",

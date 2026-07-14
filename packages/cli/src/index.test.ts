@@ -65,7 +65,7 @@ describe('sentio cli entrypoint', () => {
         }
       )
 
-      expect(requests).deep.equal(['/v1/processors/sentio/coinbase/status?version=ALL'])
+      expect(requests).deep.equal(['/api/v1/processors/sentio/coinbase/status?version=ALL'])
     } finally {
       await new Promise<void>((resolve, reject) => {
         server.close((error) => (error ? reject(error) : resolve()))
@@ -122,7 +122,7 @@ describe('sentio cli entrypoint', () => {
         }
       )
 
-      expect(requests).deep.equal(['/v1/processors/sentio/coinbase/status?version=ALL'])
+      expect(requests).deep.equal(['/api/v1/processors/sentio/coinbase/status?version=ALL'])
       const jsonStart = stdout.indexOf('{')
       const result = JSON.parse(stdout.slice(jsonStart))
       expect(result.processors).to.have.lengthOf(1)
@@ -175,7 +175,7 @@ describe('sentio cli entrypoint', () => {
         }
       )
 
-      expect(requests).deep.equal(['/v1/processors/sentio/coinbase/source_files?version=67'])
+      expect(requests).deep.equal(['/api/v1/processors/sentio/coinbase/source_files?version=67'])
     } finally {
       await new Promise<void>((resolve, reject) => {
         server.close((error) => (error ? reject(error) : resolve()))

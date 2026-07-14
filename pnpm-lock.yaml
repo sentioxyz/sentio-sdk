@@ -178,8 +178,8 @@ importers:
   packages/action:
     dependencies:
       '@bufbuild/protobuf':
-        specifier: ^2.12.0
-        version: 2.12.0
+        specifier: ^2.12.1
+        version: 2.12.1
       '@sentio/protos':
         specifier: workspace:*
         version: link:../protos
@@ -203,11 +203,11 @@ importers:
         specifier: ~7.1.0
         version: 7.1.0
       '@bufbuild/protobuf':
-        specifier: ^2.12.0
-        version: 2.12.0
+        specifier: ^2.12.1
+        version: 2.12.1
       '@connectrpc/connect':
         specifier: ^2.1.2
-        version: 2.1.2(@bufbuild/protobuf@2.12.0)
+        version: 2.1.2(@bufbuild/protobuf@2.12.1)
       '@iota/iota-sdk':
         specifier: ~1.14.0
         version: 1.14.0(typescript@6.0.3)
@@ -215,8 +215,8 @@ importers:
         specifier: ~2.20.0
         version: 2.20.1(typescript@6.0.3)
       '@sentio/api':
-        specifier: ~2.0.3
-        version: 2.0.3
+        specifier: ~2.0.4
+        version: 2.0.4
       '@sentio/chain':
         specifier: ~3.4.34
         version: 3.4.34
@@ -382,20 +382,20 @@ importers:
   packages/protos:
     dependencies:
       '@bufbuild/protobuf':
-        specifier: ^2.12.0
-        version: 2.12.0
+        specifier: ^2.12.1
+        version: 2.12.1
 
   packages/runtime:
     dependencies:
       '@bufbuild/protobuf':
-        specifier: ^2.12.0
-        version: 2.12.0
+        specifier: ^2.12.1
+        version: 2.12.1
       '@connectrpc/connect':
         specifier: ^2.0.0
-        version: 2.1.1(@bufbuild/protobuf@2.12.0)
+        version: 2.1.1(@bufbuild/protobuf@2.12.1)
       '@connectrpc/connect-node':
         specifier: ^2.0.0
-        version: 2.1.1(@bufbuild/protobuf@2.12.0)(@connectrpc/connect@2.1.1(@bufbuild/protobuf@2.12.0))
+        version: 2.1.1(@bufbuild/protobuf@2.12.1)(@connectrpc/connect@2.1.1(@bufbuild/protobuf@2.12.1))
       '@opentelemetry/exporter-metrics-otlp-grpc':
         specifier: ^0.218.0
         version: 0.218.0(@opentelemetry/api@1.9.0)
@@ -455,11 +455,11 @@ importers:
         specifier: ~7.1.0
         version: 7.1.0
       '@bufbuild/protobuf':
-        specifier: ^2.12.0
-        version: 2.12.0
+        specifier: ^2.12.1
+        version: 2.12.1
       '@connectrpc/connect':
         specifier: ^2.1.2
-        version: 2.1.2(@bufbuild/protobuf@2.12.0)
+        version: 2.1.2(@bufbuild/protobuf@2.12.1)
       '@iota/iota-sdk':
         specifier: ~1.14.0
         version: 1.14.0(typescript@6.0.3)
@@ -473,8 +473,8 @@ importers:
         specifier: ^2.11.1
         version: 2.11.1
       '@sentio/api':
-        specifier: ~2.0.3
-        version: 2.0.3
+        specifier: ~2.0.4
+        version: 2.0.4
       '@sentio/bigdecimal':
         specifier: 9.1.1-patch.3
         version: 9.1.1-patch.3
@@ -494,17 +494,17 @@ importers:
         specifier: ^6.9.0
         version: 6.9.0(bufferutil@4.0.8)(typescript@6.0.3)(utf-8-validate@5.0.10)
       '@typemove/aptos':
-        specifier: 2.0.5
-        version: 2.0.5
+        specifier: 2.0.6
+        version: 2.0.6
       '@typemove/iota':
-        specifier: 2.0.5
-        version: 2.0.5(typescript@6.0.3)
+        specifier: 2.0.6
+        version: 2.0.6(typescript@6.0.3)
       '@typemove/move':
-        specifier: 2.0.5
-        version: 2.0.5
+        specifier: 2.0.6
+        version: 2.0.6
       '@typemove/sui':
-        specifier: 2.0.5
-        version: 2.0.5(typescript@6.0.3)
+        specifier: 2.0.6
+        version: 2.0.6(typescript@6.0.3)
       bs58:
         specifier: ^6.0.0
         version: 6.0.0
@@ -689,8 +689,8 @@ packages:
     resolution: {integrity: sha512-K8ponJDxBwDHigkeFqaqT5wLGl4bTlwMafR8k7b5CPxr6Ww+UG9ls8Yx6Tcpboxu97eeGVEEyKcHmEyOwN1vSw==}
     engines: {node: ^22.18.0 || >=24.11.0}
 
-  '@bufbuild/protobuf@2.12.0':
-    resolution: {integrity: sha512-B/XlCaFIP8LOwzo+bz5uFzATYokcwCKQcghqnlfwSmM5eX/qTkvDBnDPs+gXtX/RyjxJ4DRikECcPJbyALA8FA==}
+  '@bufbuild/protobuf@2.12.1':
+    resolution: {integrity: sha512-BvAMfS6LrgZiryOAZ4pBYucu4wG/Ei/9o9DZ9akbREnMLbPJiom2i8b9C8IsKErQoiKqVhrerzt3kOT/RrzLHg==}
 
   '@chainsafe/is-ip@2.1.0':
     resolution: {integrity: sha512-KIjt+6IfysQ4GCv66xihEitBjvhU/bixbbbFxdJ1sqCp4uJ0wuZiYBPhksZoy4lfaF0k9cwNzY5upEW/VWdw3w==}
@@ -2534,8 +2534,8 @@ packages:
     peerDependencies:
       semantic-release: '>=20.1.0'
 
-  '@sentio/api@2.0.3':
-    resolution: {integrity: sha512-VE0++ObCzJZ970VtHosUDITZzfCWSTdks8sTU+4psuF19e3UyjxnTGO4x3T6RHKCMFTXjUtGsZHEkjQtTFO4nA==}
+  '@sentio/api@2.0.4':
+    resolution: {integrity: sha512-PWliypx9dNgVyHa8VPLhzr4NaY8lxph3lybemTfZ/NlhDXGN4UWNQImGJmIgcZAVAcWbrknD5Vt7I0O0pkG0RA==}
     engines: {node: '>=24'}
 
   '@sentio/bigdecimal@9.1.1-patch.3':
@@ -3017,19 +3017,19 @@ packages:
   '@tybys/wasm-util@0.10.3':
     resolution: {integrity: sha512-F3fo1MYrRJYL3zER0OUOmkutjr1Vp23m7OsSgp7nq4SP6OqX6C/56XFIPAl5bt3zaBRjmW7SGz3u/6LwFpYcOg==}
 
-  '@typemove/aptos@2.0.5':
-    resolution: {integrity: sha512-4KvYsV0SnhAaVgmDlqRDhLWbmIQy8IEhQkIbVbbvFlPyRAeJCAjqsX+LaS7+WOwBCrTcFWsi574Zvfb0Mf1Rpg==}
+  '@typemove/aptos@2.0.6':
+    resolution: {integrity: sha512-44e5FQDILSjqFvKLtxz1QPsPkvrvTXFqSFoEQLHorp/NyWjiXgbyb86z8oMIWTjpwUH8rNBDvvX2Mjmo/EE0oQ==}
     hasBin: true
 
-  '@typemove/iota@2.0.5':
-    resolution: {integrity: sha512-8uqdwLJaoYP27ODh+UGWY6/reI4HB9UTkk7LvVgSUDcM4RT+lLNEr9R7XnbbELuWwBeva1//6u/HorpPC4j4Dg==}
+  '@typemove/iota@2.0.6':
+    resolution: {integrity: sha512-n4GPdU3d63GjpICbXbWB3bcCZKQ599beCDQvH3/OUxKs4NTBsxoEaOyDu3dBnKukW0Gr+q1z5VM1Pl6SPTJIPg==}
     hasBin: true
 
-  '@typemove/move@2.0.5':
-    resolution: {integrity: sha512-h/EvZj1V18MfZrR1OWjMKWjEeOIwd+mhFBsX+IJJIhskxprjUYLBgYpc8pT+9b1cwXs68k9AD2TI97kmny9N+A==}
+  '@typemove/move@2.0.6':
+    resolution: {integrity: sha512-ETbe0AUWA8ikvgAqXclkftGeexrVMlIr7vucfC7AbyfHKD6kFq48KWX9DLqMk98rII2Qm+7I/odUvXTa4sb2qw==}
 
-  '@typemove/sui@2.0.5':
-    resolution: {integrity: sha512-EfWlbqYKMudUQ8mq468ieTFYfqgp+mTY4Y3TJDQoRexbIrrMdB/1ITaCP6w6nOt2KUrzAVTo2r5Adp1k8FJn5A==}
+  '@typemove/sui@2.0.6':
+    resolution: {integrity: sha512-IZkAmucQpYvaUaKrLylt3wrEUCDfFLl/xqwkerYDMx/yJ4oYWjNk8BnhUjPiueNZsxfEDY8fLPdA+EXgQ8837A==}
     hasBin: true
 
   '@types/bn.js@5.1.6':
@@ -7726,7 +7726,7 @@ snapshots:
       '@babel/helper-string-parser': 8.0.0
       '@babel/helper-validator-identifier': 8.0.2
 
-  '@bufbuild/protobuf@2.12.0': {}
+  '@bufbuild/protobuf@2.12.1': {}
 
   '@chainsafe/is-ip@2.1.0': {}
 
@@ -7743,18 +7743,18 @@ snapshots:
     dependencies:
       commander: 15.0.0
 
-  '@connectrpc/connect-node@2.1.1(@bufbuild/protobuf@2.12.0)(@connectrpc/connect@2.1.1(@bufbuild/protobuf@2.12.0))':
+  '@connectrpc/connect-node@2.1.1(@bufbuild/protobuf@2.12.1)(@connectrpc/connect@2.1.1(@bufbuild/protobuf@2.12.1))':
     dependencies:
-      '@bufbuild/protobuf': 2.12.0
-      '@connectrpc/connect': 2.1.1(@bufbuild/protobuf@2.12.0)
+      '@bufbuild/protobuf': 2.12.1
+      '@connectrpc/connect': 2.1.1(@bufbuild/protobuf@2.12.1)
 
-  '@connectrpc/connect@2.1.1(@bufbuild/protobuf@2.12.0)':
+  '@connectrpc/connect@2.1.1(@bufbuild/protobuf@2.12.1)':
     dependencies:
-      '@bufbuild/protobuf': 2.12.0
+      '@bufbuild/protobuf': 2.12.1
 
-  '@connectrpc/connect@2.1.2(@bufbuild/protobuf@2.12.0)':
+  '@connectrpc/connect@2.1.2(@bufbuild/protobuf@2.12.1)':
     dependencies:
-      '@bufbuild/protobuf': 2.12.0
+      '@bufbuild/protobuf': 2.12.1
 
   '@dabh/diagnostics@2.0.8':
     dependencies:
@@ -9476,20 +9476,20 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@sentio/api@2.0.3':
+  '@sentio/api@2.0.4':
     dependencies:
-      '@bufbuild/protobuf': 2.12.0
-      '@connectrpc/connect': 2.1.2(@bufbuild/protobuf@2.12.0)
-      '@sentio/connect-gateway-es': 1.0.0(@bufbuild/protobuf@2.12.0)(@connectrpc/connect@2.1.2(@bufbuild/protobuf@2.12.0))
+      '@bufbuild/protobuf': 2.12.1
+      '@connectrpc/connect': 2.1.2(@bufbuild/protobuf@2.12.1)
+      '@sentio/connect-gateway-es': 1.0.0(@bufbuild/protobuf@2.12.1)(@connectrpc/connect@2.1.2(@bufbuild/protobuf@2.12.1))
 
   '@sentio/bigdecimal@9.1.1-patch.3': {}
 
   '@sentio/chain@3.4.34': {}
 
-  '@sentio/connect-gateway-es@1.0.0(@bufbuild/protobuf@2.12.0)(@connectrpc/connect@2.1.2(@bufbuild/protobuf@2.12.0))':
+  '@sentio/connect-gateway-es@1.0.0(@bufbuild/protobuf@2.12.1)(@connectrpc/connect@2.1.2(@bufbuild/protobuf@2.12.1))':
     dependencies:
-      '@bufbuild/protobuf': 2.12.0
-      '@connectrpc/connect': 2.1.2(@bufbuild/protobuf@2.12.0)
+      '@bufbuild/protobuf': 2.12.1
+      '@connectrpc/connect': 2.1.2(@bufbuild/protobuf@2.12.1)
 
   '@sentio/ethers-v6@1.0.29(ethers@6.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(typescript@6.0.3)':
     dependencies:
@@ -10098,19 +10098,19 @@ snapshots:
       tslib: 2.8.1
     optional: true
 
-  '@typemove/aptos@2.0.5':
+  '@typemove/aptos@2.0.6':
     dependencies:
       '@aptos-labs/ts-sdk': 7.1.0
-      '@typemove/move': 2.0.5
+      '@typemove/move': 2.0.6
       chalk: 5.6.2
       commander: 15.0.0
       prettier: 3.8.3
       radash: 12.1.1
 
-  '@typemove/iota@2.0.5(typescript@6.0.3)':
+  '@typemove/iota@2.0.6(typescript@6.0.3)':
     dependencies:
       '@iota/iota-sdk': 1.14.0(typescript@6.0.3)
-      '@typemove/move': 2.0.5
+      '@typemove/move': 2.0.6
       chalk: 5.6.2
       commander: 15.0.0
       prettier: 3.8.3
@@ -10120,14 +10120,14 @@ snapshots:
       - '@gql.tada/vue-support'
       - typescript
 
-  '@typemove/move@2.0.5':
+  '@typemove/move@2.0.6':
     dependencies:
       radash: 12.1.1
 
-  '@typemove/sui@2.0.5(typescript@6.0.3)':
+  '@typemove/sui@2.0.6(typescript@6.0.3)':
     dependencies:
       '@mysten/sui': 2.20.1(typescript@6.0.3)
-      '@typemove/move': 2.0.5
+      '@typemove/move': 2.0.6
       chalk: 5.6.2
       commander: 15.0.0
       prettier: 3.8.3
