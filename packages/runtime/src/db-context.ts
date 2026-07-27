@@ -61,6 +61,10 @@ export abstract class AbstractStoreContext implements IStoreContext {
   >()
   private statsInterval: NodeJS.Timeout | undefined
   private pendings: Promise<unknown>[] = []
+  // Set once the process has finished and the context was closed. Guards
+  // against a lingering batch timer emitting after the final result (which
+  // would both lose the write and desync the reused processor stream).
+  private closed = false
 
   constructor(readonly processId: number) {}
 
@@ -78,6 +82,12 @@ export abstract class AbstractStoreContext implements IStoreContext {
       // batch upsert if possible
       return this.sendUpsertInBatch(request.value as DBRequest_DBUpsert)
     }
+
+    // Read-your-writes: any non-upsert op (get/list/delete) must observe the
+    // upserts issued before it. Flush the pending batch first so its dbRequest
+    // is sent ahead of this op on the same stream; the driver applies stream
+    // ops in arrival order, so the read/delete sees the buffered writes.
+    this.sendBatch()
 
     const requestType = request.case as RequestType
     const opId = StoreContext.opCounter++
@@ -160,6 +170,16 @@ export abstract class AbstractStoreContext implements IStoreContext {
   }
 
   close() {
+    this.closed = true
+    // Drop any un-flushed batch and cancel its timer so it can never emit
+    // after close. In the normal path awaitPendings() has already flushed it;
+    // reaching here with a pending batch means the process ended without
+    // awaiting the write (e.g. a handler error), so emitting it now would be
+    // both too late (lost from this checkpoint) and stream-corrupting.
+    if (this.upsertBatch) {
+      clearTimeout(this.upsertBatch.timer)
+      this.upsertBatch = undefined
+    }
     for (const [opId, defer] of this.defers) {
       // console.warn('context closed before db response', opId)
       defer.reject(new Error('context closed before db response, processId: ' + this.processId + ' opId: ' + opId))
@@ -221,6 +241,11 @@ export abstract class AbstractStoreContext implements IStoreContext {
   }
 
   private sendBatch() {
+    // Never emit once the context is closed: the process already sent its
+    // final result and the stream may have been handed to another process.
+    if (this.closed) {
+      return
+    }
     if (this.upsertBatch) {
       const { request, opId, timer } = this.upsertBatch
       // console.debug('sending batch upsert', opId, 'batch size', request?.entity.length)
@@ -242,6 +267,17 @@ export abstract class AbstractStoreContext implements IStoreContext {
   }
 
   async awaitPendings() {
+    // Flush any buffered upsert batch and wait for its ack before returning.
+    // Callers use this to guarantee every write has been sent AND applied by
+    // the driver before the process emits its final result. Without it the
+    // batch's setTimeout could fire after the result — losing the write and
+    // leaving a stray message on the pooled processor stream (surfacing to the
+    // driver as ERR200 "unexpected ProcessID").
+    if (this.upsertBatch) {
+      const { promise } = this.upsertBatch
+      this.sendBatch()
+      this.pendings.push(promise)
+    }
     await Promise.all(this.pendings)
   }
 }
