@@ -46,7 +46,7 @@ export class CosmosPlugin extends Plugin {
       })
 
       for (const callHandler of processor.callHandlers) {
-        const handlerId = this.handlerRegister.register(callHandler.handler, chainId)
+        const handlerId = this.handlerRegister.register(callHandler.handler, chainId, callHandler.handlerName)
 
         contractConfig.cosmosLogConfigs.push(
           create(CosmosLogHandlerConfigSchema, {

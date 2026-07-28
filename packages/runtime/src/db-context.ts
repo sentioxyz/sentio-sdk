@@ -36,6 +36,10 @@ type ProcessStreamResponseV3Init = MessageInitShape<typeof ProcessStreamResponse
 type Request = NonNullable<MessageInitShape<typeof DBRequestSchema>['op']>
 type RequestType = NonNullable<Request['case']>
 
+// Frames beyond the first handful are runtime and Node internals; the caller's own
+// code is at the top because captureStackTrace trims ours off.
+const MAX_REPORTED_FRAMES = 12
+
 export const timeoutError = new Error('timeout')
 
 // Name the entity and id, not just the op kind: "get BinanceAlphaPriceEntity 56-0x…"
@@ -85,8 +89,20 @@ export abstract class AbstractStoreContext implements IStoreContext {
   // against a lingering batch timer emitting after the final result (which
   // would both lose the write and desync the reused processor stream).
   protected closed = false
+  /**
+   * Which handler this process is running, e.g.
+   * "TermMaxVaultProcessorTemplate.onTimeInterval (ETH_BLOCK on chain 56)". Set by the
+   * service once the binding is known, and reported with any late message: the handler
+   * frame is usually absent from a late call's stack, so without this the user cannot
+   * tell which of their handlers is at fault.
+   */
+  protected handlerDescription?: string
 
   constructor(readonly processId: number) {}
+
+  describeHandler(description: string) {
+    this.handlerDescription = description
+  }
 
   newPromise<T>(opId: bigint, requestType?: RequestType) {
     return new Promise<T>((resolve, reject) => {
@@ -325,15 +341,26 @@ export abstract class AbstractStoreContext implements IStoreContext {
    * reads is their own code rather than two frames of ours.
    */
   protected reportLateMessage(what: string, boundary?: (...args: never[]) => unknown): Error {
-    const err = new Error(
-      `[sentio] ${what} was issued after process ${this.processId} had already finished, so it was dropped. ` +
-        `Something in the handler was still running after the handler returned — every store write, ` +
-        `store read and metric must be awaited before the handler completes. A common cause is one ` +
-        `Promise.all() branch rejecting while its siblings keep running: Promise.all rejects immediately ` +
-        `but does NOT cancel the others, so give each branch its own .catch() (or use Promise.allSettled) ` +
-        `to keep them inside the handler. The stack below points at the call that arrived too late.`
-    )
+    const where = this.handlerDescription ? ` in ${this.handlerDescription}` : ''
+    const summary =
+      `[sentio] ${what}${where} was issued after process ${this.processId} had already finished, ` +
+      `so it was dropped. Something in the handler was still running after the handler returned — every ` +
+      `store write, store read and metric must be awaited before the handler completes. A common cause is ` +
+      `one Promise.all() branch rejecting while its siblings keep running: Promise.all rejects immediately ` +
+      `but does NOT cancel the others, so give each branch its own .catch() (or use Promise.allSettled) ` +
+      `to keep them inside the handler.`
+
+    const err = new Error(summary)
     Error.captureStackTrace?.(err, boundary ?? this.reportLateMessage)
+
+    // Inline the frames into `message`. The datasource log view renders only the
+    // message, so a stack left in `err.stack` alone is invisible to the user who has
+    // to act on it. Capped because the frames past the first few are runtime and Node
+    // internals.
+    const frames = (err.stack ?? '').split('\n').slice(1, 1 + MAX_REPORTED_FRAMES)
+    if (frames.length) {
+      err.message = `${summary}\nIssued at:\n${frames.join('\n')}`
+    }
     console.error(err)
     return err
   }

@@ -82,16 +82,21 @@ describe('DataBindingContext rejects messages issued after close', () => {
     const ctx = new DataBindingContext(3, subject)
     const { logged, restore } = silenceConsoleError()
 
+    ctx.describeHandler('MyTemplate.onTimeInterval (ETH_BLOCK on chain 56)')
     ctx.close()
     await assert.rejects(
       () => ctx.sendRequest({ case: 'get', value: { entity: 'BinanceAlphaPriceEntity', id: '56-0xabc' } }),
       (err: Error) => {
-        // The message must name the op, entity and id so the caller can find it,
-        // and carry a stack pointing at the late call.
+        // Everything the user needs must be in `message`: the datasource log view
+        // renders only that field, so anything left in `err.stack` alone is invisible.
         assert.match(err.message, /get BinanceAlphaPriceEntity 56-0xabc/)
         assert.match(err.message, /after process 3 had already finished/)
         assert.match(err.message, /Promise\.all/)
-        assert.ok(err.stack && err.stack.includes('db-context.test'), 'stack must reach the caller')
+        // Which handler — a late call's own stack rarely still contains that frame.
+        assert.match(err.message, /in MyTemplate\.onTimeInterval \(ETH_BLOCK on chain 56\)/)
+        // And the frames, inlined rather than only on err.stack.
+        assert.match(err.message, /Issued at:/)
+        assert.ok(err.message.includes('db-context.test'), 'the inlined stack must reach the caller')
         return true
       }
     )

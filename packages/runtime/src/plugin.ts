@@ -22,6 +22,29 @@ export abstract class Plugin {
   name: string
   supportedHandlers: HandlerType[] = []
 
+  /**
+   * Handler registry, for plugins that keep one. Declared structurally so the runtime
+   * does not depend on the sdk package where HandlerRegister lives; every chain plugin
+   * already exposes a field of this shape under this name.
+   */
+  handlerRegister?: { getHandlerName(chainId: string, handlerId: number): string | undefined }
+
+  /**
+   * Display names of the handlers a binding targets, for diagnostics. A handler id is
+   * meaningless to the user, and a stack trace does not always contain the handler
+   * frame — a detached continuation has long since lost it — so this is often the only
+   * way to say which handler a message belongs to.
+   */
+  handlerNames(request: DataBinding): string[] {
+    const register = this.handlerRegister
+    if (!register) {
+      return []
+    }
+    return request.handlerIds
+      .map((id) => register.getHandlerName(request.chainId, id))
+      .filter((name): name is string => !!name)
+  }
+
   async configure(config: ProcessConfigResponse, forChainId?: string): Promise<void> {}
 
   async start(start: StartRequest): Promise<void> {}
@@ -123,6 +146,22 @@ export class PluginManager {
       throw new Error(`No plugin for ${request.handlerType}`)
     }
     return plugin.partition(request)
+  }
+
+  /**
+   * One-line identification of what a binding is processing, for diagnostics: handler
+   * names when the plugin knows them, otherwise the raw ids, plus the handler type and
+   * chain. Never throws — callers are error paths.
+   */
+  describeBinding(request: DataBinding): string {
+    let handlers: string[] = []
+    try {
+      handlers = this.typesToPlugin.get(request.handlerType)?.handlerNames(request) ?? []
+    } catch {
+      // a registry lookup must never mask the error being reported
+    }
+    const named = handlers.length ? handlers.join(', ') : `handlerId ${request.handlerIds.join(', ')}`
+    return `${named} (${HandlerType[request.handlerType] ?? request.handlerType} on chain ${request.chainId})`
   }
 
   preprocessBinding(

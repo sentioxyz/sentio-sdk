@@ -78,7 +78,7 @@ export class EthPlugin extends Plugin {
 
       // Step 1. Prepare all the block handlers
       for (const blockHandler of processor.blockHandlers) {
-        const handlerId = this.handlerRegister.register(blockHandler.handler, chainId)
+        const handlerId = this.handlerRegister.register(blockHandler.handler, chainId, blockHandler.handlerName)
 
         this.partitionManager.registerPartitionHandler(HandlerType.ETH_BLOCK, handlerId, blockHandler.partitionHandler)
         // TODO wrap the block handler into one
@@ -98,7 +98,7 @@ export class EthPlugin extends Plugin {
 
       // Step 2. Prepare all trace handlers
       for (const traceHandler of processor.traceHandlers) {
-        const handlerId = this.handlerRegister.register(traceHandler.handler, chainId)
+        const handlerId = this.handlerRegister.register(traceHandler.handler, chainId, traceHandler.handlerName)
 
         this.partitionManager.registerPartitionHandler(HandlerType.ETH_TRACE, handlerId, traceHandler.partitionHandler)
         for (const signature of traceHandler.signatures) {
@@ -116,7 +116,7 @@ export class EthPlugin extends Plugin {
       // Step 3. Prepare all the event handlers
       for (const eventsHandler of processor.eventHandlers) {
         // associate id with filter
-        const handlerId = this.handlerRegister.register(eventsHandler.handler, chainId)
+        const handlerId = this.handlerRegister.register(eventsHandler.handler, chainId, eventsHandler.handlerName)
         this.partitionManager.registerPartitionHandler(HandlerType.ETH_LOG, handlerId, eventsHandler.partitionHandler)
         const logConfig = create(LogHandlerConfigSchema, {
           handlerId: handlerId,
@@ -185,7 +185,7 @@ export class EthPlugin extends Plugin {
       })
 
       for (const blockHandler of processor.blockHandlers) {
-        const handlerId = this.handlerRegister.register(blockHandler.handler, chainId)
+        const handlerId = this.handlerRegister.register(blockHandler.handler, chainId, blockHandler.handlerName)
         contractConfig.intervalConfigs.push(
           create(OnIntervalConfigSchema, {
             slot: 0,
@@ -200,7 +200,11 @@ export class EthPlugin extends Plugin {
       }
 
       for (const transactionHandler of processor.transactionHandler) {
-        const handlerId = this.handlerRegister.register(transactionHandler.handler, chainId)
+        const handlerId = this.handlerRegister.register(
+          transactionHandler.handler,
+          chainId,
+          transactionHandler.handlerName
+        )
         this.partitionManager.registerPartitionHandler(
           HandlerType.ETH_TRANSACTION,
           handlerId,
@@ -216,7 +220,7 @@ export class EthPlugin extends Plugin {
       }
 
       for (const traceHandler of processor.traceHandlers) {
-        const handlerId = this.handlerRegister.register(traceHandler.handler, chainId)
+        const handlerId = this.handlerRegister.register(traceHandler.handler, chainId, traceHandler.handlerName)
         for (const signature of traceHandler.signatures) {
           contractConfig.traceConfigs.push(
             create(TraceHandlerConfigSchema, {
@@ -231,7 +235,11 @@ export class EthPlugin extends Plugin {
 
       for (const eventsHandler of processor.eventHandlers) {
         // associate id with filter
-        const handlerId = this.handlerRegister.register(eventsHandler.handler, processor.getChainId())
+        const handlerId = this.handlerRegister.register(
+          eventsHandler.handler,
+          processor.getChainId(),
+          eventsHandler.handlerName
+        )
         const logConfig = create(LogHandlerConfigSchema, {
           handlerId: handlerId,
           handlerName: eventsHandler.handlerName,
@@ -297,7 +305,11 @@ export class EthPlugin extends Plugin {
       // TODO add interval
       for (const eventsHandler of processor.eventHandlers) {
         // associate id with filter
-        const handlerId = this.handlerRegister.register(eventsHandler.handler, processor.getChainId())
+        const handlerId = this.handlerRegister.register(
+          eventsHandler.handler,
+          processor.getChainId(),
+          eventsHandler.handlerName
+        )
         const logConfig = create(LogHandlerConfigSchema, {
           handlerId: handlerId,
           handlerName: eventsHandler.handlerName,

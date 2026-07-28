@@ -162,6 +162,9 @@ export class ProcessorServiceImplV3 implements ServiceImpl<typeof ProcessorV3> {
 
   private startProcess(processId: number, binding: DataBinding, subject: Subject<ProcessStreamResponseV3Init>) {
     const context = this.contexts.new(processId, subject)
+    // Name the handler on the context so a late message can say which handler it came
+    // from; its own stack will not show that (see reportLateMessage).
+    context.describeHandler(PluginManager.INSTANCE.describeBinding(binding))
     const start = Date.now()
     PluginManager.INSTANCE.processBinding(binding, undefined, context)
       .then(async (result) => {

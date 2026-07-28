@@ -93,7 +93,7 @@ export class SuiPluginPart {
         endBlock: suiProcessor.config.endCheckpoint
       })
       for (const handler of suiProcessor.eventHandlers) {
-        const handlerId = this.handlerRegister.register(handler.handler, chainId)
+        const handlerId = this.handlerRegister.register(handler.handler, chainId, handler.handlerName)
         this.partitionManager.registerPartitionHandler(HandlerType.SUI_EVENT, handlerId, handler.partitionHandler)
         const eventHandlerConfig: MoveEventHandlerConfig = create(MoveEventHandlerConfigSchema, {
           filters: handler.filters.map((f) => {
@@ -110,7 +110,7 @@ export class SuiPluginPart {
         contractConfig.moveEventConfigs.push(eventHandlerConfig)
       }
       for (const handler of suiProcessor.callHandlers) {
-        const handlerId = this.handlerRegister.register(handler.handler, chainId)
+        const handlerId = this.handlerRegister.register(handler.handler, chainId, handler.handlerName)
         this.partitionManager.registerPartitionHandler(HandlerType.SUI_CALL, handlerId, handler.partitionHandler)
         const functionHandlerConfig: MoveCallHandlerConfig = create(MoveCallHandlerConfigSchema, {
           filters: handler.filters.map((filter) => {
@@ -131,7 +131,7 @@ export class SuiPluginPart {
       }
       // deprecated, use objectType processor instead
       for (const handler of suiProcessor.objectChangeHandlers) {
-        const handlerId = this.handlerRegister.register(handler.handler, chainId)
+        const handlerId = this.handlerRegister.register(handler.handler, chainId, handler.handlerName)
         const objectChangeHandler: MoveResourceChangeConfig = create(MoveResourceChangeConfigSchema, {
           types: typeof handler.type === 'string' ? [handler.type] : handler.type,
           handlerId,
@@ -156,7 +156,7 @@ export class SuiPluginPart {
       })
 
       for (const handler of processor.objectChangeHandlers) {
-        const handlerId = this.handlerRegister.register(handler.handler, chainId)
+        const handlerId = this.handlerRegister.register(handler.handler, chainId, handler.handlerName)
         const objectChangeHandler: MoveResourceChangeConfig = create(MoveResourceChangeConfigSchema, {
           types: typeof handler.type === 'string' ? [handler.type] : handler.type,
           handlerId,
@@ -167,7 +167,7 @@ export class SuiPluginPart {
       }
 
       for (const handler of processor.objectHandlers) {
-        const handlerId = this.handlerRegister.register(handler.handler, chainId)
+        const handlerId = this.handlerRegister.register(handler.handler, chainId, handler.handlerName)
 
         accountConfig.moveIntervalConfigs.push(
           create(MoveOnIntervalConfigSchema, {
@@ -190,7 +190,7 @@ export class SuiPluginPart {
 
       if (processor instanceof SuiAddressProcessor) {
         for (const handler of processor.callHandlers) {
-          const handlerId = this.handlerRegister.register(handler.handler, chainId)
+          const handlerId = this.handlerRegister.register(handler.handler, chainId, handler.handlerName)
           const functionHandlerConfig: MoveCallHandlerConfig = create(MoveCallHandlerConfigSchema, {
             filters: handler.filters.map((filter) => {
               return {

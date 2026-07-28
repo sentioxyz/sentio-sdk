@@ -56,7 +56,7 @@ export class FuelPlugin extends Plugin {
         endBlock: processorConfig.endBlock
       })
       for (const txHandler of processor.txHandlers) {
-        const handlerId = this.handlerRegister.register(txHandler.handler, chainId)
+        const handlerId = this.handlerRegister.register(txHandler.handler, chainId, txHandler.handlerName)
         this.partitionManager.registerPartitionHandler(
           HandlerType.FUEL_TRANSACTION,
           handlerId,
@@ -90,7 +90,7 @@ export class FuelPlugin extends Plugin {
       }
 
       for (const receiptHandler of processor.receiptHandlers ?? []) {
-        const handlerId = this.handlerRegister.register(receiptHandler.handler, chainId)
+        const handlerId = this.handlerRegister.register(receiptHandler.handler, chainId, receiptHandler.handlerName)
         this.partitionManager.registerPartitionHandler(
           HandlerType.FUEL_RECEIPT,
           handlerId,
@@ -109,7 +109,7 @@ export class FuelPlugin extends Plugin {
       }
 
       for (const blockHandler of processor.blockHandlers) {
-        const handlerId = this.handlerRegister.register(blockHandler.handler, chainId)
+        const handlerId = this.handlerRegister.register(blockHandler.handler, chainId, blockHandler.handlerName)
         this.partitionManager.registerPartitionHandler(HandlerType.FUEL_BLOCK, handlerId, blockHandler.partitionHandler)
         contractConfig.intervalConfigs.push(
           create(OnIntervalConfigSchema, {
