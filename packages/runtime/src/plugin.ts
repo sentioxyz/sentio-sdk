@@ -16,34 +16,12 @@ import {
 } from '@sentio/protos'
 import { create } from '@bufbuild/protobuf'
 import { IDataBindingContext, IStoreContext } from './db-context.js'
+import { describeBindingData, HandlerDescriptors } from './handler-descriptor.js'
 import { AsyncLocalStorage } from 'node:async_hooks'
 
 export abstract class Plugin {
   name: string
   supportedHandlers: HandlerType[] = []
-
-  /**
-   * Handler registry, for plugins that keep one. Declared structurally so the runtime
-   * does not depend on the sdk package where HandlerRegister lives; every chain plugin
-   * already exposes a field of this shape under this name.
-   */
-  handlerRegister?: { getHandlerName(chainId: string, handlerId: number): string | undefined }
-
-  /**
-   * Display names of the handlers a binding targets, for diagnostics. A handler id is
-   * meaningless to the user, and a stack trace does not always contain the handler
-   * frame — a detached continuation has long since lost it — so this is often the only
-   * way to say which handler a message belongs to.
-   */
-  handlerNames(request: DataBinding): string[] {
-    const register = this.handlerRegister
-    if (!register) {
-      return []
-    }
-    return request.handlerIds
-      .map((id) => register.getHandlerName(request.chainId, id))
-      .filter((name): name is string => !!name)
-  }
 
   async configure(config: ProcessConfigResponse, forChainId?: string): Promise<void> {}
 
@@ -92,6 +70,8 @@ export class PluginManager {
   dbContextLocalStorage = new AsyncLocalStorage<IDataBindingContext | IStoreContext | undefined>()
   plugins: Plugin[] = []
   typesToPlugin = new Map<HandlerType, Plugin>()
+  /** Handler labels, refreshed from every config we generate. See describeBinding. */
+  readonly handlerDescriptors = new HandlerDescriptors()
 
   register(plugin: Plugin) {
     if (this.plugins.find((p) => p.name === plugin.name)) {
@@ -112,6 +92,9 @@ export class PluginManager {
     for (const plugin of this.plugins) {
       await plugin.configure(config)
     }
+    // The finished config is the only place that ties a handler id to its contract
+    // address and name, so keep the derived labels in step with it.
+    this.handlerDescriptors.build(config)
   }
 
   start(start: StartRequest, actionServerPort?: number) {
@@ -149,19 +132,32 @@ export class PluginManager {
   }
 
   /**
-   * One-line identification of what a binding is processing, for diagnostics: handler
-   * names when the plugin knows them, otherwise the raw ids, plus the handler type and
-   * chain. Never throws — callers are error paths.
+   * One-line identification of what a binding is processing, for diagnostics: the
+   * driver-style handler labels (contract address included, so template instances are
+   * distinguishable) plus what actually triggered this run. Never throws — callers are
+   * error paths, where masking the original error would be worse than a vague label.
+   *
+   * Every handler id gets an entry, even ones with no label: a report that silently
+   * omits a candidate handler is worse than one that says "handlerId 99" for the id it
+   * cannot name. Bindings dispatched without per-handler config — Solana instructions,
+   * for one — legitimately have no name to resolve, hence the handler type and chain
+   * are always spelled out as the fallback identification.
    */
   describeBinding(request: DataBinding): string {
-    let handlers: string[] = []
-    try {
-      handlers = this.typesToPlugin.get(request.handlerType)?.handlerNames(request) ?? []
-    } catch {
-      // a registry lookup must never mask the error being reported
-    }
-    const named = handlers.length ? handlers.join(', ') : `handlerId ${request.handlerIds.join(', ')}`
-    return `${named} (${HandlerType[request.handlerType] ?? request.handlerType} on chain ${request.chainId})`
+    const handlers = request.handlerIds.map((id) => {
+      let label: string | undefined
+      try {
+        label = this.handlerDescriptors.get(request.chainId, id)
+      } catch {
+        // fall through to the bare id
+      }
+      return label ?? `handlerId ${id}`
+    })
+    const type = HandlerType[request.handlerType] ?? request.handlerType
+    const who = handlers.length ? handlers.join(', ') : 'no handler id'
+    const trigger = describeBindingData(request)
+    const where = `${who} (${type} on chain ${request.chainId})`
+    return trigger ? `${where} at ${trigger}` : where
   }
 
   preprocessBinding(

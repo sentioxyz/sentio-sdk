@@ -94,7 +94,7 @@ export class AptosPlugin extends Plugin {
       })
       // 1. Prepare event handlers
       for (const handler of aptosProcessor.eventHandlers) {
-        const handlerId = this.handlerRegister.register(handler.handler, chainId, handler.handlerName)
+        const handlerId = this.handlerRegister.register(handler.handler, chainId)
         this.partitionManager.registerPartitionHandler(HandlerType.APT_EVENT, handlerId, handler.partitionHandler)
         const eventHandlerConfig: MoveEventHandlerConfig = create(MoveEventHandlerConfigSchema, {
           filters: handler.filters.map((f) => {
@@ -113,7 +113,7 @@ export class AptosPlugin extends Plugin {
 
       // 2. Prepare function handlers
       for (const handler of aptosProcessor.callHandlers) {
-        const handlerId = this.handlerRegister.register(handler.handler, chainId, handler.handlerName)
+        const handlerId = this.handlerRegister.register(handler.handler, chainId)
         this.partitionManager.registerPartitionHandler(HandlerType.APT_CALL, handlerId, handler.partitionHandler)
         const functionHandlerConfig: MoveCallHandlerConfig = create(MoveCallHandlerConfigSchema, {
           filters: handler.filters.map((filter) => {
@@ -135,7 +135,7 @@ export class AptosPlugin extends Plugin {
 
       // 3. Prepare onInterval handlers
       for (const handler of aptosProcessor.transactionIntervalHandlers) {
-        const handlerId = this.handlerRegister.register(handler.handler, chainId, handler.handlerName)
+        const handlerId = this.handlerRegister.register(handler.handler, chainId)
         this.partitionManager.registerPartitionHandler(HandlerType.APT_CALL, handlerId, handler.partitionHandler)
         contractConfig.moveIntervalConfigs.push(
           create(MoveOnIntervalConfigSchema, {
@@ -172,7 +172,7 @@ export class AptosPlugin extends Plugin {
         endBlock: aptosProcessor.config.endVersion
       })
       for (const handler of aptosProcessor.resourceChangeHandlers) {
-        const handlerId = this.handlerRegister.register(handler.handler, chainId, handler.handlerName)
+        const handlerId = this.handlerRegister.register(handler.handler, chainId)
         this.partitionManager.registerPartitionHandler(HandlerType.APT_RESOURCE, handlerId, handler.partitionHandler)
         accountConfig.moveResourceChangeConfigs.push(
           create(MoveResourceChangeConfigSchema, {
@@ -199,7 +199,7 @@ export class AptosPlugin extends Plugin {
         endBlock: aptosProcessor.config.endVersion
       })
       for (const handler of aptosProcessor.resourceIntervalHandlers) {
-        const handlerId = this.handlerRegister.register(handler.handler, chainId, handler.handlerName)
+        const handlerId = this.handlerRegister.register(handler.handler, chainId)
         this.partitionManager.registerPartitionHandler(HandlerType.APT_RESOURCE, handlerId, handler.partitionHandler)
         if (handler.timeIntervalInMinutes || handler.versionInterval) {
           accountConfig.moveIntervalConfigs.push(

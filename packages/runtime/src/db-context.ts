@@ -90,18 +90,31 @@ export abstract class AbstractStoreContext implements IStoreContext {
   // would both lose the write and desync the reused processor stream).
   protected closed = false
   /**
-   * Which handler this process is running, e.g.
-   * "TermMaxVaultProcessorTemplate.onTimeInterval (ETH_BLOCK on chain 56)". Set by the
-   * service once the binding is known, and reported with any late message: the handler
-   * frame is usually absent from a late call's stack, so without this the user cannot
-   * tell which of their handlers is at fault.
+   * Resolves to which handler this process is running and what triggered it, e.g.
+   * "18#TermMaxVault:0xe5e01b82…/interval/TermMaxVaultProcessorTemplate.onTimeInterval
+   * at block 51947524 hash 0x8d818612". Reported with any late message: the handler
+   * frame is usually absent from such a call's stack, so without this the user cannot
+   * tell which handler — or which template instance — is at fault.
+   *
+   * Deliberately a thunk. Producing it parses the binding's raw JSON, which is far too
+   * expensive to do for every binding on the happy path when it is needed almost never.
    */
-  protected handlerDescription?: string
+  protected describeSource?: () => string
 
   constructor(readonly processId: number) {}
 
-  describeHandler(description: string) {
-    this.handlerDescription = description
+  /** Record how to describe this process's binding, resolved only if it is reported. */
+  describeHandler(describe: () => string) {
+    this.describeSource = describe
+  }
+
+  private sourceDescription(): string | undefined {
+    try {
+      return this.describeSource?.()
+    } catch {
+      // a bad label must never displace the error being reported
+      return undefined
+    }
   }
 
   newPromise<T>(opId: bigint, requestType?: RequestType) {
@@ -341,7 +354,8 @@ export abstract class AbstractStoreContext implements IStoreContext {
    * reads is their own code rather than two frames of ours.
    */
   protected reportLateMessage(what: string, boundary?: (...args: never[]) => unknown): Error {
-    const where = this.handlerDescription ? ` in ${this.handlerDescription}` : ''
+    const source = this.sourceDescription()
+    const where = source ? ` in ${source}` : ''
     const summary =
       `[sentio] ${what}${where} was issued after process ${this.processId} had already finished, ` +
       `so it was dropped. Something in the handler was still running after the handler returned — every ` +
