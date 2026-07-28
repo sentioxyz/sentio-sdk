@@ -144,14 +144,16 @@ export class PluginManager {
    * are always spelled out as the fallback identification.
    */
   describeBinding(request: DataBinding): string {
-    const handlers = request.handlerIds.map((id) => {
-      let label: string | undefined
+    const handlers = request.handlerIds.flatMap((id) => {
+      let labels: string[] = []
       try {
-        label = this.handlerDescriptors.get(request.chainId, id)
+        labels = this.handlerDescriptors.get(request.chainId, id)
       } catch {
         // fall through to the bare id
       }
-      return label ?? `handlerId ${id}`
+      // Report every candidate: an id is only unique per processor, so one id can
+      // legitimately name several handlers, and naming just one would blame the wrong.
+      return labels.length ? labels : [`handlerId ${id}`]
     })
     const type = HandlerType[request.handlerType] ?? request.handlerType
     const who = handlers.length ? handlers.join(', ') : 'no handler id'

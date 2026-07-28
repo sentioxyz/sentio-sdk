@@ -100,6 +100,53 @@ describe('PluginManager.describeBinding', () => {
     assert.match(desc, /0#MyProgram:Prog111\/interval\/onSlotInterval/)
   })
 
+  // A handler id is unique per processor, not per chain: Solana assigns interval ids
+  // from blockHandlers.entries(), so every program restarts at 0 and dispatch runs that
+  // id in each one. Overwriting would blame one program for the other's late work.
+  test('reports every candidate when an id is reused across processors', () => {
+    const manager = new PluginManager()
+    manager.handlerDescriptors.build(
+      create(ProcessConfigResponseSchema, {
+        contractConfigs: [
+          create(ContractConfigSchema, {
+            contract: { chainId: 'sol_mainnet', name: 'ProgramA', address: 'AAA111' },
+            intervalConfigs: [{ handlerId: 0, handlerName: 'onSlotInterval' }]
+          }),
+          create(ContractConfigSchema, {
+            contract: { chainId: 'sol_mainnet', name: 'ProgramB', address: 'BBB222' },
+            intervalConfigs: [{ handlerId: 0, handlerName: 'onSlotInterval' }]
+          })
+        ]
+      })
+    )
+    const desc = manager.describeBinding(
+      create(DataBindingSchema, { handlerIds: [0], handlerType: HandlerType.SOL_BLOCK, chainId: 'sol_mainnet' })
+    )
+    assert.match(desc, /ProgramA:AAA111/, 'the first program must not be overwritten')
+    assert.match(desc, /ProgramB:BBB222/, 'the second must be reported too')
+  })
+
+  // ETH account processors and the Move resource/object/address handlers report through
+  // accountConfigs, not contractConfigs.
+  test('ingests accountConfigs as well', () => {
+    const manager = new PluginManager()
+    manager.handlerDescriptors.build(
+      create(ProcessConfigResponseSchema, {
+        accountConfigs: [
+          {
+            chainId: '1',
+            address: '0xacc0untaddre55',
+            intervalConfigs: [{ handlerId: 3, handlerName: 'MyAccountProcessor.onTimeInterval' }]
+          }
+        ]
+      })
+    )
+    const desc = manager.describeBinding(
+      create(DataBindingSchema, { handlerIds: [3], handlerType: HandlerType.ETH_BLOCK, chainId: '1' })
+    )
+    assert.match(desc, /3#0xacc0untaddre55\/interval\/MyAccountProcessor\.onTimeInterval/)
+  })
+
   test('a malformed payload does not break the description', () => {
     const desc = managerWithConfig().describeBinding(binding([18], 'not json'))
     assert.match(desc, /TermMaxVaultProcessorTemplate\.onTimeInterval/, 'handler label must survive')
