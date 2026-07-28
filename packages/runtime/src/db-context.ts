@@ -36,9 +36,18 @@ type ProcessStreamResponseV3Init = MessageInitShape<typeof ProcessStreamResponse
 type Request = NonNullable<MessageInitShape<typeof DBRequestSchema>['op']>
 type RequestType = NonNullable<Request['case']>
 
-// Frames beyond the first handful are runtime and Node internals; the caller's own
-// code is at the top because captureStackTrace trims ours off.
-const MAX_REPORTED_FRAMES = 12
+// Both ends of a stack carry the useful information, so a deep one is trimmed in the
+// middle rather than at the tail: the top frames are where the late call was actually
+// made (runtime frames are already trimmed off by captureStackTrace), and the bottom
+// ones are the entry point that led there — which is the closest thing to naming the
+// handler that the stack can offer, on the occasions it has not been lost.
+const MAX_HEAD_FRAMES = 8
+const MAX_TAIL_FRAMES = 4
+
+// V8 keeps only the innermost `Error.stackTraceLimit` frames — 10 by default — so on a
+// deep stack the entry point is discarded before we ever see it. Raised just for this
+// capture, since keeping both ends is the entire point, and restored immediately after.
+const STACK_CAPTURE_DEPTH = 50
 
 export const timeoutError = new Error('timeout')
 
@@ -60,6 +69,34 @@ function describeRequest(request: Request): string {
       // The oneof can be unset, in which case `case` is undefined.
       return request.case ?? 'op'
   }
+}
+
+/**
+ * Keep both ends of a stack, dropping the middle when it is too long to inline.
+ *
+ * A diagnostic must not grow with the depth of what it describes, but truncating from one
+ * end throws away half of what makes it useful: the top frames are where the late call was
+ * made, the bottom ones the entry point that led there.
+ *
+ * Node's own internals are dropped first so the budget goes to frames the reader can act
+ * on — otherwise a deep call inside the test runner or the processor host fills the tail
+ * with `node:internal/...` and pushes the user's entry point into the omitted middle.
+ * V8-synthesised markers like `async Promise.all (index 3)` are not `node:` frames and are
+ * kept; they are often the single most informative line.
+ */
+function boundedFrames(frames: string[]): string[] {
+  const ownCode = frames.filter((frame) => !frame.includes('node:'))
+  // If everything was internal there is nothing better to show.
+  const usable = ownCode.length ? ownCode : frames
+  if (usable.length <= MAX_HEAD_FRAMES + MAX_TAIL_FRAMES) {
+    return usable
+  }
+  const omitted = usable.length - MAX_HEAD_FRAMES - MAX_TAIL_FRAMES
+  return [
+    ...usable.slice(0, MAX_HEAD_FRAMES),
+    `    ... ${omitted} frame(s) omitted ...`,
+    ...usable.slice(-MAX_TAIL_FRAMES)
+  ]
 }
 
 export interface IStoreContext {
@@ -337,13 +374,18 @@ export abstract class AbstractStoreContext implements IStoreContext {
       `immediately but does NOT cancel the others, so give each branch its own .catch() (or use ` +
       `Promise.allSettled) to keep them inside the handler.`
 
+    const previousLimit = Error.stackTraceLimit
+    Error.stackTraceLimit = Math.max(previousLimit, STACK_CAPTURE_DEPTH)
     const err = new Error(summary)
     Error.captureStackTrace?.(err, boundary ?? this.reportLateMessage)
+    // Read `stack` before restoring: the frames are captured at construction, but forcing
+    // the (lazy) formatting here keeps this independent of when anyone reads it.
+    const captured = err.stack ?? ''
+    Error.stackTraceLimit = previousLimit
 
     // Inline the frames into `message`. The datasource log view renders only the message,
     // so a stack left in `err.stack` alone is invisible to the user who has to act on it.
-    // Capped because a diagnostic must not grow with what it describes.
-    const frames = (err.stack ?? '').split('\n').slice(1, 1 + MAX_REPORTED_FRAMES)
+    const frames = boundedFrames(captured.split('\n').slice(1))
     if (frames.length) {
       err.message = `${summary}\nIssued at:\n${frames.join('\n')}`
     }
