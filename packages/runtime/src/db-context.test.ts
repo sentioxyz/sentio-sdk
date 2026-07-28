@@ -62,3 +62,71 @@ describe('DataBindingContext write/read ordering', () => {
     assert.deepEqual(ops, [], 'no emission may happen after the context is closed')
   })
 })
+
+// An operation *started* after the process finished is a different failure from a
+// buffered one escaping: the handler returned while something it never awaited was
+// still running (the classic case being a rejected Promise.all sibling). It must not
+// reach the stream, because the stream has been recycled and the driver would fail
+// whichever process owns it now with ERR200 "unexpected ProcessID".
+describe('DataBindingContext rejects messages issued after close', () => {
+  function silenceConsoleError() {
+    const original = console.error
+    const logged: unknown[] = []
+    console.error = (...args: unknown[]) => void logged.push(args[0])
+    return { logged, restore: () => void (console.error = original) }
+  }
+
+  test('a store op issued after close is dropped, rejected, and logged with a stack', async () => {
+    const subject = new Subject<any>()
+    const ops = collect(subject)
+    const ctx = new DataBindingContext(3, subject)
+    const { logged, restore } = silenceConsoleError()
+
+    ctx.close()
+    await assert.rejects(
+      () => ctx.sendRequest({ case: 'get', value: { entity: 'BinanceAlphaPriceEntity', id: '56-0xabc' } }),
+      (err: Error) => {
+        // The message must name the op, entity and id so the caller can find it,
+        // and carry a stack pointing at the late call.
+        assert.match(err.message, /get BinanceAlphaPriceEntity 56-0xabc/)
+        assert.match(err.message, /after process 3 had already finished/)
+        assert.match(err.message, /Promise\.all/)
+        assert.ok(err.stack && err.stack.includes('db-context.test'), 'stack must reach the caller')
+        return true
+      }
+    )
+    restore()
+
+    assert.deepEqual(ops, [], 'a late op must never reach the stream')
+    assert.equal(logged.length, 1, 'must log too — the caller usually swallows the rejection')
+  })
+
+  test('late upserts are rejected as well, not silently buffered', async () => {
+    const subject = new Subject<any>()
+    const ops = collect(subject)
+    const ctx = new DataBindingContext(4, subject)
+    const { restore } = silenceConsoleError()
+
+    ctx.close()
+    await assert.rejects(() => ctx.sendRequest(upsertReq('1')), /upsert E \(1 row\(s\)\)/)
+    restore()
+
+    await new Promise((r) => setTimeout(r, 20))
+    assert.deepEqual(ops, [], 'a late upsert must not be buffered into a new batch either')
+  })
+
+  test('late timeseries and template messages are dropped, not emitted', () => {
+    const subject = new Subject<any>()
+    const ops = collect(subject)
+    const ctx = new DataBindingContext(5, subject)
+    const { logged, restore } = silenceConsoleError()
+
+    ctx.close()
+    ctx.sendTimeseriesRequest([{} as any])
+    ctx.sendTemplateRequest([{} as any], false)
+    restore()
+
+    assert.deepEqual(ops, [], 'neither may reach the recycled stream')
+    assert.equal(logged.length, 2, 'both must be reported')
+  })
+})
