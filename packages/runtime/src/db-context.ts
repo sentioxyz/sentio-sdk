@@ -193,6 +193,21 @@ export abstract class AbstractStoreContext implements IStoreContext {
     this.doSend({ value: { case: 'result', value: errorResult }, processId })
   }
 
+  /**
+   * Mark the process finished. Must be called synchronously *immediately before*
+   * the final result is emitted — not from a later `.finally()`.
+   *
+   * Once the result is on the stream the driver may hand that stream to another
+   * process, so nothing may follow it. The gap between emitting the result and
+   * close() running is several microtasks wide, which is more than enough for a
+   * detached continuation to wake up and slip a request through: without this the
+   * observed outbound order is ["result", "dbRequest"], exactly what the guards
+   * exist to prevent. close() still does the teardown afterwards.
+   */
+  finish() {
+    this.closed = true
+  }
+
   close() {
     this.closed = true
     // Drop any un-flushed batch and cancel its timer so it can never emit

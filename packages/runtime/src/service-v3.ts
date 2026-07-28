@@ -181,6 +181,11 @@ export class ProcessorServiceImplV3 implements ServiceImpl<typeof ProcessorV3> {
         const otherResults = clone(ProcessResultSchema, result)
         otherResults.timeseriesResult = []
 
+        // Close the context to further messages in the same synchronous step that
+        // emits the result: after this point the stream may be recycled to another
+        // process, and waiting for the .finally() below would leave a microtask
+        // window in which a detached continuation could still append to it.
+        context.finish()
         subject.next({
           processId,
           value: {
@@ -191,6 +196,7 @@ export class ProcessorServiceImplV3 implements ServiceImpl<typeof ProcessorV3> {
       })
       .catch((e) => {
         console.error(e, e.stack)
+        context.finish() // same reasoning as the success path — error() emits a result too
         context.error(processId, e)
         process_binding_error.add(1)
       })
