@@ -147,6 +147,27 @@ describe('PluginManager.describeBinding', () => {
     assert.match(desc, /3#0xacc0untaddre55\/interval\/MyAccountProcessor\.onTimeInterval/)
   })
 
+  // The same rule the stack cap follows: a diagnostic's length must not scale with what
+  // it describes, or the thing meant to keep logs sane becomes the thing bloating them.
+  test('bounds the candidate list when many processors share an id', () => {
+    const manager = new PluginManager()
+    manager.handlerDescriptors.build(
+      create(ProcessConfigResponseSchema, {
+        contractConfigs: Array.from({ length: 20 }, (_, i) =>
+          create(ContractConfigSchema, {
+            contract: { chainId: 'sol_mainnet', name: `Program${i}`, address: `ADDR${i}` },
+            intervalConfigs: [{ handlerId: 0, handlerName: 'onSlotInterval' }]
+          })
+        )
+      })
+    )
+    const desc = manager.describeBinding(
+      create(DataBindingSchema, { handlerIds: [0], handlerType: HandlerType.SOL_BLOCK, chainId: 'sol_mainnet' })
+    )
+    assert.match(desc, /\.\.\.\+14 more/, 'the remainder must be counted, not printed')
+    assert.equal(desc.match(/Program\d+/g)?.length, 6, 'only the cap many are spelled out')
+  })
+
   test('a malformed payload does not break the description', () => {
     const desc = managerWithConfig().describeBinding(binding([18], 'not json'))
     assert.match(desc, /TermMaxVaultProcessorTemplate\.onTimeInterval/, 'handler label must survive')

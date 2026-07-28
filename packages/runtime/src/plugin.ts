@@ -19,6 +19,10 @@ import { IDataBindingContext, IStoreContext } from './db-context.js'
 import { describeBindingData, HandlerDescriptors } from './handler-descriptor.js'
 import { AsyncLocalStorage } from 'node:async_hooks'
 
+// Reporting every candidate must not mean an unbounded message: a chain can have many
+// programs sharing one handler id. Same reasoning as the stack frame cap in db-context.
+const MAX_REPORTED_HANDLERS = 6
+
 export abstract class Plugin {
   name: string
   supportedHandlers: HandlerType[] = []
@@ -162,7 +166,10 @@ export class PluginManager {
       return labels.length ? labels : [`handlerId ${id}`]
     })
     const type = HandlerType[request.handlerType] ?? request.handlerType
-    const who = handlers.length ? handlers.join(', ') : 'no handler id'
+    const elided = Math.max(0, handlers.length - MAX_REPORTED_HANDLERS)
+    const who = handlers.length
+      ? handlers.slice(0, MAX_REPORTED_HANDLERS).join(', ') + (elided ? `, ...+${elided} more` : '')
+      : 'no handler id'
     const trigger = describeBindingData(request)
     const where = `${who} (${type} on chain ${request.chainId})`
     return trigger ? `${where} at ${trigger}` : where

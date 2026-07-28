@@ -20,17 +20,24 @@ type HandlerList = Array<{ handlerId: number; handlerName: string }> | undefined
  * every program on a chain starts again at 0, and dispatch runs that id in each one.
  * Keeping one label per id would silently overwrite the first program's with the
  * second's and blame the wrong one — worse than reporting both candidates.
+ *
+ * Rebuilt on every configure, which is what keeps it current: handler ids are assigned
+ * during configure (each chain's registry is cleared first, so it is idempotent), and a
+ * template instance appearing at runtime forces a fresh getConfig — the driver needs
+ * the new ids itself — so the snapshot cannot lag behind the ids in use.
  */
 export class HandlerDescriptors {
   // chainId -> handlerId -> labels
-  private byChain = new Map<string, Map<number, string[]>>()
+  private byChain: Map<string, Map<number, string[]>> = new Map()
 
   /** Replace everything with labels derived from a freshly generated config. */
   build(config: ProcessConfigResponse): void {
-    this.byChain.clear()
+    // Swap in one go: clearing first would let a describeBinding racing with a
+    // getConfig see an empty map and degrade to bare ids for no reason.
+    const built = new Map<string, Map<number, string[]>>()
     for (const contractConfig of config.contractConfigs ?? []) {
       const contract = contractConfig.contract
-      this.ingest(contract?.chainId ?? '', describeSource(contract?.name, contract?.address), [
+      ingest(built, contract?.chainId ?? '', describeSource(contract?.name, contract?.address), [
         ['log', contractConfig.logConfigs],
         ['trace', contractConfig.traceConfigs],
         ['transaction', contractConfig.transactionConfig],
@@ -50,7 +57,7 @@ export class HandlerDescriptors {
     // and the Aptos/Sui/Iota resource, object and address handlers all live here, and
     // would otherwise degrade to a bare id despite the config naming them.
     for (const accountConfig of config.accountConfigs ?? []) {
-      this.ingest(accountConfig.chainId, describeSource(undefined, accountConfig.address), [
+      ingest(built, accountConfig.chainId, describeSource(undefined, accountConfig.address), [
         ['interval', accountConfig.intervalConfigs],
         ['interval', intervalsOf(accountConfig.moveIntervalConfigs)],
         ['call', accountConfig.moveCallConfigs],
@@ -58,44 +65,51 @@ export class HandlerDescriptors {
         ['log', accountConfig.logConfigs]
       ])
     }
+    this.byChain = built
   }
 
   /** Every label registered for this id, most often exactly one. */
   get(chainId: string, handlerId: number): string[] {
     return this.byChain.get(chainId)?.get(handlerId) ?? []
   }
+}
 
-  private ingest(chainId: string, source: string, groups: Array<[string, HandlerList]>): void {
-    for (const [type, list] of groups) {
-      for (const handler of list ?? []) {
-        this.add(
-          chainId,
-          handler.handlerId,
-          `${handler.handlerId}#${source}/${type}/${handler.handlerName || 'unnamed'}`
-        )
-      }
-    }
-  }
+type Built = Map<string, Map<number, string[]>>
 
-  private add(chainId: string, handlerId: number, label: string): void {
-    let forChain = this.byChain.get(chainId)
-    if (!forChain) {
-      forChain = new Map()
-      this.byChain.set(chainId, forChain)
-    }
-    const labels = forChain.get(handlerId)
-    if (!labels) {
-      forChain.set(handlerId, [label])
-    } else if (!labels.includes(label)) {
-      labels.push(label)
+function ingest(built: Built, chainId: string, source: string, groups: Array<[string, HandlerList]>): void {
+  for (const [type, list] of groups) {
+    for (const handler of list ?? []) {
+      add(
+        built,
+        chainId,
+        handler.handlerId,
+        `${handler.handlerId}#${source}/${type}/${handler.handlerName || 'unnamed'}`
+      )
     }
   }
 }
 
-/** e.g. "TermMaxMarket:0x66cc6a17f93f2dc013dfcf8627ebd1269c20fd8f", or just the address. */
+function add(built: Built, chainId: string, handlerId: number, label: string): void {
+  let forChain = built.get(chainId)
+  if (!forChain) {
+    forChain = new Map()
+    built.set(chainId, forChain)
+  }
+  const labels = forChain.get(handlerId)
+  if (!labels) {
+    forChain.set(handlerId, [label])
+  } else if (!labels.includes(label)) {
+    labels.push(label)
+  }
+}
+
+/** e.g. "TermMaxMarket:0x66cc6a17…", or just the address, or the name alone. */
 function describeSource(name: string | undefined, address: string | undefined): string {
-  const addr = address || '?'
-  return name ? `${name}:${addr}` : addr
+  if (name && address) {
+    return `${name}:${address}`
+  }
+  // Whichever one exists; "unknown" rather than a bare separator if neither does.
+  return name || address || 'unknown'
 }
 
 function intervalsOf(configs: Array<{ intervalConfig?: { handlerId: number; handlerName: string } }> | undefined) {
@@ -170,7 +184,9 @@ export function describeBindingData(binding: DataBinding): string | undefined {
       case 'suiObjectChange':
         return join([`checkpoint ${data.value.slot}`, data.value.txDigest && `tx ${data.value.txDigest}`])
 
-      // --- Fuel / Cosmos / Starknet: only an index or timestamp is carried ---
+      // --- The rest carry nothing that pins down a single occurrence: fuelTransaction
+      // and fuelBlock only hold a Struct and a timestamp, cosmosCall and starknetEvents
+      // just raw payloads. Better to say nothing than to invent a locator. ---
       case 'fuelReceipt':
         return num('receipt', data.value.receiptIndex)
       case 'fuelBlock':
@@ -205,11 +221,16 @@ function num(label: string, value: unknown): string | undefined {
   return Number.isFinite(parsed) ? `${label} ${parsed}` : undefined
 }
 
-function atBlock(raw: { number?: unknown; blockNumber?: unknown; hash?: string; blockHash?: string }): string {
+function atBlock(raw: {
+  number?: unknown
+  blockNumber?: unknown
+  hash?: string
+  blockHash?: string
+}): string | undefined {
   const number = num('block', raw.number ?? raw.blockNumber)
   const hash = raw.hash ?? raw.blockHash
   // Short hash prefix, matching how the driver renders a block summary.
-  return join([number, hash && `hash ${String(hash).slice(0, 10)}`]) ?? ''
+  return join([number, hash && `hash ${String(hash).slice(0, 10)}`])
 }
 
 function join(parts: Array<string | undefined | false>): string | undefined {
