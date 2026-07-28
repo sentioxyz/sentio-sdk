@@ -89,33 +89,8 @@ export abstract class AbstractStoreContext implements IStoreContext {
   // against a lingering batch timer emitting after the final result (which
   // would both lose the write and desync the reused processor stream).
   protected closed = false
-  /**
-   * Resolves to which handler this process is running and what triggered it, e.g.
-   * "18#TermMaxVault:0xe5e01b82…/interval/TermMaxVaultProcessorTemplate.onTimeInterval
-   * at block 51947524 hash 0x8d818612". Reported with any late message: the handler
-   * frame is usually absent from such a call's stack, so without this the user cannot
-   * tell which handler — or which template instance — is at fault.
-   *
-   * Deliberately a thunk. Producing it parses the binding's raw JSON, which is far too
-   * expensive to do for every binding on the happy path when it is needed almost never.
-   */
-  protected describeSource?: () => string
 
   constructor(readonly processId: number) {}
-
-  /** Record how to describe this process's binding, resolved only if it is reported. */
-  describeHandler(describe: () => string) {
-    this.describeSource = describe
-  }
-
-  private sourceDescription(): string | undefined {
-    try {
-      return this.describeSource?.()
-    } catch {
-      // a bad label must never displace the error being reported
-      return undefined
-    }
-  }
 
   newPromise<T>(opId: bigint, requestType?: RequestType) {
     return new Promise<T>((resolve, reject) => {
@@ -354,23 +329,20 @@ export abstract class AbstractStoreContext implements IStoreContext {
    * reads is their own code rather than two frames of ours.
    */
   protected reportLateMessage(what: string, boundary?: (...args: never[]) => unknown): Error {
-    const source = this.sourceDescription()
-    const where = source ? ` in ${source}` : ''
     const summary =
-      `[sentio] ${what}${where} was issued after process ${this.processId} had already finished, ` +
-      `so it was dropped. Something in the handler was still running after the handler returned — every ` +
-      `store write, store read and metric must be awaited before the handler completes. A common cause is ` +
-      `one Promise.all() branch rejecting while its siblings keep running: Promise.all rejects immediately ` +
-      `but does NOT cancel the others, so give each branch its own .catch() (or use Promise.allSettled) ` +
-      `to keep them inside the handler.`
+      `[sentio] ${what} was issued after process ${this.processId} had already finished, so it was ` +
+      `dropped. Something in the handler was still running after the handler returned — every store ` +
+      `write, store read and metric must be awaited before the handler completes. A common cause is ` +
+      `one Promise.all() branch rejecting while its siblings keep running: Promise.all rejects ` +
+      `immediately but does NOT cancel the others, so give each branch its own .catch() (or use ` +
+      `Promise.allSettled) to keep them inside the handler.`
 
     const err = new Error(summary)
     Error.captureStackTrace?.(err, boundary ?? this.reportLateMessage)
 
-    // Inline the frames into `message`. The datasource log view renders only the
-    // message, so a stack left in `err.stack` alone is invisible to the user who has
-    // to act on it. Capped because the frames past the first few are runtime and Node
-    // internals.
+    // Inline the frames into `message`. The datasource log view renders only the message,
+    // so a stack left in `err.stack` alone is invisible to the user who has to act on it.
+    // Capped because a diagnostic must not grow with what it describes.
     const frames = (err.stack ?? '').split('\n').slice(1, 1 + MAX_REPORTED_FRAMES)
     if (frames.length) {
       err.message = `${summary}\nIssued at:\n${frames.join('\n')}`

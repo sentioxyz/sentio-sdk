@@ -16,12 +16,7 @@ import {
 } from '@sentio/protos'
 import { create } from '@bufbuild/protobuf'
 import { IDataBindingContext, IStoreContext } from './db-context.js'
-import { describeBindingData, HandlerDescriptors } from './handler-descriptor.js'
 import { AsyncLocalStorage } from 'node:async_hooks'
-
-// Reporting every candidate must not mean an unbounded message: a chain can have many
-// programs sharing one handler id. Same reasoning as the stack frame cap in db-context.
-const MAX_REPORTED_HANDLERS = 6
 
 export abstract class Plugin {
   name: string
@@ -74,8 +69,6 @@ export class PluginManager {
   dbContextLocalStorage = new AsyncLocalStorage<IDataBindingContext | IStoreContext | undefined>()
   plugins: Plugin[] = []
   typesToPlugin = new Map<HandlerType, Plugin>()
-  /** Handler labels, refreshed from every config we generate. See describeBinding. */
-  readonly handlerDescriptors = new HandlerDescriptors()
 
   register(plugin: Plugin) {
     if (this.plugins.find((p) => p.name === plugin.name)) {
@@ -96,9 +89,6 @@ export class PluginManager {
     for (const plugin of this.plugins) {
       await plugin.configure(config)
     }
-    // The finished config is the only place that ties a handler id to its contract
-    // address and name, so keep the derived labels in step with it.
-    this.handlerDescriptors.build(config)
   }
 
   start(start: StartRequest, actionServerPort?: number) {
@@ -133,46 +123,6 @@ export class PluginManager {
       throw new Error(`No plugin for ${request.handlerType}`)
     }
     return plugin.partition(request)
-  }
-
-  /**
-   * One-line identification of what a binding is processing, for diagnostics: the
-   * driver-style handler labels (contract address included, so template instances are
-   * distinguishable) plus what actually triggered this run. Never throws — callers are
-   * error paths, where masking the original error would be worse than a vague label.
-   *
-   * Every handler id gets an entry, even ones with no label: a report that silently
-   * omits a candidate handler is worse than one that says "handlerId 99" for the id it
-   * cannot name. The handler type and chain are always spelled out, so a binding with
-   * nothing resolvable is still identified.
-   *
-   * Naming the handler is best-effort by design. Solana instructions are the known gap:
-   * the concrete handler is chosen during dispatch from the decoded instruction, and
-   * InstructionHandlerConfig carries no id or name, so the config cannot name it. That
-   * would take the solana plugin recording its choice on the context — deliberately not
-   * done, since the binding already yields the slot and program account, which narrows
-   * it far enough not to be worth that plumbing.
-   */
-  describeBinding(request: DataBinding): string {
-    const handlers = request.handlerIds.flatMap((id) => {
-      let labels: string[] = []
-      try {
-        labels = this.handlerDescriptors.get(request.chainId, id)
-      } catch {
-        // fall through to the bare id
-      }
-      // Report every candidate: an id is only unique per processor, so one id can
-      // legitimately name several handlers, and naming just one would blame the wrong.
-      return labels.length ? labels : [`handlerId ${id}`]
-    })
-    const type = HandlerType[request.handlerType] ?? request.handlerType
-    const elided = Math.max(0, handlers.length - MAX_REPORTED_HANDLERS)
-    const who = handlers.length
-      ? handlers.slice(0, MAX_REPORTED_HANDLERS).join(', ') + (elided ? `, ...+${elided} more` : '')
-      : 'no handler id'
-    const trigger = describeBindingData(request)
-    const where = `${who} (${type} on chain ${request.chainId})`
-    return trigger ? `${where} at ${trigger}` : where
   }
 
   preprocessBinding(
