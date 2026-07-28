@@ -37,8 +37,8 @@ describe('PluginManager.describeBinding', () => {
 
   test('labels a handler with its contract, type and name', () => {
     const desc = managerWithConfig().describeBinding(binding([18]))
-    assert.match(desc, /18#TermMaxVault:0xe5e01b82904a49ce5a670c1b7488c3f29433088a/)
-    assert.match(desc, /\/interval\/TermMaxVaultProcessorTemplate\.onTimeInterval/)
+    assert.match(desc, /0#Contract:0xe5e01b82904a49ce5a670c1b7488c3f29433088a/)
+    assert.match(desc, /\/interval\/TermMaxVaultProcessorTemplate\.onTimeInterval\/18$|\/18 /)
   })
 
   test('distinguishes two template instances sharing a handler name', () => {
@@ -97,7 +97,7 @@ describe('PluginManager.describeBinding', () => {
     const desc = manager.describeBinding(
       create(DataBindingSchema, { handlerIds: [0], handlerType: HandlerType.SOL_BLOCK, chainId: 'sol_mainnet' })
     )
-    assert.match(desc, /0#MyProgram:Prog111\/interval\/onSlotInterval/)
+    assert.match(desc, /0#Contract:Prog111\/interval\/onSlotInterval\/0/)
   })
 
   // A handler id is unique per processor, not per chain: Solana assigns interval ids
@@ -122,8 +122,8 @@ describe('PluginManager.describeBinding', () => {
     const desc = manager.describeBinding(
       create(DataBindingSchema, { handlerIds: [0], handlerType: HandlerType.SOL_BLOCK, chainId: 'sol_mainnet' })
     )
-    assert.match(desc, /ProgramA:AAA111/, 'the first program must not be overwritten')
-    assert.match(desc, /ProgramB:BBB222/, 'the second must be reported too')
+    assert.match(desc, /0#Contract:AAA111/, 'the first program must not be overwritten')
+    assert.match(desc, /1#Contract:BBB222/, 'the second must be reported too')
   })
 
   // ETH account processors and the Move resource/object/address handlers report through
@@ -144,7 +144,7 @@ describe('PluginManager.describeBinding', () => {
     const desc = manager.describeBinding(
       create(DataBindingSchema, { handlerIds: [3], handlerType: HandlerType.ETH_BLOCK, chainId: '1' })
     )
-    assert.match(desc, /3#0xacc0untaddre55\/interval\/MyAccountProcessor\.onTimeInterval/)
+    assert.match(desc, /0#Account:0xacc0untaddre55\/interval\/MyAccountProcessor\.onTimeInterval\/3/)
   })
 
   // The same rule the stack cap follows: a diagnostic's length must not scale with what
@@ -165,7 +165,7 @@ describe('PluginManager.describeBinding', () => {
       create(DataBindingSchema, { handlerIds: [0], handlerType: HandlerType.SOL_BLOCK, chainId: 'sol_mainnet' })
     )
     assert.match(desc, /\.\.\.\+14 more/, 'the remainder must be counted, not printed')
-    assert.equal(desc.match(/Program\d+/g)?.length, 6, 'only the cap many are spelled out')
+    assert.equal(desc.match(/Contract:ADDR\d+/g)?.length, 6, 'only the cap many are spelled out')
   })
 
   test('a malformed payload does not break the description', () => {

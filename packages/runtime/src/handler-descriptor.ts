@@ -5,21 +5,26 @@ type HandlerList = Array<{ handlerId: number; handlerName: string }> | undefined
 /**
  * Maps a handler id back to readable labels, for diagnostics.
  *
- * Built from the config the processor itself reports — which is the same data the
- * driver uses to label handlers (`controller.HandlerID`, rendered as
- * `<id>#<dataSource>/<type>/<name>`). Deriving ours from that one source means the
- * label in an SDK error matches what the user already sees in driver logs and the
- * datasource UI, instead of being a second, subtly different naming scheme.
+ * Built from the config the processor itself reports — the same data the driver uses
+ * to label handlers — and rendered in the driver's own shape
+ * (`controller.HandlerID.String()`: `<dataSourceID>#<dataSource>/<type>/<name>/<id>`,
+ * where dataSourceID is the config's index and dataSource is `<Contract|Account>:<address>`).
+ * Matching it means the label in an SDK error is the same string the user already sees
+ * in driver logs and the datasource UI. The driver additionally prefixes dataSource
+ * with `<chainType>:<chainId>:`, which the sdk side does not know — the chain is
+ * reported separately by describeBinding.
  *
  * The contract address matters as much as the handler name: with processor templates
  * the same handler is bound once per instance, so the name alone cannot say *which*
  * instance misbehaved.
  *
- * A handler id maps to a *list* of labels, because it is only unique per processor,
- * not per chain: Solana assigns its interval ids from `blockHandlers.entries()`, so
- * every program on a chain starts again at 0, and dispatch runs that id in each one.
- * Keeping one label per id would silently overwrite the first program's with the
- * second's and blame the wrong one — worse than reporting both candidates.
+ * A handler id maps to a *list* of labels, because it is only unique per config, not
+ * per chain: ids restart at 0 for each one. Solana is where this bites — interval
+ * handlers must be declared without an address (the driver rejects an address with an
+ * interval config), so several of them share a chain with nothing but the config index
+ * to tell them apart. Keeping one label per id would silently overwrite the first with
+ * the second and blame the wrong handler; the index is part of the label precisely so
+ * they stay distinguishable.
  *
  * Rebuilt on every configure, which is what keeps it current: handler ids are assigned
  * during configure (each chain's registry is cleared first, so it is idempotent), and a
@@ -35,9 +40,11 @@ export class HandlerDescriptors {
     // Swap in one go: clearing first would let a describeBinding racing with a
     // getConfig see an empty map and degrade to bare ids for no reason.
     const built = new Map<string, Map<number, string[]>>()
-    for (const contractConfig of config.contractConfigs ?? []) {
+    // dataSourceID is the config's index, numbered independently per collection —
+    // exactly how the driver does it, with Contract/Account keeping the two apart.
+    for (const [dataSourceID, contractConfig] of (config.contractConfigs ?? []).entries()) {
       const contract = contractConfig.contract
-      ingest(built, contract?.chainId ?? '', describeSource(contract?.name, contract?.address), [
+      ingest(built, contract?.chainId ?? '', dataSourceID, describeSource('Contract', contract?.address), [
         ['log', contractConfig.logConfigs],
         ['trace', contractConfig.traceConfigs],
         ['transaction', contractConfig.transactionConfig],
@@ -56,8 +63,8 @@ export class HandlerDescriptors {
     // Account processors report through a separate collection: ETH account handlers
     // and the Aptos/Sui/Iota resource, object and address handlers all live here, and
     // would otherwise degrade to a bare id despite the config naming them.
-    for (const accountConfig of config.accountConfigs ?? []) {
-      ingest(built, accountConfig.chainId, describeSource(undefined, accountConfig.address), [
+    for (const [dataSourceID, accountConfig] of (config.accountConfigs ?? []).entries()) {
+      ingest(built, accountConfig.chainId, dataSourceID, describeSource('Account', accountConfig.address), [
         ['interval', accountConfig.intervalConfigs],
         ['interval', intervalsOf(accountConfig.moveIntervalConfigs)],
         ['call', accountConfig.moveCallConfigs],
@@ -76,15 +83,17 @@ export class HandlerDescriptors {
 
 type Built = Map<string, Map<number, string[]>>
 
-function ingest(built: Built, chainId: string, source: string, groups: Array<[string, HandlerList]>): void {
+function ingest(
+  built: Built,
+  chainId: string,
+  dataSourceID: number,
+  source: string,
+  groups: Array<[string, HandlerList]>
+): void {
   for (const [type, list] of groups) {
     for (const handler of list ?? []) {
-      add(
-        built,
-        chainId,
-        handler.handlerId,
-        `${handler.handlerId}#${source}/${type}/${handler.handlerName || 'unnamed'}`
-      )
+      const label = `${dataSourceID}#${source}/${type}/${handler.handlerName}/${handler.handlerId}`
+      add(built, chainId, handler.handlerId, label)
     }
   }
 }
@@ -103,13 +112,14 @@ function add(built: Built, chainId: string, handlerId: number, label: string): v
   }
 }
 
-/** e.g. "TermMaxMarket:0x66cc6a17…", or just the address, or the name alone. */
-function describeSource(name: string | undefined, address: string | undefined): string {
-  if (name && address) {
-    return `${name}:${address}`
-  }
-  // Whichever one exists; "unknown" rather than a bare separator if neither does.
-  return name || address || 'unknown'
+/**
+ * The driver's dataSource tail: "Contract:0x66cc6a17…", or bare "Contract" when there
+ * is no address — which `BuildDataSource` also omits, and which is the normal case for
+ * an interval handler.
+ */
+function describeSource(srcType: 'Contract' | 'Account', address: string | undefined): string {
+  const adjusted = address && address !== '*' ? address : ''
+  return adjusted ? `${srcType}:${adjusted}` : srcType
 }
 
 function intervalsOf(configs: Array<{ intervalConfig?: { handlerId: number; handlerName: string } }> | undefined) {
