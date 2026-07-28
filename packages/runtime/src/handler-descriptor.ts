@@ -138,7 +138,8 @@ export function describeBindingData(binding: DataBinding): string | undefined {
         return join([atBlock(trace), tx(trace.transactionHash)])
       }
 
-      // --- Solana: slot, plus which program for an instruction ---
+      // --- Solana: slot, plus which program for an instruction. The program stands in
+      // for the handler name here, which the config cannot supply (see describeBinding). ---
       case 'solInstruction':
         return join([
           `slot ${data.value.slot}`,

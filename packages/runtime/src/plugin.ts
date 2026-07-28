@@ -139,9 +139,15 @@ export class PluginManager {
    *
    * Every handler id gets an entry, even ones with no label: a report that silently
    * omits a candidate handler is worse than one that says "handlerId 99" for the id it
-   * cannot name. Bindings dispatched without per-handler config — Solana instructions,
-   * for one — legitimately have no name to resolve, hence the handler type and chain
-   * are always spelled out as the fallback identification.
+   * cannot name. The handler type and chain are always spelled out, so a binding with
+   * nothing resolvable is still identified.
+   *
+   * Naming the handler is best-effort by design. Solana instructions are the known gap:
+   * the concrete handler is chosen during dispatch from the decoded instruction, and
+   * InstructionHandlerConfig carries no id or name, so the config cannot name it. That
+   * would take the solana plugin recording its choice on the context — deliberately not
+   * done, since the binding already yields the slot and program account, which narrows
+   * it far enough not to be worth that plumbing.
    */
   describeBinding(request: DataBinding): string {
     const handlers = request.handlerIds.flatMap((id) => {
