@@ -91,7 +91,10 @@ describe('DataBindingContext rejects messages issued after close', () => {
         assert.match(err.message, /get BinanceAlphaPriceEntity 56-0xabc/)
         assert.match(err.message, /after process 3 had already finished/)
         assert.match(err.message, /Promise\.all/)
-        assert.ok(err.stack && err.stack.includes('db-context.test'), 'stack must reach the caller')
+        // The frames must be in `message`: the datasource log view renders only that
+        // field, so a stack left on err.stack alone never reaches the user.
+        assert.match(err.message, /Issued at:/)
+        assert.ok(err.message.includes('db-context.test'), 'the inlined stack must reach the caller')
         return true
       }
     )
@@ -99,6 +102,42 @@ describe('DataBindingContext rejects messages issued after close', () => {
 
     assert.deepEqual(ops, [], 'a late op must never reach the stream')
     assert.equal(logged.length, 1, 'must log too — the caller usually swallows the rejection')
+  })
+
+  // A deep stack is trimmed in the middle, never at an end: the top frames are where the
+  // late call was made, the bottom ones the entry point that led there.
+  test('a deep stack keeps both ends and omits the middle', async () => {
+    const subject = new Subject<any>()
+    const ctx = new DataBindingContext(6, subject)
+    const { restore } = silenceConsoleError()
+    ctx.close()
+
+    // Recurse to guarantee more frames than the head+tail budget.
+    const deep = async (n: number): Promise<unknown> =>
+      n === 0 ? ctx.sendRequest({ case: 'get', value: { entity: 'E', id: '1' } }) : deep(n - 1)
+    const err = await deep(40).then(
+      () => undefined,
+      (e: Error) => e
+    )
+    restore()
+
+    const message = err!.message
+    assert.match(message, /frame\(s\) omitted/, 'the middle must be summarised')
+    const frames = message.slice(message.indexOf('Issued at:')).split('\n').slice(1)
+    // 8 head + the omission marker + 4 tail.
+    assert.equal(frames.length, 13, `unexpected frame layout:\n${frames.join('\n')}`)
+    assert.ok(frames[0].includes('db-context.test'), 'the innermost frame must survive')
+    // The omission belongs in the middle: a marker at either end would mean that side was
+    // truncated away instead.
+    assert.ok(!frames[frames.length - 1].includes('omitted'), 'the outer end must be kept, not cut')
+    assert.match(frames[frames.length - 1], /^\s+at /, 'and it must be a real frame')
+    // Node internals are dropped first so the budget goes to frames the reader can act on.
+    // V8 markers like "async Promise.all (index 0)" are not node: frames and are kept —
+    // they are often the single most informative line.
+    assert.ok(
+      !frames.some((frame) => frame.includes('node:')),
+      `node internals must not take up the budget:\n${frames.join('\n')}`
+    )
   })
 
   test('late upserts are rejected as well, not silently buffered', async () => {
