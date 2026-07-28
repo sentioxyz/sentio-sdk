@@ -53,7 +53,8 @@ function describeRequest(request: Request): string {
       return `${request.case} ${entities} (${request.value.id?.length ?? 0} row(s))`
     }
     default:
-      return request.case
+      // The oneof can be unset, in which case `case` is undefined.
+      return request.case ?? 'op'
   }
 }
 
