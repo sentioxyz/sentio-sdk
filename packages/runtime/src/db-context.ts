@@ -38,6 +38,25 @@ type RequestType = NonNullable<Request['case']>
 
 export const timeoutError = new Error('timeout')
 
+// Name the entity and id, not just the op kind: "get BinanceAlphaPriceEntity 56-0x…"
+// usually points straight at the call site, while a bare "get" rarely does.
+function describeRequest(request: Request): string {
+  switch (request.case) {
+    case 'get':
+      return `get ${request.value.entity} ${request.value.id}`
+    case 'list':
+      return `list ${request.value.entity}`
+    case 'upsert':
+    case 'update':
+    case 'delete': {
+      const entities = [...new Set(request.value.entity ?? [])].join(',')
+      return `${request.case} ${entities} (${request.value.id?.length ?? 0} row(s))`
+    }
+    default:
+      return request.case
+  }
+}
+
 export interface IStoreContext {
   sendRequest(request: Request, timeoutSecs?: number): Promise<DBResponse>
 
@@ -64,7 +83,7 @@ export abstract class AbstractStoreContext implements IStoreContext {
   // Set once the process has finished and the context was closed. Guards
   // against a lingering batch timer emitting after the final result (which
   // would both lose the write and desync the reused processor stream).
-  private closed = false
+  protected closed = false
 
   constructor(readonly processId: number) {}
 
@@ -78,6 +97,10 @@ export abstract class AbstractStoreContext implements IStoreContext {
   abstract doSend(resp: ProcessStreamResponseInit | ProcessStreamResponseV3Init): void
 
   sendRequest(request: Request, timeoutSecs?: number): Promise<DBResponse> {
+    if (this.closed) {
+      return Promise.reject(this.reportLateMessage(`store ${describeRequest(request)}`, this.sendRequest))
+    }
+
     if (STORE_BATCH_IDLE > 0 && STORE_BATCH_SIZE > 1 && request.case === 'upsert') {
       // batch upsert if possible
       return this.sendUpsertInBatch(request.value as DBRequest_DBUpsert)
@@ -266,6 +289,39 @@ export abstract class AbstractStoreContext implements IStoreContext {
     }
   }
 
+  /**
+   * Report a message the process tried to emit after it had already finished, and
+   * return the Error describing it.
+   *
+   * Such a message cannot be delivered: the final result was already sent, and the
+   * stream it would go out on has been handed back to the pool and may now belong to
+   * another process — writing to it makes the driver fail *that* process with ERR200
+   * "unexpected ProcessID". Dropping it is the only safe option.
+   *
+   * This always logs rather than relying solely on the rejection, because the late
+   * call is nearly always on a path that already swallows errors — the classic case
+   * being one `Promise.all` branch rejecting while its siblings keep running — so the
+   * rejection alone would be invisible. The Error is built here, at the call site, so
+   * its stack points into the handler code that failed to await.
+   *
+   * `boundary` is the runtime entry point the caller came through; its frame and
+   * everything below it is trimmed from the stack so the very first line the user
+   * reads is their own code rather than two frames of ours.
+   */
+  protected reportLateMessage(what: string, boundary?: (...args: never[]) => unknown): Error {
+    const err = new Error(
+      `[sentio] ${what} was issued after process ${this.processId} had already finished, so it was dropped. ` +
+        `Something in the handler was still running after the handler returned — every store write, ` +
+        `store read and metric must be awaited before the handler completes. A common cause is one ` +
+        `Promise.all() branch rejecting while its siblings keep running: Promise.all rejects immediately ` +
+        `but does NOT cancel the others, so give each branch its own .catch() (or use Promise.allSettled) ` +
+        `to keep them inside the handler. The stack below points at the call that arrived too late.`
+    )
+    Error.captureStackTrace?.(err, boundary ?? this.reportLateMessage)
+    console.error(err)
+    return err
+  }
+
   async awaitPendings() {
     // Flush any buffered upsert batch and wait for its ack before returning.
     // Callers use this to guarantee every write has been sent AND applied by
@@ -308,6 +364,13 @@ export class DataBindingContext extends AbstractStoreContext implements IDataBin
   }
 
   sendTemplateRequest(templates: Array<TemplateInstance>, unbind: boolean) {
+    if (this.closed) {
+      this.reportLateMessage(
+        `${unbind ? 'unbind' : 'bind'} of ${templates.length} template instance(s)`,
+        this.sendTemplateRequest
+      )
+      return
+    }
     this.subject.next({
       processId: this.processId,
       value: {
@@ -320,6 +383,10 @@ export class DataBindingContext extends AbstractStoreContext implements IDataBin
     })
   }
   sendTimeseriesRequest(timeseries: Array<TimeseriesResult>) {
+    if (this.closed) {
+      this.reportLateMessage(`${timeseries.length} timeseries record(s)`, this.sendTimeseriesRequest)
+      return
+    }
     this.subject.next({
       processId: this.processId,
       value: {
