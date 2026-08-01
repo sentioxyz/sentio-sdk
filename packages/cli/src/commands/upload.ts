@@ -85,17 +85,14 @@ export function createUploadCommand() {
     .option('--token <token>', '(Optional) Manually provide token rather than use saved credential')
     .option('--host <host>', '(Optional) Override Sentio Host name')
     .option('--num-workers <count>', '(Optional) Number of processor workers to start', myParseInt)
-    .option(
-      '--sentio-network <network>',
-      '(Optional) Sentio network to connect to, can be testnet or mainnet'
-    )
+    .option('--sentio-network <network>', '(Optional) Sentio network to connect to, can be testnet, devnet2 or mainnet')
     .option(
       '--required-chain-id <chain_id...>',
       '(Optional) Specify chain IDs required for the Sentio network. This option is only available when --sentio-network is used. If omitted, all chain IDs from the project configuration (contracts or network overrides) will be used.'
     )
     .option(
       '--no-platform',
-      'Upload processor directly to Sentio Network without platform support. Requires $PRIVATE_KEY env var. Only testnet is supported.'
+      'Upload processor directly to Sentio Network without platform support. Requires $PRIVATE_KEY env var. Supported networks: testnet, devnet2.'
     )
     .option(
       '--ipfs-put-url <url>',

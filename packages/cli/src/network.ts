@@ -26,19 +26,29 @@ const TESTNET_CONFIG: SentioNetworkConfig = {
   addressBookAddress: '0xb7e9E56DFC27bcfA63698F2F5890e186426A0123'
 }
 
+// Sentio Network devnet2 — chain id 7892301. Separate chain from testnet, but
+// the contracts are deployed deterministically, so every module proxy (and the
+// AddressBook itself) sits at the same address as on testnet. The one exception
+// is `sentio_token`, which on devnet2 is the WETH9 predeploy — resolved through
+// the AddressBook like everything else, so nothing here needs to know.
+const DEVNET2_CONFIG: SentioNetworkConfig = {
+  chainId: 7892301,
+  rpcUrl: 'https://sentio-devnet2.test-rpc.sentio.xyz',
+  explorerUrl: 'https://devnet2-explorer.sentio.xyz',
+  addressBookAddress: '0xb7e9E56DFC27bcfA63698F2F5890e186426A0123'
+}
+
 export function getSentioNetworkConfig(network: string, addressBookOverride?: string): SentioNetworkConfig {
   let config: SentioNetworkConfig
   if (network === 'testnet' || network === 'testnet-v2' || network === '7892102') {
     config = TESTNET_CONFIG
+  } else if (network === 'devnet2' || network === 'devnet-v2' || network === '7892301') {
+    config = DEVNET2_CONFIG
   } else if (network === 'mainnet' || network === '789210') {
-    console.error(
-      chalk.red('Sentio Network mainnet is not yet supported. Only testnet is available.')
-    )
+    console.error(chalk.red('Sentio Network mainnet is not yet supported. Only testnet and devnet2 are available.'))
     process.exit(1)
   } else {
-    console.error(
-      chalk.red(`Invalid sentio network: ${network}. Only "testnet" is supported.`)
-    )
+    console.error(chalk.red(`Invalid sentio network: ${network}. Only "testnet" and "devnet2" are supported.`))
     process.exit(1)
   }
 
