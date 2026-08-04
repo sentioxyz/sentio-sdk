@@ -116,6 +116,7 @@ export function overrideConfigWithOptions(config: YamlProjectConfig, options: an
       case 'testnet-v2':
         config.sentioNetwork = '7892102'
         break
+      case 'devnet':
       case 'devnet2':
       case 'devnet-v2':
         config.sentioNetwork = '7892301'
