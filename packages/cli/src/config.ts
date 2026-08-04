@@ -34,7 +34,7 @@ export interface YamlProjectConfig {
   silentOverwrite?: boolean
   variables?: Variable[]
   numWorkers?: number // Number of processor worker to start, default to 1
-  sentioNetwork?: string // Sentio network to connect to, can be testnet, devnet2 or mainnet
+  sentioNetwork?: string // Sentio network to connect to, can be testnet, devnet or mainnet
   requiredChainIds?: string[]
 }
 
@@ -117,8 +117,6 @@ export function overrideConfigWithOptions(config: YamlProjectConfig, options: an
         config.sentioNetwork = '7892102'
         break
       case 'devnet':
-      case 'devnet2':
-      case 'devnet-v2':
         config.sentioNetwork = '7892301'
         break
       case '7892102':
@@ -127,7 +125,7 @@ export function overrideConfigWithOptions(config: YamlProjectConfig, options: an
         config.sentioNetwork = options.sentioNetwork
         break
       default:
-        console.error(`Invalid sentio network: ${options.sentioNetwork}, only mainnet, testnet or devnet2 is allowed`)
+        console.error(`Invalid sentio network: ${options.sentioNetwork}, only mainnet, testnet or devnet is allowed`)
         process.exit(1)
     }
   }

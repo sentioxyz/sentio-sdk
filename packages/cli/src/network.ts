@@ -26,17 +26,17 @@ const TESTNET_CONFIG: SentioNetworkConfig = {
   addressBookAddress: '0xb7e9E56DFC27bcfA63698F2F5890e186426A0123'
 }
 
-// Sentio Network devnet — chain id 7892301, the network also known as devnet2.
-// The original devnet (7892201) has been decommissioned and this chain inherited
-// the canonical `sentio-devnet` slug, so the RPC host is sentio-devnet, NOT
-// sentio-devnet2 (that hostname is not routed and answers "unknown network
-// slug"). Same relationship as testnet-v2 taking over the plain testnet hosts.
+// Sentio Network devnet — chain id 7892301. This replaced the original devnet
+// (7892201), which has been decommissioned, and inherited its hosts: the RPC is
+// sentio-devnet.test-rpc.sentio.xyz and the explorer devnet-explorer.sentio.xyz.
+// `sentio-devnet2` is NOT a thing — that hostname is unrouted and answers
+// "unknown network slug". Same as testnet-v2 taking over the plain testnet hosts.
 //
 // Contracts are deployed deterministically, so every module proxy — and the
 // AddressBook itself — sits at the same address as on testnet. The one exception
 // is `sentio_token`, which here is the WETH9 predeploy; it resolves through the
 // AddressBook like everything else, so nothing in this file needs to know.
-const DEVNET2_CONFIG: SentioNetworkConfig = {
+const DEVNET_CONFIG: SentioNetworkConfig = {
   chainId: 7892301,
   rpcUrl: 'https://sentio-devnet.test-rpc.sentio.xyz',
   explorerUrl: 'https://devnet-explorer.sentio.xyz',
@@ -47,13 +47,13 @@ export function getSentioNetworkConfig(network: string, addressBookOverride?: st
   let config: SentioNetworkConfig
   if (network === 'testnet' || network === 'testnet-v2' || network === '7892102') {
     config = TESTNET_CONFIG
-  } else if (network === 'devnet' || network === 'devnet2' || network === 'devnet-v2' || network === '7892301') {
-    config = DEVNET2_CONFIG
+  } else if (network === 'devnet' || network === '7892301') {
+    config = DEVNET_CONFIG
   } else if (network === 'mainnet' || network === '789210') {
-    console.error(chalk.red('Sentio Network mainnet is not yet supported. Only testnet and devnet2 are available.'))
+    console.error(chalk.red('Sentio Network mainnet is not yet supported. Only testnet and devnet are available.'))
     process.exit(1)
   } else {
-    console.error(chalk.red(`Invalid sentio network: ${network}. Only "testnet" and "devnet2" are supported.`))
+    console.error(chalk.red(`Invalid sentio network: ${network}. Only "testnet" and "devnet" are supported.`))
     process.exit(1)
   }
 
