@@ -60,6 +60,79 @@ export function getProvider(chainId?: EthChainId): JsonRpcProvider {
   return provider
 }
 
+// Default upper bound for a single RPC promise to settle, queue wait included.
+// Deliberately above any sane queue+request latency and far below "stuck forever".
+const DEFAULT_RPC_CALL_TIMEOUT_MS = 120_000
+
+// Read per call so tests (and operators) can adjust without a module reload.
+function rpcCallTimeoutMs(): number {
+  const n = Number(process.env['RPC_CALL_TIMEOUT_MS'])
+  return Number.isFinite(n) && n > 0 ? n : DEFAULT_RPC_CALL_TIMEOUT_MS
+}
+
+// Keep the diagnostic bounded: `what` may describe params with large calldata.
+const TIMEOUT_WHAT_MAX = 120
+
+function timeoutError(ms: number, what: string): Error & { code: string } {
+  const bounded = what.length > TIMEOUT_WHAT_MAX ? `${what.slice(0, TIMEOUT_WHAT_MAX)}…(${what.length} chars)` : what
+  const e = new Error(`rpc request did not settle within ${ms}ms: ${bounded}`) as Error & { code: string }
+  e.code = 'TIMEOUT'
+  return e
+}
+
+/**
+ * Run `task` on `executor` such that BOTH of these settle within the deadline:
+ *
+ * - the returned (outward) promise — a request whose transport dies without
+ *   ever settling (half-dead keep-alive connection, a rejection lost inside a
+ *   lower layer) must not hang its awaiters. For eth_call this is amplified by
+ *   the in-flight promise cache: the pending promise is cached by tag, so one
+ *   dead request would pin every later identical call, surviving even
+ *   process-level retries (the replayed block issues the same call and awaits
+ *   the same zombie promise);
+ * - the queue task itself — PQueue must always get its concurrency slot back.
+ *   Racing only the outward promise would leave the never-settling task owning
+ *   its slot forever, and after `concurrency` such zombies every later call
+ *   could only time out in the queue.
+ *
+ * A task that only starts after the deadline rejects immediately, releasing
+ * the slot without touching the transport. A task still running when its
+ * remaining budget expires is abandoned; the orphaned transport promise gets a
+ * swallow-handler so a late rejection is never unhandled.
+ *
+ * The timeout error carries code 'TIMEOUT' so the existing eth_call retry
+ * path treats it exactly like an ethers transport timeout.
+ */
+function boundedTask<T>(executor: PQueue, what: string, task: () => Promise<T>): Promise<T> {
+  const ms = rpcCallTimeoutMs()
+  const enqueued = Date.now()
+  const settled = executor.add(() => {
+    const remaining = ms - (Date.now() - enqueued)
+    if (remaining <= 0) {
+      return Promise.reject(timeoutError(ms, what))
+    }
+    const running = task()
+    let timer: NodeJS.Timeout | undefined
+    const deadline = new Promise<never>((_, reject) => {
+      timer = setTimeout(() => {
+        running.catch(() => {})
+        reject(timeoutError(ms, what))
+      }, remaining)
+      // A pending deadline must never keep the process alive on its own.
+      timer.unref?.()
+    })
+    return Promise.race([running, deadline]).finally(() => clearTimeout(timer))
+  })
+  // Bound the outward promise as well: with a saturated queue the task may not
+  // even have started by the deadline, but callers must still see settlement.
+  let timer: NodeJS.Timeout | undefined
+  const deadline = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(timeoutError(ms, what)), ms)
+    timer.unref?.()
+  })
+  return Promise.race([settled, deadline]).finally(() => clearTimeout(timer)) as Promise<T>
+}
+
 function getTag(prefix: string, value: any): string {
   return (
     prefix +
@@ -116,7 +189,7 @@ export class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
 
   async send(method: string, params: Array<any>): Promise<any> {
     if (method !== 'eth_call' || params.length > 2) {
-      return await this.executor.add(() => super.send(method, params))
+      return await boundedTask(this.executor, method, () => super.send(method, params))
     }
     const tag = getTag(method, params)
     const block = params[params.length - 1]
@@ -125,7 +198,11 @@ export class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
       miss_count.add(1)
       const handler = metricsStorage.getStore()
       const queued: number = Date.now()
-      perform = this.executor.add(() => {
+      // The bounded description (not the full tag): the tag embeds calldata.
+      const what = `eth_call to=${params[0]?.to} block=${block}`
+      // boundedTask keeps the CACHED promise settleable: the cache must never
+      // hold a promise that can stay pending forever.
+      perform = boundedTask(this.executor, what, () => {
         const started = Date.now()
         processMetrics.processor_rpc_queue_duration.record(started - queued, {
           chain_id: this._network.chainId.toString(),
