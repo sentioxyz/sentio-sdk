@@ -60,6 +60,44 @@ export function getProvider(chainId?: EthChainId): JsonRpcProvider {
   return provider
 }
 
+// Default upper bound for a single RPC promise to settle, queue wait included.
+// Deliberately above any sane queue+request latency and far below "stuck forever".
+const DEFAULT_RPC_CALL_TIMEOUT_MS = 120_000
+
+// Read per call so tests (and operators) can adjust without a module reload.
+function rpcCallTimeoutMs(): number {
+  const n = Number(process.env['RPC_CALL_TIMEOUT_MS'])
+  return Number.isFinite(n) && n > 0 ? n : DEFAULT_RPC_CALL_TIMEOUT_MS
+}
+
+/**
+ * Bound an RPC promise with a hard deadline.
+ *
+ * A request whose transport dies without ever settling (half-dead keep-alive
+ * connection, a rejection lost inside a lower layer) would otherwise hang its
+ * awaiter forever. For eth_call this is amplified by the in-flight promise
+ * cache: the pending promise is cached by tag, so one dead request pins every
+ * later identical call — surviving even process-level retries, because the
+ * replayed block issues the same call and awaits the same zombie promise.
+ *
+ * The timeout error carries code 'TIMEOUT' so the existing eth_call retry
+ * path treats it exactly like an ethers transport timeout.
+ */
+function withDeadline<T>(promise: Promise<T>, what: string): Promise<T> {
+  const ms = rpcCallTimeoutMs()
+  let timer: NodeJS.Timeout | undefined
+  const deadline = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => {
+      const e = new Error(`rpc request did not settle within ${ms}ms: ${what}`) as Error & { code: string }
+      e.code = 'TIMEOUT'
+      reject(e)
+    }, ms)
+    // A pending deadline must never keep the process alive on its own.
+    timer.unref?.()
+  })
+  return Promise.race([promise, deadline]).finally(() => clearTimeout(timer)) as Promise<T>
+}
+
 function getTag(prefix: string, value: any): string {
   return (
     prefix +
@@ -116,7 +154,10 @@ export class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
 
   async send(method: string, params: Array<any>): Promise<any> {
     if (method !== 'eth_call' || params.length > 2) {
-      return await this.executor.add(() => super.send(method, params))
+      return await withDeadline(
+        this.executor.add(() => super.send(method, params)),
+        method
+      )
     }
     const tag = getTag(method, params)
     const block = params[params.length - 1]
@@ -147,6 +188,9 @@ export class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
             })
           })
       })
+      // Bound the CACHED promise itself, not each awaiter: the cache must never
+      // hold a promise that can stay pending forever.
+      perform = withDeadline(perform as Promise<any>, tag)
 
       queue_size.record(this.executor.size)
 
