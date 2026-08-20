@@ -87,4 +87,35 @@ describe('rpc deadline', () => {
     }
     expect(err?.code).eq('TIMEOUT')
   })
+
+  test('a zombie call frees its concurrency slot (concurrency 1)', async () => {
+    process.env['RPC_CALL_TIMEOUT_MS'] = '150'
+    const provider = new HangingProvider('http://127.0.0.1:1', Network.from(1), 1, 1)
+    providers.push(provider)
+    await provider
+      .send('eth_call', [{ to: '0x0000000000000000000000000000000000000003', data: '0x' }, '0x42'])
+      .catch(() => {})
+    const sendsAfterFirst = provider.sends
+    expect(sendsAfterFirst).gte(1)
+    // A different call must still reach the transport through the single slot:
+    // the timed-out task has to settle inside PQueue, not just for its awaiters.
+    let err: any
+    await provider
+      .send('eth_call', [{ to: '0x0000000000000000000000000000000000000004', data: '0x' }, '0x42'])
+      .catch((e) => (err = e))
+    expect(err?.code).eq('TIMEOUT')
+    expect(provider.sends).gt(sendsAfterFirst)
+  })
+
+  test('the timeout message stays bounded even for huge calldata', async () => {
+    process.env['RPC_CALL_TIMEOUT_MS'] = '150'
+    const provider = newHangingProvider()
+    const hugeData = '0x' + 'ab'.repeat(200_000)
+    let err: any
+    await provider
+      .send('eth_call', [{ to: '0x0000000000000000000000000000000000000005', data: hugeData }, '0x42'])
+      .catch((e) => (err = e))
+    expect(err?.code).eq('TIMEOUT')
+    expect(err?.message?.length).lt(400)
+  })
 })
