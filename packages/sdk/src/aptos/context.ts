@@ -57,7 +57,7 @@ export abstract class AptosBaseContext extends MoveContext<AptosNetwork, MoveMod
 
 export class AptosTransactionContext<T extends GeneralTransactionResponse> extends AptosBaseContext {
   moduleName: string
-  transaction: T
+  transaction!: T
   eventIndex: number
 
   constructor(

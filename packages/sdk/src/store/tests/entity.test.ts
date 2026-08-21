@@ -33,7 +33,7 @@ enum EnumA {
 class Person extends AbstractEntity {
   @Required
   @IDColumn
-  id: ID
+  id!: ID
 
   @IntColumn
   intValue?: Int
@@ -61,7 +61,7 @@ class Person extends AbstractEntity {
 
   @Required
   @BooleanColumn
-  booleanValue: Boolean
+  booleanValue!: Boolean
 
   @ListColumn('Int')
   arrayInt?: Array<Int | undefined>
@@ -73,8 +73,8 @@ class Person extends AbstractEntity {
   enumArray?: Array<EnumA>
 
   @Many('Pet')
-  pets: Promise<Array<Pet | undefined>>
-  petsIDs: Array<ID | undefined>
+  pets!: Promise<Array<Pet | undefined>>
+  petsIDs!: Array<ID | undefined>
 
   constructor(data?: Partial<Person>) {
     super()
@@ -84,16 +84,16 @@ class Person extends AbstractEntity {
 @Entity('Pet')
 class Pet extends AbstractEntity {
   @IDColumn
-  id: ID
+  id!: ID
 
   @Required
   @One('Person')
-  owner: Promise<Person>
-  ownerID: ID
+  owner!: Promise<Person>
+  ownerID!: ID
 
   @Required
   @BooleanColumn
-  isCat: Boolean
+  isCat!: Boolean
 
   constructor(data?: Partial<Pet>) {
     super()

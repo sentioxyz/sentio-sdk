@@ -44,7 +44,7 @@ export function multiply<K extends ValueType>(value: K): UpdateOp<K> {
 
 export abstract class AbstractEntity {
   abstract id: ID
-  private readonly _data: RichStruct
+  private readonly _data!: RichStruct
 
   toJSON() {
     const obj: any = {}
