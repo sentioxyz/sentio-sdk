@@ -2,7 +2,7 @@ import { describe, test } from 'node:test'
 import assert from 'assert'
 import { Subject } from 'rxjs'
 import { create } from '@bufbuild/protobuf'
-import { RichStructSchema } from '@sentio/protos'
+import { DBResponseSchema, RichStructSchema } from '@sentio/protos'
 
 // STORE_UPSERT_NO_ACK is read when the module loads, so it is set before the
 // dynamic import. node:test runs every file in its own process, so the flag does
@@ -68,5 +68,38 @@ describe('DataBindingContext with STORE_UPSERT_NO_ACK', () => {
     assert.strictEqual(messages.length, 1, 'both upserts left in one batch')
     assert.strictEqual(messages[0].value.value.noResponse, true)
     assert.deepStrictEqual(messages[0].value.value.op.value.id, ['1', '2'])
+  })
+
+  test('an error for a no-ack upsert fails the context: later requests reject, awaitPendings rejects', async () => {
+    const subject = new Subject<any>()
+    const messages = collect(subject)
+    const ctx = new DataBindingContext(3, subject)
+
+    void ctx.sendRequest(upsertReq('1'))
+    await ctx.awaitPendings()
+    assert.strictEqual(messages.length, 1)
+    const opId = messages[0].value.value.opId
+
+    // the driver answers a no_response op only when it failed
+    ctx.result(create(DBResponseSchema, { opId, value: { case: 'error', value: 'boom' } }))
+
+    await assert.rejects(ctx.sendRequest(upsertReq('2')), /boom/)
+    await assert.rejects(ctx.sendRequest({ case: 'get', value: { entity: 'E', id: '2' } }), /boom/)
+    assert.strictEqual(messages.length, 1, 'nothing left the context after the failure')
+    await assert.rejects(ctx.awaitPendings(), /boom/, 'the process ends with an error instead of a success result')
+  })
+
+  test('an acknowledgement for a no-ack upsert (an older driver) is ignored', async () => {
+    const subject = new Subject<any>()
+    const messages = collect(subject)
+    const ctx = new DataBindingContext(4, subject)
+
+    void ctx.sendRequest(upsertReq('1'))
+    await ctx.awaitPendings()
+    ctx.result(create(DBResponseSchema, { opId: messages[0].value.value.opId }))
+
+    void ctx.sendRequest(upsertReq('2'))
+    await ctx.awaitPendings()
+    assert.strictEqual(messages.length, 2, 'the context keeps working')
   })
 })

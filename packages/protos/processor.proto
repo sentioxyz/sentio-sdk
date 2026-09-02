@@ -593,9 +593,10 @@ message DBRequest {
     DBList list = 5;
   }
   // Write ops only (upsert/update/delete): the processor does not wait for a
-  // DBResponse and the driver must not send one. Ops on a stream are applied in
-  // order, so a write is still applied before the result that follows it, and a
-  // failed write still fails the binding on the driver side.
+  // DBResponse. Ops on a stream are applied in order, so the write still lands
+  // before the result that follows it. The driver answers only a failed op, with
+  // an error DBResponse, and then fails the binding; the processor may use the
+  // answer to log the failure and stop the handler.
   bool no_response = 7;
 
   message DBGet {

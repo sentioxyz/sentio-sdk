@@ -90,4 +90,38 @@ describe('Test Service V3 with partition: eager start', () => {
     await new Promise((resolve) => setTimeout(resolve, 200))
     assert.deepStrictEqual(cases, ['partitions', 'dbRequest', 'result'], 'the late start command is ignored')
   })
+
+  test('keeps the partition handshake for an UNKNOWN binding and ignores its start command', async () => {
+    const binding = create(ProcessStreamRequestSchema, {
+      processId: 8,
+      value: {
+        case: 'binding',
+        value: { handlerIds: [0], handlerType: HandlerType.UNKNOWN, data: {}, chainId: '1' }
+      }
+    })
+    const subject = new Subject<ProcessStreamResponseV3Init>()
+    const cases: string[] = []
+    let partitions: any = undefined
+    subject.subscribe((resp: ProcessStreamResponseV3Init) => {
+      cases.push(resp.value?.case ?? 'unknown')
+      if (resp.value?.case === 'partitions') {
+        partitions = resp.value.value
+      }
+    })
+
+    await service.handleRequest(binding, undefined, subject)
+    await new Promise((resolve) => setTimeout(resolve, 50))
+    assert.deepStrictEqual(
+      cases,
+      ['partitions', 'result'],
+      'the driver reads the first message as the partition response'
+    )
+    assert.strictEqual(partitions?.started, true)
+
+    const start = create(ProcessStreamRequestSchema, { processId: 8, value: { case: 'start', value: true } })
+    const lastBinding = binding.value.case === 'binding' ? binding.value.value : undefined
+    await service.handleRequest(start, lastBinding, subject)
+    await new Promise((resolve) => setTimeout(resolve, 50))
+    assert.deepStrictEqual(cases, ['partitions', 'result'], 'the start command from an older driver is ignored')
+  })
 })

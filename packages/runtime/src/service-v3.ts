@@ -6,6 +6,7 @@ import {
   ProcessConfigResponseSchema,
   ProcessorV3,
   ProcessResultSchema,
+  ProcessStreamResponse_PartitionsSchema,
   type ProcessStreamRequest,
   ProcessStreamResponseV3Schema,
   type StartRequest,
@@ -36,6 +37,11 @@ const PARTITION_EAGER_START = process.env['SENTIO_PARTITION_EAGER_START'] !== 'f
 
 export class ProcessorServiceImplV3 implements ServiceImpl<typeof ProcessorV3> {
   readonly enablePartition: boolean
+  // Process ids whose binding ran on its own right after the partition response.
+  // A start command for such a process is ignored: an older driver still sends
+  // one, possibly after the binding finished. The next binding on the same
+  // process id clears the entry.
+  private readonly eagerStarted = new Set<number>()
   private readonly loader: () => Promise<any>
   private readonly shutdownHandler?: () => void
   private started = false
@@ -117,9 +123,27 @@ export class ProcessorServiceImplV3 implements ServiceImpl<typeof ProcessorV3> {
   ) {
     const binding = request.value.case === 'binding' ? request.value.value : undefined
     if (binding) {
+      this.eagerStarted.delete(request.processId)
       process_binding_count.add(1)
 
       if (binding.handlerType === HandlerType.UNKNOWN) {
+        if (this.enablePartition) {
+          // Keep the partition handshake: the driver reads the first message as
+          // the partition response. With eager start the result follows at once
+          // and a late start command is a no-op; without it the driver's start
+          // command is answered in the start branch below.
+          subject.next({
+            processId: request.processId,
+            value: {
+              case: 'partitions',
+              value: create(ProcessStreamResponse_PartitionsSchema, { started: PARTITION_EAGER_START })
+            }
+          })
+          if (!PARTITION_EAGER_START) {
+            return
+          }
+          this.eagerStarted.add(request.processId)
+        }
         subject.next({
           processId: request.processId,
           value: { case: 'result', value: create(ProcessResultSchema) }
@@ -144,6 +168,7 @@ export class ProcessorServiceImplV3 implements ServiceImpl<typeof ProcessorV3> {
             value: { case: 'partitions', value: partitions }
           })
           if (PARTITION_EAGER_START) {
+            this.eagerStarted.add(request.processId)
             this.startProcess(request.processId, binding, subject)
           }
         } catch (e) {
@@ -157,11 +182,10 @@ export class ProcessorServiceImplV3 implements ServiceImpl<typeof ProcessorV3> {
     }
 
     if (request.value.case === 'start') {
-      if (this.enablePartition && PARTITION_EAGER_START) {
-        // Every binding already started on its own after its partition response.
-        // A driver that does not read `started` still sends the command, possibly
-        // after the binding finished (and its process id was recycled), so it must
-        // be ignored rather than matched against a running context.
+      if (this.eagerStarted.has(request.processId)) {
+        // The binding already ran after its partition response. A driver that does
+        // not read `started` still sends the command, possibly after the binding
+        // finished, so it must not start anything again.
         return
       }
       if (!lastBinding) {
@@ -169,13 +193,31 @@ export class ProcessorServiceImplV3 implements ServiceImpl<typeof ProcessorV3> {
         subject.error(new Error('start request received without binding'))
         return
       }
+      if (lastBinding.handlerType === HandlerType.UNKNOWN) {
+        // The shortcut above answered the partition request; the start command
+        // gets the empty result it would have sent without partitioning.
+        subject.next({
+          processId: request.processId,
+          value: { case: 'result', value: create(ProcessResultSchema) }
+        })
+        return
+      }
       this.startProcess(request.processId, lastBinding, subject)
     }
 
     if (request.value.case === 'dbResult') {
+      const dbResult = request.value.value
       const context = this.contexts.get(request.processId)
+      if (!context) {
+        if (dbResult.value.case === 'error') {
+          // A write the process did not wait for failed after the process had
+          // finished. The driver has failed the binding; this is for the log.
+          console.error('db error for finished process', request.processId, 'op:', dbResult.opId, dbResult.value.value)
+        }
+        return
+      }
       try {
-        context?.result(request.value.value)
+        context.result(dbResult)
       } catch (e) {
         subject.error(new Error('db result error, process should stop'))
       }
