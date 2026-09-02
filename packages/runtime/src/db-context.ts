@@ -26,6 +26,13 @@ const {
 const STORE_BATCH_IDLE = process.env['STORE_BATCH_MAX_IDLE'] ? parseInt(process.env['STORE_BATCH_MAX_IDLE']) : 1
 const STORE_BATCH_SIZE = process.env['STORE_BATCH_SIZE'] ? parseInt(process.env['STORE_BATCH_SIZE']) : 10
 const STORE_UPSERT_NO_WAIT = process.env['STORE_UPSERT_NO_WAIT'] === 'true'
+// STORE_UPSERT_NO_ACK=true: upserts are sent with no_response and never wait for
+// the driver's acknowledgement, not even in awaitPendings() before the final
+// result. The driver applies ops on a stream in order, so the write still lands
+// before the result that follows it; it answers only a failed write, with an
+// error, and then fails the binding. That answer marks this context failed so the
+// handler stops (see `failed`). Requires a driver that understands no_response.
+const STORE_UPSERT_NO_ACK = process.env['STORE_UPSERT_NO_ACK'] === 'true'
 
 // Init-shapes carried over the rxjs Subject before being yielded by connect.
 type ProcessStreamResponseInit = MessageInitShape<typeof ProcessStreamResponseSchema>
@@ -126,6 +133,12 @@ export abstract class AbstractStoreContext implements IStoreContext {
   // against a lingering batch timer emitting after the final result (which
   // would both lose the write and desync the reused processor stream).
   protected closed = false
+  // Ops sent with no_response: the driver answers them only when they fail.
+  private noAckOps = new Set<bigint>()
+  // Set when a write the process did not wait for failed. Every later request
+  // rejects with it and awaitPendings() throws it, so the handler stops instead
+  // of working on a binding the driver has already failed.
+  protected failed: Error | undefined
 
   constructor(readonly processId: number) {}
 
@@ -142,6 +155,9 @@ export abstract class AbstractStoreContext implements IStoreContext {
     if (this.closed) {
       return Promise.reject(this.reportLateMessage(`store ${describeRequest(request)}`, this.sendRequest))
     }
+    if (this.failed) {
+      return Promise.reject(this.failed)
+    }
 
     if (STORE_BATCH_IDLE > 0 && STORE_BATCH_SIZE > 1 && request.case === 'upsert') {
       // batch upsert if possible
@@ -156,6 +172,21 @@ export abstract class AbstractStoreContext implements IStoreContext {
 
     const requestType = request.case as RequestType
     const opId = StoreContext.opCounter++
+    if (requestType === 'upsert' && STORE_UPSERT_NO_ACK) {
+      this.noAckOps.add(opId)
+      this.doSend({
+        value: {
+          case: 'dbRequest',
+          value: {
+            op: request,
+            opId,
+            noResponse: true
+          }
+        }
+      })
+      send_counts[requestType]?.add(1)
+      return Promise.resolve(create(DBResponseSchema, { opId }))
+    }
     const promise = this.newPromise<DBResponse>(opId, requestType)
 
     const start = Date.now()
@@ -219,6 +250,9 @@ export abstract class AbstractStoreContext implements IStoreContext {
         defer.resolve(dbResult)
       }
       this.defers.delete(opId)
+    } else if (this.noAckOps.delete(opId) && dbResult.value.case === 'error') {
+      this.failed = new Error(`write ${opId} the process did not wait for failed: ${dbResult.value.value}`)
+      console.error('process', this.processId, this.failed.message)
     }
     unsolved_requests.record(this.defers.size, { processId: this.processId })
   }
@@ -265,6 +299,7 @@ export abstract class AbstractStoreContext implements IStoreContext {
       defer.reject(new Error('context closed before db response, processId: ' + this.processId + ' opId: ' + opId))
     }
     this.defers.clear()
+    this.noAckOps.clear()
     if (this.statsInterval) {
       clearInterval(this.statsInterval)
     }
@@ -300,9 +335,11 @@ export abstract class AbstractStoreContext implements IStoreContext {
         this.sendBatch()
       }, STORE_BATCH_IDLE)
       const start = Date.now()
-      const promise = this.newPromise<DBResponse>(opId, 'upsert').finally(() => {
-        request_times['upsert'].add(Date.now() - start)
-      })
+      const promise = STORE_UPSERT_NO_ACK
+        ? Promise.resolve(create(DBResponseSchema, { opId }))
+        : this.newPromise<DBResponse>(opId, 'upsert').finally(() => {
+            request_times['upsert'].add(Date.now() - start)
+          })
 
       this.upsertBatch = {
         opId,
@@ -323,7 +360,8 @@ export abstract class AbstractStoreContext implements IStoreContext {
   private sendBatch() {
     // Never emit once the context is closed: the process already sent its
     // final result and the stream may have been handed to another process.
-    if (this.closed) {
+    // Nor after a failure: the driver has already failed the binding.
+    if (this.closed || this.failed) {
       return
     }
     if (this.upsertBatch) {
@@ -336,10 +374,14 @@ export abstract class AbstractStoreContext implements IStoreContext {
           case: 'dbRequest',
           value: {
             op: { case: 'upsert', value: request },
-            opId
+            opId,
+            noResponse: STORE_UPSERT_NO_ACK
           }
         }
       })
+      if (STORE_UPSERT_NO_ACK) {
+        this.noAckOps.add(opId)
+      }
       send_counts['upsert']?.add(1)
       batched_request_count.add(1)
       batched_total_count.add(request.entity.length)
@@ -406,6 +448,9 @@ export abstract class AbstractStoreContext implements IStoreContext {
       this.pendings.push(promise)
     }
     await Promise.all(this.pendings)
+    if (this.failed) {
+      throw this.failed
+    }
   }
 }
 

@@ -504,6 +504,11 @@ message ProcessStreamResponse {
       }
     }
     map<int32, Partition> partitions = 1; // key is handler id, because DataBinding.handler_ids is a array
+    // The processor already started executing the binding after computing the
+    // partitions; the driver must not send a start request. The driver still
+    // serves the binding's first db read only after every earlier task has a
+    // partition and every earlier task of the same partition has finished.
+    bool started = 2;
   }
 }
 
@@ -587,6 +592,12 @@ message DBRequest {
     DBDelete delete = 4;
     DBList list = 5;
   }
+  // Write ops only (upsert/update/delete): the processor does not wait for a
+  // DBResponse. Ops on a stream are applied in order, so the write still lands
+  // before the result that follows it. The driver answers only a failed op, with
+  // an error DBResponse, and then fails the binding; the processor may use the
+  // answer to log the failure and stop the handler.
+  bool no_response = 7;
 
   message DBGet {
     string entity = 1;
