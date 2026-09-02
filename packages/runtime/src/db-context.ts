@@ -26,6 +26,12 @@ const {
 const STORE_BATCH_IDLE = process.env['STORE_BATCH_MAX_IDLE'] ? parseInt(process.env['STORE_BATCH_MAX_IDLE']) : 1
 const STORE_BATCH_SIZE = process.env['STORE_BATCH_SIZE'] ? parseInt(process.env['STORE_BATCH_SIZE']) : 10
 const STORE_UPSERT_NO_WAIT = process.env['STORE_UPSERT_NO_WAIT'] === 'true'
+// STORE_UPSERT_NO_ACK=true: upserts are sent with no_response and never wait for
+// the driver's DBResponse, not even before the final result. Ops on the stream
+// are applied in order, so an upsert is still applied before the result that
+// follows it and a failed upsert still fails the binding on the driver side; the
+// processor just does not spend a round trip on the acknowledgement.
+const STORE_UPSERT_NO_ACK = process.env['STORE_UPSERT_NO_ACK'] === 'true'
 
 // Init-shapes carried over the rxjs Subject before being yielded by connect.
 type ProcessStreamResponseInit = MessageInitShape<typeof ProcessStreamResponseSchema>
@@ -156,6 +162,20 @@ export abstract class AbstractStoreContext implements IStoreContext {
 
     const requestType = request.case as RequestType
     const opId = StoreContext.opCounter++
+    if (requestType === 'upsert' && STORE_UPSERT_NO_ACK) {
+      this.doSend({
+        value: {
+          case: 'dbRequest',
+          value: {
+            op: request,
+            opId,
+            noResponse: true
+          }
+        }
+      })
+      send_counts[requestType]?.add(1)
+      return Promise.resolve(create(DBResponseSchema, { opId }))
+    }
     const promise = this.newPromise<DBResponse>(opId, requestType)
 
     const start = Date.now()
@@ -300,9 +320,11 @@ export abstract class AbstractStoreContext implements IStoreContext {
         this.sendBatch()
       }, STORE_BATCH_IDLE)
       const start = Date.now()
-      const promise = this.newPromise<DBResponse>(opId, 'upsert').finally(() => {
-        request_times['upsert'].add(Date.now() - start)
-      })
+      const promise = STORE_UPSERT_NO_ACK
+        ? Promise.resolve(create(DBResponseSchema, { opId }))
+        : this.newPromise<DBResponse>(opId, 'upsert').finally(() => {
+            request_times['upsert'].add(Date.now() - start)
+          })
 
       this.upsertBatch = {
         opId,
@@ -336,7 +358,8 @@ export abstract class AbstractStoreContext implements IStoreContext {
           case: 'dbRequest',
           value: {
             op: { case: 'upsert', value: request },
-            opId
+            opId,
+            noResponse: STORE_UPSERT_NO_ACK
           }
         }
       })

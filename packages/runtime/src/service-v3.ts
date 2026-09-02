@@ -30,6 +30,10 @@ const { process_binding_count, process_binding_time, process_binding_error } = p
 
 const TIME_SERIES_RESULT_BATCH_SIZE = 1000
 
+// SENTIO_PARTITION_EAGER_START=false restores waiting for the driver's start
+// command after the partition response.
+const PARTITION_EAGER_START = process.env['SENTIO_PARTITION_EAGER_START'] !== 'false'
+
 export class ProcessorServiceImplV3 implements ServiceImpl<typeof ProcessorV3> {
   readonly enablePartition: boolean
   private readonly loader: () => Promise<any>
@@ -127,10 +131,21 @@ export class ProcessorServiceImplV3 implements ServiceImpl<typeof ProcessorV3> {
         try {
           console.debug('sending partition request', binding)
           const partitions = await PluginManager.INSTANCE.partition(binding)
+          // Eager start: run the binding right after answering the partition
+          // request instead of waiting for the driver's start command. The driver
+          // gates the binding's first db read on the previous task of the same
+          // partition anyway, so nothing observable moves earlier; the start
+          // round trip just leaves the critical path. `started` tells a driver
+          // that understands it to skip the start command; an older driver still
+          // sends one, which is ignored below.
+          partitions.started = PARTITION_EAGER_START
           subject.next({
             processId: request.processId,
             value: { case: 'partitions', value: partitions }
           })
+          if (PARTITION_EAGER_START) {
+            this.startProcess(request.processId, binding, subject)
+          }
         } catch (e) {
           console.error('Partition error:', e)
           subject.error(new Error('Partition error: ' + errorString(e)))
@@ -142,6 +157,13 @@ export class ProcessorServiceImplV3 implements ServiceImpl<typeof ProcessorV3> {
     }
 
     if (request.value.case === 'start') {
+      if (this.enablePartition && PARTITION_EAGER_START) {
+        // Every binding already started on its own after its partition response.
+        // A driver that does not read `started` still sends the command, possibly
+        // after the binding finished (and its process id was recycled), so it must
+        // be ignored rather than matched against a running context.
+        return
+      }
       if (!lastBinding) {
         console.error('start request received without binding')
         subject.error(new Error('start request received without binding'))
