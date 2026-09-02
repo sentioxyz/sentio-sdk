@@ -124,4 +124,38 @@ describe('Test Service V3 with partition: eager start', () => {
     await new Promise((resolve) => setTimeout(resolve, 50))
     assert.deepStrictEqual(cases, ['partitions', 'result'], 'the start command from an older driver is ignored')
   })
+
+  test('keeps one eager-start marker per stream, not one per process id', async () => {
+    // Process ids are unique per binding (the driver counts up), so a marker kept
+    // per process would grow with every binding the service ever ran.
+    const subject = new Subject<ProcessStreamResponseV3Init>()
+    const cases: string[] = []
+    subject.subscribe((resp: ProcessStreamResponseV3Init) => cases.push(resp.value?.case ?? 'unknown'))
+
+    const first = 1000
+    const count = 1000
+    for (let processId = first; processId < first + count; processId++) {
+      const binding = create(ProcessStreamRequestSchema, {
+        processId,
+        value: {
+          case: 'binding',
+          value: { handlerIds: [0], handlerType: HandlerType.UNKNOWN, data: {}, chainId: '1' }
+        }
+      })
+      await service.handleRequest(binding, undefined, subject)
+    }
+    assert.strictEqual(cases.length, 2 * count, 'every binding answered the partition request and finished')
+
+    const markers: WeakMap<Subject<ProcessStreamResponseV3Init>, number> = (service as any).eagerStarted
+    assert.strictEqual(markers.get(subject), first + count - 1, 'only the current binding of the stream is marked')
+
+    const last = first + count - 1
+    await service.handleRequest(
+      create(ProcessStreamRequestSchema, { processId: last, value: { case: 'start', value: true } }),
+      undefined,
+      subject
+    )
+    await new Promise((resolve) => setTimeout(resolve, 50))
+    assert.strictEqual(cases.length, 2 * count, 'a late start for the current binding is still ignored')
+  })
 })

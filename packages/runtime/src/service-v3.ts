@@ -37,11 +37,12 @@ const PARTITION_EAGER_START = process.env['SENTIO_PARTITION_EAGER_START'] !== 'f
 
 export class ProcessorServiceImplV3 implements ServiceImpl<typeof ProcessorV3> {
   readonly enablePartition: boolean
-  // Process ids whose binding ran on its own right after the partition response.
-  // A start command for such a process is ignored: an older driver still sends
-  // one, possibly after the binding finished. The next binding on the same
-  // process id clears the entry.
-  private readonly eagerStarted = new Set<number>()
+  // Per stream: the process whose binding ran on its own right after the
+  // partition response. A start command for it is ignored: an older driver still
+  // sends one, possibly after the binding finished, but always before the next
+  // binding on that stream, which replaces the entry. Process ids are unique per
+  // binding, so nothing is kept per process.
+  private readonly eagerStarted = new WeakMap<Subject<ProcessStreamResponseV3Init>, number>()
   private readonly loader: () => Promise<any>
   private readonly shutdownHandler?: () => void
   private started = false
@@ -123,7 +124,7 @@ export class ProcessorServiceImplV3 implements ServiceImpl<typeof ProcessorV3> {
   ) {
     const binding = request.value.case === 'binding' ? request.value.value : undefined
     if (binding) {
-      this.eagerStarted.delete(request.processId)
+      this.eagerStarted.delete(subject)
       process_binding_count.add(1)
 
       if (binding.handlerType === HandlerType.UNKNOWN) {
@@ -132,6 +133,9 @@ export class ProcessorServiceImplV3 implements ServiceImpl<typeof ProcessorV3> {
           // the partition response. With eager start the result follows at once
           // and a late start command is a no-op; without it the driver's start
           // command is answered in the start branch below.
+          if (PARTITION_EAGER_START) {
+            this.eagerStarted.set(subject, request.processId)
+          }
           subject.next({
             processId: request.processId,
             value: {
@@ -142,7 +146,6 @@ export class ProcessorServiceImplV3 implements ServiceImpl<typeof ProcessorV3> {
           if (!PARTITION_EAGER_START) {
             return
           }
-          this.eagerStarted.add(request.processId)
         }
         subject.next({
           processId: request.processId,
@@ -163,12 +166,14 @@ export class ProcessorServiceImplV3 implements ServiceImpl<typeof ProcessorV3> {
           // that understands it to skip the start command; an older driver still
           // sends one, which is ignored below.
           partitions.started = PARTITION_EAGER_START
+          if (PARTITION_EAGER_START) {
+            this.eagerStarted.set(subject, request.processId)
+          }
           subject.next({
             processId: request.processId,
             value: { case: 'partitions', value: partitions }
           })
           if (PARTITION_EAGER_START) {
-            this.eagerStarted.add(request.processId)
             this.startProcess(request.processId, binding, subject)
           }
         } catch (e) {
@@ -182,7 +187,7 @@ export class ProcessorServiceImplV3 implements ServiceImpl<typeof ProcessorV3> {
     }
 
     if (request.value.case === 'start') {
-      if (this.eagerStarted.has(request.processId)) {
+      if (this.eagerStarted.get(subject) === request.processId) {
         // The binding already ran after its partition response. A driver that does
         // not read `started` still sends the command, possibly after the binding
         // finished, so it must not start anything again.
