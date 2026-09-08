@@ -9,6 +9,7 @@ import {
   Int,
   Timestamp,
   AddOp,
+  ExpressionOp,
   MultiplyOp,
   UpdateValues
 } from './types.js'
@@ -142,6 +143,11 @@ export class Store {
             fields[field] = {
               op: EntityUpdateData_Operator.MULTIPLY,
               value: serializeRichValue(value.value)
+            }
+          } else if (value instanceof ExpressionOp) {
+            fields[field] = {
+              op: EntityUpdateData_Operator.EXPRESSION,
+              expression: value.expression
             }
           } else if (value !== undefined) {
             fields[field] = {
