@@ -30,6 +30,15 @@ export class MultiplyOp<T> extends UpdateOp<T> {
   }
 }
 
+/**
+ * Computes the new value of a field from the previous version of the entity, see {@link expr}.
+ */
+export class ExpressionOp<T> extends UpdateOp<T> {
+  constructor(readonly expression: string) {
+    super()
+  }
+}
+
 export type UpdateValues<T> = {
   [K in keyof T]?: T[K] | UpdateOp<T[K]>
 } & { id: ID }
@@ -40,6 +49,46 @@ export function add<K extends ValueType>(value: K): UpdateOp<K> {
 
 export function multiply<K extends ValueType>(value: K): UpdateOp<K> {
   return new MultiplyOp<K>(value)
+}
+
+/**
+ * Set a field to the result of an expression evaluated by the server against the previous version
+ * of the entity. Unlike {@link add} and {@link multiply} the expression may reference other fields
+ * of the same entity (by their schema field names), compare values and branch:
+ *
+ * ```ts
+ * await Account.update({
+ *   id,
+ *   balance: expr('coalesce(balance, 0) + pending'),
+ *   status: expr("if(balance > 0, 'active', 'idle')"),
+ *   updates: expr('if(exist(), updates + 1, 1)')
+ * })
+ * ```
+ *
+ * Supported syntax:
+ * - arithmetic `+ - * /` with parentheses and number literals (`1`, `-2.5`, `1e18`); `a div b` is
+ *   integer division, both sides must be integers (Int / Int8 / BigInt / Timestamp fields or
+ *   digit-only literals) and it truncates toward zero
+ * - comparison `= != > >= < <=` on numbers or strings
+ * - logic `and`, `or`, `not`, literals `true`, `false`, `null`, string literals `'abc'`
+ * - `exist()`: whether the entity had a previous version
+ * - `isNull(x)`: whether `x` evaluates to null
+ * - `coalesce(a, b, ...)`: the first non-null argument
+ * - `if(cond, a, b)`
+ * - `concat(a, b, ...)`: joins strings; `toString(x)`: a number, boolean or string as a string
+ *
+ * The full reference (types, precedence, null rules) is in the entities documentation.
+ *
+ * Null follows SQL rules: a field reference is null when the entity does not exist yet, arithmetic
+ * and comparisons with a null operand are null, `and` / `or` use three-valued logic, and `if`
+ * treats a null condition as false. Storing null into a non-null field fails the update, so use
+ * `coalesce(field, 0)` for fields that may be written for the first time. Typing is strict: there is
+ * no implicit conversion between strings, numbers and booleans. Every numeric field type is computed
+ * with decimal arithmetic, `/` is decimal division and the result is rounded when the field is an
+ * integer type.
+ */
+export function expr<K extends ValueType>(expression: string): UpdateOp<K> {
+  return new ExpressionOp<K>(expression)
 }
 
 export abstract class AbstractEntity {

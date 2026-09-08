@@ -561,10 +561,16 @@ message EntityUpdateData {
     SET = 0; // set the value
     ADD = 1; // add the value, only for numeric type
     MULTIPLY = 2; // multiply the value, only for numeric type
+    // Evaluate `expression` against the previous version of the entity and store the result.
+    // The expression may reference other fields of the same entity, use + - * / div,
+    // = != > >= < <=, and/or/not, exist(), isNull(x), coalesce(...), if(c, a, b), concat(...), toString(x).
+    // Field references resolve to null when the entity does not exist yet.
+    EXPRESSION = 3;
   }
   message FieldValue {
     common.RichValue value = 1;
     Operator op = 2;
+    string expression = 3; // only for op == EXPRESSION
   }
   map<string, FieldValue> fields = 1;
 }
