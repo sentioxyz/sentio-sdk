@@ -66,7 +66,9 @@ export function multiply<K extends ValueType>(value: K): UpdateOp<K> {
  * ```
  *
  * Supported syntax:
- * - arithmetic `+ - * /` with parentheses and number literals (`1`, `-2.5`, `1e18`)
+ * - arithmetic `+ - * /` with parentheses and number literals (`1`, `-2.5`, `1e18`); `a div b` is
+ *   integer division, both sides must be integers (Int / Int8 / BigInt / Timestamp fields or
+ *   digit-only literals) and it truncates toward zero
  * - comparison `= != > >= < <=` on numbers or strings
  * - logic `and`, `or`, `not`, literals `true`, `false`, `null`, string literals `'abc'`
  * - `exist()`: whether the entity had a previous version
@@ -77,8 +79,10 @@ export function multiply<K extends ValueType>(value: K): UpdateOp<K> {
  * Null follows SQL rules: a field reference is null when the entity does not exist yet, arithmetic
  * and comparisons with a null operand are null, `and` / `or` use three-valued logic, and `if`
  * treats a null condition as false. Storing null into a non-null field fails the update, so use
- * `coalesce(field, 0)` for fields that may be written for the first time. Every numeric field type
- * is computed with decimal arithmetic and rounded when the field is an integer type.
+ * `coalesce(field, 0)` for fields that may be written for the first time. Typing is strict: there is
+ * no implicit conversion between strings, numbers and booleans. Every numeric field type is computed
+ * with decimal arithmetic, `/` is decimal division and the result is rounded when the field is an
+ * integer type.
  */
 export function expr<K extends ValueType>(expression: string): UpdateOp<K> {
   return new ExpressionOp<K>(expression)
