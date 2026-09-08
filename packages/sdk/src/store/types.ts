@@ -60,14 +60,14 @@ export function multiply<K extends ValueType>(value: K): UpdateOp<K> {
  * await Account.update({
  *   id,
  *   balance: expr('coalesce(balance, 0) + pending'),
- *   status: expr("if(gt(balance, 0), 'active', 'idle')"),
+ *   status: expr("if(balance > 0, 'active', 'idle')"),
  *   updates: expr('if(exist(), updates + 1, 1)')
  * })
  * ```
  *
  * Supported syntax:
  * - arithmetic `+ - * /` with parentheses and number literals (`1`, `-2.5`, `1e18`)
- * - comparison `eq(a, b)`, `ne`, `gt`, `gte`, `lt`, `lte` on numbers or strings
+ * - comparison `= != > >= < <=` on numbers or strings
  * - logic `and`, `or`, `not`, literals `true`, `false`, `null`, string literals `'abc'`
  * - `exist()`: whether the entity had a previous version
  * - `isNull(x)`: whether `x` evaluates to null

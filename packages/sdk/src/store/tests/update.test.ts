@@ -63,7 +63,7 @@ describe('store update operators', () => {
       id: 'c1',
       count: add(1),
       total: multiply(2),
-      status: expr("if(gt(count, 10), 'hot', 'cold')")
+      status: expr("if(count > 10, 'hot', 'cold')")
     })
 
     assert.equal(context.requests.length, 1)
@@ -78,7 +78,7 @@ describe('store update operators', () => {
     assert.equal(fields['count'].op, EntityUpdateData_Operator.ADD)
     assert.equal(fields['total'].op, EntityUpdateData_Operator.MULTIPLY)
     assert.equal(fields['status'].op, EntityUpdateData_Operator.EXPRESSION)
-    assert.equal(fields['status'].expression, "if(gt(count, 10), 'hot', 'cold')")
+    assert.equal(fields['status'].expression, "if(count > 10, 'hot', 'cold')")
     assert.equal(fields['status'].value, undefined)
   })
 
