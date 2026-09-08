@@ -563,7 +563,7 @@ message EntityUpdateData {
     MULTIPLY = 2; // multiply the value, only for numeric type
     // Evaluate `expression` against the previous version of the entity and store the result.
     // The expression may reference other fields of the same entity, use + - * / div,
-    // = != > >= < <=, and/or/not, exist(), isNull(x), coalesce(...), if(c, a, b).
+    // = != > >= < <=, and/or/not, exist(), isNull(x), coalesce(...), if(c, a, b), concat(...), toString(x).
     // Field references resolve to null when the entity does not exist yet.
     EXPRESSION = 3;
   }

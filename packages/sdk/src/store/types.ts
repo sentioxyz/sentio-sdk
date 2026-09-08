@@ -75,6 +75,9 @@ export function multiply<K extends ValueType>(value: K): UpdateOp<K> {
  * - `isNull(x)`: whether `x` evaluates to null
  * - `coalesce(a, b, ...)`: the first non-null argument
  * - `if(cond, a, b)`
+ * - `concat(a, b, ...)`: joins strings; `toString(x)`: a number, boolean or string as a string
+ *
+ * The full reference (types, precedence, null rules) is in the entities documentation.
  *
  * Null follows SQL rules: a field reference is null when the entity does not exist yet, arithmetic
  * and comparisons with a null operand are null, `and` / `or` use three-valued logic, and `if`
