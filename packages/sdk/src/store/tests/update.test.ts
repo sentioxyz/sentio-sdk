@@ -2,7 +2,7 @@ import { describe, it } from 'node:test'
 import assert from 'assert'
 import { create } from '@bufbuild/protobuf'
 import { type DBResponse, DBResponseSchema, EntityUpdateData_Operator } from '@sentio/protos'
-import type { IStoreContext, Request } from '@sentio/runtime'
+import type { IStoreContext } from '@sentio/runtime'
 
 import { Entity, IDColumn, IntColumn, Required, StringColumn } from '../decorators.js'
 import { AbstractEntity, add, expr, multiply, type ID, type Int, type String } from '../types.js'
@@ -40,6 +40,9 @@ type Counter @entity {
 `,
   entities: { Counter }
 })
+
+// the request type is not exported by the runtime, derive it from the context interface
+type Request = Parameters<IStoreContext['sendRequest']>[0]
 
 class RecordingContext implements IStoreContext {
   requests: Request[] = []
