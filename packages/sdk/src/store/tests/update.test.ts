@@ -9,7 +9,6 @@ import { AbstractEntity, add, expr, multiply, type ID, type Int, type String } f
 import { Store } from '../store.js'
 import { DatabaseSchema } from '../../core/database-schema.js'
 
-
 @Entity('Counter')
 class Counter extends AbstractEntity {
   @Required
