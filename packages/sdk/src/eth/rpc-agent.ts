@@ -34,8 +34,11 @@ export function rpcCallTimeoutMs(): number {
 }
 
 // `timeout` on an Agent doubles as the idle timeout of its free sockets; we want a long connect
-// timeout but a short idle retention, so shorten the timer again when a socket goes back to
-// the free pool. (`keepSocketAlive` is the documented hook Node calls exactly at that point.)
+// timeout but a short idle retention, so cap the timer again when a socket goes back to the
+// free pool. (`keepSocketAlive` is the documented hook Node calls exactly at that point.) The
+// base hook already honours a server `Keep-Alive: timeout=N` hint, minus Node's safety buffer,
+// whenever that is shorter than the agent timeout — keep whichever is shorter, never lengthen
+// it: an idle socket that outlives the server's idle timeout is a reset waiting to happen.
 // (@types/node does not declare the hook, hence the structural cast.)
 interface KeepSocketAlive {
   keepSocketAlive(socket: Socket): boolean
@@ -47,11 +50,22 @@ function keepAliveWithShortIdle<T extends http.Agent | https.Agent>(agent: T): T
   hooks.keepSocketAlive = (socket: Socket): boolean => {
     const keep = base(socket)
     if (keep) {
-      socket.setTimeout(FREE_SOCKET_IDLE_MS)
+      socket.setTimeout(freeSocketIdleMs(socket.timeout))
     }
     return keep
   }
   return agent
+}
+
+// The idle timeout to leave on a freed socket, given the one Node's hook selected for it.
+export function freeSocketIdleMs(selected: number | undefined): number {
+  return selected && selected > 0 ? Math.min(selected, FREE_SOCKET_IDLE_MS) : FREE_SOCKET_IDLE_MS
+}
+
+// Same scheme test ethers' node transport applies (case-insensitive), so a request never lands
+// on an agent for the other protocol.
+export function isHttpsUrl(url: string): boolean {
+  return url.split(':')[0].toLowerCase() === 'https'
 }
 
 export function rpcAgentOptions(extra?: http.AgentOptions): http.AgentOptions {
@@ -86,7 +100,7 @@ export function rpcAgents(): RpcAgents {
     agents = {
       http: viaHttp,
       https: viaHttps,
-      getUrlFunc: (req, signal) => (req.url.startsWith('https:') ? overHttps : overHttp)(req, signal)
+      getUrlFunc: (req, signal) => (isHttpsUrl(req.url) ? overHttps : overHttp)(req, signal)
     }
   }
   return agents
