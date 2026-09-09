@@ -1,10 +1,11 @@
 import { JsonRpcProvider, Network, hexlify } from 'ethers'
-import type { JsonRpcError, JsonRpcPayload, JsonRpcResult } from 'ethers'
+import type { FetchRequest, JsonRpcError, JsonRpcPayload, JsonRpcResult } from 'ethers'
 
 import PQueue from 'p-queue'
 import { EthChainId } from '@sentio/chain'
 import { LRUCache } from 'lru-cache'
 import { Endpoints, providerMetrics, processMetrics, metricsStorage, GLOBAL_CONFIG } from '@sentio/runtime'
+import { rpcCallTimeoutMs, rpcFetchRequest } from './rpc-agent.js'
 const { miss_count, hit_count, queue_size } = providerMetrics
 
 export const DummyProvider = new JsonRpcProvider('', Network.from(1))
@@ -50,24 +51,15 @@ export function getProvider(chainId?: EthChainId): JsonRpcProvider {
   // console.log(
   //   `init provider for chain ${network.chainId}, concurrency: ${Endpoints.INSTANCE.concurrency}, batchCount: ${Endpoints.INSTANCE.batchCount}`
   // )
+  // Our own transport agents: see rpc-agent.ts for why the default agent is not usable here.
   provider = new QueuedStaticJsonRpcProvider(
-    address,
+    rpcFetchRequest(address),
     network,
     Endpoints.INSTANCE.concurrency,
     Endpoints.INSTANCE.batchCount
   )
   providers.set(key, provider)
   return provider
-}
-
-// Default upper bound for a single RPC promise to settle, queue wait included.
-// Deliberately above any sane queue+request latency and far below "stuck forever".
-const DEFAULT_RPC_CALL_TIMEOUT_MS = 120_000
-
-// Read per call so tests (and operators) can adjust without a module reload.
-function rpcCallTimeoutMs(): number {
-  const n = Number(process.env['RPC_CALL_TIMEOUT_MS'])
-  return Number.isFinite(n) && n > 0 ? n : DEFAULT_RPC_CALL_TIMEOUT_MS
 }
 
 // Keep the diagnostic bounded: `what` may describe params with large calldata.
@@ -181,7 +173,7 @@ export class QueuedStaticJsonRpcProvider extends JsonRpcProvider {
     max: 300000 // 300k items
   })
 
-  constructor(url: string, network: Network, concurrency: number, batchCount = 1) {
+  constructor(url: string | FetchRequest, network: Network, concurrency: number, batchCount = 1) {
     // TODO re-enable match when possible
     super(url, network, { staticNetwork: network, batchMaxCount: batchCount })
     this.executor = new PQueue({ concurrency: concurrency })
