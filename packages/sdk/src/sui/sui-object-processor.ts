@@ -278,7 +278,7 @@ export class SuiObjectProcessor extends SuiBaseObjectOrAddressProcessorInternal<
 export class SuiObjectTypeProcessor<T> extends SuiBaseObjectOrAddressProcessor<
   (self: TypedSuiMoveObject<T>, dynamicFieldObjects: SuiMoveObjectInput[], ctx: SuiObjectContext) => PromiseOrVoid
 > {
-  objectType: TypeDescriptor<T>
+  objectType!: TypeDescriptor<T>
 
   static bind<T>(options: SuiObjectTypeBindOptions<T>): SuiObjectTypeProcessor<T> {
     const processor = new SuiObjectTypeProcessor<T>({

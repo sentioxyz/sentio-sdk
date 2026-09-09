@@ -19,7 +19,7 @@ import { IDataBindingContext, IStoreContext } from './db-context.js'
 import { AsyncLocalStorage } from 'node:async_hooks'
 
 export abstract class Plugin {
-  name: string
+  name!: string
   supportedHandlers: HandlerType[] = []
 
   async configure(config: ProcessConfigResponse, forChainId?: string): Promise<void> {}

@@ -57,8 +57,8 @@ export function cleanTest() {
 
 export class TestProcessorServer {
   service: ProcessorServiceImplV3
-  contractConfigs: ContractConfig[]
-  accountConfigs: AccountConfig[]
+  contractConfigs!: ContractConfig[]
+  accountConfigs!: AccountConfig[]
   storeContext: TestStoreContext
   private nextProcessId = 1
 

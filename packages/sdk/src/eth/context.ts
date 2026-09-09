@@ -22,7 +22,7 @@ export abstract class EthContext extends BaseContext {
   private readonly log?: LogParams
   readonly block?: BlockParams
   readonly trace?: Trace
-  readonly blockNumber: number
+  readonly blockNumber!: number
   readonly transactionHash?: string
   readonly transaction?: TransactionResponseParams
   readonly transactionReceipt?: TransactionReceiptParams
@@ -250,12 +250,12 @@ export class BoundContractView<TContract extends BaseContract, TContractView ext
   address: string
   // context will be set right after context creation (in context's constructor)
   // context: ContractContext<TContract, BoundContractView<TContract, TContractView>>
-  context: EthContext
-  callStatic: {
+  context!: EthContext
+  callStatic!: {
     context: EthContext
     view: TContractView
   }
-  encodeCall: {
+  encodeCall!: {
     context: EthContext
     view: TContractView
   }

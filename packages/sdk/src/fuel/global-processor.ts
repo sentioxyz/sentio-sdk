@@ -15,7 +15,7 @@ export class FuelGlobalProcessor implements FuelBaseProcessor<GlobalFuelProcesso
   txHandlers: CallHandler<Data_FuelTransaction>[] = []
   blockHandlers = []
 
-  private provider: Provider
+  private provider!: Provider
 
   static bind(config: GlobalFuelProcessorConfig): FuelGlobalProcessor {
     const processor = new FuelGlobalProcessor(config)
