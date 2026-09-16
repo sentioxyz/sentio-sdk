@@ -16207,8 +16207,7 @@
             {
               "constraints": [
                 1,
-                2,
-                3
+                2
               ]
             }
           ],
@@ -17718,6 +17717,56 @@
         }
       ],
       "name": "event"
+    }
+  },
+  {
+    "address": "0x2",
+    "module": {
+      "datatypes": [
+        {
+          "abilities": [
+            4
+          ],
+          "typeParameters": [],
+          "fields": [
+            {
+              "name": "id",
+              "position": 0,
+              "type": {
+                "typeParameterInstantiation": [],
+                "type": 10,
+                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000002::object::UID"
+              }
+            }
+          ],
+          "variants": [],
+          "typeName": "0x0000000000000000000000000000000000000000000000000000000000000002::forwarding_address::ForwardingAddressRegistry",
+          "definingId": "0x0000000000000000000000000000000000000000000000000000000000000002",
+          "module": "forwarding_address",
+          "name": "ForwardingAddressRegistry",
+          "kind": 1
+        }
+      ],
+      "functions": [
+        {
+          "typeParameters": [],
+          "parameters": [
+            {
+              "reference": 1,
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 10,
+                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000002::tx_context::TxContext"
+              }
+            }
+          ],
+          "returns": [],
+          "name": "create",
+          "visibility": 1,
+          "isEntry": false
+        }
+      ],
+      "name": "forwarding_address"
     }
   },
   {
@@ -23315,6 +23364,130 @@
           ],
           "parameters": [
             {
+              "reference": 2,
+              "body": {
+                "typeParameterInstantiation": [
+                  {
+                    "typeParameterInstantiation": [],
+                    "type": 11,
+                    "typeParameter": 0
+                  },
+                  {
+                    "typeParameterInstantiation": [],
+                    "type": 11,
+                    "typeParameter": 1
+                  }
+                ],
+                "type": 10,
+                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000002::linked_table::LinkedTable"
+              }
+            },
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 11,
+                "typeParameter": 0
+              }
+            },
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 11,
+                "typeParameter": 0
+              }
+            },
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 11,
+                "typeParameter": 1
+              }
+            }
+          ],
+          "returns": [],
+          "name": "insert_after",
+          "visibility": 2,
+          "isEntry": false
+        },
+        {
+          "typeParameters": [
+            {
+              "constraints": [
+                1,
+                2,
+                3
+              ]
+            },
+            {
+              "constraints": [
+                3
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "reference": 2,
+              "body": {
+                "typeParameterInstantiation": [
+                  {
+                    "typeParameterInstantiation": [],
+                    "type": 11,
+                    "typeParameter": 0
+                  },
+                  {
+                    "typeParameterInstantiation": [],
+                    "type": 11,
+                    "typeParameter": 1
+                  }
+                ],
+                "type": 10,
+                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000002::linked_table::LinkedTable"
+              }
+            },
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 11,
+                "typeParameter": 0
+              }
+            },
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 11,
+                "typeParameter": 0
+              }
+            },
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 11,
+                "typeParameter": 1
+              }
+            }
+          ],
+          "returns": [],
+          "name": "insert_before",
+          "visibility": 2,
+          "isEntry": false
+        },
+        {
+          "typeParameters": [
+            {
+              "constraints": [
+                1,
+                2,
+                3
+              ]
+            },
+            {
+              "constraints": [
+                3
+              ]
+            }
+          ],
+          "parameters": [
+            {
               "reference": 1,
               "body": {
                 "typeParameterInstantiation": [
@@ -24770,6 +24943,22 @@
           "isEntry": false
         },
         {
+          "typeParameters": [],
+          "parameters": [],
+          "returns": [
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 10,
+                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000002::object::UID"
+              }
+            }
+          ],
+          "name": "forwarding_address_registry",
+          "visibility": 3,
+          "isEntry": false
+        },
+        {
           "typeParameters": [
             {
               "constraints": [
@@ -25002,6 +25191,12 @@
                 "typeParameterInstantiation": [],
                 "type": 1
               }
+            },
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 1
+              }
             }
           ],
           "returns": [
@@ -25041,10 +25236,16 @@
                 "typeParameterInstantiation": [],
                 "type": 1
               }
+            },
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 1
+              }
             }
           ],
           "returns": [],
-          "name": "record_new_uid",
+          "name": "record_new_uid_from_hash",
           "visibility": 1,
           "isEntry": false
         },
@@ -26809,6 +27010,59 @@
           "name": "only_dep_upgrades",
           "visibility": 2,
           "isEntry": true
+        },
+        {
+          "typeParameters": [],
+          "parameters": [
+            {
+              "reference": 1,
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 10,
+                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000002::package::UpgradeCap"
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 10,
+                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000002::object::ID"
+              }
+            }
+          ],
+          "name": "original_package_id",
+          "visibility": 2,
+          "isEntry": false
+        },
+        {
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 1
+              }
+            },
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 6
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 1
+              }
+            }
+          ],
+          "name": "original_package_id_impl",
+          "visibility": 1,
+          "isEntry": false
         },
         {
           "typeParameters": [],
@@ -29904,6 +30158,965 @@
         }
       ],
       "name": "ristretto255"
+    }
+  },
+  {
+    "address": "0x2",
+    "module": {
+      "datatypes": [
+        {
+          "abilities": [
+            2
+          ],
+          "typeParameters": [
+            {
+              "constraints": [
+                2
+              ],
+              "isPhantom": true
+            }
+          ],
+          "fields": [
+            {
+              "name": "pos0",
+              "position": 0,
+              "type": {
+                "typeParameterInstantiation": [],
+                "type": 6
+              }
+            }
+          ],
+          "variants": [],
+          "typeName": "0x0000000000000000000000000000000000000000000000000000000000000002::scratch::BorrowMarker",
+          "definingId": "0x0000000000000000000000000000000000000000000000000000000000000002",
+          "module": "scratch",
+          "name": "BorrowMarker",
+          "kind": 1
+        },
+        {
+          "abilities": [
+            1,
+            2
+          ],
+          "typeParameters": [],
+          "fields": [
+            {
+              "name": "dummy_field",
+              "position": 0,
+              "type": {
+                "typeParameterInstantiation": [],
+                "type": 2
+              }
+            }
+          ],
+          "variants": [],
+          "typeName": "0x0000000000000000000000000000000000000000000000000000000000000002::scratch::BorrowMarkerKey",
+          "definingId": "0x0000000000000000000000000000000000000000000000000000000000000002",
+          "module": "scratch",
+          "name": "BorrowMarkerKey",
+          "kind": 1
+        },
+        {
+          "abilities": [
+            1,
+            2
+          ],
+          "typeParameters": [
+            {
+              "constraints": [
+                1,
+                2
+              ],
+              "isPhantom": true
+            }
+          ],
+          "fields": [
+            {
+              "name": "dummy_field",
+              "position": 0,
+              "type": {
+                "typeParameterInstantiation": [],
+                "type": 2
+              }
+            }
+          ],
+          "variants": [],
+          "typeName": "0x0000000000000000000000000000000000000000000000000000000000000002::scratch::Permit",
+          "definingId": "0x0000000000000000000000000000000000000000000000000000000000000002",
+          "module": "scratch",
+          "name": "Permit",
+          "kind": 1
+        }
+      ],
+      "functions": [
+        {
+          "typeParameters": [
+            {
+              "constraints": [
+                1,
+                2
+              ]
+            },
+            {
+              "constraints": [
+                2
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "reference": 2,
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 10,
+                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000002::tx_context::TxContext"
+              }
+            },
+            {
+              "body": {
+                "typeParameterInstantiation": [
+                  {
+                    "typeParameterInstantiation": [],
+                    "type": 11,
+                    "typeParameter": 0
+                  }
+                ],
+                "type": 10,
+                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000002::scratch::Permit"
+              }
+            },
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 11,
+                "typeParameter": 0
+              }
+            },
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 11,
+                "typeParameter": 1
+              }
+            }
+          ],
+          "returns": [],
+          "name": "add",
+          "visibility": 2,
+          "isEntry": false
+        },
+        {
+          "typeParameters": [
+            {
+              "constraints": [
+                2
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 1
+              }
+            },
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 11,
+                "typeParameter": 0
+              }
+            }
+          ],
+          "returns": [],
+          "name": "add_impl",
+          "visibility": 1,
+          "isEntry": false
+        },
+        {
+          "typeParameters": [
+            {
+              "constraints": [
+                1,
+                2
+              ]
+            },
+            {
+              "constraints": [
+                2
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "reference": 2,
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 10,
+                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000002::tx_context::TxContext"
+              }
+            },
+            {
+              "body": {
+                "typeParameterInstantiation": [
+                  {
+                    "typeParameterInstantiation": [],
+                    "type": 11,
+                    "typeParameter": 0
+                  }
+                ],
+                "type": 10,
+                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000002::scratch::Permit"
+              }
+            },
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 11,
+                "typeParameter": 0
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 11,
+                "typeParameter": 1
+              }
+            },
+            {
+              "body": {
+                "typeParameterInstantiation": [
+                  {
+                    "typeParameterInstantiation": [],
+                    "type": 11,
+                    "typeParameter": 1
+                  }
+                ],
+                "type": 10,
+                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000002::scratch::BorrowMarker"
+              }
+            }
+          ],
+          "name": "begin_borrow",
+          "visibility": 2,
+          "isEntry": false
+        },
+        {
+          "typeParameters": [
+            {
+              "constraints": [
+                2
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "reference": 2,
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 10,
+                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000002::tx_context::TxContext"
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "typeParameterInstantiation": [
+                  {
+                    "typeParameterInstantiation": [],
+                    "type": 11,
+                    "typeParameter": 0
+                  }
+                ],
+                "type": 10,
+                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000002::scratch::BorrowMarker"
+              }
+            }
+          ],
+          "name": "borrow_marker",
+          "visibility": 1,
+          "isEntry": false
+        },
+        {
+          "typeParameters": [
+            {
+              "constraints": [
+                1,
+                2
+              ]
+            },
+            {
+              "constraints": [
+                2
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "reference": 2,
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 10,
+                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000002::tx_context::TxContext"
+              }
+            },
+            {
+              "body": {
+                "typeParameterInstantiation": [
+                  {
+                    "typeParameterInstantiation": [],
+                    "type": 11,
+                    "typeParameter": 0
+                  }
+                ],
+                "type": 10,
+                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000002::scratch::Permit"
+              }
+            },
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 11,
+                "typeParameter": 0
+              }
+            },
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 11,
+                "typeParameter": 1
+              }
+            },
+            {
+              "body": {
+                "typeParameterInstantiation": [
+                  {
+                    "typeParameterInstantiation": [],
+                    "type": 11,
+                    "typeParameter": 1
+                  }
+                ],
+                "type": 10,
+                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000002::scratch::BorrowMarker"
+              }
+            }
+          ],
+          "returns": [],
+          "name": "end_borrow",
+          "visibility": 2,
+          "isEntry": false
+        },
+        {
+          "typeParameters": [
+            {
+              "constraints": [
+                1,
+                2
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "reference": 1,
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 10,
+                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000002::tx_context::TxContext"
+              }
+            },
+            {
+              "body": {
+                "typeParameterInstantiation": [
+                  {
+                    "typeParameterInstantiation": [],
+                    "type": 11,
+                    "typeParameter": 0
+                  }
+                ],
+                "type": 10,
+                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000002::scratch::Permit"
+              }
+            },
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 11,
+                "typeParameter": 0
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 2
+              }
+            }
+          ],
+          "name": "exists",
+          "visibility": 2,
+          "isEntry": false
+        },
+        {
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 1
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 2
+              }
+            }
+          ],
+          "name": "exists_impl",
+          "visibility": 1,
+          "isEntry": false
+        },
+        {
+          "typeParameters": [
+            {
+              "constraints": [
+                1,
+                2
+              ]
+            },
+            {
+              "constraints": [
+                2
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "reference": 1,
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 10,
+                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000002::tx_context::TxContext"
+              }
+            },
+            {
+              "body": {
+                "typeParameterInstantiation": [
+                  {
+                    "typeParameterInstantiation": [],
+                    "type": 11,
+                    "typeParameter": 0
+                  }
+                ],
+                "type": 10,
+                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000002::scratch::Permit"
+              }
+            },
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 11,
+                "typeParameter": 0
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 2
+              }
+            }
+          ],
+          "name": "exists_with_type",
+          "visibility": 2,
+          "isEntry": false
+        },
+        {
+          "typeParameters": [
+            {
+              "constraints": [
+                2
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 1
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 2
+              }
+            }
+          ],
+          "name": "exists_with_type_impl",
+          "visibility": 1,
+          "isEntry": false
+        },
+        {
+          "typeParameters": [
+            {
+              "constraints": [
+                1,
+                2
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 11,
+                "typeParameter": 0
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 1
+              }
+            }
+          ],
+          "name": "hash_type_and_key",
+          "visibility": 1,
+          "isEntry": false
+        },
+        {
+          "typeParameters": [
+            {
+              "constraints": [
+                1,
+                2
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "body": {
+                "typeParameterInstantiation": [
+                  {
+                    "typeParameterInstantiation": [],
+                    "type": 11,
+                    "typeParameter": 0
+                  }
+                ],
+                "type": 10,
+                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000001::internal::Permit"
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "typeParameterInstantiation": [
+                  {
+                    "typeParameterInstantiation": [],
+                    "type": 11,
+                    "typeParameter": 0
+                  }
+                ],
+                "type": 10,
+                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000002::scratch::Permit"
+              }
+            }
+          ],
+          "name": "permit",
+          "visibility": 2,
+          "isEntry": false
+        },
+        {
+          "typeParameters": [
+            {
+              "constraints": [
+                1,
+                2
+              ]
+            },
+            {
+              "constraints": [
+                1,
+                2
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "reference": 1,
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 10,
+                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000002::tx_context::TxContext"
+              }
+            },
+            {
+              "body": {
+                "typeParameterInstantiation": [
+                  {
+                    "typeParameterInstantiation": [],
+                    "type": 11,
+                    "typeParameter": 0
+                  }
+                ],
+                "type": 10,
+                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000002::scratch::Permit"
+              }
+            },
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 11,
+                "typeParameter": 0
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 11,
+                "typeParameter": 1
+              }
+            }
+          ],
+          "name": "read",
+          "visibility": 2,
+          "isEntry": false
+        },
+        {
+          "typeParameters": [
+            {
+              "constraints": [
+                1,
+                2
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 1
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 11,
+                "typeParameter": 0
+              }
+            }
+          ],
+          "name": "read_impl",
+          "visibility": 1,
+          "isEntry": false
+        },
+        {
+          "typeParameters": [
+            {
+              "constraints": [
+                1,
+                2
+              ]
+            },
+            {
+              "constraints": [
+                1,
+                2
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "reference": 1,
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 10,
+                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000002::tx_context::TxContext"
+              }
+            },
+            {
+              "body": {
+                "typeParameterInstantiation": [
+                  {
+                    "typeParameterInstantiation": [],
+                    "type": 11,
+                    "typeParameter": 0
+                  }
+                ],
+                "type": 10,
+                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000002::scratch::Permit"
+              }
+            },
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 11,
+                "typeParameter": 0
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "typeParameterInstantiation": [
+                  {
+                    "typeParameterInstantiation": [],
+                    "type": 11,
+                    "typeParameter": 1
+                  }
+                ],
+                "type": 10,
+                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000001::option::Option"
+              }
+            }
+          ],
+          "name": "read_opt",
+          "visibility": 2,
+          "isEntry": false
+        },
+        {
+          "typeParameters": [
+            {
+              "constraints": [
+                1,
+                2
+              ]
+            },
+            {
+              "constraints": [
+                2
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "reference": 2,
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 10,
+                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000002::tx_context::TxContext"
+              }
+            },
+            {
+              "body": {
+                "typeParameterInstantiation": [
+                  {
+                    "typeParameterInstantiation": [],
+                    "type": 11,
+                    "typeParameter": 0
+                  }
+                ],
+                "type": 10,
+                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000002::scratch::Permit"
+              }
+            },
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 11,
+                "typeParameter": 0
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 11,
+                "typeParameter": 1
+              }
+            }
+          ],
+          "name": "remove",
+          "visibility": 2,
+          "isEntry": false
+        },
+        {
+          "typeParameters": [
+            {
+              "constraints": [
+                2
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 1
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 11,
+                "typeParameter": 0
+              }
+            }
+          ],
+          "name": "remove_impl",
+          "visibility": 1,
+          "isEntry": false
+        },
+        {
+          "typeParameters": [
+            {
+              "constraints": [
+                1,
+                2
+              ]
+            },
+            {
+              "constraints": [
+                2
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "reference": 2,
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 10,
+                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000002::tx_context::TxContext"
+              }
+            },
+            {
+              "body": {
+                "typeParameterInstantiation": [
+                  {
+                    "typeParameterInstantiation": [],
+                    "type": 11,
+                    "typeParameter": 0
+                  }
+                ],
+                "type": 10,
+                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000002::scratch::Permit"
+              }
+            },
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 11,
+                "typeParameter": 0
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "typeParameterInstantiation": [
+                  {
+                    "typeParameterInstantiation": [],
+                    "type": 11,
+                    "typeParameter": 1
+                  }
+                ],
+                "type": 10,
+                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000001::option::Option"
+              }
+            }
+          ],
+          "name": "remove_opt",
+          "visibility": 2,
+          "isEntry": false
+        },
+        {
+          "typeParameters": [
+            {
+              "constraints": [
+                1,
+                2
+              ]
+            },
+            {
+              "constraints": [
+                2
+              ]
+            },
+            {
+              "constraints": [
+                2
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "reference": 2,
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 10,
+                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000002::tx_context::TxContext"
+              }
+            },
+            {
+              "body": {
+                "typeParameterInstantiation": [
+                  {
+                    "typeParameterInstantiation": [],
+                    "type": 11,
+                    "typeParameter": 0
+                  }
+                ],
+                "type": 10,
+                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000002::scratch::Permit"
+              }
+            },
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 11,
+                "typeParameter": 0
+              }
+            },
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 11,
+                "typeParameter": 1
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "typeParameterInstantiation": [
+                  {
+                    "typeParameterInstantiation": [],
+                    "type": 11,
+                    "typeParameter": 2
+                  }
+                ],
+                "type": 10,
+                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000001::option::Option"
+              }
+            }
+          ],
+          "name": "replace",
+          "visibility": 2,
+          "isEntry": false
+        }
+      ],
+      "name": "scratch"
     }
   },
   {
