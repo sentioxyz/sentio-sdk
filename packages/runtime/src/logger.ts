@@ -162,6 +162,27 @@ export class LogGuard {
 
 const GUARD_BYPASS = Symbol.for('sentio.logGuardBypass')
 
+// Fields winston or the formats above put on `info` themselves. Anything else is metadata that winston
+// copied from a trailing object argument (`console.log('msg', { ... })`) and that the json/simple
+// formats would serialise in full, on top of the copy utilFormatter already rendered into `message`.
+const OWN_INFO_FIELDS = new Set(['level', 'message', 'timestamp', 'stack'])
+
+/** Serialised size of the metadata fields on `info`, or Infinity when they cannot be serialised. */
+function metadataBytes(info: any, keys: string[]): number {
+  if (keys.length === 0) {
+    return 0
+  }
+  const meta: Record<string, unknown> = {}
+  for (const key of keys) {
+    meta[key] = info[key]
+  }
+  try {
+    return Buffer.byteLength(stringify(meta))
+  } catch {
+    return Infinity
+  }
+}
+
 export function setupLogger(
   json: boolean,
   enableDebug: boolean,
@@ -213,9 +234,22 @@ export function setupLogger(
       if (typeof info.stack === 'string') {
         info.stack = guard.truncate(info.stack)
       }
+      const metaKeys = Object.keys(info).filter((key) => !OWN_INFO_FIELDS.has(key))
+      let metaSize = metadataBytes(info, metaKeys)
+      const max = guardOptions.maxLineBytes
+      if (max > 0 && metaSize > max) {
+        // The rendered copy in `message` has already been cut to the cap; the raw fields must not slip
+        // past it through the metadata, so they are dropped rather than serialised.
+        for (const key of metaKeys) {
+          delete info[key]
+        }
+        info.message = `${info.message} ...[metadata of ${metaSize} bytes dropped by sentio runtime, limit ${max}]`
+        metaSize = 0
+      }
       const size =
         Buffer.byteLength(String(info.message ?? '')) +
-        (typeof info.stack === 'string' ? Buffer.byteLength(info.stack) : 0)
+        (typeof info.stack === 'string' ? Buffer.byteLength(info.stack) : 0) +
+        metaSize
       return guard.admit(size) ? info : false
     }
   }

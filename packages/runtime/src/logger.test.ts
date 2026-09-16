@@ -175,8 +175,40 @@ describe('setupLogger with the log guard', () => {
     assert.equal(messages[0], 'x'.repeat(32) + ' ...[truncated by sentio runtime: line was 100 bytes, limit 32]')
     assert.equal(messages[1], 'second')
     assert.equal(messages[2], 'third {"a":1}')
+    assert.equal(JSON.parse(lines[2]).a, 1, 'small metadata is still emitted')
     assert.include(messages[3], 'dropped 2 console log lines')
     assert.equal(JSON.parse(lines[3]).level, 'warn')
+  })
+
+  test('drops oversized metadata copied from object arguments', () => {
+    setupLogger(true, false, undefined, { maxLineBytes: 32, maxLinesPerSecond: 0, maxBytesPerSecond: 0 })
+    console.log('response', { payload: 'x'.repeat(2 * 1024 * 1024) })
+    console.log('response', { payload: 'small' })
+    assert.lengthOf(lines, 2)
+    assert.isBelow(lines[0].length, 512, lines[0].slice(0, 200))
+    const big = JSON.parse(lines[0])
+    assert.isUndefined(big.payload)
+    assert.include(big.message, 'truncated by sentio runtime')
+    assert.include(big.message, 'metadata of 2097166 bytes dropped by sentio runtime, limit 32')
+    assert.deepEqual(JSON.parse(lines[1]).payload, 'small')
+  })
+
+  test('bounds metadata in simple output mode too', () => {
+    setupLogger(false, false, undefined, { maxLineBytes: 32, maxLinesPerSecond: 0, maxBytesPerSecond: 0 })
+    console.log('response', { payload: 'x'.repeat(2 * 1024 * 1024) })
+    assert.lengthOf(lines, 1)
+    assert.isBelow(lines[0].length, 512)
+  })
+
+  test('charges metadata against the byte budget', async () => {
+    setupLogger(true, false, undefined, { maxLineBytes: 0, maxLinesPerSecond: 0, maxBytesPerSecond: 100 })
+    console.log('m', { payload: 'x'.repeat(200) })
+    console.log('small')
+    await new Promise((resolve) => setTimeout(resolve, 1100))
+    const messages = lines.map((l) => JSON.parse(l).message as string)
+    assert.lengthOf(messages, 2, lines.join(''))
+    assert.equal(messages[0], 'small')
+    assert.include(messages[1], 'dropped 1 console log lines')
   })
 
   test('truncates the error stack too', () => {
