@@ -2,7 +2,13 @@ import { describe, test } from 'node:test'
 import fs from 'fs-extra'
 import os from 'os'
 import path from 'path'
-import { getABI, collectLegacySuiAbis } from './abi.js'
+import {
+  getABI,
+  collectLegacySuiAbis,
+  convertLegacySuiAbis,
+  isLegacyNormalizedModules,
+  normalizedModulesToAbi
+} from './abi.js'
 import { AptosChainId, EthChainId, SuiChainId } from '@sentio/chain'
 import { expect } from 'chai'
 
@@ -52,22 +58,86 @@ describe('Test ABI get', () => {
   })
 })
 
-describe('Test legacy Sui ABI collection', () => {
-  const legacyModuleMap = {
-    m1: {
-      fileFormatVersion: 6,
-      address: '0xpkg',
-      name: 'm1',
-      friends: [],
-      structs: {
-        S: { abilities: { abilities: ['Copy', 'Drop'] }, typeParameters: [], fields: [{ name: 'x', type: 'U64' }] }
-      },
-      exposedFunctions: {
-        f: { visibility: 'Public', isEntry: false, typeParameters: [], parameters: ['U64'], return: [] }
+describe('Test legacy Sui ABI conversion', () => {
+  // The `{ name: module }` map returned by JSON-RPC getNormalizedMoveModulesByPackage.
+  const legacyModule = {
+    fileFormatVersion: 6,
+    address: '0xpkg',
+    name: 'm1',
+    friends: [],
+    structs: {
+      S: {
+        abilities: { abilities: ['Copy', 'Drop'] },
+        typeParameters: [{ constraints: { abilities: ['Store'] }, isPhantom: false }],
+        fields: [
+          { name: 'x', type: 'U64' },
+          { name: 'v', type: { Vector: { TypeParameter: 0 } } },
+          { name: 'id', type: { Struct: { address: '0x2', module: 'object', name: 'UID', typeArguments: [] } } }
+        ]
+      }
+    },
+    exposedFunctions: {
+      f: {
+        visibility: 'Public',
+        isEntry: true,
+        typeParameters: [{ abilities: ['Drop'] }],
+        parameters: [
+          'U64',
+          { MutableReference: { Struct: { address: '0x2', module: 'tx_context', name: 'TxContext' } } }
+        ],
+        return: [{ Reference: 'Bool' }]
       }
     }
   }
-  const newShapeAbi = [{ address: '0x111', module: { name: 'n', datatypes: [], functions: [] } }]
+  const legacyModuleMap = { m1: legacyModule }
+  // The pre-gRPC codegen read modules through Object.values, so an array of
+  // modules (e.g. saved by hand from a JSON-RPC response) was accepted too.
+  const legacyModuleArray = [legacyModule]
+  const grpcShapeAbi = [{ address: '0x111', module: { name: 'n', datatypes: [], functions: [] } }]
+  const convertedModule = {
+    address: '0xpkg',
+    module: {
+      name: 'm1',
+      datatypes: [
+        {
+          name: 'S',
+          kind: 1,
+          abilities: [1, 2],
+          typeParameters: [{ constraints: [3] }],
+          fields: [
+            { name: 'x', position: 0, type: { type: 6, typeParameterInstantiation: [] } },
+            {
+              name: 'v',
+              position: 1,
+              type: {
+                type: 9,
+                typeParameterInstantiation: [{ type: 11, typeParameter: 0, typeParameterInstantiation: [] }]
+              }
+            },
+            {
+              name: 'id',
+              position: 2,
+              type: { type: 10, typeName: '0x2::object::UID', typeParameterInstantiation: [] }
+            }
+          ],
+          variants: []
+        }
+      ],
+      functions: [
+        {
+          name: 'f',
+          visibility: 2,
+          isEntry: true,
+          typeParameters: [{ constraints: [2] }],
+          parameters: [
+            { body: { type: 6, typeParameterInstantiation: [] } },
+            { reference: 2, body: { type: 10, typeName: '0x2::tx_context::TxContext', typeParameterInstantiation: [] } }
+          ],
+          returns: [{ reference: 1, body: { type: 2, typeParameterInstantiation: [] } }]
+        }
+      ]
+    }
+  }
 
   function makeDir() {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'sentio-sui-abi-'))
@@ -75,61 +145,134 @@ describe('Test legacy Sui ABI collection', () => {
     return dir
   }
 
-  test('collects a legacy mainnet ABI with the address taken from its file name', () => {
-    const dir = makeDir()
-    try {
-      const file = path.join(dir, '0xabc.json')
-      fs.writeFileSync(file, JSON.stringify(legacyModuleMap))
+  function write(file: string, content: any) {
+    fs.writeFileSync(file, JSON.stringify(content))
+  }
 
-      const legacy = collectLegacySuiAbis(dir)
+  function read(file: string) {
+    return JSON.parse(fs.readFileSync(file, 'utf8'))
+  }
 
-      expect(legacy).length(1)
-      expect(legacy[0].file).eq(file)
-      expect(legacy[0].address).eq('0xabc')
-      expect(legacy[0].chain).eq(SuiChainId.SUI_MAINNET)
-    } finally {
-      fs.removeSync(dir)
-    }
+  describe('isLegacyNormalizedModules', () => {
+    test('detects the JSON-RPC module map, also wrapped in result', () => {
+      expect(isLegacyNormalizedModules(legacyModuleMap)).eq(true)
+      expect(isLegacyNormalizedModules({ result: legacyModuleMap })).eq(true)
+    })
+
+    test('detects an array of legacy modules', () => {
+      expect(isLegacyNormalizedModules(legacyModuleArray)).eq(true)
+      expect(isLegacyNormalizedModules({ result: legacyModuleArray })).eq(true)
+    })
+
+    test('does not flag the gRPC array shape or non-ABI content', () => {
+      expect(isLegacyNormalizedModules(grpcShapeAbi)).eq(false)
+      expect(isLegacyNormalizedModules([])).eq(false)
+      expect(isLegacyNormalizedModules({})).eq(false)
+      expect(isLegacyNormalizedModules(null)).eq(false)
+      expect(isLegacyNormalizedModules('abi')).eq(false)
+    })
   })
 
-  test('marks files under testnet/ as SUI_TESTNET', () => {
-    const dir = makeDir()
-    try {
-      const file = path.join(dir, 'testnet', '0xdef.json')
-      fs.writeFileSync(file, JSON.stringify(legacyModuleMap))
+  describe('normalizedModulesToAbi', () => {
+    test('converts the module map to the gRPC array shape', () => {
+      expect(normalizedModulesToAbi(legacyModuleMap)).deep.eq([convertedModule])
+      expect(normalizedModulesToAbi({ result: legacyModuleMap })).deep.eq([convertedModule])
+    })
 
-      const legacy = collectLegacySuiAbis(dir)
+    test('converts an array of legacy modules identically', () => {
+      expect(normalizedModulesToAbi(legacyModuleArray)).deep.eq([convertedModule])
+    })
 
-      expect(legacy).length(1)
-      expect(legacy[0].chain).eq(SuiChainId.SUI_TESTNET)
-    } finally {
-      fs.removeSync(dir)
-    }
+    test('uses the fallback address only for modules without one', () => {
+      const { address, ...noAddress } = legacyModule
+      expect(normalizedModulesToAbi([noAddress], '0xfile')[0].address).eq('0xfile')
+      expect(normalizedModulesToAbi([legacyModule], '0xfile')[0].address).eq(address)
+      expect(() => normalizedModulesToAbi([noAddress])).throw('cannot resolve package address of module m1')
+    })
   })
 
-  test('falls back to the module address for files saved under a custom name', () => {
-    const dir = makeDir()
-    try {
-      const file = path.join(dir, 'my-package.json')
-      fs.writeFileSync(file, JSON.stringify(legacyModuleMap))
+  describe('collectLegacySuiAbis', () => {
+    test('collects legacy map and array files, recursing into testnet/', () => {
+      const dir = makeDir()
+      try {
+        const mapFile = path.join(dir, '0xabc.json')
+        const arrayFile = path.join(dir, 'testnet', 'my-package.json')
+        write(mapFile, legacyModuleMap)
+        write(arrayFile, legacyModuleArray)
+        write(path.join(dir, '0x111.json'), grpcShapeAbi)
+        fs.writeFileSync(path.join(dir, 'broken.json'), '{')
+        fs.writeFileSync(path.join(dir, 'notes.txt'), JSON.stringify(legacyModuleMap))
 
-      const legacy = collectLegacySuiAbis(dir)
+        const legacy = collectLegacySuiAbis(dir).sort((a, b) => a.file.localeCompare(b.file))
 
-      expect(legacy).length(1)
-      expect(legacy[0].address).eq('0xpkg')
-    } finally {
-      fs.removeSync(dir)
-    }
+        expect(legacy.map((l) => l.file)).deep.eq([mapFile, arrayFile])
+        expect(legacy[0].fallbackAddress).eq('0xabc')
+        expect(legacy[0].modules).deep.eq(legacyModuleMap)
+        expect(legacy[1].fallbackAddress).eq(undefined)
+        expect(legacy[1].modules).deep.eq(legacyModuleArray)
+      } finally {
+        fs.removeSync(dir)
+      }
+    })
+
+    test('returns nothing for a missing directory', () => {
+      expect(collectLegacySuiAbis(path.join(os.tmpdir(), 'sentio-sui-abi-missing'))).length(0)
+    })
   })
 
-  test('ignores already-migrated gRPC-shape files', () => {
-    const dir = makeDir()
-    try {
-      fs.writeFileSync(path.join(dir, '0x111.json'), JSON.stringify(newShapeAbi))
+  describe('convertLegacySuiAbis', () => {
+    test('rewrites legacy files in place and leaves gRPC-shape files untouched', () => {
+      const dir = makeDir()
+      try {
+        const mapFile = path.join(dir, '0xabc.json')
+        const arrayFile = path.join(dir, 'testnet', 'my-package.json')
+        const grpcFile = path.join(dir, '0x111.json')
+        write(mapFile, legacyModuleMap)
+        write(arrayFile, legacyModuleArray)
+        write(grpcFile, grpcShapeAbi)
+        const grpcRaw = fs.readFileSync(grpcFile, 'utf8')
 
-      expect(collectLegacySuiAbis(dir)).length(0)
-    } finally {
-      fs.removeSync(dir)
-    }
+        convertLegacySuiAbis(dir)
+
+        expect(read(mapFile)).deep.eq([convertedModule])
+        expect(read(arrayFile)).deep.eq([convertedModule])
+        expect(fs.readFileSync(grpcFile, 'utf8')).eq(grpcRaw)
+        // Converted files are in the gRPC shape now, so a second pass is a no-op.
+        expect(collectLegacySuiAbis(dir)).length(0)
+      } finally {
+        fs.removeSync(dir)
+      }
+    })
+
+    test('takes the package address from the file name when the modules carry none', () => {
+      const dir = makeDir()
+      try {
+        const { address, ...noAddress } = legacyModule
+        const file = path.join(dir, '0xfromfile.json')
+        write(file, { m1: noAddress })
+
+        convertLegacySuiAbis(dir)
+
+        expect(read(file)).deep.eq([{ ...convertedModule, address: '0xfromfile' }])
+      } finally {
+        fs.removeSync(dir)
+      }
+    })
+
+    test('skips a file whose package address cannot be resolved', () => {
+      const dir = makeDir()
+      try {
+        const { address, ...noAddress } = legacyModule
+        const file = path.join(dir, 'custom-name.json')
+        write(file, { m1: noAddress })
+        const raw = fs.readFileSync(file, 'utf8')
+
+        convertLegacySuiAbis(dir)
+
+        expect(fs.readFileSync(file, 'utf8')).eq(raw)
+      } finally {
+        fs.removeSync(dir)
+      }
+    })
   })
 })

@@ -137,65 +137,60 @@ function normalizedModule(name: string, m: any): any {
 }
 
 // Convert the JSON-RPC normalized-modules shape (a `{ name: module }` map or an
-// array of modules) into the gRPC ABI array consumed by the v2 codegen.
-export function normalizedModulesToAbi(modules: any): Array<{ address: string; module: any }> {
+// array of modules, optionally wrapped in `{ result }`) into the gRPC ABI array
+// consumed by the v2 codegen. `fallbackAddress` fills in the package address of
+// modules that don't carry one; modules that do keep their own.
+export function normalizedModulesToAbi(
+  modules: any,
+  fallbackAddress?: string
+): Array<{ address: string; module: any }> {
   const map = modules?.result ?? modules
   const entries: Array<[string, any]> = Array.isArray(map)
     ? map.map((m: any) => [m.name, m])
     : Object.entries(map ?? {})
-  return entries.map(([n, m]) => ({ address: m.address, module: normalizedModule(n, m) }))
+  return entries.map(([n, m]) => {
+    const address = m.address ?? fallbackAddress
+    if (typeof address !== 'string' || !address.startsWith('0x')) {
+      throw Error(`cannot resolve package address of module ${m.name ?? n}`)
+    }
+    return { address, module: normalizedModule(n, m) }
+  })
 }
 
-// A Sui ABI downloaded by an older CLI is the raw JSON-RPC
-// `getNormalizedMoveModulesByPackage` result: a `{ moduleName: { structs,
-// exposedFunctions, ... } }` map. The v2 codegen (see comment at top of file)
-// instead consumes the gRPC array shape produced by `normalizedModulesToAbi`.
-// Feeding a legacy-shaped file straight to codegen throws
-// (`modules.map is not a function`), so `sentio add`/`build`/`gen` fail whenever
-// a stale Sui ABI is already sitting in `abis/sui`. Detect that legacy shape.
-function isLegacyNormalizedModules(parsed: any): boolean {
-  // The gRPC shape is an array; the legacy JSON-RPC shape is a plain object map.
-  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
-    return false
-  }
-  const map = parsed.result ?? parsed
-  if (!map || typeof map !== 'object' || Array.isArray(map)) {
-    return false
-  }
-  return Object.values(map).some((m: any) => m && typeof m === 'object' && ('exposedFunctions' in m || 'structs' in m))
+function isLegacyNormalizedModule(m: any): boolean {
+  return !!m && typeof m === 'object' && !Array.isArray(m) && ('exposedFunctions' in m || 'structs' in m)
 }
 
-// A legacy-shaped Sui ABI file on disk, together with the package address and
-// network recovered from its name/content so it can be re-downloaded.
+// A Sui ABI saved by an older CLI (or by hand from a JSON-RPC response) is the
+// raw `getNormalizedMoveModulesByPackage` result: a `{ moduleName: { structs,
+// exposedFunctions, ... } }` map or an array of such modules (the pre-gRPC
+// codegen read both through Object.values), optionally wrapped in `{ result }`.
+// The v2 codegen (see comment at top of file) instead consumes the gRPC array
+// shape (`[{ address, module }]`) produced by `normalizedModulesToAbi`. Feeding
+// a legacy-shaped file straight to codegen throws (`modules.map is not a
+// function` for the map, `Cannot read properties of undefined` for the array),
+// so `sentio add`/`build`/`gen` fail whenever a stale Sui ABI is already
+// sitting in `abis/sui`. Detect every legacy variant.
+export function isLegacyNormalizedModules(parsed: any): boolean {
+  const map = parsed?.result ?? parsed
+  if (!map || typeof map !== 'object') {
+    return false
+  }
+  return (Array.isArray(map) ? map : Object.values(map)).some(isLegacyNormalizedModule)
+}
+
+// A legacy-shaped Sui ABI file on disk together with its parsed content and the
+// package address recovered from the 0x-prefixed file name (what `sentio add`
+// uses by default), used for modules that don't carry their own address.
 export interface LegacySuiAbi {
   file: string
-  address: string
-  chain: SuiChainId.SUI_MAINNET | SuiChainId.SUI_TESTNET
+  modules: any
+  fallbackAddress?: string
 }
 
-// Recover the package address of a legacy Sui ABI: prefer the 0x-prefixed file
-// name (what `sentio add` uses by default), otherwise fall back to the `address`
-// carried by the normalized modules (covers files saved under a custom --name).
-function legacySuiPackageAddress(file: string, parsed: any): string | undefined {
-  const base = path.basename(file, '.json')
-  if (base.startsWith('0x')) {
-    return base
-  }
-  const map = parsed?.result ?? parsed
-  for (const module of Object.values(map ?? {})) {
-    const address = (module as any)?.address
-    if (typeof address === 'string' && address.startsWith('0x')) {
-      return address
-    }
-  }
-  return undefined
-}
-
-// Recursively collect every legacy-shaped Sui ABI under `baseDir`, resolving the
-// package address and network (testnet ABIs live under `<baseDir>/testnet`, see
-// getABIFilePath) for each. Pure/offline — the download happens in
-// `redownloadLegacySuiAbis`. Iota still consumes the legacy shape, so this must
-// only ever be pointed at the Sui directory.
+// Recursively collect every legacy-shaped Sui ABI under `baseDir`. Pure/offline;
+// the conversion happens in `convertLegacySuiAbis`. Iota still consumes the
+// legacy shape, so this must only ever be pointed at the Sui directory.
 export function collectLegacySuiAbis(baseDir: string): LegacySuiAbi[] {
   const result: LegacySuiAbi[] = []
   const walk = (dir: string) => {
@@ -220,43 +215,39 @@ export function collectLegacySuiAbis(baseDir: string): LegacySuiAbi[] {
       if (!isLegacyNormalizedModules(parsed)) {
         continue
       }
-      const address = legacySuiPackageAddress(fullPath, parsed)
-      if (!address) {
-        console.log(
-          chalk.yellow(`Skipping legacy Sui ABI ${fullPath}: cannot resolve package address, re-download it manually`)
-        )
-        continue
-      }
-      const isTestnet = path.relative(baseDir, fullPath).split(path.sep).includes('testnet')
-      result.push({ file: fullPath, address, chain: isTestnet ? SuiChainId.SUI_TESTNET : SuiChainId.SUI_MAINNET })
+      const base = path.basename(fullPath, '.json')
+      result.push({ file: fullPath, modules: parsed, fallbackAddress: base.startsWith('0x') ? base : undefined })
     }
   }
   walk(baseDir)
   return result
 }
 
-// Sui ABIs downloaded by an older CLI are stored in the legacy JSON-RPC map
-// shape, which the current gRPC codegen can't read (`modules.map is not a
-// function`), so a stale Sui ABI left in `abis/sui` makes `sentio add`/`build`/
-// `gen` fail for the whole project. Collect every such file, then re-download it
-// through getABI so it lands in the current shape with fresh on-chain data.
-// Fetched sequentially with a delay between same-network requests to stay under
-// Sui public-RPC rate limits, matching the "download missing ABI" loop.
-export async function redownloadLegacySuiAbis(baseDir = path.resolve('abis', 'sui')): Promise<void> {
+// Sui ABIs saved by an older CLI are stored in the legacy JSON-RPC shape, which
+// the current gRPC codegen can't read, so a stale Sui ABI left in `abis/sui`
+// makes `sentio add`/`build`/`gen` fail for the whole project. Rewrite every
+// such file in place through `normalizedModulesToAbi`. The legacy file already
+// holds the full module ABI, so this is a pure local conversion: no network, no
+// dependence on a hard-coded fullnode URL, and it also covers packages saved
+// from networks the CLI can't re-download from.
+export function convertLegacySuiAbis(baseDir = path.resolve('abis', 'sui')): void {
   const legacy = collectLegacySuiAbis(baseDir)
   if (legacy.length === 0) {
     return
   }
-  console.log(chalk.yellow(`Found ${legacy.length} legacy Sui ABI file(s), re-downloading in the current format`))
-  let previousChain = ''
-  for (const { file, chain, address } of legacy) {
-    if (chain === previousChain) {
-      await new Promise((resolve) => setTimeout(resolve, 5000))
-    } else {
-      previousChain = chain
+  console.log(chalk.yellow(`Found ${legacy.length} legacy Sui ABI file(s), converting to the current format`))
+  for (const { file, modules, fallbackAddress } of legacy) {
+    let abi
+    try {
+      abi = normalizedModulesToAbi(modules, fallbackAddress)
+    } catch (e: any) {
+      console.log(
+        chalk.yellow(`Skipping legacy Sui ABI ${file}: ${e?.message ?? e}, re-download it with \`sentio add\``)
+      )
+      continue
     }
-    const res = await getABI(chain, address, path.basename(file, '.json'))
-    writeABIFile(res.abi, file)
+    fs.writeFileSync(file, JSON.stringify(abi, null, 2))
+    console.log(chalk.green('Converted legacy Sui ABI', file))
   }
 }
 
