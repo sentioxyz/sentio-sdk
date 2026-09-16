@@ -160,9 +160,11 @@ describe('setupLogger with the log guard', () => {
     setupLogger(false, true)
   })
 
+  const unlimited = { maxLineBytes: 0, maxLinesPerSecond: 0, maxBytesPerSecond: 0 }
+
   test('truncates, drops and summarises console output', async () => {
-    setupLogger(true, false, undefined, { maxLineBytes: 32, maxLinesPerSecond: 3, maxBytesPerSecond: 0 })
-    console.log('x'.repeat(100))
+    setupLogger(true, false, undefined, { maxLineBytes: 256, maxLinesPerSecond: 3, maxBytesPerSecond: 0 })
+    console.log('x'.repeat(400))
     console.log('second')
     console.error('third', { a: 1 })
     console.log('fourth, dropped')
@@ -172,36 +174,50 @@ describe('setupLogger with the log guard', () => {
 
     const messages = lines.map((l) => JSON.parse(l).message as string)
     assert.lengthOf(messages, 4, lines.join(''))
-    assert.equal(messages[0], 'x'.repeat(32) + ' ...[truncated by sentio runtime: line was 100 bytes, limit 32]')
+    assert.equal(messages[0], 'x'.repeat(256) + ' ...[truncated by sentio runtime: line was 400 bytes, limit 256]')
     assert.equal(messages[1], 'second')
     assert.equal(messages[2], 'third {"a":1}')
-    assert.equal(JSON.parse(lines[2]).a, 1, 'small metadata is still emitted')
+    assert.equal(JSON.parse(lines[2]).a, 1, 'metadata within the cap is still emitted')
     assert.include(messages[3], 'dropped 2 console log lines')
     assert.equal(JSON.parse(lines[3]).level, 'warn')
   })
 
   test('drops oversized metadata copied from object arguments', () => {
-    setupLogger(true, false, undefined, { maxLineBytes: 32, maxLinesPerSecond: 0, maxBytesPerSecond: 0 })
+    setupLogger(true, false, undefined, { ...unlimited, maxLineBytes: 256 })
     console.log('response', { payload: 'x'.repeat(2 * 1024 * 1024) })
     console.log('response', { payload: 'small' })
     assert.lengthOf(lines, 2)
-    assert.isBelow(lines[0].length, 512, lines[0].slice(0, 200))
+    assert.isBelow(lines[0].length, 1024, lines[0].slice(0, 200))
     const big = JSON.parse(lines[0])
     assert.isUndefined(big.payload)
     assert.include(big.message, 'truncated by sentio runtime')
-    assert.include(big.message, 'metadata of 2097166 bytes dropped by sentio runtime, limit 32')
+    assert.match(big.message, /1 metadata fields dropped by sentio runtime: line was \d+ bytes, limit 256/)
     assert.deepEqual(JSON.parse(lines[1]).payload, 'small')
   })
 
   test('bounds metadata in simple output mode too', () => {
-    setupLogger(false, false, undefined, { maxLineBytes: 32, maxLinesPerSecond: 0, maxBytesPerSecond: 0 })
+    setupLogger(false, false, undefined, { ...unlimited, maxLineBytes: 256 })
     console.log('response', { payload: 'x'.repeat(2 * 1024 * 1024) })
     assert.lengthOf(lines, 1)
-    assert.isBelow(lines[0].length, 512)
+    assert.isBelow(lines[0].length, 1024)
   })
 
-  test('charges metadata against the byte budget', async () => {
-    setupLogger(true, false, undefined, { maxLineBytes: 0, maxLinesPerSecond: 0, maxBytesPerSecond: 100 })
+  test('measures the rendered line, so repeated references and odd field types cannot slip past', () => {
+    setupLogger(true, false, undefined, { ...unlimited, maxLineBytes: 4096 })
+    const shared = { data: 'x'.repeat(8192) }
+    console.log('response', { items: Array(200).fill(shared) })
+    console.log('response', { stack: { payload: 'x'.repeat(2 * 1024 * 1024) } })
+    console.log('response', { message: 'x'.repeat(2 * 1024 * 1024) })
+    assert.lengthOf(lines, 3)
+    for (const line of lines) {
+      assert.isBelow(line.length, 2 * 4096 + 512, line.slice(0, 200))
+      assert.match(line, /(truncated|dropped) by sentio runtime/)
+    }
+    assert.isUndefined(JSON.parse(lines[1]).stack)
+  })
+
+  test('charges the rendered size against the byte budget', async () => {
+    setupLogger(true, false, undefined, { ...unlimited, maxBytesPerSecond: 200 })
     console.log('m', { payload: 'x'.repeat(200) })
     console.log('small')
     await new Promise((resolve) => setTimeout(resolve, 1100))
@@ -212,12 +228,13 @@ describe('setupLogger with the log guard', () => {
   })
 
   test('truncates the error stack too', () => {
-    setupLogger(true, false, undefined, { maxLineBytes: 64, maxLinesPerSecond: 0, maxBytesPerSecond: 0 })
-    console.error(new Error('e'.repeat(200)))
+    setupLogger(true, false, undefined, { ...unlimited, maxLineBytes: 512 })
+    console.error(new Error('e'.repeat(2000)))
     assert.lengthOf(lines, 1)
     const entry = JSON.parse(lines[0])
     assert.include(entry.message, 'truncated by sentio runtime')
     assert.include(entry.stack, 'truncated by sentio runtime')
-    assert.isBelow(entry.stack.length, 200)
+    assert.isBelow(entry.stack.length, 700)
+    assert.isBelow(lines[0].length, 2 * 512 + 512)
   })
 })

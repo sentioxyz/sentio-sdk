@@ -161,27 +161,11 @@ export class LogGuard {
 }
 
 const GUARD_BYPASS = Symbol.for('sentio.logGuardBypass')
+const MESSAGE = Symbol.for('message')
 
-// Fields winston or the formats above put on `info` themselves. Anything else is metadata that winston
-// copied from a trailing object argument (`console.log('msg', { ... })`) and that the json/simple
-// formats would serialise in full, on top of the copy utilFormatter already rendered into `message`.
-const OWN_INFO_FIELDS = new Set(['level', 'message', 'timestamp', 'stack'])
-
-/** Serialised size of the metadata fields on `info`, or Infinity when they cannot be serialised. */
-function metadataBytes(info: any, keys: string[]): number {
-  if (keys.length === 0) {
-    return 0
-  }
-  const meta: Record<string, unknown> = {}
-  for (const key of keys) {
-    meta[key] = info[key]
-  }
-  try {
-    return Buffer.byteLength(stringify(meta))
-  } catch {
-    return Infinity
-  }
-}
+// Fields the formats above set on `info` themselves. Everything else winston copied from a trailing
+// object argument (`console.log('msg', { ... })`) and the json/simple formats serialise in full.
+const OWN_INFO_FIELDS = new Set(['level', 'timestamp'])
 
 export function setupLogger(
   json: boolean,
@@ -219,37 +203,39 @@ export function setupLogger(
   const guard = new LogGuard(guardOptions, (summary) => {
     logger.warn({ message: summary, [GUARD_BYPASS]: true } as any)
   })
-  // Runs after the message and the error stack are strings: cuts oversized text and drops lines that
-  // exceed the per-second budget (returning false discards the entry). The summary line bypasses the
-  // guard so it cannot be dropped by the very limit it reports, and debug lines that the level filter
-  // discards anyway are not charged against the budget.
+  const render = json ? format.json() : format.simple()
+  // Runs on the rendered line, i.e. on exactly the bytes the transport would write, so nothing that
+  // winston copied onto `info` can slip past it. A line within the cap costs one byte count; an
+  // oversized one has its message and stack cut, every other field dropped, and is rendered again.
+  // Returning false discards the entry. The summary line bypasses the guard so it cannot be dropped
+  // by the very limit it reports; debug lines the level filter discards anyway are not charged.
   const guardFormatter = {
     transform: (info: any) => {
       if (info[GUARD_BYPASS] || (info.level === 'debug' && !enableDebug)) {
         return info
       }
-      if (typeof info.message === 'string') {
-        info.message = guard.truncate(info.message)
-      }
-      if (typeof info.stack === 'string') {
-        info.stack = guard.truncate(info.stack)
-      }
-      const metaKeys = Object.keys(info).filter((key) => !OWN_INFO_FIELDS.has(key))
-      let metaSize = metadataBytes(info, metaKeys)
+      let size = Buffer.byteLength(String(info[MESSAGE]))
       const max = guardOptions.maxLineBytes
-      if (max > 0 && metaSize > max) {
-        // The rendered copy in `message` has already been cut to the cap; the raw fields must not slip
-        // past it through the metadata, so they are dropped rather than serialised.
-        for (const key of metaKeys) {
-          delete info[key]
+      if (max > 0 && size > max) {
+        let dropped = 0
+        for (const key of Object.keys(info)) {
+          const keepAsText = (key === 'message' || key === 'stack') && typeof info[key] === 'string'
+          if (!OWN_INFO_FIELDS.has(key) && !keepAsText) {
+            delete info[key]
+            dropped++
+          }
         }
-        info.message = `${info.message} ...[metadata of ${metaSize} bytes dropped by sentio runtime, limit ${max}]`
-        metaSize = 0
+        info.message = guard.truncate(String(info.message ?? ''))
+        if (typeof info.stack === 'string') {
+          info.stack = guard.truncate(info.stack)
+        }
+        if (dropped > 0) {
+          const note = `${dropped} metadata fields dropped by sentio runtime: line was ${size} bytes, limit ${max}`
+          info.message += ` ...[${note}]`
+        }
+        info = render.transform(info, render.options)
+        size = Buffer.byteLength(String(info[MESSAGE]))
       }
-      const size =
-        Buffer.byteLength(String(info.message ?? '')) +
-        (typeof info.stack === 'string' ? Buffer.byteLength(info.stack) : 0) +
-        metaSize
       return guard.admit(size) ? info : false
     }
   }
@@ -259,8 +245,8 @@ export function setupLogger(
       format.timestamp({ format: 'YYYY-MM-DDTHH:mm:ss.SSSZ' }),
       utilFormatter,
       format.errors({ stack: true }),
+      render,
       guardFormatter,
-      json ? format.json() : format.simple(),
       format.label({ label: workerId ? `worker #{workerId}` : '' })
     ),
     level: enableDebug ? 'debug' : 'info',
