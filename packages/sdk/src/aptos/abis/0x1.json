@@ -17089,7 +17089,8 @@
           "is_view": false,
           "generic_type_params": [],
           "params": [
-            "&signer"
+            "&signer",
+            "u64"
           ],
           "return": []
         },
@@ -17129,6 +17130,21 @@
             "vector<u8>"
           ],
           "return": []
+        },
+        {
+          "name": "on_new_block_v2",
+          "visibility": "friend",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [
+            "&signer",
+            "u64",
+            "u64",
+            "0x1::option::Option<vector<u8>>",
+            "0x1::option::Option<u64>"
+          ],
+          "return": []
         }
       ],
       "structs": [
@@ -17154,6 +17170,40 @@
             {
               "name": "decryption_key",
               "type": "0x1::option::Option<vector<u8>>"
+            }
+          ],
+          "variants": []
+        },
+        {
+          "name": "PerBlockDecryptionKeyV2",
+          "is_native": false,
+          "is_event": false,
+          "is_enum": false,
+          "abilities": [
+            "drop",
+            "key"
+          ],
+          "generic_type_params": [],
+          "fields": [
+            {
+              "name": "epoch",
+              "type": "u64"
+            },
+            {
+              "name": "block_round",
+              "type": "u64"
+            },
+            {
+              "name": "decryption_key",
+              "type": "0x1::option::Option<vector<u8>>"
+            },
+            {
+              "name": "decryption_round",
+              "type": "0x1::option::Option<u64>"
+            },
+            {
+              "name": "next_decryption_round",
+              "type": "u64"
             }
           ],
           "variants": []

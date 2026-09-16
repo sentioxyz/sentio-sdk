@@ -2380,11 +2380,6 @@
         "typeParameters": [],
         "parameters": [
           "U64",
-          "U64",
-          "U64",
-          "U64",
-          "U64",
-          "U64",
           {
             "MutableReference": {
               "Struct": {
@@ -2591,13 +2586,11 @@
             }
           },
           {
-            "Reference": {
-              "Struct": {
-                "address": "0x2",
-                "module": "object",
-                "name": "ID",
-                "typeArguments": []
-              }
+            "Struct": {
+              "address": "0x2",
+              "module": "object",
+              "name": "ID",
+              "typeArguments": []
             }
           }
         ],
@@ -3778,6 +3771,56 @@
       }
     }
   },
+  "protocol_config": {
+    "fileFormatVersion": 6,
+    "address": "0x3",
+    "name": "protocol_config",
+    "friends": [
+      {
+        "address": "0x3",
+        "name": "iota_system_state_inner"
+      }
+    ],
+    "structs": {},
+    "exposedFunctions": {
+      "get_attr": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "Vector": "U8"
+          }
+        ],
+        "return": [
+          {
+            "TypeParameter": 0
+          }
+        ]
+      },
+      "is_feature_enabled": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Vector": "U8"
+          }
+        ],
+        "return": [
+          "Bool"
+        ]
+      }
+    }
+  },
   "staking_pool": {
     "fileFormatVersion": 6,
     "address": "0x3",
@@ -4907,12 +4950,7 @@
     "fileFormatVersion": 6,
     "address": "0x3",
     "name": "timelocked_staking",
-    "friends": [
-      {
-        "address": "0x3",
-        "name": "genesis"
-      }
-    ],
+    "friends": [],
     "structs": {
       "TimelockedStakedIota": {
         "abilities": {
@@ -5177,70 +5215,6 @@
             }
           },
           "Address",
-          {
-            "MutableReference": {
-              "Struct": {
-                "address": "0x2",
-                "module": "tx_context",
-                "name": "TxContext",
-                "typeArguments": []
-              }
-            }
-          }
-        ],
-        "return": []
-      },
-      "request_add_stake_at_genesis": {
-        "visibility": "Friend",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "MutableReference": {
-              "Struct": {
-                "address": "0x3",
-                "module": "validator",
-                "name": "ValidatorV1",
-                "typeArguments": []
-              }
-            }
-          },
-          {
-            "Struct": {
-              "address": "0x2",
-              "module": "balance",
-              "name": "Balance",
-              "typeArguments": [
-                {
-                  "Struct": {
-                    "address": "0x2",
-                    "module": "iota",
-                    "name": "IOTA",
-                    "typeArguments": []
-                  }
-                }
-              ]
-            }
-          },
-          "Address",
-          "U64",
-          {
-            "Struct": {
-              "address": "0x1",
-              "module": "option",
-              "name": "Option",
-              "typeArguments": [
-                {
-                  "Struct": {
-                    "address": "0x1",
-                    "module": "string",
-                    "name": "String",
-                    "typeArguments": []
-                  }
-                }
-              ]
-            }
-          },
           {
             "MutableReference": {
               "Struct": {
@@ -5804,10 +5778,6 @@
       {
         "address": "0x3",
         "name": "iota_system_state_inner"
-      },
-      {
-        "address": "0x3",
-        "name": "timelocked_staking"
       },
       {
         "address": "0x3",
@@ -8310,9 +8280,7 @@
           }
         ],
         "return": [
-          {
-            "Reference": "Address"
-          }
+          "Address"
         ]
       },
       "verified_operation_cap_address": {
@@ -8332,9 +8300,7 @@
           }
         ],
         "return": [
-          {
-            "Reference": "Address"
-          }
+          "Address"
         ]
       }
     }
@@ -8842,6 +8808,36 @@
       }
     },
     "exposedFunctions": {
+      "active_validator": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "validator_set",
+                "name": "ValidatorSetV2",
+                "typeArguments": []
+              }
+            }
+          },
+          "Address"
+        ],
+        "return": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "validator",
+                "name": "ValidatorV1",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      },
       "active_validator_addresses": {
         "visibility": "Friend",
         "isEntry": false,
@@ -8861,6 +8857,36 @@
         "return": [
           {
             "Vector": "Address"
+          }
+        ]
+      },
+      "active_validator_mut": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "validator_set",
+                "name": "ValidatorSetV2",
+                "typeArguments": []
+              }
+            }
+          },
+          "Address"
+        ],
+        "return": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "validator",
+                "name": "ValidatorV1",
+                "typeArguments": []
+              }
+            }
           }
         ]
       },
@@ -9007,6 +9033,66 @@
         ],
         "return": []
       },
+      "any_validator": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "validator_set",
+                "name": "ValidatorSetV2",
+                "typeArguments": []
+              }
+            }
+          },
+          "Address"
+        ],
+        "return": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "validator",
+                "name": "ValidatorV1",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      },
+      "any_validator_mut": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "validator_set",
+                "name": "ValidatorSetV2",
+                "typeArguments": []
+              }
+            }
+          },
+          "Address"
+        ],
+        "return": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "validator",
+                "name": "ValidatorV1",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      },
       "assert_no_pending_or_active_duplicates": {
         "visibility": "Friend",
         "isEntry": false,
@@ -9034,6 +9120,96 @@
           }
         ],
         "return": []
+      },
+      "candidate_validator": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "validator_set",
+                "name": "ValidatorSetV2",
+                "typeArguments": []
+              }
+            }
+          },
+          "Address"
+        ],
+        "return": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "validator",
+                "name": "ValidatorV1",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      },
+      "candidate_validator_mut": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "validator_set",
+                "name": "ValidatorSetV2",
+                "typeArguments": []
+              }
+            }
+          },
+          "Address"
+        ],
+        "return": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "validator",
+                "name": "ValidatorV1",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      },
+      "committee_validator": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "validator_set",
+                "name": "ValidatorSetV2",
+                "typeArguments": []
+              }
+            }
+          },
+          "Address"
+        ],
+        "return": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "validator",
+                "name": "ValidatorV1",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
       },
       "committee_validator_addresses": {
         "visibility": "Friend",
@@ -9138,66 +9314,6 @@
           }
         ]
       },
-      "get_active_validator_ref_inner": {
-        "visibility": "Friend",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Reference": {
-              "Struct": {
-                "address": "0x3",
-                "module": "validator_set",
-                "name": "ValidatorSetV2",
-                "typeArguments": []
-              }
-            }
-          },
-          "Address"
-        ],
-        "return": [
-          {
-            "Reference": {
-              "Struct": {
-                "address": "0x3",
-                "module": "validator",
-                "name": "ValidatorV1",
-                "typeArguments": []
-              }
-            }
-          }
-        ]
-      },
-      "get_committee_validator_ref_inner": {
-        "visibility": "Friend",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Reference": {
-              "Struct": {
-                "address": "0x3",
-                "module": "validator_set",
-                "name": "ValidatorSetV2",
-                "typeArguments": []
-              }
-            }
-          },
-          "Address"
-        ],
-        "return": [
-          {
-            "Reference": {
-              "Struct": {
-                "address": "0x3",
-                "module": "validator",
-                "name": "ValidatorV1",
-                "typeArguments": []
-              }
-            }
-          }
-        ]
-      },
       "get_pending_validator_ref": {
         "visibility": "Public",
         "isEntry": false,
@@ -9218,186 +9334,6 @@
         "return": [
           {
             "Reference": {
-              "Struct": {
-                "address": "0x3",
-                "module": "validator",
-                "name": "ValidatorV1",
-                "typeArguments": []
-              }
-            }
-          }
-        ]
-      },
-      "get_pending_validator_ref_inner": {
-        "visibility": "Friend",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "Reference": {
-              "Struct": {
-                "address": "0x3",
-                "module": "validator_set",
-                "name": "ValidatorSetV2",
-                "typeArguments": []
-              }
-            }
-          },
-          "Address"
-        ],
-        "return": [
-          {
-            "Reference": {
-              "Struct": {
-                "address": "0x3",
-                "module": "validator",
-                "name": "ValidatorV1",
-                "typeArguments": []
-              }
-            }
-          }
-        ]
-      },
-      "get_validator_mut": {
-        "visibility": "Friend",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "MutableReference": {
-              "Vector": {
-                "Struct": {
-                  "address": "0x3",
-                  "module": "validator",
-                  "name": "ValidatorV1",
-                  "typeArguments": []
-                }
-              }
-            }
-          },
-          "Address"
-        ],
-        "return": [
-          {
-            "MutableReference": {
-              "Struct": {
-                "address": "0x3",
-                "module": "validator",
-                "name": "ValidatorV1",
-                "typeArguments": []
-              }
-            }
-          }
-        ]
-      },
-      "get_validator_mut_with_ctx": {
-        "visibility": "Friend",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "MutableReference": {
-              "Struct": {
-                "address": "0x3",
-                "module": "validator_set",
-                "name": "ValidatorSetV2",
-                "typeArguments": []
-              }
-            }
-          },
-          {
-            "Reference": {
-              "Struct": {
-                "address": "0x2",
-                "module": "tx_context",
-                "name": "TxContext",
-                "typeArguments": []
-              }
-            }
-          }
-        ],
-        "return": [
-          {
-            "MutableReference": {
-              "Struct": {
-                "address": "0x3",
-                "module": "validator",
-                "name": "ValidatorV1",
-                "typeArguments": []
-              }
-            }
-          }
-        ]
-      },
-      "get_validator_mut_with_ctx_including_candidates": {
-        "visibility": "Friend",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "MutableReference": {
-              "Struct": {
-                "address": "0x3",
-                "module": "validator_set",
-                "name": "ValidatorSetV2",
-                "typeArguments": []
-              }
-            }
-          },
-          {
-            "Reference": {
-              "Struct": {
-                "address": "0x2",
-                "module": "tx_context",
-                "name": "TxContext",
-                "typeArguments": []
-              }
-            }
-          }
-        ],
-        "return": [
-          {
-            "MutableReference": {
-              "Struct": {
-                "address": "0x3",
-                "module": "validator",
-                "name": "ValidatorV1",
-                "typeArguments": []
-              }
-            }
-          }
-        ]
-      },
-      "get_validator_mut_with_verified_cap": {
-        "visibility": "Friend",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "MutableReference": {
-              "Struct": {
-                "address": "0x3",
-                "module": "validator_set",
-                "name": "ValidatorSetV2",
-                "typeArguments": []
-              }
-            }
-          },
-          {
-            "Reference": {
-              "Struct": {
-                "address": "0x3",
-                "module": "validator_cap",
-                "name": "ValidatorOperationCap",
-                "typeArguments": []
-              }
-            }
-          },
-          "Bool"
-        ],
-        "return": [
-          {
-            "MutableReference": {
               "Struct": {
                 "address": "0x3",
                 "module": "validator",
@@ -9637,6 +9573,66 @@
           "U64"
         ]
       },
+      "pending_validator": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "validator_set",
+                "name": "ValidatorSetV2",
+                "typeArguments": []
+              }
+            }
+          },
+          "Address"
+        ],
+        "return": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "validator",
+                "name": "ValidatorV1",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      },
+      "pending_validator_mut": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "validator_set",
+                "name": "ValidatorSetV2",
+                "typeArguments": []
+              }
+            }
+          },
+          "Address"
+        ],
+        "return": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x3",
+                "module": "validator",
+                "name": "ValidatorV1",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      },
       "pool_exchange_rates": {
         "visibility": "Friend",
         "isEntry": false,
@@ -9653,13 +9649,11 @@
             }
           },
           {
-            "Reference": {
-              "Struct": {
-                "address": "0x2",
-                "module": "object",
-                "name": "ID",
-                "typeArguments": []
-              }
+            "Struct": {
+              "address": "0x2",
+              "module": "object",
+              "name": "ID",
+              "typeArguments": []
             }
           }
         ],
@@ -9889,35 +9883,6 @@
           },
           {
             "MutableReference": {
-              "Struct": {
-                "address": "0x2",
-                "module": "tx_context",
-                "name": "TxContext",
-                "typeArguments": []
-              }
-            }
-          }
-        ],
-        "return": []
-      },
-      "request_set_commission_rate": {
-        "visibility": "Friend",
-        "isEntry": false,
-        "typeParameters": [],
-        "parameters": [
-          {
-            "MutableReference": {
-              "Struct": {
-                "address": "0x3",
-                "module": "validator_set",
-                "name": "ValidatorSetV2",
-                "typeArguments": []
-              }
-            }
-          },
-          "U64",
-          {
-            "Reference": {
               "Struct": {
                 "address": "0x2",
                 "module": "tx_context",

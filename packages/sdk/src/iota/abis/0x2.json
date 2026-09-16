@@ -9940,7 +9940,37 @@
         ]
       }
     },
-    "exposedFunctions": {}
+    "exposedFunctions": {
+      "derive_address": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "object",
+              "name": "ID",
+              "typeArguments": []
+            }
+          },
+          {
+            "TypeParameter": 0
+          }
+        ],
+        "return": [
+          "Address"
+        ]
+      }
+    }
   },
   "display": {
     "fileFormatVersion": 6,
@@ -10577,6 +10607,10 @@
       {
         "address": "0x2",
         "name": "config"
+      },
+      {
+        "address": "0x2",
+        "name": "derived_object"
       },
       {
         "address": "0x2",
@@ -16912,6 +16946,490 @@
       }
     }
   },
+  "module_metadata": {
+    "fileFormatVersion": 6,
+    "address": "0x2",
+    "name": "module_metadata",
+    "friends": [
+      {
+        "address": "0x2",
+        "name": "package_metadata"
+      }
+    ],
+    "structs": {
+      "ModuleMetadata": {
+        "abilities": {
+          "abilities": [
+            "Store",
+            "Key"
+          ]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "id",
+            "type": {
+              "Struct": {
+                "address": "0x2",
+                "module": "object",
+                "name": "UID",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "size",
+            "type": "U64"
+          }
+        ]
+      },
+      "ModuleMetadataKey": {
+        "abilities": {
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "pos0",
+            "type": {
+              "Struct": {
+                "address": "0x1",
+                "module": "ascii",
+                "name": "String",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      },
+      "ViewFunctionMetadataV1FieldName": {
+        "abilities": {
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "dummy_field",
+            "type": "Bool"
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {
+      "add": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
+          },
+          {
+            "abilities": [
+              "Store"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "module_metadata",
+                "name": "ModuleMetadata",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "TypeParameter": 0
+          },
+          {
+            "TypeParameter": 1
+          }
+        ],
+        "return": []
+      },
+      "add_view_function_metadata_v1": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "module_metadata",
+                "name": "ModuleMetadata",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Vector": {
+              "Struct": {
+                "address": "0x1",
+                "module": "ascii",
+                "name": "String",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": []
+      },
+      "borrow": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
+          },
+          {
+            "abilities": [
+              "Store"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "module_metadata",
+                "name": "ModuleMetadata",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "TypeParameter": 0
+          }
+        ],
+        "return": [
+          {
+            "Reference": {
+              "TypeParameter": 1
+            }
+          }
+        ]
+      },
+      "borrow_mut": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
+          },
+          {
+            "abilities": [
+              "Store"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "module_metadata",
+                "name": "ModuleMetadata",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "TypeParameter": 0
+          }
+        ],
+        "return": [
+          {
+            "MutableReference": {
+              "TypeParameter": 1
+            }
+          }
+        ]
+      },
+      "borrow_view_functions_metadata_v1": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "module_metadata",
+                "name": "ModuleMetadata",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Reference": {
+              "Vector": {
+                "Struct": {
+                  "address": "0x1",
+                  "module": "ascii",
+                  "name": "String",
+                  "typeArguments": []
+                }
+              }
+            }
+          }
+        ]
+      },
+      "contains": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "module_metadata",
+                "name": "ModuleMetadata",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "TypeParameter": 0
+          }
+        ],
+        "return": [
+          "Bool"
+        ]
+      },
+      "contains_view_functions_metadata_v1": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "module_metadata",
+                "name": "ModuleMetadata",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          "Bool"
+        ]
+      },
+      "contains_with_type": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
+          },
+          {
+            "abilities": [
+              "Store"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "module_metadata",
+                "name": "ModuleMetadata",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "TypeParameter": 0
+          }
+        ],
+        "return": [
+          "Bool"
+        ]
+      },
+      "is_empty": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "module_metadata",
+                "name": "ModuleMetadata",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          "Bool"
+        ]
+      },
+      "is_view_function_v1": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "module_metadata",
+                "name": "ModuleMetadata",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x1",
+                "module": "ascii",
+                "name": "String",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          "Bool"
+        ]
+      },
+      "length": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "module_metadata",
+                "name": "ModuleMetadata",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          "U64"
+        ]
+      },
+      "new": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "object",
+              "name": "ID",
+              "typeArguments": []
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "ascii",
+              "name": "String",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "module_metadata",
+              "name": "ModuleMetadata",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "remove": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
+          },
+          {
+            "abilities": [
+              "Store"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "module_metadata",
+                "name": "ModuleMetadata",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "TypeParameter": 0
+          }
+        ],
+        "return": [
+          {
+            "TypeParameter": 1
+          }
+        ]
+      }
+    }
+  },
   "object": {
     "fileFormatVersion": 6,
     "address": "0x2",
@@ -16931,7 +17449,19 @@
       },
       {
         "address": "0x2",
+        "name": "module_metadata"
+      },
+      {
+        "address": "0x2",
+        "name": "package_metadata"
+      },
+      {
+        "address": "0x2",
         "name": "random"
+      },
+      {
+        "address": "0x2",
+        "name": "transaction_deny_rules"
       }
     ],
     "structs": {
@@ -17266,6 +17796,22 @@
         ]
       },
       "randomness_state": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "object",
+              "name": "UID",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "transaction_deny_rules": {
         "visibility": "Friend",
         "isEntry": false,
         "typeParameters": [],
@@ -19031,6 +19577,61 @@
           }
         ]
       },
+      "ModuleMetadataV1FieldName": {
+        "abilities": {
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "dummy_field",
+            "type": "Bool"
+          }
+        ]
+      },
+      "ModuleName": {
+        "abilities": {
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "pos0",
+            "type": {
+              "Struct": {
+                "address": "0x1",
+                "module": "ascii",
+                "name": "String",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      },
+      "ModulesMetadataFieldName": {
+        "abilities": {
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "dummy_field",
+            "type": "Bool"
+          }
+        ]
+      },
       "PackageMetadataKey": {
         "abilities": {
           "abilities": [
@@ -19121,6 +19722,22 @@
             }
           }
         ]
+      },
+      "PackageMetadataVersionFieldName": {
+        "abilities": {
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "dummy_field",
+            "type": "Bool"
+          }
+        ]
       }
     },
     "exposedFunctions": {
@@ -19147,6 +19764,45 @@
               "module": "type_name",
               "name": "TypeName",
               "typeArguments": []
+            }
+          }
+        ]
+      },
+      "authenticator_function_metadata_v1": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "module_metadata",
+                "name": "ModuleMetadata",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x1",
+                "module": "ascii",
+                "name": "String",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "package_metadata",
+                "name": "AuthenticatorMetadataV1",
+                "typeArguments": []
+              }
             }
           }
         ]
@@ -19184,6 +19840,240 @@
                 "address": "0x2",
                 "module": "package_metadata",
                 "name": "AuthenticatorMetadataV1",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      },
+      "borrow_modules_metadata": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "package_metadata",
+                "name": "PackageMetadataV1",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "vec_map",
+                "name": "VecMap",
+                "typeArguments": [
+                  {
+                    "Struct": {
+                      "address": "0x2",
+                      "module": "package_metadata",
+                      "name": "ModuleName",
+                      "typeArguments": []
+                    }
+                  },
+                  {
+                    "Struct": {
+                      "address": "0x2",
+                      "module": "module_metadata",
+                      "name": "ModuleMetadata",
+                      "typeArguments": []
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "borrow_package_metadata_version_field": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "package_metadata",
+                "name": "PackageMetadataV1",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Reference": "U64"
+          }
+        ]
+      },
+      "function_name": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "package_metadata",
+                "name": "AuthenticatorMetadataV1",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x1",
+                "module": "ascii",
+                "name": "String",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      },
+      "has_package_metadata_version_field": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "package_metadata",
+                "name": "PackageMetadataV1",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          "Bool"
+        ]
+      },
+      "module_authenticator_function_metadata_v1": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "package_metadata",
+                "name": "PackageMetadataV1",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x1",
+                "module": "ascii",
+                "name": "String",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x1",
+                "module": "ascii",
+                "name": "String",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "package_metadata",
+                "name": "AuthenticatorMetadataV1",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      },
+      "module_metadata": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "package_metadata",
+                "name": "PackageMetadataV1",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x1",
+                "module": "ascii",
+                "name": "String",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "module_metadata",
+                "name": "ModuleMetadata",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      },
+      "module_name": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "package_metadata",
+                "name": "ModuleName",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x1",
+                "module": "ascii",
+                "name": "String",
                 "typeArguments": []
               }
             }
@@ -19299,6 +20189,52 @@
               "module": "object",
               "name": "ID",
               "typeArguments": []
+            }
+          }
+        ]
+      },
+      "try_get_authenticator_function_metadata_v1": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "module_metadata",
+                "name": "ModuleMetadata",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x1",
+                "module": "ascii",
+                "name": "String",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "option",
+              "name": "Option",
+              "typeArguments": [
+                {
+                  "Struct": {
+                    "address": "0x2",
+                    "module": "package_metadata",
+                    "name": "AuthenticatorMetadataV1",
+                    "typeArguments": []
+                  }
+                }
+              ]
             }
           }
         ]
@@ -19972,6 +20908,29 @@
     "friends": [],
     "structs": {},
     "exposedFunctions": {
+      "get_attr": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": [
+              "Copy",
+              "Drop",
+              "Store"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "Vector": "U8"
+          }
+        ],
+        "return": [
+          {
+            "TypeParameter": 0
+          }
+        ]
+      },
       "is_feature_enabled": {
         "visibility": "Friend",
         "isEntry": false,
@@ -26989,6 +27948,256 @@
         ]
       }
     }
+  },
+  "transaction_deny_rules": {
+    "fileFormatVersion": 6,
+    "address": "0x2",
+    "name": "transaction_deny_rules",
+    "friends": [],
+    "structs": {
+      "TransactionDenyRules": {
+        "abilities": {
+          "abilities": [
+            "Key"
+          ]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "id",
+            "type": {
+              "Struct": {
+                "address": "0x2",
+                "module": "object",
+                "name": "UID",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "inner",
+            "type": {
+              "Struct": {
+                "address": "0x2",
+                "module": "versioned",
+                "name": "Versioned",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      },
+      "TransactionDenyRulesInnerV1": {
+        "abilities": {
+          "abilities": [
+            "Store"
+          ]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "version",
+            "type": "U64"
+          },
+          {
+            "name": "denied_addresses",
+            "type": {
+              "Struct": {
+                "address": "0x2",
+                "module": "linked_table",
+                "name": "LinkedTable",
+                "typeArguments": [
+                  "Address",
+                  "Bool"
+                ]
+              }
+            }
+          },
+          {
+            "name": "denied_objects",
+            "type": {
+              "Struct": {
+                "address": "0x2",
+                "module": "linked_table",
+                "name": "LinkedTable",
+                "typeArguments": [
+                  {
+                    "Struct": {
+                      "address": "0x2",
+                      "module": "object",
+                      "name": "ID",
+                      "typeArguments": []
+                    }
+                  },
+                  "Bool"
+                ]
+              }
+            }
+          },
+          {
+            "name": "denied_packages",
+            "type": {
+              "Struct": {
+                "address": "0x2",
+                "module": "linked_table",
+                "name": "LinkedTable",
+                "typeArguments": [
+                  {
+                    "Struct": {
+                      "address": "0x2",
+                      "module": "object",
+                      "name": "ID",
+                      "typeArguments": []
+                    }
+                  },
+                  "Bool"
+                ]
+              }
+            }
+          },
+          {
+            "name": "package_publish_disabled",
+            "type": "Bool"
+          },
+          {
+            "name": "package_upgrade_disabled",
+            "type": "Bool"
+          },
+          {
+            "name": "shared_object_disabled",
+            "type": "Bool"
+          },
+          {
+            "name": "user_transaction_disabled",
+            "type": "Bool"
+          },
+          {
+            "name": "receiving_objects_disabled",
+            "type": "Bool"
+          },
+          {
+            "name": "move_authenticator_disabled",
+            "type": "Bool"
+          }
+        ]
+      },
+      "TransactionDenyRulesUpdated": {
+        "abilities": {
+          "abilities": [
+            "Copy",
+            "Drop"
+          ]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "epoch",
+            "type": "U64"
+          },
+          {
+            "name": "added_addresses",
+            "type": {
+              "Vector": "Address"
+            }
+          },
+          {
+            "name": "removed_addresses",
+            "type": {
+              "Vector": "Address"
+            }
+          },
+          {
+            "name": "added_objects",
+            "type": {
+              "Vector": {
+                "Struct": {
+                  "address": "0x2",
+                  "module": "object",
+                  "name": "ID",
+                  "typeArguments": []
+                }
+              }
+            }
+          },
+          {
+            "name": "removed_objects",
+            "type": {
+              "Vector": {
+                "Struct": {
+                  "address": "0x2",
+                  "module": "object",
+                  "name": "ID",
+                  "typeArguments": []
+                }
+              }
+            }
+          },
+          {
+            "name": "added_packages",
+            "type": {
+              "Vector": {
+                "Struct": {
+                  "address": "0x2",
+                  "module": "object",
+                  "name": "ID",
+                  "typeArguments": []
+                }
+              }
+            }
+          },
+          {
+            "name": "removed_packages",
+            "type": {
+              "Vector": {
+                "Struct": {
+                  "address": "0x2",
+                  "module": "object",
+                  "name": "ID",
+                  "typeArguments": []
+                }
+              }
+            }
+          },
+          {
+            "name": "package_publish_disabled",
+            "type": "Bool"
+          },
+          {
+            "name": "package_upgrade_disabled",
+            "type": "Bool"
+          },
+          {
+            "name": "shared_object_disabled",
+            "type": "Bool"
+          },
+          {
+            "name": "user_transaction_disabled",
+            "type": "Bool"
+          },
+          {
+            "name": "receiving_objects_disabled",
+            "type": "Bool"
+          },
+          {
+            "name": "move_authenticator_disabled",
+            "type": "Bool"
+          },
+          {
+            "name": "denied_addresses_len",
+            "type": "U64"
+          },
+          {
+            "name": "denied_objects_len",
+            "type": "U64"
+          },
+          {
+            "name": "denied_packages_len",
+            "type": "U64"
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {}
   },
   "transfer": {
     "fileFormatVersion": 6,
