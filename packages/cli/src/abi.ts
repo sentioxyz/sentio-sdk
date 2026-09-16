@@ -150,7 +150,7 @@ export function normalizedModulesToAbi(
     : Object.entries(map ?? {})
   return entries.map(([n, m]) => {
     const address = m.address ?? fallbackAddress
-    if (typeof address !== 'string' || !address.startsWith('0x')) {
+    if (typeof address !== 'string' || address === '') {
       throw Error(`cannot resolve package address of module ${m.name ?? n}`)
     }
     return { address, module: normalizedModule(n, m) }
@@ -237,7 +237,7 @@ export function convertLegacySuiAbis(baseDir = path.resolve('abis', 'sui')): voi
   }
   console.log(chalk.yellow(`Found ${legacy.length} legacy Sui ABI file(s), converting to the current format`))
   for (const { file, modules, fallbackAddress } of legacy) {
-    let abi
+    let abi: ReturnType<typeof normalizedModulesToAbi>
     try {
       abi = normalizedModulesToAbi(modules, fallbackAddress)
     } catch (e: any) {
