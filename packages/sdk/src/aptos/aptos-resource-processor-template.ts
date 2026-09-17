@@ -18,7 +18,7 @@ export class AptosResourceProcessorTemplateState extends ListStateStorage<AptosR
   static INSTANCE = new AptosResourceProcessorTemplateState()
 }
 
-class Handler {
+interface Handler {
   type?: string
   checkpointInterval?: HandleInterval
   timeIntervalInMinutes?: HandleInterval

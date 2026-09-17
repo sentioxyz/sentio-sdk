@@ -1,10 +1,10 @@
 import { EthChainId } from '@sentio/chain'
 
-export class BindOptions {
+export interface BindOptions {
   // Contract address
   address: string
   // Optional, if not set, then use eth mainnet
-  network?: EthChainId = EthChainId.ETHEREUM
+  network?: EthChainId
   // Optional, override default contract name
   name?: string
   start?: TimeOrBlock
@@ -39,7 +39,7 @@ export function getOptionsSignature(opts: BindOptions): string {
   return sig.join('_')
 }
 
-export class AccountBindOptions {
+export interface AccountBindOptions {
   address: string
   network: EthChainId
   startBlock?: bigint | number

@@ -4,7 +4,7 @@ import { Attributes, Counter, metrics, Gauge, Histogram } from '@opentelemetry/a
 const getMeter = () => metrics.getMeter('processor')
 
 class C {
-  private _counter: Counter<Attributes>
+  private _counter?: Counter<Attributes>
   private value: number = 0
 
   constructor(private name: string) {}
@@ -27,7 +27,7 @@ class C {
 }
 
 class G {
-  private _gauge: Gauge<Attributes>
+  private _gauge?: Gauge<Attributes>
   private value: number = 0
 
   constructor(private name: string) {}
@@ -50,7 +50,7 @@ class G {
 }
 
 class H {
-  private _histogram: Histogram<Attributes>
+  private _histogram?: Histogram<Attributes>
   private value: number = 0
 
   constructor(private name: string) {}

@@ -35,7 +35,7 @@ type MemoryDatabaseContext = IStoreContext & {
 export class MemoryDatabase {
   db = new Map<string, Record<string, any>>()
   public lastDbRequest: DBRequest | undefined
-  _schema: GraphQLSchema
+  _schema!: GraphQLSchema
 
   constructor(readonly dbContext: MemoryDatabaseContext) {}
 

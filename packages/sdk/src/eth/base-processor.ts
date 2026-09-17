@@ -46,7 +46,7 @@ export interface AddressOrTypeEventFilter extends DeferredTopicFilter {
 
 export const defaultPreprocessHandler = () => create(PreprocessResultSchema, { ethCallParams: [] }) as any
 
-export class EventsHandler {
+export interface EventsHandler {
   filters: AddressOrTypeEventFilter[]
   handlerName: string
   handler: (event: Data_EthLog) => Promise<ProcessResult>
@@ -55,7 +55,7 @@ export class EventsHandler {
   partitionHandler?: (event: Data_EthLog) => Promise<string | undefined>
 }
 
-export class TraceHandler {
+export interface TraceHandler {
   signatures: string[]
   handlerName: string
   handler: (trace: Data_EthTrace) => Promise<ProcessResult>
@@ -64,7 +64,7 @@ export class TraceHandler {
   partitionHandler?: (trace: Data_EthTrace) => Promise<string | undefined>
 }
 
-export class BlockHandler {
+export interface BlockHandler {
   blockInterval?: HandleInterval
   timeIntervalInMinutes?: HandleInterval
   handlerName: string
@@ -74,7 +74,7 @@ export class BlockHandler {
   partitionHandler?: (block: Data_EthBlock) => Promise<string | undefined>
 }
 
-export class TransactionHandler {
+export interface TransactionHandler {
   handler: (tx: Data_EthTransaction) => Promise<ProcessResult>
   handlerName: string
   preprocessHandler?: (event: Data_EthTransaction, preprocessStore: { [k: string]: any }) => Promise<PreprocessResult>
@@ -82,7 +82,7 @@ export class TransactionHandler {
   partitionHandler?: (tx: Data_EthTransaction) => Promise<string | undefined>
 }
 
-class BindInternalOptions {
+interface BindInternalOptions {
   address: string
   network: EthChainId
   name: string
