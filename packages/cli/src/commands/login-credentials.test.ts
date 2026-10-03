@@ -91,6 +91,66 @@ test('failed reauthentication preserves credentials; success replaces only the s
       }
     })
     assert.equal(JSON.parse(fs.readFileSync(file, 'utf8'))[host].api_keys, 'new-key')
+
+    // Chrome can abort its first navigation and retry while token exchange is
+    // pending. Every live callback must receive success from one redemption.
+    let releaseRetryToken!: () => void
+    let retryTokenStarted!: () => void
+    const retryPending = new Promise<void>((resolve) => {
+      releaseRetryToken = resolve
+    })
+    const retryExchanging = new Promise<void>((resolve) => {
+      retryTokenStarted = resolve
+    })
+    const beforeRetry = calls.length
+    globalThis.fetch = async (input, init) => {
+      if (String(input) === config.tokenEndpoint) {
+        retryTokenStarted()
+        await retryPending
+      }
+      return exchangeFetch(input, init)
+    }
+    const responseBodies: Promise<string>[] = []
+    await startServer({
+      serverPort: 0,
+      sentioHost: host,
+      state: 'expected',
+      codeVerifier: 'verifier',
+      authConfig: config,
+      timeoutMs: 1000,
+      onReady: async (port) => {
+        const callback = `http://127.0.0.1:${port}/callback?state=expected&code=valid`
+        const first = http.get(callback)
+        first.on('error', () => {})
+        await retryExchanging
+        first.destroy()
+        for (let i = 0; i < 2; i++) {
+          responseBodies.push(
+            new Promise<string>((resolve, reject) => {
+              http
+                .get(callback, (res) => {
+                  let body = ''
+                  res.on('data', (chunk) => {
+                    body += chunk
+                  })
+                  res.on('end', () => {
+                    if (res.statusCode !== 200) reject(new Error(`Callback status ${res.statusCode}`))
+                    else resolve(body)
+                  })
+                  res.on('error', reject)
+                })
+                .on('error', reject)
+            })
+          )
+        }
+        await setTimeout(20)
+        releaseRetryToken()
+      }
+    })
+    for (const body of await Promise.all(responseBodies)) {
+      assert.equal(body, 'Login success, please go back to CLI to continue')
+    }
+    assert.equal(calls.length - beforeRetry, 3, 'retries must redeem one code and create one API key')
   } finally {
     os.homedir = originalHome
     globalThis.fetch = originalFetch
