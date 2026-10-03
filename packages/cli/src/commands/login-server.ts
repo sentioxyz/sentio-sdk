@@ -4,7 +4,6 @@ import url from 'url'
 import { getApiUrl, getCliVersion } from '../utils.js'
 import { WriteLoginCredentials } from '../key.js'
 import chalk from 'chalk'
-import http from 'http'
 import os from 'os'
 import * as crypto from 'crypto'
 
@@ -21,7 +20,6 @@ interface AuthParams {
 export function startServer(params: AuthParams): Promise<void> {
   return new Promise((resolve, reject) => {
     const app = express()
-    let server: http.Server
     let redeeming = false
     let settled = false
     const controller = new AbortController()
@@ -69,7 +67,7 @@ export function startServer(params: AuthParams): Promise<void> {
         res.status(400).end('Login failed. Check the terminal and try again.', () => finish(error as Error))
       }
     })
-    server = app.listen(params.serverPort, '127.0.0.1')
+    const server = app.listen(params.serverPort, '127.0.0.1')
     server.once('error', finish)
     server.once('listening', () => {
       const address = server.address() as { port: number }
