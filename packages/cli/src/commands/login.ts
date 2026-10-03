@@ -1,12 +1,11 @@
 import { Command } from '@commander-js/extra-typings'
-import { getAuthConfig, getFinalizedHost } from '../config.js'
+import { getAuthConfig, getFinalizedHost, type AuthConfig } from '../config.js'
 import { startServer, exchangeCodeAndSave } from './login-server.js'
-import readline from 'readline'
+import readline from 'node:readline/promises'
 import url, { URL } from 'url'
 import * as crypto from 'crypto'
 import chalk from 'chalk'
 import { WriteKey, ReadKey, ReadAccessToken, isAccessTokenExpired } from '../key.js'
-import fetch from 'node-fetch'
 import open from 'open'
 import { CommandOptionsType } from './types.js'
 import { getApiUrl } from '../utils.js'
@@ -20,11 +19,13 @@ export function createLoginCommand() {
     .option('--api-key <key>', '(Optional) Your API key')
     .option('--status', 'Show current login status')
     .option('--no-browser', 'Print the auth URL and accept the authorization code manually (for headless environments)')
-    .action((options) => {
-      if (options.status) {
-        loginStatus(options)
-      } else {
-        login(options)
+    .action(async (options) => {
+      try {
+        if (options.status) await loginStatus(options)
+        else await login(options)
+      } catch (error) {
+        console.error(chalk.red('Login failed: ' + (error as Error).message))
+        process.exitCode = 1
       }
     })
 }
@@ -63,124 +64,97 @@ async function loginStatus(options: CommandOptionsType<typeof createLoginCommand
   }
 }
 
-function login(options: CommandOptionsType<typeof createLoginCommand>) {
+async function login(options: CommandOptionsType<typeof createLoginCommand>) {
   const host = getFinalizedHost(options.host)
-
   if (options.apiKey) {
-    console.log(chalk.blue('login to ' + host))
-    const apiKey = options.apiKey
-    checkKey(host, apiKey).then(async (res) => {
-      if (res.status == 200) {
-        WriteKey(host, apiKey)
-        const { username } = (await res.json()) as { username: string }
-        console.log(chalk.green(`login success with ${username}`))
-      } else {
-        console.error(chalk.red('login failed, code:', res.status, res.statusText))
-      }
-    })
+    const response = await checkKey(host, options.apiKey)
+    if (!response.ok) throw new Error(`API key validation failed: ${response.status}`)
+    const { username } = (await response.json()) as { username: string }
+    WriteKey(host, options.apiKey)
+    console.log(chalk.green(`Login success with ${username}`))
+    return
+  }
+  const attempt = await createLoginAttempt(host)
+  if (options.browser === false) {
+    await loginNoBrowser(host, attempt)
   } else {
-    const verifier = base64URLEncode(crypto.randomBytes(32))
-    const challenge = base64URLEncode(sha256(verifier))
-
-    const conf = getAuthConfig(host)
-    if (conf.domain === '') {
-      console.error(chalk.red('invalid host, try login with an API key if it is a dev env'))
-      return
-    }
-    const authURL = buildAuthURL(conf, challenge)
-
-    if (options.browser === false) {
-      loginNoBrowser(host, authURL.toString(), verifier)
-      return
-    }
-
-    console.log('Continue your authorization in the browser')
-    open(authURL.toString()).catch((reason) => {
-      console.error(chalk.yellow('Unable to open browser: ' + reason))
-      console.error(chalk.yellow('Falling back to manual login...'))
-      loginNoBrowser(host, authURL.toString(), verifier)
-    })
-
-    startServer({
-      serverPort: port,
-      sentioHost: options.host || '',
-      codeVerifier: verifier
-    })
+    await loginInBrowser(host, attempt)
   }
 }
 
-/**
- * Launches the interactive browser-based OAuth login flow and waits for it to complete.
- * Stores the API key and access token in the local config upon success.
- * Throws if login fails or the host has no auth config (e.g. local dev environments).
- */
-export function loginInteractiveAndWait(host: string): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const conf = getAuthConfig(host)
-    if (conf.domain === '') {
-      reject(new Error('No auth config for this host. Use --api-key for local/dev environments.'))
-      return
+/** Reauthenticate when a command needs an expired privileged access token. */
+export async function loginInteractiveAndWait(host: string): Promise<void> {
+  await loginInBrowser(host, await createLoginAttempt(host))
+}
+
+async function createLoginAttempt(host: string) {
+  const conf = await getAuthConfig(host)
+  const verifier = base64URLEncode(crypto.randomBytes(32))
+  const state = 'sentio-cli:' + base64URLEncode(crypto.randomBytes(32))
+  return { conf, verifier, state, authURL: buildAuthURL(conf, base64URLEncode(sha256(verifier)), state) }
+}
+
+async function loginInBrowser(host: string, attempt: Awaited<ReturnType<typeof createLoginAttempt>>) {
+  // Bind before opening the browser, and own the listener until success,
+  // cancellation, an OAuth error or timeout. Nothing listens on external interfaces.
+  await startServer({
+    serverPort: port,
+    sentioHost: host,
+    codeVerifier: attempt.verifier,
+    state: attempt.state,
+    authConfig: attempt.conf,
+    onReady: async () => {
+      console.log('Continue your authorization in the browser')
+      try {
+        await open(attempt.authURL.toString())
+      } catch {
+        console.log('Open this URL in your browser: ' + attempt.authURL.toString())
+      }
     }
-
-    const verifier = base64URLEncode(crypto.randomBytes(32))
-    const challenge = base64URLEncode(sha256(verifier))
-    const authURL = buildAuthURL(conf, challenge)
-
-    console.log(chalk.blue('Opening browser for login...'))
-    open(authURL.toString()).catch((reason) => {
-      console.error(chalk.yellow('Unable to open browser automatically.'))
-      console.error(chalk.yellow('Open this URL in your browser: ' + authURL.toString()))
-    })
-
-    startServer({
-      serverPort: port,
-      sentioHost: host,
-      codeVerifier: verifier,
-      onSuccess: resolve,
-      onFailure: reject
-    })
   })
 }
 
-function loginNoBrowser(host: string, authURL: string, codeVerifier: string) {
-  console.log(chalk.blue('\nOpen the following URL in your browser to complete login:'))
-  console.log(chalk.cyan(authURL))
-  console.log(chalk.blue('\nAfter completing login, copy the authorization code from the redirect URL'))
-  console.log(chalk.blue('(it is the value of the `code` query parameter) and paste it below.\n'))
-
+async function loginNoBrowser(host: string, attempt: Awaited<ReturnType<typeof createLoginAttempt>>) {
+  console.log(chalk.blue('Open this URL in a browser to complete login:'))
+  console.log(chalk.cyan(attempt.authURL.toString()))
+  console.log('After signing in, paste the callback URL or its code parameter below.')
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
-  rl.question('Authorization code: ', async (input) => {
+  try {
+    const input = (await rl.question('Authorization code or callback URL: ')).trim()
+    if (!input) throw new Error('No code provided, login aborted.')
+    let code = input
+    if (/^https?:\/\//.test(input)) {
+      const callback = new URL(input)
+      const expected = attempt.conf.redirectUri
+      if (
+        ![expected, `http://localhost:${port}/callback`].includes(callback.origin + callback.pathname) ||
+        callback.searchParams.get('state') !== attempt.state
+      )
+        throw new Error('Invalid authorization callback state or URL')
+      if (callback.searchParams.has('error')) throw new Error('Authorization was not completed')
+      code = callback.searchParams.get('code') ?? ''
+    }
+    if (!code) throw new Error('Missing authorization code')
+    const username = await exchangeCodeAndSave(host, code, attempt.verifier, attempt.conf)
+    console.log(chalk.green(`Login success with ${username}`))
+  } finally {
     rl.close()
-    const code = input.trim()
-    if (!code) {
-      console.error(chalk.red('No code provided, login aborted.'))
-      process.exit(1)
-    }
-    try {
-      const username = await exchangeCodeAndSave(host, code, codeVerifier)
-      console.log(chalk.green(`Login success with ${username}`))
-    } catch (e) {
-      console.error(chalk.red('Login failed: ' + (e as Error).message))
-      process.exit(1)
-    }
-  })
+  }
 }
 
-function buildAuthURL(
-  conf: { domain: string; clientId: string; audience: string; redirectUri: string },
-  challenge: string
-): URL {
-  const authURL = new URL(conf.domain + `/authorize?`)
-  const params = new url.URLSearchParams({
+export function buildAuthURL(conf: AuthConfig, challenge: string, state: string): URL {
+  const authURL = new URL(conf.authorizationEndpoint)
+  authURL.search = new url.URLSearchParams({
     response_type: 'code',
     code_challenge: challenge,
     code_challenge_method: 'S256',
     client_id: conf.clientId,
     redirect_uri: conf.redirectUri,
-    audience: conf.audience,
-    prompt: 'login'
-  })
-  authURL.search = params.toString()
+    [conf.resourceParameter]: conf.audience,
+    scope: conf.scope,
+    prompt: 'login',
+    state
+  }).toString()
   return authURL
 }
 

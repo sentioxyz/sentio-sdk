@@ -29,9 +29,10 @@ function readConfig(): SentioKeyConfig {
 
 function writeConfig(config: SentioKeyConfig) {
   if (!fs.existsSync(sentioDir)) {
-    fs.mkdirSync(sentioDir, { recursive: true })
+    fs.mkdirSync(sentioDir, { recursive: true, mode: 0o700 })
   }
-  fs.writeFileSync(configFile, JSON.stringify(config, null, 2))
+  fs.writeFileSync(configFile, JSON.stringify(config, null, 2), { mode: 0o600 })
+  fs.chmodSync(configFile, 0o600)
 }
 
 export function WriteKey(host: string, api_key: string) {
@@ -44,9 +45,12 @@ export function ReadKey(host: string): string | undefined {
   return readConfig()[host]?.api_keys
 }
 
-export function WriteAccessToken(host: string, token: string, expiresAt: number) {
+export function WriteLoginCredentials(host: string, apiKey: string, token: string, expiresAt?: number) {
   const config = readConfig()
-  config[host] = { ...config[host], access_token: token, access_token_expires_at: expiresAt }
+  config[host] = {
+    api_keys: apiKey,
+    ...(expiresAt !== undefined ? { access_token: token, access_token_expires_at: expiresAt } : {})
+  }
   writeConfig(config)
 }
 

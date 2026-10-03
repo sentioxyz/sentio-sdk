@@ -51,7 +51,66 @@ export function getFinalizedHost(host: string | undefined): string {
   return HostMap[host] ?? host
 }
 
-export function getAuthConfig(host: string): {
+export interface AuthConfig {
+  clientId: string
+  audience: string
+  redirectUri: string
+  authorizationEndpoint: string
+  tokenEndpoint: string
+  resourceParameter: 'audience' | 'resource'
+  scope: string
+}
+
+export async function getAuthConfig(host: string): Promise<AuthConfig> {
+  const origin = new URL(host).origin
+  const response = await fetch(new URL('/api/cli/auth', origin), {
+    redirect: 'error',
+    signal: AbortSignal.timeout(10_000)
+  })
+  // Keep installations whose server has not deployed discovery on their existing
+  // login flow. Outages or invalid config must never select a different issuer.
+  if (response.status === 404) {
+    const { domain, clientId, audience, redirectUri } = getLegacyAuthConfig(host)
+    return {
+      clientId,
+      audience,
+      redirectUri,
+      authorizationEndpoint: domain + '/authorize',
+      tokenEndpoint: domain + '/oauth/token',
+      resourceParameter: 'audience',
+      scope: 'openid profile email'
+    }
+  }
+  if (!response.ok) throw new Error(`Unable to load login configuration (${response.status}). Try again later.`)
+  return validateAuthConfig(await response.json(), origin)
+}
+
+export function validateAuthConfig(value: unknown, origin: string): AuthConfig {
+  const config = value as AuthConfig
+  if (
+    !config ||
+    (['clientId', 'audience', 'redirectUri', 'authorizationEndpoint', 'tokenEndpoint', 'scope'] as const).some(
+      (key) => typeof config[key] !== 'string' || !config[key]
+    ) ||
+    !['audience', 'resource'].includes(config.resourceParameter)
+  )
+    throw new Error('Invalid login configuration')
+  for (const field of ['authorizationEndpoint', 'tokenEndpoint', 'redirectUri'] as const) {
+    const url = new URL(config[field])
+    if (
+      url.username ||
+      url.password ||
+      url.hash ||
+      (url.protocol !== 'https:' && !(url.protocol === 'http:' && ['localhost', '127.0.0.1'].includes(url.hostname)))
+    ) {
+      throw new Error('Login configuration requires secure URLs')
+    }
+  }
+  if (new URL(config.redirectUri).origin !== origin) throw new Error('Invalid login callback origin')
+  return config
+}
+
+function getLegacyAuthConfig(host: string): {
   domain: string
   clientId: string
   audience: string
@@ -84,6 +143,7 @@ export function getAuthConfig(host: string): {
     default:
       break
   }
+  if (!domain) throw new Error('No login configuration for this host. Use --api-key instead.')
   return { domain, clientId, audience, redirectUri }
 }
 
