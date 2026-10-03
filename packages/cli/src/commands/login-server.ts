@@ -51,6 +51,14 @@ export function startServer(params: AuthParams): Promise<void> {
         return
       }
       redeeming = true
+      const respond = (message: string, error?: Error) => {
+        // A browser can close the tab while the token request is still running.
+        // Completing login must not depend on delivering a response to that tab.
+        const complete = () => finish(error)
+        if (res.destroyed) return complete()
+        res.once('close', complete)
+        res.status(error ? 400 : 200).end(message, complete)
+      }
       try {
         if (req.query.error) throw new Error('Authorization was not completed')
         if (typeof req.query.code !== 'string' || !req.query.code) throw new Error('Missing authorization code')
@@ -62,9 +70,9 @@ export function startServer(params: AuthParams): Promise<void> {
           controller.signal
         )
         console.log(chalk.green(`Login success with ${username}`))
-        res.end('Login success, please go back to CLI to continue', () => finish())
+        respond('Login success, please go back to CLI to continue')
       } catch (error) {
-        res.status(400).end('Login failed. Check the terminal and try again.', () => finish(error as Error))
+        respond('Login failed. Check the terminal and try again.', error as Error)
       }
     })
     const server = app.listen(params.serverPort, '127.0.0.1')

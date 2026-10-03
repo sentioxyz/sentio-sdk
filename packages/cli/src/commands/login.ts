@@ -90,7 +90,7 @@ export async function loginInteractiveAndWait(host: string): Promise<void> {
 async function createLoginAttempt(host: string) {
   const conf = await getAuthConfig(host)
   const verifier = base64URLEncode(crypto.randomBytes(32))
-  const state = base64URLEncode(crypto.randomBytes(32))
+  const state = 'sentio-cli:' + base64URLEncode(crypto.randomBytes(32))
   return { conf, verifier, state, authURL: buildAuthURL(conf, base64URLEncode(sha256(verifier)), state) }
 }
 

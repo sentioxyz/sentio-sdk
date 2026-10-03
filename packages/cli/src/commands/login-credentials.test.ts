@@ -3,6 +3,8 @@ import { test } from 'node:test'
 import os from 'node:os'
 import fs from 'node:fs'
 import path from 'node:path'
+import http from 'node:http'
+import { setTimeout } from 'node:timers/promises'
 
 test('failed reauthentication preserves credentials; success replaces only the selected host', async () => {
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'sentio-cli-login-'))
@@ -10,7 +12,7 @@ test('failed reauthentication preserves credentials; success replaces only the s
   const originalFetch = globalThis.fetch
   os.homedir = () => directory
   try {
-    const { exchangeCodeAndSave } = await import('./login-server.js')
+    const { exchangeCodeAndSave, startServer } = await import('./login-server.js')
     const host = 'https://app.example.test'
     const config = {
       clientId: 'native',
@@ -55,6 +57,40 @@ test('failed reauthentication preserves credentials; success replaces only the s
     assert.deepEqual(saved['https://other.example.test'], previous['https://other.example.test'])
     assert.equal(calls.length, 3, 'must reuse this attempt config, not refetch it during code exchange')
     assert.equal(fs.statSync(file).mode & 0o777, 0o600)
+
+    const exchangeFetch = globalThis.fetch
+    let releaseToken!: () => void
+    let tokenStarted!: () => void
+    const pendingToken = new Promise<void>((resolve) => {
+      releaseToken = resolve
+    })
+    const exchanging = new Promise<void>((resolve) => {
+      tokenStarted = resolve
+    })
+    globalThis.fetch = async (input, init) => {
+      if (String(input) === config.tokenEndpoint) {
+        tokenStarted()
+        await pendingToken
+      }
+      return exchangeFetch(input, init)
+    }
+    await startServer({
+      serverPort: 0,
+      sentioHost: host,
+      state: 'expected',
+      codeVerifier: 'verifier',
+      authConfig: config,
+      timeoutMs: 1000,
+      onReady: async (port) => {
+        const request = http.get(`http://127.0.0.1:${port}/callback?state=expected&code=valid`)
+        request.on('error', () => {})
+        await exchanging
+        request.destroy()
+        await setTimeout(20)
+        releaseToken()
+      }
+    })
+    assert.equal(JSON.parse(fs.readFileSync(file, 'utf8'))[host].api_keys, 'new-key')
   } finally {
     os.homedir = originalHome
     globalThis.fetch = originalFetch
