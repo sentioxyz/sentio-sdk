@@ -20,7 +20,8 @@ interface AuthParams {
 export function startServer(params: AuthParams): Promise<void> {
   return new Promise((resolve, reject) => {
     const app = express()
-    let redeeming = false
+    let redemption: Promise<string> | undefined
+    let responses = 0
     let settled = false
     const controller = new AbortController()
     const finish = (error?: Error) => {
@@ -46,15 +47,16 @@ export function startServer(params: AuthParams): Promise<void> {
         res.status(400).end('Invalid authorization state')
         return
       }
-      if (redeeming) {
-        res.status(409).end('Authorization already in progress')
-        return
-      }
-      redeeming = true
+      responses++
       const respond = (message: string, error?: Error) => {
-        // A browser can close the tab while the token request is still running.
-        // Completing login must not depend on delivering a response to that tab.
-        const complete = () => finish(error)
+        // Browsers may interrupt and retry the navigation during redemption.
+        // Flush every waiting response before closing the shared listener.
+        let completed = false
+        const complete = () => {
+          if (completed) return
+          completed = true
+          if (--responses === 0) finish(error)
+        }
         if (res.destroyed) return complete()
         res.once('close', complete)
         res.status(error ? 400 : 200).end(message, complete)
@@ -62,14 +64,17 @@ export function startServer(params: AuthParams): Promise<void> {
       try {
         if (req.query.error) throw new Error('Authorization was not completed')
         if (typeof req.query.code !== 'string' || !req.query.code) throw new Error('Missing authorization code')
-        const username = await exchangeCodeAndSave(
+        redemption ??= exchangeCodeAndSave(
           getFinalizedHost(params.sentioHost),
           req.query.code,
           params.codeVerifier,
           params.authConfig,
           controller.signal
-        )
-        console.log(chalk.green(`Login success with ${username}`))
+        ).then((username) => {
+          console.log(chalk.green(`Login success with ${username}`))
+          return username
+        })
+        await redemption
         respond('Login success, please go back to CLI to continue')
       } catch (error) {
         respond('Login failed. Check the terminal and try again.', error as Error)
