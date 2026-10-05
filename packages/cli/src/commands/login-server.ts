@@ -17,6 +17,15 @@ interface AuthParams {
   timeoutMs?: number
 }
 
+// Only fixed messages are rendered; OAuth parameters never appear in the page.
+function loginResultPage(message: string): string {
+  return `<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Sentio CLI</title></head>
+<body><p>${message}</p></body>
+</html>`
+}
+
 export function startServer(params: AuthParams): Promise<void> {
   return new Promise((resolve, reject) => {
     const app = express()
@@ -43,8 +52,9 @@ export function startServer(params: AuthParams): Promise<void> {
     process.once('SIGINT', interrupted)
     app.get('/callback', async (req, res) => {
       res.setHeader('Cache-Control', 'no-store')
+      res.type('html')
       if (typeof req.query.state !== 'string' || req.query.state !== params.state) {
-        res.status(400).end('Invalid authorization state')
+        res.status(400).end(loginResultPage('Invalid authorization state'))
         return
       }
       responses++
@@ -59,7 +69,7 @@ export function startServer(params: AuthParams): Promise<void> {
         }
         if (res.destroyed) return complete()
         res.once('close', complete)
-        res.status(error ? 400 : 200).end(message, complete)
+        res.status(error ? 400 : 200).end(loginResultPage(message), complete)
       }
       try {
         if (req.query.error) throw new Error('Authorization was not completed')

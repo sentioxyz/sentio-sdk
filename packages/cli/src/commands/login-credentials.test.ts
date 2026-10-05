@@ -129,6 +129,7 @@ test('failed reauthentication preserves credentials; success replaces only the s
             new Promise<string>((resolve, reject) => {
               http
                 .get(callback, (res) => {
+                  assert.equal(res.headers['content-type'], 'text/html; charset=utf-8')
                   let body = ''
                   res.on('data', (chunk) => {
                     body += chunk
@@ -148,7 +149,8 @@ test('failed reauthentication preserves credentials; success replaces only the s
       }
     })
     for (const body of await Promise.all(responseBodies)) {
-      assert.equal(body, 'Login success, please go back to CLI to continue')
+      assert.match(body, /^<!doctype html>/)
+      assert.match(body, /<p>Login success, please go back to CLI to continue<\/p>/)
     }
     assert.equal(calls.length - beforeRetry, 3, 'retries must redeem one code and create one API key')
   } finally {
