@@ -70,7 +70,6 @@
     "gen": "pnpm gen:eth && pnpm gen:aptos && pnpm gen:sui && pnpm gen:iota && pnpm gen:solana && pnpm gen:fuel && pnpm gen:store",
     "gen:aptos": "cp node_modules/@typemove/aptos/src/abis/*.json src/aptos/abis && tsx src/aptos/codegen/run.ts src/aptos/abis src/aptos/builtin && pnpm gen:aptos_test",
     "gen:aptos_test": "tsx src/aptos/codegen/run.ts src/aptos/tests/abis src/aptos/tests/types",
-    "gen:docs": "typedoc --options typedoc.json",
     "gen:eth": "tsx src/eth/codegen/run.ts src/eth/abis src/eth/builtin && pnpm gen:eth_test",
     "gen:eth_test": "tsx src/eth/codegen/run.ts src/eth/tests/abis/eth ./src/eth/tests/types",
     "gen:fuel": "tsx src/fuel/codegen/run.ts src/fuel/abis src/sui/builtin && pnpm gen:fuel_test",
@@ -130,8 +129,7 @@
   },
   "devDependencies": {
     "prettier": "^3.2.4",
-    "tsdown": "^0.22.3",
-    "typedoc": "^0.28.0"
+    "tsdown": "^0.22.3"
   },
   "engines": {
     "node": ">=24.11.0"
