@@ -93,7 +93,7 @@ export function expr<K extends ValueType>(expression: string): UpdateOp<K> {
 
 export abstract class AbstractEntity {
   abstract id: ID
-  private readonly _data: RichStruct
+  private readonly _data!: RichStruct
 
   toJSON() {
     const obj: any = {}

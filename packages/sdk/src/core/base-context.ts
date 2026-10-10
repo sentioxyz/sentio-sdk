@@ -18,8 +18,8 @@ import { MemoryCache } from '../store/cache.js'
 export abstract class BaseContext {
   meter: Meter
   eventLogger: EventLoggerBinding
-  private _store: Store
-  private _cache: MemoryCache
+  private _store!: Store
+  private _cache!: MemoryCache
   baseLabels: Labels
   private active: boolean
 

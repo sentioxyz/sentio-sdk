@@ -12,7 +12,7 @@ export class SuiContext extends MoveContext<SuiNetwork, ModuleWithAddress, SuiEv
   moduleName: string
   timestamp: Date
   checkpoint: bigint
-  transaction: GrpcTypes.ExecutedTransaction
+  transaction!: GrpcTypes.ExecutedTransaction
   eventIndex: number
   coder: MoveCoder
 

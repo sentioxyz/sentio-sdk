@@ -24,7 +24,7 @@ export class MoveDex<
   AccountContextType extends MoveAccountContext<Network, ModuleType, StructType | EventType>,
   T
 > {
-  coinList: MoveCoinList<TokenType, Network>
+  coinList!: MoveCoinList<TokenType, Network>
   poolAdaptor: MovePoolAdaptor<StructType, T>
   volume: Gauge
   volumeByCoin: Gauge
