@@ -270,7 +270,7 @@ export class IPFSBatchUploader extends BatchUploader {
       }
 
       const formData = new FormData()
-      const blob = new Blob([fileContent], { type: 'application/octet-stream' })
+      const blob = new Blob([Uint8Array.from(fileContent)], { type: 'application/octet-stream' })
       formData.append('file', blob, fileKey) // 'file' is a common field name for single file uploads
 
       const uploadResponse = await fetch(putUrl, {
