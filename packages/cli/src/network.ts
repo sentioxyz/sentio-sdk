@@ -272,7 +272,7 @@ export async function isOperatorOnChain(
 
 export async function uploadToIPFS(fileBuffer: Buffer, ipfsUrl: string): Promise<string> {
   const formData = new FormData()
-  const blob = new Blob([fileBuffer], { type: 'application/octet-stream' })
+  const blob = new Blob([Uint8Array.from(fileBuffer)], { type: 'application/octet-stream' })
   formData.append('file', blob, 'lib.js')
 
   const response = await fetch(ipfsUrl, {

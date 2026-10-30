@@ -25,6 +25,6 @@
     "@bufbuild/protobuf": "^2.12.1"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=26"
   }
 }

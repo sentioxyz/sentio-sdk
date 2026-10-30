@@ -18,9 +18,9 @@ allowBuilds:
   utf-8-validate: false
 # Keep hoisting so transitive deps (e.g. @fuel-ts/*, superstruct, ix, tslib) resolve.
 shamefullyHoist: true
-# Enforce engines field (was in .npmrc as `engine-strict=true`; pnpm 11 no longer
-# reads it from there).
-engineStrict: true
+# Fuel SDK 0.103 still caps its declared Node support at 24. Warn for dependency
+# engine ranges while CI validates Node 26; workspace packages require Node >=26.
+engineStrict: false
 # pnpm 11's default ~24h minimumReleaseAge blocks installing our own same-day
 # @typemove/* releases; disable it for this repo.
 minimumReleaseAge: 0
