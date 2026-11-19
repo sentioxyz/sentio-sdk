@@ -7,8 +7,10 @@
 set -euo pipefail
 
 SCRIPTS="$(cd "$(dirname "$0")" && pwd)"
-ROOT="${WORK_DIR:-$SCRIPTS/work}"
-mkdir -p "$ROOT"
+# Absolute, and exported so verify.mjs resolves the same directory after the cd below.
+mkdir -p "${WORK_DIR:-$SCRIPTS/work}"
+ROOT="$(cd "${WORK_DIR:-$SCRIPTS/work}" && pwd)"
+export WORK_DIR="$ROOT"
 cd "$ROOT"
 
 npm whoami >/dev/null || { echo "not logged in: run npm login first" >&2; exit 1; }

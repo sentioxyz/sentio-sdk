@@ -89,7 +89,7 @@ after its paths are checked, and nothing inside an extracted directory is ever e
 
 ## Checking the published packages
 
-Requires Node, npm and `tar`. No dependencies are installed.
+Requires Node, npm and `tar` (bsdtar or GNU tar). No dependencies are installed.
 
 ```bash
 ./repack.sh           # downloads the official tarballs into work/official

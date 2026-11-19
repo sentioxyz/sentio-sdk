@@ -10,11 +10,20 @@
 set -euo pipefail
 
 SCRIPTS="$(cd "$(dirname "$0")" && pwd)"
-ROOT="${WORK_DIR:-$SCRIPTS/work}"
-mkdir -p "$ROOT"
+# Absolute, and exported so verify.mjs resolves the same directory after the cd below.
+mkdir -p "${WORK_DIR:-$SCRIPTS/work}"
+ROOT="$(cd "${WORK_DIR:-$SCRIPTS/work}" && pwd)"
+export WORK_DIR="$ROOT"
 cd "$ROOT"
 
 names() { node "$SCRIPTS/list.mjs"; }
+
+# Pack as root:root without platform metadata. bsdtar (macOS) and GNU tar spell this differently.
+if tar --version 2>/dev/null | grep -qi bsdtar; then
+  TAR_OWNER_FLAGS=(--no-xattrs --no-mac-metadata --uid 0 --gid 0 --uname '' --gname '')
+else
+  TAR_OWNER_FLAGS=(--owner=0 --group=0 --numeric-owner)
+fi
 
 rm -rf official repacked dist
 mkdir -p dist
@@ -35,8 +44,7 @@ while IFS=$'\t' read -r upstream slug fork_tgz; do
   cp -R "official/$slug/x/package" "repacked/$slug/package"
   node "$SCRIPTS/rewrite-package-json.mjs" "repacked/$slug/package/package.json"
 
-  COPYFILE_DISABLE=1 tar --no-xattrs --no-mac-metadata --uid 0 --gid 0 --uname '' --gname '' \
-    -czf "dist/$fork_tgz" -C "repacked/$slug" package
+  COPYFILE_DISABLE=1 tar "${TAR_OWNER_FLAGS[@]}" -czf "dist/$fork_tgz" -C "repacked/$slug" package
 done < <(names)
 
 echo "repacked $(ls dist | wc -l | tr -d ' ') packages into $ROOT/dist"
