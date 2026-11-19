@@ -1,0 +1,51 @@
+@sentio/fuels@0.103.0
+  fork     sha512-UssmimoieG77i7/Jo2pufUWMFC5KGlMrDmEVW9h01+XIv3OrjLmj2zamhi3zZmqTyDeoYen3knDOiIGAocpPuA==
+  official fuels@0.103.0 sha512-jV/EqE1/kibZzC1jqW4BhRyM7/ndX6+3W176crVs+260T48aa9rkNT1+TNqdmXewmjusqJ7La4GR1Cx7h/ZPcw==
+@sentio/fuel-ts-abi-coder@0.103.0
+  fork     sha512-QekaXVsZMFN9JPvsujh5A9zWM0LD3ZHYoOJPjaurxYz1sZDAfYAQ83gc7UMmwRvlMtDuQ0tgteM1AwYP9w6Jxw==
+  official @fuel-ts/abi-coder@0.103.0 sha512-tErLljHqz8Tnpndijd3XiGSbsBanFCeq2Bbl5DBjbVrZ737m5BqsYVYgBjSDkRmrRxz/uFFmXl1qLEU3MWNtPQ==
+@sentio/fuel-ts-abi-typegen@0.103.0
+  fork     sha512-yCBiVb3TlgcncvyCQw+5ALpxw5J9n42IQcO+vjiDVBxy2w0iJTqvsEGihnP73YWtKMPkkNMgmAAFF6hEXfFJ6g==
+  official @fuel-ts/abi-typegen@0.103.0 sha512-XO9zai8MomXjCHnoa7K/gfO/Nco6Atmu8ptPJ1rHkhbftP75jXp5owflVFe+e+zvIXPA/UsZkM/uxJN0fB2njg==
+@sentio/fuel-ts-account@0.103.0
+  fork     sha512-Th++3/ABsvuiVNPCRRnXOtIkQw80npabaHXy0BWORAf2TXkOWF0bwn9JWTsrqTz68tobXBB5nWOP32hiEGECSQ==
+  official @fuel-ts/account@0.103.0 sha512-FI4iPK6yYtdU8d+pwknyVtOLAsxP0raybH3gPAWhYR7Bp4C4iA6dXnGXQcznBEW52Ez++5LjqvejJjZkIOzohw==
+@sentio/fuel-ts-address@0.103.0
+  fork     sha512-S6eh9ddhwmu2Fy1IQBCBTtGS++3vtmXI3PldsjmGaFK6d+aEEhHBBkZXY9Gnfvd6ZFHLofYu3xVB43K6iHpUtw==
+  official @fuel-ts/address@0.103.0 sha512-Yb/mpU+4D4a6OdTLAvVeEFncNSLtW4NjToxdceDIv/y45TDFdubwcmMw+7gA/fDcn+6p88mojrcCEcRrnDg2qQ==
+@sentio/fuel-ts-contract@0.103.0
+  fork     sha512-U0xWylnOsSQGw7kNF8qIiNUjKupsPpdDS5k2aQ78g71jh3lGorf8ppFL0UbKLVDkxxzlFFU3RqVYxo1FMGKk2Q==
+  official @fuel-ts/contract@0.103.0 sha512-pdYxN7beDNn+JYRmQ1/1TYEK0QcWB4WvQsmAWlESE2WzmlMVDqoa4U1U5rsh5uZde1/Jb3TikXJeSWpyRa4J5Q==
+@sentio/fuel-ts-crypto@0.103.0
+  fork     sha512-JZhRRJ8lyQbdAzrCLNxwFH8HBuv6t/zKzCmKWi621Qji3VM47d+SgGvztKtpnS578cfVrwCR4yxiw7MlJX1DnA==
+  official @fuel-ts/crypto@0.103.0 sha512-8DWeYl1TkXY7Ga/2X1zI4Jv6Ua7mFHRgArwaSV0ckhk+Fu+KK4K9diUAge10TRUe11byG3cX2ObcVIlNtthnPg==
+@sentio/fuel-ts-errors@0.103.0
+  fork     sha512-Y3Iogbg4qGlL7p0mo8tZJlNsWS6mkG4JORaWx40flDPK+aAAuYWT1OYHXrzSdMDOggXzJnOwN76JUd/GXGMDEA==
+  official @fuel-ts/errors@0.103.0 sha512-IvWB/Q7rRNYI/GrLuCD4EiGHOi5a+9a7P3AXMZ8gqE2PA5yYKUPQlI87xTvB9f9ZTiX1H/XwdCKprmKp6Nh16g==
+@sentio/fuel-ts-hasher@0.103.0
+  fork     sha512-7wYrC83RCSuy5chalXTh/S/0zTQ8PIFzi6Q9wLpnexGD3l+siOjQooEzH/iJiweXYy2KOT6TA7ENHQaitPrG6A==
+  official @fuel-ts/hasher@0.103.0 sha512-P1EU4iHb7biGSqIldNEgkULcmrY11xdF9fE4Ja3EUZTViI1ekUt2a7r8402CkafLjBpheKzRpsdyL2pqkxJqdw==
+@sentio/fuel-ts-math@0.103.0
+  fork     sha512-4s2wOYrF95Dg0iEXX6TWG70mgpZ8doocmq6xn80txD7KR1t+ZqkygcyhFp3FDSN5ltTtlCDysTtq82JAzOOifA==
+  official @fuel-ts/math@0.103.0 sha512-djUGWHC45GN8xiI4r20eg3hs1pHcZzkNLLFoX3Mg4gcEyPesr0dt+TdvyFGr/tBqoEuS+IBAS2rFB6v1f3Q+Xg==
+@sentio/fuel-ts-merkle@0.103.0
+  fork     sha512-86UsEA5e1qmWmtf1dvAgDTqK9UVTXbVyw0kBTzTHFx5iZH1Rb4D/9HdY9ByyY43LRRocOuL1zgSHK5Bn3KxZ0Q==
+  official @fuel-ts/merkle@0.103.0 sha512-A80K7SZgOcnl0SuxurR+6bOAbKPM/gOMlcHDqeAU2vsClG2Zp3Apu1+v7PZJvPgi8JRUHDuDWlqpkNQvLRDvdQ==
+@sentio/fuel-ts-program@0.103.0
+  fork     sha512-zurm/3gkV0frGQJ0g4TR1TBoMVFzA1NMFpPU4ewaKxWiAKgllGVwzuLPJSaqdIPKgn4NgCcYPPSPirKChVIZIg==
+  official @fuel-ts/program@0.103.0 sha512-GXvFpNsyg0VpDm8DXmpE+2oYSufprcPHciiwET1NpexlCGIdiPhBRDA3hqq6P+n+ovNNMNWHgwNxu77Yle9lxA==
+@sentio/fuel-ts-recipes@0.103.0
+  fork     sha512-Y386tjcOT9hrN6Xp/l4La5v46p2HHaMs1YeBEorpIq84hbj4hrom5/mYcn1QtCpozrewpXKaYa8Gsv4cK94NqQ==
+  official @fuel-ts/recipes@0.103.0 sha512-Ei3BTFQXM5Q+7PLln/ChdGis0oHJghdEjr7C8w/3dOGMcTVXwzQOg8kzNzXoYdDMgRxFBG6oX5Wi2JY+x8ShLg==
+@sentio/fuel-ts-script@0.103.0
+  fork     sha512-h4jw6I1OjaMJiK1VnB5YZwxHKgXJ32MH1Cr8oRgJNuGqwfxSFXC0FaZBM/FHOMGw7z2zgxpO85kbqhnvW4AXIw==
+  official @fuel-ts/script@0.103.0 sha512-JN5fY5pNM/lnZlU6ZDKNExK0N5C/9I3/o8FbmZBh3i1pyNxDaceEbEX8YMu/PkWXlG5mbiDXYFNWRmzlV8rZ6g==
+@sentio/fuel-ts-transactions@0.103.0
+  fork     sha512-87qcHpboNVAdelJ8zqJ1Ika3sQQvUJpx0B8PpgV1Dl+fHZLbyr/bvn0ApUrNnH+SWYXveqwrYC5zKhH4fNoQSA==
+  official @fuel-ts/transactions@0.103.0 sha512-oOZ/2Q1r+2823MDsMdD/pU3TwVmOfdaBjbudC+oCT+fidBZMAVRQfF/i4SWDtPfSsRuZRD0qDUA4zicYpxphiA==
+@sentio/fuel-ts-utils@0.103.0
+  fork     sha512-mr6wJXibKZhRN66lv1Jo5ocpSDAlxaorVykHADSgkbobzzvw+HifoM64uzkO5y7V4D1nKd7sC8dn2dvy82he7w==
+  official @fuel-ts/utils@0.103.0 sha512-vYPb0vySLq0PZ0ytdWQnSeG1KjRBB90Fet114iS23sAd+Q1DZ75SHcgekPHkA0Hn4mTrE0Blch+d9tLnLeLrdw==
+@sentio/fuel-ts-versions@0.103.0
+  fork     sha512-9sPs31/MvNW5H6KFef/CC9KSutptnerXN7OMVjL9eP1fl+ALT4Mate2BvL3kTa3Dfgz89MP5tFXMk7Pq85MOlA==
+  official @fuel-ts/versions@0.103.0 sha512-+omgQvyrOY3e41CdeFBbYl3wWkAimLIKx4lwT+wWWH+/Hxqx5J6oy102ETlr7r93u25X2a68K+USZlR6v7JXMA==
