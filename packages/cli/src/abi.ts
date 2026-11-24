@@ -7,7 +7,7 @@ import { AptosChainId, ChainId, SuiChainId } from '@sentio/chain'
 
 import type { Aptos } from '@aptos-labs/ts-sdk'
 import type { IotaClient } from '@iota/iota-sdk/client'
-import type { SuiJsonRpcClient } from '@mysten/sui/jsonRpc'
+import type { SuiGrpcClient } from '@mysten/sui/grpc'
 import { ReadKey } from './key.js'
 import { Auth } from './commands/upload.js'
 import { getApiUrl } from './utils.js'
@@ -251,6 +251,27 @@ export function convertLegacySuiAbis(baseDir = path.resolve('abis', 'sui')): voi
   }
 }
 
+// Download a Sui package ABI over gRPC, in the `[{ address, module }]` shape the
+// v2 codegen reads (the same shape `typemove-sui` writes from its
+// `SuiChainAdapter.fetchModules`). @mysten/sui 3 removed the JSON-RPC client, so
+// this replaces `getNormalizedMoveModulesByPackage` + `normalizedModulesToAbi`.
+// No selector: fetch the package stored at exactly this id. The caller-supplied
+// address is kept (gRPC returns the long-form storage id, while system packages
+// are keyed by their short form such as 0x2).
+export async function fetchSuiAbi(
+  client: Pick<SuiGrpcClient, 'movePackageService'>,
+  address: string
+): Promise<Array<{ address: string; module: any }>> {
+  const { response } = await client.movePackageService.getPackage({
+    packageId: address,
+    selector: { oneofKind: undefined }
+  })
+  if (!response.package) {
+    throw Error(`No package returned for ${address}`)
+  }
+  return (response.package.modules ?? []).map((module) => ({ address, module }))
+}
+
 export async function getABI(
   chain: ChainId,
   address: string,
@@ -263,22 +284,19 @@ export async function getABI(
 
   // SUI
   try {
-    const SuiJsonRpcClient = (await import('@mysten/sui/jsonRpc')).SuiJsonRpcClient
-    let suiClient: SuiJsonRpcClient | undefined
+    const SuiGrpcClient = (await import('@mysten/sui/grpc')).SuiGrpcClient
+    let suiClient: SuiGrpcClient | undefined
     switch (chain) {
       case SuiChainId.SUI_MAINNET:
-        suiClient = new SuiJsonRpcClient({ url: 'https://fullnode.mainnet.sui.io/', network: 'mainnet' })
+        suiClient = new SuiGrpcClient({ baseUrl: 'https://fullnode.mainnet.sui.io', network: 'mainnet' })
         break
       case SuiChainId.SUI_TESTNET:
-        suiClient = new SuiJsonRpcClient({ url: 'https://fullnode.testnet.sui.io/', network: 'testnet' })
+        suiClient = new SuiGrpcClient({ baseUrl: 'https://fullnode.testnet.sui.io', network: 'testnet' })
         break
     }
     if (suiClient) {
       try {
-        return {
-          abi: normalizedModulesToAbi(await suiClient.getNormalizedMoveModulesByPackage({ package: address })),
-          name
-        }
+        return { abi: await fetchSuiAbi(suiClient, address), name }
       } catch (e) {
         console.error(baseErrMsg, e)
         process.exit(1)
