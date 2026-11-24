@@ -36,7 +36,7 @@
     "@bufbuild/protobuf": "^2.12.1",
     "@connectrpc/connect": "^2.1.2",
     "@iota/iota-sdk": "~1.17.0",
-    "@mysten/sui": "~2.38.0",
+    "@mysten/sui": "~3.0.0",
     "@sentio/api": "~2.0.4",
     "@sentio/chain": "~3.4.36",
     "@sentio/graph-cli": "^0.97.0",

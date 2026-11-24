@@ -209,8 +209,8 @@ importers:
         specifier: ~1.17.0
         version: 1.17.0(typescript@6.0.3)
       '@mysten/sui':
-        specifier: ~2.38.0
-        version: 2.38.0(typescript@6.0.3)
+        specifier: ~3.0.0
+        version: 3.0.1(typescript@6.0.3)
       '@sentio/api':
         specifier: ~2.0.4
         version: 2.0.4
@@ -470,8 +470,8 @@ importers:
         specifier: ~1.17.0
         version: 1.17.0(typescript@6.0.3)
       '@mysten/sui':
-        specifier: ~2.38.0
-        version: 2.38.0(typescript@6.0.3)
+        specifier: ~3.0.0
+        version: 3.0.1(typescript@6.0.3)
       '@prettier/sync':
         specifier: ^0.6.0
         version: 0.6.1(prettier@3.5.3)
@@ -500,17 +500,17 @@ importers:
         specifier: ^6.9.0
         version: 6.9.0(bufferutil@4.0.8)(typescript@6.0.3)(utf-8-validate@5.0.10)
       '@typemove/aptos':
-        specifier: 2.0.9
-        version: 2.0.9
+        specifier: 2.0.10
+        version: 2.0.10
       '@typemove/iota':
-        specifier: 2.0.9
-        version: 2.0.9(typescript@6.0.3)
+        specifier: 2.0.10
+        version: 2.0.10(typescript@6.0.3)
       '@typemove/move':
-        specifier: 2.0.9
-        version: 2.0.9
+        specifier: 2.0.10
+        version: 2.0.10
       '@typemove/sui':
-        specifier: 2.0.9
-        version: 2.0.9(typescript@6.0.3)
+        specifier: 2.0.10
+        version: 2.0.10(typescript@6.0.3)
       bs58:
         specifier: ^6.0.0
         version: 6.0.0
@@ -1669,8 +1669,8 @@ packages:
   '@mysten/bcs@2.1.4':
     resolution: {integrity: sha512-ksfm0HGy82iDcuLaf4kAduaeTNqALH8D8WCdxxwU/L2Gpk4SnqoC7D8R4qMoMpCSkh56CFVG3Tme343Iz2P8PA==}
 
-  '@mysten/sui@2.38.0':
-    resolution: {integrity: sha512-j/uG+waSo62eWH0c3+a/3V8tnsAUTKfe7OIXtIDmhPLQcWnPCchf0R5WjxMx904Vh61qfYmrySFYoAau2+7bwA==}
+  '@mysten/sui@3.0.1':
+    resolution: {integrity: sha512-humKrLNPyScafqwbl2axfffWO9YVK3blAkxHJyBy4tid5CZ1P19NIRlHv659oa8DhR8KeGpCTeb9/8xcoIDKkQ==}
     engines: {node: '>=22'}
 
   '@mysten/utils@0.4.2':
@@ -2980,19 +2980,19 @@ packages:
   '@tybys/wasm-util@0.10.3':
     resolution: {integrity: sha512-F3fo1MYrRJYL3zER0OUOmkutjr1Vp23m7OsSgp7nq4SP6OqX6C/56XFIPAl5bt3zaBRjmW7SGz3u/6LwFpYcOg==}
 
-  '@typemove/aptos@2.0.9':
-    resolution: {integrity: sha512-A+pSDdMow5hEXTnx0Bz6mC6bi51djI10OI4hY8+pJBiesgNhQ3GTEDEaGgYHFwvsoSIAeM0+C1bNAY/Neddg3A==}
+  '@typemove/aptos@2.0.10':
+    resolution: {integrity: sha512-KlnZ5q3R3ladMH7vjfhbYfpG8rIKQQLoxOLazp29dHEiu2BtsLPezfPqIlYNTpcSG0Zo6cGFV3GnG+qyjGHe+g==}
     hasBin: true
 
-  '@typemove/iota@2.0.9':
-    resolution: {integrity: sha512-xhFb4dBHXRzYu89UOnNXiVjLgpfXfvA9PI1swO277I231LQSbA8F98kJDC46hwM8A8anQgMe9kfHh0H3Iv8S3g==}
+  '@typemove/iota@2.0.10':
+    resolution: {integrity: sha512-ccrhRX5oedaMT9n0orkNTBuyY5QRAeuSaTbm5SxAt7du99Tf5Qs2ErE4ttdxB2traV/diNJGhk3CLAiYaLFkHA==}
     hasBin: true
 
-  '@typemove/move@2.0.9':
-    resolution: {integrity: sha512-trR58o19H+4jIpKirUcl72oKRbMkZz9COIrZu/YMcXYHgBeHMgsSMG2APTTbkmJLLspo5wSp8yfmXxnJCrqTCw==}
+  '@typemove/move@2.0.10':
+    resolution: {integrity: sha512-U4rQjYEr9aC7G1Y80yu+bWRXoOCfgDWi4R7pu42z67VqAxjhcFDqPxHvcN6XstxKMLPKnhtQi2lmsY2gNdpOEg==}
 
-  '@typemove/sui@2.0.9':
-    resolution: {integrity: sha512-kjhGUZsZ92+x6Mf/0n8rCIu2Sek970+Ss+M6T8TVuQH07gauSy+H9bRgS9w/kSA6pY6VZrMRKHoK5+Jhcxxg4Q==}
+  '@typemove/sui@2.0.10':
+    resolution: {integrity: sha512-CiqLLkKgQbjsqgqq7Y0a33cvBaU48EB4x62RLt1+ZvoIcbvCsSGC5/uHgqjbqlNyPWy1hQ6K9IScK2WzjhaLEw==}
     hasBin: true
 
   '@types/bn.js@5.1.6':
@@ -3859,6 +3859,10 @@ packages:
 
   commander@15.0.0:
     resolution: {integrity: sha512-z67u4ZhzCL/Tydu1lJARtEZYWbWaN7oYLHbsuzocr6y4N6WZAagG3RQ4FW61V1/0+jImpj293XfrcYnd1qxtPg==}
+    engines: {node: '>=22.12.0'}
+
+  commander@15.1.0:
+    resolution: {integrity: sha512-cgnQ88TRrWcC7pVq46RzJVRMktu3W2RcbnoidnfBsl1bmDCBwJS/udcIZpKoCrbAYYaCqsz1yZCVIgbIaU3ddQ==}
     engines: {node: '>=22.12.0'}
 
   commander@2.20.3:
@@ -8408,7 +8412,7 @@ snapshots:
       '@mysten/utils': 0.4.2
       '@scure/base': 2.4.0
 
-  '@mysten/sui@2.38.0(typescript@6.0.3)':
+  '@mysten/sui@3.0.1(typescript@6.0.3)':
     dependencies:
       '@graphql-typed-document-node/core': 3.2.0(graphql@17.1.0)
       '@mysten/bcs': 2.1.4
@@ -10021,21 +10025,21 @@ snapshots:
       tslib: 2.8.1
     optional: true
 
-  '@typemove/aptos@2.0.9':
+  '@typemove/aptos@2.0.10':
     dependencies:
       '@aptos-labs/ts-sdk': 7.5.0
-      '@typemove/move': 2.0.9
+      '@typemove/move': 2.0.10
       chalk: 6.0.1
-      commander: 15.0.0
+      commander: 15.1.0
       prettier: 3.10.1
       radash: 12.1.1
 
-  '@typemove/iota@2.0.9(typescript@6.0.3)':
+  '@typemove/iota@2.0.10(typescript@6.0.3)':
     dependencies:
       '@iota/iota-sdk': 1.17.0(typescript@6.0.3)
-      '@typemove/move': 2.0.9
+      '@typemove/move': 2.0.10
       chalk: 6.0.1
-      commander: 15.0.0
+      commander: 15.1.0
       prettier: 3.10.1
       radash: 12.1.1
     transitivePeerDependencies:
@@ -10043,16 +10047,16 @@ snapshots:
       - '@gql.tada/vue-support'
       - typescript
 
-  '@typemove/move@2.0.9':
+  '@typemove/move@2.0.10':
     dependencies:
       radash: 12.1.1
 
-  '@typemove/sui@2.0.9(typescript@6.0.3)':
+  '@typemove/sui@2.0.10(typescript@6.0.3)':
     dependencies:
-      '@mysten/sui': 2.38.0(typescript@6.0.3)
-      '@typemove/move': 2.0.9
+      '@mysten/sui': 3.0.1(typescript@6.0.3)
+      '@typemove/move': 2.0.10
       chalk: 6.0.1
-      commander: 15.0.0
+      commander: 15.1.0
       prettier: 3.10.1
       radash: 12.1.1
     transitivePeerDependencies:
@@ -10922,6 +10926,8 @@ snapshots:
   commander@14.0.3: {}
 
   commander@15.0.0: {}
+
+  commander@15.1.0: {}
 
   commander@2.20.3: {}
 
@@ -13240,7 +13246,7 @@ snapshots:
     dependencies:
       '@babel/code-frame': 7.24.7
       index-to-position: 0.1.2
-      type-fest: 4.34.1
+      type-fest: 4.41.0
 
   parse-json@8.3.0:
     dependencies:
@@ -13499,7 +13505,7 @@ snapshots:
       '@types/normalize-package-data': 2.4.4
       normalize-package-data: 6.0.2
       parse-json: 8.1.0
-      type-fest: 4.34.1
+      type-fest: 4.41.0
       unicorn-magic: 0.1.0
 
   readable-stream@2.3.8:

@@ -625,7 +625,9 @@
     "abi": {
       "address": "0x1",
       "name": "code",
-      "friends": [],
+      "friends": [
+        "0x1::object_code_deployment"
+      ],
       "exposed_functions": [
         {
           "name": "grant_permission",
@@ -674,6 +676,20 @@
           "params": [
             "&signer",
             "0x1::code::PackageMetadata",
+            "vector<vector<u8>>"
+          ],
+          "return": []
+        },
+        {
+          "name": "publish_package_to_object",
+          "visibility": "friend",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [
+            "&signer",
+            "&signer",
+            "vector<u8>",
             "vector<vector<u8>>"
           ],
           "return": []
@@ -2576,9 +2592,9 @@
           "is_view": false,
           "generic_type_params": [],
           "params": [
+            "&signer",
             "address",
-            "vector<u8>",
-            "address"
+            "vector<u8>"
           ],
           "return": []
         },
@@ -2590,7 +2606,7 @@
           "generic_type_params": [],
           "params": [
             "address",
-            "vector<u8>"
+            "vector<vector<u8>>"
           ],
           "return": []
         }
@@ -14426,6 +14442,17 @@
           ]
         },
         {
+          "name": "is_eager_module_initialization_disabled",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [],
+          "return": [
+            "bool"
+          ]
+        },
+        {
           "name": "is_enabled",
           "visibility": "public",
           "is_entry": false,
@@ -23164,23 +23191,6 @@
           ]
         },
         {
-          "name": "snapshot",
-          "visibility": "public",
-          "is_entry": false,
-          "is_view": false,
-          "generic_type_params": [
-            {
-              "constraints": []
-            }
-          ],
-          "params": [
-            "&0x1::aggregator_v2::Aggregator<T0>"
-          ],
-          "return": [
-            "0x1::aggregator_v2::AggregatorSnapshot<T0>"
-          ]
-        },
-        {
           "name": "max_value",
           "visibility": "public",
           "is_entry": false,
@@ -23309,6 +23319,23 @@
           ],
           "return": [
             "0x1::aggregator_v2::DerivedStringSnapshot"
+          ]
+        },
+        {
+          "name": "snapshot",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": []
+            }
+          ],
+          "params": [
+            "&0x1::aggregator_v2::Aggregator<T0>"
+          ],
+          "return": [
+            "0x1::aggregator_v2::AggregatorSnapshot<T0>"
           ]
         },
         {
@@ -24066,6 +24093,7 @@
         "0x1::keyless_account",
         "0x1::jwks",
         "0x1::jwk_consensus_config",
+        "0x1::hot_state_config",
         "0x1::gas_schedule",
         "0x1::execution_config",
         "0x1::epoch_timeout_config",
@@ -32717,6 +32745,74 @@
       "structs": [
         {
           "name": "ExecutionConfig",
+          "is_native": false,
+          "is_event": false,
+          "is_enum": false,
+          "abilities": [
+            "drop",
+            "store",
+            "key"
+          ],
+          "generic_type_params": [],
+          "fields": [
+            {
+              "name": "config",
+              "type": "vector<u8>"
+            }
+          ],
+          "variants": []
+        }
+      ]
+    }
+  },
+  {
+    "abi": {
+      "address": "0x1",
+      "name": "hot_state_config",
+      "friends": [
+        "0x1::reconfiguration_with_dkg",
+        "0x1::genesis"
+      ],
+      "exposed_functions": [
+        {
+          "name": "on_new_epoch",
+          "visibility": "friend",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [
+            "&signer"
+          ],
+          "return": []
+        },
+        {
+          "name": "initialize",
+          "visibility": "friend",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [
+            "&signer",
+            "vector<u8>"
+          ],
+          "return": []
+        },
+        {
+          "name": "set_for_next_epoch",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [
+            "&signer",
+            "vector<u8>"
+          ],
+          "return": []
+        }
+      ],
+      "structs": [
+        {
+          "name": "HotStateConfig",
           "is_native": false,
           "is_event": false,
           "is_enum": false,

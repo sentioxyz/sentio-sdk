@@ -56,11 +56,14 @@ export async function toSuiClientObjects(rawObjects: any[]): Promise<SuiMoveObje
 // `GrpcCoreClient.getTransaction`, fed by an in-memory fake transport that hands
 // back our changes as a protobuf-ts `TransactionEffects` message.
 //
-// Two upstream-internal details this depends on (both asserted by
+// Upstream-internal details this depends on (all asserted by
 // to-client-types.test.ts, which fails loudly if an upgrade changes them):
 //   1. `parseTransactionEffects` dereferences `effects.status.error` unguarded on
 //      the non-success path, so a minimal `status: { success: true }` is required.
 //   2. `getTransaction` returns a `{ $kind: 'Transaction', Transaction }` union.
+//   3. Since @mysten/sui 3, `parseGrpcTransactionResponse` throws unless
+//      `transaction.sender` is present. It only feeds the result's `sender`, which
+//      we discard, so a placeholder address is enough.
 // See https://github.com/MystenLabs/ts-sdks/blob/8588da38e0a813f87b345c348e63486a7a766a61/packages/sui/src/grpc/core.ts#L1132
 export async function toSuiClientChangedObjects(rawChanges: any[]): Promise<SuiClientTypes.ChangedObject[]> {
   if (rawChanges.length === 0) {
@@ -70,8 +73,9 @@ export async function toSuiClientChangedObjects(rawChanges: any[]): Promise<SuiC
     { status: { success: true }, changedObjects: rawChanges },
     { ignoreUnknownFields: true }
   )
+  const transaction = { digest: '', effects, transaction: { sender: '0x0' } }
   const core = new GrpcCoreClient({
-    client: { ledgerService: { getTransaction: async () => ({ response: { transaction: { digest: '', effects } } }) } }
+    client: { ledgerService: { getTransaction: async () => ({ response: { transaction } }) } }
   } as any)
   const res: any = await core.getTransaction({ digest: '', include: { effects: true } })
   return (res.Transaction ?? res).effects.changedObjects

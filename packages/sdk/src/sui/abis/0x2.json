@@ -8498,6 +8498,23 @@
       "functions": [
         {
           "typeParameters": [],
+          "parameters": [],
+          "returns": [
+            {
+              "reference": 1,
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 10,
+                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000002::clock::Clock"
+              }
+            }
+          ],
+          "name": "borrow",
+          "visibility": 2,
+          "isEntry": false
+        },
+        {
+          "typeParameters": [],
           "parameters": [
             {
               "reference": 2,
@@ -8541,6 +8558,23 @@
           ],
           "returns": [],
           "name": "create",
+          "visibility": 1,
+          "isEntry": false
+        },
+        {
+          "typeParameters": [],
+          "parameters": [],
+          "returns": [
+            {
+              "reference": 1,
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 10,
+                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000002::clock::Clock"
+              }
+            }
+          ],
+          "name": "native_borrow",
           "visibility": 1,
           "isEntry": false
         },
@@ -15946,6 +15980,30 @@
           "name": "exists",
           "visibility": 2,
           "isEntry": false
+        },
+        {
+          "typeParameters": [],
+          "parameters": [
+            {
+              "reference": 2,
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 10,
+                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000002::object::UID"
+              }
+            },
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 10,
+                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000002::object::UID"
+              }
+            }
+          ],
+          "returns": [],
+          "name": "release",
+          "visibility": 2,
+          "isEntry": false
         }
       ],
       "name": "derived_object"
@@ -16275,43 +16333,6 @@
           "name": "create_and_keep",
           "visibility": 2,
           "isEntry": true
-        },
-        {
-          "typeParameters": [
-            {
-              "constraints": [
-                4
-              ]
-            }
-          ],
-          "parameters": [
-            {
-              "reference": 2,
-              "body": {
-                "typeParameterInstantiation": [],
-                "type": 10,
-                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000002::tx_context::TxContext"
-              }
-            }
-          ],
-          "returns": [
-            {
-              "body": {
-                "typeParameterInstantiation": [
-                  {
-                    "typeParameterInstantiation": [],
-                    "type": 11,
-                    "typeParameter": 0
-                  }
-                ],
-                "type": 10,
-                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000002::display::Display"
-              }
-            }
-          ],
-          "name": "create_internal",
-          "visibility": 1,
-          "isEntry": false
         },
         {
           "typeParameters": [
@@ -27236,6 +27257,52 @@
           ],
           "name": "id_to_bytes",
           "visibility": 2,
+          "isEntry": false
+        },
+        {
+          "typeParameters": [],
+          "parameters": [
+            {
+              "reference": 1,
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 10,
+                "typeName": "0x0000000000000000000000000000000000000000000000000000000000000002::object::UID"
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 2
+              }
+            }
+          ],
+          "name": "is_shared_input",
+          "visibility": 3,
+          "isEntry": false
+        },
+        {
+          "typeParameters": [],
+          "parameters": [
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 1
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 2
+              }
+            }
+          ],
+          "name": "is_shared_input_impl",
+          "visibility": 1,
           "isEntry": false
         },
         {
