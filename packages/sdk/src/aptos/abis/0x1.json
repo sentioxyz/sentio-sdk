@@ -625,9 +625,7 @@
     "abi": {
       "address": "0x1",
       "name": "code",
-      "friends": [
-        "0x1::object_code_deployment"
-      ],
+      "friends": [],
       "exposed_functions": [
         {
           "name": "grant_permission",
@@ -654,17 +652,6 @@
           "return": [
             "bool"
           ]
-        },
-        {
-          "name": "check_code_publishing_permission",
-          "visibility": "friend",
-          "is_entry": false,
-          "is_view": false,
-          "generic_type_params": [],
-          "params": [
-            "&signer"
-          ],
-          "return": []
         },
         {
           "name": "freeze_code_object",
@@ -989,22 +976,6 @@
           ]
         },
         {
-          "name": "merge",
-          "visibility": "public",
-          "is_entry": false,
-          "is_view": false,
-          "generic_type_params": [
-            {
-              "constraints": []
-            }
-          ],
-          "params": [
-            "&mut 0x1::coin::Coin<T0>",
-            "0x1::coin::Coin<T0>"
-          ],
-          "return": []
-        },
-        {
           "name": "initialize",
           "visibility": "public",
           "is_entry": false,
@@ -1187,6 +1158,22 @@
           "return": [
             "bool"
           ]
+        },
+        {
+          "name": "merge",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": []
+            }
+          ],
+          "params": [
+            "&mut 0x1::coin::Coin<T0>",
+            "0x1::coin::Coin<T0>"
+          ],
+          "return": []
         },
         {
           "name": "mint",
@@ -1516,6 +1503,23 @@
           "return": [
             "0x1::fungible_asset::BurnRef",
             "0x1::coin::BurnRefReceipt"
+          ]
+        },
+        {
+          "name": "get_paired_mint_copy_ref",
+          "visibility": "friend",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": []
+            }
+          ],
+          "params": [
+            "&0x1::coin::MintCapability<T0>"
+          ],
+          "return": [
+            "0x1::fungible_asset::MintRef"
           ]
         },
         {
@@ -2542,6 +2546,121 @@
         }
       ],
       "structs": []
+    }
+  },
+  {
+    "abi": {
+      "address": "0x1",
+      "name": "init",
+      "friends": [
+        "0x1::code"
+      ],
+      "exposed_functions": [
+        {
+          "name": "internal_maybe_initialize",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [
+            "bool"
+          ],
+          "return": [
+            "0x1::option::Option<signer>"
+          ]
+        },
+        {
+          "name": "record_deploy_owner",
+          "visibility": "friend",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [
+            "address",
+            "vector<u8>",
+            "address"
+          ],
+          "return": []
+        },
+        {
+          "name": "reset_initialized",
+          "visibility": "friend",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [
+            "address",
+            "vector<u8>"
+          ],
+          "return": []
+        }
+      ],
+      "structs": [
+        {
+          "name": "InitializationState",
+          "is_native": false,
+          "is_event": false,
+          "is_enum": true,
+          "abilities": [
+            "key"
+          ],
+          "generic_type_params": [],
+          "fields": [],
+          "variants": [
+            {
+              "name": "V1",
+              "fields": [
+                {
+                  "name": "modules",
+                  "type": "0x1::ordered_map::OrderedMap<0x1::init::ModuleId, 0x1::init::ModuleState>"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "ModuleId",
+          "is_native": false,
+          "is_event": false,
+          "is_enum": false,
+          "abilities": [
+            "copy",
+            "drop",
+            "store"
+          ],
+          "generic_type_params": [],
+          "fields": [
+            {
+              "name": "hash",
+              "type": "u128"
+            }
+          ],
+          "variants": []
+        },
+        {
+          "name": "ModuleState",
+          "is_native": false,
+          "is_event": false,
+          "is_enum": false,
+          "abilities": [
+            "copy",
+            "drop",
+            "store"
+          ],
+          "generic_type_params": [],
+          "fields": [
+            {
+              "name": "only_once",
+              "type": "0x1::option::Option<bool>"
+            },
+            {
+              "name": "deploy_owner",
+              "type": "0x1::option::Option<address>"
+            }
+          ],
+          "variants": []
+        }
+      ]
     }
   },
   {
@@ -7132,6 +7251,138 @@
       "friends": [],
       "exposed_functions": [
         {
+          "name": "test_variant$Option$None",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": []
+            }
+          ],
+          "params": [
+            "&0x1::option::Option<T0>"
+          ],
+          "return": [
+            "bool"
+          ]
+        },
+        {
+          "name": "test_variant$Option$Some",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": []
+            }
+          ],
+          "params": [
+            "&0x1::option::Option<T0>"
+          ],
+          "return": [
+            "bool"
+          ]
+        },
+        {
+          "name": "pack$Option$None",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": []
+            }
+          ],
+          "params": [],
+          "return": [
+            "0x1::option::Option<T0>"
+          ]
+        },
+        {
+          "name": "pack$Option$Some",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": []
+            }
+          ],
+          "params": [
+            "T0"
+          ],
+          "return": [
+            "0x1::option::Option<T0>"
+          ]
+        },
+        {
+          "name": "unpack$Option$None",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": []
+            }
+          ],
+          "params": [
+            "0x1::option::Option<T0>"
+          ],
+          "return": []
+        },
+        {
+          "name": "unpack$Option$Some",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": []
+            }
+          ],
+          "params": [
+            "0x1::option::Option<T0>"
+          ],
+          "return": [
+            "T0"
+          ]
+        },
+        {
+          "name": "borrow$Option$0$0",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": []
+            }
+          ],
+          "params": [
+            "&0x1::option::Option<T0>"
+          ],
+          "return": [
+            "&T0"
+          ]
+        },
+        {
+          "name": "borrow_mut$Option$0$0",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": []
+            }
+          ],
+          "params": [
+            "&mut 0x1::option::Option<T0>"
+          ],
+          "return": [
+            "&mut T0"
+          ]
+        },
+        {
           "name": "contains",
           "visibility": "public",
           "is_entry": false,
@@ -7477,6 +7728,206 @@
       "name": "result",
       "friends": [],
       "exposed_functions": [
+        {
+          "name": "test_variant$Result$Ok",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": []
+            },
+            {
+              "constraints": []
+            }
+          ],
+          "params": [
+            "&0x1::result::Result<T0, T1>"
+          ],
+          "return": [
+            "bool"
+          ]
+        },
+        {
+          "name": "test_variant$Result$Err",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": []
+            },
+            {
+              "constraints": []
+            }
+          ],
+          "params": [
+            "&0x1::result::Result<T0, T1>"
+          ],
+          "return": [
+            "bool"
+          ]
+        },
+        {
+          "name": "pack$Result$Ok",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": []
+            },
+            {
+              "constraints": []
+            }
+          ],
+          "params": [
+            "T0"
+          ],
+          "return": [
+            "0x1::result::Result<T0, T1>"
+          ]
+        },
+        {
+          "name": "pack$Result$Err",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": []
+            },
+            {
+              "constraints": []
+            }
+          ],
+          "params": [
+            "T1"
+          ],
+          "return": [
+            "0x1::result::Result<T0, T1>"
+          ]
+        },
+        {
+          "name": "unpack$Result$Ok",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": []
+            },
+            {
+              "constraints": []
+            }
+          ],
+          "params": [
+            "0x1::result::Result<T0, T1>"
+          ],
+          "return": [
+            "T0"
+          ]
+        },
+        {
+          "name": "unpack$Result$Err",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": []
+            },
+            {
+              "constraints": []
+            }
+          ],
+          "params": [
+            "0x1::result::Result<T0, T1>"
+          ],
+          "return": [
+            "T1"
+          ]
+        },
+        {
+          "name": "borrow$Result$0$0",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": []
+            },
+            {
+              "constraints": []
+            }
+          ],
+          "params": [
+            "&0x1::result::Result<T0, T1>"
+          ],
+          "return": [
+            "&T0"
+          ]
+        },
+        {
+          "name": "borrow$Result$0$1",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": []
+            },
+            {
+              "constraints": []
+            }
+          ],
+          "params": [
+            "&0x1::result::Result<T0, T1>"
+          ],
+          "return": [
+            "&T1"
+          ]
+        },
+        {
+          "name": "borrow_mut$Result$0$0",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": []
+            },
+            {
+              "constraints": []
+            }
+          ],
+          "params": [
+            "&mut 0x1::result::Result<T0, T1>"
+          ],
+          "return": [
+            "&mut T0"
+          ]
+        },
+        {
+          "name": "borrow_mut$Result$0$1",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": []
+            },
+            {
+              "constraints": []
+            }
+          ],
+          "params": [
+            "&mut 0x1::result::Result<T0, T1>"
+          ],
+          "return": [
+            "&mut T1"
+          ]
+        },
         {
           "name": "is_err",
           "visibility": "public",
@@ -8388,6 +8839,26 @@
           "return": []
         },
         {
+          "name": "resolve",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": [
+                "store"
+              ]
+            }
+          ],
+          "params": [
+            "address",
+            "u64"
+          ],
+          "return": [
+            "T0"
+          ]
+        },
+        {
           "name": "register",
           "visibility": "public",
           "is_entry": false,
@@ -8775,26 +9246,6 @@
           ],
           "return": [
             "u64"
-          ]
-        },
-        {
-          "name": "resolve",
-          "visibility": "public",
-          "is_entry": false,
-          "is_view": false,
-          "generic_type_params": [
-            {
-              "constraints": [
-                "store"
-              ]
-            }
-          ],
-          "params": [
-            "address",
-            "u64"
-          ],
-          "return": [
-            "T0"
           ]
         },
         {
@@ -13128,6 +13579,17 @@
           ]
         },
         {
+          "name": "gas_refund_fa_mint_enabled",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [],
+          "return": [
+            "bool"
+          ]
+        },
+        {
           "name": "get_abort_if_multisig_payload_mismatch_feature",
           "visibility": "public",
           "is_entry": false,
@@ -13458,6 +13920,17 @@
           ]
         },
         {
+          "name": "get_function_value_dispatch_feature",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [],
+          "return": [
+            "u64"
+          ]
+        },
+        {
           "name": "get_jwk_consensus_feature",
           "visibility": "public",
           "is_entry": false,
@@ -13568,6 +14041,17 @@
           ]
         },
         {
+          "name": "get_multisig_script_feature",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [],
+          "return": [
+            "u64"
+          ]
+        },
+        {
           "name": "get_multisig_timelock_feature",
           "visibility": "public",
           "is_entry": false,
@@ -13590,7 +14074,40 @@
           ]
         },
         {
+          "name": "get_native_collateral_feature",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [],
+          "return": [
+            "u64"
+          ]
+        },
+        {
           "name": "get_native_memory_operations_feature",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [],
+          "return": [
+            "u64"
+          ]
+        },
+        {
+          "name": "get_native_orderbook_feature",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [],
+          "return": [
+            "u64"
+          ]
+        },
+        {
+          "name": "get_native_position_feature",
           "visibility": "public",
           "is_entry": false,
           "is_view": false,
@@ -13777,6 +14294,17 @@
           ]
         },
         {
+          "name": "get_trading_native_feature",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [],
+          "return": [
+            "u64"
+          ]
+        },
+        {
           "name": "get_transaction_context_extension_feature",
           "visibility": "public",
           "is_entry": false,
@@ -13933,7 +14461,29 @@
           ]
         },
         {
+          "name": "is_function_value_dispatch_enabled",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [],
+          "return": [
+            "bool"
+          ]
+        },
+        {
           "name": "is_jwk_consensus_per_key_mode_enabled",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [],
+          "return": [
+            "bool"
+          ]
+        },
+        {
+          "name": "is_lazy_module_initialization_enabled",
           "visibility": "public",
           "is_entry": false,
           "is_view": false,
@@ -13955,6 +14505,17 @@
           ]
         },
         {
+          "name": "is_multisig_script_enabled",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [],
+          "return": [
+            "bool"
+          ]
+        },
+        {
           "name": "is_multisig_timelock_enabled",
           "visibility": "public",
           "is_entry": false,
@@ -13966,7 +14527,40 @@
           ]
         },
         {
+          "name": "is_native_collateral_enabled",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [],
+          "return": [
+            "bool"
+          ]
+        },
+        {
           "name": "is_native_memory_operations_enabled",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [],
+          "return": [
+            "bool"
+          ]
+        },
+        {
+          "name": "is_native_orderbook_enabled",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [],
+          "return": [
+            "bool"
+          ]
+        },
+        {
+          "name": "is_native_position_enabled",
           "visibility": "public",
           "is_entry": false,
           "is_view": false,
@@ -14000,6 +14594,17 @@
         },
         {
           "name": "is_storage_slot_natives_enabled",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [],
+          "return": [
+            "bool"
+          ]
+        },
+        {
+          "name": "is_trading_native_enabled",
           "visibility": "public",
           "is_entry": false,
           "is_view": false,
@@ -15598,6 +16203,17 @@
           "name": "destroy_mint_cap",
           "visibility": "friend",
           "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [
+            "&signer"
+          ],
+          "return": []
+        },
+        {
+          "name": "upgrade_supply",
+          "visibility": "private",
+          "is_entry": true,
           "is_view": false,
           "generic_type_params": [],
           "params": [
@@ -18453,6 +19069,34 @@
           ]
         },
         {
+          "name": "get",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": [
+                "copy",
+                "drop",
+                "store"
+              ]
+            },
+            {
+              "constraints": [
+                "copy",
+                "store"
+              ]
+            }
+          ],
+          "params": [
+            "&0x1::ordered_map::OrderedMap<T0, T1>",
+            "&T0"
+          ],
+          "return": [
+            "0x1::option::Option<T1>"
+          ]
+        },
+        {
           "name": "add_all",
           "visibility": "public",
           "is_entry": false,
@@ -18575,34 +19219,6 @@
           "return": [
             "&T0",
             "&T1"
-          ]
-        },
-        {
-          "name": "get",
-          "visibility": "public",
-          "is_entry": false,
-          "is_view": false,
-          "generic_type_params": [
-            {
-              "constraints": [
-                "copy",
-                "drop",
-                "store"
-              ]
-            },
-            {
-              "constraints": [
-                "copy",
-                "store"
-              ]
-            }
-          ],
-          "params": [
-            "&0x1::ordered_map::OrderedMap<T0, T1>",
-            "&T0"
-          ],
-          "return": [
-            "0x1::option::Option<T1>"
           ]
         },
         {
@@ -23056,6 +23672,19 @@
           ]
         },
         {
+          "name": "mint_to_fungible_store_for_gas",
+          "visibility": "friend",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [
+            "&0x1::fungible_asset::MintRef",
+            "address",
+            "u64"
+          ],
+          "return": []
+        },
+        {
           "name": "register_apt",
           "visibility": "friend",
           "is_entry": false,
@@ -23553,7 +24182,6 @@
       "address": "0x1",
       "name": "create_signer",
       "friends": [
-        "0x1::permissioned_signer",
         "0x1::account",
         "0x1::object",
         "0x1::account_abstraction",
@@ -23562,6 +24190,7 @@
         "0x1::aptos_account",
         "0x1::stake",
         "0x1::reconfiguration_with_dkg",
+        "0x1::init",
         "0x1::transaction_validation",
         "0x1::genesis",
         "0x1::multisig_account"
@@ -24101,6 +24730,23 @@
           ],
           "return": [
             "bool"
+          ]
+        },
+        {
+          "name": "load_function_value",
+          "visibility": "friend",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": []
+            }
+          ],
+          "params": [
+            "&0x1::function_info::FunctionInfo"
+          ],
+          "return": [
+            "T0"
           ]
         },
         {
@@ -25250,30 +25896,6 @@
           ]
         },
         {
-          "name": "merge",
-          "visibility": "public",
-          "is_entry": false,
-          "is_view": false,
-          "generic_type_params": [],
-          "params": [
-            "&mut 0x1::fungible_asset::FungibleAsset",
-            "0x1::fungible_asset::FungibleAsset"
-          ],
-          "return": []
-        },
-        {
-          "name": "revoke_permission",
-          "visibility": "public",
-          "is_entry": false,
-          "is_view": false,
-          "generic_type_params": [],
-          "params": [
-            "&signer",
-            "0x1::object::Object<0x1::fungible_asset::Metadata>"
-          ],
-          "return": []
-        },
-        {
           "name": "burn",
           "visibility": "public",
           "is_entry": false,
@@ -25541,6 +26163,25 @@
           ]
         },
         {
+          "name": "balance_snapshot",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": [
+                "key"
+              ]
+            }
+          ],
+          "params": [
+            "0x1::object::Object<T0>"
+          ],
+          "return": [
+            "0x1::aggregator_v2::AggregatorSnapshot<u64>"
+          ]
+        },
+        {
           "name": "balance_with_ref",
           "visibility": "public",
           "is_entry": false,
@@ -25794,6 +26435,19 @@
           ]
         },
         {
+          "name": "generate_mint_copy_ref",
+          "visibility": "friend",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [
+            "&0x1::fungible_asset::MintRef"
+          ],
+          "return": [
+            "0x1::fungible_asset::MintRef"
+          ]
+        },
+        {
           "name": "generate_mint_ref",
           "visibility": "public",
           "is_entry": false,
@@ -25844,20 +26498,6 @@
           "return": [
             "0x1::fungible_asset::RawSupplyRef"
           ]
-        },
-        {
-          "name": "grant_permission_by_address",
-          "visibility": "friend",
-          "is_entry": false,
-          "is_view": false,
-          "generic_type_params": [],
-          "params": [
-            "&signer",
-            "&signer",
-            "address",
-            "u64"
-          ],
-          "return": []
         },
         {
           "name": "grant_permission_by_store",
@@ -25927,6 +26567,25 @@
           ]
         },
         {
+          "name": "is_concurrent",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": true,
+          "generic_type_params": [
+            {
+              "constraints": [
+                "key"
+              ]
+            }
+          ],
+          "params": [
+            "0x1::object::Object<T0>"
+          ],
+          "return": [
+            "bool"
+          ]
+        },
+        {
           "name": "is_frozen",
           "visibility": "public",
           "is_entry": false,
@@ -25982,6 +26641,18 @@
           "return": [
             "0x1::option::Option<u128>"
           ]
+        },
+        {
+          "name": "merge",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [
+            "&mut 0x1::fungible_asset::FungibleAsset",
+            "0x1::fungible_asset::FungibleAsset"
+          ],
+          "return": []
         },
         {
           "name": "metadata_from_asset",
@@ -26086,19 +26757,6 @@
           ]
         },
         {
-          "name": "refill_permission",
-          "visibility": "friend",
-          "is_entry": false,
-          "is_view": false,
-          "generic_type_params": [],
-          "params": [
-            "&signer",
-            "u64",
-            "address"
-          ],
-          "return": []
-        },
-        {
           "name": "register_derive_supply_dispatch_function",
           "visibility": "friend",
           "is_entry": false,
@@ -26132,6 +26790,18 @@
           "generic_type_params": [],
           "params": [
             "&0x1::object::DeleteRef"
+          ],
+          "return": []
+        },
+        {
+          "name": "revoke_permission",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [
+            "&signer",
+            "0x1::object::Object<0x1::fungible_asset::Metadata>"
           ],
           "return": []
         },
@@ -26362,38 +27032,6 @@
           "return": [
             "0x1::option::Option<0x1::function_info::FunctionInfo>"
           ]
-        },
-        {
-          "name": "withdraw_permission_check",
-          "visibility": "friend",
-          "is_entry": false,
-          "is_view": false,
-          "generic_type_params": [
-            {
-              "constraints": [
-                "key"
-              ]
-            }
-          ],
-          "params": [
-            "&signer",
-            "0x1::object::Object<T0>",
-            "u64"
-          ],
-          "return": []
-        },
-        {
-          "name": "withdraw_permission_check_by_address",
-          "visibility": "friend",
-          "is_entry": false,
-          "is_view": false,
-          "generic_type_params": [],
-          "params": [
-            "&signer",
-            "address",
-            "u64"
-          ],
-          "return": []
         },
         {
           "name": "withdraw_sanity_check",
@@ -27567,27 +28205,32 @@
           ]
         },
         {
-          "name": "allocate_spare_slots",
+          "name": "get",
           "visibility": "public",
           "is_entry": false,
           "is_view": false,
           "generic_type_params": [
             {
               "constraints": [
+                "copy",
+                "drop",
                 "store"
               ]
             },
             {
               "constraints": [
+                "copy",
                 "store"
               ]
             }
           ],
           "params": [
-            "&mut 0x1::big_ordered_map::BigOrderedMap<T0, T1>",
-            "u64"
+            "&0x1::big_ordered_map::BigOrderedMap<T0, T1>",
+            "&T0"
           ],
-          "return": []
+          "return": [
+            "0x1::option::Option<T1>"
+          ]
         },
         {
           "name": "add_all",
@@ -27693,34 +28336,6 @@
           "return": [
             "T0",
             "&T1"
-          ]
-        },
-        {
-          "name": "get",
-          "visibility": "public",
-          "is_entry": false,
-          "is_view": false,
-          "generic_type_params": [
-            {
-              "constraints": [
-                "copy",
-                "drop",
-                "store"
-              ]
-            },
-            {
-              "constraints": [
-                "copy",
-                "store"
-              ]
-            }
-          ],
-          "params": [
-            "&0x1::big_ordered_map::BigOrderedMap<T0, T1>",
-            "&T0"
-          ],
-          "return": [
-            "0x1::option::Option<T1>"
           ]
         },
         {
@@ -28160,6 +28775,29 @@
           "return": [
             "0x1::option::Option<T1>"
           ]
+        },
+        {
+          "name": "allocate_spare_slots",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": [
+                "store"
+              ]
+            },
+            {
+              "constraints": [
+                "store"
+              ]
+            }
+          ],
+          "params": [
+            "&mut 0x1::big_ordered_map::BigOrderedMap<T0, T1>",
+            "u64"
+          ],
+          "return": []
         },
         {
           "name": "back_key",
@@ -30756,6 +31394,17 @@
           "return": []
         },
         {
+          "name": "convert_to_aptos_fa_mint_ref",
+          "visibility": "public",
+          "is_entry": true,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [
+            "&signer"
+          ],
+          "return": []
+        },
+        {
           "name": "emit_fee_statement",
           "visibility": "friend",
           "is_entry": false,
@@ -30892,6 +31541,23 @@
           "variants": []
         },
         {
+          "name": "AptosFAMintCapabilities",
+          "is_native": false,
+          "is_event": false,
+          "is_enum": false,
+          "abilities": [
+            "key"
+          ],
+          "generic_type_params": [],
+          "fields": [
+            {
+              "name": "mint_ref",
+              "type": "0x1::fungible_asset::MintRef"
+            }
+          ],
+          "variants": []
+        },
+        {
           "name": "CollectedFeesPerBlock",
           "is_native": false,
           "is_event": false,
@@ -30972,6 +31638,20 @@
           "return": []
         },
         {
+          "name": "resolve",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [
+            "u64",
+            "address"
+          ],
+          "return": [
+            "signer"
+          ]
+        },
+        {
           "name": "create_proposal",
           "visibility": "public",
           "is_entry": true,
@@ -31001,20 +31681,6 @@
             "bool"
           ],
           "return": []
-        },
-        {
-          "name": "resolve",
-          "visibility": "public",
-          "is_entry": false,
-          "is_view": false,
-          "generic_type_params": [],
-          "params": [
-            "u64",
-            "address"
-          ],
-          "return": [
-            "signer"
-          ]
         },
         {
           "name": "vote",
@@ -35287,17 +35953,6 @@
           "return": []
         },
         {
-          "name": "current",
-          "visibility": "public",
-          "is_entry": false,
-          "is_view": false,
-          "generic_type_params": [],
-          "params": [],
-          "return": [
-            "0x1::chunky_dkg_config::ChunkyDKGConfig"
-          ]
-        },
-        {
           "name": "initialize",
           "visibility": "public",
           "is_entry": false,
@@ -35308,6 +35963,17 @@
             "0x1::chunky_dkg_config::ChunkyDKGConfig"
           ],
           "return": []
+        },
+        {
+          "name": "current",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [],
+          "return": [
+            "0x1::chunky_dkg_config::ChunkyDKGConfig"
+          ]
         },
         {
           "name": "set_for_next_epoch",
@@ -35597,17 +36263,6 @@
           "return": []
         },
         {
-          "name": "current",
-          "visibility": "public",
-          "is_entry": false,
-          "is_view": false,
-          "generic_type_params": [],
-          "params": [],
-          "return": [
-            "0x1::randomness_config::RandomnessConfig"
-          ]
-        },
-        {
           "name": "initialize",
           "visibility": "public",
           "is_entry": false,
@@ -35618,6 +36273,17 @@
             "0x1::randomness_config::RandomnessConfig"
           ],
           "return": []
+        },
+        {
+          "name": "current",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [],
+          "return": [
+            "0x1::randomness_config::RandomnessConfig"
+          ]
         },
         {
           "name": "set_for_next_epoch",
@@ -38313,20 +38979,7 @@
     "abi": {
       "address": "0x1",
       "name": "permissioned_signer",
-      "friends": [
-        "0x1::account",
-        "0x1::object",
-        "0x1::fungible_asset",
-        "0x1::voting",
-        "0x1::stake",
-        "0x1::aptos_governance",
-        "0x1::code",
-        "0x1::delegation_pool",
-        "0x1::vesting",
-        "0x1::transaction_validation",
-        "0x1::permissioned_delegation",
-        "0x1::staking_proxy"
-      ],
+      "friends": [],
       "exposed_functions": [
         {
           "name": "address_of",
@@ -38355,150 +39008,6 @@
           ]
         },
         {
-          "name": "assert_master_signer",
-          "visibility": "friend",
-          "is_entry": false,
-          "is_view": false,
-          "generic_type_params": [],
-          "params": [
-            "&signer"
-          ],
-          "return": []
-        },
-        {
-          "name": "authorize_increase",
-          "visibility": "friend",
-          "is_entry": false,
-          "is_view": false,
-          "generic_type_params": [
-            {
-              "constraints": [
-                "copy",
-                "drop",
-                "store"
-              ]
-            }
-          ],
-          "params": [
-            "&signer",
-            "&signer",
-            "u256",
-            "T0"
-          ],
-          "return": []
-        },
-        {
-          "name": "capacity",
-          "visibility": "friend",
-          "is_entry": false,
-          "is_view": false,
-          "generic_type_params": [
-            {
-              "constraints": [
-                "copy",
-                "drop",
-                "store"
-              ]
-            }
-          ],
-          "params": [
-            "&signer",
-            "T0"
-          ],
-          "return": [
-            "0x1::option::Option<u256>"
-          ]
-        },
-        {
-          "name": "authorize_unlimited",
-          "visibility": "friend",
-          "is_entry": false,
-          "is_view": false,
-          "generic_type_params": [
-            {
-              "constraints": [
-                "copy",
-                "drop",
-                "store"
-              ]
-            }
-          ],
-          "params": [
-            "&signer",
-            "&signer",
-            "T0"
-          ],
-          "return": []
-        },
-        {
-          "name": "check_permission_capacity_above",
-          "visibility": "friend",
-          "is_entry": false,
-          "is_view": false,
-          "generic_type_params": [
-            {
-              "constraints": [
-                "copy",
-                "drop",
-                "store"
-              ]
-            }
-          ],
-          "params": [
-            "&signer",
-            "u256",
-            "T0"
-          ],
-          "return": [
-            "bool"
-          ]
-        },
-        {
-          "name": "check_permission_consume",
-          "visibility": "friend",
-          "is_entry": false,
-          "is_view": false,
-          "generic_type_params": [
-            {
-              "constraints": [
-                "copy",
-                "drop",
-                "store"
-              ]
-            }
-          ],
-          "params": [
-            "&signer",
-            "u256",
-            "T0"
-          ],
-          "return": [
-            "bool"
-          ]
-        },
-        {
-          "name": "check_permission_exists",
-          "visibility": "friend",
-          "is_entry": false,
-          "is_view": false,
-          "generic_type_params": [
-            {
-              "constraints": [
-                "copy",
-                "drop",
-                "store"
-              ]
-            }
-          ],
-          "params": [
-            "&signer",
-            "T0"
-          ],
-          "return": [
-            "bool"
-          ]
-        },
-        {
           "name": "create_permissioned_handle",
           "visibility": "public",
           "is_entry": false,
@@ -38509,20 +39018,6 @@
           ],
           "return": [
             "0x1::permissioned_signer::PermissionedHandle"
-          ]
-        },
-        {
-          "name": "create_storable_permissioned_handle",
-          "visibility": "friend",
-          "is_entry": false,
-          "is_view": false,
-          "generic_type_params": [],
-          "params": [
-            "&signer",
-            "u64"
-          ],
-          "return": [
-            "0x1::permissioned_signer::StorablePermissionedHandle"
           ]
         },
         {
@@ -38537,17 +39032,6 @@
           "return": []
         },
         {
-          "name": "destroy_storable_permissioned_handle",
-          "visibility": "friend",
-          "is_entry": false,
-          "is_view": false,
-          "generic_type_params": [],
-          "params": [
-            "0x1::permissioned_signer::StorablePermissionedHandle"
-          ],
-          "return": []
-        },
-        {
           "name": "grant_revoke_permission",
           "visibility": "public",
           "is_entry": false,
@@ -38556,47 +39040,6 @@
           "params": [
             "&signer",
             "&signer"
-          ],
-          "return": []
-        },
-        {
-          "name": "grant_unlimited_with_permissioned_signer",
-          "visibility": "friend",
-          "is_entry": false,
-          "is_view": false,
-          "generic_type_params": [
-            {
-              "constraints": [
-                "copy",
-                "drop",
-                "store"
-              ]
-            }
-          ],
-          "params": [
-            "&signer",
-            "T0"
-          ],
-          "return": []
-        },
-        {
-          "name": "increase_limit",
-          "visibility": "friend",
-          "is_entry": false,
-          "is_view": false,
-          "generic_type_params": [
-            {
-              "constraints": [
-                "copy",
-                "drop",
-                "store"
-              ]
-            }
-          ],
-          "params": [
-            "&signer",
-            "u256",
-            "T0"
           ],
           "return": []
         },
@@ -38614,19 +39057,6 @@
           ]
         },
         {
-          "name": "permissions_storage_address",
-          "visibility": "friend",
-          "is_entry": false,
-          "is_view": false,
-          "generic_type_params": [],
-          "params": [
-            "&0x1::permissioned_signer::StorablePermissionedHandle"
-          ],
-          "return": [
-            "address"
-          ]
-        },
-        {
           "name": "revoke_all_handles",
           "visibility": "public",
           "is_entry": true,
@@ -38634,26 +39064,6 @@
           "generic_type_params": [],
           "params": [
             "&signer"
-          ],
-          "return": []
-        },
-        {
-          "name": "revoke_permission",
-          "visibility": "friend",
-          "is_entry": false,
-          "is_view": false,
-          "generic_type_params": [
-            {
-              "constraints": [
-                "copy",
-                "drop",
-                "store"
-              ]
-            }
-          ],
-          "params": [
-            "&signer",
-            "T0"
           ],
           "return": []
         },
@@ -38677,19 +39087,6 @@
           "generic_type_params": [],
           "params": [
             "&0x1::permissioned_signer::PermissionedHandle"
-          ],
-          "return": [
-            "signer"
-          ]
-        },
-        {
-          "name": "signer_from_storable_permissioned_handle",
-          "visibility": "friend",
-          "is_entry": false,
-          "is_view": false,
-          "generic_type_params": [],
-          "params": [
-            "&0x1::permissioned_signer::StorablePermissionedHandle"
           ],
           "return": [
             "signer"
@@ -39014,6 +39411,28 @@
         },
         {
           "name": "is_encrypted_txn",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [],
+          "return": [
+            "bool"
+          ]
+        },
+        {
+          "name": "is_multisig_payload_txn",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [],
+          "return": [
+            "bool"
+          ]
+        },
+        {
+          "name": "is_orderless_txn",
           "visibility": "public",
           "is_entry": false,
           "is_view": false,
@@ -41508,6 +41927,18 @@
             "&0x1::fungible_asset::TransferRef",
             "address",
             "bool"
+          ],
+          "return": []
+        },
+        {
+          "name": "upgrade_to_concurrent",
+          "visibility": "public",
+          "is_entry": true,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [
+            "&signer",
+            "0x1::object::Object<0x1::fungible_asset::Metadata>"
           ],
           "return": []
         },
@@ -44143,6 +44574,25 @@
           ],
           "return": [
             "u64"
+          ]
+        },
+        {
+          "name": "derived_balance_snapshot",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [
+            {
+              "constraints": [
+                "key"
+              ]
+            }
+          ],
+          "params": [
+            "0x1::object::Object<T0>"
+          ],
+          "return": [
+            "0x1::aggregator_v2::AggregatorSnapshot<u64>"
           ]
         },
         {
