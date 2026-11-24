@@ -8511,6 +8511,59 @@
         {
           "typeParameters": [
             {
+              "constraints": [
+                1
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "reference": 1,
+              "body": {
+                "typeParameterInstantiation": [
+                  {
+                    "typeParameterInstantiation": [],
+                    "type": 11,
+                    "typeParameter": 0
+                  }
+                ],
+                "type": 9
+              }
+            },
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 6
+              }
+            },
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 6
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "typeParameterInstantiation": [
+                  {
+                    "typeParameterInstantiation": [],
+                    "type": 11,
+                    "typeParameter": 0
+                  }
+                ],
+                "type": 9
+              }
+            }
+          ],
+          "name": "copy_range",
+          "visibility": 2,
+          "isEntry": false
+        },
+        {
+          "typeParameters": [
+            {
               "constraints": []
             }
           ],
@@ -8723,6 +8776,46 @@
         {
           "typeParameters": [
             {
+              "constraints": [
+                2
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "reference": 2,
+              "body": {
+                "typeParameterInstantiation": [
+                  {
+                    "typeParameterInstantiation": [],
+                    "type": 11,
+                    "typeParameter": 0
+                  }
+                ],
+                "type": 9
+              }
+            },
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 6
+              }
+            },
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 6
+              }
+            }
+          ],
+          "returns": [],
+          "name": "keep_range",
+          "visibility": 2,
+          "isEntry": false
+        },
+        {
+          "typeParameters": [
+            {
               "constraints": []
             }
           ],
@@ -8857,6 +8950,120 @@
             }
           ],
           "name": "remove",
+          "visibility": 2,
+          "isEntry": false
+        },
+        {
+          "typeParameters": [
+            {
+              "constraints": []
+            }
+          ],
+          "parameters": [
+            {
+              "reference": 2,
+              "body": {
+                "typeParameterInstantiation": [
+                  {
+                    "typeParameterInstantiation": [],
+                    "type": 11,
+                    "typeParameter": 0
+                  }
+                ],
+                "type": 9
+              }
+            },
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 6
+              }
+            },
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 6
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "typeParameterInstantiation": [
+                  {
+                    "typeParameterInstantiation": [],
+                    "type": 11,
+                    "typeParameter": 0
+                  }
+                ],
+                "type": 9
+              }
+            }
+          ],
+          "name": "remove_range",
+          "visibility": 2,
+          "isEntry": false
+        },
+        {
+          "typeParameters": [
+            {
+              "constraints": []
+            }
+          ],
+          "parameters": [
+            {
+              "reference": 2,
+              "body": {
+                "typeParameterInstantiation": [
+                  {
+                    "typeParameterInstantiation": [],
+                    "type": 11,
+                    "typeParameter": 0
+                  }
+                ],
+                "type": 9
+              }
+            },
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 6
+              }
+            },
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 6
+              }
+            },
+            {
+              "body": {
+                "typeParameterInstantiation": [
+                  {
+                    "typeParameterInstantiation": [],
+                    "type": 11,
+                    "typeParameter": 0
+                  }
+                ],
+                "type": 9
+              }
+            }
+          ],
+          "returns": [
+            {
+              "body": {
+                "typeParameterInstantiation": [
+                  {
+                    "typeParameterInstantiation": [],
+                    "type": 11,
+                    "typeParameter": 0
+                  }
+                ],
+                "type": 9
+              }
+            }
+          ],
+          "name": "replace_range",
           "visibility": 2,
           "isEntry": false
         },
@@ -9086,6 +9293,40 @@
             }
           ],
           "name": "take",
+          "visibility": 2,
+          "isEntry": false
+        },
+        {
+          "typeParameters": [
+            {
+              "constraints": [
+                2
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "reference": 2,
+              "body": {
+                "typeParameterInstantiation": [
+                  {
+                    "typeParameterInstantiation": [],
+                    "type": 11,
+                    "typeParameter": 0
+                  }
+                ],
+                "type": 9
+              }
+            },
+            {
+              "body": {
+                "typeParameterInstantiation": [],
+                "type": 6
+              }
+            }
+          ],
+          "returns": [],
+          "name": "truncate",
           "visibility": 2,
           "isEntry": false
         }

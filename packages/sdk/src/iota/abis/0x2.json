@@ -20905,7 +20905,12 @@
     "fileFormatVersion": 6,
     "address": "0x2",
     "name": "protocol_config",
-    "friends": [],
+    "friends": [
+      {
+        "address": "0x2",
+        "name": "account"
+      }
+    ],
     "structs": {},
     "exposedFunctions": {
       "get_attr": {

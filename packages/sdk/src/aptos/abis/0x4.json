@@ -737,6 +737,21 @@
           "return": []
         },
         {
+          "name": "create",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [
+            "u64",
+            "u64",
+            "address"
+          ],
+          "return": [
+            "0x4::royalty::Royalty"
+          ]
+        },
+        {
           "name": "get",
           "visibility": "public",
           "is_entry": false,
@@ -754,6 +769,30 @@
           "return": [
             "0x1::option::Option<0x4::royalty::Royalty>"
           ]
+        },
+        {
+          "name": "exists_at",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [
+            "address"
+          ],
+          "return": [
+            "bool"
+          ]
+        },
+        {
+          "name": "delete",
+          "visibility": "friend",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [
+            "address"
+          ],
+          "return": []
         },
         {
           "name": "numerator",
@@ -780,45 +819,6 @@
           "return": [
             "u64"
           ]
-        },
-        {
-          "name": "create",
-          "visibility": "public",
-          "is_entry": false,
-          "is_view": false,
-          "generic_type_params": [],
-          "params": [
-            "u64",
-            "u64",
-            "address"
-          ],
-          "return": [
-            "0x4::royalty::Royalty"
-          ]
-        },
-        {
-          "name": "exists_at",
-          "visibility": "public",
-          "is_entry": false,
-          "is_view": false,
-          "generic_type_params": [],
-          "params": [
-            "address"
-          ],
-          "return": [
-            "bool"
-          ]
-        },
-        {
-          "name": "delete",
-          "visibility": "friend",
-          "is_entry": false,
-          "is_view": false,
-          "generic_type_params": [],
-          "params": [
-            "address"
-          ],
-          "return": []
         },
         {
           "name": "payee_address",

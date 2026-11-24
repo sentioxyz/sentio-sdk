@@ -4727,7 +4727,8 @@
               "name": "StakedIota",
               "typeArguments": []
             }
-          }
+          },
+          "U64"
         ],
         "return": [
           "U64",

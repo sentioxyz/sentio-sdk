@@ -6,18 +6,6 @@
       "friends": [],
       "exposed_functions": [
         {
-          "name": "merge",
-          "visibility": "public",
-          "is_entry": false,
-          "is_view": false,
-          "generic_type_params": [],
-          "params": [
-            "&mut 0x3::token::Token",
-            "0x3::token::Token"
-          ],
-          "return": []
-        },
-        {
           "name": "burn",
           "visibility": "public",
           "is_entry": true,
@@ -44,6 +32,18 @@
             "0x3::token::TokenId",
             "address",
             "u64"
+          ],
+          "return": []
+        },
+        {
+          "name": "merge",
+          "visibility": "public",
+          "is_entry": false,
+          "is_view": false,
+          "generic_type_params": [],
+          "params": [
+            "&mut 0x3::token::Token",
+            "0x3::token::Token"
           ],
           "return": []
         },

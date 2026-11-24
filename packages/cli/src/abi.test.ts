@@ -4,6 +4,7 @@ import os from 'os'
 import path from 'path'
 import {
   getABI,
+  fetchSuiAbi,
   collectLegacySuiAbis,
   convertLegacySuiAbis,
   isLegacyNormalizedModules,
@@ -55,6 +56,49 @@ describe('Test ABI get', () => {
       undefined
     )
     expect(abi.abi !== undefined).eq(true)
+  })
+})
+
+// Offline: runs in CI too. Guards the gRPC download path that replaced the
+// JSON-RPC client removed in @mysten/sui 3 (whose leftover stub threw at
+// construction, silently sending Sui downloads down the Ethereum path).
+describe('Test Sui ABI download over gRPC', () => {
+  const grpcModule = { name: 'clob', datatypes: [], functions: [{ name: 'f', visibility: 2, isEntry: false }] }
+
+  function fakeClient(pkg: any) {
+    const calls: any[] = []
+    const client: any = {
+      movePackageService: {
+        getPackage: async (req: any) => {
+          calls.push(req)
+          return { response: { package: pkg } }
+        }
+      }
+    }
+    return { client, calls }
+  }
+
+  test('fetches exactly the given package id and returns the codegen ABI shape', async () => {
+    const { client, calls } = fakeClient({ storageId: '0x' + 'de'.padStart(64, '0'), modules: [grpcModule] })
+    const abi = await fetchSuiAbi(client, '0xdee9')
+    expect(calls).deep.eq([{ packageId: '0xdee9', selector: { oneofKind: undefined } }])
+    // Caller-supplied short-form address is kept, not the long-form storage id.
+    expect(abi).deep.eq([{ address: '0xdee9', module: grpcModule }])
+  })
+
+  test('throws when no package is returned', async () => {
+    const { client } = fakeClient(undefined)
+    let err: any
+    await fetchSuiAbi(client, '0xdee9').catch((e) => (err = e))
+    expect(String(err?.message)).contains('No package returned for 0xdee9')
+  })
+
+  test('the Sui clients getABI builds can be constructed', async () => {
+    const { SuiGrpcClient } = await import('@mysten/sui/grpc')
+    for (const network of ['mainnet', 'testnet'] as const) {
+      const client = new SuiGrpcClient({ baseUrl: `https://fullnode.${network}.sui.io`, network })
+      expect(typeof client.movePackageService.getPackage).eq('function')
+    }
   })
 })
 
