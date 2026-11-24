@@ -31,7 +31,7 @@ export default defineConfig([
     languageOptions: {
       parserOptions: {
         projectService: {
-          allowDefaultProject: ['*.mjs', '*.js', 'packages/cli/bin.mjs']
+          allowDefaultProject: ['*.mjs', '*.js', 'packages/cli/bin.mjs', 'scripts/fuels-node26-fork/*.mjs']
         }
       },
       ecmaVersion: 'latest',
