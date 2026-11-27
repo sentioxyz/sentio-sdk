@@ -315,7 +315,7 @@ ${constructorInterface}
 ${c.annotations.join('\n')}
 export class ${c.name} ${c.parent ? `extends ${c.parent}` : ''} ${c.interfaces.length > 0 ? `implements ${c.interfaces.join(', ')}` : ''} {
 ${c.fields
-  .map((f) => `${f.annotations.map((a) => `\n\t${a}`).join('')}\n\t${f.name}${f.optional ? '?' : ''}: ${f.type}`)
+  .map((f) => `${f.annotations.map((a) => `\n\t${a}`).join('')}\n\t${f.name}${f.optional ? '?' : '!'}: ${f.type}`)
   .join('\n')}
   ${isEntity ? `constructor(data: Partial<${c.name}ConstructorInput>) {super()}` : ''}
   ${(c.methods ?? []).map(genMethod).join('\n')}

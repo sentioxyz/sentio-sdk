@@ -24,7 +24,7 @@ import { TransactionFilter, accountAddressString } from '../move/index.js'
 import { ConnectError, Code } from '@connectrpc/connect'
 import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 
-class ObjectHandler<HandlerType> {
+interface ObjectHandler<HandlerType> {
   type?: string
   checkpointInterval?: HandleInterval
   timeIntervalInMinutes?: HandleInterval
@@ -229,7 +229,7 @@ export abstract class IotaObjectOrAddressProcessorTemplate<
   }
 }
 
-class AddressTransactionHandler {
+interface AddressTransactionHandler {
   handler: (transaction: IotaTransactionBlockResponse, ctx: IotaContext) => void
   filter?: TransactionFilter
   fetchConfig?: Partial<MoveFetchConfig>

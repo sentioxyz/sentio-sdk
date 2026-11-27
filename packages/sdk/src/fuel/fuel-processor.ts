@@ -39,7 +39,7 @@ export class FuelProcessor<TContract extends Contract> implements FuelBaseProces
   blockHandlers: BlockHandler[] = []
   receiptHandlers: ReceiptHandler[] = []
 
-  private provider: Provider
+  private provider!: Provider
 
   static bind(config: FuelProcessorConfig): FuelProcessor<any> {
     const processor = new FuelProcessor(config)

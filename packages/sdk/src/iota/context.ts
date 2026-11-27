@@ -17,7 +17,7 @@ export class IotaContext extends MoveContext<IotaNetwork, IotaMoveNormalizedModu
   moduleName: string
   timestamp: Date
   checkpoint: bigint
-  transaction: IotaTransactionBlockResponse
+  transaction!: IotaTransactionBlockResponse
   eventIndex: number
   coder: MoveCoder
 

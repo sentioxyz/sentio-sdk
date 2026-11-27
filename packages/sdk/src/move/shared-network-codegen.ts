@@ -17,7 +17,7 @@ export abstract class SharedNetworkCodegen<NetworkType, ModuleTypes, StructType>
   StructType
 > {
   // readonly ALL_NETWORKS: string[]
-  readonly NETWORK: object
+  readonly NETWORK!: object
   readonly networkIdToKey = new Map<NetworkType, string>()
 
   network: NetworkType

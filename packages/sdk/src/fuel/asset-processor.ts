@@ -16,7 +16,7 @@ import { getHandlerName, proxyProcessor } from '../utils/metrics.js'
 export class FuelAssetProcessor implements FuelBaseProcessor<FuelAssetProcessorConfig> {
   txHandlers: CallHandler<Data_FuelTransaction>[] = []
   blockHandlers = []
-  private provider: Provider
+  private provider!: Provider
 
   static bind(config: FuelAssetProcessorConfig): FuelAssetProcessor {
     const processor = new FuelAssetProcessor(config)

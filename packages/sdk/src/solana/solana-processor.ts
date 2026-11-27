@@ -53,7 +53,7 @@ export class SolanaBaseProcessor {
   network: SolanaChainId
   processInnerInstruction: boolean
   config: IndexConfigure = { startSlot: 0n }
-  instructionCoder: InstructionCoder
+  instructionCoder?: InstructionCoder
 
   decodeInstruction(rawInstruction: string): Instruction | null {
     if (this.instructionCoder) {
@@ -62,7 +62,7 @@ export class SolanaBaseProcessor {
     return null
   }
 
-  fromParsedInstruction: (instruction: { type: string; info: any }) => Instruction | null
+  fromParsedInstruction?: (instruction: { type: string; info: any }) => Instruction | null
 
   constructor(options: SolanaBindOptions) {
     this.address = options.address
