@@ -5,6 +5,7 @@ import {
   buildEndpointInvocation,
   parseEndpointArgSchema,
   parseEndpointArgValues,
+  resolveEndpointVisibility,
   toRichValueTemplate
 } from './endpoint.js'
 
@@ -84,5 +85,14 @@ describe('endpoint command helpers', () => {
     )
 
     expect(invocation.method).eq('POST')
+  })
+
+  test('resolveEndpointVisibility defaults to private and needs --public to expose', () => {
+    expect(resolveEndpointVisibility({})).eq(false)
+    expect(resolveEndpointVisibility({ private: true })).eq(false)
+    expect(resolveEndpointVisibility({ public: true })).eq(true)
+    expect(() => resolveEndpointVisibility({ public: true, private: true })).to.throw(
+      'Use only one of --public and --private.'
+    )
   })
 })

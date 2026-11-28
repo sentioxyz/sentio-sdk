@@ -21,6 +21,7 @@ interface EndpointCreateOptions extends EndpointOptions {
   args?: string
   endpointName?: string
   slug?: string
+  public?: boolean
   private?: boolean
   version?: number
 }
@@ -96,7 +97,8 @@ function createEndpointCreateCommand() {
     .option('--args <json>', 'JSON object of SQL parameter types, for example {"a":"string","b":"int"}')
     .option('--endpoint-name <name>', 'Endpoint name')
     .option('--slug <slug>', 'Endpoint slug')
-    .option('--private', 'Create a private endpoint')
+    .option('--public', 'Make the endpoint callable by anyone, without access to the project (default: private)')
+    .option('--private', 'Create a private endpoint (the default; kept for compatibility)')
     .option('--version <version>', 'Processor version', parseInteger)
     .addHelpText(
       'after',
@@ -104,7 +106,7 @@ function createEndpointCreateCommand() {
 
 Examples:
   $ sentio endpoint create --project sentio/coinbase --query "select * from transfer where amount > \${min_amount}" --args '{"min_amount":"int"}'
-  $ sentio endpoint create --project sentio/coinbase --query "select now()" --endpoint-name "Now" --slug now
+  $ sentio endpoint create --project sentio/coinbase --query "select now()" --endpoint-name "Now" --slug now --public
 `
     )
     .action(async (options, command) => {
@@ -187,6 +189,7 @@ async function runEndpointCreate(options: EndpointCreateOptions) {
   if (!options.query) {
     throw new CliError('SQL query is required. Use --query <sql>.')
   }
+  const isPublic = resolveEndpointVisibility(options)
   const context = createApiContext(options)
   const project = await resolveProjectRef(options, context, { ownerSlug: true, projectId: true })
   const argSchema = parseEndpointArgSchema(options.args)
@@ -224,7 +227,7 @@ async function runEndpointCreate(options: EndpointCreateOptions) {
     name: endpointName,
     slug,
     sqlQueryId,
-    isPublic: options.private ? false : true,
+    isPublic,
     enabled: true
   })
 
@@ -235,7 +238,7 @@ async function runEndpointCreate(options: EndpointCreateOptions) {
     owner: project.owner,
     projectSlug: project.slug,
     sqlQueryId,
-    isPublic: options.private ? false : true,
+    isPublic,
     enabled: true
   }
 
@@ -644,6 +647,14 @@ function normalizeEndpointMethod(method?: string) {
 
 function shouldIncludeCurlParameter(param: EndpointParameter) {
   return param.required === true
+}
+
+// Endpoints are private unless --public is given, so exposing a project's data is always an explicit choice.
+export function resolveEndpointVisibility(options: { public?: boolean; private?: boolean }) {
+  if (options.public && options.private) {
+    throw new CliError('Use only one of --public and --private.')
+  }
+  return options.public === true
 }
 
 function parseInteger(value: string) {
